@@ -1,0 +1,55 @@
+===========
+OrganizeKit
+===========
+
+
+:Maintainer: Yen-Ju Chen <yjchenx gmail >
+:License: MIT Licence.
+:Version: 0.1
+
+OrganizeKit provides a common storage facility for objects with properties,
+such as contact information, playlist, bookmark, etc.
+These objects have defined structure (property-value relationship) 
+which can be handled better than general property list.
+But values of these properties are too flexible to be stored in database,
+for example, a contact information may have multipe home phone numbers.
+Records can be grouped and groups can have groups inside.
+AddressBook framework from Apple provides a good machenism of handling 
+these kind of objects.  OrganizeKit aims to provide a general storage 
+facility based on similar interface.
+
+It also includes a subset of Blocks framework[1] to build applications
+in plugin architecture.
+
+Note: OrganizeKit is written from scratch. 
+It only try to mimic the API of AddressBook.
+It is supposedly to be the next version of CollectionKit.
+
+[1] http://www.hogbaysoftware.com/project/blocks
+
+Developer
+---------
+
+* OrganizeKit provides three basic unit:
+  OKObject, OKGroup and OKCollection.
+
+* OKObject is the basic unit with arbitrary property.
+  It provides -setValue:forKey: and -valueForKey:. 
+  Besides basic data type provided by GNUstep, OKMultiValue is allowed.
+
+* OKGroup is a subclass of OKObject and can contain objects or subgroups.
+  It has a hierarchical structure where any object must belong to one
+  or more groups (subgroups).
+
+* OKCollection can contain objects and groups.
+  Objects may not belong to any group.
+
+* Search is handled with NSPredicate instead of something simliar to 
+  ABSearchElement to reduce redundancy.
+
+* Each item has a unique ID (UUID) in the collection.
+  It is generated automatically and should not change
+  unless collision is avoid.
+
+* Each unit provide property list to be stored.
+  
