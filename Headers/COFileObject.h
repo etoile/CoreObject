@@ -6,13 +6,13 @@
 
 */
 
-#import "OKObject.h"
+#import "COObject.h"
 
-extern NSString *kOKFilePathProperty; // kOKStringProperty
-extern NSString *kOKFileCreationDateProperty; // kOKDateProperty
-extern NSString *kOKFileModificationDateProperty; // kOKDateProperty
+extern NSString *kCOFilePathProperty; // kCOStringProperty
+extern NSString *kCOFileCreationDateProperty; // kCODateProperty
+extern NSString *kCOFileModificationDateProperty; // kCODateProperty
 
-@interface OKFileObject: OKObject
+@interface COFileObject: COObject
 {
 	/* Cache */
 	NSFileManager *_fm;

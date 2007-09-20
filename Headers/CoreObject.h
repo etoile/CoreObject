@@ -9,13 +9,13 @@
 
 #import "GNUstep.h"
 
-#import "OKObject.h"
-#import "OKGroup.h"
-#import "OKCollection.h"
-#import "OKMultiValue.h"
-#import "OKUUID.h"
-#import "OKPropertyType.h"
-#import "OKFileObject.h"
+#import "COObject.h"
+#import "COGroup.h"
+#import "COCollection.h"
+#import "COMultiValue.h"
+#import "COUUID.h"
+#import "COPropertyType.h"
+#import "COFileObject.h"
 
 #import "BKExtension.h"
 #import "BKExtensionPoint.h"

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
-#import "OKCollection.h"
+#import "COCollection.h"
 #import "GNUstep.h"
 
 @interface TestCollection: NSObject <UKTest>
@@ -24,13 +24,13 @@
 @implementation TestCollection
 - (void) testBasic
 {
-	OKFileObject *fo1 = [[OKFileObject alloc] initWithPath: file1];
+	COFileObject *fo1 = [[COFileObject alloc] initWithPath: file1];
 	UKStringsEqual(@"TestFile1.txt", [[fo1 path] lastPathComponent]);
-	OKFileObject *fo2 = [[OKFileObject alloc] initWithPath: file2];
+	COFileObject *fo2 = [[COFileObject alloc] initWithPath: file2];
 	UKStringsEqual(@"TestFile2.txt", [[fo2 path] lastPathComponent]);
 
 	NSString *p = [testPath stringByAppendingPathComponent: @"test.collection"];
-	OKCollection *collection = [[OKCollection alloc] initWithLocation: p];
+	COCollection *collection = [[COCollection alloc] initWithLocation: p];
 	UKNotNil(collection);
 	BOOL isDir = NO;
 	UKTrue([fm fileExistsAtPath: p isDirectory: &isDir]);
@@ -67,9 +67,9 @@
 	NSLog(@"Create %@", testPath);
 	
 	ASSIGN(file1, [testPath stringByAppendingPathComponent: @"TestFile1.txt"]);
-	[@"This is a test file for OKCollection" writeToFile: file1 atomically: YES];
+	[@"This is a test file for COCollection" writeToFile: file1 atomically: YES];
 	ASSIGN(file2, [testPath stringByAppendingPathComponent: @"TestFile2.txt"]);
-	[@"This is another test file for OKCollection" writeToFile: file2 atomically: YES];
+	[@"This is another test file for COCollection" writeToFile: file2 atomically: YES];
 	return self;
 
 }

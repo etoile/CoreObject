@@ -1,13 +1,13 @@
-===========
-OrganizeKit
-===========
+==========
+CoreObject
+==========
 
 
 :Maintainer: Yen-Ju Chen <yjchenx gmail >
 :License: MIT Licence.
 :Version: 0.1
 
-OrganizeKit provides a common storage facility for objects with properties,
+CoreObject provides a common storage facility for objects with properties,
 such as contact information, playlist, bookmark, etc.
 These objects have defined structure (property-value relationship) 
 which can be handled better than general property list.
@@ -15,33 +15,36 @@ But values of these properties are too flexible to be stored in database,
 for example, a contact information may have multipe home phone numbers.
 Records can be grouped and groups can have groups inside.
 AddressBook framework from Apple provides a good machenism of handling 
-these kind of objects.  OrganizeKit aims to provide a general storage 
+these kind of objects. CoreObject aims to provide a general storage 
 facility based on similar interface.
 
 It also includes a subset of Blocks framework[1] to build applications
 in plugin architecture.
 
-Note: OrganizeKit is written from scratch. 
+Note: CoreObject is written from scratch. 
 It only try to mimic the API of AddressBook.
-It is supposedly to be the next version of CollectionKit.
+CoreObject was initially called OrganizeKit. This framework was supposedly to 
+be the next version of CollectionKit. OrganizeKit became CoreObject when we 
+realized it precisely offers the Name Service layer which had been envisionned
+for CoreObject.
 
 [1] http://www.hogbaysoftware.com/project/blocks
 
 Developer
 ---------
 
-* OrganizeKit provides three basic unit:
-  OKObject, OKGroup and OKCollection.
+* CoreObject provides three basic unit:
+  COObject, COGroup and COCollection.
 
-* OKObject is the basic unit with arbitrary property.
+* COObject is the basic unit with arbitrary property.
   It provides -setValue:forKey: and -valueForKey:. 
-  Besides basic data type provided by GNUstep, OKMultiValue is allowed.
+  Besides basic data type provided by GNUstep, COMultiValue is allowed.
 
-* OKGroup is a subclass of OKObject and can contain objects or subgroups.
+* COGroup is a subclass of COObject and can contain objects or subgroups.
   It has a hierarchical structure where any object must belong to one
   or more groups (subgroups).
 
-* OKCollection can contain objects and groups.
+* COCollection can contain objects and groups.
   Objects may not belong to any group.
 
 * Search is handled with NSPredicate instead of something simliar to 

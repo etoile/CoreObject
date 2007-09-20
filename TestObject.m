@@ -8,12 +8,12 @@
 
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
-#import "OKObject.h"
-#import "OKMultiValue.h"
+#import "COObject.h"
+#import "COMultiValue.h"
 #import "GNUstep.h"
 
 /* For testing subclass */
-@interface SubObject: OKObject
+@interface SubObject: COObject
 @end
 
 @interface TestObject: NSObject <UKTest>
@@ -34,13 +34,13 @@
 - (void) testSubclass
 {
 	SubObject *so = [[SubObject alloc] init];
-	OKMultiValue *mv = [[OKMultiValue alloc] init];
+	COMultiValue *mv = [[COMultiValue alloc] init];
 	[mv addValue: @"Value1" withLabel: @"Label1"];
 	[mv addValue: @"Value2" withLabel: @"Label2"];
 	[mv addValue: @"Value3" withLabel: @"Label3"];
 	UKTrue([so setValue: mv forProperty: @"MultiStrings"]);
 	DESTROY(mv);
-	mv = [[OKMultiValue alloc] init];
+	mv = [[COMultiValue alloc] init];
 	[mv addValue: [NSNumber numberWithInt: 1] withLabel: @"I1"];
 	[mv addValue: [NSNumber numberWithInt: 2] withLabel: @"I2"];
 	[mv addValue: [NSNumber numberWithInt: 3] withLabel: @"I3"];
@@ -58,7 +58,7 @@
 	{
 		NSLog(@"Error: %@ (%@ %@)", error, self, NSStringFromSelector(_cmd));
 	}
-	/* We don't need multable option here. OKMultiValue should handle it. */
+	/* We don't need multable option here. COMultiValue should handle it. */
 	error = nil;
 	NSPropertyListFormat format = 0;
     pl = [NSPropertyListSerialization propertyListFromData: data
@@ -71,10 +71,10 @@
 	{
 		NSLog(@"Error: %@ (%@ %@)", error, self, NSStringFromSelector(_cmd));
 	}
-	id object = [OKObject objectWithPropertyList: pl];
+	id object = [COObject objectWithPropertyList: pl];
 	UKTrue([object isKindOfClass: [SubObject class]]);
-	UKIntsEqual([[object class] typeOfProperty: @"MultiStrings"], kOKMultiStringProperty);
-	UKIntsEqual([[object class] typeOfProperty: @"MultiIntegers"], kOKMultiIntegerProperty);
+	UKIntsEqual([[object class] typeOfProperty: @"MultiStrings"], kCOMultiStringProperty);
+	UKIntsEqual([[object class] typeOfProperty: @"MultiIntegers"], kCOMultiIntegerProperty);
 	mv = [object valueForProperty: @"MultiStrings"];
 	UKStringsEqual(@"Value1", [mv valueAtIndex: 0]);
 	[mv replaceValueAtIndex: 0 withValue: @"NewValue1"];
@@ -84,23 +84,23 @@
 - (void) testPropertyList
 {
 	NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithInt: kOKStringProperty], 
+		[NSNumber numberWithInt: kCOStringProperty], 
 			@"Location",
-		[NSNumber numberWithInt: kOKStringProperty], 
+		[NSNumber numberWithInt: kCOStringProperty], 
 			@"Contant",
-		[NSNumber numberWithInt: kOKRealProperty], 
+		[NSNumber numberWithInt: kCORealProperty], 
 			@"Float",
-		[NSNumber numberWithInt: kOKMultiStringProperty], 
+		[NSNumber numberWithInt: kCOMultiStringProperty], 
 			@"Multiple",
 		nil];
-	[OKObject addPropertiesAndTypes: dict];
+	[COObject addPropertiesAndTypes: dict];
 
-	OKObject *o = [[OKObject alloc] init];
+	COObject *o = [[COObject alloc] init];
 	UKTrue([o setValue: @"Home" forProperty: @"Location"]);
 	UKTrue([o setValue: @"Someone" forProperty: @"Contant"]);
 	UKTrue([o setValue: [NSNumber numberWithFloat: 2.12] 
 	          forProperty: @"Float"]);
-	OKMultiValue *mv = [[OKMultiValue alloc] init];
+	COMultiValue *mv = [[COMultiValue alloc] init];
 	[mv addValue: @"Value1" withLabel: @"Label1"];
 	[mv addValue: @"Value2" withLabel: @"Label2"];
 	[mv addValue: @"Value3" withLabel: @"Label3"];
@@ -126,7 +126,7 @@
 	NSLog(@"Write to file %@", p);
 #endif
 
-	/* We don't need multable option here. OKMultiValue should handle it. */
+	/* We don't need multable option here. COMultiValue should handle it. */
 	error = nil;
 	NSPropertyListFormat format = 0;
     pl = [NSPropertyListSerialization propertyListFromData: data
@@ -140,7 +140,7 @@
 		NSLog(@"Error: %@ (%@ %@)", error, self, NSStringFromSelector(_cmd));
 	}
 
-	OKObject *o1 = [[OKObject alloc] initWithPropertyList: pl];
+	COObject *o1 = [[COObject alloc] initWithPropertyList: pl];
 	UKTrue([o isEqual: o1]); /* Based on uid */
 	UKStringsEqual([o valueForProperty: @"Location"],
 	               [o1 valueForProperty: @"Location"]);
@@ -154,30 +154,30 @@
 	UKObjectsNotEqual([o valueForProperty: @"Float"],
 	                  [o1 valueForProperty: @"Float"]);
 
-	OKObject *o2 = [OKObject objectWithPropertyList: pl];
-	UKTrue([o2 isKindOfClass: [OKObject class]]);
+	COObject *o2 = [COObject objectWithPropertyList: pl];
+	UKTrue([o2 isKindOfClass: [COObject class]]);
 }
 
 - (void) testSearchText
 {
 	NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithInt: kOKStringProperty], 
+		[NSNumber numberWithInt: kCOStringProperty], 
 			@"Location",
-		[NSNumber numberWithInt: kOKStringProperty], 
+		[NSNumber numberWithInt: kCOStringProperty], 
 			@"Contant",
-		[NSNumber numberWithInt: kOKRealProperty], 
+		[NSNumber numberWithInt: kCORealProperty], 
 			@"Float",
-		[NSNumber numberWithInt: kOKMultiStringProperty], 
+		[NSNumber numberWithInt: kCOMultiStringProperty], 
 			@"Multiple",
 		nil];
-	[OKObject addPropertiesAndTypes: dict];
+	[COObject addPropertiesAndTypes: dict];
 
-	OKObject *o = [[OKObject alloc] init];
+	COObject *o = [[COObject alloc] init];
 	UKTrue([o setValue: @"Home" forProperty: @"Location"]);
 	UKTrue([o setValue: @"Someone" forProperty: @"Contant"]);
 	UKTrue([o setValue: [NSNumber numberWithFloat: 2.12] 
 	          forProperty: @"Float"]);
-	OKMultiValue *mv = [[OKMultiValue alloc] init];
+	COMultiValue *mv = [[COMultiValue alloc] init];
 	[mv addValue: @"Value1" withLabel: @"Label1"];
 	[mv addValue: @"Value2" withLabel: @"Label2"];
 	[mv addValue: @"Value3" withLabel: @"Label3"];
@@ -191,9 +191,9 @@
 	UKTrue([o matchesPredicate: p1]);
 	p1 = [NSPredicate predicateWithFormat: @"%K == %@", @"Multiple.Label1", @"Value1"];
 	UKTrue([o matchesPredicate: p1]);
-	p1 = [NSPredicate predicateWithFormat: @"%K CONTAINS %@", qOKTextContent, @"Value1"];
+	p1 = [NSPredicate predicateWithFormat: @"%K CONTAINS %@", qCOTextContent, @"Value1"];
 	UKTrue([o matchesPredicate: p1]);
-	p1 = [NSPredicate predicateWithFormat: @"%K CONTAINS %@", qOKTextContent, @"Someone"];
+	p1 = [NSPredicate predicateWithFormat: @"%K CONTAINS %@", qCOTextContent, @"Someone"];
 	UKTrue([o matchesPredicate: p1]);
 	
 }
@@ -201,14 +201,14 @@
 - (void) testSearch
 {
 	NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithInt: kOKStringProperty], 
+		[NSNumber numberWithInt: kCOStringProperty], 
 			@"Location",
-		[NSNumber numberWithInt: kOKRealProperty], 
+		[NSNumber numberWithInt: kCORealProperty], 
 			@"Float",
 		nil];
-	[OKObject addPropertiesAndTypes: dict];
+	[COObject addPropertiesAndTypes: dict];
 
-	OKObject *o = [[OKObject alloc] init];
+	COObject *o = [[COObject alloc] init];
 	UKTrue([o setValue: @"Home" forProperty: @"Location"]);
 	UKTrue([o setValue: [NSNumber numberWithFloat: 2.12] 
 	          forProperty: @"Float"]);
@@ -257,14 +257,14 @@
 - (void) testBasic
 {
 	NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithInt: kOKStringProperty], 
+		[NSNumber numberWithInt: kCOStringProperty], 
 			@"Location",
-		[NSNumber numberWithInt: kOKRealProperty], 
+		[NSNumber numberWithInt: kCORealProperty], 
 			@"Float",
 		nil];
-	[OKObject addPropertiesAndTypes: dict];
+	[COObject addPropertiesAndTypes: dict];
 
-	OKObject *o = [[OKObject alloc] init];
+	COObject *o = [[COObject alloc] init];
 	UKFalse([o isReadOnly]);
 	UKNotNil([o uniqueID]);
 	UKTrue([o setValue: @"Home" forProperty: @"Location"]);
@@ -279,33 +279,33 @@
 
 - (void) testPropertiesAndTypes
 {
-	OKPropertyType type;
-	NSArray *properties = [OKObject properties];
+	COPropertyType type;
+	NSArray *properties = [COObject properties];
 	UKNotNil(properties);
 	int count = [properties count];
-	type = [OKObject typeOfProperty: kOKUIDProperty];
-	UKIntsEqual(type, kOKStringProperty);
-	type = [OKObject typeOfProperty: kOKCreationDateProperty];
-	UKIntsEqual(type, kOKDateProperty);
-	type = [OKObject typeOfProperty: kOKModificationDateProperty];
-	UKIntsEqual(type, kOKDateProperty);
-	type = [OKObject typeOfProperty: kOKReadOnlyProperty];
-	UKIntsEqual(type, kOKIntegerProperty);
+	type = [COObject typeOfProperty: kCOUIDProperty];
+	UKIntsEqual(type, kCOStringProperty);
+	type = [COObject typeOfProperty: kCOCreationDateProperty];
+	UKIntsEqual(type, kCODateProperty);
+	type = [COObject typeOfProperty: kCOModificationDateProperty];
+	UKIntsEqual(type, kCODateProperty);
+	type = [COObject typeOfProperty: kCOReadOnlyProperty];
+	UKIntsEqual(type, kCOIntegerProperty);
 
-	int result = [OKObject removeProperties: [NSArray arrayWithObjects: @"NotExistingProperty", kOKCreationDateProperty, kOKModificationDateProperty, nil]];
+	int result = [COObject removeProperties: [NSArray arrayWithObjects: @"NotExistingProperty", kCOCreationDateProperty, kCOModificationDateProperty, nil]];
 	UKIntsEqual(result, 2);
-	UKIntsEqual(count-2, [[OKObject properties] count]);
+	UKIntsEqual(count-2, [[COObject properties] count]);
 
 	NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithInt: kOKDateProperty], 
-			kOKCreationDateProperty,
-		[NSNumber numberWithInt: kOKDateProperty], 
-			kOKModificationDateProperty,
+		[NSNumber numberWithInt: kCODateProperty], 
+			kCOCreationDateProperty,
+		[NSNumber numberWithInt: kCODateProperty], 
+			kCOModificationDateProperty,
 		nil];
-	[OKObject addPropertiesAndTypes: dict];
-	UKIntsEqual(count, [[OKObject properties] count]);
-	type = [OKObject typeOfProperty: kOKCreationDateProperty];
-	UKIntsEqual(type, kOKDateProperty);
+	[COObject addPropertiesAndTypes: dict];
+	UKIntsEqual(count, [[COObject properties] count]);
+	type = [COObject typeOfProperty: kCOCreationDateProperty];
+	UKIntsEqual(type, kCODateProperty);
 }
 @end
 
@@ -313,19 +313,19 @@
 + (void) initialize
 {       
     NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
-        [NSNumber numberWithInt: kOKStringProperty],
-            kOKUIDProperty,
-        [NSNumber numberWithInt: kOKDateProperty],
-            kOKCreationDateProperty,
-        [NSNumber numberWithInt: kOKDateProperty],
-            kOKModificationDateProperty, 
-        [NSNumber numberWithInt: kOKIntegerProperty],
-            kOKReadOnlyProperty,
-        [NSNumber numberWithInt: kOKArrayProperty],
-            kOKParentsProperty,
-        [NSNumber numberWithInt: kOKMultiStringProperty],
+        [NSNumber numberWithInt: kCOStringProperty],
+            kCOUIDProperty,
+        [NSNumber numberWithInt: kCODateProperty],
+            kCOCreationDateProperty,
+        [NSNumber numberWithInt: kCODateProperty],
+            kCOModificationDateProperty, 
+        [NSNumber numberWithInt: kCOIntegerProperty],
+            kCOReadOnlyProperty,
+        [NSNumber numberWithInt: kCOArrayProperty],
+            kCOParentsProperty,
+        [NSNumber numberWithInt: kCOMultiStringProperty],
             @"MultiStrings",
-        [NSNumber numberWithInt: kOKMultiIntegerProperty],
+        [NSNumber numberWithInt: kCOMultiIntegerProperty],
             @"MultiIntegers",
         nil];
     [SubObject addPropertiesAndTypes: pt];

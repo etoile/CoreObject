@@ -6,17 +6,17 @@
 
 */
 
-#import "OKSmartGroup.h"
+#import "COSmartGroup.h"
 #import "GNUstep.h"
 
-NSString *kOKPredicateProperty = @"kOKPredicateProperty";
+NSString *kCOPredicateProperty = @"kCOPredicateProperty";
 
-@implementation OKSmartGroup
+@implementation COSmartGroup
 - (void) _updateSmartGroup
 {
 	if (predicate && target)
 	{
-		NSMutableArray *ma = [self valueForProperty: kOKGroupChildrenProperty];
+		NSMutableArray *ma = [self valueForProperty: kCOGroupChildrenProperty];
 		[ma setArray: [target objectsMatchingPredicate: predicate]];
 	}
 }
@@ -35,13 +35,13 @@ NSString *kOKPredicateProperty = @"kOKPredicateProperty";
 	[self _updateSmartGroup];
 }
 
-- (void) setTarget: (OKGroup *) group
+- (void) setTarget: (COGroup *) group
 {
 	ASSIGN(target, group);
 	[self _updateSmartGroup];
 }
 
-/* OKGroup */
+/* COGroup */
 - (NSArray *) objectsMatchingPredicate: (NSPredicate *) p
 {
 	/* If we are ask to match predicate, update objects first */
@@ -55,7 +55,7 @@ NSString *kOKPredicateProperty = @"kOKPredicateProperty";
 	self = [super init];
 	[_nc addObserver: self
 	     selector: @selector(objectChanged:)
-	     name: kOKObjectChangedNotification
+	     name: kCOObjectChangedNotification
 	     object: nil];
 	return self;
 }

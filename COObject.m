@@ -6,30 +6,30 @@
 
 */
 
-#import "OKObject.h"
-#import "OKMultiValue.h"
-#import "OKUUID.h"
+#import "COObject.h"
+#import "COMultiValue.h"
+#import "COUUID.h"
 #import "GNUstep.h"
 
 static NSMutableDictionary *propertyTypes;
 
-NSString *kOKUIDProperty = @"kOKUIDProperty";
-NSString *kOKCreationDateProperty = @"kOKCreationDateProperty";
-NSString *kOKModificationDateProperty = @"kOKModificationDateProperty";
-NSString *kOKReadOnlyProperty = @"kOKReadOnlyProperty";
-NSString *kOKParentsProperty = @"kOKParentsProperty";
-NSString *kOKTagProperty = @"kOKTagProperty";
+NSString *kCOUIDProperty = @"kCOUIDProperty";
+NSString *kCOCreationDateProperty = @"kCOCreationDateProperty";
+NSString *kCOModificationDateProperty = @"kCOModificationDateProperty";
+NSString *kCOReadOnlyProperty = @"kCOReadOnlyProperty";
+NSString *kCOParentsProperty = @"kCOParentsProperty";
+NSString *kCOTagProperty = @"kCOTagProperty";
 
-NSString *qOKTextContent = @"qOKTextContent";
+NSString *qCOTextContent = @"qCOTextContent";
 
 /* For property list */
-NSString *pOKClassKey = @"Class";
-NSString *pOKPropertiesKey = @"Properties";
-NSString *pOKValuesKey = @"Values";
-NSString *pOKVersionKey = @"Version";
-NSString *pOKVersion1Value = @"OKVersion1";
+NSString *pCOClassKey = @"Class";
+NSString *pCOPropertiesKey = @"Properties";
+NSString *pCOValuesKey = @"Values";
+NSString *pCOVersionKey = @"Version";
+NSString *pCOVersion1Value = @"COVersion1";
 
-@implementation OKObject
+@implementation COObject
 /* Private */
 
 /* Return all text for search */
@@ -40,19 +40,19 @@ NSString *pOKVersion1Value = @"OKVersion1";
 	NSString *property = nil;
 	while ((property = [e nextObject]))
 	{
-		OKPropertyType type = [[self class] typeOfProperty: property];
+		COPropertyType type = [[self class] typeOfProperty: property];
 		switch(type)
 		{
-			case kOKStringProperty:
-			case kOKArrayProperty:
-			case kOKDictionaryProperty:
+			case kCOStringProperty:
+			case kCOArrayProperty:
+			case kCODictionaryProperty:
 				[text appendFormat: @"%@ ", [[self valueForProperty: property] description]];
 				break;
-			case kOKMultiStringProperty:
-			case kOKMultiArrayProperty:
-			case kOKMultiDictionaryProperty:
+			case kCOMultiStringProperty:
+			case kCOMultiArrayProperty:
+			case kCOMultiDictionaryProperty:
 				{
-					OKMultiValue *mv = [self valueForProperty: property];
+					COMultiValue *mv = [self valueForProperty: property];
 					int i, count = [mv count];
 					for (i = 0; i < count; i++)
 					{
@@ -72,20 +72,20 @@ NSString *pOKVersion1Value = @"OKVersion1";
 	/* We ignore class here because class is decided before this method */
 	id object = nil;
 
-	if ((object = [propertyList objectForKey: pOKPropertiesKey]))
+	if ((object = [propertyList objectForKey: pCOPropertiesKey]))
 		[[self class] addPropertiesAndTypes: object];
 
-	if ((object = [propertyList objectForKey: pOKValuesKey]))
+	if ((object = [propertyList objectForKey: pCOValuesKey]))
 	{
-		/* Check OKMultiValue */
+		/* Check COMultiValue */
 		NSMutableDictionary *dict = [(NSDictionary *) object mutableCopy];
 		NSEnumerator *e = [[dict allKeys] objectEnumerator];
 		NSString *key = nil;
 		while ((key = [e nextObject]))
 		{
-			if ([[self class] typeOfProperty: key] & kOKMultiValueMask)
+			if ([[self class] typeOfProperty: key] & kCOMultiValueMask)
 			{
-				OKMultiValue *mv = [[OKMultiValue alloc] initWithPropertyList: [dict objectForKey: key]];
+				COMultiValue *mv = [[COMultiValue alloc] initWithPropertyList: [dict objectForKey: key]];
 				[dict setObject: mv forKey: key];
 				DESTROY(mv);
 			}
@@ -164,28 +164,28 @@ NSString *pOKVersion1Value = @"OKVersion1";
 	return count;
 }
 
-+ (OKPropertyType) typeOfProperty: (NSString *) property
++ (COPropertyType) typeOfProperty: (NSString *) property
 {
 	if (propertyTypes == nil)
-		return kOKErrorInProperty;
+		return kCOErrorInProperty;
 
 	NSDictionary *dict = [propertyTypes objectForKey: NSStringFromClass([self class])];
 	if (dict == nil)
 	{
-		return kOKErrorInProperty;
+		return kCOErrorInProperty;
 	}
 
 	NSNumber *type = [dict objectForKey: property];
 	if (type)
 		return [type intValue];
 	else
-		return kOKErrorInProperty;
+		return kCOErrorInProperty;
 }
 
 + (id) objectWithPropertyList: (NSDictionary *) propertyList
 {
 	id object = nil;
-	if ((object = [propertyList objectForKey: pOKClassKey]) &&
+	if ((object = [propertyList objectForKey: pCOClassKey]) &&
 	    ([object isKindOfClass: [NSString class]]))
 	{
 		Class oClass = NSClassFromString((NSString *)object);
@@ -204,8 +204,8 @@ NSString *pOKVersion1Value = @"OKVersion1";
 		return nil;
 	}
 	/* Let check version */
-	NSString *v = [propertyList objectForKey: pOKVersionKey];
-	if ([v isEqualToString: pOKVersion1Value])
+	NSString *v = [propertyList objectForKey: pCOVersionKey];
+	if ([v isEqualToString: pCOVersion1Value])
 	{
 		[self _readObjectVersion1: propertyList];
 	}
@@ -224,27 +224,27 @@ NSString *pOKVersion1Value = @"OKVersion1";
 	NSMutableDictionary *pl = [[NSMutableDictionary alloc] init];
 	NSMutableDictionary *dict;
 
-	[pl setObject: NSStringFromClass([self class]) forKey: pOKClassKey];
+	[pl setObject: NSStringFromClass([self class]) forKey: pCOClassKey];
 	[pl setObject: [[self class] propertiesAndTypes] 
-	       forKey: pOKPropertiesKey];
+	       forKey: pCOPropertiesKey];
 
 	dict = [_properties mutableCopy];
 	/* We remove parents property */
-	[dict removeObjectForKey: kOKParentsProperty];
-	/* If we have OKMultiValue, save its property list */
+	[dict removeObjectForKey: kCOParentsProperty];
+	/* If we have COMultiValue, save its property list */
 	NSEnumerator *e = [[dict allKeys] objectEnumerator];
 	NSString *key = nil;
 	while ((key = [e nextObject]))
 	{
 		id value = [dict objectForKey: key];
-		if ([value isKindOfClass: [OKMultiValue class]])
+		if ([value isKindOfClass: [COMultiValue class]])
 		{
-			[dict setObject: [(OKMultiValue *)value propertyList]
+			[dict setObject: [(COMultiValue *)value propertyList]
 			         forKey: key];
 		}
 	}
-	[pl setObject: dict forKey: pOKValuesKey];
-	[pl setObject: pOKVersion1Value forKey: pOKVersionKey];
+	[pl setObject: dict forKey: pCOValuesKey];
+	[pl setObject: pCOVersion1Value forKey: pCOVersionKey];
 	return AUTORELEASE(pl);
 }
 
@@ -254,11 +254,11 @@ NSString *pOKVersion1Value = @"OKVersion1";
 		return NO;
 
 	[_properties removeObjectForKey: property];
-	[self setValue: [NSDate date] forProperty: kOKModificationDateProperty];
-    [_nc postNotificationName: kOKObjectChangedNotification
+	[self setValue: [NSDate date] forProperty: kCOModificationDateProperty];
+    [_nc postNotificationName: kCOObjectChangedNotification
          object: self
 	     userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
-	                 property, kOKRemovedProperty, nil]];
+	                 property, kCORemovedProperty, nil]];
 	return YES;
 }
 
@@ -269,11 +269,11 @@ NSString *pOKVersion1Value = @"OKVersion1";
 
 	[_properties setObject: value forKey: property];
 	[_properties setObject: [NSDate date] 
-	                forKey: kOKModificationDateProperty];
-    [_nc postNotificationName: kOKObjectChangedNotification
+	                forKey: kCOModificationDateProperty];
+    [_nc postNotificationName: kCOObjectChangedNotification
          object: self
 	     userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
-	                 property, kOKUpdatedProperty, nil]];
+	                 property, kCOUpdatedProperty, nil]];
 	return YES;
 }
 
@@ -285,7 +285,7 @@ NSString *pOKVersion1Value = @"OKVersion1";
 - (NSArray *) parentGroups
 {
     NSMutableSet *set = AUTORELEASE([[NSMutableSet alloc] init]);
-    NSArray *value = [self valueForProperty: kOKParentsProperty];
+    NSArray *value = [self valueForProperty: kCOParentsProperty];
     if (value)
     {
         [set addObjectsFromArray: value];
@@ -301,12 +301,12 @@ NSString *pOKVersion1Value = @"OKVersion1";
 
 - (BOOL) isReadOnly
 {	
-	return ([[self valueForProperty: kOKReadOnlyProperty] intValue] == 1);
+	return ([[self valueForProperty: kCOReadOnlyProperty] intValue] == 1);
 }
 
 - (NSString *) uniqueID
 {
-	return [self valueForProperty: kOKUIDProperty];
+	return [self valueForProperty: kCOUIDProperty];
 }
 
 - (BOOL) matchesPredicate: (NSPredicate *) predicate
@@ -406,20 +406,20 @@ NSString *pOKVersion1Value = @"OKVersion1";
 + (void) initialize
 {
 	NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
-		[NSNumber numberWithInt: kOKStringProperty], 
-			kOKUIDProperty,
-		[NSNumber numberWithInt: kOKDateProperty], 
-			kOKCreationDateProperty,
-		[NSNumber numberWithInt: kOKDateProperty], 
-			kOKModificationDateProperty,
-		[NSNumber numberWithInt: kOKIntegerProperty], 
-			kOKReadOnlyProperty,
-		[NSNumber numberWithInt: kOKArrayProperty], 
-			kOKParentsProperty,
-		[NSNumber numberWithInt: kOKArrayProperty], 
-			kOKTagProperty,
+		[NSNumber numberWithInt: kCOStringProperty], 
+			kCOUIDProperty,
+		[NSNumber numberWithInt: kCODateProperty], 
+			kCOCreationDateProperty,
+		[NSNumber numberWithInt: kCODateProperty], 
+			kCOModificationDateProperty,
+		[NSNumber numberWithInt: kCOIntegerProperty], 
+			kCOReadOnlyProperty,
+		[NSNumber numberWithInt: kCOArrayProperty], 
+			kCOParentsProperty,
+		[NSNumber numberWithInt: kCOArrayProperty], 
+			kCOTagProperty,
 		nil];
-	[OKObject addPropertiesAndTypes: pt];
+	[COObject addPropertiesAndTypes: pt];
 	DESTROY(pt);
 }
 
@@ -428,15 +428,15 @@ NSString *pOKVersion1Value = @"OKVersion1";
 	self = [super init];
 	_properties = [[NSMutableDictionary alloc] init];
 	[self setValue: [NSNumber numberWithInt: 0] 
-	      forProperty: kOKReadOnlyProperty];
+	      forProperty: kCOReadOnlyProperty];
 	[self setValue: [NSString UUIDString]
-	      forProperty: kOKUIDProperty];
+	      forProperty: kCOUIDProperty];
 	[self setValue: [NSDate date]
-	      forProperty: kOKCreationDateProperty];
+	      forProperty: kCOCreationDateProperty];
 	[self setValue: [NSDate date]
-	      forProperty: kOKModificationDateProperty];
+	      forProperty: kCOModificationDateProperty];
     [self setValue: AUTORELEASE([[NSMutableArray alloc] init])
-          forProperty: kOKParentsProperty];
+          forProperty: kCOParentsProperty];
 	_nc = [NSNotificationCenter defaultCenter];
 	return self;
 }
@@ -454,14 +454,14 @@ NSString *pOKVersion1Value = @"OKVersion1";
 #endif
 - (unsigned long) hash
 {
-	return [[self valueForProperty: kOKUIDProperty] hash];
+	return [[self valueForProperty: kCOUIDProperty] hash];
 }
 
-- (BOOL) isEqual: (OKObject *) other
+- (BOOL) isEqual: (COObject *) other
 {
 	if (other && [other isKindOfClass: [self class]])
 	{
-		return [[self valueForProperty: kOKUIDProperty] isEqual: [other valueForProperty: kOKUIDProperty]];
+		return [[self valueForProperty: kCOUIDProperty] isEqual: [other valueForProperty: kCOUIDProperty]];
 	}
 	return NO;
 }
@@ -469,7 +469,7 @@ NSString *pOKVersion1Value = @"OKVersion1";
 /* NSCopying */
 - (id) copyWithZone: (NSZone *) zone
 {
-	OKObject *clone = [[[self class] allocWithZone: zone] init];
+	COObject *clone = [[[self class] allocWithZone: zone] init];
 	clone->_properties = [_properties mutableCopyWithZone: zone];
 	return clone;
 }
@@ -478,7 +478,7 @@ NSString *pOKVersion1Value = @"OKVersion1";
 - (id) valueForKey: (NSString *) key
 {
 	/* Intercept query property */
-	if ([key isEqualToString: qOKTextContent])
+	if ([key isEqualToString: qCOTextContent])
 	{
 		return [self _textContent];
 	}
@@ -488,7 +488,7 @@ NSString *pOKVersion1Value = @"OKVersion1";
 - (id) valueForKeyPath: (NSString *) key
 {
 	/* Intercept query property */
-	if ([key isEqualToString: qOKTextContent])
+	if ([key isEqualToString: qCOTextContent])
 	{
 		return [self _textContent];
 	}
@@ -497,9 +497,9 @@ NSString *pOKVersion1Value = @"OKVersion1";
 	if ([keys count])
 	{
 		id value = [self valueForProperty: [keys objectAtIndex: 0]];
-		if ([value isKindOfClass: [OKMultiValue class]])
+		if ([value isKindOfClass: [COMultiValue class]])
 		{
-			OKMultiValue *mv = (OKMultiValue *) value;
+			COMultiValue *mv = (COMultiValue *) value;
 			int i, count = [mv count];
 			NSMutableArray *array = [[NSMutableArray alloc] init];
 			if ([keys count] > 1)
@@ -530,7 +530,7 @@ NSString *pOKVersion1Value = @"OKVersion1";
 
 @end
 
-NSString *kOKObjectChangedNotification = @"kOKObjectChangedNotification";
-NSString *kOKUpdatedProperty = @"kOKUpdatedProperty";
-NSString *kOKRemovedProperty = @"kOKRemovedProperty";
+NSString *kCOObjectChangedNotification = @"kCOObjectChangedNotification";
+NSString *kCOUpdatedProperty = @"kCOUpdatedProperty";
+NSString *kCORemovedProperty = @"kCORemovedProperty";
 

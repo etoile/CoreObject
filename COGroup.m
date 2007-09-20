@@ -6,40 +6,40 @@
 
 */
 
-#import "OKGroup.h"
-#import "OKMultiValue.h"
+#import "COGroup.h"
+#import "COMultiValue.h"
 #import "GNUstep.h"
 
-NSString *kOKGroupNameProperty = @"kOKGroupNameProperty";
-NSString *kOKGroupChildrenProperty = @"kOKGroupChildrenProperty";
-NSString *kOKGroupSubgroupsProperty = @"kOKGroupSubgroupsProperty";
+NSString *kCOGroupNameProperty = @"kCOGroupNameProperty";
+NSString *kCOGroupChildrenProperty = @"kCOGroupChildrenProperty";
+NSString *kCOGroupSubgroupsProperty = @"kCOGroupSubgroupsProperty";
 
-NSString *pOKAllObjectsKey = @"AllObjects";
-NSString *pOKAllClassesKey = @"AllClasses";
-NSString *pOKAllGroupsKey = @"AllGroups";
+NSString *pCOAllObjectsKey = @"AllObjects";
+NSString *pCOAllClassesKey = @"AllClasses";
+NSString *pCOAllGroupsKey = @"AllGroups";
 
-NSString *kOKGroupAddObjectNotification = @"kOKGroupAddObjectNotification";
-NSString *kOKGroupRemoveObjectNotification = @"kOKGroupRemoveObjectNotification";
-NSString *kOKGroupAddSubgroupNotification = @"kOKGroupAddSubgroupNotification";
-NSString *kOKGroupRemoveSubgroupNotification = @"kOKGroupRemoveSubgroupNotification";
-NSString *kOKGroupChild = @"kOKGroupChild";
+NSString *kCOGroupAddObjectNotification = @"kCOGroupAddObjectNotification";
+NSString *kCOGroupRemoveObjectNotification = @"kCOGroupRemoveObjectNotification";
+NSString *kCOGroupAddSubgroupNotification = @"kCOGroupAddSubgroupNotification";
+NSString *kCOGroupRemoveSubgroupNotification = @"kCOGroupRemoveSubgroupNotification";
+NSString *kCOGroupChild = @"kCOGroupChild";
 
-@implementation OKGroup
+@implementation COGroup
 /* Private */
-- (void) _addAsParent: (OKObject *) object
+- (void) _addAsParent: (COObject *) object
 {
-	NSMutableArray *a = [object valueForProperty: kOKParentsProperty];
+	NSMutableArray *a = [object valueForProperty: kCOParentsProperty];
 	if (a == nil)
 	{
 		a = AUTORELEASE([[NSMutableArray alloc] init]);
-		[object setValue: a forProperty: kOKParentsProperty];
+		[object setValue: a forProperty: kCOParentsProperty];
 	}
 	[a addObject: self];
 }
 
-- (void) _removeAsParent: (OKObject *) object
+- (void) _removeAsParent: (COObject *) object
 {
-	NSMutableArray *a = [object valueForProperty: kOKParentsProperty];
+	NSMutableArray *a = [object valueForProperty: kCOParentsProperty];
 	if (a)
 	{
 		[a removeObject: self];
@@ -51,7 +51,7 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 	CREATE_AUTORELEASE_POOL(x);
 
 	/* Generate all classes */
-	NSDictionary *dict = [propertyList objectForKey: pOKAllClassesKey];
+	NSDictionary *dict = [propertyList objectForKey: pCOAllClassesKey];
 	NSEnumerator *e = [[dict allKeys] objectEnumerator]; 
 	NSString *key = nil;
 	while ((key = [e nextObject]))
@@ -62,26 +62,26 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 
 	/* Generate all objects */
 	NSMutableDictionary *allObjects = [[NSMutableDictionary alloc] init];
-	dict = [propertyList objectForKey: pOKAllObjectsKey];
+	dict = [propertyList objectForKey: pCOAllObjectsKey];
 	e = [[dict allKeys] objectEnumerator];
 	while ((key = [e nextObject]))
 	{
 		NSDictionary *objectPL = [dict objectForKey: key];
-		Class cls = NSClassFromString([objectPL objectForKey: pOKClassKey]);
+		Class cls = NSClassFromString([objectPL objectForKey: pCOClassKey]);
 
-		OKObject *object = nil;
-		/* We check OKGroup first because OKGroup is subclass of OKObject */
-		if ([cls isSubclassOfClass: [OKGroup class]])
+		COObject *object = nil;
+		/* We check COGroup first because COGroup is subclass of COObject */
+		if ([cls isSubclassOfClass: [COGroup class]])
 		{
-			/* Let make sure OKMultiValue is properly set */
-			NSMutableDictionary *values = [[objectPL objectForKey: pOKValuesKey] mutableCopy];
+			/* Let make sure COMultiValue is properly set */
+			NSMutableDictionary *values = [[objectPL objectForKey: pCOValuesKey] mutableCopy];
 			NSEnumerator *ee = [[values allKeys] objectEnumerator];
 			NSString *property = nil;
 			while ((property = [ee nextObject]));
 			{
-				if ([cls typeOfProperty: property] & kOKMultiValueMask)
+				if ([cls typeOfProperty: property] & kCOMultiValueMask)
 				{
-					OKMultiValue *mv = [[OKMultiValue alloc] initWithPropertyList: [values objectForKey: property]];
+					COMultiValue *mv = [[COMultiValue alloc] initWithPropertyList: [values objectForKey: property]];
 					[values setObject: mv forKey: property];
 					DESTROY(mv);
 				}
@@ -90,17 +90,17 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 			[object->_properties addEntriesFromDictionary: values];
 			DESTROY(values); // mutable copied above
 		}
-		else if ([cls isSubclassOfClass: [OKObject class]])
+		else if ([cls isSubclassOfClass: [COObject class]])
 		{
-			/* We need to put verion back here because OKObject need that */
+			/* We need to put verion back here because COObject need that */
 			NSMutableDictionary *d = [objectPL mutableCopy];
-//			[d setObject: pOKVersion1Value forKey: pOKVersionKey];
-			object = [OKObject objectWithPropertyList: d];
+//			[d setObject: pCOVersion1Value forKey: pCOVersionKey];
+			object = [COObject objectWithPropertyList: d];
 			DESTROY(d);
 		}
 		else
 		{
-			NSLog(@"Error: unknown class %@", [objectPL objectForKey: pOKClassKey]);
+			NSLog(@"Error: unknown class %@", [objectPL objectForKey: pCOClassKey]);
 		}
 
 		[allObjects setObject: object forKey: key];
@@ -109,13 +109,13 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 	[allObjects setObject: self forKey: [self uniqueID]];
 
 	/* Let's rebuild the group relationship */
-	dict = [propertyList objectForKey: pOKAllGroupsKey];
+	dict = [propertyList objectForKey: pCOAllGroupsKey];
 	e = [[dict allKeys] objectEnumerator];
 	NSString *uid = nil;
 	while ((uid = [e nextObject]))
 	{
 		NSArray *members = [dict objectForKey: uid];
-		OKGroup *group = [allObjects objectForKey: uid];
+		COGroup *group = [allObjects objectForKey: uid];
 		if ((members == nil) || (group == nil))
 		{
 			NSLog(@"Internal Error: no object for uid %@", uid);
@@ -124,13 +124,13 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 		for (i = 0; i < count; i++)
 		{
 			NSString *mid = [members objectAtIndex: i];
-			OKObject *object = [allObjects objectForKey: mid];
-			/* We check OKGroup first because OKGroup is subclass of OKObject */
-			if ([object isKindOfClass: [OKGroup class]])
+			COObject *object = [allObjects objectForKey: mid];
+			/* We check COGroup first because COGroup is subclass of COObject */
+			if ([object isKindOfClass: [COGroup class]])
 			{
-				[group addSubgroup: (OKGroup *)object];
+				[group addSubgroup: (COGroup *)object];
 			}
-			else if ([object isKindOfClass: [OKObject class]])
+			else if ([object isKindOfClass: [COObject class]])
 			{
 				[group addObject: object];
 			}
@@ -150,8 +150,8 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 {
 	self = [super initWithPropertyList: propertyList];
 
-	NSString *v = [propertyList objectForKey: pOKVersionKey];
-	if ([v isEqualToString: pOKVersion1Value])
+	NSString *v = [propertyList objectForKey: pCOVersionKey];
+	if ([v isEqualToString: pCOVersion1Value])
 	{
 		[self _readGroupVersion1: propertyList];
 	}
@@ -172,28 +172,28 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 
 	CREATE_AUTORELEASE_POOL(x);
 	/* We remove our parent and childrend */
-	[[pl objectForKey: pOKValuesKey] removeObjectForKey: kOKParentsProperty];
-	[[pl objectForKey: pOKValuesKey] removeObjectForKey: kOKGroupChildrenProperty];
-	[[pl objectForKey: pOKValuesKey] removeObjectForKey: kOKGroupSubgroupsProperty];
+	[[pl objectForKey: pCOValuesKey] removeObjectForKey: kCOParentsProperty];
+	[[pl objectForKey: pCOValuesKey] removeObjectForKey: kCOGroupChildrenProperty];
+	[[pl objectForKey: pCOValuesKey] removeObjectForKey: kCOGroupSubgroupsProperty];
 
 	NSMutableDictionary *allObjects = [[NSMutableDictionary alloc] init];
 	NSMutableDictionary *classes = [[NSMutableDictionary alloc] init];
-	OKObject *o = nil;
-	OKGroup *g = nil;
+	COObject *o = nil;
+	COGroup *g = nil;
 
 	/* We first store everything flat */
 	NSEnumerator *e = [[self allObjects] objectEnumerator];
 	while ((o = [e nextObject]))
 	{
 		NSMutableDictionary *dict = [o propertyList];
-		NSString *cls = [dict objectForKey: pOKClassKey];;
+		NSString *cls = [dict objectForKey: pCOClassKey];;
 		if ([classes objectForKey: cls] == nil)
 		{
 			/* We cache this class */
-			[classes setObject: [dict objectForKey: pOKPropertiesKey]
+			[classes setObject: [dict objectForKey: pCOPropertiesKey]
 			            forKey: cls];
 		}
-		[dict removeObjectForKey: pOKPropertiesKey];
+		[dict removeObjectForKey: pCOPropertiesKey];
 		[allObjects setObject: dict forKey: [o uniqueID]];
 	}
 	e = [[self allGroups] objectEnumerator];
@@ -210,33 +210,33 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 			            forKey: cls];
 		}
 
-		[dict1 setObject: cls forKey: pOKClassKey];
+		[dict1 setObject: cls forKey: pCOClassKey];
 
 		dict2 = AUTORELEASE([g->_properties mutableCopy]);
 
 		/* We remove parents and children property */
-		[dict2 removeObjectForKey: kOKParentsProperty];
-		[dict2 removeObjectForKey: kOKGroupChildrenProperty];
-		[dict2 removeObjectForKey: kOKGroupSubgroupsProperty];
+		[dict2 removeObjectForKey: kCOParentsProperty];
+		[dict2 removeObjectForKey: kCOGroupChildrenProperty];
+		[dict2 removeObjectForKey: kCOGroupSubgroupsProperty];
 
-		/* If we have OKMultiValue, save its property list */
+		/* If we have COMultiValue, save its property list */
 		NSEnumerator *e = [[dict2 allKeys] objectEnumerator];
 		NSString *key = nil;
 		while ((key = [e nextObject]))
 		{
 			id value = [dict2 objectForKey: key];
-			if ([value isKindOfClass: [OKMultiValue class]])
+			if ([value isKindOfClass: [COMultiValue class]])
 			{
-				[dict2 setObject: [(OKMultiValue *)value propertyList]
+				[dict2 setObject: [(COMultiValue *)value propertyList]
 				          forKey: key];
 			}
         }
-		[dict1 setObject: dict2 forKey: pOKValuesKey];
+		[dict1 setObject: dict2 forKey: pCOValuesKey];
 		[allObjects setObject: dict1 forKey: [g uniqueID]];
 		DESTROY(dict1);
 	}
-	[pl setObject: allObjects forKey: pOKAllObjectsKey];
-	[pl setObject: classes forKey: pOKAllClassesKey];
+	[pl setObject: allObjects forKey: pCOAllObjectsKey];
+	[pl setObject: classes forKey: pCOAllClassesKey];
 	DESTROY(allObjects);
 	DESTROY(classes);
 
@@ -260,40 +260,40 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 		DESTROY(members);
 		DESTROY(uids);
 	}
-	[pl setObject: groups forKey: pOKAllGroupsKey];
+	[pl setObject: groups forKey: pCOAllGroupsKey];
 	DESTROY(groups);
 	DESTROY(array); // mutable copoied above
-	[pl setObject: pOKVersion1Value forKey: pOKVersionKey];
+	[pl setObject: pCOVersion1Value forKey: pCOVersionKey];
 
 	DESTROY(x);
 	return AUTORELEASE(pl); // pl got auto-released here
 }
 
-- (BOOL) addObject: (OKObject *) object
+- (BOOL) addObject: (COObject *) object
 {
-	NSMutableArray *a = [self valueForProperty: kOKGroupChildrenProperty];
+	NSMutableArray *a = [self valueForProperty: kCOGroupChildrenProperty];
 	if ([a containsObject: object] == NO)
 	{
 		[self _addAsParent: object];
 		[a addObject: object];
-		[_nc postNotificationName: kOKGroupAddObjectNotification
+		[_nc postNotificationName: kCOGroupAddObjectNotification
 		     object: self
-		     userInfo: [NSDictionary dictionaryWithObject: object forKey: kOKGroupChild]];
+		     userInfo: [NSDictionary dictionaryWithObject: object forKey: kCOGroupChild]];
 		return YES;
 	}
 	return NO;
 }
 
-- (BOOL) removeObject: (OKObject *) object
+- (BOOL) removeObject: (COObject *) object
 {
-	NSMutableArray *a = [self valueForProperty: kOKGroupChildrenProperty];
+	NSMutableArray *a = [self valueForProperty: kCOGroupChildrenProperty];
 	if ([a containsObject: object] == YES)
 	{
 		[self _removeAsParent: object];
 		[a removeObject: object];
-		[_nc postNotificationName: kOKGroupRemoveObjectNotification
+		[_nc postNotificationName: kCOGroupRemoveObjectNotification
 		     object: self
-		     userInfo: [NSDictionary dictionaryWithObject: object forKey: kOKGroupChild]];
+		     userInfo: [NSDictionary dictionaryWithObject: object forKey: kCOGroupChild]];
 		return YES;
 	}
 	return NO;
@@ -301,34 +301,34 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 
 - (NSArray *) objects
 {
-	return [self valueForProperty: kOKGroupChildrenProperty];
+	return [self valueForProperty: kCOGroupChildrenProperty];
 }
 
-- (BOOL) addSubgroup: (OKGroup *) group
+- (BOOL) addSubgroup: (COGroup *) group
 {
-	NSMutableArray *a = [self valueForProperty: kOKGroupSubgroupsProperty];
+	NSMutableArray *a = [self valueForProperty: kCOGroupSubgroupsProperty];
 	if ([a containsObject: group] == NO)
 	{
 		[self _addAsParent: group];
 		[a addObject: group];
-		[_nc postNotificationName: kOKGroupAddObjectNotification
+		[_nc postNotificationName: kCOGroupAddObjectNotification
 		     object: self
-		     userInfo: [NSDictionary dictionaryWithObject: group forKey: kOKGroupChild]];
+		     userInfo: [NSDictionary dictionaryWithObject: group forKey: kCOGroupChild]];
 		return YES;
 	}
 	return NO;
 }
 
-- (BOOL) removeSubgroup: (OKGroup *) group
+- (BOOL) removeSubgroup: (COGroup *) group
 {
-	NSMutableArray *a = [self valueForProperty: kOKGroupSubgroupsProperty];
+	NSMutableArray *a = [self valueForProperty: kCOGroupSubgroupsProperty];
 	if ([a containsObject: group] == YES)
 	{
 		[self _removeAsParent: group];
 		[a removeObject: group];
-		[_nc postNotificationName: kOKGroupRemoveObjectNotification
+		[_nc postNotificationName: kCOGroupRemoveObjectNotification
 		     object: self
-		     userInfo: [NSDictionary dictionaryWithObject: group forKey: kOKGroupChild]];
+		     userInfo: [NSDictionary dictionaryWithObject: group forKey: kCOGroupChild]];
 		return YES;
 	}
 	return NO;
@@ -336,7 +336,7 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 
 - (NSArray *) subgroups
 {
-	return [self valueForProperty: kOKGroupSubgroupsProperty];
+	return [self valueForProperty: kCOGroupSubgroupsProperty];
 }
 
 - (NSArray *) objectsMatchingPredicate: (NSPredicate *) predicate
@@ -346,7 +346,7 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 	int i, count = [array count];
 	for (i = 0; i < count; i++)
 	{
-		OKObject *object = [array objectAtIndex: i];
+		COObject *object = [array objectAtIndex: i];
 		if ([object matchesPredicate: predicate])
 			[set addObject: object];
 	}
@@ -361,7 +361,7 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 	int i, count = [array count];
 	for (i = 0; i < count; i++)
 	{
-		OKGroup *group = [array objectAtIndex: i];
+		COGroup *group = [array objectAtIndex: i];
 		/* Try to prevent recursive */
 		if ([group isEqual: self])
 			continue;
@@ -378,7 +378,7 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 	int i, count = [array count];
 	for (i = 0; i < count; i++)
 	{
-		OKGroup *group = [array objectAtIndex: i];
+		COGroup *group = [array objectAtIndex: i];
 		/* Try to prevent recursive */
 		if ([group isEqual: self])
 			continue;
@@ -390,19 +390,19 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 /* NSObject */
 + (void) initialize
 {
-	/* We need to repeat what is in OKObject 
+	/* We need to repeat what is in COObject 
 	   because GNU objc runtime will not call super for this method */
-	NSDictionary *pt = [OKObject propertiesAndTypes];
-	[OKGroup addPropertiesAndTypes: pt];
+	NSDictionary *pt = [COObject propertiesAndTypes];
+	[COGroup addPropertiesAndTypes: pt];
 	pt = [[NSDictionary alloc] initWithObjectsAndKeys:
-		[NSNumber numberWithInt: kOKStringProperty], 
-			kOKGroupNameProperty,
-		[NSNumber numberWithInt: kOKArrayProperty], 
-			kOKGroupChildrenProperty,
-		[NSNumber numberWithInt: kOKArrayProperty], 
-			kOKGroupSubgroupsProperty,
+		[NSNumber numberWithInt: kCOStringProperty], 
+			kCOGroupNameProperty,
+		[NSNumber numberWithInt: kCOArrayProperty], 
+			kCOGroupChildrenProperty,
+		[NSNumber numberWithInt: kCOArrayProperty], 
+			kCOGroupSubgroupsProperty,
 		nil];
-	[OKGroup addPropertiesAndTypes: pt];
+	[COGroup addPropertiesAndTypes: pt];
 	DESTROY(pt);
 }
 
@@ -411,9 +411,9 @@ NSString *kOKGroupChild = @"kOKGroupChild";
 	self = [super init];
 	/* Initialize children and parents property */
 	[self setValue: AUTORELEASE([[NSMutableArray alloc] init])
-	      forProperty: kOKGroupChildrenProperty];
+	      forProperty: kCOGroupChildrenProperty];
 	[self setValue: AUTORELEASE([[NSMutableArray alloc] init])
-	      forProperty: kOKGroupSubgroupsProperty];
+	      forProperty: kCOGroupSubgroupsProperty];
 	return self;
 }
 

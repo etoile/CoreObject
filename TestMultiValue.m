@@ -6,13 +6,13 @@
 
 */
 
-#import "OKMultiValue.h"
+#import "COMultiValue.h"
 #import "GNUstep.h"
 #import <UnitKit/UnitKit.h>
 
 @interface TestMultiValue: NSObject <UKTest>
 {
-	OKMultiValue *mv;
+	COMultiValue *mv;
 }
 @end
 
@@ -20,7 +20,7 @@
 - (id) init
 {
 	self = [super init];
-	mv = [[OKMultiValue alloc] init];
+	mv = [[COMultiValue alloc] init];
 	[mv addValue: @"value0" withLabel: @"label0"];
 	[mv addValue: @"value1" withLabel: @"label1"];
 	[mv setPrimaryIdentifier: [mv identifierAtIndex: 0]];
@@ -52,7 +52,7 @@
 		NSLog(@"Error: %@ (%@ %@)", error, self, NSStringFromSelector(_cmd));
 	}
 
-	/* We don't need multable option here. OKMultiValue should handle it. */
+	/* We don't need multable option here. COMultiValue should handle it. */
 	error = nil;
 	NSPropertyListFormat format = 0;
 	pl = [NSPropertyListSerialization propertyListFromData: data
@@ -66,7 +66,7 @@
 		NSLog(@"Error: %@ (%@ %@)", error, self, NSStringFromSelector(_cmd));
 	}
 
-	OKMultiValue *vv = [[OKMultiValue alloc] initWithPropertyList: pl];
+	COMultiValue *vv = [[COMultiValue alloc] initWithPropertyList: pl];
 	UKStringsEqual([mv primaryIdentifier], [vv primaryIdentifier]);
 	[mv setPrimaryIdentifier: [mv identifierAtIndex: 1]];
 	UKStringsNotEqual([mv primaryIdentifier], [vv primaryIdentifier]);
@@ -112,7 +112,7 @@
 
 - (void) testCopy
 {
-	OKMultiValue *v = [mv copy];
+	COMultiValue *v = [mv copy];
 	UKNotNil(v);
 	UKStringsEqual(@"value0", [v valueAtIndex: 0]);
 	UKStringsEqual(@"value1", [v valueAtIndex: 1]);
@@ -129,9 +129,9 @@
 
 - (void) testMutableCopy
 {
-	OKMultiValue *v = [mv copy];
+	COMultiValue *v = [mv copy];
 	UKNotNil(v);
-	OKMultiValue *vv = [v copy];
+	COMultiValue *vv = [v copy];
 	UKNotNil(vv);
 	UKStringsEqual(@"value0", [vv valueAtIndex: 0]);
 	UKStringsEqual(@"value1", [vv valueAtIndex: 1]);
@@ -154,7 +154,7 @@
 
 - (void) testIdentifierAndType
 {
-	OKMultiValue *v = [mv copy];
+	COMultiValue *v = [mv copy];
 	UKNotNil(v);
 	UKNotNil([mv primaryIdentifier]);
 	UKNotNil([v primaryIdentifier]);

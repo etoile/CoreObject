@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
 #import <UUID/uuid.h>
-#import "OKUUID.h"
+#import "COUUID.h"
 #import "GNUstep.h"
 
 @interface TestUUID: NSObject <UKTest>

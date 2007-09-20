@@ -7,30 +7,30 @@
 */
 
 #import <Foundation/Foundation.h>
-#import "OKPropertyType.h"
+#import "COPropertyType.h"
 
-extern NSString *kOKUIDProperty; // kOKStringProperty
-extern NSString *kOKCreationDateProperty; // kOKDateProperty
-extern NSString *kOKModificationDateProperty; // kOKDateProperty
-extern NSString *kOKReadOnlyProperty; //kOKIntegerProperty
-extern NSString *kOKParentsProperty; // kOKArrayProperty
-extern NSString *kOKTagProperty; // kOKArrayProperty
+extern NSString *kCOUIDProperty; // kCOStringProperty
+extern NSString *kCOCreationDateProperty; // kCODateProperty
+extern NSString *kCOModificationDateProperty; // kCODateProperty
+extern NSString *kCOReadOnlyProperty; //kCOIntegerProperty
+extern NSString *kCOParentsProperty; // kCOArrayProperty
+extern NSString *kCOTagProperty; // kCOArrayProperty
 
-extern NSString *kOKObjectChangedNotification;
-extern NSString *kOKUpdatedProperty;
-extern NSString *kOKRemovedProperty;
+extern NSString *kCOObjectChangedNotification;
+extern NSString *kCOUpdatedProperty;
+extern NSString *kCORemovedProperty;
 
 /* Only for search. No real property */
-extern NSString *qOKTextContent;
+extern NSString *qCOTextContent;
 
 /* For property list */
-extern NSString *pOKClassKey;
-extern NSString *pOKPropertiesKey;
-extern NSString *pOKValuesKey;
-extern NSString *pOKVersionKey;
-extern NSString *pOKVersion1Value;
+extern NSString *pCOClassKey;
+extern NSString *pCOPropertiesKey;
+extern NSString *pCOValuesKey;
+extern NSString *pCOVersionKey;
+extern NSString *pCOVersion1Value;
 
-@interface OKObject: NSObject <NSCopying>
+@interface COObject: NSObject <NSCopying>
 {
 	NSMutableDictionary *_properties;
 	NSNotificationCenter *_nc;
@@ -40,7 +40,7 @@ extern NSString *pOKVersion1Value;
 + (NSDictionary *) propertiesAndTypes;
 + (NSArray *) properties;
 + (int) removeProperties: (NSArray *) properties;
-+ (OKPropertyType) typeOfProperty: (NSString *) property;
++ (COPropertyType) typeOfProperty: (NSString *) property;
 
 + (id) objectWithPropertyList: (NSDictionary *) propertyList;
 
@@ -53,10 +53,10 @@ extern NSString *pOKVersion1Value;
 
 - (NSArray *) parentGroups; /* Include parents of parents */
 
-/* Use KOKReadOnlyProperty to set read-only */
+/* Use KCOReadOnlyProperty to set read-only */
 - (BOOL) isReadOnly;
 
-/* Use kOKUIDProperty to set UID */
+/* Use kCOUIDProperty to set UID */
 - (NSString *) uniqueID;
 
 - (BOOL) matchesPredicate: (NSPredicate *) predicate;

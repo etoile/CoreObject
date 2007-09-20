@@ -5,20 +5,20 @@
    modify it under the terms of the MIT license. See COPYING.
 
 */
-#import "OKGroup.h"
-#import "OKFileObject.h"
+#import "COGroup.h"
+#import "COFileObject.h"
 
-/* OKCollection is a specialized group which allow you to add files into
+/* COCollection is a specialized group which allow you to add files into
    a place and organize them automatically.
-   When a OKFileObject or its subclass is added into OKCollection,
-   its file will be moved or copied into location of OKCollection.
-   By default, OKCollection allows you to organize files based on added date.
-   Subclass of OKCollection can use different organization.
+   When a COFileObject or its subclass is added into COCollection,
+   its file will be moved or copied into location of COCollection.
+   By default, COCollection allows you to organize files based on added date.
+   Subclass of COCollection can use different organization.
 */
 
 extern NSString *collectionExtension;
 
-@interface OKCollection: OKGroup
+@interface COCollection: COGroup
 {
 	NSString *_location;
 	NSArray *_autoProperties;
@@ -35,11 +35,11 @@ extern NSString *collectionExtension;
 
 /* Return path relative to location. Subclass should override this
    to change the style of sub-directories structures. */
-- (NSString *) pathForFileObject: (OKFileObject *) object;
+- (NSString *) pathForFileObject: (COFileObject *) object;
 
 /* When specified properties of any object changes,
-   OKCollection move file to new value of -pathForFileObject.
-   Therefore, file associated with OKFileObject is always organized
+   COCollection move file to new value of -pathForFileObject.
+   Therefore, file associated with COFileObject is always organized
    based on properties. If nil, files will not be moved when properties changed.
  */ 
 - (void) setAutoOrganizingProperties: (NSArray *) properties;

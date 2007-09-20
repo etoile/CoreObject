@@ -6,13 +6,13 @@
 
 */
 
-#import "OKCollection.h"
+#import "COCollection.h"
 #import "GNUstep.h"
 
 NSString *collectionExtension = @"collection";
 NSString *collectionStore = @"_collection.store"; /* For property list */
 
-@implementation OKCollection
+@implementation COCollection
 /* Private */
 
 /* Return NO if there is anything wrong */
@@ -116,13 +116,13 @@ NSString *collectionStore = @"_collection.store"; /* For property list */
 {
 //	NSLog(@"%@", NSStringFromSelector(_cmd));
 	/* Check to see whether this is a parent */
-	OKFileObject *object = [[not userInfo] objectForKey: kOKGroupChild];
+	COFileObject *object = [[not userInfo] objectForKey: kCOGroupChild];
 	if (object == nil)
 	{
-		NSLog(@"Internal Error: no object from kOKGroupAddObjectNotification");
+		NSLog(@"Internal Error: no object from kCOGroupAddObjectNotification");
 		return;
 	}
-	if ([object isKindOfClass: [OKFileObject class]] == NO)
+	if ([object isKindOfClass: [COFileObject class]] == NO)
 	{
 		/* Not a file object. Nothing to do */
 		return;
@@ -164,13 +164,13 @@ NSString *collectionStore = @"_collection.store"; /* For property list */
 {
 //	NSLog(@"%@", NSStringFromSelector(_cmd));
 	/* Check to see whether this is a parent */
-	OKFileObject *object = [[not userInfo] objectForKey: kOKGroupChild];
+	COFileObject *object = [[not userInfo] objectForKey: kCOGroupChild];
 	if (object == nil)
 	{
-		NSLog(@"Internal Error: no object from kOKGroupAddObjectNotification");
+		NSLog(@"Internal Error: no object from kCOGroupAddObjectNotification");
 		return;
 	}
-	if ([object isKindOfClass: [OKFileObject class]] == NO)
+	if ([object isKindOfClass: [COFileObject class]] == NO)
 	{
 		/* Not a file object. Nothing to do */
 		return;
@@ -291,19 +291,19 @@ NSString *collectionStore = @"_collection.store"; /* For property list */
 	/* We start to listen after it is initialized */
 	[_nc addObserver: self
 	     selector: @selector(_receiveAddObjectNotification:)
-	     name: kOKGroupAddObjectNotification
+	     name: kCOGroupAddObjectNotification
 	     object: nil];
 	[_nc addObserver: self
 	     selector: @selector(_receiveRemoveObjectNotification:)
-	     name: kOKGroupRemoveObjectNotification
+	     name: kCOGroupRemoveObjectNotification
 	     object: nil];
 	[_nc addObserver: self
 	     selector: @selector(_receiveAddSubgroupNotification:)
-	     name: kOKGroupAddSubgroupNotification
+	     name: kCOGroupAddSubgroupNotification
 	     object: nil];
 	[_nc addObserver: self
 	     selector: @selector(_receiveRemoveSubgroupNotification:)
-	     name: kOKGroupRemoveSubgroupNotification
+	     name: kCOGroupRemoveSubgroupNotification
 	     object: nil];
 
 	return self;
@@ -327,12 +327,12 @@ NSString *collectionStore = @"_collection.store"; /* For property list */
 	return [data writeToFile: p atomically: YES];
 }
 
-- (NSString *) pathForFileObject: (OKFileObject *) fileObject
+- (NSString *) pathForFileObject: (COFileObject *) fileObject
 {
-	if ([fileObject isKindOfClass: [OKFileObject class]])
+	if ([fileObject isKindOfClass: [COFileObject class]])
 	{
 		/* Let's check the creation date */
-		NSDate *date = [fileObject valueForProperty: kOKCreationDateProperty];
+		NSDate *date = [fileObject valueForProperty: kCOCreationDateProperty];
 		NSString *p = [date descriptionWithCalendarFormat: @"%Y/%m/" timeZone: nil locale: nil];
 		p = [p stringByAppendingPathComponent: [[fileObject path] lastPathComponent]];
 		return p;

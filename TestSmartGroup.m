@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
-#import "OKSmartGroup.h"
-#import "OKObject.h"
-#import "OKMultiValue.h"
+#import "COSmartGroup.h"
+#import "COObject.h"
+#import "COMultiValue.h"
 #import "GNUstep.h"
 
 @interface TestSmartGroup: NSObject <UKTest>
@@ -31,40 +31,40 @@
 - (void) testSearchText
 {
 	NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithInt: kOKStringProperty], 
+		[NSNumber numberWithInt: kCOStringProperty], 
 			@"Location",
-		[NSNumber numberWithInt: kOKRealProperty], 
+		[NSNumber numberWithInt: kCORealProperty], 
 			@"Float",
 		nil];
-	[OKObject addPropertiesAndTypes: dict];
+	[COObject addPropertiesAndTypes: dict];
 
-	OKObject *o1 = [[OKObject alloc] init];
+	COObject *o1 = [[COObject alloc] init];
 	UKTrue([o1 setValue: @"Home" forProperty: @"Location"]);
 	UKTrue([o1 setValue: [NSNumber numberWithFloat: 2.12] 
 	           forProperty: @"Float"]);
 
-	OKObject *o2 = [[OKObject alloc] init];
+	COObject *o2 = [[COObject alloc] init];
 	UKTrue([o2 setValue: @"Home" forProperty: @"Location"]);
 	UKTrue([o2 setValue: [NSNumber numberWithFloat: 3.12] 
 	           forProperty: @"Float"]);
 
-	OKObject *o3 = [[OKObject alloc] init];
+	COObject *o3 = [[COObject alloc] init];
 	UKTrue([o3 setValue: @"Office" forProperty: @"Location"]);
 	UKTrue([o3 setValue: [NSNumber numberWithFloat: 2.12] 
 	           forProperty: @"Float"]);
 
-	OKObject *o4 = [[OKObject alloc] init];
+	COObject *o4 = [[COObject alloc] init];
 	UKTrue([o4 setValue: @"Office" forProperty: @"Location"]);
 	UKTrue([o4 setValue: [NSNumber numberWithFloat: 4.12] 
 	           forProperty: @"Float"]);
 
-	OKGroup *group = [[OKGroup alloc] init];
+	COGroup *group = [[COGroup alloc] init];
 	UKTrue([group addObject: o1]);
 	UKTrue([group addObject: o2]);
 	UKTrue([group addObject: o3]);
 	UKTrue([group addObject: o4]);
 
-	OKSmartGroup *smart = [[OKSmartGroup alloc] init];
+	COSmartGroup *smart = [[COSmartGroup alloc] init];
 	NSPredicate *p = [NSPredicate predicateWithFormat: @"%K == %@", @"Location", @"Home"];
 	[smart setPredicate: p];
 	[smart setTarget: group];

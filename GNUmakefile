@@ -3,26 +3,26 @@ include $(GNUSTEP_MAKEFILES)/common.make
 #test=yes
 
 ifeq ($(test), yes)
-BUNDLE_NAME = OrganizeKit
+BUNDLE_NAME = CoreObject
 else
-FRAMEWORK_NAME = OrganizeKit
+FRAMEWORK_NAME = CoreObject
 endif
 
-OrganizeKit_SUBPROJECTS = \
+CoreObject_SUBPROJECTS = \
 	UUID \
 	Blocks
 
-OrganizeKit_OBJC_FILES = \
-	OKCollection.m \
-	OKSmartGroup.m \
-	OKGroup.m \
-	OKFileObject.m \
-	OKObject.m \
-	OKMultiValue.m \
-	OKUUID.m
+CoreObject_OBJC_FILES = \
+	COCollection.m \
+	COSmartGroup.m \
+	COGroup.m \
+	COFileObject.m \
+	COObject.m \
+	COMultiValue.m \
+	COUUID.m
 
 ifeq ($(test), yes)
-OrganizeKit_OBJC_FILES += \
+CoreObject_OBJC_FILES += \
 	TestCollection.m \
 	TestSmartGroup.m \
 	TestGroup.m \
@@ -31,21 +31,21 @@ OrganizeKit_OBJC_FILES += \
 	TestUUID.m 
 endif
 
-OrganizeKit_HEADER_FILES_DIR += Headers
-OrganizeKit_HEADER_FILES = \
-	OrganizeKit.h \
-	OKCollection.h \
-	OKSmartGroup.h \
-	OKGroup.h \
-	OKFileObject.h \
-	OKObject.h \
-	OKMultiValue.h \
-	OKPropertyType.h \
-	OKUUID.h \
+CoreObject_HEADER_FILES_DIR += Headers
+CoreObject_HEADER_FILES = \
+	CoreObject.h \
+	COCollection.h \
+	COSmartGroup.h \
+	COGroup.h \
+	COFileObject.h \
+	COObject.h \
+	COMultiValue.h \
+	COPropertyType.h \
+	COUUID.h \
 	GNUstep.h
 
 # Blocks
-OrganizeKit_HEADER_FILES += \
+CoreObject_HEADER_FILES += \
 	Blocks.h \
 	BKExtension.h \
 	BKExtensionPoint.h \
@@ -54,17 +54,17 @@ OrganizeKit_HEADER_FILES += \
 	BKPluginRegistry.h \
 	BKRequirement.h \
 
-OrganizeKit_RESOURCE_FILES += \
+CoreObject_RESOURCE_FILES += \
 	Blocks/plugin.xml \
 	Blocks/Info.plist
 
 ifeq ($(FOUNDATION_LIB), apple)
 ifeq ($(test), yes)
-	OrganizeKit_OBJC_LIBS += -framework UnitKit
+	CoreObject_OBJC_LIBS += -framework UnitKit
 endif
 else
 ifeq ($(test), yes)
-	OrganizeKit_LDFLAGS += -lUnitKit
+	CoreObject_LDFLAGS += -lUnitKit
 endif
 endif
 

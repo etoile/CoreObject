@@ -6,10 +6,10 @@
 
 */
 
-#import "OKUUID.h"
+#import "COUUID.h"
 #import <UUID/uuid.h>
 
-@implementation NSString (OKUUID)
+@implementation NSString (COUUID)
 
 + (NSString *) UUIDString
 {

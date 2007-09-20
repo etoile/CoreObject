@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSString (OKUUID)
+@interface NSString (COUUID)
 
 + (NSString *) UUIDString;
 + (NSString *) UUIDStringWithURL: (NSURL *) url;

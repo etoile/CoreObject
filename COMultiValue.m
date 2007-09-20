@@ -6,7 +6,7 @@
 
 */
 
-#import "OKMultiValue.h"
+#import "COMultiValue.h"
 #import "GNUstep.h"
 
 static NSString *kIdentifier = @"kIdentifier";
@@ -16,7 +16,7 @@ static NSString *kValue = @"kValue";
 static NSString *pPrimaryIdentifierKey = @"PrimaryIdentifier";
 static NSString *pMultiValueKey = @"MultiValue";
 
-@implementation OKMultiValue
+@implementation COMultiValue
 
 - (id) initWithPropertyList: (NSDictionary *) propertyList
 {
@@ -96,13 +96,13 @@ static NSString *pMultiValueKey = @"MultiValue";
 	return [_values count];
 }
 
-- (OKPropertyType) propertyType
+- (COPropertyType) propertyType
 {
 	if ([self count])
 	{
 		id value = [self valueAtIndex: 0];
 		if ([value isKindOfClass: [NSString class]])
-			return kOKMultiStringProperty;
+			return kCOMultiStringProperty;
 		else if ([value isKindOfClass: [NSNumber class]])
 		{
 			const char *oct = [(NSNumber *)value objCType];
@@ -111,37 +111,37 @@ static NSString *pMultiValueKey = @"MultiValue";
 			    (oct == @encode(long)) ||
 			    (oct == @encode(unsigned long)))
 			{
-				return kOKMultiIntegerProperty;
+				return kCOMultiIntegerProperty;
 			}
 			else if ((oct == @encode(float)) ||
 			         (oct == @encode(double)))
 			{
-				return kOKMultiRealProperty;
+				return kCOMultiRealProperty;
 			}
 			else
 			{
-				return kOKErrorInProperty;
+				return kCOErrorInProperty;
 			}
 		}
 		else if ([value isKindOfClass: [NSDate class]])
 		{
-			return kOKMultiDateProperty;
+			return kCOMultiDateProperty;
 		}
 		else if ([value isKindOfClass: [NSArray class]])
 		{
-			return kOKMultiArrayProperty;
+			return kCOMultiArrayProperty;
 		}
 		else if ([value isKindOfClass: [NSDictionary class]])
 		{
-			return kOKMultiDictionaryProperty;
+			return kCOMultiDictionaryProperty;
 		}
 		else if ([value isKindOfClass: [NSData class]])
 		{
-			return kOKMultiDataProperty;
+			return kCOMultiDataProperty;
 		}
 	}
 	
-	return kOKErrorInProperty;
+	return kCOErrorInProperty;
 }
 
 /* NSObject */
@@ -168,7 +168,7 @@ static NSString *pMultiValueKey = @"MultiValue";
 /* NSCopying */
 - (id) copyWithZone: (NSZone *) zone
 {
-	OKMultiValue *clone = [[OKMultiValue allocWithZone: zone] init];
+	COMultiValue *clone = [[COMultiValue allocWithZone: zone] init];
 	NSMutableArray *array = [[NSMutableArray allocWithZone: zone] init];
 	NSEnumerator *e = [_values objectEnumerator];
 	NSMutableDictionary *d = nil;
@@ -185,7 +185,7 @@ static NSString *pMultiValueKey = @"MultiValue";
 /* NSMutableCopying */
 - (id)mutableCopyWithZone: (NSZone *) zone
 {
-	OKMultiValue *clone = [[OKMultiValue allocWithZone: zone] init];
+	COMultiValue *clone = [[COMultiValue allocWithZone: zone] init];
 	int pi, i, count = [self count];
 	id value = nil;
 	NSString *label = nil;

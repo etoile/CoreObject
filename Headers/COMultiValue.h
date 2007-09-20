@@ -7,12 +7,12 @@
 */
 
 #import <Foundation/Foundation.h>
-#import "OKPropertyType.h"
+#import "COPropertyType.h"
 
-/* Unlike ABMultiValue, OKMultiValue is always mutable.
-   The reason is that unmutable OKMultiValue is not very useful. */
+/* Unlike ABMultiValue, COMultiValue is always mutable.
+   The reason is that unmutable COMultiValue is not very useful. */
 
-@interface OKMultiValue: NSObject <NSCopying>
+@interface COMultiValue: NSObject <NSCopying>
 {
 	/* We use mutable array of mutable dictionary.
 	 * We use mutable collections to make things easier.
@@ -20,7 +20,7 @@
 	 */
 	NSMutableArray *_values;
 	NSString *_primaryIdentifier;
-	OKPropertyType _propertyType;
+	COPropertyType _propertyType;
 }
 
 /* For read and write */
@@ -38,7 +38,7 @@
 
 - (unsigned int) count;
 /* Always use the first type of value. If there is no value, return ErrorType */
-- (OKPropertyType) propertyType;
+- (COPropertyType) propertyType;
 
 /* Mutable */
 

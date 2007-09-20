@@ -7,17 +7,17 @@
 */
 
 #import <Foundation/Foundation.h>
-#import "OKGroup.h"
+#import "COGroup.h"
 
-extern NSString *kOKPredicateProperty;
+extern NSString *kCOPredicateProperty;
 
-@interface OKSmartGroup: OKGroup
+@interface COSmartGroup: COGroup
 {
-	OKGroup *target;
+	COGroup *target;
 	NSPredicate *predicate;
 }
 
 - (void) setPredicate: (NSPredicate *) predicate;
-- (void) setTarget: (OKGroup *) group; 
+- (void) setTarget: (COGroup *) group; 
 @end
 
