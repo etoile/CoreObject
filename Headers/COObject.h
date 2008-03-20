@@ -9,6 +9,22 @@
 #import <Foundation/Foundation.h>
 #import "COPropertyType.h"
 
+/* CoreObject Protocol (Objects) */
+
+@protocol COObject
+/** Adds object to the receiver. */
+- (BOOL) isCopyPromise;
+/** Returns the model properties of the receiver. 
+	Properties should encompass all model attributes and relationships that you 
+	want to publish. Your Property-Value Coding implementation will determine
+	for each one whether they are readable, writable or both.*/
+- (NSArray *) properties;
+/** Returns the metadatas of the receiver to be indexed by the metadata server. 
+	The set of metadatas may intersect or not the set of properties. */
+- (NSDictionary *) metadatas;
+//- (NSArray *) parentGroups;
+@end
+
 extern NSString *kCOUIDProperty; // kCOStringProperty
 extern NSString *kCOCreationDateProperty; // kCODateProperty
 extern NSString *kCOModificationDateProperty; // kCODateProperty

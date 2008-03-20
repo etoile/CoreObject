@@ -16,6 +16,8 @@
 #import "COUUID.h"
 #import "COPropertyType.h"
 #import "COFileObject.h"
+#import "COFile.h"
+#import "CODirectory.h"
 
 #import "BKExtension.h"
 #import "BKExtensionPoint.h"

@@ -8,6 +8,8 @@ else
 FRAMEWORK_NAME = CoreObject
 endif
 
+CoreObject_LIBRARIES_DEPEND_UPON += -lEtoileFoundation
+
 CoreObject_SUBPROJECTS = \
 	UUID \
 	Blocks
@@ -19,16 +21,25 @@ CoreObject_OBJC_FILES = \
 	COFileObject.m \
 	COObject.m \
 	COMultiValue.m \
-	COUUID.m
+	COUUID.m \
+	CODirectory.m \
+	COFile.m
 
 ifeq ($(test), yes)
+CoreObject_OBJC_FILES += \
+	TestFile.m \
+	TestDirectory.m
+endif
+
+ifeq ($(test), all)
 CoreObject_OBJC_FILES += \
 	TestCollection.m \
 	TestSmartGroup.m \
 	TestGroup.m \
 	TestObject.m \
 	TestMultiValue.m \
-	TestUUID.m 
+	TestUUID.m \
+	TestFile.m
 endif
 
 CoreObject_HEADER_FILES_DIR += Headers
@@ -42,7 +53,9 @@ CoreObject_HEADER_FILES = \
 	COMultiValue.h \
 	COPropertyType.h \
 	COUUID.h \
-	GNUstep.h
+	GNUstep.h \
+	CODirectory.h \
+	COFile.h
 
 # Blocks
 CoreObject_HEADER_FILES += \
@@ -60,11 +73,11 @@ CoreObject_RESOURCE_FILES += \
 
 ifeq ($(FOUNDATION_LIB), apple)
 ifeq ($(test), yes)
-	CoreObject_OBJC_LIBS += -framework UnitKit
+	CoreObject_OBJC_LIBS += -framework UnitKit -framework EtoileFoundation
 endif
 else
 ifeq ($(test), yes)
-	CoreObject_LDFLAGS += -lUnitKit
+	CoreObject_LDFLAGS += -lUnitKit -lEtoileFoundation
 endif
 endif
 

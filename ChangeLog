@@ -1,0 +1,20 @@
+2008-03-20  Quentin Mathe <qmathe@club-internet.fr>
+
+	Introduced a preliminary CoreObject protocol and a filesystem backend that
+	implements it.
+	* Headers/COObject.h:
+	* Headers/COGroup.h:
+	Added a rough CoreObject protocol that consists of COObject and COGroup
+	protocols. COObject and COGroup classes don't yet conform to these.
+	* Headers/COFile.h:
+	* COFile.m:.
+	* Headers/CODirectory.h:
+	* CODirectory.m:.
+	Added. These classes makes up the FS server backend that will be later moved 
+	out of the framework into a standalone bundle.
+	* TestFile.m:
+	* TestDirectory.m:
+	Added.
+	* GNUmakefile:
+	* Headers/CoreObject.h: 
+	Updated.
