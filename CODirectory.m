@@ -96,7 +96,7 @@ DEALLOC()
 	exist on the file system. */
 - (BOOL) addObject: (id) object
 {
-	if ([self isValidObject: object])
+	if ([self isValidObject: object] == NO)
 		return NO;
 
 	BOOL result = NO;
@@ -118,7 +118,7 @@ DEALLOC()
 	and pointing to the URL of this object. */
 - (BOOL) addSymbolicLink: (id)object
 {
-	if ([self isValidObject: object])
+	if ([self isValidObject: object] == NO)
 		return NO;
 	if ([object isCopyPromise])
 	{
@@ -135,7 +135,7 @@ DEALLOC()
 	and pointing to the URL of this object. */
 - (BOOL) addHardLink: (id)object
 {
-	if ([self isValidObject: object])
+	if ([self isValidObject: object] == NO)
 		return NO;
 	if ([object isCopyPromise])
 	{
@@ -143,6 +143,7 @@ DEALLOC()
 		            format: @"Hard linked object %@ cannot be a copy promise", object];
 	}
 
+	ETLog(@"Remove file %@", FSPATH(object));
 	return [FM removeFileAtPath: FSPATH(object) handler: FM_HANDLER];
 }
 
@@ -154,13 +155,20 @@ DEALLOC()
 	// id parentDir = [CODirectory objectWithURL: [[object URL] parentURL]];
 	// [parentDir removeCachedObject: object]; or [parentDir recache]; or 
 	// [object didRemoveFromGroup: self];
+	NSString *destPath = [FSPATH(self) appendPath: 
+		[FSPATH(object) lastPathComponent]];
 
-	return [FM movePath: FSPATH(object) toPath: FSPATH(self) handler: FM_HANDLER];
+	ETLog(@"Move file %@ to path %@", FSPATH(object), destPath);
+	return [FM movePath: FSPATH(object) toPath: destPath handler: FM_HANDLER];
 }
 
 - (BOOL) addCopiedObject: (id)object
 {
-	return [FM copyPath: FSPATH(object) toPath: FSPATH(self) handler: FM_HANDLER];
+	NSString *destPath = [FSPATH(self) appendPath: 
+		[FSPATH(object) lastPathComponent]];
+
+	ETLog(@"Copy file %@ to path %@", FSPATH(object), destPath );
+	return [FM copyPath: FSPATH(object) toPath: destPath handler: FM_HANDLER];
 }
 
 /** Create a directory when none exists at the receiver URL. */
@@ -171,7 +179,7 @@ DEALLOC()
 
 - (BOOL) checkObjectToBeRemovedOrDeleted: (id)object
 {
-	if ([self isValidObject: object])
+	if ([self isValidObject: object] == NO)
 		return NO;
 	if ([object isCopyPromise])
 	{
@@ -213,7 +221,6 @@ DEALLOC()
 {
 	if ([self checkObjectToBeRemovedOrDeleted: object])
 		return NO;
-
 
 	// NOTE: If we cache the children objects/files at some point, we will have 
 	// to remove the moved object from the existing CODirectory instance that 

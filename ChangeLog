@@ -1,3 +1,18 @@
+2008-03-21  Quentin Mathe <qmathe@club-internet.fr>
+
+	Fixed file move operation and probably copy too (have to write tests to 
+	ensure copy works as advertised).
+	* COFile.m:.
+	Fixed -URL to return an autoreleased copy as expected for such value object.
+	* CODirectory.m
+	(-addObject:, -addSymbolicLink:, -addHardLink:, 
+	-checkObjectToBeRemovedOrDeleted:): Corrected object validity boolean test.
+	(-addCopiedObject, -addMovedObject:): Fixed destination path to match 
+	NSFileManager expectation.
+	* TestFile.m:
+	* TestDirectory.m:
+	Added new tests.
+
 2008-03-20  Quentin Mathe <qmathe@club-internet.fr>
 
 	Introduced a preliminary CoreObject protocol and a filesystem backend that

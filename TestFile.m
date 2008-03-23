@@ -100,6 +100,18 @@
 	UKFalse([file exists]); // file object points to a directory and not a file
 }
 
+
+- (void) testDidAddToGroup
+{
+	id dir = [CODirectory objectWithURL: TEMP_URL];
+	id sourceURL = [self URL];
+
+	[self didAddToGroup: dir];
+	UKObjectsNotEqual([self URL], sourceURL);
+	UKStringsEqual([[self URL] lastPathComponent], [sourceURL lastPathComponent]);
+	UKObjectsEqual([self URL], [[dir URL] appendPath: [sourceURL lastPathComponent]]);
+}
+
 @end
 
 @implementation SubFile

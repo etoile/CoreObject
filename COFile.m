@@ -85,7 +85,7 @@ DEALLOC(DESTROY(_url))
 	The URL may point to a non-existent file or directory. */
 - (NSURL *) URL
 {
-	return _url;
+	return AUTORELEASE([_url copy]);
 }
 
 - (void) setURL: (NSURL *)url

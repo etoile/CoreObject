@@ -90,6 +90,27 @@
 	[self delete];
 }
 
+- (void) testMoveObject
+{
+	id file1 = [COFile objectWithURL: TEMP_URL];
+	id sourceURL = [file1 URL];
+
+	[self create];
+	[file1 create];
+	UKFalse([[self objects] containsObject: file1]);
+
+	[self addObject: file1];
+	UKObjectsNotEqual([file1 URL], sourceURL);
+	UKTrue([file1 exists]);
+	UKTrue([[self objects] containsObject: file1]);	
+	
+	id file2 = [COFile objectWithURL: sourceURL];
+	UKFalse([file2 exists]);
+	UKObjectsNotEqual([file2 URL], [file1 URL]);
+
+	[self delete]; // will delete file1 moved inside
+}
+
 @end
 
 @implementation SubDirectory
