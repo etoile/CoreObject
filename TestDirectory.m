@@ -111,6 +111,32 @@
 	[self delete]; // will delete file1 moved inside
 }
 
+- (void) testCopyObject
+{
+	id file1 = [COFile objectWithURL: TEMP_URL];
+	id sourceURL = [file1 URL];
+
+	[self create];
+	[file1 create];
+	id file1Copy = [file1 copy];
+	UKObjectsEqual(file1Copy, file1);
+	UKTrue([file1Copy exists]); // points to file1 URL	
+	UKFalse([[self objects] containsObject: file1]);
+	UKFalse([[self objects] containsObject: file1Copy]);
+
+	[self addObject: file1Copy];
+	UKObjectsNotEqual([file1Copy URL], sourceURL);
+	UKTrue([file1Copy exists]);
+	UKTrue([[self objects] containsObject: file1Copy]);
+	
+	UKTrue([file1 exists]);
+	UKObjectsNotEqual([file1 URL], [file1Copy URL]);
+	UKFalse([[self objects] containsObject: file1]);	
+
+	[self delete]; // will delete file1Copy located inside
+	[file1 delete];
+}
+
 @end
 
 @implementation SubDirectory

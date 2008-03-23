@@ -1,5 +1,10 @@
 2008-03-21  Quentin Mathe <qmathe@club-internet.fr>
 
+	Wrote tests that ensure file copy operation behaves correctly.
+	* TestDirectory.m (-testCopyObject): Added.
+
+2008-03-21  Quentin Mathe <qmathe@club-internet.fr>
+
 	Fixed file move operation and probably copy too (have to write tests to 
 	ensure copy works as advertised).
 	* COFile.m:.
