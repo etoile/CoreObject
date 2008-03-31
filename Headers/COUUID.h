@@ -14,6 +14,16 @@
 @interface COUUID : NSObject {
 	uuid_t uuid;
 }
+/**
+ * Initialize the UUID object with a 128-bit binary value
+ */
+- (id) initWithUUID:(uuid_t*)aUUID;
+/**
+ * Initialize the UUID object from a string representation.
+ */
+- (id) initWithString:(NSString*)aString;
+- (BOOL) isEqualTo:(id)anObject;
+- (NSString*) stringValue;
 - (uuid_t*) uuid;
 @end
 

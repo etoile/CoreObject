@@ -21,6 +21,12 @@
 	}
 	return self;
 }
+- (id) initWithUUID:(uuid_t*)aUUID
+{
+	if(nil == (self = [super init])) { return nil; }
+	memcpy(&uuid, aUUID, 16);
+	return self;
+}
 - (id) initWithString:(NSString*)aString
 {
 	if(nil == (self = [super init])) { return nil; }
