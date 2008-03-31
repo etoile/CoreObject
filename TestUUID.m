@@ -86,15 +86,5 @@
 	}
 	DESTROY(set);
 	NSLog(@"Long testing is done");
-
-	NSURL *u1 = [NSURL URLWithString: @"http://www.gnustep.org"];
-	NSURL *u2 = [NSURL URLWithString: @"http://www.gnustep.org"];
-	NSURL *u3 = [NSURL URLWithString: @"http://www.etoile-project.org"];
-
-	NSString *s1 = [NSString UUIDStringWithURL: u1];
-	NSString *s2 = [NSString UUIDStringWithURL: u2];
-	NSString *s3 = [NSString UUIDStringWithURL: u3];
-	UKStringsEqual(s1, s2);
-	UKStringsNotEqual(s1, s3);
 }
 @end

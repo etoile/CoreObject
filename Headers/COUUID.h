@@ -7,13 +7,19 @@
 */
 
 #import <Foundation/Foundation.h>
+//TODO: Replace this with some conditional compilation for finding the correct
+//DCE-compliant UUID header
+#include <UUID/uuid_dce.h>
+
+@interface COUUID : NSObject {
+	uuid_t uuid;
+}
+- (uuid_t*) uuid;
+@end
 
 #define COUUIDSize (36 * sizeof(char))
-
 
 @interface NSString (COUUID)
 
 + (NSString *) UUIDString;
-+ (NSString *) UUIDStringWithURL: (NSURL *) url;
-
 @end

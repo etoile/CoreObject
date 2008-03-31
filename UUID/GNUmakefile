@@ -22,15 +22,15 @@ before-all::
 	fi; \
 	\
 	echo "Building"; \
-	make -f Makefile;
+	${MAKE} -f Makefile;
 
 after-clean::
 	if [ -f Makefile ]; then \
-		make -f Makefile clean; \
+		${MAKE} -f Makefile clean; \
 	fi
 
 after-distclean::
 	if [ -f Makefile ]; then \
-		make -f Makefile distclean; \
+		${MAKE} -f Makefile distclean; \
 	fi
 
