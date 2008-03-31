@@ -16,6 +16,9 @@
 #import "COUUID.h"
 #import "COPropertyType.h"
 #import "COFileObject.h"
+#import "COSerializer.h"
+#import "CODeserializer.h"
+#import "COUtility.h"
 #import "COFile.h"
 #import "CODirectory.h"
 
@@ -25,4 +28,3 @@
 #import "BKPlugin.h"
 #import "BKPluginRegistry.h"
 #import "BKRequirement.h"
-

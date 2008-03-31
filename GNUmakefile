@@ -8,7 +8,8 @@ else
 FRAMEWORK_NAME = CoreObject
 endif
 
-CoreObject_LIBRARIES_DEPEND_UPON += -lEtoileFoundation
+CoreObject_LDFLAGS += -lEtoileFoundation -lEtoileSerialize
+CoreObject_LIBRARIES_DEPEND_UPON += -lEtoileFoundation -lEtoileSerialize
 
 CoreObject_SUBPROJECTS = \
 	UUID \
@@ -22,11 +23,15 @@ CoreObject_OBJC_FILES = \
 	COObject.m \
 	COMultiValue.m \
 	COUUID.m \
+	COSerializer.m \
+	CODeserializer.m \
+	NSObject+CoreObject.m \
 	CODirectory.m \
 	COFile.m
 
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += \
+	TestSerializer.m \
 	TestFile.m \
 	TestDirectory.m
 endif
@@ -53,6 +58,10 @@ CoreObject_HEADER_FILES = \
 	COMultiValue.h \
 	COPropertyType.h \
 	COUUID.h \
+	COSerializer.h \
+	CODeserializer.h \
+	COUtility.h \
+	NSObject+CoreObject.h \
 	GNUstep.h \
 	CODirectory.h \
 	COFile.h
@@ -73,11 +82,13 @@ CoreObject_RESOURCE_FILES += \
 
 ifeq ($(FOUNDATION_LIB), apple)
 ifeq ($(test), yes)
+	# TODO: Apple target broken currently, we may support compiling CoreObject 
+	# without EtoileSerialize later to restore Cocoa compatibility
 	CoreObject_OBJC_LIBS += -framework UnitKit -framework EtoileFoundation
 endif
 else
 ifeq ($(test), yes)
-	CoreObject_LDFLAGS += -lUnitKit -lEtoileFoundation
+	CoreObject_LDFLAGS += -lUnitKit -lEtoileFoundation -lEtoileSerialize
 endif
 endif
 
@@ -87,5 +98,6 @@ ifeq ($(test), yes)
 include $(GNUSTEP_MAKEFILES)/bundle.make
 else
 include $(GNUSTEP_MAKEFILES)/framework.make
+-include ../../etoile.make
 -include GNUmakefile.postamble
 endif

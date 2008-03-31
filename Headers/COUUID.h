@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
+#define COUUIDSize (36 * sizeof(char))
+
+
 @interface NSString (COUUID)
 
 + (NSString *) UUIDString;

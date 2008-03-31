@@ -1,5 +1,21 @@
 2008-03-31  Quentin Mathe <qmathe@club-internet.fr>
 
+	Added some basic partially implemented classes to handle the integration 
+	with EtoileSerialize.
+	* Headers/CoreObject.h: Updated.
+	* Headers/COUUID.h: Added a macro that returns the size of UUID type.
+	* Headers/COUtility.h:
+	* Headers/NSObject+CoreObject.h:
+	* Headers/COSerializer.h:
+	* Headers/CODeserializer.h:
+	* NSObject+CoreObject.m:
+	* COSerializer.m:
+	* CODeserializer.m:
+	Added.
+	* GNUmakefile: Updated.
+
+2008-03-31  Quentin Mathe <qmathe@club-internet.fr>
+
 	* Headers/COGroup.h: Fixed COGroup protocol to inherit from COObject as 
 	expected.
 
