@@ -12,7 +12,7 @@
 
 /* CoreObject Protocol (Relationships) */
 
-@protocol COGroup <ETCollection>
+@protocol COGroup <COObject, ETCollection>
 
 /** Must return YES to indicate the receiver is a group. */
 - (BOOL) isGroup;
