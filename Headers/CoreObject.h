@@ -13,7 +13,6 @@
 #import "COGroup.h"
 #import "COCollection.h"
 #import "COMultiValue.h"
-#import "COUUID.h"
 #import "COPropertyType.h"
 #import "COFileObject.h"
 #import "COSerializer.h"

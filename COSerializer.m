@@ -7,7 +7,6 @@
 */
 
 #import "COSerializer.h"
-#import "COUUID.h"
 #import "NSObject+CoreObject.h"
 
 /* CoreObject Serializer */

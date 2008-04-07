@@ -11,9 +11,7 @@ endif
 CoreObject_LDFLAGS += -lEtoileFoundation -lEtoileSerialize
 CoreObject_LIBRARIES_DEPEND_UPON += -lEtoileFoundation -lEtoileSerialize
 
-CoreObject_SUBPROJECTS = \
-	UUID \
-	Blocks
+CoreObject_SUBPROJECTS = Blocks
 
 CoreObject_OBJC_FILES = \
 	COCollection.m \
@@ -22,7 +20,6 @@ CoreObject_OBJC_FILES = \
 	COFileObject.m \
 	COObject.m \
 	COMultiValue.m \
-	COUUID.m \
 	COSerializer.m \
 	CODeserializer.m \
 	NSObject+CoreObject.m \
@@ -43,7 +40,6 @@ CoreObject_OBJC_FILES += \
 	TestGroup.m \
 	TestObject.m \
 	TestMultiValue.m \
-	TestUUID.m \
 	TestFile.m
 endif
 
@@ -57,7 +53,6 @@ CoreObject_HEADER_FILES = \
 	COObject.h \
 	COMultiValue.h \
 	COPropertyType.h \
-	COUUID.h \
 	COSerializer.h \
 	CODeserializer.h \
 	COUtility.h \

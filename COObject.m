@@ -8,7 +8,6 @@
 
 #import "COObject.h"
 #import "COMultiValue.h"
-#import "COUUID.h"
 #import "GNUstep.h"
 
 static NSMutableDictionary *propertyTypes;
