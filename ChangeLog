@@ -1,5 +1,13 @@
 2008-04-15  Quentin Mathe <qmathe@club-internet.fr>
 
+	* Headers/NSObject+CoreObject.h
+	* Headers/COProxy.h
+	* NSObject+CoreObject.m
+	* COProxy.m
+	(-isCoreObjectProxy): Added.
+
+2008-04-15  Quentin Mathe <qmathe@club-internet.fr>
+
 	Fixed compilation with EtoileSerialize trunk version.
 	* Headers/CoreObject.h:
 	* GNUmakefile: 

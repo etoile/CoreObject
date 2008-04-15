@@ -20,4 +20,9 @@
 	return [self conformsToProtocol: @protocol(COManagedObject)];
 }
 
+- (BOOL) isCoreObjectProxy
+{
+	return NO;
+}
+
 @end

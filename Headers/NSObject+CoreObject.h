@@ -28,5 +28,6 @@
 
 - (BOOL) isCoreObject;
 - (BOOL) isManagedCoreObject;
+- (BOOL) isCoreObjectProxy;
 
 @end

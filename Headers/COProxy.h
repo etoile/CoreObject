@@ -37,4 +37,5 @@
  * Restore to a previous version.
  */
 - (int) setVersion:(int)aVersion;
+- (BOOL) isCoreObjectProxy;
 @end

@@ -121,4 +121,10 @@ static id logBackend;
 		[fullSave serializeObject:object withName:"FullSave"];
 	}
 }
+
+- (BOOL) isCoreObjectProxy 
+{
+	return YES; 
+}
+
 @end
