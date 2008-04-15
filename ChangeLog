@@ -1,3 +1,10 @@
+2008-04-15  Quentin Mathe <qmathe@club-internet.fr>
+
+	WARNING: Doesn't compile with the trunk version of EtoileSerialize.
+	* Headers/COProxy.h:
+	* COProxy.m:
+	Added by copying them from EtoileSerialize.
+
 2008-04-07  Quentin Mathe <qmathe@club-internet.fr>
 
 	Removed existing UUID stuff from CoreObject in favor of the support now 
