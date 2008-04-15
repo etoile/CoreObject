@@ -1,5 +1,14 @@
 2008-04-15  Quentin Mathe <qmathe@club-internet.fr>
 
+	Fixed compilation with EtoileSerialize trunk version.
+	* Headers/CoreObject.h:
+	* GNUmakefile: 
+	Disabled COSerializer and CODeserializer which aren't needed immediately 
+	because EtoileSerialize now provides most of their features in their parent 
+	classes.
+
+2008-04-15  Quentin Mathe <qmathe@club-internet.fr>
+
 	WARNING: Doesn't compile with the trunk version of EtoileSerialize.
 	* Headers/COProxy.h:
 	* COProxy.m:

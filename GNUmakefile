@@ -20,11 +20,11 @@ CoreObject_OBJC_FILES = \
 	COFileObject.m \
 	COObject.m \
 	COMultiValue.m \
-	COSerializer.m \
-	CODeserializer.m \
 	NSObject+CoreObject.m \
 	CODirectory.m \
 	COFile.m
+#	COSerializer.m \
+#	CODeserializer.m \
 
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += \
@@ -53,13 +53,13 @@ CoreObject_HEADER_FILES = \
 	COObject.h \
 	COMultiValue.h \
 	COPropertyType.h \
-	COSerializer.h \
-	CODeserializer.h \
 	COUtility.h \
 	NSObject+CoreObject.h \
 	GNUstep.h \
 	CODirectory.h \
 	COFile.h
+#	COSerializer.h \
+#	CODeserializer.h \
 
 # Blocks
 CoreObject_HEADER_FILES += \
