@@ -31,10 +31,18 @@
 	* COSerializer.m:
 	* CODeserializer.m:
 	Rewritten to be useful in a different way now that most of their old logic 
-	has been moved to EtoileSerialize. Now encapsulate the interaction details 
+	has been moved to EtoileSerialize. Now encapsulates the interaction details 
 	with EtoileSerialize.
 	* Headers/CoreObject.h: Renenabled serializer classes.
 	* GNUmakefile: Updated.
+
+2008-04-15  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSObject+CoreObject.h:
+	* Headers/COProxy.h:
+	* NSObject+CoreObject.m:
+	* COProxy.m:
+	(-isCoreObjectProxy): Added.
 
 2008-04-15  Quentin Mathe <qmathe@club-internet.fr>
 
