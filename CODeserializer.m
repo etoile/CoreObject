@@ -16,6 +16,24 @@
    write a deserializer like COZFSDeserializer. */
 @implementation ETDeserializer (CODeserializer)
 
++ (id) defaultCoreObjectDeserializer
+{
+	return [self defaultCoreObjectDeserializerWithURL:  [NSURL fileURLWithPath: @"~/CoreObjectLibrary"]];
+}
+
++ (id) defaultCoreObjectDeserializerWithURL: (NSURL *)anURL
+{
+	id deback = [ETDeserializerBackendBinary new];
+	id store = [[ETSerialObjectBundle alloc] initWithPath: [anURL path]];
+
+	[deback deserializeFromStore: store];
+	id deserializer = [ETDeserializer deserializerWithBackend: deback];
+
+	RELEASE(store);
+
+	return deserializer;
+}
+
 /** Handle the deserialization of the core object identified by anUUID. */
 - (void) loadUUID: (char *)anUUID withName: (char *)aName
 {

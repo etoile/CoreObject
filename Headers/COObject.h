@@ -9,6 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COPropertyType.h"
+#import "COUtility.h"
+
+@class COObjectContext;
 
 /* CoreObject Protocol (Objects) */
 
@@ -51,6 +54,7 @@ extern NSString *pCOVersion1Value;
 {
 	NSMutableDictionary *_properties;
 	NSNotificationCenter *_nc;
+	COObjectContext *_objectContext;
 }
 
 + (int) addPropertiesAndTypes: (NSDictionary *) properties;

@@ -8,6 +8,8 @@
 
 #import "COObject.h"
 #import "COMultiValue.h"
+#import "COObjectContext.h"
+#import "NSObject+CoreObject.h"
 #import "GNUstep.h"
 
 static NSMutableDictionary *propertyTypes;
@@ -221,7 +223,8 @@ NSString *pCOVersion1Value = @"COVersion1";
 - (NSMutableDictionary *) propertyList
 {
 	NSMutableDictionary *pl = [[NSMutableDictionary alloc] init];
-	NSMutableDictionary *dict;
+	NSMutableDictionary *dict = nil;
+	//NSMutableDictionary *relations = [[NSMutableDictionary alloc] init];
 
 	[pl setObject: NSStringFromClass([self class]) forKey: pCOClassKey];
 	[pl setObject: [[self class] propertiesAndTypes] 
@@ -241,31 +244,95 @@ NSString *pCOVersion1Value = @"COVersion1";
 			[dict setObject: [(COMultiValue *)value propertyList]
 			         forKey: key];
 		}
+#if 0
+		else if ([value isManagedCoreObject]) // has UUID and URL
+		{
+			[relations setObject: value forKey: [value UUID]];
+			[dict setObject: [value UUID] forKey: key];
+		}
+		else if ([value isCoreObject]) // has URL
+		{
+			[relations setObject: value forKey: [value URL]];
+			[dict setObject: [value URL] forKey: key];
+		}
+#endif
 	}
 	[pl setObject: dict forKey: pCOValuesKey];
 	[pl setObject: pCOVersion1Value forKey: pCOVersionKey];
 	return AUTORELEASE(pl);
 }
 
+- (COObjectContext *) objectContext
+{
+	return _objectContext;
+}
+
+- (NSDictionary *) relatedCoreObjects
+{
+	NSDictionary *properties = [self propertyList];
+	NSMutableDictionary *relations = [NSMutableDictionary dictionary];
+#if 0
+	/* We remove parents property */
+	[properties removeObjectForKey: kCOParentsProperty];
+	/* If we have COMultiValue, save its property list */
+	NSEnumerator *e = [[properties allKeys] objectEnumerator];
+	NSString *key = nil;
+	while ((key = [e nextObject]))
+	{
+		id value = [dict objectForKey: key];
+		if ([value isKindOfClass: [COMultiValue class]])
+		{
+			[properties setObject: [(COMultiValue *)value propertyList]
+			               forKey: key];
+		}
+		else if ([value isManagedCoreObject]) // has UUID and URL
+		{
+			[relations setObject: value forKey: [value UUID]];
+			[dict setObject: [value UUID] forKey: key];
+		}
+		else if ([value isCoreObject]) // has URL
+		{
+			[relations setObject: value forKey: [value URL]];
+			[dict setObject: [value URL] forKey: key];
+		}
+	}
+#endif
+	return relations;
+}
+
+- (void) loadRelatedCoreObjects: (NSDictionary *)relations
+{
+
+}
+
+- (void) storeRelatedCoreObjects: (NSDictionary *)relations
+{
+
+}
+
 - (BOOL) removeValueForProperty: (NSString *) property
 {
-	if ([self isReadOnly])
+	if (IGNORE_CHANGES || [self isReadOnly])
 		return NO;
 
+	RECORD(property)
 	[_properties removeObjectForKey: property];
 	[self setValue: [NSDate date] forProperty: kCOModificationDateProperty];
     [_nc postNotificationName: kCOObjectChangedNotification
          object: self
 	     userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
 	                 property, kCORemovedProperty, nil]];
+	END_RECORD
+
 	return YES;
 }
 
 - (BOOL) setValue: (id) value forProperty: (NSString *) property
 {
-	if ([self isReadOnly])
+	if (IGNORE_CHANGES || [self isReadOnly])
 		return NO;
 
+	RECORD(value, property)
 	[_properties setObject: value forKey: property];
 	[_properties setObject: [NSDate date] 
 	                forKey: kCOModificationDateProperty];
@@ -273,6 +340,8 @@ NSString *pCOVersion1Value = @"COVersion1";
          object: self
 	     userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
 	                 property, kCOUpdatedProperty, nil]];
+	END_RECORD
+
 	return YES;
 }
 
@@ -437,6 +506,8 @@ NSString *pCOVersion1Value = @"COVersion1";
     [self setValue: AUTORELEASE([[NSMutableArray alloc] init])
           forProperty: kCOParentsProperty];
 	_nc = [NSNotificationCenter defaultCenter];
+	// FIXME: Should be obtained by parameter usually
+	_objectContext = [COObjectContext defaultContext];
 	return self;
 }
 

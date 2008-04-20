@@ -11,27 +11,23 @@
 
 /* CoreObject Serializer */
 
-@implementation COSerializer
+@implementation ETSerializer (CoreObject)
 
-- (size_t) storeObjectFromAddress: (void *)anAddress withName: (char *)aName
++ (NSURL *) defaultLibraryURL
 {
-	id object = *(id *)anAddress;
-
-	if ([object isCoreObject])
-	{
-		return [self storeCoreObject: object withName: aName];
-	}
-	else
-	{
-		return [super storeObjectFromAddress: anAddress withName: aName];
-	}
+	return [NSURL fileURLWithPath: @"~/CoreObjectLibrary"];
 }
 
-- (size_t) storeCoreObject: (id)anObject withName: (char *)aName
++ (id) defaultCoreObjectSerializer
 {
-	[[self backend] storeUUID: (char *)[[anObject UUID] UTF8String] 
-	                 withName: aName];
-	return COUUIDSize;
+	return [ETSerializer serializerWithBackend: [ETSerializerBackendBinary class]
+	                                    forURL: [self defaultLibraryURL]];
+}
+
++ (id) defaultCoreObjectSerializerWithURL: (NSURL *)anURL
+{
+	return [ETSerializer serializerWithBackend: [ETSerializerBackendBinary class]
+	                                    forURL: anURL];
 }
 
 @end

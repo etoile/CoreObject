@@ -15,8 +15,8 @@
 #import "COMultiValue.h"
 #import "COPropertyType.h"
 #import "COFileObject.h"
-#if 0
 #import "COSerializer.h"
+#if 0
 #import "CODeserializer.h"
 #endif
 #import "COUtility.h"

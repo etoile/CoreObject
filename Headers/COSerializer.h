@@ -12,12 +12,12 @@
 #import "COUtility.h"
 
 /** Extends ETSerializer to handle the serialization of core objects. */
-@interface COSerializer : ETSerializer
-{
+@interface ETSerializer (CoreObject)
 
-}
+// TODO: Move to COLibrary
++ (NSURL *) defaultLibraryURL;
 
-- (size_t) storeObjectFromAddress: (void *)anAddress withName: (char *)aName;
-- (size_t) storeCoreObject: (id)anObject withName: (char *)aName;
++ (id) defaultCoreObjectSerializer;
++ (id) defaultCoreObjectSerializerWithURL: (NSURL *)anURL;
 
 @end

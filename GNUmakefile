@@ -8,6 +8,7 @@ else
 FRAMEWORK_NAME = CoreObject
 endif
 
+CoreObject_OBJCFLAGS += -std=c99 
 CoreObject_LDFLAGS += -lEtoileFoundation -lEtoileSerialize
 CoreObject_LIBRARIES_DEPEND_UPON += -lEtoileFoundation -lEtoileSerialize
 
@@ -19,12 +20,13 @@ CoreObject_OBJC_FILES = \
 	COGroup.m \
 	COFileObject.m \
 	COObject.m \
+	COObjectContext.m \
 	COMultiValue.m \
 	NSObject+CoreObject.m \
 	CODirectory.m \
-	COFile.m
-#	COSerializer.m \
-#	CODeserializer.m \
+	COFile.m \
+	COSerializer.m \
+	CODeserializer.m
 
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += \
@@ -51,15 +53,16 @@ CoreObject_HEADER_FILES = \
 	COGroup.h \
 	COFileObject.h \
 	COObject.h \
+	COObjectContext.h \
 	COMultiValue.h \
 	COPropertyType.h \
 	COUtility.h \
 	NSObject+CoreObject.h \
 	GNUstep.h \
 	CODirectory.h \
-	COFile.h
-#	COSerializer.h \
-#	CODeserializer.h \
+	COFile.h \
+	COSerializer.h \
+	CODeserializer.h
 
 # Blocks
 CoreObject_HEADER_FILES += \

@@ -6,7 +6,7 @@
 
 */
 
-#import <CoreObject/NSObject+CoreObject.h>
+#import "NSObject+CoreObject.h"
 
 @implementation NSObject (CoreObject)
 

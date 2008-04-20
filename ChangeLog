@@ -1,10 +1,40 @@
-2008-04-15  Quentin Mathe <qmathe@club-internet.fr>
+2008-04-19  Quentin Mathe <qmathe@club-internet.fr>
 
-	* Headers/NSObject+CoreObject.h
-	* Headers/COProxy.h
-	* NSObject+CoreObject.m
-	* COProxy.m
-	(-isCoreObjectProxy): Added.
+	Introduced COOObjectContext to manage pools of managed core objects 
+	(COObject and COProxy). First step towards the modularization of COProxy to 
+	share all its code with the adaptative model (COObject and related 
+	subclasses).
+	WARNING: Work in progress code, mostly untested but compiles fine.
+	* Headers/COObjectContext.h:
+	* COObjectContext.m:
+	Added.
+	* Headers/COUtility.h: Added various new macros to handle the recording of 
+	invocations.
+	* Headers/COObject.h: Added _objectContext ivar.
+	* COObject.m:
+	(-init): Modified to initialize _objectContext ivar.
+	(-objectContext):
+	(-relatedCoreObjects):
+	(-loadRelatedCoreObjects):
+	(-storeRelatedCoreObjects):
+	New methods (latest three to deal with core object faults).
+	(-setValue:forProperty:):
+	(-valueForProperty:):
+	Modified to use the new recording macros (several other methods will have to 
+	be modified).
+	* Headers/NSObject+CoreObject.h: Extended COManagedObject protocol to 
+	exploit the new managed object context (API needs work). Modified -UUID 
+	return type to be an ETUUID value object instead of an NSString.
+	* NSObject+CoreObject.m: Minor import change to compile.
+	* Headers/COSerializer.h:
+	* Headers/CODeserializer.h:
+	* COSerializer.m:
+	* CODeserializer.m:
+	Rewritten to be useful in a different way now that most of their old logic 
+	has been moved to EtoileSerialize. Now encapsulate the interaction details 
+	with EtoileSerialize.
+	* Headers/CoreObject.h: Renenabled serializer classes.
+	* GNUmakefile: Updated.
 
 2008-04-15  Quentin Mathe <qmathe@club-internet.fr>
 
