@@ -21,7 +21,7 @@ static COObjectContext *defaultObjectContext = nil;
 + (id) defaultContext
 {
 	if (defaultObjectContext == nil)
-		defaultObjectContext = AUTORELEASE([[COObjectContext alloc] init]);
+		defaultObjectContext = [[COObjectContext alloc] init];
 
 	return defaultObjectContext;
 }
@@ -143,12 +143,14 @@ static COObjectContext *defaultObjectContext = nil;
 	receiver and may be overriden in subclasses. */
 - (void) beginRecordObject: (id)object
 {
+	//ETLog(@"---> Push on record stack: %@", object);
 	[_recordedObjectStack addObject: object];
 }
 
 /** Pops the last recorded and pushed object from the record session stack. */
 - (void) endRecord
 {
+	//ETLog(@"---> Pop from record stack: %@", [_recordedObjectStack lastObject]);
 	[_recordedObjectStack removeLastObject];
 }
 
@@ -346,17 +348,25 @@ static COObjectContext *defaultObjectContext = nil;
 
 - (void) recordInvocation: (NSInvocation *)inv
 {
-	if ([[inv target] isEqual: [self currentRecordedObject]] == NO)
+	if ([self isRecording])
 	{
-		if ([self isRecording])
-		{
-			[self beginRecordObject: [inv target]];
-		}
-		else /* Initiate a new record session */
-		{
-			[self beginRecordSessionWithObject: [inv target]];
-		}
+		[self beginRecordObject: [inv target]];
 	}
+	else /* Initiate a new record session */
+	{
+		[self beginRecordSessionWithObject: [inv target]];
+	}
+
+	/* Only record if needed, although we always push the target of the record 
+	   on the recorded object stack.
+	   That may change in future, we could return NO when the target of the 
+	   of the record is already on stack and the message won't be recorded. We 
+	   would return YES otherwise, when pushing the target on the record stack 
+	   for the first time. This change would mean not to call -endRecord if NO
+	   is returned. This check could be hidden in END_RECORD macro by keeping 
+	   around the boolean result of -recordInvocation: with RECORD. */
+	if ([[inv target] isEqual: [self currentRecordedObject]])
+		return;
 
 	int newObjectVersion = [self serializeInvocation: inv];
 
@@ -406,7 +416,7 @@ static COObjectContext *defaultObjectContext = nil;
 
 - (int) snapshotTimeInterval
 {
-	return 100;
+	return _fullSaveTimeInterval;
 }
 
 - (void) snapshotObject: (id)object

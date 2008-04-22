@@ -15,6 +15,7 @@
 static NSMutableDictionary *propertyTypes;
 
 NSString *kCOUIDProperty = @"kCOUIDProperty";
+NSString *kCOVersionProperty = @"kCOVersionProperty";
 NSString *kCOCreationDateProperty = @"kCOCreationDateProperty";
 NSString *kCOModificationDateProperty = @"kCOModificationDateProperty";
 NSString *kCOReadOnlyProperty = @"kCOReadOnlyProperty";
@@ -377,6 +378,11 @@ NSString *pCOVersion1Value = @"COVersion1";
 	return [self valueForProperty: kCOUIDProperty];
 }
 
+- (int) version
+{
+	return [(NSNumber *)[self valueForProperty: kCOVersionProperty] intValue];
+}
+
 - (BOOL) matchesPredicate: (NSPredicate *) predicate
 {
 	BOOL result = NO;
@@ -476,6 +482,8 @@ NSString *pCOVersion1Value = @"COVersion1";
 	NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
 		[NSNumber numberWithInt: kCOStringProperty], 
 			kCOUIDProperty,
+		[NSNumber numberWithInt: kCOIntegerProperty], 
+			kCOVersionProperty,
 		[NSNumber numberWithInt: kCODateProperty], 
 			kCOCreationDateProperty,
 		[NSNumber numberWithInt: kCODateProperty], 
@@ -499,6 +507,8 @@ NSString *pCOVersion1Value = @"COVersion1";
 	      forProperty: kCOReadOnlyProperty];
 	[self setValue: [NSString UUIDString]
 	      forProperty: kCOUIDProperty];
+	[self setValue: [NSNumber numberWithInt: 0]
+	      forProperty: kCOVersionProperty];
 	[self setValue: [NSDate date]
 	      forProperty: kCOCreationDateProperty];
 	[self setValue: [NSDate date]

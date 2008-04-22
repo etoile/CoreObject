@@ -1,3 +1,26 @@
+2008-04-22 Quentin Mathe <qmathe@club-internet.fr>
+
+	Written some basic serialization tests and ensured COObjectContext doesn't 
+	break the existing code. All tests pass but one (NSNumber issue, may be 
+	GNUstep-related).
+	* COObjectContext.m:
+	(+defaultContext): Fixed the incorrect release of the default context that 
+	lead to a crash.
+	(-recordInvocation:): Tweaked to always push objects on the recorded objects 
+	stack and documented. This fix a crash occuring in -endRecord trying to 
+	remove an object which isn't present.
+	(-snapshotTimeInterval): Corrected to return the ivar value.
+	* Headers/NSObject+CoreObject.h: Declared -version in COManagedObject 
+	protocol.
+	* Headers/COObject.h:
+	* COObject.m:
+	(-version:): New method with associated property kCOVersionProperty (fix a
+	missing selector exception in COObjectContext).
+	(+initialize, -init): Updated to declare kCOVersionProperty.
+	* TestObject.m: Updated to test kCOVersionProperty.
+	* TestSerializer.m: More tests.
+	* GNUmakefile: Turned on all tests by default.
+
 2008-04-19  Quentin Mathe <qmathe@club-internet.fr>
 
 	Introduced COOObjectContext to manage pools of managed core objects 

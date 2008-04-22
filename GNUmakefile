@@ -30,19 +30,14 @@ CoreObject_OBJC_FILES = \
 
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += \
-	TestSerializer.m \
-	TestFile.m \
-	TestDirectory.m
-endif
-
-ifeq ($(test), all)
-CoreObject_OBJC_FILES += \
 	TestCollection.m \
 	TestSmartGroup.m \
 	TestGroup.m \
 	TestObject.m \
 	TestMultiValue.m \
-	TestFile.m
+	TestSerializer.m \
+	TestFile.m \
+	TestDirectory.m
 endif
 
 CoreObject_HEADER_FILES_DIR += Headers

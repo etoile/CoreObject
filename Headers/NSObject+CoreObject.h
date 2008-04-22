@@ -38,6 +38,7 @@
 // metadatas (or persistent properties) and metadatas to be indexed (or 
 // indexable persistent properties). 
 - (NSDictionary *) metadatas;
+- (int) version;
 @end
 
 /* NSObject extensions */

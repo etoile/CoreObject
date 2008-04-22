@@ -285,6 +285,8 @@
 	int count = [properties count];
 	type = [COObject typeOfProperty: kCOUIDProperty];
 	UKIntsEqual(type, kCOStringProperty);
+	type = [COObject typeOfProperty: kCOVersionProperty];
+	UKIntsEqual(type, kCOIntegerProperty);
 	type = [COObject typeOfProperty: kCOCreationDateProperty];
 	UKIntsEqual(type, kCODateProperty);
 	type = [COObject typeOfProperty: kCOModificationDateProperty];
@@ -315,6 +317,8 @@
     NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
         [NSNumber numberWithInt: kCOStringProperty],
             kCOUIDProperty,
+        [NSNumber numberWithInt: kCOIntegerProperty],
+            kCOVersionProperty,
         [NSNumber numberWithInt: kCODateProperty],
             kCOCreationDateProperty,
         [NSNumber numberWithInt: kCODateProperty],

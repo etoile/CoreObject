@@ -30,6 +30,7 @@
 @end
 
 extern NSString *kCOUIDProperty; // kCOStringProperty
+extern NSString *kCOVersionProperty; // kCOIntegerProperty
 extern NSString *kCOCreationDateProperty; // kCODateProperty
 extern NSString *kCOModificationDateProperty; // kCODateProperty
 extern NSString *kCOReadOnlyProperty; //kCOIntegerProperty
@@ -79,6 +80,7 @@ extern NSString *pCOVersion1Value;
 
 /* Use kCOUIDProperty to set UID */
 - (NSString *) uniqueID;
+- (int) version;
 
 - (BOOL) matchesPredicate: (NSPredicate *) predicate;
 
