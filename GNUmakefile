@@ -27,7 +27,8 @@ CoreObject_OBJC_FILES = \
 	COFile.m \
 	COSerializer.m \
 	CODeserializer.m \
-	COMetadataServer.m
+	COMetadataServer.m \
+	COObjectServer.m
 
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += \
@@ -60,7 +61,8 @@ CoreObject_HEADER_FILES = \
 	COFile.h \
 	COSerializer.h \
 	CODeserializer.h \
-	COMetadataServer.h
+	COMetadataServer.h \
+	COObjectServer.h
 
 # Blocks
 CoreObject_HEADER_FILES += \
