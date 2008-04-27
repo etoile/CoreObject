@@ -1,3 +1,13 @@
+2008-04-26 Quentin Mathe <qmathe@club-internet.fr>
+
+	Added a rudimentary metadata server only taking care of mapping UUIDs to 
+	URLs with a simple dictionary for now.
+	* Headers/COMetadataServer.h:
+	* COMetadataServer.m:
+	* TestMetadataServer.m:
+	Added.
+	* GNUmakefile: Updated.
+
 2008-04-22 Quentin Mathe <qmathe@club-internet.fr>
 
 	Written some basic serialization tests and ensured COObjectContext doesn't 
