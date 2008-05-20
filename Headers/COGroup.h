@@ -74,11 +74,20 @@ extern NSString *kCOGroupAddSubgroupNotification;
 extern NSString *kCOGroupRemoveSubgroupNotification;
 extern NSString *kCOGroupChild;
 
-@interface COGroup: COObject
+@interface COGroup: COObject <COGroup>
+
+- (BOOL) isGroup;
+- (BOOL) isOpaque;
+
 - (BOOL) addObject: (COObject *) object;
 - (BOOL) removeObject: (COObject *) object;
 - (NSArray *) objects;
 
+- (BOOL) addGroup: (id <COGroup>)subgroup;
+- (BOOL) removeGroup: (id <COGroup>)subgroup;
+- (NSArray *) groups;
+
+// FIXME: Remove the next three methods after updating all code relying on them
 - (BOOL) addSubgroup: (COGroup *) group;
 - (BOOL) removeSubgroup: (COGroup *) group;
 - (NSArray *) subgroups;
@@ -87,6 +96,11 @@ extern NSString *kCOGroupChild;
 - (NSArray *) allGroups;
 
 - (NSArray *) objectsMatchingPredicate: (NSPredicate *) predicate;
+
+- (BOOL) isOrdered;
+- (BOOL) isEmpty;
+- (id) content;
+- (NSArray *) contentArray;
 
 @end
 

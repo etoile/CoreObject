@@ -254,7 +254,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 		int i, count = [members count];
 		for (i = 0; i < count; i++)
 		{
-			[uids addObject: [[members objectAtIndex: i] uniqueID]];
+			[uids addObject: [(id <COObject>)[members objectAtIndex: i] uniqueID]];
 		}
 		[groups setObject: uids forKey: [g uniqueID]];
 		DESTROY(members);
@@ -267,6 +267,16 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 	DESTROY(x);
 	return AUTORELEASE(pl); // pl got auto-released here
+}
+
+- (BOOL) isGroup
+{
+	return YES;
+}
+
+- (BOOL) isOpaque
+{
+	return NO;
 }
 
 - (BOOL) addObject: (COObject *) object
@@ -302,6 +312,21 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 - (NSArray *) objects
 {
 	return [self valueForProperty: kCOGroupChildrenProperty];
+}
+
+- (BOOL) addGroup: (id <COGroup>)subgroup
+{
+	return [self addSubgroup: subgroup];
+}
+
+- (BOOL) removeGroup: (id <COGroup>)subgroup
+{
+	return [self removeSubgroup: subgroup];
+}
+
+- (NSArray *) groups
+{
+	return [self subgroups];
 }
 
 - (BOOL) addSubgroup: (COGroup *) group
@@ -385,6 +410,26 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 		[set addObjectsFromArray: [group allGroups]];
 	}
 	return [set allObjects];
+}
+
+- (BOOL) isOrdered
+{
+	return YES;
+}
+
+- (BOOL) isEmpty
+{
+	return ([[self objects] count] == 0);
+}
+
+- (id) content
+{
+	return [self objects];
+}
+
+- (NSArray *) contentArray
+{
+	return [self content];
 }
 
 /* NSObject */

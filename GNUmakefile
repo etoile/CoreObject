@@ -37,8 +37,6 @@ CoreObject_OBJC_FILES += \
 	TestGroup.m \
 	TestObject.m \
 	TestMultiValue.m \
-	TestSerializer.m \
-	TestMetadataServer.m \
 	TestFile.m \
 	TestDirectory.m
 endif

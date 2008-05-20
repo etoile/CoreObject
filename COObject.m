@@ -312,6 +312,14 @@ NSString *pCOVersion1Value = @"COVersion1";
 
 }
 
+/** Returns the properties published by the receiver and accessible through 
+	Property Value Coding. The returned array includes the properties inherited 
+	from the superclass too (see -[NSObject properties]). */
+- (NSArray *) properties
+{
+	return [[super properties] arrayByAddingObjectsFromArray: [[self class] properties]];
+}
+
 - (BOOL) removeValueForProperty: (NSString *) property
 {
 	if (IGNORE_CHANGES || [self isReadOnly])
@@ -382,6 +390,17 @@ NSString *pCOVersion1Value = @"COVersion1";
 - (int) version
 {
 	return [(NSNumber *)[self valueForProperty: kCOVersionProperty] intValue];
+}
+
+- (BOOL) isCopyPromise
+{
+	return NO;
+}
+
+// FIXME: Implement
+- (NSDictionary *) metadatas
+{
+	return nil;
 }
 
 - (BOOL) matchesPredicate: (NSPredicate *) predicate
@@ -533,12 +552,12 @@ NSString *pCOVersion1Value = @"COVersion1";
 	return [_properties description];
 }
 #endif
-- (unsigned long) hash
+- (unsigned int) hash
 {
 	return [[self valueForProperty: kCOUIDProperty] hash];
 }
 
-- (BOOL) isEqual: (COObject *) other
+- (BOOL) isEqual: (id) other
 {
 	if (other && [other isKindOfClass: [self class]])
 	{

@@ -19,6 +19,7 @@
 
 + (id) objectWithURL: (NSURL *)url;
 
+- (NSString *) uniqueID;
 - (NSURL *) URL;
 - (NSArray *) properties;
 - (NSDictionary *) metadatas;

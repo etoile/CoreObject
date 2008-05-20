@@ -15,8 +15,7 @@
 
 /* CoreObject Protocol (Objects) */
 
-@protocol COObject
-/** Adds object to the receiver. */
+@protocol COObject <NSObject, NSCopying>
 - (BOOL) isCopyPromise;
 /** Returns the model properties of the receiver. 
 	Properties should encompass all model attributes and relationships that you 
@@ -27,6 +26,17 @@
 	The set of metadatas may intersect or not the set of properties. */
 - (NSDictionary *) metadatas;
 //- (NSArray *) parentGroups;
+/** Returns a unique ID that can be used to recreate a previously known object 
+	by passing this value to -initWithUniqueID:.
+	The choice of the unique ID scheme is up to the class that conforms to 
+	COObject protocol. 
+	A common choice is to return the absolute string form of the URL that 
+	identifies the receiver object. 
+	The FS backend  (COFile and CODirectory) uses a combination of the related 
+	filesystem inode and device/volume identifier.
+	The Native backend (COObject and COGroup) uses an UUID. */
+- (NSString *) uniqueID;
+//- (id) initWithUniqueID:
 @end
 
 extern NSString *kCOUIDProperty; // kCOStringProperty
@@ -51,7 +61,7 @@ extern NSString *pCOValuesKey;
 extern NSString *pCOVersionKey;
 extern NSString *pCOVersion1Value;
 
-@interface COObject: NSObject <NSCopying>
+@interface COObject: NSObject <COObject>
 {
 	NSMutableDictionary *_properties;
 	NSNotificationCenter *_nc;
@@ -69,6 +79,7 @@ extern NSString *pCOVersion1Value;
 - (id) initWithPropertyList: (NSDictionary *) propertyList;
 - (NSMutableDictionary *) propertyList;
 
+- (NSArray *) properties;
 - (BOOL) removeValueForProperty: (NSString *) property;
 - (BOOL) setValue: (id) value forProperty: (NSString *) property;
 - (id) valueForProperty: (NSString *) property;

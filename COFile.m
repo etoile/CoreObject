@@ -53,7 +53,7 @@ DEALLOC(DESTROY(_url))
 	declared as a copy promise. 
 	If you add a copy promise to a CODirectory, the file pointed by the URL 
 	will get copied inside the directory to which you send -addObject:. */
-- (id) copyWithZone: (NSZone)zone
+- (id) copyWithZone: (NSZone *)zone
 {
 	return [[[self class] alloc] initWithURL: [self URL] isCopyPromise: YES];
 }
@@ -75,10 +75,23 @@ DEALLOC(DESTROY(_url))
 	return (isSameType && [[self URL] isEqual: [object URL]]);
 }
 
-- (unsigned long) hash
+- (unsigned int) hash
 {
 	// TODO: May be return [[self UUID] hash]; when possible
 	return [super hash];
+}
+
+/** Returns a unique identifier specific to the FS backend that allows to 
+	recreate a file object with the same identity than the receiver at a later 
+	point. In the other words, the new object will reference the same file 
+	than the receiver.
+	TODO: Presently, moving a file breaks the ability to recreate a file object 
+	pointing to it with a previously obtained unique ID. We should return a 
+	combination of inode + volume/device identifier to better keep track of file 
+	objects, rather than simply relying on a dumb URL. */
+- (NSString *) uniqueID
+{
+	return [[self URL] absoluteString];
 }
 
 /** Returns the local filesystem URL that was used to instantiate the receiver. 

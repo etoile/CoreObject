@@ -1,5 +1,34 @@
 2008-05-20 Quentin Mathe <qmathe@club-internet.fr>
 
+	Improved COObject protocol and made COObject and COGroup classes conform to
+	their associated protocols. Fixed various compiler warnings by taking care
+	of that.
+	* GNUmakefile: Disabled serialization tests temporarily.
+	* Headers/COObject.h:
+	* COObject.m:
+	Added -uniqueID to COObject protocol and modified COObject class to conform 
+	to the former protocol. Also made COObject protocol inherits from NSObject 
+	and NSCopying protocol.
+	(-properties, -metadatas, -isCopyPromise): Added for COObject protocol 
+	conformance.
+	(-hash, -isEqual:): Fixed type declarations to match NSObject API.
+	* Headers/COGroup.h:
+	* COGroup.m:
+	Modified COGroup class to conform to COGroup protocol.
+	(-isGroup:, -isOpaque:, -addGroup, -removeGroup, -groups): Added for COGroup 
+	protocol conformance.
+	(-isOrdered, -isEmpty, -content, -contentArray): Added for ETCollection 
+	protocol conformance.
+	(-propertyList): Added a cast to <COObject> to get rid of a warning 
+	about conflicting return types with -[NSEvent uniqueID].
+	* Headers/COFile.h:
+	* COFile.m:
+	(-uniqueID): Added.
+	(-hash, -copyWithZone:): Fixed type declarations to match NSObject and 
+	NSCopying API.
+
+2008-05-20 Quentin Mathe <qmathe@club-internet.fr>
+
 	* COObject.m (-serialize:using:, -deserialize:fromPointer:version:): New 
 	methods to handle the serialization of managed core objects (ETSerializable 
 	informal protocol).
