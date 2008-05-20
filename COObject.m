@@ -6,6 +6,7 @@
 
 */
 
+#import <strings.h>
 #import "COObject.h"
 #import "COMultiValue.h"
 #import "COObjectContext.h"
@@ -544,6 +545,37 @@ NSString *pCOVersion1Value = @"COVersion1";
 		return [[self valueForProperty: kCOUIDProperty] isEqual: [other valueForProperty: kCOUIDProperty]];
 	}
 	return NO;
+}
+
+/* Serialization (EtoileSerialize) */
+
+- (BOOL) serialize: (char *)aVariable using: (ETSerializer *)aSerializer
+{
+	if (strcmp(aVariable, "_nc") == 0
+	 || strcmp(aVariable, "_objectContext") == 0)
+	{
+		return YES; /* Should not be automatically serialized (manual) */
+	}
+
+	return NO; /* Serializer handles the ivar */
+}
+
+- (void *) deserialize: (char *)aVariable 
+           fromPointer: (void *)aBlob 
+               version: (int)aVersion
+{
+	if (strcmp(aVariable, "_nc") == 0)
+	{
+		_nc = [NSNotificationCenter defaultCenter];
+		return MANUAL_DESERIALIZE;
+	}
+	else if (strcmp(aVariable, "_objectContext") == 0)
+	{
+		_objectContext = [COObjectContext defaultContext];
+		return MANUAL_DESERIALIZE;
+	}
+
+	return AUTO_DESERIALIZE;
 }
 
 /* NSCopying */

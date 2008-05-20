@@ -1,3 +1,9 @@
+2008-05-20 Quentin Mathe <qmathe@club-internet.fr>
+
+	* COObject.m (-serialize:using:, -deserialize:fromPointer:version:): New 
+	methods to handle the serialization of managed core objects (ETSerializable 
+	informal protocol).
+
 2008-04-27 Quentin Mathe <qmathe@club-internet.fr>
 
 	Added a partially implemented object server that plays the roles of a 
