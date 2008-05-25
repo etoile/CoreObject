@@ -72,7 +72,7 @@ DEALLOC(DESTROY(_url))
 - (BOOL) isEqual: (id)object
 {
 	BOOL isSameType = ([object isKindOfClass: [self class]] && ![object isGroup]);
-	return isSameType && [[self URL] isEqual: [object URL]]);
+	return (isSameType && [[self URL] isEqual: [object URL]]);
 }
 
 - (unsigned int) hash
