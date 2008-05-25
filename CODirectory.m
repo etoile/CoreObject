@@ -22,6 +22,17 @@
 
 @implementation CODirectory
 
++ (BOOL) isGroupAtURL: (NSURL *)anURL
+{
+	if ([anURL isFileURL] == NO)
+		return NO;
+
+	BOOL isDir = NO;
+	BOOL result = [FM fileExistsAtPath: [anURL path] isDirectory: &isDir];
+
+	return (result && isDir);
+}
+
 /** Returns the active trash directory.
 	The returned directory may vary with the user. */
 + (CODirectory *) trashDirectory
@@ -77,10 +88,7 @@ DEALLOC()
 	directory. */
 - (BOOL) exists
 {
-	BOOL isDir = NO;
-	BOOL result = [FM fileExistsAtPath: FSPATH(self) isDirectory: &isDir];
-
-	return (result && isDir);
+	return [[self class] isGroupAtURL: [self URL]];
 }
 
 /** Returns whether object belongs to the receiver directory by being stored 
@@ -250,7 +258,7 @@ DEALLOC()
 		id object = nil;
 		BOOL isDir = NO;
 
-		ETLog(@"Enumerate file %@", path);
+		//ETLog(@"Enumerate file %@", path);
 
 		if ([FM fileExistsAtPath: path isDirectory: &isDir])
 		{

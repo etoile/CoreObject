@@ -72,7 +72,7 @@ DEALLOC(DESTROY(_url))
 - (BOOL) isEqual: (id)object
 {
 	BOOL isSameType = ([object isKindOfClass: [self class]] && ![object isGroup]);
-	return (isSameType && [[self URL] isEqual: [object URL]]);
+	return isSameType && [[self URL] isEqual: [object URL]]);
 }
 
 - (unsigned int) hash
@@ -108,20 +108,45 @@ DEALLOC(DESTROY(_url))
 		[NSException raise: NSInvalidArgumentException format: @"URL must not "
 			@"be nil for %@", self];
 	}
+	if ([url isFileURL] == NO)
+	{
+		[NSException raise: NSInvalidArgumentException format: @"URL %@ must "
+			@"be a file URL for %@", url, self];
+	}
 	ASSIGN(_url, url);
 }
 
+// TODO: Optimize, probably horribly slow. Also not sure we got to expose NSObject 
+// properties by default
 - (NSArray *) properties
 {
-	return [super properties];
+	NSArray *properties = [[self metadatas] allKeys];
+
+	properties = [properties arrayByAddingObjectsFromArray: [super properties]];
+	/* icon, name, displayName and URL are declared in metadatas */
+	properties = [properties arrayByAddingObjectsFromArray: 
+		A(@"isCopyPromise", @"exists", @"metadatas", @"uniqueID")];
+
+	return properties;
 }
 
 - (id) valueForProperty: (NSString *)key
 {
-	id value = [[self metadatas] objectForKey: key];
-	
-	if (value == nil)
-		value = [super valueForKey: key];
+	NSDictionary *metadatas = [self metadatas];
+	id value = nil;
+
+	/* The preliminary check for key in metadatas ensures a nil value won't be 
+	   replaced by another value if an identically named property is declared by
+	   NSObject. */
+	if ([[metadatas allKeys] containsObject: key])
+	{
+		value = [metadatas objectForKey: key];
+	}
+	else
+	{
+		value = [super valueForProperty: key];
+	}
+	//ETLog(@"Found value %@ for %@ in %@", value, key, self);
 	
 	return value;
 }
@@ -139,11 +164,14 @@ DEALLOC(DESTROY(_url))
 /** Returns the filesystem attributes of the receiver. */
 - (NSDictionary *) metadatas
 {
-	NSMutableDictionary *metadatas = [NSMutableDictionary dictionary];
+	NSMutableDictionary *metadatas = [NSMutableDictionary dictionaryWithCapacity: 35];
 
-	// FIXME: Must include icon, name and displayName
+	[metadatas setObject: [self icon] forKey: @"icon"];
+	[metadatas setObject: [self name] forKey: @"name"];
+	[metadatas setObject: [self displayName] forKey: @"displayName"];
+	[metadatas setObject: [self URL] forKey: @"URL"];
 	[metadatas addEntriesFromDictionary: 
-		[FM fileAttributesAtPath: FSPATH(self) traverseLink: NO]];
+		[FM fileAttributesAtPath: FSPATH(self) traverseLink: NO]]; // ~28 entries
 	return metadatas;
 }
 

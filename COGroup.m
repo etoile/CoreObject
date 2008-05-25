@@ -25,6 +25,13 @@ NSString *kCOGroupRemoveSubgroupNotification = @"kCOGroupRemoveSubgroupNotificat
 NSString *kCOGroupChild = @"kCOGroupChild";
 
 @implementation COGroup
+
+// TODO: Implement
++ (BOOL) isGroupAtURL: (NSURL *)anURL
+{
+	return NO;
+}
+
 /* Private */
 - (void) _addAsParent: (COObject *) object
 {
@@ -412,9 +419,10 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return [set allObjects];
 }
 
+// NOTE: We may want to be ordered... we return arrays for methods like -objects
 - (BOOL) isOrdered
 {
-	return YES;
+	return NO;
 }
 
 - (BOOL) isEmpty
@@ -430,6 +438,12 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 - (NSArray *) contentArray
 {
 	return [self content];
+}
+
+- (void) insertObject: (id)object atIndex: (unsigned int)index
+{
+	// FIXME: If we decide to return YES in -isOrdered, modify...
+	[self addObject: object];
 }
 
 /* NSObject */

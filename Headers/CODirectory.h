@@ -17,6 +17,8 @@
 
 }
 
++ (BOOL) isGroupAtURL: (NSURL *)anURL;
+
 + (CODirectory *) trashDirectory;
 
 + (id) delegate;

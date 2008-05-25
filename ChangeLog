@@ -1,3 +1,27 @@
+2008-05-25 Quentin Mathe <qmathe@club-internet.fr>
+
+	Improved the filesystem backend to work as expected with EtoileUI, mainly by
+	cleanly exporting metadatas as properties, supporting to test whether a URL 
+	references a group or not, and properly turning pick and drop operations 
+	into filesystem operations through ETCollectionMutation.
+	* Headers/COGroup.h:
+	* COGroup.m:
+	Modified COGroup protocol to conform to ETCollectionMutation.
+	(-insertObject:atIndex:): New method (to be conform to ETCollectionMutation).
+	(-isOrdered): Modified to return NO (may change later).
+	(+isGroupAtURL:): New method (protocol and class).
+	* Headers/CODirectory.h:
+	* CODirectory.m:
+	(+isGroupAtURL:): New method.
+	(-exists): Moved existing code into +isGroupAtURL: and modified to call it.
+	* COFile.m:
+	(-metadatas): Fixed to include URL, name, displayName and icon in metadatas.
+	(-valueForProperty:): Improved to only look up in superclass the properties 
+	not declared in metadatas.
+	(-properties): Fixed to expose metadatas as properties.
+	(-setURL:): Improved to raise an exception if the URL doesn't reference a 
+	file.
+
 2008-05-20 Quentin Mathe <qmathe@club-internet.fr>
 
 	Improved COObject protocol and made COObject and COGroup classes conform to

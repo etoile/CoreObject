@@ -12,7 +12,9 @@
 
 /* CoreObject Protocol (Relationships) */
 
-@protocol COGroup <COObject, ETCollection>
+@protocol COGroup <COObject, ETCollection, ETCollectionMutation>
+
++ (BOOL) isGroupAtURL: (NSURL *)url;
 
 /** Must return YES to indicate the receiver is a group. */
 - (BOOL) isGroup;
@@ -76,6 +78,8 @@ extern NSString *kCOGroupChild;
 
 @interface COGroup: COObject <COGroup>
 
++ (BOOL) isGroupAtURL: (NSURL *)anURL;
+
 - (BOOL) isGroup;
 - (BOOL) isOpaque;
 
@@ -101,6 +105,7 @@ extern NSString *kCOGroupChild;
 - (BOOL) isEmpty;
 - (id) content;
 - (NSArray *) contentArray;
+- (void) insertObject: (id)object atIndex: (unsigned int)index;
 
 @end
 
