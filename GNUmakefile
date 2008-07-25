@@ -12,7 +12,6 @@ CoreObject_OBJCFLAGS += -std=c99
 CoreObject_LDFLAGS += -lEtoileFoundation -lEtoileSerialize
 CoreObject_LIBRARIES_DEPEND_UPON += -lEtoileFoundation -lEtoileSerialize
 
-CoreObject_SUBPROJECTS = Blocks
 
 CoreObject_OBJC_FILES = \
 	COCollection.m \
@@ -61,20 +60,6 @@ CoreObject_HEADER_FILES = \
 	CODeserializer.h \
 	COMetadataServer.h \
 	COObjectServer.h
-
-# Blocks
-CoreObject_HEADER_FILES += \
-	Blocks.h \
-	BKExtension.h \
-	BKExtensionPoint.h \
-	BKLog.h \
-	BKPlugin.h \
-	BKPluginRegistry.h \
-	BKRequirement.h \
-
-CoreObject_RESOURCE_FILES += \
-	Blocks/plugin.xml \
-	Blocks/Info.plist
 
 ifeq ($(FOUNDATION_LIB), apple)
 ifeq ($(test), yes)

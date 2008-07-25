@@ -22,10 +22,3 @@
 #import "COUtility.h"
 #import "COFile.h"
 #import "CODirectory.h"
-
-#import "BKExtension.h"
-#import "BKExtensionPoint.h"
-#import "BKLog.h"
-#import "BKPlugin.h"
-#import "BKPluginRegistry.h"
-#import "BKRequirement.h"
