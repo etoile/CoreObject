@@ -15,6 +15,7 @@
 @protocol COGroup <COObject, ETCollection, ETCollectionMutation>
 
 + (BOOL) isGroupAtURL: (NSURL *)url;
++ (id) objectWithURL: (NSURL *)url;
 
 /** Must return YES to indicate the receiver is a group. */
 - (BOOL) isGroup;
@@ -79,6 +80,7 @@ extern NSString *kCOGroupChild;
 @interface COGroup: COObject <COGroup>
 
 + (BOOL) isGroupAtURL: (NSURL *)anURL;
++ (id) objectWithURL: (NSURL *)url;
 
 - (BOOL) isGroup;
 - (BOOL) isOpaque;

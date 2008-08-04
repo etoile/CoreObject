@@ -33,6 +33,12 @@
 	return (result && isDir);
 }
 
+// NOTE: Shut down compiler warning.
++ (id) objectWithURL: (NSURL *)url
+{
+	return [super objectWithURL: url];
+}
+
 /** Returns the active trash directory.
 	The returned directory may vary with the user. */
 + (CODirectory *) trashDirectory

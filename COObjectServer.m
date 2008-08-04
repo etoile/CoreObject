@@ -9,10 +9,9 @@
 #import "COObjectServer.h"
 #import "NSObject+CoreObject.h"
 #import "COMetadataServer.h"
+#import "COGroup.h"
+#import "COUtility.h"
 #import "GNUstep.h"
-
-#define DEFAULTS [NSUserDefaults standardUserDefaults]
-#define FM [NSFileManager defaultManager]
 
 /** Must be a string and not an NSURL object for NSUserDefaults needs. */
 NSString *CODefaultObjectServerURL = nil;

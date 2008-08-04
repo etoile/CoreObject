@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
+#import <EtoileSerialize/EtoileSerialize.h>
 #import "COPropertyType.h"
 #import "COUtility.h"
 
@@ -66,7 +67,11 @@ extern NSString *pCOVersion1Value;
 	NSMutableDictionary *_properties;
 	NSNotificationCenter *_nc;
 	COObjectContext *_objectContext;
+	/** The current version of the object. */
+	int _objectVersion;
 }
+
+/* Data Model Declaration */
 
 + (int) addPropertiesAndTypes: (NSDictionary *) properties;
 + (NSDictionary *) propertiesAndTypes;
@@ -76,8 +81,12 @@ extern NSString *pCOVersion1Value;
 
 + (id) objectWithPropertyList: (NSDictionary *) propertyList;
 
+/* Property List Import/Export */
+
 - (id) initWithPropertyList: (NSDictionary *) propertyList;
 - (NSMutableDictionary *) propertyList;
+
+/* Managed Object Edition */
 
 - (NSArray *) properties;
 - (BOOL) removeValueForProperty: (NSString *) property;
@@ -86,13 +95,33 @@ extern NSString *pCOVersion1Value;
 
 - (NSArray *) parentGroups; /* Include parents of parents */
 
-/* Use KCOReadOnlyProperty to set read-only */
-- (BOOL) isReadOnly;
+- (BOOL) isReadOnly; /* Use KCOReadOnlyProperty to set read-only */
 
-/* Use kCOUIDProperty to set UID */
-- (NSString *) uniqueID;
-- (int) version;
+/* Persistency */
+
++ (BOOL) automaticallyMakeNewInstancesPersistent;
++ (void) setAutomaticallyMakeNewInstancesPersistent: (BOOL)flag;
+
+- (int) version; /* Use kCOUIDProperty to set UID */
+
+- (COObjectContext *) objectContext;
+- (BOOL) isPersistent;
+- (int) objectVersion;
+- (int) lastObjectVersion;
+- (BOOL) save;
+- (ETUUID *) UUID;
+
+/* Query */
 
 - (BOOL) matchesPredicate: (NSPredicate *) predicate;
+
+/* Private (Object Versioning callbacks) */
+
+- (void) deserializerDidFinish: (ETDeserializer *)deserializer forVersion: (int)objectVersion;
+- (void) serializerDidFinish: (ETSerializer *)serializer forVersion: (int)objectVersion;
+
+/* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
+
+- (NSString *) uniqueID;
 
 @end

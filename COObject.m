@@ -32,6 +32,7 @@ NSString *pCOValuesKey = @"Values";
 NSString *pCOVersionKey = @"Version";
 NSString *pCOVersion1Value = @"COVersion1";
 
+
 @implementation COObject
 /* Private */
 
@@ -271,7 +272,7 @@ NSString *pCOVersion1Value = @"COVersion1";
 
 - (NSDictionary *) relatedCoreObjects
 {
-	NSDictionary *properties = [self propertyList];
+//	NSDictionary *properties = [self propertyList];
 	NSMutableDictionary *relations = [NSMutableDictionary dictionary];
 #if 0
 	/* We remove parents property */
@@ -382,14 +383,67 @@ NSString *pCOVersion1Value = @"COVersion1";
 	return ([[self valueForProperty: kCOReadOnlyProperty] intValue] == 1);
 }
 
+// TODO: Modify COObject to only rely on it and removes -uniqueID
+- (ETUUID *) UUID
+{	return AUTORELEASE([[ETUUID alloc] initWithString: [self valueForProperty: kCOUIDProperty]]);
+}
+
 - (NSString *) uniqueID
 {
 	return [self valueForProperty: kCOUIDProperty];
 }
 
+static BOOL automaticPersistency = NO;
+
++ (BOOL) automaticallyMakeNewInstancesPersistent
+{
+	return automaticPersistency;
+}
+
++ (void) setAutomaticallyMakeNewInstancesPersistent: (BOOL)flag
+{
+	automaticPersistency = flag;
+}
+
+- (BOOL) isPersistent
+{
+	return ([self objectVersion] > -1);
+}
+
+/** Returns the version of the object format, plays a role similar to class 
+    versioning provided by +[NSObject version]. */
 - (int) version
 {
 	return [(NSNumber *)[self valueForProperty: kCOVersionProperty] intValue];
+}
+
+- (void) _setObjectVersion: (int)version
+{
+	ETDebugLog(@"Setting version from %d to %d of %@", _objectVersion, version, self);
+	_objectVersion = version;
+}
+
+/** Returns the current version of the instance. This version represents a 
+    revision in the object history. 
+    The returned value is comprised between 0 (base version created on first 
+    serialization) and the last object version which can be known by calling 
+    -lastObjectVersion. */
+- (int) objectVersion
+{
+	return _objectVersion;
+}
+
+- (int) lastObjectVersion
+{
+	// TODO: Implement 
+	return 0;
+}
+
+- (BOOL) save
+{
+	int prevVersion = [self objectVersion];
+	[[self objectContext] snapshotObject: self];
+	return ([self objectVersion] > prevVersion);
 }
 
 - (BOOL) isCopyPromise
@@ -536,8 +590,11 @@ NSString *pCOVersion1Value = @"COVersion1";
     [self setValue: AUTORELEASE([[NSMutableArray alloc] init])
           forProperty: kCOParentsProperty];
 	_nc = [NSNotificationCenter defaultCenter];
-	// FIXME: Should be obtained by parameter usually
+	/* We get the object context at the end, hence all the previous calls are 
+	   not serialized by RECORD in -setValue:forProperty: 
+	   FIXME: Should be obtained by parameter usually. */
 	_objectContext = [COObjectContext defaultContext];
+	_objectVersion = -1;
 	return self;
 }
 
@@ -571,7 +628,8 @@ NSString *pCOVersion1Value = @"COVersion1";
 - (BOOL) serialize: (char *)aVariable using: (ETSerializer *)aSerializer
 {
 	if (strcmp(aVariable, "_nc") == 0
-	 || strcmp(aVariable, "_objectContext") == 0)
+	 || strcmp(aVariable, "_objectContext") == 0
+	 || strcmp(aVariable, "_objectVersion") == 0)
 	{
 		return YES; /* Should not be automatically serialized (manual) */
 	}
@@ -595,6 +653,17 @@ NSString *pCOVersion1Value = @"COVersion1";
 	}
 
 	return AUTO_DESERIALIZE;
+}
+
+- (void) deserializerDidFinish: (ETDeserializer *)deserializer forVersion: (int)objectVersion
+{
+	NSLog(@"Finished deserialization of %@ to object version %d", self, objectVersion);
+	_objectVersion = objectVersion;
+}
+
+- (void) serializerDidFinish: (ETSerializer *)serializer forVersion: (int)objectVersion
+{
+	_objectVersion = objectVersion;
 }
 
 /* NSCopying */

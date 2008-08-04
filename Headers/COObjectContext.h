@@ -93,7 +93,7 @@
 /* Message-based Persistency */
 
 - (BOOL) shouldRecordChangesToObject: (id)object;
-- (void) recordInvocation: (NSInvocation *)inv;
+- (int) recordInvocation: (NSInvocation *)inv;
 - (int) serializeInvocation: (NSInvocation *)inv; //-storeInvocation:
 - (void) logInvocation: (NSInvocation *)inv recordVersion: (int)aVersion;
 - (void) forwardInvocationIfNeeded: (NSInvocation *)inv;

@@ -8,7 +8,7 @@
 
 #import <EtoileFoundation/Macros.h>
 
-#define DEFAULTS [NSUserDefaults defaults]
+#define DEFAULTS [NSUserDefaults standardUserDefaults]
 #define FM [NSFileManager defaultManager]
 
 #define IGNORE_CHANGES \
@@ -17,13 +17,20 @@
 #define TEST_IGNORE_CHANGES(returnValue) \
 if (IGNORE_CHANGES) return (returnValue);
 
-#define RECORD(...) \
-[[self objectContext] recordInvocation: \
-	[NSInvocation invocationWithTarget: self \
-	                          selector: _cmd \
-	                         arguments: A(__VA_ARGS__)]];
+#define ETDebugLog ETLog
 
-#define END_RECORD [[self objectContext] endRecord];
+#define RECORD(...) \
+NSArray *argArray = A(__VA_ARGS__); \
+ETDebugLog(@" ++ Will try record %@ on %@ with %@", NSStringFromSelector(_cmd), self, argArray); \
+int __prevObjectVersion = _objectVersion; \
+_objectVersion = [[self objectContext] recordInvocation: \
+	                 [NSInvocation invocationWithTarget: self \
+	                                           selector: _cmd \
+	                                          arguments: argArray]];
+
+#define END_RECORD \
+if (__prevObjectVersion != _objectVersion) \
+	[[self objectContext] endRecord];
 //id context = [object coreObjectContext];
 //if ([context containsObject: [context lastRecordedObject]] == NO)
 //	record

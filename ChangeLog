@@ -1,3 +1,68 @@
+2008-08-04 Quentin Mathe <qmathe@club-internet.fr>
+
+	Finished to clean up and test basic features of COObjectContext (object 
+	space/plane-like persistency to be shared by CoreObject data model and 
+	COProxy). This code extracted and modularized from COProxy now works as 
+	expected. COGroup persistency and advanced features like replacing an object 
+	by another temporal instance in a CoreObject graph aren't implemented yet.
+	WARNING: Unstable API, do not use.
+	* Headers/COObject.h:
+	* COObject.m:
+	New ivar _objectVersion.
+	(+automaticallyMakeNewInstancesPersistent, 
+	+setAutomaticallyMakeNewInstancesPersistent:, 
+	-objectContext, 
+	-objectVersion, -_setObjectVersion:, -lastObjectVersion, -isPersistent, 
+	-save, 
+	-UUID, 
+	-serializerDidFinish:forVersion:, -deserializerDidFinish:forVersion:): 
+	New methods.
+	(-serialize:using:): Modified to ignore _objectVersion.
+	(-uniqueID): Deprecated.
+	* Headers/COSerializer.h:
+	* COSerializer.m:
+	(+defaultBackendClass, +defaultCoreObjectDeltaSerializerForObject:, 
+	+defaultCoreObjectFullSaveSerializerForObject:, +serializationURLForObject:,
+	+serializerWithBackend:objectVersion:forURL:, +serializeObject:toURL:, 
+	-version): New ETSerializer category methods.
+	* Headers/CODeserializer.h:
+	* CODeserializer.m:
+	(+defaultCoreObjectDeserializer, +deserializerObjectWithURL:): 
+	New ETDeserializer category methods.
+	* Headers/COObjectContext.h:
+	* COObjectContext.m:
+	(-snapshotSerializerForObject:, -deltaSerializerForObject:): 
+	Modified to return ready-to-use serializers set up by 
+	ETSerializer(COSerializer). 
+	(-lastSnapshotOfObject:forVersion:snapshotVersion:): Fixed to really 
+	deserialize the last snapshot before the given version and not just the 
+	last snapshot. Also modified to update the object version of the returned 
+	instance.
+	(-playbackInvocations:fromVersion:toVersion:): Modified to update the object 
+	version of the returned instance.
+	(-recordInvocation:): Modified to return the object version incremented or 
+	not on return, this allows to know whether the invocation was recorded or 
+	not. Fixed to return at the right time when an invocation doesn't have to 
+	be recorded (record stack not empty). Added a check to be sure the target 
+	belongs to the context.
+	(-serializeInvocation:): Modified to handle object versions. Fixed to 
+	correctly increment and retrieve the version bound to the delta serializer. 
+	Added code to take a BaseVersion snapshot on first invocation record. Added 
+	some assertion checks.
+	(-logInvocation:recordVersion:): Modified to increment the context version.
+	(-snapshotObject:shouldIncremementObjectVersion:): New method.
+	(-snapshotObject:): Moved code into the previous method.
+	* Headers/COUtility.h: Modified the macros to record invocations of managed 
+	methods.
+	* TestSerializer.m:
+	* TestObjectContext.m: 
+	Added.
+	* Source/COObjectServer.m:
+	* Source/COGroup.m (+objectWithURL:):
+	* Source/CODirectory.m (+objectWithURL:):
+	Fixed warnings in COObjectServer by declaring +objectWithURL in COGroup 
+	protocol.
+
 2008-05-25 Quentin Mathe <qmathe@club-internet.fr>
 
 	Improved the filesystem backend to work as expected with EtoileUI, mainly by

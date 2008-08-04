@@ -37,7 +37,9 @@ CoreObject_OBJC_FILES += \
 	TestObject.m \
 	TestMultiValue.m \
 	TestFile.m \
-	TestDirectory.m
+	TestDirectory.m \
+	TestSerializer.m \
+	TestObjectContext.m
 endif
 
 CoreObject_HEADER_FILES_DIR += Headers

@@ -32,6 +32,12 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return NO;
 }
 
+// TODO: Implement
++ (id) objectWithURL: (NSURL *)url
+{
+	return nil;
+}
+
 /* Private */
 - (void) _addAsParent: (COObject *) object
 {

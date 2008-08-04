@@ -7,11 +7,16 @@
 */
 
 #import "COObjectContext.h"
+#import "COObject.h"
 #import "COSerializer.h"
 #import "NSObject+CoreObject.h"
 
 #define AVERAGE_MANAGED_OBJECTS_COUNT 1000
 #define RECORD_STACK_SIZE 10
+
+@interface COObjectContext (Private)
+- (void) snapshotObject: (id)object shouldIncrementObjectVersion: (BOOL)updateVersion;
+@end
 
 
 @implementation COObjectContext
@@ -143,14 +148,14 @@ static COObjectContext *defaultObjectContext = nil;
 	receiver and may be overriden in subclasses. */
 - (void) beginRecordObject: (id)object
 {
-	//ETLog(@"---> Push on record stack: %@", object);
+	ETDebugLog(@"---> Push on record stack: %@", object);
 	[_recordedObjectStack addObject: object];
 }
 
 /** Pops the last recorded and pushed object from the record session stack. */
 - (void) endRecord
 {
-	//ETLog(@"---> Pop from record stack: %@", [_recordedObjectStack lastObject]);
+	ETDebugLog(@"---> Pop from record stack: %@", [_recordedObjectStack lastObject]);
 	[_recordedObjectStack removeLastObject];
 }
 
@@ -167,6 +172,8 @@ static COObjectContext *defaultObjectContext = nil;
 /** Retrieve the delta serializer for a given object. */
 - (ETSerializer *) deltaSerializerForObject: (id)object
 {
+	return [ETSerializer defaultCoreObjectDeltaSerializerForObject: object];
+
 	if ([object respondsToSelector: @selector(deltaSerializer)])
 	{
 		return [object deltaSerializer];
@@ -180,6 +187,8 @@ static COObjectContext *defaultObjectContext = nil;
 /** Retrieve the snapshot serializer for a given object. */
 - (ETSerializer *) snapshotSerializerForObject: (id)object
 {
+	return [ETSerializer defaultCoreObjectFullSaveSerializerForObject: object];
+
 	if ([object respondsToSelector: @selector(snapshotSerializer)])
 	{
 		return [object snapshotSerializer];
@@ -207,7 +216,10 @@ static COObjectContext *defaultObjectContext = nil;
 	return snapshotVersion;
 }
 
-/** Restores the full-save version closest to the requested one. */
+/** Restores the full-save version closest to the requested one.
+    snpashotVersion is the object version of the returned snapshot object. If 
+    you pass a non-NULL pointer, snapshotVersion is updated by the method 
+    so you can get back the version number by reference. */
 - (id) lastSnapshotOfObject: (id)object 
                  forVersion: (int)aVersion 
             snapshotVersion: (int *)snapshotVersion;
@@ -224,7 +236,10 @@ static COObjectContext *defaultObjectContext = nil;
 	if (snapshotVersion != NULL)
 		*snapshotVersion = fullSaveVersion;
 
-	return [snapshotDeserializer restoreObjectGraph];
+	[snapshotDeserializer setVersion: fullSaveVersion];
+	id snapshotObject = [snapshotDeserializer restoreObjectGraph];
+	[snapshotObject deserializerDidFinish: snapshotDeserializer forVersion: fullSaveVersion];
+	return snapshotObject;
 }
 
 /** Not really useful right now */
@@ -247,6 +262,8 @@ static COObjectContext *defaultObjectContext = nil;
 	id rolledbackObject = [self lastSnapshotOfObject: object 
 	                                      forVersion: aVersion
 	                                 snapshotVersion: &baseVersion];
+	ETDebugLog(@"Roll back object %@ with snapshot %@ at version %d", object,
+		rolledbackObject, baseVersion);
 
 	[self playbackInvocationsWithObject: rolledbackObject 
 	                        fromVersion: baseVersion
@@ -255,7 +272,11 @@ static COObjectContext *defaultObjectContext = nil;
 	return rolledbackObject;
 }
 
-/** Play back each of the subsequent invocations */
+/** Play back each of the subsequent invocations on object.
+    The invocations that will be invoked on the object as target will be the 
+    all invocation serialized between baseVersion and finalVersion. The first 
+    replayed invocation will be 'baseVersion + 1' and the last one 
+    'finalVersion'.  */
 - (void) playbackInvocationsWithObject: (id)object 
                            fromVersion: (int)baseVersion 
                              toVersion: (int)finalVersion 
@@ -273,12 +294,19 @@ static COObjectContext *defaultObjectContext = nil;
 	id deltaDeserializer = [[self deltaSerializerForObject: object] deserializer];
 	NSInvocation *inv = nil;
 
+	/*NSAssert3([deltaDeserializer version] == [object objectVersion], 
+		@"Delta deserializer version %d and object version %d must match for "
+		@"invocations playback on %@", [deltaDeserializer version], 
+		[object objectVersion], object);*/
+
 	for (int v = baseVersion + 1; v <= finalVersion; v++)
 	{
 		[deltaDeserializer setVersion: v];
 		CREATE_AUTORELEASE_POOL(pool);
 		inv = [deltaDeserializer restoreObjectGraph];
+		ETDebugLog(@"Play back %@ at version %d", inv, v);
 		[inv invokeWithTarget: object];
+		[object deserializerDidFinish: deltaDeserializer forVersion: v];
 		DESTROY(inv);
 		DESTROY(pool);
 	}
@@ -346,44 +374,68 @@ static COObjectContext *defaultObjectContext = nil;
 	return [object isEqual: [self currentRecordSessionObject]];
 }
 
-- (void) recordInvocation: (NSInvocation *)inv
+/** Returns the new object version of the target for which the invocation was 
+    recorded. If the invocation isn't recorded, then the returned version is 
+    identical to the current object version of the invocation target. 
+    See also RECORD macro in ETUtility.h */
+- (int) recordInvocation: (NSInvocation *)inv
 {
+	id object = [inv target];
+
+	// TODO: Generalize this check to all methods that require it
+	if ([_registeredObjects containsObject: object] == NO)
+		return [object objectVersion];
+
 	if ([self isRecording])
 	{
 		[self beginRecordObject: [inv target]];
+
+		/* Only record if needed, although we always push the target of the record 
+			on the recorded object stack.
+			That may change in future, we could return NO when the target of the 
+			of the record is already on stack and the message won't be recorded. We 
+			would return YES otherwise, when pushing the target on the record stack 
+			for the first time. This change would mean not to call -endRecord if NO
+			is returned. This check could be hidden in END_RECORD macro by keeping 
+			around the boolean result of -recordInvocation: with RECORD. */
+		if ([[inv target] isEqual: [self currentRecordedObject]])
+			return [[inv target] objectVersion];
 	}
 	else /* Initiate a new record session */
 	{
 		[self beginRecordSessionWithObject: [inv target]];
 	}
 
-	/* Only record if needed, although we always push the target of the record 
-	   on the recorded object stack.
-	   That may change in future, we could return NO when the target of the 
-	   of the record is already on stack and the message won't be recorded. We 
-	   would return YES otherwise, when pushing the target on the record stack 
-	   for the first time. This change would mean not to call -endRecord if NO
-	   is returned. This check could be hidden in END_RECORD macro by keeping 
-	   around the boolean result of -recordInvocation: with RECORD. */
-	if ([[inv target] isEqual: [self currentRecordedObject]])
-		return;
-
 	int newObjectVersion = [self serializeInvocation: inv];
 
 	[self logInvocation: inv recordVersion: newObjectVersion];
+
+	return newObjectVersion;
 }
 
 - (int) serializeInvocation: (NSInvocation *)inv
 {
 	id object = [inv target];
 	id deltaSerializer = nil;
-	int version = -1;
+	int version = [object objectVersion];
+
+	/* First Snapshot if needed (aka Base Version) */
+	if (version == -1)
+	{
+		[self snapshotObject: object shouldIncrementObjectVersion: YES];
+		version = [object objectVersion];
+		NSAssert(version == 0, @"First serialized version should have been reported");
+	}
 
 	/* Record */
 	deltaSerializer = [self deltaSerializerForObject: object];
-	version = [deltaSerializer newVersion];
+	// NOTE: Don't use [deltaSerializer newVersion]; here because 
+	// -serializeObject:withName: already takes care of calling -newVersion.
+	// We instead retrieve the version right after serializing the invocation.
 	[inv setTarget: nil];
 	[deltaSerializer serializeObject: inv withName: "Delta"];
+	version = [deltaSerializer version];
+	ETDebugLog(@"Serialized invocation with version %d", version);
 
 	/* Forward if needed */
 	[inv setTarget: object];
@@ -391,7 +443,12 @@ static COObjectContext *defaultObjectContext = nil;
 
 	/* Snapshot if needed, by periodically saving a full copy */
 	if (version % [self snapshotTimeInterval] == 0)
-		[self snapshotObject: object];
+		[self snapshotObject: object shouldIncrementObjectVersion: NO];
+
+	/* Object version should keep its initial value and is normally set to the 
+	   returned 'version' value by the sender, that is usually 'object'. */
+	NSAssert(version == ([object objectVersion] + 1), @"Object version must not "
+		@"have been updated yet");
 
 	return version;
 }
@@ -402,6 +459,7 @@ static COObjectContext *defaultObjectContext = nil;
 - (void) logInvocation: (NSInvocation *)inv recordVersion: (int)aVersion
 {
 	ETLog(@"Record %@ version %d in %@", inv, aVersion, self);
+	_version++;
 }
 
 /** Commonly used to forward the invocation to the real object if the 
@@ -421,10 +479,29 @@ static COObjectContext *defaultObjectContext = nil;
 
 - (void) snapshotObject: (id)object
 {
+	[self snapshotObject: object shouldIncrementObjectVersion: YES];
+}
+
+- (void) snapshotObject: (id)object shouldIncrementObjectVersion: (BOOL)updateVersion
+{
 	id snapshotSerializer = [self snapshotSerializerForObject: object];
 
-	[snapshotSerializer setVersion: [object version]];
-	[snapshotSerializer serializeObject: object withName:"FullSave"];
+	//[snapshotSerializer setVersion: [object objectVersion]];
+	if ([object objectVersion] == -1)
+	{
+		// TODO: Serialize right in the object bundle and not in a branch
+		[snapshotSerializer serializeObject: object withName:"BaseVersion"];
+	}
+	else
+	{
+		[snapshotSerializer serializeObject: object withName:"FullSave"];
+	}
+
+	if (updateVersion)
+	{
+		[object serializerDidFinish: snapshotSerializer 
+		                 forVersion: [object objectVersion] + 1];
+	}
 }
 
 /** COProxy compatibility method. Probably to be removed. */

@@ -17,7 +17,20 @@
 // TODO: Move to COLibrary
 + (NSURL *) defaultLibraryURL;
 
++ (Class) defaultBackendClass;
 + (id) defaultCoreObjectSerializer;
-+ (id) defaultCoreObjectSerializerWithURL: (NSURL *)anURL;
++ (id) defaultCoreObjectSerializerWithURL: (NSURL *)aURL;
++ (id) defaultCoreObjectDeltaSerializerForObject: (id)object;
++ (id) defaultCoreObjectFullSaveSerializerForObject: (id)object;
++ (NSURL *) serializationURLForObject: (id)object;
+
++ (ETSerializer*) serializerWithBackend:(Class)aBackendClass 
+                          objectVersion: (int)version 
+                                 forURL:(NSURL*)anURL;
+
+// Is this method really needed or used currently?
++ (BOOL) serializeObject: (id)object toURL: (NSURL *)aURL;
+
+- (int) version;
 
 @end

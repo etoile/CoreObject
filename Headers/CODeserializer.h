@@ -16,7 +16,7 @@
 @interface ETDeserializer (CODeserializer)
 
 + (id) defaultCoreObjectDeserializer;
-+ (id) defaultCoreObjectDeserializerWithURL: (NSURL *)anURL;
-- (void) loadUUID: (char *)anUUID withName: (char *)aName;
++ (id) defaultCoreObjectDeserializerWithURL: (NSURL *)aURL;
++ (id) deserializeObjectWithURL: (NSURL *)aURL;
 
 @end

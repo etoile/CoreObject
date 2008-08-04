@@ -7,6 +7,7 @@
 */
 
 #import "CODeserializer.h"
+#import "COSerializer.h"
 #import "NSObject+CoreObject.h"
 
 /* CoreObject Deserializer */
@@ -18,26 +19,51 @@
 
 + (id) defaultCoreObjectDeserializer
 {
-	return [self defaultCoreObjectDeserializerWithURL:  [NSURL fileURLWithPath: @"~/CoreObjectLibrary"]];
+	return [self defaultCoreObjectDeserializerWithURL: 
+		[ETSerializer defaultLibraryURL]];
 }
 
-+ (id) defaultCoreObjectDeserializerWithURL: (NSURL *)anURL
++ (id) defaultCoreObjectDeserializerWithURL: (NSURL *)aURL
 {
-	id deback = [ETDeserializerBackendBinary new];
-	id store = [[ETSerialObjectBundle alloc] initWithPath: [anURL path]];
-
-	[deback deserializeFromStore: store];
-	id deserializer = [ETDeserializer deserializerWithBackend: deback];
-
-	RELEASE(store);
-
-	return deserializer;
+	return [[ETSerializer defaultCoreObjectSerializerWithURL: aURL] deserializer];
 }
 
++ (id) deserializeObjectWithURL: (NSURL *)aURL
+{
+	// FIXME: Move this quick-and-dirty check of the URL parameter into 
+	// EtoileSerialize once the initialization code of the serialization 
+	// backends is improved. We should also check that the directory is an 
+	/// object bundle (put this in ETSerialObjectBundle).
+	if ([aURL isFileURL] == NO 
+	 || [FM fileExistsAtPath: [aURL path] isDirectory: NULL] == NO)
+	{
+		return nil;
+	}
+
+	//CREATE_AUTORELEASE_POOL(pool);
+
+	id deserializer = [self defaultCoreObjectDeserializerWithURL: aURL];
+	[deserializer setBranch: @"root"];
+	[deserializer setVersion: 0];
+	id newInstance = [deserializer restoreObjectGraph];
+
+	//DESTROY(pool);
+
+	return newInstance;
+}
+
+#if 0
 /** Handle the deserialization of the core object identified by anUUID. */
-- (void) loadUUID: (char *)anUUID withName: (char *)aName
+- (void) loadUUID: (char *)aUUID withName: (char *)aName
 {
-	NSLog(@"Load CoreObject %s to name %s", anUUID, aName);
+	NSLog(@"$$$ Load CoreObject %s to name %s", aUUID, aName);
+
+	ETUUID *uuid = [[ETUUID alloc] initWithUUID: aUUID];
+
+	/* The object server takes care of the translation of the UUID into an URL
+	   with the help of the metadata server, deserializes it and caches it. */
+	object = [[COObjectServer defaultServer] objectForUUID: uuid];
 }
+#endif
 
 @end
