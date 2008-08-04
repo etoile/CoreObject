@@ -17,16 +17,19 @@
 #define TEST_IGNORE_CHANGES(returnValue) \
 if (IGNORE_CHANGES) return (returnValue);
 
+#ifndef ETDebugLog
 #define ETDebugLog ETLog
+#endif
 
 #define RECORD(...) \
 NSArray *argArray = A(__VA_ARGS__); \
-ETDebugLog(@" ++ Will try record %@ on %@ with %@", NSStringFromSelector(_cmd), self, argArray); \
 int __prevObjectVersion = _objectVersion; \
 _objectVersion = [[self objectContext] recordInvocation: \
 	                 [NSInvocation invocationWithTarget: self \
 	                                           selector: _cmd \
 	                                          arguments: argArray]];
+
+// ETDebugLog(@" ++ Will try record %@ on %@ with %@", NSStringFromSelector(_cmd), self, argArray);
 
 #define END_RECORD \
 if (__prevObjectVersion != _objectVersion) \
