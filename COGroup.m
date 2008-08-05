@@ -9,6 +9,9 @@
 #import "COGroup.h"
 #import "COMultiValue.h"
 #import "GNUstep.h"
+#import "COObjectContext.h"
+#import "COUtility.h"
+
 
 NSString *kCOGroupNameProperty = @"kCOGroupNameProperty";
 NSString *kCOGroupChildrenProperty = @"kCOGroupChildrenProperty";
@@ -37,6 +40,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 {
 	return nil;
 }
+
 
 /* Private */
 - (void) _addAsParent: (COObject *) object
@@ -297,11 +301,19 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	NSMutableArray *a = [self valueForProperty: kCOGroupChildrenProperty];
 	if ([a containsObject: object] == NO)
 	{
+		if (IGNORE_CHANGES || [self isReadOnly])
+			return NO;
+	
+		RECORD(object)
+
 		[self _addAsParent: object];
 		[a addObject: object];
 		[_nc postNotificationName: kCOGroupAddObjectNotification
 		     object: self
 		     userInfo: [NSDictionary dictionaryWithObject: object forKey: kCOGroupChild]];
+
+		END_RECORD
+
 		return YES;
 	}
 	return NO;
@@ -312,11 +324,19 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	NSMutableArray *a = [self valueForProperty: kCOGroupChildrenProperty];
 	if ([a containsObject: object] == YES)
 	{
+		if (IGNORE_CHANGES || [self isReadOnly])
+			return NO;
+	
+		RECORD(object)
+
 		[self _removeAsParent: object];
 		[a removeObject: object];
 		[_nc postNotificationName: kCOGroupRemoveObjectNotification
 		     object: self
 		     userInfo: [NSDictionary dictionaryWithObject: object forKey: kCOGroupChild]];
+
+		END_RECORD
+
 		return YES;
 	}
 	return NO;
@@ -347,11 +367,19 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	NSMutableArray *a = [self valueForProperty: kCOGroupSubgroupsProperty];
 	if ([a containsObject: group] == NO)
 	{
+		if (IGNORE_CHANGES || [self isReadOnly])
+			return NO;
+	
+		RECORD(group)
+
 		[self _addAsParent: group];
 		[a addObject: group];
 		[_nc postNotificationName: kCOGroupAddObjectNotification
 		     object: self
 		     userInfo: [NSDictionary dictionaryWithObject: group forKey: kCOGroupChild]];
+
+		END_RECORD
+
 		return YES;
 	}
 	return NO;
@@ -362,11 +390,19 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	NSMutableArray *a = [self valueForProperty: kCOGroupSubgroupsProperty];
 	if ([a containsObject: group] == YES)
 	{
+		if (IGNORE_CHANGES || [self isReadOnly])
+			return NO;
+	
+		RECORD(group)
+
 		[self _removeAsParent: group];
 		[a removeObject: group];
 		[_nc postNotificationName: kCOGroupRemoveObjectNotification
 		     object: self
 		     userInfo: [NSDictionary dictionaryWithObject: group forKey: kCOGroupChild]];
+
+		END_RECORD
+
 		return YES;
 	}
 	return NO;
@@ -455,11 +491,11 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 /* NSObject */
 + (void) initialize
 {
-	/* We need to repeat what is in COObject 
-	   because GNU objc runtime will not call super for this method */
-	NSDictionary *pt = [COObject propertiesAndTypes];
-	[COGroup addPropertiesAndTypes: pt];
-	pt = [[NSDictionary alloc] initWithObjectsAndKeys:
+	/* We need to register COObject properties and types by calling super 
+	   because GNU objc runtime will not call +initialize on superclass as 
+	   NeXT runtime does. */
+	[super initialize];
+	NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
 		[NSNumber numberWithInt: kCOStringProperty], 
 			kCOGroupNameProperty,
 		[NSNumber numberWithInt: kCOArrayProperty], 
@@ -467,7 +503,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 		[NSNumber numberWithInt: kCOArrayProperty], 
 			kCOGroupSubgroupsProperty,
 		nil];
-	[COGroup addPropertiesAndTypes: pt];
+	[self addPropertiesAndTypes: pt];
 	DESTROY(pt);
 }
 

@@ -85,6 +85,8 @@ extern NSString *kCOGroupChild;
 - (BOOL) isGroup;
 - (BOOL) isOpaque;
 
+/* Managed Object Edition */
+
 - (BOOL) addObject: (COObject *) object;
 - (BOOL) removeObject: (COObject *) object;
 - (NSArray *) objects;
@@ -93,21 +95,26 @@ extern NSString *kCOGroupChild;
 - (BOOL) removeGroup: (id <COGroup>)subgroup;
 - (NSArray *) groups;
 
-// FIXME: Remove the next three methods after updating all code relying on them
-- (BOOL) addSubgroup: (COGroup *) group;
-- (BOOL) removeSubgroup: (COGroup *) group;
-- (NSArray *) subgroups;
-
 - (NSArray *) allObjects; /* Not group */
 - (NSArray *) allGroups;
 
+/* Object Graph Query */
+
 - (NSArray *) objectsMatchingPredicate: (NSPredicate *) predicate;
+
+/* Collection Protocol */
 
 - (BOOL) isOrdered;
 - (BOOL) isEmpty;
 - (id) content;
 - (NSArray *) contentArray;
 - (void) insertObject: (id)object atIndex: (unsigned int)index;
+
+/* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
+
+- (BOOL) addSubgroup: (COGroup *) group;
+- (BOOL) removeSubgroup: (COGroup *) group;
+- (NSArray *) subgroups;
 
 @end
 

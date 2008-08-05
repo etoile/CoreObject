@@ -1,3 +1,15 @@
+2008-08-05 Quentin Mathe <qmathe@club-internet.fr>
+
+	* COObject.m:
+	* COFileObject.m:
+	Fixed +initialize to call superclass and look less weird. Documented 
+	extensively.
+	* Headers/COGroup.h: Reorganized to be cleaner.
+	* COGroup.m:
+	(+initialize): Fixed to call superclass and look less weird.
+	(-addObject:, -removeObject:, addSubgroup:, -removeSubgroup:): Inserted 
+	persistency support.
+
 2008-08-04 Quentin Mathe <qmathe@club-internet.fr>
 
 	Finished to clean up and test basic features of COObjectContext (object 

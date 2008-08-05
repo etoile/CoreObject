@@ -16,11 +16,11 @@ NSString *kCOFileModificationDateProperty = @"kCOFileModificationDateProperty";
 @implementation COFileObject
 + (void) initialize
 {
-	/* We need to repeat what is in COObject 
-	   because GNU objc runtime will not call super for this method */
-	NSDictionary *pt = [COObject propertiesAndTypes];
-	[COFileObject addPropertiesAndTypes: pt];
-	pt = [[NSDictionary alloc] initWithObjectsAndKeys:
+	/* We need to register COObject properties and types by calling super 
+	   because GNU objc runtime will not call +initialize on superclass as 
+	   NeXT runtime does. */
+	[super initialize];
+	NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
 	[NSNumber numberWithInt: kCOStringProperty], 
 			kCOFilePathProperty,
 	[NSNumber numberWithInt: kCODateProperty], 
@@ -28,7 +28,7 @@ NSString *kCOFileModificationDateProperty = @"kCOFileModificationDateProperty";
 	[NSNumber numberWithInt: kCODateProperty], 
 			kCOFileModificationDateProperty,
 			nil];
-	[COFileObject addPropertiesAndTypes: pt];
+	[self addPropertiesAndTypes: pt];
 	DESTROY(pt);
 }
 

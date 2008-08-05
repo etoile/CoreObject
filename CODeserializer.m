@@ -40,6 +40,8 @@
 		return nil;
 	}
 
+	// NOTE: By reading ETSerializerTest.m example, no local autorelease pool 
+	// seems to be necessary for deserialization. 
 	//CREATE_AUTORELEASE_POOL(pool);
 
 	id deserializer = [self defaultCoreObjectDeserializerWithURL: aURL];

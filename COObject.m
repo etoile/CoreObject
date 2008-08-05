@@ -550,7 +550,22 @@ static BOOL automaticPersistency = NO;
 	return result;
 }
 
-/* NSObject */
+/** If you want to create a subclass of a CoreObject data model class, you 
+    should declare the new properties and types of the class by creating a 
+    dictionary with types as objects and keys as properties, then calls 
+    +addPropertiesAndTypes: with this dictionary as parameter.
+    Each type must be a NSNumber initialized with one of the type constants 
+    defined in COPropertyType.h. Each property must be a string that uniquely 
+    identify the property by its name, and whose name doesn't collide with a 
+    property inherited from superclasses. For properties, you typically declare 
+    your owns as string constants with an identifier name prefixed by 'k' and
+    suffixed by 'Property'. For example, see COObject.h which exposes all 
+    properties of the COObject data model class.
+    When you create a subclass of COObject or some other subclasses such as 
+    COGroup, you  must first call +initalize on your superclass to get all 
+    inherited properties and types registered for your subclass. This only holds 
+    for the GNU runtime though, and may change in future if CoreObject was 
+    ported to another runtime. */
 + (void) initialize
 {
 	NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
@@ -569,7 +584,7 @@ static BOOL automaticPersistency = NO;
 		[NSNumber numberWithInt: kCOArrayProperty], 
 			kCOTagProperty,
 		nil];
-	[COObject addPropertiesAndTypes: pt];
+	[self addPropertiesAndTypes: pt];
 	DESTROY(pt);
 }
 
