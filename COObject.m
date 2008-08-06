@@ -393,6 +393,24 @@ NSString *pCOVersion1Value = @"COVersion1";
 	return [self valueForProperty: kCOUIDProperty];
 }
 
+/** Returns an array of all selectors names whose methods calls can trigger
+    persistency, by handing an invocation to the object context which can in  
+    turn record it and snapshot the receiver if necessary.
+    All messages which are managed method calls are persisted only if necessary, 
+    so if such a message is sent by another managed object part of the same 
+    object context, it won't be recorded (see COObjectContext for a more 
+    thorough explanation). 
+    This method plays a no role currently, if we put aside some runtime 
+    reflection that could be eventually done with it. In future, by overriding 
+    this method, you will be able to declare which methods should automatically 
+    triggers persistency without having to rely on RECORD and END_RECORD macros 
+    in your method body. */
++ (NSArray *) managedMethodNames
+{
+	return A(NSStringFromSelector(@selector(setValue:forProperty:)),
+	         NSStringFromSelector(@selector(removeValueForProperty:)));
+}
+
 static BOOL automaticPersistency = NO;
 
 + (BOOL) automaticallyMakeNewInstancesPersistent
@@ -405,6 +423,56 @@ static BOOL automaticPersistency = NO;
 	automaticPersistency = flag;
 }
 
+/** Allows to temporarily disable persistency for the receiver. 
+    All managed method calls will not result in any recorded invocations or 
+    snapshots.
+    A very common usage of this method is to avoid the recording of 
+    initialization messages in -init. For example:
+    SUPERINIT
+    [self disablePersistency]; // was enabled by the superclass (such as COObject)
+    [self setValue: @"Swansea forProperty: @"Town"];
+    [self enablePersistency];
+    return self;
+    An object will continue to return YES for -isPersistent, even if 
+   -disablePersistency has been called. */
+- (void) disablePersistency
+{
+	if ([self objectContext] == nil)
+	{
+		ETLog(@"WARNING: %@ misses an object context to disable persistency");
+	}
+
+	// NOTE: Another way would be: [_objectContext unregisterObject: self];
+	// By doing, we wouldn't need to check explictly for _isPersistencyEnabled 
+	// in RECORD macro and the object context would discard the invocation 
+	// because the receiver isn't registered. However testing whether the 
+	// persistency is enabled makes sense, because invocations are created 
+	// only if needed.
+	// _isPersistencyEnabled would be easy to replace by -isPersistencyEnabled 
+	// { return [[_objectContext registeredObjects] containsObject: self] }
+	_isPersistencyEnabled = NO;
+}
+
+/** Allows to restore persistency for the receiver, if it is presently
+    disabled. See -disablePersistency. */
+- (void) enablePersistency
+{
+	if ([self objectContext] == nil)
+	{
+		ETLog(@"WARNING: %@ misses an object context to enable persistency");
+	}
+	
+	// NOTE: Another way would be: [_objectContext registerObject: self];
+	_isPersistencyEnabled = YES;
+}
+
+/** Returns whether the receiver has been turned into a persistent object. 
+    Once an object has become persistent, it will remain so until it got 
+    fully destroyed:
+    - deallocated in memory
+    - deleted on-disk
+   TODO: Add the possibility to create a non-persistent copy from a persistent
+   instance. */
 - (BOOL) isPersistent
 {
 	return ([self objectVersion] > -1);
@@ -591,6 +659,7 @@ static BOOL automaticPersistency = NO;
 - (id) init
 {
 	self = [super init];
+
 	_properties = [[NSMutableDictionary alloc] init];
 	[self setValue: [NSNumber numberWithInt: 0] 
 	      forProperty: kCOReadOnlyProperty];
@@ -605,11 +674,18 @@ static BOOL automaticPersistency = NO;
     [self setValue: AUTORELEASE([[NSMutableArray alloc] init])
           forProperty: kCOParentsProperty];
 	_nc = [NSNotificationCenter defaultCenter];
+
 	/* We get the object context at the end, hence all the previous calls are 
 	   not serialized by RECORD in -setValue:forProperty: 
 	   FIXME: Should be obtained by parameter usually. */
 	_objectContext = [COObjectContext defaultContext];
 	_objectVersion = -1;
+	if ([[self class] automaticallyMakeNewInstancesPersistent])
+	{
+		[_objectContext registerObject: self];
+		[self enablePersistency];
+	}
+
 	return self;
 }
 
@@ -642,9 +718,11 @@ static BOOL automaticPersistency = NO;
 
 - (BOOL) serialize: (char *)aVariable using: (ETSerializer *)aSerializer
 {
+	//ETDebugLog(@"Try serialize %s");
 	if (strcmp(aVariable, "_nc") == 0
 	 || strcmp(aVariable, "_objectContext") == 0
-	 || strcmp(aVariable, "_objectVersion") == 0)
+	 || strcmp(aVariable, "_objectVersion") == 0
+	 || strcmp(aVariable, "_isPersistencyEnabled") == 0)
 	{
 		return YES; /* Should not be automatically serialized (manual) */
 	}
@@ -656,6 +734,7 @@ static BOOL automaticPersistency = NO;
            fromPointer: (void *)aBlob 
                version: (int)aVersion
 {
+	//ETDebugLog(@"Try deserialize %s class version %d into %@", aVariable, aVersion, self);
 	if (strcmp(aVariable, "_nc") == 0)
 	{
 		_nc = [NSNotificationCenter defaultCenter];
@@ -664,6 +743,12 @@ static BOOL automaticPersistency = NO;
 	else if (strcmp(aVariable, "_objectContext") == 0)
 	{
 		_objectContext = [COObjectContext defaultContext];
+		return MANUAL_DESERIALIZE;
+	}
+	else if (strcmp(aVariable, "_isPersistencyEnabled") == 0)
+	{
+		 /* If we deserialize an object, it is persistent :-) */
+		_isPersistencyEnabled = 1;
 		return MANUAL_DESERIALIZE;
 	}
 

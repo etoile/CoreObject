@@ -43,7 +43,7 @@
 
 - (void) testBasicSnapshotRollback
 {
-	id object = AUTORELEASE([[SubObject alloc] init]);
+	COObject *object = AUTORELEASE([[SubObject alloc] init]);
 
 	[object setValue: @"me" forProperty: @"whoami"];
 	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
@@ -56,7 +56,7 @@
 
 - (void) testPlaybackBasedRollback
 {
-	id object = AUTORELEASE([[SubObject alloc] init]);
+	COObject *object = AUTORELEASE([[SubObject alloc] init]);
 
 	[object setValue: @"me" forProperty: @"whoami"];
 	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
@@ -77,8 +77,8 @@
 
 - (void) testMultiObjectPersistency
 {
-	id object = AUTORELEASE([[SubObject alloc] init]);
-	id object2 = AUTORELEASE([[SubObject alloc] init]);
+	COObject *object = AUTORELEASE([[SubObject alloc] init]);
+	COObject *object2 = AUTORELEASE([[SubObject alloc] init]);
 
 	[object setValue: @"me" forProperty: @"whoami"]; // version 1
 	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
@@ -95,6 +95,68 @@
 	id object1v7 = [self objectByRollingbackObject: object toVersion: 7];
 	UKStringsEqual(@"Who knows!", [object1v7 valueForProperty: @"whoami"]);
 	UKObjectsEqual([NSArray array], [object1v7 valueForProperty: @"otherObjects"]);
+}
+
+- (void) testGroupPersistency
+{
+	COObject *object = AUTORELEASE([[SubObject alloc] init]);
+	COObject *object2 = AUTORELEASE([[SubObject alloc] init]);
+	COObject *object3 = AUTORELEASE([[SubObject alloc] init]);
+	COGroup *group = AUTORELEASE([[COGroup alloc] init]);
+	COGroup *group2 = AUTORELEASE([[COGroup alloc] init]);
+
+	UKIntsEqual(-1, [object objectVersion]);
+	UKIntsEqual(-1, [group objectVersion]);
+	UKIntsEqual(-1, [group2 objectVersion]);
+
+	[group2 addObject: object2];
+	[group addObject: object];
+
+	UKIntsEqual(-1, [object objectVersion]);
+	UKIntsEqual(1, [group objectVersion]);
+	UKIntsEqual(1, [group2 objectVersion]);
+
+	[group addGroup: group2];
+
+	UKIntsEqual(2, [group objectVersion]);
+	UKIntsEqual(1, [group2 objectVersion]);
+
+	[group2 addObject: object3];
+
+	UKIntsEqual(2, [group2 objectVersion]);
+
+	/* Test snapshot rollback */
+	id group1v0 = [self objectByRollingbackObject: group toVersion: 0];
+	UKIntsEqual(0, [group1v0 objectVersion]);
+	UKIntsEqual(2, [group objectVersion]);
+	UKTrue([group1v0 isEmpty]);
+	UKFalse([group isEmpty]);
+	UKObjectsEqual([group UUID], [group1v0 UUID]);
+	/* Pass because we test equality only on UUID and type, probably a valid 
+	   choice but we may make it stricter by testing the objectVersion and 
+	   introducing another equality test -isTemporalInstance:.
+	   Another choice is to keep -isEqual: as is and adds -isTemporarilyEqual: */
+	UKObjectsEqual(group, group1v0); 
+
+	/* Test playback rollback (move forward in time) */
+	id group1v2 = [self objectByRollingbackObject: group1v0 toVersion: 2];
+	UKIntsEqual(2, [group1v2 objectVersion]);
+	UKIntsEqual(0, [group1v0 objectVersion]);
+	UKFalse([group1v2 isEmpty]);
+	UKObjectsEqual([group UUID], [group1v2 UUID]);
+	UKObjectsEqual([group objects], [group1v2 objects]);
+
+	/* Test playback rollback (move backward in time) */
+	id group1v1 = [self objectByRollingbackObject: group1v2 toVersion: 1];
+	UKIntsEqual(1, [group1v1 objectVersion]);
+	UKIntsEqual(2, [group1v2 objectVersion]);
+	UKFalse([group1v1 isEmpty]);
+	UKObjectsEqual([group UUID], [group1v1 UUID]);
+	// NOTE: The next two tests only holds if -objects doesn't return subgroups
+	UKObjectsEqual([group objects], [group1v1 objects]);
+	UKObjectsNotEqual([group groups], [group1v1 groups]);
+	UKObjectsEqual(object, [[group1v1 objects] objectAtIndex: 0]);
+	//UKObjectsSame(object, [[group1v1 objects] objectAtIndex: 0]); // FIXME
 }
 
 - (void) testDummySerialization
@@ -119,18 +181,16 @@
 
 + (void) initialize
 {
-	/* We need to repeat what is in COObject 
-	   because GNU objc runtime will not call super for this method */
-	NSDictionary *pt = [COObject propertiesAndTypes];
-	[SubObject addPropertiesAndTypes: pt];
+	[super initialize];
 
-    pt = [[NSDictionary alloc] initWithObjectsAndKeys:
+	NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
         [NSNumber numberWithInt: kCOStringProperty],
             @"whoami",
         [NSNumber numberWithInt: kCOArrayProperty],
             @"otherObjects",
         nil];
-    [SubObject addPropertiesAndTypes: pt];
+    [self addPropertiesAndTypes: pt];
+	[self setAutomaticallyMakeNewInstancesPersistent: YES];
 
     DESTROY(pt);
 }
@@ -139,14 +199,12 @@
 {
 	SUPERINIT
 
-	// TODO: Come up with something prettier and less verbose such as 
-	// -[COObject disablePersistency] and -enablePersistency may be...
-	[[self objectContext] unregisterObject: self];
+	[self disablePersistency];
 	[self setValue: @"Nobody"
 	      forProperty: @"whoami"];
 	[self setValue: [NSMutableArray arrayWithObject: @"New York"]
 	      forProperty: @"otherObjects"];
-	[[self objectContext] registerObject: self];
+	[self enablePersistency];
 
 	return self;
 }

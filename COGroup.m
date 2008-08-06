@@ -41,6 +41,13 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return nil;
 }
 
++ (NSArray *) managedMethodNames
+{
+	return A(NSStringFromSelector(@selector(addObject:)),
+	         NSStringFromSelector(@selector(removeObject:)),
+	         NSStringFromSelector(@selector(addGroup:)),
+	         NSStringFromSelector(@selector(removeGroup:)));
+}
 
 /* Private */
 - (void) _addAsParent: (COObject *) object
@@ -511,10 +518,12 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 {
 	self = [super init];
 	/* Initialize children and parents property */
+	[self disablePersistency];
 	[self setValue: AUTORELEASE([[NSMutableArray alloc] init])
 	      forProperty: kCOGroupChildrenProperty];
 	[self setValue: AUTORELEASE([[NSMutableArray alloc] init])
 	      forProperty: kCOGroupSubgroupsProperty];
+	[self enablePersistency];
 	return self;
 }
 

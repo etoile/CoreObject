@@ -22,14 +22,16 @@ if (IGNORE_CHANGES) return (returnValue);
 #endif
 
 #define RECORD(...) \
-NSArray *argArray = A(__VA_ARGS__); \
 int __prevObjectVersion = _objectVersion; \
-_objectVersion = [[self objectContext] recordInvocation: \
+if (_isPersistencyEnabled) \
+{ \
+	NSArray *argArray = A(__VA_ARGS__); \
+	ETDebugLog(@" ++ Will try record %@ on %@ with %@", NSStringFromSelector(_cmd), self, argArray); \
+	_objectVersion = [[self objectContext] recordInvocation: \
 	                 [NSInvocation invocationWithTarget: self \
 	                                           selector: _cmd \
-	                                          arguments: argArray]];
-
-// ETDebugLog(@" ++ Will try record %@ on %@ with %@", NSStringFromSelector(_cmd), self, argArray);
+	                                          arguments: argArray]]; \
+}
 
 #define END_RECORD \
 if (__prevObjectVersion != _objectVersion) \

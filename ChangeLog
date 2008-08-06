@@ -1,5 +1,28 @@
 2008-08-06 Quentin Mathe <qmathe@club-internet.fr>
 
+	* Headers/COUtility.h: Modified RECORD macro to bypass persistency if 
+	temporarily disabled.
+	* Headers/COObject.h:
+	* COObject.m:
+	New ivar _isPersistencyEnabled.
+	(-init): Tweaked to currently non-persistent objects by default and register 
+	the receiver in the object context only if persistency has been turned on.
+	(-enablePersistency, -disablePersistency): Added.
+	(-serialize:using:, -deserialize:fromPointer:version:): Modified so 
+	_isPersistencyEnabled doesn't get serialized.
+	(-managedMethodNames): Added.
+	* Headers/COGroup.h:
+	* COGroup.m:
+	(-managedMethodNames): Added.
+	(-init):  Updated to disable persistency during initialization.
+	* COFileObject.m (-initWithPath:): Updated to disable persistency during 
+	initialization.
+	* TestObjectContext.m: Added a bunch of tests for group persistency.
+	(+[SubObject initialize]): Corrected to match recent changes in the way
+	to declare the data model (see +[COObject initialize]).
+
+2008-08-06 Quentin Mathe <qmathe@club-internet.fr>
+
 	Don't serialize cached file manager for the following classes...
 	* COFileObject.m:
 	* COCollection.m:

@@ -65,10 +65,16 @@ extern NSString *pCOVersion1Value;
 @interface COObject: NSObject <COObject>
 {
 	NSMutableDictionary *_properties;
+	/** Cache, 
+	   Not sure it really makes a difference, ask Yen-Ju... If it does, 
+	   probably better to use a global var. */
 	NSNotificationCenter *_nc;
 	COObjectContext *_objectContext;
 	/** The current version of the object. */
 	int _objectVersion;
+	/** Indicates whether managed method calls are handed to the object context 
+	    (see -[COObjectContext recordInvocation:]) */
+	BOOL _isPersistencyEnabled;
 }
 
 /* Data Model Declaration */
@@ -78,6 +84,8 @@ extern NSString *pCOVersion1Value;
 + (NSArray *) properties;
 + (int) removeProperties: (NSArray *) properties;
 + (COPropertyType) typeOfProperty: (NSString *) property;
+
+/* Factory method */
 
 + (id) objectWithPropertyList: (NSDictionary *) propertyList;
 
@@ -99,8 +107,15 @@ extern NSString *pCOVersion1Value;
 
 /* Persistency */
 
+//+ (BOOL) automaticallyWakeUpLibraryAndInsertIntoObjectContext;
+//+ (void) setAutomaticallyWakeUpLibraryAndInsertIntoObjectContext: (BOOL)flag;
+//- (COLibrary *) library;
+
++ (NSArray *) managedMethodNames;
 + (BOOL) automaticallyMakeNewInstancesPersistent;
 + (void) setAutomaticallyMakeNewInstancesPersistent: (BOOL)flag;
+- (void) disablePersistency;
+- (void) enablePersistency;
 
 - (int) version; /* Use kCOUIDProperty to set UID */
 
