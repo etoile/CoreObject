@@ -1,14 +1,9 @@
-2008-08-05 Quentin Mathe <qmathe@club-internet.fr>
+2008-08-06 Quentin Mathe <qmathe@club-internet.fr>
 
-	* COObject.m:
+	Don't serialize cached file manager for the following classes...
 	* COFileObject.m:
-	Fixed +initialize to call superclass and look less weird. Documented 
-	extensively.
-	* Headers/COGroup.h: Reorganized to be cleaner.
-	* COGroup.m:
-	(+initialize): Fixed to call superclass and look less weird.
-	(-addObject:, -removeObject:, addSubgroup:, -removeSubgroup:): Inserted 
-	persistency support.
+	* COCollection.m:
+	(-serialize:using:, -deserialize:fromPointer:version:): Added.
 
 2008-08-04 Quentin Mathe <qmathe@club-internet.fr>
 

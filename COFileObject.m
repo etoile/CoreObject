@@ -14,6 +14,7 @@ NSString *kCOFileCreationDateProperty = @"kCOFileCreationDateProperty";
 NSString *kCOFileModificationDateProperty = @"kCOFileModificationDateProperty";
 
 @implementation COFileObject
+
 + (void) initialize
 {
 	/* We need to register COObject properties and types by calling super 
@@ -42,6 +43,7 @@ NSString *kCOFileModificationDateProperty = @"kCOFileModificationDateProperty";
 - (id) initWithPath: (NSString *) path
 {
 	self = [self init];
+
 	/* Make sure file exists */
 	if ([_fm fileExistsAtPath: path] == NO)
 	{
@@ -50,6 +52,7 @@ NSString *kCOFileModificationDateProperty = @"kCOFileModificationDateProperty";
 		return nil;
 	}
 	[self setPath: path];
+
 	return self;
 }
 
@@ -68,6 +71,39 @@ NSString *kCOFileModificationDateProperty = @"kCOFileModificationDateProperty";
 	{
 		[self setValue: path forProperty: kCOFilePathProperty];
 	}
+}
+
+/* Serialization (EtoileSerialize)
+   TODO: this code is copied/pasted in COCollection.m, figure out a way to 
+   share it. */
+
+- (BOOL) serialize: (char *)aVariable using: (ETSerializer *)aSerializer
+{
+	if ([super serialize: aVariable using: aSerializer])
+		return YES;
+
+	if (strcmp(aVariable, "_fm") == 0)
+	{
+		return YES; /* Should not be automatically serialized (manual) */
+	}
+
+	return NO; /* Serializer handles the ivar */
+}
+
+- (void *) deserialize: (char *)aVariable 
+           fromPointer: (void *)aBlob 
+               version: (int)aVersion
+{
+	if ([super deserialize: aVariable fromPointer: aBlob version: aVersion] == MANUAL_DESERIALIZE)
+		return MANUAL_DESERIALIZE;
+
+	if (strcmp(aVariable, "_fm") == 0)
+	{
+		_fm = [NSFileManager defaultManager];
+		return MANUAL_DESERIALIZE;
+	}
+
+	return AUTO_DESERIALIZE;
 }
 
 @end

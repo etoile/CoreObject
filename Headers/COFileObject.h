@@ -14,7 +14,9 @@ extern NSString *kCOFileModificationDateProperty; // kCODateProperty
 
 @interface COFileObject: COObject
 {
-	/* Cache */
+	/** Cache, 
+	    Not sure it really makes a difference, ask Yen-Ju... If it does, 
+	    probably better to use a global var. */
 	NSFileManager *_fm;
 }
 

@@ -361,5 +361,38 @@ NSString *collectionStore = @"_collection.store"; /* For property list */
 	return _location;
 }
 
+/* Serialization (EtoileSerialize)
+   TODO: this code is copied/pasted in COFileObject.m, figure out a way to 
+   share it. */
+
+- (BOOL) serialize: (char *)aVariable using: (ETSerializer *)aSerializer
+{
+	if ([super serialize: aVariable using: aSerializer])
+		return YES;
+
+	if (strcmp(aVariable, "_fm") == 0)
+	{
+		return YES; /* Should not be automatically serialized (manual) */
+	}
+
+	return NO; /* Serializer handles the ivar */
+}
+
+- (void *) deserialize: (char *)aVariable 
+           fromPointer: (void *)aBlob 
+               version: (int)aVersion
+{
+	if ([super deserialize: aVariable fromPointer: aBlob version: aVersion] == MANUAL_DESERIALIZE)
+		return MANUAL_DESERIALIZE;
+
+	if (strcmp(aVariable, "_fm") == 0)
+	{
+		_fm = [NSFileManager defaultManager];
+		return MANUAL_DESERIALIZE;
+	}
+
+	return AUTO_DESERIALIZE;
+}
+
 @end
 
