@@ -17,8 +17,14 @@
 #define TEST_IGNORE_CHANGES(returnValue) \
 if (IGNORE_CHANGES) return (returnValue);
 
+// TODO: Move these macros into EtoileFoundation. Ugly hack to workaround 
+// multiple definition warnings when both CoreObject and EtoileUI are used
 #ifndef ETDebugLog
+#ifdef DEBUG_LOG
 #define ETDebugLog ETLog
+#else
+#define ETDebugLog(format, args...)
+#endif
 #endif
 
 #define RECORD(...) \

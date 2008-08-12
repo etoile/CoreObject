@@ -130,6 +130,14 @@ extern NSString *pCOVersion1Value;
 
 - (BOOL) matchesPredicate: (NSPredicate *) predicate;
 
+/* Serialization (EtoileSerialize callbacks) */
+
+- (BOOL) serialize: (char *)aVariable using: (ETSerializer *)aSerializer;
+- (void *) deserialize: (char *)aVariable 
+           fromPointer: (void *)aBlob 
+               version: (int)aVersion;
+- (void) finishedDeserializing;
+
 /* Private (Object Versioning callbacks) */
 
 - (void) deserializerDidFinish: (ETDeserializer *)deserializer forVersion: (int)objectVersion;

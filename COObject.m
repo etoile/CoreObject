@@ -716,6 +716,8 @@ static BOOL automaticPersistency = NO;
 
 /* Serialization (EtoileSerialize) */
 
+/** If you override this method, you must call superclass implemention before 
+    your own code. */
 - (BOOL) serialize: (char *)aVariable using: (ETSerializer *)aSerializer
 {
 	//ETDebugLog(@"Try serialize %s");
@@ -730,34 +732,34 @@ static BOOL automaticPersistency = NO;
 	return NO; /* Serializer handles the ivar */
 }
 
+/** If you override this method, you must call superclass implemention before 
+    your own code. */
 - (void *) deserialize: (char *)aVariable 
            fromPointer: (void *)aBlob 
                version: (int)aVersion
 {
-	//ETDebugLog(@"Try deserialize %s class version %d into %@", aVariable, aVersion, self);
-	if (strcmp(aVariable, "_nc") == 0)
-	{
-		_nc = [NSNotificationCenter defaultCenter];
-		return MANUAL_DESERIALIZE;
-	}
-	else if (strcmp(aVariable, "_objectContext") == 0)
-	{
-		_objectContext = [COObjectContext defaultContext];
-		return MANUAL_DESERIALIZE;
-	}
-	else if (strcmp(aVariable, "_isPersistencyEnabled") == 0)
-	{
-		 /* If we deserialize an object, it is persistent :-) */
-		_isPersistencyEnabled = 1;
-		return MANUAL_DESERIALIZE;
-	}
+	ETDebugLog(@"Try deserialize %s into %@ (class version %d)", aVariable, aVersion, self);
 
 	return AUTO_DESERIALIZE;
 }
 
+// TODO: If we can get the deserializer in parameter, the next method 
+// -deserializerDidFinish:forVersion: might eventually be removed.
+/** If you override this method, you must call superclass implemention before 
+    your own code. */
+- (void) finishedDeserializing
+{
+	ETDebugLog(@"Finished deserializing of %@", self);
+
+	_nc = [NSNotificationCenter defaultCenter];
+	_objectContext = [COObjectContext defaultContext];
+	/* If we deserialize an object, it is persistent :-) */
+	_isPersistencyEnabled = YES;
+}
+
 - (void) deserializerDidFinish: (ETDeserializer *)deserializer forVersion: (int)objectVersion
 {
-	NSLog(@"Finished deserialization of %@ to object version %d", self, objectVersion);
+	ETDebugLog(@"Finished deserialization of %@ to object version %d", self, objectVersion);
 	_objectVersion = objectVersion;
 }
 
@@ -833,4 +835,3 @@ static BOOL automaticPersistency = NO;
 NSString *kCOObjectChangedNotification = @"kCOObjectChangedNotification";
 NSString *kCOUpdatedProperty = @"kCOUpdatedProperty";
 NSString *kCORemovedProperty = @"kCORemovedProperty";
-

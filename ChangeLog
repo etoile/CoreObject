@@ -1,3 +1,15 @@
+2008-08-12 Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/COObject.h:
+	* COObject.m:
+	* COGroup.m:
+	* COCollection.m:
+	* COFileObject.m:
+	Fixed incorrect use of -deserialize:fromPointer:version: by replacing it 
+	with -finishedDeserializing. Now ivars which aren't serialized are properly 
+	set for deseserialized objects.
+	* Headers/COUtility.h: Tweaked to disable debug logging by default.
+
 2008-08-06 Quentin Mathe <qmathe@club-internet.fr>
 
 	* Headers/COUtility.h: Modified RECORD macro to bypass persistency if 

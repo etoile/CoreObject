@@ -92,20 +92,10 @@ NSString *kCOFileModificationDateProperty = @"kCOFileModificationDateProperty";
 	return NO; /* Serializer handles the ivar */
 }
 
-- (void *) deserialize: (char *)aVariable 
-           fromPointer: (void *)aBlob 
-               version: (int)aVersion
+- (void) finishedDeserializing
 {
-	if ([super deserialize: aVariable fromPointer: aBlob version: aVersion] == MANUAL_DESERIALIZE)
-		return MANUAL_DESERIALIZE;
-
-	if (strcmp(aVariable, "_fm") == 0)
-	{
-		_fm = [NSFileManager defaultManager];
-		return MANUAL_DESERIALIZE;
-	}
-
-	return AUTO_DESERIALIZE;
+	[super finishedDeserializing];
+	_fm = [NSFileManager defaultManager];
 }
 
 @end
