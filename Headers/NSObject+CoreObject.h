@@ -29,16 +29,16 @@
 	defaults). But even in this case, using an object context can be useful to allow 
 	the user to revert inspector-specific changes when the inspector has lost the 
 	focus. May not make sense at UI level. */
-- (id) initWithLibrary: (id)aLibrary inObjectContext: (COObjectContext *)aContext;
-- (id) initWithUUID: (ETUUID *)anUUID inObjectContext: (COObjectContext *)aContext;
-- (id) initWithURL: (NSURL *)anURL inObjectContext: (COObjectContext *)aContext;
+//- (id) initWithLibrary: (id)aLibrary inObjectContext: (COObjectContext *)aContext;
+//- (id) initWithUUID: (ETUUID *)anUUID inObjectContext: (COObjectContext *)aContext;
+//- (id) initWithURL: (NSURL *)anURL inObjectContext: (COObjectContext *)aContext;
 - (ETUUID *) UUID;
-- (id) localStore;
+//- (id) localStore;
 // TODO: We need to discuss the terminology here and differentiate between 
 // metadatas (or persistent properties) and metadatas to be indexed (or 
 // indexable persistent properties). 
-- (NSDictionary *) metadatas;
-- (int) version;
+//- (NSDictionary *) metadatas;
+//- (int) version;
 @end
 
 /* NSObject extensions */
@@ -48,5 +48,10 @@
 - (BOOL) isCoreObject;
 - (BOOL) isManagedCoreObject;
 - (BOOL) isCoreObjectProxy;
+- (BOOL) isFault;
 
+@end
+
+@interface ETUUID (CoreObject)
+- (BOOL) isFault;
 @end

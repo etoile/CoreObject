@@ -21,6 +21,24 @@
 #define SubBasicObject TestSerializerSubBasicObject
 #define SubObject TestSerializerSubObject
 
+@implementation ETSerializer (Test)
++ (NSURL *) libraryURLForTest
+{
+	NSString *path = [@"./TestLibrary" stringByStandardizingPath];
+	BOOL isDir = NO;
+	BOOL hasCreatedDir = [FM createDirectoryAtPath: path attributes: nil];
+
+	if (hasCreatedDir == NO && 
+	  ([FM fileExistsAtPath: path isDirectory: &isDir] == NO || isDir == NO))
+	{
+		ETLog(@"WARNING: Failed to create test library at path %@, a file with "
+			"the same name may already exists", path);
+	}
+
+	return [NSURL fileURLWithPath: path];
+}
+@end
+
 /* For testing subclass */
 @interface SubBasicObject : NSObject
 {
@@ -145,6 +163,47 @@ id testRoundTrip(id object)
 - (void) testManagedObjectSerialization
 {
 
+}
+
+- (void) testBasicManagedCoreObjectGraphSerialization
+{
+	id object1 = AUTORELEASE([[SubObject alloc] init]);
+	id refObject1 = AUTORELEASE([[SubObject alloc] init]);
+	[object1 setValue: A(refObject1, @"New York") forProperty: @"otherObjects"];
+
+	/* First serialize refObject1 in order it can be found as a serialized 
+	   object on disk when deserializing object1. */
+	NSURL *refObjectURL = [[ETSerializer defaultLibraryURL] URLByAppendingPath: 
+		[[refObject1 UUID] stringValue]];
+	[ETSerializer serializeObject: refObject1 toURL: refObjectURL];
+
+	/* Check refObject1 serialization */
+	NSString *path = [refObjectURL path];
+	BOOL isDir = NO;
+	//ETLog(@"path %@ -> %@", path, APPEND_PATH(path, @"root/0.save"));
+	UKTrue([FM fileExistsAtPath: path isDirectory: &isDir]);
+	UKTrue(isDir);
+
+	/* Then serializes object1 and recreates a new instance by deserializing it */
+	id object2 = [self roundTrip: object1];
+
+	/* Check object1 serialization */
+	UKTrue([FM fileExistsAtPath: [TEMP_URL path] isDirectory: &isDir]);
+	UKTrue(isDir);
+	//ETLog(@"path %@ -> %@", path, APPEND_PATH(path, @"root/0.save"));
+	UKTrue([FM fileExistsAtPath: APPEND_PATH(path, @"root/0.save") isDirectory: &isDir]);
+	UKFalse(isDir);
+	UKObjectsEqual(A(refObject1, @"New York"), [object1 valueForProperty: @"otherObjects"]);
+
+	/* Check the managed core object graph is properly recreated by deserialization */
+	UKNotNil(object2);
+	UKStringsEqual([object2 valueForProperty: @"whoami"], [NSString stringWithString: @"Nobody"]);
+	UKIntsEqual(2, [[object2 valueForProperty: @"otherObjects"] count]);
+	UKStringsEqual(@"New York", [[object2 valueForProperty: @"otherObjects"] lastObject]);
+	id loadedRefObject = [[object2 valueForProperty: @"otherObjects"] firstObject];
+	UKObjectsEqual([refObject1 UUID], [loadedRefObject UUID]);
+	UKObjectsEqual(refObject1, loadedRefObject);
+	UKObjectsNotSame(refObject1, loadedRefObject);
 }
 
 @end

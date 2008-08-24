@@ -25,4 +25,22 @@
 	return NO;
 }
 
+/** Returns YES if the object is a fault. A fault object is a fake or marker 
+    object used to denote the fact the real object isn't loaded in memory. */
+- (BOOL) isFault
+{
+	return NO;
+}
+
+@end
+
+
+@implementation ETUUID (CoreObject)
+
+/** CoreObject uses UUID as fault markers. */
+- (BOOL) isFault
+{
+	return YES;
+}
+
 @end

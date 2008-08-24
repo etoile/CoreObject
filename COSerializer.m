@@ -19,6 +19,7 @@
 - (id) initWithBackend:(Class)aBackend objectVersion: (int)version forURL:(NSURL*)anURL;
 // NOTE: Not used, may be removed later.
 + (id) defaultCoreObjectSerializerForObject: (id)object;
++ (NSURL *) libraryURLForTest; // Not implemented here (see TestSerializer.m)
 @end
 
 /* CoreObject Serializer */
@@ -33,6 +34,10 @@
 
 + (NSURL *) defaultLibraryURL
 {
+#ifdef UKTEST
+	if ([self respondsToSelector: @selector(libraryURLForTest)])
+		return [self libraryURLForTest];
+#endif
 	return [NSURL fileURLWithPath: @"~/CoreObjectLibrary"];
 }
 
@@ -133,16 +138,29 @@
 	return objectVersion;
 }
 
-#if 0
-- (size_t) storeObjectFromAddress:(void*) address withName:(char*) name
+- (size_t) storeObjectFromAddress: (void *)address withName: (char *)name
 {
-	if(*(id*)address != nil)
+	id object = *(id*)address;
+
+	if ([object isManagedCoreObject]) /* Store managed Core Object */
 	{
-		[self enqueueObject:*(id*)address];
+		ETDebugLog(@"Store managed object %@ with name %s and uuid %@", 
+			object, name, [object UUID]);
+		[backend storeUUID: (char *)[[object UUID] UUIDValue] withName: name];
 	}
-	[backend storeObjectReference:COREF_FROM_ID(*(id*)address) withName:name];
+	else /* Store normal object */
+	{
+		if (object != nil)
+		{
+			[self enqueueObject: object];
+		}
+		[backend storeObjectReference: COREF_FROM_ID(object) withName: name];
+	}
+
+	/* The returned size doesn't seem to be ever used for objects, hence even 
+	   if the object isn't serialized as part of the current object graph, 
+	   everything should be fine. */
 	return sizeof(id);
 }
-#endif 
 
 @end

@@ -1,14 +1,22 @@
-2008-08-12 Quentin Mathe <qmathe@club-internet.fr>
+2008-08-14 Quentin Mathe <qmathe@club-internet.fr>
 
-	* Headers/COObject.h:
-	* COObject.m:
-	* COGroup.m:
-	* COCollection.m:
-	* COFileObject.m:
-	Fixed incorrect use of -deserialize:fromPointer:version: by replacing it 
-	with -finishedDeserializing. Now ivars which aren't serialized are properly 
-	set for deseserialized objects.
-	* Headers/COUtility.h: Tweaked to disable debug logging by default.
+	Implemented managed core object graph serialization and deserialization by 
+	treating each managed core object as a distinct persistent root.
+	* Headers/NSObject+CoreObject.h:
+	* NSObject+CoreObject.m:
+	(-[ETUUID isFault]): New method.
+	* COSerializer.m (-storeObjectFromAddress:withName:): 
+	* CODeserializer.m (-loadUUID:withName:):
+	New methods that patch ETSerializer and ETDeserializer, to be moved back 
+	into EtoileSerialize once stabilised.
+	(+[ETSerializer defaultLibraryURL]): Modified to provide a hook for a 
+	testing specific library URL.
+	* TestSerializer.m 
+	(+[ETSerializer libraryURLForTest]): New method to put persistent objects 
+	created by tests outside of the main CoreObject library.
+	(-testBasicManagedCoreObjectGraphSerialization): New method to test managed 
+	core object graph persistency.
+	* GNUmakefile: Modified to define UKTEST for test bundle target.
 
 2008-08-06 Quentin Mathe <qmathe@club-internet.fr>
 

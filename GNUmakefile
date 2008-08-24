@@ -30,6 +30,7 @@ CoreObject_OBJC_FILES = \
 	COObjectServer.m
 
 ifeq ($(test), yes)
+CoreObject_CPPFLAGS += -DUKTEST=1
 CoreObject_OBJC_FILES += \
 	TestCollection.m \
 	TestSmartGroup.m \
