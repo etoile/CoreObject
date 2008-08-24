@@ -112,7 +112,7 @@
 	CREATE_AUTORELEASE_POOL(pool);
 
 	id serializer = [self defaultCoreObjectSerializerWithURL: aURL];
-	[serializer serializeObject: object withName: "rootobject"];
+	[serializer serializeObject: object withName: @"rootobject"];
 
 	DESTROY(pool);
 

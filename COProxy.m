@@ -54,14 +54,14 @@ static id logBackend;
 	backend = aSerializer;
 	serializer = [[ETSerializer serializerWithBackend:aSerializer 
 								 			  forURL:baseURL] retain];
-	[serializer serializeObject:object withName:"BaseVersion"];
+	[serializer serializeObject:object withName:@"BaseVersion"];
 	NSString * path = [NSString stringWithFormat:@"%@/FullSaves",
 					 [baseURL path]];
 	NSURL * fullsaveURL = [NSURL fileURLWithPath:path];
 	fullSave = [[ETSerializer serializerWithBackend:backend
 											forURL:fullsaveURL] retain];
 	[fullSave setVersion:0];
-	[fullSave serializeObject:object withName:"FullSave"];
+	[fullSave serializeObject:object withName:@"FullSave"];
 	return self;
 }
 - (int) version
@@ -110,15 +110,15 @@ static id logBackend;
 {
 	version = [serializer newVersion];
 	[anInvocation setTarget:nil];
-	[serializer serializeObject:anInvocation withName:"Delta"];
-	//[logBackend serializeObject:anInvocation withName:"Delta"];
+	[serializer serializeObject:anInvocation withName:@"Delta"];
+	//[logBackend serializeObject:anInvocation withName:@"Delta"];
 	[anInvocation setTarget:object];
 	[anInvocation invoke];
 	/* Periodically save a full copy */
 	if(version % FULL_SAVE_INTERVAL == 0)
 	{
 		[fullSave setVersion:version];
-		[fullSave serializeObject:object withName:"FullSave"];
+		[fullSave serializeObject:object withName:@"FullSave"];
 	}
 }
 

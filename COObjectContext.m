@@ -433,7 +433,7 @@ static COObjectContext *defaultObjectContext = nil;
 	// -serializeObject:withName: already takes care of calling -newVersion.
 	// We instead retrieve the version right after serializing the invocation.
 	[inv setTarget: nil];
-	[deltaSerializer serializeObject: inv withName: "Delta"];
+	[deltaSerializer serializeObject: inv withName: @"Delta"];
 	version = [deltaSerializer version];
 	ETDebugLog(@"Serialized invocation with version %d", version);
 
@@ -490,11 +490,11 @@ static COObjectContext *defaultObjectContext = nil;
 	if ([object objectVersion] == -1)
 	{
 		// TODO: Serialize right in the object bundle and not in a branch
-		[snapshotSerializer serializeObject: object withName:"BaseVersion"];
+		[snapshotSerializer serializeObject: object withName:@"BaseVersion"];
 	}
 	else
 	{
-		[snapshotSerializer serializeObject: object withName:"FullSave"];
+		[snapshotSerializer serializeObject: object withName:@"FullSave"];
 	}
 
 	if (updateVersion)

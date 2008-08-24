@@ -166,12 +166,12 @@
 	id inv = [NSInvocation invocationWithTarget: object selector: @selector(description) arguments: [NSArray array]];
 	id serializer = [[ETSerializer serializerWithBackend: [ETSerializerBackendBinary class]
 								 			  forURL: baseURL] retain];
-	//[serializer serializeObject:object withName:"TestBaseVersion"];
+	//[serializer serializeObject:object withName:@"TestBaseVersion"];
 	//[inv setTarget: nil];
 	int version = [serializer newVersion];
 	[inv setTarget:nil];
-	[serializer serializeObject: inv withName:"TestDelta"];
-	[serializer serializeObject: inv withName:"Anything"];
+	[serializer serializeObject: inv withName:@"TestDelta"];
+	[serializer serializeObject: inv withName:@"Anything"];
 #endif
 }
 

@@ -45,7 +45,7 @@ id testRoundTrip(id object)
 
 	/* Serialize */
 	id serializer = [ETSerializer defaultCoreObjectSerializerWithURL: TEMP_URL];
-	[serializer serializeObject: object withName: "test"];
+	[serializer serializeObject: object withName: @"test"];
 
 	/* Deserialize */
 	id deserializer = [serializer deserializer];
@@ -65,7 +65,7 @@ id testRoundTrip(id object)
 	id serializer = [ETSerializer defaultCoreObjectSerializerWithURL: destURL];
 
 	CREATE_AUTORELEASE_POOL(pool);
-	[serializer serializeObject: object withName: "test"];
+	[serializer serializeObject: object withName: @"test"];
 	DESTROY(pool);
 
 	return destURL;
