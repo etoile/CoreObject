@@ -10,7 +10,7 @@ endif
 
 CoreObject_OBJCFLAGS += -std=c99 
 CoreObject_LDFLAGS += -lEtoileFoundation -lEtoileSerialize
-CoreObject_LIBRARIES_DEPEND_UPON += -lEtoileFoundation -lEtoileSerialize
+CoreObject_LIBRARIES_DEPEND_UPON += -lEtoileFoundation -lEtoileSerialize -lpq
 
 
 CoreObject_OBJC_FILES = \
@@ -40,7 +40,8 @@ CoreObject_OBJC_FILES += \
 	TestFile.m \
 	TestDirectory.m \
 	TestSerializer.m \
-	TestObjectContext.m
+	TestObjectContext.m \
+	TestMetadataServer.m
 endif
 
 CoreObject_HEADER_FILES_DIR += Headers
@@ -72,7 +73,7 @@ ifeq ($(test), yes)
 endif
 else
 ifeq ($(test), yes)
-	CoreObject_LDFLAGS += -lUnitKit -lEtoileFoundation -lEtoileSerialize
+	CoreObject_LDFLAGS += -lUnitKit -lEtoileFoundation -lEtoileSerialize -lpq
 endif
 endif
 

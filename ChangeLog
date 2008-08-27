@@ -1,3 +1,16 @@
+2008-08-27 Quentin Mathe <qmathe@club-internet.fr>
+
+	Major rewrite of the Metadata server to use PostgreSQL for the Metadata DB
+	instead of a dumb dictionary. This code isn't yet plugged into the rest of 
+	CoreObject and the DB schema will surely evolve.
+	Note: To run the test suite, you must first run setup-coreobject.sh script.
+	* Headers/COMetadataServer.h:
+	* COMetadataServer.m:
+	* TestMetadataServer.m:
+	Rewritten. Removed CORefRecord class.
+	* GNUmakefile: Updated.
+	* setup-coreobject.sh: Added.
+
 2008-08-14 Quentin Mathe <qmathe@club-internet.fr>
 
 	Implemented managed core object graph serialization and deserialization by 

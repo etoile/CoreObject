@@ -7,53 +7,15 @@
 */
 
 #import "COMetadataServer.h"
-#import "GNUstep.h"
+#import "COUtility.h"
 
 #define DEFAULTS [NSUserDefaults standardUserDefaults]
 #define FM [NSFileManager defaultManager]
 
-NSString *CODefaultMetadataServerURL = nil;
+NSURL *CODefaultMetadataDBURL = nil;
 //NSString *COStoreConfigurationFile = @"StoreConfiguration.plist";
 
 static COMetadataServer *metadataServer = nil;
-
-
-@implementation CORefRecord : NSObject
-
-- (id) initWithUUID: (ETUUID *)uuid URL: (NSURL *)url
-{
-	SUPERINIT
-
-	ASSIGN(_uuid, uuid);
-	ASSIGN(_url, url);
-	[self setRecordInfo: [NSArray array]];
-
-	return self;
-}
-
-DEALLOC(DESTROY(_uuid); DESTROY(_url); DESTROY(_recordInfo));
-
-- (ETUUID *) UUID
-{
-	return _uuid;
-}
-
-- (NSURL *) URL
-{
-	return _url;
-}
-
-- (NSArray *) recordInfo
-{
-	return _recordInfo;
-}
-
-- (void) setRecordInfo: (NSArray *)info
-{
-	ASSIGN(_recordInfo, info);
-}
-
-@end
 
 
 @implementation COMetadataServer
@@ -62,17 +24,19 @@ DEALLOC(DESTROY(_uuid); DESTROY(_url); DESTROY(_recordInfo));
 {
 	if (self == [COMetadataServer class])
 	{
-		CODefaultMetadataServerURL = [[NSURL fileURLWithPath: @"~/CoreObjectMetadata"] absoluteString];
+		CODefaultMetadataDBURL = [self defaultDBURL];
 	}
 }
 
-/** Returns the URL of the default metadata server. 
-	This URL points to a bundle where all CoreObject metadatas are stored. Hence 
-	the URL can be used to locate both the metadata store and server. */
+/** Returns the URL used to initialize the default metadata server. 
+	If a default is set for CODefaultMetadataDBURL, this value is returned, 
+	otherwise +defaultDBURL value is.
+	This URL is used to connect to the DB server (presently a 
+	PostgreSQL server) where the metadatas are stored. */
 + (NSURL *) defaultStoreURL
 {
 	// FIXME: Use Defaults
-	return [NSURL URLWithString: CODefaultMetadataServerURL];
+	return CODefaultMetadataDBURL;
 }
 
 /** Returns the default metadata server. 
@@ -83,27 +47,42 @@ DEALLOC(DESTROY(_uuid); DESTROY(_url); DESTROY(_recordInfo));
 + (id) defaultServer
 {
 	if (metadataServer == nil)
-		metadataServer = [[self alloc] initWithURL: [self defaultStoreURL]];
-
-#if 0	
-	/* Found no existing metadata store, we must create one */
-	if (metadataServer == nil)
-		metadataServer = [[self alloc] createWithURL: [self defaultServerURL]];
-#endif
+	{
+		metadataServer = [[self alloc] initWithURL: [self defaultStoreURL]
+		                    shouldCreateDBIfNeeded: YES];
+	}
 
 	return metadataServer;
 }
 
 /** <init />
 	Instantiates and returns a new metadata server instance that will use the 
-	metadata store located at baseURL. 
-	If no metadata store exists at the given URL, returns nil. */
-- (id) initWithURL: (NSURL *)storeURL
+	metadata store located at storeURL. 
+	If no metadata store exists at the given URL and canCreateDB equals NO, 
+	returns nil if no DB can be accessed through this URL. A metadata DB can 
+	be accessed if the DB server accepts our connection and finds a DB name 
+	that matches the URL path. server accepts our connectionHowever if 
+	canCreateDB equals YES and the DB cannot be reached, then tries to create 
+	the DB if the DB server accepts our connection.
+    Metadata DB URL format: pgsql://user:password@host/dbname */
+- (id) initWithURL: (NSURL *)storeURL shouldCreateDBIfNeeded: (BOOL)canCreateDB
 {
 	SUPERINIT
 
-	ASSIGN(_storeURL, storeURL);
+	if (storeURL != nil)
+	{
+		ASSIGN(_storeURL, storeURL);
+	}
+	else
+	{
+		ASSIGN(_storeURL, [[self class] defaultStoreURL]);
+	}
+#ifdef DICT_METADATASERVER
 	_URLsByUUIDs = [[NSMutableDictionary alloc] initWithCapacity: 10000];
+#else
+	if ([self setUpWithURL: _storeURL shouldCreateDBIfNeeded: canCreateDB] == NO)
+		DESTROY(self);
+#endif
 
 	return self;
 }
@@ -111,8 +90,284 @@ DEALLOC(DESTROY(_uuid); DESTROY(_url); DESTROY(_recordInfo));
 - (void) dealloc
 {
 	DESTROY(_storeURL);
+#ifdef DICT_METADATASERVER
 	DESTROY(_URLsByUUIDs);
+#else
+	[self closeDBConnection];
+#endif
 	[super dealloc];
+}
+
+/* First opens a connection to the DB, if it fails returns NO, otherwise 
+   returns YES. 
+   If the connection is sucessfully established, asks the DB server for a DB 
+   with a name matching the URL path. If none is found and canCreateDB equals 
+   YES, sets up a new metadata DB on the server accessed through dbURL and 
+   with a name equals to the URL path.
+   If dbURL is nil, a local connection will be established. */
+- (BOOL) setUpWithURL: (NSURL *)dbURL shouldCreateDBIfNeeded: (BOOL)canCreateDB
+{
+	if ([self openDBConnectionWithURL: dbURL] == NO)
+	{
+		// TODO: The connection will fail if the DB has not yet been created, 
+		// but relying on this failure to know whether the DB exists or not is 
+		// really crude. By connecting to the 'postgres' DB, we could issue a 
+		// query to make this test. The query would be:
+		// SELECT datname FROM pg_database WHERE datname = 'dbName';
+		if (canCreateDB)
+		{
+			[self setUpDBWithURL: dbURL];
+			// TODO: Handle DB creation failure with errors, may be exceptions or 
+			// ETLog(@"WARNING: Failed to create DB on server at %@", dbURL);
+		}
+		if ([self openDBConnectionWithURL: dbURL] == NO)
+		{
+			ETLog(@"WARNING: Failed to connect to DB server at %@", dbURL);
+			return NO;
+		}
+	}
+
+	[self installDBEventListener];
+
+	return YES;
+}
+
+/* DB Interaction */
+
+/** Returns the name to use for the Metadata DB specific to the current user. */
++ (NSString *) defaultDBName
+{
+	return [NSString stringWithFormat: @"%@-%s", @"coreobject", getenv("USER")];
+}
+
+/** Returns the URL to use for the Metadata DB specific to the current user.
+    This value is typically used when no DB URL is handed to 
+    -initWithURL:shouldCreateDBIfNeeded:.
+    See -initWithURL:shouldCreateDBIfNeeded: for the URL format. */
++ (NSURL *) defaultDBURL
+{
+	return [NSURL URLWithString: [NSString stringWithFormat: 
+		@"pgsql://%s@localhost/%@", getenv("USER"), [self defaultDBName]]];
+}
+
+/* Trims the leading '/' from the path. */
+- (NSString *) stringByTrimmingLeadingSlashInPath: (NSString *)path
+{
+	if ([path length] <= 1)
+		return path;
+
+	return [path substringFromIndex: 1];
+}
+
+/** Creates a new Metadata DB at the given URL specified.
+    If dbURL is nil, tries to create a local metadata DB.
+    If an existing DB connection is already opened, the connection will be lost 
+    after calling this method, this shouldn't be a problem normally since the 
+    connection to the metadata DB is opened only the DB has already been created.
+    See -initWithURL:shouldCreateDBIfNeeded: for the URL format. */
+- (void) setUpDBWithURL: (NSURL *)dbURL
+{
+	NSURL *theDBURL = (dbURL != nil) ? dbURL : [[self class] defaultStoreURL];
+	NSString *dbName = [self stringByTrimmingLeadingSlashInPath: [dbURL path]];
+	NSURL *pgsqlDBURL = [NSURL URLWithString: [NSString stringWithFormat: 
+		@"pgsql://%s@localhost/%@", getenv("USER"), @"postgres"]];
+
+	[self closeDBConnection]; /* In case a connection is already opened */
+
+	// NOTE: The creation of the metadata DB for CoreObject can be done either 
+	// in SQL or in the shell. In our case, we use SQL.
+	// createdb -O username coreobject-username
+	// CREATE DATABASE coreobject-username OWNER username
+
+	/* Create the DB with the current user as the owner */
+
+	[self openDBConnectionWithURL: pgsqlDBURL];
+	[self executeDBRequest: [NSString stringWithFormat: @"CREATE DATABASE %@ OWNER %s;", dbName, getenv("USER")]];
+	[self closeDBConnection];
+
+	/* Create the DB schema */
+
+	[self openDBConnectionWithURL: theDBURL];
+
+	 // FIXME: UUID should of type UUID instead of text, but the format of
+	// -[ETUUID stringValue] isn't understood by pgsql. -stringValue should 
+	// return a canonical form or we should add -canonicalStringValue?
+	[self executeDBRequest: @"CREATE TABLE UUID ( \
+		UUID text PRIMARY KEY, \
+		URL text, \
+		inode integer, \
+		volumeID integer, \
+		lastURLModifDate timestamp, \
+		objectVersion integer, \
+		objectType text, \
+		groupCache uuid[]);"];
+
+	[self executeDBRequest: @"CREATE TABLE History ( \
+		UUID text, \
+		objectVersion integer, \
+		contextUUID uuid, \
+		date timestamp, \
+		globalVersion serial);"]; 
+	// NOTE: Global version is mostly needed in case several rows are added in a 
+	// few microseconds hence associated with identical timestamps.
+
+	[self closeDBConnection];
+}
+
+/** Executes one or more SQL requests separated by colons in a single 
+    transaction. Return YES if all the requests succeed, otherwise returns NO 
+    and logs a warning for the first SQL request that failed without executing 
+    the subsequent ones. */
+- (BOOL) executeDBRequest: (NSString *)SQLRequest 
+{
+	PGresult *result = PQexec(conn, [SQLRequest UTF8String]);
+	
+	if (result == NULL || PQresultStatus(result) != PGRES_COMMAND_OK)
+	{
+		ETLog(@"WARNING: Failed to execute SQL request: %@ - %s - %s",
+			SQLRequest, PQresStatus(PQresultStatus(result)), PQresultErrorMessage(result));
+		[self handleDBRequestFailure];
+		PQclear(result);
+		return NO;
+	}
+
+	PQclear(result);
+	return YES;
+}
+
+- (id) queryResultObjectWithPGResult: (PGresult *)result
+{
+	int nbOfRows = PQntuples(result);
+	int nbOfCols = PQnfields(result);
+
+	ETDebugLog(@"Query result: %d rows and %d colums", nbOfRows, nbOfCols);
+
+	if (nbOfRows == 1 && nbOfCols == 1)
+	{
+		return [NSString stringWithUTF8String: PQgetvalue(result, 0, 0)];
+	}
+	else
+	{
+		// TODO: Implement. SQLClient returns a SQLRecord object which is an
+		// an array. We may rely on SQLClient rather than writing our own code 
+		// here. However turning the query result into an array of dictionaries 
+		// seems to be pretty easy if we don't care about mapping PGSQL types
+		// to ObjC types and we just return strings or data objects as values.
+		// Having such a feature right in CoreObject would allow to build a
+		// MetadataDB browser easily with EtoileUI and without a dependency on
+		// SQLClient.
+	}
+
+	return nil;
+}
+
+/** Does the same as -executeDBRequest: but handles query result by returning 
+    selected rows as a property list built in the following way: 
+    - each row is turned into a dictionary
+      - each column attribute into a key
+      - each column value into a value
+    - all rows are turned into an array.
+   So the result is an array of dictionaries whose keys are column attributes 
+   and values are colum values.
+   If the SQL select is done on a single attribute, then no dictionaries are 
+   used, the column values are put directly into the array. If a single row is 
+   matched for a single attribute, no array is returned but only the matched 
+   column value of the selected row. 
+   TODO: only single value result are implemented, see 
+   -queryResultObjectWithPGResult: for implementing what is described above. */
+- (id) executeDBQuery: (NSString *)SQLRequest
+{
+	PGresult *result = PQexec(conn, [SQLRequest UTF8String]);
+	id queryResultObject = nil;
+
+	if (result == NULL || PQresultStatus(result) != PGRES_TUPLES_OK)
+	{
+		ETLog(@"WARNING: Failed to execute SQL request: %@", SQLRequest);
+		[self handleDBRequestFailure];
+		PQclear(result);
+		return nil;
+	}
+
+	queryResultObject = [self queryResultObjectWithPGResult: result];
+
+	PQclear(result);
+	return queryResultObject;
+}
+
+/** We do nothing for now, we may close the connection, try to close and reopen 
+    it, or implement some alternative fallback behaviors in future. */
+- (void) handleDBRequestFailure
+{
+
+}
+
+/** Destroys all the Metadata DB content by dropping the tables of the schema.
+    However the Metadata DB itself isn't dropped. */
+- (void) resetDB
+{
+	[self executeDBRequest: @"DROP TABLE UUID; DROP TABLE History;"];
+}
+
+- (void) installDBEventListener
+{
+	// TODO: Implement later depending on your needs. We could for example
+	// listen to objectVersion changes so we can catch managed objects that 
+	// become outdated immediately when concurrent write occurs on it, rather 
+	// than handling it the next time a managed method is called.
+}
+
+/** Connects to the Metadata DB at the URL specified in Defaults and prepares 
+    the receiver to read and write metadatas in the DB. 
+    A metadata DB can be accessed if the DB server accepts our connection and 
+    finds a DB name that matches the URL path.
+    TODO: Handles dbURL as documented instead of ingoring it and just connecting 
+    to the local server. */
+- (BOOL) openDBConnectionWithURL: (NSURL *)dbURL
+{
+	NSURL *theDBURL = (dbURL != nil) ? dbURL : [[self class] defaultStoreURL];
+	NSString *theDBName = [self stringByTrimmingLeadingSlashInPath: [theDBURL path]];
+
+	/*
+	* begin, by setting the parameters for a backend connection if the
+	* parameters are null, then the system will try to use reasonable
+	* defaults by looking up environment variables or, failing that,
+	* using hardwired constants
+	*/
+	char *pghost = NULL; /* host name of the backend server */
+	char *pgport = NULL;//[[theDBURL port] UTF8String]; /* port of the backend server */
+	char *pgoptions = NULL; /* special options to start up the backend server */
+	char *pgtty = NULL; /* debugging tty for the backend server */
+	char *dbname = (char *)[theDBName UTF8String];
+
+	/* Uses the URL host only if it doesn't refer to the localhost, because pgsql
+	   handles local connection through a socket in tmp directory on Unix. */
+	if ([[theDBURL host] isEqual: @"localhost"] == NO 
+	 && [[theDBURL host] isEqual: @""] == NO)
+	{
+		pghost = (char *)[[theDBURL host] UTF8String];
+	}
+
+	/* make a connection to the database */
+	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbname);
+
+	/* check to see that the backend connection was successfully made */
+	if (PQstatus(conn) == CONNECTION_BAD)
+	{
+		ETLog(@"WARNING: Failed to connect to database '%s': %s", dbname, PQerrorMessage(conn));
+		return NO;
+	}
+
+	return YES;
+}
+
+/** Closes the connection to the Metadata DB at the URL specified in Defaults 
+    and clean up all infos related to the current DB interaction in the 
+    receiver. */
+- (void) closeDBConnection
+{
+	/* If status is CONNECTION_BAD, PQfinish() causes a double free */
+	if (conn != NULL && PQstatus(conn) == CONNECTION_OK)
+		PQfinish(conn);
 }
 
 /** Returns the property list that encodes the configuration of the metadata 
@@ -120,63 +375,112 @@ DEALLOC(DESTROY(_uuid); DESTROY(_url); DESTROY(_recordInfo));
 	metadata server. */
 - (NSMutableDictionary *) configurationDictionary
 {
-	return nil; // FIXME: Implement
+	// FIXME: Implement, but first figure out which settings should be exposed.
+	return nil;
 }
 
-/** Returns the URL that was used to instantiate the receiver and where the 
-	metadata store is located. */
+/** Returns the URL that was used to instantiate the receiver.*/
 - (NSURL *) storeURL
 {
 	return _storeURL;
 }
 
-/** Generates ref record by eventually delegating it to NSURLProtocol. */
-- (CORefRecord *) refRecordForUUID: (ETUUID *)UUID
-{
-	NSURL *url = [self URLForUUID: UUID];
-	CORefRecord *record = nil;
-
-	if (url != nil)
-		record = AUTORELEASE([[CORefRecord alloc] initWithUUID: UUID URL: url]);
-
-	return record;
-}
-
-/** Reads UUID in the info.plist of the bundle at url. */
+/** Returns the UUID bound to url by querying the Metadata database. If no such 
+    asssociation is found, returns nil.
+    The UUID can also be retrieved from the info.plist of the managed object 
+    bundle at url, if EtoileSerialize uses the filesystem as store backend. */
 - (ETUUID *) UUIDForURL: (NSURL *)url
 {
-	return nil; // FIXME: Implement
+	NSString *uuidString = [self executeDBQuery: [NSString stringWithFormat: 
+		@"SELECT UUID FROM UUID WHERE URL = '%@';", [url absoluteString]]];
+	ETUUID *uuid = nil;
+
+	ETDebugLog(@"Got UUID %@ for %@", uuidString, url);
+
+	if (uuidString != nil)
+		uuid = AUTORELEASE([[ETUUID alloc] initWithString: uuidString]);
+	
+	return uuid;
 }
 
-/** Retrieves the URL bound to UUID in the UUID/URL database. */
+/** Retrieves the URL bound to uuid in the Metadata database. If no such 
+    asssociation is found, returns nil. */
 - (NSURL *) URLForUUID: (ETUUID *)uuid
 {
+#ifdef DICT_METADATASERVER
 	return [_URLsByUUIDs objectForKey: uuid];
+#else
+
+	NSString *urlString = [self executeDBQuery: [NSString stringWithFormat: 
+		@"SELECT URL FROM UUID WHERE UUID = '%@';", [uuid stringValue]]];
+	NSURL *url = nil;
+
+	ETDebugLog(@" Got URL %@ for %@", urlString, uuid);
+
+	if (urlString != nil)
+		url = [NSURL URLWithString: urlString];
+	
+	return url;
+
+#endif
 }
 
-/** Binds uuid to url by inserting the UUID/URL pair in the UUID/URL database. */
+/** Binds uuid to url by inserting the UUID/URL pair and related infos in the 
+    Metadata database. */
 - (void) setURL: (NSURL *)url forUUID: (ETUUID *)uuid
 {
-	// TODO: Build a ref record and calls a method that stores the ref record 
-	// in a dict or a db.
+#ifdef DICT_METADATASERVER
 	[_URLsByUUIDs setObject: url forKey: uuid];
+#else
+
+	// TODO: The way UPDATE are handled isn't that nice, try to improve once we
+	// know precisely when and what we need to update. Performance must be 
+	// carefully taken in account.
+	NSString *prevSQLRequest = @"";
+	NSString *nextSQLRequest = @"";
+	BOOL isUpdate = ([self URLForUUID: uuid] != nil);
+
+	if (isUpdate)
+	{
+		prevSQLRequest = [NSString stringWithFormat: 
+			@"BEGIN; DELETE FROM UUID WHERE UUID = '%@';", [uuid stringValue]];
+		nextSQLRequest = @"COMMIT;";
+		
+	}
+
+	[self executeDBRequest: [NSString stringWithFormat: 
+		@"%@ INSERT INTO UUID (UUID, URL, inode, volumeID, "
+		"lastURLModifDate, objectVersion, objectType) " // TODO: Add groupCache
+		"VALUES ('%@', '%@', %i, %i, '%@', %i, '%@'); %@", 
+			prevSQLRequest,
+			[uuid stringValue], 
+			[url absoluteString], 
+			-1,
+			-1,
+			[NSDate date], // NOTE: May need to format the output with -descriptionWithLocale:
+			-1,
+			@"",
+			nextSQLRequest]];
+
+	ETDebugLog(@"Inserted URL %@ for %@", urlString, uuid);
+
+#endif
 }
 
-/** Unbinds uuid from its associated URL by removing the UUID/URL pair in the
-	UUID/URL database. */
+/** Unbinds uuid from its associated URL by removing the UUID/URL pair and 
+    related infos in the Metadata database. */
 - (void) removeURLForUUID: (ETUUID *)uuid
 {
+#ifdef DICT_METADATASERVER
 	[_URLsByUUIDs removeObjectForKey: uuid];
-}
+#else
 
-/** Triggers the save of the metadata server state at the serialization URL 
-	defined by -storeURL. 
-	The save includes the serialization of the store/server configuration and 
-	all URL/UUID pairs not yet flushed if the URL/UUID storage backend is a 
-	simple dictionary and not a DB. */
-- (void) save
-{
-	//[COSerializer serializeObject: self];
+	[self executeDBRequest: [NSString stringWithFormat: 
+		@"DELETE FROM UUID WHERE UUID = '%@';", [uuid stringValue]]];
+
+	ETDebugLog(@"Deleted URL %@ for %@", urlString, uuid);
+
+#endif
 }
 
 @end

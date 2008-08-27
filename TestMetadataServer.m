@@ -10,6 +10,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <EtoileSerialize/EtoileSerialize.h>
 #import <UnitKit/UnitKit.h>
+#import <postgresql/libpq-fe.h>
 #import "COMetadataServer.h"
 #import "COSerializer.h"
 #import "CODeserializer.h"
@@ -17,52 +18,66 @@
 
 #define FM [NSFileManager defaultManager]
 #define TMP_URL [NSURL fileURLWithPath: [FM tempDirectory]]
-#define TMP_URL_DIR TMP_URL
-
-
-@interface TestRefRecord : NSObject <UKTest>
-@end
 
 @interface COMetadataServer (TestMetadataServer) <UKTest>
 @end
 
 
-@implementation TestRefRecord
-
-- (void) testInit
-{
-	id uuid = [ETUUID UUID];
-	id url = TMP_URL;
-	id record = [[CORefRecord alloc] initWithUUID: uuid URL: url];
-
-	UKNotNil(record);
-	UKNotNil([record UUID]);
-	UKObjectsEqual(uuid, [record UUID]);
-	UKNotNil([record URL]);
-	UKObjectsEqual(url, [record URL]);
-	UKNotNil(record);
-	UKNotNil([record recordInfo]);
-	UKObjectsEqual([NSArray array], [record recordInfo]);
-}
-
-@end
-
-
 @implementation COMetadataServer (TestMetadataServer)
 
+/* We patch the DB name to create a DB reserved to tests. */
++ (NSString *) defaultDBName
+{
+	return @"coreobjecttest";
+}
+
+- (void) testDBConnection
+{
+	conn = PQsetdb(NULL, NULL, NULL, NULL, "unknowndb");
+	UKIntsEqual(CONNECTION_BAD, PQstatus(conn));
+	[self closeDBConnection];
+
+	/* Try access the internal db of pgsql */
+	conn = PQsetdb(NULL, NULL, NULL, NULL, "postgres");
+	UKIntsEqual(CONNECTION_OK, PQstatus(conn));
+	[self closeDBConnection];
+}
+
+- (void) testOpenDBConnectionWithURL
+{
+	id url = [NSURL URLWithString: [NSString stringWithFormat: 
+		@"pgsql://%s@localhost/postgres", getenv("USER")]];
+
+	UKTrue([self openDBConnectionWithURL: url]);
+	UKIntsEqual(CONNECTION_OK, PQstatus(conn));
+	[self closeDBConnection];
+}
+
+- (void) testSetUpDBWithURL
+{
+	id testDBURL = [NSURL URLWithString: @"pgsql://localhost/coreobjectbasictest"];
+	id pgsqlDBURL = [NSURL URLWithString: @"pgsql://localhost/postgres"];
+
+	[self setUpDBWithURL: testDBURL];
+	/* -setUpDBWithURL: doesn't result in an open connection and cannot drop a 
+	   a db if connected to it, so another connection is necessary... */
+	[self openDBConnectionWithURL: pgsqlDBURL];
+	[self executeDBRequest: @"DROP DATABASE CoreObjectBasicTest;"];
+	[self closeDBConnection];
+}
+
 - (void) testInit
 {
-	id url = TMP_URL_DIR;
-	id server = [[COMetadataServer alloc] initWithURL: url];
+	id server = [[COMetadataServer alloc] initWithURL: nil shouldCreateDBIfNeeded: NO];
 
 	UKNotNil(server);
 	UKNotNil([server storeURL]);
-	UKObjectsEqual(url, [server storeURL]);
+	//UKObjectsEqual(url, [server storeURL]);
 }
 
 - (id) initForTest
 {
-	return [self initWithURL: TMP_URL_DIR];
+	return [self initWithURL: nil shouldCreateDBIfNeeded: YES];
 }
 
 + (void) testDefaultStoreURL
@@ -75,20 +90,26 @@
 	UKNotNil([self defaultServer]);
 }
 
-- (void) testUUIDForURL: (NSURL *)url
+- (void) testUUIDForURL
 {
+	id url = TMP_URL;
+	id url2 = TMP_URL;
+	id uuid = [ETUUID UUID];
 
+	[self setURL: url forUUID: uuid];
+	UKObjectsEqual(uuid, [self UUIDForURL: url]);
+	UKObjectsNotEqual(uuid, [self UUIDForURL: url2]);
 }
 
 - (void) testURLForUUID
 {
+
 	id url = TMP_URL;
 	id uuid = [ETUUID UUID];
 	id uuid2 = [ETUUID UUID];
 
 	[self setURL: url forUUID: uuid];
 
-	UKNotNil([self URLForUUID: uuid]);
 	UKObjectsEqual(url, [self URLForUUID: uuid]);
 	UKObjectsNotEqual(url, [self URLForUUID: uuid2]);
 
