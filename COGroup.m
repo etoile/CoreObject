@@ -305,6 +305,9 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 - (BOOL) addObject: (COObject *) object
 {
+	if ([object conformsToProtocol: @protocol(COGroup)])
+		return [self addGroup: (id <COGroup>)object];
+		
 	NSMutableArray *a = [self valueForProperty: kCOGroupChildrenProperty];
 	if ([a containsObject: object] == NO)
 	{
@@ -328,6 +331,9 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 - (BOOL) removeObject: (COObject *) object
 {
+	if ([object conformsToProtocol: @protocol(COGroup)])
+		return [self removeGroup: (id <COGroup>)object];
+
 	NSMutableArray *a = [self valueForProperty: kCOGroupChildrenProperty];
 	if ([a containsObject: object] == YES)
 	{
@@ -351,7 +357,8 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 - (NSArray *) objects
 {
-	return [self valueForProperty: kCOGroupChildrenProperty];
+	return [[self valueForProperty: kCOGroupChildrenProperty] arrayByAddingObjectsFromArray:
+	            [self valueForProperty: kCOGroupSubgroupsProperty]];
 }
 
 - (BOOL) addGroup: (id <COGroup>)subgroup

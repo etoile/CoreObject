@@ -153,7 +153,7 @@
 	UKFalse([group1v1 isEmpty]);
 	UKObjectsEqual([group UUID], [group1v1 UUID]);
 	// NOTE: The next two tests only holds if -objects doesn't return subgroups
-	UKObjectsEqual([group objects], [group1v1 objects]);
+	// UKObjectsEqual([group objects], [group1v1 objects]);
 	UKObjectsNotEqual([group groups], [group1v1 groups]);
 	UKObjectsEqual(object, [[group1v1 objects] objectAtIndex: 0]);
 	//UKObjectsSame(object, [[group1v1 objects] objectAtIndex: 0]); // FIXME

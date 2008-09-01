@@ -25,8 +25,8 @@
 	COGroup instance. */
 - (BOOL) addObject: (id <COObject>)object;
 - (BOOL) removeObject: (id <COObject>)object;
-/** Returns objects directly owned by the receiver, that includes every objects 
-	and subgroups which are immediate children. */
+/** Returns objects directly owned by the receiver, that includes every object
+	and subgroup which is an immediate child. */
 - (NSArray *) objects;
 
 /** Adds subgroup to the receiver.

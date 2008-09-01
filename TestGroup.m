@@ -142,7 +142,10 @@
 	NSArray *p = [o1 parentGroups];
 	UKTrue([p containsObject: g]);
 	UKTrue([g removeObject: o3]);
-	UKIntsEqual([a count], 3);
+	
+	// Commented out the following test because it assumes [g objects] will 
+	// continue to update when the group does.  
+	//UKIntsEqual([a count], 3);
 	p = [o3 parentGroups];
 	UKIntsEqual([p count], 0);
 
@@ -260,11 +263,11 @@
 
 	COGroup *gg1 = [[COGroup alloc] init];
 	UKTrue([g1 addSubgroup: gg1]);
-	UKIntsEqual([[g1 objects] count], 3);
+	UKIntsEqual([[g1 objects] count], 4);
 	UKIntsEqual([[g1 subgroups] count], 1);
 
-	UKIntsEqual([[g objects] count], 4);
-	UKIntsEqual([[g allObjects] count], 4);
+	UKIntsEqual([[g objects] count], 7);
+	UKIntsEqual([[g allObjects] count], 8);
 	UKIntsEqual([[g subgroups] count], 3);
 	UKIntsEqual([[g allGroups] count], 4);
 
@@ -303,8 +306,8 @@
 	}
 	COGroup *group = [COGroup objectWithPropertyList: pl];
 	UKTrue([group isKindOfClass: [COGroup class]]);
-	UKIntsEqual([[group objects] count], 4);
-	UKIntsEqual([[group allObjects] count], 4);
+	UKIntsEqual([[group objects] count], 7);
+	UKIntsEqual([[group allObjects] count], 8);
 	UKIntsEqual([[group subgroups] count], 3);
 	UKIntsEqual([[group allGroups] count], 4);
 }
