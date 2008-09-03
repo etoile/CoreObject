@@ -218,7 +218,9 @@ DEALLOC(DESTROY(_url))
 /** Returns whether a file exists at the receiver URL. */
 - (BOOL) exists
 {
-	return [FM fileExistsAtPath: FSPATH(self) isDirectory: NULL];
+	BOOL isDir = NO;
+	BOOL exists = [FM fileExistsAtPath: FSPATH(self) isDirectory: &isDir];
+	return (exists && isDir == NO);
 }
 
 /** Creates a blank file if none exists at the receiver URL. */

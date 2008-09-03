@@ -144,8 +144,14 @@
 	UKTrue([o isEqual: o1]); /* Based on uid */
 	UKStringsEqual([o valueForProperty: @"Location"],
 	               [o1 valueForProperty: @"Location"]);
+#ifdef GNUSTEP
+	UKTrue([[o valueForProperty: @"Float"] floatValue] ==
+	               [[o1 valueForProperty: @"Float"] floatValue]);
+#else
+	// FIXME: This test fails on GNUstep, as if -[NSValue isEqual:] was buggy.
 	UKObjectsEqual([o valueForProperty: @"Float"],
 	               [o1 valueForProperty: @"Float"]);
+#endif
 	UKTrue([o setValue: @"Office" forProperty: @"Location"]);
 	UKTrue([o setValue: [NSNumber numberWithFloat: 3.12] 
 	          forProperty: @"Float"]);

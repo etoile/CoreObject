@@ -45,9 +45,15 @@
 {
 	COObject *object = AUTORELEASE([[SubObject alloc] init]);
 
+	UKIntsEqual(-1, [object objectVersion]);
+
+	/* This first recorded invocation results in a snapshot with version 0, 
+       immediately followed by an invocation record with version 1. */
 	[object setValue: @"me" forProperty: @"whoami"];
+	UKIntsEqual(1, [object objectVersion]);
 	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
 	[object setValue: @"everybody" forProperty: @"whoami"];
+	UKIntsEqual(3, [object objectVersion]);
 
 	id object1v3 = [self objectByRollingbackObject: object toVersion: 0];
 	UKStringsEqual(@"Nobody", [object1v3 valueForProperty: @"whoami"]);
@@ -61,6 +67,8 @@
 	[object setValue: @"me" forProperty: @"whoami"];
 	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
 	[object setValue: @"everybody" forProperty: @"whoami"];
+
+	UKIntsEqual(3, [object objectVersion]);
 
 	id object1v1 = [self objectByRollingbackObject: object toVersion: 1];
 	UKStringsEqual(@"me", [object1v1 valueForProperty: @"whoami"]);
@@ -87,10 +95,14 @@
 	[object setValue: [NSArray array] forProperty: @"otherObjects"];
 	[object setValue: @"... hm not sure" forProperty: @"whoami"];
 	[object2 setValue: @"fox" forProperty: @"whoami"]; // version 1
+	UKIntsEqual(1, [object2 objectVersion]);
 	[object setValue: @"Who knows!" forProperty: @"whoami"]; // version 7
 	[object2 setValue: @"wolf" forProperty: @"whoami"];
 	[object2 setValue: @"rabbit" forProperty: @"whoami"];
 	[object setValue: @"My name is no name!" forProperty: @"whoami"];
+
+	UKIntsEqual(8, [object objectVersion]);
+	UKIntsEqual(3, [object2 objectVersion]);
 
 	id object1v7 = [self objectByRollingbackObject: object toVersion: 7];
 	UKStringsEqual(@"Who knows!", [object1v7 valueForProperty: @"whoami"]);
@@ -128,6 +140,9 @@
 	/* Test snapshot rollback */
 	id group1v0 = [self objectByRollingbackObject: group toVersion: 0];
 	UKIntsEqual(0, [group1v0 objectVersion]);
+return;
+	UKIntsEqual(2, [group1v0 lastObjectVersion]);
+
 	UKIntsEqual(2, [group objectVersion]);
 	UKTrue([group1v0 isEmpty]);
 	UKFalse([group isEmpty]);

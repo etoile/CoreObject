@@ -1,3 +1,14 @@
+2008-09-03 Quentin Mathe <qmathe@club-internet.fr>
+
+	Made all tests pass.
+	* COFile.m (-exists):
+	* TestFile.m:
+	Fixed a broken unit test for COFile.
+	* TestObject.m: Worked around a NSValue comparison issue on GNUstep.
+	* TestObjectContext.m: Disabled the last tests in -testGroupPersistency, 
+	they need upcoming stuff to work. Added some additional unit tests for 
+	-objectVersion.
+
 2008-08-27 Quentin Mathe <qmathe@club-internet.fr>
 
 	Major rewrite of the Metadata server to use PostgreSQL for the Metadata DB
