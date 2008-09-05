@@ -9,6 +9,7 @@
 #import "COObjectContext.h"
 #import "COObject.h"
 #import "COSerializer.h"
+#import "COMetadataServer.h"
 #import "NSObject+CoreObject.h"
 
 #define AVERAGE_MANAGED_OBJECTS_COUNT 1000
@@ -57,7 +58,15 @@ static COObjectContext *defaultObjectContext = nil;
 
 	[super dealloc];
 }
-	
+
+/** Returns the metadata server bound to this object context. 
+    By default, returns -[COMetadataServer defaultServer]. */
+- (COMetadataServer *) metadataServer
+{
+	// TODO: Make possible to use other metadata servers rather than just the 
+	// default one. That will on the object context and object server in use. 
+	return [COMetadataServer defaultServer];
+}	
 
 /* Registering Managed Objects */
 
@@ -74,6 +83,49 @@ static COObjectContext *defaultObjectContext = nil;
 - (NSSet *) registeredObjects
 {
 	return AUTORELEASE([_registeredObjects copy]);
+}
+
+/* Retrieves the URL where an object is presently serialized, or if it hasn't 
+   been serializerd yet, builds the URL by taking the library to which the 
+   object belongs to.
+   If object isn't registered, returns nil. */
+- (NSURL *) serializationURLForObject: (id)object
+{
+	if ([_registeredObjects containsObject: object] == NO)
+		return NO;
+
+	NSURL *url = [[self metadataServer] URLForUUID: [object UUID]];
+
+	if (url == nil)
+	{
+		// TODO: Modify once we have proper library support.
+		url = [[ETSerializer defaultLibraryURL] URLByAppendingPath: [[object UUID] stringValue]];
+	}
+
+	return url;
+}
+
+/** Sets the URL where the object will be serialized on the first save.
+    If the object has already been saved in the past, isn't registered or url is 
+    nil, returns NO.
+    TODO: Raises an invalid argument exception is url is nil? */
+- (BOOL) setSerializationURL: (NSURL *)url forObject: (id)object
+{
+	if ([_registeredObjects containsObject: object] == NO)
+		return NO;
+
+	NSURL *existingURL = [[self metadataServer] URLForUUID: [object UUID]];
+
+	if (existingURL != nil)
+		return NO;
+
+	NSAssert2(existingURL == nil && [object objectVersion] == -1, @"If no URL/UUID "
+		"pair exists in %@, the object version is expected to be -1 and not %i",
+		[self metadataServer], [object objectVersion]);
+
+	[[self metadataServer] setURL: url forUUID: [object UUID]];
+
+	return YES;
 }
 
 /** Use double-dispatch style */
@@ -197,6 +249,37 @@ static COObjectContext *defaultObjectContext = nil;
 	{
 		return [self snapshotSerializer];
 	}
+}
+
+/** Returns the first version forward in time which corresponds to a snapshot or
+    a delta. If no such version can be found (no snapshot or delta available 
+    unless an error occured), returns -1. */
+- (int) lastVersionOfObject: (id)object
+{
+	if ([object isPersistent] == NO)
+		return -1;
+
+	// TODO: Move this code into ETSerialObjectBundle, probably by adding 
+	// methods such -lastVersion:inBranch: and -lastVersion. We may also cache 
+	// the last version in a plist stored in the bundle to avoid the linear 
+	// search in the directory.
+	NSURL *serializationURL = [[[ETSerializer serializationURLForObject: object] 
+		URLByAppendingPath: @"Delta"] URLByAppendingPath: @"root"];
+	NSArray *deltaFileNames = [[NSFileManager defaultManager] 
+		directoryContentsAtPath: [[serializationURL path] stringByStandardizingPath]];
+	int aVersion = -1;
+
+	/* Directory content isn't sorted so we must iterate through all the content */
+	FOREACH(deltaFileNames, deltaName, NSString *)
+	{
+		ETDebugLog(@"Test delta %@ to find last version of %@", deltaName, object);
+		int deltaVersion = [[deltaName stringByDeletingPathExtension] intValue];
+
+		if (deltaVersion > aVersion)
+			aVersion = deltaVersion;
+	}
+
+	return aVersion;
 }
 
 /** Returns the first version back in time which corresponds to a snapshot and 
@@ -408,6 +491,9 @@ static COObjectContext *defaultObjectContext = nil;
 
 	int newObjectVersion = [self serializeInvocation: inv];
 
+	/* -[object objectVersion] still returns the old version at this point, 
+	   so we pass the new version in parameter with recordVersion: */
+	[self updateMetadatasForObject: object recordVersion: newObjectVersion];
 	[self logInvocation: inv recordVersion: newObjectVersion];
 
 	return newObjectVersion;
@@ -477,11 +563,17 @@ static COObjectContext *defaultObjectContext = nil;
 	return _fullSaveTimeInterval;
 }
 
+/** Snapshots an object and updates the object metadatas in the metadata server
+    by calling -updateMetadasForObject:. */
 - (void) snapshotObject: (id)object
 {
 	[self snapshotObject: object shouldIncrementObjectVersion: YES];
+	[self updateMetadatasForObject: object recordVersion: [object objectVersion]];
 }
 
+/** Snapshots an object but doesn't update the object metadatas in the 
+    metadata server. You must call -updateMetadasForObject:recordVersion: if you 
+    want to. */
 - (void) snapshotObject: (id)object shouldIncrementObjectVersion: (BOOL)updateVersion
 {
 	id snapshotSerializer = [self snapshotSerializerForObject: object];
@@ -502,6 +594,17 @@ static COObjectContext *defaultObjectContext = nil;
 		[object serializerDidFinish: snapshotSerializer 
 		                 forVersion: [object objectVersion] + 1];
 	}
+}
+
+/** Updates the metadatas of object in the current metadata server. */
+- (void) updateMetadatasForObject: (id)object recordVersion: (int)aVersion
+{
+	NSURL *url = [self serializationURLForObject: object];
+
+	/* Register the object in the metadata server or update the object infos */
+	[[self metadataServer] setURL: url forUUID: [object UUID]];
+	// TODO: Update more stuff: objectVersion, inode etc. May be a part of 
+	// the updates directly in the metadata server itself.
 }
 
 /** COProxy compatibility method. Probably to be removed. */

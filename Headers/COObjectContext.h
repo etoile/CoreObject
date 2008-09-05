@@ -10,6 +10,8 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <EtoileSerialize/EtoileSerialize.h>
 
+@class COMetadataServer;
+
 
 @interface COObjectContext : NSObject
 {
@@ -32,11 +34,15 @@
 
 + (id) defaultContext;
 
+- (COMetadataServer *) metadataServer;
+
 /* Registering Managed Objects */
 
 - (void) registerObject: (id)object;
 - (void) unregisterObject: (id)object;
 - (NSSet *) registeredObjects;
+- (NSURL *) serializationURLForObject: (id)object;
+- (BOOL) setSerializationURL: (NSURL *)url forObject: (id)object;
 - (BOOL) replaceObject: (id)object byObject: (id)temporalInstance;
 
 /* Controlling Record Session */
@@ -73,6 +79,7 @@
 
 /* Navigating Object History */
 
+- (int) lastVersionOfObject: (id)object;
 - (int) lastSnapshotVersionOfObject: (id)object forVersion: (int)aVersion;
 - (id) lastSnapshotOfObject: (id)object 
                  forVersion: (int)aVersion 
@@ -97,6 +104,8 @@
 - (int) serializeInvocation: (NSInvocation *)inv; //-storeInvocation:
 - (void) logInvocation: (NSInvocation *)inv recordVersion: (int)aVersion;
 - (void) forwardInvocationIfNeeded: (NSInvocation *)inv;
+
+- (void) updateMetadatasForObject: (id)object recordVersion: (int)aVersion;
 
 /* Snapshot-based Persistency */
 

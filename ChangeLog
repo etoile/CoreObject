@@ -1,3 +1,27 @@
+2008-09-05 Quentin Mathe <qmathe@club-internet.fr>
+
+	Modified COObjectContext to leverage the metadata server. COMetadataServer 
+	is now used to retrieve the URL bound to each object UUID, and also insert 
+	an UUID/URL pair on the first serialization of an object.
+	* COObject.m (-lastObjectVersion): Implemented.
+	* Headers/COObjectContext.h:
+	* COObjectContext.m:
+	(-metadataServer, -lastVersionOfObject:, 
+	-updateMetadatasForObject:recordVersion:, 
+	-serializationURLForObject:, -setSerializationURL:forObject:): New methods.
+	(-recordInvocation:, -snapshotObject:): Updated to call 
+	-updateMetadatasForObject:recordVersion:.
+	* Headers/COSerializer.h:
+	* COSerializer.m:
+	Updated all methods that return serializers, to initialize them with the URL 
+	provided by the object context of the object passed in parameter, instead of 
+	using +serializationURLForObject:.
+	(-defaultLibraryURL): Modified to return an absolute path.
+	(-store, -URL): New methods.
+	(-[ETSerialObjectBundle URL]): New category.
+	* TestSerializer.m (-libraryURLForTest): Corrected to return an absolute 
+	path.
+
 2008-09-03 Quentin Mathe <qmathe@club-internet.fr>
 
 	Made all tests pass.

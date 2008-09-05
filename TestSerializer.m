@@ -24,7 +24,7 @@
 @implementation ETSerializer (Test)
 + (NSURL *) libraryURLForTest
 {
-	NSString *path = [@"./TestLibrary" stringByStandardizingPath];
+	NSString *path = [[FM currentDirectoryPath] stringByAppendingPathComponent: @"TestLibrary"];
 	BOOL isDir = NO;
 	BOOL hasCreatedDir = [FM createDirectoryAtPath: path attributes: nil];
 

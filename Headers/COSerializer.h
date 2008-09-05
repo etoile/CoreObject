@@ -32,5 +32,14 @@
 + (BOOL) serializeObject: (id)object toURL: (NSURL *)aURL;
 
 - (int) version;
+- (id) store;
+- (NSURL *) URL;
 
+@end
+
+@interface ETSerialObjectBundle (CoreObject)
+// TODO: Move into EtoileSerialize. 
+// The store should use probably URL instead of path in all cases and at least 
+// expose the URL through an -URL declared in the ETSerialObjectStore protocol.
+- (NSURL *) URL;
 @end

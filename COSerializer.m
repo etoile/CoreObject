@@ -8,6 +8,7 @@
 
 #import "COSerializer.h"
 #import "COObject.h"
+#import "COMetadataServer.h"
 #import "NSObject+CoreObject.h"
 
 @interface ETSerializer (Private)
@@ -38,7 +39,7 @@
 	if ([self respondsToSelector: @selector(libraryURLForTest)])
 		return [self libraryURLForTest];
 #endif
-	return [NSURL fileURLWithPath: @"~/CoreObjectLibrary"];
+	return [NSURL fileURLWithPath: [@"~/CoreObjectLibrary" stringByStandardizingPath]];
 }
 
 + (id) defaultCoreObjectSerializer
@@ -57,13 +58,13 @@
 {
 	return [ETSerializer serializerWithBackend: [self defaultBackendClass]
 	                             objectVersion: [object objectVersion]
-	                                    forURL: [self serializationURLForObject: object]];
+	                                    forURL: [[object objectContext] serializationURLForObject: object]];
 	                                    //forURL: [object URL]];
 }
 
 + (id) defaultCoreObjectDeltaSerializerForObject: (id)object
 {
-	NSURL *serializationURL = [[self serializationURLForObject: object] 
+	NSURL *serializationURL = [[[object objectContext] serializationURLForObject: object] 
 		URLByAppendingPath: @"Delta"];
 
 	return [ETSerializer serializerWithBackend: [self defaultBackendClass]
@@ -74,7 +75,7 @@
 
 + (id) defaultCoreObjectFullSaveSerializerForObject: (id)object
 {
-	NSURL *serializationURL = [[self serializationURLForObject: object] 
+	NSURL *serializationURL = [[[object objectContext] serializationURLForObject: object] 
 		URLByAppendingPath: @"FullSave"];
 
 	return [ETSerializer serializerWithBackend: [self defaultBackendClass]
@@ -138,6 +139,19 @@
 	return objectVersion;
 }
 
+/** Returns the serialization URL used to initialize the receiver. */
+- (NSURL *) URL
+{
+	return [[self store] URL];
+}
+
+/** Returns the object store identified by -URL, which receives the serialized 
+    data. */
+- (id) store
+{
+	return store;
+}
+
 - (size_t) storeObjectFromAddress: (void *)address withName: (char *)name
 {
 	id object = *(id*)address;
@@ -164,3 +178,16 @@
 }
 
 @end
+
+@implementation ETSerialObjectBundle (CoreObject)
+
+/** Returns the URL where the serialized data are stored for the receiver. */
+- (NSURL *) URL
+{
+	/* We standardize the path, because we don't support relative URL in the 
+	   metadata server currently. */
+	return [[NSURL fileURLWithPath: bundlePath] absoluteURL];
+}
+
+@end
+

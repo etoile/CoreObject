@@ -501,12 +501,30 @@ static BOOL automaticPersistency = NO;
 	return _objectVersion;
 }
 
+/** API only used for replacing an existing object by a past temporal in the 
+    managed object graph. See COObjectContext. 
+    WARNING: May be removed later. */
 - (int) lastObjectVersion
 {
-	// TODO: Implement 
-	return 0;
+	ETLog(@"Requested last object version, found %d in %@", 
+		[_objectContext lastVersionOfObject: self], _objectContext);
+
+	return [_objectContext lastVersionOfObject: self];
+	// NOTE: An implementation variant that may prove be quicker would be...
+	// return [[COObjectServer objectForUUID: [self UUID]] objectVersion]
+	//
+	// All managed objects cached in the object server have always 
+	// -objectVersion equal to -lastObjectVersion, only temporal instances 
+	// break this rule, but temporal instances are never referenced by the 
+	// object server. If they are merged, then their object version is 
+	// updated to match the one of the object they replace. At this point, 
+	// they will be cached in the object server, but not qualify as temporal
+	// instances anymore.
 }
 
+/** Saves the receiver by asking the object context to make a new snapshot.
+    If the save succeeds, returns YES. If the save fails, NO is returned and 
+    the object version isn't touched. */
 - (BOOL) save
 {
 	int prevVersion = [self objectVersion];
