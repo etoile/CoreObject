@@ -30,6 +30,7 @@
 #else /* PGSQL */
 	PGconn *conn;
 #endif
+	NSFileManager *_fm; /* Cache */
 }
 
 + (NSURL *) defaultStoreURL;
@@ -40,7 +41,15 @@
 - (ETUUID *) UUIDForURL: (NSURL *)url; // read it in the info.plist of the bundle
 - (NSURL *) URLForUUID: (ETUUID *)uuid; // lookup in the db
 - (void) setURL: (NSURL *)url forUUID: (ETUUID *)uuid;
+- (void) setURL: (NSURL *)url forUUID: (ETUUID *)uuid
+	withObjectVersion: (int)objectVersion 
+	             type: (NSString *)objectType 
+	          isGroup: (BOOL)isGroup
+	        timestamp: (NSDate *)recordTimestamp;
 - (void) removeURLForUUID: (ETUUID *)uuid;
+- (void) updateUUID: (ETUUID *)uuid 
+    toObjectVersion: (int)objectVersion
+          timestamp: (NSDate *)recordTimestamp;
 
 - (NSURL *) storeURL;
 - (NSMutableDictionary *) configurationDictionary;

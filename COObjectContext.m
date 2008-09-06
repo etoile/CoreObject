@@ -601,10 +601,27 @@ static COObjectContext *defaultObjectContext = nil;
 {
 	NSURL *url = [self serializationURLForObject: object];
 
-	/* Register the object in the metadata server or update the object infos */
-	[[self metadataServer] setURL: url forUUID: [object UUID]];
-	// TODO: Update more stuff: objectVersion, inode etc. May be a part of 
-	// the updates directly in the metadata server itself.
+	ETDebugLog(@"Update %@ %@ metadatas with new version %d", object, [object UUID], aVersion);
+
+	/* This first recorded invocation results in a snapshot with version 0, 
+       immediately followed by an invocation record with version 1. */
+	if (aVersion == 0 || aVersion == 1) /* Insert UUID/URL pair (on first serialization) */
+	{
+		/* Register the object in the metadata server */
+		[[self metadataServer] setURL: url forUUID: [object UUID]
+			withObjectVersion: aVersion 
+			             type: [object className] 
+			          isGroup: [object isGroup]
+			        timestamp: [NSDate date]];
+	}
+	else /* Update UUID/URL pair */
+	{
+		/* Modify object version, the metadata server may update other infos 
+		   behind the scene, such as the URL modification date .*/
+		[[self metadataServer] updateUUID: [object UUID] 
+		                  toObjectVersion: aVersion
+		                        timestamp: [NSDate date]];
+	}
 }
 
 /** COProxy compatibility method. Probably to be removed. */

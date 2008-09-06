@@ -83,6 +83,7 @@ static COMetadataServer *metadataServer = nil;
 	if ([self setUpWithURL: _storeURL shouldCreateDBIfNeeded: canCreateDB] == NO)
 		DESTROY(self);
 #endif
+	ASSIGN(_fm, [NSFileManager defaultManager]);
 
 	return self;
 }
@@ -95,6 +96,7 @@ static COMetadataServer *metadataServer = nil;
 #else
 	[self closeDBConnection];
 #endif
+	DESTROY(_fm);
 	[super dealloc];
 }
 
@@ -419,23 +421,39 @@ static COMetadataServer *metadataServer = nil;
 
 	if (urlString != nil)
 		url = [NSURL URLWithString: urlString];
-	
+
 	return url;
 
 #endif
 }
 
-/** Binds uuid to url by inserting the UUID/URL pair and related infos in the 
-    Metadata database. */
+/** Calls -setURL:forUUID:withObjectVersion:type:modificationDate: with hint
+    values, so that only the URL/UUID pair is updated, but not the additional 
+    infos that corresponds to the extra parameters. */
+- (void) setURL: (NSURL *)url forUUID: (ETUUID *)uuid 
+{
+	[self setURL: url forUUID: uuid withObjectVersion: -1
+	                                             type: nil
+	                                          isGroup: NO
+	                                        timestamp: [NSDate date]];
+}
+
+/** Binds uuid to url by inserting the UUID/URL pair and eventually additional 
+    infos in the Metadata database.
+    If an UUID/URL pair already exists, it is deleted then the new one is 
+    inserted. For a quick update rather a raw delete/insert, see 
+    -updateUUID:toObjectVersion:timestamp:. */
+//- (void) setURL: (NSURL *)url forUUID: (ETUUID *)uuid withNewVersion: ofObject:
 - (void) setURL: (NSURL *)url forUUID: (ETUUID *)uuid
+	withObjectVersion: (int)objectVersion 
+	             type: (NSString *)objectType 
+	          isGroup: (BOOL)isGroup
+	        timestamp: (NSDate *)recordTimestamp
 {
 #ifdef DICT_METADATASERVER
 	[_URLsByUUIDs setObject: url forKey: uuid];
 #else
 
-	// TODO: The way UPDATE are handled isn't that nice, try to improve once we
-	// know precisely when and what we need to update. Performance must be 
-	// carefully taken in account.
 	NSString *prevSQLRequest = @"";
 	NSString *nextSQLRequest = @"";
 	BOOL isUpdate = ([self URLForUUID: uuid] != nil);
@@ -448,6 +466,13 @@ static COMetadataServer *metadataServer = nil;
 		
 	}
 
+	// NOTE: If using NSFileManager is a source of slowness, we could rewrite 
+	// that in C with POSIX functions.
+	NSDictionary *fileAttributes = [_fm fileAttributesAtPath: [url path] traverseLink: YES];
+	unsigned long inode = [fileAttributes fileSystemFileNumber];
+	// FIXME: Should be volumeID and may be removed at later point.
+	unsigned long deviceID = [fileAttributes fileSystemNumber];
+
 	[self executeDBRequest: [NSString stringWithFormat: 
 		@"%@ INSERT INTO UUID (UUID, URL, inode, volumeID, "
 		"lastURLModifDate, objectVersion, objectType) " // TODO: Add groupCache
@@ -455,14 +480,14 @@ static COMetadataServer *metadataServer = nil;
 			prevSQLRequest,
 			[uuid stringValue], 
 			[url absoluteString], 
-			-1,
-			-1,
-			[NSDate date], // NOTE: May need to format the output with -descriptionWithLocale:
-			-1,
-			@"",
+			(unsigned int)inode, /* POSIX defines ino_t as a unsigned int */
+			(unsigned int)deviceID, /* POSIX doesn't define dev_t, but probably safe? */
+			recordTimestamp, // NOTE: May need to format the output with -descriptionWithLocale:
+			objectVersion,
+			objectType,
 			nextSQLRequest]];
 
-	ETDebugLog(@"Inserted URL %@ for %@", urlString, uuid);
+	ETDebugLog(@"Inserted URL %@ for %@", [url absoluteString], uuid);
 
 #endif
 }
@@ -481,6 +506,24 @@ static COMetadataServer *metadataServer = nil;
 	ETDebugLog(@"Deleted URL %@ for %@", urlString, uuid);
 
 #endif
+}
+
+/** Updates the UUID/URL pair infos without a raw delete/insert as all
+    -setURL:forUUID: methods does.
+    This method is used to quickly update the metadata DB each time a managed 
+    object is modified: an invocation is recorded and/or an object snapshot 
+    taken. */
+- (void) updateUUID: (ETUUID *)uuid 
+    toObjectVersion: (int)objectVersion 
+          timestamp: (NSDate *)recordTimestamp
+{
+	[self executeDBRequest: [NSString stringWithFormat: 
+		@"UPDATE UUID SET lastURLModifDate = '%@', objectVersion = %i WHERE UUID = '%@';",
+			recordTimestamp, // NOTE: May need to format the output with -descriptionWithLocale:
+			objectVersion,
+			[uuid stringValue]]];
+
+	ETDebugLog(@"Updated UUID %@ to %i %@", uuid, objectVersion, recordTimestamp);
 }
 
 @end

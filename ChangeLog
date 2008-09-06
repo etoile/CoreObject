@@ -1,3 +1,17 @@
+2008-09-06 Quentin Mathe <qmathe@club-internet.fr>
+
+	Improved to store object infos attached to each UUID/URL pair in the 
+	metadata DB.
+	* Headers/COMetadataServer.h:
+	* COMetadataServer.m:
+	New ivar _fm.
+	(-setURL:forUUID:): Moved code into the next method.
+	(-setURL:forUUID:withObjectVersion:type:isGroup:timestamp:): New method.
+	(-updateUUID:toObjectVersion:timestamp:): New method.
+	* COObjectContext.m (-updateMetadatasForObject:recordVersion:): Improved 
+	to pass more infos to the metadata server and update object infos with 
+	an SQL update rather than a raw SQL delete/insert.
+
 2008-09-05 Quentin Mathe <qmathe@club-internet.fr>
 
 	Modified COObjectContext to leverage the metadata server. COMetadataServer 
