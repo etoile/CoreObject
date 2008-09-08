@@ -204,12 +204,15 @@ static COMetadataServer *metadataServer = nil;
 		objectType text, \
 		groupCache uuid[]);"];
 
+	/* contextVersion is stored for conveniency, it could be easily found by 
+	   selecting all rows for a given contextUUID and sorting them by globalVersion */
 	[self executeDBRequest: @"CREATE TABLE History ( \
-		UUID text, \
+		objectUUID text, \
 		objectVersion integer, \
-		contextUUID uuid, \
+		contextUUID text, \
+		contextVersion integer, \
 		date timestamp, \
-		globalVersion serial);"]; 
+		globalVersion serial PRIMARY KEY);"]; 
 	// NOTE: Global version is mostly needed in case several rows are added in a 
 	// few microseconds hence associated with identical timestamps.
 

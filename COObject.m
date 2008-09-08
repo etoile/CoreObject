@@ -32,6 +32,10 @@ NSString *pCOValuesKey = @"Values";
 NSString *pCOVersionKey = @"Version";
 NSString *pCOVersion1Value = @"COVersion1";
 
+@interface COObject (FrameworkPrivate)
+- (void) setObjectContext: (COObjectContext *)ctxt;
+@end
+
 
 @implementation COObject
 /* Private */
@@ -270,6 +274,12 @@ NSString *pCOVersion1Value = @"COVersion1";
 	return _objectContext;
 }
 
+- (void) setObjectContext: (COObjectContext *)ctxt
+{
+	/* The object context is our owner and retains us. */
+	_objectContext = ctxt;
+}
+
 - (NSDictionary *) relatedCoreObjects
 {
 //	NSDictionary *properties = [self propertyList];
@@ -411,16 +421,32 @@ NSString *pCOVersion1Value = @"COVersion1";
 	         NSStringFromSelector(@selector(removeValueForProperty:)));
 }
 
-static BOOL automaticPersistency = NO;
+static NSMutableSet *automaticPersistentClasses = nil;
 
+/** Returns whether the instances, that are member of this specific class, are 
+    made persistent when they are initialized. */
 + (BOOL) automaticallyMakeNewInstancesPersistent
 {
-	return automaticPersistency;
+	return [automaticPersistentClasses containsObject: self];
 }
 
+/** Sets whether the instances, that are member of this specific class, are 
+    made persistent when they are initialized. 
+    An instance becomes persistenty by registering it in an object context and 
+    sending it -enablePersistency. */
 + (void) setAutomaticallyMakeNewInstancesPersistent: (BOOL)flag
 {
-	automaticPersistency = flag;
+	if (automaticPersistentClasses == nil)
+		automaticPersistentClasses = [[NSMutableSet alloc] init];
+
+	if (flag)
+	{
+		[automaticPersistentClasses addObject: self];
+	}
+	else
+	{
+		[automaticPersistentClasses removeObject: self];
+	}
 }
 
 /** Allows to temporarily disable persistency for the receiver. 
@@ -439,7 +465,7 @@ static BOOL automaticPersistency = NO;
 {
 	if ([self objectContext] == nil)
 	{
-		ETLog(@"WARNING: %@ misses an object context to disable persistency");
+		ETLog(@"WARNING: %@ misses an object context to disable persistency", self);
 	}
 
 	// NOTE: Another way would be: [_objectContext unregisterObject: self];
@@ -459,7 +485,7 @@ static BOOL automaticPersistency = NO;
 {
 	if ([self objectContext] == nil)
 	{
-		ETLog(@"WARNING: %@ misses an object context to enable persistency");
+		ETLog(@"WARNING: %@ misses an object context to enable persistency", self);
 	}
 	
 	// NOTE: Another way would be: [_objectContext registerObject: self];
@@ -696,11 +722,10 @@ static BOOL automaticPersistency = NO;
 	/* We get the object context at the end, hence all the previous calls are 
 	   not serialized by RECORD in -setValue:forProperty: 
 	   FIXME: Should be obtained by parameter usually. */
-	_objectContext = [COObjectContext defaultContext];
 	_objectVersion = -1;
 	if ([[self class] automaticallyMakeNewInstancesPersistent])
 	{
-		[_objectContext registerObject: self];
+		[[COObjectContext defaultContext] registerObject: self];
 		[self enablePersistency];
 	}
 
@@ -718,18 +743,39 @@ static BOOL automaticPersistency = NO;
 	return [_properties description];
 }
 #endif
+
 - (unsigned int) hash
 {
 	return [[self valueForProperty: kCOUIDProperty] hash];
 }
 
-- (BOOL) isEqual: (id) other
+/** Returns whether other is equal the receiver.
+    Two managed core objects are equal if they share the same UUID and object 
+    version. 
+    See also -isTemporalInstance:. */
+- (BOOL) isEqual: (id)other
 {
-	if (other && [other isKindOfClass: [self class]])
-	{
-		return [[self valueForProperty: kCOUIDProperty] isEqual: [other valueForProperty: kCOUIDProperty]];
-	}
-	return NO;
+	if (other == nil || [other isKindOfClass: [self class]] == NO)
+		return NO;
+
+	BOOL hasEqualUUID = [[self valueForProperty: kCOUIDProperty] isEqual: [other valueForProperty: kCOUIDProperty]];
+	BOOL hasEqualObjectVersion = ([self objectVersion] == [other objectVersion]);
+
+	return hasEqualUUID && hasEqualObjectVersion;
+}
+
+/** Returns whether other is a temporal instance of the receiver.
+    Two objects are temporal instances of each other if they share the same 
+    UUID but differs by their object version. */
+- (BOOL) isTemporalInstance: (id)other
+{
+	if (other == nil || [other isKindOfClass: [self class]] == NO)
+		return NO;
+
+	BOOL hasEqualUUID = [[self valueForProperty: kCOUIDProperty] isEqual: [other valueForProperty: kCOUIDProperty]];
+	BOOL hasDifferentObjectVersion = ([self objectVersion] != [other objectVersion]);
+
+	return hasEqualUUID && hasDifferentObjectVersion;
 }
 
 /* Serialization (EtoileSerialize) */
@@ -770,7 +816,13 @@ static BOOL automaticPersistency = NO;
 	ETDebugLog(@"Finished deserializing of %@", self);
 
 	_nc = [NSNotificationCenter defaultCenter];
-	_objectContext = [COObjectContext defaultContext];
+	_objectContext = nil;
+	 /* Reset a default version to be immediately overriden by
+	   deserializerDidFinish:forVersion: called back by the context. 
+	   This is also useful to ensure consistency if a non-persistent object is 
+	   serialized/deserialized without COObjectContext facility. 
+	   See TestSerializer.m */
+	_objectVersion = -1;
 	/* If we deserialize an object, it is persistent :-) */
 	_isPersistencyEnabled = YES;
 }

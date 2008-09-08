@@ -20,8 +20,10 @@
 + (Class) defaultBackendClass;
 + (id) defaultCoreObjectSerializer;
 + (id) defaultCoreObjectSerializerWithURL: (NSURL *)aURL;
-+ (id) defaultCoreObjectDeltaSerializerForObject: (id)object;
-+ (id) defaultCoreObjectFullSaveSerializerForObject: (id)object;
++ (id) defaultCoreObjectDeltaSerializerForURL: (NSURL *)anURL
+                                      version: (int)objectVersion;
++ (id) defaultCoreObjectFullSaveSerializerForURL: (NSURL *)anURL
+                                         version: (int)objectVersion;
 + (NSURL *) serializationURLForObject: (id)object;
 
 + (ETSerializer*) serializerWithBackend:(Class)aBackendClass 

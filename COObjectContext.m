@@ -15,10 +15,13 @@
 #define AVERAGE_MANAGED_OBJECTS_COUNT 1000
 #define RECORD_STACK_SIZE 10
 
+@interface COObject (FrameworkPrivate)
+- (void) setObjectContext: (COObjectContext *)ctxt;
+@end
+
 @interface COObjectContext (Private)
 - (void) snapshotObject: (id)object shouldIncrementObjectVersion: (BOOL)updateVersion;
 @end
-
 
 @implementation COObjectContext
 
@@ -44,6 +47,7 @@ static COObjectContext *defaultObjectContext = nil;
 	_revertedObject =nil;
 	_delegate = nil;
 	_version = 0;
+	_uuid = [[ETUUID alloc] init];
 
 	return self;
 }
@@ -55,6 +59,7 @@ static COObjectContext *defaultObjectContext = nil;
 	DESTROY(_registeredObjects);
 	//_deltaSerializer;
 	//_fullSaveSerializer;
+	DESTROY(_uuid);
 
 	[super dealloc];
 }
@@ -70,16 +75,36 @@ static COObjectContext *defaultObjectContext = nil;
 
 /* Registering Managed Objects */
 
+/** Registers an object to belong to the receiver.
+    A managed core object can belong to a single object context at a time. Hence 
+    you must unregister it before being able to move it from one context to 
+    another one. 
+    If you try to register an object that is already registered, an 
+    NSInvalidArgumentException exception will be raised. */
 - (void) registerObject: (id)object
 {
+	if ([object objectContext] != nil)
+	{
+		[NSException raise: NSInvalidArgumentException format: @"Object %@ "
+			"must not belong to another object context %@ to be registered", 
+			object, [object objectContext]];
+		return;
+	}
+
+	[object setObjectContext: self];
 	[_registeredObjects addObject: object];
 }
 
+/** Unregisters an object so it doesn't belong anymore to the receiver. */
 - (void) unregisterObject: (id)object
 {
+	/* Set the weak reference on the context to nil, before removing the object
+	   because it may trigger its deallocation. */
+	[object setObjectContext: nil];
 	[_registeredObjects removeObject: object];
 }
 
+/** Returns all the managed core objects that belongs to receiver. */
 - (NSSet *) registeredObjects
 {
 	return AUTORELEASE([_registeredObjects copy]);
@@ -91,8 +116,10 @@ static COObjectContext *defaultObjectContext = nil;
    If object isn't registered, returns nil. */
 - (NSURL *) serializationURLForObject: (id)object
 {
-	if ([_registeredObjects containsObject: object] == NO)
-		return NO;
+	// NOTE: Don't check if object is registered because it might be a temporal 
+	// instance (not registered) when -playbackInvocationsWithObject:toVersion:
+	// calls us. If we want to enforce a check, we may add a category method 
+	// -containsTemporalInstance: and/or -temporalMember: to NSSet.
 
 	NSURL *url = [[self metadataServer] URLForUUID: [object UUID]];
 
@@ -133,6 +160,10 @@ static COObjectContext *defaultObjectContext = nil;
 {
 	BOOL hasReplaced = NO;
 
+	/* A temporal instance has a nil object context, but if temporalInstance is 
+	   just some other object, another context usually owns it. */
+	[[temporalInstance objectContext] unregisterObject: temporalInstance];
+	[self registerObject: temporalInstance];
 	[self snapshotObject: object];
 	FOREACHI([self registeredObjects], managedObject)
 	{
@@ -224,46 +255,79 @@ static COObjectContext *defaultObjectContext = nil;
 /** Retrieve the delta serializer for a given object. */
 - (ETSerializer *) deltaSerializerForObject: (id)object
 {
-	return [ETSerializer defaultCoreObjectDeltaSerializerForObject: object];
-
 	if ([object respondsToSelector: @selector(deltaSerializer)])
 	{
 		return [object deltaSerializer];
 	}
-	else
+	else /* Default case */
 	{
-		return [self deltaSerializer];
+		NSURL *serializationURL = [self serializationURLForObject: object];
+
+		return [ETSerializer defaultCoreObjectDeltaSerializerForURL: serializationURL 
+	                                                    version: [object objectVersion]];
+		// FIXME: return [self deltaSerializer];
 	}
 }
 
 /** Retrieve the snapshot serializer for a given object. */
 - (ETSerializer *) snapshotSerializerForObject: (id)object
 {
-	return [ETSerializer defaultCoreObjectFullSaveSerializerForObject: object];
-
 	if ([object respondsToSelector: @selector(snapshotSerializer)])
 	{
 		return [object snapshotSerializer];
 	}
-	else
+	else /* Default case */
 	{
-		return [self snapshotSerializer];
+		NSURL *serializationURL = [self serializationURLForObject: object];
+
+		return [ETSerializer defaultCoreObjectFullSaveSerializerForURL: serializationURL 
+	                                                           version: [object objectVersion]];
+		// FIXME: return [self snapshotSerializer];
 	}
+}
+
+/* Navigating Context History */
+
+/** Returns the UUID of the receiver that is used to identify the history of 
+    the object context in the Metadata DB. */
+- (ETUUID *) UUID
+{
+	return _uuid;
+}
+
+/** Returns the last version of the receiver that can be used to identify 
+    the current state of the all the registered objects and eventually 
+    reverts to it a later point. The state of all registered objects remain 
+    untouched until the next time this version value gets incremented. 
+    An object context version is a timemark in the interleaved history of all 
+    the registered objects. Each object context version is associated with a 
+    unique set of object versions. If at a later point, you set the context 
+    version to a past version, the context will revert back to the unique set of 
+    temporal instances bound to this version. */
+- (int) version
+{
+	return _version;
 }
 
 /** Returns the first version forward in time which corresponds to a snapshot or
     a delta. If no such version can be found (no snapshot or delta available 
-    unless an error occured), returns -1. */
+    unless an error occured), returns -1.
+    If object hasn't been made persistent yet or isn't registered in the 
+    receiver also returns -1. Hence this method returns -1 for rolledback 
+    objects not yet inserted in an object context. */
 - (int) lastVersionOfObject: (id)object
 {
-	if ([object isPersistent] == NO)
+	// FIXME: Test UUID or add -containsTemporalInstance: to NSSet
+	/*if ([object isPersistent] == NO || [_registeredObjects containsObject: object] == NO)
+	{
 		return -1;
+	}*/
 
 	// TODO: Move this code into ETSerialObjectBundle, probably by adding 
 	// methods such -lastVersion:inBranch: and -lastVersion. We may also cache 
 	// the last version in a plist stored in the bundle to avoid the linear 
 	// search in the directory.
-	NSURL *serializationURL = [[[ETSerializer serializationURLForObject: object] 
+	NSURL *serializationURL = [[[self serializationURLForObject: object] 
 		URLByAppendingPath: @"Delta"] URLByAppendingPath: @"root"];
 	NSArray *deltaFileNames = [[NSFileManager defaultManager] 
 		directoryContentsAtPath: [[serializationURL path] stringByStandardizingPath]];
@@ -339,6 +403,21 @@ static COObjectContext *defaultObjectContext = nil;
 }
 #endif
 
+/** Returns a temporal instance of the given object, by finding the last 
+    snapshot before aVersion, deserializing it and replaying all the serialized 
+    invocations between this snapshot version and aVersion.
+    The returned instance has no object context and is equal to 'object' because 
+    they share the same UUID even if they differ by their object version. 
+    You cannot use a rolled back object has a persistent object until it 
+    gets inserted in an object context. No invocations will ever be recorded 
+    until it is inserted. It can either replace object in the receiver, object 
+    can be unregistered from the receiver to allow the insertion of the rolled 
+    back object in another object context. This is necessary because a given 
+    object identity (all temporal instances included) must belong to a single 
+    object context per process.
+    A managed core object identity is defined by its UUID. 
+    The state of a rolledback object can be altered before inserting it in an 
+    object context, but this is strongly discouraged. */
 - (id) objectByRollingbackObject: (id)object toVersion: (int)aVersion
 {
 	int baseVersion = -1;
@@ -494,7 +573,9 @@ static COObjectContext *defaultObjectContext = nil;
 	/* -[object objectVersion] still returns the old version at this point, 
 	   so we pass the new version in parameter with recordVersion: */
 	[self updateMetadatasForObject: object recordVersion: newObjectVersion];
-	[self logInvocation: inv recordVersion: newObjectVersion];
+	[self logInvocation: inv 
+	      recordVersion: newObjectVersion
+	          timestamp: [NSDate date]];
 
 	return newObjectVersion;
 }
@@ -542,10 +623,26 @@ static COObjectContext *defaultObjectContext = nil;
 /** Logs all invocations properly interleaved and indexed by delta versions in 
 	a way that makes possible to support undo/redo transparently and in a
 	persistent manner for multiple managed objects. */
-- (void) logInvocation: (NSInvocation *)inv recordVersion: (int)aVersion
+- (void) logInvocation: (NSInvocation *)inv 
+         recordVersion: (int)aVersion 
+             timestamp: (NSDate *)recordTimestamp
 {
-	ETLog(@"Record %@ version %d in %@", inv, aVersion, self);
+	id object = [inv target];
+
 	_version++;
+
+	[[self metadataServer] executeDBRequest: [NSString stringWithFormat: 
+		@"INSERT INTO History (objectUUID, objectVersion, contextUUID, "
+		"contextVersion, date) "
+		"VALUES ('%@', %i, '%@', %i, '%@');", 
+			[[object UUID] stringValue],
+			aVersion,
+			[_uuid stringValue],
+			_version,
+			recordTimestamp]];
+
+	ETLog(@"Log %@ objectUUID %@ objectVersion %i contextVersion %i", 
+		inv, [object UUID], aVersion, _version);
 }
 
 /** Commonly used to forward the invocation to the real object if the 
@@ -581,7 +678,7 @@ static COObjectContext *defaultObjectContext = nil;
 	//[snapshotSerializer setVersion: [object objectVersion]];
 	if ([object objectVersion] == -1)
 	{
-		// TODO: Serialize right in the object bundle and not in a branch
+		// TODO: Serialize right in the object bundle and not in a branch.
 		[snapshotSerializer serializeObject: object withName:@"BaseVersion"];
 	}
 	else

@@ -94,6 +94,10 @@ extern NSString *pCOVersion1Value;
 - (id) initWithPropertyList: (NSDictionary *) propertyList;
 - (NSMutableDictionary *) propertyList;
 
+- (id) init;
+//- (id) initWithURL: (NSURL *)serializationURL 
+//   inObjectContext: (COObjectContext *)context;
+
 /* Managed Object Edition */
 
 - (NSArray *) properties;
@@ -124,7 +128,12 @@ extern NSString *pCOVersion1Value;
 - (int) objectVersion;
 - (int) lastObjectVersion;
 - (BOOL) save;
+
+/* Identity */
+
 - (ETUUID *) UUID;
+- (BOOL) isEqual: (id)other;
+- (BOOL) isTemporalInstance: (id)other;
 
 /* Query */
 

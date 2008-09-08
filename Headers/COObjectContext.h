@@ -30,6 +30,7 @@
 	id _revertedObject;
 	id _delegate;
 	int _version;
+	ETUUID *_uuid;
 }
 
 + (id) defaultContext;
@@ -66,9 +67,10 @@
 
 /* Navigating Context History */
 
-// FIXME: Implement
-#if 0
+- (ETUUID *) UUID;
 - (int) version;
+#if 0
+// FIXME: Implement
 - (void) rollbackToVersion: (int)aVersion;
 - (void) snapshot;
 //- (id) undoManager;
@@ -102,7 +104,9 @@
 - (BOOL) shouldRecordChangesToObject: (id)object;
 - (int) recordInvocation: (NSInvocation *)inv;
 - (int) serializeInvocation: (NSInvocation *)inv; //-storeInvocation:
-- (void) logInvocation: (NSInvocation *)inv recordVersion: (int)aVersion;
+- (void) logInvocation: (NSInvocation *)inv 
+         recordVersion: (int)aVersion
+             timestamp: (NSDate *)recordTimestamp;
 - (void) forwardInvocationIfNeeded: (NSInvocation *)inv;
 
 - (void) updateMetadatasForObject: (id)object recordVersion: (int)aVersion;

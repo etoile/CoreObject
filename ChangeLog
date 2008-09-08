@@ -1,3 +1,40 @@
+2008-09-08 Quentin Mathe <qmathe@club-internet.fr>
+
+	Some adjustements in the overall architecture to better shift the 
+	responsabilities between the core classes. Modified COMetadataServer and
+	COObjectContext to store the histories of object contexts into the metadata 
+	DB. Worked out a better handling of equality vs temporality for managed core 
+	objects.
+	* COMetadataServer.m (-setUpDBWithURL): Modified the schema of History table 
+	a bit.
+	* Headers/COSerializer.h:
+	* COSerializer.m: 
+	Modified the parameters of defaultCoreObjectXXXSerializerForObject: methods 
+	to rather take an URL and an object version in parameters, and thereby not 
+	depend on the presence of an object context.
+	* COObjectContext.m:
+	Documented several methods.
+	(-registerObject:): Modified to raise an exception if the object already 
+	belongs to another context.
+	(-UUID, -version): Added.
+	(-lastVersionOfObject:): Fixed to use the right URL where deltas are located.
+	(-logInvocation:recordVersion:timestamp:):Implemented. Also added a 
+	timestamp: parameter to this method, so we can pass a consistent timestamp 
+	during an invocation record.
+	* Headers/COObject.h:
+	* COObject.m:
+	(-isEqual:): Modified to take in account the object version.
+	(-isTemporalInstance:, -setObjectContext:): Added.
+	(-init): Modified to use a callback on -setObjectContext: from 
+	COObjectContext rather than setting _objectContext ivar directly. This 
+	allows to change the context of an object easily at a later point.
+	(automaticallyMakeNewInstancesPersistent): Modified to be a per class 
+	property rather than a global one.
+	(-finishedDeserializing): Reset _objectVersion to -1. This fixes the unit 
+	test in TestDeserializer.m at line 205.
+	* TestObjectContext.m: Many modifications. Added a test method for 
+	-lastVersionOfObject:.
+
 2008-09-06 Quentin Mathe <qmathe@club-internet.fr>
 
 	Improved to store object infos attached to each UUID/URL pair in the 

@@ -54,6 +54,8 @@
 	                                    forURL: aURL];
 }
 
+/** Unlike the next two factory methods, object must have an non-nil object 
+    context. */
 + (id) defaultCoreObjectSerializerForObject: (id)object
 {
 	return [ETSerializer serializerWithBackend: [self defaultBackendClass]
@@ -62,24 +64,24 @@
 	                                    //forURL: [object URL]];
 }
 
-+ (id) defaultCoreObjectDeltaSerializerForObject: (id)object
++ (id) defaultCoreObjectDeltaSerializerForURL: (NSURL *)anURL
+                                      version: (int)objectVersion
 {
-	NSURL *serializationURL = [[[object objectContext] serializationURLForObject: object] 
-		URLByAppendingPath: @"Delta"];
+	NSURL *serializationURL = [anURL URLByAppendingPath: @"Delta"];
 
 	return [ETSerializer serializerWithBackend: [self defaultBackendClass]
-	                             objectVersion: [object objectVersion]
+	                             objectVersion: objectVersion
 	                                    forURL: serializationURL];
 	                                    //forURL: [object URL]];
 }
 
-+ (id) defaultCoreObjectFullSaveSerializerForObject: (id)object
++ (id) defaultCoreObjectFullSaveSerializerForURL: (NSURL *)anURL
+                                         version: (int)objectVersion
 {
-	NSURL *serializationURL = [[[object objectContext] serializationURLForObject: object] 
-		URLByAppendingPath: @"FullSave"];
+	NSURL *serializationURL = [anURL URLByAppendingPath: @"FullSave"];
 
 	return [ETSerializer serializerWithBackend: [self defaultBackendClass]
-	                             objectVersion: [object objectVersion]
+	                             objectVersion: objectVersion
 	                                    forURL: serializationURL];
 	                                    //forURL: [object URL]];
 }
