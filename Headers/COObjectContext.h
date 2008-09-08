@@ -86,7 +86,7 @@
 - (id) lastSnapshotOfObject: (id)object 
                  forVersion: (int)aVersion 
             snapshotVersion: (int *)snapshotVersion;
-- (id) objectByRollingbackObject: (id)object toVersion: (int)version;
+- (id) objectByRollingbackObject: (id)anObject toVersion: (int)version;
 //- (void) getObject: (id *)object byRollingbackToVersion: (int)version;
 - (void) playbackInvocationsWithObject: (id)object 
                            fromVersion: (int)baseVersion 

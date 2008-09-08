@@ -406,25 +406,27 @@ static COObjectContext *defaultObjectContext = nil;
 /** Returns a temporal instance of the given object, by finding the last 
     snapshot before aVersion, deserializing it and replaying all the serialized 
     invocations between this snapshot version and aVersion.
-    The returned instance has no object context and is equal to 'object' because 
-    they share the same UUID even if they differ by their object version. 
-    You cannot use a rolled back object has a persistent object until it 
+    The returned instance has no object context and isn't equal to anObject, 
+    but returns YES to -isTemporalInstance:, because both anObject and the 
+    rolled back object share the same UUID 
+    even if they differ by their object version. 
+    You cannot use a rolled back object as a persistent object until it 
     gets inserted in an object context. No invocations will ever be recorded 
-    until it is inserted. It can either replace object in the receiver, object 
-    can be unregistered from the receiver to allow the insertion of the rolled 
-    back object in another object context. This is necessary because a given 
-    object identity (all temporal instances included) must belong to a single 
-    object context per process.
+    until it is inserted. It can either replace anObject in the receiver, or 
+    anObject can be unregistered from the receiver to allow the insertion of the 
+    rolled back object into another object context. This is necessary because a 
+    given object identity (all temporal instances included) must belong to a 
+    single object context per process.
     A managed core object identity is defined by its UUID. 
-    The state of a rolledback object can be altered before inserting it in an 
+    The state of a rolled back object can be altered before inserting it in an 
     object context, but this is strongly discouraged. */
-- (id) objectByRollingbackObject: (id)object toVersion: (int)aVersion
+- (id) objectByRollingbackObject: (id)anObject toVersion: (int)aVersion
 {
 	int baseVersion = -1;
-	id rolledbackObject = [self lastSnapshotOfObject: object 
+	id rolledbackObject = [self lastSnapshotOfObject: anObject 
 	                                      forVersion: aVersion
 	                                 snapshotVersion: &baseVersion];
-	ETDebugLog(@"Roll back object %@ with snapshot %@ at version %d", object,
+	ETDebugLog(@"Roll back object %@ with snapshot %@ at version %d", anObject,
 		rolledbackObject, baseVersion);
 
 	[self playbackInvocationsWithObject: rolledbackObject 
