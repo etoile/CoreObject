@@ -1,5 +1,16 @@
 2008-09-08 Quentin Mathe <qmathe@club-internet.fr>
 
+	* COObject.m (-_readObjectVersion1:, -propertyList):
+	* COGroup.m (-_readGroupVersion1:, -propertyList):
+	* COPropertyListFormat.m (-_readObjectVersion1, -_readGroupVersion1:, 
+	-_ouputObjectVersion1, -_outputGroupVersion1:):
+	Moved property list format related methods and variables in a standalone 
+	file made of categories on COObject and COGroup. Updated -propertyList 
+	methods to now call new extracted methods -_outputObjectVersion1 and 
+    -_outputGroupVersion1 which are symetric to reading methods.
+
+2008-09-08 Quentin Mathe <qmathe@club-internet.fr>
+
 	Some adjustements in the overall architecture to better shift the 
 	responsabilities between the core classes. Modified COMetadataServer and
 	COObjectContext to store the histories of object contexts into the metadata 

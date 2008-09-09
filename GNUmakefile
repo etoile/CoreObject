@@ -21,6 +21,7 @@ CoreObject_OBJC_FILES = \
 	COObject.m \
 	COObjectContext.m \
 	COMultiValue.m \
+	COPropertyListFormat.m \
 	NSObject+CoreObject.m \
 	CODirectory.m \
 	COFile.m \

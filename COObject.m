@@ -25,15 +25,13 @@ NSString *kCOTagProperty = @"kCOTagProperty";
 
 NSString *qCOTextContent = @"qCOTextContent";
 
-/* For property list */
-NSString *pCOClassKey = @"Class";
-NSString *pCOPropertiesKey = @"Properties";
-NSString *pCOValuesKey = @"Values";
-NSString *pCOVersionKey = @"Version";
-NSString *pCOVersion1Value = @"COVersion1";
-
 @interface COObject (FrameworkPrivate)
 - (void) setObjectContext: (COObjectContext *)ctxt;
+@end
+
+@interface COObject (COPropertyListFormat)
+- (void) _readObjectVersion1: (NSDictionary *)propertyList;
+- (NSMutableDictionary *) _outputObjectVersion1;
 @end
 
 
@@ -73,34 +71,6 @@ NSString *pCOVersion1Value = @"COVersion1";
 		}
 	}
 	return AUTORELEASE(text);
-}
-
-- (void) _readObjectVersion1: (NSDictionary *) propertyList
-{
-	/* We ignore class here because class is decided before this method */
-	id object = nil;
-
-	if ((object = [propertyList objectForKey: pCOPropertiesKey]))
-		[[self class] addPropertiesAndTypes: object];
-
-	if ((object = [propertyList objectForKey: pCOValuesKey]))
-	{
-		/* Check COMultiValue */
-		NSMutableDictionary *dict = [(NSDictionary *) object mutableCopy];
-		NSEnumerator *e = [[dict allKeys] objectEnumerator];
-		NSString *key = nil;
-		while ((key = [e nextObject]))
-		{
-			if ([[self class] typeOfProperty: key] & kCOMultiValueMask)
-			{
-				COMultiValue *mv = [[COMultiValue alloc] initWithPropertyList: [dict objectForKey: key]];
-				[dict setObject: mv forKey: key];
-				DESTROY(mv);
-			}
-		}
-		[_properties addEntriesFromDictionary: dict];
-		DESTROY(dict); /* mutable copied above */
-	}
 }
 
 /* End of Private */
@@ -229,44 +199,7 @@ NSString *pCOVersion1Value = @"COVersion1";
 
 - (NSMutableDictionary *) propertyList
 {
-	NSMutableDictionary *pl = [[NSMutableDictionary alloc] init];
-	NSMutableDictionary *dict = nil;
-	//NSMutableDictionary *relations = [[NSMutableDictionary alloc] init];
-
-	[pl setObject: NSStringFromClass([self class]) forKey: pCOClassKey];
-	[pl setObject: [[self class] propertiesAndTypes] 
-	       forKey: pCOPropertiesKey];
-
-	dict = [_properties mutableCopy];
-	/* We remove parents property */
-	[dict removeObjectForKey: kCOParentsProperty];
-	/* If we have COMultiValue, save its property list */
-	NSEnumerator *e = [[dict allKeys] objectEnumerator];
-	NSString *key = nil;
-	while ((key = [e nextObject]))
-	{
-		id value = [dict objectForKey: key];
-		if ([value isKindOfClass: [COMultiValue class]])
-		{
-			[dict setObject: [(COMultiValue *)value propertyList]
-			         forKey: key];
-		}
-#if 0
-		else if ([value isManagedCoreObject]) // has UUID and URL
-		{
-			[relations setObject: value forKey: [value UUID]];
-			[dict setObject: [value UUID] forKey: key];
-		}
-		else if ([value isCoreObject]) // has URL
-		{
-			[relations setObject: value forKey: [value URL]];
-			[dict setObject: [value URL] forKey: key];
-		}
-#endif
-	}
-	[pl setObject: dict forKey: pCOValuesKey];
-	[pl setObject: pCOVersion1Value forKey: pCOVersionKey];
-	return AUTORELEASE(pl);
+	return [self _outputObjectVersion1];
 }
 
 - (COObjectContext *) objectContext
