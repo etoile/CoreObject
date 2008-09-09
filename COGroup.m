@@ -44,10 +44,12 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 + (NSArray *) managedMethodNames
 {
-	return A(NSStringFromSelector(@selector(addObject:)),
-	         NSStringFromSelector(@selector(removeObject:)),
-	         NSStringFromSelector(@selector(addGroup:)),
-	         NSStringFromSelector(@selector(removeGroup:)));
+	NSArray *methodNames = A(NSStringFromSelector(@selector(addObject:)),
+	                         NSStringFromSelector(@selector(removeObject:)),
+	                         NSStringFromSelector(@selector(addGroup:)),
+	                         NSStringFromSelector(@selector(removeGroup:)));
+
+	return [methodNames arrayByAddingObjectsFromArray: [super managedMethodNames]];
 }
 
 /* Private */
