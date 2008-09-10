@@ -307,6 +307,105 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	[self addObject: object];
 }
 
+/* Merging */
+
+/** Returns whether the receiver contains a temporal instance of anObject.
+    See -[COObject isTemporalInstance:]. */
+- (BOOL) containsTemporalInstance: (id)anObject
+{
+	NSMutableArray *strictObjects = [self valueForProperty: kCOGroupChildrenProperty];
+	NSMutableArray *subgroups = [self valueForProperty: kCOGroupSubgroupsProperty];
+
+	// NOTE: If this is too slow, we can speed it up by caching 
+	// -isTemporalInstance: IMP or even altering eqSel internal ivar of NSArray 
+	// for the comparison selector and then just calls -containsObject: 
+	// before restoring the comparison selector. The last option means using a 
+	// category on NSArray.
+
+	if ([anObject isGroup])
+	{
+		FOREACHI(subgroups, aChildGroup)
+		{
+			if ([anObject isTemporalInstance: aChildGroup])
+				return YES;;
+		}
+	}
+	else
+	{
+		FOREACHI(strictObjects, aChildObject)
+		{
+			if ([anObject isTemporalInstance: aChildObject])
+				return YES;
+		}
+	}
+
+	return NO;
+}
+
+/** No merging strategy is implemented by COObject.
+    COGroup is the only subclass which handles merging of replacement objects. */
+- (COMergeResult) replaceObject: (id)anObject 
+                       byObject: (id)otherObject 
+                isTemporalMerge: (BOOL)temporal 
+                          error: (NSError **)error
+{
+	if (temporal && [otherObject isMemberOfClass: [anObject class]] == NO)
+	{
+		ETLog(@"WARNING: Merged object class %@ must be identical to replaced "
+			"object class %@ for a temporal replacement", otherObject, anObject);
+		return COMergeResultNone;
+	}
+
+	if ([[self objects] containsObject: anObject] == NO)
+		return COMergeResultNone; // Nothing to merge in the receiver
+	//if ([self containsTemporalInstance: otherObject])
+	//	return COMergeResultNone; // Nothing to merge in the receiver
+
+	/* Otherwise the merging really happens now */
+	NSMutableArray *targetChildObjects = nil;
+	BOOL isGroupReplacement = [otherObject isKindOfClass: [COGroup class]];
+
+	if (isGroupReplacement)
+	{
+		targetChildObjects = [self valueForProperty: kCOGroupSubgroupsProperty];
+	}
+	else
+	{
+		targetChildObjects = [self valueForProperty: kCOGroupChildrenProperty];
+
+	}
+
+	// TODO: If we want to support this method for non-temporal replacement 
+	// we need to synthetize a add and a remove invocation record here.
+	//RECORD(anObject, otherObject, NULL)
+
+	// NOTE: addObject: and -removeObject: won't work here, because 
+	// IGNORE_CHANGES makes them return immediately when a revert is underway. 
+
+	/* The following code implictly set valid references to parents for 
+	   otherObject, by the mean of _addAsParent:. 
+	   If otherObject isn't a temporal instance, it will continue to reference 
+	   the same parents as before in addition to self. So it shouldn't expected 
+	   that this method will make otherObject have the parent references of 
+	   anObject. 
+	   If it is a temporal instance, the valid parent references are recreated 
+	   by having the object context calls this method on each registered group 
+	   to remove andObject and insert otherObject. */
+	int indexOfReplacedObject = [targetChildObjects indexOfObject: anObject];
+	[self _removeAsParent: anObject];
+	[targetChildObjects removeObject: anObject];
+	[self _addAsParent: otherObject];
+	[targetChildObjects insertObject: otherObject atIndex: indexOfReplacedObject];
+	// TODO: Post a kGroupMergeObjectNotification.
+	//	[_nc postNotificationName: kCOGroupMergeObjectNotification
+	//	     object: self
+	//	     userInfo: D(anObject, kCOGroupTargetChild, otherObject, kCOGroupMergedChild)];
+
+	//END_RECORD
+
+	return COMergeResultSucceeded;
+}
+
 /* NSObject */
 + (void) initialize
 {

@@ -12,6 +12,13 @@
 
 @class COMetadataServer;
 
+typedef enum _COMergeResult
+{
+	COMergeResultNone,
+	COMergeResultFailed,
+	COMergeResultSucceeded
+} COMergeResult;
+
 
 @interface COObjectContext : NSObject
 {
@@ -31,6 +38,7 @@
 	id _delegate;
 	int _version;
 	ETUUID *_uuid;
+	NSArray *_lastMergeErrors;
 }
 
 + (id) defaultContext;
@@ -44,7 +52,13 @@
 - (NSSet *) registeredObjects;
 - (NSURL *) serializationURLForObject: (id)object;
 - (BOOL) setSerializationURL: (NSURL *)url forObject: (id)object;
-- (BOOL) replaceObject: (id)object byObject: (id)temporalInstance;
+
+/* Merging */
+
+- (COMergeResult) replaceObject: (id)anObject 
+                       byObject: (id)temporalInstance
+               collectAllErrors: (BOOL)tryAll;
+- (NSArray *) lastMergeErrors;
 
 /* Controlling Record Session */
 
@@ -86,8 +100,9 @@
 - (id) lastSnapshotOfObject: (id)object 
                  forVersion: (int)aVersion 
             snapshotVersion: (int *)snapshotVersion;
-- (id) objectByRollingbackObject: (id)anObject toVersion: (int)version;
-//- (void) getObject: (id *)object byRollingbackToVersion: (int)version;
+- (id) objectByRollingbackObject: (id)anObject 
+                       toVersion: (int)aVersion
+                mergeImmediately: (BOOL)mergeNow;
 - (void) playbackInvocationsWithObject: (id)object 
                            fromVersion: (int)baseVersion 
                              toVersion: (int)finalVersion;

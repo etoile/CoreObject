@@ -8,6 +8,7 @@
 
 #import "COObjectContext.h"
 #import "COObject.h"
+#import "COGroup.h"
 #import "COSerializer.h"
 #import "COMetadataServer.h"
 #import "NSObject+CoreObject.h"
@@ -155,26 +156,105 @@ static COObjectContext *defaultObjectContext = nil;
 	return YES;
 }
 
-/** Use double-dispatch style */
-- (BOOL) replaceObject: (id)object byObject: (id)temporalInstance
+/** Replaces anObject registered in the receiver by another one which is 
+    usually a temporal instance, but doesn't have to. Hence you can also use 
+    this method to substitute an object by another one in the object context,
+    and update the relationships of the first object to reference the new one. 
+    Because the relationships are carried over, a replacement involves a merge.
+    which adjusts the parent groups of the replaced object, so they now refer.
+    Merging only occurs if you roll back one or several registered objects, if 
+    the whole object context is reverted to a past version, the resulting object 
+    graph will be in a coherent state and this method won't be called. */
+- (COMergeResult) replaceObject: (id)anObject 
+                       byObject: (id)temporalInstance 
+               collectAllErrors: (BOOL)tryAll
 {
-	BOOL hasReplaced = NO;
+	// TODO: This XOR is a bit verbose...
+	if (([anObject isKindOfClass: [COGroup class]] == NO && [temporalInstance isKindOfClass: [COGroup class]])
+	 || ([anObject isKindOfClass: [COGroup class]] && [temporalInstance isKindOfClass: [COGroup class]] == NO))
+	{
+		[NSException raise: NSInvalidArgumentException 
+		            format: @"Replaced Object %@ and replacement object %@ "
+		                     "must be the same kind, either group or strict object", 
+		                     anObject, temporalInstance];
+		return COMergeResultFailed;
+	}
 
-	/* A temporal instance has a nil object context, but if temporalInstance is 
-	   just some other object, another context usually owns it. */
-	[[temporalInstance objectContext] unregisterObject: temporalInstance];
-	[self registerObject: temporalInstance];
-	[self snapshotObject: object];
+	NSMutableArray *objectsRefusingReplacement = [NSMutableArray array];
+	COMergeResult mergeResult = COMergeResultFailed;
+	BOOL isTemporal = [temporalInstance isTemporalInstance: anObject];
+	NSError *mergeError = NULL;
+
+	/* We disable the persistency, especially the recording of the invocations 
+	   when a temporal instance is merged. The identity of the object to be 
+	   merged is the same than the replaced object (UUIDs are identical), hence 
+	   only the object replacement itself needs to be recorded, but not the 
+	   relationships which are tracked by UUIDs. However relationships have to be 
+	   fixed because the instance they refer to is now invalid.
+	   Object replacement is recorded by simply snapshoting temporalInstance, 
+	   this creates a new version with the old object state right after the last 
+	   version of anObject. */
+	if (isTemporal)
+		[self beginRevertObject: anObject];
+
+	// TODO: All the following code will have to be modified to support multiple 
+	/// object contexts per process.
+	[self snapshotObject: anObject];
+
+	/* Merge Parent References */
 	FOREACHI([self registeredObjects], managedObject)
 	{
+
 		// TODO: Asks each managed object if the merge is possible before 
 		// attempting to apply it. If the merge fails, we are in an invalid 
 		// state with both object and temporalInstance being referenced in 
 		// relationships
-		hasReplaced = [managedObject replaceObject: object byObject: temporalInstance];
+		if ([managedObject isKindOfClass: [COGroup class]])
+		{
+			mergeResult = [managedObject replaceObject: anObject 
+			                                  byObject: temporalInstance 
+			                           isTemporalMerge: isTemporal
+			                                     error: &mergeError];
+			if (mergeResult == COMergeResultFailed)
+				[objectsRefusingReplacement addObject: managedObject];
+		}
 	}
 
-	return hasReplaced;
+	/* Report which objects haven't handled the merge */
+	if ([objectsRefusingReplacement count] > 0)
+	{
+		// TODO: Rather return an NSError which can be used for UI feedback 
+		// rather than logging or raising an exception.
+		NSLog(@"WARNING: Failed to merge temporal instance %@ of %@ into the "
+			@"following %@ whose faulty classes implement "
+			@"-anObjectject:byObject: in a partial or incorrect way.", 
+			temporalInstance, anObject, objectsRefusingReplacement);
+	}
+
+	/* Merge Children References
+
+	   Now that parent references or backward pointers are fixed, if the 
+	   two objects are groups we need to merge their children references. */
+	if ([temporalInstance isKindOfClass: [COGroup class]])
+	{
+		//[temporalInstance mergeObjectsWithObjectsOfGroup: anObject policy: ];
+	}
+
+	[self unregisterObject: anObject];
+	[self registerObject: temporalInstance];
+
+	if (isTemporal)
+		[self endRevert];
+
+	return mergeResult;
+}
+
+/** Returns the errors that occured the last time 
+   -replaceObject:byObject:collectAllErrors: was called.
+   The previous errors are discarded each time the latter method is called. */
+- (NSArray *) lastMergeErrors
+{
+	return _lastMergeErrors;
 }
 
 /* Controlling Record Session */
@@ -389,20 +469,6 @@ static COObjectContext *defaultObjectContext = nil;
 	return snapshotObject;
 }
 
-/** Not really useful right now */
-#if 0
-- (void) getObject: (id *)object byRollingbackToVersion: (int)version
-{
-	id oldObject = [self objectByRollingbackObject: *object toVersion: version];
-
-	if (oldObject != nil)
-	{
-		DESTROY(object);
-		object = &oldObject;
-	}
-}
-#endif
-
 /** Returns a temporal instance of the given object, by finding the last 
     snapshot before aVersion, deserializing it and replaying all the serialized 
     invocations between this snapshot version and aVersion.
@@ -419,9 +485,53 @@ static COObjectContext *defaultObjectContext = nil;
     single object context per process.
     A managed core object identity is defined by its UUID. 
     The state of a rolled back object can be altered before inserting it in an 
-    object context, but this is strongly discouraged. */
-- (id) objectByRollingbackObject: (id)anObject toVersion: (int)aVersion
+    object context, but this is strongly discouraged.
+    anObject can be a temporal instance of an object registered in the receiver.
+    If aVersions is equal to the version of anObject, returns anObject and logs 
+    a warning.
+    If aVersion is beyong the version of anObject, returns nil and logs a 
+    warning. 
+    TODO: Raises exception or returns for nil object and object whose 
+   identity/UUID doesn't match the one of any registered objects.
+
+    TODO: Rewrite by including the following doc, make it a bit shorter and 
+    moves the details in the CoreObject guide...
+    Returns a past temporal instance of object and identified by version in the 
+    history of the current object.
+    If the requested version doesn't exist, typically by being posterior to the 
+    last version, returns nil.
+    Pass YES for mergeNow, if you want object to be automatically replaced by 
+    the temporal instance the managed object graph. Passing NO is currently 
+    discouraged: by sending messages to the temporal instance, the existing 
+    object history posterior to version can be messed up by being fully or 
+    partially overwritten. Future version of the framework could eventually 
+    return locked temporal instances to limit this kind of corruption.
+    In the rare case where -[object lastObjectVersion] and 
+    -[object objectVersion] doesn't match, you can get an temporal 
+    instance more recent than object. This should only happen if you try to 
+    call -objectByRollingbackObject:toVersion: with a temporal instance that 
+    just got returned by the method, and hasn't been merged in the object 
+    graph yet (see -anObjectject:byTemporalInstance:). You shouldn't rely on 
+    this feature since it could be removed at any point in a future version of 
+    the API. */
+- (id) objectByRollingbackObject: (id)anObject 
+                       toVersion: (int)aVersion
+                mergeImmediately: (BOOL)mergeNow
 {
+	int lastObjectVersion = [self lastVersionOfObject: anObject];
+
+	if (aVersion > lastObjectVersion)
+	{
+		ETLog(@"WARNING: Failed to roll back, the version %i is beyond the object history %i",
+			aVersion, lastObjectVersion);
+		return nil;
+	}
+	else if (aVersion == [anObject objectVersion])
+	{
+		ETLog(@"WARNING: Failed to roll back, the version matches the object passed in parameter");
+		return anObject;
+	}
+
 	int baseVersion = -1;
 	id rolledbackObject = [self lastSnapshotOfObject: anObject 
 	                                      forVersion: aVersion
@@ -432,6 +542,9 @@ static COObjectContext *defaultObjectContext = nil;
 	[self playbackInvocationsWithObject: rolledbackObject 
 	                        fromVersion: baseVersion
 	                          toVersion: aVersion];
+
+	if (mergeNow)
+		[self replaceObject: anObject byObject: rolledbackObject collectAllErrors: YES];
 
 	return rolledbackObject;
 }
@@ -527,7 +640,7 @@ static COObjectContext *defaultObjectContext = nil;
 	objects have to be fixed when the rolledback object gets inserted into the 
 	context, to replace the current temporal instance in use. A new temporal 
 	instance can be inserted into the receiver and its relationships corrected
-	by calling the method -replaceObject:byObject:. */
+	by calling the method -anObjectject:byObject:. */
 - (BOOL) shouldIgnoreChangesToObject: (id)object
 {
 	return ([self isReverting] && ([self isRolledbackObject: object] == NO));

@@ -38,6 +38,11 @@
 
 @implementation COObjectContext (TestObjectContext)
 
+- (id) objectByRollingbackObject: (id)object toVersion: (int)aVersion 
+{
+	return [self objectByRollingbackObject: object toVersion: aVersion mergeImmediately: NO];
+}
+
 - (void) testInit
 {
 	UKNotNil([[self class] defaultContext]);
@@ -145,6 +150,36 @@
 	UKObjectsEqual([object UUID], [object1v7 UUID]);
 	UKStringsEqual(@"Who knows!", [object1v7 valueForProperty: @"whoami"]);
 	UKObjectsEqual([NSArray array], [object1v7 valueForProperty: @"otherObjects"]);
+}
+
+- (void) testMerge
+{
+	COObject *object = NEW(SubObject);
+	COObject *object2 = NEW(SubObject);
+	COObject *object3 = NEW(SubObject);
+	COGroup *group = NEW(COGroup);
+	COGroup *group2 = NEW(COGroup);
+
+	UKObjectsEqual(self, [object objectContext]);
+	UKObjectsEqual(self, [group objectContext]);
+
+	[group2 addObject: object2];
+	[group addObject: object];
+	[group addGroup: group2];
+	[group2 addObject: object3];
+
+	[object setValue: @"me" forProperty: @"whoami"]; // version 1
+	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
+
+	id objectv1 = [self objectByRollingbackObject: object toVersion: 1 mergeImmediately: YES];
+	UKStringsEqual(@"me", [objectv1 valueForProperty: @"whoami"]);
+	UKObjectsEqual(A(@"New York"), [objectv1 valueForProperty: @"otherObjects"]);
+	UKFalse([[group objects] containsObject: object]);
+	UKTrue([[group objects] containsObject: objectv1]);
+	UKFalse([group containsTemporalInstance: objectv1]); // object1 shouldn't be a temporal instance once it's inserted
+	UKObjectsSame([[group objects] objectAtIndex: 0], objectv1);
+	UKFalse([[self registeredObjects] containsObject: object]);
+	UKTrue([[self registeredObjects] containsObject: objectv1]);
 }
 
 - (void) testGroupPersistency

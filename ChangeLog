@@ -1,3 +1,23 @@
+2008-10-08 Quentin Mathe <qmathe@club-internet.fr>
+
+	First part of the merge support. This allows temporal instances to replace 
+	existing instances in the object context without breaking group 
+	relationships. Temporal instances which are groups, aren't yet properly 
+	merged.
+	* COObjectContext.h:
+	* COObjectContext.m:
+	New enum COMergeResult.
+	(-lastMergeErrors): Added.
+	(-objectByRollingbackObject:toVersion:mergeImmediately:): Added an extra 
+	mergeNow parameter. Implemented most of the merge logic that belongs to 
+	COObjectContext, the rest is in COGroup.
+	* COGroup.h:
+	* COGroup.m:
+	(-containsTemporalInstance:, 
+	-replaceObject:byObject:isTemporalMerge:error:): Added.
+	* TestObjectContext.m (-objectByRollingbackObject:toVersion:, -testMerge): 
+	Added.
+
 2008-09-08 Quentin Mathe <qmathe@club-internet.fr>
 
 	* COObject.m (-_readObjectVersion1:, -propertyList):

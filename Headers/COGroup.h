@@ -8,6 +8,7 @@
 */
 
 #import "COObject.h"
+#import "COObjectContext.h"
 #import <EtoileFoundation/EtoileFoundation.h>
 
 /* CoreObject Protocol (Relationships) */
@@ -109,6 +110,17 @@ extern NSString *kCOGroupChild;
 - (id) content;
 - (NSArray *) contentArray;
 - (void) insertObject: (id)object atIndex: (unsigned int)index;
+
+/* Merging */
+
+- (BOOL) containsTemporalInstance: (id)anObject;
+- (COMergeResult) replaceObject: (id)anObject 
+                       byObject: (id)otherObject 
+                isTemporalMerge: (BOOL)temporal 
+                          error: (NSError **)error;
+/** Returns the set of the removed objects */
+//- (NSSet *) mergeObjectsWithObjectsOfGroup: (COGroup *)aGroup policy: (COGroupMergePolicy)aPolicy;
+// Merge policy: old, existing, union, intersection.
 
 /* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
 
