@@ -20,6 +20,7 @@ NSString *kCOVersionProperty = @"kCOVersionProperty";
 NSString *kCOCreationDateProperty = @"kCOCreationDateProperty";
 NSString *kCOModificationDateProperty = @"kCOModificationDateProperty";
 NSString *kCOReadOnlyProperty = @"kCOReadOnlyProperty";
+ /* Transient property (see -finishedDeserializing) */
 NSString *kCOParentsProperty = @"kCOParentsProperty";
 NSString *kCOTagProperty = @"kCOTagProperty";
 
@@ -648,8 +649,8 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	      forProperty: kCOCreationDateProperty];
 	[self setValue: [NSDate date]
 	      forProperty: kCOModificationDateProperty];
-    [self setValue: AUTORELEASE([[NSMutableArray alloc] init])
-          forProperty: kCOParentsProperty];
+    [self setValue: [NSMutableArray array]
+          forProperty: kCOParentsProperty]; /* Transient property */
 	_nc = [NSNotificationCenter defaultCenter];
 
 	/* We get the object context at the end, hence all the previous calls are 
@@ -711,19 +712,53 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	return hasEqualUUID && hasDifferentObjectVersion;
 }
 
+- (BOOL) isCoreObject
+{
+	return YES;
+}
+
+- (BOOL) isManagedCoreObject
+{
+	return YES;
+}
+
 /* Serialization (EtoileSerialize) */
 
 /** If you override this method, you must call superclass implemention before 
     your own code. */
 - (BOOL) serialize: (char *)aVariable using: (ETSerializer *)aSerializer
 {
-	//ETDebugLog(@"Try serialize %s");
+	//ETDebugLog(@"Try serialize %s in %@", aVariable, self);
 	if (strcmp(aVariable, "_nc") == 0
 	 || strcmp(aVariable, "_objectContext") == 0
 	 || strcmp(aVariable, "_objectVersion") == 0
 	 || strcmp(aVariable, "_isPersistencyEnabled") == 0)
 	{
 		return YES; /* Should not be automatically serialized (manual) */
+	}
+	if (strcmp(aVariable, "_properties") == 0)
+	{
+		/* We discard the parents array which is transient and may have become 
+		   invalid. For example, a parent group might have been deleted. 
+		   The most important issue is that we are unable to treat a 
+		   relationship change, that alter two different objects as an atomic 
+		   unit of change. This would imply to serialize/deserialize two 
+		   invocations, in a single transaction that binds the two new object 
+		   versions (in the history of each object).
+		   Moreover...
+		   Deserializing all child objects to correct their parent relationships, 
+		   would be really slow, if the group has several hundreds of children 
+		   or more. Add, remove operations would also be slow on a huge number 
+		   of objects, because this would involve to deserialize/reserialize 
+		   each moved object.
+		   We could alternatively discard kCOParentsProperty on deserialization 
+		   rather than at serialization time. */
+		NSMutableArray *parents = RETAIN([_properties objectForKey: kCOParentsProperty]);
+		[_properties setObject: [NSMutableArray array] forKey: kCOParentsProperty];
+		[aSerializer storeObjectFromAddress: &_properties withName: "_properties"];
+		[_properties setObject: parents forKey: kCOParentsProperty];
+		RELEASE(parents);
+		return YES;
 	}
 
 	return NO; /* Serializer handles the ivar */
@@ -735,7 +770,7 @@ static NSMutableSet *automaticPersistentClasses = nil;
            fromPointer: (void *)aBlob 
                version: (int)aVersion
 {
-	ETDebugLog(@"Try deserialize %s into %@ (class version %d)", aVariable, aVersion, self);
+	//ETDebugLog(@"Try deserialize %s into %@ (class version %d)", aVariable, aVersion, self);
 
 	return AUTO_DESERIALIZE;
 }
@@ -758,6 +793,13 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	_objectVersion = -1;
 	/* If we deserialize an object, it is persistent :-) */
 	_isPersistencyEnabled = YES;
+	// TODO: _properties is an invalid dictionary when this method is called.
+	// The next line results in a crash in EtoileSerialize. May be we should 
+	// improve EtoileSerialize to push back -finishedDeserializing to a point 
+	// where all objects are fully deserialized...
+	// This line should be removed later, we now handle kCOParentsProperty as 
+	// transient in -serialize:using.
+	//[_properties setObject: [NSMutableArray array] forKey: kCOParentsProperty];
 }
 
 - (void) deserializerDidFinish: (ETDeserializer *)deserializer forVersion: (int)objectVersion

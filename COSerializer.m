@@ -29,7 +29,6 @@
 
 + (Class) defaultBackendClass
 {
-	//return [ETSerializerBackendXML class];
 	return [ETSerializerBackendBinary class];
 }
 
@@ -160,23 +159,24 @@
 
 	if ([object isManagedCoreObject]) /* Store managed Core Object */
 	{
-		ETDebugLog(@"Store managed object %@ with name %s and uuid %@", 
-			object, name, [object UUID]);
-		[backend storeUUID: (char *)[[object UUID] UUIDValue] withName: name];
+		ETDebugLog(@"Store managed object %@ with name %s and uuid %-0.8x", 
+			object, name, [[object UUID] UUIDValue]);
+		[backend storeUUID: [[object UUID] UUIDValue] withName: name];
+		return ETUUIDSize;
 	}
 	else /* Store normal object */
 	{
+		ETDebugLog(@"Store object %@ with name %s", object, name);
 		if (object != nil)
 		{
 			[self enqueueObject: object];
 		}
 		[backend storeObjectReference: COREF_FROM_ID(object) withName: name];
+		/* The returned size doesn't seem to be ever used for objects, hence even 
+		   if the object isn't serialized as part of the current object graph, 
+		   everything should be fine. */
+		return sizeof(id);
 	}
-
-	/* The returned size doesn't seem to be ever used for objects, hence even 
-	   if the object isn't serialized as part of the current object graph, 
-	   everything should be fine. */
-	return sizeof(id);
 }
 
 @end

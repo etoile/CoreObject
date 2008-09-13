@@ -11,6 +11,7 @@
 #import "GNUstep.h"
 #import "COObjectContext.h"
 #import "COUtility.h"
+#import "NSObject+CoreObject.h"
 
 NSString *kCOGroupNameProperty = @"kCOGroupNameProperty";
 NSString *kCOGroupChildrenProperty = @"kCOGroupChildrenProperty";
@@ -25,6 +26,14 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 @interface COGroup (COPropertyListFormat)
 - (void) _readGroupVersion1: (NSDictionary *)propertyList;
 - (NSMutableDictionary *) _outputGroupVersion1;
+@end
+
+@interface COGroup (Private)
+- (void) _addAsParent: (COObject *) object;
+- (void) _removeAsParent: (COObject *) object;
+- (void) _replaceFaultObject: (id)aFault 
+                     inArray: (NSMutableArray *)objects 
+                  withObject: (id)resolvedObject;
 @end
 
 
@@ -404,6 +413,76 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	//END_RECORD
 
 	return COMergeResultSucceeded;
+}
+
+/** Returns whether some childen of the receiver are fault markers and not 
+    real objects. */
+- (BOOL) hasFaults
+{
+	return _hasFaults;
+}
+
+/** Resolves all the existing faults in the children of the receiver, by 
+    replacing them with the real objects they represent or by keeping them 
+    as is if no real object can be resolved. 
+    -objects automatically tries to resolve faults by calling this method.
+    An fault may not be resolved if no valid UUID/URL pair exists in the 
+    metadata server, or if the URL isn't unreachable and prevents the object to 
+    be deserialized. Until unresolved faults exist, -hasFaults will return YES 
+    and -objects will try to resolve them each time you call it. */
+- (void) resolveFaults
+{
+	if ([self hasFaults] == NO)
+		return;
+
+	// NOTE: Don't call -objects here, because it calls -resolveFaults.
+	NSMutableArray *childObjects = [self valueForProperty: kCOGroupChildrenProperty];
+	NSMutableArray *subgroupObjects = [self valueForProperty: kCOGroupSubgroupsProperty];
+	NSArray *objects = [childObjects arrayByAddingObjectsFromArray: subgroupObjects];
+	id resolvedObject = nil;
+	BOOL resolvedAllFaults = YES;
+
+	FOREACHI(objects, anObject)
+	{
+		if ([anObject isFault])
+		{
+			resolvedObject = [[self objectContext] resolvedObjectForFault: anObject];
+
+			if (resolvedObject == nil)
+			{
+				resolvedAllFaults = NO;
+				ETLog(@"NOTE: No object available for UUID %@", anObject);
+			}
+		}
+
+		// TODO: Probably replace by -isGroup...
+		if ([anObject isKindOfClass: [COGroup class]])
+		{
+			[self _replaceFaultObject: anObject inArray: subgroupObjects withObject: resolvedObject];
+		}
+		else
+		{
+			[self _replaceFaultObject: anObject inArray: childObjects withObject: resolvedObject];
+		}
+	}
+
+	if (resolvedAllFaults)
+		_hasFaults = NO;
+}
+
+- (void) _replaceFaultObject: (id)aFault 
+                     inArray: (NSMutableArray *)objects 
+                  withObject: (id)resolvedObject
+{
+	if (resolvedObject != nil)
+	{
+		int faultIndex = [objects indexOfObject: aFault];
+		[objects replaceObjectAtIndex: faultIndex withObject: resolvedObject];
+	}
+	else
+	{
+		[objects removeObject: aFault];
+	}
 }
 
 /* NSObject */

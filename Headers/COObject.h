@@ -97,6 +97,8 @@ extern NSString *pCOVersion1Value;
 - (id) init;
 //- (id) initWithURL: (NSURL *)serializationURL 
 //   inObjectContext: (COObjectContext *)context;
+- (BOOL) isCoreObject;
+- (BOOL) isManagedCoreObject;
 
 /* Managed Object Edition */
 

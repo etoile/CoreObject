@@ -10,7 +10,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <EtoileSerialize/EtoileSerialize.h>
 
-@class COMetadataServer;
+@class COMetadataServer, COObjectServer;
 
 typedef enum _COMergeResult
 {
@@ -44,6 +44,7 @@ typedef enum _COMergeResult
 + (id) defaultContext;
 
 - (COMetadataServer *) metadataServer;
+- (COObjectServer *) objectServer;
 
 /* Registering Managed Objects */
 
@@ -52,6 +53,10 @@ typedef enum _COMergeResult
 - (NSSet *) registeredObjects;
 - (NSURL *) serializationURLForObject: (id)object;
 - (BOOL) setSerializationURL: (NSURL *)url forObject: (id)object;
+
+/* Faulting */
+
+- (id) resolvedObjectForFault: (id)aFault;
 
 /* Merging */
 

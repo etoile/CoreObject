@@ -8,6 +8,7 @@
 
 #import "CODeserializer.h"
 #import "COSerializer.h"
+#import "COObjectServer.h"
 #import "NSObject+CoreObject.h"
 #import "COObject.h"
 
@@ -55,80 +56,32 @@
 	return newInstance;
 }
 
-/**
- * Find the address of an named instance variable for an object.  This searches
- * through the list of instance variables in the class structure's ivars field.
- * Since this is a simple array, this search completes in O(n) time.  This can
- * not be improved upon without maintaining an external map of names to
- * instance variables.
- */
-inline static void * addressForIVarName(id anObject, char * aName, int hint)
+/** Patches EtoileSerialize to resolve UUIDValue to a managed core object. 
+    The object is looked up in the object server which acts as a cache for 
+    all core objects in memory. If the real object isn't available in memory, an 
+    ETUUID instance is returned as a fault marker. */
+- (id) lookUpObjectForUUID: (unsigned char *)aUUIDValue
 {
-	//Find a real iVar
-	Class class = anObject->class_pointer;
-	while(class != Nil && class != class->super_class)
-	{
-		struct objc_ivar_list* ivarlist = class->ivars;
-		if(ivarlist != NULL) 
-		{
-			for(int i=0 ; i<ivarlist->ivar_count ; i++)
-			{
-				char * name = (char*)ivarlist->ivar_list[i].ivar_name;
-				if(strcmp(aName, name) == 0)
-				{
-					return ((char*)anObject + (ivarlist->ivar_list[i].ivar_offset));
-				}
-			}
-		}
-		//If the instance variable is not from this class, check the superclass.
-		class = class->super_class;
-	}
-	return NULL;
-}
+	ETUUID *uuid = [[ETUUID alloc] initWithUUID: aUUIDValue];
+	id otherManagedObject = [[COObjectServer defaultServer] cachedObjectForUUID: uuid];
+	BOOL isNotAvailableInObjectServerCache = (otherManagedObject == nil);
 
-/** Handle the deserialization of the core object identified by anUUID. */
-- (void) loadUUID: (char *)aUUID withName: (char *)aName
-{
-	ETDebugLog(@"Load CoreObject %s to name %s", aUUID, aName);
+	/* Use UUID as fault marker if the object isn't available in memory.
+	   Each group will turn faults into real objects when -objects is called. 
+	   By doing, resolved objects are automically inserted into the object 
+	   context of the first parent group that unfaults them.
+	   Here we don't touch the object context of the objects returned by the 
+	   object server. If they are cached in the object server, that's usually 
+	   means they are registered in an object context that did cache them. */
+	if (isNotAvailableInObjectServerCache)
+		otherManagedObject = uuid;
 
-	ETUUID *uuid = [[ETUUID alloc] initWithUUID: (unsigned char *)aUUID];
-	id otherManagedObject = nil;
-
-	// TODO: Uses the object server here to locate the object anywhere on disk 
-	// and requests insertion of the deserialized object into the current object 
-	// context if no other object contexts already own it. 
-	// Modify once we have proper library support and see also 
-	// -[COSerializer serializationURLForObject:]
-#if 1
-	NSURL *url = [[ETSerializer defaultLibraryURL] URLByAppendingPath: [uuid stringValue]];
-
-	otherManagedObject = [ETDeserializer deserializeObjectWithURL: url];
-#else
-	/* The object server takes care of the translation of the UUID into an URL
-	   with the help of the metadata server, deserializes it and caches it. */
-	//otherManagedObject = [[COObjectServer defaultServer] objectForUUID: uuid
-	//	ifNewInsertIntoObjectContext: [object objectContext]];
-#endif
-
-	if(![object deserialize:aName fromPointer:aUUID version:classVersion])
-	{
-		ETDebugLog(@"Set managed object %@ with uuid %s at name %s", 
-			otherManagedObject, aUUID, aName);
-		// FIXME: We doesn't handle uuids in nested types for now. Will be fixed 
-		// by moving this code back into EtoileSerialize and using OFFSET_OF_IVAR
-		// rather than just addressForIVarName
-		//char *address = OFFSET_OF_IVAR(object, aName, loadedIVar++, sizeof(id));
-		loadedIVar++;
-		char *address = addressForIVarName(object, aName, 0);
-		if(address != NULL)
-		{
-			*(id *)address = otherManagedObject;
-		}
-		else
-		{
-			*(id*)address = nil;
-		}
-	}
+	// TODO: We may want to force uncached objects to be deserialized when UUIDs 
+	// aren't in a group children, but rather in some ivar of other kinds of 
+	// objects. In such case, the resolved/deserialized object should be 
+	// inserted in the object context of 'object' variable.
+	
+	return otherManagedObject;
 }
 
 @end

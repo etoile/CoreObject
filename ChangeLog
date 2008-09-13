@@ -1,3 +1,51 @@
+2008-13-08 Quentin Mathe <qmathe@club-internet.fr>
+
+	Modified COSerializer and CODeserializer to rely on latest modifications 
+	in EtoileSerialize. Removed a large chunk of CODeserializer code that is 
+	now handled by EtoileSerialize, CODeserializer now only patches 
+	-[ETDeserializer lookUpObjectForUUID:] instead of -loadUUID:withName:. 
+	Wrote several new basic serialization related tests.
+	Added a basic in-memory cache logic for managed objects in COObjectServer. 
+	Modified COObjectContext and CODeserializer to use it on 
+	-lookUpObjectForUUID:. Added preliminary faulting support to COGroup for 
+	lazily resolving UUIDs into managed objects. This will eliminate the load of 
+	the whole of core object graph the first time a managed object is 
+	deserialized.
+	Made transient the backward relationship from objects to parent groups, but 
+	this will need more adjustements to work well.
+	* COObjectServer.h:
+	* Source/COObjectServer.m:
+	(-cacheObject:, -removeCachedObject: -cachedObjectForUUID:): Added. These 
+	methods provides the basic cache to track core objects loaded in memory.
+	* COObject.h:
+	* Source/COObject.m:
+	(-serialize:using:): Made kCOParentsProperty transient.
+	(-isCoreObject, -isManagedCoreObject): Added. We should conform to 
+	COManagedObject protocol, but in the meantime we just implement these.
+	* COSerializer.m (-storeObjectFromAddress:withName:): Tweaked a bit logging 
+	and return.
+	* CODeserializer.m:
+	(-loadUUID:withName:, addressForIVarName()): Removed. Done by moving the 
+	basic logic of -loadUUID:withName: into EtoileSerialize where it should be.
+	(-lookUpObjectForUUID:) Added. This method patches the basic one
+	implemented by ETDeserializer 
+	* TestSerializer.m 
+	Added managedObject ivar to SubBasicObject class. Added visual output for 
+	serialization and various methods to test UUID serialization/deserialization.
+	(-visualBackendClass, -visualSerialize, 
+	-testInvocationWithUUID, 
+	-testBasicObjectWithManagedObjectIVarSerialization): Added.
+	* COGroup.h:
+	* COGroup.m:
+	New ivar _hasFaults.
+	(-hasFaults:, -resolveFaults, -_replaceFaultObject:inArray:withObject:): 
+	Added.
+	* COObjectContext.h:
+	* Source/COObjectContext.m:
+	(-objectServer, -resolveObjectForFault:): Added.
+	(-registerObject:, -unregisterObject:): Updated to add and remove managed 
+	objects in the cache of the object server.
+
 2008-10-08 Quentin Mathe <qmathe@club-internet.fr>
 
 	First part of the merge support. This allows temporal instances to replace 

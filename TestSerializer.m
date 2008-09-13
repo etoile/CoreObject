@@ -13,7 +13,10 @@
 #import "COObject.h"
 #import "COSerializer.h"
 #import "CODeserializer.h"
+#import "COObjectServer.h"
 #import "COUtility.h"
+
+#define VISUAL_TEST
 
 #define TEMP_URL (NSURL *)[NSURL fileURLWithPath: @"/tmp/testManagedCoreObject"]
 #define FM [NSFileManager defaultManager]
@@ -44,6 +47,8 @@
 {
 	NSString *whoami;
 	NSMutableArray *otherObjects;
+@public
+	id managedObject;
 }
 - (NSString *) whoami;
 - (NSMutableArray *) otherObjects;
@@ -77,9 +82,8 @@ id testRoundTrip(id object)
 
 @implementation TestSerializer
 
-- (NSURL *) serialize: (id)object atURL: (NSURL *)anURL
+- (NSURL *) serialize: (id)object atURL: (NSURL *)destURL
 {
-	NSURL *destURL = (anURL != nil ? anURL : TEMP_URL);
 	id serializer = [ETSerializer defaultCoreObjectSerializerWithURL: destURL];
 
 	CREATE_AUTORELEASE_POOL(pool);
@@ -87,6 +91,21 @@ id testRoundTrip(id object)
 	DESTROY(pool);
 
 	return destURL;
+}
+
+- (Class) visualBackendClass
+{
+	return [ETSerializerBackendXML class];
+	//return [ETSerializerBackendExample class];
+}
+
+- (void) visualSerialize: (id)object
+{
+	id serializer = [ETSerializer serializerWithBackend: [self visualBackendClass] forURL: nil];
+
+	CREATE_AUTORELEASE_POOL(pool);
+	[serializer serializeObject: object withName: @"visualtest"];
+	DESTROY(pool);
 }
 
 - (id) unserializeFromURL: (NSURL *)anURL
@@ -111,7 +130,7 @@ id testRoundTrip(id object)
 
 - (id) roundTrip: (id)object
 {
-	return [self unserializeFromURL: [self serialize: object atURL: nil]];
+	return [self unserializeFromURL: [self serialize: object atURL: TEMP_URL]];
 }
 
 - (void) testBasicObjectSerialization
@@ -206,6 +225,76 @@ id testRoundTrip(id object)
 	UKObjectsNotSame(refObject1, loadedRefObject);
 }
 
+- (void) testBasicObjectWithManagedObjectIVarSerialization
+{
+	SubBasicObject *object1 = AUTORELEASE([[SubBasicObject alloc] init]);
+	id managedObject = AUTORELEASE([[SubObject alloc] init]);
+	object1->managedObject = managedObject;
+
+	/* Autmatic persistency îs disabled on SubObject class so we can carry our 
+	   tests without all the CoreObject machinery. However we must cache the 
+	   managedObject instance manually, in order to ensure -loadUUID:withName: 
+	   will find it in the managed object cache. */
+	UKNil([managedObject objectContext]);
+	[[COObjectServer defaultServer] cacheObject: managedObject];
+	UKNotNil([[COObjectServer defaultServer] cachedObjectForUUID: [managedObject UUID]]);
+
+#ifdef VISUAL_TEST
+	[self visualSerialize: object1];
+#endif
+	SubBasicObject *object2 = [self roundTrip: object1];
+
+	UKObjectsSame(managedObject, object2->managedObject);
+}
+
+- (void) dummyMethodWithUUID: (ETUUID *)anUUID { }
+
+- (void) testInvocationWithUUID
+{
+	id object1 = AUTORELEASE([[SubObject alloc] init]);
+
+	/* Test UUID object serialization */
+	id inv = [NSInvocation invocationWithTarget: self 
+	                                   selector: @selector(dummyMethodWithUUID:) 
+	                                  arguments: A([object1 UUID])];
+
+	[inv setTarget: nil];
+#ifdef VISUAL_TEST
+	[self visualSerialize: inv];
+#endif
+	id newInv = [self roundTrip: inv];
+	id newUUID = nil;
+
+	UKNil([newInv target]);
+	// FIXME: Shouldn't EtoileSerialize or GNUstep NSInvocation implementation 
+	// looks up the existing selector instead of creating a new one?
+	//UKTrue([inv selector] == [newInv selector]);
+	UKStringsEqual(NSStringFromSelector([inv selector]), NSStringFromSelector([newInv selector]));
+	/* Serializing an ETUUID instance must result in an UUID object on 
+	   deserialization the UUID must not be turned into 'object1' for example. 
+	   Only managed objects are serialized as UUIDs and then these UUIDs turned 
+	   back into objects on deserialization. */
+	[newInv getArgument: &newUUID atIndex: 2];
+	UKObjectsEqual([object1 UUID], newUUID);
+
+	/* Test managed Object to UUID serialization */
+	inv = [NSInvocation invocationWithTarget: self 
+	                                selector: @selector(dummyMethodWithUUID:) 
+	                               arguments: A(object1)];
+
+	[[COObjectServer defaultServer] cacheObject: object1];
+	[inv setTarget: nil];
+#ifdef VISUAL_TEST
+	[self visualSerialize: inv];
+#endif
+	newInv = [self roundTrip: inv];
+	id newObject1 = nil;
+
+	UKStringsEqual(NSStringFromSelector([inv selector]), NSStringFromSelector([newInv selector]));
+	[newInv getArgument: &newObject1 atIndex: 2];
+	UKObjectsSame(object1, newObject1);
+}
+
 @end
 
 
@@ -246,6 +335,7 @@ DEALLOC(DESTROY(otherObjects))
             @"otherObjects",
         nil];
     [SubObject addPropertiesAndTypes: pt];
+	[self setAutomaticallyMakeNewInstancesPersistent: NO];
 
     DESTROY(pt);
 }

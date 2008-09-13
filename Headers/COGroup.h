@@ -79,6 +79,9 @@ extern NSString *kCOGroupRemoveSubgroupNotification;
 extern NSString *kCOGroupChild;
 
 @interface COGroup: COObject <COGroup>
+{
+	BOOL _hasFaults;
+}
 
 + (BOOL) isGroupAtURL: (NSURL *)anURL;
 + (id) objectWithURL: (NSURL *)url;
@@ -121,6 +124,8 @@ extern NSString *kCOGroupChild;
 /** Returns the set of the removed objects */
 //- (NSSet *) mergeObjectsWithObjectsOfGroup: (COGroup *)aGroup policy: (COGroupMergePolicy)aPolicy;
 // Merge policy: old, existing, union, intersection.
+- (BOOL) hasFaults;
+- (void) resolveFaults;
 
 /* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
 

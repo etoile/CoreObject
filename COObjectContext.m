@@ -11,6 +11,7 @@
 #import "COGroup.h"
 #import "COSerializer.h"
 #import "COMetadataServer.h"
+#import "COObjectServer.h"
 #import "NSObject+CoreObject.h"
 
 #define AVERAGE_MANAGED_OBJECTS_COUNT 1000
@@ -72,6 +73,13 @@ static COObjectContext *defaultObjectContext = nil;
 	// TODO: Make possible to use other metadata servers rather than just the 
 	// default one. That will on the object context and object server in use. 
 	return [COMetadataServer defaultServer];
+}
+
+/** Returns the object server bound to this object context. 
+    By default, returns -[COObjectServer defaultServer]. */
+- (COObjectServer *) objectServer
+{
+	return [COObjectServer defaultServer];
 }	
 
 /* Registering Managed Objects */
@@ -92,13 +100,24 @@ static COObjectContext *defaultObjectContext = nil;
 		return;
 	}
 
+	BOOL isAlreadyCached = ([[self objectServer] cacheObject: object] == NO);
+
+	if (isAlreadyCached)
+	{
+		ETLog(@"WARNING: Object %@ has no object context but is wrongly cached "
+			"in the object server %@. Won't register it.", object, [self objectServer]);
+		return;
+	}
+	[[self objectServer] cacheObject: object];
 	[object setObjectContext: self];
 	[_registeredObjects addObject: object];
 }
 
-/** Unregisters an object so it doesn't belong anymore to the receiver. */
+/** Unregisters an object so it doesn't belong anymore to the receiver.
+    You must retain the object, otherwise it will be released. */
 - (void) unregisterObject: (id)object
 {
+	[[self objectServer] removeCachedObject: object];
 	/* Set the weak reference on the context to nil, before removing the object
 	   because it may trigger its deallocation. */
 	[object setObjectContext: nil];
@@ -154,6 +173,21 @@ static COObjectContext *defaultObjectContext = nil;
 	[[self metadataServer] setURL: url forUUID: [object UUID]];
 
 	return YES;
+}
+
+/* Faulting */
+
+/** Returns a real object by resolving the fault object passed in parameter.
+    The resolved object is automatically registered into the receiver if it 
+    isn't already. */
+- (id) resolvedObjectForFault: (id)aFault
+{
+	id cachedObject = [[self objectServer] cachedObjectForUUID: aFault];
+
+	if ([_registeredObjects containsObject: cachedObject] == NO)
+		[self registerObject: cachedObject];
+	
+	return cachedObject;
 }
 
 /** Replaces anObject registered in the receiver by another one which is 

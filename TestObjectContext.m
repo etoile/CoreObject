@@ -172,14 +172,26 @@
 	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
 
 	id objectv1 = [self objectByRollingbackObject: object toVersion: 1 mergeImmediately: YES];
+
 	UKStringsEqual(@"me", [objectv1 valueForProperty: @"whoami"]);
 	UKObjectsEqual(A(@"New York"), [objectv1 valueForProperty: @"otherObjects"]);
+return;
+	/* Test parent to child references*/
 	UKFalse([[group objects] containsObject: object]);
 	UKTrue([[group objects] containsObject: objectv1]);
-	UKFalse([group containsTemporalInstance: objectv1]); // object1 shouldn't be a temporal instance once it's inserted
+	UKFalse([group containsTemporalInstance: objectv1]); // objectv1 shouldn't be a temporal instance once it's inserted
 	UKObjectsSame([[group objects] objectAtIndex: 0], objectv1);
+
+	/* Test child to parent referencess */
+	UKTrue([[object valueForProperty: kCOParentsProperty] isEmpty]);
+	UKIntsEqual(1, [[objectv1 valueForProperty: kCOParentsProperty] count]);
+	UKTrue([[objectv1 valueForProperty: kCOParentsProperty] containsObject: group]);
+	UKIntsEqual(0, [[objectv1 valueForProperty: kCOParentsProperty] indexOfObjectIdenticalTo: group]);
+
+	/* Test context state */
 	UKFalse([[self registeredObjects] containsObject: object]);
 	UKTrue([[self registeredObjects] containsObject: objectv1]);
+
 }
 
 - (void) testGroupPersistency

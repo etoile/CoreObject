@@ -134,7 +134,7 @@ static COObjectServer *localObjectServer = nil;
 
 - (id) objectForUUID: (ETUUID *)uuid
 {
-	return nil; // FIXME: Implement
+	return [_coreObjectTable objectForKey: uuid];
 }
 
 /** Only accepts URLs with scheme uuid:// */
@@ -192,11 +192,18 @@ static COObjectServer *localObjectServer = nil;
 	}
 }
 
-/** Adds an object to the local store of the receiver.
-	This method is called by managed objects once they are initialized (before 
-	returning self at the end of the designated initializer). */
-- (void) addObject: (id)object 
-{ 
+/** Adds an object to the cache of the receiver and returns NO if it failed 
+	because the object was already cached.
+	This method is called by object contexts when managed objects are registered. */
+- (BOOL) cacheObject: (id)object 
+{
+	if ([[_coreObjectTable allValues] containsObject: object])
+		return NO;
+
+	[_coreObjectTable setObject: object forKey: [object UUID]];
+	return YES;
+
+	// TODO: Use
 	if ([object conformsToProtocol: @protocol(COManagedObject)])
 	{
 		[_coreObjectTable setObject: object forKey: [object UUID]];
@@ -207,9 +214,13 @@ static COObjectServer *localObjectServer = nil;
 	}
 }
 
-/** Removes an object from the object store of the receiver. */
-- (void) removeObject: (id)object 
+/** Removes an object from the object cache of the receiver. */
+- (void) removeCachedObject: (id)object 
 { 
+	[_coreObjectTable removeObjectForKey: [object UUID]];
+	return;
+
+	// TODO: Use
 	if ([object conformsToProtocol: @protocol(COManagedObject)])
 	{
 		[_coreObjectTable removeObjectForKey: [object UUID]];
@@ -218,6 +229,11 @@ static COObjectServer *localObjectServer = nil;
 	{
 		[_coreObjectTable removeObjectForKey: [object URL]];
 	}
+}
+
+- (id) cachedObjectForUUID: (ETUUID *)anUUID
+{
+	return [_coreObjectTable objectForKey: anUUID];
 }
 
 - (NSURL *) serializationURL

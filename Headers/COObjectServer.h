@@ -35,12 +35,17 @@
 
 - (id) initWithMetadataServer: (id)metadataServer URL: (NSURL *)url;
 
+//- (void) setUpRootGroup;
+//- (void) setUpPublishedObjectsOverDO;
+
 /* CoreObject Factory */
 
 - (id) objectForURL: (NSURL *)url;
 - (id) objectForUUID: (ETUUID *)uuid;
 - (id) managedObjectForURL: (NSURL *)url;
 - (id) distantObjectForURL: (NSURL *)url;
+
+//- (COGroup *) rootGroup;
 
 /* Registering CoreObject backend classes */
 
@@ -66,6 +71,12 @@
 //- (id) propertyList;
 //- (void) readConfigurationFromURL: (NSURL *)url;
 //- (void) writeConfigurationToURL: (NSURL *)url;
+
+/* Shared Object Cache */
+
+- (BOOL) cacheObject: (id)object;
+- (void) removeCachedObject: (id)object;
+- (id) cachedObjectForUUID: (ETUUID *)anUUID;
 
 /** Returns the serialization URL. */
 - (NSURL *) serializationURL;
