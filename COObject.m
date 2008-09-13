@@ -753,11 +753,17 @@ static NSMutableSet *automaticPersistentClasses = nil;
 		   each moved object.
 		   We could alternatively discard kCOParentsProperty on deserialization 
 		   rather than at serialization time. */
-		NSMutableArray *parents = RETAIN([_properties objectForKey: kCOParentsProperty]);
-		[_properties setObject: [NSMutableArray array] forKey: kCOParentsProperty];
-		[aSerializer storeObjectFromAddress: &_properties withName: "_properties"];
-		[_properties setObject: parents forKey: kCOParentsProperty];
-		RELEASE(parents);
+		// TODO: Benchmark persistentProperties creation cost. If this is too 
+		// slow, cache, optimize or eventually turn kCOParentsProperty into 
+		// a transient ivar... or some other clever trick.
+		// peristentProperties is also fragile currently because it relies 
+		// on the assumption that no other autorelease pools is created within 
+		// the serialization triggered by -[ETSerializer serializeObject:withName:]
+		NSMutableDictionary *persistentProperties = 
+			[[NSMutableDictionary alloc] initWithDictionary: _properties];
+		[persistentProperties setObject: [NSMutableArray array] forKey: kCOParentsProperty];
+		[aSerializer storeObjectFromAddress: &persistentProperties withName: "_properties"];
+		AUTORELEASE(persistentProperties);
 		return YES;
 	}
 

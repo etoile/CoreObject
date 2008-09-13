@@ -175,7 +175,7 @@
 
 	UKStringsEqual(@"me", [objectv1 valueForProperty: @"whoami"]);
 	UKObjectsEqual(A(@"New York"), [objectv1 valueForProperty: @"otherObjects"]);
-return;
+
 	/* Test parent to child references*/
 	UKFalse([[group objects] containsObject: object]);
 	UKTrue([[group objects] containsObject: objectv1]);
@@ -191,7 +191,6 @@ return;
 	/* Test context state */
 	UKFalse([[self registeredObjects] containsObject: object]);
 	UKTrue([[self registeredObjects] containsObject: objectv1]);
-
 }
 
 - (void) testGroupPersistency
