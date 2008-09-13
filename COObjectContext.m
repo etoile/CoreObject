@@ -19,6 +19,7 @@
 
 @interface COObject (FrameworkPrivate)
 - (void) setObjectContext: (COObjectContext *)ctxt;
+- (void) _setObjectVersion: (int)version;
 @end
 
 @interface COObjectContext (Private)
@@ -233,7 +234,6 @@ static COObjectContext *defaultObjectContext = nil;
 
 	// TODO: All the following code will have to be modified to support multiple 
 	/// object contexts per process.
-	[self snapshotObject: anObject];
 
 	/* Merge Parent References */
 	FOREACHI([self registeredObjects], managedObject)
@@ -274,8 +274,17 @@ static COObjectContext *defaultObjectContext = nil;
 		//[temporalInstance mergeObjectsWithObjectsOfGroup: anObject policy: ];
 	}
 
+	/* Swap the instances in the context */
 	[self unregisterObject: anObject];
 	[self registerObject: temporalInstance];
+
+	/* Commit the merge 
+
+	   Sync the object version and take a snaphot of the temporal instance now 
+	   in use. Right after that, both anObject and temporalInstance will reply 
+	   to -lastObjectVersion by returning [anObject objectVersion] + 1. */
+	[temporalInstance _setObjectVersion: [anObject objectVersion]];
+	[self snapshotObject: temporalInstance];
 
 	if (isTemporal)
 		[self endRevert];

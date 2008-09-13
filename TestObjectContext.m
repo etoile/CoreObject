@@ -171,10 +171,21 @@
 	[object setValue: @"me" forProperty: @"whoami"]; // version 1
 	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
 
+	/* Test Object Merge */
+
+	int objectVersionBeforeMerge = [object objectVersion];
+	int groupVersionBeforeMerge = [group objectVersion];
 	id objectv1 = [self objectByRollingbackObject: object toVersion: 1 mergeImmediately: YES];
 
+	/* Test merged object */
+	UKNotNil([objectv1 objectContext]);
 	UKStringsEqual(@"me", [objectv1 valueForProperty: @"whoami"]);
 	UKObjectsEqual(A(@"New York"), [objectv1 valueForProperty: @"otherObjects"]);
+	UKIntsEqual(objectVersionBeforeMerge + 1, [objectv1 objectVersion]); // version is incremented when the merge is committed
+
+	/* Test replaced object */
+	UKNil([object objectContext]);
+	UKIntsEqual(objectVersionBeforeMerge, [object objectVersion]);
 
 	/* Test parent to child references*/
 	UKFalse([[group objects] containsObject: object]);
@@ -187,6 +198,9 @@
 	UKIntsEqual(1, [[objectv1 valueForProperty: kCOParentsProperty] count]);
 	UKTrue([[objectv1 valueForProperty: kCOParentsProperty] containsObject: group]);
 	UKIntsEqual(0, [[objectv1 valueForProperty: kCOParentsProperty] indexOfObjectIdenticalTo: group]);
+
+	/* Test parent group */
+	UKIntsEqual(groupVersionBeforeMerge, [group objectVersion]); // just a temporal replacement, no serialization should occur
 
 	/* Test context state */
 	UKFalse([[self registeredObjects] containsObject: object]);
