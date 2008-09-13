@@ -163,7 +163,10 @@
 	UKObjectsEqual(self, [object objectContext]);
 	UKObjectsEqual(self, [group objectContext]);
 
-	[group2 addObject: object2];
+	[group2 setValue: @"blizzard" forProperty: kCOGroupNameProperty];
+	[group2 setValue: @"cloud" forProperty: kCOGroupNameProperty];
+	[group2 addObject: object2]; // version 3
+	[group2 setValue: @"tulip" forProperty: kCOGroupNameProperty];
 	[group addObject: object];
 	[group addGroup: group2];
 	[group2 addObject: object3];
@@ -205,6 +208,37 @@
 	/* Test context state */
 	UKFalse([[self registeredObjects] containsObject: object]);
 	UKTrue([[self registeredObjects] containsObject: objectv1]);
+
+	/* Test Group Merge */
+
+	groupVersionBeforeMerge = [group objectVersion];
+	int group2VersionBeforeMerge = [group2 objectVersion];
+	id group2v3 = [self objectByRollingbackObject: group2 toVersion: 3 mergeImmediately: YES];
+
+	/* Test merged object */
+	UKNotNil([group2v3 objectContext]);
+	UKStringsEqual(@"cloud", [group2v3 valueForProperty: kCOGroupNameProperty]);
+	UKObjectsEqual(A(object2), [group2v3 objects]);
+	UKIntsEqual(group2VersionBeforeMerge + 1, [group2v3 objectVersion]); // version is incremented when the merge is committed
+
+	/* Test replaced object */
+	UKNil([group2 objectContext]);
+	UKIntsEqual(group2VersionBeforeMerge, [group2 objectVersion]);
+
+	/* Test parent to child references*/
+	UKFalse([[group objects] containsObject: group2]);
+	UKTrue([[group objects] containsObject: group2v3]); // parent to child relationship is versionned by the parent in all cases
+	UKFalse([group containsTemporalInstance: group2v3]); // group2v3 shouldn't be a temporal instance once it's inserted
+	UKObjectsSame([[group subgroups] objectAtIndex: 0], group2v3);
+
+	/* Test child to parent referencess */
+	UKTrue([[group2 valueForProperty: kCOParentsProperty] isEmpty]);
+	UKIntsEqual(1, [[group2v3 valueForProperty: kCOParentsProperty] count]);
+	UKTrue([[group2v3 valueForProperty: kCOParentsProperty] containsObject: group]);
+	UKIntsEqual(0, [[group2v3 valueForProperty: kCOParentsProperty] indexOfObjectIdenticalTo: group]);
+
+	/* Test parent group */
+	UKIntsEqual(groupVersionBeforeMerge, [group objectVersion]); // just a temporal replacement, no serialization should occur
 }
 
 - (void) testGroupPersistency
