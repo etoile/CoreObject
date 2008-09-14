@@ -61,6 +61,24 @@ static COObjectServer *localObjectServer = nil;
 	return [self initWithMetadataServer: nil URL: nil];
 }
 
+// TODO: Eventually support init/save on the object server like that...
+#if 0
+- (id) initWithMetadataServer: (id)metadataServer URL: (NSURL *)serializationURL
+{
+	id existingServer = [ETDeserializer deserializeObjectWithURL: serializationURL];
+
+	if (existingServer != nil)
+	{
+		RELEASE(self);
+		return existingServer;
+	}
+	else
+	{
+		return [self _initWithMetadataServer: metadataServer URL: serializationURL];
+	}
+}
+#endif
+
 /** <init />
 	Instantiates an returns a new local object server instance that uses the 
 	metadata server and the library passed in parameter. */
@@ -247,7 +265,7 @@ static COObjectServer *localObjectServer = nil;
 	configuration. */
 - (void) save 
 { 
-	//[COSerialization serializeObject: self];
+	//[ETSerializer serializeObject: self toURL: [self serializationURL]];
 }
 
 - (void) handleError: (NSError *)error

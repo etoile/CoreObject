@@ -6,6 +6,9 @@
 
 */
 
+#ifdef ICONKIT
+#import <IconKit/IconKit.h>
+#endif
 #import "COFile.h"
 #import "COObject.h"
 #import "CODirectory.h"
@@ -196,8 +199,15 @@ DEALLOC(DESTROY(_url))
 /** Returns the icon bound to the receiver. */
 - (NSImage *) icon
 {
-	// FIXME: Use IconKit instead of NSWorkspace
+	// TODO: Not enabled for now; we shoudn't depend on either AppKit or IconKit 
+	// in the FS backend, hence the code probably needs to load IconKit as a 
+	// bundle by checking whether the current process is linked to AppKit or not.
+	// Move -icon a COFile category in EtoileUI.
+#ifdef ICONKIT
+	return [[IKIcon iconForURL: [self URL]] image];
+#else
 	return [[NSWorkspace sharedWorkspace] iconForFile: FSPATH(self)];
+#endif
 }
 
 - (void) didRemoveFromGroup: (id)group

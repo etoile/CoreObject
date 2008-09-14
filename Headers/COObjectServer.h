@@ -47,6 +47,13 @@
 
 //- (COGroup *) rootGroup;
 
+/* Libraries */
+
+//- (void) registerLibrary: (COOGroup *)aGroup forType: (NSString *)libraryType;
+//- (COGroup *) libraryForType: (NSString *)libraryType;
+//- (id) photoLibrary;
+//- (id) musicLibrary;
+
 /* Registering CoreObject backend classes */
 
 - (void) registerObjectClass: (Class)objectClass 
@@ -77,6 +84,11 @@
 - (BOOL) cacheObject: (id)object;
 - (void) removeCachedObject: (id)object;
 - (id) cachedObjectForUUID: (ETUUID *)anUUID;
+
+// TODO: In future, we may need some faulting mechanism if we browse very 
+// large object graphs as the generic ObjectManager will make possible.
+//- (BOOL) hasFaultForUUID: (ETUUID *)uuid;
+//- (void) turnCachedObjectsIntoFaultsIfNotUsed;
 
 /** Returns the serialization URL. */
 - (NSURL *) serializationURL;

@@ -23,6 +23,9 @@
 
 + (id) delegate;
 + (void) setDelegate: (id)delegate;
+// TODO: Implement
+//+ (BOOL) shouldCreateAddedObjectIfNeeded;
+//+ (void) setShouldCreateAddedObjectIfNeeded: (BOOL)flag;
 
 - (BOOL) isValidObject: (id)object;
 - (BOOL) containsObject: (id)object;
