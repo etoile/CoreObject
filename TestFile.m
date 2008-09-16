@@ -11,6 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COFile.h"
 #import "CODirectory.h"
+#import "COGroup.h"
 #import "GNUstep.h"
 
 #define FM [NSFileManager defaultManager]

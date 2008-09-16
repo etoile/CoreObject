@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import "COObject.h"
+#import "COCoreObjectProtocol.h"
 
 
 @interface COFile : NSObject <COObject>

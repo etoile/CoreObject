@@ -48,6 +48,7 @@ endif
 CoreObject_HEADER_FILES_DIR += Headers
 CoreObject_HEADER_FILES = \
 	CoreObject.h \
+	COCoreObjectProtocol.h \
 	COCollection.h \
 	COSmartGroup.h \
 	COGroup.h \

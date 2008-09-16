@@ -9,16 +9,20 @@
 
 #import "GNUstep.h"
 
+#import "NSObject+CoreObject.h"
+#import "COCoreObjectProtocol.h"
 #import "COObject.h"
 #import "COGroup.h"
+#import "COSmartGroup.h"
 #import "COCollection.h"
 #import "COMultiValue.h"
 #import "COPropertyType.h"
 #import "COFileObject.h"
+#import "COObjectServer.h"
+#import "COMetadataServer.h"
 #import "COSerializer.h"
-#if 0
 #import "CODeserializer.h"
-#endif
+#import "COObjectContext.h"
 #import "COUtility.h"
 #import "COFile.h"
 #import "CODirectory.h"

@@ -9,36 +9,11 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <EtoileSerialize/EtoileSerialize.h>
+#import "COCoreObjectProtocol.h"
 #import "COPropertyType.h"
 #import "COUtility.h"
 
 @class COObjectContext;
-
-/* CoreObject Protocol (Objects) */
-
-@protocol COObject <NSObject, NSCopying>
-- (BOOL) isCopyPromise;
-/** Returns the model properties of the receiver. 
-	Properties should encompass all model attributes and relationships that you 
-	want to publish. Your Property-Value Coding implementation will determine
-	for each one whether they are readable, writable or both.*/
-- (NSArray *) properties;
-/** Returns the metadatas of the receiver to be indexed by the metadata server. 
-	The set of metadatas may intersect or not the set of properties. */
-- (NSDictionary *) metadatas;
-//- (NSArray *) parentGroups;
-/** Returns a unique ID that can be used to recreate a previously known object 
-	by passing this value to -initWithUniqueID:.
-	The choice of the unique ID scheme is up to the class that conforms to 
-	COObject protocol. 
-	A common choice is to return the absolute string form of the URL that 
-	identifies the receiver object. 
-	The FS backend  (COFile and CODirectory) uses a combination of the related 
-	filesystem inode and device/volume identifier.
-	The Native backend (COObject and COGroup) uses an UUID. */
-- (NSString *) uniqueID;
-//- (id) initWithUniqueID:
-@end
 
 extern NSString *kCOUIDProperty; // kCOStringProperty
 extern NSString *kCOVersionProperty; // kCOIntegerProperty

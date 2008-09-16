@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import "COGroup.h"
+#import "COCoreObjectProtocol.h"
 #import "COFile.h"
 
 
