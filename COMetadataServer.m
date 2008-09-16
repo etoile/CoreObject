@@ -139,7 +139,7 @@ static COMetadataServer *metadataServer = nil;
 /** Returns the name to use for the Metadata DB specific to the current user. */
 + (NSString *) defaultDBName
 {
-	return [NSString stringWithFormat: @"%@-%s", @"coreobject", getenv("USER")];
+	return [NSString stringWithFormat: @"%@_%s", @"coreobject", getenv("USER")];
 }
 
 /** Returns the URL to use for the Metadata DB specific to the current user.

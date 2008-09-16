@@ -1,3 +1,8 @@
+2008-16-08 Quentin Mathe <qmathe@club-internet.fr>
+
+	* COMetadataServer.m (+defaultDBName): Fixed to use an underscore rather 
+	than a dash in the DB name, otherwise an SQL error arises.
+
 2008-15-08 Quentin Mathe <qmathe@club-internet.fr>
 
 	Added custom merging policies for children of groups/relationships when 
