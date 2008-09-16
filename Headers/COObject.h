@@ -83,6 +83,7 @@ extern NSString *pCOVersion1Value;
 
 /* Data Model Declaration */
 
++ (void) initialize;
 + (int) addPropertiesAndTypes: (NSDictionary *) properties;
 + (NSDictionary *) propertiesAndTypes;
 + (NSArray *) properties;
@@ -98,11 +99,14 @@ extern NSString *pCOVersion1Value;
 - (id) initWithPropertyList: (NSDictionary *) propertyList;
 - (NSMutableDictionary *) propertyList;
 
+/* Common Methods */
+
 - (id) init;
 //- (id) initWithURL: (NSURL *)serializationURL 
 //   inObjectContext: (COObjectContext *)context;
 - (BOOL) isCoreObject;
 - (BOOL) isManagedCoreObject;
+- (NSDictionary *) metadatas;
 
 /* Managed Object Edition */
 
@@ -114,6 +118,7 @@ extern NSString *pCOVersion1Value;
 - (NSArray *) parentGroups; /* Include parents of parents */
 
 - (BOOL) isReadOnly; /* Use KCOReadOnlyProperty to set read-only */
+- (int) version;
 
 /* Persistency */
 
@@ -126,8 +131,6 @@ extern NSString *pCOVersion1Value;
 + (void) setAutomaticallyMakeNewInstancesPersistent: (BOOL)flag;
 - (void) disablePersistency;
 - (void) enablePersistency;
-
-- (int) version; /* Use kCOUIDProperty to set UID */
 
 - (COObjectContext *) objectContext;
 - (BOOL) isPersistent;

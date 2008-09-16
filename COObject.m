@@ -15,6 +15,7 @@
 
 static NSMutableDictionary *propertyTypes;
 
+/* Properties */
 NSString *kCOUIDProperty = @"kCOUIDProperty";
 NSString *kCOVersionProperty = @"kCOVersionProperty";
 NSString *kCOCreationDateProperty = @"kCOCreationDateProperty";
@@ -26,6 +27,11 @@ NSString *kCOTagProperty = @"kCOTagProperty";
 
 NSString *qCOTextContent = @"qCOTextContent";
 
+/* Notifications */
+NSString *kCOObjectChangedNotification = @"kCOObjectChangedNotification";
+NSString *kCOUpdatedProperty = @"kCOUpdatedProperty";
+NSString *kCORemovedProperty = @"kCORemovedProperty";
+
 @interface COObject (FrameworkPrivate)
 - (void) setObjectContext: (COObjectContext *)ctxt;
 @end
@@ -35,46 +41,52 @@ NSString *qCOTextContent = @"qCOTextContent";
 - (NSMutableDictionary *) _outputObjectVersion1;
 @end
 
+@interface COObject (Private)
+- (NSString *) _textContent;
+@end
+
 
 @implementation COObject
-/* Private */
 
-/* Return all text for search */
-- (NSString *) _textContent
+/* Data Model Declaration */
+
+/** If you want to create a subclass of a CoreObject data model class, you 
+    should declare the new properties and types of the class by creating a 
+    dictionary with types as objects and keys as properties, then calls 
+    +addPropertiesAndTypes: with this dictionary as parameter.
+    Each type must be a NSNumber initialized with one of the type constants 
+    defined in COPropertyType.h. Each property must be a string that uniquely 
+    identify the property by its name, and whose name doesn't collide with a 
+    property inherited from superclasses. For properties, you typically declare 
+    your owns as string constants with an identifier name prefixed by 'k' and
+    suffixed by 'Property'. For example, see COObject.h which exposes all 
+    properties of the COObject data model class.
+    When you create a subclass of COObject or some other subclasses such as 
+    COGroup, you  must first call +initalize on your superclass to get all 
+    inherited properties and types registered for your subclass. This only holds 
+    for the GNU runtime though, and may change in future if CoreObject was 
+    ported to another runtime. */
++ (void) initialize
 {
-	NSMutableString *text = [[NSMutableString alloc] init];
-	NSEnumerator *e = [[[self class] properties] objectEnumerator];
-	NSString *property = nil;
-	while ((property = [e nextObject]))
-	{
-		COPropertyType type = [[self class] typeOfProperty: property];
-		switch(type)
-		{
-			case kCOStringProperty:
-			case kCOArrayProperty:
-			case kCODictionaryProperty:
-				[text appendFormat: @"%@ ", [[self valueForProperty: property] description]];
-				break;
-			case kCOMultiStringProperty:
-			case kCOMultiArrayProperty:
-			case kCOMultiDictionaryProperty:
-				{
-					COMultiValue *mv = [self valueForProperty: property];
-					int i, count = [mv count];
-					for (i = 0; i < count; i++)
-					{
-						[text appendFormat: @"%@ ", [[mv valueAtIndex: i] description]];
-					}
-				}
-				break;
-			default:
-				continue;
-		}
-	}
-	return AUTORELEASE(text);
+	NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
+		[NSNumber numberWithInt: kCOStringProperty], 
+			kCOUIDProperty,
+		[NSNumber numberWithInt: kCOIntegerProperty], 
+			kCOVersionProperty,
+		[NSNumber numberWithInt: kCODateProperty], 
+			kCOCreationDateProperty,
+		[NSNumber numberWithInt: kCODateProperty], 
+			kCOModificationDateProperty,
+		[NSNumber numberWithInt: kCOIntegerProperty], 
+			kCOReadOnlyProperty,
+		[NSNumber numberWithInt: kCOArrayProperty], 
+			kCOParentsProperty,
+		[NSNumber numberWithInt: kCOArrayProperty], 
+			kCOTagProperty,
+		nil];
+	[self addPropertiesAndTypes: pt];
+	DESTROY(pt);
 }
-
-/* End of Private */
 
 + (int) addPropertiesAndTypes: (NSDictionary *) properties
 {
@@ -161,6 +173,8 @@ NSString *qCOTextContent = @"qCOTextContent";
 		return kCOErrorInProperty;
 }
 
+/* Factory Method */
+
 + (id) objectWithPropertyList: (NSDictionary *) propertyList
 {
 	id object = nil;
@@ -173,6 +187,9 @@ NSString *qCOTextContent = @"qCOTextContent";
 	return nil;
 }
 
+/* Property List Import/Export */
+
+/** <init /> **/
 - (id) initWithPropertyList: (NSDictionary *) propertyList
 {
 	self = [self init];
@@ -203,59 +220,76 @@ NSString *qCOTextContent = @"qCOTextContent";
 	return [self _outputObjectVersion1];
 }
 
-- (COObjectContext *) objectContext
-{
-	return _objectContext;
-}
+/* Common Methods */
 
-- (void) setObjectContext: (COObjectContext *)ctxt
+- (id) init
 {
-	/* The object context is our owner and retains us. */
-	_objectContext = ctxt;
-}
+	self = [super init];
 
-- (NSDictionary *) relatedCoreObjects
-{
-//	NSDictionary *properties = [self propertyList];
-	NSMutableDictionary *relations = [NSMutableDictionary dictionary];
-#if 0
-	/* We remove parents property */
-	[properties removeObjectForKey: kCOParentsProperty];
-	/* If we have COMultiValue, save its property list */
-	NSEnumerator *e = [[properties allKeys] objectEnumerator];
-	NSString *key = nil;
-	while ((key = [e nextObject]))
+	_properties = [[NSMutableDictionary alloc] init];
+	[self setValue: [NSNumber numberWithInt: 0] 
+	      forProperty: kCOReadOnlyProperty];
+	[self setValue: [NSString UUIDString]
+	      forProperty: kCOUIDProperty];
+	[self setValue: [NSNumber numberWithInt: 0]
+	      forProperty: kCOVersionProperty];
+	[self setValue: [NSDate date]
+	      forProperty: kCOCreationDateProperty];
+	[self setValue: [NSDate date]
+	      forProperty: kCOModificationDateProperty];
+    [self setValue: [NSMutableArray array]
+          forProperty: kCOParentsProperty]; /* Transient property */
+	_nc = [NSNotificationCenter defaultCenter];
+
+	/* We get the object context at the end, hence all the previous calls are 
+	   not serialized by RECORD in -setValue:forProperty: 
+	   FIXME: Should be obtained by parameter usually. */
+	_objectVersion = -1;
+	if ([[self class] automaticallyMakeNewInstancesPersistent])
 	{
-		id value = [dict objectForKey: key];
-		if ([value isKindOfClass: [COMultiValue class]])
-		{
-			[properties setObject: [(COMultiValue *)value propertyList]
-			               forKey: key];
-		}
-		else if ([value isManagedCoreObject]) // has UUID and URL
-		{
-			[relations setObject: value forKey: [value UUID]];
-			[dict setObject: [value UUID] forKey: key];
-		}
-		else if ([value isCoreObject]) // has URL
-		{
-			[relations setObject: value forKey: [value URL]];
-			[dict setObject: [value URL] forKey: key];
-		}
+		[[COObjectContext defaultContext] registerObject: self];
+		[self enablePersistency];
 	}
+
+	return self;
+}
+
+- (void) dealloc
+{
+	DESTROY(_properties);
+	[super dealloc];
+}
+
+#if 0 // Crash due the recursive back to parent group.
+- (NSString *) description
+{
+	return [_properties description];
+}
 #endif
-	return relations;
-}
 
-- (void) loadRelatedCoreObjects: (NSDictionary *)relations
+- (BOOL) isCoreObject
 {
-
+	return YES;
 }
 
-- (void) storeRelatedCoreObjects: (NSDictionary *)relations
+- (BOOL) isManagedCoreObject
 {
-
+	return YES;
 }
+
+
+- (BOOL) isCopyPromise
+{
+	return NO;
+}
+
+// FIXME: Implement
+- (NSDictionary *) metadatas
+{
+	return nil;
+}
+
+/* Managed Object Edition */
 
 /** Returns the properties published by the receiver and accessible through 
 	Property Value Coding. The returned array includes the properties inherited 
@@ -327,15 +361,14 @@ NSString *qCOTextContent = @"qCOTextContent";
 	return ([[self valueForProperty: kCOReadOnlyProperty] intValue] == 1);
 }
 
-// TODO: Modify COObject to only rely on it and removes -uniqueID
-- (ETUUID *) UUID
-{	return AUTORELEASE([[ETUUID alloc] initWithString: [self valueForProperty: kCOUIDProperty]]);
+/** Returns the version of the object format, plays a role similar to class 
+    versioning provided by +[NSObject version]. */
+- (int) version
+{
+	return [(NSNumber *)[self valueForProperty: kCOVersionProperty] intValue];
 }
 
-- (NSString *) uniqueID
-{
-	return [self valueForProperty: kCOUIDProperty];
-}
+/* Persistency */
 
 /** Returns an array of all selectors names whose methods calls can trigger
     persistency, by handing an invocation to the object context which can in  
@@ -399,7 +432,7 @@ static NSMutableSet *automaticPersistentClasses = nil;
 {
 	if ([self objectContext] == nil)
 	{
-		ETLog(@"WARNING: %@ misses an object context to disable persistency", self);
+		//ETLog(@"WARNING: %@ misses an object context to disable persistency", self);
 	}
 
 	// NOTE: Another way would be: [_objectContext unregisterObject: self];
@@ -419,7 +452,7 @@ static NSMutableSet *automaticPersistentClasses = nil;
 {
 	if ([self objectContext] == nil)
 	{
-		ETLog(@"WARNING: %@ misses an object context to enable persistency", self);
+		//ETLog(@"WARNING: %@ misses an object context to enable persistency", self);
 	}
 	
 	// NOTE: Another way would be: [_objectContext registerObject: self];
@@ -438,11 +471,15 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	return ([self objectVersion] > -1);
 }
 
-/** Returns the version of the object format, plays a role similar to class 
-    versioning provided by +[NSObject version]. */
-- (int) version
+- (COObjectContext *) objectContext
 {
-	return [(NSNumber *)[self valueForProperty: kCOVersionProperty] intValue];
+	return _objectContext;
+}
+
+- (void) setObjectContext: (COObjectContext *)ctxt
+{
+	/* The object context is our owner and retains us. */
+	_objectContext = ctxt;
 }
 
 - (void) _setObjectVersion: (int)version
@@ -492,16 +529,50 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	return ([self objectVersion] > prevVersion);
 }
 
-- (BOOL) isCopyPromise
+/* Identity */
+
+// TODO: Modify COObject to only rely on it and removes -uniqueID
+- (ETUUID *) UUID
 {
-	return NO;
+	return AUTORELEASE([[ETUUID alloc] initWithString: [self valueForProperty: kCOUIDProperty]]);
 }
 
-// FIXME: Implement
-- (NSDictionary *) metadatas
+/** Returns a hash based on the UUID. */
+- (unsigned int) hash
 {
-	return nil;
+	return [[self valueForProperty: kCOUIDProperty] hash];
 }
+
+/** Returns whether other is equal the receiver.
+    Two managed core objects are equal if they share the same UUID and object 
+    version. 
+    See also -isTemporalInstance:. */
+- (BOOL) isEqual: (id)other
+{
+	if (other == nil || [other isKindOfClass: [self class]] == NO)
+		return NO;
+
+	BOOL hasEqualUUID = [[self valueForProperty: kCOUIDProperty] isEqual: [other valueForProperty: kCOUIDProperty]];
+	BOOL hasEqualObjectVersion = ([self objectVersion] == [other objectVersion]);
+
+	return hasEqualUUID && hasEqualObjectVersion;
+}
+
+/** Returns whether other is a temporal instance of the receiver.
+    Two objects are temporal instances of each other if they share the same 
+    UUID but differs by their object version. */
+- (BOOL) isTemporalInstance: (id)other
+{
+	if (other == nil || [other isKindOfClass: [self class]] == NO)
+		return NO;
+
+	BOOL hasEqualUUID = [[self valueForProperty: kCOUIDProperty] isEqual: [other valueForProperty: kCOUIDProperty]];
+	BOOL hasDifferentObjectVersion = ([self objectVersion] != [other objectVersion]);
+
+	return hasEqualUUID && hasDifferentObjectVersion;
+}
+
+/* Query */
 
 - (BOOL) matchesPredicate: (NSPredicate *) predicate
 {
@@ -594,132 +665,6 @@ static NSMutableSet *automaticPersistentClasses = nil;
 		}
 	}
 	return result;
-}
-
-/** If you want to create a subclass of a CoreObject data model class, you 
-    should declare the new properties and types of the class by creating a 
-    dictionary with types as objects and keys as properties, then calls 
-    +addPropertiesAndTypes: with this dictionary as parameter.
-    Each type must be a NSNumber initialized with one of the type constants 
-    defined in COPropertyType.h. Each property must be a string that uniquely 
-    identify the property by its name, and whose name doesn't collide with a 
-    property inherited from superclasses. For properties, you typically declare 
-    your owns as string constants with an identifier name prefixed by 'k' and
-    suffixed by 'Property'. For example, see COObject.h which exposes all 
-    properties of the COObject data model class.
-    When you create a subclass of COObject or some other subclasses such as 
-    COGroup, you  must first call +initalize on your superclass to get all 
-    inherited properties and types registered for your subclass. This only holds 
-    for the GNU runtime though, and may change in future if CoreObject was 
-    ported to another runtime. */
-+ (void) initialize
-{
-	NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
-		[NSNumber numberWithInt: kCOStringProperty], 
-			kCOUIDProperty,
-		[NSNumber numberWithInt: kCOIntegerProperty], 
-			kCOVersionProperty,
-		[NSNumber numberWithInt: kCODateProperty], 
-			kCOCreationDateProperty,
-		[NSNumber numberWithInt: kCODateProperty], 
-			kCOModificationDateProperty,
-		[NSNumber numberWithInt: kCOIntegerProperty], 
-			kCOReadOnlyProperty,
-		[NSNumber numberWithInt: kCOArrayProperty], 
-			kCOParentsProperty,
-		[NSNumber numberWithInt: kCOArrayProperty], 
-			kCOTagProperty,
-		nil];
-	[self addPropertiesAndTypes: pt];
-	DESTROY(pt);
-}
-
-- (id) init
-{
-	self = [super init];
-
-	_properties = [[NSMutableDictionary alloc] init];
-	[self setValue: [NSNumber numberWithInt: 0] 
-	      forProperty: kCOReadOnlyProperty];
-	[self setValue: [NSString UUIDString]
-	      forProperty: kCOUIDProperty];
-	[self setValue: [NSNumber numberWithInt: 0]
-	      forProperty: kCOVersionProperty];
-	[self setValue: [NSDate date]
-	      forProperty: kCOCreationDateProperty];
-	[self setValue: [NSDate date]
-	      forProperty: kCOModificationDateProperty];
-    [self setValue: [NSMutableArray array]
-          forProperty: kCOParentsProperty]; /* Transient property */
-	_nc = [NSNotificationCenter defaultCenter];
-
-	/* We get the object context at the end, hence all the previous calls are 
-	   not serialized by RECORD in -setValue:forProperty: 
-	   FIXME: Should be obtained by parameter usually. */
-	_objectVersion = -1;
-	if ([[self class] automaticallyMakeNewInstancesPersistent])
-	{
-		[[COObjectContext defaultContext] registerObject: self];
-		[self enablePersistency];
-	}
-
-	return self;
-}
-
-- (void) dealloc
-{
-	DESTROY(_properties);
-	[super dealloc];
-}
-#if 0 // Crash due the recursive back to parent group.
-- (NSString *) description
-{
-	return [_properties description];
-}
-#endif
-
-- (unsigned int) hash
-{
-	return [[self valueForProperty: kCOUIDProperty] hash];
-}
-
-/** Returns whether other is equal the receiver.
-    Two managed core objects are equal if they share the same UUID and object 
-    version. 
-    See also -isTemporalInstance:. */
-- (BOOL) isEqual: (id)other
-{
-	if (other == nil || [other isKindOfClass: [self class]] == NO)
-		return NO;
-
-	BOOL hasEqualUUID = [[self valueForProperty: kCOUIDProperty] isEqual: [other valueForProperty: kCOUIDProperty]];
-	BOOL hasEqualObjectVersion = ([self objectVersion] == [other objectVersion]);
-
-	return hasEqualUUID && hasEqualObjectVersion;
-}
-
-/** Returns whether other is a temporal instance of the receiver.
-    Two objects are temporal instances of each other if they share the same 
-    UUID but differs by their object version. */
-- (BOOL) isTemporalInstance: (id)other
-{
-	if (other == nil || [other isKindOfClass: [self class]] == NO)
-		return NO;
-
-	BOOL hasEqualUUID = [[self valueForProperty: kCOUIDProperty] isEqual: [other valueForProperty: kCOUIDProperty]];
-	BOOL hasDifferentObjectVersion = ([self objectVersion] != [other objectVersion]);
-
-	return hasEqualUUID && hasDifferentObjectVersion;
-}
-
-- (BOOL) isCoreObject
-{
-	return YES;
-}
-
-- (BOOL) isManagedCoreObject
-{
-	return YES;
 }
 
 /* Serialization (EtoileSerialize) */
@@ -819,7 +764,8 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	_objectVersion = objectVersion;
 }
 
-/* NSCopying */
+/* Copying */
+
 - (id) copyWithZone: (NSZone *) zone
 {
 	COObject *clone = [[[self class] allocWithZone: zone] init];
@@ -828,6 +774,7 @@ static NSMutableSet *automaticPersistentClasses = nil;
 }
 
 /* KVC */
+
 - (id) valueForKey: (NSString *) key
 {
 	/* Intercept query property */
@@ -881,8 +828,89 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	return [self valueForKey: key];
 }
 
-@end
+/* Return all text for search */
+- (NSString *) _textContent
+{
+	NSMutableString *text = [[NSMutableString alloc] init];
+	NSEnumerator *e = [[[self class] properties] objectEnumerator];
+	NSString *property = nil;
+	while ((property = [e nextObject]))
+	{
+		COPropertyType type = [[self class] typeOfProperty: property];
+		switch(type)
+		{
+			case kCOStringProperty:
+			case kCOArrayProperty:
+			case kCODictionaryProperty:
+				[text appendFormat: @"%@ ", [[self valueForProperty: property] description]];
+				break;
+			case kCOMultiStringProperty:
+			case kCOMultiArrayProperty:
+			case kCOMultiDictionaryProperty:
+				{
+					COMultiValue *mv = [self valueForProperty: property];
+					int i, count = [mv count];
+					for (i = 0; i < count; i++)
+					{
+						[text appendFormat: @"%@ ", [[mv valueAtIndex: i] description]];
+					}
+				}
+				break;
+			default:
+				continue;
+		}
+	}
+	return AUTORELEASE(text);
+}
 
-NSString *kCOObjectChangedNotification = @"kCOObjectChangedNotification";
-NSString *kCOUpdatedProperty = @"kCOUpdatedProperty";
-NSString *kCORemovedProperty = @"kCORemovedProperty";
+/* Deprecated */
+
+- (NSString *) uniqueID
+{
+	return [self valueForProperty: kCOUIDProperty];
+}
+
+- (NSDictionary *) relatedCoreObjects
+{
+//	NSDictionary *properties = [self propertyList];
+	NSMutableDictionary *relations = [NSMutableDictionary dictionary];
+#if 0
+	/* We remove parents property */
+	[properties removeObjectForKey: kCOParentsProperty];
+	/* If we have COMultiValue, save its property list */
+	NSEnumerator *e = [[properties allKeys] objectEnumerator];
+	NSString *key = nil;
+	while ((key = [e nextObject]))
+	{
+		id value = [dict objectForKey: key];
+		if ([value isKindOfClass: [COMultiValue class]])
+		{
+			[properties setObject: [(COMultiValue *)value propertyList]
+			               forKey: key];
+		}
+		else if ([value isManagedCoreObject]) // has UUID and URL
+		{
+			[relations setObject: value forKey: [value UUID]];
+			[dict setObject: [value UUID] forKey: key];
+		}
+		else if ([value isCoreObject]) // has URL
+		{
+			[relations setObject: value forKey: [value URL]];
+			[dict setObject: [value URL] forKey: key];
+		}
+	}
+#endif
+	return relations;
+}
+
+- (void) loadRelatedCoreObjects: (NSDictionary *)relations
+{
+
+}
+
+- (void) storeRelatedCoreObjects: (NSDictionary *)relations
+{
+
+}
+
+@end
