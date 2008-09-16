@@ -32,6 +32,13 @@ extern NSString *kCOGroupChild;
 + (BOOL) isGroupAtURL: (NSURL *)anURL;
 + (id) objectWithURL: (NSURL *)url;
 
+/* Data Model Declaration */
+
++ (void) initialize;
+
+/* Common Methods */
+
+- (id) init;
 - (BOOL) isGroup;
 - (BOOL) isOpaque;
 
@@ -45,8 +52,12 @@ extern NSString *kCOGroupChild;
 - (BOOL) removeGroup: (id <COGroup>)subgroup;
 - (NSArray *) groups;
 
-- (NSArray *) allObjects; /* Not group */
+- (NSArray *) allObjects;
 - (NSArray *) allGroups;
+
+/* Persistency */
+
++ (NSArray *) managedMethodNames;
 
 /* Object Graph Query */
 

@@ -54,38 +54,28 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return nil;
 }
 
-+ (NSArray *) managedMethodNames
-{
-	NSArray *methodNames = A(NSStringFromSelector(@selector(addObject:)),
-	                         NSStringFromSelector(@selector(removeObject:)),
-	                         NSStringFromSelector(@selector(addGroup:)),
-	                         NSStringFromSelector(@selector(removeGroup:)));
+/* Data Model Declaration */
 
-	return [methodNames arrayByAddingObjectsFromArray: [super managedMethodNames]];
++ (void) initialize
+{
+	/* We need to register COObject properties and types by calling super 
+	   because GNU objc runtime will not call +initialize on superclass as 
+	   NeXT runtime does. */
+	[super initialize];
+	NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
+		[NSNumber numberWithInt: kCOStringProperty], 
+			kCOGroupNameProperty,
+		[NSNumber numberWithInt: kCOArrayProperty], 
+			kCOGroupChildrenProperty,
+		[NSNumber numberWithInt: kCOArrayProperty], 
+			kCOGroupSubgroupsProperty,
+		nil];
+	[self addPropertiesAndTypes: pt];
+	DESTROY(pt);
 }
 
-/* Private */
-- (void) _addAsParent: (COObject *) object
-{
-	NSMutableArray *a = [object valueForProperty: kCOParentsProperty];
-	if (a == nil)
-	{
-		a = AUTORELEASE([[NSMutableArray alloc] init]);
-		[object setValue: a forProperty: kCOParentsProperty];
-	}
-	[a addObject: self];
-}
+/* Property List Import/Export */
 
-- (void) _removeAsParent: (COObject *) object
-{
-	NSMutableArray *a = [object valueForProperty: kCOParentsProperty];
-	if (a)
-	{
-		[a removeObject: self];
-	}
-}
-
-/* End of Private */
 - (id) initWithPropertyList: (id) propertyList
 {
 	self = [super initWithPropertyList: propertyList];
@@ -110,6 +100,22 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return [self _outputGroupVersion1];
 }
 
+/* Common Methods */
+
+/** <ini /> */
+- (id) init
+{
+	self = [super init];
+	/* Initialize children and parents property */
+	[self disablePersistency];
+	[self setValue: AUTORELEASE([[NSMutableArray alloc] init])
+	      forProperty: kCOGroupChildrenProperty];
+	[self setValue: AUTORELEASE([[NSMutableArray alloc] init])
+	      forProperty: kCOGroupSubgroupsProperty];
+	[self enablePersistency];
+	return self;
+}
+
 - (BOOL) isGroup
 {
 	return YES;
@@ -118,6 +124,28 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 - (BOOL) isOpaque
 {
 	return NO;
+}
+
+/* Managed Object Edition */
+
+- (void) _addAsParent: (COObject *) object
+{
+	NSMutableArray *a = [object valueForProperty: kCOParentsProperty];
+	if (a == nil)
+	{
+		a = AUTORELEASE([[NSMutableArray alloc] init]);
+		[object setValue: a forProperty: kCOParentsProperty];
+	}
+	[a addObject: self];
+}
+
+- (void) _removeAsParent: (COObject *) object
+{
+	NSMutableArray *a = [object valueForProperty: kCOParentsProperty];
+	if (a)
+	{
+		[a removeObject: self];
+	}
 }
 
 - (BOOL) addObject: (COObject *) object
@@ -244,20 +272,6 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return [self valueForProperty: kCOGroupSubgroupsProperty];
 }
 
-- (NSArray *) objectsMatchingPredicate: (NSPredicate *) predicate
-{
-	NSMutableSet *set = AUTORELEASE([[NSMutableSet alloc] init]);
-	NSArray *array = [self allObjects];
-	int i, count = [array count];
-	for (i = 0; i < count; i++)
-	{
-		COObject *object = [array objectAtIndex: i];
-		if ([object matchesPredicate: predicate])
-			[set addObject: object];
-	}
-	return [set allObjects];
-}
-
 - (NSArray *) allObjects
 {
 	NSMutableSet *set = AUTORELEASE([[NSMutableSet alloc] init]);
@@ -291,6 +305,36 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	}
 	return [set allObjects];
 }
+
+/* Persistency */
+
++ (NSArray *) managedMethodNames
+{
+	NSArray *methodNames = A(NSStringFromSelector(@selector(addObject:)),
+	                         NSStringFromSelector(@selector(removeObject:)),
+	                         NSStringFromSelector(@selector(addGroup:)),
+	                         NSStringFromSelector(@selector(removeGroup:)));
+
+	return [methodNames arrayByAddingObjectsFromArray: [super managedMethodNames]];
+}
+
+/* Object Graph Query */
+
+- (NSArray *) objectsMatchingPredicate: (NSPredicate *) predicate
+{
+	NSMutableSet *set = AUTORELEASE([[NSMutableSet alloc] init]);
+	NSArray *array = [self allObjects];
+	int i, count = [array count];
+	for (i = 0; i < count; i++)
+	{
+		COObject *object = [array objectAtIndex: i];
+		if ([object matchesPredicate: predicate])
+			[set addObject: object];
+	}
+	return [set allObjects];
+}
+
+/* Collection Protocol */
 
 /** Returns NO by default.
     You can override this method in your subclass, returning YES should be 
@@ -484,6 +528,8 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	}
 }
 
+/* Faulting */
+
 /** Returns whether some childen of the receiver are fault markers and not 
     real objects. */
 - (BOOL) hasFaults
@@ -554,42 +600,4 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	}
 }
 
-/* NSObject */
-+ (void) initialize
-{
-	/* We need to register COObject properties and types by calling super 
-	   because GNU objc runtime will not call +initialize on superclass as 
-	   NeXT runtime does. */
-	[super initialize];
-	NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
-		[NSNumber numberWithInt: kCOStringProperty], 
-			kCOGroupNameProperty,
-		[NSNumber numberWithInt: kCOArrayProperty], 
-			kCOGroupChildrenProperty,
-		[NSNumber numberWithInt: kCOArrayProperty], 
-			kCOGroupSubgroupsProperty,
-		nil];
-	[self addPropertiesAndTypes: pt];
-	DESTROY(pt);
-}
-
-- (id) init
-{
-	self = [super init];
-	/* Initialize children and parents property */
-	[self disablePersistency];
-	[self setValue: AUTORELEASE([[NSMutableArray alloc] init])
-	      forProperty: kCOGroupChildrenProperty];
-	[self setValue: AUTORELEASE([[NSMutableArray alloc] init])
-	      forProperty: kCOGroupSubgroupsProperty];
-	[self enablePersistency];
-	return self;
-}
-
-- (void) dealloc
-{
-	[super dealloc];
-}
-
 @end
-
