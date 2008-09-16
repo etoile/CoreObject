@@ -1,3 +1,28 @@
+2008-15-08 Quentin Mathe <qmathe@club-internet.fr>
+
+	Added custom merging policies for children of groups/relationships when 
+	old versions are rolled back. Four merge policies exist for COGroup children:
+	old children (default), existing children, union and intersection. Until 
+	now, 'old children' was the merge policy applied in all cases.
+	These merge policies can also be used to combine two groups into a single 
+	one when they aren't temporal instances of each other.
+	* Headers/COObjectContext.h:
+	* COObjectContext.m:
+	Added COChildrenMergePolicy enum and _mergePolicy ivar with related 
+	accessors.
+	(-init): Updated for initiazing _mergePolicy ivar.
+	(-replaceObject:byObject:collectAllErrors:): Modified to call 
+	-mergeObjectsWithObjectsOfGroup:policy on temporalInstance if it's a group.
+	* Headers/COGroup.h:
+	* COGroup.m:
+	(-mergeObjectsWithObjectsOfGroup:policy: -mergeArray:intoArray:policy:): 
+	Added.
+	* TestObjectContext.m (-testOldChildrenMergePolicy, 
+	-testExistingChildrenMergePolicy, -testChildrenUnionMergePolicy,
+	-testChildrenIntersectionMergePolicy): Added.
+	(-initForTest, -releaseForTest): Added to ensure we enable COGroup 
+	persistency for each test we run.
+
 2008-13-08 Quentin Mathe <qmathe@club-internet.fr>
 
 	Modified COSerializer and CODeserializer to rely on latest modifications 

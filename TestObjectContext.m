@@ -43,6 +43,18 @@
 	return [self objectByRollingbackObject: object toVersion: aVersion mergeImmediately: NO];
 }
 
+- (id) initForTest
+{
+	[COGroup setAutomaticallyMakeNewInstancesPersistent: YES];
+	return [self init];
+}
+
+- (void) releaseForTest
+{
+	[COGroup setAutomaticallyMakeNewInstancesPersistent: NO];
+	[super release];
+}
+
 - (void) testInit
 {
 	UKNotNil([[self class] defaultContext]);
@@ -152,6 +164,31 @@
 	UKObjectsEqual([NSArray array], [object1v7 valueForProperty: @"otherObjects"]);
 }
 
+#define DOC(comment)
+#define CREATE_OBJECT_GRAPH\
+	COObject *object = NEW(SubObject);\
+	COObject *object2 = NEW(SubObject);\
+	COObject *object3 = NEW(SubObject);\
+	COGroup *group = NEW(COGroup);\
+	COGroup *group2 = NEW(COGroup);\
+	COGroup *group3 = NEW(COGroup);\
+\
+	UKObjectsEqual(self, [object objectContext]);\
+	UKObjectsEqual(self, [group objectContext]);\
+\
+	[group2 setValue: @"blizzard" forProperty: kCOGroupNameProperty];\
+	[group2 setValue: @"cloud" forProperty: kCOGroupNameProperty];\
+	[group2 addObject: object2]; DOC(version 3)\
+	[group2 setValue: @"tulip" forProperty: kCOGroupNameProperty];\
+	[group addObject: object];\
+	[group addGroup: group2]; DOC(version 2)\
+	[group addGroup: group3]; DOC(version 3)\
+	[group removeGroup: group2]; DOC(version 4)\
+	[group2 addObject: object3];\
+\
+	[object setValue: @"me" forProperty: @"whoami"]; DOC(version 1)\
+	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];\
+
 - (void) testMerge
 {
 	COObject *object = NEW(SubObject);
@@ -239,6 +276,50 @@
 
 	/* Test parent group */
 	UKIntsEqual(groupVersionBeforeMerge, [group objectVersion]); // just a temporal replacement, no serialization should occur
+}
+
+- (void) testOldChildrenMergePolicy
+{
+	CREATE_OBJECT_GRAPH
+
+	/* Test Old Children Merge */
+	[self setMergePolicy: COOldChildrenMergePolicy];
+	id groupv2 = [self objectByRollingbackObject: group toVersion: 2 mergeImmediately: YES];
+
+	UKObjectsEqual(A(object, group2), [groupv2 objects]);
+}
+
+- (void) testExistingChildrenMergePolicy
+{
+	CREATE_OBJECT_GRAPH
+
+	[self setMergePolicy: COExistingChildrenMergePolicy];
+	id groupv2 = [self objectByRollingbackObject: group toVersion: 2 mergeImmediately: YES];
+
+	UKObjectsEqual(A(object, group3), [groupv2 objects]);
+}
+
+- (void) testChildrenUnionMergePolicy
+{
+	CREATE_OBJECT_GRAPH
+
+	[self setMergePolicy: COChildrenUnionMergePolicy];
+	id groupv2 = [self objectByRollingbackObject: group toVersion: 2 mergeImmediately: YES];
+
+	/* Merging isn't expected to respect the children */
+	id childrenUnionv2v4 = [NSSet setWithObjects: object, group2, group3, nil];
+	UKObjectsEqual(childrenUnionv2v4, [NSSet setWithArray: [groupv2 objects]]);
+}
+
+- (void) testChildrenIntersectionMergePolicy
+{
+	CREATE_OBJECT_GRAPH
+
+	[self setMergePolicy: COChildrenIntersectionMergePolicy];
+	id groupv2 = [self objectByRollingbackObject: group toVersion: 2 mergeImmediately: YES];
+
+	/* Merging isn't expected to respect the children, use NSSet if more than one child */
+	UKObjectsEqual(A(object), [groupv2 objects]);
 }
 
 - (void) testGroupPersistency

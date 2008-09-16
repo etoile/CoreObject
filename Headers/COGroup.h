@@ -121,9 +121,10 @@ extern NSString *kCOGroupChild;
                        byObject: (id)otherObject 
                 isTemporalMerge: (BOOL)temporal 
                           error: (NSError **)error;
-/** Returns the set of the removed objects */
-//- (NSSet *) mergeObjectsWithObjectsOfGroup: (COGroup *)aGroup policy: (COGroupMergePolicy)aPolicy;
-// Merge policy: old, existing, union, intersection.
+- (void) mergeObjectsWithObjectsOfGroup: (COGroup *)aGroup policy: (COChildrenMergePolicy)aPolicy;
+
+/* Faulting */
+
 - (BOOL) hasFaults;
 - (void) resolveFaults;
 

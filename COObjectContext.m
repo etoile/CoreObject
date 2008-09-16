@@ -51,6 +51,7 @@ static COObjectContext *defaultObjectContext = nil;
 	_delegate = nil;
 	_version = 0;
 	_uuid = [[ETUUID alloc] init];
+	_mergePolicy = COOldChildrenMergePolicy;
 
 	return self;
 }
@@ -191,6 +192,24 @@ static COObjectContext *defaultObjectContext = nil;
 	return cachedObject;
 }
 
+/* Merging */
+
+/** Returns the current merge policy for children objects when a temporal 
+    instance of a group is merged back into the receiver.
+    See COChildrenMergePolicy for details. */
+- (COChildrenMergePolicy) mergePolicy
+{
+	return _mergePolicy;
+}
+
+/** Sets the current merge policy for children objects when a temporal 
+    instance of a group is merged back into the receiver.
+   See COChildrenMergePolicy for details. */
+- (void) setMergePolicy: (COChildrenMergePolicy)aPolicy
+{
+	_mergePolicy = aPolicy;
+}
+
 /** Replaces anObject registered in the receiver by another one which is 
     usually a temporal instance, but doesn't have to. Hence you can also use 
     this method to substitute an object by another one in the object context,
@@ -236,7 +255,7 @@ static COObjectContext *defaultObjectContext = nil;
 	/// object contexts per process.
 
 	/* Merge Parent References */
-	FOREACHI([self registeredObjects], managedObject)
+	FOREACHI([self registeredObjects], managedObject) // NOTE: iterating through kCOParentsProperty of anObject could work probably
 	{
 
 		// TODO: Asks each managed object if the merge is possible before 
@@ -271,7 +290,11 @@ static COObjectContext *defaultObjectContext = nil;
 	   two objects are groups we need to merge their children references. */
 	if ([temporalInstance isKindOfClass: [COGroup class]])
 	{
-		//[temporalInstance mergeObjectsWithObjectsOfGroup: anObject policy: ];
+		[temporalInstance mergeObjectsWithObjectsOfGroup: anObject policy: [self mergePolicy]];
+		// TODO: If the temporal instance is a group, we need to fix the 
+		// kCOParentsProperty of all objects owned by this group.
+		// We could handle this on COObject, but the best is probably in
+		// -mergeObjectsWithObjectsOfGroup:policy: of COGroup.
 	}
 
 	/* Swap the instances in the context */

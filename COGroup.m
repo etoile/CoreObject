@@ -34,6 +34,9 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 - (void) _replaceFaultObject: (id)aFault 
                      inArray: (NSMutableArray *)objects 
                   withObject: (id)resolvedObject;
+- (void) mergeArray: (NSMutableArray *)existingChildren 
+          intoArray: (NSMutableArray *)oldChildren
+             policy: (COChildrenMergePolicy)aPolicy;
 @end
 
 
@@ -289,7 +292,11 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return [set allObjects];
 }
 
-// NOTE: We may want to be ordered... we return arrays for methods like -objects
+/** Returns NO by default.
+    You can override this method in your subclass, returning YES should be 
+    enough since COGroup are implictly ordered. Both kCOGroupChildrenProperty 
+    and kCOGroupSubgroupsProperty are mutable arrays. 
+    See -mergeObjectsWithObjectsOfGroup:policy for merging related issues. */
 - (BOOL) isOrdered
 {
 	return NO;
@@ -413,6 +420,68 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	//END_RECORD
 
 	return COMergeResultSucceeded;
+}
+
+/** Merges all the children of aGroup into the receiver children. The chilren 
+    are the arrays returned by -objects on both the receiver and aGroup.
+    The merge is done by applying the specified merge policy.
+    This merge policy can be set on the object context, that call backs this 
+    method when merging is necessary.
+    NOTE: union and intersection don't try to maintain the order, so you 
+    shouldn't expect the objects to be properly ordered after reverting a group.
+    This doesn't matter for a COGroup which returns NO to -isOrdered, but if 
+    your own subclass overrides it to return YES, be careful. You can
+    eventually override this method to fix the order.  */
+- (void) mergeObjectsWithObjectsOfGroup: (COGroup *)aGroup 
+                                 policy: (COChildrenMergePolicy)aPolicy
+{
+	[self mergeArray: [aGroup valueForProperty: kCOGroupChildrenProperty]
+	       intoArray: [self valueForProperty: kCOGroupChildrenProperty]
+	          policy: aPolicy];
+	[self mergeArray: [aGroup valueForProperty: kCOGroupSubgroupsProperty]
+	       intoArray: [self valueForProperty: kCOGroupSubgroupsProperty]
+	          policy: aPolicy];
+}
+
+/* Merges the first array elements into the second array by appliying the 
+   specified merge policy: 
+   - old (ignore the first array)
+   - existing (add the elements of the second array into the first array)
+   - union
+   - intersection. 
+   FIXME: union and intersection don't try to maintain the order. Not sure this 
+   will ever prove to be an issue. Eventually we could design our own 
+   NSSortedSet class as an NSArray replacement, but only for merging purpose.
+   Relying on it in other cases would make property list export/import more 
+   complex. */
+- (void) mergeArray: (NSMutableArray *)existingChildren 
+          intoArray: (NSMutableArray *)oldChildren
+             policy: (COChildrenMergePolicy)aPolicy
+{
+	switch (aPolicy)
+	{
+		case COOldChildrenMergePolicy:
+			break;
+		case COExistingChildrenMergePolicy:
+			[oldChildren setArray: existingChildren];
+			break;
+		case COChildrenUnionMergePolicy:
+		{
+			NSMutableSet *oldChildrenSet = [NSMutableSet setWithArray: oldChildren];
+
+			[oldChildrenSet unionSet: [NSSet setWithArray: existingChildren]];
+			[oldChildren setArray: [oldChildrenSet allObjects]];
+			break;
+		}
+		case COChildrenIntersectionMergePolicy:
+		{
+			NSMutableSet *oldChildrenSet = [NSMutableSet setWithArray: oldChildren];
+
+			[oldChildrenSet intersectSet: [NSSet setWithArray: existingChildren]];
+			[oldChildren setArray: [oldChildrenSet allObjects]];
+			break;
+		}
+	}
 }
 
 /** Returns whether some childen of the receiver are fault markers and not 
