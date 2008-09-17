@@ -215,7 +215,7 @@ DEALLOC()
 	This lazy behavior for the delete filesystem operation makes possible to 
 	move files accross directories (or other kind of CoreObject groups) in the 
 	following way:
-	[artDirectory removeObject: myPoemFile];
+	[artDirectory removeMember: myPoemFile];
 	[poetryDirectory addMember: myPoemFile]; */
 - (BOOL) removeMember: (id)object;
 {
@@ -299,10 +299,10 @@ DEALLOC()
 	return [self addMember: subgroup];
 }
 
-/** See -removeObject:. */
+/** See -removeMember:. */
 - (BOOL) removeGroup: (id <COGroup>)subgroup
 {
-	return [self removeObject: subgroup];
+	return [self removeMember: subgroup];
 }
 
 // FIXME: Implement
@@ -383,11 +383,11 @@ DEALLOC()
 	if (result)
 	{
 		[object willAddToGroup: self];
-		result = [parentDir removeObject: object]; /* Delete the previous hard link */
+		result = [parentDir removeMember: object]; /* Delete the previous hard link */
 	}
 #else
 	/* Handles file move with a normal move operation */
-	result = [parentDir removeObject: object];
+	result = [parentDir removeMember: object];
 	if (result)
 	{
 		/* Eventually cancel any pending removal now that a group holds it */

@@ -47,9 +47,9 @@
 	UKTrue([p1 hasPrefix: [collection location]]);
 	UKTrue([p2 hasPrefix: [collection location]]);
 
-	[collection removeObject: fo2];
+	[collection removeMember: fo2];
 	UKIntsEqual([[collection objects] count], 1);
-	[collection removeObject: fo1];
+	[collection removeMember: fo1];
 	UKIntsEqual([[collection objects] count], 0);
 	UKNil([fo1 path]);
 	UKNil([fo2 path]);
