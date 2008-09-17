@@ -45,17 +45,17 @@
     This method must call -addGroup: if anObject is a COGroup instance, or 
     eventually refuses it and only accepts group addition through -addGroup:. 
     Implementing this last behavior isn't advised though. */
-- (BOOL) addObject: (id)anObject;
+- (BOOL) addMember: (id)anObject;
 /** Removes an object from the receiver. 
     This method must call -removeGroup: if anObject is a COGroup instance, or 
     eventually refuses it and only accepts group removal through -removeGroup:. 
     Implementing this last behavior isn't advised though.  */
-- (BOOL) removeObject: (id)anObject;
+- (BOOL) removeMember: (id)anObject;
 /** Returns objects directly owned by the receiver, that includes every objects 
     and subgroups which are immediate children.
     If you refuse addition and removal of groups in -addObject: and 
     -removeObject:, you must also exclude groups from the returned array. */
-- (NSArray *) objects;
+- (NSArray *) members;
 
 /** Adds a subgroup to the receiver.
 	The class that implements this method must not call -addObject: directly.

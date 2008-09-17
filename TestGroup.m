@@ -40,22 +40,22 @@
 	COObject *o1= [[COObject alloc] init];
 	[o1 setValue: @"Home" forProperty: @"Location"];
 	[o1 setValue: [NSNumber numberWithFloat: 2.12] forProperty: @"Float"];
-	UKTrue([g addObject: o1]);
+	UKTrue([g addMember: o1]);
 
 	COObject *o2 = [[COObject alloc] init];
 	[o2 setValue: @"Office" forProperty: @"Location"];
 	[o2 setValue: [NSNumber numberWithFloat: 11.2] forProperty: @"Float"];
-	UKTrue([g addObject: o2]);
+	UKTrue([g addMember: o2]);
 
 	COObject *o3 = [[COObject alloc] init];
 	[o3 setValue: @"Vacation" forProperty: @"Location"];
 	[o3 setValue: [NSNumber numberWithFloat: 0] forProperty: @"Float"];
-	UKTrue([g addObject: o3]);
+	UKTrue([g addMember: o3]);
 
 	COObject *o4 = [[COObject alloc] init];
 	[o4 setValue: @"Factory" forProperty: @"Location"];
 	[o4 setValue: [NSNumber numberWithFloat: 20.1] forProperty: @"Float"];
-	UKTrue([g addObject: o4]);
+	UKTrue([g addMember: o4]);
 
 	NSArray *array = nil;
 	NSPredicate *p1;
@@ -120,30 +120,30 @@
 	COObject *o1= [[COObject alloc] init];
 	[o1 setValue: @"Home" forProperty: @"Location"];
 	[o1 setValue: [NSNumber numberWithFloat: 2.12] forProperty: @"Float"];
-	UKTrue([g addObject: o1]);
+	UKTrue([g addMember: o1]);
 
 	COObject *o2 = [[COObject alloc] init];
 	[o2 setValue: @"Office" forProperty: @"Location"];
 	[o2 setValue: [NSNumber numberWithFloat: 11.2] forProperty: @"Float"];
-	UKTrue([g addObject: o2]);
+	UKTrue([g addMember: o2]);
 
 	COObject *o3 = [[COObject alloc] init];
 	[o3 setValue: @"Vacation" forProperty: @"Location"];
 	[o3 setValue: [NSNumber numberWithFloat: 0] forProperty: @"Float"];
-	UKTrue([g addObject: o3]);
+	UKTrue([g addMember: o3]);
 
 	COObject *o4 = [[COObject alloc] init];
 	[o4 setValue: @"Factory" forProperty: @"Location"];
 	[o4 setValue: [NSNumber numberWithFloat: 20.1] forProperty: @"Float"];
-	UKTrue([g addObject: o4]);
+	UKTrue([g addMember: o4]);
 
-	NSArray *a = [g objects];
+	NSArray *a = [g members];
 	UKIntsEqual([a count], 4);
 	NSArray *p = [o1 parentGroups];
 	UKTrue([p containsObject: g]);
-	UKTrue([g removeObject: o3]);
+	UKTrue([g removeMember: o3]);
 	
-	// Commented out the following test because it assumes [g objects] will 
+	// Commented out the following test because it assumes [g members] will 
 	// continue to update when the group does.  
 	//UKIntsEqual([a count], 3);
 	p = [o3 parentGroups];
@@ -169,8 +169,8 @@
 	COObject *o1= [[COObject alloc] init];
 	[o1 setValue: @"Home" forProperty: @"Location"];
 	[o1 setValue: [NSNumber numberWithFloat: 2.12] forProperty: @"Float"];
-	UKTrue([g addObject: o1]);
-	UKIntsEqual([[g objects] count], 1);
+	UKTrue([g addMember: o1]);
+	UKIntsEqual([[g members] count], 1);
 
 	/* We test property list here */
 	id pl = [g propertyList];
@@ -201,7 +201,7 @@
 
 	COGroup *group = [COGroup objectWithPropertyList: pl];
 	UKTrue([group isKindOfClass: [COGroup class]]);
-	UKIntsEqual([[group objects] count], 1);
+	UKIntsEqual([[group members] count], 1);
 	UKIntsEqual([[group allGroups] count], 0);
 	UKIntsEqual([[group allObjects] count], 1);
 }
@@ -220,53 +220,53 @@
 	COObject *o1= [[COObject alloc] init];
 	[o1 setValue: @"Home" forProperty: @"Location"];
 	[o1 setValue: [NSNumber numberWithFloat: 2.12] forProperty: @"Float"];
-	UKTrue([g addObject: o1]);
-	UKIntsEqual([[g objects] count], 1);
+	UKTrue([g addMember: o1]);
+	UKIntsEqual([[g members] count], 1);
 
 	COObject *o2 = [[COObject alloc] init];
 	[o2 setValue: @"Office" forProperty: @"Location"];
 	[o2 setValue: [NSNumber numberWithFloat: 11.2] forProperty: @"Float"];
-	UKTrue([g addObject: o2]);
-	UKIntsEqual([[g objects] count], 2);
+	UKTrue([g addMember: o2]);
+	UKIntsEqual([[g members] count], 2);
 
 	COObject *o3 = [[COObject alloc] init];
 	[o3 setValue: @"Vacation" forProperty: @"Location"];
 	[o3 setValue: [NSNumber numberWithFloat: 0] forProperty: @"Float"];
-	UKTrue([g addObject: o3]);
-	UKIntsEqual([[g objects] count], 3);
+	UKTrue([g addMember: o3]);
+	UKIntsEqual([[g members] count], 3);
 
 	COObject *o4 = [[COObject alloc] init];
 	[o4 setValue: @"Factory" forProperty: @"Location"];
 	[o4 setValue: [NSNumber numberWithFloat: 20.1] forProperty: @"Float"];
-	UKTrue([g addObject: o4]);
-	UKIntsEqual([[g objects] count], 4);
+	UKTrue([g addMember: o4]);
+	UKIntsEqual([[g members] count], 4);
 
 	COGroup *g1 = [[COGroup alloc] init];
-	[g1 addObject: o1];
-	[g1 addObject: o2];
-	[g1 addObject: o3];
+	[g1 addMember: o1];
+	[g1 addMember: o2];
+	[g1 addMember: o3];
 	UKTrue([g addSubgroup: g1]);
 	UKIntsEqual([[g subgroups] count], 1);
-	UKIntsEqual([[g1 objects] count], 3);
+	UKIntsEqual([[g1 members] count], 3);
 
 	COGroup *g2 = [[COGroup alloc] init];
-	[g2 addObject: o1];
-	[g2 addObject: o4];
+	[g2 addMember: o1];
+	[g2 addMember: o4];
 	UKTrue([g addSubgroup: g2]);
 	UKIntsEqual([[g subgroups] count], 2);
-	UKIntsEqual([[g2 objects] count], 2);
+	UKIntsEqual([[g2 members] count], 2);
 
 	COGroup *g3 = [[COGroup alloc] init];
 	UKTrue([g addSubgroup: g3]);
 	UKIntsEqual([[g subgroups] count], 3);
-	UKIntsEqual([[g3 objects] count], 0);
+	UKIntsEqual([[g3 members] count], 0);
 
 	COGroup *gg1 = [[COGroup alloc] init];
 	UKTrue([g1 addSubgroup: gg1]);
-	UKIntsEqual([[g1 objects] count], 4);
+	UKIntsEqual([[g1 members] count], 4);
 	UKIntsEqual([[g1 subgroups] count], 1);
 
-	UKIntsEqual([[g objects] count], 7);
+	UKIntsEqual([[g members] count], 7);
 	UKIntsEqual([[g allObjects] count], 8);
 	UKIntsEqual([[g subgroups] count], 3);
 	UKIntsEqual([[g allGroups] count], 4);
@@ -306,7 +306,7 @@
 	}
 	COGroup *group = [COGroup objectWithPropertyList: pl];
 	UKTrue([group isKindOfClass: [COGroup class]]);
-	UKIntsEqual([[group objects] count], 7);
+	UKIntsEqual([[group members] count], 7);
 	UKIntsEqual([[group allObjects] count], 8);
 	UKIntsEqual([[group subgroups] count], 3);
 	UKIntsEqual([[group allGroups] count], 4);

@@ -1,3 +1,18 @@
+2008-17-08 Quentin Mathe <qmathe@club-internet.fr>
+
+	Renamed methods -addObject:, -removeObject:, -objects of COGroup protocol 
+	and class to eliminate conflicts with Foundation collections that don't 
+	return a boolean. This also solves the overlapping with ETCollection.
+	* Headers/COCoreObjectProtocol.h:
+	* Headers/COGroup.h:
+	* COGroup.m:
+	(-addObject:): Renamed to -addMember:.
+	(-removeObject:): Renamed -removeMember:.
+	(-objects): Renamed -members.
+	Updated documentation and kept these old methods as deprecated until all the 
+	code is updated.
+	* TestGroup.m: Updated.
+
 2008-16-08 Quentin Mathe <qmathe@club-internet.fr>
 
 	* COMetadataServer.m (+defaultDBName): Fixed to use an underscore rather 

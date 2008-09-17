@@ -149,11 +149,15 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 }
 
 /** Adds an object to the receiver children.
-    Returns YES if the object was added, NO otherwise. anObject can be rejected 
-    if it doesn't conform to
     anObject can be any objects that conform to COObject protocol, groups 
-    included. Groups must conform to COGroup that itself conforms to COObject. */
-- (BOOL) addObject: (id)object
+    included. Groups must conform to COGroup that itself conforms to COObject.
+    Returns YES if the object was added, NO otherwise. anObject will be rejected 
+    if it doesn't conform to COObject protocol, or is already a member of the 
+    receiver.
+    Subclasses can introduce additional constraints to control whether anObject 
+    should be accepted or rejected. When writing a subclass, you must call 
+    the superclass method in your implementation.  */
+- (BOOL) addMember: (id)object
 {
 	if ([object conformsToProtocol: @protocol(COGroup)])
 		return [self addGroup: (id <COGroup>)object];
@@ -181,8 +185,14 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 /** Removes an object from the receiver children.
     anObject can be any objects that conform to COObject protocol, groups 
-    included. Groups must conform to COGroup that itself conforms to COObject. */
-- (BOOL) removeObject: (id)object
+    included. Groups must conform to COGroup that itself conforms to COObject.
+    Returns YES if the object was removed, NO otherwise. anObject will be 
+    rejected if it doesn't conform to COObject protocol, or isn't a member of 
+    the receiver. 
+    Subclasses can introduce additional constraints to control whether anObject 
+    should be accepted or rejected. When writing a subclass, you must call 
+    the superclass method in your implementation. */
+- (BOOL) removeMember: (id)object
 {
 	if ([object conformsToProtocol: @protocol(COGroup)])
 		return [self removeGroup: (id <COGroup>)object];
@@ -208,7 +218,9 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return NO;
 }
 
-- (NSArray *) objects
+/** Returns the objects that belongs to the receiver.
+    Groups are included in the returned array. */
+- (NSArray *) members
 {
 	return [[self valueForProperty: kCOGroupChildrenProperty] arrayByAddingObjectsFromArray:
 	            [self valueForProperty: kCOGroupSubgroupsProperty]];
@@ -283,7 +295,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 - (NSArray *) allObjects
 {
 	NSMutableSet *set = AUTORELEASE([[NSMutableSet alloc] init]);
-	[set addObjectsFromArray: [self objects]];
+	[set addObjectsFromArray: [self members]];
 	NSArray *array = [self subgroups];
 	int i, count = [array count];
 	for (i = 0; i < count; i++)
@@ -318,8 +330,8 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 + (NSArray *) managedMethodNames
 {
-	NSArray *methodNames = A(NSStringFromSelector(@selector(addObject:)),
-	                         NSStringFromSelector(@selector(removeObject:)),
+	NSArray *methodNames = A(NSStringFromSelector(@selector(addMember:)),
+	                         NSStringFromSelector(@selector(removeMember:)),
 	                         NSStringFromSelector(@selector(addGroup:)),
 	                         NSStringFromSelector(@selector(removeGroup:)));
 
@@ -356,12 +368,12 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 - (BOOL) isEmpty
 {
-	return ([[self objects] count] == 0);
+	return ([[self members] count] == 0);
 }
 
 - (id) content
 {
-	return [self objects];
+	return [self members];
 }
 
 - (NSArray *) contentArray
@@ -372,7 +384,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 - (void) insertObject: (id)object atIndex: (unsigned int)index
 {
 	// FIXME: If we decide to return YES in -isOrdered, modify...
-	[self addObject: object];
+	[self addMember: object];
 }
 
 /* Merging */
@@ -424,7 +436,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 		return COMergeResultNone;
 	}
 
-	if ([[self objects] containsObject: anObject] == NO)
+	if ([[self members] containsObject: anObject] == NO)
 		return COMergeResultNone; // Nothing to merge in the receiver
 	//if ([self containsTemporalInstance: otherObject])
 	//	return COMergeResultNone; // Nothing to merge in the receiver
@@ -447,7 +459,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	// we need to synthetize a add and a remove invocation record here.
 	//RECORD(anObject, otherObject, NULL)
 
-	// NOTE: addObject: and -removeObject: won't work here, because 
+	// NOTE: addMember: and -removeMember: won't work here, because 
 	// IGNORE_CHANGES makes them return immediately when a revert is underway. 
 
 	/* The following code implictly set valid references to parents for 
@@ -607,5 +619,11 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 		[objects removeObject: aFault];
 	}
 }
+
+/* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
+
+- (BOOL) addObject: (id) object { return [self addMember: object]; }
+- (BOOL) removeObject: (id) object { return [self removeMember: object]; }
+- (NSArray *) objects { return [self members]; }
 
 @end

@@ -44,9 +44,9 @@ extern NSString *kCOGroupChild;
 
 /* Managed Object Edition */
 
-- (BOOL) addObject: (id) object;
-- (BOOL) removeObject: (id) object;
-- (NSArray *) objects;
+- (BOOL) addMember: (id)object;
+- (BOOL) removeMember: (id)object;
+- (NSArray *) members;
 
 - (BOOL) addGroup: (id <COGroup>)subgroup;
 - (BOOL) removeGroup: (id <COGroup>)subgroup;
@@ -69,6 +69,9 @@ extern NSString *kCOGroupChild;
 - (BOOL) isEmpty;
 - (id) content;
 - (NSArray *) contentArray;
+- (NSArray *) objects;
+- (BOOL) addObject: (id) object;
+- (BOOL) removeObject: (id) object;
 - (void) insertObject: (id)object atIndex: (unsigned int)index;
 
 /* Merging */
@@ -90,6 +93,9 @@ extern NSString *kCOGroupChild;
 - (BOOL) addSubgroup: (COGroup *) group;
 - (BOOL) removeSubgroup: (COGroup *) group;
 - (NSArray *) subgroups;
+- (BOOL) addObject: (id) object;
+- (BOOL) removeObject: (id) object;
+- (NSArray *) objects;
 
 @end
 
