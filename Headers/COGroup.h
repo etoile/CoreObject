@@ -90,9 +90,6 @@ extern NSString *kCOGroupChild;
 
 /* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
 
-- (BOOL) addSubgroup: (COGroup *) group;
-- (BOOL) removeSubgroup: (COGroup *) group;
-- (NSArray *) subgroups;
 - (BOOL) addObject: (id) object;
 - (BOOL) removeObject: (id) object;
 - (NSArray *) objects;

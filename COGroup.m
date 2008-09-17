@@ -236,22 +236,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	            [self valueForProperty: kCOGroupSubgroupsProperty]];
 }
 
-- (BOOL) addGroup: (id <COGroup>)subgroup
-{
-	return [self addSubgroup: subgroup];
-}
-
-- (BOOL) removeGroup: (id <COGroup>)subgroup
-{
-	return [self removeSubgroup: subgroup];
-}
-
-- (NSArray *) groups
-{
-	return [self subgroups];
-}
-
-- (BOOL) addSubgroup: (COGroup *) group
+- (BOOL) addGroup: (id <COGroup>)group
 {
 	NSMutableArray *a = [self valueForProperty: kCOGroupSubgroupsProperty];
 	if ([a containsObject: group] == NO)
@@ -274,7 +259,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return NO;
 }
 
-- (BOOL) removeSubgroup: (COGroup *) group
+- (BOOL) removeGroup: (id <COGroup>)group
 {
 	NSMutableArray *a = [self valueForProperty: kCOGroupSubgroupsProperty];
 	if ([a containsObject: group] == YES)
@@ -297,7 +282,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return NO;
 }
 
-- (NSArray *) subgroups
+- (NSArray *) groups
 {
 	return [self valueForProperty: kCOGroupSubgroupsProperty];
 }
