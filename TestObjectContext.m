@@ -228,10 +228,10 @@
 	UKIntsEqual(objectVersionBeforeMerge, [object objectVersion]);
 
 	/* Test parent to child references*/
-	UKFalse([[group objects] containsObject: object]);
-	UKTrue([[group objects] containsObject: objectv1]);
+	UKFalse([[group members] containsObject: object]);
+	UKTrue([[group members] containsObject: objectv1]);
 	UKFalse([group containsTemporalInstance: objectv1]); // objectv1 shouldn't be a temporal instance once it's inserted
-	UKObjectsSame([[group objects] objectAtIndex: 0], objectv1);
+	UKObjectsSame([[group members] objectAtIndex: 0], objectv1);
 
 	/* Test child to parent referencess */
 	UKTrue([[object valueForProperty: kCOParentsProperty] isEmpty]);
@@ -255,7 +255,7 @@
 	/* Test merged object */
 	UKNotNil([group2v3 objectContext]);
 	UKStringsEqual(@"cloud", [group2v3 valueForProperty: kCOGroupNameProperty]);
-	UKObjectsEqual(A(object2), [group2v3 objects]);
+	UKObjectsEqual(A(object2), [group2v3 members]);
 	UKIntsEqual(group2VersionBeforeMerge + 1, [group2v3 objectVersion]); // version is incremented when the merge is committed
 
 	/* Test replaced object */
@@ -263,8 +263,8 @@
 	UKIntsEqual(group2VersionBeforeMerge, [group2 objectVersion]);
 
 	/* Test parent to child references*/
-	UKFalse([[group objects] containsObject: group2]);
-	UKTrue([[group objects] containsObject: group2v3]); // parent to child relationship is versionned by the parent in all cases
+	UKFalse([[group members] containsObject: group2]);
+	UKTrue([[group members] containsObject: group2v3]); // parent to child relationship is versionned by the parent in all cases
 	UKFalse([group containsTemporalInstance: group2v3]); // group2v3 shouldn't be a temporal instance once it's inserted
 	UKObjectsSame([[group subgroups] objectAtIndex: 0], group2v3);
 
@@ -286,7 +286,7 @@
 	[self setMergePolicy: COOldChildrenMergePolicy];
 	id groupv2 = [self objectByRollingbackObject: group toVersion: 2 mergeImmediately: YES];
 
-	UKObjectsEqual(A(object, group2), [groupv2 objects]);
+	UKObjectsEqual(A(object, group2), [groupv2 members]);
 }
 
 - (void) testExistingChildrenMergePolicy
@@ -296,7 +296,7 @@
 	[self setMergePolicy: COExistingChildrenMergePolicy];
 	id groupv2 = [self objectByRollingbackObject: group toVersion: 2 mergeImmediately: YES];
 
-	UKObjectsEqual(A(object, group3), [groupv2 objects]);
+	UKObjectsEqual(A(object, group3), [groupv2 members]);
 }
 
 - (void) testChildrenUnionMergePolicy
@@ -308,7 +308,7 @@
 
 	/* Merging isn't expected to respect the children */
 	id childrenUnionv2v4 = [NSSet setWithObjects: object, group2, group3, nil];
-	UKObjectsEqual(childrenUnionv2v4, [NSSet setWithArray: [groupv2 objects]]);
+	UKObjectsEqual(childrenUnionv2v4, [NSSet setWithArray: [groupv2 members]]);
 }
 
 - (void) testChildrenIntersectionMergePolicy
@@ -319,7 +319,7 @@
 	id groupv2 = [self objectByRollingbackObject: group toVersion: 2 mergeImmediately: YES];
 
 	/* Merging isn't expected to respect the children, use NSSet if more than one child */
-	UKObjectsEqual(A(object), [groupv2 objects]);
+	UKObjectsEqual(A(object), [groupv2 members]);
 }
 
 - (void) testGroupPersistency
@@ -380,7 +380,7 @@
 	// Two objects with the same UUID and version don't qualify as temporal instances
 	UKFalse([group1v2 isTemporalInstance: group]);
 	// FIXME: 
-	//UKObjectsEqual([group objects], [group1v2 objects]);
+	//UKObjectsEqual([group members], [group1v2 members]);
 
 	/* Test playback rollback (move backward in time) */
 	id group1v1 = [self objectByRollingbackObject: group1v2 toVersion: 1];
@@ -393,11 +393,11 @@
 	UKTrue([group1v1 isTemporalInstance: group1v0]);
 	UKTrue([group1v1 isTemporalInstance: group]);
 	// NOTE: The next two tests only holds if -objects doesn't return subgroups
-	// UKObjectsEqual([group objects], [group1v1 objects]);
+	// UKObjectsEqual([group members], [group1v1 members]);
 	UKObjectsNotEqual([group groups], [group1v1 groups]);
 	// FIXME:
-	//UKObjectsEqual(object, [[group1v1 objects] objectAtIndex: 0]);
-	//UKObjectsSame(object, [[group1v1 objects] objectAtIndex: 0]);
+	//UKObjectsEqual(object, [[group1v1 members] objectAtIndex: 0]);
+	//UKObjectsSame(object, [[group1v1 members] objectAtIndex: 0]);
 }
 
 - (void) testDummySerialization

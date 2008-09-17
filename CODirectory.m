@@ -103,7 +103,7 @@ DEALLOC()
 	file at a subpath of the receiver URL. */
 - (BOOL) containsObject: (id)object
 {
-	return [[self objects] containsObject: object];
+	return [[self members] containsObject: object];
 }
 
 /** Will return NO and won't add the object if the represented directory doesn't 
@@ -335,12 +335,12 @@ DEALLOC()
 
 - (BOOL) isEmpty
 {
-	return ([[self objects] count] == 0);
+	return ([[self members] count] == 0);
 }
 
 - (id) content
 {
-	return [self objects];
+	return [self members];
 }
 
 - (NSArray *) contentArray

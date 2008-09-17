@@ -288,7 +288,8 @@ NSString *pCOAllGroupsKey = @"AllGroups";
 	{
 		NSMutableArray *members = [[NSMutableArray alloc] init];
 		NSMutableArray *uids = [[NSMutableArray alloc] init];
-		[members addObjectsFromArray: [g objects]];
+		[members addObjectsFromArray: [g members]];
+		 // FIXME: Shouldn't be needed anymore now that [g members] returns both objects and groups
 		[members addObjectsFromArray: [g subgroups]];
 		int i, count = [members count];
 		for (i = 0; i < count; i++)

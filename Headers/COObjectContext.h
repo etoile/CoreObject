@@ -23,7 +23,7 @@ typedef enum _COMergeResult
     policies can be used when a COGroup instance is rolled back to a past 
     version, to specify how the differences in the children between the old and 
     the existing instances must be handled at merge time. 
-    Children are returned by-[COGroup objects]. Merging is driven by 
+    Children are returned by-[COGroup members]. Merging is driven by 
     -replaceObject:byObject:collectAllErrors:. The merging policy is passed to 
     COGroup with -mergeObjectsWithObjectsOfGroup:policy:, when the rolled back 
     instance is on the verge of replacing the instance currently registered in 

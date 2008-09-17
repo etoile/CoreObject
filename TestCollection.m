@@ -38,9 +38,9 @@
 //	NSLog(@"%@", [collection pathForFileObject: fo1]);
 //	NSLog(@"%@", [collection pathForFileObject: fo2]);
 	[collection addMember: fo1];
-	UKIntsEqual([[collection objects] count], 1);
+	UKIntsEqual([[collection members] count], 1);
 	[collection addMember: fo2];
-	UKIntsEqual([[collection objects] count], 2);
+	UKIntsEqual([[collection members] count], 2);
 
 	NSString *p1 = [fo1 path];
 	NSString *p2 = [fo2 path];
@@ -48,9 +48,9 @@
 	UKTrue([p2 hasPrefix: [collection location]]);
 
 	[collection removeMember: fo2];
-	UKIntsEqual([[collection objects] count], 1);
+	UKIntsEqual([[collection members] count], 1);
 	[collection removeMember: fo1];
-	UKIntsEqual([[collection objects] count], 0);
+	UKIntsEqual([[collection members] count], 0);
 	UKNil([fo1 path]);
 	UKNil([fo2 path]);
 }

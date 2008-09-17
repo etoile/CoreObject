@@ -68,38 +68,38 @@
 	NSPredicate *p = [NSPredicate predicateWithFormat: @"%K == %@", @"Location", @"Home"];
 	[smart setPredicate: p];
 	[smart setTarget: group];
-	UKIntsEqual([[smart objects] count], 2);
+	UKIntsEqual([[smart members] count], 2);
 
 	p = [NSPredicate predicateWithFormat: @"%K == %@", @"Location", @"Office"];
 	[smart setPredicate: p];
-	UKIntsEqual([[smart objects] count], 2);
+	UKIntsEqual([[smart members] count], 2);
 
 	p = [NSPredicate predicateWithFormat: @"%K == %@", @"Float", [NSNumber numberWithFloat: 2.12]];
 	[smart setPredicate: p];
-	UKIntsEqual([[smart objects] count], 2);
+	UKIntsEqual([[smart members] count], 2);
 
 	p = [NSPredicate predicateWithFormat: @"%K < %@", @"Float", [NSNumber numberWithFloat: 4]];
 	[smart setPredicate: p];
-	UKIntsEqual([[smart objects] count], 3);
+	UKIntsEqual([[smart members] count], 3);
 
 	/* Test recursive */
 	[group addSubgroup: group];
 	p = [NSPredicate predicateWithFormat: @"%K == %@", @"Location", @"Office"];
 	[smart setPredicate: p];
-	UKIntsEqual([[smart objects] count], 2);
+	UKIntsEqual([[smart members] count], 2);
 
 	p = [NSPredicate predicateWithFormat: @"%K == %@", @"Float", [NSNumber numberWithFloat: 2.12]];
 	[smart setPredicate: p];
-	UKIntsEqual([[smart objects] count], 2);
+	UKIntsEqual([[smart members] count], 2);
 
 	p = [NSPredicate predicateWithFormat: @"%K < %@", @"Float", [NSNumber numberWithFloat: 4]];
 	[smart setPredicate: p];
-	UKIntsEqual([[smart objects] count], 3);
+	UKIntsEqual([[smart members] count], 3);
 
 	/* Test update */
 	UKTrue([o2 setValue: [NSNumber numberWithFloat: 4.12] 
 	           forProperty: @"Float"]);
-	UKIntsEqual([[smart objects] count], 2);
+	UKIntsEqual([[smart members] count], 2);
 }
 
 @end
