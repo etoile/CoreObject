@@ -56,6 +56,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 /* Data Model Declaration */
 
+/** See +[COObject initialize] */
 + (void) initialize
 {
 	/* We need to register COObject properties and types by calling super 
@@ -87,14 +88,19 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	}
 	else
 	{
-		NSLog(@"Unknown version %@", v);
-		[self dealloc];
+		ETLog(@"Unknown version %@", v);
+		[self dealloc]; // FIXME: Why is this not -release?
 		return nil;
 	}
 
 	return self;
 }
 
+/** Returns a property list representation of the core object graph connected 
+    to the receiver.
+    Depending on the cycles that exists in the object graph, the whole core 
+    object graph can be exported in the returned property list. The serialized
+    objects are all those returned by -allObjects. */
 - (NSMutableDictionary *) propertyList
 {
 	return [self _outputGroupVersion1];
@@ -102,25 +108,30 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 /* Common Methods */
 
-/** <ini /> */
+/** <init /> */
 - (id) init
 {
 	self = [super init];
 	/* Initialize children and parents property */
 	[self disablePersistency];
-	[self setValue: AUTORELEASE([[NSMutableArray alloc] init])
+	[self setValue: [NSMutableArray array]
 	      forProperty: kCOGroupChildrenProperty];
-	[self setValue: AUTORELEASE([[NSMutableArray alloc] init])
+	[self setValue: [NSMutableArray array]
 	      forProperty: kCOGroupSubgroupsProperty];
 	[self enablePersistency];
 	return self;
 }
 
+/** Returns YES by default.
+    See also COGroup protocol and NSObject+Model in EtoileFoundation. */
 - (BOOL) isGroup
 {
 	return YES;
 }
 
+/** Returns NO to indicate COGroup instances shouldn't be treated as opaque 
+    object by default.
+    -isOpaque explained in details in COGroup protocol.*/
 - (BOOL) isOpaque
 {
 	return NO;
@@ -133,8 +144,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	NSMutableArray *a = [object valueForProperty: kCOParentsProperty];
 	if (a == nil)
 	{
-		a = AUTORELEASE([[NSMutableArray alloc] init]);
-		[object setValue: a forProperty: kCOParentsProperty];
+		[object setValue: [NSMutableArray array] forProperty: kCOParentsProperty];
 	}
 	[a addObject: self];
 }
@@ -142,7 +152,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 - (void) _removeAsParent: (COObject *) object
 {
 	NSMutableArray *a = [object valueForProperty: kCOParentsProperty];
-	if (a)
+	if (a != nil)
 	{
 		[a removeObject: self];
 	}
@@ -294,7 +304,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 - (NSArray *) allObjects
 {
-	NSMutableSet *set = AUTORELEASE([[NSMutableSet alloc] init]);
+	NSMutableSet *set = [NSMutableSet set];
 	[set addObjectsFromArray: [self members]];
 	NSArray *array = [self subgroups];
 	int i, count = [array count];
@@ -311,7 +321,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 - (NSArray *) allGroups
 {
-	NSMutableSet *set = AUTORELEASE([[NSMutableSet alloc] init]);
+	NSMutableSet *set = [NSMutableSet set];
 	[set addObjectsFromArray: [self subgroups]];
 	NSArray *array = [self subgroups];
 	int i, count = [array count];
@@ -342,7 +352,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 - (NSArray *) objectsMatchingPredicate: (NSPredicate *) predicate
 {
-	NSMutableSet *set = AUTORELEASE([[NSMutableSet alloc] init]);
+	NSMutableSet *set = [NSMutableSet set];
 	NSArray *array = [self allObjects];
 	int i, count = [array count];
 	for (i = 0; i < count; i++)
@@ -357,6 +367,9 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 /* Collection Protocol */
 
 /** Returns NO by default.
+    See ETCollection protocol in EtoileFoundation.
+    You must override this method and -insertObject:atIndex:, if you write a 
+    subclass whose children are ordered.
     You can override this method in your subclass, returning YES should be 
     enough since COGroup are implictly ordered. Both kCOGroupChildrenProperty 
     and kCOGroupSubgroupsProperty are mutable arrays. 
@@ -366,24 +379,29 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return NO;
 }
 
+/** See ETCollection protocol in EtoileFoundation. */
 - (BOOL) isEmpty
 {
 	return ([[self members] count] == 0);
 }
 
+/** See ETCollection protocol in EtoileFoundation. */
 - (id) content
 {
 	return [self members];
 }
 
+/** See ETCollection protocol in EtoileFoundation. */
 - (NSArray *) contentArray
 {
 	return [self content];
 }
 
+/** See ETCollectionMutation protocol in EtoileFoundation.
+    You must override this method and -isOrdered, if you write a subclass whose 
+    children are ordered. */
 - (void) insertObject: (id)object atIndex: (unsigned int)index
 {
-	// FIXME: If we decide to return YES in -isOrdered, modify...
 	[self addMember: object];
 }
 

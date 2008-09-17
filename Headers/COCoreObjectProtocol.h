@@ -38,7 +38,8 @@
 + (BOOL) isGroupAtURL: (NSURL *)anURL;
 + (id) objectWithURL: (NSURL *)anURL;
 
-/** Must return YES to indicate the receiver is a group. */
+/** Must return YES to indicate the receiver is a group. 
+    See also NSObject+Model in EtoileFoundation. */
 - (BOOL) isGroup;
 
 /** Adds an object to the receiver. 
