@@ -53,16 +53,16 @@
 - (BOOL) removeMember: (id)anObject;
 /** Returns objects directly owned by the receiver, that includes every objects 
     and subgroups which are immediate children.
-    If you refuse addition and removal of groups in -addObject: and 
-    -removeObject:, you must also exclude groups from the returned array. */
+    If you refuse addition and removal of groups in -addMember: and 
+    -removeMember:, you must also exclude groups from the returned array. */
 - (NSArray *) members;
 
 /** Adds a subgroup to the receiver.
-	The class that implements this method must not call -addObject: directly.
-	-addObject: and -addGroup should rather call a common private method like 
-	_addObject: if they want to share their implementation.
+	The class that implements this method must not call -addMember: directly.
+	-addMember: and -addGroup should rather call a common private method like 
+	_addMember: if they want to share their implementation.
 	In many implementation cases, this method involves no other work than 
-	-addObject:. However it is useful when you want to introduce some special 
+	-addMember:. However it is useful when you want to introduce some special 
 	handling or semantic for the ownership of subgroups. For example, you could 
 	tailor it for custom indexing, storing and caching of relationships or even 
 	generate new groups for the insertion of the given subgroup. This last 
@@ -70,14 +70,15 @@
 	relationships based on existing relationships between objects and other 
 	conditions. */
 - (BOOL) addGroup: (id <COGroup>)aGroup;
-/** Removes a subgroup from the receiver. */
+/** Removes a subgroup from the receiver.
+    See -addGroup: for the implementation rules you must follow. */
 - (BOOL) removeGroup: (id <COGroup>)aGroup;
 /** Returns subgroups directly owned by the receiver, that includes every groups 
 	which are immediate children. */
 - (NSArray *) groups;
 
 /** Returns all objects belonging to this group, that includes immediate 
-    children and other descendent children, recursively returned by -objects. 
+    children and other descendent children, recursively returned by -members. 
     TODO: Add a depth limit, otherwise this method will often return the whole 
     CoreObject graph. */
 - (NSArray *) allObjects;
