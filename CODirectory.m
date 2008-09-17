@@ -328,6 +328,16 @@ DEALLOC()
 	return NO;
 }
 
+/* Object Graph Query */
+
+- (NSArray *) objectsMatchingPredicate: (NSPredicate *)aPredicate
+{
+	// TODO: May be implement... not sure though
+	return NO;
+}
+
+/* Collection Protocol */
+
 - (BOOL) isOrdered
 {
 	return NO;

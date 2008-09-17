@@ -574,12 +574,13 @@ static NSMutableSet *automaticPersistentClasses = nil;
 
 /* Query */
 
-- (BOOL) matchesPredicate: (NSPredicate *) predicate
+/** See COObject protocol. */
+- (BOOL) matchesPredicate: (NSPredicate *)aPredicate
 {
 	BOOL result = NO;
-	if ([predicate isKindOfClass: [NSCompoundPredicate class]])
+	if ([aPredicate isKindOfClass: [NSCompoundPredicate class]])
 	{
-		NSCompoundPredicate *cp = (NSCompoundPredicate *) predicate;
+		NSCompoundPredicate *cp = (NSCompoundPredicate *)aPredicate;
 		NSArray *subs = [cp subpredicates];
 		int i, count = [subs count];
 		switch ([cp compoundPredicateType])
@@ -602,12 +603,12 @@ static NSMutableSet *automaticPersistentClasses = nil;
 				}
 				break;
 			default: 
-				NSLog(@"Error: Unknown compound predicate type");
+				ETLog(@"Error: Unknown compound predicate type");
 		}
 	}
-	else if ([predicate isKindOfClass: [NSComparisonPredicate class]])
+	else if ([aPredicate isKindOfClass: [NSComparisonPredicate class]])
 	{
-		NSComparisonPredicate *cp = (NSComparisonPredicate *) predicate;
+		NSComparisonPredicate *cp = (NSComparisonPredicate *)aPredicate;
 		id lv = [[cp leftExpression] expressionValueWithObject: self context: nil];
 		id rv = [[cp rightExpression] expressionValueWithObject: self context: nil];
 		NSArray *array = nil;
@@ -660,7 +661,7 @@ static NSMutableSet *automaticPersistentClasses = nil;
 						return NO;
 					}
 				default:
-					NSLog(@"Error: Unknown predicate operator");
+					ETLog(@"Error: Unknown predicate operator");
 			}
 		}
 	}

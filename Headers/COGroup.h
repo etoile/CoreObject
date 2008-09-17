@@ -61,7 +61,7 @@ extern NSString *kCOGroupChild;
 
 /* Object Graph Query */
 
-- (NSArray *) objectsMatchingPredicate: (NSPredicate *) predicate;
+- (NSArray *) objectsMatchingPredicate: (NSPredicate *)aPredicate;
 
 /* Collection Protocol */
 

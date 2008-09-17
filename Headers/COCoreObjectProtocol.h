@@ -29,6 +29,8 @@
 	The Native backend (COObject and COGroup) uses an UUID. */
 - (NSString *) uniqueID;
 //- (id) initWithUniqueID:
+/** Returns whether the object satisfied the search query aPredicate. */
+- (BOOL) matchesPredicate: (NSPredicate *)aPredicate;
 @end
 
 /* Relationships between Objects */
@@ -98,4 +100,16 @@
 	as it wants within the code that implements the browsing of core object 
 	graphs. */
 - (BOOL) isOpaque;
+/** Returns all the elements that satisfied the search query aPredicate in the 
+    object graph connected to the receiver.
+    Applies only to the portion of the core object graph currently loaded in 
+    memory. You must deserialize no objects within this method. 
+    This method is used to provide instant-search on a limited scope of the core 
+    object graph, typically an object library edited in an Object Manager. 
+    Instant search is unlike a metadata DB query that always involve a small
+    delay, and which quickly increases with the complexity of the query. However 
+    a metadata DB query can have the whole core object graph as its search scope.
+    You must return nil and not an empty array if your subclass doesn't support 
+    searching the object graph connected to an instance. */
+- (NSArray *) objectsMatchingPredicate: (NSPredicate *)aPredicate;
 @end

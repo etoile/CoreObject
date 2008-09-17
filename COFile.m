@@ -252,6 +252,14 @@ DEALLOC(DESTROY(_url))
 	return _isCopyPromise;
 }
 
+/* Query */
+
+- (BOOL) matchesPredicate: (NSPredicate *)aPredicate
+{
+	// TODO: Implement
+	return NO;
+}
+
 @end
 
 #if 0

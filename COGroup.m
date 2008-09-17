@@ -335,17 +335,19 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 /* Object Graph Query */
 
-- (NSArray *) objectsMatchingPredicate: (NSPredicate *) predicate
+/** See COGroup protocol.
+    Override in your subclass, if you accept members which doesn't implement 
+    COObject protocol. */
+- (NSArray *) objectsMatchingPredicate: (NSPredicate *)aPredicate
 {
 	NSMutableSet *set = [NSMutableSet set];
-	NSArray *array = [self allObjects];
-	int i, count = [array count];
-	for (i = 0; i < count; i++)
+
+	FOREACH([self allObjects], object, id <COObject>)
 	{
-		COObject *object = [array objectAtIndex: i];
-		if ([object matchesPredicate: predicate])
+		if ([object matchesPredicate: aPredicate])
 			[set addObject: object];
 	}
+
 	return [set allObjects];
 }
 

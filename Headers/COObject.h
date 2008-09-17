@@ -121,7 +121,7 @@ extern NSString *pCOVersion1Value;
 
 /* Query */
 
-- (BOOL) matchesPredicate: (NSPredicate *) predicate;
+- (BOOL) matchesPredicate: (NSPredicate *)aPredicate;
 
 /* Serialization (EtoileSerialize callbacks) */
 
