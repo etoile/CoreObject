@@ -18,7 +18,6 @@
 /** Returns the metadatas of the receiver to be indexed by the metadata server. 
 	The set of metadatas may intersect or not the set of properties. */
 - (NSDictionary *) metadatas;
-//- (NSArray *) parentGroups;
 /** Returns a unique ID that can be used to recreate a previously known object 
 	by passing this value to -initWithUniqueID:.
 	The choice of the unique ID scheme is up to the class that conforms to 
@@ -36,45 +35,57 @@
 
 @protocol COGroup <COObject, ETCollection, ETCollectionMutation>
 
-+ (BOOL) isGroupAtURL: (NSURL *)url;
-+ (id) objectWithURL: (NSURL *)url;
++ (BOOL) isGroupAtURL: (NSURL *)anURL;
++ (id) objectWithURL: (NSURL *)anURL;
 
 /** Must return YES to indicate the receiver is a group. */
 - (BOOL) isGroup;
 
-/** Adds object to the receiver. 
-	This method must call -addGroup: if the object passed in paremeter is a 
-	COGroup instance. */
-- (BOOL) addObject: (id <COObject>)object;
-- (BOOL) removeObject: (id <COObject>)object;
+/** Adds an object to the receiver. 
+    This method must call -addGroup: if anObject is a COGroup instance, or 
+    eventually refuses it and only accepts group addition through -addGroup:. 
+    Implementing this last behavior isn't advised though. */
+- (BOOL) addObject: (id)anObject;
+/** Removes an object from the receiver. 
+    This method must call -removeGroup: if anObject is a COGroup instance, or 
+    eventually refuses it and only accepts group removal through -removeGroup:. 
+    Implementing this last behavior isn't advised though.  */
+- (BOOL) removeObject: (id)anObject;
 /** Returns objects directly owned by the receiver, that includes every objects 
-    and subgroups which are immediate children. */
+    and subgroups which are immediate children.
+    If you refuse addition and removal of groups in -addObject: and 
+    -removeObject:, you must also exclude groups from the returned array. */
 - (NSArray *) objects;
 
-/** Adds subgroup to the receiver.
+/** Adds a subgroup to the receiver.
 	The class that implements this method must not call -addObject: directly.
 	-addObject: and -addGroup should rather call a common private method like 
-	_addObject: if they want to share their implementation. 
-	WARNING: Documentation below needs to be refined once we have produced some 
-	concrete use cases.
+	_addObject: if they want to share their implementation.
 	In many implementation cases, this method involves no other work than 
 	-addObject:. However it is useful when you want to introduce some special 
 	handling or semantic for the ownership of subgroups. For example, you could 
-	tailor it for special indexing, storing and caching of relationships or even 
+	tailor it for custom indexing, storing and caching of relationships or even 
 	generate new groups for the insertion of the given subgroup. This last 
 	option represents the possibility to compute or generate lazily new 
 	relationships based on existing relationships between objects and other 
 	conditions. */
-- (BOOL) addGroup: (id <COGroup>)subgroup;
-/** Removes subgroup from the receiver. */
-- (BOOL) removeGroup: (id <COGroup>)subgroup;
+- (BOOL) addGroup: (id <COGroup>)aGroup;
+/** Removes a subgroup from the receiver. */
+- (BOOL) removeGroup: (id <COGroup>)aGroup;
 /** Returns subgroups directly owned by the receiver, that includes every groups 
 	which are immediate children. */
 - (NSArray *) groups;
 
 /** Returns all objects belonging to this group, that includes immediate 
-	children returned by -objects and other descendent children. */
-- (NSArray *) allObjects; /* Not group */
+    children and other descendent children, recursively returned by -objects. 
+    TODO: Add a depth limit, otherwise this method will often return the whole 
+    CoreObject graph. */
+- (NSArray *) allObjects;
+/** Returns all subgroups belonging to this group, that includes immediate 
+    children and other descendent children, recursively returned by 
+    -valueForProperty: kCOGroupSubgroupsProperty.
+    TODO: Add a depth limit, otherwise this method will often return all the 
+    nodes that make up the goreObject graph.  */
 - (NSArray *) allGroups;
 
 /** Returns YES when the receiver should be handled and displayed as a COObject 

@@ -148,7 +148,12 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	}
 }
 
-- (BOOL) addObject: (COObject *) object
+/** Adds an object to the receiver children.
+    Returns YES if the object was added, NO otherwise. anObject can be rejected 
+    if it doesn't conform to
+    anObject can be any objects that conform to COObject protocol, groups 
+    included. Groups must conform to COGroup that itself conforms to COObject. */
+- (BOOL) addObject: (id)object
 {
 	if ([object conformsToProtocol: @protocol(COGroup)])
 		return [self addGroup: (id <COGroup>)object];
@@ -174,7 +179,10 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return NO;
 }
 
-- (BOOL) removeObject: (COObject *) object
+/** Removes an object from the receiver children.
+    anObject can be any objects that conform to COObject protocol, groups 
+    included. Groups must conform to COGroup that itself conforms to COObject. */
+- (BOOL) removeObject: (id)object
 {
 	if ([object conformsToProtocol: @protocol(COGroup)])
 		return [self removeGroup: (id <COGroup>)object];

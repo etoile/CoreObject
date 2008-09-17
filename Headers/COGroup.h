@@ -44,8 +44,8 @@ extern NSString *kCOGroupChild;
 
 /* Managed Object Edition */
 
-- (BOOL) addObject: (COObject *) object;
-- (BOOL) removeObject: (COObject *) object;
+- (BOOL) addObject: (id) object;
+- (BOOL) removeObject: (id) object;
 - (NSArray *) objects;
 
 - (BOOL) addGroup: (id <COGroup>)subgroup;
