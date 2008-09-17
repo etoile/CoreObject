@@ -55,7 +55,7 @@ DEALLOC(DESTROY(_url))
 /** Returns a new instance pointing to the same URL than the receiver but 
 	declared as a copy promise. 
 	If you add a copy promise to a CODirectory, the file pointed by the URL 
-	will get copied inside the directory to which you send -addObject:. */
+	will get copied inside the directory to which you send -addMember:. */
 - (id) copyWithZone: (NSZone *)zone
 {
 	return [[[self class] alloc] initWithURL: [self URL] isCopyPromise: YES];
@@ -216,7 +216,7 @@ DEALLOC(DESTROY(_url))
 }
 
 /** Adjusts the URL of the receiver and turns a copy promise into a normal 
-	object usually once the copy has been handled by -[CODirectory addObject:].
+	object usually once the copy has been handled by -[CODirectory addMember:].
 	You must not call this method unless you write a COGroup conforming class. */
 - (void) didAddToGroup: (id)group
 {

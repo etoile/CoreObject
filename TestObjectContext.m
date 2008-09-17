@@ -178,13 +178,13 @@
 \
 	[group2 setValue: @"blizzard" forProperty: kCOGroupNameProperty];\
 	[group2 setValue: @"cloud" forProperty: kCOGroupNameProperty];\
-	[group2 addObject: object2]; DOC(version 3)\
+	[group2 addMember: object2]; DOC(version 3)\
 	[group2 setValue: @"tulip" forProperty: kCOGroupNameProperty];\
-	[group addObject: object];\
+	[group addMember: object];\
 	[group addGroup: group2]; DOC(version 2)\
 	[group addGroup: group3]; DOC(version 3)\
 	[group removeGroup: group2]; DOC(version 4)\
-	[group2 addObject: object3];\
+	[group2 addMember: object3];\
 \
 	[object setValue: @"me" forProperty: @"whoami"]; DOC(version 1)\
 	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];\
@@ -202,11 +202,11 @@
 
 	[group2 setValue: @"blizzard" forProperty: kCOGroupNameProperty];
 	[group2 setValue: @"cloud" forProperty: kCOGroupNameProperty];
-	[group2 addObject: object2]; // version 3
+	[group2 addMember: object2]; // version 3
 	[group2 setValue: @"tulip" forProperty: kCOGroupNameProperty];
-	[group addObject: object];
+	[group addMember: object];
 	[group addGroup: group2];
-	[group2 addObject: object3];
+	[group2 addMember: object3];
 
 	[object setValue: @"me" forProperty: @"whoami"]; // version 1
 	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
@@ -336,8 +336,8 @@
 	UKIntsEqual(-1, [group objectVersion]);
 	UKIntsEqual(-1, [group2 objectVersion]);
 
-	[group2 addObject: object2];
-	[group addObject: object];
+	[group2 addMember: object2];
+	[group addMember: object];
 
 	UKIntsEqual(-1, [object objectVersion]);
 	UKIntsEqual(1, [group objectVersion]);
@@ -348,7 +348,7 @@
 	UKIntsEqual(2, [group objectVersion]);
 	UKIntsEqual(1, [group2 objectVersion]);
 
-	[group2 addObject: object3];
+	[group2 addMember: object3];
 
 	UKIntsEqual(2, [group2 objectVersion]);
 

@@ -216,13 +216,13 @@ DEALLOC()
 	move files accross directories (or other kind of CoreObject groups) in the 
 	following way:
 	[artDirectory removeObject: myPoemFile];
-	[poetryDirectory addObject: myPoemFile]; */
+	[poetryDirectory addMember: myPoemFile]; */
 - (BOOL) removeMember: (id)object;
 {
 	if ([self checkObjectToBeRemovedOrDeleted: object])
 		return NO;
 
-	BOOL result = [[CODirectory trashDirectory] addObject: object];
+	BOOL result = [[CODirectory trashDirectory] addMember: object];
 	[object didRemoveFromGroup: self];
 
 	return result;
@@ -293,10 +293,10 @@ DEALLOC()
 	return YES;
 }
 
-/** See -addObject:. */
+/** See -addMember:. */
 - (BOOL) addGroup: (id <COGroup>)subgroup
 {
-	return [self addObject: subgroup];
+	return [self addMember: subgroup];
 }
 
 /** See -removeObject:. */
@@ -350,7 +350,7 @@ DEALLOC()
 
 - (void) insertObject: (id)object atIndex: (unsigned int)index
 {
-	[self addObject: object];
+	[self addMember: object];
 }
 
 // FIXME: Shouldn't return a boolean.

@@ -59,10 +59,10 @@
 	           forProperty: @"Float"]);
 
 	COGroup *group = [[COGroup alloc] init];
-	UKTrue([group addObject: o1]);
-	UKTrue([group addObject: o2]);
-	UKTrue([group addObject: o3]);
-	UKTrue([group addObject: o4]);
+	UKTrue([group addMember: o1]);
+	UKTrue([group addMember: o2]);
+	UKTrue([group addMember: o3]);
+	UKTrue([group addMember: o4]);
 
 	COSmartGroup *smart = [[COSmartGroup alloc] init];
 	NSPredicate *p = [NSPredicate predicateWithFormat: @"%K == %@", @"Location", @"Home"];

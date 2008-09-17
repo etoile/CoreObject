@@ -191,7 +191,7 @@ NSString *pCOAllGroupsKey = @"AllGroups";
 			}
 			else if ([object isKindOfClass: [COObject class]])
 			{
-				[group addObject: object];
+				[group addMember: object];
 			}
 			else
 			{

@@ -37,9 +37,9 @@
 	UKTrue(isDir);
 //	NSLog(@"%@", [collection pathForFileObject: fo1]);
 //	NSLog(@"%@", [collection pathForFileObject: fo2]);
-	[collection addObject: fo1];
+	[collection addMember: fo1];
 	UKIntsEqual([[collection objects] count], 1);
-	[collection addObject: fo2];
+	[collection addMember: fo2];
 	UKIntsEqual([[collection objects] count], 2);
 
 	NSString *p1 = [fo1 path];
