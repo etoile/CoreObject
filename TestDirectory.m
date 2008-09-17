@@ -80,14 +80,14 @@
 
 - (void) testObjects
 {
-	UKNotNil([self objects]);
-	UKTrue([[self objects] isEmpty]);
+	UKNotNil([self members]);
+	UKTrue([[self members] isEmpty]);
 
 	[self create];
 	[self createChildFileWithName: @"Wherever"];
 	[self createChildFileWithName: @"Hector"];
-	UKFalse([[self objects] isEmpty]);
-	UKIntsEqual(2, [[self objects] count]);
+	UKFalse([[self members] isEmpty]);
+	UKIntsEqual(2, [[self members] count]);
 	[self delete];
 }
 
@@ -98,12 +98,12 @@
 
 	[self create];
 	[file1 create];
-	UKFalse([[self objects] containsObject: file1]);
+	UKFalse([[self members] containsObject: file1]);
 
-	[self addObject: file1];
+	[self addMember: file1];
 	UKObjectsNotEqual([file1 URL], sourceURL);
 	UKTrue([file1 exists]);
-	UKTrue([[self objects] containsObject: file1]);	
+	UKTrue([[self members] containsObject: file1]);	
 	
 	id file2 = [COFile objectWithURL: sourceURL];
 	UKFalse([file2 exists]);
@@ -122,17 +122,17 @@
 	id file1Copy = [file1 copy];
 	UKObjectsEqual(file1Copy, file1);
 	UKTrue([file1Copy exists]); // points to file1 URL	
-	UKFalse([[self objects] containsObject: file1]);
-	UKFalse([[self objects] containsObject: file1Copy]);
+	UKFalse([[self members] containsObject: file1]);
+	UKFalse([[self members] containsObject: file1Copy]);
 
-	[self addObject: file1Copy];
+	[self addMember: file1Copy];
 	UKObjectsNotEqual([file1Copy URL], sourceURL);
 	UKTrue([file1Copy exists]);
-	UKTrue([[self objects] containsObject: file1Copy]);
+	UKTrue([[self members] containsObject: file1Copy]);
 	
 	UKTrue([file1 exists]);
 	UKObjectsNotEqual([file1 URL], [file1Copy URL]);
-	UKFalse([[self objects] containsObject: file1]);	
+	UKFalse([[self members] containsObject: file1]);	
 
 	[self delete]; // will delete file1Copy located inside
 	[file1 delete];
