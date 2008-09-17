@@ -245,30 +245,30 @@
 	[g1 addMember: o1];
 	[g1 addMember: o2];
 	[g1 addMember: o3];
-	UKTrue([g addSubgroup: g1]);
-	UKIntsEqual([[g subgroups] count], 1);
+	UKTrue([g addGroup: g1]);
+	UKIntsEqual([[g groups] count], 1);
 	UKIntsEqual([[g1 members] count], 3);
 
 	COGroup *g2 = [[COGroup alloc] init];
 	[g2 addMember: o1];
 	[g2 addMember: o4];
-	UKTrue([g addSubgroup: g2]);
-	UKIntsEqual([[g subgroups] count], 2);
+	UKTrue([g addGroup: g2]);
+	UKIntsEqual([[g groups] count], 2);
 	UKIntsEqual([[g2 members] count], 2);
 
 	COGroup *g3 = [[COGroup alloc] init];
-	UKTrue([g addSubgroup: g3]);
-	UKIntsEqual([[g subgroups] count], 3);
+	UKTrue([g addGroup: g3]);
+	UKIntsEqual([[g groups] count], 3);
 	UKIntsEqual([[g3 members] count], 0);
 
 	COGroup *gg1 = [[COGroup alloc] init];
-	UKTrue([g1 addSubgroup: gg1]);
+	UKTrue([g1 addGroup: gg1]);
 	UKIntsEqual([[g1 members] count], 4);
-	UKIntsEqual([[g1 subgroups] count], 1);
+	UKIntsEqual([[g1 groups] count], 1);
 
 	UKIntsEqual([[g members] count], 7);
 	UKIntsEqual([[g allObjects] count], 8);
-	UKIntsEqual([[g subgroups] count], 3);
+	UKIntsEqual([[g groups] count], 3);
 	UKIntsEqual([[g allGroups] count], 4);
 
 	/* We test property list here */
@@ -308,7 +308,7 @@
 	UKTrue([group isKindOfClass: [COGroup class]]);
 	UKIntsEqual([[group members] count], 7);
 	UKIntsEqual([[group allObjects] count], 8);
-	UKIntsEqual([[group subgroups] count], 3);
+	UKIntsEqual([[group groups] count], 3);
 	UKIntsEqual([[group allGroups] count], 4);
 }
 

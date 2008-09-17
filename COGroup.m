@@ -306,7 +306,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 {
 	NSMutableSet *set = [NSMutableSet set];
 	[set addObjectsFromArray: [self members]];
-	NSArray *array = [self subgroups];
+	NSArray *array = [self groups];
 	int i, count = [array count];
 	for (i = 0; i < count; i++)
 	{
@@ -322,8 +322,8 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 - (NSArray *) allGroups
 {
 	NSMutableSet *set = [NSMutableSet set];
-	[set addObjectsFromArray: [self subgroups]];
-	NSArray *array = [self subgroups];
+	[set addObjectsFromArray: [self groups]];
+	NSArray *array = [self groups];
 	int i, count = [array count];
 	for (i = 0; i < count; i++)
 	{

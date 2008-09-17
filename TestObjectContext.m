@@ -266,7 +266,7 @@
 	UKFalse([[group members] containsObject: group2]);
 	UKTrue([[group members] containsObject: group2v3]); // parent to child relationship is versionned by the parent in all cases
 	UKFalse([group containsTemporalInstance: group2v3]); // group2v3 shouldn't be a temporal instance once it's inserted
-	UKObjectsSame([[group subgroups] objectAtIndex: 0], group2v3);
+	UKObjectsSame([[group groups] objectAtIndex: 0], group2v3);
 
 	/* Test child to parent referencess */
 	UKTrue([[group2 valueForProperty: kCOParentsProperty] isEmpty]);

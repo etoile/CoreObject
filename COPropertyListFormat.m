@@ -185,9 +185,10 @@ NSString *pCOAllGroupsKey = @"AllGroups";
 			NSString *mid = [members objectAtIndex: i];
 			COObject *object = [allObjects objectForKey: mid];
 			/* We check COGroup first because COGroup is subclass of COObject */
+			// FIXME: We shouldn't need the following double cases now that -addMember: handles both objects and groups.
 			if ([object isKindOfClass: [COGroup class]])
 			{
-				[group addSubgroup: (COGroup *)object];
+				[group addGroup: (COGroup *)object];
 			}
 			else if ([object isKindOfClass: [COObject class]])
 			{
@@ -290,7 +291,7 @@ NSString *pCOAllGroupsKey = @"AllGroups";
 		NSMutableArray *uids = [[NSMutableArray alloc] init];
 		[members addObjectsFromArray: [g members]];
 		 // FIXME: Shouldn't be needed anymore now that [g members] returns both objects and groups
-		[members addObjectsFromArray: [g subgroups]];
+		[members addObjectsFromArray: [g groups]];
 		int i, count = [members count];
 		for (i = 0; i < count; i++)
 		{

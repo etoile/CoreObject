@@ -83,7 +83,7 @@
 	UKIntsEqual([[smart members] count], 3);
 
 	/* Test recursive */
-	[group addSubgroup: group];
+	[group addGroup: group];
 	p = [NSPredicate predicateWithFormat: @"%K == %@", @"Location", @"Office"];
 	[smart setPredicate: p];
 	UKIntsEqual([[smart members] count], 2);
