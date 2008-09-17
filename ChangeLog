@@ -1,4 +1,15 @@
-2008-17-08 Quentin Mathe <qmathe@club-internet.fr>
+2008-09-17 Quentin Mathe <qmathe@club-internet.fr>
+
+	Renamed methods -addObject:, -removeObject:, -objects in CODirectory, to 
+	comply with latest changes done to COGroup protocol.
+	* Headers/CODirectory.h:
+	* CODirectory.m:
+	(-addObject:): Renamed to -addMember:.
+	(-removeObject:): Renamed -removeMember:.
+	(-objects): Renamed -members.
+	Kept these old methods as deprecated until all the code is updated.
+
+2008-09-17 Quentin Mathe <qmathe@club-internet.fr>
 
 	Renamed methods -addObject:, -removeObject:, -objects of COGroup protocol 
 	and class to eliminate conflicts with Foundation collections that don't 
@@ -13,12 +24,12 @@
 	code is updated.
 	* TestGroup.m: Updated.
 
-2008-16-08 Quentin Mathe <qmathe@club-internet.fr>
+2008-09-16 Quentin Mathe <qmathe@club-internet.fr>
 
 	* COMetadataServer.m (+defaultDBName): Fixed to use an underscore rather 
 	than a dash in the DB name, otherwise an SQL error arises.
 
-2008-15-08 Quentin Mathe <qmathe@club-internet.fr>
+2008-09-15 Quentin Mathe <qmathe@club-internet.fr>
 
 	Added custom merging policies for children of groups/relationships when 
 	old versions are rolled back. Four merge policies exist for COGroup children:
@@ -43,7 +54,7 @@
 	(-initForTest, -releaseForTest): Added to ensure we enable COGroup 
 	persistency for each test we run.
 
-2008-13-08 Quentin Mathe <qmathe@club-internet.fr>
+2008-09-13 Quentin Mathe <qmathe@club-internet.fr>
 
 	Modified COSerializer and CODeserializer to rely on latest modifications 
 	in EtoileSerialize. Removed a large chunk of CODeserializer code that is 
@@ -91,7 +102,7 @@
 	(-registerObject:, -unregisterObject:): Updated to add and remove managed 
 	objects in the cache of the object server.
 
-2008-10-08 Quentin Mathe <qmathe@club-internet.fr>
+2008-09-10 Quentin Mathe <qmathe@club-internet.fr>
 
 	First part of the merge support. This allows temporal instances to replace 
 	existing instances in the object context without breaking group 

@@ -108,7 +108,7 @@ DEALLOC()
 
 /** Will return NO and won't add the object if the represented directory doesn't 
 	exist on the file system. */
-- (BOOL) addObject: (id) object
+- (BOOL) addMember: (id)object
 {
 	if ([self isValidObject: object] == NO)
 		return NO;
@@ -217,7 +217,7 @@ DEALLOC()
 	following way:
 	[artDirectory removeObject: myPoemFile];
 	[poetryDirectory addObject: myPoemFile]; */
-- (BOOL) removeObject: (id) object
+- (BOOL) removeMember: (id)object;
 {
 	if ([self checkObjectToBeRemovedOrDeleted: object])
 		return NO;
@@ -245,7 +245,7 @@ DEALLOC()
 
 /** Returns all files and directories located in the receiver directory. 
 	This excludes files and directories inside subdirectories. */
-- (NSArray *) objects
+- (NSArray *) members
 {
 	NSMutableArray *files = [NSMutableArray array];
 	NSString *dirPath = FSPATH(self);
@@ -352,6 +352,17 @@ DEALLOC()
 {
 	[self addObject: object];
 }
+
+// FIXME: Shouldn't return a boolean.
+- (BOOL) removeObject: (id) object
+{
+	return [self removeMember: object];
+}
+
+/* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
+
+- (BOOL) addObject: (id) object { return [self addMember: object]; }
+- (NSArray *) objects { return [self members]; }
 
 @end
 

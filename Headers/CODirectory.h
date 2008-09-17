@@ -29,10 +29,10 @@
 
 - (BOOL) isValidObject: (id)object;
 - (BOOL) containsObject: (id)object;
-- (BOOL) addObject: (id)object;
-- (BOOL) removeObject: (id)object;
+- (BOOL) addMember: (id)object;
+- (BOOL) removeMember: (id)object;
 - (BOOL) deleteObject: (id)object;
-- (NSArray *) objects;
+- (NSArray *) members;
 
 - (BOOL) addSymbolicLink: (id)object;
 - (BOOL) addHardLink: (id)object;
@@ -46,6 +46,12 @@
 - (id) content;
 - (NSArray *) contentArray;
 - (void) insertObject: (id)object atIndex: (unsigned int)index;
+- (BOOL) removeObject: (id)object;
+
+/* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
+
+- (BOOL) addObject: (id)object;
+- (NSArray *) objects;
 
 @end
 
