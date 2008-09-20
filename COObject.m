@@ -260,12 +260,20 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	[super dealloc];
 }
 
-#if 0 // Crash due the recursive back to parent group.
+// TODO: Turn this into -shortDescription probably and add a more detailed 
+// -description that ouputs all the properties. 
+// Take note that [_properties description] won't work, because...
+// -description triggers -description on kCOParentsProperty and each element 
+// is a COGroup instances which will call -description on 
+// kCOGroupChildrenProperty and kCOGroupSubgroupsProperty. This will call back 
+// -description on the receiver and results in an infinite recursion.
 - (NSString *) description
 {
-	return [_properties description];
+	NSString *desc = [super description];
+
+	return [NSString stringWithFormat: @"%@ id: %@ version: %i", desc, 
+		[self UUID], [self objectVersion]];
 }
-#endif
 
 - (BOOL) isCoreObject
 {
