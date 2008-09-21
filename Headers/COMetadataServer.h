@@ -65,6 +65,7 @@
 - (void) setUpDBWithURL: (NSURL *)dbURL;
 - (BOOL) executeDBRequest: (NSString *)SQLRequest;
 - (id) executeDBQuery: (NSString *)SQLRequest;
+- (PGresult *) executeRawPGSQLQuery: (NSString *)SQLRequest;
 - (void) handleDBRequestFailure;
 - (void) installDBEventListener;
 - (BOOL) openDBConnectionWithURL: (NSURL *)dbURL;

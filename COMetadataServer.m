@@ -299,6 +299,20 @@ static COMetadataServer *metadataServer = nil;
 	return queryResultObject;
 }
 
+/** Performs a SQL query and returns the query result in a PGresult data 
+    structure specific to PostgreSQL.
+    It's strongly advised to use -executeDBQuery: instead of this low-level 
+    method, unless if you want to use PostgreSQL specific extensions to SQL. 
+    However take in account the underlying metadata DB might not always be 
+    driven by PostgreSQL.
+    This method doesn't perform any checks on either SQLRequest or the returned 
+    result. You are in charge of verifying the result, handling potential 
+    failures of the query and freeing the returned structure. */
+- (PGresult *) executeRawPGSQLQuery: (NSString *)SQLRequest
+{
+	return PQexec(conn, [SQLRequest UTF8String]);
+}
+
 /** We do nothing for now, we may close the connection, try to close and reopen 
     it, or implement some alternative fallback behaviors in future. */
 - (void) handleDBRequestFailure

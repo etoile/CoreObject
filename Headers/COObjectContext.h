@@ -23,7 +23,7 @@ typedef enum _COMergeResult
     policies can be used when a COGroup instance is rolled back to a past 
     version, to specify how the differences in the children between the old and 
     the existing instances must be handled at merge time. 
-    Children are returned by-[COGroup members]. Merging is driven by 
+    Children are returned by -[COGroup members]. Merging is driven by 
     -replaceObject:byObject:collectAllErrors:. The merging policy is passed to 
     COGroup with -mergeObjectsWithObjectsOfGroup:policy:, when the rolled back 
     instance is on the verge of replacing the instance currently registered in 
@@ -57,6 +57,7 @@ typedef enum _COChildrenMergePolicy
 	/* Successive senders inside a record session (invocation sequence) */
 	NSMutableArray *_recordedObjectStack;
 	id _revertedObject;
+	BOOL _revertingContext;
 	id _delegate;
 	int _version;
 	ETUUID *_uuid;
@@ -113,15 +114,11 @@ typedef enum _COChildrenMergePolicy
 
 - (ETUUID *) UUID;
 - (int) version;
-#if 0
-// FIXME: Implement
 - (void) rollbackToVersion: (int)aVersion;
-- (void) snapshot;
-//- (id) undoManager;
 - (void) undo;
 - (void) redo;
-- (void) isRevertingContext;
-#endif
+- (BOOL) isRevertingContext;
+//- (void) snapshot;
 
 /* Navigating Object History */
 
@@ -148,7 +145,7 @@ typedef enum _COChildrenMergePolicy
 
 - (BOOL) shouldRecordChangesToObject: (id)object;
 - (int) recordInvocation: (NSInvocation *)inv;
-- (int) serializeInvocation: (NSInvocation *)inv; //-storeInvocation:
+- (int) serializeInvocation: (NSInvocation *)inv;
 - (void) logInvocation: (NSInvocation *)inv 
          recordVersion: (int)aVersion
              timestamp: (NSDate *)recordTimestamp;

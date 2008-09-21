@@ -6,6 +6,7 @@
 
 */
 
+#include <stdio.h>
 #import "COObjectContext.h"
 #import "COObject.h"
 #import "COGroup.h"
@@ -455,6 +456,161 @@ static COObjectContext *defaultObjectContext = nil;
 	return _version;
 }
 
+// TODO: Break -rollbackToVersion: in several small methods.
+
+/* Query example:
+SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, objectVersion, contextVersion FROM HISTORY WHERE contextUUID = '64dc7e8f-db73-4bcc-666f-d9bf6b77a80a') AS ContextHistory WHERE contextVersion > 2000 ORDER BY contextVersion DESC LIMIT 10 */
+- (void) rollbackToVersion: (int)aVersion
+{
+	_revertingContext = YES;
+
+	/* Query the global history for the history of the context before aVersion */
+	NSString *query = [NSString stringWithFormat: 
+		@"SELECT objectUUID, objectVersion, contextVersion FROM \
+			(SELECT objectUUID, objectVersion, contextVersion FROM History \
+			 WHERE contextUUID = '%@') AS ContextHistory \
+		  WHERE contextVersion < %i ORDER BY contextVersion DESC", 
+		[[self UUID] stringValue], (aVersion + 1)];
+
+	PGresult *result = [[self metadataServer] executeRawPGSQLQuery: query];
+	int nbOfRows = PQntuples(result);
+	int nbOfCols = PQnfields(result);
+	ETUUID *objectUUID = nil;
+	int objectVersion = -1;
+	int contextVersion = -1;
+	/* Collection where the object versions to be rolled back are put keyed by UUIDs */
+	NSMutableDictionary *rolledbackObjectVersions = [NSMutableDictionary dictionary];
+
+	ETLog(@"Context rollback query result: %d rows and %d colums", nbOfRows, nbOfCols);
+
+	/* Log the query result for debugging */
+	PQprintOpt options = {0};
+	options.header    = 1;    /* Ask for column headers           */
+	options.align     = 1;    /* Pad short columns for alignment  */
+	options.fieldSep  = "|";  /* Use a pipe as the field separator*/
+	PQprint(stdout, result, &options);
+
+	/* Find all the objects to be reverted */ 
+	int nbOfRegisteredObjects = [_registeredObjects count];
+	for (int row = 0; row < nbOfRows; row++)
+	{
+		objectUUID = AUTORELEASE([[ETUUID alloc] initWithString: 
+			[NSString stringWithUTF8String: PQgetvalue(result, row, 0)]]);
+		objectVersion = atoi(PQgetvalue(result, row, 1));
+		contextVersion = atoi(PQgetvalue(result, row, 2));
+
+		BOOL objectNotAlreadyFound = ([[rolledbackObjectVersions allKeys] containsObject: objectUUID] == NO);
+
+		if (objectNotAlreadyFound)
+		{
+			[rolledbackObjectVersions setObject: [NSNumber numberWithInt: objectVersion] 
+			                             forKey: objectUUID];
+		}
+
+		/* If a past object version has already been found for each registered 
+		   object, we already know all the objects to be reverted, hence we 
+		   can skip the rest of the earlier history. */
+		if ([rolledbackObjectVersions count] == nbOfRegisteredObjects)
+			break;
+	}
+
+	/* Find the base versions for objects that don't appear in the context history
+
+	    Base versions (first snapshot) aren't written in the context history, 
+	    only recorded invocations are, hence if we haven't reached the targeted 
+	    context version but we just reached the first recorded invocation of an 
+	    object (version 1), the expected objectVersion to roll back will be 0 
+	    and not 1. */
+	FOREACHI(_registeredObjects, registeredObject)
+	{
+		// NOTE: [registeredObject objectVersion] > 0 ensures that we won't 
+		// restore an object that hasn't been yet snaphotted (no invocation recorded yet).
+		if ([rolledbackObjectVersions objectForKey: [registeredObject UUID]] == nil
+		 && [registeredObject objectVersion] > 0)
+		{
+			[rolledbackObjectVersions setObject: [NSNumber numberWithInt: 0]
+			                             forKey: [registeredObject UUID]];
+		}
+		// TODO: Generalize the idea to handle trimmed history...
+		// This done by querying contextVersion superior to aVersion rather than 
+		// inferior as we do in the first query.
+		// SELECT [...] WHERE contextVersion > aVersion ORDER BY contextVersion
+		// foreach registeredObject not in rolledbackObjectVersions
+		// {
+		//		version = first object version right after aVersion
+		//	    rolledbackObjectVersions setObject: --version forKey: [object UUID]
+		// }
+	}
+
+	/* Free the query result now the object versions are extracted */
+	PQclear(result);
+
+	ETLog(@"Will revert objects to versions: %@", rolledbackObjectVersions);
+
+	/* Revert all the objects we just found */
+	id objectServer = [self objectServer];
+	FOREACHI([rolledbackObjectVersions allKeys], targetUUID)
+	{
+		id targetObject = [objectServer cachedObjectForUUID: targetUUID];
+		BOOL targetRegisteredInContext = (targetObject != nil && [_registeredObjects containsObject: targetObject]);
+
+		if (targetRegisteredInContext)
+		{
+			int targetVersion = [[rolledbackObjectVersions objectForKey: targetUUID] intValue];
+			BOOL targetUpToDate = (targetVersion == [targetObject objectVersion]);
+
+			/* Only revert the objects that have changed between aVersion and the 
+			   current context version */
+			if (targetUpToDate)
+				continue;
+
+			/* Revert and merge */
+			[self objectByRollingbackObject: targetObject 
+			                      toVersion: targetVersion
+			               mergeImmediately: YES];
+		}
+	}
+
+	/* Log the revert operation in the History */
+	_version++;
+	[[self metadataServer] executeDBRequest: [NSString stringWithFormat: 
+		@"INSERT INTO History (objectUUID, objectVersion, contextUUID, "
+		"contextVersion, date) "
+		"VALUES ('%@', %i, '%@', %i, '%@');", 
+			[_uuid stringValue],
+			aVersion,
+			[_uuid stringValue],
+			_version,
+			[NSDate date]]];
+
+	ETLog(@"Log revert context with UUID %@ to version %i as new version %i", 
+		 _uuid, aVersion, _version);
+
+	_revertingContext = NO;
+}
+
+/** Reverts the receiver to the last version right before the one currently 
+    returned by -version.
+    This method calls -rollbackToVersion:. */
+- (void) undo
+{
+	// TODO: Implement a real undo model.
+	[self rollbackToVersion: ([self version] - 1)];
+}
+
+- (void) redo
+{
+	// TODO: Implement redo based on the undo model.
+}
+
+/** Returns YES when eitherthe whole context is currently rolled back to a past 
+    version, otherwise returns NO.
+    See also -isReverting. */
+- (BOOL) isRevertingContext
+{
+	return _revertingContext;
+}
+
 /** Returns the first version forward in time which corresponds to a snapshot or
     a delta. If no such version can be found (no snapshot or delta available 
     unless an error occured), returns -1.
@@ -664,11 +820,16 @@ static COObjectContext *defaultObjectContext = nil;
 }
 #endif
 
+/** Returns YES when either an object is currently rolled back to a past 
+    version, otherwise returns NO.
+    See also -isRevertingContext. */
 - (BOOL) isReverting
 {
 	return ([self currentRevertedObject] != nil);
 }
 
+/** Returns the registered object for which -objectByRollingbackObject: is 
+    currently executed. */
 - (id) currentRevertedObject
 {
 	return _revertedObject;
@@ -676,42 +837,55 @@ static COObjectContext *defaultObjectContext = nil;
 
 /** Returns whether object is a temporal instance of a given object owned by
 	the context. 
-	The latter object is called a reverted object in such situation. */
+	The latter object is called a reverted object in such situation.
+	The rolled back object doesn't belong to the receiver because it is a 
+	temporal instance that can be retrieved only by requesting it to the 
+	receiver for a given object with the same UUID (the reverted object already 
+	inserted/owned by the receiver context). */
 - (BOOL) isRolledbackObject: (id)object
 {
 	return ([[object UUID] isEqual: [[self currentRevertedObject] UUID]]
 		&& ([[self registeredObjects] containsObject: object] == NO));
 }
 
+/** Marks the start of a revert operation.
+    A revert operations typically involves exchanges of messages among the 
+    registered objects or state alteration, that must not be recorded.
+    By calling this method, you ensure -shouldIgnoreChangesToObject: will 
+    behave correctly. */
 - (void) beginRevertObject: (id)object
 {
 	ASSIGN(_revertedObject, object);
 }
 
+/** Marks the end of a revert operation, thereby enables the recording of 
+    invocations. */
 - (void) endRevert
 {
 	ASSIGN(_revertedObject, nil);
 }
 
-/** We can ignore changes only during a revert. If it is the case, all changes 
-	must be applied only to the rolledback object (not belonging to the 
-	object context) and any other messages sent by the rolledback object to other 
-	objects must be ignored. The fact these objects belongs to the object 
-	context or not doesn't matter. 
-	The rolledback object doesn't belong to the receiver because it is a 
-	temporal instance that can be retrieved only by requesting to the receiver 
-	for a given object with the same UUID (the reverted object already 
-	inserted/owned by the receiver context).
-	The relationships broken between the rolledback object and its related 
-	objects have to be fixed when the rolledback object gets inserted into the 
-	context, to replace the current temporal instance in use. A new temporal 
-	instance can be inserted into the receiver and its relationships corrected
-	by calling the method -anObjectject:byObject:. */
-- (BOOL) shouldIgnoreChangesToObject: (id)object
+/** Returns YES if anObject is a temporal instance of an object registered in 
+    the receiver and a revert operation is underway, otherwise returns NO.
+    This method is mainly useful to decide whether a managed method should 
+    return immediately or execute and mutate the state of the model object its 
+    belongs to. 
+    The rule is to ignore all side-effects triggered by a managed method during 
+    a revert. If a revert is underway, all changes must be applied only to the 
+    rolled back object (not belonging to the object context) and any other 
+    messages sent by the rolled back object to other objects must be ignored. 
+    The fact these objects belongs to the object context or not doesn't matter: 
+    temporal instances when they got just rolled back are in a state that can be
+    incoherent with other objects in memory. 
+    See also -isRolledbackObject:. */
+- (BOOL) shouldIgnoreChangesToObject: (id)anObject
 {
-	return ([self isReverting] && ([self isRolledbackObject: object] == NO));
+	return ([self isReverting] && ([self isRolledbackObject: anObject] == NO));
 }
 
+/* If this method returns NO, -recordInvocation: will refuse the invocation 
+   serialization. 
+   -recordInvocation: calls it with the invocation target.*/
 - (BOOL) shouldRecordChangesToObject: (id)object
 {
 	return [object isEqual: [self currentRecordSessionObject]];
@@ -720,7 +894,15 @@ static COObjectContext *defaultObjectContext = nil;
 /** Returns the new object version of the target for which the invocation was 
     recorded. If the invocation isn't recorded, then the returned version is 
     identical to the current object version of the invocation target. 
-    See also RECORD macro in ETUtility.h */
+    The invocation is recorded in three steps:
+    - the invocation is serialized (eventually a snapshot is taken too)
+    - the basic object infos stored in the metadata DB are updated for the invocation target
+    - the record operation is logged in the receiver history.
+    For more details on each step, see respectively -serializeInvocation;,
+    -updateMetadatasForObject:, logInvocation:recordVersion:timestamp:.
+    Finally this method returns the new object version to the invocation target 
+    that is in charge of updating the value it returns for -objectVersion.
+    See also -shouldRecordChangesToObject: and RECORD macro in COUtility.h */
 - (int) recordInvocation: (NSInvocation *)inv
 {
 	id object = [inv target];
@@ -822,7 +1004,7 @@ static COObjectContext *defaultObjectContext = nil;
 			_version,
 			recordTimestamp]];
 
-	ETLog(@"Log %@ objectUUID %@ objectVersion %i contextVersion %i", 
+	ETDebugLog(@"Log %@ objectUUID %@ objectVersion %i contextVersion %i", 
 		inv, [object UUID], aVersion, _version);
 }
 

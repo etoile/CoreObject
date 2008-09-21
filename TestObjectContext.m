@@ -13,6 +13,7 @@
 #import "COObject.h"
 #import "COGroup.h"
 #import "COObjectContext.h"
+#import "COObjectServer.h"
 #import "COSerializer.h"
 #import "CODeserializer.h"
 #import "COUtility.h"
@@ -320,6 +321,90 @@
 
 	/* Merging isn't expected to respect the children, use NSSet if more than one child */
 	UKObjectsEqual(A(object), [groupv2 members]);
+}
+
+- (void) testOneStepContextRollback
+{
+	UKIntsEqual(0, [self version]);
+
+	CREATE_OBJECT_GRAPH
+	id objectServer = [self objectServer];
+	int lastVersion = 11;
+
+	UKIntsEqual(lastVersion, [self version]);
+
+	/* Move back to the previous version (undo) */
+
+	[self rollbackToVersion: lastVersion - 1];
+	UKIntsEqual((lastVersion + 1), [self version]);
+
+	/* Merged instance has replaced the existing instance in the core object cache */
+	id newObject = [objectServer cachedObjectForUUID: [object UUID]];
+
+	UKObjectsEqual([object UUID], [newObject UUID]);
+	UKObjectsNotEqual(object, newObject);
+	UKTrue([newObject isTemporalInstance: object]);
+	UKIntsEqual([object objectVersion] + 1, [newObject objectVersion]);
+	UKStringsEqual([object valueForProperty: @"whoami"], [newObject valueForProperty: @"whoami"]);
+	UKStringsEqual(@"me", [newObject valueForProperty: @"whoami"]);
+	UKObjectsEqual(A(@"New York"), [newObject valueForProperty: @"otherObjects"]);
+
+	/* Move back to the initial version (redo) */
+	[self rollbackToVersion: lastVersion];
+	UKIntsEqual((lastVersion + 2), [self version]);
+
+	/* Merged instance has replaced the existing instance in the core object cache */
+	id newObject2 = [objectServer cachedObjectForUUID: [newObject UUID]];
+
+	UKObjectsEqual([object UUID], [newObject2 UUID]);
+	UKObjectsNotEqual(object, newObject2);
+	UKTrue([newObject2 isTemporalInstance: object]);
+	UKTrue([newObject2 isTemporalInstance: newObject]);
+	UKIntsEqual([object objectVersion] + 2, [newObject2 objectVersion]);
+	UKStringsEqual([object valueForProperty: @"whoami"], [newObject2 valueForProperty: @"whoami"]);
+	UKStringsEqual(@"me", [newObject2 valueForProperty: @"whoami"]);
+	UKObjectsEqual(A(@"New York", @"Minneapolis", @"London"), [newObject2 valueForProperty: @"otherObjects"]);
+}
+
+- (void) testMultiStepContextRollback
+{
+	UKIntsEqual(0, [self version]);
+
+	CREATE_OBJECT_GRAPH
+	id objectServer = [self objectServer];
+	int lastVersion = 11;
+
+	UKIntsEqual(lastVersion, [self version]);
+
+	/* Move back to the previous version (undo) */
+
+	[self rollbackToVersion: 6];
+	UKIntsEqual((lastVersion + 1), [self version]);
+
+	/* Merged instance has replaced the existing instance in the core object cache */
+	id newObject = [objectServer cachedObjectForUUID: [object UUID]];
+
+	UKObjectsEqual([object UUID], [newObject UUID]);
+	UKObjectsNotEqual(object, newObject);
+	UKTrue([newObject isTemporalInstance: object]);
+	UKIntsEqual([object objectVersion] + 1, [newObject objectVersion]);
+	UKStringsNotEqual([object valueForProperty: @"whoami"], [newObject valueForProperty: @"whoami"]);
+	UKStringsEqual(@"Nobody", [newObject valueForProperty: @"whoami"]);
+	UKObjectsEqual(A(@"New York"), [newObject valueForProperty: @"otherObjects"]);
+
+	id newGroup = [objectServer cachedObjectForUUID: [group UUID]];
+	id newGroup2 = [objectServer cachedObjectForUUID: [group2 UUID]];
+
+	UKIntsEqual([group objectVersion] + 1, [newGroup objectVersion]);
+	UKNil([newGroup valueForProperty: kCOGroupNameProperty]);
+	UKObjectsEqual(A(newObject), [newGroup valueForProperty: kCOGroupChildrenProperty]);
+	UKObjectsEqual(A(newGroup2), [newGroup valueForProperty: kCOGroupSubgroupsProperty]);
+
+	UKIntsEqual([group2 objectVersion] + 1, [newGroup2 objectVersion]);
+	UKStringsEqual(@"tulip", [newGroup2 valueForProperty: kCOGroupNameProperty]);
+	/* object2 version doesn't change in CREATE_OBJECT_GRAPH, hence the initial instance is still valid */
+	UKObjectsEqual(A(object2), [newGroup2 valueForProperty: kCOGroupChildrenProperty]);
+	UKTrue([[newGroup2 valueForProperty: kCOGroupSubgroupsProperty] isEmpty]);
 }
 
 - (void) testGroupPersistency

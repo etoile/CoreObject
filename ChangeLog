@@ -1,3 +1,20 @@
+2008-09-21 Quentin Mathe <qmathe@club-internet.fr>
+
+	Implemented navigation in the history of object contexts with the new 
+	method -rollbackToVersion:. History can now be navigated either per object 
+	or per context; the object context plays the role of a pool of objects.
+	* Headers/COMetadataServer.h:
+	* COMetadataServer.m:
+	(-executeRawPGSQLQuery:): Added as a low-level API for 
+	-[COObjectContext rollbackToVersion:].
+	* Headers/COObjectContext.h:
+	* COObjectContext.m:
+	Various documentation update. New ivar _revertingContext.
+	(-rollbackToVersion:, -isRevertingContext): Added.
+	(-undo, -redo): Added skeleton methods.
+	* TestObjectContext.m 
+	(-testOneStepContextRollback, -testMultiStepContextRollback): Added.
+
 2008-09-17 Quentin Mathe <qmathe@club-internet.fr>
 
 	Renamed methods -addObject:, -removeObject:, -objects in CODirectory, to 

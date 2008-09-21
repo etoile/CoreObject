@@ -152,6 +152,7 @@ static COObjectServer *localObjectServer = nil;
 
 - (id) objectForUUID: (ETUUID *)uuid
 {
+	// first try -cachedObjectForUUID:, otherwise look up UUID in db and deserializes
 	return [_coreObjectTable objectForKey: uuid];
 }
 
