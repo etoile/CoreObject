@@ -18,6 +18,9 @@
 #define AVERAGE_MANAGED_OBJECTS_COUNT 1000
 #define RECORD_STACK_SIZE 10
 
+NSString *COObjectContextDidMergeObjectsNotification = @"COObjectContextDidMergeObjectsNotification";
+NSString *COMergedObjectsKey = @"COMergedObjectsKey";
+
 @interface COObject (FrameworkPrivate)
 - (void) setObjectContext: (COObjectContext *)ctxt;
 - (void) _setObjectVersion: (int)version;
@@ -84,6 +87,32 @@ static COObjectContext *defaultObjectContext = nil;
 {
 	return [COObjectServer defaultServer];
 }	
+
+/** Returns the delegate set for the receiver, otherwise returns nil. */
+- (id) delegate
+{
+	return _delegate;
+}
+
+/** Sets the delegate set for the receiver.
+    The delegate is not retained. */
+- (void) setDelegate: (id)aDelegate
+{
+	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+
+	if (_delegate != nil)
+		[nc removeObserver: _delegate name: nil object: self];
+
+	_delegate = aDelegate;
+
+	if ([_delegate respondsToSelector: @selector(objectContextDidMergeObjects:)])
+	{
+		[nc addObserver: _delegate
+		       selector: @selector(objectContextDidMergeObjects:)
+		           name: COObjectContextDidMergeObjectsNotification 
+		         object: self];
+	}
+}
 
 /* Registering Managed Objects */
 
@@ -548,6 +577,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	ETLog(@"Will revert objects to versions: %@", rolledbackObjectVersions);
 
 	/* Revert all the objects we just found */
+	NSMutableSet *mergedObjects = [NSMutableSet set];
 	id objectServer = [self objectServer];
 	FOREACHI([rolledbackObjectVersions allKeys], targetUUID)
 	{
@@ -565,9 +595,10 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 				continue;
 
 			/* Revert and merge */
-			[self objectByRollingbackObject: targetObject 
-			                      toVersion: targetVersion
-			               mergeImmediately: YES];
+			id rolledbackObject = [self objectByRollingbackObject: targetObject 
+			                                            toVersion: targetVersion
+			                                     mergeImmediately: YES];
+			[mergedObjects addObject: rolledbackObject];
 		}
 	}
 
@@ -585,6 +616,12 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 
 	ETLog(@"Log revert context with UUID %@ to version %i as new version %i", 
 		 _uuid, aVersion, _version);
+
+	/* Post notification */
+	[[NSNotificationCenter defaultCenter] 
+		postNotificationName: COObjectContextDidMergeObjectsNotification
+		object: self
+		userInfo: D(COMergedObjectsKey, mergedObjects)];
 
 	_revertingContext = NO;
 }

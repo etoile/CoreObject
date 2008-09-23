@@ -1,3 +1,13 @@
+2008-09-23 Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/COObjectContext.h:
+	* COObjectContext.m:
+	New notification named COObjectContextDidMergeObjectsNotification and the 
+	related userInfo key COMergedObjectsKey.
+	(-setDelegate, -delegate): Added.
+	(-rollbackToVersion:): Modified to collect merged objects.
+	(-[NSObject objectContextDidMergeObjects:]): Added.
+
 2008-09-21 Quentin Mathe <qmathe@club-internet.fr>
 
 	Implemented navigation in the history of object contexts with the new 

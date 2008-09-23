@@ -12,6 +12,14 @@
 
 @class COMetadataServer, COObjectServer;
 
+/** Notification posted at the end of a merge. For now, this notification is only 
+    posted for -rollbackToVersion:, -undo, -redo.
+    Includes the following keys in userInfo dictionary:
+    - COMergedObjectsKey */
+extern NSString *COObjectContextDidMergeObjectsNotification;
+/** Key for the objects that just got merged into the object context. */
+extern NSString *COMergedObjectsKey;
+
 typedef enum _COMergeResult
 {
 	COMergeResultNone,
@@ -69,6 +77,9 @@ typedef enum _COChildrenMergePolicy
 
 - (COMetadataServer *) metadataServer;
 - (COObjectServer *) objectServer;
+
+- (id) delegate;
+- (void) setDelegate: (id)aDelegate;
 
 /* Registering Managed Objects */
 
@@ -162,4 +173,10 @@ typedef enum _COChildrenMergePolicy
 
 - (int) setVersion: (int)aVersion forObject: (id)object;
 
+@end
+
+@interface NSObject (COObjectContextDelegate)
+// TODO: Eventually add a delegate method to control the merge process...
+// - (BOOL) objectContext:willMergeObject:withObject:inPlace:isTemporal:
+- (void) objectContextDidMergeObjects: (NSNotification *)notif;
 @end
