@@ -339,9 +339,20 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	return YES;
 }
 
+/** Returns the value identified by property. If the property doesn't exist,
+    returns nil.
+    First try to find the property in the receiver data model. If no property is 
+    found, try to find it in the properties inherited from the superclass. 
+    Take note that COObject only inherits properties from NSObject. */
 - (id) valueForProperty: (NSString *) property
 {
-	return [_properties objectForKey: property];
+	id value = [_properties objectForKey: property];
+	
+	/* Pass up to NSObject+Model if not declared in our data model */
+	if (value == nil && [[[self class] properties] containsObject: property] == NO)
+		value = [super valueForProperty: property];
+
+	return value;
 }
 
 - (NSArray *) parentGroups
@@ -781,6 +792,13 @@ static NSMutableSet *automaticPersistentClasses = nil;
 
 /* KVC */
 
+/** Returns the value identified by key. 
+    The returned value is identical to -valueForProperty:, except that it 
+    returns the text content if you pass qCOTextContent as key. This addition 
+    is used by -matchesPredicate:.
+    For now, this method returns nil for an undefined key and doesn't raise an 
+    exception by calling -valueForUndefinedKey:, however this is subject to 
+    change.*/
 - (id) valueForKey: (NSString *) key
 {
 	/* Intercept query property */

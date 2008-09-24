@@ -315,6 +315,28 @@
 	type = [COObject typeOfProperty: kCOCreationDateProperty];
 	UKIntsEqual(type, kCODateProperty);
 }
+
+- (void) testKVC
+{
+	SubObject *so = [[SubObject alloc] init];
+
+	/* Test data model access */
+	UKObjectsEqual([so valueForProperty: kCOUIDProperty], [so valueForKey: kCOUIDProperty]);
+	UKObjectsEqual([so valueForProperty: kCOVersionProperty], [so valueForKey: kCOVersionProperty]);
+	UKObjectsEqual([so valueForProperty: kCOCreationDateProperty], [so valueForKey: kCOCreationDateProperty]);
+	UKObjectsEqual([so valueForProperty: kCOModificationDateProperty], [so valueForKey: kCOModificationDateProperty]);
+	UKObjectsEqual([so valueForProperty: kCOReadOnlyProperty], [so valueForKey: kCOReadOnlyProperty]);
+	UKObjectsEqual([so valueForProperty: kCOParentsProperty], [so valueForKey: kCOParentsProperty]);
+	UKObjectsEqual([so valueForProperty: kCOModificationDateProperty], [so valueForKey: kCOModificationDateProperty]);
+
+	/* Test inherited properties access */
+	UKObjectsEqual([so valueForProperty: @"displayName"], [so valueForKey: @"displayName"]);
+	UKObjectsEqual([so valueForProperty: @"className"], [so valueForKey: @"className"]);
+	UKObjectsEqual([so valueForProperty: @"isGroup"], [so valueForKey: @"isGroup"]);
+
+	DESTROY(so);
+}
+
 @end
 
 @implementation SubObject

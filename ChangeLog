@@ -1,5 +1,13 @@
 2008-09-24 Quentin Mathe <qmathe@club-internet.fr>
 
+	* COObject.m:
+	(-valueForProperty:): Modified to look for the property/value pair in 
+	the inherited properties in addition to the data model. Documented.
+	(-valueForKey:): Documented.
+	* TestObject.m (-testKVC): Added.
+
+2008-09-24 Quentin Mathe <qmathe@club-internet.fr>
+
 	* Headers/COObject.h:
 	* COObject.m:
 	Removed kCOTagProperty, because tags will be implemented in term of groups.
