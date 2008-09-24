@@ -879,47 +879,4 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	return [self valueForProperty: kCOUIDProperty];
 }
 
-- (NSDictionary *) relatedCoreObjects
-{
-//	NSDictionary *properties = [self propertyList];
-	NSMutableDictionary *relations = [NSMutableDictionary dictionary];
-#if 0
-	/* We remove parents property */
-	[properties removeObjectForKey: kCOParentsProperty];
-	/* If we have COMultiValue, save its property list */
-	NSEnumerator *e = [[properties allKeys] objectEnumerator];
-	NSString *key = nil;
-	while ((key = [e nextObject]))
-	{
-		id value = [dict objectForKey: key];
-		if ([value isKindOfClass: [COMultiValue class]])
-		{
-			[properties setObject: [(COMultiValue *)value propertyList]
-			               forKey: key];
-		}
-		else if ([value isManagedCoreObject]) // has UUID and URL
-		{
-			[relations setObject: value forKey: [value UUID]];
-			[dict setObject: [value UUID] forKey: key];
-		}
-		else if ([value isCoreObject]) // has URL
-		{
-			[relations setObject: value forKey: [value URL]];
-			[dict setObject: [value URL] forKey: key];
-		}
-	}
-#endif
-	return relations;
-}
-
-- (void) loadRelatedCoreObjects: (NSDictionary *)relations
-{
-
-}
-
-- (void) storeRelatedCoreObjects: (NSDictionary *)relations
-{
-
-}
-
 @end
