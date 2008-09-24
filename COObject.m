@@ -23,7 +23,6 @@ NSString *kCOModificationDateProperty = @"kCOModificationDateProperty";
 NSString *kCOReadOnlyProperty = @"kCOReadOnlyProperty";
  /* Transient property (see -finishedDeserializing) */
 NSString *kCOParentsProperty = @"kCOParentsProperty";
-NSString *kCOTagProperty = @"kCOTagProperty";
 
 NSString *qCOTextContent = @"qCOTextContent";
 
@@ -81,8 +80,6 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 			kCOReadOnlyProperty,
 		[NSNumber numberWithInt: kCOArrayProperty], 
 			kCOParentsProperty,
-		[NSNumber numberWithInt: kCOArrayProperty], 
-			kCOTagProperty,
 		nil];
 	[self addPropertiesAndTypes: pt];
 	DESTROY(pt);

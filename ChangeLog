@@ -1,3 +1,9 @@
+2008-09-24 Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/COObject.h:
+	* COObject.m:
+	Removed kCOTagProperty, because tags will be implemented in term of groups.
+
 2008-09-23 Quentin Mathe <qmathe@club-internet.fr>
 
 	* Headers/COObjectContext.h:
