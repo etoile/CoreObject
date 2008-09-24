@@ -137,6 +137,12 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return NO;
 }
 
+/** Returns kCGroupNameProperty as the display name. */
+- (NSString *) displayName
+{
+	return [self valueForProperty: kCOGroupNameProperty];
+}
+
 /* Managed Object Edition */
 
 - (void) _addAsParent: (COObject *) object

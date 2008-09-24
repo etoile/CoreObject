@@ -41,6 +41,7 @@ extern NSString *kCOGroupChild;
 - (id) init;
 - (BOOL) isGroup;
 - (BOOL) isOpaque;
+- (NSString *) displayName;
 
 /* Managed Object Edition */
 
