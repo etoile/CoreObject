@@ -75,6 +75,8 @@ typedef enum _COChildrenMergePolicy
 
 + (id) defaultContext;
 
+- (id) initWithUUID: (ETUUID *)aContextUUID;
+
 - (COMetadataServer *) metadataServer;
 - (COObjectServer *) objectServer;
 
@@ -167,6 +169,7 @@ typedef enum _COChildrenMergePolicy
 /* Snapshot-based Persistency */
 
 - (int) snapshotTimeInterval;
+- (void) setSnapshotTimeInterval: (int)anInterval;
 - (void) snapshotObject: (id)object;
 
 /* COProxy Compatibility */

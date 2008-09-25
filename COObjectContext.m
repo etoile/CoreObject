@@ -27,6 +27,7 @@ NSString *COMergedObjectsKey = @"COMergedObjectsKey";
 @end
 
 @interface COObjectContext (Private)
+- (int) latestVersion;
 - (void) snapshotObject: (id)object shouldIncrementObjectVersion: (BOOL)updateVersion;
 @end
 
@@ -44,32 +45,73 @@ static COObjectContext *defaultObjectContext = nil;
 
 - (id) init
 {
+	return [self initWithUUID: nil];
+}
+
+- (id) initWithUUID: (ETUUID *)aContextUUID
+{
 	SUPERINIT
+
+	BOOL isNewContext = (aContextUUID == nil);
+
+	if (isNewContext)
+	{
+		_uuid = [[ETUUID alloc] init];
+	}
+	else
+	{
+		ASSIGN(_uuid, aContextUUID);
+	}
+	_version = [self latestVersion];
 
 	//_deltaSerializer;
 	//_fullSaveSerializer;
-	_fullSaveTimeInterval = 100;
 	_registeredObjects = [[NSMutableSet alloc] initWithCapacity: AVERAGE_MANAGED_OBJECTS_COUNT];
 	_recordedObjectStack = [[NSMutableArray alloc] initWithCapacity: RECORD_STACK_SIZE];
-	_revertedObject =nil;
-	_delegate = nil;
-	_version = 0;
-	_uuid = [[ETUUID alloc] init];
-	_mergePolicy = COOldChildrenMergePolicy;
+	_revertedObject = nil;
+	[self setSnapshotTimeInterval: 100];
+	[self setDelegate: nil];
+	[self setMergePolicy: COOldChildrenMergePolicy];
 
 	return self;
 }
 
 - (void) dealloc
 {
+	// NOTE: Delegate is a weak reference.
+	//_deltaSerializer;
+	//_fullSaveSerializer;
 	DESTROY(_revertedObject);
 	DESTROY(_recordedObjectStack);
 	DESTROY(_registeredObjects);
-	//_deltaSerializer;
-	//_fullSaveSerializer;
 	DESTROY(_uuid);
 
 	[super dealloc];
+}
+
+/** Returns the lastest object context version in the metadata server.
+    If the object context is new and hasn't logged a version in the metadata 
+    server yet, returns 0. */
+- (int) latestVersion
+{
+	/* The two following queries are equivalent, but max() returns a null row 
+	   when no rows are selected, we could eventually modify 
+	   -[COMetadataServer queryResultObjectWithPGResult:] to return NSNull in 
+	   such case... the coalesce function may also eliminate this null row, but 
+	   I cannot figure how to use it. 
+
+	   SELECT max(contextVersion) FROM History WHERE contextUUID = '946e8e7c-9be5-4a79-7985-e6932736d058';
+	   SELECT contextVersion FROM History WHERE contextUUID = '5901dd38-949-4245-6331-ed1019adc254' 
+	   ORDER BY contextVersion DESC LIMIT 1; */
+
+	id versionNumber = [[self metadataServer] executeDBQuery: [NSString stringWithFormat: 
+		@"SELECT contextVersion FROM History WHERE contextUUID = '%@' "
+		 "ORDER BY contextVersion DESC LIMIT 1;", [[self UUID] stringValue]]];
+
+	if (versionNumber == nil)
+		return 0;
+
+	return [versionNumber intValue];
 }
 
 /** Returns the metadata server bound to this object context. 
@@ -1055,6 +1097,15 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		[inv invoke];
 }
 
+/** Sets the time interval that has to be elapsed between two snapshots, before 
+    taking a new one the next time -recordInvocation: is called. */
+- (void) setSnapshotTimeInterval: (int)anInterval
+{
+	_fullSaveTimeInterval = anInterval;
+}
+
+/** Returns the time interval that has to be elapsed, before taking a new 
+    sanpshot when -recordInvocation: is called. */
 - (int) snapshotTimeInterval
 {
 	return _fullSaveTimeInterval;

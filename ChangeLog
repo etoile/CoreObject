@@ -1,5 +1,15 @@
 2008-09-25 Quentin Mathe <qmathe@club-internet.fr>
 
+	* Headers/COObjectContext.h:
+	* COObjectContext.m: 
+	(-initWithUUID:): Added new designated initializer.
+	(-setSnapshotTimeInterval:, -latestVersion): Added.
+	(-init): Moved code into -initWithUUID: and modified to call this last 
+	method.
+	* TestObjectContext.m (-testLatestVersion): Added.
+
+2008-09-25 Quentin Mathe <qmathe@club-internet.fr>
+
 	* COMetadataServer.m (-queryResultObjectWithPGResult:): Enhanced to support 
 	returning NSNumber objects and not just NSString.
 	* TestMetadataServer.m (-testDBQuery): Added.

@@ -33,6 +33,9 @@
 - (id) initWithObjectContext: (COObjectContext *)ctxt;
 @end
 
+@interface COObjectContext (Private)
+- (int) latestVersion;
+@end
 
 @interface COObjectContext (TestObjectContext) <UKTest>
 @end
@@ -59,6 +62,16 @@
 - (void) testInit
 {
 	UKNotNil([[self class] defaultContext]);
+}
+
+- (void) testLatestVersion
+{
+	UKIntsEqual(0, [self latestVersion]);
+	
+	COObject *object = NEW(SubObject);
+	[object setValue: @"me" forProperty: @"whoami"];
+		
+	UKIntsEqual(1, [self latestVersion]);
 }
 
 - (void) testLastVersionOfObject
