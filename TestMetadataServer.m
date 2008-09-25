@@ -133,4 +133,16 @@
 	UKNil([self URLForUUID: uuid]);
 }
 
+- (void) testDBQuery
+{
+	id url = TMP_URL;
+	id uuid = [ETUUID UUID];
+
+	/* Ensure we have at least one row */
+	[self setURL: url forUUID: uuid]; // NOTE: inserts -1 as objectVersion
+	UKObjectsEqual([NSNumber numberWithInt: -1], [self executeDBQuery: @"SELECT min(objectVersion) FROM UUID"]);
+	id urlQuery = [NSString stringWithFormat: @"SELECT url FROM UUID WHERE url = '%@'", [url absoluteString]];
+	UKStringsEqual([url absoluteString], [self executeDBQuery: urlQuery]);
+}
+
 @end

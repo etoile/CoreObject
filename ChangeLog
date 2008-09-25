@@ -1,3 +1,9 @@
+2008-09-25 Quentin Mathe <qmathe@club-internet.fr>
+
+	* COMetadataServer.m (-queryResultObjectWithPGResult:): Enhanced to support 
+	returning NSNumber objects and not just NSString.
+	* TestMetadataServer.m (-testDBQuery): Added.
+
 2008-09-24 Quentin Mathe <qmathe@club-internet.fr>
 
 	* COObject.m:

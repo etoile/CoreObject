@@ -9,6 +9,11 @@
 #import "COMetadataServer.h"
 #import "COUtility.h"
 
+/* postgresql/catalog/pg_type.h cannot be included, hence we redeclare some types */
+#define INT8OID	20
+#define INT2OID	21
+#define INT4OID 23
+
 #define DEFAULTS [NSUserDefaults standardUserDefaults]
 #define FM [NSFileManager defaultManager]
 
@@ -249,7 +254,17 @@ static COMetadataServer *metadataServer = nil;
 
 	if (nbOfRows == 1 && nbOfCols == 1)
 	{
-		return [NSString stringWithUTF8String: PQgetvalue(result, 0, 0)];
+		switch (PQftype(result, 0))
+		{
+			case INT2OID:
+				return [NSNumber numberWithInt: atoi(PQgetvalue(result, 0, 0))];
+			case INT4OID:
+				return [NSNumber numberWithLong: atol(PQgetvalue(result, 0, 0))];
+			case INT8OID:
+				return [NSNumber numberWithLongLong: atoll(PQgetvalue(result, 0, 0))];
+			default:
+				return [NSString stringWithUTF8String: PQgetvalue(result, 0, 0)];
+		}
 	}
 	else
 	{
