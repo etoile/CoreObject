@@ -66,12 +66,28 @@
 
 - (void) testLatestVersion
 {
-	UKIntsEqual(0, [self latestVersion]);
+	/* Test New Context */
+	id ctxt = [[[self class] alloc] init];
+	id ctxtUUID = [ctxt UUID];
+	UKIntsEqual(0, [ctxt latestVersion]);
 	
-	COObject *object = NEW(SubObject);
+	COObject *object = AUTORELEASE([[SubObject alloc] initWithObjectContext: ctxt]);
+	[object setValue: @"me" forProperty: @"whoami"];	
+	UKIntsEqual(1, [ctxt latestVersion]);
+	
+	RETAIN(ctxtUUID);
+	DESTROY(ctxt);
+	
+	/* Test Recreate Context */
+	ctxt = [[[self class] alloc] initWithUUID: ctxtUUID];
+	RELEASE(ctxtUUID);	
+	UKIntsEqual(1, [ctxt latestVersion]);
+	
+	object = AUTORELEASE([[SubObject alloc] initWithObjectContext: ctxt]);
 	[object setValue: @"me" forProperty: @"whoami"];
-		
-	UKIntsEqual(1, [self latestVersion]);
+	UKIntsEqual(2, [ctxt latestVersion]);
+	
+	DESTROY(ctxt);
 }
 
 - (void) testLastVersionOfObject
