@@ -42,7 +42,8 @@ CoreObject_OBJC_FILES += \
 	TestDirectory.m \
 	TestSerializer.m \
 	TestObjectContext.m \
-	TestMetadataServer.m
+	TestMetadataServer.m \
+	TestObjectServer.m
 endif
 
 CoreObject_HEADER_FILES_DIR += Headers
