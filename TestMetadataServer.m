@@ -145,4 +145,15 @@
 	UKStringsEqual([url absoluteString], [self executeDBQuery: urlQuery]);
 }
 
+- (void) testObjectVersionForUUID
+{
+	ETUUID *uuid = [ETUUID UUID];
+	
+	UKIntsEqual(-1, [self objectVersionForUUID: uuid]);
+	[self setURL: TMP_URL forUUID: uuid];
+	UKIntsEqual(-1, [self objectVersionForUUID: uuid]);
+	[self updateUUID: uuid toObjectVersion: 5 timestamp: [NSDate date]];
+	UKIntsEqual(5, [self objectVersionForUUID: uuid]);
+}
+
 @end

@@ -1,5 +1,12 @@
 2008-09-27 Quentin Mathe <qmathe@club-internet.fr>
 
+	* Headers/COMetadataServer.h:
+	* COMetadataServer.m: 
+	(+objectVersionForUUID:): Added.
+	* TestMetadataServer.m: Updated.
+
+2008-09-27 Quentin Mathe <qmathe@club-internet.fr>
+
 	* Headers/COObjectContext.h:
 	* COObjectContext.m: 
 	(+defaultContext:): Removed.

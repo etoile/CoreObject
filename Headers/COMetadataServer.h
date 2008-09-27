@@ -50,6 +50,7 @@
 - (void) updateUUID: (ETUUID *)uuid 
     toObjectVersion: (int)objectVersion
           timestamp: (NSDate *)recordTimestamp;
+- (int) objectVersionForUUID: (ETUUID *)anUUID;
 
 - (NSURL *) storeURL;
 - (NSMutableDictionary *) configurationDictionary;

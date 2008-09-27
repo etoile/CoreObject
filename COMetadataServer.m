@@ -558,4 +558,28 @@ static COMetadataServer *metadataServer = nil;
 	ETDebugLog(@"Updated UUID %@ to %i %@", uuid, objectVersion, recordTimestamp);
 }
 
+
+/** Returns the object version bound to an UUID in the Metadata database. If no 
+    UUID entry is found, returns -1. 
+    The returned value is also -1, if the UUID entry hasn't been updated once
+    once created with -setURL:forUUID:. */
+- (int) objectVersionForUUID: (ETUUID *)anUUID
+{
+	PGresult *result = [self executeRawPGSQLQuery: [NSString stringWithFormat: 
+		@"SELECT objectVersion FROM UUID WHERE UUID = '%@';", [anUUID stringValue]]];
+	
+	// TODO: Handle invalid result...
+	int nbOfRows = PQntuples(result);
+	int version = -1;
+	
+	NSAssert(nbOfRows <= 1, @"Each UUID entry must be unique in the UUID table");
+	
+	if (nbOfRows == 1)
+		version = atoi(PQgetvalue(result, 0, 0));
+	
+	free(result);
+	
+	return version;
+}
+
 @end
