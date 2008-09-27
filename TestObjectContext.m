@@ -61,7 +61,7 @@
 
 - (void) testInit
 {
-	UKNotNil([[self class] defaultContext]);
+	UKNotNil([[self class] currentContext]);
 }
 
 - (void) testLatestVersion
@@ -121,7 +121,7 @@
 {
 	COObject *object = AUTORELEASE([[SubObject alloc] init]);
 
-	UKObjectsEqual([[self class] defaultContext], [object objectContext]);
+	UKObjectsEqual([[self class] currentContext], [object objectContext]);
 	UKIntsEqual(-1, [object objectVersion]);
 
 	/* This first recorded invocation results in a snapshot with version 0, 

@@ -73,7 +73,8 @@ typedef enum _COChildrenMergePolicy
 	COChildrenMergePolicy _mergePolicy;
 }
 
-+ (id) defaultContext;
++ (COObjectContext *) currentContext;
++ (void) setCurrentContext: (COObjectContext *)aContext;
 
 - (id) initWithUUID: (ETUUID *)aContextUUID;
 

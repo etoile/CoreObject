@@ -1,3 +1,20 @@
+2008-09-27 Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/COObjectContext.h:
+	* COObjectContext.m: 
+	(+defaultContext:): Removed.
+	(+currentContext:, +setCurrentContext:, +initialize): Added.
+	* TestObjectContext.m: Updated.
+
+2008-09-26 Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/COObjectServer.h:
+	* COObjectServer.m: 
+	Documented several methods and...
+	(-metadataServer): Added.
+	(-objectForUUID: -managedObjectForURL:): Implemented.
+	* TestObjectServer.m: Added.
+
 2008-09-25 Quentin Mathe <qmathe@club-internet.fr>
 
 	* Headers/COObjectContext.h:

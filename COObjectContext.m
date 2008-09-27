@@ -33,14 +33,26 @@ NSString *COMergedObjectsKey = @"COMergedObjectsKey";
 
 @implementation COObjectContext
 
-static COObjectContext *defaultObjectContext = nil;
+static COObjectContext *currentObjectContext = nil;
 
-+ (id) defaultContext
++ (void) initialize
 {
-	if (defaultObjectContext == nil)
-		defaultObjectContext = [[COObjectContext alloc] init];
+	if (self != [COObjectContext class])
+		return;
 
-	return defaultObjectContext;
+	[self setCurrentContext: AUTORELEASE([[COObjectContext alloc] init])];	
+}
+
+/** Returns the current object context. */
++ (COObjectContext *) currentContext
+{
+	return currentObjectContext;
+}
+
+/** Sets the current object context. */
++ (void) setCurrentContext: (COObjectContext *)aContext
+{
+	ASSIGN(currentObjectContext, aContext);
 }
 
 - (id) init
@@ -87,6 +99,11 @@ static COObjectContext *defaultObjectContext = nil;
 	DESTROY(_uuid);
 
 	[super dealloc];
+}
+
+- (NSString *) description
+{
+	return [NSString stringWithFormat: @"%@ version: %i", [super description], [self version]];
 }
 
 /** Returns the lastest object context version in the metadata server.
