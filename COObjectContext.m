@@ -175,6 +175,122 @@ static COObjectContext *currentObjectContext = nil;
 
 /* Registering Managed Objects */
 
+/** Returns the object identified by anUUID, if it exits and belongs to the 
+    receiver or by deserializing a new instance if it doesn't exist. If the 
+    object is cached in the object server but belongs to another object 
+    context or no serialized object exists for an UUID, returns nil.
+    If the returned object is a new instance deserialized by this method, 
+    the new instance is registered in the receiver before getting returned. 
+    If no serialized object exists for anUUID, this means either no such 
+    UUID entry exist in the metadata server or that the URL bound to anUUID 
+    doesn't point to a stored object that can be deserialized. */
+- (id) objectForUUID: (ETUUID *)anUUID
+{
+	id object = [[self objectServer] cachedObjectForUUID: anUUID];
+	BOOL boundToCachedObject = (object != nil);
+
+	if (boundToCachedObject)
+	{
+		if ([_registeredObjects containsObject: object])
+		{
+			return object;
+		}
+		return nil;
+	}
+	
+	// TODO: If two queries badly impact the performance, only do a single one 
+	// by adding a new method to COMetadataServer.
+	int objectVersion = [[self metadataServer] objectVersionForUUID: anUUID];
+	NSURL *objectURL = [[self metadataServer] URLForUUID: anUUID];
+	// TODO: Replace the next line with  
+	// int fullSaveVersion = [[NSObjectSerialBundle objectStoreWithURL: objectURL] lastVersionInBranch: @"root" ofType: @"FullSave"]
+	int fullSaveVersion = [self lastSnapshotVersionOfObjectWithURL: objectURL];
+	ETDeserializer *snapshotDeserializer = [[ETSerializer 
+		defaultCoreObjectFullSaveSerializerForURL: objectURL version: fullSaveVersion] deserializer];
+	
+	// FIXME: -[ETSerializer deserializer] doesn't replicate the version on the 
+	// returned deserializer
+	[snapshotDeserializer setVersion: fullSaveVersion];
+	object = [snapshotDeserializer restoreObjectGraph];
+	
+	if (object == nil)
+		return nil;
+
+	[object deserializerDidFinish: snapshotDeserializer forVersion: fullSaveVersion];
+	
+	[self playbackInvocationsWithObject: object 
+	                        fromVersion: fullSaveVersion 
+	                          toVersion: objectVersion];
+	
+	NSAssert2([object objectVersion] == objectVersion, @"Recreated object "
+		"version %@ doesn't match the requested version %i", object, objectVersion);
+
+	[self registerObject: object];
+	
+	return object;
+}
+
+/** Returns the first version back in time which corresponds to a snapshot and 
+	not a delta. If no such version can be found (probably no snapshot 
+	available), returns -1. */
+- (int) lastSnapshotVersionOfObjectWithURL: (NSURL *)anURL
+{
+	NSURL *serializationURL = [[anURL URLByAppendingPath: @"FullSave"] URLByAppendingPath: @"root"];
+	NSString *branchPath = [serializationURL path];
+	/* -directoryContentsAtPath: returns nil if branchPath is invalid */
+	NSArray *saveNames = [[NSFileManager defaultManager] directoryContentsAtPath: branchPath];
+	int aVersion = -1;
+
+	/* Directory content isn't sorted so we must iterate through all the content */
+	int saveVersion = -1;
+	FOREACH(saveNames, saveName, NSString *)
+	{
+		ETDebugLog(@"Test %@ to find last version at %@", saveName, serializationURL);
+		saveVersion = [[saveName stringByDeletingPathExtension] intValue];
+
+		if (saveVersion > aVersion)
+			aVersion = saveVersion;
+	}
+
+	return aVersion;
+}
+
+/** Returns the first version forward in time which corresponds to a snapshot or
+    a delta. If no such version can be found (no snapshot or delta available 
+    unless an error occured), returns -1.
+    If object hasn't been made persistent yet or isn't registered in the 
+    receiver also returns -1. Hence this method returns -1 for rolledback 
+    objects not yet inserted in an object context. */
+- (int) lastVersionOfObjectWithURL: (NSURL *)anURL
+{
+	// FIXME: Test UUID or add -containsTemporalInstance: to NSSet
+	/*if ([object isPersistent] == NO || [_registeredObjects containsObject: object] == NO)
+	{
+		return -1;
+	}*/
+
+	// TODO: Move this code into ETSerialObjectBundle, probably by adding 
+	// methods such -lastVersion:inBranch: and -lastVersion. We may also cache 
+	// the last version in a plist stored in the bundle to avoid the linear 
+	// search in the directory.
+	NSURL *serializationURL = [[anURL URLByAppendingPath: @"Delta"] URLByAppendingPath: @"root"];
+	NSArray *deltaFileNames = [[NSFileManager defaultManager] 
+		directoryContentsAtPath: [[serializationURL path] stringByStandardizingPath]];
+	int aVersion = -1;
+
+	/* Directory content isn't sorted so we must iterate through all the content */
+	FOREACH(deltaFileNames, deltaName, NSString *)
+	{
+		ETDebugLog(@"Test delta %@ to find last version of %@", deltaName, object);
+		int deltaVersion = [[deltaName stringByDeletingPathExtension] intValue];
+
+		if (deltaVersion > aVersion)
+			aVersion = deltaVersion;
+	}
+
+	return aVersion;
+}
+
 /** Registers an object to belong to the receiver.
     A managed core object can belong to a single object context at a time. Hence 
     you must unregister it before being able to move it from one context to 

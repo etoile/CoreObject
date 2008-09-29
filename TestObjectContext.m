@@ -90,6 +90,61 @@
 	DESTROY(ctxt);
 }
 
+- (void) testObjectForUUID
+{
+	COObject *object = NEW(SubObject);
+	
+	[object setValue: @"me" forProperty: @"whoami"];
+	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
+	
+	UKObjectsSame(object, [self objectForUUID: [object UUID]]);
+	
+	[self unregisterObject: object];
+	
+	id newObject = [self objectForUUID: [object UUID]];
+	
+	UKObjectsNotSame(object, newObject);
+	UKObjectsEqual(object, newObject); // version and UUID are identical
+	UKTrue([[self registeredObjects] containsObject: newObject]);
+}
+
+- (void) testLastSnapshotVersionOfObjectWithURL
+{
+	COObject *object = AUTORELEASE([[SubObject alloc] init]);
+
+	COObjectContext *ctxt = [object objectContext];
+	NSURL *objectURL = [ctxt serializationURLForObject: object];
+
+	ETLog(@"UUID is %@ for %@ at URL %@ ", [object UUID], object, objectURL);
+	UKIntsEqual(-1, [ctxt lastSnapshotVersionOfObjectWithURL: objectURL]);
+
+	/* This first recorded invocation results in a snapshot with version 0, 
+       immediately followed by an invocation record with version 1. */
+	[object setValue: @"me" forProperty: @"whoami"];
+	UKIntsEqual(0, [ctxt lastSnapshotVersionOfObjectWithURL: objectURL]);
+	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
+	/* Snapshot is automatically taken only every 100 invocations by default. */
+	UKIntsEqual(0, [ctxt lastSnapshotVersionOfObjectWithURL: objectURL]);
+	/* We increment the version to a relatively high number, so we can be sure 
+	   the test doesn't accidentally pass because we look in the wrong object 
+	   bundle. Most of other object bundles created in tests have a version 
+	   around 3 or 4. */
+	for (int i = 1; i <= 15; i++)
+	{
+		[ctxt snapshotObject: object];
+	}
+	/* Base version is zero so we ignore this first snapshot */
+	int nbOfSnapshotsFollowingDeltas = 15;
+	int nbOfDeltas = 2;
+	int lastSnapshotVersion = nbOfDeltas + nbOfSnapshotsFollowingDeltas;
+	
+	/* An extra delta that makes the last snapshot version different from the 
+	   last object version */
+	[object setValue: @"hm" forProperty: @"whoami"];
+
+	UKIntsEqual(lastSnapshotVersion, [ctxt lastSnapshotVersionOfObjectWithURL: objectURL]);
+}
+
 - (void) testLastVersionOfObject
 {
 	COObject *object = AUTORELEASE([[SubObject alloc] init]);

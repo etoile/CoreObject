@@ -1,3 +1,11 @@
+2008-09-29 Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/COObjectContext.h:
+	* COObjectContext.m (-lastSnapshotVersionOfObjectWithURL:, 
+	-objectForUUID:): Added.
+	* TestObjectContext.m (-testLastSnapshotVersionOfObjectWithURL, 
+	-testObjectForUUID:): Added.
+
 2008-09-27 Quentin Mathe <qmathe@club-internet.fr>
 
 	* Headers/COMetadataServer.h:
