@@ -224,6 +224,9 @@ static COObjectContext *currentObjectContext = nil;
 	
 	NSAssert2([object objectVersion] == objectVersion, @"Recreated object "
 		"version %@ doesn't match the requested version %i", object, objectVersion);
+	
+	if ([object isKindOfClass: [COGroup class]])
+		[object setHasFaults: YES];
 
 	[self registerObject: object];
 	
@@ -385,16 +388,17 @@ static COObjectContext *currentObjectContext = nil;
 /* Faulting */
 
 /** Returns a real object by resolving the fault object passed in parameter.
-    The resolved object is automatically registered into the receiver if it 
-    isn't already. */
+    If the resolved object doesn't exist as a cached object and has to be 
+    deserialized, the new instance is automatically registered into the receiver 
+   and cached in the object server. */
 - (id) resolvedObjectForFault: (id)aFault
 {
 	id cachedObject = [[self objectServer] cachedObjectForUUID: aFault];
 
-	if ([_registeredObjects containsObject: cachedObject] == NO)
-		[self registerObject: cachedObject];
+	if (cachedObject != nil)
+		return cachedObject;
 	
-	return cachedObject;
+	return [self objectForUUID: aFault];;
 }
 
 /* Merging */
@@ -976,6 +980,9 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	[self playbackInvocationsWithObject: rolledbackObject 
 	                        fromVersion: baseVersion
 	                          toVersion: aVersion];
+	
+	if ([rolledbackObject isKindOfClass: [COGroup class]])
+		[rolledbackObject setHasFaults: YES];
 
 	if (mergeNow)
 		[self replaceObject: anObject byObject: rolledbackObject collectAllErrors: YES];

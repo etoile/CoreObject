@@ -26,7 +26,7 @@ extern NSString *kCOGroupChild;
 
 @interface COGroup: COObject <COGroup>
 {
-	BOOL _hasFaults;
+	BOOL _hasFaults; /** Transient flag set to YES on deserialization (see -finishedDeserializing) */
 }
 
 + (BOOL) isGroupAtURL: (NSURL *)anURL;
@@ -87,6 +87,7 @@ extern NSString *kCOGroupChild;
 /* Faulting */
 
 - (BOOL) hasFaults;
+- (void) setHasFaults: (BOOL)flag;
 - (void) resolveFaults;
 
 /* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */

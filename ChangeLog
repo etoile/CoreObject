@@ -1,3 +1,21 @@
+2008-09-30 Quentin Mathe <qmathe@club-internet.fr>
+
+	More work on faulting. Faulting is now working but is not used yet.
+	* Headers/COGroup.h:
+	* COGroup.m:
+	(-resolveFaults): Fixed by modifying it to match the doc and the new test 
+	method.
+	(-setHasFaults,-serialize:using:): Added.
+	(-members, -groups, -mergeObjectsWithObjectsOfGroup:policy:, 
+	replaceObject:byObject:isTemporalMerge:error:): Modified to call 
+	-resolveFaults.
+	* TestGroup.m (-testResolveFaults): Added.
+	* COObjectContext.m (-resolvedObjectForFault:): Fixed, the current code 
+	was a rough draft.
+	(-objectForUUID:, objectByRollingbackObject:toVersion:mergeImmediately:): 
+	Modified to mark deserialized objects as having faults.
+	* TestObjectContext.m (-testResolvedObjectForFault): Added.
+
 2008-09-29 Quentin Mathe <qmathe@club-internet.fr>
 
 	* Headers/COObjectContext.h:

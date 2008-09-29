@@ -90,6 +90,23 @@
 	DESTROY(ctxt);
 }
 
+- (void) testResolvedObjectForFault
+{
+	COObject *object = NEW(SubObject);
+	
+	[object setValue: @"me" forProperty: @"whoami"];
+	
+	UKObjectsSame(object, [self resolvedObjectForFault: [object UUID]]);
+	
+	[self unregisterObject: object];
+	
+	id newObject = [self resolvedObjectForFault: [object UUID]];
+	
+	UKObjectsNotSame(object, newObject);
+	UKObjectsEqual(object, newObject); // version and UUID are identical
+	UKTrue([[self registeredObjects] containsObject: newObject]);
+}
+
 - (void) testObjectForUUID
 {
 	COObject *object = NEW(SubObject);

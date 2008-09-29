@@ -118,6 +118,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	      forProperty: kCOGroupChildrenProperty];
 	[self setValue: [NSMutableArray array]
 	      forProperty: kCOGroupSubgroupsProperty];
+	_hasFaults = NO;
 	[self enablePersistency];
 	return self;
 }
@@ -177,7 +178,14 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 {
 	if ([object conformsToProtocol: @protocol(COGroup)])
 		return [self addGroup: (id <COGroup>)object];
-		
+
+	// TODO: Take faults in account...
+	// Could check whether a contains a fault for object by comparing the UUIDs 
+	// in another method than -containsObject... containsObjectOrFault:
+	// otherwise -resolveFaults is called by invocation playback and it gets
+	// messy unless we check whether -isReverting is true.
+	//[self resolveFaults];
+
 	NSMutableArray *a = [self valueForProperty: kCOGroupChildrenProperty];
 	if ([a containsObject: object] == NO)
 	{
@@ -213,6 +221,8 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	if ([object conformsToProtocol: @protocol(COGroup)])
 		return [self removeGroup: (id <COGroup>)object];
 
+	// TODO: Take faults in account
+
 	NSMutableArray *a = [self valueForProperty: kCOGroupChildrenProperty];
 	if ([a containsObject: object] == YES)
 	{
@@ -238,12 +248,16 @@ NSString *kCOGroupChild = @"kCOGroupChild";
     Groups are included in the returned array. */
 - (NSArray *) members
 {
+	[self resolveFaults];
+
 	return [[self valueForProperty: kCOGroupChildrenProperty] arrayByAddingObjectsFromArray:
 	            [self valueForProperty: kCOGroupSubgroupsProperty]];
 }
 
 - (BOOL) addGroup: (id <COGroup>)group
 {
+	// TODO: Take faults in account
+
 	NSMutableArray *a = [self valueForProperty: kCOGroupSubgroupsProperty];
 	if ([a containsObject: group] == NO)
 	{
@@ -267,6 +281,8 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 - (BOOL) removeGroup: (id <COGroup>)group
 {
+	// TODO: Take faults in account
+
 	NSMutableArray *a = [self valueForProperty: kCOGroupSubgroupsProperty];
 	if ([a containsObject: group] == YES)
 	{
@@ -290,6 +306,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 - (NSArray *) groups
 {
+	[self resolveFaults];
 	return [self valueForProperty: kCOGroupSubgroupsProperty];
 }
 
@@ -440,6 +457,8 @@ NSString *kCOGroupChild = @"kCOGroupChild";
                 isTemporalMerge: (BOOL)temporal 
                           error: (NSError **)error
 {
+	[self resolveFaults];
+
 	if (temporal && [otherObject isMemberOfClass: [anObject class]] == NO)
 	{
 		ETLog(@"WARNING: Merged object class %@ must be identical to replaced "
@@ -510,6 +529,9 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 - (void) mergeObjectsWithObjectsOfGroup: (COGroup *)aGroup 
                                  policy: (COChildrenMergePolicy)aPolicy
 {
+	[self resolveFaults];
+	[aGroup resolveFaults];
+
 	[self mergeArray: [aGroup valueForProperty: kCOGroupChildrenProperty]
 	       intoArray: [self valueForProperty: kCOGroupChildrenProperty]
 	          policy: aPolicy];
@@ -561,11 +583,21 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 /* Faulting */
 
-/** Returns whether some childen of the receiver are fault markers and not 
-    real objects. */
+/** Returns whether some children of the receiver are fault markers and not 
+    real objects.
+    If -hasFaults returns YES, the receiver will attempt to resolve them 
+    the next time any collection mutation methods related to the children is 
+    called.  */
 - (BOOL) hasFaults
 {
 	return _hasFaults;
+}
+
+/** Marks the receiver as potentially having fault markers and not real objects 
+    for some children. */
+- (void) setHasFaults: (BOOL)flag
+{
+	_hasFaults = flag;
 }
 
 /** Resolves all the existing faults in the children of the receiver, by 
@@ -590,19 +622,20 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 	FOREACHI(objects, anObject)
 	{
-		if ([anObject isFault])
-		{
-			resolvedObject = [[self objectContext] resolvedObjectForFault: anObject];
+		if ([anObject isFault] == NO)
+			continue;
 
-			if (resolvedObject == nil)
-			{
-				resolvedAllFaults = NO;
-				ETLog(@"NOTE: No object available for UUID %@", anObject);
-			}
+		resolvedObject = [[self objectContext] resolvedObjectForFault: anObject];
+
+		if (resolvedObject == nil)
+		{
+			resolvedAllFaults = NO;
+			ETLog(@"NOTE: No object available for UUID %@", anObject);
+			continue;
 		}
 
 		// TODO: Probably replace by -isGroup...
-		if ([anObject isKindOfClass: [COGroup class]])
+		if ([resolvedObject isKindOfClass: [COGroup class]])
 		{
 			[self _replaceFaultObject: anObject inArray: subgroupObjects withObject: resolvedObject];
 		}
@@ -629,6 +662,22 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	{
 		[objects removeObject: aFault];
 	}
+}
+
+/* Serialization (EtoileSerialize) */
+
+/** If you override this method, you must call superclass implemention before 
+    your own code. */
+- (BOOL) serialize: (char *)aVariable using: (ETSerializer *)aSerializer
+{
+	BOOL didSerialize = [super serialize: aVariable using: aSerializer];
+
+	if (strcmp(aVariable, "_hasFaults") == 0)
+	{
+		didSerialize = YES; /* Should not be automatically serialized (manual) */
+	}
+
+	return didSerialize;
 }
 
 /* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
