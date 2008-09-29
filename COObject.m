@@ -172,6 +172,7 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 
 /* Factory Method */
 
+/** Returns a core object graph by importing propertyList. */
 + (id) objectWithPropertyList: (NSDictionary *) propertyList
 {
 	id object = nil;
@@ -212,6 +213,11 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	return self;
 }
 
+/** Returns the receiver data model as a property list.
+    You can use this method for exporting and -initWithPropertyList: as the 
+    symetric method for importing. 
+    If you want to export an object graph rather than a single object, use 
+    -[COGroup propertyList].*/
 - (NSMutableDictionary *) propertyList
 {
 	return [self _outputObjectVersion1];
@@ -244,7 +250,7 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	_objectVersion = -1;
 	if ([[self class] automaticallyMakeNewInstancesPersistent])
 	{
-		[[COObjectContext defaultContext] registerObject: self];
+		[[COObjectContext currentContext] registerObject: self];
 		[self enablePersistency];
 	}
 
@@ -254,6 +260,8 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 - (void) dealloc
 {
 	DESTROY(_properties);
+	// NOTE: _objectContext is a weak reference
+	
 	[super dealloc];
 }
 
@@ -281,7 +289,6 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 {
 	return YES;
 }
-
 
 - (BOOL) isCopyPromise
 {
