@@ -11,19 +11,64 @@
 #import "COGroup.h"
 #import "GNUstep.h"
 
-@interface TestGroup: NSObject <UKTest>
+@interface TestGroup : NSObject <UKTest>
+{
+	COGroup *g;
+	COObject *o1;
+	COObject *o2;
+	COObject *o3;
+	COObject *o4;
+	COGroup *g1;
+	COGroup *g2;
+	COGroup *g3;
+	COGroup *gg1;
+}
+
 @end
 
 @implementation TestGroup
-- (id) init
+
+- (id) initForTest
 {
-	self = [super init];
+	SUPERINIT
+
+	g = [[COGroup alloc] init];
+	o1 = [[COObject alloc] init];
+	[o1 setValue: @"Home" forProperty: @"Location"];
+	[o1 setValue: [NSNumber numberWithFloat: 2.12] forProperty: @"Float"];
+
+	o2 = [[COObject alloc] init];
+	[o2 setValue: @"Office" forProperty: @"Location"];
+	[o2 setValue: [NSNumber numberWithFloat: 11.2] forProperty: @"Float"];
+
+	o3 = [[COObject alloc] init];
+	[o3 setValue: @"Vacation" forProperty: @"Location"];
+	[o3 setValue: [NSNumber numberWithFloat: 0] forProperty: @"Float"];
+
+	o4 = [[COObject alloc] init];
+	[o4 setValue: @"Factory" forProperty: @"Location"];
+	[o4 setValue: [NSNumber numberWithFloat: 20.1] forProperty: @"Float"];
+	
+	g1 = [[COGroup alloc] init];
+	g2 = [[COGroup alloc] init];
+	g3 = [[COGroup alloc] init];
+	gg1 = [[COGroup alloc] init];
+	
 	return self;
 }
 
-- (void) dealloc
+- (void) releaseForTest
 {
-	[super dealloc];
+	DESTROY(o1);
+	DESTROY(o2);
+	DESTROY(o3);
+	DESTROY(o4);
+	DESTROY(g1);
+	DESTROY(g2);
+	DESTROY(g3);
+	DESTROY(gg1);
+
+	[super release];
 }
 
 - (void) testSearch
@@ -36,25 +81,9 @@
 		nil];
 	[COObject addPropertiesAndTypes: dict];
 
-	COGroup *g = [[COGroup alloc] init];
-	COObject *o1= [[COObject alloc] init];
-	[o1 setValue: @"Home" forProperty: @"Location"];
-	[o1 setValue: [NSNumber numberWithFloat: 2.12] forProperty: @"Float"];
 	UKTrue([g addMember: o1]);
-
-	COObject *o2 = [[COObject alloc] init];
-	[o2 setValue: @"Office" forProperty: @"Location"];
-	[o2 setValue: [NSNumber numberWithFloat: 11.2] forProperty: @"Float"];
 	UKTrue([g addMember: o2]);
-
-	COObject *o3 = [[COObject alloc] init];
-	[o3 setValue: @"Vacation" forProperty: @"Location"];
-	[o3 setValue: [NSNumber numberWithFloat: 0] forProperty: @"Float"];
 	UKTrue([g addMember: o3]);
-
-	COObject *o4 = [[COObject alloc] init];
-	[o4 setValue: @"Factory" forProperty: @"Location"];
-	[o4 setValue: [NSNumber numberWithFloat: 20.1] forProperty: @"Float"];
 	UKTrue([g addMember: o4]);
 
 	NSArray *array = nil;
@@ -100,10 +129,6 @@
 	p1 = [NSPredicate predicateWithFormat: @"%K == %@ AND (NOT %K < %@)", @"Location", @"Home", @"Float", [NSNumber numberWithFloat: 4]];
 	UKFalse([o matchesPredicate: p1]);
 #endif
-	DESTROY(o1);
-	DESTROY(o2);
-	DESTROY(o3);
-	DESTROY(o4);
 }
 
 - (void) testObjects
@@ -116,25 +141,9 @@
 		nil];
 	[COObject addPropertiesAndTypes: dict];
 
-	COGroup *g = [[COGroup alloc] init];
-	COObject *o1= [[COObject alloc] init];
-	[o1 setValue: @"Home" forProperty: @"Location"];
-	[o1 setValue: [NSNumber numberWithFloat: 2.12] forProperty: @"Float"];
 	UKTrue([g addMember: o1]);
-
-	COObject *o2 = [[COObject alloc] init];
-	[o2 setValue: @"Office" forProperty: @"Location"];
-	[o2 setValue: [NSNumber numberWithFloat: 11.2] forProperty: @"Float"];
 	UKTrue([g addMember: o2]);
-
-	COObject *o3 = [[COObject alloc] init];
-	[o3 setValue: @"Vacation" forProperty: @"Location"];
-	[o3 setValue: [NSNumber numberWithFloat: 0] forProperty: @"Float"];
 	UKTrue([g addMember: o3]);
-
-	COObject *o4 = [[COObject alloc] init];
-	[o4 setValue: @"Factory" forProperty: @"Location"];
-	[o4 setValue: [NSNumber numberWithFloat: 20.1] forProperty: @"Float"];
 	UKTrue([g addMember: o4]);
 
 	NSArray *a = [g members];
@@ -148,11 +157,6 @@
 	//UKIntsEqual([a count], 3);
 	p = [o3 parentGroups];
 	UKIntsEqual([p count], 0);
-
-	DESTROY(o1);
-	DESTROY(o2);
-	DESTROY(o3);
-	DESTROY(o4);
 }
 
 - (void) testPropertyList
@@ -165,10 +169,6 @@
 		nil];
 	[COObject addPropertiesAndTypes: dict];
 
-	COGroup *g = [[COGroup alloc] init];
-	COObject *o1= [[COObject alloc] init];
-	[o1 setValue: @"Home" forProperty: @"Location"];
-	[o1 setValue: [NSNumber numberWithFloat: 2.12] forProperty: @"Float"];
 	UKTrue([g addMember: o1]);
 	UKIntsEqual([[g members] count], 1);
 
@@ -216,32 +216,15 @@
 		nil];
 	[COObject addPropertiesAndTypes: dict];
 
-	COGroup *g = [[COGroup alloc] init];
-	COObject *o1= [[COObject alloc] init];
-	[o1 setValue: @"Home" forProperty: @"Location"];
-	[o1 setValue: [NSNumber numberWithFloat: 2.12] forProperty: @"Float"];
 	UKTrue([g addMember: o1]);
 	UKIntsEqual([[g members] count], 1);
-
-	COObject *o2 = [[COObject alloc] init];
-	[o2 setValue: @"Office" forProperty: @"Location"];
-	[o2 setValue: [NSNumber numberWithFloat: 11.2] forProperty: @"Float"];
 	UKTrue([g addMember: o2]);
 	UKIntsEqual([[g members] count], 2);
-
-	COObject *o3 = [[COObject alloc] init];
-	[o3 setValue: @"Vacation" forProperty: @"Location"];
-	[o3 setValue: [NSNumber numberWithFloat: 0] forProperty: @"Float"];
 	UKTrue([g addMember: o3]);
 	UKIntsEqual([[g members] count], 3);
-
-	COObject *o4 = [[COObject alloc] init];
-	[o4 setValue: @"Factory" forProperty: @"Location"];
-	[o4 setValue: [NSNumber numberWithFloat: 20.1] forProperty: @"Float"];
 	UKTrue([g addMember: o4]);
 	UKIntsEqual([[g members] count], 4);
 
-	COGroup *g1 = [[COGroup alloc] init];
 	[g1 addMember: o1];
 	[g1 addMember: o2];
 	[g1 addMember: o3];
@@ -249,19 +232,16 @@
 	UKIntsEqual([[g groups] count], 1);
 	UKIntsEqual([[g1 members] count], 3);
 
-	COGroup *g2 = [[COGroup alloc] init];
 	[g2 addMember: o1];
 	[g2 addMember: o4];
 	UKTrue([g addGroup: g2]);
 	UKIntsEqual([[g groups] count], 2);
 	UKIntsEqual([[g2 members] count], 2);
 
-	COGroup *g3 = [[COGroup alloc] init];
 	UKTrue([g addGroup: g3]);
 	UKIntsEqual([[g groups] count], 3);
 	UKIntsEqual([[g3 members] count], 0);
 
-	COGroup *gg1 = [[COGroup alloc] init];
 	UKTrue([g1 addGroup: gg1]);
 	UKIntsEqual([[g1 members] count], 4);
 	UKIntsEqual([[g1 groups] count], 1);
@@ -291,7 +271,7 @@
 	NSLog(@"Write to file %@", p);
 #endif
 
-	/* We don't need multable option here. COMultiValue should handle it. */
+	/* We don't need mutable option here. COMultiValue should handle it. */
 	error = nil;
 	NSPropertyListFormat format = 0;
 	pl = [NSPropertyListSerialization propertyListFromData: data
@@ -324,37 +304,20 @@
 - (void) testResolveFaults
 {
 	/* Test resolving child objects */
-	COGroup *g = [[COGroup alloc] init];
+	
 	[g setHasFaults: YES];
 	// -resolvedFaults calls -[COObjectContext resolvedObjectForFault:]
 	[[COObjectContext currentContext] registerObject: g];
 
-	COObject *o1= [[COObject alloc] init];
 	NSMutableArray *gChildren = [g valueForProperty: kCOGroupChildrenProperty];
 
-	[o1 setValue: @"Home" forProperty: @"Location"];
-	[o1 setValue: [NSNumber numberWithFloat: 2.12] forProperty: @"Float"];
 	// -addMember: triggers -resolveFaults, this would resolve o2 now
 	[gChildren addObject: o1];
-
-	COObject *o2 = [[COObject alloc] init];
-	[o2 setValue: @"Office" forProperty: @"Location"];
-	[o2 setValue: [NSNumber numberWithFloat: 11.2] forProperty: @"Float"];
 	[gChildren addObject: [o2 UUID]];
-
 	[[COObjectContext currentContext] registerObject: o2]; // cache o2
-
-	COObject *o3 = [[COObject alloc] init];
-	[o3 setValue: @"Vacation" forProperty: @"Location"];
-	[o3 setValue: [NSNumber numberWithFloat: 0] forProperty: @"Float"];
 	[gChildren addObject: [o3 UUID]];
 	/* Don't register o3 so -[COObjectContext resolvedObjectForFault:] returns nil */
-
-	COObject *o4 = [[COObject alloc] init];
-	[o4 setValue: @"Factory" forProperty: @"Location"];
-	[o4 setValue: [NSNumber numberWithFloat: 20.1] forProperty: @"Float"];
-	UKTrue([g addMember: o4]);
-
+	[gChildren addObject: o4];
 	[gChildren addObject: [ETUUID UUID]];
 
 	[g resolveFaults];
@@ -366,31 +329,22 @@
 	// FIXME: Fix UnitKit, should be UKObjectKindOf(ETUUID, [childObjects objectAtIndex: 3]);
 	UKObjectKindOf([childObjects objectAtIndex: 4], ETUUID);
 	UKIntsEqual(5, [childObjects count]);
-	
-	DESTROY(g);
 
 	/* Test resolving child groups */
+	DESTROY(g);
 	g = [[COGroup alloc] init];
 	[g setHasFaults: YES];
 	[[COObjectContext currentContext] registerObject: g];
 		
-	COGroup *g1 = [[COGroup alloc] init];
 	[g1 addMember: o1];
 	[g1 addMember: o2];
 	[g1 addMember: o3];
 	[g addGroup: g1];
-
-	COGroup *g2 = [[COGroup alloc] init];
 	[g2 addMember: o1];
 	[g2 addMember: o4];
 	[g addGroup: [g2 UUID]];
-
 	[[COObjectContext currentContext] registerObject: g2];
-
-	COGroup *g3 = [[COGroup alloc] init];
 	[g addGroup: [g3 UUID]];
-
-	COGroup *gg1 = [[COGroup alloc] init];
 	[g1 addGroup: gg1];
 	[g1 addGroup: [ETUUID UUID]];
 
