@@ -198,10 +198,47 @@ static COObjectContext *currentObjectContext = nil;
 		return nil;
 	}
 	
+	object = [self objectWithUUID: anUUID];
+	BOOL noPersistentObjectAvailable = (object == nil);
+
+	if (noPersistentObjectAvailable)
+		return nil;
+	
+	if ([object isKindOfClass: [COGroup class]])
+		[object setHasFaults: YES];
+	[self registerObject: object];
+	
+	return object;
+}
+
+/** Recreates the last version of an object for a given UUID by deserializing 
+    it and playing back invocations on it, then returns it.
+    The returned instance doesn't get registered in the receiver. */
+- (id) objectWithUUID: (ETUUID *)anUUID
+{
 	// TODO: If two queries badly impact the performance, only do a single one 
 	// by adding a new method to COMetadataServer.
 	int objectVersion = [[self metadataServer] objectVersionForUUID: anUUID];
 	NSURL *objectURL = [[self metadataServer] URLForUUID: anUUID];
+		
+	return [self objectWithURL: objectURL version: objectVersion];
+}
+
+/** Recreates an object for a given UUID and object version by deserializing 
+    it and playing back invocations on it, then returns it.
+    The returned instance doesn't get registered in the receiver. */
+- (id) objectWithUUID: (ETUUID *)anUUID version: (int)objectVersion
+{
+	NSURL *objectURL = [[self metadataServer] URLForUUID: anUUID];
+		
+	return [self objectWithURL: objectURL version: objectVersion];
+}
+
+/** Recreates an object for a given URL and object version by deserializing 
+    it and playing back invocations on it, then returns it.
+    The returned instance doesn't get registered in the receiver. */
+- (id) objectWithURL: (NSURL *)objectURL version: (int)objectVersion
+{
 	// TODO: Replace the next line with  
 	// int fullSaveVersion = [[NSObjectSerialBundle objectStoreWithURL: objectURL] lastVersionInBranch: @"root" ofType: @"FullSave"]
 	int fullSaveVersion = [self lastSnapshotVersionOfObjectWithURL: objectURL];
@@ -211,9 +248,10 @@ static COObjectContext *currentObjectContext = nil;
 	// FIXME: -[ETSerializer deserializer] doesn't replicate the version on the 
 	// returned deserializer
 	[snapshotDeserializer setVersion: fullSaveVersion];
-	object = [snapshotDeserializer restoreObjectGraph];
+	id object = [snapshotDeserializer restoreObjectGraph];
+	BOOL deserializationFailed = (object == nil);
 	
-	if (object == nil)
+	if (deserializationFailed)
 		return nil;
 
 	[object deserializerDidFinish: snapshotDeserializer forVersion: fullSaveVersion];
@@ -224,11 +262,6 @@ static COObjectContext *currentObjectContext = nil;
 	
 	NSAssert2([object objectVersion] == objectVersion, @"Recreated object "
 		"version %@ doesn't match the requested version %i", object, objectVersion);
-	
-	if ([object isKindOfClass: [COGroup class]])
-		[object setHasFaults: YES];
-
-	[self registerObject: object];
 	
 	return object;
 }

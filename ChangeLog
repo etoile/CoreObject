@@ -1,5 +1,11 @@
 2008-09-30 Quentin Mathe <qmathe@club-internet.fr>
 
+	* Headers/COObjectContext.h:
+	* COObjectContext.m (-objectForUUID:): Modularized into several new methods 
+	-objectWithUUID:, -objectWithUUID:version:, -objectWithURL:version.
+
+2008-09-30 Quentin Mathe <qmathe@club-internet.fr>
+
 	More work on faulting. Faulting is now working but is not used yet.
 	* Headers/COGroup.h:
 	* COGroup.m:

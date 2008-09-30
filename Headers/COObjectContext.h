@@ -87,6 +87,11 @@ typedef enum _COChildrenMergePolicy
 /* Registering Managed Objects */
 
 - (id) objectForUUID: (ETUUID *)anUUID;
+
+// TODO: Move the next methods in other classes
+- (id) objectWithUUID: (ETUUID *)anUUID;
+- (id) objectWithUUID: (ETUUID *)anUUID version: (int)objectVersion;
+- (id) objectWithURL: (NSURL *)objectURL version: (int)objectVersion;
 - (int) lastSnapshotVersionOfObjectWithURL: (NSURL *)anURL;
 
 - (void) registerObject: (id)object;
