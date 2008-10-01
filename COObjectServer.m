@@ -211,9 +211,12 @@ static COObjectServer *localObjectServer = nil;
 	}
 		
 	id object = [ETDeserializer deserializeObjectWithURL: storedObjectURL];
+	BOOL deserializationFailed = (object == nil);
 	
 	// TODO: Verify the object conforms to COManagedObject and thereby responds 
 	// to -UUID
+	if (deserializationFailed)
+		return nil;
 	
 	BOOL isAlreadyInMemory = ([self cachedObjectForUUID: [object UUID]] != nil);
 	

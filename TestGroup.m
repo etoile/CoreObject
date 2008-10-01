@@ -336,17 +336,12 @@
 	[g setHasFaults: YES];
 	[[COObjectContext currentContext] registerObject: g];
 		
-	[g1 addMember: o1];
-	[g1 addMember: o2];
-	[g1 addMember: o3];
 	[g addGroup: g1];
-	[g2 addMember: o1];
-	[g2 addMember: o4];
 	[g addGroup: [g2 UUID]];
 	[[COObjectContext currentContext] registerObject: g2];
 	[g addGroup: [g3 UUID]];
-	[g1 addGroup: gg1];
-	[g1 addGroup: [ETUUID UUID]];
+	[g addGroup: gg1];
+	[g addGroup: [ETUUID UUID]];
 
 	[g resolveFaults];
 
