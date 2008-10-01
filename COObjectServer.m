@@ -10,6 +10,7 @@
 #import "NSObject+CoreObject.h"
 #import "COMetadataServer.h"
 #import "COGroup.h"
+#import "COSerializer.h"
 #import "CODeserializer.h"
 #import "COUtility.h"
 #import "GNUstep.h"
@@ -225,6 +226,65 @@ static COObjectServer *localObjectServer = nil;
 	[self cacheObject: object];
 	
 	return object;
+}
+
+/** Recreates an object for a given URL and object version by deserializing 
+    it and playing back invocations on it, then returns it.
+    The returned instance doesn't get cached in the receiver.
+    For now, this method uses simply binary delta and full save deserializers.*/
+- (id) objectWithURL: (NSURL *)objectURL version: (int)objectVersion
+{
+	// TODO: Replace the next line with  
+	// int fullSaveVersion = [[NSObjectSerialBundle objectStoreWithURL: objectURL] lastVersionInBranch: @"root" ofType: @"FullSave"]
+	int fullSaveVersion = [self lastSnapshotVersionOfObjectWithURL: objectURL forVersion: objectVersion];
+	ETDeserializer *snapshotDeserializer = [[ETSerializer 
+		defaultCoreObjectFullSaveSerializerForURL: objectURL version: fullSaveVersion] deserializer];
+	
+	// FIXME: -[ETSerializer deserializer] doesn't replicate the version on the 
+	// returned deserializer
+	[snapshotDeserializer setVersion: fullSaveVersion];
+	id object = [snapshotDeserializer restoreObjectGraph];
+	BOOL deserializationFailed = (object == nil);
+	
+	if (deserializationFailed)
+		return nil;
+
+	[object deserializerDidFinish: snapshotDeserializer forVersion: fullSaveVersion];
+	
+	ETDeserializer *deltaDeserializer = [[ETSerializer 
+		defaultCoreObjectDeltaSerializerForURL: objectURL version: fullSaveVersion] deserializer];
+		
+	[deltaDeserializer playbackInvocationsWithObject: object 
+	                                     fromVersion: fullSaveVersion 
+	                                       toVersion: objectVersion];
+	
+	NSAssert2([object objectVersion] == objectVersion, @"Recreated object "
+		"version %@ doesn't match the requested version %i", object, objectVersion);
+	
+	return object;
+}
+
+/** Recreates the last version of an object for a given UUID by deserializing 
+    it and playing back invocations on it, then returns it.
+    The returned instance doesn't get registered in the receiver. */
+- (id) objectWithUUID: (ETUUID *)anUUID
+{
+	// TODO: If two queries badly impact the performance, only do a single one 
+	// by adding a new method to COMetadataServer.
+	int objectVersion = [[self metadataServer] objectVersionForUUID: anUUID];
+	NSURL *objectURL = [[self metadataServer] URLForUUID: anUUID];
+		
+	return [self objectWithURL: objectURL version: objectVersion];
+}
+
+/** Recreates an object for a given UUID and object version by deserializing 
+    it and playing back invocations on it, then returns it.
+    The returned instance doesn't get registered in the receiver. */
+- (id) objectWithUUID: (ETUUID *)anUUID version: (int)objectVersion
+{
+	NSURL *objectURL = [[self metadataServer] URLForUUID: anUUID];
+		
+	return [self objectWithURL: objectURL version: objectVersion];
 }
 
 /** Returns a proxy object for the core object path of url.

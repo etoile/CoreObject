@@ -11,6 +11,7 @@
 #import "COObject.h"
 #import "COGroup.h"
 #import "COSerializer.h"
+#import "CODeserializer.h"
 #import "COMetadataServer.h"
 #import "COObjectServer.h"
 #import "NSObject+CoreObject.h"
@@ -198,7 +199,7 @@ static COObjectContext *currentObjectContext = nil;
 		return nil;
 	}
 	
-	object = [self objectWithUUID: anUUID];
+	object = [[self objectServer] objectWithUUID: anUUID];
 	BOOL noPersistentObjectAvailable = (object == nil);
 
 	if (noPersistentObjectAvailable)
@@ -207,61 +208,6 @@ static COObjectContext *currentObjectContext = nil;
 	if ([object isKindOfClass: [COGroup class]])
 		[object setHasFaults: YES];
 	[self registerObject: object];
-	
-	return object;
-}
-
-/** Recreates the last version of an object for a given UUID by deserializing 
-    it and playing back invocations on it, then returns it.
-    The returned instance doesn't get registered in the receiver. */
-- (id) objectWithUUID: (ETUUID *)anUUID
-{
-	// TODO: If two queries badly impact the performance, only do a single one 
-	// by adding a new method to COMetadataServer.
-	int objectVersion = [[self metadataServer] objectVersionForUUID: anUUID];
-	NSURL *objectURL = [[self metadataServer] URLForUUID: anUUID];
-		
-	return [self objectWithURL: objectURL version: objectVersion];
-}
-
-/** Recreates an object for a given UUID and object version by deserializing 
-    it and playing back invocations on it, then returns it.
-    The returned instance doesn't get registered in the receiver. */
-- (id) objectWithUUID: (ETUUID *)anUUID version: (int)objectVersion
-{
-	NSURL *objectURL = [[self metadataServer] URLForUUID: anUUID];
-		
-	return [self objectWithURL: objectURL version: objectVersion];
-}
-
-/** Recreates an object for a given URL and object version by deserializing 
-    it and playing back invocations on it, then returns it.
-    The returned instance doesn't get registered in the receiver. */
-- (id) objectWithURL: (NSURL *)objectURL version: (int)objectVersion
-{
-	// TODO: Replace the next line with  
-	// int fullSaveVersion = [[NSObjectSerialBundle objectStoreWithURL: objectURL] lastVersionInBranch: @"root" ofType: @"FullSave"]
-	int fullSaveVersion = [[self objectServer] lastSnapshotVersionOfObjectWithURL: objectURL forVersion: objectVersion];
-	ETDeserializer *snapshotDeserializer = [[ETSerializer 
-		defaultCoreObjectFullSaveSerializerForURL: objectURL version: fullSaveVersion] deserializer];
-	
-	// FIXME: -[ETSerializer deserializer] doesn't replicate the version on the 
-	// returned deserializer
-	[snapshotDeserializer setVersion: fullSaveVersion];
-	id object = [snapshotDeserializer restoreObjectGraph];
-	BOOL deserializationFailed = (object == nil);
-	
-	if (deserializationFailed)
-		return nil;
-
-	[object deserializerDidFinish: snapshotDeserializer forVersion: fullSaveVersion];
-	
-	[self playbackInvocationsWithObject: object 
-	                        fromVersion: fullSaveVersion 
-	                          toVersion: objectVersion];
-	
-	NSAssert2([object objectVersion] == objectVersion, @"Recreated object "
-		"version %@ doesn't match the requested version %i", object, objectVersion);
 	
 	return object;
 }
@@ -949,25 +895,8 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	
 	[self beginRevertObject: object];
 
-	id deltaDeserializer = [[self deltaSerializerForObject: object] deserializer];
-	NSInvocation *inv = nil;
-
-	/*NSAssert3([deltaDeserializer version] == [object objectVersion], 
-		@"Delta deserializer version %d and object version %d must match for "
-		@"invocations playback on %@", [deltaDeserializer version], 
-		[object objectVersion], object);*/
-
-	for (int v = baseVersion + 1; v <= finalVersion; v++)
-	{
-		[deltaDeserializer setVersion: v];
-		CREATE_AUTORELEASE_POOL(pool);
-		inv = [deltaDeserializer restoreObjectGraph];
-		ETDebugLog(@"Play back %@ at version %d", inv, v);
-		[inv invokeWithTarget: object];
-		[object deserializerDidFinish: deltaDeserializer forVersion: v];
-		DESTROY(inv);
-		DESTROY(pool);
-	}
+	ETDeserializer *deltaDeserializer = [[self deltaSerializerForObject: object] deserializer];
+	[deltaDeserializer playbackInvocationsWithObject: object fromVersion: baseVersion toVersion: finalVersion];
 
 	[self endRevert];
 }

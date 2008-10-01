@@ -88,11 +88,6 @@ typedef enum _COChildrenMergePolicy
 
 - (id) objectForUUID: (ETUUID *)anUUID;
 
-// TODO: Move the next methods in other classes
-- (id) objectWithUUID: (ETUUID *)anUUID;
-- (id) objectWithUUID: (ETUUID *)anUUID version: (int)objectVersion;
-- (id) objectWithURL: (NSURL *)objectURL version: (int)objectVersion;
-
 - (void) registerObject: (id)object;
 - (void) unregisterObject: (id)object;
 - (NSSet *) registeredObjects;

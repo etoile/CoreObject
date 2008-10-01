@@ -19,4 +19,9 @@
 + (id) defaultCoreObjectDeserializerWithURL: (NSURL *)aURL;
 + (id) deserializeObjectWithURL: (NSURL *)aURL;
 
+- (void) playbackInvocationsWithObject: (id)object 
+                           fromVersion: (int)baseVersion 
+                             toVersion: (int)finalVersion;
+
+
 @end

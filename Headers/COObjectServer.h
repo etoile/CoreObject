@@ -50,6 +50,10 @@
 - (id) managedObjectForURL: (NSURL *)url;
 - (id) distantObjectForURL: (NSURL *)url;
 
+- (id) objectWithURL: (NSURL *)objectURL version: (int)objectVersion;
+- (id) objectWithUUID: (ETUUID *)anUUID version: (int)objectVersion;
+- (id) objectWithUUID: (ETUUID *)anUUID;
+
 //- (COGroup *) rootGroup;
 
 /* Libraries */

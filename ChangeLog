@@ -1,5 +1,18 @@
 2008-10-01 Quentin Mathe <qmathe@club-internet.fr>
 
+	* Headers/COObjectServer.h:
+	* Source/COObjectServer.m:
+	* Headers/COObjectContext.h:
+	* COObjectContext.m:
+	(-objectWithUUID:, -objectWithUUID:version:, -objectWithURL:): Moved these 
+	methods into COObjectServer.
+	(-playbackInvocations:fromVersion:toVersion): Extracted the core logic into 
+	a new method in CODeserializer.
+	* CODeserializer.m (-playbackInvocations:fromVersion:toVersion:): Added 
+	by extracting code from COObjectContext.
+
+2008-10-01 Quentin Mathe <qmathe@club-internet.fr>
+
 	Moved delta and snapshot version querying methods from COObjectContext to 
 	COObjectServer. This is an intermediate step towards moving the logic into 
 	EtoileSerialize.

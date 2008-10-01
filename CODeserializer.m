@@ -9,6 +9,7 @@
 #import "CODeserializer.h"
 #import "COSerializer.h"
 #import "COObjectServer.h"
+#import "COObjectContext.h"
 #import "NSObject+CoreObject.h"
 #import "COObject.h"
 
@@ -54,6 +55,36 @@
 	//DESTROY(pool);
 
 	return newInstance;
+}
+
+/** Play back each of the subsequent invocations on object.
+    The invocations that will be invoked on the object as target will be the 
+    all invocation serialized between baseVersion and finalVersion. The first 
+    replayed invocation will be 'baseVersion + 1' and the last one 
+    'finalVersion'.  */
+- (void) playbackInvocationsWithObject: (id)anObject 
+                           fromVersion: (int)baseVersion 
+                             toVersion: (int)finalVersion 
+{
+	id deltaDeserializer = self;
+	NSInvocation *inv = nil;
+
+	/*NSAssert3([deltaDeserializer version] == [object anObjectVersion], 
+		@"Delta deserializer version %d and anObject version %d must match for "
+		@"invocations playback on %@", [deltaDeserializer version], 
+		[object anObjectVersion], anObject);*/
+
+	for (int v = baseVersion + 1; v <= finalVersion; v++)
+	{
+		[deltaDeserializer setVersion: v];
+		CREATE_AUTORELEASE_POOL(pool);
+		inv = [deltaDeserializer restoreObjectGraph];
+		ETDebugLog(@"Play back %@ at version %d", inv, v);
+		[inv invokeWithTarget: anObject];
+		[anObject deserializerDidFinish: deltaDeserializer forVersion: v];
+		DESTROY(inv);
+		DESTROY(pool);
+	}
 }
 
 /** Patches EtoileSerialize to resolve UUIDValue to a managed core object. 
