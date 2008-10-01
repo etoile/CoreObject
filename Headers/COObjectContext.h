@@ -93,6 +93,7 @@ typedef enum _COChildrenMergePolicy
 - (id) objectWithUUID: (ETUUID *)anUUID version: (int)objectVersion;
 - (id) objectWithURL: (NSURL *)objectURL version: (int)objectVersion;
 - (int) lastSnapshotVersionOfObjectWithURL: (NSURL *)anURL;
+- (int) lastSnapshotVersionOfObjectWithURL: (NSURL *)anURL forVersion: (int)targetVersion;
 
 - (void) registerObject: (id)object;
 - (void) unregisterObject: (id)object;

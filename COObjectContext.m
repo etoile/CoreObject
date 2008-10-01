@@ -241,7 +241,7 @@ static COObjectContext *currentObjectContext = nil;
 {
 	// TODO: Replace the next line with  
 	// int fullSaveVersion = [[NSObjectSerialBundle objectStoreWithURL: objectURL] lastVersionInBranch: @"root" ofType: @"FullSave"]
-	int fullSaveVersion = [self lastSnapshotVersionOfObjectWithURL: objectURL];
+	int fullSaveVersion = [self lastSnapshotVersionOfObjectWithURL: objectURL forVersion: objectVersion];
 	ETDeserializer *snapshotDeserializer = [[ETSerializer 
 		defaultCoreObjectFullSaveSerializerForURL: objectURL version: fullSaveVersion] deserializer];
 	
@@ -271,6 +271,14 @@ static COObjectContext *currentObjectContext = nil;
 	available), returns -1. */
 - (int) lastSnapshotVersionOfObjectWithURL: (NSURL *)anURL
 {
+	return [self lastSnapshotVersionOfObjectWithURL: anURL forVersion: INT_MAX];
+}
+
+/** Returns the first version back in time, right before aVersion, which 
+    corresponds to a snapshot and not a delta. If no such version can be found 
+    (probably no snapshot available), returns -1. */
+- (int) lastSnapshotVersionOfObjectWithURL: (NSURL *)anURL forVersion: (int)targetVersion
+{
 	NSURL *serializationURL = [[anURL URLByAppendingPath: @"FullSave"] URLByAppendingPath: @"root"];
 	NSString *branchPath = [serializationURL path];
 	/* -directoryContentsAtPath: returns nil if branchPath is invalid */
@@ -284,12 +292,13 @@ static COObjectContext *currentObjectContext = nil;
 		ETDebugLog(@"Test %@ to find last version at %@", saveName, serializationURL);
 		saveVersion = [[saveName stringByDeletingPathExtension] intValue];
 
-		if (saveVersion > aVersion)
+		if (saveVersion > aVersion && saveVersion <= targetVersion)
 			aVersion = saveVersion;
 	}
 
 	return aVersion;
 }
+
 
 /** Returns the first version forward in time which corresponds to a snapshot or
     a delta. If no such version can be found (no snapshot or delta available 
@@ -871,21 +880,13 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	return [self lastVersionOfObjectWithURL: [self serializationURLForObject: object]];
 }
 
-/** Returns the first version back in time which corresponds to a snapshot and 
-	not a delta. If no such version can be found (probably no snapshot 
-	available), returns -1. */
+/** Returns the first version back in time, right before aVersion, which 
+    corresponds to a snapshot and not a delta. If no such version can be found 
+    (probably no snapshot available), returns -1. */
 - (int) lastSnapshotVersionOfObject: (id)object forVersion: (int)aVersion
 {
-	id snapshotDeserializer = [[self snapshotSerializerForObject: object] deserializer];
-	int snapshotVersion = aVersion;
-
-	while (snapshotVersion >= 0 
-	 && [snapshotDeserializer setVersion: snapshotVersion] != snapshotVersion)
-	{
-		snapshotVersion--;
-	}
-
-	return snapshotVersion;
+	return [self lastSnapshotVersionOfObjectWithURL: [self serializationURLForObject: object]
+	                                     forVersion: aVersion];
 }
 
 /** Restores the full-save version closest to the requested one.

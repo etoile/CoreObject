@@ -1,3 +1,15 @@
+2008-10-01 Quentin Mathe <qmathe@club-internet.fr>
+
+	Reduced the amount of duplicated code for querying snapshot version.
+	* Headers/COObjectContext.h:
+	* COObjectContext.m:
+	(-lastSnapshotVersionOfObjectWithURL:): Moved code into new method 
+	-lastSnapshotVersionOfObjectWithURL:forVersion: and modified to now call 
+	this new method.
+	(-lastSnapshotVersionOfObjectWithURL:forVersion:): Added.
+	(-lastSnapshotVersionOfObject:forVersion:): Modified to now call 
+	-lastSnapshotVersionOfObjectWithURL:forVersion:.
+
 2008-09-30 Quentin Mathe <qmathe@club-internet.fr>
 
 	* Headers/COObjectContext.h:
