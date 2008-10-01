@@ -37,6 +37,13 @@ static COObjectServer *localObjectServer = nil;
 	return localObjectServer;
 }
 
+/* Private method reserved for testing purpose. */
++ (void) makeNewDefaultServer
+{
+	RELEASE(localObjectServer);
+	localObjectServer = [[self alloc] init];	
+}
+
 /** <override-dummy />
 	Returns the base URL of the default object store that must be defined by +localObjectServerClass
 	The base URL can be defined in a subclass by overriding 

@@ -33,6 +33,10 @@
 - (id) initWithObjectContext: (COObjectContext *)ctxt;
 @end
 
+@interface COObjectServer (Test)
++ (void) makeNewDefaultServer;
+@end
+
 @interface COObjectContext (Private)
 - (int) latestVersion;
 @end
@@ -49,12 +53,19 @@
 
 - (id) initForTest
 {
+	/* Empty the cache in case other test classes don't do it in -releaseForTest.
+	   If the cache doesn't get emptied, cached objects may point to invalid 
+	   contexts each time a context is released. COObject->_objectContext is a 
+	   weak refence.
+	   TODO: Implement a cleanup strategy for contexts that got released. */
+	[COObjectServer makeNewDefaultServer];
 	[COGroup setAutomaticallyMakeNewInstancesPersistent: YES];
 	return [self init];
 }
 
 - (void) releaseForTest
 {
+	[COObjectServer makeNewDefaultServer];
 	[COGroup setAutomaticallyMakeNewInstancesPersistent: NO];
 	[super release];
 }
