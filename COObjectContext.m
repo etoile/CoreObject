@@ -868,33 +868,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
     objects not yet inserted in an object context. */
 - (int) lastVersionOfObject: (id)object
 {
-	// FIXME: Test UUID or add -containsTemporalInstance: to NSSet
-	/*if ([object isPersistent] == NO || [_registeredObjects containsObject: object] == NO)
-	{
-		return -1;
-	}*/
-
-	// TODO: Move this code into ETSerialObjectBundle, probably by adding 
-	// methods such -lastVersion:inBranch: and -lastVersion. We may also cache 
-	// the last version in a plist stored in the bundle to avoid the linear 
-	// search in the directory.
-	NSURL *serializationURL = [[[self serializationURLForObject: object] 
-		URLByAppendingPath: @"Delta"] URLByAppendingPath: @"root"];
-	NSArray *deltaFileNames = [[NSFileManager defaultManager] 
-		directoryContentsAtPath: [[serializationURL path] stringByStandardizingPath]];
-	int aVersion = -1;
-
-	/* Directory content isn't sorted so we must iterate through all the content */
-	FOREACH(deltaFileNames, deltaName, NSString *)
-	{
-		ETDebugLog(@"Test delta %@ to find last version of %@", deltaName, object);
-		int deltaVersion = [[deltaName stringByDeletingPathExtension] intValue];
-
-		if (deltaVersion > aVersion)
-			aVersion = deltaVersion;
-	}
-
-	return aVersion;
+	return [self lastVersionOfObjectWithURL: [self serializationURLForObject: object]];
 }
 
 /** Returns the first version back in time which corresponds to a snapshot and 
