@@ -1,5 +1,24 @@
 2008-10-01 Quentin Mathe <qmathe@club-internet.fr>
 
+	Moved delta and snapshot version querying methods from COObjectContext to 
+	COObjectServer. This is an intermediate step towards moving the logic into 
+	EtoileSerialize.
+	* Headers/COObjectContext.h:
+	* COObjectContext.m:
+	* Headers/COObjectServer.h:
+	* Source/COObjectServer.m:
+	Moved -lastVersionOfObjectWithURL:, -lastSnapshotVersionOfObjectWithURL:, 
+	-lastSnapshotVersionOfObjectWithURL:forVersion: from COObjectContext to 
+	COObjectServer.
+	(-lastVersionOfObject:, -lastSnapshotVersionOfObject:forVersion:, 
+	-objectWithURL:forVersion:): Updated to now rely on the object server for 
+	getting the object versions.
+	* TestObjectContext.m:
+	* TestObjectServer.m:
+	Moved -testLastSnapshotVersionOfObjectWithURL into COObjectServer tests.
+
+2008-10-01 Quentin Mathe <qmathe@club-internet.fr>
+
 	Reduced the amount of duplicated code for querying snapshot version.
 	* Headers/COObjectContext.h:
 	* COObjectContext.m:

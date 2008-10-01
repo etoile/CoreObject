@@ -100,6 +100,12 @@
 - (void) save;
 - (void) handleError: (NSError *)error;
 
+/* Querying Object Version (to be moved to COSerializer and ETObjectSerialStore) */
+
+- (int) lastVersionOfObjectWithURL: (NSURL *)anURL;
+- (int) lastSnapshotVersionOfObjectWithURL: (NSURL *)anURL;
+- (int) lastSnapshotVersionOfObjectWithURL: (NSURL *)anURL forVersion: (int)targetVersion;
+
 @end
 
 /* URL Protocols/Schemes */

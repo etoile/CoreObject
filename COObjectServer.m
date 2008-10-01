@@ -351,4 +351,75 @@ static COObjectServer *localObjectServer = nil;
 	RELEASE(error);
 }
 
+/* Querying Object Version */
+
+/** Returns the first version forward in time which corresponds to a snapshot or
+    a delta. If no such version can be found (no snapshot or delta available 
+    unless an error occured), returns -1.
+    If object hasn't been made persistent yet or isn't registered in the 
+    receiver also returns -1. Hence this method returns -1 for rolledback 
+    objects not yet inserted in an object context. */
+- (int) lastVersionOfObjectWithURL: (NSURL *)anURL
+{
+	// FIXME: Test UUID or add -containsTemporalInstance: to NSSet
+	/*if ([object isPersistent] == NO || [_registeredObjects containsObject: object] == NO)
+	{
+		return -1;
+	}*/
+
+	// TODO: Move this code into ETSerialObjectBundle, probably by adding 
+	// methods such -lastVersion:inBranch: and -lastVersion. We may also cache 
+	// the last version in a plist stored in the bundle to avoid the linear 
+	// search in the directory.
+	NSURL *serializationURL = [[anURL URLByAppendingPath: @"Delta"] URLByAppendingPath: @"root"];
+	NSArray *deltaFileNames = [[NSFileManager defaultManager] 
+		directoryContentsAtPath: [[serializationURL path] stringByStandardizingPath]];
+	int aVersion = -1;
+
+	/* Directory content isn't sorted so we must iterate through all the content */
+	FOREACH(deltaFileNames, deltaName, NSString *)
+	{
+		ETDebugLog(@"Test delta %@ to find last version of %@", deltaName, object);
+		int deltaVersion = [[deltaName stringByDeletingPathExtension] intValue];
+
+		if (deltaVersion > aVersion)
+			aVersion = deltaVersion;
+	}
+
+	return aVersion;
+}
+
+/** Returns the first version back in time which corresponds to a snapshot and 
+	not a delta. If no such version can be found (probably no snapshot 
+	available), returns -1. */
+- (int) lastSnapshotVersionOfObjectWithURL: (NSURL *)anURL
+{
+	return [self lastSnapshotVersionOfObjectWithURL: anURL forVersion: INT_MAX];
+}
+
+/** Returns the first version back in time, right before aVersion, which 
+    corresponds to a snapshot and not a delta. If no such version can be found 
+    (probably no snapshot available), returns -1. */
+- (int) lastSnapshotVersionOfObjectWithURL: (NSURL *)anURL forVersion: (int)targetVersion
+{
+	NSURL *serializationURL = [[anURL URLByAppendingPath: @"FullSave"] URLByAppendingPath: @"root"];
+	NSString *branchPath = [serializationURL path];
+	/* -directoryContentsAtPath: returns nil if branchPath is invalid */
+	NSArray *saveNames = [[NSFileManager defaultManager] directoryContentsAtPath: branchPath];
+	int aVersion = -1;
+
+	/* Directory content isn't sorted so we must iterate through all the content */
+	int saveVersion = -1;
+	FOREACH(saveNames, saveName, NSString *)
+	{
+		ETDebugLog(@"Test %@ to find last version at %@", saveName, serializationURL);
+		saveVersion = [[saveName stringByDeletingPathExtension] intValue];
+
+		if (saveVersion > aVersion && saveVersion <= targetVersion)
+			aVersion = saveVersion;
+	}
+
+	return aVersion;
+}
+
 @end

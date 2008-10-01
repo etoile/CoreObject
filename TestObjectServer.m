@@ -61,6 +61,7 @@
 	UKObjectsSame(newInstance, [self objectForUUID: uuid]);
 }
 
+#if 0
 - (void) testManagedObjectForURL
 {
 	// TODO: Test for exception on nil url.
@@ -85,6 +86,7 @@
 	UKNotNil([self managedObjectForURL: url]);
 	
 }
+#endif
 
 - (void) testCacheObject
 {
@@ -94,5 +96,47 @@
 	UKFalse([self cacheObject: object]);
 	UKFalse([self cacheObject: [object copy]]); /* UUID is conserved by copy */
 }
+
+- (void) testLastSnapshotVersionOfObjectWithURL
+{
+	[COObject setAutomaticallyMakeNewInstancesPersistent: YES];
+	
+	COObject *object = AUTORELEASE([[COObject alloc] init]);
+
+	COObjectContext *ctxt = [object objectContext];
+	NSURL *objectURL = [ctxt serializationURLForObject: object];
+
+	ETLog(@"UUID is %@ for %@ at URL %@ ", [object UUID], object, objectURL);
+	UKIntsEqual(-1, [self lastSnapshotVersionOfObjectWithURL: objectURL]);
+
+	/* This first recorded invocation results in a snapshot with version 0, 
+       immediately followed by an invocation record with version 1. */
+	[object setValue: @"me" forProperty: @"whoami"];
+	UKIntsEqual(0, [self lastSnapshotVersionOfObjectWithURL: objectURL]);
+	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
+	/* Snapshot is automatically taken only every 100 invocations by default. */
+	UKIntsEqual(0, [self lastSnapshotVersionOfObjectWithURL: objectURL]);
+	/* We increment the version to a relatively high number, so we can be sure 
+	   the test doesn't accidentally pass because we look in the wrong object 
+	   bundle. Most of other object bundles created in tests have a version 
+	   around 3 or 4. */
+	for (int i = 1; i <= 15; i++)
+	{
+		[ctxt snapshotObject: object];
+	}
+	/* Base version is zero so we ignore this first snapshot */
+	int nbOfSnapshotsFollowingDeltas = 15;
+	int nbOfDeltas = 2;
+	int lastSnapshotVersion = nbOfDeltas + nbOfSnapshotsFollowingDeltas;
+	
+	/* An extra delta that makes the last snapshot version different from the 
+	   last object version */
+	[object setValue: @"hm" forProperty: @"whoami"];
+
+	UKIntsEqual(lastSnapshotVersion, [self lastSnapshotVersionOfObjectWithURL: objectURL]);
+
+	[COObject setAutomaticallyMakeNewInstancesPersistent: NO];
+}
+
 
 @end
