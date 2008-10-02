@@ -20,6 +20,7 @@ CoreObject_OBJC_FILES = \
 	COFileObject.m \
 	COObject.m \
 	COObjectContext.m \
+	COObjectContext+GraphRollback.m \
 	COMultiValue.m \
 	COPropertyListFormat.m \
 	NSObject+CoreObject.m \
