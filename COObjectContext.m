@@ -441,8 +441,11 @@ static COObjectContext *currentObjectContext = nil;
 	   Sync the object version and take a snaphot of the temporal instance now 
 	   in use. Right after that, both anObject and temporalInstance will reply 
 	   to -lastObjectVersion by returning [anObject objectVersion] + 1. */
+	BOOL isSingleObjectChange = ([self isRevertingContext] == NO);
 	[temporalInstance _setObjectVersion: [anObject objectVersion]];
-	[self snapshotObject: temporalInstance];
+	[self snapshotObject: temporalInstance shouldIncrementObjectVersion: YES];
+	[self logRecord: anObject objectVersion: [anObject objectVersion] 
+		timestamp: [NSDate date] shouldIncrementContextVersion: isSingleObjectChange];
 
 	if (isTemporal)
 		[self endRevert];
@@ -896,9 +899,8 @@ static COObjectContext *currentObjectContext = nil;
 	/* -[object objectVersion] still returns the old version at this point, 
 	   so we pass the new version in parameter with recordVersion: */
 	[self updateMetadatasForObject: object recordVersion: newObjectVersion];
-	[self logInvocation: inv 
-	      recordVersion: newObjectVersion
-	          timestamp: [NSDate date]];
+	[self logRecord: inv objectVersion: newObjectVersion timestamp: [NSDate date]
+		shouldIncrementContextVersion: YES];
 
 	return newObjectVersion;
 }
@@ -912,8 +914,15 @@ static COObjectContext *currentObjectContext = nil;
 	/* First Snapshot if needed (aka Base Version) */
 	if (version == -1)
 	{
+		/* Don't call simply -snapshotObject: in order to call 
+		   -updateMetadatasForObject: a single time on return in -serializeInvocation:
+		   In this precise case, we increment the object version directly for 
+		   the snapshot. The increment for the recorded invocation will be 
+		   handled by 'object' itself when -serializeInvocation: returns. */
 		[self snapshotObject: object shouldIncrementObjectVersion: YES];
 		version = [object objectVersion];
+		[self logRecord: inv objectVersion: version timestamp: [NSDate date]
+			shouldIncrementContextVersion: YES];
 		NSAssert(version == 0, @"First serialized version should have been reported");
 	}
 
@@ -946,13 +955,22 @@ static COObjectContext *currentObjectContext = nil;
 /** Logs all invocations properly interleaved and indexed by delta versions in 
 	a way that makes possible to support undo/redo transparently and in a
 	persistent manner for multiple managed objects. */
-- (void) logInvocation: (NSInvocation *)inv 
-         recordVersion: (int)aVersion 
-             timestamp: (NSDate *)recordTimestamp
+- (void) logRecord: (id)aRecord objectVersion: (int)aVersion 
+	timestamp: (NSDate *)recordTimestamp shouldIncrementContextVersion: (BOOL)updateContextVersion
 {
-	id object = [inv target];
+	id object = nil;
+	
+	if ([aRecord isKindOfClass: [NSInvocation class]])
+	{
+		object = [aRecord target];
+	}
+	else
+	{
+		object = aRecord;	
+	}
 
-	_version++;
+	if (updateContextVersion)
+		_version++;
 
 	[[self metadataServer] executeDBRequest: [NSString stringWithFormat: 
 		@"INSERT INTO History (objectUUID, objectVersion, contextUUID, "
@@ -965,7 +983,7 @@ static COObjectContext *currentObjectContext = nil;
 			recordTimestamp]];
 
 	ETDebugLog(@"Log %@ objectUUID %@ objectVersion %i contextVersion %i", 
-		inv, [object UUID], aVersion, _version);
+		aRecord, [object UUID], aVersion, _version);
 }
 
 /** Commonly used to forward the invocation to the real object if the 
@@ -997,7 +1015,9 @@ static COObjectContext *currentObjectContext = nil;
 - (void) snapshotObject: (id)object
 {
 	[self snapshotObject: object shouldIncrementObjectVersion: YES];
-	[self updateMetadatasForObject: object recordVersion: [object objectVersion]];
+	int newObjectVersion = [object objectVersion];
+	[self logRecord: object objectVersion: newObjectVersion timestamp: [NSDate date]
+		shouldIncrementContextVersion: YES];
 }
 
 /** Snapshots an object but doesn't update the object metadatas in the 
@@ -1020,8 +1040,10 @@ static COObjectContext *currentObjectContext = nil;
 
 	if (updateVersion)
 	{
+		int newObjectVersion = [object objectVersion] + 1;
 		[object serializerDidFinish: snapshotSerializer 
-		                 forVersion: [object objectVersion] + 1];
+		                 forVersion: newObjectVersion];
+		[self updateMetadatasForObject: object recordVersion: newObjectVersion];
 	}
 }
 

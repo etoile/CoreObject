@@ -1,5 +1,29 @@
 2008-10-02 Quentin Mathe <qmathe@club-internet.fr>
 
+	More work towards the ability to navigate the history of a context accross 
+	a revert point. Modified to log snapshots into the context history, if they 
+	aren't coupled with an invocation record.
+	* Headers/COObjectContext.h:
+	* COObjectContext.m:
+	(-replaceObject:byObject:collectAllErrors:): Rewritten to correctly log the 
+	replacement into the context history by taking in account whether it occurs 
+	within a context rollback or not.
+	(-logInvocation:recordVersion:timestamp:): 
+	Renamed -logRecord:objectVersion:timestamp:shouldIncremementContextVersion: 
+	and modified to support incrementing the context version for logging 
+	snapshots in addition to recorded invocations.
+	(-serializeInvocation:): Modified to log the base version snapshot.
+	(-snapshotObject:): Modified to log the snapshot and moved metadatas 
+	update into -snapshotObject:shouldIncremementObjectVersion:.
+	(-snapshotObject:shouldIncremementObjectVersion:): Modified to update the 
+	metadatas instead of relying on the caller to do so.
+	(-init): Modified to use the added method for triggering the persistency if 
+	needed.
+	* TestObjectContext.m: Modified to take in account that snaphots such as 
+	base version snapshots now increment the context version.
+
+2008-10-02 Quentin Mathe <qmathe@club-internet.fr>
+
 	Reworked the triggering of the persistency in -init in a way that is going 
 	to allow to take the first snapshot right at initialization time.
 	* Headers/COObject.h:

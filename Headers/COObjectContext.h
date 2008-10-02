@@ -162,9 +162,8 @@ typedef enum _COChildrenMergePolicy
 - (BOOL) shouldRecordChangesToObject: (id)object;
 - (int) recordInvocation: (NSInvocation *)inv;
 - (int) serializeInvocation: (NSInvocation *)inv;
-- (void) logInvocation: (NSInvocation *)inv 
-         recordVersion: (int)aVersion
-             timestamp: (NSDate *)recordTimestamp;
+- (void) logRecord: (id)aRecord objectVersion: (int)aVersion 
+	timestamp: (NSDate *)recordTimestamp shouldIncrementContextVersion: (BOOL)updateContextVersion;
 - (void) forwardInvocationIfNeeded: (NSInvocation *)inv;
 
 - (void) updateMetadatasForObject: (id)object recordVersion: (int)aVersion;

@@ -84,7 +84,7 @@
 	
 	COObject *object = AUTORELEASE([[SubObject alloc] initWithObjectContext: ctxt]);
 	[object setValue: @"me" forProperty: @"whoami"];	
-	UKIntsEqual(1, [ctxt latestVersion]);
+	UKIntsEqual(2, [ctxt latestVersion]);
 	
 	RETAIN(ctxtUUID);
 	DESTROY(ctxt);
@@ -92,11 +92,11 @@
 	/* Test Recreate Context */
 	ctxt = [[[self class] alloc] initWithUUID: ctxtUUID];
 	RELEASE(ctxtUUID);	
-	UKIntsEqual(1, [ctxt latestVersion]);
+	UKIntsEqual(2, [ctxt latestVersion]);
 	
 	object = AUTORELEASE([[SubObject alloc] initWithObjectContext: ctxt]);
 	[object setValue: @"me" forProperty: @"whoami"];
-	UKIntsEqual(2, [ctxt latestVersion]);
+	UKIntsEqual(4, [ctxt latestVersion]);
 	
 	DESTROY(ctxt);
 }
@@ -404,7 +404,7 @@
 
 	CREATE_OBJECT_GRAPH
 	id objectServer = [self objectServer];
-	int lastVersion = 11;
+	int lastVersion = 14;
 
 	UKIntsEqual(lastVersion, [self version]);
 
@@ -447,13 +447,13 @@
 
 	CREATE_OBJECT_GRAPH
 	id objectServer = [self objectServer];
-	int lastVersion = 11;
+	int lastVersion = 14;
 
 	UKIntsEqual(lastVersion, [self version]);
 
 	/* Move back to the previous version (undo) */
 
-	[self rollbackToVersion: 6];
+	[self rollbackToVersion: 8];
 	UKIntsEqual((lastVersion + 1), [self version]);
 
 	/* Merged instance has replaced the existing instance in the core object cache */
