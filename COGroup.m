@@ -113,13 +113,15 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 {
 	self = [super init];
 	/* Initialize children and parents property */
-	[self disablePersistency];
+
 	[self setValue: [NSMutableArray array]
 	      forProperty: kCOGroupChildrenProperty];
 	[self setValue: [NSMutableArray array]
 	      forProperty: kCOGroupSubgroupsProperty];
 	_hasFaults = NO;
-	[self enablePersistency];
+
+	[self tryStartPersistencyIfInstanceOfClass: [COGroup class]];
+	
 	return self;
 }
 

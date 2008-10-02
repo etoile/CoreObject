@@ -44,7 +44,6 @@ NSString *kCOFileModificationDateProperty = @"kCOFileModificationDateProperty";
 {
 	self = [self init];
 
-	[self disablePersistency];
 	/* Make sure file exists */
 	if ([_fm fileExistsAtPath: path] == NO)
 	{
@@ -53,7 +52,8 @@ NSString *kCOFileModificationDateProperty = @"kCOFileModificationDateProperty";
 		return nil;
 	}
 	[self setPath: path];
-	[self enablePersistency];
+
+	[self tryStartPersistencyIfInstanceOfClass: [COFileObject class]];
 
 	return self;
 }

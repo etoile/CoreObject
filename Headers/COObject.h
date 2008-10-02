@@ -78,6 +78,7 @@ extern NSString *pCOVersion1Value;
 - (id) init;
 //- (id) initWithURL: (NSURL *)serializationURL 
 //   inObjectContext: (COObjectContext *)context;
+- (BOOL) tryStartPersistencyIfInstanceOfClass: (Class)aClass;
 - (BOOL) isCoreObject;
 - (BOOL) isManagedCoreObject;
 - (NSDictionary *) metadatas;

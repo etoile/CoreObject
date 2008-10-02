@@ -248,13 +248,25 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	   not serialized by RECORD in -setValue:forProperty: 
 	   FIXME: Should be obtained by parameter usually. */
 	_objectVersion = -1;
-	if ([[self class] automaticallyMakeNewInstancesPersistent])
-	{
-		[[COObjectContext currentContext] registerObject: self];
-		[self enablePersistency];
-	}
+	[self tryStartPersistencyIfInstanceOfClass: [COObject class]];
 
 	return self;
+}
+
+- (BOOL) tryStartPersistencyIfInstanceOfClass: (Class)aClass
+{
+	BOOL isNotSubclassInstance = [self isMemberOfClass: aClass];
+	
+	if ([[self class] automaticallyMakeNewInstancesPersistent]
+	   && isNotSubclassInstance)
+	{
+		[[COObjectContext currentContext] registerObject: self];
+		//[self save];
+		[self enablePersistency];
+		return YES;
+	}
+	
+	return NO;
 }
 
 - (void) dealloc

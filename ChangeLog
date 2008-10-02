@@ -1,7 +1,21 @@
+2008-10-02 Quentin Mathe <qmathe@club-internet.fr>
+
+	Reworked the triggering of the persistency in -init in a way that is going 
+	to allow to take the first snapshot right at initialization time.
+	* Headers/COObject.h:
+	* COObject.m:
+	(-tryStartPersistencyIfInstanceOfClass:): Added.
+	(-init): Modified to use the added method for triggering the persistency if 
+	needed.
+	* COFileObject.m (-init):
+	* COGroup.m (-init):
+	* TestObjectContext.m (-[SubObject init]):
+	Modified to use -tryStartPersistencyIfInstanceOfClass:
+
 2008-10-01 Quentin Mathe <qmathe@club-internet.fr>
 
 	* Headers/COObjectServer.h:
-	* Source/COObjectServer.m:
+	* COObjectServer.m:
 	* Headers/COObjectContext.h:
 	* COObjectContext.m:
 	(-objectWithUUID:, -objectWithUUID:version:, -objectWithURL:): Moved these 
@@ -19,7 +33,7 @@
 	* Headers/COObjectContext.h:
 	* COObjectContext.m:
 	* Headers/COObjectServer.h:
-	* Source/COObjectServer.m:
+	* COObjectServer.m:
 	Moved -lastVersionOfObjectWithURL:, -lastSnapshotVersionOfObjectWithURL:, 
 	-lastSnapshotVersionOfObjectWithURL:forVersion: from COObjectContext to 
 	COObjectServer.

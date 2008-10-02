@@ -209,8 +209,12 @@ static COObjectServer *localObjectServer = nil;
 	{
 		storedObjectURL = url;
 	}
-		
+#if 0	
+	id object = [self objectWithURL: storedObjectURL
+	                        version: [self lastSnapshotVersionOfObjectWithURL: storedObjectURL]];
+#else
 	id object = [ETDeserializer deserializeObjectWithURL: storedObjectURL];
+#endif
 	BOOL deserializationFailed = (object == nil);
 	
 	// TODO: Verify the object conforms to COManagedObject and thereby responds 

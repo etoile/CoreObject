@@ -600,12 +600,11 @@
 {
 	SUPERINIT
 
-	[self disablePersistency];
 	[self setValue: @"Nobody"
 	      forProperty: @"whoami"];
 	[self setValue: [NSMutableArray arrayWithObject: @"New York"]
 	      forProperty: @"otherObjects"];
-	[self enablePersistency];
+	[self tryStartPersistencyIfInstanceOfClass: [SubObject class]];
 
 	return self;
 }
