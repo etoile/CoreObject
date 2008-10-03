@@ -261,7 +261,7 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	   && isNotSubclassInstance)
 	{
 		[[COObjectContext currentContext] registerObject: self];
-		//[self save];
+		[self save];
 		[self enablePersistency];
 		return YES;
 	}

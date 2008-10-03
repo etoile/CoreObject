@@ -109,7 +109,7 @@
 	NSURL *objectURL = [ctxt serializationURLForObject: object];
 
 	ETLog(@"UUID is %@ for %@ at URL %@ ", [object UUID], object, objectURL);
-	UKIntsEqual(-1, [self lastSnapshotVersionOfObjectWithURL: objectURL]);
+	UKIntsEqual(0, [self lastSnapshotVersionOfObjectWithURL: objectURL]);
 
 	/* This first recorded invocation results in a snapshot with version 0, 
        immediately followed by an invocation record with version 1. */

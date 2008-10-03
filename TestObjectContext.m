@@ -169,7 +169,7 @@
 	COObject *object = NEW(SubObject);
 
 	UKObjectsEqual([[self class] currentContext], [object objectContext]);
-	UKIntsEqual(-1, [object objectVersion]);
+	UKIntsEqual(0, [object objectVersion]);
 
 	/* This first recorded invocation results in a snapshot with version 0, 
        immediately followed by an invocation record with version 1. */
@@ -405,7 +405,7 @@
 
 	CREATE_OBJECT_GRAPH
 	id objectServer = [self objectServer];
-	int lastVersion = 14;
+	int lastVersion = 17;
 
 	UKIntsEqual(lastVersion, [self version]);
 
@@ -448,13 +448,13 @@
 
 	CREATE_OBJECT_GRAPH
 	id objectServer = [self objectServer];
-	int lastVersion = 14;
+	int lastVersion = 17;
 
 	UKIntsEqual(lastVersion, [self version]);
 
 	/* Move back to the previous version (undo) */
 
-	[self rollbackToVersion: 8];
+	[self rollbackToVersion: 12];
 	UKIntsEqual((lastVersion + 1), [self version]);
 
 	/* Merged instance has replaced the existing instance in the core object cache */
@@ -493,14 +493,14 @@
 
 	UKObjectsEqual(self, [object3 objectContext]);
 	UKObjectsEqual(self, [group objectContext]);
-	UKIntsEqual(-1, [object objectVersion]);
-	UKIntsEqual(-1, [group objectVersion]);
-	UKIntsEqual(-1, [group2 objectVersion]);
+	UKIntsEqual(0, [object objectVersion]);
+	UKIntsEqual(0, [group objectVersion]);
+	UKIntsEqual(0, [group2 objectVersion]);
 
 	[group2 addMember: object2];
 	[group addMember: object];
 
-	UKIntsEqual(-1, [object objectVersion]);
+	UKIntsEqual(0, [object objectVersion]);
 	UKIntsEqual(1, [group objectVersion]);
 	UKIntsEqual(1, [group2 objectVersion]);
 
