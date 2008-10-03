@@ -23,6 +23,15 @@
 @implementation COObjectContext (GraphRollback)
 
 // TODO: Break -rollbackToVersion: in several small methods.
+// TODO: Handle trimmed history...
+// This done by querying contextVersion superior to aVersion rather than 
+// inferior as we do in the first query.
+// SELECT [...] WHERE contextVersion > aVersion ORDER BY contextVersion
+// foreach registeredObject not in rolledbackObjectVersions
+// {
+//		version = first object version right after aVersion
+//	    rolledbackObjectVersions setObject: --version forKey: [object UUID]
+// }
 
 /* Query example:
 SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, objectVersion, contextVersion FROM HISTORY WHERE contextUUID = '64dc7e8f-db73-4bcc-666f-d9bf6b77a80a') AS ContextHistory WHERE contextVersion > 2000 ORDER BY contextVersion DESC LIMIT 10 */
@@ -32,34 +41,6 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 
 	NSMutableDictionary *rolledbackObjectVersions = 
 		[self findAllObjectVersionsMatchingContextVersion: aVersion];
-
-	/* Find the base versions for objects that don't appear in the context history
-
-	    Base versions (first snapshot) aren't written in the context history, 
-	    only recorded invocations are, hence if we haven't reached the targeted 
-	    context version but we just reached the first recorded invocation of an 
-	    object (version 1), the expected objectVersion to roll back will be 0 
-	    and not 1. */
-	FOREACHI(_registeredObjects, registeredObject)
-	{
-		// NOTE: [registeredObject objectVersion] > 0 ensures that we won't 
-		// restore an object that hasn't been yet snaphotted (no invocation recorded yet).
-		if ([rolledbackObjectVersions objectForKey: [registeredObject UUID]] == nil
-		 && [registeredObject objectVersion] > 0)
-		{
-			[rolledbackObjectVersions setObject: [NSNumber numberWithInt: 0]
-			                             forKey: [registeredObject UUID]];
-		}
-		// TODO: Generalize the idea to handle trimmed history...
-		// This done by querying contextVersion superior to aVersion rather than 
-		// inferior as we do in the first query.
-		// SELECT [...] WHERE contextVersion > aVersion ORDER BY contextVersion
-		// foreach registeredObject not in rolledbackObjectVersions
-		// {
-		//		version = first object version right after aVersion
-		//	    rolledbackObjectVersions setObject: --version forKey: [object UUID]
-		// }
-	}
 
 	ETLog(@"Will revert objects to versions: %@", rolledbackObjectVersions);
 
