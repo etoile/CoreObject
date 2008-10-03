@@ -14,6 +14,10 @@
 #import "COMetadataServer.h"
 #import "COObjectServer.h"
 
+@interface COObjectContext (GraphRollback)
+- (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion;
+@end
+
 
 @implementation COObjectContext (GraphRollback)
 
@@ -25,55 +29,8 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 {
 	_revertingContext = YES;
 
-	/* Query the global history for the history of the context before aVersion */
-	NSString *query = [NSString stringWithFormat: 
-		@"SELECT objectUUID, objectVersion, contextVersion FROM \
-			(SELECT objectUUID, objectVersion, contextVersion FROM History \
-			 WHERE contextUUID = '%@') AS ContextHistory \
-		  WHERE contextVersion < %i ORDER BY contextVersion DESC", 
-		[[self UUID] stringValue], (aVersion + 1)];
-
-	PGresult *result = [[self metadataServer] executeRawPGSQLQuery: query];
-	int nbOfRows = PQntuples(result);
-	int nbOfCols = PQnfields(result);
-	ETUUID *objectUUID = nil;
-	int objectVersion = -1;
-	int contextVersion = -1;
-	/* Collection where the object versions to be rolled back are put keyed by UUIDs */
-	NSMutableDictionary *rolledbackObjectVersions = [NSMutableDictionary dictionary];
-
-	ETLog(@"Context rollback query result: %d rows and %d colums", nbOfRows, nbOfCols);
-
-	/* Log the query result for debugging */
-	PQprintOpt options = {0};
-	options.header    = 1;    /* Ask for column headers           */
-	options.align     = 1;    /* Pad short columns for alignment  */
-	options.fieldSep  = "|";  /* Use a pipe as the field separator*/
-	PQprint(stdout, result, &options);
-
-	/* Find all the objects to be reverted */ 
-	int nbOfRegisteredObjects = [_registeredObjects count];
-	for (int row = 0; row < nbOfRows; row++)
-	{
-		objectUUID = AUTORELEASE([[ETUUID alloc] initWithString: 
-			[NSString stringWithUTF8String: PQgetvalue(result, row, 0)]]);
-		objectVersion = atoi(PQgetvalue(result, row, 1));
-		contextVersion = atoi(PQgetvalue(result, row, 2));
-
-		BOOL objectNotAlreadyFound = ([[rolledbackObjectVersions allKeys] containsObject: objectUUID] == NO);
-
-		if (objectNotAlreadyFound)
-		{
-			[rolledbackObjectVersions setObject: [NSNumber numberWithInt: objectVersion] 
-			                             forKey: objectUUID];
-		}
-
-		/* If a past object version has already been found for each registered 
-		   object, we already know all the objects to be reverted, hence we 
-		   can skip the rest of the earlier history. */
-		if ([rolledbackObjectVersions count] == nbOfRegisteredObjects)
-			break;
-	}
+	NSMutableDictionary *rolledbackObjectVersions = 
+		[self findAllObjectVersionsMatchingContextVersion: aVersion];
 
 	/* Find the base versions for objects that don't appear in the context history
 
@@ -102,9 +59,6 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		//	    rolledbackObjectVersions setObject: --version forKey: [object UUID]
 		// }
 	}
-
-	/* Free the query result now the object versions are extracted */
-	PQclear(result);
 
 	ETLog(@"Will revert objects to versions: %@", rolledbackObjectVersions);
 
@@ -156,6 +110,66 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		userInfo: D(COMergedObjectsKey, mergedObjects)];
 
 	_revertingContext = NO;
+}
+
+/* Collects the object versions at a given context version and returns them in 
+   a dictionary keyed by the UUIDs of the matched objects. */
+- (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion
+{
+	/* Query the global history for the history of the context before aVersion */
+	NSString *query = [NSString stringWithFormat: 
+		@"SELECT objectUUID, objectVersion, contextVersion FROM \
+			(SELECT objectUUID, objectVersion, contextVersion FROM History \
+			 WHERE contextUUID = '%@') AS ContextHistory \
+		  WHERE contextVersion < %i ORDER BY contextVersion DESC", 
+		[[self UUID] stringValue], (aVersion + 1)];
+
+	PGresult *result = [[self metadataServer] executeRawPGSQLQuery: query];
+	int nbOfRows = PQntuples(result);
+	int nbOfCols = PQnfields(result);
+	ETUUID *objectUUID = nil;
+	int objectVersion = -1;
+	int contextVersion = -1;
+	/* Collection where the object versions to be rolled back are put keyed by UUIDs */
+	NSMutableDictionary *rolledbackObjectVersions = [NSMutableDictionary dictionary];
+
+	ETLog(@"Context rollback query result: %d rows and %d colums", nbOfRows, nbOfCols);
+
+	/* Log the query result for debugging */
+	PQprintOpt options = {0};
+	options.header    = 1;    /* Ask for column headers           */
+	options.align     = 1;    /* Pad short columns for alignment  */
+	options.fieldSep  = "|";  /* Use a pipe as the field separator*/
+	PQprint(stdout, result, &options);
+
+	/* Find all the objects to be reverted */ 
+	int nbOfRegisteredObjects = [_registeredObjects count];
+	for (int row = 0; row < nbOfRows; row++)
+	{
+		objectUUID = AUTORELEASE([[ETUUID alloc] initWithString: 
+			[NSString stringWithUTF8String: PQgetvalue(result, row, 0)]]);
+		objectVersion = atoi(PQgetvalue(result, row, 1));
+		contextVersion = atoi(PQgetvalue(result, row, 2));
+
+		BOOL objectNotAlreadyFound = ([[rolledbackObjectVersions allKeys] containsObject: objectUUID] == NO);
+
+		if (objectNotAlreadyFound)
+		{
+			[rolledbackObjectVersions setObject: [NSNumber numberWithInt: objectVersion] 
+			                             forKey: objectUUID];
+		}
+
+		/* If a past object version has already been found for each registered 
+		   object, we already know all the objects to be reverted, hence we 
+		   can skip the rest of the earlier history. */
+		if ([rolledbackObjectVersions count] == nbOfRegisteredObjects)
+			break;
+	}
+	
+	/* Free the query result now the object versions are extracted */
+	PQclear(result);
+	
+	return rolledbackObjectVersions;
 }
 
 @end
