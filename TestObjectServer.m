@@ -28,11 +28,13 @@
 
 - (id) initForTest
 {
+	[COObjectContext setCurrentContext: NEW(COObjectContext)]; // for safety
 	return [self init];
 }
 
 - (void) releaseForTest
 {
+	[COObjectContext setCurrentContext: NEW(COObjectContext)]; // for safety
 	[super release];
 }
 

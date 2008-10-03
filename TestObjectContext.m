@@ -20,17 +20,13 @@
 
 #define FM [NSFileManager defaultManager]
 #define TMP_URL [NSURL fileURLWithPath: [FM tempDirectory]]
-#define NEW(X) (AUTORELEASE([[X alloc] initWithObjectContext: self]))
+#define NEW(X) (AUTORELEASE([[X alloc] init]))
 
 /* To eliminate a class name collision with other test suites */
 #define SubObject SubRecordedObject
 //#define SubGroup SubRecordedGroup
 
 @interface SubObject : COObject
-@end
-
-@interface COObject (Test)
-- (id) initWithObjectContext: (COObjectContext *)ctxt;
 @end
 
 @interface COObjectServer (Test)
@@ -60,6 +56,7 @@
 	   TODO: Implement a cleanup strategy for contexts that got released. */
 	[COObjectServer makeNewDefaultServer];
 	[COGroup setAutomaticallyMakeNewInstancesPersistent: YES];
+	[COObjectContext setCurrentContext: self];
 	return [self init];
 }
 
@@ -67,6 +64,7 @@
 {
 	[COObjectServer makeNewDefaultServer];
 	[COGroup setAutomaticallyMakeNewInstancesPersistent: NO];
+	[COObjectContext setCurrentContext: NEW(COObjectContext)];
 	[super release];
 }
 
@@ -82,7 +80,9 @@
 	id ctxtUUID = [ctxt UUID];
 	UKIntsEqual(0, [ctxt latestVersion]);
 	
-	COObject *object = AUTORELEASE([[SubObject alloc] initWithObjectContext: ctxt]);
+	[[self class] setCurrentContext: ctxt];
+	
+	COObject *object = NEW(SubObject);
 	[object setValue: @"me" forProperty: @"whoami"];	
 	UKIntsEqual(2, [ctxt latestVersion]);
 	
@@ -94,10 +94,11 @@
 	RELEASE(ctxtUUID);	
 	UKIntsEqual(2, [ctxt latestVersion]);
 	
-	object = AUTORELEASE([[SubObject alloc] initWithObjectContext: ctxt]);
+	object = NEW(SubObject);
 	[object setValue: @"me" forProperty: @"whoami"];
 	UKIntsEqual(4, [ctxt latestVersion]);
 	
+	[[self class] setCurrentContext: NEW(COObjectContext)];
 	DESTROY(ctxt);
 }
 
@@ -138,7 +139,7 @@
 
 - (void) testLastVersionOfObject
 {
-	COObject *object = AUTORELEASE([[SubObject alloc] init]);
+	COObject *object = NEW(SubObject);
 
 	COObjectContext *ctxt = [object objectContext];
 	NSArray *manyNames = A(@"A", @"B", @"C", @"D", @"E", @"F", @"I", @"G", @"H");
@@ -165,7 +166,7 @@
 
 - (void) testBasicSnapshotRollback
 {
-	COObject *object = AUTORELEASE([[SubObject alloc] init]);
+	COObject *object = NEW(SubObject);
 
 	UKObjectsEqual([[self class] currentContext], [object objectContext]);
 	UKIntsEqual(-1, [object objectVersion]);
@@ -185,7 +186,7 @@
 
 - (void) testPlaybackBasedRollback
 {
-	COObject *object = AUTORELEASE([[SubObject alloc] initWithObjectContext: self]);
+	COObject *object = NEW(SubObject);
 
 	UKObjectsEqual(self, [object objectContext]);
 
@@ -214,8 +215,8 @@
 
 - (void) testMultiObjectPersistency
 {
-	COObject *object = AUTORELEASE([[SubObject alloc] initWithObjectContext: self]);
-	COObject *object2 = AUTORELEASE([[SubObject alloc] initWithObjectContext: self]);
+	COObject *object = NEW(SubObject);
+	COObject *object2 = NEW(SubObject);
 
 	[object setValue: @"me" forProperty: @"whoami"]; // version 1
 	[object setValue: A(@"New York", @"Minneapolis", @"London") forProperty: @"otherObjects"];
@@ -605,20 +606,6 @@
 	[self setValue: [NSMutableArray arrayWithObject: @"New York"]
 	      forProperty: @"otherObjects"];
 	[self tryStartPersistencyIfInstanceOfClass: [SubObject class]];
-
-	return self;
-}
-
-@end
-
-@implementation COObject (Test)
-
-- (id) initWithObjectContext: (COObjectContext *)ctxt
-{
-	self = [self init];
-
-	[[self objectContext] unregisterObject: self];
-	[ctxt registerObject: self];
 
 	return self;
 }
