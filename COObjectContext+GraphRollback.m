@@ -16,6 +16,7 @@
 
 @interface COObjectContext (GraphRollback)
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion;
+- (void) printQueryResult: (PGresult *)result;
 @end
 
 
@@ -134,20 +135,14 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	NSMutableDictionary *rolledbackObjectVersions = [NSMutableDictionary dictionary];
 
 	ETLog(@"Context rollback query result: %d rows and %d colums", nbOfRows, nbOfCols);
-
-	/* Log the query result for debugging */
-	PQprintOpt options = {0};
-	options.header    = 1;    /* Ask for column headers           */
-	options.align     = 1;    /* Pad short columns for alignment  */
-	options.fieldSep  = "|";  /* Use a pipe as the field separator*/
-	PQprint(stdout, result, &options);
+	[self printQueryResult: result];
 
 	/* Find all the objects to be reverted */ 
 	int nbOfRegisteredObjects = [_registeredObjects count];
 	for (int row = 0; row < nbOfRows; row++)
 	{
-		objectUUID = AUTORELEASE([[ETUUID alloc] initWithString: 
-			[NSString stringWithUTF8String: PQgetvalue(result, row, 0)]]);
+		objectUUID = [ETUUID UUIDWithString: 
+			[NSString stringWithUTF8String: PQgetvalue(result, row, 0)]];
 		objectVersion = atoi(PQgetvalue(result, row, 1));
 		contextVersion = atoi(PQgetvalue(result, row, 2));
 
@@ -170,6 +165,18 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	PQclear(result);
 	
 	return rolledbackObjectVersions;
+}
+
+/* Prints the query result on stdout for debugging. */
+- (void) printQueryResult: (PGresult *)result
+{
+	PQprintOpt options = {0};
+
+	options.header    = 1;    /* Ask for column headers           */
+	options.align     = 1;    /* Pad short columns for alignment  */
+	options.fieldSep  = "|";  /* Use a pipe as the field separator*/
+
+	PQprint(stdout, result, &options);
 }
 
 @end
