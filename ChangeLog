@@ -1,3 +1,27 @@
+2008-10-10 Quentin Mathe <qmathe@club-internet.fr>
+
+	Added fault handling to COObjectServer in order to support fixing faults for 
+	all managed objects in memory, this is another missing piece for navigating 
+	the history of an object context.
+	Also tuned faulting behavior at COGroup level to integrate with these 
+	changes and keep trace of unresolved faults rather than getting rid of them.
+	* Headers/COGroup.h:
+	* COGroup.m:
+	(-replaceFaultObject:inArray:withObject:): Renamed to 
+	-_tryReplaceFaultObject:inArray:withObject:, reworked the code to match the
+	documentation and be usable by both -tryResolveFault: and -resolveFaults.
+	Faults that cannot be resolved are now let as is rather than being ditched.
+	(-tryResolveFault:, -_tryReplaceFaultObject:inArray:withObject:): Added.
+	* TestGroup.m:
+	Modified to create a fresh context and object server on each test method run.
+	(-testTryResolveFault): Added.
+	* Headers/COObjectServer.h:
+	* COObjectServer.m:
+	(-resolvePendingFaultsWithinCachedObjectGraph, -resolveAllFaultsForUUID:): 
+	Added work-in-progress methods for dealing with faults at object server 
+	level.
+	* TestObjectServer.m: Added TestFaulting class.
+
 2008-10-02 Quentin Mathe <qmathe@club-internet.fr>
 
 	More work towards the ability to navigate the history of a context accross 

@@ -94,6 +94,11 @@
 - (void) removeCachedObject: (id)object;
 - (id) cachedObjectForUUID: (ETUUID *)anUUID;
 
+/* Faulting */
+
+- (void) resolvePendingFaultsWithinCachedObjectGraph;
+- (void) resolveAllFaultsForUUID: (ETUUID *)anUUID;
+
 // TODO: In future, we may need some faulting mechanism if we browse very 
 // large object graphs as the generic ObjectManager will make possible.
 //- (BOOL) hasFaultForUUID: (ETUUID *)uuid;

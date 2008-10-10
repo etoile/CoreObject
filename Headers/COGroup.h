@@ -89,6 +89,7 @@ extern NSString *kCOGroupChild;
 - (BOOL) hasFaults;
 - (void) setHasFaults: (BOOL)flag;
 - (void) resolveFaults;
+- (BOOL) tryResolveFault: (ETUUID *)aFault;
 
 /* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
 

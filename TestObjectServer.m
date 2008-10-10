@@ -13,6 +13,7 @@
 #import "COObjectServer.h"
 #import "COMetadataServer.h"
 #import "COObject.h"
+#import "COGroup.h"
 #import "COObjectContext.h"
 #import "COSerializer.h"
 #import "CODeserializer.h"
@@ -140,5 +141,104 @@
 	[COObject setAutomaticallyMakeNewInstancesPersistent: NO];
 }
 
+@end
+
+@interface COObjectServer (TestPrivate)
++ (void) makeNewDefaultServer;
+@end
+
+@interface TestFaulting : NSObject <UKTest>
+{
+	id objectServer;
+	id object;
+	id pendingFaultObject;
+	id pendingFaultGroup;
+	id group;
+	id group2;
+}
+
+@end
+
+@implementation TestFaulting
+
+- (void) cacheObjects: (NSArray *)objects
+{
+	FOREACHI(objects, anObject)
+	{
+		[objectServer cacheObject: anObject];	
+	}
+}
+
+- (id) initForTest
+{
+	[COObject setAutomaticallyMakeNewInstancesPersistent: YES];
+	[COGroup setAutomaticallyMakeNewInstancesPersistent: YES];
+	[COObjectServer makeNewDefaultServer];
+	[COObjectContext setCurrentContext: NEW(COObjectContext)]; 
+
+	objectServer = [COObjectServer defaultServer];
+	object = [[COObject alloc] init];
+	pendingFaultObject = [[COObject alloc] init];
+	pendingFaultGroup = [[COGroup alloc] init];
+	group = [[COGroup alloc] init];
+	group2 = [[COGroup alloc] init];
+
+	[self cacheObjects: 
+		A(object, pendingFaultObject, pendingFaultGroup, group, group2)];
+	[group addMember: object];
+	[group addMember: [pendingFaultObject UUID]];
+	/* Be careful to call -addGroup: instead of -addMember: when inserting a 
+	   fault marker for a group. -addMember: cannot detect if the parameter 
+	   is a group if you pass an UUID as a fault marker. */
+	[group2 addGroup: [pendingFaultGroup UUID]];
+	[pendingFaultGroup addMember: [pendingFaultObject UUID]];
+	[group setHasFaults: YES];
+	[group2 setHasFaults: YES];	
+	[pendingFaultGroup setHasFaults: YES];
+
+	return self;
+}
+
+- (void) releaseForTest
+{
+	[COObject setAutomaticallyMakeNewInstancesPersistent: NO];
+	[COGroup setAutomaticallyMakeNewInstancesPersistent: NO];
+	[COObjectServer makeNewDefaultServer];
+	[COObjectContext setCurrentContext: NEW(COObjectContext)];
+
+	DESTROY(object);
+	DESTROY(pendingFaultObject);
+	DESTROY(pendingFaultGroup);
+	DESTROY(group);
+	DESTROY(group2);
+
+	[super release];	
+}
+
+- (void) checkResolvedFaults
+{
+	/* For now, -tryResolveFault: doesn't check whether other faults remain */
+	UKTrue([group hasFaults]);
+	UKTrue([group2 hasFaults]);
+	UKTrue([pendingFaultGroup hasFaults]);
+	UKObjectsEqual(A(object, pendingFaultObject), [group members]);
+	UKObjectsEqual(A(pendingFaultGroup), [group2 members]);
+	UKObjectsEqual(A(pendingFaultObject), [pendingFaultGroup members]);	
+}
+
+- (void) testResolvePendingFaultsWithinCachedObjectGraph
+{
+	[objectServer resolvePendingFaultsWithinCachedObjectGraph];
+	
+	[self checkResolvedFaults];
+}
+
+- (void) testResolveAllFaultsForUUID
+{
+	[objectServer resolveAllFaultsForUUID: [pendingFaultObject UUID]];
+	[objectServer resolveAllFaultsForUUID: [pendingFaultGroup UUID]];
+
+	[self checkResolvedFaults];
+}
 
 @end

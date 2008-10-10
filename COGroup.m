@@ -31,9 +31,9 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 @interface COGroup (Private)
 - (void) _addAsParent: (COObject *) object;
 - (void) _removeAsParent: (COObject *) object;
-- (void) _replaceFaultObject: (id)aFault 
-                     inArray: (NSMutableArray *)objects 
-                  withObject: (id)resolvedObject;
+- (BOOL) _tryReplaceFaultObject: (id)aFault 
+                        inArray: (NSMutableArray *)objects 
+                     withObject: (id)resolvedObject;
 - (void) mergeArray: (NSMutableArray *)existingChildren 
           intoArray: (NSMutableArray *)oldChildren
              policy: (COChildrenMergePolicy)aPolicy;
@@ -121,7 +121,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	_hasFaults = NO;
 
 	[self tryStartPersistencyIfInstanceOfClass: [COGroup class]];
-	
+
 	return self;
 }
 
@@ -639,11 +639,11 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 		// TODO: Probably replace by -isGroup...
 		if ([resolvedObject isKindOfClass: [COGroup class]])
 		{
-			[self _replaceFaultObject: anObject inArray: subgroupObjects withObject: resolvedObject];
+			[self _tryReplaceFaultObject: anObject inArray: subgroupObjects withObject: resolvedObject];
 		}
 		else
 		{
-			[self _replaceFaultObject: anObject inArray: childObjects withObject: resolvedObject];
+			[self _tryReplaceFaultObject: anObject inArray: childObjects withObject: resolvedObject];
 		}
 	}
 
@@ -651,19 +651,42 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 		_hasFaults = NO;
 }
 
-- (void) _replaceFaultObject: (id)aFault 
-                     inArray: (NSMutableArray *)objects 
-                  withObject: (id)resolvedObject
+
+/** Resolves aFault if present in the children of the receiver, by replacing it 
+    with the real object it represents, or by keeping it as is if no real object 
+    can be resolved. */
+- (BOOL) tryResolveFault: (ETUUID *)aFault
 {
-	if (resolvedObject != nil)
+	id resolvedObject = [[self objectContext] resolvedObjectForFault: aFault];
+
+	if (resolvedObject == nil)
+		return NO;
+
+	if ([resolvedObject isKindOfClass: [COGroup class]])
 	{
-		int faultIndex = [objects indexOfObject: aFault];
-		[objects replaceObjectAtIndex: faultIndex withObject: resolvedObject];
+		return [self _tryReplaceFaultObject: aFault 
+		                            inArray: [self valueForProperty: kCOGroupSubgroupsProperty]
+		                         withObject: resolvedObject];
 	}
 	else
 	{
-		[objects removeObject: aFault];
+		return [self _tryReplaceFaultObject: aFault 
+		                            inArray: [self valueForProperty: kCOGroupChildrenProperty]
+		                         withObject: resolvedObject];
 	}
+}
+
+- (BOOL) _tryReplaceFaultObject: (id)aFault 
+                        inArray: (NSMutableArray *)objects 
+                     withObject: (id)resolvedObject
+{
+	int faultIndex = [objects indexOfObject: aFault];
+
+	if (resolvedObject == nil || faultIndex == NSNotFound)
+		return NO;
+
+	[objects replaceObjectAtIndex: faultIndex withObject: resolvedObject];
+	return YES;
 }
 
 /* Serialization (EtoileSerialize) */

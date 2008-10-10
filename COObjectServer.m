@@ -397,6 +397,41 @@ static COObjectServer *localObjectServer = nil;
 	return [_coreObjectTable objectForKey: anUUID];
 }
 
+/* Faulting */
+
+/** Resolves the faults within the loaded managed object graph, for which a 
+    cached object is available in the receiver. If no cached object exists for a
+    fault marker, the fault marker is let as is.
+    The loaded managed object graph is the cached object graph hold by the 
+    receiver. */ 
+- (void) resolvePendingFaultsWithinCachedObjectGraph
+{
+	FOREACHI([_coreObjectTable allKeys], uuid)
+	{
+		[self resolveAllFaultsForUUID: uuid];	
+	}
+}
+
+/** Resolves all the faults that may exist in the cached object graph, for the 
+    fault marker anUUID.
+    This methods operates by traversing the whole cached object graph, and trying 
+    to resolve faults every time the enumerated node is a group. */ 
+- (void) resolveAllFaultsForUUID: (ETUUID *)anUUID
+{
+	NSMutableArray *fixedGroups = [NSMutableArray array];
+
+	FOREACHI([_coreObjectTable allValues], object)
+	{
+		if ([object isKindOfClass: [COGroup class]] == NO)
+			continue;
+		
+		if ([object tryResolveFault: anUUID]);
+			[fixedGroups addObject: object];
+	}
+	
+	ETLog(@"Resolved fault %@ in groups %@", anUUID, fixedGroups);
+}
+
 - (NSURL *) serializationURL
 {
 	return _serializationURL;

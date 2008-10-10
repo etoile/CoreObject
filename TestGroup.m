@@ -9,7 +9,13 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
 #import "COGroup.h"
+#import "COObjectServer.h"
+#import "COObjectContext.h"
 #import "GNUstep.h"
+
+@interface COObjectServer (Test)
++ (void) makeNewDefaultServer;
+@end
 
 @interface TestGroup : NSObject <UKTest>
 {
@@ -31,6 +37,10 @@
 - (id) initForTest
 {
 	SUPERINIT
+
+	/* Object server and context are used by -testResolveFaults */
+	[COObjectServer makeNewDefaultServer];
+	[COObjectContext setCurrentContext: AUTORELEASE([[COObjectContext alloc] init])];
 
 	g = [[COGroup alloc] init];
 	o1 = [[COObject alloc] init];
@@ -67,6 +77,9 @@
 	DESTROY(g2);
 	DESTROY(g3);
 	DESTROY(gg1);
+
+	[COObjectServer makeNewDefaultServer];
+	[COObjectContext setCurrentContext: AUTORELEASE([[COObjectContext alloc] init])];
 
 	[super release];
 }
@@ -301,6 +314,9 @@
 	UKIntsEqual(kCOArrayProperty, [COGroup typeOfProperty: kCOGroupChildrenProperty]);
 }
 
+// TODO: Move these faulting related tests into TestFaulting class presently 
+// part of TestObjectServer.m
+
 - (void) testResolveFaults
 {
 	/* Test resolving child objects */
@@ -351,6 +367,41 @@
 	UKObjectsEqual([g3 UUID], [childObjects objectAtIndex: 2]);
 	UKObjectKindOf([childObjects objectAtIndex: 4], ETUUID);
 	UKIntsEqual(5, [childObjects count]); // includes gg1
+}
+
+- (void) testTryResolveFault
+{
+	[g setHasFaults: YES];
+	// -resolvedFaults calls -[COObjectContext resolvedObjectForFault:]
+	[[COObjectContext currentContext] registerObject: g];
+
+	NSMutableArray *gChildren = [g valueForProperty: kCOGroupChildrenProperty];
+	//NSMutableArray *gChildGroups= [g valueForProperty: kCOGroupSubgroupsProperty];
+
+	// -addMember: triggers -resolveFaults, this would resolve o2 now
+	[gChildren addObject: o1];
+	[gChildren addObject: [o2 UUID]];
+	[[COObjectContext currentContext] registerObject: o2]; // cache o2
+	[gChildren addObject: [o3 UUID]];
+	/* Don't register o3 so -[COObjectContext resolvedObjectForFault:] returns nil */
+	[gChildren addObject: o4];
+	id uuid = [ETUUID UUID];
+	[gChildren addObject: uuid];
+
+	UKFalse([g tryResolveFault: nil]);
+	UKFalse([g tryResolveFault: [o1 UUID]]);
+	UKTrue([g tryResolveFault: [o2 UUID]]);
+	UKFalse([g tryResolveFault: [o3 UUID]]);
+	UKFalse([g tryResolveFault: [o4 UUID]]);
+	UKFalse([g tryResolveFault: uuid]);
+		
+	NSArray *childObjects = [g valueForProperty: kCOGroupChildrenProperty];
+	UKObjectsSame(o1, [childObjects objectAtIndex: 0]);
+	UKObjectsSame(o2, [childObjects objectAtIndex: 1]);
+	UKObjectsEqual([o3 UUID], [childObjects objectAtIndex: 2]);
+	// FIXME: Fix UnitKit, should be UKObjectKindOf(ETUUID, [childObjects objectAtIndex: 3]);
+	UKObjectKindOf([childObjects objectAtIndex: 4], ETUUID);
+	UKIntsEqual(5, [childObjects count]);
 }
 
 @end
