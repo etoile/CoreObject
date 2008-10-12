@@ -11,6 +11,7 @@
 #import <EtoileSerialize/EtoileSerialize.h>
 #import <UnitKit/UnitKit.h>
 #import "COObject.h"
+#import "COGroup.h"
 #import "COSerializer.h"
 #import "CODeserializer.h"
 #import "COObjectServer.h"
@@ -23,6 +24,10 @@
 #define APPEND_PATH(path1, path2) [path1 stringByAppendingPathComponent: path2]
 #define SubBasicObject TestSerializerSubBasicObject
 #define SubObject TestSerializerSubObject
+
+@interface COObjectServer (Test)
++ (void) makeNewDefaultServer;
+@end
 
 @implementation ETSerializer (Test)
 + (NSURL *) libraryURLForTest
@@ -95,8 +100,8 @@ id testRoundTrip(id object)
 
 - (Class) visualBackendClass
 {
-	return [ETSerializerBackendXML class];
-	//return [ETSerializerBackendExample class];
+	//return [ETSerializerBackendXML class];
+	return [ETSerializerBackendExample class];
 }
 
 - (void) visualSerialize: (id)object
@@ -126,6 +131,19 @@ id testRoundTrip(id object)
 	//DESTROY(pool);
 
 	return newInstance;
+}
+
+- (id) initForTest
+{
+	SUPERINIT
+	[COObjectServer makeNewDefaultServer];
+	return self;
+}
+
+- (void) releaseForTest
+{
+	[COObjectServer makeNewDefaultServer];
+	[super release];
 }
 
 - (id) roundTrip: (id)object
@@ -190,39 +208,15 @@ id testRoundTrip(id object)
 	id refObject1 = AUTORELEASE([[SubObject alloc] init]);
 	[object1 setValue: A(refObject1, @"New York") forProperty: @"otherObjects"];
 
-	/* First serialize refObject1 in order it can be found as a serialized 
-	   object on disk when deserializing object1. */
-	NSURL *refObjectURL = [[ETSerializer defaultLibraryURL] URLByAppendingPath: 
-		[[refObject1 UUID] stringValue]];
-	[ETSerializer serializeObject: refObject1 toURL: refObjectURL];
-
-	/* Check refObject1 serialization */
-	NSString *path = [refObjectURL path];
-	BOOL isDir = NO;
-	//ETLog(@"path %@ -> %@", path, APPEND_PATH(path, @"root/0.save"));
-	UKTrue([FM fileExistsAtPath: path isDirectory: &isDir]);
-	UKTrue(isDir);
-
-	/* Then serializes object1 and recreates a new instance by deserializing it */
+	[[COObjectServer defaultServer] cacheObject: refObject1];
 	id object2 = [self roundTrip: object1];
 
-	/* Check object1 serialization */
-	UKTrue([FM fileExistsAtPath: [TEMP_URL path] isDirectory: &isDir]);
-	UKTrue(isDir);
-	//ETLog(@"path %@ -> %@", path, APPEND_PATH(path, @"root/0.save"));
-	UKTrue([FM fileExistsAtPath: APPEND_PATH(path, @"root/0.save") isDirectory: &isDir]);
-	UKFalse(isDir);
-	UKObjectsEqual(A(refObject1, @"New York"), [object1 valueForProperty: @"otherObjects"]);
-
 	/* Check the managed core object graph is properly recreated by deserialization */
-	UKNotNil(object2);
 	UKStringsEqual([object2 valueForProperty: @"whoami"], [NSString stringWithString: @"Nobody"]);
 	UKIntsEqual(2, [[object2 valueForProperty: @"otherObjects"] count]);
 	UKStringsEqual(@"New York", [[object2 valueForProperty: @"otherObjects"] lastObject]);
 	id loadedRefObject = [[object2 valueForProperty: @"otherObjects"] firstObject];
-	UKObjectsEqual([refObject1 UUID], [loadedRefObject UUID]);
-	UKObjectsEqual(refObject1, loadedRefObject);
-	UKObjectsNotSame(refObject1, loadedRefObject);
+	UKObjectsSame(refObject1, loadedRefObject);
 }
 
 - (void) testBasicObjectWithManagedObjectIVarSerialization
@@ -245,6 +239,23 @@ id testRoundTrip(id object)
 	SubBasicObject *object2 = [self roundTrip: object1];
 
 	UKObjectsSame(managedObject, object2->managedObject);
+}
+
+- (void) testGroupSerialization
+{
+	id group = AUTORELEASE([[COGroup alloc] init]);
+	id childObject = AUTORELEASE([[SubObject alloc] init]);
+	id childGroup = AUTORELEASE([[COGroup alloc] init]);
+
+	[group addMember: childObject];
+	[group addMember: childGroup];
+	
+	id newGroup = [self roundTrip: group];
+#ifdef VISUAL_TEST
+	[self visualSerialize: group];
+#endif
+
+	UKObjectsEqual(A([childObject UUID], [childGroup UUID]), [newGroup members]);
 }
 
 - (void) dummyMethodWithUUID: (ETUUID *)anUUID { }
