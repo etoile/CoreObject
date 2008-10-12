@@ -130,6 +130,11 @@ static COObjectServer *localObjectServer = nil;
 	[super dealloc];
 }
 
+- (NSString *) description
+{
+	return [NSString stringWithFormat: @"%@ cache: %@", [super description], _coreObjectTable];
+}
+
 /** Returns the metadata server that has been associated with the receiver.
     This metadata server will be used by all object contexts bound to the
     receiver. */
