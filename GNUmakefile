@@ -44,7 +44,8 @@ CoreObject_OBJC_FILES += \
 	TestSerializer.m \
 	TestObjectContext.m \
 	TestMetadataServer.m \
-	TestObjectServer.m
+	TestObjectServer.m \
+	TestGraphRollback.m
 endif
 
 CoreObject_HEADER_FILES_DIR += Headers

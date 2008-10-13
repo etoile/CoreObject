@@ -1,3 +1,17 @@
+2008-10-13 Quentin Mathe <qmathe@club-internet.fr>
+
+	* COObjectContext+GraphRollback.m:
+	(-mergeFreshObject:, -objectForUUID:version:): Added.
+	(-_rollbackToVersion:): Improved to take care of recreating and merging 
+	temporal instances that exist at the requested context version but not at 
+	the current one. Also extended to resolve all faults for which objects exist 
+	in memory.
+	* TestGraphRollback.m: Added. Written a special test class for testing 
+	the history navigation of the core object graph bound to an object context. 
+	This code is a modularized and extended version of several existing test 
+	methods from TestObjectContext.m.
+	* GNUmakefile: Updated to include TestGraphRollback.m.
+
 2008-10-10 Quentin Mathe <qmathe@club-internet.fr>
 
 	Added fault handling to COObjectServer in order to support fixing faults for 
