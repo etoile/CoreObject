@@ -15,6 +15,7 @@
 #import "COObjectServer.h"
 
 @interface COObjectContext (GraphRollback)
+- (int) lookUpVersionIfRollbackPointAtVersion: (int)aVersion;
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion;
 - (void) printQueryResult: (PGresult *)result;
 @end
@@ -158,17 +159,54 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	_revertingContext = NO;
 }
 
+/** Returns a context version that isn't a rollback point, by looking back for 
+    the past version restored on this rollback point.
+    If aVersion isn't a rollback point, returns aVersion as is.
+    If aVersion is a rollback point, looks up the restored version and checks
+    whether it is a rollback point or not. If it isn't, returns the found 
+    version, otherwise continues the lookup until a version not bound to a 
+    rollback point is reached. */
+- (int) lookUpVersionIfRollbackPointAtVersion: (int)aVersion
+{
+	NSString *query = [NSString stringWithFormat: 
+		@"SELECT objectUUID, contextUUID, objectVersion FROM \
+			(SELECT objectUUID, contextUUID, objectVersion, contextVersion FROM History \
+			 WHERE contextUUID = '%@') AS ContextHistory \
+		  WHERE contextVersion = %i;", 
+		[[self UUID] stringValue], aVersion];
+
+	PGresult *result = [[self metadataServer] executeRawPGSQLQuery: query];
+	[self printQueryResult: result];
+
+	ETUUID *objectUUID = [ETUUID UUIDWithString: 
+		[NSString stringWithUTF8String: PQgetvalue(result, 0, 0)]];
+	ETUUID *contextUUID = [ETUUID UUIDWithString: 
+		[NSString stringWithUTF8String: PQgetvalue(result, 0, 1)]];
+	int foundVersion = aVersion;
+	BOOL isRollbackPoint = [objectUUID isEqual: contextUUID];
+
+	if (isRollbackPoint)
+	{
+		int restoredVersion = atoi(PQgetvalue(result, 0, 2));
+		foundVersion = [self lookUpVersionIfRollbackPointAtVersion: restoredVersion];
+	}
+
+	return foundVersion;
+}
+
 /* Collects the object versions at a given context version and returns them in 
    a dictionary keyed by the UUIDs of the matched objects. */
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion
 {
+	int targetVersion = [self lookUpVersionIfRollbackPointAtVersion: aVersion];
+
 	/* Query the global history for the history of the context before aVersion */
 	NSString *query = [NSString stringWithFormat: 
 		@"SELECT objectUUID, objectVersion, contextVersion FROM \
 			(SELECT objectUUID, objectVersion, contextVersion FROM History \
 			 WHERE contextUUID = '%@') AS ContextHistory \
 		  WHERE contextVersion < %i ORDER BY contextVersion DESC", 
-		[[self UUID] stringValue], (aVersion + 1)];
+		[[self UUID] stringValue], (targetVersion + 1)];
 
 	PGresult *result = [[self metadataServer] executeRawPGSQLQuery: query];
 	int nbOfRows = PQntuples(result);

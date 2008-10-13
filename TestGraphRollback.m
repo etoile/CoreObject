@@ -288,10 +288,10 @@
 	[self checkRolledbackObjectsAtVersion16: objectVersionIncrements
 	                     invalidatedObjects: A(object, group, group2)];
 
-	/*[CTXT rollbackToVersion: 19];
+	[CTXT rollbackToVersion: 19];
 
 	UKIntsEqual(lastVersion + 4, [CTXT version]);
-	[self checkRolledbackObjectsAtVersion4: 4];*/
+	[self checkRolledbackObjectsAtVersion4: 4];
 
 	DESTROY(contextUUID);
 }

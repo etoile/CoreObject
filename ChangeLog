@@ -1,6 +1,15 @@
 2008-10-13 Quentin Mathe <qmathe@club-internet.fr>
 
 	* COObjectContext+GraphRollback.m:
+	(-lookUpVersionIfRollbackPointAtVersion:): Added.
+	(-findAllObjectVersionsMatchingContextVersion:): Modified to get the right 
+	version to restore by calling -lookUpVersionIfRollbackPointAtVersion:.
+	* TestGraphRollback.m (-testRecreateContextAfterRollback): Modified to 
+	include a test for rolling back to a past rollback point.
+
+2008-10-13 Quentin Mathe <qmathe@club-internet.fr>
+
+	* COObjectContext+GraphRollback.m:
 	(-mergeFreshObject:, -objectForUUID:version:): Added.
 	(-_rollbackToVersion:): Improved to take care of recreating and merging 
 	temporal instances that exist at the requested context version but not at 
