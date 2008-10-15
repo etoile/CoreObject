@@ -22,6 +22,8 @@
 - (int) lookUpVersionIfRollbackPointAtVersion: (int)aVersion;
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion;
 - (void) printQueryResult: (PGresult *)result;
+- (void) discardObjectsNotYetCreatedAtVersion: (int)aVersion 
+                            forObjectVersions: (NSMutableDictionary *)rolledbackObjectVersions;
 @end
 
 
@@ -81,18 +83,8 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	ETLog(@"Will revert objects to versions: %@ for registered objects %@", 
 		 [rolledbackObjectVersions stringValue], [_registeredObjects stringValue]);
 
-	/* Discard registered objects not yet created at aVersion */
-	NSArray *targetUUIDs = [rolledbackObjectVersions allKeys];
-	FOREACHI(_registeredObjects, object)
-	{
-		BOOL isFutureObject = ([targetUUIDs containsObject: [object UUID]] == NO);
-
-		if (isFutureObject)
-		{
-			[self unregisterObject: object];
-			ETLog(@"Discard future object %@", object);
-		}
-	}
+	[self discardObjectsNotYetCreatedAtVersion: aVersion
+	                         forObjectVersions: rolledbackObjectVersions];
 
 	/* Revert all the objects we just found */
 	NSMutableSet *mergedObjects = [NSMutableSet set];
@@ -296,6 +288,25 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	options.fieldSep  = "|";  /* Use a pipe as the field separator*/
 
 	PQprint(stdout, result, &options);
+}
+
+/* Discards registered objects not yet created at aVersion.
+   The objects are removed from the cached objects by being unregistered. */
+- (void) discardObjectsNotYetCreatedAtVersion: (int)aVersion 
+                            forObjectVersions: (NSMutableDictionary *)rolledbackObjectVersions
+{
+	NSArray *targetUUIDs = [rolledbackObjectVersions allKeys];
+
+	FOREACHI(_registeredObjects, object)
+	{
+		BOOL isFutureObject = ([targetUUIDs containsObject: [object UUID]] == NO);
+
+		if (isFutureObject)
+		{
+			[self unregisterObject: object];
+			ETLog(@"Discard future object %@", object);
+		}
+	}
 }
 
 @end
