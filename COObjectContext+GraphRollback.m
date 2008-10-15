@@ -22,8 +22,8 @@
 - (int) lookUpVersionIfRollbackPointAtVersion: (int)aVersion;
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion;
 - (void) printQueryResult: (PGresult *)result;
-- (void) discardObjectsNotYetCreatedAtVersion: (int)aVersion 
-                            forObjectVersions: (NSMutableDictionary *)rolledbackObjectVersions;
+- (void) discardCurrentObjectsNotYetCreatedAtVersion: (int)aVersion 
+                                   forObjectVersions: (NSDictionary *)restoredObjectVersions;
 @end
 
 
@@ -77,24 +77,24 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 {
 	_revertingContext = YES;
 
-	NSMutableDictionary *rolledbackObjectVersions = 
+	NSMutableDictionary *restoredObjectVersions = 
 		[self findAllObjectVersionsMatchingContextVersion: aVersion];
 
-	ETLog(@"Will revert objects to versions: %@ for registered objects %@", 
-		 [rolledbackObjectVersions stringValue], [_registeredObjects stringValue]);
+	ETLog(@"Will restore objects to versions: %@ for registered objects %@", 
+		 restoredObjectVersions, _registeredObjects);
 
-	[self discardObjectsNotYetCreatedAtVersion: aVersion
-	                         forObjectVersions: rolledbackObjectVersions];
+	[self discardCurrentObjectsNotYetCreatedAtVersion: aVersion
+	                                forObjectVersions: restoredObjectVersions];
 
 	/* Revert all the objects we just found */
 	NSMutableSet *mergedObjects = [NSMutableSet set];
 	id objectServer = [self objectServer];
-	FOREACHI([rolledbackObjectVersions allKeys], targetUUID)
+	FOREACHI([restoredObjectVersions allKeys], targetUUID)
 	{
 		id targetObject = [objectServer cachedObjectForUUID: targetUUID];
 		BOOL targetRegisteredInContext = (targetObject != nil && [_registeredObjects containsObject: targetObject]);
-		int targetVersion = [[rolledbackObjectVersions objectForKey: targetUUID] intValue];
-		id rolledbackObject = nil;
+		int targetVersion = [[restoredObjectVersions objectForKey: targetUUID] intValue];
+		id restoredObject = nil;
 
 		if (targetRegisteredInContext) /* Rollback an existing instance */
 		{
@@ -105,10 +105,10 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 			if (targetUpToDate)
 				continue;
 
-			rolledbackObject = [self objectByRollingbackObject: targetObject 
+			restoredObject = [self objectByRollingbackObject: targetObject 
 			                                         toVersion: targetVersion
 			                                  mergeImmediately: YES];
-			ETLog(@"Rollback %@ version %i within %@", rolledbackObject, targetVersion, self);
+			ETLog(@"Restore %@ version %i within %@", restoredObject, targetVersion, self);
 		}
 		else /* Recreate a missing instance */
 		{
@@ -119,8 +119,8 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 			if (targetUpToDate)
 				continue;
 
-			rolledbackObject = [self objectForUUID: targetUUID version: targetVersion];
-			ETLog(@"Recreate %@ version %i within %@", rolledbackObject, targetVersion, self);
+			restoredObject = [self objectForUUID: targetUUID version: targetVersion];
+			ETLog(@"Recreate %@ version %i within %@", restoredObject, targetVersion, self);
 		}
 
 		/* Other objects may refer this object we just rolled back, however 
@@ -131,7 +131,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		   Take note that resolving pending faults isn't mandatory because 
 		   faults are also resolved on demand (see COGroup). */
 		
-		[mergedObjects addObject: rolledbackObject];
+		[mergedObjects addObject: restoredObject];
 	}
 
 	/* Resolve pending faults
@@ -169,7 +169,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 			_version,
 			[NSDate date]]];
 
-	ETLog(@"Log revert context with UUID %@ to version %i as new version %i", 
+	ETLog(@"Log restore context with UUID %@ to version %i as new version %i", 
 		 _uuid, aVersion, _version);
 
 	/* Post notification */
@@ -237,9 +237,9 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	int objectVersion = -1;
 	int contextVersion = -1;
 	/* Collection where the object versions to be rolled back are put keyed by UUIDs */
-	NSMutableDictionary *rolledbackObjectVersions = [NSMutableDictionary dictionary];
+	NSMutableDictionary *restoredObjectVersions = [NSMutableDictionary dictionary];
 
-	ETLog(@"Context rollback query result: %d rows and %d colums", nbOfRows, nbOfCols);
+	ETLog(@"Context restore query result: %d rows and %d colums", nbOfRows, nbOfCols);
 	[self printQueryResult: result];
 
 	/* Find all the objects to be reverted */ 
@@ -251,12 +251,12 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		objectVersion = atoi(PQgetvalue(result, row, 1));
 		contextVersion = atoi(PQgetvalue(result, row, 2));
 
-		BOOL objectNotAlreadyFound = ([[rolledbackObjectVersions allKeys] containsObject: objectUUID] == NO);
+		BOOL objectNotAlreadyFound = ([[restoredObjectVersions allKeys] containsObject: objectUUID] == NO);
 
 		if (objectNotAlreadyFound)
 		{
-			[rolledbackObjectVersions setObject: [NSNumber numberWithInt: objectVersion] 
-			                             forKey: objectUUID];
+			[restoredObjectVersions setObject: [NSNumber numberWithInt: objectVersion] 
+			                           forKey: objectUUID];
 		}
 
 		/* If a past object version has already been found for each registered 
@@ -268,14 +268,14 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		// history between the target version and the current version rather 
 		// than before the target version to 0, we can limit the amount of 
 		// work by only considering the objects modified in this timespan.
-		//if ([rolledbackObjectVersions count] == nbOfRegisteredObjects)
+		//if ([restoredObjectVersions count] == nbOfRegisteredObjects)
 		//	break;
 	}
 	
 	/* Free the query result now the object versions are extracted */
 	PQclear(result);
 	
-	return rolledbackObjectVersions;
+	return restoredObjectVersions;
 }
 
 /* Prints the query result on stdout for debugging. */
@@ -292,14 +292,14 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 
 /* Discards registered objects not yet created at aVersion.
    The objects are removed from the cached objects by being unregistered. */
-- (void) discardObjectsNotYetCreatedAtVersion: (int)aVersion 
-                            forObjectVersions: (NSMutableDictionary *)rolledbackObjectVersions
+- (void) discardCurrentObjectsNotYetCreatedAtVersion: (int)aVersion 
+                                   forObjectVersions: (NSDictionary *)restoredObjectVersions
 {
-	NSArray *targetUUIDs = [rolledbackObjectVersions allKeys];
+	NSArray *restoredUUIDs = [restoredObjectVersions allKeys];
 
 	FOREACHI(_registeredObjects, object)
 	{
-		BOOL isFutureObject = ([targetUUIDs containsObject: [object UUID]] == NO);
+		BOOL isFutureObject = ([restoredUUIDs containsObject: [object UUID]] == NO);
 
 		if (isFutureObject)
 		{
