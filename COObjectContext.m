@@ -29,11 +29,13 @@ NSString *COMergedObjectsKey = @"COMergedObjectsKey";
 
 @interface COObjectContext (Private)
 - (int) latestVersion;
+- (void) commitMergeOfInstance: (id)temporalInstance forObject:  (id)anObject;
 - (void) snapshotObject: (id)object shouldIncrementObjectVersion: (BOOL)updateVersion;
 @end
 
 @interface COObjectContext (GraphRollback)
 - (void) _rollbackToVersion: (int)aVersion;
+- (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion;
 @end
 
 @implementation COObjectContext
@@ -327,6 +329,33 @@ static COObjectContext *currentObjectContext = nil;
 	return [self objectForUUID: aFault];;
 }
 
+/** Returns the UUIDs of the all the objects that belongs the receiver for the 
+    given version. 
+    If you substract the UUIDs of the registered objects from the returned set, 
+    the resulting set contains every faults that belongs to the object context. */
+- (NSArray *) allObjectUUIDsMatchingContextVersion: (int)aVersion
+{
+	return [[self findAllObjectVersionsMatchingContextVersion: aVersion] allKeys];
+}
+
+/** Loads and register all the objects that belongs to the receiver but are not
+    yet loaded.
+    These objects may exist as faults in the object graph by being referenced 
+    by other objects. Take note this method won't resolve existing faults 
+    that points to these objects within the loaded object graph. These pending 
+    faults will lazily resolved the next time they are accessed (for example by 
+    calling -members on a group). If you want to resolve them immediately, 
+    you must call -[COObjectServer resolvePendingFaultsWithinCachedObjectGraph]. */
+- (void) loadAllObjects
+{
+	NSArray *faults =  [self allObjectUUIDsMatchingContextVersion: [self version]];
+
+	FOREACH(faults, eachFault, ETUUID *)
+	{
+		[self objectForUUID: eachFault];
+	}
+}
+
 /* Merging */
 
 /** Returns the current merge policy for children objects when a temporal 
@@ -436,21 +465,36 @@ static COObjectContext *currentObjectContext = nil;
 	[self unregisterObject: anObject];
 	[self registerObject: temporalInstance];
 
-	/* Commit the merge 
-
-	   Sync the object version and take a snaphot of the temporal instance now 
-	   in use. Right after that, both anObject and temporalInstance will reply 
-	   to -lastObjectVersion by returning [anObject objectVersion] + 1. */
-	BOOL isSingleObjectChange = ([self isRevertingContext] == NO);
-	[temporalInstance _setObjectVersion: [anObject objectVersion]];
-	[self snapshotObject: temporalInstance shouldIncrementObjectVersion: YES];
-	[self logRecord: anObject objectVersion: [anObject objectVersion] 
-		timestamp: [NSDate date] shouldIncrementContextVersion: isSingleObjectChange];
+	[self commitMergeOfInstance: temporalInstance forObject: anObject];
 
 	if (isTemporal)
 		[self endRevert];
 
 	return mergeResult;
+}
+
+/** Commits an object merge by syncing the object version and taking a snaphot 
+    of the temporal instance now in use. 
+    Right after that, both anObject and temporalInstance will reply to 
+    -lastObjectVersion by returning [anObject objectVersion] + 1. */
+- (void) commitMergeOfInstance: (id)temporalInstance forObject: (id)anObject
+{
+	BOOL isSingleObjectChange = ([self isRevertingContext] == NO);
+
+	if (anObject != nil)
+	{
+		[temporalInstance _setObjectVersion: [anObject objectVersion]];
+	}
+	else
+	{
+		int lastObjectVersion = [[self metadataServer] objectVersionForUUID: [temporalInstance UUID]];
+		[temporalInstance _setObjectVersion: lastObjectVersion];
+	}
+	[self snapshotObject: temporalInstance shouldIncrementObjectVersion: YES];
+	if (anObject == nil)
+		anObject = temporalInstance;
+	[self logRecord: anObject objectVersion: [anObject objectVersion] 
+		timestamp: [NSDate date] shouldIncrementContextVersion: isSingleObjectChange];	
 }
 
 /** Returns the errors that occured the last time 

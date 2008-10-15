@@ -45,6 +45,12 @@ static COObjectServer *localObjectServer = nil;
 	localObjectServer = [[self alloc] init];	
 }
 
+/* Private getter reserved for testing purpose. */
+- (NSDictionary *) cachedObjects
+{
+	return _coreObjectTable;
+}
+
 /** <override-dummy />
 	Returns the base URL of the default object store that must be defined by +localObjectServerClass
 	The base URL can be defined in a subclass by overriding 

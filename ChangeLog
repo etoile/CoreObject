@@ -1,3 +1,36 @@
+2008-10-15 Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/COObjectContext.h:
+	* COObjectContext.m: 
+	(-loadAllObjects, allObjectUUIDsMatchingContextVersion:, 
+	-commitMergeOfInstance:forObject:): Added. 
+	(-replaceObject:byObject:collectAllErrors:): Extracted the code that takes 
+	care of taking a snaphot to record an object replacement into 
+	-commitMergeOfInstance:forObject:.
+	* COObjectContext+GraphRollback.m:
+	(-lastObjectVersionForUUID:): Added.
+	(-objectForUUID:version:): Modified to call 
+	-commitMergeOfInstance:forObject:.
+	(-_rollbackToVersion:): Improved to discard future objects when rolling back 
+	the context to an old version. Before they were kept as cached objects. 
+	Also improved to avoid the loading of objects whose versions haven't changed 
+	between the target version and the current one.
+	(-findAllObjectVersionsMatchingContextVersion:): Fixed to scan all the 
+	history rather than exiting when the expected versions of the registered 
+	objects have been found. By scanning all the history, we handle properly 
+	the rollback of objects that aren't loaded. Until now only loaded/registered 
+	objects were properly reverted.
+	* COObjectServer (-cachedObjects): Added private getter used by the tests.
+	* TestGraphRollback.m:
+	Added a few tests to ensure the instances that belongs to the future are 
+	properly discarded from the cache when the context is rolled back.
+	(-currentInstance:): Added this shortcut method and updated the test 
+	methods to use it.
+	(-recreateObjectGraph): Rewrote to really load all the objects belonging to 
+	the context, including any objects disconnected from the graph.
+	(-testRecreateContextAfterRollback): Modified to force the loading of 
+	objects when moving from version 4 to 16 of the context.
+
 2008-10-13 Quentin Mathe <qmathe@club-internet.fr>
 
 	* COObjectContext+GraphRollback.m:

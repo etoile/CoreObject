@@ -14,6 +14,10 @@
 #import "COMetadataServer.h"
 #import "COObjectServer.h"
 
+@interface COObjectContext (Private)
+- (void) commitMergeOfInstance: (id)temporalInstance forObject:  (id)anObject;
+@end
+
 @interface COObjectContext (GraphRollback)
 - (int) lookUpVersionIfRollbackPointAtVersion: (int)aVersion;
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion;
@@ -54,11 +58,16 @@
 {
 	id object = [[self objectServer] objectWithUUID: anUUID version: objectVersion];
 
+	[self commitMergeOfInstance: object forObject: nil];
 	[self mergeFreshObject: object];
 
 	return object;
 }
 
+- (int) lastObjectVersionForUUID: (ETUUID *)aUUID
+{
+	return [[self metadataServer] objectVersionForUUID: aUUID];
+}
 
 /* Query example:
 SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, objectVersion, contextVersion FROM HISTORY WHERE contextUUID = '64dc7e8f-db73-4bcc-666f-d9bf6b77a80a') AS ContextHistory WHERE contextVersion > 2000 ORDER BY contextVersion DESC LIMIT 10 */
@@ -69,7 +78,21 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	NSMutableDictionary *rolledbackObjectVersions = 
 		[self findAllObjectVersionsMatchingContextVersion: aVersion];
 
-	ETLog(@"Will revert objects to versions: %@", rolledbackObjectVersions);
+	ETLog(@"Will revert objects to versions: %@ for registered objects %@", 
+		 [rolledbackObjectVersions stringValue], [_registeredObjects stringValue]);
+
+	/* Discard registered objects not yet created at aVersion */
+	NSArray *targetUUIDs = [rolledbackObjectVersions allKeys];
+	FOREACHI(_registeredObjects, object)
+	{
+		BOOL isFutureObject = ([targetUUIDs containsObject: [object UUID]] == NO);
+
+		if (isFutureObject)
+		{
+			[self unregisterObject: object];
+			ETLog(@"Discard future object %@", object);
+		}
+	}
 
 	/* Revert all the objects we just found */
 	NSMutableSet *mergedObjects = [NSMutableSet set];
@@ -97,6 +120,13 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		}
 		else /* Recreate a missing instance */
 		{
+			BOOL targetUpToDate = (targetVersion == [self lastObjectVersionForUUID: targetUUID]);
+
+			/* Only revert the objects that have changed between aVersion and the 
+			   current context version */
+			if (targetUpToDate)
+				continue;
+
 			rolledbackObject = [self objectForUUID: targetUUID version: targetVersion];
 			ETLog(@"Recreate %@ version %i within %@", rolledbackObject, targetVersion, self);
 		}
@@ -111,7 +141,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		
 		[mergedObjects addObject: rolledbackObject];
 	}
-	
+
 	/* Resolve pending faults
 
 	   Not truly necessary as explained, but this reduces the amount of faults 
@@ -221,7 +251,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	[self printQueryResult: result];
 
 	/* Find all the objects to be reverted */ 
-	int nbOfRegisteredObjects = [_registeredObjects count];
+	//int nbOfRegisteredObjects = [_registeredObjects count];
 	for (int row = 0; row < nbOfRows; row++)
 	{
 		objectUUID = [ETUUID UUIDWithString: 
@@ -240,8 +270,14 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		/* If a past object version has already been found for each registered 
 		   object, we already know all the objects to be reverted, hence we 
 		   can skip the rest of the earlier history. */
-		if ([rolledbackObjectVersions count] == nbOfRegisteredObjects)
-			break;
+		// FIXME: Test against the number of objects that belong to the context 
+		// rather than the number of registered objects since some objects to 
+		// be rolledback may not be loaded at this point. If the scan the 
+		// history between the target version and the current version rather 
+		// than before the target version to 0, we can limit the amount of 
+		// work by only considering the objects modified in this timespan.
+		//if ([rolledbackObjectVersions count] == nbOfRegisteredObjects)
+		//	break;
 	}
 	
 	/* Free the query result now the object versions are extracted */

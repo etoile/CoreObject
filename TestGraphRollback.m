@@ -29,6 +29,7 @@
 
 @interface COObjectServer (Test)
 + (void) makeNewDefaultServer;
+- (NSDictionary *) cachedObjects;
 @end
 
 @interface COObjectContext (Private)
@@ -111,19 +112,27 @@
 	[super release];
 }
 
+- (id) currentInstance: (id)anObject
+{
+	return [[CTXT objectServer] cachedObjectForUUID: [anObject UUID]];
+}
+
 - (void) checkRolledbackObjectsAtVersion4: (int)increment
 {
-	id objectServer = [CTXT objectServer];
-		
+	UKNil([self currentInstance: group2]);
+	UKNil([self currentInstance: group3]);
+	UKIntsEqual(4, [[CTXT registeredObjects] count]);
+	UKIntsEqual(4, [[[CTXT objectServer] cachedObjects] count]);
+
 	/* Merged instance has replaced the existing instance in the core object cache */
-	id newObject = [objectServer cachedObjectForUUID: [object UUID]];
+	id newObject = [self currentInstance: object];
 
 	UKTrue([newObject isTemporalInstance: object]);
 	UKIntsEqual([object objectVersion] + increment, [newObject objectVersion]);
 	UKStringsEqual(@"Nobody", [newObject valueForProperty: @"whoami"]);
 	UKObjectsEqual(A(@"New York"), [newObject valueForProperty: @"otherObjects"]);
 
-	id newGroup = [objectServer cachedObjectForUUID: [group UUID]];
+	id newGroup = [self currentInstance: group];
 
 	UKIntsEqual([group objectVersion] + increment, [newGroup objectVersion]);
 	UKNil([newGroup valueForProperty: kCOGroupNameProperty]);
@@ -133,18 +142,19 @@
 
 - (void) checkRolledbackObjectsAtVersion12
 {
-	id objectServer = [CTXT objectServer];
-		
+	UKIntsEqual(6, [[CTXT registeredObjects] count]);
+	UKIntsEqual(6, [[[CTXT objectServer] cachedObjects] count]);
+	
 	/* Merged instance has replaced the existing instance in the core object cache */
-	id newObject = [objectServer cachedObjectForUUID: [object UUID]];
+	id newObject = [self currentInstance: object];
 
 	UKTrue([newObject isTemporalInstance: object]);
 	UKIntsEqual([object objectVersion] + 1, [newObject objectVersion]);
 	UKStringsEqual(@"Nobody", [newObject valueForProperty: @"whoami"]);
 	UKObjectsEqual(A(@"New York"), [newObject valueForProperty: @"otherObjects"]);
 
-	id newGroup = [objectServer cachedObjectForUUID: [group UUID]];
-	id newGroup2 = [objectServer cachedObjectForUUID: [group2 UUID]];
+	id newGroup = [self currentInstance: group];
+	id newGroup2 = [self currentInstance: group2];
 
 	UKIntsEqual([group objectVersion] + 1, [newGroup objectVersion]);
 	UKNil([newGroup valueForProperty: kCOGroupNameProperty]);
@@ -166,12 +176,13 @@
 - (void) checkRolledbackObjectsAtVersion16: (int *)increments
                         invalidatedObjects: (NSArray *)invalidObjects
 {
-	id objectServer = [CTXT objectServer];
-		
+	UKIntsEqual(6, [[CTXT registeredObjects] count]);
+	UKIntsEqual(6, [[[CTXT objectServer] cachedObjects] count]);
+
 	/* Merged instance has replaced the existing instance in the core object cache */
-	id newObject = [objectServer cachedObjectForUUID: [object UUID]];
-	id newObject2 = [objectServer cachedObjectForUUID: [object2 UUID]];
-	id newObject3 = [objectServer cachedObjectForUUID: [object3 UUID]];
+	id newObject = [self currentInstance: object];
+	id newObject2 = [self currentInstance: object2];
+	id newObject3 = [self currentInstance: object3];
 
 	if ([invalidObjects containsObject: object])
 		UKTrue([newObject isTemporalInstance: object]);
@@ -187,9 +198,9 @@
 	UKStringsEqual(@"Nobody", [newObject3 valueForProperty: @"whoami"]);
 	UKObjectsEqual(A(@"New York"), [newObject3 valueForProperty: @"otherObjects"]);
 
-	id newGroup = [objectServer cachedObjectForUUID: [group UUID]];
-	id newGroup2 = [objectServer cachedObjectForUUID: [group2 UUID]];
-	id newGroup3 = [objectServer cachedObjectForUUID: [group3 UUID]];
+	id newGroup = [self currentInstance: group];
+	id newGroup2 = [self currentInstance: group2];
+	id newGroup3 = [self currentInstance: group3];
 
 	if ([invalidObjects containsObject: group])
 		UKTrue([newGroup isTemporalInstance: group]);
@@ -212,10 +223,8 @@
 
 - (void) checkRolledbackObjectsForRedo
 {
-	id objectServer = [CTXT objectServer];
-
 	/* Merged instance has replaced the existing instance in the core object cache */
-	id newObject2 = [objectServer cachedObjectForUUID: [object UUID]];
+	id newObject2 = [self currentInstance: object];
 
 	UKTrue([newObject2 isTemporalInstance: object]);
 	UKIntsEqual([object objectVersion] + 2, [newObject2 objectVersion]);
@@ -247,16 +256,20 @@
 
 - (void) recreateObjectGraph
 {
-	id rootGroup = [CTXT objectForUUID: [group UUID]];
-
-	UKNotNil(rootGroup);
+	/* Resolving faults on the root group or even all groups isn't enough to 
+	   ensure every objects are loaded, because for some context versions 
+	   objects might still be part of the context but not belonging to any 
+	   groups and thereby disconnected from the graph.
+	   For example, at context v16, group2 and object2 are disconnected.
+	   At context v12, object3 is disconnected. */
+	[CTXT loadAllObjects];
 	
-	[rootGroup resolveFaults];
-	
-	FOREACHI([rootGroup groups], subgroup)
-	{
-		[subgroup resolveFaults];
-	}
+	/* -resolvePendingFaultsWithinCachedGraph: would be equivalent, but adds 
+	   yet another layer for testing purpose, so we simply call -resolveFaults 
+	   on each group. If debugging is necessary, it helps a bit. */
+	[[self currentInstance: group] resolveFaults];
+	[[self currentInstance: group2] resolveFaults];
+	[[self currentInstance: group3] resolveFaults];
 }
 
 - (void) testRecreateContextAfterRollback
@@ -265,22 +278,28 @@
 
 	[CTXT rollbackToVersion: 12];
 
+	/* Destroy the context and the object server and recreate them */
 	id contextUUID = RETAIN([CTXT UUID]);
 	[COObjectContext setCurrentContext: nil];
 	[COObjectServer makeNewDefaultServer];
 	[COObjectContext setCurrentContext: AUTORELEASE([[COObjectContext alloc] initWithUUID: contextUUID])];
+
+	/* All objects are faults, thereby we must load them */
 	[self recreateObjectGraph];
 
 	UKIntsEqual(lastVersion + 1, [CTXT version]);
 	[self checkRolledbackObjectsAtVersion12];
 
+	/* More rollbacks */
+
 	[CTXT rollbackToVersion: 4];
-	
 	UKIntsEqual(lastVersion + 2, [CTXT version]);
 	[self checkRolledbackObjectsAtVersion4: 2];
 
 	[CTXT rollbackToVersion: 16];
-
+	/* We move forward in time, every objects created after v4 must be loaded 
+	   explicitly to work around the lazy loading (aka faulting). */
+	[self recreateObjectGraph];
 	UKIntsEqual(lastVersion + 3, [CTXT version]);
 	/* See -checkRolledbackObjectsAtVersion16:invalidatedObjects: for 
 	   explanations about invalidated objects */
@@ -289,7 +308,6 @@
 	                     invalidatedObjects: A(object, group, group2)];
 
 	[CTXT rollbackToVersion: 19];
-
 	UKIntsEqual(lastVersion + 4, [CTXT version]);
 	[self checkRolledbackObjectsAtVersion4: 4];
 

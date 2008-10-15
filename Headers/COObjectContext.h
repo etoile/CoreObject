@@ -97,6 +97,8 @@ typedef enum _COChildrenMergePolicy
 /* Faulting */
 
 - (id) resolvedObjectForFault: (id)aFault;
+- (NSArray *) allObjectUUIDsMatchingContextVersion: (int)aVersion;
+- (void) loadAllObjects;
 
 /* Merging */
 
