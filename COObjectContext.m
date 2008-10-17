@@ -752,12 +752,12 @@ static COObjectContext *currentObjectContext = nil;
     In the rare case where -[object lastObjectVersion] and 
     -[object objectVersion] doesn't match, you can get an temporal 
     instance more recent than object. This should only happen if you try to 
-    call -objectByRollingbackObject:toVersion: with a temporal instance that 
+    call -objectByRestoringObject:toVersion: with a temporal instance that 
     just got returned by the method, and hasn't been merged in the object 
     graph yet (see -anObjectject:byTemporalInstance:). You shouldn't rely on 
     this feature since it could be removed at any point in a future version of 
     the API. */
-- (id) objectByRollingbackObject: (id)anObject 
+- (id) objectByRestoringObject: (id)anObject 
                        toVersion: (int)aVersion
                 mergeImmediately: (BOOL)mergeNow
 {
@@ -835,7 +835,7 @@ static COObjectContext *currentObjectContext = nil;
 	return ([self currentRevertedObject] != nil);
 }
 
-/** Returns the registered object for which -objectByRollingbackObject: is 
+/** Returns the registered object for which -objectByRestoringObject: is 
     currently executed. */
 - (id) currentRevertedObject
 {
@@ -1128,7 +1128,7 @@ static COObjectContext *currentObjectContext = nil;
 	                                      forVersion: aVersion
 	                                 snapshotVersion: &foundVersion];
 
-	//[self objectByRollingbackObject: rolledbackObject toVersion:
+	//[self objectByRestoringObject: rolledbackObject toVersion:
 
 	[object release];
 	object = rolledbackObject;

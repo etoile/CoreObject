@@ -285,7 +285,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 			if (currentObjectUpToDate)
 				continue;
 
-			restoredObject = [self objectByRollingbackObject: currentObject 
+			restoredObject = [self objectByRestoringObject: currentObject 
 			                                       toVersion: restoredVersion
 			                                mergeImmediately: YES];
 			ETLog(@"Restore %@ version %i within %@", restoredObject, restoredVersion, self);

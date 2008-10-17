@@ -145,7 +145,7 @@ typedef enum _COChildrenMergePolicy
 - (id) lastSnapshotOfObject: (id)object 
                  forVersion: (int)aVersion 
             snapshotVersion: (int *)snapshotVersion;
-- (id) objectByRollingbackObject: (id)anObject 
+- (id) objectByRestoringObject: (id)anObject 
                        toVersion: (int)aVersion
                 mergeImmediately: (BOOL)mergeNow;
 - (void) playbackInvocationsWithObject: (id)object 

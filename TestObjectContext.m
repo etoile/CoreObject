@@ -42,9 +42,9 @@
 
 @implementation COObjectContext (TestObjectContext)
 
-- (id) objectByRollingbackObject: (id)object toVersion: (int)aVersion 
+- (id) objectByRestoringObject: (id)object toVersion: (int)aVersion 
 {
-	return [self objectByRollingbackObject: object toVersion: aVersion mergeImmediately: NO];
+	return [self objectByRestoringObject: object toVersion: aVersion mergeImmediately: NO];
 }
 
 - (id) initForTest
@@ -179,7 +179,7 @@
 	[object setValue: @"everybody" forProperty: @"whoami"];
 	UKIntsEqual(3, [object objectVersion]);
 
-	id object1v3 = [[object objectContext] objectByRollingbackObject: object toVersion: 0];
+	id object1v3 = [[object objectContext] objectByRestoringObject: object toVersion: 0];
 	UKStringsEqual(@"Nobody", [object1v3 valueForProperty: @"whoami"]);
 	UKObjectsEqual([NSMutableArray arrayWithObject: @"New York"], [object1v3 valueForProperty: @"otherObjects"]);
 }
@@ -196,18 +196,18 @@
 
 	UKIntsEqual(3, [object objectVersion]);
 
-	id object1v1 = [self objectByRollingbackObject: object toVersion: 1];
+	id object1v1 = [self objectByRestoringObject: object toVersion: 1];
 	UKNil([object1v1 objectContext]);
 	UKObjectsEqual([object UUID], [object1v1 UUID]);
 	UKStringsEqual(@"me", [object1v1 valueForProperty: @"whoami"]);
 	UKObjectsEqual([NSArray arrayWithObject: @"New York"], [object1v1 valueForProperty: @"otherObjects"]);
 
-	id object1v2 = [self objectByRollingbackObject: object toVersion: 2];
+	id object1v2 = [self objectByRestoringObject: object toVersion: 2];
 	UKObjectsEqual([object UUID], [object1v2 UUID]);
 	UKStringsEqual(@"me", [object1v2 valueForProperty: @"whoami"]);
 	UKObjectsEqual(A(@"New York", @"Minneapolis", @"London"), [object1v2 valueForProperty: @"otherObjects"]);
 
-	id object1v3 = [self objectByRollingbackObject: object toVersion: 3];
+	id object1v3 = [self objectByRestoringObject: object toVersion: 3];
 	UKObjectsEqual([object UUID], [object1v3 UUID]);
 	UKStringsEqual(@"everybody", [object1v3 valueForProperty: @"whoami"]);
 	UKObjectsEqual(A(@"New York", @"Minneapolis", @"London"), [object1v3 valueForProperty: @"otherObjects"]);
@@ -234,7 +234,7 @@
 	UKIntsEqual(8, [object objectVersion]);
 	UKIntsEqual(3, [object2 objectVersion]);
 
-	id object1v7 = [self objectByRollingbackObject: object toVersion: 7];
+	id object1v7 = [self objectByRestoringObject: object toVersion: 7];
 	UKNil([object1v7 objectContext]);
 	UKObjectsEqual([object UUID], [object1v7 UUID]);
 	UKStringsEqual(@"Who knows!", [object1v7 valueForProperty: @"whoami"]);
@@ -292,7 +292,7 @@
 
 	int objectVersionBeforeMerge = [object objectVersion];
 	int groupVersionBeforeMerge = [group objectVersion];
-	id objectv1 = [self objectByRollingbackObject: object toVersion: 1 mergeImmediately: YES];
+	id objectv1 = [self objectByRestoringObject: object toVersion: 1 mergeImmediately: YES];
 
 	/* Test merged object */
 	UKNotNil([objectv1 objectContext]);
@@ -327,7 +327,7 @@
 
 	groupVersionBeforeMerge = [group objectVersion];
 	int group2VersionBeforeMerge = [group2 objectVersion];
-	id group2v3 = [self objectByRollingbackObject: group2 toVersion: 3 mergeImmediately: YES];
+	id group2v3 = [self objectByRestoringObject: group2 toVersion: 3 mergeImmediately: YES];
 
 	/* Test merged object */
 	UKNotNil([group2v3 objectContext]);
@@ -361,7 +361,7 @@
 
 	/* Test Old Children Merge */
 	[self setMergePolicy: COOldChildrenMergePolicy];
-	id groupv2 = [self objectByRollingbackObject: group toVersion: 2 mergeImmediately: YES];
+	id groupv2 = [self objectByRestoringObject: group toVersion: 2 mergeImmediately: YES];
 
 	UKObjectsEqual(A(object, group2), [groupv2 members]);
 }
@@ -371,7 +371,7 @@
 	CREATE_OBJECT_GRAPH
 
 	[self setMergePolicy: COExistingChildrenMergePolicy];
-	id groupv2 = [self objectByRollingbackObject: group toVersion: 2 mergeImmediately: YES];
+	id groupv2 = [self objectByRestoringObject: group toVersion: 2 mergeImmediately: YES];
 
 	UKObjectsEqual(A(object, group3), [groupv2 members]);
 }
@@ -381,7 +381,7 @@
 	CREATE_OBJECT_GRAPH
 
 	[self setMergePolicy: COChildrenUnionMergePolicy];
-	id groupv2 = [self objectByRollingbackObject: group toVersion: 2 mergeImmediately: YES];
+	id groupv2 = [self objectByRestoringObject: group toVersion: 2 mergeImmediately: YES];
 
 	/* Merging isn't expected to respect the children */
 	id childrenUnionv2v4 = [NSSet setWithObjects: object, group2, group3, nil];
@@ -393,7 +393,7 @@
 	CREATE_OBJECT_GRAPH
 
 	[self setMergePolicy: COChildrenIntersectionMergePolicy];
-	id groupv2 = [self objectByRollingbackObject: group toVersion: 2 mergeImmediately: YES];
+	id groupv2 = [self objectByRestoringObject: group toVersion: 2 mergeImmediately: YES];
 
 	/* Merging isn't expected to respect the children, use NSSet if more than one child */
 	UKObjectsEqual(A(object), [groupv2 members]);
@@ -514,7 +514,7 @@
 	UKIntsEqual(2, [group2 objectVersion]);
 
 	/* Test snapshot rollback */
-	id group1v0 = [self objectByRollingbackObject: group toVersion: 0];
+	id group1v0 = [self objectByRestoringObject: group toVersion: 0];
 	UKNil([group1v0 objectContext]);
 	UKIntsEqual(0, [group1v0 objectVersion]);
 	UKIntsEqual(2, [group objectVersion]);
@@ -528,7 +528,7 @@
 	UKTrue([group1v0 isTemporalInstance: group]); 
 
 	/* Test playback rollback (move forward in time) */
-	id group1v2 = [self objectByRollingbackObject: group1v0 toVersion: 2];
+	id group1v2 = [self objectByRestoringObject: group1v0 toVersion: 2];
 	UKIntsEqual(2, [group1v2 objectVersion]);
 	UKIntsEqual(0, [group1v0 objectVersion]);
 	UKIntsEqual(2, [self lastVersionOfObject: group1v2]);
@@ -544,7 +544,7 @@
 	//UKObjectsEqual([group members], [group1v2 members]);
 
 	/* Test playback rollback (move backward in time) */
-	id group1v1 = [self objectByRollingbackObject: group1v2 toVersion: 1];
+	id group1v1 = [self objectByRestoringObject: group1v2 toVersion: 1];
 	UKIntsEqual(1, [group1v1 objectVersion]);
 	UKIntsEqual(2, [group1v2 objectVersion]);
 	UKFalse([group1v1 isEmpty]);
