@@ -24,6 +24,7 @@
 - (void) printQueryResult: (PGresult *)result;
 - (void) discardCurrentObjectsNotYetCreatedAtVersion: (int)aVersion 
                                    forObjectVersions: (NSDictionary *)restoredObjectVersions;
+- (NSSet *) restoreObjectsIfNeededForObjectVersions: (NSDictionary *)restoredObjectVersions;
 - (void) logRestoreContextVersion: (int)aVersion;
 @end
 
@@ -81,60 +82,14 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	NSMutableDictionary *restoredObjectVersions = 
 		[self findAllObjectVersionsMatchingContextVersion: aVersion];
 
-	ETLog(@"Will restore objects to versions: %@ for registered objects %@", 
+	ETDebugLog(@"Will restore objects to versions %@ for registered objects %@", 
 		 restoredObjectVersions, _registeredObjects);
 
 	[self discardCurrentObjectsNotYetCreatedAtVersion: aVersion
 	                                forObjectVersions: restoredObjectVersions];
 
-	/* Restore all the objects we just found */
-	NSMutableSet *mergedObjects = [NSMutableSet set];
-	id objectServer = [self objectServer];
-	FOREACHI([restoredObjectVersions allKeys], restoredUUID)
-	{
-		id currentObject = [objectServer cachedObjectForUUID: restoredUUID];
-		// NOTE: We check the object really belongs to the context by safety.
-		BOOL objectAlreadyLoaded = (currentObject != nil && [_registeredObjects containsObject: currentObject]);
-		int restoredVersion = [[restoredObjectVersions objectForKey: restoredUUID] intValue];
-		id restoredObject = nil;
-
-		if (objectAlreadyLoaded) /* Restore an object present in the cache */
-		{
-			BOOL currentObjectUpToDate = (restoredVersion == [currentObject objectVersion]);
-
-			/* Only restore the objects that have changed between aVersion and 
-			   the current context version */
-			if (currentObjectUpToDate)
-				continue;
-
-			restoredObject = [self objectByRollingbackObject: currentObject 
-			                                       toVersion: restoredVersion
-			                                mergeImmediately: YES];
-			ETLog(@"Restore %@ version %i within %@", restoredObject, restoredVersion, self);
-		}
-		else /* Restore an object missing from the cache */
-		{
-			BOOL inStoreObjectUpToDate = (restoredVersion == [self lastObjectVersionForUUID: restoredUUID]);
-
-			/* Only restore the objects that have changed between aVersion and 
-			   the current context version */
-			if (inStoreObjectUpToDate)
-				continue;
-
-			restoredObject = [self objectForUUID: restoredUUID version: restoredVersion];
-			ETLog(@"Recreate %@ version %i within %@", restoredObject, restoredVersion, self);
-		}
-
-		/* Other objects may refer this object we just restored, however 
-		   we don't resolve these pending faults immediately, because other
-		   objects yet to be restored may introduce new pending faults for 
-		   that object. In other words, more faults may appear if following 
-		   restored objects hold a reference on the one we just restored. 
-		   Take note that resolving pending faults isn't mandatory because 
-		   faults are also resolved on demand (see COGroup). */
-		
-		[mergedObjects addObject: restoredObject];
-	}
+	NSSet *mergedObjects = 
+		[self restoreObjectsIfNeededForObjectVersions: restoredObjectVersions];
 
 	/* Resolve pending faults
 
@@ -295,6 +250,71 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 			ETDebugLog(@"Discard future object %@", object);
 		}
 	}
+}
+
+/* Restores the objects we just found with 
+   -findAllObjectVersionsMatchingContextVersion: if they have changed between 
+   the restored version and the current version, then merges each restored 
+   object in the object context. Finally returns these merged objects. 
+   Restored/merged objects are temporal instances that matches the restored 
+   context version and replaces their related current instances registered in 
+   the context. 
+   For each restored object, the restore operation is recorded as a merge in the 
+   history of each object by calling -commitMergeOfInstance:forObject:. For a 
+   context restore, the merge is simply a raw replacement by taking a snaphot 
+   of the restored object. */
+- (NSSet *) restoreObjectsIfNeededForObjectVersions: (NSDictionary *)restoredObjectVersions
+{
+	COObjectServer *objectServer = [self objectServer];
+	NSMutableSet *mergedObjects = [NSMutableSet set];
+
+	FOREACHI([restoredObjectVersions allKeys], restoredUUID)
+	{
+		id currentObject = [objectServer cachedObjectForUUID: restoredUUID];
+		// NOTE: We check the object really belongs to the context by safety.
+		BOOL objectAlreadyLoaded = (currentObject != nil && [_registeredObjects containsObject: currentObject]);
+		int restoredVersion = [[restoredObjectVersions objectForKey: restoredUUID] intValue];
+		id restoredObject = nil;
+
+		if (objectAlreadyLoaded) /* Restore an object present in the cache */
+		{
+			BOOL currentObjectUpToDate = (restoredVersion == [currentObject objectVersion]);
+
+			/* Only restore the objects that have changed between aVersion and 
+			   the current context version */
+			if (currentObjectUpToDate)
+				continue;
+
+			restoredObject = [self objectByRollingbackObject: currentObject 
+			                                       toVersion: restoredVersion
+			                                mergeImmediately: YES];
+			ETLog(@"Restore %@ version %i within %@", restoredObject, restoredVersion, self);
+		}
+		else /* Restore an object missing from the cache */
+		{
+			BOOL inStoreObjectUpToDate = (restoredVersion == [self lastObjectVersionForUUID: restoredUUID]);
+
+			/* Only restore the objects that have changed between aVersion and 
+			   the current context version */
+			if (inStoreObjectUpToDate)
+				continue;
+
+			restoredObject = [self objectForUUID: restoredUUID version: restoredVersion];
+			ETLog(@"Recreate %@ version %i within %@", restoredObject, restoredVersion, self);
+		}
+
+		/* Other objects may refer this object we just restored, however 
+		   we don't resolve these pending faults immediately, because other
+		   objects yet to be restored may introduce new pending faults for 
+		   that object. In other words, more faults may appear if following 
+		   restored objects hold a reference on the one we just restored. 
+		   Take note that resolving pending faults isn't mandatory because 
+		   faults are also resolved on demand (see COGroup). */
+		
+		[mergedObjects addObject: restoredObject];
+	}
+
+	return mergedObjects;
 }
 
 /* Logs the restore operation in the global history kept in the metadata 
