@@ -13,7 +13,7 @@
 @class COMetadataServer, COObjectServer;
 
 /** Notification posted at the end of a merge. For now, this notification is only 
-    posted for -rollbackToVersion:, -undo, -redo.
+    posted for -restoreToVersion:, -undo, -redo.
     Includes the following keys in userInfo dictionary:
     - COMergedObjectsKey */
 extern NSString *COObjectContextDidMergeObjectsNotification;
@@ -65,7 +65,7 @@ typedef enum _COChildrenMergePolicy
 	/* Successive senders inside a record session (invocation sequence) */
 	NSMutableArray *_recordedObjectStack;
 	id _revertedObject;
-	BOOL _revertingContext;
+	BOOL _restoringContext;
 	id _delegate;
 	int _version;
 	ETUUID *_uuid;
@@ -132,10 +132,10 @@ typedef enum _COChildrenMergePolicy
 
 - (ETUUID *) UUID;
 - (int) version;
-- (void) rollbackToVersion: (int)aVersion;
+- (void) restoreToVersion: (int)aVersion;
 - (void) undo;
 - (void) redo;
-- (BOOL) isRevertingContext;
+- (BOOL) isRestoringContext;
 //- (void) snapshot;
 
 /* Navigating Object History */

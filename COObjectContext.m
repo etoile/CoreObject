@@ -34,7 +34,7 @@ NSString *COMergedObjectsKey = @"COMergedObjectsKey";
 @end
 
 @interface COObjectContext (GraphRollback)
-- (void) _rollbackToVersion: (int)aVersion;
+- (void) _restoreToVersion: (int)aVersion;
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion;
 @end
 
@@ -479,7 +479,7 @@ static COObjectContext *currentObjectContext = nil;
     -lastObjectVersion by returning [anObject objectVersion] + 1. */
 - (void) commitMergeOfInstance: (id)temporalInstance forObject: (id)anObject
 {
-	BOOL isSingleObjectChange = ([self isRevertingContext] == NO);
+	BOOL isSingleObjectChange = ([self isRestoringContext] == NO);
 
 	if (anObject != nil)
 	{
@@ -637,18 +637,18 @@ static COObjectContext *currentObjectContext = nil;
 	return _version;
 }
 
-- (void) rollbackToVersion: (int)aVersion
+- (void) restoreToVersion: (int)aVersion
 {
-	[self _rollbackToVersion: aVersion];
+	[self _restoreToVersion: aVersion];
 }
 
 /** Reverts the receiver to the last version right before the one currently 
     returned by -version.
-    This method calls -rollbackToVersion:. */
+    This method calls -restoreToVersion:. */
 - (void) undo
 {
 	// TODO: Implement a real undo model.
-	[self rollbackToVersion: ([self version] - 1)];
+	[self restoreToVersion: ([self version] - 1)];
 }
 
 - (void) redo
@@ -659,9 +659,9 @@ static COObjectContext *currentObjectContext = nil;
 /** Returns YES when eitherthe whole context is currently rolled back to a past 
     version, otherwise returns NO.
     See also -isReverting. */
-- (BOOL) isRevertingContext
+- (BOOL) isRestoringContext
 {
-	return _revertingContext;
+	return _restoringContext;
 }
 
 /** Returns the first version forward in time which corresponds to a snapshot or
@@ -829,7 +829,7 @@ static COObjectContext *currentObjectContext = nil;
 
 /** Returns YES when either an object is currently rolled back to a past 
     version, otherwise returns NO.
-    See also -isRevertingContext. */
+    See also -isRestoringContext. */
 - (BOOL) isReverting
 {
 	return ([self currentRevertedObject] != nil);

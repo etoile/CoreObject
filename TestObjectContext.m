@@ -411,7 +411,7 @@
 
 	/* Move back to the previous version (undo) */
 
-	[self rollbackToVersion: lastVersion - 1];
+	[self restoreToVersion: lastVersion - 1];
 	UKIntsEqual((lastVersion + 1), [self version]);
 
 	/* Merged instance has replaced the existing instance in the core object cache */
@@ -426,7 +426,7 @@
 	UKObjectsEqual(A(@"New York"), [newObject valueForProperty: @"otherObjects"]);
 
 	/* Move back to the initial version (redo) */
-	[self rollbackToVersion: lastVersion];
+	[self restoreToVersion: lastVersion];
 	UKIntsEqual((lastVersion + 2), [self version]);
 
 	/* Merged instance has replaced the existing instance in the core object cache */
@@ -454,7 +454,7 @@
 
 	/* Move back to the previous version (undo) */
 
-	[self rollbackToVersion: 12];
+	[self restoreToVersion: 12];
 	UKIntsEqual((lastVersion + 1), [self version]);
 
 	/* Merged instance has replaced the existing instance in the core object cache */

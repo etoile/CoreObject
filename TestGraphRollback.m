@@ -240,7 +240,7 @@
 
 	/* Move back to the previous version (undo) */
 
-	[CTXT rollbackToVersion: lastVersion - 1];
+	[CTXT restoreToVersion: lastVersion - 1];
 	UKIntsEqual((lastVersion + 1), [CTXT version]);
 
 	int objectVersionIncrements[] = { 1, 0, 0, 0, 0, 0 };
@@ -248,7 +248,7 @@
 	                     invalidatedObjects: A(object)];
 
 	/* Move back to the initial version (redo) */
-	[CTXT rollbackToVersion: lastVersion];
+	[CTXT restoreToVersion: lastVersion];
 	UKIntsEqual((lastVersion + 2), [CTXT version]);
 
 	[self checkRolledbackObjectsForRedo];
@@ -276,7 +276,7 @@
 {
 	int lastVersion = 17;
 
-	[CTXT rollbackToVersion: 12];
+	[CTXT restoreToVersion: 12];
 
 	/* Destroy the context and the object server and recreate them */
 	id contextUUID = RETAIN([CTXT UUID]);
@@ -292,11 +292,11 @@
 
 	/* More rollbacks */
 
-	[CTXT rollbackToVersion: 4];
+	[CTXT restoreToVersion: 4];
 	UKIntsEqual(lastVersion + 2, [CTXT version]);
 	[self checkRolledbackObjectsAtVersion4: 2];
 
-	[CTXT rollbackToVersion: 16];
+	[CTXT restoreToVersion: 16];
 	/* We move forward in time, every objects created after v4 must be loaded 
 	   explicitly to work around the lazy loading (aka faulting). */
 	[self recreateObjectGraph];
@@ -307,7 +307,7 @@
 	[self checkRolledbackObjectsAtVersion16: objectVersionIncrements
 	                     invalidatedObjects: A(object, group, group2)];
 
-	[CTXT rollbackToVersion: 19];
+	[CTXT restoreToVersion: 19];
 	UKIntsEqual(lastVersion + 4, [CTXT version]);
 	[self checkRolledbackObjectsAtVersion4: 4];
 

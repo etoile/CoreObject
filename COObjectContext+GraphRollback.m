@@ -31,7 +31,7 @@
 
 @implementation COObjectContext (GraphRollback)
 
-// TODO: Break -rollbackToVersion: in several small methods.
+// TODO: Break -restoreVersion: in several small methods.
 // TODO: Handle trimmed history...
 // This done by querying contextVersion superior to aVersion rather than 
 // inferior as we do in the first query.
@@ -75,9 +75,9 @@
 
 /* Query example:
 SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, objectVersion, contextVersion FROM HISTORY WHERE contextUUID = '64dc7e8f-db73-4bcc-666f-d9bf6b77a80a') AS ContextHistory WHERE contextVersion > 2000 ORDER BY contextVersion DESC LIMIT 10 */
-- (void) _rollbackToVersion: (int)aVersion
+- (void) _restoreToVersion: (int)aVersion
 {
-	_revertingContext = YES;
+	_restoringContext = YES;
 
 	NSMutableDictionary *restoredObjectVersions = 
 		[self findAllObjectVersionsMatchingContextVersion: aVersion];
@@ -122,7 +122,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		object: self
 		userInfo: D(COMergedObjectsKey, mergedObjects)];
 
-	_revertingContext = NO;
+	_restoringContext = NO;
 }
 
 /** Returns a context version that isn't a restore point, by looking back for 
