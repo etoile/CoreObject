@@ -64,7 +64,7 @@ typedef enum _COChildrenMergePolicy
 	NSMutableSet *_registeredObjects;
 	/* Successive senders inside a record session (invocation sequence) */
 	NSMutableArray *_recordedObjectStack;
-	id _revertedObject;
+	id _objectUnderRestoration;
 	BOOL _restoringContext;
 	id _delegate;
 	int _version;
@@ -146,16 +146,16 @@ typedef enum _COChildrenMergePolicy
                  forVersion: (int)aVersion 
             snapshotVersion: (int *)snapshotVersion;
 - (id) objectByRestoringObject: (id)anObject 
-                       toVersion: (int)aVersion
-                mergeImmediately: (BOOL)mergeNow;
+                     toVersion: (int)aVersion
+              mergeImmediately: (BOOL)mergeNow;
 - (void) playbackInvocationsWithObject: (id)object 
                            fromVersion: (int)baseVersion 
                              toVersion: (int)finalVersion;
-- (BOOL) isReverting; /** Rolling back or playing back */
-- (id) currentRevertedObject;
-- (BOOL) isRolledbackObject: (id)object;
-- (void) beginRevertObject: (id)object;
-- (void) endRevert;
+- (BOOL) isRestoring;
+- (id) currentObjectUnderRestoration;
+- (BOOL) isRestoredObject: (id)object;
+- (void) beginRestoreObject: (id)object;
+- (void) endRestore;
 //- (BOOL) canApplyChangesToObject: (id)object; 
 - (BOOL) shouldIgnoreChangesToObject: (id)object;
 

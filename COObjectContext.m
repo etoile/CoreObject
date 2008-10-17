@@ -87,7 +87,7 @@ static COObjectContext *currentObjectContext = nil;
 	//_fullSaveSerializer;
 	_registeredObjects = [[NSMutableSet alloc] initWithCapacity: AVERAGE_MANAGED_OBJECTS_COUNT];
 	_recordedObjectStack = [[NSMutableArray alloc] initWithCapacity: RECORD_STACK_SIZE];
-	_revertedObject = nil;
+	_objectUnderRestoration = nil;
 	[self setSnapshotTimeInterval: 100];
 	[self setDelegate: nil];
 	[self setMergePolicy: COOldChildrenMergePolicy];
@@ -100,7 +100,7 @@ static COObjectContext *currentObjectContext = nil;
 	// NOTE: Delegate is a weak reference.
 	//_deltaSerializer;
 	//_fullSaveSerializer;
-	DESTROY(_revertedObject);
+	DESTROY(_objectUnderRestoration);
 	DESTROY(_recordedObjectStack);
 	DESTROY(_registeredObjects);
 	DESTROY(_uuid);
@@ -413,7 +413,7 @@ static COObjectContext *currentObjectContext = nil;
 	   this creates a new version with the old object state right after the last 
 	   version of anObject. */
 	if (isTemporal)
-		[self beginRevertObject: anObject];
+		[self beginRestoreObject: anObject];
 
 	// TODO: All the following code will have to be modified to support multiple 
 	/// object contexts per process.
@@ -468,7 +468,7 @@ static COObjectContext *currentObjectContext = nil;
 	[self commitMergeOfInstance: temporalInstance forObject: anObject];
 
 	if (isTemporal)
-		[self endRevert];
+		[self endRestore];
 
 	return mergeResult;
 }
@@ -656,9 +656,9 @@ static COObjectContext *currentObjectContext = nil;
 	// TODO: Implement redo based on the undo model.
 }
 
-/** Returns YES when eitherthe whole context is currently rolled back to a past 
-    version, otherwise returns NO.
-    See also -isReverting. */
+/** Returns YES when the whole context is currently getting restored to another 
+    version than the current one, otherwise returns NO.
+    See also -isRestoring. */
 - (BOOL) isRestoringContext
 {
 	return _restoringContext;
@@ -804,20 +804,20 @@ static COObjectContext *currentObjectContext = nil;
                            fromVersion: (int)baseVersion 
                              toVersion: (int)finalVersion 
 {
-	if ([self isReverting])
+	if ([self isRestoring])
 	{
 		[NSException raise: NSInternalInconsistencyException format: 
 			@"Invocations cannot be played back on %@ when the context %@ is "
 			@"already reverting another object %@", object, self, 
-			[self currentRevertedObject]];
+			[self currentObjectUnderRestoration]];
 	}
 	
-	[self beginRevertObject: object];
+	[self beginRestoreObject: object];
 
 	ETDeserializer *deltaDeserializer = [[self deltaSerializerForObject: object] deserializer];
 	[deltaDeserializer playbackInvocationsWithObject: object fromVersion: baseVersion toVersion: finalVersion];
 
-	[self endRevert];
+	[self endRestore];
 }
 
 #if 0
@@ -827,19 +827,19 @@ static COObjectContext *currentObjectContext = nil;
 }
 #endif
 
-/** Returns YES when either an object is currently rolled back to a past 
-    version, otherwise returns NO.
+/** Returns YES when an object is currently getting restored to a past version, 
+    otherwise returns NO.
     See also -isRestoringContext. */
-- (BOOL) isReverting
+- (BOOL) isRestoring
 {
-	return ([self currentRevertedObject] != nil);
+	return ([self currentObjectUnderRestoration] != nil);
 }
 
-/** Returns the registered object for which -objectByRestoringObject: is 
-    currently executed. */
-- (id) currentRevertedObject
+/** Returns the registered object for which -objectByRestoringObject:toVersion: 
+    is currently executed. */
+- (id) currentObjectUnderRestoration
 {
-	return _revertedObject;
+	return _objectUnderRestoration;
 }
 
 /** Returns whether object is a temporal instance of a given object owned by
@@ -849,9 +849,9 @@ static COObjectContext *currentObjectContext = nil;
 	temporal instance that can be retrieved only by requesting it to the 
 	receiver for a given object with the same UUID (the reverted object already 
 	inserted/owned by the receiver context). */
-- (BOOL) isRolledbackObject: (id)object
+- (BOOL) isRestoredObject: (id)object
 {
-	return ([[object UUID] isEqual: [[self currentRevertedObject] UUID]]
+	return ([[object UUID] isEqual: [[self currentObjectUnderRestoration] UUID]]
 		&& ([[self registeredObjects] containsObject: object] == NO));
 }
 
@@ -860,16 +860,16 @@ static COObjectContext *currentObjectContext = nil;
     registered objects or state alteration, that must not be recorded.
     By calling this method, you ensure -shouldIgnoreChangesToObject: will 
     behave correctly. */
-- (void) beginRevertObject: (id)object
+- (void) beginRestoreObject: (id)object
 {
-	ASSIGN(_revertedObject, object);
+	ASSIGN(_objectUnderRestoration, object);
 }
 
 /** Marks the end of a revert operation, thereby enables the recording of 
     invocations. */
-- (void) endRevert
+- (void) endRestore
 {
-	ASSIGN(_revertedObject, nil);
+	ASSIGN(_objectUnderRestoration, nil);
 }
 
 /** Returns YES if anObject is a temporal instance of an object registered in 
@@ -884,10 +884,10 @@ static COObjectContext *currentObjectContext = nil;
     The fact these objects belongs to the object context or not doesn't matter: 
     temporal instances when they got just rolled back are in a state that can be
     incoherent with other objects in memory. 
-    See also -isRolledbackObject:. */
+    See also -isRestoredObject:. */
 - (BOOL) shouldIgnoreChangesToObject: (id)anObject
 {
-	return ([self isReverting] && ([self isRolledbackObject: anObject] == NO));
+	return ([self isRestoring] && ([self isRestoredObject: anObject] == NO));
 }
 
 /* If this method returns NO, -recordInvocation: will refuse the invocation 
