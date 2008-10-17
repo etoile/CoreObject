@@ -15,7 +15,7 @@
 #import "COObjectServer.h"
 
 @interface COObjectContext (Private)
-- (void) commitMergeOfInstance: (id)temporalInstance forObject:  (id)anObject;
+- (void) commitMergeOfInstance: (id)temporalInstance forObject: (id)anObject;
 @end
 
 @interface COObjectContext (GraphRollback)
@@ -86,41 +86,42 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	[self discardCurrentObjectsNotYetCreatedAtVersion: aVersion
 	                                forObjectVersions: restoredObjectVersions];
 
-	/* Revert all the objects we just found */
+	/* Restore all the objects we just found */
 	NSMutableSet *mergedObjects = [NSMutableSet set];
 	id objectServer = [self objectServer];
-	FOREACHI([restoredObjectVersions allKeys], targetUUID)
+	FOREACHI([restoredObjectVersions allKeys], restoredUUID)
 	{
-		id targetObject = [objectServer cachedObjectForUUID: targetUUID];
-		BOOL targetRegisteredInContext = (targetObject != nil && [_registeredObjects containsObject: targetObject]);
-		int targetVersion = [[restoredObjectVersions objectForKey: targetUUID] intValue];
+		id currentObject = [objectServer cachedObjectForUUID: restoredUUID];
+		// NOTE: We check the object really belongs to the context by safety.
+		BOOL objectAlreadyLoaded = (currentObject != nil && [_registeredObjects containsObject: currentObject]);
+		int restoredVersion = [[restoredObjectVersions objectForKey: restoredUUID] intValue];
 		id restoredObject = nil;
 
-		if (targetRegisteredInContext) /* Rollback an existing instance */
+		if (objectAlreadyLoaded) /* Restore an object present in the cache */
 		{
-			BOOL targetUpToDate = (targetVersion == [targetObject objectVersion]);
+			BOOL currentObjectUpToDate = (restoredVersion == [currentObject objectVersion]);
 
-			/* Only revert the objects that have changed between aVersion and the 
-			   current context version */
-			if (targetUpToDate)
+			/* Only restore the objects that have changed between aVersion and 
+			   the current context version */
+			if (currentObjectUpToDate)
 				continue;
 
-			restoredObject = [self objectByRollingbackObject: targetObject 
-			                                         toVersion: targetVersion
-			                                  mergeImmediately: YES];
-			ETLog(@"Restore %@ version %i within %@", restoredObject, targetVersion, self);
+			restoredObject = [self objectByRollingbackObject: currentObject 
+			                                       toVersion: restoredVersion
+			                                mergeImmediately: YES];
+			ETLog(@"Restore %@ version %i within %@", restoredObject, restoredVersion, self);
 		}
-		else /* Recreate a missing instance */
+		else /* Restore an object missing from the cache */
 		{
-			BOOL targetUpToDate = (targetVersion == [self lastObjectVersionForUUID: targetUUID]);
+			BOOL inStoreObjectUpToDate = (restoredVersion == [self lastObjectVersionForUUID: restoredUUID]);
 
-			/* Only revert the objects that have changed between aVersion and the 
-			   current context version */
-			if (targetUpToDate)
+			/* Only restore the objects that have changed between aVersion and 
+			   the current context version */
+			if (inStoreObjectUpToDate)
 				continue;
 
-			restoredObject = [self objectForUUID: targetUUID version: targetVersion];
-			ETLog(@"Recreate %@ version %i within %@", restoredObject, targetVersion, self);
+			restoredObject = [self objectForUUID: restoredUUID version: restoredVersion];
+			ETLog(@"Recreate %@ version %i within %@", restoredObject, restoredVersion, self);
 		}
 
 		/* Other objects may refer this object we just rolled back, however 
@@ -216,8 +217,8 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	return foundVersion;
 }
 
-/* Collects the object versions at a given context version and returns them in 
-   a dictionary keyed by the UUIDs of the matched objects. */
+/* Collects the object versions to restore at a given context version and 
+   returns them in a dictionary keyed by the UUIDs of the matched objects. */
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion
 {
 	int targetVersion = [self lookUpVersionIfRollbackPointAtVersion: aVersion];
