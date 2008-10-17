@@ -19,7 +19,7 @@
 @end
 
 @interface COObjectContext (GraphRollback)
-- (int) lookUpVersionIfRollbackPointAtVersion: (int)aVersion;
+- (int) lookUpVersionIfRestorePointAtVersion: (int)aVersion;
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion;
 - (void) printQueryResult: (PGresult *)result;
 - (void) discardCurrentObjectsNotYetCreatedAtVersion: (int)aVersion 
@@ -124,11 +124,11 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 			ETLog(@"Recreate %@ version %i within %@", restoredObject, restoredVersion, self);
 		}
 
-		/* Other objects may refer this object we just rolled back, however 
+		/* Other objects may refer this object we just restored, however 
 		   we don't resolve these pending faults immediately, because other
-		   objects yet to be rolled back may introduce new pending faults for 
+		   objects yet to be restored may introduce new pending faults for 
 		   that object. In other words, more faults may appear if following 
-		   rolled back objects hold a reference on the current one. 
+		   restored objects hold a reference on the one we just restored. 
 		   Take note that resolving pending faults isn't mandatory because 
 		   faults are also resolved on demand (see COGroup). */
 		
@@ -140,16 +140,16 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	   Not truly necessary as explained, but this reduces the amount of faults 
 	   and connect all the loaded objects in the graph.
 
-	   Most of the faults are resolved when the rolled back objects get 
+	   Most of the faults are resolved when the restored objects get 
 	   deserialized, -loadUUID:withName: tries to resolve faults with the help 
 	   of the object server, by checking whether an object is already cached for 
 	   the given UUID.
 	   This won't work in all cases. For example, if an object A has a fault for 
 	   an object B, and A is deserialized before B, A will have a pending fault 
-	   for B. This problem doesn't occur with rolled back objects because a
+	   for B. This problem doesn't occur with restored objects because a
 	   reference to another temporal instance B[n-1] will be replaced by the 
 	   existing object B[n], then this object will replaced by B[n-1] when 
-	   rolled back.
+	   restored.
 
 	   Resolving only faults that refers to merged objects isn't sufficient,
 	   because merged objects can themselves have pending faults that refers to 
@@ -158,7 +158,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	   	[[self objectServer] resolvePendingFaultsForUUID: [mergedObject UUID]]; */
 	[[self objectServer] resolvePendingFaultsWithinCachedObjectGraph];
 
-	/* Log the revert operation in the History */
+	/* Log the restore operation in the History */
 	_version++;
 	[[self metadataServer] executeDBRequest: [NSString stringWithFormat: 
 		@"INSERT INTO History (objectUUID, objectVersion, contextUUID, "
@@ -182,14 +182,14 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	_revertingContext = NO;
 }
 
-/** Returns a context version that isn't a rollback point, by looking back for 
-    the past version restored on this rollback point.
-    If aVersion isn't a rollback point, returns aVersion as is.
-    If aVersion is a rollback point, looks up the restored version and checks
-    whether it is a rollback point or not. If it isn't, returns the found 
+/** Returns a context version that isn't a restore point, by looking back for 
+    the past version restored on this restore point.
+    If aVersion isn't a restore point, returns aVersion as is.
+    If aVersion is a restore point, looks up the restored version and checks
+    whether it is a restore point or not. If it isn't, returns the found 
     version, otherwise continues the lookup until a version not bound to a 
-    rollback point is reached. */
-- (int) lookUpVersionIfRollbackPointAtVersion: (int)aVersion
+    restore point is reached. */
+- (int) lookUpVersionIfRestorePointAtVersion: (int)aVersion
 {
 	NSString *query = [NSString stringWithFormat: 
 		@"SELECT objectUUID, contextUUID, objectVersion FROM \
@@ -206,12 +206,12 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	ETUUID *contextUUID = [ETUUID UUIDWithString: 
 		[NSString stringWithUTF8String: PQgetvalue(result, 0, 1)]];
 	int foundVersion = aVersion;
-	BOOL isRollbackPoint = [objectUUID isEqual: contextUUID];
+	BOOL isRestorePoint = [objectUUID isEqual: contextUUID];
 
-	if (isRollbackPoint)
+	if (isRestorePoint)
 	{
 		int restoredVersion = atoi(PQgetvalue(result, 0, 2));
-		foundVersion = [self lookUpVersionIfRollbackPointAtVersion: restoredVersion];
+		foundVersion = [self lookUpVersionIfRestorePointAtVersion: restoredVersion];
 	}
 
 	return foundVersion;
@@ -221,7 +221,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
    returns them in a dictionary keyed by the UUIDs of the matched objects. */
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion
 {
-	int targetVersion = [self lookUpVersionIfRollbackPointAtVersion: aVersion];
+	int restoredVersion = [self lookUpVersionIfRestorePointAtVersion: aVersion];
 
 	/* Query the global history for the history of the context before aVersion */
 	NSString *query = [NSString stringWithFormat: 
@@ -229,7 +229,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 			(SELECT objectUUID, objectVersion, contextVersion FROM History \
 			 WHERE contextUUID = '%@') AS ContextHistory \
 		  WHERE contextVersion < %i ORDER BY contextVersion DESC", 
-		[[self UUID] stringValue], (targetVersion + 1)];
+		[[self UUID] stringValue], (restoredVersion + 1)];
 
 	PGresult *result = [[self metadataServer] executeRawPGSQLQuery: query];
 	int nbOfRows = PQntuples(result);
@@ -237,14 +237,13 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	ETUUID *objectUUID = nil;
 	int objectVersion = -1;
 	int contextVersion = -1;
-	/* Collection where the object versions to be rolled back are put keyed by UUIDs */
+	/* Collection where the object versions to be restored are put keyed by UUIDs */
 	NSMutableDictionary *restoredObjectVersions = [NSMutableDictionary dictionary];
 
 	ETLog(@"Context restore query result: %d rows and %d colums", nbOfRows, nbOfCols);
 	[self printQueryResult: result];
 
-	/* Find all the objects to be reverted */ 
-	//int nbOfRegisteredObjects = [_registeredObjects count];
+	/* Find all the objects to be restored */ 
 	for (int row = 0; row < nbOfRows; row++)
 	{
 		objectUUID = [ETUUID UUIDWithString: 
@@ -265,9 +264,9 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		   can skip the rest of the earlier history. */
 		// FIXME: Test against the number of objects that belong to the context 
 		// rather than the number of registered objects since some objects to 
-		// be rolledback may not be loaded at this point. If the scan the 
-		// history between the target version and the current version rather 
-		// than before the target version to 0, we can limit the amount of 
+		// be restored may not be loaded at this point. If we scan the 
+		// history between the restored version and the current version rather 
+		// than before the restored version to 0, we can limit the amount of 
 		// work by only considering the objects modified in this timespan.
 		//if ([restoredObjectVersions count] == nbOfRegisteredObjects)
 		//	break;
@@ -284,9 +283,9 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 {
 	PQprintOpt options = {0};
 
-	options.header    = 1;    /* Ask for column headers           */
-	options.align     = 1;    /* Pad short columns for alignment  */
-	options.fieldSep  = "|";  /* Use a pipe as the field separator*/
+	options.header = 1; /* Ask for column headers */
+	options.align = 1; /* Pad short columns for alignment */
+	options.fieldSep = "|"; /* Use a pipe as the field separator */
 
 	PQprint(stdout, result, &options);
 }
@@ -305,7 +304,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		if (isFutureObject)
 		{
 			[self unregisterObject: object];
-			ETLog(@"Discard future object %@", object);
+			ETDebugLog(@"Discard future object %@", object);
 		}
 	}
 }
