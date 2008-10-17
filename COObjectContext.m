@@ -1055,8 +1055,8 @@ static COObjectContext *currentObjectContext = nil;
 	return _fullSaveTimeInterval;
 }
 
-/** Snapshots an object and updates the object metadatas in the metadata server
-    by calling -updateMetadasForObject:. */
+/** Snapshots an object, logs the change in the context history and updates the 
+    object metadatas in the metadata server. */
 - (void) snapshotObject: (id)object
 {
 	[self snapshotObject: object shouldIncrementObjectVersion: YES];
@@ -1065,14 +1065,15 @@ static COObjectContext *currentObjectContext = nil;
 		shouldIncrementContextVersion: YES];
 }
 
-/** Snapshots an object but doesn't update the object metadatas in the 
-    metadata server. You must call -updateMetadasForObject:recordVersion: if you 
-    want to. */
+/** Snapshots an object but doesn't log the change in the context history. 
+    If updateVersion is equal to YES, the version of object is incremented of 1 
+    and the object metadatas are updated in the metadata server, otherwise both 
+    are bypassed.
+    You should usually call -snapshotObject: rather than this method. */
 - (void) snapshotObject: (id)object shouldIncrementObjectVersion: (BOOL)updateVersion
 {
 	id snapshotSerializer = [self snapshotSerializerForObject: object];
 
-	//[snapshotSerializer setVersion: [object objectVersion]];
 	if ([object objectVersion] == -1)
 	{
 		// TODO: Serialize right in the object bundle and not in a branch.
