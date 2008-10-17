@@ -24,6 +24,7 @@
 - (void) printQueryResult: (PGresult *)result;
 - (void) discardCurrentObjectsNotYetCreatedAtVersion: (int)aVersion 
                                    forObjectVersions: (NSDictionary *)restoredObjectVersions;
+- (void) logRestoreContextVersion: (int)aVersion;
 @end
 
 
@@ -158,20 +159,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	   	[[self objectServer] resolvePendingFaultsForUUID: [mergedObject UUID]]; */
 	[[self objectServer] resolvePendingFaultsWithinCachedObjectGraph];
 
-	/* Log the restore operation in the History */
-	_version++;
-	[[self metadataServer] executeDBRequest: [NSString stringWithFormat: 
-		@"INSERT INTO History (objectUUID, objectVersion, contextUUID, "
-		"contextVersion, date) "
-		"VALUES ('%@', %i, '%@', %i, '%@');", 
-			[_uuid stringValue],
-			aVersion,
-			[_uuid stringValue],
-			_version,
-			[NSDate date]]];
-
-	ETLog(@"Log restore context with UUID %@ to version %i as new version %i", 
-		 _uuid, aVersion, _version);
+	[self logRestoreContextVersion: aVersion];
 
 	/* Post notification */
 	[[NSNotificationCenter defaultCenter] 
@@ -307,6 +295,25 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 			ETDebugLog(@"Discard future object %@", object);
 		}
 	}
+}
+
+/* Logs the restore operation in the global history kept in the metadata 
+   server. */
+- (void) logRestoreContextVersion: (int)aVersion
+{
+	_version++;
+	[[self metadataServer] executeDBRequest: [NSString stringWithFormat: 
+		@"INSERT INTO History (objectUUID, objectVersion, contextUUID, "
+		"contextVersion, date) "
+		"VALUES ('%@', %i, '%@', %i, '%@');", 
+			[_uuid stringValue],
+			aVersion,
+			[_uuid stringValue],
+			_version,
+			[NSDate date]]];
+
+	ETDebugLog(@"Log restore context with UUID %@ to version %i as new version %i", 
+		 _uuid, aVersion, _version);
 }
 
 @end
