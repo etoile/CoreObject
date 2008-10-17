@@ -76,6 +76,7 @@ typedef enum _COChildrenMergePolicy
 + (COObjectContext *) currentContext;
 + (void) setCurrentContext: (COObjectContext *)aContext;
 
+- (id) init;
 - (id) initWithUUID: (ETUUID *)aContextUUID;
 
 - (COMetadataServer *) metadataServer;

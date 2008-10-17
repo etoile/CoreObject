@@ -62,11 +62,16 @@ static COObjectContext *currentObjectContext = nil;
 	ASSIGN(currentObjectContext, aContext);
 }
 
+/** Initializes and returns a new object context with a random UUID. */
 - (id) init
 {
 	return [self initWithUUID: nil];
 }
 
+/** <init /> Initializes and returns a new object context for a given UUID. 
+    If the UUID refers to an object context that is already known in the 
+    metadata server, the returned instance will have a version that matches the 
+    last change logged in the history of this context. */
 - (id) initWithUUID: (ETUUID *)aContextUUID
 {
 	SUPERINIT
@@ -83,8 +88,6 @@ static COObjectContext *currentObjectContext = nil;
 	}
 	_version = [self latestVersion];
 
-	//_deltaSerializer;
-	//_fullSaveSerializer;
 	_registeredObjects = [[NSMutableSet alloc] initWithCapacity: AVERAGE_MANAGED_OBJECTS_COUNT];
 	_recordedObjectStack = [[NSMutableArray alloc] initWithCapacity: RECORD_STACK_SIZE];
 	_objectUnderRestoration = nil;
@@ -98,8 +101,6 @@ static COObjectContext *currentObjectContext = nil;
 - (void) dealloc
 {
 	// NOTE: Delegate is a weak reference.
-	//_deltaSerializer;
-	//_fullSaveSerializer;
 	DESTROY(_objectUnderRestoration);
 	DESTROY(_recordedObjectStack);
 	DESTROY(_registeredObjects);
@@ -160,7 +161,7 @@ static COObjectContext *currentObjectContext = nil;
 	return _delegate;
 }
 
-/** Sets the delegate set for the receiver.
+/** Sets the delegate for the receiver.
     The delegate is not retained. */
 - (void) setDelegate: (id)aDelegate
 {
@@ -182,7 +183,7 @@ static COObjectContext *currentObjectContext = nil;
 
 /* Registering Managed Objects */
 
-/** Returns the object identified by anUUID, if it exits and belongs to the 
+/** Returns the object identified by anUUID, if it exists and belongs to the 
     receiver or by deserializing a new instance if it doesn't exist. If the 
     object is cached in the object server but belongs to another object 
     context or no serialized object exists for an UUID, returns nil.
