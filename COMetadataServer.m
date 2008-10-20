@@ -200,9 +200,9 @@ static COMetadataServer *metadataServer = nil;
 	// -[ETUUID stringValue] isn't understood by pgsql. -stringValue should 
 	// return a canonical form or we should add -canonicalStringValue?
 	[self executeDBRequest: @"CREATE TABLE UUID ( \
-		UUID text PRIMARY KEY, \
+		UUID uuid PRIMARY KEY, \
 		URL text, \
-		contextUUID text, \
+		contextUUID uuid, \
 		inode integer, \
 		volumeID integer, \
 		lastURLModifDate timestamp, \
@@ -213,9 +213,9 @@ static COMetadataServer *metadataServer = nil;
 	/* contextVersion is stored for conveniency, it could be easily found by 
 	   selecting all rows for a given contextUUID and sorting them by globalVersion */
 	[self executeDBRequest: @"CREATE TABLE History ( \
-		objectUUID text, \
+		objectUUID uuid, \
 		objectVersion integer, \
-		contextUUID text, \
+		contextUUID uuid, \
 		contextVersion integer, \
 		date timestamp, \
 		globalVersion serial PRIMARY KEY);"]; 
@@ -506,15 +506,26 @@ static COMetadataServer *metadataServer = nil;
 	unsigned long inode = [fileAttributes fileSystemFileNumber];
 	// FIXME: Should be volumeID and may be removed at later point.
 	unsigned long deviceID = [fileAttributes fileSystemNumber];
+	NSString *contextUUIDString = [contextUUID stringValue];
+
+	// TODO: Make this formatting more transparent...
+	if (contextUUIDString != nil)
+	{
+		contextUUIDString = [NSString stringWithFormat: @"'%@'", [contextUUID stringValue]];
+	}
+	else
+	{
+		contextUUIDString = @"NULL";
+	}
 
 	[self executeDBRequest: [NSString stringWithFormat: 
 		@"%@ INSERT INTO UUID (UUID, URL, contextUUID, inode, volumeID, "
 		"lastURLModifDate, objectVersion, objectType) " // TODO: Add groupCache
-		"VALUES ('%@', '%@', '%@', %i, %i, '%@', %i, '%@'); %@", 
+		"VALUES ('%@', '%@', %@, %i, %i, '%@', %i, '%@'); %@", 
 			prevSQLRequest,
 			[uuid stringValue], 
 			[url absoluteString], 
-			[contextUUID stringValue],
+			contextUUIDString,
 			(unsigned int)inode, /* POSIX defines ino_t as a unsigned int */
 			(unsigned int)deviceID, /* POSIX doesn't define dev_t, but probably safe? */
 			recordTimestamp, // NOTE: May need to format the output with -descriptionWithLocale:
