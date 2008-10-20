@@ -89,6 +89,7 @@ typedef enum _COChildrenMergePolicy
 
 - (id) objectForUUID: (ETUUID *)anUUID;
 
+- (void) insertObject: (id)anObject;
 - (void) registerObject: (id)object;
 - (void) unregisterObject: (id)object;
 - (NSSet *) registeredObjects;

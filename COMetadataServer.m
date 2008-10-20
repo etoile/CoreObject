@@ -202,6 +202,7 @@ static COMetadataServer *metadataServer = nil;
 	[self executeDBRequest: @"CREATE TABLE UUID ( \
 		UUID text PRIMARY KEY, \
 		URL text, \
+		contextUUID text, \
 		inode integer, \
 		volumeID integer, \
 		lastURLModifDate timestamp, \
@@ -467,7 +468,8 @@ static COMetadataServer *metadataServer = nil;
 	[self setURL: url forUUID: uuid withObjectVersion: -1
 	                                             type: nil
 	                                          isGroup: NO
-	                                        timestamp: [NSDate date]];
+	                                        timestamp: [NSDate date]
+	                                    inContextUUID: nil];
 }
 
 /** Binds uuid to url by inserting the UUID/URL pair and eventually additional 
@@ -475,12 +477,12 @@ static COMetadataServer *metadataServer = nil;
     If an UUID/URL pair already exists, it is deleted then the new one is 
     inserted. For a quick update rather a raw delete/insert, see 
     -updateUUID:toObjectVersion:timestamp:. */
-//- (void) setURL: (NSURL *)url forUUID: (ETUUID *)uuid withNewVersion: ofObject:
 - (void) setURL: (NSURL *)url forUUID: (ETUUID *)uuid
 	withObjectVersion: (int)objectVersion 
 	             type: (NSString *)objectType 
 	          isGroup: (BOOL)isGroup
 	        timestamp: (NSDate *)recordTimestamp
+	    inContextUUID: (ETUUID *)contextUUID
 {
 #ifdef DICT_METADATASERVER
 	[_URLsByUUIDs setObject: url forKey: uuid];
@@ -506,12 +508,13 @@ static COMetadataServer *metadataServer = nil;
 	unsigned long deviceID = [fileAttributes fileSystemNumber];
 
 	[self executeDBRequest: [NSString stringWithFormat: 
-		@"%@ INSERT INTO UUID (UUID, URL, inode, volumeID, "
+		@"%@ INSERT INTO UUID (UUID, URL, contextUUID, inode, volumeID, "
 		"lastURLModifDate, objectVersion, objectType) " // TODO: Add groupCache
-		"VALUES ('%@', '%@', %i, %i, '%@', %i, '%@'); %@", 
+		"VALUES ('%@', '%@', '%@', %i, %i, '%@', %i, '%@'); %@", 
 			prevSQLRequest,
 			[uuid stringValue], 
 			[url absoluteString], 
+			[contextUUID stringValue],
 			(unsigned int)inode, /* POSIX defines ino_t as a unsigned int */
 			(unsigned int)deviceID, /* POSIX doesn't define dev_t, but probably safe? */
 			recordTimestamp, // NOTE: May need to format the output with -descriptionWithLocale:

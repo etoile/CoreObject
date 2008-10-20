@@ -1,3 +1,22 @@
+2008-10-20 Quentin Mathe <qmathe@club-internet.fr>
+
+	Initial work on a strict ownership of core objects by object contexts. 
+	Added a contextUUID column to the UUID table of the metadata DB.
+	* Headers/COObjectContext.h:
+	* COObjectContext.m: 
+	(-insertObject:): Added.
+	(-logRecord:objectVersion:timestamp:shouldIncrementContextVersion:): Modifed 
+	to only do an insert in the metadata DB on the version 0 of an object. Also 
+	updated to call the renamed insert method of COMetadataServer.
+	* Headers/COMetadataServer.h:
+	* COMetadataServer.m:
+	(-setUpDBWithURL:): Modified the DB schema to include a contextUUID column 
+	in the main table.
+	(-setURL:forUUID:withObjectVersion:type:isGroup:timestamp:): 
+	Modified to include take an extra inContextUUID: parameter.
+	* COObject.m (-tryStartPersistencyIfInstanceOfClass:): Updated to call 
+	-insertObject:.
+
 2008-10-15 Quentin Mathe <qmathe@club-internet.fr>
 
 	* Headers/COObjectContext.h:

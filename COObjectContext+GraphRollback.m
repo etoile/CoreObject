@@ -31,7 +31,6 @@
 
 @implementation COObjectContext (GraphRollback)
 
-// TODO: Break -restoreVersion: in several small methods.
 // TODO: Handle trimmed history...
 // This done by querying contextVersion superior to aVersion rather than 
 // inferior as we do in the first query.

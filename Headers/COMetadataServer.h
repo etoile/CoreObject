@@ -45,7 +45,8 @@
 	withObjectVersion: (int)objectVersion 
 	             type: (NSString *)objectType 
 	          isGroup: (BOOL)isGroup
-	        timestamp: (NSDate *)recordTimestamp;
+	        timestamp: (NSDate *)recordTimestamp
+	    inContextUUID: (ETUUID *)contextUUID;
 - (void) removeURLForUUID: (ETUUID *)uuid;
 - (void) updateUUID: (ETUUID *)uuid 
     toObjectVersion: (int)objectVersion

@@ -219,12 +219,23 @@ static COObjectContext *currentObjectContext = nil;
 	return object;
 }
 
+/** Registers an object to belong to the receiver, then takes a base version 
+    snapshot to make it immediately persistent. This inserts the object into 
+    the metadata DB.
+    See also -registerObject:. */
+- (void) insertObject: (id)anObject
+{
+	[self registerObject: anObject];
+	[self snapshotObject: anObject];
+}
+
 /** Registers an object to belong to the receiver.
     A managed core object can belong to a single object context at a time. Hence 
     you must unregister it before being able to move it from one context to 
     another one. 
     If you try to register an object that is already registered, an 
-    NSInvalidArgumentException exception will be raised. */
+    NSInvalidArgumentException exception will be raised.
+    You shouldn't usually called this method but rather -insertObject:. */
 - (void) registerObject: (id)object
 {
 	if ([object objectContext] != nil)
@@ -1100,16 +1111,17 @@ static COObjectContext *currentObjectContext = nil;
 
 	ETDebugLog(@"Update %@ %@ metadatas with new version %d", object, [object UUID], aVersion);
 
-	/* This first recorded invocation results in a snapshot with version 0, 
-       immediately followed by an invocation record with version 1. */
-	if (aVersion == 0 || aVersion == 1) /* Insert UUID/URL pair (on first serialization) */
+	/* This first recorded invocation is always preceded by a snapshot with 
+	   version 0. */
+	if (aVersion == 0) /* Insert UUID/URL pair (on first serialization) */
 	{
 		/* Register the object in the metadata server */
 		[[self metadataServer] setURL: url forUUID: [object UUID]
 			withObjectVersion: aVersion 
 			             type: [object className] 
 			          isGroup: [object isGroup]
-			        timestamp: [NSDate date]];
+			        timestamp: [NSDate date]
+			    inContextUUID: [self UUID]];
 	}
 	else /* Update UUID/URL pair */
 	{
