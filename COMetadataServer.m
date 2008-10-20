@@ -196,9 +196,6 @@ static COMetadataServer *metadataServer = nil;
 
 	[self openDBConnectionWithURL: theDBURL];
 
-	 // FIXME: UUID should of type UUID instead of text, but the format of
-	// -[ETUUID stringValue] isn't understood by pgsql. -stringValue should 
-	// return a canonical form or we should add -canonicalStringValue?
 	[self executeDBRequest: @"CREATE TABLE UUID ( \
 		UUID uuid PRIMARY KEY, \
 		URL text, \
