@@ -29,6 +29,7 @@ NSString *COMergedObjectsKey = @"COMergedObjectsKey";
 
 @interface COObjectContext (Private)
 - (int) latestVersion;
+- (void) tryMergeRelationshipsOfObject: (id)anObject intoInstance: (id)targetInstance;
 - (void) commitMergeOfInstance: (id)temporalInstance forObject:  (id)anObject;
 - (void) snapshotObject: (id)object shouldIncrementObjectVersion: (BOOL)updateVersion;
 @end
@@ -460,18 +461,9 @@ static COObjectContext *currentObjectContext = nil;
 			temporalInstance, anObject, objectsRefusingReplacement);
 	}
 
-	/* Merge Children References
-
-	   Now that parent references or backward pointers are fixed, if the 
-	   two objects are groups we need to merge their children references. */
-	if ([temporalInstance isKindOfClass: [COGroup class]])
-	{
-		[temporalInstance mergeObjectsWithObjectsOfGroup: anObject policy: [self mergePolicy]];
-		// TODO: If the temporal instance is a group, we need to fix the 
-		// kCOParentsProperty of all objects owned by this group.
-		// We could handle this on COObject, but the best is probably in
-		// -mergeObjectsWithObjectsOfGroup:policy: of COGroup.
-	}
+	 /* Now that parent references or backward pointers are fixed, if the two 
+	    objects are groups we need to merge their member/children references. */
+	[self tryMergeRelationshipsOfObject: anObject intoInstance: temporalInstance];
 
 	/* Swap the instances in the context */
 	[self unregisterObject: anObject];
@@ -483,6 +475,24 @@ static COObjectContext *currentObjectContext = nil;
 		[self endRestore];
 
 	return mergeResult;
+}
+
+/* Merges the members of anObject into the members of temporalInstance, if both 
+   are COGroup or subclass instances.
+   TODO: Eventually extends the merge facility to COObject, so that COObject 
+   subclasses can create their own core objects relationships and handle the 
+   merge in their own way, rather restricting this feature to COGroup. */
+- (void) tryMergeRelationshipsOfObject: (id)anObject intoInstance: (id)targetInstance
+{
+	if ([targetInstance isKindOfClass: [COGroup class]] == NO)
+		return;
+	
+	[targetInstance mergeObjectsWithObjectsOfGroup: anObject policy: [self mergePolicy]];
+	// TODO: If the temporal instance is a group, we need to fix the 
+	// kCOParentsProperty of all objects owned by this group.
+	// We could handle this on COObject, but the best is probably in
+	// -mergeObjectsWithObjectsOfGroup:policy: of COGroup.
+
 }
 
 /** Commits an object merge by syncing the object version and taking a snaphot 
