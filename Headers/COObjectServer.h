@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
+#import <CoreObject/COObjectContext.h>
 
 @class COMetadataServer;
 
@@ -93,6 +94,8 @@
 - (BOOL) cacheObject: (id)object;
 - (void) removeCachedObject: (id)object;
 - (id) cachedObjectForUUID: (ETUUID *)anUUID;
+
+- (COMergeResult) updateRelationshipsToObject: (id)anObject withInstance: (id)newObject;
 
 /* Faulting */
 

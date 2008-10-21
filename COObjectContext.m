@@ -30,7 +30,6 @@ NSString *COMergedObjectsKey = @"COMergedObjectsKey";
 @interface COObjectContext (Private)
 - (int) latestVersion;
 - (BOOL) isInvalidObject: (id)newObject forReplacingObject: (id)anObject;
-- (COMergeResult) updateRelationshipsToObject: (id)anObject withInstance: (id)newObject;
 - (void) tryMergeRelationshipsOfObject: (id)anObject intoInstance: (id)targetInstance;
 - (void) commitMergeOfInstance: (id)temporalInstance forObject:  (id)anObject;
 - (void) snapshotObject: (id)object shouldIncrementObjectVersion: (BOOL)updateVersion;
@@ -395,8 +394,8 @@ static COObjectContext *currentObjectContext = nil;
     and update the relationships of the first object to reference the new one. 
     Because the relationships are carried over, a replacement involves a merge.
     which adjusts the parent groups of the replaced object, so they now refer.
-    Merging only occurs if you roll back one or several registered objects, if 
-    the whole object context is reverted to a past version, the resulting object 
+    Merging only occurs if you restore one or several registered objects, if 
+    the whole object context is restored to a past version, the resulting object 
     graph will be in a coherent state and this method won't be called. */
 - (COMergeResult) replaceObject: (id)anObject 
                        byObject: (id)temporalInstance 
@@ -426,11 +425,8 @@ static COObjectContext *currentObjectContext = nil;
 	if (isTemporal)
 		[self beginRestoreObject: anObject];
 
-	// TODO: All the following code will have to be modified to support multiple 
-	/// object contexts per process.
-
-	mergeResult = [self updateRelationshipsToObject: anObject 
-	                                   withInstance: temporalInstance];
+	mergeResult = [[self objectServer] updateRelationshipsToObject: anObject 
+	                                                  withInstance: temporalInstance];
 
 	 /* Now that parent references or backward pointers are fixed, if the two 
 	    objects are groups we need to merge their member/children references. */
@@ -452,46 +448,6 @@ static COObjectContext *currentObjectContext = nil;
 {
 	return (([anObject isKindOfClass: [COGroup class]] == NO && [newObject isKindOfClass: [COGroup class]])
 	 || ([anObject isKindOfClass: [COGroup class]] && [newObject isKindOfClass: [COGroup class]] == NO));
-}
-
-/* Merge Parent References */
-- (COMergeResult) updateRelationshipsToObject: (id)anObject withInstance: (id)newObject
-{
-	NSMutableArray *objectsRefusingReplacement = [NSMutableArray array];
-	COMergeResult mergeResult = COMergeResultFailed;
-	NSError *mergeError = NULL;
-	BOOL isTemporal = [newObject isTemporalInstance: anObject];
-
-	// NOTE: iterating through kCOParentsProperty of anObject could work probably
-	FOREACHI([self registeredObjects], managedObject)
-	{
-		// TODO: Asks each managed object if the merge is possible before 
-		// attempting to apply it. If the merge fails, we are in an invalid 
-		// state with both object and temporalInstance being referenced in 
-		// relationships
-		if ([managedObject isKindOfClass: [COGroup class]])
-		{
-			mergeResult = [managedObject replaceObject: anObject 
-			                                  byObject: newObject
-			                           isTemporalMerge: isTemporal
-			                                     error: &mergeError];
-			if (mergeResult == COMergeResultFailed)
-				[objectsRefusingReplacement addObject: managedObject];
-		}
-	}
-
-	/* Report which objects haven't handled the merge */
-	if ([objectsRefusingReplacement count] > 0)
-	{
-		// TODO: Rather return an NSError which can be used for UI feedback 
-		// rather than logging or raising an exception.
-		NSLog(@"WARNING: Failed to merge temporal instance %@ of %@ into the "
-			@"following %@ whose faulty classes implement "
-			@"-anObjectject:byObject: in a partial or incorrect way.", 
-			newObject, anObject, objectsRefusingReplacement);
-	}
-
-	return mergeResult;
 }
 
 /* Merges the members of anObject into the members of temporalInstance, if both 

@@ -408,6 +408,48 @@ static COObjectServer *localObjectServer = nil;
 	return [_coreObjectTable objectForKey: anUUID];
 }
 
+/** Merges parent references. */
+- (COMergeResult) updateRelationshipsToObject: (id)anObject withInstance: (id)newObject
+{
+	NSMutableArray *objectsRefusingReplacement = [NSMutableArray array];
+	COMergeResult mergeResult = COMergeResultFailed;
+	NSError *mergeError = NULL;
+	BOOL isTemporal = [newObject isTemporalInstance: anObject];
+
+	// NOTE: Iterating through kCOParentsProperty of anObject could probably 
+	// work, but may be unsafe when this method is used for restoring a context 
+	// to a past version.
+	FOREACHI(_coreObjectTable, managedObject)
+	{
+		// TODO: Asks each managed object if the merge is possible before 
+		// attempting to apply it. If the merge fails, we are in an invalid 
+		// state with both object and newObject being referenced in 
+		// relationships
+		if ([managedObject isKindOfClass: [COGroup class]])
+		{
+			mergeResult = [managedObject replaceObject: anObject 
+			                                  byObject: newObject
+			                           isTemporalMerge: isTemporal
+			                                     error: &mergeError];
+			if (mergeResult == COMergeResultFailed)
+				[objectsRefusingReplacement addObject: managedObject];
+		}
+	}
+
+	/* Report which objects haven't handled the merge */
+	if ([objectsRefusingReplacement count] > 0)
+	{
+		// TODO: Rather return an NSError which can be used for UI feedback 
+		// rather than logging or raising an exception.
+		ETLog(@"WARNING: Failed to merge temporal instance %@ of %@ into the "
+			@"following %@ whose faulty classes implement "
+			@"-anObjectject:byObject: in a partial or incorrect way.", 
+			newObject, anObject, objectsRefusingReplacement);
+	}
+
+	return mergeResult;
+}
+
 /* Faulting */
 
 /** Resolves the faults within the loaded managed object graph, for which a 
