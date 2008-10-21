@@ -29,6 +29,7 @@ NSString *COMergedObjectsKey = @"COMergedObjectsKey";
 
 @interface COObjectContext (Private)
 - (int) latestVersion;
+- (BOOL) isInvalidObject: (id)newObject forReplacingObject: (id)anObject;
 - (COMergeResult) updateRelationshipsToObject: (id)anObject withInstance: (id)newObject;
 - (void) tryMergeRelationshipsOfObject: (id)anObject intoInstance: (id)targetInstance;
 - (void) commitMergeOfInstance: (id)temporalInstance forObject:  (id)anObject;
@@ -401,9 +402,7 @@ static COObjectContext *currentObjectContext = nil;
                        byObject: (id)temporalInstance 
                collectAllErrors: (BOOL)tryAll
 {
-	// TODO: This XOR is a bit verbose...
-	if (([anObject isKindOfClass: [COGroup class]] == NO && [temporalInstance isKindOfClass: [COGroup class]])
-	 || ([anObject isKindOfClass: [COGroup class]] && [temporalInstance isKindOfClass: [COGroup class]] == NO))
+	if ([self isInvalidObject: temporalInstance forReplacingObject: anObject])
 	{
 		[NSException raise: NSInvalidArgumentException 
 		            format: @"Replaced Object %@ and replacement object %@ "
@@ -447,6 +446,12 @@ static COObjectContext *currentObjectContext = nil;
 		[self endRestore];
 
 	return mergeResult;
+}
+
+- (BOOL) isInvalidObject: (id)newObject forReplacingObject: (id)anObject
+{
+	return (([anObject isKindOfClass: [COGroup class]] == NO && [newObject isKindOfClass: [COGroup class]])
+	 || ([anObject isKindOfClass: [COGroup class]] && [newObject isKindOfClass: [COGroup class]] == NO));
 }
 
 /* Merge Parent References */
