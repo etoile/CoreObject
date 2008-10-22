@@ -22,6 +22,7 @@
 #import "COMetadataServer.h"
 #import "COSerializer.h"
 #import "CODeserializer.h"
+#import "COPersistentPool.h"
 #import "COObjectContext.h"
 #import "COUtility.h"
 #import "COFile.h"

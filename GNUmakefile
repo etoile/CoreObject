@@ -19,6 +19,7 @@ CoreObject_OBJC_FILES = \
 	COGroup.m \
 	COFileObject.m \
 	COObject.m \
+	COPersistentPool.m \
 	COObjectContext.m \
 	COObjectContext+GraphRollback.m \
 	COMultiValue.m \
@@ -57,6 +58,7 @@ CoreObject_HEADER_FILES = \
 	COGroup.h \
 	COFileObject.h \
 	COObject.h \
+	COPersistentPool.h \
 	COObjectContext.h \
 	COMultiValue.h \
 	COPropertyType.h \

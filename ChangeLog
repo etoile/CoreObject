@@ -1,3 +1,14 @@
+2008-10-22 Quentin Mathe <qmathe@club-internet.fr>
+
+	* COObjectContext.m: Extracted the record session mechanism not yet really 
+	used into an new private superclass COPersistentPool.
+	* Headers/COPersistentPool.h:
+	* COPersistentPool.m:
+	Added.
+	* GNUmakefile:
+	* Headers/CoreObject.h:
+	Updated to include the new files.
+
 2008-10-21 Quentin Mathe <qmathe@club-internet.fr>
 
 	* COMetadataServer.m:

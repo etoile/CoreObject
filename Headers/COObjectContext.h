@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <EtoileSerialize/EtoileSerialize.h>
+#import <CoreObject/COPersistentPool.h>
 
 @class COMetadataServer, COObjectServer;
 
@@ -50,7 +51,7 @@ typedef enum _COChildrenMergePolicy
 } COChildrenMergePolicy;
 
 
-@interface COObjectContext : NSObject
+@interface COObjectContext : COPersistentPool
 {
 	// TODO: To be able to use shared serializers in the managed object context, 
 	// the related classes must become reusable, otherwise the cost of 
@@ -62,8 +63,6 @@ typedef enum _COChildrenMergePolicy
 	int _fullSaveTimeInterval;
 	/* Managed Objects belonging to the context */
 	NSMutableSet *_registeredObjects;
-	/* Successive senders inside a record session (invocation sequence) */
-	NSMutableArray *_recordedObjectStack;
 	id _objectUnderRestoration;
 	BOOL _restoringContext;
 	id _delegate;
@@ -110,18 +109,6 @@ typedef enum _COChildrenMergePolicy
                        byObject: (id)temporalInstance
                collectAllErrors: (BOOL)tryAll;
 - (NSArray *) lastMergeErrors;
-
-/* Controlling Record Session */
-
-- (BOOL) isRecording;
-- (id) currentRecordSessionObject;
-- (id) currentRecordedObject;
-- (void) beginRecordSessionWithObject: (id)object;
-- (void) endRecordSession;
-- (void) beginRecordObject: (id)object;
-- (void) endRecord;
-/*- (void) pushObjectInRecordSessionStack: 
-- (void) popObjectFromRecordSessionStack:*/
 
 /* Retrieving Serializers */
 
