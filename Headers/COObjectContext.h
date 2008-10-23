@@ -165,10 +165,6 @@ typedef enum _COChildrenMergePolicy
 - (void) setSnapshotTimeInterval: (int)anInterval;
 - (void) snapshotObject: (id)object;
 
-/* COProxy Compatibility */
-
-- (int) setVersion: (int)aVersion forObject: (id)object;
-
 @end
 
 @interface NSObject (COObjectContextDelegate)

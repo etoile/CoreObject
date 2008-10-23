@@ -10,6 +10,7 @@
 #import "COObjectContext.h"
 #import "COObject.h"
 #import "COGroup.h"
+#import "COProxy.h"
 #import "COSerializer.h"
 #import "CODeserializer.h"
 #import "COMetadataServer.h"
@@ -24,6 +25,13 @@ NSString *COMergedObjectsKey = @"COMergedObjectsKey";
 @interface COObject (FrameworkPrivate)
 - (void) setObjectContext: (COObjectContext *)ctxt;
 - (void) _setObjectVersion: (int)version;
+@end
+
+@interface COProxy (FrameworkPrivate)
+- (id) _realObject;
+- (void) _setRealObject: (id)anObject;
+- (void) _setObjectVersion: (int)aVersion;
+- (void) setObjectContext: (COObjectContext *)ctxt;
 @end
 
 @interface COObjectContext (Private)
@@ -616,7 +624,9 @@ static COObjectContext *currentObjectContext = nil;
 /** Restores the full-save version closest to the requested one.
     snpashotVersion is the object version of the returned snapshot object. If 
     you pass a non-NULL pointer, snapshotVersion is updated by the method 
-    so you can get back the version number by reference. */
+    so you can get back the version number by reference.
+    If object is a CoreObject proxy, then the returned object is this same proxy
+    with its wrapped object set to the requested snapshot. */
 - (id) lastSnapshotOfObject: (id)object 
                  forVersion: (int)aVersion 
             snapshotVersion: (int *)snapshotVersion;
@@ -635,8 +645,18 @@ static COObjectContext *currentObjectContext = nil;
 
 	[snapshotDeserializer setVersion: fullSaveVersion];
 	id snapshotObject = [snapshotDeserializer restoreObjectGraph];
-	[snapshotObject deserializerDidFinish: snapshotDeserializer forVersion: fullSaveVersion];
-	return snapshotObject;
+
+	if ([object isCoreObjectProxy])
+	{
+		[object _setRealObject: snapshotObject];
+		[object _setObjectVersion: fullSaveVersion];
+		return object;
+	}
+	else
+	{
+		[snapshotObject _setObjectVersion: fullSaveVersion];
+		return snapshotObject;
+	}
 }
 
 /** Returns a temporal instance of the given object, by finding the last 
@@ -726,7 +746,9 @@ static COObjectContext *currentObjectContext = nil;
     The invocations that will be invoked on the object as target will be the 
     all invocation serialized between baseVersion and finalVersion. The first 
     replayed invocation will be 'baseVersion + 1' and the last one 
-    'finalVersion'.  */
+    'finalVersion'. 
+    If you pass a CoreObject proxy, the invocations are transparently replayed 
+    on the wrapped object. */
 - (void) playbackInvocationsWithObject: (id)object 
                            fromVersion: (int)baseVersion 
                              toVersion: (int)finalVersion 
@@ -1046,22 +1068,6 @@ static COObjectContext *currentObjectContext = nil;
 		                  toObjectVersion: aVersion
 		                        timestamp: [NSDate date]];
 	}
-}
-
-/** COProxy compatibility method. Probably to be removed. */
-- (int) setVersion: (int)aVersion forObject: (id)object
-{
-	int foundVersion = -1;
-	int rolledbackVersion = -1;
-	id rolledbackObject = [self lastSnapshotOfObject: object 
-	                                      forVersion: aVersion
-	                                 snapshotVersion: &foundVersion];
-
-	//[self objectByRestoringObject: rolledbackObject toVersion:
-
-	[object release];
-	object = rolledbackObject;
-	return rolledbackVersion;
 }
 
 @end

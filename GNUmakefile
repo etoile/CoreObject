@@ -30,7 +30,8 @@ CoreObject_OBJC_FILES = \
 	COSerializer.m \
 	CODeserializer.m \
 	COMetadataServer.m \
-	COObjectServer.m
+	COObjectServer.m \
+	COProxy.m
 
 ifeq ($(test), yes)
 CoreObject_CPPFLAGS += -DUKTEST=1
@@ -70,7 +71,8 @@ CoreObject_HEADER_FILES = \
 	COSerializer.h \
 	CODeserializer.h \
 	COMetadataServer.h \
-	COObjectServer.h
+	COObjectServer.h \
+	COProxy.h
 
 ifeq ($(FOUNDATION_LIB), apple)
 ifeq ($(test), yes)

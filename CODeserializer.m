@@ -12,6 +12,12 @@
 #import "COObjectContext.h"
 #import "NSObject+CoreObject.h"
 #import "COObject.h"
+#import "COProxy.h"
+
+@interface COProxy (FrameworkPrivate)
+- (id) _realObject;
+- (void) _setObjectVersion: (int)aVersion;
+@end
 
 /* CoreObject Deserializer */
 
@@ -61,11 +67,14 @@
     The invocations that will be invoked on the object as target will be the 
     all invocation serialized between baseVersion and finalVersion. The first 
     replayed invocation will be 'baseVersion + 1' and the last one 
-    'finalVersion'.  */
+    'finalVersion'. 
+    If you pass a CoreObject proxy, the invocations are transparently replayed 
+    on the wrapped object */
 - (void) playbackInvocationsWithObject: (id)anObject 
                            fromVersion: (int)baseVersion 
                              toVersion: (int)finalVersion 
 {
+	id realObject = ([anObject isCoreObjectProxy] ? [anObject _realObject] : anObject);
 	id deltaDeserializer = self;
 	NSInvocation *inv = nil;
 
@@ -80,8 +89,8 @@
 		CREATE_AUTORELEASE_POOL(pool);
 		inv = [deltaDeserializer restoreObjectGraph];
 		ETDebugLog(@"Play back %@ at version %d", inv, v);
-		[inv invokeWithTarget: anObject];
-		[anObject deserializerDidFinish: deltaDeserializer forVersion: v];
+		[inv invokeWithTarget: realObject];
+		[anObject _setObjectVersion: v];
 		DESTROY(inv);
 		DESTROY(pool);
 	}

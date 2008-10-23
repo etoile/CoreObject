@@ -1,13 +1,14 @@
-2008-10-22 Quentin Mathe <qmathe@club-internet.fr>
+2008-10-23 Quentin Mathe <qmathe@club-internet.fr>
 
-	* COObjectContext.m: Extracted the record session mechanism not yet really 
-	used into an new private superclass COPersistentPool.
-	* Headers/COPersistentPool.h:
-	* COPersistentPool.m:
-	Added.
+	* Headers/COProxy.h:
+	* COProxy.m:
+	Fully rewritten.
+	* COObjectContext.m (-lastSnapshotOfObject:forVersion:snapshotVersion:):
+	* CODeserializer.m (-playbackInvocations:fromVersion:toVersion:):
+	Modified to support passing a core object proxy.
 	* GNUmakefile:
 	* Headers/CoreObject.h:
-	Updated to include the new files.
+	Updated to include COProxy.
 
 2008-10-21 Quentin Mathe <qmathe@club-internet.fr>
 

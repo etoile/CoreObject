@@ -24,6 +24,7 @@
 #import "CODeserializer.h"
 #import "COPersistentPool.h"
 #import "COObjectContext.h"
+#import "COProxy.h"
 #import "COUtility.h"
 #import "COFile.h"
 #import "CODirectory.h"

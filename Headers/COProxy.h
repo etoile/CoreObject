@@ -1,7 +1,15 @@
-/**
- * <author name="David Chisnall"></author>
- */
+/*
+   Copyright (C) 2007 David Chisnall
+
+   This application is free software; you can redistribute it and/or 
+   modify it under the terms of the MIT license. See COPYING.
+
+*/
+
 #import <Foundation/Foundation.h>
+#import <EtoileFoundation/EtoileFoundation.h>
+
+@class COObjectContext;
 
 /**
  * The COProxy class is a simple proxy which is responsible for wrapping a
@@ -13,29 +21,26 @@
  * graph representing a document, or a major component in a composite document
  * (e.g. an image in a larger work).  
  */
-@interface COProxy : NSProxy {
-	/** The real object. */
-	id object;
-	/** The current version of the object. */
-	int version;
-	/** The location at which serialized copies of the object should be stored. */
-	NSURL * baseURL;
-	/** The serializer used to store deltas. */
-	id serializer;
-	/** Serializer used to store full saves */
-	id fullSave;
-	/** The class of the serializer's back end. */
-	Class backend;
+@interface COProxy : NSProxy 
+{
+	/* Object identity */
+	ETUUID *_uuid;
+	/* Real object */
+	id _object;
+	/* Object context to which the object belongs to */
+	COObjectContext *_objectContext;
+	/* Current version of the real object */
+	int _objectVersion;
 }
-/**
- * Manage anObject, using aSerializer to for serialization
- */
-- (id) initWithObject:(id)anObject
-           serializer:(Class)aSerializer
-			forBundle:(NSURL*)anURL;
-/**
- * Restore to a previous version.
- */
-- (int) setVersion:(int)aVersion;
+
+- (id) initWithObject: (id)anObject UUID: (ETUUID *)aUUID;
+- (id) initWithObject: (id)anObject;
+
 - (BOOL) isCoreObjectProxy;
+
+- (ETUUID *) UUID;
+- (int) objectVersion;
+- (int) restoreObjectToVersion: (int)aVersion;
+- (COObjectContext *) objectContext;
+
 @end
