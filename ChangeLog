@@ -2,13 +2,13 @@
 
 	* Headers/COProxy.h:
 	* COProxy.m:
-	Fully rewritten.
-	* COObjectContext.m (-lastSnapshotOfObject:forVersion:snapshotVersion:):
-	* CODeserializer.m (-playbackInvocations:fromVersion:toVersion:):
-	Modified to support passing a core object proxy.
-	* GNUmakefile:
-	* Headers/CoreObject.h:
-	Updated to include COProxy.
+	(+proxyWithObject:UUID:, -isManagedCoreObject): Added.
+	* Headers/COObjectServer.h:
+	* COObjectServer.m:
+	A bit cleaning here and there.
+	(-objectWithUUID:): Modified to rely on -objectWithUUID:version:.
+	(-objectWithUUID:version:): Modified to transparently wrap the resulting 
+	object into a COProxy if needed.
 
 2008-10-21 Quentin Mathe <qmathe@club-internet.fr>
 

@@ -20,7 +20,12 @@
 - (void) setUpCustomProxyClassIfNeeded;
 @end
 
-@implementation COProxy 
+@implementation COProxy
+
++ (id) proxyWithObject: (id)anObject UUID: (ETUUID *)aUUID
+{
+	return AUTORELEASE([[[self class] alloc] initWithObject: anObject UUID: aUUID]);
+}
 
 - (id) initWithObject: (id)anObject
 {
@@ -62,6 +67,11 @@ DEALLOC(DESTROY(_object); DESTROY(_uuid); DESTROY(_objectContext);)
 - (BOOL) isCoreObjectProxy 
 {
 	return YES; 
+}
+
+- (BOOL) isManagedCoreObject
+{
+	return YES;
 }
 
 - (id) _realObject

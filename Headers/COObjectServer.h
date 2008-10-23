@@ -72,6 +72,7 @@
 - (void) registerGroupClass: (Class)groupClass 
             forProtocolType: (NSString *)urlScheme;
 - (Class) groupClassForProtocolType: (NSString *)urlScheme;
+
 // TODO: In future, we may allow to delegate the object requests to another 
 // object server (which can be located on another host) for a given url 
 // protocol. This feature may not be really needed though.
@@ -88,6 +89,9 @@
 //- (id) propertyList;
 //- (void) readConfigurationFromURL: (NSURL *)url;
 //- (void) writeConfigurationToURL: (NSURL *)url;
+
+- (NSURL *) serializationURL;
+- (void) save;
 
 /* Shared Object Cache */
 
@@ -106,11 +110,6 @@
 // large object graphs as the generic ObjectManager will make possible.
 //- (BOOL) hasFaultForUUID: (ETUUID *)uuid;
 //- (void) turnCachedObjectsIntoFaultsIfNotUsed;
-
-/** Returns the serialization URL. */
-- (NSURL *) serializationURL;
-- (void) save;
-- (void) handleError: (NSError *)error;
 
 /* Querying Object Version (to be moved to COSerializer and ETObjectSerialStore) */
 

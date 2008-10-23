@@ -257,7 +257,7 @@ static COObjectServer *localObjectServer = nil;
 /** Recreates an object for a given URL and object version by deserializing 
     it and playing back invocations on it, then returns it.
     The returned instance doesn't get cached in the receiver.
-    For now, this method uses simply binary delta and full save deserializers.*/
+    For now, this method uses simply binary delta and full save deserializers. */
 - (id) objectWithURL: (NSURL *)objectURL version: (int)objectVersion
 {
 	// TODO: Replace the next line with  
@@ -292,25 +292,48 @@ static COObjectServer *localObjectServer = nil;
 
 /** Recreates the last version of an object for a given UUID by deserializing 
     it and playing back invocations on it, then returns it.
-    The returned instance doesn't get registered in the receiver. */
+    The returned instance doesn't get registered in the receiver. 
+    If the resulting object is an instance of a class expected to be used with 
+    a CoreObject proxy, the object is transparently wrapped and a proxy is 
+    returned. */
 - (id) objectWithUUID: (ETUUID *)anUUID
 {
 	// TODO: If two queries badly impact the performance, only do a single one 
-	// by adding a new method to COMetadataServer.
+	// by adding a new method to COMetadataServer and calling 
+	// -objectWithURL:version: directly instead of passing through 
+	// -objectWithUUID:version:
+	//int objectVersion = [[self metadataServer] objectVersionForUUID: anUUID];
+	//NSURL *objectURL = [[self metadataServer] URLForUUID: anUUID];
+
 	int objectVersion = [[self metadataServer] objectVersionForUUID: anUUID];
-	NSURL *objectURL = [[self metadataServer] URLForUUID: anUUID];
-		
-	return [self objectWithURL: objectURL version: objectVersion];
+
+	return [self objectWithUUID: anUUID version: objectVersion];
 }
 
 /** Recreates an object for a given UUID and object version by deserializing 
     it and playing back invocations on it, then returns it.
-    The returned instance doesn't get registered in the receiver. */
+    The returned instance doesn't get registered in the receiver.
+    If the resulting object is an instance of a class expected to be used with 
+    a CoreObject proxy, the object is transparently wrapped and a proxy is 
+    returned. */
 - (id) objectWithUUID: (ETUUID *)anUUID version: (int)objectVersion
 {
 	NSURL *objectURL = [[self metadataServer] URLForUUID: anUUID];
-		
-	return [self objectWithURL: objectURL version: objectVersion];
+	id realObject = [self objectWithURL: objectURL version: objectVersion];
+
+	if (realObject == nil)
+		return nil;
+
+	BOOL usesProxy = ([realObject isKindOfClass: [COObject class]] == NO);
+	id object = realObject;
+
+	if (usesProxy)
+	{
+		object = [COProxy proxyWithObject: realObject UUID: anUUID];
+		[object _setObjectVersion: objectVersion];
+	}
+
+	return object;
 }
 
 /** Returns a proxy object for the core object path of url.
@@ -493,6 +516,8 @@ static COObjectServer *localObjectServer = nil;
 	ETLog(@"Resolved fault %@ in groups %@", anUUID, fixedGroups);
 }
 
+/** Returns the serialization URL.
+    WARNING: Not yet used. */
 - (NSURL *) serializationURL
 {
 	return _serializationURL;
@@ -501,20 +526,16 @@ static COObjectServer *localObjectServer = nil;
 /** Triggers the save of the object server state at the serialization URL 
 	defined by -serializationURL. 
 	The save only includes the serialization of the store/server 
-	configuration. */
+	configuration. 
+    WARNING: Not implemented. */
 - (void) save 
 { 
 	//[ETSerializer serializeObject: self toURL: [self serializationURL]];
 }
 
-- (void) handleError: (NSError *)error
-{
-	//NSLog(@"Error: %@ (%@ %@)", error, self, [err methodName]);
-	NSLog(@"Error: %@ (%@)", error, self);
-	RELEASE(error);
-}
-
-/* Querying Object Version */
+/* Querying Object Version
+   TODO: Move all these methods on ETSerialObjectBundle once refactored to 
+   fully represent a stored object with all branches inside. */
 
 /** Returns the first version forward in time which corresponds to a snapshot or
     a delta. If no such version can be found (no snapshot or delta available 
@@ -524,12 +545,6 @@ static COObjectServer *localObjectServer = nil;
     objects not yet inserted in an object context. */
 - (int) lastVersionOfObjectWithURL: (NSURL *)anURL
 {
-	// FIXME: Test UUID or add -containsTemporalInstance: to NSSet
-	/*if ([object isPersistent] == NO || [_registeredObjects containsObject: object] == NO)
-	{
-		return -1;
-	}*/
-
 	// TODO: Move this code into ETSerialObjectBundle, probably by adding 
 	// methods such -lastVersion:inBranch: and -lastVersion. We may also cache 
 	// the last version in a plist stored in the bundle to avoid the linear 

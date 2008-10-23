@@ -33,10 +33,13 @@
 	int _objectVersion;
 }
 
++ (id) proxyWithObject: (id)anObject UUID: (ETUUID *)aUUID;
+
 - (id) initWithObject: (id)anObject UUID: (ETUUID *)aUUID;
 - (id) initWithObject: (id)anObject;
 
 - (BOOL) isCoreObjectProxy;
+- (BOOL) isManagedCoreObject;
 
 - (ETUUID *) UUID;
 - (int) objectVersion;
