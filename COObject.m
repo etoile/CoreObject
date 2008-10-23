@@ -761,8 +761,9 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	return AUTO_DESERIALIZE;
 }
 
-// TODO: If we can get the deserializer in parameter, the next method 
-// -deserializerDidFinish:forVersion: might eventually be removed.
+// TODO: If we can get the deserializer in parameter, the need to call 
+// -_setObjectVersion: in delta or snapshot deserialization methods might 
+// eventually be eliminated.
 /** If you override this method, you must call superclass implemention before 
     your own code. */
 - (void) finishedDeserializing
@@ -772,7 +773,7 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	_nc = [NSNotificationCenter defaultCenter];
 	_objectContext = nil;
 	 /* Reset a default version to be immediately overriden by
-	   deserializerDidFinish:forVersion: called back by the context. 
+	   _setObjectVersion: called back by the context. 
 	   This is also useful to ensure consistency if a non-persistent object is 
 	   serialized/deserialized without COObjectContext facility. 
 	   See TestSerializer.m */
@@ -786,17 +787,6 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	// This line should be removed later, we now handle kCOParentsProperty as 
 	// transient in -serialize:using.
 	//[_properties setObject: [NSMutableArray array] forKey: kCOParentsProperty];
-}
-
-- (void) deserializerDidFinish: (ETDeserializer *)deserializer forVersion: (int)objectVersion
-{
-	ETDebugLog(@"Finished deserialization of %@ to object version %d", self, objectVersion);
-	_objectVersion = objectVersion;
-}
-
-- (void) serializerDidFinish: (ETSerializer *)serializer forVersion: (int)objectVersion
-{
-	_objectVersion = objectVersion;
 }
 
 /* Copying */

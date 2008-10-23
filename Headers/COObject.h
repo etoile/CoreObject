@@ -131,11 +131,6 @@ extern NSString *pCOVersion1Value;
                version: (int)aVersion;
 - (void) finishedDeserializing;
 
-/* Private (Object Versioning callbacks) */
-
-- (void) deserializerDidFinish: (ETDeserializer *)deserializer forVersion: (int)objectVersion;
-- (void) serializerDidFinish: (ETSerializer *)serializer forVersion: (int)objectVersion;
-
 /* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
 
 - (NSString *) uniqueID;

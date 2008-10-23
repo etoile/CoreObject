@@ -1035,8 +1035,7 @@ static COObjectContext *currentObjectContext = nil;
 	if (updateVersion)
 	{
 		int newObjectVersion = [object objectVersion] + 1;
-		[object serializerDidFinish: snapshotSerializer 
-		                 forVersion: newObjectVersion];
+		[object _setObjectVersion: newObjectVersion];
 		[self updateMetadatasForObject: object recordVersion: newObjectVersion];
 	}
 }

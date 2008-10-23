@@ -10,6 +10,7 @@
 #import "NSObject+CoreObject.h"
 #import "COMetadataServer.h"
 #import "COGroup.h"
+#import "COProxy.h"
 #import "COSerializer.h"
 #import "CODeserializer.h"
 #import "COUtility.h"
@@ -24,6 +25,13 @@ NSString *COUUIDURLProtocol = @"uuid";
 
 static COObjectServer *localObjectServer = nil;
 
+@interface COObject (FrameworkPrivate)
+- (void) _setObjectVersion: (int)version;
+@end
+
+@interface COProxy (FrameworkPrivate)
+- (void) _setObjectVersion: (int)aVersion;
+@end
 
 @implementation COObjectServer
 
@@ -267,7 +275,7 @@ static COObjectServer *localObjectServer = nil;
 	if (deserializationFailed)
 		return nil;
 
-	[object deserializerDidFinish: snapshotDeserializer forVersion: fullSaveVersion];
+	[object _setObjectVersion: fullSaveVersion];
 	
 	ETDeserializer *deltaDeserializer = [[ETSerializer 
 		defaultCoreObjectDeltaSerializerForURL: objectURL version: fullSaveVersion] deserializer];
