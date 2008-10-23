@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
+#import <CoreObject/NSObject+CoreObject.h>
 
 @class COObjectContext;
 
@@ -21,7 +22,7 @@
  * graph representing a document, or a major component in a composite document
  * (e.g. an image in a larger work).  
  */
-@interface COProxy : NSProxy 
+@interface COProxy : NSProxy <COManagedObject>
 {
 	/* Object identity */
 	ETUUID *_uuid;
@@ -45,5 +46,7 @@
 - (int) objectVersion;
 - (int) restoreObjectToVersion: (int)aVersion;
 - (COObjectContext *) objectContext;
+
+- (NSDictionary *) metadatas;
 
 @end

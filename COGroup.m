@@ -29,8 +29,8 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 @end
 
 @interface COGroup (Private)
-- (void) _addAsParent: (COObject *) object;
-- (void) _removeAsParent: (COObject *) object;
+- (void) _addAsParent: (id) object;
+- (void) _removeAsParent: (id) object;
 - (BOOL) _tryReplaceFaultObject: (id)aFault 
                         inArray: (NSMutableArray *)objects 
                      withObject: (id)resolvedObject;
@@ -148,8 +148,11 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 /* Managed Object Edition */
 
-- (void) _addAsParent: (COObject *) object
+- (void) _addAsParent: (id) object
 {
+	if ([object isKindOfClass: [COObject class]] == NO)
+		return;
+
 	NSMutableArray *a = [object valueForProperty: kCOParentsProperty];
 	if (a == nil)
 	{
@@ -158,8 +161,11 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	[a addObject: self];
 }
 
-- (void) _removeAsParent: (COObject *) object
+- (void) _removeAsParent: (id) object
 {
+	if ([object isKindOfClass: [COObject class]] == NO)
+		return;
+
 	NSMutableArray *a = [object valueForProperty: kCOParentsProperty];
 	if (a != nil)
 	{

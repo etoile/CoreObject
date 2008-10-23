@@ -12,6 +12,7 @@
 #import "COCoreObjectProtocol.h"
 #import "COPropertyType.h"
 #import "COUtility.h"
+#import <NSObject+CoreObject.h>
 
 @class COObjectContext;
 
@@ -36,7 +37,7 @@ extern NSString *pCOValuesKey;
 extern NSString *pCOVersionKey;
 extern NSString *pCOVersion1Value;
 
-@interface COObject: NSObject <COObject>
+@interface COObject: NSObject <COObject, COManagedObject>
 {
 	/** Persistent properties (except kCOParentsProperty) */
 	NSMutableDictionary *_properties;

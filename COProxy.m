@@ -38,6 +38,8 @@
 
 	ASSIGN(_object, anObject);
 	ASSIGN(_uuid, aUUID);
+	[self setObjectContext: [COObjectContext currentContext]];
+	_objectVersion = 0;
 
 	[self setUpCustomProxyClassIfNeeded];
 
@@ -122,6 +124,13 @@ DEALLOC(DESTROY(_object); DESTROY(_uuid); DESTROY(_objectContext);)
 {
 	/* The object context is our owner and retains us. */
 	_objectContext = ctxt;
+}
+
+/** Returns the persistent metadatas to be indexed.
+    WARNING: Not yet implemented. */
+- (NSDictionary *) metadatas
+{
+	return nil;
 }
 
 - (NSMethodSignature *) methodSignatureForSelector: (SEL)aSelector
