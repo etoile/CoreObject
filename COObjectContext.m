@@ -980,13 +980,13 @@ static COObjectContext *currentObjectContext = nil;
 }
 
 /** Commonly used to forward the invocation to the real object if the 
-	initial receiver (the target of the invocation) was a CoreObject proxy.
+	initial receiver (the target of the invocation) is a CoreObject proxy.
 	By default, this method checks the type of the target of the invocation and 
 	forwards it only if it is a COProxy instance. */
 - (void) forwardInvocationIfNeeded: (NSInvocation *)inv
 {
 	if ([[inv target] isCoreObjectProxy])
-		[inv invoke];
+		[inv invokeWithTarget: [[inv target] _realObject]];
 }
 
 /** Sets the time interval that has to be elapsed between two snapshots, before 
@@ -1040,7 +1040,9 @@ static COObjectContext *currentObjectContext = nil;
 	}
 }
 
-/** Updates the metadatas of object in the current metadata server. */
+/** Updates the metadatas of object in the current metadata server.
+    The update is timestamped by getting the current date inside this method,  
+    right before asking the metadata server to apply the update. */
 - (void) updateMetadatasForObject: (id)object recordVersion: (int)aVersion
 {
 	NSURL *url = [self serializationURLForObject: object];
