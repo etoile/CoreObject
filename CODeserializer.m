@@ -19,24 +19,16 @@
 - (void) _setObjectVersion: (int)aVersion;
 @end
 
-/* CoreObject Deserializer */
+/* CoreObject Deserializer Additions */
 
-/* The default CoreObject Deserializer, in future storage specific code could be 
-   extracted in a subclass called COFSDeserializer. It would make possible to 
-   write a deserializer like COZFSDeserializer. */
 @implementation ETDeserializer (CODeserializer)
-
-+ (id) defaultCoreObjectDeserializer
-{
-	return [self defaultCoreObjectDeserializerWithURL: 
-		[ETSerializer defaultLibraryURL]];
-}
 
 + (id) defaultCoreObjectDeserializerWithURL: (NSURL *)aURL
 {
 	return [[ETSerializer defaultCoreObjectSerializerWithURL: aURL] deserializer];
 }
 
+// TODO: May be remove this method, not really useful for now...
 + (id) deserializeObjectWithURL: (NSURL *)aURL
 {
 	// FIXME: Move this quick-and-dirty check of the URL parameter into 

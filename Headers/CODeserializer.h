@@ -11,11 +11,9 @@
 #import <EtoileSerialize/EtoileSerialize.h>
 #import "COUtility.h"
 
-#define CODeserializer ETDeserializer
-
+/** Extends ETDeserializer to handle the deserialization of core objects. */
 @interface ETDeserializer (CODeserializer)
 
-+ (id) defaultCoreObjectDeserializer;
 + (id) defaultCoreObjectDeserializerWithURL: (NSURL *)aURL;
 + (id) deserializeObjectWithURL: (NSURL *)aURL;
 

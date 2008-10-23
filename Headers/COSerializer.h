@@ -18,7 +18,6 @@
 + (NSURL *) defaultLibraryURL;
 
 + (Class) defaultBackendClass;
-+ (id) defaultCoreObjectSerializer;
 + (id) defaultCoreObjectSerializerWithURL: (NSURL *)aURL;
 + (id) defaultCoreObjectDeltaSerializerForURL: (NSURL *)anURL
                                       version: (int)objectVersion;

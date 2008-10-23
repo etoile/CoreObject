@@ -41,26 +41,15 @@
 	return [NSURL fileURLWithPath: [@"~/CoreObjectLibrary" stringByStandardizingPath]];
 }
 
-+ (id) defaultCoreObjectSerializer
-{
-	return [ETSerializer serializerWithBackend: [self defaultBackendClass]
-	                                    forURL: [self defaultLibraryURL]];
-}
+// TODO: Once ETObjectStore has been refactored to represent an object bundle 
+// as whole. We could probably keep -defaultCoreObjectSerializerWithURL: and 
+// get rid of the next two methods by attaching both snapshot and delta 
+// serialization to ETSerializer with methods such -serializeObject:inBranch:
 
 + (id) defaultCoreObjectSerializerWithURL: (NSURL *)aURL
 {
 	return [ETSerializer serializerWithBackend: [self defaultBackendClass]
 	                                    forURL: aURL];
-}
-
-/** Unlike the next two factory methods, object must have an non-nil object 
-    context. */
-+ (id) defaultCoreObjectSerializerForObject: (id)object
-{
-	return [ETSerializer serializerWithBackend: [self defaultBackendClass]
-	                             objectVersion: [object objectVersion]
-	                                    forURL: [[object objectContext] serializationURLForObject: object]];
-	                                    //forURL: [object URL]];
 }
 
 + (id) defaultCoreObjectDeltaSerializerForURL: (NSURL *)anURL
