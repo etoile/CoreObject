@@ -285,8 +285,7 @@ static COObjectContext *currentObjectContext = nil;
 
 /* Retrieves the URL where an object is presently serialized, or if it hasn't 
    been serializerd yet, builds the URL by taking the library to which the 
-   object belongs to.
-   If object isn't registered, returns nil. */
+   object belongs to. */
 - (NSURL *) serializationURLForObject: (id)object
 {
 	// NOTE: Don't check if object is registered because it might be a temporal 
@@ -357,7 +356,7 @@ static COObjectContext *currentObjectContext = nil;
 	return [[self findAllObjectVersionsMatchingContextVersion: aVersion] allKeys];
 }
 
-/** Loads and register all the objects that belongs to the receiver but are not
+/** Loads and registers all the objects that belongs to the receiver but are not
     yet loaded.
     These objects may exist as faults in the object graph by being referenced 
     by other objects. Take note this method won't resolve existing faults 
@@ -560,12 +559,12 @@ static COObjectContext *currentObjectContext = nil;
 
 /** Returns the last version of the receiver that can be used to identify 
     the current state of the all the registered objects and eventually 
-    reverts to it a later point. The state of all registered objects remain 
+    restores to it a later point. The state of all registered objects remain 
     untouched until the next time this version value gets incremented. 
     An object context version is a timemark in the interleaved history of all 
     the registered objects. Each object context version is associated with a 
     unique set of object versions. If at a later point, you set the context 
-    version to a past version, the context will revert back to the unique set of 
+    version to a past version, the context will restore back to the unique set of 
     temporal instances bound to this version. */
 - (int) version
 {
@@ -577,7 +576,7 @@ static COObjectContext *currentObjectContext = nil;
 	[self _restoreToVersion: aVersion];
 }
 
-/** Reverts the receiver to the last version right before the one currently 
+/** Restores the receiver to the last version right before the one currently 
     returned by -version.
     This method calls -restoreToVersion:. */
 - (void) undo
@@ -664,17 +663,17 @@ static COObjectContext *currentObjectContext = nil;
     invocations between this snapshot version and aVersion.
     The returned instance has no object context and isn't equal to anObject, 
     but returns YES to -isTemporalInstance:, because both anObject and the 
-    rolled back object share the same UUID 
+    restored object share the same UUID 
     even if they differ by their object version. 
-    You cannot use a rolled back object as a persistent object until it 
+    You cannot use a restored object as a persistent object until it 
     gets inserted in an object context. No invocations will ever be recorded 
     until it is inserted. It can either replace anObject in the receiver, or 
     anObject can be unregistered from the receiver to allow the insertion of the 
-    rolled back object into another object context. This is necessary because a 
+    restored object into another object context. This is necessary because a 
     given object identity (all temporal instances included) must belong to a 
     single object context per process.
     A managed core object identity is defined by its UUID. 
-    The state of a rolled back object can be altered before inserting it in an 
+    The state of a restored object can be altered before inserting it in an 
     object context, but this is strongly discouraged.
     anObject can be a temporal instance of an object registered in the receiver.
     If aVersions is equal to the version of anObject, returns anObject and logs 
@@ -742,7 +741,7 @@ static COObjectContext *currentObjectContext = nil;
 	return rolledbackObject;
 }
 
-/** Play back each of the subsequent invocations on object.
+/** Plays back each of the subsequent invocations on object.
     The invocations that will be invoked on the object as target will be the 
     all invocation serialized between baseVersion and finalVersion. The first 
     replayed invocation will be 'baseVersion + 1' and the last one 
@@ -757,7 +756,7 @@ static COObjectContext *currentObjectContext = nil;
 	{
 		[NSException raise: NSInternalInconsistencyException format: 
 			@"Invocations cannot be played back on %@ when the context %@ is "
-			@"already reverting another object %@", object, self, 
+			@"already restoring another object %@", object, self, 
 			[self currentObjectUnderRestoration]];
 	}
 	
@@ -784,8 +783,8 @@ static COObjectContext *currentObjectContext = nil;
 	return ([self currentObjectUnderRestoration] != nil);
 }
 
-/** Returns the registered object for which -objectByRestoringObject:toVersion: 
-    is currently executed. */
+/** Returns the registered object for which 
+    -objectByRestoringObject:toVersion:mergeImmediately: is currently executed. */
 - (id) currentObjectUnderRestoration
 {
 	return _objectUnderRestoration;
@@ -793,10 +792,10 @@ static COObjectContext *currentObjectContext = nil;
 
 /** Returns whether object is a temporal instance of a given object owned by
 	the context. 
-	The latter object is called a reverted object in such situation.
-	The rolled back object doesn't belong to the receiver because it is a 
+	The latter object is called a current object in such situation.
+	The restored object doesn't belong to the receiver, because it is a 
 	temporal instance that can be retrieved only by requesting it to the 
-	receiver for a given object with the same UUID (the reverted object already 
+	receiver for a current object with the same UUID (the object already 
 	inserted/owned by the receiver context). */
 - (BOOL) isRestoredObject: (id)object
 {
@@ -804,8 +803,8 @@ static COObjectContext *currentObjectContext = nil;
 		&& ([[self registeredObjects] containsObject: object] == NO));
 }
 
-/** Marks the start of a revert operation.
-    A revert operations typically involves exchanges of messages among the 
+/** Marks the start of a restore operation.
+    A restore operation might involve exchanges of messages among the 
     registered objects or state alteration, that must not be recorded.
     By calling this method, you ensure -shouldIgnoreChangesToObject: will 
     behave correctly. */
@@ -814,7 +813,7 @@ static COObjectContext *currentObjectContext = nil;
 	ASSIGN(_objectUnderRestoration, object);
 }
 
-/** Marks the end of a revert operation, thereby enables the recording of 
+/** Marks the end of a restore operation, thereby enables the recording of 
     invocations. */
 - (void) endRestore
 {
@@ -822,16 +821,16 @@ static COObjectContext *currentObjectContext = nil;
 }
 
 /** Returns YES if anObject is a temporal instance of an object registered in 
-    the receiver and a revert operation is underway, otherwise returns NO.
+    the receiver and a restore operation is underway, otherwise returns NO.
     This method is mainly useful to decide whether a managed method should 
     return immediately or execute and mutate the state of the model object its 
     belongs to. 
     The rule is to ignore all side-effects triggered by a managed method during 
-    a revert. If a revert is underway, all changes must be applied only to the 
-    rolled back object (not belonging to the object context) and any other 
-    messages sent by the rolled back object to other objects must be ignored. 
+    a restore. If a restore is underway, all changes must be applied only to the 
+    restored object (not belonging to the object context) and any other 
+    messages sent by the restored object to other objects must be ignored. 
     The fact these objects belongs to the object context or not doesn't matter: 
-    temporal instances when they got just rolled back are in a state that can be
+    temporal instances when they got just restored are in a state that can be
     incoherent with other objects in memory. 
     See also -isRestoredObject:. */
 - (BOOL) shouldIgnoreChangesToObject: (id)anObject
@@ -852,10 +851,12 @@ static COObjectContext *currentObjectContext = nil;
     identical to the current object version of the invocation target. 
     The invocation is recorded in three steps:
     - the invocation is serialized (eventually a snapshot is taken too)
-    - the basic object infos stored in the metadata DB are updated for the invocation target
+    - the basic object infos stored in the metadata DB are updated for the 
+      invocation target
     - the record operation is logged in the receiver history.
     For more details on each step, see respectively -serializeInvocation;,
-    -updateMetadatasForObject:, logInvocation:recordVersion:timestamp:.
+    -updateMetadatasForObject:recordVersion:, 
+    -logRecord:objectVersion:timestamp:shouldIncrementContextVersion:.
     Finally this method returns the new object version to the invocation target 
     that is in charge of updating the value it returns for -objectVersion.
     See also -shouldRecordChangesToObject: and RECORD macro in COUtility.h */
