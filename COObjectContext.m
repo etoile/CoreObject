@@ -514,7 +514,7 @@ static COObjectContext *currentObjectContext = nil;
 	return _fullSaveSerializer;
 }
 
-/** Retrieve the delta serializer for a given object. */
+/** Retrieves the delta serializer for a given object. */
 - (ETSerializer *) deltaSerializerForObject: (id)object
 {
 	if ([object respondsToSelector: @selector(deltaSerializer)])
@@ -531,7 +531,7 @@ static COObjectContext *currentObjectContext = nil;
 	}
 }
 
-/** Retrieve the snapshot serializer for a given object. */
+/** Retrieves the snapshot serializer for a given object. */
 - (ETSerializer *) snapshotSerializerForObject: (id)object
 {
 	if ([object respondsToSelector: @selector(snapshotSerializer)])
@@ -571,6 +571,8 @@ static COObjectContext *currentObjectContext = nil;
 	return _version;
 }
 
+/** Restores the receiver to the given version.
+    See also -version.*/
 - (void) restoreToVersion: (int)aVersion
 {
 	[self _restoreToVersion: aVersion];
@@ -602,7 +604,7 @@ static COObjectContext *currentObjectContext = nil;
     a delta. If no such version can be found (no snapshot or delta available 
     unless an error occured), returns -1.
     If object hasn't been made persistent yet or isn't registered in the 
-    receiver also returns -1. Hence this method returns -1 for rolledback 
+    receiver also returns -1. Hence this method returns -1 for restored 
     objects not yet inserted in an object context. */
 - (int) lastVersionOfObject: (id)object
 {
@@ -711,34 +713,34 @@ static COObjectContext *currentObjectContext = nil;
 
 	if (aVersion > lastObjectVersion)
 	{
-		ETLog(@"WARNING: Failed to roll back, the version %i is beyond the object history %i",
+		ETLog(@"WARNING: Failed to restore, the version %i is beyond the object history %i",
 			aVersion, lastObjectVersion);
 		return nil;
 	}
 	else if (aVersion == [anObject objectVersion])
 	{
-		ETLog(@"WARNING: Failed to roll back, the version matches the object passed in parameter");
+		ETLog(@"WARNING: Failed to restore, the version matches the object passed in parameter");
 		return anObject;
 	}
 
 	int baseVersion = -1;
-	id rolledbackObject = [self lastSnapshotOfObject: anObject 
-	                                      forVersion: aVersion
-	                                 snapshotVersion: &baseVersion];
-	ETDebugLog(@"Roll back object %@ with snapshot %@ at version %d", anObject,
-		rolledbackObject, baseVersion);
+	id restoredObject = [self lastSnapshotOfObject: anObject 
+	                                    forVersion: aVersion
+	                               snapshotVersion: &baseVersion];
+	ETDebugLog(@"Restore object %@ with snapshot %@ at version %d", anObject,
+		restoredObject, baseVersion);
 
-	[self playbackInvocationsWithObject: rolledbackObject 
+	[self playbackInvocationsWithObject: restoredObject 
 	                        fromVersion: baseVersion
 	                          toVersion: aVersion];
 	
-	if ([rolledbackObject isKindOfClass: [COGroup class]])
-		[rolledbackObject setHasFaults: YES];
+	if ([restoredObject isKindOfClass: [COGroup class]])
+		[restoredObject setHasFaults: YES];
 
 	if (mergeNow)
-		[self replaceObject: anObject byObject: rolledbackObject collectAllErrors: YES];
+		[self replaceObject: anObject byObject: restoredObject collectAllErrors: YES];
 
-	return rolledbackObject;
+	return restoredObject;
 }
 
 /** Plays back each of the subsequent invocations on object.
