@@ -1,3 +1,17 @@
+2008-10-24 Quentin Mathe <qmathe@club-internet.fr>
+
+	Finished to implement the low-level undo model discussed with Eric. I 
+	thought I already fully implemented it, but in fact I hadn't :-)
+	* Headers/COObjectContext.h:
+	* COObjectContext.m: 
+	(-undo): Rewritten.
+	(-redo): Implemented.
+	(-canRedo, -isUndoing, -isRedoing, -beginUndoSequence, -endUndoSequence): 
+	Added.
+	(-logRecord:objectVersion:timestamp:shouldIncrementContextVersion:): 
+	Modified to end the undo sequence if changes other than undo or redo actions 
+	get logged.
+
 2008-10-23 Quentin Mathe <qmathe@club-internet.fr>
 
 	* Headers/COProxy.h:

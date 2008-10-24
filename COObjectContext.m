@@ -39,6 +39,9 @@ NSString *COMergedObjectsKey = @"COMergedObjectsKey";
 - (BOOL) isInvalidObject: (id)newObject forReplacingObject: (id)anObject;
 - (void) tryMergeRelationshipsOfObject: (id)anObject intoInstance: (id)targetInstance;
 - (void) commitMergeOfInstance: (id)temporalInstance forObject:  (id)anObject;
+- (void) beginUndoSequenceIfNeeded;
+- (void) endUndoSequenceIfNeeded;
+- (void) endUndoSequence;
 - (void) snapshotObject: (id)object shouldIncrementObjectVersion: (BOOL)updateVersion;
 @end
 
@@ -102,6 +105,10 @@ static COObjectContext *currentObjectContext = nil;
 	[self setSnapshotTimeInterval: 100];
 	[self setDelegate: nil];
 	[self setMergePolicy: COOldChildrenMergePolicy];
+	_firstUndoVersion = -1;
+	_restoredVersionUndoCursor = -1;
+	_isUndoing = NO;
+	_isRedoing = NO;
 
 	return self;
 }
@@ -578,18 +585,81 @@ static COObjectContext *currentObjectContext = nil;
 	[self _restoreToVersion: aVersion];
 }
 
+- (void) beginUndoSequence
+{
+	_firstUndoVersion = [self version] + 1;
+	_restoredVersionUndoCursor = [self version];
+}
+
+- (void) endUndoSequence
+{
+	_firstUndoVersion = -1;
+}
+
 /** Restores the receiver to the last version right before the one currently 
-    returned by -version.
+    returned by -version, if no undo/redo sequence is underway. Then a new 
+    undo/redo sequence is started.
+    If an undo/redo sequence has already been started by calling -undo, restores
+    the receiver to the last version right before the version restored by the 
+    previous undo/redo action.
+    An undo/redo sequence is cleared, when the context version is incremented 
+    by another method than -undo or -redo.
+    Be aware that undo/redo actions are logged into the history, then once 
+    you exit an undo/redo sequence and you want to revert to a version and state 
+    anterior to this undo/redo sequence, it's necessary to undo all undo/redo
+    operations that belongs to the sequence and recorded by the context.
     This method calls -restoreToVersion:. */
 - (void) undo
 {
-	// TODO: Implement a real undo model.
-	[self restoreToVersion: ([self version] - 1)];
+	BOOL noCurrentUndoSequence = (_firstUndoVersion == -1);
+
+	if (noCurrentUndoSequence)
+		[self beginUndoSequence];
+
+	_isUndoing = YES;
+	// TODO: Implement more useful undo models on top of this low-level model.
+	[self restoreToVersion: --_restoredVersionUndoCursor];
+	_isUndoing = NO;
 }
 
+/** Returns whether we are in an undo sequence or not. If YES, -redo will 
+    restore the receiver to a past version. */
+- (BOOL) canRedo
+{
+	return (_firstUndoVersion != -1);	
+}
+
+/** Restores the receiver to the first version right after the version restored 
+    by the previous undo/redo action.
+    If -canRedo returns NO, does nothing.
+    See also -undo. */
 - (void) redo
 {
-	// TODO: Implement redo based on the undo model.
+	if ([self canRedo] == NO)
+		return;
+
+	_isRedoing = YES;
+	[self restoreToVersion: ++_restoredVersionUndoCursor];
+	_isRedoing = NO;
+
+	BOOL hasRevertedAllUndoActions = (_firstUndoVersion == _restoredVersionUndoCursor);
+
+	if (hasRevertedAllUndoActions)
+		[self endUndoSequence];
+}
+
+/** Returns whether an undo action triggered by -undo is currently underway for 
+    the receiver. */
+- (BOOL) isUndoing
+{
+	return _isUndoing;
+}
+
+/** Returns whether a redo action triggered by -redo is currently underway for 
+    the receiver. */
+- (BOOL) isRedoing
+{
+	return _isRedoing;
 }
 
 /** Returns YES when the whole context is currently getting restored to another 
@@ -980,6 +1050,11 @@ static COObjectContext *currentObjectContext = nil;
 
 	ETDebugLog(@"Log %@ objectUUID %@ objectVersion %i contextVersion %i", 
 		aRecord, [object UUID], aVersion, _version);
+
+	BOOL exitingUndoSequence = ([self isUndoing] == NO || [self isRedoing] == NO);
+
+	if (exitingUndoSequence)
+		[self endUndoSequence];
 }
 
 /** Commonly used to forward the invocation to the real object if the 

@@ -70,6 +70,12 @@ typedef enum _COChildrenMergePolicy
 	ETUUID *_uuid;
 	NSArray *_lastMergeErrors;
 	COChildrenMergePolicy _mergePolicy;
+
+	/* Low-level Undo/Redo */
+	int _firstUndoVersion;
+	int _restoredVersionUndoCursor;
+	BOOL _isUndoing;
+	BOOL _isRedoing;
 }
 
 + (COObjectContext *) currentContext;
@@ -123,7 +129,10 @@ typedef enum _COChildrenMergePolicy
 - (int) version;
 - (void) restoreToVersion: (int)aVersion;
 - (void) undo;
+- (BOOL) canRedo;
 - (void) redo;
+- (BOOL) isUndoing;
+- (BOOL) isRedoing;
 - (BOOL) isRestoringContext;
 //- (void) snapshot;
 
