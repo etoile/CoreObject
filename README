@@ -68,8 +68,20 @@ Known Limitations
   filesystem. Well, in theory it isn't designed to erase your data, but who 
   knows, that's a developer preview release... ;-)
 - Multiple object contexts per process are supported but mostly untested.
+- Switching to another metadata DB isn't yet supported, only the default one 
+  bound to the current user can be used.
 - Messages sent to multivalues aren't recorded, so you must reset a multivalue 
   on the object that uses it each time you alter a COMultiValue instance.
+- No support for the recording of messages sent within an object cluster, only 
+  the persistent roots COObject, COGroup or COProxy can trigger persistency, 
+  the objects that belongs to the object graph/cluster behind those class 
+  instances cannot. This multivalue limitation previously described is in fact a 
+  subcase of this one.
+  For now, if you want to record changes within an object cluster, the 
+  problem can be worked around for COProxy. You can do it by adding a special 
+  method to which you pass an object ref of your own, and implements this method 
+  so that it records then forwards the message to the desired object in the 
+  cluster.
 - No deletion model, so you cannot remove an object from an object context once 
   it has been inserted and there is also no way to handle in-store deletion 
   (deleting an object bundle on disk and removing the entry from the metadata 
@@ -87,3 +99,13 @@ Known Limitations
   the metadata DB updated by hand. There is no way that the metadata server can 
   detect such moves for now. See COMetadataServer.h if you are interested in 
   doing that.
+- Property list export should mostly work but currently depends on having all
+  the core objects to export in-memory. Property list import works more or less, 
+  but isn't truly usable because the metadata DB isn't updated at import time. 
+  So it's a bit of no use, unless you decide to update the metadata DB by 
+  yourself once the property list has been read and the object graph recreated 
+  in-memory. Property list export/import hasn't been recently tested and was 
+  written before COObjectContext and COObjectServer existed, so an imported 
+  object graph is recreated without any care for the new persistency 
+  architecture. This means imported core objects won't be correctly registered 
+  into the current context and cached in the object server.
