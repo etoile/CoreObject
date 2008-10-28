@@ -21,6 +21,9 @@ facility based on similar interface.
 It also includes a subset of Blocks framework[1] to build applications
 in plugin architecture.
 
+Before writing code that uses CoreObject, be sure to read Known Limitations 
+section.
+
 Note: CoreObject is written from scratch. 
 It only try to mimic the API of AddressBook.
 CoreObject was initially called OrganizeKit. This framework was supposedly to 
@@ -56,3 +59,31 @@ Developer
 
 * Each unit provide property list to be stored.
   
+
+Known Limitations
+-----------------
+
+- The Filesystem backend (COFile and CODirectory) is work-in-progress, don't 
+  play with it if you prefer to be sure you won't lost any data on your 
+  filesystem. Well, in theory it isn't designed to erase your data, but who 
+  knows, that's a developer preview release... ;-)
+- Multiple object contexts per process are supported but mostly untested.
+- Messages sent to multivalues aren't recorded, so you must reset a multivalue 
+  on the object that uses it each time you alter a COMultiValue instance.
+- No deletion model, so you cannot remove an object from an object context once 
+  it has been inserted and there is also no way to handle in-store deletion 
+  (deleting an object bundle on disk and removing the entry from the metadata 
+  DB).
+- Backwards pointers between persistent roots aren't well supported. They are 
+  returned by -parentGroups for COObject class or subclass instances, so for 
+  now it is advised to avoid using this method.
+- No history cleaning.
+- No indexing of object properties or metadatas
+- No fine-grained concurrency control, hence the loading of an object in memory 
+  and the access to an object context must be limited to a single procress. 
+  Different processes can read/write different objects at the same time if they 
+  belong to different object contexts.
+- Object bundles on disk that are moved or renamed must have their entries in 
+  the metadata DB updated by hand. There is no way that the metadata server can 
+  detect such moves for now. See COMetadataServer.h if you are interested in 
+  doing that.
