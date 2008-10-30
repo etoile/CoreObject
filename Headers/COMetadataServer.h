@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <postgresql/libpq-fe.h>
+#import <libpq-fe.h>
 
 /** Before being able to  create a DB, both the rights to access the PostgreSQL 
     server and to create a DB must be granted to the user with the following 
