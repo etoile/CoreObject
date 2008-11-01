@@ -156,6 +156,8 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		foundVersion = [self lookUpVersionIfRestorePointAtVersion: restoredVersion];
 	}
 
+	PQclear(result);
+
 	return foundVersion;
 }
 
@@ -213,10 +215,9 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 		//if ([restoredObjectVersions count] == nbOfRegisteredObjects)
 		//	break;
 	}
-	
-	/* Free the query result now the object versions are extracted */
+
 	PQclear(result);
-	
+
 	return restoredObjectVersions;
 }
 
