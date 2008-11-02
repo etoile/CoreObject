@@ -132,7 +132,7 @@ extern NSString *pCOVersion1Value;
                version: (int)aVersion;
 - (void) finishedDeserializing;
 
-/* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
+/* Deprecated (DO NOT USE, MAY BE REMOVED LATER) */
 
 - (NSString *) uniqueID;
 
