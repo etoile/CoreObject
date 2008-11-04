@@ -49,7 +49,8 @@ CoreObject_OBJC_FILES += \
 	TestObjectContext.m \
 	TestMetadataServer.m \
 	TestObjectServer.m \
-	TestGraphRollback.m
+	TestGraphRollback.m \
+	TestProxy.m
 endif
 
 CoreObject_HEADER_FILES_DIR += Headers

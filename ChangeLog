@@ -1,3 +1,36 @@
+2008-11-04 Quentin Mathe <qmathe@club-internet.fr>
+
+	Got COProxy really working. Added proxy-related unit tests. Almost fully 
+	documented the API. Improved COProxy to support introspection, NSObject 
+	methods and explicit declaration of persistency triggers. This last point 
+	makes the persistency a lot safer, otherwise the proxy tends to wrongly 
+	serialize method calls behind you back.
+	Made various adjustements to avoid duplicating documentation accross classes 
+	that implement the COManagedObject protocol.
+	* COObjectContext.m:
+	(-objectByRestoringObject:toVersion: mergeImmediately:): Fixed to handle 
+	the commit of the restored object directly for a COProxy instance, instead 
+	of calling -replaceObject:byObject:collectAllErrors:. This last method 
+	doesn't handle COProxy well yet. 
+	(-snapshotObject:shouldIncrementContextVersion:): Fixed to snapshot the 
+	real object and not the proxy.
+	(-logRecord:objectVersion:timestamp:shouldIncrementContextVersion:): Fixed 
+	to use NSStringFromClass rather than -className which isn't part of NSProxy 
+	protocol.
+	* Headers/NSObject+CoreObject.h:
+	* NSObject+CoreObject.m:
+	* COObject.m: 
+	Reworked documentation by moving up various method documentation into 
+	COManagedObject protocol. Filled holes in the documentation.
+	* Headers/COProxy.h:
+	* COProxy.m: Major rewrite of the implementation to be usable, my first 
+	attempt proved to be a really rough approximation. Added introspection 
+	support on the real object through the proxy. Improved the 
+	handling/forwarding of messages to get the proxy/model combo behaves exactly 
+	as a usual object. Fully documented API.
+	* TestProxy.m: Added.
+	* GNUmakefile: Updated to include TestProxy.m.
+
 2008-10-24 Quentin Mathe <qmathe@club-internet.fr>
 
 	Finished to implement the low-level undo model discussed with Eric. I 

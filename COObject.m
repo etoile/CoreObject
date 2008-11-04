@@ -313,11 +313,15 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 		[self UUID], [self objectVersion]];
 }
 
+/** Returns YES. 
+    See COManagedObject protocol. */
 - (BOOL) isCoreObject
 {
 	return YES;
 }
 
+/** Returns YES
+    See COManagedObject protocol. */
 - (BOOL) isManagedCoreObject
 {
 	return YES;
@@ -434,7 +438,7 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
     so if such a message is sent by another managed object part of the same 
     object context, it won't be recorded (see COObjectContext for a more 
     thorough explanation). 
-    This method plays a no role currently, if we put aside some runtime 
+    This method plays no role currently, if we put aside some runtime 
     reflection that could be eventually done with it. In future, by overriding 
     this method, you will be able to declare which methods should automatically 
     triggers persistency without having to rely on RECORD and END_RECORD macros 
@@ -523,7 +527,7 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	return ([self objectVersion] > -1);
 }
 
-/** Returns the object context that manages the persistency of the receiver. */
+/** See COManagedObject protocol. */
 - (COObjectContext *) objectContext
 {
 	return _objectContext;
@@ -545,11 +549,8 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	_objectVersion = version;
 }
 
-/** Returns the current version of the instance. This version represents a 
-    revision in the object history. 
-    The returned value is comprised between 0 (base version created on first 
-    serialization) and the last object version which can be known by calling 
-    -lastObjectVersion. */
+/** See COManagedObject protocol.
+    The last object version which can be known by calling -lastObjectVersion. */
 - (int) objectVersion
 {
 	return _objectVersion;
@@ -588,23 +589,19 @@ static NSMutableSet *automaticPersistentClasses = nil;
 
 /* Identity */
 
-/** Returns the UUID that is used to uniquely identified the receiver as a core 
-    object. */
+/** See COManagedObject protocol. */
 - (ETUUID *) UUID
 {
 	return AUTORELEASE([[ETUUID alloc] initWithString: [self valueForProperty: kCOUIDProperty]]);
 }
 
-/** Returns a hash based on the UUID. */
+/** See COManagedObject protocol. */
 - (unsigned int) hash
 {
 	return [[self valueForProperty: kCOUIDProperty] hash];
 }
 
-/** Returns whether other is equal to the receiver.
-    Two managed core objects are equal if they share the same UUID and object 
-    version. 
-    See also -isTemporalInstance:. */
+/**  See COManagedObject protocol. */
 - (BOOL) isEqual: (id)other
 {
 	if (other == nil || [other isKindOfClass: [self class]] == NO)
@@ -616,9 +613,7 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	return hasEqualUUID && hasEqualObjectVersion;
 }
 
-/** Returns whether other is a temporal instance of the receiver.
-    Two objects are temporal instances of each other if they share the same 
-    UUID but differs by their object version. */
+/** See COOManagedObject protocol. */
 - (BOOL) isTemporalInstance: (id)other
 {
 	if (other == nil || [other isKindOfClass: [self class]] == NO)

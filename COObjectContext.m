@@ -807,8 +807,20 @@ static COObjectContext *currentObjectContext = nil;
 	if ([restoredObject isKindOfClass: [COGroup class]])
 		[restoredObject setHasFaults: YES];
 
+	// TODO: Simplify by getting rid of the two branches inside the if statement
 	if (mergeNow)
-		[self replaceObject: anObject byObject: restoredObject collectAllErrors: YES];
+	{
+		if ([anObject isCoreObjectProxy])
+		{
+			NSAssert([restoredObject isCoreObjectProxy], @"Restored object must be a proxy if the current object is one");
+			NSAssert(restoredObject == anObject, @"Restored object must be identical to the current object, if the latter one is a proxy");
+			[self commitMergeOfInstance: restoredObject forObject: nil];
+		}
+		else
+		{
+			[self replaceObject: anObject byObject: restoredObject collectAllErrors: YES];
+		}
+	}
 
 	return restoredObject;
 }
@@ -1099,15 +1111,16 @@ static COObjectContext *currentObjectContext = nil;
 - (void) snapshotObject: (id)object shouldIncrementObjectVersion: (BOOL)updateVersion
 {
 	id snapshotSerializer = [self snapshotSerializerForObject: object];
-
+	id realObject = ([object isCoreObjectProxy] ? [object _realObject] : object);
+	
 	if ([object objectVersion] == -1)
 	{
 		// TODO: Serialize right in the object bundle and not in a branch.
-		[snapshotSerializer serializeObject: object withName:@"BaseVersion"];
+		[snapshotSerializer serializeObject: realObject withName:@"BaseVersion"];
 	}
 	else
 	{
-		[snapshotSerializer serializeObject: object withName:@"FullSave"];
+		[snapshotSerializer serializeObject: realObject withName:@"FullSave"];
 	}
 
 	if (updateVersion)
@@ -1131,10 +1144,13 @@ static COObjectContext *currentObjectContext = nil;
 	   version 0. */
 	if (aVersion == 0) /* Insert UUID/URL pair (on first serialization) */
 	{
-		/* Register the object in the metadata server */
+		/* Register the object in the metadata server
+		   NOTE: -[object className] won't work to get the proxy class, in 
+		   future we should pass an UTI-based aggregate type 
+		   { COProxy, RealObjectClass } .*/
 		[[self metadataServer] setURL: url forUUID: [object UUID]
 			withObjectVersion: aVersion 
-			             type: [object className] 
+			             type: NSStringFromClass(object)
 			          isGroup: [object isGroup]
 			        timestamp: [NSDate date]
 			    inContextUUID: [self UUID]];

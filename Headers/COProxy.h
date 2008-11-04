@@ -14,7 +14,7 @@
 
 /**
  * The COProxy class is a simple proxy which is responsible for wrapping a
- * model object being managed by CoreObject.  The object will be serialized as
+ * model object being managed by CoreObject. The object will be serialized as
  * will every message sent to it, allowing deterministic replay of the object's
  * entire lifecycle.
  *
@@ -32,12 +32,24 @@
 	COObjectContext *_objectContext;
 	/* Current version of the real object */
 	int _objectVersion;
+	/* Arrays of selectors for which invocations are recorded */
+	SEL *_persistencySelectors;
+	/* Size of the previous array of selectors */
+	int _persistencySelectorCount;
 }
 
++ (id) proxyWithObject: (id)anObject;
 + (id) proxyWithObject: (id)anObject UUID: (ETUUID *)aUUID;
 
 - (id) initWithObject: (id)anObject UUID: (ETUUID *)aUUID;
 - (id) initWithObject: (id)anObject;
+
+- (NSArray *) persistencyMethodNames;
+- (void) setPersistencyMethodNames: (NSArray *)methodNames;
+- (BOOL) isPersistencySelector: (SEL)aSelector;
+
+- (BOOL) isEqual: (id)other;
+- (BOOL) isTemporalInstance: (id)other;
 
 - (BOOL) isCoreObjectProxy;
 - (BOOL) isManagedCoreObject;

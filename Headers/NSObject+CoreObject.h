@@ -18,13 +18,39 @@
 	CoreObject provides two classes that adopt this protocol COProxy and 
 	COObject related subclasses.*/
 @protocol COManagedObject
+	
+/** Returns the UUID that is used to uniquely identified the receiver as a core 
+    object. */
 - (ETUUID *) UUID;
+
+/** Returns a hash based on the UUID. */
+- (unsigned int) hash;
+
+/** Returns the current version of the instance. This version represents a 
+    revision in the object history. 
+    If the object hasn't yet been made persistent, returns -1.
+    The returned value is otherwise comprised between 0 (base version created on 
+    first serialization) and the last object version. */
 - (int) objectVersion;
+
+/** Returns the object context that manages the persistency of the receiver. */
 - (COObjectContext *) objectContext;
+
+/** Returns whether other is equal to the receiver.
+    Two managed core objects are equal if they share the same UUID and object 
+    version. 
+    See also -isTemporalInstance:. */
+- (BOOL) isEqual: (id)other;
+
+/** Returns whether other is a temporal instance of the receiver.
+    Two objects are temporal instances of each other if they share the same 
+    UUID but differs by their object version. */
+- (BOOL) isTemporalInstance: (id)other;
 
 // TODO: We need to discuss the terminology here and differentiate between 
 // metadatas (or persistent properties) and metadatas to be indexed (or 
-// indexable persistent properties). 
+// indexable persistent properties).
+/** Returns the persistent metadatas to be indexed. */
 - (NSDictionary *) metadatas;
 @end
 
