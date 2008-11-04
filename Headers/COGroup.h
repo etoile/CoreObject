@@ -49,8 +49,8 @@ extern NSString *kCOGroupChild;
 - (BOOL) removeMember: (id)object;
 - (NSArray *) members;
 
-- (BOOL) addGroup: (id <COGroup>)subgroup;
-- (BOOL) removeGroup: (id <COGroup>)subgroup;
+- (BOOL) addGroup: (id <COGroup>)aGroup;
+- (BOOL) removeGroup: (id <COGroup>)aGroup;
 - (NSArray *) groups;
 
 - (NSArray *) allObjects;

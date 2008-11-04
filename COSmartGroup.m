@@ -29,15 +29,15 @@ NSString *kCOPredicateProperty = @"kCOPredicateProperty";
 	[self _updateSmartGroup];
 }
 
-- (void) setPredicate: (NSPredicate *) p
+- (void) setPredicate: (NSPredicate *)aPredicate
 {
-	ASSIGN(predicate, p);
+	ASSIGN(predicate, aPredicate);
 	[self _updateSmartGroup];
 }
 
-- (void) setTarget: (COGroup *) group
+- (void) setTarget: (COGroup *)aGroup
 {
-	ASSIGN(target, group);
+	ASSIGN(target, aGroup);
 	[self _updateSmartGroup];
 }
 

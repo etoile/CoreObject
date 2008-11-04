@@ -262,23 +262,23 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	            [self valueForProperty: kCOGroupSubgroupsProperty]];
 }
 
-- (BOOL) addGroup: (id <COGroup>)group
+- (BOOL) addGroup: (id <COGroup>)aGroup
 {
 	// TODO: Take faults in account
 
 	NSMutableArray *a = [self valueForProperty: kCOGroupSubgroupsProperty];
-	if ([a containsObject: group] == NO)
+	if ([a containsObject: aGroup] == NO)
 	{
 		if (IGNORE_CHANGES || [self isReadOnly])
 			return NO;
 	
-		RECORD(group)
+		RECORD(aGroup)
 
-		[self _addAsParent: group];
-		[a addObject: group];
+		[self _addAsParent: aGroup];
+		[a addObject: aGroup];
 		[_nc postNotificationName: kCOGroupAddObjectNotification
 		     object: self
-		     userInfo: [NSDictionary dictionaryWithObject: group forKey: kCOGroupChild]];
+		     userInfo: [NSDictionary dictionaryWithObject: aGroup forKey: kCOGroupChild]];
 
 		END_RECORD
 
@@ -287,23 +287,23 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return NO;
 }
 
-- (BOOL) removeGroup: (id <COGroup>)group
+- (BOOL) removeGroup: (id <COGroup>)aGroup
 {
 	// TODO: Take faults in account
 
 	NSMutableArray *a = [self valueForProperty: kCOGroupSubgroupsProperty];
-	if ([a containsObject: group] == YES)
+	if ([a containsObject: aGroup] == YES)
 	{
 		if (IGNORE_CHANGES || [self isReadOnly])
 			return NO;
 	
-		RECORD(group)
+		RECORD(aGroup)
 
-		[self _removeAsParent: group];
-		[a removeObject: group];
+		[self _removeAsParent: aGroup];
+		[a removeObject: aGroup];
 		[_nc postNotificationName: kCOGroupRemoveObjectNotification
 		     object: self
-		     userInfo: [NSDictionary dictionaryWithObject: group forKey: kCOGroupChild]];
+		     userInfo: [NSDictionary dictionaryWithObject: aGroup forKey: kCOGroupChild]];
 
 		END_RECORD
 

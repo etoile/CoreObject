@@ -17,7 +17,8 @@ extern NSString *kCOPredicateProperty;
 	NSPredicate *predicate;
 }
 
-- (void) setPredicate: (NSPredicate *) predicate;
-- (void) setTarget: (COGroup *) group; 
+- (void) setPredicate: (NSPredicate *)aPredicate;
+- (void) setTarget: (COGroup *)aGroup;
+
 @end
 
