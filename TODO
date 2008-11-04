@@ -1,0 +1,31 @@
+TODO
+
+## EtoileSerialize ##
+
+- Modify ETObjectStore represents an entire object including the branches and 
+  not just a single branch.
+- Modify ETObjectStore so that it lets us store some metadatas, for 
+  ETObjectBundle an Info.plist along the branch directories would be fine.
+
+
+## CoreObject ##
+
+- Add a deletion model both for object contexts and in-store object 
+  representations.
+- Rewrote as much as possible of COMetadataServer to use SQLClient library 
+  rather than libpq directly.
+- History cleaning without breaking the possibility to restore a context to 
+  a coherent state if the target version is still present in the global history 
+  of the metadata DB.
+- Possibility to create a non-persistent copy of a persistent instance.
+
+## EtoileFoundation ##
+
+- Add split object support that can be leveraged to handle the history of a 
+  single object distinctly depending on whether it is loaded in an editor or 
+  a manager. The editor alters the content (image data, sound data, compound 
+  document structure) and optionally the properties/metadatas when the object 
+  manager only alters the properties/metadatas. For now, CoreObject only 
+  deals with versioning of the properties/metadatas. Take note that many kind 
+  of objects such contacts or bookmarks only consist of properties/metadatas 
+  (without content in a document sense).
