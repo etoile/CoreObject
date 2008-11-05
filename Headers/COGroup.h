@@ -58,7 +58,7 @@ extern NSString *kCOGroupChild;
 
 /* Persistency */
 
-+ (NSArray *) managedMethodNames;
+- (NSArray *) persistencyMethodNames;
 
 /* Object Graph Query */
 

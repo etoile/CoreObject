@@ -102,7 +102,7 @@ extern NSString *pCOVersion1Value;
 //+ (void) setAutomaticallyWakeUpLibraryAndInsertIntoObjectContext: (BOOL)flag;
 //- (COLibrary *) library;
 
-+ (NSArray *) managedMethodNames;
+- (NSArray *) persistencyMethodNames;
 + (BOOL) automaticallyMakeNewInstancesPersistent;
 + (void) setAutomaticallyMakeNewInstancesPersistent: (BOOL)flag;
 - (void) disablePersistency;

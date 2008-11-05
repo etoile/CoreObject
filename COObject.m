@@ -49,22 +49,22 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 
 /* Data Model Declaration */
 
-/** If you want to create a subclass of a CoreObject data model class, you 
+/** <p>If you want to create a subclass of a CoreObject data model class, you 
     should declare the new properties and types of the class by creating a 
     dictionary with types as objects and keys as properties, then calls 
-    +addPropertiesAndTypes: with this dictionary as parameter.
-    Each type must be a NSNumber initialized with one of the type constants 
-    defined in COPropertyType.h. Each property must be a string that uniquely 
-    identify the property by its name, and whose name doesn't collide with a 
+    +addPropertiesAndTypes: with this dictionary as parameter.</p>
+    <p>Each type must be a <code>NSNumber</code> initialized with one of the type constants 
+    defined in <file>COPropertyType.h</file>. Each property must be a string that uniquely 
+    identifies the property by its name, and whose name doesn't collide with a 
     property inherited from superclasses. For properties, you typically declare 
-    your owns as string constants with an identifier name prefixed by 'k' and
-    suffixed by 'Property'. For example, see COObject.h which exposes all 
-    properties of the COObject data model class.
-    When you create a subclass of COObject or some other subclasses such as 
-    COGroup, you  must first call +initalize on your superclass to get all 
+    your owns as string constants with an identifier name prefixed by <em>k</em> and
+    suffixed by <em>Property</em>. For example, see <file>COObject.h</file> which exposes all 
+    properties of the COObject data model class.</p>
+    <p>When you create a subclass of COObject some other subclasses such as 
+    <ref type="class" id="COGroup">COGroup</ref>, you  must first call +initialize on your superclass to get all 
     inherited properties and types registered for your subclass. This only holds 
     for the GNU runtime though, and may change in future if CoreObject was 
-    ported to another runtime. */
+    ported to another runtime.</p> */
 + (void) initialize
 {
 	NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
@@ -85,9 +85,9 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	DESTROY(pt);
 }
 
-/** Declares new properties for the data model associated with this class. 
-    The property declaration is a list of property type keyed by property 
-    names. */
+/** <p>Declares new properties for the data model associated with this class.</p>
+    <p>The property declaration is a list of property type keyed by property 
+    names.</p> */
 + (int) addPropertiesAndTypes: (NSDictionary *) properties
 {
 	if (propertyTypes == nil)
@@ -114,20 +114,20 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	return count;
 }
 
-/** Returns the property types keyed by property names for the data model 
+/** <p>Returns the property types keyed by property names for the data model 
     that has been declared for this class, by calling 
     +addPropertiesAndTypes: and +removeProperties: either on this class or a 
-    superclass.
-    The data model includes the properties declared either on this class or 
-    inherited from a superclass (see +initialize).*/
+    superclass.</p>
+    <p>The data model includes the properties declared either on this class or 
+    inherited from a superclass, see +initialize.</p> */
 + (NSDictionary *) propertiesAndTypes
 {
 	return [propertyTypes objectForKey: NSStringFromClass([self class])];
 }
 
-/** Returns the property names of the data model declared for this class. 
-    The data model includes the properties declared either on this class or 
-    inherited from a superclass (see +initialize). */
+/** <p>Returns the property names of the data model declared for this class.</p>
+    <p>The data model includes the properties declared either on this class or 
+    inherited from a superclass, see +initialize.</p> */
 + (NSArray *) properties
 {
 	if (propertyTypes == nil)
@@ -140,12 +140,12 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	return [dict allKeys];
 }
 
-/** Removes declared properties (type/name pairs) from the data model, that 
-    matches a property name from properties array.
-    The data model includes the properties declared either on this class or 
-    inherited from a superclass (see +initialize).
-    Removing a property that is inherited from a superclass, won't remove it 
-    in the superclass data model, but only from the receiver class data model. */
+/** <p>Removes declared properties (type/name pairs) from the data model, that 
+    match a property name from properties array.</p>
+    <p>The data model includes the properties declared either on this class or 
+    inherited from a superclass, see +initialize.</p>
+    <p>Removing a property that is inherited from a superclass, won't remove it 
+    in the superclass data model, but only from the receiver class data model.</p> */
 + (int) removeProperties: (NSArray *) properties
 {
 	if (propertyTypes == nil)
@@ -170,10 +170,10 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	return count;
 }
 
-/** Returns the type of a property declared in the data model for the given 
-    property name.
-    The data model includes the properties declared either on this class or 
-    inherited from a superclass (see +initialize).*/
+/** <p>Returns the type of a property declared in the data model for the given 
+    property name.</p>
+    <p>The data model includes the properties declared either on this class or 
+    inherited from a superclass, see +initialize.</p> */
 + (COPropertyType) typeOfProperty: (NSString *) property
 {
 	if (propertyTypes == nil)
@@ -194,7 +194,8 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 
 /* Factory Method */
 
-/** Returns a core object graph by importing propertyList. */
+/** <p>Returns a core object graph by importing propertyList.</p>
+    <p>See -initWithPropertyList:.</p> */
 + (id) objectWithPropertyList: (NSDictionary *) propertyList
 {
 	id object = nil;
@@ -209,7 +210,7 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 
 /* Property List Import/Export */
 
-/** <init /> **/
+/** <p></p> */
 - (id) initWithPropertyList: (NSDictionary *) propertyList
 {
 	self = [self init];
@@ -235,11 +236,11 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	return self;
 }
 
-/** Returns the receiver data model as a property list.
-    You can use this method for exporting and -initWithPropertyList: as the 
-    symetric method for importing. 
-    If you want to export an object graph rather than a single object, use 
-    -[COGroup propertyList].*/
+/** <p>Returns the receiver data model as a property list.</p>
+    <p>You can use this method for exporting and -initWithPropertyList: as the 
+    symetric method for importing.</p>
+    <p>If you want to export an object graph rather than a single object, use 
+    -[COGroup propertyList].</p> */
 - (NSMutableDictionary *) propertyList
 {
 	return [self _outputObjectVersion1];
@@ -247,6 +248,7 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 
 /* Common Methods */
 
+/** <init /><p></p> */
 - (id) init
 {
 	self = [super init];
@@ -275,6 +277,7 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	return self;
 }
 
+/** <p></p> */
 - (BOOL) tryStartPersistencyIfInstanceOfClass: (Class)aClass
 {
 	BOOL isNotSubclassInstance = [self isMemberOfClass: aClass];
@@ -313,15 +316,13 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 		[self UUID], [self objectVersion]];
 }
 
-/** Returns YES. 
-    See COManagedObject protocol. */
+/** <p>Returns YES. See COManagedObject protocol.</p> */
 - (BOOL) isCoreObject
 {
 	return YES;
 }
 
-/** Returns YES
-    See COManagedObject protocol. */
+/** <p>Returns YES. See COManagedObject protocol.</p> */
 - (BOOL) isManagedCoreObject
 {
 	return YES;
@@ -340,14 +341,15 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 
 /* Managed Object Edition */
 
-/** Returns the properties published by the receiver and accessible through 
-	Property Value Coding. The returned array includes the properties inherited 
-	from the superclass too (see -[NSObject properties]). */
+/** <p>Returns the properties published by the receiver and accessible through 
+    <em>Property Value Coding</em>. The returned array includes the properties 
+    inherited from the superclass too, see -[NSObject properties].</p> */
 - (NSArray *) properties
 {
 	return [[super properties] arrayByAddingObjectsFromArray: [[self class] properties]];
 }
 
+/** <p></p> */
 - (BOOL) removeValueForProperty: (NSString *) property
 {
 	if (IGNORE_CHANGES || [self isReadOnly])
@@ -365,6 +367,7 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	return YES;
 }
 
+/** <p></p> */
 - (BOOL) setValue: (id) value forProperty: (NSString *) property
 {
 	if (IGNORE_CHANGES || [self isReadOnly])
@@ -383,11 +386,11 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	return YES;
 }
 
-/** Returns the value identified by property. If the property doesn't exist,
-    returns nil.
-    First try to find the property in the receiver data model. If no property is 
-    found, try to find it in the properties inherited from the superclass. 
-    Take note that COObject only inherits properties from NSObject. */
+/** <p>Returns the value identified by property. If the property doesn't exist,
+    returns nil.</p>
+    <p>First try to find the property in the receiver data model. If no property is 
+    found, try to find it in the properties inherited from the superclass.</p>
+    <p>Take note that COObject only inherits properties from <code>NSObject</code>.</p> */
 - (id) valueForProperty: (NSString *) property
 {
 	id value = [_properties objectForKey: property];
@@ -399,6 +402,7 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 	return value;
 }
 
+/** <p></p> */
 - (NSArray *) parentGroups
 {
     NSMutableSet *set = AUTORELEASE([[NSMutableSet alloc] init]);
@@ -416,14 +420,14 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
     return [set allObjects];
 }
 
-/** Returns whether the receiver is in read-only mode. */
+/** <p>Returns whether the receiver is in read-only mode.</p> */
 - (BOOL) isReadOnly
 {	
 	return ([[self valueForProperty: kCOReadOnlyProperty] intValue] == 1);
 }
 
-/** Returns the version of the object format, plays a role similar to class 
-    versioning provided by +[NSObject version]. */
+/** <p>Returns the version of the object format, plays a role similar to class 
+    versioning provided by +[NSObject version].</p> */
 - (int) version
 {
 	return [(NSNumber *)[self valueForProperty: kCOVersionProperty] intValue];
@@ -431,19 +435,19 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 
 /* Persistency */
 
-/** Returns an array of all selectors names whose methods calls can trigger
+/** <p>Returns an array of all selectors names whose methods calls can trigger
     persistency, by handing an invocation to the object context which can in  
-    turn record it and snapshot the receiver if necessary.
-    All messages which are managed method calls are persisted only if necessary, 
+    turn record it and snapshot the receiver if necessary.</p>
+    <p>All messages which are persistency method calls are persisted only if necessary, 
     so if such a message is sent by another managed object part of the same 
     object context, it won't be recorded (see COObjectContext for a more 
-    thorough explanation). 
-    This method plays no role currently, if we put aside some runtime 
+    thorough explanation).</p>
+    <p>This method plays no role currently, if we put aside some runtime 
     reflection that could be eventually done with it. In future, by overriding 
     this method, you will be able to declare which methods should automatically 
-    triggers persistency without having to rely on RECORD and END_RECORD macros 
-    in your method body. */
-+ (NSArray *) managedMethodNames
+    trigger persistency without having to rely on RECORD and END_RECORD macros 
+    in your method body.</p> */
+- (NSArray *) persistencyMethodNames
 {
 	return A(NSStringFromSelector(@selector(setValue:forProperty:)),
 	         NSStringFromSelector(@selector(removeValueForProperty:)));
@@ -451,18 +455,19 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 
 static NSMutableSet *automaticPersistentClasses = nil;
 
-/** Returns whether the instances, that are member of this specific class, are 
-    made persistent when they are initialized. */
+/** <p>Returns whether the instances, that are members of this specific class, are 
+    made persistent when they are initialized.</p>
+    <p>Returns NO by default, but this is subject to change in future.</p> */
 + (BOOL) automaticallyMakeNewInstancesPersistent
 {
 	return [automaticPersistentClasses containsObject: self];
 }
 
-/** Sets whether the instances, that are member of this specific class, are 
-    made persistent when they are initialized. 
-    An instance becomes persistent by registering it in an object context and 
+/** <p>Sets whether the instances, that are members of this specific class, are 
+    made persistent when they are initialized.</p>
+    <p>An instance becomes persistent by registering it in an object context and 
     sending it -enablePersistency. See -tryStartPersistencyIfInstanceOfClass: 
-    to do so. */
+    to do so.</p> */
 + (void) setAutomaticallyMakeNewInstancesPersistent: (BOOL)flag
 {
 	if (automaticPersistentClasses == nil)
@@ -478,14 +483,14 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	}
 }
 
-/** Allows to temporarily disable persistency for the receiver. 
-    All managed method calls will not result in any recorded invocations or 
-    snapshots.
-    A very common usage of this method is to avoid the recording of a large 
+/** <p>Allows to temporarily disable persistency for the receiver. 
+    All persistency method calls will not result in any recorded invocations or 
+    snapshots.</p>
+    <p>A very common usage of this method is to avoid the recording of a large 
     number of messages and only take a snapshot by calling -save once done, 
-    then returning to normal with -enablePersistency.
-    An object will continue to return YES for -isPersistent, even if 
-   -disablePersistency has been called. */
+    then returning to normal with -enablePersistency.</p>
+    <p>An object will continue to return YES for -isPersistent, even if 
+   -disablePersistency has been called.</p> */
 - (void) disablePersistency
 {
 	if ([self objectContext] == nil)
@@ -504,8 +509,8 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	_isPersistencyEnabled = NO;
 }
 
-/** Allows to restore persistency for the receiver, if it is presently
-    disabled. See -disablePersistency. */
+/** <p>Allows to restore persistency for the receiver, if it is presently
+    disabled. See -disablePersistency.</p> */
 - (void) enablePersistency
 {
 	if ([self objectContext] == nil)
@@ -517,17 +522,18 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	_isPersistencyEnabled = YES;
 }
 
-/** Returns whether the receiver has been turned into a persistent object. 
-    Once an object has become persistent, it will remain so until it got 
-    fully destroyed:
-    - deallocated in memory
-    - deleted on-disk */
+/** <p>Returns whether the receiver has been turned into a persistent object.</p>
+    <p>Once an object has become persistent, it will remain so until it got 
+    fully destroyed:</p>
+    <list>
+    <item>deallocated in memory</item>
+    <item>deleted on-disk</item></list> */
 - (BOOL) isPersistent
 {
 	return ([self objectVersion] > -1);
 }
 
-/** See COManagedObject protocol. */
+/** <p>See COManagedObject protocol.</p> */
 - (COObjectContext *) objectContext
 {
 	return _objectContext;
@@ -549,16 +555,16 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	_objectVersion = version;
 }
 
-/** See COManagedObject protocol.
-    The last object version which can be known by calling -lastObjectVersion. */
+/** <p>See COManagedObject protocol.</p>
+    <p>The last object version which can be known by calling -lastObjectVersion.</p> */
 - (int) objectVersion
 {
 	return _objectVersion;
 }
 
-/** API only used for replacing an existing object by a past temporal in the 
-    managed object graph. See COObjectContext. 
-    WARNING: May be removed later. */
+/** <p>API only used for replacing an existing object by a past temporal in the 
+    managed object graph. See COObjectContext.</p>
+    <p><strong>WARNING: May be removed later.</strong></p> */
 - (int) lastObjectVersion
 {
 	ETDebugLog(@"Requested last object version, found %d in %@", 
@@ -577,9 +583,9 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	// instances anymore.
 }
 
-/** Saves the receiver by asking the object context to make a new snapshot.
-    If the save succeeds, returns YES. If the save fails, NO is returned and 
-    the object version isn't touched. */
+/** <p>Saves the receiver by asking the object context to make a new snapshot.</p>
+    <p>If the save succeeds, returns YES. If the save fails, NO is returned and 
+    the object version isn't touched.</p> */
 - (BOOL) save
 {
 	int prevVersion = [self objectVersion];
@@ -589,19 +595,19 @@ static NSMutableSet *automaticPersistentClasses = nil;
 
 /* Identity */
 
-/** See COManagedObject protocol. */
+/** <p>See COManagedObject protocol.</p> */
 - (ETUUID *) UUID
 {
 	return AUTORELEASE([[ETUUID alloc] initWithString: [self valueForProperty: kCOUIDProperty]]);
 }
 
-/** See COManagedObject protocol. */
+/** <p>See COManagedObject protocol.</p> */
 - (unsigned int) hash
 {
 	return [[self valueForProperty: kCOUIDProperty] hash];
 }
 
-/**  See COManagedObject protocol. */
+/**  <p>See COManagedObject protocol.</p> */
 - (BOOL) isEqual: (id)other
 {
 	if (other == nil || [other isKindOfClass: [self class]] == NO)
@@ -613,7 +619,7 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	return hasEqualUUID && hasEqualObjectVersion;
 }
 
-/** See COOManagedObject protocol. */
+/** <p>See COOManagedObject protocol.</p> */
 - (BOOL) isTemporalInstance: (id)other
 {
 	if (other == nil || [other isKindOfClass: [self class]] == NO)
@@ -627,7 +633,7 @@ static NSMutableSet *automaticPersistentClasses = nil;
 
 /* Query */
 
-/** See COObject protocol. */
+/** <p>See COObject protocol.</p> */
 - (BOOL) matchesPredicate: (NSPredicate *)aPredicate
 {
 	BOOL result = NO;
@@ -723,8 +729,8 @@ static NSMutableSet *automaticPersistentClasses = nil;
 
 /* Serialization (EtoileSerialize) */
 
-/** If you override this method, you must call superclass implemention before 
-    your own code. */
+/** <p>If you override this method, you must call superclass implemention before 
+    your own code.</p> */
 - (BOOL) serialize: (char *)aVariable using: (ETSerializer *)aSerializer
 {
 	//ETDebugLog(@"Try serialize %s in %@", aVariable, self);
@@ -769,8 +775,8 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	return NO; /* Serializer handles the ivar */
 }
 
-/** If you override this method, you must call superclass implemention before 
-    your own code. */
+/** <p>If you override this method, you must call superclass implemention before 
+    your own code.</p> */
 - (void *) deserialize: (char *)aVariable 
            fromPointer: (void *)aBlob 
                version: (int)aVersion
@@ -783,8 +789,8 @@ static NSMutableSet *automaticPersistentClasses = nil;
 // TODO: If we can get the deserializer in parameter, the need to call 
 // -_setObjectVersion: in delta or snapshot deserialization methods might 
 // eventually be eliminated.
-/** If you override this method, you must call superclass implemention before 
-    your own code. */
+/** <p>If you override this method, you must call superclass implemention before 
+    your own code.</p> */
 - (void) finishedDeserializing
 {
 	ETDebugLog(@"Finished deserializing of %@", self);
@@ -819,13 +825,13 @@ static NSMutableSet *automaticPersistentClasses = nil;
 
 /* KVC */
 
-/** Returns the value identified by key. 
-    The returned value is identical to -valueForProperty:, except that it 
+/** <p>Returns the value identified by key.</p>
+    <p>The returned value is identical to -valueForProperty:, except that it 
     returns the text content if you pass qCOTextContent as key. This addition 
-    is used by -matchesPredicate:.
-    For now, this method returns nil for an undefined key and doesn't raise an 
+    is used by -matchesPredicate:.</p>
+    <p>For now, this method returns nil for an undefined key and doesn't raise an 
     exception by calling -valueForUndefinedKey:, however this is subject to 
-    change.*/
+    change.</p> */
 - (id) valueForKey: (NSString *) key
 {
 	/* Intercept query property */
@@ -836,7 +842,7 @@ static NSMutableSet *automaticPersistentClasses = nil;
 	return [self valueForProperty: key];
 }
 
-/** Returns the value for the given key path. See -valueForKey:. */
+/** <p>Returns the value for the given key path. See -valueForKey:.</p> */
 - (id) valueForKeyPath: (NSString *) key
 {
 	/* Intercept query property */

@@ -354,14 +354,14 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 /* Persistency */
 
-+ (NSArray *) managedMethodNames
+- (NSArray *) persistencyMethodNames
 {
 	NSArray *methodNames = A(NSStringFromSelector(@selector(addMember:)),
 	                         NSStringFromSelector(@selector(removeMember:)),
 	                         NSStringFromSelector(@selector(addGroup:)),
 	                         NSStringFromSelector(@selector(removeGroup:)));
 
-	return [methodNames arrayByAddingObjectsFromArray: [super managedMethodNames]];
+	return [methodNames arrayByAddingObjectsFromArray: [super persistencyMethodNames]];
 }
 
 /* Object Graph Query */
