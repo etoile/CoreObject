@@ -1,0 +1,68 @@
+==================
+CoreObject INSTALL
+==================
+
+Required software
+-----------------
+
+You need to have the GNUstep core libraries installed in order to compile and 
+use CoreObject. The core packages are, at a minimum:
+
+   * gnustep-make
+
+   * gnustep-base
+
+See <http://www.gnustep.org/> for further information.
+
+You also need to have PostgreSQL and libpq library installed:
+
+    * PostgreSQL
+
+    * libpq
+
+See <http://www.postgresql.org/> for further information.
+
+Finally you need from Etoile itself:
+
+   * EtoileFoundation, which can be found in Etoile/Frameworks/EtoileFoundation
+
+   * EtoileSerialize, which can be found in Etoile/Frameworks/EtoileSerialize
+
+These last two dependencies are automatically handled when CoreObject is built 
+by running 'make' tool in Frameworks or any other parent directories.
+
+
+Notation
+--------
+
+In the following document, square brackets "[ ]" are used to indicate optional 
+parameters.
+
+
+Build and Install
+-----------------
+
+   Steps to build and install:
+
+   * make
+
+   * [[sudo] -E] make install
+
+   * ./setup-coreobject.sh
+
+
+Uninstall
+---------
+
+   Steps to uninstall:
+
+   * [sudo [-E]] make uninstall
+
+   * ./uninstall-coreobject.sh
+
+
+Trouble
+-------
+
+Give us feedback! Tell us what you like; tell us what you think could be better. 
+Send bug reports and patches to <etoile-track@gna.org>.
