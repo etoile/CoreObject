@@ -145,7 +145,7 @@
 	NSArray *manyNames = A(@"A", @"B", @"C", @"D", @"E", @"F", @"I", @"G", @"H");
 
 	//ETLog(@"UUID is %@ for %@ at URL %@ ", [object UUID], object, [ctxt serializationURLForObject: object]);
-	UKIntsEqual(-1, [ctxt lastVersionOfObject: object]);
+	UKIntsEqual(0, [ctxt lastVersionOfObject: object]);
 
 	/* This first recorded invocation results in a snapshot with version 0, 
        immediately followed by an invocation record with version 1. */

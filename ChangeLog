@@ -1,3 +1,14 @@
+2008-11-12 Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/COObjectServer.h:
+	* COObjectServer.m: 
+	(-lastVersionOfObjectWithURL:): Moved existing code into the next method 
+	and rewritten this one to take in account the possibility to have a last 
+	version that is a snapshot without an associated delta.
+	(-lastDeltaVersionOfObjectWithURL:): Added.
+	* TestObjectContext.m (-testLatestVersion): Updated to match the new 
+	expectations
+
 2008-11-04 Quentin Mathe <qmathe@club-internet.fr>
 
 	Got COProxy really working. Added proxy-related unit tests. Almost fully 

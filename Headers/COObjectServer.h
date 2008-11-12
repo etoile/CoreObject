@@ -114,6 +114,7 @@
 /* Querying Object Version (to be moved to COSerializer and ETObjectSerialStore) */
 
 - (int) lastVersionOfObjectWithURL: (NSURL *)anURL;
+- (int) lastDeltaVersionOfObjectWithURL: (NSURL *)anURL;
 - (int) lastSnapshotVersionOfObjectWithURL: (NSURL *)anURL;
 - (int) lastSnapshotVersionOfObjectWithURL: (NSURL *)anURL forVersion: (int)targetVersion;
 
