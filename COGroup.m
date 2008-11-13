@@ -452,7 +452,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 		FOREACHI(subgroups, aChildGroup)
 		{
 			if ([anObject isTemporalInstance: aChildGroup])
-				return YES;;
+				return YES;
 		}
 	}
 	else
@@ -572,8 +572,31 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 - (void) mergeObjectsWithObjectsOfGroup: (COGroup *)aGroup 
                                  policy: (COChildrenMergePolicy)aPolicy
 {
-	[self resolveFaults];
-	[aGroup resolveFaults];
+	// FIXME: This doesn't work well if 'self' is a temporal instance, 
+	 // [self objectContext] returns nil when we got called indirectly by 
+	// -replaceObject:byObject:collectAllErrors:. 
+	// The instances are swapped in the context right after we return. Hence 
+	// moving -tryMergeRelationshipsOfObject:intoInstance: to follow 
+	// unregister/register is useless, because aGroup will now miss a context.
+	// See also the warnings logged by -resolveFaults.
+	// Until a better approach is worked out, a hack has been added to 
+	// -[COObjectContext replaceObject:byObject:collectAllErrors:]. 
+	// Working approaches could be to turn all members into faults for the merge, 
+	// or extend NSSet in a way or antoher so that it treats a UUID and the 
+	// object bound to it as equal.
+	// Moreover triggering fault resolution here can lead to the same effect 
+	// than -replaceObject:byObject:... -resolveFaults may load a group with 
+	// a UUID reference on self/aGroup, but aGroup is still the cached object, 
+	// so -lookUpObjectForUUID: will resolve it wrongly to aGroup rather than 
+	// self. The same arises if self/aGroup holds an unresolved reference on itself.
+
+	// HACK: Don't resolve if we are restoring the context especially, but 
+	// do it in -[COObjectContext replaceObject:byObject:...]
+	if ([self isTemporalInstance: aGroup] == NO)
+	{
+		[self resolveFaults];
+		[aGroup resolveFaults];
+	}
 
 	[self mergeArray: [aGroup valueForProperty: kCOGroupChildrenProperty]
 	       intoArray: [self valueForProperty: kCOGroupChildrenProperty]
@@ -670,12 +693,16 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 		if ([anObject isFault] == NO)
 			continue;
 
+		if ([self objectContext] == nil)
+			ETLog(@"WARNING: Trying to resolve fault with a nil context");
+
 		resolvedObject = [[self objectContext] resolvedObjectForFault: anObject];
 
 		if (resolvedObject == nil)
 		{
 			resolvedAllFaults = NO;
-			ETLog(@"NOTE: No object available for UUID %@", anObject);
+			ETLog(@"Failed to resolve object %@, the object might not be "
+				   "available in store or referenced in the metadata DB", anObject);
 			continue;
 		}
 
