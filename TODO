@@ -6,6 +6,10 @@ TODO
   not just a single branch.
 - Modify ETObjectStore so that it lets us store some metadatas, for 
   ETObjectBundle an Info.plist along the branch directories would be fine.
+- Better error reporting for nil or invalid URL at deserialization time, instead 
+  of File NSMapTable.m: 364. In NSMapGet Nul table argument supplied
+  See also -testResolveFaults in TestGroup.m and -objectWithURL:version: 
+  (currently in COObjectServer).
 
 
 ## CoreObject ##

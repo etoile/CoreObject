@@ -336,6 +336,10 @@
 	[gChildren addObject: o4];
 	[gChildren addObject: [ETUUID UUID]];
 
+	/* o3 and [ETUUID UUID] for which no object exists will result in a warning 
+	   being logged each time -resolveFaults is called, and also the following 
+	   deserialization failure:
+	   File NSMapTable.m: 364. In NSMapGet Nul table argument supplied */
 	[g resolveFaults];
 
 	NSArray *childObjects = [g valueForProperty: kCOGroupChildrenProperty];
