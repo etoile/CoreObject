@@ -44,6 +44,7 @@
 	COGroup *group;
 	COGroup *group2;
 	COGroup *group3;
+	int memorizedVersions[5];
 }
 - (void) setUpTestGraph;
 @end
@@ -69,6 +70,9 @@
 	return self;
 }
 
+/* Object version tuples:
+   - { 0, 0, 0, 2, 4, 0 } at v12
+   - { 2, 0, 0, 4, 5, 0 } at v17 */
 - (void) setUpTestGraph
 {
 	// context v0
@@ -117,8 +121,22 @@
 	return [[CTXT objectServer] cachedObjectForUUID: [anObject UUID]];
 }
 
-- (void) checkRolledbackObjectsAtVersion4: (int)increment
+- (void) memorizeCurrentInstanceVersions
 {
+	memorizedVersions[0] = [[self currentInstance: object] objectVersion];
+	memorizedVersions[1] = [[self currentInstance: object2] objectVersion];
+	memorizedVersions[2] = [[self currentInstance: object3] objectVersion];
+	memorizedVersions[3] = [[self currentInstance: group] objectVersion];
+	memorizedVersions[4] = [[self currentInstance: group2] objectVersion];
+	memorizedVersions[5] = [[self currentInstance: group3] objectVersion];
+}
+
+- (void) checkRestoredObjectsAtVersion4: (int *)increments
+{
+	// NOTE: If REAL_RESTORE_POINT_TRAVERSAL isn't defined in 
+	// COObjectContext(GraphRollback), the next four tests can fail if you 
+	// restore from a version for which these objects are loaded, see the 
+	// comment for the aforementioned macro explains why...
 	UKNil([self currentInstance: group2]);
 	UKNil([self currentInstance: group3]);
 	UKIntsEqual(4, [[CTXT registeredObjects] count]);
@@ -128,13 +146,13 @@
 	id newObject = [self currentInstance: object];
 
 	UKTrue([newObject isTemporalInstance: object]);
-	UKIntsEqual([object objectVersion] + increment, [newObject objectVersion]);
+	UKIntsEqual(memorizedVersions[0] + increments[0], [newObject objectVersion]);
 	UKStringsEqual(@"Nobody", [newObject valueForProperty: @"whoami"]);
 	UKObjectsEqual(A(@"New York"), [newObject valueForProperty: @"otherObjects"]);
 
 	id newGroup = [self currentInstance: group];
 
-	UKIntsEqual([group objectVersion] + increment, [newGroup objectVersion]);
+	UKIntsEqual(memorizedVersions[3] + increments[3], [newGroup objectVersion]);
 	UKNil([newGroup valueForProperty: kCOGroupNameProperty]);
 	UKTrue([[newGroup valueForProperty: kCOGroupChildrenProperty] isEmpty]);
 	UKTrue([[newGroup valueForProperty: kCOGroupSubgroupsProperty] isEmpty]);
@@ -232,6 +250,48 @@
 	UKObjectsEqual(A(@"New York", @"Minneapolis", @"London"), [newObject2 valueForProperty: @"otherObjects"]);
 }
 
+- (void) checkRestoredObjectsForAlter: (int *)increments
+{
+	UKIntsEqual(6, [[CTXT registeredObjects] count]);
+	UKIntsEqual(6, [[[CTXT objectServer] cachedObjects] count]);
+
+	/* Merged instance has replaced the existing instance in the core object cache */
+	id newObject = [self currentInstance: object];
+	id newObject2 = [self currentInstance: object2];
+	id newObject3 = [self currentInstance: object3];
+
+	UKIntsEqual(memorizedVersions[0] + increments[0], [newObject objectVersion]);
+	UKStringsEqual(@"Nobody", [newObject valueForProperty: @"whoami"]);
+	UKObjectsEqual(A(@"New York"), [newObject valueForProperty: @"otherObjects"]);
+
+	UKIntsEqual(memorizedVersions[1] + increments[1], [newObject2 objectVersion]);
+	UKStringsEqual(@"anyone", [newObject2 valueForProperty: @"whoami"]);
+	UKObjectsEqual(A(@"New York"), [newObject2 valueForProperty: @"otherObjects"]);
+
+	UKIntsEqual(memorizedVersions[2] + increments[2], [newObject3 objectVersion]);
+	UKStringsEqual(@"Nobody", [newObject3 valueForProperty: @"whoami"]);
+	UKObjectsEqual(A(@"New York"), [newObject3 valueForProperty: @"otherObjects"]);
+
+	id newGroup = [self currentInstance: group];
+	id newGroup2 = [self currentInstance: group2];
+	id newGroup3 = [self currentInstance: group3];
+
+	UKIntsEqual(memorizedVersions[3] + increments[3], [newGroup objectVersion]);
+	UKNil([newGroup valueForProperty: kCOGroupNameProperty]);
+	UKTrue([[newGroup valueForProperty: kCOGroupChildrenProperty] isEmpty]);
+	UKObjectsEqual(A(newGroup2, newGroup3), [newGroup valueForProperty: kCOGroupSubgroupsProperty]);
+
+	UKIntsEqual(memorizedVersions[4] + increments[4], [newGroup2 objectVersion]);
+	UKStringsEqual(@"tulip", [newGroup2 valueForProperty: kCOGroupNameProperty]);
+	UKObjectsEqual(A(newObject2), [newGroup2 valueForProperty: kCOGroupChildrenProperty]);
+	UKTrue([[newGroup2 valueForProperty: kCOGroupSubgroupsProperty] isEmpty]);	
+
+	UKIntsEqual(memorizedVersions[5] + increments[5], [newGroup3 objectVersion]);
+	UKStringsEqual(@"zzz", [newGroup3 valueForProperty: kCOGroupNameProperty]);
+	UKObjectsEqual(A(newObject3), [newGroup3 valueForProperty: kCOGroupChildrenProperty]);
+	UKTrue([[newGroup3 valueForProperty: kCOGroupSubgroupsProperty] isEmpty]);
+}
+
 - (void) testContextRollbackTo17
 {
 	int lastVersion = 17;
@@ -292,9 +352,11 @@
 
 	/* More rollbacks */
 
+	[self memorizeCurrentInstanceVersions];
 	[CTXT restoreToVersion: 4];
 	UKIntsEqual(lastVersion + 2, [CTXT version]);
-	[self checkRolledbackObjectsAtVersion4: 2];
+	int objectVersionIncrements[] = { 1, 0, 0, 1, 0, 0 };
+	[self checkRestoredObjectsAtVersion4: objectVersionIncrements];
 
 	[CTXT restoreToVersion: 16];
 	/* We move forward in time, every objects created after v4 must be loaded 
@@ -303,15 +365,111 @@
 	UKIntsEqual(lastVersion + 3, [CTXT version]);
 	/* See -checkRolledbackObjectsAtVersion16:invalidatedObjects: for 
 	   explanations about invalidated objects */
-	int objectVersionIncrements[] = { 3, 0, 0, 3, 2, 0 };
-	[self checkRolledbackObjectsAtVersion16: objectVersionIncrements
+	int objectVersionIncrements2[] = { 3, 0, 0, 3, 2, 0 };
+	[self checkRolledbackObjectsAtVersion16: objectVersionIncrements2
 	                     invalidatedObjects: A(object, group, group2)];
 
+	[self memorizeCurrentInstanceVersions];
 	[CTXT restoreToVersion: 19];
 	UKIntsEqual(lastVersion + 4, [CTXT version]);
-	[self checkRolledbackObjectsAtVersion4: 4];
+	int objectVersionIncrements3[] = { 1, 0, 0, 1, 0, 0 };
+	/* Will fail if REAL_RESTORE_POINT_TRAVERSAL isn't defined, see 
+	   -checkRestoredObjectsAtVersion4: */
+	[self checkRestoredObjectsAtVersion4: objectVersionIncrements3];
 
 	DESTROY(contextUUID);
+}
+
+/* Changes to be applied after restoring the context to version 12.
+   Returns the number of changes (the context version increment).
+   Object version increments: { 0, 1, 0, 2, 0, 2 } */
+- (int) alterCurrentObjectGraph
+{
+	[[self currentInstance: object2] setValue: @"anyone" forProperty: @"whoami"];
+	[[self currentInstance: group3] setValue: @"zzz" forProperty: kCOGroupNameProperty];
+	[[self currentInstance: group] removeMember: [self currentInstance: object]];
+	[[self currentInstance: group3] addMember: [self currentInstance: object3]];
+	[[self currentInstance: group] addGroup: [self currentInstance: group3]];
+
+	return 5;
+}
+
+/* Not yet used */
+- (void) alterCurrentObjectGraphMore
+{
+	[object setValue: A([NSNumber numberWithInt: 5]) forProperty: @"otherObjects"];
+	[group3 addGroup: group]; // cyclic structure	
+}
+
+- (void) testRestoreFollowingRestoreAndChanges
+{
+	int lastVersion = 17;
+
+	[CTXT restoreToVersion: 12];
+	UKIntsEqual(lastVersion + 1, [CTXT version]);
+	[self checkRolledbackObjectsAtVersion12];
+
+	[self memorizeCurrentInstanceVersions];
+	int nbOfChanges = [self alterCurrentObjectGraph];
+	int alterVersion = lastVersion + 1 + nbOfChanges;
+	UKIntsEqual(alterVersion, [CTXT version]);
+
+	/* Object version tuple right after restore to v12:
+	       -setUpTestGraph at v17  { 2, 0, 0, 4, 5, 0 }
+	       -setUpTestGraph at v12  { 0, 0, 0, 2, 4, 0 }
+	    -> -restoreToVersion: 12   { 3, 0, 0, 5, 6, 0 }
+
+	    The -> operator means increments each version listed on the first line 
+	    if the corresponding version on the second line is different.
+
+        Object version tuple at this point:
+	     -restoreToVersion: 12     { 3, 0, 0, 5, 6, 0 }
+	   + -alterCurrentObjectGraph  { 0, 1, 0, 2, 0, 2 } (delta)
+	                               { 3, 1, 0, 7, 6, 2 }
+
+	   Increment tuple at this point as a delta against v17:
+	     -restoreToVersion: 12     { 1, 0, 0, 1, 1, 0 } (delta)
+	   + -alterCurrentObjectGraph  { 0, 1, 0, 2, 0, 2 } (delta)
+	                               { 1, 1, 0, 3, 1, 2 } (delta)
+	
+	   Presently we only need the increment tuple against v18 (restored v12) 
+	   which is simply -alterCurrentObjectGraph  { 0, 1, 0, 2, 0, 2 } (delta) */
+	int objectVersionIncrements[] = { 0, 1, 0, 2, 0, 2 };
+	[self checkRestoredObjectsForAlter: objectVersionIncrements];
+
+	[self memorizeCurrentInstanceVersions];
+	[CTXT restoreToVersion: 4];
+
+	/* Object version tuple right after this restore to v4:
+	         -alterCurrentObjectGraph  { 3, 1, 0, 7, 6, 2 }
+	       + -restoreToVersion: 4      { 1, 1, 0, 1, 0, 0 } (delta)
+	                                   { 4, 2, 0, 8, 6, 2 } */
+	int objectVersionIncrements2[] = { 1, 1, 0, 1, 0, 0 };
+	[self checkRestoredObjectsAtVersion4: objectVersionIncrements2];
+
+	[self memorizeCurrentInstanceVersions];
+	[CTXT restoreToVersion: alterVersion];
+	/* Object version tuple right after this restore to 'alter' version state:
+	         -restoreToVersion: 4        { 4, 2, 0, 8, 6, 2 } 
+	       + -restoreToVersion: 'alter'  { 1, 1, 0, 1, 0, 0 } (delta)
+	                                     { 5, 3, 0, 9, 6, 2 }
+	
+	   At v4, group3 is missing in the cache so memorizedVersions[5] is zero, 
+	   that's why we pass its latest version 2. Moreover it is not changed from 
+	   v4 to 'alter' version so it won't restored. Same for group2, but in this 
+	   case:
+
+	   context              group2 
+	   v17                 -> v5
+	   v24 (restore 12)    -> v6
+	   v18..23             -> nothing (no modifications)
+	   v25 (restore 4)     -> nothing (not yet created, hence disconnected) 
+	   v26 (restore alter) -> nothing ('alter' implies no modifications) 
+	
+	   Alternatively we could do [CTXT loadAllObjects]. */
+	int objectVersionIncrements3[] = { 1, 1, 0, 1, 6, 2 };
+	[self recreateObjectGraph];
+	[self checkRestoredObjectsForAlter: objectVersionIncrements3];
 }
 
 @end

@@ -393,6 +393,7 @@ static COObjectServer *localObjectServer = nil;
 	if ([[_coreObjectTable allValues] containsObject: object])
 		return NO;
 
+	ETDebugLog(@"Cache object %@", object);
 	[_coreObjectTable setObject: object forKey: [object UUID]];
 	return YES;
 
@@ -452,6 +453,9 @@ static COObjectServer *localObjectServer = nil;
 	// to a past version.
 	FOREACHI(_coreObjectTable, managedObject)
 	{
+		ETDebugLog(@"Update relationship of %@ from %@ to %@", managedObject, 
+			anObject, newObject);
+
 		// TODO: Asks each managed object if the merge is possible before 
 		// attempting to apply it. If the merge fails, we are in an invalid 
 		// state with both object and newObject being referenced in 

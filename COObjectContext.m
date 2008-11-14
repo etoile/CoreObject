@@ -459,7 +459,6 @@ static COObjectContext *currentObjectContext = nil;
 	[self tryMergeRelationshipsOfObject: anObject intoInstance: temporalInstance];
 
 	[self commitMergeOfInstance: temporalInstance forObject: anObject];
-
 	if (isTemporal)
 		[self endRestore];
 
@@ -507,10 +506,12 @@ static COObjectContext *currentObjectContext = nil;
 		int lastObjectVersion = [[self metadataServer] objectVersionForUUID: [temporalInstance UUID]];
 		[temporalInstance _setObjectVersion: lastObjectVersion];
 	}
+
+	// TODO: May be write unit tests to ensure we write the expected .save file 
+	// and log the correct incremented version.
 	[self snapshotObject: temporalInstance shouldIncrementObjectVersion: YES];
-	if (anObject == nil)
-		anObject = temporalInstance;
-	[self logRecord: anObject objectVersion: [anObject objectVersion] 
+	ETDebugLog(@"Commit merge of %@", temporalInstance);
+	[self logRecord: temporalInstance objectVersion: [temporalInstance objectVersion] 
 		timestamp: [NSDate date] shouldIncrementContextVersion: isSingleObjectChange];	
 }
 
@@ -1017,10 +1018,13 @@ static COObjectContext *currentObjectContext = nil;
 
 	/* Record */
 	deltaSerializer = [self deltaSerializerForObject: object];
-	// NOTE: Don't use [deltaSerializer newVersion]; here because 
-	// -serializeObject:withName: already takes care of calling -newVersion.
-	// We instead retrieve the version right after serializing the invocation.
 	[inv setTarget: nil];
+	/* Don't use [deltaSerializer newVersion]; here because 
+	   -serializeObject:withName: already takes care of calling -newVersion.
+	   No need to call -setVersion: either because -deltaSerializerForObject: 
+	   initializes the serializer with the current object version.
+	   The invocation is written on disk as (version + 1).save and we 
+	   retrieve this new version. */
 	[deltaSerializer serializeObject: inv withName: @"Delta"];
 	version = [deltaSerializer version];
 	ETDebugLog(@"Serialized invocation with version %d", version);
@@ -1121,6 +1125,8 @@ static COObjectContext *currentObjectContext = nil;
     You should usually call -snapshotObject: rather than this method. */
 - (void) snapshotObject: (id)object shouldIncrementObjectVersion: (BOOL)updateVersion
 {
+	/* -snapshotSerializerForObject: initializes the serializer with the current 
+	   object version. */
 	id snapshotSerializer = [self snapshotSerializerForObject: object];
 	id realObject = ([object isCoreObjectProxy] ? [object _realObject] : object);
 	

@@ -1,3 +1,44 @@
+2008-11-14 Quentin Mathe <qmathe@club-internet.fr>
+
+	* COObjectServer.m: Added some debug logging facilities.
+	* COObjectContext.m (commitMergeOfInstance:forObject:): Fixed to always log 
+	the new version resulting of the snapshot in the history of the context. 
+	When anObject wasn't nil, we were wrongly logging the current version of 
+	anObject, which isn't the new (or latest) version as soon as the snapshot is 
+	taken.
+	* COOObjectContext+GraphRollback:
+	Disabled some logging.
+	(-_restoreToVersion:, -logRestoreContextVersion:): Don't increment the 
+	context version in the latter method but in -_restoreToVersion:. So all 
+	restored objects are logged with the context version of the restore point.
+	(-findAllObjectVersionsMatchingContextVersion:): 
+	Fixed to correctly order the query result on a restore point where multiple 
+	rows have the same context version (related and made possible by 
+	-commitMergeOfInstance:forObject:). 
+	Implemented two strategies that deal with the traversal of restore points, 
+	to correctly reconstruct the object graph when restoring the context. The 
+	first is dead simple, but cannot take in acccount insertion/deletion of 
+	objects logged in the history, the other one is more complex but accurate 
+	and reflects what the object graph state is really: a list of messages where 
+	restore points are jumps or continuations in this message flow.
+	Now the context is properly restored in the following case:
+	- any operations (this includes arbitrary restorations interleaved with 
+      normal changes or not)
+	- restore to a past context version as a new version t1
+	- new changes in this context
+	- restore to a context version t1 - n
+	Before the bug fixes of this commit, context(t1 - n) was most of the time 
+	an invalid object graph.
+	(-lookUpVersionIfRestorePointAtVersion:): Fixed to handle the case where 
+	multiple rows exist with the same context version for a restore point. This 
+	only occurs now because of the change to -commitMergeOfInstance:forObject:.
+	This fix is similar to the one done for the previous method.
+	(-collectObjectVersionsRestoredByContextVersion: inQueryResult:forRow:
+	withDictionary:): Added.
+	* TestGraphRollback.m: Major test update to cover the previous changes. This 
+	includes various improvements of the test class not yet fully exploited by 
+	all test methods.
+
 2008-11-12 Quentin Mathe <qmathe@club-internet.fr>
 
 	* Headers/COObjectServer.h:

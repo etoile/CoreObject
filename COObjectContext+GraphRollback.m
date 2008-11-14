@@ -22,6 +22,10 @@
 - (int) lookUpVersionIfRestorePointAtVersion: (int)aVersion;
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion;
 - (void) printQueryResult: (PGresult *)result;
+- (int) collectObjectVersionsRestoredByContextVersion: (int)aVersion 
+                                        inQueryResult: (PGresult *)result
+                                               forRow: (int *)aRow
+                                       withDictionary: (NSMutableDictionary *)restoredObjectVersions;
 - (void) discardCurrentObjectsNotYetCreatedAtVersion: (int)aVersion 
                                    forObjectVersions: (NSDictionary *)restoredObjectVersions;
 - (NSSet *) restoreObjectsIfNeededForObjectVersions: (NSDictionary *)restoredObjectVersions;
@@ -78,6 +82,11 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 {
 	_restoringContext = YES;
 
+	 // NOTE: We increment context version right now to ensure 
+	// -commitMergeOfInstance:forObject: will log into the history with the 
+	// version used to identify the restore point we are on the way to create.
+	_version++;
+
 	NSMutableDictionary *restoredObjectVersions = 
 		[self findAllObjectVersionsMatchingContextVersion: aVersion];
 
@@ -133,15 +142,17 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
     restore point is reached. */
 - (int) lookUpVersionIfRestorePointAtVersion: (int)aVersion
 {
+	// NOTE: See -findAllObjectVersionsMatchingContextVersion: doc to understand 
+	// why we use the global version in the query.
 	NSString *query = [NSString stringWithFormat: 
-		@"SELECT objectUUID, contextUUID, objectVersion FROM \
-			(SELECT objectUUID, contextUUID, objectVersion, contextVersion FROM History \
+		@"SELECT objectUUID, contextUUID, objectVersion, globalVersion FROM \
+			(SELECT objectUUID, contextUUID, objectVersion, contextVersion, globalVersion FROM History \
 			 WHERE contextUUID = '%@') AS ContextHistory \
-		  WHERE contextVersion = %i;", 
+		  WHERE contextVersion = %i ORDER BY globalVersion DESC;", 
 		[[self UUID] stringValue], aVersion];
 
 	PGresult *result = [[self metadataServer] executeRawPGSQLQuery: query];
-	[self printQueryResult: result];
+	//[self printQueryResult: result];
 
 	ETUUID *objectUUID = [ETUUID UUIDWithString: 
 		[NSString stringWithUTF8String: PQgetvalue(result, 0, 0)]];
@@ -161,40 +172,144 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	return foundVersion;
 }
 
+/* When this macro is defined, the history scanning jumps to the restored 
+   context version when a restore point is encountered, and bypass all the 
+   history between both. This ensures objects which are inserted/created between 
+   these two points in time, hence didn't exist before, won't be restored. In 
+   future, this will also make possible to correctly ignore a deletion, if it 
+   occurs between a restore point that got traversed and the restored context 
+   version associated with it.
+   Take note that by default, this algorithm also leverages the list of the restored 
+   objects logged in the history for each restore point. This allows to restore 
+   the object graph more quickly, see the last paragraph. But a from scratch
+   reconstruction of the object graph is possible, if these infos are ignored. 
+   A restore from scratch would involve partially restoring each restore point 
+   in the list of the restore points that make up the current object graph state.
+   (Would be more clear with a diagram that shows how we traverse the history 
+   table...)
+
+   If the macro isn't defined, the history scanning is linear and doesn't 
+   progress by backward jumps, that bypass parts of the history between a 
+   restore point and the restored context version associated with it. However 
+   this algorithm only works because we log all the objects that got restored at 
+   a restore point. The downside is that it ignores insertion and deletion of
+   objects, so some objects may weirdly remain available, by being still cached 
+   and registered in the context.
+
+   Logging all restored objects for a restore point isn't really necessary to 
+   support context restoration, but has the following advantages:
+   - faster context restoration by leveraging the snapshots created by previous 
+     context restorations. Context restorations can be an extremly costly 
+     operation if you traverse the entire history and recreate all the objects 
+     to restore by the mean of invocation playback. This limits the amount of 
+     objects for which we need to scan the history and for which many invocations 
+     have to be played back. (a detailed analysis with benchmarks will have to 
+     be carried out)
+   - probably helpful to simplify and maximize the trimming of the history.
+     Because each time an object gets restored, all its previous history can 
+     potentially be discarded. (think about to be sure)
+   - more consistent history, since every object versions appear in the history. 
+     The the ones that corresponds to a merge of a restored object aren't implicit
+   - convenient to see what is affected by a restore point (useful for debugging
+     and inspecting) */
+#define REAL_RESTORE_POINT_TRAVERSAL
+
+// NOTE: Update these if you shuffle the order of the fields in the query of 
+// -findAllObjectVersionsMatchingContextVersion:
+#define OBJECT_UUID_COL 0
+#define CTXT_UUID_COL 1
+#define OBJECT_VERSION_COL 2
+#define CTXT_VERSION_COL 3
+
 /* Collects the object versions to restore at a given context version and 
-   returns them in a dictionary keyed by the UUIDs of the matched objects. */
+   returns them in a dictionary keyed by the UUIDs of the matched objects.
+
+   Note: The sorting of the query result is done on the global version rather 
+   than the context version because multiple rows are logged with identical
+   context version for each restored object at a restore point. If we sort on 
+   the context version, we are not sure the row logged by the context for the 
+   restore point will be in first position. */
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion
 {
-	int restoredVersion = [self lookUpVersionIfRestorePointAtVersion: aVersion];
-
 	/* Query the global history for the history of the context before aVersion */
 	NSString *query = [NSString stringWithFormat: 
-		@"SELECT objectUUID, objectVersion, contextVersion FROM \
-			(SELECT objectUUID, objectVersion, contextVersion FROM History \
+		@"SELECT objectUUID, contextUUID, objectVersion, contextVersion, globalVersion FROM \
+			(SELECT objectUUID, contextUUID, objectVersion, contextVersion, globalVersion FROM History \
 			 WHERE contextUUID = '%@') AS ContextHistory \
-		  WHERE contextVersion < %i ORDER BY contextVersion DESC", 
-		[[self UUID] stringValue], (restoredVersion + 1)];
+		  WHERE contextVersion < %i ORDER BY globalVersion DESC", 
+		[[self UUID] stringValue], (aVersion + 1)];
 
 	PGresult *result = [[self metadataServer] executeRawPGSQLQuery: query];
 	int nbOfRows = PQntuples(result);
-	int nbOfCols = PQnfields(result);
 	ETUUID *objectUUID = nil;
+	ETUUID *contextUUID = nil;
 	int objectVersion = -1;
 	int contextVersion = -1;
+	int restoredCtxtVersion = -1;
+	BOOL isTraversingRestorePoint = NO;
 	/* Collection where the object versions to be restored are put keyed by UUIDs */
 	NSMutableDictionary *restoredObjectVersions = [NSMutableDictionary dictionary];
 
-	ETLog(@"Context restore query result: %d rows and %d colums", nbOfRows, nbOfCols);
-	[self printQueryResult: result];
+	ETDebugLog(@"Restore context %@ with query result: %d rows and %d colums...", self, nbOfRows, nbOfCols);
+	//[self printQueryResult: result];
 
 	/* Find all the objects to be restored */ 
 	for (int row = 0; row < nbOfRows; row++)
 	{
 		objectUUID = [ETUUID UUIDWithString: 
-			[NSString stringWithUTF8String: PQgetvalue(result, row, 0)]];
-		objectVersion = atoi(PQgetvalue(result, row, 1));
-		contextVersion = atoi(PQgetvalue(result, row, 2));
+			[NSString stringWithUTF8String: PQgetvalue(result, row, OBJECT_UUID_COL)]];
+		contextUUID = [ETUUID UUIDWithString: 
+			[NSString stringWithUTF8String: PQgetvalue(result, row, CTXT_UUID_COL)]];
+		objectVersion = atoi(PQgetvalue(result, row, OBJECT_VERSION_COL));
+		contextVersion = atoi(PQgetvalue(result, row, CTXT_VERSION_COL));
 
+#ifdef REAL_RESTORE_POINT_TRAVERSAL
+
+		// TODO: Extract the the next two if statements in a method to make this 
+		// clearer or rewrite a bit differently 
+
+		/* Skip rows if we are looking for a given context version after 
+		   traversing a restore point. */
+		if (isTraversingRestorePoint) /* Fast backward iteration over the history */
+		{
+			if (contextVersion != restoredCtxtVersion)
+				continue;
+
+			/* Revert to the normal iteration over the history when the restored 
+			   version we are looking for is found. */
+			isTraversingRestorePoint = NO;
+		}
+		else /* Normal iteration over this history */
+		{
+			/* Handle the case where row is a restore point, row variable may be 
+			   altered if there are restore rows bound to the restore point, that 
+			   have to to be skipped.
+			   If we found a restore point, we switch to fast backward iteration 
+			   by setting isTraversingRestorePoint to YES. */
+			restoredCtxtVersion = 
+				[self collectObjectVersionsRestoredByContextVersion: contextVersion
+				                                      inQueryResult: result 
+				                                             forRow: &row 
+				                                     withDictionary: restoredObjectVersions];
+			if (restoredCtxtVersion != -1)
+			{
+				 /* Row is currently equal to the next context version we want 
+				    to inspect, so we must negate the effect of for (;;row++) */	
+				row--;
+				isTraversingRestorePoint = YES;
+				continue;
+			}
+		}
+
+#else
+
+		BOOL isRestorePoint = [objectUUID isEqual: contextUUID];
+		if (isRestorePoint)
+			continue;
+
+#endif
+
+		/* Collect the current object version if needed */
 		BOOL objectNotAlreadyFound = ([[restoredObjectVersions allKeys] containsObject: objectUUID] == NO);
 
 		if (objectNotAlreadyFound)
@@ -219,6 +334,50 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 	PQclear(result);
 
 	return restoredObjectVersions;
+}
+
+// TODO: Support restore from scratch if a nil dictionary is passed.
+- (int) collectObjectVersionsRestoredByContextVersion: (int)aVersion 
+                                        inQueryResult: (PGresult *)result
+                                               forRow: (int *)aRow
+                                       withDictionary: (NSMutableDictionary *)restoredObjectVersions
+{
+	char *objectUUIDValue = PQgetvalue(result, *aRow, OBJECT_UUID_COL);
+	char *contextUUIDValue = PQgetvalue(result, *aRow, CTXT_UUID_COL);
+	BOOL isRestorePoint = (strcmp(objectUUIDValue, contextUUIDValue) == 0
+		&& aVersion == atoi(PQgetvalue(result, *aRow, CTXT_VERSION_COL)));
+
+	if (isRestorePoint == NO)
+		return -1;
+
+	int restoredVersion = atoi(PQgetvalue(result, *aRow, OBJECT_VERSION_COL));
+	int nbOfRows = PQntuples(result);
+	int row = *aRow + 1; /* aRow + 1 is used to skip the restore point row. */
+
+	for (; row < nbOfRows; row++)
+	{
+		ETUUID *objectUUID = [ETUUID UUIDWithString: 
+			[NSString stringWithUTF8String: PQgetvalue(result, row, OBJECT_UUID_COL)]];
+		int objectVersion = atoi(PQgetvalue(result, row, OBJECT_VERSION_COL));
+		int contextVersion = atoi(PQgetvalue(result, row, CTXT_VERSION_COL));
+		BOOL isRestoreRow = (contextVersion == aVersion);
+
+		if (isRestoreRow == NO)
+			break;
+
+		BOOL objectNotAlreadyFound = ([[restoredObjectVersions allKeys] containsObject: objectUUID] == NO);
+
+		if (objectNotAlreadyFound)
+		{
+			[restoredObjectVersions setObject: [NSNumber numberWithInt: objectVersion] 
+			                           forKey: objectUUID];
+		}
+	}
+
+	/* Expose the restored rows to be skipped to the caller */
+	*aRow = row;
+
+	return restoredVersion;
 }
 
 /* Prints the query result on stdout for debugging. */
@@ -283,12 +442,15 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 			/* Only restore the objects that have changed between aVersion and 
 			   the current context version */
 			if (currentObjectUpToDate)
+			{
+				//ETLog(@"Ignore %@ restored version %i within %@", currentObject, restoredVersion, self);
 				continue;
+			}
 
 			restoredObject = [self objectByRestoringObject: currentObject 
 			                                       toVersion: restoredVersion
 			                                mergeImmediately: YES];
-			ETLog(@"Restore %@ version %i within %@", restoredObject, restoredVersion, self);
+			ETDebugLog(@"Restore %@ restored version %i", restoredObject, restoredVersion);
 		}
 		else /* Restore an object missing from the cache */
 		{
@@ -297,10 +459,13 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 			/* Only restore the objects that have changed between aVersion and 
 			   the current context version */
 			if (inStoreObjectUpToDate)
+			{
+				//ETLog(@"Ignore in store %@ restored version %i", restoredUUID, restoredVersion);
 				continue;
+			}
 
 			restoredObject = [self objectForUUID: restoredUUID version: restoredVersion];
-			ETLog(@"Recreate %@ version %i within %@", restoredObject, restoredVersion, self);
+			ETDebugLog(@"Recreate %@ restored version %i within %@", restoredObject, restoredVersion, self);
 		}
 
 		/* Other objects may refer this object we just restored, however 
@@ -321,7 +486,7 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
    server. */
 - (void) logRestoreContextVersion: (int)aVersion
 {
-	_version++;
+	// NOTE: We don't increment _version here but before in -_restoreToVersion:
 	[[self metadataServer] executeDBRequest: [NSString stringWithFormat: 
 		@"INSERT INTO History (objectUUID, objectVersion, contextUUID, "
 		"contextVersion, date) "
