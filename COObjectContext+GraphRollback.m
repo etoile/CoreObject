@@ -265,13 +265,14 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 
 #ifdef REAL_RESTORE_POINT_TRAVERSAL
 
-		// TODO: Extract the the next two if statements in a method to make this 
-		// clearer or rewrite a bit differently 
-
+		// TODO: Extract all this #ifdef code in a method to make this clearer
+		// or rewrite a bit differently 
+		
 		/* Skip rows if we are looking for a given context version after 
 		   traversing a restore point. */
-		if (isTraversingRestorePoint) /* Fast backward iteration over the history */
+		if (isTraversingRestorePoint)
 		{
+			/* Fast backward iteration over the history */
 			if (contextVersion != restoredCtxtVersion)
 				continue;
 
@@ -279,26 +280,27 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 			   version we are looking for is found. */
 			isTraversingRestorePoint = NO;
 		}
-		else /* Normal iteration over this history */
+
+		/* Handle the case where row is a restore point, row variable may be 
+		   altered if there are restore rows bound to the restore point, that 
+		   have to to be skipped.
+		   If we found a restore point, we switch to fast backward iteration 
+		   by setting isTraversingRestorePoint to YES.
+		   If we don't, row and restoredObjectVersions are let as is by the 
+		   method call and we process further to collect the object version from 
+		   this message row. */
+		restoredCtxtVersion = 
+			[self collectObjectVersionsRestoredByContextVersion: contextVersion
+			                                      inQueryResult: result 
+			                                             forRow: &row 
+			                                     withDictionary: restoredObjectVersions];
+		if (restoredCtxtVersion != -1)
 		{
-			/* Handle the case where row is a restore point, row variable may be 
-			   altered if there are restore rows bound to the restore point, that 
-			   have to to be skipped.
-			   If we found a restore point, we switch to fast backward iteration 
-			   by setting isTraversingRestorePoint to YES. */
-			restoredCtxtVersion = 
-				[self collectObjectVersionsRestoredByContextVersion: contextVersion
-				                                      inQueryResult: result 
-				                                             forRow: &row 
-				                                     withDictionary: restoredObjectVersions];
-			if (restoredCtxtVersion != -1)
-			{
-				 /* Row is currently equal to the next context version we want 
-				    to inspect, so we must negate the effect of for (;;row++) */	
-				row--;
-				isTraversingRestorePoint = YES;
-				continue;
-			}
+			/* Row is currently equal to the next context version we want 
+			   to inspect, so we must negate the effect of for (;;row++) */
+			row--;
+			isTraversingRestorePoint = YES;
+			continue;
 		}
 
 #else
@@ -308,6 +310,10 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
 			continue;
 
 #endif
+
+		NSAssert3([objectUUID isEqual: _uuid] == NO, @"At row %i, restore point "
+			@"%i to version %i wrongly matched as a logged message in the history", 
+			row, contextVersion, objectVersion);
 
 		/* Collect the current object version if needed */
 		BOOL objectNotAlreadyFound = ([[restoredObjectVersions allKeys] containsObject: objectUUID] == NO);
