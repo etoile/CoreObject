@@ -1088,7 +1088,7 @@ static COObjectContext *currentObjectContext = nil;
 	ETDebugLog(@"Log %@ objectUUID %@ objectVersion %i contextVersion %i", 
 		aRecord, [object UUID], aVersion, _version);
 
-	BOOL exitingUndoSequence = ([self isUndoing] == NO || [self isRedoing] == NO);
+	BOOL exitingUndoSequence = ([self isUndoing] == NO && [self isRedoing] == NO);
 
 	if (exitingUndoSequence)
 		[self endUndoSequence];
