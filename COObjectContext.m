@@ -833,6 +833,15 @@ static COObjectContext *currentObjectContext = nil;
 		{
 			[self replaceObject: anObject byObject: restoredObject collectAllErrors: YES];
 		}
+
+		BOOL shouldNotifyNowOfMerge = ([self isRestoringContext] == NO);
+		if (shouldNotifyNowOfMerge)
+		{
+			[[NSNotificationCenter defaultCenter] 
+				postNotificationName: COObjectContextDidMergeObjectsNotification
+				object: self
+				userInfo: D(COMergedObjectsKey, A(restoredObject))];
+		}
 	}
 
 	return restoredObject;
