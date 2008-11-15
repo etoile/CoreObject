@@ -443,8 +443,8 @@ static COMetadataServer *metadataServer = nil;
 	return [_URLsByUUIDs objectForKey: uuid];
 #else
 
-	if (uuid == nil)
-		return nil;
+	//if (uuid == nil)
+	//	return nil;
 
 	NSString *urlString = [self executeDBQuery: [NSString stringWithFormat: 
 		@"SELECT URL FROM UUID WHERE UUID = '%@';", [uuid stringValue]]];
