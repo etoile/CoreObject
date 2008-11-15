@@ -655,7 +655,7 @@ static COObjectContext *currentObjectContext = nil;
 	[self restoreToVersion: ++_restoredVersionUndoCursor];
 	_isRedoing = NO;
 
-	BOOL hasRevertedAllUndoActions = (_firstUndoVersion == _restoredVersionUndoCursor);
+	BOOL hasRevertedAllUndoActions = (_restoredVersionUndoCursor == (_firstUndoVersion - 1));
 
 	if (hasRevertedAllUndoActions)
 		[self endUndoSequence];
