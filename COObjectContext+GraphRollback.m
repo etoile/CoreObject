@@ -80,6 +80,13 @@
 SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, objectVersion, contextVersion FROM HISTORY WHERE contextUUID = '64dc7e8f-db73-4bcc-666f-d9bf6b77a80a') AS ContextHistory WHERE contextVersion > 2000 ORDER BY contextVersion DESC LIMIT 10 */
 - (void) _restoreToVersion: (int)aVersion
 {
+	if (aVersion >= _version)
+	{
+		ETLog(@"WARNING: The context %@ cannot be restored to a version equal "
+			   "or beyond the current one %i (%i requested).", self, _version, aVersion);
+		return;
+	}
+
 	_restoringContext = YES;
 
 	 // NOTE: We increment context version right now to ensure 
@@ -139,9 +146,14 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
     If aVersion is a restore point, looks up the restored version and checks
     whether it is a restore point or not. If it isn't, returns the found 
     version, otherwise continues the lookup until a version not bound to a 
-    restore point is reached. */
+    restore point is reached. 
+    If a version is invalid, for example it is beyond the current context 
+    version, returns -1. */
 - (int) lookUpVersionIfRestorePointAtVersion: (int)aVersion
 {
+	if (aVersion > [self version])
+		return -1;
+
 	// NOTE: See -findAllObjectVersionsMatchingContextVersion: doc to understand 
 	// why we use the global version in the query.
 	NSString *query = [NSString stringWithFormat: 
@@ -231,6 +243,9 @@ SELECT objectUUID, objectVersion, contextVersion FROM (SELECT objectUUID, object
    restore point will be in first position. */
 - (NSMutableDictionary *) findAllObjectVersionsMatchingContextVersion: (int)aVersion
 {
+	if (aVersion > [self version])
+		return [NSMutableDictionary dictionary];
+
 	/* Query the global history for the history of the context before aVersion */
 	NSString *query = [NSString stringWithFormat: 
 		@"SELECT objectUUID, contextUUID, objectVersion, contextVersion, globalVersion FROM \

@@ -125,7 +125,8 @@ static COObjectContext *currentObjectContext = nil;
 
 - (NSString *) description
 {
-	return [NSString stringWithFormat: @"%@ version: %i", [super description], [self version]];
+	return [NSString stringWithFormat: @"%@ id: %@ version: %i", 
+ 		[super description], [self UUID], [self version]];
 }
 
 /** Returns the lastest object context version in the metadata server.

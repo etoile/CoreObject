@@ -3,7 +3,8 @@ CoreObject
 ==========
 
 
-:Maintainer: Yen-Ju Chen <yjchenx gmail >
+:Maintainer: Quentin Mathe <qmathe@club-internet.fr>
+:Authors: Yen-Ju Chen, Quentin Mathe, Eric Wasylischen
 :License: MIT Licence.
 :Version: 0.1
 
@@ -18,9 +19,6 @@ AddressBook framework from Apple provides a good machenism of handling
 these kind of objects. CoreObject aims to provide a general storage 
 facility based on similar interface.
 
-It also includes a subset of Blocks framework[1] to build applications
-in plugin architecture.
-
 Before writing code that uses CoreObject, be sure to read Known Limitations 
 section.
 
@@ -31,10 +29,25 @@ be the next version of CollectionKit. OrganizeKit became CoreObject when we
 realized it precisely offers the Name Service layer which had been envisionned
 for CoreObject.
 
-[1] http://www.hogbaysoftware.com/project/blocks
+Build and Install
+-----------------
 
-Developer
----------
+Read INSTALL document.
+
+
+Mac OS X support
+----------------
+
+CoreObject is not supported on Mac OS X, mostly because it depends on 
+EtoileSerialize that heavily depends on the GNU ObjC runtime API. 
+No future support is currently planned at this time, but patches are welcome if 
+you are interested in porting CoreObject to Cocoa. To achieve that, 
+EtoileSerialize will have to be rewritten or eventually ported to the 
+NeXT/Apple runtime.
+
+
+Developer notes
+===============
 
 * CoreObject provides three basic unit:
   COObject, COGroup and COCollection.
@@ -58,7 +71,6 @@ Developer
   unless collision is avoid.
 
 * Each unit provide property list to be stored.
-  
 
 Known Limitations
 -----------------
@@ -109,3 +121,21 @@ Known Limitations
   object graph is recreated without any care for the new persistency 
   architecture. This means imported core objects won't be correctly registered 
   into the current context and cached in the object server.
+
+
+Tests suite
+-----------
+
+UnitKit (bundled with Etoile) is required.
+
+   Steps to produce a test bundle and run tests suite:
+
+    * make test=yes 
+
+    * ukrun
+
+
+Contribute 
+----------
+
+Read TODO document.
