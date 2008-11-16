@@ -51,6 +51,62 @@ typedef enum _COChildrenMergePolicy
 } COChildrenMergePolicy;
 
 
+/** <p>COObjectContext implements the core persistency logic that makes up 
+    CoreObject. Both COObject and COProxy are bound a context to which they 
+    fully delegate the handling of their persistency.</p>
+    <p>Each object context can own multiple objects. These can be instances of 
+    COObject hierarchy or foreign model objects wrapped behind a COProxy 
+    instance. With CoreObject, each object that is inserted in an object context 
+    becomes a persistent root. By default, objects are inserted in the object 
+    context returned by -currentContext. Once an object has been inserted, you 
+    cannot move it to another object context (at least for now).</p>
+    <p>Each persistent root will be stored in an object bundle on disk. By default, 
+    objects are serialized automatically in ~/CoreObjectLibrary, although 
+    nothing prevents you to move or rename the object bundle if you update 
+    the URL/UUID mapping infos in the metadata DB by yourself (see 
+    COMetadataServer).</p>
+    <p>For each metadata DB, by default one for each user, a single core 
+    object graph exists. All core objects tracked by this metadata DB makes up 
+    this graph. This object graph is usually further partionned into multiple 
+    object contexts which are versionned independently. Because each core object 
+    is also a versionned persistent root, versionning is supported at two 
+    granularity level per objects and per contexts (or object graphs). This 
+    allows to have indepent versionning of subsets of the overall core object 
+    graph. These core object subgraphs are each one owned and managed by their 
+    own context. Because relationships between core objects are allowed exactly 
+    in the same way within a context or across context boundaries, there is 
+    really a single core object graph rather than multiple object graphs which 
+    can be unionned to behave like a single one.</p>
+    <p>The history of the entire core object graph is logged in the metadata DB 
+    (see COMetadataServer), including restore operations. By running queries 
+    over the history, the history specific to a given context can be extracted 
+    and used to restored it to a a past version by restoring multiple objects 
+    which have changed in the version interval. 
+    Then restoring each object consists identifying the most recent snapshot 
+    before the wanted object version, and replaying all the invocations 
+    serialized as deltas until this version. This history data is stored as 
+    deltas and snapshots/fullsaves in each object bundle. The storage model and
+    the serialization/deserialized based on snapshots/fullsaves and deltas is 
+    almost entirely delegated to EtoileSerialize.</p>
+    <p>A context is uniquely identified by an UUID. By passing this UUID to 
+    -initWithUUID:, a context previously deallocated, can be recreated. Every 
+    time, an object is inserted into a context, the object is marked as 
+    belonging to this context in the metadata DB and the insertion is logged 
+    into the history. Hence you can recreate a context, that was used prior to 
+    the last launch of your currently running application, and the entire object 
+    graph it is in charge of. Here is a summary of what needs to be done:
+    <list>
+    <item>retrieve the UUID with -UUID and store it with NSUserDefaults for 
+    example (see NSUserDefaults additions in EtoileFoundation for that)</item>
+    <item>retrieve this UUID from its store location and pass it to a new 
+    context like that [[COObjectContext alloc] initWithUUID: ctxtUUID]</item>
+    <item>retrieve an entry point in the object graph from the recreated 
+    context, by calling [ctxt objectForUUID: anObjectUUID]. This is necessary 
+    because all objects are faults initially because of the lazy loading of 
+    core objects. Alternatively you can force the loading of all objects that 
+    belong to this context with -loadAllObjects.</item></list>
+    Take note that you need to store the UUID of the object playing the role 
+    of an entry point somewhere (NSUserDefaults for example).</p> */
 @interface COObjectContext : COPersistentPool
 {
 	// TODO: To be able to use shared serializers in the managed object context, 

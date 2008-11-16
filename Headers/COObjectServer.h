@@ -23,7 +23,8 @@
 	each one is a sandbox and rolling back an object owned by one or several 
 	object servers won't trigger the update of all references to it that exist
 	outside of the active object server (the one bound to the object context 
-	that got asked to roll back the object). */
+	that got asked to roll back the object).
+    WARNING: This class is still very much in development. */
 @interface COObjectServer: NSObject
 {
 	NSURL *_serializationURL;
@@ -45,11 +46,6 @@
 //- (void) setUpPublishedObjectsOverDO;
 
 /* CoreObject Factory */
-
-- (id) objectForURL: (NSURL *)url;
-- (id) objectForUUID: (ETUUID *)uuid;
-- (id) managedObjectForURL: (NSURL *)url;
-- (id) distantObjectForURL: (NSURL *)url;
 
 - (id) objectWithURL: (NSURL *)objectURL version: (int)objectVersion;
 - (id) objectWithUUID: (ETUUID *)anUUID version: (int)objectVersion;
@@ -89,9 +85,8 @@
 //- (id) propertyList;
 //- (void) readConfigurationFromURL: (NSURL *)url;
 //- (void) writeConfigurationToURL: (NSURL *)url;
-
-- (NSURL *) serializationURL;
-- (void) save;
+//- (NSURL *) serializationURL;
+//- (void) save;
 
 /* Shared Object Cache */
 

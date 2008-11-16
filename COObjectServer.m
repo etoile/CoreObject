@@ -33,6 +33,15 @@ static COObjectServer *localObjectServer = nil;
 - (void) _setObjectVersion: (int)aVersion;
 @end
 
+@interface COObjectServer (UnstableAPI)
+// WARNING: Don't use the following four methods, they might not behave 
+// correctly or crash
+- (id) objectForURL: (NSURL *)url;
+- (id) objectForUUID: (ETUUID *)uuid;
+- (id) managedObjectForURL: (NSURL *)url;
+- (id) distantObjectForURL: (NSURL *)url;
+@end
+
 @implementation COObjectServer
 
 /** Returns the local object server. */

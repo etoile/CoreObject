@@ -1,4 +1,3 @@
-==================
 CoreObject INSTALL
 ==================
 
@@ -50,6 +49,9 @@ Build and Install
 
    * ./setup-coreobject.sh
 
+setup-coreobject.sh only creates a PostgreSQL role with your username. The 
+CoreObject database is not created at this time, but lazily when you launch a 
+CoreObject-based application for the first time.
 
 Uninstall
 ---------
@@ -59,6 +61,18 @@ Uninstall
    * [sudo [-E]] make uninstall
 
    * ./uninstall-coreobject.sh
+
+uninstall-coreobject.sh only deletes the CoreObject database but not your 
+PostgreSQL user role. So running this script doesn't imply you will have to run 
+setup-coreobject.sh later if you want use CoreObject again. This also means you 
+can use this script to reset the content of the CoreObject DB, however all the 
+existing core objects and the history will be lost. Lost core objects still 
+exist on disk in ~/CoreObjectLibrary though, but we have currently no support to 
+repopulate the DB by reimporting existing core objects. 
+If you want to fully get rid of all core objects including their stored 
+representations on disk, delete the ~/CoreObjectLibrary directory. You have to 
+do so, because no deletion model is currently implemented (with some sort of GC 
+at storage level).
 
 
 Trouble

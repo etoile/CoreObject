@@ -1,4 +1,5 @@
-TODO
+CoreObject TODO
+===============
 
 ## EtoileSerialize ##
 
@@ -22,6 +23,7 @@ TODO
   a coherent state if the target version is still present in the global history 
   of the metadata DB.
 - Possibility to create a non-persistent copy of a persistent instance.
+
 
 ## EtoileFoundation ##
 

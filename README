@@ -1,23 +1,20 @@
-==========
 CoreObject
 ==========
-
 
 :Maintainer: Quentin Mathe <qmathe@club-internet.fr>
 :Authors: Yen-Ju Chen, Quentin Mathe, Eric Wasylischen
 :License: MIT Licence.
-:Version: 0.1
+:Version: 0.4
 
-CoreObject provides a common storage facility for objects with properties,
-such as contact information, playlist, bookmark, etc.
-These objects have defined structure (property-value relationship) 
-which can be handled better than general property list.
-But values of these properties are too flexible to be stored in database,
-for example, a contact information may have multipe home phone numbers.
-Records can be grouped and groups can have groups inside.
-AddressBook framework from Apple provides a good machenism of handling 
-these kind of objects. CoreObject aims to provide a general storage 
-facility based on similar interface.
+*CoreObject* is a framework for describing and organizing model objects, with 
+automatic persistence and versioning by recording messages sent to objects. It 
+offers a flexible versioning scheme where both individual objects and their 
+entire object graph can be versioned separately. The built-in object model is a 
+generalization of the property model used by the AddressBook framework. Foreign 
+model objects can be also integrated by wrapping them with a special proxy.
+CoreObject uses the EtoileSerialize framework which, in many cases, allows 
+objects and messages to be automatically serialized with no extra code being 
+written.
 
 Before writing code that uses CoreObject, be sure to read Known Limitations 
 section.
@@ -49,28 +46,59 @@ NeXT/Apple runtime.
 Developer notes
 ===============
 
-* CoreObject provides three basic unit:
-  COObject, COGroup and COCollection.
+CoreObject provides small number of basic units:
+  - COMetadataServer, COObjectContext, COObjectServer
+  - COObject, COGroup, COProxy
+  Usually you only need to interact with the last three classes that conforms 
+  to the COManagedObject protocol and eventually COObjectContext if you want to
+  interact with the persistency history.
 
-* COObject is the basic unit with arbitrary property.
-  It provides -setValue:forKey: and -valueForKey:. 
-  Besides basic data type provided by GNUstep, COMultiValue is allowed.
+* COObject is the base data model class that you can extend with arbitrary 
+  properties. It provides -setValue:forProperty: and -valueForProperty: as the 
+  basic property access protocol. Besides basic data type provided by GNUstep, 
+  COMultiValue is allowed.
 
-* COGroup is a subclass of COObject and can contain objects or subgroups.
-  It has a hierarchical structure where any object must belong to one
-  or more groups (subgroups).
+* COGroup is a subclass of COObject and can contain members, either objects or 
+  groups. It has a hierarchical structure where any object must belong to one or 
+  more groups. This class can be also subclassed,  if you want to define 
+  additional properties or your own constraints on the members that can be added 
+  or removed.
 
-* COCollection can contain objects and groups.
-  Objects may not belong to any group.
+* COProxy is a proxy class to integrate any object models that stand apart from 
+  the COObject/COGroup hierarchy. By passing a model object to the proxy 
+  initializer, you get a proxy which is a core object
 
-* Search is handled with NSPredicate instead of something simliar to 
+* Each core object is uniquely identified by a UUID. It is generated 
+  automatically and must not be changed.
+
+* COObject and COGroup are also two protocols that makes up the Core Object 
+  Protocol. Every core objects implements either one or both.
+  If a class implements COManagedObject in addition to the previous two, its 
+  instances are persistent core objects whose persistency is managed by 
+  CoreObject, otherwise they are transient core objects such as 
+  COFile/CODirectory instances. Transient core object have no history associated 
+  with them, they are recreated each time they are used, and they are typically 
+  used to map arbitrary external representations into the core object graph.
+
+* Search is handled with NSPredicate instead of something similar to 
   ABSearchElement to reduce redundancy.
 
-* Each item has a unique ID (UUID) in the collection.
-  It is generated automatically and should not change
-  unless collision is avoid.
 
-* Each unit provide property list to be stored.
+Built-in Object Model
+---------------------
+
+CoreObject provides a semi-structured object model, that can be used as a common 
+storage facility for objects with properties, such as contact information, 
+playlist, bookmark, etc.
+These objects have defined structure (property-value relationship) 
+which can be handled better than general property list. But values of these 
+properties are too flexible to be stored in database, for example, a contact 
+information may have multipe home phone numbers. Records can be grouped and 
+groups can have groups inside.
+AddressBook framework from Apple provides a good mechanism of handling these 
+kind of objects. CoreObject aims to provide a general storage facility based on 
+similar interface.
+
 
 Known Limitations
 -----------------
@@ -79,7 +107,16 @@ Known Limitations
   play with it if you prefer to be sure you won't lost any data on your 
   filesystem. Well, in theory it isn't designed to erase your data, but who 
   knows, that's a developer preview release... ;-)
+- Transient core object support is a moving target for now, the current support 
+  is very limited and not well integrated with the rest of CoreObject
+- COPersistentPool, COCollection API should be ignored
+- COObjectServer API is very unstable and some methods such as -objectForURL:,
+  -objectForUUID:, managedObjectForURL:, distantObjectForURL: may not work at 
+  all.
 - Multiple object contexts per process are supported but mostly untested.
+- Context restoration with one or more COProxy intances in the graph of the 
+  registered objects is untested, altough restoring a single COProxy to a past
+  version is well supported.
 - Switching to another metadata DB isn't yet supported, only the default one 
   bound to the current user can be used.
 - Messages sent to multivalues aren't recorded, so you must reset a multivalue 
