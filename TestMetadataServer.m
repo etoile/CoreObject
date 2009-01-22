@@ -10,7 +10,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <EtoileSerialize/EtoileSerialize.h>
 #import <UnitKit/UnitKit.h>
-#import <postgresql/libpq-fe.h>
+#import <libpq-fe.h>
 #import "COMetadataServer.h"
 #import "COSerializer.h"
 #import "CODeserializer.h"
