@@ -6,6 +6,7 @@
 
 */
 
+#include <objc/objc.h>
 #import "COProxy.h"
 #import "COObjectContext.h"
 #import "COObjectServer.h"
@@ -234,7 +235,7 @@
 {
 	for (int i = 0; i < _persistencySelectorCount; i++)
 	{
-		if (_persistencySelectors[i] == aSelector)
+		if (sel_eq(_persistencySelectors[i], aSelector))
 			return YES;
 	}
 

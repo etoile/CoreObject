@@ -1,3 +1,9 @@
+2009-02-16 Quentin Mathe <qmathe@club-internet.fr>
+
+	Fixed COProxy related test failures reported by Truls Becken. 
+	* COProxy.m (-isPersistencySelector:): Fixed to test selector equality 
+	correctly.
+
 2008-11-14 Quentin Mathe <qmathe@club-internet.fr>
 
 	* COObjectServer.m: Added some debug logging facilities.

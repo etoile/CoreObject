@@ -166,7 +166,9 @@
 DEALLOC(DESTROY(whoami); DESTROY(otherObjects);)
 
 - (NSArray *) persistencyMethodNames 
-{ 
+{
+	// NOTE: We don't include -removeOtherObject: to test whether it is well 
+	// ignored in -testForwardInvocation.
 	return A(@"setWhoAmI:", @"addOtherObject:"); 
 }
 
