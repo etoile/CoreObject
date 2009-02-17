@@ -45,7 +45,7 @@
 	// seems to be necessary for deserialization. 
 	//CREATE_AUTORELEASE_POOL(pool);
 
-	id deserializer = [self defaultCoreObjectDeserializerWithURL: aURL];
+	ETDeserializer *deserializer = [self defaultCoreObjectDeserializerWithURL: aURL];
 	[deserializer setBranch: @"root"];
 	[deserializer setVersion: 0];
 	id newInstance = [deserializer restoreObjectGraph];
@@ -67,7 +67,7 @@
                              toVersion: (int)finalVersion 
 {
 	id realObject = ([anObject isCoreObjectProxy] ? [anObject _realObject] : anObject);
-	id deltaDeserializer = self;
+	ETDeserializer *deltaDeserializer = self;
 	NSInvocation *inv = nil;
 
 	/*NSAssert3([deltaDeserializer version] == [object anObjectVersion], 
