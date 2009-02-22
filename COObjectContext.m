@@ -1008,7 +1008,7 @@ static COObjectContext *currentObjectContext = nil;
 - (int) serializeInvocation: (NSInvocation *)inv
 {
 	id object = [inv target];
-	id deltaSerializer = nil;
+	ETSerializer *deltaSerializer = nil;
 	int version = [object objectVersion];
 
 	/* First Snapshot if needed (aka Base Version) */
