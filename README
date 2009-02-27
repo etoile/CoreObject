@@ -4,7 +4,7 @@ CoreObject
 :Maintainer: Quentin Mathe <qmathe@club-internet.fr>
 :Authors: Yen-Ju Chen, Quentin Mathe, Eric Wasylishen
 :License: MIT Licence.
-:Version: 0.4
+:Version: 0.4.1
 
 *CoreObject* is a framework for describing and organizing model objects, with 
 automatic persistence and versioning by recording messages sent to objects. It 
