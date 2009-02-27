@@ -6,7 +6,7 @@ ifeq ($(test), yes)
 BUNDLE_NAME = CoreObject
 else
 FRAMEWORK_NAME = CoreObject
-CoreObject_VERSION = 0.4
+CoreObject_VERSION = 0.4.1
 endif
 
 CoreObject_OBJCFLAGS += -std=c99 

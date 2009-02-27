@@ -1,6 +1,11 @@
 CoreObject NEWS
 ===============
 
+0.4.1 (Etoile 0.4.1)
+--------------------
+
+- Small fixes for compiler warnings/errors
+
 0.4 (Etoile 0.4)
 ----------------
 
