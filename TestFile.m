@@ -111,7 +111,7 @@
 	[self didAddToGroup: dir];
 	UKObjectsNotEqual([self URL], sourceURL);
 	UKStringsEqual([[self URL] lastPathComponent], [sourceURL lastPathComponent]);
-	UKObjectsEqual([self URL], [[dir URL] appendPath: [sourceURL lastPathComponent]]);
+	UKObjectsEqual([self URL], [[dir URL] URLByAppendingPath: [sourceURL lastPathComponent]]);
 }
 
 @end

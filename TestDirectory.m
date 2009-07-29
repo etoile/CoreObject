@@ -73,7 +73,7 @@
 
 - (void) createChildFileWithName: (id)name
 {
-	NSString *path = [[[self URL] path] appendPath: name];
+	NSString *path = [[[self URL] path] stringByAppendingPathComponent: name];
 	BOOL result = [FM createFileAtPath: path contents: nil attributes: nil];
 	UKTrue(result);
 }
