@@ -65,7 +65,7 @@ DEALLOC(DESTROY(_url))
 {
 	NSString *desc = [super description];
 
-	desc = [[desc append: @" "] append: FSPATH(self)];
+	desc = [[desc stringByAppendingString: @" "] stringByAppendingString: FSPATH(self)];
 	//return [[self properties] description];
 
 	return desc;
@@ -220,7 +220,7 @@ DEALLOC(DESTROY(_url))
 	You must not call this method unless you write a COGroup conforming class. */
 - (void) didAddToGroup: (id)group
 {
-	NSURL *destURL = [[group URL] appendPath: [FSPATH(self) lastPathComponent]];
+	NSURL *destURL = [[group URL] URLByAppendingPath: [FSPATH(self) lastPathComponent]];
 	_isCopyPromise = NO;
 	[self setURL: destURL];
 }

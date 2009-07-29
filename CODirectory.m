@@ -141,7 +141,7 @@ DEALLOC()
 	}
 
 	NSString *linkName = [FSPATH(object) lastPathComponent];
-	NSString *linkPath = [FSPATH(self) appendPath: linkName];
+	NSString *linkPath = [FSPATH(self) stringByAppendingPathComponent: linkName];
 	return [FM createSymbolicLinkAtPath: linkPath pathContent: FSPATH(object)];
 }
 
@@ -169,7 +169,7 @@ DEALLOC()
 	// id parentDir = [CODirectory objectWithURL: [[object URL] parentURL]];
 	// [parentDir removeCachedObject: object]; or [parentDir recache]; or 
 	// [object didRemoveFromGroup: self];
-	NSString *destPath = [FSPATH(self) appendPath: 
+	NSString *destPath = [FSPATH(self) stringByAppendingPathComponent: 
 		[FSPATH(object) lastPathComponent]];
 
 	ETLog(@"Move file %@ to path %@", FSPATH(object), destPath);
@@ -178,7 +178,7 @@ DEALLOC()
 
 - (BOOL) addCopiedObject: (id)object
 {
-	NSString *destPath = [FSPATH(self) appendPath: 
+	NSString *destPath = [FSPATH(self) stringByAppendingPathComponent: 
 		[FSPATH(object) lastPathComponent]];
 
 	ETLog(@"Copy file %@ to path %@", FSPATH(object), destPath );
@@ -260,7 +260,7 @@ DEALLOC()
 	// in the following code).
 	while ((fileName = [e nextObject]) != nil)
 	{
-		NSString *path = [dirPath appendPath: fileName];
+		NSString *path = [dirPath stringByAppendingPathComponent: fileName];
 		id object = nil;
 		BOOL isDir = NO;
 
