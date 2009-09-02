@@ -150,7 +150,7 @@
 	{
 		ETDebugLog(@"Store managed object %@ with name %s and uuid %-0.8x", 
 			object, name, [[object UUID] UUIDValue]);
-		[backend storeUUID: [[object UUID] UUIDValue] withName: name];
+		[backend storeUUID: (unsigned char *)[[object UUID] UUIDValue] withName: name];
 		return ETUUIDSize;
 	}
 	else /* Store normal object */
