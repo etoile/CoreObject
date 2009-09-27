@@ -15,6 +15,7 @@
 #import "CODeserializer.h"
 #import "COUtility.h"
 #import "GNUstep.h"
+#include <limits.h>
 
 /** Must be a string and not an NSURL object for NSUserDefaults needs. */
 NSString *CODefaultObjectServerURL = nil;
