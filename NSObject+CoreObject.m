@@ -26,6 +26,10 @@
     NO by default. */
 - (BOOL) isManagedCoreObject
 {
+	if (class_isMetaClass(isa))
+	{
+		return NO;
+	}
 	return [self conformsToProtocol: @protocol(COManagedObject)];
 }
 
