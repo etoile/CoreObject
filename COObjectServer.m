@@ -523,8 +523,10 @@ static COObjectServer *localObjectServer = nil;
 		if ([object isKindOfClass: [COGroup class]] == NO)
 			continue;
 		
-		if ([object tryResolveFault: anUUID]);
+		if ([object tryResolveFault: anUUID])
+		{
 			[fixedGroups addObject: object];
+		}
 	}
 	
 	ETDebugLog(@"Resolved fault %@ in groups %@", anUUID, fixedGroups);
