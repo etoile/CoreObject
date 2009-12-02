@@ -346,23 +346,35 @@
 	return sig;
 }
 
-/** Forwards the invocation to the real object after serializing it. Every few
-    invocations, it will also save a full copy of the object, see 
-    -[COObjectContext setSnapshotTimeInterval:] to specify a custom interval.
-    See also -[COObjectContext recordInvocation:] to understand the persistency
-    mechanism in details.
+/* Speeds up the proxy forwarding when the message doesn't trigger persistency.
+More explanations in -forwardInvocation:.
 
-    TODO: We should try to make this method faster, it's probably a bottleneck.
-    A tricky point is that both the proxy and the real object must react to
-    introspection correctly (as a single object). Unknown messages that neither 
-    the proxy or the real object implement must also result in an unknown 
-    selector exception as expected.
-    Ways to speed up the execution:
+Alternative possibilities, we don't use:
     - reimplement NSObject and NSProxy methods to bypass -forwardInvocation:
     - synthetize methods at runtime for each methods declared in 
       -persistencyMethodNames
     - macros to help the developer to manually syntethize persistency methods at 
-      compile time. */
+      compile time. */ 
+- (id) forwardingTargetForSelector: (SEL)aSelector
+{
+	return [self isPersistencySelector: aSelector] ? nil : _object;
+}
+
+/** Forwards the invocation to the real object after serializing it. Every few
+invocations, it will also save a full copy of the object, see 
+-[COObjectContext setSnapshotTimeInterval:] to specify a custom interval.
+
+See also -[COObjectContext recordInvocation:] to understand the persistency
+mechanism in details.
+
+When a message is only implemented by the real object but doesn't trigger 
+persistency, when the runtime supports it (e.g. GNUstep libobjc2) 
+-forwardingTargetForSelector: is used to speed up the execution.
+
+Note: A tricky point is that both the proxy and the real object must react to 
+introspection correctly (as a single object). Unknown messages that neither the 
+proxy or the real object implement must also result in an unknown selector 
+exception as expected. */
 - (void) forwardInvocation: (NSInvocation *)anInvocation
 {
 	SEL selector = [anInvocation selector];
