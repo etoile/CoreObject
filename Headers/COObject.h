@@ -22,6 +22,8 @@ extern NSString *kCOCreationDateProperty; // kCODateProperty
 extern NSString *kCOModificationDateProperty; // kCODateProperty
 extern NSString *kCOReadOnlyProperty; //kCOIntegerProperty
 extern NSString *kCOParentsProperty; // kCOArrayProperty
+extern NSString *kCOSizeProperty;
+extern NSString *kCOTypeNameProperty;
 
 extern NSString *kCOObjectChangedNotification;
 extern NSString *kCOUpdatedProperty;

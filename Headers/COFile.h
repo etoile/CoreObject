@@ -15,6 +15,7 @@
 {
 	NSURL *_url;
 	BOOL _isCopyPromise;
+	NSMutableDictionary *_cachedMetadatas;
 }
 
 + (id) objectWithURL: (NSURL *)url;
@@ -23,8 +24,11 @@
 - (NSURL *) URL;
 - (NSArray *) properties;
 - (NSDictionary *) metadatas;
+- (BOOL) isValidMetadataKey: (NSString *)key;
+- (void) setName: (NSString *)aName;
 - (NSString *) name;
 - (NSString *) displayName;
+- (void) setDisplayName: (NSString *)aName;
 - (NSImage *) icon;
 //- (NSData *) content;
 //- (NSString *) textContent;
@@ -37,6 +41,7 @@
 - (BOOL) isCopyPromise;
 
 /* Use reserved to COGroup conforming classes */
+
 - (void) didRemoveFromGroup: (id)group;
 - (void) didAddToGroup: (id)group;
 
