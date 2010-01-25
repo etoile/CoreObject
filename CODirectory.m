@@ -343,19 +343,34 @@ DEALLOC()
 	return NO;
 }
 
+/** See ETCollection protocol in EtoileFoundation. */
 - (BOOL) isEmpty
 {
 	return ([[self members] count] == 0);
 }
 
+/** See ETCollection protocol in EtoileFoundation. */
+- (NSUInteger) count
+{
+	return [[self members] count];
+}
+
+/** See ETCollection protocol in EtoileFoundation. */
 - (id) content
 {
 	return [self members];
 }
 
+/** See ETCollection protocol in EtoileFoundation. */
 - (NSArray *) contentArray
 {
 	return [self content];
+}
+
+/** See ETCollection protocol in EtoileFoundation. */
+- (NSEnumerator *) objectEnumerator
+{
+	return [[self members] objectEnumerator];
 }
 
 - (void) insertObject: (id)object atIndex: (unsigned int)index

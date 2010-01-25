@@ -43,8 +43,10 @@
 
 - (BOOL) isOrdered;
 - (BOOL) isEmpty;
+- (NSUInteger) count;
 - (id) content;
 - (NSArray *) contentArray;
+- (NSEnumerator *) objectEnumerator;
 - (void) insertObject: (id)object atIndex: (unsigned int)index;
 - (BOOL) removeObject: (id)object;
 
