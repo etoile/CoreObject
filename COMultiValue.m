@@ -105,16 +105,16 @@ static NSString *pMultiValueKey = @"MultiValue";
 			return kCOMultiStringProperty;
 		else if ([value isKindOfClass: [NSNumber class]])
 		{
-			const char *oct = [(NSNumber *)value objCType];
-			if ((oct == @encode(int)) ||
-			    (oct == @encode(unsigned int)) ||
-			    (oct == @encode(long)) ||
-			    (oct == @encode(unsigned long)))
+			char oct = [(NSNumber *)value objCType][0];
+			if ((oct == @encode(int)[0]) ||
+			    (oct == @encode(unsigned int)[0]) ||
+			    (oct == @encode(long)[0]) ||
+			    (oct == @encode(unsigned long)[0]))
 			{
 				return kCOMultiIntegerProperty;
 			}
-			else if ((oct == @encode(float)) ||
-			         (oct == @encode(double)))
+			else if ((oct == @encode(float)[0]) ||
+			         (oct == @encode(double)[0]))
 			{
 				return kCOMultiRealProperty;
 			}
