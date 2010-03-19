@@ -265,7 +265,7 @@
 }
 
 /** See COManagedObject protocol. */
-- (unsigned int) hash
+- (NSUInteger) hash
 {
 	return [_uuid hash];
 }

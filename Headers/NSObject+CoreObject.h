@@ -24,7 +24,7 @@
 - (ETUUID *) UUID;
 
 /** Returns a hash based on the UUID. */
-- (unsigned int) hash;
+- (NSUInteger) hash;
 
 /** Returns the current version of the instance. This version represents a 
     revision in the object history. 

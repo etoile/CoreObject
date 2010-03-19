@@ -88,7 +88,7 @@ get copied inside the directory to which you send -addMember:. */
 	return (isSameType && [[self URL] isEqual: [object URL]]);
 }
 
-- (unsigned int) hash
+- (NSUInteger) hash
 {
 	// TODO: May be return [[self UUID] hash]; when possible
 	return [super hash];

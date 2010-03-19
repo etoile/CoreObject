@@ -604,7 +604,7 @@ static NSMutableSet *automaticPersistentClasses = nil;
 }
 
 /** <p>See COManagedObject protocol.</p> */
-- (unsigned int) hash
+- (NSUInteger) hash
 {
 	return [[self valueForProperty: kCOUIDProperty] hash];
 }
