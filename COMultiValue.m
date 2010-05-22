@@ -91,7 +91,7 @@ static NSString *pMultiValueKey = @"MultiValue";
 	return [[_values objectAtIndex: index] valueForKey: kValue];
 }
 
-- (unsigned int) count
+- (NSUInteger) count
 {
 	return [_values count];
 }

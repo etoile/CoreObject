@@ -36,7 +36,7 @@
 - (NSString *) labelAtIndex: (int) index;
 - (id) valueAtIndex: (int) index;
 
-- (unsigned int) count;
+- (NSUInteger) count;
 /* Always use the first type of value. If there is no value, return ErrorType */
 - (COPropertyType) propertyType;
 
