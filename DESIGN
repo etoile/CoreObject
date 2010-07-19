@@ -1,0 +1,4 @@
+Design Document
+===============
+
+CoreObject is (currently) implemented as a state based revision control system. This means that it stores the state of the object graph, and deduces operations using a diff algorithm. Contrast this with an operation based system, which stores the operations used to go from one state to the next, and deduces the state by replaying operations.

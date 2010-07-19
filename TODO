@@ -1,0 +1,8 @@
+To do
+=====
+
+- Figure out how to store conflicts
+- Use delta compression in the store
+- Port to GNUstep
+- Use UnitKit
+- Look into using CLucene for text indexing, maybe?

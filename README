@@ -1,0 +1,47 @@
+ObjectMerging / CoreObject rewrite
+====================================
+
+Author: Eric Wasylishen
+License: MIT X11
+
+This is my work-in-progress rewrite of CoreObject.
+
+Primary goals:
+---------------
+- Be a storage framework that could be used in a GNUstep/Cocoa app 
+  which gives your app revision control for free. i.e., the app's document
+  format would be an "object bundle" directory containing the document's
+  history graph and all of the versions of objects (delta compressed
+  for space efficiency).
+  
+- Similar spirit as CoreData, except adding revision control, and objects 
+  don't need to follow a schema.
+
+
+Changes vs. the original CoreObject implemenation:
+--------------------------------------------------
+
+- More restricted object contents: no serialization of existing ObjC objects;
+ it is not possible to incorporate normal ObjC classes into the CoreObject
+ graph. (you could use keyed archiving and then store the resulting
+ NSData as a property of an object, though)
+ 
+- Does not use message-based persistency
+
+- Any multivalued property can contain COObjects
+
+- My COObjectContext has a different role (it may be confusing to use the same name)
+
+- (planned) full support for revision control features (diff, merge, branching)
+ as well as selective undo.
+
+
+Inspired by these papers:
+--------------------------
+- "Difference and Union of Models" by M. Alanen and I. Porres.
+- "A flexible object merging framework" by J. P. Munson and P. Dewan.
+ This paper has a lot of nice examples of collaboration scenarios with merging
+
+
+Currently this is in a pretty early stage..
+

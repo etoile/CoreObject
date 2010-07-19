@@ -1,0 +1,34 @@
+Diff notes
+----------
+
+Currently, for diffing ordered sequences, I'm using a BSD-licensed C++ implementation
+(diff.hh) of the Myers algorithm, the same algorithm GNU diff implements.
+It doesn't really need to be C++, that was just easiest for me to work with
+when porting it from C#.
+
+The GNU algorithm has some heuristics which my implementation lacks, so the GNU
+code is faster in some cases. I think this mostly affects diffing unrelated arrays.
+I did one test case with 130k element arrays, and large unrelated sections.
+GNU diff was about 0.3s, and mine was 3.0s. Not too much worse, anyway.
+
+Another algorithm I investigated is the one used in python's difflib. It's
+conceptually very simple (find the longest common _substring_, then recursively
+repeat the algorithim on the two non-common sides of the string. This
+will incrementally generate a long common subsequence (i.e. diff). I wrote a 
+test implementation in ObjC but it was too slow -- need to play with the idea 
+a bit more.
+
+
+Other links:
+- libxdiff (http://www.xmailserver.org/xdiff-lib.html), LGPL
+   This has a collection of algorithims including the python one and the myers one
+   with the heuristics, but is LGPL licensed.
+
+- libmba (http://www.ioplex.com/~miallen/libmba/dl/src/diff.c), MIT
+   Myers algorithm
+   
+- google-diff-patch-match (http://code.google.com/p/google-diff-match-patch), ApacheV2
+
+- patience diff (http://bramcohen.livejournal.com/73318.html)
+   This seems to produce output similar to the python algorithim.
+   
