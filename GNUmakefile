@@ -90,5 +90,6 @@ include $(GNUSTEP_MAKEFILES)/bundle.make
 else
 include $(GNUSTEP_MAKEFILES)/framework.make
 -include ../../etoile.make
+-include ../../documentation.make
 -include GNUmakefile.postamble
 endif
