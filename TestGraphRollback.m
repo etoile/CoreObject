@@ -339,10 +339,10 @@
 	[CTXT restoreToVersion: 12];
 
 	/* Destroy the context and the object server and recreate them */
-	id contextUUID = RETAIN([CTXT UUID]);
+	ETUUID *contextUUID = RETAIN([CTXT UUID]);
 	[COObjectContext setCurrentContext: nil];
 	[COObjectServer makeNewDefaultServer];
-	[COObjectContext setCurrentContext: AUTORELEASE([[COObjectContext alloc] initWithUUID: contextUUID])];
+	[COObjectContext setCurrentContext: AUTORELEASE([(COObjectContext *)[COObjectContext alloc] initWithUUID: contextUUID])];
 
 	/* All objects are faults, thereby we must load them */
 	[self recreateObjectGraph];

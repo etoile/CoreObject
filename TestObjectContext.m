@@ -90,7 +90,7 @@
 	DESTROY(ctxt);
 	
 	/* Test Recreate Context */
-	ctxt = [[[self class] alloc] initWithUUID: ctxtUUID];
+	ctxt = [(COObjectContext *)[[self class] alloc] initWithUUID: ctxtUUID];
 	RELEASE(ctxtUUID);	
 	UKIntsEqual(2, [ctxt latestVersion]);
 	

@@ -22,6 +22,10 @@
 #define TMP_URL [NSURL fileURLWithPath: [FM tempDirectory]]
 #define NEW(X) (AUTORELEASE([[X alloc] init]))
 
+@interface COObjectServer (UnstableAPI)
+- (id) objectForUUID: (ETUUID *)uuid;
+@end
+
 @interface COObjectServer (TestObjectServer) <UKTest>
 @end
 
@@ -186,12 +190,12 @@
 	[self cacheObjects: 
 		A(object, pendingFaultObject, pendingFaultGroup, group, group2)];
 	[group addMember: object];
-	[group addMember: [pendingFaultObject UUID]];
+	[group addMember: (id)[pendingFaultObject UUID]];
 	/* Be careful to call -addGroup: instead of -addMember: when inserting a 
 	   fault marker for a group. -addMember: cannot detect if the parameter 
 	   is a group if you pass an UUID as a fault marker. */
-	[group2 addGroup: [pendingFaultGroup UUID]];
-	[pendingFaultGroup addMember: [pendingFaultObject UUID]];
+	[group2 addGroup: (id)[pendingFaultGroup UUID]];
+	[pendingFaultGroup addMember: (id)[pendingFaultObject UUID]];
 	[group setHasFaults: YES];
 	[group2 setHasFaults: YES];	
 	[pendingFaultGroup setHasFaults: YES];

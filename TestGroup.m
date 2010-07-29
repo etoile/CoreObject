@@ -357,9 +357,9 @@
 	[[COObjectContext currentContext] registerObject: g];
 		
 	[g addGroup: g1];
-	[g addGroup: [g2 UUID]];
+	[g addGroup: (id)[g2 UUID]];
 	[[COObjectContext currentContext] registerObject: g2];
-	[g addGroup: [g3 UUID]];
+	[g addGroup: (id)[g3 UUID]];
 	[g addGroup: gg1];
 	[g addGroup: [ETUUID UUID]];
 

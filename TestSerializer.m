@@ -76,7 +76,7 @@ id testRoundTrip(id object)
 	[serializer serializeObject: object withName: @"test"];
 
 	/* Deserialize */
-	id deserializer = [serializer deserializer];
+	ETDeserializer *deserializer = [serializer deserializer];
 	[deserializer setVersion: 0];
 	id newInstance = [deserializer restoreObjectGraph];
 
@@ -121,7 +121,7 @@ id testRoundTrip(id object)
 	// FIXME: Is no autorelease pool necessary here?
 	//CREATE_AUTORELEASE_POOL(pool);
 
-	id deserializer = [ETDeserializer defaultCoreObjectDeserializerWithURL: sourceURL];
+	ETDeserializer *deserializer = [ETDeserializer defaultCoreObjectDeserializerWithURL: sourceURL];
 
 	[deserializer setBranch: @"root"];
 	[deserializer setVersion: 0];
