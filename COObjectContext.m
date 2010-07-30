@@ -80,13 +80,23 @@ static COObjectContext *currentObjectContext = nil;
 	return [self initWithUUID: nil];
 }
 
-/** <init /> Initializes and returns a new object context for a given UUID. 
-    If the UUID refers to an object context that is already known in the 
-    metadata server, the returned instance will have a version that matches the 
-    last change logged in the history of this context. */
+/** <init /> Initializes and returns a new object context for a given UUID.
+ 
+If the UUID refers to an object context that is already known in the metadata 
+server, the returned instance will have a version that matches the last change 
+logged in the history of this context. */
 - (id) initWithUUID: (ETUUID *)aContextUUID
 {
-	SUPERINIT
+	// FIXME: Should be -currentServer or similar rather than -defaultServer
+	COObjectContext *cachedCtxt = [[COObjectServer defaultServer] cachedContextForUUID: aContextUUID];
+
+	if (nil != cachedCtxt)
+	{
+		DESTROY(self);
+		return RETAIN(cachedCtxt);
+	}
+
+	SUPERINIT;
 
 	BOOL isNewContext = (aContextUUID == nil);
 
