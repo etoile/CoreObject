@@ -68,9 +68,14 @@
 	[super release];
 }
 
-- (void) testInit
+- (void) testCurrentContext
 {
 	UKNotNil([[self class] currentContext]);
+}
+
+- (void) testInit
+{
+	UKObjectsSame(self, AUTORELEASE([(COObjectContext *)[[self class] alloc] initWithUUID: [self UUID]]));
 }
 
 - (void) testLatestVersion

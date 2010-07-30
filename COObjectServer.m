@@ -287,7 +287,10 @@ static COObjectServer *localObjectServer = nil;
 	if (deserializationFailed)
 		return nil;
 
-	[object _setObjectVersion: fullSaveVersion];
+	if ([object isManagedCoreObject])
+	{
+		[object _setObjectVersion: fullSaveVersion];
+	}
 	
 	ETDeserializer *deltaDeserializer = [[ETSerializer 
 		defaultCoreObjectDeltaSerializerForURL: objectURL version: fullSaveVersion] deserializer];
@@ -295,9 +298,12 @@ static COObjectServer *localObjectServer = nil;
 	[deltaDeserializer playbackInvocationsWithObject: object 
 	                                     fromVersion: fullSaveVersion 
 	                                       toVersion: objectVersion];
-	
-	NSAssert2([object objectVersion] == objectVersion, @"Recreated object "
-		"version %@ doesn't match the requested version %i", object, objectVersion);
+
+	if ([object isManagedCoreObject])
+	{	
+		NSAssert2([object objectVersion] == objectVersion, @"Recreated object "
+			"version %@ doesn't match the requested version %i", object, objectVersion);
+	}
 	
 	return object;
 }
@@ -592,7 +598,7 @@ If no entry exists for an UUID in the context cache, returns nil. */
 if it failed because the context was already cached. */
 - (BOOL) cacheContext: (COObjectContext *)aCtxt
 {
-	if ([_contextTable objectForKey: [aCtxt UUID]] != nil);
+	if ([_contextTable objectForKey: [aCtxt UUID]] != nil)
 		return NO;
 
 	[_contextTable setObject: aCtxt forKey: [aCtxt UUID]];

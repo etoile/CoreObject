@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/NSObject+CoreObject.h>
+#import <CoreObject/COFault.h>
 
 @class COObjectContext;
 
@@ -22,7 +23,7 @@
  * graph representing a document, or a major component in a composite document
  * (e.g. an image in a larger work).  
  */
-@interface COProxy : NSProxy <COManagedObject>
+@interface COProxy : NSProxy <COManagedObject, COFault>
 {
 	/* Object identity */
 	ETUUID *_uuid;
@@ -60,5 +61,13 @@
 - (COObjectContext *) objectContext;
 
 - (NSDictionary *) metadatas;
+
+/* Faulting */
+
+- (id) initWithFaultDescription: (NSDictionary *)aFaultDesc
+                futureClassName: (NSString *)aClassName;
+- (BOOL) isFault;
+- (NSString *) futureClassName;
+- (NSError *) load;
 
 @end

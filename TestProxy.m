@@ -12,6 +12,7 @@
 #import "COProxy.h"
 #import "COObjectContext.h"
 #import "COObjectServer.h"
+#import "COMetadataServer.h"
 #import "COUtility.h"
 
 #define NEW(X) (AUTORELEASE([[X alloc] init]))
@@ -71,6 +72,46 @@
 	UKNotNil([proxy objectContext]);
 	UKIntsEqual(0, [proxy objectVersion]);
 	UKObjectsEqual([COProxy class], ((COProxy *)proxy)->isa);
+}
+
+- (void) testInitAsFaultWhenAlreadyLoaded
+{
+	id metadataServer = [[COObjectServer defaultServer] metadataServer];
+	id faultDesc = [metadataServer faultDescriptionForUUID: [proxy UUID]];
+	id fault = [[COProxy alloc] initWithFaultDescription: faultDesc futureClassName: nil];
+
+	UKObjectsSame(proxy, fault);
+}
+
+- (void) testInitAsFaultAndLoad
+{
+	int objectVersion = [proxy objectVersion];
+
+	[[proxy objectContext] unregisterObject: proxy];
+
+	/* Paranoid check */
+	UKNil([[COObjectServer defaultServer] cachedObjectForUUID: [proxy UUID]]);
+
+	id metadataServer = [[COObjectServer defaultServer] metadataServer];
+	id faultDesc = [metadataServer faultDescriptionForUUID: [proxy UUID]]; 
+	id fault = [[COProxy alloc] initWithFaultDescription: faultDesc futureClassName: nil];
+
+	UKObjectsNotSame(proxy, fault);
+	UKTrue([fault isFault]);
+	UKIntsEqual(-1, [fault objectVersion]);
+	UKObjectsEqual([COObjectContext currentContext], [fault objectContext]);
+	UKTrue([[[COObjectContext currentContext] registeredObjects] containsObject: fault]);
+
+	[(COProxy *)fault load];
+
+	UKFalse([fault isFault]);
+	UKIntsEqual(objectVersion, [fault objectVersion]);
+	UKObjectsEqual([COObjectContext currentContext], [fault objectContext]);
+	UKTrue([[[COObjectContext currentContext] registeredObjects] containsObject: fault]);
+
+	/* Test real object is ready and persistency selectors have been restored */
+	UKStringsEqual(@"Nobody", [fault whoAmI]);
+	UKIntsEqual(objectVersion, [fault objectVersion]);
 }
 
 - (void) testRespondsToSelector

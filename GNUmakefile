@@ -34,7 +34,8 @@ CoreObject_OBJC_FILES = \
 	CODeserializer.m \
 	COMetadataServer.m \
 	COObjectServer.m \
-	COProxy.m
+	COProxy.m \
+	COFault.m
 
 ifeq ($(test), yes)
 CoreObject_CPPFLAGS += -DUKTEST=1
@@ -76,7 +77,8 @@ CoreObject_HEADER_FILES = \
 	CODeserializer.h \
 	COMetadataServer.h \
 	COObjectServer.h \
-	COProxy.h
+	COProxy.h \
+	COFault.h
 
 ifeq ($(test), yes)
 	CoreObject_LDFLAGS += -lUnitKit -lEtoileFoundation -lEtoileSerialize -lpq

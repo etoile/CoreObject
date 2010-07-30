@@ -615,7 +615,7 @@ Warning: For now, the instance size is null. */
 	NSString *type = [self executeDBQuery: [NSString stringWithFormat: 
 		@"SELECT objectType FROM UUID WHERE UUID = '%@';", [aUUID stringValue]]];
 	NSString *contextString = [self executeDBQuery: [NSString stringWithFormat: 
-		@"SELECT context FROM UUID WHERE UUID = '%@';", [aUUID stringValue]]];
+		@"SELECT contextUUID FROM UUID WHERE UUID = '%@';", [aUUID stringValue]]];
 	ETUUID *contextUUID = [ETUUID UUIDWithString: contextString]; 
 
 	if (nil == type || nil == contextUUID)

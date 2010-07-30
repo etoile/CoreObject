@@ -120,6 +120,8 @@ logged in the history of this context. */
 	_isUndoing = NO;
 	_isRedoing = NO;
 
+	[[self objectServer] cacheContext: self];
+
 	return self;
 }
 
@@ -236,6 +238,11 @@ logged in the history of this context. */
 
 	if (noPersistentObjectAvailable)
 		return nil;
+
+	// NOTE: On creation or load, COProxy registers itself.
+	// For now, that's unlike COObject which won't register itself on load.
+	if ([object isCoreObjectProxy])
+		return object;
 	
 	if ([object isKindOfClass: [COGroup class]])
 		[object setHasFaults: YES];

@@ -10,6 +10,8 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <EtoileSerialize/EtoileSerialize.h>
 
+@class COObjectContext;
+
 /** The protocol to which any fault class must comply to. 
 
 CoreObject comes with two concrete fault classes COBasicFault and COProxy. 
@@ -23,6 +25,27 @@ has to be returned  by overriding or implementing the +faultClass method. */
 /** Initializes and returns a new fault object that can later be turned into 
 a core object.
 
+aFaultDesc must be the dictionary returned by 
+-[COMetadataServer faultDescriptionForUUID:] for a core object UUID.<br />
+This dictionary contains the following keys:
+
+<deflist>
+<term>kCOUUIDCoreMetadata</term>
+<item>Value is an ETUUID that identifies the core object to be loaded.</item>
+<term>kCOObjectTypeCoreMetadata</term>
+<item>Value is a NSString that gives the real (or original) class name of the 
+core object to be loaded.</item>
+<term>kCOInstanceSizeCoreMetadata</term>
+<item>Value is a NSNumber unsigned integer that gives the final size of the 
+core object in memory. This size always corresponds to the original class 
+instance size. Hence a COPerson loaded as a COObject can later become a true 
+COPerson if the class gets loaded.<br />
+The instance size is usually cached in the Metadata DB.</item>
+<term>kCOContextCoreMetadata</term>
+<item>Value is an ETUUID that identifies the object context that owns the core 
+object and where the fault must be registered.</item>
+</deflist>
+
 aClassName describes the class to set on the core object when -load is invoked. 
 It might be another class that the original one. For example, a COGroup or 
 COPerson can be instantiated as a COObject. This is mainly useful to let 
@@ -31,15 +54,9 @@ the original class is not available. This also help to minimize the number of
 loaded frameworks/classes when traversing the CoreObject graph in a very open 
 way (e.g. as a generic object manager would allow it).
 
-anInstanceSize gives the final size of the core object in memory. This size 
-always corresponds to the original class instance size. Hence a COPerson loaded 
-as a COObject can later become a true COPerson if the class gets loaded.<br />
-The instance size is usually cached in the Metadata DB.
-
 On return, -isFault must return NO. */
-- (id) initWithUUID: (ETUUID *)anUUID 
-    futureClassName: (NSString *)aClassName
-       instanceSize: (NSUInteger)anInstanceSize;
+- (id) initWithFaultDescription: (NSDictionary *)aFaultDesc
+                futureClassName: (NSString *)aClassName;
 /** Deserializes the real object and enables its persistency.
 
 When the real object is already loaded, must return nil immediately.
@@ -63,18 +80,6 @@ persistency-related. */
 /** See -[(COManagedObject) isEqual:]. */
 - (BOOL) isEqual: (id)other;
 
-@end
-
-
-/** Describes what must be known to instantiate a fault for a core object.
-
-You don't have to implement this protocol, but COMetadataServer return objects 
-that conforms to it. */
-@protocol COFaultDescription
-/** Returns the core object class name. */
-- (NSString *) objectType;
-/** Returns the core object size in memory. */
-- (NSUInteger) instanceSize;
 @end
 
 

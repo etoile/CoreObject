@@ -10,6 +10,7 @@
 #import "COProxy.h"
 #import "COObjectContext.h"
 #import "COObjectServer.h"
+#import "COMetadataServer.h"
 #import "COUtility.h"
 
 @interface COProxy (FrameworkPrivate)
@@ -54,6 +55,17 @@
 	return [self initWithObject: anObject UUID: [ETUUID UUID]];
 }
 
+/* Return a cached object instead of self if the UUID exists in the cache */
+#define LOOKUP_CACHED_OBJECT_AND_RETURN_ON_SUCCESS \
+	id cachedObject = [[COObjectServer defaultServer] cachedObjectForUUID: aUUID]; \
+ \
+	if (cachedObject != nil) \
+	{ \
+		RETAIN(cachedObject); \
+		DESTROY(self); \
+		return cachedObject; \
+	}
+
 /** <init />Initializes and returns a new CoreObject proxy for handling the 
     persistency of anObject known by aUUID.
     If aUUID doesn't exist the metadata server bound to the current object 
@@ -77,39 +89,26 @@
 {
 	// NOTE: Don't call -[super init], otherwise NSProxy raises an exception.
 
-	// TODO: Try to compact the following code by rewriting -[COObjectServer objectForUUID:]
-	if (anObject == nil)
-	{
-		/* Return a cached object instead of self if aUUID exists in the cache */
-		id cachedObject = [[COObjectServer defaultServer] cachedObjectForUUID: aUUID];
-		
-		if (cachedObject != nil)
-		{
-			RETAIN(cachedObject);
-			DESTROY(self);
-			return cachedObject;
-		}
-		
-		/* Try to load the object if the UUID exists in the metadata DB */
-		id loadedObject = [[COObjectContext currentContext] objectForUUID: aUUID];
-		
-		if (loadedObject != nil)
-		{
-			RETAIN(loadedObject);
-			DESTROY(self);
-			return loadedObject;
-		}
-	}
+	LOOKUP_CACHED_OBJECT_AND_RETURN_ON_SUCCESS
 
-	/* Normal initialization */
+	BOOL isNewCoreObject = (anObject != nil);
+
 	ASSIGN(_object, anObject);
 	ASSIGN(_uuid, aUUID);
 	_objectVersion = -1;
 
-	if ([anObject respondsToSelector: @selector(persistencyMethodNames)])
-		[self setPersistencyMethodNames: [anObject persistencyMethodNames]];
-	[self setUpCustomProxyClassIfNeeded];
-	[self startPersistency];
+	if (isNewCoreObject)
+	{
+		[self startPersistency]; /* Insert and snapshot the object */
+	}
+	else
+	{
+		// FIXME: Should be -currentServer or similar rather than -defaultServer
+		COObjectContext *context = [[COObjectServer defaultServer] contextForObjectWithUUID: aUUID];
+
+		[context registerObject: self]; /* Will call back -setObjectContext: */
+		[self load];
+	}
 
 	return self;
 }
@@ -132,10 +131,22 @@
 	}
 }
 
+- (void) enablePersistency
+{
+	ETAssert(nil != _object);
+
+	if ([_object respondsToSelector: @selector(persistencyMethodNames)])
+	{
+		[self setPersistencyMethodNames: [_object persistencyMethodNames]];
+	}
+	[self setUpCustomProxyClassIfNeeded];
+}
+
 /* Initializes objectContext and objectVersion by inserting the proxy in the 
    current object context. This creates the base version snapshot. */
 - (void) startPersistency
 {
+	[self enablePersistency];
 	[[COObjectContext currentContext] insertObject: self];
 }
 
@@ -406,6 +417,73 @@ exception as expected. */
 		   -doesNotRecognizeSelector: will called on the real object then. */
 		[anInvocation invokeWithTarget: _object];
 	}
+}
+
+/** Initializes the receiver as a fault whose real object is bound to the fault 
+description.
+
+Doesn't load the real object unlike other initializers. 
+
+The class argument is ignored since COProxy doesn't support -futureClass. */
+- (id) initWithFaultDescription: (NSDictionary *)aFaultDesc futureClassName: (NSString *)aFutureClassName
+{
+	ETUUID *aUUID = [aFaultDesc objectForKey: kCOUUIDCoreMetadata];
+
+	LOOKUP_CACHED_OBJECT_AND_RETURN_ON_SUCCESS;
+
+	COObjectContext *context = AUTORELEASE([(COObjectContext *)[COObjectContext alloc] initWithUUID: 
+		[aFaultDesc objectForKey: kCOContextCoreMetadata]]);
+
+	ASSIGN(_uuid, aUUID);
+	_objectVersion = -1;
+	[context registerObject: self]; /* Will call back -setObjectContext: */
+
+	return self;
+}
+
+/** Returns whether the real object has to be loaded. 
+
+See COFault protocol. */
+- (BOOL) isFault
+{
+	return (_object == nil);
+}
+
+/** Always returns nil.
+
+See COFault protocol. */
+- (NSString *) futureClassName
+{
+	return nil;
+}
+
+/** Loads the real object wrapped by the proxy and enables the persistency.
+
+If -isFault returns NO, does nothing.
+ 
+If the loading fails, logs a warning.
+
+Warning: returns nil in all cases currently. */
+- (NSError *) load
+{
+	if ([self isFault] == NO)
+		return nil;
+
+	/* Try to load the object if the UUID exists in the metadata DB */
+	id loadedObject = [[COObjectServer defaultServer] rawObjectWithUUID: _uuid];
+
+	if (loadedObject == nil)
+	{
+		ETLog(@"WARNING: Invalid fault ! Object %@ cannot be loaded", _uuid);
+		return nil;
+	}
+
+	ASSIGN(_object, loadedObject);
+	// TODO: We should rather get the version with -rawObjectWithUUID:
+	_objectVersion = [_objectContext lastVersionOfObject: self];
+	[self enablePersistency];
+
+	return nil;
 }
 
 @end
