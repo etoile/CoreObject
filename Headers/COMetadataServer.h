@@ -10,6 +10,8 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <libpq-fe.h>
 
+@protocol COFaultDescription;
+
 /** Before being able to  create a DB, both the rights to access the PostgreSQL 
     server and to create a DB must be granted to the user with the following 
     command:
@@ -52,6 +54,7 @@
     toObjectVersion: (int)objectVersion
           timestamp: (NSDate *)recordTimestamp;
 - (int) objectVersionForUUID: (ETUUID *)anUUID;
+- (NSDictionary *) faultDescriptionForUUID: (ETUUID *)aUUID;
 
 - (NSURL *) storeURL;
 - (NSMutableDictionary *) configurationDictionary;
@@ -78,3 +81,14 @@
 /* Defaults */
 
 extern NSURL *CODefaultMetadataServerURL;
+
+/* Intrisic Metadatas */
+
+/** The UUID of a core object. */
+extern NSString *kCOUUIDCoreMetadata;
+/** The class name of a core object. */
+extern NSString *kCOObjectTypeCoreMetadata;
+/** The size in memory of a core object. */
+extern NSString *kCOInstanceSizeCoreMetadata;
+/** The context UUID of a core object */
+extern NSString *kCOContextCoreMetadata;

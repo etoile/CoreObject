@@ -596,4 +596,38 @@ static COMetadataServer *metadataServer = nil;
 	return version;
 }
 
+/** Returns what must be known to instantiate a fault for a core object bound 
+the given UUID in the Metadata base.
+
+The returned dictionary contains the keys kCOUUIDCoreMetadata, 
+kCObjectTypeCoreMetadata,  kCOInstanceSizeCoreMetadata and kCOContextCoreMetadata, 
+and their respective values as ETUUID, NSString, NSNumber and ETUUID.<br />
+For detailed explanations, see -[ETFault initWithFaultDescription:futureClassName:].
+
+kCOUUIDCoreMetadata value is the UUID argument.
+
+If no UUID entry is found, returns nil.
+
+Warning: For now, the instance size is null. */
+- (NSDictionary *) faultDescriptionForUUID: (ETUUID *)aUUID
+{
+	// FIXME: Remove that ugly duplication once switched to SQLClient
+	NSString *type = [self executeDBQuery: [NSString stringWithFormat: 
+		@"SELECT objectType FROM UUID WHERE UUID = '%@';", [aUUID stringValue]]];
+	NSString *contextString = [self executeDBQuery: [NSString stringWithFormat: 
+		@"SELECT context FROM UUID WHERE UUID = '%@';", [aUUID stringValue]]];
+	ETUUID *contextUUID = [ETUUID UUIDWithString: contextString]; 
+
+	if (nil == type || nil == contextUUID)
+		return nil;
+
+	return D(aUUID, kCOUUIDCoreMetadata, type, kCOObjectTypeCoreMetadata, 
+		[NSNull null], kCOInstanceSizeCoreMetadata, contextUUID, kCOContextCoreMetadata);
+}
+
 @end
+
+NSString *kCOUUIDCoreMetadata = @"UUID";
+NSString *kCOObjectTypeCoreMetadata = @"objectType";
+NSString *kCOInstanceSizeCoreMetadata = @"instanceSize";
+NSString *kCOContextCoreMetadata = @"context";

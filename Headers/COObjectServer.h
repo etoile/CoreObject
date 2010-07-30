@@ -33,6 +33,7 @@
 	id _metadataServer;
 	id _defaultLibrary;
 	id _coreObjectTable; /** Objects by UUIDs or by URLs if no existing UUIDs */
+	NSMutableDictionary *_contextTable;
 }
 
 + (id) defaultServer;
@@ -47,7 +48,8 @@
 
 /* CoreObject Factory */
 
-- (id) objectWithURL: (NSURL *)objectURL version: (int)objectVersion;
+- (id) rawObjectWithURL: (NSURL *)objectURL version: (int)objectVersion;
+- (id) rawObjectWithUUID: (ETUUID *)aUUID;
 - (id) objectWithUUID: (ETUUID *)anUUID version: (int)objectVersion;
 - (id) objectWithUUID: (ETUUID *)anUUID;
 
@@ -105,6 +107,12 @@
 // large object graphs as the generic ObjectManager will make possible.
 //- (BOOL) hasFaultForUUID: (ETUUID *)uuid;
 //- (void) turnCachedObjectsIntoFaultsIfNotUsed;
+
+/* Context Access */
+
+- (COObjectContext *) contextForObjectWithUUID: (ETUUID *)aUUID;
+- (COObjectContext *) cachedContextForUUID: (ETUUID *)aUUID;
+- (BOOL) cacheContext: (COObjectContext *)aCtxt;
 
 /* Querying Object Version (to be moved to COSerializer and ETObjectSerialStore) */
 

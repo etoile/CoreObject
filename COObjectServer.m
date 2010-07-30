@@ -140,6 +140,7 @@ static COObjectServer *localObjectServer = nil;
 	_objectClasses = [[NSMutableDictionary alloc] init];
 	_groupClasses = [[NSMutableDictionary alloc] init];
 	_coreObjectTable = [[NSMutableDictionary alloc] init];
+	_contextTable = [[NSMutableDictionary alloc] init];
 
 	return self;
 }
@@ -149,6 +150,7 @@ static COObjectServer *localObjectServer = nil;
 	DESTROY(_objectClasses);
 	DESTROY(_groupClasses);
 	DESTROY(_coreObjectTable);
+	DESTROY(_contextTable);
 	DESTROY(_metadataServer);
 	DESTROY(_serializationURL);
 	[super dealloc];
@@ -268,7 +270,7 @@ static COObjectServer *localObjectServer = nil;
     it and playing back invocations on it, then returns it.
     The returned instance doesn't get cached in the receiver.
     For now, this method uses simply binary delta and full save deserializers. */
-- (id) objectWithURL: (NSURL *)objectURL version: (int)objectVersion
+- (id) rawObjectWithURL: (NSURL *)objectURL version: (int)objectVersion
 {
 	// TODO: Replace the next line with  
 	// int fullSaveVersion = [[NSObjectSerialBundle objectStoreWithURL: objectURL] lastVersionInBranch: @"root" ofType: @"FullSave"]
@@ -300,6 +302,18 @@ static COObjectServer *localObjectServer = nil;
 	return object;
 }
 
+- (id) rawObjectWithUUID: (ETUUID *)aUUID version: (int)objectVersion
+{
+	NSURL *objectURL = [[self metadataServer] URLForUUID: aUUID];
+	return [self rawObjectWithURL: objectURL version: objectVersion];
+}
+
+- (id) rawObjectWithUUID: (ETUUID *)aUUID
+{
+	int objectVersion = [[self metadataServer] objectVersionForUUID: aUUID];
+	return [self rawObjectWithUUID: aUUID version: objectVersion];
+}
+
 /** Recreates the last version of an object for a given UUID by deserializing 
     it and playing back invocations on it, then returns it.
     The returned instance doesn't get registered in the receiver. 
@@ -328,18 +342,17 @@ static COObjectServer *localObjectServer = nil;
     returned. */
 - (id) objectWithUUID: (ETUUID *)anUUID version: (int)objectVersion
 {
-	NSURL *objectURL = [[self metadataServer] URLForUUID: anUUID];
-	id realObject = [self objectWithURL: objectURL version: objectVersion];
+	id rawObject = [self rawObjectWithUUID: anUUID version: objectVersion];
 
-	if (realObject == nil)
+	if (rawObject == nil)
 		return nil;
 
-	BOOL usesProxy = ([realObject isKindOfClass: [COObject class]] == NO);
-	id object = realObject;
+	BOOL usesProxy = ([rawObject isKindOfClass: [COObject class]] == NO);
+	id object = rawObject;
 
 	if (usesProxy)
 	{
-		object = [COProxy proxyWithObject: realObject UUID: anUUID];
+		object = [COProxy proxyWithObject: rawObject UUID: anUUID];
 		[object _setObjectVersion: objectVersion];
 	}
 
@@ -547,6 +560,43 @@ static COObjectServer *localObjectServer = nil;
 - (void) save 
 { 
 	//[ETSerializer serializeObject: self toURL: [self serializationURL]];
+}
+
+/* Context Access */
+
+/** Returns the object context to which belongs the core object identified by 
+aUUID.
+
+If the object context is not loaded, it gets instantiated and cached as needed.
+
+If the core object is unknown to the Metadata base, returns nil. */
+- (COObjectContext *) contextForObjectWithUUID: (ETUUID *)aUUID
+{
+	NSDictionary *faultDesc = [[self metadataServer] faultDescriptionForUUID: aUUID];
+	ETUUID *contextUUID = [faultDesc objectForKey: kCOContextCoreMetadata];
+
+	/* Will check our context cache */
+	return AUTORELEASE([(COObjectContext *)[COObjectContext alloc] initWithUUID: contextUUID]);
+}
+
+/** Returns the object context identified by aUUID in the context cache of the 
+receiver.
+
+If no entry exists for an UUID in the context cache, returns nil. */
+- (COObjectContext *) cachedContextForUUID: (ETUUID *)aUUID
+{
+	return [_contextTable objectForKey: aUUID];
+}
+
+/** Adds an object context to the context cache of the receiver and returns NO 
+if it failed because the context was already cached. */
+- (BOOL) cacheContext: (COObjectContext *)aCtxt
+{
+	if ([_contextTable objectForKey: [aCtxt UUID]] != nil);
+		return NO;
+
+	[_contextTable setObject: aCtxt forKey: [aCtxt UUID]];
+	return YES;
 }
 
 /* Querying Object Version
