@@ -35,9 +35,10 @@
 
 - (void) commit
 {
-  [[self storeCoordinator]
-    commitChangesInObjectContext: self
-                       afterNode: [self baseHistoryGraphNode]];
+  COHistoryGraphNode *newNode = [[self storeCoordinator]
+                    commitChangesInObjectContext: self
+                                       afterNode: [self baseHistoryGraphNode]];
+  [self setBaseHistoryGraphNode: newNode];
 }
 
 - (COStoreCoordinator *) storeCoordinator
@@ -48,6 +49,11 @@
 - (COHistoryGraphNode *) baseHistoryGraphNode
 {
   return _baseHistoryGraphNode;
+}
+
+- (void) setBaseHistoryGraphNode: (COHistoryGraphNode*)node
+{
+  ASSIGN(_baseHistoryGraphNode, node);
 }
 
 - (BOOL) hasChanges
@@ -117,12 +123,7 @@
 
 - (void) revert
 {
-  // FIXME: Slow?
-  
-  for (ETUUID *uuid in _changedObjectUUIDs)
-  {
-    [[self objectForUUID: uuid] revert];
-  }
+  [self revertObjects: [self changedObjects]];
 }
 
 - (void) rollbackToRevision: (COHistoryGraphNode *)node
@@ -134,7 +135,46 @@
 
 - (void)selectiveUndoChangesMadeInRevision: (COHistoryGraphNode *)ver
 {
+  COHistoryGraphNode *priorToVer = [[ver parents] objectAtIndex: 0]; // FIXME:..
+  
+  COObjectContext *o = [[COObjectContext alloc] initWithHistoryGraphNode: ver];
+  COObjectContext *a = [[COObjectContext alloc] initWithHistoryGraphNode: priorToVer];
+  
+  COObjectGraphDiff *oa = [COObjectGraphDiff diffObjectContext:o with: a];
+  COObjectGraphDiff *ob = [COObjectGraphDiff diffObjectContext:o with: self];
+  COObjectGraphDiff *merged = [COObjectGraphDiff mergeDiff: oa withDiff: ob];
+  
+  [merged applyToContext: self];
 }
+
+- (void) revertObjects: (NSArray*)objects
+{
+  for (COObject *object in objects)
+  {
+    [object revert];
+  }
+}
+
+- (void) commitObjects: (NSArray*)objects
+{
+  // FIXME: commit owned children of objects
+  COHistoryGraphNode *newNode = [[self storeCoordinator] commitChangesInObjects: objects
+                                                           afterNode: [self baseHistoryGraphNode]];
+  [self setBaseHistoryGraphNode: newNode];
+}
+- (void) rollbackObjects: (NSArray*)objects toRevision: (COHistoryGraphNode *)ver
+{
+}
+- (void) threeWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects bases: (NSArray*)bases
+{
+}
+- (void) twoWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects
+{
+}
+- (void) selectiveUndoChangesInObjects: (NSArray*)objects madeInRevision: (COHistoryGraphNode *)ver
+{
+}
+
 
 
 @end

@@ -6,7 +6,7 @@
 - (NSString*) description
 {
   return [NSString stringWithFormat: @"History graph node %@, %d parents %d branches %d objects", 
-    [[self uuid] stringValue], [[self parents] count], [[self branches] count], [[self uuidToObjectVersionMaping] count]];
+    [[self uuid] stringValue], [_parentNodeUUIDs count], [_childNodeUUIDs count], [[self uuidToObjectVersionMaping] count]];
 }
 
 - (COStoreCoordinator *) storeCoordinator
@@ -24,7 +24,11 @@
   NSMutableArray *result = [NSMutableArray arrayWithCapacity: [_parentNodeUUIDs count]];
   for (ETUUID *uuid in _parentNodeUUIDs)
   {
-    [result addObject: [_store historyGraphNodeForUUID: uuid]];
+    COHistoryGraphNode *node = [_store historyGraphNodeForUUID: uuid];
+    if (node)
+    {
+      [result addObject: node];
+    }
   }
   return result;
 }
@@ -34,7 +38,11 @@
   NSMutableArray *result = [NSMutableArray arrayWithCapacity: [_childNodeUUIDs count]];
   for (ETUUID *uuid in _childNodeUUIDs)
   {
-    [result addObject: [_store historyGraphNodeForUUID: uuid]];
+    COHistoryGraphNode *node = [_store historyGraphNodeForUUID: uuid];
+    if (node)
+    {
+      [result addObject: node];
+    }
   }
   return result;
 }

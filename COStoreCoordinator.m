@@ -122,9 +122,16 @@
   if (nil == node)
   {
     NSDictionary *nodePlist = [COSerializer unserializeData: [_store dataForKey: [uuid stringValue]]];
-    node = [[[COHistoryGraphNode alloc] initWithPropertyList: nodePlist storeCoordinator: self] autorelease];
-    NSLog(@"Read history node %@", [node uuid]);
-    [_historyGraphNodes setObject: node forKey: [node uuid]];
+    if (nodePlist)
+    {
+      node = [[[COHistoryGraphNode alloc] initWithPropertyList: nodePlist storeCoordinator: self] autorelease];
+      NSLog(@"Read history node %@", [node uuid]);
+      [_historyGraphNodes setObject: node forKey: [node uuid]];
+    }
+    else
+    {
+      NSLog(@"WARNING: Requested node %@ not in store", uuid);
+    }
   }
 
   return node;
@@ -138,7 +145,6 @@
   [_store setData: [COSerializer serializeObject: [node propertyList]]
            forKey: [[node uuid] stringValue]];
 
-  if ([[node branches] isEmpty])
   {
     NSLog(@"Marking %@ as tip", node);
     [_store setData: [COSerializer serializeObject: [[node uuid] stringValue]]

@@ -98,4 +98,14 @@
 
 - (void)selectiveUndoChangesMadeInRevision: (COHistoryGraphNode *)ver;
 
+
+- (void) revertObjects: (NSArray*)objects;
+- (void) commitObjects: (NSArray*)objects;
+- (void) rollbackObjects: (NSArray*)objects toRevision: (COHistoryGraphNode *)ver;
+- (void) threeWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects bases: (NSArray*)bases;
+- (void) twoWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects;
+- (void) selectiveUndoChangesInObjects: (NSArray*)objects madeInRevision: (COHistoryGraphNode *)ver;
+
 @end
+
+

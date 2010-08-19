@@ -225,12 +225,7 @@
  */
 - (void) commit
 {
-  // FIXME: commit owned children?
-
-  COHistoryGraphNode *newHead = [[_ctx storeCoordinator] commitChangesInObjects: [NSArray arrayWithObject: self]
-                                                         afterNode: [_ctx baseHistoryGraphNode]];
-                                                         
-  //FIXME: update our context to notify it of the new revision?
+  [[self objectContext] commitObjects: [NSArray arrayWithObjects: self]];
 }
 
 /**
@@ -271,12 +266,14 @@
 
 - (void) twoWayMergeWithObject: (COObject *)otherObj
 {
-
+  [[self objectContext] twoWayMergeObjects: [NSArray arrayWithObject: self]
+                               withObjects: [NSArray arrayWithObject: otherObj]];
 }
 
 - (void) selectiveUndoChangesMadeInRevision: (COHistoryGraphNode *)ver
 {
-
+  [[self objectContext] selectiveUndoChangesInObjects: [NSArray arrayWithObject: self]
+                                       madeInRevision: ver];
 }
 
 @end
