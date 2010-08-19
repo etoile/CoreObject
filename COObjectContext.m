@@ -39,6 +39,7 @@
                     commitChangesInObjectContext: self
                                        afterNode: [self baseHistoryGraphNode]];
   [self setBaseHistoryGraphNode: newNode];
+  [_changedObjectUUIDs removeAllObjects];
 }
 
 - (COStoreCoordinator *) storeCoordinator

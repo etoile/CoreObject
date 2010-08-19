@@ -133,8 +133,10 @@
   
   [ctx commit];
   
-  [obj2 setValue: @"???" forProperty: @"author"];
-  [obj2 setValue: S(@"H.P. Lovecraft") forProperty: @"lent-to"];
+  //[obj2 setValue: @"???" forProperty: @"author"];
+  assert(![[ctx changedObjects] containsObject: obj2]);
+  [[obj2 mutableSetValueForKey: @"lent-to"] removeObject: @"Eric Wasylishen"];
+  assert([[ctx changedObjects] containsObject: obj2]);
   
   [ctx commit];
   

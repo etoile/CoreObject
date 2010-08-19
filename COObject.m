@@ -64,10 +64,33 @@
   return [_data allKeys];
 }
 
-- (id) valueForProperty:(NSString *)key
+/**
+ * If the returned value is an array/set, if it is modified, the context
+ * must be notified.
+ */
+- (id)mutableValueForProperty: (NSString*)key
 {
   [self loadIfNeeded];
   return [_data valueForKey: key];
+}
+
+- (id) valueForProperty:(NSString *)key
+{
+  id obj = [self mutableValueForProperty: key];
+  
+  // Make sure we return an immutable collection
+  if ([obj isKindOfClass: [NSArray class]])
+  {
+    return [NSArray arrayWithArray: obj];
+  }
+  if ([obj isKindOfClass: [NSSet class]])
+  {
+    return [NSSet setWithSet: obj];
+  }
+  else
+  {
+    return obj;
+  }
 }
 
 + (BOOL) isPrimitiveCoreObjectValue: (id)value
@@ -112,7 +135,15 @@
   {
     if ([COObject isCoreObjectValue: value])
     {
-      [_data setValue: value forKey: key];
+      if ([value isKindOfClass: [NSArray class]]
+          || [value isKindOfClass: [NSSet class]])
+      {
+        // Collections must be mutable
+        value = [[value mutableCopy] autorelease];
+      }
+      
+      [_data setValue: value
+               forKey: key];
     }
     else
     {
