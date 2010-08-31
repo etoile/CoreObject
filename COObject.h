@@ -61,7 +61,8 @@
 - (id) initWithContext: (COObjectContext*)ctx uuid: (ETUUID*)uuid data: (NSDictionary *)data;
 - (NSData*)sha1Hash;
 - (void)loadIfNeeded;
-- (id)mutableValueForProperty: (NSString*)key;
+- (id)_mutableValueForProperty: (NSString*)key;
+- (void) setModified;
 
 @end
 

@@ -68,7 +68,7 @@
  * If the returned value is an array/set, if it is modified, the context
  * must be notified.
  */
-- (id)mutableValueForProperty: (NSString*)key
+- (id)_mutableValueForProperty: (NSString*)key
 {
   [self loadIfNeeded];
   return [_data valueForKey: key];
@@ -76,7 +76,7 @@
 
 - (id) valueForProperty:(NSString *)key
 {
-  id obj = [self mutableValueForProperty: key];
+  id obj = [self _mutableValueForProperty: key];
   
   // Make sure we return an immutable collection
   if ([obj isKindOfClass: [NSArray class]])
@@ -151,7 +151,7 @@
     }
   }
 
-  [[self objectContext] markObjectUUIDChanged: [self uuid]];
+  [self setModified];
 }
 
 - (NSString*)description
@@ -231,6 +231,11 @@
   return [result sha1Hash];
 }
 
+- (void) setModified
+{
+  [[self objectContext] markObjectUUIDChanged: [self uuid]];
+}
+
 @end
 
 
@@ -247,7 +252,7 @@
   {
     [self setData: [[_ctx storeCoordinator] dataForObjectWithUUID: _uuid
                                                atHistoryGraphNode: [_ctx baseHistoryGraphNode]]];
-    [_ctx markObjectUUIDUnchanged: _uuid];
+    [self setModified];
   }
 }
 
@@ -269,7 +274,7 @@
   if (![_data isEqual: newData])
   {
     [self setData: newData];
-    [_ctx markObjectUUIDChanged: _uuid];
+    [self setModified];
   }
 }
 

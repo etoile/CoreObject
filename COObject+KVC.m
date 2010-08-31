@@ -84,7 +84,7 @@
 }
 - (void) notifyObjectContext
 {
-  [[_obj objectContext] markObjectUUIDChanged: [_obj uuid]];
+  [_obj setModified];
 }
 
 /* Primitive methods required to create a NSMutableArray subclass */
@@ -149,7 +149,7 @@
 }
 - (void) notifyObjectContext
 {
-  [[_obj objectContext] markObjectUUIDChanged: [_obj uuid]];
+  [_obj setModified];
 }
 
 /* Primitive methods required to create a NSMutableArray subclass */

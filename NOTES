@@ -1,3 +1,63 @@
+Problem: Conflict handling....
+------------------------------
+
+-> in some cases we'll want a most-recent-wins policy (however conflict metadata
+   should still be saved in the db.)
+  
+Open question: when a merge generates conflicts, should the user be able to
+resolve them at a finer granularity than a commit? probably not..
+
+Solution: 
+not sure.
+
+
+Problem: non-temporal changes
+-----------------------------
+changes could be divided in to 3 categories:
+- non-persistent
+- persistent, non-temporal 
+    (e.g. setting the "last printed date" property of a document - shouldn't be undoable)
+    All versions of an object share the same value for these properties - 
+    they are unaffected by revert operations.
+    Handling this could potentially be a big pain. For example, commiting a
+    change to a non-temporal property can fail (if it was modified since the
+    start of the transaction), unlike a change to a temporal property which
+    never fails since it implicitly creates a branch.
+    
+- persistent, temporal (normal properties of objects; changes can be undone)
+
+Solution:
+non-persistent : not handled by CoreObject
+persistent, non-temporal : handled by setting an attribute on a HistGraphNode to
+                           have it be skipped in the undo/redo UI, but otherwise
+                           treat it like a temporal property.
+                           This wastes space, but is probably the cleanest
+                           way of handling these.
+persistent, temporal : default behaviour.
+
+
+Problem: Weak/strong properties
+-------------------------------
+
+objects referred to by a strong attribute are treated as "part of" the obejct.
+so when performing operations on a particular object, e.g. "revert to revision",
+all strongly referenced objects are also reverted.
+weak references are usually for 'parent' relationships (e.g. when you revert 
+an object, you don't want to revert the container it is in)
+
+Solution: strong is the default. Can set a 'weak' modifier on an attribute.
+
+Problem:
+------
+viewing history graph of an object
+solution:
+1. generate set of all strongly referenced COObjects + the base object
+  [ this could be a lot of objects. ]
+2. for each node in the overall history graph, if (modified objects
+ intersects set from 1.), include node in the graph
+
+
+
 Diff notes
 ----------
 
