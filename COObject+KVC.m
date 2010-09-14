@@ -74,13 +74,13 @@
 }
 - (void) dealloc
 {
-  [_obj relrase];
+  [_obj release];
   [_property release];
 }
 
 - (NSMutableArray*) targetMutableArray
 {
-  return [_obj mutableValueForProperty: _property];
+  return [_obj _mutableValueForProperty: _property];
 }
 - (void) notifyObjectContext
 {
@@ -145,7 +145,7 @@
 
 - (NSMutableSet*) targetMutableSet
 {
-  return [_obj mutableValueForProperty: _property];
+  return [_obj _mutableValueForProperty: _property];
 }
 - (void) notifyObjectContext
 {
