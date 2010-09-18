@@ -120,14 +120,14 @@
 
 	while (objectClass != Nil)
 	{
-		proxyClass = NSClassFromString([NSString stringWithFormat:@"COProxy_%s", objectClass->name]);
+		proxyClass = NSClassFromString([NSString stringWithFormat:@"COProxy_%s", class_getName(objectClass)]);
 
 		if (Nil != proxyClass)
 		{
 			self->isa = proxyClass;
 			break;
 		}
-		objectClass = objectClass->super_class;
+		objectClass = class_getSuperclass(objectClass);
 	}
 }
 
