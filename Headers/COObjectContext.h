@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <EtoileSerialize/EtoileSerialize.h>
-#import <CoreObject/COPersistentPool.h>
+#import "COPersistentPool.h"
 
 @class COMetadataServer, COObjectServer;
 

@@ -12,7 +12,7 @@
 #import "COCoreObjectProtocol.h"
 #import "COPropertyType.h"
 #import "COUtility.h"
-#import <CoreObject/NSObject+CoreObject.h>
+#import "NSObject+CoreObject.h"
 
 @class COObjectContext;
 

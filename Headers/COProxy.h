@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <CoreObject/NSObject+CoreObject.h>
+#import "NSObject+CoreObject.h"
 #import <CoreObject/COFault.h>
 
 @class COObjectContext;

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <CoreObject/COObjectContext.h>
+#import "COObjectContext.h"
 
 @class COMetadataServer;
 

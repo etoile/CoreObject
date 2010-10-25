@@ -78,7 +78,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 /* Property List Import/Export */
 
-- (id) initWithPropertyList: (id) propertyList
+- (id) initWithPropertyList: (NSDictionary*) propertyList
 {
 	self = [super initWithPropertyList: propertyList];
 
