@@ -224,7 +224,7 @@
   [self record: [COObjectGraphModifySet modifySet:name diff:diff forUUID:obj]];
 }
 
-- (void)applyToContext: (COObjectContext*)ctx
+- (void)applyToContext: (COEditingContext*)ctx
 {
   for (ETUUID *uuid in _editsByPropertyAndUUID)
   {
@@ -294,15 +294,85 @@
   }  
 }
 
-+ (COObjectGraphDiff *)diffObjectContext: (COObjectContext*)base with: (COObjectContext*)modified;
++ (COObjectGraphDiff *)diffObjectContext: (COEditingContext*)base with: (COEditingContext*)modified;
 {
   COObjectGraphDiff *result = [[[COObjectGraphDiff alloc] init] autorelease];
+  
+  assert(0);
   
   // FIXME: find all objects that could have changed between base and modified, 
   // and call a nonrecursive version of _diffObject
   
   // if there is a history link between the contexts, we can use a fast path
   // if not, we need to take the union of all UUIDs in each context.
+  
+  return result;
+}
+
++ (COObjectGraphDiff *)diffHistoryNode: (COHistoryGraphNode*)n1 withHistoryNode: (COHistoryGraphNode*)n2
+{
+  // either n1 must be a parent of n2, or vice-versa
+  BOOL n2IsParent = NO;
+  COHistoryGraphNode *p=n1;
+  while (p != nil && [[p parents] count] > 0)
+  {    
+    p = [[p parents] objectAtIndex: 0];
+    if (p == n2)
+    {
+      n2IsParent = YES;
+      break;
+    }
+  }
+  
+  if (!n2IsParent)
+  {
+    BOOL n1IsParent = NO;
+    p = n2;
+    while (p != nil && [[p parents] count] > 0)
+    {    
+      p = [[p parents] objectAtIndex: 0];
+      if (p == n1)
+      {
+        n1IsParent = YES;
+        break;
+      }
+    }  
+    if (!n1IsParent)
+    {
+      NSLog(@"ERROR: +[COObjectGraphDiff diffHistoryNode:withHistoryNode:] failed, it requires n1 and n2 to be on the same line of history");
+      assert(0);
+      return nil;
+    }
+  }
+  
+  // Collect the UUIDs of all objects modified between (inclusive) the two nodes
+  NSMutableSet *objectUUIDs = [NSMutableSet set];
+  
+  p = (n2IsParent ? n1 : n2);
+  while (p != (n2IsParent ? n2 : n1))
+  {
+    [objectUUIDs addObjectsFromArray: [[p uuidToObjectVersionMaping] allKeys]];
+    p = [[p parents] objectAtIndex: 0];
+  }
+  [objectUUIDs addObjectsFromArray: [[p uuidToObjectVersionMaping] allKeys]];
+  
+  // Create temporary object contexts
+  
+  COEditingContext *c1 = [[COEditingContext alloc] initWithHistoryGraphNode: n1];
+  COEditingContext *c2 = [[COEditingContext alloc] initWithHistoryGraphNode: n2];
+  
+  // Now create the diff
+  
+  COObjectGraphDiff *result = [[[COObjectGraphDiff alloc] init] autorelease];
+  for (ETUUID *uuid in objectUUIDs)
+  {
+    COObject *o1 = [c1 objectForUUID: uuid];
+    COObject *o2 = [c2 objectForUUID: uuid];
+    [self _diffObject: o1 with: o2 addToDiff: result];
+  }
+  
+  [c1 release];
+  [c2 release];
   
   return result;
 }

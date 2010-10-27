@@ -1,8 +1,8 @@
 #import <EtoileFoundation/EtoileFoundation.h>
-#import "COObjectContext.h"
+#import "COEditingContext.h"
 #import "COHistoryGraphNode.h"
 
-@class COObjectContext;
+@class COEditingContext;
 
 /**
  * 'Working copy' of an object.
@@ -17,26 +17,46 @@
  *
  * You should use ETUUID's to refer to objects outside of the context
  * of a COObjectContext.
+ *
+ * Rules for writing custom accessor methods:
+ *  - call willAccessValueForProperty, etc.
+ *
  */
 @interface COObject : NSObject
 {
 @private
+  BOOL _isFault;
   NSMutableDictionary *_data;
-  COObjectContext *_ctx;
+  COEditingContext *_ctx;
   ETUUID *_uuid;
+  ETEntityDescription *_description;
 }
 
 // Public
 
+- (ETEntityDescription *)modelDescription;
 /**
+ * Automatic fine-grained copy
+ */
+- (id)copyWithZone: (NSZone*)zone;
+
+/**
+ * override: never
  * Creates a new object (generates a new UUID) in the given context.
  */
-- (id) initWithContext: (COObjectContext*)ctx;
+- (id) initWithContext: (COEditingContext*)ctx;
+
+/**
+ * override: never
+ * Creates a new object (generates a new UUID) in the given context, with
+ * the given entity description.
+ */
+- (id) initWithModelDescription: (ETEntityDescription*)desc context: (COEditingContext*)ctx;
 
 - (BOOL) isEqual: (id)otherObject;
 
 - (ETUUID*) uuid;
-- (COObjectContext*) objectContext;
+- (COEditingContext*) objectContext;
 
 - (BOOL) isFault;
 
@@ -46,19 +66,29 @@
  * framework.
  */
 - (void) didAwaken;
+/**
+ * Caled when the object is created. 
+ */
+- (void) awakeFromCreate;
+
+/* Property-value coding */
 
 - (NSArray *)properties;
 - (id) valueForProperty:(NSString *)key;
 - (void) setValue:(id)value forProperty:(NSString*)key;
 
+/** @override-never */
+- (void)willAccessValueForProperty:(NSString *)key;
+- (void)willChangeValueForProperty:(NSString *)key;
+- (void)didChangeValueForProperty:(NSString *)key;
 
 @end
 
 
 @interface COObject (Private)
 
-- (id) initFaultedObjectWithContext: (COObjectContext*)ctx uuid: (ETUUID*)uuid;
-- (id) initWithContext: (COObjectContext*)ctx uuid: (ETUUID*)uuid data: (NSDictionary *)data;
+- (id) initFaultedObjectWithContext: (COEditingContext*)ctx uuid: (ETUUID*)uuid;
+- (id) initWithContext: (COEditingContext*)ctx uuid: (ETUUID*)uuid data: (NSDictionary *)data;
 - (NSData*)sha1Hash;
 - (void)loadIfNeeded;
 - (id)_mutableValueForProperty: (NSString*)key;
@@ -116,6 +146,6 @@
  * This takes a data dictionary from the store and replaces object references
  * with actual (faulted) COObject instances
  */
-- (void)setData: (NSDictionary*)data;
+- (void)unfaultWithData: (NSDictionary*)data;
 
 @end

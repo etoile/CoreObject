@@ -6,7 +6,13 @@
 extern const NSString *kCOAuthorHistoryGraphNodeProperty;
 extern const NSString *kCODateHistoryGraphNodeProperty;
 extern const NSString *kCOTypeHistoryGraphNodeProperty;
+extern const NSString *kCOShortDescriptionHistoryGraphNodeProperty;
 extern const NSString *kCODescriptionHistoryGraphNodeProperty;
+
+extern const NSString *kCOTypeMinorEdit;
+extern const NSString *kCOTypeCheckpoint;
+extern const NSString *kCOTypeMerge;
+extern const NSString *kCOTypeCreateBranch;
 
 /**
  * A node in the store's history graph. Managed by a COStoreCoordinator.

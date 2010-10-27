@@ -17,6 +17,25 @@ Primary goals:
 - Similar spirit as CoreData, except adding revision control, and objects 
   don't need to follow a schema.
 
+Capabilities
+------------
+
+- Manages persistence and versioning of an object graph composed of COObject or subclasses.
+These are premitted to have property-list type (..) values for properties, and are 
+identified by a UUID.
+
+
+Not handled in the core, but would be built on top
+--------------------------------------------------
+
+- meta-level information about objects (i.e. which properties are "strong"/containment
+or "weak"/association links). All object references in CO are "weak", so for example
+rolling back one object to an older version doesn't modify any of the objects its
+properties refer to.
+
+
+
+
 
 Changes vs. the original CoreObject implemenation:
 --------------------------------------------------

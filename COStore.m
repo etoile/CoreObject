@@ -50,7 +50,7 @@
 - (BOOL)setData: (NSData *)data forKey: (NSString *)key;
 {
   NSString *path = [[_url path] stringByAppendingPathComponent: key];
-  NSLog(@"Saving in '%@'", path);
+  //NSLog(@"Saving in '%@'", path);
   
   [data writeToFile: path atomically: YES]; // zlibCompressed]
   return YES;

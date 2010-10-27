@@ -1,10 +1,11 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
+#import "COHistoryGraphNode.h"
 #import "COArrayDiff.h"
 #import "COSetDiff.h"
 
 @class COObject;
-@class COObjectContext;
+@class COEditingContext;
 
 /**
  * 
@@ -19,13 +20,14 @@
 - (void)recordModifyArray: (COArrayDiff *)diff forProperty: (NSString*)name ofObject: (ETUUID*)obj;
 - (void)recordModifySet: (COSetDiff *)diff forProperty: (NSString*)name ofObject: (ETUUID*)obj;
 
-- (void)applyToContext: (COObjectContext*)ctx;
+- (void)applyToContext: (COEditingContext*)ctx;
 @end
 
 
 @interface COObjectGraphDiff (Factory)
 
-+ (COObjectGraphDiff *)diffObjectContext: (COObjectContext*)base with: (COObjectContext*)modified;
++ (COObjectGraphDiff *)diffObjectContext: (COEditingContext*)base with: (COEditingContext*)modified;
++ (COObjectGraphDiff *)diffHistoryNode: (COHistoryGraphNode*)n1 withHistoryNode: (COHistoryGraphNode*)n2;
 + (COObjectGraphDiff *)diffObject: (COObject *)base with: (COObject *)other;
 
 @end

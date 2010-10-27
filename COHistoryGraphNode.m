@@ -1,12 +1,23 @@
 #import "COHistoryGraphNode.h"
 
+const NSString *kCOAuthorHistoryGraphNodeProperty = @"COAuthorHistoryGraphNodeProperty";
+const NSString *kCODateHistoryGraphNodeProperty = @"CODateHistoryGraphNodeProperty";
+const NSString *kCOTypeHistoryGraphNodeProperty = @"COTypeHistoryGraphNodeProperty";
+const NSString *kCOShortDescriptionHistoryGraphNodeProperty = @"COShortDescriptionHistoryGraphNodeProperty";
+const NSString *kCODescriptionHistoryGraphNodeProperty = @"CODescriptionHistoryGraphNodeProperty";
+
+const NSString *kCOTypeMinorEdit = @"COTypeMinorEdit";
+const NSString *kCOTypeCheckpoint = @"COTypeCheckpoint";
+const NSString *kCOTypeMerge = @"COTypeMerge";
+const NSString *kCOTypeCreateBranch = @"COTypeCreateBranch";
+
 
 @implementation COHistoryGraphNode
 
 - (NSString*) description
 {
-  return [NSString stringWithFormat: @"History graph node %@, %d parents %d branches %d objects", 
-    [[self uuid] stringValue], [_parentNodeUUIDs count], [_childNodeUUIDs count], [[self uuidToObjectVersionMaping] count]];
+  return [NSString stringWithFormat: @"History graph node %@, %d parents %d branches %d objects metadata %@", 
+    [[self uuid] stringValue], [_parentNodeUUIDs count], [_childNodeUUIDs count], [[self uuidToObjectVersionMaping] count], _properties];
 }
 
 - (COStoreCoordinator *) storeCoordinator
@@ -70,6 +81,7 @@ static NSArray *ArrayWithUUIDsForUUIDStrings(NSArray *arr)
   NSMutableArray *result = [NSMutableArray arrayWithCapacity: [arr count]];
   for (NSString *str in arr)
   {
+    assert([str isKindOfClass: [NSString class]]);
     [result addObject: [ETUUID UUIDWithString: str]];
   }
   return result;
@@ -80,6 +92,7 @@ static NSArray *ArrayWithUUIDStringsForUUIDs(NSArray *arr)
   NSMutableArray *result = [NSMutableArray arrayWithCapacity: [arr count]];
   for (ETUUID *uuid in arr)
   {
+    assert([uuid isKindOfClass: [ETUUID class]]);
     [result addObject: [uuid stringValue]];
   }
   return result;
@@ -90,6 +103,7 @@ static NSArray *ArrayWithHexStringsForDatas(NSArray *arr)
   NSMutableArray *result = [NSMutableArray arrayWithCapacity: [arr count]];
   for (NSData *data in arr)
   {
+    assert([data isKindOfClass: [NSData class]]);
     [result addObject: [data hexString]];
   }
   return result;
@@ -118,6 +132,10 @@ uuidToObjectVersionMaping: (NSDictionary*)mapping
   _uuid = [uuid retain];
   _store = store; // Weak reference
   _properties = [[NSMutableDictionary alloc] initWithDictionary: properties];
+
+  for (ETUUID *uuid in parents) { assert([uuid isKindOfClass: [ETUUID class]]); }
+  for (ETUUID *uuid in children) { assert([uuid isKindOfClass: [ETUUID class]]); }
+
   _parentNodeUUIDs = [[NSMutableArray alloc] initWithArray: parents];
   _childNodeUUIDs = [[NSMutableArray alloc] initWithArray: children];
   _uuidToObjectVersionMaping = [[NSDictionary alloc] initWithDictionary: mapping];
@@ -168,6 +186,7 @@ uuidToObjectVersionMaping: (NSDictionary*)mapping
 
 - (void) addChildNodeUUID: (ETUUID*)child
 {
+  assert([child isKindOfClass: [ETUUID class]]);
   [_childNodeUUIDs addObject: child];
 }
 

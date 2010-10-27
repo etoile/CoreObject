@@ -4,7 +4,7 @@
 #import "COStore.h"
 #import "COSerializer.h"
 #import "COObject.h"
-#import "COObjectContext.h"
+#import "COEditingContext.h"
 #import "NSData+sha1.h"
 #import "NSData+compression.h"
 
@@ -121,7 +121,7 @@
   
   COStoreCoordinator *sc = [[COStoreCoordinator alloc] initWithURL: STORE_URL];
   
-  COObjectContext *ctx = [[COObjectContext alloc] initWithStoreCoordinator: sc];
+  COEditingContext *ctx = [[COEditingContext alloc] initWithStoreCoordinator: sc];
   COObject *obj1 = [[COObject alloc] initWithContext:ctx];
   [obj1 setValue: @"Necronomicon" forProperty: @"title"];
   [obj1 setValue: @"Abdhul Al-hazred" forProperty: @"author"];
@@ -146,7 +146,7 @@
   
   NSLog(@"Reopening store..");  
   COStoreCoordinator *sc2 = [[COStoreCoordinator alloc] initWithURL: STORE_URL];
-  COObjectContext *ctx2 = [[COObjectContext alloc] initWithHistoryGraphNode: [sc2 tip]];
+  COEditingContext *ctx2 = [[COEditingContext alloc] initWithHistoryGraphNode: [sc2 tip]];
   NSLog(@"Previous tip revision is: %@", [ctx2 baseHistoryGraphNode]);  
 
   for (ETUUID *uuid in [[[ctx2 baseHistoryGraphNode] uuidToObjectVersionMaping] allKeys])
@@ -165,7 +165,7 @@
 {
   NSLog(@"Testing object merging");
     
-  COObjectContext *ctx = [[COObjectContext alloc] init];
+  COEditingContext *ctx = [[COEditingContext alloc] init];
   COObject *obj1 = [[COObject alloc] initWithContext:ctx];
   [obj1 setValue: @"Necronomicon" forProperty: @"title"];
   [obj1 setValue: @"Abdhul Al-hazred" forProperty: @"author"];
@@ -204,7 +204,7 @@
   
   {
     COStoreCoordinator *sc = [[COStoreCoordinator alloc] initWithURL: STORE_URL];
-    COObjectContext *ctx = [[COObjectContext alloc] initWithStoreCoordinator: sc];
+    COEditingContext *ctx = [[COEditingContext alloc] initWithStoreCoordinator: sc];
     
     COObject *book1 = [[COObject alloc] initWithContext:ctx];
     [book1 setValue: @"The King in Yellow" forProperty: @"title"];
@@ -230,7 +230,7 @@
   NSLog(@"Reopening store..");  
   {
     COStoreCoordinator *sc2 = [[COStoreCoordinator alloc] initWithURL: STORE_URL];
-    COObjectContext *ctx2 = [[COObjectContext alloc] initWithHistoryGraphNode: [sc2 tip]];
+    COEditingContext *ctx2 = [[COEditingContext alloc] initWithHistoryGraphNode: [sc2 tip]];
     COObject *library = [ctx2 objectForUUID: libraryUUID];
     NSLog(@"Library (reopened): %@", library);
     

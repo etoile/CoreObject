@@ -2,6 +2,8 @@
 #import "COSerializer.h"
 #import "NSData+sha1.h"
 
+const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
+
 @implementation COStoreCoordinator
 
 - (id)initWithURL: (NSURL*)url
@@ -27,8 +29,13 @@
 
 - (COHistoryGraphNode *)tip
 {
-  return [self historyGraphNodeForUUID:
-    [ETUUID UUIDWithString: [COSerializer unserializeData: [_store dataForKey: @"tip"]]]];
+  NSString *uuidString = [COSerializer unserializeData: [_store dataForKey: @"tip"]];
+  COHistoryGraphNode *node = nil;
+  if (uuidString != nil)
+  {
+    node = [self historyGraphNodeForUUID: [ETUUID UUIDWithString: uuidString]];
+  }
+  return node;
 }
 
 - (COHistoryGraphNode *) createBranchOfNode: (COHistoryGraphNode*)node
@@ -52,12 +59,16 @@
   
   return newNode;
 }
-- (COHistoryGraphNode *) commitChangesInObjectContext: (COObjectContext *)ctx  afterNode: (COHistoryGraphNode*)node
+- (COHistoryGraphNode *) commitChangesInObjectContext: (COEditingContext *)ctx 
+                                            afterNode: (COHistoryGraphNode*)node
+                                         withMetadata: (NSDictionary*)metadata
 {
-  return [self commitChangesInObjects: [ctx changedObjects] afterNode: node];
+  return [self commitChangesInObjects: [ctx changedObjects] afterNode: node withMetadata: metadata];
 }
 
-- (COHistoryGraphNode *) commitChangesInObjects: (NSArray *)objects  afterNode: (COHistoryGraphNode*)node
+- (COHistoryGraphNode *) commitChangesInObjects: (NSArray *)objects 
+                                      afterNode: (COHistoryGraphNode*)node
+                                      withMetadata: (NSDictionary*)metadata
 {
   NSMutableDictionary *mapping = [NSMutableDictionary dictionaryWithCapacity: [objects count]];
   
@@ -71,10 +82,13 @@
     [mapping setObject: hash forKey: [obj uuid]];
   }
 
+  NSDictionary *meta = [NSMutableDictionary dictionaryWithDictionary: metadata];
+  [meta setObject: [NSDate date] forKey: kCODateHistoryGraphNodeProperty];
+
   COHistoryGraphNode *newNode = [[[COHistoryGraphNode alloc] initWithUUID: [ETUUID UUID]
            storeCoordinator: self
-            properties: nil
-            parentNodeUUIDs: node ? [NSArray arrayWithObject: node] : nil
+            properties: meta
+            parentNodeUUIDs: node ? A([node uuid]) : nil
              childNodeUUIDs: nil
           uuidToObjectVersionMaping: mapping] autorelease];
   
@@ -86,6 +100,23 @@
     [self commitHistoryGraphNode: node];
   }
   [self commitHistoryGraphNode: newNode];
+  
+
+  // Post notification
+  
+  NSMutableArray *uuids = [NSMutableArray array];
+  for (COObject *obj in objects)
+  {
+    [uuids addObject: [obj uuid]];
+  }
+  NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+    uuids, @"objectUUIDs",
+    [newNode uuid], @"commitUUID",
+    nil];
+  [[NSNotificationCenter defaultCenter] postNotificationName: COStoreDidCommitNotification
+                                                      object: self
+                                                    userInfo: userInfo];
+
   return newNode;
 }
 
@@ -101,7 +132,9 @@
   {
     if ([[node parents] count] != 1)
     {
-      NSLog(@"Warning: requested UUID %@ not found.", uuid);
+      // We get here when -loadIfNeeded is called on a new object
+      // not yet in the store.
+      //NSLog(@"Warning: requested UUID %@ not found.", uuid);
       return nil;
     }
     node = [[node parents] objectAtIndex: 0];

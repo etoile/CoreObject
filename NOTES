@@ -133,7 +133,11 @@ all strongly referenced objects are also reverted.
 weak references are usually for 'parent' relationships (e.g. when you revert 
 an object, you don't want to revert the container it is in)
 
-Solution: strong is the default. Can set a 'weak' modifier on an attribute.
+revised solution:
+
+CO only uses 'weak' references. i.e. operations on sets of objects 
+(revert objects X,Y,Z to revision R) take an exact group of objects.
+
 
 Problem:
 ------
@@ -141,8 +145,9 @@ viewing history graph of an object
 solution:
 1. generate set of all strongly referenced COObjects + the base object
   [ this could be a lot of objects. ]
+  (Not handled by CO)
 2. for each node in the overall history graph, if (modified objects
- intersects set from 1.), include node in the graph
+ intersects set from 1.), include node in the graph (handled by CO)
 
 
 

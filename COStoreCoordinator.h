@@ -5,7 +5,9 @@
 
 @class COHistoryGraphNode;
 @class COObjectGraphDiff;
-@class COObjectContext;
+@class COEditingContext;
+
+extern const NSString *COStoreDidCommitNotification;
 
 /**
  * High-level interface to the storage layer. Creates and manages HistoryGraphNodes.
@@ -43,13 +45,16 @@
  * Commits the changes in the given object context as a new history graph node
  * Returns the new node
  */
-- (COHistoryGraphNode *) commitChangesInObjectContext: (COObjectContext *)ctx  afterNode: (COHistoryGraphNode*)node;
+- (COHistoryGraphNode *) commitChangesInObjectContext: (COEditingContext *)ctx
+                                            afterNode: (COHistoryGraphNode*)node
+                                         withMetadata: (NSDictionary*)metadata;
 /**
  * Commits some changed objects as a new history graph 
  * Returns the new node
  */
-- (COHistoryGraphNode *) commitChangesInObjects: (NSArray *)objects afterNode: (COHistoryGraphNode*)node;
-
+- (COHistoryGraphNode *) commitChangesInObjects: (NSArray *)objects
+                                      afterNode: (COHistoryGraphNode*)node
+                                   withMetadata: (NSDictionary*)metadata;
 @end
 
 /**

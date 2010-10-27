@@ -1,0 +1,676 @@
+2009-11-19 Niels Grewe <niels.grewe@halbordnung.de>
+
+	Support writing XML in a transactional manner.
+	* EtoileXML/ETXMLWriter.h:
+	* EtoileXML/ETXMLWriter.m: Added some synchronization mechanisms to
+	ETXMLWriter and a private subclass that uses them. The -beginTransaction
+	method can now be used to obtain a XML writer that writes well-formed
+	XML transactionally.
+
+2009-11-15 Niels Grewe <niels.grewe@halbordnung.de>
+
+	* Headers/ETSocket.h:
+	* Source/ETSocket.m: Added a -initWithFileHandle: initializer to
+	ETSocket. Wrote a new ETListenSocket subclass to create server sockets
+	and added corresponding delegate protocol. No SSL support yet.
+
+2009-10-22  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* Headers/runtime.h: Added a wrapper header which include the 
+	Objective-C 2 runtime library functions, either from 
+	objc/runtime.h on OS X or ObjectiveC2/runtime.h with the GNU runtime.
+	
+
+2009-09-25  Quentin Mathe <qmathe@club-internet.fr>
+
+	EtoileFoundation now compiles on Solaris.
+	* Source/NSFileManager+TempFile.m: Added a mkdtemp() implementation to 
+	compile on recent Solaris versions (only very recent versions include 
+	mkdtemp).
+	* GNUmakefile: Tweaked to know where to look for openssl on Solaris.
+	* Source/GNUmakefile: Declared _XOPEN_SOURCE test macro to allow us 
+	to use functions such as strdup() (POSIX extension to the C standard 
+	lib) on Solaris.
+
+2009-07-27  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/ETClassMirror.h:
+	* Source/ETClassMirror.m:
+	(-instanceVariableMirrorsWithOwnerMirror:, 
+	-allInstanceVariableMirrorsWithOwnerMirror:): Added.
+	(-instanceVariableMirrors, -allInstanceVariableMirrors): Moved the 
+	implementation into the two new methods mentioned above and updated to 
+	now simply call those new methods.
+	* Headers/ETObjectMirror.h:
+	* Source/ETSourceMirror.m:
+	(-instanceVariableMirrors, -allInstanceVariableMirrors): Modified to 
+	now call the new methods added to ETClassMirror.
+	* Headers/ETInstanceVariableMirror.h:
+	* Source/ETInstanceVariableMirror.m:
+	New ivar _cachedValueMirror.
+	(-valueMirror, -cachedValueMirrorForValue:, -ownerObjectMirror): Added.
+	(-initWithIvar:ownerMirror:, +mirrorWithIvar:ownerMirror:): Modified
+	to include an extra 'ownerMirror' parameter.
+	(-ownerMirror): Modified the return type to <ETMirror>.
+	(-value, -setValue:): Updated to retrieve the owner with
+	-ownerObjectMirror.
+
+2009-06-30  Quentin Mathe <qmathe@club-internet.fr>
+
+	New +[NSObject mutableClass] to simplify mutable class retrieval. This is 
+	necessary to support Mac OS X and have all tests passed with Cocoa.
+	With Cocoa, all collection classes are toll-free bridged with their 
+	equivalent CoreFoundation types.
+	The issue is that the instances returned by these collection classes always 
+	use the mutable class variant as their superclass. e.g. NSCFDictionary which 
+	is returned by NSDictionary (and also NSMutableDictionary) is a subclass of 
+	NSMutableDictionary. The same holds for NSArray and other collection classes.
+	Because of that, you have no way to conclude whether an instance is mutable 
+	or not. There is no API in Foundation or CoreFoundation to check the 
+	mutability.
+	* Headers/NSObject+Model.h:
+	* Source/NSObject+Model.m:
+	* Headers/ETCollection.h:
+	* Source/ETCollection.m:
+	(+mutableClass): New method implemented by NSObject (dummy implementation) 
+	and collection classes.
+	* Headers/ETCollection+HOM.h:
+	* Source/ETCollection+HOMMethods.m:
+	(+mutableSubclass, -mutableSubclass): Removed.
+	* Source/ETCollection+HOM.m:
+	(ETHOMMappedCollectionWithBoIAsBlock, 
+	ETHOMFilteredCollectionWithBoIAsBlock()): Updated to use +mutableClass 
+	instead of -mutableSubclass.
+
+2009-06-22  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Source/NSObject+HOM.m (-forwardInvocation:): Fixed invocation return 
+	value on GNUstep. The return value is the target when the invocation 
+	hasn't been invoked and not nil as with Cocoa.
+	* GNUmakefile:
+	* Source/GNUmakefile:
+	* Headers/EtoileFoundation.h:
+	Updated to include the new NSObject(HOM) related files.
+
+2009-06-22  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSObject+HOM.h:
+	* Source/NSObject+HOM.m:
+	* Source/TestBasicHOM.m:
+	Added.
+
+2009-06-14  Eric Wasylishen <ewasylishen@gmail.com>
+
+  Fixed a bug in ETUTI which was causing Melodie to crash on startup.
+  NSClassFromString will, in some cases, return private subclasses rather
+  than the class you requested (e.g. NSClassFromString(@"NSImage") returns
+  CLImage). I wasn't expecting this, and it introduced some inconsistency
+  in the UTI database. Added a workaround which is a bit of a hack and should
+  eventually be replaced with something better, when we have our new
+  reflection API.
+
+2009-05-09  Quentin Mathe <qmathe@club-internet.fr>
+
+	Made EUTI API a bit more consistent. Initializers or factory methods whose 
+	last method keyword is 'supertypes:' were taking an array of UTI string 
+	representations, when -supertypes returns an array of ETUTI objects. Now 
+	'supertypes' in a method name always means an array of ETUTI objects, and 
+	'supertypeStrings' an array of UTI string representations.
+	* Headers/ETUTI.h:
+	* Source/ETUTI.m:
+	(+registerTypeWithString:description:supertypes:): Renamed 
+	+registerTypeWithString:description:supertypeStrings:.
+	(+transientTypeWithSupertypeStrings:, +transientTypeWithSupertypes:): 
+	Renamed +transientTypeWithSupertypes: to +transientTypeWithSupertypeStrings: 
+	and rewritten +transientTypeWithSupertypes: to have a new behavior.
+	(-supertypes, -allSupertypes, -allSubtypes, -subtypes): Modified 
+	documentation to make clear these methods that return UTIs won't return 
+	string representations but ETUTI objects.
+	* Source/TestUTI.m: Udpated.
+
+2009-05-05  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/ETUI.h:
+	* Source/ETUTI.m:
+	Made ETUTI conforms to NSCopying, this way UTI objects can be used as keys 
+	in dictionaries.
+
+2009-01-21  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Source/NSObject+Etoile.m:
+	(ETInstanceVariable -value, -setValue:): Fixed to check the type encoding 
+	before trying to set or get the value. For example, this eliminates the 
+	exception raised by -value with most C structures not supported by NSValue.
+	-setValue: often results in a crash when I edit a text cell that calls it 
+	with an NSString, no idea why for now... 
+
+2009-01-19  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Source/NSObject+Etoile.m:
+	(ETInstanceVariable -value, -setValue:): Modified to support reading and 
+	writing common primitive types in addition to objects, thanks to GNUstep KVC 
+	related helper functions. Now does what the documentation states :-)
+
+2009-01-19  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSObject+Etoile.h:
+	* Source/NSObject+Etoile.m:
+	ETInstanceVariable
+	Documented public methods.
+	(-typeEncoding, -isObjectType, -properties): Added.
+	(-typeName): Extracted the type encoding retrieval into the new method 
+	-typeEncoding.
+
+2009-01-17  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSObject+Etoile.h: Modified _ivar in ETInstanceVariable to 
+	support NEXT_RUNTIME_2.
+	* Source/NSObject+Etoile.m:
+	(-instanceVariableForName:, -instanceVariableNames): 
+	(ETInstanceVariable -name, -type, -value, -setValue:):
+	Added NEXT_RUNTIME_2 support.
+
+2008-11-21  Günther Noack <guenther@unix-ag.uni-kl.de>
+
+	* ETTranscript class added
+
+2008-11-15  Quentin Mathe <qmathe@club-internet.fr>
+
+	* GNUmakefile: Bumped the framework version to 0.4. Cleaned a bit also.
+	* GNUmakefile.postamble: Removed.
+	* EtoileThread/GNUmakefile:
+	* EtoileXML/GNUmakefile:
+	Set these subframework versions to 0.1.
+	* README: Written detailed content.
+	* EtoileThread/README:
+	* INSTALL: 
+	Updated.
+	* NEWS:
+	* EtoileXML/README:
+	Added.
+
+2008-09-23  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSObject+Model.h:
+	* NSObject+Model.m: 
+	(-primitiveValueForKey:, -setPrimitiveValue:forKey:): Added.
+	(-valueForProperty:, -setValue:forProperty:): Updated to use the new 
+	methods.
+	Also updated these methods in ETProperty class.
+
+2008-09-12  Quentin Mathe <qmathe@club-internet.fr>
+
+	Added -hash to ETUUID. The hash function produces around 1 collisions for 
+	100000 UUIDs.
+	* GNUmakefile: Defined UKTEST_LONG for long testing.
+	* Source/ETUUID.m (-hash): Added..
+	* Source/TestUUID.m (-testHash): Added a new test for collisions between 
+	UUID hashes.
+
+2008-09-08  Quentin Mathe <qmathe@club-internet.fr>
+
+	Fixed UUID collisions on Linux by porting FreeBSD srandomdev() to it. If a 
+	program is run several times, clock() returns relatively often an identical 
+	value and with the low precision: 13000, 17000 etc. for example with ukrun 
+	on my machine. This number is used as a seed, so identical sequences of 
+	UUIDs can easily happen on Linux. This problem would also occur for multiple 
+	programs that run concurrently and create UUIDs.
+	* Source/ETUUID.m: Added ETSRandomDev() and modified INITRANDOM to use it if
+	srandomdev() isn't available.
+	* Source/TestUUID.m (-testString): Added a new test for collisions between 
+	random sequences. Turned on collision test by default.
+
+2008-07-31  Quentin Mathe <qmathe@club-internet.fr>
+
+	+allSubclasses and +directSubclasses tested with EtoileUI on Mac OS X.
+	* Headers/NSObject+Etoile.h:
+	* Source/NSObject+Etoile.m:
+	(+allSubclasses, +directSubclasses):
+	Fixed this buggy code I wrote yesterday. My loop test was wrong and I wasn't
+	taking in account the fact only NSObject root class implements 
+	-isSubclassOfClass:, other root classes may not (for example Object).
+	(ETGetSuperclass(), ETIsSubclassOfClass()): New private functions working
+	as a little abstraction layer over GNU, NeXT 1 and 2 runtimes. Could be made 
+	public in future.
+
+2008-07-30  Quentin Mathe <qmathe@club-internet.fr>
+
+	Mac OS X backport.
+	* Headers/EtoileCompatibility.h: Replaced an incorrect reference to 
+	'EtoileUI' by 'EtoileFoundation'.
+	* Headers/EtoileFoundation.h: Disabled problematic headers on Mac OS X.
+	* Source/ETUUID.m: Modified to include GNUstep macros through 
+	EtoileCompatibility.h.
+
+2008-07-30  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSObject+Etoile.h:
+	* Source/NSObject+Etoile.m:
+	(+allSubclasses, +directSubclasses):
+	New methods based on GSObjCRuntime API and NeXT runtime API.
+
+2008-07-28  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/EtoileFoundation.h: Removed ETPrototype.h.
+	* Source/GNUmakefile:
+	* GNUmakefile:
+	Tweaked to build on Ubuntu with no warnings and only compiles ETPrototype.m
+	if needed.
+
+2008-07-25  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSObject+Etoile.h:
+	* Source/NSObject+Etoile.m:
+	(+[ETProtocol protocolForName:): New method.
+
+2008-06-30  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Source/GNUmakefile: Fixed properly the Linux compilation bug that got 
+	previously worked around with r3198. Done by declaring the right POSIX flag.
+	* Source/ETGetOptionsDictionary.m:
+	Removed stuff from r3198.
+
+2008-06-30  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSString+Etoile.h:
+	* Headers/NSURL+Etoile.h:
+	Removed AppKit import.
+
+2008-06-17  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Source/ETGetOptionsDictionary.m: Fixed compilation on Ubuntu by declaring 
+	optopt and optarg. Needs further investigation because getopt() is reported 
+	as an implicit function and doesn't seem to appear by default in unistd.h
+	as it should. Bug reported by kpropell on etoile-discuss.
+
+2008-06-05  Yen-Ju Chen <yjchenx gmail>
+
+	* UUID:
+	  Update to 1.6.1 with Quentin's fix on uuid_dce_to_string (uuid_dce.c)
+	  It passes all tests.
+
+2008-05-16  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSString.h:
+	* Source/NSString.m:
+	(-appendString:, -appendPath:): Deprecated.
+	* Headers/NSURL.h:
+	* Source/NSURL.m:
+	(-appendPath:): Deprecated.
+	(-URLByAppendingPath:): New replacement method for -appendPath:.
+
+2008-04-29  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/Macros.h: Inserted 'unused' attribute to disable warnings when the 
+	header is imported.
+
+2008-04-28  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/ETUUID.h: Made conform to NSCopying.
+	* Source/ETUUID.m (-copyWithZone:): Added.
+
+2008-04-23  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/ETObjectChain.h:
+	* Headers/ETFilter.h:
+	* Source/ETObjectChain.m:
+	* Source/ETFilter.m:
+	(-initWithCollection:): Renamed -initWithObjects: to be more inline with 
+	usual OpenStep terminology and avoid conflicts with the identically named 
+	methods taking a variable number of args.
+	(-_buildLinkedListWithCollection:): Renamed -_buildLinkedListWithObjects: 
+	to match the previous change.
+
+2008-04-23  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/ETCollection.h:
+	* Source/ETCollection.m:
+	(-[NSArray contentArray]): Modified to return a new instance that can be 
+	mutated without worrying about the state of the original one.
+
+2008-04-22  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Source/NSInvocation+Etoile.m: Fixed missing selector in built invocation. 
+
+2008-04-21  Quentin Mathe <qmathe@club-internet.fr>
+
+	Refactored UUID tests. All tests pass. 
+	* UUID/uuid_dce.c (uuid_dce_to_string): Fixed str parameter wronly passed 
+	byref to uuid_export().
+	* Source/ETUUID.m:
+	Polished the code a bit.
+	(-isEqual:): Modified to use uuid_equal() instead of uuid_compare().
+	* Source/TestUUID.m: Extended to test the new ETUUID class and the 
+	DCE-compatible API.
+	* Source/GNUmakefile:
+	* GNUmakefile:
+	Modified to support generating a test bundle.
+
+2008-04-20  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Source/TestUUID.m: Added by moving it out of CoreObject.
+
+2008-04-19  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/ETUUID.h:
+	* Source/ETUUID.m: 
+	Replaced -release use by the RELEASE macro to be inline with the rest of 
+	the framework code.
+	(+UUID): New factory method.
+	(-UUIDValue): Renamed -UUID to make clear the method returns a C value and 
+	the distinction with -UUID that core objects implement.
+
+2008-04-19  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSInvocation+Etoile.h:
+	* Source/NSInvocation+Etoile.m:
+	Added.
+	* Headers/EtoileFoundation.h:
+	* GNUmakefile: 
+	* Source/GNUmakefile: 
+	Updated and reincluded NSFileManager+NameForTempFile as deprecated because 
+	various modules relies on it presently and have to be modified.
+	* Headers/NSFileManager+NameForTempFile.h: Added a deprecation warning.
+
+2008-04-19  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/ETUUID.h:
+	* Source/ETUUID.m: 
+	Made conform to Etoile coding style guidelines and modified to use SUPERINIT 
+	macro.
+
+2008-04-19  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/ETUUID.h:
+	* Source/ETUUID.m: 
+	(-isEqual:): Renamed -isEqualTo: that is not the standard equality test 
+	method but an AppleScript extension.
+
+2008-04-17  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/ETUUID.h:
+	* Source/ETUUID.m: 
+	Renamed COUUID to ETUUID, I forgot to do it previously.
+
+2008-04-07  Quentin Mathe <qmathe@club-internet.fr>
+
+	* EtoileXML/GNUmakefile: Fixed to deploy NSAttributedString+HTML.h as 
+	expected.
+
+2008-04-07  Quentin Mathe <qmathe@club-internet.fr>
+
+	* GNUmakefile.postamble: Fixed small syntax issues that make the compilation  
+	fails time to time.
+	* UUID/GNUmakefile: Modified to pass --with-dce flag for ./configure to 
+	eliminate undefined symbol references about functions declared in uuid_dce.h 
+	when launching a program that links EtoileFoundation.
+
+2008-04-06  Quentin Mathe <qmathe@club-internet.fr>
+
+	* EtoileXML/ETXMLNullHandler.m: Fixed a small typo that prevented the 
+	compilation and surely introduced by recent reformatting of the code.
+
+2008-04-06  Quentin Mathe <qmathe@club-internet.fr>
+
+	* EtoileXML/COPYING: Added.
+
+2008-04-05  Quentin Mathe <qmathe@club-internet.fr>
+
+	* EtoileThread/*.[hm]: Made all the coding style consistent and conform to 
+	Etoile guidelines.
+
+2008-04-05  Quentin Mathe <qmathe@club-internet.fr>
+
+	* EtoileThread/*.[hm]: Made all license notices consistent and pretty :-)
+
+2008-04-05  Quentin Mathe <qmathe@club-internet.fr>
+
+	* EtoileXML/*.[hm]: Made method names, class declarations and spacing 
+	between these constructs consistent and compliant with Etoile coding 
+	guidelines. Various method names or parameters will have to be reworked 
+	though.
+
+2008-04-05  Quentin Mathe <qmathe@club-internet.fr>
+
+	* EtoileXML/ETXMLParserDelegate.h: Modified ETXMLParserDelegate protocol to 
+	inherit from NSObject protocol.
+	* EtoileXML/ETXMLNullHandler.h:
+	* EtoileXML/ETXMLNullHandler.m:
+	* EtoileXML/ETXMLParser.h:
+	* EtoileXML/ETXMLParser.m:
+	Removed NSObject protocol in the type of the parameters that must conform to
+	ETXMLParserDelegate.
+
+2008-04-05  Quentin Mathe <qmathe@club-internet.fr>
+
+	* COPYING: Updated copyright holders and replaced outdated 
+	EtoileExtensionsKit mentions by EtoileFoundation.
+
+2008-04-05  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/EtoileFoundation.h: Included EtoileXML headers.
+
+2008-04-05  Quentin Mathe <qmathe@club-internet.fr>
+
+	* EtoileXML/*.[hm]: Made all license notices consistent and pretty :-)
+
+2008-04-05  Quentin Mathe <qmathe@club-internet.fr>
+
+	* EtoileXML/*.h: Modified all import statements to be consistent and allows 
+	these headers to be imported by other modules when compiling against the 
+	framework.
+
+2008-04-05  Quentin Mathe <qmathe@club-internet.fr>
+
+	* EtoileXML: Added by copying ETXML from Services/Jabber.
+	* EtoileXML/GNUmakefile: Modified to compile as a framework, reference
+	library symbols explicitly and integrate well in the build process. Also 
+	cleaned a bit.
+	* EtoileXML/Macros.h: Copied from Services/Jabber/ to make EtoileXML 
+	compiles. Should probably be cleaned or removed at later point.
+	* GNUmakefile: Updated to handle EtoileXML as a subframework.
+	* EtoileThread/GNUmakefile: Modified to reference library symbols 
+	explicitly.
+
+2008-04-05  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/ETUUID.h:
+	* Source/ETUUID.m:
+	Added by copying COUUID.h and COUUID.m from CoreObject.
+	* GNUmakefile.postamble:
+	Added to handle linking uuid_dce.h into ./EtoileFoundation on build.
+	* Headers/EtoileFoundation.h:
+	* Source/GNUmakefile:
+	Updated.
+	* GNUmakefile: Declared libuuid_embedded variable that specifies whether 
+	UUID (libossp-uuid) should be compiled and linked in a static way.
+
+2008-04-05  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/ETUUID.h:
+	* Source/ETUUID.m:
+	Added by copying COUUID.h and COUUID.m from CoreObject.
+	* GNUmakefile.postamble:
+	Added to handle linking uuid_dce.h into ./EtoileFoundation on build.
+	* Headers/EtoileFoundation.h:
+	* Source/GNUmakefile:
+	Updated.
+	* GNUmakefile: Declared libuuid_embedded variable that specifies whether 
+	UUID (libossp-uuid) should be compiled and linked in a static way.
+
+2008-04-03  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/EtoileFoundation.h: Added a license notice and import statements 
+	for all EtoileThread headers.
+
+2008-04-03  Quentin Mathe <qmathe@club-internet.fr>
+
+	* EtoileThread/GNUmakefile: Renamed the framework EtoileThread instead of 
+	ETThread. Removed the debug flag -g because gnustep-make passes it by 
+	default. Some extra cleaning too.
+	* GNUmakefile: Added PACKAGE_NAME declaration and updated to match the new 
+	name of EtoileThread framework.
+
+2008-04-02  Quentin Mathe <qmathe@club-internet.fr>
+
+	* GNUmakefile: 
+	* Source/GNUmakefile:
+	Cleaned these GNUmakefiles and corrected the compilation of the 
+	framework to build the Source as a compilation unit subproject of 
+	EtoileFoundation and not a standalone subproject as EtoileThread.
+
+2008-04-01  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSObject+Model.n:
+	* Source/NSObject+Model.m:
+	Removed the AppKit dependency on NSImage by moving it to 
+	/branches/qmathe/Container (that will become EtoileUI).
+
+2008-03-31  Quentin Mathe <qmathe@club-internet.fr>
+
+	* GNUmakefile: 
+	* EtoileThread/GNUmakefile:
+	Modified to include EtoileThread in the build and links it. Forced 
+	to create explicit library references at linking time.
+
+2008-03-31  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/EtoileFoundation: Removed UKKQueue.h to avoid compiler warnings 
+	when kqueue isn't available and that header isn't installed.
+	* GNUmakefile: 
+	* Source/GNUmakefile:
+	Tidied a bit. Modified to always install UKFileWatcher.h even kqueue isn't 
+	available.
+
+2008-03-20  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Source/NSObject+Model.m: Fixed a typo in -properties.
+
+2008-03-19  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSURL+Etoile.h:
+	* Source/NSURL+Etoile.m:
+	Added.
+	* Headers/EtoileFoundation.h:
+	* Source/GNUmakefile:
+	* GNUmakefile:
+	Updated.
+
+2008-03-19  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/NSString+Etoile.h:
+	* Source/NSString+Etoile.m:
+	Documented methods.
+	(-appendPath:): New shortcut method.
+
+2008-03-19  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/ETPrototype.h:
+	* Source/ETPrototype.m:
+	Extended ETPrototype protocol and class.
+	(-prototype, -setPrototype:): New accessors.
+	(-cloneWithZone:) New method. Fixed missing prototype retain by calling 
+	-setPrototype.
+	(-clone): Moved code into -cloneWithZone: and the method itself into
+	NSObject+Etoile.
+	(-dealloc): Fixed missing prototype release.
+	* Headers/NSObject+Etoile.h:
+	* Headers/NSObject+Etoile.m:
+	(-clone:, -isPrototype:): New methods.
+	* Headers/ETObjectRegistry.h: 
+	* Headers/ETObjectRegistry.m: 
+	Removed ETPrototype protocol declaration now superceded by the one in 
+	ETPrototype.h.
+	(-setMethod:forSelector:): New dummy method to conform to ETPrototype.
+	(-clone): Removed.
+	* Headers/EtoileFoundation.h:
+	* Source/GNUmakefile:
+	* GNUmakefile:
+	Updated to include ETPrototype.
+
+2008-03-17  Quentin Mathe <qmathe@club-internet.fr>
+
+	[branches/qmathe/Container/EtoileFoundation]
+	Merge of Container into EtoileFoundation.
+	* Headers/ETTransform.h:
+	* Source/ETTransform.m:
+	Fixed  incorrect import statements.
+
+2008-03-17  Quentin Mathe <qmathe@club-internet.fr>
+
+	[branches/qmathe/Container/EtoileFoundation]
+	Merge of Container into EtoileFoundation.
+	* Headers/EtoileCompatibility.h: Merged ETCompatibility.h from Container.
+	* Headers/EtoileFoundation.h: Updated to include newly added headers.
+	* Source/GNUmakefile:
+	* GNUmakefile:
+	Updated to include newly added files.
+	* Replaced EtoileUI by EtoileFoundation in import statements.
+	* Replaced ETCompatibility by EtoileCompatibility in import statements.
+
+2008-03-16  Quentin Mathe <qmathe@club-internet.fr>
+
+	[branches/qmathe/Container/EtoileFoundation]
+	Merge of Container into EtoileFoundation.
+	WARNING: Imported files not yet included in compilation.
+	* Moved Foundation related headers and source files from Container to 
+	EtoileFoundation to which they really belong to.
+
+2007-05-03  Yen-Ju Chen <yjchenx at gmail>
+	
+	* Toplevel GNUmakefile make the frameworks
+	  while Source/GNUmakefile make the subproject
+
+2007-05-01  Yen-Ju Chen <yjchenx at gmail>
+
+	* Move Cocoa.h to one level up. 
+	  I don't see the reason to have it in its own directory.
+	* Turn EtoileFoundation into framework.
+	* Remove Cocoa.h which I don't know why it is necessary
+	  considering AppKit.h should cover everything even on Cocoa.
+
+2007-04-20  Yen-Ju Chen <yjchenx at gmail>
+
+	* Move OSBundleExtensionLoader from OpenSpaceManager.
+	* Try to conform code style.
+
+2007-02-28  Yen-Ju Chen <yjchenx at gmail>
+
+	* Move UKNibOwner to EtoileUI (Bug #8511).
+
+2007-02-19  Yen-Ju Chen <yjchenx at gmail>
+
+	* Format README in reStructuedText
+
+2006-11-07  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Compile on Cocoa.
+
+2006-10-31  Quentin Mathe <qmathe@club-internet.fr>
+
+	* Headers/Cocoa/Cocoa.h:
+	* Headers/EtoileCompatibility.h:
+	* Headers/NSFileManager+NameForTempFile.h:
+	* Headers/UKFileWatcher.h:
+	* Headers/UKKQueue.h:
+	* Headers/UKMainThreadProxy.h:
+	* Headers/UKNibOwner.h:
+	* Headers/UKPushbackMesssenger.h:
+	* Headers/UKThreadMessenger.h:
+	* Headers/UKPluginsRegistry.h:
+	* Source/NSFileManager+NameForTempFile.m:
+	* Source/UKKQueue.m:
+	* Source/UKMainThreadProxy.m:
+	* Source/UKNibOwner.m:
+	* Source/UKPushbackMesssenger.m:
+	* Source/UKThreadMessenger.m:
+	* Source/UKPluginsRegistry.m:
+    * Source/GNUmakefile:
+    * Source/GNUmakefile.postamble:
+	* README:
+	* INSTALL:
+	* GNUmakefile:
+	Imported this new framework resulting from the split of EtoileExtensionsKit
+	in three modules (EtoileUI, EtoileFoundation, DistributedView).
+	The framework has been created with svn cp on EtoileExtensionsKit to keep 
+	files history.
