@@ -66,26 +66,27 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
   return [self commitChangesInObjects: [ctx changedObjects] afterNode: node withMetadata: metadata];
 }
 
-- (COHistoryGraphNode *) commitChangesInObjects: (NSArray *)objects 
+- (COHistoryGraphNode *) commitObjectDatas: (NSArray *)datas
                                       afterNode: (COHistoryGraphNode*)node
                                       withMetadata: (NSDictionary*)metadata
+                                      withHistoryNodeUUID: (ETUUID*)uuid
 {
-  NSMutableDictionary *mapping = [NSMutableDictionary dictionaryWithCapacity: [objects count]];
+  NSMutableDictionary *mapping = [NSMutableDictionary dictionaryWithCapacity: [datas count]];
   
-  for (COObject *obj in objects)
+  for (NSDictionary *data in datas)
   {
-    NSData *hash = [obj sha1Hash];
+    NSData *hash = [data sha1Hash];
     
-    [_store setData: [COSerializer serializeObject: [obj propertyList]]
+    [_store setData: [COSerializer serializeObject: data]
            forKey: [hash hexString]];
            
-    [mapping setObject: hash forKey: [obj uuid]];
+    [mapping setObject: hash forKey: [ETUUID UUIDWithString: [data objectForKey: @"uuid"]]];
   }
 
   NSDictionary *meta = [NSMutableDictionary dictionaryWithDictionary: metadata];
   [meta setObject: [NSDate date] forKey: kCODateHistoryGraphNodeProperty];
 
-  COHistoryGraphNode *newNode = [[[COHistoryGraphNode alloc] initWithUUID: [ETUUID UUID]
+  COHistoryGraphNode *newNode = [[[COHistoryGraphNode alloc] initWithUUID: uuid
            storeCoordinator: self
             properties: meta
             parentNodeUUIDs: node ? A([node uuid]) : nil
@@ -104,13 +105,8 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
 
   // Post notification
   
-  NSMutableArray *uuids = [NSMutableArray array];
-  for (COObject *obj in objects)
-  {
-    [uuids addObject: [obj uuid]];
-  }
   NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-    uuids, @"objectUUIDs",
+    [mapping allKeys], @"objectUUIDs",
     [newNode uuid], @"commitUUID",
     nil];
   [[NSNotificationCenter defaultCenter] postNotificationName: COStoreDidCommitNotification
@@ -118,6 +114,16 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
                                                     userInfo: userInfo];
 
   return newNode;
+}
+
+- (COHistoryGraphNode *) commitChangesInObjects: (NSArray *)objects 
+                                      afterNode: (COHistoryGraphNode*)node
+                                      withMetadata: (NSDictionary*)metadata
+{
+  return [self commitObjectDatas: [[objects mappedCollection] propertyList]
+                       afterNode: node
+                    withMetadata: metadata
+             withHistoryNodeUUID: [ETUUID UUID]];
 }
 
 @end
@@ -128,6 +134,7 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
 {
   // Find the node in which the given object UUID was last modified
   NSData *hash = nil;
+  unsigned int n = 0;
   while ((hash = [[node uuidToObjectVersionMaping] objectForKey: uuid]) == nil)
   {
     if ([[node parents] count] != 1)
@@ -137,7 +144,9 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
       //NSLog(@"Warning: requested UUID %@ not found.", uuid);
       return nil;
     }
-    node = [[node parents] objectAtIndex: 0];
+    COHistoryGraphNode *parent = [[node parents] objectAtIndex: 0];
+    assert((++n) < 10000);
+    node = parent;
   }
   
   NSDictionary *data = [COSerializer unserializeData: [_store dataForKey: [hash hexString]]];

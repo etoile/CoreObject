@@ -6,8 +6,10 @@
 {
   IBOutlet NSOutlineView *outlineView;
   Document *doc; // weak ref
+  BOOL isSharing;
 }
 
+- (id)initWithDocument: (id)document isSharing: (BOOL)sharing;
 - (id)initWithDocument: (id)document;
 
 - (Document*)projectDocument;

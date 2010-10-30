@@ -1,15 +1,14 @@
 #import <Cocoa/Cocoa.h>
-#import "SharingSession.h"
-#import "SharingMessage.h"
+#import "SharingServer.h"
 
-@class SharingSession;
+@class SharingServer;
 
 /**
  * Server's representation of a single client
  */
-@interface SharingSessionPeer : NSObject
+@interface SharingServerPeer : NSObject
 {
-  SharingSession *owner;
+  SharingServer *owner;
 
   NSString *clientName;
 
@@ -25,17 +24,13 @@
    * relative to this.
    */
   ETUUID *shadowHistoryGraphNodeUUID;
-  
-  /**
-   * Messages waiting to be sent.
-   * Nonempty only if isServerWaitingForResponse is YES
-   */
-  NSMutableArray *queuedMessages;
 }
 
-- (id) initWithSharingSession: (SharingSession*)session
+- (id) initWithSharingSession: (SharingServer*)session
                    clientName: (NSString*)name;
 
-- (void) enqueueOrSendMessage: (SharingMessage*)msg;
+
+- (void)synchronizeWithClientIfPossible;
+- (void)handleMessage: (NSDictionary*)msg;
 
 @end

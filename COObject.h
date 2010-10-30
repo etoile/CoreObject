@@ -41,6 +41,12 @@
 - (id)copyWithZone: (NSZone*)zone;
 
 /**
+ * Returns an array containing all COObjects "strongly contained" by this one.
+ * This means objects which are values for "composite" properties.
+ */
+- (NSArray*)allStronglyContainedObjects;
+
+/**
  * override: never
  * Creates a new object (generates a new UUID) in the given context.
  */
@@ -90,7 +96,9 @@
 - (id) initFaultedObjectWithContext: (COEditingContext*)ctx uuid: (ETUUID*)uuid;
 - (id) initWithContext: (COEditingContext*)ctx uuid: (ETUUID*)uuid data: (NSDictionary *)data;
 - (NSData*)sha1Hash;
+- (void) load;
 - (void)loadIfNeeded;
+- (void) markAsNeedingReload;
 - (id)_mutableValueForProperty: (NSString*)key;
 - (void) setModified;
 

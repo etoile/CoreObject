@@ -1112,7 +1112,7 @@
 					/usr/GNUstep/System/Library/Headers/,
 				);
 				INFOPLIST_FILE = "../EtoileFoundation/EtoileFoundation-Info.plist";
-				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/GNUstep/System/Library/Libraries/;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -1229,7 +1229,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				GCC_PREPROCESSOR_DEFINITIONS = NeXT_RUNTIME;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /usr/GNUstep/System/Library/Headers/;

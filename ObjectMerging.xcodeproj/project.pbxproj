@@ -8,11 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		6627ED9B12761EBC00E06946 /* CheckpointAsSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627ED9A12761EBC00E06946 /* CheckpointAsSheetController.m */; };
-		6627EDFA12762B8C00E06946 /* SharingSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627EDF912762B8C00E06946 /* SharingSession.m */; };
-		6627EE361276317A00E06946 /* SharingSessionPeer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627EE351276317A00E06946 /* SharingSessionPeer.m */; };
-		6627EE95127764E800E06946 /* SharingMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627EE94127764E800E06946 /* SharingMessage.m */; };
+		6627EDFA12762B8C00E06946 /* SharingServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627EDF912762B8C00E06946 /* SharingServer.m */; };
+		6627EE361276317A00E06946 /* SharingServerPeer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627EE351276317A00E06946 /* SharingServerPeer.m */; };
 		6627EE9812777D6300E06946 /* SharingClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627EE9712777D6300E06946 /* SharingClient.m */; };
 		6627EEDD1278A55A00E06946 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 6627EEDC1278A55A00E06946 /* README */; };
+		6627EF531278EE8400E06946 /* SharingController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627EF521278EE8400E06946 /* SharingController.m */; };
+		6627F0D8127A95DF00E06946 /* EtoileFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 792BF91C124FBAD00040BF68 /* EtoileFoundation.framework */; };
+		6627F13A127A99F100E06946 /* ObjectMerging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* ObjectMerging.framework */; };
+		6627F391127C7E6800E06946 /* ExceptionHandling.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6627F390127C7E6700E06946 /* ExceptionHandling.framework */; };
 		66708F9C12486F0400E65F00 /* ProjectDemoMainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* ProjectDemoMainMenu.xib */; };
 		66708F9F12486F0400E65F00 /* OutlineWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66708F9412486E9D00E65F00 /* OutlineWindow.xib */; };
 		66708FAB12486F0400E65F00 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
@@ -75,9 +78,8 @@
 		6686BFF5125CF0200065DE1A /* ChatWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6686BFF4125CF0200065DE1A /* ChatWindow.xib */; };
 		6686BFFA125CF1B90065DE1A /* ChatWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BFF9125CF1B90065DE1A /* ChatWindowController.m */; };
 		6686C046125CF9E70065DE1A /* CONetworkPeer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BFDD125AE7730065DE1A /* CONetworkPeer.m */; };
-		6686C10B125D73220065DE1A /* EtoileFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 792BF91C124FBAD00040BF68 /* EtoileFoundation.framework */; };
 		6686C128125D7F140065DE1A /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686C127125D7F140065DE1A /* NetworkController.m */; };
-		6686C2AF125E62830065DE1A /* ObjectMerging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* ObjectMerging.framework */; };
+		6686C2AF125E62830065DE1A /* ObjectMerging.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* ObjectMerging.framework */; };
 		6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686C341125EC5070065DE1A /* ProjectDocument.m */; };
 		6698320412691F970011C7FC /* SCRATCHPAD in Resources */ = {isa = PBXBuildFile; fileRef = 6698320312691F970011C7FC /* SCRATCHPAD */; };
 		66983346126BB1150011C7FC /* HistoryInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66983345126BB1150011C7FC /* HistoryInspectorController.m */; };
@@ -142,7 +144,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				6686C10B125D73220065DE1A /* EtoileFoundation.framework in CopyFiles */,
+				6686C2AF125E62830065DE1A /* ObjectMerging.framework in CopyFiles */,
+				6627F0D8127A95DF00E06946 /* EtoileFoundation.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,15 +161,16 @@
 		6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		6627ED9912761EBC00E06946 /* CheckpointAsSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CheckpointAsSheetController.h; sourceTree = "<group>"; };
 		6627ED9A12761EBC00E06946 /* CheckpointAsSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CheckpointAsSheetController.m; sourceTree = "<group>"; };
-		6627EDF812762B8C00E06946 /* SharingSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingSession.h; sourceTree = "<group>"; };
-		6627EDF912762B8C00E06946 /* SharingSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingSession.m; sourceTree = "<group>"; };
-		6627EE341276317A00E06946 /* SharingSessionPeer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingSessionPeer.h; sourceTree = "<group>"; };
-		6627EE351276317A00E06946 /* SharingSessionPeer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingSessionPeer.m; sourceTree = "<group>"; };
-		6627EE93127764E800E06946 /* SharingMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingMessage.h; sourceTree = "<group>"; };
-		6627EE94127764E800E06946 /* SharingMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingMessage.m; sourceTree = "<group>"; };
+		6627EDF812762B8C00E06946 /* SharingServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingServer.h; sourceTree = "<group>"; };
+		6627EDF912762B8C00E06946 /* SharingServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingServer.m; sourceTree = "<group>"; };
+		6627EE341276317A00E06946 /* SharingServerPeer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingServerPeer.h; sourceTree = "<group>"; };
+		6627EE351276317A00E06946 /* SharingServerPeer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingServerPeer.m; sourceTree = "<group>"; };
 		6627EE9612777D6300E06946 /* SharingClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingClient.h; sourceTree = "<group>"; };
 		6627EE9712777D6300E06946 /* SharingClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingClient.m; sourceTree = "<group>"; };
 		6627EEDC1278A55A00E06946 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		6627EF511278EE8400E06946 /* SharingController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingController.h; sourceTree = "<group>"; };
+		6627EF521278EE8400E06946 /* SharingController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingController.m; sourceTree = "<group>"; };
+		6627F390127C7E6700E06946 /* ExceptionHandling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExceptionHandling.framework; path = System/Library/Frameworks/ExceptionHandling.framework; sourceTree = SDKROOT; };
 		66708F7112486CD300E65F00 /* OutlineController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutlineController.h; sourceTree = "<group>"; };
 		66708F7212486CD300E65F00 /* OutlineController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutlineController.m; sourceTree = "<group>"; };
 		66708F9412486E9D00E65F00 /* OutlineWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OutlineWindow.xib; sourceTree = "<group>"; };
@@ -262,7 +266,8 @@
 				66708FB612486F0400E65F00 /* Cocoa.framework in Frameworks */,
 				66708FB712486F0400E65F00 /* libz.dylib in Frameworks */,
 				66708FB812486F0400E65F00 /* libcrypto.dylib in Frameworks */,
-				6686C2AF125E62830065DE1A /* ObjectMerging.framework in Frameworks */,
+				6627F13A127A99F100E06946 /* ObjectMerging.framework in Frameworks */,
+				6627F391127C7E6800E06946 /* ExceptionHandling.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -328,6 +333,7 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				6686BE2812592D6F0065DE1A /* libz.1.1.3.dylib */,
+				6627F390127C7E6700E06946 /* ExceptionHandling.framework */,
 			);
 			name = ObjectMerging;
 			sourceTree = "<group>";
@@ -344,10 +350,10 @@
 		6627EE911277625B00E06946 /* Server */ = {
 			isa = PBXGroup;
 			children = (
-				6627EDF812762B8C00E06946 /* SharingSession.h */,
-				6627EDF912762B8C00E06946 /* SharingSession.m */,
-				6627EE341276317A00E06946 /* SharingSessionPeer.h */,
-				6627EE351276317A00E06946 /* SharingSessionPeer.m */,
+				6627EDF812762B8C00E06946 /* SharingServer.h */,
+				6627EDF912762B8C00E06946 /* SharingServer.m */,
+				6627EE341276317A00E06946 /* SharingServerPeer.h */,
+				6627EE351276317A00E06946 /* SharingServerPeer.m */,
 			);
 			name = Server;
 			sourceTree = "<group>";
@@ -544,11 +550,13 @@
 		6686BFD8125AE74B0065DE1A /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				6627EE93127764E800E06946 /* SharingMessage.h */,
-				6627EE94127764E800E06946 /* SharingMessage.m */,
+				6627EF511278EE8400E06946 /* SharingController.h */,
+				6627EF521278EE8400E06946 /* SharingController.m */,
+				6686C126125D7F140065DE1A /* NetworkController.h */,
+				6686C127125D7F140065DE1A /* NetworkController.m */,
 				6627EE921277634200E06946 /* Client */,
 				6627EE911277625B00E06946 /* Server */,
-				6686BFF0125CEC380065DE1A /* UI */,
+				6686BFF0125CEC380065DE1A /* Chat UI */,
 				6686BFEF125CEC300065DE1A /* Library */,
 				6686BFE2125AEF550065DE1A /* NOTES-Networking */,
 			);
@@ -564,16 +572,14 @@
 			name = Library;
 			sourceTree = "<group>";
 		};
-		6686BFF0125CEC380065DE1A /* UI */ = {
+		6686BFF0125CEC380065DE1A /* Chat UI */ = {
 			isa = PBXGroup;
 			children = (
-				6686C126125D7F140065DE1A /* NetworkController.h */,
-				6686C127125D7F140065DE1A /* NetworkController.m */,
 				6686BFF4125CF0200065DE1A /* ChatWindow.xib */,
 				6686BFF8125CF1B90065DE1A /* ChatWindowController.h */,
 				6686BFF9125CF1B90065DE1A /* ChatWindowController.m */,
 			);
-			name = UI;
+			name = "Chat UI";
 			sourceTree = "<group>";
 		};
 		6699633B115F0C4200359BE6 /* Documentation */ = {
@@ -796,10 +802,10 @@
 				6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */,
 				66983346126BB1150011C7FC /* HistoryInspectorController.m in Sources */,
 				6627ED9B12761EBC00E06946 /* CheckpointAsSheetController.m in Sources */,
-				6627EDFA12762B8C00E06946 /* SharingSession.m in Sources */,
-				6627EE361276317A00E06946 /* SharingSessionPeer.m in Sources */,
-				6627EE95127764E800E06946 /* SharingMessage.m in Sources */,
+				6627EDFA12762B8C00E06946 /* SharingServer.m in Sources */,
+				6627EE361276317A00E06946 /* SharingServerPeer.m in Sources */,
 				6627EE9812777D6300E06946 /* SharingClient.m in Sources */,
+				6627EF531278EE8400E06946 /* SharingController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -894,7 +900,6 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "ProjectDemo/ProjectDemo-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -941,10 +946,8 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				INFOPLIST_FILE = "ObjectMerging-Info.plist";
-				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,

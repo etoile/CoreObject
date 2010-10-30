@@ -10,7 +10,7 @@ const NSString *kCOTypeMinorEdit = @"COTypeMinorEdit";
 const NSString *kCOTypeCheckpoint = @"COTypeCheckpoint";
 const NSString *kCOTypeMerge = @"COTypeMerge";
 const NSString *kCOTypeCreateBranch = @"COTypeCreateBranch";
-
+const NSString *kCOTypeHidden = @"COTypeHidden";
 
 @implementation COHistoryGraphNode
 

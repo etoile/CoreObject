@@ -150,6 +150,33 @@
 {
   [_instantiatedObjects setObject: object forKey: uuid];
 }
+
+/**
+ * Helper method for live collaboration
+ */
+- (COHistoryGraphNode *) commitObjectDatas: (NSArray*)datas withHistoryNodeUUID: (ETUUID*)uuid
+{
+//  assert([_changedObjectUUIDs count] == 0);
+  assert(_baseHistoryGraphNode != nil);
+  
+  for (NSString *uuidString in [[datas mappedCollection] objectForKey: @"uuid"])
+  {
+    ETUUID *u = [ETUUID UUIDWithString: uuidString];
+    COObject *obj = [_instantiatedObjects objectForKey: u];
+    if (obj)
+    {
+      [obj markAsNeedingReload];
+      NSLog(@"~~~~~~~~~~~~~~~~~~Will force reload of %@", u);
+    }
+  }
+  
+  COHistoryGraphNode *newNode = [_storeCoordinator commitObjectDatas:datas 
+                                    afterNode:_baseHistoryGraphNode
+                                 withMetadata:nil 
+                          withHistoryNodeUUID:uuid];
+  [self setBaseHistoryGraphNode: newNode];
+}
+
 @end
 
 
@@ -189,6 +216,7 @@
   COObjectGraphDiff *merged = [COObjectGraphDiff mergeDiff: oa withDiff: ob];
   NSLog(@"!!!!merged %@", merged);
   
+  [self rollbackToRevision: ver];
   [merged applyToContext: self];
 }
 

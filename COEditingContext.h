@@ -81,6 +81,11 @@
 - (NSArray *) changedObjects;
 - (void) recordObject: (COObject*)object forUUID: (ETUUID*)uuid;
 
+/**
+ * Special purpose method for collaboration
+ */
+- (COHistoryGraphNode *) commitObjectDatas: (NSArray*)datas withHistoryNodeUUID: (ETUUID*)uuid;
+
 @end
 
 

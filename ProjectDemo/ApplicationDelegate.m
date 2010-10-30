@@ -3,7 +3,7 @@
 #import "OutlineController.h"
 #import "Document.h"
 #import "HistoryInspectorController.h"
-#import "SharingSession.h"
+#import "SharingServer.h"
 
 #define STORE_URL [NSURL URLWithString: [@"~/ProjectDemoStore" stringByExpandingTildeInPath]]
 
@@ -42,10 +42,6 @@
   
   // Show existing documents
   [self projectDocumentsDidChange: project];
-  
-  // FIXME: temp
-  id c = [[SharingSession alloc] initWithDocument: [[project documents] anyObject]];
-  
 }
 
 - (COEditingContext*)editingContext
@@ -70,6 +66,7 @@
   
   Document *document = [[[Document alloc] initWithContext: context] autorelease];
   [document setRootObject: outlineItem];
+  [document setDocumentName: [NSString stringWithFormat: @"Document %@", [[document uuid] stringValue]]];
   
   [project addDocument: document];
 
@@ -107,10 +104,7 @@
 
 - (void)saveDocumentAs: (id)sender
 {
-  NSWindow *win = [[self keyDocumentController] window];
-  assert(win != nil);
-  
-  NSString *name = [checkpointAsSheetController showSheetOnWindow: win];
+  NSString *name = [checkpointAsSheetController showSheet];
   if (name != nil)
   {
     [self checkpointWithName: name];
@@ -161,7 +155,7 @@
 
 - (void) shareWithInspectorForDocument: (Document*)doc
 {
-  [sharingWindow orderFront: nil];
+  [sharingController shareWithInspectorForDocument: doc];
 }
 
 @end

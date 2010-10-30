@@ -41,6 +41,12 @@ public:
   return self;
 }
 
+- (void) dealloc
+{
+  [ops release];
+  [super dealloc];
+}
+
 - (void)diffWithA: (NSArray*)a B: (NSArray*)b
 {
   ops = [[NSMutableArray alloc] init];
@@ -61,8 +67,11 @@ public:
     switch ((*it).type)
     {
       case ManagedFusion::INSERTION:
-        [ops addObject: [COArrayDiffOperationInsert insertWithLocation: firstRange.location
-                                                              objects: [b subarrayWithRange: secondRange]]];
+        if (secondRange.length > 0)
+        {
+          [ops addObject: [COArrayDiffOperationInsert insertWithLocation: firstRange.location
+                                                                objects: [b subarrayWithRange: secondRange]]];
+        }
         break;
       case ManagedFusion::DELETION:
         [ops addObject: [COArrayDiffOperationDelete deleteWithRange: firstRange]];
@@ -140,6 +149,7 @@ public:
   COArrayDiffOperationInsert *op = [[[COArrayDiffOperationInsert alloc] init] autorelease];
   op->range = NSMakeRange(loc, 0);
   op->insertedObjects = [objs retain];
+  assert([objs count] > 0);
   return op;
 }
 

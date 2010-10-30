@@ -3,6 +3,38 @@
 #import "COArrayDiff.h"
 #import "COSetDiff.h"
 
+/* These three functions are a hack */
+
+static id EnsureObjectIsFromContext(id object, COEditingContext *ctx)
+{
+  if ([object isKindOfClass: [COObject class]] && [object objectContext] != ctx)
+  {
+    return [ctx objectForUUID: [object uuid]];
+  }
+  return object;
+}
+
+static NSArray *EnsureObjectsAreFromContextInArray(NSArray *arr, COEditingContext *ctx)
+{
+  NSMutableArray *result = [NSMutableArray array];
+  for (id obj in arr)
+  {
+    [result addObject: EnsureObjectIsFromContext(obj, ctx)];
+  }
+  return result;
+}
+
+static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx)
+{
+  NSMutableSet *result = [NSMutableSet set];
+  for (id obj in set)
+  {
+    [result addObject: EnsureObjectIsFromContext(obj, ctx)];
+  }
+  return result;
+}
+
+
 
 /**
  * COObjectGraphEdit classes. These are simple wrapper objects.
@@ -87,7 +119,7 @@
 }
 - (void) applyToObject: (COObject*)obj
 {
-  [obj setValue: newValue forProperty: propertyName];
+  [obj setValue: EnsureObjectIsFromContext(newValue, [obj objectContext]) forProperty: propertyName];
 }
 - (NSString *)description
 {
@@ -124,7 +156,11 @@
 - (void) applyToObject: (COObject*)obj
 {
   // FIXME: slow
-  [obj setValue: [diff arrayWithDiffAppliedTo: [obj valueForProperty: propertyName]]
+  NSArray *oldArray = [obj valueForProperty: propertyName];
+  NSArray *temp = [diff arrayWithDiffAppliedTo: oldArray];
+  NSArray *newArray = EnsureObjectsAreFromContextInArray(temp, [obj objectContext]); 
+  
+  [obj setValue: newArray
     forProperty: propertyName];
 }
 - (NSString *)description
@@ -162,8 +198,11 @@
 }
 - (void) applyToObject: (COObject*)obj
 {
+  NSSet *temp = [diff setWithDiffAppliedTo: [obj valueForProperty: propertyName]];
+  NSSet *result = EnsureObjectsAreFromContextInSet(temp, [obj objectContext]);
+  
   // FIXME: slow
-  [obj setValue: [diff setWithDiffAppliedTo: [obj valueForProperty: propertyName]]
+  [obj setValue: result
     forProperty: propertyName];
 }
 - (NSString *)description
@@ -200,6 +239,7 @@
   NSMutableDictionary *propDict = [_editsByPropertyAndUUID objectForKey: [edit uuid]];
   if (nil == propDict)
   {
+    assert([edit uuid] != nil);
     propDict = [NSMutableDictionary dictionary];
     [_editsByPropertyAndUUID setObject: propDict forKey: [edit uuid]];
   } 
@@ -263,6 +303,24 @@
  */
 + (void) _diffObject: (COObject*)base with: (COObject*)other addToDiff: (COObjectGraphDiff*)diff
 {
+  assert(base != nil || other != nil);
+  
+  NSLog(@"Diff %@ with %@", base, other);
+  
+  if (base == nil)
+  {
+    // The object is being inserted, copy all property values
+    for (NSString *prop in [other properties])
+    {
+      [diff recordSetValue: [other valueForProperty: prop] forProperty: prop ofObject: [other uuid]];
+    }     
+    return; 
+  }
+  else if (other == nil)
+  {
+    return; // The object was deleted.. but we don't bother recording this.
+  }
+
   NSMutableSet *props = [NSMutableSet setWithArray: [base properties]];
   [props unionSet: [NSSet setWithArray: [other properties]]];
     
@@ -270,26 +328,29 @@
   {
     id baseVal = [base valueForProperty: prop];
     id otherVal = [other valueForProperty: prop];
-            
-    if ([baseVal isKindOfClass: [NSArray class]] && [otherVal isKindOfClass: [NSArray class]])
+    if (![baseVal isEqual: otherVal]
+        && !(baseVal == nil && otherVal == nil))
     {
-      COArrayDiff *arrayDiff = [[[COArrayDiff alloc] initWithFirstArray: (NSArray*)baseVal
-                                                            secondArray: (NSArray*)otherVal] autorelease];
-      [diff recordModifyArray: arrayDiff forProperty: prop ofObject: [base uuid]];
-    }
-    else if ([baseVal isKindOfClass: [NSSet class]] && [otherVal isKindOfClass: [NSSet class]])
-    {
-      COSetDiff *setDiff = [[[COSetDiff alloc] initWithFirstSet: (NSSet*)baseVal
-                                                      secondSet: (NSSet*)otherVal] autorelease];
-      [diff recordModifySet: setDiff forProperty: prop ofObject: [base uuid]];
-    }
-    else if (otherVal == nil)
-    {
-      [diff recordRemoveProperty: prop ofObject: [base uuid]];
-    }
-    else
-    {
-      [diff recordSetValue: otherVal forProperty: prop ofObject: [base uuid]];
+      if ([baseVal isKindOfClass: [NSArray class]] && [otherVal isKindOfClass: [NSArray class]])
+      {
+        COArrayDiff *arrayDiff = [[[COArrayDiff alloc] initWithFirstArray: (NSArray*)baseVal
+                                                              secondArray: (NSArray*)otherVal] autorelease];
+        [diff recordModifyArray: arrayDiff forProperty: prop ofObject: [base uuid]];
+      }
+      else if ([baseVal isKindOfClass: [NSSet class]] && [otherVal isKindOfClass: [NSSet class]])
+      {
+        COSetDiff *setDiff = [[[COSetDiff alloc] initWithFirstSet: (NSSet*)baseVal
+                                                        secondSet: (NSSet*)otherVal] autorelease];
+        [diff recordModifySet: setDiff forProperty: prop ofObject: [base uuid]];
+      }
+      else if (baseVal != nil && otherVal == nil)
+      {
+        [diff recordRemoveProperty: prop ofObject: [base uuid]];
+      }
+      else
+      {
+        [diff recordSetValue: otherVal forProperty: prop ofObject: [base uuid]];
+      }
     }
   }  
 }
@@ -368,6 +429,8 @@
   {
     COObject *o1 = [c1 objectForUUID: uuid];
     COObject *o2 = [c2 objectForUUID: uuid];
+    // either may be nil, but not both
+    assert(o1 != nil || o2 != nil);
     [self _diffObject: o1 with: o2 addToDiff: result];
   }
   

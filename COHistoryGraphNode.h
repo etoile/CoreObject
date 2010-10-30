@@ -13,6 +13,7 @@ extern const NSString *kCOTypeMinorEdit;
 extern const NSString *kCOTypeCheckpoint;
 extern const NSString *kCOTypeMerge;
 extern const NSString *kCOTypeCreateBranch;
+extern const NSString *kCOTypeHidden;
 
 /**
  * A node in the store's history graph. Managed by a COStoreCoordinator.

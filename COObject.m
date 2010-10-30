@@ -161,6 +161,52 @@
   return newObject;
 }
 
+static void GatherAllStronglyContainedObjects(id object, NSMutableArray *dest)
+{
+  if (![object isKindOfClass: [COObject class]])
+  {
+    [dest addObject: object];
+    return;
+  }
+}
+
+- (NSArray*)allStronglyContainedObjects
+{
+  NSMutableArray *result = [NSMutableArray array];
+  for (ETPropertyDescription *propDesc in [[self modelDescription] allPropertyDescriptions])
+  {
+    if ([propDesc isComposite])
+    {
+      id value = [self valueForProperty: [propDesc name]];
+      
+      assert([propDesc isMultivalued] ==
+        ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]));
+        
+      if ([propDesc isMultivalued])
+      {
+        for (id subvalue in value)
+        {
+          if ([subvalue isKindOfClass: [COObject class]])
+          {
+            [result addObject: subvalue];
+            [result addObjectsFromArray: [subvalue allStronglyContainedObjects]];
+          }
+        }
+      }
+      else
+      {
+        if ([value isKindOfClass: [COObject class]])
+        {
+          [result addObject: value];
+          [result addObjectsFromArray: [value allStronglyContainedObjects]];
+        }
+        // Ignore non-COObject objects
+      }
+    }
+  }
+  return result;
+}
+
 - (ETEntityDescription *)modelDescription
 {
   if (_description != nil)
@@ -252,7 +298,7 @@
 }
 
 + (BOOL) isPrimitiveCoreObjectValue: (id)value
-{
+{  
   return [value isKindOfClass: [NSNumber class]] ||
     [value isKindOfClass: [NSDate class]] ||
     [value isKindOfClass: [NSData class]] ||
@@ -280,12 +326,34 @@
   }
 }
 
+- (void)debugCheckValue:(id)value
+{
+  if ([value isKindOfClass: [NSArray class]] ||
+      [value isKindOfClass: [NSSet class]])
+  {
+    for (id subvalue in value)
+    {
+      [self debugCheckValue: subvalue];
+    }
+  }
+  else 
+  {
+    if ([value isKindOfClass: [COObject class]])
+    {
+      assert([value objectContext] == _ctx);
+    }    
+  }
+}
+
 - (void) privateSetValue:(id)value forProperty:(NSString*)key
 {
   if (nil == value)
   {
-    // FIXME: ??
-    [NSException raise: NSInvalidArgumentException format: @"Tried to set nil value for property"];
+    // FIXME: Hack
+    value = @"<nil>";
+
+//    assert(0);
+//    [NSException raise: NSInvalidArgumentException format: @"Tried to set nil value for property"];
   }
   if (![COObject isCoreObjectValue: value])
   {
@@ -304,6 +372,8 @@
   {
     value = [[value mutableCopy] autorelease];
   }
+  
+  [self debugCheckValue: value];
   
   // FIXME: slow
   @try
@@ -363,13 +433,22 @@
 
 @implementation COObject (Private)
 
+- (void) load
+{
+  [self unfaultWithData: [[_ctx storeCoordinator] dataForObjectWithUUID: _uuid
+                                         atHistoryGraphNode: [_ctx baseHistoryGraphNode]]];
+}
+
+- (void) markAsNeedingReload
+{
+  _isFault = YES;
+}
 
 - (void) loadIfNeeded
 {
   if ([self isFault])
   {
-    [self unfaultWithData: [[_ctx storeCoordinator] dataForObjectWithUUID: _uuid
-                                           atHistoryGraphNode: [_ctx baseHistoryGraphNode]]];
+    [self load];
   }
 }
 
@@ -408,8 +487,7 @@
   // FIXME: revert owned children?
   if ([_ctx objectHasChanges: _uuid])
   {
-    [self unfaultWithData: [[_ctx storeCoordinator] dataForObjectWithUUID: _uuid
-                                               atHistoryGraphNode: [_ctx baseHistoryGraphNode]]];
+    [self load];
     // Remove from the list of modified objects
     [[self objectContext] markObjectUUIDUnchanged: [self uuid]];
   }

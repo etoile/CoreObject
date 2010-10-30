@@ -33,11 +33,13 @@
                                                                                     type: (id)@"NSNumber"];
       ETPropertyDescription *documentTypeProperty = [ETPropertyDescription descriptionWithName: @"documentType"
                                                                                       type: (id)@"NSString"];                                                                                            
+      ETPropertyDescription *documentNameProperty = [ETPropertyDescription descriptionWithName: @"documentName"
+                                                                                      type: (id)@"NSString"];                                                                                            
       ETPropertyDescription *rootObjectProperty = [ETPropertyDescription descriptionWithName: @"rootObject"
                                                                                       type: (id)@"NSObject"];
       [rootObjectProperty setOpposite: (id)@"DocumentItem.document"];
       
-      [docEntity setPropertyDescriptions: A(screenRectProperty, isOpenProperty, documentTypeProperty, rootObjectProperty)];
+      [docEntity setPropertyDescriptions: A(screenRectProperty, isOpenProperty, documentTypeProperty, rootObjectProperty, documentNameProperty)];
       
       [repo addUnresolvedDescription: docEntity];
       
@@ -93,10 +95,23 @@
   [self didChangeValueForProperty: @"rootObject"];
 }
 
+- (NSString*) documentName
+{
+  [self willAccessValueForProperty: @"documentName"];
+  return documentName;
+}
+- (void) setDocumentName:(NSString*)n
+{
+  [self willChangeValueForProperty: @"documentName"];
+  ASSIGN(documentName, n);
+  [self didChangeValueForProperty: @"documentName"];
+}
+
 
 - (void)dealloc
 {
   [documentType release];
+  [documentName release];
   [rootObject release];
   [super dealloc];
 }

@@ -19,7 +19,7 @@
   
   [intersection release];
   
-  ops = [NSMutableArray array];
+  ops = [[NSMutableArray alloc] init];
   if (![add isEmpty])
   {
     [(NSMutableArray*)ops addObject: [COSetDiffOperationAdd addOperationWithAddedObjects: add]];
@@ -34,7 +34,7 @@
 - (id) initWithOperations: (NSArray *)operations
 {
   SUPERINIT;
-  ops = [operations retain];
+  ops = [[NSArray alloc] initWithArray: operations];
   return self;
 }
 

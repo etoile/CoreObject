@@ -26,6 +26,7 @@ extern const NSString *COStoreDidCommitNotification;
 
 /**
  * most recently changed head history node (from mercurial terminology)
+ * FIXME: is this guaranteed to be non-nil? 
  */
 - (COHistoryGraphNode *)tip;
 

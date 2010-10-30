@@ -1,3 +1,4 @@
+#import <Cocoa/Cocoa.h>
 #include <zlib.h>
 #import "NSData+compression.h"
 

@@ -1,50 +1,53 @@
 #import "OutlineController.h"
-
+#import "SharingController.h"
 
 @implementation OutlineController
 
-// Hack to recieve notifications when the model is changed.
-
-- (void) setDelegatesOn: (OutlineItem *)i
-{
-  [i setDelegate: self];
-  for (OutlineItem *child in [i contents])
-  {
-    [self setDelegatesOn: child];
-  }
-}
-
-- (void) unsetDelegatesOn: (OutlineItem *)i
-{
-  [i setDelegate: nil];
-  for (OutlineItem *child in [i contents])
-  {
-    [self unsetDelegatesOn: child];
-  }  
-}
-
-// End hack.
-
-
-- (id)initWithDocument: (id)document
+- (id)initWithDocument: (id)document isSharing: (BOOL)sharing;
 {
   self = [super initWithWindowNibName: @"OutlineWindow"];
   
   if (!self) { [self release]; return nil; }
 
   doc = document; // weak ref
+  isSharing = sharing;
   
   assert([self rootObject] != nil);
   
-  [self setDelegatesOn: [self rootObject]];
-  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+      selector: @selector(didCommit:)
+       name: COStoreDidCommitNotification 
+       object: nil];
+
   return self;
+}
+
+- (id)initWithDocument: (id)document
+{
+  return [self initWithDocument:document isSharing: NO];
 }
 
 - (void)dealloc
 {
-  [self unsetDelegatesOn: [self rootObject]];
+  [[NSNotificationCenter defaultCenter] removeObserver: self];
   [super dealloc];
+}
+
+- (void)didCommit: (NSNotification*)notif
+{
+  NSMutableSet *updateObjectUUIDs = [NSMutableSet setWithArray: [[notif userInfo] objectForKey: @"objectUUIDs"]];
+  NSArray *allObjectsUUIDsInDocument = 
+    [[[[doc allStronglyContainedObjects] mappedCollection] uuid]
+      arrayByAddingObject: [doc uuid]];
+//  NSLog(@"Did commit. update %@, all %@", updateObjectUUIDs, allObjectsUUIDsInDocument);
+  [updateObjectUUIDs intersectSet: [NSSet setWithArray: allObjectsUUIDsInDocument]];
+//  NSLog(@"intersect %@", updateObjectUUIDs);
+    
+  if ([updateObjectUUIDs count] > 0)
+  {
+    NSLog(@"Reloading outline for %@", doc);
+    [outlineView reloadData];  
+  }
 }
 
 - (Document*)projectDocument
@@ -67,6 +70,34 @@
   [outlineView registerForDraggedTypes:
                         [NSArray arrayWithObject:@"org.etoile.outlineItem"]];
   [outlineView setDelegate: self];
+  
+  if ([doc documentName])
+  {
+    NSString *title;
+    if (isSharing)
+    {
+      title = [NSString stringWithFormat: @"Shared Document %@ From %@",
+        [doc documentName],
+        [[SharingController sharedSharingController] fullNameOfUserSharingDocument: doc]];
+    }
+    else
+    {
+      title = [doc documentName];
+    }
+    [[self window] setTitle: title]; 
+  }
+  
+  // Disable the share button if it is a shared document
+  if (isSharing)
+  {
+    for (NSToolbarItem *item in [[[self window] toolbar] items])
+    {
+      if ([[item itemIdentifier] isEqual: @"share"])
+      {
+        [item setEnabled: NO];
+      }
+    }
+  }
 }
 
 - (void)windowWillClose:(NSNotification *)notification
@@ -82,7 +113,6 @@ static int i = 0;
                                                   context: [[self rootObject] objectContext]];
   [item autorelease];
   [item setLabel: [NSString stringWithFormat: @"Item %d", i++]];
-  [item setDelegate: self];
   return item;
 }
 
@@ -112,7 +142,7 @@ static int i = 0;
 
   [self commitWithType: kCOTypeMinorEdit
       shortDescription: @"Add Item"
-       longDescription: [NSString stringWithFormat: @"Add item..."]];
+       longDescription: [NSString stringWithFormat: @"Add item %@", [item label]]];
 }
 
 - (IBAction) addChildItem: (id)sender;
@@ -126,7 +156,7 @@ static int i = 0;
 
   [self commitWithType: kCOTypeMinorEdit
       shortDescription: @"Add Child Item"
-       longDescription: [NSString stringWithFormat: @"Add child item to %@", [dest label]]];
+       longDescription: [NSString stringWithFormat: @"Add child item %@ to %@", [item label], [dest label]]];
 }
 
 - (IBAction) shiftLeft: (id)sender
@@ -143,13 +173,13 @@ static int i = 0;
     [parent removeItemAtIndex: indexOfItemInParent];
     [grandparent addItem: item atIndex: [[grandparent contents] indexOfObject: parent] + 1];
     [item release];
-    
-    [outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex:[outlineView rowForItem: item]]
-         byExtendingSelection: NO];
 
     [self commitWithType: kCOTypeMinorEdit
         shortDescription: @"Shift Left"
          longDescription: [NSString stringWithFormat: @"Shift left item %@", [item label]]];
+
+    [outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex:[outlineView rowForItem: item]]
+         byExtendingSelection: NO];
   }
 }
 - (IBAction) shiftRight: (id)sender
@@ -167,14 +197,15 @@ static int i = 0;
     [newParent addItem: item];
     [item release];
     
+    [self commitWithType: kCOTypeMinorEdit
+        shortDescription: @"Shift Right"
+         longDescription: [NSString stringWithFormat: @"Shift right item %@", [item label]]];
+
     [outlineView expandItem: newParent];
 
     [outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex:[outlineView rowForItem: item]]
              byExtendingSelection: NO];
-
-    [self commitWithType: kCOTypeMinorEdit
-        shortDescription: @"Shift Right"
-         longDescription: [NSString stringWithFormat: @"Shift right item %@", [item label]]];
+         
   }  
 }
 
@@ -311,6 +342,10 @@ static int i = 0;
     }
   }
 
+  [self commitWithType: kCOTypeMinorEdit
+      shortDescription: @"Drop Items"
+       longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
+
   [outlineView expandItem: newParent];
   
   for (OutlineItem *outlineItem in outlineItems)
@@ -318,10 +353,6 @@ static int i = 0;
     [newSelectedRows addIndex: [outlineView rowForItem: outlineItem]];
   }  
   [outlineView selectRowIndexes: newSelectedRows byExtendingSelection: NO];
-
-  [self commitWithType: kCOTypeMinorEdit
-      shortDescription: @"Drop Items"
-       longDescription: [NSString stringWithFormat: @"Drop items..."]];
 
   return YES;
 }
@@ -336,7 +367,7 @@ static int i = 0;
     [outlineView reloadItem: parent];
   }*/
   
-  
+  /*
   if (item == [self rootObject])
   {
     NSLog(@"root didchange");
@@ -346,7 +377,7 @@ static int i = 0;
   {
     NSLog(@"%@ didchange", [item label]);
     [outlineView reloadItem: item reloadChildren: YES];  
-  }
+  }*/
 }
 
 @end

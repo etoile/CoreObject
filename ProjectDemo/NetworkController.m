@@ -2,6 +2,14 @@
 #import "ChatWindowController.h"
 #include <sys/utsname.h>
 
+/**
+ * Delay incoming messages for 2.0 seconds to make it easier to see what the
+ * live collaboration code is doing
+ */
+#define MESSAGE_DELAY 0.0
+
+NSString *NetworkControllerDidReceiveMessageNotification = @"NetworkControllerDidReceiveMessageNotification";
+
 @implementation NetworkController
 
 static NSString *FakeEmail()
@@ -11,17 +19,24 @@ static NSString *FakeEmail()
   return [NSString stringWithFormat: @"%s@%s", getenv("USER"), n.nodename];
 }
 
+static NetworkController *sharedNetworkController = nil;
+
++ (NetworkController*)sharedNetworkController
+{
+  return sharedNetworkController;
+}
+
 - (id) init
 {
   self = [super init];
   
-  // FIXME: don't spam U of A network.
-/*
   connectedPeerInfo = [[NSMutableDictionary alloc] init];
   openChatWindowControllers = [[NSMutableArray alloc] init];
   myPeer = [[CONetworkPeer alloc] init];
   [myPeer setDelegate: self];
-  */
+  
+  assert(sharedNetworkController == nil);
+  sharedNetworkController = self;
   
   return self;
 }
@@ -34,6 +49,11 @@ static NSString *FakeEmail()
   [super dealloc];
 }
 
+- (NSString*) peerName
+{
+  return [myPeer peerName];
+}
+
 - (void)awakeFromNib
 {
   [networkTableView setDoubleAction: @selector(chat:)];
@@ -44,6 +64,16 @@ static NSString *FakeEmail()
 {
   return [[connectedPeerInfo allKeys] sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
 }
+
+- (NSString*)fullNameForPeerName: (NSString*)peerName
+{
+  return [[connectedPeerInfo objectForKey: peerName] objectForKey: @"fullname"];
+}
+- (NSString*)emailForPeerName: (NSString*)peerName
+{
+  return [[connectedPeerInfo objectForKey: peerName] objectForKey: @"email"];
+}
+
 
 /**
  * Convenince method to send a property list to another peer
@@ -89,6 +119,14 @@ static NSString *FakeEmail()
   return NO;
 }
 
+- (void)usersListDidChange
+{
+  [networkTableView reloadData];
+  // Hack to notify the sharing window of the update as well.
+  [sharingController usersListDidChange];
+}
+
+
 /* CONetworkPeerDelegate methods */
 
 - (void) networkPeer:(CONetworkPeer*)peer didReceiveConnectionFromPeerNamed: (NSString*)name
@@ -104,7 +142,7 @@ static NSString *FakeEmail()
 - (void) networkPeer:(CONetworkPeer*)peer didReceiveDisconnectionFromPeerNamed: (NSString*)name
 {
   [connectedPeerInfo removeObjectForKey: name];
-  [networkTableView reloadData];
+  [self usersListDidChange];
   NSLog(@"<disconnect> Peers: %@", connectedPeerInfo);
 }
 - (void) networkPeer:(CONetworkPeer*)peer didReceiveData: (NSData*)data fromPeerNamed: (NSString*)name
@@ -135,7 +173,7 @@ static NSString *FakeEmail()
         nil]
         forKey: name];
 
-    [networkTableView reloadData];
+    [self usersListDidChange];
     NSLog(@"<connect> Peers: %@", connectedPeerInfo);
   }
   else if ([type isEqualToString: @"chat"])
@@ -145,9 +183,19 @@ static NSString *FakeEmail()
   }
   else
   {
-    NSLog(@"Warning, unhandled message %@ from %@", plist, name);
+    [NSTimer scheduledTimerWithTimeInterval: MESSAGE_DELAY
+                                   target:self
+                                    selector:@selector(delayMessage:)
+                                     userInfo:plist 
+                                     repeats:NO];
   }
+}
 
+- (void)delayMessage:(NSTimer*)timer
+{
+  [[NSNotificationCenter defaultCenter] postNotificationName: NetworkControllerDidReceiveMessageNotification
+                                                      object: self
+                                                    userInfo: [timer userInfo]];
 }
 
 /* IB Actions */

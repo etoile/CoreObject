@@ -11,6 +11,7 @@
   BOOL isOpen;
   NSString *documentType;
   id rootObject;
+  NSString *documentName;
 }
 
 - (BOOL) isOpen;
@@ -19,5 +20,7 @@
 - (void) setDocumentType:(NSString*)t;
 - (id) rootObject;
 - (void) setRootObject:(id)r;
+- (NSString*)documentName;
+- (void)setDocumentName:(NSString *)n;
 
 @end

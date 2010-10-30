@@ -25,8 +25,8 @@
 {
   NSRange r1 = [self range];
   NSRange r2 = [other range];
-  return (r1.location >= r2.location && r1.location <= (r2.location + r2.length))
-    || (r2.location >= r1.location && r2.location <= (r1.location + r1.length));
+  return (r1.location >= r2.location && r1.location < (r2.location + r2.length) && r1.length > 0)
+    || (r2.location >= r1.location && r2.location < (r1.location + r1.length) && r2.length > 0);
 }
 
 @end
@@ -44,6 +44,17 @@
 - (NSArray *)operations
 {
   return ops;
+}
+
+- (NSString*)description
+{
+  NSMutableString *output = [NSMutableString stringWithFormat: @"<%@ %p: ", NSStringFromClass([self class]), self];
+  for (id op in [self operations])
+  {
+    [output appendFormat:@"\n\t%@,", op];
+  }
+  [output appendFormat:@"\n>"];  
+  return output;
 }
 
 /**

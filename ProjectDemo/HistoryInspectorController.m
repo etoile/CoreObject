@@ -37,6 +37,10 @@ static void collectNodes(COHistoryGraphNode *node, NSMutableArray *collection)
   COHistoryGraphNode *node = [context baseHistoryGraphNode];
   while ([node parents] != nil && [[node parents] count] > 0)
   {
+    if ([[node uuid] isEqual: [[[node parents] objectAtIndex: 0] uuid]])
+    {
+      assert(0); 
+    }
     node = [[node parents] objectAtIndex: 0];
   }
   

@@ -1,4 +1,4 @@
-#import <Foundation/NSData.h>
+#import <Cocoa/Cocoa.h>
 
 /**
  * These categories add a sha1Hash method to property lists.

@@ -2,12 +2,12 @@
 
 @implementation CheckpointAsSheetController
 
-- (NSString*) showSheetOnWindow: (NSWindow*)win
+- (NSString*) showSheet
 {
   didSave = NO;
   
   [NSApp beginSheet: sheet
-      modalForWindow: win
+      modalForWindow: nil
       modalDelegate: nil
       didEndSelector: NULL
       contextInfo: nil];

@@ -5,8 +5,6 @@
 
 @implementation OutlineItem
 
-@synthesize delegate; // notification hack - remove when we can use KVO
-
 + (void)initialize
 {
   if (self == [OutlineItem class])
@@ -69,8 +67,6 @@
   [self willChangeValueForProperty: @"label"];
   ASSIGN(label, l);
   [self didChangeValueForProperty: @"label"];
-  
-  [delegate outlineItemDidChange: self]; // notification hack - remove when we can use KVO
 }
 
 - (OutlineItem*)parent
@@ -83,8 +79,6 @@
   [self willChangeValueForProperty: @"parent"];
   parent = p;
   [self didChangeValueForProperty: @"parent"];
-
-  //[delegate outlineItemDidChange: self]; // notification hack - remove when we can use KVO
 }
 
 
@@ -112,21 +106,16 @@
   [contents insertObject: item atIndex: index];
   [self didChangeValueForProperty: @"contents"];
   [item setParent: self];
-  
-  [delegate outlineItemDidChange: self]; // notification hack - remove when we can use KVO
 }
 - (void) removeItemAtIndex: (NSUInteger)index
 {
   [self willChangeValueForProperty: @"contents"];
   [contents removeObjectAtIndex: index];
   [self didChangeValueForProperty: @"contents"];
-  
-  [delegate outlineItemDidChange: self]; // notification hack - remove when we can use KVO
 }
 
 - (void)didAwaken
 {
-  [delegate outlineItemDidChange: self]; // notification hack - remove when we can use KVO
 }
 
 @end

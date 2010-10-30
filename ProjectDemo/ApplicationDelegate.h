@@ -3,12 +3,14 @@
 #import "NetworkController.h"
 #import "HistoryInspectorController.h"
 #import "CheckpointAsSheetController.h"
+#import "SharingController.h"
 
 @interface ApplicationDelegate : NSObject
 {
   IBOutlet NSWindow *newDocumentTypeWindow;
   IBOutlet NSWindow *networkWindow;
-  IBOutlet NSWindow *sharingWindow;
+  
+  IBOutlet SharingController *sharingController;
   IBOutlet NetworkController *networkController;
   IBOutlet HistoryInspectorController *historyController;
   IBOutlet CheckpointAsSheetController *checkpointAsSheetController;
@@ -18,6 +20,8 @@
   
   NSMutableDictionary *controllerForDocumentUUID;
 }
+
+- (COEditingContext*)editingContext;
 
 - (IBAction) newTextDocument: (id)sender;
 - (IBAction) newOutline: (id)sender;
