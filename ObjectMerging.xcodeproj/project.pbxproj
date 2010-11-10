@@ -45,7 +45,7 @@
 		6686BDE812592C5D0065DE1A /* COObject+KVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDB912592C1B0065DE1A /* COObject+KVC.m */; };
 		6686BDE912592C5D0065DE1A /* COEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDBB12592C1B0065DE1A /* COEditingContext.m */; };
 		6686BDEA12592C5D0065DE1A /* COFetchRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDBD12592C1B0065DE1A /* COFetchRequest.m */; };
-		6686BDEB12592C5D0065DE1A /* COHistoryGraphNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDBF12592C1B0065DE1A /* COHistoryGraphNode.m */; };
+		6686BDEB12592C5D0065DE1A /* COHistoryNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDBF12592C1B0065DE1A /* COHistoryNode.m */; };
 		6686BDEC12592C5D0065DE1A /* COStoreCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDC112592C1B0065DE1A /* COStoreCoordinator.m */; };
 		6686BDED12592C5D0065DE1A /* COObjectGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDC312592C1B0065DE1A /* COObjectGraphDiff.m */; };
 		6686BDEF12592C810065DE1A /* NSData+compression.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDD812592C1B0065DE1A /* NSData+compression.h */; };
@@ -61,7 +61,7 @@
 		6686BDF912592C810065DE1A /* COObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDB712592C1B0065DE1A /* COObject.h */; };
 		6686BDFA12592C810065DE1A /* COEditingContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDBA12592C1B0065DE1A /* COEditingContext.h */; };
 		6686BDFB12592C810065DE1A /* COFetchRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDBC12592C1B0065DE1A /* COFetchRequest.h */; };
-		6686BDFC12592C810065DE1A /* COHistoryGraphNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDBE12592C1B0065DE1A /* COHistoryGraphNode.h */; };
+		6686BDFC12592C810065DE1A /* COHistoryNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDBE12592C1B0065DE1A /* COHistoryNode.h */; };
 		6686BDFD12592C810065DE1A /* COStoreCoordinator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDC012592C1B0065DE1A /* COStoreCoordinator.h */; };
 		6686BDFE12592C810065DE1A /* COObjectGraphDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDC212592C1B0065DE1A /* COObjectGraphDiff.h */; };
 		6686BDFF12592C8F0065DE1A /* ObjectMerging-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6686BDAD12592BDA0065DE1A /* ObjectMerging-Info.plist */; };
@@ -207,8 +207,8 @@
 		6686BDBB12592C1B0065DE1A /* COEditingContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = COEditingContext.m; sourceTree = "<group>"; };
 		6686BDBC12592C1B0065DE1A /* COFetchRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = COFetchRequest.h; sourceTree = "<group>"; };
 		6686BDBD12592C1B0065DE1A /* COFetchRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = COFetchRequest.m; sourceTree = "<group>"; };
-		6686BDBE12592C1B0065DE1A /* COHistoryGraphNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = COHistoryGraphNode.h; sourceTree = "<group>"; };
-		6686BDBF12592C1B0065DE1A /* COHistoryGraphNode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = COHistoryGraphNode.m; sourceTree = "<group>"; };
+		6686BDBE12592C1B0065DE1A /* COHistoryNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = COHistoryNode.h; sourceTree = "<group>"; };
+		6686BDBF12592C1B0065DE1A /* COHistoryNode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = COHistoryNode.m; sourceTree = "<group>"; };
 		6686BDC012592C1B0065DE1A /* COStoreCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = COStoreCoordinator.h; sourceTree = "<group>"; };
 		6686BDC112592C1B0065DE1A /* COStoreCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = COStoreCoordinator.m; sourceTree = "<group>"; };
 		6686BDC212592C1B0065DE1A /* COObjectGraphDiff.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = COObjectGraphDiff.h; sourceTree = "<group>"; };
@@ -473,8 +473,8 @@
 				6686BDBB12592C1B0065DE1A /* COEditingContext.m */,
 				6686BDBC12592C1B0065DE1A /* COFetchRequest.h */,
 				6686BDBD12592C1B0065DE1A /* COFetchRequest.m */,
-				6686BDBE12592C1B0065DE1A /* COHistoryGraphNode.h */,
-				6686BDBF12592C1B0065DE1A /* COHistoryGraphNode.m */,
+				6686BDBE12592C1B0065DE1A /* COHistoryNode.h */,
+				6686BDBF12592C1B0065DE1A /* COHistoryNode.m */,
 				6686BDC012592C1B0065DE1A /* COStoreCoordinator.h */,
 				6686BDC112592C1B0065DE1A /* COStoreCoordinator.m */,
 				6686BDC212592C1B0065DE1A /* COObjectGraphDiff.h */,
@@ -650,7 +650,7 @@
 				6686BDF912592C810065DE1A /* COObject.h in Headers */,
 				6686BDFA12592C810065DE1A /* COEditingContext.h in Headers */,
 				6686BDFB12592C810065DE1A /* COFetchRequest.h in Headers */,
-				6686BDFC12592C810065DE1A /* COHistoryGraphNode.h in Headers */,
+				6686BDFC12592C810065DE1A /* COHistoryNode.h in Headers */,
 				6686BDFD12592C810065DE1A /* COStoreCoordinator.h in Headers */,
 				6686BDFE12592C810065DE1A /* COObjectGraphDiff.h in Headers */,
 			);
@@ -858,7 +858,7 @@
 				6686BDE812592C5D0065DE1A /* COObject+KVC.m in Sources */,
 				6686BDE912592C5D0065DE1A /* COEditingContext.m in Sources */,
 				6686BDEA12592C5D0065DE1A /* COFetchRequest.m in Sources */,
-				6686BDEB12592C5D0065DE1A /* COHistoryGraphNode.m in Sources */,
+				6686BDEB12592C5D0065DE1A /* COHistoryNode.m in Sources */,
 				6686BDEC12592C5D0065DE1A /* COStoreCoordinator.m in Sources */,
 				6686BDED12592C5D0065DE1A /* COObjectGraphDiff.m in Sources */,
 			);

@@ -1,4 +1,4 @@
-#import "COHistoryGraphNode.h"
+#import "COHistoryNode.h"
 
 const NSString *kCOAuthorHistoryGraphNodeProperty = @"COAuthorHistoryGraphNodeProperty";
 const NSString *kCODateHistoryGraphNodeProperty = @"CODateHistoryGraphNodeProperty";
@@ -12,7 +12,7 @@ const NSString *kCOTypeMerge = @"COTypeMerge";
 const NSString *kCOTypeCreateBranch = @"COTypeCreateBranch";
 const NSString *kCOTypeHidden = @"COTypeHidden";
 
-@implementation COHistoryGraphNode
+@implementation COHistoryNode
 
 - (NSString*) description
 {
@@ -43,7 +43,7 @@ const NSString *kCOTypeHidden = @"COTypeHidden";
 
 - (BOOL) isEqual:(id)object
 {
-	if ([object isKindOfClass: [COHistoryGraphNode class]])
+	if ([object isKindOfClass: [COHistoryNode class]])
 	{
 		return [[self uuid] isEqual: [object uuid]];
 	}
@@ -64,7 +64,7 @@ const NSString *kCOTypeHidden = @"COTypeHidden";
 	NSMutableArray *result = [NSMutableArray arrayWithCapacity: [_parentNodeUUIDs count]];
 	for (ETUUID *uuid in _parentNodeUUIDs)
 	{
-		COHistoryGraphNode *node = [_store historyGraphNodeForUUID: uuid];
+		COHistoryNode *node = [_store historyGraphNodeForUUID: uuid];
 		if (node)
 		{
 			[result addObject: node];
@@ -73,7 +73,7 @@ const NSString *kCOTypeHidden = @"COTypeHidden";
 	return result;
 }
 
-- (COHistoryGraphNode *)parent
+- (COHistoryNode *)parent
 {
 	NSArray *parents = [self _parents];
 	if ([parents count] > 0)
@@ -104,7 +104,7 @@ const NSString *kCOTypeHidden = @"COTypeHidden";
 	NSMutableArray *result = [NSMutableArray arrayWithCapacity: [_childNodeUUIDs count]];
 	for (ETUUID *uuid in _childNodeUUIDs)
 	{
-		COHistoryGraphNode *node = [_store historyGraphNodeForUUID: uuid];
+		COHistoryNode *node = [_store historyGraphNodeForUUID: uuid];
 		if (node)
 		{
 			[result addObject: node];
@@ -174,7 +174,7 @@ static NSArray *ArrayWithDatasForHexStrings(NSArray *arr)
 	return result;
 }
 
-@implementation COHistoryGraphNode (Private)
+@implementation COHistoryNode (Private)
 
 - (id)       initWithUUID: (ETUUID*)uuid
          storeCoordinator: (COStoreCoordinator*)store
@@ -196,7 +196,7 @@ uuidToObjectVersionMaping: (NSDictionary*)mapping
 	_uuidToObjectVersionMaping = [[NSDictionary alloc] initWithDictionary: mapping];
 	
 	// FIXME: remove (cycle check)
-	for (COHistoryGraphNode *n = [self parent]; n != nil; n = [n parent])
+	for (COHistoryNode *n = [self parent]; n != nil; n = [n parent])
 	{
 		assert(![[n uuid] isEqual: [self uuid]]);
 	}

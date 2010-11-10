@@ -42,9 +42,9 @@
 	
 	COEditingContext *ctx = [[NSApp delegate] editingContext];
 	COStoreCoordinator *coordinator = [[[NSApp delegate] editingContext] storeCoordinator];
-	COHistoryGraphNode *currentHead = [[[NSApp delegate] editingContext] baseHistoryGraphNode];
+	COHistoryNode *currentHead = [[[NSApp delegate] editingContext] baseHistoryGraphNode];
 	
-	COHistoryGraphNode *newNode = [coordinator commitObjectDatas: [msg objectForKey: @"startingHistoryGraphNodeData"]
+	COHistoryNode *newNode = [coordinator commitObjectDatas: [msg objectForKey: @"startingHistoryGraphNodeData"]
 													   afterNode: currentHead
 													withMetadata: nil
 											 withHistoryNodeUUID: shadowHistoryGraphNodeUUID];
@@ -147,9 +147,9 @@
 	}
 	
 	COStoreCoordinator *coordinator = [[[NSApp delegate] editingContext] storeCoordinator];
-	COHistoryGraphNode *currentHead = [[[NSApp delegate] editingContext] baseHistoryGraphNode];
+	COHistoryNode *currentHead = [[[NSApp delegate] editingContext] baseHistoryGraphNode];
 	
-	COHistoryGraphNode *shadowNode = [coordinator historyGraphNodeForUUID: shadowHistoryGraphNodeUUID];
+	COHistoryNode *shadowNode = [coordinator historyGraphNodeForUUID: shadowHistoryGraphNodeUUID];
 	
 	if ([shadowNode isEqual: currentHead])
 	{
@@ -159,7 +159,7 @@
 	
 	// Verify that we can reach the shadow node by searching backwards from the base history graph node
 	BOOL found = NO;
-	for (COHistoryGraphNode *ptr = currentHead; ptr != nil; ptr = [ptr parent])
+	for (COHistoryNode *ptr = currentHead; ptr != nil; ptr = [ptr parent])
 	{
 		if ([ptr isEqual: shadowNode])
 		{
@@ -174,7 +174,7 @@
 	
 	// Collect UUIDS of all objects changed AFTER the shadow node and before or on the baseHistoryGraphNode
 	NSMutableSet *objectsToShare = [NSMutableSet set];
-	for (COHistoryGraphNode *ptr = currentHead; ![ptr isEqual: shadowNode]; ptr = [ptr parent])
+	for (COHistoryNode *ptr = currentHead; ![ptr isEqual: shadowNode]; ptr = [ptr parent])
 	{
 		[objectsToShare unionSet: [NSSet setWithArray: [[ptr uuidToObjectVersionMaping] allKeys]]];
 	}

@@ -1,9 +1,9 @@
 #import <EtoileFoundation/EtoileFoundation.h>
-#import "COHistoryGraphNode.h"
+#import "COHistoryNode.h"
 #import "COObjectGraphDiff.h"
 #import "COStore.h"
 
-@class COHistoryGraphNode;
+@class COHistoryNode;
 @class COObjectGraphDiff;
 @class COEditingContext;
 
@@ -28,7 +28,7 @@ extern const NSString *COStoreDidCommitNotification;
  * most recently changed head history node (from mercurial terminology)
  * FIXME: is this guaranteed to be non-nil? 
  */
-- (COHistoryGraphNode *)tip;
+- (COHistoryNode *)tip;
 
 //- (NSArray*)rootHistoryGraphNodes;
 
@@ -36,25 +36,25 @@ extern const NSString *COStoreDidCommitNotification;
  * Creates a new history graph node afer the given node which is a branch.
  * Returns the new node.
  */
-- (COHistoryGraphNode *) createBranchOfNode: (COHistoryGraphNode*)node;
+- (COHistoryNode *) createBranchOfNode: (COHistoryNode*)node;
 /**
  * Creates a new history graph node merging two existing nodes.
  * Returns the new node.
  */
-- (COHistoryGraphNode *) createMergeOfNode: (COHistoryGraphNode*)node1 andNode: (COHistoryGraphNode*)node2;
+- (COHistoryNode *) createMergeOfNode: (COHistoryNode*)node1 andNode: (COHistoryNode*)node2;
 /**
  * Commits the changes in the given object context as a new history graph node
  * Returns the new node
  */
-- (COHistoryGraphNode *) commitChangesInObjectContext: (COEditingContext *)ctx
-                                            afterNode: (COHistoryGraphNode*)node
+- (COHistoryNode *) commitChangesInObjectContext: (COEditingContext *)ctx
+                                            afterNode: (COHistoryNode*)node
                                          withMetadata: (NSDictionary*)metadata;
 /**
  * Commits some changed objects as a new history graph 
  * Returns the new node
  */
-- (COHistoryGraphNode *) commitChangesInObjects: (NSArray *)objects
-                                      afterNode: (COHistoryGraphNode*)node
+- (COHistoryNode *) commitChangesInObjects: (NSArray *)objects
+                                      afterNode: (COHistoryNode*)node
                                    withMetadata: (NSDictionary*)metadata;
 @end
 
@@ -75,13 +75,13 @@ extern const NSString *COStoreDidCommitNotification;
  * Note: not cached
  * Note: caller's responsibility to modify output to have actualy COObject references
  */
-- (NSDictionary*) dataForObjectWithUUID: (ETUUID*)uuid atHistoryGraphNode: (COHistoryGraphNode *)node;
+- (NSDictionary*) dataForObjectWithUUID: (ETUUID*)uuid atHistoryGraphNode: (COHistoryNode *)node;
 
-- (COHistoryGraphNode *) historyGraphNodeForUUID: (ETUUID*)uuid;
-- (void) commitHistoryGraphNode: (COHistoryGraphNode *)node;
+- (COHistoryNode *) historyGraphNodeForUUID: (ETUUID*)uuid;
+- (void) commitHistoryGraphNode: (COHistoryNode *)node;
 
-- (COHistoryGraphNode *) commitObjectDatas: (NSArray *)datas
-                                 afterNode: (COHistoryGraphNode*)node
+- (COHistoryNode *) commitObjectDatas: (NSArray *)datas
+                                 afterNode: (COHistoryNode*)node
                               withMetadata: (NSDictionary*)metadata
                        withHistoryNodeUUID: (ETUUID*)uuid;
 

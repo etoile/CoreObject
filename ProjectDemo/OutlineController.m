@@ -35,7 +35,7 @@
 
 - (void)didCommit: (NSNotification*)notif
 {
-	COHistoryGraphNode *node = [notif userInfo];
+	COHistoryNode *node = [notif userInfo];
 	NSMutableSet *updateObjectUUIDs = [NSMutableSet setWithArray: [[node uuidToObjectVersionMaping] allKeys]];
 	NSArray *allObjectsUUIDsInDocument = 
     [[[[doc allStronglyContainedObjects] mappedCollection] uuid]

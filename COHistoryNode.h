@@ -32,7 +32,7 @@ extern const NSString *kCOTypeHidden;
  * edit. (In a text editor, I expect the COHistoryGraphNodes would have
  * the same granularity as undo manager actions; i.e. one sentence of typing?)
  */
-@interface COHistoryGraphNode : NSObject
+@interface COHistoryNode : NSObject
 {
 @private
 	ETUUID *_uuid;
@@ -45,7 +45,7 @@ extern const NSString *kCOTypeHidden;
 
 - (COStoreCoordinator *) storeCoordinator;
 
-- (COHistoryGraphNode *)parent;
+- (COHistoryNode *)parent;
 
 - (NSArray *)mergedBranches;
 
@@ -72,7 +72,7 @@ extern const NSString *kCOTypeHidden;
 
 @end
 
-@interface COHistoryGraphNode (Private)
+@interface COHistoryNode (Private)
 
 - (id)       initWithUUID: (ETUUID*)uuid
          storeCoordinator: (COStoreCoordinator*)store

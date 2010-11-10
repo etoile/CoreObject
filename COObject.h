@@ -1,6 +1,6 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COEditingContext.h"
-#import "COHistoryGraphNode.h"
+#import "COHistoryNode.h"
 
 @class COEditingContext;
 
@@ -125,7 +125,7 @@
 /**
  * Rolls back this object to the state it was in at the given revision, discarding all current changes
  */
-- (void) rollbackToRevision: (COHistoryGraphNode *)ver;
+- (void) rollbackToRevision: (COHistoryNode *)ver;
 
 /**
  * Replaces the reciever with the result of doing a three-way merge with it an otherObj,
@@ -140,7 +140,7 @@
 - (void) threeWayMergeWithObject: (COObject*)otherObj base: (COObject *)baseObj;
 - (void) twoWayMergeWithObject: (COObject *)otherObj;
 
-- (void) selectiveUndoChangesMadeInRevision: (COHistoryGraphNode *)ver;
+- (void) selectiveUndoChangesMadeInRevision: (COHistoryNode *)ver;
 
 @end
 

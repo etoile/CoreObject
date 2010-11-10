@@ -1,10 +1,10 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COStore.h"
 #import "COStoreCoordinator.h"
-#import "COHistoryGraphNode.h"
+#import "COHistoryNode.h"
 
 @class COObject;
-@class COHistoryGraphNode;
+@class COHistoryNode;
 @class COObjectGraphDiff;
 @class COFetchRequest;
 @class COStoreCoordinator;
@@ -19,7 +19,7 @@ extern const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification
  */
 @interface COEditingContext : NSObject
 {
-	COHistoryGraphNode *_baseHistoryGraphNode; // history graph node this context was initialized with (based on)
+	COHistoryNode *_baseHistoryGraphNode; // history graph node this context was initialized with (based on)
 	NSMutableSet *_changedObjectUUIDs;  // UUIDS of objects in this context which have uncommitted changes
 	COStoreCoordinator *_storeCoordinator;
 	NSMutableDictionary *_instantiatedObjects; // UUID -> COObject mapping
@@ -31,7 +31,7 @@ extern const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification
  * Creates a new object context representing the object graph state
  * at the requested history node.
  */
-- (id) initWithHistoryGraphNode: (COHistoryGraphNode*)node;
+- (id) initWithHistoryGraphNode: (COHistoryNode*)node;
 
 /**
  * Creates a new empty object context. The first commit will create a root
@@ -54,7 +54,7 @@ extern const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification
 /**
  * Returns the history graph node this context was created with
  */
-- (COHistoryGraphNode *) baseHistoryGraphNode;
+- (COHistoryNode *) baseHistoryGraphNode;
 
 /**
  * @return whether or not this context has any uncomitted changes
@@ -78,7 +78,7 @@ extern const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification
 
 @interface COEditingContext (Private)
 
-- (void) loadObject: (COObject*)obj withDataAtHistoryGraphNode: (COHistoryGraphNode*)node;
+- (void) loadObject: (COObject*)obj withDataAtHistoryGraphNode: (COHistoryNode*)node;
 - (void) loadObjectWithDataAtBaseHistoryGraphNode: (COObject*)obj;
 
 - (void) markObjectUUIDChanged: (ETUUID*)uuid;
@@ -102,17 +102,17 @@ extern const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification
 /**
  * Rolls back this object context to the state it was in at the given revision, discarding all current changes
  */
-- (void) rollbackToRevision: (COHistoryGraphNode *)ver;
+- (void) rollbackToRevision: (COHistoryNode *)ver;
 
-- (void)selectiveUndoChangesMadeInRevision: (COHistoryGraphNode *)ver;
+- (void)selectiveUndoChangesMadeInRevision: (COHistoryNode *)ver;
 
 
 - (void) revertObjects: (NSArray*)objects;
 - (void) commitObjects: (NSArray*)objects;
-- (void) rollbackObjects: (NSArray*)objects toRevision: (COHistoryGraphNode *)ver;
+- (void) rollbackObjects: (NSArray*)objects toRevision: (COHistoryNode *)ver;
 - (void) threeWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects bases: (NSArray*)bases;
 - (void) twoWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects;
-- (void) selectiveUndoChangesInObjects: (NSArray*)objects madeInRevision: (COHistoryGraphNode *)ver;
+- (void) selectiveUndoChangesInObjects: (NSArray*)objects madeInRevision: (COHistoryNode *)ver;
 
 @end
 

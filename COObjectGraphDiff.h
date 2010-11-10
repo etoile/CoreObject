@@ -1,6 +1,6 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
-#import "COHistoryGraphNode.h"
+#import "COHistoryNode.h"
 #import "COArrayDiff.h"
 #import "COSetDiff.h"
 
@@ -27,7 +27,7 @@
 @interface COObjectGraphDiff (Factory)
 
 + (COObjectGraphDiff *)diffObjectContext: (COEditingContext*)base with: (COEditingContext*)modified;
-+ (COObjectGraphDiff *)diffHistoryNode: (COHistoryGraphNode*)n1 withHistoryNode: (COHistoryGraphNode*)n2;
++ (COObjectGraphDiff *)diffHistoryNode: (COHistoryNode*)n1 withHistoryNode: (COHistoryNode*)n2;
 + (COObjectGraphDiff *)diffObject: (COObject *)base with: (COObject *)other;
 
 @end

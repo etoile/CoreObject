@@ -1,6 +1,6 @@
 #import "SharingServerPeer.h"
 #import "COStoreCoordinator.h"
-#import "COHistoryGraphNode.h"
+#import "COHistoryNode.h"
 #import "NetworkController.h"
 
 @implementation SharingServerPeer
@@ -15,7 +15,7 @@
 	/* See -[SharingClient initWithInvitationMessage:] */
 	
 	// FIXME: ugly access
-	COHistoryGraphNode *shadow = [[[[owner document] objectContext] storeCoordinator] tip];
+	COHistoryNode *shadow = [[[[owner document] objectContext] storeCoordinator] tip];
 	
 	ASSIGN(shadowHistoryGraphNodeUUID, [shadow uuid]);
 	assert(shadowHistoryGraphNodeUUID != nil);
@@ -103,11 +103,11 @@
 	ETUUID *newShadowUUID = [ETUUID UUIDWithString: [msg objectForKey: @"newShadowHistoryGraphNodeUUID"]];
 	
 	COStoreCoordinator *coordinator = [[[NSApp delegate] editingContext] storeCoordinator];
-	COHistoryGraphNode *currentHead = [[[NSApp delegate] editingContext] baseHistoryGraphNode];
+	COHistoryNode *currentHead = [[[NSApp delegate] editingContext] baseHistoryGraphNode];
 	
-	COHistoryGraphNode *oldShadowNode = [coordinator historyGraphNodeForUUID: shadowHistoryGraphNodeUUID];
+	COHistoryNode *oldShadowNode = [coordinator historyGraphNodeForUUID: shadowHistoryGraphNodeUUID];
 	
-	COHistoryGraphNode *tempNodeToMerge = [coordinator commitObjectDatas: [msg objectForKey: @"datas"]
+	COHistoryNode *tempNodeToMerge = [coordinator commitObjectDatas: [msg objectForKey: @"datas"]
 															   afterNode: oldShadowNode
 															withMetadata: nil
 													 withHistoryNodeUUID: newShadowUUID];

@@ -60,7 +60,7 @@
 	[self release];
 	
 	COStoreCoordinator *sc = [ctx storeCoordinator];
-	COHistoryGraphNode *node = [ctx baseHistoryGraphNode];
+	COHistoryNode *node = [ctx baseHistoryGraphNode];
 	NSDictionary *data = [sc dataForObjectWithUUID: uuid
 								atHistoryGraphNode: node];
 	if (data == nil)
@@ -508,7 +508,7 @@ static void GatherAllStronglyContainedObjects(id object, NSMutableArray *dest)
 /**
  * Rolls back this object to the state it was in at the given revision, discarding all current changes
  */
-- (void) rollbackToRevision: (COHistoryGraphNode *)ver
+- (void) rollbackToRevision: (COHistoryNode *)ver
 {
 	[_ctx loadObject: self withDataAtHistoryGraphNode: ver];
 	[_ctx markObjectUUIDChanged: _uuid];
@@ -542,7 +542,7 @@ static void GatherAllStronglyContainedObjects(id object, NSMutableArray *dest)
 								 withObjects: [NSArray arrayWithObject: otherObj]];
 }
 
-- (void) selectiveUndoChangesMadeInRevision: (COHistoryGraphNode *)ver
+- (void) selectiveUndoChangesMadeInRevision: (COHistoryNode *)ver
 {
 	[[self objectContext] selectiveUndoChangesInObjects: [NSArray arrayWithObject: self]
 										 madeInRevision: ver];

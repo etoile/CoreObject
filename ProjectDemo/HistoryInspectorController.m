@@ -1,6 +1,6 @@
 #import "HistoryInspectorController.h"
 #import "COEditingContext.h"
-#import "COHistoryGraphNode.h"
+#import "COHistoryNode.h"
 
 @implementation HistoryInspectorController
 
@@ -23,10 +23,10 @@
 	context = ctx;
 }
 
-static void collectNodes(COHistoryGraphNode *node, NSMutableArray *collection)
+static void collectNodes(COHistoryNode *node, NSMutableArray *collection)
 {
 	[collection addObject: node];
-	for (COHistoryGraphNode *children in [node branches])
+	for (COHistoryNode *children in [node branches])
 	{
 		collectNodes(children, collection);
 	}
@@ -34,7 +34,7 @@ static void collectNodes(COHistoryGraphNode *node, NSMutableArray *collection)
 
 - (NSArray*)allHistoryGraphNodes
 {
-	COHistoryGraphNode *node = [context baseHistoryGraphNode];
+	COHistoryNode *node = [context baseHistoryGraphNode];
 	while ([node parent] != nil)
 	{
 		if ([node isEqual: [node parent]])
@@ -68,7 +68,7 @@ static void collectNodes(COHistoryGraphNode *node, NSMutableArray *collection)
 
 /* helper methods */
 
-- (COHistoryGraphNode*)selectedRowHistoryNode
+- (COHistoryNode*)selectedRowHistoryNode
 {
 	return [[self allHistoryGraphNodes] objectAtIndex: [historyInspectorTable selectedRow]];
 }
@@ -82,7 +82,7 @@ static void collectNodes(COHistoryGraphNode *node, NSMutableArray *collection)
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
-	COHistoryGraphNode *node = [[self allHistoryGraphNodes] objectAtIndex: rowIndex];
+	COHistoryNode *node = [[self allHistoryGraphNodes] objectAtIndex: rowIndex];
 	
 	if ([[aTableColumn identifier] isEqualToString: @"date"])
 	{
@@ -109,7 +109,7 @@ static void collectNodes(COHistoryGraphNode *node, NSMutableArray *collection)
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notif
 {
-	COHistoryGraphNode *node = [self selectedRowHistoryNode];
+	COHistoryNode *node = [self selectedRowHistoryNode];
 	[textDisplay setString: [node detailedDescription]];
 }
 
@@ -117,7 +117,7 @@ static void collectNodes(COHistoryGraphNode *node, NSMutableArray *collection)
 
 - (IBAction)revertTo: (id)sender
 {
-	COHistoryGraphNode *selected = [self selectedRowHistoryNode];
+	COHistoryNode *selected = [self selectedRowHistoryNode];
 	NSLog(@"Reverting to %@", selected);
 	[context rollbackToRevision: selected];
 	
@@ -127,7 +127,7 @@ static void collectNodes(COHistoryGraphNode *node, NSMutableArray *collection)
 }
 - (IBAction)selectiveUndo: (id)sender
 {
-	COHistoryGraphNode *selected = [self selectedRowHistoryNode];
+	COHistoryNode *selected = [self selectedRowHistoryNode];
 	NSLog(@"Undoing %@", selected);
 	[context selectiveUndoChangesMadeInRevision: selected];
 	

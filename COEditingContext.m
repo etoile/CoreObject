@@ -26,7 +26,7 @@ const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"CO
 	return self;
 }
 
-- (id) initWithHistoryGraphNode: (COHistoryGraphNode*)node
+- (id) initWithHistoryGraphNode: (COHistoryNode*)node
 {
 	self = [self initWithStoreCoordinator: [node storeCoordinator]];
 	ASSIGN(_baseHistoryGraphNode, node);
@@ -49,7 +49,7 @@ const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"CO
 
 - (void) commitWithMetadata: (NSDictionary*)metadata
 {
-	COHistoryGraphNode *newNode = [[self storeCoordinator]
+	COHistoryNode *newNode = [[self storeCoordinator]
 								   commitChangesInObjectContext: self
 								   afterNode: [self baseHistoryGraphNode]
 								   withMetadata: metadata];
@@ -85,7 +85,7 @@ const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"CO
 	return _storeCoordinator;
 }
 
-- (COHistoryGraphNode *) baseHistoryGraphNode
+- (COHistoryNode *) baseHistoryGraphNode
 {
 	return _baseHistoryGraphNode;
 }
@@ -94,7 +94,7 @@ const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"CO
  * Sets the base history graph node, clears any uncommitted changes,
  * and reloads all instantiated objects.
  */
-- (void) setBaseHistoryGraphNode: (COHistoryGraphNode*)node
+- (void) setBaseHistoryGraphNode: (COHistoryNode*)node
 {
 	ASSIGN(_baseHistoryGraphNode, node);
 	
@@ -114,7 +114,7 @@ const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"CO
 /**
  * Sets the base history graph node.
  */
-- (void) setBaseHistoryGraphNodeUnsafe: (COHistoryGraphNode*)node
+- (void) setBaseHistoryGraphNodeUnsafe: (COHistoryNode*)node
 {
 	ASSIGN(_baseHistoryGraphNode, node); 
 }
@@ -161,7 +161,7 @@ const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"CO
 
 @implementation COEditingContext (Private)
 
-- (void) loadObject: (COObject*)obj withDataAtHistoryGraphNode: (COHistoryGraphNode*)node
+- (void) loadObject: (COObject*)obj withDataAtHistoryGraphNode: (COHistoryNode*)node
 {
 	[obj unfaultWithData: [_storeCoordinator dataForObjectWithUUID: [obj uuid]
 												atHistoryGraphNode: node]];
@@ -205,7 +205,7 @@ const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"CO
 	[self revertObjects: [self changedObjects]];
 }
 
-- (void) rollbackToRevision: (COHistoryGraphNode *)node
+- (void) rollbackToRevision: (COHistoryNode *)node
 {
 	// FIXME: this is broken, it only reverts loaded objects
 	
@@ -220,11 +220,11 @@ const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"CO
 	[_changedObjectUUIDs addObjectsFromArray: [_instantiatedObjects allKeys]];
 }
 
-- (void)selectiveUndoChangesMadeInRevision: (COHistoryGraphNode *)ver
+- (void)selectiveUndoChangesMadeInRevision: (COHistoryNode *)ver
 {
 	NSLog(@"-[COEditingContext selectiveUndoChangesMadeInRevision: %@]", ver);
 	
-	COHistoryGraphNode *priorToVer = [ver parent];
+	COHistoryNode *priorToVer = [ver parent];
 	if (priorToVer == nil)
 	{
 		NSLog(@"Can't undo first change");
@@ -243,7 +243,7 @@ const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"CO
 	NSLog(@"!!!!merged %@", merged);
 	
 	
-	COHistoryGraphNode *oldBaseNode = [self baseHistoryGraphNode];
+	COHistoryNode *oldBaseNode = [self baseHistoryGraphNode];
 	// The 'merged' diff we are going to apply is relative to 'ver', so we temporairly change
 	[self setBaseHistoryGraphNode: ver];
 	
@@ -271,11 +271,11 @@ const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"CO
 - (void) commitObjects: (NSArray*)objects
 {
 	// FIXME: commit owned children of objects
-	COHistoryGraphNode *newNode = [[self storeCoordinator] commitChangesInObjects: objects
+	COHistoryNode *newNode = [[self storeCoordinator] commitChangesInObjects: objects
 																		afterNode: [self baseHistoryGraphNode]];
 	[self setBaseHistoryGraphNode: newNode];
 }
-- (void) rollbackObjects: (NSArray*)objects toRevision: (COHistoryGraphNode *)ver
+- (void) rollbackObjects: (NSArray*)objects toRevision: (COHistoryNode *)ver
 {
 }
 - (void) threeWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects bases: (NSArray*)bases
@@ -284,7 +284,7 @@ const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"CO
 - (void) twoWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects
 {
 }
-- (void) selectiveUndoChangesInObjects: (NSArray*)objects madeInRevision: (COHistoryGraphNode *)ver
+- (void) selectiveUndoChangesInObjects: (NSArray*)objects madeInRevision: (COHistoryNode *)ver
 {
 }
 

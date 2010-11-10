@@ -370,7 +370,7 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 	return result;
 }
 
-+ (COObjectGraphDiff *)diffHistoryNode: (COHistoryGraphNode*)n1 withHistoryNode: (COHistoryGraphNode*)n2
++ (COObjectGraphDiff *)diffHistoryNode: (COHistoryNode*)n1 withHistoryNode: (COHistoryNode*)n2
 {
 	if ([n1 isEqual: n2])
 	{
@@ -380,7 +380,7 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 	// FIXME: relax this constraint
 	// either n1 must be a parent of n2, or vice-versa
 	BOOL n2IsParent = NO;
-	COHistoryGraphNode *p=n1;
+	COHistoryNode *p=n1;
 	while ([p parent] != nil)
 	{    
 		p = [p parent];

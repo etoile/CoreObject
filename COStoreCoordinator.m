@@ -27,10 +27,10 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
 	return nil;
 }
 
-- (COHistoryGraphNode *)tip
+- (COHistoryNode *)tip
 {
 	NSString *uuidString = [COSerializer unserializeData: [_store dataForKey: @"tip"]];
-	COHistoryGraphNode *node = nil;
+	COHistoryNode *node = nil;
 	if (uuidString != nil)
 	{
 		node = [self historyGraphNodeForUUID: [ETUUID UUIDWithString: uuidString]];
@@ -38,9 +38,9 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
 	return node;
 }
 
-- (COHistoryGraphNode *) createBranchOfNode: (COHistoryGraphNode*)node
+- (COHistoryNode *) createBranchOfNode: (COHistoryNode*)node
 {
-	COHistoryGraphNode *newNode = [[[COHistoryGraphNode alloc] initWithUUID: [ETUUID UUID]
+	COHistoryNode *newNode = [[[COHistoryNode alloc] initWithUUID: [ETUUID UUID]
 														   storeCoordinator: self
 																 properties: nil
 															parentNodeUUIDs: [NSArray arrayWithObject:node]
@@ -53,21 +53,21 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
 	[self commitHistoryGraphNode: newNode];
 	return newNode;
 }
-- (COHistoryGraphNode *) createMergeOfNode: (COHistoryGraphNode*)node1 andNode: (COHistoryGraphNode*)node2
+- (COHistoryNode *) createMergeOfNode: (COHistoryNode*)node1 andNode: (COHistoryNode*)node2
 {
-	COHistoryGraphNode *newNode = nil;
+	COHistoryNode *newNode = nil;
 	
 	return newNode;
 }
-- (COHistoryGraphNode *) commitChangesInObjectContext: (COEditingContext *)ctx 
-                                            afterNode: (COHistoryGraphNode*)node
+- (COHistoryNode *) commitChangesInObjectContext: (COEditingContext *)ctx 
+                                            afterNode: (COHistoryNode*)node
                                          withMetadata: (NSDictionary*)metadata
 {
 	return [self commitChangesInObjects: [ctx changedObjects] afterNode: node withMetadata: metadata];
 }
 
-- (COHistoryGraphNode *) commitObjectDatas: (NSArray *)datas
-								 afterNode: (COHistoryGraphNode*)node
+- (COHistoryNode *) commitObjectDatas: (NSArray *)datas
+								 afterNode: (COHistoryNode*)node
 							  withMetadata: (NSDictionary*)metadata
 					   withHistoryNodeUUID: (ETUUID*)uuid
 {
@@ -86,7 +86,7 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
 	NSDictionary *meta = [NSMutableDictionary dictionaryWithDictionary: metadata];
 	[meta setObject: [NSDate date] forKey: kCODateHistoryGraphNodeProperty];
 	
-	COHistoryGraphNode *newNode = [[[COHistoryGraphNode alloc] initWithUUID: uuid
+	COHistoryNode *newNode = [[[COHistoryNode alloc] initWithUUID: uuid
 														   storeCoordinator: self
 																 properties: meta
 															parentNodeUUIDs: node ? A([node uuid]) : nil
@@ -116,8 +116,8 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
 	return newNode;
 }
 
-- (COHistoryGraphNode *) commitChangesInObjects: (NSArray *)objects 
-                                      afterNode: (COHistoryGraphNode*)node
+- (COHistoryNode *) commitChangesInObjects: (NSArray *)objects 
+                                      afterNode: (COHistoryNode*)node
 								   withMetadata: (NSDictionary*)metadata
 {
 	return [self commitObjectDatas: [[objects mappedCollection] propertyList]
@@ -130,7 +130,7 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
 
 @implementation COStoreCoordinator (Private)
 
-- (NSDictionary*) dataForObjectWithUUID: (ETUUID*)uuid atHistoryGraphNode: (COHistoryGraphNode *)node
+- (NSDictionary*) dataForObjectWithUUID: (ETUUID*)uuid atHistoryGraphNode: (COHistoryNode *)node
 {
 	// Find the node in which the given object UUID was last modified
 	NSData *hash = nil;
@@ -153,16 +153,16 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
 	return data;
 }
 
-- (COHistoryGraphNode *) historyGraphNodeForUUID: (ETUUID*)uuid
+- (COHistoryNode *) historyGraphNodeForUUID: (ETUUID*)uuid
 {
 	assert([uuid isKindOfClass: [ETUUID class]]);
-	COHistoryGraphNode *node = [_historyGraphNodes objectForKey: uuid];
+	COHistoryNode *node = [_historyGraphNodes objectForKey: uuid];
 	if (nil == node)
 	{
 		NSDictionary *nodePlist = [COSerializer unserializeData: [_store dataForKey: [uuid stringValue]]];
 		if (nodePlist)
 		{
-			node = [[[COHistoryGraphNode alloc] initWithPropertyList: nodePlist storeCoordinator: self] autorelease];
+			node = [[[COHistoryNode alloc] initWithPropertyList: nodePlist storeCoordinator: self] autorelease];
 			NSLog(@"Read history node %@", [node uuid]);
 			[_historyGraphNodes setObject: node forKey: [node uuid]];
 		}
@@ -175,7 +175,7 @@ const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
 	return node;
 }
 
-- (void) commitHistoryGraphNode: (COHistoryGraphNode *)node
+- (void) commitHistoryGraphNode: (COHistoryNode *)node
 {
 	//FIXME: ugly
 	[_historyGraphNodes setObject: node forKey: [node uuid]];
