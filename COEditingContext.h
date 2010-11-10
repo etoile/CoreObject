@@ -9,6 +9,8 @@
 @class COFetchRequest;
 @class COStoreCoordinator;
 
+extern const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification;
+
 /**
  * An object context is like a working copy in a revision control system.
  * It is associated with a particlar version of the history graph,
@@ -17,10 +19,10 @@
  */
 @interface COEditingContext : NSObject
 {
-  COHistoryGraphNode *_baseHistoryGraphNode; // history graph node this context was initialized with (based on)
-  NSMutableSet *_changedObjectUUIDs;  // UUIDS of objects in this context which have uncommitted changes
-  COStoreCoordinator *_storeCoordinator;
-  NSMutableDictionary *_instantiatedObjects; // UUID -> COObject mapping
+	COHistoryGraphNode *_baseHistoryGraphNode; // history graph node this context was initialized with (based on)
+	NSMutableSet *_changedObjectUUIDs;  // UUIDS of objects in this context which have uncommitted changes
+	COStoreCoordinator *_storeCoordinator;
+	NSMutableDictionary *_instantiatedObjects; // UUID -> COObject mapping
 }
 
 // Public
@@ -76,15 +78,13 @@
 
 @interface COEditingContext (Private)
 
+- (void) loadObject: (COObject*)obj withDataAtHistoryGraphNode: (COHistoryGraphNode*)node;
+- (void) loadObjectWithDataAtBaseHistoryGraphNode: (COObject*)obj;
+
 - (void) markObjectUUIDChanged: (ETUUID*)uuid;
 - (void) markObjectUUIDUnchanged: (ETUUID*)uuid;
 - (NSArray *) changedObjects;
 - (void) recordObject: (COObject*)object forUUID: (ETUUID*)uuid;
-
-/**
- * Special purpose method for collaboration
- */
-- (COHistoryGraphNode *) commitObjectDatas: (NSArray*)datas withHistoryNodeUUID: (ETUUID*)uuid;
 
 @end
 

@@ -13,13 +13,13 @@
  */
 @interface SharingServer : NSObject
 {
-  /* The document being shared */
-  Document *doc;
-  
-  /* Dictionary of SharingServerPeer objects indexed by name */
-  NSMutableDictionary *peers;
-  
-  ETUUID *sessionID;
+	/* The document being shared */
+	Document *doc;
+	
+	/* Dictionary of SharingServerPeer objects indexed by name */
+	NSMutableDictionary *peers;
+	
+	ETUUID *sessionID;
 }
 
 - (id) initWithDocument: (Document*)d;

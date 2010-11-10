@@ -6,7 +6,7 @@
  */
 @interface COSequenceDiff : NSObject
 {
-  NSMutableArray *ops;
+	NSMutableArray *ops;
 }
 
 - (id) initWithOperations: (NSArray*)opers;
@@ -19,7 +19,7 @@
 
 @interface COSequenceDiffOperation : NSObject
 {
-  NSRange range;
+	NSRange range;
 }
 @property (nonatomic, assign, readonly) NSRange range;
 

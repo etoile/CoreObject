@@ -4,10 +4,10 @@
 
 @interface ChatWindowController : NSWindowController
 {
-  IBOutlet NSTextView *chatTextView;
-  NetworkController *networkController; // weak ref
-  NSString *chatPeerName;
-  NSString *chatPeerFullName;
+	IBOutlet NSTextView *chatTextView;
+	NetworkController *networkController; // weak ref
+	NSString *chatPeerName;
+	NSString *chatPeerFullName;
 }
 
 - (id) initWithNetworkController: (NetworkController*)controller

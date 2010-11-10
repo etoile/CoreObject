@@ -2,7 +2,7 @@
 
 @interface TextController : NSWindowController
 {
-  IBOutlet NSTextView *textView;
+	IBOutlet NSTextView *textView;
 }
 
 @end

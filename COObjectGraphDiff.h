@@ -12,7 +12,7 @@
  */
 @interface COObjectGraphDiff : NSObject
 {
-  NSMutableDictionary *_editsByPropertyAndUUID; // This maps { uuid : { property_name : COObjectGraphEdit object } }
+	NSMutableDictionary *_editsByPropertyAndUUID; // This maps { uuid : { property_name : COObjectGraphEdit object } }
 }
 
 - (void)recordRemoveProperty: (NSString*)name ofObject: (ETUUID*)obj;

@@ -35,23 +35,19 @@ extern const NSString *kCOTypeHidden;
 @interface COHistoryGraphNode : NSObject
 {
 @private
-  ETUUID *_uuid;
-  COStoreCoordinator *_store;
-  NSMutableDictionary *_properties;
-  NSMutableArray *_parentNodeUUIDs;
-  NSMutableArray *_childNodeUUIDs;
-  NSDictionary *_uuidToObjectVersionMaping;
+	ETUUID *_uuid;
+	COStoreCoordinator *_store;
+	NSMutableDictionary *_properties;
+	NSMutableArray *_parentNodeUUIDs;
+	NSMutableArray *_childNodeUUIDs;
+	NSDictionary *_uuidToObjectVersionMaping;
 }
 
 - (COStoreCoordinator *) storeCoordinator;
 
-/**
- * Returns the parents of this history node.
- * 
- * History nodes can have zero parents, which indicates they are a root node.
- * One parent corresponds to a normal edit, and two or more corresponds to a merge.
- */
-- (NSArray *)parents;
+- (COHistoryGraphNode *)parent;
+
+- (NSArray *)mergedBranches;
 
 /**
  * Returns the children of this history node.

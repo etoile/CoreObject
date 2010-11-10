@@ -10,8 +10,8 @@
  */
 @interface COStore : NSObject
 {
-  NSURL *_url;
-  
+	NSURL *_url;
+	
 }
 - (id) initWithURL: (NSURL *)url;
 + (COStore *)storeWithURL: (NSURL *)url;

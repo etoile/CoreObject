@@ -60,20 +60,45 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>668F7DC1-2CDB-45D6-AFDE-AAD2745CF9A2</string>
+							<string>4234865C-2260-4B2A-95C2-6A3DD7259416</string>
+							<string>64DC2DFF-201A-4DCB-BCB5-2F22C34FA361</string>
 							<string>88695023-1469-4A6B-BCE5-CF0BFF5E204C</string>
-							<string>B6BB8CF0-3A3D-4F0A-BF63-DE74C2451197</string>
-							<string>E86DE019-4641-42BD-AE72-47E636F5C574</string>
-							<string>F6299D39-81AB-4A82-B6A4-F0047846CEF6</string>
+							<string>A6DC9979-8AC6-4A0B-8220-939978D4E6AC</string>
+							<string>B8ABFC9C-631E-454B-A575-66CFD5FF755B</string>
+							<string>BC145CF8-64E1-427F-A840-E8B838F5BBEF</string>
+							<string>DA9CDB1B-C9E1-413B-9FDD-6A32B16364BD</string>
+							<string>FE71AF68-7008-485B-9555-6A5DAD7A9353</string>
 							<string>NSToolbarFlexibleSpaceItem</string>
 							<string>NSToolbarSeparatorItem</string>
 							<string>NSToolbarSpaceItem</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="NSToolbarItem" id="437734028">
+							<object class="NSToolbarItem" id="853549272">
 								<object class="NSMutableString" key="NSToolbarItemIdentifier">
-									<characters key="NS.bytes">668F7DC1-2CDB-45D6-AFDE-AAD2745CF9A2</characters>
+									<characters key="NS.bytes">4234865C-2260-4B2A-95C2-6A3DD7259416</characters>
+								</object>
+								<string key="NSToolbarItemLabel">Shift Right</string>
+								<string key="NSToolbarItemPaletteLabel">Shift Right</string>
+								<nil key="NSToolbarItemToolTip"/>
+								<nil key="NSToolbarItemView"/>
+								<object class="NSCustomResource" key="NSToolbarItemImage">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">format-indent-more</string>
+								</object>
+								<nil key="NSToolbarItemTarget"/>
+								<nil key="NSToolbarItemAction"/>
+								<string key="NSToolbarItemMinSize">{0, 0}</string>
+								<string key="NSToolbarItemMaxSize">{0, 0}</string>
+								<bool key="NSToolbarItemEnabled">YES</bool>
+								<bool key="NSToolbarItemAutovalidates">YES</bool>
+								<int key="NSToolbarItemTag">-1</int>
+								<bool key="NSToolbarIsUserRemovable">YES</bool>
+								<int key="NSToolbarItemVisibilityPriority">0</int>
+							</object>
+							<object class="NSToolbarItem" id="548696747">
+								<object class="NSMutableString" key="NSToolbarItemIdentifier">
+									<characters key="NS.bytes">64DC2DFF-201A-4DCB-BCB5-2F22C34FA361</characters>
 								</object>
 								<string key="NSToolbarItemLabel">Shift Left</string>
 								<string key="NSToolbarItemPaletteLabel">Shift Left</string>
@@ -81,7 +106,7 @@
 								<nil key="NSToolbarItemView"/>
 								<object class="NSCustomResource" key="NSToolbarItemImage">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">NSGoLeftTemplate</string>
+									<string key="NSResourceName">format-indent-less</string>
 								</object>
 								<nil key="NSToolbarItemTarget"/>
 								<nil key="NSToolbarItemAction"/>
@@ -115,59 +140,103 @@
 								<bool key="NSToolbarIsUserRemovable">YES</bool>
 								<int key="NSToolbarItemVisibilityPriority">0</int>
 							</object>
-							<object class="NSToolbarItem" id="473184895">
+							<object class="NSToolbarItem" id="576706014">
 								<object class="NSMutableString" key="NSToolbarItemIdentifier">
-									<characters key="NS.bytes">B6BB8CF0-3A3D-4F0A-BF63-DE74C2451197</characters>
-								</object>
-								<string key="NSToolbarItemLabel">Shift Right</string>
-								<string key="NSToolbarItemPaletteLabel">Shift Right</string>
-								<nil key="NSToolbarItemToolTip"/>
-								<nil key="NSToolbarItemView"/>
-								<object class="NSCustomResource" key="NSToolbarItemImage">
-									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">NSGoRightTemplate</string>
-								</object>
-								<nil key="NSToolbarItemTarget"/>
-								<nil key="NSToolbarItemAction"/>
-								<string key="NSToolbarItemMinSize">{0, 0}</string>
-								<string key="NSToolbarItemMaxSize">{0, 0}</string>
-								<bool key="NSToolbarItemEnabled">YES</bool>
-								<bool key="NSToolbarItemAutovalidates">YES</bool>
-								<int key="NSToolbarItemTag">-1</int>
-								<bool key="NSToolbarIsUserRemovable">YES</bool>
-								<int key="NSToolbarItemVisibilityPriority">0</int>
-							</object>
-							<object class="NSToolbarItem" id="105552841">
-								<object class="NSMutableString" key="NSToolbarItemIdentifier">
-									<characters key="NS.bytes">E86DE019-4641-42BD-AE72-47E636F5C574</characters>
-								</object>
-								<string key="NSToolbarItemLabel">Add Item</string>
-								<string key="NSToolbarItemPaletteLabel">Add Item</string>
-								<string key="NSToolbarItemToolTip"/>
-								<nil key="NSToolbarItemView"/>
-								<object class="NSCustomResource" key="NSToolbarItemImage" id="1011717447">
-									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">NSAddTemplate</string>
-								</object>
-								<nil key="NSToolbarItemTarget"/>
-								<nil key="NSToolbarItemAction"/>
-								<string key="NSToolbarItemMinSize">{0, 0}</string>
-								<string key="NSToolbarItemMaxSize">{0, 0}</string>
-								<bool key="NSToolbarItemEnabled">YES</bool>
-								<bool key="NSToolbarItemAutovalidates">YES</bool>
-								<int key="NSToolbarItemTag">-1</int>
-								<bool key="NSToolbarIsUserRemovable">YES</bool>
-								<int key="NSToolbarItemVisibilityPriority">0</int>
-							</object>
-							<object class="NSToolbarItem" id="771236727">
-								<object class="NSMutableString" key="NSToolbarItemIdentifier">
-									<characters key="NS.bytes">F6299D39-81AB-4A82-B6A4-F0047846CEF6</characters>
+									<characters key="NS.bytes">A6DC9979-8AC6-4A0B-8220-939978D4E6AC</characters>
 								</object>
 								<string key="NSToolbarItemLabel">Add Child Item</string>
 								<string key="NSToolbarItemPaletteLabel">Add Child Item</string>
 								<nil key="NSToolbarItemToolTip"/>
 								<nil key="NSToolbarItemView"/>
-								<reference key="NSToolbarItemImage" ref="1011717447"/>
+								<object class="NSCustomResource" key="NSToolbarItemImage" id="443401595">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">list-add</string>
+								</object>
+								<nil key="NSToolbarItemTarget"/>
+								<nil key="NSToolbarItemAction"/>
+								<string key="NSToolbarItemMinSize">{0, 0}</string>
+								<string key="NSToolbarItemMaxSize">{0, 0}</string>
+								<bool key="NSToolbarItemEnabled">YES</bool>
+								<bool key="NSToolbarItemAutovalidates">YES</bool>
+								<int key="NSToolbarItemTag">-1</int>
+								<bool key="NSToolbarIsUserRemovable">YES</bool>
+								<int key="NSToolbarItemVisibilityPriority">0</int>
+							</object>
+							<object class="NSToolbarItem" id="210621707">
+								<object class="NSMutableString" key="NSToolbarItemIdentifier">
+									<characters key="NS.bytes">B8ABFC9C-631E-454B-A575-66CFD5FF755B</characters>
+								</object>
+								<string key="NSToolbarItemLabel">Undo</string>
+								<string key="NSToolbarItemPaletteLabel">Undo</string>
+								<nil key="NSToolbarItemToolTip"/>
+								<nil key="NSToolbarItemView"/>
+								<object class="NSCustomResource" key="NSToolbarItemImage">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">edit-undo</string>
+								</object>
+								<nil key="NSToolbarItemTarget"/>
+								<nil key="NSToolbarItemAction"/>
+								<string key="NSToolbarItemMinSize">{0, 0}</string>
+								<string key="NSToolbarItemMaxSize">{0, 0}</string>
+								<bool key="NSToolbarItemEnabled">YES</bool>
+								<bool key="NSToolbarItemAutovalidates">YES</bool>
+								<int key="NSToolbarItemTag">-1</int>
+								<bool key="NSToolbarIsUserRemovable">YES</bool>
+								<int key="NSToolbarItemVisibilityPriority">0</int>
+							</object>
+							<object class="NSToolbarItem" id="662945109">
+								<object class="NSMutableString" key="NSToolbarItemIdentifier">
+									<characters key="NS.bytes">BC145CF8-64E1-427F-A840-E8B838F5BBEF</characters>
+								</object>
+								<string key="NSToolbarItemLabel">Add Item</string>
+								<string key="NSToolbarItemPaletteLabel">Add Item</string>
+								<nil key="NSToolbarItemToolTip"/>
+								<nil key="NSToolbarItemView"/>
+								<reference key="NSToolbarItemImage" ref="443401595"/>
+								<nil key="NSToolbarItemTarget"/>
+								<nil key="NSToolbarItemAction"/>
+								<string key="NSToolbarItemMinSize">{0, 0}</string>
+								<string key="NSToolbarItemMaxSize">{0, 0}</string>
+								<bool key="NSToolbarItemEnabled">YES</bool>
+								<bool key="NSToolbarItemAutovalidates">YES</bool>
+								<int key="NSToolbarItemTag">-1</int>
+								<bool key="NSToolbarIsUserRemovable">YES</bool>
+								<int key="NSToolbarItemVisibilityPriority">0</int>
+							</object>
+							<object class="NSToolbarItem" id="176520694">
+								<object class="NSMutableString" key="NSToolbarItemIdentifier">
+									<characters key="NS.bytes">DA9CDB1B-C9E1-413B-9FDD-6A32B16364BD</characters>
+								</object>
+								<string key="NSToolbarItemLabel">Redo</string>
+								<string key="NSToolbarItemPaletteLabel">Redo</string>
+								<nil key="NSToolbarItemToolTip"/>
+								<nil key="NSToolbarItemView"/>
+								<object class="NSCustomResource" key="NSToolbarItemImage">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">edit-redo</string>
+								</object>
+								<nil key="NSToolbarItemTarget"/>
+								<nil key="NSToolbarItemAction"/>
+								<string key="NSToolbarItemMinSize">{0, 0}</string>
+								<string key="NSToolbarItemMaxSize">{0, 0}</string>
+								<bool key="NSToolbarItemEnabled">YES</bool>
+								<bool key="NSToolbarItemAutovalidates">YES</bool>
+								<int key="NSToolbarItemTag">-1</int>
+								<bool key="NSToolbarIsUserRemovable">YES</bool>
+								<int key="NSToolbarItemVisibilityPriority">0</int>
+							</object>
+							<object class="NSToolbarItem" id="587269875">
+								<object class="NSMutableString" key="NSToolbarItemIdentifier">
+									<characters key="NS.bytes">FE71AF68-7008-485B-9555-6A5DAD7A9353</characters>
+								</object>
+								<string key="NSToolbarItemLabel">History</string>
+								<string key="NSToolbarItemPaletteLabel">History</string>
+								<nil key="NSToolbarItemToolTip"/>
+								<nil key="NSToolbarItemView"/>
+								<object class="NSCustomResource" key="NSToolbarItemImage">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">history</string>
+								</object>
 								<nil key="NSToolbarItemTarget"/>
 								<nil key="NSToolbarItemAction"/>
 								<string key="NSToolbarItemMinSize">{0, 0}</string>
@@ -272,18 +341,25 @@
 						<reference ref="405642006"/>
 						<reference ref="334492118"/>
 						<reference ref="346551423"/>
-						<reference ref="105552841"/>
-						<reference ref="771236727"/>
-						<reference ref="437734028"/>
-						<reference ref="473184895"/>
 						<reference ref="487041967"/>
+						<reference ref="210621707"/>
+						<reference ref="176520694"/>
+						<reference ref="587269875"/>
+						<reference ref="662945109"/>
+						<reference ref="576706014"/>
+						<reference ref="548696747"/>
+						<reference ref="853549272"/>
 					</object>
 					<object class="NSMutableArray" key="NSToolbarIBDefaultItems">
 						<bool key="EncodedWithXMLCoder">YES</bool>
-						<reference ref="105552841"/>
-						<reference ref="771236727"/>
-						<reference ref="437734028"/>
-						<reference ref="473184895"/>
+						<reference ref="662945109"/>
+						<reference ref="576706014"/>
+						<reference ref="548696747"/>
+						<reference ref="853549272"/>
+						<reference ref="405642006"/>
+						<reference ref="210621707"/>
+						<reference ref="176520694"/>
+						<reference ref="587269875"/>
 						<reference ref="346551423"/>
 						<reference ref="487041967"/>
 					</object>
@@ -491,43 +567,67 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">addItem:</string>
-						<reference key="source" ref="1021"/>
-						<reference key="destination" ref="105552841"/>
-					</object>
-					<int key="connectionID">841</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">addChildItem:</string>
-						<reference key="source" ref="1021"/>
-						<reference key="destination" ref="771236727"/>
-					</object>
-					<int key="connectionID">844</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">shiftLeft:</string>
-						<reference key="source" ref="1021"/>
-						<reference key="destination" ref="437734028"/>
-					</object>
-					<int key="connectionID">849</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">shiftRight:</string>
-						<reference key="source" ref="1021"/>
-						<reference key="destination" ref="473184895"/>
-					</object>
-					<int key="connectionID">850</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">shareWith:</string>
 						<reference key="source" ref="1021"/>
 						<reference key="destination" ref="487041967"/>
 					</object>
 					<int key="connectionID">862</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">undo:</string>
+						<reference key="source" ref="1021"/>
+						<reference key="destination" ref="210621707"/>
+					</object>
+					<int key="connectionID">874</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">redo:</string>
+						<reference key="source" ref="1021"/>
+						<reference key="destination" ref="176520694"/>
+					</object>
+					<int key="connectionID">875</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">history:</string>
+						<reference key="source" ref="1021"/>
+						<reference key="destination" ref="587269875"/>
+					</object>
+					<int key="connectionID">876</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">addItem:</string>
+						<reference key="source" ref="1021"/>
+						<reference key="destination" ref="662945109"/>
+					</object>
+					<int key="connectionID">881</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">addChildItem:</string>
+						<reference key="source" ref="1021"/>
+						<reference key="destination" ref="576706014"/>
+					</object>
+					<int key="connectionID">882</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">shiftLeft:</string>
+						<reference key="source" ref="1021"/>
+						<reference key="destination" ref="548696747"/>
+					</object>
+					<int key="connectionID">883</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">shiftRight:</string>
+						<reference key="source" ref="1021"/>
+						<reference key="destination" ref="853549272"/>
+					</object>
+					<int key="connectionID">884</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -628,11 +728,14 @@
 							<reference ref="405642006"/>
 							<reference ref="334492118"/>
 							<reference ref="346551423"/>
-							<reference ref="105552841"/>
-							<reference ref="771236727"/>
-							<reference ref="437734028"/>
-							<reference ref="473184895"/>
 							<reference ref="487041967"/>
+							<reference ref="210621707"/>
+							<reference ref="176520694"/>
+							<reference ref="587269875"/>
+							<reference ref="662945109"/>
+							<reference ref="576706014"/>
+							<reference ref="548696747"/>
+							<reference ref="853549272"/>
 						</object>
 						<reference key="parent" ref="513744381"/>
 					</object>
@@ -652,28 +755,43 @@
 						<reference key="parent" ref="487502284"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">831</int>
-						<reference key="object" ref="105552841"/>
-						<reference key="parent" ref="487502284"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">843</int>
-						<reference key="object" ref="771236727"/>
-						<reference key="parent" ref="487502284"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">845</int>
-						<reference key="object" ref="437734028"/>
-						<reference key="parent" ref="487502284"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">846</int>
-						<reference key="object" ref="473184895"/>
-						<reference key="parent" ref="487502284"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">861</int>
 						<reference key="object" ref="487041967"/>
+						<reference key="parent" ref="487502284"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">871</int>
+						<reference key="object" ref="210621707"/>
+						<reference key="parent" ref="487502284"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">872</int>
+						<reference key="object" ref="176520694"/>
+						<reference key="parent" ref="487502284"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">873</int>
+						<reference key="object" ref="587269875"/>
+						<reference key="parent" ref="487502284"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">877</int>
+						<reference key="object" ref="662945109"/>
+						<reference key="parent" ref="487502284"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">878</int>
+						<reference key="object" ref="576706014"/>
+						<reference key="parent" ref="487502284"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">879</int>
+						<reference key="object" ref="548696747"/>
+						<reference key="parent" ref="487502284"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">880</int>
+						<reference key="object" ref="853549272"/>
 						<reference key="parent" ref="487502284"/>
 					</object>
 				</object>
@@ -702,7 +820,6 @@
 					<string>826.IBPluginDependency</string>
 					<string>828.IBPluginDependency</string>
 					<string>829.IBPluginDependency</string>
-					<string>831.IBPluginDependency</string>
 					<string>861.designableToolbarItemIdentifier</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
@@ -729,7 +846,6 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>share</string>
 				</object>
 			</object>
@@ -749,18 +865,11 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">870</int>
+			<int key="maxID">884</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">ProjectDemo/OutlineItem.h</string>
-					</object>
-				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -777,12 +886,18 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>addChildItem:</string>
 							<string>addItem:</string>
+							<string>history:</string>
+							<string>redo:</string>
 							<string>shareWith:</string>
 							<string>shiftLeft:</string>
 							<string>shiftRight:</string>
+							<string>undo:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -796,9 +911,12 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>addChildItem:</string>
 							<string>addItem:</string>
+							<string>history:</string>
+							<string>redo:</string>
 							<string>shareWith:</string>
 							<string>shiftLeft:</string>
 							<string>shiftRight:</string>
+							<string>undo:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -811,6 +929,14 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">history:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">redo:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">shareWith:</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -820,6 +946,10 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">shiftRight:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">undo:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 						</object>
@@ -1035,6 +1165,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="716017827">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">AppKit.framework/Headers/NSView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">ExceptionHandling.framework/Headers/NSExceptionHandler.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1326,21 +1463,27 @@
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<object class="NSArray" key="dict.sortedKeys">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>NSAddTemplate</string>
 				<string>NSEveryone</string>
-				<string>NSGoLeftTemplate</string>
-				<string>NSGoRightTemplate</string>
 				<string>NSMenuCheckmark</string>
 				<string>NSMenuMixedState</string>
+				<string>edit-redo</string>
+				<string>edit-undo</string>
+				<string>format-indent-less</string>
+				<string>format-indent-more</string>
+				<string>history</string>
+				<string>list-add</string>
 			</object>
 			<object class="NSMutableArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>{8, 8}</string>
 				<string>{32, 32}</string>
-				<string>{9, 9}</string>
-				<string>{9, 9}</string>
 				<string>{9, 8}</string>
 				<string>{7, 2}</string>
+				<string>{32, 32}</string>
+				<string>{32, 32}</string>
+				<string>{32, 32}</string>
+				<string>{32, 32}</string>
+				<string>{32, 32}</string>
+				<string>{32, 32}</string>
 			</object>
 		</object>
 	</data>

@@ -3,8 +3,8 @@
 
 @interface TextItem : COObject
 {
-  NSMutableDictionary *textAttributes;
-  NSString *text;
+	NSMutableDictionary *textAttributes;
+	NSString *text;
 }
 
 @end

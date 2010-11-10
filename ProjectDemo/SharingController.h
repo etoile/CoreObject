@@ -14,13 +14,13 @@
  */
 @interface SharingController : NSObject
 {
-  NSMutableDictionary *serverForSessionUUID;
-  NSMutableDictionary *clientForSessionUUID;
-
-  IBOutlet NSWindow *sharingWindow;
-  IBOutlet NSTableView *sharingTable;
-  
-  ETUUID *inspectingDocumentUUID;
+	NSMutableDictionary *serverForSessionUUID;
+	NSMutableDictionary *clientForSessionUUID;
+	
+	IBOutlet NSWindow *sharingWindow;
+	IBOutlet NSTableView *sharingTable;
+	
+	ETUUID *inspectingDocumentUUID;
 }
 
 + (SharingController*)sharedSharingController;

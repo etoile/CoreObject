@@ -4,9 +4,9 @@
 
 @interface OutlineController : NSWindowController
 {
-  IBOutlet NSOutlineView *outlineView;
-  Document *doc; // weak ref
-  BOOL isSharing;
+	IBOutlet NSOutlineView *outlineView;
+	Document *doc; // weak ref
+	BOOL isSharing;
 }
 
 - (id)initWithDocument: (id)document isSharing: (BOOL)sharing;
@@ -19,6 +19,9 @@
 - (IBAction) addChildItem: (id)sender;
 - (IBAction) shiftLeft: (id)sender;
 - (IBAction) shiftRight: (id)sender;
+- (IBAction) undo: (id)sender;
+- (IBAction) redo: (id)sender;
+- (IBAction) history: (id)sender;
 
 - (IBAction) shareWith: (id)sender;
 

@@ -18,8 +18,8 @@ extern const NSString *COStoreDidCommitNotification;
  */
 @interface COStoreCoordinator : NSObject
 {
-  COStore *_store;
-  NSMutableDictionary *_historyGraphNodes;
+	COStore *_store;
+	NSMutableDictionary *_historyGraphNodes;
 }
 
 - (id)initWithURL: (NSURL*)url;
@@ -79,5 +79,10 @@ extern const NSString *COStoreDidCommitNotification;
 
 - (COHistoryGraphNode *) historyGraphNodeForUUID: (ETUUID*)uuid;
 - (void) commitHistoryGraphNode: (COHistoryGraphNode *)node;
+
+- (COHistoryGraphNode *) commitObjectDatas: (NSArray *)datas
+                                 afterNode: (COHistoryGraphNode*)node
+                              withMetadata: (NSDictionary*)metadata
+                       withHistoryNodeUUID: (ETUUID*)uuid;
 
 @end

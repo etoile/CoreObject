@@ -7,9 +7,9 @@
 
 - (void) dealloc
 {
-  [opsFromBase release];
-  [opsFromOther release];
-  [super dealloc];
+	[opsFromBase release];
+	[opsFromOther release];
+	[super dealloc];
 }
 
 @end
@@ -18,16 +18,16 @@
 + (COMergeConflict*)conflictWithOpsFromBase: (NSArray*)a
                                opsFromOther: (NSArray*)b
 {
-  COMergeConflict *conflict = [[[COMergeConflict alloc] init] autorelease];
-  
-  if (!(([a count] == 1 && [b count] >= 1) || ([a count] >= 1 && [b count] == 1)))
-  {
-    [NSException raise: NSInvalidArgumentException format: @"COMergeConflict invalid ops count"];
-  }
-  
-  conflict->opsFromBase = [a retain];
-  conflict->opsFromOther = [b retain];
-  return conflict;
+	COMergeConflict *conflict = [[[COMergeConflict alloc] init] autorelease];
+	
+	if (!(([a count] == 1 && [b count] >= 1) || ([a count] >= 1 && [b count] == 1)))
+	{
+		[NSException raise: NSInvalidArgumentException format: @"COMergeConflict invalid ops count"];
+	}
+	
+	conflict->opsFromBase = [a retain];
+	conflict->opsFromOther = [b retain];
+	return conflict;
 }
 
 @end
@@ -41,16 +41,16 @@
 
 - (void) dealloc
 {
-  [nonoverlappingNonconflictingOps release];
-  [overlappingNonconflictingOps release];
-  [conflicts release];
-  [super dealloc];
+	[nonoverlappingNonconflictingOps release];
+	[overlappingNonconflictingOps release];
+	[conflicts release];
+	[super dealloc];
 }
 
 - (NSArray *)nonconflictingOps
 {
-  return [nonoverlappingNonconflictingOps arrayByAddingObjectsFromArray: 
-    overlappingNonconflictingOps];
+	return [nonoverlappingNonconflictingOps arrayByAddingObjectsFromArray: 
+			overlappingNonconflictingOps];
 }
 
 @end
@@ -61,11 +61,11 @@
                                overlappingNonconflictingOps: (NSArray *)b
                                                   conflicts: (NSArray *)c
 {
-  COMergeResult *result = [[[COMergeResult alloc] init] autorelease];
-  result->nonoverlappingNonconflictingOps = [a retain];
-  result->overlappingNonconflictingOps = [b retain];
-  result->conflicts = [c retain];
-  return result;
+	COMergeResult *result = [[[COMergeResult alloc] init] autorelease];
+	result->nonoverlappingNonconflictingOps = [a retain];
+	result->overlappingNonconflictingOps = [b retain];
+	result->conflicts = [c retain];
+	return result;
 }
 
 @end

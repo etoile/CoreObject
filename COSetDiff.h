@@ -3,7 +3,7 @@
 
 @interface COSetDiff : NSObject
 {
-  NSArray *ops;
+	NSArray *ops;
 }
 
 // Creating
@@ -33,7 +33,7 @@
 
 @interface COSetDiffOperationAdd : NSObject
 {
-  NSSet *addedObjects;
+	NSSet *addedObjects;
 }
 @property (nonatomic, retain, readonly) NSSet *addedObjects;
 + (COSetDiffOperationAdd*)addOperationWithAddedObjects: (NSSet*)add;
@@ -42,7 +42,7 @@
 
 @interface COSetDiffOperationRemove : NSObject
 {
-  NSSet *removedObjects;
+	NSSet *removedObjects;
 }
 @property (nonatomic, retain, readonly) NSSet *removedObjects;
 + (COSetDiffOperationRemove*)removeOperationWithRemovedObjects: (NSSet*)remove;

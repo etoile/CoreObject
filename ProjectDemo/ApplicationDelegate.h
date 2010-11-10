@@ -7,18 +7,18 @@
 
 @interface ApplicationDelegate : NSObject
 {
-  IBOutlet NSWindow *newDocumentTypeWindow;
-  IBOutlet NSWindow *networkWindow;
-  
-  IBOutlet SharingController *sharingController;
-  IBOutlet NetworkController *networkController;
-  IBOutlet HistoryInspectorController *historyController;
-  IBOutlet CheckpointAsSheetController *checkpointAsSheetController;
-  
-  COEditingContext *context;
-  Project *project;
-  
-  NSMutableDictionary *controllerForDocumentUUID;
+	IBOutlet NSWindow *newDocumentTypeWindow;
+	IBOutlet NSWindow *networkWindow;
+	
+	IBOutlet SharingController *sharingController;
+	IBOutlet NetworkController *networkController;
+	IBOutlet HistoryInspectorController *historyController;
+	IBOutlet CheckpointAsSheetController *checkpointAsSheetController;
+	
+	COEditingContext *context;
+	Project *project;
+	
+	NSMutableDictionary *controllerForDocumentUUID;
 }
 
 - (COEditingContext*)editingContext;
@@ -30,4 +30,8 @@
 - (void)checkpointWithName: (NSString*)name;
 
 - (void) shareWithInspectorForDocument: (Document*)doc;
+
+- (void)undo:(id)sender;
+- (void)redo:(id)sender;
+
 @end

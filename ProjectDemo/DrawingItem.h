@@ -3,7 +3,7 @@
 
 @interface DrawingItem : COObject
 {
-
+	
 }
 
 @end

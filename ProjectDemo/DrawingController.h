@@ -2,7 +2,7 @@
 
 @interface DrawingController : NSWindowController
 {
-  IBOutlet NSView *outlineView;
+	IBOutlet NSView *outlineView;
 }
 
 @end

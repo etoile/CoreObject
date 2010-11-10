@@ -21,12 +21,12 @@
  */
 @interface CONetworkPeer : NSObject
 {
-  NSConnection *vendingConnection;
-  NSNetService *netService;
-  NSString *peerName;
-  NSNetServiceBrowser *serviceBrowser;
-  NSMutableDictionary *connectedPeers;
-  id<CONetworkPeerDelegate> delegate;
+	NSConnection *vendingConnection;
+	NSNetService *netService;
+	NSString *peerName;
+	NSNetServiceBrowser *serviceBrowser;
+	NSMutableDictionary *connectedPeers;
+	id<CONetworkPeerDelegate> delegate;
 }
 
 @property (readwrite, nonatomic, assign) id<CONetworkPeerDelegate> delegate;

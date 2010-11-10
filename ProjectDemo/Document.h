@@ -3,15 +3,15 @@
 
 @interface Document : COObject
 {
-  /** 
-   * Note that primitiveScreenRect and isOpen are persistent properties, 
-   * but shouldn't be shared when collaborating.
-   */
-  NSRect primitiveScreenRect;
-  BOOL isOpen;
-  NSString *documentType;
-  id rootObject;
-  NSString *documentName;
+	/** 
+	 * Note that primitiveScreenRect and isOpen are persistent properties, 
+	 * but shouldn't be shared when collaborating.
+	 */
+	NSRect primitiveScreenRect;
+	BOOL isOpen;
+	NSString *documentType;
+	id rootObject;
+	NSString *documentName;
 }
 
 - (BOOL) isOpen;

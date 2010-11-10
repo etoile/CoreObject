@@ -12,8 +12,8 @@
  */
 @interface COMergeConflict : NSObject
 {
-  NSArray *opsFromBase;
-  NSArray *opsFromOther;
+	NSArray *opsFromBase;
+	NSArray *opsFromOther;
 }
 @property (nonatomic, readonly, retain) NSArray *opsFromBase;             
 @property (nonatomic, readonly, retain) NSArray *opsFromOther;
@@ -24,9 +24,9 @@
  */
 @interface COMergeResult : NSObject
 {
-  NSArray *nonoverlappingNonconflictingOps;
-  NSArray *overlappingNonconflictingOps;
-  NSArray *conflicts;
+	NSArray *nonoverlappingNonconflictingOps;
+	NSArray *overlappingNonconflictingOps;
+	NSArray *conflicts;
 }
 
 /**

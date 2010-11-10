@@ -3,7 +3,7 @@
 
 @interface COArrayDiff : COSequenceDiff
 {
-
+	
 }
 
 - (id) initWithFirstArray: (NSArray *)first
@@ -20,7 +20,7 @@
 
 @interface COArrayDiffOperationInsert : COSequenceDiffOperation 
 {
-  NSArray *insertedObjects;
+	NSArray *insertedObjects;
 }
 
 @property (nonatomic, retain, readonly)  NSArray* insertedObjects;
@@ -43,7 +43,7 @@
 
 @interface COArrayDiffOperationModify : COSequenceDiffOperation
 {
-  NSArray *insertedObjects;  
+	NSArray *insertedObjects;  
 }
 
 @property (nonatomic, retain, readonly)  NSArray* insertedObjects;

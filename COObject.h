@@ -25,11 +25,11 @@
 @interface COObject : NSObject
 {
 @private
-  BOOL _isFault;
-  NSMutableDictionary *_data;
-  COEditingContext *_ctx;
-  ETUUID *_uuid;
-  ETEntityDescription *_description;
+	BOOL _isFault;
+	NSMutableDictionary *_data;
+	COEditingContext *_ctx;
+	ETUUID *_uuid;
+	ETEntityDescription *_description;
 }
 
 // Public
@@ -87,6 +87,8 @@
 - (void)willAccessValueForProperty:(NSString *)key;
 - (void)willChangeValueForProperty:(NSString *)key;
 - (void)didChangeValueForProperty:(NSString *)key;
+
+- (NSString*)detailedDescription;
 
 @end
 

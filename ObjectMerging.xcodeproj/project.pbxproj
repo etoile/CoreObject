@@ -83,6 +83,12 @@
 		6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686C341125EC5070065DE1A /* ProjectDocument.m */; };
 		6698320412691F970011C7FC /* SCRATCHPAD in Resources */ = {isa = PBXBuildFile; fileRef = 6698320312691F970011C7FC /* SCRATCHPAD */; };
 		66983346126BB1150011C7FC /* HistoryInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66983345126BB1150011C7FC /* HistoryInspectorController.m */; };
+		79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A8128A48DF00EC0255 /* edit-redo.tiff */; };
+		79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A9128A48DF00EC0255 /* edit-undo.tiff */; };
+		79F122B1128A49FE00EC0255 /* history.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122B0128A49FE00EC0255 /* history.tiff */; };
+		79F122C4128A4B7800EC0255 /* format-indent-less.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122C1128A4B7800EC0255 /* format-indent-less.tiff */; };
+		79F122C5128A4B7800EC0255 /* format-indent-more.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122C2128A4B7800EC0255 /* format-indent-more.tiff */; };
+		79F122C6128A4B7800EC0255 /* list-add.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122C3128A4B7800EC0255 /* list-add.tiff */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -254,6 +260,12 @@
 		6699653F1162E1C000359BE6 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		6699661A11632D3300359BE6 /* DESIGN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DESIGN; sourceTree = "<group>"; wrapsLines = 1; };
 		66AD537F113076E9003FE840 /* NOTES */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NOTES; sourceTree = "<group>"; };
+		79F122A8128A48DF00EC0255 /* edit-redo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "edit-redo.tiff"; sourceTree = "<group>"; };
+		79F122A9128A48DF00EC0255 /* edit-undo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "edit-undo.tiff"; sourceTree = "<group>"; };
+		79F122B0128A49FE00EC0255 /* history.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = history.tiff; sourceTree = "<group>"; };
+		79F122C1128A4B7800EC0255 /* format-indent-less.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "format-indent-less.tiff"; sourceTree = "<group>"; };
+		79F122C2128A4B7800EC0255 /* format-indent-more.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "format-indent-more.tiff"; sourceTree = "<group>"; };
+		79F122C3128A4B7800EC0255 /* list-add.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "list-add.tiff"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* ProjectDemo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ProjectDemo-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -370,6 +382,7 @@
 		66708FEF124870CB00E65F00 /* ProjectDemo */ = {
 			isa = PBXGroup;
 			children = (
+				79F122B2128A4A4200EC0255 /* Icons */,
 				6686B8A1125522D70065DE1A /* Model Objects */,
 				6686B873125516A10065DE1A /* Outline Document */,
 				6686B8721255169B0065DE1A /* Drawing Document */,
@@ -604,6 +617,19 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		79F122B2128A4A4200EC0255 /* Icons */ = {
+			isa = PBXGroup;
+			children = (
+				79F122C1128A4B7800EC0255 /* format-indent-less.tiff */,
+				79F122C2128A4B7800EC0255 /* format-indent-more.tiff */,
+				79F122C3128A4B7800EC0255 /* list-add.tiff */,
+				79F122B0128A49FE00EC0255 /* history.tiff */,
+				79F122A8128A48DF00EC0255 /* edit-redo.tiff */,
+				79F122A9128A48DF00EC0255 /* edit-undo.tiff */,
+			);
+			name = Icons;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -759,6 +785,12 @@
 				667090011248726900E65F00 /* OutlineInspector.xib in Resources */,
 				6686BFF5125CF0200065DE1A /* ChatWindow.xib in Resources */,
 				6627EEDD1278A55A00E06946 /* README in Resources */,
+				79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */,
+				79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */,
+				79F122B1128A49FE00EC0255 /* history.tiff in Resources */,
+				79F122C4128A4B7800EC0255 /* format-indent-less.tiff in Resources */,
+				79F122C5128A4B7800EC0255 /* format-indent-more.tiff in Resources */,
+				79F122C6128A4B7800EC0255 /* list-add.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

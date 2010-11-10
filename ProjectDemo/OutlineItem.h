@@ -3,9 +3,9 @@
 
 @interface OutlineItem : COObject //FIXME: DocumentItem has a 'document' property
 {
-  NSMutableArray *contents;
-  NSString *label;
-  OutlineItem *parent;
+	NSMutableArray *contents;
+	NSString *label;
+	OutlineItem *parent;
 }
 
 - (NSString*)label;

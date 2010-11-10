@@ -18,12 +18,12 @@ extern NSString *NetworkControllerDidReceiveMessageNotification;
  */
 @interface NetworkController : NSObject <CONetworkPeerDelegate>
 {
-  CONetworkPeer *myPeer;
-  NSMutableDictionary *connectedPeerInfo;
-  NSMutableArray *openChatWindowControllers;
-
-  IBOutlet NSTableView *networkTableView;
-  IBOutlet SharingController *sharingController;
+	CONetworkPeer *myPeer;
+	NSMutableDictionary *connectedPeerInfo;
+	NSMutableArray *openChatWindowControllers;
+	
+	IBOutlet NSTableView *networkTableView;
+	IBOutlet SharingController *sharingController;
 }
 
 + (NetworkController*)sharedNetworkController;

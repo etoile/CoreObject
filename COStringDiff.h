@@ -20,7 +20,7 @@
 
 @interface COStringDiffOperationInsert : COSequenceDiffOperation 
 {
-  NSString *insertedString;
+	NSString *insertedString;
 }
 
 @property (nonatomic, retain, readonly) NSString* insertedString;
@@ -41,7 +41,7 @@
 
 @interface COStringDiffOperationModify : COSequenceDiffOperation
 {
-  NSString *insertedString;
+	NSString *insertedString;
 }
 
 @property (nonatomic, retain, readonly) NSString* insertedString;

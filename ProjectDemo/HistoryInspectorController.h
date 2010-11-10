@@ -3,9 +3,10 @@
 
 @interface HistoryInspectorController : NSObject
 {
-  IBOutlet NSWindow *historyInspectorWindow;
-  IBOutlet NSTableView *historyInspectorTable;
-  COEditingContext *context;
+	IBOutlet NSWindow *historyInspectorWindow;
+	IBOutlet NSTableView *historyInspectorTable;
+	IBOutlet NSTextView *textDisplay;
+	COEditingContext *context;
 }
 
 - (void)setContext: (COEditingContext*)ctx;

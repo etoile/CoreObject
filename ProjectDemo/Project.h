@@ -4,10 +4,10 @@
 
 @interface Project : COObject
 {
-  NSMutableSet *documents;
-  
-  // notification hack - remove when we can use KVO
-  id delegate;
+	NSMutableSet *documents;
+	
+	// notification hack - remove when we can use KVO
+	id delegate;
 }
 
 - (NSArray*) documents;
