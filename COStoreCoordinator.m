@@ -2,7 +2,7 @@
 #import "COSerializer.h"
 #import "NSData+sha1.h"
 
-const NSString *COStoreDidCommitNotification = @"COStoreDidCommitNotification";
+NSString * const COStoreDidCommitNotification = @"COStoreDidCommitNotification";
 
 @implementation COStoreCoordinator
 

@@ -9,7 +9,7 @@
 @class COFetchRequest;
 @class COStoreCoordinator;
 
-extern const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification;
+extern NSString * const COEditingContextBaseHistoryGraphNodeDidChangeNotification;
 
 /**
  * An object context is like a working copy in a revision control system.

@@ -7,7 +7,7 @@
 @class COObjectGraphDiff;
 @class COEditingContext;
 
-extern const NSString *COStoreDidCommitNotification;
+extern NSString * const COStoreDidCommitNotification;
 
 /**
  * High-level interface to the storage layer. Creates and manages HistoryGraphNodes.

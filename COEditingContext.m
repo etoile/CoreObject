@@ -1,6 +1,6 @@
 #import "COEditingContext.h"
 
-const NSString *COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"COEditingContextBaseHistoryGraphNodeDidChangeNotification";
+NSString * const COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"COEditingContextBaseHistoryGraphNodeDidChangeNotification";
 
 @implementation COEditingContext
 

@@ -76,6 +76,7 @@
 {
 	[_obj release];
 	[_property release];
+	[super dealloc];
 }
 
 - (NSMutableArray*) targetMutableArray
@@ -141,6 +142,7 @@
 {
 	[_obj release];
 	[_property release];
+	[super dealloc];
 }
 
 - (NSMutableSet*) targetMutableSet
