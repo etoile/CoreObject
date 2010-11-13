@@ -85,6 +85,7 @@
 		66983346126BB1150011C7FC /* HistoryInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66983345126BB1150011C7FC /* HistoryInspectorController.m */; };
 		66C33D69128F158600E5B15B /* COHistoryTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C33D67128F158600E5B15B /* COHistoryTrack.h */; };
 		66C33D6A128F158600E5B15B /* COHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D68128F158600E5B15B /* COHistoryTrack.m */; };
+		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A8128A48DF00EC0255 /* edit-redo.tiff */; };
 		79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A9128A48DF00EC0255 /* edit-undo.tiff */; };
 		79F122B1128A49FE00EC0255 /* history.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122B0128A49FE00EC0255 /* history.tiff */; };
@@ -264,6 +265,8 @@
 		66AD537F113076E9003FE840 /* NOTES */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NOTES; sourceTree = "<group>"; };
 		66C33D67128F158600E5B15B /* COHistoryTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COHistoryTrack.h; sourceTree = "<group>"; };
 		66C33D68128F158600E5B15B /* COHistoryTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COHistoryTrack.m; sourceTree = "<group>"; };
+		66C33D6F128F395400E5B15B /* ItemReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItemReference.h; sourceTree = "<group>"; };
+		66C33D70128F395400E5B15B /* ItemReference.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItemReference.m; sourceTree = "<group>"; };
 		79F122A8128A48DF00EC0255 /* edit-redo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "edit-redo.tiff"; sourceTree = "<group>"; };
 		79F122A9128A48DF00EC0255 /* edit-undo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "edit-undo.tiff"; sourceTree = "<group>"; };
 		79F122B0128A49FE00EC0255 /* history.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = history.tiff; sourceTree = "<group>"; };
@@ -452,6 +455,8 @@
 				6686BEE712593D800065DE1A /* Project.m */,
 				6686BEE912593D900065DE1A /* Document.h */,
 				6686BEEA12593D900065DE1A /* Document.m */,
+				66C33D6F128F395400E5B15B /* ItemReference.h */,
+				66C33D70128F395400E5B15B /* ItemReference.m */,
 			);
 			name = "Model Objects";
 			sourceTree = "<group>";
@@ -798,6 +803,7 @@
 				79F122C4128A4B7800EC0255 /* format-indent-less.tiff in Resources */,
 				79F122C5128A4B7800EC0255 /* format-indent-more.tiff in Resources */,
 				79F122C6128A4B7800EC0255 /* list-add.tiff in Resources */,
+				66C33D71128F395400E5B15B /* ItemReference.m in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
