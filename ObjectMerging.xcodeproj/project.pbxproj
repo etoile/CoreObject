@@ -83,6 +83,8 @@
 		6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686C341125EC5070065DE1A /* ProjectDocument.m */; };
 		6698320412691F970011C7FC /* SCRATCHPAD in Resources */ = {isa = PBXBuildFile; fileRef = 6698320312691F970011C7FC /* SCRATCHPAD */; };
 		66983346126BB1150011C7FC /* HistoryInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66983345126BB1150011C7FC /* HistoryInspectorController.m */; };
+		66C33D69128F158600E5B15B /* COHistoryTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C33D67128F158600E5B15B /* COHistoryTrack.h */; };
+		66C33D6A128F158600E5B15B /* COHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D68128F158600E5B15B /* COHistoryTrack.m */; };
 		79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A8128A48DF00EC0255 /* edit-redo.tiff */; };
 		79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A9128A48DF00EC0255 /* edit-undo.tiff */; };
 		79F122B1128A49FE00EC0255 /* history.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122B0128A49FE00EC0255 /* history.tiff */; };
@@ -260,6 +262,8 @@
 		6699653F1162E1C000359BE6 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		6699661A11632D3300359BE6 /* DESIGN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DESIGN; sourceTree = "<group>"; wrapsLines = 1; };
 		66AD537F113076E9003FE840 /* NOTES */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NOTES; sourceTree = "<group>"; };
+		66C33D67128F158600E5B15B /* COHistoryTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COHistoryTrack.h; sourceTree = "<group>"; };
+		66C33D68128F158600E5B15B /* COHistoryTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COHistoryTrack.m; sourceTree = "<group>"; };
 		79F122A8128A48DF00EC0255 /* edit-redo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "edit-redo.tiff"; sourceTree = "<group>"; };
 		79F122A9128A48DF00EC0255 /* edit-undo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "edit-undo.tiff"; sourceTree = "<group>"; };
 		79F122B0128A49FE00EC0255 /* history.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = history.tiff; sourceTree = "<group>"; };
@@ -466,6 +470,8 @@
 		6686BDB612592C1B0065DE1A /* Front-end API */ = {
 			isa = PBXGroup;
 			children = (
+				66C33D67128F158600E5B15B /* COHistoryTrack.h */,
+				66C33D68128F158600E5B15B /* COHistoryTrack.m */,
 				6686BDB712592C1B0065DE1A /* COObject.h */,
 				6686BDB812592C1B0065DE1A /* COObject.m */,
 				6686BDB912592C1B0065DE1A /* COObject+KVC.m */,
@@ -653,6 +659,7 @@
 				6686BDFC12592C810065DE1A /* COHistoryNode.h in Headers */,
 				6686BDFD12592C810065DE1A /* COStoreCoordinator.h in Headers */,
 				6686BDFE12592C810065DE1A /* COObjectGraphDiff.h in Headers */,
+				66C33D69128F158600E5B15B /* COHistoryTrack.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -861,6 +868,7 @@
 				6686BDEB12592C5D0065DE1A /* COHistoryNode.m in Sources */,
 				6686BDEC12592C5D0065DE1A /* COStoreCoordinator.m in Sources */,
 				6686BDED12592C5D0065DE1A /* COObjectGraphDiff.m in Sources */,
+				66C33D6A128F158600E5B15B /* COHistoryTrack.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
