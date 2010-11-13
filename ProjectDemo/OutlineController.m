@@ -197,20 +197,23 @@ static int i = 0;
 	{
 		NSLog(@"Requesting object at %d in collection of %d", indexOfItemInParent - 1, [[parent contents] count]);
 		OutlineItem *newParent = [[parent contents] objectAtIndex: (indexOfItemInParent - 1)];
-		[item retain];
-		[parent removeItemAtIndex: [[parent contents] indexOfObject: item]];
-		[newParent addItem: item];
-		[item release];
 		
-		[self commitWithType: kCOTypeMinorEdit
-			shortDescription: @"Shift Right"
-			 longDescription: [NSString stringWithFormat: @"Shift right item %@", [item label]]];
-		
-		[outlineView expandItem: newParent];
-		
-		[outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex:[outlineView rowForItem: item]]
-				 byExtendingSelection: NO];
-		
+		if ([newParent isKindOfClass: [OutlineItem class]])
+		{		
+			[item retain];
+			[parent removeItemAtIndex: [[parent contents] indexOfObject: item]];
+			[newParent addItem: item];
+			[item release];
+			
+			[self commitWithType: kCOTypeMinorEdit
+				shortDescription: @"Shift Right"
+				 longDescription: [NSString stringWithFormat: @"Shift right item %@", [item label]]];
+			
+			[outlineView expandItem: newParent];
+			
+			[outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex:[outlineView rowForItem: item]]
+					 byExtendingSelection: NO];
+		}
 	}  
 }
 
@@ -276,18 +279,7 @@ static int i = 0;
 - (id) outlineView: (NSOutlineView *)outlineView objectValueForTableColumn: (NSTableColumn *)column byItem: (id)item
 {
 	if (nil == item) { item = [self rootObject]; }
-	if ([item isKindOfClass: [OutlineItem class]])
-	{
-		return [item label];
-	}
-	else if ([item isKindOfClass: [ItemReference class]])
-	{
-		return [NSString stringWithFormat: @"Link to %@", [[item referencedItem] uuid]];
-	}
-	else
-	{
-		return nil;
-	}
+	return [item label];
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item

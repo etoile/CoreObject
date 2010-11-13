@@ -22,4 +22,6 @@
 - (OutlineItem*)referencedItem;
 - (void)setReferencedItem:(OutlineItem *)p;
 
+- (NSString*)label;
+
 @end

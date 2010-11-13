@@ -76,4 +76,9 @@
 {
 }
 
+- (NSString*)label
+{
+	return [NSString stringWithFormat: @"Link to %@", [[self referencedItem] uuid]];	
+}
+
 @end
