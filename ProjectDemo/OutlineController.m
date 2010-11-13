@@ -370,6 +370,10 @@ static int i = 0;
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
 {
+	if (![item isKindOfClass: [OutlineItem class]])
+	{
+		return NSDragOperationNone;
+	}
 	for (NSPasteboardItem *pbItem in [[info draggingPasteboard] pasteboardItems])
 	{
 		OutlineItem *srcItem = (OutlineItem*)[[[pbItem propertyListForType: @"org.etoile.outlineItem"] valueForKey:@"outlineItemPointer"] integerValue];
