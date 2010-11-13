@@ -65,6 +65,15 @@
 	[self willAccessValueForProperty: @"parent"];
 	return parent;
 }
+- (OutlineItem*)root
+{
+	id root = self;
+	while ([root parent] != nil)
+	{
+		root = [root parent];
+	}
+	return root;
+}
 - (void)setParent:(OutlineItem *)p
 {
 	[self willChangeValueForProperty: @"parent"];

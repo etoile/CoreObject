@@ -34,4 +34,6 @@
 - (void)undo:(id)sender;
 - (void)redo:(id)sender;
 
+- (OutlineController*)controllerForDocumentRootObject: (COObject*)rootObject;
+
 @end

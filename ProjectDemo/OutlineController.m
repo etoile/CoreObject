@@ -70,8 +70,10 @@
 - (void)windowDidLoad
 {
 	[outlineView registerForDraggedTypes:
-	 [NSArray arrayWithObject:@"org.etoile.outlineItem"]];
+		[NSArray arrayWithObject:@"org.etoile.outlineItem"]];
 	[outlineView setDelegate: self];
+	[outlineView setTarget: self];
+	[outlineView setDoubleAction: @selector(doubleClick:)];
 	
 	if ([doc documentName])
 	{
@@ -249,6 +251,54 @@ static int i = 0;
 	[self shiftLeft: sender];
 }
 
+/* NSOutlineView Target/Action */
+
+- (void)doubleClick: (id)sender
+{
+	if (sender == outlineView)
+	{
+		id item = [self selectedItem];
+		if ([item isKindOfClass: [ItemReference class]])
+		{
+			// User double clicked on an item reference / link
+			// so order-front the link target's document window and select it.
+			id target = [item referencedItem];
+			
+			id root = [target root];
+			OutlineController *otherController = [[[NSApplication sharedApplication] delegate]
+												  controllerForDocumentRootObject: root];
+			assert(otherController != nil);
+			
+			// FIXME: ugly
+			
+			[[otherController window] makeKeyAndOrderFront: nil];
+			[otherController->outlineView expandItem: nil expandChildren: YES];
+			[otherController->outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex:[otherController->outlineView rowForItem: target]]
+					 byExtendingSelection: NO];
+		}
+		else if ([item isKindOfClass: [OutlineItem class]])
+		{
+			// setting a double action on an outline view seems to break normal editing
+			// so we hack it in here.
+			
+			[outlineView editColumn: 0
+								row: [outlineView selectedRow]
+						  withEvent: nil
+							 select: YES];
+		}
+	}
+}
+
+/* NSOutlineView delegate */
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+	if ([item isKindOfClass: [OutlineItem class]])
+	{
+		return YES;
+	}
+	return NO;
+}
 
 /* NSOutlineView data source */
 

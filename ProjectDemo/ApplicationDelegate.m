@@ -132,6 +132,18 @@
 }
 
 
+- (OutlineController*)controllerForDocumentRootObject: (COObject*)rootObject;
+{
+	for (Document *doc in [project documents])
+	{
+		if ([[[doc rootObject] uuid] isEqual: [rootObject uuid]])
+		{
+			return [controllerForDocumentUUID objectForKey: [doc uuid]];
+		}
+	}
+	return nil;
+}
+
 /* Project delegate */
 
 - (void)projectDocumentsDidChange: (Project*)p

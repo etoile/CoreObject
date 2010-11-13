@@ -14,6 +14,8 @@
 - (OutlineItem*)parent;
 - (void)setParent:(OutlineItem *)p;
 
+- (OutlineItem*)root;
+
 - (NSArray *)contents;
 - (NSArray *)allContents;
 
