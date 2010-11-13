@@ -86,6 +86,7 @@
 		66C33D69128F158600E5B15B /* COHistoryTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C33D67128F158600E5B15B /* COHistoryTrack.h */; };
 		66C33D6A128F158600E5B15B /* COHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D68128F158600E5B15B /* COHistoryTrack.m */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
+		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A8128A48DF00EC0255 /* edit-redo.tiff */; };
 		79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A9128A48DF00EC0255 /* edit-undo.tiff */; };
 		79F122B1128A49FE00EC0255 /* history.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122B0128A49FE00EC0255 /* history.tiff */; };
@@ -831,6 +832,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66C33D90128F449400E5B15B /* ItemReference.m in Sources */,
 				6686C046125CF9E70065DE1A /* CONetworkPeer.m in Sources */,
 				6686B80F125513D80065DE1A /* OutlineItem.m in Sources */,
 				6686B810125513D80065DE1A /* DrawingItem.m in Sources */,

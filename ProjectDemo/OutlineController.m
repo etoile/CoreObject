@@ -1,5 +1,6 @@
 #import "OutlineController.h"
 #import "SharingController.h"
+#import "ItemReference.h"
 
 @implementation OutlineController
 
@@ -150,14 +151,17 @@ static int i = 0;
 {
 	OutlineItem *dest = [self selectedItem];
 	
-	OutlineItem *item = [self newItem];
-	[dest addItem: item];
-	
-	[outlineView expandItem: dest];
-	
-	[self commitWithType: kCOTypeMinorEdit
-		shortDescription: @"Add Child Item"
-		 longDescription: [NSString stringWithFormat: @"Add child item %@ to %@", [item label], [dest label]]];
+	if ([dest isKindOfClass: [OutlineItem class]])
+	{
+		OutlineItem *item = [self newItem];
+		[dest addItem: item];
+		
+		[outlineView expandItem: dest];
+		
+		[self commitWithType: kCOTypeMinorEdit
+			shortDescription: @"Add Child Item"
+			 longDescription: [NSString stringWithFormat: @"Add child item %@ to %@", [item label], [dest label]]];
+	}
 }
 
 - (IBAction) shiftLeft: (id)sender
@@ -253,34 +257,54 @@ static int i = 0;
 
 - (BOOL) outlineView: (NSOutlineView *)outlineView isItemExpandable: (id)item
 {
-	if (nil == item) { item = [self rootObject]; }
-	return [[item contents] count] > 0;
+	return [self outlineView: outlineView numberOfChildrenOfItem: item] > 0;
 }
 
 - (NSInteger) outlineView: (NSOutlineView *)outlineView numberOfChildrenOfItem: (id)item
 {
 	if (nil == item) { item = [self rootObject]; }
-	return [[item contents] count];
+	if ([item isKindOfClass: [OutlineItem class]])
+	{
+		return [[item contents] count];
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 - (id) outlineView: (NSOutlineView *)outlineView objectValueForTableColumn: (NSTableColumn *)column byItem: (id)item
 {
 	if (nil == item) { item = [self rootObject]; }
-	return [item label];
+	if ([item isKindOfClass: [OutlineItem class]])
+	{
+		return [item label];
+	}
+	else if ([item isKindOfClass: [ItemReference class]])
+	{
+		return [NSString stringWithFormat: @"Link to %@", [[item referencedItem] uuid]];
+	}
+	else
+	{
+		return nil;
+	}
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
 	if (nil == item) { item = [self rootObject]; }
+
+	if ([item isKindOfClass: [OutlineItem class]])
+	{
+		NSString *oldLabel = [[item label] retain];
+		[item setLabel: object];
 	
-	NSString *oldLabel = [[item label] retain];
-	[item setLabel: object];
+		[self commitWithType: kCOTypeMinorEdit
+			shortDescription: @"Edit Label"
+			 longDescription: [NSString stringWithFormat: @"Edit label from %@ to %@", oldLabel, [item label]]];
 	
-	[self commitWithType: kCOTypeMinorEdit
-		shortDescription: @"Edit Label"
-		 longDescription: [NSString stringWithFormat: @"Edit label from %@ to %@", oldLabel, [item label]]];
-	
-	[oldLabel release];
+		[oldLabel release];
+	}
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pb
@@ -317,7 +341,6 @@ static int i = 0;
 			}
 		}
 	}
-	
 	return NSDragOperationPrivate;
 }
 
@@ -334,6 +357,31 @@ static int i = 0;
 	for (NSPasteboardItem *pbItem in [[info draggingPasteboard] pasteboardItems])
 	{
 		[outlineItems addObject: (OutlineItem*)[[[pbItem propertyListForType: @"org.etoile.outlineItem"] valueForKey:@"outlineItemPointer"] integerValue]];
+	}
+	
+	
+	/* Make a link if the user is holding control */
+	
+	if ([info draggingSourceOperationMask] == NSDragOperationLink &&
+		![[outlineItems objectAtIndex: 0] isKindOfClass: [ItemReference class]]) // Don't make links to link objects
+	{
+		OutlineItem *itemToLinkTo = [outlineItems objectAtIndex: 0];
+		
+		if (insertionIndex == -1) { insertionIndex = [[newParent contents] count]; }
+		
+		ItemReference *ref = [[ItemReference alloc] initWithParent: newParent
+													referencedItem: itemToLinkTo
+														   context: [[self rootObject] objectContext]];
+		[ref autorelease];
+		
+		[newParent addItem: ref 
+				   atIndex: insertionIndex]; 
+		
+		[self commitWithType: kCOTypeMinorEdit
+			shortDescription: @"Drop Link"
+			 longDescription: [NSString stringWithFormat: @"Drop Link to %@ on %@", [itemToLinkTo label], [newParent label]]];
+		
+		return;
 	}
 	
 	// Here we only work on the model.
