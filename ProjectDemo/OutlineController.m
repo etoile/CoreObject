@@ -251,6 +251,34 @@ static int i = 0;
 	[self shiftLeft: sender];
 }
 
+- (void)deleteForward:(id)sender
+{
+	id itemToDelete = [self selectedItem];
+	if (itemToDelete != nil && itemToDelete != [self rootObject])
+	{
+		NSInteger index = [[[itemToDelete parent] contents] indexOfObject: itemToDelete];
+		assert(index != NSNotFound);
+		NSString *label = [[itemToDelete label] retain];
+		[[itemToDelete parent] removeItemAtIndex: index];
+		
+		[self commitWithType: kCOTypeMinorEdit
+			shortDescription: @"Delete Item"
+			 longDescription: [NSString stringWithFormat: @"Delete Item %@", label]];
+
+		[label release];
+	}
+}
+
+- (void)delete:(id)sender
+{
+	[self deleteForward: sender];
+}
+
+- (void)keyDown:(NSEvent *)theEvent
+{
+	[self interpretKeyEvents: [NSArray arrayWithObject:theEvent]];
+}
+
 /* NSOutlineView Target/Action */
 
 - (void)doubleClick: (id)sender
