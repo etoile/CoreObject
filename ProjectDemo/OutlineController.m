@@ -75,6 +75,26 @@
 	[outlineView setTarget: self];
 	[outlineView setDoubleAction: @selector(doubleClick:)];
 	
+	//NSLog(@"Got rect %@ for doc %@", NSStringFromRect([doc screenRectValue]), [doc uuid]);
+	
+	if (!NSIsEmptyRect([doc screenRectValue]))
+	{
+		// Disable automatic positioning
+		[self setShouldCascadeWindows: NO];
+		[[self window] setFrame: [doc screenRectValue] display: NO];		
+	}
+
+	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(windowFrameDidChange:)
+												 name: NSWindowDidMoveNotification 
+											   object: [self window]];
+	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(windowFrameDidChange:)
+												 name: NSWindowDidEndLiveResizeNotification 
+											   object: [self window]];	
+	
 	if ([doc documentName])
 	{
 		NSString *title;
@@ -102,6 +122,18 @@
 			}
 		}
 	}
+}
+
+- (void)windowFrameDidChange:(NSNotification*)notification
+{
+	[doc setScreenRectValue: [[self window] frame]];
+	
+	assert([[doc objectContext] objectHasChanges: [doc uuid]]);
+	assert([[doc valueForProperty: @"screenRect"] isEqual: NSStringFromRect([[self window] frame])]);
+	
+	[self commitWithType: kCOTypeMinorEdit
+		shortDescription: @"Move Window"
+		 longDescription: [NSString stringWithFormat: @"Move to %@", NSStringFromRect([doc screenRectValue])]];	
 }
 
 - (void)windowWillClose:(NSNotification *)notification

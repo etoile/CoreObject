@@ -14,6 +14,9 @@
 	NSString *documentName;
 }
 
+- (NSRect) screenRectValue;
+- (void) setScreenRectValue:(NSRect)r;
+
 - (BOOL) isOpen;
 - (void) setIsOpen:(BOOL)i;
 - (NSString*) documentType;

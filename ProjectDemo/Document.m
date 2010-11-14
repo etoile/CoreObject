@@ -50,13 +50,16 @@
 	}
 }
 
-- (NSRect) myRect
+- (NSRect) screenRectValue
 {
+	[self willAccessValueForProperty: @"screenRect"]; // FIXME: shouldn't need, valueForProperty: is broken
 	return NSRectFromString([self valueForProperty:@"screenRect"]);
 }
-- (void) setMyRect:(NSRect)r
+- (void) setScreenRectValue:(NSRect)r
 {
+	[self willChangeValueForProperty: @"screenRect"]; // FIXME: shouldn't need; setValue:forProperty: is broken
 	[self setValue: NSStringFromRect(r) forProperty:@"screenRect"];
+	[self didChangeValueForProperty: @"screenRect"]; // FIXME: shouldn't need; setValue:forProperty: is broken
 }
 
 - (BOOL) isOpen
