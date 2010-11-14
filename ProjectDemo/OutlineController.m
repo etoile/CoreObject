@@ -398,7 +398,7 @@ static int i = 0;
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
 {
-	if (![item isKindOfClass: [OutlineItem class]])
+	if (item != nil && ![item isKindOfClass: [OutlineItem class]])
 	{
 		return NSDragOperationNone;
 	}
