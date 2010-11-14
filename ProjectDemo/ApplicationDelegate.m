@@ -49,6 +49,11 @@
 	return context;
 }
 
+- (HistoryInspectorController*)historyController
+{
+	return historyController;
+}
+
 - (void)dealloc
 {
 	[project release];

@@ -236,7 +236,7 @@ static int i = 0;
 }
 - (IBAction) history: (id)sender
 {
-	NSLog(@"History");	
+	[[[NSApp delegate] historyController] showHistoryForDocument: doc];
 }
 
 /* NSResponder */

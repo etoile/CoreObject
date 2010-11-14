@@ -136,5 +136,17 @@ static void collectNodes(COHistoryNode *node, NSMutableArray *collection)
 			longDescription: [NSString stringWithFormat: @"Undo changes made in revision %@", [[selected uuid] stringValue]]];
 }
 
+- (IBAction)showProjectHistory: (id)sender
+{
+	[historyInspectorWindow makeKeyAndOrderFront: nil];
+	[historyInspectorWindow setTitle: @"Project History"];
+}
+
+- (void)showHistoryForDocument: (Document*)aDocument
+{
+	[historyInspectorWindow makeKeyAndOrderFront: nil];	
+	[historyInspectorWindow setTitle: 
+	 [NSString stringWithFormat: @"Document %@ History", [aDocument uuid]]];
+}
 
 @end

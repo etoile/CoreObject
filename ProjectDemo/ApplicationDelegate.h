@@ -22,6 +22,7 @@
 }
 
 - (COEditingContext*)editingContext;
+- (HistoryInspectorController*)historyController;
 
 - (IBAction) newTextDocument: (id)sender;
 - (IBAction) newOutline: (id)sender;

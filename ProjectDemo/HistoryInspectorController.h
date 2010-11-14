@@ -1,5 +1,6 @@
 #import <Cocoa/Cocoa.h>
 #import "COEditingContext.h"
+#import "Document.h"
 
 @interface HistoryInspectorController : NSObject
 {
@@ -13,5 +14,9 @@
 
 - (IBAction)revertTo: (id)sender;
 - (IBAction)selectiveUndo: (id)sender;
+
+- (IBAction)showProjectHistory: (id)sender;
+
+- (void)showHistoryForDocument: (Document*)aDocument;
 
 @end
