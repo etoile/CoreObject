@@ -121,6 +121,32 @@ static NSArray *ArrayWithCommitsForUUIDs(COStoreCoordinator *store, NSArray *uui
 @end
 
 
+@implementation COCommit (Factory)
+
++ (COCommit*)commitWithStoreCoordinator: (COStoreCoordinator*)sc
+{
+	return [[[COCommit alloc] initWithUUID: [ETUUID UUID]
+						  storeCoordinator: sc
+								properties: [NSDictionary dictionary]
+			 parentNodeUUIDsForObjectUUIDs: [NSDictionary dictionary]
+			  childNodeUUIDsForObjectUUIDs: [NSDictionary dictionary]
+				 uuidToObjectVersionMaping: [NSDictionary dictionary]] autorelease];
+}
+
+- (void)  addObjectUUID: (ETUUID*)uuid
+		  objectVersion: (NSData*)version
+           parentCommit: (COCommit*)parent
+additionalParentCommits: (NSArray*)additionalParents
+{
+	[_objectUUIDToObjectVersionMaping setObject: version forKey: uuid];
+
+	NSMutableArray *parents = [NSMutableArray arrayWithObject: [parent commitUUID]];
+	[parent addObjectsFromArray: [[additionalParents mappedCollection] commitUUID]]];
+	[_parentNodeUUIDsForObjectUUID setObject: parents forKey: uuid];
+}
+
+@end
+
 
 // FIXME: this code is a bit of a mess
 

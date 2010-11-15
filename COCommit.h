@@ -27,9 +27,10 @@ extern const NSString *kCOTypeCreateBranch;
 extern const NSString *kCOTypeHidden;
 
 /**
- * We store separate history graphs for each CoreObject.
+ * A COCommit is a batch of changes to one or more object history graphs
  *
- * A COCommit is a batch of changes to one or more of these object history graphs.
+ * The persistent COCommit objects form the per-object history graphs - other
+ * history graphs must be synthesized from these primitive per-object graphs.
  */
 @interface COCommit : NSObject
 {
@@ -83,6 +84,28 @@ extern const NSString *kCOTypeHidden;
 
 @end
 
+
+// FIXME: Not sure if this is wanted.
+@interface COCommit (Factory)
+
+/**
+ * Creates and returns a new, empty commit object.
+ */
++ (COCommit*)commitWithStoreCoordinator: (COStoreCoordinator*)sc;
+
+/**
+ * Adds to the receiver changes to one object.
+ * additionalParents may be empty; it is used to indicate merged parents.
+ *
+ * Note: currently, the caller must update the child dictionaries of commits
+ * referenced in parent and additionalParents
+ */
+- (void)  addObjectUUID: (ETUUID*)uuid
+		  objectVersion: (NSData*)version
+           parentCommit: (COCommit*)parent
+additionalParentCommits: (NSArray*)additionalParents;
+
+@end
 
 
 @interface COCommit (Private)
