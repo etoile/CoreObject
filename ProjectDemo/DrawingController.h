@@ -1,8 +1,10 @@
 #import <Cocoa/Cocoa.h>
+#import "Document.h"
 
 @interface DrawingController : NSWindowController
 {
-	IBOutlet NSView *outlineView;
+	Document *doc; // weak ref
+	BOOL isSharing;
 }
 
 @end

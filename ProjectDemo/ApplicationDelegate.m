@@ -1,6 +1,8 @@
 #import "ApplicationDelegate.h"
 #import "OutlineItem.h"
 #import "OutlineController.h"
+#import "DrawingController.h"
+#import "TextController.h"
 #import "Document.h"
 #import "HistoryInspectorController.h"
 #import "SharingServer.h"
@@ -61,29 +63,36 @@
 	[super dealloc];
 }
 
-- (IBAction) newTextDocument: (id)sender
+- (void) newDocumentWithType: (NSString*)type rootObject: (COObject*)rootObj
 {
-	
-}
-- (IBAction) newOutline: (id)sender
-{
-	OutlineItem *outlineItem = [[[OutlineItem alloc] initWithContext: context] autorelease];
-	
 	Document *document = [[[Document alloc] initWithContext: context] autorelease];
-	[document setRootObject: outlineItem];
+	[document setRootObject: rootObj];
 	[document setDocumentName: [NSString stringWithFormat: @"Document %@", [[document uuid] stringValue]]];
+	[document setDocumentType: type];
 	
 	[project addDocument: document];
 	
-	NSLog(@"Added a document model object %@, outline item %@", document, outlineItem);
+	NSLog(@"Added a document model object %@, outline item %@", document, rootObj);
 	NSLog(@"Changed objects %@", [context changedObjects]);
 	[context commit];
 	
 	[newDocumentTypeWindow orderOut: nil];
 }
+
+- (IBAction) newTextDocument: (id)sender
+{
+	[self newDocumentWithType: @"text"
+				   rootObject: nil];	
+}
+- (IBAction) newOutline: (id)sender
+{
+	[self newDocumentWithType: @"outline"
+				   rootObject: [[[OutlineItem alloc] initWithContext: context] autorelease]];
+}
 - (IBAction) newDrawing: (id)sender
 {
-	
+	[self newDocumentWithType: @"drawing"
+				   rootObject: nil];
 }
 
 /* Convenience */
@@ -155,6 +164,16 @@
 {
 	NSLog(@"projectDocumentsDidChange: called, loading %d documents", (int)[[p documents] count]);
 	
+	static NSDictionary *classForType;
+	if (classForType == nil)
+	{
+		classForType = [[NSDictionary alloc] initWithObjectsAndKeys:
+			[OutlineController class], @"outline",
+			[DrawingController class], @"drawing",
+			[TextController class], @"text",
+			nil];
+	}
+	
 	NSMutableSet *unwantedDocumentUUIDs = [NSMutableSet setWithArray:
 										   [controllerForDocumentUUID allKeys]];
 	
@@ -165,8 +184,11 @@
 		OutlineController *controller = [controllerForDocumentUUID objectForKey: [doc uuid]];
 		if (controller == nil)
 		{
+			Class cls = [classForType objectForKey: [doc documentType]];
+			assert(cls != Nil);
+			
 			// Create a new document controller
-			controller = [[[OutlineController alloc] initWithDocument: doc] autorelease];
+			controller = [[[cls alloc] initWithDocument: doc] autorelease];
 			[controller showWindow: nil];
 			[controllerForDocumentUUID setObject: controller forKey: [doc uuid]];
 		}
