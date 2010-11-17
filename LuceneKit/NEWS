@@ -1,0 +1,17 @@
+LuceneKit NEWS
+==============
+
+Note: LuceneKit was not part of Etoile 0.2 release.
+
+
+0.1.1 (Etoile 0.4)
+------------------
+
+- PCREParser supported as an alternative to OgreKit (Manuel Guesdon)
+- Many memory leaks fixes (Manuel Guesdon)
+
+
+0.1 (Etoile 0.1)
+----------------
+
+- First release.

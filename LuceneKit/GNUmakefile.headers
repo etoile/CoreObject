@@ -1,0 +1,184 @@
+# Install headers
+
+LuceneKit_HEADER_FILES_DIR = ./LuceneKit
+LuceneKit_HEADER_FILES_INSTALL_DIR = LuceneKit
+LuceneKit_HEADER_FILES = \
+	LuceneKit.h \
+	LCIndexManager.h \
+	LCMetadataAttribute.h
+
+# Headers/Java
+LuceneKit_HEADER_FILES += \
+	Java.h \
+	LCReader.h \
+	LCStringReader.h
+
+# Headers/Util
+LuceneKit_HEADER_FILES += \
+	Util.h \
+	LCSmallFloat.h \
+	LCBitVector.h \
+	LCPriorityQueue.h \
+	NSString+Additions.h \
+	NSData+Additions.h
+
+# Headers/Store
+LuceneKit_HEADER_FILES += \
+	Store.h \
+	LCDirectory.h \
+	LCFSDirectory.h \
+	LCFSIndexInput.h \
+	LCFSIndexOutput.h \
+	LCIndexInput.h \
+	LCIndexOutput.h \
+	LCRAMDirectory.h \
+	LCRAMFile.h \
+	LCRAMInputStream.h \
+	LCRAMOutputStream.h
+
+# Headers/Document
+LuceneKit_HEADER_FILES += \
+	Document.h \
+	LCDateTools.h \
+	LCDocument.h \
+	LCField.h \
+	LCNumberTools.h
+
+# Headers/Analysis
+LuceneKit_HEADER_FILES += \
+	Analysis.h \
+	LCStopAnalyzer.h \
+	LCStopFilter.h \
+	LCAnalyzer.h \
+	LCToken.h \
+	LCCharTokenizer.h \
+	LCTokenFilter.h \
+	LCLetterTokenizer.h \
+	LCTokenStream.h \
+	LCLowerCaseFilter.h \
+	LCTokenizer.h \
+	LCLowerCaseTokenizer.h \
+	LCWhitespaceAnalyzer.h \
+	LCPerFieldAnalyzerWrapper.h \
+	LCWhitespaceTokenizer.h \
+	LCPorterStemFilter.h \
+	LCWordlistLoader.h \
+	LCSimpleAnalyzer.h \
+	PorterStemmer.h
+
+# Headers/Index
+LuceneKit_HEADER_FILES += \
+	Index.h \
+	LCCompoundFileReader.h \
+	LCCompoundFileWriter.h \
+	LCDocumentWriter.h \
+	LCFieldInfo.h \
+	LCFieldInfos.h \
+	LCFieldsReader.h \
+	LCFieldsWriter.h \
+	LCFilterIndexReader.h \
+	LCIndexModifier.h \
+	LCIndexReader.h \
+	LCIndexWriter.h \
+	LCMultiReader.h \
+	LCMultipleTermPositions.h \
+	LCSegmentInfo.h \
+	LCSegmentInfos.h \
+	LCSegmentMergeInfo.h \
+	LCSegmentMergeQueue.h \
+	LCSegmentMerger.h \
+	LCSegmentReader.h \
+	LCSegmentTermDocs.h \
+	LCSegmentTermEnum.h \
+	LCSegmentTermPositionVector.h \
+	LCSegmentTermPositions.h \
+	LCSegmentTermVector.h \
+	LCTerm.h \
+	LCTermBuffer.h \
+	LCTermDocs.h \
+	LCTermEnum.h \
+	LCTermFreqVector.h \
+	LCTermInfo.h \
+	LCTermInfosReader.h \
+	LCTermInfosWriter.h \
+	LCTermPositionVector.h \
+	LCTermPositions.h \
+	LCTermVectorOffsetInfo.h \
+	LCTermVectorsReader.h \
+	LCTermVectorsWriter.h
+
+# Headers/Search
+LuceneKit_HEADER_FILES += \
+	Search.h \
+	LCBooleanClause.h \
+	LCBooleanQuery.h \
+	LCBooleanScorer.h \
+	LCCachingWrapperFilter.h \
+	LCConjunctionScorer.h \
+	LCDateFilter.h \
+	LCDefaultSimilarity.h \
+	LCDisjunctionSumScorer.h \
+	LCExactPhraseScorer.h \
+	LCExplanation.h \
+	LCFieldCache.h \
+	LCFieldCacheImpl.h \
+	LCFieldDoc.h \
+	LCFieldDocSortedHitQueue.h \
+	LCFieldSortedHitQueue.h \
+	LCFilter.h \
+	LCFilteredQuery.h \
+	LCFilteredTermEnum.h \
+	LCFuzzyQuery.h \
+	LCFuzzyTermEnum.h \
+	LCHit.h \
+	LCHitCollector.h \
+	LCHitIterator.h \
+	LCHitQueue.h \
+	LCHits.h \
+	LCIndexSearcher.h \
+	LCMultiPhraseQuery.h \
+	LCMultiSearcher.h \
+	LCMultiTermQuery.h \
+	LCNonMatchingScorer.h \
+	LCPrefixQuery.h \
+	LCPhrasePositions.h \
+	LCPhrasePrefixQuery.h \
+	LCPhraseQuery.h \
+	LCPhraseQueue.h \
+	LCPhraseScorer.h \
+	LCQuery.h \
+	LCQueryFilter.h \
+	LCQueryTermVector.h \
+	LCRangeFilter.h \
+	LCRangeQuery.h \
+	LCReqExclScorer.h \
+	LCReqOptSumScorer.h \
+	LCScoreDoc.h \
+	LCScoreDocComparator.h \
+	LCScorer.h \
+	LCSearchable.h \
+	LCSearcher.h \
+	LCSimilarity.h \
+	LCSimilarityDelegator.h \
+	LCSort.h \
+	LCSortComparator.h \
+	LCSortComparatorSource.h \
+	LCSortField.h \
+	LCTermQuery.h \
+	LCTermScorer.h \
+	LCTopDocCollector.h \
+	LCTopDocs.h \
+	LCTopFieldDocCollector.h \
+	LCTopFieldDocs.h \
+	LCWeight.h \
+	LCWildcardQuery.h \
+	LCWildcardTermEnum.h
+
+# Headers/QueryParser
+LuceneKit_HEADER_FILES += \
+	QueryParser.h \
+	LCQueryParser.h
+
+# Headers/GNUstep
+LuceneKit_HEADER_FILES += \
+	GNUstep.h 
