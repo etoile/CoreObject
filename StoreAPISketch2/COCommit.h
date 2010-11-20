@@ -1,11 +1,12 @@
 #import <EtoileFoundation/EtoileFoundation.h>
+#import "CONamedBranch.h"
 
 @class COStore;
-
 
 @interface COCommit : NSObject
 {
 	COStore *store;
+	ETUUID *uuid;
 }
 
 - (ETUUID*)UUID;
@@ -14,11 +15,11 @@
 
 - (NSArray*)changedObjects;
 
-- (ETUUID*)namedBranchForObject: (ETUUID*)object;
+- (CONamedBranch*)namedBranchForObject: (ETUUID*)object;
 
-- (ETUUID*)parentCommitForObject: (ETUUID*)object;
+- (COCommit*)parentCommitForObject: (ETUUID*)object;
 
-- (ETUUID*)mergedCommitForObject: (ETUUID*)object;
+- (COCommit*)mergedCommitForObject: (ETUUID*)object;
 
 - (NSArray*)childCommitsForObject: (ETUUID*)object;
 

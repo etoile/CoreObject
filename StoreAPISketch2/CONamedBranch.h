@@ -5,7 +5,10 @@
 @interface CONamedBranch : NSObject
 {
 	COStore *store;
+	ETUUID *uuid;
 }
+
+- (id)initWithStore: (COStore*)aStore uuid: (ETUUID*)aUUID;
 
 - (ETUUID*)UUID;
 

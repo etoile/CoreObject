@@ -9,6 +9,11 @@
 @package
 	FMDatabase *db;
 	NSURL *url;
+	NSMutableDictionary *commitObjectForUUID;
+	NSMutableDictionary *branchObjectForUUID;
+	
+	ETUUID *commitInProgress;
+	ETUUID *objectInProgress;
 }
 
 - (id)initWithURL: (NSURL*)aURL;
@@ -24,9 +29,10 @@
 - (void)beginCommitWithMetadata: (NSDictionary*)meta;
 
 - (void)beginChangesForObject: (ETUUID*)object
-				onNamedBranch: (ETUUID*)namedBranch
-				 parentCommit: (ETUUID*)parent
-				 mergedCommit: (ETUUID*)mergedBranch;
+				onNamedBranch: (CONamedBranch*)namedBranch
+			updateObjectState: (BOOL)updateState
+				 parentCommit: (COCommit*)parent
+				 mergedCommit: (COCommit*)mergedBranch;
 
 - (void)setValue: (id)value
 	 forProperty: (NSString*)property
@@ -41,8 +47,24 @@
 
 - (COCommit*)commitForUUID: (ETUUID*)aCommit;
 
+/* Object State */
+
+- (CONamedBranch*)activeBranchForObjectUUID: (ETUUID*)object;
+- (void)setActiveBranch: (CONamedBranch*)branch forObjectUUID: (ETUUID*)object;
+- (COCommit*)currentCommitForObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch;
+- (BOOL)setCurrentCommit: (COCommit*)commit forObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch;
+- (COCommit*)tipForObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch;
+
 /* Full-text Search */
 
 - (NSArray*)resultDictionariesForQuery: (NSString*)query;
+
+/* Private */
+
+- (BOOL)setupDB;
+- (NSNumber*)keyForUUID: (ETUUID*)uuid;
+- (ETUUID*)UUIDForKey: (int64_t)key;
+- (NSNumber*)keyForProperty: (NSString*)property;
+- (NSString*)propertyForKey: (int64_t)key;
 
 @end

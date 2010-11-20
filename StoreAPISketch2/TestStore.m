@@ -5,7 +5,7 @@
 
 static COStore *SetUpStore()
 {
-	NSURL *url = [NSURL fileURLWithPath: [@"~/TestStore" stringByExpandingTildeInPath]];
+	NSURL *url = [NSURL fileURLWithPath: [@"~/TestStore.sqlitedb" stringByExpandingTildeInPath]];
 	
 	if([[NSFileManager defaultManager] fileExistsAtPath: [url path]])
 	{
@@ -41,7 +41,7 @@ static void TearDownStore(COStore *s)
 	[b setName: @"My Branch"];
 	UKStringsEqual(@"My Branch", [b name]);
 	
-	UKObjectsEqual([s namedBranchForUUID: [b UUID]], b);
+	UKObjectsEqual(b, [s namedBranchForUUID: [b UUID]]);
 	
 	[b setMetadata: [NSDictionary dictionaryWithObject:[NSNumber numberWithBool: YES] forKey:@"metadataWorks"]];
 	UKObjectsEqual([NSNumber numberWithBool: YES], [[b metadata] objectForKey: @"metadataWorks"]);
@@ -60,6 +60,7 @@ static void TearDownStore(COStore *s)
 	[s beginCommitWithMetadata: sampleMetadata];
 	[s beginChangesForObject: o1
 			   onNamedBranch: nil
+		   updateObjectState: YES
 				parentCommit: nil
 				mergedCommit: nil];
 	[s setValue: @"bob"
@@ -85,6 +86,142 @@ static void TearDownStore(COStore *s)
 	UKObjectsEqual([NSDictionary dictionaryWithObject: @"bob" forKey: @"name"],
 				   [c1 valuesAndPropertiesForObject: o1]);
 	
+	TearDownStore(s);
+}
+
+- (void)testFullTextSearch
+{
+	COStore *s = SetUpStore();
+	
+	ETUUID *o1 = [ETUUID UUID];
+	
+	[s beginCommitWithMetadata: nil];
+	
+	[s beginChangesForObject: o1
+			   onNamedBranch: nil
+		   updateObjectState: YES
+				parentCommit: nil
+				mergedCommit: nil];
+	[s setValue: @"ALL YOUR BASE ARE BELONG TO US"
+	forProperty: @"name"
+	   ofObject: o1
+	shouldIndex: YES];
+	
+	[s finishChangesForObject: o1];
+	COCommit *c1 = [s finishCommit];
+
+	NSArray *searchResults = [s resultDictionariesForQuery: @"belo*"];
+	UKIntsEqual(1, [searchResults count]);
+	if ([searchResults count] == 1)
+	{
+		NSDictionary *result = [searchResults objectAtIndex: 0];
+		UKObjectsEqual(@"name", [result objectForKey: @"property"]);
+		UKObjectsEqual([c1 UUID], [result objectForKey: @"commitUUID"]);
+		UKObjectsEqual(o1, [result objectForKey: @"objectUUID"]);
+	}
+	TearDownStore(s);
+}
+
+- (void)testCommitWithNoChanges
+{
+	COStore *s = SetUpStore();
+	
+	ETUUID *o1 = [ETUUID UUID];
+	
+	[s beginCommitWithMetadata: nil];
+	[s beginChangesForObject: o1
+			   onNamedBranch: nil
+		   updateObjectState: YES
+				parentCommit: nil
+				mergedCommit: nil];	
+	[s finishChangesForObject: o1];
+	COCommit *c1 = [s finishCommit];
+	UKNotNil(c1);
+	
+	TearDownStore(s);
+}
+
+- (void)testHistoryGraphBasic
+{
+	COStore *s = SetUpStore();
+	
+	ETUUID *o1 = [ETUUID UUID];
+	
+	[s beginCommitWithMetadata: nil];
+	[s beginChangesForObject: o1
+			   onNamedBranch: nil
+		   updateObjectState: YES
+				parentCommit: nil
+				mergedCommit: nil];	
+	[s setValue: @"bob"
+	forProperty: @"name"
+	   ofObject: o1
+	shouldIndex: NO];	
+	[s finishChangesForObject: o1];
+	COCommit *c1 = [s finishCommit];
+	
+	[s beginCommitWithMetadata: nil];
+	[s beginChangesForObject: o1
+			   onNamedBranch: nil
+		   updateObjectState: YES
+				parentCommit: c1
+				mergedCommit: nil];
+	[s setValue: @"bob"
+	forProperty: @"name"
+	   ofObject: o1
+	shouldIndex: NO];	
+	[s finishChangesForObject: o1];
+	COCommit *c2 = [s finishCommit];
+	
+	COCommit *c = [c2 parentCommitForObject: o1];
+	COCommit *csame = [c2 parentCommitForObject: o1];
+	UKNotNil(c);
+	UKObjectsEqual(c1, c);
+	UKObjectsEqual(c, csame);
+	
+	TearDownStore(s);
+}
+
+- (void)testObjectState
+{
+	COStore *s = SetUpStore();
+
+	ETUUID *o1 = [ETUUID UUID];
+	
+	UKNil([s currentCommitForObjectUUID:o1 onBranch:nil]);	
+	
+	[s beginCommitWithMetadata: nil];
+	[s beginChangesForObject: o1
+			   onNamedBranch: nil
+		   updateObjectState: YES
+				parentCommit: nil
+				mergedCommit: nil];
+	[s setValue: @"bob"
+	forProperty: @"name"
+	   ofObject: o1
+	shouldIndex: NO];
+	[s finishChangesForObject: o1];
+	COCommit *c1 = [s finishCommit];
+	UKNotNil(c1);
+	UKNotNil([s currentCommitForObjectUUID:o1 onBranch:nil]);
+	UKObjectsEqual(c1, [s currentCommitForObjectUUID:o1 onBranch:nil]);
+	UKObjectsEqual(c1, [s tipForObjectUUID:o1 onBranch:nil]);
+	
+	[s beginCommitWithMetadata: nil];
+	[s beginChangesForObject: o1
+			   onNamedBranch: nil
+		   updateObjectState: YES
+				parentCommit: nil
+				mergedCommit: nil];
+	[s setValue: @"bob"
+	forProperty: @"name"
+	   ofObject: o1
+	shouldIndex: NO];	
+	[s finishChangesForObject: o1];
+	COCommit *c2 = [s finishCommit];
+	UKNotNil(c2);
+	UKObjectsEqual(c2, [s currentCommitForObjectUUID:o1 onBranch:nil]);
+	UKObjectsEqual(c2, [s tipForObjectUUID:o1 onBranch:nil]);
 	TearDownStore(s);
 }
 
