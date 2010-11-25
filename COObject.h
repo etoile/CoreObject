@@ -25,6 +25,7 @@
 	BOOL _isDamaged;
 	BOOL _isIgnoringDamageNotifications;
 	BOOL _isIgnoringRelationshipConsistency;
+	BOOL _inDescription; // FIXME: remove; only for debugging
 }
 
 /* Attributes */

@@ -235,77 +235,95 @@
 	{
 		ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
 		assert(desc != nil);
-		if ([desc isContainer])
+		
+		if ([desc opposite] != nil)
 		{
 			NSString *oppositeName = [[desc opposite] name];
-			COObject *oldContainer = [self valueForProperty: key];
-			COObject *newContainer = value;
-			
-			//BOOL oldWasIgnoring = [oldContainer isIgnoringRelationshipConsistency];
-			//BOOL newWasIgnoring = [newContainer isIgnoringRelationshipConsistency];
-			[oldContainer setIgnoringRelationshipConsistency: YES];
-			[newContainer setIgnoringRelationshipConsistency: YES];			
-			
-			[oldContainer removeObject: self forProperty: oppositeName];
-			[newContainer addObject: self forProperty: oppositeName];			
-			
-			[oldContainer setIgnoringRelationshipConsistency: NO];
-			[newContainer setIgnoringRelationshipConsistency: NO];	
-		}
-		else if ([desc isComposite])
-		{
-			NSString *oppositeName = [[desc opposite] name];
-			NSArray *oldObjects;
-			if ([[self valueForProperty: key] isKindOfClass: [NSArray class]])
+			if (![desc isMultivalued]) // modifying the single-valued side of a relationship
 			{
-				oldObjects = [self valueForProperty: key];
-			}
-			else if ([[self valueForProperty: key] isKindOfClass: [NSSet class]])
-			{
-				oldObjects = [[self valueForProperty: key] allObjects];
-			}			
-			else
-			{
-				if ([self valueForProperty: key] != nil)
+				COObject *oldContainer = [self valueForProperty: key];
+				COObject *newContainer = value;
+				
+				//BOOL oldWasIgnoring = [oldContainer isIgnoringRelationshipConsistency];
+				//BOOL newWasIgnoring = [newContainer isIgnoringRelationshipConsistency];
+				[oldContainer setIgnoringRelationshipConsistency: YES];
+				[newContainer setIgnoringRelationshipConsistency: YES];			
+				
+				if ([[desc opposite] isMultivalued])
 				{
-					oldObjects = [NSArray arrayWithObject: [self valueForProperty: key]];
+					[oldContainer removeObject: self forProperty: oppositeName];
+					[newContainer addObject: self forProperty: oppositeName];			
 				}
 				else
 				{
-					oldObjects = [NSArray array];
+					[oldContainer setValue: nil forProperty: oppositeName];
+					[newContainer setValue: self forProperty: oppositeName];			
 				}
-			}
 
-			NSArray *newObjects;
-			if ([value isKindOfClass: [NSSet class]])
-			{
-				newObjects = [value allObjects];
+				[oldContainer setIgnoringRelationshipConsistency: NO];
+				[newContainer setIgnoringRelationshipConsistency: NO];	
 			}
-			else if (value == nil)
+			else // modifying the multivalued side of a relationship
 			{
-				newObjects = [NSArray array];
-			}
-			else
-			{
-				newObjects = value;
-			}
-			assert([newObjects isKindOfClass: [NSArray class]]);
-			
-			for (COObject *obj in [oldObjects arrayByAddingObjectsFromArray: newObjects])
-			{
-				[obj setIgnoringRelationshipConsistency: YES];
-			}
-			for (COObject *oldObj in oldObjects)
-			{
-				[oldObj setValue: nil forProperty: oppositeName];
-			}
-			for (COObject *newObj in newObjects)
-			{
-				[newObj setValue: self forProperty: oppositeName];
-			}
-			for (COObject *obj in [oldObjects arrayByAddingObjectsFromArray: newObjects])
-			{
-				[obj setIgnoringRelationshipConsistency: NO];
+				NSArray *oldObjects;
+				if ([[self valueForProperty: key] isKindOfClass: [NSSet class]])
+				{
+					oldObjects = [[self valueForProperty: key] allObjects];
+				}			
+				else if ([self valueForProperty: key] == nil)
+				{
+					oldObjects = [NSArray array]; // Should only happen when an object is first created..
+				}
+				else
+				{
+					oldObjects = [self valueForProperty: key];
+				}
+				
+				assert([oldObjects isKindOfClass: [NSArray class]]);
+				
+				NSArray *newObjects;
+				if ([value isKindOfClass: [NSSet class]])
+				{
+					newObjects = [value allObjects];
+				}
+				else
+				{
+					newObjects = value;
+				}
+				assert([newObjects isKindOfClass: [NSArray class]]);
+				
+				for (COObject *obj in [oldObjects arrayByAddingObjectsFromArray: newObjects])
+				{
+					[obj setIgnoringRelationshipConsistency: YES];
+				}
+				
+				if ([[desc opposite] isMultivalued])
+				{
+					for (COObject *oldObj in oldObjects)
+					{
+						[oldObj removeObject: self forProperty: oppositeName];
+					}
+					for (COObject *newObj in newObjects)
+					{
+						[newObj addObject: self forProperty: oppositeName];
+					}
+				}
+				else
+				{
+					for (COObject *oldObj in oldObjects)
+					{
+						[oldObj setValue: nil forProperty: oppositeName];
+					}
+					for (COObject *newObj in newObjects)
+					{
+						[newObj setValue: self forProperty: oppositeName];
+					}	
+				}
+
+				for (COObject *obj in [oldObjects arrayByAddingObjectsFromArray: newObjects])
+				{
+					[obj setIgnoringRelationshipConsistency: NO];
+				}
 			}
 		}
 	}
@@ -335,67 +353,67 @@
 
 - (void) addObject: (id)object forProperty:(NSString*)key
 {
-	[self willChangeValueForProperty: key];
-	
 	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
 	if (![desc isMultivalued])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"attempt to call addObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
 	}
 	
-	
-	// FIXME: add safety checks
-	[[self valueForProperty: key] addObject: object];
-	
-	[self didChangeValueForProperty: key];
+	// FIXME: Modify the value directly.. this will require refactoring setValue:forProperty:
+	// so that we can run the relationship integrity code and other checks directly
+	id copy = [[self valueForProperty: key] mutableCopy];
+	assert([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]);
+	[copy addObject: object];
+	[self setValue: copy forProperty: key];
+	[copy release];
 }
 - (void) insertObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString*)key
 {
-	[self willChangeValueForProperty: key];
-	
 	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
 	if (!([desc isMultivalued] && [desc isOrdered]))
 	{
 		[NSException raise: NSInvalidArgumentException format: @"attempt to call inesrtObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
 	}
 	
-	// FIXME: add safety checks
-	[[self valueForProperty: key] insertObject: object atIndex: index];
+	// FIXME: see comment in addObject:ForProperty
 	
-	
-	[self didChangeValueForProperty: key];
+	id copy = [[self valueForProperty: key] mutableCopy];
+	assert([copy isKindOfClass: [NSMutableArray class]]);
+	[copy insertObject: object atIndex: index];
+	[self setValue: copy forProperty: key];
+	[copy release];
 }
 - (void) removeObject: (id)object forProperty:(NSString*)key
 {
-	[self willChangeValueForProperty: key];
-	
 	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
 	if (![desc isMultivalued])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"attempt to call removeObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
 	}
 	
+	// FIXME: see comment in addObject:ForProperty
 	
-	// FIXME: add safety checks
-	[[self valueForProperty: key] removeObject: object];
-	
-	[self didChangeValueForProperty: key];
+	id copy = [[self valueForProperty: key] mutableCopy];
+	assert([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]);
+	[copy removeObject: object];
+	[self setValue: copy forProperty: key];
+	[copy release];
 }
 - (void) removeObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString*)key
 {
-	[self willChangeValueForProperty: key];
-	
 	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
 	if (!([desc isMultivalued] && [desc isOrdered]))
 	{
 		[NSException raise: NSInvalidArgumentException format: @"attempt to call removeObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
 	}
 	
-	// FIXME: add safety checks
-	[[self valueForProperty: key] removeObject: object atIndex: index];
+	// FIXME: see comment in addObject:ForProperty
 	
-	
-	[self didChangeValueForProperty: key];
+	id copy = [[self valueForProperty: key] mutableCopy];
+	assert([copy isKindOfClass: [NSMutableArray class]]);
+	[copy removeObject: object atIndex: index];
+	[self setValue: copy forProperty: key];
+	[copy release];
 }
 
 - (void)willAccessValueForProperty:(NSString *)key
@@ -457,14 +475,25 @@
 
 - (NSString*) description
 {
+	if (_inDescription)
+	{
+		// If we are called recursively, don't print the contents of _variableStorage
+		// since it would result in an infinite loop.
+		return [NSString stringWithFormat: @"<Recursive reference to %@ %p UUID=%@>", NSStringFromClass([self class]), self, _uuid];
+	}
+	
+	_inDescription = YES;
+	NSString *desc;
 	if ([self isFault])
 	{
-		return [NSString stringWithFormat: @"<Faulted %@ %p UUID=%@>", NSStringFromClass([self class]), self, _uuid];  
+		desc = [NSString stringWithFormat: @"<Faulted %@ %p UUID=%@>", NSStringFromClass([self class]), self, _uuid];  
 	}
 	else
 	{
-		return [NSString stringWithFormat: @"<%@ %p UUID=%@ variableStorage=%@>", NSStringFromClass([self class]), self, _uuid, _variableStorage];  
+		desc = [NSString stringWithFormat: @"<%@ %p UUID=%@ variableStorage=%@>", NSStringFromClass([self class]), self, _uuid, _variableStorage];  
 	}
+	_inDescription = NO;
+	return desc;
 }
 
 - (BOOL)isEqual: (id)object

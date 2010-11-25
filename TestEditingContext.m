@@ -48,7 +48,7 @@ static void TearDownContext(COEditingContext *ctx)
 	UKNotNil(obj);
 	UKObjectsSame([COObject class], [obj class]);
 	
-	NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentGroup", @"parentContainers", @"contents", @"label", nil];
+	NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentGroup", @"parentCollections", @"contents", @"label", nil];
 	UKObjectsEqual([NSSet setWithArray: expectedProperties],
 				   [NSSet setWithArray: [obj properties]]);
 
@@ -79,7 +79,7 @@ static void TearDownContext(COEditingContext *ctx)
 		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 		COObject *obj = [ctx objectWithUUID: objUUID];
 		UKNotNil(obj);
-		NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentGroup", @"parentContainers", @"contents", @"label", nil];
+		NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentGroup", @"parentCollections", @"contents", @"label", nil];
 		UKObjectsEqual([NSSet setWithArray: expectedProperties],
 					   [NSSet setWithArray: [obj properties]]);
 		UKStringsEqual(@"Hello", [obj valueForProperty: @"label"]);
