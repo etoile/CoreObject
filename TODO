@@ -1,8 +1,30 @@
 To do
 =====
 
-- Figure out how to store conflicts
-- Use delta compression in the store
 - Port to GNUstep
-- Use UnitKit
-- Look into using CLucene for text indexing, maybe?
+- switch from fmdb to SQLClient
+
+Merging:
+ - move detection
+ - custom attributed string merger
+ 
+Model Objects (COObject):
+ - KVO support?
+ - relationship integrity maintainence (one-to-one, one-to-many, many-to-many)
+ - copy + paste support
+ 
+History tracks
+ - implement.
+ - UI-level normal undo/redo
+ 
+Collaboration
+ - UI-level normal undo/redo using selective undo.
+ 
+Editing Context
+ -
+ 
+ProjectDemo
+ - add XMPP
+ - add drawing support
+ - text support
+ - port to ObjectMerging2

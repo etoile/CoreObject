@@ -1,187 +1,21 @@
-Problem: Conflict handling....
-------------------------------
+Notes
+=======
 
--> in some cases we'll want a most-recent-wins policy (however conflict metadata
-   should still be saved in the db.)
-  
-Open question: when a merge generates conflicts, should the user be able to
-resolve them at a finer granularity than a commit? probably not..
+UI Defaults:
+------------
+The Undo/Redo/Branch commands should apply to the active document by default.
 
-Solution: 
-
-for:
-e.g. user edits properties of a picture (location, title, notes, people) in
-a property sheet, and commits the sheet all at once. in the meantime a
-collaborator set the name to something else.
-The right resolution UI would let the user just resolve the name field.
-
-against:
-is it posiible that the user could mess up the consistency of the commit?
-yes.. but this is always possible. it's up to the UI to ensure that
-only sensible merge resolutions are done.
-
-conclusion: for.
-
-Q:
-where should the conflict data be stored?
-A:
-in the metadata section of the object
- -> the conflict metadata is versioned just like any other data,
- and resolving a conflict just deletes the metadata and commits the change.
- 
-Q:
-How exactly should the conflict metadata be structured?
-A:
-moves should be detected.
-it should be a set of operations.
--> want to support easy diff visualization
- (show me an editable visualization of all the changes I've made to this document)
-
-  1. We can apply the nonconflicting changes, then store pairs of altrenate
-   operations in the metadata.
-    -> this is actually not feasible. Not applying any changes means those
-    properties would be left back at the base version - i.e. totally inconsisteny.
-    conclusion: abosolutely not
-    
-  2. favour one side (the 'base side' of the merge) 
-    then in the conflict metadata store a list of operations which transform the
-    current state into the altrenate result, which can be selectively applied.
-
-    -> the challenge here is that further commits can mess up the operations.
-    since operations need to be transformed.
-  
-  3. maybe there's some other way where we get the conflict data
-    kept consistent for free..
-    
-    if the merge is conflict free, you get this:
-    
-      /-B-C--D--\ 
-     /           \
-    a--b--c--d----\-e
-    
-    of course there may be minor errors that need to be corrected by hand.
-    
-    if the merge has conflicts, you get this:
-    
-      /-B-C--D--\-/-E
-     /           X  
-    a--b--c--d--/-\-e
-    
-    where e is the merge favouring lowecase, and E favour uppercase.
-
-    ... hm ..
-    
-    then resolving the conflict is a matter of merging E and e.
-    
-    displaying a merge UI wich can accomodate incoming commits,
-    will require recomputing diffs.
-
-    
-Principles merging should obey:
- - when you get changes you should be able to keep working 
- - don't want the user to get lost in branches
-    
-    
-Q: what should the user diff api look like?
-A: want:
- - a list of operation, each op containg affect locations (uuid/peroperty)
- - e.g. <move uuid 0x2345 from uuid 0x123 : people [3] to uuid 0x456 friends[5]>.
-
-Q: how should resolving conflicts interact with undo?
-A: resolving a conflict should be undoable.
-
-Q: what if a conflict occurrs in the conflict metadata!?!
-A: just use a most-recent-wins policy.
-
-Q: should conflict metadata be shared with other users when collaborating?
-A: probably not.
+	Branch Menu
+	--------------
+ (Default Branch)
+    Trying DIfferent Brush    (X = delete)
+    New Branch...
 
 
+Branch Metadata should be mutable.i.e. isOpen controls whether the branch appears on the menus.Design:
+The CoreObject store is composed to two halves:
+an immutable per-object commit log,
+and
+a mutable portion which records the current version of each object, defines a 
+per-object history track by labeling a tip and current commit.
 
-
-Problem: non-temporal changes
------------------------------
-changes could be divided in to 3 categories:
-- non-persistent
-- persistent, non-temporal 
-    (e.g. setting the "last printed date" property of a document - shouldn't be undoable)
-    All versions of an object share the same value for these properties - 
-    they are unaffected by revert operations.
-    Handling this could potentially be a big pain. For example, commiting a
-    change to a non-temporal property can fail (if it was modified since the
-    start of the transaction), unlike a change to a temporal property which
-    never fails since it implicitly creates a branch.
-    
-- persistent, temporal (normal properties of objects; changes can be undone)
-
-Solution:
-non-persistent : not handled by CoreObject
-persistent, non-temporal : handled by setting an attribute on a HistGraphNode to
-                           have it be skipped in the undo/redo UI, but otherwise
-                           treat it like a temporal property.
-                           This wastes space, but is probably the cleanest
-                           way of handling these.
-persistent, temporal : default behaviour.
-
-
-Problem: Weak/strong properties
--------------------------------
-
-objects referred to by a strong attribute are treated as "part of" the obejct.
-so when performing operations on a particular object, e.g. "revert to revision",
-all strongly referenced objects are also reverted.
-weak references are usually for 'parent' relationships (e.g. when you revert 
-an object, you don't want to revert the container it is in)
-
-revised solution:
-
-CO only uses 'weak' references. i.e. operations on sets of objects 
-(revert objects X,Y,Z to revision R) take an exact group of objects.
-
-
-Problem:
-------
-viewing history graph of an object
-solution:
-1. generate set of all strongly referenced COObjects + the base object
-  [ this could be a lot of objects. ]
-  (Not handled by CO)
-2. for each node in the overall history graph, if (modified objects
- intersects set from 1.), include node in the graph (handled by CO)
-
-
-
-Diff notes
-----------
-
-Currently, for diffing ordered sequences, I'm using a BSD-licensed C++ implementation
-(diff.hh) of the Myers algorithm, the same algorithm GNU diff implements.
-It doesn't really need to be C++, that was just easiest for me to work with
-when porting it from C#.
-
-The GNU algorithm has some heuristics which my implementation lacks, so the GNU
-code is faster in some cases. I think this mostly affects diffing unrelated arrays.
-I did one test case with 130k element arrays, and large unrelated sections.
-GNU diff was about 0.3s, and mine was 3.0s. Not too much worse, anyway.
-
-Another algorithm I investigated is the one used in python's difflib. It's
-conceptually very simple (find the longest common _substring_, then recursively
-repeat the algorithim on the two non-common sides of the string. This
-will incrementally generate a long common subsequence (i.e. diff). I wrote a 
-test implementation in ObjC but it was too slow -- need to play with the idea 
-a bit more.
-
-
-Other links:
-- libxdiff (http://www.xmailserver.org/xdiff-lib.html), LGPL
-   This has a collection of algorithims including the python one and the myers one
-   with the heuristics, but is LGPL licensed.
-
-- libmba (http://www.ioplex.com/~miallen/libmba/dl/src/diff.c), MIT
-   Myers algorithm
-   
-- google-diff-patch-match (http://code.google.com/p/google-diff-match-patch), ApacheV2
-
-- patience diff (http://bramcohen.livejournal.com/73318.html)
-   This seems to produce output similar to the python algorithim.
-   

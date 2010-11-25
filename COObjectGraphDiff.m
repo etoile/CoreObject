@@ -3,37 +3,26 @@
 #import "COArrayDiff.h"
 #import "COSetDiff.h"
 
-/* These three functions are a hack */
-
-static id EnsureObjectIsFromContext(id object, COEditingContext *ctx)
+// FIXME: do something like this
+#if 0
+static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 {
-	if ([object isKindOfClass: [COObject class]] && [object objectContext] != ctx)
+	NSUInteger c = [array count];
+	NSMutableArray *result = [NSMutableArray arrayWithCapacity: c];
+	for (NSUInteger i=0; i<c; i++)
 	{
-		return [ctx objectForUUID: [object uuid]];
+		id val = [array objectAtIndex: i];
+		if ([val isKindOfClass: [COObject class]])
+		{
+			[result addObject: [val UUID]];
+		}
+		else
+		{
+			[result addObject: val];
+		}
 	}
-	return object;
 }
-
-static NSArray *EnsureObjectsAreFromContextInArray(NSArray *arr, COEditingContext *ctx)
-{
-	NSMutableArray *result = [NSMutableArray array];
-	for (id obj in arr)
-	{
-		[result addObject: EnsureObjectIsFromContext(obj, ctx)];
-	}
-	return result;
-}
-
-static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx)
-{
-	NSMutableSet *result = [NSMutableSet set];
-	for (id obj in set)
-	{
-		[result addObject: EnsureObjectIsFromContext(obj, ctx)];
-	}
-	return result;
-}
-
+#endif
 
 
 /**
@@ -42,20 +31,20 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 
 @interface COObjectGraphEdit : NSObject
 {
-	ETUUID *uuid;
+	ETUUID *UUID;
 	NSString *propertyName;
 }
-@property (nonatomic, retain) ETUUID *uuid;
+@property (nonatomic, retain) ETUUID *UUID;
 @property (nonatomic, retain) NSString *propertyName;
 - (void) applyToObject: (COObject*)obj;
 @end
 
 @implementation COObjectGraphEdit
-@synthesize uuid;
+@synthesize UUID;
 @synthesize propertyName;
 - (void) dealloc
 {
-	[uuid release];
+	[UUID release];
 	[propertyName release];
 	[super dealloc];
 }
@@ -64,6 +53,8 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 	[self doesNotRecognizeSelector: _cmd];
 }
 @end
+
+
 
 
 
@@ -78,7 +69,7 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 {
 	COObjectGraphRemoveProperty *r = [[COObjectGraphRemoveProperty alloc] init];
 	[r setPropertyName: p];
-	[r setUuid: u];
+	[r setUUID: u];
 	return [r autorelease];
 }
 - (void) applyToObject: (COObject*)obj
@@ -87,7 +78,7 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 }
 - (NSString *)description
 {
-	return [NSString stringWithFormat: @"%@:%@ remove", uuid, propertyName];
+	return [NSString stringWithFormat: @"%@:%@ remove", UUID, propertyName];
 }
 
 @end
@@ -114,16 +105,16 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 	COObjectGraphSetProperty *s = [[COObjectGraphSetProperty alloc] init];
 	[s setPropertyName: p];
 	[s setNewValue: v];
-	[s setUuid: u];
+	[s setUUID: u];
 	return [s autorelease];
 }
 - (void) applyToObject: (COObject*)obj
 {
-	[obj setValue: EnsureObjectIsFromContext(newValue, [obj objectContext]) forProperty: propertyName];
+	[obj setValue: newValue forProperty: propertyName];
 }
 - (NSString *)description
 {
-	return [NSString stringWithFormat: @"%@:%@ set to '%@'", uuid, propertyName, newValue];
+	return [NSString stringWithFormat: @"%@:%@ set to '%@'", UUID, propertyName, newValue];
 }
 
 @end
@@ -150,7 +141,7 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 	COObjectGraphModifyArray *m = [[COObjectGraphModifyArray alloc] init];
 	[m setPropertyName: p];
 	[m setDiff: d];
-	[m setUuid: u];
+	[m setUUID: u];
 	return [m autorelease];
 }
 - (void) applyToObject: (COObject*)obj
@@ -158,14 +149,14 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 	// FIXME: slow
 	NSArray *oldArray = [obj valueForProperty: propertyName];
 	NSArray *temp = [diff arrayWithDiffAppliedTo: oldArray];
-	NSArray *newArray = EnsureObjectsAreFromContextInArray(temp, [obj objectContext]); 
+	NSArray *newArray = temp; 
 	
 	[obj setValue: newArray
 	  forProperty: propertyName];
 }
 - (NSString *)description
 {
-	return [NSString stringWithFormat: @"%@:%@ modify array '%@'", uuid, propertyName, diff];
+	return [NSString stringWithFormat: @"%@:%@ modify array '%@'", UUID, propertyName, diff];
 }
 @end
 
@@ -193,13 +184,13 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 	COObjectGraphModifySet *m = [[COObjectGraphModifySet alloc] init];
 	[m setPropertyName: p];
 	[m setDiff: d];
-	[m setUuid: u];
+	[m setUUID: u];
 	return [m autorelease];
 }
 - (void) applyToObject: (COObject*)obj
 {
 	NSSet *temp = [diff setWithDiffAppliedTo: [obj valueForProperty: propertyName]];
-	NSSet *result = EnsureObjectsAreFromContextInSet(temp, [obj objectContext]);
+	NSSet *result = temp;
 	
 	// FIXME: slow
 	[obj setValue: result
@@ -207,7 +198,7 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 }
 - (NSString *)description
 {
-	return [NSString stringWithFormat: @"%@:%@ modify set '%@'", uuid, propertyName, diff];
+	return [NSString stringWithFormat: @"%@:%@ modify set '%@'", UUID, propertyName, diff];
 }
 @end
 
@@ -224,6 +215,8 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 	SUPERINIT;
 	
 	_editsByPropertyAndUUID = [[NSMutableDictionary alloc] init];
+	_deletedObjectUUIDs = [[NSMutableArray alloc] init];
+	_insertedObjectDataByUUID = [[NSMutableDictionary alloc] init];
 	
 	return self;
 }
@@ -231,45 +224,66 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 - (void)dealloc
 {
 	[_editsByPropertyAndUUID release];
+	[_deletedObjectUUIDs release];
+	[_insertedObjectDataByUUID release];
 	[super dealloc];
 }
 
 - (void)record: (COObjectGraphEdit*)edit
 {
-	NSMutableDictionary *propDict = [_editsByPropertyAndUUID objectForKey: [edit uuid]];
+	NSMutableDictionary *propDict = [_editsByPropertyAndUUID objectForKey: [edit UUID]];
 	if (nil == propDict)
 	{
-		assert([edit uuid] != nil);
+		assert([edit UUID] != nil);
 		propDict = [NSMutableDictionary dictionary];
-		[_editsByPropertyAndUUID setObject: propDict forKey: [edit uuid]];
+		[_editsByPropertyAndUUID setObject: propDict forKey: [edit UUID]];
 	} 
 	
 	[propDict setObject: edit forKey: [edit propertyName]];
 }
 
-- (void)recordRemoveProperty: (NSString*)name ofObject: (ETUUID*)obj
+- (void)recordRemoveProperty: (NSString*)name ofObjectUUID: (ETUUID*)obj
 {
 	[self record: [COObjectGraphRemoveProperty removeProperty: name forUUID: obj]];
 }
-- (void)recordSetValue: (id)value forProperty: (NSString*)name ofObject: (ETUUID*)obj
+- (void)recordSetValue: (id)value forProperty: (NSString*)name ofObjectUUID: (ETUUID*)obj
 {
 	[self record: [COObjectGraphSetProperty setProperty:name to:value forUUID:obj]];
 }
-- (void)recordModifyArray: (COArrayDiff *)diff forProperty: (NSString*)name ofObject: (ETUUID*)obj
+- (void)recordModifyArray: (COArrayDiff *)diff forProperty: (NSString*)name ofObjectUUID: (ETUUID*)obj
 {
 	[self record: [COObjectGraphModifyArray modifyArray:name diff:diff forUUID:obj]];
 }
-- (void)recordModifySet: (COSetDiff *)diff forProperty: (NSString*)name ofObject: (ETUUID*)obj
+- (void)recordModifySet: (COSetDiff *)diff forProperty: (NSString*)name ofObjectUUID: (ETUUID*)obj
 {
 	[self record: [COObjectGraphModifySet modifySet:name diff:diff forUUID:obj]];
+}
+- (void)recordDeleteObjectWithUUID: (ETUUID*)uuid
+{
+	[_deletedObjectUUIDs addObject: uuid];
+}
+- (void)recordInsertObjectWithUUID: (ETUUID*)uuid
+							  data: (NSDictionary*)data
+{
+	[_insertedObjectDataByUUID setObject: data forKey: uuid];
 }
 
 - (void)applyToContext: (COEditingContext*)ctx
 {
+	// FIXME: write
+	/*
+	for (ETUUID *uuid in [_insertedObjectsByUUID allKeys])
+	{
+		[ctx insertObjectWithEntityName:<#(NSString *)aFullName#>
+	}	
+	for (ETUUID *uuid in _deletedObjectUUIDs)
+	{
+		[ctx deleteObjectWithID: uuid];
+	}*/
 	for (ETUUID *uuid in _editsByPropertyAndUUID)
 	{
 		NSDictionary *propDict = [_editsByPropertyAndUUID objectForKey: uuid];
-		COObject *obj = [ctx objectForUUID: uuid];
+		COObject *obj = [ctx objectWithUUID: uuid];
 		
 		for (COObjectGraphEdit *edit in [propDict allValues])
 		{
@@ -299,26 +313,26 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 @implementation COObjectGraphDiff (Factory)
 
 /**
- * Note this is nonrecursive, you must call it on COObjects contained inside as well
+ * Note this is nonrecursive; it doesn't compare COObjects referenced by the given ones
  */
 + (void) _diffObject: (COObject*)base with: (COObject*)other addToDiff: (COObjectGraphDiff*)diff
 {
-	assert(base != nil || other != nil);
-	
+
 	NSLog(@"Diff %@ with %@", base, other);
 	
-	if (base == nil)
+	if (base == nil && other == nil)
 	{
-		// The object is being inserted, copy all property values
-		for (NSString *prop in [other properties])
-		{
-			[diff recordSetValue: [other valueForProperty: prop] forProperty: prop ofObject: [other uuid]];
-		}     
-		return; 
+		return;
+	}
+	else if (base == nil)
+	{
+		[diff recordInsertObjectWithUUID: [other UUID] data: [other propertyList]];
+		return;
 	}
 	else if (other == nil)
 	{
-		return; // The object was deleted.. but we don't bother recording this.
+		[diff recordDeleteObjectWithUUID: [base UUID]];
+		return;
 	}
 	
 	NSMutableSet *props = [NSMutableSet setWithArray: [base properties]];
@@ -335,38 +349,43 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 			{
 				COArrayDiff *arrayDiff = [[[COArrayDiff alloc] initWithFirstArray: (NSArray*)baseVal
 																	  secondArray: (NSArray*)otherVal] autorelease];
-				[diff recordModifyArray: arrayDiff forProperty: prop ofObject: [base uuid]];
+				[diff recordModifyArray: arrayDiff forProperty: prop ofObjectUUID: [base UUID]];
 			}
 			else if ([baseVal isKindOfClass: [NSSet class]] && [otherVal isKindOfClass: [NSSet class]])
 			{
 				COSetDiff *setDiff = [[[COSetDiff alloc] initWithFirstSet: (NSSet*)baseVal
 																secondSet: (NSSet*)otherVal] autorelease];
-				[diff recordModifySet: setDiff forProperty: prop ofObject: [base uuid]];
+				[diff recordModifySet: setDiff forProperty: prop ofObjectUUID: [base UUID]];
 			}
 			else if (baseVal != nil && otherVal == nil)
 			{
-				[diff recordRemoveProperty: prop ofObject: [base uuid]];
+				[diff recordRemoveProperty: prop ofObjectUUID: [base UUID]];
 			}
 			else
 			{
-				[diff recordSetValue: otherVal forProperty: prop ofObject: [base uuid]];
+				[diff recordSetValue: otherVal forProperty: prop ofObjectUUID: [base UUID]];
 			}
 		}
 	}  
 }
 
-+ (COObjectGraphDiff *)diffObjectContext: (COEditingContext*)base with: (COEditingContext*)modified;
++ (COObjectGraphDiff *)diffObjectsWithUUIDs: (NSArray*)objectUUIDs
+								  inContext: (COEditingContext*)base 
+								withContext: (COEditingContext*)other
 {
 	COObjectGraphDiff *result = [[[COObjectGraphDiff alloc] init] autorelease];
-	
-	assert(0);
-	
-	// FIXME: find all objects that could have changed between base and modified, 
-	// and call a nonrecursive version of _diffObject
-	
-	// if there is a history link between the contexts, we can use a fast path
-	// if not, we need to take the union of all UUIDs in each context.
-	
+	for (ETUUID *uuid in objectUUIDs)
+	{
+		COObject *o1 = [base objectWithUUID: uuid];
+		COObject *o2 = [other objectWithUUID: uuid];
+		
+		if (o1 == nil && o2 == nil)
+		{
+			NSLog(@"Warning: neither context %@ nor %@ contains %@", base, other, uuid);
+		}
+		
+		[self _diffObject: o1 with: o2 addToDiff: result];
+	}
 	return result;
 }
 
@@ -377,87 +396,18 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 		return [[[COObjectGraphDiff alloc] init] autorelease];
 	}
 	
-	// FIXME: relax this constraint
-	// either n1 must be a parent of n2, or vice-versa
-	BOOL n2IsParent = NO;
-	COHistoryNode *p=n1;
-	while ([p parent] != nil)
-	{    
-		p = [p parent];
-		if (p == n2)
-		{
-			n2IsParent = YES;
-			break;
-		}
-	}
-	
-	if (!n2IsParent)
-	{
-		BOOL n1IsParent = NO;
-		p = n2;
-		while ([p parent] != nil)
-		{    
-			p = [p parent];
-			if (p == n1)
-			{
-				n1IsParent = YES;
-				break;
-			}
-		}  
-		if (!n1IsParent)
-		{
-			NSLog(@"ERROR: +[COObjectGraphDiff diffHistoryNode:withHistoryNode:] failed, it requires n1 and n2 to be on the same line of history");
-			assert(0);
-			return nil;
-		}
-	}
-	
-	// Collect the UUIDs of all objects modified between (inclusive) the two nodes
-	NSMutableSet *objectUUIDs = [NSMutableSet set];
-	
-	p = (n2IsParent ? n1 : n2);
-	while (p != (n2IsParent ? n2 : n1))
-	{
-		[objectUUIDs addObjectsFromArray: [[p uuidToObjectVersionMaping] allKeys]];
-		p = [p parent];
-	}
-	[objectUUIDs addObjectsFromArray: [[p uuidToObjectVersionMaping] allKeys]];
-	
-	// Create temporary object contexts
-	
 	COEditingContext *c1 = [[COEditingContext alloc] initWithHistoryGraphNode: n1];
 	COEditingContext *c2 = [[COEditingContext alloc] initWithHistoryGraphNode: n2];
 	
-	// Now create the diff
+	NSArray *uuids = [[n1 storeCoordinator] objectUUIDsChangedBetweenNode:n1 andNode:n2];
 	
-	COObjectGraphDiff *result = [[[COObjectGraphDiff alloc] init] autorelease];
-	for (ETUUID *uuid in objectUUIDs)
-	{
-		COObject *o1 = [c1 objectForUUID: uuid];
-		COObject *o2 = [c2 objectForUUID: uuid];
-		// either may be nil, but not both
-		assert(o1 != nil || o2 != nil);
-		[self _diffObject: o1 with: o2 addToDiff: result];
-	}
-	
+	COObjectGraphDiff *result = [COObjectGraphDiff diffObjectsWithUUIDs: uuids
+															  inContext:c1
+															withContext:c2];
 	[c1 release];
 	[c2 release];
-	
 	return result;
-}
-
-+ (COObjectGraphDiff *)diffObject: (COObject *)base with: (COObject *)other;
-{
-	COObjectGraphDiff *result = [[[COObjectGraphDiff alloc] init] autorelease];
-	
-	[self _diffObject: base with: other addToDiff: result];
-	
-	// FXIME: recursively find all objects (uuids) referenced inside base and other,
-	// and diff all pairs of UUIDs found on both sides.
-	
-	return result;
-}
-
+}	
 @end
 
 
@@ -509,14 +459,14 @@ static NSSet *EnsureObjectsAreFromContextInSet(NSSet *set, COEditingContext *ctx
 					NSLog(@"Both are modifying array %@.. trying array merge", prop);
 					COMergeResult *merge = [[(COObjectGraphModifyArray*)edit1 diff] mergeWith: [(COObjectGraphModifyArray*)edit2 diff]];
 					
-					[result recordModifyArray: [[[COArrayDiff alloc] initWithOperations: [merge nonconflictingOps]] autorelease] forProperty: prop ofObject: uuid];
+					[result recordModifyArray: [[[COArrayDiff alloc] initWithOperations: [merge nonconflictingOps]] autorelease] forProperty: prop ofObjectUUID: uuid];
 				}
 				else if ([edit1 isKindOfClass: [COObjectGraphModifySet class]] && [edit2 isKindOfClass: [COObjectGraphModifySet class]])
 				{
 					NSLog(@"Both are modifying set %@.. trying set merge", prop);
 					COMergeResult *merge = [[(COObjectGraphModifySet*)edit1 diff] mergeWith: [(COObjectGraphModifySet*)edit2 diff]];
 					
-					[result recordModifySet: [[[COSetDiff alloc] initWithOperations: [merge nonconflictingOps]] autorelease] forProperty: prop ofObject: uuid];
+					[result recordModifySet: [[[COSetDiff alloc] initWithOperations: [merge nonconflictingOps]] autorelease] forProperty: prop ofObjectUUID: uuid];
 				}
 				else
 				{

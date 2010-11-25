@@ -1,156 +1,285 @@
 #import "COEditingContext.h"
-
-NSString * const COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"COEditingContextBaseHistoryGraphNodeDidChangeNotification";
+#import <EtoileFoundation/ETModelDescriptionRepository.h>
 
 @implementation COEditingContext
 
-- (id) initWithStoreCoordinator: (COStoreCoordinator*)store
++ (COEditingContext*)contextWithURL: (NSURL*)aURL
+{
+	COEditingContext *ctx = [[self alloc] initWithStore: [[[COStore alloc] initWithURL: aURL] autorelease]];
+	return [ctx autorelease];
+}
+
+- (id) initWithStore: (COStore*)store
 {
 	SUPERINIT;
-	ASSIGN(_storeCoordinator, store);
-	assert(store != nil);
 	
-	_changedObjectUUIDs = [[NSMutableSet alloc] init];
+	ASSIGN(_store, store);
+	
+	_damagedObjectUUIDs = [[NSMutableSet alloc] init];
 	_instantiatedObjects = [[NSMutableDictionary alloc] init];
+	_commitUUIDForObject = [[NSMutableDictionary alloc] init];
+	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
 	
-	[self setBaseHistoryGraphNode: [[self storeCoordinator] tip]];
-	if ([self baseHistoryGraphNode] != nil)
-	{
-		NSLog(@"COEditingContext init: loaded previous history graph node");
-	}
-	else
-	{
-		NSLog(@"COEditingContext init: no previous history graph node, need to make a commit first");
-	}
+	_tipNodeForObjectUUIDOnBranchWithUUID = [[NSMutableDictionary alloc] init];
+	_currentNodeForObjectUUIDOnBranchWithUUID = [[NSMutableDictionary alloc] init];
+	_currentBranchForObjectUUID = [[NSMutableDictionary alloc] init];
+	_insertedObjectUUIDs = [[NSMutableSet alloc] init];
+	_deletedObjectUUIDs = [[NSMutableSet alloc] init];
 	
 	return self;
 }
-
-- (id) initWithHistoryGraphNode: (COHistoryNode*)node
+- (COStore*)store
 {
-	self = [self initWithStoreCoordinator: [node storeCoordinator]];
-	ASSIGN(_baseHistoryGraphNode, node);
-	return self;
-}
-
-- (id) init
-{
-	return [self initWithHistoryGraphNode: nil];
+	return _store;
 }
 
 - (void) dealloc
 {
-	DESTROY(_baseHistoryGraphNode);
-	DESTROY(_storeCoordinator);
-	DESTROY(_changedObjectUUIDs);
+	DESTROY(_store);
+	DESTROY(_damagedObjectUUIDs);
 	DESTROY(_instantiatedObjects);
+	DESTROY(_commitUUIDForObject);
+	DESTROY(_modelRepository);
+	
+	DESTROY(_tipNodeForObjectUUIDOnBranchWithUUID);
+	DESTROY(_currentNodeForObjectUUIDOnBranchWithUUID);
+	DESTROY(_currentBranchForObjectUUID);
+	DESTROY(_insertedObjectUUIDs);
+	DESTROY(_deletedObjectUUIDs);
 	[super dealloc];
 }
 
-- (void) commitWithMetadata: (NSDictionary*)metadata
+// Accessors
+
+- (ETModelDescriptionRepository*) modelRepository
 {
-	COHistoryNode *newNode = [[self storeCoordinator]
-								   commitChangesInObjectContext: self
-								   afterNode: [self baseHistoryGraphNode]
-								   withMetadata: metadata];
-	[_changedObjectUUIDs removeAllObjects];
-	
-	// We can use the unsafe variant because we know all objects are in the same state
-	// as in the newly committed node
-	[self setBaseHistoryGraphNodeUnsafe: newNode];
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName: COEditingContextBaseHistoryGraphNodeDidChangeNotification
-														object: self
-													  userInfo: newNode]; 
+	return _modelRepository; 
 }
 
-- (void) commitWithType: (NSString*)type
-       shortDescription: (NSString*)shortDescription
-        longDescription: (NSString*)longDescription
-{
-	NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
-	[metadata setObject: type forKey: kCOTypeHistoryGraphNodeProperty];
-	[metadata setObject: shortDescription forKey: kCOShortDescriptionHistoryGraphNodeProperty];
-	[metadata setObject: longDescription forKey: kCODescriptionHistoryGraphNodeProperty];
-	[self commitWithMetadata: metadata];
-}
-
-- (void) commit
-{
-	[self commitWithMetadata: nil];
-}
-
-- (COStoreCoordinator *) storeCoordinator
-{
-	return _storeCoordinator;
-}
-
-- (COHistoryNode *) baseHistoryGraphNode
-{
-	return _baseHistoryGraphNode;
-}
-
-/**
- * Sets the base history graph node, clears any uncommitted changes,
- * and reloads all instantiated objects.
- */
-- (void) setBaseHistoryGraphNode: (COHistoryNode*)node
-{
-	ASSIGN(_baseHistoryGraphNode, node);
-	
-	if ([_changedObjectUUIDs count] != 0)
-	{
-		NSLog(@"WARNING: -[COEditingContext setBaseHistoryGraphNode] discarded some changes; probably indicates a bug");
-		[_changedObjectUUIDs removeAllObjects];
-	}
-	
-	// Reload all instantiated objects
-	for (COObject *obj in [_instantiatedObjects allValues])
-	{
-		[self loadObject: obj withDataAtHistoryGraphNode: node];
-	}
-}
-
-/**
- * Sets the base history graph node.
- */
-- (void) setBaseHistoryGraphNodeUnsafe: (COHistoryNode*)node
-{
-	ASSIGN(_baseHistoryGraphNode, node); 
-}
 
 - (BOOL) hasChanges
 {
-	return ![_changedObjectUUIDs isEmpty];
-}
-
-- (COObjectGraphDiff *) changes
-{
-	COEditingContext *temp = [[COEditingContext alloc] initWithHistoryGraphNode: [self baseHistoryGraphNode]];
-	COObjectGraphDiff *diff = [COObjectGraphDiff diffObjectContext: self with: temp];
-	[temp release];
-	return diff;
+	return ![_damagedObjectUUIDs isEmpty];
 }
 
 - (BOOL) objectHasChanges: (ETUUID*)uuid
 {
-	return [_changedObjectUUIDs containsObject: uuid];
+	return [_damagedObjectUUIDs containsObject: uuid];
 }
 
-- (COObject*) objectForUUID: (ETUUID*)uuid
+
+// Creating and accessing objects
+
+- (Class) classForEntityDescription: (ETEntityDescription*)desc
+{
+	Class cls = [_modelRepository classForEntityDescription: desc];
+	if (cls == Nil)
+	{
+		cls = [COObject class];
+	}
+	return cls;
+}
+
+- (COObject*) insertObjectWithEntityName: (NSString*)aFullName
+{
+	COObject *result = nil;
+	ETEntityDescription *desc = [_modelRepository descriptionForName: aFullName];
+	if (desc != nil)
+	{
+		ETUUID *uuid = [[ETUUID alloc] init];
+		Class cls = [self classForEntityDescription: desc];
+		result = [[cls alloc] initWithUUID: uuid
+						 entityDescription: desc
+								   context: self
+								   isFault: NO];
+		[_instantiatedObjects setObject: result forKey: uuid];
+		[_insertedObjectUUIDs addObject: uuid];
+		[result release];
+		[uuid release];
+	}
+	return result;
+}
+
+- (COObject*) objectWithUUID: (ETUUID*)uuid
+{
+	return [self objectWithUUID: uuid entityName: nil];
+}
+
+
+// FIXME: implement
+/*
+- (COObject*) insertObject: (COObject*)obj
+{
+	
+	ETUUID *uuid = [obj UUID];
+	[_instantiatedObjects objectForKey: 
+	 
+	 id copy = [[[self class] alloc] initWithModelDescription: _description 
+													  context: ctx
+														 uuid: _uuid
+														isNew: YES];
+	 [_ctx recordObject: copy forUUID: [self UUID]];
+	 return copy;
+	 }
+
+	return nil;
+}
+*/
+
+- (void) deleteObjectWithUUID: (ETUUID*)uuid
+{
+	[_deletedObjectUUIDs addObject: uuid];
+	[_instantiatedObjects removeObjectForKey: uuid];
+}
+
+
+
+
+// Committing changes
+
+- (void) commit
+{
+	[self commitWithType: nil shortDescription: nil longDescription: nil];
+}
+- (void) commitWithType: (NSString*)type
+       shortDescription: (NSString*)shortDescription
+        longDescription: (NSString*)longDescription
+{
+	for (ETUUID *uuid in _insertedObjectUUIDs)
+	{
+		NSString *name = [[[self objectWithUUID: uuid] entityDescription] fullName];
+		NSLog(@"Storing entity name %@ for %@", name, uuid);
+		[_store setEntityName: name
+				forObjectUUID: uuid];
+	}
+	
+	[_store beginCommitWithMetadata: nil];
+	for (ETUUID *uuid in _damagedObjectUUIDs)
+	{
+		[_store beginChangesForObject: uuid
+				   onNamedBranch: nil
+			   updateObjectState: YES
+					parentCommit: nil
+					mergedCommit: nil];
+		COObject *obj = [self objectWithUUID: uuid];
+		NSLog(@"Committing changes for %@", obj);
+		for (NSString *prop in [obj properties])
+		{
+			id value = [obj valueForProperty: prop];
+			id plist = [obj propertyListForValue: value];
+			
+			[_store setValue: plist
+			 forProperty: prop
+			 ofObject: uuid
+			 shouldIndex: NO];
+		}
+
+		[_store finishChangesForObject: uuid];
+	}
+	
+	COCommit *c = [_store finishCommit];
+	assert(c != nil);
+	
+	[_insertedObjectUUIDs removeAllObjects];
+}
+
+@end
+
+ 
+@implementation COEditingContext (PrivateToCOObject)
+ 
+- (void) markObjectDamaged: (COObject*)obj
+{
+	[obj setDamaged: YES];
+	[_damagedObjectUUIDs addObject: [obj UUID]]; 
+}
+- (void) markObjectUndamaged: (COObject*)obj
+{
+	[obj setDamaged: NO]; 
+	[_damagedObjectUUIDs removeObject: [obj UUID]];
+}
+ 
+- (void) loadObject: (COObject*)obj
+{
+	[self loadObject: obj atCommit: nil];
+}
+
+- (void)loadObject: (COObject*)obj atCommit: (COCommit*)aCommit
+{
+	ETUUID *objUUID = [obj UUID];
+	if (aCommit == nil)
+	{
+		ETUUID *commitUUID = [_commitUUIDForObject objectForKey: objUUID];
+		aCommit = [_store commitForUUID: commitUUID];
+		if (aCommit == nil)
+		{
+			commitUUID = [_store currentCommitForObjectUUID: objUUID onBranch: [_store activeBranchForObjectUUID: objUUID]];
+			aCommit = [_store commitForUUID: commitUUID];
+		}
+	}
+	
+	if (aCommit == nil)
+	{
+		[NSException raise: NSInvalidArgumentException format: @"Object %@ not found in store", obj];
+	}
+	
+	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj properties]];
+	NSLog(@"Properties to fetch: %@", propertiesToFetch);
+	
+	obj->_isIgnoringDamageNotifications = YES;
+	
+	while ([propertiesToFetch count] > 0)
+	{
+		if (aCommit == nil)
+		{
+			[NSException raise: NSInternalInconsistencyException format: @"Store is missing properties %@ for %@", propertiesToFetch, obj];
+		}
+		
+		NSDictionary *dict = [aCommit valuesAndPropertiesForObject: objUUID];
+		
+		for (NSString *key in [dict allKeys])
+		{
+			id plist = [dict objectForKey: key];
+			id value = [obj valueForPropertyList: plist];
+			NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
+			[obj setValue: value
+			  forProperty: key];
+			[propertiesToFetch removeObject: key];
+		}
+		
+		aCommit = [aCommit parentCommitForObject: objUUID];
+	}
+	
+	obj->_isFault = NO;
+	obj->_isDamaged = NO;
+	obj->_isIgnoringDamageNotifications = NO;
+}
+
+- (COObject*) objectWithUUID: (ETUUID*)uuid entityName: (NSString*)name
 {
 	COObject *result = [_instantiatedObjects objectForKey: uuid];
 	
 	if (result == nil)
 	{
-		result = [[COObject alloc] initFaultedObjectWithContext: self uuid: uuid];
-		if (result != nil)
+		ETEntityDescription *desc = [_modelRepository descriptionForName: name];
+		if (desc == nil)
 		{
-			// Save the COObject instance in our map
-			[_instantiatedObjects setObject: result forKey: uuid];
-			
-			[result release];
+			NSString *name = [_store entityNameForObjectUUID: uuid];
+			if (name == nil)
+			{
+				[NSException raise: NSGenericException format: @"Failed to find an entity name for %@", uuid];
+			}
+			desc = [_modelRepository descriptionForName: name];
 		}
+		
+		Class cls = [self classForEntityDescription: desc];
+		result = [[cls alloc] initWithUUID: uuid
+						 entityDescription: desc
+								   context: self
+								   isFault: YES];
+		
+		[_instantiatedObjects setObject: result forKey: uuid];
+		[result release];
 	}
 	
 	return result;
@@ -159,65 +288,80 @@ NSString * const COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"C
 @end
 
 
-@implementation COEditingContext (Private)
+// FIXME:
+@implementation COEditingContext (PrivateToCOHistoryTrack)
 
-- (void) loadObject: (COObject*)obj withDataAtHistoryGraphNode: (COHistoryNode*)node
+- (ETUUID*) namedBranchForObjectUUID: (ETUUID*)obj
 {
-	[obj unfaultWithData: [_storeCoordinator dataForObjectWithUUID: [obj uuid]
-												atHistoryGraphNode: node]];
+	id branch = [_currentBranchForObjectUUID objectForKey: obj];
+	if (branch == [NSNull null]) { branch = nil; }
+	return branch;
+}
+- (void) setNamedBranch: (ETUUID*)branch forObjectUUID: (ETUUID*)obj
+{
+	if (branch == nil) { branch = [NSNull null]; }
+	[_currentBranchForObjectUUID setObject:branch forKey: obj];
 }
 
-- (void) loadObjectWithDataAtBaseHistoryGraphNode: (COObject*)obj
+- (ETUUID*)currentCommitForObjectUUID: (ETUUID*)object onBranch: (ETUUID*)branch
 {
-	[self loadObject: obj withDataAtHistoryGraphNode: _baseHistoryGraphNode];
+	if (branch == nil) { branch = [NSNull null]; }
+	//return [[_currentNodeForObjectUUIDOnBranchWithUUID objectForKey: object] objectForKey: branch];
+	return nil;
+}
+- (void) setCurrentCommit: (ETUUID*)commit forObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch
+{
+	if (branch == nil) { branch = [NSNull null]; }
 }
 
-- (void) markObjectUUIDChanged: (ETUUID*)uuid
+- (ETUUID*)tipForObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch
 {
-	[_changedObjectUUIDs addObject: uuid];
+	if (branch == nil) { branch = [NSNull null]; }
+	return nil;
 }
-- (void) markObjectUUIDUnchanged: (ETUUID*)uuid
+- (void) setTip: (ETUUID*)commit forObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch
 {
-	[_changedObjectUUIDs removeObject: uuid];
-}
-- (NSArray *) changedObjects
-{
-	NSMutableArray *result = [NSMutableArray arrayWithCapacity: [_changedObjectUUIDs count]];
-	for (ETUUID *uuid in _changedObjectUUIDs)
-	{
-		[result addObject: [self objectForUUID: uuid]];
-	}
-	return result;
-}
-- (void) recordObject: (COObject*)object forUUID: (ETUUID*)uuid
-{
-	[_instantiatedObjects setObject: object forKey: uuid];
+	if (branch == nil) { branch = [NSNull null]; }
+	return nil;	
 }
 
 @end
 
 
+
 @implementation COEditingContext (Rollback)
 
-
-- (void) revert
+- (void) discardAllChanges
 {
-	[self revertObjects: [self changedObjects]];
+	for (COObject *object in [_instantiatedObjects allValues])
+	{
+		[self discardAllChangesInObject: object];
+	}
+	assert([self hasChanges] == NO);
 }
+
+- (void) discardAllChangesInObject: (COObject*)object
+{
+	[_damagedObjectUUIDs removeObject: object];
+	
+	// FIXME
+//	[self loadObject: object withDataAtHistoryGraphNode: _baseHistoryGraphNode];	
+}
+
+/*
 
 - (void) rollbackToRevision: (COHistoryNode *)node
 {
 	// FIXME: this is broken, it only reverts loaded objects
 	
-	[_changedObjectUUIDs removeAllObjects];
+	[_damagedObjectUUIDs removeAllObjects];
 	
-	for (COObject *obj in [_instantiatedObjects allValues])
+	for (COObject *object in [_instantiatedObjects allValues])
 	{
-		[obj unfaultWithData: [[self storeCoordinator] dataForObjectWithUUID: [obj uuid]
-														  atHistoryGraphNode: node]];
+		[self loadObject: object withDataAtHistoryGraphNode: node];
 	}
 	
-	[_changedObjectUUIDs addObjectsFromArray: [_instantiatedObjects allKeys]];
+	[_damagedObjectUUIDs addObjectsFromArray: [_instantiatedObjects allKeys]];
 }
 
 - (void)selectiveUndoChangesMadeInRevision: (COHistoryNode *)ver
@@ -232,11 +376,13 @@ NSString * const COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"C
 	}
 	
 	NSLog(@"Using %@ as parent", priorToVer);
-    
-	COObjectGraphDiff *oa = [COObjectGraphDiff diffHistoryNode:ver  withHistoryNode: priorToVer];
+	
+	COObjectGraphDiff *oa = [COObjectGraphDiff diffHistoryNode: ver
+											   withHistoryNode: priorToVer];
 	NSLog(@"!!!!OA %@", oa);
 	
-	COObjectGraphDiff *ob = [COObjectGraphDiff diffHistoryNode:ver withHistoryNode: [self baseHistoryGraphNode]];
+	COObjectGraphDiff *ob = [COObjectGraphDiff diffHistoryNode: ver
+											   withHistoryNode: _baseHistoryGraphNode];
 	NSLog(@"!!!!OB %@", ob);
 	
 	COObjectGraphDiff *merged = [COObjectGraphDiff mergeDiff: oa withDiff: ob];
@@ -244,7 +390,7 @@ NSString * const COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"C
 	
 	
 	COHistoryNode *oldBaseNode = [self baseHistoryGraphNode];
-	// The 'merged' diff we are going to apply is relative to 'ver', so we temporairly change
+	// The 'merged' diff we are going to apply is relative to 'ver', so we ; change
 	[self setBaseHistoryGraphNode: ver];
 	
 	[merged applyToContext: self];
@@ -252,42 +398,13 @@ NSString * const COEditingContextBaseHistoryGraphNodeDidChangeNotification = @"C
 	[self setBaseHistoryGraphNodeUnsafe: oldBaseNode];
 	
 	NSLog(@"Changed objects after selective undo:");
-	for (ETUUID *uuid in _changedObjectUUIDs)
+	for (ETUUID *uuid in _damagedObjectUUIDs)
 	{
-		COObject *obj = [self objectForUUID: uuid];
+		COObject *obj = [self objectWithUUID: uuid];
 		NSLog(@"Obj %@", [obj detailedDescription]);
 	}
 	
 }
-
-- (void) revertObjects: (NSArray*)objects
-{
-	for (COObject *object in objects)
-	{
-		[object revert];
-	}
-}
-
-- (void) commitObjects: (NSArray*)objects
-{
-	// FIXME: commit owned children of objects
-	COHistoryNode *newNode = [[self storeCoordinator] commitChangesInObjects: objects
-																		afterNode: [self baseHistoryGraphNode]];
-	[self setBaseHistoryGraphNode: newNode];
-}
-- (void) rollbackObjects: (NSArray*)objects toRevision: (COHistoryNode *)ver
-{
-}
-- (void) threeWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects bases: (NSArray*)bases
-{
-}
-- (void) twoWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects
-{
-}
-- (void) selectiveUndoChangesInObjects: (NSArray*)objects madeInRevision: (COHistoryNode *)ver
-{
-}
-
-
+*/
 
 @end

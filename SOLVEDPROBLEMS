@@ -1,0 +1,108 @@
+Solved Problems
+===============
+
+Q: Not sure the best way to represent checkpoints. Tags?
+A: Probably just an empty commit as in OM1
+
+Q: Does every branch have a single parent? should it? 
+A: no, but per-object the first
+commits in the branches do. It's not a big deal.
+
+
+In live collab, it's really important that CMD+Z just undo _your_ changes.
+So we can't bind the undo/redo actions directly to a COHistoryTrack, but need
+something more complex with does selective undo/redos. However, we should be 
+able to write a special COHistoryTrack like object which simulates undo/redo
+by making selective-undo commits.
+
+
+When we do merging, we should be able to prevent the "double-merging" problem
+down to a per-object level, because our history graphs are per-object.
+
+
+Q:  Does it make sense for COObjectGraphDiff to encode 'Change current branch'?
+A: No, it doesn't make sense.
+
+
+How should two applications with the same store open interact?
+--------------------------------------------------------------
+Suppose User switches from default branch to branch A in app 1, how should this 
+be reflected in app2?
+Answer: This should be rare. If one tries to commit after the other changed
+the branch, the commit would fail.
+
+
+Q: Is it clear that the db needs to record a “current branch” for each object?
+A: If we didn’t, every time you opened a document you would open the default branch
+but then if you branched, closed the computer, and came back, you would lose your place
+So, yes.
+
+
+Q: How should the COEditingContext handle changes to the mutable store data:
+branch switches
+moving tip tag onto an unlabelled branch (when navigating undo history)
+moving ‘current tag’ (undo/redo)
+editing branch metadata (open/closing a branch
+A: The only sensible answer is that these are recorded in memory in the context, 
+and then attempt to be commited to the store.
+
+
+Q: Branching puzzle: user switches from the default branch to a named branch.
+software requests an object not modified on the branch.
+How does the system know where to get it?
+A: It just looks in the UUID->commit mapping! This is not a problem at all.
+Remember, the system has one single state for every object at any given time
+
+
+Q: how do we build the list of branches of an object?
+A: should be an easy query. Implemented.
+
+
+Q: Role of editing context?
+A: It’s a scratchpad where changes can be made before being committed.
+When each object is instantiated, the current state is recorded in the context.
+ When there’s an attempt to commit the context, we check if any of the current 
+ states have changed. (If so, we have to go in to the contingency code that loads 
+ the newer changes, merges the changes in the context, and then commits them again)
+
+Q: Should setting the active branch be undoable?
+A: From a UI perspective, it seems so. But it's
+too much work to be worthwhile.
+
+Q: In OM1, we specified an absolute point in the history graph using a COHistoryGraphNode.
+How do we do this in OM2?
+A: In OM2, we can specify an absolute point _for a set of obejct UUIDs S_ by doing the
+following: { uuid1 : comit1, uuid2 : commit2, etc. }.The problem is, this doesn't
+take into account active branches. Solution - include the named branch for each object.
+
+
+
+Q: How do we create an editing context not bound to the current state of the 
+store?
+A: Just need to specify the state we want it bound to. This is a solved problem.
+
+
+Problem: non-temporal changes
+-----------------------------
+changes could be divided in to 3 categories:
+- non-persistent
+- persistent, non-temporal 
+    (e.g. setting the "last printed date" property of a document - shouldn't be undoable)
+    All versions of an object share the same value for these properties - 
+    they are unaffected by revert operations.
+    Handling this could potentially be a big pain. For example, commiting a
+    change to a non-temporal property can fail (if it was modified since the
+    start of the transaction), unlike a change to a temporal property which
+    never fails since it implicitly creates a branch.
+    
+- persistent, temporal (normal properties of objects; changes can be undone)
+
+Solution:
+non-persistent : not handled by CoreObject
+persistent, non-temporal : handled by setting an attribute on a HistGraphNode to
+                           have it be skipped in the undo/redo UI, but otherwise
+                           treat it like a temporal property.
+                           This wastes space, but is probably the cleanest
+                           way of handling these.
+persistent, temporal : default behaviour.
+

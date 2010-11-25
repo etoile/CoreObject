@@ -85,7 +85,7 @@
 }
 - (void) notifyObjectContext
 {
-	[_obj setModified];
+	[_obj notifyContextOfDamageIfNeeded];
 }
 
 /* Primitive methods required to create a NSMutableArray subclass */
@@ -151,7 +151,7 @@
 }
 - (void) notifyObjectContext
 {
-	[_obj setModified];
+	[_obj notifyContextOfDamageIfNeeded];
 }
 
 /* Primitive methods required to create a NSMutableArray subclass */

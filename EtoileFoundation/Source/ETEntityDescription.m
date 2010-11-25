@@ -187,7 +187,12 @@
 
 - (ETPropertyDescription *)propertyDescriptionForName: (NSString *)name
 {
-	return [_propertyDescriptions valueForKey: name];
+	ETPropertyDescription *desc = [_propertyDescriptions valueForKey: name];
+	if (desc == nil)
+	{
+		desc = [_parent propertyDescriptionForName: name];
+	}
+	return desc;
 }
 
 - (ETValidationResult *) validateValue: (id)value forKey: (NSString *)key

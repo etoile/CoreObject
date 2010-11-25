@@ -140,6 +140,7 @@ static NSString *anonymousPackageName = @"Anonymous";
 	_unresolvedDescriptions = [[NSMutableSet alloc] init];
 	_descriptionsByName = [[NSMutableDictionary alloc] init];
 	_entityDescriptionsByClass = [[NSMapTable alloc] init];
+	_classesByEntityDescription = [[NSMapTable alloc] init];
 	[self addDescription: [ETPackageDescription descriptionWithName: anonymousPackageName]];
 	[self setUpWithCPrimitives: [self newCPrimitives] 
 	          objectPrimitives: [self newObjectPrimitives]];
@@ -155,6 +156,7 @@ static NSString *anonymousPackageName = @"Anonymous";
 	DESTROY(_unresolvedDescriptions);
 	DESTROY(_descriptionsByName);
 	DESTROY(_entityDescriptionsByClass);
+	DESTROY(_classesByEntityDescription);
 	[super dealloc];
 }
 
@@ -224,6 +226,11 @@ static NSString *anonymousPackageName = @"Anonymous";
 	return [_entityDescriptionsByClass objectForKey: aClass];
 }
 
+- (Class) classForEntityDescription: (ETEntityDescription*)anEntityDescription
+{
+	return [_classesByEntityDescription objectForKey: anEntityDescription];
+}
+
 - (void) setEntityDescription: (ETEntityDescription *)anEntityDescription
                      forClass: (Class)aClass
 {
@@ -235,6 +242,7 @@ static NSString *anonymousPackageName = @"Anonymous";
 					         "added to the repository"];
 	}
 	[_entityDescriptionsByClass setObject: anEntityDescription forKey: aClass];
+	[_classesByEntityDescription setObject: aClass forKey: anEntityDescription];
 }
 
 - (void) addUnresolvedDescription: (ETModelElementDescription *)aDescription

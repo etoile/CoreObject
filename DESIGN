@@ -1,73 +1,9 @@
-Design Document
-===============
+Design Ideas
+==============
 
-CoreObject is (currently) implemented as a state based revision control system. This means that it stores the state of the object graph, and deduces operations using a diff algorithm. Contrast this with an operation based system, which stores the operations used to go from one state to the next, and deduces the state by replaying operations.
+"A Selective Undo Mechanism for Graphical User Interfaces Based On Command Objects"
+by Thomas Berlage makes a good case for 'direct selective undo' (what I implemented)
+rather than "script-based" selective undo.
 
-
-History Graph
-=============
-
-It looks like storing one global history graph (like git) won't work for CoreObject.
-We want things like:
- - per-document history navigation
-
-
-
-
-Designing things from the ground up...
-======================================
-
- - We have Objects idnetified by UUIDs
- - We have Commits which are basically functions f(uuid) -> objectData
- - Commits have an order based on the time they were made
- 
-It's not clear what the commit function should return for objects not modified during the commit.
-
- - Objects can be arranged in a hierarchical structure
- 
- - When we make a commit which affects an object O, we can say there is a
- relationship between the last commit which modified O and this commit
- 
- 
- 
-Designing things from the ground up... (property perspective)
-=============================================================
-
- - We have Objects idnetified by UUIDs
- - We have Commits which are modify one property of one object
- - Commits have an order based on the time they were made
- - Objects can be arranged in a hierarchical structure
- - When we make a commit which affects O.p (property p of object O), we can say there is a
- relationship between the last commit which modified O.p and this commit
- - From this, we can build a history graph of O.p, and navigate it, and create
-  branches.
- - We can introduce a grouping relationship among several commits saying that 
- they should be atomic.
- 
-Can we construct a history graph for object O?
-
-See paper
-
-It looks like this works, and is extensible upwards, dynamically, to as many 
-levels as we want.
-
-
-
-
-
-
-So...
-
-
-With the above algorithm, we can take any subset of the list of commits, draw a
-history graph of them, and be able to move the history navigation tag and
-make new commits at any point.
-
-
-
-
-
-
-
-
-
+We will use the 'opposite' property description metamodel property to indicate
+that relationship integrity maintainence should be performed.

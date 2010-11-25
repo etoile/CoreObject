@@ -2,8 +2,6 @@
 #import "COArrayDiff.h"
 #include "diff.hh"
 
-
-
 class NSArrayWrapper
 {
 private:
@@ -13,8 +11,10 @@ private:
 public:
 	bool equal(size_t i, size_t j)
 	{
-		return [objectAtIndexIMP1(arr1, @selector(objectAtIndex:), i) isEqual:
-				objectAtIndexIMP2(arr2, @selector(objectAtIndex:), j)];
+		id left = objectAtIndexIMP1(arr1, @selector(objectAtIndex:), i);
+		id right = objectAtIndexIMP2(arr2, @selector(objectAtIndex:), j);
+		
+		return [left isEqual: right];
 	}
 	NSArrayWrapper(NSArray *a1, NSArray *a2) : arr1(a1), arr2(a2)
 	{
@@ -31,13 +31,13 @@ public:
 };
 
 
-
 @implementation COArrayDiff
 
 - (id) initWithFirstArray: (NSArray *)first secondArray: (NSArray *)second
 {
 	SUPERINIT;
-	[self diffWithA:first B:second];
+	[self diffWithA:first
+				  B:second];
 	return self;
 }
 

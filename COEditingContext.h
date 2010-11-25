@@ -1,119 +1,114 @@
 #import <EtoileFoundation/EtoileFoundation.h>
+#import "COObject.h"
 #import "COStore.h"
-#import "COStoreCoordinator.h"
-#import "COHistoryNode.h"
 
 @class COObject;
-@class COHistoryNode;
-@class COObjectGraphDiff;
-@class COFetchRequest;
-@class COStoreCoordinator;
-
-extern NSString * const COEditingContextBaseHistoryGraphNodeDidChangeNotification;
 
 /**
  * An object context is like a working copy in a revision control system.
- * It is associated with a particlar version of the history graph,
- * knows how to create COObject instances for a given UUID (representing
- * that object in the state it was in 
+ *
+ * It queues changes and then attempts to commit them to the store.
  */
 @interface COEditingContext : NSObject
 {
-	COHistoryNode *_baseHistoryGraphNode; // history graph node this context was initialized with (based on)
-	NSMutableSet *_changedObjectUUIDs;  // UUIDS of objects in this context which have uncommitted changes
-	COStoreCoordinator *_storeCoordinator;
+	COStore *_store;
+	NSMutableSet *_damagedObjectUUIDs; // UUIDS of objects in this context which have uncommitted changes
 	NSMutableDictionary *_instantiatedObjects; // UUID -> COObject mapping
+	NSMutableDictionary *_commitUUIDForObject; // Object UUID -> Commit UUID mapping
+	ETModelDescriptionRepository *_modelRepository;
+
+	NSMutableDictionary *_tipNodeForObjectUUIDOnBranchWithUUID;
+	NSMutableDictionary *_currentNodeForObjectUUIDOnBranchWithUUID;
+	NSMutableDictionary *_currentBranchForObjectUUID;
+	NSMutableSet *_insertedObjectUUIDs;
+	NSMutableSet *_deletedObjectUUIDs;
 }
 
-// Public
+// Creation
 
-/**
- * Creates a new object context representing the object graph state
- * at the requested history node.
- */
-- (id) initWithHistoryGraphNode: (COHistoryNode*)node;
++ (COEditingContext*)contextWithURL: (NSURL*)aURL;
 
-/**
- * Creates a new empty object context. The first commit will create a root
- * node in the store's history graph.
- */
-- (id) initWithStoreCoordinator: (COStoreCoordinator*)store;
+- (id)initWithStore: (COStore*)store;
+- (COStore*)store;
 
-/**
- * Creates an empty, non-persistent context
- */
-- (id) init;
+//- (id)initWithStore: (COStore *)store historyTrack: (COHistoryTrack*)historyTrack;
+
+- (id)init;
+
+// Access
+
+- (ETModelDescriptionRepository*) modelRepository;
+
+- (BOOL) hasChanges;
+- (BOOL) objectHasChanges: (ETUUID*)uuid;
+
+- (Class) classForEntityDescription: (ETEntityDescription*)desc;
+- (COObject*) insertObjectWithEntityName: (NSString*)aFullName;
+
+- (COObject*) objectWithUUID: (ETUUID*)uuid;
+
+
+// Committing changes
 
 - (void) commit;
 - (void) commitWithType: (NSString*)type
        shortDescription: (NSString*)shortDescription
         longDescription: (NSString*)longDescription;
 
-- (COStoreCoordinator *) storeCoordinator;
+@end
 
-/**
- * Returns the history graph node this context was created with
- */
-- (COHistoryNode *) baseHistoryGraphNode;
 
-/**
- * @return whether or not this context has any uncomitted changes
- */
-- (BOOL) hasChanges;
+@interface COEditingContext (PrivateToCOObject)
 
-/**
- * Returns the object graph diff describing uncommitted changes in the 
- * objects in this context. Could be computed by diffing each object
- * in _changedObjectUUIDs against the base version in _baseHistoryGraphNode
- */
-- (COObjectGraphDiff *) changes;
-- (BOOL) objectHasChanges: (ETUUID*)uuid;
+- (void) markObjectDamaged: (COObject*)obj;
+- (void) markObjectUndamaged: (COObject*)obj;
+- (void) loadObject: (COObject*)obj;
+- (void) loadObject: (COObject*)obj atCommit: (COCommit*)aCommit;
 
-// Public - accessing objects
-
-- (COObject*) objectForUUID: (ETUUID*)uuid;
+- (COObject*) objectWithUUID: (ETUUID*)uuid entityName: (NSString*)name;
 
 @end
 
 
-@interface COEditingContext (Private)
+@interface COEditingContext (PrivateToCOHistoryTrack)
 
-- (void) loadObject: (COObject*)obj withDataAtHistoryGraphNode: (COHistoryNode*)node;
-- (void) loadObjectWithDataAtBaseHistoryGraphNode: (COObject*)obj;
+// Queuing changes to the mutable part of the store (Private - use COHistoryTrack)
 
-- (void) markObjectUUIDChanged: (ETUUID*)uuid;
-- (void) markObjectUUIDUnchanged: (ETUUID*)uuid;
-- (NSArray *) changedObjects;
-- (void) recordObject: (COObject*)object forUUID: (ETUUID*)uuid;
+- (ETUUID*) namedBranchForObjectUUID: (ETUUID*)obj;
+- (void) setNamedBranch: (ETUUID*)branch forObjectUUID: (ETUUID*)obj;
+
+// same as the next pair but uses the context's current branch for that object
+- (ETUUID*)currentCommitForObjectUUID: (ETUUID*)object;
+- (void) setCurrentCommit: (ETUUID*)commit forObjectUUID: (ETUUID*)object;
+
+- (ETUUID*)currentCommitForObjectUUID: (ETUUID*)object onBranch: (ETUUID*)branch;
+- (void) setCurrentCommit: (ETUUID*)commit forObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch;
+
+- (ETUUID*)tipForObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch;
+- (void) setTip: (ETUUID*)commit forObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch;
 
 @end
 
 
-/**
- * History related manipulations to the working copy. (to all objects)
- */
 @interface COEditingContext (Rollback)
 
-/**
- * Reverts back to the last saved version
- */
-- (void) revert;
+// Manipulation of the editing context itself - rather than the store
 
-/**
- * Rolls back this object context to the state it was in at the given revision, discarding all current changes
- */
+- (void) discardAllChanges;
+- (void) discardAllChangesInObject: (COObject*)object;
+
+/*
 - (void) rollbackToRevision: (COHistoryNode *)ver;
 
 - (void)selectiveUndoChangesMadeInRevision: (COHistoryNode *)ver;
 
 
-- (void) revertObjects: (NSArray*)objects;
 - (void) commitObjects: (NSArray*)objects;
 - (void) rollbackObjects: (NSArray*)objects toRevision: (COHistoryNode *)ver;
 - (void) threeWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects bases: (NSArray*)bases;
 - (void) twoWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects;
 - (void) selectiveUndoChangesInObjects: (NSArray*)objects madeInRevision: (COHistoryNode *)ver;
+*/
 
 @end
-
 

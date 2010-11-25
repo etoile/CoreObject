@@ -1,179 +1,106 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
-#import "NSData+sha1.h"
+#import "COGroup.h"
+#import "COCollection.h"
 
 @implementation COObject
 
-/**
- * Designated initializer
- */
-- (id) initWithModelDescription: (ETEntityDescription*)desc
-                        context: (COEditingContext*)ctx
-                           uuid: (ETUUID*)uuid
-                          isNew: (BOOL)isNew
++ (void)initialize
 {
-	SUPERINIT;
-	
-	ASSIGN(_ctx, ctx);
-	assert(_ctx != nil);
-	
-	ASSIGN(_uuid, uuid);
-	assert(_uuid != nil);  
-	
-	_data = nil;
-	_isFault = YES;
-	
-	[_ctx recordObject: self forUUID: [self uuid]];
-	
-	ASSIGN(_description, desc);
-	
-	if (nil == [self modelDescription])
+	if (self == [COObject class])
 	{
-		assert(0); // FIXME: remove
-		[NSException raise: NSInvalidArgumentException
-					format: @"Error, you must either provide a description to -[COObject initWithModelDescription:context:] or have a description registered for the subclass of COObject you are using."];
-		return nil;
-	}
+		// COObject entity description
+		
+		ETEntityDescription *object = [ETEntityDescription descriptionWithName: @"COObject"];
+		
+		ETPropertyDescription *parentGroupProperty = [ETPropertyDescription descriptionWithName: @"parentGroup"
+																						   type: (id)@"Anonymous.COGroup"];
+		[parentGroupProperty setIsContainer: YES];
+		[parentGroupProperty setMultivalued: NO];
 	
-	// FIXME: this is kind of ugly
-	// Set up multivalued properties
-	for (ETPropertyDescription *propDesc in [[self modelDescription] allPropertyDescriptions])
-	{
-		if ([propDesc isMultivalued])
-		{
-			id container = [propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set];
-			[self setValue: container forProperty: [propDesc name]];
-		}
+		ETPropertyDescription *parentCollectionsProperty = [ETPropertyDescription descriptionWithName: @"parentCollections"
+																								type: (id)@"Anonymous.COCollection"];
+		
+		[parentCollectionsProperty setMultivalued: YES];
+		
+		[object setPropertyDescriptions: A(parentGroupProperty, parentCollectionsProperty)];
+		
+		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: object];
+		[[ETModelDescriptionRepository mainRepository] setEntityDescription: object
+																   forClass: [COObject class]];
+		
+		// COGroup entity description
+		
+		ETEntityDescription *group = [ETEntityDescription descriptionWithName: @"COGroup"];
+		[group setParent: (id)@"Anonymous.COObject"];
+		
+		ETPropertyDescription *groupContentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
+																						type: (id)@"Anonymous.COObject"];
+		[groupContentsProperty setMultivalued: YES];
+		[groupContentsProperty setOpposite: (id)@"Anonymous.COObject.parentGroup"]; // FIXME: just 'parent' should work...
+		[groupContentsProperty setOrdered: YES];
+		
+		[group setPropertyDescriptions: A(groupContentsProperty)];
+		
+		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: group];
+		[[ETModelDescriptionRepository mainRepository] setEntityDescription: group
+																   forClass: [COGroup class]];
+		
+		// COCollection entity description
+		
+		ETEntityDescription *collection = [ETEntityDescription descriptionWithName: @"COCollection"];
+		[collection setParent: (id)@"Anonymous.COObject"];
+		
+		ETPropertyDescription *collectionContentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
+																						type: (id)@"Anonymous.COObject"];
+		[collectionContentsProperty setMultivalued: YES];
+		[collectionContentsProperty setOpposite: (id)@"Anonymous.COObject.parentCollections"]; // FIXME: just 'parentCollections' should work...
+		[collectionContentsProperty setOrdered: NO];
+		
+		[collection setPropertyDescriptions: A(collectionContentsProperty)];
+		
+		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: collection];
+		[[ETModelDescriptionRepository mainRepository] setEntityDescription: collection
+																   forClass: [COCollection class]];
+		
+		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
+		assert([[[[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.COGroup"] propertyDescriptionForName: @"contents"] isComposite]);
 	}
-	
-	if (isNew)
-	{
-		[self awakeFromCreate];
-		[self setModified];
-	}
-	
-	return self;
 }
 
-- (id) initFaultedObjectWithContext: (COEditingContext*)ctx uuid: (ETUUID*)uuid
+// Attributes
+
+- (ETEntityDescription *)entityDescription
 {
-	[self release];
-	
-	COStoreCoordinator *sc = [ctx storeCoordinator];
-	COHistoryNode *node = [ctx baseHistoryGraphNode];
-	NSDictionary *data = [sc dataForObjectWithUUID: uuid
-								atHistoryGraphNode: node];
-	if (data == nil)
-	{
-		NSLog(@"Warning, requested object %@ not in store", uuid);
-		return nil;
-	}
-	
-	NSString *classname = [data objectForKey: @"class"];
-	
-	self = [NSClassFromString(classname) alloc];
-	self = [super init];
-	if (self == nil)
-	{
-		NSLog(@"Initializing requested class %@ failed, using COObject", classname);
-		self = [COObject alloc];
-		self = [super init];
-		if (self == nil)
-		{
-			return nil;
-		}
-	}
-    
-	ETEntityDescription *desc = [[ETModelDescriptionRepository mainRepository] descriptionForName: [data objectForKey: @"entity"]];
-	
-	return [self initWithModelDescription: desc
-								  context: ctx
-									 uuid: uuid
-									isNew: NO];
+	return _entityDescription;
 }
 
-/**
- * Create a new object with the given model description in the given context
- */
-- (id) initWithModelDescription: (ETEntityDescription*)desc context: (COEditingContext*)ctx
+- (ETUUID*) UUID
 {
-	return [self initWithModelDescription: desc
-								  context: ctx
-									 uuid: [ETUUID UUID]
-									isNew: YES];
+	return _uuid;
 }
 
-/**
- * Create a new object of the receiver's class in the given context
- */
-- (id) initWithContext: (COEditingContext*)ctx
+- (COEditingContext*) editingContext
 {
-	return [self initWithModelDescription:nil context:ctx];
+	return _context;
 }
 
-- (void) dealloc
+- (BOOL) isFault
 {
-	DESTROY(_ctx);
-	DESTROY(_uuid);
-	DESTROY(_data);
-	[super dealloc];
+	return _isFault;
 }
 
-/**
- * Note, two objects are considered equal if they have the same UUID
- * (even if the instances represent different versions.)
- *
- * This will make diffing just work, but maybe doesn't make sense?
- */
-- (BOOL) isEqual: (id)otherObject
+- (BOOL) isDamaged
 {
-	if ([otherObject isKindOfClass: [COObject class]])
-	{
-		COObject *otherCOObject = (COObject*)otherObject;
-		return [[otherCOObject uuid] isEqual: _uuid];
-	}
-	return NO;
+	return _isDamaged; 
 }
 
-/**
- * Automatic fine-grained copy
- */
-- (id)copyWithZone: (NSZone*)zone
-{
-	COObject *newObject = [[[self class] alloc] initWithModelDescription: _description context: _ctx];
-	for (ETPropertyDescription *propDesc in [[self modelDescription] allPropertyDescriptions])
-	{
-		if (![propDesc isDerived])
-		{
-			id value = [self valueForProperty: [propDesc name]];
-			if ([propDesc isComposite])
-			{
-				id valuecopy = [value copyWithZone: zone];
-				[newObject setValue: valuecopy forProperty: [propDesc name]];
-				[valuecopy release];
-			}
-			else
-			{
-				[newObject setValue: value forProperty: [propDesc name]];  
-			}
-		}
-	}
-	return newObject;
-}
-
-static void GatherAllStronglyContainedObjects(id object, NSMutableArray *dest)
-{
-	if (![object isKindOfClass: [COObject class]])
-	{
-		[dest addObject: object];
-		return;
-	}
-}
+/* Helper methods based on the metamodel */
 
 - (NSArray*)allStronglyContainedObjects
 {
 	NSMutableArray *result = [NSMutableArray array];
-	for (ETPropertyDescription *propDesc in [[self modelDescription] allPropertyDescriptions])
+	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
 	{
 		if ([propDesc isComposite])
 		{
@@ -207,103 +134,35 @@ static void GatherAllStronglyContainedObjects(id object, NSMutableArray *dest)
 	return result;
 }
 
-- (ETEntityDescription *)modelDescription
-{
-	if (_description != nil)
-	{
-		return _description;
-	}
-	else
-	{
-		return [[ETModelDescriptionRepository mainRepository]
-				entityDescriptionForClass: [self class]];    
-	}
-}
 
-- (ETUUID*) uuid
-{
-	return _uuid;
-}
-- (COEditingContext*) objectContext
-{
-	return _ctx;
-}
 
-- (BOOL) isFault
-{
-	return _isFault;
-}
+/* Property-value coding */
 
-- (void) didAwaken
-{
-	// FIXME: remove
-	NSLog(@"%@ awoke.", self);
-}
-- (void) awakeFromCreate
-{
-	NSLog(@"%@ awoke from create.", self);
-}
 
 - (NSArray *)properties
 {
-	return [[self modelDescription] allPropertyDescriptionNames];
-}
-
-- (void)setPrimitiveValue:(id)value forKey:(NSString *)key
-{
-	[super setValue:value forKey:key];
-}
-
-- (id)primitiveValueForKey:(NSString *)key
-{
-	return [super valueForKey: key]; // Call NSObject's -valueForKey: (we override -valueForKey:)
-}
-
-/**
- * If the returned value is an array/set, if it is modified, the context
- * must be notified.
- */
-- (id)privateValueForProperty: (NSString*)key
-{  
-	id result;
-	@try
-	{
-		result = [self primitiveValueForKey: key];
-	}
-	@catch (NSException *exc)
-	{
-		result = [_data objectForKey: key];  
-	}
-	return result;
+	return [[self entityDescription] allPropertyDescriptionNames];
 }
 
 - (id) valueForProperty:(NSString *)key
 {
 	[self willAccessValueForProperty: key];
-	id obj = [self privateValueForProperty: key];
-	
-	// Make sure we return an immutable collection
-	if ([obj isKindOfClass: [NSArray class]])
+	id value = [_variableStorage objectForKey: key];
+	if (value == [NSNull null])
 	{
-		return [NSArray arrayWithArray: obj];
+		return nil;
 	}
-	if ([obj isKindOfClass: [NSSet class]])
-	{
-		return [NSSet setWithSet: obj];
-	}
-	else
-	{
-		return obj;
-	}
+	return value;
 }
 
 + (BOOL) isPrimitiveCoreObjectValue: (id)value
 {  
 	return [value isKindOfClass: [NSNumber class]] ||
-    [value isKindOfClass: [NSDate class]] ||
-    [value isKindOfClass: [NSData class]] ||
-    [value isKindOfClass: [NSString class]] ||
-    [value isKindOfClass: [COObject class]];
+		[value isKindOfClass: [NSDate class]] ||
+		[value isKindOfClass: [NSData class]] ||
+		[value isKindOfClass: [NSString class]] ||
+		[value isKindOfClass: [COObject class]] ||
+		value == nil;
 }
 
 + (BOOL) isCoreObjectValue: (id)value
@@ -340,32 +199,31 @@ static void GatherAllStronglyContainedObjects(id object, NSMutableArray *dest)
 	{
 		if ([value isKindOfClass: [COObject class]])
 		{
-			assert([value objectContext] == _ctx);
+			assert([value editingContext] == _context);
 		}    
 	}
 }
 
-- (void) privateSetValue:(id)value forProperty:(NSString*)key
+- (void) setValue:(id)value forProperty:(NSString*)key
 {
-	if (nil == value)
+	if (![[self properties] containsObject: key])
 	{
-		// FIXME: Hack
-		value = @"<nil>";
-		
-		//    assert(0);
-		//    [NSException raise: NSInvalidArgumentException format: @"Tried to set nil value for property"];
+		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
+		return;
 	}
+	
+	[self willChangeValueForProperty: key];
+
 	if (![COObject isCoreObjectValue: value])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Invalid property type"];
 	}
-	
-	if (![[self properties] containsObject: key])
+
+	if (nil == value)
 	{
-		NSLog(@"Tried to set value for invalid property %@", key);
-		return;
+		value = [NSNull null];
 	}
-	
+
 	// Collections must be mutable
 	if ([value isKindOfClass: [NSArray class]]
 		|| [value isKindOfClass: [NSSet class]])
@@ -375,29 +233,135 @@ static void GatherAllStronglyContainedObjects(id object, NSMutableArray *dest)
 	
 	[self debugCheckValue: value];
 	
-	// FIXME: slow
-	@try
-	{
-		[self setPrimitiveValue:value forKey:key];
-	}
-	@catch (NSException *e)
-	{
-		if (nil == _data)
-		{
-			_data = [[NSMutableDictionary alloc] init];
-		}
-		[_data setValue: value
-				 forKey: key];
-	}
-}
-- (void) setValue:(id)value forProperty:(NSString*)key
-{
-	[self willChangeValueForKey:key];
-	[self privateSetValue:value forProperty:key];
-	[self didChangeValueForKey: key];
+	[_variableStorage setObject: value
+						 forKey: key];
+		
+	[self didChangeValueForProperty: key];
 }
 
-- (NSString*)description
+- (void) addObject: (id)object forProperty:(NSString*)key
+{
+	[self willChangeValueForProperty: key];
+	
+	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	if (![desc isMultivalued])
+	{
+		[NSException raise: NSInvalidArgumentException format: @"attempt to call addObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
+	}
+	
+	
+	// FIXME: add safety checks
+	[[self valueForProperty: key] addObject: object];
+	
+	[self didChangeValueForProperty: key];
+}
+- (void) insertObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString*)key
+{
+	[self willChangeValueForProperty: key];
+	
+	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	if (!([desc isMultivalued] && [desc isOrdered]))
+	{
+		[NSException raise: NSInvalidArgumentException format: @"attempt to call inesrtObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
+	}
+	
+	// FIXME: add safety checks
+	[[self valueForProperty: key] insertObject: object atIndex: index];
+	
+	
+	[self didChangeValueForProperty: key];
+}
+- (void) removeObject: (id)object forProperty:(NSString*)key
+{
+	[self willChangeValueForProperty: key];
+	
+	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	if (![desc isMultivalued])
+	{
+		[NSException raise: NSInvalidArgumentException format: @"attempt to call removeObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
+	}
+	
+	
+	// FIXME: add safety checks
+	[[self valueForProperty: key] removeObject: object];
+	
+	[self didChangeValueForProperty: key];
+}
+- (void) removeObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString*)key
+{
+	[self willChangeValueForProperty: key];
+	
+	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	if (!([desc isMultivalued] && [desc isOrdered]))
+	{
+		[NSException raise: NSInvalidArgumentException format: @"attempt to call removeObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
+	}
+	
+	// FIXME: add safety checks
+	[[self valueForProperty: key] insertObject: object atIndex: index];
+	
+	
+	[self didChangeValueForProperty: key];
+}
+
+- (void)willAccessValueForProperty:(NSString *)key
+{
+	[self unfaultIfNeeded];
+}
+- (void)willChangeValueForProperty:(NSString *)key
+{
+	[self unfaultIfNeeded];
+}
+- (void)didChangeValueForProperty:(NSString *)key
+{
+	[self notifyContextOfDamageIfNeeded];
+}
+
+// Overridable Notifications
+
+- (void) awakeFromInsert
+{
+	// Set up collections
+	BOOL wasIgnoringDamage = _isIgnoringDamageNotifications;
+	_isIgnoringDamageNotifications = YES;
+	
+	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+	{
+		if ([propDesc isMultivalued])
+		{
+			id container = [propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set];
+			[self setValue: container forProperty: [propDesc name]];
+		}
+	}
+	
+	_isIgnoringDamageNotifications = wasIgnoringDamage;
+}
+
+- (void) awakeFromFetch
+{
+	// Debugging check that collections were set up properly
+	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+	{
+		if ([propDesc isMultivalued])
+		{
+			Class cls = [propDesc isOrdered] ? [NSMutableArray class] : [NSMutableSet class];
+			if (![[self valueForProperty: [propDesc name]] isKindOfClass: cls])
+			{
+				[NSException raise: NSInternalInconsistencyException format: @"Property %@ of %@ is a collection but was not set up properly", [propDesc name], self];
+			}
+		}
+	}
+}
+- (void) willTurnIntoFault
+{
+} 
+- (void) didTurnIntoFault
+{
+}
+
+// NSObject methods
+
+- (NSString*) description
 {
 	if ([self isFault])
 	{
@@ -405,156 +369,164 @@ static void GatherAllStronglyContainedObjects(id object, NSMutableArray *dest)
 	}
 	else
 	{
-		return [NSString stringWithFormat: @"<%@ %p UUID=%@ data=%@>", NSStringFromClass([self class]), self, _uuid, _data];  
+		return [NSString stringWithFormat: @"<%@ %p UUID=%@ variableStorage=%@>", NSStringFromClass([self class]), self, _uuid, _variableStorage];  
 	}
 }
 
-- (void)willAccessValueForProperty:(NSString *)key
+- (BOOL)isEqual: (id)object
 {
-	[self loadIfNeeded];
-}
-- (void)willChangeValueForProperty:(NSString *)key
-{
-	[self loadIfNeeded];
-}
-- (void)didChangeValueForProperty:(NSString *)key
-{
-	[self setModified];
-}
-
-- (NSString*)detailedDescription
-{
-	NSMutableString *str = [NSMutableString stringWithFormat: @"%@, data: {\n", [self description]];
-	for (NSString *prop in [self properties])
+	if ([object isKindOfClass: [COObject class]])
 	{
-		[str appendFormat:@"\t'%@' : %@\n", prop, [self valueForProperty: prop]]; 
+		COObject *other = (COObject*)object;
+		if (![[self UUID] isEqual: [other UUID]])
+		{
+			return NO; 
+		}
+		for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+		{
+			if (![propDesc isDerived])
+			{
+				id selfValue = [self valueForProperty: [propDesc name]];
+				id otherValue = [other valueForProperty: [propDesc name]];
+				if (![selfValue isEqual: otherValue])
+				{
+					return NO; 
+				}
+			}
+		}
+		return YES;
 	}
-	[str appendFormat:@"}"];
-	return str;
+	return NO;
+}
+
+/**
+ * Automatic fine-grained copy
+ */
+- (id)copyWithZone: (NSZone*)zone
+{
+	COObject *newObject = [[[self class] alloc] initWithUUID: [ETUUID UUID]
+										   entityDescription: _entityDescription
+													 context: _context
+													 isFault: NO];
+									
+	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+	{
+		if (![propDesc isDerived])
+		{
+			id value = [self valueForProperty: [propDesc name]];
+			if ([propDesc isContainer])
+			{
+				[newObject setValue: value forProperty: [propDesc name]];  
+			}
+			else
+			{
+				// FIXME: need to deep copy collections
+				id valuecopy = [value copyWithZone: zone]; 
+				[newObject setValue: valuecopy forProperty: [propDesc name]];
+				[valuecopy release];
+			}
+		}
+	}
+	return newObject;
 }
 
 @end
-
-
-
-
-
-
 
 
 @implementation COObject (Private)
 
-- (void) markAsNeedingReload
+- (void) turnIntoFault
 {
-	_isFault = YES;
-}
-
-- (void) loadIfNeeded
-{
-	if ([self isFault])
+	if (!_isFault)
 	{
-		[_ctx loadObjectWithDataAtBaseHistoryGraphNode: self];
+		[self willTurnIntoFault];
+		ASSIGN(_variableStorage, nil);
+		_isFault = YES;
+		[self didTurnIntoFault];
 	}
 }
 
-- (void) unload
+- (void) unfaultIfNeeded
 {
-	[_data release];
-	_data = nil;
+	if (!_isIgnoringDamageNotifications && _isFault)
+	{
+		assert(_variableStorage == nil);
+		_variableStorage = [[NSMapTable alloc] init];
+
+		[_context loadObject: self];
+		_isFault = NO;
+		[self awakeFromFetch];
+	}
 }
 
-/**
- * Returns a sha1 of the object
- */
-- (NSData*)sha1Hash
+- (void) notifyContextOfDamageIfNeeded
 {
-	// FIXME : generating the property list and throwing it away is wasteful, remove this method
-	
-	return [[self propertyList] sha1Hash];
-}
-
-- (void) setModified
-{
-	[[self objectContext] markObjectUUIDChanged: [self uuid]];
+	if (!_isIgnoringDamageNotifications && !_isDamaged)
+	{
+		[_context markObjectDamaged: self]; // This will call -setDamaged: YES on us
+	}
 }
 
 @end
 
 
+@implementation COObject (PrivateToEditingContext)
 
-@implementation COObject (Rollback)
+// Init/dealloc
 
-/**
- * Reverts back to the last saved version
- */
-- (void) revert
+- (id) initWithUUID: (ETUUID*)aUUID 
+  entityDescription: (ETEntityDescription*)anEntityDescription
+			context: (COEditingContext*)aContext
+			isFault: (BOOL)isFault
 {
-	// FIXME: revert owned children?
-	if ([_ctx objectHasChanges: _uuid])
+	SUPERINIT;
+	
+	NILARG_EXCEPTION_TEST(aUUID);
+	NILARG_EXCEPTION_TEST(anEntityDescription);
+	NILARG_EXCEPTION_TEST(aContext);
+	
+	ASSIGN(_uuid, aUUID);
+	ASSIGN(_entityDescription, anEntityDescription);
+	_context = aContext; // weak reference
+	_variableStorage = nil;
+	_isFault = isFault;
+	_isDamaged = NO;
+	_isIgnoringDamageNotifications = NO;
+	
+	if (!_isFault)
 	{
-		[_ctx loadObjectWithDataAtBaseHistoryGraphNode: self];
-		[_ctx markObjectUUIDUnchanged: _uuid];
+		[_context markObjectDamaged: self];
+		_variableStorage = [[NSMapTable alloc] init];
+		[self awakeFromInsert]; // FIXME: not necessairly
 	}
-}
-
-/**
- * Commit changes made to jst this object?
- */
-- (void) commit
-{
-	[_ctx commitObjects: [NSArray arrayWithObject: self]];
-}
-
-/**
- * Rolls back this object to the state it was in at the given revision, discarding all current changes
- */
-- (void) rollbackToRevision: (COHistoryNode *)ver
-{
-	[_ctx loadObject: self withDataAtHistoryGraphNode: ver];
-	[_ctx markObjectUUIDChanged: _uuid];
-}
-
-/**
- * Replaces the reciever with the result of doing a three-way merge with it an otherObj,
- * using baseObj as the base revision.
- *
- * Note that otherObj and baseObj will likely be COObject instances represeting the
- * same UUID as the reciever from other (temporary) object contexts
- * constructed just for doing the merge.
- *
- * Note that nothing is committed.
- */
-- (void) threeWayMergeWithObject: (COObject*)otherObj base: (COObject *)baseObj
-{
-	[self loadIfNeeded];
 	
-	COObjectGraphDiff *oa = [COObjectGraphDiff diffObject: baseObj with: self];
-	COObjectGraphDiff *ob = [COObjectGraphDiff diffObject: baseObj with: otherObj];
-	COObjectGraphDiff *merged = [COObjectGraphDiff mergeDiff: oa withDiff: ob];
-	[merged applyToContext: [self objectContext]];
+	return self;
+}
+
+- (void) dealloc
+{
+	// FIXME: call user hook?
 	
-	//FIXME: applying |merged| to the context will mutate |baseObj|, not |self|
+	_context = nil;
+	DESTROY(_uuid);
+	DESTROY(_entityDescription);
+	DESTROY(_variableStorage);
+	[super dealloc];
 }
 
-- (void) twoWayMergeWithObject: (COObject *)otherObj
+- (void) setDamaged: (BOOL)isDamaged
 {
-	[[self objectContext] twoWayMergeObjects: [NSArray arrayWithObject: self]
-								 withObjects: [NSArray arrayWithObject: otherObj]];
-}
-
-- (void) selectiveUndoChangesMadeInRevision: (COHistoryNode *)ver
-{
-	[[self objectContext] selectiveUndoChangesInObjects: [NSArray arrayWithObject: self]
-										 madeInRevision: ver];
+	_isDamaged = isDamaged; 
 }
 
 @end
+
 
 
 
 @implementation COObject (PropertyListImportExport)
 
-NSArray *COArrayPropertyListForArray(NSArray *array)
+static NSArray *COArrayPropertyListForArray(NSArray *array)
 {
 	NSMutableArray *newArray = [NSMutableArray arrayWithCapacity: [array count]];
 	for (id value in array)
@@ -568,46 +540,28 @@ NSArray *COArrayPropertyListForArray(NSArray *array)
 	return newArray;
 }
 
-- (NSDictionary*) propertyList
+- (NSDictionary*) propertyListForValue: (NSObject*)value
 {
-	[self loadIfNeeded];
-	
-	NSMutableDictionary *keysAndValues = [NSMutableDictionary dictionary];
-	for (id key in [self properties])
+	if ([value isKindOfClass: [COObject class]])
 	{
-		id value = [self valueForProperty: key];
-		if ([value isKindOfClass: [COObject class]])
-		{
-			value = [value referencePropertyList];
-		}
-		else if ([value isKindOfClass: [NSArray class]])
-		{
-			value = COArrayPropertyListForArray(value);
-		}
-		else if ([value isKindOfClass: [NSSet class]])
-		{
-			value = [NSDictionary dictionaryWithObjectsAndKeys:
-					 @"unorderedCollection", @"type",
-					 COArrayPropertyListForArray([value allObjects]), @"objects",
-					 nil];
-		}
-		if (value == nil)
-		{
-			//NSLog(@"Warning, property %@ is nil when generating property list", key);
-		}
-		else
-		{
-			[keysAndValues setValue: value forKey: key];
-		}
+		value = [value referencePropertyList];
 	}
-	
-	return [NSDictionary dictionaryWithObjectsAndKeys:
-			@"object-data", @"type",
-			[_uuid stringValue], @"uuid",
-			keysAndValues, @"keysAndValues",
-			NSStringFromClass([self class]), @"class",
-			[[self modelDescription] fullName], @"entity",
-			nil];
+	else if ([value isKindOfClass: [NSArray class]])
+	{
+		value = COArrayPropertyListForArray(value);
+	}
+	else if ([value isKindOfClass: [NSSet class]])
+	{
+		value = [NSDictionary dictionaryWithObjectsAndKeys:
+				 @"unorderedCollection", @"type",
+				 COArrayPropertyListForArray([value allObjects]), @"objects",
+				 nil];
+	}
+	else if (value == nil)
+	{
+		value = [NSDictionary dictionaryWithObject: @"nil" forKey: @"type"];
+	}
+	return value;
 }
 
 - (NSDictionary*) referencePropertyList
@@ -615,17 +569,19 @@ NSArray *COArrayPropertyListForArray(NSArray *array)
 	return [NSDictionary dictionaryWithObjectsAndKeys:
 			@"object-ref", @"type",
 			[_uuid stringValue], @"uuid",
+			[_entityDescription fullName], @"entity",
 			nil];
 }
 
-- (NSObject *)parsePropertyList: (NSObject*)plist
+- (NSObject *)valueForPropertyList: (NSObject*)plist
 {
 	if ([plist isKindOfClass: [NSDictionary class]])
 	{
 		if ([[plist valueForKey: @"type"] isEqualToString: @"object-ref"])
 		{
-			ETUUID *uuid = [ETUUID UUIDWithString: [(NSDictionary*)plist objectForKey: @"uuid"]];
-			return [[self objectContext] objectForUUID: uuid];
+			ETUUID *uuid = [ETUUID UUIDWithString: [plist valueForKey: @"uuid"]];
+			return [[self editingContext] objectWithUUID: uuid 
+											  entityName: [plist valueForKey: @"entity"]];
 		}
 		else if ([[plist valueForKey: @"type"] isEqualToString: @"unorderedCollection"])
 		{
@@ -633,9 +589,13 @@ NSArray *COArrayPropertyListForArray(NSArray *array)
 			NSMutableSet *set = [NSMutableSet setWithCapacity: [objects count]];
 			for (int i=0; i<[objects count]; i++)
 			{
-				[set addObject: [self parsePropertyList: [objects objectAtIndex:i]]];
+				[set addObject: [self valueForPropertyList: [objects objectAtIndex:i]]];
 			}
 			return set;
+		}
+		else if ([[plist valueForKey: @"type"] isEqualToString: @"nil"])
+		{
+			return nil;
 		}
 	}
 	else if ([plist isKindOfClass: [NSArray class]])
@@ -644,42 +604,27 @@ NSArray *COArrayPropertyListForArray(NSArray *array)
 		id mapped[count];
 		for (int i=0; i<count; i++)
 		{
-			mapped[i] = [self parsePropertyList: [(NSArray*)plist objectAtIndex:i]];
+			mapped[i] = [self valueForPropertyList: [(NSArray*)plist objectAtIndex:i]];
 		}
 		return [NSArray arrayWithObjects: mapped count: count];
 	}
 	return plist;
 }
 
-/**
- * This takes a data dictionary from the store and replaces object references
- * with actual (faulted) COObject instances
- */
-- (void)unfaultWithData: (NSDictionary*)data
+@end
+
+
+@implementation COObject (Debug)
+
+- (NSString*)detailedDescription
 {
-	if (data == nil)
+	NSMutableString *str = [NSMutableString stringWithFormat: @"%@, object data: {\n", [self description]];
+	for (NSString *prop in [self properties])
 	{
-		// We get here when -loadIfNeeded is called on a new object
-		// not yet in the store.
-		//NSLog(@"ERROR: unfaultWithData: called with nil.. investigate");
-		return;
+		[str appendFormat:@"\t'%@' : %@\n", prop, [self valueForProperty: prop]]; 
 	}
-	assert([[data objectForKey:@"uuid"] isEqual: [[self uuid] stringValue]]);
-	assert([[data objectForKey:@"type"] isEqual: @"object-data"]);
-	assert([[data objectForKey:@"class"] isEqual: NSStringFromClass([self class])]);
-	assert([[data objectForKey:@"entity"] isEqual: [[self modelDescription] fullName]]);
-	
-	_isFault = NO;
-	
-	NSDictionary *keysAndValues = [data valueForKey: @"keysAndValues"];
-	for (NSString *key in [keysAndValues allKeys])
-	{
-		// NOTE: This must not case change notifications, which is why we call privateSetValue:forProperty:
-		[self privateSetValue: [self parsePropertyList: [keysAndValues objectForKey: key]]
-				  forProperty: key];
-	}
-	
-	[self didAwaken];
+	[str appendFormat:@"}"];
+	return str;
 }
 
 @end

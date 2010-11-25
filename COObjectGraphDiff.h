@@ -13,6 +13,8 @@
 @interface COObjectGraphDiff : NSObject
 {
 	NSMutableDictionary *_editsByPropertyAndUUID; // This maps { uuid : { property_name : COObjectGraphEdit object } }
+	NSMutableArray *_deletedObjectUUIDs;
+	NSMutableDictionary *_insertedObjectDataByUUID;
 }
 
 - (void)recordRemoveProperty: (NSString*)name ofObject: (ETUUID*)obj;
@@ -26,9 +28,15 @@
 
 @interface COObjectGraphDiff (Factory)
 
-+ (COObjectGraphDiff *)diffObjectContext: (COEditingContext*)base with: (COEditingContext*)modified;
-+ (COObjectGraphDiff *)diffHistoryNode: (COHistoryNode*)n1 withHistoryNode: (COHistoryNode*)n2;
-+ (COObjectGraphDiff *)diffObject: (COObject *)base with: (COObject *)other;
++ (COObjectGraphDiff *)diffObjectsWithUUIDs: (NSArray*)objectUUIDs
+								  inContext: (COEditingContext*)base 
+								withContext: (COEditingContext*)other;
+
+/**
+ * Convenience method
+ */
++ (COObjectGraphDiff *)diffHistoryNode: (COHistoryNode*)n1
+					   withHistoryNode: (COHistoryNode*)n2;
 
 @end
 

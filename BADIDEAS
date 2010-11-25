@@ -1,0 +1,24 @@
+Bad Ideas
+===========
+
+Design ideas which seem appealing or reasonable but are dead ends for some reason.
+
+Q: Can we avoid storing 'tip' by just looking for the newest non-hidden
+commit on a branch? looks like yes... But actually no, because we can e.g.
+set the tip to be the end of an anonymous branch without comitting to it.
+
+
+
+Meta-History (History of history operations, i.e. undo/redo)
+------------------------------------------------------------
+
+Question: Should changes to the mutable part of the store be attached to a commit?
+i.e. the commit metadata? Do we want "undo" or "redo" or "change branch" to show up 
+in the history log?
+
+A: It seems sensible,.. but if you consider the history log with a branch graph view,
+it makes it clear that these are meta-operations. Do we want/need "meta-history"?
+It's probably unnecessary and a lot of complexity to implement.
+
+Emacs' undo system provides this but it's kind of a pain; it's only advantage
+in emacs is to make up for not properly modeling branching undo.
