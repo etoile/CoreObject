@@ -82,4 +82,45 @@
 	DELETE_STORE;
 }
 
+- (void)testRelationshipIntegrityMarksDamage
+{
+	COStore *store = [[COStore alloc] initWithURL: STORE_URL];
+	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
+	
+	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; // See COObject.m for metamodel definition
+	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
+	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
+	[ctx commit];
+	
+	UKFalse([ctx objectHasChanges: [o1 UUID]]);
+	UKFalse([ctx objectHasChanges: [o2 UUID]]);
+	UKFalse([ctx objectHasChanges: [o3 UUID]]);
+			 
+	[o2 setValue: o1 forProperty: @"parentGroup"]; // should add o2 to o1's contents
+	UKTrue([ctx objectHasChanges: [o1 UUID]]);
+	UKTrue([ctx objectHasChanges: [o2 UUID]]);
+	UKFalse([ctx objectHasChanges: [o3 UUID]]);
+	
+	[ctx commit];
+	UKFalse([ctx objectHasChanges: [o1 UUID]]);
+	UKFalse([ctx objectHasChanges: [o2 UUID]]);
+	UKFalse([ctx objectHasChanges: [o3 UUID]]);
+	
+	[o2 setValue: o3 forProperty: @"parentGroup"]; // should add o2 to o3's contents, and remove o2 from o1
+	UKTrue([ctx objectHasChanges: [o1 UUID]]);
+	UKTrue([ctx objectHasChanges: [o2 UUID]]);
+	UKTrue([ctx objectHasChanges: [o3 UUID]]);
+	
+	[ctx commit];
+	
+	[o3 removeObject: o2 forProperty: @"contents"]; // should make o2's parentGroup nil
+	UKFalse([ctx objectHasChanges: [o1 UUID]]);
+	UKTrue([ctx objectHasChanges: [o2 UUID]]);
+	UKTrue([ctx objectHasChanges: [o3 UUID]]);	
+
+	[ctx release];
+	[store release];
+	DELETE_STORE;
+}
+
 @end

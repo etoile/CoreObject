@@ -12,6 +12,11 @@
 @interface COEditingContext : NSObject
 {
 	COStore *_store;
+	
+	/**
+	 * Note: never modify directly; call -markObjectDamaged/-markObjectUndamaged instead.
+	 * Otherwise the cached value in COObject won't be updated.
+	 */
 	NSMutableSet *_damagedObjectUUIDs; // UUIDS of objects in this context which have uncommitted changes
 	NSMutableDictionary *_instantiatedObjects; // UUID -> COObject mapping
 	NSMutableDictionary *_commitUUIDForObject; // Object UUID -> Commit UUID mapping

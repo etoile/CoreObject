@@ -173,7 +173,7 @@
 			 ofObject: uuid
 			 shouldIndex: NO];
 		}
-
+		
 		[_store finishChangesForObject: uuid];
 	}
 	
@@ -181,6 +181,10 @@
 	assert(c != nil);
 	
 	[_insertedObjectUUIDs removeAllObjects];
+	for (ETUUID *uuid in [NSArray arrayWithArray: _damagedObjectUUIDs])
+	{
+		[self markObjectUndamaged: [self objectWithUUID: uuid]];
+	}
 }
 
 @end
@@ -342,7 +346,7 @@
 
 - (void) discardAllChangesInObject: (COObject*)object
 {
-	[_damagedObjectUUIDs removeObject: object];
+	[self markObjectUndamaged: object];
 	
 	// FIXME
 //	[self loadObject: object withDataAtHistoryGraphNode: _baseHistoryGraphNode];	
