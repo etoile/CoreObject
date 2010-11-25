@@ -18,7 +18,7 @@
 	
 	// Test one-to-many relationships
 	
-	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; // See TestCommon.m for metamodel definition
+	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; // See COObject.m for metamodel definition
 	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
 	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
 	
@@ -35,7 +35,7 @@
 	
 	// Test many-to-many relationships
 	
-	COObject *t1 = [ctx insertObjectWithEntityName: @"Anonymous.COCollection"]; // See TestCommon.m for metamodel definition
+	COObject *t1 = [ctx insertObjectWithEntityName: @"Anonymous.COCollection"]; // See COObject.m for metamodel definition
 	COObject *t2 = [ctx insertObjectWithEntityName: @"Anonymous.COCollection"];
 	COObject *t3 = [ctx insertObjectWithEntityName: @"Anonymous.COCollection"];
 	
@@ -61,7 +61,7 @@
 	COStore *store = [[COStore alloc] initWithURL: STORE_URL];
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 	
-	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; // See TestCommon.m for metamodel definition
+	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; // See COObject.m for metamodel definition
 	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
 	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
 	
@@ -81,6 +81,5 @@
 	[store release];
 	DELETE_STORE;
 }
-
 
 @end

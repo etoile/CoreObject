@@ -84,6 +84,9 @@
 - (void) notifyContextOfDamageIfNeeded;
 - (void) turnIntoFault;
 
+- (BOOL) isIgnoringRelationshipConsistency;
+- (void) setIgnoringRelationshipConsistency: (BOOL)ignore;
+
 @end
 
 

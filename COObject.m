@@ -204,6 +204,16 @@
 	}
 }
 
+- (BOOL) isIgnoringRelationshipConsistency
+{
+	return _isIgnoringRelationshipConsistency;
+}
+
+- (void) setIgnoringRelationshipConsistency: (BOOL)ignore
+{
+	_isIgnoringRelationshipConsistency = ignore;
+}
+
 - (void) setValue:(id)value forProperty:(NSString*)key
 {
 	if (![[self properties] containsObject: key])
@@ -211,19 +221,97 @@
 		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
 		return;
 	}
-	
-	[self willChangeValueForProperty: key];
 
 	if (![COObject isCoreObjectValue: value])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Invalid property type"];
 	}
 
-	if (nil == value)
+	// FIXME: use the metamodel's validation support?
+	
+	
+	// Begin relationship integrity
+	if (!_isIgnoringRelationshipConsistency)
 	{
-		value = [NSNull null];
-	}
+		ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+		assert(desc != nil);
+		if ([desc isContainer])
+		{
+			NSString *oppositeName = [[desc opposite] name];
+			COObject *oldContainer = [self valueForProperty: key];
+			COObject *newContainer = value;
+			
+			//BOOL oldWasIgnoring = [oldContainer isIgnoringRelationshipConsistency];
+			//BOOL newWasIgnoring = [newContainer isIgnoringRelationshipConsistency];
+			[oldContainer setIgnoringRelationshipConsistency: YES];
+			[newContainer setIgnoringRelationshipConsistency: YES];			
+			
+			[oldContainer removeObject: self forProperty: oppositeName];
+			[newContainer addObject: self forProperty: oppositeName];			
+			
+			[oldContainer setIgnoringRelationshipConsistency: NO];
+			[newContainer setIgnoringRelationshipConsistency: NO];	
+		}
+		else if ([desc isComposite])
+		{
+			NSString *oppositeName = [[desc opposite] name];
+			NSArray *oldObjects;
+			if ([[self valueForProperty: key] isKindOfClass: [NSArray class]])
+			{
+				oldObjects = [self valueForProperty: key];
+			}
+			else if ([[self valueForProperty: key] isKindOfClass: [NSSet class]])
+			{
+				oldObjects = [[self valueForProperty: key] allObjects];
+			}			
+			else
+			{
+				if ([self valueForProperty: key] != nil)
+				{
+					oldObjects = [NSArray arrayWithObject: [self valueForProperty: key]];
+				}
+				else
+				{
+					oldObjects = [NSArray array];
+				}
+			}
 
+			NSArray *newObjects;
+			if ([value isKindOfClass: [NSSet class]])
+			{
+				newObjects = [value allObjects];
+			}
+			else if (value == nil)
+			{
+				newObjects = [NSArray array];
+			}
+			else
+			{
+				newObjects = value;
+			}
+			assert([newObjects isKindOfClass: [NSArray class]]);
+			
+			for (COObject *obj in [oldObjects arrayByAddingObjectsFromArray: newObjects])
+			{
+				[obj setIgnoringRelationshipConsistency: YES];
+			}
+			for (COObject *oldObj in oldObjects)
+			{
+				[oldObj setValue: nil forProperty: oppositeName];
+			}
+			for (COObject *newObj in newObjects)
+			{
+				[newObj setValue: self forProperty: oppositeName];
+			}
+			for (COObject *obj in [oldObjects arrayByAddingObjectsFromArray: newObjects])
+			{
+				[obj setIgnoringRelationshipConsistency: NO];
+			}
+		}
+	}
+	// End relationship integrity	
+	
+	
 	// Collections must be mutable
 	if ([value isKindOfClass: [NSArray class]]
 		|| [value isKindOfClass: [NSSet class]])
@@ -231,8 +319,14 @@
 		value = [[value mutableCopy] autorelease];
 	}
 	
+	// Make sure the value is in the same context as us
 	[self debugCheckValue: value];
 	
+	// Actually set the value.
+	
+	[self willChangeValueForProperty: key];
+	
+	if (nil == value) { value = [NSNull null]; }
 	[_variableStorage setObject: value
 						 forKey: key];
 		
@@ -298,7 +392,7 @@
 	}
 	
 	// FIXME: add safety checks
-	[[self valueForProperty: key] insertObject: object atIndex: index];
+	[[self valueForProperty: key] removeObject: object atIndex: index];
 	
 	
 	[self didChangeValueForProperty: key];
@@ -375,6 +469,11 @@
 
 - (BOOL)isEqual: (id)object
 {
+	if (object == self)
+	{
+		return YES;
+	}
+	
 	if ([object isKindOfClass: [COObject class]])
 	{
 		COObject *other = (COObject*)object;
@@ -388,7 +487,7 @@
 			{
 				id selfValue = [self valueForProperty: [propDesc name]];
 				id otherValue = [other valueForProperty: [propDesc name]];
-				if (![selfValue isEqual: otherValue])
+				if (![selfValue isEqual: otherValue] && !(selfValue == nil && otherValue == nil))
 				{
 					return NO; 
 				}
