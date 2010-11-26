@@ -272,6 +272,10 @@ same name). */
 	{
 		[desc setValue: realValue forKey: aProperty];
 	}
+	else
+	{
+		[NSException raise: NSInternalInconsistencyException format: @"Couldn't resolve property %@ value %@ for %@", aProperty, value, desc];
+	}
 }
 
 - (NSSet *) resolveAndAddEntityDescriptions: (NSSet *)unresolvedEntityDescs

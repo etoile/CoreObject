@@ -176,7 +176,9 @@
 	}
 	// FIXME: what does it mean if opposite == self? 
 	//        FM3 seems to do this for the opposite property of FM3.Property
-	if (_isSettingOpposite || opposite == _opposite || opposite == self)
+	// It's uesd for some one-to-one relationships (like "spouse") or
+	// many-to-many relationship (like "cousins")
+	if (_isSettingOpposite || opposite == _opposite)
 	{
 		return;
 	}

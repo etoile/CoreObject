@@ -123,4 +123,27 @@
 	DELETE_STORE;
 }
 
+- (void)testOneToOneRelationship
+{
+	COStore *store = [[COStore alloc] initWithURL: STORE_URL];
+	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
+	
+	COObject *p1 = [ctx insertObjectWithEntityName: @"Anonymous.Person"]; // See TestCommon.m for metamodel definition
+	COObject *p2 = [ctx insertObjectWithEntityName: @"Anonymous.Person"];
+	COObject *p3 = [ctx insertObjectWithEntityName: @"Anonymous.Person"];
+	
+	UKNil([p1 valueForProperty: @"spouse"]);
+	[p1 setValue: p2 forProperty: @"spouse"];
+	UKObjectsEqual(p1, [p2 valueForProperty: @"spouse"]);
+	UKObjectsEqual(p2, [p1 valueForProperty: @"spouse"]);	
+	[p2 setValue: p3 forProperty: @"spouse"];
+	UKNil([p1 valueForProperty: @"spouse"]);
+	UKObjectsEqual(p2, [p3 valueForProperty: @"spouse"]);
+	UKObjectsEqual(p3, [p2 valueForProperty: @"spouse"]);	
+	
+	[ctx release];
+	[store release];
+	DELETE_STORE;
+}
+
 @end
