@@ -54,3 +54,17 @@ void setUpMetamodel()
 	
 	[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
 }
+
+COEditingContext *NewContext()
+{
+	COStore *store = [[[COStore alloc] initWithURL: STORE_URL] autorelease];
+	assert(store != nil);
+	return [[COEditingContext alloc] initWithStore: store];
+}
+
+void TearDownContext(COEditingContext *ctx)
+{
+	assert(ctx != nil);
+	[ctx release];
+	DELETE_STORE;
+}

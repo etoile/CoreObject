@@ -140,6 +140,42 @@
  */
 - (void)setNamedBranch: (CONamedBranch*)branch
 {
+	[self setNamedBranch: branch recursivelyOnObject: obj];
+}
+
+- (void)setNamedBranch:(CONamedBranch *)branch recursivelyOnObject: (COObject*)anObject
+{
+	assert([anObject isKindOfClass: [COObject class]]);
+	
+	COEditingContext *ctx = [obj editingContext];
+
+	// Ask the context to set the branch on this individual object. This should
+	// reload all of its properties.
+
+	[ctx setNamedBranch: [branch UUID] forObjectUUID: [anObject UUID]];
+	 
+	for (ETPropertyDescription *propDesc in [[anObject entityDescription] allPropertyDescriptions])
+	{
+		if ([propDesc isComposite])
+		{
+			id value = [anObject valueForProperty: [propDesc name]];
+			
+			assert([propDesc isMultivalued] ==
+				   ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]));
+			
+			if ([propDesc isMultivalued])
+			{
+				for (id subvalue in value)
+				{
+					[self setNamedBranch: branch recursivelyOnObject: subvalue];
+				}
+			}
+			else
+			{
+				[self setNamedBranch: branch recursivelyOnObject: value];
+			}
+		}
+	}	
 }
 
 /* Private */

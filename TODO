@@ -10,7 +10,6 @@ Merging:
  
 Model Objects (COObject):
  - KVO support?
- - relationship integrity maintainence (one-to-one, one-to-many, many-to-many)
  - copy + paste support
  
 History tracks

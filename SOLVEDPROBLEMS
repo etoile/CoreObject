@@ -1,6 +1,22 @@
 Solved Problems
 ===============
 
+Q: Will copy/paste and relationship integrity conflict with each other?
+e.g. suppose you have two Person entities which have a 1:1 spouse relationship
+set to each other:
+
+p1--p2
+
+and you make a copy of p2, which is called p3. Creating p3 shouldn't alter p1 or p2.
+
+It's a bit of a heuristic, but when doing a copy, we could set all properties
+where the opposite side of the multivalued, but leave 'nil' relationships where
+the opposite isn't multivalued, so we don't run in to problems like the one above.
+Alternatively we could copy p1 as well.
+Maybe this should be specified in the metamodel as a "copy rule".
+
+
+
 Q: Not sure the best way to represent checkpoints. Tags?
 A: Probably just an empty commit as in OM1
 

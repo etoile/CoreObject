@@ -10,22 +10,6 @@
 
 @implementation TestEditingContext
 
-static COEditingContext *NewContext()
-{
-	COStore *store = [[[COStore alloc] initWithURL: STORE_URL] autorelease];
-	assert(store != nil);
-	return [[COEditingContext alloc] initWithStore: store];
-}
-
-static void TearDownContext(COEditingContext *ctx)
-{
-	assert(ctx != nil);
-	[ctx release];
-	DELETE_STORE;
-}
-
-
-
 - (id) init
 {
 	self = [super init];
@@ -46,7 +30,7 @@ static void TearDownContext(COEditingContext *ctx)
 	
 	COObject *obj = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	UKNotNil(obj);
-	UKObjectsSame([COObject class], [obj class]);
+	UKTrue([obj isKindOfClass: [COObject class]]);
 	
 	NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentGroup", @"parentCollections", @"contents", @"label", nil];
 	UKObjectsEqual([NSSet setWithArray: expectedProperties],
@@ -90,21 +74,5 @@ static void TearDownContext(COEditingContext *ctx)
 	DELETE_STORE;
 }
 
-- (void)testHistoryTracks
-{
-	COEditingContext *ctx = NewContext();
-	
-	COObject *container = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COObject *subcontainer1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COObject *subcontainer2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	COObject *leaf1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COObject *leaf2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	COObject *leaf3 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	
-	
-	
-	
-	TearDownContext(ctx);
-}
 
 @end

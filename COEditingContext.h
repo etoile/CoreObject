@@ -48,7 +48,7 @@
 - (BOOL) objectHasChanges: (ETUUID*)uuid;
 
 - (Class) classForEntityDescription: (ETEntityDescription*)desc;
-- (COObject*) insertObjectWithEntityName: (NSString*)aFullName;
+- (id) insertObjectWithEntityName: (NSString*)aFullName;
 
 - (COObject*) objectWithUUID: (ETUUID*)uuid;
 

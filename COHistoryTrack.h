@@ -61,6 +61,7 @@
 
 /* Private */
 
+- (void)setNamedBranch:(CONamedBranch *)branch recursivelyOnObject: (COObject*)anObject;
 - (NSArray*)changedObjectsForCommit: (COCommit*)commit;
 - (COHistoryTrackNode*)parentForCommit: (COCommit*)commit;
 - (COHistoryTrackNode*)mergedNodeForCommit: (COCommit*)commit;

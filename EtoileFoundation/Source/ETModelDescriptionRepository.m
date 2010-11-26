@@ -228,7 +228,12 @@ static NSString *anonymousPackageName = @"Anonymous";
 
 - (Class) classForEntityDescription: (ETEntityDescription*)anEntityDescription
 {
-	return [_classesByEntityDescription objectForKey: anEntityDescription];
+	Class cls = [_classesByEntityDescription objectForKey: anEntityDescription];
+	if (cls == nil && [anEntityDescription parent] != nil)
+	{
+		cls = [self classForEntityDescription: [anEntityDescription parent]];
+	}
+	return cls;
 }
 
 - (void) setEntityDescription: (ETEntityDescription *)anEntityDescription

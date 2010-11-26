@@ -1,6 +1,7 @@
 Unsolved Problems
 =================
 
+
 Q: What if you branch while sharing a document? set a branch?
 A: Synchronization is a complex and multi-step process. Depending on the application,
 it needs to be customized.

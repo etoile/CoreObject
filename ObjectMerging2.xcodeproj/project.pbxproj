@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6620EFA4129F3AAD00FD5AB9 /* TestHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */; };
 		6686BDE712592C5D0065DE1A /* COObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDB812592C1B0065DE1A /* COObject.m */; };
 		6686BDE912592C5D0065DE1A /* COEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDBB12592C1B0065DE1A /* COEditingContext.m */; };
 		6686BDEF12592C810065DE1A /* NSData+compression.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDD812592C1B0065DE1A /* NSData+compression.h */; };
@@ -129,6 +130,7 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
+		6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestHistoryTrack.m; sourceTree = "<group>"; };
 		6627F390127C7E6700E06946 /* ExceptionHandling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExceptionHandling.framework; path = System/Library/Frameworks/ExceptionHandling.framework; sourceTree = SDKROOT; };
 		6686BDAC12592BDA0065DE1A /* ObjectMerging.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectMerging.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6686BDAD12592BDA0065DE1A /* ObjectMerging-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ObjectMerging-Info.plist"; sourceTree = "<group>"; };
@@ -409,6 +411,7 @@
 				66D09D03129C936E006BEDC3 /* TestCommon.m */,
 				66D09D92129CEDB2006BEDC3 /* TestGroup.m */,
 				66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */,
+				6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */,
 			);
 			name = Test;
 			sourceTree = "<group>";
@@ -658,6 +661,7 @@
 				66D09D04129C936E006BEDC3 /* TestCommon.m in Sources */,
 				66D09D93129CEDB2006BEDC3 /* TestGroup.m in Sources */,
 				66D09EF4129EF6C7006BEDC3 /* TestRelationshipIntegrity.m in Sources */,
+				6620EFA4129F3AAD00FD5AB9 /* TestHistoryTrack.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
