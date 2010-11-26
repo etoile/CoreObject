@@ -26,13 +26,6 @@
 
 	COGroup *document2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
-	/*COCollection *tag1 = [ctx insertObjectWithEntityName: @"Anonymous.Tag"];
-	COCollection *tag2 = [ctx insertObjectWithEntityName: @"Anonymous.Tag"];
-	
-	COObject *person1 = [ctx insertObjectWithEntityName: @"Anonymous.Person"];
-	COObject *person2 = [ctx insertObjectWithEntityName: @"Anonymous.Person"];
-	COObject *person3 = [ctx insertObjectWithEntityName: @"Anonymous.Person"];	*/
-	
 	// Set up the initial state
 	
 	[document1 setValue:@"Document 1" forProperty: @"label"];
@@ -60,14 +53,135 @@
 	[group2 addObject: leaf2]; [ctx commit];
 	[document2 addObject: group2]; [ctx commit];
 	[group2	setValue: @"Groceries" forProperty: @"label"]; [ctx commit];
-	[group1 setValue: @"Work" forProperty: @"label"]; [ctx commit];
+	[group1 setValue: @"Work Contacts" forProperty: @"label"]; [ctx commit];
 	[leaf3 setValue: @"Wine" forProperty: @"label"]; [ctx commit];
 	[leaf1 setValue: @"Alice" forProperty: @"label"]; [ctx commit];
+	[leaf3 setValue: @"Red wine" forProperty: @"label"]; [ctx commit];
+	[leaf2 setValue: @"Cheese" forProperty: @"label"]; [ctx commit];
+	[leaf1 setValue: @"Alice (cell)" forProperty: @"label"]; [ctx commit];
 	
-	NSLog(@"%@", [workspace debugDescription]);
+	// introduce some new objects
 	
-	// FIXME: 
-	UKPass();
+	COGroup *leaf4 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COGroup *leaf5 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
+	COGroup *leaf6 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	
+	[leaf4 setValue: @"Leaf 4" forProperty: @"label"]; [ctx commit];
+	[leaf5 setValue: @"Leaf 5" forProperty: @"label"]; [ctx commit];
+	[leaf6 setValue: @"Leaf 6" forProperty: @"label"]; [ctx commit];	
+	
+	// add them to the lists
+
+	[group1 addObject: leaf4]; [ctx commit];
+	[group2 addObject: leaf5]; [ctx commit];
+	[group2 addObject: leaf6]; [ctx commit];
+
+	[leaf4 setValue: @"Carol" forProperty: @"label"]; [ctx commit];
+	[leaf5 setValue: @"Pizza" forProperty: @"label"]; [ctx commit];
+	[leaf6 setValue: @"Beer" forProperty: @"label"]; [ctx commit];	
+	
+	UKFalse([ctx hasChanges]);
+	
+	// Finally, create some history tracks.
+	
+	
+	COHistoryTrack *workspaceTrack = [[COHistoryTrack alloc] initTrackWithObject: workspace containedObjects: YES];
+	COHistoryTrack *doc1Track = [[COHistoryTrack alloc] initTrackWithObject: document1 containedObjects: YES];
+	COHistoryTrack *doc2Track = [[COHistoryTrack alloc] initTrackWithObject: document2 containedObjects: YES];
+	COHistoryTrack *leaf3Track = [[COHistoryTrack alloc] initTrackWithObject: leaf3 containedObjects: NO];
+	
+	UKNotNil(workspaceTrack);
+	UKNotNil(doc1Track);
+	UKNotNil(doc2Track);
+	UKNotNil(leaf3Track);
+	
+	
+	// Start with an easy test
+	
+	
+	UKObjectsEqual(@"Red wine", [leaf3 valueForProperty: @"label"]);
+	[leaf3Track undo];
+	UKObjectsEqual(@"Wine", [leaf3 valueForProperty: @"label"]);
+	[leaf3Track undo];
+	UKObjectsEqual(@"Leaf 3", [leaf3 valueForProperty: @"label"]);
+	UKObjectsEqual(S([leaf3 UUID]), [ctx changedObjectUUIDs]); // Ensure that no other objects were changed by the history track
+	
+	
+	// Now try undoing changes made to Document 1, using doc1track. It shouldn't 
+	// affect leaf3 until seveal steps back in to the history.
+	
+	
+	// first undo should change leaf4's label from "Carol" -> "Leaf 4"
+	UKObjectsEqual(@"Carol", [leaf4 valueForProperty: @"label"]);
+	[doc1Track undo]; 
+	UKObjectsEqual(@"Leaf 4", [leaf4 valueForProperty: @"label"]);
+	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID]), [ctx changedObjectUUIDs]);
+	
+	// next undo should remove leaf4 from group1
+	UKObjectsEqual(S([leaf1 UUID], [leaf4 UUID]), [NSSet setWithArray: [group1 contentArray]]);
+	[doc1Track undo]; 
+	UKObjectsEqual(S([leaf1 UUID]), [NSSet setWithArray: [group1 contentArray]]);	
+	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID]), [ctx changedObjectUUIDs]);
+	
+	// next undo should change leaf1's label from "Alice (cell)" -> "Alice"
+	UKObjectsEqual(@"Alice (cell)", [leaf1 valueForProperty: @"label"]);
+	[doc1Track undo]; 
+	UKObjectsEqual(@"Alice", [leaf1 valueForProperty: @"label"]);
+	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID]), [ctx changedObjectUUIDs]);
+	
+	// next undo should change group1's label from "Work Contacts" -> "Group 1"
+	UKObjectsEqual(@"Work Contacts", [group1 valueForProperty: @"label"]);
+	[doc1Track undo]; 
+	UKObjectsEqual(@"Group 1", [group1 valueForProperty: @"label"]);
+	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID]), [ctx changedObjectUUIDs]);
+	
+	// next undo should move group2 from document 2 back to document 1
+	UKTrue([[document2 contentArray] containsObject: group2]);
+	UKFalse([[document1 contentArray] containsObject: group2]);
+	UKObjectsSame(document2, [group2 valueForProperty: @"parentGroup"]);
+	[doc1Track undo]; 
+	UKFalse([[document2 contentArray] containsObject: group2]);
+	UKTrue([[document1 contentArray] containsObject: group2]);
+	UKObjectsSame(document1, [group2 valueForProperty: @"parentGroup"]);
+	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID]), [ctx changedObjectUUIDs]);
+	
+	// next undo should move leaf2 ("Tomatoes") from group 2 to group 1
+	UKTrue([[group2 contentArray] containsObject: leaf2]);
+	UKFalse([[group1 contentArray] containsObject: leaf2]);
+	UKObjectsSame(group2, [leaf2 valueForProperty: @"parentGroup"]);
+	[doc1Track undo]; 
+	UKFalse([[group2 contentArray] containsObject: leaf2]);
+	UKTrue([[group1 contentArray] containsObject: leaf2]);
+	UKObjectsSame(group1, [leaf2 valueForProperty: @"parentGroup"]);
+	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx changedObjectUUIDs]);
+	
+	// next undo should rename leaf2 "Tomatoes" -> "Leaf 2"
+	UKObjectsEqual(@"Tomatoes", [leaf2 valueForProperty: @"label"]);
+	[doc1Track undo]; 
+	UKObjectsEqual(@"Leaf 2", [leaf2 valueForProperty: @"label"]);
+	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx changedObjectUUIDs]);
+
+	// next undo should rename document 1 "My Contacts" -> "Document 1"
+	UKObjectsEqual(@"My Contacts", [document1 valueForProperty: @"label"]);
+	[doc1Track undo]; 
+	UKObjectsEqual(@"Document 1", [document1 valueForProperty: @"label"]);
+	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx changedObjectUUIDs]);
+	
+	// FIXME: The next undo would undo the initial commit of Document 1.
+	// Need to decide what happens if you try to undo it
+	
+	// Verify that the state of document2 wasn't changed. (other than moving group2 back to document 1)
+	UKObjectsEqual(@"Groceries", [group2 valueForProperty: @"label"]); 
+
+	
+	
+	//
+	// Now we will test a more complicated scenario. 
+	
+	
+	[workspaceTrack release];
+	[doc1Track release];
+	[doc2Track release];
 	TearDownContext(ctx);
 }
 @end

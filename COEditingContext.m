@@ -66,7 +66,10 @@
 {
 	return [_damagedObjectUUIDs containsObject: uuid];
 }
-
+- (NSSet*) changedObjectUUIDs
+{
+	return [NSSet setWithSet: _damagedObjectUUIDs];
+}
 
 // Creating and accessing objects
 
@@ -255,7 +258,7 @@
 	}
 	
 	obj->_isFault = NO;
-	obj->_isDamaged = NO;
+	[self markObjectUndamaged: obj];
 	obj->_isIgnoringDamageNotifications = NO;
 }
 
@@ -271,7 +274,9 @@
 			NSString *name = [_store entityNameForObjectUUID: uuid];
 			if (name == nil)
 			{
-				[NSException raise: NSGenericException format: @"Failed to find an entity name for %@", uuid];
+				//[NSException raise: NSGenericException format: @"Failed to find an entity name for %@", uuid];
+				NSLog(@"WARNING: -[COEditingContext objectWithUUID:entityName:] failed to find an entity name for %@ (probably, the requested object does not exist)", uuid);
+				return nil;
 			}
 			desc = [_modelRepository descriptionForName: name];
 		}
@@ -346,10 +351,20 @@
 
 - (void) discardAllChangesInObject: (COObject*)object
 {
-	[self markObjectUndamaged: object];
+	// FIXME: is this what we want?
 	
-	// FIXME
-//	[self loadObject: object withDataAtHistoryGraphNode: _baseHistoryGraphNode];	
+	// Special case for objects which haven't yet been comitted
+	if ([_insertedObjectUUIDs containsObject: [object UUID]])
+	{
+		[self markObjectUndamaged: object];
+		[_insertedObjectUUIDs removeObject: [object UUID]];
+		[_instantiatedObjects removeObjectForKey: [object UUID]];
+		// lingering instances may be in a 'zombie' state now... not sure how to solve that problem
+	}
+	else
+	{
+		[self loadObject: object];
+	}
 }
 
 /*

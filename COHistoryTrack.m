@@ -31,7 +31,7 @@
  * Convience method moves the current node one node closer to the tip, on
  * the path defined by starting at the tipNode and following parent pointers.
  */
-- (COHistoryTrackNode*)moveCurrentNodeForward
+- (COHistoryTrackNode*)redo
 {
 	return nil; // FIXME: non-primitive (implementable on the rest of the api)
 }
@@ -39,7 +39,7 @@
 /** 
  * Same as above, but moves one node away from the tip.
  */
-- (COHistoryTrackNode*)moveCurrentNodeBackward
+- (COHistoryTrackNode*)undo
 {
 	return nil; // FIXME: non-primitive (implementable on the rest of the api)
 }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6620EFA4129F3AAD00FD5AB9 /* TestHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */; };
+		6620F13C129F8CC500FD5AB9 /* COHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09999129A5B64006BEDC3 /* COHistoryTrack.m */; };
 		6686BDE712592C5D0065DE1A /* COObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDB812592C1B0065DE1A /* COObject.m */; };
 		6686BDE912592C5D0065DE1A /* COEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDBB12592C1B0065DE1A /* COEditingContext.m */; };
 		6686BDEF12592C810065DE1A /* NSData+compression.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDD812592C1B0065DE1A /* NSData+compression.h */; };
@@ -610,6 +611,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6620F13C129F8CC500FD5AB9 /* COHistoryTrack.m in Sources */,
 				66D09D86129CEC8C006BEDC3 /* COGroup.m in Sources */,
 				66D09D57129CE470006BEDC3 /* COCollection.m in Sources */,
 				66D09AB6129B29F3006BEDC3 /* NSData+compression.m in Sources */,

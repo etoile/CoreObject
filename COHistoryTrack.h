@@ -32,11 +32,11 @@
  * Convience method moves the current node one node closer to the tip, on
  * the path defined by starting at the tipNode and following parent pointers.
  */
-- (COHistoryTrackNode*)moveCurrentNodeForward;
+- (COHistoryTrackNode*)redo;
 /** 
  * Same as above, but moves one node away from the tip.
  */
-- (COHistoryTrackNode*)moveCurrentNodeBackward;
+- (COHistoryTrackNode*)undo;
 
 /**
  * This figures out what current nodes need to be moved on the object

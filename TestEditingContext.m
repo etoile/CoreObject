@@ -75,4 +75,30 @@
 }
 
 
+- (void)testDiscardChanges
+{
+	COEditingContext *ctx = NewContext();
+
+	UKFalse([ctx hasChanges]);
+		
+	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	ETUUID *u1 = [[o1 UUID] retain];
+	
+	// FIXME: It's not entirely clear what this should do
+	[ctx discardAllChanges];
+	UKNil([ctx objectWithUUID: u1]);
+	
+	UKFalse([ctx hasChanges]);
+	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[o2 setValue: @"hello" forProperty: @"label"];
+	[ctx commit];
+	UKObjectsEqual(@"hello", [o2 valueForProperty: @"label"]);
+	
+	[o2 setValue: @"bye" forProperty: @"label"];
+	[ctx discardAllChanges];
+	UKObjectsEqual(@"hello", [o2 valueForProperty: @"label"]);
+	
+	TearDownContext(ctx);
+}
+
 @end
