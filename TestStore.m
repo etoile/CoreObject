@@ -162,12 +162,16 @@ static void TearDownStore(COStore *s)
 		{
 			id temp = result2; result2 = result1; result1 = temp;
 		}
-		UKObjectsEqual(@"name", [result1 objectForKey: @"property"]);
 		UKObjectsEqual([c2 UUID], [result1 objectForKey: @"commitUUID"]);
 		UKObjectsEqual(o1, [result1 objectForKey: @"objectUUID"]);
-		UKObjectsEqual(@"name", [result2 objectForKey: @"property"]);
+		UKObjectsEqual(@"name", [result1 objectForKey: @"property"]);
+		UKObjectsEqual(@"dogs", [result1 objectForKey: @"value"]);
+		
+
 		UKObjectsEqual([c4 UUID], [result2 objectForKey: @"commitUUID"]);
-		UKObjectsEqual(o1, [result2 objectForKey: @"objectUUID"]);			 
+		UKObjectsEqual(o1, [result2 objectForKey: @"objectUUID"]);
+		UKObjectsEqual(@"name", [result2 objectForKey: @"property"]);
+		UKObjectsEqual(@"dogpound", [result2 objectForKey: @"value"]);
 	}
 	TearDownStore(s);
 }

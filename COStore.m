@@ -672,16 +672,19 @@ void CHECK(id db)
 			ETUUID *commitUUID = [self UUIDForKey: commitKey];
 			ETUUID *objectUUID = [self UUIDForKey: objectKey];
 			NSString *property = [self propertyForKey: propertyKey];
+			NSString *value = [[[self commitForUUID: commitUUID] valuesAndPropertiesForObject: objectUUID] objectForKey: property];
 			
 			assert(commitUUID != nil);
 			assert(objectUUID != nil);
 			assert(property != nil);
-			
+			assert(value != nil && [value isKindOfClass: [NSString class]]);
+					
 			[results addObject: 
 				[NSDictionary dictionaryWithObjectsAndKeys:
 					commitUUID, @"commitUUID",
 					objectUUID, @"objectUUID",
 					property, @"property",
+				    value, @"value",
 					nil]];
 		}
 		else
