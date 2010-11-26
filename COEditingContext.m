@@ -148,7 +148,7 @@
 	for (ETUUID *uuid in _insertedObjectUUIDs)
 	{
 		NSString *name = [[[self objectWithUUID: uuid] entityDescription] fullName];
-		NSLog(@"Storing entity name %@ for %@", name, uuid);
+		//NSLog(@"Storing entity name %@ for %@", name, uuid);
 		[_store setEntityName: name
 				forObjectUUID: uuid];
 	}
@@ -162,7 +162,7 @@
 					parentCommit: nil
 					mergedCommit: nil];
 		COObject *obj = [self objectWithUUID: uuid];
-		NSLog(@"Committing changes for %@", obj);
+		//NSLog(@"Committing changes for %@", obj);
 		for (NSString *prop in [obj properties])
 		{
 			id value = [obj valueForProperty: prop];
@@ -228,7 +228,7 @@
 	}
 	
 	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj properties]];
-	NSLog(@"Properties to fetch: %@", propertiesToFetch);
+	//NSLog(@"Properties to fetch: %@", propertiesToFetch);
 	
 	obj->_isIgnoringDamageNotifications = YES;
 	
@@ -245,7 +245,7 @@
 		{
 			id plist = [dict objectForKey: key];
 			id value = [obj valueForPropertyList: plist];
-			NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
+			//NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
 			[obj setValue: value
 			  forProperty: key];
 			[propertiesToFetch removeObject: key];

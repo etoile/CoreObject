@@ -232,7 +232,7 @@
 	
 	// Begin relationship integrity
 	if (!_isIgnoringRelationshipConsistency)
-	{
+	{		
 		ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
 		assert(desc != nil);
 		
@@ -278,7 +278,6 @@
 				{
 					oldObjects = [self valueForProperty: key];
 				}
-				
 				assert([oldObjects isKindOfClass: [NSArray class]]);
 				
 				NSArray *newObjects;
@@ -291,7 +290,7 @@
 					newObjects = value;
 				}
 				assert([newObjects isKindOfClass: [NSArray class]]);
-				
+							  
 				for (COObject *obj in [oldObjects arrayByAddingObjectsFromArray: newObjects])
 				{
 					[obj setIgnoringRelationshipConsistency: YES];
@@ -316,6 +315,7 @@
 					}
 					for (COObject *newObj in newObjects)
 					{
+						[[newObj valueForProperty: oppositeName] removeObject: newObj forProperty: key];
 						[newObj setValue: self forProperty: oppositeName];
 					}	
 				}
@@ -479,18 +479,18 @@
 	{
 		// If we are called recursively, don't print the contents of _variableStorage
 		// since it would result in an infinite loop.
-		return [NSString stringWithFormat: @"<Recursive reference to %@ %p UUID=%@>", NSStringFromClass([self class]), self, _uuid];
+		return [NSString stringWithFormat: @"<Recursive reference to %@(%@) at %p UUID %@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
 	}
 	
 	_inDescription = YES;
 	NSString *desc;
 	if ([self isFault])
 	{
-		desc = [NSString stringWithFormat: @"<Faulted %@ %p UUID=%@>", NSStringFromClass([self class]), self, _uuid];  
+		desc = [NSString stringWithFormat: @"<Faulted %@(%@) %p UUID=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];  
 	}
 	else
 	{
-		desc = [NSString stringWithFormat: @"<%@ %p UUID=%@ variableStorage=%@>", NSStringFromClass([self class]), self, _uuid, _variableStorage];  
+		desc = [NSString stringWithFormat: @"<%@(%@) %p UUID=%@ variableStorage=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid, _variableStorage];  
 	}
 	_inDescription = NO;
 	return desc;
@@ -744,14 +744,70 @@ static NSArray *COArrayPropertyListForArray(NSArray *array)
 
 @implementation COObject (Debug)
 
+static int indent = 0;
+
 - (NSString*)detailedDescription
 {
-	NSMutableString *str = [NSMutableString stringWithFormat: @"%@, object data: {\n", [self description]];
-	for (NSString *prop in [self properties])
+	if (_inDescription)
 	{
-		[str appendFormat:@"\t'%@' : %@\n", prop, [self valueForProperty: prop]]; 
+		return [NSString stringWithFormat: @"<Recursive reference to %@(%@) at %p UUID %@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
 	}
-	[str appendFormat:@"}"];
+	_inDescription = YES;
+	indent++;
+	NSMutableString *str = [NSMutableString stringWithFormat: @"<%@(%@) at %p UUID %@ data: {\n",  [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
+	indent++;
+	
+	NSMutableArray *props = [NSMutableArray arrayWithArray: [self properties]];
+	if ([props containsObject: @"contents"])
+	{
+		[props removeObject: @"contents"];
+		[props insertObject: @"contents" atIndex: 0];
+	}
+	if ([props containsObject: @"label"])
+	{
+		[props removeObject: @"label"];
+		[props insertObject: @"label" atIndex: 0];
+	}
+	for (NSString *prop in props)
+	{
+		NSMutableString *valuestring = [NSMutableString string];
+		id value = [self valueForProperty: prop];
+		if ([value isKindOfClass: [NSSet class]])
+		{
+			[valuestring appendFormat: @"(\n"];
+			for (id item in value)
+			{
+				for (int i=0; i<indent + 1; i++) [valuestring appendFormat: @"\t"];
+				[valuestring appendFormat: @"%@\n", [item debugDescription]];	
+			}
+			for (int i=0; i<indent; i++) [valuestring appendFormat: @"\t"];
+			[valuestring appendFormat: @"),\n"];
+		}
+		else if ([value isKindOfClass: [NSArray class]])
+		{
+			[valuestring appendFormat: @"{\n"];
+			for (id item in value)
+			{
+				for (int i=0; i<indent + 1; i++) [valuestring appendFormat: @"\t"];
+				[valuestring appendFormat: @"%@", [item debugDescription]];	
+			}
+			for (int i=0; i<indent; i++) [valuestring appendFormat: @"\t"];
+			[valuestring appendFormat: @"},\n"];
+		}
+		else
+		{
+			[valuestring appendFormat: @"%@,\n", [value debugDescription]];
+		}
+
+		
+		for (int i=0; i<indent; i++) [str appendFormat: @"\t"];
+		[str appendFormat:@"%@ : %@", prop, valuestring]; 
+	}
+	indent--;
+	for (int i=0; i<indent; i++) [str appendFormat: @"\t"];
+	[str appendFormat:@"}>\n"];
+	indent--;
+	_inDescription = NO;
 	return str;
 }
 

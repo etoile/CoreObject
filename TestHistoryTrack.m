@@ -16,6 +16,7 @@
 {
 	COEditingContext *ctx = NewContext();
 	
+	COGroup *workspace = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COGroup *document1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COGroup *group1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COGroup *leaf1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -41,20 +42,32 @@
 	[group2 setValue:@"Group 2" forProperty: @"label"];
 	[leaf3 setValue:@"Leaf 3" forProperty: @"label"];
 	[document2 setValue:@"Document 2" forProperty: @"label"];
-	
+
+	[workspace addObject: document1];
+	[workspace addObject: document2];
 	[document1 addObject: group1];
 	[group1 addObject: leaf1];
 	[group1 addObject: leaf2];	
 	[document1 addObject: group2];	
 	[group2 addObject: leaf3];
-
-	// Now make some changes
 	
-	[group2 addObject: leaf2];
-	[document2 addObject: group2];
+	[ctx commit];
+	// Now make some changes
+		
+	[document2 setValue: @"My Shopping List" forProperty: @"label"]; [ctx commit];
+	[document1 setValue: @"My Contacts" forProperty: @"label"]; [ctx commit];
+	[leaf2 setValue: @"Tomatoes" forProperty: @"label"]; [ctx commit];
+	[group2 addObject: leaf2]; [ctx commit];
+	[document2 addObject: group2]; [ctx commit];
+	[group2	setValue: @"Groceries" forProperty: @"label"]; [ctx commit];
+	[group1 setValue: @"Work" forProperty: @"label"]; [ctx commit];
+	[leaf3 setValue: @"Wine" forProperty: @"label"]; [ctx commit];
+	[leaf1 setValue: @"Alice" forProperty: @"label"]; [ctx commit];
+	
+	NSLog(@"%@", [workspace debugDescription]);
 	
 	// FIXME: 
-	
+	UKPass();
 	TearDownContext(ctx);
 }
 @end

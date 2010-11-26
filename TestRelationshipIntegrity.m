@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
 #import "COEditingContext.h"
+#import "COGroup.h"
 #import "TestCommon.h"
 
 @interface TestRelationshipIntegrity : NSObject <UKTest>
@@ -77,6 +78,18 @@
 	[o3 removeObject: o2 forProperty: @"contents"];
 	UKNil([o2 valueForProperty: @"parentGroup"]);
 	
+	// Now test moving by modifying the multivalued side of the relationship
+	
+	COGroup *o4 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; 
+	COGroup *o5 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
+	COGroup *o6 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];	
+	
+	[o5 addObject: o4];
+	[o6 addObject: o4]; // Should move o4 from o5 to o6
+	UKObjectsEqual([NSArray array], [o5 contentArray]);
+	UKObjectsEqual(A(o4), [o6 contentArray]);
+	UKObjectsSame(o6, [o4 valueForProperty: @"parentGroup"]);
+	
 	[ctx release];
 	[store release];
 	DELETE_STORE;
@@ -144,6 +157,59 @@
 	[ctx release];
 	[store release];
 	DELETE_STORE;
+}
+
+- (void)testShoppingList
+{
+	COEditingContext *ctx = NewContext();
+	
+	COGroup *workspace = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COGroup *document1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COGroup *group1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COGroup *leaf1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COGroup *leaf2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
+	COGroup *group2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
+	COGroup *leaf3 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	
+	COGroup *document2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	
+	// Set up the initial state
+	[document1 setValue:@"Document 1" forProperty: @"label"];
+	[group1 setValue:@"Group 1" forProperty: @"label"];
+	[leaf1 setValue:@"Leaf 1" forProperty: @"label"];
+	[leaf2 setValue:@"Leaf 2" forProperty: @"label"];
+	[group2 setValue:@"Group 2" forProperty: @"label"];
+	[leaf3 setValue:@"Leaf 3" forProperty: @"label"];
+	[document2 setValue:@"Document 2" forProperty: @"label"];
+	
+	[workspace addObject: document1];
+	[workspace addObject: document2];
+	[document1 addObject: group1];
+	[group1 addObject: leaf1];
+	[group1 addObject: leaf2];	
+	[document1 addObject: group2];	
+	[group2 addObject: leaf3];
+	
+	[ctx commit];
+	// Now make some changes
+	
+	[group2 addObject: leaf2]; [ctx commit];
+	[document2 addObject: group2]; [ctx commit];
+
+	UKObjectsSame(workspace, [document1 valueForProperty: @"parentGroup"]);
+	UKObjectsSame(workspace, [document2 valueForProperty: @"parentGroup"]);	
+	UKObjectsSame(document1, [group1 valueForProperty: @"parentGroup"]);	
+	UKObjectsSame(document2, [group2 valueForProperty: @"parentGroup"]);	
+	UKObjectsSame(group1, [leaf1 valueForProperty: @"parentGroup"]);	
+	UKObjectsSame(group2, [leaf2 valueForProperty: @"parentGroup"]);	
+	UKObjectsSame(group2, [leaf3 valueForProperty: @"parentGroup"]);	
+	UKObjectsEqual(S(document1, document2), [NSSet setWithArray: [workspace contentArray]]);
+	UKObjectsEqual(S(group1), [NSSet setWithArray: [document1 contentArray]]); //fails
+	UKObjectsEqual(S(group2), [NSSet setWithArray: [document2 contentArray]]);
+	UKObjectsEqual(S(leaf1), [NSSet setWithArray: [group1 contentArray]]); //fails
+	UKObjectsEqual(S(leaf2, leaf3), [NSSet setWithArray: [group2 contentArray]]);
+	
+	TearDownContext(ctx);
 }
 
 @end
