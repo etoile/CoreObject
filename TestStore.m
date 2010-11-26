@@ -129,28 +129,45 @@ static void TearDownStore(COStore *s)
 	ETUUID *o1 = [ETUUID UUID];
 	
 	[s beginCommitWithMetadata: nil];
-	
-	[s beginChangesForObject: o1
-			   onNamedBranch: nil
-		   updateObjectState: YES
-				parentCommit: nil
-				mergedCommit: nil];
-	[s setValue: @"ALL YOUR BASE ARE BELONG TO US"
-	forProperty: @"name"
-	   ofObject: o1
-	shouldIndex: YES];
-	
+	[s beginChangesForObject: o1 onNamedBranch: nil updateObjectState: YES parentCommit: nil mergedCommit: nil];
+	[s setValue: @"cats" forProperty: @"name" ofObject: o1 shouldIndex: YES];
 	[s finishChangesForObject: o1];
 	COCommit *c1 = [s finishCommit];
 
-	NSArray *searchResults = [s resultDictionariesForQuery: @"belo*"];
-	UKIntsEqual(1, [searchResults count]);
-	if ([searchResults count] == 1)
+	[s beginCommitWithMetadata: nil];
+	[s beginChangesForObject: o1 onNamedBranch: nil updateObjectState: YES parentCommit: c1	mergedCommit: nil];
+	[s setValue: @"dogs" forProperty: @"name" ofObject: o1 shouldIndex: YES];
+	[s finishChangesForObject: o1];
+	COCommit *c2 = [s finishCommit];
+	
+	[s beginCommitWithMetadata: nil];
+	[s beginChangesForObject: o1 onNamedBranch: nil updateObjectState: YES parentCommit: c2	mergedCommit: nil];
+	[s setValue: @"horses" forProperty: @"name" ofObject: o1 shouldIndex: YES];
+	[s finishChangesForObject: o1];
+	COCommit *c3 = [s finishCommit];
+	
+	[s beginCommitWithMetadata: nil];
+	[s beginChangesForObject: o1 onNamedBranch: nil updateObjectState: YES parentCommit: c3	mergedCommit: nil];
+	[s setValue: @"dogpound" forProperty: @"name" ofObject: o1 shouldIndex: YES];
+	[s finishChangesForObject: o1];
+	COCommit *c4 = [s finishCommit];
+	
+	NSArray *searchResults = [s resultDictionariesForQuery: @"dog*"];
+	UKIntsEqual(2, [searchResults count]);
+	if ([searchResults count] == 2)
 	{
-		NSDictionary *result = [searchResults objectAtIndex: 0];
-		UKObjectsEqual(@"name", [result objectForKey: @"property"]);
-		UKObjectsEqual([c1 UUID], [result objectForKey: @"commitUUID"]);
-		UKObjectsEqual(o1, [result objectForKey: @"objectUUID"]);
+		NSDictionary *result1 = [searchResults objectAtIndex: 0];
+		NSDictionary *result2 = [searchResults objectAtIndex: 1];
+		if ([[c4 UUID] isEqual: [result1 objectForKey: @"commitUUID"]])
+		{
+			id temp = result2; result2 = result1; result1 = temp;
+		}
+		UKObjectsEqual(@"name", [result1 objectForKey: @"property"]);
+		UKObjectsEqual([c2 UUID], [result1 objectForKey: @"commitUUID"]);
+		UKObjectsEqual(o1, [result1 objectForKey: @"objectUUID"]);
+		UKObjectsEqual(@"name", [result2 objectForKey: @"property"]);
+		UKObjectsEqual([c4 UUID], [result2 objectForKey: @"commitUUID"]);
+		UKObjectsEqual(o1, [result2 objectForKey: @"objectUUID"]);			 
 	}
 	TearDownStore(s);
 }
