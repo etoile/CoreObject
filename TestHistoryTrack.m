@@ -48,7 +48,11 @@
 	// Now make some changes
 		
 	[document2 setValue: @"My Shopping List" forProperty: @"label"]; [ctx commit];
+	/* undo on workspace track, doc2 track: undo the last commit. */
+	
 	[document1 setValue: @"My Contacts" forProperty: @"label"]; [ctx commit];
+	/* undo on workspace track, doc1 track: undo the last commit. */
+	
 	[leaf2 setValue: @"Tomatoes" forProperty: @"label"]; [ctx commit];
 	[group2 addObject: leaf2]; [ctx commit];
 	[document2 addObject: group2]; [ctx commit];
@@ -145,6 +149,11 @@
 	UKObjectsSame(document1, [group2 valueForProperty: @"parentGroup"]);
 	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID]), [ctx changedObjectUUIDs]);
 	
+	// FIXME: After group 2 is moved back to doc1, the next undo will actually
+	// be the newest changes in group 2 (e.g. Leaf 6 -> Beer, and Leaf 5 -> Pizza)
+	// So the following tests need to be rewritten.
+	
+/*	
 	// next undo should move leaf2 ("Tomatoes") from group 2 to group 1
 	UKTrue([[group2 contentArray] containsObject: leaf2]);
 	UKFalse([[group1 contentArray] containsObject: leaf2]);
@@ -170,14 +179,18 @@
 	// FIXME: The next undo would undo the initial commit of Document 1.
 	// Need to decide what happens if you try to undo it
 	
-	// Verify that the state of document2 wasn't changed. (other than moving group2 back to document 1)
-	UKObjectsEqual(@"Groceries", [group2 valueForProperty: @"label"]); 
-
 	
 	
 	//
-	// Now we will test a more complicated scenario. 
+	// Now we will test a more complicated scenario: performing undo/redo on
+	// document 2.
+	//
 	
+	
+	UKObjectsEqual(@"Groceries", [group2 valueForProperty: @"label"]); // Verify that the state of document2 wasn't changed (other than moving group2 back to document 1)
+	[doc2Track undo];
+	// FIXME
+*/
 	
 	[workspaceTrack release];
 	[doc1Track release];

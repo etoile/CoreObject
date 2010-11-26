@@ -159,10 +159,12 @@
 	[_store beginCommitWithMetadata: nil];
 	for (ETUUID *uuid in _damagedObjectUUIDs)
 	{
+		COCommit *parentCommit = [_store commitForUUID: [_store currentCommitForObjectUUID: uuid onBranch: nil]];
+		
 		[_store beginChangesForObject: uuid
 				   onNamedBranch: nil
 			   updateObjectState: YES
-					parentCommit: nil
+					parentCommit: parentCommit
 					mergedCommit: nil];
 		COObject *obj = [self objectWithUUID: uuid];
 		//NSLog(@"Committing changes for %@", obj);
@@ -310,6 +312,18 @@
 {
 	if (branch == nil) { branch = [NSNull null]; }
 	[_currentBranchForObjectUUID setObject:branch forKey: obj];
+}
+
+- (ETUUID*)currentCommitForObjectUUID: (ETUUID*)object
+{
+	// FIXME: Quick hack for testing
+	return [_store currentCommitForObjectUUID: object onBranch: nil];
+}
+- (void) setCurrentCommit: (ETUUID*)commit forObjectUUID: (ETUUID*)object
+{
+	// FIXME: Quick hack for testing
+	[_store setCurrentCommit: commit forObjectUUID: object onBranch: nil];
+	[self loadObject: [self objectWithUUID: object] atCommit: commit];
 }
 
 - (ETUUID*)currentCommitForObjectUUID: (ETUUID*)object onBranch: (ETUUID*)branch

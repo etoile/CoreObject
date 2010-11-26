@@ -1,6 +1,10 @@
 Unsolved Problems
 =================
 
+Q: I'm not totally convinced that the history tracks undo/redo will
+never require a merge to apply.
+
+
 
 Q: What if you branch while sharing a document? set a branch?
 A: Synchronization is a complex and multi-step process. Depending on the application,

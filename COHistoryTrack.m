@@ -11,8 +11,15 @@
 - (id)initTrackWithObject: (COObject*)container containedObjects: (BOOL)contained
 {
 	self = [super init];
-	
+	ASSIGN(obj, container);
+	// FIXME:
 	return self;
+}
+
+- (void)dealloc
+{
+	DESTROY(obj);
+	[super dealloc];
 }
 
 
@@ -36,12 +43,63 @@
 	return nil; // FIXME: non-primitive (implementable on the rest of the api)
 }
 
-/** 
- * Same as above, but moves one node away from the tip.
- */
+- (NSSet*)currentObjectSet
+{
+	NSMutableSet *currentSet = [NSMutableSet set];
+	[currentSet addObjectsFromArray: [obj allStronglyContainedObjects]];
+	[currentSet addObject: obj];
+	return currentSet;
+}
+
+- (COCommit*)currentParent
+{
+	NSSet *objSet = [self currentObjectSet];
+	COEditingContext *ctx = [obj editingContext];
+	COStore *store = [ctx store];
+	
+	// Fact the parent commit must be the parent commit of one of the objects
+	// on objSet.
+	NSMutableArray *potentialParents = [NSMutableArray array];
+	for (COObject *o in objSet)
+	{
+		COCommit *commit = [store commitForUUID: [ctx currentCommitForObjectUUID: [o UUID]]];
+		if (commit == nil)
+		{
+			// FIXME: what to do here?
+			NSLog(@"WARNING, -[COHistoryTrack currentParent], current commit for object %@ is nil", [o UUID]);
+		}
+		else
+		{
+			COCommit *parentForObject = [commit parentCommitForObject: [o UUID]];
+			[potentialParents addObject: parentForObject];
+		}
+	}
+	
+	// FIXME: As an optimisation, we just need to find the minimum element, not sort the whole array 
+	[potentialParents sortUsingDescriptors: [NSArray arrayWithObject: [NSSortDescriptor sortDescriptorWithKey:@"metadata.date" ascending:NO]]];
+	
+	COCommit *parent = [potentialParents firstObject];
+	return parent;
+}
+
 - (COHistoryTrackNode*)undo
 {
-	return nil; // FIXME: non-primitive (implementable on the rest of the api)
+	COEditingContext *ctx = [obj editingContext];
+	COCommit *parent = [self currentParent];
+	//assert(parent != nil);
+	
+	NSMutableSet *objectsToUndo = [NSMutableSet set];
+	[objectsToUndo addObjectsFromArray: [parent changedObjects]];
+	[objectsToUndo intersectSet: [[[self currentObjectSet] mappedCollection] UUID]];
+	
+	
+	// FIXME: We need to run the relationship integrity code _after_ the loop
+	for (ETUUID *objectToUndo in objectsToUndo)
+	{
+		[ctx setCurrentCommit:parent forObjectUUID:objectToUndo];
+	}
+	
+	return nil; // FIXME
 }
 
 
@@ -76,32 +134,6 @@
 
 // FIXME: make this sketch work 
 #if 0
-
-- (NSSet*)currentObjectSet
-{
-	return [NSSet setWithArray: [obj allStronglyContainedObjects]];
-}
-
-- (COHistoryTrackNode*)currentParent
-{
-	NSSet *objSet = [self currentObjectSet];
-	COEditingContext *ctx = [obj editingContext];
-	
-	// Fact the parent commit must be the parent commit of one of the objects
-	// on objSet.
-	NSMutableArray *potentialParents = [NSMutableArray array];
-	for (COObject *obj in objSet)
-	{
-		COCommit *commit = [ctx currentCommitForObjectUUID: [obj UUID]];
-		[potentialParents addObject: [commit parentCommitForObject: [obj UUID]]];
-	}
-	
-	
-	// FIXME: As an optimisation, we just need to find the minimum element, not sort the whole array 
-	[potentialParents sortUsingDescriptors: [NSArray arrayWithObject: [NSSortDescriptor sortDescriptorWithKey:@"metadata.date" ascending:NO]]];
-	
-	COCommit *parent = [potentialParents firstObject];
-}
 
 // Sounds more tricky than currentParent
 - (NSArray *)currentBranches
