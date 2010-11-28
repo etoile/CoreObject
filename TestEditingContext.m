@@ -102,17 +102,6 @@
 	TearDownContext(ctx);
 }
 
-- (void)testCopyingBetweenContextsWithSharedStore
-{
-	COEditingContext *ctx1 = NewContext();
-	COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: [ctx1 store]];
-	
-	//FIXME:
-	
-	[ctx2 release];
-	TearDownContext(ctx1);
-}
-
 - (void)testCopyingBetweenContextsWithNoStoreSimple
 {
 	COEditingContext *ctx1 = [[COEditingContext alloc] init];
@@ -165,6 +154,52 @@
 	[ctx2 release];
 }
 
+- (void)testCopyingBetweenContextsWithSharedStore
+{
+	COEditingContext *ctx1 = NewContext();
+	COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: [ctx1 store]];
+	
+	COGroup *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COGroup *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COGroup *subchild = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	
+	[parent setValue: @"Shopping" forProperty: @"label"];
+	[child setValue: @"Groceries" forProperty: @"label"];
+	[subchild setValue: @"Pizza" forProperty: @"label"];
+	[child addObject: subchild];
+	[parent addObject: child];
+	
+	[ctx1 commit];
+	
+	// We'll add another sub-child and leave it uncommitted.
+	COGroup *subchild2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[subchild2 setValue: @"Salad" forProperty: @"label"];
+	[child addObject: subchild2];
+	
+	// We are going to copy 'child' from ctx1 to ctx2. It should copy
+	// 'child', 'subchild', and 'subchild2', but not 'parent'
+	
+	COGroup *childCopy = [ctx2 insertObject: child fromContext: ctx1];
+	UKNotNil(childCopy);
+	UKObjectsSame(ctx2, [childCopy editingContext]);
+	UKNil([childCopy valueForProperty: @"parentGroup"]);
+	UKStringsEqual(@"Groceries", [childCopy valueForProperty: @"label"]);
+	UKNotNil([childCopy contentArray]);
+	
+	COGroup *subchildCopy = [[childCopy contentArray] firstObject];
+	UKNotNil(subchildCopy);
+	UKObjectsSame(ctx2, [subchildCopy editingContext]);
+	UKStringsEqual(@"Pizza", [subchildCopy valueForProperty: @"label"]);
+	
+	COGroup *subchild2Copy = [[childCopy contentArray] objectAtIndex: 1];
+	UKNotNil(subchild2Copy);
+	UKObjectsSame(ctx2, [subchild2Copy editingContext]);
+	UKStringsEqual(@"Salad", [subchild2Copy valueForProperty: @"label"]);
+	
+	
+	[ctx2 release];
+	TearDownContext(ctx1);
+}
 
 
 @end
