@@ -408,6 +408,12 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 	[c2 release];
 	return result;
 }	
+
++ (COObjectGraphDiff *)diffContainer: (COGroup*)group1 withContainer: (COGroup*)group2
+{
+	
+}
+
 @end
 
 

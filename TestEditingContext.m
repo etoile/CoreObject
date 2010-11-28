@@ -202,4 +202,24 @@
 }
 
 
+- (void)testCopyingBetweenContextsCornerCases
+{
+	COEditingContext *ctx1 = [[COEditingContext alloc] init];
+	COEditingContext *ctx2 = [[COEditingContext alloc] init];
+	
+	COObject *o1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[o1 setValue: @"Shopping" forProperty: @"label"];
+	
+	COObject *o1copy = [ctx2 insertObject: o1 fromContext: ctx1];
+	
+	// Insert again
+	COObject *o1copy2 = [ctx2 insertObject: o1 fromContext: ctx1];
+	UKObjectsSame(o1copy, o1copy2);
+	
+	//FIXME: Should inserting again copy over new changes (if any)?
+	
+	[ctx1 release];
+	[ctx2 release];
+}
+
 @end

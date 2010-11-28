@@ -1,7 +1,9 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
+#import "COGroup.h"
 #import "COArrayDiff.h"
 #import "COSetDiff.h"
+
 
 @class COObject;
 @class COEditingContext;
@@ -36,6 +38,11 @@
  */
 + (COObjectGraphDiff *)diffHistoryNode: (id)n1
 					   withHistoryNode: (id)n2;
+
+/**
+ * Convenience method
+ */
++ (COObjectGraphDiff *)diffContainer: (COGroup*)group1 withContainer: (COGroup*)group2;
 
 @end
 
