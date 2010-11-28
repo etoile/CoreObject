@@ -18,11 +18,6 @@
 	COEditingContext *_context; // weak reference
 	NSMapTable *_variableStorage;
 	BOOL _isFault;
-	/**
-	 * This flag is a cache present only for performance reasons; COEditingContext 
-	 * is responsible for tracking which objects are damaged
-	 */
-	BOOL _isDamaged;
 	BOOL _isIgnoringDamageNotifications;
 	BOOL _isIgnoringRelationshipConsistency;
 	BOOL _inDescription; // FIXME: remove; only for debugging

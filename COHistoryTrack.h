@@ -1,5 +1,5 @@
 #import <Cocoa/Cocoa.h>
-#import "COCommit.h"
+#import "CORevision.h"
 #import "COObject.h"
 
 @class COHistoryTrackNode;
@@ -10,12 +10,11 @@
  *
  * It also allow exposes a simlpe NSUndoManager-like way of navigating
  * history.
- *
- * It's bound to a context so changes to the history track
  */
 @interface COHistoryTrack : NSObject
 {
-	COObject *obj; // we'll make changes to its context
+	COObject *obj;
+	BOOL affectsContainedObjects;
 }
 
 /**
@@ -25,54 +24,31 @@
  */
 - (id)initTrackWithObject: (COObject*)container containedObjects: (BOOL)contained;
 
-- (COHistoryTrackNode*)tipNode;
 - (COHistoryTrackNode*)currentNode;
 
-/**
- * Convience method moves the current node one node closer to the tip, on
- * the path defined by starting at the tipNode and following parent pointers.
- */
-- (COHistoryTrackNode*)redo;
-/** 
- * Same as above, but moves one node away from the tip.
- */
-- (COHistoryTrackNode*)undo;
+- (void)redo;
+- (void)undo;
 
 /**
  * This figures out what current nodes need to be moved on the object
  * history graph, and moves them in ctx
  */
 - (void)setCurrentNode: (COHistoryTrackNode*)node;
-/**
- * Moves the tip node
- */
-- (void)setTipNode: (COHistoryTrackNode*)node;
 
-
-- (NSArray*)namedBranches;
-
-- (CONamedBranch*)currentBranch;
-
-/**
- * Changes the branch. Note that this effectively rebuilds the history track,
- * so tip node and current node will be different.
- */
-- (void)setNamedBranch: (CONamedBranch*)branch;
 
 /* Private */
 
-- (void)setNamedBranch:(CONamedBranch *)branch recursivelyOnObject: (COObject*)anObject;
-- (NSArray*)changedObjectsForCommit: (COCommit*)commit;
-- (COHistoryTrackNode*)parentForCommit: (COCommit*)commit;
-- (COHistoryTrackNode*)mergedNodeForCommit: (COCommit*)commit;
-- (NSArray*)childNodesForCommit: (COCommit*)commit;
+- (NSArray*)changedObjectsForCommit: (CORevision*)commit;
+- (COHistoryTrackNode*)parentForCommit: (CORevision*)commit;
+- (COHistoryTrackNode*)mergedNodeForCommit: (CORevision*)commit;
+- (NSArray*)childNodesForCommit: (CORevision*)commit;
 
 @end
 
 
 @interface COHistoryTrackNode
 {
-	COCommit *commit;
+	CORevision *commit;
 	COHistoryTrack *ownerTrack;
 }
 
@@ -87,6 +63,6 @@
 
 /* Private */
 
-- (COCommit*)underlyingCommit;
+- (CORevision*)underlyingCommit;
 
 @end

@@ -389,7 +389,7 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 	return result;
 }
 
-+ (COObjectGraphDiff *)diffHistoryNode: (COHistoryNode*)n1 withHistoryNode: (COHistoryNode*)n2
++ (COObjectGraphDiff *)diffHistoryNode: (id)n1 withHistoryNode: (id)n2
 {
 	if ([n1 isEqual: n2])
 	{

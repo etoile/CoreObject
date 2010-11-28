@@ -12,7 +12,7 @@
 {
 	self = [super init];
 	ASSIGN(obj, container);
-	// FIXME:
+	affectsContainedObjects = contained;
 	return self;
 }
 
@@ -20,12 +20,6 @@
 {
 	DESTROY(obj);
 	[super dealloc];
-}
-
-
-- (COHistoryTrackNode*)tipNode
-{
-	return nil;
 }
 
 - (COHistoryTrackNode*)currentNode
@@ -51,7 +45,7 @@
 	return currentSet;
 }
 
-- (COCommit*)currentParent
+- (CORevision*)currentParent
 {
 	NSSet *objSet = [self currentObjectSet];
 	COEditingContext *ctx = [obj editingContext];
@@ -62,7 +56,7 @@
 	NSMutableArray *potentialParents = [NSMutableArray array];
 	for (COObject *o in objSet)
 	{
-		COCommit *commit = [store commitForUUID: [ctx currentCommitForObjectUUID: [o UUID]]];
+		CORevision *commit = [store commitForUUID: [ctx currentCommitForObjectUUID: [o UUID]]];
 		if (commit == nil)
 		{
 			// FIXME: what to do here?
@@ -70,7 +64,7 @@
 		}
 		else
 		{
-			COCommit *parentForObject = [commit parentCommitForObject: [o UUID]];
+			CORevision *parentForObject = [commit parentCommitForObject: [o UUID]];
 			[potentialParents addObject: parentForObject];
 		}
 	}
@@ -78,14 +72,15 @@
 	// FIXME: As an optimisation, we just need to find the minimum element, not sort the whole array 
 	[potentialParents sortUsingDescriptors: [NSArray arrayWithObject: [NSSortDescriptor sortDescriptorWithKey:@"metadata.date" ascending:NO]]];
 	
-	COCommit *parent = [potentialParents firstObject];
+	CORevision *parent = [potentialParents firstObject];
 	return parent;
 }
 
 - (COHistoryTrackNode*)undo
 {
+#if 0
 	COEditingContext *ctx = [obj editingContext];
-	COCommit *parent = [self currentParent];
+	CORevision *parent = [self currentParent];
 	//assert(parent != nil);
 	
 	NSMutableSet *objectsToUndo = [NSMutableSet set];
@@ -98,7 +93,7 @@
 	{
 		[ctx setCurrentCommit:parent forObjectUUID:objectToUndo];
 	}
-	
+#endif
 	return nil; // FIXME
 }
 
@@ -118,19 +113,6 @@
 {
 }
 
-/** This returns the UI's list of all branches for this history track
- * FIXME: maybe we should have open/closed as part of the api.
- */
-- (NSArray*)namedBranches
-{
-	return nil;
-}
-
-
-- (CONamedBranch*)currentBranch
-{
-	return nil;
-}
 
 // FIXME: make this sketch work 
 #if 0
@@ -155,76 +137,21 @@
 
 #endif
 
-/**
- * Changes the branch. Note that this effectively rebuilds the history track,
- * so tip node and current node will be different.
- *
- * Something to be careful of: suppose the branch we change to has more objects
- * in the docuemnt. It isn't sufficicent to simply find all strongly contained
- * objects of the document and change the branch on those.
- *
- * It has to be an interative process: change branch on the root object
- * then recursively change branch on each child.
- *
- * !!! We can introduce inconsistencies....
- *
- *
- */
-- (void)setNamedBranch: (CONamedBranch*)branch
-{
-	[self setNamedBranch: branch recursivelyOnObject: obj];
-}
-
-- (void)setNamedBranch:(CONamedBranch *)branch recursivelyOnObject: (COObject*)anObject
-{
-	assert([anObject isKindOfClass: [COObject class]]);
-	
-	COEditingContext *ctx = [obj editingContext];
-
-	// Ask the context to set the branch on this individual object. This should
-	// reload all of its properties.
-
-	[ctx setNamedBranch: [branch UUID] forObjectUUID: [anObject UUID]];
-	 
-	for (ETPropertyDescription *propDesc in [[anObject entityDescription] allPropertyDescriptions])
-	{
-		if ([propDesc isComposite])
-		{
-			id value = [anObject valueForProperty: [propDesc name]];
-			
-			assert([propDesc isMultivalued] ==
-				   ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]));
-			
-			if ([propDesc isMultivalued])
-			{
-				for (id subvalue in value)
-				{
-					[self setNamedBranch: branch recursivelyOnObject: subvalue];
-				}
-			}
-			else
-			{
-				[self setNamedBranch: branch recursivelyOnObject: value];
-			}
-		}
-	}	
-}
-
 /* Private */
 
-- (NSArray*)changedObjectsForCommit: (COCommit*)commit
+- (NSArray*)changedObjectsForCommit: (CORevision*)commit
 {
 	
 }
-- (COHistoryTrackNode*)parentForCommit: (COCommit*)commit
+- (COHistoryTrackNode*)parentForCommit: (CORevision*)commit
 {
 	
 }
-- (COHistoryTrackNode*)mergedNodeForCommit: (COCommit*)commit
+- (COHistoryTrackNode*)mergedNodeForCommit: (CORevision*)commit
 {
 	
 }
-- (NSArray*)childNodesForCommit: (COCommit*)commit
+- (NSArray*)childNodesForCommit: (CORevision*)commit
 {
 	
 }
@@ -265,7 +192,7 @@
 
 /* Private */
 
-- (COCommit*)underlyingCommit
+- (CORevision*)underlyingCommit
 {
 	return commit;
 }

@@ -1,6 +1,33 @@
 Design Ideas
 ==============
 
+Branching Models
+----------------
+Possibilities:
+ - git style: branches happen at the entire-repository level. while this is
+	simple conceptually, it wouldn't work so well for CoreObject because
+	typically you just want to branch one document or one project, not every
+	object on your system 
+
+ - The approach I was trying was having per-object branches managed at the
+	store level, but it's looking to be really complicated.
+	
+ - subversion style: branching is making a copy.
+
+Here is a good blog post explaining the limitations of DAG-based vcs's
+(git/mercurial/bazaar/etc.), compared with subversion's more flexible
+branching model:
+http://softwareswirl.blogspot.com/2009/08/git-mercurial-and-bazaarsimplicity.html
+
+See also:
+http://www.bcs-cmsg.org.uk/conference/2003/papers/wingerd.pdf
+"Container-Based SCM and Inter-File Branching" describing Perforce's branching
+model (sounds the same as subversion - making copies of directories - but
+perforce had accurate branch/merge metadata several years before Subversion) 
+
+Selective Undo
+-------------
+
 "A Selective Undo Mechanism for Graphical User Interfaces Based On Command Objects"
 by Thomas Berlage makes a good case for 'direct selective undo' (what I implemented)
 rather than "script-based" selective undo.

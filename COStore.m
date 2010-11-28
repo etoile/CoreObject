@@ -8,8 +8,8 @@
 	self = [super init];
 	url = [aURL retain];
 	db = [[FMDatabase alloc] initWithPath: [url path]];
-	commitObjectForUUID = [[NSMutableDictionary alloc] init];
-	branchObjectForUUID = [[NSMutableDictionary alloc] init];
+	commitObjectForID = [[NSMutableDictionary alloc] init];
+
 	if (![self setupDB])
 	{
 		NSLog(@"DB Create Failed");
@@ -21,8 +21,7 @@
 
 - (void)dealloc
 {
-	[commitObjectForUUID release];
-	[branchObjectForUUID release];
+	[commitObjectForID release];
 	[url release];
 	[db release];
 	[super dealloc];
@@ -66,7 +65,7 @@ void CHECK(id db)
 	[setToWAL close];
 #endif	
 	
-	FMResultSet *storeVersionRS = [db executeQuery: @"SELECT version FROM storemetadata"];
+	FMResultSet *storeVersionRS = [db executeQuery: @"SELECT version FROM storeMetadata"];
 	if ([storeVersionRS next])
 	{
 		int ver = [storeVersionRS intForColumnIndex: 0];
@@ -88,8 +87,8 @@ void CHECK(id db)
 	
 	// Otherwise, set up the DB
 	
-	success = success && [db executeUpdate: @"CREATE TABLE storemetadata(version INTEGER)"]; CHECK(db);
-	success = success && [db executeUpdate: @"INSERT INTO storemetadata(version) VALUES(1)"]; CHECK(db);
+	success = success && [db executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER)"]; CHECK(db);
+	success = success && [db executeUpdate: @"INSERT INTO storeMetadata(version) VALUES(1)"]; CHECK(db);
 	
 	// Instead of storing UUIDs and property names thoughout the database,
 	// we store them in two tables, and use integer ID's to refer to those
@@ -117,42 +116,14 @@ void CHECK(id db)
 	// actual search results. 
 	
 	
-	success = success && [db executeUpdate: @"CREATE TABLE commits(commitrow INTEGER PRIMARY KEY, commituuid INTEGER, objectuuid INTEGER, property INTEGER, value BLOB)"]; CHECK(db);
-	success = success && [db executeUpdate: @"CREATE INDEX commitsIndex ON commits(commituuid)"]; CHECK(db);	
+	success = success && [db executeUpdate: @"CREATE TABLE commits(commitrow INTEGER PRIMARY KEY, revisionnumber INTEGER, objectuuid INTEGER, property INTEGER, value BLOB)"]; CHECK(db);
+	success = success && [db executeUpdate: @"CREATE INDEX commitsIndex ON commits(revisionnumber)"]; CHECK(db);	
 	success = success && [db executeUpdate: @"CREATE VIRTUAL TABLE commitsTextSearch USING fts3()"];	 CHECK(db);
 	
 	// One table for storing commit metadata
 	
-	success = success && [db executeUpdate: @"CREATE TABLE commitMetadata(commituuid INTEGER PRIMARY KEY, plist BLOB)"];CHECK(db);
-	
-	// One table for storing per-object commit metadata. This is the history graph.
-	
-	success = success && [db executeUpdate: @"CREATE TABLE perObjectCommitMetadata(commituuid INTEGER, objectuuid INTEGER, branchuuid INTEGER, parentcommituuid INTEGER, mergedcommituuid INTEGER)"];		CHECK(db); 
-	success = success && [db executeUpdate: @"CREATE INDEX perObjectCommitMetadataIndex ON perObjectCommitMetadata(commituuid)"];CHECK(db);
-	success = success && [db executeUpdate: @"CREATE INDEX childCommitsIndex ON perObjectCommitMetadata(parentcommituuid)"];CHECK(db); // To make -[COCommit childCommitsForObject:] fast
-	//
-	// The preceeding tables are append-only.
-	// The following are the mutable state part of COStore:
-	//
-	
-	// A simple table for named branches
-	
-	success = success && [db executeUpdate: @"CREATE TABLE namedBranches(branchuuid INTEGER PRIMARY KEY, name STRING, plist BLOB)"]; CHECK(db);
-
-	// A simple table for storing the current branch of each object
-	
-	success = success && [db executeUpdate: @"CREATE TABLE currentBranchForObject(objectuuid INTEGER PRIMARY KEY, branchuuid INTEGER)"]; CHECK(db);
-	
-	
-	// Finally, a table for storing the current state of objects on various branches
-	
-	success = success && [db executeUpdate: @"CREATE TABLE objectState(objectuuid INTEGER, branchuuid INTEGER, tipcommituuid INTEGER, currentcommituuid INTEGER)"]; CHECK(db);
-	success = success && [db executeUpdate: @"CREATE INDEX objectStateIndex ON objectState(objectuuid)"];CHECK(db);
-	
-	// And a table for storing entity names.
-	
-	success = success && [db executeUpdate: @"CREATE TABLE objectEntity(objectuuid INTEGER PRIMARY KEY, entityname STRING)"]; CHECK(db);	
-	
+	success = success && [db executeUpdate: @"CREATE TABLE commitMetadata(revisionnumber INTEGER PRIMARY KEY, plist BLOB)"];CHECK(db);
+		
 	return success;
 }
 
@@ -230,39 +201,6 @@ void CHECK(id db)
 	return result;
 }
 
-/* Named branches */
-
-- (CONamedBranch*)createNamedBranch
-{
-	ETUUID *uuid = [ETUUID UUID];
-	[db executeUpdate: @"INSERT INTO namedbranches VALUES(?, NULL, NULL)", 
-	 [self keyForUUID: uuid]];
-	
-	CONamedBranch *branchObject = [[[CONamedBranch alloc] initWithStore: self uuid: uuid] autorelease];
-	[branchObjectForUUID setObject: branchObject
-							forKey: uuid];
-	return branchObject;
-}
-
-- (CONamedBranch*)namedBranchForUUID: (ETUUID*)uuid
-{
-	CONamedBranch *result = [branchObjectForUUID objectForKey: uuid];
-	if (result == nil)
-	{
-		FMResultSet *rs = [db executeQuery:@"SELECT branchuuid FROM namedBranches WHERE branchuuid = ?",
-						  [self keyForUUID: uuid]];
-		if ([rs next])
-		{
-			CONamedBranch *branchObject = [[[CONamedBranch alloc] initWithStore: self uuid: uuid] autorelease];
-			[branchObjectForUUID setObject: branchObject
-									forKey: uuid];
-			result = branchObject;
-		}
-		[rs close];
-	}
-	return result;
-}
-
 /* Committing Changes */
 
 - (void)beginCommitWithMetadata: (NSDictionary*)meta
@@ -271,7 +209,6 @@ void CHECK(id db)
 	{
 		[NSException raise: NSGenericException format: @"Attempt to call -beginCommitWithMetadata: while a commit is already in progress."];
 	}
-	commitInProgress = [[ETUUID alloc] init];
 	
 	NSData *data = [NSPropertyListSerialization dataFromPropertyList: meta
 															  format: NSPropertyListXMLFormat_v1_0
@@ -279,16 +216,13 @@ void CHECK(id db)
 	
 	[db beginTransaction];
 	
-	[db executeUpdate: @"INSERT INTO commitMetadata VALUES(?, ?)",
-		[self keyForUUID: commitInProgress],
+	[db executeUpdate: @"INSERT INTO commitMetadata(plist) VALUES(?)",
 		data];
+	
+	commitInProgress = [[NSNumber numberWithUnsignedLongLong: [db lastInsertRowId]] retain];
 }
 
 - (void)beginChangesForObject: (ETUUID*)object
-				onNamedBranch: (CONamedBranch*)namedBranch
-			updateObjectState: (BOOL)updateState
-				 parentCommit: (COCommit*)parent
-				 mergedCommit: (COCommit*)mergedBranch
 {
 	if (commitInProgress == nil)
 	{
@@ -299,34 +233,6 @@ void CHECK(id db)
 		[NSException raise: NSGenericException format: @"Finish the current object first"];
 	}
 	objectInProgress = [object retain];
-	
-	[db executeUpdate: @"INSERT INTO perObjectCommitMetadata(commituuid, objectuuid, branchuuid, parentcommituuid, mergedcommituuid) VALUES(?, ?, ?, ?, ?)",
-		[self keyForUUID: commitInProgress],
-		[self keyForUUID: objectInProgress],
-		[self keyForUUID: [namedBranch UUID]],
-		[self keyForUUID: [parent UUID]],
-		[self keyForUUID: [mergedBranch UUID]]];
-	CHECK(db);
-	
-	if (updateState)
-	{
-		ETUUID *tipUUID = [self tipForObjectUUID:object onBranch:namedBranch];
-		ETUUID *currentUUID = [self currentCommitForObjectUUID:object onBranch: namedBranch];
-		
-		if ([tipUUID isEqual: currentUUID])
-		{
-			[self setTip: commitInProgress forObjectUUID:object onBranch:namedBranch];
-			[self setCurrentCommit: commitInProgress forObjectUUID:object onBranch:namedBranch];
-		}
-		else
-		{
-			[self setTip: commitInProgress forObjectUUID:object onBranch:namedBranch];
-			if (currentUUID == nil)
-			{
-				[self setCurrentCommit: commitInProgress forObjectUUID:object onBranch:namedBranch];
-			}
-		}
-	}
 }
 
 - (void)setValue: (id)value
@@ -351,8 +257,8 @@ void CHECK(id db)
 		[NSException raise: NSInvalidArgumentException format: @"Error serializing object %@", value];
 	}
 	
-	[db executeUpdate: @"INSERT INTO commits(commitrow, commituuid, objectuuid, property, value) VALUES(NULL, ?, ?, ?, ?)",
-		[self keyForUUID: commitInProgress],
+	[db executeUpdate: @"INSERT INTO commits(commitrow, revisionnumber, objectuuid, property, value) VALUES(NULL, ?, ?, ?, ?)",
+		commitInProgress,
 		[self keyForUUID: objectInProgress],
 		[self keyForProperty: property],
 		data];
@@ -390,15 +296,19 @@ void CHECK(id db)
 	objectInProgress = nil;
 }
 
-- (COCommit*)finishCommit
+- (CORevision*)finishCommit
 {
+	if (objectInProgress != nil)
+	{
+		[NSException raise: NSGenericException format: @"Object still in progress"];
+	}
 	if (commitInProgress == nil)
 	{
 		[NSException raise: NSGenericException format: @"Start a commit first"];
 	}
 	[db commit];
 	
-	COCommit *result = [self commitForUUID: commitInProgress];
+	CORevision *result = [self revisionWithRevisionNumber: [commitInProgress unsignedLongLongValue]];
 	
 	[commitInProgress release];
 	commitInProgress = nil;
@@ -408,247 +318,24 @@ void CHECK(id db)
 
 /* Accessing History Graph and Committed Changes */
 
-- (COCommit*)commitForUUID: (ETUUID*)uuid;
+- (CORevision*)revisionWithRevisionNumber: (uint64_t)anID
 {
-	COCommit *result = [commitObjectForUUID objectForKey: uuid];
+	NSNumber *idNumber = [NSNumber numberWithUnsignedLongLong: anID];
+	CORevision *result = [commitObjectForID objectForKey: idNumber];
 	if (result == nil)
 	{
-		FMResultSet *rs = [db executeQuery:@"SELECT commituuid FROM commitMetadata WHERE commituuid = ?",
-						   [self keyForUUID: uuid]];
+		FMResultSet *rs = [db executeQuery:@"SELECT revisionnumber FROM commitMetadata WHERE revisionnumber = ?",
+						   idNumber];
 		if ([rs next])
 		{
-			COCommit *commitObject = [[[COCommit alloc] initWithStore: self uuid: uuid] autorelease];
-			[commitObjectForUUID setObject: commitObject
-									forKey: uuid];
+			CORevision *commitObject = [[[CORevision alloc] initWithStore: self revisionNumber: anID] autorelease];
+			[commitObjectForID setObject: commitObject
+								  forKey: idNumber];
 			result = commitObject;
 		}
 		[rs close];
 	}
 	return result;
-}
-
-/* Object State */
-
-- (NSArray*)branchesForObjectUUID: (ETUUID*)object
-{
-	NSMutableArray *result = [NSMutableArray array];
-	FMResultSet *rs = [db executeQuery:@"SELECT branchuuid FROM objectState WHERE objectuuid = ?",
-					   [self keyForUUID: object]];
-	while ([rs next])
-	{
-		CONamedBranch *branch = [self namedBranchForUUID: [self UUIDForKey: [rs longLongIntForColumnIndex: 0]]];
-		[result addObject: branch];
-	}
-	[rs close];
-	return result;
-}
-
-- (CONamedBranch*)activeBranchForObjectUUID: (ETUUID*)object
-{
-	CONamedBranch *result = nil;
-	FMResultSet *rs = [db executeQuery:@"SELECT branchuuid FROM currentBranchForObject WHERE objectuuid = ?",
-					   [self keyForUUID: object]];
-	if ([rs next])
-	{
-		result = [self namedBranchForUUID: [self UUIDForKey: [rs longLongIntForColumnIndex: 0]]];
-	}
-	[rs close];
-	return result;
-}
-
-- (void)setActiveBranch: (CONamedBranch*)branch forObjectUUID: (ETUUID*)object
-{
-	BOOL createTransaction = ![db inTransaction];
-	if (createTransaction) { [db beginTransaction]; }
-	
-	if (nil != [self activeBranchForObjectUUID: object])
-	{
-		[db executeUpdate: @"UPDATE currentBranchForObject SET branchuuid = ? WHERE objectuuid = ?",
-		 [self keyForUUID: [branch UUID]],
-		 [self keyForUUID: object]];
-		CHECK(db);
-	}
-	else
-	{
-		[db executeUpdate: @"INSERT INTO currentBranchForObject(objectuuid, branchuuid) VALUES(?, ?)",
-		 [self keyForUUID: [branch UUID]],
-		 [self keyForUUID: object]];
-		CHECK(db);
-	}
-	
-	if (createTransaction) { [db commit]; }
-}
-
-- (ETUUID*)currentCommitForObjectUUID: (ETUUID*)uuid onBranch: (CONamedBranch*)branch
-{
-	ETUUID *result = nil;
-	NSString *query;
-	if (branch == nil)
-	{
-		query = @"SELECT currentcommituuid FROM objectState WHERE objectuuid = ? AND branchuuid IS NULL";
-	}
-	else
-	{
-		query = @"SELECT currentcommituuid FROM objectState WHERE objectuuid = ? AND branchuuid = ?";
-	}
-
-	FMResultSet *rs = [db executeQuery: query,
-					   [self keyForUUID: uuid],
-					   [self keyForUUID: [branch UUID]]];
-	if ([rs next])
-	{
-		result = [self UUIDForKey: [rs longLongIntForColumnIndex: 0]];
-	}
-	[rs close];
-	return result;
-}
-
-- (BOOL)setCurrentCommit: (ETUUID*)commit forObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch
-{
-	BOOL createTransaction = ![db inTransaction];
-	if (createTransaction) { [db beginTransaction]; }
-	
-	NSString *query;
-	if (branch == nil)
-	{
-		query = @"SELECT tipcommituuid, currentcommituuid FROM objectState WHERE objectuuid = ? AND branchuuid IS NULL";
-	}
-	else
-	{
-		query = @"SELECT tipcommituuid, currentcommituuid FROM objectState WHERE objectuuid = ? AND branchuuid = ?";
-	}
-	
-	FMResultSet *rs = [db executeQuery: query,
-					   [self keyForUUID: object],
-					   [self keyForUUID: [branch UUID]]];
-	if ([rs next])
-	{		
-		NSString *query2;
-		if (branch == nil)
-		{
-			query2 = @"UPDATE objectState SET currentcommituuid = ? WHERE objectuuid = ? AND branchuuid IS NULL";
-		}
-		else
-		{
-			query2 = @"UPDATE objectState SET currentcommituuid = ? WHERE objectuuid = ? AND branchuuid = ?";
-		}
-		[db executeUpdate: query2,
-		 [self keyForUUID: commit],
-		 [self keyForUUID: object],
-		 [self keyForUUID: [branch UUID]]];
-		CHECK(db);			
-	}
-	else
-	{
-		[db executeUpdate: @"INSERT INTO objectState(objectuuid, branchuuid, tipcommituuid, currentcommituuid) VALUES(?, ?, ?, ?)",
-		 [self keyForUUID: object],
-		 [self keyForUUID: [branch UUID]],
-		 [self keyForUUID: commit],
-		 [self keyForUUID: commit]];
-		CHECK(db);
-	}
-	[rs close];
-	
-	if (createTransaction) { [db commit]; }
-	return YES;
-}
-
-- (ETUUID*)tipForObjectUUID: (ETUUID*)uuid onBranch: (CONamedBranch*)branch
-{
-	ETUUID *result = nil;
-	NSString *query;
-	if (branch == nil)
-	{
-		query = @"SELECT tipcommituuid FROM objectState WHERE objectuuid = ? AND branchuuid IS NULL";
-	}
-	else
-	{
-		query = @"SELECT tipcommituuid FROM objectState WHERE objectuuid = ? AND branchuuid = ?";
-	}
-	
-	FMResultSet *rs = [db executeQuery: query,
-					   [self keyForUUID: uuid],
-					   [self keyForUUID: [branch UUID]]];
-	if ([rs next])
-	{
-		result = [self UUIDForKey: [rs longLongIntForColumnIndex: 0]];
-	}
-	[rs close];
-	return result;
-}
-
-- (BOOL)setTip: (ETUUID*)commit forObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch
-{
-	BOOL createTransaction = ![db inTransaction];
-	if (createTransaction) { [db beginTransaction]; }
-	
-	NSString *query;
-	if (branch == nil)
-	{
-		query = @"SELECT tipcommituuid, currentcommituuid FROM objectState WHERE objectuuid = ? AND branchuuid IS NULL";
-	}
-	else
-	{
-		query = @"SELECT tipcommituuid, currentcommituuid FROM objectState WHERE objectuuid = ? AND branchuuid = ?";
-	}
-	
-	FMResultSet *rs = [db executeQuery: query,
-					   [self keyForUUID: object],
-					   [self keyForUUID: [branch UUID]]];
-	if ([rs next])
-	{		
-		NSString *query2;
-		if (branch == nil)
-		{
-			query2 = @"UPDATE objectState SET tipcommituuid = ? WHERE objectuuid = ? AND branchuuid IS NULL";
-		}
-		else
-		{
-			query2 = @"UPDATE objectState SET tipcommituuid = ? WHERE objectuuid = ? AND branchuuid = ?";
-		}
-		[db executeUpdate: query2,
-		 [self keyForUUID: commit],
-		 [self keyForUUID: object],
-		 [self keyForUUID: [branch UUID]]];
-		CHECK(db);			
-	}
-	else
-	{
-		[db executeUpdate: @"INSERT INTO objectState(objectuuid, branchuuid, tipcommituuid, currentcommituuid) VALUES(?, ?, ?, ?)",
-		 [self keyForUUID: object],
-		 [self keyForUUID: [branch UUID]],
-		 [self keyForUUID: commit],
-		 [self keyForUUID: commit]];
-		CHECK(db);
-	}
-	[rs close];
-	
-	if (createTransaction) { [db commit]; }
-	return YES;
-}
-
-- (NSString*)entityNameForObjectUUID: (ETUUID*)object
-{
-	NSString *result = nil;
-	FMResultSet *rs = [db executeQuery:@"SELECT entityname FROM objectEntity WHERE objectuuid = ?",
-					   [self keyForUUID: object]];
-	if ([rs next])
-	{
-		result = [rs stringForColumnIndex: 0];
-	}
-	[rs close];
-	return result;	
-}
-- (void)setEntityName: (NSString*)name forObjectUUID: (ETUUID*)object
-{
-	BOOL ok = [db executeUpdate: @"INSERT INTO objectEntity(objectuuid, entityname) VALUES(?,?)",
-		[self keyForUUID: object],
-		name];
-	
-	if (!ok)
-	{
-		[NSException raise: NSGenericException format: @"Attempt to change the entity name of object %@", object];
-	}
 }
 
 /* Full-text Search */
@@ -661,7 +348,7 @@ void CHECK(id db)
 	while ([rs next])
 	{
 		int64_t rowIndex = [rs longLongIntForColumnIndex: 0];
-		FMResultSet *commitRs = [db executeQuery:@"SELECT commituuid, objectuuid, property FROM commits WHERE commitrow = ?", 
+		FMResultSet *commitRs = [db executeQuery:@"SELECT revisionnumber, objectuuid, property FROM commits WHERE commitrow = ?", 
 			[NSNumber numberWithLongLong: rowIndex]];
 		if ([commitRs next])
 		{
@@ -669,19 +356,19 @@ void CHECK(id db)
 			int64_t objectKey = [commitRs longLongIntForColumnIndex: 1];
 			int64_t propertyKey = [commitRs longLongIntForColumnIndex: 2];
 			
-			ETUUID *commitUUID = [self UUIDForKey: commitKey];
+			NSNumber *revisionNumber = [NSNumber numberWithLongLong: commitKey];
 			ETUUID *objectUUID = [self UUIDForKey: objectKey];
 			NSString *property = [self propertyForKey: propertyKey];
-			NSString *value = [[[self commitForUUID: commitUUID] valuesAndPropertiesForObject: objectUUID] objectForKey: property];
+			NSString *value = [[[self revisionWithRevisionNumber: commitKey] valuesAndPropertiesForObject: objectUUID] objectForKey: property];
 			
-			assert(commitUUID != nil);
+			assert(revisionNumber != nil);
 			assert(objectUUID != nil);
 			assert(property != nil);
 			assert(value != nil && [value isKindOfClass: [NSString class]]);
 					
 			[results addObject: 
 				[NSDictionary dictionaryWithObjectsAndKeys:
-					commitUUID, @"commitUUID",
+					revisionNumber, @"revisionNumber",
 					objectUUID, @"objectUUID",
 					property, @"property",
 				    value, @"value",
@@ -696,6 +383,20 @@ void CHECK(id db)
 	[rs close];
 	
 	return results;
+}
+
+/* Revision history */
+
+- (uint64_t) latestRevisionNumber
+{
+	FMResultSet *rs = [db executeQuery:@"SELECT MAX(revisionnumber) FROM commitMetadata"];
+	uint64_t num = 0;
+	if ([rs next])
+	{
+		num = [rs longLongIntForColumnIndex: 0];
+	}
+	[rs close];
+	return num;
 }
 
 @end

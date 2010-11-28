@@ -92,7 +92,7 @@
 
 - (BOOL) isDamaged
 {
-	return _isDamaged; 
+	return [_context objectHasChanges: _uuid]; 
 }
 
 /* Helper methods based on the metamodel */
@@ -202,16 +202,6 @@
 			assert([value editingContext] == _context);
 		}    
 	}
-}
-
-- (BOOL) isIgnoringRelationshipConsistency
-{
-	return _isIgnoringRelationshipConsistency;
-}
-
-- (void) setIgnoringRelationshipConsistency: (BOOL)ignore
-{
-	_isIgnoringRelationshipConsistency = ignore;
 }
 
 - (void) setValue:(id)value forProperty:(NSString*)key
@@ -589,10 +579,20 @@
 
 - (void) notifyContextOfDamageIfNeeded
 {
-	if (!_isIgnoringDamageNotifications && !_isDamaged)
+	if (!_isIgnoringDamageNotifications && ![self isDamaged])
 	{
-		[_context markObjectDamaged: self]; // This will call -setDamaged: YES on us
+		[_context markObjectDamaged: self];
 	}
+}
+
+- (BOOL) isIgnoringRelationshipConsistency
+{
+	return _isIgnoringRelationshipConsistency;
+}
+
+- (void) setIgnoringRelationshipConsistency: (BOOL)ignore
+{
+	_isIgnoringRelationshipConsistency = ignore;
 }
 
 @end
@@ -618,7 +618,6 @@
 	_context = aContext; // weak reference
 	_variableStorage = nil;
 	_isFault = isFault;
-	_isDamaged = NO;
 	_isIgnoringDamageNotifications = NO;
 	
 	if (!_isFault)
@@ -640,11 +639,6 @@
 	DESTROY(_entityDescription);
 	DESTROY(_variableStorage);
 	[super dealloc];
-}
-
-- (void) setDamaged: (BOOL)isDamaged
-{
-	_isDamaged = isDamaged; 
 }
 
 @end

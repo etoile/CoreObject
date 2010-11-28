@@ -19,12 +19,8 @@
 	 */
 	NSMutableSet *_damagedObjectUUIDs; // UUIDS of objects in this context which have uncommitted changes
 	NSMutableDictionary *_instantiatedObjects; // UUID -> COObject mapping
-	NSMutableDictionary *_commitUUIDForObject; // Object UUID -> Commit UUID mapping
 	ETModelDescriptionRepository *_modelRepository;
 
-	NSMutableDictionary *_tipNodeForObjectUUIDOnBranchWithUUID;
-	NSMutableDictionary *_currentNodeForObjectUUIDOnBranchWithUUID;
-	NSMutableDictionary *_currentBranchForObjectUUID;
 	NSMutableSet *_insertedObjectUUIDs;
 	NSMutableSet *_deletedObjectUUIDs;
 }
@@ -36,9 +32,10 @@
 - (id)initWithStore: (COStore*)store;
 - (COStore*)store;
 
-//- (id)initWithStore: (COStore *)store historyTrack: (COHistoryTrack*)historyTrack;
-
 - (id)init;
+
+// FIXME: Should this copy uncommitted changes?
+- (id)copyWithZone: (NSZone*)zone;
 
 // Access
 
@@ -50,6 +47,7 @@
 
 - (Class) classForEntityDescription: (ETEntityDescription*)desc;
 - (id) insertObjectWithEntityName: (NSString*)aFullName;
+- (id) insertObject: (COObject*)sourceObject fromContext: (COEditingContext*)sourceContext;
 
 - (COObject*) objectWithUUID: (ETUUID*)uuid;
 
@@ -69,31 +67,12 @@
 - (void) markObjectDamaged: (COObject*)obj;
 - (void) markObjectUndamaged: (COObject*)obj;
 - (void) loadObject: (COObject*)obj;
-- (void) loadObject: (COObject*)obj atCommit: (COCommit*)aCommit;
+- (void)loadObject: (COObject*)obj atRevision: (CORevision*)aRevision;
 
 - (COObject*) objectWithUUID: (ETUUID*)uuid entityName: (NSString*)name;
 
 @end
 
-
-@interface COEditingContext (PrivateToCOHistoryTrack)
-
-// Queuing changes to the mutable part of the store (Private - use COHistoryTrack)
-
-- (ETUUID*) namedBranchForObjectUUID: (ETUUID*)obj;
-- (void) setNamedBranch: (ETUUID*)branch forObjectUUID: (ETUUID*)obj;
-
-// same as the next pair but uses the context's current branch for that object
-- (ETUUID*)currentCommitForObjectUUID: (ETUUID*)object;
-- (void) setCurrentCommit: (ETUUID*)commit forObjectUUID: (ETUUID*)object;
-
-- (ETUUID*)currentCommitForObjectUUID: (ETUUID*)object onBranch: (ETUUID*)branch;
-- (void) setCurrentCommit: (ETUUID*)commit forObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch;
-
-- (ETUUID*)tipForObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch;
-- (void) setTip: (ETUUID*)commit forObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch;
-
-@end
 
 
 @interface COEditingContext (Rollback)

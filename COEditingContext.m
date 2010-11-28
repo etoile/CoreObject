@@ -17,12 +17,8 @@
 	
 	_damagedObjectUUIDs = [[NSMutableSet alloc] init];
 	_instantiatedObjects = [[NSMutableDictionary alloc] init];
-	_commitUUIDForObject = [[NSMutableDictionary alloc] init];
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
 	
-	_tipNodeForObjectUUIDOnBranchWithUUID = [[NSMutableDictionary alloc] init];
-	_currentNodeForObjectUUIDOnBranchWithUUID = [[NSMutableDictionary alloc] init];
-	_currentBranchForObjectUUID = [[NSMutableDictionary alloc] init];
 	_insertedObjectUUIDs = [[NSMutableSet alloc] init];
 	_deletedObjectUUIDs = [[NSMutableSet alloc] init];
 	
@@ -38,15 +34,18 @@
 	DESTROY(_store);
 	DESTROY(_damagedObjectUUIDs);
 	DESTROY(_instantiatedObjects);
-	DESTROY(_commitUUIDForObject);
 	DESTROY(_modelRepository);
 	
-	DESTROY(_tipNodeForObjectUUIDOnBranchWithUUID);
-	DESTROY(_currentNodeForObjectUUIDOnBranchWithUUID);
-	DESTROY(_currentBranchForObjectUUID);
 	DESTROY(_insertedObjectUUIDs);
 	DESTROY(_deletedObjectUUIDs);
 	[super dealloc];
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+	id copy = [[COEditingContext alloc] initWithStore: _store];
+	// FIXME:
+	return copy;
 }
 
 // Accessors
@@ -83,24 +82,30 @@
 	return cls;
 }
 
-- (COObject*) insertObjectWithEntityName: (NSString*)aFullName
+- (COObject*) insertObjectWithEntityName: (NSString*)aFullName UUID: (ETUUID*)aUUID
 {
 	COObject *result = nil;
 	ETEntityDescription *desc = [_modelRepository descriptionForName: aFullName];
-	if (desc != nil)
+	if (desc == nil)
 	{
-		ETUUID *uuid = [[ETUUID alloc] init];
-		Class cls = [self classForEntityDescription: desc];
-		result = [[cls alloc] initWithUUID: uuid
-						 entityDescription: desc
-								   context: self
-								   isFault: NO];
-		[_instantiatedObjects setObject: result forKey: uuid];
-		[_insertedObjectUUIDs addObject: uuid];
-		[result release];
-		[uuid release];
+		[NSException raise: NSInvalidArgumentException format: @"Entity name %@ invalid", aFullName];
 	}
+	
+	Class cls = [self classForEntityDescription: desc];
+	result = [[cls alloc] initWithUUID: aUUID
+					 entityDescription: desc
+							   context: self
+							   isFault: NO];
+	[_instantiatedObjects setObject: result forKey: aUUID];
+	[_insertedObjectUUIDs addObject: aUUID];
+	[result release];
+	
 	return result;
+}
+
+- (COObject*) insertObjectWithEntityName: (NSString*)aFullName
+{
+	return [self insertObjectWithEntityName:aFullName UUID: [ETUUID UUID]];
 }
 
 - (COObject*) objectWithUUID: (ETUUID*)uuid
@@ -108,26 +113,16 @@
 	return [self objectWithUUID: uuid entityName: nil];
 }
 
-
-// FIXME: implement
-/*
-- (COObject*) insertObject: (COObject*)obj
+- (id) insertObject: (COObject*)sourceObject fromContext: (COEditingContext*)sourceContext
 {
+	NSString *entityName = [[sourceObject entityDescription] fullName];
+	assert(entityName != nil);
 	
-	ETUUID *uuid = [obj UUID];
-	[_instantiatedObjects objectForKey: 
-	 
-	 id copy = [[[self class] alloc] initWithModelDescription: _description 
-													  context: ctx
-														 uuid: _uuid
-														isNew: YES];
-	 [_ctx recordObject: copy forUUID: [self UUID]];
-	 return copy;
-	 }
-
-	return nil;
+	COObject *copy = [self insertObjectWithEntityName: entityName UUID: [sourceObject UUID]];
+	//FIXME:
+	
+	return copy;
 }
-*/
 
 - (void) deleteObjectWithUUID: (ETUUID*)uuid
 {
@@ -148,24 +143,10 @@
        shortDescription: (NSString*)shortDescription
         longDescription: (NSString*)longDescription
 {
-	for (ETUUID *uuid in _insertedObjectUUIDs)
-	{
-		NSString *name = [[[self objectWithUUID: uuid] entityDescription] fullName];
-		//NSLog(@"Storing entity name %@ for %@", name, uuid);
-		[_store setEntityName: name
-				forObjectUUID: uuid];
-	}
-	
 	[_store beginCommitWithMetadata: nil];
 	for (ETUUID *uuid in _damagedObjectUUIDs)
-	{
-		COCommit *parentCommit = [_store commitForUUID: [_store currentCommitForObjectUUID: uuid onBranch: nil]];
-		
-		[_store beginChangesForObject: uuid
-				   onNamedBranch: nil
-			   updateObjectState: YES
-					parentCommit: parentCommit
-					mergedCommit: nil];
+	{		
+		[_store beginChangesForObject: uuid];
 		COObject *obj = [self objectWithUUID: uuid];
 		//NSLog(@"Committing changes for %@", obj);
 		for (NSString *prop in [obj properties])
@@ -179,14 +160,21 @@
 			 shouldIndex: NO];
 		}
 		
+		// FIXME: Hack
+		NSString *name = [[[self objectWithUUID: uuid] entityDescription] fullName];
+		[_store setValue: name
+			 forProperty: @"_entity"
+				ofObject: uuid
+			 shouldIndex: NO];
+		
 		[_store finishChangesForObject: uuid];
 	}
 	
-	COCommit *c = [_store finishCommit];
+	CORevision *c = [_store finishCommit];
 	assert(c != nil);
 	
 	[_insertedObjectUUIDs removeAllObjects];
-	for (ETUUID *uuid in [NSArray arrayWithArray: _damagedObjectUUIDs])
+	for (ETUUID *uuid in [_damagedObjectUUIDs allObjects])
 	{
 		[self markObjectUndamaged: [self objectWithUUID: uuid]];
 	}
@@ -199,64 +187,76 @@
  
 - (void) markObjectDamaged: (COObject*)obj
 {
-	[obj setDamaged: YES];
 	[_damagedObjectUUIDs addObject: [obj UUID]]; 
 }
 - (void) markObjectUndamaged: (COObject*)obj
 {
-	[obj setDamaged: NO]; 
 	[_damagedObjectUUIDs removeObject: [obj UUID]];
 }
  
 - (void) loadObject: (COObject*)obj
 {
-	[self loadObject: obj atCommit: nil];
+	[self loadObject: obj atRevision: nil];
 }
 
-- (void)loadObject: (COObject*)obj atCommit: (COCommit*)aCommit
+- (NSString*)entityNameForObjectUUID: (ETUUID*)obj
 {
-	ETUUID *objUUID = [obj UUID];
-	if (aCommit == nil)
+	for (uint64_t revNum = [_store latestRevisionNumber]; revNum > 0; revNum--)
 	{
-		ETUUID *commitUUID = [_commitUUIDForObject objectForKey: objUUID];
-		aCommit = [_store commitForUUID: commitUUID];
-		if (aCommit == nil)
+		CORevision *revision = [_store revisionWithRevisionNumber: revNum];
+		NSString *name = [[revision valuesAndPropertiesForObject: obj] objectForKey: @"_entity"];
+		if (name != nil)
 		{
-			commitUUID = [_store currentCommitForObjectUUID: objUUID onBranch: [_store activeBranchForObjectUUID: objUUID]];
-			aCommit = [_store commitForUUID: commitUUID];
+			return name;
 		}
 	}
-	
-	if (aCommit == nil)
-	{
-		[NSException raise: NSInvalidArgumentException format: @"Object %@ not found in store", obj];
-	}
-	
+	return nil;
+}
+
+- (void)loadObject: (COObject*)obj atRevision: (CORevision*)aRevision
+{
+	ETUUID *objUUID = [obj UUID];
+
 	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj properties]];
 	//NSLog(@"Properties to fetch: %@", propertiesToFetch);
 	
 	obj->_isIgnoringDamageNotifications = YES;
 	
+	uint64_t revNum;
+	if (aRevision == nil)
+	{
+		revNum = [_store latestRevisionNumber];
+	}
+	else
+	{
+		revNum = [aRevision revisionNumber];
+	}
+
+	
 	while ([propertiesToFetch count] > 0)
 	{
-		if (aCommit == nil)
+		CORevision *revision = [_store revisionWithRevisionNumber: revNum];
+		if (revision == nil)
 		{
 			[NSException raise: NSInternalInconsistencyException format: @"Store is missing properties %@ for %@", propertiesToFetch, obj];
 		}
 		
-		NSDictionary *dict = [aCommit valuesAndPropertiesForObject: objUUID];
+		NSDictionary *dict = [revision valuesAndPropertiesForObject: objUUID];
 		
 		for (NSString *key in [dict allKeys])
 		{
-			id plist = [dict objectForKey: key];
-			id value = [obj valueForPropertyList: plist];
-			//NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
-			[obj setValue: value
-			  forProperty: key];
-			[propertiesToFetch removeObject: key];
+			if ([propertiesToFetch containsObject: key])
+			{
+				id plist = [dict objectForKey: key];
+				id value = [obj valueForPropertyList: plist];
+				//NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
+				[obj setValue: value
+				  forProperty: key];
+				[propertiesToFetch removeObject: key];
+			}
 		}
 		
-		aCommit = [aCommit parentCommitForObject: objUUID];
+		revNum--;
 	}
 	
 	obj->_isFault = NO;
@@ -273,7 +273,7 @@
 		ETEntityDescription *desc = [_modelRepository descriptionForName: name];
 		if (desc == nil)
 		{
-			NSString *name = [_store entityNameForObjectUUID: uuid];
+			NSString *name = [self entityNameForObjectUUID: uuid];
 			if (name == nil)
 			{
 				//[NSException raise: NSGenericException format: @"Failed to find an entity name for %@", uuid];
@@ -298,57 +298,6 @@
 
 @end
 
-
-// FIXME:
-@implementation COEditingContext (PrivateToCOHistoryTrack)
-
-- (ETUUID*) namedBranchForObjectUUID: (ETUUID*)obj
-{
-	id branch = [_currentBranchForObjectUUID objectForKey: obj];
-	if (branch == [NSNull null]) { branch = nil; }
-	return branch;
-}
-- (void) setNamedBranch: (ETUUID*)branch forObjectUUID: (ETUUID*)obj
-{
-	if (branch == nil) { branch = [NSNull null]; }
-	[_currentBranchForObjectUUID setObject:branch forKey: obj];
-}
-
-- (ETUUID*)currentCommitForObjectUUID: (ETUUID*)object
-{
-	// FIXME: Quick hack for testing
-	return [_store currentCommitForObjectUUID: object onBranch: nil];
-}
-- (void) setCurrentCommit: (ETUUID*)commit forObjectUUID: (ETUUID*)object
-{
-	// FIXME: Quick hack for testing
-	[_store setCurrentCommit: commit forObjectUUID: object onBranch: nil];
-	[self loadObject: [self objectWithUUID: object] atCommit: commit];
-}
-
-- (ETUUID*)currentCommitForObjectUUID: (ETUUID*)object onBranch: (ETUUID*)branch
-{
-	if (branch == nil) { branch = [NSNull null]; }
-	//return [[_currentNodeForObjectUUIDOnBranchWithUUID objectForKey: object] objectForKey: branch];
-	return nil;
-}
-- (void) setCurrentCommit: (ETUUID*)commit forObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch
-{
-	if (branch == nil) { branch = [NSNull null]; }
-}
-
-- (ETUUID*)tipForObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch
-{
-	if (branch == nil) { branch = [NSNull null]; }
-	return nil;
-}
-- (void) setTip: (ETUUID*)commit forObjectUUID: (ETUUID*)object onBranch: (CONamedBranch*)branch
-{
-	if (branch == nil) { branch = [NSNull null]; }
-	return nil;	
-}
-
-@end
 
 
 
