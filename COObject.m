@@ -1,6 +1,6 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
-#import "COGroup.h"
+#import "COContainer.h"
 #import "COCollection.h"
 
 @implementation COObject
@@ -13,17 +13,17 @@
 		
 		ETEntityDescription *object = [ETEntityDescription descriptionWithName: @"COObject"];
 		
-		ETPropertyDescription *parentGroupProperty = [ETPropertyDescription descriptionWithName: @"parentGroup"
+		ETPropertyDescription *parentContainerProperty = [ETPropertyDescription descriptionWithName: @"parentContainer"
 																						   type: (id)@"Anonymous.COGroup"];
-		[parentGroupProperty setIsContainer: YES];
-		[parentGroupProperty setMultivalued: NO];
+		[parentContainerProperty setIsContainer: YES];
+		[parentContainerProperty setMultivalued: NO];
 	
 		ETPropertyDescription *parentCollectionsProperty = [ETPropertyDescription descriptionWithName: @"parentCollections"
 																								type: (id)@"Anonymous.COCollection"];
 		
 		[parentCollectionsProperty setMultivalued: YES];
 		
-		[object setPropertyDescriptions: A(parentGroupProperty, parentCollectionsProperty)];
+		[object setPropertyDescriptions: A(parentContainerProperty, parentCollectionsProperty)];
 		
 		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: object];
 		[[ETModelDescriptionRepository mainRepository] setEntityDescription: object
@@ -37,14 +37,14 @@
 		ETPropertyDescription *groupContentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
 																						type: (id)@"Anonymous.COObject"];
 		[groupContentsProperty setMultivalued: YES];
-		[groupContentsProperty setOpposite: (id)@"Anonymous.COObject.parentGroup"]; // FIXME: just 'parent' should work...
+		[groupContentsProperty setOpposite: (id)@"Anonymous.COObject.parentContainer"]; // FIXME: just 'parent' should work...
 		[groupContentsProperty setOrdered: YES];
 		
 		[group setPropertyDescriptions: A(groupContentsProperty)];
 		
 		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: group];
 		[[ETModelDescriptionRepository mainRepository] setEntityDescription: group
-																   forClass: [COGroup class]];
+																   forClass: [COContainer class]];
 		
 		// COCollection entity description
 		

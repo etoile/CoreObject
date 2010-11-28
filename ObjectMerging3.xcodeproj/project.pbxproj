@@ -50,8 +50,8 @@
 		66D09D04129C936E006BEDC3 /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D03129C936E006BEDC3 /* TestCommon.m */; };
 		66D09D56129CE470006BEDC3 /* COCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D09D54129CE470006BEDC3 /* COCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66D09D57129CE470006BEDC3 /* COCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D55129CE470006BEDC3 /* COCollection.m */; };
-		66D09D86129CEC8C006BEDC3 /* COGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 79E5EE5812876FC200CDFA23 /* COGroup.m */; };
-		66D09D93129CEDB2006BEDC3 /* TestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D92129CEDB2006BEDC3 /* TestGroup.m */; };
+		66D09D86129CEC8C006BEDC3 /* COContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 79E5EE5812876FC200CDFA23 /* COContainer.m */; };
+		66D09D93129CEDB2006BEDC3 /* TestContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D92129CEDB2006BEDC3 /* TestContainer.m */; };
 		66D09EF4129EF6C7006BEDC3 /* TestRelationshipIntegrity.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */; };
 		66FDEB5512A2F106005D6D23 /* TestObjectGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */; };
 		66FDEB5812A2F150005D6D23 /* COObjectGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDC312592C1B0065DE1A /* COObjectGraphDiff.m */; };
@@ -67,7 +67,7 @@
 		791B4E741299C90900CCF472 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6E1299C90900CCF472 /* FMDatabaseAdditions.m */; };
 		791B4E761299C90900CCF472 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E701299C90900CCF472 /* FMResultSet.m */; };
 		791B4E7C1299C92300CCF472 /* sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E7A1299C92300CCF472 /* sqlite3.c */; };
-		79E5EE5912876FC200CDFA23 /* COGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 79E5EE5712876FC200CDFA23 /* COGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		79E5EE5912876FC200CDFA23 /* COContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 79E5EE5712876FC200CDFA23 /* COContainer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -177,7 +177,7 @@
 		66D09D03129C936E006BEDC3 /* TestCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCommon.m; sourceTree = "<group>"; };
 		66D09D54129CE470006BEDC3 /* COCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCollection.h; sourceTree = "<group>"; };
 		66D09D55129CE470006BEDC3 /* COCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCollection.m; sourceTree = "<group>"; };
-		66D09D92129CEDB2006BEDC3 /* TestGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestGroup.m; sourceTree = "<group>"; };
+		66D09D92129CEDB2006BEDC3 /* TestContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestContainer.m; sourceTree = "<group>"; };
 		66D09EB4129E3BED006BEDC3 /* TRICKYCASES */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TRICKYCASES; sourceTree = "<group>"; };
 		66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestRelationshipIntegrity.m; sourceTree = "<group>"; };
 		66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestObjectGraphDiff.m; sourceTree = "<group>"; };
@@ -201,8 +201,8 @@
 		791B4E7B1299C92300CCF472 /* sqlite3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sqlite3.h; sourceTree = "<group>"; };
 		792C5F57127F78A7007205EA /* UnitKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UnitKit.framework; path = Library/Frameworks/UnitKit.framework; sourceTree = SDKROOT; };
 		792C5FAF127F7977007205EA /* Test-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Test-Info.plist"; sourceTree = "<group>"; };
-		79E5EE5712876FC200CDFA23 /* COGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COGroup.h; sourceTree = "<group>"; };
-		79E5EE5812876FC200CDFA23 /* COGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COGroup.m; sourceTree = "<group>"; };
+		79E5EE5712876FC200CDFA23 /* COContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COContainer.h; sourceTree = "<group>"; };
+		79E5EE5812876FC200CDFA23 /* COContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COContainer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -382,8 +382,8 @@
 			children = (
 				6686BDB712592C1B0065DE1A /* COObject.h */,
 				6686BDB812592C1B0065DE1A /* COObject.m */,
-				79E5EE5712876FC200CDFA23 /* COGroup.h */,
-				79E5EE5812876FC200CDFA23 /* COGroup.m */,
+				79E5EE5712876FC200CDFA23 /* COContainer.h */,
+				79E5EE5812876FC200CDFA23 /* COContainer.m */,
 				66D09D54129CE470006BEDC3 /* COCollection.h */,
 				66D09D55129CE470006BEDC3 /* COCollection.m */,
 			);
@@ -402,7 +402,7 @@
 				66D09CFB129C9222006BEDC3 /* TestSynchronization.m */,
 				66D09D02129C936E006BEDC3 /* TestCommon.h */,
 				66D09D03129C936E006BEDC3 /* TestCommon.m */,
-				66D09D92129CEDB2006BEDC3 /* TestGroup.m */,
+				66D09D92129CEDB2006BEDC3 /* TestContainer.m */,
 				66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */,
 				6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */,
 				66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */,
@@ -464,7 +464,7 @@
 				6686BDF612592C810065DE1A /* COSetDiff.h in Headers */,
 				6686BDF912592C810065DE1A /* COObject.h in Headers */,
 				6686BDFA12592C810065DE1A /* COEditingContext.h in Headers */,
-				79E5EE5912876FC200CDFA23 /* COGroup.h in Headers */,
+				79E5EE5912876FC200CDFA23 /* COContainer.h in Headers */,
 				791B4E621299C8CB00CCF472 /* CORevision.h in Headers */,
 				791B4E661299C8CB00CCF472 /* COStore.h in Headers */,
 				66D0999A129A5B64006BEDC3 /* COHistoryTrack.h in Headers */,
@@ -602,7 +602,7 @@
 			files = (
 				66FDEB5812A2F150005D6D23 /* COObjectGraphDiff.m in Sources */,
 				6620F13C129F8CC500FD5AB9 /* COHistoryTrack.m in Sources */,
-				66D09D86129CEC8C006BEDC3 /* COGroup.m in Sources */,
+				66D09D86129CEC8C006BEDC3 /* COContainer.m in Sources */,
 				66D09D57129CE470006BEDC3 /* COCollection.m in Sources */,
 				66D09AB6129B29F3006BEDC3 /* NSData+compression.m in Sources */,
 				66D09AB7129B29F3006BEDC3 /* NSData+sha1.m in Sources */,
@@ -648,7 +648,7 @@
 				66D09BC9129C5A1D006BEDC3 /* TestStore.m in Sources */,
 				66D09CFC129C9222006BEDC3 /* TestSynchronization.m in Sources */,
 				66D09D04129C936E006BEDC3 /* TestCommon.m in Sources */,
-				66D09D93129CEDB2006BEDC3 /* TestGroup.m in Sources */,
+				66D09D93129CEDB2006BEDC3 /* TestContainer.m in Sources */,
 				66D09EF4129EF6C7006BEDC3 /* TestRelationshipIntegrity.m in Sources */,
 				6620EFA4129F3AAD00FD5AB9 /* TestHistoryTrack.m in Sources */,
 				66FDEB5512A2F106005D6D23 /* TestObjectGraphDiff.m in Sources */,

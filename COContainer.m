@@ -1,6 +1,6 @@
-#import "COGroup.h"
+#import "COContainer.h"
 
-@implementation COGroup
+@implementation COContainer
 
 - (BOOL) isOrdered
 {

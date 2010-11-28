@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
 #import "COEditingContext.h"
-#import "COGroup.h"
+#import "COContainer.h"
 #import "TestCommon.h"
 
 @interface TestRelationshipIntegrity : NSObject <UKTest>
@@ -23,14 +23,14 @@
 	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
 	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
 	
-	[o2 setValue: o1 forProperty: @"parentGroup"]; // should add o2 to o1's contents
-	[o2 setValue: A(o3) forProperty: @"contents"]; // should set parentGroup of o3
+	[o2 setValue: o1 forProperty: @"parentContainer"]; // should add o2 to o1's contents
+	[o2 setValue: A(o3) forProperty: @"contents"]; // should set parentContainer of o3
 
-	UKNil([o1 valueForProperty: @"parentGroup"]);
+	UKNil([o1 valueForProperty: @"parentContainer"]);
 	UKObjectsEqual(A(o2), [o1 valueForProperty: @"contents"]);
-	UKObjectsEqual(o1, [o2 valueForProperty: @"parentGroup"]);
+	UKObjectsEqual(o1, [o2 valueForProperty: @"parentContainer"]);
 	UKObjectsEqual(A(o3), [o2 valueForProperty: @"contents"]);
-	UKObjectsEqual(o2, [o3 valueForProperty: @"parentGroup"]);
+	UKObjectsEqual(o2, [o3 valueForProperty: @"parentContainer"]);
 	UKObjectsEqual([NSArray array], [o3 valueForProperty: @"contents"]);
 	
 	
@@ -66,29 +66,29 @@
 	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
 	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
 	
-	[o2 setValue: o1 forProperty: @"parentGroup"]; // should add o2 to o1's contents
+	[o2 setValue: o1 forProperty: @"parentContainer"]; // should add o2 to o1's contents
 	UKObjectsEqual(A(o2), [o1 valueForProperty: @"contents"]);
 	UKObjectsEqual([NSArray array], [o3 valueForProperty: @"contents"]);
-	[o2 setValue: o3 forProperty: @"parentGroup"]; // should add o2 to o3's contents, and remove o2 from o1
+	[o2 setValue: o3 forProperty: @"parentContainer"]; // should add o2 to o3's contents, and remove o2 from o1
 	UKObjectsEqual([NSArray array], [o1 valueForProperty: @"contents"]);
 	UKObjectsEqual(A(o2), [o3 valueForProperty: @"contents"]);	
 
 	// Check that removing an object from a group nullifys that object's parent group pointer
 	
 	[o3 removeObject: o2 forProperty: @"contents"];
-	UKNil([o2 valueForProperty: @"parentGroup"]);
+	UKNil([o2 valueForProperty: @"parentContainer"]);
 	
 	// Now test moving by modifying the multivalued side of the relationship
 	
-	COGroup *o4 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; 
-	COGroup *o5 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
-	COGroup *o6 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];	
+	COContainer *o4 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; 
+	COContainer *o5 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
+	COContainer *o6 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];	
 	
 	[o5 addObject: o4];
 	[o6 addObject: o4]; // Should move o4 from o5 to o6
 	UKObjectsEqual([NSArray array], [o5 contentArray]);
 	UKObjectsEqual(A(o4), [o6 contentArray]);
-	UKObjectsSame(o6, [o4 valueForProperty: @"parentGroup"]);
+	UKObjectsSame(o6, [o4 valueForProperty: @"parentContainer"]);
 	
 	[ctx release];
 	[store release];
@@ -109,7 +109,7 @@
 	UKFalse([ctx objectHasChanges: [o2 UUID]]);
 	UKFalse([ctx objectHasChanges: [o3 UUID]]);
 			 
-	[o2 setValue: o1 forProperty: @"parentGroup"]; // should add o2 to o1's contents
+	[o2 setValue: o1 forProperty: @"parentContainer"]; // should add o2 to o1's contents
 	UKTrue([ctx objectHasChanges: [o1 UUID]]);
 	UKTrue([ctx objectHasChanges: [o2 UUID]]);
 	UKFalse([ctx objectHasChanges: [o3 UUID]]);
@@ -119,14 +119,14 @@
 	UKFalse([ctx objectHasChanges: [o2 UUID]]);
 	UKFalse([ctx objectHasChanges: [o3 UUID]]);
 	
-	[o2 setValue: o3 forProperty: @"parentGroup"]; // should add o2 to o3's contents, and remove o2 from o1
+	[o2 setValue: o3 forProperty: @"parentContainer"]; // should add o2 to o3's contents, and remove o2 from o1
 	UKTrue([ctx objectHasChanges: [o1 UUID]]);
 	UKTrue([ctx objectHasChanges: [o2 UUID]]);
 	UKTrue([ctx objectHasChanges: [o3 UUID]]);
 	
 	[ctx commit];
 	
-	[o3 removeObject: o2 forProperty: @"contents"]; // should make o2's parentGroup nil
+	[o3 removeObject: o2 forProperty: @"contents"]; // should make o2's parentContainer nil
 	UKFalse([ctx objectHasChanges: [o1 UUID]]);
 	UKTrue([ctx objectHasChanges: [o2 UUID]]);
 	UKTrue([ctx objectHasChanges: [o3 UUID]]);	
@@ -163,15 +163,15 @@
 {
 	COEditingContext *ctx = NewContext();
 	
-	COGroup *workspace = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *document1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *group1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *leaf1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *leaf2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	COGroup *group2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	COGroup *leaf3 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *workspace = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *document1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *group1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *leaf1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *leaf2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
+	COContainer *group2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
+	COContainer *leaf3 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
-	COGroup *document2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *document2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
 	// Set up the initial state
 	[document1 setValue:@"Document 1" forProperty: @"label"];
@@ -196,13 +196,13 @@
 	[group2 addObject: leaf2]; [ctx commit];
 	[document2 addObject: group2]; [ctx commit];
 
-	UKObjectsSame(workspace, [document1 valueForProperty: @"parentGroup"]);
-	UKObjectsSame(workspace, [document2 valueForProperty: @"parentGroup"]);	
-	UKObjectsSame(document1, [group1 valueForProperty: @"parentGroup"]);	
-	UKObjectsSame(document2, [group2 valueForProperty: @"parentGroup"]);	
-	UKObjectsSame(group1, [leaf1 valueForProperty: @"parentGroup"]);	
-	UKObjectsSame(group2, [leaf2 valueForProperty: @"parentGroup"]);	
-	UKObjectsSame(group2, [leaf3 valueForProperty: @"parentGroup"]);	
+	UKObjectsSame(workspace, [document1 valueForProperty: @"parentContainer"]);
+	UKObjectsSame(workspace, [document2 valueForProperty: @"parentContainer"]);	
+	UKObjectsSame(document1, [group1 valueForProperty: @"parentContainer"]);	
+	UKObjectsSame(document2, [group2 valueForProperty: @"parentContainer"]);	
+	UKObjectsSame(group1, [leaf1 valueForProperty: @"parentContainer"]);	
+	UKObjectsSame(group2, [leaf2 valueForProperty: @"parentContainer"]);	
+	UKObjectsSame(group2, [leaf3 valueForProperty: @"parentContainer"]);	
 	UKObjectsEqual(S(document1, document2), [NSSet setWithArray: [workspace contentArray]]);
 	UKObjectsEqual(S(group1), [NSSet setWithArray: [document1 contentArray]]); //fails
 	UKObjectsEqual(S(group2), [NSSet setWithArray: [document2 contentArray]]);

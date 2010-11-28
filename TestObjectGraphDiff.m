@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
 #import "COHistoryTrack.h"
-#import "COGroup.h"
+#import "COContainer.h"
 #import "COCollection.h"
 #import "TestCommon.h"
 
@@ -17,9 +17,9 @@
 	COEditingContext *ctx1 = [[COEditingContext alloc] init];
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	
-	COGroup *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *subchild = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *subchild = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
 	ETUUID *parentUUID = [parent UUID];
 	ETUUID *childUUID = [child UUID];
@@ -31,9 +31,9 @@
 	[child addObject: subchild];
 	[parent addObject: child];
 	
-	COGroup *parentCopy = [ctx2 insertObject: parent fromContext: ctx1];
-	COGroup *childCopy = [ctx2 insertObject: child fromContext: ctx1];
-	COGroup *subchildCopy = [ctx2 insertObject: subchild fromContext: ctx1];
+	COContainer *parentCopy = [ctx2 insertObject: parent fromContext: ctx1];
+	COContainer *childCopy = [ctx2 insertObject: child fromContext: ctx1];
+	COContainer *subchildCopy = [ctx2 insertObject: subchild fromContext: ctx1];
 	
 	// Now make some modifications to ctx2: 
 	

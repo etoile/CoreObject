@@ -1,6 +1,6 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
-#import "COGroup.h"
+#import "COContainer.h"
 #import "COArrayDiff.h"
 #import "COSetDiff.h"
 
@@ -42,7 +42,7 @@
 /**
  * Convenience method
  */
-+ (COObjectGraphDiff *)diffContainer: (COGroup*)group1 withContainer: (COGroup*)group2;
++ (COObjectGraphDiff *)diffContainer: (COContainer*)group1 withContainer: (COContainer*)group2;
 
 @end
 

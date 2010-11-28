@@ -2,7 +2,7 @@
 #import <UnitKit/UnitKit.h>
 #import "COEditingContext.h"
 #import "TestCommon.h"
-#import "COGroup.h"
+#import "COContainer.h"
 
 @interface TestEditingContext : NSObject <UKTest>
 {
@@ -33,7 +33,7 @@
 	UKNotNil(obj);
 	UKTrue([obj isKindOfClass: [COObject class]]);
 	
-	NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentGroup", @"parentCollections", @"contents", @"label", nil];
+	NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentContainer", @"parentCollections", @"contents", @"label", nil];
 	UKObjectsEqual([NSSet setWithArray: expectedProperties],
 				   [NSSet setWithArray: [obj properties]]);
 
@@ -64,7 +64,7 @@
 		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 		COObject *obj = [ctx objectWithUUID: objUUID];
 		UKNotNil(obj);
-		NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentGroup", @"parentCollections", @"contents", @"label", nil];
+		NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentContainer", @"parentCollections", @"contents", @"label", nil];
 		UKObjectsEqual([NSSet setWithArray: expectedProperties],
 					   [NSSet setWithArray: [obj properties]]);
 		UKStringsEqual(@"Hello", [obj valueForProperty: @"label"]);
@@ -125,9 +125,9 @@
 	COEditingContext *ctx1 = [[COEditingContext alloc] init];
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	
-	COGroup *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *subchild = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *subchild = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 
 	[parent setValue: @"Shopping" forProperty: @"label"];
 	[child setValue: @"Groceries" forProperty: @"label"];
@@ -138,14 +138,14 @@
 	// We are going to copy 'child' from ctx1 to ctx2. It should copy both
 	// 'child' and 'subchild', but not 'parent'
 	
-	COGroup *childCopy = [ctx2 insertObject: child fromContext: ctx1];
+	COContainer *childCopy = [ctx2 insertObject: child fromContext: ctx1];
 	UKNotNil(childCopy);
 	UKObjectsSame(ctx2, [childCopy editingContext]);
-	UKNil([childCopy valueForProperty: @"parentGroup"]);
+	UKNil([childCopy valueForProperty: @"parentContainer"]);
 	UKStringsEqual(@"Groceries", [childCopy valueForProperty: @"label"]);
 	UKNotNil([childCopy contentArray]);
 	
-	COGroup *subchildCopy = [[childCopy contentArray] firstObject];
+	COContainer *subchildCopy = [[childCopy contentArray] firstObject];
 	UKNotNil(subchildCopy);
 	UKObjectsSame(ctx2, [subchildCopy editingContext]);
 	UKStringsEqual(@"Pizza", [subchildCopy valueForProperty: @"label"]);
@@ -159,9 +159,9 @@
 	COEditingContext *ctx1 = NewContext();
 	COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: [ctx1 store]];
 	
-	COGroup *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *subchild = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *subchild = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
 	[parent setValue: @"Shopping" forProperty: @"label"];
 	[child setValue: @"Groceries" forProperty: @"label"];
@@ -172,26 +172,26 @@
 	[ctx1 commit];
 	
 	// We'll add another sub-child and leave it uncommitted.
-	COGroup *subchild2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *subchild2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[subchild2 setValue: @"Salad" forProperty: @"label"];
 	[child addObject: subchild2];
 	
 	// We are going to copy 'child' from ctx1 to ctx2. It should copy
 	// 'child', 'subchild', and 'subchild2', but not 'parent'
 	
-	COGroup *childCopy = [ctx2 insertObject: child fromContext: ctx1];
+	COContainer *childCopy = [ctx2 insertObject: child fromContext: ctx1];
 	UKNotNil(childCopy);
 	UKObjectsSame(ctx2, [childCopy editingContext]);
-	UKNil([childCopy valueForProperty: @"parentGroup"]);
+	UKNil([childCopy valueForProperty: @"parentContainer"]);
 	UKStringsEqual(@"Groceries", [childCopy valueForProperty: @"label"]);
 	UKNotNil([childCopy contentArray]);
 	
-	COGroup *subchildCopy = [[childCopy contentArray] firstObject];
+	COContainer *subchildCopy = [[childCopy contentArray] firstObject];
 	UKNotNil(subchildCopy);
 	UKObjectsSame(ctx2, [subchildCopy editingContext]);
 	UKStringsEqual(@"Pizza", [subchildCopy valueForProperty: @"label"]);
 	
-	COGroup *subchild2Copy = [[childCopy contentArray] objectAtIndex: 1];
+	COContainer *subchild2Copy = [[childCopy contentArray] objectAtIndex: 1];
 	UKNotNil(subchild2Copy);
 	UKObjectsSame(ctx2, [subchild2Copy editingContext]);
 	UKStringsEqual(@"Salad", [subchild2Copy valueForProperty: @"label"]);

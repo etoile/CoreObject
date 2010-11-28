@@ -1,21 +1,21 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
-#import "COGroup.h"
+#import "COContainer.h"
 #import "COCollection.h"
 #import "TestCommon.h"
 
-@interface TestGroup : NSObject <UKTest>
+@interface TestContainer : NSObject <UKTest>
 {
 }
 @end
 
-@implementation TestGroup
+@implementation TestContainer
 
 - (void)testGroup
 {
 	COStore *store = [[COStore alloc] initWithURL: STORE_URL];
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
-	COGroup *obj = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
+	COContainer *obj = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
 	UKNotNil(obj);	
 
 	[ctx release];

@@ -409,7 +409,7 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 	return result;
 }	
 
-+ (COObjectGraphDiff *)diffContainer: (COGroup*)group1 withContainer: (COGroup*)group2
++ (COObjectGraphDiff *)diffContainer: (COContainer*)group1 withContainer: (COContainer*)group2
 {
 	
 }

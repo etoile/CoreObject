@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
 #import "COHistoryTrack.h"
-#import "COGroup.h"
+#import "COContainer.h"
 #import "COCollection.h"
 #import "TestCommon.h"
 
@@ -16,15 +16,15 @@
 {
 	COEditingContext *ctx = NewContext();
 	
-	COGroup *workspace = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *document1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *group1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *leaf1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *leaf2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	COGroup *group2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	COGroup *leaf3 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *workspace = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *document1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *group1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *leaf1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *leaf2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
+	COContainer *group2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
+	COContainer *leaf3 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 
-	COGroup *document2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *document2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
 	// Set up the initial state
 	
@@ -66,9 +66,9 @@
 	
 	// introduce some new objects
 	
-	COGroup *leaf4 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COGroup *leaf5 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	COGroup *leaf6 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *leaf4 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *leaf5 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
+	COContainer *leaf6 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
 	[leaf4 setValue: @"Leaf 4" forProperty: @"label"]; [ctx commit];
 	[leaf5 setValue: @"Leaf 5" forProperty: @"label"]; [ctx commit];
@@ -142,11 +142,11 @@
 	// next undo should move group2 from document 2 back to document 1
 	UKTrue([[document2 contentArray] containsObject: group2]);
 	UKFalse([[document1 contentArray] containsObject: group2]);
-	UKObjectsSame(document2, [group2 valueForProperty: @"parentGroup"]);
+	UKObjectsSame(document2, [group2 valueForProperty: @"parentContainer"]);
 	[doc1Track undo]; 
 	UKFalse([[document2 contentArray] containsObject: group2]);
 	UKTrue([[document1 contentArray] containsObject: group2]);
-	UKObjectsSame(document1, [group2 valueForProperty: @"parentGroup"]);
+	UKObjectsSame(document1, [group2 valueForProperty: @"parentContainer"]);
 	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID]), [ctx changedObjectUUIDs]);
 	
 	// FIXME: After group 2 is moved back to doc1, the next undo will actually
@@ -157,11 +157,11 @@
 	// next undo should move leaf2 ("Tomatoes") from group 2 to group 1
 	UKTrue([[group2 contentArray] containsObject: leaf2]);
 	UKFalse([[group1 contentArray] containsObject: leaf2]);
-	UKObjectsSame(group2, [leaf2 valueForProperty: @"parentGroup"]);
+	UKObjectsSame(group2, [leaf2 valueForProperty: @"parentContainer"]);
 	[doc1Track undo]; 
 	UKFalse([[group2 contentArray] containsObject: leaf2]);
 	UKTrue([[group1 contentArray] containsObject: leaf2]);
-	UKObjectsSame(group1, [leaf2 valueForProperty: @"parentGroup"]);
+	UKObjectsSame(group1, [leaf2 valueForProperty: @"parentContainer"]);
 	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx changedObjectUUIDs]);
 	
 	// next undo should rename leaf2 "Tomatoes" -> "Leaf 2"
