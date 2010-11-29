@@ -38,6 +38,7 @@
  * This means objects which are values for "composite" properties.
  */
 - (NSArray*)allStronglyContainedObjects;
+- (NSArray*)allStronglyContainedObjectsIncludingSelf;
 
 /* Property-value coding */
 

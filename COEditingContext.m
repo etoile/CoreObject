@@ -170,7 +170,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	}
 }
 
-- (id) insertObject: (COObject*)sourceObject
+- (id) insertObject: (COObject*)sourceObject withRelationshipConsistency: (BOOL)consistency
 {
 	COEditingContext *sourceContext = [sourceObject editingContext];
 	NSString *entityName = [[sourceObject entityDescription] fullName];
@@ -185,6 +185,12 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	
 	BOOL sharedStore = (_store == [sourceContext store]);
 	
+	if (!consistency)
+	{
+		assert(![copy isIgnoringRelationshipConsistency]);
+		[copy setIgnoringRelationshipConsistency: YES];
+	}
+	
 	for (NSString *prop in [sourceObject properties])
 	{
 		ETPropertyDescription *desc = [[sourceObject entityDescription] propertyDescriptionForName: prop];
@@ -194,8 +200,18 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		
 		[copy setValue: valueCopy forProperty: prop];
 	}
+
+	if (!consistency)
+	{
+		[copy setIgnoringRelationshipConsistency: NO];
+	}
 	
 	return copy;
+}
+
+- (id) insertObject: (COObject*)sourceObject
+{
+	return [self insertObject: sourceObject withRelationshipConsistency: YES];
 }
 
 - (void) deleteObjectWithUUID: (ETUUID*)uuid
@@ -287,6 +303,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	return nil;
 }
 
+// FIXME: Probably need to turn off relationship consistency around loading.
 - (void)loadObject: (COObject*)obj atRevision: (CORevision*)aRevision
 {
 	ETUUID *objUUID = [obj UUID];
@@ -295,6 +312,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	//NSLog(@"Properties to fetch: %@", propertiesToFetch);
 	
 	obj->_isIgnoringDamageNotifications = YES;
+	[obj setIgnoringRelationshipConsistency: YES];
 	
 	uint64_t revNum;
 	if (aRevision == nil)
@@ -336,6 +354,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	obj->_isFault = NO;
 	[self markObjectUndamaged: obj];
 	obj->_isIgnoringDamageNotifications = NO;
+	[obj setIgnoringRelationshipConsistency: NO];	
 }
 
 - (COObject*) objectWithUUID: (ETUUID*)uuid entityName: (NSString*)name

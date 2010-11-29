@@ -14,7 +14,7 @@
 @interface COObjectGraphDiff : NSObject
 {
 	NSMutableDictionary *_editsByPropertyAndUUID; // This maps { uuid : { property_name : COObjectGraphEdit object } }
-	NSMutableArray *_deletedObjectUUIDs;
+	NSMutableSet *_deletedObjectUUIDs;
 	NSMutableDictionary *_insertedObjectsByUUID;
 }
 

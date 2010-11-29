@@ -134,7 +134,10 @@
 	return result;
 }
 
-
+- (NSArray*)allStronglyContainedObjectsIncludingSelf
+{
+	return [[self allStronglyContainedObjects] arrayByAddingObject: self];
+}
 
 /* Property-value coding */
 
@@ -147,6 +150,13 @@
 - (id) valueForProperty:(NSString *)key
 {
 	[self willAccessValueForProperty: key];
+	
+	if (![[self properties] containsObject: key])
+	{
+		[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
+		return nil;
+	}
+	
 	id value = [_variableStorage objectForKey: key];
 	if (value == [NSNull null])
 	{

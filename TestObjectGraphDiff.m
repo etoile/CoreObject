@@ -126,7 +126,66 @@
 
 - (void)testSimpleNonconflictingMerge
 {
+	COEditingContext *ctx1 = NewContext();
+	COEditingContext *ctx2 = [[COEditingContext alloc] init];
+	COEditingContext *ctx3 = [[COEditingContext alloc] init];
 	
+	COContainer *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *child3 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	
+	[child1 addObject: subchild1];
+	[parent addObject: child1];
+	[parent addObject: child2];
+	[parent addObject: child3];
+	
+	[ctx1 commit];
+	
+	[ctx2 insertObject: parent];
+	[ctx3 insertObject: parent];
+	
+	// ctx2: remove child2, set a label for subchild1
+	assert([[[ctx2 objectWithUUID: [parent UUID]] contentArray] count] == 3);
+	[[ctx2 objectWithUUID: [child2 UUID]] setValue: nil forProperty: @"parentContainer"];
+	assert([[[ctx2 objectWithUUID: [parent UUID]] contentArray] count] == 2);
+	assert([[[ctx1 objectWithUUID: [parent UUID]] contentArray] count] == 3);
+	
+	[[ctx2 objectWithUUID: [subchild1 UUID]] setValue: @"Groceries" forProperty: @"label"];
+	 
+	// ctx3: move subchild1 to child3, insert child4
+	[[ctx3 objectWithUUID: [child3 UUID]] addObject: [ctx3 objectWithUUID: [subchild1 UUID]]];
+	COContainer *child4Ctx3 = [ctx3 insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
+	[[ctx3 objectWithUUID: [parent UUID]] insertObject: child4Ctx3 atIndex: 0];
+	assert([[[ctx1 objectWithUUID: [parent UUID]] contentArray] count] == 3);
+	
+	// Now do the merge
+	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx2 objectWithUUID: [parent UUID]]];
+	UKNotNil(diff1vs2);
+	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx3 objectWithUUID: [parent UUID]]];
+	UKNotNil(diff1vs3);
+	COObjectGraphDiff *merged = [COObjectGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
+	// FIXME: Test that there are no conflicts
+
+	// Apply the resulting diff to ctx1
+	UKFalse([ctx1 hasChanges]);
+	assert([[[ctx1 objectWithUUID: [parent UUID]] contentArray] count] == 3);
+	[merged applyToContext: ctx1];
+	UKStringsEqual(@"Groceries", [subchild1 valueForProperty: @"label"]);
+	UKObjectsSame(child3, [subchild1 valueForProperty: @"parentContainer"]);
+	UKIntsEqual(3, [[parent contentArray] count]);
+	COContainer *child4 = [ctx1 objectWithUUID: [child4Ctx3 UUID]];
+	if (3 == [[parent contentArray] count])
+	{
+		UKObjectsSame(child4, [[parent contentArray] objectAtIndex: 0]);
+		UKObjectsSame(child1, [[parent contentArray] objectAtIndex: 1]);
+		UKObjectsSame(child3, [[parent contentArray] objectAtIndex: 2]);
+	}
+	
+	[ctx3 release];
+	[ctx2 release];
+	TearDownContext(ctx1);
 }
 
 - (void)testComplexNonconflictingMerge

@@ -49,6 +49,8 @@
 - (id) insertObjectWithEntityName: (NSString*)aFullName;
 - (id) insertObject: (COObject*)sourceObject;
 
+- (id) insertObject: (COObject*)sourceObject withRelationshipConsistency: (BOOL)consistency; //Private
+
 - (COObject*) objectWithUUID: (ETUUID*)uuid;
 
 

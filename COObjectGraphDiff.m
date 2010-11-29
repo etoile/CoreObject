@@ -262,7 +262,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	SUPERINIT;
 	
 	_editsByPropertyAndUUID = [[NSMutableDictionary alloc] init];
-	_deletedObjectUUIDs = [[NSMutableArray alloc] init];
+	_deletedObjectUUIDs = [[NSMutableSet alloc] init];
 	_insertedObjectsByUUID = [[NSMutableDictionary alloc] init];
 	
 	return self;
@@ -318,7 +318,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 {
 	for (COObject *obj in [_insertedObjectsByUUID allValues])
 	{
-		[ctx insertObject: obj];
+		[ctx insertObject: obj withRelationshipConsistency: NO];
 	}	
 	for (ETUUID *uuid in _deletedObjectUUIDs)
 	{
@@ -465,8 +465,8 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 + (COObjectGraphDiff *)diffContainer: (COContainer*)group1 withContainer: (COContainer*)group2
 {
 	NSMutableSet *set = [NSMutableSet set];
-	[set addObjectsFromArray: [group1 allStronglyContainedObjects]];
-	[set addObjectsFromArray: [group2 allStronglyContainedObjects]];
+	[set addObjectsFromArray: [group1 allStronglyContainedObjectsIncludingSelf]];
+	[set addObjectsFromArray: [group2 allStronglyContainedObjectsIncludingSelf]];
 	set = [[set mappedCollection] UUID];
 	
 	return [COObjectGraphDiff diffObjectsWithUUIDs: set
@@ -482,9 +482,38 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 + (COObjectGraphDiff*) mergeDiff: (COObjectGraphDiff*)diff1 withDiff: (COObjectGraphDiff*)diff2
 {
 	COObjectGraphDiff *result = [[[COObjectGraphDiff alloc] init] autorelease];
-
+	NSLog(@"Merging %@ and %@...", diff1, diff2);
+	
 	NILARG_EXCEPTION_TEST(diff1);
 	NILARG_EXCEPTION_TEST(diff2);
+	
+	// Merge inserts and deletes
+
+	NSSet *diff1Inserts = [NSSet setWithArray: [diff1->_insertedObjectsByUUID allKeys]];
+	NSSet *diff2Inserts = [NSSet setWithArray: [diff2->_insertedObjectsByUUID allKeys]];	
+			
+	NSMutableSet *insertConflicts = [NSMutableSet setWithSet: diff1Inserts];
+	[insertConflicts intersectSet: diff2Inserts];
+	for (ETUUID *aUUID in insertConflicts)
+	{
+		// Warn about conflicts
+		if ([[diff1->_insertedObjectsByUUID objectForKey: aUUID] editingContext] != 
+			[[diff2->_insertedObjectsByUUID objectForKey: aUUID] editingContext])
+		{
+			NSLog(@"ERROR: Insert/Insert conflict with UUID %@. LHS wins.", aUUID);
+		}
+	}
+	
+	NSMutableDictionary *allInserts = [NSMutableDictionary dictionary];
+	[allInserts addEntriesFromDictionary: diff2->_insertedObjectsByUUID];
+	[allInserts addEntriesFromDictionary: diff1->_insertedObjectsByUUID]; // If there are duplicate keys diff1 wins
+	[result->_insertedObjectsByUUID setDictionary: allInserts];
+	
+	NSSet *allDeletedUUIDs = [diff1->_deletedObjectUUIDs setByAddingObjectsFromSet: diff2->_deletedObjectUUIDs];
+	[result->_deletedObjectUUIDs setSet: allDeletedUUIDs];
+	
+	
+	// Merge edits
 	
 	NSSet *allUUIDs = [[NSSet setWithArray: [diff1->_editsByPropertyAndUUID allKeys]]
 					   setByAddingObjectsFromArray: [diff2->_editsByPropertyAndUUID allKeys]];
