@@ -55,6 +55,7 @@
 		66D09EF4129EF6C7006BEDC3 /* TestRelationshipIntegrity.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */; };
 		66FDEB5512A2F106005D6D23 /* TestObjectGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */; };
 		66FDEB5812A2F150005D6D23 /* COObjectGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDC312592C1B0065DE1A /* COObjectGraphDiff.m */; };
+		66FDED2512A3525A005D6D23 /* TestPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FDED2412A3525A005D6D23 /* TestPerformance.m */; };
 		791B4E451299C81500CCF472 /* Test_main.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E271299C77700CCF472 /* Test_main.m */; };
 		791B4E471299C81500CCF472 /* TestUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E011299C58000CCF472 /* TestUtilities.m */; };
 		791B4E491299C81500CCF472 /* TestArrayDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E031299C58000CCF472 /* TestArrayDiff.m */; };
@@ -181,6 +182,7 @@
 		66D09EB4129E3BED006BEDC3 /* TRICKYCASES */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TRICKYCASES; sourceTree = "<group>"; };
 		66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestRelationshipIntegrity.m; sourceTree = "<group>"; };
 		66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestObjectGraphDiff.m; sourceTree = "<group>"; };
+		66FDED2412A3525A005D6D23 /* TestPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestPerformance.m; sourceTree = "<group>"; };
 		791B4E011299C58000CCF472 /* TestUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUtilities.m; sourceTree = "<group>"; };
 		791B4E021299C58000CCF472 /* OldTestCOObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OldTestCOObject.m; sourceTree = "<group>"; };
 		791B4E031299C58000CCF472 /* TestArrayDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestArrayDiff.m; sourceTree = "<group>"; };
@@ -393,6 +395,7 @@
 		791B4DF41299C56900CCF472 /* Test */ = {
 			isa = PBXGroup;
 			children = (
+				66FDED2412A3525A005D6D23 /* TestPerformance.m */,
 				791B4E271299C77700CCF472 /* Test_main.m */,
 				791B4E281299C78C00CCF472 /* TestStore.m */,
 				791B4E011299C58000CCF472 /* TestUtilities.m */,
@@ -652,6 +655,7 @@
 				66D09EF4129EF6C7006BEDC3 /* TestRelationshipIntegrity.m in Sources */,
 				6620EFA4129F3AAD00FD5AB9 /* TestHistoryTrack.m in Sources */,
 				66FDEB5512A2F106005D6D23 /* TestObjectGraphDiff.m in Sources */,
+				66FDED2512A3525A005D6D23 /* TestPerformance.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

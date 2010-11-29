@@ -25,6 +25,7 @@
 
 - (void)testInsertObject
 {
+	NSLog(@"Hai there");
 	COEditingContext *ctx = NewContext();
 	UKFalse([ctx hasChanges]);
 	
@@ -40,6 +41,9 @@
 	UKObjectsSame(obj, [ctx objectWithUUID: [obj UUID]]);
 	
 	UKTrue([ctx hasChanges]);
+	
+	UKNotNil([obj valueForProperty: @"parentCollections"]);
+	UKNotNil([obj valueForProperty: @"contents"]);
 	
 	TearDownContext(ctx);
 }
@@ -171,32 +175,38 @@
 	
 	[ctx1 commit];
 	
+	// We won't commit this
+	[parent setValue: @"Todo" forProperty: @"label"];
+	
 	// We'll add another sub-child and leave it uncommitted.
 	COContainer *subchild2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[subchild2 setValue: @"Salad" forProperty: @"label"];
 	[child addObject: subchild2];
 	
 	// We are going to copy 'child' from ctx1 to ctx2. It should copy
-	// 'child', 'subchild', and 'subchild2', but not 'parent'
+	// 'child', 'subchild', and 'subchild2', but not 'parent' (so 
+	// renaming parent from "Shopping" to "Todo" should not be propagated.)
 	
 	COContainer *childCopy = [ctx2 insertObject: child fromContext: ctx1];
 	UKNotNil(childCopy);
 	UKObjectsSame(ctx2, [childCopy editingContext]);
-	UKNil([childCopy valueForProperty: @"parentContainer"]);
+	UKObjectsEqual([parent UUID], [[childCopy valueForProperty: @"parentContainer"] UUID]);
+	UKStringsEqual(@"Shopping", [[childCopy valueForProperty: @"parentContainer"] valueForProperty: @"label"]);
 	UKStringsEqual(@"Groceries", [childCopy valueForProperty: @"label"]);
 	UKNotNil([childCopy contentArray]);
-	
-	COContainer *subchildCopy = [[childCopy contentArray] firstObject];
-	UKNotNil(subchildCopy);
-	UKObjectsSame(ctx2, [subchildCopy editingContext]);
-	UKStringsEqual(@"Pizza", [subchildCopy valueForProperty: @"label"]);
-	
-	COContainer *subchild2Copy = [[childCopy contentArray] objectAtIndex: 1];
-	UKNotNil(subchild2Copy);
-	UKObjectsSame(ctx2, [subchild2Copy editingContext]);
-	UKStringsEqual(@"Salad", [subchild2Copy valueForProperty: @"label"]);
-	
-	
+	UKIntsEqual(2, [[childCopy contentArray] count]);
+	if (2 == [[childCopy contentArray] count])
+	{
+		COContainer *subchildCopy = [[childCopy contentArray] firstObject];
+		UKNotNil(subchildCopy);
+		UKObjectsSame(ctx2, [subchildCopy editingContext]);
+		UKStringsEqual(@"Pizza", [subchildCopy valueForProperty: @"label"]);
+		
+		COContainer *subchild2Copy = [[childCopy contentArray] objectAtIndex: 1];
+		UKNotNil(subchild2Copy);
+		UKObjectsSame(ctx2, [subchild2Copy editingContext]);
+		UKStringsEqual(@"Salad", [subchild2Copy valueForProperty: @"label"]);
+	}
 	[ctx2 release];
 	TearDownContext(ctx1);
 }

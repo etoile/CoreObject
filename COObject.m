@@ -222,7 +222,9 @@
 	
 	// Begin relationship integrity
 	if (!_isIgnoringRelationshipConsistency)
-	{		
+	{	
+		[self setIgnoringRelationshipConsistency: YES]; // Needed to guard against recursion
+		
 		ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
 		assert(desc != nil);
 		
@@ -234,8 +236,8 @@
 				COObject *oldContainer = [self valueForProperty: key];
 				COObject *newContainer = value;
 				
-				//BOOL oldWasIgnoring = [oldContainer isIgnoringRelationshipConsistency];
-				//BOOL newWasIgnoring = [newContainer isIgnoringRelationshipConsistency];
+				// FIXME: as an optimisation, we should do nothing if oldContainer == newContainer
+				
 				[oldContainer setIgnoringRelationshipConsistency: YES];
 				[newContainer setIgnoringRelationshipConsistency: YES];			
 				
@@ -316,6 +318,7 @@
 				}
 			}
 		}
+		[self setIgnoringRelationshipConsistency: NO];
 	}
 	// End relationship integrity	
 	
@@ -352,7 +355,11 @@
 	// FIXME: Modify the value directly.. this will require refactoring setValue:forProperty:
 	// so that we can run the relationship integrity code and other checks directly
 	id copy = [[self valueForProperty: key] mutableCopy];
-	assert([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]);
+	if (!([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]))
+	{
+		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+	}
+	
 	[copy addObject: object];
 	[self setValue: copy forProperty: key];
 	[copy release];
@@ -368,7 +375,11 @@
 	// FIXME: see comment in addObject:ForProperty
 	
 	id copy = [[self valueForProperty: key] mutableCopy];
-	assert([copy isKindOfClass: [NSMutableArray class]]);
+	if (!([copy isKindOfClass: [NSMutableArray class]]))
+	{
+		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+	}
+	
 	[copy insertObject: object atIndex: index];
 	[self setValue: copy forProperty: key];
 	[copy release];
@@ -384,7 +395,10 @@
 	// FIXME: see comment in addObject:ForProperty
 	
 	id copy = [[self valueForProperty: key] mutableCopy];
-	assert([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]);
+	if (!([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]))
+	{
+		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+	}
 	[copy removeObject: object];
 	[self setValue: copy forProperty: key];
 	[copy release];
@@ -400,7 +414,11 @@
 	// FIXME: see comment in addObject:ForProperty
 	
 	id copy = [[self valueForProperty: key] mutableCopy];
-	assert([copy isKindOfClass: [NSMutableArray class]]);
+	if (!([copy isKindOfClass: [NSMutableArray class]]))
+	{
+		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+	}
+	
 	[copy removeObject: object atIndex: index];
 	[self setValue: copy forProperty: key];
 	[copy release];

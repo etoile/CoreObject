@@ -24,6 +24,12 @@
 	
 	return self;
 }
+
+- (id) init
+{
+	return [self initWithStore: nil];
+}
+
 - (COStore*)store
 {
 	return _store;
@@ -54,7 +60,6 @@
 {
 	return _modelRepository; 
 }
-
 
 - (BOOL) hasChanges
 {
@@ -113,13 +118,81 @@
 	return [self objectWithUUID: uuid entityName: nil];
 }
 
+
+/**
+ * Helper method for -insertObject:fromContext:
+ */
+static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, BOOL sharedStore)
+{
+	if ([value isKindOfClass: [NSArray class]])
+	{
+		NSMutableArray *copy = [NSMutableArray array];
+		for (id subvalue in value)
+		{
+			id subvaluecopy = handle(subvalue, ctx, desc, sharedStore);
+			if (nil == subvaluecopy)
+			{
+				NSLog(@"error");
+			}
+			[copy addObject: subvaluecopy];
+		}
+		return copy;
+	}
+	else if ([value isKindOfClass: [NSSet class]])
+	{
+		NSMutableSet *copy = [NSMutableSet set];
+		for (id subvalue in value)
+		{
+			id subvaluecopy = handle(subvalue, ctx, desc, sharedStore);
+			if (nil == subvaluecopy)
+			{
+				NSLog(@"error");
+			}
+			[copy addObject: subvaluecopy];			
+		}		
+		return copy;
+	}
+	else if ([value isKindOfClass: [COObject class]])
+	{
+		if ([desc isComposite])
+		{
+			return [ctx insertObject: value fromContext: [value editingContext]];
+		}
+		else
+		{
+			COObject *copy = [ctx objectWithUUID: [value UUID]];
+			return copy;
+		}
+	}
+	else
+	{
+		return [[value mutableCopy] autorelease];
+	}
+}
+
 - (id) insertObject: (COObject*)sourceObject fromContext: (COEditingContext*)sourceContext
 {
 	NSString *entityName = [[sourceObject entityDescription] fullName];
 	assert(entityName != nil);
 	
-	COObject *copy = [self insertObjectWithEntityName: entityName UUID: [sourceObject UUID]];
-	//FIXME:
+	COObject *copy = [self objectWithUUID: [sourceObject UUID]];
+
+	if (copy == nil)
+	{
+		copy = [self insertObjectWithEntityName: entityName UUID: [sourceObject UUID]];
+	}
+	
+	BOOL sharedStore = (_store == [sourceContext store]);
+	
+	for (NSString *prop in [sourceObject properties])
+	{
+		ETPropertyDescription *desc = [[sourceObject entityDescription] propertyDescriptionForName: prop];
+		
+		id value = [sourceObject valueForProperty: prop];
+		id valueCopy = handle(value, self, desc, sharedStore);
+		
+		[copy setValue: valueCopy forProperty: prop];
+	}
 	
 	return copy;
 }

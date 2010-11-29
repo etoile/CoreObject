@@ -411,7 +411,7 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 
 + (COObjectGraphDiff *)diffContainer: (COContainer*)group1 withContainer: (COContainer*)group2
 {
-	
+	return nil;
 }
 
 @end
@@ -422,6 +422,9 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 + (COObjectGraphDiff*) mergeDiff: (COObjectGraphDiff*)diff1 withDiff: (COObjectGraphDiff*)diff2
 {
 	COObjectGraphDiff *result = [[[COObjectGraphDiff alloc] init] autorelease];
+
+	NILARG_EXCEPTION_TEST(diff1);
+	NILARG_EXCEPTION_TEST(diff2);
 	
 	NSSet *allUUIDs = [[NSSet setWithArray: [diff1->_editsByPropertyAndUUID allKeys]]
 					   setByAddingObjectsFromArray: [diff2->_editsByPropertyAndUUID allKeys]];
