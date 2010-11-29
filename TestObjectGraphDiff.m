@@ -188,6 +188,73 @@
 	TearDownContext(ctx1);
 }
 
+- (void)testNonconflictingMergeWithMove
+{
+	COEditingContext *ctx1 = NewContext();
+	COEditingContext *ctx2 = [[COEditingContext alloc] init];
+	COEditingContext *ctx3 = [[COEditingContext alloc] init];
+	
+	COContainer *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	
+	[parent addObject: child1];
+	[parent addObject: child2];
+	
+	[ctx1 commit];
+	
+	[ctx2 insertObject: parent];
+	[ctx3 insertObject: parent];
+	
+	// ctx2: remove child1
+	[[ctx2 objectWithUUID: [parent UUID]] removeObject: [ctx2 objectWithUUID: [child1 UUID]]];
+	
+	// ctx3: put child1 inside  child2, and add a new child3 inside child2
+	COContainer *child3Ctx3 = [ctx3 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[[ctx3 objectWithUUID: [child2 UUID]] addObject: [ctx3 objectWithUUID: [child1 UUID]]];
+	[[ctx3 objectWithUUID: [child2 UUID]] addObject: child3Ctx3];
+	
+	// Now do the merge
+	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx2 objectWithUUID: [parent UUID]]];
+	UKNotNil(diff1vs2);
+	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx3 objectWithUUID: [parent UUID]]];
+	UKNotNil(diff1vs3);
+	COObjectGraphDiff *merged = [COObjectGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
+	// FIXME: Test that there are no conflicts
+	
+	// Apply the resulting diff to ctx1
+	UKFalse([ctx1 hasChanges]);
+	[merged applyToContext: ctx1];
+
+	// Expected result:
+	//
+	// parent
+	//  |
+	//   \-child2
+	//       |
+	//       \-child3
+	
+	COContainer *child3 = [ctx1 objectWithUUID: [child3Ctx3 UUID]];
+
+	UKIntsEqual(1, [[parent contentArray] count]);
+	if ([[parent contentArray] count] == 1)
+	{
+		UKObjectsSame(child2, [[parent contentArray] firstObject]);
+		UKObjectsSame(parent, [child2 valueForProperty: @"parentContainer"]);
+	}
+	UKIntsEqual(1, [[child2 contentArray] count]);
+	if ([[child2 contentArray] count] == 1)
+	{
+		UKObjectsSame(child3, [[child2 contentArray] firstObject]);
+		UKObjectsSame(child2, [child3 valueForProperty: @"parentContainer"]);
+	}
+	
+	[ctx3 release];
+	[ctx2 release];
+	TearDownContext(ctx1);
+}
+
+
 - (void)testComplexNonconflictingMerge
 {
 	
