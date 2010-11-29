@@ -15,7 +15,7 @@
 {
 	COStore *store = [[COStore alloc] initWithURL: STORE_URL];
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
-	COContainer *obj = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
+	COContainer *obj = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"];
 	UKNotNil(obj);	
 
 	[ctx release];

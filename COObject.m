@@ -14,7 +14,7 @@
 		ETEntityDescription *object = [ETEntityDescription descriptionWithName: @"COObject"];
 		
 		ETPropertyDescription *parentContainerProperty = [ETPropertyDescription descriptionWithName: @"parentContainer"
-																						   type: (id)@"Anonymous.COGroup"];
+																						   type: (id)@"Anonymous.COContainer"];
 		[parentContainerProperty setIsContainer: YES];
 		[parentContainerProperty setMultivalued: NO];
 	
@@ -29,9 +29,9 @@
 		[[ETModelDescriptionRepository mainRepository] setEntityDescription: object
 																   forClass: [COObject class]];
 		
-		// COGroup entity description
+		// COContainer entity description
 		
-		ETEntityDescription *group = [ETEntityDescription descriptionWithName: @"COGroup"];
+		ETEntityDescription *group = [ETEntityDescription descriptionWithName: @"COContainer"];
 		[group setParent: (id)@"Anonymous.COObject"];
 		
 		ETPropertyDescription *groupContentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
@@ -64,7 +64,7 @@
 																   forClass: [COCollection class]];
 		
 		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-		assert([[[[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.COGroup"] propertyDescriptionForName: @"contents"] isComposite]);
+		assert([[[[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.COContainer"] propertyDescriptionForName: @"contents"] isComposite]);
 	}
 }
 

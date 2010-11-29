@@ -19,9 +19,9 @@
 	
 	// Test one-to-many relationships
 	
-	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; // See COObject.m for metamodel definition
-	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
-	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
+	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"]; // See COObject.m for metamodel definition
+	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"];
+	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"];
 	
 	[o2 setValue: o1 forProperty: @"parentContainer"]; // should add o2 to o1's contents
 	[o2 setValue: A(o3) forProperty: @"contents"]; // should set parentContainer of o3
@@ -62,9 +62,9 @@
 	COStore *store = [[COStore alloc] initWithURL: STORE_URL];
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 	
-	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; // See COObject.m for metamodel definition
-	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
-	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
+	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"]; // See COObject.m for metamodel definition
+	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"];
+	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"];
 	
 	[o2 setValue: o1 forProperty: @"parentContainer"]; // should add o2 to o1's contents
 	UKObjectsEqual(A(o2), [o1 valueForProperty: @"contents"]);
@@ -80,9 +80,9 @@
 	
 	// Now test moving by modifying the multivalued side of the relationship
 	
-	COContainer *o4 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; 
-	COContainer *o5 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
-	COContainer *o6 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];	
+	COContainer *o4 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"]; 
+	COContainer *o5 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"];
+	COContainer *o6 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"];	
 	
 	[o5 addObject: o4];
 	[o6 addObject: o4]; // Should move o4 from o5 to o6
@@ -100,9 +100,9 @@
 	COStore *store = [[COStore alloc] initWithURL: STORE_URL];
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 	
-	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; // See COObject.m for metamodel definition
-	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
-	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
+	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"]; // See COObject.m for metamodel definition
+	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"];
+	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"];
 	[ctx commit];
 	
 	UKFalse([ctx objectHasChanges: [o1 UUID]]);

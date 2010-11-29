@@ -1,8 +1,8 @@
 #import "COObject.h"
 
 /**
- * COGroup is a COObject subclass which has an ordered, strong container
- * (contained objects can only be in one COGroup).
+ * COContainer is a COObject subclass which has an ordered, strong container
+ * (contained objects can only be in one COContainer).
  */
 @interface COContainer : COObject <ETCollection, ETCollectionMutation>
 {

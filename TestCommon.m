@@ -10,7 +10,7 @@ void setUpMetamodel()
 	// Outline item entity
 	{
 		ETEntityDescription *outlineEntity = [ETEntityDescription descriptionWithName: @"OutlineItem"];
-		[outlineEntity setParent: (id)@"Anonymous.COGroup"];
+		[outlineEntity setParent: (id)@"Anonymous.COContainer"];
 		
 		ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
 																		  type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
