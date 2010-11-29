@@ -25,7 +25,6 @@
 
 - (void)testInsertObject
 {
-	NSLog(@"Hai there");
 	COEditingContext *ctx = NewContext();
 	UKFalse([ctx hasChanges]);
 	
@@ -114,7 +113,7 @@
 	COObject *o1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[o1 setValue: @"Shopping" forProperty: @"label"];
 	
-	COObject *o1copy = [ctx2 insertObject: o1 fromContext: ctx1];
+	COObject *o1copy = [ctx2 insertObject: o1];
 	UKNotNil(o1copy);
 	UKObjectsSame(ctx1, [o1 editingContext]);
 	UKObjectsSame(ctx2, [o1copy editingContext]);
@@ -142,7 +141,7 @@
 	// We are going to copy 'child' from ctx1 to ctx2. It should copy both
 	// 'child' and 'subchild', but not 'parent'
 	
-	COContainer *childCopy = [ctx2 insertObject: child fromContext: ctx1];
+	COContainer *childCopy = [ctx2 insertObject: child];
 	UKNotNil(childCopy);
 	UKObjectsSame(ctx2, [childCopy editingContext]);
 	UKNil([childCopy valueForProperty: @"parentContainer"]);
@@ -187,7 +186,7 @@
 	// 'child', 'subchild', and 'subchild2', but not 'parent' (so 
 	// renaming parent from "Shopping" to "Todo" should not be propagated.)
 	
-	COContainer *childCopy = [ctx2 insertObject: child fromContext: ctx1];
+	COContainer *childCopy = [ctx2 insertObject: child];
 	UKNotNil(childCopy);
 	UKObjectsSame(ctx2, [childCopy editingContext]);
 	UKObjectsEqual([parent UUID], [[childCopy valueForProperty: @"parentContainer"] UUID]);
@@ -220,10 +219,10 @@
 	COObject *o1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[o1 setValue: @"Shopping" forProperty: @"label"];
 	
-	COObject *o1copy = [ctx2 insertObject: o1 fromContext: ctx1];
+	COObject *o1copy = [ctx2 insertObject: o1];
 	
 	// Insert again
-	COObject *o1copy2 = [ctx2 insertObject: o1 fromContext: ctx1];
+	COObject *o1copy2 = [ctx2 insertObject: o1];
 	UKObjectsSame(o1copy, o1copy2);
 	
 	//FIXME: Should inserting again copy over new changes (if any)?

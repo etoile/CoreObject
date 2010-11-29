@@ -1,6 +1,22 @@
 Tricky Cases
 ==============
 
+Relationship consistency and applying diffs can conflict with each other.
+e.g.
+
+Obj1 { contents : ( x ) }
+Obj2 { contents : ( ) }
+
+  |
+ \|/
+ 
+Obj1 { contents : ( ) }
+Obj2 { contents : ( x ) }
+
+For now we can turn off relationship consistency before applying diffs, I guess.
+
+
+
 Argument for needing automatic relationship consistency (like CoreData):
 ------------------------------------------------------------------------
 

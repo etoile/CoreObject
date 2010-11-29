@@ -34,12 +34,18 @@
 	[child addObject: subchild3];
 	[parent addObject: child];
 	
-	COContainer *parentCtx2 = [ctx2 insertObject: parent fromContext: ctx1];
-	COContainer *childCtx2 = [ctx2 insertObject: child fromContext: ctx1];
-	COContainer *subchild1Ctx2 = [ctx2 insertObject: subchild1 fromContext: ctx1];
-	COContainer *subchild2Ctx2 = [ctx2 insertObject: subchild2 fromContext: ctx1];
-	COContainer *subchild3Ctx2 = [ctx2 insertObject: subchild3 fromContext: ctx1];	
+	COContainer *parentCtx2 = [ctx2 insertObject: parent];
+	COContainer *childCtx2 = [ctx2 insertObject: child];
+	COContainer *subchild1Ctx2 = [ctx2 insertObject: subchild1];
+	COContainer *subchild2Ctx2 = [ctx2 insertObject: subchild2];
+	COContainer *subchild3Ctx2 = [ctx2 insertObject: subchild3];	
 
+	UKObjectsEqual([parent UUID], [parentCtx2 UUID]);
+	UKObjectsEqual([child UUID], [childCtx2 UUID]);
+	UKObjectsEqual([subchild1 UUID], [subchild1Ctx2 UUID]);
+	UKObjectsEqual([subchild2 UUID], [subchild2Ctx2 UUID]);
+	UKObjectsEqual([subchild3 UUID], [subchild3Ctx2 UUID]);
+	
 	// Now make some modifications to ctx2: 
 	
 	[childCtx2 removeObject: subchild2Ctx2]; // Remove "Salad"
@@ -89,10 +95,10 @@
 	[parent addObject: child1];
 	[parent addObject: child2];
 	
-	COContainer *parentCtx2 = [ctx2 insertObject: parent fromContext: ctx1];
-	COContainer *child1Ctx2 = [ctx2 insertObject: child1 fromContext: ctx1];
-	COContainer *child2Ctx2 = [ctx2 insertObject: child2 fromContext: ctx1];
-	COContainer *subchild1Ctx2 = [ctx2 insertObject: subchild1 fromContext: ctx1];
+	COContainer *parentCtx2 = [ctx2 insertObject: parent];
+	COContainer *child1Ctx2 = [ctx2 insertObject: child1];
+	COContainer *child2Ctx2 = [ctx2 insertObject: child2];
+	COContainer *subchild1Ctx2 = [ctx2 insertObject: subchild1];
 	
 	// Now make some modifications to ctx2: (move "Salad" from "Groceries" to "Todo")
 	
@@ -155,8 +161,8 @@
 	[parent addObject: child2];
 	[parent addObject: child3];
 	
-	[ctx2 insertObject: parent fromContext: ctx1];
-	[ctx3 insertObject: parent fromContext: ctx1];
+	[ctx2 insertObject: parent];
+	[ctx3 insertObject: parent];
 
 	// ctx2: move subchild1 to child2
 	[[ctx2 objectWithUUID: [child2 UUID]] addObject: [ctx2 objectWithUUID: [subchild1 UUID]]];

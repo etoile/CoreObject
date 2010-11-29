@@ -15,7 +15,7 @@
 {
 	NSMutableDictionary *_editsByPropertyAndUUID; // This maps { uuid : { property_name : COObjectGraphEdit object } }
 	NSMutableArray *_deletedObjectUUIDs;
-	NSMutableDictionary *_insertedObjectDataByUUID;
+	NSMutableDictionary *_insertedObjectsByUUID;
 }
 
 - (void)recordRemoveProperty: (NSString*)name ofObject: (ETUUID*)obj;

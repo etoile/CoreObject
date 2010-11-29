@@ -498,10 +498,15 @@
 	}
 	else
 	{
-		desc = [NSString stringWithFormat: @"<%@(%@) %p UUID=%@ variableStorage=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid, _variableStorage];  
+		desc = [NSString stringWithFormat: @"<%@(%@) %p UUID=%@ properties=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid, [self properties]];  
 	}
 	_inDescription = NO;
 	return desc;
+}
+
+- (NSUInteger)hash
+{
+	return [_uuid hash] ^ 0x39ab6f39b15233de;
 }
 
 - (BOOL)isEqual: (id)object
@@ -510,6 +515,19 @@
 	{
 		return YES;
 	}
+	if (![object isKindOfClass: [COObject class]])
+	{
+		return NO;
+	}
+	if ([[object UUID] isEqual: [self UUID]])
+	{
+		return YES;
+	}
+	
+	return NO;
+	/*
+
+	// FIXME: Incomplete/ incorrect
 	
 	if ([object isKindOfClass: [COObject class]])
 	{
@@ -524,6 +542,10 @@
 			{
 				id selfValue = [self valueForProperty: [propDesc name]];
 				id otherValue = [other valueForProperty: [propDesc name]];
+				if (selfValue == otherValue)
+				{
+					continue;
+				}
 				if (![selfValue isEqual: otherValue] && !(selfValue == nil && otherValue == nil))
 				{
 					return NO; 
@@ -532,7 +554,7 @@
 		}
 		return YES;
 	}
-	return NO;
+	return NO;*/
 }
 
 /**

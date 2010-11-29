@@ -120,7 +120,7 @@
 
 
 /**
- * Helper method for -insertObject:fromContext:
+ * Helper method for -insertObject:
  */
 static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, BOOL sharedStore)
 {
@@ -156,7 +156,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	{
 		if ([desc isComposite])
 		{
-			return [ctx insertObject: value fromContext: [value editingContext]];
+			return [ctx insertObject: value];
 		}
 		else
 		{
@@ -170,8 +170,9 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	}
 }
 
-- (id) insertObject: (COObject*)sourceObject fromContext: (COEditingContext*)sourceContext
+- (id) insertObject: (COObject*)sourceObject
 {
+	COEditingContext *sourceContext = [sourceObject editingContext];
 	NSString *entityName = [[sourceObject entityDescription] fullName];
 	assert(entityName != nil);
 	

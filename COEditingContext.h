@@ -47,7 +47,7 @@
 
 - (Class) classForEntityDescription: (ETEntityDescription*)desc;
 - (id) insertObjectWithEntityName: (NSString*)aFullName;
-- (id) insertObject: (COObject*)sourceObject fromContext: (COEditingContext*)sourceContext;
+- (id) insertObject: (COObject*)sourceObject;
 
 - (COObject*) objectWithUUID: (ETUUID*)uuid;
 

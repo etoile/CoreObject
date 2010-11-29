@@ -3,9 +3,8 @@
 #import "COArrayDiff.h"
 #import "COSetDiff.h"
 
-// FIXME: do something like this
-#if 0
-static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
+
+static NSArray *ArrayWithCOObjectsReplacedWithUUIDs(NSArray *array)
 {
 	NSUInteger c = [array count];
 	NSMutableArray *result = [NSMutableArray arrayWithCapacity: c];
@@ -21,9 +20,26 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 			[result addObject: val];
 		}
 	}
+	return result;
 }
-#endif
 
+static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
+{
+	NSUInteger c = [set count];
+	NSMutableSet *result = [NSMutableSet setWithCapacity: c];
+	for (id val in set)
+	{
+		if ([val isKindOfClass: [COObject class]])
+		{
+			[result addObject: [val UUID]];
+		}
+		else
+		{
+			[result addObject: val];
+		}
+	}
+	return result;
+}
 
 /**
  * COObjectGraphEdit classes. These are simple wrapper objects.
@@ -110,6 +126,11 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 }
 - (void) applyToObject: (COObject*)obj
 {
+	if ([newValue isKindOfClass: [ETUUID class]])
+	{
+		newValue = [[obj editingContext] objectWithUUID: newValue];
+		assert(newValue != nil); //FIXME: remove
+	}
 	[obj setValue: newValue forProperty: propertyName];
 }
 - (NSString *)description
@@ -149,7 +170,20 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 	// FIXME: slow
 	NSArray *oldArray = [obj valueForProperty: propertyName];
 	NSArray *temp = [diff arrayWithDiffAppliedTo: oldArray];
-	NSArray *newArray = temp; 
+	NSArray *newArray = [NSMutableArray array]; 
+	for (id value in temp)
+	{
+		if ([value isKindOfClass: [ETUUID class]])
+		{
+			id newValue = [[obj editingContext] objectWithUUID: value];
+			assert(newValue != nil); //FIXME: remove
+			[newArray addObject: newValue];
+		}
+		else
+		{
+			[newArray addObject: value];
+		}
+	}
 	
 	[obj setValue: newArray
 	  forProperty: propertyName];
@@ -190,10 +224,23 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 - (void) applyToObject: (COObject*)obj
 {
 	NSSet *temp = [diff setWithDiffAppliedTo: [obj valueForProperty: propertyName]];
-	NSSet *result = temp;
+	NSMutableSet *newSet = [NSMutableSet set]; 
+	for (id value in temp)
+	{
+		if ([value isKindOfClass: [ETUUID class]])
+		{
+			id newValue = [[obj editingContext] objectWithUUID: value];
+			assert(newValue != nil); //FIXME: remove
+			[newSet addObject: newValue];
+		}
+		else
+		{
+			[newSet addObject: value];
+		}
+	}
 	
 	// FIXME: slow
-	[obj setValue: result
+	[obj setValue: newSet
 	  forProperty: propertyName];
 }
 - (NSString *)description
@@ -216,7 +263,7 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 	
 	_editsByPropertyAndUUID = [[NSMutableDictionary alloc] init];
 	_deletedObjectUUIDs = [[NSMutableArray alloc] init];
-	_insertedObjectDataByUUID = [[NSMutableDictionary alloc] init];
+	_insertedObjectsByUUID = [[NSMutableDictionary alloc] init];
 	
 	return self;
 }
@@ -225,7 +272,7 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 {
 	[_editsByPropertyAndUUID release];
 	[_deletedObjectUUIDs release];
-	[_insertedObjectDataByUUID release];
+	[_insertedObjectsByUUID release];
 	[super dealloc];
 }
 
@@ -262,33 +309,33 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 {
 	[_deletedObjectUUIDs addObject: uuid];
 }
-- (void)recordInsertObjectWithUUID: (ETUUID*)uuid
-							  data: (NSDictionary*)data
+- (void)recordInsertObject: (COObject*)obj
 {
-	[_insertedObjectDataByUUID setObject: data forKey: uuid];
+	[_insertedObjectsByUUID setObject: obj forKey: [obj UUID]];
 }
 
 - (void)applyToContext: (COEditingContext*)ctx
 {
-	// FIXME: write
-	/*
-	for (ETUUID *uuid in [_insertedObjectsByUUID allKeys])
+	for (COObject *obj in [_insertedObjectsByUUID allValues])
 	{
-		[ctx insertObjectWithEntityName:<#(NSString *)aFullName#>
+		[ctx insertObject: obj];
 	}	
 	for (ETUUID *uuid in _deletedObjectUUIDs)
 	{
-		[ctx deleteObjectWithID: uuid];
-	}*/
+		[ctx deleteObjectWithUUID: uuid];
+	}
 	for (ETUUID *uuid in _editsByPropertyAndUUID)
 	{
 		NSDictionary *propDict = [_editsByPropertyAndUUID objectForKey: uuid];
 		COObject *obj = [ctx objectWithUUID: uuid];
 		
+		assert(![obj isIgnoringRelationshipConsistency]);
+		[obj setIgnoringRelationshipConsistency: YES];
 		for (COObjectGraphEdit *edit in [propDict allValues])
 		{
 			[edit applyToObject: obj];
 		}
+		[obj setIgnoringRelationshipConsistency: NO];
 	}
 }
 
@@ -318,7 +365,7 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 + (void) _diffObject: (COObject*)base with: (COObject*)other addToDiff: (COObjectGraphDiff*)diff
 {
 
-	NSLog(@"Diff %@ with %@", base, other);
+	//NSLog(@"Diff %@ with %@", base, other);
 	
 	if (base == nil && other == nil)
 	{
@@ -326,7 +373,7 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 	}
 	else if (base == nil)
 	{
-		[diff recordInsertObjectWithUUID: [other UUID] data: [other propertyList]];
+		[diff recordInsertObject: other];
 		return;
 	}
 	else if (other == nil)
@@ -347,14 +394,14 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 		{
 			if ([baseVal isKindOfClass: [NSArray class]] && [otherVal isKindOfClass: [NSArray class]])
 			{
-				COArrayDiff *arrayDiff = [[[COArrayDiff alloc] initWithFirstArray: (NSArray*)baseVal
-																	  secondArray: (NSArray*)otherVal] autorelease];
+				COArrayDiff *arrayDiff = [[[COArrayDiff alloc] initWithFirstArray: ArrayWithCOObjectsReplacedWithUUIDs(baseVal)
+																	  secondArray: ArrayWithCOObjectsReplacedWithUUIDs(otherVal)] autorelease];
 				[diff recordModifyArray: arrayDiff forProperty: prop ofObjectUUID: [base UUID]];
 			}
 			else if ([baseVal isKindOfClass: [NSSet class]] && [otherVal isKindOfClass: [NSSet class]])
 			{
-				COSetDiff *setDiff = [[[COSetDiff alloc] initWithFirstSet: (NSSet*)baseVal
-																secondSet: (NSSet*)otherVal] autorelease];
+				COSetDiff *setDiff = [[[COSetDiff alloc] initWithFirstSet: SetWithCOObjectsReplacedWithUUIDs(baseVal)
+																secondSet: SetWithCOObjectsReplacedWithUUIDs(otherVal)] autorelease];
 				[diff recordModifySet: setDiff forProperty: prop ofObjectUUID: [base UUID]];
 			}
 			else if (baseVal != nil && otherVal == nil)
@@ -363,6 +410,10 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 			}
 			else
 			{
+				if ([otherVal isKindOfClass: [COObject class]])
+				{
+					otherVal = [otherVal UUID];
+				}
 				[diff recordSetValue: otherVal forProperty: prop ofObjectUUID: [base UUID]];
 			}
 		}
@@ -376,6 +427,8 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 	COObjectGraphDiff *result = [[[COObjectGraphDiff alloc] init] autorelease];
 	for (ETUUID *uuid in objectUUIDs)
 	{
+		assert([uuid isKindOfClass: [ETUUID class]]);
+		
 		COObject *o1 = [base objectWithUUID: uuid];
 		COObject *o2 = [other objectWithUUID: uuid];
 		
@@ -411,7 +464,14 @@ static NSArray *ArrayCopyWithCOObjectsReplacedWithUUIDs(NSArray *array)
 
 + (COObjectGraphDiff *)diffContainer: (COContainer*)group1 withContainer: (COContainer*)group2
 {
-	return nil;
+	NSMutableSet *set = [NSMutableSet set];
+	[set addObjectsFromArray: [group1 allStronglyContainedObjects]];
+	[set addObjectsFromArray: [group2 allStronglyContainedObjects]];
+	set = [[set mappedCollection] UUID];
+	
+	return [COObjectGraphDiff diffObjectsWithUUIDs: set
+										 inContext: [group1 editingContext]
+									   withContext: [group2 editingContext]];
 }
 
 @end

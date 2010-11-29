@@ -34,7 +34,7 @@ int main (int argc, const char * argv[]) {
 	
 	StatusPrinter *stats = [StatusPrinter new];
 	[[UKTestHandler handler] setDelegate: stats];
-	//[[UKTestHandler handler] setQuiet: YES];
+	[[UKTestHandler handler] setQuiet: YES];
 	
 	UKRunner *runner = [UKRunner new];
 	[runner runTestsInBundle: [NSBundle mainBundle]];
