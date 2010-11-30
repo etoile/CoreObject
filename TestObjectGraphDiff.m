@@ -188,7 +188,7 @@
 	TearDownContext(ctx1);
 }
 
-- (void)testNonconflictingMergeWithMove
+- (void)testNonconflictingMergeWithMoveAndDeleteOnOneToManyRelationship
 {
 	COEditingContext *ctx1 = NewContext();
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
@@ -203,16 +203,41 @@
 	
 	[ctx1 commit];
 	
+	// ctx1:
+	//
+	// parent
+	//  |
+	//  |--child1
+	//  |
+	//   \-child2
+		
 	[ctx2 insertObject: parent];
 	[ctx3 insertObject: parent];
 	
 	// ctx2: remove child1
 	[[ctx2 objectWithUUID: [parent UUID]] removeObject: [ctx2 objectWithUUID: [child1 UUID]]];
 	
+	// ctx2:
+	//
+	// parent
+	//  |
+	//   \-child2
+		
 	// ctx3: put child1 inside  child2, and add a new child3 inside child2
 	COContainer *child3Ctx3 = [ctx3 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[[ctx3 objectWithUUID: [child2 UUID]] addObject: [ctx3 objectWithUUID: [child1 UUID]]];
 	[[ctx3 objectWithUUID: [child2 UUID]] addObject: child3Ctx3];
+	
+	// ctx3:
+	//
+	// parent
+	//  |
+	//   \-child2
+	//       |
+	//       |-child1
+	//       |
+	//       \-child3
+	
 	
 	// Now do the merge
 	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx2 objectWithUUID: [parent UUID]]];

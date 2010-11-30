@@ -41,6 +41,85 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	return result;
 }
 
+
+@interface COObjectGraphPath : NSObject
+{
+	ETUUID *objectUUID;
+	NSString *property;
+	NSNumber *index;
+}
+@property (readwrite, retain, nonatomic) ETUUID *objectUUID;
+@property (readwrite, retain, nonatomic) NSString *property;
+@property (readwrite, retain, nonatomic) NSNumber *index;
+@end
+
+@implementation COObjectGraphPath
+
+@synthesize objectUUID; 
+@synthesize property;
+@synthesize index;
+
+- (BOOL)isEqual:(id)object
+{
+	if ([object isKindOfClass: [COObjectGraphPath class]])
+	{
+		return [objectUUID isEqual: [object objectUUID]]
+			&& [property isEqual: [object property]]
+			&& ([index isEqual: [object index]] || (index == nil && [object index] == nil));
+	}
+	return NO;
+}
+
+- (void)dealloc
+{
+	[objectUUID release];
+	[property release];
+	[index release];
+	[super dealloc];
+}
+
+@end
+
+
+@interface COMoveInfo : NSObject
+{
+	COObjectGraphPath *sourcePath, *destPath;
+	ETUUID *movedObjectUUID;
+}
+@property (readwrite, retain, nonatomic) COObjectGraphPath *sourcePath;
+@property (readwrite, retain, nonatomic) COObjectGraphPath *destPath;
+@property (readwrite, retain, nonatomic) ETUUID *movedObjectUUID;
+@end
+
+@implementation COMoveInfo
+
+@synthesize sourcePath; 
+@synthesize destPath;
+@synthesize movedObjectUUID;
+
+- (BOOL)isEqual:(id)object
+{
+	if ([object isKindOfClass: [COMoveInfo class]])
+	{
+		return [sourcePath isEqual: [object sourcePath]]
+		&& [destPath isEqual: [object destPath]]
+		&& [movedObjectUUID isEqual: [object movedObjectUUID]];
+	}
+	return NO;
+}
+
+- (void)dealloc
+{
+	[sourcePath release];
+	[destPath release];
+	[movedObjectUUID release];
+	[super dealloc];
+}
+
+@end
+
+
+
 /**
  * COObjectGraphEdit classes. These are simple wrapper objects.
  */
@@ -354,6 +433,25 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	return desc;
 }
 
+- (NSDictionary*)movedObjects
+{
+	/*
+	 { uuid : COMoveInfo } 
+	 */
+	
+/*	NSSet *
+	for (ETUUID *uuid in _editsByPropertyAndUUID)
+	{
+		NSDictionary *propDict = [_editsByPropertyAndUUID objectForKey: uuid];
+		for (COObjectGraphEdit *edit in [propDict allValues])
+		{
+			
+		}
+	}
+	
+	return nil*/
+}
+
 @end
 
 
@@ -518,12 +616,6 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	NSSet *allUUIDs = [[NSSet setWithArray: [diff1->_editsByPropertyAndUUID allKeys]]
 					   setByAddingObjectsFromArray: [diff2->_editsByPropertyAndUUID allKeys]];
 	
-	// FIXME: Do move detection; detect conflicting moves.
-	// Should be pretty easy, just construct sets containing all objects that
-	// are both removed somewhere and added somewhere in a diff, and treat the
-	// intersection of those sets as moves.
-	// Do that for both diffs, and then check if there are any moves which
-	// have the same source in both diffs but different destinations.
 	
 	for (ETUUID *uuid in allUUIDs)
 	{
