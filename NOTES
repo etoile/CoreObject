@@ -1,6 +1,13 @@
 Notes
 =======
 
+"Scalable XML Collaborative Editing with Undo" - Stéphane Martin, Pascal Urso, and Stéphane Weiss
+http://arxiv.org/pdf/1010.3615
+
+A recent paper with an approached to editing structured documents with selective
+undo.
+
+
 History navigation
 -------------------
 

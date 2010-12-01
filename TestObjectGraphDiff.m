@@ -188,8 +188,10 @@
 	TearDownContext(ctx1);
 }
 
-- (void)testNonconflictingMergeWithMoveAndDeleteOnOneToManyRelationship
+- (void)testMoveAndDeleteOnOneToManyRelationship
 {
+	// Expected result: the delete wins, with no conflicts
+	
 	COEditingContext *ctx1 = NewContext();
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	COEditingContext *ctx3 = [[COEditingContext alloc] init];
@@ -251,6 +253,8 @@
 	UKFalse([ctx1 hasChanges]);
 	[merged applyToContext: ctx1];
 
+	// FIXME: Check that there were no conflicts
+	
 	// Expected result:
 	//
 	// parent
@@ -279,21 +283,87 @@
 	TearDownContext(ctx1);
 }
 
-
-- (void)testComplexNonconflictingMerge
+- (void)testMoveAndDeleteOnManyToManyRelationship
 {
+	// Expected: both succeed
 	
+	COEditingContext *ctx1 = NewContext();
+	COEditingContext *ctx2 = [[COEditingContext alloc] init];
+	COEditingContext *ctx3 = [[COEditingContext alloc] init];
+	
+	COCollection *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COCollection *tag2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COContainer *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	
+	[tag1 addObject: child];
+	
+	[ctx1 commit];
+	
+	// ctx1:
+	//
+	// tag1         tag2
+	//  |
+	//   \--child
+	
+	COCollection *tag1Ctx2 = [ctx2 insertObject: tag1];
+	COCollection *tag2Ctx2 = [ctx2 insertObject: tag2];
+	COCollection *childCtx2 = [ctx2 insertObject: child];
+	
+	COCollection *tag1Ctx3 = [ctx3 insertObject: tag1];
+	COCollection *tag2Ctx3 = [ctx3 insertObject: tag2];
+	COCollection *childCtx3 = [ctx3 insertObject: child];	
+	
+	// ctx2: move child to tag2
+	UKTrue([[tag1Ctx2 contentArray] containsObject: childCtx2]);
+	[tag1Ctx2 removeObject: childCtx2];
+	[tag2Ctx2 addObject: childCtx2];
+	
+	// ctx2:
+	//
+	// tag1         tag2
+	//               |
+	//                \--child
+	
+	// ctx3: delete child from tag1
+	UKTrue([[tag1Ctx3 contentArray] containsObject: childCtx3]);
+	[tag1Ctx3 removeObject: childCtx2];
+	
+	// ctx3:
+	//
+	// tag1         tag2
+	//               
+	// child
+	
+	
+	// Now do the merge
+	NSArray *uuids = [[A(tag1, tag2, child) mappedCollection] UUID];
+	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffObjectsWithUUIDs:uuids  inContext:ctx1 withContext:ctx2];
+	UKNotNil(diff1vs2);
+	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffObjectsWithUUIDs:uuids  inContext:ctx1 withContext:ctx3];
+	UKNotNil(diff1vs3);
+	COObjectGraphDiff *merged = [COObjectGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
+	// FIXME: Test that there are no conflicts
+	
+	// Apply the resulting diff to ctx1
+	[merged applyToContext: ctx1];
+	
+	// Expected result:
+	//
+	// tag1         tag2
+	//               |
+	//                \--child
+	
+	UKIntsEqual(0, [[tag1 contentArray] count]);
+	UKIntsEqual(1, [[tag2 contentArray] count]);
+	UKObjectsEqual(S(tag2), [child valueForProperty: @"parentCollections"]);
+	
+	[ctx3 release];
+	[ctx2 release];
+	TearDownContext(ctx1);
 }
 
-- (void)testSimpleConflictingMerge
-{
-	
-}
 
-- (void)testComplexConflictingMerge
-{
-	
-}
+
 
 - (void)testConflictingMovesMerge
 {

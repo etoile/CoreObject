@@ -3,6 +3,7 @@
 #import "COEditingContext.h"
 #import "TestCommon.h"
 #import "COContainer.h"
+#import "COCollection.h"
 
 @interface TestEditingContext : NSObject <UKTest>
 {
@@ -226,6 +227,28 @@
 	UKObjectsSame(o1copy, o1copy2);
 	
 	//FIXME: Should inserting again copy over new changes (if any)?
+	
+	[ctx1 release];
+	[ctx2 release];
+}
+
+- (void)testCopyingBetweenContextsWithManyToMany
+{
+	COEditingContext *ctx1 = [[COEditingContext alloc] init];
+	COEditingContext *ctx2 = [[COEditingContext alloc] init];
+
+	COCollection *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COContainer *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+
+	[tag1 addObject: child];
+
+	// Copy the tag collection to ctx2. At first it will be empty since child isn't in ctx2 yet
+	
+	COCollection *tag1copy = [ctx2 insertObject: tag1];
+	UKObjectsEqual([NSArray array], [tag1copy contentArray]);
+	
+	COContainer *childcopy = [ctx2 insertObject: child];
+	UKObjectsEqual([NSArray arrayWithObject: childcopy], [tag1copy contentArray]);
 	
 	[ctx1 release];
 	[ctx2 release];

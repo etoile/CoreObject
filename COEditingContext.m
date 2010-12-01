@@ -146,7 +146,10 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 			{
 				NSLog(@"error");
 			}
-			[copy addObject: subvaluecopy];
+			else
+			{
+				[copy addObject: subvaluecopy];
+			}
 		}
 		return copy;
 	}
@@ -160,7 +163,10 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 			{
 				NSLog(@"error");
 			}
-			[copy addObject: subvaluecopy];			
+			else
+			{
+				[copy addObject: subvaluecopy];	
+			}
 		}		
 		return copy;
 	}

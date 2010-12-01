@@ -10,6 +10,9 @@
  *
  * It also allow exposes a simlpe NSUndoManager-like way of navigating
  * history.
+ *
+ * Undo/redo causes a new commit.
+ * Similar idea as http://www.loria.fr/~weiss/pmwiki/uploads/Main/CollaborateCom.pdf
  */
 @interface COHistoryTrack : NSObject
 {

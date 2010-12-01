@@ -7,4 +7,9 @@
 	return NO;
 }
 
+- (NSArray *) contentArray
+{
+	return [[self content] allObjects];
+}
+
 @end
