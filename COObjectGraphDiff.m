@@ -397,7 +397,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 {
 	for (COObject *obj in [_insertedObjectsByUUID allValues])
 	{
-		[ctx insertObject: obj withRelationshipConsistency: NO];
+		[ctx insertObject: obj withRelationshipConsistency: NO newUUID: NO];
 	}	
 	for (ETUUID *uuid in _deletedObjectUUIDs)
 	{

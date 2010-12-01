@@ -134,14 +134,14 @@
 /**
  * Helper method for -insertObject:
  */
-static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, BOOL sharedStore)
+static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, BOOL consistency, BOOL newUUID)
 {
 	if ([value isKindOfClass: [NSArray class]])
 	{
 		NSMutableArray *copy = [NSMutableArray array];
 		for (id subvalue in value)
 		{
-			id subvaluecopy = handle(subvalue, ctx, desc, sharedStore);
+			id subvaluecopy = handle(subvalue, ctx, desc, consistency, newUUID);
 			if (nil == subvaluecopy)
 			{
 				NSLog(@"error");
@@ -158,7 +158,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		NSMutableSet *copy = [NSMutableSet set];
 		for (id subvalue in value)
 		{
-			id subvaluecopy = handle(subvalue, ctx, desc, sharedStore);
+			id subvaluecopy = handle(subvalue, ctx, desc, consistency, newUUID);
 			if (nil == subvaluecopy)
 			{
 				NSLog(@"error");
@@ -174,7 +174,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	{
 		if ([desc isComposite])
 		{
-			return [ctx insertObject: value];
+			return [ctx insertObject: value withRelationshipConsistency: consistency newUUID: newUUID];
 		}
 		else
 		{
@@ -188,21 +188,28 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	}
 }
 
-- (id) insertObject: (COObject*)sourceObject withRelationshipConsistency: (BOOL)consistency
+- (id) insertObject: (COObject*)sourceObject withRelationshipConsistency: (BOOL)consistency  newUUID: (BOOL)newUUID
 {
 	COEditingContext *sourceContext = [sourceObject editingContext];
 	NSString *entityName = [[sourceObject entityDescription] fullName];
 	assert(entityName != nil);
 	
-	COObject *copy = [self objectWithUUID: [sourceObject UUID]];
+	COObject *copy;
+	
+	if (!newUUID)
+	{	
+		copy = [self objectWithUUID: [sourceObject UUID]];
 
-	if (copy == nil)
-	{
-		copy = [self insertObjectWithEntityName: entityName UUID: [sourceObject UUID]];
+		if (copy == nil)
+		{
+			copy = [self insertObjectWithEntityName: entityName UUID: [sourceObject UUID]];
+		}
 	}
-	
-	BOOL sharedStore = (_store == [sourceContext store]);
-	
+	else
+	{
+		copy = [self insertObjectWithEntityName: entityName UUID: [ETUUID UUID]];
+	}
+
 	if (!consistency)
 	{
 		assert(![copy isIgnoringRelationshipConsistency]);
@@ -214,7 +221,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		ETPropertyDescription *desc = [[sourceObject entityDescription] propertyDescriptionForName: prop];
 		
 		id value = [sourceObject valueForProperty: prop];
-		id valueCopy = handle(value, self, desc, sharedStore);
+		id valueCopy = handle(value, self, desc, consistency, newUUID);
 		
 		[copy setValue: valueCopy forProperty: prop];
 	}
@@ -229,7 +236,12 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 - (id) insertObject: (COObject*)sourceObject
 {
-	return [self insertObject: sourceObject withRelationshipConsistency: YES];
+	return [self insertObject: sourceObject withRelationshipConsistency: YES newUUID: NO];
+}
+
+- (id) insertObjectCopy: (COObject*)sourceObject
+{
+	return [self insertObject: sourceObject withRelationshipConsistency: YES newUUID: YES];
 }
 
 - (void) deleteObjectWithUUID: (ETUUID*)uuid

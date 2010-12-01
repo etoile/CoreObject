@@ -70,7 +70,6 @@
 
 - (NSString*) description;
 - (BOOL) isEqual: (id)otherObject;
-- (id)copyWithZone: (NSZone*)zone;
 
 @end
 

@@ -1,6 +1,44 @@
 Design Ideas
 ==============
 
+Attributed String Merging
+-------------------------
+If we used one object per character, this would work out of the box.
+
+Example:
+
+			    /--> "_eto_ile" (underline)
+      "etoile"
+	           \--> "e*toile*" (bold)
+			   
+merging the two branches shouldn't conflict, because a character can be both
+bold and underlined.  but if we modeled it as:
+
+ORIGINAL: textRuns : ( { uuid : u1, string : 'etoile'} )
+  
+V1:       textRuns : ( { uuid : u2, string : 'eto', attrs : underline }, { uuid : u3, string : 'ile' } )
+
+V2:       textRuns : ( { uuid : u4, string : 'e' }, { uuid : u5, string : 'toile', attrs : bold } )
+  
+The merge would have conflicts, but we don't want it to.
+
+However... 
+
+			    /--> "_eto_ile" (heading level 1)
+      "etoile"
+	           \--> "e*toile*" (heading level 2)
+
+Merging these should conflict, because a character can only have one heading level.
+
+
+
+Will splitting/recombining cause problems with object identity?
+-> It means we can't give any semantics to the UUID of a run of text.
+This is probably OK.
+        
+
+
+
 Object graph diff
 -----------------
 

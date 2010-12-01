@@ -54,10 +54,23 @@
 - (NSSet*) changedObjectUUIDs;
 
 - (Class) classForEntityDescription: (ETEntityDescription*)desc;
+/**
+ * Creates a new instance of the given entity name (assigning the instance a new UUID)
+ * and returns the object. This is the factory method for COObject.
+ */
 - (id) insertObjectWithEntityName: (NSString*)aFullName;
+/**
+ * Copies an object from another context into this context.
+ * The copy refers to the same underlying Core Object (same UUID)
+ */
 - (id) insertObject: (COObject*)sourceObject;
+/**
+ * Creates a copy of a Core Object (assigning it a new UUID), including copying
+ * all strongly contained objects (composite properties)
+ */
+- (id) insertObjectCopy: (COObject*)sourceObject;
 
-- (id) insertObject: (COObject*)sourceObject withRelationshipConsistency: (BOOL)consistency; //Private
+- (id) insertObject: (COObject*)sourceObject withRelationshipConsistency: (BOOL)consistency newUUID: (BOOL)newUUID; //Private
 
 - (COObject*) objectWithUUID: (ETUUID*)uuid;
 

@@ -573,37 +573,6 @@
 	return NO;*/
 }
 
-/**
- * Automatic fine-grained copy
- */
-- (id)copyWithZone: (NSZone*)zone
-{
-	COObject *newObject = [[[self class] alloc] initWithUUID: [ETUUID UUID]
-										   entityDescription: _entityDescription
-													 context: _context
-													 isFault: NO];
-									
-	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
-	{
-		if (![propDesc isDerived])
-		{
-			id value = [self valueForProperty: [propDesc name]];
-			if ([propDesc isContainer])
-			{
-				[newObject setValue: value forProperty: [propDesc name]];  
-			}
-			else
-			{
-				// FIXME: need to deep copy collections
-				id valuecopy = [value copyWithZone: zone]; 
-				[newObject setValue: valuecopy forProperty: [propDesc name]];
-				[valuecopy release];
-			}
-		}
-	}
-	return newObject;
-}
-
 @end
 
 
