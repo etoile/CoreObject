@@ -1,159 +1,133 @@
 #import "COHistoryTrack.h"
-
+#import "COContainer.h"
+#import "COObjectGraphDiff.h"
 
 @implementation COHistoryTrack
 
-/**
- * COHistoryTrack gives lets you make manipulations to the state of the store
- * like doing an undo with respect to a particular group of objects. It delegates
- * the actual changes to an editing context, where they must be committed.
- */
 - (id)initTrackWithObject: (COObject*)container containedObjects: (BOOL)contained
 {
 	self = [super init];
-	ASSIGN(obj, container);
+	ASSIGN(trackObject, container);
 	affectsContainedObjects = contained;
 	return self;
 }
 
 - (void)dealloc
 {
-	DESTROY(obj);
+	DESTROY(trackObject);
 	[super dealloc];
 }
 
-- (COHistoryTrackNode*)currentNode
-{
-	return nil;
-}
-
-
-/**
- * Convience method moves the current node one node closer to the tip, on
- * the path defined by starting at the tipNode and following parent pointers.
- */
-- (COHistoryTrackNode*)redo
-{
-	return nil; // FIXME: non-primitive (implementable on the rest of the api)
-}
-
-- (NSSet*)currentObjectSet
-{
-	NSMutableSet *currentSet = [NSMutableSet set];
-	[currentSet addObjectsFromArray: [obj allStronglyContainedObjects]];
-	[currentSet addObject: obj];
-	return currentSet;
-}
-
-- (CORevision*)currentParent
-{
-	NSSet *objSet = [self currentObjectSet];
-	COEditingContext *ctx = [obj editingContext];
-	COStore *store = [ctx store];
-	
-	// Fact the parent commit must be the parent commit of one of the objects
-	// on objSet.
-	NSMutableArray *potentialParents = [NSMutableArray array];
-	for (COObject *o in objSet)
-	{
-		CORevision *commit = [store commitForUUID: [ctx currentCommitForObjectUUID: [o UUID]]];
-		if (commit == nil)
-		{
-			// FIXME: what to do here?
-			NSLog(@"WARNING, -[COHistoryTrack currentParent], current commit for object %@ is nil", [o UUID]);
-		}
-		else
-		{
-			CORevision *parentForObject = [commit parentCommitForObject: [o UUID]];
-			[potentialParents addObject: parentForObject];
-		}
-	}
-	
-	// FIXME: As an optimisation, we just need to find the minimum element, not sort the whole array 
-	[potentialParents sortUsingDescriptors: [NSArray arrayWithObject: [NSSortDescriptor sortDescriptorWithKey:@"metadata.date" ascending:NO]]];
-	
-	CORevision *parent = [potentialParents firstObject];
-	return parent;
-}
-
-- (COHistoryTrackNode*)undo
-{
-#if 0
-	COEditingContext *ctx = [obj editingContext];
-	CORevision *parent = [self currentParent];
-	//assert(parent != nil);
-	
-	NSMutableSet *objectsToUndo = [NSMutableSet set];
-	[objectsToUndo addObjectsFromArray: [parent changedObjects]];
-	[objectsToUndo intersectSet: [[[self currentObjectSet] mappedCollection] UUID]];
-	
-	
-	// FIXME: We need to run the relationship integrity code _after_ the loop
-	for (ETUUID *objectToUndo in objectsToUndo)
-	{
-		[ctx setCurrentCommit:parent forObjectUUID:objectToUndo];
-	}
-#endif
-	return nil; // FIXME
-}
-
-
-/**
- * This figures out what current nodes need to be moved on the object
- * history graph, and moves them in ctx
- */
 - (void)setCurrentNode: (COHistoryTrackNode*)node
 {
 }
 
-/**
- * Moves the tip node
- */
-- (void)setTipNode: (COHistoryTrackNode*)node
+- (COHistoryTrackNode*)currentNode
 {
-}
-
-
-// FIXME: make this sketch work 
-#if 0
-
-// Sounds more tricky than currentParent
-- (NSArray *)currentBranches
-{
-	NSSet *objSet = [self currentObjectSet];
-	COEditingContext *ctx = [obj editingContext];
+	CORevision *rev = [[self store] revisionWithRevisionNumber: [[self store] latestRevisionNumber]];
 	
-	NSMutableSet *potentialBranches = [NSMutableSet set];
-	for (COObject *obj in objSet)
+	if (![self revisionIsOnTrack: rev])
 	{
-		COCommit *commit = [ctx currentCommitForObjectUUID: [obj UUID]];
-		[potentialParents addObjectsFromArray: [commit childCommitsForObject: [obj UUID]]];
+		rev = [self nextRevisionOnTrackAfter: rev backwards: YES];
 	}
-
-	// Note that we used a set to eliminate duplicates. Also note that the
-	// return value is randomly ordered.
-	return [potentialBranches allObjects];
+	
+	return [COHistoryTrackNode nodeWithRevision: rev
+										  owner: self];	
 }
 
-#endif
+- (COHistoryTrackNode*)undo
+{
+	COHistoryTrackNode *currentNode = [self currentNode];
+	
+	while ([[currentNode metadata] valueForKey: @"undoMetadata"] != nil)
+	{
+		currentNode = [currentNode parent];
+	}
+	
+	CORevision *revToUndo = [currentNode underlyingRevision];
+	CORevision *revBeforeUndo = [[currentNode parent] underlyingRevision];
+	
+	COEditingContext *revToUndoCtx = [[COEditingContext alloc] initWithRevision: revToUndo];
+	COEditingContext *revBeforeUndoCtx = [[COEditingContext alloc] initWithRevision: revBeforeUndo];
+	COEditingContext *currentRevisionCtx = [trackObject editingContext];
+	
+	COContainer *revToUndoObj = [revToUndoCtx objectWithUUID: [trackObject UUID]];
+	COContainer *revBeforeUndoObj = [revBeforeUndoCtx objectWithUUID: [trackObject UUID]];
+	COContainer *currentRevisionObj = [currentRevisionCtx objectWithUUID: [trackObject UUID]];
+	
+	COObjectGraphDiff *oa = [COObjectGraphDiff diffContainer: revToUndoObj withContainer: revBeforeUndoObj];
+	COObjectGraphDiff *ob = [COObjectGraphDiff diffContainer: revToUndoObj withContainer: currentRevisionObj];	
+	COObjectGraphDiff *merged = [COObjectGraphDiff mergeDiff: oa withDiff: ob];
+	
+	[merged applyToContext: revToUndoCtx];
+	
+	// Now we want to copy the changes from revToUnoCtx into our actual context
+	
+	COObjectGraphDiff *copier = [COObjectGraphDiff diffContainer: currentRevisionObj withContainer: revToUndoObj];
+	[copier applyToContext: currentRevisionCtx];
+	
+//	[self setCurrentNode: [[self currentNode] parent]];
+	return [self currentNode];
+}
+
+- (COHistoryTrackNode*)redo
+{
+	[self setCurrentNode: [[self currentNode] child]];
+	return [self currentNode];
+}
+
 
 /* Private */
 
-- (NSArray*)changedObjectsForCommit: (CORevision*)commit
+- (COStore*)store
 {
-	
+	return [[trackObject editingContext] store];
 }
-- (COHistoryTrackNode*)parentForCommit: (CORevision*)commit
+
+- (BOOL)revisionIsOnTrack: (CORevision*)rev
 {
+	COEditingContext *ctx = [[COEditingContext alloc] initWithRevision: rev];
+	COObject *objAtRev = [ctx objectWithUUID: [trackObject UUID]];
+	NSArray *allObjectsOnTrackAtRev = [[[objAtRev allStronglyContainedObjectsIncludingSelf] mappedCollection] UUID];
+	[ctx release];
 	
+	NSSet *allObjectsOnTrackAtRevSet = [NSSet setWithArray: allObjectsOnTrackAtRev];
+	NSSet *changedSet = [NSSet setWithArray: [rev changedObjects]];
+	return [allObjectsOnTrackAtRevSet intersectsSet: changedSet];
 }
-- (COHistoryTrackNode*)mergedNodeForCommit: (CORevision*)commit
-{
+
+- (CORevision *)nextRevisionOnTrackAfter: (CORevision *)rev backwards: (BOOL)back
+{	
+	COEditingContext *ctx = [[COEditingContext alloc] initWithRevision: rev];
+	COObject *objAtRev = [ctx objectWithUUID: [trackObject UUID]];
+	NSArray *allObjectsOnTrackAtRev = [[[objAtRev allStronglyContainedObjectsIncludingSelf] mappedCollection] UUID];
+	[ctx release];
+	objAtRev = nil;
 	
-}
-- (NSArray*)childNodesForCommit: (CORevision*)commit
-{
-	
+	assert([allObjectsOnTrackAtRev count] > 0);
+
+	NSSet *allObjectsOnTrackAtRevSet = [NSSet setWithArray: allObjectsOnTrackAtRev];
+	int64_t current = [rev revisionNumber];
+	while (1)
+	{
+		// Advance to the next number
+		current = (back ? (current - 1) : (current + 1));
+		
+		if (current < 1 || current > [[self store] latestRevisionNumber])
+		{
+			return nil;
+		}
+		
+		// Check if the current revison modified anything in allObjectsOnTrackAtRev
+ 		CORevision *newCurrentRev = [[self store] revisionWithRevisionNumber: current];
+		assert(newCurrentRev != nil);
+		NSSet *newCurrentRevModifiedSet = [NSSet setWithArray: [newCurrentRev changedObjects]];
+		
+		if ([allObjectsOnTrackAtRevSet intersectsSet: newCurrentRevModifiedSet])
+		{
+			return newCurrentRev;
+		}
+	}
 }
 
 
@@ -165,36 +139,45 @@
 
 - (NSDictionary*)metadata
 {
-	return [commit metadata];
-}
-
-- (NSArray*)changedObjects
-{
-	return [ownerTrack changedObjectsForCommit: commit];
+	return [revision metadata];
 }
 
 /* History graph */
 
 - (COHistoryTrackNode*)parent
 {
-	return [ownerTrack parentForCommit: commit];;
+	CORevision *parentRev = [ownerTrack nextRevisionOnTrackAfter: revision backwards: YES];
+	return [COHistoryTrackNode nodeWithRevision:parentRev owner: ownerTrack];
 }
 
-- (COHistoryTrackNode*)mergedNode
+- (COHistoryTrackNode*)child
 {
-	return [ownerTrack mergedNodeForCommit: commit];
+	return nil;
 }
-
-- (NSArray*)childNodes
+- (NSArray*)secondaryBranches
 {
-	return [ownerTrack childNodesForCommit: commit];
+	return nil;
 }
 
 /* Private */
 
-- (CORevision*)underlyingCommit
++ (COHistoryTrackNode*)nodeWithRevision: (CORevision*)aRevision owner: (COHistoryTrack*)anOwner
 {
-	return commit;
+	COHistoryTrackNode *node = [[[self alloc] init] autorelease];
+	node->revision = [aRevision retain];
+	node->ownerTrack = anOwner;
+	return node;
+}
+
+- (void)dealloc
+{
+	[revision release];
+	[super dealloc];
+}
+
+- (CORevision*)underlyingRevision
+{
+	return revision;
 }
 
 @end

@@ -78,7 +78,7 @@
 @interface COObject (Private)
 
 - (void) unfaultIfNeeded;
-- (void) notifyContextOfDamageIfNeeded;
+- (void) notifyContextOfDamageIfNeededForProperty: (NSString*)prop;
 - (void) turnIntoFault;
 
 - (BOOL) isIgnoringRelationshipConsistency;

@@ -16,6 +16,11 @@
 	[super dealloc];
 }
 
+- (COStore*)store
+{
+	return store;
+}
+
 - (uint64_t)revisionNumber
 {
 	return revisionNumber;
@@ -42,7 +47,7 @@
 
 - (NSArray*)changedObjects
 {
-	NSMutableArray *result = [NSMutableArray array];
+	NSMutableSet *result = [NSMutableSet set];
 	FMResultSet *rs = [store->db executeQuery:@"SELECT objectuuid FROM commits WHERE revisionnumber = ?",
 					   [NSNumber numberWithUnsignedLongLong: revisionNumber]];
 	while ([rs next])
@@ -50,7 +55,7 @@
 		[result addObject: [store UUIDForKey: [rs longLongIntForColumnIndex: 0]]];
 	}
 	[rs close];
-	return [NSArray arrayWithArray: result];
+	return [result allObjects];
 }
 
 - (NSDictionary*)valuesAndPropertiesForObject: (ETUUID*)object

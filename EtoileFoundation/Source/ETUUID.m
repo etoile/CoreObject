@@ -101,7 +101,8 @@ static void ETSRandomDev()
 
 + (void) initialize
 {
-	INITRANDOM();
+	//INITRANDOM();
+	srandom(0);
 }
 
 + (id) UUID
@@ -124,6 +125,7 @@ static void ETSRandomDev()
 		long r = random();
 		uuid[i] = (unsigned char)r;
 	}
+
 	// Clear bits 6 and 7
 	CLOCK_SEQ_HI_AND_RESERVED(uuid) &= (unsigned char)63;
 	// Set bit 6

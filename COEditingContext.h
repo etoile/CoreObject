@@ -12,12 +12,13 @@
 @interface COEditingContext : NSObject
 {
 	COStore *_store;
+	CORevision *_revision;
 	
 	/**
 	 * Note: never modify directly; call -markObjectDamaged/-markObjectUndamaged instead.
 	 * Otherwise the cached value in COObject won't be updated.
 	 */
-	NSMutableSet *_damagedObjectUUIDs; // UUIDS of objects in this context which have uncommitted changes
+	NSMutableDictionary *_damagedObjectUUIDs; // UUIDS of objects in this context which have uncommitted changes
 	NSMutableDictionary *_instantiatedObjects; // UUID -> COObject mapping
 	ETModelDescriptionRepository *_modelRepository;
 
@@ -29,6 +30,13 @@
 
 + (COEditingContext*)contextWithURL: (NSURL*)aURL;
 
+/**
+ * Initializes a context which uses a specified revision of a store
+ */
+- (id)initWithRevision: (CORevision*)aRevision;
+/**
+ * Initializes a context which uses the current state of the store
+ */
 - (id)initWithStore: (COStore*)store;
 - (COStore*)store;
 
@@ -61,12 +69,16 @@
        shortDescription: (NSString*)shortDescription
         longDescription: (NSString*)longDescription;
 
+// Private
+
+- (uint64_t)currentRevisionNumber;
+
 @end
 
 
 @interface COEditingContext (PrivateToCOObject)
 
-- (void) markObjectDamaged: (COObject*)obj;
+- (void) markObjectDamaged: (COObject*)obj forProperty: (NSString*)aProperty;
 - (void) markObjectUndamaged: (COObject*)obj;
 - (void) loadObject: (COObject*)obj;
 - (void)loadObject: (COObject*)obj atRevision: (CORevision*)aRevision;

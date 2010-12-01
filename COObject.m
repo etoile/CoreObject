@@ -246,54 +246,60 @@
 				COObject *oldContainer = [self valueForProperty: key];
 				COObject *newContainer = value;
 				
-				// FIXME: as an optimisation, we should do nothing if oldContainer == newContainer
-				
-				[oldContainer setIgnoringRelationshipConsistency: YES];
-				[newContainer setIgnoringRelationshipConsistency: YES];			
-				
-				if ([[desc opposite] isMultivalued])
-				{
-					[oldContainer removeObject: self forProperty: oppositeName];
-					[newContainer addObject: self forProperty: oppositeName];			
-				}
-				else
-				{
-					[oldContainer setValue: nil forProperty: oppositeName];
-					[newContainer setValue: self forProperty: oppositeName];			
-				}
+				if (newContainer != oldContainer)
+				{					
+					[oldContainer setIgnoringRelationshipConsistency: YES];
+					[newContainer setIgnoringRelationshipConsistency: YES];			
+					
+					if ([[desc opposite] isMultivalued])
+					{
+						[oldContainer removeObject: self forProperty: oppositeName];
+						[newContainer addObject: self forProperty: oppositeName];			
+					}
+					else
+					{
+						[oldContainer setValue: nil forProperty: oppositeName];
+						[newContainer setValue: self forProperty: oppositeName];			
+					}
 
-				[oldContainer setIgnoringRelationshipConsistency: NO];
-				[newContainer setIgnoringRelationshipConsistency: NO];	
+					[oldContainer setIgnoringRelationshipConsistency: NO];
+					[newContainer setIgnoringRelationshipConsistency: NO];
+				}
 			}
 			else // modifying the multivalued side of a relationship
 			{
-				NSArray *oldObjects;
+				NSMutableSet *oldObjects;
 				if ([[self valueForProperty: key] isKindOfClass: [NSSet class]])
 				{
-					oldObjects = [[self valueForProperty: key] allObjects];
+					oldObjects = [NSMutableSet setWithSet: [self valueForProperty: key]];
 				}			
 				else if ([self valueForProperty: key] == nil)
 				{
-					oldObjects = [NSArray array]; // Should only happen when an object is first created..
+					oldObjects = [NSMutableSet set]; // Should only happen when an object is first created..
 				}
 				else
 				{
-					oldObjects = [self valueForProperty: key];
+					oldObjects = [NSMutableSet setWithArray: [self valueForProperty: key]];
 				}
-				assert([oldObjects isKindOfClass: [NSArray class]]);
 				
-				NSArray *newObjects;
+				NSMutableSet *newObjects;
 				if ([value isKindOfClass: [NSSet class]])
 				{
-					newObjects = [value allObjects];
+					newObjects = [NSMutableSet setWithSet: value];
 				}
 				else
 				{
-					newObjects = value;
+					newObjects = [NSMutableSet setWithArray: value];
 				}
-				assert([newObjects isKindOfClass: [NSArray class]]);
-							  
-				for (COObject *obj in [oldObjects arrayByAddingObjectsFromArray: newObjects])
+				
+				NSMutableSet *commonObjects = [NSMutableSet setWithSet: oldObjects];
+				[commonObjects intersectSet: newObjects];
+				
+				[oldObjects minusSet: commonObjects]; 
+				[newObjects minusSet: commonObjects];
+				// Now newObjects is added objects, and oldObjects is removed objects
+				
+				for (COObject *obj in [oldObjects setByAddingObjectsFromSet: newObjects])
 				{
 					[obj setIgnoringRelationshipConsistency: YES];
 				}
@@ -322,7 +328,7 @@
 					}	
 				}
 
-				for (COObject *obj in [oldObjects arrayByAddingObjectsFromArray: newObjects])
+				for (COObject *obj in [oldObjects setByAddingObjectsFromSet: newObjects])
 				{
 					[obj setIgnoringRelationshipConsistency: NO];
 				}
@@ -444,7 +450,7 @@
 }
 - (void)didChangeValueForProperty:(NSString *)key
 {
-	[self notifyContextOfDamageIfNeeded];
+	[self notifyContextOfDamageIfNeededForProperty: key];
 }
 
 // Overridable Notifications
@@ -627,11 +633,11 @@
 	}
 }
 
-- (void) notifyContextOfDamageIfNeeded
+- (void) notifyContextOfDamageIfNeededForProperty: (NSString*)prop
 {
-	if (!_isIgnoringDamageNotifications && ![self isDamaged])
+	if (!_isIgnoringDamageNotifications)
 	{
-		[_context markObjectDamaged: self];
+		[_context markObjectDamaged: self forProperty: prop];
 	}
 }
 
@@ -672,7 +678,7 @@
 	
 	if (!_isFault)
 	{
-		[_context markObjectDamaged: self];
+		[_context markObjectDamaged: self forProperty: nil];
 		_variableStorage = [[NSMapTable alloc] init];
 		[self awakeFromInsert]; // FIXME: not necessairly
 	}

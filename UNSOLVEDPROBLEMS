@@ -1,6 +1,24 @@
 Unsolved Problems
 =================
 
+Cascading undo
+--------------
+If the history has something like:
+
+...
+Insert circle c1
+modify c1
+modify c1
+modify c1
+modify c1
+modify c1
+...
+
+and the user does a selective undo of "insert c1", should
+we hide the "modify c1" actions from the history track until the "insert c1" 
+action is re-done?
+
+
 
 Q: What if you branch while sharing a document? set a branch?
 A: Synchronization is a complex and multi-step process. Depending on the application,

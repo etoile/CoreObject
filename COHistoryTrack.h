@@ -13,56 +13,45 @@
  */
 @interface COHistoryTrack : NSObject
 {
-	COObject *obj;
+	COObject *trackObject;
 	BOOL affectsContainedObjects;
 }
 
-/**
- * COHistoryTrack gives lets you make manipulations to the state of the store
- * like doing an undo with respect to a particular group of objects. It delegates
- * the actual changes to an editing context, where they must be committed.
- */
 - (id)initTrackWithObject: (COObject*)container containedObjects: (BOOL)contained;
 
 - (COHistoryTrackNode*)currentNode;
 
-- (void)redo;
-- (void)undo;
+- (COHistoryTrackNode*)redo;
+- (COHistoryTrackNode*)undo;
 
-/**
- * This figures out what current nodes need to be moved on the object
- * history graph, and moves them in ctx
- */
 - (void)setCurrentNode: (COHistoryTrackNode*)node;
 
 
 /* Private */
 
-- (NSArray*)changedObjectsForCommit: (CORevision*)commit;
-- (COHistoryTrackNode*)parentForCommit: (CORevision*)commit;
-- (COHistoryTrackNode*)mergedNodeForCommit: (CORevision*)commit;
-- (NSArray*)childNodesForCommit: (CORevision*)commit;
+- (COStore*)store;
+- (BOOL)revisionIsOnTrack: (CORevision*)rev;
+- (CORevision *)nextRevisionOnTrackAfter: (CORevision *)rev backwards: (BOOL)back;
 
 @end
 
 
-@interface COHistoryTrackNode
+@interface COHistoryTrackNode : NSObject
 {
-	CORevision *commit;
+	CORevision *revision;
 	COHistoryTrack *ownerTrack;
 }
 
 - (NSDictionary*)metadata;
-- (NSArray*)changedObjects;
 
 /* History graph */
 
 - (COHistoryTrackNode*)parent;
-- (COHistoryTrackNode*)mergedNode;
-- (NSArray*)childNodes;
+- (COHistoryTrackNode*)child;
+- (NSArray*)secondaryBranches;
 
 /* Private */
 
-- (CORevision*)underlyingCommit;
-
+- (CORevision*)underlyingRevision;
++ (COHistoryTrackNode*)nodeWithRevision: (CORevision*)aRevision owner: (COHistoryTrack*)anOwner;
 @end

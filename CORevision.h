@@ -8,6 +8,8 @@
 	uint64_t revisionNumber;
 }
 
+- (COStore*)store;
+
 - (uint64_t)revisionNumber;
 
 - (NSDictionary*)metadata;
