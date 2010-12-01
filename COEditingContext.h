@@ -71,6 +71,7 @@
 
 // Private
 
+- (void) commitWithMetadata: (NSDictionary*)metadata;
 - (uint64_t)currentRevisionNumber;
 
 @end

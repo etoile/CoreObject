@@ -39,9 +39,13 @@
 {
 	COHistoryTrackNode *currentNode = [self currentNode];
 	
-	while ([[currentNode metadata] valueForKey: @"undoMetadata"] != nil)
+	if ([[currentNode metadata] valueForKey: @"undoMetadata"] != nil)
 	{
-		currentNode = [currentNode parent];
+		// we just undod
+		uint64_t lastUndo = [[[currentNode metadata] valueForKey: @"undoMetadata"] intValue];
+		
+		currentNode = [COHistoryTrackNode nodeWithRevision: [[self store] revisionWithRevisionNumber: lastUndo]
+													 owner: self];
 	}
 	
 	CORevision *revToUndo = [currentNode underlyingRevision];
@@ -65,6 +69,9 @@
 	
 	COObjectGraphDiff *copier = [COObjectGraphDiff diffContainer: currentRevisionObj withContainer: revToUndoObj];
 	[copier applyToContext: currentRevisionCtx];
+	
+	[currentRevisionCtx commitWithMetadata: [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: [revBeforeUndo revisionNumber]]
+																		forKey: @"undoMetadata" ]];
 	
 //	[self setCurrentNode: [[self currentNode] parent]];
 	return [self currentNode];

@@ -245,7 +245,11 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
        shortDescription: (NSString*)shortDescription
         longDescription: (NSString*)longDescription
 {
-	[_store beginCommitWithMetadata: nil];
+	[self commitWithMetadata: nil];
+}
+- (void) commitWithMetadata: (NSDictionary*)metadata
+{
+	[_store beginCommitWithMetadata: metadata];
 	for (ETUUID *uuid in [_damagedObjectUUIDs allKeys])
 	{		
 		if ([uuid isEqual: [ETUUID UUIDWithString: @"0891cc5b-c4b2-44ba-60ec-54eaf4fd3c96"]])
