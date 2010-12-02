@@ -110,18 +110,6 @@
 - (void) discardAllChanges;
 - (void) discardAllChangesInObject: (COObject*)object;
 
-/*
-- (void) rollbackToRevision: (COHistoryNode *)ver;
-
-- (void)selectiveUndoChangesMadeInRevision: (COHistoryNode *)ver;
-
-
-- (void) commitObjects: (NSArray*)objects;
-- (void) rollbackObjects: (NSArray*)objects toRevision: (COHistoryNode *)ver;
-- (void) threeWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects bases: (NSArray*)bases;
-- (void) twoWayMergeObjects: (NSArray*)objects withObjects: (NSArray*)otherObjects;
-- (void) selectiveUndoChangesInObjects: (NSArray*)objects madeInRevision: (COHistoryNode *)ver;
-*/
 
 @end
 

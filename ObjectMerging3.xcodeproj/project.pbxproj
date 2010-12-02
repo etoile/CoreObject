@@ -51,7 +51,6 @@
 		66D09D56129CE470006BEDC3 /* COCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D09D54129CE470006BEDC3 /* COCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66D09D57129CE470006BEDC3 /* COCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D55129CE470006BEDC3 /* COCollection.m */; };
 		66D09D86129CEC8C006BEDC3 /* COContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 79E5EE5812876FC200CDFA23 /* COContainer.m */; };
-		66D09D93129CEDB2006BEDC3 /* TestContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D92129CEDB2006BEDC3 /* TestContainer.m */; };
 		66D09EF4129EF6C7006BEDC3 /* TestRelationshipIntegrity.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */; };
 		66FDEB5512A2F106005D6D23 /* TestObjectGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */; };
 		66FDEB5812A2F150005D6D23 /* COObjectGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDC312592C1B0065DE1A /* COObjectGraphDiff.m */; };
@@ -179,14 +178,12 @@
 		66D09D03129C936E006BEDC3 /* TestCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCommon.m; sourceTree = "<group>"; };
 		66D09D54129CE470006BEDC3 /* COCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCollection.h; sourceTree = "<group>"; };
 		66D09D55129CE470006BEDC3 /* COCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCollection.m; sourceTree = "<group>"; };
-		66D09D92129CEDB2006BEDC3 /* TestContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestContainer.m; sourceTree = "<group>"; };
 		66D09EB4129E3BED006BEDC3 /* TRICKYCASES */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TRICKYCASES; sourceTree = "<group>"; };
 		66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestRelationshipIntegrity.m; sourceTree = "<group>"; };
 		66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestObjectGraphDiff.m; sourceTree = "<group>"; };
 		66FDED2412A3525A005D6D23 /* TestPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestPerformance.m; sourceTree = "<group>"; };
 		66FDF11B12A7038C005D6D23 /* TestCopy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCopy.m; sourceTree = "<group>"; };
 		791B4E011299C58000CCF472 /* TestUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUtilities.m; sourceTree = "<group>"; };
-		791B4E021299C58000CCF472 /* OldTestCOObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OldTestCOObject.m; sourceTree = "<group>"; };
 		791B4E031299C58000CCF472 /* TestArrayDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestArrayDiff.m; sourceTree = "<group>"; };
 		791B4E271299C77700CCF472 /* Test_main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Test_main.m; sourceTree = "<group>"; };
 		791B4E281299C78C00CCF472 /* TestStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestStore.m; sourceTree = "<group>"; };
@@ -401,13 +398,11 @@
 				791B4E271299C77700CCF472 /* Test_main.m */,
 				791B4E281299C78C00CCF472 /* TestStore.m */,
 				791B4E011299C58000CCF472 /* TestUtilities.m */,
-				791B4E021299C58000CCF472 /* OldTestCOObject.m */,
 				791B4E031299C58000CCF472 /* TestArrayDiff.m */,
 				66D09ADA129B2C9A006BEDC3 /* TestEditingContext.m */,
 				66D09CFB129C9222006BEDC3 /* TestSynchronization.m */,
 				66D09D02129C936E006BEDC3 /* TestCommon.h */,
 				66D09D03129C936E006BEDC3 /* TestCommon.m */,
-				66D09D92129CEDB2006BEDC3 /* TestContainer.m */,
 				66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */,
 				6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */,
 				66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */,
@@ -654,7 +649,6 @@
 				66D09BC9129C5A1D006BEDC3 /* TestStore.m in Sources */,
 				66D09CFC129C9222006BEDC3 /* TestSynchronization.m in Sources */,
 				66D09D04129C936E006BEDC3 /* TestCommon.m in Sources */,
-				66D09D93129CEDB2006BEDC3 /* TestContainer.m in Sources */,
 				66D09EF4129EF6C7006BEDC3 /* TestRelationshipIntegrity.m in Sources */,
 				6620EFA4129F3AAD00FD5AB9 /* TestHistoryTrack.m in Sources */,
 				66FDEB5512A2F106005D6D23 /* TestObjectGraphDiff.m in Sources */,
