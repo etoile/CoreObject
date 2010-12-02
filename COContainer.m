@@ -21,18 +21,22 @@
 
 - (void) addObject: (id)object
 {
+	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
 	[self addObject: object forProperty: @"contents"];
 }
 - (void) insertObject: (id)object atIndex: (NSUInteger)index
 {
+	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
 	[self insertObject: object atIndex: index forProperty: @"contents"];
 }
 - (void) removeObject: (id)object
 {
+	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
 	[self removeObject: object forProperty: @"contents"];
 }
 - (void) removeObject: (id)object atIndex: (NSUInteger)index
 {
+	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
 	[self removeObject: object atIndex: index forProperty: @"contents"];
 }
 

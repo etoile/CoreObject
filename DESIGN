@@ -71,6 +71,10 @@ Move/Move
 
 any other cases?
 
+We need to perserve relationship consistency when merging,
+so we need to sort out relationship modifications from other edits. And pair up
+both sides of the edits, since diffs will have changes to both sides.
+
 
 Branching Models
 ----------------

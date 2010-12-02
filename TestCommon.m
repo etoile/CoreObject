@@ -51,6 +51,33 @@ void setUpMetamodel()
 		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: personEntity];
 	}
 	
+	// Bezier point entity
+	{
+		
+		
+		
+	}
+	
+	// Bezier path entity
+	{
+		
+		
+	}
+	
+	// Text Attribute entity
+	{
+		
+	}
+	
+	// Text Fragment entity
+	{
+
+	}
+	
+	// Text Tree entity
+	{
+		
+	}
 	
 	[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
 }
