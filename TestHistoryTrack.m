@@ -45,6 +45,24 @@
 	[group2 addObject: leaf3];
 	
 	[ctx commit];
+	
+	// workspace
+	//  |
+	//  |--document1
+	//  |   |
+	//  |   |-group1
+	//  |   |   |
+	//  |   |   |-leaf1	
+	//  |   |   |
+	//  |   |   \-leaf2
+	//  |   |
+	//  |    \-group2
+	//  |       |
+	//  |       \-leaf3
+	//  | 
+	//   \-document2	
+	
+	
 	// Now make some changes
 		
 	[document2 setValue: @"My Shopping List" forProperty: @"label"]; [ctx commit];
@@ -54,8 +72,45 @@
 	/* undo on workspace track, doc1 track: undo the last commit. */
 	
 	[leaf2 setValue: @"Tomatoes" forProperty: @"label"]; [ctx commit];
+	
 	[group2 addObject: leaf2]; [ctx commit];
+	
+	// workspace
+	//  |
+	//  |--document1
+	//  |   |
+	//  |   |-group1
+	//  |   |   |
+	//  |   |   \-leaf1	
+	//  |   |
+	//  |    \-group2
+	//  |       |
+	//  |       |-leaf3
+	//  |       |
+	//  |       \-leaf2
+	//  | 
+	//   \-document2
+	
+	
 	[document2 addObject: group2]; [ctx commit];
+	
+	// workspace
+	//  |
+	//  |--document1
+	//  |   |
+	//  |   \-group1
+	//  |       |
+	//  |       \-leaf1	
+	//  | 
+	//   \-document2
+	//      |
+	//       \-group2
+	//          |
+	//          |-leaf3
+	//          |
+	//          \-leaf2
+	
+	
 	[group2	setValue: @"Groceries" forProperty: @"label"]; [ctx commit];
 	[group1 setValue: @"Work Contacts" forProperty: @"label"]; [ctx commit];
 	[leaf3 setValue: @"Wine" forProperty: @"label"]; [ctx commit];
@@ -77,9 +132,76 @@
 	// add them to the lists
 
 	[group1 addObject: leaf4]; [ctx commit];
+	
+	// workspace
+	//  |
+	//  |--document1
+	//  |   |
+	//  |   \-group1
+	//  |       |
+	//  |       |-leaf1	
+	//  |       |
+	//  |       \-leaf4
+	//  | 
+	//   \-document2
+	//      |
+	//       \-group2
+	//          |
+	//          |-leaf3
+	//          |
+	//          \-leaf2
+	
+	
+	
 	[group2 addObject: leaf5]; [ctx commit];
+
+	// workspace
+	//  |
+	//  |--document1
+	//  |   |
+	//  |   \-group1
+	//  |       |
+	//  |       |-leaf1	
+	//  |       |
+	//  |       \-leaf4
+	//  | 
+	//   \-document2
+	//      |
+	//       \-group2
+	//          |
+	//          |-leaf3
+	//          |
+	//          |-leaf2
+	//          |
+	//          \-leaf5
+	
+	
+	
 	[group2 addObject: leaf6]; [ctx commit];
 
+	// workspace
+	//  |
+	//  |--document1
+	//  |   |
+	//  |   \-group1
+	//  |       |
+	//  |       |-leaf1	
+	//  |       |
+	//  |       \-leaf4
+	//  | 
+	//   \-document2
+	//      |
+	//       \-group2
+	//          |
+	//          |-leaf3
+	//          |
+	//          |-leaf2
+	//          |
+	//          |-leaf5	
+	//          |
+	//          \-leaf6
+	
+	
 	[leaf4 setValue: @"Carol" forProperty: @"label"]; [ctx commit];
 	[leaf5 setValue: @"Pizza" forProperty: @"label"]; [ctx commit];
 	[leaf6 setValue: @"Beer" forProperty: @"label"]; [ctx commit];	
