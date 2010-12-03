@@ -51,7 +51,7 @@ public:
 {
 	ops = [[NSMutableArray alloc] init];
 	
-	NSLog(@"ArrayDiffing %d vs %d objects", [a count], [b count]);
+	//NSLog(@"ArrayDiffing %d vs %d objects", [a count], [b count]);
 	
 	NSArrayWrapper wrapper(a, b);
 	std::vector<ManagedFusion::DifferenceItem> items = 

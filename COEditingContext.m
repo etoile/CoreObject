@@ -144,7 +144,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 			id subvaluecopy = handle(subvalue, ctx, desc, consistency, newUUID);
 			if (nil == subvaluecopy)
 			{
-				NSLog(@"error");
+				//NSLog(@"error");
 			}
 			else
 			{
@@ -161,7 +161,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 			id subvaluecopy = handle(subvalue, ctx, desc, consistency, newUUID);
 			if (nil == subvaluecopy)
 			{
-				NSLog(@"error");
+				//NSLog(@"error");
 			}
 			else
 			{
@@ -270,11 +270,6 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	[_store beginCommitWithMetadata: metadata];
 	for (ETUUID *uuid in [_damagedObjectUUIDs allKeys])
 	{		
-		if ([uuid isEqual: [ETUUID UUIDWithString: @"0891cc5b-c4b2-44ba-60ec-54eaf4fd3c96"]])
-		{
-			NSLog(@"Committing to leaf3");
-		}
-		
 		[_store beginChangesForObject: uuid];
 		COObject *obj = [self objectWithUUID: uuid];
 		//NSLog(@"Committing changes for %@", obj);
@@ -444,7 +439,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 			if (name == nil)
 			{
 				//[NSException raise: NSGenericException format: @"Failed to find an entity name for %@", uuid];
-				NSLog(@"WARNING: -[COEditingContext objectWithUUID:entityName:] failed to find an entity name for %@ (probably, the requested object does not exist)", uuid);
+				//NSLog(@"WARNING: -[COEditingContext objectWithUUID:entityName:] failed to find an entity name for %@ (probably, the requested object does not exist)", uuid);
 				return nil;
 			}
 			desc = [_modelRepository descriptionForName: name];
