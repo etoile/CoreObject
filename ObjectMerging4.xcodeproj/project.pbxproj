@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6614501412B01DF5000DB843 /* COCommit.h in Headers */ = {isa = PBXBuildFile; fileRef = 6614501212B01DF5000DB843 /* COCommit.h */; };
+		6614501512B01DF6000DB843 /* COCommit.m in Sources */ = {isa = PBXBuildFile; fileRef = 6614501312B01DF5000DB843 /* COCommit.m */; };
+		6614501812B020AA000DB843 /* COStoreCoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 6614501612B020AA000DB843 /* COStoreCoreObject.h */; };
+		6614501912B020AA000DB843 /* COStoreCoreObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 6614501712B020AA000DB843 /* COStoreCoreObject.m */; };
 		6620EFA4129F3AAD00FD5AB9 /* TestHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */; };
 		6620F13C129F8CC500FD5AB9 /* COHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09999129A5B64006BEDC3 /* COHistoryTrack.m */; };
 		6686BDE712592C5D0065DE1A /* COObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDB812592C1B0065DE1A /* COObject.m */; };
@@ -129,6 +133,13 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
+		6614500F12B0127E000DB843 /* Design.rtfd */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; path = Design.rtfd; sourceTree = "<group>"; };
+		6614501012B01C96000DB843 /* COBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COBranch.h; sourceTree = "<group>"; };
+		6614501112B01C96000DB843 /* COBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COBranch.m; sourceTree = "<group>"; };
+		6614501212B01DF5000DB843 /* COCommit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommit.h; sourceTree = "<group>"; };
+		6614501312B01DF5000DB843 /* COCommit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommit.m; sourceTree = "<group>"; };
+		6614501612B020AA000DB843 /* COStoreCoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COStoreCoreObject.h; sourceTree = "<group>"; };
+		6614501712B020AA000DB843 /* COStoreCoreObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COStoreCoreObject.m; sourceTree = "<group>"; };
 		6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestHistoryTrack.m; sourceTree = "<group>"; };
 		6627F390127C7E6700E06946 /* ExceptionHandling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExceptionHandling.framework; path = System/Library/Frameworks/ExceptionHandling.framework; sourceTree = SDKROOT; };
 		6686BDAC12592BDA0065DE1A /* ObjectMerging.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectMerging.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -168,7 +179,6 @@
 		66D09ADA129B2C9A006BEDC3 /* TestEditingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestEditingContext.m; sourceTree = "<group>"; };
 		66D09B14129B704E006BEDC3 /* COSynchronizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COSynchronizer.h; sourceTree = "<group>"; };
 		66D09B15129B704E006BEDC3 /* COSynchronizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COSynchronizer.m; sourceTree = "<group>"; };
-		66D09B24129B7342006BEDC3 /* BADIDEAS */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BADIDEAS; sourceTree = "<group>"; };
 		66D09B25129B7440006BEDC3 /* UNSOLVEDPROBLEMS */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UNSOLVEDPROBLEMS; sourceTree = "<group>"; };
 		66D09B26129B7448006BEDC3 /* SOLVEDPROBLEMS */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SOLVEDPROBLEMS; sourceTree = "<group>"; };
 		66D09B28129B7838006BEDC3 /* IMPLEMENTATION */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = IMPLEMENTATION; sourceTree = "<group>"; };
@@ -178,7 +188,6 @@
 		66D09D03129C936E006BEDC3 /* TestCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCommon.m; sourceTree = "<group>"; };
 		66D09D54129CE470006BEDC3 /* COCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCollection.h; sourceTree = "<group>"; };
 		66D09D55129CE470006BEDC3 /* COCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCollection.m; sourceTree = "<group>"; };
-		66D09EB4129E3BED006BEDC3 /* TRICKYCASES */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TRICKYCASES; sourceTree = "<group>"; };
 		66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestRelationshipIntegrity.m; sourceTree = "<group>"; };
 		66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestObjectGraphDiff.m; sourceTree = "<group>"; };
 		66FDED2412A3525A005D6D23 /* TestPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestPerformance.m; sourceTree = "<group>"; };
@@ -364,16 +373,15 @@
 		6699633B115F0C4200359BE6 /* Documentation */ = {
 			isa = PBXGroup;
 			children = (
+				6614500F12B0127E000DB843 /* Design.rtfd */,
 				6699633C115F0C5E00359BE6 /* README */,
 				669963EB11600FD500359BE6 /* LICENSE */,
 				6699661A11632D3300359BE6 /* DESIGN */,
 				66982A1F11EBC2A0007154CD /* TODO */,
-				66D09B24129B7342006BEDC3 /* BADIDEAS */,
 				66D09B25129B7440006BEDC3 /* UNSOLVEDPROBLEMS */,
 				66D09B26129B7448006BEDC3 /* SOLVEDPROBLEMS */,
 				66D09B28129B7838006BEDC3 /* IMPLEMENTATION */,
 				66D09B29129B78C8006BEDC3 /* NOTES */,
-				66D09EB4129E3BED006BEDC3 /* TRICKYCASES */,
 			);
 			name = Documentation;
 			sourceTree = "<group>";
@@ -419,6 +427,12 @@
 				791B4E5D1299C8CB00CCF472 /* CORevision.m */,
 				791B4E601299C8CB00CCF472 /* COStore.h */,
 				791B4E611299C8CB00CCF472 /* COStore.m */,
+				6614501012B01C96000DB843 /* COBranch.h */,
+				6614501112B01C96000DB843 /* COBranch.m */,
+				6614501212B01DF5000DB843 /* COCommit.h */,
+				6614501312B01DF5000DB843 /* COCommit.m */,
+				6614501612B020AA000DB843 /* COStoreCoreObject.h */,
+				6614501712B020AA000DB843 /* COStoreCoreObject.m */,
 			);
 			name = Store;
 			sourceTree = "<group>";
@@ -470,6 +484,8 @@
 				791B4E661299C8CB00CCF472 /* COStore.h in Headers */,
 				66D0999A129A5B64006BEDC3 /* COHistoryTrack.h in Headers */,
 				66D09D56129CE470006BEDC3 /* COCollection.h in Headers */,
+				6614501412B01DF5000DB843 /* COCommit.h in Headers */,
+				6614501812B020AA000DB843 /* COStoreCoreObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -535,7 +551,7 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "ObjectMerging3" */;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "ObjectMerging4" */;
 			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -620,6 +636,8 @@
 				791B4E741299C90900CCF472 /* FMDatabaseAdditions.m in Sources */,
 				791B4E761299C90900CCF472 /* FMResultSet.m in Sources */,
 				791B4E7C1299C92300CCF472 /* sqlite3.c in Sources */,
+				6614501512B01DF6000DB843 /* COCommit.m in Sources */,
+				6614501912B020AA000DB843 /* COStoreCoreObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -900,7 +918,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "ObjectMerging3" */ = {
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "ObjectMerging4" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,
