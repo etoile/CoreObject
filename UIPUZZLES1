@@ -1,0 +1,42 @@
+CoreObject 4 Design: UI Puzzles
+================================
+
+Examples of user objects
+	document, contact, group, image, music track, drawing,..
+
+Types of link/copy
+	transclusion
+	copy
+	not permitted (unique object)
+
+Drag & drop related
+	•	Create a document, edit, switch to new branch, drag to shelf. switch back to original branch.
+	⁃	does the object on the shelf have a branch menu?
+	⁃	The thing on the shelf will be a UUID ref (not including branch) to the document, just as valid as the one in the container where the document was created.
+	⁃	does the object on the shelf change back to the original branch when the document is switched back?
+	⁃	yes
+	•	branching paradox with persistent roots: document (persistent root) is in a folder (persistent root). branch the folder, move the document out, switch back to the original branch.
+	⁃	
+	•	Drop a hyperlink to a paragraph of doc1 into doc2. Move the paragraph into doc3 (deleting it from doc1). Where does the hyperlink point?
+	⁃	to nowhere; moving the paragraph to doc3 created a copy.
+	•	Drop a hyperlink to doc1 into doc2. Move doc1 into a different folder. Where does the hyperlink point?
+	⁃	
+
+Undo Related
+	•	A writing application needs per-document branching and undo. However the documents are contained in a hierarchical project. Also needs stable hyperlinking between documents.
+
+
+Creating branches, or undoing, on things which contain documents:
+	Examples: photo library, music library, document library, entire project
+	group of photos, playlist, group of documents, group of drawings / documents
+
+	All of these have the property that a document can be in more than one. I.e. a many-to-many
+	relationship with the contained documents. Therefore branching, undo, etc., do not act recursively 	on the contained documents.
+
+We shouldn't normally have a user object strongly contained in another user object.
+
+
+
+Disallowing commits spanning multiple persistent roots actually doesn't buy anything - you need to disallow moving embedded objects from one core object to another.
+
+

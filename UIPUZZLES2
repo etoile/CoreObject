@@ -1,0 +1,54 @@
+CoreObject 4 Design: UI Puzzles Part 2
+======================================
+
+Drag & drop related
+	•	Create a document, edit, switch to new branch, drag to shelf. switch back to original branch.
+		⁃	the object on the shelf should have a branch menu?
+		⁃	the object on the shelf changes back to the original branch when the document is switched back
+	•	branching paradox with persistent roots: document (persistent root) is in a folder (persistent root). branch the folder, move the document out, switch back to the original branch.
+	•	Drop a hyperlink to a paragraph of doc1 into doc2. Move the paragraph into doc3 (deleting it from doc1). Where does the hyperlink point?
+		⁃	to nowhere; moving the paragraph to doc3 created a copy.
+	•	Drop a hyperlink to doc1 into doc2. Move doc1 into a different folder. Where does the hyperlink point?
+		⁃	
+
+Undo Related
+	•	A writing application needs per-document branching and undo. However the documents are contained in a hierarchical project. Also needs stable hyperlinking between documents.
+
+
+Creating branches, or undoing, on things which contain documents:
+	Examples: photo library, music library, document library, entire project
+	group of photos, playlist, group of documents, group of drawings / documents
+
+	All of these have the property that a document can be in more than one. I.e. a many-to-many
+	relationship with the contained documents. Therefore branching, undo, etc., do not act recursively 	on the contained documents.
+
+Interaction between tagging
+
+Tagging UI semantics
+--------------------
+
+-What should happen when you browse the history of a tag/project?
+	- just navigates history of which documents are included in the project
+
+Properties of Projects
+ - can create/delete without affecting contained objects
+ - what are acceptable semantics of revision control of a project?
+	- just navigates history of which documents are included in the project
+	- navigates history of all documents included in the project + history of which documents are included in the project
+		- if (the same) document is in multiple projects, should undo/redo in one project modify another project?
+		- probably not.
+
+
+
+Project Scenario A
+------------------
+Eric creates a project to manage research on OODBMSs. He downloads 25 PDF’s and drops them into this project. As he reads them he adds annotations, and groups them in to a hierarchy within the project to keep track of which ones are interesting. He also creates a notes document in the project to keep track of notes. He reshuffles the hierarchy as he works, and altrenates between reading/annotating, taking notes, and reshuffling the hierarchy of PDF’s.
+
+In the middle he switches to the Etoile art project and hunts for fonts/icons.
+
+ -- > Work through
+
+Undo needs to be dynamically for a flexible set of objects (whatever is open/visible on screen right now). Probably the default history view should be this as well.
+
+Should undo in a workspace undo closing a document?
+

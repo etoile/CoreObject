@@ -1,6 +1,45 @@
 Solved Problems
 ===============
 
+
+Object graph diff
+-----------------
+
+Needs to be rewritten as the current design isn't very intelligent.
+
+diffing two containers:
+
+c1, c2 where uuid(c1) == uuid(c2)
+
+We want a deafult policy which has sensible results in 99% of cases.
+How should our default policy handle one-to-many relationships vs many-to-many?
+
+Move/Delete:
+
+- for a one-to-many relationship (COContainer), when merging two diffs
+where one deletes an object and the other diff moves it, the delete should win.
+
+- for a many-to-many relationship (COCollection), when merging two diffs
+where one deletes an object and the other diff moves it, the move should win.
+
+Insert/Insert:
+
+- one-to-many: conflict if the inserts are in different places.
+- many-to-many: both sides succeed if the inserts are in different places.
+
+Move/Move
+
+- one-to-many: conflict if the move destinations are in different places.
+- many-to-many: both sides succeed if the move destinations are in different places.
+
+any other cases?
+
+We need to perserve relationship consistency when merging,
+so we need to sort out relationship modifications from other edits. And pair up
+both sides of the edits, since diffs will have changes to both sides.
+
+---
+
 Q: Will copy/paste and relationship integrity conflict with each other?
 e.g. suppose you have two Person entities which have a 1:1 spouse relationship
 set to each other:

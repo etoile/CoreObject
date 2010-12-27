@@ -85,6 +85,9 @@ What should succeed silently
 
 Setting a batches of 'current' or 'tip's should be atomic, probably
 
+
+
+
 Diff notes
 ----------
 
