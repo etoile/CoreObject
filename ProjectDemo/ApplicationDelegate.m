@@ -11,6 +11,35 @@
 
 @implementation ApplicationDelegate
 
+- (void)globalForward: (id)sender
+{
+	NSLog(@"Forward");
+}
+
+- (void)globalBack: (id)sender
+{
+	NSLog(@"Back");	
+}
+
+- (void)addStatusBarButtons
+{
+    NSStatusBar *bar = [NSStatusBar systemStatusBar];
+
+    NSStatusItem *forwardButton = [bar statusItemWithLength:NSSquareStatusItemLength];
+	[forwardButton setImage: [NSImage imageNamed: NSImageNameGoRightTemplate]];
+    [forwardButton setHighlightMode:YES];
+	[forwardButton setTarget: self];
+	[forwardButton setAction: @selector(globalForward:)];
+	[forwardButton retain];	
+	
+    NSStatusItem *backButton = [bar statusItemWithLength:NSSquareStatusItemLength];
+	[backButton setImage: [NSImage imageNamed: NSImageNameGoLeftTemplate]];
+    [backButton setHighlightMode:YES];
+	[backButton setTarget: self];
+	[backButton setAction: @selector(globalBack:)];
+	[backButton retain];
+}
+
 - (void)awakeFromNib
 {
 	context = [[COEditingContext alloc] initWithStoreCoordinator: 
@@ -42,6 +71,12 @@
 	
 	[historyController setContext: context];
 	
+	// UI Setup
+	[self addStatusBarButtons];
+	desktopWindow = [[DesktopWindow alloc] init];
+	projectNavWindow = [[ProjectNavWindow alloc] init];
+	overlayShelf = [[OverlayShelf alloc] init];
+	
 	// Show existing documents
 	[self projectDocumentsDidChange: project];
 }
@@ -60,6 +95,8 @@
 {
 	[project release];
 	[controllerForDocumentUUID release];
+	[desktopWindow release];
+	[projectNavWindow release];
 	[super dealloc];
 }
 
@@ -144,6 +181,24 @@
 {
 	
 }
+
+
+- (IBAction)newProject: (id)sender
+{
+	Project *newProject = [[Project alloc] initWithContext: context];
+	[context commit];
+	NSLog(@"Creating a new project %@ = %@", [newProject uuid], newProject); 
+	[newProject setDelegate: self];
+
+	
+}
+
+- (IBAction)deleteProject: (id)sender
+{
+	
+	
+}
+
 
 
 - (OutlineController*)controllerForDocumentRootObject: (COObject*)rootObject;

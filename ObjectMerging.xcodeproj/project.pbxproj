@@ -85,6 +85,11 @@
 		66983346126BB1150011C7FC /* HistoryInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66983345126BB1150011C7FC /* HistoryInspectorController.m */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
+		799118FD12CD3C82009D28C0 /* DesktopWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 799118FC12CD3C82009D28C0 /* DesktopWindow.m */; };
+		7991190512CD3D75009D28C0 /* ProjectNavWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 7991190412CD3D75009D28C0 /* ProjectNavWindow.m */; };
+		7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7991191412CD3F3C009D28C0 /* 2560x1600.jpg */; };
+		7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */ = {isa = PBXBuildFile; fileRef = 7991198512CD4B1A009D28C0 /* OverlayShelf.m */; };
+		7991198A12CD4B72009D28C0 /* stamp.png in Resources */ = {isa = PBXBuildFile; fileRef = 7991198912CD4B72009D28C0 /* stamp.png */; };
 		79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A8128A48DF00EC0255 /* edit-redo.tiff */; };
 		79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A9128A48DF00EC0255 /* edit-undo.tiff */; };
 		79F122B1128A49FE00EC0255 /* history.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122B0128A49FE00EC0255 /* history.tiff */; };
@@ -182,7 +187,7 @@
 		66708F7112486CD300E65F00 /* OutlineController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutlineController.h; sourceTree = "<group>"; };
 		66708F7212486CD300E65F00 /* OutlineController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutlineController.m; sourceTree = "<group>"; };
 		66708F9412486E9D00E65F00 /* OutlineWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OutlineWindow.xib; sourceTree = "<group>"; };
-		66708FBC12486F0600E65F00 /* ProjectDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProjectDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66708FBC12486F0600E65F00 /* Étoilé.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Étoilé.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		667090001248726900E65F00 /* OutlineInspector.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OutlineInspector.xib; sourceTree = "<group>"; };
 		6686B7B01253C1850065DE1A /* OutlineItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutlineItem.h; sourceTree = "<group>"; };
 		6686B7B11253C1850065DE1A /* OutlineItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutlineItem.m; sourceTree = "<group>"; };
@@ -296,14 +301,14 @@
 		66C33E0C1290BC7700E5B15B /* SKTInspectorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTInspectorController.m; sourceTree = "<group>"; };
 		66C33E0D1290BC7700E5B15B /* SKTToolPaletteController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKTToolPaletteController.h; sourceTree = "<group>"; };
 		66C33E0E1290BC7700E5B15B /* SKTToolPaletteController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTToolPaletteController.m; sourceTree = "<group>"; };
-		66D098BC129385F1006BEDC3 /* COCommit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommit.h; sourceTree = "<group>"; };
-		66D098BD129385F1006BEDC3 /* COCommit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommit.m; sourceTree = "<group>"; };
-		66D098BE129385F1006BEDC3 /* COHistoryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COHistoryView.h; sourceTree = "<group>"; };
-		66D098BF129385F1006BEDC3 /* COHistoryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COHistoryView.m; sourceTree = "<group>"; };
-		66D098C0129385F1006BEDC3 /* CONamedBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CONamedBranch.h; sourceTree = "<group>"; };
-		66D098C1129385F1006BEDC3 /* CONamedBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CONamedBranch.m; sourceTree = "<group>"; };
-		66D098C2129385F1006BEDC3 /* COStoreCoordinator2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COStoreCoordinator2.h; sourceTree = "<group>"; };
-		66D098C3129385F1006BEDC3 /* COStoreCoordinator2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COStoreCoordinator2.m; sourceTree = "<group>"; };
+		799118FB12CD3C82009D28C0 /* DesktopWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DesktopWindow.h; sourceTree = "<group>"; };
+		799118FC12CD3C82009D28C0 /* DesktopWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DesktopWindow.m; sourceTree = "<group>"; };
+		7991190312CD3D75009D28C0 /* ProjectNavWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectNavWindow.h; sourceTree = "<group>"; };
+		7991190412CD3D75009D28C0 /* ProjectNavWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectNavWindow.m; sourceTree = "<group>"; };
+		7991191412CD3F3C009D28C0 /* 2560x1600.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = 2560x1600.jpg; path = Images/2560x1600.jpg; sourceTree = "<group>"; };
+		7991198412CD4B1A009D28C0 /* OverlayShelf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OverlayShelf.h; sourceTree = "<group>"; };
+		7991198512CD4B1A009D28C0 /* OverlayShelf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OverlayShelf.m; sourceTree = "<group>"; };
+		7991198912CD4B72009D28C0 /* stamp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stamp.png; sourceTree = "<group>"; };
 		79F122A8128A48DF00EC0255 /* edit-redo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "edit-redo.tiff"; sourceTree = "<group>"; };
 		79F122A9128A48DF00EC0255 /* edit-undo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "edit-undo.tiff"; sourceTree = "<group>"; };
 		79F122B0128A49FE00EC0255 /* history.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = history.tiff; sourceTree = "<group>"; };
@@ -371,7 +376,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				66708FBC12486F0600E65F00 /* ProjectDemo.app */,
+				66708FBC12486F0600E65F00 /* Étoilé.app */,
 				6686BDAC12592BDA0065DE1A /* ObjectMerging.framework */,
 				6686BE0712592CB20065DE1A /* TestApp.app */,
 			);
@@ -383,7 +388,6 @@
 			children = (
 				6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */,
 				6699633B115F0C4200359BE6 /* Documentation */,
-				66D098B6129385C3006BEDC3 /* StoreRewrite */,
 				66708FEF124870CB00E65F00 /* ProjectDemo */,
 				6686BDB212592C1B0065DE1A /* ObjectMerging */,
 				6686BE7A12592ED10065DE1A /* Test App */,
@@ -427,6 +431,9 @@
 		66708FEF124870CB00E65F00 /* ProjectDemo */ = {
 			isa = PBXGroup;
 			children = (
+				7991197F12CD4AA9009D28C0 /* Overlay Shelf */,
+				7991190212CD3D36009D28C0 /* Project Navigator */,
+				799118F812CD3C63009D28C0 /* Desktop */,
 				66C33DED1290BC7700E5B15B /* Sketch */,
 				79F122B2128A4A4200EC0255 /* Icons */,
 				6686B8A1125522D70065DE1A /* Model Objects */,
@@ -702,21 +709,6 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		66D098B6129385C3006BEDC3 /* StoreRewrite */ = {
-			isa = PBXGroup;
-			children = (
-				66D098BC129385F1006BEDC3 /* COCommit.h */,
-				66D098BD129385F1006BEDC3 /* COCommit.m */,
-				66D098BE129385F1006BEDC3 /* COHistoryView.h */,
-				66D098BF129385F1006BEDC3 /* COHistoryView.m */,
-				66D098C0129385F1006BEDC3 /* CONamedBranch.h */,
-				66D098C1129385F1006BEDC3 /* CONamedBranch.m */,
-				66D098C2129385F1006BEDC3 /* COStoreCoordinator2.h */,
-				66D098C3129385F1006BEDC3 /* COStoreCoordinator2.m */,
-			);
-			path = StoreRewrite;
-			sourceTree = "<group>";
-		};
 		792BF914124FBAD00040BF68 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -727,15 +719,44 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		799118F812CD3C63009D28C0 /* Desktop */ = {
+			isa = PBXGroup;
+			children = (
+				799118FB12CD3C82009D28C0 /* DesktopWindow.h */,
+				799118FC12CD3C82009D28C0 /* DesktopWindow.m */,
+			);
+			name = Desktop;
+			sourceTree = "<group>";
+		};
+		7991190212CD3D36009D28C0 /* Project Navigator */ = {
+			isa = PBXGroup;
+			children = (
+				7991190312CD3D75009D28C0 /* ProjectNavWindow.h */,
+				7991190412CD3D75009D28C0 /* ProjectNavWindow.m */,
+			);
+			name = "Project Navigator";
+			sourceTree = "<group>";
+		};
+		7991197F12CD4AA9009D28C0 /* Overlay Shelf */ = {
+			isa = PBXGroup;
+			children = (
+				7991198412CD4B1A009D28C0 /* OverlayShelf.h */,
+				7991198512CD4B1A009D28C0 /* OverlayShelf.m */,
+			);
+			name = "Overlay Shelf";
+			sourceTree = "<group>";
+		};
 		79F122B2128A4A4200EC0255 /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				7991198912CD4B72009D28C0 /* stamp.png */,
 				79F122C1128A4B7800EC0255 /* format-indent-less.tiff */,
 				79F122C2128A4B7800EC0255 /* format-indent-more.tiff */,
 				79F122C3128A4B7800EC0255 /* list-add.tiff */,
 				79F122B0128A49FE00EC0255 /* history.tiff */,
 				79F122A8128A48DF00EC0255 /* edit-redo.tiff */,
 				79F122A9128A48DF00EC0255 /* edit-undo.tiff */,
+				7991191412CD3F3C009D28C0 /* 2560x1600.jpg */,
 			);
 			name = Icons;
 			sourceTree = "<group>";
@@ -769,9 +790,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		66708F9912486F0400E65F00 /* ProjectDemo */ = {
+		66708F9912486F0400E65F00 /* Étoilé */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 66708FB912486F0400E65F00 /* Build configuration list for PBXNativeTarget "ProjectDemo" */;
+			buildConfigurationList = 66708FB912486F0400E65F00 /* Build configuration list for PBXNativeTarget "Étoilé" */;
 			buildPhases = (
 				66708F9A12486F0400E65F00 /* Resources */,
 				66708FA012486F0400E65F00 /* Sources */,
@@ -784,10 +805,10 @@
 				6686BAD512569D400065DE1A /* PBXTargetDependency */,
 				6686C2B5125E629B0065DE1A /* PBXTargetDependency */,
 			);
-			name = ProjectDemo;
+			name = "Étoilé";
 			productInstallPath = "$(HOME)/Applications";
 			productName = ObjectMerging;
-			productReference = 66708FBC12486F0600E65F00 /* ProjectDemo.app */;
+			productReference = 66708FBC12486F0600E65F00 /* Étoilé.app */;
 			productType = "com.apple.product-type.application";
 		};
 		6686BDAB12592BDA0065DE1A /* ObjectMerging */ = {
@@ -852,7 +873,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				66708F9912486F0400E65F00 /* ProjectDemo */,
+				66708F9912486F0400E65F00 /* Étoilé */,
 				6686BDAB12592BDA0065DE1A /* ObjectMerging */,
 				6686BE0612592CB20065DE1A /* TestApp */,
 			);
@@ -902,6 +923,8 @@
 				79F122C5128A4B7800EC0255 /* format-indent-more.tiff in Resources */,
 				79F122C6128A4B7800EC0255 /* list-add.tiff in Resources */,
 				66C33D71128F395400E5B15B /* ItemReference.m in Resources */,
+				7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */,
+				7991198A12CD4B72009D28C0 /* stamp.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -950,6 +973,9 @@
 				6627EE361276317A00E06946 /* SharingServerPeer.m in Sources */,
 				6627EE9812777D6300E06946 /* SharingClient.m in Sources */,
 				6627EF531278EE8400E06946 /* SharingController.m in Sources */,
+				799118FD12CD3C82009D28C0 /* DesktopWindow.m in Sources */,
+				7991190512CD3D75009D28C0 /* ProjectNavWindow.m in Sources */,
+				7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1051,7 +1077,7 @@
 					"\\\"$(SRCROOT)/../../../trunk/Etoile/Frameworks/CoreObject/build/CoreObject.build/Release/CoreObject.build/Objects-normal/i386\\\"",
 					"\\\"$(SRCROOT)/../../../trunk/Etoile/Frameworks/CoreObject/build/CoreObject.build/Release/CoreObject.build/Objects-normal/x86_64\\\"",
 				);
-				PRODUCT_NAME = ProjectDemo;
+				PRODUCT_NAME = "Étoilé";
 			};
 			name = Debug;
 		};
@@ -1074,7 +1100,7 @@
 					"\\\"$(SRCROOT)/../../../trunk/Etoile/Frameworks/CoreObject/build/CoreObject.build/Release/CoreObject.build/Objects-normal/i386\\\"",
 					"\\\"$(SRCROOT)/../../../trunk/Etoile/Frameworks/CoreObject/build/CoreObject.build/Release/CoreObject.build/Objects-normal/x86_64\\\"",
 				);
-				PRODUCT_NAME = ProjectDemo;
+				PRODUCT_NAME = "Étoilé";
 			};
 			name = Release;
 		};
@@ -1210,7 +1236,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		66708FB912486F0400E65F00 /* Build configuration list for PBXNativeTarget "ProjectDemo" */ = {
+		66708FB912486F0400E65F00 /* Build configuration list for PBXNativeTarget "Étoilé" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				66708FBA12486F0400E65F00 /* Debug */,

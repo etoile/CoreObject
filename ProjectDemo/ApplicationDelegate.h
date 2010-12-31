@@ -4,6 +4,9 @@
 #import "HistoryInspectorController.h"
 #import "CheckpointAsSheetController.h"
 #import "SharingController.h"
+#import "DesktopWindow.h"
+#import "ProjectNavWindow.h"
+#import "OverlayShelf.h"
 
 @interface ApplicationDelegate : NSObject
 {
@@ -14,6 +17,10 @@
 	IBOutlet NetworkController *networkController;
 	IBOutlet HistoryInspectorController *historyController;
 	IBOutlet CheckpointAsSheetController *checkpointAsSheetController;
+	
+	DesktopWindow *desktopWindow;
+	ProjectNavWindow *projectNavWindow;
+	OverlayShelf *overlayShelf;
 	
 	COEditingContext *context;
 	Project *project;
@@ -34,6 +41,9 @@
 
 - (void)undo:(id)sender;
 - (void)redo:(id)sender;
+
+- (IBAction)newProject: (id)sender;
+- (IBAction)deleteProject: (id)sender;
 
 - (OutlineController*)controllerForDocumentRootObject: (COObject*)rootObject;
 
