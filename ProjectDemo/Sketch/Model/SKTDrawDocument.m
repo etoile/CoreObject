@@ -3,7 +3,6 @@
 //
 
 #import "SKTDrawDocument.h"
-#import "SKTDrawWindowController.h"
 #import "SKTGraphic.h"
 #import "SKTRenderingView.h"
 #import "SKTRectangle.h"
@@ -38,17 +37,9 @@ NSString *SKTDrawDocumentType = @"Apple Sketch Graphic Format";
     [super dealloc];
 }
 
-- (void)makeWindowControllers {
-    SKTDrawWindowController *myController = [[SKTDrawWindowController allocWithZone:[self zone]] init];
-    [self addWindowController:myController];
-    [myController release];
-}
-
 static NSString *SKTGraphicsListKey = @"GraphicsList";
 static NSString *SKTDrawDocumentVersionKey = @"DrawDocumentVersion";
 static int SKTCurrentDrawDocumentVersion = 1;
-static NSString *SKTPrintInfoKey = @"PrintInfo";
-
 
 - (NSDictionary *)drawDocumentDictionaryForGraphics:(NSArray *)graphics {
     NSMutableDictionary *doc = [NSMutableDictionary dictionary];
@@ -135,6 +126,11 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
     return rect;
 }
 
+- (NSSize)documentSize
+{
+	return [self drawingBoundsForGraphics: _graphics].size;
+}
+
 - (NSData *)TIFFRepresentationForGraphics:(NSArray *)graphics error:(NSError **)outError {
 
     // How big a of a TIFF are we going to make?
@@ -213,10 +209,6 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 
 // This method will only be invoked on Mac OS 10.4 and later. If you're writing an application that has to run on 10.3.x and earlier you should override -dataRepresentationOfType: instead.
 
-- (NSData *)dataRepresentationOfType: (NSString*) typeName
-{
-	return [self dataOfType: typeName error: NULL];
-}
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
 
@@ -243,87 +235,6 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 
 }
 
-// This method will only be invoked on Mac 10.4 and later. If you're writing an application that has to run on 10.3.x and earlier you should override -loadDataRepresentation:ofType: instead.
-//
-- (BOOL) loadDataRepresentation: (NSData*) data ofType: (NSString*) typeName
-{
-	return [self readFromData: data ofType: typeName error: NULL];
-}
-
-- (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
-
-    // This application's Info.plist only declares one document type, SKTDrawDocumentType, for which it can play the "editor" role, and none for which it can play the "viewer" role, so the type better be SKTDrawDocumentType.
-    NSParameterAssert([typeName isEqualToString:SKTDrawDocumentType]);
-
-    // Read in the property list.
-    NSDictionary *properties = [self drawDocumentDictionaryFromData:data error:outError];
-    if (properties) {
-
-	// Get the graphics and set them. Strictly speaking the property list of an empty document should have an empty graphics array, not no graphics array, but we cope easily with either. It wouldn't be good practice to invoke [self setGraphics:nil] though (passing or returning nil collection pointers rarely is).
-	NSArray *graphics = [self graphicsFromDrawDocumentDictionary:properties];
-	if (!graphics) {
-	    graphics = [NSArray array];
-	}
-        [self setGraphics:graphics];
-	
-	// There's no point in considering the opening of the document to have failed" if we can't get print info. A more finished app might present a panel warning the user that something's fishy though.
-	NSData *printInfoData = [properties objectForKey:SKTPrintInfoKey];
-	if (printInfoData) {
-            NSPrintInfo *printInfo = [NSUnarchiver unarchiveObjectWithData:printInfoData];
-            if (printInfo) {
-                [self setPrintInfo:printInfo];
-
-		// -[NSDocument setPrintInfo:] registered an undo action, but that wasn't appropriate in this case.
-		[[self undoManager] removeAllActions];
-
-            }
-	}
-
-    } // else it was -drawDocumentDictionaryFromData:error:'s responsibility to set *outError to something good.
-    return properties ? YES : NO;
-
-}
-
-- (NSSize)documentSize {
-    NSPrintInfo *printInfo = [self printInfo];
-    NSSize paperSize = [printInfo paperSize];
-    paperSize.width -= ([printInfo leftMargin] + [printInfo rightMargin]);
-    paperSize.height -= ([printInfo topMargin] + [printInfo bottomMargin]);
-    return paperSize;
-}
-
-// This method will only be invoked on Mac 10.4 and later. If you're writing an application that has to run on 10.3.x and earlier you should override -printShowingPrintPanel: instead.
-- (NSPrintOperation *)printOperationWithSettings:(NSDictionary *)printSettings error:(NSError **)outError {
-    
-    // Create a view that will be used just for printing.
-    NSSize documentSize = [self documentSize];
-    SKTRenderingView *renderingView = [[SKTRenderingView alloc] initWithFrame:NSMakeRect(0.0, 0.0, documentSize.width, documentSize.height) graphics:[self graphics]];
-    
-    // Create a print operation.
-    NSPrintOperation *printOperation = [NSPrintOperation printOperationWithView:renderingView printInfo:[self printInfo]];
-    [renderingView release];
-    
-    // Specify that the print operation can run in a separate thread. This will cause the print progress panel to appear as a sheet on the document window.
-    [printOperation setCanSpawnSeparateThread:YES];
-    
-    // Set any print settings that might have been specified in a Print Document Apple event. We do it this way because we shouldn't be mutating the result of [self printInfo] here, and using the result of [printOperation printInfo], a copy of the original print info, means we don't have to make yet another temporary copy of [self printInfo].
-    [[[printOperation printInfo] dictionary] addEntriesFromDictionary:printSettings];
-    
-    // We don't have to autorelease the print operation because +[NSPrintOperation printOperationWithView:printInfo:] of course already autoreleased it. Nothing in this method can fail, so we never return nil, so we don't have to worry about setting *outError.
-    return printOperation;
-    
-}
-
-- (void)setPrintInfo:(NSPrintInfo *)printInfo {
-    
-    // Do the regular Cocoa thing...
-    [super setPrintInfo:printInfo];
-
-    // ...and then make sure that all of the graphic views know the new document size, if it changed.
-    [[self windowControllers] makeObjectsPerformSelector:@selector(setUpGraphicView)];
-
-}
-
 - (NSArray *)graphics {
     return _graphics;
 }
@@ -339,14 +250,13 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
     }
 }
 
-- (void)invalidateGraphic:(SKTGraphic *)graphic {
-    NSArray *windowControllers = [self windowControllers];
-
-    [windowControllers makeObjectsPerformSelector:@selector(invalidateGraphic:) withObject:graphic];
+- (void)invalidateGraphic:(SKTGraphic *)graphic
+{
+	// FIXME: call invalidateGraphic: on the graphic view
 }
 
 - (void)insertGraphic:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    [[[self undoManager] prepareWithInvocationTarget:self] removeGraphicAtIndex:index];
+    //[[[self undoManager] prepareWithInvocationTarget:self] removeGraphicAtIndex:index];
     [_graphics insertObject:graphic atIndex:index];
     [graphic setDocument:self];
     [self invalidateGraphic:graphic];
@@ -356,12 +266,12 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
     id graphic = [[_graphics objectAtIndex:index] retain];
     [_graphics removeObjectAtIndex:index];
     [self invalidateGraphic:graphic];
-    [[[self undoManager] prepareWithInvocationTarget:self] insertGraphic:graphic atIndex:index];
+    //[[[self undoManager] prepareWithInvocationTarget:self] insertGraphic:graphic atIndex:index];
     [graphic release];
 }
 
 - (void)removeGraphic:(SKTGraphic *)graphic {
-    unsigned index = [_graphics indexOfObjectIdenticalTo:graphic];
+    NSInteger index = [_graphics indexOfObjectIdenticalTo:graphic];
     if (index != NSNotFound) {
         [self removeGraphicAtIndex:index];
     }
@@ -370,7 +280,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 - (void)moveGraphic:(SKTGraphic *)graphic toIndex:(unsigned)newIndex {
     unsigned curIndex = [_graphics indexOfObjectIdenticalTo:graphic];
     if (curIndex != newIndex) {
-        [[[self undoManager] prepareWithInvocationTarget:self] moveGraphic:graphic toIndex:((curIndex > newIndex) ? curIndex+1 : curIndex)];
+        //[[[self undoManager] prepareWithInvocationTarget:self] moveGraphic:graphic toIndex:((curIndex > newIndex) ? curIndex+1 : curIndex)];
         if (curIndex < newIndex) {
             newIndex--;
         }
@@ -458,7 +368,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
         [self addInGraphics:graphic];
     } else {
         NSArray *graphics = [self graphics];
-        int newIndex = [graphics indexOfObjectIdenticalTo:[rects objectAtIndex:index]];
+        NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[rects objectAtIndex:index]];
         if (newIndex != NSNotFound) {
             [self insertGraphic:graphic atIndex:newIndex];
         } else {
@@ -471,7 +381,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 - (void)removeFromRectanglesAtIndex:(unsigned)index {
     NSArray *rects = [self rectangles];
     NSArray *graphics = [self graphics];
-    int newIndex = [graphics indexOfObjectIdenticalTo:[rects objectAtIndex:index]];
+    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[rects objectAtIndex:index]];
     if (newIndex != NSNotFound) {
         [self removeGraphicAtIndex:newIndex];
     } else {
@@ -483,7 +393,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 - (void)replaceInRectangles:(SKTGraphic *)graphic atIndex:(unsigned)index {
     NSArray *rects = [self rectangles];
     NSArray *graphics = [self graphics];
-    int newIndex = [graphics indexOfObjectIdenticalTo:[rects objectAtIndex:index]];
+    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[rects objectAtIndex:index]];
     if (newIndex != NSNotFound) {
         [self removeGraphicAtIndex:newIndex];
         [self insertGraphic:graphic atIndex:newIndex];
@@ -509,7 +419,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
         [self addInGraphics:graphic];
     } else {
         NSArray *graphics = [self graphics];
-        int newIndex = [graphics indexOfObjectIdenticalTo:[circles objectAtIndex:index]];
+        NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[circles objectAtIndex:index]];
         if (newIndex != NSNotFound) {
             [self insertGraphic:graphic atIndex:newIndex];
         } else {
@@ -522,7 +432,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 - (void)removeFromCirclesAtIndex:(unsigned)index {
     NSArray *circles = [self circles];
     NSArray *graphics = [self graphics];
-    int newIndex = [graphics indexOfObjectIdenticalTo:[circles objectAtIndex:index]];
+    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[circles objectAtIndex:index]];
     if (newIndex != NSNotFound) {
         [self removeGraphicAtIndex:newIndex];
     } else {
@@ -534,7 +444,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 - (void)replaceInCircles:(SKTGraphic *)graphic atIndex:(unsigned)index {
     NSArray *circles = [self circles];
     NSArray *graphics = [self graphics];
-    int newIndex = [graphics indexOfObjectIdenticalTo:[circles objectAtIndex:index]];
+    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[circles objectAtIndex:index]];
     if (newIndex != NSNotFound) {
         [self removeGraphicAtIndex:newIndex];
         [self insertGraphic:graphic atIndex:newIndex];
@@ -560,7 +470,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
         [self addInGraphics:graphic];
     } else {
         NSArray *graphics = [self graphics];
-        int newIndex = [graphics indexOfObjectIdenticalTo:[lines objectAtIndex:index]];
+        NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[lines objectAtIndex:index]];
         if (newIndex != NSNotFound) {
             [self insertGraphic:graphic atIndex:newIndex];
         } else {
@@ -573,7 +483,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 - (void)removeFromLinesAtIndex:(unsigned)index {
     NSArray *lines = [self lines];
     NSArray *graphics = [self graphics];
-    int newIndex = [graphics indexOfObjectIdenticalTo:[lines objectAtIndex:index]];
+    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[lines objectAtIndex:index]];
     if (newIndex != NSNotFound) {
         [self removeGraphicAtIndex:newIndex];
     } else {
@@ -585,7 +495,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 - (void)replaceInLines:(SKTGraphic *)graphic atIndex:(unsigned)index {
     NSArray *lines = [self lines];
     NSArray *graphics = [self graphics];
-    int newIndex = [graphics indexOfObjectIdenticalTo:[lines objectAtIndex:index]];
+    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[lines objectAtIndex:index]];
     if (newIndex != NSNotFound) {
         [self removeGraphicAtIndex:newIndex];
         [self insertGraphic:graphic atIndex:newIndex];
@@ -611,7 +521,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
         [self addInGraphics:graphic];
     } else {
         NSArray *graphics = [self graphics];
-        int newIndex = [graphics indexOfObjectIdenticalTo:[textAreas objectAtIndex:index]];
+        NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[textAreas objectAtIndex:index]];
         if (newIndex != NSNotFound) {
             [self insertGraphic:graphic atIndex:newIndex];
         } else {
@@ -624,7 +534,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 - (void)removeFromTextAreasAtIndex:(unsigned)index {
     NSArray *textAreas = [self textAreas];
     NSArray *graphics = [self graphics];
-    int newIndex = [graphics indexOfObjectIdenticalTo:[textAreas objectAtIndex:index]];
+    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[textAreas objectAtIndex:index]];
     if (newIndex != NSNotFound) {
         [self removeGraphicAtIndex:newIndex];
     } else {
@@ -636,7 +546,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 - (void)replaceInTextAreas:(SKTGraphic *)graphic atIndex:(unsigned)index {
     NSArray *textAreas = [self textAreas];
     NSArray *graphics = [self graphics];
-    int newIndex = [graphics indexOfObjectIdenticalTo:[textAreas objectAtIndex:index]];
+    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[textAreas objectAtIndex:index]];
     if (newIndex != NSNotFound) {
         [self removeGraphicAtIndex:newIndex];
         [self insertGraphic:graphic atIndex:newIndex];
@@ -662,7 +572,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
         [self addInGraphics:graphic];
     } else {
         NSArray *graphics = [self graphics];
-        int newIndex = [graphics indexOfObjectIdenticalTo:[images objectAtIndex:index]];
+        NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[images objectAtIndex:index]];
         if (newIndex != NSNotFound) {
             [self insertGraphic:graphic atIndex:newIndex];
         } else {
@@ -675,7 +585,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 - (void)removeFromImagesAtIndex:(unsigned)index {
     NSArray *images = [self images];
     NSArray *graphics = [self graphics];
-    int newIndex = [graphics indexOfObjectIdenticalTo:[images objectAtIndex:index]];
+    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[images objectAtIndex:index]];
     if (newIndex != NSNotFound) {
         [self removeGraphicAtIndex:newIndex];
     } else {
@@ -687,7 +597,7 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
 - (void)replaceInImages:(SKTGraphic *)graphic atIndex:(unsigned)index {
     NSArray *images = [self images];
     NSArray *graphics = [self graphics];
-    int newIndex = [graphics indexOfObjectIdenticalTo:[images objectAtIndex:index]];
+    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[images objectAtIndex:index]];
     if (newIndex != NSNotFound) {
         [self removeGraphicAtIndex:newIndex];
         [self insertGraphic:graphic atIndex:newIndex];
@@ -697,228 +607,6 @@ static NSString *SKTPrintInfoKey = @"PrintInfo";
     }
 }
 
-// The following "indicesOf..." methods are in support of scripting.  They allow more flexible range and relative specifiers to be used with the different graphic keys of a SKTDrawDocument.
-// The scripting engine does not know about the fact that the "rectangles" key is really just a subset of the "graphics" key, so script code like "rectangles from circle 1 to line 4" don't make sense to it.  But Sketch does know and can answer such questions itself, with a little work.
-/*
-- (NSArray *)indicesOfObjectsByEvaluatingRangeSpecifier:(NSRangeSpecifier *)rangeSpec {
-    NSString *key = [rangeSpec key];
-
-    if ([key isEqual:@"graphics"] || [key isEqual:@"rectangles"] || [key isEqual:@"circles"] || [key isEqual:@"lines"] || [key isEqual:@"textAreas"] || [key isEqual:@"images"]) {
-        // This is one of the keys we might want to deal with.
-        NSScriptObjectSpecifier *startSpec = [rangeSpec startSpecifier];
-        NSScriptObjectSpecifier *endSpec = [rangeSpec endSpecifier];
-        NSString *startKey = [startSpec key];
-        NSString *endKey = [endSpec key];
-        NSArray *graphics = [self graphics];
-
-        if ((startSpec == nil) && (endSpec == nil)) {
-            // We need to have at least one of these...
-            return nil;
-        }
-        if ([graphics count] == 0) {
-            // If there are no graphics, there can be no match.  Just return now.
-            return [NSArray array];
-        }
-
-        if ((!startSpec || [startKey isEqual:@"graphics"] || [startKey isEqual:@"rectangles"] || [startKey isEqual:@"circles"] || [startKey isEqual:@"lines"] || [startKey isEqual:@"textAreas"] || [startKey isEqual:@"images"]) && (!endSpec || [endKey isEqual:@"graphics"] || [endKey isEqual:@"rectangles"] || [endKey isEqual:@"circles"] || [endKey isEqual:@"lines"] || [endKey isEqual:@"textAreas"] || [endKey isEqual:@"images"])) {
-            int startIndex;
-            int endIndex;
-
-            // The start and end keys are also ones we want to handle.
-
-            // The strategy here is going to be to find the index of the start and stop object in the full graphics array, regardless of what its key is.  Then we can find what we're looking for in that range of the graphics key (weeding out objects we don't want, if necessary).
-
-            // First find the index of the first start object in the graphics array
-            if (startSpec) {
-                id startObject = [startSpec objectsByEvaluatingSpecifier];
-                if ([startObject isKindOfClass:[NSArray class]]) {
-                    if ([startObject count] == 0) {
-                        startObject = nil;
-                    } else {
-                        startObject = [startObject objectAtIndex:0];
-                    }
-                }
-                if (!startObject) {
-                    // Oops.  We could not find the start object.
-                    return nil;
-                }
-                startIndex = [graphics indexOfObjectIdenticalTo:startObject];
-                if (startIndex == NSNotFound) {
-                    // Oops.  We couldn't find the start object in the graphics array.  This should not happen.
-                    return nil;
-                }
-            } else {
-                startIndex = 0;
-            }
-
-            // Now find the index of the last end object in the graphics array
-            if (endSpec) {
-                id endObject = [endSpec objectsByEvaluatingSpecifier];
-                if ([endObject isKindOfClass:[NSArray class]]) {
-                    unsigned endObjectsCount = [endObject count];
-                    if (endObjectsCount == 0) {
-                        endObject = nil;
-                    } else {
-                        endObject = [endObject objectAtIndex:(endObjectsCount-1)];
-                    }
-                }
-                if (!endObject) {
-                    // Oops.  We could not find the end object.
-                    return nil;
-                }
-                endIndex = [graphics indexOfObjectIdenticalTo:endObject];
-                if (endIndex == NSNotFound) {
-                    // Oops.  We couldn't find the end object in the graphics array.  This should not happen.
-                    return nil;
-                }
-            } else {
-                endIndex = [graphics count] - 1;
-            }
-
-            if (endIndex < startIndex) {
-                // Accept backwards ranges gracefully
-                int temp = endIndex;
-                endIndex = startIndex;
-                startIndex = temp;
-            }
-
-            {
-                // Now startIndex and endIndex specify the end points of the range we want within the graphics array.
-                // We will traverse the range and pick the objects we want.
-                // We do this by getting each object and seeing if it actually appears in the real key that we are trying to evaluate in.
-                NSMutableArray *result = [NSMutableArray array];
-                BOOL keyIsGraphics = [key isEqual:@"graphics"];
-                NSArray *rangeKeyObjects = (keyIsGraphics ? nil : [self valueForKey:key]);
-                id curObj;
-                unsigned curKeyIndex, i;
-
-                for (i=startIndex; i<=endIndex; i++) {
-                    if (keyIsGraphics) {
-                        [result addObject:[NSNumber numberWithInt:i]];
-                    } else {
-                        curObj = [graphics objectAtIndex:i];
-                        curKeyIndex = [rangeKeyObjects indexOfObjectIdenticalTo:curObj];
-                        if (curKeyIndex != NSNotFound) {
-                            [result addObject:[NSNumber numberWithInt:curKeyIndex]];
-                        }
-                    }
-                }
-                return result;
-            }
-        }
-    }
-    return nil;
-}
-
-- (NSArray *)indicesOfObjectsByEvaluatingRelativeSpecifier:(NSRelativeSpecifier *)relSpec {
-    NSString *key = [relSpec key];
-
-    if ([key isEqual:@"graphics"] || [key isEqual:@"rectangles"] || [key isEqual:@"circles"] || [key isEqual:@"lines"] || [key isEqual:@"textAreas"] || [key isEqual:@"images"]) {
-        // This is one of the keys we might want to deal with.
-        NSScriptObjectSpecifier *baseSpec = [relSpec baseSpecifier];
-        NSString *baseKey = [baseSpec key];
-        NSArray *graphics = [self graphics];
-        NSRelativePosition relPos = [relSpec relativePosition];
-
-        if (baseSpec == nil) {
-            // We need to have one of these...
-            return nil;
-        }
-        if ([graphics count] == 0) {
-            // If there are no graphics, there can be no match.  Just return now.
-            return [NSArray array];
-        }
-
-        if ([baseKey isEqual:@"graphics"] || [baseKey isEqual:@"rectangles"] || [baseKey isEqual:@"circles"] || [baseKey isEqual:@"lines"] || [baseKey isEqual:@"textAreas"] || [baseKey isEqual:@"images"]) {
-            int baseIndex;
-
-            // The base key is also one we want to handle.
-
-            // The strategy here is going to be to find the index of the base object in the full graphics array, regardless of what its key is.  Then we can find what we're looking for before or after it.
-
-            // First find the index of the first or last base object in the graphics array
-            // Base specifiers are to be evaluated within the same container as the relative specifier they are the base of.  That's this document.
-            id baseObject = [baseSpec objectsByEvaluatingWithContainers:self];
-            if ([baseObject isKindOfClass:[NSArray class]]) {
-                int baseCount = [baseObject count];
-                if (baseCount == 0) {
-                    baseObject = nil;
-                } else {
-                    if (relPos == NSRelativeBefore) {
-                        baseObject = [baseObject objectAtIndex:0];
-                    } else {
-                        baseObject = [baseObject objectAtIndex:(baseCount-1)];
-                    }
-                }
-            }
-            if (!baseObject) {
-                // Oops.  We could not find the base object.
-                return nil;
-            }
-
-            baseIndex = [graphics indexOfObjectIdenticalTo:baseObject];
-            if (baseIndex == NSNotFound) {
-                // Oops.  We couldn't find the base object in the graphics array.  This should not happen.
-                return nil;
-            }
-
-            {
-                // Now baseIndex specifies the base object for the relative spec in the graphics array.
-                // We will start either right before or right after and look for an object that matches the type we want.
-                // We do this by getting each object and seeing if it actually appears in the real key that we are trying to evaluate in.
-                NSMutableArray *result = [NSMutableArray array];
-                BOOL keyIsGraphics = [key isEqual:@"graphics"];
-                NSArray *relKeyObjects = (keyIsGraphics ? nil : [self valueForKey:key]);
-                id curObj;
-                unsigned curKeyIndex, graphicCount = [graphics count];
-
-                if (relPos == NSRelativeBefore) {
-                    baseIndex--;
-                } else {
-                    baseIndex++;
-                }
-                while ((baseIndex >= 0) && (baseIndex < graphicCount)) {
-                    if (keyIsGraphics) {
-                        [result addObject:[NSNumber numberWithInt:baseIndex]];
-                        break;
-                    } else {
-                        curObj = [graphics objectAtIndex:baseIndex];
-                        curKeyIndex = [relKeyObjects indexOfObjectIdenticalTo:curObj];
-                        if (curKeyIndex != NSNotFound) {
-                            [result addObject:[NSNumber numberWithInt:curKeyIndex]];
-                            break;
-                        }
-                    }
-                    if (relPos == NSRelativeBefore) {
-                        baseIndex--;
-                    } else {
-                        baseIndex++;
-                    }
-                }
-
-                return result;
-            }
-        }
-    }
-    return nil;
-}
-    
-- (NSArray *)indicesOfObjectsByEvaluatingObjectSpecifier:(NSScriptObjectSpecifier *)specifier {
-    // We want to handle some range and relative specifiers ourselves in order to support such things as "graphics from circle 3 to circle 5" or "circles from graphic 1 to graphic 10" or "circle before rectangle 3".
-    // Returning nil from this method will cause the specifier to try to evaluate itself using its default evaluation strategy.
-	
-    if ([specifier isKindOfClass:[NSRangeSpecifier class]]) {
-        return [self indicesOfObjectsByEvaluatingRangeSpecifier:(NSRangeSpecifier *)specifier];
-    } else if ([specifier isKindOfClass:[NSRelativeSpecifier class]]) {
-        return [self indicesOfObjectsByEvaluatingRelativeSpecifier:(NSRelativeSpecifier *)specifier];
-    }
-
-
-    // If we didn't handle it, return nil so that the default object specifier evaluation will do it.
-    return nil;
-}
-
-*/
 @end
 
 

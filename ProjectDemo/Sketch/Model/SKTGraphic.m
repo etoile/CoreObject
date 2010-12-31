@@ -59,10 +59,6 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
     return _document;
 }
 
-- (NSUndoManager *)undoManager {
-    return [[self document] undoManager];
-}
-
 - (NSString *)graphicType {
     return NSStringFromClass([self class]);
 }
@@ -78,7 +74,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
         if (!_gFlags.manipulatingBounds) {
             // Send the notification before and after so that observers who invalidate display in views will wind up invalidating both the original rect and the new one.
             [self didChange];
-            [[[self undoManager] prepareWithInvocationTarget:self] setBounds:_bounds];
+            //[[[self undoManager] prepareWithInvocationTarget:self] setBounds:_bounds];
         }
         _bounds = bounds;
         if (!_gFlags.manipulatingBounds) {
@@ -93,7 +89,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 - (void)setDrawsFill:(BOOL)flag {
     if (_gFlags.drawsFill != flag) {
-        [[[self undoManager] prepareWithInvocationTarget:self] setDrawsFill:_gFlags.drawsFill];
+        //[[[self undoManager] prepareWithInvocationTarget:self] setDrawsFill:_gFlags.drawsFill];
         _gFlags.drawsFill = (flag ? YES : NO);
         [self didChange];
     }
@@ -105,7 +101,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 - (void)setFillColor:(NSColor *)fillColor {
     if (_fillColor != fillColor) {
-        [[[self undoManager] prepareWithInvocationTarget:self] setFillColor:_fillColor];
+        //[[[self undoManager] prepareWithInvocationTarget:self] setFillColor:_fillColor];
         [_fillColor autorelease];
         _fillColor = [fillColor retain];
         [self didChange];
@@ -123,7 +119,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 - (void)setDrawsStroke:(BOOL)flag {
     if (_gFlags.drawsStroke != flag) {
-        [[[self undoManager] prepareWithInvocationTarget:self] setDrawsStroke:_gFlags.drawsStroke];
+        //[[[self undoManager] prepareWithInvocationTarget:self] setDrawsStroke:_gFlags.drawsStroke];
         _gFlags.drawsStroke = (flag ? YES : NO);
         [self didChange];
     }
@@ -135,7 +131,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 - (void)setStrokeColor:(NSColor *)strokeColor {
     if (_strokeColor != strokeColor) {
-        [[[self undoManager] prepareWithInvocationTarget:self] setStrokeColor:_strokeColor];
+        //[[[self undoManager] prepareWithInvocationTarget:self] setStrokeColor:_strokeColor];
         [_strokeColor autorelease];
         _strokeColor = [strokeColor retain];
         [self didChange];
@@ -153,7 +149,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 - (void)setStrokeLineWidth:(float)width {
     if (_lineWidth != width) {
-        [[[self undoManager] prepareWithInvocationTarget:self] setStrokeLineWidth:_lineWidth];
+        //[[[self undoManager] prepareWithInvocationTarget:self] setStrokeLineWidth:_lineWidth];
         if (width >= 0.0) {
             [self setDrawsStroke:YES];
             _lineWidth = width;

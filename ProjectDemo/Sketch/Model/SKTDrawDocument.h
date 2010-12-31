@@ -6,7 +6,7 @@
 
 @class SKTGraphic;
 
-@interface SKTDrawDocument : NSDocument {
+@interface SKTDrawDocument : NSObject {
     @private
     NSMutableArray *_graphics;
 }

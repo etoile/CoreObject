@@ -40,7 +40,7 @@
     if (contents != _contents) 
 	{
         NSAttributedString *contentsCopy = [[NSAttributedString allocWithZone:[self zone]] initWithAttributedString:_contents];
-        [[[self undoManager] prepareWithInvocationTarget:self] setContents:contentsCopy];
+        //[[[self undoManager] prepareWithInvocationTarget:self] setContents:contentsCopy];
         [contentsCopy release];
         // We are willing to accept either a string or an attributed string.
         if ([contents isKindOfClass:[NSAttributedString class]]) 

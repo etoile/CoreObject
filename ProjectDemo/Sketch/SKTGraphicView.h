@@ -15,7 +15,8 @@
 
 @interface SKTGraphicView : NSView {
     @private
-    IBOutlet SKTDrawWindowController *controller;
+	DrawingController *_drawingController;
+	
     NSMutableArray *_selectedGraphics;
     SKTGraphic *_creatingGraphic;
     NSRect _rubberbandRect;
@@ -38,13 +39,12 @@
     } _gvFlags;
     NSRect _verticalRulerLineRect;
     NSRect _horizontalRulerLineRect;
-	
-	DrawingController *_drawingController;
 }
 
 // SKTDrawWindowController accessors and convenience methods
 - (void)setDrawWindowController:(SKTDrawWindowController *)theController;
 - (SKTDrawWindowController *)drawWindowController;
+
 - (SKTDrawDocument *)drawDocument;
 - (NSArray *)graphics;
 

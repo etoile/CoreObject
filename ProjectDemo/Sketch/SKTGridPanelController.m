@@ -5,7 +5,6 @@
 #import "SKTGridPanelController.h"
 #import "SKTGridView.h"
 #import "SKTGraphicView.h"
-#import "SKTDrawWindowController.h"
 #import <math.h>
 
 @implementation SKTGridPanelController
@@ -49,13 +48,9 @@
 }
 
 - (void)setMainWindow:(NSWindow *)mainWindow {
-    NSWindowController *controller = [mainWindow windowController];
-
-    if (controller && [controller isKindOfClass:[SKTDrawWindowController class]]) {
-        _inspectingGraphicView = [(SKTDrawWindowController *)controller graphicView];
-    } else {
-        _inspectingGraphicView = nil;
-    }
+    // FIXME: get the view
+    _inspectingGraphicView = nil;
+	
     [self updatePanel];
 }
 

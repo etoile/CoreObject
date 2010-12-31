@@ -11,7 +11,15 @@
 	doc = document; // weak ref
 	isSharing = sharing;
 	
+	drawDocument = [[SKTDrawDocument alloc] init];
+	
 	return self;
+}
+
+- (void)dealloc
+{
+	[drawDocument release];
+	[super dealloc];
 }
 
 - (id)initWithDocument: (id)document
@@ -70,6 +78,12 @@
 }
 
 
+- (void) setToolClass: (Class)class
+{
+	toolClass = class;
+	NSLog(@"Tool class: %@", NSStringFromClass(toolClass));
+}
+
 /* IB Actions */
 
 - (IBAction) selectTool: (id)sender
@@ -93,15 +107,16 @@
 	[self setToolClass: [SKTTextArea class]];
 }
 
-- (void) setToolClass: (Class)class
-{
-	toolClass = class;
-	NSLog(@"Tool class: %@", NSStringFromClass(toolClass));
-}
+
 
 - (Class)currentGraphicClass
 {
 	return toolClass;
+}
+
+- (SKTDrawDocument *)drawDocument
+{
+	return drawDocument;
 }
 
 @end

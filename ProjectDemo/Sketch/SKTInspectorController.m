@@ -3,7 +3,6 @@
 //
 
 #import "SKTInspectorController.h"
-#import "SKTDrawWindowController.h"
 #import "SKTGraphicView.h"
 #import "SKTGraphic.h"
 
@@ -40,13 +39,9 @@
 }
 
 - (void)setMainWindow:(NSWindow *)mainWindow {
-    NSWindowController *controller = [mainWindow windowController];
-
-    if (controller && [controller isKindOfClass:[SKTDrawWindowController class]]) {
-        _inspectingGraphicView = [(SKTDrawWindowController *)controller graphicView];
-    } else {
-        _inspectingGraphicView = nil;
-    }
+	// FIXME: get the view
+	_inspectingGraphicView = nil;
+	
     needsUpdate = YES;
 #ifdef GNUSTEP
 	[self updateUI];

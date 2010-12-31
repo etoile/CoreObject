@@ -14,6 +14,8 @@
 	BOOL isSharing;
 	Class toolClass;
 	IBOutlet SKTGraphicView *graphicView;
+	
+	SKTDrawDocument *drawDocument;
 }
 
 - (IBAction) selectTool: (id)sender;
@@ -23,5 +25,7 @@
 - (IBAction) textTool: (id)sender;
 
 - (Class)currentGraphicClass; // called by SKTGraphicsView
+
+- (SKTDrawDocument *)drawDocument;
 
 @end

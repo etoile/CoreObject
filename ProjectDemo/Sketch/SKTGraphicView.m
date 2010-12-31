@@ -3,7 +3,6 @@
 //
 
 #import "SKTGraphicView.h"
-#import "SKTDrawWindowController.h"
 #import "SKTDrawDocument.h"
 #import "SKTGraphic.h"
 #import "SKTFoundationExtras.h"
@@ -62,22 +61,12 @@ static float SKTDefaultPasteCascadeDelta = 10.0;
 	_drawingController = c;
 }
 
-
-// SKTDrawWindowController accessors and convenience methods
-- (void)setDrawWindowController:(SKTDrawWindowController *)theController {
-    controller = theController;
-}
-
-- (SKTDrawWindowController *)drawWindowController {
-    return controller;
-}
-
 - (SKTDrawDocument *)drawDocument {
-    return [[self drawWindowController] document];
+    return [[self drawingController] drawDocument];
 }
 
 - (NSArray *)graphics {
-    return [[[self drawWindowController] document] graphics];
+    return [[self drawDocument] graphics];
 }
 
 // Display invalidation
@@ -124,10 +113,10 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 }
 
 - (void)selectGraphic:(SKTGraphic *)graphic {
-    unsigned curIndex = [_selectedGraphics indexOfObjectIdenticalTo:graphic];
+    NSInteger curIndex = [_selectedGraphics indexOfObjectIdenticalTo:graphic];
     if (curIndex == NSNotFound) {
-        [[[self undoManager] prepareWithInvocationTarget:self] deselectGraphic:graphic];
-        [[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Selection Change", @"UndoStrings", @"Action name for selection changes.")];
+        //[[[self undoManager] prepareWithInvocationTarget:self] deselectGraphic:graphic];
+        //[[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Selection Change", @"UndoStrings", @"Action name for selection changes.")];
         [_selectedGraphics addObject:graphic];
         [self invalidateGraphic:graphic];
         _pasteCascadeDelta = NSMakePoint(SKTDefaultPasteCascadeDelta, SKTDefaultPasteCascadeDelta);
@@ -137,10 +126,10 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 }
 
 - (void)deselectGraphic:(SKTGraphic *)graphic {
-    unsigned curIndex = [_selectedGraphics indexOfObjectIdenticalTo:graphic];
+    NSInteger curIndex = [_selectedGraphics indexOfObjectIdenticalTo:graphic];
     if (curIndex != NSNotFound) {
-        [[[self undoManager] prepareWithInvocationTarget:self] selectGraphic:graphic];
-        [[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Selection Change", @"UndoStrings", @"Action name for selection changes.")];
+        //[[[self undoManager] prepareWithInvocationTarget:self] selectGraphic:graphic];
+        //[[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Selection Change", @"UndoStrings", @"Action name for selection changes.")];
         [_selectedGraphics removeObjectAtIndex:curIndex];
         [self invalidateGraphic:graphic];
         _pasteCascadeDelta = NSMakePoint(SKTDefaultPasteCascadeDelta, SKTDefaultPasteCascadeDelta);
@@ -156,10 +145,10 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
     if (c > 0) {
         for (i=0; i<c; i++) {
             curGraphic = [_selectedGraphics objectAtIndex:i];
-            [[[self undoManager] prepareWithInvocationTarget:self] selectGraphic:curGraphic];
+            //[[[self undoManager] prepareWithInvocationTarget:self] selectGraphic:curGraphic];
             [self invalidateGraphic:curGraphic];
         }
-        [[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Selection Change", @"UndoStrings", @"Action name for selection changes.")];
+        //[[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Selection Change", @"UndoStrings", @"Action name for selection changes.")];
         [_selectedGraphics removeAllObjects];
         _pasteCascadeDelta = NSMakePoint(SKTDefaultPasteCascadeDelta, SKTDefaultPasteCascadeDelta);
         [[NSNotificationCenter defaultCenter] postNotificationName:SKTGraphicViewSelectionDidChangeNotification object:self];
@@ -248,7 +237,6 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 }
 
 - (void)drawRect:(NSRect)rect {
-    SKTDrawWindowController *drawWindowController = [self drawWindowController];
     NSArray *graphics;
     unsigned i;
     SKTGraphic *curGraphic;
@@ -262,7 +250,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
         SKTDrawGridWithSettingsInRect([self gridSpacing], [self gridColor], rect, NSZeroPoint);
     }
 
-    graphics = [[drawWindowController document] graphics];
+    graphics = [[self drawDocument] graphics];
     i = [graphics count];
     while (i-- > 0) {
         curGraphic = [graphics objectAtIndex:i];
@@ -360,7 +348,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
         if ([_creatingGraphic isEditable]) {
             [self startEditingGraphic:_creatingGraphic withEvent:nil ];
         }
-        [[document undoManager] setActionName:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Create %@", @"UndoStrings", @"Action name for newly created graphics.  Class name is inserted at the substitution."), [[NSBundle mainBundle] localizedStringForKey:NSStringFromClass(theClass) value:@"" table:@"GraphicClassNames"]]];
+        //[[document undoManager] setActionName:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Create %@", @"UndoStrings", @"Action name for newly created graphics.  Class name is inserted at the substitution."), [[NSBundle mainBundle] localizedStringForKey:NSStringFromClass(theClass) value:@"" table:@"GraphicClassNames"]]];
     }
     [_creatingGraphic release];
     _creatingGraphic = nil;
@@ -403,7 +391,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 
     [graphic stopBoundsManipulation];
 
-    [[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Resize", @"UndoStrings", @"Action name for resizes.")];
+    //[[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Resize", @"UndoStrings", @"Action name for resizes.")];
 }
 
 - (void)rubberbandSelectWithEvent:(NSEvent *)theEvent {
@@ -531,7 +519,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 
         if (didMove) {
             // Only if we really moved.
-            [[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Move", @"UndoStrings", @"Action name for moves.")];
+            //[[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Move", @"UndoStrings", @"Action name for moves.")];
         }
     }
 }
@@ -714,7 +702,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
             if (hitGraphic) {
                 NSColor *color = [[NSColor colorFromPasteboard:pboard] colorWithAlphaComponent:1.0];
                 [hitGraphic setFillColor:color];
-                [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Set Fill Color", @"UndoStrings", @"Action name for setting fill color.")];
+                //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Set Fill Color", @"UndoStrings", @"Action name for setting fill color.")];
             }
         } else if ([type isEqualToString:NSFilenamesPboardType]) {
             NSArray *filenames = [pboard propertyListForType:NSFilenamesPboardType];
@@ -793,7 +781,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
             [curGraphic setFillColor:color];
             [curGraphic setDrawsFill:YES];
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Set Fill Color", @"UndoStrings", @"Action name for setting fill color.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Set Fill Color", @"UndoStrings", @"Action name for setting fill color.")];
     }
 }
 
@@ -811,7 +799,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
     if ([selCopy count] > 0) {
         [[self drawDocument] performSelector:@selector(removeGraphic:) withEachObjectInArray:selCopy];
         [selCopy release];
-        [[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Delete", @"UndoStrings", @"Action name for deletions.")];
+        //[[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Delete", @"UndoStrings", @"Action name for deletions.")];
     }
 }
 
@@ -823,7 +811,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
         while (c-- > 0) {
             [document moveGraphic:[orderedSelection objectAtIndex:c] toIndex:0];
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Bring To Front", @"UndoStrings", @"Action name for bring to front.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Bring To Front", @"UndoStrings", @"Action name for bring to front.")];
     }
 }
 
@@ -836,7 +824,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
         for (i=0; i<c; i++) {
             [document moveGraphic:[orderedSelection objectAtIndex:i] toIndex:lastIndex];
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Send To Back", @"UndoStrings", @"Action name for send to back.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Send To Back", @"UndoStrings", @"Action name for send to back.")];
     }
 }
 
@@ -855,7 +843,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
                 [curGraphic setBounds:curBounds];
             }
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Align Left Edges", @"UndoStrings", @"Action name for align left edges.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Align Left Edges", @"UndoStrings", @"Action name for align left edges.")];
     }
 }
 
@@ -874,7 +862,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
                 [curGraphic setBounds:curBounds];
             }
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Align Right Edges", @"UndoStrings", @"Action name for align right edges.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Align Right Edges", @"UndoStrings", @"Action name for align right edges.")];
     }
 }
 
@@ -893,7 +881,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
                 [curGraphic setBounds:curBounds];
             }
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Align Top Edges", @"UndoStrings", @"Action name for align top edges.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Align Top Edges", @"UndoStrings", @"Action name for align top edges.")];
     }
 }
 
@@ -912,7 +900,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
                 [curGraphic setBounds:curBounds];
             }
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Align Bottom Edges", @"UndoStrings", @"Action name for align bottom edges.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Align Bottom Edges", @"UndoStrings", @"Action name for align bottom edges.")];
     }
 }
 
@@ -931,7 +919,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
                 [curGraphic setBounds:curBounds];
             }
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Align Horizontal Centers", @"UndoStrings", @"Action name for align horizontal centers.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Align Horizontal Centers", @"UndoStrings", @"Action name for align horizontal centers.")];
     }
 }
 
@@ -950,7 +938,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
                 [curGraphic setBounds:curBounds];
             }
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Align Vertical Centers", @"UndoStrings", @"Action name for align vertical centers.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Align Vertical Centers", @"UndoStrings", @"Action name for align vertical centers.")];
     }
 }
 
@@ -969,7 +957,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
                 [curGraphic setBounds:curBounds];
             }
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Make Same Width", @"UndoStrings", @"Action name for make same width.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Make Same Width", @"UndoStrings", @"Action name for make same width.")];
     }
 }
 
@@ -988,7 +976,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
                 [curGraphic setBounds:curBounds];
             }
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Make Same Width", @"UndoStrings", @"Action name for make same width.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Make Same Width", @"UndoStrings", @"Action name for make same width.")];
     }
 }
 
@@ -996,7 +984,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
     NSArray *selection = [self selectedGraphics];
     if ([selection count] > 0) {
         [selection makeObjectsPerformSelector:@selector(makeNaturalSize)];
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Make Natural Size", @"UndoStrings", @"Action name for natural size.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Make Natural Size", @"UndoStrings", @"Action name for natural size.")];
     }
 }
 
@@ -1033,7 +1021,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
             curBounds.size.height = curMaxPoint.y - curBounds.origin.y;
             [curGraphic setBounds:curBounds];
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Grid Selected Graphics", @"UndoStrings", @"Action name for grid selected graphics.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Grid Selected Graphics", @"UndoStrings", @"Action name for grid selected graphics.")];
     }
 }
 
@@ -1088,7 +1076,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 - (IBAction)cut:(id)sender {
     [self copy:sender];
     [self delete:sender];
-    [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Cut", @"UndoStrings", @"Action name for cut.")];
+    //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Cut", @"UndoStrings", @"Action name for cut.")];
 }
 
 - (IBAction)paste:(id)sender {
@@ -1128,7 +1116,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 		    }
 		    _pasteCascadeNumber++;
 		    _pasteCascadeDelta = savedPasteCascadeDelta;
-		    [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Paste", @"UndoStrings", @"Action name for paste.")];
+		    //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Paste", @"UndoStrings", @"Action name for paste.")];
 		}
 	    } else {
 
@@ -1142,12 +1130,12 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
             if ([filenames count] == 1) {
                 NSString *filename = [filenames objectAtIndex:0];
                 if ([self makeNewImageFromContentsOfFile:filename atPoint:NSMakePoint(50, 50)]) {
-                    [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Paste", @"UndoStrings", @"Action name for paste.")];
+                    //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Paste", @"UndoStrings", @"Action name for paste.")];
                 }
             }
         }
     } else if ([self makeNewImageFromPasteboard:pboard atPoint:NSMakePoint(50, 50)]) {
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Paste", @"UndoStrings", @"Action name for paste.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Paste", @"UndoStrings", @"Action name for paste.")];
     }
 }
 
@@ -1186,7 +1174,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
         for (i=0; i<c; i++) {
             [[selection objectAtIndex:i] moveBy:delta];
         }
-        [[self undoManager] setActionName:NSLocalizedStringFromTable(@"Nudge", @"UndoStrings", @"Action name for nudge keyboard commands.")];
+        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Nudge", @"UndoStrings", @"Action name for nudge keyboard commands.")];
     }
 }
 

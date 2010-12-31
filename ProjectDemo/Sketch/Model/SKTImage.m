@@ -42,7 +42,7 @@
 
 - (void)setImage:(NSImage *)image {
     if (image != _image) {
-        [[[self undoManager] prepareWithInvocationTarget:self] setImage:_image];
+        //[[[self undoManager] prepareWithInvocationTarget:self] setImage:_image];
         [_image release];
         _image = [image retain];
         [self SKT_clearCachedImage];
@@ -89,7 +89,7 @@
 
 - (void)setFlippedHorizontally:(BOOL)flag {
     if (_flippedHorizontally != flag) {
-        [[[self undoManager] prepareWithInvocationTarget:self] setFlippedHorizontally:_flippedHorizontally];
+        //[[[self undoManager] prepareWithInvocationTarget:self] setFlippedHorizontally:_flippedHorizontally];
         _flippedHorizontally = flag;
         [self SKT_clearCachedImage];
         [self didChange];
@@ -102,7 +102,7 @@
 
 - (void)setFlippedVertically:(BOOL)flag {
     if (_flippedVertically != flag) {
-        [[[self undoManager] prepareWithInvocationTarget:self] setFlippedVertically:_flippedVertically];
+        //[[[self undoManager] prepareWithInvocationTarget:self] setFlippedVertically:_flippedVertically];
         _flippedVertically = flag;
         [self SKT_clearCachedImage];
         [self didChange];
