@@ -7,6 +7,7 @@
 @class SKTDrawWindowController;
 @class SKTDrawDocument;
 @class SKTGraphic;
+@class DrawingController;
 
 #define SKT_HALF_HANDLE_WIDTH 3.0
 #define SKT_HANDLE_WIDTH (SKT_HALF_HANDLE_WIDTH * 2.0)
@@ -37,6 +38,8 @@
     } _gvFlags;
     NSRect _verticalRulerLineRect;
     NSRect _horizontalRulerLineRect;
+	
+	DrawingController *_drawingController;
 }
 
 // SKTDrawWindowController accessors and convenience methods
@@ -44,6 +47,9 @@
 - (SKTDrawWindowController *)drawWindowController;
 - (SKTDrawDocument *)drawDocument;
 - (NSArray *)graphics;
+
+- (DrawingController*)drawingController;
+- (void)setDrawingController: (DrawingController*)c;
 
 // Display invalidation
 - (void)invalidateGraphic:(SKTGraphic *)graphic;

@@ -53,6 +53,16 @@ static float SKTDefaultPasteCascadeDelta = 10.0;
     [super dealloc];
 }
 
+- (DrawingController*)drawingController
+{
+	return _drawingController;
+}
+- (void)setDrawingController: (DrawingController*)c
+{
+	_drawingController = c;
+}
+
+
 // SKTDrawWindowController accessors and convenience methods
 - (void)setDrawWindowController:(SKTDrawWindowController *)theController {
     controller = theController;
@@ -583,7 +593,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 }
 
 - (void)mouseDown:(NSEvent *)theEvent {
-    Class theClass = [[SKTToolPaletteController sharedToolPaletteController] currentGraphicClass];
+    Class theClass = [[self drawingController] currentGraphicClass];
     if ([self editingGraphic]) {
         [self endEditing];
     }

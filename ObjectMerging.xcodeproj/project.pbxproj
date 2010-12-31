@@ -106,6 +106,11 @@
 		79911A5312CDAECD009D28C0 /* SKTGridView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33E0A1290BC7700E5B15B /* SKTGridView.m */; };
 		79911A5412CDAECD009D28C0 /* SKTInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33E0C1290BC7700E5B15B /* SKTInspectorController.m */; };
 		79911A5512CDAECD009D28C0 /* SKTToolPaletteController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33E0E1290BC7700E5B15B /* SKTToolPaletteController.m */; };
+		79911A6312CDB215009D28C0 /* Arrow.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79911A5E12CDB215009D28C0 /* Arrow.tiff */; };
+		79911A6412CDB215009D28C0 /* Circle.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79911A5F12CDB215009D28C0 /* Circle.tiff */; };
+		79911A6512CDB215009D28C0 /* Line.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79911A6012CDB215009D28C0 /* Line.tiff */; };
+		79911A6612CDB215009D28C0 /* Rectangle.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79911A6112CDB215009D28C0 /* Rectangle.tiff */; };
+		79911A6712CDB215009D28C0 /* TextGraphic.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79911A6212CDB215009D28C0 /* TextGraphic.tiff */; };
 		79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A8128A48DF00EC0255 /* edit-redo.tiff */; };
 		79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A9128A48DF00EC0255 /* edit-undo.tiff */; };
 		79F122B1128A49FE00EC0255 /* history.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122B0128A49FE00EC0255 /* history.tiff */; };
@@ -325,6 +330,11 @@
 		7991198912CD4B72009D28C0 /* stamp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stamp.png; sourceTree = "<group>"; };
 		79911A0712CD974A009D28C0 /* Application.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Application.h; sourceTree = "<group>"; };
 		79911A0812CD974A009D28C0 /* Application.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Application.m; sourceTree = "<group>"; };
+		79911A5E12CDB215009D28C0 /* Arrow.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Arrow.tiff; sourceTree = "<group>"; };
+		79911A5F12CDB215009D28C0 /* Circle.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Circle.tiff; sourceTree = "<group>"; };
+		79911A6012CDB215009D28C0 /* Line.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Line.tiff; sourceTree = "<group>"; };
+		79911A6112CDB215009D28C0 /* Rectangle.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Rectangle.tiff; sourceTree = "<group>"; };
+		79911A6212CDB215009D28C0 /* TextGraphic.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = TextGraphic.tiff; sourceTree = "<group>"; };
 		79F122A8128A48DF00EC0255 /* edit-redo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "edit-redo.tiff"; sourceTree = "<group>"; };
 		79F122A9128A48DF00EC0255 /* edit-undo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "edit-undo.tiff"; sourceTree = "<group>"; };
 		79F122B0128A49FE00EC0255 /* history.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = history.tiff; sourceTree = "<group>"; };
@@ -765,6 +775,11 @@
 		79F122B2128A4A4200EC0255 /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				79911A5E12CDB215009D28C0 /* Arrow.tiff */,
+				79911A5F12CDB215009D28C0 /* Circle.tiff */,
+				79911A6012CDB215009D28C0 /* Line.tiff */,
+				79911A6112CDB215009D28C0 /* Rectangle.tiff */,
+				79911A6212CDB215009D28C0 /* TextGraphic.tiff */,
 				7991198912CD4B72009D28C0 /* stamp.png */,
 				79F122C1128A4B7800EC0255 /* format-indent-less.tiff */,
 				79F122C2128A4B7800EC0255 /* format-indent-more.tiff */,
@@ -941,6 +956,11 @@
 				66C33D71128F395400E5B15B /* ItemReference.m in Resources */,
 				7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */,
 				7991198A12CD4B72009D28C0 /* stamp.png in Resources */,
+				79911A6312CDB215009D28C0 /* Arrow.tiff in Resources */,
+				79911A6412CDB215009D28C0 /* Circle.tiff in Resources */,
+				79911A6512CDB215009D28C0 /* Line.tiff in Resources */,
+				79911A6612CDB215009D28C0 /* Rectangle.tiff in Resources */,
+				79911A6712CDB215009D28C0 /* TextGraphic.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
