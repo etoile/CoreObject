@@ -91,6 +91,21 @@
 		7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */ = {isa = PBXBuildFile; fileRef = 7991198512CD4B1A009D28C0 /* OverlayShelf.m */; };
 		7991198A12CD4B72009D28C0 /* stamp.png in Resources */ = {isa = PBXBuildFile; fileRef = 7991198912CD4B72009D28C0 /* stamp.png */; };
 		79911A0912CD974A009D28C0 /* Application.m in Sources */ = {isa = PBXBuildFile; fileRef = 79911A0812CD974A009D28C0 /* Application.m */; };
+		79911A4712CDAECD009D28C0 /* SKTCircle.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33DF01290BC7700E5B15B /* SKTCircle.m */; };
+		79911A4812CDAECD009D28C0 /* SKTDrawDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33DF21290BC7700E5B15B /* SKTDrawDocument.m */; };
+		79911A4912CDAECD009D28C0 /* SKTGraphic.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33DF41290BC7700E5B15B /* SKTGraphic.m */; };
+		79911A4A12CDAECD009D28C0 /* SKTImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33DF61290BC7700E5B15B /* SKTImage.m */; };
+		79911A4B12CDAECD009D28C0 /* SKTLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33DF81290BC7700E5B15B /* SKTLine.m */; };
+		79911A4C12CDAECD009D28C0 /* SKTRectangle.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33DFA1290BC7700E5B15B /* SKTRectangle.m */; };
+		79911A4D12CDAECD009D28C0 /* SKTRenderingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33DFC1290BC7700E5B15B /* SKTRenderingView.m */; };
+		79911A4E12CDAECD009D28C0 /* SKTTextArea.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33DFE1290BC7700E5B15B /* SKTTextArea.m */; };
+		79911A4F12CDAECD009D28C0 /* SKTDrawWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33E021290BC7700E5B15B /* SKTDrawWindowController.m */; };
+		79911A5012CDAECD009D28C0 /* SKTFoundationExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33E041290BC7700E5B15B /* SKTFoundationExtras.m */; };
+		79911A5112CDAECD009D28C0 /* SKTGraphicView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33E061290BC7700E5B15B /* SKTGraphicView.m */; };
+		79911A5212CDAECD009D28C0 /* SKTGridPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33E081290BC7700E5B15B /* SKTGridPanelController.m */; };
+		79911A5312CDAECD009D28C0 /* SKTGridView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33E0A1290BC7700E5B15B /* SKTGridView.m */; };
+		79911A5412CDAECD009D28C0 /* SKTInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33E0C1290BC7700E5B15B /* SKTInspectorController.m */; };
+		79911A5512CDAECD009D28C0 /* SKTToolPaletteController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33E0E1290BC7700E5B15B /* SKTToolPaletteController.m */; };
 		79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A8128A48DF00EC0255 /* edit-redo.tiff */; };
 		79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A9128A48DF00EC0255 /* edit-undo.tiff */; };
 		79F122B1128A49FE00EC0255 /* history.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122B0128A49FE00EC0255 /* history.tiff */; };
@@ -286,8 +301,6 @@
 		66C33DFC1290BC7700E5B15B /* SKTRenderingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTRenderingView.m; sourceTree = "<group>"; };
 		66C33DFD1290BC7700E5B15B /* SKTTextArea.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKTTextArea.h; sourceTree = "<group>"; };
 		66C33DFE1290BC7700E5B15B /* SKTTextArea.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTTextArea.m; sourceTree = "<group>"; };
-		66C33DFF1290BC7700E5B15B /* SKTDrawAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKTDrawAppDelegate.h; sourceTree = "<group>"; };
-		66C33E001290BC7700E5B15B /* SKTDrawAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTDrawAppDelegate.m; sourceTree = "<group>"; };
 		66C33E011290BC7700E5B15B /* SKTDrawWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKTDrawWindowController.h; sourceTree = "<group>"; };
 		66C33E021290BC7700E5B15B /* SKTDrawWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTDrawWindowController.m; sourceTree = "<group>"; };
 		66C33E031290BC7700E5B15B /* SKTFoundationExtras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKTFoundationExtras.h; sourceTree = "<group>"; };
@@ -671,8 +684,6 @@
 			isa = PBXGroup;
 			children = (
 				66C33DEE1290BC7700E5B15B /* Model */,
-				66C33DFF1290BC7700E5B15B /* SKTDrawAppDelegate.h */,
-				66C33E001290BC7700E5B15B /* SKTDrawAppDelegate.m */,
 				66C33E011290BC7700E5B15B /* SKTDrawWindowController.h */,
 				66C33E021290BC7700E5B15B /* SKTDrawWindowController.m */,
 				66C33E031290BC7700E5B15B /* SKTFoundationExtras.h */,
@@ -957,6 +968,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				79911A4712CDAECD009D28C0 /* SKTCircle.m in Sources */,
+				79911A4812CDAECD009D28C0 /* SKTDrawDocument.m in Sources */,
+				79911A4912CDAECD009D28C0 /* SKTGraphic.m in Sources */,
+				79911A4A12CDAECD009D28C0 /* SKTImage.m in Sources */,
+				79911A4B12CDAECD009D28C0 /* SKTLine.m in Sources */,
+				79911A4C12CDAECD009D28C0 /* SKTRectangle.m in Sources */,
+				79911A4D12CDAECD009D28C0 /* SKTRenderingView.m in Sources */,
+				79911A4E12CDAECD009D28C0 /* SKTTextArea.m in Sources */,
+				79911A4F12CDAECD009D28C0 /* SKTDrawWindowController.m in Sources */,
+				79911A5012CDAECD009D28C0 /* SKTFoundationExtras.m in Sources */,
+				79911A5112CDAECD009D28C0 /* SKTGraphicView.m in Sources */,
+				79911A5212CDAECD009D28C0 /* SKTGridPanelController.m in Sources */,
+				79911A5312CDAECD009D28C0 /* SKTGridView.m in Sources */,
+				79911A5412CDAECD009D28C0 /* SKTInspectorController.m in Sources */,
+				79911A5512CDAECD009D28C0 /* SKTToolPaletteController.m in Sources */,
 				66C33D90128F449400E5B15B /* ItemReference.m in Sources */,
 				6686C046125CF9E70065DE1A /* CONetworkPeer.m in Sources */,
 				6686B80F125513D80065DE1A /* OutlineItem.m in Sources */,
