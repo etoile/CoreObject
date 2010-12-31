@@ -90,6 +90,7 @@
 		7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7991191412CD3F3C009D28C0 /* 2560x1600.jpg */; };
 		7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */ = {isa = PBXBuildFile; fileRef = 7991198512CD4B1A009D28C0 /* OverlayShelf.m */; };
 		7991198A12CD4B72009D28C0 /* stamp.png in Resources */ = {isa = PBXBuildFile; fileRef = 7991198912CD4B72009D28C0 /* stamp.png */; };
+		79911A0912CD974A009D28C0 /* Application.m in Sources */ = {isa = PBXBuildFile; fileRef = 79911A0812CD974A009D28C0 /* Application.m */; };
 		79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A8128A48DF00EC0255 /* edit-redo.tiff */; };
 		79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122A9128A48DF00EC0255 /* edit-undo.tiff */; };
 		79F122B1128A49FE00EC0255 /* history.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122B0128A49FE00EC0255 /* history.tiff */; };
@@ -309,6 +310,8 @@
 		7991198412CD4B1A009D28C0 /* OverlayShelf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OverlayShelf.h; sourceTree = "<group>"; };
 		7991198512CD4B1A009D28C0 /* OverlayShelf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OverlayShelf.m; sourceTree = "<group>"; };
 		7991198912CD4B72009D28C0 /* stamp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stamp.png; sourceTree = "<group>"; };
+		79911A0712CD974A009D28C0 /* Application.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Application.h; sourceTree = "<group>"; };
+		79911A0812CD974A009D28C0 /* Application.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Application.m; sourceTree = "<group>"; };
 		79F122A8128A48DF00EC0255 /* edit-redo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "edit-redo.tiff"; sourceTree = "<group>"; };
 		79F122A9128A48DF00EC0255 /* edit-undo.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "edit-undo.tiff"; sourceTree = "<group>"; };
 		79F122B0128A49FE00EC0255 /* history.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = history.tiff; sourceTree = "<group>"; };
@@ -454,6 +457,8 @@
 				6627ED9A12761EBC00E06946 /* CheckpointAsSheetController.m */,
 				6698320312691F970011C7FC /* SCRATCHPAD */,
 				6627EEDC1278A55A00E06946 /* README */,
+				79911A0712CD974A009D28C0 /* Application.h */,
+				79911A0812CD974A009D28C0 /* Application.m */,
 			);
 			path = ProjectDemo;
 			sourceTree = "<group>";
@@ -976,6 +981,7 @@
 				799118FD12CD3C82009D28C0 /* DesktopWindow.m in Sources */,
 				7991190512CD3D75009D28C0 /* ProjectNavWindow.m in Sources */,
 				7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */,
+				79911A0912CD974A009D28C0 /* Application.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

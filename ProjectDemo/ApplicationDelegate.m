@@ -40,6 +40,21 @@
 	[backButton retain];
 }
 
+- (void)showShelf: (id)sender
+{
+	[overlayShelf setIgnoresMouseEvents: NO];
+	[overlayShelf setAlphaValue:0.0];
+	[overlayShelf orderFront: sender];
+	[[overlayShelf animator] setAlphaValue:1.0];
+}
+
+- (void)hideShelf: (id)sender
+{
+	[overlayShelf setIgnoresMouseEvents: YES];
+	[[overlayShelf animator] setAlphaValue:0.0];
+}
+
+
 - (void)awakeFromNib
 {
 	context = [[COEditingContext alloc] initWithStoreCoordinator: 

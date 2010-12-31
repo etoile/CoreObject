@@ -48,6 +48,6 @@
 	<key>NSMainNibFile</key>
 	<string>ProjectDemoMainMenu</string>
 	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
+	<string>Application</string>
 </dict>
 </plist>
