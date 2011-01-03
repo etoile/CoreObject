@@ -1,7 +1,7 @@
 /*
    Copyright (C) 2007 David Chisnall
 
-   This application is free software; you can redistribute it and/or 
+   This application is free software; you can redistribute it and/or
    modify it under the terms of the MIT license. See COPYING.
 
 */
@@ -46,7 +46,7 @@
 	return nil;
 }
 
-/** Initializes and returns a new CoreObject proxy for handling the persistency 
+/** Initializes and returns a new CoreObject proxy for handling the persistency
     of anObject.
     A random UUID is automatically picked for the receiver.
     anObject must not be nil, otherwise an NSInvalidArgumentException is raised. */
@@ -66,24 +66,24 @@
 		return cachedObject; \
 	}
 
-/** <init />Initializes and returns a new CoreObject proxy for handling the 
+/** <init />Initializes and returns a new CoreObject proxy for handling the
     persistency of anObject known by aUUID.
-    If aUUID doesn't exist the metadata server bound to the current object 
-    context, the receiver is a fresh core object, whose object version is equal 
-    to 0 and immediately inserted in -[COObjectContext currentContext], then 
-    snapshotted. 
-    If the UUID is already in use in the metadata server and anObject is nil, 
-    the object server is asked for a matching cached object, if none is found, 
-    the current objet context is asked to load the object known for the given 
+    If aUUID doesn't exist the metadata server bound to the current object
+    context, the receiver is a fresh core object, whose object version is equal
+    to 0 and immediately inserted in -[COObjectContext currentContext], then
+    snapshotted.
+    If the UUID is already in use in the metadata server and anObject is nil,
+    the object server is asked for a matching cached object, if none is found,
+    the current objet context is asked to load the object known for the given
     UUID. The resulting object is then set as the object wrapped by the proxy.
-    Once you have obtained a core object proxy, you must install the persistency 
-    triggers for your model object by calling -setPersistencyMethodNames:. 
+    Once you have obtained a core object proxy, you must install the persistency
+    triggers for your model object by calling -setPersistencyMethodNames:.
 
     TODO: Implement the following error checks...
-    Either anObject or aUUID can be nil but not both at the same time, otherwise 
+    Either anObject or aUUID can be nil but not both at the same time, otherwise
     an NSInvalidArgumentException is raised.
-    In case anObject and aUUID are both different from nil, but the UUID is 
-    already exists in the metadata server, an NSInvalidArgumentException is also 
+    In case anObject and aUUID are both different from nil, but the UUID is
+    already exists in the metadata server, an NSInvalidArgumentException is also
     raised. */
 - (id) initWithObject: (id)anObject UUID: (ETUUID *)aUUID
 {
@@ -142,7 +142,7 @@
 	[self setUpCustomProxyClassIfNeeded];
 }
 
-/* Initializes objectContext and objectVersion by inserting the proxy in the 
+/* Initializes objectContext and objectVersion by inserting the proxy in the
    current object context. This creates the base version snapshot. */
 - (void) startPersistency
 {
@@ -153,10 +153,10 @@
 - (void) dealloc
 {
 	// NOTE: _objectContext is a weak reference
-	DESTROY(_object); 
-	DESTROY(_uuid); 
-	free(_persistencySelectors); 
-	_persistencySelectors = NULL; 
+	DESTROY(_object);
+	DESTROY(_uuid);
+	free(_persistencySelectors);
+	_persistencySelectors = NULL;
 	_persistencySelectorCount = -1;
 
 	[super dealloc];
@@ -195,19 +195,19 @@
 
 /** Returns YES.
     See NSObject(CoreObject). */
-- (BOOL) isCoreObjectProxy 
+- (BOOL) isCoreObjectProxy
 {
-	return YES; 
+	return YES;
 }
 
 /** Returns an array of all selectors names whose methods calls can trigger
-    persistency, by handing an invocation to the object context which can in  
+    persistency, by handing an invocation to the object context which can in
     turn record it and snapshot the receiver if necessary.
-    All messages which are persistency method calls are persisted only if 
-    necessary, so if such a message is sent by another managed object part of 
-    the same object context, it won't be recorded (see COObjectContext for a 
+    All messages which are persistency method calls are persisted only if
+    necessary, so if such a message is sent by another managed object part of
+    the same object context, it won't be recorded (see COObjectContext for a
     more thorough explanation).
-    -forwardInvocation: decides how to handle an invocation based on these  
+    -forwardInvocation: decides how to handle an invocation based on these
     returned method names. */
 - (NSArray *) persistencyMethodNames
 {
@@ -238,7 +238,7 @@
 	}
 }
 
-/** Returns whether aSelector matches a persistent method name declared in 
+/** Returns whether aSelector matches a persistent method name declared in
     -persistencyMethodNames.
     This method is called by -forwardInvocation:, therefore subclasses must not
     alter its current behavior, even if they extend it. */
@@ -246,23 +246,23 @@
 {
 	for (int i = 0; i < _persistencySelectorCount; i++)
 	{
-		if (sel_eq(_persistencySelectors[i], aSelector))
+		if (sel_isEqual(_persistencySelectors[i], aSelector))
 			return YES;
 	}
 
 	return NO;
 }
 
-/* Framework private method that returns the object wrapped by the proxy, used 
-   mostly by COObjectContext as the target for snapshots, invocation playback 
+/* Framework private method that returns the object wrapped by the proxy, used
+   mostly by COObjectContext as the target for snapshots, invocation playback
    and invocation forwarding. */
 - (id) _realObject
 {
 	return _object;
 }
 
-/* Framework private method that sets the object wrapped by the proxy, used 
-   mostly by COObjectContext as the target for replacing the wrapped object or 
+/* Framework private method that sets the object wrapped by the proxy, used
+   mostly by COObjectContext as the target for replacing the wrapped object or
    restoring a temporal instance. */
 - (void) _setRealObject: (id)anObject
 {
@@ -287,23 +287,23 @@
 	return _objectVersion;
 }
 
-/* Framework private method used on serialization and deserialization, either 
+/* Framework private method used on serialization and deserialization, either
    delta or snapshot. */
 - (void) _setObjectVersion: (int)aVersion
 {
 	_objectVersion = aVersion;
 }
 
-/** Restores the real object to the given object version if possible, then 
-   commits the restored version by taking a snapshot. Returns the current object 
-   version + 1 if the receiver has been successfully restored, otherwise returns 
-   -1. If no restore operation has been carried, the requested object version 
+/** Restores the real object to the given object version if possible, then
+   commits the restored version by taking a snapshot. Returns the current object
+   version + 1 if the receiver has been successfully restored, otherwise returns
+   -1. If no restore operation has been carried, the requested object version
    is already the current one, returns aVersion.
-   See -[COObjectContext objectByRestoringObject:toVersion:immediately: for 
+   See -[COObjectContext objectByRestoringObject:toVersion:immediately: for
    a detailed account of the restoration mechanism. */
 - (int) restoreObjectToVersion: (int)aVersion
 {
-	id restoredObject = [[self objectContext] objectByRestoringObject: self 
+	id restoredObject = [[self objectContext] objectByRestoringObject: self
 	                                                        toVersion: aVersion
 	                                                 mergeImmediately: YES];
 
@@ -321,7 +321,7 @@
 	return _objectContext;
 }
 
-/* Framework private method used only by COObjectContext on insertion/removal of 
+/* Framework private method used only by COObjectContext on insertion/removal of
    objects. */
 - (void) setObjectContext: (COObjectContext *)ctxt
 {
@@ -362,38 +362,38 @@ More explanations in -forwardInvocation:.
 
 Alternative possibilities, we don't use:
     - reimplement NSObject and NSProxy methods to bypass -forwardInvocation:
-    - synthetize methods at runtime for each methods declared in 
+    - synthetize methods at runtime for each methods declared in
       -persistencyMethodNames
-    - macros to help the developer to manually syntethize persistency methods at 
-      compile time. */ 
+    - macros to help the developer to manually syntethize persistency methods at
+      compile time. */
 - (id) forwardingTargetForSelector: (SEL)aSelector
 {
 	return [self isPersistencySelector: aSelector] ? nil : _object;
 }
 
 /** Forwards the invocation to the real object after serializing it. Every few
-invocations, it will also save a full copy of the object, see 
+invocations, it will also save a full copy of the object, see
 -[COObjectContext setSnapshotTimeInterval:] to specify a custom interval.
 
 See also -[COObjectContext recordInvocation:] to understand the persistency
 mechanism in details.
 
-When a message is only implemented by the real object but doesn't trigger 
-persistency, when the runtime supports it (e.g. GNUstep libobjc2) 
+When a message is only implemented by the real object but doesn't trigger
+persistency, when the runtime supports it (e.g. GNUstep libobjc2)
 -forwardingTargetForSelector: is used to speed up the execution.
 
-Note: A tricky point is that both the proxy and the real object must react to 
-introspection correctly (as a single object). Unknown messages that neither the 
-proxy or the real object implement must also result in an unknown selector 
+Note: A tricky point is that both the proxy and the real object must react to
+introspection correctly (as a single object). Unknown messages that neither the
+proxy or the real object implement must also result in an unknown selector
 exception as expected. */
 - (void) forwardInvocation: (NSInvocation *)anInvocation
 {
 	SEL selector = [anInvocation selector];
 
-	/* For instropection, we pass messages such as -isKindOfClass: to the real 
+	/* For instropection, we pass messages such as -isKindOfClass: to the real
 	   object. By default -[NSProxy isKindOfClass:] calls -forwardInvocation:.
-	   We do the same for NSObject methods such as -descriptionWithLocale:, 
-	   -isGroup etc. not implemented by NSProxy and which must not be recorded 
+	   We do the same for NSObject methods such as -descriptionWithLocale:,
+	   -isGroup etc. not implemented by NSProxy and which must not be recorded
 	   but just forwarded. */
 	if ([[self class] respondsToSelector: selector]
 	 || [NSObject instancesRespondToSelector: selector])
@@ -411,18 +411,18 @@ exception as expected. */
 		if (_objectVersion != prevObjectVersion)
 			[_objectContext endRecord];
 	}
-	else 
+	else
 	{
-		/* We also forwards if -respondsToSelector: has returned NO, 
+		/* We also forwards if -respondsToSelector: has returned NO,
 		   -doesNotRecognizeSelector: will called on the real object then. */
 		[anInvocation invokeWithTarget: _object];
 	}
 }
 
-/** Initializes the receiver as a fault whose real object is bound to the fault 
+/** Initializes the receiver as a fault whose real object is bound to the fault
 description.
 
-Doesn't load the real object unlike other initializers. 
+Doesn't load the real object unlike other initializers.
 
 The class argument is ignored since COProxy doesn't support -futureClass. */
 - (id) initWithFaultDescription: (NSDictionary *)aFaultDesc futureClassName: (NSString *)aFutureClassName
@@ -431,7 +431,7 @@ The class argument is ignored since COProxy doesn't support -futureClass. */
 
 	LOOKUP_CACHED_OBJECT_AND_RETURN_ON_SUCCESS;
 
-	COObjectContext *context = AUTORELEASE([(COObjectContext *)[COObjectContext alloc] initWithUUID: 
+	COObjectContext *context = AUTORELEASE([(COObjectContext *)[COObjectContext alloc] initWithUUID:
 		[aFaultDesc objectForKey: kCOContextCoreMetadata]]);
 
 	ASSIGN(_uuid, aUUID);
@@ -441,7 +441,7 @@ The class argument is ignored since COProxy doesn't support -futureClass. */
 	return self;
 }
 
-/** Returns whether the real object has to be loaded. 
+/** Returns whether the real object has to be loaded.
 
 See COFault protocol. */
 - (BOOL) isFault
@@ -460,7 +460,7 @@ See COFault protocol. */
 /** Loads the real object wrapped by the proxy and enables the persistency.
 
 If -isFault returns NO, does nothing.
- 
+
 If the loading fails, logs a warning.
 
 Warning: returns nil in all cases currently. */
