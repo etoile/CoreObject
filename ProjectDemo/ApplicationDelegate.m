@@ -277,4 +277,9 @@
 	[sharingController shareWithInspectorForDocument: doc];
 }
 
+- (void)showSearchResults: (id)sender
+{
+	[searchWindow orderFront: self];
+}
+
 @end

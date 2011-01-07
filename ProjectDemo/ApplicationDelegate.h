@@ -12,6 +12,7 @@
 {
 	IBOutlet NSWindow *newDocumentTypeWindow;
 	IBOutlet NSWindow *networkWindow;
+	IBOutlet NSWindow *searchWindow;
 	
 	IBOutlet SharingController *sharingController;
 	IBOutlet NetworkController *networkController;
@@ -46,5 +47,7 @@
 - (IBAction)deleteProject: (id)sender;
 
 - (OutlineController*)controllerForDocumentRootObject: (COObject*)rootObject;
+
+- (void)showSearchResults: (id)sender;
 
 @end

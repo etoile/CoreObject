@@ -1,7 +1,8 @@
 #import "ProjectNavWindow.h"
 
-@interface ScreenEdgeView : NSView
+@interface ScreenEdgeView : NSView <NSTextFieldDelegate>
 {
+	NSSearchField *search;
 }
 
 @end
@@ -12,11 +13,15 @@
 {
 	self = [super initWithFrame: frameRect];
 	
-	[self addSubview: [[NSButton alloc] initWithFrame: NSMakeRect(0,0,100,100)]];
+	search = [[[NSSearchField alloc] initWithFrame: NSMakeRect(0,000,100,20)] autorelease];
+	[search setDelegate: self];
+	[self addSubview: search];
 	
-	[self registerForDraggedTypes: [NSArray arrayWithObjects:
+	//[self addSubview: [[[NSButton alloc] initWithFrame: NSMakeRect(0,600,100,20)] autorelease]];
+	
+	/*[self registerForDraggedTypes: [NSArray arrayWithObjects:
 									NSPasteboardTypeString,
-									nil]];
+									nil]];*/
 	
 	return self;
 }
@@ -25,6 +30,13 @@
 {
 	NSLog(@"Entered");
 	return NSDragOperationCopy;
+}
+
+- (void)controlTextDidChange:(NSNotification *)aNotification
+{
+	NSLog(@"%@", [search stringValue]);
+	
+	[[NSApp delegate] showSearchResults: nil];
 }
 
 @end
@@ -59,10 +71,13 @@
 	
 	NSView *view = [[[ScreenEdgeView alloc] initWithFrame: NSMakeRect(0, 0, frame.size.width, frame.size.height)] autorelease];
 	[self setContentView: view];
-	
 	[self orderFront: nil];	
 	
 	return self;
+}
+- (BOOL) canBecomeKeyWindow
+{
+	return YES;
 }
 
 @end

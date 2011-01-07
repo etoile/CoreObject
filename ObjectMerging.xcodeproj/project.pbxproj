@@ -451,6 +451,7 @@
 		66708FEF124870CB00E65F00 /* ProjectDemo */ = {
 			isa = PBXGroup;
 			children = (
+				66E8EE0C12D673BB00780264 /* Search Window */,
 				7991197F12CD4AA9009D28C0 /* Overlay Shelf */,
 				7991190212CD3D36009D28C0 /* Project Navigator */,
 				799118F812CD3C63009D28C0 /* Desktop */,
@@ -723,6 +724,13 @@
 				66C33DFE1290BC7700E5B15B /* SKTTextArea.m */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		66E8EE0C12D673BB00780264 /* Search Window */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Search Window";
 			sourceTree = "<group>";
 		};
 		792BF914124FBAD00040BF68 /* Products */ = {
