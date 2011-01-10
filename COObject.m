@@ -475,7 +475,10 @@ static void GatherAllStronglyContainedObjects(id object, NSMutableArray *dest)
 
 - (void) setModified
 {
-	[[self objectContext] markObjectUUIDChanged: [self uuid]];
+	if (!_isUnfaulting)
+	{
+		[[self objectContext] markObjectUUIDChanged: [self uuid]];
+	}
 }
 
 @end
@@ -670,16 +673,23 @@ NSArray *COArrayPropertyListForArray(NSArray *array)
 	assert([[data objectForKey:@"entity"] isEqual: [[self modelDescription] fullName]]);
 	
 	_isFault = NO;
+	_isUnfaulting = YES;
+	assert(![[self objectContext] objectHasChanges: [self uuid]]);
 	
 	NSDictionary *keysAndValues = [data valueForKey: @"keysAndValues"];
 	for (NSString *key in [keysAndValues allKeys])
 	{
+		assert(![[self objectContext] objectHasChanges: [self uuid]]);
 		// NOTE: This must not case change notifications, which is why we call privateSetValue:forProperty:
 		[self privateSetValue: [self parsePropertyList: [keysAndValues objectForKey: key]]
 				  forProperty: key];
+		assert(![[self objectContext] objectHasChanges: [self uuid]]);
 	}
 	
 	[self didAwaken];
+	
+	assert(![[self objectContext] objectHasChanges: [self uuid]]);
+	_isUnfaulting = NO;
 }
 
 @end

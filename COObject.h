@@ -30,6 +30,7 @@
 	COEditingContext *_ctx;
 	ETUUID *_uuid;
 	ETEntityDescription *_description;
+	BOOL _isUnfaulting;
 }
 
 // Public
