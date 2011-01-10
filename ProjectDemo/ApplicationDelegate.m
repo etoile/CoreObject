@@ -230,6 +230,13 @@
 
 /* Project delegate */
 
+- (void)keyDocumentChanged: (NSNotification*)notif
+{
+	NSLog(@"Key document changed to: %@", [self keyDocumentController]);
+	
+	// FIXME: update inspectors
+}
+
 - (void)projectDocumentsDidChange: (Project*)p
 {
 	NSLog(@"projectDocumentsDidChange: called, loading %d documents", (int)[[p documents] count]);
@@ -261,12 +268,20 @@
 			controller = [[[cls alloc] initWithDocument: doc] autorelease];
 			[controller showWindow: nil];
 			[controllerForDocumentUUID setObject: controller forKey: [doc uuid]];
+			// Observe key document changes
+			[[NSNotificationCenter defaultCenter] addObserver: self
+													 selector: @selector(keyDocumentChanged:)
+														 name: NSWindowDidBecomeKeyNotification
+													   object: [controller window]];
 		}
 	}
 	
 	for (ETUUID *unwanted in unwantedDocumentUUIDs)
 	{
 		NSWindow *window = [[controllerForDocumentUUID objectForKey: unwanted] window];
+		[[NSNotificationCenter defaultCenter] removeObserver: self
+														name: NSWindowDidBecomeKeyNotification
+													  object: window];
 		[window orderOut: nil];
 		[controllerForDocumentUUID removeObjectForKey: unwanted];
 	}
