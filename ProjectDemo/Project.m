@@ -1,6 +1,5 @@
 #import "Project.h"
 
-
 @implementation Project
 
 @synthesize delegate; // notification hack - remove when we can use KVO
@@ -14,8 +13,13 @@
 		ETPropertyDescription *documentsProperty = [ETPropertyDescription descriptionWithName: @"documents"
 																						 type: (id)@"Document"];
 		[documentsProperty setMultivalued: YES];
+
+		[Tag class];
+		ETPropertyDescription *tagsProperty = [ETPropertyDescription descriptionWithName: @"tags"
+																						 type: (id)@"Tag"];
+		[tagsProperty setMultivalued: YES];
 		
-		[entity setPropertyDescriptions: A(documentsProperty)];
+		[entity setPropertyDescriptions: A(documentsProperty, tagsProperty)];
 		
 		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: entity];
 		[[ETModelDescriptionRepository mainRepository] setEntityDescription: entity
@@ -45,6 +49,24 @@
 	[self didChangeValueForProperty: @"documents"];
 	
 	[delegate projectDocumentsDidChange: self];// notification hack - remove when we can use KVO
+}
+
+- (NSSet*) tags
+{
+	[self willAccessValueForProperty: @"tags"];
+	return tags;
+}
+- (void) addTag: (Tag *)tag
+{
+	[self willChangeValueForProperty: @"tags"];
+	[tags addObject: tag];
+	[self didChangeValueForProperty: @"tags"];
+}
+- (void) removeTag: (Tag *)tag
+{
+	[self willChangeValueForProperty: @"tags"];
+	[tags removeObject: tag];
+	[self didChangeValueForProperty: @"tags"];
 }
 
 - (void)didAwaken

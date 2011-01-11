@@ -116,6 +116,7 @@
 		79F122C5128A4B7800EC0255 /* format-indent-more.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122C2128A4B7800EC0255 /* format-indent-more.tiff */; };
 		79F122C6128A4B7800EC0255 /* list-add.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122C3128A4B7800EC0255 /* list-add.tiff */; };
 		79FC089012DBE8E300DE3C18 /* TagWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 79FC088F12DBE8E300DE3C18 /* TagWindowController.m */; };
+		79FC08D812DC008C00DE3C18 /* Tag.m in Sources */ = {isa = PBXBuildFile; fileRef = 79FC08D712DC008C00DE3C18 /* Tag.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -338,6 +339,8 @@
 		79F122C3128A4B7800EC0255 /* list-add.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "list-add.tiff"; sourceTree = "<group>"; };
 		79FC088E12DBE8E300DE3C18 /* TagWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TagWindowController.h; sourceTree = "<group>"; };
 		79FC088F12DBE8E300DE3C18 /* TagWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagWindowController.m; sourceTree = "<group>"; };
+		79FC08D612DC008C00DE3C18 /* Tag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tag.h; sourceTree = "<group>"; };
+		79FC08D712DC008C00DE3C18 /* Tag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tag.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* ProjectDemo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ProjectDemo-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -531,6 +534,8 @@
 				6686BEEA12593D900065DE1A /* Document.m */,
 				66C33D6F128F395400E5B15B /* ItemReference.h */,
 				66C33D70128F395400E5B15B /* ItemReference.m */,
+				79FC08D612DC008C00DE3C18 /* Tag.h */,
+				79FC08D712DC008C00DE3C18 /* Tag.m */,
 			);
 			name = "Model Objects";
 			sourceTree = "<group>";
@@ -1030,6 +1035,7 @@
 				7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */,
 				79911A0912CD974A009D28C0 /* Application.m in Sources */,
 				79FC089012DBE8E300DE3C18 /* TagWindowController.m in Sources */,
+				79FC08D812DC008C00DE3C18 /* Tag.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

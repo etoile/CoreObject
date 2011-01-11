@@ -298,4 +298,9 @@
 	[searchWindow orderFront: self];
 }
 
+- (Project *)project
+{
+	return project;
+}
+
 @end

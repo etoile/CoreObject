@@ -52,4 +52,6 @@
 
 - (void)showSearchResults: (id)sender;
 
+- (Project *)project;
+
 @end
