@@ -3,10 +3,11 @@
 //
 
 #import <AppKit/AppKit.h>
+#import "COObject.h"
 
 @class SKTGraphic;
 
-@interface SKTDrawDocument : NSObject {
+@interface SKTDrawDocument : COObject {
     @private
     NSMutableArray *_graphics;
 }

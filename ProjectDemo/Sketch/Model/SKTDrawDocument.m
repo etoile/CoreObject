@@ -22,12 +22,58 @@ NSString *SKTDrawDocumentType = @"Apple Sketch Graphic Format";
 
 @implementation SKTDrawDocument
 
-- (id)init {
-    self = [super init];
++ (void)initialize
+{
+	if (self == [SKTDrawDocument class])
+	{
+		ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
+
+		// SKTDrawDocument metamodel
+		{
+			ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTDrawDocument"];
+			
+			ETPropertyDescription *graphicsProperty = [ETPropertyDescription descriptionWithName: @"graphics"
+																							  type: (id)@"SKTGraphic"];
+			[graphicsProperty setMultivalued: YES];
+			[graphicsProperty setOrdered: YES];
+			[graphicsProperty setOpposite: (id)@"SKTGraphic.document"];
+			
+			[entity setPropertyDescriptions: A(graphicsProperty)];
+			
+			[repo addUnresolvedDescription: entity];
+			
+			[repo setEntityDescription: entity
+							  forClass: [SKTDrawDocument class]];
+		}
+		
+		// SKTGraphic metamodel
+		{
+			ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTGraphic"];
+			
+			ETPropertyDescription *documentProperty = [ETPropertyDescription descriptionWithName: @"document"
+																							type: (id)@"SKTDrawDocument"];
+			[documentProperty setOpposite: (id)@"SKTDrawDocument.graphics"];
+			[documentProperty setIsContainer: YES];
+			
+			[entity setPropertyDescriptions: A(documentProperty)];
+			
+			[repo addUnresolvedDescription: entity];
+			
+			[repo setEntityDescription: entity
+							  forClass: [SKTGraphic class]];
+		}
+	
+		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
+	}
+}
+
+- (id)initWithContext: (COEditingContext*)ctx
+{
+	self = [super initWithContext: ctx];
     if (self) {
         _graphics = [[NSMutableArray allocWithZone:[self zone]] init];
     }
-    return self;
+	return self;
 }
 
 - (void)dealloc {
@@ -128,7 +174,7 @@ static int SKTCurrentDrawDocumentVersion = 1;
 
 - (NSSize)documentSize
 {
-	return [self drawingBoundsForGraphics: _graphics].size;
+	return [self drawingBoundsForGraphics: [self graphics]].size;
 }
 
 - (NSData *)TIFFRepresentationForGraphics:(NSArray *)graphics error:(NSError **)outError {
@@ -236,11 +282,12 @@ static int SKTCurrentDrawDocumentVersion = 1;
 }
 
 - (NSArray *)graphics {
+	[self willAccessValueForProperty: @"graphics"];
     return _graphics;
 }
 
 - (void)setGraphics:(NSArray *)graphics {
-    unsigned i = [_graphics count];
+    unsigned i = [[self graphics] count];
     while (i-- > 0) {
         [self removeGraphicAtIndex:i];
     }
@@ -257,353 +304,47 @@ static int SKTCurrentDrawDocumentVersion = 1;
 
 - (void)insertGraphic:(SKTGraphic *)graphic atIndex:(unsigned)index {
     //[[[self undoManager] prepareWithInvocationTarget:self] removeGraphicAtIndex:index];
+	[self willChangeValueForProperty: @"graphics"];
     [_graphics insertObject:graphic atIndex:index];
+	[self didChangeValueForProperty: @"graphics"];
     [graphic setDocument:self];
     [self invalidateGraphic:graphic];
 }
 
 - (void)removeGraphicAtIndex:(unsigned)index {
-    id graphic = [[_graphics objectAtIndex:index] retain];
+    id graphic = [[[self graphics] objectAtIndex:index] retain];
+	[self willChangeValueForProperty: @"graphics"];
     [_graphics removeObjectAtIndex:index];
+	[self didChangeValueForProperty: @"graphics"];
+	
     [self invalidateGraphic:graphic];
     //[[[self undoManager] prepareWithInvocationTarget:self] insertGraphic:graphic atIndex:index];
     [graphic release];
 }
 
 - (void)removeGraphic:(SKTGraphic *)graphic {
-    NSInteger index = [_graphics indexOfObjectIdenticalTo:graphic];
+    NSInteger index = [[self graphics] indexOfObjectIdenticalTo:graphic];
     if (index != NSNotFound) {
         [self removeGraphicAtIndex:index];
     }
 }
 
 - (void)moveGraphic:(SKTGraphic *)graphic toIndex:(unsigned)newIndex {
-    unsigned curIndex = [_graphics indexOfObjectIdenticalTo:graphic];
+    unsigned curIndex = [[self graphics] indexOfObjectIdenticalTo:graphic];
     if (curIndex != newIndex) {
         //[[[self undoManager] prepareWithInvocationTarget:self] moveGraphic:graphic toIndex:((curIndex > newIndex) ? curIndex+1 : curIndex)];
         if (curIndex < newIndex) {
             newIndex--;
         }
         [graphic retain];
+		
+		[self willChangeValueForProperty: @"graphics"];
         [_graphics removeObjectAtIndex:curIndex];
         [_graphics insertObject:graphic atIndex:newIndex];
+		[self didChangeValueForProperty: @"graphics"];
+		
         [graphic release];
         [self invalidateGraphic:graphic];
-    }
-}
-
-@end
-
-@implementation SKTDrawDocument (SKTScriptingExtras)
-
-// These are methods that we probably wouldn't bother with if we weren't scriptable.
-
-// graphics and setGraphics: are already implemented above.
-
-- (void)addInGraphics:(SKTGraphic *)graphic {
-    [self insertGraphic:graphic atIndex:[[self graphics] count]];
-}
-
-- (void)insertInGraphics:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    [self insertGraphic:graphic atIndex:index];
-}
-
-- (void)removeFromGraphicsAtIndex:(unsigned)index {
-    [self removeGraphicAtIndex:index];
-}
-
-- (void)replaceInGraphics:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    [self removeGraphicAtIndex:index];
-    [self insertGraphic:graphic atIndex:index];
-}
-
-- (NSArray *)graphicsWithClass:(Class)theClass {
-    NSArray *graphics = [self graphics];
-    NSMutableArray *result = [NSMutableArray array];
-    unsigned i, c = [graphics count];
-    id curGraphic;
-
-    for (i=0; i<c; i++) {
-        curGraphic = [graphics objectAtIndex:i];
-        if ([curGraphic isKindOfClass:theClass]) {
-            [result addObject:curGraphic];
-        }
-    }
-    return result;
-}
-
-- (NSArray *)rectangles {
-    return [self graphicsWithClass:[SKTRectangle class]];
-}
-
-- (NSArray *)circles {
-    return [self graphicsWithClass:[SKTCircle class]];
-}
-
-- (NSArray *)lines {
-    return [self graphicsWithClass:[SKTLine class]];
-}
-
-- (NSArray *)textAreas {
-    return [self graphicsWithClass:[SKTTextArea class]];
-}
-
-- (NSArray *)images {
-    return [self graphicsWithClass:[SKTImage class]];
-}
-
-- (void)setRectangles:(NSArray *)rects {
-    // We won't allow wholesale setting of these subset keys.
-    [NSException raise: @"NSOperationNotSupportedForKeyException" format:@"Setting 'rectangles' key is not supported."];
-}
-
-- (void)addInRectangles:(SKTGraphic *)graphic {
-    [self addInGraphics:graphic];
-}
-
-- (void)insertInRectangles:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    // MF:!!! This is not going to be ideal.  If we are being asked to, say, "make a new rectangle at after rectangle 2", we will be after rectangle 2, but we may be after some other stuff as well since we will be asked to insertInRectangles:atIndex:3...
-    NSArray *rects = [self rectangles];
-    if (index == [rects count]) {
-        [self addInGraphics:graphic];
-    } else {
-        NSArray *graphics = [self graphics];
-        NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[rects objectAtIndex:index]];
-        if (newIndex != NSNotFound) {
-            [self insertGraphic:graphic atIndex:newIndex];
-        } else {
-            // Shouldn't happen.
-            [NSException raise:NSRangeException format:@"Could not find the given rectangle in the graphics."];
-        }
-    }
-}
-
-- (void)removeFromRectanglesAtIndex:(unsigned)index {
-    NSArray *rects = [self rectangles];
-    NSArray *graphics = [self graphics];
-    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[rects objectAtIndex:index]];
-    if (newIndex != NSNotFound) {
-        [self removeGraphicAtIndex:newIndex];
-    } else {
-        // Shouldn't happen.
-        [NSException raise:NSRangeException format:@"Could not find the given rectangle in the graphics."];
-    }
-}
-
-- (void)replaceInRectangles:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    NSArray *rects = [self rectangles];
-    NSArray *graphics = [self graphics];
-    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[rects objectAtIndex:index]];
-    if (newIndex != NSNotFound) {
-        [self removeGraphicAtIndex:newIndex];
-        [self insertGraphic:graphic atIndex:newIndex];
-    } else {
-        // Shouldn't happen.
-        [NSException raise:NSRangeException format:@"Could not find the given rectangle in the graphics."];
-    }
-}
-
-- (void)setCircles:(NSArray *)circles {
-    // We won't allow wholesale setting of these subset keys.
-    [NSException raise: @"NSOperationNotSupportedForKeyException" format:@"Setting 'circles' key is not supported."];
-}
-
-- (void)addInCircles:(SKTGraphic *)graphic {
-    [self addInGraphics:graphic];
-}
-
-- (void)insertInCircles:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    // MF:!!! This is not going to be ideal.  If we are being asked to, say, "make a new rectangle at after rectangle 2", we will be after rectangle 2, but we may be after some other stuff as well since we will be asked to insertInCircles:atIndex:3...
-    NSArray *circles = [self circles];
-    if (index == [circles count]) {
-        [self addInGraphics:graphic];
-    } else {
-        NSArray *graphics = [self graphics];
-        NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[circles objectAtIndex:index]];
-        if (newIndex != NSNotFound) {
-            [self insertGraphic:graphic atIndex:newIndex];
-        } else {
-            // Shouldn't happen.
-            [NSException raise:NSRangeException format:@"Could not find the given circle in the graphics."];
-        }
-    }
-}
-
-- (void)removeFromCirclesAtIndex:(unsigned)index {
-    NSArray *circles = [self circles];
-    NSArray *graphics = [self graphics];
-    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[circles objectAtIndex:index]];
-    if (newIndex != NSNotFound) {
-        [self removeGraphicAtIndex:newIndex];
-    } else {
-        // Shouldn't happen.
-        [NSException raise:NSRangeException format:@"Could not find the given circle in the graphics."];
-    }
-}
-
-- (void)replaceInCircles:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    NSArray *circles = [self circles];
-    NSArray *graphics = [self graphics];
-    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[circles objectAtIndex:index]];
-    if (newIndex != NSNotFound) {
-        [self removeGraphicAtIndex:newIndex];
-        [self insertGraphic:graphic atIndex:newIndex];
-    } else {
-        // Shouldn't happen.
-        [NSException raise:NSRangeException format:@"Could not find the given circle in the graphics."];
-    }
-}
-
-- (void)setLines:(NSArray *)lines {
-    // We won't allow wholesale setting of these subset keys.
-    [NSException raise: @"NSOperationNotSupportedForKeyException" format:@"Setting 'lines' key is not supported."];
-}
-
-- (void)addInLines:(SKTGraphic *)graphic {
-    [self addInGraphics:graphic];
-}
-
-- (void)insertInLines:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    // MF:!!! This is not going to be ideal.  If we are being asked to, say, "make a new rectangle at after rectangle 2", we will be after rectangle 2, but we may be after some other stuff as well since we will be asked to insertInLines:atIndex:3...
-    NSArray *lines = [self lines];
-    if (index == [lines count]) {
-        [self addInGraphics:graphic];
-    } else {
-        NSArray *graphics = [self graphics];
-        NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[lines objectAtIndex:index]];
-        if (newIndex != NSNotFound) {
-            [self insertGraphic:graphic atIndex:newIndex];
-        } else {
-            // Shouldn't happen.
-            [NSException raise:NSRangeException format:@"Could not find the given line in the graphics."];
-        }
-    }
-}
-
-- (void)removeFromLinesAtIndex:(unsigned)index {
-    NSArray *lines = [self lines];
-    NSArray *graphics = [self graphics];
-    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[lines objectAtIndex:index]];
-    if (newIndex != NSNotFound) {
-        [self removeGraphicAtIndex:newIndex];
-    } else {
-        // Shouldn't happen.
-        [NSException raise:NSRangeException format:@"Could not find the given line in the graphics."];
-    }
-}
-
-- (void)replaceInLines:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    NSArray *lines = [self lines];
-    NSArray *graphics = [self graphics];
-    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[lines objectAtIndex:index]];
-    if (newIndex != NSNotFound) {
-        [self removeGraphicAtIndex:newIndex];
-        [self insertGraphic:graphic atIndex:newIndex];
-    } else {
-        // Shouldn't happen.
-        [NSException raise:NSRangeException format:@"Could not find the given line in the graphics."];
-    }
-}
-
-- (void)setTextAreas:(NSArray *)textAreas {
-    // We won't allow wholesale setting of these subset keys.
-    [NSException raise: @"NSOperationNotSupportedForKeyException" format:@"Setting 'textAreas' key is not supported."];
-}
-
-- (void)addInTextAreas:(SKTGraphic *)graphic {
-    [self addInGraphics:graphic];
-}
-
-- (void)insertInTextAreas:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    // MF:!!! This is not going to be ideal.  If we are being asked to, say, "make a new rectangle at after rectangle 2", we will be after rectangle 2, but we may be after some other stuff as well since we will be asked to insertInTextAreas:atIndex:3...
-    NSArray *textAreas = [self textAreas];
-    if (index == [textAreas count]) {
-        [self addInGraphics:graphic];
-    } else {
-        NSArray *graphics = [self graphics];
-        NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[textAreas objectAtIndex:index]];
-        if (newIndex != NSNotFound) {
-            [self insertGraphic:graphic atIndex:newIndex];
-        } else {
-            // Shouldn't happen.
-            [NSException raise:NSRangeException format:@"Could not find the given text area in the graphics."];
-        }
-    }
-}
-
-- (void)removeFromTextAreasAtIndex:(unsigned)index {
-    NSArray *textAreas = [self textAreas];
-    NSArray *graphics = [self graphics];
-    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[textAreas objectAtIndex:index]];
-    if (newIndex != NSNotFound) {
-        [self removeGraphicAtIndex:newIndex];
-    } else {
-        // Shouldn't happen.
-        [NSException raise:NSRangeException format:@"Could not find the given text area in the graphics."];
-    }
-}
-
-- (void)replaceInTextAreas:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    NSArray *textAreas = [self textAreas];
-    NSArray *graphics = [self graphics];
-    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[textAreas objectAtIndex:index]];
-    if (newIndex != NSNotFound) {
-        [self removeGraphicAtIndex:newIndex];
-        [self insertGraphic:graphic atIndex:newIndex];
-    } else {
-        // Shouldn't happen.
-        [NSException raise:NSRangeException format:@"Could not find the given text area in the graphics."];
-    }
-}
-
-- (void)setImages:(NSArray *)images {
-    // We won't allow wholesale setting of these subset keys.
-    [NSException raise: @"NSOperationNotSupportedForKeyException" format:@"Setting 'images' key is not supported."];
-}
-
-- (void)addInImages:(SKTGraphic *)graphic {
-    [self addInGraphics:graphic];
-}
-
-- (void)insertInImages:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    // MF:!!! This is not going to be ideal.  If we are being asked to, say, "make a new rectangle at after rectangle 2", we will be after rectangle 2, but we may be after some other stuff as well since we will be asked to insertInImages:atIndex:3...
-    NSArray *images = [self images];
-    if (index == [images count]) {
-        [self addInGraphics:graphic];
-    } else {
-        NSArray *graphics = [self graphics];
-        NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[images objectAtIndex:index]];
-        if (newIndex != NSNotFound) {
-            [self insertGraphic:graphic atIndex:newIndex];
-        } else {
-            // Shouldn't happen.
-            [NSException raise:NSRangeException format:@"Could not find the given image in the graphics."];
-        }
-    }
-}
-
-- (void)removeFromImagesAtIndex:(unsigned)index {
-    NSArray *images = [self images];
-    NSArray *graphics = [self graphics];
-    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[images objectAtIndex:index]];
-    if (newIndex != NSNotFound) {
-        [self removeGraphicAtIndex:newIndex];
-    } else {
-        // Shouldn't happen.
-        [NSException raise:NSRangeException format:@"Could not find the given image in the graphics."];
-    }
-}
-
-- (void)replaceInImages:(SKTGraphic *)graphic atIndex:(unsigned)index {
-    NSArray *images = [self images];
-    NSArray *graphics = [self graphics];
-    NSInteger newIndex = [graphics indexOfObjectIdenticalTo:[images objectAtIndex:index]];
-    if (newIndex != NSNotFound) {
-        [self removeGraphicAtIndex:newIndex];
-        [self insertGraphic:graphic atIndex:newIndex];
-    } else {
-        // Shouldn't happen.
-        [NSException raise:NSRangeException format:@"Could not find the given image in the graphics."];
     }
 }
 

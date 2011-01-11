@@ -8,9 +8,27 @@
 
 @implementation SKTTextArea
 
-- (id)init 
++ (void)initialize
 {
-	self = [super init];
+	if (self == [SKTTextArea class])
+	{
+		ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
+		ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTTextArea"];
+		
+		// FIXME: 
+		
+		[repo addUnresolvedDescription: entity];
+		
+		[repo setEntityDescription: entity
+						  forClass: [SKTTextArea class]];		
+		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
+	}
+}
+
+
+- (id)initWithContext: (COEditingContext*)ctx
+{
+	self = [super initWithContext: ctx];
 	if (self) 
 	{
 		_contents = [[NSTextStorage allocWithZone:[self zone]] init];

@@ -8,6 +8,27 @@
 
 @implementation SKTLine
 
++ (void)initialize
+{
+	if (self == [SKTLine class])
+	{
+		ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
+		ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTLine"];
+		
+		ETPropertyDescription *startsAtLowerLeftProperty = [ETPropertyDescription descriptionWithName: @"startsAtLowerLeft"
+																						type: (id)@"Anonymous.NSNumber"];
+		
+		[entity setPropertyDescriptions: A(startsAtLowerLeftProperty)];
+		
+		
+		[repo addUnresolvedDescription: entity];
+		
+		[repo setEntityDescription: entity
+						  forClass: [SKTLine class]];		
+		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
+	}
+}
+
 - (id)copyWithZone:(NSZone *)zone {
     id newObj = [super copyWithZone:zone];
 

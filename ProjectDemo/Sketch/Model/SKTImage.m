@@ -6,6 +6,23 @@
 
 @implementation SKTImage
 
++ (void)initialize
+{
+	if (self == [SKTImage class])
+	{
+		ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
+		ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTImage"];
+		
+		// FIXME: image data property
+		
+		[repo addUnresolvedDescription: entity];
+		
+		[repo setEntityDescription: entity
+						  forClass: [SKTImage class]];		
+		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
+	}
+}
+
 - (id)init {
     self = [super init];
     if (self) {

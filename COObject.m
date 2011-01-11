@@ -111,6 +111,12 @@
 	return [self initWithModelDescription:nil context:ctx];
 }
 
+- (id) init
+{
+	assert(0); // You have to use initWithContext:
+	return nil;
+}
+
 - (void) dealloc
 {
 	DESTROY(_ctx);

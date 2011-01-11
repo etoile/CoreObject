@@ -6,6 +6,22 @@
 
 @implementation SKTCircle
 
++ (void)initialize
+{
+	if (self == [SKTCircle class])
+	{
+		ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
+		ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTCircle"];
+		
+		[repo addUnresolvedDescription: entity];
+		
+		[repo setEntityDescription: entity
+						  forClass: [SKTCircle class]];		
+		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
+	}
+}
+
+
 - (NSBezierPath *)bezierPath {
     NSBezierPath *path = [NSBezierPath bezierPathWithOvalInRect:[self bounds]];
 

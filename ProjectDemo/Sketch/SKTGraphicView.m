@@ -341,7 +341,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 
 - (void)createGraphicOfClass:(Class)theClass withEvent:(NSEvent *)theEvent {
     SKTDrawDocument *document = [self drawDocument];
-    _creatingGraphic = [[theClass allocWithZone:[document zone]] init];
+    _creatingGraphic = [[theClass allocWithZone:[document zone]] initWithContext: [document objectContext]];
     if ([_creatingGraphic createWithEvent:theEvent inView:self]) {
         [document insertGraphic:_creatingGraphic atIndex:0];
         [self selectGraphic:_creatingGraphic];

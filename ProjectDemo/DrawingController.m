@@ -10,15 +10,12 @@
 	
 	doc = document; // weak ref
 	isSharing = sharing;
-	
-	drawDocument = [[SKTDrawDocument alloc] init];
-	
+
 	return self;
 }
 
 - (void)dealloc
 {
-	[drawDocument release];
 	[super dealloc];
 }
 
@@ -72,7 +69,7 @@
 	assert([[doc objectContext] objectHasChanges: [doc uuid]]);
 	assert([[doc valueForProperty: @"screenRect"] isEqual: NSStringFromRect([[self window] frame])]);
 	
-	[self commitWithType: kCOTypeMinorEdit
+	[[doc objectContext] commitWithType: kCOTypeMinorEdit
 		shortDescription: @"Move Window"
 		 longDescription: [NSString stringWithFormat: @"Move to %@", NSStringFromRect([doc screenRectValue])]];	
 }
@@ -116,12 +113,14 @@
 
 - (SKTDrawDocument *)drawDocument
 {
-	return drawDocument;
+	SKTDrawDocument *drawDoc = [doc rootObject];
+	assert([drawDoc isKindOfClass: [SKTDrawDocument class]]);
+	return drawDoc;
 }
 
 - (Document*)projectDocument
 {
-	return nil;
+	return doc;
 }
 
 @end

@@ -14,8 +14,6 @@
 	BOOL isSharing;
 	Class toolClass;
 	IBOutlet SKTGraphicView *graphicView;
-	
-	SKTDrawDocument *drawDocument;
 }
 
 - (IBAction) selectTool: (id)sender;

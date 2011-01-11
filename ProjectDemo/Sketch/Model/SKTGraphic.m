@@ -12,9 +12,19 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 @implementation SKTGraphic
 
++ (void)initialize
+{
+	if (self == [SKTGraphic class])
+	{
+		// FIXME: Hack
+		[SKTDrawDocument class]; // Our metamodel is set up in SKTDrawDocument
+	}
+}
+
 // =================================== Initialization ===================================
-- (id)init {
-    self = [super init];
+- (id)initWithContext: (COEditingContext*)ctx
+{
+    self = [super initWithContext: ctx];
     if (self) {
         _document = nil;
         [self setBounds:NSMakeRect(0.0, 0.0, 1.0, 1.0)];
@@ -37,7 +47,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    id newObj = [[[self class] allocWithZone:zone] init];
+    id newObj = [[[self class] allocWithZone:zone] initWithContext: [self objectContext]];
 
     // Document is not "copied".  The new graphic will need to be inserted into a document.
     [newObj setBounds:[self bounds]];
@@ -324,6 +334,8 @@ NSString *SKTStrokeLineWidthKey = @"StrokeLineWidth";
 }
 
 + (id)graphicWithPropertyListRepresentation:(NSDictionary *)dict {
+	assert(0); // FIXME: What context do we use?
+	
     Class theClass = NSClassFromString([dict objectForKey:SKTClassKey]);
     id theGraphic = nil;
     
@@ -618,64 +630,6 @@ NSString *SKTStrokeLineWidthKey = @"StrokeLineWidth";
 
 - (NSString *)description {
     return [[self propertyListRepresentation] description];
-}
-
-@end
-
-@implementation SKTGraphic (SKTScriptingExtras)
-
-// These are methods that we probably wouldn't bother with if we weren't scriptable.
-
-	/*
-- (NSScriptObjectSpecifier *)objectSpecifier {
-    NSArray *graphics = [[self document] graphics];
-    unsigned index = [graphics indexOfObjectIdenticalTo:self];
-    if (index != NSNotFound) {
-        NSScriptObjectSpecifier *containerRef = [[self document] objectSpecifier];
-        return [[[NSIndexSpecifier allocWithZone:[self zone]] initWithContainerClassDescription:[containerRef keyClassDescription] containerSpecifier:containerRef key:@"graphics" index:index] autorelease];
-    } else {
-        return nil;
-    }
-}
-*/
-- (float)xPosition {
-    return [self bounds].origin.x;
-}
-
-- (void)setXPosition:(float)newVal {
-    NSRect bounds = [self bounds];
-    bounds.origin.x = newVal;
-    [self setBounds:bounds];
-}
-
-- (float)yPosition {
-    return [self bounds].origin.y;
-}
-
-- (void)setYPosition:(float)newVal {
-    NSRect bounds = [self bounds];
-    bounds.origin.y = newVal;
-    [self setBounds:bounds];
-}
-
-- (float)width {
-    return [self bounds].size.width;
-}
-
-- (void)setWidth:(float)newVal {
-    NSRect bounds = [self bounds];
-    bounds.size.width = newVal;
-    [self setBounds:bounds];
-}
-
-- (float)height {
-    return [self bounds].size.height;
-}
-
-- (void)setHeight:(float)newVal {
-    NSRect bounds = [self bounds];
-    bounds.size.height = newVal;
-    [self setBounds:bounds];
 }
 
 @end

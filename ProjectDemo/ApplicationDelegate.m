@@ -6,6 +6,7 @@
 #import "Document.h"
 #import "HistoryInspectorController.h"
 #import "SharingServer.h"
+#import "SKTDrawDocument.h"
 
 #define STORE_URL [NSURL URLWithString: [@"~/ProjectDemoStore" stringByExpandingTildeInPath]]
 
@@ -144,7 +145,7 @@
 - (IBAction) newDrawing: (id)sender
 {
 	[self newDocumentWithType: @"drawing"
-				   rootObject: nil];
+				   rootObject: [[[SKTDrawDocument alloc] initWithContext: context] autorelease]];
 }
 
 /* Convenience */

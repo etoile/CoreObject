@@ -3,6 +3,7 @@
 //
 
 #import <AppKit/AppKit.h>
+#import "COObject.h"
 
 @class SKTGraphicView;
 @class SKTDrawDocument;
@@ -34,7 +35,7 @@ enum {
 
 extern NSString *SKTGraphicDidChangeNotification;
 
-@interface SKTGraphic : NSObject <NSCopying> {
+@interface SKTGraphic : COObject <NSCopying> {
     @private
     SKTDrawDocument *_document;
     NSRect _bounds;
