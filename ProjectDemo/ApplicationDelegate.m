@@ -161,6 +161,11 @@
 	return nil;
 }
 
+- (Document *)keyDocument
+{
+	return [[self keyDocumentController] projectDocument];
+}
+
 /* NSResponder */
 
 - (void)saveDocument: (id)sender
@@ -234,8 +239,9 @@
 {
 	NSLog(@"Key document changed to: %@", [self keyDocumentController]);
 	
-	// FIXME: update inspectors
+	[tagWindowController setDocument: [self keyDocument]];
 	
+	// FIXME: update inspectors	
 }
 
 - (void)projectDocumentsDidChange: (Project*)p

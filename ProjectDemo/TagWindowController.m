@@ -11,9 +11,27 @@
 	return self;
 }
 
+- (void) show: (id)sender
+{
+	[window makeKeyAndOrderFront: nil];
+	[table reloadData];
+}
+
+- (void) setDocument: (Document*)doc
+{
+	document = doc;
+	[window setTitle: [NSString stringWithFormat: @"Tags for %@", [doc documentName]]];
+	[table reloadData];
+}
+
 - (NSArray *)tagsArray
 {
-	NSArray *tagsArray = [[[[NSApp delegate] project] tags] allObjects];
+	NSArray *tagsArray = [[document tags] allObjects];
+	if (tagsArray == nil)
+	{
+		tagsArray = [NSArray array];
+	}
+	
 	tagsArray = [tagsArray sortedArrayUsingDescriptors: A([NSSortDescriptor sortDescriptorWithKey: @"label" ascending: YES])];
 	return tagsArray;
 }
@@ -26,9 +44,35 @@
 		NSString *label = [tagNameField stringValue];
 		
 		COEditingContext *ctx = [[NSApp delegate] editingContext];
-		Tag *newTag = [[[Tag alloc] initWithContext: ctx] autorelease];
-		[newTag setLabel: label];
-		[[[NSApp delegate] project] addTag: newTag];
+		
+		// see if there is already a tag with this name
+		Tag *found = nil;
+		for (Tag *tag in [[[NSApp delegate] project] tags])
+		{
+			if ([[tag label] isEqual: label])
+			{
+				found = tag;
+				break;
+			}
+		}
+		
+		Tag *newTag;
+		if (found != nil)
+		{
+			// reuse an existing tag object
+			newTag = found;
+			NSLog(@"Reusing tag %@", newTag);
+		}
+		else
+		{
+			// create a new tag
+			newTag = [[[Tag alloc] initWithContext: ctx] autorelease];
+			[newTag setLabel: label];
+			[[[NSApp delegate] project] addTag: newTag];
+			NSLog(@"Creating new tag %@", newTag);
+		}
+		
+		[document addTag: newTag];
 		
 		[ctx commit];
 		
@@ -45,7 +89,7 @@
 		Tag *tagToRemove = [[self tagsArray] objectAtIndex: item];
 		
 		COEditingContext *ctx = [[NSApp delegate] editingContext];
-		[[[NSApp delegate] project] removeTag: tagToRemove];
+		[document removeTag: tagToRemove];
 		[ctx commit];
 	}
 	[table reloadData];

@@ -119,4 +119,9 @@
 	return drawDocument;
 }
 
+- (Document*)projectDocument
+{
+	return nil;
+}
+
 @end

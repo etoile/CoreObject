@@ -1,6 +1,5 @@
 #import "Document.h"
 
-
 @implementation Document
 
 + (void)initialize
@@ -39,7 +38,13 @@
 																							  type: (id)@"NSObject"];
 			[rootObjectProperty setOpposite: (id)@"DocumentItem.document"];
 			
-			[docEntity setPropertyDescriptions: A(screenRectProperty, isOpenProperty, documentTypeProperty, rootObjectProperty, documentNameProperty)];
+			[Tag class];
+			ETPropertyDescription *tagsProperty = [ETPropertyDescription descriptionWithName: @"tags"
+																						type: (id)@"Tag"];
+			[tagsProperty setMultivalued: YES];
+			
+			
+			[docEntity setPropertyDescriptions: A(screenRectProperty, isOpenProperty, documentTypeProperty, rootObjectProperty, documentNameProperty, tagsProperty)];
 			
 			[repo addUnresolvedDescription: docEntity];
 			
@@ -110,12 +115,30 @@
 	[self didChangeValueForProperty: @"documentName"];
 }
 
+- (NSSet*) tags
+{
+	[self willAccessValueForProperty: @"tags"];
+	return tags;
+}
+- (void) addTag: (Tag *)tag
+{
+	[self willChangeValueForProperty: @"tags"];
+	[tags addObject: tag];
+	[self didChangeValueForProperty: @"tags"];
+}
+- (void) removeTag: (Tag *)tag
+{
+	[self willChangeValueForProperty: @"tags"];
+	[tags removeObject: tag];
+	[self didChangeValueForProperty: @"tags"];
+}
 
 - (void)dealloc
 {
 	[documentType release];
 	[documentName release];
 	[rootObject release];
+	[tags release];
 	[super dealloc];
 }
 

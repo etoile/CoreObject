@@ -54,4 +54,10 @@
 
 - (Project *)project;
 
+
+/* Convenience */
+
+- (NSWindowController*) keyDocumentController;
+- (Document *)keyDocument;
+
 @end

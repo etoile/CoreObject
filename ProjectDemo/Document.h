@@ -1,5 +1,6 @@
 #import <Cocoa/Cocoa.h>
 #import "COObject.h"
+#import "Tag.h"
 
 @interface Document : COObject
 {
@@ -12,6 +13,7 @@
 	NSString *documentType;
 	id rootObject;
 	NSString *documentName;
+	NSMutableSet *tags;
 }
 
 - (NSRect) screenRectValue;
@@ -25,5 +27,9 @@
 - (void) setRootObject:(id)r;
 - (NSString*)documentName;
 - (void)setDocumentName:(NSString *)n;
+
+- (NSSet*) tags;
+- (void) addTag: (Tag *)tag;
+- (void) removeTag: (Tag *)tag;
 
 @end

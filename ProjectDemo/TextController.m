@@ -20,5 +20,9 @@
 	return [self initWithDocument:document isSharing: NO];
 }
 
+- (Document*)projectDocument
+{
+	return nil;
+}
 
 @end
