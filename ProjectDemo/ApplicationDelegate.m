@@ -235,6 +235,7 @@
 	NSLog(@"Key document changed to: %@", [self keyDocumentController]);
 	
 	// FIXME: update inspectors
+	
 }
 
 - (void)projectDocumentsDidChange: (Project*)p

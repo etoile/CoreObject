@@ -7,6 +7,7 @@
 #import "DesktopWindow.h"
 #import "ProjectNavWindow.h"
 #import "OverlayShelf.h"
+#import "TagWindowController.h"
 
 @interface ApplicationDelegate : NSObject
 {
@@ -18,6 +19,7 @@
 	IBOutlet NetworkController *networkController;
 	IBOutlet HistoryInspectorController *historyController;
 	IBOutlet CheckpointAsSheetController *checkpointAsSheetController;
+	IBOutlet TagWindowController *tagWindowController;
 	
 	DesktopWindow *desktopWindow;
 	ProjectNavWindow *projectNavWindow;

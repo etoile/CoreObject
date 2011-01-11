@@ -115,6 +115,7 @@
 		79F122C4128A4B7800EC0255 /* format-indent-less.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122C1128A4B7800EC0255 /* format-indent-less.tiff */; };
 		79F122C5128A4B7800EC0255 /* format-indent-more.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122C2128A4B7800EC0255 /* format-indent-more.tiff */; };
 		79F122C6128A4B7800EC0255 /* list-add.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 79F122C3128A4B7800EC0255 /* list-add.tiff */; };
+		79FC089012DBE8E300DE3C18 /* TagWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 79FC088F12DBE8E300DE3C18 /* TagWindowController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -335,6 +336,8 @@
 		79F122C1128A4B7800EC0255 /* format-indent-less.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "format-indent-less.tiff"; sourceTree = "<group>"; };
 		79F122C2128A4B7800EC0255 /* format-indent-more.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "format-indent-more.tiff"; sourceTree = "<group>"; };
 		79F122C3128A4B7800EC0255 /* list-add.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "list-add.tiff"; sourceTree = "<group>"; };
+		79FC088E12DBE8E300DE3C18 /* TagWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TagWindowController.h; sourceTree = "<group>"; };
+		79FC088F12DBE8E300DE3C18 /* TagWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagWindowController.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* ProjectDemo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ProjectDemo-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -477,6 +480,8 @@
 				6627EEDC1278A55A00E06946 /* README */,
 				79911A0712CD974A009D28C0 /* Application.h */,
 				79911A0812CD974A009D28C0 /* Application.m */,
+				79FC088E12DBE8E300DE3C18 /* TagWindowController.h */,
+				79FC088F12DBE8E300DE3C18 /* TagWindowController.m */,
 			);
 			path = ProjectDemo;
 			sourceTree = "<group>";
@@ -1024,6 +1029,7 @@
 				7991190512CD3D75009D28C0 /* ProjectNavWindow.m in Sources */,
 				7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */,
 				79911A0912CD974A009D28C0 /* Application.m in Sources */,
+				79FC089012DBE8E300DE3C18 /* TagWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
