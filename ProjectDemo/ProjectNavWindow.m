@@ -35,8 +35,10 @@
 - (void)controlTextDidChange:(NSNotification *)aNotification
 {
 	NSLog(@"%@", [search stringValue]);
-	
-	[[NSApp delegate] showSearchResults: nil];
+	if (![[search stringValue] isEqual: @""])
+	{
+		[[NSApp delegate] showSearchResults: nil];
+	}
 }
 
 @end

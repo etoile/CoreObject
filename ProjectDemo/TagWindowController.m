@@ -39,6 +39,8 @@
 
 - (IBAction) addTag: (id)sender
 {
+	if (document == nil) return;
+	
 	if ([tagNameField stringValue] != nil && ![[tagNameField stringValue] isEqual: @""])
 	{
 		NSString *label = [tagNameField stringValue];
@@ -74,7 +76,9 @@
 		
 		[document addTag: newTag];
 		
-		[ctx commit];
+		[ctx commitWithType:kCOTypeMinorEdit
+		   shortDescription:@"Add tag"
+			longDescription:[NSString stringWithFormat: @"Add tag '%@' to document '%@'", label, [document documentName]]];
 		
 		[tagNameField setStringValue: @""];
 		[table reloadData];
@@ -83,6 +87,8 @@
 
 - (IBAction) removeTag: (id)sender
 {
+	if (document == nil) return;
+	
 	NSInteger item = [table selectedRow];
 	if (item >= 0 && item < [[self tagsArray] count])
 	{
@@ -90,7 +96,10 @@
 		
 		COEditingContext *ctx = [[NSApp delegate] editingContext];
 		[document removeTag: tagToRemove];
-		[ctx commit];
+
+		[ctx commitWithType:kCOTypeMinorEdit
+		   shortDescription:@"Remove tag"
+			longDescription:[NSString stringWithFormat: @"Remove tag '%@' from document '%@'", [tagToRemove label], [document documentName]]];
 	}
 	[table reloadData];
 }
