@@ -1,5 +1,5 @@
 #import "TextController.h"
-
+#import "COEditingContext.h"
 
 @implementation TextController
 
@@ -23,6 +23,22 @@
 - (Document*)projectDocument
 {
 	return nil;
+}
+
+- (void)windowDidLoad
+{
+	[textView setDelegate: self];
+	
+	NSString *label = [[doc rootObject] label];
+	[[textView textStorage] setAttributedString: [[[NSAttributedString alloc] initWithString: label] autorelease]];	
+}
+
+- (void)textDidChange:(NSNotification*)notif
+{
+	[[doc rootObject] setLabel: [[textView textStorage] string]];
+	[[doc objectContext] commitWithType:kCOTypeMinorEdit
+					   shortDescription:@"Edit Text"
+						longDescription:@"Edit Text"];
 }
 
 @end

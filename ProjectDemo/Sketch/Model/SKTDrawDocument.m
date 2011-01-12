@@ -76,6 +76,15 @@ NSString *SKTDrawDocumentType = @"Apple Sketch Graphic Format";
 	return self;
 }
 
+- (void) didAwaken
+{
+	// FIXME: hack
+	if (_graphics == nil)
+	{
+		_graphics = [[NSMutableArray allocWithZone:[self zone]] init];
+	}
+}
+
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_graphics release];

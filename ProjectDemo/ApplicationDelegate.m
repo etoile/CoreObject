@@ -1,5 +1,6 @@
 #import "ApplicationDelegate.h"
 #import "OutlineItem.h"
+#import "TextItem.h"
 #import "OutlineController.h"
 #import "DrawingController.h"
 #import "TextController.h"
@@ -135,7 +136,7 @@
 - (IBAction) newTextDocument: (id)sender
 {
 	[self newDocumentWithType: @"text"
-				   rootObject: nil];	
+				   rootObject: [[[TextItem alloc] initWithContext: context] autorelease]];	
 }
 - (IBAction) newOutline: (id)sender
 {
