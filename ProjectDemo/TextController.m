@@ -22,7 +22,7 @@
 
 - (Document*)projectDocument
 {
-	return nil;
+	return doc;
 }
 
 - (void)windowDidLoad
