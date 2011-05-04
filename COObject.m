@@ -346,9 +346,9 @@ NSString *kCORemovedProperty = @"kCORemovedProperty";
 /** <p>Returns the properties published by the receiver and accessible through 
     <em>Property Value Coding</em>. The returned array includes the properties 
     inherited from the superclass too, see -[NSObject properties].</p> */
-- (NSArray *) properties
+- (NSArray *) propertyNames
 {
-	return [[super properties] arrayByAddingObjectsFromArray: [[self class] properties]];
+	return [[super propertyNames] arrayByAddingObjectsFromArray: [[self class] properties]];
 }
 
 /** <p></p> */

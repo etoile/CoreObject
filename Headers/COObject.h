@@ -88,7 +88,7 @@ extern NSString *pCOVersion1Value;
 
 /* Managed Object Edition */
 
-- (NSArray *) properties;
+- (NSArray *) propertyNames;
 - (BOOL) removeValueForProperty: (NSString *) property;
 - (BOOL) setValue: (id) value forProperty: (NSString *) property;
 - (id) valueForProperty: (NSString *) property;

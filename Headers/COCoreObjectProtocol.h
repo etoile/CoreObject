@@ -14,7 +14,7 @@
 	Properties should encompass all model attributes and relationships that you 
 	want to publish. Your Property-Value Coding implementation will determine
 	for each one whether they are readable, writable or both.*/
-- (NSArray *) properties;
+- (NSArray *) propertyNames;
 /** Returns the metadatas of the receiver to be indexed by the metadata server. 
 	The set of metadatas may intersect or not the set of properties. */
 - (NSDictionary *) metadatas;

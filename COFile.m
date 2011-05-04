@@ -136,11 +136,11 @@ The URL may point to a non-existent file or directory. */
 
 // TODO: Optimize, probably horribly slow. Also not sure we got to expose NSObject 
 // properties by default
-- (NSArray *) properties
+- (NSArray *) propertyNames
 {
 	NSArray *properties = [[self metadatas] allKeys];
 
-	properties = [properties arrayByAddingObjectsFromArray: [super properties]];
+	properties = [properties arrayByAddingObjectsFromArray: [super propertyNames]];
 	/* icon, name, displayName and URL are declared in metadatas */
 	properties = [properties arrayByAddingObjectsFromArray: 
 		A(@"isCopyPromise", @"exists", @"metadatas", @"uniqueID")];

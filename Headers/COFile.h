@@ -22,7 +22,7 @@
 
 - (NSString *) uniqueID;
 - (NSURL *) URL;
-- (NSArray *) properties;
+- (NSArray *) propertyNames;
 - (NSDictionary *) metadatas;
 - (BOOL) isValidMetadataKey: (NSString *)key;
 - (void) setName: (NSString *)aName;
