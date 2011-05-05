@@ -64,7 +64,7 @@
 
 - (void) testProperties
 {
-	id properties = [self properties];
+	id properties = [self propertyNames];
 
 	UKNotNil(properties); 
 	UKTrue([properties count] > 0);
