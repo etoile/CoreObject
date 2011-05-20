@@ -64,19 +64,6 @@ extern NSString *kCOGroupChild;
 
 - (NSArray *) objectsMatchingPredicate: (NSPredicate *)aPredicate;
 
-/* Collection Protocol */
-
-- (BOOL) isOrdered;
-- (BOOL) isEmpty;
-- (id) content;
-- (NSUInteger) count;
-- (NSArray *) contentArray;
-- (NSEnumerator *) objectEnumerator;
-- (NSArray *) objects;
-- (BOOL) addObject: (id) object;
-- (BOOL) removeObject: (id) object;
-- (void) insertObject: (id)object atIndex: (unsigned int)index;
-
 /* Merging */
 
 - (BOOL) containsTemporalInstance: (id)anObject;
@@ -92,12 +79,6 @@ extern NSString *kCOGroupChild;
 - (void) setHasFaults: (BOOL)flag;
 - (void) resolveFaults;
 - (BOOL) tryResolveFault: (ETUUID *)aFault;
-
-/* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
-
-- (BOOL) addObject: (id) object;
-- (BOOL) removeObject: (id) object;
-- (NSArray *) objects;
 
 @end
 

@@ -39,21 +39,5 @@
 
 - (BOOL) create;
 
-/* Collection protocol (except -removeObject: declared previously) */
-
-- (BOOL) isOrdered;
-- (BOOL) isEmpty;
-- (NSUInteger) count;
-- (id) content;
-- (NSArray *) contentArray;
-- (NSEnumerator *) objectEnumerator;
-- (void) insertObject: (id)object atIndex: (unsigned int)index;
-- (BOOL) removeObject: (id)object;
-
-/* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
-
-- (BOOL) addObject: (id)object;
-- (NSArray *) objects;
-
 @end
 

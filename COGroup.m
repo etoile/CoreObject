@@ -40,6 +40,7 @@ NSString *kCOGroupChild = @"kCOGroupChild";
              policy: (COChildrenMergePolicy)aPolicy;
 @end
 
+#pragma GCC diagnostic ignored "-Wprotocol"
 
 @implementation COGroup
 
@@ -60,6 +61,12 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 /** See +[COObject initialize] */
 + (void) initialize
 {
+	if (self == [COGroup class])
+	{
+		[self applyTraitFromClass: [ETCollectionTrait class]];
+		[self applyTraitFromClass: [ETMutableCollectionTrait class]];
+	}
+
 	/* We need to register COObject properties and types by calling super 
 	   because GNU objc runtime will not call +initialize on superclass as 
 	   NeXT runtime does. */
@@ -407,18 +414,6 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 }
 
 /** See ETCollection protocol in EtoileFoundation. */
-- (BOOL) isEmpty
-{
-	return ([[self members] count] == 0);
-}
-
-/** See ETCollection protocol in EtoileFoundation. */
-- (NSUInteger) count
-{
-	return [[self members] count];
-}
-
-/** See ETCollection protocol in EtoileFoundation. */
 - (id) content
 {
 	return [self members];
@@ -430,18 +425,17 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 	return [self content];
 }
 
-/** See ETCollection protocol in EtoileFoundation. */
-- (NSEnumerator *) objectEnumerator
-{
-	return [[self members] objectEnumerator];
-}
-
 /** See ETCollectionMutation protocol in EtoileFoundation.
     You must override this method and -isOrdered, if you write a subclass whose 
     children are ordered. */
-- (void) insertObject: (id)object atIndex: (unsigned int)index
+- (void) insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
 {
 	[self addMember: object];
+}
+
+- (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
+{
+	[self removeMember: object];
 }
 
 /* Merging */
@@ -786,11 +780,5 @@ NSString *kCOGroupChild = @"kCOGroupChild";
 
 	return didSerialize;
 }
-
-/* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
-
-- (BOOL) addObject: (id) object { return [self addMember: object]; }
-- (BOOL) removeObject: (id) object { return [self removeMember: object]; }
-- (NSArray *) objects { return [self members]; }
 
 @end

@@ -10,6 +10,8 @@
 #import "COFile.h"
 #import "GNUstep.h"
 
+#pragma GCC diagnostic ignored "-Wprotocol"
+
 #define FM [NSFileManager defaultManager]
 #define FM_HANDLER [CODirectory delegate]
 #define FSPATH(x) [[x URL] path]
@@ -20,7 +22,17 @@
 - (BOOL) checkObjectToBeRemovedOrDeleted: (id)object;
 @end
 
+
 @implementation CODirectory
+
++ (void) initialize
+{
+	if (self == [CODirectory class])
+	{
+		[self applyTraitFromClass: [ETCollectionTrait class]];
+		[self applyTraitFromClass: [ETMutableCollectionTrait class]];
+	}
+}
 
 + (BOOL) isGroupAtURL: (NSURL *)anURL
 {
@@ -58,11 +70,6 @@ static id fsServerDelegate = nil;
 + (void) setDelegate: (id)delegate
 {
 	fsServerDelegate = delegate;
-}
-
-+ (void) initialize
-{
-
 }
 
 - (id) init
@@ -338,23 +345,6 @@ DEALLOC()
 
 /* Collection Protocol */
 
-- (BOOL) isOrdered
-{
-	return NO;
-}
-
-/** See ETCollection protocol in EtoileFoundation. */
-- (BOOL) isEmpty
-{
-	return ([[self members] count] == 0);
-}
-
-/** See ETCollection protocol in EtoileFoundation. */
-- (NSUInteger) count
-{
-	return [[self members] count];
-}
-
 /** See ETCollection protocol in EtoileFoundation. */
 - (id) content
 {
@@ -367,27 +357,15 @@ DEALLOC()
 	return [self content];
 }
 
-/** See ETCollection protocol in EtoileFoundation. */
-- (NSEnumerator *) objectEnumerator
-{
-	return [[self members] objectEnumerator];
-}
-
-- (void) insertObject: (id)object atIndex: (unsigned int)index
+- (void) insertObject: (id)object atIndex: (unsigned int)index hint: (id)hint
 {
 	[self addMember: object];
 }
 
-// FIXME: Shouldn't return a boolean.
-- (BOOL) removeObject: (id) object
+- (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
 {
-	return [self removeMember: object];
+	[self removeMember: object];
 }
-
-/* Deprecated (DO NOT USE, WILL BE REMOVED LATER) */
-
-- (BOOL) addObject: (id) object { return [self addMember: object]; }
-- (NSArray *) objects { return [self members]; }
 
 @end
 
