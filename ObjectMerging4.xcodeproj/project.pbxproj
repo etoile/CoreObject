@@ -7,10 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6614501412B01DF5000DB843 /* COCommit.h in Headers */ = {isa = PBXBuildFile; fileRef = 6614501212B01DF5000DB843 /* COCommit.h */; };
-		6614501512B01DF6000DB843 /* COCommit.m in Sources */ = {isa = PBXBuildFile; fileRef = 6614501312B01DF5000DB843 /* COCommit.m */; };
-		6614501812B020AA000DB843 /* COStoreCoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 6614501612B020AA000DB843 /* COStoreCoreObject.h */; };
-		6614501912B020AA000DB843 /* COStoreCoreObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 6614501712B020AA000DB843 /* COStoreCoreObject.m */; };
 		6620EFA4129F3AAD00FD5AB9 /* TestHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */; };
 		6620F13C129F8CC500FD5AB9 /* COHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09999129A5B64006BEDC3 /* COHistoryTrack.m */; };
 		6686BDE712592C5D0065DE1A /* COObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDB812592C1B0065DE1A /* COObject.m */; };
@@ -484,8 +480,6 @@
 				791B4E661299C8CB00CCF472 /* COStore.h in Headers */,
 				66D0999A129A5B64006BEDC3 /* COHistoryTrack.h in Headers */,
 				66D09D56129CE470006BEDC3 /* COCollection.h in Headers */,
-				6614501412B01DF5000DB843 /* COCommit.h in Headers */,
-				6614501812B020AA000DB843 /* COStoreCoreObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -636,8 +630,6 @@
 				791B4E741299C90900CCF472 /* FMDatabaseAdditions.m in Sources */,
 				791B4E761299C90900CCF472 /* FMResultSet.m in Sources */,
 				791B4E7C1299C92300CCF472 /* sqlite3.c in Sources */,
-				6614501512B01DF6000DB843 /* COCommit.m in Sources */,
-				6614501912B020AA000DB843 /* COStoreCoreObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -29,6 +29,19 @@
 // Creation
 
 + (COEditingContext*)contextWithURL: (NSURL*)aURL;
+/** 
+ * Returns the context that should be used when none is provided.
+ *
+ * Factories that create persistent instances in EtoileUI will use this method. 
+ * As an example, see -[ETLayoutItemFactory compoundDocument]. 
+ */
++ (COEditingContext *) currentContext;
+/** 
+ * Sets the context that should be used when none is provided.
+ *
+ * See also +currentContext. 
+ */
++ (void) setCurrentContext: (COEditingContext *)aCtxt;
 
 /**
  * Initializes a context which uses a specified revision of a store
@@ -59,6 +72,11 @@
  * and returns the object. This is the factory method for COObject.
  */
 - (id) insertObjectWithEntityName: (NSString*)aFullName;
+/**
+ * Creates a new instance of the given class (assigning the instance a new UUID)
+ * and returns the object.
+ */
+- (id) insertObjectWithClass: (Class)aClass;
 /**
  * Copies an object from another context into this context.
  * The copy refers to the same underlying Core Object (same UUID)

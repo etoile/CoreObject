@@ -9,6 +9,18 @@
 	return [ctx autorelease];
 }
 
+static COEditingContext *currentCtxt = nil;
+
++ (COEditingContext *) currentContext
+{
+	return currentCtxt;
+}
+
++ (void) setCurrentContext: (COEditingContext *)aCtxt
+{
+	ASSIGN(currentCtxt, aCtxt);
+}
+
 - (id) initWithStore: (COStore*)store revision: (CORevision*)aRevision
 {
 	SUPERINIT;
@@ -118,6 +130,11 @@
 	[result release];
 	
 	return result;
+}
+
+- (COObject *) insertObjectWithClass: (Class)aClass
+{
+	return [self insertObjectWithEntityName: [[_modelRepository entityDescriptionForClass: aClass] fullName]];
 }
 
 - (COObject*) insertObjectWithEntityName: (NSString*)aFullName
