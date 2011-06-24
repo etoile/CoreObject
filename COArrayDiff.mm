@@ -30,6 +30,11 @@ public:
 	}
 };
 
+@interface COArrayDiff (Private)
+
+- (void)diffWithA: (NSArray*)a B: (NSArray*)b;
+
+@end
 
 @implementation COArrayDiff
 
@@ -96,9 +101,10 @@ public:
 	{
 		if ([op isKindOfClass: [COArrayDiffOperationInsert class]])
 		{
-			NSRange range = NSMakeRange([op range].location + i, [[op insertedObjects] count]);
+			COArrayDiffOperationInsert *opp = (COArrayDiffOperationInsert*)op;
+			NSRange range = NSMakeRange([op range].location + i, [[opp insertedObjects] count]);
 			
-			[array insertObjects: [op insertedObjects]
+			[array insertObjects: [opp insertedObjects]
 					   atIndexes: [NSIndexSet indexSetWithIndexesInRange: range]];
 			
 			i += range.length;
@@ -112,11 +118,12 @@ public:
 		}
 		else if ([op isKindOfClass: [COArrayDiffOperationModify class]])
 		{
-			NSRange deleteRange = NSMakeRange([op range].location + i, [op range].length);
-			NSRange insertRange = NSMakeRange([op range].location + i, [[op insertedObjects] count]);
+			COArrayDiffOperationModify *opp = (COArrayDiffOperationModify*)op;
+			NSRange deleteRange = NSMakeRange([opp range].location + i, [opp range].length);
+			NSRange insertRange = NSMakeRange([opp range].location + i, [[opp insertedObjects] count]);
 			
 			[array removeObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: deleteRange]];
-			[array insertObjects: [op insertedObjects]
+			[array insertObjects: [opp insertedObjects]
 					   atIndexes: [NSIndexSet indexSetWithIndexesInRange: insertRange]];
 			i += (insertRange.length - deleteRange.length);
 		}

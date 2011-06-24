@@ -687,28 +687,36 @@ static NSArray *COArrayPropertyListForArray(NSArray *array)
 	return newArray;
 }
 
-- (NSDictionary*) propertyListForValue: (NSObject*)value
+- (NSDictionary*) propertyListForValue: (id)value
 {
+	NSDictionary *result = nil;
+
 	if ([value isKindOfClass: [COObject class]])
 	{
-		value = [value referencePropertyList];
+		result = [value referencePropertyList];
 	}
 	else if ([value isKindOfClass: [NSArray class]])
 	{
-		value = COArrayPropertyListForArray(value);
+		result = (NSDictionary *)COArrayPropertyListForArray(value);
 	}
 	else if ([value isKindOfClass: [NSSet class]])
 	{
-		value = [NSDictionary dictionaryWithObjectsAndKeys:
+		result = [NSDictionary dictionaryWithObjectsAndKeys:
 				 @"unorderedCollection", @"type",
 				 COArrayPropertyListForArray([value allObjects]), @"objects",
 				 nil];
 	}
 	else if (value == nil)
 	{
-		value = [NSDictionary dictionaryWithObject: @"nil" forKey: @"type"];
+		result = [NSDictionary dictionaryWithObject: @"nil" forKey: @"type"];
 	}
-	return value;
+	else
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"value must of type COObject, NSArray, NSSet or nil"];
+		return nil;
+	}
+	return result;
 }
 
 - (NSDictionary*) referencePropertyList
@@ -797,7 +805,7 @@ static int indent = 0;
 			for (id item in value)
 			{
 				for (int i=0; i<indent + 1; i++) [valuestring appendFormat: @"\t"];
-				[valuestring appendFormat: @"%@\n", [item debugDescription]];	
+				[valuestring appendFormat: @"%@\n", [item description]];	
 			}
 			for (int i=0; i<indent; i++) [valuestring appendFormat: @"\t"];
 			[valuestring appendFormat: @"),\n"];
@@ -808,14 +816,14 @@ static int indent = 0;
 			for (id item in value)
 			{
 				for (int i=0; i<indent + 1; i++) [valuestring appendFormat: @"\t"];
-				[valuestring appendFormat: @"%@", [item debugDescription]];	
+				[valuestring appendFormat: @"%@", [item description]];	
 			}
 			for (int i=0; i<indent; i++) [valuestring appendFormat: @"\t"];
 			[valuestring appendFormat: @"},\n"];
 		}
 		else
 		{
-			[valuestring appendFormat: @"%@,\n", [value debugDescription]];
+			[valuestring appendFormat: @"%@,\n", [value description]];
 		}
 
 		

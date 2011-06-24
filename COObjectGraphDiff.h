@@ -18,10 +18,10 @@
 	NSMutableDictionary *_insertedObjectsByUUID;
 }
 
-- (void)recordRemoveProperty: (NSString*)name ofObject: (ETUUID*)obj;
-- (void)recordSetValue: (id)value forProperty: (NSString*)name ofObject: (ETUUID*)obj;
-- (void)recordModifyArray: (COArrayDiff *)diff forProperty: (NSString*)name ofObject: (ETUUID*)obj;
-- (void)recordModifySet: (COSetDiff *)diff forProperty: (NSString*)name ofObject: (ETUUID*)obj;
+- (void)recordRemoveProperty: (NSString*)name ofObjectUUID: (ETUUID*)obj;
+- (void)recordSetValue: (id)value forProperty: (NSString*)name ofObjectUUID: (ETUUID*)obj;
+- (void)recordModifyArray: (COArrayDiff *)diff forProperty: (NSString*)name ofObjectUUID: (ETUUID*)obj;
+- (void)recordModifySet: (COSetDiff *)diff forProperty: (NSString*)name ofObjectUUID: (ETUUID*)obj;
 
 - (void)applyToContext: (COEditingContext*)ctx;
 @end
@@ -36,8 +36,8 @@
 /**
  * Convenience method
  */
-+ (COObjectGraphDiff *)diffHistoryNode: (id)n1
-					   withHistoryNode: (id)n2;
+// + (COObjectGraphDiff *)diffHistoryNode: (id)n1
+// 					   withHistoryNode: (id)n2;
 
 /**
  * Convenience method

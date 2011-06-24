@@ -207,7 +207,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 - (id) insertObject: (COObject*)sourceObject withRelationshipConsistency: (BOOL)consistency  newUUID: (BOOL)newUUID
 {
-	COEditingContext *sourceContext = [sourceObject editingContext];
+	//COEditingContext *sourceContext = [sourceObject editingContext];
 	NSString *entityName = [[sourceObject entityDescription] fullName];
 	assert(entityName != nil);
 	

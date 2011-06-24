@@ -144,8 +144,8 @@ namespace ManagedFusion
 		/// Initialize the Diff-Data buffer.
 		/// </summary>
 		/// <param name="data">reference to the buffer</param>
-		DiffData(T &initData, int size) : data(initData),
-		Length(size) {}
+		DiffData(T &initData, int size) : Length(size), data(initData)
+		 {}
 	};
 	
 	enum DifferenceType {

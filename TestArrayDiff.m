@@ -23,7 +23,7 @@
 	UKObjectsEqual(array3, [diff13 arrayWithDiffAppliedTo: array1]);
 	
 	COMergeResult *merged = [diff12 mergeWith: diff13];
-	
+	NSLog(@"Merge result: %@", merged);
 	// FIXME: test the merge result
 	//NSLog(@"Expected: a->A, remove b, delete d, insert 'zoo' after d, insert foo after e");
 }

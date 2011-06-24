@@ -1,7 +1,8 @@
 #import <Cocoa/Cocoa.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import "FMDatabase.h"
 #import "CORevision.h"
+
+@class FMDatabase;
 
 @interface COStore : NSObject
 {

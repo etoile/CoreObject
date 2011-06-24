@@ -63,9 +63,10 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 {
 	if ([object isKindOfClass: [COObjectGraphPath class]])
 	{
-		return [objectUUID isEqual: [object objectUUID]]
-			&& [property isEqual: [object property]]
-			&& ([index isEqual: [object index]] || (index == nil && [object index] == nil));
+		COObjectGraphPath *rhs = object;
+		return [objectUUID isEqual: [rhs objectUUID]]
+			&& [property isEqual: [rhs property]]
+			&& ([index isEqual: [rhs index]] || (index == nil && [rhs index] == nil));
 	}
 	return NO;
 }
@@ -249,7 +250,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	// FIXME: slow
 	NSArray *oldArray = [obj valueForProperty: propertyName];
 	NSArray *temp = [diff arrayWithDiffAppliedTo: oldArray];
-	NSArray *newArray = [NSMutableArray array]; 
+	NSMutableArray *newArray = [NSMutableArray array]; 
 	for (id value in temp)
 	{
 		if ([value isKindOfClass: [ETUUID class]])
@@ -450,6 +451,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	}
 	
 	return nil*/
+	return nil;
 }
 
 @end
@@ -540,34 +542,34 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	return result;
 }
 
-+ (COObjectGraphDiff *)diffHistoryNode: (id)n1 withHistoryNode: (id)n2
-{
-	if ([n1 isEqual: n2])
-	{
-		return [[[COObjectGraphDiff alloc] init] autorelease];
-	}
-	
-	COEditingContext *c1 = [[COEditingContext alloc] initWithHistoryGraphNode: n1];
-	COEditingContext *c2 = [[COEditingContext alloc] initWithHistoryGraphNode: n2];
-	
-	NSArray *uuids = [[n1 storeCoordinator] objectUUIDsChangedBetweenNode:n1 andNode:n2];
-	
-	COObjectGraphDiff *result = [COObjectGraphDiff diffObjectsWithUUIDs: uuids
-															  inContext:c1
-															withContext:c2];
-	[c1 release];
-	[c2 release];
-	return result;
-}	
+// + (COObjectGraphDiff *)diffHistoryNode: (id)n1 withHistoryNode: (id)n2
+// {
+// 	if ([n1 isEqual: n2])
+// 	{
+// 		return [[[COObjectGraphDiff alloc] init] autorelease];
+// 	}
+// 	
+// 	COEditingContext *c1 = [[COEditingContext alloc] initWithHistoryGraphNode: n1];
+// 	COEditingContext *c2 = [[COEditingContext alloc] initWithHistoryGraphNode: n2];
+// 	
+// 	NSArray *uuids = [[n1 storeCoordinator] objectUUIDsChangedBetweenNode:n1 andNode:n2];
+// 	
+// 	COObjectGraphDiff *result = [COObjectGraphDiff diffObjectsWithUUIDs: uuids
+// 															  inContext:c1
+// 															withContext:c2];
+// 	[c1 release];
+// 	[c2 release];
+// 	return result;
+// }	
 
 + (COObjectGraphDiff *)diffContainer: (COContainer*)group1 withContainer: (COContainer*)group2
 {
 	NSMutableSet *set = [NSMutableSet set];
 	[set addObjectsFromArray: [group1 allStronglyContainedObjectsIncludingSelf]];
 	[set addObjectsFromArray: [group2 allStronglyContainedObjectsIncludingSelf]];
-	set = [[set mappedCollection] UUID];
+	set = (NSMutableSet*)[[set mappedCollection] UUID];
 	
-	return [COObjectGraphDiff diffObjectsWithUUIDs: set
+	return [COObjectGraphDiff diffObjectsWithUUIDs: [set allObjects]
 										 inContext: [group1 editingContext]
 									   withContext: [group2 editingContext]];
 }

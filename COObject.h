@@ -88,7 +88,7 @@
 
 @interface COObject (PropertyListImportExport)
 
-- (NSDictionary*) propertyListForValue: (NSObject*)value;
+- (NSDictionary*) propertyListForValue: (id)value;
 - (NSDictionary*) referencePropertyList;
 - (NSObject *)valueForPropertyList: (NSObject*)plist;
 
@@ -108,7 +108,7 @@
  * Used only by -[COEditingContext markObject[Un]damaged]; to update
  * the object's cached damage flag
  */
-- (void) setDamaged: (BOOL)isDamaged;
+// - (void) setDamaged: (BOOL)isDamaged;
 
 @end
 

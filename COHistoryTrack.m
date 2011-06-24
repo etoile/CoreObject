@@ -55,9 +55,9 @@
 	COEditingContext *revBeforeUndoCtx = [[COEditingContext alloc] initWithRevision: revBeforeUndo];
 	COEditingContext *currentRevisionCtx = [trackObject editingContext];
 	
-	COContainer *revToUndoObj = [revToUndoCtx objectWithUUID: [trackObject UUID]];
-	COContainer *revBeforeUndoObj = [revBeforeUndoCtx objectWithUUID: [trackObject UUID]];
-	COContainer *currentRevisionObj = [currentRevisionCtx objectWithUUID: [trackObject UUID]];
+	COContainer *revToUndoObj = (COContainer*)[revToUndoCtx objectWithUUID: [trackObject UUID]];
+	COContainer *revBeforeUndoObj = (COContainer*)[revBeforeUndoCtx objectWithUUID: [trackObject UUID]];
+	COContainer *currentRevisionObj = (COContainer*)[currentRevisionCtx objectWithUUID: [trackObject UUID]];
 	
 	COObjectGraphDiff *oa = [COObjectGraphDiff diffContainer: revToUndoObj withContainer: revBeforeUndoObj];
 	COObjectGraphDiff *ob = [COObjectGraphDiff diffContainer: revToUndoObj withContainer: currentRevisionObj];	
@@ -95,7 +95,7 @@
 {
 	COEditingContext *ctx = [[COEditingContext alloc] initWithRevision: rev];
 	COObject *objAtRev = [ctx objectWithUUID: [trackObject UUID]];
-	NSArray *allObjectsOnTrackAtRev = [[[objAtRev allStronglyContainedObjectsIncludingSelf] mappedCollection] UUID];
+	NSArray *allObjectsOnTrackAtRev = (NSArray*)[[[objAtRev allStronglyContainedObjectsIncludingSelf] mappedCollection] UUID];
 	[ctx release];
 	
 	NSSet *allObjectsOnTrackAtRevSet = [NSSet setWithArray: allObjectsOnTrackAtRev];
@@ -107,7 +107,7 @@
 {	
 	COEditingContext *ctx = [[COEditingContext alloc] initWithRevision: rev];
 	COObject *objAtRev = [ctx objectWithUUID: [trackObject UUID]];
-	NSArray *allObjectsOnTrackAtRev = [[[objAtRev allStronglyContainedObjectsIncludingSelf] mappedCollection] UUID];
+	NSArray *allObjectsOnTrackAtRev = (NSArray*)[[[objAtRev allStronglyContainedObjectsIncludingSelf] mappedCollection] UUID];
 	[ctx release];
 	objAtRev = nil;
 	

@@ -1,4 +1,5 @@
 #import "CORevision.h"
+#import "FMDatabase.h"
 #import "COStore.h"
 
 @implementation CORevision

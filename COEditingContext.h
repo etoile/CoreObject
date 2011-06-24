@@ -92,6 +92,7 @@
 
 - (COObject*) objectWithUUID: (ETUUID*)uuid;
 
+- (void) deleteObjectWithUUID: (ETUUID*)uuid;
 
 // Committing changes
 
