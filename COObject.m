@@ -710,6 +710,10 @@ static NSArray *COArrayPropertyListForArray(NSArray *array)
 	{
 		result = [NSDictionary dictionaryWithObject: @"nil" forKey: @"type"];
 	}
+	else if ([COObject isPrimitiveCoreObjectValue: value])
+	{
+		result = D(value, @"value", @"primitive", @"type");
+	}
 	else
 	{
 		[NSException raise: NSInvalidArgumentException
@@ -751,6 +755,10 @@ static NSArray *COArrayPropertyListForArray(NSArray *array)
 		else if ([[plist valueForKey: @"type"] isEqualToString: @"nil"])
 		{
 			return nil;
+		}
+		else if ([[plist valueForKey: @"type"] isEqualToString: @"primitive"])
+		{
+			return [plist valueForKey: @"value"];
 		}
 	}
 	else if ([plist isKindOfClass: [NSArray class]])
