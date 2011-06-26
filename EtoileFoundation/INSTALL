@@ -1,0 +1,30 @@
+EtoileFoundation INSTALL
+========================
+
+Required software
+-----------------
+
+You need to have the GNUstep core libraries installed in order to
+compile and use EtoileFoundation. The core packages are, at a minimum:
+
+ * gnustep-make
+ * gnustep-base
+ * gnustep-gui
+ * gnustep-back
+
+See <http://www.gnustep.org/> for further information.
+
+
+Build and Install
+-----------------
+
+Steps to build:
+
+	make install
+
+
+Trouble
+-------
+
+   Give us feedback! Tell us what you like; tell us what you think
+could be better. Send bug reports and patches to <bug-etoile@gna.org>.

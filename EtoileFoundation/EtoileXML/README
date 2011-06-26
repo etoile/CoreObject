@@ -1,0 +1,21 @@
+EtoileXML
+=========
+
+:Maintainer: David Chisnall
+:Authors: David Chisnall, Yen-Ju Chen, Niels Grewe
+:License: Modified BSD License
+:Version: 0.1
+
+Write an introduction to EtoileXML.
+
+Mac OS X Support
+----------------
+
+You can build EtoileXML with the Xcode project of EtoileFoundation located in the parent directory.
+
+Developer Notes
+===============
+
+EtoileXML links EtoileFoundation and not the reverse. From EtoileFoundation, it mainly uses ETSocket to support writing XML to a socket (see ETXMLSocketWriter).
+
+For now, EtoileXML links the AppKit (known as gnustep-gui on GNUstep), we expect to move the classes that introduce this dependency elsewhere in the long run. You can compile EtoileXML without any AppKit dependency by excluding ETXMLXHTML-IMParser and NSAttributedString+HTML from the build.

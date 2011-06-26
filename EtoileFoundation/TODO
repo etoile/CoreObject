@@ -1,0 +1,17 @@
+TODO EtoileFoundation
+=====================
+
+- Redesign the mirror API in order to allow the existing classes to be extended per use case (e.g. documentation, runtime reflection, code generation, access control etc.). SourceCodeKit should be able to leverage it unlike now. See:
+  + Mirrors: Design Principles for Meta-level Facilities of Object: bracha.org/mirrors.pdf 
+  + Proxies: Design Principles for Robust Object-oriented Intercession: soft.vub.ac.be/~tvcutsem/proxies/assets/proxies.pdf
+  + Mirages: Behavioral Intercession in a Mirror-based Architecture: soft.vub.ac.be/Publications/2007/vub-prog-tr-07-16.pdf 
+  + Newspeak Mixin implementation: newspeaklanguage.org
+- Finish the mirror implementation and write a related test suite
+- Finish metamodel implementation (validation, role classes etc.) and extend the test suite
+- Get rid of glibc_hack_unistd.h if possible
+- Update NSURL+Etoile once recent Mac OS X additions such as -URLByAppendingPathComponent: are added to GNUstep
+
+Known Issues
+------------
+
+- Figure out why CArray doesn't compile on Mac OS X

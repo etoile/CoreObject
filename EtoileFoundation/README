@@ -1,0 +1,84 @@
+EtoileFoundation
+================
+
+Maintainers
+: Quentin Mathe <quentin.mathe@gmail.com>, David Chisnall
+Authors
+: David Chisnall, Quentin Mathe, Uli Kusterer, Yen-Ju Chen, Eric Wasylishen
+License
+: Modified BSD License
+Version
+: 0.4.2
+
+EtoileFoundation is the core framework for all Etoile projects, providing numerous convenience methods on top of the OpenStep foundation and significantly better support for reflection. Here is a summary of some the interesting features:
+
+- mirror-based reflection
+- mixins and traits
+- restartable exceptions
+- double-dispatch
+- collection class protocol and additions
+- UUID
+- convenient macros such as FOREACH
+- dynamic C array
+- prototypes (if you use the GNUstep libobjc2 which is required to do a full Etoile build)
+- metamodel
+- UTI
+- generic history model
+- socket
+- stack trace recording
+
+Two sub-frameworks are bundled with it: 
+- *EtoileThread* which allows objects to transparently be run in a separate thread. 
+- *EtoileXML* which is a light-weight and tolerant XML parsing framework whose main ability is to handle truncated and not well-formed XML documents. For example, with XML streams used by the XMPP protocol, the XML is received in fragments.
+
+Be wary that the framework is really much work-in-progress for now, so some parts really need improvements and the API is still a moving target.
+
+
+Build and Install
+-----------------
+
+Read INSTALL document.
+
+
+Mac OS X support
+----------------
+
+EtoileFoundation is supported on Mac OS X, minus the parts that only works with the GNU runtime (prototypes, restartable exceptions and some introspection stuff).
+An Xcode project is available to build both EtoileFoundation and EtoileXML on Mac OS X. EtoileThread is unsupported on Mac OS X presently.
+
+ETException.m, NSObject+Prototypes.m, NSBlocks.m and CArray.m are not compiled on Mac OS X.
+
+For EtoileFoundation compilation, many warnings about missing protocol method implementations are reported, because #pragma GCC diagnostic ignored "-Wprotocol" only works with LLVM 1.5 64 bits. By default, EtoileFoundation is compiled as a Universal 32/64 bits framework. Switch *Architectures* to Intel 64 bits to eliminate these issues at development time (supposing your machine is 64 bits compatible).
+
+Developer Notes
+===============
+
+If you want to use classes from EtoileThread or EtoileXML, you can use import EtoileFoundation.h which is an umbrella header for all the EtoileFoundation, EtoileThread and EtoileXML classes. However linking requires that you link EtoileXML and EtoileThread by yourself since EtoileFoundation does not.
+
+Unlike EtoileThread which has no dependency, EtoileXML depends on EtoileFoundation and links it.
+
+
+EtoileThread
+------------
+
+See the README in the EtoileThread subdirectory.
+
+
+EtoileXML
+---------
+
+See the README in the EtoileXML subdirectory.
+
+
+Tests suite
+-----------
+
+UnitKit (bundled with Etoile) is required.
+
+Steps to produce a test bundle and run tests suite:
+
+    * make test=yes 
+
+    * ukrun
+
+The test suite doesn't test the classes that belong to EtoileThread and EtoileXML. For these, tests are available in their respective subdirectories but they currently don't use UnitKit.

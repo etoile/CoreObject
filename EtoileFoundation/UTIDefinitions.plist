@@ -1,0 +1,2489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+
+	<!-- public -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.3gpp</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.movie</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.3gpp2</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.movie</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.aifc-audio</string>
+
+		<key>UTTypeDescription</key>
+		<string>AIFF Compressed Audio</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.aiff-audio</string>
+
+		<key>UTTypeDescription</key>
+		<string>AIFF Audio</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.archive</string>
+
+		<key>UTTypeDescription</key>
+		<string>Archive</string>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.assembly-source</string>
+
+		<key>UTTypeDescription</key>
+		<string>Assembly Source</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.audio</string>
+
+		<key>UTTypeDescription</key>
+		<string>Audio</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audiovisual-content</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.audiovisual-content</string>
+
+		<key>UTTypeDescription</key>
+		<string>Audio-Visual Content</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.content</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.avi</string>
+
+		<key>UTTypeDescription</key>
+		<string>AVI Video</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.movie</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>avi</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.c-header</string>
+
+		<key>UTTypeDescription</key>
+		<string>C Header File</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>h</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.c-plus-plus-header</string>
+
+		<key>UTTypeDescription</key>
+		<string>C++ Header File</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.c-plus-plus-source</string>
+
+		<key>UTTypeDescription</key>
+		<string>C++ Source Code</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.c-source</string>
+
+		<key>UTTypeDescription</key>
+		<string>C Source Code</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>c</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.case-insensitive-text</string>
+
+		<key>UTTypeDescription</key>
+		<string>Case-Insensitive Text</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.text</string>
+		</array>
+	</dict>
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.calendar-event</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.camera-raw-image</string>
+
+		<key>UTTypeDescription</key>
+		<string>Raw Image</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>crw</string>
+				<string>cr2</string>
+				<string>nef</string>
+				<string>nrw</string>
+				<string>dng</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.composite-content</string>
+
+		<key>UTTypeDescription</key>
+		<string>Composite Content</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.content</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.contact</string>
+
+		<key>UTTypeDescription</key>
+		<string>Contact</string>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.content</string>
+
+		<key>UTTypeDescription</key>
+		<string>Content</string>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.cpio-archive</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.csh-script</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.shell-script</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.data</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.item</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.database</string>
+
+		<key>UTTypeDescription</key>
+		<string>Database</string>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.directory</string>
+
+		<key>UTTypeDescription</key>
+		<string>Directory</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.item</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.disk-image</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.archive</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.executable</string>
+
+		<key>UTTypeDescription</key>
+		<string>Executable</string>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.fax</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.file-url</string>
+
+		<key>UTTypeDescription</key>
+		<string>File URL</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.url</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.filename-extension</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.case-insensitive-text</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.folder</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.directory</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.font</string>
+
+		<key>UTTypeDescription</key>
+		<string>Font</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.html</string>
+
+		<key>UTTypeDescription</key>
+		<string>HTML Document</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.text</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>html</string>
+				<string>htm</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>text/html</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.image</string>
+
+		<key>UTTypeDescription</key>
+		<string>Image</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.content</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.item</string>
+
+		<key>UTTypeDescription</key>
+		<string>Item</string>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.jpeg</string>
+
+		<key>UTTypeDescription</key>
+		<string>JPEG Image</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>jpg</string>
+				<string>jpeg</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>image/jpeg</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.jpeg-2000</string>
+
+		<key>UTTypeDescription</key>
+		<string>JPEG 2000 Image</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>jp2</string>
+				<string>jpx</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>image/jp2</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.message</string>
+
+		<key>UTTypeDescription</key>
+		<string>Message</string>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.mig-source</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.mime-type</string>
+
+		<key>UTTypeDescription</key>
+		<string>MIME Type</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.case-insensitive-text</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.movie</string>
+
+		<key>UTTypeDescription</key>
+		<string>Movie</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audiovisual-content</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.mp3</string>
+
+		<key>UTTypeDescription</key>
+		<string>MP3 Audio</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>mp3</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>audio/mpeg</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.mpeg</string>
+
+		<key>UTTypeDescription</key>
+		<string>MPEG Video</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.movie</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>mpg</string>
+				<string>mpeg</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>video/mpeg</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.mpeg-4</string>
+
+		<key>UTTypeDescription</key>
+		<string>MEPG-4 Video</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.movie</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>mp4</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>video/mp4</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.mpeg-4-audio</string>
+
+		<key>UTTypeDescription</key>
+		<string>MPEG-4 Audio</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+			<string>public.mpeg-4</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>aac</string>
+				<string>m4a</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>audio/mp4</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.object-code</string>
+
+		<key>UTTypeDescription</key>
+		<string>Object Code</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.executable</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.objective-c-plus-plus-source</string>
+
+		<key>UTTypeDescription</key>
+		<string>Objective-C++ Source Code</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>mm</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.objective-c-source</string>
+
+		<key>UTTypeDescription</key>
+		<string>Objective-C Source Code</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>m</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.opentype-font</string>
+
+		<key>UTTypeDescription</key>
+		<string>OpenType Font</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.font</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.perl-script</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.shell-script</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.php-script</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.shell-script</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.plain-text</string>
+
+		<key>UTTypeDescription</key>
+		<string>Plain Text</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.text</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>txt</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>text/plain</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.png</string>
+
+		<key>UTTypeDescription</key>
+		<string>PNG Image</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>                 
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>png</string>
+			</array>
+			<key>public.mime-type</key>                 
+				<array>
+					<string>image/png</string>
+                        </array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.presentation</string>
+
+		<key>UTTypeDescription</key>
+		<string>Presentation</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.composite-content</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.python-script</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.shell-script</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.rtf</string>
+
+		<key>UTTypeDescription</key>
+		<string>RTF Document</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.text</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>rtf</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>text/rtf</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.ruby-script</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.shell-script</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.script</string>
+
+		<key>UTTypeDescription</key>
+		<string>Script</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.shell-script</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.script</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.source-code</string>
+
+		<key>UTTypeDescription</key>
+		<string>Source Code</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.plain-text</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.symlink</string>
+
+		<key>UTTypeDescription</key>
+		<string>Symbolic Link</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.item</string>
+			<string>com.apple.resolvable</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.tar-archive</string>
+
+		<key>UTTypeDescription</key>
+		<string>Tar Archive</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>org.gnu.gnu-tar-archive</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.text</string>
+
+		<key>UTTypeDescription</key>
+		<string>Text</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.content</string>
+			<string>public.data</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.tiff</string>
+
+		<key>UTTypeDescription</key>
+		<string>TIFF Image</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>tiff</string>
+				<string>tif</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>image/tiff</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.truetype-collection-font</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.font</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.truetype-font</string>
+
+		<key>UTTypeDescription</key>
+		<string>TrueType Font</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.font</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.truetype-ttf-font</string>
+
+		<key>UTTypeDescription</key>
+		<string>TrueType Font</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.truetype-font</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.ulaw-audio</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.url</string>
+
+		<key>UTTypeDescription</key>
+		<string>Uniform Resource Locator</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.url-name</string>
+
+		<key>UTTypeDescription</key>
+		<string>URL Name</string>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.utf16-external-plain-text</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.plain-text</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.utf16-plain-text</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.plain-text</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.utf8-plain-text</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.plain-text</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.vcard</string>
+
+		<key>UTTypeDescription</key>
+		<string>VCard</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.content</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>vcard</string>
+				<string>vcf</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.video</string>
+
+		<key>UTTypeDescription</key>
+		<string>Video</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.movie</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.volume</string>
+
+		<key>UTTypeDescription</key>
+		<string>Volume</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.folder</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.xbitmap-image</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>public.xml</string>
+
+		<key>UTTypeDescription</key>
+		<string>XML Document</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.text</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>xml</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>text/xml</string>
+			</array>
+		</dict>
+	</dict>
+
+	<!-- com.adobe -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.adobe.encapsulated-postscript</string>
+
+		<key>UTTypeDescription</key>
+		<string>Encapsulated PostScript</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.adobe.postscript</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>eps</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>application/postscript</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.adobe.illustrator.ai-image</string>
+
+		<key>UTTypeDescription</key>
+		<string>Adobe Illustrator Image</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>ai</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.adobe.pdf</string>
+
+		<key>UTTypeDescription</key>
+		<string>Portable Document Format</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.composite-content</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>pdf</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>application/pdf</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.adobe.photoshop-image</string>
+
+		<key>UTTypeDescription</key>
+		<string>Adobe Photoshop Image</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>psd</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.adobe.postscript</string>
+
+		<key>UTTypeDescription</key>
+		<string>PostScript Document</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>ps</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>application/postscript</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.adobe.postscript-font</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.font</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.adobe.postscript-lwfn-font</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.adobe.postscript-font</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.adobe.postscript-pfb-font</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.adobe.postscript-font</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.adobe.postscript.pfa-font</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.adobe.postscript-font</string>
+		</array>
+	</dict>
+
+	<!-- com.apple -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.alias-file</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>com.apple.resolvable</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.alias-record</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>com.apple.resolvable</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.applescript.script</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.applescript.text</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.script</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.application</string>
+
+		<key>UTTypeDescription</key>
+		<string>Application</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.executable</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.application-bundle</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.apple.package</string>
+			<string>com.apple.bundle</string>
+			<string>com.apple.application</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>app</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.application-file</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.apple.application</string>
+			<string>public.data</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.binhex-archive</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.archive</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.bundle</string>
+
+		<key>UTTypeDescription</key>
+		<string>Bundle</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.directory</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>bundle</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.colorsync-profile</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.coreaudio-format</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.dashboard-widget</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.apple.bundle</string>
+			<string>com.apple.package</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.deprecated-application-file</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.apple.application-file</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.flat-rtfd</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.composite-content</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.font-suitcase</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.font</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.framework</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.apple.bundle</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.icns</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.ink.inktext</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.keynote.key</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.apple.package</string>
+			<string>public.presentation</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.keynote.kth</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.apple.package</string>
+			<string>public.composite-content</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.macbinary-archive</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.archive</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.mach-o-binary</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.executable</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.macpaint-image</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.metadata-importer</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.apple.plugin</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.mount-point</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.item</string>
+			<string>com.apple.resolvable</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.nspboard-type</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.text</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.ostype</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.text</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.package</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.directory</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.pef-binary</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.executable</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.pict</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.plugin</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.apple.bundle</string>
+			<string>com.apple.package</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.protected-mpeg-4-audio</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.quartz-composer-composition</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.executable</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.quicktime-image</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.quicktime-movie</string>
+
+		<key>UTTypeDescription</key>
+		<string>QuickTime Movie</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.movie</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>mov</string>
+				<string>qt</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>video/quicktime</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.resolvable</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.rez-source</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.rtfd</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>com.apple.package</string>
+			<string>public.composite-content</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.symbol-export</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.traditional-mac-plain-text</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.plain-text</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.truetype-datafork-suitcase-font</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.truetype-font</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.txn.text-multimedia-data</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.composite-content</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.apple.webarchive</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.composite-content</string>
+		</array>
+	</dict>
+
+	<!-- com.compuserve -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.compuserve.gif</string>
+
+		<key>UTTypeDescription</key>
+		<string>GIF Image</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>gif</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>image/gif</string>
+			</array>
+		</dict>
+	</dict>
+
+	<!-- com.digidesign -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.digidesign.sd2-audio</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+		</array>
+	</dict>
+
+	<!-- com.ilm -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.ilm.openexr-image</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+	</dict>
+
+	<!-- com.j2 -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.j2.jfx-fax</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.fax</string>
+		</array>
+	</dict>
+
+	<!-- com.js -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.js.efx-fax</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.fax</string>
+		</array>
+	</dict>
+
+	<!-- com.kodak -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.kodak.flashpix.image</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+	</dict>
+
+	<!-- com.microsoft -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.advanced-stream-redirector</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.xml</string>
+			<string>public.audiovisual-content</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.advanced-systems-format</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audiovisual-content</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.bmp</string>
+
+		<key>UTTypeDescription</key>
+		<string>BMP Image</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>bmp</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.excel.xls</string>
+
+		<key>UTTypeDescription</key>
+		<string>Microsoft Excel Spreadsheet</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.ico</string>
+
+		<key>UTTypeDescription</key>
+		<string>Microsoft Icon</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.powerpoint.ppt</string>
+
+		<key>UTTypeDescription</key>
+		<string>Powerpoint Presentation</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.presentation</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>ppt</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.waveform-audio</string>
+
+		<key>UTTypeDescription</key>
+		<string>WAV Audio</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>wav</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.windows-dynamic-link-library</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.executable</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.windows-executable</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.executable</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.windows-media-wax</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+			<string>com.microsoft.advanced-stream-redirector</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.windows-media-wm</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.movie</string>
+			<string>com.microsoft.advanced-systems-format</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.windows-media-wma</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+			<string>com.microsoft.advanced-systems-format</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.windows-media-wmp</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.movie</string>
+			<string>com.microsoft.advanced-systems-format</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.windows-media-wmv</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.movie</string>
+			<string>com.microsoft.advanced-systems-format</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.windows-media-wmx</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+			<string>com.microsoft.advanced-stream-redirector</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.windows-media-wvx</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+			<string>com.microsoft.advanced-stream-redirector</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.microsoft.word.doc</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+		</array>
+	</dict>
+
+	<!-- com.netscape -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.netscape.javascript-source</string>
+
+		<key>UTTypeDescription</key>
+		<string>ECMAScript Source Code</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+			<string>public.executable</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>js</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>application/javascript</string>
+				<string>application/ecmascript</string>
+				<string>text/javascript</string>
+				<string>text/ecmascript</string>
+			</array>
+		</dict>
+	</dict>
+
+	<!-- com.pkware -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.pkware.zip-archive</string>
+
+		<key>UTTypeDescription</key>
+		<string>Zip Archive</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.archive</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>zip</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>application/zip</string>
+			</array>
+		</dict>
+	</dict>
+
+	<!-- com.real -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.real.realaudio</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.real.realmedia</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.movie</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.real.smil</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.xml</string>
+		</array>
+	</dict>
+
+	<!-- com.sgi -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.sgi.sgi-image</string>
+
+		<key>UTTypeDescription</key>
+		<string>SGI Image</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>sgi</string>
+			</array>
+		</dict>
+	</dict>
+
+	<!-- com.sun -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.sun.java-archive</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.executable</string>
+			<string>public.archive</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.sun.java-class</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.executable</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.sun.java-source</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.source-code</string>
+		</array>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.sun.java-web-start</string>
+
+		<key>UTTypeDescription</key>
+		<string></string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.xml</string>
+		</array>
+	</dict>
+
+	<!-- com.truevision -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>com.truevision.tga-image</string>
+
+		<key>UTTypeDescription</key>
+		<string>Truevision Targa Image</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.image</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>tga</string>
+			</array>
+		</dict>
+	</dict>
+
+	<!-- org.gnu -->
+
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>org.gnu.gnu-tar-archive</string>
+
+		<key>UTTypeDescription</key>
+		<string>Tar Archive</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.archive</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>tar</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>org.gnu.gnu-zip-archive</string>
+
+		<key>UTTypeDescription</key>
+		<string>gzip Archive</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.data</string>
+			<string>public.archive</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>gz</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>org.gnu.gnu-zip-tar-archive</string>
+
+		<key>UTTypeDescription</key>
+		<string>gzipped Tar Archive</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>org.gnu.gnu-zip-archive</string>
+		</array>
+
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>tgz</string>
+			</array>
+		</dict>
+	</dict>
+	
+	<!-- custom additions -->
+	
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>org.flac.flac-audio</string>
+
+		<key>UTTypeDescription</key>
+		<string>FLAC Audio</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>flac</string>
+			</array>
+		</dict>
+	</dict>
+	<dict>
+		<key>UTTypeIdentifier</key>
+		<string>org.xiph.ogg-vorbis-audio</string>
+
+		<key>UTTypeDescription</key>
+		<string>Ogg Vorbis Audio</string>
+
+		<key>UTTypeConformsTo</key>
+		<array>
+			<string>public.audio</string>
+		</array>
+		
+		<key>UTTypeTagSpecification</key>
+		<dict>
+			<key>public.filename-extension</key>
+			<array>
+				<string>ogg</string>
+				<string>oga</string>
+			</array>
+			<key>public.mime-type</key>
+			<array>
+				<string>audio/vorbis</string>
+			</array>
+		</dict>
+	</dict>
+	
+</array>
+</plist>
