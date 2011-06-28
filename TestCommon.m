@@ -2,7 +2,9 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
 
-void setUpMetamodel()
+@implementation UKRunner (TestSuiteSetUp)
+
++ (void) setUpMetamodel
 {
 	// HACK: make sure COObject's metamodel is set up
 	[COObject class];
@@ -81,6 +83,13 @@ void setUpMetamodel()
 	
 	[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
 }
+
++ (void) setUp
+{
+	[self setUpMetamodel];
+}
+
+@end
 
 COEditingContext *NewContext()
 {

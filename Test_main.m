@@ -1,46 +1,34 @@
 #import <Foundation/Foundation.h>
+#import <EtoileFoundation/EtoileFoundation.h>
 #import <UnitKit/UKRunner.h>
 #import <UnitKit/UKTestHandler.h>
-#import "TestCommon.h"
 
-@interface StatusPrinter : NSObject
-{
-	unsigned int warnings;
-}
-- (void) reportWarning:(NSString *)message;
-- (void) printStatus;
+@interface UKRunner (TestSuiteSetUp)
++ (void) setUp;
 @end
 
-@implementation StatusPrinter
-
-- (void) reportWarning:(NSString *)message
+int main (int argc, const char *argv[])
 {
-	warnings++;
-	NSLog(@"%@", message);
-}
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-- (void) printStatus
-{	
-	NSLog(@"%d passed, %d failed, %d warnings", [[UKTestHandler handler] testsPassed], [[UKTestHandler handler] testsFailed], warnings);
-}
+	//[[UKTestHandler handler] setQuiet: YES];
 
-@end
+	// TODO: Tweak UnitKit to support setting up a test suite
+	[[UKRunner ifResponds] setUp];
 
-
-int main (int argc, const char * argv[]) {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-
-	setUpMetamodel();
-	
-	StatusPrinter *stats = [StatusPrinter new];
-	[[UKTestHandler handler] setDelegate: stats];
-	[[UKTestHandler handler] setQuiet: YES];
-	
 	UKRunner *runner = [UKRunner new];
+
 	[runner runTestsInBundle: [NSBundle mainBundle]];
+
+	// FIXME: Handle that properly in UnitKit 
+    int testsPassed = [[UKTestHandler handler] testsPassed];
+    int testsFailed = [[UKTestHandler handler] testsFailed];
+	int exceptionsReported = [[UKTestHandler handler] exceptionsReported];
+    
+	printf("\nResult: %i tests, %i failed, %i exceptions\n", 
+		(testsPassed + testsFailed), testsFailed, exceptionsReported);
 	
-	[stats printStatus];
-	
+	[runner release];
     [pool drain];
     return 0;
 }
