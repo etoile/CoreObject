@@ -1,5 +1,4 @@
 #import "COEditingContext.h"
-#import <EtoileFoundation/ETModelDescriptionRepository.h>
 
 @implementation COEditingContext
 

@@ -1,6 +1,7 @@
-#import <Cocoa/Cocoa.h>
-#import "CORevision.h"
-#import "COObject.h"
+#import <Foundation/Foundation.h>
+#import <EtoileFoundation/EtoileFoundation.h>
+#import <ObjectMerging/CORevision.h>
+#import <ObjectMerging/COObject.h>
 
 @class COHistoryTrackNode;
 

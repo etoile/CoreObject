@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import "COObject.h"
-#import "COStore.h"
+#import <ObjectMerging/COObject.h>
+#import <ObjectMerging/COStore.h>
 
 @class COObject;
 

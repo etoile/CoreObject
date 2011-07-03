@@ -1,4 +1,3 @@
-#import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
 #import "COContainer.h"
 #import "COCollection.h"

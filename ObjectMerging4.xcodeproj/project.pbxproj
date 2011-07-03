@@ -155,7 +155,6 @@
 		6686BDAD12592BDA0065DE1A /* ObjectMerging-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ObjectMerging-Info.plist"; sourceTree = "<group>"; };
 		6686BDB712592C1B0065DE1A /* COObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = COObject.h; sourceTree = "<group>"; };
 		6686BDB812592C1B0065DE1A /* COObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = COObject.m; sourceTree = "<group>"; };
-		6686BDB912592C1B0065DE1A /* COObject+KVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "COObject+KVC.m"; sourceTree = "<group>"; };
 		6686BDBA12592C1B0065DE1A /* COEditingContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = COEditingContext.h; sourceTree = "<group>"; };
 		6686BDBB12592C1B0065DE1A /* COEditingContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = COEditingContext.m; sourceTree = "<group>"; };
 		6686BDC212592C1B0065DE1A /* COObjectGraphDiff.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = COObjectGraphDiff.h; sourceTree = "<group>"; };
@@ -334,7 +333,6 @@
 			isa = PBXGroup;
 			children = (
 				66D09D58129CE477006BEDC3 /* Model Objects */,
-				6686BDB912592C1B0065DE1A /* COObject+KVC.m */,
 				6686BDBA12592C1B0065DE1A /* COEditingContext.h */,
 				6686BDBB12592C1B0065DE1A /* COEditingContext.m */,
 				6686BDC212592C1B0065DE1A /* COObjectGraphDiff.h */,

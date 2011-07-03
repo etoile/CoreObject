@@ -1,4 +1,6 @@
-#import "COContainer.h"
+#import <Foundation/Foundation.h>
+#import <EtoileFoundation/EtoileFoundation.h>
+#import <ObjectMerging/COContainer.h>
 
 /**
  * COColection is an unordered, weak (an object can be in any number of collections)

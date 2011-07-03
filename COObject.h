@@ -1,5 +1,6 @@
+#import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import "COEditingContext.h"
+#import <ObjectMerging/COEditingContext.h>
 
 @class COEditingContext;
 
