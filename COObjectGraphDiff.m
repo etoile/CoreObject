@@ -1,5 +1,7 @@
-#import <Foundation/NSSet.h>
 #import "COObjectGraphDiff.h"
+#import "COEditingContext.h"
+#import "COObject.h"
+#import "COContainer.h"
 #import "COArrayDiff.h"
 #import "COSetDiff.h"
 

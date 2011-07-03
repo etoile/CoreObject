@@ -1,9 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <ObjectMerging/COObject.h>
-#import <ObjectMerging/COStore.h>
 
-@class COObject;
+@class COStore, CORevision, COObject;
 
 /**
  * An object context is like a working copy in a revision control system.

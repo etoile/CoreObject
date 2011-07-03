@@ -143,12 +143,6 @@
 		60CF350813BA9348001F9011 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		6614500F12B0127E000DB843 /* Design.rtfd */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; path = Design.rtfd; sourceTree = "<group>"; };
-		6614501012B01C96000DB843 /* COBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COBranch.h; sourceTree = "<group>"; };
-		6614501112B01C96000DB843 /* COBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COBranch.m; sourceTree = "<group>"; };
-		6614501212B01DF5000DB843 /* COCommit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommit.h; sourceTree = "<group>"; };
-		6614501312B01DF5000DB843 /* COCommit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommit.m; sourceTree = "<group>"; };
-		6614501612B020AA000DB843 /* COStoreCoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COStoreCoreObject.h; sourceTree = "<group>"; };
-		6614501712B020AA000DB843 /* COStoreCoreObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COStoreCoreObject.m; sourceTree = "<group>"; };
 		6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestHistoryTrack.m; sourceTree = "<group>"; };
 		6627F390127C7E6700E06946 /* ExceptionHandling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExceptionHandling.framework; path = System/Library/Frameworks/ExceptionHandling.framework; sourceTree = SDKROOT; };
 		6686BDAC12592BDA0065DE1A /* ObjectMerging.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectMerging.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -440,12 +434,6 @@
 				791B4E5D1299C8CB00CCF472 /* CORevision.m */,
 				791B4E601299C8CB00CCF472 /* COStore.h */,
 				791B4E611299C8CB00CCF472 /* COStore.m */,
-				6614501012B01C96000DB843 /* COBranch.h */,
-				6614501112B01C96000DB843 /* COBranch.m */,
-				6614501212B01DF5000DB843 /* COCommit.h */,
-				6614501312B01DF5000DB843 /* COCommit.m */,
-				6614501612B020AA000DB843 /* COStoreCoreObject.h */,
-				6614501712B020AA000DB843 /* COStoreCoreObject.m */,
 			);
 			name = Store;
 			sourceTree = "<group>";
@@ -785,15 +773,15 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/EtoileFoundation/build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
 					"$(BUILT_PRODUCTS_DIR)",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
 				SDKROOT = macosx10.6;
 				WARNING_CFLAGS = "-Wall";
 			};

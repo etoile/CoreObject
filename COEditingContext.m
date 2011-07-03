@@ -1,4 +1,7 @@
 #import "COEditingContext.h"
+#import "COObject.h"
+#import "COStore.h"
+#import "CORevision.h"
 
 @implementation COEditingContext
 

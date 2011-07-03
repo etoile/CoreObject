@@ -1,8 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <ObjectMerging/CORevision.h>
-#import <ObjectMerging/COObject.h>
 
+@class CORevision, COObject, COStore;
 @class COHistoryTrackNode;
 
 /**

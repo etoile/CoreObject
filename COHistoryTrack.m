@@ -1,6 +1,10 @@
 #import "COHistoryTrack.h"
+#import "CORevision.h"
+#import "COEditingContext.h"
+#import "COObject.h"
 #import "COContainer.h"
 #import "COObjectGraphDiff.h"
+#import "COStore.h"
 
 @implementation COHistoryTrack
 

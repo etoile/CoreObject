@@ -1,4 +1,5 @@
 #import "COObject.h"
+#import "COEditingContext.h"
 #import "COContainer.h"
 #import "COCollection.h"
 
@@ -434,7 +435,7 @@
 		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
 	}
 	
-	[copy removeObject: object atIndex: index];
+	[copy removeObject: object atIndex: index hint: nil];
 	[self setValue: copy forProperty: key];
 	[copy release];
 }

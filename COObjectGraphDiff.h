@@ -1,13 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <ObjectMerging/COObject.h>
-#import <ObjectMerging/COContainer.h>
-#import <ObjectMerging/COArrayDiff.h>
-#import <ObjectMerging/COSetDiff.h>
 
-
-@class COObject;
-@class COEditingContext;
+@class COArrayDiff, COSetDiff, COEditingContext, COContainer;
 
 /**
  * 

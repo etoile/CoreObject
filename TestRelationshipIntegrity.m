@@ -2,6 +2,7 @@
 #import <UnitKit/UnitKit.h>
 #import "COEditingContext.h"
 #import "COContainer.h"
+#import "COStore.h"
 #import "TestCommon.h"
 
 @interface TestRelationshipIntegrity : NSObject <UKTest>

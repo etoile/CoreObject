@@ -1,9 +1,10 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
 #import "COEditingContext.h"
-#import "TestCommon.h"
 #import "COContainer.h"
 #import "COCollection.h"
+#import "COStore.h"
+#import "TestCommon.h"
 
 @interface TestEditingContext : NSObject <UKTest>
 {

@@ -1,6 +1,7 @@
-#import "TestCommon.h"
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
+#import "COStore.h"
+#import "TestCommon.h"
 
 @implementation UKRunner (TestSuiteSetUp)
 

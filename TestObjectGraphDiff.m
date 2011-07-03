@@ -147,35 +147,35 @@
 	[ctx3 insertObject: parent];
 	
 	// ctx2: remove child2, set a label for subchild1
-	assert([[[ctx2 objectWithUUID: [parent UUID]] contentArray] count] == 3);
+	assert([[(id)[ctx2 objectWithUUID: [parent UUID]] contentArray] count] == 3);
 	[[ctx2 objectWithUUID: [child2 UUID]] setValue: nil forProperty: @"parentContainer"];
-	assert([[[ctx2 objectWithUUID: [parent UUID]] contentArray] count] == 2);
-	assert([[[ctx1 objectWithUUID: [parent UUID]] contentArray] count] == 3);
+	assert([[(id)[ctx2 objectWithUUID: [parent UUID]] contentArray] count] == 2);
+	assert([[(id)[ctx1 objectWithUUID: [parent UUID]] contentArray] count] == 3);
 	
 	[[ctx2 objectWithUUID: [subchild1 UUID]] setValue: @"Groceries" forProperty: @"label"];
 	 
 	// ctx3: move subchild1 to child3, insert child4
-	[[ctx3 objectWithUUID: [child3 UUID]] addObject: [ctx3 objectWithUUID: [subchild1 UUID]]];
+	[(id)[ctx3 objectWithUUID: [child3 UUID]] addObject: [ctx3 objectWithUUID: [subchild1 UUID]]];
 	COContainer *child4Ctx3 = [ctx3 insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	[[ctx3 objectWithUUID: [parent UUID]] insertObject: child4Ctx3 atIndex: 0];
-	assert([[[ctx1 objectWithUUID: [parent UUID]] contentArray] count] == 3);
+	[(id)[ctx3 objectWithUUID: [parent UUID]] insertObject: child4Ctx3 atIndex: 0];
+	assert([[(id)[ctx1 objectWithUUID: [parent UUID]] contentArray] count] == 3);
 	
 	// Now do the merge
-	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx2 objectWithUUID: [parent UUID]]];
+	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: (id)[ctx2 objectWithUUID: [parent UUID]]];
 	UKNotNil(diff1vs2);
-	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx3 objectWithUUID: [parent UUID]]];
+	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: (id)[ctx3 objectWithUUID: [parent UUID]]];
 	UKNotNil(diff1vs3);
 	COObjectGraphDiff *merged = [COObjectGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
 	// FIXME: Test that there are no conflicts
 
 	// Apply the resulting diff to ctx1
 	UKFalse([ctx1 hasChanges]);
-	assert([[[ctx1 objectWithUUID: [parent UUID]] contentArray] count] == 3);
+	assert([[(id)[ctx1 objectWithUUID: [parent UUID]] contentArray] count] == 3);
 	[merged applyToContext: ctx1];
 	UKStringsEqual(@"Groceries", [subchild1 valueForProperty: @"label"]);
 	UKObjectsSame(child3, [subchild1 valueForProperty: @"parentContainer"]);
 	UKIntsEqual(3, [[parent contentArray] count]);
-	COContainer *child4 = [ctx1 objectWithUUID: [child4Ctx3 UUID]];
+	COContainer *child4 = (id)[ctx1 objectWithUUID: [child4Ctx3 UUID]];
 	if (3 == [[parent contentArray] count])
 	{
 		UKObjectsSame(child4, [[parent contentArray] objectAtIndex: 0]);
@@ -221,7 +221,7 @@
 	[ctx3 insertObject: parent];
 	
 	// ctx2: remove child1
-	[[ctx2 objectWithUUID: [parent UUID]] removeObject: [ctx2 objectWithUUID: [child1 UUID]]];
+	[(id)[ctx2 objectWithUUID: [parent UUID]] removeObject: [ctx2 objectWithUUID: [child1 UUID]]];
 	
 	// ctx2:
 	//
@@ -231,8 +231,8 @@
 		
 	// ctx3: put child1 inside  child2, and add a new child3 inside child2
 	COContainer *child3Ctx3 = [ctx3 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	[[ctx3 objectWithUUID: [child2 UUID]] addObject: [ctx3 objectWithUUID: [child1 UUID]]];
-	[[ctx3 objectWithUUID: [child2 UUID]] addObject: child3Ctx3];
+	[(id)[ctx3 objectWithUUID: [child2 UUID]] addObject: [ctx3 objectWithUUID: [child1 UUID]]];
+	[(id)[ctx3 objectWithUUID: [child2 UUID]] addObject: child3Ctx3];
 	
 	// ctx3:
 	//
@@ -246,9 +246,9 @@
 	
 	
 	// Now do the merge
-	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx2 objectWithUUID: [parent UUID]]];
+	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: (id)[ctx2 objectWithUUID: [parent UUID]]];
 	UKNotNil(diff1vs2);
-	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx3 objectWithUUID: [parent UUID]]];
+	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: (id)[ctx3 objectWithUUID: [parent UUID]]];
 	UKNotNil(diff1vs3);
 	COObjectGraphDiff *merged = [COObjectGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
 	// FIXME: Test that there are no conflicts
@@ -267,7 +267,7 @@
 	//       |
 	//       \-child3
 	
-	COContainer *child3 = [ctx1 objectWithUUID: [child3Ctx3 UUID]];
+	COContainer *child3 = (id)[ctx1 objectWithUUID: [child3Ctx3 UUID]];
 
 	UKIntsEqual(1, [[parent contentArray] count]);
 	if ([[parent contentArray] count] == 1)
@@ -340,7 +340,7 @@
 	
 	
 	// Now do the merge
-	NSArray *uuids = [[A(tag1, tag2, child) mappedCollection] UUID];
+	NSArray *uuids = (id)[[A(tag1, tag2, child) mappedCollection] UUID];
 	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffObjectsWithUUIDs:uuids  inContext:ctx1 withContext:ctx2];
 	UKNotNil(diff1vs2);
 	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffObjectsWithUUIDs:uuids  inContext:ctx1 withContext:ctx3];
@@ -397,10 +397,10 @@
 	
 	// ctx2: insert subchild1 in child1
 	COContainer *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	[[ctx2 objectWithUUID: [child1 UUID]] addObject: subchild1Ctx2];
+	[(id)[ctx2 objectWithUUID: [child1 UUID]] addObject: subchild1Ctx2];
 	UKObjectsSame([ctx2 objectWithUUID: [child1 UUID]], [subchild1Ctx2 valueForProperty: @"parentContainer"]);
-	UKIntsEqual(1, [[[ctx2 objectWithUUID: [child1 UUID]] contentArray] count]);
-	UKIntsEqual(0, [[[ctx2 objectWithUUID: [child2 UUID]] contentArray] count]);				
+	UKIntsEqual(1, [[(id)[ctx2 objectWithUUID: [child1 UUID]] contentArray] count]);
+	UKIntsEqual(0, [[(id)[ctx2 objectWithUUID: [child2 UUID]] contentArray] count]);				
 	
 	// ctx2:
 	//
@@ -415,10 +415,10 @@
 	
 	// ctx3: insert subchild1 in child2
 	[ctx3 insertObject: subchild1Ctx2];
-	[[ctx3 objectWithUUID: [child2 UUID]] addObject: [ctx3 objectWithUUID: [subchild1Ctx2 UUID]]];
+	[(id)[ctx3 objectWithUUID: [child2 UUID]] addObject: [ctx3 objectWithUUID: [subchild1Ctx2 UUID]]];
 	UKObjectsSame([ctx3 objectWithUUID: [child2 UUID]], [[ctx3 objectWithUUID: [subchild1Ctx2 UUID]] valueForProperty: @"parentContainer"]);
-	UKIntsEqual(0, [[[ctx3 objectWithUUID: [child1 UUID]] contentArray] count]);
-	UKIntsEqual(1, [[[ctx3 objectWithUUID: [child2 UUID]] contentArray] count]);				
+	UKIntsEqual(0, [[(id)[ctx3 objectWithUUID: [child1 UUID]] contentArray] count]);
+	UKIntsEqual(1, [[(id)[ctx3 objectWithUUID: [child2 UUID]] contentArray] count]);				
 	
 	// ctx3:
 	//
@@ -430,9 +430,9 @@
 	//      |
 	//      \-subchild1
 	
-	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx2 objectWithUUID: [parent UUID]]];
+	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: (id)[ctx2 objectWithUUID: [parent UUID]]];
 	UKNotNil(diff1vs2);
-	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx3 objectWithUUID: [parent UUID]]];
+	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: (id)[ctx3 objectWithUUID: [parent UUID]]];
 	UKNotNil(diff1vs3);
 	
 	[COObjectGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
@@ -467,9 +467,9 @@
 	
 	// ctx2: insert subchild1 in child1
 	COContainer *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	[[ctx2 objectWithUUID: [child1 UUID]] addObject: subchild1Ctx2];
+	[(id)[ctx2 objectWithUUID: [child1 UUID]] addObject: subchild1Ctx2];
 	UKObjectsSame([ctx2 objectWithUUID: [child1 UUID]], [subchild1Ctx2 valueForProperty: @"parentContainer"]);
-	UKIntsEqual(1, [[[ctx2 objectWithUUID: [child1 UUID]] contentArray] count]);
+	UKIntsEqual(1, [[(id)[ctx2 objectWithUUID: [child1 UUID]] contentArray] count]);
 	
 	// ctx2:
 	//
@@ -482,9 +482,9 @@
 	
 	// ctx3: insert subchild1 in child1
 	[ctx3 insertObject: subchild1Ctx2];
-	[[ctx3 objectWithUUID: [child1 UUID]] addObject: [ctx3 objectWithUUID: [subchild1Ctx2 UUID]]];
+	[(id)[ctx3 objectWithUUID: [child1 UUID]] addObject: [ctx3 objectWithUUID: [subchild1Ctx2 UUID]]];
 	UKObjectsSame([ctx3 objectWithUUID: [child1 UUID]], [[ctx3 objectWithUUID: [subchild1Ctx2 UUID]] valueForProperty: @"parentContainer"]);
-	UKIntsEqual(1, [[[ctx3 objectWithUUID: [child1 UUID]] contentArray] count]);				
+	UKIntsEqual(1, [[(id)[ctx3 objectWithUUID: [child1 UUID]] contentArray] count]);				
 	
 	// ctx3:
 	//
@@ -494,15 +494,15 @@
 	//      |
 	//      \-subchild1	
 	
-	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx2 objectWithUUID: [parent UUID]]];
+	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: (id)[ctx2 objectWithUUID: [parent UUID]]];
 	UKNotNil(diff1vs2);
-	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx3 objectWithUUID: [parent UUID]]];
+	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: (id)[ctx3 objectWithUUID: [parent UUID]]];
 	UKNotNil(diff1vs3);
 	
 	[COObjectGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
 	// FIXME: Test that the changes are nonconflicting
 	
-	COContainer *subchild1 = [ctx1 objectWithUUID: [subchild1Ctx2 UUID]];
+	COContainer *subchild1 = (id)[ctx1 objectWithUUID: [subchild1Ctx2 UUID]];
 	UKObjectsSame(child1, [subchild1 valueForProperty: @"parentContainer"]);
 	UKIntsEqual(1, [[child1 contentArray] count]);
 	UKObjectsEqual(A(subchild1), [child1 contentArray]);
@@ -562,7 +562,7 @@
 	//                \--child
 	
 	// Now do the merge
-	NSArray *uuids = [[A(tag1, tag2, childCtx2) mappedCollection] UUID];
+	NSArray *uuids = (id)[[A(tag1, tag2, childCtx2) mappedCollection] UUID];
 	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffObjectsWithUUIDs:uuids  inContext:ctx1 withContext:ctx2];
 	UKNotNil(diff1vs2);
 	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffObjectsWithUUIDs:uuids  inContext:ctx1 withContext:ctx3];
@@ -580,7 +580,7 @@
 	//   \--child    \--child
 	
 	
-	COContainer *child = [ctx1 objectWithUUID: [childCtx2 UUID]];
+	COContainer *child = (id)[ctx1 objectWithUUID: [childCtx2 UUID]];
 	UKIntsEqual(1, [[tag1 contentArray] count]);
 	UKIntsEqual(1, [[tag2 contentArray] count]);
 	UKObjectsEqual(S(tag1, tag2), [child valueForProperty: @"parentCollections"]);
@@ -633,7 +633,7 @@
 	[ctx3 insertObject: parent];
 
 	// ctx2: move subchild1 to child2
-	[[ctx2 objectWithUUID: [child2 UUID]] addObject: [ctx2 objectWithUUID: [subchild1 UUID]]];
+	[(id)[ctx2 objectWithUUID: [child2 UUID]] addObject: [ctx2 objectWithUUID: [subchild1 UUID]]];
 
 	// ctx2:
 	//
@@ -649,7 +649,7 @@
 	
 	
 	// ctx3: move subchild1 to child3
-	[[ctx3 objectWithUUID: [child3 UUID]] addObject: [ctx3 objectWithUUID: [subchild1 UUID]]];
+	[(id)[ctx3 objectWithUUID: [child3 UUID]] addObject: [ctx3 objectWithUUID: [subchild1 UUID]]];
 	
 	// ctx3:
 	//
@@ -663,9 +663,9 @@
 	//      |
 	//      \-subchild1
 	
-	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx2 objectWithUUID: [parent UUID]]];
+	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: (id)[ctx2 objectWithUUID: [parent UUID]]];
 	UKNotNil(diff1vs2);
-	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx3 objectWithUUID: [parent UUID]]];
+	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: (id)[ctx3 objectWithUUID: [parent UUID]]];
 	UKNotNil(diff1vs3);
 	
 	[COObjectGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
@@ -705,7 +705,7 @@
 	[ctx3 insertObject: parent];
 	
 	// ctx2: move subchild1 to child2
-	[[ctx2 objectWithUUID: [child2 UUID]] addObject: [ctx2 objectWithUUID: [subchild1 UUID]]];
+	[(id)[ctx2 objectWithUUID: [child2 UUID]] addObject: [ctx2 objectWithUUID: [subchild1 UUID]]];
 
 	// ctx2:
 	//
@@ -718,7 +718,7 @@
 	//      \-subchild1
 	
 	// ctx3: move subchild1 to child2
-	[[ctx3 objectWithUUID: [child2 UUID]] addObject: [ctx3 objectWithUUID: [subchild1 UUID]]];
+	[(id)[ctx3 objectWithUUID: [child2 UUID]] addObject: [ctx3 objectWithUUID: [subchild1 UUID]]];
 	
 	// ctx3:
 	//
@@ -730,9 +730,9 @@
 	//      |
 	//      \-subchild1
 	
-	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx2 objectWithUUID: [parent UUID]]];
+	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffContainer: parent withContainer: (id)[ctx2 objectWithUUID: [parent UUID]]];
 	UKNotNil(diff1vs2);
-	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: [ctx3 objectWithUUID: [parent UUID]]];
+	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffContainer: parent withContainer: (id)[ctx3 objectWithUUID: [parent UUID]]];
 	UKNotNil(diff1vs3);
 	
 	[COObjectGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
@@ -804,7 +804,7 @@
 	//                              \--child
 	
 	// Now do the merge
-	NSArray *uuids = [[A(tag1, tag2, tag3, child) mappedCollection] UUID];
+	NSArray *uuids = (id)[[A(tag1, tag2, tag3, child) mappedCollection] UUID];
 	COObjectGraphDiff *diff1vs2 = [COObjectGraphDiff diffObjectsWithUUIDs:uuids  inContext:ctx1 withContext:ctx2];
 	UKNotNil(diff1vs2);
 	COObjectGraphDiff *diff1vs3 = [COObjectGraphDiff diffObjectsWithUUIDs:uuids  inContext:ctx1 withContext:ctx3];
