@@ -36,7 +36,7 @@
 	
 	NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentContainer", @"parentCollections", @"contents", @"label", nil];
 	UKObjectsEqual([NSSet setWithArray: expectedProperties],
-				   [NSSet setWithArray: [obj properties]]);
+				   [NSSet setWithArray: [obj propertyNames]]);
 
 	UKObjectsSame(obj, [ctx objectWithUUID: [obj UUID]]);
 	
@@ -70,7 +70,7 @@
 		UKNotNil(obj);
 		NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentContainer", @"parentCollections", @"contents", @"label", nil];
 		UKObjectsEqual([NSSet setWithArray: expectedProperties],
-					   [NSSet setWithArray: [obj properties]]);
+					   [NSSet setWithArray: [obj propertyNames]]);
 		UKStringsEqual(@"Hello", [obj valueForProperty: @"label"]);
 		[ctx release];
 		[store release];

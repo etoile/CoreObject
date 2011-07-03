@@ -142,7 +142,7 @@
 /* Property-value coding */
 
 
-- (NSArray *)properties
+- (NSArray *)propertyNames
 {
 	return [[self entityDescription] allPropertyDescriptionNames];
 }
@@ -151,7 +151,7 @@
 {
 	[self willAccessValueForProperty: key];
 	
-	if (![[self properties] containsObject: key])
+	if (![[self propertyNames] containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
 		return nil;
@@ -216,7 +216,7 @@
 
 - (void) setValue:(id)value forProperty:(NSString*)key
 {
-	if (![[self properties] containsObject: key])
+	if (![[self propertyNames] containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
 		return;
@@ -514,7 +514,7 @@
 	}
 	else
 	{
-		desc = [NSString stringWithFormat: @"<%@(%@) %p UUID=%@ properties=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid, [self properties]];  
+		desc = [NSString stringWithFormat: @"<%@(%@) %p UUID=%@ properties=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid, [self propertyNames]];  
 	}
 	_inDescription = NO;
 	return desc;
@@ -792,7 +792,7 @@ static int indent = 0;
 	NSMutableString *str = [NSMutableString stringWithFormat: @"<%@(%@) at %p UUID %@ data: {\n",  [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
 	indent++;
 	
-	NSMutableArray *props = [NSMutableArray arrayWithArray: [self properties]];
+	NSMutableArray *props = [NSMutableArray arrayWithArray: [self propertyNames]];
 	if ([props containsObject: @"contents"])
 	{
 		[props removeObject: @"contents"];

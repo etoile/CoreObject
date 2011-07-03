@@ -1,3 +1,4 @@
+#import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
 @class COStore;

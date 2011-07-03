@@ -42,7 +42,7 @@
 
 /* Property-value coding */
 
-- (NSArray *)properties;
+- (NSArray *)propertyNames;
 - (id) valueForProperty:(NSString *)key;
 - (void) setValue:(id)value forProperty:(NSString*)key;
 

@@ -482,8 +482,8 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 		return;
 	}
 	
-	NSMutableSet *props = [NSMutableSet setWithArray: [base properties]];
-	[props unionSet: [NSSet setWithArray: [other properties]]];
+	NSMutableSet *props = [NSMutableSet setWithArray: [base propertyNames]];
+	[props unionSet: [NSSet setWithArray: [other propertyNames]]];
     
 	for (NSString *prop in props)
 	{

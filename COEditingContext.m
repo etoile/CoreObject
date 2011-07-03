@@ -233,7 +233,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		[copy setIgnoringRelationshipConsistency: YES];
 	}
 	
-	for (NSString *prop in [sourceObject properties])
+	for (NSString *prop in [sourceObject propertyNames])
 	{
 		ETPropertyDescription *desc = [[sourceObject entityDescription] propertyDescriptionForName: prop];
 		
@@ -294,7 +294,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		NSArray *propsToCommit;
 		if ([_insertedObjectUUIDs containsObject: uuid])
 		{
-			propsToCommit = [obj properties]; // for the first commit, commit all property values
+			propsToCommit = [obj propertyNames]; // for the first commit, commit all property values
 		}
 		else
 		{
@@ -394,7 +394,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 {
 	ETUUID *objUUID = [obj UUID];
 
-	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj properties]];
+	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj propertyNames]];
 	//NSLog(@"Properties to fetch: %@", propertiesToFetch);
 	
 	obj->_isIgnoringDamageNotifications = YES;
