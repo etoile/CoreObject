@@ -85,6 +85,11 @@
 	return _context;
 }
 
+- (BOOL) isRoot
+{
+	return _isRoot;
+}
+
 - (BOOL) isFault
 {
 	return _isFault;
@@ -214,12 +219,12 @@
 	}
 }
 
-- (void) setValue:(id)value forProperty:(NSString*)key
+- (BOOL) setValue:(id)value forProperty:(NSString*)key
 {
 	if (![[self propertyNames] containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
-		return;
+		return NO;
 	}
 
 	if (![COObject isCoreObjectValue: value])
@@ -358,6 +363,8 @@
 						 forKey: key];
 		
 	[self didChangeValueForProperty: key];
+
+	return YES;
 }
 
 - (void) addObject: (id)object forProperty:(NSString*)key

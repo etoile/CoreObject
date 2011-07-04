@@ -18,6 +18,7 @@
 	COEditingContext *_context; // weak reference
 	NSMapTable *_variableStorage;
 	BOOL _isFault;
+	BOOL _isRoot;
 	BOOL _isIgnoringDamageNotifications;
 	BOOL _isIgnoringRelationshipConsistency;
 	BOOL _inDescription; // FIXME: remove; only for debugging
@@ -29,7 +30,15 @@
 - (ETEntityDescription *) entityDescription;
 - (COEditingContext*) editingContext;
 - (BOOL) isFault;
+/** 
+ * Returns whether the receiver is a root object that can enclose embedded 
+ * objects.
+ *
+ * Embedded objects returns NO.
+ */
+- (BOOL) isRoot;
 - (BOOL) isDamaged;
+
 
 /* Helper methods based on the metamodel */
 
@@ -44,7 +53,7 @@
 
 - (NSArray *)propertyNames;
 - (id) valueForProperty:(NSString *)key;
-- (void) setValue:(id)value forProperty:(NSString*)key;
+- (BOOL) setValue:(id)value forProperty:(NSString*)key;
 
 /* Collection mutation methods */
 
