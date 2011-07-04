@@ -45,7 +45,14 @@
 - (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
 {
 	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
-	[self removeObject: object atIndex: index forProperty: @"contents"];
+	if (index == ETUndeterminedIndex)
+	{
+		[self removeObject: object forProperty: @"contents"];	
+	}
+	else
+	{
+		[self removeObject: object atIndex: index forProperty: @"contents"];
+	}
 }
 
 @end
