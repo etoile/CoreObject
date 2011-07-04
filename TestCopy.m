@@ -45,7 +45,7 @@
 	UKIntsEqual(1, [[parentCopy contentArray] count]);
 	if (1 == [[parentCopy contentArray] count])
 	{
-		COContainer *childCopy = [[parent contentArray] firstObject];
+		COContainer *childCopy = [[parentCopy contentArray] firstObject];
 		UKObjectsEqual(@"Groceries", [childCopy valueForProperty: @"label"]);
 		UKObjectsSame(parentCopy, [childCopy valueForProperty: @"parentContainer"]);
 		UKObjectsNotEqual([child UUID], [childCopy UUID]);
