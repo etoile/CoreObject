@@ -11,7 +11,7 @@ int main (int argc, const char *argv[])
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-	//[[UKTestHandler handler] setQuiet: YES];
+	[[UKTestHandler handler] setQuiet: YES];
 
 	// TODO: Tweak UnitKit to support setting up a test suite
 	[[UKRunner ifResponds] setUp];
