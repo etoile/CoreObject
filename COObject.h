@@ -24,6 +24,19 @@
 	BOOL _inDescription; // FIXME: remove; only for debugging
 }
 
+/** <init />
+ * Initializes and returns a non-persistent object.
+ *
+ * The receiver can be made persistent later, by inserting it into an editing 
+ * context with -becomePersistentInContext:rootObject:.<br />
+ * Its identity will remain stable once persistency has been enabled, because 
+ * this initializer gives a UUID to the object.
+ *
+ * You should use insertion methods provided by COEditingContext to create 
+ * objects that are immediately persistent.
+ */
+- (id) init;
+
 /** 
  * Makes the receiver persistent by inserting it into the given editing context.
  *
@@ -151,6 +164,7 @@
  */
 - (id) initWithUUID: (ETUUID*)aUUID 
   entityDescription: (ETEntityDescription*)anEntityDescription
+         rootObject: (id)aRootObject
 			context: (COEditingContext*)aContext
 			isFault: (BOOL)isFault;
 /**

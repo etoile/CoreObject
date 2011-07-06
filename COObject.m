@@ -68,6 +68,40 @@
 	}
 }
 
+- (id) commonInitWithUUID: (ETUUID *)aUUID 
+        entityDescription: (ETEntityDescription *)anEntityDescription
+               rootObject: (COObject *)aRootObject
+                  context: (COEditingContext *)aContext
+                  isFault: (BOOL)isFault
+{
+	ASSIGN(_uuid, aUUID);
+	ASSIGN(_entityDescription, anEntityDescription);
+	_context = aContext;
+	_rootObject = aRootObject;
+	_variableStorage = nil;
+	_isFault = isFault;
+	_isIgnoringDamageNotifications = NO;
+	
+	if (!_isFault)
+	{
+		[_context markObjectDamaged: self forProperty: nil];
+		_variableStorage = [[NSMapTable alloc] init];
+		[self awakeFromInsert]; // FIXME: not necessairly
+	}
+
+	return self;
+}
+
+- (id) init
+{
+	SUPERINIT;
+	return [self commonInitWithUUID: [ETUUID UUID]
+	              entityDescription: nil
+	                     rootObject: nil
+	                        context: nil
+	                        isFault: NO];
+}
+
 - (void) becomePersistentInContext: (COEditingContext *)aContext 
                         rootObject: (COObject *)aRootObject
 {
@@ -659,6 +693,7 @@
 
 - (id) initWithUUID: (ETUUID*)aUUID 
   entityDescription: (ETEntityDescription*)anEntityDescription
+         rootObject: (id)aRootObject
 			context: (COEditingContext*)aContext
 			isFault: (BOOL)isFault
 {
@@ -667,21 +702,13 @@
 	NILARG_EXCEPTION_TEST(aUUID);
 	NILARG_EXCEPTION_TEST(anEntityDescription);
 	NILARG_EXCEPTION_TEST(aContext);
-	
-	ASSIGN(_uuid, aUUID);
-	ASSIGN(_entityDescription, anEntityDescription);
-	_context = aContext; // weak reference
-	_variableStorage = nil;
-	_isFault = isFault;
-	_isIgnoringDamageNotifications = NO;
-	
-	if (!_isFault)
-	{
-		[_context markObjectDamaged: self forProperty: nil];
-		_variableStorage = [[NSMapTable alloc] init];
-		[self awakeFromInsert]; // FIXME: not necessairly
-	}
-	
+	// TODO: NILARG_EXCEPTION_TEST(aRootObject);
+		
+	self = [self commonInitWithUUID: aUUID 
+	              entityDescription: anEntityDescription
+	                     rootObject: aRootObject
+	                        context: aContext
+	                        isFault: isFault];
 	return self;
 }
 

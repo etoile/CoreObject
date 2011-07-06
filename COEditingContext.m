@@ -134,8 +134,10 @@ static COEditingContext *currentCtxt = nil;
 	}
 	
 	Class cls = [self classForEntityDescription: desc];
+	// FIXME: Pass some valid root object
 	result = [[cls alloc] initWithUUID: aUUID
 					 entityDescription: desc
+	                        rootObject: nil
 							   context: self
 							   isFault: NO];
 	[self registerObject: result];
@@ -231,7 +233,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	if (isBecomingPersistent)
 	{
 		[self registerObject: sourceObject];
-		return;
+		return sourceObject;
 	}
 
 	/* Source Object is already persistent
@@ -574,8 +576,10 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		}
 		
 		Class cls = [self classForEntityDescription: desc];
+		// FIXME: Pass some valid root object
 		result = [[cls alloc] initWithUUID: uuid
 						 entityDescription: desc
+	                            rootObject: nil
 								   context: self
 								   isFault: YES];
 		
