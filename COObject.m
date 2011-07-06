@@ -68,6 +68,19 @@
 	}
 }
 
+- (void) becomePersistentInContext: (COEditingContext *)aContext 
+                        rootObject: (COObject *)aRootObject
+{
+	NILARG_EXCEPTION_TEST(aContext);
+	NILARG_EXCEPTION_TEST(aRootObject);
+	INVALIDARG_EXCEPTION_TEST(aRootObject, 
+		aRootObject != self || [[aContext loadedObjects] containsObject: aRootObject] == NO);
+	ETAssert(_uuid != nil);
+	_context = aContext;
+	_rootObject = aRootObject;
+	[aContext insertObject: self];
+}
+
 // Attributes
 
 - (ETEntityDescription *)entityDescription
@@ -85,14 +98,24 @@
 	return _context;
 }
 
+- (COObject *) rootObject
+{
+	return _rootObject;
+}
+
 - (BOOL) isRoot
 {
-	return _isRoot;
+	return (_rootObject == self);
 }
 
 - (BOOL) isFault
 {
 	return _isFault;
+}
+
+- (BOOL) isPersistent
+{
+	return (_context != nil && _rootObject != nil);
 }
 
 - (BOOL) isDamaged
@@ -667,6 +690,7 @@
 	// FIXME: call user hook?
 	
 	_context = nil;
+	_rootObject = nil;
 	DESTROY(_uuid);
 	DESTROY(_entityDescription);
 	DESTROY(_variableStorage);

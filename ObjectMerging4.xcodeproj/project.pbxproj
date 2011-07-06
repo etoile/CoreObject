@@ -104,6 +104,13 @@
 			remoteGlobalIDString = 6072CF691360E144003256C5 /* PlugInExample.plugin */;
 			remoteInfo = PlugInExample;
 		};
+		60FB0A1A13C3264E00C2AB94 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 603647AB0E409244003377E0 /* EtoileFoundation */;
+			remoteInfo = EtoileFoundation;
+		};
 		791B4E4A1299C81F00CCF472 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -483,6 +490,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				60FB0A1B13C3264E00C2AB94 /* PBXTargetDependency */,
 			);
 			name = ObjectMerging;
 			productName = ObjectMergign;
@@ -659,6 +667,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		60FB0A1B13C3264E00C2AB94 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = EtoileFoundation;
+			targetProxy = 60FB0A1A13C3264E00C2AB94 /* PBXContainerItemProxy */;
+		};
 		791B4E4B1299C81F00CCF472 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6686BDAB12592BDA0065DE1A /* ObjectMerging */;

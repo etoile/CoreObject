@@ -16,25 +16,65 @@
 	ETEntityDescription *_entityDescription;
 	ETUUID *_uuid;
 	COEditingContext *_context; // weak reference
+	COObject *_rootObject; // weak reference
 	NSMapTable *_variableStorage;
 	BOOL _isFault;
-	BOOL _isRoot;
 	BOOL _isIgnoringDamageNotifications;
 	BOOL _isIgnoringRelationshipConsistency;
 	BOOL _inDescription; // FIXME: remove; only for debugging
 }
 
+/** 
+ * Makes the receiver persistent by inserting it into the given editing context.
+ *
+ * If the root object argument is the receiver itself, then the receiver becomes 
+ * a root object (or a persistent root from the storage standpoint).
+ *
+ * Raises an exception if any argument is nil.<br />
+ * When the root object is not the receiver or doesn't belong to the editing 
+ * context, raises an exception too.
+ */
+- (void) becomePersistentInContext: (COEditingContext *)aContext 
+                        rootObject: (COObject *)aRootObject;
+
 /* Attributes */
 
+/** 
+ * Returns the UUID that uniquely identifies the persistent object that 
+ * corresponds to the receiver.
+ *
+ * A persistent object has a single instance per editing context.
+ */
 - (ETUUID *) UUID;
 - (ETEntityDescription *) entityDescription;
+/** 
+ * Returns the editing context when the receiver is persistent, otherwise  
+ * returns nil.
+ */
 - (COEditingContext*) editingContext;
+/** 
+ * Returns the root object when the receiver is persistent, otherwise returns nil.
+ *
+ * When the receiver is persistent, returns either self or the root object that 
+ * encloses the receiver as an embedded object.
+ *
+ * See also -isRoot.
+ */
+- (COObject *) rootObject;
 - (BOOL) isFault;
+/**
+ * Returns whether the receiver is saved on the disk.
+ *
+ * When persistent, the receiver has both a valid editing context and root object.
+ */
+- (BOOL) isPersistent;
 /** 
  * Returns whether the receiver is a root object that can enclose embedded 
  * objects.
  *
- * Embedded objects returns NO.
+ * Embedded or non-persistent objects returns NO.
+ *
+ * See also -rootObject.
  */
 - (BOOL) isRoot;
 - (BOOL) isDamaged;

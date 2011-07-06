@@ -87,6 +87,11 @@ static COEditingContext *currentCtxt = nil;
 	return _modelRepository; 
 }
 
+- (NSSet *) loadedObjects
+{
+	return [NSSet setWithArray: [_instantiatedObjects allValues]];
+}
+
 - (BOOL) hasChanges
 {
 	return [_damagedObjectUUIDs count] > 0;
@@ -113,6 +118,12 @@ static COEditingContext *currentCtxt = nil;
 	return cls;
 }
 
+- (void) registerObject: (COObject *)object
+{
+	[_instantiatedObjects setObject: object forKey: [object UUID]];
+	[_insertedObjectUUIDs addObject: [object UUID]];
+}
+
 - (COObject*) insertObjectWithEntityName: (NSString*)aFullName UUID: (ETUUID*)aUUID
 {
 	COObject *result = nil;
@@ -127,8 +138,7 @@ static COEditingContext *currentCtxt = nil;
 					 entityDescription: desc
 							   context: self
 							   isFault: NO];
-	[_instantiatedObjects setObject: result forKey: aUUID];
-	[_insertedObjectUUIDs addObject: aUUID];
+	[self registerObject: result];
 	[result release];
 	
 	return result;
@@ -209,7 +219,25 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 - (id) insertObject: (COObject*)sourceObject withRelationshipConsistency: (BOOL)consistency  newUUID: (BOOL)newUUID
 {
-	//COEditingContext *sourceContext = [sourceObject editingContext];
+	COEditingContext *sourceContext = [sourceObject editingContext];
+	ETAssert(sourceContext != nil);
+	/* See -[COObject becomePersistentInContext:rootObject:] */
+	BOOL isBecomingPersistent = (newUUID == NO && sourceContext == self);
+
+	/* Source object was not persistent until then
+	   
+	   So we don't want to create a new instance, but just register it */
+
+	if (isBecomingPersistent)
+	{
+		[self registerObject: sourceObject];
+		return;
+	}
+
+	/* Source Object is already persistent
+	
+	   So we create a persistent object alias or copy in the receiver context */
+
 	NSString *entityName = [[sourceObject entityDescription] fullName];
 	assert(entityName != nil);
 	
@@ -274,33 +302,84 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 // Committing changes
 
+- (NSMapTable *) UUIDsByRootObjectFromObjectUUIDs: (id <ETCollection>)objectUUIDs
+{
+	NSMapTable *UUIDsByRootObject = [NSMapTable mapTableWithStrongToStrongObjects];
+
+	for (ETUUID *uuid in objectUUIDs)
+	{
+		COObject *object = [self objectWithUUID: uuid];
+		COObject *rootObject = [object rootObject];
+		NSMutableSet *UUIDs = [UUIDsByRootObject objectForKey: rootObject];
+
+		if (UUIDs == nil)
+		{
+			UUIDs = [NSMutableSet set];
+			[UUIDsByRootObject setObject: UUIDs forKey: rootObject];
+		}
+		[UUIDs addObject: uuid];
+	}
+
+	return UUIDsByRootObject;
+}
+
+- (NSMapTable *) insertedObjectUUIDsByRootObject
+{
+	return [self UUIDsByRootObjectFromObjectUUIDs: _insertedObjectUUIDs];
+}
+
+- (NSMapTable *) damagedObjectUUIDsByRootObject
+{
+	return [self UUIDsByRootObjectFromObjectUUIDs: [_damagedObjectUUIDs allKeys]];
+}
+
 - (void) commit
 {
 	[self commitWithType: nil shortDescription: nil longDescription: nil];
 }
+
 - (void) commitWithType: (NSString*)type
        shortDescription: (NSString*)shortDescription
         longDescription: (NSString*)longDescription
 {
 	[self commitWithMetadata: nil];
 }
-- (void) commitWithMetadata: (NSDictionary*)metadata
+
+- (NSDictionary *) damagedObjectUUIDSubsetForUUIDs: (NSArray *)keys
 {
+	NSMutableDictionary *subset = [NSMutableDictionary dictionary];
+
+	for (ETUUID *uuid in _damagedObjectUUIDs)
+	{
+		[subset setObject: [_damagedObjectUUIDs objectForKey: uuid] 
+		           forKey: uuid];
+	}
+
+	return subset;
+}
+
+- (void) commitWithMetadata: (NSDictionary *)metadata 
+                 rootObject: (COObject *)rootObject
+        insertedObjectUUIDs: (NSSet *)insertedObjectUUIDs
+         damagedObjectUUIDs: (NSDictionary *)damagedObjectUUIDs
+{
+	// TODO: ETAssert([rootObject isRoot]);
+
 	[_store beginCommitWithMetadata: metadata];
-	for (ETUUID *uuid in [_damagedObjectUUIDs allKeys])
+	for (ETUUID *uuid in [damagedObjectUUIDs allKeys])
 	{		
 		[_store beginChangesForObject: uuid];
 		COObject *obj = [self objectWithUUID: uuid];
 		//NSLog(@"Committing changes for %@", obj);
 		
 		NSArray *propsToCommit;
-		if ([_insertedObjectUUIDs containsObject: uuid])
+		if ([insertedObjectUUIDs containsObject: uuid])
 		{
 			propsToCommit = [obj propertyNames]; // for the first commit, commit all property values
 		}
 		else
 		{
-			propsToCommit = [_damagedObjectUUIDs objectForKey: uuid]; // otherwise just damaged values
+			propsToCommit = [damagedObjectUUIDs objectForKey: uuid]; // otherwise just damaged values
 		}
 
 		
@@ -328,12 +407,42 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	CORevision *c = [_store finishCommit];
 	assert(c != nil);
 	
-	[_insertedObjectUUIDs removeAllObjects];
-	for (ETUUID *uuid in [_damagedObjectUUIDs allKeys])
+	[_insertedObjectUUIDs minusSet: insertedObjectUUIDs];
+	for (ETUUID *uuid in [damagedObjectUUIDs allKeys])
 	{
 		[self markObjectUndamaged: [self objectWithUUID: uuid]];
 	}
 }
+
+#if ROOTOBJECT_SUPPORT
+- (void) commitWithMetadata: (NSDictionary*)metadata
+{
+	NSMapTable *insertedObjectUUIDs = [self insertedObjectUUIDsByRootObject];
+	NSMapTable *damagedObjectUUIDs = [self damagedObjectUUIDsByRootObject];
+	NSSet *rootObjects = [NSSet setWithArray: [[[insertedObjectUUIDs keyEnumerator] allObjects] 
+		arrayByAddingObjectsFromArray: [[damagedObjectUUIDs keyEnumerator] allObjects]]];
+
+	// TODO: Add a batch commit UUID in the metadata
+	for (COObject *rootObject in rootObjects)
+	{
+		NSDictionary *damagedObjectUUIDSubset = [self damagedObjectUUIDSubsetForUUIDs: 
+			[damagedObjectUUIDs objectForKey: rootObject]];
+
+		[self commitWithMetadata: metadata
+		              rootObject: rootObject
+		     insertedObjectUUIDs: [insertedObjectUUIDs objectForKey: rootObject]
+		      damagedObjectUUIDs: damagedObjectUUIDSubset];
+	}
+}
+#else
+- (void) commitWithMetadata: (NSDictionary*)metadata
+{
+		[self commitWithMetadata: metadata
+		              rootObject: nil
+		     insertedObjectUUIDs: _insertedObjectUUIDs
+		      damagedObjectUUIDs: _damagedObjectUUIDs];
+}
+#endif
 
 // Private
 

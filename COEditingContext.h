@@ -61,6 +61,13 @@
 
 - (ETModelDescriptionRepository*) modelRepository;
 
+/**
+ * Returns the objects presently managed by the receiver in memory.
+ *
+ * Faults can be included among the returned objects.
+ */
+- (NSSet *) loadedObjects;
+
 - (BOOL) hasChanges;
 - (BOOL) objectHasChanges: (ETUUID*)uuid;
 - (NSSet*) changedObjectUUIDs;
