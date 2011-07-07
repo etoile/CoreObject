@@ -15,6 +15,8 @@
 		60FB089813C3076200C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		60FB089B13C3077400C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
+		60FB0E8C13C61C3A00C2AB94 /* COFault.h in Headers */ = {isa = PBXBuildFile; fileRef = 60FB0E8913C61C3A00C2AB94 /* COFault.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60FB0E8D13C61C3A00C2AB94 /* COFault.m in Sources */ = {isa = PBXBuildFile; fileRef = 60FB0E8A13C61C3A00C2AB94 /* COFault.m */; };
 		6620EFA4129F3AAD00FD5AB9 /* TestHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */; };
 		6620F13C129F8CC500FD5AB9 /* COHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09999129A5B64006BEDC3 /* COHistoryTrack.m */; };
 		6686BDE712592C5D0065DE1A /* COObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDB812592C1B0065DE1A /* COObject.m */; };
@@ -127,6 +129,8 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		605BFF3F13B50C7700073E18 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		60CF350813BA9348001F9011 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		60FB0E8913C61C3A00C2AB94 /* COFault.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COFault.h; sourceTree = "<group>"; };
+		60FB0E8A13C61C3A00C2AB94 /* COFault.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COFault.m; sourceTree = "<group>"; };
 		6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		6614500F12B0127E000DB843 /* Design.rtfd */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; path = Design.rtfd; sourceTree = "<group>"; };
 		6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestHistoryTrack.m; sourceTree = "<group>"; };
@@ -323,6 +327,8 @@
 		6686BDB612592C1B0065DE1A /* Front-end API */ = {
 			isa = PBXGroup;
 			children = (
+				60FB0E8913C61C3A00C2AB94 /* COFault.h */,
+				60FB0E8A13C61C3A00C2AB94 /* COFault.m */,
 				66D09D58129CE477006BEDC3 /* Model Objects */,
 				6686BDBA12592C1B0065DE1A /* COEditingContext.h */,
 				6686BDBB12592C1B0065DE1A /* COEditingContext.m */,
@@ -472,6 +478,7 @@
 				791B4E661299C8CB00CCF472 /* COStore.h in Headers */,
 				66D0999A129A5B64006BEDC3 /* COHistoryTrack.h in Headers */,
 				66D09D56129CE470006BEDC3 /* COCollection.h in Headers */,
+				60FB0E8C13C61C3A00C2AB94 /* COFault.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -627,6 +634,7 @@
 				791B4E741299C90900CCF472 /* FMDatabaseAdditions.m in Sources */,
 				791B4E761299C90900CCF472 /* FMResultSet.m in Sources */,
 				791B4E7C1299C92300CCF472 /* sqlite3.c in Sources */,
+				60FB0E8D13C61C3A00C2AB94 /* COFault.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

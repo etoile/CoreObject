@@ -18,7 +18,6 @@
 	COEditingContext *_context; // weak reference
 	COObject *_rootObject; // weak reference
 	NSMapTable *_variableStorage;
-	BOOL _isFault;
 	BOOL _isIgnoringDamageNotifications;
 	BOOL _isIgnoringRelationshipConsistency;
 	BOOL _inDescription; // FIXME: remove; only for debugging
@@ -138,7 +137,11 @@
 
 @interface COObject (Private)
 
-- (void) unfaultIfNeeded;
+/** 
+ * Returns COObjectFault. 
+ */
++ (Class) faultClass;
+- (NSError *) unfaultIfNeeded;
 - (void) notifyContextOfDamageIfNeededForProperty: (NSString*)prop;
 - (void) turnIntoFault;
 

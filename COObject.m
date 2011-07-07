@@ -1,7 +1,9 @@
 #import "COObject.h"
+#import "COFault.h"
 #import "COEditingContext.h"
 #import "COContainer.h"
 #import "COCollection.h"
+#include <objc/runtime.h>
 
 @implementation COObject
 
@@ -55,10 +57,13 @@
 	_context = aContext;
 	_rootObject = aRootObject;
 	_variableStorage = nil;
-	_isFault = isFault;
 	_isIgnoringDamageNotifications = NO;
 	
-	if (!_isFault)
+	if (isFault)
+	{
+		object_setClass(self, [[self class] faultClass]);
+	}
+	else
 	{
 		[_context markObjectDamaged: self forProperty: nil];
 		_variableStorage = [[NSMapTable alloc] init];
@@ -121,12 +126,14 @@
 
 - (BOOL) isFault
 {
-	return _isFault;
+	return NO;
 }
 
 - (BOOL) isPersistent
 {
-	return (_context != nil && _rootObject != nil);
+	return (_context != nil);
+	// TODO: Switch to the code below on root object are saved in the db
+	// return (_context != nil && _rootObject != nil);
 }
 
 - (BOOL) isDamaged
@@ -212,6 +219,7 @@
 		[value isKindOfClass: [NSData class]] ||
 		[value isKindOfClass: [NSString class]] ||
 		[value isKindOfClass: [COObject class]] ||
+		[value isKindOfClass: [COObjectFault class]] ||
 		value == nil;
 }
 
@@ -262,10 +270,12 @@
 		return NO;
 	}
 
-	if (![COObject isCoreObjectValue: value])
-	{
-		[NSException raise: NSInvalidArgumentException format: @"Invalid property type"];
-	}
+	// FIXME: Move this check elsewhere or rework it because it can break on 
+	// transient values or archived objects such as NSColor, NSView.
+	//if (![COObject isCoreObjectValue: value])
+	//{
+	//	[NSException raise: NSInvalidArgumentException format: @"Invalid property type"];
+	//}
 
 	// FIXME: use the metamodel's validation support?
 	
@@ -622,28 +632,26 @@
 
 @implementation COObject (Private)
 
-- (void) turnIntoFault
++ (Class) faultClass
 {
-	if (!_isFault)
-	{
-		[self willTurnIntoFault];
-		ASSIGN(_variableStorage, nil);
-		_isFault = YES;
-		[self didTurnIntoFault];
-	}
+	return [COObjectFault class];
 }
 
-- (void) unfaultIfNeeded
+- (void) turnIntoFault
 {
-	if (!_isIgnoringDamageNotifications && _isFault)
-	{
-		assert(_variableStorage == nil);
-		_variableStorage = [[NSMapTable alloc] init];
+	if ([self isFault])
+		return;
 
-		[_context loadObject: self];
-		_isFault = NO;
-		[self awakeFromFetch];
-	}
+	[self willTurnIntoFault];
+	ASSIGN(_variableStorage, nil);
+	object_setClass(self, [[self class] faultClass]);
+	[self didTurnIntoFault];
+}
+
+- (NSError *) unfaultIfNeeded
+{
+	ETAssert([self isFault] == NO);
+	return nil;
 }
 
 - (void) notifyContextOfDamageIfNeededForProperty: (NSString*)prop

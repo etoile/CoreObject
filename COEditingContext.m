@@ -559,7 +559,6 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		revNum--;
 	}
 	
-	obj->_isFault = NO;
 	[self markObjectUndamaged: obj];
 	obj->_isIgnoringDamageNotifications = NO;
 	[obj setIgnoringRelationshipConsistency: NO];	
