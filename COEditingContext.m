@@ -33,6 +33,10 @@ static COEditingContext *currentCtxt = nil;
 	_damagedObjectUUIDs = [[NSMutableDictionary alloc] init];
 	_instantiatedObjects = [[NSMutableDictionary alloc] init];
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
+	assert([[[_modelRepository descriptionForName: @"Anonymous.COContainer"] 
+		propertyDescriptionForName: @"contents"] isComposite]);
+	assert([[[[_modelRepository descriptionForName: @"Anonymous.COCollection"] 
+		parent] name] isEqual: @"COObject"]);
 	
 	_insertedObjectUUIDs = [[NSMutableSet alloc] init];
 	_deletedObjectUUIDs = [[NSMutableSet alloc] init];

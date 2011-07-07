@@ -5,67 +5,28 @@
 
 @implementation COObject
 
-+ (void)initialize
++ (ETEntityDescription *) newEntityDescription
 {
-	if (self == [COObject class])
-	{
-		// COObject entity description
+	ETEntityDescription *object = [self newBasicEntityDescription];
+
+	// For subclasses that don't override -newEntityDescription, we must not add the 
+	// property descriptions that we will inherit through the parent
+	if ([[object name] isEqual: [COObject className]] == NO) 
+		return object;
 		
-		ETEntityDescription *object = [ETEntityDescription descriptionWithName: @"COObject"];
-		
-		ETPropertyDescription *parentContainerProperty = [ETPropertyDescription descriptionWithName: @"parentContainer"
-																						   type: (id)@"Anonymous.COContainer"];
-		[parentContainerProperty setIsContainer: YES];
-		[parentContainerProperty setMultivalued: NO];
+	ETPropertyDescription *parentContainerProperty = 
+		[ETPropertyDescription descriptionWithName: @"parentContainer" type: (id)@"Anonymous.COContainer"];
+	[parentContainerProperty setIsContainer: YES];
+	[parentContainerProperty setMultivalued: NO];
+
+	ETPropertyDescription *parentCollectionsProperty = 
+		[ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.COCollection"];
 	
-		ETPropertyDescription *parentCollectionsProperty = [ETPropertyDescription descriptionWithName: @"parentCollections"
-																								type: (id)@"Anonymous.COCollection"];
-		
-		[parentCollectionsProperty setMultivalued: YES];
-		
-		[object setPropertyDescriptions: A(parentContainerProperty, parentCollectionsProperty)];
-		
-		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: object];
-		[[ETModelDescriptionRepository mainRepository] setEntityDescription: object
-																   forClass: [COObject class]];
-		
-		// COContainer entity description
-		
-		ETEntityDescription *group = [ETEntityDescription descriptionWithName: @"COContainer"];
-		[group setParent: (id)@"Anonymous.COObject"];
-		
-		ETPropertyDescription *groupContentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
-																						type: (id)@"Anonymous.COObject"];
-		[groupContentsProperty setMultivalued: YES];
-		[groupContentsProperty setOpposite: (id)@"Anonymous.COObject.parentContainer"]; // FIXME: just 'parent' should work...
-		[groupContentsProperty setOrdered: YES];
-		
-		[group setPropertyDescriptions: A(groupContentsProperty)];
-		
-		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: group];
-		[[ETModelDescriptionRepository mainRepository] setEntityDescription: group
-																   forClass: [COContainer class]];
-		
-		// COCollection entity description
-		
-		ETEntityDescription *collection = [ETEntityDescription descriptionWithName: @"COCollection"];
-		[collection setParent: (id)@"Anonymous.COObject"];
-		
-		ETPropertyDescription *collectionContentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
-																						type: (id)@"Anonymous.COObject"];
-		[collectionContentsProperty setMultivalued: YES];
-		[collectionContentsProperty setOpposite: (id)@"Anonymous.COObject.parentCollections"]; // FIXME: just 'parentCollections' should work...
-		[collectionContentsProperty setOrdered: NO];
-		
-		[collection setPropertyDescriptions: A(collectionContentsProperty)];
-		
-		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: collection];
-		[[ETModelDescriptionRepository mainRepository] setEntityDescription: collection
-																   forClass: [COCollection class]];
-		
-		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-		assert([[[[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.COContainer"] propertyDescriptionForName: @"contents"] isComposite]);
-	}
+	[parentCollectionsProperty setMultivalued: YES];
+	
+	[object setPropertyDescriptions: A(parentContainerProperty, parentCollectionsProperty)];
+
+	return object;
 }
 
 - (id) commonInitWithUUID: (ETUUID *)aUUID 
@@ -112,6 +73,7 @@
 	ETAssert(_uuid != nil);
 	_context = aContext;
 	_rootObject = aRootObject;
+	ASSIGN(_entityDescription, [[aContext modelRepository] entityDescriptionForClass: [self class]]);
 	[aContext insertObject: self];
 }
 
@@ -774,9 +736,15 @@ static NSArray *COArrayPropertyListForArray(NSArray *array)
 	}
 	else
 	{
-		[NSException raise: NSInvalidArgumentException
-		            format: @"value must of type COObject, NSArray, NSSet or nil"];
-		return nil;
+		// FIXME: Perhaps add a method which can be overriden to explicitly 
+		// declare which instances we can encode without raising an exception.
+		// For example... -validCoreObjectDataClasses.
+		// Would be better to get these from [ETPropertyDescription type].
+		result = D([NSKeyedArchiver archivedDataWithRootObject: value], @"value", @"data", @"type");
+	
+		//[NSException raise: NSInvalidArgumentException
+		//            format: @"value must of type COObject, NSArray, NSSet or nil"];
+		//return nil;
 	}
 	return result;
 }
@@ -829,6 +797,11 @@ static NSArray *COArrayPropertyListForArray(NSArray *array)
 		}
 		return [NSArray arrayWithObjects: mapped count: count];
 	}
+	else if ([plist isKindOfClass: [NSData class]])
+	{
+		return [NSKeyedUnarchiver unarchiveObjectWithData: (NSData *)plist];
+	}
+
 	return plist;
 }
 

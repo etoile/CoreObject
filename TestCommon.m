@@ -7,9 +7,6 @@
 
 + (void) setUpMetamodel
 {
-	// HACK: make sure COObject's metamodel is set up
-	[COObject class];
-	
 	// Outline item entity
 	{
 		ETEntityDescription *outlineEntity = [ETEntityDescription descriptionWithName: @"OutlineItem"];

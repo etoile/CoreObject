@@ -13,6 +13,27 @@
 	[self applyTraitFromClass: [ETMutableCollectionTrait class]];
 }
 
++ (ETEntityDescription *) newEntityDescription
+{
+	ETEntityDescription *group = [self newBasicEntityDescription];
+
+	// For subclasses that don't override -newEntityDescription, we must not add the 
+	// property descriptions that we will inherit through the parent
+	if ([[group name] isEqual: [COContainer className]] == NO) 
+		return group;
+	
+	ETPropertyDescription *groupContentsProperty = 
+		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.COObject"];
+	
+	[groupContentsProperty setMultivalued: YES];
+	[groupContentsProperty setOpposite: (id)@"Anonymous.COObject.parentContainer"]; // FIXME: just 'parent' should work...
+	[groupContentsProperty setOrdered: YES];
+	
+	[group setPropertyDescriptions: A(groupContentsProperty)];
+
+	return group;	
+}
+
 - (BOOL) isOrdered
 {
 	return YES;
