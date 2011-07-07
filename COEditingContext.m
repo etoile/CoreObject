@@ -98,7 +98,9 @@ static COEditingContext *currentCtxt = nil;
 
 - (BOOL) hasChanges
 {
-	return [_damagedObjectUUIDs count] > 0;
+	return ([_damagedObjectUUIDs count] > 0 
+		|| [_insertedObjectUUIDs count] > 0 
+		|| [_deletedObjectUUIDs count] > 0);
 }
 
 - (BOOL) objectHasChanges: (ETUUID*)uuid
@@ -370,9 +372,12 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
          damagedObjectUUIDs: (NSDictionary *)damagedObjectUUIDs
 {
 	// TODO: ETAssert([rootObject isRoot]);
+	// TODO: We should add the deleted object UUIDs to the set below
+	NSSet *committedObjectUUIDs = 
+		[insertedObjectUUIDs setByAddingObjectsFromArray: [damagedObjectUUIDs allKeys]];
 
 	[_store beginCommitWithMetadata: metadata];
-	for (ETUUID *uuid in [damagedObjectUUIDs allKeys])
+	for (ETUUID *uuid in committedObjectUUIDs)
 	{		
 		[_store beginChangesForObject: uuid];
 		COObject *obj = [self objectWithUUID: uuid];

@@ -68,8 +68,23 @@
  */
 - (NSSet *) loadedObjects;
 
+/**
+ * Returns whether any object has been inserted, deleted or updated since the 
+ * last commit.
+ */
 - (BOOL) hasChanges;
+/**
+ * Returns whether the object that corresponds to the UUID has been updated 
+ * since the last commit.
+ *
+ * Won't return YES if the object has just been inserted or deleted.
+ */
 - (BOOL) objectHasChanges: (ETUUID*)uuid;
+/**
+ * Returns the UUIDs of the objects updated since the last commit.
+ *
+ * Doesn't include newly inserted or deleted objects.
+ */
 - (NSSet*) changedObjectUUIDs;
 
 - (Class) classForEntityDescription: (ETEntityDescription*)desc;
