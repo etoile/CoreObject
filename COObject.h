@@ -188,5 +188,6 @@
 */
 
 @interface COObject (Debug)
+- (id) roundTripValueForProperty: (NSString *)key;
 - (NSString*)detailedDescription;
 @end

@@ -13,7 +13,10 @@
 	// property descriptions that we will inherit through the parent
 	if ([[object name] isEqual: [COObject className]] == NO) 
 		return object;
-		
+
+	// TODO: I think these properties should be declared in subclasses or custom 
+	// entity descriptions set per COObject instance (Quentin).
+
 	ETPropertyDescription *parentContainerProperty = 
 		[ETPropertyDescription descriptionWithName: @"parentContainer" type: (id)@"Anonymous.COContainer"];
 	[parentContainerProperty setIsContainer: YES];
@@ -36,7 +39,19 @@
                   isFault: (BOOL)isFault
 {
 	ASSIGN(_uuid, aUUID);
-	ASSIGN(_entityDescription, anEntityDescription);
+	if (anEntityDescription != nil)
+	{
+		ASSIGN(_entityDescription, anEntityDescription);
+	}
+	else
+	{
+		// NOTE: Ensure we can use -propertyNames and metamodel-based 
+		// introspection before -becomePersistentInContext:rootObject: is called.
+		// TODO: Could be removed if -propertyNames in NSObject(Model) do a 
+		// lookup in the main repository.
+		ASSIGN(_entityDescription, [[ETModelDescriptionRepository mainRepository] 
+			entityDescriptionForClass: [self class]]);
+	}
 	_context = aContext;
 	_rootObject = aRootObject;
 	_variableStorage = nil;
@@ -181,12 +196,13 @@
 		return nil;
 	}
 	
+	return [self primitiveValueForKey: key];
+}
+
+- (id) valueForUndefinedKey: (NSString *)key
+{
 	id value = [_variableStorage objectForKey: key];
-	if (value == [NSNull null])
-	{
-		return nil;
-	}
-	return value;
+	return (value == [NSNull null] ? nil : value);
 }
 
 + (BOOL) isPrimitiveCoreObjectValue: (id)value
@@ -376,14 +392,16 @@
 	// Actually set the value.
 	
 	[self willChangeValueForProperty: key];
-	
-	if (nil == value) { value = [NSNull null]; }
-	[_variableStorage setObject: value
-						 forKey: key];
-		
+	[self setPrimitiveValue: value forKey: key];
 	[self didChangeValueForProperty: key];
 
 	return YES;
+}
+
+- (void) setValue: (id)value forUndefinedKey: (NSString *)key
+{
+	[_variableStorage setObject: (value == nil ? [NSNull null] : value)
+						 forKey: key];
 }
 
 - (void) addObject: (id)object forProperty:(NSString*)key
@@ -707,6 +725,66 @@ static NSArray *COArrayPropertyListForArray(NSArray *array)
 	return newArray;
 }
 
+/* Returns the CoreObject serialized type for a NSValue or NSNumber object.
+
+Nil is returned when the type is unsupported by CoreObject serialization. */
+- (NSString *) typeForValue: (id)value
+{
+	const char *type = [value objCType];
+
+	if  (strcmp(type, @encode(NSPoint)) == 0)
+	{
+		return @"point";
+	}
+	else if (strcmp(type, @encode(NSSize)) == 0)
+	{
+		return @"size";
+	}
+	else if (strcmp(type, @encode(NSRect)) == 0)
+	{
+		return @"rect";
+	}
+	else if (strcmp(type, @encode(NSRange)) == 0)
+	{
+		return @"range";
+	}
+	else if (strcmp(type, @encode(SEL)) == 0)
+	{
+		return @"sel";
+	}
+	return nil;
+}
+
+/* Returns the CoreObject serialization result for a NSValue or NSNumber object.
+
+Nil is returned when the value type is unsupported by CoreObject serialization. */
+- (NSString *) stringValueForValue: (id)value
+{
+	const char *type = [value objCType];
+
+	if  (strcmp(type, @encode(NSPoint)) == 0)
+	{
+		return NSStringFromPoint([value pointValue]);
+	}
+	else if (strcmp(type, @encode(NSSize)) == 0)
+	{
+		return NSStringFromSize([value sizeValue]);	
+	}
+	else if (strcmp(type, @encode(NSRect)) == 0)
+	{
+		return NSStringFromRect([value rectValue]);
+	}
+	else if (strcmp(type, @encode(NSRange)) == 0)
+	{
+		return NSStringFromRange([value rangeValue]);
+	}
+	else if (strcmp(type, @encode(SEL)) == 0)
+	{
+		return NSStringFromSelector((SEL)[value pointerValue]);
+	}
+	return nil;
+}
+
 - (NSDictionary*) propertyListForValue: (id)value
 {
 	NSDictionary *result = nil;
@@ -734,13 +812,17 @@ static NSArray *COArrayPropertyListForArray(NSArray *array)
 	{
 		result = D(value, @"value", @"primitive", @"type");
 	}
+	else if ([value isKindOfClass: [NSValue class]] && [self typeForValue: value] != nil)
+	{
+		result = D([self stringValueForValue: value], @"value", [self typeForValue: value] , @"type");
+	}
 	else
 	{
 		// FIXME: Perhaps add a method which can be overriden to explicitly 
 		// declare which instances we can encode without raising an exception.
 		// For example... -validCoreObjectDataClasses.
 		// Would be better to get these from [ETPropertyDescription type].
-		result = D([NSKeyedArchiver archivedDataWithRootObject: value], @"value", @"data", @"type");
+		result = (NSDictionary *)[NSKeyedArchiver archivedDataWithRootObject: value];
 	
 		//[NSException raise: NSInvalidArgumentException
 		//            format: @"value must of type COObject, NSArray, NSSet or nil"];
@@ -760,15 +842,21 @@ static NSArray *COArrayPropertyListForArray(NSArray *array)
 
 - (NSObject *)valueForPropertyList: (NSObject*)plist
 {
+	// TODO: Could move the string to NSValue handling to a new method 
+	// -valueForString:... Would be more symetric if we allow subclasses to 
+	// declare new value types
+
 	if ([plist isKindOfClass: [NSDictionary class]])
 	{
-		if ([[plist valueForKey: @"type"] isEqualToString: @"object-ref"])
+		NSString *type = [plist valueForKey: @"type"];
+
+		if ([type isEqualToString: @"object-ref"])
 		{
 			ETUUID *uuid = [ETUUID UUIDWithString: [plist valueForKey: @"uuid"]];
 			return [[self editingContext] objectWithUUID: uuid 
 											  entityName: [plist valueForKey: @"entity"]];
 		}
-		else if ([[plist valueForKey: @"type"] isEqualToString: @"unorderedCollection"])
+		else if ([type isEqualToString: @"unorderedCollection"])
 		{
 			NSArray *objects = [plist valueForKey: @"objects"];
 			NSMutableSet *set = [NSMutableSet setWithCapacity: [objects count]];
@@ -778,13 +866,33 @@ static NSArray *COArrayPropertyListForArray(NSArray *array)
 			}
 			return set;
 		}
-		else if ([[plist valueForKey: @"type"] isEqualToString: @"nil"])
+		else if ([type isEqualToString: @"nil"])
 		{
 			return nil;
 		}
-		else if ([[plist valueForKey: @"type"] isEqualToString: @"primitive"])
+		else if ([type isEqualToString: @"primitive"])
 		{
 			return [plist valueForKey: @"value"];
+		}
+		else if ([type isEqualToString: @"point"])
+		{
+			return [NSValue valueWithPoint: NSPointFromString([plist valueForKey: @"value"])];
+		}
+		else if ([type isEqualToString: @"size"])
+		{
+			return [NSValue valueWithSize: NSSizeFromString([plist valueForKey: @"value"])];
+		}
+		else if ([type isEqualToString: @"rect"])
+		{
+			return [NSValue valueWithRect: NSRectFromString([plist valueForKey: @"value"])];
+		}
+		else if ([type isEqualToString: @"range"])
+		{
+			return [NSValue valueWithRange: NSRangeFromString([plist valueForKey: @"value"])];
+		}
+		else if ([type isEqualToString: @"sel"])
+		{
+			return [NSValue value: NSSelectorFromString([plist valueForKey: @"value"]) withObjCType: @encode(SEL)];
 		}
 	}
 	else if ([plist isKindOfClass: [NSArray class]])
@@ -809,6 +917,12 @@ static NSArray *COArrayPropertyListForArray(NSArray *array)
 
 
 @implementation COObject (Debug)
+
+- (id) roundTripValueForProperty: (NSString *)key
+{
+	id plist = [self propertyListForValue: [self valueForProperty: key]];
+	return [self valueForPropertyList: plist];
+}
 
 static int indent = 0;
 
