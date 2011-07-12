@@ -18,7 +18,8 @@
 	[collectionContentsProperty setMultivalued: YES];
 	[collectionContentsProperty setOpposite: (id)@"Anonymous.COObject.parentCollections"]; // FIXME: just 'parentCollections' should work...
 	[collectionContentsProperty setOrdered: NO];
-	
+	[collectionContentsProperty setPersistent: YES];
+
 	[collection setPropertyDescriptions: A(collectionContentsProperty)];
 
 	return collection;

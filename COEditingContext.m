@@ -270,8 +270,9 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		assert(![copy isIgnoringRelationshipConsistency]);
 		[copy setIgnoringRelationshipConsistency: YES];
 	}
-	
-	for (NSString *prop in [sourceObject propertyNames])
+
+	// FIXME: Copy transient properties if needed
+	for (NSString *prop in [sourceObject persistentPropertyNames])
 	{
 		ETPropertyDescription *desc = [[sourceObject entityDescription] propertyDescriptionForName: prop];
 		
@@ -386,7 +387,8 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		NSArray *propsToCommit;
 		if ([insertedObjectUUIDs containsObject: uuid])
 		{
-			propsToCommit = [obj propertyNames]; // for the first commit, commit all property values
+			// for the first commit, commit all property values
+			propsToCommit = [obj persistentPropertyNames];
 		}
 		else
 		{
@@ -516,7 +518,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 {
 	ETUUID *objUUID = [obj UUID];
 
-	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj propertyNames]];
+	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj persistentPropertyNames]];
 	//NSLog(@"Properties to fetch: %@", propertiesToFetch);
 	
 	obj->_isIgnoringDamageNotifications = YES;

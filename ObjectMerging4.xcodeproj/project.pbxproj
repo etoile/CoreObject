@@ -82,35 +82,35 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 60073EAD10074D26007272E6 /* EtoileXML.framework */;
+			remoteGlobalIDString = 60073EAD10074D26007272E6;
 			remoteInfo = EtoileXML;
 		};
 		60FB087C13C3066300C2AB94 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 603647AC0E409244003377E0 /* EtoileFoundation.framework */;
+			remoteGlobalIDString = 603647AC0E409244003377E0;
 			remoteInfo = EtoileFoundation;
 		};
 		60FB087E13C3066300C2AB94 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 609B66D70FEE80CE0007F842 /* TestEtoileFoundation.bundle */;
+			remoteGlobalIDString = 609B66D70FEE80CE0007F842;
 			remoteInfo = TestEtoileFoundation;
 		};
 		60FB088013C3066300C2AB94 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 6072CF691360E144003256C5 /* PlugInExample.plugin */;
+			remoteGlobalIDString = 6072CF691360E144003256C5;
 			remoteInfo = PlugInExample;
 		};
 		60FB0A1A13C3264E00C2AB94 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 603647AB0E409244003377E0 /* EtoileFoundation */;
+			remoteGlobalIDString = 603647AB0E409244003377E0;
 			remoteInfo = EtoileFoundation;
 		};
 		791B4E4A1299C81F00CCF472 /* PBXContainerItemProxy */ = {

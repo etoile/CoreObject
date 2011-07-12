@@ -10,7 +10,7 @@
  * You should use ETUUID's to refer to objects outside of the context
  * of a COEditingContext.
  */
-@interface COObject : NSObject
+@interface COObject : NSObject <NSCopying>
 {
 	@package
 	ETEntityDescription *_entityDescription;
@@ -48,6 +48,7 @@
  */
 - (void) becomePersistentInContext: (COEditingContext *)aContext 
                         rootObject: (COObject *)aRootObject;
+- (id) copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription;
 
 /* Attributes */
 
@@ -103,7 +104,8 @@
 
 /* Property-value coding */
 
-- (NSArray *)propertyNames;
+- (NSArray *) propertyNames;
+- (NSArray *) persistentPropertyNames;
 - (id) valueForProperty:(NSString *)key;
 - (BOOL) setValue:(id)value forProperty:(NSString*)key;
 

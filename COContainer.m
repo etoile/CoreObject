@@ -28,7 +28,8 @@
 	[groupContentsProperty setMultivalued: YES];
 	[groupContentsProperty setOpposite: (id)@"Anonymous.COObject.parentContainer"]; // FIXME: just 'parent' should work...
 	[groupContentsProperty setOrdered: YES];
-	
+	[groupContentsProperty setPersistent: YES];
+
 	[group setPropertyDescriptions: A(groupContentsProperty)];
 
 	return group;	

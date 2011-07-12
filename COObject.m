@@ -28,8 +28,11 @@
 		[ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.COCollection"];
 	
 	[parentCollectionsProperty setMultivalued: YES];
-	
-	[object setPropertyDescriptions: A(parentContainerProperty, parentCollectionsProperty)];
+
+	NSArray *persistentProperties = A(parentContainerProperty, parentCollectionsProperty);
+
+	[[persistentProperties mappedCollection] setPersistent: YES];
+	[object setPropertyDescriptions: persistentProperties];
 
 	return object;
 }
@@ -95,6 +98,33 @@
 	_rootObject = aRootObject;
 	ASSIGN(_entityDescription, [[aContext modelRepository] entityDescriptionForClass: [self class]]);
 	[aContext insertObject: self];
+}
+
+- (id) copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription
+{
+	COObject *newObject = [[self class] allocWithZone: aZone];
+	
+	newObject->_uuid = [[ETUUID alloc] init];
+	newObject->_rootObject = _rootObject;
+	newObject->_context = _context;
+	if (_variableStorage != nil)
+	{
+		newObject->_variableStorage = [[NSMapTable alloc] init];
+
+		if (usesModelDescription)
+		{
+			// TODO: For variable storage properties, support a metamodel-driven copy
+			// Share support code with -insertObjectCopy: or make -insertObjectCopy: 
+			// uses -copyWithZone:
+		}
+	}
+
+	return newObject;
+}
+
+- (id) copyWithZone: (NSZone *)aZone
+{
+	return [self copyWithZone: aZone usesModelDescription: NO];
 }
 
 // Attributes
@@ -193,11 +223,16 @@
 	return [[self entityDescription] allPropertyDescriptionNames];
 }
 
+- (NSArray *) persistentPropertyNames
+{
+	return (id)[[[[self entityDescription] allPersistentPropertyDescriptions] mappedCollection] name];
+}
+
 - (id) valueForProperty:(NSString *)key
 {
 	[self willAccessValueForProperty: key];
 	
-	if (![[self propertyNames] containsObject: key])
+	if (![ containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
 		return nil;
@@ -945,7 +980,7 @@ static int indent = 0;
 	NSMutableString *str = [NSMutableString stringWithFormat: @"<%@(%@) at %p UUID %@ data: {\n",  [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
 	indent++;
 	
-	NSMutableArray *props = [NSMutableArray arrayWithArray: [self propertyNames]];
+	NSMutableArray *props = [NSMutableArray arrayWithArray: [self persistentPropertyNames]];
 	if ([props containsObject: @"contents"])
 	{
 		[props removeObject: @"contents"];

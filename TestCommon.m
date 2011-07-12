@@ -14,9 +14,10 @@
 		
 		ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
 																		  type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
-		
+
 		[outlineEntity setPropertyDescriptions: A(labelProperty)];
-		
+		[[[outlineEntity propertyDescriptions] mappedCollection] setPersistent: YES];
+
 		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: outlineEntity];
 	}
 	
@@ -27,8 +28,9 @@
 		
 		ETPropertyDescription *tagLabelProperty = [ETPropertyDescription descriptionWithName: @"label"
 																		  type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
-		
+
 		[tagEntity setPropertyDescriptions: A(tagLabelProperty)];
+		[[[tagEntity propertyDescriptions] mappedCollection] setPersistent: YES];
 		
 		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: tagEntity];
 	}
@@ -47,7 +49,8 @@
 																						type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
 		
 		[personEntity setPropertyDescriptions: A(spouseProperty, personNameProperty)];
-		
+		[[[personEntity propertyDescriptions] mappedCollection] setPersistent: YES];
+
 		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: personEntity];
 	}
 	
