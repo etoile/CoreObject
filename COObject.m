@@ -232,7 +232,7 @@
 {
 	[self willAccessValueForProperty: key];
 	
-	if (![ containsObject: key])
+	if (![[self propertyNames] containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
 		return nil;
