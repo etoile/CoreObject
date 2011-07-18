@@ -832,9 +832,28 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 {
 	NSDictionary *result = nil;
 
+	/* Some root object relationships are special in the sense the value can be 
+	   a core object but its persistency isn't enabled. We interpret these 
+	   one-to-one relationships as transient.
+	   Usually a root object belongs to some other objects at run-time, in some 
+	   cases the root object  want to hold a backward pointer (inverse 
+	   relationship) to those non-persistent object(s).
+	   For example, a root object can be a layout item whose parent item is the 
+	   window group... In such a case, we don't want to persist the window 
+	   group, but ignore it. At deseserialiation time, the app is responsible 
+	   to add the item back to the window group (the parent item would be 
+	   restored then). */
 	if ([value isKindOfClass: [COObject class]])
 	{
-		result = [value referencePropertyList];
+		if ([value isPersistent])
+		{
+			result = [value referencePropertyList];
+		}
+		else
+		{
+			ETAssert([self isRoot]);
+			result = D(@"nil", @"type");
+		}
 	}
 	else if ([value isKindOfClass: [NSArray class]])
 	{
@@ -876,6 +895,9 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 
 - (NSDictionary*) referencePropertyList
 {
+	NSAssert1([self isPersistent], 
+		@"Usually means -becomePersistentInContext:rootObject: hasn't been called on %@", self);
+
 	return [NSDictionary dictionaryWithObjectsAndKeys:
 			@"object-ref", @"type",
 			[_uuid stringValue], @"uuid",
