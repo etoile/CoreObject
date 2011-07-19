@@ -22,14 +22,14 @@
 
 - (void)beginCommitWithMetadata: (NSDictionary*)meta;
 
-- (void)beginChangesForObject: (ETUUID*)object;
+- (void)beginChangesForObjectUUID: (ETUUID*)object;
 
 - (void)setValue: (id)value
 	 forProperty: (NSString*)property
 		ofObject: (ETUUID*)object
 	 shouldIndex: (BOOL)shouldIndex;
 
-- (void)finishChangesForObject: (ETUUID*)object;
+- (void)finishChangesForObjectUUID: (ETUUID*)object;
 
 - (CORevision*)finishCommit;
 

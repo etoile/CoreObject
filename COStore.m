@@ -223,7 +223,7 @@ void CHECK(id db)
 	commitInProgress = [[NSNumber numberWithUnsignedLongLong: [db lastInsertRowId]] retain];
 }
 
-- (void)beginChangesForObject: (ETUUID*)object
+- (void)beginChangesForObjectUUID: (ETUUID*)object
 {
 	if (commitInProgress == nil)
 	{
@@ -257,7 +257,8 @@ void CHECK(id db)
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Error serializing object %@", value];
 	}
-	
+	//NSLog(@"STORE WRITE (%@) object %@, property %@, value %@", commitInProgress, object, property, value);
+
 	[db executeUpdate: @"INSERT INTO commits(commitrow, revisionnumber, objectuuid, property, value) VALUES(NULL, ?, ?, ?, ?)",
 		commitInProgress,
 		[self keyForUUID: objectInProgress],
@@ -283,7 +284,7 @@ void CHECK(id db)
 	}
 }
 
-- (void)finishChangesForObject: (ETUUID*)object
+- (void)finishChangesForObjectUUID: (ETUUID*)object
 {
 	if (commitInProgress == nil)
 	{
