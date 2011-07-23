@@ -95,7 +95,7 @@ void CHECK(id db)
 	// we store them in two tables, and use integer ID's to refer to those
 	// UUIDs/property names.
 	
-	success = success && [db executeUpdate: @"CREATE TABLE uuids(uuidIndex INTEGER PRIMARY KEY, uuid STRING)"]; CHECK(db);
+	success = success && [db executeUpdate: @"CREATE TABLE uuids(uuidIndex INTEGER PRIMARY KEY, uuid STRING, rootIndex INTEGER)"]; CHECK(db);
 	success = success && [db executeUpdate: @"CREATE INDEX uuidsIndex ON uuids(uuid)"]; CHECK(db);
 
 	success = success && [db executeUpdate: @"CREATE TABLE properties(propertyIndex INTEGER PRIMARY KEY, property STRING)"]; CHECK(db);
@@ -147,7 +147,17 @@ void CHECK(id db)
 	else
 	{
 		[rs close];
-		[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?)", [uuid stringValue]];
+		if (rootInProgress != nil)
+		{
+			[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, ?)", 
+			                   [uuid stringValue], rootInProgress];
+		}
+		else
+		{
+			// TODO: Not really pretty... Try to merge -insertRootUUID: with 
+			// -keyForUUID: to eliminate this branch
+			[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [uuid stringValue]];
+		}
 		key = [db lastInsertRowId];
 	}
 	return [NSNumber numberWithLongLong: key];
@@ -202,15 +212,96 @@ void CHECK(id db)
 	return result;
 }
 
+/* Content  */
+
+- (BOOL)isRootObjectUUID: (ETUUID *)uuid
+{
+	NILARG_EXCEPTION_TEST(uuid);
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = ? AND rootIndex = uuidIndex",
+	                                    [self keyForUUID: uuid]];
+	BOOL result = [rs next];
+	[rs close];
+	return result;
+}
+
+- (NSSet *)rootObjectUUIDs
+{
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE rootIndex = uuidIndex"];
+	NSMutableSet *result = [NSMutableSet set];
+
+	while ([rs next])
+	{
+		[result addObject: [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]]];
+	}
+
+	[rs close];
+	return result;
+}
+
+- (NSSet *)UUIDsForRootObjectUUID: (ETUUID *)aUUID
+{
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE rootIndex = ?", [self keyForUUID: aUUID]];
+	NSMutableSet *result = [NSMutableSet set];
+
+	while ([rs next])
+	{
+		[result addObject: [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]]];
+	}
+	ETAssert([result containsObject: aUUID]);
+
+	[rs close];
+	return result;
+}
+
+- (void)insertRootObjectUUID: (ETUUID *)uuid
+{
+	NILARG_EXCEPTION_TEST(uuid);
+	
+	NSString *uuidString = [uuid stringValue];
+	assert([uuidString isKindOfClass: [NSString class]]);
+    FMResultSet *rs = [db executeQuery: @"SELECT uuidIndex FROM uuids WHERE uuid = ?", uuidString];
+	BOOL wasInsertedPreviously = [rs next];
+
+	[rs close];
+
+	if (wasInsertedPreviously)
+	{
+		[NSException raise: NSInvalidArgumentException 
+		            format: @"The persistent root UUID %@ was inserted previously.", uuid];
+		return;
+	}
+	
+	// TODO: Merge UPDATE into INSERT if possible
+	[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [uuid stringValue]];
+	int64_t key = [db lastInsertRowId];
+	[db executeUpdate: @"UPDATE uuids SET rootIndex = ? WHERE uuidIndex = ?", 
+		[NSNumber numberWithLongLong: key], [NSNumber numberWithLongLong: key]];
+}
+
+// TODO: Rewrite to be handled in two transactions (SELECT and INSERT)
+- (void) insertRootObjectUUIDs: (NSSet *)UUIDs
+{
+	for (ETUUID *uuid in UUIDs)
+	{
+		[self insertRootObjectUUID: uuid];
+	}
+}
+
 /* Committing Changes */
 
-- (void)beginCommitWithMetadata: (NSDictionary*)meta
+- (void)beginCommitWithMetadata: (NSDictionary *)meta
+                 rootObjectUUID: (ETUUID *)rootUUID
+				 
 {
 	if (commitInProgress != nil)
 	{
 		[NSException raise: NSGenericException format: @"Attempt to call -beginCommitWithMetadata: while a commit is already in progress."];
 	}
-	
+	if ([self isRootObjectUUID: rootUUID] == NO)
+	{
+		[NSException raise: NSGenericException format: @"The object UUID %@ is not listed among the root objects.", rootUUID];	
+	}
+
 	NSData *data = [NSPropertyListSerialization dataFromPropertyList: meta
 															  format: NSPropertyListXMLFormat_v1_0
 													errorDescription: NULL];
@@ -219,8 +310,9 @@ void CHECK(id db)
 	
 	[db executeUpdate: @"INSERT INTO commitMetadata(plist) VALUES(?)",
 		data];
-	
+
 	commitInProgress = [[NSNumber numberWithUnsignedLongLong: [db lastInsertRowId]] retain];
+	ASSIGN(rootInProgress, [self keyForUUID: rootUUID]);
 }
 
 - (void)beginChangesForObjectUUID: (ETUUID*)object
@@ -282,6 +374,8 @@ void CHECK(id db)
 			NSLog(@"Error, only strings can be indexed.");
 		}
 	}
+
+	hasPushedChanges = YES;
 }
 
 - (void)finishChangesForObjectUUID: (ETUUID*)object
@@ -294,8 +388,14 @@ void CHECK(id db)
 	{
 		[NSException raise: NSGenericException format: @"Object in progress doesn't match"];
 	}
+	if (!hasPushedChanges)
+	{
+		// TODO: Turn on this exception
+		//[NSException raise: NSGenericException format: @"Push changes before finishing the commit"];
+	}
 	[objectInProgress release];
 	objectInProgress = nil;
+	hasPushedChanges = NO;
 }
 
 - (CORevision*)finishCommit
@@ -312,9 +412,8 @@ void CHECK(id db)
 	
 	CORevision *result = [self revisionWithRevisionNumber: [commitInProgress unsignedLongLongValue]];
 	
-	[commitInProgress release];
-	commitInProgress = nil;
-
+	DESTROY(commitInProgress);
+	DESTROY(rootInProgress);
 	return result;
 }
 

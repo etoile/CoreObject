@@ -12,15 +12,51 @@
 	NSMutableDictionary *commitObjectForID;
 	
 	NSNumber *commitInProgress;
+	NSNumber *rootInProgress;
 	ETUUID *objectInProgress;
+
+	BOOL hasPushedChanges;
 }
+
+/** @taskunit Initialization */
 
 - (id)initWithURL: (NSURL*)aURL;
 - (NSURL*)URL;
 
-/* Committing Changes */
+/** @taskunit Persistent Roots  */
 
-- (void)beginCommitWithMetadata: (NSDictionary*)meta;
+/** 
+ * Returns whether the UUID corresponds to a persistent root in the store. 
+ */
+- (BOOL)isRootObjectUUID: (ETUUID *)aUUID;
+/** 
+ * Returns the UUIDs that correspond to persistent roots in the store. 
+ *
+ * For a new store, will return an empty set. 
+ */
+- (NSSet *)rootObjectUUIDs;
+/** 
+ * Returns the UUIDs that corresponds to objects belonging to the persistent 
+ * root UUID. 
+ *
+ * The persistent root UUID is included in the returned set.<br />
+ * When the given UUID is not a persistent root in the store, returns an empty 
+ * set.
+ */
+- (NSSet *) UUIDsForRootObjectUUID: (ETUUID *)aUUID;
+/** 
+ * Inserts new UUIDs marked as persistent roots. 
+ *
+ * The UUID set must not be nil.
+ * These UUIDs must not exist in the store, otherwise a 
+ * NSInvalidArgumentException is raised.
+ */
+- (void) insertRootObjectUUIDs: (NSSet *)UUIDs;
+
+/** @taskunit Committing Changes */
+
+- (void)beginCommitWithMetadata: (NSDictionary *)meta 
+                 rootObjectUUID: (ETUUID *)rootUUID;
 
 - (void)beginChangesForObjectUUID: (ETUUID*)object;
 
@@ -35,15 +71,15 @@
 
 - (CORevision*)revisionWithRevisionNumber: (uint64_t)anID;
 
-/* Full-text Search */
+/** @taskunit Full-text Search */
 
 - (NSArray*)resultDictionariesForQuery: (NSString*)query;
 
-/* Revision history */
+/** @taskunit Revision history */
 
 - (uint64_t) latestRevisionNumber;
 
-/* Private */
+/** @taskunit Private */
 
 - (BOOL)setupDB;
 - (NSNumber*)keyForUUID: (ETUUID*)uuid;

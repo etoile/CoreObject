@@ -47,14 +47,15 @@ static void TearDownStore(COStore *s)
 	
 	{
 		COStore *s = [[COStore alloc] initWithURL: STORE_URL];
-		
-		[s beginCommitWithMetadata: sampleMetadata];
-		[s beginChangesForObject: o1];
+
+		[s insertRootObjectUUIDs: S(o1)];		
+		[s beginCommitWithMetadata: sampleMetadata rootObjectUUID: o1];
+		[s beginChangesForObjectUUID: o1];
 		[s setValue: @"bob"
 		forProperty: @"name"
 		   ofObject: o1
 		shouldIndex: NO];
-		[s finishChangesForObject: o1];
+		[s finishChangesForObjectUUID: o1];
 		CORevision *c1 = [s finishCommit];
 		revisionNumber = [c1 revisionNumber];		
 		[s release];
@@ -89,29 +90,31 @@ static void TearDownStore(COStore *s)
 	COStore *s = SetUpStore();
 	
 	ETUUID *o1 = [ETUUID UUID];
+
+	[s insertRootObjectUUIDs: S(o1)];	
 	
-	[s beginCommitWithMetadata: nil];
-	[s beginChangesForObject: o1];
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginChangesForObjectUUID: o1];
 	[s setValue: @"cats" forProperty: @"name" ofObject: o1 shouldIndex: YES];
-	[s finishChangesForObject: o1];
+	[s finishChangesForObjectUUID: o1];
 	CORevision *c1 = [s finishCommit];
 
-	[s beginCommitWithMetadata: nil];
-	[s beginChangesForObject: o1];
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginChangesForObjectUUID: o1];
 	[s setValue: @"dogs" forProperty: @"name" ofObject: o1 shouldIndex: YES];
-	[s finishChangesForObject: o1];
+	[s finishChangesForObjectUUID: o1];
 	CORevision *c2 = [s finishCommit];
 	
-	[s beginCommitWithMetadata: nil];
-	[s beginChangesForObject: o1];
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginChangesForObjectUUID: o1];
 	[s setValue: @"horses" forProperty: @"name" ofObject: o1 shouldIndex: YES];
-	[s finishChangesForObject: o1];
+	[s finishChangesForObjectUUID: o1];
 	CORevision *c3 = [s finishCommit];
 	
-	[s beginCommitWithMetadata: nil];
-	[s beginChangesForObject: o1];
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginChangesForObjectUUID: o1];
 	[s setValue: @"dogpound" forProperty: @"name" ofObject: o1 shouldIndex: YES];
-	[s finishChangesForObject: o1];
+	[s finishChangesForObjectUUID: o1];
 	CORevision *c4 = [s finishCommit];
 	
 	UKNotNil(c1);
@@ -148,29 +151,60 @@ static void TearDownStore(COStore *s)
 	COStore *s = SetUpStore();
 	
 	ETUUID *o1 = [ETUUID UUID];
-	
-	[s beginCommitWithMetadata: nil];
-	[s beginChangesForObject: o1];	
-	[s finishChangesForObject: o1];
+
+	[s insertRootObjectUUIDs: S(o1)];	
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginChangesForObjectUUID: o1];
+	[s finishChangesForObjectUUID: o1];
 	CORevision *c1 = [s finishCommit];
 	UKNotNil(c1);
-	
+	UKTrue([s isRootObjectUUID: o1]);
+	UKObjectsEqual(S(o1), [s rootObjectUUIDs]);
+
 	TearDownStore(s);
 }
+
+- (void)testRootObject
+{
+	COStore *s = SetUpStore();
+	
+	ETUUID *o1 = [ETUUID UUID];
+	ETUUID *o2 = [ETUUID UUID];
+	ETUUID *o3 = [ETUUID UUID];
+	[s insertRootObjectUUIDs: S(o1)];
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginChangesForObjectUUID: o2];
+	[s setValue: @"cats" forProperty: @"name" ofObject: o2 shouldIndex: NO];
+	[s finishChangesForObjectUUID: o2];
+	[s beginChangesForObjectUUID: o3];
+	[s setValue: @"dogs" forProperty: @"name" ofObject: o3 shouldIndex: NO];
+	[s finishChangesForObjectUUID: o3];
+	CORevision *c1 = [s finishCommit];
+	UKNotNil(c1);
+	UKTrue([s isRootObjectUUID: o1]);
+	UKFalse([s isRootObjectUUID: o2]);
+	UKFalse([s isRootObjectUUID: o3]);
+	UKObjectsEqual(S(o1), [s rootObjectUUIDs]);
+	UKObjectsEqual(S(o1, o2, o3), [s UUIDsForRootObjectUUID: o1]);
+
+	TearDownStore(s);
+}
+
 
 - (void)testStoreNil
 {
 	COStore *s = SetUpStore();
 	
 	ETUUID *o1 = [ETUUID UUID];
-	
-	[s beginCommitWithMetadata: nil];
-	[s beginChangesForObject: o1];
+
+	[s insertRootObjectUUIDs: S(o1)];	
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginChangesForObjectUUID: o1];
 	[s setValue: nil
 	forProperty: @"name"
 	   ofObject: o1
 	shouldIndex: NO];
-	[s finishChangesForObject: o1];
+	[s finishChangesForObjectUUID: o1];
 	CORevision *c1 = [s finishCommit];
 
 	UKNotNil(c1);

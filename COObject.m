@@ -43,6 +43,18 @@
                   context: (COEditingContext *)aContext
                   isFault: (BOOL)isFault
 {
+	NSParameterAssert(aUUID != nil);
+	BOOL isPersistent = (aRootObject != nil && aContext != nil);
+	if (isPersistent)
+	{
+		NSParameterAssert(anEntityDescription != nil);
+	}
+	else
+	{
+		NSParameterAssert(aRootObject == nil);
+		NSParameterAssert(aContext == nil);
+	}
+
 	ASSIGN(_uuid, aUUID);
 	if (anEntityDescription != nil)
 	{
@@ -725,11 +737,10 @@
 	NILARG_EXCEPTION_TEST(aUUID);
 	NILARG_EXCEPTION_TEST(anEntityDescription);
 	NILARG_EXCEPTION_TEST(aContext);
-	// TODO: NILARG_EXCEPTION_TEST(aRootObject);
-		
+
 	self = [self commonInitWithUUID: aUUID 
 	              entityDescription: anEntityDescription
-	                     rootObject: aRootObject
+	                     rootObject: (aRootObject != nil ? aRootObject : self)
 	                        context: aContext
 	                        isFault: isFault];
 	return self;

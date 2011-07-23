@@ -140,7 +140,7 @@ static COEditingContext *currentCtxt = nil;
 	}
 	
 	Class cls = [self classForEntityDescription: desc];
-	// FIXME: Pass some valid root object
+	/* Nil root object means the new object will be a root */
 	result = [[cls alloc] initWithUUID: aUUID
 					 entityDescription: desc
 	                        rootObject: nil
@@ -360,6 +360,9 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 	for (ETUUID *uuid in _damagedObjectUUIDs)
 	{
+		if ([keys containsObject: uuid] == NO)
+			continue;
+
 		[subset setObject: [_damagedObjectUUIDs objectForKey: uuid] 
 		           forKey: uuid];
 	}
@@ -372,15 +375,20 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
         insertedObjectUUIDs: (NSSet *)insertedObjectUUIDs
          damagedObjectUUIDs: (NSDictionary *)damagedObjectUUIDs
 {
+	NSParameterAssert(rootObject != nil);
+	NSParameterAssert(insertedObjectUUIDs != nil);
+	NSParameterAssert(damagedObjectUUIDs != nil);
 	// TODO: ETAssert([rootObject isRoot]);
 	// TODO: We should add the deleted object UUIDs to the set below
 	NSSet *committedObjectUUIDs = 
 		[insertedObjectUUIDs setByAddingObjectsFromArray: [damagedObjectUUIDs allKeys]];
 
-	[_store beginCommitWithMetadata: metadata];
+	[_store beginCommitWithMetadata: metadata 
+	                 rootObjectUUID: [rootObject UUID]];
+
 	for (ETUUID *uuid in committedObjectUUIDs)
 	{		
-		[_store beginChangesForObject: uuid];
+		[_store beginChangesForObjectUUID: uuid];
 		COObject *obj = [self objectWithUUID: uuid];
 		//NSLog(@"Committing changes for %@", obj);
 		
@@ -389,13 +397,18 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		{
 			// for the first commit, commit all property values
 			propsToCommit = [obj persistentPropertyNames];
+			ETAssert([_insertedObjectUUIDs containsObject: uuid]);
 		}
 		else
 		{
 			propsToCommit = [damagedObjectUUIDs objectForKey: uuid]; // otherwise just damaged values
+			ETAssert([_insertedObjectUUIDs containsObject: uuid] == NO);
 		}
 
-		
+		if ([obj isKindOfClass: NSClassFromString(@"ETDropIndicator")])
+	{
+		NSLog(@"Load drop indic");
+	}	
 		for (NSString *prop in propsToCommit)
 		{
 			id value = [obj valueForProperty: prop];
@@ -414,7 +427,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 				ofObject: uuid
 			 shouldIndex: NO];
 		
-		[_store finishChangesForObject: uuid];
+		[_store finishChangesForObjectUUID: uuid];
 	}
 	
 	CORevision *c = [_store finishCommit];
@@ -427,7 +440,6 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	}
 }
 
-#if ROOTOBJECT_SUPPORT
 - (void) commitWithMetadata: (NSDictionary*)metadata
 {
 	NSMapTable *insertedObjectUUIDs = [self insertedObjectUUIDsByRootObject];
@@ -435,27 +447,31 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	NSSet *rootObjects = [NSSet setWithArray: [[[insertedObjectUUIDs keyEnumerator] allObjects] 
 		arrayByAddingObjectsFromArray: [[damagedObjectUUIDs keyEnumerator] allObjects]]];
 
+	NSMutableSet *insertedRootObjectUUIDs = [NSMutableSet setWithSet: _insertedObjectUUIDs];
+	[insertedRootObjectUUIDs intersectSet: (id)[[rootObjects mappedCollection] UUID]];
+	[_store insertRootObjectUUIDs: insertedRootObjectUUIDs];
+
 	// TODO: Add a batch commit UUID in the metadata
 	for (COObject *rootObject in rootObjects)
 	{
+		NSSet *insertedObjectSubset = [insertedObjectUUIDs objectForKey: rootObject];
 		NSDictionary *damagedObjectUUIDSubset = [self damagedObjectUUIDSubsetForUUIDs: 
 			[damagedObjectUUIDs objectForKey: rootObject]];
 
 		[self commitWithMetadata: metadata
 		              rootObject: rootObject
-		     insertedObjectUUIDs: [insertedObjectUUIDs objectForKey: rootObject]
+		     insertedObjectUUIDs: (insertedObjectSubset != nil ? insertedObjectSubset : [NSSet set])
 		      damagedObjectUUIDs: damagedObjectUUIDSubset];
 	}
 }
-#else
-- (void) commitWithMetadata: (NSDictionary*)metadata
+
+/*- (void) commitWithMetadata: (NSDictionary*)metadata
 {
 		[self commitWithMetadata: metadata
 		              rootObject: nil
 		     insertedObjectUUIDs: _insertedObjectUUIDs
 		      damagedObjectUUIDs: _damagedObjectUUIDs];
-}
-#endif
+}*/
 
 // Private
 
@@ -523,7 +539,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	
 	obj->_isIgnoringDamageNotifications = YES;
 	[obj setIgnoringRelationshipConsistency: YES];
-	
+
 	uint64_t revNum;
 	if (aRevision == nil)
 	{
@@ -534,6 +550,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		revNum = [aRevision revisionNumber];
 	}
 
+	//NSLog(@"Load object %@ at %i", objUUID, (int)revNum);
 	
 	while ([propertiesToFetch count] > 0)
 	{
