@@ -602,11 +602,22 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 			desc = [_modelRepository descriptionForName: name];
 		}
 		
+		// NOTE: We could resolve the root object at loading time, but since 
+		// it's going to should be available in memory, we rather resolve it now.
+		ETUUID *rootUUID = [_store rootObjectUUIDForUUID: uuid];
+		ETAssert(rootUUID != nil);
+		BOOL isRoot = [rootUUID isEqual: uuid];
+		id rootObject = nil;
+
+		if (!isRoot)
+		{
+			rootObject = [self objectWithUUID: rootUUID entityName: nil];
+		}
+
 		Class cls = [self classForEntityDescription: desc];
-		// FIXME: Pass some valid root object
 		result = [[cls alloc] initWithUUID: uuid
 						 entityDescription: desc
-	                            rootObject: nil
+	                            rootObject: rootObject
 								   context: self
 								   isFault: YES];
 		

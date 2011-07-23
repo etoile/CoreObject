@@ -240,6 +240,7 @@ void CHECK(id db)
 
 - (NSSet *)UUIDsForRootObjectUUID: (ETUUID *)aUUID
 {
+	NILARG_EXCEPTION_TEST(aUUID);
     FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE rootIndex = ?", [self keyForUUID: aUUID]];
 	NSMutableSet *result = [NSMutableSet set];
 
@@ -248,6 +249,23 @@ void CHECK(id db)
 		[result addObject: [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]]];
 	}
 	ETAssert([result containsObject: aUUID]);
+
+	[rs close];
+	return result;
+}
+
+- (ETUUID *)rootObjectUUIDForUUID: (ETUUID *)aUUID
+{
+	NILARG_EXCEPTION_TEST(aUUID);
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = ?", [self keyForUUID: aUUID]];
+	ETUUID *result = nil;
+	
+	if ([rs next])
+	{
+		result = [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]];
+		/* We expect a single result */
+		ETAssert([rs next] == NO);
+	}
 
 	[rs close];
 	return result;

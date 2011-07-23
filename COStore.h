@@ -36,22 +36,32 @@
  */
 - (NSSet *)rootObjectUUIDs;
 /** 
- * Returns the UUIDs that corresponds to objects belonging to the persistent 
- * root UUID. 
+ * Returns the UUIDs of the objects owned by the the persistent root UUID. 
  *
  * The persistent root UUID is included in the returned set.<br />
- * When the given UUID is not a persistent root in the store, returns an empty 
- * set.
+ * When the UUID is not a persistent root in the store, returns an empty set.
+ *
+ * The UUID must not be nil.
  */
-- (NSSet *) UUIDsForRootObjectUUID: (ETUUID *)aUUID;
+- (NSSet *)UUIDsForRootObjectUUID: (ETUUID *)aUUID;
+/** 
+ * Returns the UUID of the persistent root that owns the object UUID.
+ *
+ * For a persistent root UUID, returns the same UUID.<br />
+ * When the UUID is not a persistent root in the store, returns nil.
+ *
+ * The UUID must not be nil.
+ */
+- (ETUUID *)rootObjectUUIDForUUID: (ETUUID *)aUUID;
 /** 
  * Inserts new UUIDs marked as persistent roots. 
  *
- * The UUID set must not be nil.
  * These UUIDs must not exist in the store, otherwise a 
  * NSInvalidArgumentException is raised.
+ *
+ * The UUID set must not be nil.
  */
-- (void) insertRootObjectUUIDs: (NSSet *)UUIDs;
+- (void)insertRootObjectUUIDs: (NSSet *)UUIDs;
 
 /** @taskunit Committing Changes */
 
