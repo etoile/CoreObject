@@ -257,7 +257,8 @@ void CHECK(id db)
 - (ETUUID *)rootObjectUUIDForUUID: (ETUUID *)aUUID
 {
 	NILARG_EXCEPTION_TEST(aUUID);
-    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = ?", [self keyForUUID: aUUID]];
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = "
+		"(SELECT rootIndex FROM uuids WHERE uuid = ?)", aUUID];
 	ETUUID *result = nil;
 	
 	if ([rs next])

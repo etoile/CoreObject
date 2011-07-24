@@ -186,6 +186,9 @@ static void TearDownStore(COStore *s)
 	UKFalse([s isRootObjectUUID: o3]);
 	UKObjectsEqual(S(o1), [s rootObjectUUIDs]);
 	UKObjectsEqual(S(o1, o2, o3), [s UUIDsForRootObjectUUID: o1]);
+	UKObjectsEqual(o1, [s rootObjectUUIDForUUID: o1]);
+	UKObjectsEqual(o1, [s rootObjectUUIDForUUID: o2]);
+	UKObjectsEqual(o1, [s rootObjectUUIDForUUID: o3]);
 
 	TearDownStore(s);
 }
