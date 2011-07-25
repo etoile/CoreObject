@@ -118,9 +118,25 @@
 
 /* Notifications to be called by accessor methods */
 
-- (void)willAccessValueForProperty:(NSString *)key;
-- (void)willChangeValueForProperty:(NSString *)key;
-- (void)didChangeValueForProperty:(NSString *)key;
+/**
+ * Tells the receiver that the value of the property (transient or persistent) 
+ * is about to change.
+ *
+ * By default, limited to calling -willChangeValueForKey:.
+ *
+ * Can be overriden, but the superclass implementation must be called.
+ */
+- (void)willChangeValueForProperty: (NSString *)key;
+/**
+ * Tells the receiver that the value of the property (transient or persistent)
+ * has changed. 
+ *
+ * By default, notifies the editing context about the receiver change and 
+ * triggers Key-Value-Observing notifications by calling -didChangeValueForKey:.
+ *
+ * Can be overriden, but the superclass implementation must be called.
+ */
+- (void)didChangeValueForProperty: (NSString *)key;
 
 /* Overridable Notifications */
 
@@ -155,6 +171,8 @@
 
 @interface COObject (PropertyListImportExport)
 
+- (id)serializedValueForProperty:(NSString *)key;
+- (BOOL)setSerializedValue:(id)value forProperty:(NSString*)key;
 - (NSDictionary*) propertyListForValue: (id)value;
 - (NSDictionary*) referencePropertyList;
 - (NSObject *)valueForPropertyList: (NSObject*)plist;

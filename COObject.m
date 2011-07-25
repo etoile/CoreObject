@@ -242,8 +242,6 @@
 
 - (id) valueForProperty:(NSString *)key
 {
-	[self willAccessValueForProperty: key];
-	
 	if (![[self propertyNames] containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
@@ -541,17 +539,15 @@
 	[copy release];
 }
 
-- (void)willAccessValueForProperty:(NSString *)key
+- (void)willChangeValueForProperty: (NSString *)key
 {
-	[self unfaultIfNeeded];
+	[super willChangeValueForKey: key];
 }
-- (void)willChangeValueForProperty:(NSString *)key
-{
-	[self unfaultIfNeeded];
-}
-- (void)didChangeValueForProperty:(NSString *)key
+
+- (void)didChangeValueForProperty: (NSString *)key
 {
 	[self notifyContextOfDamageIfNeededForProperty: key];
+	[super didChangeValueForKey: key];
 }
 
 // Overridable Notifications
@@ -765,6 +761,49 @@
 
 @implementation COObject (PropertyListImportExport)
 
+- (id)serializedValueForProperty: (NSString *)key
+{
+	// TODO: Probably a bit slow, rewrite in C
+	/*SEL getter = NSSelectorFromString([@"primitive" stringByAppendingString: [key capitalizedString]];
+
+	if ([self respondsToSelector: setter])
+	{
+		if (![[self propertyNames] containsObject: key])
+		{
+			[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
+		}
+
+		return [self performSelector: setter withObject: value object: ];
+	}
+	else*/
+	{
+		return [self valueForProperty: key];
+	}
+}
+
+- (BOOL)setSerializedValue: (id)value forProperty: (NSString *)key
+{
+	// TODO: Probably a bit slow, rewrite in C
+	/*SEL setter = NSSelectorFromString([[@"setPrimitive" stringByAppendingString: [key capitalizedString]];
+
+	if ([self respondsToSelector: setter])
+	{
+		if (![[self propertyNames] containsObject: key])
+		{
+			[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
+		}
+
+		[self performSelector: setter withObject: value];
+		
+		// TODO: Relationship consistency check
+		return YES;
+	}
+	else*/
+	{
+		return [self setValue: value forProperty: key];
+	}
+}
+
 static NSArray *COArrayPropertyListForArray(NSArray *array)
 {
 	NSMutableArray *newArray = [NSMutableArray arrayWithCapacity: [array count]];
@@ -968,7 +1007,8 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		}
 		else if ([type isEqualToString: @"sel"])
 		{
-			return [NSValue value: NSSelectorFromString([plist valueForKey: @"value"]) withObjCType: @encode(SEL)];
+			SEL sel = NSSelectorFromString([plist valueForKey: @"value"]);
+			return [NSValue valueWithBytes: &sel objCType: @encode(SEL)];
 		}
 	}
 	else if ([plist isKindOfClass: [NSArray class]])

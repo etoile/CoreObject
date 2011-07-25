@@ -389,35 +389,38 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	for (ETUUID *uuid in committedObjectUUIDs)
 	{		
 		[_store beginChangesForObjectUUID: uuid];
+
 		COObject *obj = [self objectWithUUID: uuid];
+		NSArray *persistentProperties = [obj persistentPropertyNames];
+		id <ETCollection> propertiesToCommit = nil;
+
 		//NSLog(@"Committing changes for %@", obj);
-		
-		NSArray *propsToCommit;
+
 		if ([insertedObjectUUIDs containsObject: uuid])
 		{
 			// for the first commit, commit all property values
-			propsToCommit = [obj persistentPropertyNames];
+			propertiesToCommit = persistentProperties;
 			ETAssert([_insertedObjectUUIDs containsObject: uuid]);
 		}
 		else
 		{
-			propsToCommit = [damagedObjectUUIDs objectForKey: uuid]; // otherwise just damaged values
+			// otherwise just damaged values
+			NSArray *damagedProperties = [damagedObjectUUIDs objectForKey: uuid];
+
+			propertiesToCommit = [NSMutableSet setWithArray: damagedProperties];
+			[(NSMutableSet *)propertiesToCommit intersectSet: [NSSet setWithArray: persistentProperties]];
 			ETAssert([_insertedObjectUUIDs containsObject: uuid] == NO);
 		}
 
-		if ([obj isKindOfClass: NSClassFromString(@"ETDropIndicator")])
-	{
-		NSLog(@"Load drop indic");
-	}	
-		for (NSString *prop in propsToCommit)
+		for (NSString *prop in propertiesToCommit)
 		{
 			id value = [obj valueForProperty: prop];
 			id plist = [obj propertyListForValue: value];
 			
 			[_store setValue: plist
-			 forProperty: prop
-			 ofObject: uuid
-			 shouldIndex: NO];
+			     forProperty: prop
+			        ofObject: uuid
+			     shouldIndex: NO];
 		}
 		
 		// FIXME: Hack
@@ -430,8 +433,8 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		[_store finishChangesForObjectUUID: uuid];
 	}
 	
-	CORevision *c = [_store finishCommit];
-	assert(c != nil);
+	CORevision *rev = [_store finishCommit];
+	assert(rev != nil);
 	
 	[_insertedObjectUUIDs minusSet: insertedObjectUUIDs];
 	for (ETUUID *uuid in [damagedObjectUUIDs allKeys])
@@ -569,8 +572,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 				id plist = [dict objectForKey: key];
 				id value = [obj valueForPropertyList: plist];
 				//NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
-				[obj setValue: value
-				  forProperty: key];
+				[obj setValue: value forProperty: key];
 				[propertiesToFetch removeObject: key];
 			}
 		}
