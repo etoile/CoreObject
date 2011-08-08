@@ -327,7 +327,7 @@
 - (const unsigned char *)UTF8StringForColumnIndex:(int)columnIdx {
     
     if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_NULL || (columnIdx < 0)) {
-        return nil;
+        return NULL;
     }
     
     return sqlite3_column_text(statement.statement, columnIdx);

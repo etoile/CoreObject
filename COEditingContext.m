@@ -315,7 +315,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 {
 	NSMapTable *UUIDsByRootObject = [NSMapTable mapTableWithStrongToStrongObjects];
 
-	for (ETUUID *uuid in objectUUIDs)
+	FOREACH(objectUUIDs, uuid, ETUUID*)
 	{
 		COObject *object = [self objectWithUUID: uuid];
 		COObject *rootObject = [object rootObject];
@@ -412,7 +412,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 			ETAssert([_insertedObjectUUIDs containsObject: uuid] == NO);
 		}
 
-		for (NSString *prop in propertiesToCommit)
+		FOREACH(propertiesToCommit, prop, NSString*)
 		{
 			id value = [obj valueForProperty: prop];
 			id plist = [obj propertyListForValue: value];

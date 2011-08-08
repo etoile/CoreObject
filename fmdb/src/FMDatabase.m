@@ -93,7 +93,7 @@
     }
     while (retry);
     
-	db = nil;
+	db = NULL;
     return YES;
 }
 
@@ -381,7 +381,7 @@
 }
 
 - (FMResultSet *)executeQuery:(NSString *)sql withArgumentsInArray:(NSArray *)arguments {
-    return [self executeQuery:sql withArgumentsInArray:arguments orVAList:nil];
+    return [self executeQuery:sql withArgumentsInArray:arguments orVAList:NULL];
 }
 
 - (BOOL)executeUpdate:(NSString*)sql withArgumentsInArray:(NSArray*)arrayArgs orVAList:(va_list)args {
@@ -563,7 +563,7 @@
 
 
 - (BOOL)executeUpdate:(NSString*)sql withArgumentsInArray:(NSArray *)arguments {
-    return [self executeUpdate:sql withArgumentsInArray:arguments orVAList:nil];
+    return [self executeUpdate:sql withArgumentsInArray:arguments orVAList:NULL];
 }
 
 /*

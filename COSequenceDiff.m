@@ -37,7 +37,7 @@
 - (id) initWithOperations: (NSArray*)opers
 {
 	SUPERINIT;
-	ops = [opers retain];
+	ops = [opers mutableCopy];
 	return self;
 }
 

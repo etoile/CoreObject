@@ -17,3 +17,5 @@ SUBPROJECTS=fmdb
 
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 include $(GNUSTEP_MAKEFILES)/framework.make
+-include ../../etoile.make
+

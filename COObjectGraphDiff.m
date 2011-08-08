@@ -185,39 +185,39 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 
 @interface COObjectGraphSetProperty : COObjectGraphEdit
 {
-	id newValue;
+	id newlySetValue;
 }
-@property (nonatomic, retain) id newValue;
+@property (nonatomic, retain) id newlySetValue;
 + (COObjectGraphSetProperty*)setProperty: (NSString*)p to: (id)v forUUID: (ETUUID*)u;
 @end
 
 @implementation COObjectGraphSetProperty
-@synthesize newValue;
+@synthesize newlySetValue;
 - (void)dealloc
 {
-	[newValue release];
+	[newlySetValue release];
 	[super dealloc];
 }
 + (COObjectGraphSetProperty*)setProperty: (NSString*)p to: (id)v forUUID: (ETUUID*)u
 {
 	COObjectGraphSetProperty *s = [[COObjectGraphSetProperty alloc] init];
 	[s setPropertyName: p];
-	[s setNewValue: v];
+	[s setNewlySetValue: v];
 	[s setUUID: u];
 	return [s autorelease];
 }
 - (void) applyToObject: (COObject*)obj
 {
-	if ([newValue isKindOfClass: [ETUUID class]])
+	if ([newlySetValue isKindOfClass: [ETUUID class]])
 	{
-		newValue = [[obj editingContext] objectWithUUID: newValue];
-		assert(newValue != nil); //FIXME: remove
+		newlySetValue = [[obj editingContext] objectWithUUID: newlySetValue];
+		assert(newlySetValue != nil); //FIXME: remove
 	}
-	[obj setValue: newValue forProperty: propertyName];
+	[obj setValue: newlySetValue forProperty: propertyName];
 }
 - (NSString *)description
 {
-	return [NSString stringWithFormat: @"%@:%@ set to '%@'", UUID, propertyName, newValue];
+	return [NSString stringWithFormat: @"%@:%@ set to '%@'", UUID, propertyName, newlySetValue];
 }
 
 @end
@@ -643,7 +643,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 					[result record: edit1];
 				}
 				else if ([edit1 isKindOfClass: [COObjectGraphSetProperty class]] && [edit2 isKindOfClass: [COObjectGraphSetProperty class]]
-						 && [[(COObjectGraphSetProperty*)edit1 newValue] isEqual: [(COObjectGraphSetProperty*)edit2 newValue]])
+						 && [[(COObjectGraphSetProperty*)edit1 newlySetValue] isEqual: [(COObjectGraphSetProperty*)edit2 newlySetValue]])
 				{
 					//NSLog(@"Both are set %@ to %@ (no conflict)", prop, [(COObjectGraphSetProperty*)edit1 newValue]);
 					[result record: edit1];
