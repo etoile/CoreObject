@@ -8,6 +8,17 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
+#import <Foundation/NSProxy.h>
+
+/** This faulting class depends on the *pure* non-fragile ABI
+    as the mixed non-fragile ABI causes problems with NSProxy.
+    NSProxy includes an extra ivar in fragile and mixed ABI modes,
+    but this does not exist in fragile ABI and makes the layout
+    of COObject and COObjectFault different.
+  */
+#if !(GS_NONFRAGILE == 1)
+#error "ObjectMerging/CoreObject cannot be used in mixed-ABI mode. Please configure gnustep-base with './configure --disable-mixedabi' to use the pure non-fragile ABI."
+#endif    
 
 @class COEditingContext, COObject;
 
