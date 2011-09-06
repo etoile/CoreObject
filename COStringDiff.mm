@@ -117,70 +117,70 @@ public:
 /**
  * Applys the receiver to the given mutable array
  */
-- (void) applyToAttributedString: (NSMutableAttributedString*)string
-{
-	NSDictionary *insertionAttribs = [NSDictionary dictionaryWithObjectsAndKeys:
-									  [NSColor greenColor], NSForegroundColorAttributeName, 
-									  [NSFont boldSystemFontOfSize: [NSFont systemFontSize]], NSFontAttributeName,
-									  nil];
-	
-	NSDictionary *deletionAttribs = [NSDictionary dictionaryWithObjectsAndKeys:
-									 [[NSColor redColor] colorWithAlphaComponent: 0.3], NSForegroundColorAttributeName, 
-									 [NSNumber numberWithInteger: NSUnderlineStyleSingle], NSStrikethroughStyleAttributeName,
-									 nil];
-    
-	NSDictionary *modifyDeletionAttribs = [NSDictionary dictionaryWithObjectsAndKeys:
-										   [[NSColor redColor] colorWithAlphaComponent: 0.3], NSForegroundColorAttributeName, 
-										   [NSNumber numberWithInteger: NSUnderlineStyleSingle], NSStrikethroughStyleAttributeName,
-										   nil];
-	
-	NSDictionary *modifyInsertionAttribs = [NSDictionary dictionaryWithObjectsAndKeys:
-											[NSColor colorWithCalibratedRed:0 green:0.5 blue:0 alpha:1], NSForegroundColorAttributeName, 
-											[NSFont boldSystemFontOfSize: [NSFont systemFontSize]], NSFontAttributeName,
-											nil];
-	
-	
-	NSInteger i = 0;
-	for (COSequenceDiffOperation *op in ops)
-	{
-		NSRange range = NSMakeRange([op range].location + i, [op range].length);
-		if ([op isKindOfClass: [COStringDiffOperationInsert class]])
-		{
-			NSAttributedString *insertion = 
-			[[[NSAttributedString alloc] initWithString: [(COStringDiffOperationInsert*)op insertedString]
-											 attributes: insertionAttribs] autorelease];
-			[string insertAttributedString: insertion
-								   atIndex: range.location];
-			i += [[(COStringDiffOperationInsert*)op insertedString] length];
-		}
-		else if ([op isKindOfClass: [COStringDiffOperationDelete class]])
-		{
-			[string setAttributes:deletionAttribs range:range];
-		}
-		else if ([op isKindOfClass: [COStringDiffOperationModify class]])
-		{
-			[string setAttributes:modifyDeletionAttribs range:range];
-			
-			NSAttributedString *insertion = 
-			[[[NSAttributedString alloc] initWithString: [(COStringDiffOperationModify*)op insertedString]
-											 attributes: modifyInsertionAttribs] autorelease];
-			[string insertAttributedString: insertion
-								   atIndex: range.location + range.length];
-			i += [[(COStringDiffOperationModify*)op insertedString] length];
-		}
-		else
-		{
-			assert(0);
-		}    
-	}
-}
-
-- (NSAttributedString *)attributedStringWithDiffAppliedTo: (NSString*)string
-{
-	NSMutableAttributedString *mutableString = [[NSMutableAttributedString alloc] initWithString: string];
-	[self applyToAttributedString: mutableString];
-	return [mutableString autorelease];
-}
+// - (void) applyToAttributedString: (NSMutableAttributedString*)string
+// {
+// 	NSDictionary *insertionAttribs = [NSDictionary dictionaryWithObjectsAndKeys:
+// 									  [NSColor greenColor], NSForegroundColorAttributeName, 
+// 									  [NSFont boldSystemFontOfSize: [NSFont systemFontSize]], NSFontAttributeName,
+// 									  nil];
+// 	
+// 	NSDictionary *deletionAttribs = [NSDictionary dictionaryWithObjectsAndKeys:
+// 									 [[NSColor redColor] colorWithAlphaComponent: 0.3], NSForegroundColorAttributeName, 
+// 									 [NSNumber numberWithInteger: NSUnderlineStyleSingle], NSStrikethroughStyleAttributeName,
+// 									 nil];
+//     
+// 	NSDictionary *modifyDeletionAttribs = [NSDictionary dictionaryWithObjectsAndKeys:
+// 										   [[NSColor redColor] colorWithAlphaComponent: 0.3], NSForegroundColorAttributeName, 
+// 										   [NSNumber numberWithInteger: NSUnderlineStyleSingle], NSStrikethroughStyleAttributeName,
+// 										   nil];
+// 	
+// 	NSDictionary *modifyInsertionAttribs = [NSDictionary dictionaryWithObjectsAndKeys:
+// 											[NSColor colorWithCalibratedRed:0 green:0.5 blue:0 alpha:1], NSForegroundColorAttributeName, 
+// 											[NSFont boldSystemFontOfSize: [NSFont systemFontSize]], NSFontAttributeName,
+// 											nil];
+// 	
+// 	
+// 	NSInteger i = 0;
+// 	for (COSequenceDiffOperation *op in ops)
+// 	{
+// 		NSRange range = NSMakeRange([op range].location + i, [op range].length);
+// 		if ([op isKindOfClass: [COStringDiffOperationInsert class]])
+// 		{
+// 			NSAttributedString *insertion = 
+// 			[[[NSAttributedString alloc] initWithString: [(COStringDiffOperationInsert*)op insertedString]
+// 											 attributes: insertionAttribs] autorelease];
+// 			[string insertAttributedString: insertion
+// 								   atIndex: range.location];
+// 			i += [[(COStringDiffOperationInsert*)op insertedString] length];
+// 		}
+// 		else if ([op isKindOfClass: [COStringDiffOperationDelete class]])
+// 		{
+// 			[string setAttributes:deletionAttribs range:range];
+// 		}
+// 		else if ([op isKindOfClass: [COStringDiffOperationModify class]])
+// 		{
+// 			[string setAttributes:modifyDeletionAttribs range:range];
+// 			
+// 			NSAttributedString *insertion = 
+// 			[[[NSAttributedString alloc] initWithString: [(COStringDiffOperationModify*)op insertedString]
+// 											 attributes: modifyInsertionAttribs] autorelease];
+// 			[string insertAttributedString: insertion
+// 								   atIndex: range.location + range.length];
+// 			i += [[(COStringDiffOperationModify*)op insertedString] length];
+// 		}
+// 		else
+// 		{
+// 			assert(0);
+// 		}    
+// 	}
+// }
+// 
+// - (NSAttributedString *)attributedStringWithDiffAppliedTo: (NSString*)string
+// {
+// 	NSMutableAttributedString *mutableString = [[NSMutableAttributedString alloc] initWithString: string];
+// 	[self applyToAttributedString: mutableString];
+// 	return [mutableString autorelease];
+// }
 
 
 @end

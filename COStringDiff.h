@@ -1,4 +1,4 @@
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "COSequenceDiff.h"
 
 @interface COStringDiff : COSequenceDiff
@@ -10,8 +10,8 @@
 
 - (void) applyTo: (NSMutableString*)string;
 - (NSString *)stringWithDiffAppliedTo: (NSString*)string;
-- (void) applyToAttributedString: (NSMutableAttributedString*)string;
-- (NSAttributedString *)attributedStringWithDiffAppliedTo: (NSString*)string;
+// - (void) applyToAttributedString: (NSMutableAttributedString*)string;
+// - (NSAttributedString *)attributedStringWithDiffAppliedTo: (NSString*)string;
 
 @end
 

@@ -26,7 +26,7 @@ static COEditingContext *currentCtxt = nil;
 - (id) initWithStore: (COStore*)store revision: (CORevision*)aRevision
 {
 	SUPERINIT;
-	
+
 	ASSIGN(_store, store);
 	ASSIGN(_revision, aRevision);
 	
@@ -482,7 +482,14 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 {
 	if (_revision == nil)
 	{
-		return [_store latestRevisionNumber];
+		if (_store == nil)
+		{
+			return 0;
+		}
+		else 
+		{
+			return [_store latestRevisionNumber];
+		}
 	}
 	else
 	{
