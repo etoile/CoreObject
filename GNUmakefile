@@ -1,25 +1,25 @@
 include $(GNUSTEP_MAKEFILES)/common.make
 clean : test=yes
 ifeq ($(test), yes)
-BUNDLE_NAME=CoreObject
+BUNDLE_NAME=ObjectMerging
 else
-FRAMEWORK_NAME=CoreObject
+FRAMEWORK_NAME=ObjectMerging
 endif
 
 CC=clang
 CXX=clang
 
-CoreObject_OBJC_FILES = $(wildcard CO*.m) $(wildcard NS*.m)
+ObjectMerging_OBJC_FILES = $(wildcard CO*.m) $(wildcard NS*.m)
 ifeq ($(test), yes)
-CoreObject_OBJC_FILES += $(wildcard Test*.m)
+ObjectMerging_OBJC_FILES += $(wildcard Test*.m)
 endif
-CoreObject_OBJCC_FILES = $(wildcard *.mm)
-CoreObject_HEADER_FILES = $(wildcard *.h)
-CoreObject_C_FILES= $(wildcard *.c)
-CoreObject_OBJC_LIBS = -lEtoileFoundation 
-CoreObject_CPPFLAGS=-Ifmdb/src -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS
-CoreObject_SUBPROJECTS = fmdb
-CoreObject_NEEDS_GUI = no
+ObjectMerging_OBJCC_FILES = $(wildcard *.mm)
+ObjectMerging_HEADER_FILES = $(wildcard *.h)
+ObjectMerging_C_FILES= $(wildcard *.c)
+ObjectMerging_OBJC_LIBS = -lEtoileFoundation 
+ObjectMerging_CPPFLAGS=-Ifmdb/src -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS
+ObjectMerging_SUBPROJECTS = fmdb
+ObjectMerging_NEEDS_GUI = no
 ADDITIONAL_OBJCFLAGS = -Werror
 ADDITIONAL_OBJCCFLAGS = -Werror
 

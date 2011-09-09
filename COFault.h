@@ -16,7 +16,7 @@
     but this does not exist in fragile ABI and makes the layout
     of COObject and COObjectFault different.
   */
-#if !(GS_NONFRAGILE == 1)
+#if defined(GNUSTEP) && !(GS_NONFRAGILE == 1)
 #error "ObjectMerging/CoreObject cannot be used in mixed-ABI mode. Please configure gnustep-base with './configure --disable-mixedabi' to use the pure non-fragile ABI."
 #endif    
 
