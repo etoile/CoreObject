@@ -14,21 +14,23 @@
  * Undo/redo causes a new commit.
  * Similar idea as http://www.loria.fr/~weiss/pmwiki/uploads/Main/CollaborateCom.pdf
  */
-@interface COHistoryTrack : NSObject
+@interface COHistoryTrack : NSObject <ETCollection>
 {
 	COObject *trackObject;
 	BOOL affectsContainedObjects;
+	NSMutableArray *cachedTrackNodes;
+	uint64_t revNumberAtCacheTime;
 }
 
 - (id)initTrackWithObject: (COObject*)container containedObjects: (BOOL)contained;
 
-- (COHistoryTrackNode*)currentNode;
-
 - (COHistoryTrackNode*)redo;
 - (COHistoryTrackNode*)undo;
 
+- (COHistoryTrackNode*)currentNode;
 - (void)setCurrentNode: (COHistoryTrackNode*)node;
 
+- (NSArray *)nodes;
 
 /* Private */
 
@@ -45,7 +47,10 @@
 	COHistoryTrack *ownerTrack;
 }
 
-- (NSDictionary*)metadata;
+- (NSDictionary *)metadata;
+- (uint64_t)revisionNumber;
+- (ETUUID *)UUID;
+- (NSArray *)changedObjectUUIDs;
 
 /* History graph */
 

@@ -6,37 +6,32 @@
 #import "COObjectGraphDiff.h"
 #import "COStore.h"
 
+#pragma GCC diagnostic ignored "-Wprotocol"
+
 @implementation COHistoryTrack
+
++ (void) initialize
+{
+	if (self != [COHistoryTrack class])
+		return;
+
+	[self applyTraitFromClass: [ETCollectionTrait class]];
+}
 
 - (id)initTrackWithObject: (COObject*)container containedObjects: (BOOL)contained
 {
 	self = [super init];
 	ASSIGN(trackObject, container);
 	affectsContainedObjects = contained;
+	cachedTrackNodes = [[NSMutableArray alloc] init];
 	return self;
 }
 
 - (void)dealloc
 {
 	DESTROY(trackObject);
+	DESTROY(cachedTrackNodes);
 	[super dealloc];
-}
-
-- (void)setCurrentNode: (COHistoryTrackNode*)node
-{
-}
-
-- (COHistoryTrackNode*)currentNode
-{
-	CORevision *rev = [[self store] revisionWithRevisionNumber: [[self store] latestRevisionNumber]];
-	
-	if (![self revisionIsOnTrack: rev])
-	{
-		rev = [self nextRevisionOnTrackAfter: rev backwards: YES];
-	}
-	
-	return [COHistoryTrackNode nodeWithRevision: rev
-										  owner: self];	
 }
 
 - (COHistoryTrackNode*)undo
@@ -87,6 +82,57 @@
 	return [self currentNode];
 }
 
+- (COHistoryTrackNode*)currentNode
+{
+	CORevision *rev = [[self store] revisionWithRevisionNumber: [[self store] latestRevisionNumber]];
+	
+	if (![self revisionIsOnTrack: rev])
+	{
+		rev = [self nextRevisionOnTrackAfter: rev backwards: YES];
+	}
+	
+	return [COHistoryTrackNode nodeWithRevision: rev
+										  owner: self];	
+}
+
+- (void)setCurrentNode: (COHistoryTrackNode*)node
+{
+
+}
+
+- (NSArray *) revisionsOnTrack
+{
+	ETAssert([trackObject isRoot]);
+
+	COStore *store = [[trackObject editingContext] store];
+	NSSet *rootAndInnerObjectUUIDs = [store UUIDsForRootObjectUUID: [trackObject UUID]];
+
+	return [store revisionsForObjectUUIDs: rootAndInnerObjectUUIDs];
+}
+
+- (NSArray *)cachedNodes
+{
+	BOOL recache = (revNumberAtCacheTime != [[[trackObject editingContext] store] latestRevisionNumber]);
+
+	if (recache)
+	{
+		// TODO: Recache only the new revisions if possible
+		[cachedTrackNodes removeAllObjects];
+
+		for (CORevision *rev in [self revisionsOnTrack])
+		{
+			[cachedTrackNodes addObject: [COHistoryTrackNode nodeWithRevision: rev owner: self]];
+		}
+
+		revNumberAtCacheTime = [[[trackObject editingContext] store] latestRevisionNumber];
+	}
+	return cachedTrackNodes;
+}
+
+- (NSArray *)nodes
+{
+	return [self cachedNodes];
+}
 
 /* Private */
 
@@ -103,7 +149,7 @@
 	[ctx release];
 	
 	NSSet *allObjectsOnTrackAtRevSet = [NSSet setWithArray: allObjectsOnTrackAtRev];
-	NSSet *changedSet = [NSSet setWithArray: [rev changedObjects]];
+	NSSet *changedSet = [NSSet setWithArray: [rev changedObjectUUIDs]];
 	return [allObjectsOnTrackAtRevSet intersectsSet: changedSet];
 }
 
@@ -132,7 +178,7 @@
 		// Check if the current revison modified anything in allObjectsOnTrackAtRev
  		CORevision *newCurrentRev = [[self store] revisionWithRevisionNumber: current];
 		assert(newCurrentRev != nil);
-		NSSet *newCurrentRevModifiedSet = [NSSet setWithArray: [newCurrentRev changedObjects]];
+		NSSet *newCurrentRevModifiedSet = [NSSet setWithArray: [newCurrentRev changedObjectUUIDs]];
 		
 		if ([allObjectsOnTrackAtRevSet intersectsSet: newCurrentRevModifiedSet])
 		{
@@ -141,6 +187,21 @@
 	}
 }
 
+/** Returns YES. */
+- (BOOL) isOrdered
+{
+	return YES;
+}
+
+- (id) content
+{
+	return 	[self cachedNodes];
+}
+
+- (NSArray *) contentArray
+{
+	return [NSArray arrayWithArray: [self cachedNodes]];
+}
 
 @end
 
@@ -148,9 +209,30 @@
 
 @implementation COHistoryTrackNode
 
-- (NSDictionary*)metadata
+- (NSDictionary *)metadata
 {
 	return [revision metadata];
+}
+
+- (uint64_t)revisionNumber
+{
+	return [revision revisionNumber];
+}
+
+- (ETUUID *)UUID
+{
+	return [revision UUID];
+}
+
+- (NSArray*)changedObjectUUIDs
+{
+	return [revision changedObjectUUIDs];
+}
+
+- (NSArray *)propertyNames
+{
+	return [[super propertyNames] arrayByAddingObjectsFromArray: 
+		A(@"revisionNumber", @"UUID", @"metadata", @"changedObjectUUIDs")];
 }
 
 /* History graph */

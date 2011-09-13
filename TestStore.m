@@ -68,10 +68,10 @@ static void TearDownStore(COStore *s)
 		
 		UKNotNil(c1);
 		
-		UKIntsEqual(1, [[c1 changedObjects] count]);
-		if ([[c1 changedObjects] count] == 1)
+		UKIntsEqual(1, [[c1 changedObjectUUIDs] count]);
+		if ([[c1 changedObjectUUIDs] count] == 1)
 		{
-			UKObjectsEqual(o1, [[c1 changedObjects] objectAtIndex: 0]);
+			UKObjectsEqual(o1, [[c1 changedObjectUUIDs] objectAtIndex: 0]);
 		}
 		
 		UKObjectsEqual(sampleMetadata, [c1 metadata]);

@@ -3,23 +3,24 @@
 
 @class COStore;
 
-@interface CORevision : NSObject
+@interface CORevision : NSObject <ETCollection>
 {
 	COStore *store;
 	uint64_t revisionNumber;
 }
 
-- (COStore*)store;
+- (COStore *)store;
 
 - (uint64_t)revisionNumber;
+- (ETUUID *)UUID;
 
-- (NSDictionary*)metadata;
+- (NSDictionary *)metadata;
 
-- (NSArray*)changedObjects;
-- (NSDictionary*)valuesAndPropertiesForObject: (ETUUID*)object;
+- (NSArray *)changedObjectUUIDs;
+- (NSDictionary *)valuesAndPropertiesForObject: (ETUUID*)object;
 
 /* Private */
 
-- (id)initWithStore: (COStore*)aStore revisionNumber: (uint64_t)anID;
+- (id)initWithStore: (COStore *)aStore revisionNumber: (uint64_t)anID;
 
 @end

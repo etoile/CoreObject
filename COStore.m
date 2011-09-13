@@ -458,6 +458,36 @@ void CHECK(id db)
 	return result;
 }
 
+- (NSArray *)revisionsForObjectUUIDs: (NSSet *)uuids
+{
+	NSMutableArray *revs = [NSMutableArray array];
+	NSMutableArray *idNumbers = [NSMutableArray array];
+
+	// TODO: Slow and ugly... Can probably be eliminated with a Join-like operation.
+	for (ETUUID *uuid in uuids)
+	{
+		[idNumbers addObject: [self keyForUUID: uuid]];
+	}
+
+	NSString *formattedIdNumbers = [[[idNumbers stringValue] 
+		componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]] 
+		componentsJoinedByString: @""];
+	// NOTE: We use a distinct query string because -executeQuery returns nil with 'WHERE xyz IN ?'
+	NSString *query = [NSString stringWithFormat: @"SELECT DISTINCT revisionnumber FROM commits WHERE objectUUID IN %@ ORDER BY revisionnumber", formattedIdNumbers];
+	FMResultSet *rs = [db executeQuery: query];
+
+	while ([rs next])
+	{
+		uint64_t result = [rs longLongIntForColumnIndex: 0];
+		CORevision *rev = [[[CORevision alloc] initWithStore: self revisionNumber: result] autorelease];
+
+		[revs addObject: rev];
+	}
+	[rs close];
+
+	return revs;
+}
+
 /* Full-text Search */
 
 - (NSArray*)resultDictionariesForQuery: (NSString*)query
@@ -517,6 +547,57 @@ void CHECK(id db)
 	}
 	[rs close];
 	return num;
+}
+
+@end
+
+@implementation CORecord
+
+- (id)initWithDictionary: (NSDictionary *)aDict
+{
+	SUPERINIT;
+	ASSIGN(dictionary, aDict);
+	return self;
+}
+
+- (void)dealloc
+{
+	DESTROY(dictionary);
+	[super dealloc];
+}
+
+- (NSArray *)propertyNames
+{
+	return [[super propertyNames] arrayByAddingObjectsFromArray: 
+		[dictionary allKeys]];
+}
+
+- (id) valueForProperty: (NSString *)aKey
+{
+	id value = [dictionary objectForKey: aKey];
+
+	if (value == nil)
+	{
+		value = [super valueForProperty: aKey];
+	}
+	return value;
+}
+
+- (BOOL) setValue: (id)value forProperty: (NSString *)aKey
+{
+	if ([[dictionary allKeys] containsObject: aKey])
+	{
+		if ([dictionary isMutable])
+		{
+			[(NSMutableDictionary *)dictionary setObject: value forKey: aKey];
+			return YES;
+		}
+		else
+		{
+			return NO;
+		}
+	}
+	return [super setValue: value forProperty: aKey];
 }
 
 @end

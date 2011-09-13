@@ -2,9 +2,19 @@
 #import "FMDatabase.h"
 #import "COStore.h"
 
+#pragma GCC diagnostic ignored "-Wprotocol"
+
 @implementation CORevision
 
-- (id)initWithStore: (COStore*)aStore revisionNumber: (uint64_t)aRevision
++ (void) initialize
+{
+	if (self != [CORevision class])
+		return;
+
+	[self applyTraitFromClass: [ETCollectionTrait class]];
+}
+
+- (id)initWithStore: (COStore *)aStore revisionNumber: (uint64_t)aRevision
 {
 	self = [super init];
 	store = aStore;
@@ -17,7 +27,13 @@
 	[super dealloc];
 }
 
-- (COStore*)store
+- (NSArray *)propertyNames
+{
+	return [[super propertyNames] arrayByAddingObjectsFromArray: 
+		A(@"revisionNumber", @"UUID", @"metadata", @"changedObjectUUIDs")];
+}
+
+- (COStore *)store
 {
 	return store;
 }
@@ -27,7 +43,12 @@
 	return revisionNumber;
 }
 
-- (NSDictionary*)metadata
+- (ETUUID *)UUID
+{
+	return nil;
+}
+
+- (NSDictionary *)metadata
 {
 	FMResultSet *rs = [store->db executeQuery:@"SELECT plist FROM commitMetadata WHERE revisionnumber = ?",
 						[NSNumber numberWithUnsignedLongLong: revisionNumber]];
@@ -46,7 +67,7 @@
 	return nil;
 }
 
-- (NSArray*)changedObjects
+- (NSArray *)changedObjectUUIDs
 {
 	NSMutableSet *result = [NSMutableSet set];
 	FMResultSet *rs = [store->db executeQuery:@"SELECT objectuuid FROM commits WHERE revisionnumber = ?",
@@ -59,7 +80,59 @@
 	return [result allObjects];
 }
 
-- (NSDictionary*)valuesAndPropertiesForObject: (ETUUID*)object
+- (NSArray *)changedPropertiesForObjectUUID: (ETUUID *)uuid
+{
+	NSMutableArray *result = [NSMutableArray array];
+	FMResultSet *rs = [store->db executeQuery:@"SELECT property FROM commits WHERE revisionnumber = ? AND objectuuid = ?",
+					   [NSNumber numberWithUnsignedLongLong: revisionNumber],
+					   [store keyForUUID: uuid]];
+
+	while ([rs next])
+	{
+		[result addObject: [store propertyForKey: [rs longLongIntForColumnIndex: 0]]];
+	}
+	[rs close];
+
+	return result;
+}
+
+- (NSString *) formattedChangedPropertiesForObjectUUID: (ETUUID *)objectUUID
+{
+	NSArray *changedProperties = [self changedPropertiesForObjectUUID: objectUUID];
+	NSMutableString *description = [NSMutableString string];
+	BOOL isList = NO;
+
+	for (NSString *property in changedProperties)
+	{
+		if (isList)
+		{
+			[description appendString: @", "];
+		}
+		[description appendString: property];
+		isList = YES;
+	}
+
+	return description;
+}
+
+- (NSArray *)changedObjectRecords
+{
+	NSMutableArray *objRecords = [NSMutableArray array];
+
+	for (ETUUID *objectUUID in [self changedObjectUUIDs])
+	{
+		NSString *changedProperties = [self formattedChangedPropertiesForObjectUUID: objectUUID];
+		NSNumber *revNumberObject = [NSNumber numberWithUnsignedLongLong: revisionNumber];
+		CORecord *record = AUTORELEASE([[CORecord alloc] initWithDictionary: 
+			D(objectUUID, @"UUID", changedProperties, @"properties", revNumberObject, @"revisionNumber")]);
+
+		[objRecords addObject: record];
+	}
+
+	return objRecords;
+}
+
+- (NSDictionary *)valuesAndPropertiesForObject: (ETUUID *)object
 {
 	NSMutableDictionary *result = [NSMutableDictionary dictionary];
 	
@@ -83,6 +156,16 @@
 	}
 	[rs close];	
 	return [NSDictionary dictionaryWithDictionary: result];
+}
+
+- (id) content
+{
+	return 	[self changedObjectRecords];
+}
+
+- (NSArray *) contentArray
+{
+	return [NSArray arrayWithArray: [self changedObjectRecords]];
 }
 
 @end

@@ -80,6 +80,7 @@
 - (CORevision*)finishCommit;
 
 - (CORevision*)revisionWithRevisionNumber: (uint64_t)anID;
+- (NSArray *)revisionsForObjectUUIDs: (NSSet *)uuids;
 
 /** @taskunit Full-text Search */
 
@@ -96,5 +97,17 @@
 - (ETUUID*)UUIDForKey: (int64_t)key;
 - (NSNumber*)keyForProperty: (NSString*)property;
 - (NSString*)propertyForKey: (int64_t)key;
+
+@end
+
+/** Wraps a dictionary into an object which is a value rather a collection.
+
+Should be provided by SQLClient or moved to EtoileFoundation. */
+@interface CORecord : NSObject
+{
+	NSDictionary *dictionary;
+}
+
+- (id) initWithDictionary: (NSDictionary *)aDict;
 
 @end
