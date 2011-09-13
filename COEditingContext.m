@@ -530,7 +530,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	for (uint64_t revNum = [self currentRevisionNumber]; revNum > 0; revNum--)
 	{
 		CORevision *revision = [_store revisionWithRevisionNumber: revNum];
-		NSString *name = [[revision valuesAndPropertiesForObject: obj] objectForKey: @"_entity"];
+		NSString *name = [[revision valuesAndPropertiesForObjectUUID: obj] objectForKey: @"_entity"];
 		if (name != nil)
 		{
 			return name;
@@ -570,7 +570,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 			[NSException raise: NSInternalInconsistencyException format: @"Store is missing properties %@ for %@", propertiesToFetch, obj];
 		}
 		
-		NSDictionary *dict = [revision valuesAndPropertiesForObject: objUUID];
+		NSDictionary *dict = [revision valuesAndPropertiesForObjectUUID: objUUID];
 		
 		for (NSString *key in [dict allKeys])
 		{

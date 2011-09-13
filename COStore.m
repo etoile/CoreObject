@@ -509,7 +509,7 @@ void CHECK(id db)
 			NSNumber *revisionNumber = [NSNumber numberWithLongLong: commitKey];
 			ETUUID *objectUUID = [self UUIDForKey: objectKey];
 			NSString *property = [self propertyForKey: propertyKey];
-			NSString *value = [[[self revisionWithRevisionNumber: commitKey] valuesAndPropertiesForObject: objectUUID] objectForKey: property];
+			NSString *value = [[[self revisionWithRevisionNumber: commitKey] valuesAndPropertiesForObjectUUID: objectUUID] objectForKey: property];
 			
 			assert(revisionNumber != nil);
 			assert(objectUUID != nil);

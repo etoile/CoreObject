@@ -76,7 +76,7 @@ static void TearDownStore(COStore *s)
 		
 		UKObjectsEqual(sampleMetadata, [c1 metadata]);
 		UKObjectsEqual([NSDictionary dictionaryWithObject: @"bob" forKey: @"name"],
-					   [c1 valuesAndPropertiesForObject: o1]);
+					   [c1 valuesAndPropertiesForObjectUUID: o1]);
 		
 		[s2 release];
 	}

@@ -16,21 +16,22 @@
 
 - (id)initWithStore: (COStore *)aStore revisionNumber: (uint64_t)aRevision
 {
-	self = [super init];
-	store = aStore;
+	SUPERINIT;
+	ASSIGN(store, aStore);
 	revisionNumber = aRevision;
 	return self;
 }
 
 - (void)dealloc
 {
+	DESTROY(store);
 	[super dealloc];
 }
 
 - (NSArray *)propertyNames
 {
 	return [[super propertyNames] arrayByAddingObjectsFromArray: 
-		A(@"revisionNumber", @"UUID", @"metadata", @"changedObjectUUIDs")];
+		A(@"revisionNumber", @"UUID", @"date", @"type", @"metadata", @"changedObjectUUIDs")];
 }
 
 - (COStore *)store
@@ -44,6 +45,16 @@
 }
 
 - (ETUUID *)UUID
+{
+	return nil;
+}
+
+- (NSDate *)date
+{
+	return nil;
+}
+
+- (NSString *)type
 {
 	return nil;
 }
@@ -80,12 +91,12 @@
 	return [result allObjects];
 }
 
-- (NSArray *)changedPropertiesForObjectUUID: (ETUUID *)uuid
+- (NSArray *)changedPropertiesForObjectUUID: (ETUUID *)objectUUID
 {
 	NSMutableArray *result = [NSMutableArray array];
 	FMResultSet *rs = [store->db executeQuery:@"SELECT property FROM commits WHERE revisionnumber = ? AND objectuuid = ?",
 					   [NSNumber numberWithUnsignedLongLong: revisionNumber],
-					   [store keyForUUID: uuid]];
+					   [store keyForUUID: objectUUID]];
 
 	while ([rs next])
 	{
@@ -96,7 +107,7 @@
 	return result;
 }
 
-- (NSString *) formattedChangedPropertiesForObjectUUID: (ETUUID *)objectUUID
+- (NSString *)formattedChangedPropertiesForObjectUUID: (ETUUID *)objectUUID
 {
 	NSArray *changedProperties = [self changedPropertiesForObjectUUID: objectUUID];
 	NSMutableString *description = [NSMutableString string];
@@ -132,7 +143,7 @@
 	return objRecords;
 }
 
-- (NSDictionary *)valuesAndPropertiesForObject: (ETUUID *)object
+- (NSDictionary *)valuesAndPropertiesForObjectUUID: (ETUUID *)object
 {
 	NSMutableDictionary *result = [NSMutableDictionary dictionary];
 	
@@ -158,12 +169,12 @@
 	return [NSDictionary dictionaryWithDictionary: result];
 }
 
-- (id) content
+- (id)content
 {
 	return 	[self changedObjectRecords];
 }
 
-- (NSArray *) contentArray
+- (NSArray *)contentArray
 {
 	return [NSArray arrayWithArray: [self changedObjectRecords]];
 }
