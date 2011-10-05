@@ -3,7 +3,8 @@
 #import "COStore.h"
 #import "TestCommon.h"
 
-@implementation UKRunner (TestSuiteSetUp)
+
+@implementation TestCommon
 
 + (void) setUpMetamodel
 {
@@ -90,12 +91,18 @@
 	[self setUpMetamodel];
 }
 
++ (void)initialize
+{
+	if ([[self class] isEqual: [TestCommon class]])
+	{
+		[self setUp];
+	}
+} 
+
 @end
 
-COEditingContext *NewContext()
+COEditingContext *NewContext(COStore* store)
 {
-	COStore *store = [[[COStore alloc] initWithURL: STORE_URL] autorelease];
-	assert(store != nil);
 	return [[COEditingContext alloc] initWithStore: store];
 }
 

@@ -6,7 +6,7 @@
 #import "COStore.h"
 #import "TestCommon.h"
 
-@interface TestEditingContext : NSObject <UKTest>
+@interface TestEditingContext : TestCommon <UKTest>
 {
 }
 @end
@@ -20,16 +20,18 @@
 }
 - (void)testCreate
 {
-	COEditingContext *ctx = NewContext();
+	OPEN_STORE(store);
+	COEditingContext *ctx = NewContext(store);
 	UKNotNil(ctx);
 	TearDownContext(ctx);
+	CLOSE_STORE(store);
 }
 
 - (void)testInsertObject
 {
-	COEditingContext *ctx = NewContext();
+	OPEN_STORE(store)
+	COEditingContext *ctx = NewContext(store);
 	UKFalse([ctx hasChanges]);
-	
 	
 	COObject *obj = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	UKNotNil(obj);
@@ -47,6 +49,7 @@
 	UKNotNil([obj valueForProperty: @"contents"]);
 	
 	TearDownContext(ctx);
+	CLOSE_STORE(store);
 }
 
 - (void)testBasicPersistence
@@ -54,6 +57,7 @@
 	ETUUID *objUUID;
 	
 	{
+		NSAutoreleasePool *arp = [NSAutoreleasePool new];
 		COStore *store = [[COStore alloc] initWithURL: STORE_URL];
 		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 		COObject *obj = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -61,11 +65,12 @@
 		[obj setValue: @"Hello" forProperty: @"label"];
 		[ctx commit];
 		[ctx release];
+		[arp drain];
 		[store release];
 	}
 	
 	{
-		COStore *store = [[COStore alloc] initWithURL: STORE_URL];
+		OPEN_STORE(store);
 		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 		COObject *obj = [ctx objectWithUUID: objUUID];
 		UKNotNil(obj);
@@ -74,7 +79,7 @@
 					   [NSSet setWithArray: [obj persistentPropertyNames]]);
 		UKStringsEqual(@"Hello", [obj valueForProperty: @"label"]);
 		[ctx release];
-		[store release];
+		CLOSE_STORE(store);
 	}
 	[objUUID release];
 	DELETE_STORE;
@@ -83,7 +88,8 @@
 
 - (void)testDiscardChanges
 {
-	COEditingContext *ctx = NewContext();
+	OPEN_STORE(store);
+	COEditingContext *ctx = NewContext(store);
 
 	UKFalse([ctx hasChanges]);
 		
@@ -105,6 +111,7 @@
 	UKObjectsEqual(@"hello", [o2 valueForProperty: @"label"]);
 	
 	TearDownContext(ctx);
+	CLOSE_STORE(store);
 }
 
 - (void)testCopyingBetweenContextsWithNoStoreSimple
@@ -161,7 +168,8 @@
 
 - (void)testCopyingBetweenContextsWithSharedStore
 {
-	COEditingContext *ctx1 = NewContext();
+	OPEN_STORE(store);
+	COEditingContext *ctx1 = NewContext(store);
 	COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: [ctx1 store]];
 	
 	COContainer *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -210,6 +218,7 @@
 	}
 	[ctx2 release];
 	TearDownContext(ctx1);
+	CLOSE_STORE(store);
 }
 
 

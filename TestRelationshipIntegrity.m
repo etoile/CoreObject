@@ -98,7 +98,7 @@
 
 - (void)testRelationshipIntegrityMarksDamage
 {
-	COStore *store = [[COStore alloc] initWithURL: STORE_URL];
+	OPEN_STORE(store);
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 	
 	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"]; // See COObject.m for metamodel definition
@@ -133,7 +133,7 @@
 	UKTrue([ctx objectHasChanges: [o3 UUID]]);	
 
 	[ctx release];
-	[store release];
+	CLOSE_STORE(store);
 	DELETE_STORE;
 }
 
@@ -162,7 +162,8 @@
 
 - (void)testShoppingList
 {
-	COEditingContext *ctx = NewContext();
+	OPEN_STORE(store);
+	COEditingContext *ctx = NewContext(store);
 	
 	COContainer *workspace = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COContainer *document1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -211,6 +212,7 @@
 	UKObjectsEqual(S(leaf2, leaf3), [NSSet setWithArray: [group2 contentArray]]);
 	
 	TearDownContext(ctx);
+	CLOSE_STORE(store);
 }
 
 @end

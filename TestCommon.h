@@ -1,13 +1,28 @@
 #import <Cocoa/Cocoa.h>
 #import <UnitKit/UKRunner.h>
 #import "COEditingContext.h"
+#import "COStore.h"
 
 #define STORE_URL [NSURL fileURLWithPath: [@"~/TestStore.sqlitedb" stringByExpandingTildeInPath]]
+/**
+  * Open the store. Note that we create an autorelease pool. This is very deliberate - the nature
+  * of the unit tests is that we open and close the database connection alot. sqlite3 requires that
+  * all the prepared statements are "finalized" before the connection is closed. FM uses prepared
+  * statements to perform SQL queries, but it doesn't destroy them before returning - they are 
+  * attached to the FMResult objects, which are autoreleased. This means that un-released FMStatement
+  * instances are floating about, which means that in turn un-finalised prepared statements are
+  * around when we close the database. This sequence ensures that all the prepared statements are
+  * finalized before the database is closed. This problem is unlikely to occur in a real programme,
+  * as the DB connection is open for the entire programme length and probably controlled through a
+  * ETApplication hook, where we could control the NSAutoreleasePool creation.
+  */
+#define OPEN_STORE(store)  NSAutoreleasePool *_pool = [NSAutoreleasePool new]; COStore *store = [[COStore alloc] initWithURL: STORE_URL];
+#define CLOSE_STORE(store) [_pool drain]; [store release];
 #define DELETE_STORE [[NSFileManager defaultManager] removeItemAtPath: [STORE_URL path] error: NULL]
 
-@interface UKRunner (TestSuiteSetUp)
+@interface TestCommon : NSObject
 + (void) setUp;
 @end
 
-COEditingContext *NewContext();
+COEditingContext *NewContext(COStore *store);
 void TearDownContext(COEditingContext *ctx);

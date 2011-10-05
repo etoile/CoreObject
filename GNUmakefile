@@ -1,3 +1,4 @@
+PACKAGE_NAME=ObjectMerging
 include $(GNUSTEP_MAKEFILES)/common.make
 clean : test=yes
 ifeq ($(test), yes)
@@ -31,4 +32,4 @@ include $(GNUSTEP_MAKEFILES)/aggregate.make
 include $(GNUSTEP_MAKEFILES)/bundle.make	
 include $(GNUSTEP_MAKEFILES)/framework.make
 -include ../../etoile.make
-
+-include etoile.make

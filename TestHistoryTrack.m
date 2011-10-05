@@ -14,7 +14,8 @@
 
 - (void)testBasic
 {
-	COEditingContext *ctx = NewContext();
+	OPEN_STORE(store);
+	COEditingContext *ctx = NewContext(store);
 	
 	COContainer *workspace = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COContainer *document1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -322,5 +323,6 @@
 	[doc1Track release];
 	[doc2Track release];
 	TearDownContext(ctx);
+	CLOSE_STORE(store);
 }
 @end

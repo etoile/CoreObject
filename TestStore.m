@@ -12,31 +12,29 @@
 
 @implementation TestStore
 
-static COStore *SetUpStore()
+static void DeleteOldStore()
 {
 	if([[NSFileManager defaultManager] fileExistsAtPath: [STORE_URL path]])
 	{
 		BOOL removed = [[NSFileManager defaultManager] removeItemAtPath: [STORE_URL path] error: NULL];
 		assert(removed);
 	}
-	
-	return [[COStore alloc] initWithURL: STORE_URL];
 }
+#define SETUP_STORE(store) \
+	DeleteOldStore(); \
+	OPEN_STORE(store);
 
-static void TearDownStore(COStore *s)
-{
-	assert(s != nil);
-	NSURL *url = [[s URL] retain];
-	[s release];
-	[[NSFileManager defaultManager] removeItemAtPath: [url path] error: NULL];
-}
-
+#define TEAR_DOWN_STORE(store) \
+	NSURL *_store_url =[[store URL] retain]; \
+	CLOSE_STORE(store); \
+	[[NSFileManager defaultManager] removeItemAtPath: [_store_url path] error: NULL]; \
+	[_store_url release];
 
 - (void)testCreate
 {
-	COStore *s = SetUpStore();
-	UKNotNil(s);
-	TearDownStore(s);
+	SETUP_STORE(store);
+	UKNotNil(store);
+	TEAR_DOWN_STORE(store);
 }
 
 - (void)testReopenStore
@@ -46,8 +44,7 @@ static void TearDownStore(COStore *s)
 	uint64_t revisionNumber = 0;
 	
 	{
-		COStore *s = [[COStore alloc] initWithURL: STORE_URL];
-
+		OPEN_STORE(s);
 		[s insertRootObjectUUIDs: S(o1)];		
 		[s beginCommitWithMetadata: sampleMetadata rootObjectUUID: o1];
 		[s beginChangesForObjectUUID: o1];
@@ -58,11 +55,11 @@ static void TearDownStore(COStore *s)
 		[s finishChangesForObjectUUID: o1];
 		CORevision *c1 = [s finishCommit];
 		revisionNumber = [c1 revisionNumber];		
-		[s release];
+		CLOSE_STORE(s);
 	}
 	
 	{
-		COStore *s2 = [[COStore alloc] initWithURL: STORE_URL];
+		OPEN_STORE(s2);
 
 		CORevision *c1 = [s2 revisionWithRevisionNumber: revisionNumber];
 		
@@ -78,7 +75,7 @@ static void TearDownStore(COStore *s)
 		UKObjectsEqual([NSDictionary dictionaryWithObject: @"bob" forKey: @"name"],
 					   [c1 valuesAndPropertiesForObjectUUID: o1]);
 		
-		[s2 release];
+		CLOSE_STORE(s2);
 	}
 	
 	[[NSFileManager defaultManager] removeItemAtPath: [STORE_URL path] error: NULL];
@@ -87,7 +84,7 @@ static void TearDownStore(COStore *s)
 
 - (void)testFullTextSearch
 {
-	COStore *s = SetUpStore();
+	SETUP_STORE(s);
 	
 	ETUUID *o1 = [ETUUID UUID];
 
@@ -143,12 +140,12 @@ static void TearDownStore(COStore *s)
 		UKObjectsEqual(@"name", [result2 objectForKey: @"property"]);
 		UKObjectsEqual(@"dogpound", [result2 objectForKey: @"value"]);
 	}
-	TearDownStore(s);
+	TEAR_DOWN_STORE(s);
 }
 
 - (void)testCommitWithNoChanges
 {
-	COStore *s = SetUpStore();
+	SETUP_STORE(s);
 	
 	ETUUID *o1 = [ETUUID UUID];
 
@@ -161,13 +158,13 @@ static void TearDownStore(COStore *s)
 	UKTrue([s isRootObjectUUID: o1]);
 	UKObjectsEqual(S(o1), [s rootObjectUUIDs]);
 
-	TearDownStore(s);
+	TEAR_DOWN_STORE(s);
 }
 
 - (void)testRootObject
 {
-	COStore *s = SetUpStore();
-	
+	SETUP_STORE(s);
+
 	ETUUID *o1 = [ETUUID UUID];
 	ETUUID *o2 = [ETUUID UUID];
 	ETUUID *o3 = [ETUUID UUID];
@@ -190,13 +187,13 @@ static void TearDownStore(COStore *s)
 	UKObjectsEqual(o1, [s rootObjectUUIDForUUID: o2]);
 	UKObjectsEqual(o1, [s rootObjectUUIDForUUID: o3]);
 
-	TearDownStore(s);
+	TEAR_DOWN_STORE(s);
 }
 
 
 - (void)testStoreNil
 {
-	COStore *s = SetUpStore();
+	SETUP_STORE(s);
 	
 	ETUUID *o1 = [ETUUID UUID];
 
@@ -212,7 +209,7 @@ static void TearDownStore(COStore *s)
 
 	UKNotNil(c1);
 	
-	TearDownStore(s);
+	TEAR_DOWN_STORE(s);
 }
 
 @end

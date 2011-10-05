@@ -2,8 +2,9 @@
 #import <UnitKit/UnitKit.h>
 #import "COArrayDiff.h"
 #import "COStringDiff.h"
+#import "TestCommon.h"
 
-@interface TestDiff : NSObject <UKTest>
+@interface TestDiff : TestCommon <UKTest>
 {
 }
 @end

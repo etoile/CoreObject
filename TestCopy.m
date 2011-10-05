@@ -6,7 +6,7 @@
 #import "COObjectGraphDiff.h"
 #import "TestCommon.h"
 
-@interface TestCopy : NSObject <UKTest>
+@interface TestCopy : TestCommon <UKTest>
 {
 }
 @end

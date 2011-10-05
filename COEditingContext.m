@@ -351,7 +351,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
        shortDescription: (NSString*)shortDescription
         longDescription: (NSString*)longDescription
 {
-	[self commitWithMetadata: nil];
+	[self commitWithMetadata: [NSDictionary dictionary]];
 }
 
 - (NSDictionary *) damagedObjectUUIDSubsetForUUIDs: (NSArray *)keys

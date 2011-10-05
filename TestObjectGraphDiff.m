@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
+#import "COStore.h"
 #import "COHistoryTrack.h"
 #import "COContainer.h"
 #import "COCollection.h"
@@ -126,7 +127,8 @@
 
 - (void)testSimpleNonconflictingMerge
 {
-	COEditingContext *ctx1 = NewContext();
+	OPEN_STORE(store);
+	COEditingContext *ctx1 = NewContext(store);
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	COEditingContext *ctx3 = [[COEditingContext alloc] init];
 	
@@ -186,6 +188,7 @@
 	[ctx3 release];
 	[ctx2 release];
 	TearDownContext(ctx1);
+	CLOSE_STORE(store);
 }
 
 //
@@ -195,8 +198,8 @@
 - (void)testMoveAndDeleteOnOneToManyRelationship
 {
 	// Expected result: the delete wins, with no conflicts
-	
-	COEditingContext *ctx1 = NewContext();
+	OPEN_STORE(store);
+	COEditingContext *ctx1 = NewContext(store);
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	COEditingContext *ctx3 = [[COEditingContext alloc] init];
 	
@@ -285,13 +288,14 @@
 	[ctx3 release];
 	[ctx2 release];
 	TearDownContext(ctx1);
+	CLOSE_STORE(store);
 }
 
 - (void)testMoveAndDeleteOnManyToManyRelationship
 {
 	// Expected: both succeed
-	
-	COEditingContext *ctx1 = NewContext();
+	OPEN_STORE(store);
+	COEditingContext *ctx1 = NewContext(store);
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	COEditingContext *ctx3 = [[COEditingContext alloc] init];
 	
@@ -364,6 +368,7 @@
 	[ctx3 release];
 	[ctx2 release];
 	TearDownContext(ctx1);
+	CLOSE_STORE(store);
 }
 
 //
