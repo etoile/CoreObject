@@ -2,6 +2,7 @@
 #import "COObject.h"
 #import "COStore.h"
 #import "CORevision.h"
+#import "COCommitTrack.h"
 
 @implementation COEditingContext
 
@@ -23,16 +24,23 @@ static COEditingContext *currentCtxt = nil;
 	ASSIGN(currentCtxt, aCtxt);
 }
 
-- (id) initWithStore: (COStore*)store revision: (CORevision*)aRevision
+- (id)initWithStore: (COStore*)store
+{
+	return [self initWithStore: store maxRevision: 0];
+}
+
+- (id)initWithStore: (COStore*)store maxRevision: (int64_t)maxRevisionNumber;
 {
 	SUPERINIT;
 
 	ASSIGN(_store, store);
-	ASSIGN(_revision, aRevision);
-	
+	_maxRevisionNumber = maxRevisionNumber;	
+
 	_damagedObjectUUIDs = [[NSMutableDictionary alloc] init];
 	_instantiatedObjects = [[NSMutableDictionary alloc] init];
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
+	_rootObjectRevisions = [NSMutableDictionary new];
+	_rootObjectCommitTracks = [NSMutableDictionary new];
 	assert([[[_modelRepository descriptionForName: @"Anonymous.COContainer"] 
 		propertyDescriptionForName: @"contents"] isComposite]);
 	assert([[[[_modelRepository descriptionForName: @"Anonymous.COCollection"] 
@@ -42,16 +50,6 @@ static COEditingContext *currentCtxt = nil;
 	_deletedObjectUUIDs = [[NSMutableSet alloc] init];
 	
 	return self;
-}
-
-- (id) initWithStore: (COStore*)store
-{
-	return [self initWithStore: store revision: nil];
-}
-
-- (id)initWithRevision: (CORevision*)aRevision
-{
-	return [self initWithStore: [aRevision store] revision: aRevision];
 }
 
 - (id) init
@@ -66,7 +64,6 @@ static COEditingContext *currentCtxt = nil;
 
 - (void) dealloc
 {
-	DESTROY(_revision);
 	DESTROY(_store);
 	DESTROY(_damagedObjectUUIDs);
 	DESTROY(_instantiatedObjects);
@@ -74,6 +71,8 @@ static COEditingContext *currentCtxt = nil;
 	
 	DESTROY(_insertedObjectUUIDs);
 	DESTROY(_deletedObjectUUIDs);
+	DESTROY(_rootObjectRevisions);
+	DESTROY(_rootObjectCommitTracks);
 	[super dealloc];
 }
 
@@ -130,7 +129,7 @@ static COEditingContext *currentCtxt = nil;
 	[_insertedObjectUUIDs addObject: [object UUID]];
 }
 
-- (COObject*) insertObjectWithEntityName: (NSString*)aFullName UUID: (ETUUID*)aUUID
+- (COObject*) insertObjectWithEntityName: (NSString*)aFullName UUID: (ETUUID*)aUUID rootObject: (COObject*)rootObject
 {
 	COObject *result = nil;
 	ETEntityDescription *desc = [_modelRepository descriptionForName: aFullName];
@@ -141,11 +140,12 @@ static COEditingContext *currentCtxt = nil;
 	
 	Class cls = [self classForEntityDescription: desc];
 	/* Nil root object means the new object will be a root */
-	result = [[cls alloc] initWithUUID: aUUID
-					 entityDescription: desc
-	                        rootObject: nil
-							   context: self
-							   isFault: NO];
+	result = [[cls alloc] 
+		     initWithUUID: aUUID
+		entityDescription: desc
+		       rootObject: rootObject
+		          context: self
+		          isFault: NO];
 	[self registerObject: result];
 	[result release];
 	
@@ -159,7 +159,12 @@ static COEditingContext *currentCtxt = nil;
 
 - (COObject*) insertObjectWithEntityName: (NSString*)aFullName
 {
-	return [self insertObjectWithEntityName:aFullName UUID: [ETUUID UUID]];
+	return [self insertObjectWithEntityName:aFullName UUID: [ETUUID UUID] rootObject: nil];
+}
+
+- (COObject*) insertObjectWithEntityName: (NSString*)aFullName rootObject: (COObject*)rootObject
+{
+	return [self insertObjectWithEntityName: aFullName UUID: [ETUUID UUID] rootObject: rootObject];
 }
 
 - (COObject*) objectWithUUID: (ETUUID*)uuid
@@ -167,6 +172,10 @@ static COEditingContext *currentCtxt = nil;
 	return [self objectWithUUID: uuid entityName: nil];
 }
 
+- (COObject*) objectWithUUID: (ETUUID*)uuid atRevision: (CORevision*)revision
+{
+	return [self objectWithUUID: uuid entityName: nil atRevision: revision];
+}
 
 /**
  * Helper method for -insertObject:
@@ -257,12 +266,12 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 		if (copy == nil)
 		{
-			copy = [self insertObjectWithEntityName: entityName UUID: [sourceObject UUID]];
+			copy = [self insertObjectWithEntityName: entityName UUID: [sourceObject UUID] rootObject: nil];
 		}
 	}
 	else
 	{
-		copy = [self insertObjectWithEntityName: entityName UUID: [ETUUID UUID]];
+		copy = [self insertObjectWithEntityName: entityName UUID: [ETUUID UUID] rootObject: nil];
 	}
 
 	if (!consistency)
@@ -384,7 +393,8 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		[insertedObjectUUIDs setByAddingObjectsFromArray: [damagedObjectUUIDs allKeys]];
 
 	[_store beginCommitWithMetadata: metadata 
-	                 rootObjectUUID: [rootObject UUID]];
+	                 rootObjectUUID: [rootObject UUID]
+	                   baseRevision: [rootObject revision]];
 
 	for (ETUUID *uuid in committedObjectUUIDs)
 	{		
@@ -424,17 +434,22 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		}
 		
 		// FIXME: Hack
-		NSString *name = [[[self objectWithUUID: uuid] entityDescription] fullName];
+		NSString *name = [[[self objectWithUUID: uuid] 
+			entityDescription] 
+				fullName];
 		[_store setValue: name
-			 forProperty: @"_entity"
-				ofObject: uuid
-			 shouldIndex: NO];
+		     forProperty: @"_entity"
+			ofObject: uuid
+		     shouldIndex: NO];
 		
 		[_store finishChangesForObjectUUID: uuid];
 	}
 	
 	CORevision *rev = [_store finishCommit];
 	assert(rev != nil);
+	[_rootObjectRevisions setObject: rev forKey: [rootObject UUID]];
+	[[_rootObjectCommitTracks objectForKey: [rootObject UUID]]
+		newCommitAtRevision: rev];
 	
 	[_insertedObjectUUIDs minusSet: insertedObjectUUIDs];
 	for (ETUUID *uuid in [damagedObjectUUIDs allKeys])
@@ -476,26 +491,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		      damagedObjectUUIDs: _damagedObjectUUIDs];
 }*/
 
-// Private
 
-- (uint64_t)currentRevisionNumber
-{
-	if (_revision == nil)
-	{
-		if (_store == nil)
-		{
-			return 0;
-		}
-		else 
-		{
-			return [_store latestRevisionNumber];
-		}
-	}
-	else
-	{
-		return [_revision revisionNumber];
-	}
-}
 
 @end
 
@@ -527,7 +523,8 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 - (NSString*)entityNameForObjectUUID: (ETUUID*)obj
 {
-	for (uint64_t revNum = [self currentRevisionNumber]; revNum > 0; revNum--)
+	uint64_t maxNum = _maxRevisionNumber > 0 ? _maxRevisionNumber : [_store latestRevisionNumber];
+	for (uint64_t revNum = maxNum; revNum > 0; revNum--)
 	{
 		CORevision *revision = [_store revisionWithRevisionNumber: revNum];
 		NSString *name = [[revision valuesAndPropertiesForObjectUUID: obj] objectForKey: @"_entity"];
@@ -539,9 +536,30 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	return nil;
 }
 
+- (CORevision*)revisionForObject: (COObject*)object
+{
+	COObject *rootObject = [object rootObject];
+	return [_rootObjectRevisions objectForKey: [rootObject UUID]];
+}
+
+- (COCommitTrack*)commitTrackForObject: (COObject*)object
+{
+	ETUUID *rootObjectUUID = [[object rootObject] UUID];
+	COCommitTrack *commitTrack = [_rootObjectCommitTracks objectForKey: rootObjectUUID];
+	if (nil == commitTrack)
+	{
+		commitTrack = [COCommitTrack commitTrackForObject: [object rootObject]];
+		[_rootObjectCommitTracks 
+			setObject: commitTrack
+			   forKey: rootObjectUUID];
+	}
+	return commitTrack;
+}
+
 // FIXME: Probably need to turn off relationship consistency around loading.
 - (void)loadObject: (COObject*)obj atRevision: (CORevision*)aRevision
 {
+	CORevision *objectRev = nil;
 	ETUUID *objUUID = [obj UUID];
 
 	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj persistentPropertyNames]];
@@ -550,32 +568,23 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	obj->_isIgnoringDamageNotifications = YES;
 	[obj setIgnoringRelationshipConsistency: YES];
 
-	uint64_t revNum;
 	if (aRevision == nil)
 	{
-		revNum = [self currentRevisionNumber];
-	}
-	else
-	{
-		revNum = [aRevision revisionNumber];
+		aRevision = [self revisionForObject: obj];
 	}
 
 	//NSLog(@"Load object %@ at %i", objUUID, (int)revNum);
 	
-	while ([propertiesToFetch count] > 0)
+	while ([propertiesToFetch count] > 0 && aRevision != nil)
 	{
-		CORevision *revision = [_store revisionWithRevisionNumber: revNum];
-		if (revision == nil)
-		{
-			[NSException raise: NSInternalInconsistencyException format: @"Store is missing properties %@ for %@", propertiesToFetch, obj];
-		}
-		
-		NSDictionary *dict = [revision valuesAndPropertiesForObjectUUID: objUUID];
+		NSDictionary *dict = [aRevision valuesAndPropertiesForObjectUUID: objUUID];
 		
 		for (NSString *key in [dict allKeys])
 		{
 			if ([propertiesToFetch containsObject: key])
-			{
+			{	
+				if (nil == objectRev)
+					objectRev = aRevision;
 				id plist = [dict objectForKey: key];
 				id value = [obj valueForPropertyList: plist];
 				//NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
@@ -584,7 +593,12 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 			}
 		}
 		
-		revNum--;
+		aRevision = [aRevision baseRevision];
+	}
+
+	if ([propertiesToFetch count] > 0)
+	{
+		[NSException raise: NSInternalInconsistencyException format: @"Store is missing properties %@ for %@", propertiesToFetch, obj];
 	}
 	
 	[self markObjectUndamaged: obj];
@@ -594,7 +608,21 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 - (COObject*) objectWithUUID: (ETUUID*)uuid entityName: (NSString*)name
 {
+	return [self objectWithUUID: uuid entityName: name atRevision: nil];
+}
+
+- (COObject*) objectWithUUID: (ETUUID*)uuid entityName: (NSString*)name atRevision: (CORevision*)revision
+{
 	COObject *result = [_instantiatedObjects objectForKey: uuid];
+
+	if (result != nil && revision != nil)
+	{
+		CORevision *existingRevision = [self revisionForObject: result];
+		if (![existingRevision isEqual: revision])
+			[NSException raise: NSInternalInconsistencyException
+			            format: @"Object %@ requested at revision %@ but already loaded at revision %@",
+				result, revision, existingRevision];
+	}
 	
 	if (result == nil)
 	{
@@ -617,19 +645,39 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		ETAssert(rootUUID != nil);
 		BOOL isRoot = [rootUUID isEqual: uuid];
 		id rootObject = nil;
+		CORevision *maxRevision = nil;
 
+		if (isRoot)
+		{
+			if (nil == revision)
+			{
+				NSArray * revisionNodes = [_store 
+					loadCommitTrackForObject: rootUUID	
+						    fromRevision: nil
+						    nodesForward: 0
+						   nodesBackward: 0];
+				revision = [revisionNodes objectAtIndex: 0];
+			}
+		}
 		if (!isRoot)
 		{
-			rootObject = [self objectWithUUID: rootUUID entityName: nil];
+			if (nil == revision && nil != maxRevision)
+				revision = maxRevision;
+			rootObject = [self objectWithUUID: rootUUID entityName: nil atRevision: revision];
 		}
 
 		Class cls = [self classForEntityDescription: desc];
-		result = [[cls alloc] initWithUUID: uuid
-						 entityDescription: desc
-	                            rootObject: rootObject
-								   context: self
-								   isFault: YES];
+		result = [[cls alloc] 
+			     initWithUUID: uuid
+			entityDescription: desc
+			       rootObject: rootObject
+				  context: self
+				  isFault: YES];
 		
+		if (isRoot)
+		{
+			[_rootObjectRevisions setObject: revision forKey: [result UUID]];
+		}
 		[_instantiatedObjects setObject: result forKey: uuid];
 		[result release];
 	}
@@ -638,9 +686,6 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 }
 
 @end
-
-
-
 
 @implementation COEditingContext (Rollback)
 
@@ -669,6 +714,43 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	{
 		[self loadObject: object];
 	}
+}
+
+- (void)reloadRootObjectTree: (COObject*)rootObject atRevision: (CORevision*)revision
+{
+	ETUUID *rootObjectUUID = [rootObject UUID];
+	CORevision *oldRevision = [_rootObjectRevisions objectForKey: rootObjectUUID];
+	[_rootObjectRevisions removeObjectForKey: rootObjectUUID];
+	[_rootObjectRevisions setObject: revision forKey: rootObjectUUID];
+
+	// FIXME: Optimise for undo/redo cases (revisions next to each other)
+	
+	// Case 1: unrelated revisions
+	// This part is somewhat tricky. We need to reload all sub-objects
+	// that already exist in the context, and we ought to get rid of all
+	// subobjects that are no longer in use. Objects that exist in the 
+	// new revision but were not part of the old revision tree should
+	// automatically be faulted in (I think).
+	NSSet *allIDs = [_store UUIDsForRootObjectUUID: rootObjectUUID];
+
+	NSMutableSet *loadedIDs = [NSMutableSet setWithSet: allIDs];
+	[loadedIDs intersectSet: [NSSet setWithArray: [_instantiatedObjects allKeys]]];
+	
+	FOREACH(loadedIDs, uuid, ETUUID*)
+	{
+		[self loadObject: [_instantiatedObjects objectForKey: uuid] atRevision: revision];
+	}
+	
+	// As you can see, we haven't removed objects that are "dangling". There
+	// might be an advantage to this, but most likely not. Its quite hard (we
+	// have to search the whole object tree for references or use the store
+	// to get the set of object ids in each revision and minus the sets) so
+	// I couldn't be bothered right now. May in fact be easiest to dispose of
+	// the editing context and reload it.
+
+	// Case 2: [revision baseRevision] == oldRevision (redo)
+
+	// Case 3: [oldRevision baseRevision] == revision (undo)
 }
 
 @end

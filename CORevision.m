@@ -14,11 +14,12 @@
 	[self applyTraitFromClass: [ETCollectionTrait class]];
 }
 
-- (id)initWithStore: (COStore *)aStore revisionNumber: (uint64_t)aRevision
+- (id)initWithStore: (COStore *)aStore revisionNumber: (uint64_t)aRevision baseRevisionNumber: (uint64_t)aBaseRevision
 {
 	SUPERINIT;
 	ASSIGN(store, aStore);
 	revisionNumber = aRevision;
+	baseRevisionNumber = aBaseRevision;
 	return self;
 }
 
@@ -44,6 +45,11 @@
 	return revisionNumber;
 }
 
+- (CORevision*)baseRevision
+{
+	return [store revisionWithRevisionNumber: baseRevisionNumber];
+}
+
 - (ETUUID *)UUID
 {
 	return nil;
@@ -56,6 +62,17 @@
 
 - (NSString *)type
 {
+	return nil;
+}
+
+- (CORevision*)nextRevision
+{
+	FMResultSet *rs = [store->db executeQuery: @"SELECT MAX(revisionnumber) FROM commitMetadata WHERE baserevisionnumber = ?", revisionNumber];
+	if ([rs next])
+	{
+		int64_t nextRevisionNumber = [rs longLongIntForColumnIndex: 0];
+		return [store revisionWithRevisionNumber: nextRevisionNumber];
+	}
 	return nil;
 }
 
@@ -177,6 +194,14 @@
 - (NSArray *)contentArray
 {
 	return [NSArray arrayWithArray: [self changedObjectRecords]];
+}
+
+- (NSString*)description
+{
+	return [NSString stringWithFormat: @"%@ (%qi <= %@)", 
+		NSStringFromClass([self class]),
+		revisionNumber,
+		baseRevisionNumber != 0 ? [NSString stringWithFormat: @"%qi", baseRevisionNumber] : @"root"];
 }
 
 @end

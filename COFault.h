@@ -20,7 +20,7 @@
 #error "ObjectMerging/CoreObject cannot be used in mixed-ABI mode. Please configure gnustep-base with './configure --disable-mixedabi' to use the pure non-fragile ABI."
 #endif    
 
-@class COEditingContext, COObject;
+@class COEditingContext, COObject, CORevision;
 
 /** The protocol to which any fault class must comply to. 
 

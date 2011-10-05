@@ -27,6 +27,7 @@
 {
 	COStore *store;
 	uint64_t revisionNumber;
+	uint64_t baseRevisionNumber;
 }
 
 /** @taskunit Store */
@@ -44,6 +45,15 @@
  * This number shouldn't be used to uniquely identify the revision, unlike -UUID. 
  */
 - (uint64_t)revisionNumber;
+
+/**
+  * The revision upon which this one is based i.e. the main
+  * previous revision. This is nil when this is the first
+  * revision for a root object.
+  */
+- (CORevision*)baseRevision;
+
+
 /** 
  * Returns the revision UUID. 
  */
@@ -85,6 +95,14 @@
  * Initializes and returns a new revision object to represent a precise revision 
  * number in the given store. 
  */
-- (id)initWithStore: (COStore *)aStore revisionNumber: (uint64_t)anID;
+- (id)initWithStore: (COStore *)aStore revisionNumber: (uint64_t)anID baseRevisionNumber: (uint64_t)baseID;
 
+/**
+  * Return the next revision after this one. Note that in a non-linear history model,
+  * there are multiple "next revisions". Therefore this method is only meaningful in linear
+  * revision models, where each revision has only one revision that calls it is "base revision". 
+  * In the non-linear case, it returns the "next revision" that has
+  * the highest revision number.
+  */
+- (CORevision*)nextRevision;
 @end

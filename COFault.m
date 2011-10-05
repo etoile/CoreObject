@@ -47,6 +47,11 @@
 	return [_uuid isEqual: [self UUID]];
 }
 
+- (BOOL)isKindOfClass: (Class)cl
+{
+	return [NSClassFromString([self futureClassName]) isSubclassOfClass: cl];
+}
+
 - (NSError *) unfaultIfNeeded
 {
 	if (_isIgnoringDamageNotifications)

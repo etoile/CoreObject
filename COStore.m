@@ -123,8 +123,12 @@ void CHECK(id db)
 	
 	// One table for storing commit metadata
 	
-	success = success && [db executeUpdate: @"CREATE TABLE commitMetadata(revisionnumber INTEGER PRIMARY KEY, plist BLOB)"];CHECK(db);
+	success = success && [db executeUpdate: @"CREATE TABLE commitMetadata(revisionnumber INTEGER PRIMARY KEY, baserevisionnumber INTEGER, plist BLOB)"];CHECK(db);
 		
+	// Commit Track node table
+	success = success && [db executeUpdate: @"CREATE TABLE commitTrackNode(committracknodeid INTEGER PRIMARY KEY, objectuuid INTEGER, revisionnumber INTEGER, nextnode INTEGER, prevnode INTEGER)"]; CHECK(db);
+	// Commit Track table 
+	success = success && [db executeUpdate: @"CREATE TABLE commitTrack(objectuuid INTEGER PRIMARY KEY, currentnode INTEGER)"]; CHECK(db);
 	return success;
 }
 
@@ -310,8 +314,19 @@ void CHECK(id db)
 
 - (void)beginCommitWithMetadata: (NSDictionary *)meta
                  rootObjectUUID: (ETUUID *)rootUUID
+		   baseRevision: (CORevision*)baseRevision
 				 
 {
+	NSNumber *baseRevisionNumber = nil;
+	if (nil != baseRevision)
+	{
+		baseRevisionNumber = [NSNumber numberWithLongLong: [baseRevision revisionNumber]];
+	}
+	if (nil == meta)
+	{
+		// Needed because GNUstep persists nil so that it loads again as @"nil"
+		meta = [NSDictionary dictionary];
+	}
 	if (commitInProgress != nil)
 	{
 		[NSException raise: NSGenericException format: @"Attempt to call -beginCommitWithMetadata: while a commit is already in progress."];
@@ -321,14 +336,15 @@ void CHECK(id db)
 		[NSException raise: NSGenericException format: @"The object UUID %@ is not listed among the root objects.", rootUUID];	
 	}
 
-	NSData *data = [NSPropertyListSerialization dataFromPropertyList: meta
-															  format: NSPropertyListXMLFormat_v1_0
-													errorDescription: NULL];
+	NSData *data = [NSPropertyListSerialization 
+		dataFromPropertyList: meta
+		              format: NSPropertyListXMLFormat_v1_0
+		    errorDescription: NULL];
 	
 	[db beginTransaction];
-	
-	[db executeUpdate: @"INSERT INTO commitMetadata(plist) VALUES(?)",
-		data];
+
+	[db executeUpdate: @"INSERT INTO commitMetadata(plist, baserevisionnumber) VALUES(?, ?)",
+		data, baseRevisionNumber];
 
 	commitInProgress = [[NSNumber numberWithUnsignedLongLong: [db lastInsertRowId]] retain];
 	ASSIGN(rootInProgress, [self keyForUUID: rootUUID]);
@@ -361,9 +377,10 @@ void CHECK(id db)
 		[NSException raise: NSGenericException format: @"Object in progress doesn't match"];
 	}
 
-	NSData *data = [NSPropertyListSerialization dataFromPropertyList: value
-															  format: NSPropertyListXMLFormat_v1_0
-													errorDescription: NULL];	
+	NSData *data = [NSPropertyListSerialization 
+		dataFromPropertyList: value
+		              format: NSPropertyListXMLFormat_v1_0
+		    errorDescription: NULL];	
 	if (data == nil && value != nil)
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Error serializing object %@", value];
@@ -427,6 +444,7 @@ void CHECK(id db)
 	{
 		[NSException raise: NSGenericException format: @"Start a commit first"];
 	}
+	[self updateCommitTrackForRootObjectUUID: rootInProgress newRevision: commitInProgress];
 	[db commit];
 	
 	CORevision *result = [self revisionWithRevisionNumber: [commitInProgress unsignedLongLongValue]];
@@ -444,11 +462,12 @@ void CHECK(id db)
 	CORevision *result = [commitObjectForID objectForKey: idNumber];
 	if (result == nil)
 	{
-		FMResultSet *rs = [db executeQuery:@"SELECT revisionnumber FROM commitMetadata WHERE revisionnumber = ?",
+		FMResultSet *rs = [db executeQuery:@"SELECT revisionnumber, baserevisionnumber FROM commitMetadata WHERE revisionnumber = ?",
 						   idNumber];
 		if ([rs next])
 		{
-			CORevision *commitObject = [[[CORevision alloc] initWithStore: self revisionNumber: anID] autorelease];
+			int64_t baseRevisionNumber = [rs longLongIntForColumnIndex: 1];
+			CORevision *commitObject = [[[CORevision alloc] initWithStore: self revisionNumber: anID baseRevisionNumber: baseRevisionNumber] autorelease];
 			[commitObjectForID setObject: commitObject
 								  forKey: idNumber];
 			result = commitObject;
@@ -473,13 +492,18 @@ void CHECK(id db)
 		componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]] 
 		componentsJoinedByString: @""];
 	// NOTE: We use a distinct query string because -executeQuery returns nil with 'WHERE xyz IN ?'
-	NSString *query = [NSString stringWithFormat: @"SELECT DISTINCT revisionnumber FROM commits WHERE objectUUID IN %@ ORDER BY revisionnumber", formattedIdNumbers];
+	NSString *query = [NSString stringWithFormat: @"SELECT DISTINCT revisionnumber, baseRevisionNumber FROM commits WHERE objectUUID IN %@ ORDER BY revisionnumber", formattedIdNumbers];
 	FMResultSet *rs = [db executeQuery: query];
 
 	while ([rs next])
 	{
 		uint64_t result = [rs longLongIntForColumnIndex: 0];
-		CORevision *rev = [[[CORevision alloc] initWithStore: self revisionNumber: result] autorelease];
+		uint64_t baseRevision = [rs longLongIntForColumnIndex: 1];
+		CORevision *rev = [[[CORevision alloc] 
+			     initWithStore: self 
+			    revisionNumber: result 
+			baseRevisionNumber: baseRevision] 
+				autorelease];
 
 		[revs addObject: rev];
 	}
@@ -549,6 +573,241 @@ void CHECK(id db)
 	return num;
 }
 
+- (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)uuidIndex
+                                    currentNodeId: (int64_t*)pCurrentNodeId
+{
+	int64_t currentNodeId;
+	// TODO: (Chris) Determine if we should use the latest revision number of the store
+	// or the last revision number the object occurs in. Really, if we create
+	// a commit track for every object, this issue shouldn't arise.
+	CORevision *revision = [self revisionWithRevisionNumber: [self latestRevisionNumber]];
+	NSDebugLLog(@"COStore", @"Creating commit track for object %@", [self UUIDForKey: [uuidIndex longLongValue]]);
+	[db executeUpdate: @"INSERT INTO commitTrackNode(committracknodeid, objectuuid, revisionnumber, nextnode, prevnode) VALUES (NULL, ?, ?, NULL, NULL)",
+		uuidIndex, [NSNumber numberWithLongLong: [revision revisionNumber]]]; CHECK(db);
+	currentNodeId = [db lastInsertRowId];
+	[db executeUpdate: @"INSERT INTO commitTrack(objectuuid, currentnode) VALUES (?, ?)", 
+		uuidIndex, [NSNumber numberWithLongLong: currentNodeId]]; CHECK(db);
+	if (pCurrentNodeId)
+		*pCurrentNodeId = currentNodeId;
+	return revision;
+}
+
+- (CORevision*)commitTrackForRootObject: (NSNumber*)objectUUIDIndex
+                            currentNode: (int64_t*)pCurrentNode
+                           previousNode: (int64_t*)pPreviousNode
+                               nextNode: (int64_t*)pNextNode
+{
+	FMResultSet *rs = [db executeQuery: @"SELECT commitTrack.objectuuid, currentnode, revisionnumber, nextnode, prevnode FROM commitTrack JOIN commitTrackNode ON committracknodeid = currentnode WHERE commitTrack.objectuuid = ?", objectUUIDIndex]; CHECK(db);
+	if ([rs next])
+	{
+		if (pCurrentNode)
+			*pCurrentNode = [rs longLongIntForColumnIndex: 1];
+
+		if (pPreviousNode) 
+			*pPreviousNode = [rs longLongIntForColumnIndex: 4];
+		if (pNextNode)
+			*pNextNode =[rs longLongIntForColumnIndex: 3];
+		int64_t revisionnumber = [rs longLongIntForColumnIndex: 2];
+		return [self revisionWithRevisionNumber: revisionnumber];
+	}
+	return nil;
+}
+
+/**
+  * Load the revision numbers for a root object along its commit track.
+  * The resulting array of revisions will be (forward + backward + 1) elements
+  * long, with the revisions ordered from oldest to last.
+  * revision may optionally be nil to find a commit track for an object
+  * (or create one if it doesn't exist).
+  * 
+  * The current implementation is quite inefficient in that it hits the
+  * database (forward + backward + 1) time, once for each
+  * revision on the commit track.
+ */
+- (NSArray*)loadCommitTrackForObject: (ETUUID*)objectUUID
+                        fromRevision: (CORevision*)revision
+                        nodesForward: (NSUInteger)forward
+                       nodesBackward: (NSUInteger)backward
+{
+	NILARG_EXCEPTION_TEST(objectUUID);
+	if (![self isRootObjectUUID: objectUUID])
+		[NSException raise: NSInvalidArgumentException format: @"The object with UUID %@ does not exist!", objectUUID];
+
+	NSMutableArray *nodes = [[NSMutableArray alloc] initWithCapacity: (1 + forward + backward)];
+	NSNumber *objectUUIDIndex = [self keyForUUID: objectUUID];
+	int64_t nextNode, prevNode;
+	int64_t currentNode;	
+	if (nil == revision)
+	{
+		revision = [self commitTrackForRootObject: objectUUIDIndex currentNode: &currentNode previousNode: &prevNode nextNode: &nextNode];
+		if (nil == revision)
+		{
+			revision = [self createCommitTrackForRootObjectUUID: objectUUIDIndex currentNodeId: &currentNode];
+			prevNode = nextNode = 0;
+		}
+	}
+
+	// Insert the middle mode (revision)
+	[nodes addObject: revision];
+	
+	// Retrieve the backward revisions along the track (starting at the middle node)
+	for (int i = 0; i < backward; i++)
+	{
+		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, prevnode FROM commitTrackNode WHERE objectuuid = ? AND committracknodeid = ?", objectUUIDIndex, [NSNumber numberWithLongLong: prevNode]]; CHECK(db);
+		if ([rs next])
+		{
+			prevNode = [rs longLongIntForColumnIndex: 1];
+			revision = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
+			[nodes insertObject: revision atIndex: 0];
+		}
+		else
+		{
+			for (int j = i; j < backward; j++)
+			{
+				[nodes insertObject: [NSNull null] atIndex: 0];
+			}
+			break;
+		}
+	}
+	
+	// Retrieve the forward revisions on the track
+	for (int i = 0; i < forward; i++)
+	{
+		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, nextnode FROM commitTrackNode WHERE objectuuid = ? AND committracknodeid = ?", objectUUIDIndex, [NSNumber numberWithLongLong: nextNode]]; CHECK(db);
+		if ([rs next])
+		{
+			nextNode = [rs longLongIntForColumnIndex: 1];
+			revision = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
+			[nodes addObject: revision];
+		}
+		else
+		{
+			for (int j = i; j < forward; j++)
+			{
+				[nodes addObject: [NSNull null]];
+			}
+			break;
+		}
+	}
+	return [nodes autorelease];
+}
+
+- (void)updateCommitTrackForRootObjectUUID: (NSNumber*)rootObjectIndex
+                               newRevision: (NSNumber*)newRevision
+{
+	int64_t oldNodeInt;
+	CORevision *oldRev = 
+		[self commitTrackForRootObject: rootObjectIndex
+		                   currentNode: &oldNodeInt
+				  previousNode: NULL
+		                      nextNode: NULL];
+	if (oldRev)
+	{
+		NSNumber* oldNode = [NSNumber numberWithLongLong: oldNodeInt];
+		NSNumber* newNode;
+		
+		[db executeUpdate: @"INSERT INTO commitTrackNode(committracknodeid, objectuuid, revisionnumber, prevnode, nextnode) VALUES (NULL, ?, ?, ?, NULL)",
+			rootObjectIndex, 
+			newRevision, 
+			oldNode]; CHECK(db);
+		newNode = [NSNumber numberWithLongLong: [db lastInsertRowId]];
+		[db executeUpdate: @"UPDATE commitTrackNode SET nextnode = ? WHERE committracknodeid = ? AND objectuuid = ?",
+			newNode, oldNode, rootObjectIndex]; CHECK(db);
+		[db executeUpdate: @"UPDATE commitTrack SET currentnode = ? WHERE objectuuid = ?",
+			newNode, rootObjectIndex]; CHECK(db);
+		NSDebugLLog(@"COStore", @"Updated commit track for %@ - created new commit track node %@ pointed to by %@ for revision %@",
+			[self UUIDForKey: [rootObjectIndex longLongValue]], newNode, oldNode, newRevision); 
+	}
+	else
+	{
+		[self createCommitTrackForRootObjectUUID: rootObjectIndex currentNodeId: NULL];
+	}
+}
+- (CORevision*)undoOnCommitTrack: (ETUUID*)rootObjectUUID
+{
+	NSNumber *rootObjectIndex = [self keyForUUID: rootObjectUUID];
+	FMResultSet *rs = [db executeQuery: @"SELECT prevnode FROM commitTrack ct JOIN commitTrackNode ctn ON ct.currentNode = ctn.committracknodeid "
+		"WHERE ct.objectuuid = ?", rootObjectIndex]; CHECK(db);
+	if ([rs next])
+	{
+		NSNumber *prevNode = [NSNumber numberWithLongLong: [rs longLongIntForColumnIndex: 0]];
+		if ([prevNode longLongValue]== 0)
+			[NSException raise: NSInvalidArgumentException
+			            format: @"Root Object UUID %@ is already at the beginning of its commit track and cannot be undone.", rootObjectUUID];
+		[db executeUpdate: @"UPDATE commitTrack SET currentnode = ? WHERE objectuuid = ?",
+				prevNode, rootObjectIndex]; CHECK(db);
+		rs = [db executeQuery: @"SELECT revisionnumber FROM committracknode WHERE committracknodeid = ?", 
+		   prevNode]; CHECK(db);
+		if ([rs next])
+		{
+			int64_t revisionNumber = [rs longLongIntForColumnIndex: 0];
+			return [self revisionWithRevisionNumber: revisionNumber];
+		}
+		else
+		{
+			[NSException raise: NSInternalInconsistencyException
+			            format: @"Unable to find node %q in Commit Track %@ to retrieve revision number", 
+				prevNode, rootObjectUUID]; 
+		}
+	}
+	else
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"Commit Track not found for object %@!", rootObjectUUID];
+	}
+	return nil;
+}
+- (CORevision*)redoOnCommitTrack: (ETUUID*)rootObjectUUID
+{
+	NSNumber *rootObjectIndex = [self keyForUUID: rootObjectUUID];
+	FMResultSet *rs = [db executeQuery: @"SELECT nextNode FROM commitTrack ct JOIN commitTrackNode ctn ON ct.currentNode = ctn.committracknodeid "
+		"WHERE ct.objectuuid = ?", rootObjectIndex]; CHECK(db);
+	if ([rs next])
+	{
+		NSNumber* nextNode = [NSNumber numberWithLongLong: [rs longLongIntForColumnIndex: 0]];
+		if ([nextNode longLongValue] == 0)
+			[NSException raise: NSInvalidArgumentException
+			            format: @"Root Object UUID %@ is already at the end of its commit track and cannot be redone.", rootObjectUUID];
+		[db executeUpdate: @"UPDATE commitTrack SET currentnode = ? WHERE objectuuid = ?",
+				nextNode, rootObjectIndex]; CHECK(db);
+		rs = [db executeQuery: @"SELECT revisionnumber FROM committracknode WHERE committracknodeid = ?", 
+			nextNode]; CHECK(db);
+		if ([rs next])
+		{
+			int64_t revisionNumber = [rs longLongIntForColumnIndex: 0];
+			return [self revisionWithRevisionNumber: revisionNumber];
+		}
+		else
+		{
+			[NSException raise: NSInternalInconsistencyException
+			            format: @"Unable to find node %q in Commit Track %@ to retrieve revision number", 
+				nextNode, rootObjectUUID]; 
+		}
+	}
+	else
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"Commit Track not found for object %@!", rootObjectUUID];
+	}
+	return nil;
+}
+- (CORevision*)maxRevision: (int64_t)maxRevNumber forRootObjectUUID: (ETUUID*)uuid
+{
+	if (maxRevNumber <= 0)
+		maxRevNumber = [self latestRevisionNumber];
+	FMResultSet *rs = [db executeQuery: @"SELECT MAX(revisionnumber) FROM uuids "
+		"JOIN commits ON uuids.uuidIndex = commits.objectuuid "
+		"WHERE revisionnumber <= ? AND commits.rootIndex = ?",
+		[self keyForUUID: uuid], [NSNumber numberWithLongLong: maxRevNumber]]; CHECK(db);
+	if ([rs next])
+	{
+		return [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
+	}
+	else
+	{
+		return nil;
+	}
+}
 @end
 
 @implementation CORecord

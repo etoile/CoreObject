@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COStore, CORevision, COObject;
+@class COStore, CORevision, COObject, COCommitTrack;
 
 /**
  * An object context is like a working copy in a revision control system.
@@ -11,7 +11,8 @@
 @interface COEditingContext : NSObject
 {
 	COStore *_store;
-	CORevision *_revision;
+
+	int64_t _maxRevisionNumber;
 	
 	/**
 	 * Note: never modify directly; call -markObjectDamaged/-markObjectUndamaged instead.
@@ -19,6 +20,8 @@
 	 */
 	NSMutableDictionary *_damagedObjectUUIDs; // UUIDS of objects in this context which have uncommitted changes
 	NSMutableDictionary *_instantiatedObjects; // UUID -> COObject mapping
+	NSMutableDictionary *_rootObjectRevisions; // UUID of root object -> revision mapping
+	NSMutableDictionary *_rootObjectCommitTracks; // UUID of root object -> commit track
 	ETModelDescriptionRepository *_modelRepository;
 
 	NSMutableSet *_insertedObjectUUIDs;
@@ -43,13 +46,15 @@
 + (void) setCurrentContext: (COEditingContext *)aCtxt;
 
 /**
- * Initializes a context which uses a specified revision of a store
- */
-- (id)initWithRevision: (CORevision*)aRevision;
-/**
  * Initializes a context which uses the current state of the store
  */
 - (id)initWithStore: (COStore*)store;
+
+/**
+  * Initialize the context, fixing the maximum revision number that can
+  * be loaded of an object.
+  */
+- (id)initWithStore: (COStore*)store maxRevision: (int64_t)maxRevisionNumber;
 - (COStore*)store;
 
 - (id)init;
@@ -94,6 +99,11 @@
  */
 - (id) insertObjectWithEntityName: (NSString*)aFullName;
 /**
+ * Creates a new instance of the given entity name (assigning the instance a new UUID)
+ * under the specified root object and returns the object. This is the factory method for COObject.
+ */
+- (id) insertObjectWithEntityName: (NSString*)aFullName rootObject: (COObject*)rootObject;
+/**
  * Creates a new instance of the given class (assigning the instance a new UUID)
  * and returns the object.
  */
@@ -112,6 +122,7 @@
 - (id) insertObject: (COObject*)sourceObject withRelationshipConsistency: (BOOL)consistency newUUID: (BOOL)newUUID; //Private
 
 - (COObject*) objectWithUUID: (ETUUID*)uuid;
+- (COObject*) objectWithUUID: (ETUUID*)uuid atRevision: (CORevision*)revision;
 
 - (void) deleteObjectWithUUID: (ETUUID*)uuid;
 
@@ -125,7 +136,6 @@
 // Private
 
 - (void) commitWithMetadata: (NSDictionary*)metadata;
-- (uint64_t)currentRevisionNumber;
 
 @end
 
@@ -135,10 +145,11 @@
 - (void) markObjectDamaged: (COObject*)obj forProperty: (NSString*)aProperty;
 - (void) markObjectUndamaged: (COObject*)obj;
 - (void) loadObject: (COObject*)obj;
-- (void)loadObject: (COObject*)obj atRevision: (CORevision*)aRevision;
-
+- (void) loadObject: (COObject*)obj atRevision: (CORevision*)aRevision;
+- (CORevision*)revisionForObject: (COObject*)object;
+- (COCommitTrack*)commitTrackForObject: (COObject*)object;
+- (COObject*) objectWithUUID: (ETUUID*)uuid entityName: (NSString*)name atRevision: (CORevision*)revision;
 - (COObject*) objectWithUUID: (ETUUID*)uuid entityName: (NSString*)name;
-
 @end
 
 
@@ -150,6 +161,11 @@
 - (void) discardAllChanges;
 - (void) discardAllChangesInObject: (COObject*)object;
 
+/**
+  * Reload the object at a new revision.
+  */
+- (void)reloadRootObjectTree: (COObject*)object
+                  atRevision: (CORevision*)revision;
 
 @end
 

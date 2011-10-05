@@ -171,6 +171,11 @@
 	return NO;
 }
 
+- (CORevision*)revision
+{
+	return [_context revisionForObject: self];
+}
+
 - (BOOL) isPersistent
 {
 	return (_context != nil);
@@ -670,6 +675,10 @@
 	return NO;*/
 }
 
+- (COCommitTrack*)commitTrack
+{
+	return [_context commitTrackForObject: self];
+}
 @end
 
 
@@ -714,6 +723,7 @@
 {
 	_isIgnoringRelationshipConsistency = ignore;
 }
+
 
 @end
 
@@ -969,7 +979,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		{
 			ETUUID *uuid = [ETUUID UUIDWithString: [plist valueForKey: @"uuid"]];
 			return [[self editingContext] objectWithUUID: uuid 
-											  entityName: [plist valueForKey: @"entity"]];
+			                                  entityName: [plist valueForKey: @"entity"]];
 		}
 		else if ([type isEqualToString: @"unorderedCollection"])
 		{

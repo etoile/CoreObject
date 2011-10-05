@@ -46,7 +46,7 @@ static void DeleteOldStore()
 	{
 		OPEN_STORE(s);
 		[s insertRootObjectUUIDs: S(o1)];		
-		[s beginCommitWithMetadata: sampleMetadata rootObjectUUID: o1];
+		[s beginCommitWithMetadata: sampleMetadata rootObjectUUID: o1 baseRevision: nil];
 		[s beginChangesForObjectUUID: o1];
 		[s setValue: @"bob"
 		forProperty: @"name"
@@ -90,25 +90,25 @@ static void DeleteOldStore()
 
 	[s insertRootObjectUUIDs: S(o1)];	
 	
-	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: nil];
 	[s beginChangesForObjectUUID: o1];
 	[s setValue: @"cats" forProperty: @"name" ofObject: o1 shouldIndex: YES];
 	[s finishChangesForObjectUUID: o1];
 	CORevision *c1 = [s finishCommit];
 
-	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: c1];
 	[s beginChangesForObjectUUID: o1];
 	[s setValue: @"dogs" forProperty: @"name" ofObject: o1 shouldIndex: YES];
 	[s finishChangesForObjectUUID: o1];
 	CORevision *c2 = [s finishCommit];
 	
-	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: c2];
 	[s beginChangesForObjectUUID: o1];
 	[s setValue: @"horses" forProperty: @"name" ofObject: o1 shouldIndex: YES];
 	[s finishChangesForObjectUUID: o1];
 	CORevision *c3 = [s finishCommit];
 	
-	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: c3];
 	[s beginChangesForObjectUUID: o1];
 	[s setValue: @"dogpound" forProperty: @"name" ofObject: o1 shouldIndex: YES];
 	[s finishChangesForObjectUUID: o1];
@@ -150,7 +150,7 @@ static void DeleteOldStore()
 	ETUUID *o1 = [ETUUID UUID];
 
 	[s insertRootObjectUUIDs: S(o1)];	
-	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: nil];
 	[s beginChangesForObjectUUID: o1];
 	[s finishChangesForObjectUUID: o1];
 	CORevision *c1 = [s finishCommit];
@@ -169,7 +169,7 @@ static void DeleteOldStore()
 	ETUUID *o2 = [ETUUID UUID];
 	ETUUID *o3 = [ETUUID UUID];
 	[s insertRootObjectUUIDs: S(o1)];
-	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: nil];
 	[s beginChangesForObjectUUID: o2];
 	[s setValue: @"cats" forProperty: @"name" ofObject: o2 shouldIndex: NO];
 	[s finishChangesForObjectUUID: o2];
@@ -198,7 +198,7 @@ static void DeleteOldStore()
 	ETUUID *o1 = [ETUUID UUID];
 
 	[s insertRootObjectUUIDs: S(o1)];	
-	[s beginCommitWithMetadata: nil rootObjectUUID: o1];
+	[s beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: nil];
 	[s beginChangesForObjectUUID: o1];
 	[s setValue: nil
 	forProperty: @"name"

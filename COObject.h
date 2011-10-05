@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COEditingContext;
+@class COEditingContext, CORevision, COCommitTrack;
 
 /**
  * Working copy of an object, owned by an editing context.
@@ -75,6 +75,18 @@
  */
 - (COObject *) rootObject;
 - (BOOL) isFault;
+
+/**
+  * Return the revision of this object in the editing
+  * context.
+  */
+- (CORevision*)revision;
+
+/**
+  * Returns the commit track for this object.
+  */
+- (COCommitTrack*)commitTrack;
+
 /**
  * Returns whether the receiver is saved on the disk.
  *
@@ -188,8 +200,8 @@
 - (id) initWithUUID: (ETUUID*)aUUID 
   entityDescription: (ETEntityDescription*)anEntityDescription
          rootObject: (id)aRootObject
-			context: (COEditingContext*)aContext
-			isFault: (BOOL)isFault;
+            context: (COEditingContext*)aContext
+            isFault: (BOOL)isFault;
 /**
  * Used only by -[COEditingContext markObject[Un]damaged]; to update
  * the object's cached damage flag

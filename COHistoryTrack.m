@@ -50,12 +50,12 @@
 	CORevision *revToUndo = [currentNode underlyingRevision];
 	CORevision *revBeforeUndo = [[currentNode parent] underlyingRevision];
 	
-	COEditingContext *revToUndoCtx = [[COEditingContext alloc] initWithRevision: revToUndo];
-	COEditingContext *revBeforeUndoCtx = [[COEditingContext alloc] initWithRevision: revBeforeUndo];
+	COEditingContext *revToUndoCtx = [[COEditingContext alloc] initWithStore: [revToUndo store] maxRevision: [revToUndo revisionNumber]];
+	COEditingContext *revBeforeUndoCtx = [[COEditingContext alloc] initWithStore: [revBeforeUndo store] maxRevision: [revBeforeUndo revisionNumber]];
 	COEditingContext *currentRevisionCtx = [trackObject editingContext];
 	
-	COContainer *revToUndoObj = (COContainer*)[revToUndoCtx objectWithUUID: [trackObject UUID]];
-	COContainer *revBeforeUndoObj = (COContainer*)[revBeforeUndoCtx objectWithUUID: [trackObject UUID]];
+	COContainer *revToUndoObj = (COContainer*)[revToUndoCtx objectWithUUID: [trackObject UUID] atRevision: revToUndo];
+	COContainer *revBeforeUndoObj = (COContainer*)[revBeforeUndoCtx objectWithUUID: [trackObject UUID] atRevision: revBeforeUndo];
 	COContainer *currentRevisionObj = (COContainer*)[currentRevisionCtx objectWithUUID: [trackObject UUID]];
 	
 	COObjectGraphDiff *oa = [COObjectGraphDiff diffContainer: revToUndoObj withContainer: revBeforeUndoObj];
@@ -84,7 +84,7 @@
 
 - (COHistoryTrackNode*)currentNode
 {
-	CORevision *rev = [[self store] revisionWithRevisionNumber: [[self store] latestRevisionNumber]];
+	CORevision *rev = [trackObject revision];
 	
 	if (![self revisionIsOnTrack: rev])
 	{
@@ -143,8 +143,8 @@
 
 - (BOOL)revisionIsOnTrack: (CORevision*)rev
 {
-	COEditingContext *ctx = [[COEditingContext alloc] initWithRevision: rev];
-	COObject *objAtRev = [ctx objectWithUUID: [trackObject UUID]];
+	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: [rev store]];
+	COObject *objAtRev = [ctx objectWithUUID: [trackObject UUID] atRevision: rev];
 	NSArray *allObjectsOnTrackAtRev = (NSArray*)[[[objAtRev allStronglyContainedObjectsIncludingSelf] mappedCollection] UUID];
 	[ctx release];
 	
@@ -155,8 +155,8 @@
 
 - (CORevision *)nextRevisionOnTrackAfter: (CORevision *)rev backwards: (BOOL)back
 {	
-	COEditingContext *ctx = [[COEditingContext alloc] initWithRevision: rev];
-	COObject *objAtRev = [ctx objectWithUUID: [trackObject UUID]];
+	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: [rev store]];
+	COObject *objAtRev = [ctx objectWithUUID: [trackObject UUID] atRevision: rev];
 	NSArray *allObjectsOnTrackAtRev = (NSArray*)[[[objAtRev allStronglyContainedObjectsIncludingSelf] mappedCollection] UUID];
 	[ctx release];
 	objAtRev = nil;
@@ -164,19 +164,19 @@
 	assert([allObjectsOnTrackAtRev count] > 0);
 
 	NSSet *allObjectsOnTrackAtRevSet = [NSSet setWithArray: allObjectsOnTrackAtRev];
-	int64_t current = [rev revisionNumber];
+	CORevision *current = rev;
 	while (1)
 	{
 		// Advance to the next number
-		current = (back ? (current - 1) : (current + 1));
+		current = (back ? ([rev baseRevision]) : ([rev nextRevision]));
 		
-		if (current < 1 || current > [[self store] latestRevisionNumber])
+		if (nil == current)
 		{
 			return nil;
 		}
 		
 		// Check if the current revison modified anything in allObjectsOnTrackAtRev
- 		CORevision *newCurrentRev = [[self store] revisionWithRevisionNumber: current];
+ 		CORevision *newCurrentRev = current;
 		assert(newCurrentRev != nil);
 		NSSet *newCurrentRevModifiedSet = [NSSet setWithArray: [newCurrentRev changedObjectUUIDs]];
 		

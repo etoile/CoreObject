@@ -66,7 +66,8 @@
 /** @taskunit Committing Changes */
 
 - (void)beginCommitWithMetadata: (NSDictionary *)meta 
-                 rootObjectUUID: (ETUUID *)rootUUID;
+                 rootObjectUUID: (ETUUID *)rootUUID
+                   baseRevision: (CORevision*)revision;
 
 - (void)beginChangesForObjectUUID: (ETUUID*)object;
 
@@ -97,7 +98,17 @@
 - (ETUUID*)UUIDForKey: (int64_t)key;
 - (NSNumber*)keyForProperty: (NSString*)property;
 - (NSString*)propertyForKey: (int64_t)key;
-
+- (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)rootObjectUUID
+                                    currentNodeId: (int64_t*)currentNodeId;
+- (void)updateCommitTrackForRootObjectUUID: (NSNumber*)rootObjectUUIDIndex
+                               newRevision: (NSNumber*)newRevision;
+- (NSArray*)loadCommitTrackForObject: (ETUUID*)objectUUID
+                        fromRevision: (CORevision*)revision
+                        nodesForward: (NSUInteger)nodes
+                       nodesBackward: (NSUInteger)nodes;
+- (CORevision*)undoOnCommitTrack: (ETUUID*)commitTrack;
+- (CORevision*)redoOnCommitTrack: (ETUUID*)commitTrack;
+- (CORevision*)maxRevision: (int64_t)maxRevNumber forRootObjectUUID: (ETUUID*)uuid;
 @end
 
 /** Wraps a dictionary into an object which is a value rather a collection.
