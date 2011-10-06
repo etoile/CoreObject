@@ -258,6 +258,25 @@ void CHECK(id db)
 	return result;
 }
 
+- (NSSet*)UUIDsForRootObjectUUID: (ETUUID*)aUUID atRevision: (CORevision*)revision
+{
+	// FIXME: This may need to be optimised by storing a list of object UUIDs
+	// at some revisions.
+	NSMutableSet *uuids = [NSMutableSet set];
+	while (revision != nil)
+	{
+    		FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids JOIN commits ON uuids.uuidindex = commits.objectuuid "
+			"WHERE rootindex = ? AND revisionnumber = ?", 
+			[self keyForUUID: aUUID], [NSNumber numberWithLongLong: [revision revisionNumber]]]; CHECK(db);
+		while ([rs next])
+		{
+			[uuids addObject: [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]]];
+		}
+		revision = [revision baseRevision];
+	}
+	return uuids;
+}
+
 - (ETUUID *)rootObjectUUIDForUUID: (ETUUID *)aUUID
 {
 	NILARG_EXCEPTION_TEST(aUUID);

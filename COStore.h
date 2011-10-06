@@ -44,6 +44,14 @@
  * The UUID must not be nil.
  */
 - (NSSet *)UUIDsForRootObjectUUID: (ETUUID *)aUUID;
+
+/**
+  * Returns the persistent UUIDs of objects owned by root object, on the revision
+  * track. This method is needed to reload an object a particular revision, where
+  * some of its objects don't exist.
+  */
+- (NSSet*)UUIDsForRootObjectUUID: (ETUUID*)aUUID atRevision: (CORevision*)revision;
+
 /** 
  * Returns the UUID of the persistent root that owns the object UUID.
  *

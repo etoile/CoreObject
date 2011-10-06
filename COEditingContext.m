@@ -315,9 +315,6 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	[_instantiatedObjects removeObjectForKey: uuid];
 }
 
-
-
-
 // Committing changes
 
 - (NSMapTable *) UUIDsByRootObjectFromObjectUUIDs: (id <ETCollection>)objectUUIDs
@@ -731,14 +728,29 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	// subobjects that are no longer in use. Objects that exist in the 
 	// new revision but were not part of the old revision tree should
 	// automatically be faulted in (I think).
+
+	// All objects in all revisions
 	NSSet *allIDs = [_store UUIDsForRootObjectUUID: rootObjectUUID];
 
+	// Objects needed in this revision
+	NSSet *neededIDs = [_store UUIDsForRootObjectUUID: rootObjectUUID atRevision: revision];
+
+	// Loaded objects in editing context
 	NSMutableSet *loadedIDs = [NSMutableSet setWithSet: allIDs];
 	[loadedIDs intersectSet: [NSSet setWithArray: [_instantiatedObjects allKeys]]];
-	
-	FOREACH(loadedIDs, uuid, ETUUID*)
+
+	// Loaded objects to be unloaded
+	NSMutableSet *unwantedIDs = [NSMutableSet setWithSet: loadedIDs];
+	[unwantedIDs minusSet: neededIDs];
+
+	FOREACH(neededIDs, uuid, ETUUID*)
 	{
 		[self loadObject: [_instantiatedObjects objectForKey: uuid] atRevision: revision];
+	}
+
+	FOREACH(unwantedIDs, uuid, ETUUID*)
+	{
+		[_instantiatedObjects removeObjectForKey: uuid];
 	}
 	
 	// As you can see, we haven't removed objects that are "dangling". There
