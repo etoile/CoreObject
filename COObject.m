@@ -91,11 +91,13 @@
 - (id) init
 {
 	SUPERINIT;
-	return [self commonInitWithUUID: [ETUUID UUID]
+	self = [self commonInitWithUUID: [ETUUID UUID]
 	              entityDescription: nil
 	                     rootObject: nil
 	                        context: nil
 	                        isFault: NO];
+	[self didCreate];
+	return self;
 }
 
 - (void) becomePersistentInContext: (COEditingContext *)aContext 
@@ -556,6 +558,10 @@
 }
 
 // Overridable Notifications
+
+- (void) didCreate
+{
+}
 
 - (void) awakeFromInsert
 {

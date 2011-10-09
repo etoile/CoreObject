@@ -146,6 +146,7 @@ static COEditingContext *currentCtxt = nil;
 		       rootObject: rootObject
 		          context: self
 		          isFault: NO];
+	[result didCreate];
 	[self registerObject: result];
 	[result release];
 	
@@ -739,11 +740,15 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	NSMutableSet *loadedIDs = [NSMutableSet setWithSet: allIDs];
 	[loadedIDs intersectSet: [NSSet setWithArray: [_instantiatedObjects allKeys]]];
 
+	// Needed and already loaded objects in editing context
+	NSMutableSet *neededAndLoadedIDs = [NSMutableSet setWithSet: neededIDs];
+	[neededAndLoadedIDs intersectSet: loadedIDs];
+
 	// Loaded objects to be unloaded
 	NSMutableSet *unwantedIDs = [NSMutableSet setWithSet: loadedIDs];
 	[unwantedIDs minusSet: neededIDs];
 
-	FOREACH(neededIDs, uuid, ETUUID*)
+	FOREACH(neededAndLoadedIDs, uuid, ETUUID*)
 	{
 		[self loadObject: [_instantiatedObjects objectForKey: uuid] atRevision: revision];
 	}

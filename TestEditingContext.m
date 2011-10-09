@@ -11,6 +11,29 @@
 }
 @end
 
+/**
+  * A class to test the -[COObject didCreate] 
+  * method (unfortunately no anonymous classes in
+  * this language).
+  */
+@interface TestCreateExample : COObject
+{
+	NSInteger didCreateCalled;
+}
+- (NSInteger)didCreateCalled;
+@end
+
+@implementation TestCreateExample
+- (NSInteger)didCreateCalled
+{
+	return didCreateCalled;
+}
+- (void)didCreate
+{
+	didCreateCalled++;
+}
+@end
+
 @implementation TestEditingContext
 
 - (id) init
@@ -85,6 +108,48 @@
 	DELETE_STORE;
 }
 
+- (void)testDidCreate
+{
+	ETUUID *objUUID;
+	
+	{
+		NSAutoreleasePool *arp = [NSAutoreleasePool new];
+		COStore *store = [[COStore alloc] initWithURL: STORE_URL];
+		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
+		// Create two objects: one through insertObjectWithEntityName:, the other
+		// using the -init call.
+		TestCreateExample *obj = (TestCreateExample*)[ctx 
+			insertObjectWithEntityName: @"Anonymous.TestCreateExample"];
+		TestCreateExample *obj2 = [TestCreateExample new];
+
+		UKIntsEqual(1, [obj didCreateCalled]);
+
+		UKIntsEqual(1, [obj2 didCreateCalled]);
+		[obj2 becomePersistentInContext: ctx 
+                                     rootObject: obj2];
+		UKIntsEqual(1, [obj2 didCreateCalled]);
+
+		objUUID = [[obj UUID] retain];
+
+		[ctx commit];
+		[obj2 release];
+		[ctx release];
+		[arp drain];
+		[store release];
+	}
+	
+	{
+		OPEN_STORE(store);
+		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
+		TestCreateExample *obj = (TestCreateExample*)[ctx objectWithUUID: objUUID];
+		UKNotNil(obj);
+		UKIntsEqual(0, [obj didCreateCalled]);
+		[ctx release];
+		CLOSE_STORE(store);
+	}
+	[objUUID release];
+	DELETE_STORE;
+}
 
 - (void)testDiscardChanges
 {

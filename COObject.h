@@ -151,7 +151,13 @@
 - (void)didChangeValueForProperty: (NSString *)key;
 
 /* Overridable Notifications */
-
+/**
+  * A notification that the object was created for the first time.
+  * Override this method to perform any initialisation that should be
+  * performed the very first time an object is instantiated, such
+  * as calculating and setting default values.
+  */
+- (void) didCreate;
 - (void) awakeFromInsert;
 - (void) awakeFromFetch;
 - (void) willTurnIntoFault;

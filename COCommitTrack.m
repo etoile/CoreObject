@@ -21,7 +21,7 @@
 		[NSException raise: NSInvalidArgumentException
 		            format: @"Cannot load commit _track for object %@ which does not have an editing context", object];
 	}
-	_commitLog = [object retain];
+	_commitLog = object;
 	_cachedNodes =  [[NSMutableArray alloc] initWithCapacity: CACHE_AMOUNT]; 
 	_currentNode = NSNotFound;
 	if ([_commitLog revision] == nil)
@@ -49,7 +49,6 @@
 }
 - (void)dealloc
 {
-	[_commitLog release];
 	[_cachedNodes release];
 	[super dealloc];
 }
