@@ -46,7 +46,7 @@ static COEditingContext *currentCtxt = nil;
 	assert([[[[_modelRepository descriptionForName: @"Anonymous.COCollection"] 
 		parent] name] isEqual: @"COObject"]);
 	
-	_insertedObjectUUIDs = [[NSMutableSet alloc] init];
+	_insertedObjects = [[NSMutableSet alloc] init];
 	_deletedObjectUUIDs = [[NSMutableSet alloc] init];
 	
 	return self;
@@ -64,7 +64,7 @@ static COEditingContext *currentCtxt = nil;
 	DESTROY(_instantiatedObjects);
 	DESTROY(_modelRepository);
 	
-	DESTROY(_insertedObjectUUIDs);
+	DESTROY(_insertedObjects);
 	DESTROY(_deletedObjectUUIDs);
 	DESTROY(_rootObjectRevisions);
 	DESTROY(_rootObjectCommitTracks);
@@ -89,6 +89,16 @@ static COEditingContext *currentCtxt = nil;
 	return _modelRepository; 
 }
 
+- (Class)classForEntityDescription: (ETEntityDescription *)desc
+{
+	Class cls = [_modelRepository classForEntityDescription: desc];
+	if (cls == Nil)
+	{
+		cls = [COObject class];
+	}
+	return cls;
+}
+
 - (NSSet *) loadedObjects
 {
 	return [NSSet setWithArray: [_instantiatedObjects allValues]];
@@ -97,7 +107,7 @@ static COEditingContext *currentCtxt = nil;
 - (BOOL) hasChanges
 {
 	return ([_damagedObjectUUIDs count] > 0 
-		|| [_insertedObjectUUIDs count] > 0 
+		|| [_insertedObjects count] > 0 
 		|| [_deletedObjectUUIDs count] > 0);
 }
 
@@ -112,20 +122,10 @@ static COEditingContext *currentCtxt = nil;
 
 // Creating and accessing objects
 
-- (Class) classForEntityDescription: (ETEntityDescription*)desc
-{
-	Class cls = [_modelRepository classForEntityDescription: desc];
-	if (cls == Nil)
-	{
-		cls = [COObject class];
-	}
-	return cls;
-}
-
 - (void) registerObject: (COObject *)object
 {
 	[_instantiatedObjects setObject: object forKey: [object UUID]];
-	[_insertedObjectUUIDs addObject: [object UUID]];
+	[_insertedObjects addObject: object];
 }
 
 - (COObject*) insertObjectWithEntityName: (NSString*)aFullName UUID: (ETUUID*)aUUID rootObject: (COObject*)rootObject
@@ -340,7 +340,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 - (NSMapTable *) insertedObjectUUIDsByRootObject
 {
-	return [self UUIDsByRootObjectFromObjectUUIDs: _insertedObjectUUIDs];
+	return [self UUIDsByRootObjectFromObjectUUIDs: (id)[[_insertedObjects mappedCollection] UUID]];
 }
 
 - (NSMapTable *) damagedObjectUUIDsByRootObject
@@ -414,7 +414,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		{
 			// for the first commit, commit all property values
 			propertiesToCommit = persistentProperties;
-			ETAssert([_insertedObjectUUIDs containsObject: uuid]);
+			ETAssert([_insertedObjects containsObject: obj]);
 		}
 		else
 		{
@@ -423,7 +423,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 			propertiesToCommit = [NSMutableSet setWithArray: damagedProperties];
 			[(NSMutableSet *)propertiesToCommit intersectSet: [NSSet setWithArray: persistentProperties]];
-			ETAssert([_insertedObjectUUIDs containsObject: uuid] == NO);
+			ETAssert([_insertedObjects containsObject: obj] == NO);
 		}
 
 		FOREACH(propertiesToCommit, prop, NSString*)
@@ -455,7 +455,11 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	[[_rootObjectCommitTracks objectForKey: [rootObject UUID]]
 		newCommitAtRevision: rev];
 	
-	[_insertedObjectUUIDs minusSet: insertedObjectUUIDs];
+	//[_insertedObjects minusSet: insertedObjects];
+	for (ETUUID *uuid in insertedObjectUUIDs)
+	{
+		[_insertedObjects removeObject: [self objectWithUUID: uuid]];
+	}
 	for (ETUUID *uuid in [damagedObjectUUIDs allKeys])
 	{
 		[self markObjectUndamaged: [self objectWithUUID: uuid]];
@@ -469,7 +473,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	NSSet *rootObjects = [NSSet setWithArray: [[[insertedObjectUUIDs keyEnumerator] allObjects] 
 		arrayByAddingObjectsFromArray: [[damagedObjectUUIDs keyEnumerator] allObjects]]];
 
-	NSMutableSet *insertedRootObjectUUIDs = [NSMutableSet setWithSet: _insertedObjectUUIDs];
+	NSMutableSet *insertedRootObjectUUIDs = [NSMutableSet setWithSet: (id)[[_insertedObjects mappedCollection] UUID]];
 	[insertedRootObjectUUIDs intersectSet: (id)[[rootObjects mappedCollection] UUID]];
 	[_store insertRootObjectUUIDs: insertedRootObjectUUIDs];
 
@@ -707,10 +711,10 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	// FIXME: is this what we want?
 	
 	// Special case for objects which haven't yet been comitted
-	if ([_insertedObjectUUIDs containsObject: [object UUID]])
+	if ([_insertedObjects containsObject: object])
 	{
 		[self markObjectUndamaged: object];
-		[_insertedObjectUUIDs removeObject: [object UUID]];
+		[_insertedObjects removeObject: object];
 		[_instantiatedObjects removeObjectForKey: [object UUID]];
 		// lingering instances may be in a 'zombie' state now... not sure how to solve that problem
 	}
@@ -723,7 +727,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 - (void)reloadRootObjectTree: (COObject*)rootObject atRevision: (CORevision*)revision
 {
 	ETUUID *rootObjectUUID = [rootObject UUID];
-	CORevision *oldRevision = [_rootObjectRevisions objectForKey: rootObjectUUID];
+	//CORevision *oldRevision = [_rootObjectRevisions objectForKey: rootObjectUUID];
 	[_rootObjectRevisions removeObjectForKey: rootObjectUUID];
 	[_rootObjectRevisions setObject: revision forKey: rootObjectUUID];
 

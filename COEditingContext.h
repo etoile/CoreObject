@@ -24,7 +24,7 @@
 	NSMutableDictionary *_rootObjectCommitTracks; // UUID of root object -> commit track
 	ETModelDescriptionRepository *_modelRepository;
 
-	NSMutableSet *_insertedObjectUUIDs;
+	NSMutableSet *_insertedObjects;
 	NSMutableSet *_deletedObjectUUIDs;
 }
 
@@ -87,6 +87,10 @@
  * describes all the persistent objects editable in the context.
  */
 - (ETModelDescriptionRepository *)modelRepository;
+/**
+ * Returns the class bound to the entity description in the model repository.
+ */
+- (Class)classForEntityDescription: (ETEntityDescription *)desc;
 
 /**
  * Returns the objects presently managed by the receiver in memory.
@@ -114,7 +118,7 @@
  */
 - (NSSet*) changedObjectUUIDs;
 
-- (Class) classForEntityDescription: (ETEntityDescription*)desc;
+
 /**
  * Creates a new instance of the given entity name (assigning the instance a new UUID)
  * and returns the object. This is the factory method for COObject.
