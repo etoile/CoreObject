@@ -358,7 +358,14 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
        shortDescription: (NSString*)shortDescription
         longDescription: (NSString*)longDescription
 {
-	[self commitWithMetadata: [NSDictionary dictionary]];
+	NSString *commitType = type;
+
+	if (type == nil)
+	{
+		commitType = @"Unknown";
+	}
+	[self commitWithMetadata: D(shortDescription, @"shortDescription", 
+		longDescription, @"longDescription", commitType, @"type")];
 }
 
 - (NSDictionary *) damagedObjectUUIDSubsetForUUIDs: (NSArray *)keys
@@ -474,7 +481,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		NSDictionary *damagedObjectUUIDSubset = [self damagedObjectUUIDSubsetForUUIDs: 
 			[damagedObjectUUIDs objectForKey: rootObject]];
 
-		[self commitWithMetadata: metadata
+		[self commitWithMetadata: metadata 
 		              rootObject: rootObject
 		     insertedObjectUUIDs: (insertedObjectSubset != nil ? insertedObjectSubset : [NSSet set])
 		      damagedObjectUUIDs: damagedObjectUUIDSubset];

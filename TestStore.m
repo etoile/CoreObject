@@ -70,8 +70,8 @@ static void DeleteOldStore()
 		{
 			UKObjectsEqual(o1, [[c1 changedObjectUUIDs] objectAtIndex: 0]);
 		}
-		
-		UKObjectsEqual(sampleMetadata, [c1 metadata]);
+
+		UKObjectsEqual([NSNumber numberWithBool: YES], [[c1 metadata] objectForKey: @"metadataWorks"]);
 		UKObjectsEqual([NSDictionary dictionaryWithObject: @"bob" forKey: @"name"],
 					   [c1 valuesAndPropertiesForObjectUUID: o1]);
 		

@@ -20,9 +20,14 @@
 #define CLOSE_STORE(store) [_pool drain]; [store release];
 #define DELETE_STORE [[NSFileManager defaultManager] removeItemAtPath: [STORE_URL path] error: NULL]
 
+// NOTE: The Xcode project includes a test suite limited to the store tests
+#ifndef STORE_TEST
+
 @interface TestCommon : NSObject
 + (void) setUp;
 @end
 
 COEditingContext *NewContext(COStore *store);
 void TearDownContext(COEditingContext *ctx);
+
+#endif

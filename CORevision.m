@@ -32,7 +32,7 @@
 - (NSArray *)propertyNames
 {
 	return [[super propertyNames] arrayByAddingObjectsFromArray: 
-		A(@"revisionNumber", @"UUID", @"date", @"type", @"metadata", @"changedObjectUUIDs")];
+		A(@"revisionNumber", @"UUID", @"date", @"type", @"objectUUID", @"metadata", @"changedObjectUUIDs")];
 }
 
 - (COStore *)store
@@ -52,17 +52,22 @@
 
 - (ETUUID *)UUID
 {
-	return nil;
+	return [[self metadata] objectForKey: @"UUID"];
+}
+
+- (ETUUID *)objectUUID
+{
+	return [[self metadata] objectForKey: @"objectUUID"];
 }
 
 - (NSDate *)date
 {
-	return nil;
+	return [[self metadata] objectForKey: @"date"];
 }
 
 - (NSString *)type
 {
-	return nil;
+	return [[self metadata] objectForKey: @"type"];
 }
 
 - (CORevision*)nextRevision
@@ -150,9 +155,8 @@
 	for (ETUUID *objectUUID in [self changedObjectUUIDs])
 	{
 		NSString *changedProperties = [self formattedChangedPropertiesForObjectUUID: objectUUID];
-		NSNumber *revNumberObject = [NSNumber numberWithUnsignedLongLong: revisionNumber];
 		CORecord *record = AUTORELEASE([[CORecord alloc] initWithDictionary: 
-			D(objectUUID, @"UUID", changedProperties, @"properties", revNumberObject, @"revisionNumber")]);
+			D(objectUUID, @"objectUUID", changedProperties, @"properties")]);
 
 		[objRecords addObject: record];
 	}

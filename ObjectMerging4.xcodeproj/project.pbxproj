@@ -12,6 +12,10 @@
 		60CF348313BA931C001F9011 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 605BFF3F13B50C7700073E18 /* Foundation.framework */; };
 		60CF350513BA9331001F9011 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 605BFF3F13B50C7700073E18 /* Foundation.framework */; };
 		60CF350913BA9348001F9011 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF350813BA9348001F9011 /* AppKit.framework */; };
+		60F6A31814444EC300EFC711 /* COCommitTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60F6A31514444EC300EFC711 /* COCommitTrack.h */; };
+		60F6A31914444EC300EFC711 /* COCommitTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F6A31614444EC300EFC711 /* COCommitTrack.m */; };
+		60F6A31C14444EDA00EFC711 /* TestCommitTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F6A31A14444EDA00EFC711 /* TestCommitTrack.m */; };
+		60F6A31D14444EDA00EFC711 /* TestRevisionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F6A31B14444EDA00EFC711 /* TestRevisionNumber.m */; };
 		60FB089813C3076200C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		60FB089B13C3077400C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
@@ -129,6 +133,10 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		605BFF3F13B50C7700073E18 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		60CF350813BA9348001F9011 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		60F6A31514444EC300EFC711 /* COCommitTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommitTrack.h; sourceTree = "<group>"; };
+		60F6A31614444EC300EFC711 /* COCommitTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommitTrack.m; sourceTree = "<group>"; };
+		60F6A31A14444EDA00EFC711 /* TestCommitTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCommitTrack.m; sourceTree = "<group>"; };
+		60F6A31B14444EDA00EFC711 /* TestRevisionNumber.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestRevisionNumber.m; sourceTree = "<group>"; };
 		60FB0E8913C61C3A00C2AB94 /* COFault.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COFault.h; sourceTree = "<group>"; };
 		60FB0E8A13C61C3A00C2AB94 /* COFault.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COFault.m; sourceTree = "<group>"; };
 		6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
@@ -334,6 +342,8 @@
 				6686BDBB12592C1B0065DE1A /* COEditingContext.m */,
 				6686BDC212592C1B0065DE1A /* COObjectGraphDiff.h */,
 				6686BDC312592C1B0065DE1A /* COObjectGraphDiff.m */,
+				60F6A31514444EC300EFC711 /* COCommitTrack.h */,
+				60F6A31614444EC300EFC711 /* COCommitTrack.m */,
 				66D09998129A5B64006BEDC3 /* COHistoryTrack.h */,
 				66D09999129A5B64006BEDC3 /* COHistoryTrack.m */,
 				66D09B14129B704E006BEDC3 /* COSynchronizer.h */,
@@ -412,6 +422,8 @@
 		791B4DF41299C56900CCF472 /* Test */ = {
 			isa = PBXGroup;
 			children = (
+				60F6A31A14444EDA00EFC711 /* TestCommitTrack.m */,
+				60F6A31B14444EDA00EFC711 /* TestRevisionNumber.m */,
 				66FDED2412A3525A005D6D23 /* TestPerformance.m */,
 				791B4E271299C77700CCF472 /* Test_main.m */,
 				791B4E281299C78C00CCF472 /* TestStore.m */,
@@ -479,6 +491,7 @@
 				66D0999A129A5B64006BEDC3 /* COHistoryTrack.h in Headers */,
 				66D09D56129CE470006BEDC3 /* COCollection.h in Headers */,
 				60FB0E8C13C61C3A00C2AB94 /* COFault.h in Headers */,
+				60F6A31814444EC300EFC711 /* COCommitTrack.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -635,6 +648,7 @@
 				791B4E761299C90900CCF472 /* FMResultSet.m in Sources */,
 				791B4E7C1299C92300CCF472 /* sqlite3.c in Sources */,
 				60FB0E8D13C61C3A00C2AB94 /* COFault.m in Sources */,
+				60F6A31914444EC300EFC711 /* COCommitTrack.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -669,6 +683,8 @@
 				66FDEB5512A2F106005D6D23 /* TestObjectGraphDiff.m in Sources */,
 				66FDED2512A3525A005D6D23 /* TestPerformance.m in Sources */,
 				66FDF11C12A7038C005D6D23 /* TestCopy.m in Sources */,
+				60F6A31C14444EDA00EFC711 /* TestCommitTrack.m in Sources */,
+				60F6A31D14444EDA00EFC711 /* TestRevisionNumber.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -724,6 +740,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				OTHER_CFLAGS = (
+					"-DSTORE_TEST",
 					"-DSQLITE_ENABLE_FTS3",
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);

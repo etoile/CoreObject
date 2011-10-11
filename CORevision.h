@@ -19,7 +19,7 @@
  * are:
  *
  * <deflist>
- * <item>UUID</item><desc>The changed object UUID</desc>
+ * <item>objectUUID</item><desc>The changed object UUID</desc>
  * <item>properties</item><desc>The properties changed in the object</desc>
  * </deflist>
  */
@@ -58,6 +58,10 @@
  * Returns the revision UUID. 
  */
 - (ETUUID *)UUID;
+/** 
+ * Returns the root object UUID involved in the revision. 
+ */
+- (ETUUID *)objectUUID;
 /** 
  * Returns the date at which the revision was committed. 
  */

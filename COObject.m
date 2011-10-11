@@ -16,6 +16,14 @@
 	if ([[object name] isEqual: [COObject className]] == NO) 
 		return object;
 
+	// TODO: Move these properties to EtoileFoundation... See -[NSObject propertyNames].
+	// We should create a NSObject entity description and use it as our parent entity probably.
+
+	ETPropertyDescription *iconProperty = 
+		[ETPropertyDescription descriptionWithName: @"icon" type: (id)@"Anonymous.NSImage"];
+	ETPropertyDescription *displayNameProperty = 
+		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"Anonymous.NSString"];
+
 	// TODO: I think these properties should be declared in subclasses or custom 
 	// entity descriptions set per COObject instance (Quentin).
 
@@ -29,10 +37,11 @@
 	
 	[parentCollectionsProperty setMultivalued: YES];
 
+	NSArray *transientProperties = A(iconProperty, displayNameProperty);
 	NSArray *persistentProperties = A(parentContainerProperty, parentCollectionsProperty);
 
 	[[persistentProperties mappedCollection] setPersistent: YES];
-	[object setPropertyDescriptions: persistentProperties];
+	[object setPropertyDescriptions: [transientProperties arrayByAddingObjectsFromArray: persistentProperties]];
 
 	return object;
 }

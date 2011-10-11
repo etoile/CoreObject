@@ -331,7 +331,7 @@ void CHECK(id db)
 
 /* Committing Changes */
 
-- (void)beginCommitWithMetadata: (NSDictionary *)meta
+- (void)beginCommitWithMetadata: (NSDictionary *)metadata
                  rootObjectUUID: (ETUUID *)rootUUID
 		   baseRevision: (CORevision*)baseRevision
 				 
@@ -341,10 +341,10 @@ void CHECK(id db)
 	{
 		baseRevisionNumber = [NSNumber numberWithLongLong: [baseRevision revisionNumber]];
 	}
-	if (nil == meta)
+	if (nil == metadata)
 	{
 		// Needed because GNUstep persists nil so that it loads again as @"nil"
-		meta = [NSDictionary dictionary];
+		metadata = [NSDictionary dictionary];
 	}
 	if (commitInProgress != nil)
 	{
@@ -355,10 +355,14 @@ void CHECK(id db)
 		[NSException raise: NSGenericException format: @"The object UUID %@ is not listed among the root objects.", rootUUID];	
 	}
 
-	NSData *data = [NSPropertyListSerialization 
-		dataFromPropertyList: meta
-		              format: NSPropertyListXMLFormat_v1_0
-		    errorDescription: NULL];
+	NSMutableDictionary *commitMetadata = [NSMutableDictionary dictionaryWithDictionary: metadata];
+
+	[commitMetadata addEntriesFromDictionary: 
+		D([[ETUUID UUID] stringValue], @"UUID", [NSDate date], @"date", [rootUUID stringValue], @"objectUUID")];
+
+	NSData *data = [NSPropertyListSerialization dataFromPropertyList: commitMetadata
+															  format: NSPropertyListXMLFormat_v1_0
+													errorDescription: NULL];
 	
 	[db beginTransaction];
 
@@ -600,7 +604,9 @@ void CHECK(id db)
 	// or the last revision number the object occurs in. Really, if we create
 	// a commit track for every object, this issue shouldn't arise.
 	CORevision *revision = [self revisionWithRevisionNumber: [self latestRevisionNumber]];
+#ifdef GNUSTEP
 	NSDebugLLog(@"COStore", @"Creating commit track for object %@", [self UUIDForKey: [uuidIndex longLongValue]]);
+#endif
 	[db executeUpdate: @"INSERT INTO commitTrackNode(committracknodeid, objectuuid, revisionnumber, nextnode, prevnode) VALUES (NULL, ?, ?, NULL, NULL)",
 		uuidIndex, [NSNumber numberWithLongLong: [revision revisionNumber]]]; CHECK(db);
 	currentNodeId = [db lastInsertRowId];
@@ -734,8 +740,10 @@ void CHECK(id db)
 			newNode, oldNode, rootObjectIndex]; CHECK(db);
 		[db executeUpdate: @"UPDATE commitTrack SET currentnode = ? WHERE objectuuid = ?",
 			newNode, rootObjectIndex]; CHECK(db);
+#ifdef GNUSTEP
 		NSDebugLLog(@"COStore", @"Updated commit track for %@ - created new commit track node %@ pointed to by %@ for revision %@",
 			[self UUIDForKey: [rootObjectIndex longLongValue]], newNode, oldNode, newRevision); 
+#endif
 	}
 	else
 	{
