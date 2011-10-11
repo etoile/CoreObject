@@ -28,43 +28,65 @@
 	NSMutableSet *_deletedObjectUUIDs;
 }
 
-// Creation
+/** @taskunit Accessing the current context */
 
-+ (COEditingContext*)contextWithURL: (NSURL*)aURL;
 /** 
  * Returns the context that should be used when none is provided.
  *
  * Factories that create persistent instances in EtoileUI will use this method. 
  * As an example, see -[ETLayoutItemFactory compoundDocument]. 
  */
-+ (COEditingContext *) currentContext;
++ (COEditingContext *)currentContext;
 /** 
  * Sets the context that should be used when none is provided.
  *
  * See also +currentContext. 
  */
-+ (void) setCurrentContext: (COEditingContext *)aCtxt;
++ (void)setCurrentContext: (COEditingContext *)aCtxt;
+
+/** @taskunit Creating a new context */
 
 /**
- * Initializes a context which uses the current state of the store
+ * Returns a new autoreleased context initialized with the store located at the 
+ * given URL, and with no upper limit on the max revision number.
+ *
+ * See also -initWithStore:maxRevisionNumber: and -[COStore initWithURL:].
  */
-- (id)initWithStore: (COStore*)store;
++ (COEditingContext *)contextWithURL: (NSURL *)aURL;
 
 /**
-  * Initialize the context, fixing the maximum revision number that can
-  * be loaded of an object.
-  */
-- (id)initWithStore: (COStore*)store maxRevision: (int64_t)maxRevisionNumber;
-- (COStore*)store;
+ * Initializes a context which persists its content in the given store.
+ */
+- (id)initWithStore: (COStore *)store;
 
+/**
+ * <init />
+ * Initializes a context which persists its content in the given store, 
+ * fixing the maximum revision number that can be loaded of an object.
+ *
+ * If the store is nil, the context content is not persisted.
+ *
+ * If maxRevisionNumber is zero, then there is no upper limit on the revision 
+ * that can be loaded.
+ */
+- (id)initWithStore: (COStore *)store maxRevisionNumber: (int64_t)maxRevisionNumber;
+/**
+ * Initializes the context with no store. 
+ * As a result, the context content is not persisted.
+ */
 - (id)init;
 
-// FIXME: Should this copy uncommitted changes?
-- (id)copyWithZone: (NSZone*)zone;
+/** @taskunit Store and Metamodel Access */
 
-// Access
-
-- (ETModelDescriptionRepository*) modelRepository;
+/**
+ * Returns the store for which the editing context acts a working copy.
+ */
+- (COStore *)store;
+/**
+ * Returns the model description repository, which holds the metamodel that 
+ * describes all the persistent objects editable in the context.
+ */
+- (ETModelDescriptionRepository *)modelRepository;
 
 /**
  * Returns the objects presently managed by the receiver in memory.

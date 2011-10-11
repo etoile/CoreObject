@@ -50,8 +50,8 @@
 	CORevision *revToUndo = [currentNode underlyingRevision];
 	CORevision *revBeforeUndo = [[currentNode parent] underlyingRevision];
 	
-	COEditingContext *revToUndoCtx = [[COEditingContext alloc] initWithStore: [revToUndo store] maxRevision: [revToUndo revisionNumber]];
-	COEditingContext *revBeforeUndoCtx = [[COEditingContext alloc] initWithStore: [revBeforeUndo store] maxRevision: [revBeforeUndo revisionNumber]];
+	COEditingContext *revToUndoCtx = [[COEditingContext alloc] initWithStore: [revToUndo store] maxRevisionNumber: [revToUndo revisionNumber]];
+	COEditingContext *revBeforeUndoCtx = [[COEditingContext alloc] initWithStore: [revBeforeUndo store] maxRevisionNumber: [revBeforeUndo revisionNumber]];
 	COEditingContext *currentRevisionCtx = [trackObject editingContext];
 	
 	COContainer *revToUndoObj = (COContainer*)[revToUndoCtx objectWithUUID: [trackObject UUID] atRevision: revToUndo];

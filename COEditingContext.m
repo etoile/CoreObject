@@ -6,7 +6,7 @@
 
 @implementation COEditingContext
 
-+ (COEditingContext*)contextWithURL: (NSURL*)aURL
++ (COEditingContext *)contextWithURL: (NSURL *)aURL
 {
 	COEditingContext *ctx = [[self alloc] initWithStore: [[[COStore alloc] initWithURL: aURL] autorelease]];
 	return [ctx autorelease];
@@ -14,22 +14,22 @@
 
 static COEditingContext *currentCtxt = nil;
 
-+ (COEditingContext *) currentContext
++ (COEditingContext *)currentContext
 {
 	return currentCtxt;
 }
 
-+ (void) setCurrentContext: (COEditingContext *)aCtxt
++ (void)setCurrentContext: (COEditingContext *)aCtxt
 {
 	ASSIGN(currentCtxt, aCtxt);
 }
 
-- (id)initWithStore: (COStore*)store
+- (id)initWithStore: (COStore *)store
 {
-	return [self initWithStore: store maxRevision: 0];
+	return [self initWithStore: store maxRevisionNumber: 0];
 }
 
-- (id)initWithStore: (COStore*)store maxRevision: (int64_t)maxRevisionNumber;
+- (id)initWithStore: (COStore *)store maxRevisionNumber: (int64_t)maxRevisionNumber;
 {
 	SUPERINIT;
 
@@ -52,14 +52,9 @@ static COEditingContext *currentCtxt = nil;
 	return self;
 }
 
-- (id) init
+- (id)init
 {
 	return [self initWithStore: nil];
-}
-
-- (COStore*)store
-{
-	return _store;
 }
 
 - (void) dealloc
@@ -76,6 +71,7 @@ static COEditingContext *currentCtxt = nil;
 	[super dealloc];
 }
 
+// FIXME: Should this copy uncommitted changes?
 - (id)copyWithZone:(NSZone *)zone
 {
 	id copy = [[COEditingContext alloc] initWithStore: _store];
@@ -83,9 +79,12 @@ static COEditingContext *currentCtxt = nil;
 	return copy;
 }
 
-// Accessors
+- (COStore *)store
+{
+	return _store;
+}
 
-- (ETModelDescriptionRepository*) modelRepository
+- (ETModelDescriptionRepository *)modelRepository
 {
 	return _modelRepository; 
 }
