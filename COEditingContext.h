@@ -117,11 +117,17 @@
  * After a commit, returns an empty set.
  */
 - (NSSet *)updatedObjects;
+/**
+ * Returns the UUIDs of the objects updated since the last commit. See -updatedObjects.
+ */
+- (NSSet *)updatedObjectUUIDs;
 /** 
  * Returns the objects deleted in the context with -deleteObject: and to be 
  * deleted in the store on the next commit.
  *
  * After a commit, returns an empty set.
+ *
+ * Doesn't include newly inserted or deleted objects.
  */
 - (NSSet *)deletedObjects;
 /** 
@@ -143,12 +149,6 @@
  * Won't return YES if the object has just been inserted or deleted.
  */
 - (BOOL) objectHasChanges: (ETUUID*)uuid;
-/**
- * Returns the UUIDs of the objects updated since the last commit.
- *
- * Doesn't include newly inserted or deleted objects.
- */
-- (NSSet*) changedObjectUUIDs;
 
 /**
  * Creates a new instance of the given entity name (assigning the instance a new UUID)

@@ -232,7 +232,7 @@
 
 	// FIXME: [leaf3Track undo];
 	//UKObjectsEqual(@"Leaf 3", [leaf3 valueForProperty: @"label"]);
-	//UKObjectsEqual(S([leaf3 UUID]), [ctx changedObjectUUIDs]); // Ensure that no other objects were changed by the history track
+	//UKObjectsEqual(S([leaf3 UUID]), [ctx updatedObjectUUIDs]); // Ensure that no other objects were changed by the history track
 	
 	
 	// Now try undoing changes made to Document 1, using doc1track. It shouldn't 
@@ -243,13 +243,13 @@
 	UKObjectsEqual(@"Carol", [leaf4 valueForProperty: @"label"]);
 	[doc1Track undo]; 
 	//UKObjectsEqual(@"Leaf 4", [leaf4 valueForProperty: @"label"]);
-	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID]), [ctx changedObjectUUIDs]);
+	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID]), [ctx updatedObjectUUIDs]);
 	
 	// next undo should remove leaf4 from group1
 	UKObjectsEqual(S([leaf1 UUID], [leaf4 UUID]), [[[NSSet setWithArray: [group1 contentArray]] mappedCollection] UUID]);
 	//[doc1Track undo]; 
 	//UKObjectsEqual(S([leaf1 UUID]), [[[NSSet setWithArray: [group1 contentArray]] mappedCollection] UUID]);	
-	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID]), [ctx changedObjectUUIDs]);
+	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID]), [ctx updatedObjectUUIDs]);
 
 	// FIXME: Undo doesn't work in the code below.
 
@@ -258,13 +258,13 @@
 	UKObjectsEqual(@"Alice (cell)", [leaf1 valueForProperty: @"label"]);
 	[doc1Track undo]; 
 	UKObjectsEqual(@"Alice", [leaf1 valueForProperty: @"label"]);
-	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID]), [ctx changedObjectUUIDs]);
+	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID]), [ctx updatedObjectUUIDs]);
 	
 	// next undo should change group1's label from "Work Contacts" -> "Group 1"
 	UKObjectsEqual(@"Work Contacts", [group1 valueForProperty: @"label"]);
 	[doc1Track undo]; 
 	UKObjectsEqual(@"Group 1", [group1 valueForProperty: @"label"]);
-	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID]), [ctx changedObjectUUIDs]);
+	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID]), [ctx updatedObjectUUIDs]);
 	
 	// next undo should move group2 from document 2 back to document 1
 	UKTrue([[document2 contentArray] containsObject: group2]);
@@ -274,7 +274,7 @@
 	UKFalse([[document2 contentArray] containsObject: group2]);
 	UKTrue([[document1 contentArray] containsObject: group2]);
 	UKObjectsSame(document1, [group2 valueForProperty: @"parentContainer"]);
-	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID]), [ctx changedObjectUUIDs]);
+	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID]), [ctx updatedObjectUUIDs]);
 */	
 	// FIXME: After group 2 is moved back to doc1, the next undo will actually
 	// be the newest changes in group 2 (e.g. Leaf 6 -> Beer, and Leaf 5 -> Pizza)
@@ -289,19 +289,19 @@
 	UKFalse([[group2 contentArray] containsObject: leaf2]);
 	UKTrue([[group1 contentArray] containsObject: leaf2]);
 	UKObjectsSame(group1, [leaf2 valueForProperty: @"parentContainer"]);
-	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx changedObjectUUIDs]);
+	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx updatedObjectUUIDs]);
 	
 	// next undo should rename leaf2 "Tomatoes" -> "Leaf 2"
 	UKObjectsEqual(@"Tomatoes", [leaf2 valueForProperty: @"label"]);
 	[doc1Track undo]; 
 	UKObjectsEqual(@"Leaf 2", [leaf2 valueForProperty: @"label"]);
-	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx changedObjectUUIDs]);
+	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx updatedObjectUUIDs]);
 
 	// next undo should rename document 1 "My Contacts" -> "Document 1"
 	UKObjectsEqual(@"My Contacts", [document1 valueForProperty: @"label"]);
 	[doc1Track undo]; 
 	UKObjectsEqual(@"Document 1", [document1 valueForProperty: @"label"]);
-	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx changedObjectUUIDs]);
+	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx updatedObjectUUIDs]);
 	
 	// FIXME: The next undo would undo the initial commit of Document 1.
 	// Need to decide what happens if you try to undo it

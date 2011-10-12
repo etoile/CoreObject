@@ -104,6 +104,11 @@ static COEditingContext *currentCtxt = nil;
 	return [NSSet setWithArray: [_instantiatedObjects allValues]];
 }
 
+- (NSSet *)insertedObjects
+{
+	return [NSSet setWithSet: _insertedObjects];
+}
+
 - (NSSet *)updatedObjects
 {
 	NSMutableSet *updatedObjects = [NSMutableSet set];
@@ -113,6 +118,11 @@ static COEditingContext *currentCtxt = nil;
 		[updatedObjects addObject: [self objectWithUUID: uuid]];
 	}
 	return updatedObjects;
+}
+
+- (NSSet *)updatedObjectUUIDs
+{
+	return [NSSet setWithArray: [_damagedObjectUUIDs allKeys]];
 }
 
 - (NSSet *)deletedObjects
@@ -136,10 +146,6 @@ static COEditingContext *currentCtxt = nil;
 - (BOOL) objectHasChanges: (ETUUID*)uuid
 {
 	return [_damagedObjectUUIDs objectForKey: uuid] != nil;
-}
-- (NSSet*) changedObjectUUIDs
-{
-	return [NSSet setWithArray: [_damagedObjectUUIDs allKeys]];
 }
 
 // Creating and accessing objects
