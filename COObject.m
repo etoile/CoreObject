@@ -18,9 +18,10 @@
 
 	// TODO: Move these properties to EtoileFoundation... See -[NSObject propertyNames].
 	// We should create a NSObject entity description and use it as our parent entity probably.
-
+#ifndef GNUSTEP // We don't link NSImage on GNUstep because AppKit won't work
 	ETPropertyDescription *iconProperty = 
 		[ETPropertyDescription descriptionWithName: @"icon" type: (id)@"Anonymous.NSImage"];
+#endif // GNUSTEP
 	ETPropertyDescription *displayNameProperty = 
 		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"Anonymous.NSString"];
 
@@ -36,8 +37,11 @@
 		[ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.COCollection"];
 	
 	[parentCollectionsProperty setMultivalued: YES];
-
+#ifdef GNUSTEP
+	NSArray *transientProperties = A(displayNameProperty);
+#else
 	NSArray *transientProperties = A(iconProperty, displayNameProperty);
+#endif
 	NSArray *persistentProperties = A(parentContainerProperty, parentCollectionsProperty);
 
 	[[persistentProperties mappedCollection] setPersistent: YES];
