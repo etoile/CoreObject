@@ -196,7 +196,7 @@
 
 - (BOOL) isDamaged
 {
-	return [_context objectHasChanges: _uuid]; 
+	return [_context isUpdatedObject: self]; 
 }
 
 /* Helper methods based on the metamodel */

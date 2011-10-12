@@ -99,6 +99,16 @@ static COEditingContext *currentCtxt = nil;
 	return cls;
 }
 
+- (COObject *)objectWithUUID: (ETUUID *)uuid
+{
+	return [self objectWithUUID: uuid entityName: nil];
+}
+
+- (COObject *)objectWithUUID: (ETUUID *)uuid atRevision: (CORevision *)revision
+{
+	return [self objectWithUUID: uuid entityName: nil atRevision: revision];
+}
+
 - (NSSet *)loadedObjects
 {
 	return [NSSet setWithArray: [_instantiatedObjects allValues]];
@@ -125,6 +135,11 @@ static COEditingContext *currentCtxt = nil;
 	return [NSSet setWithArray: [_damagedObjectUUIDs allKeys]];
 }
 
+- (BOOL)isUpdatedObject: (COObject *)anObject
+{
+	return ([_damagedObjectUUIDs objectForKey:[anObject UUID]] != nil);
+}
+
 - (NSSet *)deletedObjects
 {
 	return [NSSet setWithSet: _deletedObjects];
@@ -141,11 +156,6 @@ static COEditingContext *currentCtxt = nil;
 	return ([_damagedObjectUUIDs count] > 0 
 		|| [_insertedObjects count] > 0 
 		|| [_deletedObjects count] > 0);
-}
-
-- (BOOL) objectHasChanges: (ETUUID*)uuid
-{
-	return [_damagedObjectUUIDs objectForKey: uuid] != nil;
 }
 
 // Creating and accessing objects
@@ -193,16 +203,6 @@ static COEditingContext *currentCtxt = nil;
 - (COObject*) insertObjectWithEntityName: (NSString*)aFullName rootObject: (COObject*)rootObject
 {
 	return [self insertObjectWithEntityName: aFullName UUID: [ETUUID UUID] rootObject: rootObject];
-}
-
-- (COObject*) objectWithUUID: (ETUUID*)uuid
-{
-	return [self objectWithUUID: uuid entityName: nil];
-}
-
-- (COObject*) objectWithUUID: (ETUUID*)uuid atRevision: (CORevision*)revision
-{
-	return [self objectWithUUID: uuid entityName: nil atRevision: revision];
 }
 
 /**
@@ -342,8 +342,6 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	[_deletedObjects addObject: anObject];
 	[_instantiatedObjects removeObjectForKey: [anObject UUID]];
 }
-
-// Committing changes
 
 - (NSMapTable *) UUIDsByRootObjectFromObjectUUIDs: (id <ETCollection>)objectUUIDs
 {

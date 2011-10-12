@@ -92,7 +92,10 @@
  */
 - (Class)classForEntityDescription: (ETEntityDescription *)desc;
 
-/** @taskunit Object Loading */
+/** @taskunit Object Access and Loading */
+
+- (COObject*) objectWithUUID: (ETUUID*)uuid;
+- (COObject*) objectWithUUID: (ETUUID*)uuid atRevision: (CORevision*)revision;
 
 /**
  * Returns the objects presently managed by the receiver in memory.
@@ -121,6 +124,13 @@
  * Returns the UUIDs of the objects updated since the last commit. See -updatedObjects.
  */
 - (NSSet *)updatedObjectUUIDs;
+/**
+ * Returns whether the object has been updated since the last commit. See 
+ * -updatedObjects.
+ *
+ * Won't return YES if the object has just been inserted or deleted.
+ */
+- (BOOL)isUpdatedObject: (COObject *)anObject;
 /** 
  * Returns the objects deleted in the context with -deleteObject: and to be 
  * deleted in the store on the next commit.
@@ -140,15 +150,12 @@
 /**
  * Returns whether any object has been inserted, deleted or updated since the 
  * last commit.
+ *
+ * See also -changedObjects.
  */
 - (BOOL) hasChanges;
-/**
- * Returns whether the object that corresponds to the UUID has been updated 
- * since the last commit.
- *
- * Won't return YES if the object has just been inserted or deleted.
- */
-- (BOOL) objectHasChanges: (ETUUID*)uuid;
+
+/** @taskunit Object Insertion */
 
 /**
  * Creates a new instance of the given entity name (assigning the instance a new UUID)
@@ -178,19 +185,18 @@
 
 - (id) insertObject: (COObject*)sourceObject withRelationshipConsistency: (BOOL)consistency newUUID: (BOOL)newUUID; //Private
 
-- (COObject*) objectWithUUID: (ETUUID*)uuid;
-- (COObject*) objectWithUUID: (ETUUID*)uuid atRevision: (CORevision*)revision;
+/** @taskunit Object Deletion */
 
 - (void)deleteObject: (COObject *)anObject;
 
-// Committing changes
+/** @taskunit Committing Changes */
 
 - (void) commit;
 - (void) commitWithType: (NSString*)type
        shortDescription: (NSString*)shortDescription
         longDescription: (NSString*)longDescription;
 
-// Private
+/** @taskunit Private */
 
 - (void) commitWithMetadata: (NSDictionary*)metadata;
 

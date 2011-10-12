@@ -106,31 +106,31 @@
 	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.COContainer"];
 	[ctx commit];
 	
-	UKFalse([ctx objectHasChanges: [o1 UUID]]);
-	UKFalse([ctx objectHasChanges: [o2 UUID]]);
-	UKFalse([ctx objectHasChanges: [o3 UUID]]);
+	UKFalse([ctx isUpdatedObject: o1]);
+	UKFalse([ctx isUpdatedObject: o2]);
+	UKFalse([ctx isUpdatedObject: o3]);
 			 
 	[o2 setValue: o1 forProperty: @"parentContainer"]; // should add o2 to o1's contents
-	UKTrue([ctx objectHasChanges: [o1 UUID]]);
-	UKTrue([ctx objectHasChanges: [o2 UUID]]);
-	UKFalse([ctx objectHasChanges: [o3 UUID]]);
+	UKTrue([ctx isUpdatedObject: o1]);
+	UKTrue([ctx isUpdatedObject: o2]);
+	UKFalse([ctx isUpdatedObject: o3]);
 	
 	[ctx commit];
-	UKFalse([ctx objectHasChanges: [o1 UUID]]);
-	UKFalse([ctx objectHasChanges: [o2 UUID]]);
-	UKFalse([ctx objectHasChanges: [o3 UUID]]);
+	UKFalse([ctx isUpdatedObject: o1]);
+	UKFalse([ctx isUpdatedObject: o2]);
+	UKFalse([ctx isUpdatedObject: o3]);
 	
 	[o2 setValue: o3 forProperty: @"parentContainer"]; // should add o2 to o3's contents, and remove o2 from o1
-	UKTrue([ctx objectHasChanges: [o1 UUID]]);
-	UKTrue([ctx objectHasChanges: [o2 UUID]]);
-	UKTrue([ctx objectHasChanges: [o3 UUID]]);
+	UKTrue([ctx isUpdatedObject: o1]);
+	UKTrue([ctx isUpdatedObject: o2]);
+	UKTrue([ctx isUpdatedObject: o3]);
 	
 	[ctx commit];
 	
 	[o3 removeObject: o2 forProperty: @"contents"]; // should make o2's parentContainer nil
-	UKFalse([ctx objectHasChanges: [o1 UUID]]);
-	UKTrue([ctx objectHasChanges: [o2 UUID]]);
-	UKTrue([ctx objectHasChanges: [o3 UUID]]);	
+	UKFalse([ctx isUpdatedObject: o1]);
+	UKTrue([ctx isUpdatedObject: o2]);
+	UKTrue([ctx isUpdatedObject: o3]);	
 
 	[ctx release];
 	CLOSE_STORE(store);
