@@ -92,13 +92,45 @@
  */
 - (Class)classForEntityDescription: (ETEntityDescription *)desc;
 
+/** @taskunit Object Loading */
+
 /**
  * Returns the objects presently managed by the receiver in memory.
  *
  * Faults can be included among the returned objects.
  */
-- (NSSet *) loadedObjects;
+- (NSSet *)loadedObjects;
 
+/** @taskunit Pending Changes */
+
+/** 
+ * Returns the new objects added to the context with -insertObject: and to be 
+ * added to the store on the next commit.
+ *
+ * After a commit, returns an empty set.
+ */
+- (NSSet *)insertedObjects;
+/** 
+ * Returns the objects whose properties have been edited in the context and to 
+ * be updated in the store on the next commit.
+ *
+ * After a commit, returns an empty set.
+ */
+- (NSSet *)updatedObjects;
+/** 
+ * Returns the objects deleted in the context with -deleteObject: and to be 
+ * deleted in the store on the next commit.
+ *
+ * After a commit, returns an empty set.
+ */
+- (NSSet *)deletedObjects;
+/** 
+ * Returns the union of the inserted, updated and deleted objects. See 
+ * -insertedObjects, -updatedObjects and -deletedObjects.
+ *
+ * After a commit, returns an empty set.
+ */
+- (NSSet *)changedObjects;
 /**
  * Returns whether any object has been inserted, deleted or updated since the 
  * last commit.
@@ -117,7 +149,6 @@
  * Doesn't include newly inserted or deleted objects.
  */
 - (NSSet*) changedObjectUUIDs;
-
 
 /**
  * Creates a new instance of the given entity name (assigning the instance a new UUID)

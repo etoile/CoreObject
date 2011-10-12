@@ -99,9 +99,31 @@ static COEditingContext *currentCtxt = nil;
 	return cls;
 }
 
-- (NSSet *) loadedObjects
+- (NSSet *)loadedObjects
 {
 	return [NSSet setWithArray: [_instantiatedObjects allValues]];
+}
+
+- (NSSet *)updatedObjects
+{
+	NSMutableSet *updatedObjects = [NSMutableSet set];
+
+	for (ETUUID *uuid in [_damagedObjectUUIDs allKeys])
+	{
+		[updatedObjects addObject: [self objectWithUUID: uuid]];
+	}
+	return updatedObjects;
+}
+
+- (NSSet *)deletedObjects
+{
+	return [NSSet setWithSet: _deletedObjects];
+}
+
+- (NSSet *)changedObjects
+{
+	NSSet *changedObjects = [_insertedObjects setByAddingObjectsFromSet: _deletedObjects];
+	return [changedObjects setByAddingObjectsFromSet: [self updatedObjects]];
 }
 
 - (BOOL) hasChanges
