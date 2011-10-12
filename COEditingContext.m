@@ -47,7 +47,7 @@ static COEditingContext *currentCtxt = nil;
 		parent] name] isEqual: @"COObject"]);
 	
 	_insertedObjects = [[NSMutableSet alloc] init];
-	_deletedObjectUUIDs = [[NSMutableSet alloc] init];
+	_deletedObjects = [[NSMutableSet alloc] init];
 	
 	return self;
 }
@@ -65,7 +65,7 @@ static COEditingContext *currentCtxt = nil;
 	DESTROY(_modelRepository);
 	
 	DESTROY(_insertedObjects);
-	DESTROY(_deletedObjectUUIDs);
+	DESTROY(_deletedObjects);
 	DESTROY(_rootObjectRevisions);
 	DESTROY(_rootObjectCommitTracks);
 	[super dealloc];
@@ -108,7 +108,7 @@ static COEditingContext *currentCtxt = nil;
 {
 	return ([_damagedObjectUUIDs count] > 0 
 		|| [_insertedObjects count] > 0 
-		|| [_deletedObjectUUIDs count] > 0);
+		|| [_deletedObjects count] > 0);
 }
 
 - (BOOL) objectHasChanges: (ETUUID*)uuid
@@ -309,10 +309,10 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	return [self insertObject: sourceObject withRelationshipConsistency: YES newUUID: YES];
 }
 
-- (void) deleteObjectWithUUID: (ETUUID*)uuid
+- (void)deleteObject: (COObject *)anObject
 {
-	[_deletedObjectUUIDs addObject: uuid];
-	[_instantiatedObjects removeObjectForKey: uuid];
+	[_deletedObjects addObject: anObject];
+	[_instantiatedObjects removeObjectForKey: [anObject UUID]];
 }
 
 // Committing changes

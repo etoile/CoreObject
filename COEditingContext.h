@@ -25,7 +25,7 @@
 	ETModelDescriptionRepository *_modelRepository;
 
 	NSMutableSet *_insertedObjects;
-	NSMutableSet *_deletedObjectUUIDs;
+	NSMutableSet *_deletedObjects;
 }
 
 /** @taskunit Accessing the current context */
@@ -150,7 +150,7 @@
 - (COObject*) objectWithUUID: (ETUUID*)uuid;
 - (COObject*) objectWithUUID: (ETUUID*)uuid atRevision: (CORevision*)revision;
 
-- (void) deleteObjectWithUUID: (ETUUID*)uuid;
+- (void)deleteObject: (COObject *)anObject;
 
 // Committing changes
 

@@ -404,7 +404,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	}	
 	for (ETUUID *uuid in _deletedObjectUUIDs)
 	{
-		[ctx deleteObjectWithUUID: uuid];
+		[ctx deleteObject: [ctxt objectWithUUID: uuid]];
 	}
 	for (ETUUID *uuid in _editsByPropertyAndUUID)
 	{
