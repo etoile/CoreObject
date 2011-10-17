@@ -95,8 +95,34 @@
 
 /** @taskunit Object Access and Loading */
 
-- (COObject*) objectWithUUID: (ETUUID*)uuid;
-- (COObject*) objectWithUUID: (ETUUID*)uuid atRevision: (CORevision*)revision;
+/** 
+ * Returns the object identified by the UUID, by loading it to its last revision 
+ * when no instance managed by the receiver is present in memory.
+ *
+ * When the UUID doesn't correspond to a persistent object, returns nil.
+ *
+ * When the object is a inner object, the last revision is the one that is tied  
+ * to its root object last revision.
+ *
+ * See also -objectWithUUID:atRevision: and -loadedObjectForUUID:.
+ */
+- (COObject *)objectWithUUID: (ETUUID *)uuid;
+/** 
+ * Returns the object identified by the UUID, by loading it to the given 
+ * revision when no instance managed by the receiver is present in memory.
+ *
+ * When the UUID doesn't correspond to a persistent object, returns nil.
+ *
+ * For a nil revision, the object is loaded is loaded at its last revision.
+ *
+ * When the object is a inner object, the last revision is the one that is tied  
+ * to its root object last revision. 
+ *
+ * When the object is already loaded, and its revision is not the requested 
+ * revision, raises an invalid argument exception.
+ *
+ * See also -loadedObjectForUUID:. */
+- (COObject *)objectWithUUID: (ETUUID *)uuid atRevision: (CORevision *)revision;
 
 /**
  * Returns the objects presently managed by the receiver in memory.
@@ -104,6 +130,20 @@
  * Faults can be included among the returned objects.
  */
 - (NSSet *)loadedObjects;
+/**
+ * Returns the root objects presently managed by the receiver in memory.
+ *
+ * Faults can be included among the returned objects.
+ *
+ * The returned objects are a subset of -loadedObjects.
+ */
+- (NSSet *)loadedRootObjects;
+/** Returns the object identified by the UUID if presently loaded in memory. 
+ *
+ * When the object is not loaded, or when there is no persistent object that 
+ * corresponds to this UUID, returns nil.
+ */
+- (id)loadedObjectForUUID: (ETUUID *)uuid;
 
 /** @taskunit Pending Changes */
 
@@ -154,52 +194,79 @@
  *
  * See also -changedObjects.
  */
-- (BOOL) hasChanges;
+- (BOOL)hasChanges;
 
 /** @taskunit Object Insertion */
 
 /**
  * Creates a new instance of the given entity name (assigning the instance a new UUID)
- * and returns the object. This is the factory method for COObject.
+ * and returns the object.
+ *
+ * The new instance is a root object.
+ *
+ * See also -insertObjectWithEntityName:rootObject:.
  */
-- (id) insertObjectWithEntityName: (NSString*)aFullName;
+- (id)insertObjectWithEntityName: (NSString *)aFullName;
 /**
  * Creates a new instance of the given entity name (assigning the instance a new UUID)
- * under the specified root object and returns the object. This is the factory method for COObject.
+ * under the specified root object and returns the object. 
+ *
+ * The entity name must correspond to the COObject class or a subclass. Thereby 
+ * returned objects will be COObject class or subclass instances in all cases.
+ *
+ * When rootObject is nil, the new instance is a root object.
+ * 
+ * This is the factory method for COObject class hierarchy.
  */
-- (id) insertObjectWithEntityName: (NSString*)aFullName rootObject: (COObject*)rootObject;
+- (id)insertObjectWithEntityName: (NSString *)aFullName rootObject: (COObject *)rootObject;
 /**
  * Creates a new instance of the given class (assigning the instance a new UUID)
  * and returns the object.
+ *
+ * When rootObject is nil, the new instance is a root object.
+ *
+ * See also -insertObjectWithEntityName:rootObject:.
  */
-- (id) insertObjectWithClass: (Class)aClass;
+- (id)insertObjectWithClass: (Class)aClass rootObject: (COObject *)rootObject;
 /**
  * Copies an object from another context into this context.
- * The copy refers to the same underlying Core Object (same UUID)
+ *
+ * The copy refers to the same underlying persistent object (same UUID).
  */
-- (id) insertObject: (COObject*)sourceObject;
+- (id)insertObject: (COObject *)sourceObject;
 /**
- * Creates a copy of a Core Object (assigning it a new UUID), including copying
- * all strongly contained objects (composite properties)
+ * Creates a copy of an object (assigning it a new UUID), including copying
+ * all strongly contained objects (composite properties).
  */
-- (id) insertObjectCopy: (COObject*)sourceObject;
-
-- (id) insertObject: (COObject*)sourceObject withRelationshipConsistency: (BOOL)consistency newUUID: (BOOL)newUUID; //Private
+- (id)insertObjectCopy: (COObject *)sourceObject;
 
 /** @taskunit Object Deletion */
 
+/**
+ * Schedules the object to be deleted both in memory and in store on the next 
+ * commit.
+ */
 - (void)deleteObject: (COObject *)anObject;
 
 /** @taskunit Committing Changes */
 
-- (void) commit;
-- (void) commitWithType: (NSString*)type
-       shortDescription: (NSString*)shortDescription
-        longDescription: (NSString*)longDescription;
+/**
+ * Commits the current changes to the store.
+ */
+- (void)commit;
+/**
+ * Commits the current changes to the store with some basic metadatas.
+ *
+ * The descriptions will be visible at the UI level when browsing the history.
+ */
+- (void)commitWithType: (NSString *)type
+      shortDescription: (NSString *)shortDescription
+       longDescription: (NSString *)longDescription;
 
 /** @taskunit Private */
 
-- (void) commitWithMetadata: (NSDictionary*)metadata;
+- (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency newUUID: (BOOL)newUUID;
+- (void)commitWithMetadata: (NSDictionary *)metadata;
 
 @end
 

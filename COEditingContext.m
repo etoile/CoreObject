@@ -114,6 +114,18 @@ static COEditingContext *currentCtxt = nil;
 	return [NSSet setWithArray: [_instantiatedObjects allValues]];
 }
 
+- (NSSet *)loadedRootObjects
+{
+	NSMutableSet *loadedRootObjects = [NSMutableSet setWithSet: [self loadedObjects]];
+	[[loadedRootObjects filter] isRoot];
+	return loadedRootObjects;
+}
+
+- (id)loadedObjectForUUID: (ETUUID *)uuid
+{
+	return [_instantiatedObjects objectForKey: uuid];
+}
+
 - (NSSet *)insertedObjects
 {
 	return [NSSet setWithSet: _insertedObjects];
@@ -145,22 +157,22 @@ static COEditingContext *currentCtxt = nil;
 	return [changedObjects setByAddingObjectsFromSet: [self updatedObjects]];
 }
 
-- (BOOL) hasChanges
+- (BOOL)hasChanges
 {
 	return ([_updatedPropertiesByObject count] > 0 
 		|| [_insertedObjects count] > 0 
 		|| [_deletedObjects count] > 0);
 }
 
-// Creating and accessing objects
-
-- (void) registerObject: (COObject *)object
+- (void)registerObject: (COObject *)object
 {
 	[_instantiatedObjects setObject: object forKey: [object UUID]];
 	[_insertedObjects addObject: object];
 }
 
-- (COObject*) insertObjectWithEntityName: (NSString*)aFullName UUID: (ETUUID*)aUUID rootObject: (COObject*)rootObject
+- (COObject *)insertObjectWithEntityName: (NSString *)aFullName 
+                                    UUID: (ETUUID *)aUUID 
+                              rootObject: (COObject *)rootObject
 {
 	COObject *result = nil;
 	ETEntityDescription *desc = [_modelRepository descriptionForName: aFullName];
@@ -184,17 +196,17 @@ static COEditingContext *currentCtxt = nil;
 	return result;
 }
 
-- (COObject *) insertObjectWithClass: (Class)aClass
+- (id)insertObjectWithClass: (Class)aClass rootObject: (COObject *)rootObject;
 {
 	return [self insertObjectWithEntityName: [[_modelRepository entityDescriptionForClass: aClass] fullName]];
 }
 
-- (COObject*) insertObjectWithEntityName: (NSString*)aFullName
+- (id)insertObjectWithEntityName: (NSString *)aFullName
 {
 	return [self insertObjectWithEntityName:aFullName UUID: [ETUUID UUID] rootObject: nil];
 }
 
-- (COObject*) insertObjectWithEntityName: (NSString*)aFullName rootObject: (COObject*)rootObject
+- (id)insertObjectWithEntityName: (NSString *)aFullName rootObject: (COObject *)rootObject
 {
 	return [self insertObjectWithEntityName: aFullName UUID: [ETUUID UUID] rootObject: rootObject];
 }
@@ -256,7 +268,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	}
 }
 
-- (id) insertObject: (COObject*)sourceObject withRelationshipConsistency: (BOOL)consistency  newUUID: (BOOL)newUUID
+- (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency  newUUID: (BOOL)newUUID
 {
 	COEditingContext *sourceContext = [sourceObject editingContext];
 	ETAssert(sourceContext != nil);
@@ -321,12 +333,12 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	return copy;
 }
 
-- (id) insertObject: (COObject*)sourceObject
+- (id)insertObject: (COObject *)sourceObject
 {
 	return [self insertObject: sourceObject withRelationshipConsistency: YES newUUID: NO];
 }
 
-- (id) insertObjectCopy: (COObject*)sourceObject
+- (id)insertObjectCopy: (COObject *)sourceObject
 {
 	return [self insertObject: sourceObject withRelationshipConsistency: YES newUUID: YES];
 }
@@ -337,7 +349,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	[_instantiatedObjects removeObjectForKey: [anObject UUID]];
 }
 
-- (NSMapTable *) objectsByRootObjectFromObjects: (id <ETCollection>)objects
+- (NSMapTable *)objectsByRootObjectFromObjects: (id <ETCollection>)objects
 {
 	NSMapTable *objectsByRootObject = [NSMapTable mapTableWithStrongToStrongObjects];
 
@@ -357,24 +369,24 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	return objectsByRootObject;
 }
 
-- (NSMapTable *) insertedObjectsByRootObject
+- (NSMapTable *)insertedObjectsByRootObject
 {
 	return [self objectsByRootObjectFromObjects: _insertedObjects];
 }
 
-- (NSMapTable *) updatedObjectsByRootObject
+- (NSMapTable *)updatedObjectsByRootObject
 {
 	return [self objectsByRootObjectFromObjects: [_updatedPropertiesByObject allKeys]];
 }
 
-- (void) commit
+- (void)commit
 {
 	[self commitWithType: nil shortDescription: nil longDescription: nil];
 }
 
-- (void) commitWithType: (NSString*)type
-       shortDescription: (NSString*)shortDescription
-        longDescription: (NSString*)longDescription
+- (void)commitWithType: (NSString*)type
+      shortDescription: (NSString*)shortDescription
+       longDescription: (NSString*)longDescription
 {
 	NSString *commitType = type;
 
@@ -386,7 +398,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		longDescription, @"longDescription", commitType, @"type")];
 }
 
-- (NSMapTable *) updatedPropertySubsetForObjects: (NSArray *)keys
+- (NSMapTable *)updatedPropertySubsetForObjects: (NSArray *)keys
 {
 	NSMapTable *subset = [NSMapTable mapTableWithStrongToStrongObjects];
 
@@ -402,10 +414,10 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	return subset;
 }
 
-- (void) commitWithMetadata: (NSDictionary *)metadata 
-                 rootObject: (COObject *)rootObject
-            insertedObjects: (NSSet *)insertedObjects
-          updatedProperties: (NSMapTable *)updatedPropertiesByObject
+- (void)commitWithMetadata: (NSDictionary *)metadata 
+                rootObject: (COObject *)rootObject
+           insertedObjects: (NSSet *)insertedObjects
+         updatedProperties: (NSMapTable *)updatedPropertiesByObject
 {
 	NSParameterAssert(rootObject != nil);
 	NSParameterAssert(insertedObjects != nil);
@@ -437,9 +449,9 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		else
 		{
 			// otherwise just damaged values
-			NSArray *damagedProperties = [updatedPropertiesByObject objectForKey: obj];
+			NSArray *updatedProperties = [updatedPropertiesByObject objectForKey: obj];
 
-			propertiesToCommit = [NSMutableSet setWithArray: damagedProperties];
+			propertiesToCommit = [NSMutableSet setWithArray: updatedProperties];
 			[(NSMutableSet *)propertiesToCommit intersectSet: [NSSet setWithArray: persistentProperties]];
 			ETAssert([_insertedObjects containsObject: obj] == NO);
 		}
@@ -479,7 +491,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	}
 }
 
-- (void) commitWithMetadata: (NSDictionary*)metadata
+- (void)commitWithMetadata: (NSDictionary *)metadata
 {
 	NSMapTable *insertedObjectsByRoot = [self insertedObjectsByRootObject];
 	NSMapTable *updatedObjectsByRoot = [self updatedObjectsByRootObject];
