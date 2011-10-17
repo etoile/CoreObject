@@ -36,18 +36,19 @@ static COEditingContext *currentCtxt = nil;
 	ASSIGN(_store, store);
 	_maxRevisionNumber = maxRevisionNumber;	
 
-	_damagedObjectUUIDs = [[NSMutableDictionary alloc] init];
-	_instantiatedObjects = [[NSMutableDictionary alloc] init];
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
+
 	_rootObjectRevisions = [NSMutableDictionary new];
 	_rootObjectCommitTracks = [NSMutableDictionary new];
 	assert([[[_modelRepository descriptionForName: @"Anonymous.COContainer"] 
 		propertyDescriptionForName: @"contents"] isComposite]);
 	assert([[[[_modelRepository descriptionForName: @"Anonymous.COCollection"] 
 		parent] name] isEqual: @"COObject"]);
-	
+
+	_instantiatedObjects = [[NSMutableDictionary alloc] init];
 	_insertedObjects = [[NSMutableSet alloc] init];
 	_deletedObjects = [[NSMutableSet alloc] init];
+	ASSIGN(_updatedPropertiesByObject, [NSMapTable mapTableWithStrongToStrongObjects]);
 	
 	return self;
 }
@@ -60,14 +61,13 @@ static COEditingContext *currentCtxt = nil;
 - (void) dealloc
 {
 	DESTROY(_store);
-	DESTROY(_damagedObjectUUIDs);
-	DESTROY(_instantiatedObjects);
 	DESTROY(_modelRepository);
-	
-	DESTROY(_insertedObjects);
-	DESTROY(_deletedObjects);
 	DESTROY(_rootObjectRevisions);
 	DESTROY(_rootObjectCommitTracks);
+	DESTROY(_instantiatedObjects);
+	DESTROY(_insertedObjects);
+	DESTROY(_deletedObjects);
+	DESTROY(_updatedPropertiesByObject);
 	[super dealloc];
 }
 
@@ -121,23 +121,17 @@ static COEditingContext *currentCtxt = nil;
 
 - (NSSet *)updatedObjects
 {
-	NSMutableSet *updatedObjects = [NSMutableSet set];
-
-	for (ETUUID *uuid in [_damagedObjectUUIDs allKeys])
-	{
-		[updatedObjects addObject: [self objectWithUUID: uuid]];
-	}
-	return updatedObjects;
+	return [NSSet setWithArray: [_updatedPropertiesByObject allKeys]];
 }
 
 - (NSSet *)updatedObjectUUIDs
 {
-	return [NSSet setWithArray: [_damagedObjectUUIDs allKeys]];
+	return [NSSet setWithArray: (id)[[[_updatedPropertiesByObject allKeys] mappedCollection] UUID]];
 }
 
 - (BOOL)isUpdatedObject: (COObject *)anObject
 {
-	return ([_damagedObjectUUIDs objectForKey:[anObject UUID]] != nil);
+	return ([_updatedPropertiesByObject objectForKey: anObject] != nil);
 }
 
 - (NSSet *)deletedObjects
@@ -153,7 +147,7 @@ static COEditingContext *currentCtxt = nil;
 
 - (BOOL) hasChanges
 {
-	return ([_damagedObjectUUIDs count] > 0 
+	return ([_updatedPropertiesByObject count] > 0 
 		|| [_insertedObjects count] > 0 
 		|| [_deletedObjects count] > 0);
 }
@@ -371,7 +365,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 - (NSMapTable *) damagedObjectUUIDsByRootObject
 {
-	return [self UUIDsByRootObjectFromObjectUUIDs: [_damagedObjectUUIDs allKeys]];
+	return [self UUIDsByRootObjectFromObjectUUIDs: (id)[[[_updatedPropertiesByObject allKeys] mappedCollection] UUID]];
 }
 
 - (void) commit
@@ -397,13 +391,13 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 {
 	NSMutableDictionary *subset = [NSMutableDictionary dictionary];
 
-	for (ETUUID *uuid in _damagedObjectUUIDs)
+	for (COObject *obj in _updatedPropertiesByObject)
 	{
-		if ([keys containsObject: uuid] == NO)
+		if ([keys containsObject: [obj UUID]] == NO)
 			continue;
 
-		[subset setObject: [_damagedObjectUUIDs objectForKey: uuid] 
-		           forKey: uuid];
+		[subset setObject: [_updatedPropertiesByObject objectForKey: obj] 
+		           forKey: [obj UUID]];
 	}
 
 	return subset;
@@ -534,20 +528,20 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
  
 - (void) markObjectDamaged: (COObject*)obj forProperty: (NSString*)aProperty
 {
-	if (nil == [_damagedObjectUUIDs objectForKey: [obj UUID]])
+	if (nil == [_updatedPropertiesByObject objectForKey: obj])
 	{
-		[_damagedObjectUUIDs setObject: [NSMutableArray array] forKey: [obj UUID]];
+		[_updatedPropertiesByObject setObject: [NSMutableArray array] forKey: obj];
 	}
 	if (aProperty != nil)
 	{
 		assert([aProperty isKindOfClass: [NSString class]]);
-		[[_damagedObjectUUIDs objectForKey: [obj UUID]] addObject: aProperty]; 
+		[[_updatedPropertiesByObject objectForKey: obj] addObject: aProperty]; 
 	}
 }
 - (void) markObjectUndamaged: (COObject*)obj
 {
 	if (obj != nil)// FIXME: hack
-	[_damagedObjectUUIDs removeObjectForKey: [obj UUID]];
+	[_updatedPropertiesByObject removeObjectForKey: obj];
 }
  
 - (void) loadObject: (COObject*)obj

@@ -10,22 +10,23 @@
  */
 @interface COEditingContext : NSObject
 {
+	@private
 	COStore *_store;
-
 	int64_t _maxRevisionNumber;
-	
+
+	ETModelDescriptionRepository *_modelRepository;
+
+	NSMutableDictionary *_rootObjectRevisions; // UUID of root object -> revision mapping
+	NSMutableDictionary *_rootObjectCommitTracks; // UUID of root object -> commit track
+
+	NSMutableDictionary *_instantiatedObjects; // UUID -> COObject mapping
+	NSMutableSet *_insertedObjects;
+	NSMutableSet *_deletedObjects;
 	/**
 	 * Note: never modify directly; call -markObjectDamaged/-markObjectUndamaged instead.
 	 * Otherwise the cached value in COObject won't be updated.
 	 */
-	NSMutableDictionary *_damagedObjectUUIDs; // UUIDS of objects in this context which have uncommitted changes
-	NSMutableDictionary *_instantiatedObjects; // UUID -> COObject mapping
-	NSMutableDictionary *_rootObjectRevisions; // UUID of root object -> revision mapping
-	NSMutableDictionary *_rootObjectCommitTracks; // UUID of root object -> commit track
-	ETModelDescriptionRepository *_modelRepository;
-
-	NSMutableSet *_insertedObjects;
-	NSMutableSet *_deletedObjects;
+	NSMapTable *_updatedPropertiesByObject; // Updated object -> updated properties
 }
 
 /** @taskunit Accessing the current context */
