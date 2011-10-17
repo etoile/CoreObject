@@ -337,35 +337,34 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	[_instantiatedObjects removeObjectForKey: [anObject UUID]];
 }
 
-- (NSMapTable *) UUIDsByRootObjectFromObjectUUIDs: (id <ETCollection>)objectUUIDs
+- (NSMapTable *) objectsByRootObjectFromObjects: (id <ETCollection>)objects
 {
-	NSMapTable *UUIDsByRootObject = [NSMapTable mapTableWithStrongToStrongObjects];
+	NSMapTable *objectsByRootObject = [NSMapTable mapTableWithStrongToStrongObjects];
 
-	FOREACH(objectUUIDs, uuid, ETUUID*)
+	for (COObject *obj in objects)
 	{
-		COObject *object = [self objectWithUUID: uuid];
-		COObject *rootObject = [object rootObject];
-		NSMutableSet *UUIDs = [UUIDsByRootObject objectForKey: rootObject];
+		COObject *rootObject = [obj rootObject];
+		NSMutableSet *innerObjects = [objectsByRootObject objectForKey: rootObject];
 
-		if (UUIDs == nil)
+		if (innerObjects == nil)
 		{
-			UUIDs = [NSMutableSet set];
-			[UUIDsByRootObject setObject: UUIDs forKey: rootObject];
+			innerObjects = [NSMutableSet set];
+			[objectsByRootObject setObject: innerObjects forKey: rootObject];
 		}
-		[UUIDs addObject: uuid];
+		[innerObjects addObject: obj];
 	}
 
-	return UUIDsByRootObject;
+	return objectsByRootObject;
 }
 
-- (NSMapTable *) insertedObjectUUIDsByRootObject
+- (NSMapTable *) insertedObjectsByRootObject
 {
-	return [self UUIDsByRootObjectFromObjectUUIDs: (id)[[_insertedObjects mappedCollection] UUID]];
+	return [self objectsByRootObjectFromObjects: _insertedObjects];
 }
 
-- (NSMapTable *) damagedObjectUUIDsByRootObject
+- (NSMapTable *) updatedObjectsByRootObject
 {
-	return [self UUIDsByRootObjectFromObjectUUIDs: (id)[[[_updatedPropertiesByObject allKeys] mappedCollection] UUID]];
+	return [self objectsByRootObjectFromObjects: [_updatedPropertiesByObject allKeys]];
 }
 
 - (void) commit
@@ -387,17 +386,17 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		longDescription, @"longDescription", commitType, @"type")];
 }
 
-- (NSDictionary *) damagedObjectUUIDSubsetForUUIDs: (NSArray *)keys
+- (NSMapTable *) updatedPropertySubsetForObjects: (NSArray *)keys
 {
-	NSMutableDictionary *subset = [NSMutableDictionary dictionary];
+	NSMapTable *subset = [NSMapTable mapTableWithStrongToStrongObjects];
 
 	for (COObject *obj in _updatedPropertiesByObject)
 	{
-		if ([keys containsObject: [obj UUID]] == NO)
+		if ([keys containsObject: obj] == NO)
 			continue;
 
 		[subset setObject: [_updatedPropertiesByObject objectForKey: obj] 
-		           forKey: [obj UUID]];
+		           forKey: obj];
 	}
 
 	return subset;
@@ -405,32 +404,31 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 - (void) commitWithMetadata: (NSDictionary *)metadata 
                  rootObject: (COObject *)rootObject
-        insertedObjectUUIDs: (NSSet *)insertedObjectUUIDs
-         damagedObjectUUIDs: (NSDictionary *)damagedObjectUUIDs
+            insertedObjects: (NSSet *)insertedObjects
+          updatedProperties: (NSMapTable *)updatedPropertiesByObject
 {
 	NSParameterAssert(rootObject != nil);
-	NSParameterAssert(insertedObjectUUIDs != nil);
-	NSParameterAssert(damagedObjectUUIDs != nil);
+	NSParameterAssert(insertedObjects != nil);
+	NSParameterAssert(updatedPropertiesByObject != nil);
 	// TODO: ETAssert([rootObject isRoot]);
 	// TODO: We should add the deleted object UUIDs to the set below
-	NSSet *committedObjectUUIDs = 
-		[insertedObjectUUIDs setByAddingObjectsFromArray: [damagedObjectUUIDs allKeys]];
+	NSSet *committedObjects = 
+		[insertedObjects setByAddingObjectsFromArray: [updatedPropertiesByObject allKeys]];
 
 	[_store beginCommitWithMetadata: metadata 
 	                 rootObjectUUID: [rootObject UUID]
 	                   baseRevision: [rootObject revision]];
 
-	for (ETUUID *uuid in committedObjectUUIDs)
+	for (COObject *obj in committedObjects)
 	{		
-		[_store beginChangesForObjectUUID: uuid];
+		[_store beginChangesForObjectUUID: [obj UUID]];
 
-		COObject *obj = [self objectWithUUID: uuid];
 		NSArray *persistentProperties = [obj persistentPropertyNames];
 		id <ETCollection> propertiesToCommit = nil;
 
 		//NSLog(@"Committing changes for %@", obj);
 
-		if ([insertedObjectUUIDs containsObject: uuid])
+		if ([insertedObjects containsObject: obj])
 		{
 			// for the first commit, commit all property values
 			propertiesToCommit = persistentProperties;
@@ -439,7 +437,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		else
 		{
 			// otherwise just damaged values
-			NSArray *damagedProperties = [damagedObjectUUIDs objectForKey: uuid];
+			NSArray *damagedProperties = [updatedPropertiesByObject objectForKey: obj];
 
 			propertiesToCommit = [NSMutableSet setWithArray: damagedProperties];
 			[(NSMutableSet *)propertiesToCommit intersectSet: [NSSet setWithArray: persistentProperties]];
@@ -453,20 +451,19 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 			
 			[_store setValue: plist
 			     forProperty: prop
-			        ofObject: uuid
+			        ofObject: [obj UUID]
 			     shouldIndex: NO];
 		}
 		
 		// FIXME: Hack
-		NSString *name = [[[self objectWithUUID: uuid] 
-			entityDescription] 
-				fullName];
+		NSString *name = [[obj entityDescription] fullName];
+
 		[_store setValue: name
 		     forProperty: @"_entity"
-			ofObject: uuid
+		        ofObject: [obj UUID]
 		     shouldIndex: NO];
 		
-		[_store finishChangesForObjectUUID: uuid];
+		[_store finishChangesForObjectUUID: [obj UUID]];
 	}
 	
 	CORevision *rev = [_store finishCommit];
@@ -475,23 +472,19 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	[[_rootObjectCommitTracks objectForKey: [rootObject UUID]]
 		newCommitAtRevision: rev];
 	
-	//[_insertedObjects minusSet: insertedObjects];
-	for (ETUUID *uuid in insertedObjectUUIDs)
+	[_insertedObjects minusSet: insertedObjects];
+	for (COObject *obj in [updatedPropertiesByObject allKeys])
 	{
-		[_insertedObjects removeObject: [self objectWithUUID: uuid]];
-	}
-	for (ETUUID *uuid in [damagedObjectUUIDs allKeys])
-	{
-		[self markObjectUndamaged: [self objectWithUUID: uuid]];
+		[self markObjectUndamaged: obj];
 	}
 }
 
 - (void) commitWithMetadata: (NSDictionary*)metadata
 {
-	NSMapTable *insertedObjectUUIDs = [self insertedObjectUUIDsByRootObject];
-	NSMapTable *damagedObjectUUIDs = [self damagedObjectUUIDsByRootObject];
-	NSSet *rootObjects = [NSSet setWithArray: [[[insertedObjectUUIDs keyEnumerator] allObjects] 
-		arrayByAddingObjectsFromArray: [[damagedObjectUUIDs keyEnumerator] allObjects]]];
+	NSMapTable *insertedObjectsByRoot = [self insertedObjectsByRootObject];
+	NSMapTable *updatedObjectsByRoot = [self updatedObjectsByRootObject];
+	NSSet *rootObjects = [NSSet setWithArray: [[[insertedObjectsByRoot keyEnumerator] allObjects] 
+		arrayByAddingObjectsFromArray: [[updatedObjectsByRoot keyEnumerator] allObjects]]];
 
 	NSMutableSet *insertedRootObjectUUIDs = [NSMutableSet setWithSet: (id)[[_insertedObjects mappedCollection] UUID]];
 	[insertedRootObjectUUIDs intersectSet: (id)[[rootObjects mappedCollection] UUID]];
@@ -500,26 +493,16 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	// TODO: Add a batch commit UUID in the metadata
 	for (COObject *rootObject in rootObjects)
 	{
-		NSSet *insertedObjectSubset = [insertedObjectUUIDs objectForKey: rootObject];
-		NSDictionary *damagedObjectUUIDSubset = [self damagedObjectUUIDSubsetForUUIDs: 
-			[damagedObjectUUIDs objectForKey: rootObject]];
+		NSSet *insertedObjectSubset = [insertedObjectsByRoot objectForKey: rootObject];
+		NSMapTable *updatedPropertySubset = [self updatedPropertySubsetForObjects: 
+			[updatedObjectsByRoot objectForKey: rootObject]];
 
 		[self commitWithMetadata: metadata 
 		              rootObject: rootObject
-		     insertedObjectUUIDs: (insertedObjectSubset != nil ? insertedObjectSubset : [NSSet set])
-		      damagedObjectUUIDs: damagedObjectUUIDSubset];
+		         insertedObjects: (insertedObjectSubset != nil ? insertedObjectSubset : [NSSet set])
+		       updatedProperties: updatedPropertySubset];
 	}
 }
-
-/*- (void) commitWithMetadata: (NSDictionary*)metadata
-{
-		[self commitWithMetadata: metadata
-		              rootObject: nil
-		     insertedObjectUUIDs: _insertedObjectUUIDs
-		      damagedObjectUUIDs: _damagedObjectUUIDs];
-}*/
-
-
 
 @end
 
