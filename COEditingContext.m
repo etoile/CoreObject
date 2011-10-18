@@ -474,7 +474,9 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 {
 	NSMapTable *objectsByRootObject = [NSMapTable mapTableWithStrongToStrongObjects];
 
-	for (COObject *obj in objects)
+	// NOTE: For now, ETCollection doesn't include -countByEnumeratingWithState:objects:count:
+	// so we use FOREACH to prevent compilation error with recent Clang.
+	FOREACH(objects, obj, COObject *)
 	{
 		COObject *rootObject = [obj rootObject];
 		NSMutableSet *innerObjects = [objectsByRootObject objectForKey: rootObject];
