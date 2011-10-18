@@ -93,7 +93,7 @@
 	}
 	else
 	{
-		[_context markObjectDamaged: self forProperty: nil];
+		[_context markObjectUpdated: self forProperty: nil];
 		_variableStorage = [[NSMapTable alloc] init];
 		[self awakeFromInsert]; // FIXME: not necessairly
 	}
@@ -729,7 +729,7 @@
 {
 	if (!_isIgnoringDamageNotifications)
 	{
-		[_context markObjectDamaged: self forProperty: prop];
+		[_context markObjectUpdated: self forProperty: prop];
 	}
 }
 
@@ -998,7 +998,8 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		{
 			ETUUID *uuid = [ETUUID UUIDWithString: [plist valueForKey: @"uuid"]];
 			return [[self editingContext] objectWithUUID: uuid 
-			                                  entityName: [plist valueForKey: @"entity"]];
+			                                  entityName: [plist valueForKey: @"entity"]
+			                                  atRevision: nil];
 		}
 		else if ([type isEqualToString: @"unorderedCollection"])
 		{

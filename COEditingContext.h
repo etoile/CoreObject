@@ -16,17 +16,27 @@
 
 	ETModelDescriptionRepository *_modelRepository;
 
-	NSMutableDictionary *_rootObjectRevisions; // UUID of root object -> revision mapping
-	NSMutableDictionary *_rootObjectCommitTracks; // UUID of root object -> commit track
+	/**
+	 * UUID of root object -> revision
+	 */
+	NSMutableDictionary *_rootObjectRevisions;
+	/**
+	 * UUID of root object -> commit track
+	 */
+	NSMutableDictionary *_rootObjectCommitTracks;
 
-	NSMutableDictionary *_instantiatedObjects; // UUID -> COObject mapping
+	/** 
+	 * UUID -> loaded or inserted object
+	 */
+	NSMutableDictionary *_instantiatedObjects;
 	NSMutableSet *_insertedObjects;
 	NSMutableSet *_deletedObjects;
 	/**
-	 * Note: never modify directly; call -markObjectDamaged/-markObjectUndamaged instead.
-	 * Otherwise the cached value in COObject won't be updated.
+	 * Updated object -> array of updated properties
+	 *
+	 * New entries must be inserted with -markObjectUpdated:forProperty:.
 	 */
-	NSMapTable *_updatedPropertiesByObject; // Updated object -> updated properties
+	NSMapTable *_updatedPropertiesByObject; 
 }
 
 /** @taskunit Accessing the current context */
@@ -121,7 +131,8 @@
  * When the object is already loaded, and its revision is not the requested 
  * revision, raises an invalid argument exception.
  *
- * See also -loadedObjectForUUID:. */
+ * See also -loadedObjectForUUID:. 
+ */
 - (COObject *)objectWithUUID: (ETUUID *)uuid atRevision: (CORevision *)revision;
 
 /**
@@ -195,6 +206,27 @@
  * See also -changedObjects.
  */
 - (BOOL)hasChanges;
+/**
+ * Discards the uncommitted changes to reset the context to its last commit state.
+ *
+ * Every object insertion or deletion is cancelled.<br /> 
+ * Every updated property is reverted to its last committed value.
+ *
+ * -insertedObjects, -updatedObjects, -deletedObjects and -changedObjects will 
+ * all return empty sets once the changes have been discarded.
+ *
+ * See also -discardChangesInObject:.
+ */
+- (void)discardAllChanges;
+/**
+ * Discards the uncommitted changes in a particular object to restore the state  
+ * it was in at the last commit.
+ *
+ * Every updated property in the object is reverted to its last committed value.
+ *
+ * See also -discardAllChanges:.
+ */
+- (void)discardChangesInObject: (COObject *)object;
 
 /** @taskunit Object Insertion */
 
@@ -265,38 +297,87 @@
 
 /** @taskunit Private */
 
-- (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency newUUID: (BOOL)newUUID;
-- (void)commitWithMetadata: (NSDictionary *)metadata;
-
-@end
-
-
-@interface COEditingContext (PrivateToCOObject)
-
-- (void) markObjectDamaged: (COObject*)obj forProperty: (NSString*)aProperty;
-- (void) markObjectUndamaged: (COObject*)obj;
-- (void) loadObject: (COObject*)obj;
-- (void) loadObject: (COObject*)obj atRevision: (CORevision*)aRevision;
-- (CORevision*)revisionForObject: (COObject*)object;
-- (COCommitTrack*)commitTrackForObject: (COObject*)object;
-- (COObject*) objectWithUUID: (ETUUID*)uuid entityName: (NSString*)name atRevision: (CORevision*)revision;
-- (COObject*) objectWithUUID: (ETUUID*)uuid entityName: (NSString*)name;
-@end
-
-
-
-@interface COEditingContext (Rollback)
-
-// Manipulation of the editing context itself - rather than the store
-
-- (void) discardAllChanges;
-- (void) discardAllChangesInObject: (COObject*)object;
-
 /**
-  * Reload the object at a new revision.
-  */
-- (void)reloadRootObjectTree: (COObject*)object
-                  atRevision: (CORevision*)revision;
-
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Inserts the object into the context by checking the relationship consistency 
+ * if requested.
+ *
+ * When the object is not yet persistent, it is inserted into the context and 
+ * the new UUID hint is ignored.
+ *
+ * When the object is already persistent, based on the new UUID hint, the new 
+ * object inserted into the context will be: 
+ *
+ * <deflist>
+ * <item>newUUID is YES</item><desc>a copy (new instance and UUID)</desc>
+ * <item>newUUID is NO</item><desc>a new context-relative instance (new 
+ * instance but same UUID)</desc>
+ * </deflist>
+ *
+ * For a persistent object, multiples instance can exist in the same process, 
+ * one per editing context.
+ *
+ * You can pass an object that belongs to another context to this method.
+ */
+- (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency newUUID: (BOOL)newUUID;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Commits the current changes to the store with the provided metadatas.
+ */
+- (void)commitWithMetadata: (NSDictionary *)metadata;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Tells the context a property value has changed in a COObject class or 
+ * subclass instance.
+ */
+- (void)markObjectUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Returns the revision of the root object that owns the object.
+ *
+ * When a root object is passed rather than a inner object, returns its revision 
+ * as you would expect it.
+ */
+- (CORevision *)revisionForObject: (COObject *)object;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Returns the commit track bound to the root object that owns the object.
+ */
+- (COCommitTrack *)commitTrackForObject: (COObject *)object;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Loads the object at its last revision.
+ *
+ * For a inner object, its last revision is its root object last revision.
+ */
+- (void)loadObject: (COObject *)obj;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Reloads the root object and its inner objects at a new revision.
+ */
+- (void)reloadRootObjectTree: (COObject *)object
+                  atRevision: (CORevision *)revision;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Returns the object identified by the UUID, by loading it to the given 
+ * revision when no instance managed by the receiver is present in memory, and 
+ * initializing it to use the given entity in such a case.
+ * 
+ * The class bound to the given entity name in the model repository is used to 
+ * instantiate the loaded object (if loading is required).
+ *
+ * This method constraints are covered in -objectWithUUID:atRevision:.
+ */
+- (COObject *)objectWithUUID: (ETUUID *)uuid 
+                  entityName: (NSString *)name 
+                  atRevision: (CORevision *)revision;
 @end
 
