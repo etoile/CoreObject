@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
+#import <ObjectMerging/COObject.h>
 
 /** 
  * @group Query
@@ -76,6 +77,8 @@
 @protocol COObjectMatching
 /**
  * Returns whether the receiver matches the predicate conditions.
+ *
+ * Must raise a NSInvalidArgumentException if the predicate is nil.
  */
 - (BOOL)matchesPredicate: (NSPredicate *)aPredicate;
 /**
@@ -83,6 +86,17 @@
  *
  * Must be implemented by recursively traversing the object graph each time 
  * the receiver has a relationship which makes sense to search.
+ */
+- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
+@end
+
+/**
+ * Concrete implementation for COObjectMatching protocol.
+ */
+@interface COObject (COObjectMatching) <COObjectMatching>
+/**
+ * Returns the receiver put in an array when it matches the query, otherwise 
+ * returns an empty array.
  */
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
 @end
