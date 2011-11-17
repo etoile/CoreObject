@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		605BFF4013B50C7700073E18 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 605BFF3F13B50C7700073E18 /* Foundation.framework */; };
+		6068BE6314750AAF00953B26 /* COQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 6068BE6214750AAF00953B26 /* COQuery.m */; };
+		6068BE6414750AAF00953B26 /* COQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 6068BE6114750AAF00953B26 /* COQuery.h */; };
+		6068BE6514750AAF00953B26 /* COQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 6068BE6214750AAF00953B26 /* COQuery.m */; };
 		607BA16413B4EEE400B86BC6 /* Test_main.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E271299C77700CCF472 /* Test_main.m */; };
 		60CF348313BA931C001F9011 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 605BFF3F13B50C7700073E18 /* Foundation.framework */; };
 		60CF350513BA9331001F9011 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 605BFF3F13B50C7700073E18 /* Foundation.framework */; };
@@ -132,6 +135,8 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		605BFF3F13B50C7700073E18 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		6068BE6114750AAF00953B26 /* COQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COQuery.h; sourceTree = "<group>"; };
+		6068BE6214750AAF00953B26 /* COQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COQuery.m; sourceTree = "<group>"; };
 		60CF350813BA9348001F9011 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		60F6A31514444EC300EFC711 /* COCommitTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommitTrack.h; sourceTree = "<group>"; };
 		60F6A31614444EC300EFC711 /* COCommitTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommitTrack.m; sourceTree = "<group>"; };
@@ -348,6 +353,8 @@
 				66D09999129A5B64006BEDC3 /* COHistoryTrack.m */,
 				66D09B14129B704E006BEDC3 /* COSynchronizer.h */,
 				66D09B15129B704E006BEDC3 /* COSynchronizer.m */,
+				6068BE6114750AAF00953B26 /* COQuery.h */,
+				6068BE6214750AAF00953B26 /* COQuery.m */,
 			);
 			name = "Front-end API";
 			sourceTree = "<group>";
@@ -492,6 +499,7 @@
 				66D09D56129CE470006BEDC3 /* COCollection.h in Headers */,
 				60FB0E8C13C61C3A00C2AB94 /* COFault.h in Headers */,
 				60F6A31814444EC300EFC711 /* COCommitTrack.h in Headers */,
+				6068BE6414750AAF00953B26 /* COQuery.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -649,6 +657,7 @@
 				791B4E7C1299C92300CCF472 /* sqlite3.c in Sources */,
 				60FB0E8D13C61C3A00C2AB94 /* COFault.m in Sources */,
 				60F6A31914444EC300EFC711 /* COCommitTrack.m in Sources */,
+				6068BE6514750AAF00953B26 /* COQuery.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -685,6 +694,7 @@
 				66FDF11C12A7038C005D6D23 /* TestCopy.m in Sources */,
 				60F6A31C14444EDA00EFC711 /* TestCommitTrack.m in Sources */,
 				60F6A31D14444EDA00EFC711 /* TestRevisionNumber.m in Sources */,
+				6068BE6314750AAF00953B26 /* COQuery.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
