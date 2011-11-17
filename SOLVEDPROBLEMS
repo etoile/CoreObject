@@ -19,7 +19,7 @@ Move/Delete:
 - for a one-to-many relationship (COContainer), when merging two diffs
 where one deletes an object and the other diff moves it, the delete should win.
 
-- for a many-to-many relationship (COCollection), when merging two diffs
+- for a many-to-many relationship (COGroup), when merging two diffs
 where one deletes an object and the other diff moves it, the move should win.
 
 Insert/Insert:

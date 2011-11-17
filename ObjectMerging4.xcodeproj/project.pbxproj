@@ -61,8 +61,8 @@
 		66D09BC9129C5A1D006BEDC3 /* TestStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E281299C78C00CCF472 /* TestStore.m */; };
 		66D09CFC129C9222006BEDC3 /* TestSynchronization.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09CFB129C9222006BEDC3 /* TestSynchronization.m */; };
 		66D09D04129C936E006BEDC3 /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D03129C936E006BEDC3 /* TestCommon.m */; };
-		66D09D56129CE470006BEDC3 /* COCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D09D54129CE470006BEDC3 /* COCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		66D09D57129CE470006BEDC3 /* COCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D55129CE470006BEDC3 /* COCollection.m */; };
+		66D09D56129CE470006BEDC3 /* COGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D09D54129CE470006BEDC3 /* COGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		66D09D57129CE470006BEDC3 /* COGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D55129CE470006BEDC3 /* COGroup.m */; };
 		66D09D86129CEC8C006BEDC3 /* COContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 79E5EE5812876FC200CDFA23 /* COContainer.m */; };
 		66D09EF4129EF6C7006BEDC3 /* TestRelationshipIntegrity.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */; };
 		66FDEB5512A2F106005D6D23 /* TestObjectGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */; };
@@ -191,8 +191,8 @@
 		66D09CFB129C9222006BEDC3 /* TestSynchronization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestSynchronization.m; sourceTree = "<group>"; };
 		66D09D02129C936E006BEDC3 /* TestCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCommon.h; sourceTree = "<group>"; };
 		66D09D03129C936E006BEDC3 /* TestCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCommon.m; sourceTree = "<group>"; };
-		66D09D54129CE470006BEDC3 /* COCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCollection.h; sourceTree = "<group>"; };
-		66D09D55129CE470006BEDC3 /* COCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCollection.m; sourceTree = "<group>"; };
+		66D09D54129CE470006BEDC3 /* COGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COGroup.h; sourceTree = "<group>"; };
+		66D09D55129CE470006BEDC3 /* COGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COGroup.m; sourceTree = "<group>"; };
 		66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestRelationshipIntegrity.m; sourceTree = "<group>"; };
 		66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestObjectGraphDiff.m; sourceTree = "<group>"; };
 		66FDED2412A3525A005D6D23 /* TestPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestPerformance.m; sourceTree = "<group>"; };
@@ -420,8 +420,8 @@
 				6686BDB812592C1B0065DE1A /* COObject.m */,
 				79E5EE5712876FC200CDFA23 /* COContainer.h */,
 				79E5EE5812876FC200CDFA23 /* COContainer.m */,
-				66D09D54129CE470006BEDC3 /* COCollection.h */,
-				66D09D55129CE470006BEDC3 /* COCollection.m */,
+				66D09D54129CE470006BEDC3 /* COGroup.h */,
+				66D09D55129CE470006BEDC3 /* COGroup.m */,
 			);
 			name = "Model Objects";
 			sourceTree = "<group>";
@@ -496,7 +496,7 @@
 				791B4E621299C8CB00CCF472 /* CORevision.h in Headers */,
 				791B4E661299C8CB00CCF472 /* COStore.h in Headers */,
 				66D0999A129A5B64006BEDC3 /* COHistoryTrack.h in Headers */,
-				66D09D56129CE470006BEDC3 /* COCollection.h in Headers */,
+				66D09D56129CE470006BEDC3 /* COGroup.h in Headers */,
 				60FB0E8C13C61C3A00C2AB94 /* COFault.h in Headers */,
 				60F6A31814444EC300EFC711 /* COCommitTrack.h in Headers */,
 				6068BE6414750AAF00953B26 /* COQuery.h in Headers */,
@@ -639,7 +639,7 @@
 				66FDEB5812A2F150005D6D23 /* COObjectGraphDiff.m in Sources */,
 				6620F13C129F8CC500FD5AB9 /* COHistoryTrack.m in Sources */,
 				66D09D86129CEC8C006BEDC3 /* COContainer.m in Sources */,
-				66D09D57129CE470006BEDC3 /* COCollection.m in Sources */,
+				66D09D57129CE470006BEDC3 /* COGroup.m in Sources */,
 				66D09AB6129B29F3006BEDC3 /* NSData+compression.m in Sources */,
 				66D09AB7129B29F3006BEDC3 /* NSData+sha1.m in Sources */,
 				66D09AB8129B29F3006BEDC3 /* COMergeResult.m in Sources */,

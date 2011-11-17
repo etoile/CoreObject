@@ -42,7 +42,7 @@ static COEditingContext *currentCtxt = nil;
 	_rootObjectCommitTracks = [NSMutableDictionary new];
 	assert([[[_modelRepository descriptionForName: @"Anonymous.COContainer"] 
 		propertyDescriptionForName: @"contents"] isComposite]);
-	assert([[[[_modelRepository descriptionForName: @"Anonymous.COCollection"] 
+	assert([[[[_modelRepository descriptionForName: @"Anonymous.COGroup"] 
 		parent] name] isEqual: @"COObject"]);
 
 	_instantiatedObjects = [[NSMutableDictionary alloc] init];

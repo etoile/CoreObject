@@ -1,6 +1,6 @@
-#import "COCollection.h"
+#import "COGroup.h"
 
-@implementation COCollection
+@implementation COGroup
 
 + (ETEntityDescription *) newEntityDescription
 {
@@ -8,7 +8,7 @@
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([[collection name] isEqual: [COCollection className]] == NO) 
+	if ([[collection name] isEqual: [COGroup className]] == NO) 
 		return collection;
 	
 	[collection setParent: (id)@"Anonymous.COObject"];
@@ -24,6 +24,31 @@
 
 	return collection;
 }
+/*
++ (id) allObjectGroup
+{
+	return [COGroup
+}
+
++ (void) registerLibrary: (COGroup *)aGroup forType: (NSString *)libraryType
+{
+
+}
+
++ (COGroup *) libraryForType: (NSString *)libraryType
+{
+
+}
+
++ (id) photoLibrary
+{
+	return [self libraryForType: kCOLibraryTypePhoto];
+}
+
++ (id) musicLibrary
+{
+	return [self libraryForType: kCOLibraryTypeMusic];
+}*/
 
 - (BOOL) isOrdered
 {
@@ -34,5 +59,11 @@
 {
 	return [[self content] allObjects];
 }
+
+@end
+
+@implementation COSmartGroup
+
+@synthesize targetGroup;
 
 @end

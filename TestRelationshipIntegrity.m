@@ -37,9 +37,9 @@
 	
 	// Test many-to-many relationships
 	
-	COObject *t1 = [ctx insertObjectWithEntityName: @"Anonymous.COCollection"]; // See COObject.m for metamodel definition
-	COObject *t2 = [ctx insertObjectWithEntityName: @"Anonymous.COCollection"];
-	COObject *t3 = [ctx insertObjectWithEntityName: @"Anonymous.COCollection"];
+	COObject *t1 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"]; // See COObject.m for metamodel definition
+	COObject *t2 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
+	COObject *t3 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
 	
 	[t1 addObject: o1 forProperty: @"contents"];
 	[t2 addObject: o1 forProperty: @"contents"];

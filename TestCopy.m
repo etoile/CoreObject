@@ -2,7 +2,7 @@
 #import <UnitKit/UnitKit.h>
 #import "COHistoryTrack.h"
 #import "COContainer.h"
-#import "COCollection.h"
+#import "COGroup.h"
 #import "COObjectGraphDiff.h"
 #import "TestCommon.h"
 
@@ -17,7 +17,7 @@
 {
 	COEditingContext *ctx1 = [[COEditingContext alloc] init];
 	
-	COCollection *tag = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COGroup *tag = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
 	COContainer *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COContainer *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COContainer *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];

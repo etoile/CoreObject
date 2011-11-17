@@ -2,7 +2,7 @@
 #import <UnitKit/UnitKit.h>
 #import "COHistoryTrack.h"
 #import "COContainer.h"
-#import "COCollection.h"
+#import "COGroup.h"
 #import "TestCommon.h"
 
 @interface TestHistoryTrack : NSObject <UKTest>

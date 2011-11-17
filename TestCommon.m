@@ -25,7 +25,7 @@
 	// Tag entity
 	{
 		ETEntityDescription *tagEntity = [ETEntityDescription descriptionWithName: @"Tag"];	
-		[tagEntity setParent: (id)@"Anonymous.COCollection"];
+		[tagEntity setParent: (id)@"Anonymous.COGroup"];
 		
 		ETPropertyDescription *tagLabelProperty = [ETPropertyDescription descriptionWithName: @"label"
 																		  type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];

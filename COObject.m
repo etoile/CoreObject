@@ -2,7 +2,7 @@
 #import "COFault.h"
 #import "COEditingContext.h"
 #import "COContainer.h"
-#import "COCollection.h"
+#import "COGroup.h"
 #include <objc/runtime.h>
 
 @implementation COObject
@@ -34,7 +34,7 @@
 	[parentContainerProperty setMultivalued: NO];
 
 	ETPropertyDescription *parentCollectionsProperty = 
-		[ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.COCollection"];
+		[ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.COGroup"];
 	
 	[parentCollectionsProperty setMultivalued: YES];
 #ifdef GNUSTEP

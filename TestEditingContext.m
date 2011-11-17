@@ -2,7 +2,7 @@
 #import <UnitKit/UnitKit.h>
 #import "COEditingContext.h"
 #import "COContainer.h"
-#import "COCollection.h"
+#import "COGroup.h"
 #import "COStore.h"
 #import "TestCommon.h"
 
@@ -312,14 +312,14 @@
 	COEditingContext *ctx1 = [[COEditingContext alloc] init];
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 
-	COCollection *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COGroup *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
 	COContainer *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 
 	[tag1 addObject: child];
 
 	// Copy the tag collection to ctx2. At first it will be empty since child isn't in ctx2 yet
 	
-	COCollection *tag1copy = [ctx2 insertObject: tag1];
+	COGroup *tag1copy = [ctx2 insertObject: tag1];
 	UKObjectsEqual([NSArray array], [tag1copy contentArray]);
 	
 	COContainer *childcopy = [ctx2 insertObject: child];

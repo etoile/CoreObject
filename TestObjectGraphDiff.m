@@ -3,7 +3,7 @@
 #import "COStore.h"
 #import "COHistoryTrack.h"
 #import "COContainer.h"
-#import "COCollection.h"
+#import "COGroup.h"
 #import "COObjectGraphDiff.h"
 #import "TestCommon.h"
 
@@ -299,8 +299,8 @@
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	COEditingContext *ctx3 = [[COEditingContext alloc] init];
 	
-	COCollection *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
-	COCollection *tag2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COGroup *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COGroup *tag2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
 	COContainer *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
 	[tag1 addObject: child];
@@ -313,13 +313,13 @@
 	//  |
 	//   \--child
 	
-	COCollection *tag1Ctx2 = [ctx2 insertObject: tag1];
-	COCollection *tag2Ctx2 = [ctx2 insertObject: tag2];
-	COCollection *childCtx2 = [ctx2 insertObject: child];
+	COGroup *tag1Ctx2 = [ctx2 insertObject: tag1];
+	COGroup *tag2Ctx2 = [ctx2 insertObject: tag2];
+	COGroup *childCtx2 = [ctx2 insertObject: child];
 	
-	COCollection *tag1Ctx3 = [ctx3 insertObject: tag1];
-	COCollection *tag2Ctx3 = [ctx3 insertObject: tag2];
-	COCollection *childCtx3 = [ctx3 insertObject: child];	
+	COGroup *tag1Ctx3 = [ctx3 insertObject: tag1];
+	COGroup *tag2Ctx3 = [ctx3 insertObject: tag2];
+	COGroup *childCtx3 = [ctx3 insertObject: child];	
 	
 	// ctx2: move child to tag2
 	UKTrue([[tag1Ctx2 contentArray] containsObject: childCtx2]);
@@ -525,8 +525,8 @@
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	COEditingContext *ctx3 = [[COEditingContext alloc] init];
 	
-	COCollection *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
-	COCollection *tag2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COGroup *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COGroup *tag2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
 
 	
 	// ctx1:
@@ -534,12 +534,12 @@
 	// tag1         tag2
 	
 	COContainer *childCtx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COCollection *tag1Ctx2 = [ctx2 insertObject: tag1];
-	COCollection *tag2Ctx2 = [ctx2 insertObject: tag2];
+	COGroup *tag1Ctx2 = [ctx2 insertObject: tag1];
+	COGroup *tag2Ctx2 = [ctx2 insertObject: tag2];
 
 	COContainer *childCtx3 = [ctx3 insertObject: childCtx2];
-	COCollection *tag1Ctx3 = [ctx3 insertObject: tag1];
-	COCollection *tag2Ctx3 = [ctx3 insertObject: tag2];
+	COGroup *tag1Ctx3 = [ctx3 insertObject: tag1];
+	COGroup *tag2Ctx3 = [ctx3 insertObject: tag2];
 
 
 	// ctx2: add child to tag1	
@@ -763,9 +763,9 @@
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	COEditingContext *ctx3 = [[COEditingContext alloc] init];
 	
-	COCollection *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
-	COCollection *tag2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
-	COCollection *tag3 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COGroup *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COGroup *tag2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COGroup *tag3 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
 	COContainer *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
 	[tag1 addObject: child];
@@ -776,15 +776,15 @@
 	//  |
 	//   \--child
 	
-	COCollection *tag1Ctx2 = [ctx2 insertObject: tag1];
-	COCollection *tag2Ctx2 = [ctx2 insertObject: tag2];
-	COCollection *tag3Ctx2 = [ctx2 insertObject: tag3];
-	COCollection *childCtx2 = [ctx2 insertObject: child];
+	COGroup *tag1Ctx2 = [ctx2 insertObject: tag1];
+	COGroup *tag2Ctx2 = [ctx2 insertObject: tag2];
+	COGroup *tag3Ctx2 = [ctx2 insertObject: tag3];
+	COGroup *childCtx2 = [ctx2 insertObject: child];
 	
-	COCollection *tag1Ctx3 = [ctx3 insertObject: tag1];
-	COCollection *tag2Ctx3 = [ctx3 insertObject: tag2];
-	COCollection *tag3Ctx3 = [ctx3 insertObject: tag3];
-	COCollection *childCtx3 = [ctx3 insertObject: child];	
+	COGroup *tag1Ctx3 = [ctx3 insertObject: tag1];
+	COGroup *tag2Ctx3 = [ctx3 insertObject: tag2];
+	COGroup *tag3Ctx3 = [ctx3 insertObject: tag3];
+	COGroup *childCtx3 = [ctx3 insertObject: child];	
 	
 	// ctx2: move child to tag2
 	UKTrue([[tag1Ctx2 contentArray] containsObject: childCtx2]);
