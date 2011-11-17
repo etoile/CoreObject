@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <ObjectMerging/COObject.h>
+#import <ObjectMerging/COGroup.h>
 
 /** 
  * @group Query
@@ -97,6 +98,16 @@
 /**
  * Returns the receiver put in an array when it matches the query, otherwise 
  * returns an empty array.
+ */
+- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
+@end
+
+/**
+ * Object graph traversal implementation for COObjectMatching protocol.
+ */
+@interface COGroup (COObjectMatching)
+/**
+ * See -[COObjectMatching objectsMatchingQuery:].
  */
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
 @end

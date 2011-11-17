@@ -48,6 +48,7 @@
 
 @end
 
+
 @implementation COObject (COObjectMatching)
 
 - (BOOL)matchesPredicate: (NSPredicate *)aPredicate
@@ -151,6 +152,26 @@
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
 {
 	return ([self matchesPredicate: [aQuery predicate]] ? A(self) : [NSArray array]);
+}
+
+@end
+
+
+@implementation COGroup (COObjectMatching)
+
+- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
+{
+	NSMutableArray *result = [NSMutableArray array];
+
+	for (COObject *object in [self content])
+	{
+		if ([object matchesPredicate: [aQuery predicate]])
+		{
+			[result addObject: object];
+		}
+	}
+
+	return result;
 }
 
 @end
