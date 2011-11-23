@@ -26,6 +26,7 @@
  */
 @interface COQuery : NSObject
 {
+	@private
 	NSPredicate *predicate;
 	NSString *SQLString;
 	BOOL matchesAgainstObjectsInMemory;

@@ -33,6 +33,8 @@
 	BOOL _inDescription; // FIXME: remove; only for debugging
 }
 
+/** @taskunit Initialization */
+
 /** <init />
  * Initializes and returns a non-persistent object.
  *
@@ -44,7 +46,7 @@
  * You should use insertion methods provided by COEditingContext to create 
  * objects that are immediately persistent.
  */
-- (id) init;
+- (id)init;
 
 /** 
  * Makes the receiver persistent by inserting it into the given editing context.
@@ -56,11 +58,11 @@
  * When the root object is not the receiver or doesn't belong to the editing 
  * context, raises an exception too.
  */
-- (void) becomePersistentInContext: (COEditingContext *)aContext 
-                        rootObject: (COObject *)aRootObject;
-- (id) copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription;
+- (void)becomePersistentInContext: (COEditingContext *)aContext 
+                       rootObject: (COObject *)aRootObject;
+- (id)copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription;
 
-/* Attributes */
+/** taskunit Persistency Attributes */
 
 /** 
  * Returns the UUID that uniquely identifies the persistent object that 
@@ -68,13 +70,13 @@
  *
  * A persistent object has a single instance per editing context.
  */
-- (ETUUID *) UUID;
-- (ETEntityDescription *) entityDescription;
+- (ETUUID *)UUID;
+- (ETEntityDescription *)entityDescription;
 /** 
  * Returns the editing context when the receiver is persistent, otherwise  
  * returns nil.
  */
-- (COEditingContext*) editingContext;
+- (COEditingContext *)editingContext;
 /** 
  * Returns the root object when the receiver is persistent, otherwise returns nil.
  *
@@ -83,26 +85,14 @@
  *
  * See also -isRoot.
  */
-- (COObject *) rootObject;
-- (BOOL) isFault;
-
-/**
-  * Return the revision of this object in the editing
-  * context.
-  */
-- (CORevision*)revision;
-
-/**
-  * Returns the commit track for this object.
-  */
-- (COCommitTrack*)commitTrack;
-
+- (COObject *)rootObject;
+- (BOOL)isFault;
 /**
  * Returns whether the receiver is saved on the disk.
  *
  * When persistent, the receiver has both a valid editing context and root object.
  */
-- (BOOL) isPersistent;
+- (BOOL)isPersistent;
 /** 
  * Returns whether the receiver is a root object that can enclose embedded 
  * objects.
@@ -111,18 +101,28 @@
  *
  * See also -rootObject.
  */
-- (BOOL) isRoot;
-- (BOOL) isDamaged;
+- (BOOL)isRoot;
+- (BOOL)isDamaged;
 
+/** @taskunit History Attributes */
 
-/* Helper methods based on the metamodel */
+/**
+ * Return the revision of this object in the editing context.
+ */
+- (CORevision *)revision;
+/**
+ * Returns the commit track for this object.
+ */
+- (COCommitTrack *)commitTrack;
+
+/** @taskunit Contained Objects based on the Metamodel */
 
 /**
  * Returns an array containing all COObjects "strongly contained" by this one.
  * This means objects which are values for "composite" properties.
  */
-- (NSArray*)allStronglyContainedObjects;
-- (NSArray*)allStronglyContainedObjectsIncludingSelf;
+- (NSArray *)allStronglyContainedObjects;
+- (NSArray *)allStronglyContainedObjectsIncludingSelf;
 
 /** @taskunit Basic Properties */
 
@@ -136,21 +136,46 @@
  */
 - (NSString *)displayName;
 
-/* Property-value coding */
+/** @taskunit Property-Value Coding */
 
-- (NSArray *) propertyNames;
-- (NSArray *) persistentPropertyNames;
-- (id) valueForProperty:(NSString *)key;
-- (BOOL) setValue:(id)value forProperty:(NSString*)key;
+- (NSArray *)propertyNames;
+- (NSArray *)persistentPropertyNames;
+- (id)valueForProperty:(NSString *)key;
+- (BOOL)setValue:(id)value forProperty:(NSString*)key;
 
-/* Collection mutation methods */
+/** @taskunit Direct Access to the Variable Storage */
 
-- (void) addObject: (id)object forProperty:(NSString*)key;
-- (void) insertObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString*)key;
-- (void) removeObject: (id)object forProperty:(NSString*)key;
-- (void) removeObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString*)key;
+/**
+ * Returns a value from the variable storage.
+ *
+ * Can be used to read a property with no instance variable.
+ *
+ * This is a low-level method whose use should be restricted to serialization 
+ * code and accessors that expose properties with no related instance variable.
+ */
+- (id)primitiveValueForKey: (NSString *)key;
+/**
+ * Sets a value in the variable storage.
+ *
+ * Can be used to write a property with no instance variable.
+ *
+ * This is a low-level method whose use should be restricted to serialization 
+ * code and accessors that expose properties with no related instance variable.
+ *
+ * This methods involves no integrity check or relationship consistency update.
+ * It won't invoke -willChangeValueForProperty: and -didChangeValueForProperty: 
+ * (or -willChangeValueForKey: and -didChangeValueForKey:).
+ */
+- (void)setPrimitiveValue: (id)value forKey: (NSString *)key;
 
-/* Notifications to be called by accessor methods */
+/** @taskunit Collection Mutation with Integrity Check */
+
+- (void)addObject: (id)object forProperty:(NSString *)key;
+- (void)insertObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString *)key;
+- (void)removeObject: (id)object forProperty:(NSString *)key;
+- (void)removeObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString *)key;
+
+/** @taskunit Notifications to be called by Accessors */
 
 /**
  * Tells the receiver that the value of the property (transient or persistent) 
@@ -172,23 +197,24 @@
  */
 - (void)didChangeValueForProperty: (NSString *)key;
 
-/* Overridable Notifications */
+/** @taskunit Overridable Notifications */
+
 /**
   * A notification that the object was created for the first time.
   * Override this method to perform any initialisation that should be
   * performed the very first time an object is instantiated, such
   * as calculating and setting default values.
   */
-- (void) didCreate;
-- (void) awakeFromInsert;
-- (void) awakeFromFetch;
-- (void) willTurnIntoFault;
-- (void) didTurnIntoFault;
+- (void)didCreate;
+- (void)awakeFromInsert;
+- (void)awakeFromFetch;
+- (void)willTurnIntoFault;
+- (void)didTurnIntoFault;
 
-/* NSObject methods */
+/** @taskunit Overriden NSObject methods */
 
-- (NSString*) description;
-- (BOOL) isEqual: (id)otherObject;
+- (NSString *)description;
+- (BOOL)isEqual: (id)otherObject;
 
 /** @taskunit Object Matching */
 

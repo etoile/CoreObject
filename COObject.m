@@ -318,13 +318,7 @@
 		return nil;
 	}
 	
-	return [self primitiveValueForKey: key];
-}
-
-- (id) valueForUndefinedKey: (NSString *)key
-{
-	id value = [_variableStorage objectForKey: key];
-	return (value == [NSNull null] ? nil : value);
+	return [super primitiveValueForKey: key];
 }
 
 + (BOOL) isPrimitiveCoreObjectValue: (id)value
@@ -537,16 +531,32 @@
 	
 	[self willChangeValueForProperty: key];
 	// FIXME: We should use -setValue:forUndefinedKey:, but this makes Worktable crashes currently
-	[self setPrimitiveValue: value forKey: key];
+	[super setPrimitiveValue: value forKey: key];
 	[self didChangeValueForProperty: key];
 
 	return YES;
 }
 
-- (void) setValue: (id)value forUndefinedKey: (NSString *)key
+- (id)primitiveValueForKey: (NSString *)key
+{
+	id value = [_variableStorage objectForKey: key];
+	return (value == [NSNull null] ? nil : value);
+}
+
+- (void) setPrimitiveValue: (id)value forKey: (NSString *)key
 {
 	[_variableStorage setObject: (value == nil ? [NSNull null] : value)
 						 forKey: key];
+}
+
+- (id)valueForUndefinedKey: (NSString *)key
+{
+	return [self primitiveValueForKey: key];
+}
+
+- (void)setValue: (id)value forUndefinedKey: (NSString *)key
+{
+	[self setPrimitiveValue: value forKey: key];
 }
 
 - (void) addObject: (id)object forProperty:(NSString*)key
