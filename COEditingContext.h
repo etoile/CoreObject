@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COStore, CORevision, COObject, COCommitTrack;
+@class COStore, CORevision, COObject, COGroup, COSmartGroup, COCommitTrack;
 
 /**
  * An object context is like a working copy in a revision control system.
@@ -86,6 +86,18 @@
  * As a result, the context content is not persisted.
  */
 - (id)init;
+
+/** @taskunit Special Groups and Libraries */
+
+/**
+ * Returns a group listing all the current core objects in the store.
+ */
+- (COSmartGroup *)mainGroup;
+
+/*+ (void) registerLibrary: (COOGroup *)aGroup forType: (NSString *)libraryType;
++ (COGroup *) libraryForType: (NSString *)libraryType;
++ (id) photoLibrary;
++ (id) musicLibrary;*/
 
 /** @taskunit Store and Metamodel Access */
 

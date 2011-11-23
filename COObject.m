@@ -1,3 +1,15 @@
+/*
+	Copyright (C) 2010 Eric Wasylishen
+
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
+	         Quentin Mathe <quentin.mathe@gmail.com>
+	Date:  November 2010
+	License:  Modified BSD  (see COPYING)
+
+	COObjectMatching protocol concrete implementation is based on MIT-licensed 
+	code by Yen-Ju Chen <yjchenx gmail> from the previous CoreObject.
+ */
+
 #import "COObject.h"
 #import "COFault.h"
 #import "COEditingContext.h"
@@ -15,6 +27,24 @@
 	// property descriptions that we will inherit through the parent
 	if ([[object name] isEqual: [COObject className]] == NO) 
 		return object;
+
+	
+	ETPropertyDescription *nameProperty = 
+		[ETPropertyDescription descriptionWithName: @"name" type: (id)@"Anonymous.NSString"];
+	ETPropertyDescription *modificationDateProperty = 
+		[ETPropertyDescription descriptionWithName: @"modificationDate" type: (id)@"Anonymous.NSDate"];
+	ETPropertyDescription *creationDateProperty = 
+		[ETPropertyDescription descriptionWithName: @"creationDate" type: (id)@"Anonymous.NSDate"];
+	ETPropertyDescription *lastVersionDescProperty = 
+		[ETPropertyDescription descriptionWithName: @"lastVersionDescription" type: (id)@"Anonymous.NSString"];
+	ETPropertyDescription *parentGroupDescProperty = 
+		[ETPropertyDescription descriptionWithName: @"parentGroupDescription" type: (id)@"Anonymous.NSString"];
+
+	// TODO: Figure out how to compute and present each core object size...
+	// Possible choices would be:
+	// - a raw size including the object history data
+	// - a snapshot size (excluding the history data)
+	// - a directory or file size to be expected if the object is exported
 
 	// TODO: Move these properties to EtoileFoundation... See -[NSObject propertyNames].
 	// We should create a NSObject entity description and use it as our parent entity probably.
@@ -37,12 +67,13 @@
 		[ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.COGroup"];
 	
 	[parentCollectionsProperty setMultivalued: YES];
-#ifdef GNUSTEP
-	NSArray *transientProperties = A(displayNameProperty);
-#else
-	NSArray *transientProperties = A(iconProperty, displayNameProperty);
+
+	NSArray *transientProperties = A(displayNameProperty, modificationDateProperty, 
+		creationDateProperty, lastVersionDescProperty, parentGroupDescProperty);
+#ifndef GNUSTEP
+	transientProperties = [transientProperties arrayByAddingObject: iconProperty];
 #endif
-	NSArray *persistentProperties = A(parentContainerProperty, parentCollectionsProperty);
+	NSArray *persistentProperties = A(nameProperty, parentContainerProperty, parentCollectionsProperty);
 
 	[[persistentProperties mappedCollection] setPersistent: YES];
 	[object setPropertyDescriptions: [transientProperties arrayByAddingObjectsFromArray: persistentProperties]];
@@ -247,8 +278,27 @@
 	return [[self allStronglyContainedObjects] arrayByAddingObject: self];
 }
 
-/* Property-value coding */
+- (NSString *)displayName
+{
+	return [self name];
+}
 
+- (NSString *)name
+{
+	return [self valueForUndefinedKey: @"name"];
+}
+
+- (void)setName: (NSString *)aName
+{
+	// TODO: Move the -updateRelationshipConsistencyWithValue:forKey: into 
+	// -willChangeValueForProperty:
+	[self updateRelationshipConsistencyWithValue: aName forKey: @"name"];
+	[self willChangeValueForProperty: @"name"];
+	[self setValue: aName forUndefinedKey: @"name"];
+	[self didChangeValueForProperty: @"name"];
+}
+
+/* Property-value coding */
 
 - (NSArray *)propertyNames
 {
@@ -327,8 +377,137 @@
 	}
 }
 
+- (void)updateRelationshipConsistencyWithValue: (id)value forKey: (NSString *)key
+{
+	// FIXME: use the metamodel's validation support?
+	
+	if (_isIgnoringRelationshipConsistency)
+		return;
+
+	[self setIgnoringRelationshipConsistency: YES]; // Needed to guard against recursion
+	
+	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	assert(desc != nil);
+	
+	if ([desc opposite] != nil)
+	{
+		NSString *oppositeName = [[desc opposite] name];
+		if (![desc isMultivalued]) // modifying the single-valued side of a relationship
+		{
+			COObject *oldContainer = [self valueForProperty: key];
+			COObject *newContainer = value;
+			
+			if (newContainer != oldContainer)
+			{					
+				[oldContainer setIgnoringRelationshipConsistency: YES];
+				[newContainer setIgnoringRelationshipConsistency: YES];			
+				
+				if ([[desc opposite] isMultivalued])
+				{
+					[oldContainer removeObject: self forProperty: oppositeName];
+					[newContainer addObject: self forProperty: oppositeName];			
+				}
+				else
+				{
+					[oldContainer setValue: nil forProperty: oppositeName];
+					[newContainer setValue: self forProperty: oppositeName];			
+				}
+
+				[oldContainer setIgnoringRelationshipConsistency: NO];
+				[newContainer setIgnoringRelationshipConsistency: NO];
+			}
+		}
+		else // modifying the multivalued side of a relationship
+		{
+			NSMutableSet *oldObjects;
+			if ([[self valueForProperty: key] isKindOfClass: [NSSet class]])
+			{
+				oldObjects = [NSMutableSet setWithSet: [self valueForProperty: key]];
+			}			
+			else if ([self valueForProperty: key] == nil)
+			{
+				oldObjects = [NSMutableSet set]; // Should only happen when an object is first created..
+			}
+			else
+			{
+				oldObjects = [NSMutableSet setWithArray: [self valueForProperty: key]];
+			}
+			
+			NSMutableSet *newObjects;
+			if ([value isKindOfClass: [NSSet class]])
+			{
+				newObjects = [NSMutableSet setWithSet: value];
+			}
+			else
+			{
+				newObjects = [NSMutableSet setWithArray: value];
+			}
+			
+			NSMutableSet *commonObjects = [NSMutableSet setWithSet: oldObjects];
+			[commonObjects intersectSet: newObjects];
+			
+			[oldObjects minusSet: commonObjects]; 
+			[newObjects minusSet: commonObjects];
+			// Now newObjects is added objects, and oldObjects is removed objects
+			
+			for (COObject *obj in [oldObjects setByAddingObjectsFromSet: newObjects])
+			{
+				[obj setIgnoringRelationshipConsistency: YES];
+			}
+			
+			if ([[desc opposite] isMultivalued])
+			{
+				for (COObject *oldObj in oldObjects)
+				{
+					[oldObj removeObject: self forProperty: oppositeName];
+				}
+				for (COObject *newObj in newObjects)
+				{
+					[newObj addObject: self forProperty: oppositeName];
+				}
+			}
+			else
+			{
+				for (COObject *oldObj in oldObjects)
+				{
+					[oldObj setValue: nil forProperty: oppositeName];
+				}
+				for (COObject *newObj in newObjects)
+				{
+					[[newObj valueForProperty: oppositeName] removeObject: newObj forProperty: key];
+					[newObj setValue: self forProperty: oppositeName];
+				}	
+			}
+
+			for (COObject *obj in [oldObjects setByAddingObjectsFromSet: newObjects])
+			{
+				[obj setIgnoringRelationshipConsistency: NO];
+			}
+		}
+	}
+	[self setIgnoringRelationshipConsistency: NO];
+}
+
 - (BOOL) setValue:(id)value forProperty:(NSString*)key
 {
+	/* We call the setter directly if implemented */
+
+	NSString *setterName = [@"set" stringByAppendingString: [key capitalizedString]];
+
+	if ([self respondsToSelector: NSSelectorFromString(setterName)])
+	{
+		/* We use -setPrimitiveValue:forKey: to get a fallback on 
+		   -setValue:forUndefinedKey: if we have a type mistmatch between the 
+		   value and the setter argument. 
+
+		   See pathResizeSelector in -[ETShape setValue:forUndefinedKey:] */
+		[self setPrimitiveValue: value forKey: key];
+		return YES;
+	}
+
+	/* Otherwise we do the integrity check, update the variable storage, and 
+	   trigger the change notifications */
+
 	if (![[self propertyNames] containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
@@ -341,118 +520,8 @@
 	//{
 	//	[NSException raise: NSInvalidArgumentException format: @"Invalid property type"];
 	//}
-
-	// FIXME: use the metamodel's validation support?
 	
-	
-	// Begin relationship integrity
-	if (!_isIgnoringRelationshipConsistency)
-	{	
-		[self setIgnoringRelationshipConsistency: YES]; // Needed to guard against recursion
-		
-		ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-		assert(desc != nil);
-		
-		if ([desc opposite] != nil)
-		{
-			NSString *oppositeName = [[desc opposite] name];
-			if (![desc isMultivalued]) // modifying the single-valued side of a relationship
-			{
-				COObject *oldContainer = [self valueForProperty: key];
-				COObject *newContainer = value;
-				
-				if (newContainer != oldContainer)
-				{					
-					[oldContainer setIgnoringRelationshipConsistency: YES];
-					[newContainer setIgnoringRelationshipConsistency: YES];			
-					
-					if ([[desc opposite] isMultivalued])
-					{
-						[oldContainer removeObject: self forProperty: oppositeName];
-						[newContainer addObject: self forProperty: oppositeName];			
-					}
-					else
-					{
-						[oldContainer setValue: nil forProperty: oppositeName];
-						[newContainer setValue: self forProperty: oppositeName];			
-					}
-
-					[oldContainer setIgnoringRelationshipConsistency: NO];
-					[newContainer setIgnoringRelationshipConsistency: NO];
-				}
-			}
-			else // modifying the multivalued side of a relationship
-			{
-				NSMutableSet *oldObjects;
-				if ([[self valueForProperty: key] isKindOfClass: [NSSet class]])
-				{
-					oldObjects = [NSMutableSet setWithSet: [self valueForProperty: key]];
-				}			
-				else if ([self valueForProperty: key] == nil)
-				{
-					oldObjects = [NSMutableSet set]; // Should only happen when an object is first created..
-				}
-				else
-				{
-					oldObjects = [NSMutableSet setWithArray: [self valueForProperty: key]];
-				}
-				
-				NSMutableSet *newObjects;
-				if ([value isKindOfClass: [NSSet class]])
-				{
-					newObjects = [NSMutableSet setWithSet: value];
-				}
-				else
-				{
-					newObjects = [NSMutableSet setWithArray: value];
-				}
-				
-				NSMutableSet *commonObjects = [NSMutableSet setWithSet: oldObjects];
-				[commonObjects intersectSet: newObjects];
-				
-				[oldObjects minusSet: commonObjects]; 
-				[newObjects minusSet: commonObjects];
-				// Now newObjects is added objects, and oldObjects is removed objects
-				
-				for (COObject *obj in [oldObjects setByAddingObjectsFromSet: newObjects])
-				{
-					[obj setIgnoringRelationshipConsistency: YES];
-				}
-				
-				if ([[desc opposite] isMultivalued])
-				{
-					for (COObject *oldObj in oldObjects)
-					{
-						[oldObj removeObject: self forProperty: oppositeName];
-					}
-					for (COObject *newObj in newObjects)
-					{
-						[newObj addObject: self forProperty: oppositeName];
-					}
-				}
-				else
-				{
-					for (COObject *oldObj in oldObjects)
-					{
-						[oldObj setValue: nil forProperty: oppositeName];
-					}
-					for (COObject *newObj in newObjects)
-					{
-						[[newObj valueForProperty: oppositeName] removeObject: newObj forProperty: key];
-						[newObj setValue: self forProperty: oppositeName];
-					}	
-				}
-
-				for (COObject *obj in [oldObjects setByAddingObjectsFromSet: newObjects])
-				{
-					[obj setIgnoringRelationshipConsistency: NO];
-				}
-			}
-		}
-		[self setIgnoringRelationshipConsistency: NO];
-	}
-	// End relationship integrity	
-	
+	[self updateRelationshipConsistencyWithValue: value forKey: key];
 	
 	// Collections must be mutable
 	if ([value isKindOfClass: [NSArray class]]
@@ -467,6 +536,7 @@
 	// Actually set the value.
 	
 	[self willChangeValueForProperty: key];
+	// FIXME: We should use -setValue:forUndefinedKey:, but this makes Worktable crashes currently
 	[self setPrimitiveValue: value forKey: key];
 	[self didChangeValueForProperty: key];
 
@@ -698,6 +768,111 @@
 {
 	return [_context commitTrackForObject: self];
 }
+
+- (BOOL)matchesPredicate: (NSPredicate *)aPredicate
+{
+	NILARG_EXCEPTION_TEST(aPredicate);
+
+	BOOL result = NO;
+
+	if ([aPredicate isKindOfClass: [NSCompoundPredicate class]])
+	{
+		NSCompoundPredicate *cp = (NSCompoundPredicate *)aPredicate;
+		NSArray *subs = [cp subpredicates];
+		int i, count = [subs count];
+
+		switch ([cp compoundPredicateType])
+		{
+			case NSNotPredicateType:
+				result = ![self matchesPredicate: [subs objectAtIndex: 0]];
+				break;
+			case NSAndPredicateType:
+				result = YES;
+				for (i = 0; i < count; i++)
+				{
+					result = result && [self matchesPredicate: [subs objectAtIndex: i]];
+				}
+				break;
+			case NSOrPredicateType:
+				result = NO;
+				for (i = 0; i < count; i++)
+				{
+					result = result || [self matchesPredicate: [subs objectAtIndex: i]];
+				}
+				break;
+			default: 
+				ETLog(@"Error: Unknown compound predicate type");
+		}
+	}
+	else if ([aPredicate isKindOfClass: [NSComparisonPredicate class]])
+	{
+		NSComparisonPredicate *cp = (NSComparisonPredicate *)aPredicate;
+		id lv = [[cp leftExpression] expressionValueWithObject: self context: nil];
+		id rv = [[cp rightExpression] expressionValueWithObject: self context: nil];
+		NSArray *array = nil;
+
+		if ([lv isKindOfClass: [NSArray class]] == NO)
+		{
+			array = [NSArray arrayWithObjects: lv, nil];
+		}
+		else
+		{
+			array = (NSArray *) lv;
+		}
+		NSEnumerator *e = [array objectEnumerator];
+		id v = nil;
+		while ((v = [e nextObject]))
+		{
+			switch ([cp predicateOperatorType])
+			{
+				case NSLessThanPredicateOperatorType:
+					return ([v compare: rv] == NSOrderedAscending);
+				case NSLessThanOrEqualToPredicateOperatorType:
+					return ([v compare: rv] != NSOrderedDescending);
+				case NSGreaterThanPredicateOperatorType:
+				return ([v compare: rv] == NSOrderedDescending);
+				case NSGreaterThanOrEqualToPredicateOperatorType:
+					return ([v compare: rv] != NSOrderedAscending);
+				case NSEqualToPredicateOperatorType:
+					return [v isEqual: rv];
+				case NSNotEqualToPredicateOperatorType:
+					return ![v isEqual: rv];
+				case NSMatchesPredicateOperatorType:
+					{
+						// FIXME: regular expression
+						return NO;
+					}
+				case NSLikePredicateOperatorType:
+					{
+						// FIXME: simple regular expression
+						return NO;
+					}
+				case NSBeginsWithPredicateOperatorType:
+					return [[v description] hasPrefix: [rv description]];
+				case NSEndsWithPredicateOperatorType:
+					return [[v description] hasSuffix: [rv description]];
+				case NSInPredicateOperatorType:
+					// NOTE: it is the reverse CONTAINS
+					return ([[rv description] rangeOfString: [v description]].location != NSNotFound);;
+				case NSCustomSelectorPredicateOperatorType:
+					{
+						// FIXME: use NSInvocation
+						return NO;
+					}
+				default:
+					NSLog(@"Error: Unknown predicate operator");
+			}
+		}
+	}
+	return result;
+}
+
+- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
+{
+	// TODO: Check and traverse relationships to visit the object graph
+	return ([self matchesPredicate: [aQuery predicate]] ? A(self) : [NSArray array]);
+}
+
 @end
 
 

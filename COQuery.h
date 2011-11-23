@@ -4,12 +4,13 @@
 	Author:  Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  November 2011
 	License:  Modified BSD  (see COPYING)
+
+	COObjectMatching protocol is based on MIT-licensed code by Yen-Ju Chen 
+	<yjchenx gmail> from the previous CoreObject.
  */
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <ObjectMerging/COObject.h>
-#import <ObjectMerging/COGroup.h>
 
 /** 
  * @group Query
@@ -73,6 +74,8 @@
 @end
 
 /**
+ * @group Query
+ *
  * Protocol to search objects directly in memory with COQuery.
  */
 @protocol COObjectMatching
@@ -87,27 +90,6 @@
  *
  * Must be implemented by recursively traversing the object graph each time 
  * the receiver has a relationship which makes sense to search.
- */
-- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
-@end
-
-/**
- * Concrete implementation for COObjectMatching protocol.
- */
-@interface COObject (COObjectMatching) <COObjectMatching>
-/**
- * Returns the receiver put in an array when it matches the query, otherwise 
- * returns an empty array.
- */
-- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
-@end
-
-/**
- * Object graph traversal implementation for COObjectMatching protocol.
- */
-@interface COGroup (COObjectMatching)
-/**
- * See -[COObjectMatching objectsMatchingQuery:].
  */
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
 @end

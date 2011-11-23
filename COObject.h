@@ -1,5 +1,15 @@
+/*
+	Copyright (C) 2010 Eric Wasylishen
+
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
+	         Quentin Mathe <quentin.mathe@gmail.com>
+	Date:  November 2010
+	License:  Modified BSD  (see COPYING)
+ */
+
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
+#import <ObjectMerging/COQuery.h>
 
 @class COEditingContext, CORevision, COCommitTrack;
 
@@ -10,7 +20,7 @@
  * You should use ETUUID's to refer to objects outside of the context
  * of a COEditingContext.
  */
-@interface COObject : NSObject <NSCopying>
+@interface COObject : NSObject <NSCopying, COObjectMatching>
 {
 	@package
 	ETEntityDescription *_entityDescription;
@@ -114,6 +124,18 @@
 - (NSArray*)allStronglyContainedObjects;
 - (NSArray*)allStronglyContainedObjectsIncludingSelf;
 
+/** @taskunit Basic Properties */
+
+/**
+ * The object name.
+ */
+@property (nonatomic, retain) NSString *name;
+
+/**
+ * Returns -name.
+ */
+- (NSString *)displayName;
+
 /* Property-value coding */
 
 - (NSArray *) propertyNames;
@@ -168,6 +190,14 @@
 - (NSString*) description;
 - (BOOL) isEqual: (id)otherObject;
 
+/** @taskunit Object Matching */
+
+/**
+ * Returns the receiver put in an array when it matches the query, otherwise 
+ * returns an empty array.
+ */
+- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
+
 @end
 
 
@@ -183,7 +213,7 @@
 
 - (BOOL) isIgnoringRelationshipConsistency;
 - (void) setIgnoringRelationshipConsistency: (BOOL)ignore;
-
+- (void)updateRelationshipConsistencyWithValue: (id)value forKey: (NSString *)key;
 @end
 
 

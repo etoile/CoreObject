@@ -1,5 +1,6 @@
 #import "COEditingContext.h"
 #import "COObject.h"
+#import "COGroup.h"
 #import "COStore.h"
 #import "CORevision.h"
 #import "COCommitTrack.h"
@@ -78,6 +79,47 @@ static COEditingContext *currentCtxt = nil;
 	// FIXME:
 	return copy;
 }
+
+- (COSmartGroup *) mainGroup
+{
+	COSmartGroup *group = AUTORELEASE([[COSmartGroup alloc] init]);
+	COContentBlock block = ^() {
+		NSSet *rootUUIDs = [[self store] rootObjectUUIDs];
+		NSMutableArray *rootObjects = [NSMutableArray arrayWithCapacity: [rootUUIDs count]];
+
+		for (ETUUID *uuid in rootUUIDs)
+		{
+			[rootObjects addObject: [self objectWithUUID: uuid]];
+		}
+
+		return rootObjects;
+	};
+
+	[group setContentBlock: block];
+	[group setName: _(@"All Objects")];
+
+	return group;
+}
+
+/*+ (void) registerLibrary: (COGroup *)aGroup forType: (NSString *)libraryType
+{
+
+}
+
++ (COGroup *) libraryForType: (NSString *)libraryType
+{
+
+}
+
++ (id) photoLibrary
+{
+	return [self libraryForType: kCOLibraryTypePhoto];
+}
+
++ (id) musicLibrary
+{
+	return [self libraryForType: kCOLibraryTypeMusic];
+}*/
 
 - (COStore *)store
 {

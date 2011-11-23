@@ -60,7 +60,7 @@
 	UKNotNil(obj);
 	UKTrue([obj isKindOfClass: [COObject class]]);
 	
-	NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentContainer", @"parentCollections", @"contents", @"label", nil];
+	NSArray *expectedProperties = [NSArray arrayWithObjects: @"name", @"parentContainer", @"parentCollections", @"contents", @"label", nil];
 	UKObjectsEqual([NSSet setWithArray: expectedProperties],
 				   [NSSet setWithArray: [obj persistentPropertyNames]]);
 
@@ -97,7 +97,7 @@
 		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 		COObject *obj = [ctx objectWithUUID: objUUID];
 		UKNotNil(obj);
-		NSArray *expectedProperties = [NSArray arrayWithObjects: @"parentContainer", @"parentCollections", @"contents", @"label", nil];
+		NSArray *expectedProperties = [NSArray arrayWithObjects: @"name", @"parentContainer", @"parentCollections", @"contents", @"label", nil];
 		UKObjectsEqual([NSSet setWithArray: expectedProperties],
 					   [NSSet setWithArray: [obj persistentPropertyNames]]);
 		UKStringsEqual(@"Hello", [obj valueForProperty: @"label"]);

@@ -1,3 +1,12 @@
+/*
+	Copyright (C) 2010 Eric Wasylishen
+
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
+	         Quentin Mathe <quentin.mathe@gmail.com>
+	Date:  November 2010
+	License:  Modified BSD  (see COPYING)
+ */
+
 #import "COContainer.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
