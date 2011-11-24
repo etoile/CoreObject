@@ -290,9 +290,9 @@
 
 - (void)setName: (NSString *)aName
 {
-	// TODO: Move the -updateRelationshipConsistencyWithValue:forKey: into 
+	// TODO: Move the -updateRelationshipConsistencyWithValue:forProperty: into 
 	// -willChangeValueForProperty:
-	[self updateRelationshipConsistencyWithValue: aName forKey: @"name"];
+	[self updateRelationshipConsistencyWithValue: aName forProperty: @"name"];
 	[self willChangeValueForProperty: @"name"];
 	[self setValue: aName forUndefinedKey: @"name"];
 	[self didChangeValueForProperty: @"name"];
@@ -371,7 +371,7 @@
 	}
 }
 
-- (void)updateRelationshipConsistencyWithValue: (id)value forKey: (NSString *)key
+- (void)updateRelationshipConsistencyWithValue: (id)value forProperty: (NSString *)key
 {
 	// FIXME: use the metamodel's validation support?
 	
@@ -515,7 +515,7 @@
 	//	[NSException raise: NSInvalidArgumentException format: @"Invalid property type"];
 	//}
 	
-	[self updateRelationshipConsistencyWithValue: value forKey: key];
+	[self updateRelationshipConsistencyWithValue: value forProperty: key];
 	
 	// Collections must be mutable
 	if ([value isKindOfClass: [NSArray class]]
@@ -642,6 +642,14 @@
 - (void)willChangeValueForProperty: (NSString *)key
 {
 	[super willChangeValueForKey: key];
+}
+
+- (void) notifyContextOfDamageIfNeededForProperty: (NSString*)prop
+{
+	if (!_isIgnoringDamageNotifications)
+	{
+		[_context markObjectUpdated: self forProperty: prop];
+	}
 }
 
 - (void)didChangeValueForProperty: (NSString *)key
@@ -883,10 +891,9 @@
 	return ([self matchesPredicate: [aQuery predicate]] ? A(self) : [NSArray array]);
 }
 
-@end
-
-
-@implementation COObject (Private)
+/* 
+ * Private 
+ */
 
 + (Class) faultClass
 {
@@ -908,14 +915,6 @@
 {
 	ETAssert([self isFault] == NO);
 	return nil;
-}
-
-- (void) notifyContextOfDamageIfNeededForProperty: (NSString*)prop
-{
-	if (!_isIgnoringDamageNotifications)
-	{
-		[_context markObjectUpdated: self forProperty: prop];
-	}
 }
 
 - (BOOL) isIgnoringRelationshipConsistency

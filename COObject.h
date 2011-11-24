@@ -162,7 +162,7 @@
  * This is a low-level method whose use should be restricted to serialization 
  * code and accessors that expose properties with no related instance variable.
  *
- * This methods involves no integrity check or relationship consistency update.
+ * This method involves no integrity check or relationship consistency update.
  * It won't invoke -willChangeValueForProperty: and -didChangeValueForProperty: 
  * (or -willChangeValueForKey: and -didChangeValueForKey:).
  */
@@ -224,22 +224,72 @@
  */
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
 
-@end
+/** @taskunit Private */
 
-
-@interface COObject (Private)
-
-/** 
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
  * Returns COObjectFault. 
  */
-+ (Class) faultClass;
-- (NSError *) unfaultIfNeeded;
-- (void) notifyContextOfDamageIfNeededForProperty: (NSString*)prop;
-- (void) turnIntoFault;
-
-- (BOOL) isIgnoringRelationshipConsistency;
-- (void) setIgnoringRelationshipConsistency: (BOOL)ignore;
-- (void)updateRelationshipConsistencyWithValue: (id)value forKey: (NSString *)key;
++ (Class)faultClass;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ * See -[COFault unfaultIfNeeded].
+ */
+- (NSError *)unfaultIfNeeded;
+/**
+ * <override-never />
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Turns the receiver back into a fault, if previously loaded.
+ *
+ * Will release the variable storage values but not the instance variable values.
+ *
+ * This method invokes -willTurnIntoFault and -didTurnIntoFault which can be 
+ * overriden in subclasses. For example, to release some instance variables.
+ *
+ * On return, the receiver class has been set to +faultClass.
+ */
+- (void)turnIntoFault;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Returns whether the receiver should skip the actions to ensure the 
+ * relationship consistency based on the metamodel.
+ *
+ * Usually in reaction to changes, various checks and updates occur to ensure 
+ * the metamodel constraints remain valid.
+ *
+ * See also -setIgnoringRelationshipConsistency:.
+ */
+- (BOOL)isIgnoringRelationshipConsistency;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Sets whether the receiver should skip the actions to ensure relationship 
+ * consistency based on the metamodel.
+ *
+ * Usually in reaction to changes, various checks and updates occur to ensure 
+ * the metamodel constraints remain valid.
+ *
+ * To tolerate inconsistent state that might occur temporarily while editing 
+ * the object graph, can be set to YES. The code where the inconsistent state 
+ * occur should be bracketed by as below:
+ *
+ * <example>
+ * [self setIgnoringRelationshipConsistency: YES];
+ * // some changes
+ * [self setIgnoringRelationshipConsistency: NO];
+ * </example>
+ */
+- (void)setIgnoringRelationshipConsistency: (BOOL)ignore;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Checks and updates the relationship consistency based on the metamodel to 
+ * ensure the object graph remains valid with the new value.
+ */
+- (void)updateRelationshipConsistencyWithValue: (id)value forProperty: (NSString *)key;
 @end
 
 
@@ -257,6 +307,8 @@
 @interface COObject (PrivateToEditingContext)
 
 /**
+ * This method is only exposed to be used internally by CoreObject.
+ *
  * If isFault is NO, the object is initialized as a newly inserted object.
  */
 - (id) initWithUUID: (ETUUID*)aUUID 
