@@ -1052,7 +1052,7 @@ static int indent = 0;
 	}
 }
 
-- (BOOL)setSerializedValue: (id)value forProperty: (NSString *)key
+- (void)setSerializedValue: (id)value forProperty: (NSString *)key
 {
 	// TODO: Probably a bit slow, rewrite in C
 	/*SEL setter = NSSelectorFromString([[@"setPrimitive" stringByAppendingString: [key capitalizedString]];
@@ -1071,7 +1071,7 @@ static int indent = 0;
 	}
 	else*/
 	{
-		return [self setValue: value forProperty: key];
+		[self setValue: value forProperty: key];
 	}
 }
 
