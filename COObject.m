@@ -132,6 +132,26 @@
 	return self;
 }
 
+- (id)initWithUUID: (ETUUID *)aUUID 
+ entityDescription: (ETEntityDescription *)anEntityDescription
+        rootObject: (id)aRootObject
+           context: (COEditingContext *)aContext
+           isFault: (BOOL)isFault
+{
+	SUPERINIT;
+	
+	NILARG_EXCEPTION_TEST(aUUID);
+	NILARG_EXCEPTION_TEST(anEntityDescription);
+	NILARG_EXCEPTION_TEST(aContext);
+
+	self = [self commonInitWithUUID: aUUID 
+	              entityDescription: anEntityDescription
+	                     rootObject: (aRootObject != nil ? aRootObject : self)
+	                        context: aContext
+	                        isFault: isFault];
+	return self;
+}
+
 - (id) init
 {
 	SUPERINIT;
@@ -142,6 +162,18 @@
 	                        isFault: NO];
 	[self didCreate];
 	return self;
+}
+
+- (void)dealloc
+{
+	// FIXME: call user hook?
+	
+	_context = nil;
+	_rootObject = nil;
+	DESTROY(_uuid);
+	DESTROY(_entityDescription);
+	DESTROY(_variableStorage);
+	[super dealloc];
 }
 
 - (void) becomePersistentInContext: (COEditingContext *)aContext 
@@ -891,6 +923,79 @@
 	return ([self matchesPredicate: [aQuery predicate]] ? A(self) : [NSArray array]);
 }
 
+- (id)roundTripValueForProperty: (NSString *)key
+{
+	id plist = [self propertyListForValue: [self valueForProperty: key]];
+	return [self valueForPropertyList: plist];
+}
+
+static int indent = 0;
+
+- (NSString *)detailedDescription
+{
+	if (_inDescription)
+	{
+		return [NSString stringWithFormat: @"<Recursive reference to %@(%@) at %p UUID %@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
+	}
+	_inDescription = YES;
+	indent++;
+	NSMutableString *str = [NSMutableString stringWithFormat: @"<%@(%@) at %p UUID %@ data: {\n",  [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
+	indent++;
+	
+	NSMutableArray *props = [NSMutableArray arrayWithArray: [self persistentPropertyNames]];
+	if ([props containsObject: @"contents"])
+	{
+		[props removeObject: @"contents"];
+		[props insertObject: @"contents" atIndex: 0];
+	}
+	if ([props containsObject: @"label"])
+	{
+		[props removeObject: @"label"];
+		[props insertObject: @"label" atIndex: 0];
+	}
+	for (NSString *prop in props)
+	{
+		NSMutableString *valuestring = [NSMutableString string];
+		id value = [self valueForProperty: prop];
+		if ([value isKindOfClass: [NSSet class]])
+		{
+			[valuestring appendFormat: @"(\n"];
+			for (id item in value)
+			{
+				for (int i=0; i<indent + 1; i++) [valuestring appendFormat: @"\t"];
+				[valuestring appendFormat: @"%@\n", [item description]];	
+			}
+			for (int i=0; i<indent; i++) [valuestring appendFormat: @"\t"];
+			[valuestring appendFormat: @"),\n"];
+		}
+		else if ([value isKindOfClass: [NSArray class]])
+		{
+			[valuestring appendFormat: @"{\n"];
+			for (id item in value)
+			{
+				for (int i=0; i<indent + 1; i++) [valuestring appendFormat: @"\t"];
+				[valuestring appendFormat: @"%@", [item description]];	
+			}
+			for (int i=0; i<indent; i++) [valuestring appendFormat: @"\t"];
+			[valuestring appendFormat: @"},\n"];
+		}
+		else
+		{
+			[valuestring appendFormat: @"%@,\n", [value description]];
+		}
+
+		
+		for (int i=0; i<indent; i++) [str appendFormat: @"\t"];
+		[str appendFormat:@"%@ : %@", prop, valuestring]; 
+	}
+	indent--;
+	for (int i=0; i<indent; i++) [str appendFormat: @"\t"];
+	[str appendFormat:@"}>\n"];
+	indent--;
+	_inDescription = NO;
+	return str;
+}
+
 /* 
  * Private 
  */
@@ -926,53 +1031,6 @@
 {
 	_isIgnoringRelationshipConsistency = ignore;
 }
-
-
-@end
-
-
-@implementation COObject (PrivateToEditingContext)
-
-// Init/dealloc
-
-- (id) initWithUUID: (ETUUID*)aUUID 
-  entityDescription: (ETEntityDescription*)anEntityDescription
-         rootObject: (id)aRootObject
-			context: (COEditingContext*)aContext
-			isFault: (BOOL)isFault
-{
-	SUPERINIT;
-	
-	NILARG_EXCEPTION_TEST(aUUID);
-	NILARG_EXCEPTION_TEST(anEntityDescription);
-	NILARG_EXCEPTION_TEST(aContext);
-
-	self = [self commonInitWithUUID: aUUID 
-	              entityDescription: anEntityDescription
-	                     rootObject: (aRootObject != nil ? aRootObject : self)
-	                        context: aContext
-	                        isFault: isFault];
-	return self;
-}
-
-- (void) dealloc
-{
-	// FIXME: call user hook?
-	
-	_context = nil;
-	_rootObject = nil;
-	DESTROY(_uuid);
-	DESTROY(_entityDescription);
-	DESTROY(_variableStorage);
-	[super dealloc];
-}
-
-@end
-
-
-
-
-@implementation COObject (PropertyListImportExport)
 
 - (id)serializedValueForProperty: (NSString *)key
 {
@@ -1034,7 +1092,7 @@ static NSArray *COArrayPropertyListForArray(NSArray *array)
 /* Returns the CoreObject serialized type for a NSValue or NSNumber object.
 
 Nil is returned when the type is unsupported by CoreObject serialization. */
-- (NSString *) typeForValue: (id)value
+- (NSString *)typeForValue: (id)value
 {
 	const char *type = [value objCType];
 
@@ -1064,7 +1122,7 @@ Nil is returned when the type is unsupported by CoreObject serialization. */
 /* Returns the CoreObject serialization result for a NSValue or NSNumber object.
 
 Nil is returned when the value type is unsupported by CoreObject serialization. */
-- (NSString *) stringValueForValue: (id)value
+- (NSString *)stringValueForValue: (id)value
 {
 	const char *type = [value objCType];
 
@@ -1091,7 +1149,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	return nil;
 }
 
-- (NSDictionary*) propertyListForValue: (id)value
+- (NSDictionary *)propertyListForValue: (id)value
 {
 	NSDictionary *result = nil;
 
@@ -1156,7 +1214,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	return result;
 }
 
-- (NSDictionary*) referencePropertyList
+- (NSDictionary *)referencePropertyList
 {
 	NSAssert1([self isPersistent], 
 		@"Usually means -becomePersistentInContext:rootObject: hasn't been called on %@", self);
@@ -1168,7 +1226,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 			nil];
 }
 
-- (NSObject *)valueForPropertyList: (NSObject*)plist
+- (NSObject *)valueForPropertyList: (NSObject *)plist
 {
 	// TODO: Could move the string to NSValue handling to a new method 
 	// -valueForString:... Would be more symetric if we allow subclasses to 
@@ -1241,84 +1299,6 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	}
 
 	return plist;
-}
-
-@end
-
-
-@implementation COObject (Debug)
-
-- (id) roundTripValueForProperty: (NSString *)key
-{
-	id plist = [self propertyListForValue: [self valueForProperty: key]];
-	return [self valueForPropertyList: plist];
-}
-
-static int indent = 0;
-
-- (NSString*)detailedDescription
-{
-	if (_inDescription)
-	{
-		return [NSString stringWithFormat: @"<Recursive reference to %@(%@) at %p UUID %@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
-	}
-	_inDescription = YES;
-	indent++;
-	NSMutableString *str = [NSMutableString stringWithFormat: @"<%@(%@) at %p UUID %@ data: {\n",  [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
-	indent++;
-	
-	NSMutableArray *props = [NSMutableArray arrayWithArray: [self persistentPropertyNames]];
-	if ([props containsObject: @"contents"])
-	{
-		[props removeObject: @"contents"];
-		[props insertObject: @"contents" atIndex: 0];
-	}
-	if ([props containsObject: @"label"])
-	{
-		[props removeObject: @"label"];
-		[props insertObject: @"label" atIndex: 0];
-	}
-	for (NSString *prop in props)
-	{
-		NSMutableString *valuestring = [NSMutableString string];
-		id value = [self valueForProperty: prop];
-		if ([value isKindOfClass: [NSSet class]])
-		{
-			[valuestring appendFormat: @"(\n"];
-			for (id item in value)
-			{
-				for (int i=0; i<indent + 1; i++) [valuestring appendFormat: @"\t"];
-				[valuestring appendFormat: @"%@\n", [item description]];	
-			}
-			for (int i=0; i<indent; i++) [valuestring appendFormat: @"\t"];
-			[valuestring appendFormat: @"),\n"];
-		}
-		else if ([value isKindOfClass: [NSArray class]])
-		{
-			[valuestring appendFormat: @"{\n"];
-			for (id item in value)
-			{
-				for (int i=0; i<indent + 1; i++) [valuestring appendFormat: @"\t"];
-				[valuestring appendFormat: @"%@", [item description]];	
-			}
-			for (int i=0; i<indent; i++) [valuestring appendFormat: @"\t"];
-			[valuestring appendFormat: @"},\n"];
-		}
-		else
-		{
-			[valuestring appendFormat: @"%@,\n", [value description]];
-		}
-
-		
-		for (int i=0; i<indent; i++) [str appendFormat: @"\t"];
-		[str appendFormat:@"%@ : %@", prop, valuestring]; 
-	}
-	indent--;
-	for (int i=0; i<indent; i++) [str appendFormat: @"\t"];
-	[str appendFormat:@"}>\n"];
-	indent--;
-	_inDescription = NO;
-	return str;
 }
 
 @end

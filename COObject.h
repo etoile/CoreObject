@@ -86,6 +86,14 @@
  * See also -isRoot.
  */
 - (COObject *)rootObject;
+/**
+ * Returns NO when the object is loaded, otherwise returns YES.
+ * 
+ * When YES is returned, the receiver class is set to +faultClass.
+ *
+ * You can send a message that COFault doesn't implement to unfault the object 
+ * (in other words, load the instance variable values).
+ */
 - (BOOL)isFault;
 /**
  * Returns whether the receiver is saved on the disk.
@@ -224,8 +232,33 @@
  */
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
 
+/** @taskunit Debugging */
+
+/** 
+ * Serializes the property value into the CoreObject serialized representation, 
+ * then unserialize it back into a value that can be passed 
+ * -setSerializedValue:forProperty:.
+ *
+ * The property value is retrieved with -serializedValueForProperty:.
+ */
+- (id)roundTripValueForProperty: (NSString *)key;
+/** 
+ * Returns a description that includes the receiver properties and their values. 
+ */
+- (NSString *)detailedDescription;
+
 /** @taskunit Private */
 
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * If isFault is NO, the object is initialized as a newly inserted object.
+ */
+- (id)initWithUUID: (ETUUID *)aUUID 
+ entityDescription: (ETEntityDescription *)anEntityDescription
+        rootObject: (id)aRootObject
+           context: (COEditingContext *)aContext
+           isFault: (BOOL)isFault;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -290,53 +323,38 @@
  * ensure the object graph remains valid with the new value.
  */
 - (void)updateRelationshipConsistencyWithValue: (id)value forProperty: (NSString *)key;
-@end
-
-
-@interface COObject (PropertyListImportExport)
-
-- (id)serializedValueForProperty:(NSString *)key;
-- (BOOL)setSerializedValue:(id)value forProperty:(NSString*)key;
-- (NSDictionary*) propertyListForValue: (id)value;
-- (NSDictionary*) referencePropertyList;
-- (NSObject *)valueForPropertyList: (NSObject*)plist;
-
-@end
-
-
-@interface COObject (PrivateToEditingContext)
-
+/**
+ *
+ */
+- (id)serializedValueForProperty: (NSString *)key;
+/**
+ * 
+ */
+- (void)setSerializedValue: (id)value forProperty: (NSString *)key;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
- * If isFault is NO, the object is initialized as a newly inserted object.
+ * Returns a CoreObject serialized representation by serializing into a plist 
+ * the value that was retrieved with -serializedValueForProperty:.
  */
-- (id) initWithUUID: (ETUUID*)aUUID 
-  entityDescription: (ETEntityDescription*)anEntityDescription
-         rootObject: (id)aRootObject
-            context: (COEditingContext*)aContext
-            isFault: (BOOL)isFault;
+- (NSDictionary *)propertyListForValue: (id)value;
 /**
- * Used only by -[COEditingContext markObject[Un]damaged]; to update
- * the object's cached damage flag
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Returns a marker to track or index the receiver in the CoreObject serialized 
+ * representation.
+ *
+ * Every time a COObject or subclass instance is in relationship with the 
+ * receiver, at serialization time -referencePropertyList is used to encode the 
+ * relationship in the CoreObject serialized representation.
  */
-// - (void) setDamaged: (BOOL)isDamaged;
+- (NSDictionary *)referencePropertyList;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Returns a value that can be passed to -setSerializedValue:forProperty: by 
+ * deserializing a CoreObject serialized representation (the plist).
+ */
+- (NSObject *)valueForPropertyList: (NSObject *)plist;
 
-@end
-
-/*
-// FIXME: these are a bit of a mess
-@interface COObject (PropertyListImportExport)
-
-- (NSDictionary*) propertyList;
-- (NSDictionary*) referencePropertyList;
-
-- (void)unfaultWithData: (NSDictionary*)data;
-
-@end
-*/
-
-@interface COObject (Debug)
-- (id) roundTripValueForProperty: (NSString *)key;
-- (NSString*)detailedDescription;
 @end
