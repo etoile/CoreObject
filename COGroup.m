@@ -142,7 +142,7 @@
 {
 	NSArray *result = nil;
 
-	if (contentBlock != nil)
+	if (contentBlock != NULL)
 	{
 		result = contentBlock();
 	}
