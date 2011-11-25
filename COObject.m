@@ -736,56 +736,31 @@
 {
 }
 
-// NSObject methods
-
-- (NSString*) description
-{
-	if (_inDescription)
-	{
-		// If we are called recursively, don't print the contents of _variableStorage
-		// since it would result in an infinite loop.
-		return [NSString stringWithFormat: @"<Recursive reference to %@(%@) at %p UUID %@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
-	}
-	
-	_inDescription = YES;
-	NSString *desc;
-	if ([self isFault])
-	{
-		desc = [NSString stringWithFormat: @"<Faulted %@(%@) %p UUID=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];  
-	}
-	else
-	{
-		desc = [NSString stringWithFormat: @"<%@(%@) %p UUID=%@ properties=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid, [self propertyNames]];  
-	}
-	_inDescription = NO;
-	return desc;
-}
-
 - (NSUInteger)hash
 {
 	return [_uuid hash] ^ 0x39ab6f39b15233de;
 }
 
-- (BOOL)isEqual: (id)object
+- (BOOL)isEqual: (id)anObject
 {
-	if (object == self)
+	if (anObject == self)
 	{
 		return YES;
 	}
-	if (![object isKindOfClass: [COObject class]])
+	if (![anObject isKindOfClass: [COObject class]])
 	{
 		return NO;
 	}
-	if ([[object UUID] isEqual: [self UUID]])
+	if ([[anObject UUID] isEqual: _uuid])
 	{
 		return YES;
 	}
-	
 	return NO;
-	/*
+}
 
-	// FIXME: Incomplete/ incorrect
-	
+- (BOOL)isDeeplyEqual: (id)object
+{
+	// FIXME: Incomplete/incorrect
 	if ([object isKindOfClass: [COObject class]])
 	{
 		COObject *other = (COObject*)object;
@@ -811,10 +786,27 @@
 		}
 		return YES;
 	}
-	return NO;*/
+	return NO;
 }
 
-- (COCommitTrack*)commitTrack
+- (BOOL) isTemporalInstance: (id)anObject
+{
+	if (anObject == self)
+	{
+		return YES;
+	}
+	if (![anObject isKindOfClass: [COObject class]])
+	{
+		return NO;
+	}
+	if ([[anObject UUID] isEqual: _uuid] && [[anObject revision] isEqual: [self revision]])
+	{
+		return YES;
+	}
+	return NO;
+}
+
+- (COCommitTrack *)commitTrack
 {
 	return [_context commitTrackForObject: self];
 }
@@ -996,16 +988,39 @@ static int indent = 0;
 	return str;
 }
 
+- (NSString *)description
+{
+	if (_inDescription)
+	{
+		// If we are called recursively, don't print the contents of _variableStorage
+		// since it would result in an infinite loop.
+		return [NSString stringWithFormat: @"<Recursive reference to %@(%@) at %p UUID %@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
+	}
+	
+	_inDescription = YES;
+	NSString *desc;
+	if ([self isFault])
+	{
+		desc = [NSString stringWithFormat: @"<Faulted %@(%@) %p UUID=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];  
+	}
+	else
+	{
+		desc = [NSString stringWithFormat: @"<%@(%@) %p UUID=%@ properties=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid, [self propertyNames]];  
+	}
+	_inDescription = NO;
+	return desc;
+}
+
 /* 
  * Private 
  */
 
-+ (Class) faultClass
++ (Class)faultClass
 {
 	return [COObjectFault class];
 }
 
-- (void) turnIntoFault
+- (void)turnIntoFault
 {
 	if ([self isFault])
 		return;
@@ -1016,13 +1031,13 @@ static int indent = 0;
 	[self didTurnIntoFault];
 }
 
-- (NSError *) unfaultIfNeeded
+- (NSError *)unfaultIfNeeded
 {
 	ETAssert([self isFault] == NO);
 	return nil;
 }
 
-- (BOOL) isIgnoringRelationshipConsistency
+- (BOOL)isIgnoringRelationshipConsistency
 {
 	return _isIgnoringRelationshipConsistency;
 }

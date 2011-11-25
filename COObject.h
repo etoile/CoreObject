@@ -146,9 +146,38 @@
 
 /** @taskunit Property-Value Coding */
 
+/** 
+ * Returns the properties declared in the receiver entity description.
+ *
+ * See also -entityDescription and -persistentPropertyNames.
+ */
 - (NSArray *)propertyNames;
+/** 
+ * Returns the persistent properties declared in the receiver entity description.
+ *
+ * The returned array contains the property descriptions which replies YES to 
+ * -[ETPropertyDescription isPersistent].
+ *
+ * See also -entityDescription and -propertyNames.
+ */
 - (NSArray *)persistentPropertyNames;
+/**
+ * Returns the property value.
+ *
+ * When the property is not declared in the entity description, raises an 
+ * NSInvalidArgumentException.
+ *
+ * See also -setValue:forProperty:.
+ */
 - (id)valueForProperty: (NSString *)key;
+/**
+ * Sets the property value.
+ *
+ * When the property is not declared in the entity description, raises an 
+ * NSInvalidArgumentException.
+ *
+ * See also -valueForProperty:.
+ */
 - (BOOL)setValue: (id)value forProperty: (NSString *)key;
 
 /** @taskunit Direct Access to the Variable Storage */
@@ -219,10 +248,33 @@
 - (void)willTurnIntoFault;
 - (void)didTurnIntoFault;
 
-/** @taskunit Overriden NSObject methods */
+/** @taskunit Object Equality */
 
-- (NSString *)description;
-- (BOOL)isEqual: (id)otherObject;
+/** Returns a hash based on the UUID. */
+- (NSUInteger)hash;
+/**
+ * Returns whether anObject is equal to the receiver.
+ *
+ * Two persistent objects are equal if they share the same UUID.<br />
+ * For now, returns YES even when the two object revisions don't match (this 
+ * is subject to change).
+ *
+ * Use <code>[a isEqual: b] && ![a isTemporalInstance: b]</code> to check 
+ * temporal equality. For example, when the same object is in use in multiple 
+ * editing contexts simultaneously.
+ *
+ * See also -isTemporalInstance:.
+ */
+- (BOOL)isEqual: (id)anObject;
+/** 
+ * Returns whether anObject is a temporal instance of the receiver. 
+ *
+ * Two persistent objects are temporal instances of each other if they share the 
+ * same UUID but differ by their revision. 
+ *
+ * See also -isEqual:.
+ */
+- (BOOL) isTemporalInstance: (id)anObject;
 
 /** @taskunit Object Matching */
 
@@ -246,6 +298,10 @@
  * Returns a description that includes the receiver properties and their values. 
  */
 - (NSString *)detailedDescription;
+/** 
+ * Returns a short description to summarize the receiver. 
+ */
+- (NSString *)description;
 
 /** @taskunit Private */
 
