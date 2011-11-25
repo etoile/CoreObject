@@ -9,6 +9,7 @@ endif
 
 CC=clang
 CXX=clang
+LD=$(CXX)
 
 ObjectMerging_OBJC_FILES = $(wildcard CO*.m) $(wildcard NS*.m)
 ifeq ($(test), yes)
@@ -24,7 +25,7 @@ ObjectMerging_NEEDS_GUI = no
 ADDITIONAL_OBJCFLAGS = -Werror
 ADDITIONAL_OBJCCFLAGS = -Werror
 
-SUBPROJECTS=fmdb
+ObjectMerging_LDFLAGS += -lstdc++ -lobjcxx
 
 LIBRARIES_DEPEND_UPON = -lEtoileFoundation $(FND_LIBS)
 

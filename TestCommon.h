@@ -1,4 +1,4 @@
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import <UnitKit/UKRunner.h>
 #import "COEditingContext.h"
 #import "COStore.h"
@@ -18,7 +18,7 @@
   */
 #define OPEN_STORE(store)  NSAutoreleasePool *_pool = [NSAutoreleasePool new]; COStore *store = [[COStore alloc] initWithURL: STORE_URL];
 #define CLOSE_STORE(store) [_pool drain]; [store release];
-#define DELETE_STORE [[NSFileManager defaultManager] removeItemAtPath: [STORE_URL path] error: NULL]
+#define DELETE_STORE [[NSFileManager defaultManager] removeFileAtPath: [STORE_URL path] handler: nil]
 
 // NOTE: The Xcode project includes a test suite limited to the store tests
 #ifndef STORE_TEST

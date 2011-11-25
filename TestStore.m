@@ -16,7 +16,7 @@ static void DeleteOldStore()
 {
 	if([[NSFileManager defaultManager] fileExistsAtPath: [STORE_URL path]])
 	{
-		BOOL removed = [[NSFileManager defaultManager] removeItemAtPath: [STORE_URL path] error: NULL];
+		BOOL removed = [[NSFileManager defaultManager] removeFileAtPath: [STORE_URL path] handler: nil];
 		assert(removed);
 	}
 }
@@ -27,7 +27,7 @@ static void DeleteOldStore()
 #define TEAR_DOWN_STORE(store) \
 	NSURL *_store_url =[[store URL] retain]; \
 	CLOSE_STORE(store); \
-	[[NSFileManager defaultManager] removeItemAtPath: [_store_url path] error: NULL]; \
+	[[NSFileManager defaultManager] removeFileAtPath: [_store_url path] handler: nil]; \
 	[_store_url release];
 
 - (void)testCreate
@@ -78,7 +78,7 @@ static void DeleteOldStore()
 		CLOSE_STORE(s2);
 	}
 	
-	[[NSFileManager defaultManager] removeItemAtPath: [STORE_URL path] error: NULL];
+	[[NSFileManager defaultManager] removeFileAtPath: [STORE_URL path] handler: nil];
 }
 
 
