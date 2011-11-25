@@ -623,7 +623,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 		FOREACH(propertiesToCommit, prop, NSString*)
 		{
-			id value = [obj valueForProperty: prop];
+			id value = [obj serializedValueForProperty: prop];
 			id plist = [obj propertyListForValue: value];
 			
 			[_store setValue: plist
@@ -749,7 +749,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 				id plist = [dict objectForKey: key];
 				id value = [obj valueForPropertyList: plist];
 				//NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
-				[obj setValue: value forProperty: key];
+				[obj setSerializedValue: value forProperty: key];
 				[propertiesToFetch removeObject: key];
 			}
 		}

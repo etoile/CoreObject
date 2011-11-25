@@ -384,14 +384,29 @@
 	}
 }
 
-- (void)debugCheckValue:(id)value
+
+// TODO: Would be better not to turn every collection into a mutable one
+// We ought to save the mutability when serializing collections. For example, 
+// don't serialize NSMutableArray into NSArray. Might be hard with the current 
+// plist format.
+- (id)checkMutabilityForCollection: (id)value
+{
+	if ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]])
+	{
+		value = [[value mutableCopy] autorelease];
+	}
+	return value;
+}
+
+/* Makes sure the value is in the same context as us. */
+- (void)checkEditingContextForValue:(id)value
 {
 	if ([value isKindOfClass: [NSArray class]] ||
 		[value isKindOfClass: [NSSet class]])
 	{
 		for (id subvalue in value)
 		{
-			[self debugCheckValue: subvalue];
+			[self checkEditingContextForValue: subvalue];
 		}
 	}
 	else 
@@ -514,20 +529,19 @@
 	[self setIgnoringRelationshipConsistency: NO];
 }
 
-- (BOOL) setValue:(id)value forProperty:(NSString*)key
+- (BOOL) setValue: (id)value forProperty: (NSString *)key
 {
 	/* We call the setter directly if implemented */
 
 	NSString *setterName = [@"set" stringByAppendingString: [key capitalizedString]];
+	SEL setter = NSSelectorFromString(setterName);
 
-	if ([self respondsToSelector: NSSelectorFromString(setterName)])
+	if ([self respondsToSelector: setter])
 	{
-		/* We use -setPrimitiveValue:forKey: to get a fallback on 
-		   -setValue:forUndefinedKey: if we have a type mistmatch between the 
-		   value and the setter argument. 
-
-		   See pathResizeSelector in -[ETShape setValue:forUndefinedKey:] */
-		[self setPrimitiveValue: value forKey: key];
+		// NOTE: We could -setValue:forKey: to get a fallback on 
+		// -setValue:forUndefinedKey: if we have a type mistmatch between the 
+		// value and the setter argument.
+		[self performSelector: setter withObject: value];
 		return YES;
 	}
 
@@ -548,22 +562,11 @@
 	//}
 	
 	[self updateRelationshipConsistencyWithValue: value forProperty: key];
-	
-	// Collections must be mutable
-	if ([value isKindOfClass: [NSArray class]]
-		|| [value isKindOfClass: [NSSet class]])
-	{
-		value = [[value mutableCopy] autorelease];
-	}
-	
-	// Make sure the value is in the same context as us
-	[self debugCheckValue: value];
-	
-	// Actually set the value.
+	value = [self checkMutabilityForCollection: value];
+	[self checkEditingContextForValue: value];
 	
 	[self willChangeValueForProperty: key];
-	// FIXME: We should use -setValue:forUndefinedKey:, but this makes Worktable crashes currently
-	[super setValue: value forKey: key];
+	[self setPrimitiveValue: value forKey: key];
 	[self didChangeValueForProperty: key];
 
 	return YES;
@@ -690,13 +693,12 @@
 	[super didChangeValueForKey: key];
 }
 
-// Overridable Notifications
-
-- (void) didCreate
+- (void)didCreate
 {
+
 }
 
-- (void) awakeFromInsert
+- (void)awakeFromInsert
 {
 	// Set up collections
 	BOOL wasIgnoringDamage = _isIgnoringDamageNotifications;
@@ -714,7 +716,7 @@
 	_isIgnoringDamageNotifications = wasIgnoringDamage;
 }
 
-- (void) awakeFromFetch
+- (void)awakeFromFetch
 {
 	// Debugging check that collections were set up properly
 	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
@@ -729,11 +731,15 @@
 		}
 	}
 }
-- (void) willTurnIntoFault
+
+- (void)willTurnIntoFault
 {
-} 
-- (void) didTurnIntoFault
+
+}
+
+- (void)didTurnIntoFault
 {
+
 }
 
 - (NSUInteger)hash
@@ -1042,7 +1048,7 @@ static int indent = 0;
 	return _isIgnoringRelationshipConsistency;
 }
 
-- (void) setIgnoringRelationshipConsistency: (BOOL)ignore
+- (void)setIgnoringRelationshipConsistency: (BOOL)ignore
 {
 	_isIgnoringRelationshipConsistency = ignore;
 }
@@ -1064,9 +1070,10 @@ static int indent = 0;
 		return [self performSelector: getter];
 	}	
 
-	/* If no valid getter can be found, we access the variable storage */
+	/* If no custom getter can be found, we use PVC which will in last resort 
+	   access the variable storage with -primitiveValueForKey: */
 
-	return [self primitiveValueForKey: key];
+	return [self valueForProperty: key];
 }
 
 - (void)setSerializedValue: (id)value forProperty: (NSString *)key
@@ -1075,7 +1082,13 @@ static int indent = 0;
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
 	}
-		
+
+	// TODO: We should check (but not update) the relationship consistency in a 
+	// vein similar to [self updateRelationshipConsistencyWithValue: value forProperty: key];
+
+	value = [self checkMutabilityForCollection: value];
+	[self checkEditingContextForValue: value];
+	
 	/* First we try to use the setter named 'setSerialized' + 'key' */
 
 	// TODO: Probably a bit slow, rewrite in C a bit
@@ -1088,7 +1101,7 @@ static int indent = 0;
 		return;
 	}	
 	
-	/* When no such setter can be found, we try to access the ivar with KVC semantics */
+	/* When no custom setter can be found, we try to access the ivar with KVC semantics */
 
 	if (ETSetInstanceVariableValueForKey(self, value, key))
 		return;
