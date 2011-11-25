@@ -148,8 +148,8 @@
 
 - (NSArray *)propertyNames;
 - (NSArray *)persistentPropertyNames;
-- (id)valueForProperty:(NSString *)key;
-- (BOOL)setValue:(id)value forProperty:(NSString*)key;
+- (id)valueForProperty: (NSString *)key;
+- (BOOL)setValue: (id)value forProperty: (NSString *)key;
 
 /** @taskunit Direct Access to the Variable Storage */
 

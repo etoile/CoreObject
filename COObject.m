@@ -350,7 +350,7 @@
 		return nil;
 	}
 	
-	return [super primitiveValueForKey: key];
+	return [super valueForKey: key];
 }
 
 + (BOOL) isPrimitiveCoreObjectValue: (id)value
@@ -563,7 +563,7 @@
 	
 	[self willChangeValueForProperty: key];
 	// FIXME: We should use -setValue:forUndefinedKey:, but this makes Worktable crashes currently
-	[super setPrimitiveValue: value forKey: key];
+	[super setValue: value forKey: key];
 	[self didChangeValueForProperty: key];
 
 	return YES;
@@ -1034,45 +1034,53 @@ static int indent = 0;
 
 - (id)serializedValueForProperty: (NSString *)key
 {
-	// TODO: Probably a bit slow, rewrite in C
-	/*SEL getter = NSSelectorFromString([@"primitive" stringByAppendingString: [key capitalizedString]];
-
-	if ([self respondsToSelector: setter])
+	if (![[self propertyNames] containsObject: key])
 	{
-		if (![[self propertyNames] containsObject: key])
-		{
-			[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
-		}
+		[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
+	}
 
-		return [self performSelector: setter withObject: value object: ];
-	}
-	else*/
+	/* First we try to use the getter named 'serialized' + 'key' */
+
+	// TODO: Probably a bit slow, rewrite in C a bit
+	SEL getter = NSSelectorFromString([@"serialized" stringByAppendingString: [key capitalizedString]]);
+
+	if ([self respondsToSelector: getter])
 	{
-		return [self valueForProperty: key];
-	}
+		return [self performSelector: getter];
+	}	
+
+	/* If no valid getter can be found, we access the variable storage */
+
+	return [self primitiveValueForKey: key];
 }
 
 - (void)setSerializedValue: (id)value forProperty: (NSString *)key
 {
-	// TODO: Probably a bit slow, rewrite in C
-	/*SEL setter = NSSelectorFromString([[@"setPrimitive" stringByAppendingString: [key capitalizedString]];
+	if (![[self propertyNames] containsObject: key])
+	{
+		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
+	}
+		
+	/* First we try to use the setter named 'setSerialized' + 'key' */
+
+	// TODO: Probably a bit slow, rewrite in C a bit
+	SEL setter = NSSelectorFromString([NSString stringWithFormat: @"%@%@:", 
+		@"setSerialized", [key capitalizedString], @":"]);
 
 	if ([self respondsToSelector: setter])
 	{
-		if (![[self propertyNames] containsObject: key])
-		{
-			[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
-		}
-
 		[self performSelector: setter withObject: value];
-		
-		// TODO: Relationship consistency check
-		return YES;
-	}
-	else*/
-	{
-		[self setValue: value forProperty: key];
-	}
+		return;
+	}	
+	
+	/* When no such setter can be found, we try to access the ivar with KVC semantics */
+
+	if (ETSetInstanceVariableValueForKey(self, value, key))
+		return;
+
+	/* If no valid ivar can be found, we access the variable storage */
+
+	[self setPrimitiveValue: value forKey: key];
 }
 
 static NSArray *COArrayPropertyListForArray(NSArray *array)
@@ -1247,7 +1255,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		{
 			NSArray *objects = [plist valueForKey: @"objects"];
 			NSMutableSet *set = [NSMutableSet setWithCapacity: [objects count]];
-			for (int i=0; i<[objects count]; i++)
+			for (int i = 0; i < [objects count]; i++)
 			{
 				[set addObject: [self valueForPropertyList: [objects objectAtIndex:i]]];
 			}
@@ -1287,7 +1295,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	{
 		NSUInteger count = [(NSArray*)plist count];
 		id mapped[count];
-		for (int i=0; i<count; i++)
+		for (int i = 0; i < count; i++)
 		{
 			mapped[i] = [self valueForPropertyList: [(NSArray*)plist objectAtIndex:i]];
 		}
