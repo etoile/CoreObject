@@ -28,7 +28,7 @@
 	[super dealloc];
 }
 
-- (NSURL*)URL
+- (NSURL *)URL
 {
 	return url;
 }
@@ -88,7 +88,7 @@ void CHECK(id db)
 	
 	// Otherwise, set up the DB
 	
-	success = success && [db executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER)"]; CHECK(db);
+	success = success && [db executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, plist BLOB)"]; CHECK(db);
 	success = success && [db executeUpdate: @"INSERT INTO storeMetadata(version) VALUES(1)"]; CHECK(db);
 	
 	// Instead of storing UUIDs and property names thoughout the database,
@@ -214,6 +214,69 @@ void CHECK(id db)
 	}
 	[rs close];
 	return result;
+}
+
+
+- (int) currentStoreVersion
+{
+	FMResultSet *resultSet = [db executeQuery: @"SELECT MAX(version) FROM storeMetadata"];
+	int version = -1;
+
+	if ([resultSet next])
+	{
+		version = [resultSet intForColumnIndex: 0];
+	}
+	else
+	{
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"Missing store version"]; 	
+	}
+	[resultSet close];
+
+	return version;
+}
+
+- (NSDictionary *)metadata
+{
+	FMResultSet *resultSet = 
+		[db executeQuery: @"SELECT plist FROM storeMetadata WHERE version == (SELECT MAX(version) FROM storeMetadata)"];
+	NSData *plistData = nil;
+	
+	if ([resultSet next])
+	{
+		plistData = [resultSet dataForColumnIndex: 0];
+	}
+	[resultSet close];
+
+	if (plistData == nil)
+	{
+		return [NSDictionary dictionary];
+	}
+
+	id plist = [NSPropertyListSerialization propertyListFromData: plistData
+	                                            mutabilityOption: NSPropertyListImmutable
+	                                                      format: NULL
+	                                            errorDescription: NULL];
+
+	ETAssert([plist isKindOfClass: [NSDictionary class]]);
+	return plist;
+}
+
+- (void)setMetadata: (NSDictionary *)plist
+{
+	NILARG_EXCEPTION_TEST(plist);
+
+	NSData *plistData = [NSPropertyListSerialization dataFromPropertyList: plist
+	                                                               format: NSPropertyListXMLFormat_v1_0
+	                                                     errorDescription: NULL];
+
+	if (plistData == nil)
+	{
+		[NSException raise: NSInvalidArgumentException format: @"Failed to serialize metadata plist %@", plist];
+	}
+
+	[db executeUpdate: @"UPDATE storeMetadata SET plist = ? WHERE version == (SELECT MAX(version) FROM storeMetadata)", 
+		plistData]; CHECK(db);
 }
 
 /* Content  */
@@ -824,8 +887,8 @@ void CHECK(id db)
 		maxRevNumber = [self latestRevisionNumber];
 	FMResultSet *rs = [db executeQuery: @"SELECT MAX(revisionnumber) FROM uuids "
 		"JOIN commits ON uuids.uuidIndex = commits.objectuuid "
-		"WHERE revisionnumber <= ? AND commits.rootIndex = ?",
-		[self keyForUUID: uuid], [NSNumber numberWithLongLong: maxRevNumber]]; CHECK(db);
+		"WHERE revisionnumber <= ? AND uuids.rootIndex = ?",
+		[NSNumber numberWithLongLong: maxRevNumber], [self keyForUUID: uuid]]; CHECK(db);
 	if ([rs next])
 	{
 		return [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];

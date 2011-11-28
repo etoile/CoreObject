@@ -23,6 +23,28 @@
 - (id)initWithURL: (NSURL*)aURL;
 - (NSURL*)URL;
 
+/** @taskunit Store Metadata */
+
+/**
+ * Returns the metadata attached to the store.
+ *
+ * See -metadata to learn about the keys in the returned plist.
+ */
+- (NSDictionary *) metadata;
+/**
+ * Sets the metadata attached to the store.
+ *
+ * The dictionary must be a valid plist and can contain the keys:
+ *
+ * <list>
+ * <item>kCOTagGroupUUID</item>
+ * <item>kCOLibraryGroupUUID</item>
+ * </list>
+ *
+ * The UUIDs must be NSString objects.
+ */
+- (void) setMetadata: (NSDictionary *)plist;
+
 /** @taskunit Persistent Roots  */
 
 /** 
