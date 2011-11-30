@@ -90,14 +90,25 @@
 /** @taskunit Special Groups and Libraries */
 
 /**
- * Returns a group listing all the current core objects in the store.
+ * Returns a group listing every core object in the store.
  */
 - (COSmartGroup *)mainGroup;
-
-/*+ (void) registerLibrary: (COOGroup *)aGroup forType: (NSString *)libraryType;
-+ (COGroup *) libraryForType: (NSString *)libraryType;
-+ (id) photoLibrary;
-+ (id) musicLibrary;*/
+/**
+ * Returns a group listing the groups that represents tags in the store.
+ */
+- (COGroup *)tagGroup;
+/**
+ * Returns a group listing the libraries in the store.
+ */
+- (COGroup *)libraryGroup;
+/**
+ * Returns a group listing the pictures in the store.
+ */
+- (id)photoLibrary;
+/**
+ * Returns a group listing the music tracks in the store.
+ */
+- (id)musicLibrary;
 
 /** @taskunit Store and Metamodel Access */
 

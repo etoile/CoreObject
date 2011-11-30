@@ -101,25 +101,55 @@ static COEditingContext *currentCtxt = nil;
 	return group;
 }
 
-/*+ (void) registerLibrary: (COGroup *)aGroup forType: (NSString *)libraryType
+- (COGroup *)tagGroup
 {
+	NSString *UUIDString = [[_store metadata] objectForKey: @"kCOTagGroupUUID"];
 
+	if (UUIDString == nil)
+	{
+		COGroup *newGroup = [self insertObjectWithEntityName: @"Anonymous.COGroup"];
+		NSMutableDictionary *metadata = AUTORELEASE([[_store metadata] mutableCopy]);
+
+		[newGroup setName: _(@"Tags")];
+		[metadata setObject: [[newGroup UUID] stringValue] 
+		             forKey: @"kCOTagGroupUUID"];
+		[_store setMetadata: metadata];
+	
+		return newGroup;
+	}
+
+	return (id)[self objectWithUUID: [ETUUID UUIDWithString: UUIDString]];
 }
 
-+ (COGroup *) libraryForType: (NSString *)libraryType
+- (COGroup *)libraryGroup
 {
+	NSString *UUIDString = [[_store metadata] objectForKey: @"kCOLibraryGroupUUID"];
 
+	if (UUIDString == nil)
+	{
+		COGroup *newGroup = [self insertObjectWithEntityName: @"Anonymous.COGroup"];
+		NSMutableDictionary *metadata = AUTORELEASE([[_store metadata] mutableCopy]);
+
+		[newGroup setName: _(@"Libraries")];
+		[metadata setObject: [[newGroup UUID] stringValue] 
+		             forKey: @"kCOLibraryGroupUUID"];
+		[_store setMetadata: metadata];
+	
+		return newGroup;
+	}
+
+	return (id)[self objectWithUUID: [ETUUID UUIDWithString: UUIDString]];
 }
 
-+ (id) photoLibrary
+- (id)photoLibrary
 {
-	return [self libraryForType: kCOLibraryTypePhoto];
+	return [[self libraryGroup] groupForTagString: @"photo"];
 }
 
-+ (id) musicLibrary
+- (id)musicLibrary
 {
-	return [self libraryForType: kCOLibraryTypeMusic];
-}*/
+	return [[self libraryGroup] groupForTagString: @"music"];
+}
 
 - (COStore *)store
 {

@@ -23,7 +23,38 @@
 {
 
 }
- 
+
+/** @taskunit Collection Mutation Additions */
+
+/**
+ * Adds all the given objects to the receiver content.
+ */
+- (void)addObjects: (NSArray *)anArray;
+
+/** @taskunit Tagging */
+
+/**
+ * Returns whether the receiver is a tag or not.
+ *
+ * A tag is group that belongs to -[COEditingContext tagGroup].
+ */
+- (BOOL)isTag;
+/**
+ * Returns the tag the receiver represents.
+ *
+ * COGroup can represent a tag attached to every object that belongs to the group.
+ *
+ * By default, returns the name in lower case.
+ */
+- (NSString *)tagString;
+/**
+ * Returns the first subgroup whose tag string matches.
+ *
+ * The search is shallow, in other words limited to the objects in the receiver 
+ * content.
+ */
+- (COGroup *)groupForTagString: (NSString *)aTag;
+
 /** @taskunit Object Matching */
 
 /**

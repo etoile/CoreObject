@@ -140,9 +140,38 @@
 @property (nonatomic, retain) NSString *name;
 
 /**
+ * Returns the last time the receiver changes were committed.
+ *
+ * The returned date is the last root object revision date. See -[CORevision date].
+ *
+ * Can be more recent than the present receiver revision (see -revision).
+ */
+- (NSDate *)modificationDate;
+/**
+ * Returns the first time the receiver changes were committed.
+ *
+ * The returned date is the first root object revision date. See -[CORevision date].
+ */
+- (NSDate *)creationDate;
+/**
  * Returns -name.
  */
 - (NSString *)displayName;
+/**
+ * Returns the groups to which the receiver belongs to.
+ *
+ * Groups are COGroup or subclass instances.
+ *
+ * See also -tags.
+ */
+- (NSArray *)parentGroups;
+/**
+ * Returns the tags attached to the receiver. 
+ *
+ * This method returns a -parentGroups subset. Groups which don't belong to 
+ * -[COEditingContext tagGroup] are filtered out.
+ */
+- (NSArray *)tags;
 
 /** @taskunit Property-Value Coding */
 
@@ -284,7 +313,7 @@
  */
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
 
-/** @taskunit Debugging */
+/** @taskunit Debugging and Description */
 
 /** 
  * Serializes the property value into the CoreObject serialized representation, 
@@ -302,6 +331,31 @@
  * Returns a short description to summarize the receiver. 
  */
 - (NSString *)description;
+/**
+ * Returns a short and human-readable description of the receiver type.
+ *
+ * This is used to present the type to the user in the UI.<br />
+ * As such, the returned string must be localized.
+ *
+ * By default, returns the entity localized description, 
+ * -[ETEntityDescription setLocalizedDescription:] can be used to customize 
+ * the description. See -entityDescription to access the entity.
+ * 
+ * You can override the method to return a custom description too. For example, 
+ * a COPhoto subclass could return the UTI description bound to the image it 
+ * encapsulates: <code>[[[self image] UTI] typeDescription]</code>.
+ *
+ * This method doesn't return the receiver UTI description e.g. 
+ * <em>Core Object</em>, it is more accurate but not simple enough to be 
+ * presented to the user. 
+ */
+- (NSString *)typeDescription;
+/** 
+ * Returns the receiver tags in a coma separated list.
+ *
+ * This is used to present -tags to the user in the UI.
+ */
+- (NSString *)tagDescription;
 
 /** @taskunit Private */
 

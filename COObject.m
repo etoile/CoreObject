@@ -13,6 +13,7 @@
 #import "COObject.h"
 #import "COFault.h"
 #import "COEditingContext.h"
+#import "COStore.h"
 #import "COContainer.h"
 #import "COGroup.h"
 #include <objc/runtime.h>
@@ -28,7 +29,14 @@
 	if ([[object name] isEqual: [COObject className]] == NO) 
 		return object;
 
-	
+	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COObject"
+	                               description: @"Core Object"
+	                          supertypeStrings: [NSArray array]
+	                                  typeTags: [NSDictionary dictionary]];
+	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
+
+	[object setLocalizedDescription: _(@"Basic Object")];
+
 	ETPropertyDescription *nameProperty = 
 		[ETPropertyDescription descriptionWithName: @"name" type: (id)@"Anonymous.NSString"];
 	ETPropertyDescription *modificationDateProperty = 
@@ -37,8 +45,10 @@
 		[ETPropertyDescription descriptionWithName: @"creationDate" type: (id)@"Anonymous.NSDate"];
 	ETPropertyDescription *lastVersionDescProperty = 
 		[ETPropertyDescription descriptionWithName: @"lastVersionDescription" type: (id)@"Anonymous.NSString"];
-	ETPropertyDescription *parentGroupDescProperty = 
-		[ETPropertyDescription descriptionWithName: @"parentGroupDescription" type: (id)@"Anonymous.NSString"];
+	ETPropertyDescription *tagDescProperty = 
+		[ETPropertyDescription descriptionWithName: @"tagDescription" type: (id)@"Anonymous.NSString"];
+	ETPropertyDescription *typeDescProperty = 
+		[ETPropertyDescription descriptionWithName: @"typeDescription" type: (id)@"Anonymous.NSString"];
 
 	// TODO: Figure out how to compute and present each core object size...
 	// Possible choices would be:
@@ -55,6 +65,7 @@
 	ETPropertyDescription *displayNameProperty = 
 		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"Anonymous.NSString"];
 
+
 	// TODO: I think these properties should be declared in subclasses or custom 
 	// entity descriptions set per COObject instance (Quentin).
 
@@ -69,7 +80,7 @@
 	[parentCollectionsProperty setMultivalued: YES];
 
 	NSArray *transientProperties = A(displayNameProperty, modificationDateProperty, 
-		creationDateProperty, lastVersionDescProperty, parentGroupDescProperty);
+		creationDateProperty, lastVersionDescProperty, tagDescProperty, typeDescProperty);
 #ifndef GNUSTEP
 	transientProperties = [transientProperties arrayByAddingObject: iconProperty];
 #endif
@@ -328,6 +339,32 @@
 	[self willChangeValueForProperty: @"name"];
 	[self setValue: aName forUndefinedKey: @"name"];
 	[self didChangeValueForProperty: @"name"];
+}
+
+- (NSDate *)modificationDate
+{
+	CORevision *rev = [[[self editingContext] store] maxRevision: INT64_MAX 
+	                                           forRootObjectUUID: [[self rootObject] UUID]];
+	return [rev date];
+}
+
+- (NSDate *)creationDate
+{
+	CORevision *rev = [[[self editingContext] store] maxRevision: 0 
+	                                           forRootObjectUUID: [[self rootObject] UUID]];
+	return [rev date];
+}
+
+- (NSArray *)parentGroups
+{
+	return [self valueForProperty: @"parentCollections"];
+}
+
+- (NSArray *)tags
+{
+	NSMutableArray *tags = [NSMutableArray arrayWithArray: [self parentGroups]];
+	[[tags filter] isTag];
+	return tags;
 }
 
 /* Property-value coding */
@@ -1015,6 +1052,16 @@ static int indent = 0;
 	}
 	_inDescription = NO;
 	return desc;
+}
+
+- (NSString *)typeDescription
+{
+	return [[self entityDescription] localizedDescription];
+}
+
+- (NSString *)tagDescription
+{
+	return [(NSArray *)[[[self tags] mappedCollection] tagString] componentsJoinedByString: @", "];
 }
 
 /* 

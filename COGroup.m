@@ -8,6 +8,7 @@
  */
 
 #import "COGroup.h"
+#import "COEditingContext.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 
@@ -21,7 +22,14 @@
 	// property descriptions that we will inherit through the parent
 	if ([[collection name] isEqual: [COGroup className]] == NO) 
 		return collection;
-	
+
+	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COGroup"
+	                               description: @"Core Object Group"
+	                          supertypeStrings: [NSArray array]
+	                                  typeTags: [NSDictionary dictionary]];
+	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
+
+	[collection setLocalizedDescription: _(@"Group")];
 	[collection setParent: (id)@"Anonymous.COObject"];
 
 	ETPropertyDescription *collectionContentsProperty = 
@@ -36,6 +44,14 @@
 	return collection;
 }
 
+- (void)addObjects: (NSArray *)anArray
+{
+	for (id object in anArray)
+	{
+		[self addObject: object];
+	}
+}
+
 - (BOOL) isOrdered
 {
 	return NO;
@@ -44,6 +60,29 @@
 - (NSArray *) contentArray
 {
 	return [[self content] allObjects];
+}
+
+- (BOOL)isTag
+{
+	return [[[self editingContext] tagGroup] containsObject: self];
+}
+
+- (NSString *)tagString
+{
+	return [[self name] lowercaseString];
+}
+
+- (COGroup *)groupForTagString: (NSString *)aTag
+{
+	for (id object in [self content])
+	{
+		if ([object respondsToSelector: @selector(tagString)] 
+		 && [[object tagString] isEqualToString: aTag])
+		{
+			return object;
+		}
+	}
+	return nil;
 }
 
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
@@ -83,7 +122,15 @@
 	// property descriptions that we will inherit through the parent
 	if ([[group name] isEqual: [COSmartGroup className]] == NO) 
 		return group;
-	
+
+	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COSmartGroup"
+	                               description: @" Smart Core Object Group"
+	                          supertypeStrings: [NSArray array]
+	                                  typeTags: [NSDictionary dictionary]];
+	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
+
+	[group setLocalizedDescription: _(@"Smart Group")];
+
 	ETPropertyDescription *contentProperty = 
 		[ETPropertyDescription descriptionWithName: @"content" type: (id)@"Anonymous.COObject"];
 	
