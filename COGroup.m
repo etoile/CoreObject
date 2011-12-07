@@ -91,7 +91,7 @@
 
 	for (COObject *object in [self content])
 	{
-		if ([object matchesPredicate: [aQuery predicate]])
+		if ([[aQuery predicate] evaluateWithObject: object])
 		{
 			[result addObject: object];
 		}

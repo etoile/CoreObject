@@ -81,12 +81,6 @@
  */
 @protocol COObjectMatching
 /**
- * Returns whether the receiver matches the predicate conditions.
- *
- * Must raise a NSInvalidArgumentException if the predicate is nil.
- */
-- (BOOL)matchesPredicate: (NSPredicate *)aPredicate;
-/**
  * Returns the objects matching the query conditions.
  *
  * Must be implemented by recursively traversing the object graph each time 
