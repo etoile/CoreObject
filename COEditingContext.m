@@ -141,12 +141,12 @@ static COEditingContext *currentCtxt = nil;
 
 - (id)photoLibrary
 {
-	return [[self libraryGroup] groupForTagString: @"photo"];
+	return [[self libraryGroup] objectForName: _(@"Photo")];
 }
 
 - (id)musicLibrary
 {
-	return [[self libraryGroup] groupForTagString: @"music"];
+	return [[self libraryGroup] objectForName: _(@"Music")];
 }
 
 - (COStore *)store

@@ -24,38 +24,72 @@
 
 }
 
-/** @taskunit Tagging */
+/**
+ * Returns YES.
+ */
+- (BOOL)isGroup;
+
+@end
+
 
 /**
- * Returns whether the receiver is a tag or not.
+ * @group Object Collection and Organization
+ *
+ * COTag represents a tag attached to every object that belongs to it.
+ */
+@interface COTag : COGroup
+{
+
+}
+
+/**
+ * Returns YES.
  *
  * A tag is group that belongs to -[COEditingContext tagGroup].
  */
 - (BOOL)isTag;
+
+/** @taskunit Tagging */
+
 /**
  * Returns the tag the receiver represents.
  *
- * COGroup can represent a tag attached to every object that belongs to the group.
+ * COTag can represent a tag attached to every object that belongs to it.
  *
  * By default, returns the name in lower case.
  */
 - (NSString *)tagString;
-/**
- * Returns the first subgroup whose tag string matches.
- *
- * The search is shallow, in other words limited to the objects in the receiver 
- * content.
- */
-- (COGroup *)groupForTagString: (NSString *)aTag;
 
 @end
+
+
+
+/**
+ * @group Object Collection and Organization
+ *
+ * COTagGroup is used to organize tags. 
+ *
+ * A tag group content is restricted to COTag objects.
+ *
+ * Tags can be belong to multiple tag groups.
+ */
+@interface COTagGroup : COGroup
+{
+
+}
+
+@end
+
 
 typedef NSArray *(^COContentBlock)(void);
 
 /**
- * @group Object Organization
+ * @group Object Collection and Organization
  *
  * A custom group class whose content is provided a query or a code block.
+ *
+ * COSmartGroup is an immutable, ordered, weak (an object can be in any number 
+ * of collections) collection class.
  */
 @interface COSmartGroup : COObject <ETCollection>
 {

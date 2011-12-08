@@ -43,6 +43,11 @@
 	return collection;
 }
 
+- (BOOL)isGroup
+{
+	return YES;
+}
+
 - (BOOL) isOrdered
 {
 	return NO;
@@ -53,9 +58,35 @@
 	return [[self content] allObjects];
 }
 
+@end
+
+
+@implementation COTag
+
++ (ETEntityDescription *) newEntityDescription
+{
+	ETEntityDescription *collection = [self newBasicEntityDescription];
+
+	// For subclasses that don't override -newEntityDescription, we must not add the 
+	// property descriptions that we will inherit through the parent
+	if ([[collection name] isEqual: [COTag className]] == NO) 
+		return collection;
+
+	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COTag"
+	                               description: @"Core Object Tag"
+	                          supertypeStrings: [NSArray array]
+	                                  typeTags: [NSDictionary dictionary]];
+	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
+
+	[collection setLocalizedDescription: _(@"Tag")];
+
+	return collection;
+}
+
 - (BOOL)isTag
 {
-	return [[[self editingContext] tagGroup] containsObject: self];
+	assert([[[self editingContext] tagGroup] containsObject: self]);
+	return YES;
 }
 
 - (NSString *)tagString
@@ -63,20 +94,33 @@
 	return [[self name] lowercaseString];
 }
 
-- (COGroup *)groupForTagString: (NSString *)aTag
+@end
+
+
+@implementation COTagGroup
+
++ (ETEntityDescription *) newEntityDescription
 {
-	for (id object in [self content])
-	{
-		if ([object respondsToSelector: @selector(tagString)] 
-		 && [[object tagString] isEqualToString: aTag])
-		{
-			return object;
-		}
-	}
-	return nil;
+	ETEntityDescription *collection = [self newBasicEntityDescription];
+
+	// For subclasses that don't override -newEntityDescription, we must not add the 
+	// property descriptions that we will inherit through the parent
+	if ([[collection name] isEqual: [COTagGroup className]] == NO) 
+		return collection;
+
+	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COTagGroup"
+	                               description: @"Core Object Tag Group"
+	                          supertypeStrings: [NSArray array]
+	                                  typeTags: [NSDictionary dictionary]];
+	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
+
+	[collection setLocalizedDescription: _(@"Tag Group")];
+
+	return collection;
 }
 
 @end
+
 
 @implementation COSmartGroup
 

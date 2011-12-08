@@ -15,24 +15,29 @@
 
 + (ETEntityDescription *) newEntityDescription
 {
-	ETEntityDescription *container = [self newBasicEntityDescription];
+	ETEntityDescription *collection = [self newBasicEntityDescription];
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([[container name] isEqual: [COContainer className]] == NO) 
-		return container;
+	if ([[collection name] isEqual: [COContainer className]] == NO) 
+		return collection;
 	
-	ETPropertyDescription *containerContentsProperty = 
+	ETPropertyDescription *contentsProperty = 
 		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.COObject"];
 	
-	[containerContentsProperty setMultivalued: YES];
-	[containerContentsProperty setOpposite: (id)@"Anonymous.COObject.parentContainer"]; // FIXME: just 'parent' should work...
-	[containerContentsProperty setOrdered: YES];
-	[containerContentsProperty setPersistent: YES];
+	[contentsProperty setMultivalued: YES];
+	[contentsProperty setOpposite: (id)@"Anonymous.COObject.parentContainer"]; // FIXME: just 'parent' should work...
+	[contentsProperty setOrdered: YES];
+	[contentsProperty setPersistent: YES];
 
-	[container setPropertyDescriptions: A(containerContentsProperty)];
+	[collection setPropertyDescriptions: A(contentsProperty)];
 
-	return container;	
+	return collection;	
+}
+
+- (BOOL)isContainer
+{
+	return YES;
 }
 
 - (BOOL) isOrdered
@@ -41,3 +46,31 @@
 }
 
 @end
+
+
+@implementation COLibrary
+
++ (ETEntityDescription *) newEntityDescription
+{
+	ETEntityDescription *collection = [self newBasicEntityDescription];
+
+	// For subclasses that don't override -newEntityDescription, we must not add the 
+	// property descriptions that we will inherit through the parent
+	if ([[collection name] isEqual: [COLibrary className]] == NO) 
+		return collection;
+
+	return collection;	
+}
+
+- (BOOL)isLibrary
+{
+	return YES;
+}
+
+- (BOOL) isOrdered
+{
+	return NO;
+}
+
+@end
+
