@@ -9,13 +9,13 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <ObjectMerging/COObject.h>
+#import <ObjectMerging/COCollection.h>
 
 /**
- * COContainer is a COObject subclass which has an ordered, strong container
- * (contained objects can only be in one COContainer).
+ * COContainer is a mutable, ordered, strong (contained objects can only be in 
+ * one COContainer) collection class.
  */
-@interface COContainer : COObject <ETCollection, ETCollectionMutation>
+@interface COContainer : COCollection
 {
 }
 

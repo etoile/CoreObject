@@ -9,27 +9,20 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <ObjectMerging/COContainer.h>
+#import <ObjectMerging/COCollection.h>
 
 @class COSmartGroup;
 
 /**
  * @group Object Organization
  *
- * COGroup is an unordered, weak (an object can be in any number of collections)
- * collection class.
+ * COGroup is a mutable, unordered, weak (an object can be in any number of 
+ * collections) collection class.
  */
-@interface COGroup : COContainer // FIXME: it's only a subclass of COContainer to avoid code duplication, since the code is identical
+@interface COGroup : COCollection
 {
 
 }
-
-/** @taskunit Collection Mutation Additions */
-
-/**
- * Adds all the given objects to the receiver content.
- */
-- (void)addObjects: (NSArray *)anArray;
 
 /** @taskunit Tagging */
 
@@ -54,15 +47,6 @@
  * content.
  */
 - (COGroup *)groupForTagString: (NSString *)aTag;
-
-/** @taskunit Object Matching */
-
-/**
- * See -[COObjectMatching objectsMatchingQuery:].
- *
- * Object graph traversal implementation for COObjectMatching protocol.
- */
-- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
 
 @end
 

@@ -30,7 +30,6 @@
 	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
 
 	[collection setLocalizedDescription: _(@"Group")];
-	[collection setParent: (id)@"Anonymous.COObject"];
 
 	ETPropertyDescription *collectionContentsProperty = 
 		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.COObject"];
@@ -42,14 +41,6 @@
 	[collection setPropertyDescriptions: A(collectionContentsProperty)];
 
 	return collection;
-}
-
-- (void)addObjects: (NSArray *)anArray
-{
-	for (id object in anArray)
-	{
-		[self addObject: object];
-	}
 }
 
 - (BOOL) isOrdered
@@ -83,21 +74,6 @@
 		}
 	}
 	return nil;
-}
-
-- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
-{
-	NSMutableArray *result = [NSMutableArray array];
-
-	for (COObject *object in [self content])
-	{
-		if ([[aQuery predicate] evaluateWithObject: object])
-		{
-			[result addObject: object];
-		}
-	}
-
-	return result;
 }
 
 @end

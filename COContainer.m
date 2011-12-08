@@ -13,77 +13,31 @@
 
 @implementation COContainer
 
-+ (void) initialize
-{
-	if (self != [COContainer class])
-		return;
-
-	[self applyTraitFromClass: [ETCollectionTrait class]];
-	[self applyTraitFromClass: [ETMutableCollectionTrait class]];
-}
-
 + (ETEntityDescription *) newEntityDescription
 {
-	ETEntityDescription *group = [self newBasicEntityDescription];
+	ETEntityDescription *container = [self newBasicEntityDescription];
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([[group name] isEqual: [COContainer className]] == NO) 
-		return group;
+	if ([[container name] isEqual: [COContainer className]] == NO) 
+		return container;
 	
-	ETPropertyDescription *groupContentsProperty = 
+	ETPropertyDescription *containerContentsProperty = 
 		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.COObject"];
 	
-	[groupContentsProperty setMultivalued: YES];
-	[groupContentsProperty setOpposite: (id)@"Anonymous.COObject.parentContainer"]; // FIXME: just 'parent' should work...
-	[groupContentsProperty setOrdered: YES];
-	[groupContentsProperty setPersistent: YES];
+	[containerContentsProperty setMultivalued: YES];
+	[containerContentsProperty setOpposite: (id)@"Anonymous.COObject.parentContainer"]; // FIXME: just 'parent' should work...
+	[containerContentsProperty setOrdered: YES];
+	[containerContentsProperty setPersistent: YES];
 
-	[group setPropertyDescriptions: A(groupContentsProperty)];
+	[container setPropertyDescriptions: A(containerContentsProperty)];
 
-	return group;	
+	return container;	
 }
 
 - (BOOL) isOrdered
 {
 	return YES;
-}
-
-- (id) content
-{
-	return [self valueForProperty: @"contents"];
-}
-
-- (NSArray *) contentArray
-{
-	 // FIXME: Should return a new array, but this might break other things currently
-	return [self valueForProperty: @"contents"];
-}
-
-- (void) insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
-{
-	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
-	if (index == ETUndeterminedIndex)
-	{
-		[self addObject: object forProperty: @"contents"];
-	}
-	else
-	{
-		[self insertObject: object atIndex: index forProperty: @"contents"];
-	}
-}
-
-- (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
-{
-	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
-	if (index == ETUndeterminedIndex)
-	{
-		[self removeObject: object forProperty: @"contents"];	
-	}
-	else
-	{
-		[self removeObject: object atIndex: index forProperty: @"contents"];
-	}
 }
 
 @end
