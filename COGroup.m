@@ -8,6 +8,7 @@
  */
 
 #import "COGroup.h"
+#import "COContainer.h"
 #import "COEditingContext.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
@@ -85,7 +86,7 @@
 
 - (BOOL)isTag
 {
-	assert([[[self editingContext] tagGroup] containsObject: self]);
+	assert([[[self editingContext] tagLibrary] containsObject: self]);
 	return YES;
 }
 

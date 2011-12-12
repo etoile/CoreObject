@@ -50,7 +50,9 @@
 
 @implementation COLibrary
 
-+ (ETEntityDescription *) newEntityDescription
+@synthesize identifier;
+
++ (ETEntityDescription *)newEntityDescription
 {
 	ETEntityDescription *collection = [self newBasicEntityDescription];
 
@@ -60,6 +62,12 @@
 		return collection;
 
 	return collection;	
+}
+
+- (void)dealloc
+{
+	DESTROY(identifier);
+	[super dealloc];
 }
 
 - (BOOL)isLibrary
@@ -74,3 +82,53 @@
 
 @end
 
+
+@implementation COEditingContext (COCommonLibraries)
+
+- (COLibrary *)tagLibrary
+{
+	COLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierTag];
+
+	if (lib == nil)
+	{
+		lib = [self insertObjectWithEntityName: @"Anonymous.COLibrary"];
+		[lib setName: _(@"Tags")];
+		[lib setIdentifier: kCOLibraryIdentifierTag];
+		[[self libraryGroup] addObject: lib];
+	}
+	return lib;
+}
+
+- (COLibrary *)photoLibrary
+{
+	COLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierPhoto];
+
+	if (lib == nil)
+	{
+		lib = [self insertObjectWithEntityName: @"Anonymous.COLibrary"];
+		[lib setName: _(@"Photos")];
+		[lib setIdentifier: kCOLibraryIdentifierPhoto];
+		[[self libraryGroup] addObject: lib];
+	}
+	return lib;
+}
+
+- (COLibrary *)musicLibrary
+{
+	COLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierMusic];
+
+	if (lib == nil)
+	{
+		lib = [self insertObjectWithEntityName: @"Anonymous.COLibrary"];
+		[lib setName: _(@"Music")];
+		[lib setIdentifier: kCOLibraryIdentifierMusic];
+		[[self libraryGroup] addObject: lib];
+	}
+	return lib;
+}
+
+@end
+
+NSString * const kCOLibraryIdentifierTag = @"kCOLibraryIdentifierTag";
+NSString * const kCOLibraryIdentifierPhoto = @"kCOLibraryIdentifierPhoto";
+NSString * const kCOLibraryIdentifierMusic = @"kCOLibraryIdentifierMusic";

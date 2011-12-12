@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <ObjectMerging/COCollection.h>
+#import <ObjectMerging/COEditingContext.h>
 
 /** 
  * @group Object Collection and Organization
@@ -40,8 +41,10 @@
  */
 @interface COLibrary : COContainer
 {
-
+	NSString *identifier;
 }
+
+@property (retain, nonatomic) NSString *identifier;
 
 /**
  * Returns YES.
@@ -49,3 +52,50 @@
 - (BOOL)isLibrary;
 
 @end
+
+/** 
+ *@group Object Collection and Organization
+ *
+ * COEditingContext category that gives access to various common libraries.
+ *
+ * You can access these libraries as shown below too:
+ *
+ * <example>
+ * [[editingContext libraryGroup] objectForIdentifier: kCOLibraryIdentifierMusic];
+ * </example>
+ */
+@interface COEditingContext (COCommonLibraries)
+
+/**
+ * Returns a library listing the tags in the store.
+ *
+ * If the library doesn't exist yet, returns a new library but won't commit it.
+ */
+- (COLibrary *)tagLibrary;
+/**
+ * Returns a group listing the pictures in the store.
+ *
+ * If the library doesn't exist yet, returns a new library but won't commit it.
+ */
+- (COLibrary *)photoLibrary;
+/**
+ * Returns a group listing the music tracks in the store.
+ *
+ * If the library doesn't exist yet, returns a new library but won't commit it.
+ */
+- (COLibrary *)musicLibrary;
+
+@end
+
+/** A unique identifier to mark the library listing the tags in the store.
+
+See also -[COEditingContext tagLibrary]. */
+extern NSString * const kCOLibraryIdentifierTag;
+/** A unique identifier to mark the library listing the pictures in the store.
+
+See also -[COEditingContext photoLibrary]. */
+extern NSString * const kCOLibraryIdentifierPhoto;
+/** A unique identifier to mark the library listing the music tracks in the store.
+
+See also -[COEditingContext musicLibrary]. */
+extern NSString * const kCOLibraryIdentifierMusic;

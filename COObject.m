@@ -39,6 +39,10 @@
 
 	ETPropertyDescription *nameProperty = 
 		[ETPropertyDescription descriptionWithName: @"name" type: (id)@"Anonymous.NSString"];
+	// TODO: Declare as a transient property... ETLayoutItem overrides it to be 
+	// a persistent property.
+	//ETPropertyDescription *idProperty = 
+	//	[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"Anonymous.NSString"];
 	ETPropertyDescription *modificationDateProperty = 
 		[ETPropertyDescription descriptionWithName: @"modificationDate" type: (id)@"Anonymous.NSDate"];
 	ETPropertyDescription *creationDateProperty = 
@@ -329,6 +333,11 @@
 - (NSString *)name
 {
 	return [self valueForUndefinedKey: @"name"];
+}
+
+- (NSString *)identifier
+{
+	return [self name];
 }
 
 - (void)setName: (NSString *)aName

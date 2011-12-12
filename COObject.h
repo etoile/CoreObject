@@ -140,6 +140,16 @@
 @property (nonatomic, retain) NSString *name;
 
 /**
+ * <override-dummy />
+ * Returns the object identifier.
+ *
+ * By default, returns -name which can be nil and might not be unique even 
+ * within a COCollection content.
+ *
+ * Can be overriden to return a custom string.
+ */
+- (NSString *)identifier;
+/**
  * Returns the last time the receiver changes were committed.
  *
  * The returned date is the last root object revision date. See -[CORevision date].

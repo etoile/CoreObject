@@ -94,21 +94,9 @@
  */
 - (COSmartGroup *)mainGroup;
 /**
- * Returns a group listing the groups that represents tags in the store.
- */
-- (COGroup *)tagGroup;
-/**
  * Returns a group listing the libraries in the store.
  */
 - (COGroup *)libraryGroup;
-/**
- * Returns a group listing the pictures in the store.
- */
-- (id)photoLibrary;
-/**
- * Returns a group listing the music tracks in the store.
- */
-- (id)musicLibrary;
 
 /** @taskunit Store and Metamodel Access */
 

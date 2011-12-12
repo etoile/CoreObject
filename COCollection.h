@@ -33,12 +33,14 @@
 /** @taskunit Object Matching */
 
 /**
- * Returns the first object whose name matches.
+ * Returns the first object whose identifier matches.
  *
  * The search is shallow, in other words limited to the objects in the receiver 
  * content.
+ *
+ * See -[COObject identifier].
  */
-- (COObject *)objectForName: (NSString *)aName;
+- (id)objectForIdentifier: (NSString *)anId;
 /**
  * See -[COObjectMatching objectsMatchingQuery:].
  *

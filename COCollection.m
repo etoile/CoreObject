@@ -78,11 +78,11 @@
 	}
 }
 
-- (COObject *)objectForName: (NSString *)aName
+- (id)objectForIdentifier: (NSString *)anId
 {
 	for (id object in [self content])
 	{
-		if ([[object name] isEqualToString: aName])
+		if ([[object identifier] isEqualToString: anId])
 		{
 			return object;
 		}
