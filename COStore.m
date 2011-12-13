@@ -100,7 +100,12 @@ void CHECK(id db)
 
 	success = success && [db executeUpdate: @"CREATE TABLE properties(propertyIndex INTEGER PRIMARY KEY, property STRING)"]; CHECK(db);
 	success = success && [db executeUpdate: @"CREATE INDEX propertiesIndex ON properties(property)"]; CHECK(db);
+
+	// One table for storing commit metadata
 	
+	success = success && [db executeUpdate: @"CREATE TABLE commitMetadata(revisionnumber INTEGER PRIMARY KEY, baserevisionnumber INTEGER, plist BLOB)"]; CHECK(db);
+	success = success && [db executeUpdate: @"CREATE INDEX commitsIndex ON commitMetadata(revisionnumber)"]; CHECK(db);	
+
 	// One table for storing the actual commit data (values/keys modified in each commit)
 	//
 	// Explanation of full-text search:
@@ -118,12 +123,7 @@ void CHECK(id db)
 	
 	
 	success = success && [db executeUpdate: @"CREATE TABLE commits(commitrow INTEGER PRIMARY KEY, revisionnumber INTEGER, objectuuid INTEGER, property INTEGER, value BLOB)"]; CHECK(db);
-	success = success && [db executeUpdate: @"CREATE INDEX commitsIndex ON commits(revisionnumber)"]; CHECK(db);	
 	success = success && [db executeUpdate: @"CREATE VIRTUAL TABLE commitsTextSearch USING fts3()"];	 CHECK(db);
-	
-	// One table for storing commit metadata
-	
-	success = success && [db executeUpdate: @"CREATE TABLE commitMetadata(revisionnumber INTEGER PRIMARY KEY, baserevisionnumber INTEGER, plist BLOB)"];CHECK(db);
 		
 	// Commit Track node table
 	success = success && [db executeUpdate: @"CREATE TABLE commitTrackNode(committracknodeid INTEGER PRIMARY KEY, objectuuid INTEGER, revisionnumber INTEGER, nextnode INTEGER, prevnode INTEGER)"]; CHECK(db);
@@ -418,6 +418,9 @@ void CHECK(id db)
 		[NSException raise: NSGenericException format: @"The object UUID %@ is not listed among the root objects.", rootUUID];	
 	}
 
+	commitInProgress = [[NSNumber numberWithUnsignedLongLong: [self latestRevisionNumber] + 1] retain];
+	ASSIGN(rootInProgress, [self keyForUUID: rootUUID]);
+
 	NSMutableDictionary *commitMetadata = [NSMutableDictionary dictionaryWithDictionary: metadata];
 
 	[commitMetadata addEntriesFromDictionary: 
@@ -429,11 +432,9 @@ void CHECK(id db)
 	
 	[db beginTransaction];
 
-	[db executeUpdate: @"INSERT INTO commitMetadata(plist, baserevisionnumber) VALUES(?, ?)",
-		data, baseRevisionNumber];
-
-	commitInProgress = [[NSNumber numberWithUnsignedLongLong: [db lastInsertRowId]] retain];
-	ASSIGN(rootInProgress, [self keyForUUID: rootUUID]);
+	[db executeUpdate: @"INSERT INTO commitMetadata(revisionnumber, baserevisionnumber, plist) VALUES(?, ?, ?)",
+		commitInProgress, baseRevisionNumber, data];
+	CHECK(db);
 }
 
 - (void)beginChangesForObjectUUID: (ETUUID*)object
@@ -578,7 +579,10 @@ void CHECK(id db)
 		componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]] 
 		componentsJoinedByString: @""];
 	// NOTE: We use a distinct query string because -executeQuery returns nil with 'WHERE xyz IN ?'
-	NSString *query = [NSString stringWithFormat: @"SELECT DISTINCT revisionnumber, baseRevisionNumber FROM commits WHERE objectUUID IN %@ ORDER BY revisionnumber", formattedIdNumbers];
+	NSString *query = [NSString stringWithFormat: 
+		@"SELECT DISTINCT commitMetadata.revisionnumber, baserevisionnumber FROM commitMetadata "
+		"JOIN commits ON commits.revisionnumber = commitMetadata.revisionNumber "
+		"WHERE commits.objectUUID IN %@ ORDER BY commitMetadata.revisionnumber", formattedIdNumbers];
 	FMResultSet *rs = [db executeQuery: query];
 
 	while ([rs next])

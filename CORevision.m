@@ -45,7 +45,7 @@
 	return revisionNumber;
 }
 
-- (CORevision*)baseRevision
+- (CORevision *)baseRevision
 {
 	return [store revisionWithRevisionNumber: baseRevisionNumber];
 }
@@ -70,9 +70,10 @@
 	return [[self metadata] objectForKey: @"type"];
 }
 
-- (CORevision*)nextRevision
+- (CORevision *)nextRevision
 {
-	FMResultSet *rs = [store->db executeQuery: @"SELECT MAX(revisionnumber) FROM commitMetadata WHERE baserevisionnumber = ?", revisionNumber];
+	FMResultSet *rs = [store->db executeQuery: 
+		@"SELECT MAX(revisionnumber) FROM commitMetadata WHERE baserevisionnumber = ?", revisionNumber];
 	if ([rs next])
 	{
 		int64_t nextRevisionNumber = [rs longLongIntForColumnIndex: 0];
@@ -83,7 +84,7 @@
 
 - (NSDictionary *)metadata
 {
-	FMResultSet *rs = [store->db executeQuery:@"SELECT plist FROM commitMetadata WHERE revisionnumber = ?",
+	FMResultSet *rs = [store->db executeQuery: @"SELECT plist FROM commitMetadata WHERE revisionnumber = ?",
 						[NSNumber numberWithUnsignedLongLong: revisionNumber]];
 	if ([rs next])
 	{
@@ -103,7 +104,7 @@
 - (NSArray *)changedObjectUUIDs
 {
 	NSMutableSet *result = [NSMutableSet set];
-	FMResultSet *rs = [store->db executeQuery:@"SELECT objectuuid FROM commits WHERE revisionnumber = ?",
+	FMResultSet *rs = [store->db executeQuery: @"SELECT objectuuid FROM commits WHERE revisionnumber = ?",
 					   [NSNumber numberWithUnsignedLongLong: revisionNumber]];
 	while ([rs next])
 	{
@@ -116,7 +117,7 @@
 - (NSArray *)changedPropertiesForObjectUUID: (ETUUID *)objectUUID
 {
 	NSMutableArray *result = [NSMutableArray array];
-	FMResultSet *rs = [store->db executeQuery:@"SELECT property FROM commits WHERE revisionnumber = ? AND objectuuid = ?",
+	FMResultSet *rs = [store->db executeQuery: @"SELECT property FROM commits WHERE revisionnumber = ? AND objectuuid = ?",
 					   [NSNumber numberWithUnsignedLongLong: revisionNumber],
 					   [store keyForUUID: objectUUID]];
 
@@ -200,7 +201,7 @@
 	return [NSArray arrayWithArray: [self changedObjectRecords]];
 }
 
-- (NSString*)description
+- (NSString *)description
 {
 	return [NSString stringWithFormat: @"%@ (%qi <= %@)", 
 		NSStringFromClass([self class]),

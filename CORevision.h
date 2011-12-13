@@ -47,11 +47,11 @@
 - (uint64_t)revisionNumber;
 
 /**
-  * The revision upon which this one is based i.e. the main
-  * previous revision. This is nil when this is the first
-  * revision for a root object.
-  */
-- (CORevision*)baseRevision;
+ * The revision upon which this one is based i.e. the main previous revision. 
+ * 
+ * This is nil when this is the first revision for a root object.
+ */
+- (CORevision *)baseRevision;
 
 
 /** 
@@ -102,11 +102,16 @@
 - (id)initWithStore: (COStore *)aStore revisionNumber: (uint64_t)anID baseRevisionNumber: (uint64_t)baseID;
 
 /**
-  * Return the next revision after this one. Note that in a non-linear history model,
-  * there are multiple "next revisions". Therefore this method is only meaningful in linear
-  * revision models, where each revision has only one revision that calls it is "base revision". 
-  * In the non-linear case, it returns the "next revision" that has
-  * the highest revision number.
-  */
-- (CORevision*)nextRevision;
+ * Returns the next revision after this one. 
+ *
+ * Note that in a non-linear history model, there are multiple <em>next 
+ * revisions<em/>. Therefore this method is only meaningful in linear revision 
+ * models, where each revision has only one next revision that calls it its 
+ * <em>base revision</em>.<br />
+ * In the non-linear case, it returns the <em>next revision</em> that has the 
+ * highest revision number.
+ *
+ * See also -baseRevision.
+ */
+- (CORevision *)nextRevision;
 @end

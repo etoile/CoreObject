@@ -34,6 +34,7 @@ static void DeleteOldStore()
 {
 	SETUP_STORE(store);
 	UKNotNil(store);
+	UKIntsEqual(0, [store latestRevisionNumber]);
 	TEAR_DOWN_STORE(store);
 }
 
@@ -64,6 +65,7 @@ static void DeleteOldStore()
 		CORevision *c1 = [s2 revisionWithRevisionNumber: revisionNumber];
 		
 		UKNotNil(c1);
+		UKIntsEqual(revisionNumber, [s2 latestRevisionNumber]);
 		
 		UKIntsEqual(1, [[c1 changedObjectUUIDs] count]);
 		if ([[c1 changedObjectUUIDs] count] == 1)
@@ -155,6 +157,8 @@ static void DeleteOldStore()
 	[s finishChangesForObjectUUID: o1];
 	CORevision *c1 = [s finishCommit];
 	UKNotNil(c1);
+	UKIntsEqual(1, [c1 revisionNumber]);
+	UKIntsEqual(1, [s latestRevisionNumber]);
 	UKTrue([s isRootObjectUUID: o1]);
 	UKObjectsEqual(S(o1), [s rootObjectUUIDs]);
 
