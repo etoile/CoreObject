@@ -871,7 +871,7 @@
 
 - (id)roundTripValueForProperty: (NSString *)key
 {
-	id plist = [self propertyListForValue: [self valueForProperty: key]];
+	id plist = [self propertyListForValue: [self serializedValueForProperty: key]];
 	return [self valueForPropertyList: plist];
 }
 
@@ -1021,7 +1021,9 @@ static int indent = 0;
 	/* First we try to use the getter named 'serialized' + 'key' */
 
 	// TODO: Probably a bit slow, rewrite in C a bit
-	SEL getter = NSSelectorFromString([@"serialized" stringByAppendingString: [key capitalizedString]]);
+	NSString *capitalizedKey = [key stringByReplacingCharactersInRange: NSMakeRange(0, 1) 
+	                                                        withString: [[key substringToIndex: 1] uppercaseString]];
+	SEL getter = NSSelectorFromString([@"serialized" stringByAppendingString: capitalizedKey]);
 
 	if ([self respondsToSelector: getter])
 	{
@@ -1050,8 +1052,10 @@ static int indent = 0;
 	/* First we try to use the setter named 'setSerialized' + 'key' */
 
 	// TODO: Probably a bit slow, rewrite in C a bit
+	NSString *capitalizedKey = [key stringByReplacingCharactersInRange: NSMakeRange(0, 1) 
+	                                                        withString: [[key substringToIndex: 1] uppercaseString]];
 	SEL setter = NSSelectorFromString([NSString stringWithFormat: @"%@%@:", 
-		@"setSerialized", [key capitalizedString], @":"]);
+		@"setSerialized", capitalizedKey, @":"]);
 
 	if ([self respondsToSelector: setter])
 	{
