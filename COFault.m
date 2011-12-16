@@ -40,6 +40,9 @@
 
 - (BOOL) isEqual: (id)other
 {
+	if (other == self)
+		return YES;
+
 	if (other == nil || [other isKindOfClass: [self class]] == NO)
 		return NO;
 
