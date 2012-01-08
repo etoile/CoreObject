@@ -32,7 +32,7 @@
 
 	return self;	
 }
-+ (COCommitTrack*)commitTrackForObject: (COObject*)object
++ (id)trackWithObject: (COObject*)object
 {
 	return [[[self alloc] 
 		initWithObject: object]
@@ -52,7 +52,7 @@
 	[_cachedNodes release];
 	[super dealloc];
 }
-- (COCommitTrackNode*)currentNode
+- (COTrackNode*)currentNode
 {
 	if (_currentNode != NSNotFound)
 		return [_cachedNodes objectAtIndex: _currentNode];
@@ -109,7 +109,7 @@
 {
 	// COStore takes care of updating the database, so we 
 	// just use this as a notification to update our cache.
-	COCommitTrackNode *newNode = [COCommitTrackNode
+	COTrackNode *newNode = [COTrackNode
 		nodeWithRevision: revision
 		         onTrack: self];
 	if (_currentNode != NSNotFound)
@@ -144,7 +144,7 @@
 	{
 		if ([[NSNull null] isEqual: revision])
 			break;
-		COCommitTrackNode *node = [COCommitTrackNode
+		COTrackNode *node = [COTrackNode
 			nodeWithRevision: revision
 			         onTrack: self];
 		if (insertPoint == 0)
@@ -166,7 +166,7 @@
 		return;
 	}
 
-	COCommitTrackNode *currentNode = [COCommitTrackNode
+	COTrackNode *currentNode = [COTrackNode
 		nodeWithRevision: [revisions objectAtIndex: backward]
 			 onTrack: self];
 
@@ -182,7 +182,7 @@
 	{
 		if ([[NSNull null] isEqual: revision])
 			break;
-		COCommitTrackNode *node = [COCommitTrackNode
+		COTrackNode *node = [COTrackNode
 			nodeWithRevision: revision
 			         onTrack: self];
 		if (insertPoint >= [_cachedNodes count])
@@ -195,48 +195,5 @@
 		}
 		++ insertPoint;
 	}
-}
-@end
-
-@implementation COCommitTrackNode 
-- (id)initWithRevision: (CORevision*)rev onTrack: (COCommitTrack*)tr
-{
-	SUPERINIT;
-	_revision = [rev retain];
-	_track = tr;
-	return self;
-}
- + (COCommitTrackNode*)nodeWithRevision: (CORevision*)revision
-                                onTrack: (COCommitTrack*)_track
-{
-	return [[[COCommitTrackNode alloc] 
-		initWithRevision: revision onTrack: _track]
-			autorelease];
-}
-
-- (BOOL)isEqual: (id)rhs
-{
-	if ([rhs isKindOfClass: [COCommitTrackNode class]])
-	{
-		return [_revision isEqual: [rhs revision]] && 
-			[_track isEqual: [rhs commitTrack]];
-	}
-	return [super isEqual: rhs];
-}
-
-- (CORevision*)revision
-{
-	return _revision;
-}
-
-- (COCommitTrack*)commitTrack
-{
-	return _track;
-}
-
-- (void)dealloc
-{
-	[_revision release];
-	[super dealloc];
 }
 @end

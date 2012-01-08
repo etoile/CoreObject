@@ -10,33 +10,32 @@
 
 @implementation COHistoryTrack
 
-+ (void) initialize
-{
-	if (self != [COHistoryTrack class])
-		return;
+@synthesize includesInnerObjects;
 
-	[self applyTraitFromClass: [ETCollectionTrait class]];
-}
-
-- (id)initTrackWithObject: (COObject*)container containedObjects: (BOOL)contained
+- (id)initWithTrackedObjects: (NSSet *)trackedObjects
 {
-	self = [super init];
-	ASSIGN(trackObject, container);
-	affectsContainedObjects = contained;
-	cachedTrackNodes = [[NSMutableArray alloc] init];
+	SUPERINIT;
+	ASSIGNCOPY(objects, trackedObjects);
+	// TODO: Remove
+	ASSIGN(trackObject, [trackedObjects anyObject]);
+	includesInnerObjects = YES;
 	return self;
 }
 
 - (void)dealloc
 {
-	DESTROY(trackObject);
-	DESTROY(cachedTrackNodes);
+	DESTROY(objects);
 	[super dealloc];
 }
 
-- (COHistoryTrackNode*)undo
+- (NSSet *)objects
 {
-	COHistoryTrackNode *currentNode = [self currentNode];
+	return objects;
+}
+
+- (void)undo
+{
+	COTrackNode *currentNode = [self currentNode];
 	
 	if ([[currentNode metadata] valueForKey: @"undoMetadata"] != nil)
 	{
@@ -44,11 +43,11 @@
 		uint64_t lastUndo = [[[currentNode metadata] valueForKey: @"undoMetadata"] intValue];
 		
 		currentNode = [COHistoryTrackNode nodeWithRevision: [[self store] revisionWithRevisionNumber: lastUndo]
-													 owner: self];
+		                                           onTrack: self];
 	}
 	
-	CORevision *revToUndo = [currentNode underlyingRevision];
-	CORevision *revBeforeUndo = [[currentNode parent] underlyingRevision];
+	CORevision *revToUndo = [currentNode revision];
+	CORevision *revBeforeUndo = [[currentNode parent] revision];
 	
 	COEditingContext *revToUndoCtx = [[COEditingContext alloc] initWithStore: [revToUndo store] maxRevisionNumber: [revToUndo revisionNumber]];
 	COEditingContext *revBeforeUndoCtx = [[COEditingContext alloc] initWithStore: [revBeforeUndo store] maxRevisionNumber: [revBeforeUndo revisionNumber]];
@@ -73,13 +72,11 @@
 																		forKey: @"undoMetadata" ]];
 	
 //	[self setCurrentNode: [[self currentNode] parent]];
-	return [self currentNode];
 }
 
-- (COHistoryTrackNode*)redo
+- (void)redo
 {
-	[self setCurrentNode: [[self currentNode] child]];
-	return [self currentNode];
+	[self setCurrentNode: [(COHistoryTrackNode *)[self currentNode] child]];
 }
 
 - (COHistoryTrackNode*)currentNode
@@ -92,7 +89,7 @@
 	}
 	
 	return [COHistoryTrackNode nodeWithRevision: rev
-										  owner: self];	
+	                                    onTrack: self];	
 }
 
 - (void)setCurrentNode: (COHistoryTrackNode*)node
@@ -117,16 +114,16 @@
 	if (recache)
 	{
 		// TODO: Recache only the new revisions if possible
-		[cachedTrackNodes removeAllObjects];
+		[cachedNodes removeAllObjects];
 
 		for (CORevision *rev in [self revisionsOnTrack])
 		{
-			[cachedTrackNodes addObject: [COHistoryTrackNode nodeWithRevision: rev owner: self]];
+			[cachedNodes addObject: [COHistoryTrackNode nodeWithRevision: rev onTrack: self]];
 		}
 
 		revNumberAtCacheTime = [[[trackObject editingContext] store] latestRevisionNumber];
 	}
-	return cachedTrackNodes;
+	return cachedNodes;
 }
 
 - (NSArray *)nodes
@@ -187,90 +184,26 @@
 	}
 }
 
-/** Returns YES. */
-- (BOOL) isOrdered
-{
-	return YES;
-}
-
-- (id) content
-{
-	return 	[self cachedNodes];
-}
-
-- (NSArray *) contentArray
-{
-	return [NSArray arrayWithArray: [self cachedNodes]];
-}
-
 @end
 
 
 
 @implementation COHistoryTrackNode
 
-- (NSDictionary *)metadata
+- (COHistoryTrackNode *)parent
 {
-	return [revision metadata];
+	CORevision *parentRev = [[self track] nextRevisionOnTrackAfter: [self revision] backwards: YES];
+	return [COHistoryTrackNode nodeWithRevision: parentRev onTrack: [self track]];
 }
 
-- (uint64_t)revisionNumber
-{
-	return [revision revisionNumber];
-}
-
-- (ETUUID *)UUID
-{
-	return [revision UUID];
-}
-
-- (NSArray*)changedObjectUUIDs
-{
-	return [revision changedObjectUUIDs];
-}
-
-- (NSArray *)propertyNames
-{
-	return [[super propertyNames] arrayByAddingObjectsFromArray: 
-		A(@"revisionNumber", @"UUID", @"metadata", @"changedObjectUUIDs")];
-}
-
-/* History graph */
-
-- (COHistoryTrackNode*)parent
-{
-	CORevision *parentRev = [ownerTrack nextRevisionOnTrackAfter: revision backwards: YES];
-	return [COHistoryTrackNode nodeWithRevision:parentRev owner: ownerTrack];
-}
-
-- (COHistoryTrackNode*)child
-{
-	return nil;
-}
-- (NSArray*)secondaryBranches
+- (COHistoryTrackNode *)child
 {
 	return nil;
 }
 
-/* Private */
-
-+ (COHistoryTrackNode*)nodeWithRevision: (CORevision*)aRevision owner: (COHistoryTrack*)anOwner
+- (NSArray *)secondaryBranches
 {
-	COHistoryTrackNode *node = [[[self alloc] init] autorelease];
-	node->revision = [aRevision retain];
-	node->ownerTrack = anOwner;
-	return node;
-}
-
-- (void)dealloc
-{
-	[revision release];
-	[super dealloc];
-}
-
-- (CORevision*)underlyingRevision
-{
-	return revision;
+	return nil;
 }
 
 @end

@@ -698,14 +698,14 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	return [_rootObjectRevisions objectForKey: [rootObject UUID]];
 }
 
-- (COCommitTrack *)commitTrackForObject: (COObject *)object
+- (COCommitTrack *)trackWithObject: (COObject *)object
 {
 	ETUUID *rootObjectUUID = [[object rootObject] UUID];
 	COCommitTrack *commitTrack = [_rootObjectCommitTracks objectForKey: rootObjectUUID];
 
 	if (nil == commitTrack)
 	{
-		commitTrack = [COCommitTrack commitTrackForObject: [object rootObject]];
+		commitTrack = [COCommitTrack trackWithObject: [object rootObject]];
 		[_rootObjectCommitTracks setObject: commitTrack 
 		                            forKey: rootObjectUUID];
 	}

@@ -13,6 +13,8 @@
 		607BA16413B4EEE400B86BC6 /* Test_main.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E271299C77700CCF472 /* Test_main.m */; };
 		60844F281490B6B2008A329F /* COCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 60844F261490B6B2008A329F /* COCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60844F291490B6B2008A329F /* COCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60844F271490B6B2008A329F /* COCollection.m */; };
+		60A55DE114A25AC4007A9864 /* COTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60A55DDF14A25AC4007A9864 /* COTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60A55DE214A25AC4007A9864 /* COTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60A55DE014A25AC4007A9864 /* COTrack.m */; };
 		60CF348313BA931C001F9011 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 605BFF3F13B50C7700073E18 /* Foundation.framework */; };
 		60CF350513BA9331001F9011 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 605BFF3F13B50C7700073E18 /* Foundation.framework */; };
 		60CF350913BA9348001F9011 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF350813BA9348001F9011 /* AppKit.framework */; };
@@ -140,6 +142,8 @@
 		6068BE6214750AAF00953B26 /* COQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COQuery.m; sourceTree = "<group>"; };
 		60844F261490B6B2008A329F /* COCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCollection.h; sourceTree = "<group>"; };
 		60844F271490B6B2008A329F /* COCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCollection.m; sourceTree = "<group>"; };
+		60A55DDF14A25AC4007A9864 /* COTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COTrack.h; sourceTree = "<group>"; };
+		60A55DE014A25AC4007A9864 /* COTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COTrack.m; sourceTree = "<group>"; };
 		60CF350813BA9348001F9011 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		60F6A31514444EC300EFC711 /* COCommitTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommitTrack.h; sourceTree = "<group>"; };
 		60F6A31614444EC300EFC711 /* COCommitTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommitTrack.m; sourceTree = "<group>"; };
@@ -358,6 +362,8 @@
 				66D09B15129B704E006BEDC3 /* COSynchronizer.m */,
 				6068BE6114750AAF00953B26 /* COQuery.h */,
 				6068BE6214750AAF00953B26 /* COQuery.m */,
+				60A55DDF14A25AC4007A9864 /* COTrack.h */,
+				60A55DE014A25AC4007A9864 /* COTrack.m */,
 			);
 			name = "Front-end API";
 			sourceTree = "<group>";
@@ -506,6 +512,7 @@
 				60F6A31814444EC300EFC711 /* COCommitTrack.h in Headers */,
 				6068BE6414750AAF00953B26 /* COQuery.h in Headers */,
 				60844F281490B6B2008A329F /* COCollection.h in Headers */,
+				60A55DE114A25AC4007A9864 /* COTrack.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -665,6 +672,7 @@
 				60F6A31914444EC300EFC711 /* COCommitTrack.m in Sources */,
 				6068BE6514750AAF00953B26 /* COQuery.m in Sources */,
 				60844F291490B6B2008A329F /* COCollection.m in Sources */,
+				60A55DE214A25AC4007A9864 /* COTrack.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

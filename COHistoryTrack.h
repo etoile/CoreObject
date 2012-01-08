@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
+#import <ObjectMerging/COTrack.h>
 
 @class CORevision, COObject, COStore;
 @class COHistoryTrackNode;
@@ -14,21 +15,18 @@
  * Undo/redo causes a new commit.
  * Similar idea as http://www.loria.fr/~weiss/pmwiki/uploads/Main/CollaborateCom.pdf
  */
-@interface COHistoryTrack : NSObject <ETCollection>
+@interface COHistoryTrack : COTrack
 {
+	NSSet *objects;
+	// TODO: Remove trackObject ivar
 	COObject *trackObject;
-	BOOL affectsContainedObjects;
-	NSMutableArray *cachedTrackNodes;
+	BOOL includesInnerObjects;
 	uint64_t revNumberAtCacheTime;
 }
 
-- (id)initTrackWithObject: (COObject*)container containedObjects: (BOOL)contained;
+- (id)initWithTrackedObjects: (NSSet *)trackedObjects;
 
-- (COHistoryTrackNode*)redo;
-- (COHistoryTrackNode*)undo;
-
-- (COHistoryTrackNode*)currentNode;
-- (void)setCurrentNode: (COHistoryTrackNode*)node;
+@property (assign, nonatomic) BOOL includesInnerObjects;
 
 - (NSArray *)nodes;
 
@@ -41,25 +39,15 @@
 @end
 
 
-@interface COHistoryTrackNode : NSObject
+@interface COHistoryTrackNode : COTrackNode
 {
-	CORevision *revision;
-	COHistoryTrack *ownerTrack;
+
 }
 
-- (NSDictionary *)metadata;
-- (uint64_t)revisionNumber;
-- (ETUUID *)UUID;
-- (NSArray *)changedObjectUUIDs;
+/** @taskunit History Graph */
 
-/* History graph */
+- (COHistoryTrackNode *)parent;
+- (COHistoryTrackNode *)child;
+- (NSArray *)secondaryBranches;
 
-- (COHistoryTrackNode*)parent;
-- (COHistoryTrackNode*)child;
-- (NSArray*)secondaryBranches;
-
-/* Private */
-
-- (CORevision*)underlyingRevision;
-+ (COHistoryTrackNode*)nodeWithRevision: (CORevision*)aRevision owner: (COHistoryTrack*)anOwner;
 @end

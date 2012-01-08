@@ -44,21 +44,21 @@
 	[ctx1 commit];
 	
 	COCommitTrack *commitTrack = [object commitTrack];
-	COCommitTrackNode *firstNode = [commitTrack currentNode];
+	COTrackNode *firstNode = [commitTrack currentNode];
 	UKNotNil(commitTrack);
 	UKNotNil(firstNode);
 	UKRaisesException([commitTrack undo]);
 
 	[object setValue: @"Shopping List" forProperty: @"label"];
 	[ctx1 commit];
-	COCommitTrackNode *secondNode = [commitTrack currentNode];
+	COTrackNode *secondNode = [commitTrack currentNode];
 
 	UKObjectsNotEqual(firstNode, secondNode);
 	UKObjectsEqual([firstNode revision], [[secondNode revision] baseRevision]);
 
 	[object setValue: @"Todo" forProperty: @"label"];
 	[ctx1 commit];
-	COCommitTrackNode *thirdNode = [commitTrack currentNode];
+	COTrackNode *thirdNode = [commitTrack currentNode];
 	UKObjectsNotEqual(thirdNode, secondNode);
 	UKObjectsEqual([[thirdNode revision] baseRevision], [secondNode revision]);
 

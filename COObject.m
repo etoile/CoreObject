@@ -860,7 +860,7 @@
 
 - (COCommitTrack *)commitTrack
 {
-	return [_context commitTrackForObject: self];
+	return [_context trackWithObject: self];
 }
 
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery

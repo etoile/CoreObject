@@ -359,7 +359,7 @@
  *
  * Returns the commit track bound to the root object that owns the object.
  */
-- (COCommitTrack *)commitTrackForObject: (COObject *)object;
+- (COCommitTrack *)trackWithObject: (COObject *)object;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

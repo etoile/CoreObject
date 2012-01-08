@@ -4,7 +4,7 @@
 #import "COContainer.h"
 #import "COGroup.h"
 #import "TestCommon.h"
-
+#if 0
 @interface TestHistoryTrack : NSObject <UKTest>
 {
 }
@@ -326,3 +326,4 @@
 	CLOSE_STORE(store);
 }
 @end
+#endif
