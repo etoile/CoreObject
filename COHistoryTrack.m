@@ -21,10 +21,10 @@
 
 @synthesize includesInnerObjects;
 
-- (id)initWithTrackedObjects: (NSSet *)trackedObjects
+- (id)initWithTrackedObjects: (NSSet *)objects
 {
 	SUPERINIT;
-	ASSIGNCOPY(objects, trackedObjects);
+	ASSIGNCOPY(trackedObjects, objects);
 	// TODO: Remove
 	ASSIGN(trackObject, [trackedObjects anyObject]);
 	includesInnerObjects = YES;
@@ -33,13 +33,13 @@
 
 - (void)dealloc
 {
-	DESTROY(objects);
+	DESTROY(trackedObjects);
 	[super dealloc];
 }
 
-- (NSSet *)objects
+- (NSSet *)trackedObjects
 {
-	return objects;
+	return trackedObjects;
 }
 
 - (void)undo

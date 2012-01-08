@@ -25,7 +25,7 @@
 	return AUTORELEASE([[self alloc] initWithTrackedObjects: S(anObject)]);
 }
 
-- (id)initWithTrackedObjects: (NSSet *)trackedObjects
+- (id)initWithTrackedObjects: (NSSet *)objects
 {
 	SUPERINIT;
 	cachedNodes =  [[NSMutableArray alloc] init]; 
@@ -33,7 +33,7 @@
 	return self;	
 }
 
-- (NSSet *)objects
+- (NSSet *)trackedObjects
 {
 	return [NSSet set];
 }

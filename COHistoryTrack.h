@@ -26,20 +26,20 @@
  */
 @interface COHistoryTrack : COTrack
 {
-	NSSet *objects;
+	NSSet *trackedObjects;
 	// TODO: Remove trackObject ivar
 	COObject *trackObject;
 	BOOL includesInnerObjects;
 	uint64_t revNumberAtCacheTime;
 }
 
-- (id)initWithTrackedObjects: (NSSet *)trackedObjects;
+- (id)initWithTrackedObjects: (NSSet *)objects;
 
 @property (assign, nonatomic) BOOL includesInnerObjects;
 
 - (NSArray *)nodes;
 
-/* Private */
+/** @taskunit Private */
 
 - (COStore*)store;
 - (BOOL)revisionIsOnTrack: (CORevision*)rev;

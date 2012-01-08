@@ -43,7 +43,7 @@
 /**
  * <init />
  */
-- (id)initWithTrackedObjects: (NSSet *)trackedObjects;
+- (id)initWithTrackedObjects: (NSSet *)objects;
 
 /** @taskunit Tracked Objects */
 
@@ -53,7 +53,7 @@
  *
  * By default, returns an empty set.
  */
-@property (readonly, nonatomic) NSSet *objects;
+@property (readonly, nonatomic) NSSet *trackedObjects;
 
 /** @taskunit Track Nodes */
 
