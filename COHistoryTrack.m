@@ -44,7 +44,7 @@
 
 - (void)undo
 {
-	COTrackNode *currentNode = [self currentNode];
+	COHistoryTrackNode *currentNode = (COHistoryTrackNode *)[self currentNode];
 	
 	if ([[currentNode metadata] valueForKey: @"undoMetadata"] != nil)
 	{
@@ -201,7 +201,7 @@
 
 - (COHistoryTrackNode *)parent
 {
-	CORevision *parentRev = [[self track] nextRevisionOnTrackAfter: [self revision] backwards: YES];
+	CORevision *parentRev = [(COHistoryTrack *)[self track] nextRevisionOnTrackAfter: [self revision] backwards: YES];
 	return [COHistoryTrackNode nodeWithRevision: parentRev onTrack: [self track]];
 }
 
