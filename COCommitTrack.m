@@ -9,10 +9,17 @@
 
 #define CACHE_AMOUNT 5
 
-@implementation COCommitTrack 
-- (id)initWithObject: (COObject*)object
+@implementation COCommitTrack
+
+@synthesize trackedObject;
+
+- (id)initWithTrackedObjects: (NSSet *)trackedObjects
 {
-	SUPERINIT;
+	self = [super initWithTrackedObjects: trackedObjects];
+	if (self == nil)
+		return nil;
+
+	COObject *object = [trackedObjects anyObject];
 	COEditingContext *ctx = [object editingContext];
 	COStore *store = [ctx store];
 	if (nil == store)
@@ -21,10 +28,10 @@
 		[NSException raise: NSInvalidArgumentException
 		            format: @"Cannot load commit _track for object %@ which does not have an editing context", object];
 	}
-	_commitLog = object;
+	ASSIGN(trackedObject, object);
 	_cachedNodes =  [[NSMutableArray alloc] initWithCapacity: CACHE_AMOUNT]; 
 	_currentNode = NSNotFound;
-	if ([_commitLog revision] == nil)
+	if ([trackedObject revision] == nil)
 	{
 		return self;
 	}
@@ -32,23 +39,19 @@
 
 	return self;	
 }
-+ (id)trackWithObject: (COObject*)object
-{
-	return [[[self alloc] 
-		initWithObject: object]
-			autorelease];
-}
+
 - (BOOL)isEqual: (id)rhs
 {
 	if ([rhs isKindOfClass: [COCommitTrack class]])
 	{
-		return [_commitLog isEqual: [rhs trackedObject]]
-			&& [[_commitLog editingContext] isEqual: [[rhs trackedObject] editingContext]];
+		return [trackedObject isEqual: [rhs trackedObject]]
+			&& [[trackedObject editingContext] isEqual: [[rhs trackedObject] editingContext]];
 	}
 	return [super isEqual: rhs];
 }
 - (void)dealloc
 {
+	DESTROY(trackedObject);
 	[_cachedNodes release];
 	[super dealloc];
 }
@@ -63,9 +66,9 @@
 {
 	if ([self currentNode] == nil)
 		[NSException raise: NSInternalInconsistencyException
-		            format: @"Cannot undo object %@ which does not have any commits", _commitLog];
-	COStore *store = [[_commitLog editingContext] store];
-	CORevision *currentRevision = [store undoOnCommitTrack: [_commitLog UUID]];
+		            format: @"Cannot undo object %@ which does not have any commits", trackedObject];
+	COStore *store = [[trackedObject editingContext] store];
+	CORevision *currentRevision = [store undoOnCommitTrack: [trackedObject UUID]];
 	if (_currentNode == 0)
 		[self cacheNodesForward: 0 backward: CACHE_AMOUNT];
 	_currentNode--;
@@ -73,17 +76,17 @@
 			![[NSNull null] isEqual: [_cachedNodes objectAtIndex: _currentNode]],
 			@"Record undone to is cached");
 	// TODO: Reset object state to old object.
-	[[_commitLog editingContext] 
-		reloadRootObjectTree: _commitLog
+	[[trackedObject editingContext] 
+		reloadRootObjectTree: trackedObject
 		          atRevision: currentRevision];
 }
 - (void)redo
 {
 	if ([self currentNode] == nil)
 		[NSException raise: NSInternalInconsistencyException
-		            format: @"Cannot redo object %@ which does not have any commits", _commitLog];
-	COStore *store = [[_commitLog editingContext] store];
-	CORevision *currentRevision = [store redoOnCommitTrack: [_commitLog UUID]];
+		            format: @"Cannot redo object %@ which does not have any commits", trackedObject];
+	COStore *store = [[trackedObject editingContext] store];
+	CORevision *currentRevision = [store redoOnCommitTrack: [trackedObject UUID]];
 	if ([_cachedNodes count] == (_currentNode+1))
 		[self cacheNodesForward: CACHE_AMOUNT backward: 0];
 	_currentNode++;
@@ -92,19 +95,11 @@
 			![[NSNull null] isEqual: [_cachedNodes objectAtIndex: _currentNode]],
 			@"Record redone to is cached");
 	// TODO: Reset object state to old object.
-	[[_commitLog editingContext] 
-		reloadRootObjectTree: _commitLog
+	[[trackedObject editingContext] 
+		reloadRootObjectTree: trackedObject
 		          atRevision: currentRevision];
 }
 
-- (COObject*)trackedObject
-{
-	return _commitLog;
-}
-
-@end
-
-@implementation COCommitTrack (PrivateToCoreObject)
 - (void)newCommitAtRevision: (CORevision*)revision
 {
 	// COStore takes care of updating the database, so we 
@@ -125,9 +120,9 @@
 
 - (void)cacheNodesForward: (NSUInteger)forward backward: (NSUInteger)backward
 {
-	COStore *store = [[_commitLog editingContext] store];
+	COStore *store = [[trackedObject editingContext] store];
 	NSArray* revisions = 
-		[store loadCommitTrackForObject: [_commitLog UUID]
+		[store loadCommitTrackForObject: [trackedObject UUID]
 		                   fromRevision: [[self currentNode] revision] 
 		                    nodesForward: forward
 		                   nodesBackward: backward];
@@ -196,4 +191,5 @@
 		++ insertPoint;
 	}
 }
+
 @end
