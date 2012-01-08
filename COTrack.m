@@ -48,7 +48,7 @@
 
 }
 
-- (NSArray *)cachedNodes
+- (NSMutableArray *)cachedNodes
 {
 	return cachedNodes;
 }

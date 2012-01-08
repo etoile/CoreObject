@@ -29,7 +29,11 @@
  */
 @interface COTrack : NSObject <ETCollection>
 {
+	@private
 	NSMutableArray *cachedNodes;
+	@protected
+	// TODO: Would be better to make the ivar below private rather than 
+	// protected but this makes the code much more verbose in subclasses.
 	NSInteger currentNodeIndex;
 }
 
@@ -67,7 +71,7 @@
 /**
  * Returns the cached track nodes. 
  */
-- (NSArray *)cachedNodes;
+- (NSMutableArray *)cachedNodes;
 
 /** @task Undo Management */
 

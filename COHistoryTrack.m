@@ -114,16 +114,16 @@
 	if (recache)
 	{
 		// TODO: Recache only the new revisions if possible
-		[cachedNodes removeAllObjects];
+		[[self cachedNodes] removeAllObjects];
 
 		for (CORevision *rev in [self revisionsOnTrack])
 		{
-			[cachedNodes addObject: [COHistoryTrackNode nodeWithRevision: rev onTrack: self]];
+			[[self cachedNodes] addObject: [COHistoryTrackNode nodeWithRevision: rev onTrack: self]];
 		}
 
 		revNumberAtCacheTime = [[[trackObject editingContext] store] latestRevisionNumber];
 	}
-	return cachedNodes;
+	return [self cachedNodes];
 }
 
 - (NSArray *)nodes

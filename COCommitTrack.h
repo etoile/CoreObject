@@ -18,8 +18,6 @@
 {
 	@private
 	COObject *trackedObject;
-	NSInteger _currentNode;
-	NSMutableArray *_cachedNodes;
 }
 
 /** @taskunit Tracked Objects */
