@@ -15,7 +15,7 @@
 /** 
  * @group History Navigation
  *
- * COTrack is an abstract class to repressent a commit sequence, that can be 
+ * COTrack is an abstract class to represent a commit sequence, that can be 
  * persistent or lazily constructed (this depends on the subclass).
  *
  * A track provides a custom view on the history graph that describes the 

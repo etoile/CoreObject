@@ -1,3 +1,11 @@
+/*
+	Copyright (C) 2011 Christopher Armstrong
+
+	Author:  Christopher Armstrong <carmstrong@fastmail.com.au>
+	Date:  September 2011
+	License:  Modified BSD  (see COPYING)
+ */
+
 #import <Foundation/Foundation.h>
 #import <ObjectMerging/COTrack.h>
 
@@ -29,7 +37,7 @@
 
 /** @taskunit Private */
 
-- (void)newCommitAtRevision: (CORevision*)revision;
+- (void)newCommitAtRevision: (CORevision *)revision;
 - (void)cacheNodesForward: (NSUInteger)forward backward: (NSUInteger)backward;
 
 @end
