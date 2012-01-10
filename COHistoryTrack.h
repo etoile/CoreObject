@@ -39,24 +39,4 @@
 
 - (NSArray *)nodes;
 
-/** @taskunit Private */
-
-- (COStore*)store;
-- (BOOL)revisionIsOnTrack: (CORevision*)rev;
-- (CORevision *)nextRevisionOnTrackAfter: (CORevision *)rev backwards: (BOOL)back;
-
-@end
-
-
-@interface COHistoryTrackNode : COTrackNode
-{
-
-}
-
-/** @taskunit History Graph */
-
-- (COHistoryTrackNode *)parent;
-- (COHistoryTrackNode *)child;
-- (NSArray *)secondaryBranches;
-
 @end

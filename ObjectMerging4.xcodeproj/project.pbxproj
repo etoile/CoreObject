@@ -323,6 +323,19 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		60413A6D14B9F66800225D2A /* Tracks */ = {
+			isa = PBXGroup;
+			children = (
+				60A55DDF14A25AC4007A9864 /* COTrack.h */,
+				60A55DE014A25AC4007A9864 /* COTrack.m */,
+				60F6A31514444EC300EFC711 /* COCommitTrack.h */,
+				60F6A31614444EC300EFC711 /* COCommitTrack.m */,
+				66D09998129A5B64006BEDC3 /* COHistoryTrack.h */,
+				66D09999129A5B64006BEDC3 /* COHistoryTrack.m */,
+			);
+			name = Tracks;
+			sourceTree = "<group>";
+		};
 		60FB087413C3066300C2AB94 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -354,16 +367,11 @@
 				6686BDBB12592C1B0065DE1A /* COEditingContext.m */,
 				6686BDC212592C1B0065DE1A /* COObjectGraphDiff.h */,
 				6686BDC312592C1B0065DE1A /* COObjectGraphDiff.m */,
-				60F6A31514444EC300EFC711 /* COCommitTrack.h */,
-				60F6A31614444EC300EFC711 /* COCommitTrack.m */,
-				66D09998129A5B64006BEDC3 /* COHistoryTrack.h */,
-				66D09999129A5B64006BEDC3 /* COHistoryTrack.m */,
+				60413A6D14B9F66800225D2A /* Tracks */,
 				66D09B14129B704E006BEDC3 /* COSynchronizer.h */,
 				66D09B15129B704E006BEDC3 /* COSynchronizer.m */,
 				6068BE6114750AAF00953B26 /* COQuery.h */,
 				6068BE6214750AAF00953B26 /* COQuery.m */,
-				60A55DDF14A25AC4007A9864 /* COTrack.h */,
-				60A55DE014A25AC4007A9864 /* COTrack.m */,
 			);
 			name = "Front-end API";
 			sourceTree = "<group>";

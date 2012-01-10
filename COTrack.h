@@ -67,13 +67,20 @@
  * Sets the current position in the the track timeline to match the track node.
  */
 - (void)setCurrentNode: (COTrackNode *)node;
-
 /**
  * Returns the cached track nodes. 
  */
 - (NSMutableArray *)cachedNodes;
+/**
+ * <override-subclass />
+ * Returns the node that follows aNode on the track when back is NO, otherwise  
+ * when back is YES, returns the node that precedes aNode.
+ *
+ * Default implementation returns nil.
+ */
+- (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back;
 
-/** @task Undo Management */
+/** @taskunit Undo Management */
 
 /**
  * <override-subclass />
@@ -119,6 +126,17 @@
  * Returns the track that owns the receiver.
  */
 - (COTrack *)track;
+
+/** @taskunit Node Traversal */
+
+/**
+ * Returns the node whose revision is the next on the track.
+ */
+- (COTrackNode *)previousNode;
+/**
+ * Returns the node whose revision is the previous on the track.
+ */
+- (COTrackNode *)nextNode;
 
 /** @taskunit Metadata */
 

@@ -53,6 +53,11 @@
 	return cachedNodes;
 }
 
+- (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
+{
+	return nil;
+}
+
 - (void)undo
 {
 
@@ -107,10 +112,9 @@
 {
 	if ([rhs isKindOfClass: [COTrackNode class]])
 	{
-		return ([revision isEqual: [rhs revision]] && 
-			[track isEqual: [rhs track]]);
+		return ([revision isEqual: [rhs revision]] && [track isEqual: [rhs track]]);
 	}
-	return [super isEqual: rhs];
+	return NO;
 }
 
 - (CORevision *)revision
@@ -121,6 +125,16 @@
 - (COTrack *)track
 {
 	return track;
+}
+
+- (COTrackNode *)previousNode
+{
+	return [track nextNodeOnTrackFrom: self backwards: YES];
+}
+
+- (COTrackNode *)nextNode
+{
+	return [track nextNodeOnTrackFrom: self backwards: NO];
 }
 
 - (NSDictionary *)metadata

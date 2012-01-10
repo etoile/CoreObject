@@ -21,7 +21,7 @@
 
 - (id)initWithTrackedObjects: (NSSet *)trackedObjects
 {
-	INVALIDARG_EXCEPTION_TEST([trackedObjects count] > 1, @"A commit track can only track a single object at a time");
+	INVALIDARG_EXCEPTION_TEST(trackedObjects, [trackedObjects count] <= 1);
 
 	COObject *object = [trackedObjects anyObject];
 
@@ -85,6 +85,7 @@
 	[[trackedObject editingContext] reloadRootObjectTree: trackedObject
 	                                          atRevision: currentRevision];
 }
+
 - (void)redo
 {
 	if ([self currentNode] == nil)
@@ -109,6 +110,56 @@
 	// TODO: Reset object state to old object.
 	[[trackedObject editingContext] reloadRootObjectTree: trackedObject
 	                                          atRevision: currentRevision];
+}
+
+- (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
+{
+	NSArray *cachedNodes = [self cachedNodes];
+	NSInteger nodeIndex = [cachedNodes indexOfObject: aNode];
+
+	if (nodeIndex == NSNotFound)
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"Node %@ must belong to the track %@ to retrieve the previous or next node", aNode, self];
+	}
+	if (back)
+	{
+		nodeIndex--;
+	}
+	else
+	{
+		nodeIndex++;
+	}
+
+	/* Recache or return a cached node */
+
+	if (nodeIndex < 0)
+	{
+		[self cacheNodesForward: 0 backward: currentNodeIndex + CACHE_AMOUNT];
+	}
+	else if (nodeIndex >= [cachedNodes count])
+	{
+		[self cacheNodesForward: nodeIndex - currentNodeIndex + CACHE_AMOUNT backward: 0];
+	}
+	else
+	{
+		return [cachedNodes objectAtIndex: nodeIndex];
+	}
+
+	/* Get the node from the updated cache */
+
+	nodeIndex = [cachedNodes indexOfObject: aNode];
+
+	if (back)
+	{
+		nodeIndex--;
+	}
+	else
+	{
+		nodeIndex++;
+	}
+
+	return [cachedNodes objectAtIndex: nodeIndex];
 }
 
 // TODO: Could be renamed -didMakeNewCommitAtRevision: to be more idiomatic

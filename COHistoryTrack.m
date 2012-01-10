@@ -51,12 +51,12 @@
 		// we just undod
 		uint64_t lastUndo = [[[currentNode metadata] valueForKey: @"undoMetadata"] intValue];
 		
-		currentNode = [COHistoryTrackNode nodeWithRevision: [[self store] revisionWithRevisionNumber: lastUndo]
+		currentNode = [COTrackNode nodeWithRevision: [[self store] revisionWithRevisionNumber: lastUndo]
 		                                           onTrack: self];
 	}
 	
 	CORevision *revToUndo = [currentNode revision];
-	CORevision *revBeforeUndo = [[currentNode parent] revision];
+	CORevision *revBeforeUndo = [[currentNode previousNode] revision];
 	
 	COEditingContext *revToUndoCtx = [[COEditingContext alloc] initWithStore: [revToUndo store] maxRevisionNumber: [revToUndo revisionNumber]];
 	COEditingContext *revBeforeUndoCtx = [[COEditingContext alloc] initWithStore: [revBeforeUndo store] maxRevisionNumber: [revBeforeUndo revisionNumber]];
@@ -80,15 +80,15 @@
 	[currentRevisionCtx commitWithMetadata: [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: [revBeforeUndo revisionNumber]]
 																		forKey: @"undoMetadata" ]];
 	
-//	[self setCurrentNode: [[self currentNode] parent]];
+//	[self setCurrentNode: [[self currentNode] previousNode]];
 }
 
 - (void)redo
 {
-	[self setCurrentNode: [(COHistoryTrackNode *)[self currentNode] child]];
+	[self setCurrentNode: [[self currentNode] nextNode]];
 }
 
-- (COHistoryTrackNode*)currentNode
+- (COTrackNode *)currentNode
 {
 	CORevision *rev = [trackObject revision];
 	
@@ -97,11 +97,10 @@
 		rev = [self nextRevisionOnTrackAfter: rev backwards: YES];
 	}
 	
-	return [COHistoryTrackNode nodeWithRevision: rev
-	                                    onTrack: self];	
+	return [COTrackNode nodeWithRevision: rev onTrack: self];	
 }
 
-- (void)setCurrentNode: (COHistoryTrackNode*)node
+- (void)setCurrentNode: (COTrackNode *)node
 {
 
 }
@@ -127,7 +126,7 @@
 
 		for (CORevision *rev in [self revisionsOnTrack])
 		{
-			[[self cachedNodes] addObject: [COHistoryTrackNode nodeWithRevision: rev onTrack: self]];
+			[[self cachedNodes] addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
 		}
 
 		revNumberAtCacheTime = [[[trackObject editingContext] store] latestRevisionNumber];
@@ -159,7 +158,7 @@
 	return [allObjectsOnTrackAtRevSet intersectsSet: changedSet];
 }
 
-- (CORevision *)nextRevisionOnTrackAfter: (CORevision *)rev backwards: (BOOL)back
+- (CORevision *)nextRevisionOnTrackFrom: (CORevision *)rev backwards: (BOOL)back
 {	
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: [rev store]];
 	COObject *objAtRev = [ctx objectWithUUID: [trackObject UUID] atRevision: rev];
@@ -193,25 +192,9 @@
 	}
 }
 
-@end
-
-
-
-@implementation COHistoryTrackNode
-
-- (COHistoryTrackNode *)parent
+- (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
 {
-	CORevision *parentRev = [(COHistoryTrack *)[self track] nextRevisionOnTrackAfter: [self revision] backwards: YES];
-	return [COHistoryTrackNode nodeWithRevision: parentRev onTrack: [self track]];
-}
-
-- (COHistoryTrackNode *)child
-{
-	return nil;
-}
-
-- (NSArray *)secondaryBranches
-{
+	// TODO: Implement
 	return nil;
 }
 
