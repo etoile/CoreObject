@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COArrayDiff, COSetDiff, COEditingContext, COContainer;
+@class COArrayDiff, COSetDiff, COEditingContext, COObject, COContainer, CORevision;
 
 /**
  * 
@@ -38,6 +38,11 @@
  * Convenience method
  */
 + (COObjectGraphDiff *)diffContainer: (COContainer*)group1 withContainer: (COContainer*)group2;
++ (COObjectGraphDiff *)diffRootObject: (COObject *)baseObject 
+                       withRootObject: (COObject *)otherObject;
+
++ (COObjectGraphDiff *)selectiveUndoDiffWithRootObject: (COObject *)aRootObject 
+                                        revisionToUndo: (CORevision *)revToUndo;
 
 @end
 

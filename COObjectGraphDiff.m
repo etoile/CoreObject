@@ -1,6 +1,7 @@
 #import "COObjectGraphDiff.h"
 #import "COEditingContext.h"
 #import "COObject.h"
+#import "CORevision.h"
 #import "COContainer.h"
 #import "COArrayDiff.h"
 #import "COSetDiff.h"
@@ -574,6 +575,71 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	return [COObjectGraphDiff diffObjectsWithUUIDs: [set allObjects]
 										 inContext: [group1 editingContext]
 									   withContext: [group2 editingContext]];
+}
+
++ (COObjectGraphDiff *)diffRootObject: (COObject *)baseObject 
+                       withRootObject: (COObject *)otherObject
+{
+	NSMutableSet *set = [NSMutableSet set];
+	[set unionSet: [baseObject allInnerObjectsIncludingSelf]];
+	[set unionSet: [otherObject allInnerObjectsIncludingSelf]];
+	set = (id)[[set mappedCollection] UUID];
+
+	return [COObjectGraphDiff diffObjectsWithUUIDs: [set allObjects]
+										 inContext: [baseObject editingContext]
+									   withContext: [otherObject editingContext]];
+}
+
++ (COObjectGraphDiff *)selectiveUndoDiffWithRootObject: (COObject *)aRootObject 
+                                        revisionToUndo: (CORevision *)revToUndo
+{
+	// NOTE: Check the editing context is sane and we don't have an outdated 
+	// root object instance.
+	assert(aRootObject == [[aRootObject editingContext] objectWithUUID: [aRootObject UUID]]);
+
+	CORevision *revBeforeUndo = [revToUndo baseRevision];
+
+	/* Load both the revision to be undone and the revision just before in two sandbox-like contexts  */
+	
+	COEditingContext *revToUndoCtxt = [[COEditingContext alloc] initWithStore: [revToUndo store] 
+	                                                        maxRevisionNumber: [revToUndo revisionNumber]];
+	COEditingContext *revBeforeUndoCtxt = [[COEditingContext alloc] initWithStore: [revBeforeUndo store] 
+	                                                            maxRevisionNumber: [revBeforeUndo revisionNumber]];
+
+	/* Retrieve the object targeted by the undo in its two past states and in its current state  */
+
+	COObject *revToUndoObj = [revToUndoCtxt objectWithUUID: [aRootObject UUID] atRevision: revToUndo];
+	COObject *revBeforeUndoObj = [revBeforeUndoCtxt objectWithUUID: [aRootObject UUID] atRevision: revBeforeUndo];
+	COObject *currentObj = aRootObject;
+
+	/* Compute a selective undo that can be applied to the object state bound to revToUndo
+
+	   We use revToUndoObj as the base for the diff, except in the last case 
+	   where we use currentObject:
+	   - oa is a patch that removes all the changes between revToUndo and 
+	     revBeforeUndo
+	   - ob is a patch that adds all the changes between revToUndo and now (the 
+	     current revision)
+	   - undoDiff is a patch that combines oa and ob, it represents the 
+	     selective undo in a valid way, but can only be applied correctly to the 
+		 object state bound to revToUndo
+	   - finalDiff is a patch that removes all the changes between revToUndo and 
+	     revBeforeUndo, but unlike oa, it has been adjusted to ensure all the 
+		 changes involved by ob that overlap with oa have been resolved, so 
+		 it can be applied without weird results to the current object state */
+
+	COObjectGraphDiff *oa = [COObjectGraphDiff diffRootObject: revToUndoObj withRootObject: revBeforeUndoObj];
+	COObjectGraphDiff *ob = [COObjectGraphDiff diffRootObject: revToUndoObj withRootObject: currentObj];	
+	COObjectGraphDiff *undoDiff = [COObjectGraphDiff mergeDiff: oa withDiff: ob];
+	
+	[undoDiff applyToContext: revToUndoCtxt];
+
+	/* Return selective undo changes that can be replicated into the current root object context
+	
+	   Once done, revToUndoCtxt and editingContext will contain two object 
+	   instances in the same state. */
+
+	return [COObjectGraphDiff diffRootObject: currentObj withRootObject: revToUndoObj];
 }
 
 @end
