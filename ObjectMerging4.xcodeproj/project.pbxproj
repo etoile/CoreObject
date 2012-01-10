@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6039CC7814BC3FBB008A8BA3 /* COCustomTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 6039CC7614BC3FBB008A8BA3 /* COCustomTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6039CC7914BC3FBB008A8BA3 /* COCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6039CC7714BC3FBB008A8BA3 /* COCustomTrack.m */; };
 		605BFF4013B50C7700073E18 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 605BFF3F13B50C7700073E18 /* Foundation.framework */; };
 		6068BE6414750AAF00953B26 /* COQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 6068BE6114750AAF00953B26 /* COQuery.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6068BE6514750AAF00953B26 /* COQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 6068BE6214750AAF00953B26 /* COQuery.m */; };
@@ -137,6 +139,8 @@
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		6039CC7614BC3FBB008A8BA3 /* COCustomTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCustomTrack.h; sourceTree = "<group>"; };
+		6039CC7714BC3FBB008A8BA3 /* COCustomTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCustomTrack.m; sourceTree = "<group>"; };
 		605BFF3F13B50C7700073E18 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6068BE6114750AAF00953B26 /* COQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COQuery.h; sourceTree = "<group>"; };
 		6068BE6214750AAF00953B26 /* COQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COQuery.m; sourceTree = "<group>"; };
@@ -332,6 +336,8 @@
 				60F6A31614444EC300EFC711 /* COCommitTrack.m */,
 				66D09998129A5B64006BEDC3 /* COHistoryTrack.h */,
 				66D09999129A5B64006BEDC3 /* COHistoryTrack.m */,
+				6039CC7614BC3FBB008A8BA3 /* COCustomTrack.h */,
+				6039CC7714BC3FBB008A8BA3 /* COCustomTrack.m */,
 			);
 			name = Tracks;
 			sourceTree = "<group>";
@@ -521,6 +527,7 @@
 				6068BE6414750AAF00953B26 /* COQuery.h in Headers */,
 				60844F281490B6B2008A329F /* COCollection.h in Headers */,
 				60A55DE114A25AC4007A9864 /* COTrack.h in Headers */,
+				6039CC7814BC3FBB008A8BA3 /* COCustomTrack.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -681,6 +688,7 @@
 				6068BE6514750AAF00953B26 /* COQuery.m in Sources */,
 				60844F291490B6B2008A329F /* COCollection.m in Sources */,
 				60A55DE214A25AC4007A9864 /* COTrack.m in Sources */,
+				6039CC7914BC3FBB008A8BA3 /* COCustomTrack.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
