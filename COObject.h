@@ -131,6 +131,7 @@
  */
 - (NSArray *)allStronglyContainedObjects;
 - (NSArray *)allStronglyContainedObjectsIncludingSelf;
+- (NSSet *)allInnerObjectsIncludingSelf;
 
 /** @taskunit Basic Properties */
 

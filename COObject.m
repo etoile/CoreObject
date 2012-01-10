@@ -325,6 +325,35 @@
 	return [[self allStronglyContainedObjects] arrayByAddingObject: self];
 }
 
+- (NSSet *)allInnerObjects
+{
+	if ([self isRoot] == NO)
+		return nil;
+
+	if ([self isPersistent] == NO)
+	{
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"Inner objects cannot be known until %@ has become persistent", self];
+	}
+
+	CORevision *loadedRev = [_context revisionForObject: self];
+
+	NSSet *innerObjectUUIDs = [[_context store] UUIDsForRootObjectUUID: [self UUID] 
+	                                                        atRevision: loadedRev];
+	NSMutableSet *innerObjects = [NSMutableSet setWithCapacity: [innerObjectUUIDs count]];
+
+	for (ETUUID *uuid in innerObjectUUIDs)
+	{
+		[innerObjects addObject: [_context objectWithUUID: uuid]];
+	}
+	return innerObjects;
+}
+
+- (NSSet *)allInnerObjectsIncludingSelf
+{
+	return [[self allInnerObjects] setByAddingObject: self];
+}
+
 - (NSString *)displayName
 {
 	return [self name];
