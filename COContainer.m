@@ -61,6 +61,12 @@
 	if ([[collection name] isEqual: [COLibrary className]] == NO) 
 		return collection;
 
+	ETPropertyDescription *idProperty = 
+		[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"Anonymous.NSString"];
+	[idProperty setPersistent: YES];
+
+	[collection setPropertyDescriptions: A(idProperty)];
+
 	return collection;	
 }
 
