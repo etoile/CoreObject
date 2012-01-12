@@ -42,9 +42,14 @@
 	return trackedObjects;
 }
 
+- (COStore *)store
+{
+	return [[trackObject editingContext] store];
+}
+
 - (void)undo
 {
-	COHistoryTrackNode *currentNode = (COHistoryTrackNode *)[self currentNode];
+	COTrackNode *currentNode = [self currentNode];
 	
 	if ([[currentNode metadata] valueForKey: @"undoMetadata"] != nil)
 	{
@@ -86,64 +91,6 @@
 - (void)redo
 {
 	[self setCurrentNode: [[self currentNode] nextNode]];
-}
-
-- (COTrackNode *)currentNode
-{
-	CORevision *rev = [trackObject revision];
-	
-	if (![self revisionIsOnTrack: rev])
-	{
-		rev = [self nextRevisionOnTrackAfter: rev backwards: YES];
-	}
-	
-	return [COTrackNode nodeWithRevision: rev onTrack: self];	
-}
-
-- (void)setCurrentNode: (COTrackNode *)node
-{
-
-}
-
-- (NSArray *) revisionsOnTrack
-{
-	ETAssert([trackObject isRoot]);
-
-	COStore *store = [[trackObject editingContext] store];
-	NSSet *rootAndInnerObjectUUIDs = [store UUIDsForRootObjectUUID: [trackObject UUID]];
-
-	return [store revisionsForObjectUUIDs: rootAndInnerObjectUUIDs];
-}
-
-- (NSArray *)cachedNodes
-{
-	BOOL recache = (revNumberAtCacheTime != [[[trackObject editingContext] store] latestRevisionNumber]);
-
-	if (recache)
-	{
-		// TODO: Recache only the new revisions if possible
-		[[self cachedNodes] removeAllObjects];
-
-		for (CORevision *rev in [self revisionsOnTrack])
-		{
-			[[self cachedNodes] addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
-		}
-
-		revNumberAtCacheTime = [[[trackObject editingContext] store] latestRevisionNumber];
-	}
-	return [self cachedNodes];
-}
-
-- (NSArray *)nodes
-{
-	return [self cachedNodes];
-}
-
-/* Private */
-
-- (COStore*)store
-{
-	return [[trackObject editingContext] store];
 }
 
 - (BOOL)revisionIsOnTrack: (CORevision*)rev
@@ -190,6 +137,58 @@
 			return newCurrentRev;
 		}
 	}
+}
+
+
+- (COTrackNode *)currentNode
+{
+	CORevision *rev = [trackObject revision];
+	
+	if (![self revisionIsOnTrack: rev])
+	{
+		rev = [self nextRevisionOnTrackFrom: rev backwards: YES];
+	}
+	
+	return [COTrackNode nodeWithRevision: rev onTrack: self];	
+}
+
+- (void)setCurrentNode: (COTrackNode *)node
+{
+
+}
+
+- (NSArray *) revisionsOnTrack
+{
+	ETAssert([trackObject isRoot]);
+
+	COStore *store = [[trackObject editingContext] store];
+	NSSet *rootAndInnerObjectUUIDs = [store UUIDsForRootObjectUUID: [trackObject UUID]];
+
+	return [store revisionsForObjectUUIDs: rootAndInnerObjectUUIDs];
+}
+
+- (NSArray *)cachedNodes
+{
+	BOOL recache = (revNumberAtCacheTime != [[[trackObject editingContext] store] latestRevisionNumber]);
+
+	if (recache)
+	{
+		// TODO: Recache only the new revisions if possible
+		[[self cachedNodes] removeAllObjects];
+
+		for (CORevision *rev in [self revisionsOnTrack])
+		{
+			[[self cachedNodes] addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
+		}
+
+		revNumberAtCacheTime = [[[trackObject editingContext] store] latestRevisionNumber];
+	}
+	return [self cachedNodes];
+}
+
+- (NSArray *)nodes
+{
+	return [self cachedNodes];
 }
 
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
