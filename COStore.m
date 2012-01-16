@@ -35,7 +35,7 @@
 
 - (ETUUID *)UUID
 {
-	FMResultSet *resultSet = [db executeQuery: @"SELECT uuid FROM storeUUID)"];
+	FMResultSet *resultSet = [db executeQuery: @"SELECT uuid FROM storeUUID"];
 	ETUUID *uuid = nil;
 
 	if ([resultSet next])
