@@ -21,7 +21,19 @@
 /** @taskunit Initialization */
 
 - (id)initWithURL: (NSURL*)aURL;
-- (NSURL*)URL;
+
+/** @taskunit Identity and Location */
+
+/**
+ * Returns the store location.
+ */
+- (NSURL *)URL;
+/**
+ * Returns the store UUID.
+ *
+ * The URL can vary by moving the store, but the UUID won't.
+ */
+- (ETUUID *)UUID;
 
 /** @taskunit Store Metadata */
 

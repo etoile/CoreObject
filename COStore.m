@@ -33,6 +33,20 @@
 	return url;
 }
 
+- (ETUUID *)UUID
+{
+	FMResultSet *resultSet = [db executeQuery: @"SELECT uuid FROM storeUUID)"];
+	ETUUID *uuid = nil;
+
+	if ([resultSet next])
+	{
+		uuid = [ETUUID UUIDWithString: [resultSet stringForColumnIndex: 0]];
+	}
+	[resultSet close];
+
+	return uuid;
+}
+
 /* DB Setup */
 
 void CHECK(id db)
@@ -87,10 +101,13 @@ void CHECK(id db)
 	
 	
 	// Otherwise, set up the DB
-	
+
+	success = success && [db executeUpdate: @"CREATE TABLE storeUUID(uuid STRING)"]; CHECK(db);
 	success = success && [db executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, plist BLOB)"]; CHECK(db);
+
+	success = success && [db executeUpdate: @"INSERT INTO storeUUID(uuid) VALUES(?)", [[ETUUID UUID] stringValue]]; CHECK(db);
 	success = success && [db executeUpdate: @"INSERT INTO storeMetadata(version) VALUES(1)"]; CHECK(db);
-	
+
 	// Instead of storing UUIDs and property names thoughout the database,
 	// we store them in two tables, and use integer ID's to refer to those
 	// UUIDs/property names.
