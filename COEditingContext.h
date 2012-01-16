@@ -392,3 +392,7 @@
                   atRevision: (CORevision *)revision;
 @end
 
+extern NSString *COEditingContextDidCommitNotification;
+
+extern NSString *kCORevisionNumbersKey;
+extern NSString *kCORevisionsKey;

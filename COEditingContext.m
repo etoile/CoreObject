@@ -48,7 +48,12 @@ static COEditingContext *currentCtxt = nil;
 	_insertedObjects = [[NSMutableSet alloc] init];
 	_deletedObjects = [[NSMutableSet alloc] init];
 	ASSIGN(_updatedPropertiesByObject, [NSMapTable mapTableWithStrongToStrongObjects]);
-	
+
+	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+	                                                    selector: @selector(didMakeCommit:) 
+	                                                        name: COEditingContextDidCommitNotification 
+	                                                      object: nil];
+
 	return self;
 }
 
@@ -59,6 +64,8 @@ static COEditingContext *currentCtxt = nil;
 
 - (void) dealloc
 {
+	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
+
 	DESTROY(_store);
 	DESTROY(_modelRepository);
 	DESTROY(_rootObjectRevisions);
@@ -76,6 +83,32 @@ static COEditingContext *currentCtxt = nil;
 	id copy = [[COEditingContext alloc] initWithStore: _store];
 	// FIXME:
 	return copy;
+}
+
+/* Handles distributed notifications about new revisions to refresh the root 
+object graphs present in memory, for which changes have been committed to the 
+store by other processes. */
+- (void)didMakeCommit: (NSNotification *)notif
+{
+	BOOL isOurCommit = [[[_store URL] absoluteString] isEqual: [notif object]];
+
+	if (isOurCommit)
+		return;
+
+	for (NSNumber *revNumber in [[notif userInfo] objectForKey: kCORevisionNumbersKey])
+	{
+		CORevision *rev = [_store revisionWithRevisionNumber: [revNumber unsignedLongLongValue]];
+		ETUUID *rootObjectUUID = [rev objectUUID];
+
+		if ([self loadedObjectForUUID: rootObjectUUID] == nil)
+		{
+			continue;
+		}
+
+		COObject *rootObject = [self objectWithUUID: rootObjectUUID];
+
+		[self reloadRootObjectTree: rootObject atRevision:  rev];
+	}
 }
 
 - (COSmartGroup *) mainGroup
@@ -577,10 +610,10 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	return subset;
 }
 
-- (void)commitWithMetadata: (NSDictionary *)metadata 
-                rootObject: (COObject *)rootObject
-           insertedObjects: (NSSet *)insertedObjects
-         updatedProperties: (NSMapTable *)updatedPropertiesByObject
+- (CORevision *)commitWithMetadata: (NSDictionary *)metadata 
+                        rootObject: (COObject *)rootObject
+                   insertedObjects: (NSSet *)insertedObjects
+                 updatedProperties: (NSMapTable *)updatedPropertiesByObject
 {
 	NSParameterAssert(rootObject != nil);
 	NSParameterAssert(insertedObjects != nil);
@@ -652,6 +685,28 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	{
 		[_updatedPropertiesByObject removeObjectForKey: obj];
 	}
+
+	return rev;
+}
+
+- (void)postCommitNotificationsWithRevisions: (NSArray *)revisions
+{
+	NSDictionary *notifInfos = D(revisions, kCORevisionsKey);
+
+	[[NSNotificationCenter defaultCenter] postNotificationName: COEditingContextDidCommitNotification 
+	                                                    object: self 
+	                                                  userInfo: notifInfos];
+
+	NSMutableArray *revNumbers = [NSMutableArray array];
+	for (CORevision *rev in revisions)
+	{
+		[revNumbers addObject: [NSNumber numberWithUnsignedLong: [rev revisionNumber]]];
+	}
+	notifInfos = D(revNumbers, kCORevisionNumbersKey);
+
+	[[NSDistributedNotificationCenter defaultCenter] postNotificationName: COEditingContextDidCommitNotification 
+	                                                               object: [[[self store] UUID] stringValue]
+	                                                             userInfo: notifInfos];
 }
 
 - (void)commitWithMetadata: (NSDictionary *)metadata
@@ -665,6 +720,8 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	[insertedRootObjectUUIDs intersectSet: (id)[[rootObjects mappedCollection] UUID]];
 	[_store insertRootObjectUUIDs: insertedRootObjectUUIDs];
 
+	NSMutableArray *revisions = [NSMutableArray array];
+
 	// TODO: Add a batch commit UUID in the metadata
 	for (COObject *rootObject in rootObjects)
 	{
@@ -672,11 +729,15 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		NSMapTable *updatedPropertySubset = [self updatedPropertySubsetForObjects: 
 			[updatedObjectsByRoot objectForKey: rootObject]];
 
-		[self commitWithMetadata: metadata 
-		              rootObject: rootObject
-		         insertedObjects: (insertedObjectSubset != nil ? insertedObjectSubset : [NSSet set])
-		       updatedProperties: updatedPropertySubset];
+		CORevision *rev = [self commitWithMetadata: metadata 
+		                                rootObject: rootObject
+		                           insertedObjects: (insertedObjectSubset != nil ? insertedObjectSubset : [NSSet set])
+		                         updatedProperties: updatedPropertySubset];
+
+		[revisions addObject: rev];
 	}
+
+ 	[self postCommitNotificationsWithRevisions: revisions];
 }
 
 - (void)markObjectUpdated: (COObject *)obj forProperty: (NSString *)aProperty
@@ -828,3 +889,8 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 }
 
 @end
+
+NSString *COEditingContextDidCommitNotification = @"COEditingContextDidCommitNotification";
+
+NSString *kCORevisionNumbersKey = @"kCORevisionNumbersKey";
+NSString *kCORevisionsKey = @"kCORevisionsKey";
