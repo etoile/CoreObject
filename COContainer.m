@@ -61,6 +61,8 @@
 	if ([[collection name] isEqual: [COLibrary className]] == NO) 
 		return collection;
 
+	[collection setLocalizedDescription: _(@"Library")];
+
 	ETPropertyDescription *idProperty = 
 		[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"Anonymous.NSString"];
 	[idProperty setPersistent: YES];
