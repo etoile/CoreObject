@@ -21,6 +21,22 @@
 	return AUTORELEASE([[self alloc] initWithUUID: aUUID editingContext: aContext]);
 }
 
+- (void) loadAllNodes
+{
+	NSArray *revisions = [[editingContext store] loadCommitTrackForObject: [self UUID]
+	                                                         fromRevision: nil 
+	                                                         nodesForward: NSUIntegerMax
+	                                                        nodesBackward: NSUIntegerMax];
+	NSMutableArray *cachedNodes = [self cachedNodes];
+
+	[cachedNodes removeAllObjects];
+
+	for (CORevision *rev in revisions)
+	{
+		[cachedNodes addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
+	}
+}
+
 - (id)initWithUUID: (ETUUID *)aUUID editingContext: (COEditingContext *)aContext
 {
 	self = [super initWithTrackedObjects: [NSSet set]];
@@ -29,6 +45,9 @@
 
 	ASSIGN(UUID, aUUID);
 	ASSIGN(editingContext, aContext);
+
+	[self loadAllNodes];
+
 	return self;
 }
 
@@ -47,6 +66,19 @@
 - (void)addRevision: (CORevision *)rev
 {
 	[[self cachedNodes] addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
+
+	NSNumber *revNumber = [NSNumber numberWithUnsignedLongLong: [rev revisionNumber]];
+
+	[[editingContext store] updateCommitTrackForRootObjectUUID: [[editingContext store] keyForUUID: [self UUID]]
+	                                               newRevision: revNumber];
+}
+
+- (void)addRevisions: (NSArray *)revisions
+{
+	for (CORevision *rev in revisions)
+	{
+		[self addRevision: rev];
+	}
 }
 
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
@@ -99,6 +131,8 @@
 	if (useCommitTrackUndo)
 	{
 		CORevision *newRev = [[editingContext store] undoOnCommitTrack: [object UUID]];
+	
+		//[[editingContext store] moveCommitTrackWithUUID: [self UUID] toRevision: newRev];
 	}
 	else /* Fall back on selective undo */
 	{
@@ -110,6 +144,9 @@
 
 		[editingContext commitWithMetadata: 
 			D([NSNumber numberWithInt: [revBeforeUndo revisionNumber]], @"undoMetadata")];
+
+		//[[editingContext store] updateCommitTrackForRootObjectUUID: [self UUID] 
+		//                                               newRevision: [editingContext latestRevisionNumber]];
 	}
 
 	currentNodeIndex--;

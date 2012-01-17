@@ -739,8 +739,11 @@ void CHECK(id db)
                        nodesBackward: (NSUInteger)backward
 {
 	NILARG_EXCEPTION_TEST(objectUUID);
-	if (![self isRootObjectUUID: objectUUID])
-		[NSException raise: NSInvalidArgumentException format: @"The object with UUID %@ does not exist!", objectUUID];
+	// TODO: The check below is disabled to support COCustomTrack. We need to 
+	// rework the API and database schema to support both commit and custom 
+	// tracks cleanly.
+	//if (![self isRootObjectUUID: objectUUID])
+	//	[NSException raise: NSInvalidArgumentException format: @"The object with UUID %@ does not exist!", objectUUID];
 
 	NSMutableArray *nodes = [[NSMutableArray alloc] initWithCapacity: (1 + forward + backward)];
 	NSNumber *objectUUIDIndex = [self keyForUUID: objectUUID];
@@ -771,9 +774,14 @@ void CHECK(id db)
 		}
 		else
 		{
-			for (int j = i; j < backward; j++)
+			BOOL insertNullMarker = (backward != NSUIntegerMax);
+
+			if (insertNullMarker)
 			{
-				[nodes insertObject: [NSNull null] atIndex: 0];
+				for (int j = i; j < backward; j++)
+				{
+					[nodes insertObject: [NSNull null] atIndex: 0];
+				}
 			}
 			break;
 		}
@@ -791,9 +799,14 @@ void CHECK(id db)
 		}
 		else
 		{
-			for (int j = i; j < forward; j++)
+			BOOL insertNullMarker = (forward != NSUIntegerMax);
+
+			if (insertNullMarker)
 			{
-				[nodes addObject: [NSNull null]];
+				for (int j = i; j < forward; j++)
+				{
+					[nodes addObject: [NSNull null]];
+				}
 			}
 			break;
 		}

@@ -68,6 +68,11 @@
 
 }
 
+- (void)undoNode: (COTrackNode *)aNode
+{
+
+}
+
 /** Returns YES. */
 - (BOOL) isOrdered
 {

@@ -98,7 +98,13 @@
  * What <em>next</em> means precisely is up to the track subclass.
  */
 - (void)redo;
-
+/**
+ * <override-subclass />
+ * Does a selective undo to cancel the changes involved in the track node revision.
+ *
+ * How to compute the selective undo precisely is up to the track subclass.
+ */
+- (void)undoNode: (COTrackNode *)aNode;
 @end
 
 

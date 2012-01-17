@@ -78,8 +78,10 @@
 @property (readonly, nonatomic) COEditingContext *editingContext;
 
 /**
- * Appends a new track node based on the revision to the track timeline.
+ * Appends new track nodes based on the revisions to the track timeline.
+ *
+ * See CORevision.
  */
-- (void) addRevision: (CORevision *)rev;
+- (void) addRevisions: (NSArray *)revisions;
 
 @end
