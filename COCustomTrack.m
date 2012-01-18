@@ -23,6 +23,11 @@
 
 - (void) loadAllNodes
 {
+	BOOL wasPersisted = [[editingContext store] isTrackUUID: [self UUID]];
+
+	if (wasPersisted == NO)
+		return;
+
 	NSArray *revisions = [[editingContext store] loadCommitTrackForObject: [self UUID]
 	                                                         fromRevision: nil 
 	                                                         nodesForward: NSUIntegerMax
@@ -35,6 +40,7 @@
 	{
 		[cachedNodes addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
 	}
+	currentNodeIndex = [cachedNodes count] - 1;
 }
 
 - (id)initWithUUID: (ETUUID *)aUUID editingContext: (COEditingContext *)aContext
@@ -67,6 +73,8 @@
 {
 	[[self cachedNodes] addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
 
+	currentNodeIndex = (currentNodeIndex == NSNotFound ? 0 : currentNodeIndex + 1);
+	
 	NSNumber *revNumber = [NSNumber numberWithUnsignedLongLong: [rev revisionNumber]];
 
 	[[editingContext store] updateCommitTrackForRootObjectUUID: [[editingContext store] keyForUUID: [self UUID]]
