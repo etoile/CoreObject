@@ -151,6 +151,11 @@
 - (CORevision*)undoOnCommitTrack: (ETUUID*)commitTrack;
 - (CORevision*)redoOnCommitTrack: (ETUUID*)commitTrack;
 - (CORevision*)maxRevision: (int64_t)maxRevNumber forRootObjectUUID: (ETUUID*)uuid;
+/**
+ * Returns whether the UUID corresponds to a track in the store. 
+ */
+- (BOOL)isTrackUUID: (ETUUID *)aUUID;
+
 @end
 
 /** Wraps a dictionary into an object which is a value rather a collection.
