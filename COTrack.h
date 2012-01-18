@@ -108,7 +108,7 @@
 @end
 
 
-@interface COTrackNode : NSObject
+@interface COTrackNode : NSObject <ETCollection>
 {
 	@private
 	CORevision *revision;

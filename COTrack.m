@@ -122,6 +122,15 @@
 	return NO;
 }
 
+- (id)forwardingTargetForSelector: (SEL)aSelector
+{
+	if ([revision respondsToSelector: aSelector])
+	{
+		return revision;
+	}
+	return nil;
+}
+
 - (CORevision *)revision
 {
 	return revision;
