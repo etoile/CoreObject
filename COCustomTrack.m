@@ -139,8 +139,8 @@
 	if (useCommitTrackUndo)
 	{
 		CORevision *newRev = [[editingContext store] undoOnCommitTrack: [object UUID]];
-	
-		//[[editingContext store] moveCommitTrackWithUUID: [self UUID] toRevision: newRev];
+
+	    [editingContext reloadRootObjectTree: object atRevision: newRev];
 	}
 	else /* Fall back on selective undo */
 	{
@@ -185,13 +185,15 @@
 	if (useCommitTrackRedo)
 	{
 		CORevision *newRev = [[editingContext store] redoOnCommitTrack: [object UUID]];
+
+	    [editingContext reloadRootObjectTree: object atRevision: newRev];
 	}
 	else /* Fall back on selective undo */
 	{
 		// TODO: Implement
 	}
 
-	currentNodeIndex--;
+	currentNodeIndex++;
 }
 
 @end

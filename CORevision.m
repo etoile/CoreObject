@@ -52,12 +52,12 @@
 
 - (ETUUID *)UUID
 {
-	return [[self metadata] objectForKey: @"UUID"];
+	return [ETUUID UUIDWithString: [[self metadata] objectForKey: @"UUID"]];
 }
 
 - (ETUUID *)objectUUID
 {
-	return [[self metadata] objectForKey: @"objectUUID"];
+	return [ETUUID UUIDWithString: [[self metadata] objectForKey: @"objectUUID"]];
 }
 
 - (NSDate *)date

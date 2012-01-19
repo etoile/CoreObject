@@ -190,6 +190,10 @@ store by other processes. */
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision
 {
+	// NOTE: We serialize UUIDs into strings in various places, this check 
+	// helps to intercept string objects that ought to be ETUUID objects.
+	NSParameterAssert([uuid isKindOfClass: [ETUUID class]]);
+
 	COObject *result = [_instantiatedObjects objectForKey: uuid];
 
 	if (result != nil && revision != nil)
