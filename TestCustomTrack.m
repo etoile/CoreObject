@@ -9,82 +9,107 @@
 
 @interface TestCustomTrack : TestCommon <UKTest>
 {
-
+	COCustomTrack *track;
+	COEditingContext *ctxt;
+	COStore *store;
 }
 
 @end
 
 @implementation TestCustomTrack
 
-- (void)testCreateCustomTrackWithNoRevisionsInStore
+- (id)init
 {
-	OPEN_STORE(store);
-	COEditingContext *ctxt = NewContext(store);
-	COCustomTrack *track = [COCustomTrack trackWithUUID: [ETUUID UUID] editingContext: ctxt];
+	SUPERINIT;
+	store = [[COStore alloc] initWithURL: STORE_URL];
+	ctxt = NewContext(store);
+	track = [[COCustomTrack alloc] initWithUUID: [ETUUID UUID] editingContext: ctxt];
+	return self;
+}
 
+- (void)dealloc
+{
+	TearDownContext(ctxt);
+	DESTROY(store);
+	[super dealloc];
+}
+
+- (void)testCreateWithNoRevisionsInStore
+{
 	UKNotNil(track);
 	UKNil([track currentNode]);
 	UKRaisesException([track undo]);
 	UKRaisesException([track redo]);
+}
 
-	TearDownContext(ctxt);
-	CLOSE_STORE(store);
+- (COTrackNode *)pushAndCheckRevisionOnTrack: (CORevision *)rev 
+                                previousNode: (COTrackNode *)previousNode 
+{
+	[track addRevisions: A(rev)];
+	COTrackNode *currentNode = [track currentNode];
+
+	UKNotNil(currentNode);
+	UKObjectsSame(previousNode, [currentNode previousNode]);
+	UKNil([currentNode nextNode]);
+	UKObjectsEqual([currentNode revision], rev);
+
+	if (previousNode == nil)
+		return currentNode;
+
+	UKObjectsSame(currentNode, [previousNode nextNode]);
+
+	BOOL wasSameRootObjectForPreviousCommit = [[rev objectUUID] isEqual: [[previousNode revision] objectUUID]];
+	
+	if (wasSameRootObjectForPreviousCommit)
+	{
+		UKObjectsEqual([previousNode revision], [rev baseRevision]);
+	}
+	else
+	{
+		// TODO: Perhaps implement a check based on the object commit track
+		UKObjectsNotEqual([previousNode revision], [rev baseRevision]);
+	}
+
+	return currentNode;
+}
+
+- (COTrackNode *)pushAndCheckRevisionsOnTrack: (NSArray *)revs 
+                                 previousNode: (COTrackNode *)previousNode 
+{
+	COTrackNode *node = previousNode;
+
+	for (CORevision *rev in revs)
+	{
+		node = [self pushAndCheckRevisionOnTrack: rev previousNode: node];
+	}
+	return node;
 }
 
 /* The custom track uses the root object commit track to undo and redo, no 
 selective undo is involved. */
 - (void)testWithSingleRootObject
 {
-	OPEN_STORE(store);
-	COEditingContext *ctxt = NewContext(store);
-	COCustomTrack *track = [COCustomTrack trackWithUUID: [ETUUID UUID] editingContext: ctxt];
-
 	/* First commit */
 
 	COContainer *object = [ctxt insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[object setValue: @"Groceries" forProperty: @"label"];
-	[ctxt commit];
 
-	CORevision *rev = [store revisionWithRevisionNumber: [store latestRevisionNumber]];
-	[track addRevisions: A(rev)];
-	COTrackNode *firstNode = [track currentNode];
-
-	UKNotNil(firstNode);
-	UKNil([firstNode previousNode]);
-	UKNil([firstNode nextNode]);
-	UKObjectsEqual([firstNode revision], rev);
+	COTrackNode *firstNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	                                               previousNode: nil];
 
 	/* Second commit */
 
 	[object setValue: @"Shopping List" forProperty: @"label"];
-	[ctxt commit];
 
-	rev = [store revisionWithRevisionNumber: [store latestRevisionNumber]];
-	[track addRevisions: A(rev)];
-	COTrackNode *secondNode = [track currentNode];
-
-	UKNotNil(secondNode);
-	UKObjectsEqual(firstNode, [secondNode previousNode]);
-	UKNil([secondNode nextNode]);
-	UKObjectsEqual(secondNode, [firstNode nextNode]);
-	UKObjectsEqual([secondNode revision], rev);
-	UKObjectsEqual([firstNode revision], [[secondNode revision] baseRevision]);
+	COTrackNode *secondNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	                                                previousNode: firstNode];
 
 	/* Third commit */
 
 	[object setValue: @"Todo" forProperty: @"label"];
-	[ctxt commit];
 
-	rev = [store revisionWithRevisionNumber: [store latestRevisionNumber]];
-	[track addRevisions: A(rev)];
-	COTrackNode *thirdNode = [track currentNode];
-
-	UKNotNil(thirdNode);
-	UKObjectsEqual(secondNode, [thirdNode previousNode]);
-	UKNil([thirdNode nextNode]);
-	UKObjectsEqual(thirdNode, [secondNode nextNode]);
-	UKObjectsEqual([thirdNode revision], rev);
-	UKObjectsEqual([[thirdNode revision] baseRevision], [secondNode revision]);
+	COTrackNode *thirdNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	                                               previousNode: secondNode];
 
 	/* First undo  (Todo -> Shopping List) */
 
@@ -125,19 +150,172 @@ selective undo is involved. */
 	[track redo];
 
 	UKObjectsEqual(thirdNode, [track currentNode]);
+}
 
-	TearDownContext(ctxt);
-	CLOSE_STORE(store);
+- (NSArray *)makeCommitsWithMultipleRootObjects
+{
+	/* First commit */
+
+	COContainer *object = [ctxt insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[object setValue: @"Groceries" forProperty: @"label"];
+
+	COTrackNode *firstNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	                                               previousNode: nil];
+
+	/* Second commit */
+
+	COContainer *doc = [ctxt insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[doc setValue: @"Document" forProperty: @"label"];
+
+	COTrackNode *secondNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	                                                previousNode: firstNode];
+
+	/* Third commit */
+
+	COContainer *para1 = [ctxt insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: doc];
+	[para1 setValue: @"paragraph 1" forProperty: @"label"];
+	[object setValue: @"Shopping List" forProperty: @"label"];
+
+	COTrackNode *thirdNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	                                               previousNode: secondNode];
+
+	/* Fourth commit */
+
+	[object setValue: @"Todo" forProperty: @"label"];
+
+	COTrackNode *fourthNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	                                                previousNode: thirdNode];
+
+	/* Fifth commit */
+
+	COContainer *para2 = [ctxt insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: doc];
+	[para2 setValue: @"paragraph 2" forProperty: @"label"];
+	[doc addObject: para1];
+	[doc addObject: para2];
+
+	COTrackNode *fifthNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	                                               previousNode: fourthNode];
+
+	/* Sixth commit */
+
+	[para1 setValue: @"paragraph with different contents" forProperty: @"label"];
+
+	COTrackNode *sixthNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	                                               previousNode: fifthNode];
+
+	return A(object, doc, para1, para2);
 }
 
 - (void)testWithMultipleRootObjects
 {
+	NSArray *objects = [self makeCommitsWithMultipleRootObjects];
+	NSArray *nodes = [track cachedNodes];
 
+	COContainer *object = [objects objectAtIndex: 0];
+	COContainer *doc = [objects objectAtIndex: 1];
+	COContainer *para1 = [objects objectAtIndex: 2];
+	COContainer *para2 = [objects objectAtIndex: 3];
+
+	/* Basic undo/redo check */
+
+	[track undo];
+	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
+	
+	[track redo];
+	UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
+
+	/* Sixth and fifth commit undone ('doc' revision) */
+
+	[track undo];
+	[track undo];
+	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
+	// FIXME: UKNil([ctxt objectWithUUID: [para2 UUID]]);
+	UKTrue([[doc content] isEmpty]);
+
+	/* Fourth commit undone ('object' revision) */
+
+	[track undo];
+	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
+
+	/* Third commit undone (two revisions one on 'doc' and one on 'object') */
+
+	[track undo];
+	// FIXME: UKNil([ctxt objectWithUUID: [para1 UUID]]);
+
+	[track undo];
+	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
+
+	/* Second commit undone ('doc' revision) */
+
+	[track undo];
+	// FIXME: UKNil([ctxt objectWithUUID: [doc UUID]]);
+	
+return;
+	/* First commit reached (root object 'object') */
+
+	// Just check the object creation hasn't been undone
+	UKNotNil([ctxt objectWithUUID: [object UUID]]);
+	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
+
+	/* Second commit redone */
+
+	[track redo];
+	UKNotNil([ctxt objectWithUUID: [doc UUID]]);
+	UKObjectsNotSame(doc, [ctxt objectWithUUID: [doc UUID]]);
+	// Get the new restored root object instance
+	doc = (COContainer *)[ctxt objectWithUUID: [doc UUID]];
+	UKStringsEqual(@"Document", [doc valueForProperty: @"label"]);
+
+	/* Third commit redone */
+
+	[track redo];
+	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
+
+	/* Third commit undone */
+
+	[track undo];
+	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
+
+	/* Third commit redone */
+
+	[track redo];
+	UKNotNil([ctxt objectWithUUID: [para1 UUID]]);
+	UKObjectsNotSame(para1, [ctxt objectWithUUID: [para1 UUID]]);
+
+	// Get the new restored object instance
+	para1 = (COContainer *)[ctxt objectWithUUID: [para1 UUID]];
+	UKTrue([[doc allInnerObjectsIncludingSelf] containsObject: para1]);
+	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
+
+	/* Fourth, fifth and sixth commits redone */
+
+	[track redo];
+	[track redo];
+	[track redo];
+	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
+	UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
+	UKNotNil([ctxt objectWithUUID: [para2 UUID]]);
+	UKObjectsNotSame(para2, [ctxt objectWithUUID: [para2 UUID]]);
+
+	// Get the new restored object instance
+	para2 = (COContainer *)[ctxt objectWithUUID: [para2 UUID]];
+	UKTrue([[doc allInnerObjectsIncludingSelf] containsObject: para2]);
+	UKStringsEqual(@"paragraph 2", [para2 valueForProperty: @"label"]);
+	UKObjectsSame(A(para1, para2), [doc content]);
 }
 
+#if 0
 - (void)testSelectiveUndo
 {
+	OPEN_STORE(store);
+	COEditingContext *ctxt = NewContext(store);
+	COCustomTrack *track = [COCustomTrack trackWithUUID: [ETUUID UUID] editingContext: ctxt];
 
+	[self makeCommitsWithMultipleRootObjects];
+
+	TearDownContext(ctxt);
+	CLOSE_STORE(store);
 }
+#endif
 
 @end

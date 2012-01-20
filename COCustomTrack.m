@@ -138,9 +138,22 @@
 	
 	if (useCommitTrackUndo)
 	{
-		CORevision *newRev = [[editingContext store] undoOnCommitTrack: [object UUID]];
+		CORevision *prevRev = [[editingContext store] maxRevision: [revToUndo revisionNumber] - 1 
+		                                        forRootObjectUUID: [object UUID]];
+		CORevision *newRev = nil;
 
-	    [editingContext reloadRootObjectTree: object atRevision: newRev];
+		if (prevRev != nil)
+		{
+			newRev = [[editingContext store] undoOnCommitTrack: [object UUID]];
+			[editingContext reloadRootObjectTree: object atRevision: newRev];
+		}
+		else
+		{
+			// TODO: Commit a delete
+
+			/* Undo root object creation */
+			[editingContext unloadRootObjectTree: object];
+		}
 	}
 	else /* Fall back on selective undo */
 	{
