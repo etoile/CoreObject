@@ -170,7 +170,7 @@ selective undo is involved. */
 	COTrackNode *secondNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
 	                                                previousNode: firstNode];
 
-	/* Third commit */
+	/* Third commit (two revisions) */
 
 	COContainer *para1 = [ctxt insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: doc];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
@@ -250,7 +250,6 @@ selective undo is involved. */
 	[track undo];
 	// FIXME: UKNil([ctxt objectWithUUID: [doc UUID]]);
 	
-return;
 	/* First commit reached (root object 'object') */
 
 	// Just check the object creation hasn't been undone
@@ -266,18 +265,21 @@ return;
 	doc = (COContainer *)[ctxt objectWithUUID: [doc UUID]];
 	UKStringsEqual(@"Document", [doc valueForProperty: @"label"]);
 
-	/* Third commit redone */
+	/* Third commit redone (involve two revisions) */
 
+	[track redo];
 	[track redo];
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
 
-	/* Third commit undone */
+	/* Third commit undone (involve two revisions)  */
 
+	[track undo];
 	[track undo];
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
-	/* Third commit redone */
+	/* Third commit redone (involve two revisions) */
 
+	[track redo];
 	[track redo];
 	UKNotNil([ctxt objectWithUUID: [para1 UUID]]);
 	UKObjectsNotSame(para1, [ctxt objectWithUUID: [para1 UUID]]);
@@ -301,7 +303,7 @@ return;
 	para2 = (COContainer *)[ctxt objectWithUUID: [para2 UUID]];
 	UKTrue([[doc allInnerObjectsIncludingSelf] containsObject: para2]);
 	UKStringsEqual(@"paragraph 2", [para2 valueForProperty: @"label"]);
-	UKObjectsSame(A(para1, para2), [doc content]);
+	UKObjectsEqual(A(para1, para2), [doc content]);
 }
 
 #if 0
