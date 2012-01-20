@@ -579,14 +579,14 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	return [self objectsByRootObjectFromObjects: [_updatedPropertiesByObject allKeys]];
 }
 
-- (void)commit
+- (NSArray *)commit
 {
-	[self commitWithType: nil shortDescription: nil longDescription: nil];
+	return [self commitWithType: nil shortDescription: nil longDescription: nil];
 }
 
-- (void)commitWithType: (NSString*)type
-      shortDescription: (NSString*)shortDescription
-       longDescription: (NSString*)longDescription
+- (NSArray *)commitWithType: (NSString*)type
+           shortDescription: (NSString*)shortDescription
+            longDescription: (NSString*)longDescription
 {
 	NSString *commitType = type;
 
@@ -594,7 +594,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	{
 		commitType = @"Unknown";
 	}
-	[self commitWithMetadata: D(shortDescription, @"shortDescription", 
+	return [self commitWithMetadata: D(shortDescription, @"shortDescription", 
 		longDescription, @"longDescription", commitType, @"type")];
 }
 
@@ -713,7 +713,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	                                                             userInfo: notifInfos];
 }
 
-- (void)commitWithMetadata: (NSDictionary *)metadata
+- (NSArray *)commitWithMetadata: (NSDictionary *)metadata
 {
 	NSMapTable *insertedObjectsByRoot = [self insertedObjectsByRootObject];
 	NSMapTable *updatedObjectsByRoot = [self updatedObjectsByRootObject];
@@ -742,6 +742,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	}
 
  	[self postCommitNotificationsWithRevisions: revisions];
+	return revisions;
 }
 
 - (void)markObjectUpdated: (COObject *)obj forProperty: (NSString *)aProperty
@@ -838,6 +839,9 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 - (void)reloadRootObjectTree: (COObject *)rootObject atRevision: (CORevision *)revision
 {
+	// TODO: Handle invalid revision. May be call -unloadRootObjectTree: if the 
+	// revision is older than the root object creation revision.
+
 	ETUUID *rootObjectUUID = [rootObject UUID];
 	//CORevision *oldRevision = [_rootObjectRevisions objectForKey: rootObjectUUID];
 	[_rootObjectRevisions removeObjectForKey: rootObjectUUID];
@@ -890,6 +894,40 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	// Case 2: [revision baseRevision] == oldRevision (redo)
 
 	// Case 3: [oldRevision baseRevision] == revision (undo)
+}
+
+// TODO: Share code with -reloadRootObjectTree:atRevision:
+- (void)unloadRootObjectTree: (COObject *)rootObject
+{
+	ETUUID *rootObjectUUID = [rootObject UUID];
+	//CORevision *oldRevision = [_rootObjectRevisions objectForKey: rootObjectUUID];
+	[_rootObjectRevisions removeObjectForKey: rootObjectUUID];
+
+	// FIXME: Optimise for undo/redo cases (revisions next to each other)
+	
+	// Case 1: unrelated revisions
+	// This part is somewhat tricky. We need to reload all sub-objects
+	// that already exist in the context, and we ought to get rid of all
+	// subobjects that are no longer in use. Objects that exist in the 
+	// new revision but were not part of the old revision tree should
+	// automatically be faulted in (I think).
+
+	// All objects in all revisions
+	NSSet *allIDs = [_store UUIDsForRootObjectUUID: rootObjectUUID];
+
+	// Loaded objects in editing context
+	NSMutableSet *loadedIDs = [NSMutableSet setWithSet: allIDs];
+	[loadedIDs intersectSet: [NSSet setWithArray: [_instantiatedObjects allKeys]]];
+
+	// Loaded objects to be unloaded
+	NSMutableSet *unwantedIDs = [NSMutableSet setWithSet: loadedIDs];
+
+	FOREACH(unwantedIDs, uuid, ETUUID*)
+	{
+		[_instantiatedObjects removeObjectForKey: uuid];
+	}
+
+	[_instantiatedObjects removeObjectForKey: rootObjectUUID];
 }
 
 @end

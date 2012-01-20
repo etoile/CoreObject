@@ -294,17 +294,24 @@
 /** @taskunit Committing Changes */
 
 /**
- * Commits the current changes to the store.
+ * Commits the current changes to the store and returns the resulting revisions.
+ *
+ * See -commitWithType:shortDescription:longDescription:.
  */
-- (void)commit;
+- (NSArray *)commit;
 /**
- * Commits the current changes to the store with some basic metadatas.
+ * Commits the current changes to the store with some basic metadatas and 
+ * returns the resulting revisions.
+ *
+ * Each root object that belong to -changedObjects results in a new revision. 
+ * We usually advice to commit a single root object at time to prevent multiple 
+ * revisions per commit.
  *
  * The descriptions will be visible at the UI level when browsing the history.
  */
-- (void)commitWithType: (NSString *)type
-      shortDescription: (NSString *)shortDescription
-       longDescription: (NSString *)longDescription;
+- (NSArray *)commitWithType: (NSString *)type
+           shortDescription: (NSString *)shortDescription
+            longDescription: (NSString *)longDescription;
 
 /** @taskunit Private */
 
@@ -335,9 +342,10 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
- * Commits the current changes to the store with the provided metadatas.
+ * Commits the current changes to the store with the provided metadatas and 
+ * returns the resulting revisions.
  */
-- (void)commitWithMetadata: (NSDictionary *)metadata;
+- (NSArray *)commitWithMetadata: (NSDictionary *)metadata;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -375,6 +383,14 @@
  */
 - (void)reloadRootObjectTree: (COObject *)object
                   atRevision: (CORevision *)revision;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Unloads the root object and its inner objects.
+ *
+ * Can be used to implement undo on root object creation.
+ */
+- (void)unloadRootObjectTree: (COObject *)object;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
