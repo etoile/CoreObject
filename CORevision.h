@@ -74,6 +74,18 @@
  * Note: This type notion is a bit vague currently. 
  */
 - (NSString *)type;
+/** 
+ * Returns the revision short description.
+ * 
+ * This description is optional.
+ */
+- (NSString *)shortDescription;
+/** 
+ * Returns the revision long description.
+ * 
+ * This description is optional.
+ */
+- (NSString *)longDescription;
 
 /** 
  * Returns the metadata attached to the revision at commit time. 

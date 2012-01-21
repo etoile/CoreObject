@@ -32,7 +32,8 @@
 - (NSArray *)propertyNames
 {
 	return [[super propertyNames] arrayByAddingObjectsFromArray: 
-		A(@"revisionNumber", @"UUID", @"date", @"type", @"objectUUID", @"metadata", @"changedObjectUUIDs")];
+		A(@"revisionNumber", @"UUID", @"date", @"type", @"shortDescription", 
+		@"longDescription", @"objectUUID", @"metadata", @"changedObjectUUIDs")];
 }
 
 - (COStore *)store
@@ -68,6 +69,16 @@
 - (NSString *)type
 {
 	return [[self metadata] objectForKey: @"type"];
+}
+
+- (NSString *)shortDescription;
+{
+	return [[self metadata] objectForKey: @"shortDescription"];
+}
+
+- (NSString *)longDescription
+{
+	return [[self metadata] objectForKey: @"longDescription"];
 }
 
 - (CORevision *)nextRevision
