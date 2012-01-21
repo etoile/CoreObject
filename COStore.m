@@ -936,7 +936,7 @@ void CHECK(id db)
 - (BOOL)isTrackUUID: (ETUUID *)uuid
 {
 	NILARG_EXCEPTION_TEST(uuid);
-    FMResultSet *rs = [db executeQuery: @"SELECT objectuuid FROM commitrack WHERE objectuuid = ?",
+    FMResultSet *rs = [db executeQuery: @"SELECT objectuuid FROM committrack WHERE objectuuid = ?",
 	                                    [self keyForUUID: uuid]];
 	BOOL result = [rs next];
 	[rs close];
