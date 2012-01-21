@@ -143,7 +143,7 @@
 - (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)rootObjectUUID
                                     currentNodeId: (int64_t*)currentNodeId;
 - (void)updateCommitTrackForRootObjectUUID: (NSNumber*)rootObjectUUIDIndex
-                               newRevision: (NSNumber*)newRevision;
+                               newRevision: (CORevision *)newRevision;
 - (NSArray*)loadCommitTrackForObject: (ETUUID*)objectUUID
                         fromRevision: (CORevision*)revision
                         nodesForward: (NSUInteger)nodes

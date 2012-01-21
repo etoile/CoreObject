@@ -74,11 +74,9 @@
 	[[self cachedNodes] addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
 
 	currentNodeIndex = (currentNodeIndex == NSNotFound ? 0 : currentNodeIndex + 1);
-	
-	NSNumber *revNumber = [NSNumber numberWithUnsignedLongLong: [rev revisionNumber]];
 
 	[[editingContext store] updateCommitTrackForRootObjectUUID: [[editingContext store] keyForUUID: [self UUID]]
-	                                               newRevision: revNumber];
+	                                               newRevision: rev];
 }
 
 - (void)addRevisions: (NSArray *)revisions

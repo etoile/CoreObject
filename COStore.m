@@ -548,10 +548,11 @@ void CHECK(id db)
 	{
 		[NSException raise: NSGenericException format: @"Start a commit first"];
 	}
-	[self updateCommitTrackForRootObjectUUID: rootInProgress newRevision: commitInProgress];
-	[db commit];
-	
+
 	CORevision *result = [self revisionWithRevisionNumber: [commitInProgress unsignedLongLongValue]];
+
+	[self updateCommitTrackForRootObjectUUID: rootInProgress newRevision: result];
+	[db commit];
 	
 	DESTROY(commitInProgress);
 	DESTROY(rootInProgress);
@@ -681,13 +682,14 @@ void CHECK(id db)
 }
 
 - (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)uuidIndex
+                                         revision: (CORevision *)aRevision
                                     currentNodeId: (int64_t*)pCurrentNodeId
 {
 	int64_t currentNodeId;
 	// TODO: (Chris) Determine if we should use the latest revision number of the store
 	// or the last revision number the object occurs in. Really, if we create
 	// a commit track for every object, this issue shouldn't arise.
-	CORevision *revision = [self revisionWithRevisionNumber: [self latestRevisionNumber]];
+	CORevision *revision = (aRevision != nil ? aRevision : [self revisionWithRevisionNumber: [self latestRevisionNumber]]);
 #ifdef GNUSTEP
 	NSDebugLLog(@"COStore", @"Creating commit track for object %@", [self UUIDForKey: [uuidIndex longLongValue]]);
 #endif
@@ -699,6 +701,12 @@ void CHECK(id db)
 	if (pCurrentNodeId)
 		*pCurrentNodeId = currentNodeId;
 	return revision;
+}
+
+- (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)uuidIndex
+                                    currentNodeId: (int64_t*)pCurrentNodeId
+{
+	return [self createCommitTrackForRootObjectUUID: uuidIndex revision: nil currentNodeId: pCurrentNodeId];
 }
 
 - (CORevision*)commitTrackForRootObject: (NSNumber*)objectUUIDIndex
@@ -815,7 +823,7 @@ void CHECK(id db)
 }
 
 - (void)updateCommitTrackForRootObjectUUID: (NSNumber*)rootObjectIndex
-                               newRevision: (NSNumber*)newRevision
+                               newRevision: (CORevision *)newRevision
 {
 	int64_t oldNodeInt;
 	CORevision *oldRev = 
@@ -830,7 +838,7 @@ void CHECK(id db)
 		
 		[db executeUpdate: @"INSERT INTO commitTrackNode(committracknodeid, objectuuid, revisionnumber, prevnode, nextnode) VALUES (NULL, ?, ?, ?, NULL)",
 			rootObjectIndex, 
-			newRevision, 
+			[NSNumber numberWithUnsignedLongLong: [newRevision revisionNumber]], 
 			oldNode]; CHECK(db);
 		newNode = [NSNumber numberWithLongLong: [db lastInsertRowId]];
 		[db executeUpdate: @"UPDATE commitTrackNode SET nextnode = ? WHERE committracknodeid = ? AND objectuuid = ?",
@@ -844,7 +852,7 @@ void CHECK(id db)
 	}
 	else
 	{
-		[self createCommitTrackForRootObjectUUID: rootObjectIndex currentNodeId: NULL];
+		[self createCommitTrackForRootObjectUUID: rootObjectIndex revision: newRevision currentNodeId: NULL];
 	}
 }
 - (CORevision*)undoOnCommitTrack: (ETUUID*)rootObjectUUID

@@ -309,14 +309,7 @@ selective undo is involved. */
 #if 0
 - (void)testSelectiveUndo
 {
-	OPEN_STORE(store);
-	COEditingContext *ctxt = NewContext(store);
-	COCustomTrack *track = [COCustomTrack trackWithUUID: [ETUUID UUID] editingContext: ctxt];
-
 	[self makeCommitsWithMultipleRootObjects];
-
-	TearDownContext(ctxt);
-	CLOSE_STORE(store);
 }
 #endif
 
