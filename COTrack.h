@@ -79,6 +79,15 @@
  * Default implementation returns nil.
  */
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back;
+/**
+ * Posts ETSourceDidUpdateNotification.
+ *
+ * You must invoke this method every time the track node collection is changed.
+ * For example, when you override -setCurrentNode:, -undo, -redo, and -undoNode:.
+ *
+ * EtoileUI relies on this notification to reload the UI transparently.
+ */
+- (void)didUpdate;
 
 /** @taskunit Undo Management */
 
@@ -146,9 +155,41 @@
 
 /** @taskunit Metadata */
 
+/**
+ * See -[CORevision metadata].
+ */
 - (NSDictionary *)metadata;
+/**
+ * See -[CORevision revisionNumber].
+ */
 - (uint64_t)revisionNumber;
+/**
+ * See -[CORevision UUID].
+ */
 - (ETUUID *)UUID;
+/**
+ * See -[CORevision objectUUID].
+ */
+- (ETUUID *)objectUUID;
+/**
+ * See -[CORevision date].
+ */
+- (NSDate *)date;
+/**
+ * See -[CORevision type].
+ */
+- (NSString *)type;
+/** 
+ * See -[CORevision shortDescription].
+ */
+- (NSString *)shortDescription;
+/** 
+ * See -[CORevision longDescription].
+ */
+- (NSString *)longDescription;
+/**
+ * See -[CORevision changedObjectUUIDs].
+ */
 - (NSArray *)changedObjectUUIDs;
 
 @end

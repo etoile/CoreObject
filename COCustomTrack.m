@@ -87,6 +87,7 @@
 	{
 		[self addRevision: rev];
 	}
+	[self didUpdate];
 }
 
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
@@ -171,6 +172,7 @@
 	}
 
 	currentNodeIndex--;
+	[self didUpdate];
 }
 
 - (void)redo
@@ -207,6 +209,7 @@
 	}
 
 	currentNodeIndex++;
+	[self didUpdate];
 }
 
 @end

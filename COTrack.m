@@ -58,6 +58,12 @@
 	return nil;
 }
 
+- (void)didUpdate
+{
+	[[NSNotificationCenter defaultCenter] 
+		postNotificationName: ETCollectionDidUpdateNotification object: self];
+}
+
 - (void)undo
 {
 
@@ -122,6 +128,8 @@
 	return NO;
 }
 
+// NOTE: For Mac OS X at least, KVC doesn't check -forwardingTargetForSelector:, 
+// so implementing it is pretty much useless. We had to reimplement the accessors (see below).
 - (id)forwardingTargetForSelector: (SEL)aSelector
 {
 	if ([revision respondsToSelector: aSelector])
@@ -166,6 +174,31 @@
 	return [revision UUID];
 }
 
+- (ETUUID *)objectUUID
+{
+	return [revision objectUUID];
+}
+
+- (NSDate *)date
+{
+	return [revision date];
+}
+
+- (NSString *)type
+{
+	return [revision type];
+}
+
+- (NSString *)shortDescription;
+{
+	return [revision shortDescription];
+}
+
+- (NSString *)longDescription
+{
+	return [revision longDescription];
+}
+
 - (NSArray *)changedObjectUUIDs
 {
 	return [revision changedObjectUUIDs];
@@ -173,8 +206,7 @@
 
 - (NSArray *)propertyNames
 {
-	return [[super propertyNames] arrayByAddingObjectsFromArray: 
-		A(@"revisionNumber", @"UUID", @"metadata", @"changedObjectUUIDs")];
+	return [[super propertyNames] arrayByAddingObjectsFromArray: [revision propertyNames]];
 }
 
 @end
