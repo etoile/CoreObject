@@ -192,10 +192,11 @@
 - (void)cacheNodesForward: (NSUInteger)forward backward: (NSUInteger)backward
 {
 	COStore *store = [[trackedObject editingContext] store];
-	NSArray *revisions = [store loadCommitTrackForObject: [trackedObject UUID]
-	                                        fromRevision: [[self currentNode] revision] 
-	                                        nodesForward: forward
-	                                       nodesBackward: backward];
+	NSUInteger newCurrentNodeIndex = 0;
+	NSArray *revisions = [store revisionsForTrackUUID: [trackedObject UUID]
+	                                 currentNodeIndex: &newCurrentNodeIndex
+	                                    backwardLimit: backward
+	                                     forwardLimit: forward];
 	NSArray *backwardRange = [revisions subarrayWithRange: NSMakeRange(0, backward)];
 	NSArray *forwardRange = [revisions subarrayWithRange: NSMakeRange(backward + 1, forward)];
 	NSMutableArray *cachedNodes = [self cachedNodes];

@@ -144,10 +144,10 @@
                                     currentNodeId: (int64_t*)currentNodeId;
 - (void)updateCommitTrackForRootObjectUUID: (NSNumber*)rootObjectUUIDIndex
                                newRevision: (CORevision *)newRevision;
-- (NSArray*)loadCommitTrackForObject: (ETUUID*)objectUUID
-                        fromRevision: (CORevision*)revision
-                        nodesForward: (NSUInteger)nodes
-                       nodesBackward: (NSUInteger)nodes;
+- (NSArray *)revisionsForTrackUUID: (ETUUID *)objectUUID
+                  currentNodeIndex: (NSUInteger *)currentNodeIndex
+                     backwardLimit: (NSUInteger)backward
+                      forwardLimit: (NSUInteger)forward;
 - (CORevision*)undoOnCommitTrack: (ETUUID*)commitTrack;
 - (CORevision*)redoOnCommitTrack: (ETUUID*)commitTrack;
 - (CORevision*)maxRevision: (int64_t)maxRevNumber forRootObjectUUID: (ETUUID*)uuid;

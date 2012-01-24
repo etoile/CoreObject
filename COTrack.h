@@ -34,7 +34,7 @@
 	@protected
 	// TODO: Would be better to make the ivar below private rather than 
 	// protected but this makes the code much more verbose in subclasses.
-	NSInteger currentNodeIndex;
+	NSUInteger currentNodeIndex;
 }
 
 /** @taskunit Initialization */

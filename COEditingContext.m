@@ -234,11 +234,10 @@ store by other processes. */
 		{
 			if (nil == revision)
 			{
-				NSArray * revisionNodes = [_store 
-					loadCommitTrackForObject: rootUUID	
-						    fromRevision: nil
-						    nodesForward: 0
-						   nodesBackward: 0];
+				NSArray *revisionNodes = [_store revisionsForTrackUUID: rootUUID
+				                                      currentNodeIndex: NULL
+				                                         backwardLimit: 0
+				                                          forwardLimit: 0];
 				revision = [revisionNodes objectAtIndex: 0];
 			}
 		}

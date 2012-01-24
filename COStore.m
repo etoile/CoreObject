@@ -741,10 +741,10 @@ void CHECK(id db)
   * database (forward + backward + 1) time, once for each
   * revision on the commit track.
  */
-- (NSArray*)loadCommitTrackForObject: (ETUUID*)objectUUID
-                        fromRevision: (CORevision*)revision
-                        nodesForward: (NSUInteger)forward
-                       nodesBackward: (NSUInteger)backward
+- (NSArray *)revisionsForTrackUUID: (ETUUID *)objectUUID
+                  currentNodeIndex: (NSUInteger *)currentNodeIndex
+                     backwardLimit: (NSUInteger)backward
+                      forwardLimit: (NSUInteger)forward;
 {
 	NILARG_EXCEPTION_TEST(objectUUID);
 	// TODO: The check below is disabled to support COCustomTrack. We need to 
@@ -755,16 +755,14 @@ void CHECK(id db)
 
 	NSMutableArray *nodes = [[NSMutableArray alloc] initWithCapacity: (1 + forward + backward)];
 	NSNumber *objectUUIDIndex = [self keyForUUID: objectUUID];
-	int64_t nextNode, prevNode;
-	int64_t currentNode;	
+	int64_t currentNode = 0;
+	int64_t nextNode = 0;
+	int64_t prevNode = 0;
+	CORevision *revision = [self commitTrackForRootObject: objectUUIDIndex currentNode: &currentNode previousNode: &prevNode nextNode: &nextNode];
+
 	if (nil == revision)
 	{
-		revision = [self commitTrackForRootObject: objectUUIDIndex currentNode: &currentNode previousNode: &prevNode nextNode: &nextNode];
-		if (nil == revision)
-		{
-			revision = [self createCommitTrackForRootObjectUUID: objectUUIDIndex currentNodeId: &currentNode];
-			prevNode = nextNode = 0;
-		}
+		revision = [self createCommitTrackForRootObjectUUID: objectUUIDIndex currentNodeId: &currentNode];
 	}
 
 	// Insert the middle mode (revision)
@@ -794,7 +792,12 @@ void CHECK(id db)
 			break;
 		}
 	}
-	
+
+	if (currentNodeIndex != NULL)
+	{
+		*currentNodeIndex = [nodes count] - 1;
+	}
+
 	// Retrieve the forward revisions on the track
 	for (int i = 0; i < forward; i++)
 	{
@@ -857,7 +860,7 @@ void CHECK(id db)
 }
 - (CORevision*)undoOnCommitTrack: (ETUUID*)rootObjectUUID
 {
-	NSNumber *rootObjectIndex = [self keyForUUID: rootObjectUUID];
+ 	NSNumber *rootObjectIndex = [self keyForUUID: rootObjectUUID];
 	FMResultSet *rs = [db executeQuery: @"SELECT prevnode FROM commitTrack ct JOIN commitTrackNode ctn ON ct.currentNode = ctn.committracknodeid "
 		"WHERE ct.objectuuid = ?", rootObjectIndex]; CHECK(db);
 	if ([rs next])
