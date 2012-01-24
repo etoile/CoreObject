@@ -28,10 +28,10 @@
 	if (wasPersisted == NO)
 		return;
 
-	NSArray *revisions = [[editingContext store] loadCommitTrackForObject: [self UUID]
-	                                                         fromRevision: nil 
-	                                                         nodesForward: NSUIntegerMax
-	                                                        nodesBackward: NSUIntegerMax];
+	NSArray *revisions = [[editingContext store] revisionsForTrackUUID: [self UUID]
+	                                                  currentNodeIndex: &currentNodeIndex
+	                                                     backwardLimit: NSUIntegerMax
+	                                                      forwardLimit: NSUIntegerMax];
 	NSMutableArray *cachedNodes = [self cachedNodes];
 
 	[cachedNodes removeAllObjects];
@@ -40,7 +40,8 @@
 	{
 		[cachedNodes addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
 	}
-	currentNodeIndex = [cachedNodes count] - 1;
+
+	//[editingContext store]
 }
 
 - (id)initWithUUID: (ETUUID *)aUUID editingContext: (COEditingContext *)aContext
@@ -139,11 +140,14 @@
 	{
 		CORevision *prevRev = [[editingContext store] maxRevision: [revToUndo revisionNumber] - 1 
 		                                        forRootObjectUUID: [object UUID]];
-		CORevision *newRev = nil;
-
+		
 		if (prevRev != nil)
 		{
-			newRev = [[editingContext store] undoOnCommitTrack: [object UUID]];
+			CORevision *newTrackRev = [[editingContext store] undoOnCommitTrack: [self UUID]];
+			CORevision *newRev = [[editingContext store] undoOnCommitTrack: [object UUID]];
+
+			assert([newTrackRev isEqual: [[[self currentNode] previousNode] revision]]);
+
 			[editingContext reloadRootObjectTree: object atRevision: newRev];
 		}
 		else
@@ -197,7 +201,10 @@
 	
 	if (useCommitTrackRedo)
 	{
+		CORevision *newTrackRev = [[editingContext store] redoOnCommitTrack: [self UUID]];
 		CORevision *newRev = [[editingContext store] redoOnCommitTrack: [object UUID]];
+
+		assert([newTrackRev isEqual: [[[self currentNode] nextNode] revision]]);
 
 	    [editingContext reloadRootObjectTree: object atRevision: newRev];
 	}
