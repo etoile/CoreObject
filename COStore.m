@@ -844,8 +844,8 @@ void CHECK(id db)
 {
 	NSArray *revs = [self revisionsForTrackUUID: aTrackUUID
 	                           currentNodeIndex: NULL
-	                              backwardLimit: NSUIntegerMax
-	                               forwardLimit: NSUIntegerMax];
+	                              backwardLimit: 0
+	                               forwardLimit: 0];
 	assert([revs count] == 1);
 	return [revs firstObject];
 }
