@@ -41,11 +41,17 @@
 		[self cacheNodesForward: CACHE_AMOUNT backward: CACHE_AMOUNT];
 	}
 
+	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+	                                                    selector: @selector(currentNodeDidChangeInStore:) 
+	                                                        name: COStoreDidChangeCurrentNodeOnTrackNotification 
+	                                                      object: [[trackedObject UUID] stringValue]];
+
 	return self;	
 }
 
 - (void)dealloc
 {
+	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 	DESTROY(trackedObject);
 	[super dealloc];
 }
@@ -58,6 +64,26 @@
 			&& [[trackedObject editingContext] isEqual: [[rhs trackedObject] editingContext]]);
 	}
 	return NO;
+}
+
+- (void)currentNodeDidChangeInStore: (NSNotification *)notif
+{
+	NSString *storeUUIDString = [[notif userInfo] objectForKey: kCOStoreUUIDStringKey];
+
+	assert([[notif object] isEqual: [[trackedObject UUID] stringValue]]);
+	assert([storeUUIDString isEqual: [[[[trackedObject editingContext] store] UUID] stringValue]]);
+
+	NSUInteger oldCurrentNodeIndex = currentNodeIndex;
+
+	// TODO: Remove the line below to be handled by the caching code 
+	[[self cachedNodes] removeAllObjects];
+	[self cacheNodesForward: CACHE_AMOUNT backward: CACHE_AMOUNT];
+
+	assert(currentNodeIndex != oldCurrentNodeIndex);
+	assert([self currentNode] != nil);
+
+	[[trackedObject editingContext] reloadRootObjectTree: trackedObject 
+	                                          atRevision: [[self currentNode] revision]];
 }
 
 - (void)undo

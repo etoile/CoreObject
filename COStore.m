@@ -551,7 +551,7 @@ void CHECK(id db)
 
 	CORevision *result = [self revisionWithRevisionNumber: [commitInProgress unsignedLongLongValue]];
 
-	[self updateCommitTrackForRootObjectUUID: rootInProgress newRevision: result];
+	[self addRevision: result toTrackUUID: [self UUIDForKey: [rootInProgress longLongValue]]];
 	[db commit];
 	
 	DESTROY(commitInProgress);
@@ -679,6 +679,21 @@ void CHECK(id db)
 	}
 	[rs close];
 	return num;
+}
+
+- (void)didChangeCurrentNodeFromRevision: (CORevision *)oldRev 
+                                  toNode: (NSNumber *)newNode 
+                                revision: (CORevision *)newRev
+                             onTrackUUID: (ETUUID *)aTrackUUID
+{
+	// TODO: Should we compute kCONewCurrentNodeIndexKey to resync tracks more easily...
+	NSDictionary *infos = D(newNode, kCONewCurrentNodeIDKey, 
+		[NSNumber numberWithLongLong: [newRev revisionNumber]], kCONewCurrentNodeRevisionNumberKey, 
+		[NSNumber numberWithLongLong: [oldRev revisionNumber]], kCOOldCurrentNodeRevisionNumberKey, 
+		[[self UUID] stringValue], kCOStoreUUIDStringKey); 
+	[[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStoreDidChangeCurrentNodeOnTrackNotification 
+	                                                               object: [aTrackUUID stringValue]
+	                                                             userInfo: infos];
 }
 
 - (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)uuidIndex
@@ -825,58 +840,86 @@ void CHECK(id db)
 	return [nodes autorelease];
 }
 
-- (void)updateCommitTrackForRootObjectUUID: (NSNumber*)rootObjectIndex
-                               newRevision: (CORevision *)newRevision
+- (CORevision *) currentRevisionForTrackUUID: (ETUUID *)aTrackUUID
 {
-	int64_t oldNodeInt;
+	NSArray *revs = [self revisionsForTrackUUID: aTrackUUID
+	                           currentNodeIndex: NULL
+	                              backwardLimit: NSUIntegerMax
+	                               forwardLimit: NSUIntegerMax];
+	assert([revs count] == 1);
+	return [revs firstObject];
+}
+
+// TODO: Or should we name it -pushRevision:onTrackUUID:...
+- (void)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID
+{
+	NSNumber *track = [self keyForUUID: aTrackUUID];
+	int64_t oldNodeId;
 	CORevision *oldRev = 
-		[self commitTrackForRootObject: rootObjectIndex
-		                   currentNode: &oldNodeInt
+		[self commitTrackForRootObject: track
+		                   currentNode: &oldNodeId
 				  previousNode: NULL
 		                      nextNode: NULL];
-	if (oldRev)
+	if (oldRev != nil)
 	{
-		NSNumber* oldNode = [NSNumber numberWithLongLong: oldNodeInt];
-		NSNumber* newNode;
+		NSNumber *oldNode = [NSNumber numberWithLongLong: oldNodeId];
+		NSNumber *prevNode = [NSNumber numberWithLongLong: [newRevision revisionNumber]];
 		
-		[db executeUpdate: @"INSERT INTO commitTrackNode(committracknodeid, objectuuid, revisionnumber, prevnode, nextnode) VALUES (NULL, ?, ?, ?, NULL)",
-			rootObjectIndex, 
-			[NSNumber numberWithUnsignedLongLong: [newRevision revisionNumber]], 
-			oldNode]; CHECK(db);
-		newNode = [NSNumber numberWithLongLong: [db lastInsertRowId]];
+		[db executeUpdate: @"INSERT INTO commitTrackNode(committracknodeid, objectuuid, revisionnumber, prevnode, nextnode) "
+			"VALUES (NULL, ?, ?, ?, NULL)", 
+			track, prevNode, oldNode]; CHECK(db);
+	
+		NSNumber *newNode = [NSNumber numberWithLongLong: [db lastInsertRowId]];
+
 		[db executeUpdate: @"UPDATE commitTrackNode SET nextnode = ? WHERE committracknodeid = ? AND objectuuid = ?",
-			newNode, oldNode, rootObjectIndex]; CHECK(db);
+			newNode, oldNode, track]; CHECK(db);
 		[db executeUpdate: @"UPDATE commitTrack SET currentnode = ? WHERE objectuuid = ?",
-			newNode, rootObjectIndex]; CHECK(db);
+			newNode, track]; CHECK(db);
+
 #ifdef GNUSTEP
 		NSDebugLLog(@"COStore", @"Updated commit track for %@ - created new commit track node %@ pointed to by %@ for revision %@",
-			[self UUIDForKey: [rootObjectIndex longLongValue]], newNode, oldNode, newRevision); 
+			aTrackUUID, newNode, oldNode, newRevision); 
 #endif
+
+		[self didChangeCurrentNodeFromRevision: oldRev toNode: newNode revision: newRevision onTrackUUID: aTrackUUID];
 	}
 	else
 	{
-		[self createCommitTrackForRootObjectUUID: rootObjectIndex revision: newRevision currentNodeId: NULL];
+		[self createCommitTrackForRootObjectUUID: track revision: newRevision currentNodeId: NULL];
 	}
 }
 - (CORevision*)undoOnCommitTrack: (ETUUID*)rootObjectUUID
 {
+	CORevision *oldRev = [self commitTrackForRootObject: [self keyForUUID: rootObjectUUID]
+		                   currentNode: NULL
+				  previousNode: NULL
+		                      nextNode: NULL];
  	NSNumber *rootObjectIndex = [self keyForUUID: rootObjectUUID];
-	FMResultSet *rs = [db executeQuery: @"SELECT prevnode FROM commitTrack ct JOIN commitTrackNode ctn ON ct.currentNode = ctn.committracknodeid "
+	FMResultSet *rs = [db executeQuery: @"SELECT prevnode FROM commitTrack ct "
+		"JOIN commitTrackNode ctn ON ct.currentNode = ctn.committracknodeid "
 		"WHERE ct.objectuuid = ?", rootObjectIndex]; CHECK(db);
+
 	if ([rs next])
 	{
 		NSNumber *prevNode = [NSNumber numberWithLongLong: [rs longLongIntForColumnIndex: 0]];
-		if ([prevNode longLongValue]== 0)
+
+		if ([prevNode longLongValue] == 0)
+		{
 			[NSException raise: NSInvalidArgumentException
 			            format: @"Root Object UUID %@ is already at the beginning of its commit track and cannot be undone.", rootObjectUUID];
+		}
+
 		[db executeUpdate: @"UPDATE commitTrack SET currentnode = ? WHERE objectuuid = ?",
-				prevNode, rootObjectIndex]; CHECK(db);
+			prevNode, rootObjectIndex]; CHECK(db);
 		rs = [db executeQuery: @"SELECT revisionnumber FROM committracknode WHERE committracknodeid = ?", 
 		   prevNode]; CHECK(db);
+
 		if ([rs next])
 		{
-			int64_t revisionNumber = [rs longLongIntForColumnIndex: 0];
-			return [self revisionWithRevisionNumber: revisionNumber];
+			CORevision *newRev = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
+
+			[self didChangeCurrentNodeFromRevision: oldRev toNode: prevNode revision: newRev onTrackUUID: rootObjectUUID];
+			return newRev;
 		}
 		else
 		{
@@ -894,23 +937,35 @@ void CHECK(id db)
 }
 - (CORevision*)redoOnCommitTrack: (ETUUID*)rootObjectUUID
 {
+	CORevision *oldRev = [self commitTrackForRootObject:[self keyForUUID: rootObjectUUID]
+		                   currentNode: NULL
+				  previousNode: NULL
+		                      nextNode: NULL];
 	NSNumber *rootObjectIndex = [self keyForUUID: rootObjectUUID];
-	FMResultSet *rs = [db executeQuery: @"SELECT nextNode FROM commitTrack ct JOIN commitTrackNode ctn ON ct.currentNode = ctn.committracknodeid "
+	FMResultSet *rs = [db executeQuery: @"SELECT nextNode FROM commitTrack ct "
+		"JOIN commitTrackNode ctn ON ct.currentNode = ctn.committracknodeid "
 		"WHERE ct.objectuuid = ?", rootObjectIndex]; CHECK(db);
+
 	if ([rs next])
 	{
-		NSNumber* nextNode = [NSNumber numberWithLongLong: [rs longLongIntForColumnIndex: 0]];
+		NSNumber *nextNode = [NSNumber numberWithLongLong: [rs longLongIntForColumnIndex: 0]];
+	
 		if ([nextNode longLongValue] == 0)
+		{
 			[NSException raise: NSInvalidArgumentException
 			            format: @"Root Object UUID %@ is already at the end of its commit track and cannot be redone.", rootObjectUUID];
+		}
+
 		[db executeUpdate: @"UPDATE commitTrack SET currentnode = ? WHERE objectuuid = ?",
-				nextNode, rootObjectIndex]; CHECK(db);
+			nextNode, rootObjectIndex]; CHECK(db);
 		rs = [db executeQuery: @"SELECT revisionnumber FROM committracknode WHERE committracknodeid = ?", 
 			nextNode]; CHECK(db);
+
 		if ([rs next])
 		{
-			int64_t revisionNumber = [rs longLongIntForColumnIndex: 0];
-			return [self revisionWithRevisionNumber: revisionNumber];
+			CORevision *newRev = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
+			[self didChangeCurrentNodeFromRevision: oldRev toNode: nextNode revision: newRev onTrackUUID: rootObjectUUID];
+			return newRev;
 		}
 		else
 		{
@@ -955,6 +1010,12 @@ void CHECK(id db)
 }
 
 @end
+
+NSString *COStoreDidChangeCurrentNodeOnTrackNotification = @"COStoreDidChangeCurrentNodeOnTrackNotification";
+NSString *kCONewCurrentNodeIDKey = @"kCONewCurrentNodeIDKey";
+NSString *kCONewCurrentNodeRevisionNumberKey = @"kCONewCurrentNodeRevisionNumberKey";
+NSString *kCOOldCurrentNodeRevisionNumberKey = @"kCOOldCurrentNodeRevisionNumberKey";
+NSString *kCOStoreUUIDStringKey = @"kCOStoreUUIDStringKey";
 
 @implementation CORecord
 

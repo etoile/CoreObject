@@ -90,7 +90,7 @@ object graphs present in memory, for which changes have been committed to the
 store by other processes. */
 - (void)didMakeCommit: (NSNotification *)notif
 {
-	BOOL isOurCommit = [[[_store URL] absoluteString] isEqual: [notif object]];
+	BOOL isOurCommit = [[[_store UUID] stringValue] isEqual: [notif object]];
 
 	if (isOurCommit)
 		return;

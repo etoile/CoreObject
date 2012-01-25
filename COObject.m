@@ -407,6 +407,11 @@
 
 /* Property-value coding */
 
+- (NSSet *) observableKeyPaths
+{
+	return S(@"name", @"lastVersionDescription", @"tagDescription");
+}
+
 - (NSArray *)propertyNames
 {
 	return [[self entityDescription] allPropertyDescriptionNames];

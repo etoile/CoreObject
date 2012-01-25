@@ -142,12 +142,12 @@
 - (NSString*)propertyForKey: (int64_t)key;
 - (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)rootObjectUUID
                                     currentNodeId: (int64_t*)currentNodeId;
-- (void)updateCommitTrackForRootObjectUUID: (NSNumber*)rootObjectUUIDIndex
-                               newRevision: (CORevision *)newRevision;
+- (void)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID;
 - (NSArray *)revisionsForTrackUUID: (ETUUID *)objectUUID
                   currentNodeIndex: (NSUInteger *)currentNodeIndex
                      backwardLimit: (NSUInteger)backward
                       forwardLimit: (NSUInteger)forward;
+- (CORevision *) currentRevisionForTrackUUID: (ETUUID *)aTrackUUID;
 - (CORevision*)undoOnCommitTrack: (ETUUID*)commitTrack;
 - (CORevision*)redoOnCommitTrack: (ETUUID*)commitTrack;
 - (CORevision*)maxRevision: (int64_t)maxRevNumber forRootObjectUUID: (ETUUID*)uuid;
@@ -157,6 +157,12 @@
 - (BOOL)isTrackUUID: (ETUUID *)aUUID;
 
 @end
+
+extern NSString *COStoreDidChangeCurrentNodeOnTrackNotification;
+extern NSString *kCONewCurrentNodeIDKey;
+extern NSString *kCONewCurrentNodeRevisionNumberKey;
+extern NSString *kCOOldCurrentNodeRevisionNumberKey;
+extern NSString *kCOStoreUUIDStringKey;
 
 /** Wraps a dictionary into an object which is a value rather a collection.
 

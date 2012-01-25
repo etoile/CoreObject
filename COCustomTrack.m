@@ -21,27 +21,47 @@
 	return AUTORELEASE([[self alloc] initWithUUID: aUUID editingContext: aContext]);
 }
 
-- (void) loadAllNodes
+- (void) reloadAllNodes
 {
 	BOOL wasPersisted = [[editingContext store] isTrackUUID: [self UUID]];
 
 	if (wasPersisted == NO)
 		return;
 
-	NSArray *revisions = [[editingContext store] revisionsForTrackUUID: [self UUID]
-	                                                  currentNodeIndex: &currentNodeIndex
-	                                                     backwardLimit: NSUIntegerMax
-	                                                      forwardLimit: NSUIntegerMax];
 	NSMutableArray *cachedNodes = [self cachedNodes];
 
 	[cachedNodes removeAllObjects];
+	[allNodes removeAllObjects];
+
+	COStore *store = [editingContext store];
+	CORevision *currentRev = [store currentRevisionForTrackUUID: [self UUID]];
+	NSArray *revisions = [store revisionsForTrackUUID: [self UUID]
+	                                                  currentNodeIndex: &currentNodeIndex
+	                                                     backwardLimit: NSUIntegerMax
+	                                                      forwardLimit: NSUIntegerMax];
 
 	for (CORevision *rev in revisions)
 	{
-		[cachedNodes addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
-	}
+		COTrackNode *node = [COTrackNode nodeWithRevision: rev onTrack: self];
 
-	//[editingContext store]
+		[allNodes addObject: node];
+
+		// TODO: If necessary, we can cache the current rev per object UUID and 
+		// retrieve all the commit track current revisions in a single SQL query.
+		CORevision *commitTrackRev = [store currentRevisionForTrackUUID: [rev objectUUID]];
+		int64_t commitTrackRevNumber = [commitTrackRev revisionNumber];
+		int64_t currentRevNumber = [currentRev revisionNumber];
+		int64_t revNumber = [rev revisionNumber];
+
+		if ((revNumber > commitTrackRevNumber && revNumber < currentRevNumber)
+		 || (revNumber > currentRevNumber && revNumber < commitTrackRevNumber))
+		{
+			currentNodeIndex--;
+			continue;
+		}
+
+		[cachedNodes addObject: node];
+	}
 }
 
 - (id)initWithUUID: (ETUUID *)aUUID editingContext: (COEditingContext *)aContext
@@ -52,15 +72,24 @@
 
 	ASSIGN(UUID, aUUID);
 	ASSIGN(editingContext, aContext);
+	allNodes = [[NSMutableArray alloc] init];
 
-	[self loadAllNodes];
+	[self reloadAllNodes];
+
+	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+	                                                    selector: @selector(currentNodeDidChangeInStore:) 
+	                                                        name: COStoreDidChangeCurrentNodeOnTrackNotification 
+	                                                      object: nil];
 
 	return self;
 }
 
 - (void)dealloc
 {
+	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 	DESTROY(UUID);
+	DESTROY(editingContext);
+	DESTROY(allNodes);
 	[super dealloc];
 }
 
@@ -70,14 +99,75 @@
 	return nil;
 }
 
+- (NSSet *)trackedObjectUUIDs
+{
+	// TODO: This is probably quite slow. We can query the store to compute the 
+	// the tracked object set.
+	NSArray *revs = (id)[[[self cachedNodes] mappedCollection] revision];
+	// TODO: Should we skip UUIDs matching tracked objects which have been 
+	// deleted at this point, see -trackedObjects and -currentNodeDidChangeInStore:...
+	return [NSSet setWithArray: (id)[[revs mappedCollection] objectUUID]];
+}
+
+- (NSSet *)trackedObjects
+{
+	NSMutableSet *objects = [NSMutableSet set];
+
+	// TODO: Skip tracked objects which have been deleted at this point, see 
+	// -trackedObjectUUIDs
+	for (ETUUID *uuid in [self trackedObjectUUIDs])
+	{
+		[objects addObject: [editingContext objectWithUUID: uuid]];
+	}
+	return objects;
+}
+
+- (void)currentNodeDidChangeInStore: (NSNotification *)notif
+{
+	NSString *trackUUIDString = [notif object];
+	BOOL isOurTrack = [[[self UUID] stringValue] isEqual: trackUUIDString];
+
+	/* We use notifications posted by tracked object tracks to be kept in sync 
+	   with the store.
+	   For concurrency control, we are not interested in notifications posted by 
+	   our other instances (using our UUID) in some local or remote editing 
+	   context. */
+	if (isOurTrack)
+		return;
+
+	BOOL isTrackedObjectTrack = [[self trackedObjectUUIDs] containsObject: trackUUIDString];
+
+	if (isTrackedObjectTrack == NO)
+		return;
+
+	CORevision *oldRev = [[self currentNode] revision];
+
+	// TODO: Reuse nodes (we reinstantiate every node currently)
+	[self reloadAllNodes];
+
+	CORevision *newRev = [[self currentNode] revision];
+	COObject *object = [editingContext objectWithUUID: [newRev objectUUID]];
+	assert([object isRoot]);
+	assert([object isPersistent]);
+		
+	if (oldRev != nil)
+	{
+		[editingContext reloadRootObjectTree: object atRevision: newRev];
+	}
+	else
+	{
+		/* Move before root object creation */
+		[editingContext unloadRootObjectTree: object];
+	}
+}
+
 - (void)addRevision: (CORevision *)rev
 {
 	[[self cachedNodes] addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
 
 	currentNodeIndex = (currentNodeIndex == NSNotFound ? 0 : currentNodeIndex + 1);
 
-	[[editingContext store] updateCommitTrackForRootObjectUUID: [[editingContext store] keyForUUID: [self UUID]]
-	                                               newRevision: rev];
+	[[editingContext store] addRevision: rev toTrackUUID: [self UUID]];
 }
 
 - (void)addRevisions: (NSArray *)revisions
