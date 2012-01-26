@@ -1099,12 +1099,15 @@ static int indent = 0;
 	
 	/* When no custom setter can be found, we try to access the ivar with KVC semantics */
 
-	if (ETSetInstanceVariableValueForKey(self, value, key))
-		return;
+	[self willChangeValueForProperty: key];
 
-	/* If no valid ivar can be found, we access the variable storage */
+	if (ETSetInstanceVariableValueForKey(self, value, key) == NO)
+	{
+		/* If no valid ivar can be found, we access the variable storage */
+		[self setPrimitiveValue: value forKey: key];
+	}
 
-	[self setPrimitiveValue: value forKey: key];
+	[self didChangeValueForProperty: key];
 }
 
 static NSArray *COArrayPropertyListForArray(NSArray *array)
