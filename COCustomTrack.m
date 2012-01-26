@@ -122,10 +122,18 @@
 	return objects;
 }
 
+- (void)checkCurrentNodeChangeNotification: (NSNotification *)notif
+{
+	NSString *storeUUIDString = [[notif userInfo] objectForKey: kCOStoreUUIDStringKey];
+	assert([storeUUIDString isEqual: [[[[self editingContext] store] UUID] stringValue]]);
+}
+
 - (void)currentNodeDidChangeInStore: (NSNotification *)notif
 {
-	NSString *trackUUIDString = [notif object];
-	BOOL isOurTrack = [[[self UUID] stringValue] isEqual: trackUUIDString];
+	[self checkCurrentNodeChangeNotification: notif];
+
+	ETUUID *trackUUID = [ETUUID UUIDWithString: [notif object]];
+	BOOL isOurTrack = [[self UUID] isEqual: trackUUID];
 
 	/* We use notifications posted by tracked object tracks to be kept in sync 
 	   with the store.
@@ -135,30 +143,45 @@
 	if (isOurTrack)
 		return;
 
-	BOOL isTrackedObjectTrack = [[self trackedObjectUUIDs] containsObject: trackUUIDString];
+	BOOL isTrackedObjectTrack = [[self trackedObjectUUIDs] containsObject: trackUUID];
 
 	if (isTrackedObjectTrack == NO)
 		return;
 
 	CORevision *oldRev = [[self currentNode] revision];
+	int64_t newRevNumber = [[[notif userInfo] objectForKey: kCONewCurrentNodeRevisionNumberKey] longLongValue];
+
+	if ([oldRev revisionNumber] == newRevNumber)
+		return;
 
 	// TODO: Reuse nodes (we reinstantiate every node currently)
 	[self reloadAllNodes];
 
-	CORevision *newRev = [[self currentNode] revision];
-	COObject *object = [editingContext objectWithUUID: [newRev objectUUID]];
-	assert([object isRoot]);
-	assert([object isPersistent]);
-		
-	if (oldRev != nil)
+	CORevision *newRev = [[editingContext store] revisionWithRevisionNumber: newRevNumber];
+	ETUUID *commitTrackUUID = [newRev objectUUID];
+	COTrackNode *node = [self currentNode];
+
+	while (node != nil)
 	{
-		[editingContext reloadRootObjectTree: object atRevision: newRev];
+		if ([[node revision] isEqual: newRev])
+		{
+			break;
+		}
+		else if ([[[node revision] objectUUID] isEqual: commitTrackUUID])
+		{
+			currentNodeIndex--;
+		}
+		else
+		{
+			break;
+		}
+		node = [node previousNode];
 	}
-	else
-	{
-		/* Move before root object creation */
-		[editingContext unloadRootObjectTree: object];
-	}
+
+	/* We don't have to reload the tracked object at the current track node 
+	   revision, because its commit track does it. */
+
+	[self didUpdate];
 }
 
 - (void)addRevision: (CORevision *)rev

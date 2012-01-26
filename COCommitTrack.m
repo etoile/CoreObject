@@ -66,17 +66,34 @@
 	return NO;
 }
 
-- (void)currentNodeDidChangeInStore: (NSNotification *)notif
+- (void)checkCurrentNodeChangeNotification: (NSNotification *)notif
 {
 	NSString *storeUUIDString = [[notif userInfo] objectForKey: kCOStoreUUIDStringKey];
 
 	assert([[notif object] isEqual: [[trackedObject UUID] stringValue]]);
 	assert([storeUUIDString isEqual: [[[[trackedObject editingContext] store] UUID] stringValue]]);
+}
+
+- (void)currentNodeDidChangeInStore: (NSNotification *)notif
+{
+	[self checkCurrentNodeChangeNotification: notif];
+
+	int64_t revNumber = [[[notif userInfo] objectForKey: kCONewCurrentNodeRevisionNumberKey] longLongValue];
+	BOOL isOurTrack = (revNumber == [[[self currentNode] revision] revisionNumber]);
+
+	/* We use notifications posted by tracked object tracks to be kept in sync 
+	   with the store.
+	   For concurrency control, we are not interested in notifications posted by 
+	   our other instances (using our UUID) in some local or remote editing 
+	   context. */
+	if (isOurTrack)
+		return;
 
 	NSUInteger oldCurrentNodeIndex = currentNodeIndex;
 
-	// TODO: Remove the line below to be handled by the caching code 
+	// TODO: Remove the two lines below to be handled by the caching code 
 	[[self cachedNodes] removeAllObjects];
+	currentNodeIndex = NSNotFound;
 	[self cacheNodesForward: CACHE_AMOUNT backward: CACHE_AMOUNT];
 
 	assert(currentNodeIndex != oldCurrentNodeIndex);
@@ -110,6 +127,8 @@
 	// TODO: Reset object state to old object.
 	[[trackedObject editingContext] reloadRootObjectTree: trackedObject
 	                                          atRevision: currentRevision];
+
+	[self didUpdate];
 }
 
 - (void)redo
@@ -136,6 +155,8 @@
 	// TODO: Reset object state to old object.
 	[[trackedObject editingContext] reloadRootObjectTree: trackedObject
 	                                          atRevision: currentRevision];
+
+	[self didUpdate];
 }
 
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
@@ -213,6 +234,8 @@
 		NSRange range = NSMakeRange(currentNodeIndex + 1, lastIndex - currentNodeIndex);
 		[[self cachedNodes] removeObjectsInRange: range];
 	}
+
+	[self didUpdate];
 }
 
 - (void)cacheNodesForward: (NSUInteger)forward backward: (NSUInteger)backward
