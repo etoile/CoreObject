@@ -161,31 +161,43 @@
 	ETUUID *commitTrackUUID = [newRev objectUUID];
 	COTrackNode *node = [self currentNode];
 
-	while (node != nil)
+	if (newRevNumber < [oldRev revisionNumber])
 	{
-		if ([[node revision] isEqual: newRev])
+		while (node != nil)
 		{
-			break;
-		}
-		else if ([[[node revision] objectUUID] isEqual: commitTrackUUID])
-		{
+			if ([[node revision] isEqual: newRev] 
+			 || [[[node revision] objectUUID] isEqual: commitTrackUUID] == NO)
+			{
+				break;
+			}
+
 			currentNodeIndex--;
+			node = [node previousNode];
 		}
-		else
+	}
+	else /* newRevNumber > [oldRev revisionNumber] */
+	{
+		while (node != nil)
 		{
-			break;
-		}
-		node = [node previousNode];
+			if ([[node revision] isEqual: newRev]
+			 || [[[[node nextNode] revision] objectUUID] isEqual: commitTrackUUID] == NO)
+			{
+				break;
+			}
+
+			currentNodeIndex++;
+			node = [node nextNode];
+		}	
 	}
 	// NOTE: At this point, [[[self currentNode] revision] isEqual: newRev] 
 	// won't hold if the object UUID for the current custom track revision
 	// doesn't match the newRev object UUID.
+	[[editingContext store] setCurrentRevision: [[self currentNode] revision]
+	                              forTrackUUID: [self UUID]];
 
 	/* We don't have to reload the tracked object at the current track node 
 	   revision, because its commit track does it. */
 
-	[[editingContext store] setCurrentRevision: newRev 
-	                              forTrackUUID: [self UUID]];
 	[self didUpdate];
 }
 
