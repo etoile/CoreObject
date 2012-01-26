@@ -148,8 +148,11 @@
                      backwardLimit: (NSUInteger)backward
                       forwardLimit: (NSUInteger)forward;
 - (CORevision *) currentRevisionForTrackUUID: (ETUUID *)aTrackUUID;
+- (void)setCurrentRevision: (CORevision *)newRev
+              forTrackUUID: (ETUUID *)aTrackUUID;
 - (CORevision*)undoOnCommitTrack: (ETUUID*)commitTrack;
 - (CORevision*)redoOnCommitTrack: (ETUUID*)commitTrack;
+
 - (CORevision*)maxRevision: (int64_t)maxRevNumber forRootObjectUUID: (ETUUID*)uuid;
 /**
  * Returns whether the UUID corresponds to a track in the store. 

@@ -850,6 +850,31 @@ void CHECK(id db)
 	return [revs firstObject];
 }
 
+- (void)setCurrentRevision: (CORevision *)newRev 
+              forTrackUUID: (ETUUID *)aTrackUUID
+{
+	CORevision *oldRev = [self currentRevisionForTrackUUID: aTrackUUID];
+	FMResultSet *resultSet = [db executeQuery: @"SELECT committracknodeid "
+		"FROM commitTrackNode WHERE objectuuid = ? AND revisionnumber = ?", 
+		[self keyForUUID: aTrackUUID], [NSNumber numberWithLongLong: [newRev revisionNumber]]]; CHECK(db);
+	NSNumber *node = nil;
+
+	if ([resultSet next])
+	{
+		node = [NSNumber numberWithLongLong: [resultSet longLongIntForColumnIndex: 0]];
+	}
+	else
+	{
+		[NSException raise: NSInternalInconsistencyException
+					format: @"Unable to find revision number %q in track %@ to retrieve the current node", 
+		                    [newRev revisionNumber], aTrackUUID]; 
+	}
+	[db executeUpdate: @"UPDATE commitTrack SET currentnode = ? WHERE objectuuid = ?",
+		node, [self keyForUUID: aTrackUUID]]; CHECK(db);
+
+	[self didChangeCurrentNodeFromRevision: oldRev toNode: node revision: newRev onTrackUUID: aTrackUUID];
+}
+
 // TODO: Or should we name it -pushRevision:onTrackUUID:...
 - (void)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID
 {

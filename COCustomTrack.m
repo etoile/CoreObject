@@ -177,10 +177,15 @@
 		}
 		node = [node previousNode];
 	}
+	// NOTE: At this point, [[[self currentNode] revision] isEqual: newRev] 
+	// won't hold if the object UUID for the current custom track revision
+	// doesn't match the newRev object UUID.
 
 	/* We don't have to reload the tracked object at the current track node 
 	   revision, because its commit track does it. */
 
+	[[editingContext store] setCurrentRevision: newRev 
+	                              forTrackUUID: [self UUID]];
 	[self didUpdate];
 }
 
