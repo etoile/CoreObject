@@ -1154,6 +1154,11 @@ Nil is returned when the type is unsupported by CoreObject serialization. */
 	return nil;
 }
 
+/* See ETGeometry.h in EtoileUI */
+static const NSPoint CONullPoint = {FLT_MIN, FLT_MIN};
+static const NSSize CONullSize = {FLT_MIN, FLT_MIN};
+static const NSRect CONullRect = {{FLT_MIN, FLT_MIN}, {FLT_MIN, FLT_MIN}};
+
 /* Returns the CoreObject serialization result for a NSValue or NSNumber object.
 
 Nil is returned when the value type is unsupported by CoreObject serialization. */
@@ -1163,15 +1168,30 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 
 	if  (strcmp(type, @encode(NSPoint)) == 0)
 	{
-		return NSStringFromPoint([value pointValue]);
+		NSPoint point = [value pointValue];
+		if (NSEqualPoints(point, CONullPoint))
+		{
+			return @"null-point";
+		}
+		return NSStringFromPoint(point);
 	}
 	else if (strcmp(type, @encode(NSSize)) == 0)
 	{
-		return NSStringFromSize([value sizeValue]);	
+		NSSize size = [value sizeValue];
+		if (NSEqualSizes(size, CONullSize))
+		{
+			return @"null-size";
+		}
+		return NSStringFromSize(size);
 	}
 	else if (strcmp(type, @encode(NSRect)) == 0)
 	{
-		return NSStringFromRect([value rectValue]);
+		NSRect rect = [value rectValue];
+		if (NSEqualRects(rect, CONullRect))
+		{
+			return @"null-rect";
+		}
+		return NSStringFromRect(rect);
 	}
 	else if (strcmp(type, @encode(NSRange)) == 0)
 	{
@@ -1298,15 +1318,45 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		}
 		else if ([type isEqualToString: @"point"])
 		{
-			return [NSValue valueWithPoint: NSPointFromString([plist valueForKey: @"value"])];
+			NSString *pointString = [plist valueForKey: @"value"];
+			NSPoint point;
+			if ([pointString isEqualToString: @"null-point"])
+			{
+				point = CONullPoint;
+			}
+			else
+			{
+				point = NSPointFromString(pointString);
+			}
+			return [NSValue valueWithPoint: point];
 		}
 		else if ([type isEqualToString: @"size"])
 		{
-			return [NSValue valueWithSize: NSSizeFromString([plist valueForKey: @"value"])];
+			NSString *sizeString = [plist valueForKey: @"value"];
+			NSSize size;
+			if ([sizeString isEqualToString: @"null-size"])
+			{
+				size = CONullSize;
+			}
+			else
+			{
+				size = NSSizeFromString(sizeString);
+			}
+			return [NSValue valueWithSize: size];
 		}
 		else if ([type isEqualToString: @"rect"])
 		{
-			return [NSValue valueWithRect: NSRectFromString([plist valueForKey: @"value"])];
+			NSString *rectString = [plist valueForKey: @"value"];
+			NSRect rect;
+			if ([rectString isEqualToString: @"null-rect"])
+			{
+				rect = CONullRect;
+			}
+			else
+			{
+				rect = NSRectFromString(rectString);
+			}
+			return [NSValue valueWithRect: rect];
 		}
 		else if ([type isEqualToString: @"range"])
 		{
