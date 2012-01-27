@@ -95,6 +95,8 @@
  * <override-subclass />
  * Moves backward on the track to undo.
  *
+ * When -canUndo returns NO, the method must return immediately.
+ *
  * An undo corresponds to changing the current track node to some previous node. 
  * What <em>previous</em> means precisely is up to the track subclass.
  */
@@ -102,6 +104,8 @@
 /**
  * <override-subclass />
  * Moves forward on the track to redo.
+ *
+ * When -canRedo returns NO, the method must return immediately.
  *
  * A redo corresponds to changing the current track node to some next node. 
  * What <em>next</em> means precisely is up to the track subclass.
@@ -114,6 +118,20 @@
  * How to compute the selective undo precisely is up to the track subclass.
  */
 - (void)undoNode: (COTrackNode *)aNode;
+/**
+ * <override-never />
+ * Returns whether undo is possible (i.e. some revision can be undone).
+ *
+ * For subclasses, this implies the current node has a valid next node.
+ */
+- (BOOL)canUndo;
+/**
+ * <override-never />
+ * Returns whether redo is possible (i.e. some revision can be redone).
+ *
+ * For subclasses, this implies the current node has a valid previous node.
+ */
+- (BOOL)canRedo;
 @end
 
 

@@ -79,6 +79,16 @@
 
 }
 
+- (BOOL)canUndo
+{
+	return ([[self currentNode] previousNode] != nil);
+}
+
+- (BOOL)canRedo
+{
+	return ([[self currentNode] nextNode] != nil);
+}
+
 /** Returns YES. */
 - (BOOL) isOrdered
 {

@@ -110,6 +110,10 @@
 		[NSException raise: NSInternalInconsistencyException
 		            format: @"Cannot undo object %@ which does not have any commits", trackedObject];
 	}
+	if ([self canUndo] == NO)
+	{
+		return;
+	}
 
 	COStore *store = [[trackedObject editingContext] store];
 	CORevision *currentRevision = [store undoOnCommitTrack: [trackedObject UUID]];
@@ -137,6 +141,10 @@
 	{
 		[NSException raise: NSInternalInconsistencyException
 		            format: @"Cannot redo object %@ which does not have any commits", trackedObject];
+	}
+	if ([self canRedo] == NO)
+	{
+		return;
 	}
 
 	COStore *store = [[trackedObject editingContext] store];

@@ -253,7 +253,7 @@
 		[NSException raise: NSInternalInconsistencyException
 		            format: @"Cannot undo when the track %@ is empty", self];
 	}
-	if ([[self currentNode] previousNode] == nil)
+	if ([self canUndo] == NO)
 	{
 		return;
 	}
@@ -314,7 +314,7 @@
 		[NSException raise: NSInternalInconsistencyException
 		            format: @"Cannot redo when the track %@ is empty", self];
 	}
-	if ([[self currentNode] nextNode] == nil)
+	if ([self canRedo] == NO)
 	{
 		return;
 	}
