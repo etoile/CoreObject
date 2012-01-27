@@ -36,6 +36,7 @@ static COEditingContext *currentCtxt = nil;
 
 	ASSIGN(_store, store);
 	_maxRevisionNumber = maxRevisionNumber;	
+	_latestRevisionNumber = [_store latestRevisionNumber];
 
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
 
@@ -90,7 +91,10 @@ object graphs present in memory, for which changes have been committed to the
 store by other processes. */
 - (void)didMakeCommit: (NSNotification *)notif
 {
-	BOOL isOurCommit = [[[_store UUID] stringValue] isEqual: [notif object]];
+	NSNumber *revNumber = [[[notif userInfo] objectForKey: kCORevisionNumbersKey] lastObject];
+	// TODO: Take in account the editing context max revision number
+	BOOL isOurCommit = ([[[_store UUID] stringValue] isEqual: [notif object]]
+		&& (_latestRevisionNumber == [revNumber longLongValue]));
 
 	if (isOurCommit)
 		return;
@@ -155,6 +159,11 @@ store by other processes. */
 - (COStore *)store
 {
 	return _store;
+}
+
+- (int64_t)latestRevisionNumber
+{
+	return _latestRevisionNumber;
 }
 
 - (ETModelDescriptionRepository *)modelRepository
@@ -679,6 +688,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	
 	CORevision *rev = [_store finishCommit];
 	assert(rev != nil);
+
 	[_rootObjectRevisions setObject: rev forKey: [rootObject UUID]];
 	[[_rootObjectCommitTracks objectForKey: [rootObject UUID]]
 		newCommitAtRevision: rev];
@@ -689,6 +699,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		[_updatedPropertiesByObject removeObjectForKey: obj];
 	}
 
+	_latestRevisionNumber = [rev revisionNumber];
 	return rev;
 }
 

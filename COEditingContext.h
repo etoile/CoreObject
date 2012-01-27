@@ -13,7 +13,7 @@
 	@private
 	COStore *_store;
 	int64_t _maxRevisionNumber;
-
+	int64_t _latestRevisionNumber;
 	ETModelDescriptionRepository *_modelRepository;
 
 	/**
@@ -104,6 +104,12 @@
  * Returns the store for which the editing context acts a working copy.
  */
 - (COStore *)store;
+/**
+ * Returns the latest revision number which might be the same than the one 
+ * returned by -[COStore latestRevisionNumber], when multiple editing contexts 
+ * are accessing the store simultaneously.
+ */
+- (int64_t)latestRevisionNumber;
 /**
  * Returns the model description repository, which holds the metamodel that 
  * describes all the persistent objects editable in the context.
