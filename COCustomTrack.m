@@ -288,19 +288,9 @@
 			[editingContext unloadRootObjectTree: object];
 		}
 	}
-	else /* Fall back on selective undo */
+	else
 	{
-		CORevision *revBeforeUndo = [revToUndo baseRevision];
-		COObjectGraphDiff *undoDiff = [COObjectGraphDiff selectiveUndoDiffWithRootObject: object 
-	                                                                      revisionToUndo: revToUndo];
-
-		[undoDiff applyToContext: editingContext];
-
-		[editingContext commitWithMetadata: 
-			D([NSNumber numberWithInt: [revBeforeUndo revisionNumber]], @"undoMetadata")];
-
-		//[[editingContext store] updateCommitTrackForRootObjectUUID: [self UUID] 
-		//                                               newRevision: [editingContext latestRevisionNumber]];
+		[self selectiveUndoWithRevision: revToUndo inEditingContext: editingContext];
 	}
 
 	currentNodeIndex--;

@@ -7,6 +7,7 @@
  */
 
 #import "COTrack.h"
+#import "COObjectGraphDiff.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 
@@ -77,6 +78,24 @@
 - (void)undoNode: (COTrackNode *)aNode
 {
 
+}
+
+- (void)selectiveUndoWithRevision: (CORevision *)revToUndo 
+                 inEditingContext: (COEditingContext *)ctxt
+{
+	NILARG_EXCEPTION_TEST(revToUndo);
+	NILARG_EXCEPTION_TEST(ctxt);
+
+	CORevision *revBeforeUndo = [revToUndo baseRevision];
+	COObject *object = [ctxt objectWithUUID: [revToUndo objectUUID]];
+	COObjectGraphDiff *undoDiff = [COObjectGraphDiff selectiveUndoDiffWithRootObject: object
+																	  revisionToUndo: revToUndo];
+
+	[undoDiff applyToContext: ctxt];
+
+	/* The track nodes are going to be transparently updated, then 
+	  -didUpdate invoked by -newCommitAtRevision:  */
+	[ctxt commitWithMetadata: D([NSNumber numberWithInt: [revBeforeUndo revisionNumber]], @"undoMetadata")];
 }
 
 - (BOOL)canUndo

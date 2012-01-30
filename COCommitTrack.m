@@ -192,6 +192,26 @@
 	[self didUpdate];
 }
 
+- (void)undoNode: (COTrackNode *)aNode
+{
+	BOOL useCommitTrackUndo = ([[[self currentNode] previousNode] isEqual: aNode]);
+	BOOL useCommitTrackRedo = ([[[self currentNode] nextNode] isEqual: aNode]);
+
+	if (useCommitTrackUndo)
+	{
+		[self undo];
+	}
+	else if (useCommitTrackRedo)
+	{
+		[self redo];
+	}
+	else
+	{
+		[self selectiveUndoWithRevision: [aNode revision] 
+		               inEditingContext: [trackedObject editingContext]];
+	}
+}
+
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
 {
 	NSArray *cachedNodes = [self cachedNodes];
@@ -239,6 +259,12 @@
 		nodeIndex++;
 	}
 
+	BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= [cachedNodes count]);
+
+	if (hasNoPreviousOrNextNode)
+	{
+		return nil;
+	}
 	return [cachedNodes objectAtIndex: nodeIndex];
 }
 

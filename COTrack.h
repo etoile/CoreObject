@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COObject, CORevision;
+@class COObject, COEditingContext, CORevision;
 @class COTrackNode;
 
 /** 
@@ -115,9 +115,21 @@
  * <override-subclass />
  * Does a selective undo to cancel the changes involved in the track node revision.
  *
- * How to compute the selective undo precisely is up to the track subclass.
+ * For a selective undo, this method must invoke 
+ * -selectiveUndoWithRevision:inEditingContext:.
+ *
+ * How the track decides between selective undo vs normal undo/redo is up to 
+ * the track subclass.
  */
 - (void)undoNode: (COTrackNode *)aNode;
+/**
+ * <override-never />
+ * Does a selective undo to cancel the changes involved in the revision.
+ *
+ * Both arguments must not be nil, otherwise raises a NSInvalidArgumentException.
+ */
+- (void)selectiveUndoWithRevision: (CORevision *)revToUndo 
+                 inEditingContext: (COEditingContext *)ctxt;
 /**
  * <override-never />
  * Returns whether undo is possible (i.e. some revision can be undone).
