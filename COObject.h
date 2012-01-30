@@ -287,6 +287,7 @@
 - (void)awakeFromFetch;
 - (void)willTurnIntoFault;
 - (void)didTurnIntoFault;
+- (void)didReload;
 
 /** @taskunit Object Equality */
 

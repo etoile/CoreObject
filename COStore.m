@@ -693,7 +693,8 @@ void CHECK(id db)
 		[[self UUID] stringValue], kCOStoreUUIDStringKey); 
 	[[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStoreDidChangeCurrentNodeOnTrackNotification 
 	                                                               object: [aTrackUUID stringValue]
-	                                                             userInfo: infos];
+	                                                             userInfo: infos
+	                                                   deliverImmediately: YES];
 }
 
 - (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)uuidIndex

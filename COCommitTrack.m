@@ -13,7 +13,7 @@
 #import "CORevision.h"
 #import "FMDatabase.h"
 
-#define CACHE_AMOUNT 5
+#define CACHE_AMOUNT 30
 
 @implementation COCommitTrack
 
@@ -76,6 +76,7 @@
 
 - (void)currentNodeDidChangeInStore: (NSNotification *)notif
 {
+
 	[self checkCurrentNodeChangeNotification: notif];
 
 	int64_t revNumber = [[[notif userInfo] objectForKey: kCONewCurrentNodeRevisionNumberKey] longLongValue];
@@ -101,6 +102,30 @@
 
 	[[trackedObject editingContext] reloadRootObjectTree: trackedObject 
 	                                          atRevision: [[self currentNode] revision]];
+
+	[self didUpdate];
+}
+
+- (void)setCurrentNode: (COTrackNode *)aNode
+{
+	INVALIDARG_EXCEPTION_TEST(aNode, [aNode track] == self);
+
+	NSUInteger nodeIndex = [[self cachedNodes] indexOfObject: aNode];
+
+	if (nodeIndex == NSNotFound)
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"Cannot find %@ on %@ currently", aNode, self];
+	}
+	currentNodeIndex = nodeIndex;
+
+	assert([[self currentNode] isEqual: aNode]);
+
+	[[[trackedObject editingContext] store] setCurrentRevision: [aNode revision]
+	                                              forTrackUUID: [trackedObject UUID]];
+	[[trackedObject editingContext] reloadRootObjectTree: trackedObject
+	                                          atRevision: [aNode revision]];
+	[self didUpdate];
 }
 
 - (void)undo

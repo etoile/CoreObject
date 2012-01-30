@@ -720,7 +720,8 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 	[[NSDistributedNotificationCenter defaultCenter] postNotificationName: COEditingContextDidCommitNotification 
 	                                                               object: [[[self store] UUID] stringValue]
-	                                                             userInfo: notifInfos];
+	                                                             userInfo: notifInfos
+	                                                   deliverImmediately: YES];
 }
 
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
@@ -904,6 +905,8 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	// Case 2: [revision baseRevision] == oldRevision (redo)
 
 	// Case 3: [oldRevision baseRevision] == revision (undo)
+
+	[rootObject didReload];
 }
 
 // TODO: Share code with -reloadRootObjectTree:atRevision:

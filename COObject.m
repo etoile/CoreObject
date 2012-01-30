@@ -822,6 +822,11 @@
 
 }
 
+- (void)didReload
+{
+
+}
+
 - (NSUInteger)hash
 {
 	return [_uuid hash] ^ 0x39ab6f39b15233de;
