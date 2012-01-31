@@ -214,10 +214,8 @@
 	{
 		result = contentBlock();
 	}
-	else if (targetGroup != nil)
+	else if (targetGroup != nil && query != nil)
 	{
-		ETAssert(query != nil);
-
 		result = [targetGroup objectsMatchingQuery: query];
 	}
 	else if (query != nil)
@@ -226,7 +224,7 @@
 	}
 	else
 	{
-		NSLog(@"WARNING: %@ misses content provider to be refreshed", self);
+		result = [targetGroup contentArray];
 	}
 
 	ETAssert([result isKindOfClass: [NSArray class]]);
