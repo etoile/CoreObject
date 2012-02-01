@@ -718,7 +718,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	}
 	notifInfos = D(revNumbers, kCORevisionNumbersKey);
 
-	[[NSDistributedNotificationCenter defaultCenter] postNotificationName: COEditingContextDidCommitNotification 
+	[(id)[NSDistributedNotificationCenter defaultCenter] postNotificationName: COEditingContextDidCommitNotification 
 	                                                               object: [[[self store] UUID] stringValue]
 	                                                             userInfo: notifInfos
 	                                                   deliverImmediately: YES];

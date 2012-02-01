@@ -691,7 +691,7 @@ void CHECK(id db)
 		[NSNumber numberWithLongLong: [newRev revisionNumber]], kCONewCurrentNodeRevisionNumberKey, 
 		[NSNumber numberWithLongLong: [oldRev revisionNumber]], kCOOldCurrentNodeRevisionNumberKey, 
 		[[self UUID] stringValue], kCOStoreUUIDStringKey); 
-	[[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStoreDidChangeCurrentNodeOnTrackNotification 
+	[(id)[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStoreDidChangeCurrentNodeOnTrackNotification 
 	                                                               object: [aTrackUUID stringValue]
 	                                                             userInfo: infos
 	                                                   deliverImmediately: YES];

@@ -7,7 +7,9 @@
  */
 
 #import "COTrack.h"
+#import "COEditingContext.h"
 #import "COObjectGraphDiff.h"
+#import "CORevision.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 

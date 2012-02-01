@@ -324,6 +324,12 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
+ * Declares the object as newly inserted and puts it among the loaded objects.
+ */
+- (void)registerObject: (COObject *)object;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
  * Inserts the object into the context by checking the relationship consistency 
  * if requested.
  *
