@@ -47,7 +47,7 @@
 	COTrackNode *firstNode = [commitTrack currentNode];
 	UKNotNil(commitTrack);
 	UKNotNil(firstNode);
-	UKRaisesException([commitTrack undo]);
+	UKFalse([commitTrack canUndo]);
 
 	[object setValue: @"Shopping List" forProperty: @"label"];
 	[ctx1 commit];
@@ -72,7 +72,7 @@
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 	UKObjectsEqual(firstNode, [commitTrack currentNode]);
 
-	UKRaisesException([commitTrack undo]);
+	UKFalse([commitTrack canUndo]);
 
 	// First redo (Groceries -> Shopping List)
 	[commitTrack redo];
@@ -83,7 +83,7 @@
 	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
 	UKObjectsEqual(thirdNode, [commitTrack currentNode]);
 
-	UKRaisesException([commitTrack redo]);
+	UKFalse([commitTrack canRedo]);
 
 	TearDownContext(ctx1);
 	CLOSE_STORE(store);

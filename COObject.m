@@ -128,14 +128,15 @@
 		ASSIGN(_entityDescription, [[ETModelDescriptionRepository mainRepository] 
 			entityDescriptionForClass: [self class]]);
 	}
-	_context = aContext;
-	_rootObject = aRootObject;
 	_variableStorage = nil;
 	_isIgnoringDamageNotifications = NO;
-	
+	_isInitialized = YES;
+
 	if (isFault)
 	{
 		object_setClass(self, [[self class] faultClass]);
+		_context = aContext;
+		_rootObject = aRootObject;
 	}
 	else
 	{
@@ -164,18 +165,28 @@
 	                     rootObject: (aRootObject != nil ? aRootObject : self)
 	                        context: aContext
 	                        isFault: isFault];
+
+	/* When the object is not reloaded, but instantiated for the first time */
+	if (isFault == NO)
+	{
+		[self init];
+	}
 	return self;
 }
 
 - (id) init
 {
-	SUPERINIT;
-	self = [self commonInitWithUUID: [ETUUID UUID]
-	              entityDescription: nil
-	                     rootObject: nil
-	                        context: nil
-	                        isFault: NO];
-	[self didCreate];
+	if (_isInitialized == NO)
+	{
+		SUPERINIT;
+		self = [self commonInitWithUUID: [ETUUID UUID]
+		              entityDescription: nil
+		                     rootObject: nil
+		                        context: nil
+		                        isFault: NO];
+								
+		[self didCreate];
+	}
 	return self;
 }
 
@@ -201,8 +212,11 @@
 	ETAssert(_uuid != nil);
 	_context = aContext;
 	_rootObject = aRootObject;
-	ASSIGN(_entityDescription, [[aContext modelRepository] entityDescriptionForClass: [self class]]);
-	[aContext insertObject: self];
+	if (_entityDescription == nil)
+	{
+		ASSIGN(_entityDescription, [[aContext modelRepository] entityDescriptionForClass: [self class]]);
+	}
+	[aContext registerObject: self];
 }
 
 - (id) copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription

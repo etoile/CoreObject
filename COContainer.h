@@ -53,6 +53,18 @@
 
 @end
 
+@interface COTagLibrary : COLibrary
+{
+	COGroup *tagGroups;
+}
+
+/**
+ * The tag categories used to organize the tags in the library.
+ */
+@property (retain, nonatomic) COGroup *tagGroups;
+
+@end
+
 /** 
  *@group Object Collection and Organization
  *
@@ -71,7 +83,7 @@
  *
  * If the library doesn't exist yet, returns a new library but won't commit it.
  */
-- (COLibrary *)tagLibrary;
+- (COTagLibrary *)tagLibrary;
 /**
  * Returns a group listing the pictures in the store.
  *

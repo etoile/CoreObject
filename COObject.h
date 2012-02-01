@@ -31,6 +31,7 @@
 	BOOL _isIgnoringDamageNotifications;
 	BOOL _isIgnoringRelationshipConsistency;
 	BOOL _inDescription; // FIXME: remove; only for debugging
+	BOOL _isInitialized;
 }
 
 /** @taskunit Initialization */
@@ -44,7 +45,24 @@
  * this initializer gives a UUID to the object.
  *
  * You should use insertion methods provided by COEditingContext to create 
- * objects that are immediately persistent.
+ * objects that are immediately persistent. Take note that these insertion 
+ * methods use -init to initialize the object.
+ *
+ * For the initializer in subclasses, you must never create entity objects that 
+ * correspond to relationships with insertion methods provided by 
+ * COEditingContext (this ensures your subclasses support both immediate and 
+ * late persistency with -becomePersistentInContext:rootObject:). For example, 
+ * you must write:
+ *
+ * <example>
+ * - (id)init
+ * {
+ *     SUPERINIT;
+ *     // Don't instantiate the group with -[COEditingContext insertObjectWithEntityName:]
+ *     personGroup = [[COGroup alloc] init];
+ *     return self;
+ * }
+ * </example>
  */
 - (id)init;
 

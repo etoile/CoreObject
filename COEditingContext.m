@@ -396,7 +396,7 @@ store by other processes. */
 		          context: self
 		          isFault: NO];
 	[result didCreate];
-	[self registerObject: result];
+	[result becomePersistentInContext: self rootObject: (rootObject != nil ? rootObject : result)];
 	[result release];
 	
 	return result;

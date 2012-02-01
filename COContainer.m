@@ -8,6 +8,7 @@
  */
 
 #import "COContainer.h"
+#import "COGroup.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 
@@ -91,17 +92,70 @@
 @end
 
 
+@implementation COTagLibrary
+
+@synthesize tagGroups;
+
++ (ETEntityDescription *)newEntityDescription
+{
+	ETEntityDescription *collection = [self newBasicEntityDescription];
+
+	// For subclasses that don't override -newEntityDescription, we must not add the 
+	// property descriptions that we will inherit through the parent
+	if ([[collection name] isEqual: [COTagLibrary className]] == NO) 
+		return collection;
+
+	ETPropertyDescription *tagGroups = 
+		[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"Anonymous.COGroup"];
+	[tagGroups setPersistent: YES];
+
+	[collection setPropertyDescriptions: A(tagGroups)];
+
+	return collection;	
+}
+
+- (id)init
+{
+	SUPERINIT;
+	[self setIdentifier: kCOLibraryIdentifierTag];
+	[self setName: _(@"Tags")];
+	tagGroups = [[COGroup alloc] init];
+	[tagGroups setName: _(@"Tag Groups")];
+	return self;
+}
+
+- (void) becomePersistentInContext: (COEditingContext *)aContext rootObject: (COObject *)aRootObject
+{
+	if ([self isPersistent])
+		return;
+
+	[super becomePersistentInContext: aContext rootObject: aRootObject];
+
+	// TODO: Leverage the model description rather than hardcoding the aspects
+	// TODO: Implement some strategy to recover in the case these aspects 
+	// are already used as embedded objects in another root object. 
+	ETAssert([[self tagGroups] isPersistent] == NO);
+	[[self tagGroups] becomePersistentInContext: aContext rootObject: aRootObject];
+}
+
+- (void)dealloc
+{
+	DESTROY(tagGroups);
+	[super dealloc];
+}
+
+@end
+
+
 @implementation COEditingContext (COCommonLibraries)
 
-- (COLibrary *)tagLibrary
+- (COTagLibrary *)tagLibrary
 {
-	COLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierTag];
+	COTagLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierTag];
 
 	if (lib == nil)
 	{
-		lib = [self insertObjectWithEntityName: @"Anonymous.COLibrary"];
-		[lib setName: _(@"Tags")];
-		[lib setIdentifier: kCOLibraryIdentifierTag];
+		lib = [self insertObjectWithEntityName: @"Anonymous.COTagLibrary"];
 		[[self libraryGroup] addObject: lib];
 	}
 	return lib;
