@@ -602,6 +602,14 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	{
 		commitType = @"Unknown";
 	}
+	if (shortDescription == nil)
+	{
+		shortDescription = @"";
+	}
+	if (longDescription == nil)
+	{
+		longDescription = @"";
+	}
 	return [self commitWithMetadata: D(shortDescription, @"shortDescription", 
 		longDescription, @"longDescription", commitType, @"type")];
 }
