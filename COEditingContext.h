@@ -318,6 +318,14 @@
 - (NSArray *)commitWithType: (NSString *)type
            shortDescription: (NSString *)shortDescription
             longDescription: (NSString *)longDescription;
+/**
+ * Commits the current changes to the store with some basic metadatas and 
+ * returns the resulting revisions.
+ *
+ * See -commitWithType:shortDescription:longDescription:.
+ */
+- (NSArray *)commitWithType: (NSString *)type
+           shortDescription: (NSString *)shortDescription;
 
 /** @taskunit Private */
 

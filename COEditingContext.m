@@ -606,6 +606,12 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		longDescription, @"longDescription", commitType, @"type")];
 }
 
+- (NSArray *)commitWithType: (NSString *)type
+           shortDescription: (NSString *)shortDescription
+{
+	return [self commitWithType: type shortDescription: shortDescription longDescription: nil];
+}
+
 - (NSMapTable *)updatedPropertySubsetForObjects: (NSArray *)keys
 {
 	NSMapTable *subset = [NSMapTable mapTableWithStrongToStrongObjects];
