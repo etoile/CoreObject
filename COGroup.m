@@ -125,7 +125,7 @@
 
 @implementation COSmartGroup
 
-@synthesize targetGroup, query, contentBlock;
+@synthesize targetCollection, query, contentBlock;
 
 + (void)initialize
 {
@@ -166,15 +166,15 @@
 
 - (void)dealloc
 {
-	DESTROY(targetGroup);
+	DESTROY(targetCollection);
 	DESTROY(query);
 	DESTROY(contentBlock);
 	[super dealloc];
 }
 
-- (void) setTargetGroup: (COGroup *)aGroup
+- (void) setTargetCollection: (id <ETCollection>)aGroup
 {
-	ASSIGN(targetGroup, aGroup);
+	ASSIGN(targetCollection, aGroup);
 	[self refresh];
 }
 
@@ -214,9 +214,16 @@
 	{
 		result = contentBlock();
 	}
-	else if (targetGroup != nil && query != nil)
+	else if (targetCollection != nil && query != nil)
 	{
-		result = [targetGroup objectsMatchingQuery: query];
+		if ([(id)targetCollection conformsToProtocol: @protocol(COObjectMatching)])
+		{
+			result = [(id <COObjectMatching>)targetCollection objectsMatchingQuery: query];
+		}
+		else if ([query predicate] != nil)
+		{
+			result = [[targetCollection contentArray] filteredArrayUsingPredicate: [query predicate]];
+		}
 	}
 	else if (query != nil)
 	{
@@ -224,12 +231,27 @@
 	}
 	else
 	{
-		result = [targetGroup contentArray];
+		result = [targetCollection contentArray];
 	}
 
 	ETAssert([result isKindOfClass: [NSArray class]]);
 
 	ASSIGN(content, result);
+}
+
+- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
+{
+	NSMutableArray *result = [NSMutableArray array];
+
+	for (COObject *object in [self content])
+	{
+		if ([[aQuery predicate] evaluateWithObject: object])
+		{
+			[result addObject: object];
+		}
+	}
+
+	return result;
 }
 
 @end

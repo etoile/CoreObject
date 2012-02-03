@@ -90,11 +90,13 @@ typedef NSArray *(^COContentBlock)(void);
  *
  * COSmartGroup is an immutable, ordered, weak (an object can be in any number 
  * of collections) collection class.
+ *
+ * Because it is an immutable collection, it isn't a COCollection subclass.
  */
 @interface COSmartGroup : COObject <ETCollection>
 {
 	@private
-	COGroup *targetGroup;
+	id <ETCollection> targetCollection;
 	COQuery *query;
 	COContentBlock contentBlock;
 	NSArray *content;
@@ -102,7 +104,7 @@ typedef NSArray *(^COContentBlock)(void);
 
 /** @taskunit Controlling the Content */
 
-@property (nonatomic, retain) COGroup *targetGroup;
+@property (nonatomic, retain) id <ETCollection> targetCollection;
 @property (nonatomic, retain) COQuery *query;
 @property (nonatomic, copy) COContentBlock contentBlock;
 
