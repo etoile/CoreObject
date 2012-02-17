@@ -276,7 +276,7 @@
 			CORevision *newTrackRev = [[editingContext store] undoOnCommitTrack: [self UUID]];
 			CORevision *newRev = [[editingContext store] undoOnCommitTrack: [object UUID]];
 
-			assert([newTrackRev isEqual: [[[self currentNode] previousNode] revision]]);
+			//assert([newTrackRev isEqual: [[[self currentNode] previousNode] revision]]);
 
 			[editingContext reloadRootObjectTree: object atRevision: newRev];
 		}
@@ -324,7 +324,7 @@
 		CORevision *newTrackRev = [[editingContext store] redoOnCommitTrack: [self UUID]];
 		CORevision *newRev = [[editingContext store] redoOnCommitTrack: [object UUID]];
 
-		assert([newTrackRev isEqual: [[[self currentNode] nextNode] revision]]);
+		//assert([newTrackRev isEqual: [[[self currentNode] nextNode] revision]]);
 
 	    [editingContext reloadRootObjectTree: object atRevision: newRev];
 	}
