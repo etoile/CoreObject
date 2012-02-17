@@ -838,4 +838,92 @@
 	[ctx1 release];
 }
 
+- (void)testSelectiveUndoOfGroupOperation
+{
+	OPEN_STORE(store);
+	COEditingContext *ctx1 = NewContext(store);
+	COEditingContext *ctx2 = [[COEditingContext alloc] init];
+	COEditingContext *ctx3 = [[COEditingContext alloc] init];
+	
+	COContainer *doc = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *line1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *circle1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *square1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *image1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+
+	[line1 setValue: @"line1" forProperty: @"label"];	
+	[circle1 setValue: @"circle1" forProperty: @"label"];
+	[square1 setValue: @"square1" forProperty: @"label"];	
+	[image1 setValue: @"image1" forProperty: @"label"];
+	
+	[doc addObject: line1];
+	[doc addObject: circle1];
+	[doc addObject: square1];
+	[doc addObject: image1];
+	
+	[ctx1 commit];
+	
+	// snapshot the state: (line1, circle1, square1, image1) into ctx2
+	[ctx2 insertObject: doc];
+	
+	COContainer *group1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[group1 setValue: @"group1" forProperty: @"label"];
+	[doc insertObject: group1 atIndex: 1];
+	[group1 addObject: circle1];
+	[group1 addObject: square1];
+	[ctx1 commit];
+	
+	// snapshot the state:  (line1, group1=(circle1, square1), image1) into ctx3
+	[ctx3 insertObject: doc];
+	
+	COContainer *triangle1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[triangle1 setValue: @"triangle1" forProperty: @"label"];
+	[doc insertObject: triangle1 atIndex: 0];
+	[ctx1 commit];
+	
+	
+	// ctx1 state:  (triangl1, line1, group1=(circle1, square1), image1)
+	
+	
+	// Now do the merge
+	
+	COObjectGraphDiff *diff_ctx3_vs_ctx2 = [COObjectGraphDiff diffContainer: (id)[ctx3 objectWithUUID: [doc UUID]]
+								  withContainer: (id)[ctx2 objectWithUUID: [doc UUID]]];
+	UKNotNil(diff_ctx3_vs_ctx2);
+
+	COObjectGraphDiff *diff_ctx3_vs_ctx1 = [COObjectGraphDiff diffContainer: (id)[ctx3 objectWithUUID: [doc UUID]]
+								  withContainer: (id)[ctx1 objectWithUUID: [doc UUID]]];
+	UKNotNil(diff_ctx3_vs_ctx2);
+	
+
+	COObjectGraphDiff *merged = [COObjectGraphDiff mergeDiff: diff_ctx3_vs_ctx2
+							withDiff: diff_ctx3_vs_ctx1];
+	// FIXME: Test that there are no conflicts
+	
+	
+	// Apply the resulting diff to ctx3
+	UKFalse([ctx1 hasChanges]);
+	[merged applyToContext: ctx3];
+	
+	UKIntsEqual(5, [[(COContainer *)[ctx3 objectWithUUID: [doc UUID]] contentArray] count]);
+	if (5 == [[doc contentArray] count])
+	{
+		UKStringsEqual(@"triangle1", [[[(COContainer *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 0] valueForProperty: @"label"]);
+		UKStringsEqual(@"line1", [[[(COContainer *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 1] valueForProperty: @"label"]);
+		UKStringsEqual(@"circle1", [[[(COContainer *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 2] valueForProperty: @"label"]);
+		UKStringsEqual(@"square1", [[[(COContainer *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 3] valueForProperty: @"label"]);	
+		UKStringsEqual(@"image1", [[[(COContainer *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 4] valueForProperty: @"label"]);
+	}
+	
+	for (COContainer *object in [(COContainer *)[ctx3 objectWithUUID: [doc UUID]] contentArray])
+	{
+		UKObjectsSame([ctx3 objectWithUUID: [doc UUID]], [object valueForProperty: @"parentContainer"]);
+	}
+	
+	[ctx3 release];
+	[ctx2 release];
+	TearDownContext(ctx1);
+	CLOSE_STORE(store);
+}
+
 @end
