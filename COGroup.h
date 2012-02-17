@@ -69,7 +69,9 @@
  *
  * COTagGroup is used to organize tags. 
  *
- * A tag group content is restricted to COTag objects.
+ * A tag group content is restricted to COTag objects. 
+ * Unlike COGroup, the content is ordered (to ensure the tag list order is  
+ * stable in the UI on every use).
  *
  * Tags can be belong to multiple tag groups.
  */

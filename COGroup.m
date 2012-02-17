@@ -117,7 +117,23 @@
 
 	[collection setLocalizedDescription: _(@"Tag Group")];
 
+#if 1
+	ETPropertyDescription *collectionContentsProperty = 
+		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.COObject"];
+	[collectionContentsProperty setMultivalued: YES];
+	[collectionContentsProperty setOpposite: (id)@"Anonymous.COObject.parentCollections"]; // FIXME: just 'parentCollections' should work...
+	[collectionContentsProperty setOrdered: YES];
+	[collectionContentsProperty setPersistent: YES];
+
+	[collection setPropertyDescriptions: A(collectionContentsProperty)];
+#endif
+
 	return collection;
+}
+
+- (BOOL) isOrdered
+{
+	return YES;
 }
 
 @end

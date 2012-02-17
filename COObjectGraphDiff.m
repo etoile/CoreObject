@@ -212,7 +212,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	if ([newlySetValue isKindOfClass: [ETUUID class]])
 	{
 		newlySetValue = [[obj editingContext] objectWithUUID: newlySetValue];
-		assert(newlySetValue != nil); //FIXME: remove
+		//assert(newlySetValue != nil); //FIXME: remove
 	}
 	[obj setValue: newlySetValue forProperty: propertyName];
 }

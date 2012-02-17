@@ -29,6 +29,15 @@
  * Adds all the given objects to the receiver content.
  */
 - (void)addObjects: (NSArray *)anArray;
+/**
+ * Posts ETSourceDidUpdateNotification.
+ *
+ * You must invoke this method every time the collection is changed.
+ * For example, when you override -insertObject:atIndex:hint:.
+ *
+ * EtoileUI relies on this notification to reload the UI transparently.
+ */
+- (void)didUpdate;
 
 /** @taskunit Object Matching */
 

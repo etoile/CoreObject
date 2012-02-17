@@ -41,6 +41,25 @@
 	}
 }
 
+- (void)didReload
+{
+	[self didUpdate];
+}
+
+- (void)didUpdate
+{
+	[[NSNotificationCenter defaultCenter] 
+		postNotificationName: ETCollectionDidUpdateNotification object: self];
+}
+
+#if 0
+- (BOOL) isOrdered
+{
+	// TODO: If too slow, return the boolean directly.
+	return [[[self entityDescription] propertyDescriptionForName: @"contents"] isOrdered];
+}
+#endif
+
 - (id) content
 {
 	return [self valueForProperty: @"contents"];
@@ -63,6 +82,7 @@
 	{
 		[self insertObject: object atIndex: index forProperty: @"contents"];
 	}
+	[self didUpdate];
 }
 
 - (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
@@ -76,6 +96,7 @@
 	{
 		[self removeObject: object atIndex: index forProperty: @"contents"];
 	}
+	[self didUpdate];
 }
 
 - (id)objectForIdentifier: (NSString *)anId
