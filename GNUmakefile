@@ -1,33 +1,39 @@
-PACKAGE_NAME=ObjectMerging
+PACKAGE_NAME = CoreObject
+
 include $(GNUSTEP_MAKEFILES)/common.make
-clean : test=yes
+
 ifeq ($(test), yes)
-BUNDLE_NAME=ObjectMerging
+BUNDLE_NAME = CoreObject
 else
-FRAMEWORK_NAME=ObjectMerging
+FRAMEWORK_NAME = CoreObject
 endif
 
-CC=clang
-CXX=clang
-LD=$(CXX)
+VERSION = 0.5
 
-ObjectMerging_OBJC_FILES = $(wildcard CO*.m) $(wildcard NS*.m)
+CC = clang
+CXX = clang
+LD = $(CXX)
+
+CoreObject_SUBPROJECTS = fmdb
+
+CoreObject_INCLUDE_DIRS = -Ifmdb/src 
+CoreObject_CPPFLAGS = -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS
+CoreObject_LDFLAGS += -lstdc++ -lobjcxx
 ifeq ($(test), yes)
-ObjectMerging_OBJC_FILES += $(wildcard Test*.m)
+CoreObject_LDFLAGS += -lEtoileFoundation 
 endif
-ObjectMerging_OBJCC_FILES = $(wildcard *.mm)
-ObjectMerging_HEADER_FILES = $(wildcard *.h)
-ObjectMerging_C_FILES= $(wildcard *.c)
-ObjectMerging_OBJC_LIBS = -lEtoileFoundation 
-ObjectMerging_CPPFLAGS=-Ifmdb/src -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS
-ObjectMerging_SUBPROJECTS = fmdb
-ObjectMerging_NEEDS_GUI = no
-ADDITIONAL_OBJCFLAGS = -Werror
-ADDITIONAL_OBJCCFLAGS = -Werror
+LIBRARIES_DEPEND_UPON = -lEtoileFoundation $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
 
-ObjectMerging_LDFLAGS += -lstdc++ -lobjcxx
 
-LIBRARIES_DEPEND_UPON = -lEtoileFoundation $(FND_LIBS)
+CoreObject_OBJC_FILES = $(wildcard CO*.m) $(wildcard NS*.m)
+ifeq ($(test), yes)
+CoreObject_OBJC_FILES += $(wildcard Test*.m)
+endif
+CoreObject_OBJCC_FILES = $(wildcard *.mm)
+CoreObject_C_FILES= $(wildcard *.c)
+CoreObject_HEADER_FILES = $(wildcard *.h)
+
+clean : test=yes
 
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 include $(GNUSTEP_MAKEFILES)/bundle.make	
