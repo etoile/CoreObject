@@ -1,933 +1,1408 @@
 /*
-   Copyright (C) 2007 Yen-Ju Chen <yjchenx gmail>
+	Copyright (C) 2010 Eric Wasylishen
 
-   This application is free software; you can redistribute it and/or 
-   modify it under the terms of the MIT license. See COPYING.
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
+	         Quentin Mathe <quentin.mathe@gmail.com>
+	Date:  November 2010
+	License:  Modified BSD  (see COPYING)
 
-*/
+	COObjectMatching protocol concrete implementation is based on MIT-licensed 
+	code by Yen-Ju Chen <yjchenx gmail> from the previous CoreObject.
+ */
 
-#import <strings.h>
 #import "COObject.h"
-#import "COMultiValue.h"
-#import "COObjectContext.h"
-#import "NSObject+CoreObject.h"
-#import "GNUstep.h"
-
-static NSMutableDictionary *propertyTypes;
-
-/* Properties */
-NSString *kCOUIDProperty = @"kCOUIDProperty";
-NSString *kCOVersionProperty = @"kCOVersionProperty";
-NSString *kCOCreationDateProperty = @"kCOCreationDateProperty";
-NSString *kCOModificationDateProperty = @"kCOModificationDateProperty";
-NSString *kCOReadOnlyProperty = @"kCOReadOnlyProperty";
- /* Transient property (see -finishedDeserializing) */
-NSString *kCOParentsProperty = @"kCOParentsProperty";
-NSString *kCOSizeProperty = @"kCOSizeProperty";
-NSString *kCOTypeNameProperty = @"kCOTypeNameProperty";
-
-NSString *qCOTextContent = @"qCOTextContent";
-
-/* Notifications */
-NSString *kCOObjectChangedNotification = @"kCOObjectChangedNotification";
-NSString *kCOUpdatedProperty = @"kCOUpdatedProperty";
-NSString *kCORemovedProperty = @"kCORemovedProperty";
-
-@interface COObject (FrameworkPrivate)
-- (void) setObjectContext: (COObjectContext *)ctxt;
-@end
-
-@interface COObject (COPropertyListFormat)
-- (void) _readObjectVersion1: (NSDictionary *)propertyList;
-- (NSMutableDictionary *) _outputObjectVersion1;
-@end
-
-@interface COObject (Private)
-- (NSString *) _textContent;
-@end
-
+#import "COFault.h"
+#import "COEditingContext.h"
+#import "COStore.h"
+#import "COContainer.h"
+#import "COGroup.h"
+#include <objc/runtime.h>
 
 @implementation COObject
 
-/* Data Model Declaration */
-
-/** <p>If you want to create a subclass of a CoreObject data model class, you 
-    should declare the new properties and types of the class by creating a 
-    dictionary with types as objects and keys as properties, then calls 
-    +addPropertiesAndTypes: with this dictionary as parameter.</p>
-    <p>Each type must be a <code>NSNumber</code> initialized with one of the type constants 
-    defined in <file>COPropertyType.h</file>. Each property must be a string that uniquely 
-    identifies the property by its name, and whose name doesn't collide with a 
-    property inherited from superclasses. For properties, you typically declare 
-    your owns as string constants with an identifier name prefixed by <em>k</em> and
-    suffixed by <em>Property</em>. For example, see <file>COObject.h</file> which exposes all 
-    properties of the COObject data model class.</p>
-    <p>When you create a subclass of COObject some other subclasses such as 
-    <ref type="class" id="COGroup">COGroup</ref>, you  must first call +initialize on your superclass to get all 
-    inherited properties and types registered for your subclass. This only holds 
-    for the GNU runtime though, and may change in future if CoreObject was 
-    ported to another runtime.</p> */
-+ (void) initialize
++ (ETEntityDescription *) newEntityDescription
 {
-	NSDictionary *pt = [[NSDictionary alloc] initWithObjectsAndKeys:
-		[NSNumber numberWithInt: kCOStringProperty], 
-			kCOUIDProperty,
-		[NSNumber numberWithInt: kCOIntegerProperty], 
-			kCOVersionProperty,
-		[NSNumber numberWithInt: kCODateProperty], 
-			kCOCreationDateProperty,
-		[NSNumber numberWithInt: kCODateProperty], 
-			kCOModificationDateProperty,
-		[NSNumber numberWithInt: kCOIntegerProperty], 
-			kCOReadOnlyProperty,
-		[NSNumber numberWithInt: kCOArrayProperty], 
-			kCOParentsProperty,
-		nil];
-	[self addPropertiesAndTypes: pt];
-	DESTROY(pt);
+	ETEntityDescription *object = [self newBasicEntityDescription];
+
+	// For subclasses that don't override -newEntityDescription, we must not add the 
+	// property descriptions that we will inherit through the parent
+	if ([[object name] isEqual: [COObject className]] == NO) 
+		return object;
+
+	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COObject"
+	                               description: @"Core Object"
+	                          supertypeStrings: [NSArray array]
+	                                  typeTags: [NSDictionary dictionary]];
+	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
+
+	[object setLocalizedDescription: _(@"Basic Object")];
+
+	ETPropertyDescription *nameProperty = 
+		[ETPropertyDescription descriptionWithName: @"name" type: (id)@"Anonymous.NSString"];
+	// TODO: Declare as a transient property... ETLayoutItem overrides it to be 
+	// a persistent property.
+	//ETPropertyDescription *idProperty = 
+	//	[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"Anonymous.NSString"];
+	ETPropertyDescription *modificationDateProperty = 
+		[ETPropertyDescription descriptionWithName: @"modificationDate" type: (id)@"Anonymous.NSDate"];
+	ETPropertyDescription *creationDateProperty = 
+		[ETPropertyDescription descriptionWithName: @"creationDate" type: (id)@"Anonymous.NSDate"];
+	ETPropertyDescription *lastVersionDescProperty = 
+		[ETPropertyDescription descriptionWithName: @"lastVersionDescription" type: (id)@"Anonymous.NSString"];
+	ETPropertyDescription *tagDescProperty = 
+		[ETPropertyDescription descriptionWithName: @"tagDescription" type: (id)@"Anonymous.NSString"];
+	ETPropertyDescription *typeDescProperty = 
+		[ETPropertyDescription descriptionWithName: @"typeDescription" type: (id)@"Anonymous.NSString"];
+
+	// TODO: Figure out how to compute and present each core object size...
+	// Possible choices would be:
+	// - a raw size including the object history data
+	// - a snapshot size (excluding the history data)
+	// - a directory or file size to be expected if the object is exported
+
+	// TODO: Move these properties to EtoileFoundation... See -[NSObject propertyNames].
+	// We should create a NSObject entity description and use it as our parent entity probably.
+#ifndef GNUSTEP // We don't link NSImage on GNUstep because AppKit won't work
+	ETPropertyDescription *iconProperty = 
+		[ETPropertyDescription descriptionWithName: @"icon" type: (id)@"Anonymous.NSImage"];
+#endif // GNUSTEP
+	ETPropertyDescription *displayNameProperty = 
+		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"Anonymous.NSString"];
+
+
+	// TODO: I think these properties should be declared in subclasses or custom 
+	// entity descriptions set per COObject instance (Quentin).
+
+	ETPropertyDescription *parentContainerProperty = 
+		[ETPropertyDescription descriptionWithName: @"parentContainer" type: (id)@"Anonymous.COContainer"];
+	[parentContainerProperty setIsContainer: YES];
+	[parentContainerProperty setMultivalued: NO];
+
+	ETPropertyDescription *parentCollectionsProperty = 
+		[ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.COGroup"];
+	
+	[parentCollectionsProperty setMultivalued: YES];
+
+	NSArray *transientProperties = A(displayNameProperty, modificationDateProperty, 
+		creationDateProperty, lastVersionDescProperty, tagDescProperty, typeDescProperty);
+#ifndef GNUSTEP
+	transientProperties = [transientProperties arrayByAddingObject: iconProperty];
+#endif
+	NSArray *persistentProperties = A(nameProperty, parentContainerProperty, parentCollectionsProperty);
+
+	[[persistentProperties mappedCollection] setPersistent: YES];
+	[object setPropertyDescriptions: [transientProperties arrayByAddingObjectsFromArray: persistentProperties]];
+
+	return object;
 }
 
-/** <p>Declares new properties for the data model associated with this class.</p>
-    <p>The property declaration is a list of property type keyed by property 
-    names.</p> */
-+ (int) addPropertiesAndTypes: (NSDictionary *) properties
+- (id) commonInitWithUUID: (ETUUID *)aUUID 
+        entityDescription: (ETEntityDescription *)anEntityDescription
+               rootObject: (COObject *)aRootObject
+                  context: (COEditingContext *)aContext
+                  isFault: (BOOL)isFault
 {
-	if (propertyTypes == nil)
+	NSParameterAssert(aUUID != nil);
+	BOOL isPersistent = (aRootObject != nil && aContext != nil);
+	if (isPersistent)
 	{
-		propertyTypes = [[NSMutableDictionary alloc] init];
-	}
-
-	NSMutableDictionary *dict = [propertyTypes objectForKey: NSStringFromClass([self class])];
-	if (dict == nil)
-	{
-		dict = [[NSMutableDictionary alloc] init];
-		[propertyTypes setObject: dict forKey: NSStringFromClass([self class])];
-		RELEASE(dict);
-	}
-	int i, count;
-	NSArray *allKeys = [properties allKeys];
-	NSArray *allValues = [properties allValues];
-	count = [allKeys count];
-	for (i = 0; i < count; i++)
-	{
-		[dict setObject: [allValues objectAtIndex: i]
-		      forKey: [allKeys objectAtIndex: i]];
-	}
-	return count;
-}
-
-/** <p>Returns the property types keyed by property names for the data model 
-    that has been declared for this class, by calling 
-    +addPropertiesAndTypes: and +removeProperties: either on this class or a 
-    superclass.</p>
-    <p>The data model includes the properties declared either on this class or 
-    inherited from a superclass, see +initialize.</p> */
-+ (NSDictionary *) propertiesAndTypes
-{
-	return [propertyTypes objectForKey: NSStringFromClass([self class])];
-}
-
-/** <p>Returns the property names of the data model declared for this class.</p>
-    <p>The data model includes the properties declared either on this class or 
-    inherited from a superclass, see +initialize.</p> */
-+ (NSArray *) properties
-{
-	if (propertyTypes == nil)
-		return nil;
-
-	NSDictionary *dict = [propertyTypes objectForKey: NSStringFromClass([self class])];
-	if (dict == nil)
-		return nil;
-
-	return [dict allKeys];
-}
-
-/** <p>Removes declared properties (type/name pairs) from the data model, that 
-    match a property name from properties array.</p>
-    <p>The data model includes the properties declared either on this class or 
-    inherited from a superclass, see +initialize.</p>
-    <p>Removing a property that is inherited from a superclass, won't remove it 
-    in the superclass data model, but only from the receiver class data model.</p> */
-+ (int) removeProperties: (NSArray *) properties
-{
-	if (propertyTypes == nil)
-		return 0;
-	NSMutableDictionary *dict = [propertyTypes objectForKey: NSStringFromClass([self class])];
-	if (dict == nil)
-	{
-		return 0;
-	}
-	NSEnumerator *e = [properties objectEnumerator];
-	NSArray *allKeys = [dict allKeys];
-	NSString *key = nil;
-	int count = 0;
-	while ((key = [e nextObject]))
-	{
-		if ([allKeys containsObject: key])
-		{
-			[dict removeObjectForKey: key];
-			count++;
-		}
-	}
-	return count;
-}
-
-/** <p>Returns the type of a property declared in the data model for the given 
-    property name.</p>
-    <p>The data model includes the properties declared either on this class or 
-    inherited from a superclass, see +initialize.</p> */
-+ (COPropertyType) typeOfProperty: (NSString *) property
-{
-	if (propertyTypes == nil)
-		return kCOErrorInProperty;
-
-	NSDictionary *dict = [propertyTypes objectForKey: NSStringFromClass([self class])];
-	if (dict == nil)
-	{
-		return kCOErrorInProperty;
-	}
-
-	NSNumber *type = [dict objectForKey: property];
-	if (type)
-		return [type intValue];
-	else
-		return kCOErrorInProperty;
-}
-
-/* Factory Method */
-
-/** <p>Returns a core object graph by importing propertyList.</p>
-    <p>See -initWithPropertyList:.</p> */
-+ (id) objectWithPropertyList: (NSDictionary *) propertyList
-{
-	id object = nil;
-	if ((object = [propertyList objectForKey: pCOClassKey]) &&
-	    ([object isKindOfClass: [NSString class]]))
-	{
-		Class oClass = NSClassFromString((NSString *)object);
-		return AUTORELEASE([[oClass alloc] initWithPropertyList: propertyList]);
-	}
-	return nil;
-}
-
-/* Property List Import/Export */
-
-/** <p></p> */
-- (id) initWithPropertyList: (NSDictionary *) propertyList
-{
-	self = [self init];
-	if ([propertyList isKindOfClass: [NSDictionary class]] == NO)
-	{
-		NSLog(@"Error: Not a valid property list: %@", propertyList);
-		[self dealloc];
-		return nil;
-	}
-	/* Let check version */
-	NSString *v = [propertyList objectForKey: pCOVersionKey];
-	if ([v isEqualToString: pCOVersion1Value])
-	{
-		[self _readObjectVersion1: propertyList];
+		NSParameterAssert(anEntityDescription != nil);
 	}
 	else
 	{
-		NSLog(@"Unknown version %@", v);
-		[self dealloc];
-		return nil;
+		NSParameterAssert(aRootObject == nil);
+		NSParameterAssert(aContext == nil);
+	}
+
+	ASSIGN(_uuid, aUUID);
+	if (anEntityDescription != nil)
+	{
+		ASSIGN(_entityDescription, anEntityDescription);
+	}
+	else
+	{
+		// NOTE: Ensure we can use -propertyNames and metamodel-based 
+		// introspection before -becomePersistentInContext:rootObject: is called.
+		// TODO: Could be removed if -propertyNames in NSObject(Model) do a 
+		// lookup in the main repository.
+		ASSIGN(_entityDescription, [[ETModelDescriptionRepository mainRepository] 
+			entityDescriptionForClass: [self class]]);
+	}
+	_variableStorage = nil;
+	_isIgnoringDamageNotifications = NO;
+	_isInitialized = YES;
+
+	if (isFault)
+	{
+		object_setClass(self, [[self class] faultClass]);
+		_context = aContext;
+		_rootObject = aRootObject;
+	}
+	else
+	{
+		[_context markObjectUpdated: self forProperty: nil];
+		_variableStorage = [[NSMapTable alloc] init];
+		[self awakeFromInsert]; // FIXME: not necessairly
 	}
 
 	return self;
 }
 
-/** <p>Returns the receiver data model as a property list.</p>
-    <p>You can use this method for exporting and -initWithPropertyList: as the 
-    symetric method for importing.</p>
-    <p>If you want to export an object graph rather than a single object, use 
-    -[COGroup propertyList].</p> */
-- (NSMutableDictionary *) propertyList
+- (id)initWithUUID: (ETUUID *)aUUID 
+ entityDescription: (ETEntityDescription *)anEntityDescription
+        rootObject: (id)aRootObject
+           context: (COEditingContext *)aContext
+           isFault: (BOOL)isFault
 {
-	return [self _outputObjectVersion1];
+	SUPERINIT;
+	
+	NILARG_EXCEPTION_TEST(aUUID);
+	NILARG_EXCEPTION_TEST(anEntityDescription);
+	NILARG_EXCEPTION_TEST(aContext);
+
+	self = [self commonInitWithUUID: aUUID 
+	              entityDescription: anEntityDescription
+	                     rootObject: (aRootObject != nil ? aRootObject : self)
+	                        context: aContext
+	                        isFault: isFault];
+
+	/* When the object is not reloaded, but instantiated for the first time */
+	if (isFault == NO)
+	{
+		[self init];
+	}
+	return self;
 }
 
-/* Common Methods */
-
-/** <init /><p></p> */
 - (id) init
 {
-	self = [super init];
-
-	_properties = [[NSMutableDictionary alloc] init];
-	[self setValue: [NSNumber numberWithInt: 0] 
-	      forProperty: kCOReadOnlyProperty];
-	[self setValue: [NSString UUIDString]
-	      forProperty: kCOUIDProperty];
-	[self setValue: [NSNumber numberWithInt: 0]
-	      forProperty: kCOVersionProperty];
-	[self setValue: [NSDate date]
-	      forProperty: kCOCreationDateProperty];
-	[self setValue: [NSDate date]
-	      forProperty: kCOModificationDateProperty];
-    [self setValue: [NSMutableArray array]
-          forProperty: kCOParentsProperty]; /* Transient property */
-	_nc = [NSNotificationCenter defaultCenter];
-
-	/* We get the object context at the end, hence all the previous calls are 
-	   not serialized by RECORD in -setValue:forProperty: 
-	   FIXME: Should be obtained by parameter usually. */
-	_objectVersion = -1;
-	[self tryStartPersistencyIfInstanceOfClass: [COObject class]];
-
+	if (_isInitialized == NO)
+	{
+		SUPERINIT;
+		self = [self commonInitWithUUID: [ETUUID UUID]
+		              entityDescription: nil
+		                     rootObject: nil
+		                        context: nil
+		                        isFault: NO];
+								
+		[self didCreate];
+	}
 	return self;
 }
 
-/** <p></p> */
-- (BOOL) tryStartPersistencyIfInstanceOfClass: (Class)aClass
+- (void)dealloc
 {
-	BOOL isNotSubclassInstance = [self isMemberOfClass: aClass];
+	// FIXME: call user hook?
 	
-	if ([[self class] automaticallyMakeNewInstancesPersistent]
-	   && isNotSubclassInstance)
-	{
-		[[COObjectContext currentContext] insertObject: self];
-		[self enablePersistency];
-		return YES;
-	}
-	
-	return NO;
-}
-
-- (void) dealloc
-{
-	DESTROY(_properties);
-	// NOTE: _objectContext is a weak reference
-	
+	_context = nil;
+	_rootObject = nil;
+	DESTROY(_uuid);
+	DESTROY(_entityDescription);
+	DESTROY(_variableStorage);
 	[super dealloc];
 }
 
-// TODO: Turn this into -shortDescription probably and add a more detailed 
-// -description that ouputs all the properties. 
-// Take note that [_properties description] won't work, because...
-// -description triggers -description on kCOParentsProperty and each element 
-// is a COGroup instances which will call -description on 
-// kCOGroupChildrenProperty and kCOGroupSubgroupsProperty. This will call back 
-// -description on the receiver and results in an infinite recursion.
-- (NSString *) description
+- (void) becomePersistentInContext: (COEditingContext *)aContext 
+                        rootObject: (COObject *)aRootObject
 {
-	NSString *desc = [super description];
-
-	return [NSString stringWithFormat: @"%@ id: %@ version: %i", desc, 
-		[self UUID], [self objectVersion]];
+	NILARG_EXCEPTION_TEST(aContext);
+	NILARG_EXCEPTION_TEST(aRootObject);
+	INVALIDARG_EXCEPTION_TEST(aRootObject, 
+		aRootObject != self || [[aContext loadedObjects] containsObject: aRootObject] == NO);
+	ETAssert(_uuid != nil);
+	_context = aContext;
+	_rootObject = aRootObject;
+	if (_entityDescription == nil)
+	{
+		ASSIGN(_entityDescription, [[aContext modelRepository] entityDescriptionForClass: [self class]]);
+	}
+	[aContext registerObject: self];
 }
 
-/** <p>Returns YES. See COManagedObject protocol.</p> */
-- (BOOL) isCoreObject
+- (id) copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription
 {
-	return YES;
+	COObject *newObject = [[self class] allocWithZone: aZone];
+	
+	newObject->_uuid = [[ETUUID alloc] init];
+	newObject->_rootObject = _rootObject;
+	newObject->_context = _context;
+	if (_variableStorage != nil)
+	{
+		newObject->_variableStorage = [[NSMapTable alloc] init];
+
+		if (usesModelDescription)
+		{
+			// TODO: For variable storage properties, support a metamodel-driven copy
+			// Share support code with -insertObjectCopy: or make -insertObjectCopy: 
+			// uses -copyWithZone:
+		}
+	}
+
+	return newObject;
 }
 
-/** <p>Returns YES. See COManagedObject protocol.</p> */
-- (BOOL) isManagedCoreObject
+- (id) copyWithZone: (NSZone *)aZone
 {
-	return YES;
+	return [self copyWithZone: aZone usesModelDescription: NO];
 }
 
-- (BOOL) isCopyPromise
+// Attributes
+
+- (ETEntityDescription *)entityDescription
+{
+	return _entityDescription;
+}
+
+- (ETUUID*) UUID
+{
+	return _uuid;
+}
+
+- (COEditingContext*) editingContext
+{
+	return _context;
+}
+
+- (COObject *) rootObject
+{
+	return _rootObject;
+}
+
+- (BOOL) isRoot
+{
+	return (_rootObject == self);
+}
+
+- (BOOL) isFault
 {
 	return NO;
 }
 
-// FIXME: Implement
-- (NSDictionary *) metadatas
+- (CORevision*)revision
 {
-	return nil;
+	return [_context revisionForObject: self];
 }
 
-/* Managed Object Edition */
-
-/** <p>Returns the properties published by the receiver and accessible through 
-    <em>Property Value Coding</em>. The returned array includes the properties 
-    inherited from the superclass too, see -[NSObject properties].</p> */
-- (NSArray *) propertyNames
-{
-	return [[super propertyNames] arrayByAddingObjectsFromArray: [[self class] properties]];
-}
-
-/** <p></p> */
-- (BOOL) removeValueForProperty: (NSString *) property
-{
-	if (IGNORE_CHANGES || [self isReadOnly])
-		return NO;
-
-	RECORD(property)
-	[_properties removeObjectForKey: property];
-	[self setValue: [NSDate date] forProperty: kCOModificationDateProperty];
-    [_nc postNotificationName: kCOObjectChangedNotification
-         object: self
-	     userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
-	                 property, kCORemovedProperty, nil]];
-	END_RECORD
-
-	return YES;
-}
-
-/** <p></p> */
-- (BOOL) setValue: (id) value forProperty: (NSString *) property
-{
-	if (IGNORE_CHANGES || [self isReadOnly])
-		return NO;
-
-	RECORD(value, property)
-	[_properties setObject: value forKey: property];
-	[_properties setObject: [NSDate date] 
-	                forKey: kCOModificationDateProperty];
-    [_nc postNotificationName: kCOObjectChangedNotification
-         object: self
-	     userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
-	                 property, kCOUpdatedProperty, nil]];
-	END_RECORD
-
-	return YES;
-}
-
-/** <p>Returns the value identified by property. If the property doesn't exist,
-    returns nil.</p>
-    <p>First try to find the property in the receiver data model. If no property is 
-    found, try to find it in the properties inherited from the superclass.</p>
-    <p>Take note that COObject only inherits properties from <code>NSObject</code>.</p> */
-- (id) valueForProperty: (NSString *) property
-{
-	id value = [_properties objectForKey: property];
-	
-	/* Pass up to NSObject+Model if not declared in our data model */
-	if (value == nil && [[[self class] properties] containsObject: property] == NO)
-		value = [super valueForProperty: property];
-
-	return value;
-}
-
-/** <p></p> */
-- (NSArray *) parentGroups
-{
-    NSMutableSet *set = AUTORELEASE([[NSMutableSet alloc] init]);
-    NSArray *value = [self valueForProperty: kCOParentsProperty];
-    if (value)
-    {
-        [set addObjectsFromArray: value];
-
-        int i, count = [value count];
-        for (i = 0; i < count; i++)
-        {
-            [set addObjectsFromArray: [[value objectAtIndex: i] parentGroups]];
-        }
-    }
-    return [set allObjects];
-}
-
-/** <p>Returns whether the receiver is in read-only mode.</p> */
-- (BOOL) isReadOnly
-{	
-	return ([[self valueForProperty: kCOReadOnlyProperty] intValue] == 1);
-}
-
-/** <p>Returns the version of the object format, plays a role similar to class 
-    versioning provided by +[NSObject version].</p> */
-- (int) version
-{
-	return [(NSNumber *)[self valueForProperty: kCOVersionProperty] intValue];
-}
-
-/* Persistency */
-
-/** <p>Returns an array of all selectors names whose methods calls can trigger
-    persistency, by handing an invocation to the object context which can in  
-    turn record it and snapshot the receiver if necessary.</p>
-    <p>All messages which are persistency method calls are persisted only if necessary, 
-    so if such a message is sent by another managed object part of the same 
-    object context, it won't be recorded (see COObjectContext for a more 
-    thorough explanation).</p>
-    <p>This method plays no role currently, if we put aside some runtime 
-    reflection that could be eventually done with it. In future, by overriding 
-    this method, you will be able to declare which methods should automatically 
-    trigger persistency without having to rely on RECORD and END_RECORD macros 
-    in your method body.</p> */
-- (NSArray *) persistencyMethodNames
-{
-	return A(NSStringFromSelector(@selector(setValue:forProperty:)),
-	         NSStringFromSelector(@selector(removeValueForProperty:)));
-}
-
-static NSMutableSet *automaticPersistentClasses = nil;
-
-/** <p>Returns whether the instances, that are members of this specific class, are 
-    made persistent when they are initialized.</p>
-    <p>Returns NO by default, but this is subject to change in future.</p> */
-+ (BOOL) automaticallyMakeNewInstancesPersistent
-{
-	return [automaticPersistentClasses containsObject: self];
-}
-
-/** <p>Sets whether the instances, that are members of this specific class, are 
-    made persistent when they are initialized.</p>
-    <p>An instance becomes persistent by registering it in an object context and 
-    sending it -enablePersistency. See -tryStartPersistencyIfInstanceOfClass: 
-    to do so.</p> */
-+ (void) setAutomaticallyMakeNewInstancesPersistent: (BOOL)flag
-{
-	if (automaticPersistentClasses == nil)
-		automaticPersistentClasses = [[NSMutableSet alloc] init];
-
-	if (flag)
-	{
-		[automaticPersistentClasses addObject: self];
-	}
-	else
-	{
-		[automaticPersistentClasses removeObject: self];
-	}
-}
-
-/** <p>Allows to temporarily disable persistency for the receiver. 
-    All persistency method calls will not result in any recorded invocations or 
-    snapshots.</p>
-    <p>A very common usage of this method is to avoid the recording of a large 
-    number of messages and only take a snapshot by calling -save once done, 
-    then returning to normal with -enablePersistency.</p>
-    <p>An object will continue to return YES for -isPersistent, even if 
-   -disablePersistency has been called.</p> */
-- (void) disablePersistency
-{
-	if ([self objectContext] == nil)
-	{
-		//ETLog(@"WARNING: %@ misses an object context to disable persistency", self);
-	}
-
-	// NOTE: Another way would be: [_objectContext unregisterObject: self];
-	// By doing, we wouldn't need to check explictly for _isPersistencyEnabled 
-	// in RECORD macro and the object context would discard the invocation 
-	// because the receiver isn't registered. However testing whether the 
-	// persistency is enabled makes sense, because invocations are created 
-	// only if needed.
-	// _isPersistencyEnabled would be easy to replace by -isPersistencyEnabled 
-	// { return [[_objectContext registeredObjects] containsObject: self] }
-	_isPersistencyEnabled = NO;
-}
-
-/** <p>Allows to restore persistency for the receiver, if it is presently
-    disabled. See -disablePersistency.</p> */
-- (void) enablePersistency
-{
-	if ([self objectContext] == nil)
-	{
-		//ETLog(@"WARNING: %@ misses an object context to enable persistency", self);
-	}
-	
-	// NOTE: Another way would be: [_objectContext registerObject: self];
-	_isPersistencyEnabled = YES;
-}
-
-/** <p>Returns whether the receiver has been turned into a persistent object.</p>
-    <p>Once an object has become persistent, it will remain so until it got 
-    fully destroyed:</p>
-    <list>
-    <item>deallocated in memory</item>
-    <item>deleted on-disk</item></list> */
 - (BOOL) isPersistent
 {
-	return ([self objectVersion] > -1);
+	return (_context != nil);
+	// TODO: Switch to the code below on root object are saved in the db
+	// return (_context != nil && _rootObject != nil);
 }
 
-/** <p>See COManagedObject protocol.</p> */
-- (COObjectContext *) objectContext
+- (BOOL) isDamaged
 {
-	return _objectContext;
+	return [_context isUpdatedObject: self]; 
 }
 
-/* Framework private method used only by COObjectContext on insertion/removal of 
-   objects. */
-- (void) setObjectContext: (COObjectContext *)ctxt
+/* Helper methods based on the metamodel */
+
+- (NSArray*)allStronglyContainedObjects
 {
-	/* The object context is our owner and retains us. */
-	_objectContext = ctxt;
-}
-
-/* Framework private method used on serialization and deserialization, either 
-   delta or snapshot. */
-- (void) _setObjectVersion: (int)version
-{
-	ETDebugLog(@"Setting version from %d to %d of %@", _objectVersion, version, self);
-	_objectVersion = version;
-}
-
-/** <p>See COManagedObject protocol.</p>
-    <p>The last object version which can be known by calling -lastObjectVersion.</p> */
-- (int) objectVersion
-{
-	return _objectVersion;
-}
-
-/** <p>API only used for replacing an existing object by a past temporal in the 
-    managed object graph. See COObjectContext.</p>
-    <p><strong>WARNING: May be removed later.</strong></p> */
-- (int) lastObjectVersion
-{
-	ETDebugLog(@"Requested last object version, found %d in %@", 
-		[_objectContext lastVersionOfObject: self], _objectContext);
-
-	return [_objectContext lastVersionOfObject: self];
-	// NOTE: An implementation variant that may prove be quicker would be...
-	// return [[COObjectServer objectForUUID: [self UUID]] objectVersion]
-	//
-	// All managed objects cached in the object server have always 
-	// -objectVersion equal to -lastObjectVersion, only temporal instances 
-	// break this rule, but temporal instances are never referenced by the 
-	// object server. If they are merged, then their object version is 
-	// updated to match the one of the object they replace. At this point, 
-	// they will be cached in the object server, but not qualify as temporal
-	// instances anymore.
-}
-
-/** <p>Saves the receiver by asking the object context to make a new snapshot.</p>
-    <p>If the save succeeds, returns YES. If the save fails, NO is returned and 
-    the object version isn't touched.</p> */
-- (BOOL) save
-{
-	int prevVersion = [self objectVersion];
-	[[self objectContext] snapshotObject: self];
-	return ([self objectVersion] > prevVersion);
-}
-
-/* Identity */
-
-/** <p>See COManagedObject protocol.</p> */
-- (ETUUID *) UUID
-{
-	return AUTORELEASE([[ETUUID alloc] initWithString: [self valueForProperty: kCOUIDProperty]]);
-}
-
-/** <p>See COManagedObject protocol.</p> */
-- (NSUInteger) hash
-{
-	return [[self valueForProperty: kCOUIDProperty] hash];
-}
-
-/**  <p>See COManagedObject protocol.</p> */
-- (BOOL) isEqual: (id)other
-{
-	if (other == nil || [other isKindOfClass: [self class]] == NO)
-		return NO;
-
-	BOOL hasEqualUUID = [[self valueForProperty: kCOUIDProperty] isEqual: [other valueForProperty: kCOUIDProperty]];
-	BOOL hasEqualObjectVersion = ([self objectVersion] == [other objectVersion]);
-
-	return hasEqualUUID && hasEqualObjectVersion;
-}
-
-/** <p>See COOManagedObject protocol.</p> */
-- (BOOL) isTemporalInstance: (id)other
-{
-	if (other == nil || [other isKindOfClass: [self class]] == NO)
-		return NO;
-
-	BOOL hasEqualUUID = [[self valueForProperty: kCOUIDProperty] isEqual: [other valueForProperty: kCOUIDProperty]];
-	BOOL hasDifferentObjectVersion = ([self objectVersion] != [other objectVersion]);
-
-	return hasEqualUUID && hasDifferentObjectVersion;
-}
-
-/* Query */
-
-/** <p>See COObject protocol.</p> */
-- (BOOL) matchesPredicate: (NSPredicate *)aPredicate
-{
-	BOOL result = NO;
-	if ([aPredicate isKindOfClass: [NSCompoundPredicate class]])
+	NSMutableArray *result = [NSMutableArray array];
+	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
 	{
-		NSCompoundPredicate *cp = (NSCompoundPredicate *)aPredicate;
-		NSArray *subs = [cp subpredicates];
-		int i, count = [subs count];
-		switch ([cp compoundPredicateType])
+		if ([propDesc isComposite])
 		{
-			case NSNotPredicateType:
-				result = ![self matchesPredicate: [subs objectAtIndex: 0]];
-				break;
-			case NSAndPredicateType:
-				result = YES;
-				for (i = 0; i < count; i++)
-				{
-					result = result && [self matchesPredicate: [subs objectAtIndex: i]];
-				}
-				break;
-			case NSOrPredicateType:
-				result = NO;
-				for (i = 0; i < count; i++)
-				{
-					result = result || [self matchesPredicate: [subs objectAtIndex: i]];
-				}
-				break;
-			default: 
-				ETLog(@"Error: Unknown compound predicate type");
-		}
-	}
-	else if ([aPredicate isKindOfClass: [NSComparisonPredicate class]])
-	{
-		NSComparisonPredicate *cp = (NSComparisonPredicate *)aPredicate;
-		id lv = [[cp leftExpression] expressionValueWithObject: self context: nil];
-		id rv = [[cp rightExpression] expressionValueWithObject: self context: nil];
-		NSArray *array = nil;
-		if ([lv isKindOfClass: [NSArray class]] == NO)
-		{
-			array = [NSArray arrayWithObjects: lv, nil];
-		}
-		else
-		{
-			array = (NSArray *) lv;
-		}
-		NSEnumerator *e = [array objectEnumerator];
-		id v = nil;
-		while ((v = [e nextObject]))
-		{
-			switch ([cp predicateOperatorType])
+			id value = [self valueForProperty: [propDesc name]];
+			
+			assert([propDesc isMultivalued] ==
+				   ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]));
+			
+			if ([propDesc isMultivalued])
 			{
-				case NSLessThanPredicateOperatorType:
-					return ([v compare: rv] == NSOrderedAscending);
-				case NSLessThanOrEqualToPredicateOperatorType:
-					return ([v compare: rv] != NSOrderedDescending);
-				case NSGreaterThanPredicateOperatorType:
-				return ([v compare: rv] == NSOrderedDescending);
-				case NSGreaterThanOrEqualToPredicateOperatorType:
-					return ([v compare: rv] != NSOrderedAscending);
-				case NSEqualToPredicateOperatorType:
-					return [v isEqual: rv];
-				case NSNotEqualToPredicateOperatorType:
-					return ![v isEqual: rv];
-				case NSMatchesPredicateOperatorType:
+				for (id subvalue in value)
+				{
+					if ([subvalue isKindOfClass: [COObject class]])
 					{
-						// FIXME: regular expression
-						return NO;
+						[result addObject: subvalue];
+						[result addObjectsFromArray: [subvalue allStronglyContainedObjects]];
 					}
-				case NSLikePredicateOperatorType:
-					{
-						// FIXME: simple regular expression
-						return NO;
-					}
-				case NSBeginsWithPredicateOperatorType:
-					return [[v description] hasPrefix: [rv description]];
-				case NSEndsWithPredicateOperatorType:
-					return [[v description] hasSuffix: [rv description]];
-				case NSInPredicateOperatorType:
-					// NOTE: it is the reverse CONTAINS
-					return ([[rv description] rangeOfString: [v description]].location != NSNotFound);;
-				case NSCustomSelectorPredicateOperatorType:
-					{
-						// FIXME: use NSInvocation
-						return NO;
-					}
-				default:
-					ETLog(@"Error: Unknown predicate operator");
+				}
+			}
+			else
+			{
+				if ([value isKindOfClass: [COObject class]])
+				{
+					[result addObject: value];
+					[result addObjectsFromArray: [value allStronglyContainedObjects]];
+				}
+				// Ignore non-COObject objects
 			}
 		}
 	}
 	return result;
 }
 
-/* Serialization (EtoileSerialize) */
-
-/** <p>If you override this method, you must call superclass implemention before 
-    your own code.</p> */
-- (BOOL) serialize: (char *)aVariable using: (ETSerializer *)aSerializer
+- (NSArray*)allStronglyContainedObjectsIncludingSelf
 {
-	//ETDebugLog(@"Try serialize %s in %@", aVariable, self);
-	if (strcmp(aVariable, "_nc") == 0
-	 || strcmp(aVariable, "_objectContext") == 0
-	 || strcmp(aVariable, "_objectVersion") == 0
-	 || strcmp(aVariable, "_isPersistencyEnabled") == 0)
+	return [[self allStronglyContainedObjects] arrayByAddingObject: self];
+}
+
+- (NSSet *)allInnerObjects
+{
+	if ([self isRoot] == NO)
+		return nil;
+
+	if ([self isPersistent] == NO)
 	{
-		return YES; /* Should not be automatically serialized (manual) */
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"Inner objects cannot be known until %@ has become persistent", self];
 	}
-	if (strcmp(aVariable, "_properties") == 0)
+
+	CORevision *loadedRev = [_context revisionForObject: self];
+
+	NSSet *innerObjectUUIDs = [[_context store] UUIDsForRootObjectUUID: [self UUID] 
+	                                                        atRevision: loadedRev];
+	NSMutableSet *innerObjects = [NSMutableSet setWithCapacity: [innerObjectUUIDs count]];
+
+	for (ETUUID *uuid in innerObjectUUIDs)
 	{
-		/* We discard the parents array which is transient and may have become 
-		   invalid. For example, a parent group might have been deleted. 
-		   The most important issue is that we are unable to treat a 
-		   relationship change, that alter two different objects as an atomic 
-		   unit of change. This would imply to serialize/deserialize two 
-		   invocations, in a single transaction that binds the two new object 
-		   versions (in the history of each object).
-		   Moreover...
-		   Deserializing all child objects to correct their parent relationships, 
-		   would be really slow, if the group has several hundreds of children 
-		   or more. Add, remove operations would also be slow on a huge number 
-		   of objects, because this would involve to deserialize/reserialize 
-		   each moved object.
-		   We could alternatively discard kCOParentsProperty on deserialization 
-		   rather than at serialization time. */
-		// TODO: Benchmark persistentProperties creation cost. If this is too 
-		// slow, cache, optimize or eventually turn kCOParentsProperty into 
-		// a transient ivar... or some other clever trick.
-		// peristentProperties is also fragile currently because it relies 
-		// on the assumption that no other autorelease pools is created within 
-		// the serialization triggered by -[ETSerializer serializeObject:withName:]
-		NSMutableDictionary *persistentProperties = 
-			[[NSMutableDictionary alloc] initWithDictionary: _properties];
-		[persistentProperties setObject: [NSMutableArray array] forKey: kCOParentsProperty];
-		[aSerializer storeObjectFromAddress: &persistentProperties withName: "_properties"];
-		AUTORELEASE(persistentProperties);
+		[innerObjects addObject: [_context objectWithUUID: uuid]];
+	}
+	return innerObjects;
+}
+
+- (NSSet *)allInnerObjectsIncludingSelf
+{
+	return [[self allInnerObjects] setByAddingObject: self];
+}
+
+- (NSString *)displayName
+{
+	return [self name];
+}
+
+- (NSString *)name
+{
+	return [self valueForUndefinedKey: @"name"];
+}
+
+- (NSString *)identifier
+{
+	return [self name];
+}
+
+- (void)setName: (NSString *)aName
+{
+	// TODO: Move the -updateRelationshipConsistencyWithValue:forProperty: into 
+	// -willChangeValueForProperty:
+	[self updateRelationshipConsistencyWithValue: aName forProperty: @"name"];
+	[self willChangeValueForProperty: @"name"];
+	[self setValue: aName forUndefinedKey: @"name"];
+	[self didChangeValueForProperty: @"name"];
+}
+
+- (NSDate *)modificationDate
+{
+	CORevision *rev = [[[self editingContext] store] maxRevision: INT64_MAX 
+	                                           forRootObjectUUID: [[self rootObject] UUID]];
+	return [rev date];
+}
+
+- (NSDate *)creationDate
+{
+	CORevision *rev = [[[self editingContext] store] maxRevision: 0 
+	                                           forRootObjectUUID: [[self rootObject] UUID]];
+	return [rev date];
+}
+
+- (NSArray *)parentGroups
+{
+	return [self valueForProperty: @"parentCollections"];
+}
+
+- (NSArray *)tags
+{
+	NSMutableArray *tags = [NSMutableArray arrayWithArray: [self parentGroups]];
+	[[tags filter] isTag];
+	return tags;
+}
+
+/* Property-value coding */
+
+- (NSSet *) observableKeyPaths
+{
+	return S(@"name", @"lastVersionDescription", @"tagDescription");
+}
+
+- (NSArray *)propertyNames
+{
+	return [[self entityDescription] allPropertyDescriptionNames];
+}
+
+- (NSArray *) persistentPropertyNames
+{
+	return (id)[[[[self entityDescription] allPersistentPropertyDescriptions] mappedCollection] name];
+}
+
+- (id) valueForProperty:(NSString *)key
+{
+	if (![[self propertyNames] containsObject: key])
+	{
+		[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
+		return nil;
+	}
+	
+	return [super valueForKey: key];
+}
+
++ (BOOL) isPrimitiveCoreObjectValue: (id)value
+{  
+	return [value isKindOfClass: [NSNumber class]] ||
+		[value isKindOfClass: [NSDate class]] ||
+		[value isKindOfClass: [NSData class]] ||
+		[value isKindOfClass: [NSString class]] ||
+		[value isKindOfClass: [COObject class]] ||
+		[value isKindOfClass: [COObjectFault class]] ||
+		value == nil;
+}
+
++ (BOOL) isCoreObjectValue: (id)value
+{
+	if ([value isKindOfClass: [NSArray class]] ||
+		[value isKindOfClass: [NSSet class]])
+	{
+		for (id subvalue in value)
+		{
+			if (![COObject isPrimitiveCoreObjectValue: subvalue])
+			{
+				return NO;
+			}
+		}
 		return YES;
 	}
-
-	return NO; /* Serializer handles the ivar */
-}
-
-/** <p>If you override this method, you must call superclass implemention before 
-    your own code.</p> */
-- (void *) deserialize: (char *)aVariable 
-           fromPointer: (void *)aBlob 
-               version: (int)aVersion
-{
-	//ETDebugLog(@"Try deserialize %s into %@ (class version %d)", aVariable, aVersion, self);
-
-	return AUTO_DESERIALIZE;
-}
-
-// TODO: If we can get the deserializer in parameter, the need to call 
-// -_setObjectVersion: in delta or snapshot deserialization methods might 
-// eventually be eliminated.
-/** <p>If you override this method, you must call superclass implemention before 
-    your own code.</p> */
-- (void) finishedDeserializing
-{
-	ETDebugLog(@"Finished deserializing of %@", self);
-
-	_nc = [NSNotificationCenter defaultCenter];
-	_objectContext = nil;
-	 /* Reset a default version to be immediately overriden by
-	   _setObjectVersion: called back by the context. 
-	   This is also useful to ensure consistency if a non-persistent object is 
-	   serialized/deserialized without COObjectContext facility. 
-	   See TestSerializer.m */
-	_objectVersion = -1;
-	/* If we deserialize an object, it is persistent :-) */
-	_isPersistencyEnabled = YES;
-	// TODO: _properties is an invalid dictionary when this method is called.
-	// The next line results in a crash in EtoileSerialize. May be we should 
-	// improve EtoileSerialize to push back -finishedDeserializing to a point 
-	// where all objects are fully deserialized...
-	// This line should be removed later, we now handle kCOParentsProperty as 
-	// transient in -serialize:using.
-	//[_properties setObject: [NSMutableArray array] forKey: kCOParentsProperty];
-}
-
-/* Copying */
-
-- (id) copyWithZone: (NSZone *) zone
-{
-	COObject *clone = [[[self class] allocWithZone: zone] init];
-	clone->_properties = [_properties mutableCopyWithZone: zone];
-	return clone;
-}
-
-/* KVC */
-
-/** <p>Returns the value identified by key.</p>
-    <p>The returned value is identical to -valueForProperty:, except that it 
-    returns the text content if you pass qCOTextContent as key. This addition 
-    is used by -matchesPredicate:.</p>
-    <p>For now, this method returns nil for an undefined key and doesn't raise an 
-    exception by calling -valueForUndefinedKey:, however this is subject to 
-    change.</p> */
-- (id) valueForKey: (NSString *) key
-{
-	/* Intercept query property */
-	if ([key isEqualToString: qCOTextContent])
+	else 
 	{
-		return [self _textContent];
+		return [COObject isPrimitiveCoreObjectValue: value];
 	}
-	return [self valueForProperty: key];
 }
 
-/** <p>Returns the value for the given key path. See -valueForKey:.</p> */
-- (id) valueForKeyPath: (NSString *) key
-{
-	/* Intercept query property */
-	if ([key isEqualToString: qCOTextContent])
-	{
-		return [self _textContent];
-	}
 
-	NSArray *keys = [key componentsSeparatedByString: @"."];
-	if ([keys count])
+// TODO: Would be better not to turn every collection into a mutable one
+// We ought to save the mutability when serializing collections. For example, 
+// don't serialize NSMutableArray into NSArray. Might be hard with the current 
+// plist format.
+- (id)checkMutabilityForCollection: (id)value
+{
+	if ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]])
 	{
-		id value = [self valueForProperty: [keys objectAtIndex: 0]];
-		if ([value isKindOfClass: [COMultiValue class]])
+		value = [[value mutableCopy] autorelease];
+	}
+	return value;
+}
+
+/* Makes sure the value is in the same context as us. */
+- (void)checkEditingContextForValue:(id)value
+{
+	if ([value isKindOfClass: [NSArray class]] ||
+		[value isKindOfClass: [NSSet class]])
+	{
+		for (id subvalue in value)
 		{
-			COMultiValue *mv = (COMultiValue *) value;
-			int i, count = [mv count];
-			NSMutableArray *array = [[NSMutableArray alloc] init];
-			if ([keys count] > 1)
-			{
-				/* Find the label first */
-				NSString *label = [keys objectAtIndex: 1];
-				for (i = 0; i < count; i++)
+			[self checkEditingContextForValue: subvalue];
+		}
+	}
+	else 
+	{
+		if ([value isKindOfClass: [COObject class]])
+		{
+			assert([value editingContext] == _context);
+		}    
+	}
+}
+
+- (void)updateRelationshipConsistencyWithValue: (id)value forProperty: (NSString *)key
+{
+	// FIXME: use the metamodel's validation support?
+	
+	if (_isIgnoringRelationshipConsistency)
+		return;
+
+	[self setIgnoringRelationshipConsistency: YES]; // Needed to guard against recursion
+	
+	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	assert(desc != nil);
+	
+	if ([desc opposite] != nil)
+	{
+		NSString *oppositeName = [[desc opposite] name];
+		if (![desc isMultivalued]) // modifying the single-valued side of a relationship
+		{
+			COObject *oldContainer = [self valueForProperty: key];
+			COObject *newContainer = value;
+			
+			if (newContainer != oldContainer)
+			{					
+				[oldContainer setIgnoringRelationshipConsistency: YES];
+				[newContainer setIgnoringRelationshipConsistency: YES];			
+				
+				if ([[desc opposite] isMultivalued])
 				{
-					if ([[mv labelAtIndex: i] isEqualToString: label])
-					{
-						[array addObject: [mv valueAtIndex: i]];
-					}
+					[oldContainer removeObject: self forProperty: oppositeName];
+					[newContainer addObject: self forProperty: oppositeName];			
+				}
+				else
+				{
+					[oldContainer setValue: nil forProperty: oppositeName];
+					[newContainer setValue: self forProperty: oppositeName];			
+				}
+
+				[oldContainer setIgnoringRelationshipConsistency: NO];
+				[newContainer setIgnoringRelationshipConsistency: NO];
+			}
+		}
+		else // modifying the multivalued side of a relationship
+		{
+			NSMutableSet *oldObjects;
+			if ([[self valueForProperty: key] isKindOfClass: [NSSet class]])
+			{
+				oldObjects = [NSMutableSet setWithSet: [self valueForProperty: key]];
+			}			
+			else if ([self valueForProperty: key] == nil)
+			{
+				oldObjects = [NSMutableSet set]; // Should only happen when an object is first created..
+			}
+			else
+			{
+				oldObjects = [NSMutableSet setWithArray: [self valueForProperty: key]];
+			}
+			
+			NSMutableSet *newObjects;
+			if ([value isKindOfClass: [NSSet class]])
+			{
+				newObjects = [NSMutableSet setWithSet: value];
+			}
+			else
+			{
+				newObjects = [NSMutableSet setWithArray: value];
+			}
+			
+			NSMutableSet *commonObjects = [NSMutableSet setWithSet: oldObjects];
+			[commonObjects intersectSet: newObjects];
+			
+			[oldObjects minusSet: commonObjects]; 
+			[newObjects minusSet: commonObjects];
+			// Now newObjects is added objects, and oldObjects is removed objects
+			
+			for (COObject *obj in [oldObjects setByAddingObjectsFromSet: newObjects])
+			{
+				[obj setIgnoringRelationshipConsistency: YES];
+			}
+			
+			if ([[desc opposite] isMultivalued])
+			{
+				for (COObject *oldObj in oldObjects)
+				{
+					[oldObj removeObject: self forProperty: oppositeName];
+				}
+				for (COObject *newObj in newObjects)
+				{
+					[newObj addObject: self forProperty: oppositeName];
 				}
 			}
 			else
 			{
-				/* Search all labels */
-				for (i = 0; i < count; i++)
+				for (COObject *oldObj in oldObjects)
 				{
-					[array addObject: [mv valueAtIndex: i]];
+					[oldObj setValue: nil forProperty: oppositeName];
+				}
+				for (COObject *newObj in newObjects)
+				{
+					[[newObj valueForProperty: oppositeName] removeObject: newObj forProperty: key];
+					[newObj setValue: self forProperty: oppositeName];
+				}	
+			}
+
+			for (COObject *obj in [oldObjects setByAddingObjectsFromSet: newObjects])
+			{
+				[obj setIgnoringRelationshipConsistency: NO];
+			}
+		}
+	}
+	[self setIgnoringRelationshipConsistency: NO];
+}
+
+- (BOOL) setValue: (id)value forProperty: (NSString *)key
+{
+	/* We call the setter directly if implemented */
+
+	NSString *setterName = [@"set" stringByAppendingString: [key capitalizedString]];
+	SEL setter = NSSelectorFromString(setterName);
+
+	if ([self respondsToSelector: setter])
+	{
+		// NOTE: We could -setValue:forKey: to get a fallback on 
+		// -setValue:forUndefinedKey: if we have a type mistmatch between the 
+		// value and the setter argument.
+		[self performSelector: setter withObject: value];
+		return YES;
+	}
+
+	/* Otherwise we do the integrity check, update the variable storage, and 
+	   trigger the change notifications */
+
+	if (![[self propertyNames] containsObject: key])
+	{
+		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
+		return NO;
+	}
+
+	// FIXME: Move this check elsewhere or rework it because it can break on 
+	// transient values or archived objects such as NSColor, NSView.
+	//if (![COObject isCoreObjectValue: value])
+	//{
+	//	[NSException raise: NSInvalidArgumentException format: @"Invalid property type"];
+	//}
+	
+	[self updateRelationshipConsistencyWithValue: value forProperty: key];
+	value = [self checkMutabilityForCollection: value];
+	[self checkEditingContextForValue: value];
+	
+	[self willChangeValueForProperty: key];
+	[self setPrimitiveValue: value forKey: key];
+	[self didChangeValueForProperty: key];
+
+	return YES;
+}
+
+- (id)primitiveValueForKey: (NSString *)key
+{
+	id value = [_variableStorage objectForKey: key];
+	return (value == [NSNull null] ? nil : value);
+}
+
+- (void) setPrimitiveValue: (id)value forKey: (NSString *)key
+{
+	[_variableStorage setObject: (value == nil ? [NSNull null] : value)
+						 forKey: key];
+}
+
+- (id)valueForUndefinedKey: (NSString *)key
+{
+	return [self primitiveValueForKey: key];
+}
+
+- (void)setValue: (id)value forUndefinedKey: (NSString *)key
+{
+	[self setPrimitiveValue: value forKey: key];
+}
+
+- (void) addObject: (id)object forProperty:(NSString*)key
+{
+	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	if (![desc isMultivalued])
+	{
+		[NSException raise: NSInvalidArgumentException format: @"attempt to call addObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
+	}
+	
+	// FIXME: Modify the value directly.. this will require refactoring setValue:forProperty:
+	// so that we can run the relationship integrity code and other checks directly
+	id copy = [[self valueForProperty: key] mutableCopy];
+	if (!([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]))
+	{
+		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+	}
+	
+	[copy addObject: object];
+	[self setValue: copy forProperty: key];
+	[copy release];
+}
+- (void) insertObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString*)key
+{
+	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	if (!([desc isMultivalued] && [desc isOrdered]))
+	{
+		[NSException raise: NSInvalidArgumentException format: @"attempt to call inesrtObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
+	}
+	
+	// FIXME: see comment in addObject:ForProperty
+	
+	id copy = [[self valueForProperty: key] mutableCopy];
+	if (!([copy isKindOfClass: [NSMutableArray class]]))
+	{
+		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+	}
+	
+	[copy insertObject: object atIndex: index];
+	[self setValue: copy forProperty: key];
+	[copy release];
+}
+- (void) removeObject: (id)object forProperty:(NSString*)key
+{
+	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	if (![desc isMultivalued])
+	{
+		[NSException raise: NSInvalidArgumentException format: @"attempt to call removeObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
+	}
+	
+	// FIXME: see comment in addObject:ForProperty
+	
+	id copy = [[self valueForProperty: key] mutableCopy];
+	if (!([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]))
+	{
+		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+	}
+	[copy removeObject: object];
+	[self setValue: copy forProperty: key];
+	[copy release];
+}
+- (void) removeObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString*)key
+{
+	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	if (!([desc isMultivalued] && [desc isOrdered]))
+	{
+		[NSException raise: NSInvalidArgumentException format: @"attempt to call removeObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
+	}
+	
+	// FIXME: see comment in addObject:ForProperty
+	
+	id copy = [[self valueForProperty: key] mutableCopy];
+	if (!([copy isKindOfClass: [NSMutableArray class]]))
+	{
+		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+	}
+	
+	[copy removeObject: object atIndex: index hint: nil];
+	[self setValue: copy forProperty: key];
+	[copy release];
+}
+
+- (void)willChangeValueForProperty: (NSString *)key
+{
+	[super willChangeValueForKey: key];
+}
+
+- (void) notifyContextOfDamageIfNeededForProperty: (NSString*)prop
+{
+	if (!_isIgnoringDamageNotifications)
+	{
+		[_context markObjectUpdated: self forProperty: prop];
+	}
+}
+
+- (void)didChangeValueForProperty: (NSString *)key
+{
+	[self notifyContextOfDamageIfNeededForProperty: key];
+	[super didChangeValueForKey: key];
+}
+
+- (void)didCreate
+{
+
+}
+
+- (void)awakeFromInsert
+{
+	// Set up collections
+	BOOL wasIgnoringDamage = _isIgnoringDamageNotifications;
+	_isIgnoringDamageNotifications = YES;
+	
+	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+	{
+		if ([propDesc isMultivalued])
+		{
+			id container = [propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set];
+			[self setValue: container forProperty: [propDesc name]];
+		}
+	}
+	
+	_isIgnoringDamageNotifications = wasIgnoringDamage;
+}
+
+- (void)awakeFromFetch
+{
+	// Debugging check that collections were set up properly
+	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+	{
+		if ([propDesc isMultivalued])
+		{
+			Class cls = [propDesc isOrdered] ? [NSMutableArray class] : [NSMutableSet class];
+			if (![[self valueForProperty: [propDesc name]] isKindOfClass: cls])
+			{
+				[NSException raise: NSInternalInconsistencyException format: @"Property %@ of %@ is a collection but was not set up properly", [propDesc name], self];
+			}
+		}
+	}
+}
+
+- (void)willTurnIntoFault
+{
+
+}
+
+- (void)didTurnIntoFault
+{
+
+}
+
+- (void)didReload
+{
+
+}
+
+- (NSUInteger)hash
+{
+	return [_uuid hash] ^ 0x39ab6f39b15233de;
+}
+
+- (BOOL)isEqual: (id)anObject
+{
+	if (anObject == self)
+	{
+		return YES;
+	}
+	if (![anObject isKindOfClass: [COObject class]])
+	{
+		return NO;
+	}
+	if ([[anObject UUID] isEqual: _uuid])
+	{
+		return YES;
+	}
+	return NO;
+}
+
+- (BOOL)isDeeplyEqual: (id)object
+{
+	// FIXME: Incomplete/incorrect
+	if ([object isKindOfClass: [COObject class]])
+	{
+		COObject *other = (COObject*)object;
+		if (![[self UUID] isEqual: [other UUID]])
+		{
+			return NO; 
+		}
+		for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+		{
+			if (![propDesc isDerived])
+			{
+				id selfValue = [self valueForProperty: [propDesc name]];
+				id otherValue = [other valueForProperty: [propDesc name]];
+				if (selfValue == otherValue)
+				{
+					continue;
+				}
+				if (![selfValue isEqual: otherValue] && !(selfValue == nil && otherValue == nil))
+				{
+					return NO; 
 				}
 			}
-			return AUTORELEASE(array);
 		}
+		return YES;
 	}
-	return [self valueForKey: key];
+	return NO;
 }
 
-/* Return all text for search */
-- (NSString *) _textContent
+- (BOOL) isTemporalInstance: (id)anObject
 {
-	NSMutableString *text = [[NSMutableString alloc] init];
-	NSEnumerator *e = [[[self class] properties] objectEnumerator];
-	NSString *property = nil;
-	while ((property = [e nextObject]))
+	if (anObject == self)
 	{
-		COPropertyType type = [[self class] typeOfProperty: property];
-		switch(type)
-		{
-			case kCOStringProperty:
-			case kCOArrayProperty:
-			case kCODictionaryProperty:
-				[text appendFormat: @"%@ ", [[self valueForProperty: property] description]];
-				break;
-			case kCOMultiStringProperty:
-			case kCOMultiArrayProperty:
-			case kCOMultiDictionaryProperty:
-				{
-					COMultiValue *mv = [self valueForProperty: property];
-					int i, count = [mv count];
-					for (i = 0; i < count; i++)
-					{
-						[text appendFormat: @"%@ ", [[mv valueAtIndex: i] description]];
-					}
-				}
-				break;
-			default:
-				continue;
-		}
+		return YES;
 	}
-	return AUTORELEASE(text);
+	if (![anObject isKindOfClass: [COObject class]])
+	{
+		return NO;
+	}
+	if ([[anObject UUID] isEqual: _uuid] && [[anObject revision] isEqual: [self revision]])
+	{
+		return YES;
+	}
+	return NO;
 }
 
-/* Deprecated */
-
-- (NSString *) uniqueID
+- (COCommitTrack *)commitTrack
 {
-	return [self valueForProperty: kCOUIDProperty];
+	return [_context trackWithObject: self];
+}
+
+- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
+{
+	// TODO: Check and traverse relationships to visit the object graph
+	return ([[aQuery predicate] evaluateWithObject: self] ? A(self) : [NSArray array]);
+}
+
+- (id)roundTripValueForProperty: (NSString *)key
+{
+	id plist = [self propertyListForValue: [self serializedValueForProperty: key]];
+	return [self valueForPropertyList: plist];
+}
+
+static int indent = 0;
+
+- (NSString *)detailedDescription
+{
+	if (_inDescription)
+	{
+		return [NSString stringWithFormat: @"<Recursive reference to %@(%@) at %p UUID %@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
+	}
+	_inDescription = YES;
+	indent++;
+	NSMutableString *str = [NSMutableString stringWithFormat: @"<%@(%@) at %p UUID %@ data: {\n",  [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
+	indent++;
+	
+	NSMutableArray *props = [NSMutableArray arrayWithArray: [self persistentPropertyNames]];
+	if ([props containsObject: @"contents"])
+	{
+		[props removeObject: @"contents"];
+		[props insertObject: @"contents" atIndex: 0];
+	}
+	if ([props containsObject: @"label"])
+	{
+		[props removeObject: @"label"];
+		[props insertObject: @"label" atIndex: 0];
+	}
+	for (NSString *prop in props)
+	{
+		NSMutableString *valuestring = [NSMutableString string];
+		id value = [self valueForProperty: prop];
+		if ([value isKindOfClass: [NSSet class]])
+		{
+			[valuestring appendFormat: @"(\n"];
+			for (id item in value)
+			{
+				for (int i=0; i<indent + 1; i++) [valuestring appendFormat: @"\t"];
+				[valuestring appendFormat: @"%@\n", [item description]];	
+			}
+			for (int i=0; i<indent; i++) [valuestring appendFormat: @"\t"];
+			[valuestring appendFormat: @"),\n"];
+		}
+		else if ([value isKindOfClass: [NSArray class]])
+		{
+			[valuestring appendFormat: @"{\n"];
+			for (id item in value)
+			{
+				for (int i=0; i<indent + 1; i++) [valuestring appendFormat: @"\t"];
+				[valuestring appendFormat: @"%@", [item description]];	
+			}
+			for (int i=0; i<indent; i++) [valuestring appendFormat: @"\t"];
+			[valuestring appendFormat: @"},\n"];
+		}
+		else
+		{
+			[valuestring appendFormat: @"%@,\n", [value description]];
+		}
+
+		
+		for (int i=0; i<indent; i++) [str appendFormat: @"\t"];
+		[str appendFormat:@"%@ : %@", prop, valuestring]; 
+	}
+	indent--;
+	for (int i=0; i<indent; i++) [str appendFormat: @"\t"];
+	[str appendFormat:@"}>\n"];
+	indent--;
+	_inDescription = NO;
+	return str;
+}
+
+- (NSString *)description
+{
+	if (_inDescription)
+	{
+		// If we are called recursively, don't print the contents of _variableStorage
+		// since it would result in an infinite loop.
+		return [NSString stringWithFormat: @"<Recursive reference to %@(%@) at %p UUID %@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];
+	}
+	
+	_inDescription = YES;
+	NSString *desc;
+	if ([self isFault])
+	{
+		desc = [NSString stringWithFormat: @"<Faulted %@(%@) %p UUID=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];  
+	}
+	else
+	{
+		desc = [NSString stringWithFormat: @"<%@(%@) %p UUID=%@ properties=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid, [self propertyNames]];  
+	}
+	_inDescription = NO;
+	return desc;
+}
+
+- (NSString *)typeDescription
+{
+	return [[self entityDescription] localizedDescription];
+}
+
+- (NSString *)tagDescription
+{
+	return [(NSArray *)[[[self tags] mappedCollection] tagString] componentsJoinedByString: @", "];
+}
+
+/* 
+ * Private 
+ */
+
++ (Class)faultClass
+{
+	return [COObjectFault class];
+}
+
+- (void)turnIntoFault
+{
+	if ([self isFault])
+		return;
+
+	[self willTurnIntoFault];
+	ASSIGN(_variableStorage, nil);
+	object_setClass(self, [[self class] faultClass]);
+	[self didTurnIntoFault];
+}
+
+- (NSError *)unfaultIfNeeded
+{
+	ETAssert([self isFault] == NO);
+	return nil;
+}
+
+- (BOOL)isIgnoringRelationshipConsistency
+{
+	return _isIgnoringRelationshipConsistency;
+}
+
+- (void)setIgnoringRelationshipConsistency: (BOOL)ignore
+{
+	_isIgnoringRelationshipConsistency = ignore;
+}
+
+- (id)serializedValueForProperty: (NSString *)key
+{
+	if (![[self propertyNames] containsObject: key])
+	{
+		[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
+	}
+
+	/* First we try to use the getter named 'serialized' + 'key' */
+
+	// TODO: Probably a bit slow, rewrite in C a bit
+	NSString *capitalizedKey = [key stringByReplacingCharactersInRange: NSMakeRange(0, 1) 
+	                                                        withString: [[key substringToIndex: 1] uppercaseString]];
+	SEL getter = NSSelectorFromString([@"serialized" stringByAppendingString: capitalizedKey]);
+
+	if ([self respondsToSelector: getter])
+	{
+		return [self performSelector: getter];
+	}	
+
+	/* If no custom getter can be found, we use PVC which will in last resort 
+	   access the variable storage with -primitiveValueForKey: */
+
+	return [self valueForProperty: key];
+}
+
+- (void)setSerializedValue: (id)value forProperty: (NSString *)key
+{
+	if (![[self propertyNames] containsObject: key])
+	{
+		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
+	}
+
+	// TODO: We should check (but not update) the relationship consistency in a 
+	// vein similar to [self updateRelationshipConsistencyWithValue: value forProperty: key];
+
+	value = [self checkMutabilityForCollection: value];
+	[self checkEditingContextForValue: value];
+	
+	/* First we try to use the setter named 'setSerialized' + 'key' */
+
+	// TODO: Probably a bit slow, rewrite in C a bit
+	NSString *capitalizedKey = [key stringByReplacingCharactersInRange: NSMakeRange(0, 1) 
+	                                                        withString: [[key substringToIndex: 1] uppercaseString]];
+	SEL setter = NSSelectorFromString([NSString stringWithFormat: @"%@%@:", 
+		@"setSerialized", capitalizedKey, @":"]);
+
+	if ([self respondsToSelector: setter])
+	{
+		[self performSelector: setter withObject: value];
+		return;
+	}	
+	
+	/* When no custom setter can be found, we try to access the ivar with KVC semantics */
+
+	[self willChangeValueForProperty: key];
+
+	if (ETSetInstanceVariableValueForKey(self, value, key) == NO)
+	{
+		/* If no valid ivar can be found, we access the variable storage */
+		[self setPrimitiveValue: value forKey: key];
+	}
+
+	[self didChangeValueForProperty: key];
+}
+
+static NSArray *COArrayPropertyListForArray(NSArray *array)
+{
+	NSMutableArray *newArray = [NSMutableArray arrayWithCapacity: [array count]];
+	for (id value in array)
+	{
+		if ([value isKindOfClass: [COObject class]])
+		{
+			value = [(COObject*)value referencePropertyList];
+		}
+		[newArray addObject: value];
+	}
+	return newArray;
+}
+
+/* Returns the CoreObject serialized type for a NSValue or NSNumber object.
+
+Nil is returned when the type is unsupported by CoreObject serialization. */
+- (NSString *)typeForValue: (id)value
+{
+	const char *type = [value objCType];
+
+	if  (strcmp(type, @encode(NSPoint)) == 0)
+	{
+		return @"point";
+	}
+	else if (strcmp(type, @encode(NSSize)) == 0)
+	{
+		return @"size";
+	}
+	else if (strcmp(type, @encode(NSRect)) == 0)
+	{
+		return @"rect";
+	}
+	else if (strcmp(type, @encode(NSRange)) == 0)
+	{
+		return @"range";
+	}
+	else if (strcmp(type, @encode(SEL)) == 0)
+	{
+		return @"sel";
+	}
+	return nil;
+}
+
+/* See ETGeometry.h in EtoileUI */
+static const NSPoint CONullPoint = {FLT_MIN, FLT_MIN};
+static const NSSize CONullSize = {FLT_MIN, FLT_MIN};
+static const NSRect CONullRect = {{FLT_MIN, FLT_MIN}, {FLT_MIN, FLT_MIN}};
+
+/* Returns the CoreObject serialization result for a NSValue or NSNumber object.
+
+Nil is returned when the value type is unsupported by CoreObject serialization. */
+- (NSString *)stringValueForValue: (id)value
+{
+	const char *type = [value objCType];
+
+	if  (strcmp(type, @encode(NSPoint)) == 0)
+	{
+		NSPoint point = [value pointValue];
+		if (NSEqualPoints(point, CONullPoint))
+		{
+			return @"null-point";
+		}
+		return NSStringFromPoint(point);
+	}
+	else if (strcmp(type, @encode(NSSize)) == 0)
+	{
+		NSSize size = [value sizeValue];
+		if (NSEqualSizes(size, CONullSize))
+		{
+			return @"null-size";
+		}
+		return NSStringFromSize(size);
+	}
+	else if (strcmp(type, @encode(NSRect)) == 0)
+	{
+		NSRect rect = [value rectValue];
+		if (NSEqualRects(rect, CONullRect))
+		{
+			return @"null-rect";
+		}
+		return NSStringFromRect(rect);
+	}
+	else if (strcmp(type, @encode(NSRange)) == 0)
+	{
+		return NSStringFromRange([value rangeValue]);
+	}
+	else if (strcmp(type, @encode(SEL)) == 0)
+	{
+		return NSStringFromSelector((SEL)[value pointerValue]);
+	}
+	return nil;
+}
+
+- (NSDictionary *)propertyListForValue: (id)value
+{
+	NSDictionary *result = nil;
+
+	/* Some root object relationships are special in the sense the value can be 
+	   a core object but its persistency isn't enabled. We interpret these 
+	   one-to-one relationships as transient.
+	   Usually a root object belongs to some other objects at run-time, in some 
+	   cases the root object  want to hold a backward pointer (inverse 
+	   relationship) to those non-persistent object(s).
+	   For example, a root object can be a layout item whose parent item is the 
+	   window group... In such a case, we don't want to persist the window 
+	   group, but ignore it. At deseserialiation time, the app is responsible 
+	   to add the item back to the window group (the parent item would be 
+	   restored then). */
+	if ([value isKindOfClass: [COObject class]])
+	{
+		if ([value isPersistent])
+		{
+			result = [value referencePropertyList];
+		}
+		else
+		{
+			ETAssert([self isRoot]);
+			result = D(@"nil", @"type");
+		}
+	}
+	else if ([value isKindOfClass: [NSArray class]])
+	{
+		result = (NSDictionary *)COArrayPropertyListForArray(value);
+	}
+	else if ([value isKindOfClass: [NSSet class]])
+	{
+		result = [NSDictionary dictionaryWithObjectsAndKeys:
+				 @"unorderedCollection", @"type",
+				 COArrayPropertyListForArray([value allObjects]), @"objects",
+				 nil];
+	}
+	else if (value == nil)
+	{
+		result = [NSDictionary dictionaryWithObject: @"nil" forKey: @"type"];
+	}
+	else if ([COObject isPrimitiveCoreObjectValue: value])
+	{
+		result = D(value, @"value", @"primitive", @"type");
+	}
+	else if ([value isKindOfClass: [NSValue class]] && [self typeForValue: value] != nil)
+	{
+		result = D([self stringValueForValue: value], @"value", [self typeForValue: value] , @"type");
+	}
+	else
+	{
+		// FIXME: Perhaps add a method which can be overriden to explicitly 
+		// declare which instances we can encode without raising an exception.
+		// For example... -validCoreObjectDataClasses.
+		// Would be better to get these from [ETPropertyDescription type].
+		result = (NSDictionary *)[NSKeyedArchiver archivedDataWithRootObject: value];
+	
+		//[NSException raise: NSInvalidArgumentException
+		//            format: @"value must of type COObject, NSArray, NSSet or nil"];
+		//return nil;
+	}
+	return result;
+}
+
+- (NSDictionary *)referencePropertyList
+{
+	NSAssert1([self isPersistent], 
+		@"Usually means -becomePersistentInContext:rootObject: hasn't been called on %@", self);
+
+	return [NSDictionary dictionaryWithObjectsAndKeys:
+			@"object-ref", @"type",
+			[_uuid stringValue], @"uuid",
+			[_entityDescription fullName], @"entity",
+			nil];
+}
+
+- (NSObject *)valueForPropertyList: (NSObject *)plist
+{
+	// TODO: Could move the string to NSValue handling to a new method 
+	// -valueForString:... Would be more symetric if we allow subclasses to 
+	// declare new value types
+
+	if ([plist isKindOfClass: [NSDictionary class]])
+	{
+		NSString *type = [plist valueForKey: @"type"];
+
+		if ([type isEqualToString: @"object-ref"])
+		{
+			ETUUID *uuid = [ETUUID UUIDWithString: [plist valueForKey: @"uuid"]];
+			return [[self editingContext] objectWithUUID: uuid 
+			                                  entityName: [plist valueForKey: @"entity"]
+			                                  atRevision: nil];
+		}
+		else if ([type isEqualToString: @"unorderedCollection"])
+		{
+			NSArray *objects = [plist valueForKey: @"objects"];
+			NSMutableSet *set = [NSMutableSet setWithCapacity: [objects count]];
+			for (int i = 0; i < [objects count]; i++)
+			{
+				[set addObject: [self valueForPropertyList: [objects objectAtIndex:i]]];
+			}
+			return set;
+		}
+		else if ([type isEqualToString: @"nil"])
+		{
+			return nil;
+		}
+		else if ([type isEqualToString: @"primitive"])
+		{
+			return [plist valueForKey: @"value"];
+		}
+		else if ([type isEqualToString: @"point"])
+		{
+			NSString *pointString = [plist valueForKey: @"value"];
+			NSPoint point;
+			if ([pointString isEqualToString: @"null-point"])
+			{
+				point = CONullPoint;
+			}
+			else
+			{
+				point = NSPointFromString(pointString);
+			}
+			return [NSValue valueWithPoint: point];
+		}
+		else if ([type isEqualToString: @"size"])
+		{
+			NSString *sizeString = [plist valueForKey: @"value"];
+			NSSize size;
+			if ([sizeString isEqualToString: @"null-size"])
+			{
+				size = CONullSize;
+			}
+			else
+			{
+				size = NSSizeFromString(sizeString);
+			}
+			return [NSValue valueWithSize: size];
+		}
+		else if ([type isEqualToString: @"rect"])
+		{
+			NSString *rectString = [plist valueForKey: @"value"];
+			NSRect rect;
+			if ([rectString isEqualToString: @"null-rect"])
+			{
+				rect = CONullRect;
+			}
+			else
+			{
+				rect = NSRectFromString(rectString);
+			}
+			return [NSValue valueWithRect: rect];
+		}
+		else if ([type isEqualToString: @"range"])
+		{
+			return [NSValue valueWithRange: NSRangeFromString([plist valueForKey: @"value"])];
+		}
+		else if ([type isEqualToString: @"sel"])
+		{
+			SEL sel = NSSelectorFromString([plist valueForKey: @"value"]);
+			return [NSValue valueWithBytes: &sel objCType: @encode(SEL)];
+		}
+	}
+	else if ([plist isKindOfClass: [NSArray class]])
+	{
+		NSUInteger count = [(NSArray*)plist count];
+		id mapped[count];
+		for (int i = 0; i < count; i++)
+		{
+			mapped[i] = [self valueForPropertyList: [(NSArray*)plist objectAtIndex:i]];
+		}
+		return [NSArray arrayWithObjects: mapped count: count];
+	}
+	else if ([plist isKindOfClass: [NSData class]])
+	{
+		return [NSKeyedUnarchiver unarchiveObjectWithData: (NSData *)plist];
+	}
+
+	return plist;
 }
 
 @end

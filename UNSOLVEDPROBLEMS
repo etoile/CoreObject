@@ -1,0 +1,218 @@
+Unsolved Problems
+=================
+
+
+
+Branching Models
+----------------
+Possibilities:
+ - git style: branches happen at the entire-repository level. so creating a
+   branch conceptually takes a snapshot of the entire repository. while this 
+   is simple, it wouldn't work so well for CoreObject because
+	typically you just want to branch one document or one project, not every
+	object on your system 
+
+ - The approach I was trying was having per-object branches managed at the
+	store level, but it's looking to be really complicated.
+	
+ - subversion style: branching is making a copy. one problem with the
+   subversion implementation of this idea is branches live in the
+   same namespace as the filesystem, which you could argue is a bad idea,
+   since branching is sort of a meta-level operation.
+
+Here is a good blog post explaining the limitations of DAG-based vcs's
+(git/mercurial/bazaar/etc.), compared with subversion's more flexible
+branching model:
+http://softwareswirl.blogspot.com/2009/08/git-mercurial-and-bazaarsimplicity.html
+
+See also:
+http://www.bcs-cmsg.org.uk/conference/2003/papers/wingerd.pdf
+"Container-Based SCM and Inter-File Branching" describing Perforce's branching
+model (sounds the same as subversion - making copies of directories - but
+perforce had accurate branch/merge metadata several years before Subversion) 
+
+Selective Undo
+-------------
+
+"A Selective Undo Mechanism for Graphical User Interfaces Based On Command Objects"
+by Thomas Berlage makes a good case for 'direct selective undo' (what I implemented)
+rather than "script-based" selective undo.
+
+We will use the 'opposite' property description metamodel property to indicate
+that relationship integrity maintainence should be performed.
+
+Attributed String Merging
+-------------------------
+If we used one object per character, this would work out of the box.
+
+Example:
+
+			    /--> "_eto_ile" (underline)
+      "etoile"
+	           \--> "e*toile*" (bold)
+			   
+merging the two branches shouldn't conflict, because a character can be both
+bold and underlined.  but if we modeled it as:
+
+ORIGINAL: textRuns : ( { uuid : u1, string : 'etoile'} )
+  
+V1:       textRuns : ( { uuid : u2, string : 'eto', attrs : underline }, { uuid : u3, string : 'ile' } )
+
+V2:       textRuns : ( { uuid : u4, string : 'e' }, { uuid : u5, string : 'toile', attrs : bold } )
+  
+The merge would have conflicts, but we don't want it to.
+
+However... 
+
+			    /--> "_eto_ile" (heading level 1)
+      "etoile"
+	           \--> "e*toile*" (heading level 2)
+
+Merging these should conflict, because a character can only have one heading level.
+
+
+
+Will splitting/recombining cause problems with object identity?
+-> It means we can't give any semantics to the UUID of a run of text.
+This is probably OK.
+
+
+
+Cascading undo
+--------------
+If the history has something like:
+
+...
+Insert circle c1
+modify c1
+modify c1
+modify c1
+modify c1
+modify c1
+...
+
+and the user does a selective undo of "insert c1", should
+we hide the "modify c1" actions from the history track until the "insert c1" 
+action is re-done?
+
+
+
+Q: What if you branch while sharing a document? set a branch?
+A: Synchronization is a complex and multi-step process. Depending on the application,
+it needs to be customized.
+For example, mercural transfers all branches by default, while git only the current branch.
+
+
+Question: Where do we implement the "contingency" thing?
+It should be factored out in to a COSynchronizer class.
+
+
+
+The GitX UI is handy => Would be nice if we had a way of labelling groups
+of commits as one logical change.
+
+
+Storing metamodels in the store as normal COObjects sounds nice...
+It could work.
+The main problem is that custom model classes would have to put up with all possible
+metamodel versions, but that's a reasonable thing to ask for.
+This would enable modifiable metamodels, and flexible objects.
+
+Problem: Merge Conflict Handling
+--------------------------------
+
+-> in some cases we'll want a most-recent-wins policy (however conflict metadata
+   should still be saved in the db?)
+  
+Open question: when a merge generates conflicts, should the user be able to
+resolve them at a finer granularity than a commit? probably not..
+
+Solution: 
+
+for:
+e.g. user edits properties of a picture (location, title, notes, people) in
+a property sheet, and commits the sheet all at once. in the meantime a
+collaborator set the name to something else.
+The right resolution UI would let the user just resolve the name field.
+
+against:
+is it posiible that the user could mess up the consistency of the commit?
+yes.. but this is always possible. it's up to the UI to ensure that
+only sensible merge resolutions are done.
+
+conclusion: for.
+
+Q:
+where should the conflict data be stored?
+A:
+in the metadata section of the object
+ -> the conflict metadata is versioned just like any other data,
+ and resolving a conflict just deletes the metadata and commits the change.
+ 
+Q:
+How exactly should the conflict metadata be structured?
+A:
+moves should be detected.
+it should be a set of operations.
+-> want to support easy diff visualization
+ (show me an editable visualization of all the changes I've made to this document)
+
+  1. We can apply the nonconflicting changes, then store pairs of altrenate
+   operations in the metadata.
+    -> this is actually not feasible. Not applying any changes means those
+    properties would be left back at the base version - i.e. totally inconsisteny.
+    conclusion: abosolutely not
+    
+  2. favour one side (the 'base side' of the merge) 
+    then in the conflict metadata store a list of operations which transform the
+    current state into the altrenate result, which can be selectively applied.
+
+    -> the challenge here is that further commits can mess up the operations.
+    since operations need to be transformed.
+  
+  3. maybe there's some other way where we get the conflict data
+    kept consistent for free..
+    
+    if the merge is conflict free, you get this:
+    
+      /-B-C--D--\ 
+     /           \
+    a--b--c--d----\-e
+    
+    of course there may be minor errors that need to be corrected by hand.
+    
+    if the merge has conflicts, you get this:
+    
+      /-B-C--D--\-/-E
+     /           X  
+    a--b--c--d--/-\-e
+    
+    where e is the merge favouring lowecase, and E favour uppercase.
+
+    ... hm ..
+    
+    then resolving the conflict is a matter of merging E and e.
+    
+    displaying a merge UI wich can accomodate incoming commits,
+    will require recomputing diffs.
+
+    
+Principles merging should obey:
+ - when you get changes you should be able to keep working 
+ - don't want the user to get lost in branches
+    
+    
+Q: what should the user diff api look like?
+A: want:
+ - a list of operation, each op containg affect locations (uuid/peroperty)
+ - e.g. <move uuid 0x2345 from uuid 0x123 : people [3] to uuid 0x456 friends[5]>.
+
+Q: how should resolving conflicts interact with undo?
+A: resolving a conflict should be undoable.
+
+Q: what if a conflict occurrs in the conflict metadata!?!
+A: just use a most-recent-wins policy.
+
+Q: should conflict metadata be shared with other users when collaborating?
+A: probably not.
+

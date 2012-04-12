@@ -1,0 +1,43 @@
+Notes
+=======
+
+"Scalable XML Collaborative Editing with Undo" - Stéphane Martin, Pascal Urso, and Stéphane Weiss
+http://arxiv.org/pdf/1010.3615
+
+A recent paper with an approached to editing structured documents with selective
+undo.
+
+
+History navigation
+-------------------
+
+Here is a nice paper looking at history navigation in various applications
+(windows help, word, netscape, etc)
+
+http://www.comp.lancs.ac.uk/~dixa/papers/histchap97/histchap97.pdf
+
+Undo/Redo
+---------
+
+Interesting discussion of undo/redo in Eclipse. 
+Looks at different undo contexts (curent text edit view vs workspace)
+http://dev.eclipse.org/viewcvs/viewvc.cgi/platform-ui-home/R3_1/undo-redo-proposal/undo-redo%20problem.html?view=co
+
+UI Defaults:
+------------
+The Undo/Redo/Branch commands should apply to the active document by default.
+
+	Branch Menu
+	--------------
+ (Default Branch)
+    Trying DIfferent Brush    (X = delete)
+    New Branch...
+
+
+Branch Metadata should be mutable.i.e. isOpen controls whether the branch appears on the menus.Design:
+The CoreObject store is composed to two halves:
+an immutable per-object commit log,
+and
+a mutable portion which records the current version of each object, defines a 
+per-object history track by labeling a tip and current commit.
+

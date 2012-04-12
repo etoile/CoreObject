@@ -1,0 +1,126 @@
+Implementation Notes
+=====================
+
+Note: We should be able to use one editing context for all of ProjectDemo.
+
+
+
+
+Implementation plans:
+======================
+
+
+Full-text-search
+-------------
+	- use FTS engine on the commit log
+	- status: implemented, not well tested
+	
+Live Collaboration
+-------------
+	- use differential synchronization / history tracks
+
+Synchronization
+-------------
+	- use differential synchronization / history tracks
+
+Commit/Update Feeds
+-------------
+	use history tracks
+
+History Tracks
+-------------
+	- partially implemented
+
+Tagging/Grouping
+-------------
+	either store text tags in a ‘tags’ property
+tags are groups, and store objects in them to make them tagged.
+
+
+Ontology Matching
+-------------
+	Synonyms from wordnet (for english) e.g. bat((club), (mammal))
+
+Distributed Storage
+-------------
+	?
+	
+
+Deletion Model / Trash Group
+-------------
+    ?
+
+
+Compression
+-------------
+
+Security
+-------------
+
+Encryption
+-------------
+
+
+Temporal Metadata Indexing
+---------------------------
+
+Same as temporal full-text indexing.
+
+
+Concurrency
+------------
+Exactly what needs locking?
+
+The COStore api should be easy to use and not feel like a database.
+
+What can fail?
+  - user 1 loads object A into an editing context, and modifies it.
+  - user 2 changes 'current' of object A.
+  => Framework needs special handling (merge)
+  
+What should succeed silently
+ - user 1 sets current of object A
+ - user 2 sets current of object A simultaneously
+ => One should win (at random)
+
+Setting a batches of 'current' or 'tip's should be atomic, probably
+
+
+
+
+Diff notes
+----------
+
+Currently, for diffing ordered sequences, I'm using a BSD-licensed C++ implementation
+(diff.hh) of the Myers algorithm, the same algorithm GNU diff implements.
+It doesn't really need to be C++, that was just easiest for me to work with
+when porting it from C#.
+
+The GNU algorithm has some heuristics which my implementation lacks, so the GNU
+code is faster in some cases. I think this mostly affects diffing unrelated arrays.
+I did one test case with 130k element arrays, and large unrelated sections.
+GNU diff was about 0.3s, and mine was 3.0s. Not too much worse, anyway.
+
+Another algorithm I investigated is the one used in python's difflib. It's
+conceptually very simple (find the longest common _substring_, then recursively
+repeat the algorithim on the two non-common sides of the string. This
+will incrementally generate a long common subsequence (i.e. diff). I wrote a 
+test implementation in ObjC but it was too slow -- need to play with the idea 
+a bit more. One possibility is to just stop after doing a certain amount of work,
+since the alrogithm produces an increasingly good approximation of the LCS at
+each stage in a way that is intuitive to humans.
+
+
+Other links:
+- libxdiff (http://www.xmailserver.org/xdiff-lib.html), LGPL
+   This has a collection of algorithims including the python one and the myers one
+   with the heuristics, but is LGPL licensed.
+
+- libmba (http://www.ioplex.com/~miallen/libmba/dl/src/diff.c), MIT
+   Myers algorithm
+   
+- google-diff-patch-match (http://code.google.com/p/google-diff-match-patch), ApacheV2
+
+- patience diff (http://bramcohen.livejournal.com/73318.html)
+   This seems to produce output similar to the python algorithim.
+   

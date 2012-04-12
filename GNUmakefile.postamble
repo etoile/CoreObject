@@ -1,6 +1,0 @@
-after-all::
-ifeq ($(FOUNDATION_LIB), apple)
-#	@cp -f Info.plist $(FRAMEWORK_NAME).framework/Contents/Info.plist
-	install_name_tool -id @executable_path/../Frameworks/$(FRAMEWORK_NAME).framework/$(FRAMEWORK_NAME) $(FRAMEWORK_NAME).framework/$(FRAMEWORK_NAME)
-endif
-

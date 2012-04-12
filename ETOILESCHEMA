@@ -1,0 +1,73 @@
+This is just a brainstorm of possible object types in Etoile, to help think
+about features CoreObject requires.
+
+Desktop : COObject
+	{ workspaces : NSArray<Workspace>, strong
+	overlayshelf : NSArray<COObject>, strong }
+
+Workspace : COObject
+	{ background : COFileObject, strong
+	contents: NSArray<COObject>, strong}
+
+
+// Text document
+
+
+TypewriterDocument : COObject
+	{ text : ETTextTree, strong }
+
+ETText : COObect
+	{ length : NSNumber, strong,
+	  parent : ETText, weak,
+	  customAttributes : NSDictionary, strong,
+	  textType : COObject , strong }
+
+ETTextTree : ETText
+	{ children : NSArray<ETTextTree>, strong, }
+	  
+ETTextFragment : ETText
+	{ text : NSString, strong }
+
+
+// Drawing document
+
+
+DrawingDocument : COObject
+	{ layers : NSArray<Layer>, strong,
+	  mediaproperties: COObject, strong, // page size, etc.
+	  }
+
+Layer : COObject
+	{ blendingmode : NSString, strong,
+	  contents : NSArray<GraphicObject>, strong }
+
+GraphicObject : COObject
+	{ parent : COObject, weak,
+	   frame : NSValue, strong
+	  transform : NSAffineTransform, strong,
+	  opacity: NSValue, strong,
+	  blendingmode : NSString, strong, }
+
+GraphicGroup : GraphicObject
+	{ contents : NSArray<GraphicObject>, strong }
+
+Shape : GraphicsObject
+	{ fillstyle : ?, strong,
+	  strokestyle : ?, strong,
+	  points : NSBezierPath, strong }
+	  
+Text : GraphicsObject
+	{ text : NSString }
+
+
+
+// Photo / PDF organizer
+
+Photo 
+{
+	title : NSString,
+	people : NSArray<Person>, weak,
+	description : NSString,
+	
+
+}

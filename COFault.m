@@ -7,27 +7,11 @@
 */
 
 #import "COFault.h"
-#import "COObjectContext.h"
-#import "COMetadataServer.h"
+#import "COEditingContext.h"
+#import "COObject.h"
+#include <objc/runtime.h>
 
 @implementation COObjectFault
-
-- (id) initWithFaultDescription: (NSDictionary *)aFaultDesc
-                futureClassName: (NSString *)aClassName
-{
-	SUPERINIT;
-
-	COObjectContext *context = AUTORELEASE([(COObjectContext *)[COObjectContext alloc] initWithUUID: 
-		[aFaultDesc objectForKey: kCOContextCoreMetadata]]);
-
-	ASSIGN(_uuid, [aFaultDesc objectForKey: kCOUUIDCoreMetadata]);
-	ASSIGN(_futureClassName, aClassName);
-	[context registerObject: self];
-
-	return self;
-}
-
-/* Identity */
 
 - (BOOL) isFault
 {
@@ -36,7 +20,7 @@
 
 - (NSString *) futureClassName
 {
-	return _futureClassName;
+	return NSStringFromClass([_context classForEntityDescription: _entityDescription]);
 }
 
 - (ETUUID *) UUID
@@ -49,8 +33,16 @@
 	return [[self UUID] hash];
 }
 
+- (COEditingContext *) editingContext
+{
+	return _context;
+}
+
 - (BOOL) isEqual: (id)other
 {
+	if (other == self)
+		return YES;
+
 	if (other == nil || [other isKindOfClass: [self class]] == NO)
 		return NO;
 
@@ -58,10 +50,43 @@
 	return [_uuid isEqual: [self UUID]];
 }
 
-- (NSError *) load
+- (BOOL)isKindOfClass: (Class)cl
 {
-	//object_setClass(self, NSClassFromString([self futureClassName]);
+	return [NSClassFromString([self futureClassName]) isSubclassOfClass: cl];
+}
+
+- (NSError *) unfaultIfNeeded
+{
+	if (_isIgnoringDamageNotifications)
+		return nil;
+
+	object_setClass(self, NSClassFromString([self futureClassName]));
+
+	// NOTE: I would move that to COObject initialization rather, the spared 
+	// space looks negligible (Quentin).
+	assert(_variableStorage == nil);
+	_variableStorage = [[NSMapTable alloc] init];
+
+	[_context loadObject: (COObject *)self];
+	// TODO: Move to -loadObject:atRevision: probably
+	[(COObject *)self awakeFromFetch];
+
+	// TODO: Return a NSError or report issues in another way
 	return nil;
+}
+
+- (NSMethodSignature *) methodSignatureForSelector: (SEL)aSelector
+{
+	return [NSClassFromString([self futureClassName]) instanceMethodSignatureForSelector: aSelector];
+}
+
+- (void) forwardInvocation: (NSInvocation *)inv
+{
+	if ([self isFault] == NO)
+		return [super forwardInvocation: inv];
+	
+	[self unfaultIfNeeded];
+	[inv invokeWithTarget: self];
 }
 
 @end

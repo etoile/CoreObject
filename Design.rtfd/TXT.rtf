@@ -1,0 +1,72 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf320
+{\fonttbl\f0\froman\fcharset0 TimesNewRomanPSMT;}
+{\colortbl;\red255\green255\blue255;}
+{\info
+{\keywords cursorLocation=566}}\margl1008\margr1008\margt1008\vieww16900\viewh14280\viewkind1\viewscale134
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\sl360\slmult1\qc\pardirnatural
+
+\f0\fs26 \cf0 \ul \ulc0 CoreObject from a Framework User\'92s Perspective\ulnone \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\sl360\slmult1\ql\qnatural\pardirnatural
+\cf0 \
+
+\b Basics
+\b0 \
+A CoreObject store is made up of two types of objects: CoreObjects and Embedded Objects. Both are identified by UUID.\
+Core Objects should represent objects which are tangible to the user, and are typically the same level of granularity as files in a traditional desktop environment. For example, the following concepts would be represented with Core Objects: tags, projects, photos, drawings, folders, word processor documents, playlists, music libraries, photo libraries, slideshows.\
+\
+An Embedded Object is contained within a Core Object and should be used to model the internal structure of Core Objects. For example, outliner items, the structure of a text document (paragraphs/headings/sections), layers, groups, and graphic shapes in a drawing, etc. should all be modeled using Embedded Objects. Embedded objects are permanently contained within their parent Core Object and can not be shared or moved to another Core Object. (They can be referenced from another Core Object, or copied to another Core Object, however.)\
+\
+
+\b Attributes and Relationships
+\b0 \
+Object attributes can be one of the following types: string, number, blob, date.\
+Relationships can be weak one-way, one-to-many, or many-to-many.\
+Core Objects and Embedded Objects may participate in many-to-many relationships. Only embedded objects may participate in one-to-many relationships, and only to objects inside their parent Core Object.\
+Note that CoreObject needs to have on side of a many-to-many relationship designated as the \'93parents\'94 property and one designated as the \'93children\'94 property. The reason for this is that semantically only the \'93children\'94 property is mutable. In practise, you can modify the relationship from the child\'92s side (e.g. [object setValue: S(tag1) forProperty: @\'93parentCollections\'94])\
+\
+
+\b Attachments\
+
+\b0 Attachments allow importing external files in to a Core Object. One imported, the files are immutable. The typical use for this feature is storing existing file types like images, pdf, mp3, or video files inside a Core Object.\
+\
+
+\b Copy/Paste
+\b0 \
+Creating copies of entire Core Objects (including their Embedded Objects) is supported. Embedded objects  may be copied from one Core Object to another (but can not be \'91moved\'92 out of their parent Core Object).
+\b \
+
+\b0 \
+
+\b Versioning
+\b0 \
+Each Core Objects maintain a full history record. A core object can be reverted to an earlier version; selective undo of a particular change is also supported.\
+\
+
+\b History Tracks\
+
+\b0 At the UI level, users expect linear undo/redo. History tracks implement this feature.\
+\
+
+\b Branching\
+
+\b0 Branches may be created at a Core Object-granularity. Each Core Object can have a git-style DAG history graph of branches.\
+\
+
+\b Search
+\b0 \
+Full-text search is supported out of the box. NSPredicate can be used to search for particular property values. If the search result matches an embedded object, both the embedded object and its parent Core Object are returned.\
+\
+
+\b Deletion Model and History Compacting
+\b0 \
+While CoreObject is designed around the ideal of zero data loss, this means the store is constantly growing in size. In practice hard drives are of a limited size and some objects will eventually need to be permanently deleted. CoreObject provides two types of deletion:\
+\
+1. Full Deletion\
+This deletes a Core Object and all embedded objects. 	As a consequence, it is possible to have a UUID reference in CoreObject point to a deleted object. This can be presented in the UI with a suitable icon, and possibly present the possibility of restoring the deleted object from a backup.\
+\
+UI Note: We should be careful with using a policy like, \'93when you delete an object from the last group it belongs to, the object is automatically moved to the trash group.\'94  On one hand this sounds reasonable and convenient.. on the other hand, it makes the behaviour of the \'91delete\'92 UI action unpredictable, because the behaviour depends on how many groups the object is in, which may not be visible to the user. So the \'91delete\'92 command might feel unstable if sometimes it results in moving the object to the trash, and sometimes it doesn\'92t.  An alternative could be to have an explicit \'93move to trash\'94 UI command, as well as a \'91delete\'92 which just removes the object from the  current group but never moves it to the trash. That way, only \'91move to trash\'92 has the potential to cause data loss, but \'91delete\'92 can never cause data loss.\
+\
+2. History Compacting\
+Deleting old commits, or deleting commits between checkpoints older than X days.\
+\
+}
