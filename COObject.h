@@ -9,7 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <ObjectMerging/COQuery.h>
+#import <CoreObject/COQuery.h>
 
 @class COEditingContext, CORevision, COCommitTrack;
 

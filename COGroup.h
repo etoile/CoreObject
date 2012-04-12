@@ -9,7 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <ObjectMerging/COCollection.h>
+#import <CoreObject/COCollection.h>
 
 @class COSmartGroup;
 

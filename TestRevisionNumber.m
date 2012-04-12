@@ -1,5 +1,5 @@
 #import "TestCommon.h"
-#import <ObjectMerging/COObject.h>
+#import <CoreObject/COObject.h>
 #import <UnitKit/UnitKit.h>
 
 @interface TestRevisionNumber : TestCommon <UKTest>

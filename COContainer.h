@@ -9,8 +9,8 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <ObjectMerging/COCollection.h>
-#import <ObjectMerging/COEditingContext.h>
+#import <CoreObject/COCollection.h>
+#import <CoreObject/COEditingContext.h>
 
 /** 
  * @group Object Collection and Organization

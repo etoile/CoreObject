@@ -7,7 +7,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <ObjectMerging/COTrack.h>
+#import <CoreObject/COTrack.h>
 
 @class COObject, CORevision;
 

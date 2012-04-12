@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <ObjectMerging/COTrack.h>
+#import <CoreObject/COTrack.h>
 
 @class COEditingContext;
 

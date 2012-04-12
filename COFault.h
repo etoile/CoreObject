@@ -17,7 +17,7 @@
     of COObject and COObjectFault different.
   */
 #if defined(GNUSTEP) && !(GS_NONFRAGILE == 1)
-#error "ObjectMerging/CoreObject cannot be used in mixed-ABI mode. Please configure gnustep-base with './configure --disable-mixedabi' to use the pure non-fragile ABI."
+#error "CoreObject cannot be used in mixed-ABI mode. Please configure gnustep-base with './configure --disable-mixedabi' to use the pure non-fragile ABI."
 #endif    
 
 @class COEditingContext, COObject, CORevision;

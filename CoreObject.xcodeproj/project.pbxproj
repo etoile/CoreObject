@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6028E42A153729ED0003A205 /* COObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 6028E429153729ED0003A205 /* COObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6039CC7814BC3FBB008A8BA3 /* COCustomTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 6039CC7614BC3FBB008A8BA3 /* COCustomTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6039CC7914BC3FBB008A8BA3 /* COCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6039CC7714BC3FBB008A8BA3 /* COCustomTrack.m */; };
 		605BFF4013B50C7700073E18 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 605BFF3F13B50C7700073E18 /* Foundation.framework */; };
@@ -41,7 +42,6 @@
 		6686BDF412592C810065DE1A /* COStringDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDD112592C1B0065DE1A /* COStringDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6686BDF512592C810065DE1A /* COArrayDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDD312592C1B0065DE1A /* COArrayDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6686BDF612592C810065DE1A /* COSetDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDD512592C1B0065DE1A /* COSetDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6686BDF912592C810065DE1A /* COObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDB712592C1B0065DE1A /* COObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6686BDFA12592C810065DE1A /* COEditingContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDBA12592C1B0065DE1A /* COEditingContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6686BDFE12592C810065DE1A /* COObjectGraphDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 6686BDC212592C1B0065DE1A /* COObjectGraphDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6686BE2A12592D7B0065DE1A /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
@@ -78,7 +78,7 @@
 		791B4E451299C81500CCF472 /* Test_main.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E271299C77700CCF472 /* Test_main.m */; };
 		791B4E471299C81500CCF472 /* TestUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E011299C58000CCF472 /* TestUtilities.m */; };
 		791B4E491299C81500CCF472 /* TestArrayDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E031299C58000CCF472 /* TestArrayDiff.m */; };
-		791B4E4C1299C82200CCF472 /* ObjectMerging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* ObjectMerging.framework */; };
+		791B4E4C1299C82200CCF472 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
 		791B4E621299C8CB00CCF472 /* CORevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 791B4E5C1299C8CB00CCF472 /* CORevision.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		791B4E631299C8CB00CCF472 /* CORevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E5D1299C8CB00CCF472 /* CORevision.m */; };
 		791B4E661299C8CB00CCF472 /* COStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 791B4E601299C8CB00CCF472 /* COStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -140,6 +140,7 @@
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		6028E429153729ED0003A205 /* COObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COObject.h; sourceTree = "<group>"; };
 		6039CC7614BC3FBB008A8BA3 /* COCustomTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCustomTrack.h; sourceTree = "<group>"; };
 		6039CC7714BC3FBB008A8BA3 /* COCustomTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCustomTrack.m; sourceTree = "<group>"; };
 		605BFF3F13B50C7700073E18 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -161,9 +162,8 @@
 		6614500F12B0127E000DB843 /* Design.rtfd */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; path = Design.rtfd; sourceTree = "<group>"; };
 		6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestHistoryTrack.m; sourceTree = "<group>"; };
 		6627F390127C7E6700E06946 /* ExceptionHandling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExceptionHandling.framework; path = System/Library/Frameworks/ExceptionHandling.framework; sourceTree = SDKROOT; };
-		6686BDAC12592BDA0065DE1A /* ObjectMerging.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectMerging.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		6686BDAD12592BDA0065DE1A /* ObjectMerging-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ObjectMerging-Info.plist"; sourceTree = "<group>"; };
-		6686BDB712592C1B0065DE1A /* COObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = COObject.h; sourceTree = "<group>"; };
+		6686BDAC12592BDA0065DE1A /* CoreObject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CoreObject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6686BDAD12592BDA0065DE1A /* CoreObject-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CoreObject-Info.plist"; sourceTree = "<group>"; };
 		6686BDB812592C1B0065DE1A /* COObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = COObject.m; sourceTree = "<group>"; };
 		6686BDBA12592C1B0065DE1A /* COEditingContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = COEditingContext.h; sourceTree = "<group>"; };
 		6686BDBB12592C1B0065DE1A /* COEditingContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = COEditingContext.m; sourceTree = "<group>"; };
@@ -228,7 +228,6 @@
 		791B4E7A1299C92300CCF472 /* sqlite3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sqlite3.c; sourceTree = "<group>"; };
 		791B4E7B1299C92300CCF472 /* sqlite3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sqlite3.h; sourceTree = "<group>"; };
 		792C5F57127F78A7007205EA /* UnitKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UnitKit.framework; path = Library/Frameworks/UnitKit.framework; sourceTree = SDKROOT; };
-		792C5FAF127F7977007205EA /* Test-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Test-Info.plist"; sourceTree = "<group>"; };
 		79E5EE5712876FC200CDFA23 /* COContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COContainer.h; sourceTree = "<group>"; };
 		79E5EE5812876FC200CDFA23 /* COContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COContainer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -262,7 +261,7 @@
 			files = (
 				60CF348313BA931C001F9011 /* Foundation.framework in Frameworks */,
 				60FB089813C3076200C2AB94 /* EtoileFoundation.framework in Frameworks */,
-				791B4E4C1299C82200CCF472 /* ObjectMerging.framework in Frameworks */,
+				791B4E4C1299C82200CCF472 /* CoreObject.framework in Frameworks */,
 				66D09AB5129B29DE006BEDC3 /* UnitKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -293,7 +292,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6686BDAC12592BDA0065DE1A /* ObjectMerging.framework */,
+				6686BDAC12592BDA0065DE1A /* CoreObject.framework */,
 				791B4E2D1299C79300CCF472 /* Test */,
 				66D099C4129AE111006BEDC3 /* StoreTest */,
 			);
@@ -307,13 +306,12 @@
 				6699633B115F0C4200359BE6 /* Documentation */,
 				791B4DF41299C56900CCF472 /* Test */,
 				791B4E501299C8AF00CCF472 /* Store */,
-				6686BDB212592C1B0065DE1A /* ObjectMerging */,
+				6686BDB212592C1B0065DE1A /* CoreObject */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				6686BE2812592D6F0065DE1A /* libz.1.1.3.dylib */,
 				6627F390127C7E6700E06946 /* ExceptionHandling.framework */,
 				792C5F57127F78A7007205EA /* UnitKit.framework */,
-				792C5FAF127F7977007205EA /* Test-Info.plist */,
 				605BFF3F13B50C7700073E18 /* Foundation.framework */,
 				60CF350813BA9348001F9011 /* AppKit.framework */,
 			);
@@ -355,19 +353,20 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		6686BDB212592C1B0065DE1A /* ObjectMerging */ = {
+		6686BDB212592C1B0065DE1A /* CoreObject */ = {
 			isa = PBXGroup;
 			children = (
-				6686BDAD12592BDA0065DE1A /* ObjectMerging-Info.plist */,
+				6686BDAD12592BDA0065DE1A /* CoreObject-Info.plist */,
 				6686BDC712592C1B0065DE1A /* Utilities */,
 				6686BDB612592C1B0065DE1A /* Front-end API */,
 			);
-			name = ObjectMerging;
+			name = CoreObject;
 			sourceTree = "<group>";
 		};
 		6686BDB612592C1B0065DE1A /* Front-end API */ = {
 			isa = PBXGroup;
 			children = (
+				6028E429153729ED0003A205 /* COObject.h */,
 				60FB0E8913C61C3A00C2AB94 /* COFault.h */,
 				60FB0E8A13C61C3A00C2AB94 /* COFault.m */,
 				66D09D58129CE477006BEDC3 /* Model Objects */,
@@ -443,7 +442,6 @@
 			children = (
 				60844F261490B6B2008A329F /* COCollection.h */,
 				60844F271490B6B2008A329F /* COCollection.m */,
-				6686BDB712592C1B0065DE1A /* COObject.h */,
 				6686BDB812592C1B0065DE1A /* COObject.m */,
 				79E5EE5712876FC200CDFA23 /* COContainer.h */,
 				79E5EE5812876FC200CDFA23 /* COContainer.m */,
@@ -518,7 +516,6 @@
 				6686BDF412592C810065DE1A /* COStringDiff.h in Headers */,
 				6686BDF512592C810065DE1A /* COArrayDiff.h in Headers */,
 				6686BDF612592C810065DE1A /* COSetDiff.h in Headers */,
-				6686BDF912592C810065DE1A /* COObject.h in Headers */,
 				6686BDFA12592C810065DE1A /* COEditingContext.h in Headers */,
 				79E5EE5912876FC200CDFA23 /* COContainer.h in Headers */,
 				791B4E621299C8CB00CCF472 /* CORevision.h in Headers */,
@@ -531,15 +528,16 @@
 				60844F281490B6B2008A329F /* COCollection.h in Headers */,
 				60A55DE114A25AC4007A9864 /* COTrack.h in Headers */,
 				6039CC7814BC3FBB008A8BA3 /* COCustomTrack.h in Headers */,
+				6028E42A153729ED0003A205 /* COObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		6686BDAB12592BDA0065DE1A /* ObjectMerging */ = {
+		6686BDAB12592BDA0065DE1A /* CoreObject */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6686BDB012592BDC0065DE1A /* Build configuration list for PBXNativeTarget "ObjectMerging" */;
+			buildConfigurationList = 6686BDB012592BDC0065DE1A /* Build configuration list for PBXNativeTarget "CoreObject" */;
 			buildPhases = (
 				6686BDA712592BDA0065DE1A /* Headers */,
 				6686BDA812592BDA0065DE1A /* Resources */,
@@ -551,9 +549,9 @@
 			dependencies = (
 				60FB0A1B13C3264E00C2AB94 /* PBXTargetDependency */,
 			);
-			name = ObjectMerging;
+			name = CoreObject;
 			productName = ObjectMergign;
-			productReference = 6686BDAC12592BDA0065DE1A /* ObjectMerging.framework */;
+			productReference = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		66D099B6129AE111006BEDC3 /* StoreTest */ = {
@@ -594,7 +592,10 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "ObjectMerging4" */;
+			attributes = {
+				ORGANIZATIONNAME = "Étoilé";
+			};
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "CoreObject" */;
 			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -614,7 +615,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				6686BDAB12592BDA0065DE1A /* ObjectMerging */,
+				6686BDAB12592BDA0065DE1A /* CoreObject */,
 				791B4E2C1299C79300CCF472 /* Test */,
 				66D099B6129AE111006BEDC3 /* StoreTest */,
 			);
@@ -742,7 +743,7 @@
 		};
 		791B4E4B1299C81F00CCF472 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 6686BDAB12592BDA0065DE1A /* ObjectMerging */;
+			target = 6686BDAB12592BDA0065DE1A /* CoreObject */;
 			targetProxy = 791B4E4A1299C81F00CCF472 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -751,16 +752,16 @@
 		6686BDAE12592BDC0065DE1A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_COMPATIBILITY_VERSION = 0;
+				DYLIB_CURRENT_VERSION = 5;
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = "ObjectMerging-Info.plist";
+				INFOPLIST_FILE = "CoreObject-Info.plist";
 				INSTALL_PATH = "@rpath";
 				OTHER_CFLAGS = (
 					"-DSQLITE_ENABLE_FTS3",
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);
-				PRODUCT_NAME = ObjectMerging;
+				PRODUCT_NAME = CoreObject;
 			};
 			name = Debug;
 		};
@@ -770,13 +771,13 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = "ObjectMerging-Info.plist";
+				INFOPLIST_FILE = "CoreObject-Info.plist";
 				INSTALL_PATH = "$(BUILT_PRODUCTS_DIR)";
 				OTHER_CFLAGS = (
 					"-DSQLITE_ENABLE_FTS3",
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);
-				PRODUCT_NAME = ObjectMerging;
+				PRODUCT_NAME = CoreObject;
 			};
 			name = Release;
 		};
@@ -851,7 +852,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6686BDB012592BDC0065DE1A /* Build configuration list for PBXNativeTarget "ObjectMerging" */ = {
+		6686BDB012592BDC0065DE1A /* Build configuration list for PBXNativeTarget "CoreObject" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6686BDAE12592BDC0065DE1A /* Debug */,
@@ -878,7 +879,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "ObjectMerging4" */ = {
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "CoreObject" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,
