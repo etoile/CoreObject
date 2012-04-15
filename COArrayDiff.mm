@@ -1,3 +1,6 @@
+// Needed to allow limits.h stuff to work in C++ (otherwise INTPTR_MAX is undefined)
+#define __STDC_LIMIT_MACROS
+
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COArrayDiff.h"
 #include "diff.hh"

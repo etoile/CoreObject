@@ -1,7 +1,8 @@
+// Needed to allow limits.h stuff to work in C++ (otherwise INTPTR_MAX is undefined)
+#define __STDC_LIMIT_MACROS
+
 #import "COStringDiff.h"
 #include "diff.hh"
-
-
 
 // For 100k characters:
 // With NSString wrapper: 1.25s
