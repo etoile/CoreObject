@@ -33,16 +33,12 @@
  * ETCollection and ETCollectionMutation protocol methods. Subclasses must 
  * thereby return a valid key, other the collection API won't behave correctly.
  *
+ * For example, -insertObject:atIndex:hint: implementation uses the content key 
+ * to invoke -[COObject insertObject:atIndex:hint:forProperty:].
+ *
  * By default, returns <em>contents</em>.
  */
 - (NSString *)contentKey;
-
-/** @taskunit Collection Mutation with Integrity Check */
-
-- (void)addObject: (id)object forProperty: (NSString *)key;
-- (void)insertObject: (id)object atIndex: (NSUInteger)index forProperty: (NSString *)key;
-- (void)removeObject: (id)object forProperty: (NSString *)key;
-- (void)removeObject: (id)object atIndex: (NSUInteger)index forProperty: (NSString *)key;
 
 /** @taskunit Collection Mutation Additions */
 

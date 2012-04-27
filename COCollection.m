@@ -57,89 +57,6 @@
 	return @"contents";
 }
 
-- (void)addObject: (id)object forProperty: (NSString *)key
-{
-	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	if (![desc isMultivalued])
-	{
-		[NSException raise: NSInvalidArgumentException format: @"attempt to call addObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
-	}
-	
-	// FIXME: Modify the value directly.. this will require refactoring setValue:forProperty:
-	// so that we can run the relationship integrity code and other checks directly
-	id copy = [[self valueForProperty: key] mutableCopy];
-	if (!([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]))
-	{
-		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
-	}
-	
-	[copy addObject: object];
-	[self setValue: copy forProperty: key];
-	[copy release];
-}
-
-- (void)insertObject: (id)object atIndex: (NSUInteger)index forProperty: (NSString *)key
-{
-	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	if (!([desc isMultivalued] && [desc isOrdered]))
-	{
-		[NSException raise: NSInvalidArgumentException format: @"attempt to call inesrtObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
-	}
-	
-	// FIXME: see comment in addObject:ForProperty
-	
-	id copy = [[self valueForProperty: key] mutableCopy];
-	if (!([copy isKindOfClass: [NSMutableArray class]]))
-	{
-		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
-	}
-	
-	[copy insertObject: object atIndex: index];
-	[self setValue: copy forProperty: key];
-	[copy release];
-}
-
-- (void)removeObject: (id)object forProperty: (NSString *)key
-{
-	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	if (![desc isMultivalued])
-	{
-		[NSException raise: NSInvalidArgumentException format: @"attempt to call removeObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
-	}
-	
-	// FIXME: see comment in addObject:ForProperty
-	
-	id copy = [[self valueForProperty: key] mutableCopy];
-	if (!([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]))
-	{
-		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
-	}
-	[copy removeObject: object];
-	[self setValue: copy forProperty: key];
-	[copy release];
-}
-
-- (void)removeObject: (id)object atIndex: (NSUInteger)index forProperty: (NSString *)key
-{
-	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	if (!([desc isMultivalued] && [desc isOrdered]))
-	{
-		[NSException raise: NSInvalidArgumentException format: @"attempt to call removeObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
-	}
-	
-	// FIXME: see comment in addObject:ForProperty
-	
-	id copy = [[self valueForProperty: key] mutableCopy];
-	if (!([copy isKindOfClass: [NSMutableArray class]]))
-	{
-		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
-	}
-	
-	[copy removeObject: object atIndex: index hint: nil];
-	[self setValue: copy forProperty: key];
-	[copy release];
-}
-
 #if 0
 - (BOOL) isOrdered
 {
@@ -161,30 +78,12 @@
 
 - (void) insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
 {
-	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
-	if (index == ETUndeterminedIndex)
-	{
-		[self addObject: object forProperty: [self contentKey]];
-	}
-	else
-	{
-		[self insertObject: object atIndex: index forProperty: [self contentKey]];
-	}
-	[self didUpdate];
+	[self insertObject: object atIndex: index hint: hint forProperty: [self contentKey]];
 }
 
 - (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
 {
-	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
-	if (index == ETUndeterminedIndex)
-	{
-		[self removeObject: object forProperty: [self contentKey]];	
-	}
-	else
-	{
-		[self removeObject: object atIndex: index forProperty: [self contentKey]];
-	}
-	[self didUpdate];
+	[self removeObject: object atIndex: index hint: hint forProperty: [self contentKey]];
 }
 
 - (id)objectForIdentifier: (NSString *)anId

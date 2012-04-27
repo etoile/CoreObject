@@ -541,8 +541,8 @@
 				
 				if ([[desc opposite] isMultivalued])
 				{
-					[oldContainer removeObject: self forProperty: oppositeName];
-					[newContainer addObject: self forProperty: oppositeName];			
+					[oldContainer removeObject: self atIndex: ETUndeterminedIndex hint: nil forProperty: oppositeName];
+					[newContainer insertObject: self atIndex: ETUndeterminedIndex hint: nil forProperty: oppositeName];			
 				}
 				else
 				{
@@ -596,11 +596,11 @@
 			{
 				for (COObject *oldObj in oldObjects)
 				{
-					[oldObj removeObject: self forProperty: oppositeName];
+					[oldObj removeObject: self atIndex: ETUndeterminedIndex hint: nil forProperty: oppositeName];
 				}
 				for (COObject *newObj in newObjects)
 				{
-					[newObj addObject: self forProperty: oppositeName];
+					[newObj insertObject: self atIndex: ETUndeterminedIndex hint: nil forProperty: oppositeName];
 				}
 			}
 			else
@@ -611,7 +611,7 @@
 				}
 				for (COObject *newObj in newObjects)
 				{
-					[[newObj valueForProperty: oppositeName] removeObject: newObj forProperty: key];
+					[[newObj valueForProperty: oppositeName] removeObject: newObj atIndex: ETUndeterminedIndex hint: nil forProperty: key];
 					[newObj setValue: self forProperty: oppositeName];
 				}	
 			}
@@ -707,6 +707,84 @@
 {
 	[self notifyContextOfDamageIfNeededForProperty: key];
 	[super didChangeValueForKey: key];
+}
+
+- (void) insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+{
+	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
+
+	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	id copy = [[self valueForProperty: key] mutableCopy];
+
+	if (index == ETUndeterminedIndex)
+	{
+		if (![desc isMultivalued])
+		{
+			[NSException raise: NSInvalidArgumentException 
+						format: @"Attempt to call addObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
+		}
+		if (!([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]))
+		{
+			[NSException raise: NSInternalInconsistencyException 
+						format: @"Multivalued property not set up properly"];
+		}
+	}
+	else
+	{
+		if (!([desc isMultivalued] && [desc isOrdered]))
+		{
+			[NSException raise: NSInvalidArgumentException format: @"Attempt to call insertObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
+		}
+		if (!([copy isKindOfClass: [NSMutableArray class]]))
+		{
+			[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+		}
+	}
+
+	[copy insertObject: object atIndex: index hint: hint];
+	// FIXME: Use -setPrimitiveValue:forKey: here
+	[self setValue: copy forProperty: key];
+	[copy release];
+
+	[self didUpdate];
+}
+
+- (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+{
+	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
+
+	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	id copy = [[self valueForProperty: key] mutableCopy];
+
+	if (index == ETUndeterminedIndex)
+	{
+		if (![desc isMultivalued])
+		{
+			[NSException raise: NSInvalidArgumentException format: @"Attempt to call removeObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
+		}
+		if (!([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]))
+		{
+			[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+		}
+	}
+	else
+	{
+		if (!([desc isMultivalued] && [desc isOrdered]))
+		{
+			[NSException raise: NSInvalidArgumentException format: @"Attempt to call removeObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
+		}
+		if (!([copy isKindOfClass: [NSMutableArray class]]))
+		{
+			[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+		}
+	}
+
+	[copy removeObject: object atIndex: index hint: hint];
+	// FIXME: Use -setPrimitiveValue:forKey: here
+	[self setValue: copy forProperty: key];
+	[copy release];
+
+	[self didUpdate];
 }
 
 - (void)didCreate

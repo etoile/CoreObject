@@ -41,13 +41,13 @@
 	COObject *t2 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
 	COObject *t3 = [ctx insertObjectWithEntityName: @"Anonymous.COGroup"];
 	
-	[t1 addObject: o1 forProperty: @"contents"];
-	[t2 addObject: o1 forProperty: @"contents"];
+	[t1 insertObject: o1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	[t2 insertObject: o1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
 	UKObjectsEqual(S(t1, t2), [o1 valueForProperty: @"parentCollections"]);
 	
-	[o2 addObject: t2 forProperty: @"parentCollections"];
-	[o2 addObject: t3 forProperty: @"parentCollections"];
+	[o2 insertObject: t2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"parentCollections"];
+	[o2 insertObject: t3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"parentCollections"];
 	
 	UKObjectsEqual(S(o1), [t1 valueForProperty: @"contents"]);
 	UKObjectsEqual(S(o1, o2), [t2 valueForProperty: @"contents"]);
@@ -76,7 +76,7 @@
 
 	// Check that removing an object from a group nullifys that object's parent group pointer
 	
-	[o3 removeObject: o2 forProperty: @"contents"];
+	[o3 removeObject: o2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	UKNil([o2 valueForProperty: @"parentContainer"]);
 	
 	// Now test moving by modifying the multivalued side of the relationship
@@ -127,7 +127,7 @@
 	
 	[ctx commit];
 	
-	[o3 removeObject: o2 forProperty: @"contents"]; // should make o2's parentContainer nil
+	[o3 removeObject: o2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]; // should make o2's parentContainer nil
 	UKFalse([ctx isUpdatedObject: o1]);
 	UKTrue([ctx isUpdatedObject: o2]);
 	UKTrue([ctx isUpdatedObject: o3]);	

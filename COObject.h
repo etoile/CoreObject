@@ -285,6 +285,29 @@
  */
 - (void)didChangeValueForProperty: (NSString *)key;
 
+/** @taskunit Collection Mutation with Integrity Check */
+
+/** 
+ * Checks the insertion and the object that goes along respect the metamodel 
+ * constraints, then calls -insertObject:atIndex:hint: on the collection bound 
+ * to the property.<br />
+ * Finally if the property is a relationship, this method updates the 
+ * relationship consistency.
+ *
+ * See also ETCollectionMutation and -updateRelationshipConsistencyWithValue:.
+ */
+- (void) insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
+/** 
+ * Checks the insertion and the object that goes along respect the metamodel 
+ * constraints, then calls -removeObject:atIndex:hint: on the collection bound 
+ * to the property.<br />
+ * Finally if the property is a relationship, this method updates the 
+ * relationship consistency.
+ *
+ * See also ETCollectionMutation and -updateRelationshipConsistencyWithValue:. 
+ */
+- (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
+
 /** @taskunit Overridable Notifications */
 
 /**
