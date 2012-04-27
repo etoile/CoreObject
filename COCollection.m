@@ -52,23 +52,28 @@
 		postNotificationName: ETCollectionDidUpdateNotification object: self];
 }
 
+- (NSString *) contentKey
+{
+	return @"contents";
+}
+
 #if 0
 - (BOOL) isOrdered
 {
 	// TODO: If too slow, return the boolean directly.
-	return [[[self entityDescription] propertyDescriptionForName: @"contents"] isOrdered];
+	return [[[self entityDescription] propertyDescriptionForName: [self contentKey] isOrdered];
 }
 #endif
 
 - (id) content
 {
-	return [self valueForProperty: @"contents"];
+	return [self valueForProperty: [self contentKey]];
 }
 
 - (NSArray *) contentArray
 {
 	 // FIXME: Should return a new array, but this might break other things currently
-	return [self valueForProperty: @"contents"];
+	return [self valueForProperty: [self contentKey]];
 }
 
 - (void) insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
@@ -76,11 +81,11 @@
 	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
 	if (index == ETUndeterminedIndex)
 	{
-		[self addObject: object forProperty: @"contents"];
+		[self addObject: object forProperty: [self contentKey]];
 	}
 	else
 	{
-		[self insertObject: object atIndex: index forProperty: @"contents"];
+		[self insertObject: object atIndex: index forProperty: [self contentKey]];
 	}
 	[self didUpdate];
 }
@@ -90,11 +95,11 @@
 	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
 	if (index == ETUndeterminedIndex)
 	{
-		[self removeObject: object forProperty: @"contents"];	
+		[self removeObject: object forProperty: [self contentKey]];	
 	}
 	else
 	{
-		[self removeObject: object atIndex: index forProperty: @"contents"];
+		[self removeObject: object atIndex: index forProperty: [self contentKey]];
 	}
 	[self didUpdate];
 }

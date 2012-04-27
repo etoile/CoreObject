@@ -23,6 +23,18 @@
 
 }
 
+/**
+ * <override-dummy />
+ * Returns the property name that holds the collection content.
+ *
+ * This method is used by COCollection to implement 
+ * ETCollection and ETCollectionMutation protocol methods. Subclasses must 
+ * thereby return a valid key, other the collection API won't behave correctly.
+ *
+ * By default, returns <em>contents</em>.
+ */
+- (NSString *)contentKey;
+
 /** @taskunit Collection Mutation Additions */
 
 /**
