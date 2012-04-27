@@ -745,8 +745,6 @@
 	// FIXME: Use -setPrimitiveValue:forKey: here
 	[self setValue: copy forProperty: key];
 	[copy release];
-
-	[self didUpdate];
 }
 
 - (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
@@ -783,8 +781,6 @@
 	// FIXME: Use -setPrimitiveValue:forKey: here
 	[self setValue: copy forProperty: key];
 	[copy release];
-
-	[self didUpdate];
 }
 
 - (void)didCreate

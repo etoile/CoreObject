@@ -79,11 +79,13 @@
 - (void) insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
 {
 	[self insertObject: object atIndex: index hint: hint forProperty: [self contentKey]];
+	[self didUpdate];
 }
 
 - (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
 {
 	[self removeObject: object atIndex: index hint: hint forProperty: [self contentKey]];
+	[self didUpdate];
 }
 
 - (id)objectForIdentifier: (NSString *)anId
