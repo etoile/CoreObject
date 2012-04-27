@@ -79,9 +79,24 @@
 	                                  typeTags: [NSDictionary dictionary]];
 	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
 
+	ETPropertyDescription *contentProperty = 
+		[ETPropertyDescription descriptionWithName: @"objects" type: (id)@"Anonymous.COObject"];
+	
+	[contentProperty setMultivalued: YES];
+	[contentProperty setOpposite: (id)@"Anonymous.COObject.tags"];
+	[contentProperty setOrdered: NO];
+	[contentProperty setPersistent: YES];
+
+	[collection setPropertyDescriptions: A(contentProperty)];
+
 	[collection setLocalizedDescription: _(@"Tag")];
 
 	return collection;
+}
+
+- (NSString *)contentKey
+{
+	return @"objects";
 }
 
 - (BOOL)isTag

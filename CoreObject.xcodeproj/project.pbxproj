@@ -366,7 +366,6 @@
 		6686BDB612592C1B0065DE1A /* Front-end API */ = {
 			isa = PBXGroup;
 			children = (
-				6028E429153729ED0003A205 /* COObject.h */,
 				60FB0E8913C61C3A00C2AB94 /* COFault.h */,
 				60FB0E8A13C61C3A00C2AB94 /* COFault.m */,
 				66D09D58129CE477006BEDC3 /* Model Objects */,
@@ -442,6 +441,7 @@
 			children = (
 				60844F261490B6B2008A329F /* COCollection.h */,
 				60844F271490B6B2008A329F /* COCollection.m */,
+				6028E429153729ED0003A205 /* COObject.h */,
 				6686BDB812592C1B0065DE1A /* COObject.m */,
 				79E5EE5712876FC200CDFA23 /* COContainer.h */,
 				79E5EE5812876FC200CDFA23 /* COContainer.m */,

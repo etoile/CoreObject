@@ -82,13 +82,17 @@
 		[ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.COGroup"];
 	
 	[parentCollectionsProperty setMultivalued: YES];
+	
+	ETPropertyDescription *tagsProperty = 
+		[ETPropertyDescription descriptionWithName: @"tags" type: (id)@"Anonymous.COTag"];
+	[tagsProperty setMultivalued: YES];
 
 	NSArray *transientProperties = A(displayNameProperty, modificationDateProperty, 
 		creationDateProperty, lastVersionDescProperty, tagDescProperty, typeDescProperty);
 #ifndef GNUSTEP
 	transientProperties = [transientProperties arrayByAddingObject: iconProperty];
 #endif
-	NSArray *persistentProperties = A(nameProperty, parentContainerProperty, parentCollectionsProperty);
+	NSArray *persistentProperties = A(nameProperty, parentContainerProperty, parentCollectionsProperty, tagsProperty);
 
 	[[persistentProperties mappedCollection] setPersistent: YES];
 	[object setPropertyDescriptions: [transientProperties arrayByAddingObjectsFromArray: persistentProperties]];
@@ -414,9 +418,7 @@
 
 - (NSArray *)tags
 {
-	NSMutableArray *tags = [NSMutableArray arrayWithArray: [self parentGroups]];
-	[[tags filter] isTag];
-	return tags;
+	return [self primitiveValueForKey: @"tags"];
 }
 
 /* Property-value coding */
@@ -686,86 +688,6 @@
 - (void)setValue: (id)value forUndefinedKey: (NSString *)key
 {
 	[self setPrimitiveValue: value forKey: key];
-}
-
-- (void) addObject: (id)object forProperty:(NSString*)key
-{
-	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	if (![desc isMultivalued])
-	{
-		[NSException raise: NSInvalidArgumentException format: @"attempt to call addObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
-	}
-	
-	// FIXME: Modify the value directly.. this will require refactoring setValue:forProperty:
-	// so that we can run the relationship integrity code and other checks directly
-	id copy = [[self valueForProperty: key] mutableCopy];
-	if (!([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]))
-	{
-		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
-	}
-	
-	[copy addObject: object];
-	[self setValue: copy forProperty: key];
-	[copy release];
-}
-- (void) insertObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString*)key
-{
-	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	if (!([desc isMultivalued] && [desc isOrdered]))
-	{
-		[NSException raise: NSInvalidArgumentException format: @"attempt to call inesrtObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
-	}
-	
-	// FIXME: see comment in addObject:ForProperty
-	
-	id copy = [[self valueForProperty: key] mutableCopy];
-	if (!([copy isKindOfClass: [NSMutableArray class]]))
-	{
-		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
-	}
-	
-	[copy insertObject: object atIndex: index];
-	[self setValue: copy forProperty: key];
-	[copy release];
-}
-- (void) removeObject: (id)object forProperty:(NSString*)key
-{
-	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	if (![desc isMultivalued])
-	{
-		[NSException raise: NSInvalidArgumentException format: @"attempt to call removeObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
-	}
-	
-	// FIXME: see comment in addObject:ForProperty
-	
-	id copy = [[self valueForProperty: key] mutableCopy];
-	if (!([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]))
-	{
-		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
-	}
-	[copy removeObject: object];
-	[self setValue: copy forProperty: key];
-	[copy release];
-}
-- (void) removeObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString*)key
-{
-	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	if (!([desc isMultivalued] && [desc isOrdered]))
-	{
-		[NSException raise: NSInvalidArgumentException format: @"attempt to call removeObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
-	}
-	
-	// FIXME: see comment in addObject:ForProperty
-	
-	id copy = [[self valueForProperty: key] mutableCopy];
-	if (!([copy isKindOfClass: [NSMutableArray class]]))
-	{
-		[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
-	}
-	
-	[copy removeObject: object atIndex: index hint: nil];
-	[self setValue: copy forProperty: key];
-	[copy release];
 }
 
 - (void)willChangeValueForProperty: (NSString *)key

@@ -23,6 +23,8 @@
 
 }
 
+/** @taskunit Content Access */
+
 /**
  * <override-dummy />
  * Returns the property name that holds the collection content.
@@ -34,6 +36,13 @@
  * By default, returns <em>contents</em>.
  */
 - (NSString *)contentKey;
+
+/** @taskunit Collection Mutation with Integrity Check */
+
+- (void)addObject: (id)object forProperty: (NSString *)key;
+- (void)insertObject: (id)object atIndex: (NSUInteger)index forProperty: (NSString *)key;
+- (void)removeObject: (id)object forProperty: (NSString *)key;
+- (void)removeObject: (id)object atIndex: (NSUInteger)index forProperty: (NSString *)key;
 
 /** @taskunit Collection Mutation Additions */
 

@@ -15,7 +15,12 @@
 		
 		ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
 																		  type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
-
+		/*ETPropertyDescription *parentContainerProperty = 
+			[ETPropertyDescription descriptionWithName: @"parentContainer" type: (id)@"Anonymous.OutlineItem"];
+		[parentContainerProperty setIsContainer: YES];
+		[parentContainerProperty setMultivalued: NO];
+		[parentContainer*/
+	
 		[outlineEntity setPropertyDescriptions: A(labelProperty)];
 		[[[outlineEntity propertyDescriptions] mappedCollection] setPersistent: YES];
 

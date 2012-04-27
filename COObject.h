@@ -263,13 +263,6 @@
  */
 - (void)setPrimitiveValue: (id)value forKey: (NSString *)key;
 
-/** @taskunit Collection Mutation with Integrity Check */
-
-- (void)addObject: (id)object forProperty:(NSString *)key;
-- (void)insertObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString *)key;
-- (void)removeObject: (id)object forProperty:(NSString *)key;
-- (void)removeObject: (id)object atIndex: (NSUInteger)index forProperty:(NSString *)key;
-
 /** @taskunit Notifications to be called by Accessors */
 
 /**
