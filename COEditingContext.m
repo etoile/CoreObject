@@ -422,38 +422,31 @@ store by other processes. */
  */
 static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, BOOL consistency, BOOL newUUID)
 {
-	if ([value isKindOfClass: [NSArray class]])
+	if ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]) 
 	{
-		NSMutableArray *copy = [NSMutableArray array];
-		for (id subvalue in value)
+		id copy = [[[[[value class] mutableClass] alloc] init] autorelease];
+
+		// NOTE: We have to use -contentArray to get a collection copy, 
+		// otherwise weird issues happen, since using 
+		// -[COObject updateRelationshipConsistencyWithValue:forProperty:] sent  
+		// to a subobject can mutate a parent multivalued property because we 
+		// use recursion to copy the composite tree.
+		for (id subvalue in [value contentArray])
 		{
-			id subvaluecopy = handle(subvalue, ctx, desc, consistency, newUUID);
-			if (nil == subvaluecopy)
+			id subvalueCopy = handle(subvalue, ctx, desc, consistency, newUUID);
+
+			if (subvalueCopy != nil)
 			{
-				//NSLog(@"error");
+				[copy addObject: subvalueCopy];
 			}
 			else
 			{
-				[copy addObject: subvaluecopy];
+				// FIXME: Can be reached when we copy an object to some other 
+				// context where some relationships cannot be resolved (-objectWithUUID: is returning nil).
+				//[NSException raise: NSInternalInconsistencyException
+				//            format: @"Multivalued property %@ contains a value %@ which cannot be copied", desc, value];
 			}
 		}
-		return copy;
-	}
-	else if ([value isKindOfClass: [NSSet class]])
-	{
-		NSMutableSet *copy = [NSMutableSet set];
-		for (id subvalue in value)
-		{
-			id subvaluecopy = handle(subvalue, ctx, desc, consistency, newUUID);
-			if (nil == subvaluecopy)
-			{
-				//NSLog(@"error");
-			}
-			else
-			{
-				[copy addObject: subvaluecopy];	
-			}
-		}		
 		return copy;
 	}
 	else if ([value isKindOfClass: [COObject class]])

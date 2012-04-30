@@ -145,7 +145,9 @@
 	else
 	{
 		[_context markObjectUpdated: self forProperty: nil];
-		_variableStorage = [[NSMapTable alloc] init];
+		_variableStorage = [[NSMapTable alloc] initWithKeyOptions: NSMapTableStrongMemory 
+		                                             valueOptions: NSMapTableStrongMemory 
+		                                                 capacity: 20];
 		[self awakeFromInsert]; // FIXME: not necessairly
 	}
 
@@ -480,20 +482,6 @@
 	}
 }
 
-
-// TODO: Would be better not to turn every collection into a mutable one
-// We ought to save the mutability when serializing collections. For example, 
-// don't serialize NSMutableArray into NSArray. Might be hard with the current 
-// plist format.
-- (id)checkMutabilityForCollection: (id)value
-{
-	if ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]])
-	{
-		value = [[value mutableCopy] autorelease];
-	}
-	return value;
-}
-
 /* Makes sure the value is in the same context as us. */
 - (void)checkEditingContextForValue:(id)value
 {
@@ -517,7 +505,6 @@
 - (void)updateRelationshipConsistencyWithValue: (id)value forProperty: (NSString *)key
 {
 	// FIXME: use the metamodel's validation support?
-	
 	if (_isIgnoringRelationshipConsistency)
 		return;
 
@@ -658,7 +645,6 @@
 	//}
 	
 	[self updateRelationshipConsistencyWithValue: value forProperty: key];
-	value = [self checkMutabilityForCollection: value];
 	[self checkEditingContextForValue: value];
 	
 	[self willChangeValueForProperty: key];
@@ -674,7 +660,7 @@
 	return (value == [NSNull null] ? nil : value);
 }
 
-- (void) setPrimitiveValue: (id)value forKey: (NSString *)key
+- (void)setPrimitiveValue: (id)value forKey: (NSString *)key
 {
 	[_variableStorage setObject: (value == nil ? [NSNull null] : value)
 						 forKey: key];
@@ -1117,11 +1103,13 @@ static int indent = 0;
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
 	}
-
+	if ([value isCollection] && [value isMutableCollection] == NO)
+	{
+		[NSException raise: NSInvalidArgumentException format: @"Tried to set immutable collection %@", key];
+	}
 	// TODO: We should check (but not update) the relationship consistency in a 
 	// vein similar to [self updateRelationshipConsistencyWithValue: value forProperty: key];
 
-	value = [self checkMutabilityForCollection: value];
 	[self checkEditingContextForValue: value];
 	
 	/* First we try to use the setter named 'setSerialized' + 'key' */
@@ -1417,7 +1405,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		{
 			mapped[i] = [self valueForPropertyList: [(NSArray*)plist objectAtIndex:i]];
 		}
-		return [NSArray arrayWithObjects: mapped count: count];
+		return [NSMutableArray arrayWithObjects: mapped count: count];
 	}
 	else if ([plist isKindOfClass: [NSData class]])
 	{
