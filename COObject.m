@@ -709,12 +709,12 @@
 	[super didChangeValueForKey: key];
 }
 
-- (void) insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+- (id)newCollectionForProperty: (NSString *)key insertionIndex: (NSInteger)index isCopy: (BOOL *)isCopy 
 {
-	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
-
 	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
 	id copy = [[self valueForProperty: key] mutableCopy];
+
+	*isCopy = YES;
 
 	if (index == ETUndeterminedIndex)
 	{
@@ -740,19 +740,32 @@
 			[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
 		}
 	}
-
-	[copy insertObject: object atIndex: index hint: hint];
-	// FIXME: Use -setPrimitiveValue:forKey: here
-	[self setValue: copy forProperty: key];
-	[copy release];
+	return copy;
 }
 
-- (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+- (void)  insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
 {
 	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
 
+	BOOL isCopy = NO;
+	id collection = [self newCollectionForProperty: key insertionIndex: index isCopy: &isCopy];
+
+	[collection insertObject: object atIndex: index hint: hint];
+
+	if (isCopy)
+	{
+		// FIXME: Use -setPrimitiveValue:forKey: here
+		[self setValue: collection forProperty: key];
+		[collection release];
+	}
+}
+
+- (id)newCollectionForProperty: (NSString *)key removalIndex: (NSInteger)index isCopy: (BOOL *)isCopy
+{
 	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
 	id copy = [[self valueForProperty: key] mutableCopy];
+
+	*isCopy = YES;
 
 	if (index == ETUndeterminedIndex)
 	{
@@ -776,11 +789,24 @@
 			[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
 		}
 	}
+	return copy;
+}
 
-	[copy removeObject: object atIndex: index hint: hint];
-	// FIXME: Use -setPrimitiveValue:forKey: here
-	[self setValue: copy forProperty: key];
-	[copy release];
+- (void)  removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+{
+	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
+
+	BOOL isCopy = NO;
+	id collection = [self newCollectionForProperty: key removalIndex: index isCopy: &isCopy];
+
+	[collection removeObject: object atIndex: index hint: hint];
+
+	if (isCopy)
+	{
+		// FIXME: Use -setPrimitiveValue:forKey: here
+		[self setValue: collection forProperty: key];
+		[collection release];
+	}
 }
 
 - (void)didCreate
