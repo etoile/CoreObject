@@ -23,10 +23,12 @@
 	if (![add isEmpty])
 	{
 		[(NSMutableArray*)ops addObject: [COSetDiffOperationAdd addOperationWithAddedObjects: add]];
+		[add release];
 	}
 	if (![remove isEmpty])
 	{
 		[(NSMutableArray*)ops addObject: [COSetDiffOperationRemove removeOperationWithRemovedObjects: remove]];
+		[remove release];
 	}
 	
 	return self;
