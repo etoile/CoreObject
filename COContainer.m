@@ -27,10 +27,9 @@
 		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.COObject"];
 	
 	[contentsProperty setMultivalued: YES];
-	[contentsProperty setOpposite: (id)@"Anonymous.COObject.parentContainer"]; // FIXME: just 'parent' should work...
 	[contentsProperty setOrdered: YES];
 	[contentsProperty setPersistent: YES];
-
+	
 	[collection setPropertyDescriptions: A(contentsProperty)];
 
 	return collection;	

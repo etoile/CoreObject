@@ -284,6 +284,7 @@
  * Can be overriden, but the superclass implementation must be called.
  */
 - (void)didChangeValueForProperty: (NSString *)key;
+- (void)didChangeValueForProperty: (NSString *)key oldValue: (id)oldValue;
 
 /** @taskunit Collection Mutation with Integrity Check */
 
@@ -478,7 +479,7 @@
  * Checks and updates the relationship consistency based on the metamodel to 
  * ensure the object graph remains valid with the new value.
  */
-- (void)updateRelationshipConsistencyWithValue: (id)value forProperty: (NSString *)key;
+- (void)updateRelationshipConsistencyForProperty: (NSString *)key oldValue: (id)oldValue;
 /**
  *
  */

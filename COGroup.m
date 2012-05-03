@@ -35,7 +35,6 @@
 	ETPropertyDescription *collectionContentsProperty = 
 		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.COObject"];
 	[collectionContentsProperty setMultivalued: YES];
-	[collectionContentsProperty setOpposite: (id)@"Anonymous.COObject.parentCollections"]; // FIXME: just 'parentCollections' should work...
 	[collectionContentsProperty setOrdered: NO];
 	[collectionContentsProperty setPersistent: YES];
 
@@ -134,9 +133,9 @@
 
 #if 1
 	ETPropertyDescription *collectionContentsProperty = 
-		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.COObject"];
+		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.COTag"];
 	[collectionContentsProperty setMultivalued: YES];
-	[collectionContentsProperty setOpposite: (id)@"Anonymous.COObject.parentCollections"]; // FIXME: just 'parentCollections' should work...
+	//[collectionContentsProperty setOpposite: (id)@"Anonymous.COTag.parentTagGroups"]; // FIXME: just 'parentCollections' should work...
 	[collectionContentsProperty setOrdered: YES];
 	[collectionContentsProperty setPersistent: YES];
 

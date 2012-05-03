@@ -14,14 +14,28 @@
 		[outlineEntity setParent: (id)@"Anonymous.COContainer"];
 		
 		ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-																		  type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
-		/*ETPropertyDescription *parentContainerProperty = 
+																		  type: (id)@"Anonymous.NSString"];
+
+		ETPropertyDescription *contentsProperty = 
+			[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.OutlineItem"];
+	
+		[contentsProperty setMultivalued: YES];
+		[contentsProperty setOrdered: YES];
+
+		ETPropertyDescription *parentContainerProperty = 
 			[ETPropertyDescription descriptionWithName: @"parentContainer" type: (id)@"Anonymous.OutlineItem"];
+		
 		[parentContainerProperty setIsContainer: YES];
 		[parentContainerProperty setMultivalued: NO];
-		[parentContainer*/
-	
-		[outlineEntity setPropertyDescriptions: A(labelProperty)];
+		[parentContainerProperty setOpposite: (id)@"Anonymous.OutlineItem.contents"];
+
+		ETPropertyDescription *parentCollectionsProperty = 
+			[ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.Tag"];
+
+		[parentCollectionsProperty setMultivalued: YES];
+		[parentCollectionsProperty setOpposite: (id)@"Anonymous.Tag.contents"];
+
+		[outlineEntity setPropertyDescriptions: A(labelProperty, contentsProperty, parentContainerProperty, parentCollectionsProperty)];
 		[[[outlineEntity propertyDescriptions] mappedCollection] setPersistent: YES];
 
 		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: outlineEntity];
@@ -35,7 +49,12 @@
 		ETPropertyDescription *tagLabelProperty = [ETPropertyDescription descriptionWithName: @"label"
 																		  type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
 
-		[tagEntity setPropertyDescriptions: A(tagLabelProperty)];
+		ETPropertyDescription *contentsProperty = 
+			[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.OutlineItem"];
+		[contentsProperty setMultivalued: YES];
+		[contentsProperty setOrdered: NO];
+
+		[tagEntity setPropertyDescriptions: A(tagLabelProperty, contentsProperty)];
 		[[[tagEntity propertyDescriptions] mappedCollection] setPersistent: YES];
 		
 		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: tagEntity];

@@ -69,20 +69,6 @@
 	ETPropertyDescription *displayNameProperty = 
 		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"Anonymous.NSString"];
 
-
-	// TODO: I think these properties should be declared in subclasses or custom 
-	// entity descriptions set per COObject instance (Quentin).
-
-	ETPropertyDescription *parentContainerProperty = 
-		[ETPropertyDescription descriptionWithName: @"parentContainer" type: (id)@"Anonymous.COContainer"];
-	[parentContainerProperty setIsContainer: YES];
-	[parentContainerProperty setMultivalued: NO];
-
-	ETPropertyDescription *parentCollectionsProperty = 
-		[ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.COGroup"];
-	
-	[parentCollectionsProperty setMultivalued: YES];
-	
 	ETPropertyDescription *tagsProperty = 
 		[ETPropertyDescription descriptionWithName: @"tags" type: (id)@"Anonymous.COTag"];
 	[tagsProperty setMultivalued: YES];
@@ -92,7 +78,7 @@
 #ifndef GNUSTEP
 	transientProperties = [transientProperties arrayByAddingObject: iconProperty];
 #endif
-	NSArray *persistentProperties = A(nameProperty, parentContainerProperty, parentCollectionsProperty, tagsProperty);
+	NSArray *persistentProperties = A(nameProperty, tagsProperty);
 
 	[[persistentProperties mappedCollection] setPersistent: YES];
 	[object setPropertyDescriptions: [transientProperties arrayByAddingObjectsFromArray: persistentProperties]];
@@ -502,7 +488,7 @@
 	}
 }
 
-- (void)updateRelationshipConsistencyWithValue: (id)value forProperty: (NSString *)key
+- (void)updateRelationshipConsistencyForProperty: (NSString *)key oldValue: (id)oldValue
 {
 	// FIXME: use the metamodel's validation support?
 	if (_isIgnoringRelationshipConsistency)
@@ -518,8 +504,8 @@
 		NSString *oppositeName = [[desc opposite] name];
 		if (![desc isMultivalued]) // modifying the single-valued side of a relationship
 		{
-			COObject *oldContainer = [self valueForProperty: key];
-			COObject *newContainer = value;
+			COObject *oldContainer = oldValue;
+			COObject *newContainer = [self valueForProperty: key];
 			
 			if (newContainer != oldContainer)
 			{					
@@ -543,28 +529,34 @@
 		}
 		else // modifying the multivalued side of a relationship
 		{
-			NSMutableSet *oldObjects;
-			if ([[self valueForProperty: key] isKindOfClass: [NSSet class]])
+			id newValue = [self valueForProperty: key];
+			NSMutableSet *newObjects;
+	
+			if ([newValue isKindOfClass: [NSSet class]])
 			{
-				oldObjects = [NSMutableSet setWithSet: [self valueForProperty: key]];
+				newObjects = [NSMutableSet setWithSet: newValue];
 			}			
-			else if ([self valueForProperty: key] == nil)
+			else if (newValue == nil)
 			{
-				oldObjects = [NSMutableSet set]; // Should only happen when an object is first created..
+				newObjects = [NSMutableSet set]; // Should usually never happen
 			}
 			else
 			{
-				oldObjects = [NSMutableSet setWithArray: [self valueForProperty: key]];
+				newObjects = [NSMutableSet setWithArray: newValue];
 			}
 			
-			NSMutableSet *newObjects;
-			if ([value isKindOfClass: [NSSet class]])
+			NSMutableSet *oldObjects;
+			if ([oldValue isKindOfClass: [NSSet class]])
 			{
-				newObjects = [NSMutableSet setWithSet: value];
+				oldObjects = [NSMutableSet setWithSet: oldValue];
+			}
+			else if (oldValue == nil)
+			{
+				oldObjects = [NSMutableSet set]; // Should only happen when an object is first created
 			}
 			else
 			{
-				newObjects = [NSMutableSet setWithArray: value];
+				oldObjects = [NSMutableSet setWithArray: oldValue];
 			}
 			
 			NSMutableSet *commonObjects = [NSMutableSet setWithSet: oldObjects];
@@ -598,8 +590,14 @@
 				}
 				for (COObject *newObj in newObjects)
 				{
-					[[newObj valueForProperty: oppositeName] removeObject: newObj atIndex: ETUndeterminedIndex hint: nil forProperty: key];
+					id oldContainer = [newObj valueForProperty: oppositeName];
+
+					[oldContainer setIgnoringRelationshipConsistency: YES];
+					
+					[oldContainer removeObject: newObj atIndex: ETUndeterminedIndex hint: nil forProperty: key];
 					[newObj setValue: self forProperty: oppositeName];
+				
+					[oldContainer setIgnoringRelationshipConsistency: NO];
 				}	
 			}
 
@@ -643,13 +641,17 @@
 	//{
 	//	[NSException raise: NSInvalidArgumentException format: @"Invalid property type"];
 	//}
-	
-	[self updateRelationshipConsistencyWithValue: value forProperty: key];
+
+ 	BOOL isMultivalued = [[[self entityDescription] propertyDescriptionForName: key] isMultivalued];
+	id oldValue = [self valueForProperty: key];
+	 
+	 oldValue = (isMultivalued ? [oldValue mutableCopy] : [oldValue retain]);
+
 	[self checkEditingContextForValue: value];
-	
+
 	[self willChangeValueForProperty: key];
 	[self setPrimitiveValue: value forKey: key];
-	[self didChangeValueForProperty: key];
+	[self didChangeValueForProperty: key oldValue: oldValue];
 
 	return YES;
 }
@@ -691,16 +693,23 @@
 
 - (void)didChangeValueForProperty: (NSString *)key
 {
+	[self didChangeValueForProperty: key oldValue: nil];
+}
+
+- (void)didChangeValueForProperty: (NSString *)key oldValue: (id)oldValue
+{
+	// TODO: Evaluate whether -checkEditingContextForValue: is too costly
+	//[self checkEditingContextForValue: [self valueForProperty: key]];
+	[self updateRelationshipConsistencyForProperty: key oldValue: oldValue];
 	[self notifyContextOfDamageIfNeededForProperty: key];
 	[super didChangeValueForKey: key];
 }
 
-- (id)newCollectionForProperty: (NSString *)key insertionIndex: (NSInteger)index isCopy: (BOOL *)isCopy 
+
+- (id)collectionForProperty: (NSString *)key insertionIndex: (NSInteger)index
 {
 	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	id copy = [[self valueForProperty: key] mutableCopy];
-
-	*isCopy = YES;
+	id collection = [self valueForProperty: key];
 
 	if (index == ETUndeterminedIndex)
 	{
@@ -709,7 +718,7 @@
 			[NSException raise: NSInvalidArgumentException 
 						format: @"Attempt to call addObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
 		}
-		if (!([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]))
+		if (!([collection isKindOfClass: [NSMutableArray class]] || [collection isKindOfClass: [NSMutableSet class]]))
 		{
 			[NSException raise: NSInternalInconsistencyException 
 						format: @"Multivalued property not set up properly"];
@@ -721,37 +730,30 @@
 		{
 			[NSException raise: NSInvalidArgumentException format: @"Attempt to call insertObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
 		}
-		if (!([copy isKindOfClass: [NSMutableArray class]]))
+		if (!([collection isKindOfClass: [NSMutableArray class]]))
 		{
 			[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
 		}
 	}
-	return copy;
+	return collection;
 }
 
-- (void)  insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+- (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
 {
-	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
+	[self checkEditingContextForValue: object];
 
-	BOOL isCopy = NO;
-	id collection = [self newCollectionForProperty: key insertionIndex: index isCopy: &isCopy];
+	id oldCollection = [[self valueForProperty: key] mutableCopy];
+	id collection = [self collectionForProperty: key insertionIndex: index];
 
+	[self willChangeValueForProperty: key];
 	[collection insertObject: object atIndex: index hint: hint];
-
-	if (isCopy)
-	{
-		// FIXME: Use -setPrimitiveValue:forKey: here
-		[self setValue: collection forProperty: key];
-		[collection release];
-	}
+	[self didChangeValueForProperty: key oldValue: oldCollection];
 }
 
-- (id)newCollectionForProperty: (NSString *)key removalIndex: (NSInteger)index isCopy: (BOOL *)isCopy
+- (id)collectionForProperty: (NSString *)key removalIndex: (NSInteger)index
 {
 	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	id copy = [[self valueForProperty: key] mutableCopy];
-
-	*isCopy = YES;
+	id collection = [self valueForProperty: key];
 
 	if (index == ETUndeterminedIndex)
 	{
@@ -759,7 +761,7 @@
 		{
 			[NSException raise: NSInvalidArgumentException format: @"Attempt to call removeObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
 		}
-		if (!([copy isKindOfClass: [NSMutableArray class]] || [copy isKindOfClass: [NSMutableSet class]]))
+		if (!([collection isKindOfClass: [NSMutableArray class]] || [collection isKindOfClass: [NSMutableSet class]]))
 		{
 			[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
 		}
@@ -770,29 +772,24 @@
 		{
 			[NSException raise: NSInvalidArgumentException format: @"Attempt to call removeObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
 		}
-		if (!([copy isKindOfClass: [NSMutableArray class]]))
+		if (!([collection isKindOfClass: [NSMutableArray class]]))
 		{
 			[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
 		}
 	}
-	return copy;
+	return collection;
 }
 
-- (void)  removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+- (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
 {
-	assert([object editingContext] == [self editingContext]); // FIXME: change to an exception
+	[self checkEditingContextForValue: object];
 
-	BOOL isCopy = NO;
-	id collection = [self newCollectionForProperty: key removalIndex: index isCopy: &isCopy];
+	id oldCollection = [[self valueForProperty: key] mutableCopy];
+	id collection = [self collectionForProperty: key removalIndex: index];
 
+	[self willChangeValueForProperty: key];
 	[collection removeObject: object atIndex: index hint: hint];
-
-	if (isCopy)
-	{
-		// FIXME: Use -setPrimitiveValue:forKey: here
-		[self setValue: collection forProperty: key];
-		[collection release];
-	}
+	[self didChangeValueForProperty: key oldValue: oldCollection];
 }
 
 - (void)didCreate

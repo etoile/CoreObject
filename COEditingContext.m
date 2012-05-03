@@ -42,8 +42,8 @@ static COEditingContext *currentCtxt = nil;
 
 	_rootObjectRevisions = [NSMutableDictionary new];
 	_rootObjectCommitTracks = [NSMutableDictionary new];
-	assert([[[_modelRepository descriptionForName: @"Anonymous.COContainer"] 
-		propertyDescriptionForName: @"contents"] isComposite]);
+	//assert([[[_modelRepository descriptionForName: @"Anonymous.COContainer"] 
+	//	propertyDescriptionForName: @"contents"] isComposite]);
 
 	_instantiatedObjects = [[NSMutableDictionary alloc] init];
 	_insertedObjects = [[NSMutableSet alloc] init];
