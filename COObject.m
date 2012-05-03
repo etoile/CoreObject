@@ -377,9 +377,6 @@
 
 - (void)setName: (NSString *)aName
 {
-	// TODO: Move the -updateRelationshipConsistencyWithValue:forProperty: into 
-	// -willChangeValueForProperty:
-	[self updateRelationshipConsistencyWithValue: aName forProperty: @"name"];
 	[self willChangeValueForProperty: @"name"];
 	[self setValue: aName forUndefinedKey: @"name"];
 	[self didChangeValueForProperty: @"name"];
