@@ -30,6 +30,7 @@
 }
 - (void)didCreate
 {
+	[super didCreate];
 	didCreateCalled++;
 }
 @end

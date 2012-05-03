@@ -312,13 +312,18 @@
 /** @taskunit Overridable Notifications */
 
 /**
-  * A notification that the object was created for the first time.
-  * Override this method to perform any initialisation that should be
-  * performed the very first time an object is instantiated, such
-  * as calculating and setting default values.
-  */
+ * A notification that the object was created for the first time.
+ *
+ * Overrides this method to perform any initialisation that should be performed 
+ * the very first time an object is instantiated, such as calculating and 
+ * setting default values.<br />
+ * The superclass implementation must be called before the subclass code.
+ *
+ * This method won't be called when the new instance is a fault, or when the 
+ * object was loaded or reloaded with -[COEditingContext loadObject:atRevision:]. `
+ * For these cases, both -awakeFromFetch and -didReload can be used.
+ */
 - (void)didCreate;
-- (void)awakeFromInsert;
 - (void)awakeFromFetch;
 - (void)willTurnIntoFault;
 - (void)didTurnIntoFault;
@@ -406,6 +411,12 @@
 
 /** @taskunit Private */
 
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Returns a new map table to store properties.
+ */
+ - (NSMapTable *)newVariableStorage;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

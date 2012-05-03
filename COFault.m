@@ -65,7 +65,7 @@
 	// NOTE: I would move that to COObject initialization rather, the spared 
 	// space looks negligible (Quentin).
 	assert(_variableStorage == nil);
-	_variableStorage = [[NSMapTable alloc] init];
+	_variableStorage = [self newVariableStorage];
 
 	[_context loadObject: (COObject *)self];
 	// TODO: Move to -loadObject:atRevision: probably

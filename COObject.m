@@ -86,6 +86,13 @@
 	return object;
 }
 
+- (NSMapTable *)newVariableStorage
+{
+	return [[NSMapTable alloc] initWithKeyOptions: NSMapTableStrongMemory 
+	                                 valueOptions: NSMapTableStrongMemory 
+	                                    capacity: 20];
+}
+
 - (id) commonInitWithUUID: (ETUUID *)aUUID 
         entityDescription: (ETEntityDescription *)anEntityDescription
                rootObject: (COObject *)aRootObject
@@ -131,10 +138,8 @@
 	else
 	{
 		[_context markObjectUpdated: self forProperty: nil];
-		_variableStorage = [[NSMapTable alloc] initWithKeyOptions: NSMapTableStrongMemory 
-		                                             valueOptions: NSMapTableStrongMemory 
-		                                                 capacity: 20];
-		[self awakeFromInsert]; // FIXME: not necessairly
+		_variableStorage = [self newVariableStorage];
+		[self didCreate];
 	}
 
 	return self;
@@ -176,16 +181,12 @@
 		                     rootObject: nil
 		                        context: nil
 		                        isFault: NO];
-								
-		[self didCreate];
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	// FIXME: call user hook?
-	
 	_context = nil;
 	_rootObject = nil;
 	DESTROY(_uuid);
@@ -220,7 +221,7 @@
 	newObject->_context = _context;
 	if (_variableStorage != nil)
 	{
-		newObject->_variableStorage = [[NSMapTable alloc] init];
+		newObject->_variableStorage = [self newVariableStorage];
 
 		if (usesModelDescription)
 		{
@@ -789,14 +790,9 @@
 	[self didChangeValueForProperty: key oldValue: oldCollection];
 }
 
+/* Puts mutable collections into multivalued properties. */
 - (void)didCreate
 {
-
-}
-
-- (void)awakeFromInsert
-{
-	// Set up collections
 	BOOL wasIgnoringDamage = _isIgnoringDamageNotifications;
 	_isIgnoringDamageNotifications = YES;
 	
@@ -804,7 +800,7 @@
 	{
 		if ([propDesc isMultivalued])
 		{
-			id container = [propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set];
+			id container = ([propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set]);
 			[self setValue: container forProperty: [propDesc name]];
 		}
 	}
