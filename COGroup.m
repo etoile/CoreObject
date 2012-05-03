@@ -204,7 +204,7 @@
 
 - (void) setTargetCollection: (id <ETCollection>)aGroup
 {
-	ASSIGN(targetCollection, aGroup);
+	ASSIGN(targetCollection, (id)aGroup);
 	[self refresh];
 }
 
