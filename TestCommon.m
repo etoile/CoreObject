@@ -115,14 +115,6 @@
 	[self setUpMetamodel];
 }
 
-+ (void)initialize
-{
-	if ([[self class] isEqual: [TestCommon class]])
-	{
-		[self setUp];
-	}
-} 
-
 @end
 
 COEditingContext *NewContext(COStore* store)
