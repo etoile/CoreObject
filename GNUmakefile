@@ -20,14 +20,26 @@ CoreObject_INCLUDE_DIRS = -Ifmdb/src
 CoreObject_CPPFLAGS = -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS
 CoreObject_LDFLAGS += -lstdc++ -lobjcxx
 ifeq ($(test), yes)
-CoreObject_LDFLAGS += -lEtoileFoundation 
+CoreObject_LDFLAGS += -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
+CoreObject_PRINCIPAL_CLASS = TestCommon
 endif
-LIBRARIES_DEPEND_UPON = -lEtoileFoundation $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
-
+LIBRARIES_DEPEND_UPON = -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
 
 CoreObject_OBJC_FILES = $(wildcard CO*.m) $(wildcard NS*.m)
 ifeq ($(test), yes)
-CoreObject_OBJC_FILES += $(wildcard Test*.m)
+CoreObject_OBJC_FILES += \
+	TestArrayDiff.m \
+	TestCommon.m \
+	TestCopy.m \
+	TestEditingContext.m \
+	TestHistoryTrack.m \
+	TestObjectGraphDiff.m \
+	TestPerformance.m \
+	TestRelationshipIntegrity.m \
+	TestRevisionNumber.m \
+	TestSynchronization.m \
+	TestStore.m \
+	TestUtilities.m
 endif
 CoreObject_OBJCC_FILES = $(wildcard *.mm)
 CoreObject_C_FILES= $(wildcard *.c)

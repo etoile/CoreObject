@@ -51,6 +51,15 @@
 	CLOSE_STORE(store);
 }
 
+- (void)testContextWithNoStore
+{
+	COEditingContext *ctx = [[COEditingContext alloc] init];
+
+	UKNil([ctx store]);
+	/* In case, -latestRevisionNumber sent to a nil store doesn't behave correctly */
+	UKIntsEqual(0, [ctx latestRevisionNumber]);
+}
+
 - (void)testInsertObject
 {
 	OPEN_STORE(store)

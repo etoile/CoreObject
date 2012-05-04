@@ -724,10 +724,12 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	}
 	notifInfos = D(revNumbers, kCORevisionNumbersKey);
 
+#ifndef GNUSTEP
 	[(id)[NSDistributedNotificationCenter defaultCenter] postNotificationName: COEditingContextDidCommitNotification 
 	                                                               object: [[[self store] UUID] stringValue]
 	                                                             userInfo: notifInfos
 	                                                   deliverImmediately: YES];
+#endif
 }
 
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
