@@ -561,7 +561,7 @@ void CHECK(id db)
 
 /* Accessing History Graph and Committed Changes */
 
-- (CORevision*)revisionWithRevisionNumber: (uint64_t)anID
+- (CORevision*)revisionWithRevisionNumber: (int64_t)anID
 {
 	NSNumber *idNumber = [NSNumber numberWithUnsignedLongLong: anID];
 	CORevision *result = [commitObjectForID objectForKey: idNumber];
@@ -605,8 +605,8 @@ void CHECK(id db)
 
 	while ([rs next])
 	{
-		uint64_t result = [rs longLongIntForColumnIndex: 0];
-		uint64_t baseRevision = [rs longLongIntForColumnIndex: 1];
+		int64_t result = [rs longLongIntForColumnIndex: 0];
+		int64_t baseRevision = [rs longLongIntForColumnIndex: 1];
 		CORevision *rev = [[[CORevision alloc] 
 			     initWithStore: self 
 			    revisionNumber: result 
@@ -669,10 +669,10 @@ void CHECK(id db)
 
 /* Revision history */
 
-- (uint64_t) latestRevisionNumber
+- (int64_t) latestRevisionNumber
 {
 	FMResultSet *rs = [db executeQuery:@"SELECT MAX(revisionnumber) FROM commitMetadata"];
-	uint64_t num = 0;
+	int64_t num = 0;
 	if ([rs next])
 	{
 		num = [rs longLongIntForColumnIndex: 0];

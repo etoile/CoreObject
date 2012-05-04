@@ -26,8 +26,8 @@
 @interface CORevision : NSObject <ETCollection>
 {
 	COStore *store;
-	uint64_t revisionNumber;
-	uint64_t baseRevisionNumber;
+	int64_t revisionNumber;
+	int64_t baseRevisionNumber;
 }
 
 /** @taskunit Store */
@@ -44,7 +44,7 @@
  *
  * This number shouldn't be used to uniquely identify the revision, unlike -UUID. 
  */
-- (uint64_t)revisionNumber;
+- (int64_t)revisionNumber;
 
 /**
  * The revision upon which this one is based i.e. the main previous revision. 
@@ -111,7 +111,7 @@
  * Initializes and returns a new revision object to represent a precise revision 
  * number in the given store. 
  */
-- (id)initWithStore: (COStore *)aStore revisionNumber: (uint64_t)anID baseRevisionNumber: (uint64_t)baseID;
+- (id)initWithStore: (COStore *)aStore revisionNumber: (int64_t)anID baseRevisionNumber: (int64_t)baseID;
 
 /**
  * Returns the next revision after this one. 

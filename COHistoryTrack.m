@@ -54,7 +54,7 @@
 	if ([[currentNode metadata] valueForKey: @"undoMetadata"] != nil)
 	{
 		// we just undod
-		uint64_t lastUndo = [[[currentNode metadata] valueForKey: @"undoMetadata"] intValue];
+		int64_t lastUndo = [[[currentNode metadata] valueForKey: @"undoMetadata"] intValue];
 		
 		currentNode = [COTrackNode nodeWithRevision: [[self store] revisionWithRevisionNumber: lastUndo]
 		                                           onTrack: self];

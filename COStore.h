@@ -122,7 +122,7 @@
 
 - (CORevision*)finishCommit;
 
-- (CORevision*)revisionWithRevisionNumber: (uint64_t)anID;
+- (CORevision*)revisionWithRevisionNumber: (int64_t)anID;
 - (NSArray *)revisionsForObjectUUIDs: (NSSet *)uuids;
 
 /** @taskunit Full-text Search */
@@ -131,7 +131,7 @@
 
 /** @taskunit Revision history */
 
-- (uint64_t) latestRevisionNumber;
+- (int64_t) latestRevisionNumber;
 
 /** @taskunit Private */
 

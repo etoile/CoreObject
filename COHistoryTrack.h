@@ -30,7 +30,7 @@
 	// TODO: Remove trackObject ivar
 	COObject *trackObject;
 	BOOL includesInnerObjects;
-	uint64_t revNumberAtCacheTime;
+	int64_t revNumberAtCacheTime;
 }
 
 - (id)initWithTrackedObjects: (NSSet *)objects;

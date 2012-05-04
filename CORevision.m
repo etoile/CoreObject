@@ -14,7 +14,7 @@
 	[self applyTraitFromClass: [ETCollectionTrait class]];
 }
 
-- (id)initWithStore: (COStore *)aStore revisionNumber: (uint64_t)aRevision baseRevisionNumber: (uint64_t)aBaseRevision
+- (id)initWithStore: (COStore *)aStore revisionNumber: (int64_t)aRevision baseRevisionNumber: (int64_t)aBaseRevision
 {
 	SUPERINIT;
 	ASSIGN(store, aStore);
@@ -41,7 +41,7 @@
 	return store;
 }
 
-- (uint64_t)revisionNumber
+- (int64_t)revisionNumber
 {
 	return revisionNumber;
 }

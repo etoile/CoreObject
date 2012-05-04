@@ -183,9 +183,9 @@ store by other processes. */
 
 - (NSString *)entityNameForObjectUUID: (ETUUID *)obj
 {
-	uint64_t maxNum = (_maxRevisionNumber > 0 ? _maxRevisionNumber : [_store latestRevisionNumber]);
+	int64_t maxNum = (_maxRevisionNumber > 0 ? _maxRevisionNumber : [_store latestRevisionNumber]);
 
-	for (uint64_t revNum = maxNum; revNum > 0; revNum--)
+	for (int64_t revNum = maxNum; revNum > 0; revNum--)
 	{
 		CORevision *revision = [_store revisionWithRevisionNumber: revNum];
 		NSString *name = [[revision valuesAndPropertiesForObjectUUID: obj] objectForKey: @"_entity"];

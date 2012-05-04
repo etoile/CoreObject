@@ -195,7 +195,7 @@
 	return [revision metadata];
 }
 
-- (uint64_t)revisionNumber
+- (int64_t)revisionNumber
 {
 	return [revision revisionNumber];
 }

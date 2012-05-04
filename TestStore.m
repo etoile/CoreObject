@@ -42,7 +42,7 @@ static void DeleteOldStore()
 {
 	ETUUID *o1 = [ETUUID UUID];
 	NSDictionary *sampleMetadata = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool: YES] forKey:@"metadataWorks"];
-	uint64_t revisionNumber = 0;
+	int64_t revisionNumber = 0;
 	
 	{
 		OPEN_STORE(s);
