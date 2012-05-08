@@ -19,6 +19,36 @@
  *
  * You should use ETUUID's to refer to objects outside of the context
  * of a COEditingContext.
+ *
+ * @section Initialization
+ *
+ * A core object can be instantiated in one or two steps by using respectively:
+ *
+ * <list>
+ * <item>-[COEditingContext insertObjectWithEntityName:] or similar 
+ * COEditingContext methods</item>
+ * <item>-init and -becomePersistentInContext:rootObject:</item>
+ * </list>
+ *
+ * In both cases, -init is used to initialize the object.<br />
+ * With -insertObjectWithEntityName:, the object becomes persistent immediately.
+ * However in the second case, the object doesn't become persistent until 
+ * -becomePersistentInContext:rootObject: is called. You can use this approach   
+ * to instantiate transient objects or to mix transient and persistent instances.
+ *
+ * When writing a COObject subclass, -init can be overriden to initialize the 
+ * the subclass properties. The designated initializer rule remains valid in 
+ * a COObject class hierarchy. See the example in -init documentation.
+ *
+ * @section Persistency
+ *
+ * Whan an object becomes persistent, you invoke 
+ * -becomePersistentInContext:rootObject: or the editing context does it. 
+ * Hence -becomePersistentInContext:rootObject: can be overriden to udpate   
+ * or initialize properties at persistency time. For example, 
+ * -becomePersistentInContext:rootObject: can be propagated to the instance 
+ * relationships to transively turn a transient object graph into a persistent 
+ * one.
  */
 @interface COObject : NSObject <NSCopying, COObjectMatching>
 {
