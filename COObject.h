@@ -37,8 +37,11 @@
  * to instantiate transient objects or to mix transient and persistent instances.
  *
  * When writing a COObject subclass, -init can be overriden to initialize the 
- * the subclass properties. The designated initializer rule remains valid in 
- * a COObject class hierarchy. See the example in -init documentation.
+ * the subclass properties. See the example in -init documentation.<br />
+ * The designated initializer rule remains valid in a COObject class hierarchy, 
+ * but -init must work correctly too (it must not return nil or a wrongly 
+ * initialized instance), usually you have to override it to call the designated 
+ * initializer. And secondary initializers must return valid instances or nil. 
  *
  * @section Persistency
  *
@@ -49,6 +52,114 @@
  * -becomePersistentInContext:rootObject: can be propagated to the instance 
  * relationships to transively turn a transient object graph into a persistent 
  * one.
+ *
+ * @section Writing Accessors
+ *
+ * You can use Property-Value Coding to read and write properties. However 
+ * implementing accessors can improve readability, type checking etc. For 
+ * most attributes, we have a basic accessor pattern. For Multivalued properties 
+ * (relationships or collection-based attributes), the basic accessor pattern 
+ * won't work correctly.
+ *
+ * <strong>Basic Accessor Pattern</strong/>
+ *
+ * <example>
+ * - (void)name
+ * {
+ *     // When no ivar is provided, you can use the variable storage as below
+ *     // return [self primitiveValueForKey: @"name"];
+ *     return name;
+ * }
+ *
+ * - (void)setName: (NSString *)aName
+ * {
+ *     [self willChangeValueForProperty: @"name"];
+ *     // When no ivar is provided, you can use the variable storage as below
+ *     // [self setPrimitiveValue: aName: forKey: @"name"];
+ *     ASSIGN(name, aName);
+ *     [self didChangeValueForProperty: @"name"];
+ * }
+ * </example>
+ *
+ * <strong>Multivalued Accessor Pattern</strong/>
+ *
+ * The example below is based on a COObject subclass using a<em>names</em> 
+ * instance variable. If the value is stored in the variable storage, the 
+ * example must be adjusted to use -primitiveValueForKey: and 
+ * -setPrimitiveValue:forKey:.<br />
+ * -removeObject:atIndex:hint:forProperty: and 
+ * -insertObject:atIndex:hint:forProperty: use the instance variable whose 
+ * name matches the property (based on Key-Value Coding ivar search rules), or 
+ * resort the variable storage when there is no matching ivar.
+ *
+ * <example>
+ *
+ * - (void)names
+ * {
+ *     return names;
+ * }
+ *
+ * - (void)addName: (NSString *)aName
+ * {
+ *     [self insertObject: aName: atIndex: ETUndeterminedIndex hint: nil forProperty: @"names"];
+ * }
+ *
+ * - (void)removeName: (NSString *)aName
+ * {
+ *     [self removeObject: aName: atIndex: ETUndeterminedIndex hint: nil forProperty: @"names"];
+ * }
+ *
+ * // Direct setters are rare, but nonetheless it is possible to write one as below...
+ * - (void)setNames: (id <ETCollection>)newNames
+ * {
+ *     id oldCollection = [[names mutableCopy] autorelease];
+ *     [self willChangeValueForProperty: @"names"];
+ *     ASSIGN(names, newNames);
+ *     [self didChangeValueForProperty: @"names" oldValue: oldCollection];
+ * }
+ * </example>
+ *
+ * @section Notifications
+ *
+ * To better control persistency, -awakeFromFetch, -didReload, -willTurnIntoFault
+ *
+ * @section Serialization
+ *
+ * @section Faulting and Reloading
+ *
+ * When a core object not present in memory but exists in the store, 
+ * -[COEditingContext objectWithUUID:] uses -[COEditingContext loadObject:] to 
+ * bring the object back in memory. All the attribute values are immediately 
+ * brought back, however relationships are not loaded immediately. For example, 
+ * if a relationship consists of multiple objects that belong to an array, 
+ * CoreObject doesn't load the real objects missing in memory, but put a COFault 
+ * object in the array for each real object not yet loaded.<br /> 
+ * Faults are core objects whose state remain unitialized until a message is 
+ * sent to them.
+ *
+ * Each fault has the same UUID than the core object it stands for. As a result, 
+ * when requesting multiple times the same object not present in memory, 
+ * the same fault instance is returned every time by 
+ * -[COEditingContext objectWithUUID:].
+ *
+ * When an object that was previously a fault is loaded, then once the 
+ * attribute values have been deserialized, -awakeFromFetch is sent to the 
+ * object to let it update its state before being used. You can thus override 
+ * -awakeFromFetch to recreate transient properties, recompute correct property 
+ * values based on the deserialized values, update relationships etc.<br />
+ * Don't forget to call the superclass implementation first.<br />
+ * In addition, navigating a root object history results in -awakeFromFetch 
+ * being sent to each object loaded to a new revision in the object graph (not 
+ * yet the case), rather being turned back into a fault. When every object in 
+ * the object graph has been reloaded or turned back into fault, -didReload is 
+ * sent to the root object.
+ *
+ * For various reasons such as memory usage or root objects being reloaded to  
+ * some revision, core objects can be turned back into faults (not yet supported).
+ * Before unloading an object, -willTurnIntoFault is called on it, then the 
+ * object is unloaded (property values are released and reset to a null value), 
+ * in the end COFault becomes its class and the resulting fault receives 
+ * the message -didTurnIntoFault.
  */
 @interface COObject : NSObject <NSCopying, COObjectMatching>
 {
@@ -327,7 +438,7 @@
  *
  * See also ETCollectionMutation and -updateRelationshipConsistencyWithValue:.
  */
-- (void) insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
+- (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
 /** 
  * Checks the insertion and the object that goes along respect the metamodel 
  * constraints, then calls -removeObject:atIndex:hint: on the collection bound 
@@ -337,23 +448,10 @@
  *
  * See also ETCollectionMutation and -updateRelationshipConsistencyWithValue:. 
  */
-- (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
+- (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
 
 /** @taskunit Overridable Notifications */
 
-/**
- * A notification that the object was created for the first time.
- *
- * Overrides this method to perform any initialisation that should be performed 
- * the very first time an object is instantiated, such as calculating and 
- * setting default values.<br />
- * The superclass implementation must be called before the subclass code.
- *
- * This method won't be called when the new instance is a fault, or when the 
- * object was loaded or reloaded with -[COEditingContext loadObject:atRevision:]. `
- * For these cases, both -awakeFromFetch and -didReload can be used.
- */
-- (void)didCreate;
 - (void)awakeFromFetch;
 - (void)willTurnIntoFault;
 - (void)didTurnIntoFault;
@@ -385,7 +483,7 @@
  *
  * See also -isEqual:.
  */
-- (BOOL) isTemporalInstance: (id)anObject;
+- (BOOL)isTemporalInstance: (id)anObject;
 
 /** @taskunit Object Matching */
 
