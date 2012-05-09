@@ -23,6 +23,31 @@
 
 }
 
+/** @taskunit Metamodel */
+
+/**
+ * <override-subclass />
+ * Returns a persistent property that describes the collection content in a way 
+ * that matches the superclass contraints.
+ * 
+ * The returned property can be customized, then inserted into the entity built 
+ * with +newEntityDescription in your subclass.
+ * 
+ * Name and type must not be nil.
+ *
+ * Both type and opposite must be entity description names such as 
+ * <em>Anonymous.NSObject</em> or <em>NSObject</em>.<br />
+ * The <em>Anonymous</em> prefix is optional. Most entity description names 
+ * don't require a prefix, because they don't belong to a package description 
+ * but are just registered at runtime directly, and belong to this Anonymous 
+ * package as a result.
+ *
+ * The default implementation raises an exception.
+ */
++ (ETPropertyDescription *)contentPropertyDescriptionWithName: (NSString *)aName
+                                                         type: (NSString *)aType
+                                                     opposite: (NSString *)oppositeType;
+
 /** @taskunit Content Access */
 
 /**

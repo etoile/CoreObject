@@ -24,6 +24,21 @@
 
 }
 
+/** @taskunit Metamodel */
+
+/**
+ * Returns a multivalued, non-ordered and persistent property.
+ *
+ * You can use this method to easily describe your collection content in a way 
+ * that matches the superclass contraints. 
+ *
+ * See -[COCollection contentPropertyDescriptionWithName:type:opposite:] which 
+ * documents the method precisely.
+ */
++ (ETPropertyDescription *)contentPropertyDescriptionWithName: (NSString *)aName
+                                                         type: (NSString *)aType
+                                                     opposite: (NSString *)oppositeType;
+
 /**
  * Returns YES.
  */

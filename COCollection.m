@@ -21,6 +21,14 @@
 	[self applyTraitFromClass: [ETMutableCollectionTrait class]];
 }
 
++ (ETPropertyDescription *)contentPropertyDescriptionWithName: (NSString *)aName
+                                                         type: (NSString *)aType
+                                                     opposite: (NSString *)oppositeType
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
+}
+
 + (ETEntityDescription *) newEntityDescription
 {
 	ETEntityDescription *collection = [self newBasicEntityDescription];

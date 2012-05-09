@@ -14,6 +14,19 @@
 
 @implementation COContainer
 
++ (ETPropertyDescription *)contentPropertyDescriptionWithName: (NSString *)aName
+                                                         type: (NSString *)aType
+                                                     opposite: (NSString *)oppositeType
+{
+	ETPropertyDescription *contentProperty = 
+		[ETPropertyDescription descriptionWithName: aName type: (id)aType];
+	[contentProperty setMultivalued: YES];
+	[contentProperty setOpposite: (id)oppositeType];
+	[contentProperty setOrdered: YES];
+	[contentProperty setPersistent: YES];
+	return contentProperty;
+}
+
 + (ETEntityDescription *) newEntityDescription
 {
 	ETEntityDescription *collection = [self newBasicEntityDescription];
@@ -24,7 +37,7 @@
 		return collection;
 	
 	ETPropertyDescription *contentsProperty = 
-		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.COObject"];
+		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"COObject"];
 	
 	[contentsProperty setMultivalued: YES];
 	[contentsProperty setOrdered: YES];
@@ -64,7 +77,7 @@
 	[collection setLocalizedDescription: _(@"Library")];
 
 	ETPropertyDescription *idProperty = 
-		[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"Anonymous.NSString"];
+		[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"NSString"];
 	[idProperty setPersistent: YES];
 
 	[collection setPropertyDescriptions: A(idProperty)];
@@ -105,7 +118,7 @@
 		return collection;
 
 	ETPropertyDescription *tagGroups = 
-		[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"Anonymous.COGroup"];
+		[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"COGroup"];
 	[tagGroups setPersistent: YES];
 
 	[collection setPropertyDescriptions: A(tagGroups)];
