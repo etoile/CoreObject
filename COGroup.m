@@ -15,6 +15,19 @@
 
 @implementation COGroup
 
++ (ETPropertyDescription *)contentPropertyDescriptionWithName: (NSString *)aName
+                                                         type: (NSString *)aType
+                                                     opposite: (NSString *)oppositeType
+{
+	ETPropertyDescription *contentProperty = 
+		[ETPropertyDescription descriptionWithName: aName type: (id)aType];
+	[contentProperty setMultivalued: YES];
+	[contentProperty setOpposite: (id)oppositeType];
+	[contentProperty setOrdered: NO];
+	[contentProperty setPersistent: YES];
+	return contentProperty;
+}
+
 + (ETEntityDescription *) newEntityDescription
 {
 	ETEntityDescription *collection = [self newBasicEntityDescription];
@@ -32,13 +45,13 @@
 
 	[collection setLocalizedDescription: _(@"Group")];
 
-	ETPropertyDescription *collectionContentsProperty = 
-		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.COObject"];
-	[collectionContentsProperty setMultivalued: YES];
-	[collectionContentsProperty setOrdered: NO];
-	[collectionContentsProperty setPersistent: YES];
+	ETPropertyDescription *contentProperty = 
+		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"COObject"];
+	[contentProperty setMultivalued: YES];
+	[contentProperty setOrdered: NO];
+	[contentProperty setPersistent: YES];
 
-	[collection setPropertyDescriptions: A(collectionContentsProperty)];
+	[collection setPropertyDescriptions: A(contentProperty)];
 
 	return collection;
 }
@@ -78,17 +91,11 @@
 	                                  typeTags: [NSDictionary dictionary]];
 	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
 
-	ETPropertyDescription *contentProperty = 
-		[ETPropertyDescription descriptionWithName: @"objects" type: (id)@"Anonymous.COObject"];
-	
-	[contentProperty setMultivalued: YES];
-	[contentProperty setOpposite: (id)@"Anonymous.COObject.tags"];
-	[contentProperty setOrdered: NO];
-	[contentProperty setPersistent: YES];
-
-	[collection setPropertyDescriptions: A(contentProperty)];
-
 	[collection setLocalizedDescription: _(@"Tag")];
+
+	ETPropertyDescription *contentProperty = 
+		[self contentPropertyDescriptionWithName: @"objects" type: @"COObject" opposite: @"COObject.tags"];
+	[collection setPropertyDescriptions: A(contentProperty)];
 
 	return collection;
 }
@@ -131,16 +138,12 @@
 
 	[collection setLocalizedDescription: _(@"Tag Group")];
 
-#if 1
-	ETPropertyDescription *collectionContentsProperty = 
-		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.COTag"];
-	[collectionContentsProperty setMultivalued: YES];
-	//[collectionContentsProperty setOpposite: (id)@"Anonymous.COTag.parentTagGroups"]; // FIXME: just 'parentCollections' should work...
-	[collectionContentsProperty setOrdered: YES];
-	[collectionContentsProperty setPersistent: YES];
+	ETPropertyDescription *contentProperty = 
+		[self contentPropertyDescriptionWithName: @"contents" type: @"COTag" opposite: nil];
+	[contentProperty setOrdered: YES];
+	//[contentProperty setOpposite: (id)@"COTag.parentTagGroups"]; // FIXME: just 'parentCollections' should work...
 
-	[collection setPropertyDescriptions: A(collectionContentsProperty)];
-#endif
+	[collection setPropertyDescriptions: A(contentProperty)];
 
 	return collection;
 }
@@ -183,10 +186,8 @@
 	[group setLocalizedDescription: _(@"Smart Group")];
 
 	ETPropertyDescription *contentProperty = 
-		[ETPropertyDescription descriptionWithName: @"content" type: (id)@"Anonymous.COObject"];
-	
+		[ETPropertyDescription descriptionWithName: @"content" type: (id)@"COObject"];
 	[contentProperty setMultivalued: YES];
-	// FIXME: We should use [contentProperty setOpposite: (id)@"Anonymous.COObject.parentGroups"];
 	[contentProperty setOrdered: YES];
 
 	[group setPropertyDescriptions: A(contentProperty)];
