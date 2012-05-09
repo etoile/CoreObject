@@ -654,6 +654,49 @@
 	return YES;
 }
 
+- (NSArray *)validateAllValues
+{
+	NSMutableArray *results = [NSMutableArray array];
+
+	// TODO: We might want to coalesce bidirectional relationships validation results
+	for (NSString *key in [self persistentPropertyNames])
+	{
+		[results addObject: [self validateValue: [self valueForProperty: key] 
+		                            forProperty: key]];
+	}
+	return results;
+}
+
+- (ETValidationResult *)validateValue: (id)value forProperty: (NSString *)key
+{
+	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
+	ETPropertyDescription *opposite = [propertyDesc opposite];
+	ETValidationResult *oppositeResult = nil;
+
+	if (opposite != nil)
+	{
+		NSString *oppositeKey = [opposite name];
+		id oppositeValue = [value valueForProperty: oppositeKey];
+
+		oppositeResult = [opposite validateValue: oppositeValue forKey: oppositeKey];
+	}
+	
+	ETValidationResult *result = [propertyDesc validateValue: value forKey: key];
+	// TODO: [result setOppositeResult: oppositeResult];
+
+	return result;
+}
+
+- (NSError *)validateForUpdate
+{
+	return nil;
+}
+
+- (BOOL)validateValue:(id *)ioValue forKey:(NSString *)key error:(NSError **)outError
+{
+
+}
+
 - (id)primitiveValueForKey: (NSString *)key
 {
 	id value = [_variableStorage objectForKey: key];

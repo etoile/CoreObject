@@ -379,6 +379,21 @@
  */
 - (BOOL)setValue: (id)value forProperty: (NSString *)key;
 
+/** @taskunit Validation */
+
+/**
+ * Validates every persistent property, then returns a validation result array.
+ *
+ * When the entity description includes persistent properties, transient objects 
+ * are validatable too.
+ *
+ * See -validateValue:forProperty: and ETValidationResult.
+ */
+- (NSArray *)validateAllValues;
+- (ETValidationResult *)validateValue: (id)value forProperty: (NSString *)key;
+- (NSError *)validateForUpdate;
+- (BOOL)validateValue:(id *)ioValue forKey:(NSString *)key error:(NSError **)outError;
+
 /** @taskunit Direct Access to the Variable Storage */
 
 /**
