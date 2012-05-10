@@ -401,6 +401,10 @@
  * Because this method is invoked at commit time, you can be sure that 
  * -becomePersistentInContext:rootObject: was called previously.
  *
+ * This method must return nil on validation success, otherwise it must return 
+ * suberrors (or a single error) that include their validation results in the 
+ * user info under the key kCOValidationResultKey.
+ *
  * The superclass implementation must be called, then the returned error is 
  * either returned directly, or when validation doesn't succeed locally 
  * combined with the new errors through +[NSError errorWithErrors:].
@@ -419,8 +423,8 @@
  * the last commit.
  *
  * This method must return nil on validation success, otherwise it must return 
- * an error that includes the validation result in the user info under the key 
- * kCOValidationResultKey.
+ * suberrors (or a single error) that include their validation results in the 
+ * user info under the key kCOValidationResultKey.
  *
  * The superclass implementation must be called, then the returned error is 
  * either returned directly, or when validation doesn't succeed locally 
@@ -437,8 +441,9 @@
  * By default, returns nil.
  *
  * This method must return nil on validation success, otherwise it must return 
- * an error that includes the validation result in the user info under the key 
- * kCOValidationResultKey.
+ * suberrors (or a single error) that include their validation results in the 
+ * user info under the key kCOValidationResultKey.
+ *
  * The superclass implementation must be called, then the returned error is 
  * either returned directly, or when validation doesn't succeed locally 
  * combined with the new errors through +[NSError errorWithErrors:].
