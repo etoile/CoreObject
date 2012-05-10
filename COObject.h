@@ -390,7 +390,29 @@
  * See -validateValue:forProperty: and ETValidationResult.
  */
 - (NSArray *)validateAllValues;
-- (ETValidationResult *)validateValue: (id)value forProperty: (NSString *)key;
+/**
+ * Validates the proposed value against the property, then returns a validation 
+ * result array.
+ *
+ * The validation is divided in two steps that occurs in the order below:
+ *
+ * <list>
+ * <item>Metamodel validation using -[ETPropertyDescription validateValue:forKey:],  
+ * (for relationships, the opposite property is validated too)</item>
+ * <item>Custom validation when a method validate<em>PropertyName</em>: returning 
+ * validation result is implemented (this validation scheme is not the same one 
+ * that the Key-Value Coding one)</item>
+ * </list>
+ *
+ * The returned array contains one or more validation results. The metamodel 
+ * validation result is returned in all cases. When custom validation based on 
+ * a validate<em>PropertyName</em> method fails, one more result is included.
+ * So you can check that a single result is included and it returns YES to 
+ * -isValid to conclude that the validation has succeeded.
+ *
+ * See -validateValue:forProperty: and ETValidationResult.
+ */
+- (NSArray *)validateValue: (id)value forProperty: (NSString *)key;
 /**
  * <override-dummy />
  * Validates the receiver when it belongs to the inserted objects in the commit 
@@ -409,7 +431,7 @@
  * either returned directly, or when validation doesn't succeed locally 
  * combined with the new errors through +[NSError errorWithErrors:].
  *
- * See also -[COEditingContext insertedObjects].
+ * See also -[COEditingContext insertedObjects] and example in -validateForUpdate.
  */
 - (NSError *)validateForInsert;
 /**
@@ -430,6 +452,8 @@
  * either returned directly, or when validation doesn't succeed locally 
  * combined with the new errors through +[NSError errorWithErrors:].
  *
+ * <example>return [[super validateForUpdate] errorWithErrors: [NSError errorsWithValidationResults: results]];</example>
+ *
  * See also -[COEditingContext updatedObjects].
  */
 - (NSError *)validateForUpdate;
@@ -448,10 +472,18 @@
  * either returned directly, or when validation doesn't succeed locally 
  * combined with the new errors through +[NSError errorWithErrors:].
  *
- * See also -[COEditingContext deletedObjects].
+ * See also -[COEditingContext deletedObjects] and example in -validateForUpdate.
  */
 - (NSError *)validateForDelete;
-- (BOOL)validateValue:(id *)ioValue forKey:(NSString *)key error:(NSError **)outError;
+/**
+ * Calls -validateValue:forProperty: to validate the value, and returns the 
+ * validation result through aValue and anError.
+ *
+ * This method exists to integrate CoreObject validation with existing Cocoa or 
+ * GNUstep programs.<br />
+ * For Etoile programs or new projects, you should use -validateValue:forProperty:.
+ */
+- (BOOL)validateValue:(id *)aValue forKey:(NSString *)key error:(NSError **)anError;
 
 /** @taskunit Direct Access to the Variable Storage */
 

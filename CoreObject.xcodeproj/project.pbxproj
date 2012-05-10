@@ -22,6 +22,8 @@
 		60CF348313BA931C001F9011 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 605BFF3F13B50C7700073E18 /* Foundation.framework */; };
 		60CF350513BA9331001F9011 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 605BFF3F13B50C7700073E18 /* Foundation.framework */; };
 		60CF350913BA9348001F9011 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF350813BA9348001F9011 /* AppKit.framework */; };
+		60EB4F69155BDAA700CFBC5C /* COError.h in Headers */ = {isa = PBXBuildFile; fileRef = 60EB4F67155BDAA700CFBC5C /* COError.h */; };
+		60EB4F6A155BDAA700CFBC5C /* COError.m in Sources */ = {isa = PBXBuildFile; fileRef = 60EB4F68155BDAA700CFBC5C /* COError.m */; };
 		60F6A31814444EC300EFC711 /* COCommitTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60F6A31514444EC300EFC711 /* COCommitTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60F6A31914444EC300EFC711 /* COCommitTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F6A31614444EC300EFC711 /* COCommitTrack.m */; };
 		60F6A31C14444EDA00EFC711 /* TestCommitTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F6A31A14444EDA00EFC711 /* TestCommitTrack.m */; };
@@ -152,6 +154,8 @@
 		60A55DDF14A25AC4007A9864 /* COTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COTrack.h; sourceTree = "<group>"; };
 		60A55DE014A25AC4007A9864 /* COTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COTrack.m; sourceTree = "<group>"; };
 		60CF350813BA9348001F9011 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		60EB4F67155BDAA700CFBC5C /* COError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COError.h; sourceTree = "<group>"; };
+		60EB4F68155BDAA700CFBC5C /* COError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COError.m; sourceTree = "<group>"; };
 		60F6A31514444EC300EFC711 /* COCommitTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommitTrack.h; sourceTree = "<group>"; };
 		60F6A31614444EC300EFC711 /* COCommitTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommitTrack.m; sourceTree = "<group>"; };
 		60F6A31A14444EDA00EFC711 /* TestCommitTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCommitTrack.m; sourceTree = "<group>"; };
@@ -385,6 +389,8 @@
 		6686BDC712592C1B0065DE1A /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				60EB4F67155BDAA700CFBC5C /* COError.h */,
+				60EB4F68155BDAA700CFBC5C /* COError.m */,
 				6686BDD712592C1B0065DE1A /* Compression and Hashing */,
 				6686BDCB12592C1B0065DE1A /* Low level Differencing & Merging */,
 			);
@@ -529,6 +535,7 @@
 				60A55DE114A25AC4007A9864 /* COTrack.h in Headers */,
 				6039CC7814BC3FBB008A8BA3 /* COCustomTrack.h in Headers */,
 				6028E42A153729ED0003A205 /* COObject.h in Headers */,
+				60EB4F69155BDAA700CFBC5C /* COError.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -693,6 +700,7 @@
 				60844F291490B6B2008A329F /* COCollection.m in Sources */,
 				60A55DE214A25AC4007A9864 /* COTrack.m in Sources */,
 				6039CC7914BC3FBB008A8BA3 /* COCustomTrack.m in Sources */,
+				60EB4F6A155BDAA700CFBC5C /* COError.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

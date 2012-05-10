@@ -11,6 +11,7 @@
  */
 
 #import "COObject.h"
+#import "COError.h"
 #import "COFault.h"
 #import "COEditingContext.h"
 #import "COStore.h"
@@ -91,6 +92,24 @@
 	return [[NSMapTable alloc] initWithKeyOptions: NSMapTableStrongMemory 
 	                                 valueOptions: NSMapTableStrongMemory 
 	                                    capacity: 20];
+}
+
+/* Puts mutable collections into multivalued properties. */
+- (void)didCreate
+{
+	BOOL wasIgnoringDamage = _isIgnoringDamageNotifications;
+	_isIgnoringDamageNotifications = YES;
+	
+	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+	{
+		if ([propDesc isMultivalued])
+		{
+			id container = ([propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set]);
+			[self setValue: container forProperty: [propDesc name]];
+		}
+	}
+	
+	_isIgnoringDamageNotifications = wasIgnoringDamage;
 }
 
 - (id) commonInitWithUUID: (ETUUID *)aUUID 
@@ -661,13 +680,13 @@
 	// TODO: We might want to coalesce bidirectional relationships validation results
 	for (NSString *key in [self persistentPropertyNames])
 	{
-		[results addObject: [self validateValue: [self valueForProperty: key] 
-		                            forProperty: key]];
+		[results addObjectsFromArray: [self validateValue: [self valueForProperty: key] 
+		                                      forProperty: key]];
 	}
 	return results;
 }
 
-- (ETValidationResult *)validateValue: (id)value forProperty: (NSString *)key
+- (ETValidationResult *)validateValueUsingMetamodel: (id)value forProperty: (NSString *)key
 {
 	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
 	ETPropertyDescription *opposite = [propertyDesc opposite];
@@ -687,6 +706,23 @@
 	return result;
 }
 
+- (ETValidationResult *)validateValueUsingPVC: (id)value forProperty: (NSString *)key
+{
+	NSString *keySelector = [@"validate" stringByAppendingString: [key capitalizedString]];
+	return [self performSelector: NSSelectorFromString(keySelector) withObject: value];
+}
+
+// TODO: If we want to support -validateValue:forKey:error: too, implement 
+// -validateUsingKVC:forProperty:
+// TODO: Would be cleaner to return an aggregate validation result
+- (NSArray *)validateValue: (id)value forProperty: (NSString *)key
+{
+	ETValidationResult *result = [self validateValueUsingMetamodel: value forProperty: key];
+	ETValidationResult *pvcResult = [self validateValueUsingPVC: value forProperty: key];
+
+	return (pvcResult != nil ? A(result, pvcResult) : A(result));
+}
+
 - (NSError *)validateForInsert
 {
 	return nil;
@@ -694,7 +730,7 @@
 
 - (NSError *)validateForUpdate
 {
-	return nil;
+	return [COError errorWithValidationResults: [self validateAllValues]];
 }
 
 - (NSError *)validateForDelete
@@ -702,9 +738,16 @@
 	return nil;
 }
 
-- (BOOL)validateValue:(id *)ioValue forKey:(NSString *)key error:(NSError **)outError
+- (BOOL)validateValue:(id *)aValue forKey:(NSString *)key error:(NSError **)anError
 {
+	NSArray *results = [self validateValue: *aValue forProperty: key];
 
+	if ([results count] == 1 && [[results firstObject] isValid])
+		return YES;
+
+	*aValue = [[results lastObject] value];
+	*anError = [COError errorWithValidationResults: results];
+	return NO;
 }
 
 - (id)primitiveValueForKey: (NSString *)key
@@ -841,24 +884,6 @@
 	[self willChangeValueForProperty: key];
 	[collection removeObject: object atIndex: index hint: hint];
 	[self didChangeValueForProperty: key oldValue: oldCollection];
-}
-
-/* Puts mutable collections into multivalued properties. */
-- (void)didCreate
-{
-	BOOL wasIgnoringDamage = _isIgnoringDamageNotifications;
-	_isIgnoringDamageNotifications = YES;
-	
-	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
-	{
-		if ([propDesc isMultivalued])
-		{
-			id container = ([propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set]);
-			[self setValue: container forProperty: [propDesc name]];
-		}
-	}
-	
-	_isIgnoringDamageNotifications = wasIgnoringDamage;
 }
 
 - (void)awakeFromFetch

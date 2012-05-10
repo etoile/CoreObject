@@ -1,4 +1,5 @@
 #import "COEditingContext.h"
+#import "COError.h"
 #import "COObject.h"
 #import "COGroup.h"
 #import "COStore.h"
@@ -733,13 +734,6 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 #endif
 }
 
-- (NSError *)errorWithErrors: (NSArray *)errors
-{
-    return [NSError errorWithDomain: kCOCoreObjectErrorDomain
-                               code: kCOValidationMultipleErrorsError
-                           userInfo: D(errors, kCODetailedErrorsKey)];
-}
-
 - (BOOL)validateChangedObjects
 {
 	NSArray *insertionErrors = (id)[[[self insertedObjects] mappedCollection] validateForInsert];
@@ -748,15 +742,16 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	NSArray *validationErrors = [[insertionErrors arrayByAddingObjectsFromArray: updateErrors] 
 		arrayByAddingObjectsFromArray: deletionErrors];
 	
-	ASSIGN(_error, [self errorWithErrors: validationErrors]);
+	ASSIGN(_error, [COError errorWithErrors: validationErrors]);
 
 	return (_error == nil);
 }
 
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
 {
-	if ([self validateChangedObjects] == NO)
-		return [NSArray array];
+	// TODO: Enable validation
+	//if ([self validateChangedObjects] == NO)
+	//	return [NSArray array];
 
 	NSMapTable *insertedObjectsByRoot = [self insertedObjectsByRootObject];
 	NSMapTable *updatedObjectsByRoot = [self updatedObjectsByRootObject];
@@ -986,7 +981,3 @@ NSString *COEditingContextDidCommitNotification = @"COEditingContextDidCommitNot
 
 NSString *kCORevisionNumbersKey = @"kCORevisionNumbersKey";
 NSString *kCORevisionsKey = @"kCORevisionsKey";
-
-NSString *kCOCoreObjectErrorDomain = @"kCOCoreObjectErrorDomain";
-NSInteger kCOValidationMultipleErrorsError = 1;
-NSString *kCODetailedErrorsKey = @"kCODetailedErrorsKey";

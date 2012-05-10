@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COStore, CORevision, COObject, COGroup, COSmartGroup, COCommitTrack;
+@class COStore, CORevision, COObject, COGroup, COSmartGroup, COCommitTrack, COError;
 
 /**
  * An object context is like a working copy in a revision control system.
@@ -37,7 +37,7 @@
 	 * New entries must be inserted with -markObjectUpdated:forProperty:.
 	 */
 	NSMapTable *_updatedPropertiesByObject; 
-	NSError *_error;
+	COError *_error;
 }
 
 /** @taskunit Accessing the current context */
@@ -440,7 +440,3 @@ extern NSString *COEditingContextDidCommitNotification;
 
 extern NSString *kCORevisionNumbersKey;
 extern NSString *kCORevisionsKey;
-
-extern NSString *kCOCoreObjectErrorDomain;
-extern NSInteger kCOValidationMultipleErrorsError;
-extern NSString *kCODetailedErrorsKey;
