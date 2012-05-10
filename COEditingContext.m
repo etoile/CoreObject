@@ -736,12 +736,17 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 - (BOOL)validateChangedObjects
 {
-	NSArray *insertionErrors = (id)[[[self insertedObjects] mappedCollection] validateForInsert];
-	NSArray *updateErrors = (id)[[[self updatedObjects] mappedCollection] validateForUpdate];
-	NSArray *deletionErrors = (id)[[[self deletedObjects] mappedCollection] validateForDelete];
-	NSArray *validationErrors = [[insertionErrors arrayByAddingObjectsFromArray: updateErrors] 
-		arrayByAddingObjectsFromArray: deletionErrors];
+	NSSet *insertionErrors = (id)[[[self insertedObjects] mappedCollection] validateForInsert];
+	NSSet *updateErrors = (id)[[[self updatedObjects] mappedCollection] validateForUpdate];
+	NSSet *deletionErrors = (id)[[[self deletedObjects] mappedCollection] validateForDelete];
+	NSMutableSet *validationErrors = [NSMutableSet setWithSet: insertionErrors];
 	
+	[validationErrors unionSet: updateErrors];
+	[validationErrors unionSet: deletionErrors];
+
+	// NOTE: We have a null value because -validateXXX returns nil on validation success
+	[validationErrors removeObject: [NSNull null]];
+
 	ASSIGN(_error, [COError errorWithErrors: validationErrors]);
 
 	return (_error == nil);
@@ -750,8 +755,8 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
 {
 	// TODO: Enable validation
-	//if ([self validateChangedObjects] == NO)
-	//	return [NSArray array];
+	if ([self validateChangedObjects] == NO)
+		return [NSArray array];
 
 	NSMapTable *insertedObjectsByRoot = [self insertedObjectsByRootObject];
 	NSMapTable *updatedObjectsByRoot = [self updatedObjectsByRootObject];

@@ -28,8 +28,10 @@
 
 /**
  * Returns a new autoreleased error that includes suberrors.
+ *
+ * Returns nil when the error array is empty.
  */
-+ (id)errorWithErrors: (NSArray *)errors;
++ (id)errorWithErrors: (id <ETCollection>)suberrors;
 /**
  * Returns a new autoreleased error based on a validation result.
  */
@@ -38,12 +40,12 @@
  * Returns new autoreleased error array where every error corresponds to 
  * validation result.
  */
-+ (NSArray *)errorsWithValidationResults: (NSArray *)errors;
++ (NSArray *)errorsWithValidationResults: (id <ETCollection>)errors;
 /**
  * Returns a new autoreleased error that includes validations results put into 
  * suberrors.
  */
-+ (id)errorWithValidationResults: (NSArray *)errors;
++ (id)errorWithValidationResults: (id <ETCollection>)errors;
 
 /** @taskunit Basic Properties */
 

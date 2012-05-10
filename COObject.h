@@ -384,6 +384,8 @@
 /**
  * Validates every persistent property, then returns a validation result array.
  *
+ * Valid results are not included in the returned array.
+ *
  * When the entity description includes persistent properties, transient objects 
  * are validatable too.
  *
@@ -394,6 +396,9 @@
  * Validates the proposed value against the property, then returns a validation 
  * result array.
  *
+ * Valid results are not included in the returned array. On success, returns 
+ * an emtpy array.
+ *
  * The validation is divided in two steps that occurs in the order below:
  *
  * <list>
@@ -403,12 +408,6 @@
  * validation result is implemented (this validation scheme is not the same one 
  * that the Key-Value Coding one)</item>
  * </list>
- *
- * The returned array contains one or more validation results. The metamodel 
- * validation result is returned in all cases. When custom validation based on 
- * a validate<em>PropertyName</em> method fails, one more result is included.
- * So you can check that a single result is included and it returns YES to 
- * -isValid to conclude that the validation has succeeded.
  *
  * See -validateValue:forProperty: and ETValidationResult.
  */

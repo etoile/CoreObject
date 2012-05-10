@@ -708,8 +708,12 @@
 
 - (ETValidationResult *)validateValueUsingPVC: (id)value forProperty: (NSString *)key
 {
-	NSString *keySelector = [@"validate" stringByAppendingString: [key capitalizedString]];
-	return [self performSelector: NSSelectorFromString(keySelector) withObject: value];
+	SEL keySelector = NSSelectorFromString([NSString stringWithFormat: @"validate%@:", [key capitalizedString]]);
+
+	if ([self respondsToSelector: keySelector] == NO)
+		return [ETValidationResult validResult: value];
+
+	return [self performSelector: keySelector withObject: value];
 }
 
 // TODO: If we want to support -validateValue:forKey:error: too, implement 
@@ -719,8 +723,17 @@
 {
 	ETValidationResult *result = [self validateValueUsingMetamodel: value forProperty: key];
 	ETValidationResult *pvcResult = [self validateValueUsingPVC: value forProperty: key];
+	NSMutableArray *results = [NSMutableArray arrayWithCapacity: 2];
 
-	return (pvcResult != nil ? A(result, pvcResult) : A(result));
+	if ([result isValid] == NO)
+	{
+		[results addObject: result];
+	}
+	if ([pvcResult isValid] == NO)
+	{
+		[results addObject: pvcResult];
+	}
+	return results;
 }
 
 - (NSError *)validateForInsert

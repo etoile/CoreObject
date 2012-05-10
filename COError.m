@@ -13,8 +13,16 @@
 
 @synthesize errors, validationResult;
 
-- (id)initWithValidationResult: (ETValidationResult *)aResult errors: (NSArray *)suberrors
+- (id)initWithValidationResult: (ETValidationResult *)aResult errors: (id <ETCollection>)suberrors
 {
+	NILARG_EXCEPTION_TEST(suberrors);
+	
+	if (aResult == nil && [suberrors isEmpty])
+	{
+		[self release];
+		return nil;
+	}
+
 	BOOL isAggregate = (suberrors != nil && [suberrors isEmpty] == NO);
 	self = [super initWithDomain: kCOCoreObjectErrorDomain 
 	                        code: (isAggregate ? kCOValidationMultipleErrorsError : kCOValidationError)
@@ -34,7 +42,7 @@
 	[super dealloc];
 }
 
-+ (id)errorWithErrors: (NSArray *)errors
++ (id)errorWithErrors: (id <ETCollection>)errors
 {
     return [[[self alloc] initWithValidationResult: nil errors: errors] autorelease];
 }
@@ -44,7 +52,7 @@
     return [[[self alloc] initWithValidationResult: aResult errors: nil] autorelease];
 }
 
-+ (NSArray *)errorsWithValidationResults: (NSArray *)results
++ (NSArray *)errorsWithValidationResults: (id <ETCollection>)results
 {
 	NSMutableArray *errors = [NSMutableArray array];
 
