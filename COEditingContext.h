@@ -37,6 +37,7 @@
 	 * New entries must be inserted with -markObjectUpdated:forProperty:.
 	 */
 	NSMapTable *_updatedPropertiesByObject; 
+	NSError *_error;
 }
 
 /** @taskunit Accessing the current context */
@@ -326,6 +327,13 @@
  */
 - (NSArray *)commitWithType: (NSString *)type
            shortDescription: (NSString *)shortDescription;
+/** 
+ * Returns the last commit error, usually involving one or several validation 
+ * issues.
+ *
+ * When commit methods return a non-empty revision array, the error is nil.
+ */
+- (NSError *)error;
 
 /** @taskunit Private */
 
@@ -432,3 +440,7 @@ extern NSString *COEditingContextDidCommitNotification;
 
 extern NSString *kCORevisionNumbersKey;
 extern NSString *kCORevisionsKey;
+
+extern NSString *kCOCoreObjectErrorDomain;
+extern NSInteger kCOValidationMultipleErrorsError;
+extern NSString *kCODetailedErrorsKey;

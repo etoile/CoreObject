@@ -75,6 +75,7 @@ static COEditingContext *currentCtxt = nil;
 	DESTROY(_insertedObjects);
 	DESTROY(_deletedObjects);
 	DESTROY(_updatedPropertiesByObject);
+	DESTROY(_error);
 	[super dealloc];
 }
 
@@ -732,8 +733,31 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 #endif
 }
 
+- (NSError *)errorWithErrors: (NSArray *)errors
+{
+    return [NSError errorWithDomain: kCOCoreObjectErrorDomain
+                               code: kCOValidationMultipleErrorsError
+                           userInfo: D(errors, kCODetailedErrorsKey)];
+}
+
+- (BOOL)validateChangedObjects
+{
+	NSArray *insertionErrors = (id)[[[self insertedObjects] mappedCollection] validateForInsert];
+	NSArray *updateErrors = (id)[[[self updatedObjects] mappedCollection] validateForUpdate];
+	NSArray *deletionErrors = (id)[[[self deletedObjects] mappedCollection] validateForDelete];
+	NSArray *validationErrors = [[insertionErrors arrayByAddingObjectsFromArray: updateErrors] 
+		arrayByAddingObjectsFromArray: deletionErrors];
+	
+	ASSIGN(_error, [self errorWithErrors: validationErrors]);
+
+	return (_error == nil);
+}
+
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
 {
+	if ([self validateChangedObjects] == NO)
+		return [NSArray array];
+
 	NSMapTable *insertedObjectsByRoot = [self insertedObjectsByRootObject];
 	NSMapTable *updatedObjectsByRoot = [self updatedObjectsByRootObject];
 	NSSet *rootObjects = [NSSet setWithArray: [[[insertedObjectsByRoot keyEnumerator] allObjects] 
@@ -762,6 +786,11 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
  	[self postCommitNotificationsWithRevisions: revisions];
 	return revisions;
+}
+
+- (NSError *)error
+{
+	return _error;
 }
 
 - (void)markObjectUpdated: (COObject *)obj forProperty: (NSString *)aProperty
@@ -957,3 +986,7 @@ NSString *COEditingContextDidCommitNotification = @"COEditingContextDidCommitNot
 
 NSString *kCORevisionNumbersKey = @"kCORevisionNumbersKey";
 NSString *kCORevisionsKey = @"kCORevisionsKey";
+
+NSString *kCOCoreObjectErrorDomain = @"kCOCoreObjectErrorDomain";
+NSInteger kCOValidationMultipleErrorsError = 1;
+NSString *kCODetailedErrorsKey = @"kCODetailedErrorsKey";
