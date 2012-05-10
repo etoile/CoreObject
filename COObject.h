@@ -391,7 +391,61 @@
  */
 - (NSArray *)validateAllValues;
 - (ETValidationResult *)validateValue: (id)value forProperty: (NSString *)key;
+/**
+ * <override-dummy />
+ * Validates the receiver when it belongs to the inserted objects in the commit 
+ * underway.
+ *
+ * By default, returns nil.
+ *
+ * Because this method is invoked at commit time, you can be sure that 
+ * -becomePersistentInContext:rootObject: was called previously.
+ *
+ * The superclass implementation must be called, then the returned error is 
+ * either returned directly, or when validation doesn't succeed locally 
+ * combined with the new errors through +[NSError errorWithErrors:].
+ *
+ * See also -[COEditingContext insertedObjects].
+ */
+- (NSError *)validateForInsert;
+/**
+ * <override-dummy />
+ * Validates the receiver when it belongs to the updated objects in the commit 
+ * under way. 
+ *
+ * By default, returns nil.
+ *
+ * Will be invoked when the receiver property values have been changed since 
+ * the last commit.
+ *
+ * This method must return nil on validation success, otherwise it must return 
+ * an error that includes the validation result in the user info under the key 
+ * kCOValidationResultKey.
+ *
+ * The superclass implementation must be called, then the returned error is 
+ * either returned directly, or when validation doesn't succeed locally 
+ * combined with the new errors through +[NSError errorWithErrors:].
+ *
+ * See also -[COEditingContext updatedObjects].
+ */
 - (NSError *)validateForUpdate;
+/**
+ * <override-dummy />
+ * Validates the receiver when it belongs to the deleted objects in the commit 
+ * underway.
+ *
+ * By default, returns nil.
+ *
+ * This method must return nil on validation success, otherwise it must return 
+ * an error that includes the validation result in the user info under the key 
+ * kCOValidationResultKey.
+ * The superclass implementation must be called, then the returned error is 
+ * either returned directly, or when validation doesn't succeed locally 
+ * combined with the new errors through +[NSError errorWithErrors:].
+ *
+ * See also -[COEditingContext deletedObjects].
+ */
+- (NSError *)validateForDelete;
 - (BOOL)validateValue:(id *)ioValue forKey:(NSString *)key error:(NSError **)outError;
 
 /** @taskunit Direct Access to the Variable Storage */

@@ -687,7 +687,17 @@
 	return result;
 }
 
+- (NSError *)validateForInsert
+{
+	return nil;
+}
+
 - (NSError *)validateForUpdate
+{
+	return nil;
+}
+
+- (NSError *)validateForDelete
 {
 	return nil;
 }
