@@ -122,16 +122,14 @@
 	return objects;
 }
 
-- (void)checkCurrentNodeChangeNotification: (NSNotification *)notif
+- (BOOL)isOurStoreForNotification: (NSNotification *)notif
 {
 	NSString *storeUUIDString = [[notif userInfo] objectForKey: kCOStoreUUIDStringKey];
-	assert([storeUUIDString isEqual: [[[[self editingContext] store] UUID] stringValue]]);
+	return [storeUUIDString isEqual: [[[[self editingContext] store] UUID] stringValue]];
 }
 
 - (void)currentNodeDidChangeInStore: (NSNotification *)notif
 {
-	[self checkCurrentNodeChangeNotification: notif];
-
 	ETUUID *trackUUID = [ETUUID UUIDWithString: [notif object]];
 	BOOL isOurTrack = [[self UUID] isEqual: trackUUID];
 
@@ -141,6 +139,13 @@
 	   our other instances (using our UUID) in some local or remote editing 
 	   context. */
 	if (isOurTrack)
+		return;
+
+	/* Paranoid check in case something goes wrong and a core object UUID 
+	   appear in multiple stores. 
+	   For now, a core object UUID is bound to a single store. Hence a commit
+	   track UUID is never in use accross multiple stores (using distinct UUIDs).  */
+	if ([self isOurStoreForNotification: notif] == NO)
 		return;
 
 	BOOL isTrackedObjectTrack = [[self trackedObjectUUIDs] containsObject: trackUUID];
