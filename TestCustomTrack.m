@@ -85,6 +85,7 @@
 	return node;
 }
 
+#if 0
 /* The custom track uses the root object commit track to undo and redo, no 
 selective undo is involved. */
 - (void)testWithSingleRootObject
@@ -306,7 +307,6 @@ selective undo is involved. */
 	UKObjectsEqual(A(para1, para2), [doc content]);
 }
 
-#if 0
 - (void)testSelectiveUndo
 {
 	[self makeCommitsWithMultipleRootObjects];
