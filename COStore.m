@@ -481,10 +481,14 @@ void CHECK(id db)
 		[NSException raise: NSGenericException format: @"Object in progress doesn't match"];
 	}
 
-	NSData *data = [NSPropertyListSerialization 
-		dataFromPropertyList: value
-		              format: NSPropertyListXMLFormat_v1_0
-		    errorDescription: NULL];	
+	NSData *data = nil;
+
+	if (value != nil)
+	{
+		data = [NSPropertyListSerialization dataFromPropertyList: value
+		                                                  format: NSPropertyListXMLFormat_v1_0
+		                                        errorDescription: NULL];
+	}	
 	if (data == nil && value != nil)
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Error serializing object %@", value];
