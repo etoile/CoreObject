@@ -74,36 +74,49 @@
 	assert([storeUUIDString isEqual: [[[[trackedObject editingContext] store] UUID] stringValue]]);
 }
 
+/* This method is called back through distributed notifications in various cases:
+   - a commit calling -addRevision:toTrackUUID:
+   - a selective undo or redo (this is the same than the previous case since 
+     this results in a new commit)
+   - an undo or redo calling -undoOnCommitTrack:
+   In each case, the track posting the notification can be either the receiver 
+   or another instance (in the same or another process) bearing the same UUID.
+   For an undo/redo, when the track triggering the notification is the receiver, 
+   then we return immediately to prevent updating the currentNodeIndex already 
+   updated in -undo and -redo methods.
+   When the receiver is not the track posting the notification, the two track 
+   instances are not located in the same editing context. */
 - (void)currentNodeDidChangeInStore: (NSNotification *)notif
 {
-
 	[self checkCurrentNodeChangeNotification: notif];
 
 	int64_t revNumber = [[[notif userInfo] objectForKey: kCONewCurrentNodeRevisionNumberKey] longLongValue];
-	BOOL isOurTrack = (revNumber == [[[self currentNode] revision] revisionNumber]);
+	BOOL isBasicUndoOrRedo = (revNumber == [[[self currentNode] revision] revisionNumber]);
 
-	/* We use notifications posted by tracked object tracks to be kept in sync 
-	   with the store.
-	   For concurrency control, we are not interested in notifications posted by 
-	   our other instances (using our UUID) in some local or remote editing 
-	   context. */
-	if (isOurTrack)
+	if (isBasicUndoOrRedo)
 		return;
 
-	NSUInteger oldCurrentNodeIndex = currentNodeIndex;
+	COTrackNode *oldCurrentNode = RETAIN([self currentNode]);
 
 	// TODO: Remove the two lines below to be handled by the caching code 
 	[[self cachedNodes] removeAllObjects];
 	currentNodeIndex = NSNotFound;
 	[self cacheNodesForward: CACHE_AMOUNT backward: CACHE_AMOUNT];
 
-	assert(currentNodeIndex != oldCurrentNodeIndex);
+	// FIXME: The currentNodeIndex assertion requires that distributed 
+	// notifications to be delivered (but the notification center might drop 
+	// some notifications under heavy load according to Cocoa API doc)
+	assert([[self currentNode] isEqual: oldCurrentNode] == NO);
 	assert([self currentNode] != nil);
+	assert(revNumber == [[[self currentNode] revision] revisionNumber]);
 
+	/* For a commit in the receiver editing context, no reloading occurs 
+	   because the tracked object state matches the revision */
 	[[trackedObject editingContext] reloadRootObjectTree: trackedObject 
 	                                          atRevision: [[self currentNode] revision]];
 
 	[self didUpdate];
+	RELEASE(oldCurrentNode);
 }
 
 - (void)setCurrentNode: (COTrackNode *)aNode
@@ -135,23 +148,25 @@
 		[NSException raise: NSInternalInconsistencyException
 		            format: @"Cannot undo object %@ which does not have any commits", trackedObject];
 	}
+	/* If -canUndo returns YES, before returning it loads some previous nodes 
+	   to ensure currentNodeIndex is not zero and can be decremented */
 	if ([self canUndo] == NO)
 	{
 		return;
 	}
 
-	COStore *store = [[trackedObject editingContext] store];
-	CORevision *currentRevision = [store undoOnCommitTrack: [trackedObject UUID]];
-
-	if (currentNodeIndex == 0)
-	{
-		[self cacheNodesForward: 0 backward: CACHE_AMOUNT];
-	}
+	/* We must update the current node before calling -undoOnCommitTrack: because
+	   this last method posts a distributed notification that might be delivered 
+	   before returning (at least on GNUstep, but not Mac OS X where immediate 
+	   delivery behavior differs slightly). */
 	currentNodeIndex--;
 	// Check to make sure new node was cached
 	NSAssert(currentNodeIndex != NSNotFound 
 		&& ![[NSNull null] isEqual: [[self cachedNodes] objectAtIndex: currentNodeIndex]],
 		@"Record undone to is cached");
+
+	COStore *store = [[trackedObject editingContext] store];
+	CORevision *currentRevision = [store undoOnCommitTrack: [trackedObject UUID]];
 
 	// TODO: Reset object state to old object.
 	[[trackedObject editingContext] reloadRootObjectTree: trackedObject
@@ -167,23 +182,25 @@
 		[NSException raise: NSInternalInconsistencyException
 		            format: @"Cannot redo object %@ which does not have any commits", trackedObject];
 	}
+	/* If -canRedo returns YES, before returning it loads some next nodes 
+	   to ensure currentNodeIndex is not zero and can be incremented */
 	if ([self canRedo] == NO)
 	{
 		return;
 	}
 
-	COStore *store = [[trackedObject editingContext] store];
-	CORevision *currentRevision = [store redoOnCommitTrack: [trackedObject UUID]];
-
-	if ([[self cachedNodes] count] == (currentNodeIndex + 1))
-	{
-		[self cacheNodesForward: CACHE_AMOUNT backward: 0];
-	}
+	/* We must update the current node before calling -redoOnCommitTrack: because
+	   this last method posts a distributed notification that might be delivered 
+	   before returning (at least on GNUstep, but not Mac OS X where immediate 
+	   delivery behavior differs slightly). */
 	currentNodeIndex++;
 	// Check to make sure new node was cached
 	NSAssert([[self cachedNodes] count] > currentNodeIndex 
 		&& ![[NSNull null] isEqual: [[self cachedNodes] objectAtIndex: currentNodeIndex]],
 		@"Record redone to is cached");
+
+	COStore *store = [[trackedObject editingContext] store];
+	CORevision *currentRevision = [store redoOnCommitTrack: [trackedObject UUID]];
 
 	// TODO: Reset object state to old object.
 	[[trackedObject editingContext] reloadRootObjectTree: trackedObject
@@ -214,6 +231,8 @@
 
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
 {
+	/* -cacheNodesForward:backward: can release this cached node */
+	RETAIN(aNode);
 	NSArray *cachedNodes = [self cachedNodes];
 	NSInteger nodeIndex = [cachedNodes indexOfObject: aNode];
 
@@ -249,6 +268,7 @@
 	/* Get the node from the updated cache */
 
 	nodeIndex = [cachedNodes indexOfObject: aNode];
+	RELEASE(aNode);
 
 	if (back)
 	{

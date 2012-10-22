@@ -31,6 +31,8 @@ CoreObject_OBJC_FILES += \
 	TestArrayDiff.m \
 	TestCommon.m \
 	TestCopy.m \
+	TestCommitTrack.m \
+	TestCustomTrack.m \
 	TestEditingContext.m \
 	TestHistoryTrack.m \
 	TestObjectGraphDiff.m \

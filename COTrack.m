@@ -15,6 +15,12 @@
 
 @implementation COTrack
 
+/* For debugging with Clang and GDB on GNUstep (ivar printing doesn't work) */
+- (NSUInteger)currentNodeIndex
+{
+	return currentNodeIndex;
+}
+
 + (void) initialize
 {
 	if (self != [COTrack class])
