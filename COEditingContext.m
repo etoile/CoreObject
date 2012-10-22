@@ -891,8 +891,11 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	// revision is older than the root object creation revision.
 
 	ETUUID *rootObjectUUID = [rootObject UUID];
-	//CORevision *oldRevision = [_rootObjectRevisions objectForKey: rootObjectUUID];
-	[_rootObjectRevisions removeObjectForKey: rootObjectUUID];
+	CORevision *currentRevision = [_rootObjectRevisions objectForKey: rootObjectUUID];
+
+	if ([revision isEqual: currentRevision])
+		return;
+
 	[_rootObjectRevisions setObject: revision forKey: rootObjectUUID];
 
 	// FIXME: Optimise for undo/redo cases (revisions next to each other)
