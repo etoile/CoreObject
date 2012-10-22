@@ -760,7 +760,7 @@ void CHECK(id db)
 - (NSArray *)revisionsForTrackUUID: (ETUUID *)objectUUID
                   currentNodeIndex: (NSUInteger *)currentNodeIndex
                      backwardLimit: (NSUInteger)backward
-                      forwardLimit: (NSUInteger)forward;
+                      forwardLimit: (NSUInteger)forward
 {
 	NILARG_EXCEPTION_TEST(objectUUID);
 	// TODO: The check below is disabled to support COCustomTrack. We need to 
@@ -769,7 +769,18 @@ void CHECK(id db)
 	//if (![self isRootObjectUUID: objectUUID])
 	//	[NSException raise: NSInvalidArgumentException format: @"The object with UUID %@ does not exist!", objectUUID];
 
-	NSMutableArray *nodes = [[NSMutableArray alloc] initWithCapacity: (1 + forward + backward)];
+	NSUInteger capacity = (forward + backward + 1);
+
+	if (backward == NSUIntegerMax || forward == NSUIntegerMax)
+	{
+		capacity = 1000;
+	}
+	if (capacity == NSUIntegerMax)
+	{
+		[NSException raise: NSInvalidArgumentException
+					format: @"Forward and backward limit sum must be below NSUIntegerMax."];
+	}
+	NSMutableArray *nodes = [NSMutableArray arrayWithCapacity: capacity];
 	NSNumber *objectUUIDIndex = [self keyForUUID: objectUUID];
 	int64_t currentNode = 0;
 	int64_t nextNode = 0;
@@ -838,7 +849,7 @@ void CHECK(id db)
 			break;
 		}
 	}
-	return [nodes autorelease];
+	return nodes;
 }
 
 - (CORevision *) currentRevisionForTrackUUID: (ETUUID *)aTrackUUID
