@@ -288,31 +288,26 @@
 	return [cachedNodes objectAtIndex: nodeIndex];
 }
 
-// TODO: Could be renamed -didMakeNewCommitAtRevision: to be more idiomatic
-- (void)newCommitAtRevision: (CORevision *)revision
+- (void)didMakeNewCommitAtRevision: (CORevision *)revision
 {
-	// COStore takes care of updating the database, so we just use this as a 
-	// notification to update our cache.
+	NSParameterAssert(revision != nil);
+
 	COTrackNode *newNode = [COTrackNode nodeWithRevision: revision onTrack: self];
+	/* At this point, revision is the max revision for the commit track */
+	BOOL isTipNodeCached = [[[[self cachedNodes] lastObject] revision] isEqual: [revision baseRevision]];
 
-	if (currentNodeIndex != NSNotFound)
+	if (isTipNodeCached == NO)
 	{
-		currentNodeIndex++;
+		[self cacheNodesForward: 0 backward: CACHE_AMOUNT];
 	}
-	else
-	{
-		currentNodeIndex = 0;
-	}
-	[[self cachedNodes] insertObject: newNode atIndex: currentNodeIndex];
+	[[self cachedNodes] addObject: newNode];
 
-	NSUInteger lastIndex = [[self cachedNodes] count] - 1;
-	BOOL evictsNodesFromCache = (lastIndex > currentNodeIndex);
-
-	if (evictsNodesFromCache)
+	if ([[self cachedNodes] count] > CACHE_AMOUNT)
 	{
-		NSRange range = NSMakeRange(currentNodeIndex + 1, lastIndex - currentNodeIndex);
-		[[self cachedNodes] removeObjectsInRange: range];
+		[[self cachedNodes] removeObjectAtIndex: 0];
 	}
+
+	currentNodeIndex = [[self cachedNodes] count] - 1;
 
 	[self didUpdate];
 }

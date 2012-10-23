@@ -37,7 +37,11 @@
 
 /** @taskunit Private */
 
-- (void)newCommitAtRevision: (CORevision *)revision;
+/**
+ * COStore takes care of updating the database, so we just use this as a
+ * notification to update our cache.
+ */
+- (void)didMakeNewCommitAtRevision: (CORevision *)revision;
 - (void)cacheNodesForward: (NSUInteger)forward backward: (NSUInteger)backward;
 
 @end

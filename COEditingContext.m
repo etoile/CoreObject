@@ -699,7 +699,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 	[_rootObjectRevisions setObject: rev forKey: [rootObject UUID]];
 	[[_rootObjectCommitTracks objectForKey: [rootObject UUID]]
-		newCommitAtRevision: rev];
+		didMakeNewCommitAtRevision: rev];
 	
 	[_insertedObjects minusSet: insertedObjects];
 	for (COObject *obj in [updatedPropertiesByObject allKeys])
