@@ -1,29 +1,57 @@
-To do
-=====
+TODO
+====
 
-- Port to GNUstep
-- switch from fmdb to SQLClient
+First Release
+-------------
 
-Merging:
- - move detection
- - custom attributed string merger
- 
-Model Objects (COObject):
- - KVO support?
- - copy + paste support
- 
-History tracks
- - implement.
- - UI-level normal undo/redo
- 
-Collaboration
- - UI-level normal undo/redo using selective undo.
- 
-Editing Context
- -
- 
-ProjectDemo
- - add XMPP
- - add drawing support
- - text support
- - port to ObjectMerging2
+- Refactor COStore into an abstract class and a COSQLStore subclass
+- Switch from FMDB to SQLClient
+- Rework COStore internal track representation to support branch and cheap copy
+- Extend COCommitTrack API to support branches and merging revisions accross tracks
+- Rewrite COHistoryTrack
+- Work out clear and well documented object copy model easy to extend in COObject subclasses (see COObject and COEditingContext copy methods)
+- Check COObject KVO semantics and documentation
+- Check relationship integrity won't go against the developer needs
+- Fix COCustomTrack broken model
+- Make COQuery a bit more usable
+- Document COStore
+- Document COTrack class and subclasses
+- Implement deletion support in COStore, COObject and COEditingContext
+
+
+Future Work
+-----------
+
+- Improve Diff API and code (probably reuse heavily NestedVersioning Diff implementation)
+- Improve Merging (move detection and custom attributed string merger)
+- Extract COCommitTrack node caching into a generic COCursor class
+- Figure out how to navigate large root object sets very quickly (evaluate writing a COSQLCursor class)
+- Implement Collaboration support (based on COSynchronizer and XMPP)
+- Figure out basic undo/redo support on an object edited collaboratively, probably using selective undo
+- Tune object copy model to respect user expectations about copy/paste in various recurrent use cases
+- Improve Relationship Integrity and leverage it in more places (e.g. copy time, more aggressive checks or object graph integrity checking in a background thread etc.)
+- Evaluate a CORevision cache per COStore or process
+- Evaluate a COTrackNode cache per track
+- Adopt or leverage NestedVersioning improvements to the property list serialization model
+
+
+Missing Features
+----------------
+
+- Schema Upgrade
+- NSPredicate to SQL generator using OMeta
+- History Compaction
+- Attachments to track imported files without importing all the data in the store (e.g. a photo or a song)
+- Import/Export
+
+
+Open Questions
+--------------
+
+How to scroll smoothly through 50 000 root objects in an Object Manager without loading all the objects in memory? 
+
+- Adjust COEditingContext loaded object cache to use a strategy that matches which root objects are going to be accessed recurrently (e.g. photos in a Photo Manager should have priority over other root objects)
+- Write a COSQLCursor that can load root objects in advance
+- Just minimize the apparent loading time at the UI level (and no other optimizations possibly)
+- Use an object pool mechanism to allocate COObject or subclass instances
+- Allocate special fault objects that support some basic properties (e.g. -name) and retrieve their values from a single query against the store (e.g. multiples root object names a in single query)
