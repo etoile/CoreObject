@@ -31,7 +31,7 @@
 		return nil;
 
 	ASSIGN(validationResult, aResult);
-	ASSIGN(errors, suberrors);
+	ASSIGN(errors, [suberrors contentArray]);
 	return self;
 }
 

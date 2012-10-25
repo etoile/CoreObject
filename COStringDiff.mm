@@ -1,4 +1,5 @@
 // Needed to allow limits.h stuff to work in C++ (otherwise INTPTR_MAX is undefined)
+// Now included in GSConfig.h since August 20 2012, see GNUstep Base SVN r35433
 #define __STDC_LIMIT_MACROS
 
 #import "COStringDiff.h"
