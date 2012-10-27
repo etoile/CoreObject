@@ -7,6 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6019B874163B6DA700D1986F /* SQLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 60988F0F163B6A90009C4F21 /* SQLite.m */; };
+		6019B875163B6DAA00D1986F /* Postgres.m in Sources */ = {isa = PBXBuildFile; fileRef = 60988F0C163B6A90009C4F21 /* Postgres.m */; };
+		6019B881163BFD8400D1986F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F16163B6B7A009C4F21 /* Cocoa.framework */; };
+		6019B887163BFD8500D1986F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6019B885163BFD8500D1986F /* InfoPlist.strings */; };
+		6019B891163BFE8900D1986F /* SQLClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 6019B88F163BFE8900D1986F /* SQLClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6019B892163BFE8900D1986F /* SQLClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 6019B890163BFE8900D1986F /* SQLClient.m */; };
+		6019B897163BFED200D1986F /* GSCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 6019B893163BFED200D1986F /* GSCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6019B898163BFED200D1986F /* GSCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6019B894163BFED200D1986F /* GSCache.m */; };
+		6019B899163BFED200D1986F /* GSTicker.h in Headers */ = {isa = PBXBuildFile; fileRef = 6019B895163BFED200D1986F /* GSTicker.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6019B89A163BFED200D1986F /* GSTicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 6019B896163BFED200D1986F /* GSTicker.m */; };
+		6019B89D163BFF0E00D1986F /* Performance.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6019B880163BFD8400D1986F /* Performance.framework */; };
+		6019B8A0163C04FA00D1986F /* sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E7A1299C92300CCF472 /* sqlite3.c */; };
+		6019B8A1163C051800D1986F /* sqlite3.h in Headers */ = {isa = PBXBuildFile; fileRef = 791B4E7B1299C92300CCF472 /* sqlite3.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6019B8A2163C09DF00D1986F /* SQLClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F15163B6B7A009C4F21 /* SQLClient.framework */; };
 		6028E42A153729ED0003A205 /* COObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 6028E429153729ED0003A205 /* COObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6039CC7814BC3FBB008A8BA3 /* COCustomTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 6039CC7614BC3FBB008A8BA3 /* COCustomTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6039CC7914BC3FBB008A8BA3 /* COCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6039CC7714BC3FBB008A8BA3 /* COCustomTrack.m */; };
@@ -16,12 +30,14 @@
 		60844F281490B6B2008A329F /* COCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 60844F261490B6B2008A329F /* COCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60844F291490B6B2008A329F /* COCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60844F271490B6B2008A329F /* COCollection.m */; };
 		60980C5914C6F6FF001C05F2 /* TestCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60980C5814C6F6FF001C05F2 /* TestCustomTrack.m */; };
+		60988F17163B6B7A009C4F21 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F16163B6B7A009C4F21 /* Cocoa.framework */; };
+		60988F1D163B6B7A009C4F21 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 60988F1B163B6B7A009C4F21 /* InfoPlist.strings */; };
 		60A55DE114A25AC4007A9864 /* COTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60A55DDF14A25AC4007A9864 /* COTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60A55DE214A25AC4007A9864 /* COTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60A55DE014A25AC4007A9864 /* COTrack.m */; };
 		60C8BC5416322E2C00A2B4EE /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 669965351162E17500359BE6 /* libz.1.2.5.dylib */; };
 		60C8BC5516322E3200A2B4EE /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
 		60C8BC5616322FE600A2B4EE /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 792C5F57127F78A7007205EA /* UnitKit.framework */; };
-		60EB4F69155BDAA700CFBC5C /* COError.h in Headers */ = {isa = PBXBuildFile; fileRef = 60EB4F67155BDAA700CFBC5C /* COError.h */; };
+		60EB4F69155BDAA700CFBC5C /* COError.h in Headers */ = {isa = PBXBuildFile; fileRef = 60EB4F67155BDAA700CFBC5C /* COError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60EB4F6A155BDAA700CFBC5C /* COError.m in Sources */ = {isa = PBXBuildFile; fileRef = 60EB4F68155BDAA700CFBC5C /* COError.m */; };
 		60F6A31814444EC300EFC711 /* COCommitTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60F6A31514444EC300EFC711 /* COCommitTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60F6A31914444EC300EFC711 /* COCommitTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F6A31614444EC300EFC711 /* COCommitTrack.m */; };
@@ -90,6 +106,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		6019B89B163BFEE800D1986F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6019B87F163BFD8400D1986F;
+			remoteInfo = Performance;
+		};
+		6019B8A3163C0A5E00D1986F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 60988F14163B6B7A009C4F21;
+			remoteInfo = SQLClient;
+		};
 		60C8BC20163223D300A2B4EE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
@@ -139,6 +169,16 @@
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		6019B880163BFD8400D1986F /* Performance.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Performance.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6019B884163BFD8500D1986F /* Performance-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Performance-Info.plist"; path = "Performance/Performance-Info.plist"; sourceTree = "<group>"; };
+		6019B886163BFD8500D1986F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		6019B88F163BFE8900D1986F /* SQLClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SQLClient.h; path = SQLClient/SQLClient.h; sourceTree = "<group>"; };
+		6019B890163BFE8900D1986F /* SQLClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SQLClient.m; path = SQLClient/SQLClient.m; sourceTree = "<group>"; };
+		6019B893163BFED200D1986F /* GSCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GSCache.h; path = Performance/GSCache.h; sourceTree = "<group>"; };
+		6019B894163BFED200D1986F /* GSCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GSCache.m; path = Performance/GSCache.m; sourceTree = "<group>"; };
+		6019B895163BFED200D1986F /* GSTicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GSTicker.h; path = Performance/GSTicker.h; sourceTree = "<group>"; };
+		6019B896163BFED200D1986F /* GSTicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GSTicker.m; path = Performance/GSTicker.m; sourceTree = "<group>"; };
+		6019B89E163C006E00D1986F /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = SQLClient/config.h; sourceTree = "<group>"; };
 		6028E429153729ED0003A205 /* COObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COObject.h; sourceTree = "<group>"; };
 		6039CC7614BC3FBB008A8BA3 /* COCustomTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCustomTrack.h; sourceTree = "<group>"; };
 		6039CC7714BC3FBB008A8BA3 /* COCustomTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCustomTrack.m; sourceTree = "<group>"; };
@@ -147,6 +187,12 @@
 		60844F261490B6B2008A329F /* COCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCollection.h; sourceTree = "<group>"; };
 		60844F271490B6B2008A329F /* COCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCollection.m; sourceTree = "<group>"; };
 		60980C5814C6F6FF001C05F2 /* TestCustomTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCustomTrack.m; sourceTree = "<group>"; };
+		60988F0C163B6A90009C4F21 /* Postgres.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Postgres.m; path = SQLClient/Postgres.m; sourceTree = "<group>"; };
+		60988F0F163B6A90009C4F21 /* SQLite.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SQLite.m; path = SQLClient/SQLite.m; sourceTree = "<group>"; };
+		60988F15163B6B7A009C4F21 /* SQLClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SQLClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		60988F16163B6B7A009C4F21 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		60988F1A163B6B7A009C4F21 /* SQLClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "SQLClient-Info.plist"; path = "SQLClient/SQLClient-Info.plist"; sourceTree = "<group>"; };
+		60988F1C163B6B7A009C4F21 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		60A55DDF14A25AC4007A9864 /* COTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COTrack.h; sourceTree = "<group>"; };
 		60A55DE014A25AC4007A9864 /* COTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COTrack.m; sourceTree = "<group>"; };
 		60EB4F67155BDAA700CFBC5C /* COError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COError.h; sourceTree = "<group>"; };
@@ -230,10 +276,28 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6019B87C163BFD8400D1986F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6019B881163BFD8400D1986F /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		60988F11163B6B7A009C4F21 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6019B89D163BFF0E00D1986F /* Performance.framework in Frameworks */,
+				60988F17163B6B7A009C4F21 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6686BDAA12592BDA0065DE1A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6019B8A2163C09DF00D1986F /* SQLClient.framework in Frameworks */,
 				60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */,
 				6686BE2A12592D7B0065DE1A /* libcrypto.dylib in Frameworks */,
 			);
@@ -290,6 +354,8 @@
 				6686BDAC12592BDA0065DE1A /* CoreObject.framework */,
 				791B4E2D1299C79300CCF472 /* Test */,
 				66D099C4129AE111006BEDC3 /* StoreTest */,
+				60988F15163B6B7A009C4F21 /* SQLClient.framework */,
+				6019B880163BFD8400D1986F /* Performance.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -302,6 +368,8 @@
 				791B4DF41299C56900CCF472 /* Test */,
 				791B4E501299C8AF00CCF472 /* Store */,
 				6686BDB212592C1B0065DE1A /* CoreObject */,
+				60988F07163B69BA009C4F21 /* SQLClient */,
+				6019B877163BFB9B00D1986F /* Performance */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
@@ -312,9 +380,23 @@
 			isa = PBXGroup;
 			children = (
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
+				60988F16163B6B7A009C4F21 /* Cocoa.framework */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6019B877163BFB9B00D1986F /* Performance */ = {
+			isa = PBXGroup;
+			children = (
+				6019B893163BFED200D1986F /* GSCache.h */,
+				6019B894163BFED200D1986F /* GSCache.m */,
+				6019B895163BFED200D1986F /* GSTicker.h */,
+				6019B896163BFED200D1986F /* GSTicker.m */,
+				6019B884163BFD8500D1986F /* Performance-Info.plist */,
+				6019B885163BFD8500D1986F /* InfoPlist.strings */,
+			);
+			name = Performance;
 			sourceTree = "<group>";
 		};
 		60413A6D14B9F66800225D2A /* Tracks */ = {
@@ -330,6 +412,20 @@
 				6039CC7714BC3FBB008A8BA3 /* COCustomTrack.m */,
 			);
 			name = Tracks;
+			sourceTree = "<group>";
+		};
+		60988F07163B69BA009C4F21 /* SQLClient */ = {
+			isa = PBXGroup;
+			children = (
+				6019B89E163C006E00D1986F /* config.h */,
+				6019B88F163BFE8900D1986F /* SQLClient.h */,
+				6019B890163BFE8900D1986F /* SQLClient.m */,
+				60988F0C163B6A90009C4F21 /* Postgres.m */,
+				60988F0F163B6A90009C4F21 /* SQLite.m */,
+				60988F1A163B6B7A009C4F21 /* SQLClient-Info.plist */,
+				60988F1B163B6B7A009C4F21 /* InfoPlist.strings */,
+			);
+			name = SQLClient;
 			sourceTree = "<group>";
 		};
 		60FB087413C3066300C2AB94 /* Products */ = {
@@ -496,6 +592,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		6019B87D163BFD8400D1986F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6019B897163BFED200D1986F /* GSCache.h in Headers */,
+				6019B899163BFED200D1986F /* GSTicker.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		60988F12163B6B7A009C4F21 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6019B891163BFE8900D1986F /* SQLClient.h in Headers */,
+				6019B8A1163C051800D1986F /* sqlite3.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6686BDA712592BDA0065DE1A /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -518,16 +632,53 @@
 				60F6A31814444EC300EFC711 /* COCommitTrack.h in Headers */,
 				6068BE6414750AAF00953B26 /* COQuery.h in Headers */,
 				60844F281490B6B2008A329F /* COCollection.h in Headers */,
+				60EB4F69155BDAA700CFBC5C /* COError.h in Headers */,
 				60A55DE114A25AC4007A9864 /* COTrack.h in Headers */,
 				6039CC7814BC3FBB008A8BA3 /* COCustomTrack.h in Headers */,
 				6028E42A153729ED0003A205 /* COObject.h in Headers */,
-				60EB4F69155BDAA700CFBC5C /* COError.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		6019B87F163BFD8400D1986F /* Performance */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6019B88C163BFD8500D1986F /* Build configuration list for PBXNativeTarget "Performance" */;
+			buildPhases = (
+				6019B87B163BFD8400D1986F /* Sources */,
+				6019B87C163BFD8400D1986F /* Frameworks */,
+				6019B87D163BFD8400D1986F /* Headers */,
+				6019B87E163BFD8400D1986F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Performance;
+			productName = Performance;
+			productReference = 6019B880163BFD8400D1986F /* Performance.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		60988F14163B6B7A009C4F21 /* SQLClient */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 60988F22163B6B7A009C4F21 /* Build configuration list for PBXNativeTarget "SQLClient" */;
+			buildPhases = (
+				60988F10163B6B7A009C4F21 /* Sources */,
+				60988F11163B6B7A009C4F21 /* Frameworks */,
+				60988F12163B6B7A009C4F21 /* Headers */,
+				60988F13163B6B7A009C4F21 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6019B89C163BFEE800D1986F /* PBXTargetDependency */,
+			);
+			name = SQLClient;
+			productName = SQLClient;
+			productReference = 60988F15163B6B7A009C4F21 /* SQLClient.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		6686BDAB12592BDA0065DE1A /* CoreObject */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6686BDB012592BDC0065DE1A /* Build configuration list for PBXNativeTarget "CoreObject" */;
@@ -540,6 +691,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				6019B8A4163C0A5E00D1986F /* PBXTargetDependency */,
 				60FB0A1B13C3264E00C2AB94 /* PBXTargetDependency */,
 			);
 			name = CoreObject;
@@ -598,6 +750,7 @@
 				Japanese,
 				French,
 				German,
+				en,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* ObjectMerging */;
 			projectDirPath = "";
@@ -610,6 +763,8 @@
 			projectRoot = "";
 			targets = (
 				6686BDAB12592BDA0065DE1A /* CoreObject */,
+				60988F14163B6B7A009C4F21 /* SQLClient */,
+				6019B87F163BFD8400D1986F /* Performance */,
 				791B4E2C1299C79300CCF472 /* Test */,
 				66D099B6129AE111006BEDC3 /* StoreTest */,
 			);
@@ -648,6 +803,22 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		6019B87E163BFD8400D1986F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6019B887163BFD8500D1986F /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		60988F13163B6B7A009C4F21 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60988F1D163B6B7A009C4F21 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6686BDA812592BDA0065DE1A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -658,6 +829,26 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6019B87B163BFD8400D1986F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6019B898163BFED200D1986F /* GSCache.m in Sources */,
+				6019B89A163BFED200D1986F /* GSTicker.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		60988F10163B6B7A009C4F21 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6019B8A0163C04FA00D1986F /* sqlite3.c in Sources */,
+				6019B874163B6DA700D1986F /* SQLite.m in Sources */,
+				6019B875163B6DAA00D1986F /* Postgres.m in Sources */,
+				6019B892163BFE8900D1986F /* SQLClient.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6686BDA912592BDA0065DE1A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -731,6 +922,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		6019B89C163BFEE800D1986F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6019B87F163BFD8400D1986F /* Performance */;
+			targetProxy = 6019B89B163BFEE800D1986F /* PBXContainerItemProxy */;
+		};
+		6019B8A4163C0A5E00D1986F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 60988F14163B6B7A009C4F21 /* SQLClient */;
+			targetProxy = 6019B8A3163C0A5E00D1986F /* PBXContainerItemProxy */;
+		};
 		60FB0A1B13C3264E00C2AB94 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = EtoileFoundation;
@@ -743,11 +944,83 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		6019B885163BFD8500D1986F /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6019B886163BFD8500D1986F /* en */,
+			);
+			name = InfoPlist.strings;
+			path = Performance;
+			sourceTree = "<group>";
+		};
+		60988F1B163B6B7A009C4F21 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				60988F1C163B6B7A009C4F21 /* en */,
+			);
+			name = InfoPlist.strings;
+			path = SQLClient;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
+		6019B88D163BFD8500D1986F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = "Performance/Performance-Info.plist";
+				INSTALL_PATH = "@rpath";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Debug;
+		};
+		6019B88E163BFD8500D1986F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = "Performance/Performance-Info.plist";
+				INSTALL_PATH = "$(BUILT_PRODUCTS_DIR)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
+		60988F23163B6B7A009C4F21 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = "SQLClient/SQLClient-Info.plist";
+				INSTALL_PATH = "@rpath";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Debug;
+		};
+		60988F24163B6B7A009C4F21 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = "SQLClient/SQLClient-Info.plist";
+				INSTALL_PATH = "$(BUILT_PRODUCTS_DIR)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
 		6686BDAE12592BDC0065DE1A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = 0;
 				DYLIB_CURRENT_VERSION = 5;
 				FRAMEWORK_VERSION = A;
@@ -764,7 +1037,6 @@
 		6686BDAF12592BDC0065DE1A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
@@ -854,6 +1126,23 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6019B88C163BFD8500D1986F /* Build configuration list for PBXNativeTarget "Performance" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6019B88D163BFD8500D1986F /* Debug */,
+				6019B88E163BFD8500D1986F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		60988F22163B6B7A009C4F21 /* Build configuration list for PBXNativeTarget "SQLClient" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				60988F23163B6B7A009C4F21 /* Debug */,
+				60988F24163B6B7A009C4F21 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		6686BDB012592BDC0065DE1A /* Build configuration list for PBXNativeTarget "CoreObject" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
