@@ -6,7 +6,6 @@
 @interface TestStore : TestCommon <UKTest>
 @end
 
-
 @implementation TestStore
 
 - (void)testCreate
@@ -17,7 +16,7 @@
 
 - (void)testReopenStore
 {
-	ETUUID *o1 = [ETUUID UUID];
+	ETUUID *o1 = [ETUUID new];
 	NSDictionary *sampleMetadata = D([NSNumber numberWithBool: YES], @"metadataWorks");
 	
 	[store insertRootObjectUUIDs: S(o1)];
@@ -47,6 +46,8 @@
 
 	UKObjectsEqual([NSNumber numberWithBool: YES], [[c1 metadata] objectForKey: @"metadataWorks"]);
 	UKObjectsEqual(D(@"bob", @"name"), [c1 valuesAndPropertiesForObjectUUID: o1]);
+
+	[o1 release];
 }
 
 

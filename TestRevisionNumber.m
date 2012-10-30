@@ -64,7 +64,7 @@
 	UKObjectsEqual(secondCommitRev, [thirdCommitRev baseRevision]);
 
 	// Load up 2 in another context
-	COEditingContext *ctx2 = NewContext(store);
+	COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: store];
 	COObject *obj2 = [ctx2 objectWithUUID: objectUUID atRevision: secondCommitRev];
 	UKNotNil(obj2);
 	UKObjectsEqual(@"Second Revision", [obj2 valueForProperty: @"label"]);
@@ -75,5 +75,7 @@
 	UKObjectsNotEqual(secondCommitRev, [obj2 revision]);
 	UKObjectsNotEqual(thirdCommitRev, [obj2 revision]);
 	UKObjectsEqual(secondCommitRev, [[obj2 revision] baseRevision]);
+
+	[ctx2 release];
 }
 @end

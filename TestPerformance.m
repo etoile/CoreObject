@@ -5,8 +5,6 @@
 #import "COContainer.h"
 
 @interface TestPerformance : NSObject <UKTest>
-{
-}
 @end
 
 @implementation TestPerformance
@@ -14,7 +12,6 @@
 #if 0
 - (void)testManyObjects
 {
-	COEditingContext *ctx = NewContext();
 	UKFalse([ctx hasChanges]);
 	
 	NSLog(@"Starting performance test");
@@ -46,8 +43,7 @@
 	[ctx commit];
 	
 	NSLog(@"Done.");
-	
-	TearDownContext(ctx);
+
 	UKPass();
 }
 #endif

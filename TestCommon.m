@@ -173,17 +173,3 @@
 }
 
 @end
-
-#ifndef STORE_TEST
-COEditingContext *NewContext(COStore* store)
-{
-	return [[COEditingContext alloc] initWithStore: store];
-}
-
-void TearDownContext(COEditingContext *ctx)
-{
-	assert(ctx != nil);
-	[ctx release];
-	DELETE_STORE;
-}
-#endif

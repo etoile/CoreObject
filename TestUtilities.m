@@ -4,8 +4,6 @@
 #import "NSData+compression.h"
 
 @interface TestUtilities : NSObject <UKTest>
-{
-}
 @end
 
 
@@ -42,6 +40,5 @@
 	UKNotNil([[NSData data] zlibCompressed]);
 	UKObjectsEqual([[[NSData data] zlibCompressed] zlibDecompressed], [NSData data]);
 }
-
 
 @end

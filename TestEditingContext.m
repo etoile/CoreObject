@@ -7,15 +7,12 @@
 #import "TestCommon.h"
 
 @interface TestEditingContext : TestCommon <UKTest>
-{
-}
 @end
 
 /**
-  * A class to test the -[COObject didCreate] 
-  * method (unfortunately no anonymous classes in
-  * this language).
-  */
+ * A class to test the -[COObject didCreate] method (unfortunately no anonymous 
+ * classes in this language).
+ */
 @interface TestCreateExample : COObject
 {
 	NSInteger didCreateCalled;

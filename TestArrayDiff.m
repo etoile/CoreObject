@@ -5,8 +5,6 @@
 #import "TestCommon.h"
 
 @interface TestDiff : TestCommon <UKTest>
-{
-}
 @end
 
 @implementation TestDiff

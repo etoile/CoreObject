@@ -6,17 +6,12 @@
 #import "TestCommon.h"
 #if 0
 @interface TestHistoryTrack : NSObject <UKTest>
-{
-}
 @end
 
 @implementation TestHistoryTrack
 
 - (void)testBasic
 {
-	OPEN_STORE(store);
-	COEditingContext *ctx = NewContext(store);
-	
 	COContainer *workspace = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COContainer *document1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COContainer *group1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -322,8 +317,6 @@
 	[workspaceTrack release];
 	[doc1Track release];
 	[doc2Track release];
-	TearDownContext(ctx);
-	CLOSE_STORE(store);
 }
 @end
 #endif

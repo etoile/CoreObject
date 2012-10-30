@@ -4,8 +4,6 @@
 #import "TestCommon.h"
 
 @interface TestSynchronization : NSObject <UKTest>
-{
-}
 @end
 
 @implementation TestSynchronization

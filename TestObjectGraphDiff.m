@@ -7,9 +7,7 @@
 #import "COObjectGraphDiff.h"
 #import "TestCommon.h"
 
-@interface TestObjectGraphDiff : NSObject <UKTest>
-{
-}
+@interface TestObjectGraphDiff : TestCommon <UKTest>
 @end
 
 @implementation TestObjectGraphDiff
@@ -127,8 +125,7 @@
 
 - (void)testSimpleNonconflictingMerge
 {
-	OPEN_STORE(store);
-	COEditingContext *ctx1 = NewContext(store);
+	COEditingContext *ctx1 = ctx;
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	COEditingContext *ctx3 = [[COEditingContext alloc] init];
 	
@@ -187,8 +184,6 @@
 	
 	[ctx3 release];
 	[ctx2 release];
-	TearDownContext(ctx1);
-	CLOSE_STORE(store);
 }
 
 //
@@ -198,8 +193,7 @@
 - (void)testMoveAndDeleteOnOneToManyRelationship
 {
 	// Expected result: the delete wins, with no conflicts
-	OPEN_STORE(store);
-	COEditingContext *ctx1 = NewContext(store);
+	COEditingContext *ctx1 = ctx;
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	COEditingContext *ctx3 = [[COEditingContext alloc] init];
 	
@@ -287,15 +281,12 @@
 	
 	[ctx3 release];
 	[ctx2 release];
-	TearDownContext(ctx1);
-	CLOSE_STORE(store);
 }
 
 - (void)testMoveAndDeleteOnManyToManyRelationship
 {
 	// Expected: both succeed
-	OPEN_STORE(store);
-	COEditingContext *ctx1 = NewContext(store);
+	COEditingContext *ctx1 = ctx;
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	COEditingContext *ctx3 = [[COEditingContext alloc] init];
 	
@@ -367,8 +358,6 @@
 	
 	[ctx3 release];
 	[ctx2 release];
-	TearDownContext(ctx1);
-	CLOSE_STORE(store);
 }
 
 //
@@ -840,8 +829,7 @@
 
 - (void)testSelectiveUndoOfGroupOperation
 {
-	OPEN_STORE(store);
-	COEditingContext *ctx1 = NewContext(store);
+	COEditingContext *ctx1 = ctx;
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 	COEditingContext *ctx3 = [[COEditingContext alloc] init];
 	
@@ -922,8 +910,6 @@
 	
 	[ctx3 release];
 	[ctx2 release];
-	TearDownContext(ctx1);
-	CLOSE_STORE(store);
 }
 
 @end
