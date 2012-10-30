@@ -17,7 +17,7 @@
 - (id)initWithStore: (COStore *)aStore revisionNumber: (int64_t)aRevision baseRevisionNumber: (int64_t)aBaseRevision
 {
 	SUPERINIT;
-	ASSIGN(store, aStore);
+	ASSIGN(store, (COSQLStore *)aStore);
 	revisionNumber = aRevision;
 	baseRevisionNumber = aBaseRevision;
 	return self;
