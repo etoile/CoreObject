@@ -6,6 +6,9 @@
 
 @implementation TestCommon
 
+// NOTE: The Xcode project includes a test suite limited to the store tests
+#ifndef STORE_TEST
+
 + (void) setUpMetamodel
 {
 	// Outline item entity
@@ -115,9 +118,16 @@
 	[self setUpMetamodel];
 }
 
+#endif
+
 - (Class)storeClass
 {
 	return STORE_CLASS;
+}
+
+- (NSURL *)storeURL
+{
+	return STORE_URL;
 }
 
 - (void)instantiateNewContextAndStore
@@ -126,7 +136,12 @@
 
 	pool = [NSAutoreleasePool new];
 	store = [[[self storeClass] alloc] initWithURL: STORE_URL];
+
+#ifdef STORE_TEST
+	ctx = (id)[[NSNull null] retain];
+#else
 	ctx = [[COEditingContext alloc] initWithStore: store];
+#endif
 }
 
 - (id)init
@@ -159,6 +174,7 @@
 
 @end
 
+#ifndef STORE_TEST
 COEditingContext *NewContext(COStore* store)
 {
 	return [[COEditingContext alloc] initWithStore: store];
@@ -170,3 +186,4 @@ void TearDownContext(COEditingContext *ctx)
 	[ctx release];
 	DELETE_STORE;
 }
+#endif

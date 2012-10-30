@@ -24,6 +24,7 @@
 		6019B8A7163C41AB00D1986F /* COSQLStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 6019B8A5163C41AB00D1986F /* COSQLStore.h */; };
 		6019B8A8163C41AB00D1986F /* COSQLStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 6019B8A6163C41AB00D1986F /* COSQLStore.m */; };
 		6019B8AA163C41AB00D1986F /* COSQLStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 6019B8A6163C41AB00D1986F /* COSQLStore.m */; };
+		6019B8CF16402C1A00D1986F /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D03129C936E006BEDC3 /* TestCommon.m */; };
 		6028E42A153729ED0003A205 /* COObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 6028E429153729ED0003A205 /* COObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6039CC7814BC3FBB008A8BA3 /* COCustomTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 6039CC7614BC3FBB008A8BA3 /* COCustomTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6039CC7914BC3FBB008A8BA3 /* COCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6039CC7714BC3FBB008A8BA3 /* COCustomTrack.m */; };
@@ -904,6 +905,7 @@
 				66D09A00129AE8A2006BEDC3 /* sqlite3.c in Sources */,
 				66D099BB129AE111006BEDC3 /* TestStore.m in Sources */,
 				6019B8AA163C41AB00D1986F /* COSQLStore.m in Sources */,
+				6019B8CF16402C1A00D1986F /* TestCommon.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
