@@ -3,6 +3,8 @@
 #import "COEditingContext.h"
 #import "COSQLStore.h"
 
+#define SA(x) [NSSet setWithArray: x]
+
 #define STORE_CLASS [COSQLStore class]
 #define STORE_URL [NSURL fileURLWithPath: [@"~/TestStore.sqlitedb" stringByExpandingTildeInPath]]
 /**
@@ -25,8 +27,20 @@
 #ifndef STORE_TEST
 
 @interface TestCommon : NSObject
+{
+	NSAutoreleasePool *pool;
+	COEditingContext *ctx;
+	COStore *store;
+}
+
 + (void) setUp;
+
 - (Class)storeClass;
+
+- (void)instantiateNewContextAndStore;
+- (void)discardContextAndStore;
+- (void)deleteStore;
+
 @end
 
 COEditingContext *NewContext(COStore *store);

@@ -3,16 +3,12 @@
 #import <UnitKit/UnitKit.h>
 
 @interface TestRevisionNumber : TestCommon <UKTest>
-
 @end
 
 @implementation TestRevisionNumber
 
 - (void)testBaseRevision
 {
-	OPEN_STORE(store);
-	COEditingContext *ctx = NewContext(store);
-	
 	COObject *obj = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	UKNil([obj revision]);
 	
@@ -37,9 +33,6 @@
 	
 	// The first commit revision's base revision should be nil
 	UKNil([firstCommitRev baseRevision]);
-
-	TearDownContext(ctx);
-	CLOSE_STORE(store);
 }
 
 - (void)testNonLinearHistory
@@ -48,8 +41,6 @@
 	//  1--2--3
 	//      \
 	//       4
-	OPEN_STORE(store);
-	COEditingContext *ctx = NewContext(store);
 	ETUUID *objectUUID;
 	
 	// 1
@@ -84,6 +75,5 @@
 	UKObjectsNotEqual(secondCommitRev, [obj2 revision]);
 	UKObjectsNotEqual(thirdCommitRev, [obj2 revision]);
 	UKObjectsEqual(secondCommitRev, [[obj2 revision] baseRevision]);
-	TearDownContext(ctx);
 }
 @end

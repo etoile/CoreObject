@@ -7,8 +7,6 @@
 #import "TestCommon.h"
 
 @interface TestCopy : TestCommon <UKTest>
-{
-}
 @end
 
 @implementation TestCopy
@@ -68,7 +66,6 @@
 			UKObjectsNotEqual([subchild3 UUID], [subchild3Copy UUID]);
 		}
 	}
-
 	
 	[ctx1 release];
 }

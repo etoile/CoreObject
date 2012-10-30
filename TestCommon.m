@@ -120,6 +120,43 @@
 	return STORE_CLASS;
 }
 
+- (void)instantiateNewContextAndStore
+{
+	[self discardContextAndStore];
+
+	pool = [NSAutoreleasePool new];
+	store = [[[self storeClass] alloc] initWithURL: STORE_URL];
+	ctx = [[COEditingContext alloc] initWithStore: store];
+}
+
+- (id)init
+{
+	SUPERINIT;
+	[self instantiateNewContextAndStore];
+	return self;
+}
+
+- (void)discardContextAndStore
+{
+	DESTROY(pool);
+	DESTROY(ctx);
+	DESTROY(store);
+}
+
+- (void)deleteStore
+{
+	[[NSFileManager defaultManager] removeFileAtPath: [STORE_URL path] handler: nil];
+}
+
+- (void)dealloc
+{
+	assert(ctx != nil);
+
+	[self discardContextAndStore];
+	[self deleteStore];
+	[super dealloc];
+}
+
 @end
 
 COEditingContext *NewContext(COStore* store)

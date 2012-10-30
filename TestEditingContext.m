@@ -37,135 +37,93 @@
 
 @implementation TestEditingContext
 
-- (id) init
-{
-	self = [super init];
-	return self;
-}
 - (void)testCreate
 {
-	OPEN_STORE(store);
-	COEditingContext *ctx = NewContext(store);
 	UKNotNil(ctx);
-	TearDownContext(ctx);
-	CLOSE_STORE(store);
 }
 
 - (void)testContextWithNoStore
 {
-	COEditingContext *ctx = [[COEditingContext alloc] init];
+	COEditingContext *ctx2 = [[COEditingContext alloc] init];
 
-	UKNil([ctx store]);
+	UKNil([ctx2 store]);
 	/* In case, -latestRevisionNumber sent to a nil store doesn't behave correctly */
-	UKIntsEqual(0, [ctx latestRevisionNumber]);
+	UKIntsEqual(0, [ctx2 latestRevisionNumber]);
+
+	DESTROY(ctx2);
+}
+
+- (NSSet *)basicProperties
+{
+	return S(@"name", @"parentContainer", @"parentCollections", @"contents", @"label", @"tags");
 }
 
 - (void)testInsertObject
 {
-	OPEN_STORE(store)
-	COEditingContext *ctx = NewContext(store);
 	UKFalse([ctx hasChanges]);
 	
 	COObject *obj = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+		
 	UKNotNil(obj);
 	UKTrue([obj isKindOfClass: [COObject class]]);
-	
-	NSArray *expectedProperties = A(@"name", @"parentContainer", @"parentCollections", @"contents", @"label", @"tags");
-	UKObjectsEqual([NSSet setWithArray: expectedProperties],
-				   [NSSet setWithArray: [obj persistentPropertyNames]]);
-
+	UKObjectsEqual([self basicProperties], SA([obj persistentPropertyNames]));
 	UKObjectsSame(obj, [ctx objectWithUUID: [obj UUID]]);
-	
 	UKTrue([ctx hasChanges]);
-	
 	UKNotNil([obj valueForProperty: @"parentCollections"]);
 	UKNotNil([obj valueForProperty: @"contents"]);
-	
-	TearDownContext(ctx);
-	CLOSE_STORE(store);
 }
 
 - (void)testBasicPersistence
 {
-	ETUUID *objUUID;
+	COObject *obj = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	ETUUID *objUUID = [[obj UUID] retain];
+
+	[obj setValue: @"Hello" forProperty: @"label"];
+	[ctx commit];
 	
-	{
-		NSAutoreleasePool *arp = [NSAutoreleasePool new];
-		COStore *store = [[[self storeClass] alloc] initWithURL: STORE_URL];
-		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
-		COObject *obj = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-		objUUID = [[obj UUID] retain];
-		[obj setValue: @"Hello" forProperty: @"label"];
-		[ctx commit];
-		[ctx release];
-		[arp drain];
-		[store release];
-	}
-	
-	{
-		OPEN_STORE(store);
-		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
-		COObject *obj = [ctx objectWithUUID: objUUID];
-		UKNotNil(obj);
-		NSArray *expectedProperties = A(@"name", @"parentContainer", @"parentCollections", @"contents", @"label", @"tags");
-		UKObjectsEqual([NSSet setWithArray: expectedProperties],
-					   [NSSet setWithArray: [obj persistentPropertyNames]]);
-		UKStringsEqual(@"Hello", [obj valueForProperty: @"label"]);
-		[ctx release];
-		CLOSE_STORE(store);
-	}
+	[self instantiateNewContextAndStore];
+
+	obj = [ctx objectWithUUID: objUUID];
+
+	UKNotNil(obj);
+	UKObjectsEqual([self basicProperties], SA([obj persistentPropertyNames]));
+	UKStringsEqual(@"Hello", [obj valueForProperty: @"label"]);
+
 	[objUUID release];
-	DELETE_STORE;
 }
 
 - (void)testDidCreate
 {
-	ETUUID *objUUID;
+	/* Test the two COObject instantiation paths, 
+	   -[COEditingContext insertObjectWithEntityName:rootObject:] and -[COObject init] */
+	TestCreateExample *obj = (id)[ctx insertObjectWithEntityName: @"Anonymous.TestCreateExample"];
+	TestCreateExample *obj2 = [TestCreateExample new];
+
+	UKIntsEqual(1, [obj didCreateCalled]);
+	UKIntsEqual(1, [obj2 didCreateCalled]);
+
+	[obj2 becomePersistentInContext: ctx
+	                     rootObject: obj2];
+
+	UKIntsEqual(1, [obj2 didCreateCalled]);
+
+	ETUUID *objUUID = [[obj UUID] retain];
+
+	[ctx commit];
+
+	[obj2 release];
+	[self instantiateNewContextAndStore];
+
+	obj = (id)[ctx objectWithUUID: objUUID];
 	
-	{
-		NSAutoreleasePool *arp = [NSAutoreleasePool new];
-		COStore *store = [[[self storeClass] alloc] initWithURL: STORE_URL];
-		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
-		// Create two objects: one through insertObjectWithEntityName:, the other
-		// using the -init call.
-		TestCreateExample *obj = (TestCreateExample*)[ctx 
-			insertObjectWithEntityName: @"Anonymous.TestCreateExample"];
-		TestCreateExample *obj2 = [TestCreateExample new];
-
-		UKIntsEqual(1, [obj didCreateCalled]);
-
-		UKIntsEqual(1, [obj2 didCreateCalled]);
-		[obj2 becomePersistentInContext: ctx 
-                                     rootObject: obj2];
-		UKIntsEqual(1, [obj2 didCreateCalled]);
-
-		objUUID = [[obj UUID] retain];
-
-		[ctx commit];
-		[obj2 release];
-		[ctx release];
-		[arp drain];
-		[store release];
-	}
+	UKNotNil(obj);
+	UKIntsEqual(0, [obj didCreateCalled]);
 	
-	{
-		OPEN_STORE(store);
-		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
-		TestCreateExample *obj = (TestCreateExample*)[ctx objectWithUUID: objUUID];
-		UKNotNil(obj);
-		UKIntsEqual(0, [obj didCreateCalled]);
-		[ctx release];
-		CLOSE_STORE(store);
-	}
 	[objUUID release];
-	DELETE_STORE;
 }
 
 - (void)testDiscardChanges
 {
-	OPEN_STORE(store);
-	COEditingContext *ctx = NewContext(store);
-
 	UKFalse([ctx hasChanges]);
 		
 	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -174,8 +132,8 @@
 	// FIXME: It's not entirely clear what this should do
 	[ctx discardAllChanges];
 	UKNil([ctx objectWithUUID: u1]);
-	
 	UKFalse([ctx hasChanges]);
+
 	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[o2 setValue: @"hello" forProperty: @"label"];
 	[ctx commit];
@@ -184,9 +142,6 @@
 	[o2 setValue: @"bye" forProperty: @"label"];
 	[ctx discardAllChanges];
 	UKObjectsEqual(@"hello", [o2 valueForProperty: @"label"]);
-	
-	TearDownContext(ctx);
-	CLOSE_STORE(store);
 }
 
 - (void)testCopyingBetweenContextsWithNoStoreSimple
@@ -196,8 +151,8 @@
 
 	COObject *o1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[o1 setValue: @"Shopping" forProperty: @"label"];
-	
 	COObject *o1copy = [ctx2 insertObject: o1];
+
 	UKNotNil(o1copy);
 	UKObjectsSame(ctx1, [o1 editingContext]);
 	UKObjectsSame(ctx2, [o1copy editingContext]);
@@ -243,13 +198,11 @@
 
 - (void)testCopyingBetweenContextsWithSharedStore
 {
-	OPEN_STORE(store);
-	COEditingContext *ctx1 = NewContext(store);
-	COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: [ctx1 store]];
+	COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: [ctx store]];
 	
-	COContainer *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *subchild = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *parent = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *child = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *subchild = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
 	[parent setValue: @"Shopping" forProperty: @"label"];
 	[child setValue: @"Groceries" forProperty: @"label"];
@@ -257,21 +210,21 @@
 	[child addObject: subchild];
 	[parent addObject: child];
 	
-	[ctx1 commit];
+	[ctx commit];
 	
 	// We won't commit this
 	[parent setValue: @"Todo" forProperty: @"label"];
 	
 	// We'll add another sub-child and leave it uncommitted.
-	COContainer *subchild2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *subchild2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[subchild2 setValue: @"Salad" forProperty: @"label"];
 	[child addObject: subchild2];
 	
-	// We are going to copy 'child' from ctx1 to ctx2. It should copy
+	// We are going to copy 'child' from ctx to ctx2. It should copy
 	// 'child', 'subchild', and 'subchild2', but not 'parent' (so 
 	// renaming parent from "Shopping" to "Todo" should not be propagated.)
-	
 	COContainer *childCopy = [ctx2 insertObject: child];
+
 	UKNotNil(childCopy);
 	UKObjectsSame(ctx2, [childCopy editingContext]);
 	UKObjectsEqual([parent UUID], [[childCopy valueForProperty: @"parentContainer"] UUID]);
@@ -279,6 +232,7 @@
 	UKStringsEqual(@"Groceries", [childCopy valueForProperty: @"label"]);
 	UKNotNil([childCopy contentArray]);
 	UKIntsEqual(2, [[childCopy contentArray] count]);
+
 	if (2 == [[childCopy contentArray] count])
 	{
 		COContainer *subchildCopy = [[childCopy contentArray] firstObject];
@@ -291,9 +245,8 @@
 		UKObjectsSame(ctx2, [subchild2Copy editingContext]);
 		UKStringsEqual(@"Salad", [subchild2Copy valueForProperty: @"label"]);
 	}
+
 	[ctx2 release];
-	TearDownContext(ctx1);
-	CLOSE_STORE(store);
 }
 
 
@@ -301,14 +254,13 @@
 {
 	COEditingContext *ctx1 = [[COEditingContext alloc] init];
 	COEditingContext *ctx2 = [[COEditingContext alloc] init];
-	
+
 	COObject *o1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[o1 setValue: @"Shopping" forProperty: @"label"];
-	
 	COObject *o1copy = [ctx2 insertObject: o1];
-	
 	// Insert again
 	COObject *o1copy2 = [ctx2 insertObject: o1];
+
 	UKObjectsSame(o1copy, o1copy2);
 	
 	//FIXME: Should inserting again copy over new changes (if any)?
@@ -333,7 +285,7 @@
 	UKObjectsEqual([NSArray array], [tag1copy contentArray]);
 	
 	COContainer *childcopy = [ctx2 insertObject: child];
-	UKObjectsEqual([NSArray arrayWithObject: childcopy], [tag1copy contentArray]);
+	UKObjectsEqual(A(childcopy), [tag1copy contentArray]);
 	
 	[ctx1 release];
 	[ctx2 release];

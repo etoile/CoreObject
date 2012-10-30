@@ -10,8 +10,6 @@
 @interface TestCustomTrack : TestCommon <UKTest>
 {
 	COCustomTrack *track;
-	COEditingContext *ctxt;
-	COStore *store;
 }
 
 @end
@@ -21,16 +19,13 @@
 - (id)init
 {
 	SUPERINIT;
-	store = [[[self storeClass] alloc] initWithURL: STORE_URL];
-	ctxt = NewContext(store);
-	track = [[COCustomTrack alloc] initWithUUID: [ETUUID UUID] editingContext: ctxt];
+	track = [[COCustomTrack alloc] initWithUUID: [ETUUID UUID] editingContext: ctx];
 	return self;
 }
 
 - (void)dealloc
 {
-	TearDownContext(ctxt);
-	DESTROY(store);
+	DESTROY(track);
 	[super dealloc];
 }
 
@@ -92,24 +87,24 @@ selective undo is involved. */
 {
 	/* First commit */
 
-	COContainer *object = [ctxt insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *object = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[object setValue: @"Groceries" forProperty: @"label"];
 
-	COTrackNode *firstNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	COTrackNode *firstNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
 	                                               previousNode: nil];
 
 	/* Second commit */
 
 	[object setValue: @"Shopping List" forProperty: @"label"];
 
-	COTrackNode *secondNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	COTrackNode *secondNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
 	                                                previousNode: firstNode];
 
 	/* Third commit */
 
 	[object setValue: @"Todo" forProperty: @"label"];
 
-	COTrackNode *thirdNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	COTrackNode *thirdNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
 	                                               previousNode: secondNode];
 
 	/* First undo  (Todo -> Shopping List) */
@@ -157,51 +152,51 @@ selective undo is involved. */
 {
 	/* First commit */
 
-	COContainer *object = [ctxt insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *object = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[object setValue: @"Groceries" forProperty: @"label"];
 
-	COTrackNode *firstNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	COTrackNode *firstNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
 	                                               previousNode: nil];
 
 	/* Second commit */
 
-	COContainer *doc = [ctxt insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *doc = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[doc setValue: @"Document" forProperty: @"label"];
 
-	COTrackNode *secondNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	COTrackNode *secondNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
 	                                                previousNode: firstNode];
 
 	/* Third commit (two revisions) */
 
-	COContainer *para1 = [ctxt insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: doc];
+	COContainer *para1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: doc];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
 	[object setValue: @"Shopping List" forProperty: @"label"];
 
-	COTrackNode *thirdNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	COTrackNode *thirdNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
 	                                               previousNode: secondNode];
 
 	/* Fourth commit */
 
 	[object setValue: @"Todo" forProperty: @"label"];
 
-	COTrackNode *fourthNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	COTrackNode *fourthNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
 	                                                previousNode: thirdNode];
 
 	/* Fifth commit */
 
-	COContainer *para2 = [ctxt insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: doc];
+	COContainer *para2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: doc];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[doc addObject: para1];
 	[doc addObject: para2];
 
-	COTrackNode *fifthNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	COTrackNode *fifthNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
 	                                               previousNode: fourthNode];
 
 	/* Sixth commit */
 
 	[para1 setValue: @"paragraph with different contents" forProperty: @"label"];
 
-	COTrackNode *sixthNode = [self pushAndCheckRevisionsOnTrack: [ctxt commit] 
+	COTrackNode *sixthNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
 	                                               previousNode: fifthNode];
 
 	return A(object, doc, para1, para2);
@@ -230,7 +225,7 @@ selective undo is involved. */
 	[track undo];
 	[track undo];
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
-	// FIXME: UKNil([ctxt objectWithUUID: [para2 UUID]]);
+	// FIXME: UKNil([ctx objectWithUUID: [para2 UUID]]);
 	UKTrue([[doc content] isEmpty]);
 
 	/* Fourth commit undone ('object' revision) */
@@ -241,7 +236,7 @@ selective undo is involved. */
 	/* Third commit undone (two revisions one on 'doc' and one on 'object') */
 
 	[track undo];
-	// FIXME: UKNil([ctxt objectWithUUID: [para1 UUID]]);
+	// FIXME: UKNil([ctx objectWithUUID: [para1 UUID]]);
 
 	[track undo];
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
@@ -249,21 +244,21 @@ selective undo is involved. */
 	/* Second commit undone ('doc' revision) */
 
 	[track undo];
-	// FIXME: UKNil([ctxt objectWithUUID: [doc UUID]]);
+	// FIXME: UKNil([ctx objectWithUUID: [doc UUID]]);
 	
 	/* First commit reached (root object 'object') */
 
 	// Just check the object creation hasn't been undone
-	UKNotNil([ctxt objectWithUUID: [object UUID]]);
+	UKNotNil([ctx objectWithUUID: [object UUID]]);
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
 	/* Second commit redone */
 
 	[track redo];
-	UKNotNil([ctxt objectWithUUID: [doc UUID]]);
-	UKObjectsNotSame(doc, [ctxt objectWithUUID: [doc UUID]]);
+	UKNotNil([ctx objectWithUUID: [doc UUID]]);
+	UKObjectsNotSame(doc, [ctx objectWithUUID: [doc UUID]]);
 	// Get the new restored root object instance
-	doc = (COContainer *)[ctxt objectWithUUID: [doc UUID]];
+	doc = (COContainer *)[ctx objectWithUUID: [doc UUID]];
 	UKStringsEqual(@"Document", [doc valueForProperty: @"label"]);
 
 	/* Third commit redone (involve two revisions) */
@@ -282,11 +277,11 @@ selective undo is involved. */
 
 	[track redo];
 	[track redo];
-	UKNotNil([ctxt objectWithUUID: [para1 UUID]]);
-	UKObjectsNotSame(para1, [ctxt objectWithUUID: [para1 UUID]]);
+	UKNotNil([ctx objectWithUUID: [para1 UUID]]);
+	UKObjectsNotSame(para1, [ctx objectWithUUID: [para1 UUID]]);
 
 	// Get the new restored object instance
-	para1 = (COContainer *)[ctxt objectWithUUID: [para1 UUID]];
+	para1 = (COContainer *)[ctx objectWithUUID: [para1 UUID]];
 	UKTrue([[doc allInnerObjectsIncludingSelf] containsObject: para1]);
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
 
@@ -297,11 +292,11 @@ selective undo is involved. */
 	[track redo];
 	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
 	UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
-	UKNotNil([ctxt objectWithUUID: [para2 UUID]]);
-	UKObjectsNotSame(para2, [ctxt objectWithUUID: [para2 UUID]]);
+	UKNotNil([ctx objectWithUUID: [para2 UUID]]);
+	UKObjectsNotSame(para2, [ctx objectWithUUID: [para2 UUID]]);
 
 	// Get the new restored object instance
-	para2 = (COContainer *)[ctxt objectWithUUID: [para2 UUID]];
+	para2 = (COContainer *)[ctx objectWithUUID: [para2 UUID]];
 	UKTrue([[doc allInnerObjectsIncludingSelf] containsObject: para2]);
 	UKStringsEqual(@"paragraph 2", [para2 valueForProperty: @"label"]);
 	UKObjectsEqual(A(para1, para2), [doc content]);

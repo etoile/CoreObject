@@ -6,18 +6,12 @@
 #import "TestCommon.h"
 
 @interface TestRelationshipIntegrity : TestCommon <UKTest>
-{
-}
 @end
 
 @implementation TestRelationshipIntegrity
 
-
 - (void)testBasicRelationshipIntegrity
 {
-	COStore *store = [[[self storeClass] alloc] initWithURL: STORE_URL];
-	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
-	
 	// Test one-to-many relationships
 	
 	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -33,8 +27,7 @@
 	UKObjectsEqual(A(o3), [o2 valueForProperty: @"contents"]);
 	UKObjectsEqual(o2, [o3 valueForProperty: @"parentContainer"]);
 	UKObjectsEqual([NSArray array], [o3 valueForProperty: @"contents"]);
-	
-	
+
 	// Test many-to-many relationships
 	
 	COObject *t1 = [ctx insertObjectWithEntityName: @"Anonymous.Tag"];
@@ -52,17 +45,10 @@
 	UKObjectsEqual(S(o1), [t1 valueForProperty: @"contents"]);
 	UKObjectsEqual(S(o1, o2), [t2 valueForProperty: @"contents"]);
 	UKObjectsEqual(S(o2), [t3 valueForProperty: @"contents"]);
-	
-	[ctx release];
-	[store release];
-	DELETE_STORE;
 }
 
 - (void)testRelationshipIntegrityForMove
 {
-	COStore *store = [[[self storeClass] alloc] initWithURL: STORE_URL];
-	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
-	
 	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -90,17 +76,10 @@
 	UKObjectsEqual([NSArray array], [o5 contentArray]);
 	UKObjectsEqual(A(o4), [o6 contentArray]);
 	UKObjectsSame(o6, [o4 valueForProperty: @"parentContainer"]);
-	
-	[ctx release];
-	[store release];
-	DELETE_STORE;
 }
 
 - (void)testRelationshipIntegrityMarksDamage
 {
-	OPEN_STORE(store);
-	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
-	
 	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -131,17 +110,10 @@
 	UKFalse([ctx isUpdatedObject: o1]);
 	UKTrue([ctx isUpdatedObject: o2]);
 	UKTrue([ctx isUpdatedObject: o3]);	
-
-	[ctx release];
-	CLOSE_STORE(store);
-	DELETE_STORE;
 }
 
 - (void)testOneToOneRelationship
 {
-	COStore *store = [[[self storeClass] alloc] initWithURL: STORE_URL];
-	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
-	
 	COObject *p1 = [ctx insertObjectWithEntityName: @"Anonymous.Person"];
 	COObject *p2 = [ctx insertObjectWithEntityName: @"Anonymous.Person"];
 	COObject *p3 = [ctx insertObjectWithEntityName: @"Anonymous.Person"];
@@ -154,17 +126,10 @@
 	UKNil([p1 valueForProperty: @"spouse"]);
 	UKObjectsEqual(p2, [p3 valueForProperty: @"spouse"]);
 	UKObjectsEqual(p3, [p2 valueForProperty: @"spouse"]);	
-	
-	[ctx release];
-	[store release];
-	DELETE_STORE;
 }
 
 - (void)testShoppingList
 {
-	OPEN_STORE(store);
-	COEditingContext *ctx = NewContext(store);
-	
 	COContainer *workspace = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COContainer *document1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COContainer *group1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -210,9 +175,6 @@
 	UKObjectsEqual(S(group2), [NSSet setWithArray: [document2 contentArray]]);
 	UKObjectsEqual(S(leaf1), [NSSet setWithArray: [group1 contentArray]]);
 	UKObjectsEqual(S(leaf2, leaf3), [NSSet setWithArray: [group2 contentArray]]);
-	
-	TearDownContext(ctx);
-	CLOSE_STORE(store);
 }
 
 @end
