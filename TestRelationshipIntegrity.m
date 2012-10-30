@@ -5,7 +5,7 @@
 #import "COStore.h"
 #import "TestCommon.h"
 
-@interface TestRelationshipIntegrity : NSObject <UKTest>
+@interface TestRelationshipIntegrity : TestCommon <UKTest>
 {
 }
 @end
@@ -15,7 +15,7 @@
 
 - (void)testBasicRelationshipIntegrity
 {
-	COStore *store = [[COStore alloc] initWithURL: STORE_URL];
+	COStore *store = [[[self storeClass] alloc] initWithURL: STORE_URL];
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 	
 	// Test one-to-many relationships
@@ -60,7 +60,7 @@
 
 - (void)testRelationshipIntegrityForMove
 {
-	COStore *store = [[COStore alloc] initWithURL: STORE_URL];
+	COStore *store = [[[self storeClass] alloc] initWithURL: STORE_URL];
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 	
 	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -139,7 +139,7 @@
 
 - (void)testOneToOneRelationship
 {
-	COStore *store = [[COStore alloc] initWithURL: STORE_URL];
+	COStore *store = [[[self storeClass] alloc] initWithURL: STORE_URL];
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 	
 	COObject *p1 = [ctx insertObjectWithEntityName: @"Anonymous.Person"];

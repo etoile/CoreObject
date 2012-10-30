@@ -1,6 +1,6 @@
 #import "CORevision.h"
 #import "FMDatabase.h"
-#import "COStore.h"
+#import "COSQLStore.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 

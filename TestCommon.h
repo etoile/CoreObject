@@ -1,8 +1,9 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UKRunner.h>
 #import "COEditingContext.h"
-#import "COStore.h"
+#import "COSQLStore.h"
 
+#define STORE_CLASS [COSQLStore class]
 #define STORE_URL [NSURL fileURLWithPath: [@"~/TestStore.sqlitedb" stringByExpandingTildeInPath]]
 /**
   * Open the store. Note that we create an autorelease pool. This is very deliberate - the nature
@@ -16,7 +17,7 @@
   * as the DB connection is open for the entire programme length and probably controlled through a
   * ETApplication hook, where we could control the NSAutoreleasePool creation.
   */
-#define OPEN_STORE(store)  NSAutoreleasePool *_pool = [NSAutoreleasePool new]; COStore *store = [[COStore alloc] initWithURL: STORE_URL];
+#define OPEN_STORE(store)  NSAutoreleasePool *_pool = [NSAutoreleasePool new]; COStore *store = [[STORE_CLASS alloc] initWithURL: STORE_URL];
 #define CLOSE_STORE(store) [_pool drain]; [store release];
 #define DELETE_STORE [[NSFileManager defaultManager] removeFileAtPath: [STORE_URL path] handler: nil]
 
@@ -25,6 +26,7 @@
 
 @interface TestCommon : NSObject
 + (void) setUp;
+- (Class)storeClass;
 @end
 
 COEditingContext *NewContext(COStore *store);

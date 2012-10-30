@@ -91,7 +91,7 @@
 	
 	{
 		NSAutoreleasePool *arp = [NSAutoreleasePool new];
-		COStore *store = [[COStore alloc] initWithURL: STORE_URL];
+		COStore *store = [[[self storeClass] alloc] initWithURL: STORE_URL];
 		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 		COObject *obj = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 		objUUID = [[obj UUID] retain];
@@ -124,7 +124,7 @@
 	
 	{
 		NSAutoreleasePool *arp = [NSAutoreleasePool new];
-		COStore *store = [[COStore alloc] initWithURL: STORE_URL];
+		COStore *store = [[[self storeClass] alloc] initWithURL: STORE_URL];
 		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
 		// Create two objects: one through insertObjectWithEntityName:, the other
 		// using the -init call.

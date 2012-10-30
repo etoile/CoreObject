@@ -21,7 +21,7 @@
 - (id)init
 {
 	SUPERINIT;
-	store = [[COStore alloc] initWithURL: STORE_URL];
+	store = [[[self storeClass] alloc] initWithURL: STORE_URL];
 	ctxt = NewContext(store);
 	track = [[COCustomTrack alloc] initWithUUID: [ETUUID UUID] editingContext: ctxt];
 	return self;

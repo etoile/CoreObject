@@ -21,6 +21,9 @@
 		6019B8A0163C04FA00D1986F /* sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E7A1299C92300CCF472 /* sqlite3.c */; };
 		6019B8A1163C051800D1986F /* sqlite3.h in Headers */ = {isa = PBXBuildFile; fileRef = 791B4E7B1299C92300CCF472 /* sqlite3.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6019B8A2163C09DF00D1986F /* SQLClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F15163B6B7A009C4F21 /* SQLClient.framework */; };
+		6019B8A7163C41AB00D1986F /* COSQLStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 6019B8A5163C41AB00D1986F /* COSQLStore.h */; };
+		6019B8A8163C41AB00D1986F /* COSQLStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 6019B8A6163C41AB00D1986F /* COSQLStore.m */; };
+		6019B8AA163C41AB00D1986F /* COSQLStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 6019B8A6163C41AB00D1986F /* COSQLStore.m */; };
 		6028E42A153729ED0003A205 /* COObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 6028E429153729ED0003A205 /* COObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6039CC7814BC3FBB008A8BA3 /* COCustomTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 6039CC7614BC3FBB008A8BA3 /* COCustomTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6039CC7914BC3FBB008A8BA3 /* COCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6039CC7714BC3FBB008A8BA3 /* COCustomTrack.m */; };
@@ -179,6 +182,8 @@
 		6019B895163BFED200D1986F /* GSTicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GSTicker.h; path = Performance/GSTicker.h; sourceTree = "<group>"; };
 		6019B896163BFED200D1986F /* GSTicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GSTicker.m; path = Performance/GSTicker.m; sourceTree = "<group>"; };
 		6019B89E163C006E00D1986F /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = SQLClient/config.h; sourceTree = "<group>"; };
+		6019B8A5163C41AB00D1986F /* COSQLStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COSQLStore.h; sourceTree = "<group>"; };
+		6019B8A6163C41AB00D1986F /* COSQLStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COSQLStore.m; sourceTree = "<group>"; };
 		6028E429153729ED0003A205 /* COObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COObject.h; sourceTree = "<group>"; };
 		6039CC7614BC3FBB008A8BA3 /* COCustomTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCustomTrack.h; sourceTree = "<group>"; };
 		6039CC7714BC3FBB008A8BA3 /* COCustomTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCustomTrack.m; sourceTree = "<group>"; };
@@ -570,6 +575,8 @@
 				791B4E5D1299C8CB00CCF472 /* CORevision.m */,
 				791B4E601299C8CB00CCF472 /* COStore.h */,
 				791B4E611299C8CB00CCF472 /* COStore.m */,
+				6019B8A5163C41AB00D1986F /* COSQLStore.h */,
+				6019B8A6163C41AB00D1986F /* COSQLStore.m */,
 			);
 			name = Store;
 			sourceTree = "<group>";
@@ -636,6 +643,7 @@
 				60A55DE114A25AC4007A9864 /* COTrack.h in Headers */,
 				6039CC7814BC3FBB008A8BA3 /* COCustomTrack.h in Headers */,
 				6028E42A153729ED0003A205 /* COObject.h in Headers */,
+				6019B8A7163C41AB00D1986F /* COSQLStore.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -879,6 +887,7 @@
 				60A55DE214A25AC4007A9864 /* COTrack.m in Sources */,
 				6039CC7914BC3FBB008A8BA3 /* COCustomTrack.m in Sources */,
 				60EB4F6A155BDAA700CFBC5C /* COError.m in Sources */,
+				6019B8A8163C41AB00D1986F /* COSQLStore.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -894,6 +903,7 @@
 				66D099FF129AE8A2006BEDC3 /* FMResultSet.m in Sources */,
 				66D09A00129AE8A2006BEDC3 /* sqlite3.c in Sources */,
 				66D099BB129AE111006BEDC3 /* TestStore.m in Sources */,
+				6019B8AA163C41AB00D1986F /* COSQLStore.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -66,12 +66,10 @@
 	return NO;
 }
 
-- (void)checkCurrentNodeChangeNotification: (NSNotification *)notif
+- (BOOL)isOurStoreForNotification: (NSNotification *)notif
 {
 	NSString *storeUUIDString = [[notif userInfo] objectForKey: kCOStoreUUIDStringKey];
-
-	assert([[notif object] isEqual: [[trackedObject UUID] stringValue]]);
-	assert([storeUUIDString isEqual: [[[[trackedObject editingContext] store] UUID] stringValue]]);
+	return [storeUUIDString isEqual: [[[[trackedObject editingContext] store] UUID] stringValue]];
 }
 
 /* This method is called back through distributed notifications in various cases:
@@ -88,12 +86,32 @@
    instances are not located in the same editing context. */
 - (void)currentNodeDidChangeInStore: (NSNotification *)notif
 {
-	[self checkCurrentNodeChangeNotification: notif];
+	/* Paranoid check in case something goes wrong and a core object UUID
+	   appear in multiple stores.
+	   For now, a core object UUID is bound to a single store. Hence a commit
+	   track UUID is never in use accross multiple stores (using distinct UUIDs).  */
+	if ([self isOurStoreForNotification: notif])
+		return;
 
+	NSParameterAssert([[[trackedObject UUID] stringValue] isEqual: [notif object]]);
+
+	COEditingContext *context = [trackedObject editingContext];
 	int64_t revNumber = [[[notif userInfo] objectForKey: kCONewCurrentNodeRevisionNumberKey] longLongValue];
-	BOOL isBasicUndoOrRedo = (revNumber == [[[self currentNode] revision] revisionNumber]);
+	BOOL isBasicUndoRedoFromCurrentContext = (revNumber == [[[self currentNode] revision] revisionNumber]);
+	BOOL isCommitFromCurrentContext = (revNumber == [context latestRevisionNumber]);
 
-	if (isBasicUndoOrRedo)
+	/* Distributed notifications are ignored in the cases below: 
+	   - -undo or -redo was invoked on the receiver
+	   - a tracked object editing context commit (see also -didMakeNewAtRevision:)
+	 
+	   This method updates the track nodes in the cases below:
+	   - -undo or -redo was invoked on another receiver instance in some other editing context
+	   - a commit on another tracked object instance in some other editing context
+	   - a selective undo
+	
+	   For each track UUID, this method requires that a single track instance 
+	   exists per editing context. */
+	if (isBasicUndoRedoFromCurrentContext || isCommitFromCurrentContext)
 		return;
 
 	COTrackNode *oldCurrentNode = RETAIN([self currentNode]);

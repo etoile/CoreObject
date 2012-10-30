@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COStore;
+@class COStore, COSQLStore;
 
 /** 
  * @group Store
@@ -25,7 +25,7 @@
  */
 @interface CORevision : NSObject <ETCollection>
 {
-	COStore *store;
+	COSQLStore *store;
 	int64_t revisionNumber;
 	int64_t baseRevisionNumber;
 }
@@ -111,7 +111,7 @@
  * Initializes and returns a new revision object to represent a precise revision 
  * number in the given store. 
  */
-- (id)initWithStore: (COStore *)aStore revisionNumber: (int64_t)anID baseRevisionNumber: (int64_t)baseID;
+- (id)initWithStore: (COSQLStore *)aStore revisionNumber: (int64_t)anID baseRevisionNumber: (int64_t)baseID;
 
 /**
  * Returns the next revision after this one. 

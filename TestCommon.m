@@ -115,6 +115,11 @@
 	[self setUpMetamodel];
 }
 
+- (Class)storeClass
+{
+	return STORE_CLASS;
+}
+
 @end
 
 COEditingContext *NewContext(COStore* store)

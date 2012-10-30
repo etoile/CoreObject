@@ -11,7 +11,7 @@ int main (int argc, const char *argv[])
 
 	[[UKTestHandler handler] setQuiet: YES];
 
-	[runner runTestsInBundle: [NSBundle mainBundle] principalClass: [TestCommon class]];
+	[runner runTestsInBundle: [NSBundle mainBundle] principalClass: NSClassFromString(@"TestCommon")];
 	[runner reportTestResults];
 	
 	[runner release];

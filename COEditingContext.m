@@ -10,7 +10,9 @@
 
 + (COEditingContext *)contextWithURL: (NSURL *)aURL
 {
-	COEditingContext *ctx = [[self alloc] initWithStore: [[[COStore alloc] initWithURL: aURL] autorelease]];
+	// TODO: Look up the store class based on the URL scheme and path extension
+	COEditingContext *ctx = [[self alloc] initWithStore:
+		[[[NSClassFromString(@"COSQLStore") alloc] initWithURL: aURL] autorelease]];
 	return [ctx autorelease];
 }
 
