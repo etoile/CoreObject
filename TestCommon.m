@@ -135,7 +135,7 @@
 	[self discardContextAndStore];
 
 	pool = [NSAutoreleasePool new];
-	store = [[[self storeClass] alloc] initWithURL: STORE_URL];
+	store = [[[self storeClass] alloc] initWithURL: [self storeURL]];
 
 #ifdef STORE_TEST
 	ctx = (id)[[NSNull null] retain];
@@ -160,7 +160,7 @@
 
 - (void)deleteStore
 {
-	[[NSFileManager defaultManager] removeFileAtPath: [STORE_URL path] handler: nil];
+	[[NSFileManager defaultManager] removeFileAtPath: [[self storeURL] path] handler: nil];
 }
 
 - (void)dealloc
