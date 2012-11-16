@@ -152,7 +152,6 @@
 	{
 		object_setClass(self, [[self class] faultClass]);
 		_context = aContext;
-		_rootObject = aRootObject;
 	}
 	else
 	{
@@ -207,7 +206,6 @@
 - (void)dealloc
 {
 	_context = nil;
-	_rootObject = nil;
 	DESTROY(_uuid);
 	DESTROY(_entityDescription);
 	DESTROY(_variableStorage);
@@ -222,8 +220,8 @@
 	INVALIDARG_EXCEPTION_TEST(aRootObject, 
 		aRootObject != self || [[(id)aContext loadedObjects] containsObject: aRootObject] == NO);
 	ETAssert(_uuid != nil);
+
 	_context = aContext;
-	_rootObject = aRootObject;
 	if (_entityDescription == nil)
 	{
 		ASSIGN(_entityDescription, [[(id)aContext modelRepository] entityDescriptionForClass: [self class]]);
@@ -240,7 +238,6 @@
 	COObject *newObject = [[self class] allocWithZone: aZone];
 	
 	newObject->_uuid = [[ETUUID alloc] init];
-	newObject->_rootObject = _rootObject;
 	newObject->_context = _context;
 	if (_variableStorage != nil)
 	{
@@ -281,12 +278,12 @@
 
 - (COObject *) rootObject
 {
-	return _rootObject;
+	return [_context rootObject];
 }
 
 - (BOOL) isRoot
 {
-	return (_rootObject == self);
+	return ([self rootObject] == self);
 }
 
 - (BOOL) isFault

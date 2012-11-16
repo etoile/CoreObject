@@ -167,7 +167,6 @@
 	ETEntityDescription *_entityDescription;
 	ETUUID *_uuid;
 	COPersistentRootEditingContext *_context; // weak reference
-	COObject *_rootObject; // weak reference
 	NSMapTable *_variableStorage;
 	BOOL _isIgnoringDamageNotifications;
 	BOOL _isIgnoringRelationshipConsistency;
