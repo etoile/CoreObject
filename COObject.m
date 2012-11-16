@@ -500,7 +500,7 @@
 	{
 		if ([value isKindOfClass: [COObject class]])
 		{
-			assert([value editingContext] == _context);
+			assert([[value editingContext] parentContext] == [_context parentContext]);
 		}    
 	}
 }
@@ -1484,7 +1484,8 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		id mapped[count];
 		for (int i = 0; i < count; i++)
 		{
-			mapped[i] = [self valueForPropertyList: [(NSArray*)plist objectAtIndex:i]];
+			id obj = [self valueForPropertyList: [(NSArray*)plist objectAtIndex:i]];
+			mapped[i] = obj;
 		}
 		return [NSMutableArray arrayWithObjects: mapped count: count];
 	}

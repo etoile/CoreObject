@@ -4,9 +4,11 @@
 @class COStore, CORevision, COObject, COGroup, COSmartGroup, COCommitTrack, COError;
 
 /**
- * An object context is like a working copy in a revision control system.
+ * An editing context exposes a CoreObject store snapshot as a working copy 
+ * (in revision control system terminology).
  *
- * It queues changes and then attempts to commit them to the store.
+ * It queues changes and when the user requests it, it attempts to commit them 
+ * to the store.
  */
 @interface COEditingContext : NSObject
 {
@@ -15,6 +17,7 @@
 	int64_t _maxRevisionNumber;
 	int64_t _latestRevisionNumber;
 	ETModelDescriptionRepository *_modelRepository;
+	NSMutableDictionary *_persistentRootContexts;
 
 	/**
 	 * UUID of root object -> revision

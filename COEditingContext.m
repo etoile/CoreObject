@@ -1,4 +1,5 @@
 #import "COEditingContext.h"
+#import "COPersistentRootEditingContext.h"
 #import "COError.h"
 #import "COObject.h"
 #import "COGroup.h"
@@ -43,6 +44,8 @@ static COEditingContext *currentCtxt = nil;
 
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
 
+	_persistentRootContexts = [NSMutableDictionary new];
+	
 	_rootObjectRevisions = [NSMutableDictionary new];
 	_rootObjectCommitTracks = [NSMutableDictionary new];
 	//assert([[[_modelRepository descriptionForName: @"Anonymous.COContainer"] 
@@ -72,6 +75,7 @@ static COEditingContext *currentCtxt = nil;
 
 	DESTROY(_store);
 	DESTROY(_modelRepository);
+	DESTROY(_persistentRootContexts);
 	DESTROY(_rootObjectRevisions);
 	DESTROY(_rootObjectCommitTracks);
 	DESTROY(_instantiatedObjects);
@@ -264,11 +268,26 @@ store by other processes. */
 		}
 
 		Class cls = [self classForEntityDescription: desc];
-		result = [[cls alloc] 
+		COPersistentRootEditingContext *ctxt = (id)[rootObject editingContext];
+		result = [cls alloc];
+		
+		if (rootObject == nil)
+		{
+			ctxt = [[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: uuid
+																	  commitTrackUUID: nil
+																		   rootObject: result
+																		parentContext: self];
+			[_persistentRootContexts setObject: ctxt forKey: uuid];
+			[ctxt release];
+		}
+		
+		ETAssert(ctxt != nil);
+
+		result = [result
 			     initWithUUID: uuid
 			entityDescription: desc
 			       rootObject: rootObject
-				  context: self
+				  context: (id)ctxt
 				  isFault: YES];
 		
 		if (isRoot)
@@ -384,7 +403,7 @@ store by other processes. */
                                     UUID: (ETUUID *)aUUID 
                               rootObject: (COObject *)rootObject
 {
-	COObject *result = nil;
+
 	ETEntityDescription *desc = [_modelRepository descriptionForName: aFullName];
 	if (desc == nil)
 	{
@@ -392,14 +411,29 @@ store by other processes. */
 	}
 	
 	Class cls = [self classForEntityDescription: desc];
+	COPersistentRootEditingContext *ctxt = (id)[rootObject editingContext];
+	COObject *result = [cls alloc];
+
+	if (rootObject == nil)
+	{
+		ctxt = [[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: aUUID
+																  commitTrackUUID: nil
+																	   rootObject: result
+																	parentContext: self];
+		[_persistentRootContexts setObject: ctxt forKey: aUUID];
+		[ctxt release];
+	}
+
+	ETAssert(ctxt != nil);
+	
 	/* Nil root object means the new object will be a root */
-	result = [[cls alloc] 
+	result = [result
 		     initWithUUID: aUUID
 		entityDescription: desc
 		       rootObject: rootObject
-		          context: self
+		          context: (id)ctxt
 		          isFault: NO];
-	[result becomePersistentInContext: self rootObject: (rootObject != nil ? rootObject : result)];
+	[result becomePersistentInContext: (id)ctxt rootObject: (rootObject != nil ? rootObject : result)];
 	[result release];
 	
 	return result;

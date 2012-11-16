@@ -70,7 +70,7 @@
 	COContainer *subchild4 = [[child contentArray] objectAtIndex: 2];
 	UKStringsEqual(@"Salsa", [subchild4	valueForProperty: @"label"]);
 	UKObjectsEqual(subchild4UUID, [subchild4 UUID]);
-	UKObjectsSame(ctx1, [subchild4 editingContext]);
+	UKObjectsSame(ctx1, [(id)[subchild4 editingContext] parentContext]);
 	
 	[ctx2 release];
 	[ctx1 release];
@@ -117,7 +117,7 @@
 	UKIntsEqual(0, [[child1 contentArray] count]);
 	UKIntsEqual(1, [[child2 contentArray] count]);
 	UKObjectsSame(subchild1, [[child2 contentArray] objectAtIndex: 0]);
-	UKObjectsSame(ctx1, [[[child2 contentArray] objectAtIndex: 0] editingContext]);
+	UKObjectsSame(ctx1, [(id)[[[child2 contentArray] objectAtIndex: 0] editingContext] parentContext]);
 	
 	[ctx2 release];
 	[ctx1 release];	

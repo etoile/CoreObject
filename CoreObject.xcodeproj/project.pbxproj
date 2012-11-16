@@ -41,6 +41,8 @@
 		60C8BC5416322E2C00A2B4EE /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 669965351162E17500359BE6 /* libz.1.2.5.dylib */; };
 		60C8BC5516322E3200A2B4EE /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
 		60C8BC5616322FE600A2B4EE /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 792C5F57127F78A7007205EA /* UnitKit.framework */; };
+		60C913921653BE1400E0C5F4 /* COPersistentRootEditingContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C913901653BE1400E0C5F4 /* COPersistentRootEditingContext.h */; };
+		60C913931653BE1400E0C5F4 /* COPersistentRootEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913911653BE1400E0C5F4 /* COPersistentRootEditingContext.m */; };
 		60EB4F69155BDAA700CFBC5C /* COError.h in Headers */ = {isa = PBXBuildFile; fileRef = 60EB4F67155BDAA700CFBC5C /* COError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60EB4F6A155BDAA700CFBC5C /* COError.m in Sources */ = {isa = PBXBuildFile; fileRef = 60EB4F68155BDAA700CFBC5C /* COError.m */; };
 		60F6A31814444EC300EFC711 /* COCommitTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60F6A31514444EC300EFC711 /* COCommitTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -201,6 +203,8 @@
 		60988F1C163B6B7A009C4F21 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		60A55DDF14A25AC4007A9864 /* COTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COTrack.h; sourceTree = "<group>"; };
 		60A55DE014A25AC4007A9864 /* COTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COTrack.m; sourceTree = "<group>"; };
+		60C913901653BE1400E0C5F4 /* COPersistentRootEditingContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COPersistentRootEditingContext.h; sourceTree = "<group>"; };
+		60C913911653BE1400E0C5F4 /* COPersistentRootEditingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COPersistentRootEditingContext.m; sourceTree = "<group>"; };
 		60EB4F67155BDAA700CFBC5C /* COError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COError.h; sourceTree = "<group>"; };
 		60EB4F68155BDAA700CFBC5C /* COError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COError.m; sourceTree = "<group>"; };
 		60F6A31514444EC300EFC711 /* COCommitTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommitTrack.h; sourceTree = "<group>"; };
@@ -463,6 +467,8 @@
 				66D09D58129CE477006BEDC3 /* Model Objects */,
 				6686BDBA12592C1B0065DE1A /* COEditingContext.h */,
 				6686BDBB12592C1B0065DE1A /* COEditingContext.m */,
+				60C913901653BE1400E0C5F4 /* COPersistentRootEditingContext.h */,
+				60C913911653BE1400E0C5F4 /* COPersistentRootEditingContext.m */,
 				6686BDC212592C1B0065DE1A /* COObjectGraphDiff.h */,
 				6686BDC312592C1B0065DE1A /* COObjectGraphDiff.m */,
 				60413A6D14B9F66800225D2A /* Tracks */,
@@ -645,6 +651,7 @@
 				6039CC7814BC3FBB008A8BA3 /* COCustomTrack.h in Headers */,
 				6028E42A153729ED0003A205 /* COObject.h in Headers */,
 				6019B8A7163C41AB00D1986F /* COSQLStore.h in Headers */,
+				60C913921653BE1400E0C5F4 /* COPersistentRootEditingContext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -889,6 +896,7 @@
 				6039CC7914BC3FBB008A8BA3 /* COCustomTrack.m in Sources */,
 				60EB4F6A155BDAA700CFBC5C /* COError.m in Sources */,
 				6019B8A8163C41AB00D1986F /* COSQLStore.m in Sources */,
+				60C913931653BE1400E0C5F4 /* COPersistentRootEditingContext.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1145,6 +1153,7 @@
 				6019B88E163BFD8500D1986F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		60988F22163B6B7A009C4F21 /* Build configuration list for PBXNativeTarget "SQLClient" */ = {
 			isa = XCConfigurationList;
