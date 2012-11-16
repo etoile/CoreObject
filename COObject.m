@@ -228,6 +228,10 @@
 	{
 		ASSIGN(_entityDescription, [[(id)aContext modelRepository] entityDescriptionForClass: [self class]]);
 	}
+	if (self == aRootObject)
+	{
+		[_context setRootObject: aRootObject];
+	}
 	[(id)aContext registerObject: self];
 }
 
@@ -1002,7 +1006,7 @@
 
 - (COCommitTrack *)commitTrack
 {
-	return [[self editingContext] trackWithObject: self];
+	return [[self editingContext] commitTrack];
 }
 
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery

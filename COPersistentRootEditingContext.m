@@ -27,7 +27,7 @@
 
 - (void)dealloc
 {
-	//DESTROY(commitTrack);
+	DESTROY(commitTrack);
 	DESTROY(rootObject);
 	DESTROY(revision);
 	[super dealloc];
@@ -41,6 +41,16 @@
 		return parentContext;
 	}
 	return [super forwardingTargetForSelector: aSelector];
+}
+
+
+- (COCommitTrack *)commitTrack
+{
+	if (commitTrack == nil)
+	{
+		ASSIGN(commitTrack, [COCommitTrack trackWithObject: [self rootObject]]);
+	}
+	return commitTrack;
 }
 
 - (id)objectWithUUID: (ETUUID *)uuid

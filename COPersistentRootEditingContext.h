@@ -82,7 +82,7 @@
  * history including the branches (and derived cheap copies) due to limitations 
  * in EtoileUI.
  */
-@property (nonatomic, readonly) COObject *rootObject;
+@property (nonatomic, retain) COObject *rootObject;
 /**
  * The persistent root revision.
  *

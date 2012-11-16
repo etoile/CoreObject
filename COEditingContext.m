@@ -46,7 +46,6 @@ static COEditingContext *currentCtxt = nil;
 
 	_persistentRootContexts = [NSMutableDictionary new];
 
-	_rootObjectCommitTracks = [NSMutableDictionary new];
 	//assert([[[_modelRepository descriptionForName: @"Anonymous.COContainer"] 
 	//	propertyDescriptionForName: @"contents"] isComposite]);
 
@@ -75,7 +74,6 @@ static COEditingContext *currentCtxt = nil;
 	DESTROY(_store);
 	DESTROY(_modelRepository);
 	DESTROY(_persistentRootContexts);
-	DESTROY(_rootObjectCommitTracks);
 	DESTROY(_instantiatedObjects);
 	DESTROY(_insertedObjects);
 	DESTROY(_deletedObjects);
@@ -743,9 +741,8 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	CORevision *rev = [_store finishCommit];
 	assert(rev != nil);
 
-	[(id)[rootObject editingContext] setRevision: rev];
-	[[_rootObjectCommitTracks objectForKey: [rootObject UUID]]
-		didMakeNewCommitAtRevision: rev];
+	[[rootObject editingContext] setRevision: rev];
+	[[[rootObject editingContext] commitTrack] didMakeNewCommitAtRevision: rev];
 	
 	[_insertedObjects minusSet: insertedObjects];
 	for (COObject *obj in [updatedPropertiesByObject allKeys])
@@ -850,20 +847,6 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 		assert([aProperty isKindOfClass: [NSString class]]);
 		[[_updatedPropertiesByObject objectForKey: obj] addObject: aProperty]; 
 	}
-}
-
-- (COCommitTrack *)trackWithObject: (COObject *)object
-{
-	ETUUID *rootObjectUUID = [[object rootObject] UUID];
-	COCommitTrack *commitTrack = [_rootObjectCommitTracks objectForKey: rootObjectUUID];
-
-	if (nil == commitTrack)
-	{
-		commitTrack = [COCommitTrack trackWithObject: [object rootObject]];
-		[_rootObjectCommitTracks setObject: commitTrack 
-		                            forKey: rootObjectUUID];
-	}
-	return commitTrack;
 }
 
 // FIXME: Probably need to turn off relationship consistency around loading.

@@ -20,11 +20,6 @@
 	ETModelDescriptionRepository *_modelRepository;
 	NSMutableDictionary *_persistentRootContexts;
 
-	/**
-	 * UUID of root object -> commit track
-	 */
-	NSMutableDictionary *_rootObjectCommitTracks;
-
 	/** 
 	 * UUID -> loaded or inserted object
 	 */
@@ -383,12 +378,6 @@
  * subclass instance.
  */
 - (void)markObjectUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Returns the commit track bound to the root object that owns the object.
- */
-- (COCommitTrack *)trackWithObject: (COObject *)object;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
