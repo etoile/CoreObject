@@ -1,5 +1,9 @@
 #import <Foundation/Foundation.h>
 
+#if 0
+@class COObjectGraphDiff;
+@class XMPPAccount;
+
 /**
  * COSynchronizer is a tool responsible for:
  * - live collaboration
@@ -23,7 +27,31 @@ problems:
  */
 @interface COSynchronizer : NSObject
 {
-
+	COEditingContext *shadowEditingContext;
+	XMPPAccount *account;
+	XMPPConversation *conversation;
 }
 
+/** @taskunit Managing the Participants */
+
+/**
+ * Returns the client persons involved in a collaboration over one or several 
+ * shared root objects.
+ */
+- (NSSet *)persons;
+- (void)invitePerson: (XMPPPerson *)aPerson;
+- (void)revokePerson: (XMPPPerson *)aPerson;
+
+
+- (void)didCommitChangedObjects: (NSSet *)changedObjects
+				  forRootObject: (COObject *)anObject;
+
+- (void)synchronizeClientsUsingDiff: (COObjectGraphDiff *)aDiff;
+
+/** @taskunit XMPP Integration */
+
+- (XMPPConversation *)conversationForPerson: (XMPPPerson *)aPerson;
+
 @end
+
+#endif
