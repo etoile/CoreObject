@@ -45,6 +45,7 @@
 	ETUUID *persistentRootUUID;
 	COCommitTrack *commitTrack;
 	COObject *rootObject;
+	CORevision *revision;
 }
 
 /** @taskunit Persistent Root Properties */
@@ -82,6 +83,12 @@
  * in EtoileUI.
  */
 @property (nonatomic, readonly) COObject *rootObject;
+/**
+ * The persistent root revision.
+ *
+ * This revision applies to the root object and inner objects. See -[COObject revision].
+ */
+@property (nonatomic, retain) CORevision *revision;
 
 /** @taskunit Object Access and Loading */
 

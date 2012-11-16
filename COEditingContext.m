@@ -45,8 +45,7 @@ static COEditingContext *currentCtxt = nil;
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
 
 	_persistentRootContexts = [NSMutableDictionary new];
-	
-	_rootObjectRevisions = [NSMutableDictionary new];
+
 	_rootObjectCommitTracks = [NSMutableDictionary new];
 	//assert([[[_modelRepository descriptionForName: @"Anonymous.COContainer"] 
 	//	propertyDescriptionForName: @"contents"] isComposite]);
@@ -76,7 +75,6 @@ static COEditingContext *currentCtxt = nil;
 	DESTROY(_store);
 	DESTROY(_modelRepository);
 	DESTROY(_persistentRootContexts);
-	DESTROY(_rootObjectRevisions);
 	DESTROY(_rootObjectCommitTracks);
 	DESTROY(_instantiatedObjects);
 	DESTROY(_insertedObjects);
@@ -215,7 +213,7 @@ store by other processes. */
 
 	if (result != nil && revision != nil)
 	{
-		CORevision *existingRevision = [self revisionForObject: result];
+		CORevision *existingRevision = [result revision];
 		if (![existingRevision isEqual: revision])
 		{
 			[NSException raise: NSInternalInconsistencyException
@@ -292,7 +290,7 @@ store by other processes. */
 		
 		if (isRoot)
 		{
-			[_rootObjectRevisions setObject: revision forKey: [result UUID]];
+			[ctxt setRevision: revision];
 		}
 		[_instantiatedObjects setObject: result forKey: uuid];
 		[result release];
@@ -579,6 +577,18 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	return [self insertObject: sourceObject withRelationshipConsistency: YES newUUID: YES];
 }
 
+- (COPersistentRootEditingContext *)makePersistentRootContext
+{
+	COPersistentRootEditingContext *ctxt =
+		[[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: [ETUUID UUID]
+														   commitTrackUUID: nil
+																rootObject: nil
+															 parentContext: self];
+	[_persistentRootContexts setObject: ctxt forKey: [ctxt persistentRootUUID]];
+	[ctxt release];
+	return ctxt;
+}
+
 - (void)deleteObject: (COObject *)anObject
 {
 	[_deletedObjects addObject: anObject];
@@ -733,7 +743,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	CORevision *rev = [_store finishCommit];
 	assert(rev != nil);
 
-	[_rootObjectRevisions setObject: rev forKey: [rootObject UUID]];
+	[(id)[rootObject editingContext] setRevision: rev];
 	[[_rootObjectCommitTracks objectForKey: [rootObject UUID]]
 		didMakeNewCommitAtRevision: rev];
 	
@@ -842,12 +852,6 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	}
 }
 
-- (CORevision *)revisionForObject: (COObject *)object
-{
-	COObject *rootObject = [object rootObject];
-	return [_rootObjectRevisions objectForKey: [rootObject UUID]];
-}
-
 - (COCommitTrack *)trackWithObject: (COObject *)object
 {
 	ETUUID *rootObjectUUID = [[object rootObject] UUID];
@@ -876,7 +880,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 	if (aRevision == nil)
 	{
-		aRevision = [self revisionForObject: obj];
+		aRevision = [obj revision];
 	}
 
 	//NSLog(@"Load object %@ at %i", objUUID, (int)revNum);
@@ -927,12 +931,12 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	// revision is older than the root object creation revision.
 
 	ETUUID *rootObjectUUID = [rootObject UUID];
-	CORevision *currentRevision = [_rootObjectRevisions objectForKey: rootObjectUUID];
+	CORevision *currentRevision = [rootObject revision];
 
 	if ([revision isEqual: currentRevision])
 		return;
 
-	[_rootObjectRevisions setObject: revision forKey: rootObjectUUID];
+	[(id)[rootObject editingContext] setRevision: revision];
 
 	// FIXME: Optimise for undo/redo cases (revisions next to each other)
 	
@@ -990,7 +994,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 {
 	ETUUID *rootObjectUUID = [rootObject UUID];
 	//CORevision *oldRevision = [_rootObjectRevisions objectForKey: rootObjectUUID];
-	[_rootObjectRevisions removeObjectForKey: rootObjectUUID];
+	[(id)[rootObject editingContext] setRevision: nil];
 
 	// FIXME: Optimise for undo/redo cases (revisions next to each other)
 	

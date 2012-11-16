@@ -13,7 +13,7 @@
 #import "COObject.h"
 #import "COError.h"
 #import "COFault.h"
-#import "COEditingContext.h"
+#import "COPersistentRootEditingContext.h"
 #import "COStore.h"
 #import "COContainer.h"
 #import "COGroup.h"
@@ -115,7 +115,7 @@
 - (id) commonInitWithUUID: (ETUUID *)aUUID 
         entityDescription: (ETEntityDescription *)anEntityDescription
                rootObject: (COObject *)aRootObject
-                  context: (COEditingContext *)aContext
+                  context: (COPersistentRootEditingContext *)aContext
                   isFault: (BOOL)isFault
 {
 	NSParameterAssert(aUUID != nil);
@@ -156,7 +156,7 @@
 	}
 	else
 	{
-		[_context markObjectUpdated: self forProperty: nil];
+		[(id)_context markObjectUpdated: self forProperty: nil];
 		_variableStorage = [self newVariableStorage];
 		[self didCreate];
 	}
@@ -167,7 +167,7 @@
 - (id)initWithUUID: (ETUUID *)aUUID 
  entityDescription: (ETEntityDescription *)anEntityDescription
         rootObject: (id)aRootObject
-           context: (COEditingContext *)aContext
+           context: (COPersistentRootEditingContext *)aContext
            isFault: (BOOL)isFault
 {
 	SUPERINIT;
@@ -214,21 +214,21 @@
 	[super dealloc];
 }
 
-- (void) becomePersistentInContext: (COEditingContext *)aContext 
+- (void) becomePersistentInContext: (COPersistentRootEditingContext *)aContext
                         rootObject: (COObject *)aRootObject
 {
 	NILARG_EXCEPTION_TEST(aContext);
 	NILARG_EXCEPTION_TEST(aRootObject);
 	INVALIDARG_EXCEPTION_TEST(aRootObject, 
-		aRootObject != self || [[aContext loadedObjects] containsObject: aRootObject] == NO);
+		aRootObject != self || [[(id)aContext loadedObjects] containsObject: aRootObject] == NO);
 	ETAssert(_uuid != nil);
 	_context = aContext;
 	_rootObject = aRootObject;
 	if (_entityDescription == nil)
 	{
-		ASSIGN(_entityDescription, [[aContext modelRepository] entityDescriptionForClass: [self class]]);
+		ASSIGN(_entityDescription, [[(id)aContext modelRepository] entityDescriptionForClass: [self class]]);
 	}
-	[aContext registerObject: self];
+	[(id)aContext registerObject: self];
 }
 
 - (id) copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription
@@ -270,7 +270,7 @@
 	return _uuid;
 }
 
-- (COEditingContext*) editingContext
+- (id) editingContext
 {
 	return _context;
 }
@@ -290,9 +290,9 @@
 	return NO;
 }
 
-- (CORevision*)revision
+- (CORevision *)revision
 {
-	return [_context revisionForObject: self];
+	return [_context revision];
 }
 
 - (BOOL) isPersistent
@@ -304,7 +304,7 @@
 
 - (BOOL) isDamaged
 {
-	return [_context isUpdatedObject: self]; 
+	return [[self editingContext] isUpdatedObject: self];
 }
 
 /* Helper methods based on the metamodel */
@@ -362,10 +362,10 @@
 		            format: @"Inner objects cannot be known until %@ has become persistent", self];
 	}
 
-	CORevision *loadedRev = [_context revisionForObject: self];
+	CORevision *loadedRev = [_context revision];
 
-	NSSet *innerObjectUUIDs = [[_context store] UUIDsForRootObjectUUID: [self UUID] 
-	                                                        atRevision: loadedRev];
+	NSSet *innerObjectUUIDs = [[[self editingContext] store] UUIDsForRootObjectUUID: [self UUID]
+	                                                                     atRevision: loadedRev];
 	NSMutableSet *innerObjects = [NSMutableSet setWithCapacity: [innerObjectUUIDs count]];
 
 	for (ETUUID *uuid in innerObjectUUIDs)
@@ -794,7 +794,7 @@
 {
 	if (!_isIgnoringDamageNotifications)
 	{
-		[_context markObjectUpdated: self forProperty: prop];
+		[[self editingContext] markObjectUpdated: self forProperty: prop];
 	}
 }
 
@@ -1002,7 +1002,7 @@
 
 - (COCommitTrack *)commitTrack
 {
-	return [_context trackWithObject: self];
+	return [[self editingContext] trackWithObject: self];
 }
 
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery

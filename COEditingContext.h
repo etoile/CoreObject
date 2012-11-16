@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
+@class COPersistentRootEditingContext;
 @class COStore, CORevision, COObject, COGroup, COSmartGroup, COCommitTrack, COError;
 
 /**
@@ -19,10 +20,6 @@
 	ETModelDescriptionRepository *_modelRepository;
 	NSMutableDictionary *_persistentRootContexts;
 
-	/**
-	 * UUID of root object -> revision
-	 */
-	NSMutableDictionary *_rootObjectRevisions;
 	/**
 	 * UUID of root object -> commit track
 	 */
@@ -293,6 +290,8 @@
  */
 - (id)insertObjectCopy: (COObject *)sourceObject;
 
+- (COPersistentRootEditingContext *)makePersistentRootContext;
+
 /** @taskunit Object Deletion */
 
 /**
@@ -384,15 +383,6 @@
  * subclass instance.
  */
 - (void)markObjectUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Returns the revision of the root object that owns the object.
- *
- * When a root object is passed rather than a inner object, returns its revision 
- * as you would expect it.
- */
-- (CORevision *)revisionForObject: (COObject *)object;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

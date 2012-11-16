@@ -21,7 +21,7 @@
 		6019B8A0163C04FA00D1986F /* sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E7A1299C92300CCF472 /* sqlite3.c */; };
 		6019B8A1163C051800D1986F /* sqlite3.h in Headers */ = {isa = PBXBuildFile; fileRef = 791B4E7B1299C92300CCF472 /* sqlite3.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6019B8A2163C09DF00D1986F /* SQLClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F15163B6B7A009C4F21 /* SQLClient.framework */; };
-		6019B8A7163C41AB00D1986F /* COSQLStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 6019B8A5163C41AB00D1986F /* COSQLStore.h */; };
+		6019B8A7163C41AB00D1986F /* COSQLStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 6019B8A5163C41AB00D1986F /* COSQLStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6019B8A8163C41AB00D1986F /* COSQLStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 6019B8A6163C41AB00D1986F /* COSQLStore.m */; };
 		6019B8AA163C41AB00D1986F /* COSQLStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 6019B8A6163C41AB00D1986F /* COSQLStore.m */; };
 		6019B8CF16402C1A00D1986F /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D03129C936E006BEDC3 /* TestCommon.m */; };
@@ -41,8 +41,11 @@
 		60C8BC5416322E2C00A2B4EE /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 669965351162E17500359BE6 /* libz.1.2.5.dylib */; };
 		60C8BC5516322E3200A2B4EE /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
 		60C8BC5616322FE600A2B4EE /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 792C5F57127F78A7007205EA /* UnitKit.framework */; };
-		60C913921653BE1400E0C5F4 /* COPersistentRootEditingContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C913901653BE1400E0C5F4 /* COPersistentRootEditingContext.h */; };
+		60C913921653BE1400E0C5F4 /* COPersistentRootEditingContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C913901653BE1400E0C5F4 /* COPersistentRootEditingContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60C913931653BE1400E0C5F4 /* COPersistentRootEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913911653BE1400E0C5F4 /* COPersistentRootEditingContext.m */; };
+		60C913941656364700E0C5F4 /* COSynchronizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D09B14129B704E006BEDC3 /* COSynchronizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60C913951656364E00E0C5F4 /* COSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09B15129B704E006BEDC3 /* COSynchronizer.m */; };
+		60C913961656364F00E0C5F4 /* COSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09B15129B704E006BEDC3 /* COSynchronizer.m */; };
 		60EB4F69155BDAA700CFBC5C /* COError.h in Headers */ = {isa = PBXBuildFile; fileRef = 60EB4F67155BDAA700CFBC5C /* COError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60EB4F6A155BDAA700CFBC5C /* COError.m in Sources */ = {isa = PBXBuildFile; fileRef = 60EB4F68155BDAA700CFBC5C /* COError.m */; };
 		60F6A31814444EC300EFC711 /* COCommitTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60F6A31514444EC300EFC711 /* COCommitTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -652,6 +655,7 @@
 				6028E42A153729ED0003A205 /* COObject.h in Headers */,
 				6019B8A7163C41AB00D1986F /* COSQLStore.h in Headers */,
 				60C913921653BE1400E0C5F4 /* COPersistentRootEditingContext.h in Headers */,
+				60C913941656364700E0C5F4 /* COSynchronizer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -897,6 +901,7 @@
 				60EB4F6A155BDAA700CFBC5C /* COError.m in Sources */,
 				6019B8A8163C41AB00D1986F /* COSQLStore.m in Sources */,
 				60C913931653BE1400E0C5F4 /* COPersistentRootEditingContext.m in Sources */,
+				60C913951656364E00E0C5F4 /* COSynchronizer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -936,6 +941,7 @@
 				60F6A31C14444EDA00EFC711 /* TestCommitTrack.m in Sources */,
 				60F6A31D14444EDA00EFC711 /* TestRevisionNumber.m in Sources */,
 				60980C5914C6F6FF001C05F2 /* TestCustomTrack.m in Sources */,
+				60C913961656364F00E0C5F4 /* COSynchronizer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

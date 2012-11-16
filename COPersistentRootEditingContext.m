@@ -8,7 +8,7 @@
 
 @implementation COPersistentRootEditingContext
 
-@synthesize parentContext, commitTrack, rootObject;
+@synthesize persistentRootUUID, parentContext, commitTrack, rootObject, revision;
 
 - (id)initWithPersistentRootUUID: (ETUUID *)aUUID
 				 commitTrackUUID: (ETUUID *)aTrackUUID
@@ -29,6 +29,7 @@
 {
 	//DESTROY(commitTrack);
 	DESTROY(rootObject);
+	DESTROY(revision);
 	[super dealloc];
 }
 
@@ -47,14 +48,14 @@
 	return [parentContext objectWithUUID: uuid];
 }
 
-- (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision
+- (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)rev
 {
-	return [parentContext objectWithUUID: uuid entityName: name atRevision: revision];
+	return [parentContext objectWithUUID: uuid entityName: name atRevision: rev];
 }
 
-- (void)reloadAtRevision: (CORevision *)revision
+- (void)reloadAtRevision: (CORevision *)rev
 {
-	[[self parentContext] reloadRootObjectTree: [self rootObject] atRevision: revision];
+	[[self parentContext] reloadRootObjectTree: [self rootObject] atRevision: rev];
 }
 
 - (void)unload

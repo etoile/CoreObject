@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COQuery.h>
 
-@class COEditingContext, CORevision, COCommitTrack;
+@class COPersistentRootEditingContext, COEditingContext, CORevision, COCommitTrack;
 
 /**
  * Working copy of an object, owned by an editing context.
@@ -166,7 +166,7 @@
 	@package
 	ETEntityDescription *_entityDescription;
 	ETUUID *_uuid;
-	COEditingContext *_context; // weak reference
+	COPersistentRootEditingContext *_context; // weak reference
 	COObject *_rootObject; // weak reference
 	NSMapTable *_variableStorage;
 	BOOL _isIgnoringDamageNotifications;
@@ -217,7 +217,7 @@
  * When the root object is not the receiver or doesn't belong to the editing 
  * context, raises an exception too.
  */
-- (void)becomePersistentInContext: (COEditingContext *)aContext 
+- (void)becomePersistentInContext: (COPersistentRootEditingContext *)aContext
                        rootObject: (COObject *)aRootObject;
 - (id)copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription;
 
@@ -232,10 +232,10 @@
 - (ETUUID *)UUID;
 - (ETEntityDescription *)entityDescription;
 /** 
- * Returns the editing context when the receiver is persistent, otherwise  
- * returns nil.
+ * Returns the persistent root editing context when the receiver is persistent,   
+ * otherwise returns nil.
  */
-- (COEditingContext *)editingContext;
+- (id)editingContext;
 /** 
  * Returns the root object when the receiver is persistent, otherwise returns nil.
  *

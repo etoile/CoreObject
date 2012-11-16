@@ -136,7 +136,8 @@
 	return self;
 }
 
-- (void) becomePersistentInContext: (COEditingContext *)aContext rootObject: (COObject *)aRootObject
+- (void) becomePersistentInContext: (COPersistentRootEditingContext *)aContext
+                        rootObject: (COObject *)aRootObject
 {
 	if ([self isPersistent])
 		return;

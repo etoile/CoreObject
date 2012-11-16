@@ -269,7 +269,7 @@
 	assert([object isRoot]);
 	assert([object isPersistent]);
 
-	BOOL useCommitTrackUndo = [revToUndo isEqual: [editingContext revisionForObject: object]];
+	BOOL useCommitTrackUndo = [revToUndo isEqual: [object revision]];
 	
 	if (useCommitTrackUndo)
 	{
@@ -322,7 +322,7 @@
 
 	// NOTE: The base revision below is not the same than [currentNode revision] 
 	// when the two revisions doesn't concern the same root object.
-	BOOL useCommitTrackRedo = [[revToRedo baseRevision] isEqual: [editingContext revisionForObject: object]];
+	BOOL useCommitTrackRedo = [[revToRedo baseRevision] isEqual: [object revision]];
 	
 	if (useCommitTrackRedo)
 	{
