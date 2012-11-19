@@ -8,6 +8,7 @@
 
 #import "COCustomTrack.h"
 #import "COEditingContext.h"
+#import "COPersistentRootEditingContext.h"
 #import "COObjectGraphDiff.h"
 #import "CORevision.h"
 #import "COStore.h"
@@ -283,14 +284,14 @@
 
 			//assert([newTrackRev isEqual: [[[self currentNode] previousNode] revision]]);
 
-			[editingContext reloadRootObjectTree: object atRevision: newRev];
+			[(id)[object editingContext] reloadAtRevision: newRev];
 		}
 		else
 		{
 			// TODO: Commit a delete
 
 			/* Undo root object creation */
-			[editingContext unloadRootObjectTree: object];
+			[(id)[object editingContext] unload];
 		}
 	}
 	else
@@ -331,7 +332,7 @@
 
 		//assert([newTrackRev isEqual: [[[self currentNode] nextNode] revision]]);
 
-	    [editingContext reloadRootObjectTree: object atRevision: newRev];
+	    [(id)[object editingContext] reloadAtRevision: newRev];
 	}
 	else /* Fall back on selective undo */
 	{

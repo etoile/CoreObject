@@ -41,18 +41,9 @@ static COEditingContext *currentCtxt = nil;
 	ASSIGN(_store, store);
 	_maxRevisionNumber = maxRevisionNumber;	
 	_latestRevisionNumber = [_store latestRevisionNumber];
-
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
-
 	_persistentRootContexts = [NSMutableDictionary new];
-
-	//assert([[[_modelRepository descriptionForName: @"Anonymous.COContainer"] 
-	//	propertyDescriptionForName: @"contents"] isComposite]);
-
-	_instantiatedObjects = [[NSMutableDictionary alloc] init];
-	_insertedObjects = [[NSMutableSet alloc] init];
-	_deletedObjects = [[NSMutableSet alloc] init];
-	ASSIGN(_updatedPropertiesByObject, [NSMapTable mapTableWithStrongToStrongObjects]);
+	_loadedObjects = [NSMutableDictionary new];
 
 	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
 	                                                    selector: @selector(didMakeCommit:) 
@@ -67,27 +58,16 @@ static COEditingContext *currentCtxt = nil;
 	return [self initWithStore: nil];
 }
 
-- (void) dealloc
+- (void)dealloc
 {
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 
 	DESTROY(_store);
 	DESTROY(_modelRepository);
 	DESTROY(_persistentRootContexts);
-	DESTROY(_instantiatedObjects);
-	DESTROY(_insertedObjects);
-	DESTROY(_deletedObjects);
-	DESTROY(_updatedPropertiesByObject);
+	DESTROY(_loadedObjects);
 	DESTROY(_error);
 	[super dealloc];
-}
-
-// FIXME: Should this copy uncommitted changes?
-- (id)copyWithZone:(NSZone *)zone
-{
-	id copy = [[COEditingContext alloc] initWithStore: _store];
-	// FIXME:
-	return copy;
 }
 
 /* Handles distributed notifications about new revisions to refresh the root 
@@ -115,11 +95,11 @@ store by other processes. */
 
 		COObject *rootObject = [self objectWithUUID: rootObjectUUID];
 
-		[self reloadRootObjectTree: rootObject atRevision:  rev];
+		[[rootObject editingContext] reloadAtRevision: rev];
 	}
 }
 
-- (COSmartGroup *) mainGroup
+- (COSmartGroup *)mainGroup
 {
 	COSmartGroup *group = AUTORELEASE([[COSmartGroup alloc] init]);
 	COContentBlock block = ^() {
@@ -170,6 +150,11 @@ store by other processes. */
 	return _latestRevisionNumber;
 }
 
+- (void)setLatestRevisionNumber: (int64_t)revNumber
+{
+	_latestRevisionNumber = revNumber;
+}
+
 - (ETModelDescriptionRepository *)modelRepository
 {
 	return _modelRepository; 
@@ -183,6 +168,38 @@ store by other processes. */
 		cls = [COObject class];
 	}
 	return cls;
+}
+
+// NOTE: Persistent root insertion or deletion are saved to the store at commit time.
+
+- (COPersistentRootEditingContext *)makePersistentRootContextWithRootObject: (COObject *)aRootObject
+{
+	COPersistentRootEditingContext *ctxt =
+	[[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: [ETUUID UUID]
+													   commitTrackUUID: nil
+															rootObject: aRootObject
+														 parentContext: self];
+	[_persistentRootContexts setObject: ctxt forKey: [ctxt persistentRootUUID]];
+	[ctxt release];
+	return ctxt;
+}
+
+- (COPersistentRootEditingContext *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
+{
+	return [self insertObjectWithEntityName: anEntityName];
+}
+
+- (COPersistentRootEditingContext *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject
+{
+	return [self makePersistentRootContextWithRootObject: aRootObject];
+}
+
+- (void)deletePersistentRootForRootObject: (COObject *)aRootObject
+{
+	COPersistentRootEditingContext *context = [aRootObject editingContext];
+
+	[self discardLoadedObjectsForPersistentRootContexts: S(context)];
+	[_persistentRootContexts removeObjectForKey: [context persistentRootUUID]];
 }
 
 - (NSString *)entityNameForObjectUUID: (ETUUID *)obj
@@ -207,7 +224,7 @@ store by other processes. */
 	// helps to intercept string objects that ought to be ETUUID objects.
 	NSParameterAssert([uuid isKindOfClass: [ETUUID class]]);
 
-	COObject *result = [_instantiatedObjects objectForKey: uuid];
+	COObject *result = [_loadedObjects objectForKey: uuid];
 
 	if (result != nil && revision != nil)
 	{
@@ -269,12 +286,7 @@ store by other processes. */
 		
 		if (rootObject == nil)
 		{
-			ctxt = [[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: uuid
-																	  commitTrackUUID: nil
-																		   rootObject: result
-																		parentContext: self];
-			[_persistentRootContexts setObject: ctxt forKey: uuid];
-			[ctxt release];
+			ctxt = [self makePersistentRootContextWithRootObject: result];
 		}
 		
 		ETAssert(ctxt != nil);
@@ -290,7 +302,7 @@ store by other processes. */
 		{
 			[ctxt setRevision: revision];
 		}
-		[_instantiatedObjects setObject: result forKey: uuid];
+		[_loadedObjects setObject: result forKey: uuid];
 		[result release];
 	}
 	
@@ -309,7 +321,12 @@ store by other processes. */
 
 - (NSSet *)loadedObjects
 {
-	return [NSSet setWithArray: [_instantiatedObjects allValues]];
+	return [NSSet setWithArray: [_loadedObjects allValues]];
+}
+
+- (NSSet *)loadedObjectUUIDs
+{
+	return [NSSet setWithArray: [_loadedObjects allKeys]];
 }
 
 - (NSSet *)loadedRootObjects
@@ -321,78 +338,114 @@ store by other processes. */
 
 - (id)loadedObjectForUUID: (ETUUID *)uuid
 {
-	return [_instantiatedObjects objectForKey: uuid];
+	return [_loadedObjects objectForKey: uuid];
+}
+
+- (void)discardLoadedObjectForUUID: (ETUUID *)aUUID
+{
+	[_loadedObjects removeObjectForKey: aUUID];
+}
+
+/* Remove from the cache all the objects that belong to discarded persistent roots */
+- (void)discardLoadedObjectsForPersistentRootContexts: (NSSet *)removedPersistentRootContexts
+{
+	for (COObject *obj in [self loadedObjects])
+	{
+		if ([removedPersistentRootContexts containsObject: [obj editingContext]])
+		{
+			[self discardLoadedObjectForUUID: [obj UUID]];
+		}
+	}
+}
+
+// NOTE: We could rewrite it using -foldWithBlock: or -leftFold (could be faster)
+- (NSSet *)setByCollectingObjectsFromPersistentRootsUsingSelector: (SEL)aSelector
+{
+	NSMutableSet *collectedObjects = [NSMutableSet set];
+
+	for (COPersistentRootEditingContext *context in [_persistentRootContexts objectEnumerator])
+	{
+		[collectedObjects unionSet: [context performSelector: aSelector]];
+	}
+	return collectedObjects;
 }
 
 - (NSSet *)insertedObjects
 {
-	return [NSSet setWithSet: _insertedObjects];
+	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(insertedObjects)];
 }
 
 - (NSSet *)updatedObjects
 {
-	return [NSSet setWithArray: [_updatedPropertiesByObject allKeys]];
+	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(insertedObjects)];
 }
 
 - (NSSet *)updatedObjectUUIDs
 {
-	return [NSSet setWithArray: (id)[[[_updatedPropertiesByObject allKeys] mappedCollection] UUID]];
+	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(updatedObjectUUIDs)];
 }
 
 - (BOOL)isUpdatedObject: (COObject *)anObject
 {
-	return ([_updatedPropertiesByObject objectForKey: anObject] != nil);
+	return [[self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(updatedObjects)] containsObject: anObject];
 }
 
 - (NSSet *)deletedObjects
 {
-	return [NSSet setWithSet: _deletedObjects];
+	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(deletedObjects)];
 }
 
 - (NSSet *)changedObjects
 {
-	NSSet *changedObjects = [_insertedObjects setByAddingObjectsFromSet: _deletedObjects];
-	return [changedObjects setByAddingObjectsFromSet: [self updatedObjects]];
+	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(changedObjects)];
 }
 
 - (BOOL)hasChanges
 {
-	return ([_updatedPropertiesByObject count] > 0 
-		|| [_insertedObjects count] > 0 
-		|| [_deletedObjects count] > 0);
+	for (COPersistentRootEditingContext *context in [_persistentRootContexts objectEnumerator])
+	{
+		if ([context hasChanges])
+			return YES;
+	}
+	return NO;
 }
 
 - (void)discardAllChanges
 {
-	for (COObject *object in [_instantiatedObjects allValues])
+	NSMutableSet *removedPersistentRootContexts = [NSMutableSet set];
+
+	/* Discard changes in persistent roots and collect discarded persistent roots */
+	for (ETUUID *uuid in _persistentRootContexts)
 	{
-		[self discardChangesInObject: object];
+		COPersistentRootEditingContext *context = [_persistentRootContexts objectForKey: uuid];
+
+		if ([context revision] != nil)
+		{
+			[context discardAllChanges];
+		}
+		else
+		{
+			[removedPersistentRootContexts addObject: context];
+		}
 	}
+
+	[self discardLoadedObjectsForPersistentRootContexts: removedPersistentRootContexts];
+
+	/* Release the discarded persistent roots */
+	[_persistentRootContexts removeObjectsForKeys:
+		(id)[[[removedPersistentRootContexts allObjects] mappedCollection] persistentRootUUID]];
+
 	assert([self hasChanges] == NO);
 }
 
 - (void)discardChangesInObject: (COObject *)object
 {
-	// FIXME: is this what we want?
-	
-	// Special case for objects which haven't yet been comitted
-	if ([_insertedObjects containsObject: object])
-	{
-		[_updatedPropertiesByObject removeObjectForKey: object];
-		[_insertedObjects removeObject: object];
-		[_instantiatedObjects removeObjectForKey: [object UUID]];
-		// lingering instances may be in a 'zombie' state now... not sure how to solve that problem
-	}
-	else
-	{
-		[self loadObject: object];
-	}
+	[[object editingContext] discardChangesInObject: object];
 }
 
-- (void)registerObject: (COObject *)object
+- (void)cacheLoadedObject: (COObject *)object
 {
-	[_instantiatedObjects setObject: object forKey: [object UUID]];
-	[_insertedObjects addObject: object];
+	[_loadedObjects setObject: object forKey: [object UUID]];
 }
 
 - (COObject *)insertObjectWithEntityName: (NSString *)aFullName 
@@ -412,12 +465,7 @@ store by other processes. */
 
 	if (rootObject == nil)
 	{
-		ctxt = [[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: aUUID
-																  commitTrackUUID: nil
-																	   rootObject: result
-																	parentContext: self];
-		[_persistentRootContexts setObject: ctxt forKey: aUUID];
-		[ctxt release];
+		ctxt = [self makePersistentRootContextWithRootObject: nil];
 	}
 
 	ETAssert(ctxt != nil);
@@ -502,18 +550,19 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 - (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency  newUUID: (BOOL)newUUID
 {
-	COEditingContext *sourceContext = [sourceObject editingContext];
+	COPersistentRootEditingContext *sourceContext = [sourceObject editingContext];
 	ETAssert(sourceContext != nil);
 	/* See -[COObject becomePersistentInContext:rootObject:] */
-	BOOL isBecomingPersistent = (newUUID == NO && sourceContext == self);
+	BOOL isBecomingPersistent = (newUUID == NO && [_persistentRootContexts containsObject: sourceContext]);
 
 	/* Source object was not persistent until then
 	   
 	   So we don't want to create a new instance, but just register it */
 
+	// FIXME: This code looks dubious. Why not use -becomePersistentInContext:rootObject:...
 	if (isBecomingPersistent)
 	{
-		[self registerObject: sourceObject];
+		[sourceContext registerObject: sourceObject];
 		return sourceObject;
 	}
 
@@ -589,40 +638,7 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 
 - (void)deleteObject: (COObject *)anObject
 {
-	[_deletedObjects addObject: anObject];
-	[_instantiatedObjects removeObjectForKey: [anObject UUID]];
-}
-
-- (NSMapTable *)objectsByRootObjectFromObjects: (id <ETCollection>)objects
-{
-	NSMapTable *objectsByRootObject = [NSMapTable mapTableWithStrongToStrongObjects];
-
-	// NOTE: For now, ETCollection doesn't include -countByEnumeratingWithState:objects:count:
-	// so we use FOREACH to prevent compilation error with recent Clang.
-	FOREACH(objects, obj, COObject *)
-	{
-		COObject *rootObject = [obj rootObject];
-		NSMutableSet *innerObjects = [objectsByRootObject objectForKey: rootObject];
-
-		if (innerObjects == nil)
-		{
-			innerObjects = [NSMutableSet set];
-			[objectsByRootObject setObject: innerObjects forKey: rootObject];
-		}
-		[innerObjects addObject: obj];
-	}
-
-	return objectsByRootObject;
-}
-
-- (NSMapTable *)insertedObjectsByRootObject
-{
-	return [self objectsByRootObjectFromObjects: _insertedObjects];
-}
-
-- (NSMapTable *)updatedObjectsByRootObject
-{
-	return [self objectsByRootObjectFromObjects: [_updatedPropertiesByObject allKeys]];
+	[[anObject editingContext] deleteObject: anObject];
 }
 
 - (NSArray *)commit
@@ -656,102 +672,6 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
            shortDescription: (NSString *)shortDescription
 {
 	return [self commitWithType: type shortDescription: shortDescription longDescription: nil];
-}
-
-- (NSMapTable *)updatedPropertySubsetForObjects: (NSArray *)keys
-{
-	NSMapTable *subset = [NSMapTable mapTableWithStrongToStrongObjects];
-
-	for (COObject *obj in _updatedPropertiesByObject)
-	{
-		if ([keys containsObject: obj] == NO)
-			continue;
-
-		[subset setObject: [_updatedPropertiesByObject objectForKey: obj] 
-		           forKey: obj];
-	}
-
-	return subset;
-}
-
-- (CORevision *)commitWithMetadata: (NSDictionary *)metadata 
-                        rootObject: (COObject *)rootObject
-                   insertedObjects: (NSSet *)insertedObjects
-                 updatedProperties: (NSMapTable *)updatedPropertiesByObject
-{
-	NSParameterAssert(rootObject != nil);
-	NSParameterAssert(insertedObjects != nil);
-	NSParameterAssert(updatedPropertiesByObject != nil);
-	// TODO: ETAssert([rootObject isRoot]);
-	// TODO: We should add the deleted object UUIDs to the set below
-	NSSet *committedObjects = 
-		[insertedObjects setByAddingObjectsFromArray: [updatedPropertiesByObject allKeys]];
-
-	[_store beginCommitWithMetadata: metadata 
-	                 rootObjectUUID: [rootObject UUID]
-	                   baseRevision: [rootObject revision]];
-
-	for (COObject *obj in committedObjects)
-	{		
-		[_store beginChangesForObjectUUID: [obj UUID]];
-
-		NSArray *persistentProperties = [obj persistentPropertyNames];
-		id <ETCollection> propertiesToCommit = nil;
-
-		//NSLog(@"Committing changes for %@", obj);
-
-		if ([insertedObjects containsObject: obj])
-		{
-			// for the first commit, commit all property values
-			propertiesToCommit = persistentProperties;
-			ETAssert([_insertedObjects containsObject: obj]);
-		}
-		else
-		{
-			// otherwise just damaged values
-			NSArray *updatedProperties = [updatedPropertiesByObject objectForKey: obj];
-
-			propertiesToCommit = [NSMutableSet setWithArray: updatedProperties];
-			[(NSMutableSet *)propertiesToCommit intersectSet: [NSSet setWithArray: persistentProperties]];
-			ETAssert([_insertedObjects containsObject: obj] == NO);
-		}
-
-		FOREACH(propertiesToCommit, prop, NSString*)
-		{
-			id value = [obj serializedValueForProperty: prop];
-			id plist = [obj propertyListForValue: value];
-			
-			[_store setValue: plist
-			     forProperty: prop
-			        ofObject: [obj UUID]
-			     shouldIndex: NO];
-		}
-		
-		// FIXME: Hack
-		NSString *name = [[obj entityDescription] fullName];
-
-		[_store setValue: name
-		     forProperty: @"_entity"
-		        ofObject: [obj UUID]
-		     shouldIndex: NO];
-		
-		[_store finishChangesForObjectUUID: [obj UUID]];
-	}
-	
-	CORevision *rev = [_store finishCommit];
-	assert(rev != nil);
-
-	[[rootObject editingContext] setRevision: rev];
-	[[[rootObject editingContext] commitTrack] didMakeNewCommitAtRevision: rev];
-	
-	[_insertedObjects minusSet: insertedObjects];
-	for (COObject *obj in [updatedPropertiesByObject allKeys])
-	{
-		[_updatedPropertiesByObject removeObjectForKey: obj];
-	}
-
-	_latestRevisionNumber = [rev revisionNumber];
-	return rev;
 }
 
 - (void)postCommitNotificationsWithRevisions: (NSArray *)revisions
@@ -801,30 +721,12 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 	if ([self validateChangedObjects] == NO)
 		return [NSArray array];
 
-	NSMapTable *insertedObjectsByRoot = [self insertedObjectsByRootObject];
-	NSMapTable *updatedObjectsByRoot = [self updatedObjectsByRootObject];
-	NSSet *rootObjects = [NSSet setWithArray: [[[insertedObjectsByRoot keyEnumerator] allObjects] 
-		arrayByAddingObjectsFromArray: [[updatedObjectsByRoot keyEnumerator] allObjects]]];
-
-	NSMutableSet *insertedRootObjectUUIDs = [NSMutableSet setWithSet: (id)[[_insertedObjects mappedCollection] UUID]];
-	[insertedRootObjectUUIDs intersectSet: (id)[[rootObjects mappedCollection] UUID]];
-	[_store insertRootObjectUUIDs: insertedRootObjectUUIDs];
-
 	NSMutableArray *revisions = [NSMutableArray array];
 
 	// TODO: Add a batch commit UUID in the metadata
-	for (COObject *rootObject in rootObjects)
+	for (COPersistentRootEditingContext *ctxt in [_persistentRootContexts objectEnumerator])
 	{
-		NSSet *insertedObjectSubset = [insertedObjectsByRoot objectForKey: rootObject];
-		NSMapTable *updatedPropertySubset = [self updatedPropertySubsetForObjects: 
-			[updatedObjectsByRoot objectForKey: rootObject]];
-
-		CORevision *rev = [self commitWithMetadata: metadata 
-		                                rootObject: rootObject
-		                           insertedObjects: (insertedObjectSubset != nil ? insertedObjectSubset : [NSSet set])
-		                         updatedProperties: updatedPropertySubset];
-
-		[revisions addObject: rev];
+		[revisions addObject: [ctxt commitWithMetadata: metadata]];
 	}
 
  	[self postCommitNotificationsWithRevisions: revisions];
@@ -834,176 +736,6 @@ static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, B
 - (NSError *)error
 {
 	return _error;
-}
-
-- (void)markObjectUpdated: (COObject *)obj forProperty: (NSString *)aProperty
-{
-	if (nil == [_updatedPropertiesByObject objectForKey: obj])
-	{
-		[_updatedPropertiesByObject setObject: [NSMutableArray array] forKey: obj];
-	}
-	if (aProperty != nil)
-	{
-		assert([aProperty isKindOfClass: [NSString class]]);
-		[[_updatedPropertiesByObject objectForKey: obj] addObject: aProperty]; 
-	}
-}
-
-// FIXME: Probably need to turn off relationship consistency around loading.
-- (void)loadObject: (COObject *)obj atRevision: (CORevision *)aRevision
-{
-	CORevision *objectRev = nil;
-	ETUUID *objUUID = [obj UUID];
-
-	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj persistentPropertyNames]];
-	//NSLog(@"Properties to fetch: %@", propertiesToFetch);
-	
-	obj->_isIgnoringDamageNotifications = YES;
-	[obj setIgnoringRelationshipConsistency: YES];
-
-	if (aRevision == nil)
-	{
-		aRevision = [obj revision];
-	}
-
-	//NSLog(@"Load object %@ at %i", objUUID, (int)revNum);
-	
-	while ([propertiesToFetch count] > 0 && aRevision != nil)
-	{
-		NSDictionary *dict = [aRevision valuesAndPropertiesForObjectUUID: objUUID];
-		
-		for (NSString *key in [dict allKeys])
-		{
-			if ([propertiesToFetch containsObject: key])
-			{	
-				if (nil == objectRev)
-				{
-					objectRev = aRevision;
-				}
-
-				id plist = [dict objectForKey: key];
-				id value = [obj valueForPropertyList: plist];
-				//NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
-				[obj setSerializedValue: value forProperty: key];
-				[propertiesToFetch removeObject: key];
-			}
-		}
-		
-		aRevision = [aRevision baseRevision];
-	}
-
-	if ([propertiesToFetch count] > 0)
-	{
-		[NSException raise: NSInternalInconsistencyException 
-		            format: @"Store is missing properties %@ for %@", propertiesToFetch, obj];
-	}
-	
-	[_updatedPropertiesByObject removeObjectForKey: obj];
-	obj->_isIgnoringDamageNotifications = NO;
-	[obj setIgnoringRelationshipConsistency: NO];	
-}
-
-- (void)loadObject: (COObject *)obj
-{
-	[self loadObject: obj atRevision: nil];
-}
-
-- (void)reloadRootObjectTree: (COObject *)rootObject atRevision: (CORevision *)revision
-{
-	// TODO: Handle invalid revision. May be call -unloadRootObjectTree: if the 
-	// revision is older than the root object creation revision.
-
-	ETUUID *rootObjectUUID = [rootObject UUID];
-	CORevision *currentRevision = [rootObject revision];
-
-	if ([revision isEqual: currentRevision])
-		return;
-
-	[(id)[rootObject editingContext] setRevision: revision];
-
-	// FIXME: Optimise for undo/redo cases (revisions next to each other)
-	
-	// Case 1: unrelated revisions
-	// This part is somewhat tricky. We need to reload all sub-objects
-	// that already exist in the context, and we ought to get rid of all
-	// subobjects that are no longer in use. Objects that exist in the 
-	// new revision but were not part of the old revision tree should
-	// automatically be faulted in (I think).
-
-	// All objects in all revisions
-	NSSet *allIDs = [_store UUIDsForRootObjectUUID: rootObjectUUID];
-
-	// Objects needed in this revision
-	NSSet *neededIDs = [_store UUIDsForRootObjectUUID: rootObjectUUID atRevision: revision];
-
-	// Loaded objects in editing context
-	NSMutableSet *loadedIDs = [NSMutableSet setWithSet: allIDs];
-	[loadedIDs intersectSet: [NSSet setWithArray: [_instantiatedObjects allKeys]]];
-
-	// Needed and already loaded objects in editing context
-	NSMutableSet *neededAndLoadedIDs = [NSMutableSet setWithSet: neededIDs];
-	[neededAndLoadedIDs intersectSet: loadedIDs];
-
-	// Loaded objects to be unloaded
-	NSMutableSet *unwantedIDs = [NSMutableSet setWithSet: loadedIDs];
-	[unwantedIDs minusSet: neededIDs];
-
-	FOREACH(neededAndLoadedIDs, uuid, ETUUID*)
-	{
-		[self loadObject: [_instantiatedObjects objectForKey: uuid] atRevision: revision];
-	}
-
-	FOREACH(unwantedIDs, uuid, ETUUID*)
-	{
-		[_instantiatedObjects removeObjectForKey: uuid];
-	}
-	
-	// As you can see, we haven't removed objects that are "dangling". There
-	// might be an advantage to this, but most likely not. Its quite hard (we
-	// have to search the whole object tree for references or use the store
-	// to get the set of object ids in each revision and minus the sets) so
-	// I couldn't be bothered right now. May in fact be easiest to dispose of
-	// the editing context and reload it.
-
-	// Case 2: [revision baseRevision] == oldRevision (redo)
-
-	// Case 3: [oldRevision baseRevision] == revision (undo)
-
-	[rootObject didReload];
-}
-
-// TODO: Share code with -reloadRootObjectTree:atRevision:
-- (void)unloadRootObjectTree: (COObject *)rootObject
-{
-	ETUUID *rootObjectUUID = [rootObject UUID];
-	//CORevision *oldRevision = [_rootObjectRevisions objectForKey: rootObjectUUID];
-	[(id)[rootObject editingContext] setRevision: nil];
-
-	// FIXME: Optimise for undo/redo cases (revisions next to each other)
-	
-	// Case 1: unrelated revisions
-	// This part is somewhat tricky. We need to reload all sub-objects
-	// that already exist in the context, and we ought to get rid of all
-	// subobjects that are no longer in use. Objects that exist in the 
-	// new revision but were not part of the old revision tree should
-	// automatically be faulted in (I think).
-
-	// All objects in all revisions
-	NSSet *allIDs = [_store UUIDsForRootObjectUUID: rootObjectUUID];
-
-	// Loaded objects in editing context
-	NSMutableSet *loadedIDs = [NSMutableSet setWithSet: allIDs];
-	[loadedIDs intersectSet: [NSSet setWithArray: [_instantiatedObjects allKeys]]];
-
-	// Loaded objects to be unloaded
-	NSMutableSet *unwantedIDs = [NSMutableSet setWithSet: loadedIDs];
-
-	FOREACH(unwantedIDs, uuid, ETUUID*)
-	{
-		[_instantiatedObjects removeObjectForKey: uuid];
-	}
-
-	[_instantiatedObjects removeObjectForKey: rootObjectUUID];
 }
 
 @end

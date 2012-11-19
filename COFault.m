@@ -7,7 +7,7 @@
 */
 
 #import "COFault.h"
-#import "COEditingContext.h"
+#import "COPersistentRootEditingContext.h"
 #import "COObject.h"
 #include <objc/runtime.h>
 
@@ -20,7 +20,7 @@
 
 - (NSString *) futureClassName
 {
-	return NSStringFromClass([_context classForEntityDescription: _entityDescription]);
+	return NSStringFromClass([(id)_context classForEntityDescription: _entityDescription]);
 }
 
 - (ETUUID *) UUID
@@ -33,7 +33,7 @@
 	return [[self UUID] hash];
 }
 
-- (COEditingContext *) editingContext
+- (COPersistentRootEditingContext *) editingContext
 {
 	return _context;
 }

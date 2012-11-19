@@ -8,6 +8,7 @@
 
 #import "COCommitTrack.h"
 #import "COEditingContext.h"
+#import "COPersistentRootEditingContext.h"
 #import "COStore.h"
 #import "COObject.h"
 #import "CORevision.h"
@@ -130,8 +131,7 @@
 
 	/* For a commit in the receiver editing context, no reloading occurs 
 	   because the tracked object state matches the revision */
-	[[trackedObject editingContext] reloadRootObjectTree: trackedObject 
-	                                          atRevision: [[self currentNode] revision]];
+	[[trackedObject editingContext] reloadAtRevision: [[self currentNode] revision]];
 
 	[self didUpdate];
 	RELEASE(oldCurrentNode);
@@ -154,8 +154,7 @@
 
 	[[[trackedObject editingContext] store] setCurrentRevision: [aNode revision]
 	                                              forTrackUUID: [trackedObject UUID]];
-	[[trackedObject editingContext] reloadRootObjectTree: trackedObject
-	                                          atRevision: [aNode revision]];
+	[[trackedObject editingContext] reloadAtRevision: [aNode revision]];
 	[self didUpdate];
 }
 
@@ -187,8 +186,7 @@
 	CORevision *currentRevision = [store undoOnCommitTrack: [trackedObject UUID]];
 
 	// TODO: Reset object state to old object.
-	[[trackedObject editingContext] reloadRootObjectTree: trackedObject
-	                                          atRevision: currentRevision];
+	[[trackedObject editingContext] reloadAtRevision: currentRevision];
 
 	[self didUpdate];
 }
@@ -221,8 +219,7 @@
 	CORevision *currentRevision = [store redoOnCommitTrack: [trackedObject UUID]];
 
 	// TODO: Reset object state to old object.
-	[[trackedObject editingContext] reloadRootObjectTree: trackedObject
-	                                          atRevision: currentRevision];
+	[[trackedObject editingContext] reloadAtRevision: currentRevision];
 
 	[self didUpdate];
 }

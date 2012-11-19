@@ -18,20 +18,10 @@
 	int64_t _maxRevisionNumber;
 	int64_t _latestRevisionNumber;
 	ETModelDescriptionRepository *_modelRepository;
+	/** Persistent root contexts by UUID */
 	NSMutableDictionary *_persistentRootContexts;
-
-	/** 
-	 * UUID -> loaded or inserted object
-	 */
-	NSMutableDictionary *_instantiatedObjects;
-	NSMutableSet *_insertedObjects;
-	NSMutableSet *_deletedObjects;
-	/**
-	 * Updated object -> array of updated properties
-	 *
-	 * New entries must be inserted with -markObjectUpdated:forProperty:.
-	 */
-	NSMapTable *_updatedPropertiesByObject; 
+	/** Loaded (or inserted) objects by UUID */
+	NSMutableDictionary *_loadedObjects;
 	COError *_error;
 }
 
@@ -116,6 +106,13 @@
  */
 - (Class)classForEntityDescription: (ETEntityDescription *)desc;
 
+
+/** @taskunit Managing Persistent Roots */
+
+- (COPersistentRootEditingContext *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName;
+- (COPersistentRootEditingContext *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
+- (void)deletePersistentRootForRootObject: (COObject *)aRootObject;
+
 /** @taskunit Object Access and Loading */
 
 /** 
@@ -151,18 +148,33 @@
 /**
  * Returns the objects presently managed by the receiver in memory.
  *
+ * The returned objects include -insertedObjects.
+ *
  * Faults can be included among the returned objects.
+ *
+ * See also -loadedObjectUUIDs.
  */
 - (NSSet *)loadedObjects;
 /**
+ * Returns the UUIDs of the objects presently managed by the receiver in memory.
+ *
+ * The returned objects include the inserted object UUIDs.
+ *
+ * Faults can be count as loaded objects.
+ *
+ * See also -loadedObjects.
+ */
+- (NSSet *)loadedObjectUUIDs;
+/**
  * Returns the root objects presently managed by the receiver in memory.
  *
- * Faults can be included among the returned objects.
+ * Faults and inserted objects can be included among the returned objects.
  *
  * The returned objects are a subset of -loadedObjects.
  */
 - (NSSet *)loadedRootObjects;
-/** Returns the object identified by the UUID if presently loaded in memory. 
+/** 
+ * Returns the object identified by the UUID if presently loaded in memory.
  *
  * When the object is not loaded, or when there is no persistent object that 
  * corresponds to this UUID, returns nil.
@@ -336,10 +348,16 @@
 
 /**
  * This method is only exposed to be used internally by CoreObject.
- *
- * Declares the object as newly inserted and puts it among the loaded objects.
  */
-- (void)registerObject: (COObject *)object;
+- (void)setLatestRevisionNumber: (int64_t)revNumber;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (void)cacheLoadedObject: (COObject *)anObject;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (void)discardLoadedObjectForUUID: (ETUUID *)aUUID;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -367,43 +385,6 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
- * Commits the current changes to the store with the provided metadatas and 
- * returns the resulting revisions.
- */
-- (NSArray *)commitWithMetadata: (NSDictionary *)metadata;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Tells the context a property value has changed in a COObject class or 
- * subclass instance.
- */
-- (void)markObjectUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Loads the object at its last revision.
- *
- * For a inner object, its last revision is its root object last revision.
- */
-- (void)loadObject: (COObject *)obj;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Reloads the root object and its inner objects at a new revision.
- */
-- (void)reloadRootObjectTree: (COObject *)object
-                  atRevision: (CORevision *)revision;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Unloads the root object and its inner objects.
- *
- * Can be used to implement undo on root object creation.
- */
-- (void)unloadRootObjectTree: (COObject *)object;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
  * Returns the object identified by the UUID, by loading it to the given 
  * revision when no instance managed by the receiver is present in memory, and 
  * initializing it to use the given entity in such a case.
@@ -416,6 +397,13 @@
 - (COObject *)objectWithUUID: (ETUUID *)uuid 
                   entityName: (NSString *)name 
                   atRevision: (CORevision *)revision;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Commits the current changes to the store with the provided metadatas and
+ * returns the resulting revisions.
+ */
+- (NSArray *)commitWithMetadata: (NSDictionary *)metadata;
 @end
 
 extern NSString *COEditingContextDidCommitNotification;
