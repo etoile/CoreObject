@@ -138,8 +138,6 @@
  */
 @property (nonatomic, readonly) COEditingContext *parentContext;
 
-//insertPersistentRootForNewRootObjectWithEntityName:
-
 /** @taskunit Pending Changes */
 
 /**
@@ -224,17 +222,6 @@
  * This is the factory method for COObject class hierarchy.
  */
 - (id)insertObjectWithEntityName: (NSString *)aFullName;
-/**
- * Copies an object from another context into this context.
- *
- * The copy refers to the same underlying persistent object (same UUID).
- */
-- (id)insertObject: (COObject *)sourceObject;
-/**
- * Creates a copy of an object (assigning it a new UUID), including copying
- * all strongly contained objects (composite properties).
- */
-- (id)insertObjectCopy: (COObject *)sourceObject;
 
 /** @taskunit Object Deletion */
 
@@ -287,6 +274,21 @@
  * You can pass an object that belongs to another context to this method.
  */
 - (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency newUUID: (BOOL)newUUID;
+/**
+ * This method is deprecated but has no replacement yet.
+ *
+ * Copies an object from another context into this context.
+ *
+ * The copy refers to the same underlying persistent object (same UUID).
+ */
+- (id)insertObject: (COObject *)sourceObject;
+/**
+ * This method is deprecated but has no replacement yet.
+ * 
+ * Creates a copy of an object (assigning it a new UUID), including copying
+ * all strongly contained objects (composite properties).
+ */
+- (id)insertObjectCopy: (COObject *)sourceObject;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
