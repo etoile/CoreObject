@@ -480,11 +480,6 @@ store by other processes. */
 	[[object editingContext] discardChangesInObject: object];
 }
 
-- (void)deleteObject: (COObject *)anObject
-{
-	[[anObject editingContext] deleteObject: anObject];
-}
-
 - (NSArray *)commit
 {
 	return [self commitWithType: nil shortDescription: nil longDescription: nil];

@@ -256,14 +256,6 @@
 
 - (COPersistentRootEditingContext *)makePersistentRootContext;
 
-/** @taskunit Object Deletion */
-
-/**
- * Schedules the object to be deleted both in memory and in store on the next 
- * commit.
- */
-- (void)deleteObject: (COObject *)anObject;
-
 /** @taskunit Committing Changes */
 
 /**
