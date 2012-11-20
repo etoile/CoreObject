@@ -6,6 +6,14 @@
 
 - (id)initWithURL: (NSURL *)aURL
 {
+	if ([self isMemberOfClass: [COStore class]])
+	{
+		[NSException raise: NSInternalInconsistencyException
+					format: _(@"%@ is an abstract class and must never be instantiated."
+							  "Subclasses such as COSQLStore must be used.")];
+		[self release];
+		return nil;
+	}
 	SUPERINIT;
 	url = [aURL retain];
 	commitObjectForID = [[NSMutableDictionary alloc] init];
