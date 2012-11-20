@@ -8,7 +8,8 @@
 
 @implementation COPersistentRootEditingContext
 
-@synthesize persistentRootUUID, parentContext, commitTrack, rootObject = _rootObject, revision = _revision;
+@synthesize persistentRootUUID = _persistentRootUUID, parentContext = _parentContext,
+	commitTrack = _commitTrack, rootObject = _rootObject, revision = _revision;
 
 - (id)initWithPersistentRootUUID: (ETUUID *)aUUID
 				 commitTrackUUID: (ETUUID *)aTrackUUID
@@ -17,12 +18,12 @@
 {
 	SUPERINIT;
 
-	ASSIGN(persistentRootUUID, aUUID);
+	ASSIGN(_persistentRootUUID, aUUID);
 	// TODO: Use the track UUID and the root object as no editing context at all
 	// when the initializer is called.
-	//ASSIGN(commitTrack, [COCommitTrack trackWithObject: aRootObject]);
+	//ASSIGN(_commitTrack, [COCommitTrack trackWithObject: aRootObject]);
 	ASSIGN(_rootObject, aRootObject);
-	parentContext = aCtxt;
+	_parentContext = aCtxt;
 
 	_insertedObjects = [[NSMutableSet alloc] init];
 	_deletedObjects = [[NSMutableSet alloc] init];
@@ -33,7 +34,7 @@
 
 - (void)dealloc
 {
-	DESTROY(commitTrack);
+	DESTROY(_commitTrack);
 	DESTROY(_rootObject);
 	DESTROY(_revision);
 	DESTROY(_insertedObjects);
@@ -44,26 +45,26 @@
 
 - (id)forwardingTargetForSelector:(SEL)aSelector
 {
-	if (parentContext != nil && [parentContext respondsToSelector: aSelector])
+	if (_parentContext != nil && [_parentContext respondsToSelector: aSelector])
 	{
 		//NSLog(@"Will forward selector %@", NSStringFromSelector(aSelector));
-		return parentContext;
+		return _parentContext;
 	}
 	return [super forwardingTargetForSelector: aSelector];
 }
 
 - (COCommitTrack *)commitTrack
 {
-	if (commitTrack == nil)
+	if (_commitTrack == nil)
 	{
-		ASSIGN(commitTrack, [COCommitTrack trackWithObject: [self rootObject]]);
+		ASSIGN(_commitTrack, [COCommitTrack trackWithObject: [self rootObject]]);
 	}
-	return commitTrack;
+	return _commitTrack;
 }
 
 - (COStore *)store
 {
-	return [parentContext store];
+	return [_parentContext store];
 }
 
 - (NSSet *)insertedObjects
@@ -121,7 +122,7 @@
 	if (isInsertedObject)
 	{
 		/* Remove the object from the cache because it has never been committed */
-		[parentContext discardLoadedObjectForUUID: [object UUID]];
+		[_parentContext discardLoadedObjectForUUID: [object UUID]];
 	}
 	if (isUpdatedObject)
 	{
@@ -142,25 +143,25 @@
 
 - (id)objectWithUUID: (ETUUID *)uuid
 {
-	return [parentContext objectWithUUID: uuid];
+	return [_parentContext objectWithUUID: uuid];
 }
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)rev
 {
-	return [parentContext objectWithUUID: uuid entityName: name atRevision: rev];
+	return [_parentContext objectWithUUID: uuid entityName: name atRevision: rev];
 }
 
 - (COObject *)insertObjectWithEntityName: (NSString *)aFullName
                                     UUID: (ETUUID *)aUUID
 {
 	
-	ETEntityDescription *desc = [[parentContext modelRepository] descriptionForName: aFullName];
+	ETEntityDescription *desc = [[_parentContext modelRepository] descriptionForName: aFullName];
 	if (desc == nil)
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Entity name %@ invalid", aFullName];
 	}
 	
-	Class cls = [parentContext classForEntityDescription: desc];
+	Class cls = [_parentContext classForEntityDescription: desc];
 	/* Nil root object means the new object will be a root */
 	COObject *result = [[cls alloc]
 			  initWithUUID: aUUID
@@ -304,7 +305,7 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	// TODO: We should add the deleted object UUIDs to the set below
 	NSSet *committedObjects = 
 		[_insertedObjects setByAddingObjectsFromArray: [_updatedPropertiesByObject allKeys]];
-	COStore *store = [parentContext store];
+	COStore *store = [_parentContext store];
 
 	if ([_insertedObjects containsObject: _rootObject])
 	{
@@ -352,7 +353,7 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 		if ([_deletedObjects containsObject: obj])
 		{
 			// TODO: Mark the object as deleted in the store
-			[parentContext discardLoadedObjectForUUID: [obj UUID]];
+			[_parentContext discardLoadedObjectForUUID: [obj UUID]];
 		}
 		
 		// FIXME: Hack
@@ -376,13 +377,13 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	[_updatedPropertiesByObject removeAllObjects];
 	[_deletedObjects removeAllObjects];
 
-	[parentContext setLatestRevisionNumber: [rev revisionNumber]];
+	[_parentContext setLatestRevisionNumber: [rev revisionNumber]];
 	return rev;
 }
 
 - (void)registerObject: (COObject *)object
 {
-	[parentContext cacheLoadedObject: object];
+	[_parentContext cacheLoadedObject: object];
 	[_insertedObjects addObject: object];
 }
 
@@ -465,7 +466,7 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	
 	ETUUID *rootObjectUUID = [[self rootObject] UUID];
 	CORevision *currentRevision = [self revision];
-	COStore *store = [parentContext store];
+	COStore *store = [_parentContext store];
 
 	if ([revision isEqual: currentRevision])
 		return;
@@ -489,7 +490,7 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	
 	// Loaded objects in editing context
 	NSMutableSet *loadedIDs = [NSMutableSet setWithSet: allIDs];
-	[loadedIDs intersectSet: [parentContext loadedObjectUUIDs]];
+	[loadedIDs intersectSet: [_parentContext loadedObjectUUIDs]];
 	
 	// Needed and already loaded objects in editing context
 	NSMutableSet *neededAndLoadedIDs = [NSMutableSet setWithSet: neededIDs];
@@ -501,12 +502,12 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	
 	FOREACH(neededAndLoadedIDs, uuid, ETUUID*)
 	{
-		[self loadObject: [parentContext loadedObjectForUUID: uuid] atRevision: revision];
+		[self loadObject: [_parentContext loadedObjectForUUID: uuid] atRevision: revision];
 	}
 	
 	FOREACH(unwantedIDs, uuid, ETUUID*)
 	{
-		[parentContext discardLoadedObjectForUUID: uuid];
+		[_parentContext discardLoadedObjectForUUID: uuid];
 	}
 	
 	// As you can see, we haven't removed objects that are "dangling". There
@@ -526,7 +527,7 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 // TODO: Share code with -reload:atRevision:
 - (void)unload
 {
-	COStore *store = [parentContext store];
+	COStore *store = [_parentContext store];
 	ETUUID *rootObjectUUID = [[self rootObject] UUID];
 	//CORevision *oldRevision = [_rootObjectRevisions objectForKey: rootObjectUUID];
 
@@ -546,17 +547,17 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	
 	// Loaded objects in editing context
 	NSMutableSet *loadedIDs = [NSMutableSet setWithSet: allIDs];
-	[loadedIDs intersectSet: [parentContext loadedObjectUUIDs]];
+	[loadedIDs intersectSet: [_parentContext loadedObjectUUIDs]];
 	
 	// Loaded objects to be unloaded
 	NSMutableSet *unwantedIDs = [NSMutableSet setWithSet: loadedIDs];
 	
 	FOREACH(unwantedIDs, uuid, ETUUID*)
 	{
-		[parentContext discardLoadedObjectForUUID: uuid];
+		[_parentContext discardLoadedObjectForUUID: uuid];
 	}
 	
-	[parentContext discardLoadedObjectForUUID: rootObjectUUID];
+	[_parentContext discardLoadedObjectForUUID: rootObjectUUID];
 }
 
 @end

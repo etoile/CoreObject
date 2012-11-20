@@ -41,9 +41,9 @@
 @interface COPersistentRootEditingContext : NSObject
 {
 	@private
-	COEditingContext *parentContext;
-	ETUUID *persistentRootUUID;
-	COCommitTrack *commitTrack;
+	COEditingContext *_parentContext;
+	ETUUID *_persistentRootUUID;
+	COCommitTrack *_commitTrack;
 	COObject *_rootObject;
 	CORevision *_revision;
 	NSMutableSet *_insertedObjects;
