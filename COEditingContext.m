@@ -482,15 +482,14 @@ store by other processes. */
 
 - (NSArray *)commit
 {
-	return [self commitWithType: nil shortDescription: nil longDescription: nil];
+	return [self commitWithType: nil shortDescription: nil];
 }
 
-- (NSArray *)commitWithType: (NSString*)type
-           shortDescription: (NSString*)shortDescription
-            longDescription: (NSString*)longDescription
+- (NSArray *)commitWithType: (NSString *)type
+           shortDescription: (NSString *)shortDescription
 {
 	NSString *commitType = type;
-
+	
 	if (type == nil)
 	{
 		commitType = @"Unknown";
@@ -499,18 +498,7 @@ store by other processes. */
 	{
 		shortDescription = @"";
 	}
-	if (longDescription == nil)
-	{
-		longDescription = @"";
-	}
-	return [self commitWithMetadata: D(shortDescription, @"shortDescription", 
-		longDescription, @"longDescription", commitType, @"type")];
-}
-
-- (NSArray *)commitWithType: (NSString *)type
-           shortDescription: (NSString *)shortDescription
-{
-	return [self commitWithType: type shortDescription: shortDescription longDescription: nil];
+	return [self commitWithMetadata: D(shortDescription, @"shortDescription", commitType, @"type")];
 }
 
 - (void)postCommitNotificationsWithRevisions: (NSArray *)revisions
@@ -536,11 +524,16 @@ store by other processes. */
 #endif
 }
 
-- (BOOL)validateChangedObjects
+- (void)didFailValidationWithError: (NSError *)anError
 {
-	NSSet *insertionErrors = (id)[[[self insertedObjects] mappedCollection] validateForInsert];
-	NSSet *updateErrors = (id)[[[self updatedObjects] mappedCollection] validateForUpdate];
-	NSSet *deletionErrors = (id)[[[self deletedObjects] mappedCollection] validateForDelete];
+	ASSIGN(_error, anError);
+}
+
+- (BOOL)validateChangedObjectsForContext: (id)aContext
+{
+	NSSet *insertionErrors = (id)[[[aContext insertedObjects] mappedCollection] validateForInsert];
+	NSSet *updateErrors = (id)[[[aContext updatedObjects] mappedCollection] validateForUpdate];
+	NSSet *deletionErrors = (id)[[[aContext deletedObjects] mappedCollection] validateForDelete];
 	NSMutableSet *validationErrors = [NSMutableSet setWithSet: insertionErrors];
 	
 	[validationErrors unionSet: updateErrors];
@@ -549,27 +542,38 @@ store by other processes. */
 	// NOTE: We have a null value because -validateXXX returns nil on validation success
 	[validationErrors removeObject: [NSNull null]];
 
-	ASSIGN(_error, [COError errorWithErrors: validationErrors]);
+	[aContext didFailValidationWithError: [COError errorWithErrors: validationErrors]];
 
-	return (_error == nil);
+	return ([aContext error] == nil);
 }
 
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
+	restrictedToPersistentRootContexts: (NSArray *)persistentRootContexts
 {
-	// TODO: Enable validation
-	if ([self validateChangedObjects] == NO)
+	// TODO: We could organize validation errors by persistent root. Each
+	// persistent root might result in a validation error that contains a
+	// suberror per inner object, then each suberror could in turn contain
+	// a suberror per validation result. For now, we just aggregate errors per
+	// inner object.
+	if ([self validateChangedObjectsForContext: self] == NO)
 		return [NSArray array];
 
 	NSMutableArray *revisions = [NSMutableArray array];
 
 	// TODO: Add a batch commit UUID in the metadata
-	for (COPersistentRootEditingContext *ctxt in [_persistentRootContexts objectEnumerator])
+	for (COPersistentRootEditingContext *ctxt in persistentRootContexts)
 	{
-		[revisions addObject: [ctxt commitWithMetadata: metadata]];
+		[revisions addObject: [ctxt saveCommitWithMetadata: metadata]];
 	}
 
  	[self postCommitNotificationsWithRevisions: revisions];
 	return revisions;
+}
+
+- (NSArray *)commitWithMetadata: (NSDictionary *)metadata
+{
+	return [self commitWithMetadata: metadata
+		restrictedToPersistentRootContexts: [_persistentRootContexts allValues]];
 }
 
 - (NSError *)error

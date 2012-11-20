@@ -277,6 +277,11 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 
 - (CORevision *)commitWithMetadata: (NSDictionary *)metadata
 {
+	return [_parentContext commitWithMetadata: metadata restrictedToPersistentRootContexts: A(self)];
+}
+
+- (CORevision *)saveCommitWithMetadata: (NSDictionary *)metadata
+{
 	NSParameterAssert(_rootObject != nil);
 	NSParameterAssert(_insertedObjects != nil);
 	NSParameterAssert(_updatedPropertiesByObject != nil);

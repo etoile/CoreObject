@@ -297,7 +297,17 @@
  *
  * Commits the current changes to the store with the provided metadatas and
  * returns the resulting revision.
+ *
+ * The commit procedure is the parent context responsability, the parent context 
+ * calls back -saveCommitWithMetadata:.
  */
 - (CORevision *)commitWithMetadata: (NSDictionary *)metadata;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Extracts the current changes, saves them to the store with the provided 
+ * metadatas and returns the resulting revision.
+ */
+- (CORevision *)saveCommitWithMetadata: (NSDictionary *)metadata;
 
 @end

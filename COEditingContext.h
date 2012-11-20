@@ -261,27 +261,20 @@
 /**
  * Commits the current changes to the store and returns the resulting revisions.
  *
- * See -commitWithType:shortDescription:longDescription:.
+ * See -commitWithType:shortDescription: and -commitWithMetadata:.
  */
 - (NSArray *)commit;
 /**
  * Commits the current changes to the store with some basic metadatas and 
  * returns the resulting revisions.
  *
- * Each root object that belong to -changedObjects results in a new revision. 
- * We usually advice to commit a single root object at time to prevent multiple 
+ * Each root object that belong to -changedObjects results in a new revision.
+ * We usually advice to commit a single root object at time to prevent multiple
  * revisions per commit.
  *
- * The descriptions will be visible at the UI level when browsing the history.
- */
-- (NSArray *)commitWithType: (NSString *)type
-           shortDescription: (NSString *)shortDescription
-            longDescription: (NSString *)longDescription;
-/**
- * Commits the current changes to the store with some basic metadatas and 
- * returns the resulting revisions.
+ * The description will be visible at the UI level when browsing the history.
  *
- * See -commitWithType:shortDescription:longDescription:.
+ * See -commitWithMetadata:.
  */
 - (NSArray *)commitWithType: (NSString *)type
            shortDescription: (NSString *)shortDescription;
@@ -338,11 +331,26 @@
                   atRevision: (CORevision *)revision;
 /**
  * This method is only exposed to be used internally by CoreObject.
+ */
+- (void)didFailValidationWithError: (NSError *)anError;
+/**
+ * This method is only exposed to be used internally by CoreObject.
  *
  * Commits the current changes to the store with the provided metadatas and
  * returns the resulting revisions.
  */
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Commits some changes to the store with the provided metadatas, and returns 
+ * the resulting revisions.
+ *
+ * Changes must belong to the given persistent root subset, otherwise they 
+ * won't be committed. -hasChanges can still be YES on return.
+ */
+- (NSArray *)commitWithMetadata: (NSDictionary *)metadata
+	restrictedToPersistentRootContexts: (NSArray *)persistentRootContexts;
 @end
 
 extern NSString *COEditingContextDidCommitNotification;
