@@ -212,7 +212,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 {
 	if ([newlySetValue isKindOfClass: [ETUUID class]])
 	{
-		newlySetValue = [[obj editingContext] objectWithUUID: newlySetValue];
+		newlySetValue = [[[obj editingContext] parentContext] objectWithUUID: newlySetValue];
 		//assert(newlySetValue != nil); //FIXME: remove
 	}
 	[obj setValue: newlySetValue forProperty: propertyName];
@@ -259,7 +259,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	{
 		if ([value isKindOfClass: [ETUUID class]])
 		{
-			id newValue = [[obj editingContext] objectWithUUID: value];
+			id newValue = [[[obj editingContext] parentContext] objectWithUUID: value];
 			assert(newValue != nil); //FIXME: remove
 			[newArray addObject: newValue];
 		}
@@ -313,7 +313,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	{
 		if ([value isKindOfClass: [ETUUID class]])
 		{
-			id newValue = [[obj editingContext] objectWithUUID: value];
+			id newValue = [[[obj editingContext] parentContext] objectWithUUID: value];
 			assert(newValue != nil); //FIXME: remove
 			[newSet addObject: newValue];
 		}
@@ -608,7 +608,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 {
 	// NOTE: Check the editing context is sane and we don't have an outdated 
 	// root object instance.
-	assert(aRootObject == [[aRootObject editingContext] objectWithUUID: [aRootObject UUID]]);
+	assert(aRootObject == [[[aRootObject editingContext] parentContext] objectWithUUID: [aRootObject UUID]]);
 
 	CORevision *revBeforeUndo = [revToUndo baseRevision];
 

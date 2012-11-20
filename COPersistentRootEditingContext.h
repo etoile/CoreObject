@@ -48,11 +48,7 @@
 	CORevision *_revision;
 	NSMutableSet *_insertedObjects;
 	NSMutableSet *_deletedObjects;
-	/**
-	 * Updated object -> array of updated properties
-	 *
-	 * New entries must be inserted with -markObjectUpdated:forProperty:.
-	 */
+	/** Array of updated property names by inner object */
 	NSMapTable *_updatedPropertiesByObject;
 }
 
@@ -107,21 +103,6 @@
  * See also -[COEditingContext store].
  */
 @property (nonatomic, readonly) COStore *store;
-
-/** @taskunit Object Access and Loading */
-
-/**
- * Returns the object identified by the UUID, by loading it to its last revision
- * when no instance managed by the receiver is present in memory.
- *
- * When the UUID doesn't correspond to a persistent object, returns nil.
- *
- * When the object is a inner object, the last revision is the one that is tied
- * to its root object last revision.
- *
- * See also -objectWithUUID:atRevision: and -loadedObjectForUUID:.
- */
-- (COObject *)objectWithUUID: (ETUUID *)uuid;
 
 /** @taskunit Editing Context Nesting */
 

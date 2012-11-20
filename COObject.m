@@ -218,7 +218,7 @@
 	NILARG_EXCEPTION_TEST(aContext);
 	NILARG_EXCEPTION_TEST(aRootObject);
 	INVALIDARG_EXCEPTION_TEST(aRootObject, 
-		aRootObject != self || [[(id)aContext loadedObjects] containsObject: aRootObject] == NO);
+		aRootObject != self || [[[aContext parentContext] loadedObjects] containsObject: aRootObject] == NO);
 	ETAssert(_uuid != nil);
 
 	_context = aContext;
@@ -230,7 +230,7 @@
 	{
 		[_context setRootObject: aRootObject];
 	}
-	[(id)aContext registerObject: self];
+	[aContext registerObject: self];
 }
 
 - (id) copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription
@@ -371,7 +371,7 @@
 
 	for (ETUUID *uuid in innerObjectUUIDs)
 	{
-		[innerObjects addObject: [_context objectWithUUID: uuid]];
+		[innerObjects addObject: [[_context parentContext] objectWithUUID: uuid]];
 	}
 	return innerObjects;
 }

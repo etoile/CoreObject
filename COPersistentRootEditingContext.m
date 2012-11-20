@@ -43,16 +43,6 @@
 	[super dealloc];
 }
 
-- (id)forwardingTargetForSelector:(SEL)aSelector
-{
-	if (_parentContext != nil && [_parentContext respondsToSelector: aSelector])
-	{
-		//NSLog(@"Will forward selector %@", NSStringFromSelector(aSelector));
-		return _parentContext;
-	}
-	return [super forwardingTargetForSelector: aSelector];
-}
-
 - (COCommitTrack *)commitTrack
 {
 	if (_commitTrack == nil)
@@ -141,16 +131,6 @@
 	[_deletedObjects addObject: anObject];
 }
 
-- (id)objectWithUUID: (ETUUID *)uuid
-{
-	return [_parentContext objectWithUUID: uuid];
-}
-
-- (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)rev
-{
-	return [_parentContext objectWithUUID: uuid entityName: name atRevision: rev];
-}
-
 - (COObject *)insertObjectWithEntityName: (NSString *)aFullName
                                     UUID: (ETUUID *)aUUID
 {
@@ -233,7 +213,7 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 		}
 		else
 		{
-			COObject *copy = [ctx objectWithUUID: [value UUID]];
+			COObject *copy = [[ctx parentContext] objectWithUUID: [value UUID]];
 			return copy;
 		}
 	}
@@ -258,7 +238,7 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	
 	if (!newUUID)
 	{
-		copy = [self objectWithUUID: [sourceObject UUID]];
+		copy = [_parentContext objectWithUUID: [sourceObject UUID]];
 		
 		if (copy == nil)
 		{

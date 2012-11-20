@@ -20,7 +20,8 @@
 
 - (NSString *) futureClassName
 {
-	return NSStringFromClass([(id)_context classForEntityDescription: _entityDescription]);
+	return NSStringFromClass([[_context parentContext]
+		classForEntityDescription: _entityDescription]);
 }
 
 - (ETUUID *) UUID
