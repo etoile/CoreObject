@@ -150,11 +150,6 @@ store by other processes. */
 	return _latestRevisionNumber;
 }
 
-- (void)setLatestRevisionNumber: (int64_t)revNumber
-{
-	_latestRevisionNumber = revNumber;
-}
-
 - (ETModelDescriptionRepository *)modelRepository
 {
 	return _modelRepository; 

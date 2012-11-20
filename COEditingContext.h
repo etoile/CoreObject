@@ -268,6 +268,11 @@
  * Commits the current changes to the store with some basic metadatas and 
  * returns the resulting revisions.
  *
+ * A commit involving multiple persistent roots is not atomic (more than a single 
+ * revision in the returned array).<br />
+ * Each returned revision results from an atomic commit on a single persistent 
+ * root.
+ *
  * Each root object that belong to -changedObjects results in a new revision.
  * We usually advice to commit a single root object at time to prevent multiple
  * revisions per commit.

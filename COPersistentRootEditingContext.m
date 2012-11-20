@@ -275,9 +275,34 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	return copy;
 }
 
+- (CORevision *)commit
+{
+	return [self commitWithType: nil shortDescription: nil];
+}
+
+- (CORevision *)commitWithType: (NSString *)type
+           shortDescription: (NSString *)shortDescription
+{
+	NSString *commitType = type;
+	
+	if (type == nil)
+	{
+		commitType = @"Unknown";
+	}
+	if (shortDescription == nil)
+	{
+		shortDescription = @"";
+	}
+	return [self commitWithMetadata: D(shortDescription, @"shortDescription", commitType, @"type")];
+}
+
+
 - (CORevision *)commitWithMetadata: (NSDictionary *)metadata
 {
-	return [_parentContext commitWithMetadata: metadata restrictedToPersistentRootContexts: A(self)];
+	NSArray *revs = [_parentContext commitWithMetadata: metadata
+	                restrictedToPersistentRootContexts: A(self)];
+	ETAssert([revs count] == 1);
+	return [revs lastObject];
 }
 
 - (CORevision *)saveCommitWithMetadata: (NSDictionary *)metadata
@@ -362,7 +387,6 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	[_updatedPropertiesByObject removeAllObjects];
 	[_deletedObjects removeAllObjects];
 
-	[_parentContext setLatestRevisionNumber: [rev revisionNumber]];
 	return rev;
 }
 

@@ -212,6 +212,31 @@
  */
 - (void)deleteObject: (COObject *)anObject;
 
+/** @taskunit Committing Changes */
+
+/**
+ * Commits the current changes to the store and returns the resulting revision.
+ *
+ * See -commitWithType:shortDescription: and -commitWithMetadata:.
+ */
+- (CORevision *)commit;
+/**
+ * Commits the current changes to the store with some basic metadatas and
+ * returns the resulting revision.
+ *
+ * A commit on a single persistent root is atomic.
+ *
+ * Each root object that belong to -changedObjects results in a new revision.
+ * We usually advice to commit a single root object at time to prevent multiple
+ * revisions per commit.
+ *
+ * The description will be visible at the UI level when browsing the history.
+ *
+ * See -commitWithMetadata:.
+ */
+- (CORevision *)commitWithType: (NSString *)type
+              shortDescription: (NSString *)shortDescription;
+
 /** @taskunit Framework Private */
 
 - (id)initWithPersistentRootUUID: (ETUUID *)aUUID
