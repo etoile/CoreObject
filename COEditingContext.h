@@ -310,10 +310,6 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void)setLatestRevisionNumber: (int64_t)revNumber;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
 - (void)cacheLoadedObject: (COObject *)anObject;
 /**
  * This method is only exposed to be used internally by CoreObject.

@@ -519,7 +519,7 @@ store by other processes. */
 #endif
 }
 
-- (void)didFailValidationWithError: (NSError *)anError
+- (void)didFailValidationWithError: (COError *)anError
 {
 	ASSIGN(_error, anError);
 }
