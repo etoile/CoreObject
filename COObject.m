@@ -217,6 +217,7 @@
 {
 	NILARG_EXCEPTION_TEST(aContext);
 	NILARG_EXCEPTION_TEST(aRootObject);
+	INVALIDARG_EXCEPTION_TEST(aContext, [aContext isKindOfClass: [COPersistentRootEditingContext class]]);
 	INVALIDARG_EXCEPTION_TEST(aRootObject, 
 		aRootObject != self || [[[aContext parentContext] loadedObjects] containsObject: aRootObject] == NO);
 	ETAssert(_uuid != nil);

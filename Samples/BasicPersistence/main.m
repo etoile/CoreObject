@@ -1,4 +1,4 @@
-#import <CoreObject/CoreObject.h>
+ #import <CoreObject/CoreObject.h>
 
 @interface Calendar : COObject
 {
@@ -145,7 +145,7 @@ int main(int argc, char **argv)
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
 	// Initialize the AppKit (for now CoreObject requires it)
 	[NSApplication sharedApplication];
-	COStore *store = [[COStore alloc] initWithURL: [NSURL fileURLWithPath: @"TestStore.db"]];
+	COStore *store = [[COSQLStore alloc] initWithURL: [NSURL fileURLWithPath: @"TestStore.db"]];
 
 	// Create the calendar and appointment and persist them
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
@@ -154,8 +154,8 @@ int main(int argc, char **argv)
 	Appointment *firstAppt = [[Appointment alloc]
 		initWithStartDate: [NSDate date]
 		          endDate: [NSDate dateWithTimeIntervalSinceNow: 3600]];
-	[firstAppt becomePersistentInContext: ctx
-		                  rootObject: calendar];
+	[firstAppt becomePersistentInContext: [calendar editingContext]
+	                          rootObject: calendar];
 	[calendar addAppointment: firstAppt]; 
 	[ctx commit];
 	[ctx release];

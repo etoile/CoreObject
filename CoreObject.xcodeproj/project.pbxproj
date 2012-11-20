@@ -46,6 +46,12 @@
 		60C913941656364700E0C5F4 /* COSynchronizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D09B14129B704E006BEDC3 /* COSynchronizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60C913951656364E00E0C5F4 /* COSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09B15129B704E006BEDC3 /* COSynchronizer.m */; };
 		60C913961656364F00E0C5F4 /* COSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09B15129B704E006BEDC3 /* COSynchronizer.m */; };
+		60C913B6165BBED000E0C5F4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60C913B5165BBED000E0C5F4 /* Foundation.framework */; };
+		60C913C1165BBEE600E0C5F4 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
+		60C913C4165BBF2B00E0C5F4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913AD165BBE9E00E0C5F4 /* main.m */; };
+		60C913C6165BBF5200E0C5F4 /* CoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C913C5165BBF5000E0C5F4 /* CoreObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60C913C7165BBF9B00E0C5F4 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
+		60C913C8165BBFBE00E0C5F4 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97324FDCFA39411CA2CEA /* AppKit.framework */; };
 		60EB4F69155BDAA700CFBC5C /* COError.h in Headers */ = {isa = PBXBuildFile; fileRef = 60EB4F67155BDAA700CFBC5C /* COError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60EB4F6A155BDAA700CFBC5C /* COError.m in Sources */ = {isa = PBXBuildFile; fileRef = 60EB4F68155BDAA700CFBC5C /* COError.m */; };
 		60F6A31814444EC300EFC711 /* COCommitTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60F6A31514444EC300EFC711 /* COCommitTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -136,6 +142,13 @@
 			remoteGlobalIDString = 6072CF691360E144003256C5;
 			remoteInfo = PlugInExample;
 		};
+		60C913C2165BBEED00E0C5F4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6686BDAB12592BDA0065DE1A;
+			remoteInfo = CoreObject;
+		};
 		60FB087A13C3066300C2AB94 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
@@ -173,6 +186,18 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		60C913B1165BBED000E0C5F4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
@@ -208,6 +233,10 @@
 		60A55DE014A25AC4007A9864 /* COTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COTrack.m; sourceTree = "<group>"; };
 		60C913901653BE1400E0C5F4 /* COPersistentRootEditingContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COPersistentRootEditingContext.h; sourceTree = "<group>"; };
 		60C913911653BE1400E0C5F4 /* COPersistentRootEditingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COPersistentRootEditingContext.m; sourceTree = "<group>"; };
+		60C913AD165BBE9E00E0C5F4 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Samples/BasicPersistence/main.m; sourceTree = "<group>"; };
+		60C913B3165BBED000E0C5F4 /* BasicPersistence */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BasicPersistence; sourceTree = BUILT_PRODUCTS_DIR; };
+		60C913B5165BBED000E0C5F4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		60C913C5165BBF5000E0C5F4 /* CoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreObject.h; sourceTree = "<group>"; };
 		60EB4F67155BDAA700CFBC5C /* COError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COError.h; sourceTree = "<group>"; };
 		60EB4F68155BDAA700CFBC5C /* COError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COError.m; sourceTree = "<group>"; };
 		60F6A31514444EC300EFC711 /* COCommitTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommitTrack.h; sourceTree = "<group>"; };
@@ -306,6 +335,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		60C913B0165BBED000E0C5F4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60C913B6165BBED000E0C5F4 /* Foundation.framework in Frameworks */,
+				60C913C8165BBFBE00E0C5F4 /* AppKit.framework in Frameworks */,
+				60C913C1165BBEE600E0C5F4 /* CoreObject.framework in Frameworks */,
+				60C913C7165BBF9B00E0C5F4 /* EtoileFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6686BDAA12592BDA0065DE1A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -369,6 +409,7 @@
 				66D099C4129AE111006BEDC3 /* StoreTest */,
 				60988F15163B6B7A009C4F21 /* SQLClient.framework */,
 				6019B880163BFD8400D1986F /* Performance.framework */,
+				60C913B3165BBED000E0C5F4 /* BasicPersistence */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -383,6 +424,7 @@
 				6686BDB212592C1B0065DE1A /* CoreObject */,
 				60988F07163B69BA009C4F21 /* SQLClient */,
 				6019B877163BFB9B00D1986F /* Performance */,
+				60C913AC165BBE7500E0C5F4 /* Examples */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
@@ -394,6 +436,7 @@
 			children = (
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				60988F16163B6B7A009C4F21 /* Cocoa.framework */,
+				60C913B5165BBED000E0C5F4 /* Foundation.framework */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
@@ -441,6 +484,22 @@
 			name = SQLClient;
 			sourceTree = "<group>";
 		};
+		60C913AC165BBE7500E0C5F4 /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+				60C913C9165BD51800E0C5F4 /* BasicPersistence */,
+			);
+			name = Examples;
+			sourceTree = "<group>";
+		};
+		60C913C9165BD51800E0C5F4 /* BasicPersistence */ = {
+			isa = PBXGroup;
+			children = (
+				60C913AD165BBE9E00E0C5F4 /* main.m */,
+			);
+			name = BasicPersistence;
+			sourceTree = "<group>";
+		};
 		60FB087413C3066300C2AB94 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -456,6 +515,7 @@
 			isa = PBXGroup;
 			children = (
 				6686BDAD12592BDA0065DE1A /* CoreObject-Info.plist */,
+				60C913C5165BBF5000E0C5F4 /* CoreObject.h */,
 				6686BDC712592C1B0065DE1A /* Utilities */,
 				6686BDB612592C1B0065DE1A /* Front-end API */,
 			);
@@ -653,6 +713,7 @@
 				60A55DE114A25AC4007A9864 /* COTrack.h in Headers */,
 				6039CC7814BC3FBB008A8BA3 /* COCustomTrack.h in Headers */,
 				6028E42A153729ED0003A205 /* COObject.h in Headers */,
+				60C913C6165BBF5200E0C5F4 /* CoreObject.h in Headers */,
 				6019B8A7163C41AB00D1986F /* COSQLStore.h in Headers */,
 				60C913921653BE1400E0C5F4 /* COPersistentRootEditingContext.h in Headers */,
 				60C913941656364700E0C5F4 /* COSynchronizer.h in Headers */,
@@ -698,6 +759,24 @@
 			productName = SQLClient;
 			productReference = 60988F15163B6B7A009C4F21 /* SQLClient.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		60C913B2165BBED000E0C5F4 /* BasicPersistence */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 60C913BE165BBED100E0C5F4 /* Build configuration list for PBXNativeTarget "BasicPersistence" */;
+			buildPhases = (
+				60C913AF165BBED000E0C5F4 /* Sources */,
+				60C913B0165BBED000E0C5F4 /* Frameworks */,
+				60C913B1165BBED000E0C5F4 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				60C913C3165BBEED00E0C5F4 /* PBXTargetDependency */,
+			);
+			name = BasicPersistence;
+			productName = BasicPersistence;
+			productReference = 60C913B3165BBED000E0C5F4 /* BasicPersistence */;
+			productType = "com.apple.product-type.tool";
 		};
 		6686BDAB12592BDA0065DE1A /* CoreObject */ = {
 			isa = PBXNativeTarget;
@@ -787,6 +866,7 @@
 				6019B87F163BFD8400D1986F /* Performance */,
 				791B4E2C1299C79300CCF472 /* Test */,
 				66D099B6129AE111006BEDC3 /* StoreTest */,
+				60C913B2165BBED000E0C5F4 /* BasicPersistence */,
 			);
 		};
 /* End PBXProject section */
@@ -866,6 +946,14 @@
 				6019B874163B6DA700D1986F /* SQLite.m in Sources */,
 				6019B875163B6DAA00D1986F /* Postgres.m in Sources */,
 				6019B892163BFE8900D1986F /* SQLClient.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		60C913AF165BBED000E0C5F4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60C913C4165BBF2B00E0C5F4 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -958,6 +1046,11 @@
 			target = 60988F14163B6B7A009C4F21 /* SQLClient */;
 			targetProxy = 6019B8A3163C0A5E00D1986F /* PBXContainerItemProxy */;
 		};
+		60C913C3165BBEED00E0C5F4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6686BDAB12592BDA0065DE1A /* CoreObject */;
+			targetProxy = 60C913C2165BBEED00E0C5F4 /* PBXContainerItemProxy */;
+		};
 		60FB0A1B13C3264E00C2AB94 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = EtoileFoundation;
@@ -1041,6 +1134,20 @@
 				INSTALL_PATH = "$(BUILT_PRODUCTS_DIR)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
+		60C913BF165BBED100E0C5F4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		60C913C0165BBED100E0C5F4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -1169,6 +1276,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		60C913BE165BBED100E0C5F4 /* Build configuration list for PBXNativeTarget "BasicPersistence" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				60C913BF165BBED100E0C5F4 /* Debug */,
+				60C913C0165BBED100E0C5F4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		6686BDB012592BDC0065DE1A /* Build configuration list for PBXNativeTarget "CoreObject" */ = {
 			isa = XCConfigurationList;
