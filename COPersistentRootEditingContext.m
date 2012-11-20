@@ -61,6 +61,11 @@
 	return commitTrack;
 }
 
+- (COStore *)store
+{
+	return [parentContext store];
+}
+
 - (NSSet *)insertedObjects
 {
 	return [NSSet setWithSet: _insertedObjects];

@@ -271,7 +271,7 @@
 	return _uuid;
 }
 
-- (id) editingContext
+- (COPersistentRootEditingContext *)editingContext
 {
 	return _context;
 }
@@ -1405,9 +1405,9 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		if ([type isEqualToString: @"object-ref"])
 		{
 			ETUUID *uuid = [ETUUID UUIDWithString: [plist valueForKey: @"uuid"]];
-			return [[self editingContext] objectWithUUID: uuid 
-			                                  entityName: [plist valueForKey: @"entity"]
-			                                  atRevision: nil];
+			return [[[self editingContext] parentContext] objectWithUUID: uuid
+			                                                  entityName: [plist valueForKey: @"entity"]
+			                                                  atRevision: nil];
 		}
 		else if ([type isEqualToString: @"unorderedCollection"])
 		{

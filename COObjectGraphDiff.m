@@ -585,8 +585,8 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	set = (NSMutableSet*)[[set mappedCollection] UUID];
 	
 	return [COObjectGraphDiff diffObjectsWithUUIDs: [set allObjects]
-										 inContext: [group1 editingContext]
-									   withContext: [group2 editingContext]];
+										 inContext: [[group1 editingContext] parentContext]
+									   withContext: [[group2 editingContext] parentContext]];
 }
 
 + (COObjectGraphDiff *)diffRootObject: (COObject *)baseObject 
@@ -598,8 +598,8 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	set = (id)[[set mappedCollection] UUID];
 
 	return [COObjectGraphDiff diffObjectsWithUUIDs: [set allObjects]
-										 inContext: [baseObject editingContext]
-									   withContext: [otherObject editingContext]];
+										 inContext: [[baseObject editingContext] parentContext]
+									   withContext: [[otherObject editingContext] parentContext]];
 }
 
 + (COObjectGraphDiff *)selectiveUndoDiffWithRootObject: (COObject *)aRootObject 

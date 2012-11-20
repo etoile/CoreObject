@@ -10,6 +10,7 @@
 #import "COHistoryTrack.h"
 #import "CORevision.h"
 #import "COEditingContext.h"
+#import "COPersistentRootEditingContext.h"
 #import "COObject.h"
 #import "COContainer.h"
 #import "COObjectGraphDiff.h"
@@ -65,7 +66,7 @@
 	
 	COEditingContext *revToUndoCtx = [[COEditingContext alloc] initWithStore: [revToUndo store] maxRevisionNumber: [revToUndo revisionNumber]];
 	COEditingContext *revBeforeUndoCtx = [[COEditingContext alloc] initWithStore: [revBeforeUndo store] maxRevisionNumber: [revBeforeUndo revisionNumber]];
-	COEditingContext *currentRevisionCtx = [trackObject editingContext];
+	COEditingContext *currentRevisionCtx = [[trackObject editingContext] parentContext];
 	
 	COContainer *revToUndoObj = (COContainer*)[revToUndoCtx objectWithUUID: [trackObject UUID] atRevision: revToUndo];
 	COContainer *revBeforeUndoObj = (COContainer*)[revBeforeUndoCtx objectWithUUID: [trackObject UUID] atRevision: revBeforeUndo];

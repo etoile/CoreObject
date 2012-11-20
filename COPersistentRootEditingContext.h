@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COEditingContext, COCommitTrack, COObject, CORevision;
+@class COEditingContext, COCommitTrack, COObject, CORevision, COStore;
 
 /**
  * A persistent root editing context exposes as a working copy a CoreObject 
@@ -99,6 +99,14 @@
  * This revision applies to the root object and inner objects. See -[COObject revision].
  */
 @property (nonatomic, retain) CORevision *revision;
+/**
+ * The store for which the editing context acts a working copy.
+ *
+ * The store is the same than the parent context.
+ *
+ * See also -[COEditingContext store].
+ */
+@property (nonatomic, readonly) COStore *store;
 
 /** @taskunit Object Access and Loading */
 
@@ -227,6 +235,14 @@
  * all strongly contained objects (composite properties).
  */
 - (id)insertObjectCopy: (COObject *)sourceObject;
+
+/** @taskunit Object Deletion */
+
+/**
+ * Schedules the object to be deleted both in memory and in store on the next
+ * commit.
+ */
+- (void)deleteObject: (COObject *)anObject;
 
 /** @taskunit Framework Private */
 

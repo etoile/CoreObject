@@ -96,7 +96,7 @@
 
 	NSParameterAssert([[[trackedObject UUID] stringValue] isEqual: [notif object]]);
 
-	COEditingContext *context = [trackedObject editingContext];
+	COEditingContext *context = [[trackedObject editingContext] parentContext];
 	int64_t revNumber = [[[notif userInfo] objectForKey: kCONewCurrentNodeRevisionNumberKey] longLongValue];
 	BOOL isBasicUndoRedoFromCurrentContext = (revNumber == [[[self currentNode] revision] revisionNumber]);
 	BOOL isCommitFromCurrentContext = (revNumber == [context latestRevisionNumber]);
@@ -240,7 +240,7 @@
 	else
 	{
 		[self selectiveUndoWithRevision: [aNode revision] 
-		               inEditingContext: [trackedObject editingContext]];
+		               inEditingContext: [[trackedObject editingContext] parentContext]];
 	}
 }
 

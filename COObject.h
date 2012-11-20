@@ -234,7 +234,7 @@
  * Returns the persistent root editing context when the receiver is persistent,   
  * otherwise returns nil.
  */
-- (id)editingContext;
+- (COPersistentRootEditingContext *)editingContext;
 /** 
  * Returns the root object when the receiver is persistent, otherwise returns nil.
  *
