@@ -19,6 +19,7 @@
 #import <CoreObject/COQuery.h>
 #import <CoreObject/CORevision.h>
 #import <CoreObject/COStore.h>
+#import <CoreObject/COSQLStore.h>
 #import <CoreObject/COSynchronizer.h>
 #import <CoreObject/COTrack.h>
 
