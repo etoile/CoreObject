@@ -52,7 +52,6 @@
 	return [super forwardingTargetForSelector: aSelector];
 }
 
-
 - (COCommitTrack *)commitTrack
 {
 	if (commitTrack == nil)
@@ -146,7 +145,151 @@
 	return [parentContext objectWithUUID: uuid entityName: name atRevision: rev];
 }
 
-- (CORevision *)commitWithMetadata: (NSDictionary *)metadata 
+- (COObject *)insertObjectWithEntityName: (NSString *)aFullName
+                                    UUID: (ETUUID *)aUUID
+{
+	
+	ETEntityDescription *desc = [[parentContext modelRepository] descriptionForName: aFullName];
+	if (desc == nil)
+	{
+		[NSException raise: NSInvalidArgumentException format: @"Entity name %@ invalid", aFullName];
+	}
+	
+	Class cls = [parentContext classForEntityDescription: desc];
+	/* Nil root object means the new object will be a root */
+	COObject *result = [[cls alloc]
+			  initWithUUID: aUUID
+			  entityDescription: desc
+			  rootObject: _rootObject
+			  context: (id)self
+			  isFault: NO];
+
+	[result becomePersistentInContext: (id)self
+	                       rootObject: (_rootObject != nil ? _rootObject : result)];
+	/* -becomePersistentInContent:rootObject: calls -registerObject: that retains the object */
+	[result release];
+
+	return result;
+}
+
+- (id)insertObjectWithEntityName: (NSString *)aFullName
+{
+	return [self insertObjectWithEntityName: aFullName UUID: [ETUUID UUID]];
+}
+
+- (id)insertObject: (COObject *)sourceObject
+{
+	return [self insertObject: sourceObject withRelationshipConsistency: YES newUUID: NO];
+}
+
+- (id)insertObjectCopy: (COObject *)sourceObject
+{
+	return [self insertObject: sourceObject withRelationshipConsistency: YES newUUID: YES];
+}
+
+/**
+ * Helper method for -insertObject:
+ */
+static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescription *desc, BOOL consistency, BOOL newUUID)
+{
+	if ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]])
+	{
+		id copy = [[[[[value class] mutableClass] alloc] init] autorelease];
+		
+		// NOTE: We have to use -contentArray to get a collection copy,
+		// otherwise weird issues happen, since using
+		// -[COObject updateRelationshipConsistencyWithValue:forProperty:] sent
+		// to a subobject can mutate a parent multivalued property because we
+		// use recursion to copy the composite tree.
+		for (id subvalue in [value contentArray])
+		{
+			id subvalueCopy = handle(subvalue, ctx, desc, consistency, newUUID);
+			
+			if (subvalueCopy != nil)
+			{
+				[copy addObject: subvalueCopy];
+			}
+			else
+			{
+				// FIXME: Can be reached when we copy an object to some other
+				// context where some relationships cannot be resolved (-objectWithUUID: is returning nil).
+				//[NSException raise: NSInternalInconsistencyException
+				//            format: @"Multivalued property %@ contains a value %@ which cannot be copied", desc, value];
+			}
+		}
+		return copy;
+	}
+	else if ([value isKindOfClass: [COObject class]])
+	{
+		if ([desc isComposite])
+		{
+			return [ctx insertObject: value withRelationshipConsistency: consistency newUUID: newUUID];
+		}
+		else
+		{
+			COObject *copy = [ctx objectWithUUID: [value UUID]];
+			return copy;
+		}
+	}
+	else
+	{
+		return [[value mutableCopy] autorelease];
+	}
+}
+
+- (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency  newUUID: (BOOL)newUUID
+{
+	NSParameterAssert([sourceObject editingContext] != nil);
+	
+	/* Source Object is already persistent
+	 
+	 So we create a persistent object alias or copy in the receiver context */
+	
+	NSString *entityName = [[sourceObject entityDescription] fullName];
+	assert(entityName != nil);
+	
+	COObject *copy;
+	
+	if (!newUUID)
+	{
+		copy = [self objectWithUUID: [sourceObject UUID]];
+		
+		if (copy == nil)
+		{
+			copy = [self insertObjectWithEntityName: entityName UUID: [sourceObject UUID]];
+		}
+	}
+	else
+	{
+		copy = [self insertObjectWithEntityName: entityName UUID: [ETUUID UUID]];
+	}
+	
+	if (!consistency)
+	{
+		assert(![copy isIgnoringRelationshipConsistency]);
+		[copy setIgnoringRelationshipConsistency: YES];
+	}
+	
+	// FIXME: Copy transient properties if needed
+	for (NSString *prop in [sourceObject persistentPropertyNames])
+	{
+		ETPropertyDescription *desc = [[sourceObject entityDescription] propertyDescriptionForName: prop];
+		
+		id value = [sourceObject valueForProperty: prop];
+		id valueCopy = handle(value, self, desc, consistency, newUUID);
+		
+		[copy setValue: valueCopy forProperty: prop];
+	}
+	
+	if (!consistency)
+	{
+		[copy setIgnoringRelationshipConsistency: NO];
+	}
+	
+	return copy;
+}
+
+- (CORevision *)commitWithMetadata: (NSDictionary *)metadata
 {
 	NSParameterAssert(_rootObject != nil);
 	NSParameterAssert(_insertedObjects != nil);

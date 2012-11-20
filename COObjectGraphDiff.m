@@ -1,5 +1,6 @@
 #import "COObjectGraphDiff.h"
 #import "COEditingContext.h"
+#import "COPersistentRootEditingContext.h"
 #import "COObject.h"
 #import "CORevision.h"
 #import "COContainer.h"
@@ -401,7 +402,18 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 {
 	for (COObject *obj in [_insertedObjectsByUUID allValues])
 	{
-		[ctx insertObject: obj withRelationshipConsistency: NO newUUID: NO];
+		COPersistentRootEditingContext *persistentRootContext =
+			[ctx contextForPersistentRootUUID: [[obj editingContext] persistentRootUUID]];
+
+		if (persistentRootContext == nil)
+		{
+			persistentRootContext = [ctx insertNewPersistentRootWithRootObject: nil];
+		}
+		COObject *insertedObj = [persistentRootContext insertObject: obj withRelationshipConsistency: NO newUUID: NO];
+		if ([persistentRootContext rootObject] == nil)
+		{
+			[persistentRootContext setRootObject: insertedObj];
+		}
 	}	
 	for (ETUUID *uuid in _deletedObjectUUIDs)
 	{

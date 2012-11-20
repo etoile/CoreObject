@@ -109,6 +109,7 @@
 
 /** @taskunit Managing Persistent Roots */
 
+- (COPersistentRootEditingContext *)contextForPersistentRootUUID: (ETUUID *)aUUID;
 - (COPersistentRootEditingContext *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName;
 - (COPersistentRootEditingContext *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
 - (void)deletePersistentRootForRootObject: (COObject *)aRootObject;
@@ -253,50 +254,6 @@
  */
 - (void)discardChangesInObject: (COObject *)object;
 
-/** @taskunit Object Insertion */
-
-/**
- * Creates a new instance of the given entity name (assigning the instance a new UUID)
- * and returns the object.
- *
- * The new instance is a root object.
- *
- * See also -insertObjectWithEntityName:rootObject:.
- */
-- (id)insertObjectWithEntityName: (NSString *)aFullName;
-/**
- * Creates a new instance of the given entity name (assigning the instance a new UUID)
- * under the specified root object and returns the object. 
- *
- * The entity name must correspond to the COObject class or a subclass. Thereby 
- * returned objects will be COObject class or subclass instances in all cases.
- *
- * When rootObject is nil, the new instance is a root object.
- * 
- * This is the factory method for COObject class hierarchy.
- */
-- (id)insertObjectWithEntityName: (NSString *)aFullName rootObject: (COObject *)rootObject;
-/**
- * Creates a new instance of the given class (assigning the instance a new UUID)
- * and returns the object.
- *
- * When rootObject is nil, the new instance is a root object.
- *
- * See also -insertObjectWithEntityName:rootObject:.
- */
-- (id)insertObjectWithClass: (Class)aClass rootObject: (COObject *)rootObject;
-/**
- * Copies an object from another context into this context.
- *
- * The copy refers to the same underlying persistent object (same UUID).
- */
-- (id)insertObject: (COObject *)sourceObject;
-/**
- * Creates a copy of an object (assigning it a new UUID), including copying
- * all strongly contained objects (composite properties).
- */
-- (id)insertObjectCopy: (COObject *)sourceObject;
-
 - (COPersistentRootEditingContext *)makePersistentRootContext;
 
 /** @taskunit Object Deletion */
@@ -344,8 +301,22 @@
  */
 - (NSError *)error;
 
+/** @taskunit Legacy */
+ 
+/**
+ * This method is deprecated.
+ *
+ * You must now use -insertNewPersistentRootWithEntityName: and sent -rootObject 
+ * to the resulting context to get the same result.
+ */
+- (id)insertObjectWithEntityName: (NSString *)anEntityName;
+
 /** @taskunit Private */
 
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (COPersistentRootEditingContext *)makePersistentRootContextWithRootObject: (COObject *)aRootObject;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -358,30 +329,6 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void)discardLoadedObjectForUUID: (ETUUID *)aUUID;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Inserts the object into the context by checking the relationship consistency 
- * if requested.
- *
- * When the object is not yet persistent, it is inserted into the context and 
- * the new UUID hint is ignored.
- *
- * When the object is already persistent, based on the new UUID hint, the new 
- * object inserted into the context will be: 
- *
- * <deflist>
- * <item>newUUID is YES</item><desc>a copy (new instance and UUID)</desc>
- * <item>newUUID is NO</item><desc>a new context-relative instance (new 
- * instance but same UUID)</desc>
- * </deflist>
- *
- * For a persistent object, multiples instance can exist in the same process, 
- * one per editing context.
- *
- * You can pass an object that belongs to another context to this method.
- */
-- (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency newUUID: (BOOL)newUUID;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

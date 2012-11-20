@@ -168,7 +168,7 @@
 
 	if (lib == nil)
 	{
-		lib = [self insertObjectWithEntityName: @"Anonymous.COTagLibrary"];
+		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COTagLibrary"] rootObject];
 		[[self libraryGroup] addObject: lib];
 	}
 	return lib;
@@ -180,7 +180,7 @@
 
 	if (lib == nil)
 	{
-		lib = [self insertObjectWithEntityName: @"Anonymous.COLibrary"];
+		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COLibrary"] rootObject];
 		[lib setName: _(@"Photos")];
 		[lib setIdentifier: kCOLibraryIdentifierPhoto];
 		[[self libraryGroup] addObject: lib];
@@ -194,7 +194,7 @@
 
 	if (lib == nil)
 	{
-		lib = [self insertObjectWithEntityName: @"Anonymous.COLibrary"];
+		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COLibrary"] rootObject];
 		[lib setName: _(@"Music")];
 		[lib setIdentifier: kCOLibraryIdentifierMusic];
 		[[self libraryGroup] addObject: lib];

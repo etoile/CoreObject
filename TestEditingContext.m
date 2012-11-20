@@ -125,8 +125,7 @@
 		
 	COObject *o1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	ETUUID *u1 = [[o1 UUID] retain];
-	
-	// FIXME: It's not entirely clear what this should do
+
 	[ctx discardAllChanges];
 	UKNil([ctx objectWithUUID: u1]);
 	UKFalse([ctx hasChanges]);
@@ -140,6 +139,8 @@
 	[ctx discardAllChanges];
 	UKObjectsEqual(@"hello", [o2 valueForProperty: @"label"]);
 }
+
+// TODO: Rework copying accross editing contexts (not yet possible to copy a persistent root)
 
 - (void)testCopyingBetweenContextsWithNoStoreSimple
 {

@@ -88,9 +88,9 @@
 	[object setValue: @"Document" forProperty: @"label"];
 	[ctx commit];
 
-	COContainer *para1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: object];
+	COContainer *para1 = [[object editingContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
-	COContainer *para2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: object];
+	COContainer *para2 = [[object editingContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[object addObject: para1];
 	[object addObject: para2];
@@ -112,9 +112,9 @@
 	[object setValue: @"Document" forProperty: @"label"];
 	[ctx commit]; // Revision 1
 
-	COContainer *para1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: object];
+	COContainer *para1 = [[object editingContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
-	COContainer *para2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: object];
+	COContainer *para2 = [[object editingContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[object addObject: para1];
 	[object addObject: para2];
@@ -124,7 +124,7 @@
 	[[object commitTrack] undo]; // back to Revision 1
 	UKIntsEqual(0, [object count]);
 
-	COContainer *para3 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: object];
+	COContainer *para3 = [[object editingContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para3 setValue: @"paragraph 3" forProperty: @"label"];
 	[object addObject: para3];
 	[ctx commit];

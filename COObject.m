@@ -173,7 +173,7 @@
 	
 	NILARG_EXCEPTION_TEST(aUUID);
 	NILARG_EXCEPTION_TEST(anEntityDescription);
-	NILARG_EXCEPTION_TEST(aContext);
+	//NILARG_EXCEPTION_TEST(aContext);
 
 	self = [self commonInitWithUUID: aUUID 
 	              entityDescription: anEntityDescription

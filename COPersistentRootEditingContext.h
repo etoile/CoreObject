@@ -81,6 +81,8 @@
 /**
  * The entry point to navigate the object graph bound to the persistent root.
  *
+ * The returned object is COObject class or subclass instance.
+ *
  * A root object isn't a core object and doesn't represent a core object either. 
  * The persistent root represents the core object. As such, use the persistent 
  * root UUID to refer to core objects and never 
@@ -90,7 +92,7 @@
  * history including the branches (and derived cheap copies) due to limitations 
  * in EtoileUI.
  */
-@property (nonatomic, retain) COObject *rootObject;
+@property (nonatomic, retain) id rootObject;
 /**
  * The persistent root revision.
  *
@@ -202,6 +204,30 @@
  */
 - (void)discardChangesInObject: (COObject *)object;
 
+/** @taskunit Object Insertion */
+
+/**
+ * Creates a new instance of the given entity name (assigning the instance a new UUID)
+ * and returns the object.
+ *
+ * The entity name must correspond to the COObject class or a subclass. Thereby
+ * returned objects will be COObject class or subclass instances in all cases.
+ *
+ * This is the factory method for COObject class hierarchy.
+ */
+- (id)insertObjectWithEntityName: (NSString *)aFullName;
+/**
+ * Copies an object from another context into this context.
+ *
+ * The copy refers to the same underlying persistent object (same UUID).
+ */
+- (id)insertObject: (COObject *)sourceObject;
+/**
+ * Creates a copy of an object (assigning it a new UUID), including copying
+ * all strongly contained objects (composite properties).
+ */
+- (id)insertObjectCopy: (COObject *)sourceObject;
+
 /** @taskunit Framework Private */
 
 - (id)initWithPersistentRootUUID: (ETUUID *)aUUID
@@ -221,6 +247,30 @@
  * subclass instance.
  */
 - (void)markObjectUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Inserts the object into the context by checking the relationship consistency
+ * if requested.
+ *
+ * When the object is not yet persistent, it is inserted into the context and
+ * the new UUID hint is ignored.
+ *
+ * When the object is already persistent, based on the new UUID hint, the new
+ * object inserted into the context will be:
+ *
+ * <deflist>
+ * <item>newUUID is YES</item><desc>a copy (new instance and UUID)</desc>
+ * <item>newUUID is NO</item><desc>a new context-relative instance (new
+ * instance but same UUID)</desc>
+ * </deflist>
+ *
+ * For a persistent object, multiples instance can exist in the same process,
+ * one per editing context.
+ *
+ * You can pass an object that belongs to another context to this method.
+ */
+- (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency newUUID: (BOOL)newUUID;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

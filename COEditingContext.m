@@ -126,7 +126,7 @@ store by other processes. */
 
 	if (UUIDString == nil)
 	{
-		COGroup *newGroup = [self insertObjectWithEntityName: @"Anonymous.COGroup"];
+		COGroup *newGroup = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COGroup"] rootObject];
 		NSMutableDictionary *metadata = AUTORELEASE([[_store metadata] mutableCopy]);
 
 		[newGroup setName: _(@"Libraries")];
@@ -170,28 +170,60 @@ store by other processes. */
 	return cls;
 }
 
+- (COPersistentRootEditingContext *)contextForPersistentRootUUID: (ETUUID *)aUUID
+{
+	return [_persistentRootContexts objectForKey: aUUID];
+}
+
 // NOTE: Persistent root insertion or deletion are saved to the store at commit time.
 
 - (COPersistentRootEditingContext *)makePersistentRootContextWithRootObject: (COObject *)aRootObject
 {
 	COPersistentRootEditingContext *ctxt =
-	[[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: [ETUUID UUID]
-													   commitTrackUUID: nil
-															rootObject: aRootObject
-														 parentContext: self];
+		[[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: [ETUUID UUID]
+														   commitTrackUUID: nil
+																rootObject: aRootObject
+															 parentContext: self];
 	[_persistentRootContexts setObject: ctxt forKey: [ctxt persistentRootUUID]];
 	[ctxt release];
 	return ctxt;
 }
 
+- (COPersistentRootEditingContext *)makePersistentRootContext
+{
+	return [self makePersistentRootContextWithRootObject: nil];
+}
+
 - (COPersistentRootEditingContext *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
 {
-	return [self insertObjectWithEntityName: anEntityName];
+	COPersistentRootEditingContext *context = [self makePersistentRootContextWithRootObject: nil];
+	ETEntityDescription *desc = [[self modelRepository] descriptionForName: anEntityName];
+	Class cls = [self classForEntityDescription: desc];
+	COObject *rootObject = [[cls alloc]
+			  initWithUUID: [ETUUID UUID]
+			  entityDescription: desc
+			  rootObject: nil
+			  context: (id)context
+			  isFault: NO];
+
+	/* Will set the root object on the persistent root context */
+	[rootObject becomePersistentInContext: context rootObject: rootObject];
+
+	return context;
+}
+
+- (id)insertObjectWithEntityName: (NSString *)anEntityName
+{
+	return [[self insertNewPersistentRootWithEntityName: anEntityName] rootObject];
 }
 
 - (COPersistentRootEditingContext *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject
 {
-	return [self makePersistentRootContextWithRootObject: aRootObject];
+	// FIXME: COObjectGraphDiff prevents us to detect an invalid root object...
+	//NILARG_EXCEPTION_TEST(aRootObject);
+	COPersistentRootEditingContext *context = [self makePersistentRootContextWithRootObject: aRootObject];
+	[aRootObject becomePersistentInContext: context rootObject: aRootObject];
+	return context;
 }
 
 - (void)deletePersistentRootForRootObject: (COObject *)aRootObject
@@ -341,6 +373,11 @@ store by other processes. */
 	return [_loadedObjects objectForKey: uuid];
 }
 
+- (void)cacheLoadedObject: (COObject *)object
+{
+	[_loadedObjects setObject: object forKey: [object UUID]];
+}
+
 - (void)discardLoadedObjectForUUID: (ETUUID *)aUUID
 {
 	[_loadedObjects removeObjectForKey: aUUID];
@@ -441,199 +478,6 @@ store by other processes. */
 - (void)discardChangesInObject: (COObject *)object
 {
 	[[object editingContext] discardChangesInObject: object];
-}
-
-- (void)cacheLoadedObject: (COObject *)object
-{
-	[_loadedObjects setObject: object forKey: [object UUID]];
-}
-
-- (COObject *)insertObjectWithEntityName: (NSString *)aFullName 
-                                    UUID: (ETUUID *)aUUID 
-                              rootObject: (COObject *)rootObject
-{
-
-	ETEntityDescription *desc = [_modelRepository descriptionForName: aFullName];
-	if (desc == nil)
-	{
-		[NSException raise: NSInvalidArgumentException format: @"Entity name %@ invalid", aFullName];
-	}
-	
-	Class cls = [self classForEntityDescription: desc];
-	COPersistentRootEditingContext *ctxt = (id)[rootObject editingContext];
-	COObject *result = [cls alloc];
-
-	if (rootObject == nil)
-	{
-		ctxt = [self makePersistentRootContextWithRootObject: nil];
-	}
-
-	ETAssert(ctxt != nil);
-	
-	/* Nil root object means the new object will be a root */
-	result = [result
-		     initWithUUID: aUUID
-		entityDescription: desc
-		       rootObject: rootObject
-		          context: (id)ctxt
-		          isFault: NO];
-	[result becomePersistentInContext: (id)ctxt rootObject: (rootObject != nil ? rootObject : result)];
-	[result release];
-	
-	return result;
-}
-
-- (id)insertObjectWithClass: (Class)aClass rootObject: (COObject *)rootObject;
-{
-	return [self insertObjectWithEntityName: [[_modelRepository entityDescriptionForClass: aClass] fullName]];
-}
-
-- (id)insertObjectWithEntityName: (NSString *)aFullName
-{
-	return [self insertObjectWithEntityName:aFullName UUID: [ETUUID UUID] rootObject: nil];
-}
-
-- (id)insertObjectWithEntityName: (NSString *)aFullName rootObject: (COObject *)rootObject
-{
-	return [self insertObjectWithEntityName: aFullName UUID: [ETUUID UUID] rootObject: rootObject];
-}
-
-/**
- * Helper method for -insertObject:
- */
-static id handle(id value, COEditingContext *ctx, ETPropertyDescription *desc, BOOL consistency, BOOL newUUID)
-{
-	if ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]) 
-	{
-		id copy = [[[[[value class] mutableClass] alloc] init] autorelease];
-
-		// NOTE: We have to use -contentArray to get a collection copy, 
-		// otherwise weird issues happen, since using 
-		// -[COObject updateRelationshipConsistencyWithValue:forProperty:] sent  
-		// to a subobject can mutate a parent multivalued property because we 
-		// use recursion to copy the composite tree.
-		for (id subvalue in [value contentArray])
-		{
-			id subvalueCopy = handle(subvalue, ctx, desc, consistency, newUUID);
-
-			if (subvalueCopy != nil)
-			{
-				[copy addObject: subvalueCopy];
-			}
-			else
-			{
-				// FIXME: Can be reached when we copy an object to some other 
-				// context where some relationships cannot be resolved (-objectWithUUID: is returning nil).
-				//[NSException raise: NSInternalInconsistencyException
-				//            format: @"Multivalued property %@ contains a value %@ which cannot be copied", desc, value];
-			}
-		}
-		return copy;
-	}
-	else if ([value isKindOfClass: [COObject class]])
-	{
-		if ([desc isComposite])
-		{
-			return [ctx insertObject: value withRelationshipConsistency: consistency newUUID: newUUID];
-		}
-		else
-		{
-			COObject *copy = [ctx objectWithUUID: [value UUID]];
-			return copy;
-		}
-	}
-	else
-	{
-		return [[value mutableCopy] autorelease];
-	}
-}
-
-- (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency  newUUID: (BOOL)newUUID
-{
-	COPersistentRootEditingContext *sourceContext = [sourceObject editingContext];
-	ETAssert(sourceContext != nil);
-	/* See -[COObject becomePersistentInContext:rootObject:] */
-	BOOL isBecomingPersistent = (newUUID == NO && [_persistentRootContexts containsObject: sourceContext]);
-
-	/* Source object was not persistent until then
-	   
-	   So we don't want to create a new instance, but just register it */
-
-	// FIXME: This code looks dubious. Why not use -becomePersistentInContext:rootObject:...
-	if (isBecomingPersistent)
-	{
-		[sourceContext registerObject: sourceObject];
-		return sourceObject;
-	}
-
-	/* Source Object is already persistent
-	
-	   So we create a persistent object alias or copy in the receiver context */
-
-	NSString *entityName = [[sourceObject entityDescription] fullName];
-	assert(entityName != nil);
-	
-	COObject *copy;
-	
-	if (!newUUID)
-	{	
-		copy = [self objectWithUUID: [sourceObject UUID]];
-
-		if (copy == nil)
-		{
-			copy = [self insertObjectWithEntityName: entityName UUID: [sourceObject UUID] rootObject: nil];
-		}
-	}
-	else
-	{
-		copy = [self insertObjectWithEntityName: entityName UUID: [ETUUID UUID] rootObject: nil];
-	}
-
-	if (!consistency)
-	{
-		assert(![copy isIgnoringRelationshipConsistency]);
-		[copy setIgnoringRelationshipConsistency: YES];
-	}
-
-	// FIXME: Copy transient properties if needed
-	for (NSString *prop in [sourceObject persistentPropertyNames])
-	{
-		ETPropertyDescription *desc = [[sourceObject entityDescription] propertyDescriptionForName: prop];
-		
-		id value = [sourceObject valueForProperty: prop];
-		id valueCopy = handle(value, self, desc, consistency, newUUID);
-		
-		[copy setValue: valueCopy forProperty: prop];
-	}
-
-	if (!consistency)
-	{
-		[copy setIgnoringRelationshipConsistency: NO];
-	}
-	
-	return copy;
-}
-
-- (id)insertObject: (COObject *)sourceObject
-{
-	return [self insertObject: sourceObject withRelationshipConsistency: YES newUUID: NO];
-}
-
-- (id)insertObjectCopy: (COObject *)sourceObject
-{
-	return [self insertObject: sourceObject withRelationshipConsistency: YES newUUID: YES];
-}
-
-- (COPersistentRootEditingContext *)makePersistentRootContext
-{
-	COPersistentRootEditingContext *ctxt =
-		[[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: [ETUUID UUID]
-														   commitTrackUUID: nil
-																rootObject: nil
-															 parentContext: self];
-	[_persistentRootContexts setObject: ctxt forKey: [ctxt persistentRootUUID]];
-	[ctxt release];
-	return ctxt;
 }
 
 - (void)deleteObject: (COObject *)anObject

@@ -68,3 +68,15 @@
 - (void)deleteStore;
 
 @end
+
+
+@interface COEditingContext (TestCommon)
+/**
+ * This method is deprecated but has no replacement yet.
+ */
+- (id)insertObject: (COObject *)obj;
+/**
+ * This method is deprecated but has no replacement yet.
+ */
+- (id)insertObjectCopy: (COObject *)obj;
+@end

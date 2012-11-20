@@ -1,5 +1,6 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
+#import "COPersistentRootEditingContext.h"
 #import "COStore.h"
 #import "TestCommon.h"
 
@@ -170,6 +171,31 @@
 	[self discardContextAndStore];
 	[self deleteStore];
 	[super dealloc];
+}
+
+@end
+
+
+@implementation COEditingContext (TestCommon)
+
+- (id)insertObject: (COObject *)sourceObject
+{
+	COPersistentRootEditingContext *context = [self makePersistentRootContextWithRootObject: nil];
+	COObject *rootObject = [context insertObject: sourceObject withRelationshipConsistency: YES newUUID: NO];
+
+	[context setRootObject: rootObject];
+
+	return rootObject;
+}
+
+- (id)insertObjectCopy: (COObject *)sourceObject
+{
+	COPersistentRootEditingContext *context = [self makePersistentRootContextWithRootObject: nil];
+	COObject *rootObject = [context insertObject: sourceObject withRelationshipConsistency: YES newUUID: YES];
+	
+	[context setRootObject: rootObject];
+	
+	return rootObject;
 }
 
 @end
