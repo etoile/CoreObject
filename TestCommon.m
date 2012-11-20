@@ -135,7 +135,6 @@
 {
 	[self discardContextAndStore];
 
-	pool = [NSAutoreleasePool new];
 	store = [[[self storeClass] alloc] initWithURL: [self storeURL]];
 
 #ifdef STORE_TEST
@@ -154,7 +153,6 @@
 
 - (void)discardContextAndStore
 {
-	DESTROY(pool);
 	DESTROY(ctx);
 	DESTROY(store);
 }

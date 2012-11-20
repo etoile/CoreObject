@@ -13,7 +13,6 @@
  */
 @interface TestCommon : NSObject
 {
-	NSAutoreleasePool *pool;
 	COEditingContext *ctx;
 	COStore *store;
 }
