@@ -1,7 +1,8 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
+#import <CoreObject/COEditingContext.h>
 
-@class COEditingContext, COCommitTrack, COObject, CORevision, COStore;
+@class COCommitTrack, COObject, CORevision, COStore;
 
 /**
  * A persistent root editing context exposes as a working copy a CoreObject 
@@ -38,7 +39,7 @@
  * From a terminology standpoint, persistent root and core object can be used 
  * interchangeably.
  */
-@interface COPersistentRootEditingContext : NSObject
+@interface COPersistentRootEditingContext : NSObject <COPersistentObjectContext>
 {
 	@private
 	COEditingContext *_parentContext;
@@ -247,6 +248,8 @@
  * This method is only exposed to be used internally by CoreObject.
  *
  * Declares the object as newly inserted and puts it among the loaded objects.
+ *
+ * The first registered object becomes the root object.
  */
 - (void)registerObject: (COObject *)object;
 /**

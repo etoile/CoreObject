@@ -138,7 +138,7 @@
 	else
 	{
 		// NOTE: Ensure we can use -propertyNames and metamodel-based 
-		// introspection before -becomePersistentInContext:rootObject: is called.
+		// introspection before -becomePersistentInContext: is called.
 		// TODO: Could be removed if -propertyNames in NSObject(Model) do a 
 		// lookup in the main repository.
 		ASSIGN(_entityDescription, [[ETModelDescriptionRepository mainRepository] 
@@ -212,24 +212,28 @@
 	[super dealloc];
 }
 
-- (void) becomePersistentInContext: (COPersistentRootEditingContext *)aContext
-                        rootObject: (COObject *)aRootObject
+- (void)becomePersistentInContext: (id <COPersistentObjectContext>)aContext
 {
 	NILARG_EXCEPTION_TEST(aContext);
-	NILARG_EXCEPTION_TEST(aRootObject);
-	INVALIDARG_EXCEPTION_TEST(aContext, [aContext isKindOfClass: [COPersistentRootEditingContext class]]);
-	INVALIDARG_EXCEPTION_TEST(aRootObject, 
-		aRootObject != self || [[[aContext parentContext] loadedObjects] containsObject: aRootObject] == NO);
+	INVALIDARG_EXCEPTION_TEST(aContext, [aContext conformsToProtocol: @protocol(COPersistentObjectContext)]);
+	if ([aContext isKindOfClass: [COPersistentRootEditingContext class]])
+	{
+		INVALIDARG_EXCEPTION_TEST(aContext, [(COPersistentRootEditingContext *)aContext rootObject] != self);
+	}
+	if (_context != nil)
+	{
+		[NSException raise: NSInternalInconsistencyException
+					format: _(@"You must not sent -becomePersistentInContext:, "
+		                       "to %@, the object is already persistent in %@"),
+		                     [self primitiveDescription], _context];
+	}
+	
+	/* Both transient and persistent objects must have a valid UUID */
 	ETAssert(_uuid != nil);
-
 	_context = aContext;
 	if (_entityDescription == nil)
 	{
 		ASSIGN(_entityDescription, [[(id)aContext modelRepository] entityDescriptionForClass: [self class]]);
-	}
-	if (self == aRootObject)
-	{
-		[_context setRootObject: aRootObject];
 	}
 	[aContext registerObject: self];
 }
@@ -1384,7 +1388,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 - (NSDictionary *)referencePropertyList
 {
 	NSAssert1([self isPersistent], 
-		@"Usually means -becomePersistentInContext:rootObject: hasn't been called on %@", self);
+		@"Usually means -becomePersistentInContext: hasn't been called on %@", self);
 
 	return [NSDictionary dictionaryWithObjectsAndKeys:
 			@"object-ref", @"type",

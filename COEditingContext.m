@@ -202,7 +202,7 @@ store by other processes. */
 			  isFault: NO];
 
 	/* Will set the root object on the persistent root context */
-	[rootObject becomePersistentInContext: context rootObject: rootObject];
+	[rootObject becomePersistentInContext: context];
 
 	return context;
 }
@@ -217,7 +217,7 @@ store by other processes. */
 	// FIXME: COObjectGraphDiff prevents us to detect an invalid root object...
 	//NILARG_EXCEPTION_TEST(aRootObject);
 	COPersistentRootEditingContext *context = [self makePersistentRootContextWithRootObject: aRootObject];
-	[aRootObject becomePersistentInContext: context rootObject: aRootObject];
+	[aRootObject becomePersistentInContext: context];
 	return context;
 }
 
@@ -227,6 +227,13 @@ store by other processes. */
 
 	[self discardLoadedObjectsForPersistentRootContexts: S(context)];
 	[_persistentRootContexts removeObjectForKey: [context persistentRootUUID]];
+}
+
+- (void)registerObject: (COObject *)object
+{
+	NILARG_EXCEPTION_TEST(object);
+	INVALIDARG_EXCEPTION_TEST(object, [_loadedObjects containsObject: object] == NO);
+	[self insertNewPersistentRootWithRootObject: object];
 }
 
 - (NSString *)entityNameForObjectUUID: (ETUUID *)obj

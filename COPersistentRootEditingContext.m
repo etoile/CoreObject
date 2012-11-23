@@ -150,9 +150,8 @@
 			  context: (id)self
 			  isFault: NO];
 
-	[result becomePersistentInContext: (id)self
-	                       rootObject: (_rootObject != nil ? _rootObject : result)];
-	/* -becomePersistentInContent:rootObject: calls -registerObject: that retains the object */
+	[result becomePersistentInContext: (id)self];
+	/* -becomePersistentInContent: calls -registerObject: that retains the object */
 	[result release];
 
 	return result;
@@ -392,6 +391,13 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 
 - (void)registerObject: (COObject *)object
 {
+	NILARG_EXCEPTION_TEST(object);
+	INVALIDARG_EXCEPTION_TEST(object, [[_parentContext loadedObjects] containsObject: object] == NO);
+
+	if ([self rootObject] == nil)
+	{
+		ASSIGN(_rootObject, object);
+	}
 	[_parentContext cacheLoadedObject: object];
 	[_insertedObjects addObject: object];
 }

@@ -137,18 +137,17 @@
 }
 
 - (void) becomePersistentInContext: (COPersistentRootEditingContext *)aContext
-                        rootObject: (COObject *)aRootObject
 {
 	if ([self isPersistent])
 		return;
 
-	[super becomePersistentInContext: aContext rootObject: aRootObject];
+	[super becomePersistentInContext: aContext];
 
 	// TODO: Leverage the model description rather than hardcoding the aspects
 	// TODO: Implement some strategy to recover in the case these aspects 
 	// are already used as embedded objects in another root object. 
 	ETAssert([[self tagGroups] isPersistent] == NO);
-	[[self tagGroups] becomePersistentInContext: aContext rootObject: aRootObject];
+	[[self tagGroups] becomePersistentInContext: aContext];
 }
 
 - (void)dealloc

@@ -154,8 +154,7 @@ int main(int argc, char **argv)
 	Appointment *firstAppt = [[Appointment alloc]
 		initWithStartDate: [NSDate date]
 		          endDate: [NSDate dateWithTimeIntervalSinceNow: 3600]];
-	[firstAppt becomePersistentInContext: [calendar editingContext]
-	                          rootObject: calendar];
+	[firstAppt becomePersistentInContext: [calendar editingContext]];
 	[calendar addAppointment: firstAppt]; 
 	[ctx commit];
 	[ctx release];

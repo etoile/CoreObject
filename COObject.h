@@ -27,13 +27,13 @@
  * <list>
  * <item>-[COEditingContext insertObjectWithEntityName:] or similar 
  * COEditingContext methods</item>
- * <item>-init and -becomePersistentInContext:rootObject:</item>
+ * <item>-init and -becomePersistentInContext:</item>
  * </list>
  *
  * In both cases, -init is used to initialize the object.<br />
  * With -insertObjectWithEntityName:, the object becomes persistent immediately.
  * However in the second case, the object doesn't become persistent until 
- * -becomePersistentInContext:rootObject: is called. You can use this approach   
+ * -becomePersistentInContext: is called. You can use this approach
  * to instantiate transient objects or to mix transient and persistent instances.
  *
  * When writing a COObject subclass, -init can be overriden to initialize the 
@@ -46,10 +46,10 @@
  * @section Persistency
  *
  * Whan an object becomes persistent, you invoke 
- * -becomePersistentInContext:rootObject: or the editing context does it. 
- * Hence -becomePersistentInContext:rootObject: can be overriden to udpate   
+ * -becomePersistentInContext: or the editing context does it.
+ * Hence -becomePersistentInContext: can be overriden to udpate   
  * or initialize properties at persistency time. For example, 
- * -becomePersistentInContext:rootObject: can be propagated to the instance 
+ * -becomePersistentInContext: can be propagated to the instance
  * relationships to transively turn a transient object graph into a persistent 
  * one.
  *
@@ -180,7 +180,7 @@
  * Initializes and returns a non-persistent object.
  *
  * The receiver can be made persistent later, by inserting it into an editing 
- * context with -becomePersistentInContext:rootObject:.<br />
+ * context with -becomePersistentInContext:.<br />
  * Its identity will remain stable once persistency has been enabled, because 
  * this initializer gives a UUID to the object.
  *
@@ -191,7 +191,7 @@
  * For the initializer in subclasses, you must never create entity objects that 
  * correspond to relationships with insertion methods provided by 
  * COEditingContext (this ensures your subclasses support both immediate and 
- * late persistency with -becomePersistentInContext:rootObject:). For example, 
+ * late persistency with -becomePersistentInContext:). For example,
  * you must write:
  *
  * <example>
@@ -209,15 +209,12 @@
 /** 
  * Makes the receiver persistent by inserting it into the given editing context.
  *
- * If the root object argument is the receiver itself, then the receiver becomes 
- * a root object (or a persistent root from the storage standpoint).
+ * If the context argument is a COEditingContext, then the receiver becomes 
+ * a root object (bound to a new persistent root).
  *
- * Raises an exception if any argument is nil.<br />
- * When the root object is not the receiver or doesn't belong to the editing 
- * context, raises an exception too.
+ * Raises an exception if any argument is nil.
  */
-- (void)becomePersistentInContext: (COPersistentRootEditingContext *)aContext
-                       rootObject: (COObject *)aRootObject;
+- (void)becomePersistentInContext: (COPersistentRootEditingContext *)aContext;
 - (id)copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription;
 
 /** taskunit Persistency Attributes */
@@ -419,7 +416,7 @@
  * By default, returns nil.
  *
  * Because this method is invoked at commit time, you can be sure that 
- * -becomePersistentInContext:rootObject: was called previously.
+ * -becomePersistentInContext: was called previously.
  *
  * This method must return nil on validation success, otherwise it must return 
  * suberrors (or a single error) that include their validation results in the 
