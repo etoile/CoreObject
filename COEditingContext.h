@@ -4,6 +4,10 @@
 @class COPersistentRootEditingContext;
 @class COStore, CORevision, COObject, COGroup, COSmartGroup, COCommitTrack, COError;
 
+@protocol COPersistentObjectContext <NSObject>
+- (void)registerObject: (COObject *)object;
+@end
+
 /**
  * An editing context exposes a CoreObject store snapshot as a working copy 
  * (in revision control system terminology).
@@ -11,7 +15,7 @@
  * It queues changes and when the user requests it, it attempts to commit them 
  * to the store.
  */
-@interface COEditingContext : NSObject
+@interface COEditingContext : NSObject <COPersistentObjectContext>
 {
 	@private
 	COStore *_store;
@@ -307,6 +311,15 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 - (COPersistentRootEditingContext *)makePersistentRootContextWithRootObject: (COObject *)aRootObject;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Inserts a new persistent root using the given object as its root object.
+ * 
+ * The object becomes a root object by registering in the persistent root. See 
+ * -[COPersistentRootEditingContext registerObject:].
+ */
+- (void)registerObject: (COObject *)object;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
