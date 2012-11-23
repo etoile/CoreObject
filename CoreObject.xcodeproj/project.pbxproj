@@ -1284,6 +1284,7 @@
 				60C913C0165BBED100E0C5F4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6686BDB012592BDC0065DE1A /* Build configuration list for PBXNativeTarget "CoreObject" */ = {
 			isa = XCConfigurationList;

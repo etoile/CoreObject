@@ -26,6 +26,10 @@
 {
 	@private
 	COObject *trackedObject;
+	COCommitTrack *parentTrack;
+	NSString *label;
+	BOOL isMainBranch;
+	BOOL isCopy;
 }
 
 /** @taskunit Tracked Objects */
@@ -34,6 +38,53 @@
  * The root object for which the commit track persists the history.
  */
 @property (readonly, nonatomic) COObject *trackedObject;
+
+/** @taskunit Track Kind */
+
+/**
+ * Returns whether the commit track represents a cheap copy.
+ *
+ * When the receiver is a cheap copy, -isBranch returns NO.
+ */
+@property (readonly, nonatomic) BOOL isCopy;
+/**
+ * Returns whether the commit track represents a branch.
+ *
+ * When the receiver is a branch, -isCopy returns NO.
+ */
+@property (readonly, nonatomic) BOOL isBranch;
+/**
+ * Returns whether the commit track represents a persistent root main branch.
+ *
+ * Unless an explicit branch is requested, a persistent root uses the main 
+ * branch as its current branch at loading time.<br />
+ * For a nil commit track, COPersistentRootEditingContext initializer retrieves 
+ * the main branch commit track and sets it as the current commit track (aka 
+ * current branch). See 
+ * -[COPersistentRootEditingContext initWithPersistentRootUUID:commitTrackUUID:rootObject:parentContext:].
+ */
+@property (readonly, nonatomic) BOOL isMainBranch;
+
+/** @taskunit Basic Properties */
+
+@property (assign, nonatomic) NSString *label;
+@property (assign, readonly) COCommitTrack *parentTrack;
+@property (assign, readonly) CORevision *parentRevision;
+
+/** @taskunit Creating Branches and Cheap copies */
+
+- (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel;
+- (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev;
+- (COCommitTrack *)makeCopyFromRevision: (CORevision *)aRev;
+
+/** @taskunit Merging Between Tracks */
+
+- (BOOL)mergeChangesFromTrack: (COCommitTrack *)aSourceTrack;
+- (BOOL)mergeChangesFromRevision: (CORevision *)startRev
+							  to: (CORevision *)endRev
+						 ofTrack: (COCommitTrack *)aSourceTrack;
+- (BOOL)mergeChangesFromRevisionSet: (NSSet *)revs
+							ofTrack: (COCommitTrack *)aSourceTrack;
 
 /** @taskunit Private */
 

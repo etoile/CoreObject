@@ -18,7 +18,7 @@
 
 @implementation COCommitTrack
 
-@synthesize trackedObject;
+@synthesize trackedObject, label, parentTrack, isCopy, isMainBranch;
 
 - (id)initWithTrackedObjects: (NSSet *)trackedObjects
 {
@@ -54,6 +54,8 @@
 {
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 	DESTROY(trackedObject);
+	DESTROY(parentTrack);
+	DESTROY(label);
 	[super dealloc];
 }
 
@@ -64,6 +66,49 @@
 		return ([trackedObject isEqual: [rhs trackedObject]]
 			&& [[trackedObject editingContext] isEqual: [[rhs trackedObject] editingContext]]);
 	}
+	return NO;
+}
+
+- (BOOL)isBranch
+{
+	return ([self isCopy] == NO && [self parentTrack] != nil);
+}
+
+- (CORevision *)parentRevision
+{
+	return nil;
+}
+
+- (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel
+{
+	return nil;
+}
+
+- (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
+{
+	return nil;
+}
+
+- (COCommitTrack *)makeCopyFromRevision: (CORevision *)aRev
+{
+	return nil;
+}
+
+- (BOOL)mergeChangesFromTrack: (COCommitTrack *)aSourceTrack
+{
+	return NO;
+}
+
+- (BOOL)mergeChangesFromRevision: (CORevision *)startRev
+							  to: (CORevision *)endRev
+						 ofTrack: (COCommitTrack *)aSourceTrack
+{
+	return NO;
+}
+
+- (BOOL)mergeChangesFromRevisionSet: (NSSet *)revs
+							ofTrack: (COCommitTrack *)aSourceTrack
+{
 	return NO;
 }
 
@@ -417,5 +462,7 @@
 		insertPoint++;
 	}
 }
+
+
 
 @end
