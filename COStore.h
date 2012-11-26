@@ -128,7 +128,9 @@
  *
  * The UUID set must not be nil, otherwise NSInvalidArgumentException is raised.
  */
-- (void)insertRootObjectUUIDs: (NSSet *)UUIDs;
+- (void)insertPersistentRootUUID: (ETUUID *)aPersistentRootUUID
+				 commitTrackUUID: (ETUUID *)aMainBranchUUID
+				  rootObjectUUID: (ETUUID *)aRootObjectUUID;
 
 /** @taskunit Committing Changes */
 

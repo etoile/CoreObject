@@ -25,6 +25,7 @@
 @interface COCommitTrack : COTrack
 {
 	@private
+	ETUUID *UUID;
 	COObject *trackedObject;
 	COCommitTrack *parentTrack;
 	NSString *label;

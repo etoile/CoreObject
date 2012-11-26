@@ -315,10 +315,16 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	NSSet *committedObjects = 
 		[_insertedObjects setByAddingObjectsFromArray: [_updatedPropertiesByObject allKeys]];
 	COStore *store = [_parentContext store];
+	BOOL isNewPersistentRoot = ([self revision] == nil);
 
-	if ([_insertedObjects containsObject: _rootObject])
+	if (isNewPersistentRoot)
 	{
-		[store insertRootObjectUUIDs: S([_rootObject UUID])];
+
+		ETAssert([_insertedObjects containsObject: _rootObject]);
+
+		[store insertPersistentRootUUID: [self persistentRootUUID]
+						commitTrackUUID: [ETUUID UUID]
+						 rootObjectUUID: [_rootObject UUID]];
 	}
 
 	[store beginCommitWithMetadata: metadata 

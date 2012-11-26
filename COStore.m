@@ -79,12 +79,9 @@
 	return nil;
 }
 
-- (void)insertRootObjectUUID: (ETUUID *)uuid
-{
-	[self doesNotRecognizeSelector: _cmd];
-}
-
-- (void) insertRootObjectUUIDs: (NSSet *)UUIDs
+- (void)insertPersistentRootUUID: (ETUUID *)aPersistentRootUUID
+				 commitTrackUUID: (ETUUID *)aMainBranchUUID
+				  rootObjectUUID: (ETUUID *)aRootObjectUUID
 {
 	[self doesNotRecognizeSelector: _cmd];
 }

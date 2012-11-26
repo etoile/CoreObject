@@ -19,7 +19,9 @@
 	ETUUID *o1 = [ETUUID new];
 	NSDictionary *sampleMetadata = D([NSNumber numberWithBool: YES], @"metadataWorks");
 	
-	[store insertRootObjectUUIDs: S(o1)];
+	[store insertPersistentRootUUID: [ETUUID UUID]
+	                commitTrackUUID: [ETUUID UUID]
+					 rootObjectUUID: o1];
 	[store beginCommitWithMetadata: sampleMetadata rootObjectUUID: o1 baseRevision: nil];
 	[store beginChangesForObjectUUID: o1];
 	[store setValue: @"bob"
@@ -55,7 +57,9 @@
 {
 	ETUUID *o1 = [ETUUID UUID];
 
-	[store insertRootObjectUUIDs: S(o1)];	
+	[store insertPersistentRootUUID: [ETUUID UUID]
+	                commitTrackUUID: [ETUUID UUID]
+					 rootObjectUUID: o1];
 	
 	[store beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: nil];
 	[store beginChangesForObjectUUID: o1];
@@ -114,7 +118,9 @@
 {
 	ETUUID *o1 = [ETUUID UUID];
 
-	[store insertRootObjectUUIDs: S(o1)];	
+	[store insertPersistentRootUUID: [ETUUID UUID]
+	                commitTrackUUID: [ETUUID UUID]
+					 rootObjectUUID: o1];
 	[store beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: nil];
 	[store beginChangesForObjectUUID: o1];
 	[store finishChangesForObjectUUID: o1];
@@ -133,7 +139,9 @@
 	ETUUID *o2 = [ETUUID UUID];
 	ETUUID *o3 = [ETUUID UUID];
 
-	[store insertRootObjectUUIDs: S(o1)];
+	[store insertPersistentRootUUID: [ETUUID UUID]
+	                commitTrackUUID: [ETUUID UUID]
+					 rootObjectUUID: o1];
 
 	[store beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: nil];
 
@@ -162,7 +170,9 @@
 {
 	ETUUID *o1 = [ETUUID UUID];
 
-	[store insertRootObjectUUIDs: S(o1)];
+	[store insertPersistentRootUUID: [ETUUID UUID]
+	                commitTrackUUID: [ETUUID UUID]
+					 rootObjectUUID: o1];
 	[store beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: nil];
 	[store beginChangesForObjectUUID: o1];
 	[store setValue: nil

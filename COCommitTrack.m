@@ -53,6 +53,7 @@
 - (void)dealloc
 {
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
+	DESTROY(UUID);
 	DESTROY(trackedObject);
 	DESTROY(parentTrack);
 	DESTROY(label);

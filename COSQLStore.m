@@ -13,7 +13,8 @@
 	db = [[FMDatabase alloc] initWithPath: [url path]];
 	if (![self setupDB])
 	{
-		NSLog(@"DB Create Failed");
+		[NSException raise: NSInternalInconsistencyException
+				 	format: _(@"WARNING: Failed to create DB at %@"), aURL];
 		[self release];
 		return nil;
 	}
@@ -49,21 +50,22 @@ void CHECK(id db)
 	}
 }
 
-- (BOOL)setupDB
+/**
+ * Returns the latest schema version.
+ *
+ * For each new store at the current URL, the returned version is set as the store version.
+ */
+- (int64_t)version
+{
+	return 2;
+}
+
+- (void)adjustDBForPerformance
 {
 	// FIXME: Not sure whether to use or not.
 	//[db setShouldCacheStatements: YES];
-	
-	if (![db open])
-	{
-		NSLog(@"couldn't open db at %@", url);
-		return NO;
-	}
-	
-	BOOL success = YES;
 
-	// Should improve performance
-#if 0	
+#if 0
 	FMResultSet *setToWAL = [db executeQuery: @"PRAGMA journal_mode=WAL"];
 	[setToWAL next];
 	if (![@"wal" isEqualToString: [setToWAL stringForColumnIndex: 0]])
@@ -71,75 +73,124 @@ void CHECK(id db)
 		NSLog(@"Enabling WAL mode failed.");
 	}
 	[setToWAL close];
-#endif	
-	
+#endif
+}
+
+- (int64_t)schemaVersionFromExistingDB
+{
 	FMResultSet *storeVersionRS = [db executeQuery: @"SELECT version FROM storeMetadata"];
+	
 	if ([storeVersionRS next])
 	{
-		int ver = [storeVersionRS intForColumnIndex: 0];
+		int64_t ver = [storeVersionRS longLongIntForColumnIndex: 0];
 		[storeVersionRS close];
-		
-		if (ver != 1)
-		{
-			NSLog(@"Error: unsupported store version %d", ver);
-			return NO;
-		}
-		// DB is already set up.
-		return YES;
+		return ver;
 	}
 	else
 	{
 		[storeVersionRS close];
 	}
+	return 0;
+}
+
+
+/* Explanation of full-text search
+
+   The FTS3 table actually has two columns: rowid, which is an integer primary
+   key, and content, which is the string content which will be indexed.
+
+   Each row inserted in to the commits table will specifies a {property : value} 
+   tuple for a given object modified in a given commit, and the rows are 
+   identified by the commitrow column. So when we insert a row in to commits 
+   that we want to be searchable, we also insert into the commitsTextSearch 
+   table (commitrow, <text to be indexed>).
+
+   To get full-text search results, we search for text in the commitsTextSearch
+   table, which gives us a table of commitrow integers, which we can look up in 
+   the commits table for the actual search results. */
+- (BOOL)setUpTablesForCurrentSchema
+{
+	BOOL success = YES;
 	
-	
-	// Otherwise, set up the DB
+	/* Store Metadata tables (including schema version) */
 
 	success = success && [db executeUpdate: @"CREATE TABLE storeUUID(uuid STRING)"]; CHECK(db);
 	success = success && [db executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, plist BLOB)"]; CHECK(db);
-
-	success = success && [db executeUpdate: @"INSERT INTO storeUUID(uuid) VALUES(?)", [[ETUUID UUID] stringValue]]; CHECK(db);
-	success = success && [db executeUpdate: @"INSERT INTO storeMetadata(version) VALUES(1)"]; CHECK(db);
-
-	// Instead of storing UUIDs and property names thoughout the database,
-	// we store them in two tables, and use integer ID's to refer to those
-	// UUIDs/property names.
 	
+	success = success && [db executeUpdate: @"INSERT INTO storeUUID(uuid) VALUES(?)", [[ETUUID UUID] stringValue]]; CHECK(db);
+	success = success && [db executeUpdate: @"INSERT INTO storeMetadata(version) VALUES(?)", [NSNumber numberWithLongLong: [self version]]]; CHECK(db);
+	
+	/* Main Index Tables 
+	 
+	   Instead of storing UUIDs and property names thoughout the database, we
+	   store them in two tables, and use integer ID's to refer to those 
+	   UUIDs/property names. */
+	
+	// UUID Index table
 	success = success && [db executeUpdate: @"CREATE TABLE uuids(uuidIndex INTEGER PRIMARY KEY, uuid STRING, rootIndex INTEGER)"]; CHECK(db);
 	success = success && [db executeUpdate: @"CREATE INDEX uuidsIndex ON uuids(uuid)"]; CHECK(db);
-
+	
+	// Property Index table
 	success = success && [db executeUpdate: @"CREATE TABLE properties(propertyIndex INTEGER PRIMARY KEY, property STRING)"]; CHECK(db);
 	success = success && [db executeUpdate: @"CREATE INDEX propertiesIndex ON properties(property)"]; CHECK(db);
-
-	// One table for storing commit metadata
 	
+	/* Persistent Root and Branch Tables */
+	
+	// Persistent Root table (cheap copies share the same root object UUID
+	// than the persistent root that owns their parent track)
+	success = success && [db executeUpdate: @"CREATE TABLE persistentRoots(uuid INTEGER PRIMARY KEY, rootobjectuuid INTEGER, mainbranchuuid INTEGER, deleted BOOLEAN)"]; CHECK(db);
+	
+	// Branch and Cheap Copy table
+	success = success && [db executeUpdate: @"CREATE TABLE branches(uuid INTEGER PRIMARY KEY, persistentrootuuid INTEGER, parentrevisionnumber INTEGER, copied BOOLEAN, deleted BOOLEAN)"]; CHECK(db);
+	
+	/* Commit Tables */
+	
+	// Commit Metadata Table
 	success = success && [db executeUpdate: @"CREATE TABLE commitMetadata(revisionnumber INTEGER PRIMARY KEY, baserevisionnumber INTEGER, plist BLOB)"]; CHECK(db);
-	success = success && [db executeUpdate: @"CREATE INDEX commitsIndex ON commitMetadata(revisionnumber)"]; CHECK(db);	
-
-	// One table for storing the actual commit data (values/keys modified in each commit)
-	//
-	// Explanation of full-text search:
-	// The FTS3 table actually has two columns: rowid, which is an integer primary key,
-	// and content, which is the string content which will be indexed.
-	//
-	// Each row inserted in to the commits table will specifies a {property : value} tuple
-	// for a given object modified in a given commit, and the rows are identified by the
-	// commitrow column. So when we insert a row in to commits that we want to be searchable,
-	// we also insert into the commitsTextSearch table (commitrow, <text to be indexed>).
-	// 
-	// To get full-text search results, we search for text in the commitsTextSearch table, which
-	// gives us a table of commitrow integers, which we can look up in the commits table for the
-	// actual search results. 
+	success = success && [db executeUpdate: @"CREATE INDEX commitsIndex ON commitMetadata(revisionnumber)"]; CHECK(db);
 	
-	
-	success = success && [db executeUpdate: @"CREATE TABLE commits(commitrow INTEGER PRIMARY KEY, revisionnumber INTEGER, objectuuid INTEGER, property INTEGER, value BLOB)"]; CHECK(db);
+	// Commit table for storing the actual commit data (values/keys modified in each commit)
+	success = success && [db executeUpdate: @"CREATE TABLE commits(commitrow INTEGER PRIMARY KEY, revisionnumber INTEGER, committrackuuuid INTEGER, objectuuid INTEGER, property INTEGER, value BLOB)"]; CHECK(db);
+	// Full-Text Search table (see method comment at the beginning)
 	success = success && [db executeUpdate: @"CREATE VIRTUAL TABLE commitsTextSearch USING fts3()"];	 CHECK(db);
-		
-	// Commit Track node table
+	
+	/* Track Tables */
+	
+	// Commit Track Node table
 	success = success && [db executeUpdate: @"CREATE TABLE commitTrackNode(committracknodeid INTEGER PRIMARY KEY, objectuuid INTEGER, revisionnumber INTEGER, nextnode INTEGER, prevnode INTEGER)"]; CHECK(db);
-	// Commit Track table 
+	// Commit Track table
 	success = success && [db executeUpdate: @"CREATE TABLE commitTrack(objectuuid INTEGER PRIMARY KEY, currentnode INTEGER)"]; CHECK(db);
+	
 	return success;
+}
+
+- (BOOL)setupDB
+{
+	if (![db open])
+	{
+		NSLog(@"WARNING: couldn't open db at %@", url);
+		return NO;
+	}
+	[self adjustDBForPerformance];
+	
+	/* DB creation and schema version check */
+
+	int64_t existingSchemaVersion = [self schemaVersionFromExistingDB];
+	BOOL isNewDB = (existingSchemaVersion == 0);
+
+	if (isNewDB)
+	{
+		return [self setUpTablesForCurrentSchema];
+	}
+	else if (existingSchemaVersion != [self version])
+	{
+		NSLog(@"ERROR: unsupported store version %lld (supported version is %lld)",
+			  existingSchemaVersion, [self version]);
+		return NO;
+	}
+
+	/* DB exists and matches our schema version */
+	return YES;
 }
 
 - (NSNumber*)keyForUUID: (ETUUID*)uuid
@@ -371,38 +422,46 @@ void CHECK(id db)
 	return result;
 }
 
-- (void)insertRootObjectUUID: (ETUUID *)uuid
+- (void)insertPersistentRootUUID: (ETUUID *)aPersistentRootUUID
+				 commitTrackUUID: (ETUUID *)aMainBranchUUID
+				  rootObjectUUID: (ETUUID *)aRootObjectUUID
 {
-	NILARG_EXCEPTION_TEST(uuid);
+	NILARG_EXCEPTION_TEST(aPersistentRootUUID);
+	NILARG_EXCEPTION_TEST(aMainBranchUUID);
+	NILARG_EXCEPTION_TEST(aRootObjectUUID);
 	
-	NSString *uuidString = [uuid stringValue];
+	NSString *uuidString = [aPersistentRootUUID stringValue];
 	assert([uuidString isKindOfClass: [NSString class]]);
     FMResultSet *rs = [db executeQuery: @"SELECT uuidIndex FROM uuids WHERE uuid = ?", uuidString];
 	BOOL wasInsertedPreviously = [rs next];
 
 	[rs close];
 
+	// TODO: Check root object was not inserted previously
 	if (wasInsertedPreviously)
 	{
 		[NSException raise: NSInvalidArgumentException 
-		            format: @"The persistent root UUID %@ was inserted previously.", uuid];
+		            format: @"The persistent root UUID %@ was inserted previously.", aPersistentRootUUID];
 		return;
 	}
-	
-	// TODO: Merge UPDATE into INSERT if possible
-	[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [uuid stringValue]];
-	int64_t key = [db lastInsertRowId];
-	[db executeUpdate: @"UPDATE uuids SET rootIndex = ? WHERE uuidIndex = ?", 
-		[NSNumber numberWithLongLong: key], [NSNumber numberWithLongLong: key]];
-}
 
-// TODO: Rewrite to be handled in two transactions (SELECT and INSERT)
-- (void) insertRootObjectUUIDs: (NSSet *)UUIDs
-{
-	for (ETUUID *uuid in UUIDs)
-	{
-		[self insertRootObjectUUID: uuid];
-	}
+	// TODO: Remove
+	[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [aRootObjectUUID stringValue]];
+	NSNumber *rootIndex = [NSNumber numberWithLongLong: [db lastInsertRowId]];
+	[db executeUpdate: @"UPDATE uuids SET rootIndex = ? WHERE uuidIndex = ?", rootIndex, rootIndex];
+
+	// TODO: Merge multiple INSERT into a single one
+
+	[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [aPersistentRootUUID stringValue]];
+	NSNumber * persistentRootIndex = [NSNumber numberWithLongLong: [db lastInsertRowId]];
+	// [db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [aRootObjectUUID stringValue]];
+	// NSNumber *rootObjectIndex = [NSNumber numberWithLongLong: [db lastInsertRowId]];
+	NSNumber *rootObjectIndex = rootIndex;
+	[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [aMainBranchUUID stringValue]];
+	NSNumber *trackIndex = [NSNumber numberWithLongLong: [db lastInsertRowId]];
+
+	[db executeUpdate: @"INSERT INTO persistentRoots VALUES(?, ?, ?)",
+		persistentRootIndex, rootObjectIndex, trackIndex];
 }
 
 /* Committing Changes */
