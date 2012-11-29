@@ -184,7 +184,7 @@ void CHECK(id db)
 	}
 	else if (existingSchemaVersion != [self version])
 	{
-		NSLog(@"ERROR: unsupported store version %lld (supported version is %lld)",
+		NSLog(@"ERROR: unsupported store version %" PRId64 " (supported version is %" PRId64 ")",
 			  existingSchemaVersion, [self version]);
 		return NO;
 	}
