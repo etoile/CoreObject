@@ -33,7 +33,20 @@
 		607BA16413B4EEE400B86BC6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E271299C77700CCF472 /* main.m */; };
 		60844F281490B6B2008A329F /* COCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 60844F261490B6B2008A329F /* COCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60844F291490B6B2008A329F /* COCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60844F271490B6B2008A329F /* COCollection.m */; };
-		60980C5914C6F6FF001C05F2 /* TestCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60980C5814C6F6FF001C05F2 /* TestCustomTrack.m */; };
+		60955575167AA9BA0017C628 /* TestStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E281299C78C00CCF472 /* TestStore.m */; };
+		60955576167AA9BC0017C628 /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D03129C936E006BEDC3 /* TestCommon.m */; };
+		60955577167AA9C50017C628 /* TestRevisionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F6A31B14444EDA00EFC711 /* TestRevisionNumber.m */; };
+		60955578167AA9CE0017C628 /* TestEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09ADA129B2C9A006BEDC3 /* TestEditingContext.m */; };
+		60955579167B540A0017C628 /* TestCommitTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F6A31A14444EDA00EFC711 /* TestCommitTrack.m */; };
+		6095557A167B540A0017C628 /* TestCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60980C5814C6F6FF001C05F2 /* TestCustomTrack.m */; };
+		6095557B167B540A0017C628 /* TestPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FDED2412A3525A005D6D23 /* TestPerformance.m */; };
+		6095557C167B540A0017C628 /* TestUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E011299C58000CCF472 /* TestUtilities.m */; };
+		6095557D167B540A0017C628 /* TestArrayDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E031299C58000CCF472 /* TestArrayDiff.m */; };
+		6095557E167B540A0017C628 /* TestSynchronization.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09CFB129C9222006BEDC3 /* TestSynchronization.m */; };
+		6095557F167B540A0017C628 /* TestRelationshipIntegrity.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */; };
+		60955580167B540A0017C628 /* TestHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */; };
+		60955581167B540A0017C628 /* TestObjectGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */; };
+		60955582167B540A0017C628 /* TestCopy.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FDF11B12A7038C005D6D23 /* TestCopy.m */; };
 		60988F17163B6B7A009C4F21 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F16163B6B7A009C4F21 /* Cocoa.framework */; };
 		60988F1D163B6B7A009C4F21 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 60988F1B163B6B7A009C4F21 /* InfoPlist.strings */; };
 		60A55DE114A25AC4007A9864 /* COTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60A55DDF14A25AC4007A9864 /* COTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -45,7 +58,6 @@
 		60C913931653BE1400E0C5F4 /* COPersistentRootEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913911653BE1400E0C5F4 /* COPersistentRootEditingContext.m */; };
 		60C913941656364700E0C5F4 /* COSynchronizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D09B14129B704E006BEDC3 /* COSynchronizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60C913951656364E00E0C5F4 /* COSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09B15129B704E006BEDC3 /* COSynchronizer.m */; };
-		60C913961656364F00E0C5F4 /* COSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09B15129B704E006BEDC3 /* COSynchronizer.m */; };
 		60C913B6165BBED000E0C5F4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60C913B5165BBED000E0C5F4 /* Foundation.framework */; };
 		60C913C1165BBEE600E0C5F4 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
 		60C913C4165BBF2B00E0C5F4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913AD165BBE9E00E0C5F4 /* main.m */; };
@@ -56,14 +68,11 @@
 		60EB4F6A155BDAA700CFBC5C /* COError.m in Sources */ = {isa = PBXBuildFile; fileRef = 60EB4F68155BDAA700CFBC5C /* COError.m */; };
 		60F6A31814444EC300EFC711 /* COCommitTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60F6A31514444EC300EFC711 /* COCommitTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60F6A31914444EC300EFC711 /* COCommitTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F6A31614444EC300EFC711 /* COCommitTrack.m */; };
-		60F6A31C14444EDA00EFC711 /* TestCommitTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F6A31A14444EDA00EFC711 /* TestCommitTrack.m */; };
-		60F6A31D14444EDA00EFC711 /* TestRevisionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F6A31B14444EDA00EFC711 /* TestRevisionNumber.m */; };
 		60FB089813C3076200C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		60FB089B13C3077400C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		60FB0E8C13C61C3A00C2AB94 /* COFault.h in Headers */ = {isa = PBXBuildFile; fileRef = 60FB0E8913C61C3A00C2AB94 /* COFault.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60FB0E8D13C61C3A00C2AB94 /* COFault.m in Sources */ = {isa = PBXBuildFile; fileRef = 60FB0E8A13C61C3A00C2AB94 /* COFault.m */; };
-		6620EFA4129F3AAD00FD5AB9 /* TestHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */; };
 		6620F13C129F8CC500FD5AB9 /* COHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09999129A5B64006BEDC3 /* COHistoryTrack.m */; };
 		6686BDE712592C5D0065DE1A /* COObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDB812592C1B0065DE1A /* COObject.m */; };
 		6686BDE912592C5D0065DE1A /* COEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDBB12592C1B0065DE1A /* COEditingContext.m */; };
@@ -93,21 +102,11 @@
 		66D09ABA129B29F3006BEDC3 /* COStringDiff.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDD212592C1B0065DE1A /* COStringDiff.mm */; };
 		66D09ABB129B29F3006BEDC3 /* COArrayDiff.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDD412592C1B0065DE1A /* COArrayDiff.mm */; };
 		66D09ABC129B29F3006BEDC3 /* COSetDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDD612592C1B0065DE1A /* COSetDiff.m */; };
-		66D09ADB129B2C9A006BEDC3 /* TestEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09ADA129B2C9A006BEDC3 /* TestEditingContext.m */; };
-		66D09BC9129C5A1D006BEDC3 /* TestStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E281299C78C00CCF472 /* TestStore.m */; };
-		66D09CFC129C9222006BEDC3 /* TestSynchronization.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09CFB129C9222006BEDC3 /* TestSynchronization.m */; };
-		66D09D04129C936E006BEDC3 /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D03129C936E006BEDC3 /* TestCommon.m */; };
 		66D09D56129CE470006BEDC3 /* COGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D09D54129CE470006BEDC3 /* COGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66D09D57129CE470006BEDC3 /* COGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09D55129CE470006BEDC3 /* COGroup.m */; };
 		66D09D86129CEC8C006BEDC3 /* COContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 79E5EE5812876FC200CDFA23 /* COContainer.m */; };
-		66D09EF4129EF6C7006BEDC3 /* TestRelationshipIntegrity.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */; };
-		66FDEB5512A2F106005D6D23 /* TestObjectGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */; };
 		66FDEB5812A2F150005D6D23 /* COObjectGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BDC312592C1B0065DE1A /* COObjectGraphDiff.m */; };
-		66FDED2512A3525A005D6D23 /* TestPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FDED2412A3525A005D6D23 /* TestPerformance.m */; };
-		66FDF11C12A7038C005D6D23 /* TestCopy.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FDF11B12A7038C005D6D23 /* TestCopy.m */; };
 		791B4E451299C81500CCF472 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E271299C77700CCF472 /* main.m */; };
-		791B4E471299C81500CCF472 /* TestUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E011299C58000CCF472 /* TestUtilities.m */; };
-		791B4E491299C81500CCF472 /* TestArrayDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E031299C58000CCF472 /* TestArrayDiff.m */; };
 		791B4E4C1299C82200CCF472 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
 		791B4E621299C8CB00CCF472 /* CORevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 791B4E5C1299C8CB00CCF472 /* CORevision.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		791B4E631299C8CB00CCF472 /* CORevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E5D1299C8CB00CCF472 /* CORevision.m */; };
@@ -618,6 +617,8 @@
 			isa = PBXGroup;
 			children = (
 				791B4E271299C77700CCF472 /* main.m */,
+				66D09D02129C936E006BEDC3 /* TestCommon.h */,
+				66D09D03129C936E006BEDC3 /* TestCommon.m */,
 				60F6A31A14444EDA00EFC711 /* TestCommitTrack.m */,
 				60980C5814C6F6FF001C05F2 /* TestCustomTrack.m */,
 				60F6A31B14444EDA00EFC711 /* TestRevisionNumber.m */,
@@ -627,8 +628,6 @@
 				791B4E031299C58000CCF472 /* TestArrayDiff.m */,
 				66D09ADA129B2C9A006BEDC3 /* TestEditingContext.m */,
 				66D09CFB129C9222006BEDC3 /* TestSynchronization.m */,
-				66D09D02129C936E006BEDC3 /* TestCommon.h */,
-				66D09D03129C936E006BEDC3 /* TestCommon.m */,
 				66D09EF3129EF6C7006BEDC3 /* TestRelationshipIntegrity.m */,
 				6620EFA3129F3AAD00FD5AB9 /* TestHistoryTrack.m */,
 				66FDEB5412A2F106005D6D23 /* TestObjectGraphDiff.m */,
@@ -1015,21 +1014,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				791B4E451299C81500CCF472 /* main.m in Sources */,
-				791B4E471299C81500CCF472 /* TestUtilities.m in Sources */,
-				791B4E491299C81500CCF472 /* TestArrayDiff.m in Sources */,
-				66D09ADB129B2C9A006BEDC3 /* TestEditingContext.m in Sources */,
-				66D09BC9129C5A1D006BEDC3 /* TestStore.m in Sources */,
-				66D09CFC129C9222006BEDC3 /* TestSynchronization.m in Sources */,
-				66D09D04129C936E006BEDC3 /* TestCommon.m in Sources */,
-				66D09EF4129EF6C7006BEDC3 /* TestRelationshipIntegrity.m in Sources */,
-				6620EFA4129F3AAD00FD5AB9 /* TestHistoryTrack.m in Sources */,
-				66FDEB5512A2F106005D6D23 /* TestObjectGraphDiff.m in Sources */,
-				66FDED2512A3525A005D6D23 /* TestPerformance.m in Sources */,
-				66FDF11C12A7038C005D6D23 /* TestCopy.m in Sources */,
-				60F6A31C14444EDA00EFC711 /* TestCommitTrack.m in Sources */,
-				60F6A31D14444EDA00EFC711 /* TestRevisionNumber.m in Sources */,
-				60980C5914C6F6FF001C05F2 /* TestCustomTrack.m in Sources */,
-				60C913961656364F00E0C5F4 /* COSynchronizer.m in Sources */,
+				60955575167AA9BA0017C628 /* TestStore.m in Sources */,
+				60955576167AA9BC0017C628 /* TestCommon.m in Sources */,
+				60955577167AA9C50017C628 /* TestRevisionNumber.m in Sources */,
+				60955578167AA9CE0017C628 /* TestEditingContext.m in Sources */,
+				60955579167B540A0017C628 /* TestCommitTrack.m in Sources */,
+				6095557A167B540A0017C628 /* TestCustomTrack.m in Sources */,
+				6095557B167B540A0017C628 /* TestPerformance.m in Sources */,
+				6095557C167B540A0017C628 /* TestUtilities.m in Sources */,
+				6095557D167B540A0017C628 /* TestArrayDiff.m in Sources */,
+				6095557E167B540A0017C628 /* TestSynchronization.m in Sources */,
+				6095557F167B540A0017C628 /* TestRelationshipIntegrity.m in Sources */,
+				60955580167B540A0017C628 /* TestHistoryTrack.m in Sources */,
+				60955581167B540A0017C628 /* TestObjectGraphDiff.m in Sources */,
+				60955582167B540A0017C628 /* TestCopy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

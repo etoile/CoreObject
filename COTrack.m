@@ -213,6 +213,16 @@
 	return [revision UUID];
 }
 
+- (ETUUID *)persistentRootUUID
+{
+	return [revision persistentRootUUID];
+}
+
+- (ETUUID *)trackUUID
+{
+	return [revision trackUUID];
+}
+
 - (ETUUID *)objectUUID
 {
 	return [revision objectUUID];

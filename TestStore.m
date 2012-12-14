@@ -14,15 +14,43 @@
 	UKIntsEqual(0, [store latestRevisionNumber]);
 }
 
+- (void)testPersistentRootInsertion
+{
+	ETUUID *rootUUID = [ETUUID UUID];
+	ETUUID *trackUUID = [ETUUID UUID];
+	ETUUID *o1 = [ETUUID UUID];
+	
+	[store insertPersistentRootUUID: rootUUID
+	                commitTrackUUID: trackUUID
+					 rootObjectUUID: o1];
+
+	ETUUID *cheapCopyUUID = [ETUUID UUID];
+	ETUUID *derivedTrackUUID = [ETUUID UUID];
+
+	[store insertPersistentRootUUID: cheapCopyUUID
+	                commitTrackUUID: derivedTrackUUID
+					 rootObjectUUID: o1];
+
+	UKObjectsEqual(o1, [store rootObjectUUIDForPersistentRootUUID: rootUUID]);
+	UKObjectsEqual(o1, [store rootObjectUUIDForPersistentRootUUID: cheapCopyUUID]);
+	UKObjectsEqual(rootUUID, [store persistentRootUUIDForCommitTrackUUID: trackUUID]);
+	UKObjectsEqual(cheapCopyUUID, [store persistentRootUUIDForCommitTrackUUID: derivedTrackUUID]);
+}
+
 - (void)testReopenStore
 {
-	ETUUID *o1 = [ETUUID new];
+	ETUUID *rootUUID = [ETUUID UUID];
+	ETUUID *trackUUID = [ETUUID UUID];
+	ETUUID *o1 = [ETUUID UUID];
 	NSDictionary *sampleMetadata = D([NSNumber numberWithBool: YES], @"metadataWorks");
-	
-	[store insertPersistentRootUUID: [ETUUID UUID]
-	                commitTrackUUID: [ETUUID UUID]
+
+	[store insertPersistentRootUUID: rootUUID
+	                commitTrackUUID: trackUUID
 					 rootObjectUUID: o1];
-	[store beginCommitWithMetadata: sampleMetadata rootObjectUUID: o1 baseRevision: nil];
+	[store beginCommitWithMetadata: sampleMetadata
+	            persistentRootUUID: rootUUID
+	               commitTrackUUID: trackUUID
+	                  baseRevision: nil];
 	[store beginChangesForObjectUUID: o1];
 	[store setValue: @"bob"
 	    forProperty: @"name"
@@ -48,38 +76,49 @@
 
 	UKObjectsEqual([NSNumber numberWithBool: YES], [[c1 metadata] objectForKey: @"metadataWorks"]);
 	UKObjectsEqual(D(@"bob", @"name"), [c1 valuesAndPropertiesForObjectUUID: o1]);
-
-	[o1 release];
 }
-
 
 - (void)testFullTextSearch
 {
+	ETUUID *rootUUID = [ETUUID UUID];
+	ETUUID *trackUUID = [ETUUID UUID];
 	ETUUID *o1 = [ETUUID UUID];
 
-	[store insertPersistentRootUUID: [ETUUID UUID]
-	                commitTrackUUID: [ETUUID UUID]
+	[store insertPersistentRootUUID: rootUUID
+	                commitTrackUUID: trackUUID
 					 rootObjectUUID: o1];
 	
-	[store beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: nil];
+	[store beginCommitWithMetadata: nil
+	            persistentRootUUID: rootUUID
+	               commitTrackUUID: trackUUID
+	                  baseRevision: nil];
 	[store beginChangesForObjectUUID: o1];
 	[store setValue: @"cats" forProperty: @"name" ofObject: o1 shouldIndex: YES];
 	[store finishChangesForObjectUUID: o1];
 	CORevision *c1 = [store finishCommit];
 
-	[store beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: c1];
+	[store beginCommitWithMetadata: nil
+	            persistentRootUUID: rootUUID
+	               commitTrackUUID: trackUUID
+	                  baseRevision: c1];
 	[store beginChangesForObjectUUID: o1];
 	[store setValue: @"dogs" forProperty: @"name" ofObject: o1 shouldIndex: YES];
 	[store finishChangesForObjectUUID: o1];
 	CORevision *c2 = [store finishCommit];
 	
-	[store beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: c2];
+	[store beginCommitWithMetadata: nil
+	            persistentRootUUID: rootUUID
+	               commitTrackUUID: trackUUID
+	                  baseRevision: c2];
 	[store beginChangesForObjectUUID: o1];
 	[store setValue: @"horses" forProperty: @"name" ofObject: o1 shouldIndex: YES];
 	[store finishChangesForObjectUUID: o1];
 	CORevision *c3 = [store finishCommit];
 	
-	[store beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: c3];
+	[store beginCommitWithMetadata: nil
+	            persistentRootUUID: rootUUID
+	               commitTrackUUID: trackUUID
+	                  baseRevision: c3];
 	[store beginChangesForObjectUUID: o1];
 	[store setValue: @"dogpound" forProperty: @"name" ofObject: o1 shouldIndex: YES];
 	[store finishChangesForObjectUUID: o1];
@@ -116,12 +155,17 @@
 
 - (void)testCommitWithNoChanges
 {
+	ETUUID *rootUUID = [ETUUID UUID];
+	ETUUID *trackUUID = [ETUUID UUID];
 	ETUUID *o1 = [ETUUID UUID];
 
-	[store insertPersistentRootUUID: [ETUUID UUID]
-	                commitTrackUUID: [ETUUID UUID]
+	[store insertPersistentRootUUID: rootUUID
+	                commitTrackUUID: trackUUID
 					 rootObjectUUID: o1];
-	[store beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: nil];
+	[store beginCommitWithMetadata: nil
+	            persistentRootUUID: rootUUID
+	               commitTrackUUID: trackUUID
+	                  baseRevision: nil];
 	[store beginChangesForObjectUUID: o1];
 	[store finishChangesForObjectUUID: o1];
 	CORevision *c1 = [store finishCommit];
@@ -135,15 +179,24 @@
 
 - (void)testRootObject
 {
+	ETUUID *rootUUID = [ETUUID UUID];
+	ETUUID *trackUUID = [ETUUID UUID];
 	ETUUID *o1 = [ETUUID UUID];
 	ETUUID *o2 = [ETUUID UUID];
 	ETUUID *o3 = [ETUUID UUID];
 
-	[store insertPersistentRootUUID: [ETUUID UUID]
-	                commitTrackUUID: [ETUUID UUID]
+	[store insertPersistentRootUUID: rootUUID
+	                commitTrackUUID: trackUUID
 					 rootObjectUUID: o1];
 
-	[store beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: nil];
+	[store beginCommitWithMetadata: nil
+	            persistentRootUUID: rootUUID
+	               commitTrackUUID: trackUUID
+	                  baseRevision: nil];
+
+	[store beginChangesForObjectUUID: o1];
+	[store setValue: @"birds" forProperty: @"name" ofObject: o1 shouldIndex: NO];
+	[store finishChangesForObjectUUID: o1];
 
 	[store beginChangesForObjectUUID: o2];
 	[store setValue: @"cats" forProperty: @"name" ofObject: o2 shouldIndex: NO];
@@ -160,20 +213,25 @@
 	UKFalse([store isRootObjectUUID: o2]);
 	UKFalse([store isRootObjectUUID: o3]);
 	UKObjectsEqual(S(o1), [store rootObjectUUIDs]);
-	UKObjectsEqual(S(o1, o2, o3), [store UUIDsForRootObjectUUID: o1]);
-	UKObjectsEqual(o1, [store rootObjectUUIDForUUID: o1]);
-	UKObjectsEqual(o1, [store rootObjectUUIDForUUID: o2]);
-	UKObjectsEqual(o1, [store rootObjectUUIDForUUID: o3]);
+	UKObjectsEqual(S(o1, o2, o3), [store objectUUIDsForCommitTrackUUID: trackUUID]);
+	UKObjectsEqual(o1, [store rootObjectUUIDForObjectUUID: o1]);
+	UKObjectsEqual(o1, [store rootObjectUUIDForObjectUUID: o2]);
+	UKObjectsEqual(o1, [store rootObjectUUIDForObjectUUID: o3]);
 }
 
 - (void)testStoreNil
 {
+	ETUUID *rootUUID = [ETUUID UUID];
+	ETUUID *trackUUID = [ETUUID UUID];
 	ETUUID *o1 = [ETUUID UUID];
-
-	[store insertPersistentRootUUID: [ETUUID UUID]
-	                commitTrackUUID: [ETUUID UUID]
+	
+	[store insertPersistentRootUUID: rootUUID
+	                commitTrackUUID: trackUUID
 					 rootObjectUUID: o1];
-	[store beginCommitWithMetadata: nil rootObjectUUID: o1 baseRevision: nil];
+	[store beginCommitWithMetadata: nil
+	            persistentRootUUID: rootUUID
+	               commitTrackUUID: trackUUID
+	                  baseRevision: nil];
 	[store beginChangesForObjectUUID: o1];
 	[store setValue: nil
 	    forProperty: @"name"

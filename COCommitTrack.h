@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreObject/COTrack.h>
 
-@class COObject, CORevision;
+@class COObject, CORevision, COPersistentRootEditingContext;
 
 /**
  * A persistent history track on an object.
@@ -26,12 +26,14 @@
 {
 	@private
 	ETUUID *UUID;
-	COObject *trackedObject;
+	COPersistentRootEditingContext *editingContext;
 	COCommitTrack *parentTrack;
 	NSString *label;
 	BOOL isMainBranch;
 	BOOL isCopy;
 }
+
+- (id)initWithUUID: (ETUUID *)aUUID editingContext: (COPersistentRootEditingContext *)aContext;
 
 /** @taskunit Tracked Objects */
 
@@ -68,9 +70,14 @@
 
 /** @taskunit Basic Properties */
 
-@property (assign, nonatomic) NSString *label;
-@property (assign, readonly) COCommitTrack *parentTrack;
-@property (assign, readonly) CORevision *parentRevision;
+@property (readonly, nonatomic) ETUUID *UUID;
+@property (retain, nonatomic) NSString *label;
+@property (readonly, nonatomic) COCommitTrack *parentTrack;
+@property (readonly, nonatomic) CORevision *parentRevision;
+/**
+ * The persistent root owning the commit track.
+ */
+@property (readonly, nonatomic) COPersistentRootEditingContext *editingContext;
 
 /** @taskunit Creating Branches and Cheap copies */
 

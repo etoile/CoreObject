@@ -111,7 +111,7 @@ void CHECK(id db)
 - (BOOL)setUpTablesForCurrentSchema
 {
 	BOOL success = YES;
-	
+
 	/* Store Metadata tables (including schema version) */
 
 	success = success && [db executeUpdate: @"CREATE TABLE storeUUID(uuid STRING)"]; CHECK(db);
@@ -150,7 +150,7 @@ void CHECK(id db)
 	success = success && [db executeUpdate: @"CREATE INDEX commitsIndex ON commitMetadata(revisionnumber)"]; CHECK(db);
 	
 	// Commit table for storing the actual commit data (values/keys modified in each commit)
-	success = success && [db executeUpdate: @"CREATE TABLE commits(commitrow INTEGER PRIMARY KEY, revisionnumber INTEGER, committrackuuuid INTEGER, objectuuid INTEGER, property INTEGER, value BLOB)"]; CHECK(db);
+	success = success && [db executeUpdate: @"CREATE TABLE commits(commitrow INTEGER PRIMARY KEY, revisionnumber INTEGER, committrackuuid INTEGER, objectuuid INTEGER, property INTEGER, value BLOB)"]; CHECK(db);
 	// Full-Text Search table (see method comment at the beginning)
 	success = success && [db executeUpdate: @"CREATE VIRTUAL TABLE commitsTextSearch USING fts3()"];	 CHECK(db);
 	
@@ -345,7 +345,7 @@ void CHECK(id db)
 - (BOOL)isRootObjectUUID: (ETUUID *)uuid
 {
 	NILARG_EXCEPTION_TEST(uuid);
-    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = ? AND rootIndex = uuidIndex",
+    FMResultSet *rs = [db executeQuery: @"SELECT rootobjectuuid FROM persistentRoots WHERE rootobjectuuid = ?",
 	                                    [self keyForUUID: uuid]];
 	BOOL result = [rs next];
 	[rs close];
@@ -354,7 +354,7 @@ void CHECK(id db)
 
 - (NSSet *)rootObjectUUIDs
 {
-    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE rootIndex = uuidIndex"];
+    FMResultSet *rs = [db executeQuery: @"SELECT DISTINCT uuids.uuid FROM uuids JOIN persistentRoots ON uuids.uuidindex = persistentRoots.rootobjectuuid"];
 	NSMutableSet *result = [NSMutableSet set];
 
 	while ([rs next])
@@ -366,49 +366,63 @@ void CHECK(id db)
 	return result;
 }
 
-- (NSSet *)UUIDsForRootObjectUUID: (ETUUID *)aUUID
+- (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID
 {
 	NILARG_EXCEPTION_TEST(aUUID);
-    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE rootIndex = ?", [self keyForUUID: aUUID]];
+    FMResultSet *rs = [db executeQuery: @"SELECT DISTINCT uuids.uuid FROM uuids JOIN commits ON uuids.uuidindex = commits.objectuuid WHERE commits.committrackuuid = ?", [self keyForUUID: aUUID]]; CHECK(db);
 	NSMutableSet *result = [NSMutableSet set];
 
 	while ([rs next])
 	{
 		[result addObject: [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]]];
 	}
-	ETAssert([result containsObject: aUUID]);
+	ETAssert([result containsObject: aUUID] == NO);
 
 	[rs close];
 	return result;
 }
 
-- (NSSet *)UUIDsForRootObjectUUID: (ETUUID *)aUUID atRevision: (CORevision *)revision
+- (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID atRevision: (CORevision *)revision
 {
 	NILARG_EXCEPTION_TEST(aUUID);
 	NILARG_EXCEPTION_TEST(revision);
+
 	// FIXME: This may need to be optimised by storing a list of object UUIDs
 	// at some revisions.
-	NSMutableSet *uuids = [NSMutableSet set];
+	FMResultSet *rs = [db executeQuery: @"SELECT DISTINCT uuids.uuid FROM uuids JOIN commits ON uuids.uuidindex = commits.objectuuid WHERE commits.committrackuuid = ? and revisionnumber <= ?", [self keyForUUID: aUUID], [NSNumber numberWithLongLong: [revision revisionNumber]]]; CHECK(db);
+	NSMutableSet *result = [NSMutableSet set];
 
-	while (revision != nil)
+	while ([rs next])
 	{
-    		FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids JOIN commits ON uuids.uuidindex = commits.objectuuid "
-			"WHERE rootindex = ? AND revisionnumber = ?", 
-			[self keyForUUID: aUUID], [NSNumber numberWithLongLong: [revision revisionNumber]]]; CHECK(db);
-		while ([rs next])
-		{
-			[uuids addObject: [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]]];
-		}
-		revision = [revision baseRevision];
+		[result addObject: [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]]];
 	}
-	return uuids;
+	ETAssert([result containsObject: aUUID] == NO);
+
+	[rs close];
+	return result;
 }
 
-- (ETUUID *)rootObjectUUIDForUUID: (ETUUID *)aUUID
+- (NSNumber *)anyTrackIndexForObjectUUID: (ETUUID *)aUUID
+{
+	FMResultSet *rs = [db executeQuery: @"SELECT committrackuuid FROM commits WHERE objectuuid = ? LIMIT 1", [self keyForUUID: aUUID]]; CHECK(db);
+	NSNumber *result = nil;
+	
+	if ([rs next])
+	{
+		result = [NSNumber numberWithLongLong: [rs longLongIntForColumn: @"committrackuuid"]];
+		/* We expect a single result */
+		ETAssert([rs next] == NO);
+	}
+
+	[rs close];
+	return result;
+}
+
+- (ETUUID *)rootObjectUUIDForObjectUUID: (ETUUID *)aUUID
 {
 	NILARG_EXCEPTION_TEST(aUUID);
-    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = "
-		"(SELECT rootIndex FROM uuids WHERE uuid = ?)", aUUID];
+
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidindex = (SELECT rootobjectuuid FROM persistentRoots WHERE uuid = (SELECT persistentrootuuid FROM branches WHERE uuid = ?))", [self anyTrackIndexForObjectUUID: aUUID]]; CHECK(db);
 	ETUUID *result = nil;
 	
 	if ([rs next])
@@ -420,6 +434,75 @@ void CHECK(id db)
 
 	[rs close];
 	return result;
+}
+
+- (ETUUID *)rootObjectUUIDForPersistentRootUUID: (ETUUID *)aPersistentRootUUID
+{
+	NILARG_EXCEPTION_TEST(aPersistentRootUUID);
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = (SELECT rootobjectuuid FROM persistentRoots WHERE uuid = ?)", [self keyForUUID: aPersistentRootUUID]]; CHECK(db);
+	ETUUID *result = nil;
+	
+	if ([rs next])
+	{
+		result = [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]];
+		/* We expect a single result */
+		ETAssert([rs next] == NO);
+	}
+	
+	[rs close];
+	return result;
+}
+
+- (ETUUID *)persistentRootUUIDForCommitTrackUUID: (ETUUID *)aTrackUUID
+{
+	NILARG_EXCEPTION_TEST(aTrackUUID);
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = (SELECT persistentrootuuid FROM branches WHERE uuid = ?)", [self keyForUUID: aTrackUUID]]; CHECK(db);
+	ETUUID *result = nil;
+	
+	if ([rs next])
+	{
+		result = [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]];
+		/* We expect a single result */
+		ETAssert([rs next] == NO);
+	}
+	
+	[rs close];
+	return result;
+}
+
+- (ETUUID *)mainBranchUUIDForPersistentRootUUID: (ETUUID *)aUUID
+{
+	NILARG_EXCEPTION_TEST(aUUID);
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = (SELECT mainbranchuuid FROM persistentRoots WHERE uuid = ?)", [self keyForUUID: aUUID]]; CHECK(db);
+	ETUUID *result = nil;
+	
+	if ([rs next])
+	{
+		result = [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]];
+		/* We expect a single result */
+		ETAssert([rs next] == NO);
+	}
+	
+	[rs close];
+	return result;
+}
+
+- (ETUUID *)persistentRootUUIDForRootObjectUUID: (ETUUID *)aUUID
+{
+	NILARG_EXCEPTION_TEST(aUUID);
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = (SELECT uuid FROM persistentRoots WHERE rootobjectuuid = ?)", [self keyForUUID: aUUID]]; CHECK(db);
+	ETUUID *result = nil;
+	
+	if ([rs next])
+	{
+		result = [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]];
+		/* We expect a single result */
+		ETAssert([rs next] == NO);
+	}
+	
+	[rs close];
+	return result;
+	return nil;
 }
 
 - (void)insertPersistentRootUUID: (ETUUID *)aPersistentRootUUID
@@ -446,29 +529,29 @@ void CHECK(id db)
 	}
 
 	// TODO: Remove
-	[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [aRootObjectUUID stringValue]];
-	NSNumber *rootIndex = [NSNumber numberWithLongLong: [db lastInsertRowId]];
-	[db executeUpdate: @"UPDATE uuids SET rootIndex = ? WHERE uuidIndex = ?", rootIndex, rootIndex];
+	NSNumber *rootIndex = [self keyForUUID: aRootObjectUUID];
+	[db executeUpdate: @"UPDATE uuids SET rootIndex = ? WHERE uuidIndex = ?", rootIndex, rootIndex]; CHECK(db);
 
 	// TODO: Merge multiple INSERT into a single one
 
-	[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [aPersistentRootUUID stringValue]];
+	[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", aPersistentRootUUID]; CHECK(db);
 	NSNumber * persistentRootIndex = [NSNumber numberWithLongLong: [db lastInsertRowId]];
-	// [db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [aRootObjectUUID stringValue]];
+	// [db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [aRootObjectUUID stringValue]]; CHECK(db);
 	// NSNumber *rootObjectIndex = [NSNumber numberWithLongLong: [db lastInsertRowId]];
 	NSNumber *rootObjectIndex = rootIndex;
-	[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [aMainBranchUUID stringValue]];
+	[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", aMainBranchUUID]; CHECK(db);
 	NSNumber *trackIndex = [NSNumber numberWithLongLong: [db lastInsertRowId]];
 
-	[db executeUpdate: @"INSERT INTO persistentRoots VALUES(?, ?, ?)",
-		persistentRootIndex, rootObjectIndex, trackIndex];
+	[db executeUpdate: @"INSERT INTO persistentRoots VALUES(?, ?, ?, NULL)", persistentRootIndex, rootObjectIndex, trackIndex]; CHECK(db);
+	[db executeUpdate: @"INSERT INTO branches VALUES(?, ?, NULL, NULL, NULL)", trackIndex, persistentRootIndex]; CHECK(db);
 }
 
 /* Committing Changes */
 
 - (void)beginCommitWithMetadata: (NSDictionary *)metadata
-                 rootObjectUUID: (ETUUID *)rootUUID
-		   baseRevision: (CORevision*)baseRevision
+			 persistentRootUUID: (ETUUID *)aPersistentRootUUID
+				commitTrackUUID: (ETUUID *)aTrackUUID
+                   baseRevision: (CORevision *)baseRevision
 				 
 {
 	NSNumber *baseRevisionNumber = nil;
@@ -485,18 +568,20 @@ void CHECK(id db)
 	{
 		[NSException raise: NSGenericException format: @"Attempt to call -beginCommitWithMetadata: while a commit is already in progress."];
 	}
-	if ([self isRootObjectUUID: rootUUID] == NO)
+	/*if ([self isRootObjectUUID: rootUUID] == NO)
 	{
 		[NSException raise: NSGenericException format: @"The object UUID %@ is not listed among the root objects.", rootUUID];	
-	}
+	}*/
 
 	commitInProgress = [[NSNumber numberWithUnsignedLongLong: [self latestRevisionNumber] + 1] retain];
-	ASSIGN(rootInProgress, [self keyForUUID: rootUUID]);
+	ASSIGN(rootInProgress, [self keyForUUID: aPersistentRootUUID]);
+	ASSIGN(trackInProgress, [self keyForUUID: aTrackUUID]);
 
 	NSMutableDictionary *commitMetadata = [NSMutableDictionary dictionaryWithDictionary: metadata];
 
+	// TODO: Should we include the persistent root and commit track among the metadata...
 	[commitMetadata addEntriesFromDictionary: 
-		D([[ETUUID UUID] stringValue], @"UUID", [NSDate date], @"date", [rootUUID stringValue], @"objectUUID")];
+		D([[ETUUID UUID] stringValue], @"UUID", [NSDate date], @"date", [aPersistentRootUUID stringValue], @"persistentRootUUID", [aTrackUUID stringValue], @"commitTrackUUID")];
 
 	NSData *data = [NSPropertyListSerialization dataFromPropertyList: commitMetadata
 															  format: NSPropertyListXMLFormat_v1_0
@@ -537,8 +622,9 @@ void CHECK(id db)
 	}
 	//NSLog(@"STORE WRITE (%@) object %@, property %@, value %@", commitInProgress, object, property, value);
 
-	[db executeUpdate: @"INSERT INTO commits(commitrow, revisionnumber, objectuuid, property, value) VALUES(NULL, ?, ?, ?, ?)",
+	[db executeUpdate: @"INSERT INTO commits(commitrow, revisionnumber, committrackuuid, objectuuid, property, value) VALUES(NULL, ?, ?, ?, ?, ?)",
 		commitInProgress,
+		trackInProgress,
 		[self keyForUUID: objectInProgress],
 		[self keyForProperty: property],
 		data];
@@ -577,11 +663,12 @@ void CHECK(id db)
 	
 	CORevision *result = [self revisionWithRevisionNumber: [commitInProgress unsignedLongLongValue]];
 	
-	[self addRevision: result toTrackUUID: [self UUIDForKey: [rootInProgress longLongValue]]];
+	[self addRevision: result toTrackUUID: [self UUIDForKey: [trackInProgress longLongValue]]];
 	[db commit];
 	
 	DESTROY(commitInProgress);
 	DESTROY(rootInProgress);
+	DESTROY(trackInProgress);
 	return result;
 }
 
@@ -593,8 +680,7 @@ void CHECK(id db)
 	CORevision *result = [commitObjectForID objectForKey: idNumber];
 	if (result == nil)
 	{
-		FMResultSet *rs = [db executeQuery:@"SELECT revisionnumber, baserevisionnumber FROM commitMetadata WHERE revisionnumber = ?",
-						   idNumber];
+		FMResultSet *rs = [db executeQuery:@"SELECT revisionnumber, baserevisionnumber FROM commitMetadata WHERE revisionnumber = ?", idNumber]; CHECK(db);
 		if ([rs next])
 		{
 			int64_t baseRevisionNumber = [rs longLongIntForColumnIndex: 1];

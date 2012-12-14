@@ -19,11 +19,12 @@
 	SUPERINIT;
 
 	ASSIGN(_persistentRootUUID, aUUID);
-	// TODO: Use the track UUID and the root object as no editing context at all
-	// when the initializer is called.
-	//ASSIGN(_commitTrack, [COCommitTrack trackWithObject: aRootObject]);
 	ASSIGN(_rootObject, aRootObject);
 	_parentContext = aCtxt;
+	if ([_parentContext store] != nil)
+	{
+		_commitTrack = [[COCommitTrack alloc] initWithUUID: aTrackUUID editingContext: self];
+	}
 
 	_insertedObjects = [[NSMutableSet alloc] init];
 	_deletedObjects = [[NSMutableSet alloc] init];
@@ -323,13 +324,14 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 		ETAssert([_insertedObjects containsObject: _rootObject]);
 
 		[store insertPersistentRootUUID: [self persistentRootUUID]
-						commitTrackUUID: [ETUUID UUID]
+						commitTrackUUID: [[self commitTrack] UUID]
 						 rootObjectUUID: [_rootObject UUID]];
 	}
 
-	[store beginCommitWithMetadata: metadata 
-	                 rootObjectUUID: [_rootObject UUID]
-	                   baseRevision: [_rootObject revision]];
+	[store beginCommitWithMetadata: metadata
+	            persistentRootUUID: [self persistentRootUUID]
+	               commitTrackUUID: [[self commitTrack] UUID]
+	                  baseRevision: [_rootObject revision]];
 
 	for (COObject *obj in committedObjects)
 	{		
@@ -484,8 +486,6 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 {
 	// TODO: Handle invalid revision. May be call -unloadRootObjectTree: if the
 	// revision is older than the root object creation revision.
-	
-	ETUUID *rootObjectUUID = [[self rootObject] UUID];
 	CORevision *currentRevision = [self revision];
 	COStore *store = [_parentContext store];
 
@@ -504,10 +504,11 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	// automatically be faulted in (I think).
 	
 	// All objects in all revisions
-	NSSet *allIDs = [store UUIDsForRootObjectUUID: rootObjectUUID];
+	NSSet *allIDs = [store objectUUIDsForCommitTrackUUID: [[self commitTrack] UUID]];
 	
 	// Objects needed in this revision
-	NSSet *neededIDs = [store UUIDsForRootObjectUUID: rootObjectUUID atRevision: revision];
+	NSSet *neededIDs = [store objectUUIDsForCommitTrackUUID: [[self commitTrack] UUID]
+	                                             atRevision: revision];
 	
 	// Loaded objects in editing context
 	NSMutableSet *loadedIDs = [NSMutableSet setWithSet: allIDs];
@@ -521,12 +522,12 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	NSMutableSet *unwantedIDs = [NSMutableSet setWithSet: loadedIDs];
 	[unwantedIDs minusSet: neededIDs];
 	
-	FOREACH(neededAndLoadedIDs, uuid, ETUUID*)
+	FOREACH(neededAndLoadedIDs, uuid, ETUUID *)
 	{
 		[self loadObject: [_parentContext loadedObjectForUUID: uuid] atRevision: revision];
 	}
 	
-	FOREACH(unwantedIDs, uuid, ETUUID*)
+	FOREACH(unwantedIDs, uuid, ETUUID *)
 	{
 		[_parentContext discardLoadedObjectForUUID: uuid];
 	}
@@ -549,7 +550,6 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 - (void)unload
 {
 	COStore *store = [_parentContext store];
-	ETUUID *rootObjectUUID = [[self rootObject] UUID];
 	//CORevision *oldRevision = [_rootObjectRevisions objectForKey: rootObjectUUID];
 
 	[self setRevision: nil];
@@ -564,7 +564,7 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	// automatically be faulted in (I think).
 	
 	// All objects in all revisions
-	NSSet *allIDs = [store UUIDsForRootObjectUUID: rootObjectUUID];
+	NSSet *allIDs = [store objectUUIDsForCommitTrackUUID: [[self commitTrack] UUID]];
 	
 	// Loaded objects in editing context
 	NSMutableSet *loadedIDs = [NSMutableSet setWithSet: allIDs];
@@ -573,12 +573,12 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	// Loaded objects to be unloaded
 	NSMutableSet *unwantedIDs = [NSMutableSet setWithSet: loadedIDs];
 	
-	FOREACH(unwantedIDs, uuid, ETUUID*)
+	FOREACH(unwantedIDs, uuid, ETUUID *)
 	{
 		[_parentContext discardLoadedObjectForUUID: uuid];
 	}
 	
-	[_parentContext discardLoadedObjectForUUID: rootObjectUUID];
+	[_parentContext discardLoadedObjectForUUID: [[self rootObject] UUID]];
 }
 
 @end

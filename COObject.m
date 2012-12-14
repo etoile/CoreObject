@@ -370,8 +370,9 @@
 
 	CORevision *loadedRev = [_context revision];
 
-	NSSet *innerObjectUUIDs = [[[self editingContext] store] UUIDsForRootObjectUUID: [self UUID]
-	                                                                     atRevision: loadedRev];
+	ETUUID *trackUUID = [[[self editingContext] commitTrack] UUID];
+	NSSet *innerObjectUUIDs = [[[self editingContext] store] objectUUIDsForCommitTrackUUID: trackUUID
+	                                                                            atRevision: loadedRev];
 	NSMutableSet *innerObjects = [NSMutableSet setWithCapacity: [innerObjectUUIDs count]];
 
 	for (ETUUID *uuid in innerObjectUUIDs)

@@ -61,19 +61,43 @@
 	return nil;
 }
 
-- (NSSet *)UUIDsForRootObjectUUID: (ETUUID *)aUUID
+- (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID
 {
 	[self doesNotRecognizeSelector: _cmd];
 	return nil;
 }
 
-- (NSSet *)UUIDsForRootObjectUUID: (ETUUID *)aUUID atRevision: (CORevision *)revision
+- (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID atRevision: (CORevision *)revision
 {
 	[self doesNotRecognizeSelector: _cmd];
 	return nil;
 }
 
-- (ETUUID *)rootObjectUUIDForUUID: (ETUUID *)aUUID
+- (ETUUID *)rootObjectUUIDForObjectUUID: (ETUUID *)aUUID
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
+}
+
+- (ETUUID *)rootObjectUUIDForPersistentRootUUID: (ETUUID *)aPersistentRootUUID
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
+}
+
+- (ETUUID *)persistentRootUUIDForCommitTrackUUID: (ETUUID *)aTrackUUId
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
+}
+
+- (ETUUID *)mainBranchUUIDForPersistentRootUUID: (ETUUID *)aUUID
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
+}
+
+- (ETUUID *)persistentRootUUIDForRootObjectUUID: (ETUUID *)aUUID
 {
 	[self doesNotRecognizeSelector: _cmd];
 	return nil;
@@ -89,8 +113,9 @@
 /* Committing Changes */
 
 - (void)beginCommitWithMetadata: (NSDictionary *)metadata
-                 rootObjectUUID: (ETUUID *)rootUUID
-		   baseRevision: (CORevision*)baseRevision
+			 persistentRootUUID: (ETUUID *)aPersistentRootUUID
+				commitTrackUUID: (ETUUID *)aTrackUUID
+                   baseRevision: (CORevision *)baseRevision
 				 
 {
 	// TODO: Move some core logic here

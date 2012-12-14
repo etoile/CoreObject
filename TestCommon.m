@@ -147,6 +147,8 @@
 - (id)init
 {
 	SUPERINIT;
+	/* Delete existing db file in case -dealloc didn't run */
+	[self deleteStore];
 	[self instantiateNewContextAndStore];
 	return self;
 }

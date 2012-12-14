@@ -56,9 +56,19 @@
 	return [ETUUID UUIDWithString: [[self metadata] objectForKey: @"UUID"]];
 }
 
+- (ETUUID *)persistentRootUUID
+{
+	return [[self metadata] objectForKey: @"persistentRootUUID"];
+}
+
+- (ETUUID *)trackUUID
+{
+	return [[self metadata] objectForKey: @"commitTrackUUID"];
+}
+
 - (ETUUID *)objectUUID
 {
-	return [ETUUID UUIDWithString: [[self metadata] objectForKey: @"objectUUID"]];
+	return [store rootObjectUUIDForPersistentRootUUID: [self persistentRootUUID]];
 }
 
 - (NSDate *)date

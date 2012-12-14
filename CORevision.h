@@ -58,6 +58,14 @@
  * Returns the revision UUID. 
  */
 - (ETUUID *)UUID;
+/**
+ * Returns the persistent object UUID involved in the revision.
+ */
+- (ETUUID *)persistentRootUUID;
+/**
+ * Returns the commit track UUID involved in the revision.
+ */
+- (ETUUID *)trackUUID;
 /** 
  * Returns the root object UUID involved in the revision. 
  */

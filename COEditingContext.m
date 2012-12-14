@@ -176,7 +176,7 @@ store by other processes. */
 {
 	COPersistentRootEditingContext *ctxt =
 		[[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: [ETUUID UUID]
-														   commitTrackUUID: nil
+														   commitTrackUUID: [ETUUID UUID]
 																rootObject: aRootObject
 															 parentContext: self];
 	[_persistentRootContexts setObject: ctxt forKey: [ctxt persistentRootUUID]];
@@ -288,7 +288,7 @@ store by other processes. */
 		
 		// NOTE: We could resolve the root object at loading time, but since 
 		// it's going to should be available in memory, we rather resolve it now.
-		ETUUID *rootUUID = [_store rootObjectUUIDForUUID: uuid];
+		ETUUID *rootUUID = [_store rootObjectUUIDForObjectUUID: uuid];
 		ETAssert(rootUUID != nil);
 		BOOL isRoot = [rootUUID isEqual: uuid];
 		id rootObject = nil;
@@ -298,7 +298,9 @@ store by other processes. */
 		{
 			if (nil == revision)
 			{
-				NSArray *revisionNodes = [_store revisionsForTrackUUID: rootUUID
+				ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: rootUUID];
+				ETUUID *trackUUID = [_store mainBranchUUIDForPersistentRootUUID: persistentRootUUID];
+				NSArray *revisionNodes = [_store revisionsForTrackUUID: trackUUID
 				                                      currentNodeIndex: NULL
 				                                         backwardLimit: 0
 				                                          forwardLimit: 0];
@@ -566,6 +568,7 @@ store by other processes. */
 	for (COPersistentRootEditingContext *ctxt in persistentRootContexts)
 	{
 		[revisions addObject: [ctxt saveCommitWithMetadata: metadata]];
+		_latestRevisionNumber = [[revisions lastObject] revisionNumber];
 	}
 
  	[self postCommitNotificationsWithRevisions: revisions];

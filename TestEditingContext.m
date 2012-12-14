@@ -78,6 +78,8 @@
 	[obj setValue: @"Hello" forProperty: @"label"];
 	[ctx commit];
 	
+	UKIntsEqual(1, [ctx latestRevisionNumber]);
+	
 	[self instantiateNewContextAndStore];
 
 	obj = [ctx objectWithUUID: objUUID];

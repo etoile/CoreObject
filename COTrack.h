@@ -198,6 +198,14 @@
  */
 - (ETUUID *)UUID;
 /**
+ * See -[CORevision persistentRootUUID].
+ */
+- (ETUUID *)persistentRootUUID;
+/**
+ * See -[CORevision trackUUID].
+ */
+- (ETUUID *)trackUUID;
+/**
  * See -[CORevision objectUUID].
  */
 - (ETUUID *)objectUUID;

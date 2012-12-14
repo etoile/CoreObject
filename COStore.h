@@ -13,6 +13,7 @@
 	
 	NSNumber *commitInProgress;
 	NSNumber *rootInProgress;
+	NSNumber *trackInProgress;
 	ETUUID *objectInProgress;
 
 	BOOL hasPushedChanges;
@@ -76,14 +77,21 @@
 
 /** 
  * <override-subclass />
- * Returns whether the UUID corresponds to a persistent root in the store.
+ * Returns whether the UUID corresponds to a root object in the store.
+ *
+ * A root object is bound to a persistent root and its cheap copies (derived 
+ * persistent roots).
  *
  * For a nil UUID, raises a NSInvalidArgumentException.
  */
 - (BOOL)isRootObjectUUID: (ETUUID *)aUUID;
 /**
  * <override-subclass />
- * Returns the UUIDs that correspond to persistent roots in the store. 
+ * Returns the UUIDs that correspond to the root objects in the store.
+ *
+ * When cheap copies exist in the store, the root object count and the 
+ * persistent root count don't match, because root objects are shared accross 
+ * a persistent root and its cheap copies.
  *
  * For a new store, will return an empty set. 
  */
@@ -97,7 +105,7 @@
  *
  * The UUID must not be nil, otherwise raises a NSInvalidArgumentException.
  */
-- (NSSet *)UUIDsForRootObjectUUID: (ETUUID *)aUUID;
+- (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID;
 
 /**
  * <override-subclass />
@@ -107,7 +115,7 @@
  *
  * The UUID must not be nil, otherwise raises a NSInvalidArgumentException.
  */
-- (NSSet *)UUIDsForRootObjectUUID: (ETUUID *)aUUID atRevision: (CORevision *)revision;
+- (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID atRevision: (CORevision *)revision;
 
 /** 
  *  <override-subclass />
@@ -118,7 +126,12 @@
  *
  * The UUID must not be nil, otherwise raises a NSInvalidArgumentException.
  */
-- (ETUUID *)rootObjectUUIDForUUID: (ETUUID *)aUUID;
+- (ETUUID *)rootObjectUUIDForObjectUUID: (ETUUID *)aUUID;
+- (ETUUID *)rootObjectUUIDForPersistentRootUUID: (ETUUID *)aPersistentRootUUID;
+- (ETUUID *)persistentRootUUIDForCommitTrackUUID: (ETUUID *)aTrackUUId;
+- (ETUUID *)mainBranchUUIDForPersistentRootUUID: (ETUUID *)aUUID;
+// TODO: Remove
+- (ETUUID *)persistentRootUUIDForRootObjectUUID: (ETUUID *)aUUID;
 /** 
  * <override-subclass />
  * Inserts new UUIDs marked as persistent roots. 
@@ -134,9 +147,10 @@
 
 /** @taskunit Committing Changes */
 
-- (void)beginCommitWithMetadata: (NSDictionary *)meta 
-                 rootObjectUUID: (ETUUID *)rootUUID
-                   baseRevision: (CORevision *)revision;
+- (void)beginCommitWithMetadata: (NSDictionary *)metadata
+			 persistentRootUUID: (ETUUID *)aPersistentRootUUID
+				commitTrackUUID: (ETUUID *)aTrackUUID
+                   baseRevision: (CORevision *)baseRevision;
 
 - (void)beginChangesForObjectUUID: (ETUUID *)object;
 

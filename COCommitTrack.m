@@ -18,26 +18,29 @@
 
 @implementation COCommitTrack
 
-@synthesize trackedObject, label, parentTrack, isCopy, isMainBranch;
+@synthesize UUID, editingContext, label, parentTrack, isCopy, isMainBranch;
 
-- (id)initWithTrackedObjects: (NSSet *)trackedObjects
+- (id)initWithUUID: (ETUUID *)aUUID editingContext: (COPersistentRootEditingContext *)aContext;
 {
-	INVALIDARG_EXCEPTION_TEST(trackedObjects, [trackedObjects count] <= 1);
+	NILARG_EXCEPTION_TEST(aUUID);
+	NILARG_EXCEPTION_TEST(aContext);
 
-	COObject *object = [trackedObjects anyObject];
-
-	if ([[object editingContext] store] == nil)
+	if ([[aContext parentContext] store] == nil)
 	{
 		[NSException raise: NSInvalidArgumentException
-		            format: @"Cannot load commit track for object %@ which does not have a store or editing context", object];
+		            format: @"Cannot load commit track for %@ which does not have a store or editing context", aContext];
 	}
 
-	self = [super initWithTrackedObjects: trackedObjects];
+	self = [super initWithTrackedObjects: nil];
 	if (self == nil)
 		return nil;
 
-	ASSIGN(trackedObject, object);
-	if ([trackedObject revision] != nil)
+	ASSIGN(UUID, aUUID);
+	/* The persistent root retains us */
+	editingContext = aContext;
+
+	// TODO: Might be not a good idea to cache nodes so soon
+	if ([[self trackedObject] revision] != nil)
 	{
 		[self cacheNodesForward: CACHE_AMOUNT backward: CACHE_AMOUNT];
 	}
@@ -45,7 +48,7 @@
 	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
 	                                                    selector: @selector(currentNodeDidChangeInStore:) 
 	                                                        name: COStoreDidChangeCurrentNodeOnTrackNotification 
-	                                                      object: [[trackedObject UUID] stringValue]];
+	                                                      object: [[self UUID] stringValue]];
 
 	return self;	
 }
@@ -54,7 +57,6 @@
 {
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 	DESTROY(UUID);
-	DESTROY(trackedObject);
 	DESTROY(parentTrack);
 	DESTROY(label);
 	[super dealloc];
@@ -64,10 +66,15 @@
 {
 	if ([rhs isKindOfClass: [COCommitTrack class]])
 	{
-		return ([trackedObject isEqual: [rhs trackedObject]]
-			&& [[trackedObject editingContext] isEqual: [[rhs trackedObject] editingContext]]);
+		return ([[self UUID] isEqual: [rhs UUID]]
+			&& [[self editingContext] isEqual: [rhs editingContext]]);
 	}
 	return NO;
+}
+
+- (COObject *)trackedObject
+{
+	return [editingContext rootObject];
 }
 
 - (BOOL)isBranch
@@ -116,7 +123,7 @@
 - (BOOL)isOurStoreForNotification: (NSNotification *)notif
 {
 	NSString *storeUUIDString = [[notif userInfo] objectForKey: kCOStoreUUIDStringKey];
-	return [storeUUIDString isEqual: [[[[trackedObject editingContext] store] UUID] stringValue]];
+	return [storeUUIDString isEqual: [[[[self editingContext] store] UUID] stringValue]];
 }
 
 /* This method is called back through distributed notifications in various cases:
@@ -140,9 +147,9 @@
 	if ([self isOurStoreForNotification: notif])
 		return;
 
-	NSParameterAssert([[[trackedObject UUID] stringValue] isEqual: [notif object]]);
+	NSParameterAssert([[[self UUID] stringValue] isEqual: [notif object]]);
 
-	COEditingContext *context = [[trackedObject editingContext] parentContext];
+	COEditingContext *context = [[self editingContext] parentContext];
 	int64_t revNumber = [[[notif userInfo] objectForKey: kCONewCurrentNodeRevisionNumberKey] longLongValue];
 	BOOL isBasicUndoRedoFromCurrentContext = (revNumber == [[[self currentNode] revision] revisionNumber]);
 	BOOL isCommitFromCurrentContext = (revNumber == [context latestRevisionNumber]);
@@ -177,7 +184,7 @@
 
 	/* For a commit in the receiver editing context, no reloading occurs 
 	   because the tracked object state matches the revision */
-	[[trackedObject editingContext] reloadAtRevision: [[self currentNode] revision]];
+	[[self editingContext] reloadAtRevision: [[self currentNode] revision]];
 
 	[self didUpdate];
 	RELEASE(oldCurrentNode);
@@ -198,9 +205,9 @@
 
 	assert([[self currentNode] isEqual: aNode]);
 
-	[[[trackedObject editingContext] store] setCurrentRevision: [aNode revision]
-	                                              forTrackUUID: [trackedObject UUID]];
-	[[trackedObject editingContext] reloadAtRevision: [aNode revision]];
+	[[[self editingContext] store] setCurrentRevision: [aNode revision]
+	                                     forTrackUUID: [self UUID]];
+	[[self editingContext] reloadAtRevision: [aNode revision]];
 	[self didUpdate];
 }
 
@@ -209,7 +216,7 @@
 	if ([self currentNode] == nil)
 	{
 		[NSException raise: NSInternalInconsistencyException
-		            format: @"Cannot undo object %@ which does not have any commits", trackedObject];
+		            format: @"Cannot undo object %@ which does not have any commits", [self trackedObject]];
 	}
 	/* If -canUndo returns YES, before returning it loads some previous nodes 
 	   to ensure currentNodeIndex is not zero and can be decremented */
@@ -228,11 +235,10 @@
 		&& ![[NSNull null] isEqual: [[self cachedNodes] objectAtIndex: currentNodeIndex]],
 		@"Record undone to is cached");
 
-	COStore *store = [[trackedObject editingContext] store];
-	CORevision *currentRevision = [store undoOnCommitTrack: [trackedObject UUID]];
+	CORevision *currentRevision = [[[self editingContext] store] undoOnCommitTrack: [self UUID]];
 
 	// TODO: Reset object state to old object.
-	[[trackedObject editingContext] reloadAtRevision: currentRevision];
+	[[self editingContext] reloadAtRevision: currentRevision];
 
 	[self didUpdate];
 }
@@ -242,7 +248,7 @@
 	if ([self currentNode] == nil)
 	{
 		[NSException raise: NSInternalInconsistencyException
-		            format: @"Cannot redo object %@ which does not have any commits", trackedObject];
+		            format: @"Cannot redo object %@ which does not have any commits", [self trackedObject]];
 	}
 	/* If -canRedo returns YES, before returning it loads some next nodes 
 	   to ensure currentNodeIndex is not zero and can be incremented */
@@ -261,11 +267,10 @@
 		&& ![[NSNull null] isEqual: [[self cachedNodes] objectAtIndex: currentNodeIndex]],
 		@"Record redone to is cached");
 
-	COStore *store = [[trackedObject editingContext] store];
-	CORevision *currentRevision = [store redoOnCommitTrack: [trackedObject UUID]];
+	CORevision *currentRevision = [[[self editingContext] store] redoOnCommitTrack: [self UUID]];
 
 	// TODO: Reset object state to old object.
-	[[trackedObject editingContext] reloadAtRevision: currentRevision];
+	[[self editingContext] reloadAtRevision: currentRevision];
 
 	[self didUpdate];
 }
@@ -286,14 +291,14 @@
 	else
 	{
 		[self selectiveUndoWithRevision: [aNode revision] 
-		               inEditingContext: [[trackedObject editingContext] parentContext]];
+		               inEditingContext: [[self editingContext] parentContext]];
 	}
 }
 
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
 {
 	/* -cacheNodesForward:backward: can release this cached node */
-	RETAIN(aNode);
+	[aNode retain];
 	NSArray *cachedNodes = [self cachedNodes];
 	NSInteger nodeIndex = [cachedNodes indexOfObject: aNode];
 
@@ -329,7 +334,7 @@
 	/* Get the node from the updated cache */
 
 	nodeIndex = [cachedNodes indexOfObject: aNode];
-	RELEASE(aNode);
+	[aNode release];
 
 	if (back)
 	{
@@ -375,9 +380,9 @@
 
 - (void)cacheNodesForward: (NSUInteger)forward backward: (NSUInteger)backward
 {
-	COStore *store = [[trackedObject editingContext] store];
+	COStore *store = [[self editingContext] store];
 	NSUInteger newCurrentNodeIndex = 0;
-	NSArray *revisions = [store revisionsForTrackUUID: [trackedObject UUID]
+	NSArray *revisions = [store revisionsForTrackUUID: [self UUID]
 	                                 currentNodeIndex: &newCurrentNodeIndex
 	                                    backwardLimit: backward
 	                                     forwardLimit: forward];

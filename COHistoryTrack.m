@@ -163,7 +163,8 @@
 	ETAssert([trackObject isRoot]);
 
 	COStore *store = [[trackObject editingContext] store];
-	NSSet *rootAndInnerObjectUUIDs = [store UUIDsForRootObjectUUID: [trackObject UUID]];
+	NSSet *rootAndInnerObjectUUIDs =
+		[store objectUUIDsForCommitTrackUUID: [[[trackObject editingContext] commitTrack] UUID]];
 
 	return [store revisionsForObjectUUIDs: rootAndInnerObjectUUIDs];
 }
