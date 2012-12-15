@@ -120,6 +120,38 @@
  */
 @property (nonatomic, readonly) COEditingContext *parentContext;
 
+/** @taskunit Object Access and Loading */
+
+/**
+ * Returns the object identified by the UUID, by loading it to its last revision
+ * when no instance managed by the receiver is present in memory.
+ *
+ * When the UUID doesn't correspond to a persistent object, returns nil.
+ *
+ * When the object is a inner object, the last revision is the one that is tied
+ * to its root object last revision.
+ *
+ * See also -objectWithUUID:atRevision: and -loadedObjectForUUID:.
+ */
+- (COObject *)objectWithUUID: (ETUUID *)uuid;
+/**
+ * Returns the object identified by the UUID, by loading it to the given
+ * revision when no instance managed by the receiver is present in memory.
+ *
+ * When the UUID doesn't correspond to a persistent object, returns nil.
+ *
+ * For a nil revision, the object is loaded is loaded at its last revision.
+ *
+ * When the object is a inner object, the last revision is the one that is tied
+ * to its root object last revision.
+ *
+ * When the object is already loaded, and its revision is not the requested
+ * revision, raises an invalid argument exception.
+ *
+ * See also -loadedObjectForUUID:.
+ */
+- (COObject *)objectWithUUID: (ETUUID *)uuid atRevision: (CORevision *)revision;
+
 /** @taskunit Pending Changes */
 
 /**

@@ -29,6 +29,21 @@
 	[super dealloc];
 }
 
+- (int64_t)baseRevisionNumber
+{
+	return baseRevisionNumber;
+}
+
+- (BOOL)isEqual: (id)rhs
+{
+	if ([rhs isKindOfClass: [CORevision class]] == NO)
+		return NO;
+
+	return (revisionNumber == [rhs revisionNumber]
+		&& baseRevisionNumber == [rhs baseRevisionNumber]
+		&& [[store URL] isEqual: [[rhs store] URL]]);
+}
+
 - (NSArray *)propertyNames
 {
 	return [[super propertyNames] arrayByAddingObjectsFromArray: 

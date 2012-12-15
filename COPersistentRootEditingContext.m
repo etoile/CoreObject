@@ -58,6 +58,16 @@
 	return [_parentContext store];
 }
 
+- (COObject *)objectWithUUID: (ETUUID *)uuid
+{
+	return [_parentContext objectWithUUID: uuid];
+}
+
+- (COObject *)objectWithUUID: (ETUUID *)uuid atRevision: (CORevision *)revision
+{
+	return [_parentContext objectWithUUID: uuid atRevision: revision];
+}
+
 - (NSSet *)insertedObjects
 {
 	return [NSSet setWithSet: _insertedObjects];

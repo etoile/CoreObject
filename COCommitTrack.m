@@ -66,8 +66,8 @@
 {
 	if ([rhs isKindOfClass: [COCommitTrack class]])
 	{
-		return ([[self UUID] isEqual: [rhs UUID]]
-			&& [[self editingContext] isEqual: [rhs editingContext]]);
+		return ([UUID isEqual: [rhs UUID]]
+			&& [[editingContext persistentRootUUID] isEqual: [[rhs editingContext] persistentRootUUID]]);
 	}
 	return NO;
 }

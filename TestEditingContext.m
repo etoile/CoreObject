@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
 #import "COEditingContext.h"
+#import "COPersistentRootEditingContext.h"
 #import "COContainer.h"
 #import "COGroup.h"
 #import "COStore.h"
@@ -58,37 +59,109 @@
 - (void)testInsertObject
 {
 	UKFalse([ctx hasChanges]);
-	
-	COObject *obj = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+
+	COObject *obj = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
 		
 	UKNotNil(obj);
 	UKTrue([obj isKindOfClass: [COObject class]]);
 	UKObjectsEqual([self basicProperties], SA([obj persistentPropertyNames]));
-	UKObjectsSame(obj, [ctx objectWithUUID: [obj UUID]]);
-	UKTrue([ctx hasChanges]);
 	UKNotNil([obj valueForProperty: @"parentCollections"]);
 	UKNotNil([obj valueForProperty: @"contents"]);
+
+	UKObjectsSame(ctx, [[obj editingContext] parentContext]);
+	UKObjectsSame(obj, [[obj editingContext] objectWithUUID: [obj UUID]]);
+	UKTrue([[ctx loadedObjects] containsObject: obj]);
+	UKTrue([[ctx loadedRootObjects] containsObject: obj]);
+
+	UKTrue([[[obj editingContext] insertedObjects] containsObject: obj]);
+	UKTrue([[ctx insertedObjects] containsObject: obj]);
+	UKTrue([[[obj editingContext] changedObjects] containsObject: obj]);
+	UKTrue([[ctx changedObjects] containsObject: obj]);
+	UKTrue([[obj editingContext] hasChanges]);
+	UKTrue([ctx hasChanges]);
+}
+
+- (void)testUpdateObject
+{
+	UKFalse([ctx hasChanges]);
+	
+	COObject *obj = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
+
+	UKTrue([[[obj editingContext] updatedObjects] isEmpty]);
+	UKTrue([[ctx updatedObjects] isEmpty]);
+
+	[obj setValue: @"Hello" forProperty: @"label"];
+
+	UKTrue([[[obj editingContext] updatedObjects] containsObject: obj]);
+	UKTrue([[ctx insertedObjects] containsObject: obj]);
+	UKTrue([[[obj editingContext] updatedObjects] containsObject: obj]);
+	UKTrue([[ctx changedObjects] containsObject: obj]);
+	UKTrue([[obj editingContext] hasChanges]);
+	UKTrue([ctx hasChanges]);
+}
+
+- (void)testDeleteObject
+{
+	UKFalse([ctx hasChanges]);
+	
+	COObject *obj = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
+	
+	UKTrue([[[obj editingContext] deletedObjects] isEmpty]);
+	UKTrue([[ctx deletedObjects] isEmpty]);
+	
+	[[obj editingContext] deleteObject: obj];
+	
+	UKTrue([[[obj editingContext] deletedObjects] containsObject: obj]);
+	UKTrue([[ctx deletedObjects] containsObject: obj]);
+	UKTrue([[ctx changedObjects] containsObject: obj]);
+	UKTrue([[obj editingContext] hasChanges]);
+	UKTrue([ctx hasChanges]);
 }
 
 - (void)testBasicPersistence
 {
-	COObject *obj = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	ETUUID *objUUID = [[obj UUID] retain];
+	COPersistentRootEditingContext *persistentRoot =
+		[[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] retain];
+	COObject *obj = [persistentRoot rootObject];
 
 	[obj setValue: @"Hello" forProperty: @"label"];
-	[ctx commit];
 	
+	UKTrue([ctx hasChanges]);
+
+	[ctx commit];
+
+	UKFalse([ctx hasChanges]);
 	UKIntsEqual(1, [ctx latestRevisionNumber]);
 	
+	/* Recreate editing context and store */
+		
 	[self instantiateNewContextAndStore];
 
-	obj = [ctx objectWithUUID: objUUID];
+	UKFalse([ctx hasChanges]);
+	UKIntsEqual(1, [ctx latestRevisionNumber]);
+	
+	/* Recreate persistent root and root object */
 
-	UKNotNil(obj);
-	UKObjectsEqual([self basicProperties], SA([obj persistentPropertyNames]));
-	UKStringsEqual(@"Hello", [obj valueForProperty: @"label"]);
+	/*COPersistentRootEditingContext *newPersistentRoot =
+		[ctx contextForPersistentRootUUID: [persistentRoot persistentRootUUID]];
+	COObject *newObj = [newPersistentRoot rootObject];*/
+	COObject *newObj = [ctx objectWithUUID: [obj UUID]];
+	COPersistentRootEditingContext *newPersistentRoot = [newObj editingContext];
 
-	[objUUID release];
+	UKNotNil(newObj);
+	UKObjectsEqual([obj UUID], [newObj UUID]);
+	UKObjectsNotSame(obj, newObj);
+	UKObjectsEqual([persistentRoot persistentRootUUID], [newPersistentRoot persistentRootUUID]);
+	UKObjectsEqual([persistentRoot commitTrack], [newPersistentRoot commitTrack]);
+	UKObjectsEqual([persistentRoot revision], [newPersistentRoot revision]);
+
+	UKObjectsEqual([self basicProperties], SA([newObj persistentPropertyNames]));
+	UKStringsEqual(@"Hello", [newObj valueForProperty: @"label"]);
+
+	UKObjectsSame(newObj, [newPersistentRoot objectWithUUID: [newObj UUID]]);
+	UKObjectsEqual([ctx loadedObjects], S(newObj));
+
+	[persistentRoot release];
 }
 
 - (void)testDidCreate

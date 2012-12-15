@@ -173,15 +173,22 @@ store by other processes. */
 // NOTE: Persistent root insertion or deletion are saved to the store at commit time.
 
 - (COPersistentRootEditingContext *)makePersistentRootContextWithRootObject: (COObject *)aRootObject
+														 persistentRootUUID: (ETUUID *)aPersistentRootUUID
+															commitTrackUUID: (ETUUID *)aTrackUUID
 {
 	COPersistentRootEditingContext *ctxt =
-		[[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: [ETUUID UUID]
-														   commitTrackUUID: [ETUUID UUID]
+		[[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: aPersistentRootUUID
+														   commitTrackUUID: aTrackUUID
 																rootObject: aRootObject
 															 parentContext: self];
 	[_persistentRootContexts setObject: ctxt forKey: [ctxt persistentRootUUID]];
 	[ctxt release];
 	return ctxt;
+}
+
+- (COPersistentRootEditingContext *)makePersistentRootContextWithRootObject: (COObject *)aRootObject
+{
+	return [self makePersistentRootContextWithRootObject: aRootObject persistentRootUUID: [ETUUID UUID] commitTrackUUID: [ETUUID UUID]];
 }
 
 - (COPersistentRootEditingContext *)makePersistentRootContext
@@ -290,6 +297,8 @@ store by other processes. */
 		// it's going to should be available in memory, we rather resolve it now.
 		ETUUID *rootUUID = [_store rootObjectUUIDForObjectUUID: uuid];
 		ETAssert(rootUUID != nil);
+		ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: rootUUID];
+		ETUUID *trackUUID = [_store mainBranchUUIDForPersistentRootUUID: persistentRootUUID];
 		BOOL isRoot = [rootUUID isEqual: uuid];
 		id rootObject = nil;
 		CORevision *maxRevision = nil;
@@ -298,8 +307,6 @@ store by other processes. */
 		{
 			if (nil == revision)
 			{
-				ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: rootUUID];
-				ETUUID *trackUUID = [_store mainBranchUUIDForPersistentRootUUID: persistentRootUUID];
 				NSArray *revisionNodes = [_store revisionsForTrackUUID: trackUUID
 				                                      currentNodeIndex: NULL
 				                                         backwardLimit: 0
@@ -322,7 +329,9 @@ store by other processes. */
 		
 		if (rootObject == nil)
 		{
-			ctxt = [self makePersistentRootContextWithRootObject: result];
+			ctxt = [self makePersistentRootContextWithRootObject: result
+											  persistentRootUUID: persistentRootUUID
+												 commitTrackUUID: trackUUID];
 		}
 		
 		ETAssert(ctxt != nil);
@@ -418,7 +427,7 @@ store by other processes. */
 
 - (NSSet *)updatedObjects
 {
-	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(insertedObjects)];
+	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(updatedObjects)];
 }
 
 - (NSSet *)updatedObjectUUIDs
