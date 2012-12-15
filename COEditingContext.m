@@ -235,14 +235,7 @@ store by other processes. */
 	[self discardLoadedObjectsForPersistentRootContexts: S(context)];
 	[_persistentRootContexts removeObjectForKey: [context persistentRootUUID]];
 }
-
-- (void)registerObject: (COObject *)object
-{
-	NILARG_EXCEPTION_TEST(object);
-	INVALIDARG_EXCEPTION_TEST(object, [_loadedObjects containsObject: object] == NO);
-	[self insertNewPersistentRootWithRootObject: object];
-}
-
+ 
 - (NSString *)entityNameForObjectUUID: (ETUUID *)obj
 {
 	int64_t maxNum = (_maxRevisionNumber > 0 ? _maxRevisionNumber : [_store latestRevisionNumber]);

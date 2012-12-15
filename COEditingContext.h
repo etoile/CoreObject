@@ -5,7 +5,6 @@
 @class COStore, CORevision, COObject, COGroup, COSmartGroup, COCommitTrack, COError;
 
 @protocol COPersistentObjectContext <NSObject>
-- (void)registerObject: (COObject *)object;
 @end
 
 /**
@@ -311,15 +310,6 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 - (COPersistentRootEditingContext *)makePersistentRootContextWithRootObject: (COObject *)aRootObject;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Inserts a new persistent root using the given object as its root object.
- * 
- * The object becomes a root object by registering in the persistent root. See 
- * -[COPersistentRootEditingContext registerObject:].
- */
-- (void)registerObject: (COObject *)object;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
