@@ -654,7 +654,7 @@
 - (id)initWithUUID: (ETUUID *)aUUID 
  entityDescription: (ETEntityDescription *)anEntityDescription
         rootObject: (id)aRootObject
-           context: (COEditingContext *)aContext
+           context: (COPersistentRootEditingContext *)aContext
            isFault: (BOOL)isFault;
 /**
  * This method is only exposed to be used internally by CoreObject.

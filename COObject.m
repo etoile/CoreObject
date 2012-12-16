@@ -212,7 +212,7 @@
 	[super dealloc];
 }
 
-- (void)becomePersistentInContext: (id <COPersistentObjectContext>)aContext
+- (void)becomePersistentInContext: (COPersistentRootEditingContext *)aContext
 {
 	NILARG_EXCEPTION_TEST(aContext);
 	INVALIDARG_EXCEPTION_TEST(aContext, [aContext conformsToProtocol: @protocol(COPersistentObjectContext)]);

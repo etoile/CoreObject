@@ -35,6 +35,8 @@
 	UKObjectsEqual(o1, [store rootObjectUUIDForPersistentRootUUID: cheapCopyUUID]);
 	UKObjectsEqual(rootUUID, [store persistentRootUUIDForCommitTrackUUID: trackUUID]);
 	UKObjectsEqual(cheapCopyUUID, [store persistentRootUUIDForCommitTrackUUID: derivedTrackUUID]);
+	UKObjectsEqual(trackUUID, [store mainBranchUUIDForPersistentRootUUID: rootUUID]);
+	UKObjectsEqual(derivedTrackUUID, [store mainBranchUUIDForPersistentRootUUID: cheapCopyUUID]);
 }
 
 - (void)testReopenStore

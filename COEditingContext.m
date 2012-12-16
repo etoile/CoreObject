@@ -43,7 +43,6 @@ static COEditingContext *currentCtxt = nil;
 	_latestRevisionNumber = [_store latestRevisionNumber];
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
 	_persistentRootContexts = [NSMutableDictionary new];
-	_loadedObjects = [NSMutableDictionary new];
 
 	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
 	                                                    selector: @selector(didMakeCommit:) 
@@ -65,7 +64,6 @@ static COEditingContext *currentCtxt = nil;
 	DESTROY(_store);
 	DESTROY(_modelRepository);
 	DESTROY(_persistentRootContexts);
-	DESTROY(_loadedObjects);
 	DESTROY(_error);
 	[super dealloc];
 }
@@ -87,8 +85,10 @@ store by other processes. */
 	{
 		CORevision *rev = [_store revisionWithRevisionNumber: [revNumber unsignedLongLongValue]];
 		ETUUID *rootObjectUUID = [rev objectUUID];
+		ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: rootObjectUUID];
+		COPersistentRootEditingContext *persistentRoot = [_persistentRootContexts objectForKey: persistentRootUUID];
 
-		if ([self loadedObjectForUUID: rootObjectUUID] == nil)
+		if ([persistentRoot loadedObjectForUUID: rootObjectUUID] == nil)
 		{
 			continue;
 		}
@@ -148,6 +148,11 @@ store by other processes. */
 - (int64_t)latestRevisionNumber
 {
 	return _latestRevisionNumber;
+}
+
+- (int64_t)maxRevisionNumber
+{
+	return _maxRevisionNumber;
 }
 
 - (ETModelDescriptionRepository *)modelRepository
@@ -235,116 +240,44 @@ store by other processes. */
 	[self discardLoadedObjectsForPersistentRootContexts: S(context)];
 	[_persistentRootContexts removeObjectForKey: [context persistentRootUUID]];
 }
- 
-- (NSString *)entityNameForObjectUUID: (ETUUID *)obj
-{
-	int64_t maxNum = (_maxRevisionNumber > 0 ? _maxRevisionNumber : [_store latestRevisionNumber]);
-
-	for (int64_t revNum = maxNum; revNum > 0; revNum--)
-	{
-		CORevision *revision = [_store revisionWithRevisionNumber: revNum];
-		NSString *name = [[revision valuesAndPropertiesForObjectUUID: obj] objectForKey: @"_entity"];
-		if (name != nil)
-		{
-			return name;
-		}
-	}
-	return nil;
-}
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision
 {
-	// NOTE: We serialize UUIDs into strings in various places, this check 
-	// helps to intercept string objects that ought to be ETUUID objects.
-	NSParameterAssert([uuid isKindOfClass: [ETUUID class]]);
-
-	COObject *result = [_loadedObjects objectForKey: uuid];
-
-	if (result != nil && revision != nil)
-	{
-		CORevision *existingRevision = [result revision];
-		if (![existingRevision isEqual: revision])
-		{
-			[NSException raise: NSInternalInconsistencyException
-			            format: @"Object %@ requested at revision %@ but already loaded at revision %@",
-				result, revision, existingRevision];
-		}
-	}
+	// NOTE: We could resolve the root object at loading time, but since 
+	// it's going to should be available in memory, we rather resolve it now.
+	ETUUID *rootUUID = [_store rootObjectUUIDForObjectUUID: uuid];
+	BOOL isCommitted = (rootUUID != nil);
 	
-	if (result == nil)
+	// TODO: Remove
+	if (isCommitted == NO)
 	{
-		ETEntityDescription *desc = [_modelRepository descriptionForName: name];
-		if (desc == nil)
+		COObject *rootObject = nil;
+
+		for (COPersistentRootEditingContext *persistentRoot in [_persistentRootContexts objectEnumerator])
 		{
-			NSString *name = [self entityNameForObjectUUID: uuid];
-			if (name == nil)
+			rootObject = [persistentRoot objectWithUUID: uuid entityName: name atRevision: revision];
+			if (rootObject != nil)
 			{
-				//[NSException raise: NSGenericException format: @"Failed to find an entity name for %@", uuid];
-				//NSLog(@"WARNING: -[COEditingContext objectWithUUID:entityName:] failed to find an entity name for %@ (probably, the requested object does not exist)", uuid);
-				return nil;
+				break;
 			}
-			desc = [_modelRepository descriptionForName: name];
 		}
-		
-		// NOTE: We could resolve the root object at loading time, but since 
-		// it's going to should be available in memory, we rather resolve it now.
-		ETUUID *rootUUID = [_store rootObjectUUIDForObjectUUID: uuid];
-		ETAssert(rootUUID != nil);
-		ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: rootUUID];
+		return rootObject;
+	}
+
+	ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: rootUUID];
+	COPersistentRootEditingContext *persistentRoot = [self contextForPersistentRootUUID: persistentRootUUID];
+
+	if (persistentRoot == nil)
+	{
 		ETUUID *trackUUID = [_store mainBranchUUIDForPersistentRootUUID: persistentRootUUID];
-		BOOL isRoot = [rootUUID isEqual: uuid];
-		id rootObject = nil;
-		CORevision *maxRevision = nil;
 
-		if (isRoot)
-		{
-			if (nil == revision)
-			{
-				NSArray *revisionNodes = [_store revisionsForTrackUUID: trackUUID
-				                                      currentNodeIndex: NULL
-				                                         backwardLimit: 0
-				                                          forwardLimit: 0];
-				revision = [revisionNodes objectAtIndex: 0];
-			}
-		}
-		if (!isRoot)
-		{
-			if (nil == revision && nil != maxRevision)
-			{
-				revision = maxRevision;
-			}
-			rootObject = [self objectWithUUID: rootUUID entityName: nil atRevision: revision];
-		}
-
-		Class cls = [self classForEntityDescription: desc];
-		COPersistentRootEditingContext *ctxt = (id)[rootObject editingContext];
-		result = [cls alloc];
-		
-		if (rootObject == nil)
-		{
-			ctxt = [self makePersistentRootContextWithRootObject: result
-											  persistentRootUUID: persistentRootUUID
-												 commitTrackUUID: trackUUID];
-		}
-		
-		ETAssert(ctxt != nil);
-
-		result = [result
-			     initWithUUID: uuid
-			entityDescription: desc
-			       rootObject: rootObject
-				  context: (id)ctxt
-				  isFault: YES];
-		
-		if (isRoot)
-		{
-			[ctxt setRevision: revision];
-		}
-		[_loadedObjects setObject: result forKey: uuid];
-		[result release];
+		persistentRoot = [self makePersistentRootContextWithRootObject: nil
+											        persistentRootUUID: persistentRootUUID
+												       commitTrackUUID: trackUUID];
+		[persistentRoot setRootObject: [persistentRoot objectWithUUID: uuid atRevision: revision]];
 	}
 	
-	return result;
+	return [persistentRoot objectWithUUID: uuid entityName: name atRevision: revision];
 }
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid
@@ -359,34 +292,12 @@ store by other processes. */
 
 - (NSSet *)loadedObjects
 {
-	return [NSSet setWithArray: [_loadedObjects allValues]];
-}
-
-- (NSSet *)loadedObjectUUIDs
-{
-	return [NSSet setWithArray: [_loadedObjects allKeys]];
+	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(loadedObjects)];
 }
 
 - (NSSet *)loadedRootObjects
 {
-	NSMutableSet *loadedRootObjects = [NSMutableSet setWithSet: [self loadedObjects]];
-	[[loadedRootObjects filter] isRoot];
-	return loadedRootObjects;
-}
-
-- (id)loadedObjectForUUID: (ETUUID *)uuid
-{
-	return [_loadedObjects objectForKey: uuid];
-}
-
-- (void)cacheLoadedObject: (COObject *)object
-{
-	[_loadedObjects setObject: object forKey: [object UUID]];
-}
-
-- (void)discardLoadedObjectForUUID: (ETUUID *)aUUID
-{
-	[_loadedObjects removeObjectForKey: aUUID];
+	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(loadedRootObjects)];
 }
 
 /* Remove from the cache all the objects that belong to discarded persistent roots */
@@ -396,7 +307,7 @@ store by other processes. */
 	{
 		if ([removedPersistentRootContexts containsObject: [obj editingContext]])
 		{
-			[self discardLoadedObjectForUUID: [obj UUID]];
+			[[obj editingContext] discardLoadedObjectForUUID: [obj UUID]];
 		}
 	}
 }

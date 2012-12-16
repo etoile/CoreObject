@@ -23,8 +23,6 @@
 	ETModelDescriptionRepository *_modelRepository;
 	/** Persistent root contexts by UUID */
 	NSMutableDictionary *_persistentRootContexts;
-	/** Loaded (or inserted) objects by UUID */
-	NSMutableDictionary *_loadedObjects;
 	COError *_error;
 }
 
@@ -100,6 +98,16 @@
  */
 - (int64_t)latestRevisionNumber;
 /**
+ * Returns the maximun revision that can be loaded for objects in persistent 
+ * roots.
+ *
+ * If the returned value is zero, there is no upper limit on the revision that
+ * can be loaded.
+ *
+ * By default, returns zero. 
+ */
+- (int64_t)maxRevisionNumber;
+/**
  * Returns the model description repository, which holds the metamodel that 
  * describes all the persistent objects editable in the context.
  */
@@ -160,16 +168,6 @@
  */
 - (NSSet *)loadedObjects;
 /**
- * Returns the UUIDs of the objects presently managed by the receiver in memory.
- *
- * The returned objects include the inserted object UUIDs.
- *
- * Faults can be count as loaded objects.
- *
- * See also -loadedObjects.
- */
-- (NSSet *)loadedObjectUUIDs;
-/**
  * Returns the root objects presently managed by the receiver in memory.
  *
  * Faults and inserted objects can be included among the returned objects.
@@ -177,13 +175,7 @@
  * The returned objects are a subset of -loadedObjects.
  */
 - (NSSet *)loadedRootObjects;
-/** 
- * Returns the object identified by the UUID if presently loaded in memory.
- *
- * When the object is not loaded, or when there is no persistent object that 
- * corresponds to this UUID, returns nil.
- */
-- (id)loadedObjectForUUID: (ETUUID *)uuid;
+
 
 /** @taskunit Pending Changes */
 
@@ -310,14 +302,6 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 - (COPersistentRootEditingContext *)makePersistentRootContextWithRootObject: (COObject *)aRootObject;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-- (void)cacheLoadedObject: (COObject *)anObject;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-- (void)discardLoadedObjectForUUID: (ETUUID *)aUUID;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
