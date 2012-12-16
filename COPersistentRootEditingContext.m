@@ -16,6 +16,9 @@
 					  rootObject: (COObject *)aRootObject
 				   parentContext: (COEditingContext *)aCtxt
 {
+	NILARG_EXCEPTION_TEST(aUUID);
+	NILARG_EXCEPTION_TEST(aTrackUUID);
+
 	SUPERINIT;
 
 	ASSIGN(_persistentRootUUID, aUUID);
@@ -36,6 +39,7 @@
 
 - (void)dealloc
 {
+	DESTROY(_persistentRootUUID);
 	DESTROY(_commitTrack);
 	DESTROY(_rootObject);
 	DESTROY(_revision);
@@ -84,7 +88,7 @@
 	// helps to intercept string objects that ought to be ETUUID objects.
 	NSParameterAssert([uuid isKindOfClass: [ETUUID class]]);
 	
-	COObject *result = [_loadedObjects objectForKey: uuid];
+	COObject *result = [self loadedObjectForUUID: uuid];
 	
 	if (result != nil && revision != nil)
 	{
@@ -155,7 +159,7 @@
 		{
 			[self setRevision: revision];
 		}
-		[_loadedObjects setObject: result forKey: uuid];
+		[self cacheLoadedObject: result];
 		[result release];
 	}
 	
@@ -294,10 +298,10 @@
 			  initWithUUID: aUUID
 			  entityDescription: desc
 			  rootObject: _rootObject
-			  context: (id)self
+			  context: self
 			  isFault: NO];
 
-	[result becomePersistentInContext: (id)self];
+	[result becomePersistentInContext: self];
 	/* -becomePersistentInContent: calls -registerObject: that retains the object */
 	[result release];
 
