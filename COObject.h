@@ -653,7 +653,6 @@
  */
 - (id)initWithUUID: (ETUUID *)aUUID 
  entityDescription: (ETEntityDescription *)anEntityDescription
-        rootObject: (id)aRootObject
            context: (COPersistentRootEditingContext *)aContext
            isFault: (BOOL)isFault;
 /**

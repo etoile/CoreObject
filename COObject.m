@@ -114,19 +114,17 @@
 
 - (id) commonInitWithUUID: (ETUUID *)aUUID 
         entityDescription: (ETEntityDescription *)anEntityDescription
-               rootObject: (COObject *)aRootObject
                   context: (COPersistentRootEditingContext *)aContext
                   isFault: (BOOL)isFault
 {
 	NSParameterAssert(aUUID != nil);
-	BOOL isPersistent = (aRootObject != nil && aContext != nil);
+	BOOL isPersistent = (aContext != nil);
 	if (isPersistent)
 	{
 		NSParameterAssert(anEntityDescription != nil);
 	}
 	else
 	{
-		NSParameterAssert(aRootObject == nil);
 		NSParameterAssert(aContext == nil);
 	}
 
@@ -165,7 +163,6 @@
 
 - (id)initWithUUID: (ETUUID *)aUUID 
  entityDescription: (ETEntityDescription *)anEntityDescription
-        rootObject: (id)aRootObject
            context: (COPersistentRootEditingContext *)aContext
            isFault: (BOOL)isFault
 {
@@ -177,7 +174,6 @@
 
 	self = [self commonInitWithUUID: aUUID 
 	              entityDescription: anEntityDescription
-	                     rootObject: (aRootObject != nil ? aRootObject : self)
 	                        context: aContext
 	                        isFault: isFault];
 
@@ -196,7 +192,6 @@
 		SUPERINIT;
 		self = [self commonInitWithUUID: [ETUUID UUID]
 		              entityDescription: nil
-		                     rootObject: nil
 		                        context: nil
 		                        isFault: NO];
 	}

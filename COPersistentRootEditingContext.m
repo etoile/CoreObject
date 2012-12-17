@@ -82,88 +82,106 @@
 	return nil;
 }
 
+// NOTE: If we decide to make the method public, move it to COEditingContext
+- (NSString *)defaultEntityName
+{
+	return @"COObject";
+}
+
+- (ETEntityDescription *)descriptionForName: (NSString *)name objectUUID: (ETUUID *)uuid
+{
+	ETModelDescriptionRepository *repo = [_parentContext modelRepository];
+	ETEntityDescription *desc = [repo descriptionForName: name];
+
+	if (desc == nil)
+	{
+		NSString *name = [self entityNameForObjectUUID: uuid];
+		if (name == nil)
+		{
+			//[NSException raise: NSGenericException format: @"Failed to find an entity name for %@", uuid];
+			//NSLog(@"WARNING: -[COEditingContext objectWithUUID:entityName:] failed to find an entity name for %@ (probably, the requested object does not exist)", uuid);
+			return nil;
+		}
+		desc = [repo descriptionForName: name];
+	}
+	return (desc != nil ? desc : [repo descriptionForName: [self defaultEntityName]]);
+}
+
+- (COObject *)loadedObjectForUUID: (ETUUID *)uuid revision: (CORevision *)revision
+{
+	COObject *obj = [self loadedObjectForUUID: uuid];
+	
+	if (obj != nil && revision != nil)
+	{
+		CORevision *existingRevision = [obj revision];
+		
+		if (![existingRevision isEqual: revision])
+		{
+			[NSException raise: NSInternalInconsistencyException
+			            format: @"Object %@ requested at revision %@ but already loaded at revision %@",
+			 obj, revision, existingRevision];
+		}
+	}
+	return obj;
+}
+
+- (CORevision *)loadableRevisionForRevision: (CORevision *)aRevision
+							 rootObjectUUID: (ETUUID *)aRootObjectUUID
+{
+	int64_t maxRevNumber = [_parentContext maxRevisionNumber];
+	BOOL hasMaxRev = (maxRevNumber > 0);
+	int64_t revNumber = (aRevision != nil ? [aRevision revisionNumber] : maxRevNumber);
+
+	if (hasMaxRev && revNumber > maxRevNumber)
+	{
+		revNumber = maxRevNumber;
+	}
+
+	return [[self store] maxRevision: revNumber
+	               forRootObjectUUID: aRootObjectUUID];
+}
+
 - (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision
 {
 	// NOTE: We serialize UUIDs into strings in various places, this check
 	// helps to intercept string objects that ought to be ETUUID objects.
 	NSParameterAssert([uuid isKindOfClass: [ETUUID class]]);
 	
-	COObject *result = [self loadedObjectForUUID: uuid];
-	
-	if (result != nil && revision != nil)
-	{
-		CORevision *existingRevision = [result revision];
+	/* Check the object cache */
 
-		if (![existingRevision isEqual: revision])
-		{
-			[NSException raise: NSInternalInconsistencyException
-			            format: @"Object %@ requested at revision %@ but already loaded at revision %@",
-			                    result, revision, existingRevision];
-		}
-	}
-	
-	if (result == nil)
-	{
-		ETEntityDescription *desc = [[_parentContext modelRepository] descriptionForName: name];
+	COObject *obj = [self loadedObjectForUUID: uuid revision: revision];
 
-		if (desc == nil)
-		{
-			NSString *name = [self entityNameForObjectUUID: uuid];
-			if (name == nil)
-			{
-				//[NSException raise: NSGenericException format: @"Failed to find an entity name for %@", uuid];
-				//NSLog(@"WARNING: -[COEditingContext objectWithUUID:entityName:] failed to find an entity name for %@ (probably, the requested object does not exist)", uuid);
-				return nil;
-			}
-			desc = [[_parentContext modelRepository] descriptionForName: name];
-		}
-		
-		// NOTE: We could resolve the root object at loading time, but since
-		// it's going to should be available in memory, we rather resolve it now.
-		ETUUID *rootUUID = [[_parentContext store] rootObjectUUIDForObjectUUID: uuid];
-		ETAssert(rootUUID != nil);
-		ETUUID *trackUUID = [[_parentContext store] mainBranchUUIDForPersistentRootUUID: [self persistentRootUUID]];
-		BOOL isRoot = [rootUUID isEqual: uuid];
-		id rootObject = nil;
-		CORevision *maxRevision = nil;
-		
-		if (isRoot)
-		{
-			if (nil == revision)
-			{
-				NSArray *revisionNodes = [[_parentContext store] revisionsForTrackUUID: trackUUID
-				                                      currentNodeIndex: NULL
-				                                         backwardLimit: 0
-				                                          forwardLimit: 0];
-				revision = [revisionNodes objectAtIndex: 0];
-			}
-		}
-		if (!isRoot)
-		{
-			if (nil == revision && nil != maxRevision)
-			{
-				revision = maxRevision;
-			}
-			rootObject = [self objectWithUUID: rootUUID entityName: nil atRevision: revision];
-		}
-		
-		Class cls = [_parentContext classForEntityDescription: desc];
-		result = [[cls alloc]
-				  initWithUUID: uuid
-				  entityDescription: desc
-				  rootObject: rootObject
-				  context: self
-				  isFault: YES];
-		
-		if (isRoot)
-		{
-			[self setRevision: revision];
-		}
-		[self cacheLoadedObject: result];
-		[result release];
+	if (obj != nil)
+		return obj;
+
+	/* Otherwise instantiate the object */
+
+	ETEntityDescription *desc = [self descriptionForName: name objectUUID: uuid];
+	BOOL hasBeenCommitted = (desc != Nil);
+
+	/* When the object is neither in the cache nor serialized in the store */
+	if (hasBeenCommitted == NO)
+		return nil;
+
+	Class objClass = [[_parentContext modelRepository] classForEntityDescription: desc];
+
+	obj = [[objClass alloc] initWithUUID: uuid
+			           entityDescription: desc
+			                     context: self
+			                    isFault: YES];
+
+	ETUUID *rootObjectUUID = [[_parentContext store] rootObjectUUIDForObjectUUID: uuid];
+	ETAssert(rootObjectUUID != nil);
+	BOOL isRoot = [rootObjectUUID isEqual: uuid];
+
+	if (isRoot)
+	{
+		[self setRevision: [self loadableRevisionForRevision: revision rootObjectUUID: rootObjectUUID]];
 	}
+	[self cacheLoadedObject: obj];
+	[obj release];
 	
-	return result;
+	return obj;
 }
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid
@@ -292,12 +310,11 @@
 		[NSException raise: NSInvalidArgumentException format: @"Entity name %@ invalid", aFullName];
 	}
 	
-	Class cls = [_parentContext classForEntityDescription: desc];
+	Class cls = [[_parentContext modelRepository] classForEntityDescription: desc];
 	/* Nil root object means the new object will be a root */
 	COObject *result = [[cls alloc]
 			  initWithUUID: aUUID
 			  entityDescription: desc
-			  rootObject: _rootObject
 			  context: self
 			  isFault: NO];
 

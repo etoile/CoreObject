@@ -20,7 +20,7 @@
 
 - (NSString *) futureClassName
 {
-	return NSStringFromClass([[_context parentContext]
+	return NSStringFromClass([[[_context parentContext] modelRepository]
 		classForEntityDescription: _entityDescription]);
 }
 

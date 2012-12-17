@@ -17,6 +17,7 @@
 @interface COEditingContext : NSObject <COPersistentObjectContext>
 {
 	@private
+	ETUUID *_uuid;
 	COStore *_store;
 	int64_t _maxRevisionNumber;
 	int64_t _latestRevisionNumber;
@@ -343,5 +344,6 @@
 
 extern NSString *COEditingContextDidCommitNotification;
 
+extern NSString *kCOEditingContextUUIDKey;
 extern NSString *kCORevisionNumbersKey;
 extern NSString *kCORevisionsKey;

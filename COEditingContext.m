@@ -38,6 +38,7 @@ static COEditingContext *currentCtxt = nil;
 {
 	SUPERINIT;
 
+	_uuid = [ETUUID new];
 	ASSIGN(_store, store);
 	_maxRevisionNumber = maxRevisionNumber;	
 	_latestRevisionNumber = [_store latestRevisionNumber];
@@ -61,6 +62,7 @@ static COEditingContext *currentCtxt = nil;
 {
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 
+	DESTROY(_uuid);
 	DESTROY(_store);
 	DESTROY(_modelRepository);
 	DESTROY(_persistentRootContexts);
@@ -73,10 +75,9 @@ object graphs present in memory, for which changes have been committed to the
 store by other processes. */
 - (void)didMakeCommit: (NSNotification *)notif
 {
-	NSNumber *revNumber = [[[notif userInfo] objectForKey: kCORevisionNumbersKey] lastObject];
 	// TODO: Take in account the editing context max revision number
-	BOOL isOurCommit = ([[[_store UUID] stringValue] isEqual: [notif object]]
-		&& (_latestRevisionNumber == [revNumber longLongValue]));
+	ETUUID *posterUUID = [ETUUID UUIDWithString: [[notif userInfo] objectForKey: kCOEditingContextUUIDKey]];
+	BOOL isOurCommit = [_uuid isEqual: posterUUID];
 
 	if (isOurCommit)
 		return;
@@ -160,16 +161,6 @@ store by other processes. */
 	return _modelRepository; 
 }
 
-- (Class)classForEntityDescription: (ETEntityDescription *)desc
-{
-	Class cls = [_modelRepository classForEntityDescription: desc];
-	if (cls == Nil)
-	{
-		cls = [COObject class];
-	}
-	return cls;
-}
-
 - (COPersistentRootEditingContext *)contextForPersistentRootUUID: (ETUUID *)aUUID
 {
 	return [_persistentRootContexts objectForKey: aUUID];
@@ -205,11 +196,10 @@ store by other processes. */
 {
 	COPersistentRootEditingContext *context = [self makePersistentRootContextWithRootObject: nil];
 	ETEntityDescription *desc = [[self modelRepository] descriptionForName: anEntityName];
-	Class cls = [self classForEntityDescription: desc];
+	Class cls = [[self modelRepository] classForEntityDescription: desc];
 	COObject *rootObject = [[cls alloc]
 			  initWithUUID: [ETUUID UUID]
 			  entityDescription: desc
-			  rootObject: nil
 			  context: (id)context
 			  isFault: NO];
 
@@ -431,7 +421,7 @@ store by other processes. */
 	{
 		[revNumbers addObject: [NSNumber numberWithUnsignedLong: [rev revisionNumber]]];
 	}
-	notifInfos = D(revNumbers, kCORevisionNumbersKey);
+	notifInfos = D(revNumbers, kCORevisionNumbersKey, [_uuid stringValue], kCOEditingContextUUIDKey);
 
 #ifndef GNUSTEP
 	[(id)[NSDistributedNotificationCenter defaultCenter] postNotificationName: COEditingContextDidCommitNotification 
@@ -503,5 +493,6 @@ store by other processes. */
 
 NSString *COEditingContextDidCommitNotification = @"COEditingContextDidCommitNotification";
 
+NSString *kCOEditingContextUUIDKey = @"kCOEditingContextUUIDKey";
 NSString *kCORevisionNumbersKey = @"kCORevisionNumbersKey";
 NSString *kCORevisionsKey = @"kCORevisionsKey";

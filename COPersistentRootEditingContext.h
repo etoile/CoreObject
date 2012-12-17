@@ -325,6 +325,10 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
+- (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (void)discardLoadedObjectForUUID: (ETUUID *)aUUID;
 /**
  * This method is only exposed to be used internally by CoreObject.
