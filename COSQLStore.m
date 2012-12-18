@@ -114,8 +114,8 @@ void CHECK(id db)
 
 	/* Store Metadata tables (including schema version) */
 
-	success = success && [db executeUpdate: @"CREATE TABLE storeUUID(uuid STRING)"]; CHECK(db);
-	success = success && [db executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, plist BLOB)"]; CHECK(db);
+	success = success && [db executeUpdate: @"CREATE TABLE storeUUID(uuid STRING  PRIMARY KEY)"]; CHECK(db);
+	success = success && [db executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER PRIMARY KEY, plist BLOB)"]; CHECK(db);
 	
 	success = success && [db executeUpdate: @"INSERT INTO storeUUID(uuid) VALUES(?)", [[ETUUID UUID] stringValue]]; CHECK(db);
 	success = success && [db executeUpdate: @"INSERT INTO storeMetadata(version) VALUES(?)", [NSNumber numberWithLongLong: [self version]]]; CHECK(db);
@@ -127,11 +127,11 @@ void CHECK(id db)
 	   UUIDs/property names. */
 	
 	// UUID Index table
-	success = success && [db executeUpdate: @"CREATE TABLE uuids(uuidIndex INTEGER PRIMARY KEY, uuid STRING, rootIndex INTEGER)"]; CHECK(db);
+	success = success && [db executeUpdate: @"CREATE TABLE uuids(uuidIndex INTEGER PRIMARY KEY, uuid STRING UNIQUE, rootIndex INTEGER)"]; CHECK(db);
 	success = success && [db executeUpdate: @"CREATE INDEX uuidsIndex ON uuids(uuid)"]; CHECK(db);
 	
 	// Property Index table
-	success = success && [db executeUpdate: @"CREATE TABLE properties(propertyIndex INTEGER PRIMARY KEY, property STRING)"]; CHECK(db);
+	success = success && [db executeUpdate: @"CREATE TABLE properties(propertyIndex INTEGER PRIMARY KEY, property STRING UNIQUE)"]; CHECK(db);
 	success = success && [db executeUpdate: @"CREATE INDEX propertiesIndex ON properties(property)"]; CHECK(db);
 	
 	/* Persistent Root and Branch Tables */
@@ -515,7 +515,8 @@ void CHECK(id db)
 	
 	NSString *uuidString = [aPersistentRootUUID stringValue];
 	assert([uuidString isKindOfClass: [NSString class]]);
-    FMResultSet *rs = [db executeQuery: @"SELECT uuidIndex FROM uuids WHERE uuid = ?", uuidString];
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM persistentRoots WHERE uuid = ?",
+		[self keyForUUID: aPersistentRootUUID]];
 	BOOL wasInsertedPreviously = [rs next];
 
 	[rs close];
@@ -534,13 +535,10 @@ void CHECK(id db)
 
 	// TODO: Merge multiple INSERT into a single one
 
-	[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", aPersistentRootUUID]; CHECK(db);
-	NSNumber * persistentRootIndex = [NSNumber numberWithLongLong: [db lastInsertRowId]];
-	// [db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", [aRootObjectUUID stringValue]]; CHECK(db);
-	// NSNumber *rootObjectIndex = [NSNumber numberWithLongLong: [db lastInsertRowId]];
+	NSNumber *persistentRootIndex = [self keyForUUID: aPersistentRootUUID];
+	// TODO: Should we use NSNumber *rootObjectIndex = [self keyForUUID: aRootObjectUUID];
 	NSNumber *rootObjectIndex = rootIndex;
-	[db executeUpdate: @"INSERT INTO uuids VALUES(NULL, ?, NULL)", aMainBranchUUID]; CHECK(db);
-	NSNumber *trackIndex = [NSNumber numberWithLongLong: [db lastInsertRowId]];
+	NSNumber *trackIndex = [self keyForUUID: aMainBranchUUID];
 
 	[db executeUpdate: @"INSERT INTO persistentRoots VALUES(?, ?, ?, NULL)", persistentRootIndex, rootObjectIndex, trackIndex]; CHECK(db);
 	[db executeUpdate: @"INSERT INTO branches VALUES(?, ?, NULL, NULL, NULL)", trackIndex, persistentRootIndex]; CHECK(db);
