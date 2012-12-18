@@ -113,11 +113,6 @@
  * describes all the persistent objects editable in the context.
  */
 - (ETModelDescriptionRepository *)modelRepository;
-/**
- * Returns the class bound to the entity description in the model repository.
- */
-- (Class)classForEntityDescription: (ETEntityDescription *)desc;
-
 
 /** @taskunit Managing Persistent Roots */
 
