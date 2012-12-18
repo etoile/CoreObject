@@ -312,7 +312,6 @@
 
 - (id)initWithPersistentRootUUID: (ETUUID *)aUUID
 				 commitTrackUUID: (ETUUID *)aTrackUUID
-					  rootObject: (COObject *)aRootObject
 				   parentContext: (COEditingContext *)aCtxt;
 /**
  * This method is only exposed to be used internally by CoreObject.

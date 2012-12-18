@@ -6,7 +6,7 @@
 #define SA(x) [NSSet setWithArray: x]
 
 #define STORE_CLASS [COSQLStore class]
-#define STORE_URL [NSURL fileURLWithPath: [@"~/TestStore.sqlitedb" stringByExpandingTildeInPath]]
+#define STORE_URL [NSURL fileURLWithPath: [@"~/TestStore.sqlite" stringByExpandingTildeInPath]]
 
 /**
  * Base class for Core Object test classes.

@@ -175,7 +175,6 @@ store by other processes. */
 	COPersistentRootEditingContext *ctxt =
 		[[COPersistentRootEditingContext alloc] initWithPersistentRootUUID: aPersistentRootUUID
 														   commitTrackUUID: aTrackUUID
-																rootObject: aRootObject
 															 parentContext: self];
 	[_persistentRootContexts setObject: ctxt forKey: [ctxt persistentRootUUID]];
 	[ctxt release];
@@ -194,14 +193,14 @@ store by other processes. */
 
 - (COPersistentRootEditingContext *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
 {
-	COPersistentRootEditingContext *context = [self makePersistentRootContextWithRootObject: nil];
 	ETEntityDescription *desc = [[self modelRepository] descriptionForName: anEntityName];
 	Class cls = [[self modelRepository] classForEntityDescription: desc];
 	COObject *rootObject = [[cls alloc]
-			  initWithUUID: [ETUUID UUID]
-			  entityDescription: desc
-			  context: (id)context
-			  isFault: NO];
+							initWithUUID: [ETUUID UUID]
+							entityDescription: desc
+							context: nil
+							isFault: NO];
+	COPersistentRootEditingContext *context = [self makePersistentRootContextWithRootObject: rootObject];
 
 	/* Will set the root object on the persistent root context */
 	[rootObject becomePersistentInContext: context];

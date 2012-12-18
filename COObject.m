@@ -213,7 +213,7 @@
 	INVALIDARG_EXCEPTION_TEST(aContext, [aContext conformsToProtocol: @protocol(COPersistentObjectContext)]);
 	if ([aContext isKindOfClass: [COPersistentRootEditingContext class]])
 	{
-		INVALIDARG_EXCEPTION_TEST(aContext, [(COPersistentRootEditingContext *)aContext rootObject] != self);
+		//INVALIDARG_EXCEPTION_TEST(aContext, [(COPersistentRootEditingContext *)aContext rootObject] != self);
 	}
 	if (_context != nil)
 	{

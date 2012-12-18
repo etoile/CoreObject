@@ -20,6 +20,8 @@
 
 @synthesize UUID, editingContext, label, parentTrack, isCopy, isMainBranch;
 
+/* Both root object and revision are lazily retrieved by the persistent root. 
+   Until the loaded revision is known, it is useless to cache track nodes. */
 - (id)initWithUUID: (ETUUID *)aUUID editingContext: (COPersistentRootEditingContext *)aContext;
 {
 	NILARG_EXCEPTION_TEST(aUUID);
@@ -38,12 +40,6 @@
 	ASSIGN(UUID, aUUID);
 	/* The persistent root retains us */
 	editingContext = aContext;
-
-	// TODO: Might be not a good idea to cache nodes so soon
-	if ([[self trackedObject] revision] != nil)
-	{
-		[self cacheNodesForward: CACHE_AMOUNT backward: CACHE_AMOUNT];
-	}
 
 	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
 	                                                    selector: @selector(currentNodeDidChangeInStore:) 

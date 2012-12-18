@@ -11,9 +11,39 @@
 @synthesize persistentRootUUID = _persistentRootUUID, parentContext = _parentContext,
 	commitTrack = _commitTrack, rootObject = _rootObject, revision = _revision;
 
+- (CORevision *)loadableRevisionForRevision: (CORevision *)aRevision
+							 rootObjectUUID: (ETUUID *)aRootObjectUUID
+{
+	int64_t maxRevNumber = [_parentContext maxRevisionNumber];
+	BOOL hasMaxRev = (maxRevNumber > 0);
+	int64_t revNumber = (aRevision != nil ? [aRevision revisionNumber] : maxRevNumber);
+	
+	if (hasMaxRev && revNumber > maxRevNumber)
+	{
+		revNumber = maxRevNumber;
+	}
+	
+	
+	// TODO: Should use -maxRevision:forCommitTrackUUID: or -maxRevision:forTrackUUID:
+	return [[self store] maxRevision: revNumber
+	               forRootObjectUUID: aRootObjectUUID];
+}
+
+- (ETUUID *)rootObjectUUID
+{
+	if (_rootObject != nil)
+	{
+		return [_rootObject UUID];
+	}
+	else
+	{
+		return [[_parentContext store]
+			rootObjectUUIDForPersistentRootUUID: [self persistentRootUUID]];
+	}
+}
+
 - (id)initWithPersistentRootUUID: (ETUUID *)aUUID
 				 commitTrackUUID: (ETUUID *)aTrackUUID
-					  rootObject: (COObject *)aRootObject
 				   parentContext: (COEditingContext *)aCtxt
 {
 	NILARG_EXCEPTION_TEST(aUUID);
@@ -22,7 +52,6 @@
 	SUPERINIT;
 
 	ASSIGN(_persistentRootUUID, aUUID);
-	ASSIGN(_rootObject, aRootObject);
 	_parentContext = aCtxt;
 	if ([_parentContext store] != nil)
 	{
@@ -125,20 +154,16 @@
 	return obj;
 }
 
-- (CORevision *)loadableRevisionForRevision: (CORevision *)aRevision
-							 rootObjectUUID: (ETUUID *)aRootObjectUUID
+/* When this method is called, the root object might not be loaded. */
+- (void)cacheLoadedRevisionForRevision: (CORevision *)revision
 {
-	int64_t maxRevNumber = [_parentContext maxRevisionNumber];
-	BOOL hasMaxRev = (maxRevNumber > 0);
-	int64_t revNumber = (aRevision != nil ? [aRevision revisionNumber] : maxRevNumber);
+	if ([self revision] != nil)
+		return;
 
-	if (hasMaxRev && revNumber > maxRevNumber)
-	{
-		revNumber = maxRevNumber;
-	}
+	ETUUID *rootObjectUUID = [self rootObjectUUID];
+	ETAssert(rootObjectUUID != nil);
 
-	return [[self store] maxRevision: revNumber
-	               forRootObjectUUID: aRootObjectUUID];
+	[self setRevision: [self loadableRevisionForRevision: revision rootObjectUUID: rootObjectUUID]];
 }
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision
@@ -169,18 +194,10 @@
 			           entityDescription: desc
 			                     context: self
 			                    isFault: YES];
-
-	ETUUID *rootObjectUUID = [[_parentContext store] rootObjectUUIDForObjectUUID: uuid];
-	ETAssert(rootObjectUUID != nil);
-	BOOL isRoot = [rootObjectUUID isEqual: uuid];
-
-	if (isRoot)
-	{
-		[self setRevision: [self loadableRevisionForRevision: revision rootObjectUUID: rootObjectUUID]];
-	}
 	[self cacheLoadedObject: obj];
 	[obj release];
-	
+	[self cacheLoadedRevisionForRevision: revision];
+
 	return obj;
 }
 
@@ -315,7 +332,7 @@
 	COObject *result = [[cls alloc]
 			  initWithUUID: aUUID
 			  entityDescription: desc
-			  context: self
+			  context: nil
 			  isFault: NO];
 
 	[result becomePersistentInContext: self];
@@ -569,10 +586,13 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 	NILARG_EXCEPTION_TEST(object);
 	INVALIDARG_EXCEPTION_TEST(object, [[_parentContext loadedObjects] containsObject: object] == NO);
 
-	if ([self rootObject] == nil)
+	/* If -becomePersistentInContext: receives -makePersistentRoot as argument.
+	   We must be sure no root object has ever been set (committed or not). */
+	if (_rootObject == nil && [self rootObjectUUID] == nil)
 	{
-		ASSIGN(_rootObject, object);
+		[self setRootObject: object];
 	}
+
 	[self cacheLoadedObject: object];
 	[_insertedObjects addObject: object];
 }
@@ -593,35 +613,30 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 // FIXME: Probably need to turn off relationship consistency around loading.
 - (void)loadObject: (COObject *)obj atRevision: (CORevision *)aRevision
 {
-	CORevision *objectRev = nil;
+	CORevision *loadedRev = aRevision;
 	ETUUID *objUUID = [obj UUID];
-	
 	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj persistentPropertyNames]];
 	//NSLog(@"Properties to fetch: %@", propertiesToFetch);
 	
 	obj->_isIgnoringDamageNotifications = YES;
 	[obj setIgnoringRelationshipConsistency: YES];
 	
-	if (aRevision == nil)
+	if (loadedRev == nil)
 	{
-		aRevision = [obj revision];
+		loadedRev = [obj revision];
 	}
+	ETAssert(loadedRev != nil);
 	
 	//NSLog(@"Load object %@ at %i", objUUID, (int)revNum);
 	
-	while ([propertiesToFetch count] > 0 && aRevision != nil)
+	while ([propertiesToFetch count] > 0 && loadedRev != nil)
 	{
-		NSDictionary *dict = [aRevision valuesAndPropertiesForObjectUUID: objUUID];
+		NSDictionary *dict = [loadedRev valuesAndPropertiesForObjectUUID: objUUID];
 		
 		for (NSString *key in [dict allKeys])
 		{
 			if ([propertiesToFetch containsObject: key])
 			{
-				if (nil == objectRev)
-				{
-					objectRev = aRevision;
-				}
-				
 				id plist = [dict objectForKey: key];
 				id value = [obj valueForPropertyList: plist];
 				//NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
@@ -630,7 +645,7 @@ static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescri
 			}
 		}
 		
-		aRevision = [aRevision baseRevision];
+		loadedRev = [loadedRev baseRevision];
 	}
 	
 	if ([propertiesToFetch count] > 0)
