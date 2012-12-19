@@ -1615,7 +1615,7 @@ static unsigned int	maxConnections = 8;
     {
       s = "";
     }
-  str = [[NSString alloc] initWithCString: s];
+  str = [[NSString alloc] initWithCString: s encoding: NSUTF8StringEncoding];
   quoted = [self quoteString: str];
   [str release];
   return quoted;
