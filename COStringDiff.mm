@@ -203,7 +203,7 @@ public:
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat: @"Insert '%@' at %d", insertedString, range.location];
+	return [NSString stringWithFormat: @"Insert '%@' at %lu", insertedString, (unsigned long)range.location];
 }
 
 - (BOOL) isEqual: (id)other

@@ -166,7 +166,7 @@ public:
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat: @"Insert '%@' at %d", insertedObjects, range.location];
+	return [NSString stringWithFormat: @"Insert '%@' at %lu", insertedObjects, (unsigned long)range.location];
 }
 
 - (BOOL) isEqual: (id)other

@@ -1200,7 +1200,7 @@ static int indent = 0;
 	// TODO: Probably a bit slow, rewrite in C a bit
 	NSString *capitalizedKey = [key stringByReplacingCharactersInRange: NSMakeRange(0, 1) 
 	                                                        withString: [[key substringToIndex: 1] uppercaseString]];
-	SEL setter = NSSelectorFromString([NSString stringWithFormat: @"%@%@:", 
+	SEL setter = NSSelectorFromString([NSString stringWithFormat: @"%@%@%@", 
 		@"setSerialized", capitalizedKey, @":"]);
 
 	if ([self respondsToSelector: setter])
