@@ -409,7 +409,7 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 
 - (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency  newUUID: (BOOL)newUUID
 {
-	NSParameterAssert([sourceObject editingContext] != nil);
+	NSParameterAssert([sourceObject persistentRoot] != nil);
 	
 	/* Source Object is already persistent
 	 

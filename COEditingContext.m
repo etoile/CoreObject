@@ -100,7 +100,7 @@ store by other processes. */
 
 		COObject *rootObject = [self objectWithUUID: rootObjectUUID];
 
-		[[rootObject editingContext] reloadAtRevision: rev];
+		[[rootObject persistentRoot] reloadAtRevision: rev];
 	}
 }
 
@@ -246,7 +246,7 @@ store by other processes. */
 - (void)deletePersistentRootForRootObject: (COObject *)aRootObject
 {
 	// NOTE: Deleted persistent roots are removed from the cache on commit.
-	[_deletedPersistentRoots addObject: [aRootObject editingContext]];
+	[_deletedPersistentRoots addObject: [aRootObject persistentRoot]];
 }
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision
@@ -313,9 +313,9 @@ store by other processes. */
 {
 	for (COObject *obj in [self loadedObjects])
 	{
-		if ([removedPersistentRoots containsObject: [obj editingContext]])
+		if ([removedPersistentRoots containsObject: [obj persistentRoot]])
 		{
-			[[obj editingContext] discardLoadedObjectForUUID: [obj UUID]];
+			[[obj persistentRoot] discardLoadedObjectForUUID: [obj UUID]];
 		}
 	}
 }
@@ -395,7 +395,7 @@ store by other processes. */
 
 - (void)discardChangesInObject: (COObject *)object
 {
-	[[object editingContext] discardChangesInObject: object];
+	[[object persistentRoot] discardChangesInObject: object];
 }
 
 - (NSArray *)commit

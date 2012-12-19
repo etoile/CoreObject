@@ -149,11 +149,11 @@
 	if (isFault)
 	{
 		object_setClass(self, [[self class] faultClass]);
-		_context = aContext;
+		_persistentRoot = aContext;
 	}
 	else
 	{
-		[(id)_context markObjectUpdated: self forProperty: nil];
+		[(id)_persistentRoot markObjectUpdated: self forProperty: nil];
 		_variableStorage = [self newVariableStorage];
 		[self didCreate];
 	}
@@ -200,7 +200,7 @@
 
 - (void)dealloc
 {
-	_context = nil;
+	_persistentRoot = nil;
 	DESTROY(_uuid);
 	DESTROY(_entityDescription);
 	DESTROY(_variableStorage);
@@ -215,17 +215,17 @@
 	{
 		//INVALIDARG_EXCEPTION_TEST(aContext, [(COPersistentRoot *)aContext rootObject] != self);
 	}
-	if (_context != nil)
+	if (_persistentRoot != nil)
 	{
 		[NSException raise: NSInternalInconsistencyException
 					format: _(@"You must not sent -becomePersistentInContext:, "
 		                       "to %@, the object is already persistent in %@"),
-		                     [self primitiveDescription], _context];
+		                     [self primitiveDescription], _persistentRoot];
 	}
 	
 	/* Both transient and persistent objects must have a valid UUID */
 	ETAssert(_uuid != nil);
-	_context = aContext;
+	_persistentRoot = aContext;
 	if (_entityDescription == nil)
 	{
 		ASSIGN(_entityDescription, [[(id)aContext modelRepository] entityDescriptionForClass: [self class]]);
@@ -238,7 +238,7 @@
 	COObject *newObject = [[self class] allocWithZone: aZone];
 	
 	newObject->_uuid = [[ETUUID alloc] init];
-	newObject->_context = _context;
+	newObject->_persistentRoot = _persistentRoot;
 	if (_variableStorage != nil)
 	{
 		newObject->_variableStorage = [self newVariableStorage];
@@ -271,14 +271,14 @@
 	return _uuid;
 }
 
-- (COPersistentRoot *)editingContext
+- (COPersistentRoot *)persistentRoot
 {
-	return _context;
+	return _persistentRoot;
 }
 
 - (COObject *) rootObject
 {
-	return [_context rootObject];
+	return [_persistentRoot rootObject];
 }
 
 - (BOOL) isRoot
@@ -293,19 +293,19 @@
 
 - (CORevision *)revision
 {
-	return [_context revision];
+	return [_persistentRoot revision];
 }
 
 - (BOOL) isPersistent
 {
-	return (_context != nil);
+	return (_persistentRoot != nil);
 	// TODO: Switch to the code below on root object are saved in the db
-	// return (_context != nil && _rootObject != nil);
+	// return (_persistentRoot != nil && _rootObject != nil);
 }
 
 - (BOOL) isDamaged
 {
-	return [[self editingContext] isUpdatedObject: self];
+	return [[self persistentRoot] isUpdatedObject: self];
 }
 
 /* Helper methods based on the metamodel */
@@ -363,16 +363,16 @@
 		            format: @"Inner objects cannot be known until %@ has become persistent", self];
 	}
 
-	CORevision *loadedRev = [_context revision];
+	CORevision *loadedRev = [_persistentRoot revision];
 
-	ETUUID *trackUUID = [[[self editingContext] commitTrack] UUID];
-	NSSet *innerObjectUUIDs = [[[self editingContext] store] objectUUIDsForCommitTrackUUID: trackUUID
+	ETUUID *trackUUID = [[[self persistentRoot] commitTrack] UUID];
+	NSSet *innerObjectUUIDs = [[[self persistentRoot] store] objectUUIDsForCommitTrackUUID: trackUUID
 	                                                                            atRevision: loadedRev];
 	NSMutableSet *innerObjects = [NSMutableSet setWithCapacity: [innerObjectUUIDs count]];
 
 	for (ETUUID *uuid in innerObjectUUIDs)
 	{
-		[innerObjects addObject: [[_context parentContext] objectWithUUID: uuid]];
+		[innerObjects addObject: [[_persistentRoot parentContext] objectWithUUID: uuid]];
 	}
 	return innerObjects;
 }
@@ -406,14 +406,14 @@
 
 - (NSDate *)modificationDate
 {
-	CORevision *rev = [[[self editingContext] store] maxRevision: INT64_MAX 
+	CORevision *rev = [[[self persistentRoot] store] maxRevision: INT64_MAX 
 	                                           forRootObjectUUID: [[self rootObject] UUID]];
 	return [rev date];
 }
 
 - (NSDate *)creationDate
 {
-	CORevision *rev = [[[self editingContext] store] maxRevision: 0 
+	CORevision *rev = [[[self persistentRoot] store] maxRevision: 0 
 	                                           forRootObjectUUID: [[self rootObject] UUID]];
 	return [rev date];
 }
@@ -502,7 +502,7 @@
 	{
 		if ([value isKindOfClass: [COObject class]])
 		{
-			assert([[value editingContext] parentContext] == [_context parentContext]);
+			assert([[value persistentRoot] parentContext] == [_persistentRoot parentContext]);
 		}    
 	}
 }
@@ -796,7 +796,7 @@
 {
 	if (!_isIgnoringDamageNotifications)
 	{
-		[[self editingContext] markObjectUpdated: self forProperty: prop];
+		[[self persistentRoot] markObjectUpdated: self forProperty: prop];
 	}
 }
 
@@ -1004,7 +1004,7 @@
 
 - (COCommitTrack *)commitTrack
 {
-	return [[self editingContext] commitTrack];
+	return [[self persistentRoot] commitTrack];
 }
 
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
@@ -1406,7 +1406,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		if ([type isEqualToString: @"object-ref"])
 		{
 			ETUUID *uuid = [ETUUID UUIDWithString: [plist valueForKey: @"uuid"]];
-			return [[[self editingContext] parentContext] objectWithUUID: uuid
+			return [[[self persistentRoot] parentContext] objectWithUUID: uuid
 			                                                  entityName: [plist valueForKey: @"entity"]
 			                                                  atRevision: nil];
 		}

@@ -212,7 +212,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 {
 	if ([newlySetValue isKindOfClass: [ETUUID class]])
 	{
-		newlySetValue = [[[obj editingContext] parentContext] objectWithUUID: newlySetValue];
+		newlySetValue = [[[obj persistentRoot] parentContext] objectWithUUID: newlySetValue];
 		//assert(newlySetValue != nil); //FIXME: remove
 	}
 	[obj setValue: newlySetValue forProperty: propertyName];
@@ -259,7 +259,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	{
 		if ([value isKindOfClass: [ETUUID class]])
 		{
-			id newValue = [[[obj editingContext] parentContext] objectWithUUID: value];
+			id newValue = [[[obj persistentRoot] parentContext] objectWithUUID: value];
 			assert(newValue != nil); //FIXME: remove
 			[newArray addObject: newValue];
 		}
@@ -313,7 +313,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	{
 		if ([value isKindOfClass: [ETUUID class]])
 		{
-			id newValue = [[[obj editingContext] parentContext] objectWithUUID: value];
+			id newValue = [[[obj persistentRoot] parentContext] objectWithUUID: value];
 			assert(newValue != nil); //FIXME: remove
 			[newSet addObject: newValue];
 		}
@@ -403,7 +403,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	for (COObject *obj in [_insertedObjectsByUUID allValues])
 	{
 		COPersistentRoot *persistentRoot =
-			[ctx persistentRootForUUID: [[obj editingContext] persistentRootUUID]];
+			[ctx persistentRootForUUID: [[obj persistentRoot] persistentRootUUID]];
 
 		if (persistentRoot == nil)
 		{
@@ -418,7 +418,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	for (ETUUID *uuid in _deletedObjectUUIDs)
 	{
 		COObject *obj = [ctx objectWithUUID: uuid];
-		[[obj editingContext] deleteObject: obj];
+		[[obj persistentRoot] deleteObject: obj];
 	}
 	for (ETUUID *uuid in _editsByPropertyAndUUID)
 	{
@@ -586,8 +586,8 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	set = (NSMutableSet*)[[set mappedCollection] UUID];
 	
 	return [COObjectGraphDiff diffObjectsWithUUIDs: [set allObjects]
-										 inContext: [[group1 editingContext] parentContext]
-									   withContext: [[group2 editingContext] parentContext]];
+										 inContext: [[group1 persistentRoot] parentContext]
+									   withContext: [[group2 persistentRoot] parentContext]];
 }
 
 + (COObjectGraphDiff *)diffRootObject: (COObject *)baseObject 
@@ -599,8 +599,8 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	set = (id)[[set mappedCollection] UUID];
 
 	return [COObjectGraphDiff diffObjectsWithUUIDs: [set allObjects]
-										 inContext: [[baseObject editingContext] parentContext]
-									   withContext: [[otherObject editingContext] parentContext]];
+										 inContext: [[baseObject persistentRoot] parentContext]
+									   withContext: [[otherObject persistentRoot] parentContext]];
 }
 
 + (COObjectGraphDiff *)selectiveUndoDiffWithRootObject: (COObject *)aRootObject 
@@ -608,7 +608,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 {
 	// NOTE: Check the editing context is sane and we don't have an outdated 
 	// root object instance.
-	assert(aRootObject == [[[aRootObject editingContext] parentContext] objectWithUUID: [aRootObject UUID]]);
+	assert(aRootObject == [[[aRootObject persistentRoot] parentContext] objectWithUUID: [aRootObject UUID]]);
 
 	CORevision *revBeforeUndo = [revToUndo baseRevision];
 
@@ -678,8 +678,8 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 	for (ETUUID *aUUID in insertConflicts)
 	{
 		// Warn about conflicts
-		if ([[diff1->_insertedObjectsByUUID objectForKey: aUUID] editingContext] != 
-			[[diff2->_insertedObjectsByUUID objectForKey: aUUID] editingContext])
+		if ([[diff1->_insertedObjectsByUUID objectForKey: aUUID] persistentRoot] != 
+			[[diff2->_insertedObjectsByUUID objectForKey: aUUID] persistentRoot])
 		{
 			//NSLog(@"ERROR: Insert/Insert conflict with UUID %@. LHS wins.", aUUID);
 		}

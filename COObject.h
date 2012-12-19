@@ -166,7 +166,7 @@
 	@package
 	ETEntityDescription *_entityDescription;
 	ETUUID *_uuid;
-	COPersistentRoot *_context; // weak reference
+	COPersistentRoot *_persistentRoot; // weak reference
 	NSMapTable *_variableStorage;
 	BOOL _isIgnoringDamageNotifications;
 	BOOL _isIgnoringRelationshipConsistency;
@@ -231,7 +231,7 @@
  * Returns the persistent root editing context when the receiver is persistent,   
  * otherwise returns nil.
  */
-- (COPersistentRoot *)editingContext;
+- (COPersistentRoot *)persistentRoot;
 /** 
  * Returns the root object when the receiver is persistent, otherwise returns nil.
  *

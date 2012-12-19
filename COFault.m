@@ -20,7 +20,7 @@
 
 - (NSString *) futureClassName
 {
-	return NSStringFromClass([[[_context parentContext] modelRepository]
+	return NSStringFromClass([[[_persistentRoot parentContext] modelRepository]
 		classForEntityDescription: _entityDescription]);
 }
 
@@ -36,7 +36,7 @@
 
 - (COPersistentRoot *) editingContext
 {
-	return _context;
+	return _persistentRoot;
 }
 
 - (BOOL) isEqual: (id)other
@@ -68,7 +68,7 @@
 	assert(_variableStorage == nil);
 	_variableStorage = [(COObject *)self newVariableStorage];
 
-	[_context loadObject: (COObject *)self];
+	[_persistentRoot loadObject: (COObject *)self];
 	// TODO: Move to -loadObject:atRevision: probably
 	[(COObject *)self awakeFromFetch];
 

@@ -32,7 +32,7 @@
 	NSSet *editedUUIDs = [[changedObjects mappedCollection] UUID];
 	COObjectGraphDiff *diff = [COObjectGraphDiff diffObjectsWithUUIDs: editedUUIDs
 															inContext: shadowEditingContext
-														  withContext: [aRootObject editingContext]];
+														  withContext: [aRootObject persistentRoot]];
 
 	[diff applyToContext: shadowEditingContext];
 	[self synchronizeClientsUsingDiff: diff];

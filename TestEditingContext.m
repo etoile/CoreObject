@@ -68,16 +68,16 @@
 	UKNotNil([obj valueForProperty: @"parentCollections"]);
 	UKNotNil([obj valueForProperty: @"contents"]);
 
-	UKObjectsSame(ctx, [[obj editingContext] parentContext]);
-	UKObjectsSame(obj, [[obj editingContext] objectWithUUID: [obj UUID]]);
+	UKObjectsSame(ctx, [[obj persistentRoot] parentContext]);
+	UKObjectsSame(obj, [[obj persistentRoot] objectWithUUID: [obj UUID]]);
 	UKTrue([[ctx loadedObjects] containsObject: obj]);
 	UKTrue([[ctx loadedRootObjects] containsObject: obj]);
 
-	UKTrue([[[obj editingContext] insertedObjects] containsObject: obj]);
+	UKTrue([[[obj persistentRoot] insertedObjects] containsObject: obj]);
 	UKTrue([[ctx insertedObjects] containsObject: obj]);
-	UKTrue([[[obj editingContext] changedObjects] containsObject: obj]);
+	UKTrue([[[obj persistentRoot] changedObjects] containsObject: obj]);
 	UKTrue([[ctx changedObjects] containsObject: obj]);
-	UKTrue([[obj editingContext] hasChanges]);
+	UKTrue([[obj persistentRoot] hasChanges]);
 	UKTrue([ctx hasChanges]);
 }
 
@@ -87,16 +87,16 @@
 	
 	COObject *obj = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
 
-	UKTrue([[[obj editingContext] updatedObjects] isEmpty]);
+	UKTrue([[[obj persistentRoot] updatedObjects] isEmpty]);
 	UKTrue([[ctx updatedObjects] isEmpty]);
 
 	[obj setValue: @"Hello" forProperty: @"label"];
 
-	UKTrue([[[obj editingContext] updatedObjects] containsObject: obj]);
+	UKTrue([[[obj persistentRoot] updatedObjects] containsObject: obj]);
 	UKTrue([[ctx insertedObjects] containsObject: obj]);
-	UKTrue([[[obj editingContext] updatedObjects] containsObject: obj]);
+	UKTrue([[[obj persistentRoot] updatedObjects] containsObject: obj]);
 	UKTrue([[ctx changedObjects] containsObject: obj]);
-	UKTrue([[obj editingContext] hasChanges]);
+	UKTrue([[obj persistentRoot] hasChanges]);
 	UKTrue([ctx hasChanges]);
 }
 
@@ -106,15 +106,15 @@
 	
 	COObject *obj = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
 	
-	UKTrue([[[obj editingContext] deletedObjects] isEmpty]);
+	UKTrue([[[obj persistentRoot] deletedObjects] isEmpty]);
 	UKTrue([[ctx deletedObjects] isEmpty]);
 	
-	[[obj editingContext] deleteObject: obj];
+	[[obj persistentRoot] deleteObject: obj];
 	
-	UKTrue([[[obj editingContext] deletedObjects] containsObject: obj]);
+	UKTrue([[[obj persistentRoot] deletedObjects] containsObject: obj]);
 	UKTrue([[ctx deletedObjects] containsObject: obj]);
 	UKTrue([[ctx changedObjects] containsObject: obj]);
-	UKTrue([[obj editingContext] hasChanges]);
+	UKTrue([[obj persistentRoot] hasChanges]);
 	UKTrue([ctx hasChanges]);
 }
 
@@ -147,7 +147,7 @@
 		[ctx contextForPersistentRootUUID: [persistentRoot persistentRootUUID]];
 	COObject *newObj = [newPersistentRoot rootObject];*/
 	COObject *newObj = [ctx objectWithUUID: [obj UUID]];
-	COPersistentRoot *newPersistentRoot = [newObj editingContext];
+	COPersistentRoot *newPersistentRoot = [newObj persistentRoot];
 
 	UKNotNil(newObj);
 	UKObjectsEqual([obj UUID], [newObj UUID]);
@@ -227,8 +227,8 @@
 	COObject *o1copy = [ctx2 insertObject: o1];
 
 	UKNotNil(o1copy);
-	UKObjectsSame(ctx1, [(id)[o1 editingContext] parentContext]);
-	UKObjectsSame(ctx2, [(id)[o1copy editingContext] parentContext]);
+	UKObjectsSame(ctx1, [(id)[o1 persistentRoot] parentContext]);
+	UKObjectsSame(ctx2, [(id)[o1copy persistentRoot] parentContext]);
 	UKStringsEqual(@"Shopping", [o1copy valueForProperty: @"label"]);
 
 	[ctx1 release];
@@ -255,14 +255,14 @@
 	
 	COContainer *childCopy = [ctx2 insertObject: child];
 	UKNotNil(childCopy);
-	UKObjectsSame(ctx2, [(id)[childCopy editingContext] parentContext]);
+	UKObjectsSame(ctx2, [(id)[childCopy persistentRoot] parentContext]);
 	UKNil([childCopy valueForProperty: @"parentContainer"]);
 	UKStringsEqual(@"Groceries", [childCopy valueForProperty: @"label"]);
 	UKNotNil([childCopy contentArray]);
 	
 	COContainer *subchildCopy = [[childCopy contentArray] firstObject];
 	UKNotNil(subchildCopy);
-	UKObjectsSame(ctx2, [(id)[subchildCopy editingContext] parentContext]);
+	UKObjectsSame(ctx2, [(id)[subchildCopy persistentRoot] parentContext]);
 	UKStringsEqual(@"Pizza", [subchildCopy valueForProperty: @"label"]);
 				   
 	[ctx1 release];
@@ -299,7 +299,7 @@
 	COContainer *childCopy = [ctx2 insertObject: child];
 
 	UKNotNil(childCopy);
-	UKObjectsSame(ctx2, [(id)[childCopy editingContext] parentContext]);
+	UKObjectsSame(ctx2, [(id)[childCopy persistentRoot] parentContext]);
 	UKObjectsEqual([parent UUID], [[childCopy valueForProperty: @"parentContainer"] UUID]);
 	UKStringsEqual(@"Shopping", [[childCopy valueForProperty: @"parentContainer"] valueForProperty: @"label"]);
 	UKStringsEqual(@"Groceries", [childCopy valueForProperty: @"label"]);
@@ -310,12 +310,12 @@
 	{
 		COContainer *subchildCopy = [[childCopy contentArray] firstObject];
 		UKNotNil(subchildCopy);
-		UKObjectsSame(ctx2, [(id)[subchildCopy editingContext] parentContext]);
+		UKObjectsSame(ctx2, [(id)[subchildCopy persistentRoot] parentContext]);
 		UKStringsEqual(@"Pizza", [subchildCopy valueForProperty: @"label"]);
 		
 		COContainer *subchild2Copy = [[childCopy contentArray] objectAtIndex: 1];
 		UKNotNil(subchild2Copy);
-		UKObjectsSame(ctx2, [(id)[subchild2Copy editingContext] parentContext]);
+		UKObjectsSame(ctx2, [(id)[subchild2Copy persistentRoot] parentContext]);
 		UKStringsEqual(@"Salad", [subchild2Copy valueForProperty: @"label"]);
 	}
 

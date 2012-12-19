@@ -51,8 +51,8 @@ persistency-related. */
 - (unsigned int) hash;
 /** See -[COObject UUID]. */
 - (ETUUID *) UUID;
-/** See -[COObject editingContext]. */
-- (COPersistentRoot *) editingContext;
+/** See -[COObject persistentRoot]. */
+- (COPersistentRoot *) persistentRoot;
 /** See -[COObject isEqual:]. */
 - (BOOL) isEqual: (id)other;
 
@@ -65,7 +65,7 @@ persistency-related. */
 	@private
 	ETEntityDescription *_entityDescription;
 	ETUUID *_uuid;
-	COPersistentRoot *_context; // weak reference
+	COPersistentRoot *_persistentRoot; // weak reference
 	NSMapTable *_variableStorage;
 	BOOL _isIgnoringDamageNotifications;
 }

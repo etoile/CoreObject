@@ -285,14 +285,14 @@
 
 			//assert([newTrackRev isEqual: [[[self currentNode] previousNode] revision]]);
 
-			[[object editingContext] reloadAtRevision: newRev];
+			[[object persistentRoot] reloadAtRevision: newRev];
 		}
 		else
 		{
 			// TODO: Commit a delete
 
 			/* Undo root object creation */
-			[[object editingContext] unload];
+			[[object persistentRoot] unload];
 		}
 	}
 	else
@@ -333,7 +333,7 @@
 
 		//assert([newTrackRev isEqual: [[[self currentNode] nextNode] revision]]);
 
-	    [[object editingContext] reloadAtRevision: newRev];
+	    [[object persistentRoot] reloadAtRevision: newRev];
 	}
 	else /* Fall back on selective undo */
 	{

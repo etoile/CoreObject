@@ -107,7 +107,7 @@
 
 - (BOOL)isTag
 {
-	assert([[[self editingContext] tagLibrary] containsObject: self]);
+	assert([[[self persistentRoot] tagLibrary] containsObject: self]);
 	return YES;
 }
 

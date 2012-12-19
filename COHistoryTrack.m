@@ -45,7 +45,7 @@
 
 - (COStore *)store
 {
-	return [[trackObject editingContext] store];
+	return [[trackObject persistentRoot] store];
 }
 
 - (void)undo
@@ -66,7 +66,7 @@
 	
 	COEditingContext *revToUndoCtx = [[COEditingContext alloc] initWithStore: [revToUndo store] maxRevisionNumber: [revToUndo revisionNumber]];
 	COEditingContext *revBeforeUndoCtx = [[COEditingContext alloc] initWithStore: [revBeforeUndo store] maxRevisionNumber: [revBeforeUndo revisionNumber]];
-	COEditingContext *currentRevisionCtx = [[trackObject editingContext] parentContext];
+	COEditingContext *currentRevisionCtx = [[trackObject persistentRoot] parentContext];
 	
 	COContainer *revToUndoObj = (COContainer*)[revToUndoCtx objectWithUUID: [trackObject UUID] atRevision: revToUndo];
 	COContainer *revBeforeUndoObj = (COContainer*)[revBeforeUndoCtx objectWithUUID: [trackObject UUID] atRevision: revBeforeUndo];
@@ -162,16 +162,16 @@
 {
 	ETAssert([trackObject isRoot]);
 
-	COStore *store = [[trackObject editingContext] store];
+	COStore *store = [[trackObject persistentRoot] store];
 	NSSet *rootAndInnerObjectUUIDs =
-		[store objectUUIDsForCommitTrackUUID: [[[trackObject editingContext] commitTrack] UUID]];
+		[store objectUUIDsForCommitTrackUUID: [[[trackObject persistentRoot] commitTrack] UUID]];
 
 	return [store revisionsForObjectUUIDs: rootAndInnerObjectUUIDs];
 }
 
 - (NSArray *)cachedNodes
 {
-	BOOL recache = (revNumberAtCacheTime != [[[trackObject editingContext] store] latestRevisionNumber]);
+	BOOL recache = (revNumberAtCacheTime != [[[trackObject persistentRoot] store] latestRevisionNumber]);
 
 	if (recache)
 	{
@@ -183,7 +183,7 @@
 			[[self cachedNodes] addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
 		}
 
-		revNumberAtCacheTime = [[[trackObject editingContext] store] latestRevisionNumber];
+		revNumberAtCacheTime = [[[trackObject persistentRoot] store] latestRevisionNumber];
 	}
 	return [self cachedNodes];
 }
