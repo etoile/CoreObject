@@ -20,7 +20,7 @@
 #error "CoreObject cannot be used in mixed-ABI mode. Please configure gnustep-base with './configure --disable-mixedabi' to use the pure non-fragile ABI."
 #endif    
 
-@class COPersistentRootEditingContext, COObject, CORevision;
+@class COPersistentRoot, COObject, CORevision;
 
 /** The protocol to which any fault class must comply to. 
 
@@ -52,7 +52,7 @@ persistency-related. */
 /** See -[COObject UUID]. */
 - (ETUUID *) UUID;
 /** See -[COObject editingContext]. */
-- (COPersistentRootEditingContext *) editingContext;
+- (COPersistentRoot *) editingContext;
 /** See -[COObject isEqual:]. */
 - (BOOL) isEqual: (id)other;
 
@@ -65,7 +65,7 @@ persistency-related. */
 	@private
 	ETEntityDescription *_entityDescription;
 	ETUUID *_uuid;
-	COPersistentRootEditingContext *_context; // weak reference
+	COPersistentRoot *_context; // weak reference
 	NSMapTable *_variableStorage;
 	BOOL _isIgnoringDamageNotifications;
 }

@@ -39,7 +39,7 @@
  * From a terminology standpoint, persistent root and core object can be used 
  * interchangeably.
  */
-@interface COPersistentRootEditingContext : NSObject <COPersistentObjectContext>
+@interface COPersistentRoot : NSObject <COPersistentObjectContext>
 {
 	@private
 	COEditingContext *_parentContext;
@@ -115,7 +115,7 @@
  * The parent context makes possible to edit multiple persistent roots 
  * simultaneously and provide an aggregate view on the editing underway.
  *
- * COPersistentRootEditingContext objects are instantiated and released by the
+ * COPersistentRoot objects are instantiated and released by the
  * parent context.
  *
  * The parent context is managed by the user.

@@ -10,7 +10,7 @@
 #import "COHistoryTrack.h"
 #import "CORevision.h"
 #import "COEditingContext.h"
-#import "COPersistentRootEditingContext.h"
+#import "COPersistentRoot.h"
 #import "COObject.h"
 #import "COContainer.h"
 #import "COObjectGraphDiff.h"

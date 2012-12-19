@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COPersistentRootEditingContext;
+@class COPersistentRoot;
 @class COStore, CORevision, COObject, COGroup, COSmartGroup, COCommitTrack, COError;
 
 @protocol COPersistentObjectContext <NSObject>
@@ -116,9 +116,9 @@
 
 /** @taskunit Managing Persistent Roots */
 
-- (COPersistentRootEditingContext *)contextForPersistentRootUUID: (ETUUID *)aUUID;
-- (COPersistentRootEditingContext *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName;
-- (COPersistentRootEditingContext *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
+- (COPersistentRoot *)contextForPersistentRootUUID: (ETUUID *)aUUID;
+- (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName;
+- (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
 - (void)deletePersistentRootForRootObject: (COObject *)aRootObject;
 
 /** @taskunit Object Access and Loading */
@@ -245,7 +245,7 @@
  */
 - (void)discardChangesInObject: (COObject *)object;
 
-- (COPersistentRootEditingContext *)makePersistentRootContext;
+- (COPersistentRoot *)makePersistentRootContext;
 
 /** @taskunit Committing Changes */
 
@@ -297,7 +297,7 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (COPersistentRootEditingContext *)makePersistentRootContextWithRootObject: (COObject *)aRootObject;
+- (COPersistentRoot *)makePersistentRootContextWithRootObject: (COObject *)aRootObject;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

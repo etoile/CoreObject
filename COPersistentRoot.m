@@ -1,4 +1,4 @@
-#import "COPersistentRootEditingContext.h"
+#import "COPersistentRoot.h"
 #import "COEditingContext.h"
 #import "COError.h"
 #import "COObject.h"
@@ -6,7 +6,7 @@
 #import "CORevision.h"
 #import "COCommitTrack.h"
 
-@implementation COPersistentRootEditingContext
+@implementation COPersistentRoot
 
 @synthesize persistentRootUUID = _persistentRootUUID, parentContext = _parentContext,
 	commitTrack = _commitTrack, rootObject = _rootObject, revision = _revision;
@@ -360,7 +360,7 @@
 /**
  * Helper method for -insertObject:
  */
-static id handle(id value, COPersistentRootEditingContext *ctx, ETPropertyDescription *desc, BOOL consistency, BOOL newUUID)
+static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, BOOL consistency, BOOL newUUID)
 {
 	if ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]])
 	{

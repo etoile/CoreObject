@@ -7,7 +7,7 @@
 */
 
 #import "COFault.h"
-#import "COPersistentRootEditingContext.h"
+#import "COPersistentRoot.h"
 #import "COObject.h"
 #include <objc/runtime.h>
 
@@ -34,7 +34,7 @@
 	return [[self UUID] hash];
 }
 
-- (COPersistentRootEditingContext *) editingContext
+- (COPersistentRoot *) editingContext
 {
 	return _context;
 }

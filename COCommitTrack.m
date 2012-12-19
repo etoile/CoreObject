@@ -8,7 +8,7 @@
 
 #import "COCommitTrack.h"
 #import "COEditingContext.h"
-#import "COPersistentRootEditingContext.h"
+#import "COPersistentRoot.h"
 #import "COStore.h"
 #import "COObject.h"
 #import "CORevision.h"
@@ -22,7 +22,7 @@
 
 /* Both root object and revision are lazily retrieved by the persistent root. 
    Until the loaded revision is known, it is useless to cache track nodes. */
-- (id)initWithUUID: (ETUUID *)aUUID editingContext: (COPersistentRootEditingContext *)aContext;
+- (id)initWithUUID: (ETUUID *)aUUID editingContext: (COPersistentRoot *)aContext;
 {
 	NILARG_EXCEPTION_TEST(aUUID);
 	NILARG_EXCEPTION_TEST(aContext);

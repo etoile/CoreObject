@@ -16,6 +16,7 @@
 #import <CoreObject/COGroup.h>
 #import <CoreObject/COHistoryTrack.h>
 #import <CoreObject/COObject.h>
+#import <CoreObject/COPersistentRoot.h>
 #import <CoreObject/COQuery.h>
 #import <CoreObject/CORevision.h>
 #import <CoreObject/COStore.h>

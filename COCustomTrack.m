@@ -8,7 +8,7 @@
 
 #import "COCustomTrack.h"
 #import "COEditingContext.h"
-#import "COPersistentRootEditingContext.h"
+#import "COPersistentRoot.h"
 #import "COObject.h"
 #import "COObjectGraphDiff.h"
 #import "CORevision.h"

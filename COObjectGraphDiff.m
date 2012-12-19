@@ -1,6 +1,6 @@
 #import "COObjectGraphDiff.h"
 #import "COEditingContext.h"
-#import "COPersistentRootEditingContext.h"
+#import "COPersistentRoot.h"
 #import "COObject.h"
 #import "CORevision.h"
 #import "COContainer.h"
@@ -402,7 +402,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 {
 	for (COObject *obj in [_insertedObjectsByUUID allValues])
 	{
-		COPersistentRootEditingContext *persistentRootContext =
+		COPersistentRoot *persistentRootContext =
 			[ctx contextForPersistentRootUUID: [[obj editingContext] persistentRootUUID]];
 
 		if (persistentRootContext == nil)

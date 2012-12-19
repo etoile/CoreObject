@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
 #import "COEditingContext.h"
-#import "COPersistentRootEditingContext.h"
+#import "COPersistentRoot.h"
 #import "COContainer.h"
 #import "COGroup.h"
 #import "COStore.h"
@@ -121,7 +121,7 @@
 - (void)testBasicPersistence
 {
 	return;
-	COPersistentRootEditingContext *persistentRoot =
+	COPersistentRoot *persistentRoot =
 		[[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] retain];
 	COObject *obj = [persistentRoot rootObject];
 
@@ -143,11 +143,11 @@
 	
 	/* Recreate persistent root and root object */
 
-	/*COPersistentRootEditingContext *newPersistentRoot =
+	/*COPersistentRoot *newPersistentRoot =
 		[ctx contextForPersistentRootUUID: [persistentRoot persistentRootUUID]];
 	COObject *newObj = [newPersistentRoot rootObject];*/
 	COObject *newObj = [ctx objectWithUUID: [obj UUID]];
-	COPersistentRootEditingContext *newPersistentRoot = [newObj editingContext];
+	COPersistentRoot *newPersistentRoot = [newObj editingContext];
 
 	UKNotNil(newObj);
 	UKObjectsEqual([obj UUID], [newObj UUID]);

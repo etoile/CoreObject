@@ -13,7 +13,7 @@
 #import "COObject.h"
 #import "COError.h"
 #import "COFault.h"
-#import "COPersistentRootEditingContext.h"
+#import "COPersistentRoot.h"
 #import "COStore.h"
 #import "COContainer.h"
 #import "COGroup.h"
@@ -114,7 +114,7 @@
 
 - (id) commonInitWithUUID: (ETUUID *)aUUID 
         entityDescription: (ETEntityDescription *)anEntityDescription
-                  context: (COPersistentRootEditingContext *)aContext
+                  context: (COPersistentRoot *)aContext
                   isFault: (BOOL)isFault
 {
 	NSParameterAssert(aUUID != nil);
@@ -163,7 +163,7 @@
 
 - (id)initWithUUID: (ETUUID *)aUUID 
  entityDescription: (ETEntityDescription *)anEntityDescription
-           context: (COPersistentRootEditingContext *)aContext
+           context: (COPersistentRoot *)aContext
            isFault: (BOOL)isFault
 {
 	SUPERINIT;
@@ -207,13 +207,13 @@
 	[super dealloc];
 }
 
-- (void)becomePersistentInContext: (COPersistentRootEditingContext *)aContext
+- (void)becomePersistentInContext: (COPersistentRoot *)aContext
 {
 	NILARG_EXCEPTION_TEST(aContext);
 	INVALIDARG_EXCEPTION_TEST(aContext, [aContext conformsToProtocol: @protocol(COPersistentObjectContext)]);
-	if ([aContext isKindOfClass: [COPersistentRootEditingContext class]])
+	if ([aContext isKindOfClass: [COPersistentRoot class]])
 	{
-		//INVALIDARG_EXCEPTION_TEST(aContext, [(COPersistentRootEditingContext *)aContext rootObject] != self);
+		//INVALIDARG_EXCEPTION_TEST(aContext, [(COPersistentRoot *)aContext rootObject] != self);
 	}
 	if (_context != nil)
 	{
@@ -271,7 +271,7 @@
 	return _uuid;
 }
 
-- (COPersistentRootEditingContext *)editingContext
+- (COPersistentRoot *)editingContext
 {
 	return _context;
 }

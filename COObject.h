@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COQuery.h>
 
-@class COPersistentRootEditingContext, COEditingContext, CORevision, COCommitTrack;
+@class COPersistentRoot, COEditingContext, CORevision, COCommitTrack;
 
 /**
  * Working copy of an object, owned by an editing context.
@@ -166,7 +166,7 @@
 	@package
 	ETEntityDescription *_entityDescription;
 	ETUUID *_uuid;
-	COPersistentRootEditingContext *_context; // weak reference
+	COPersistentRoot *_context; // weak reference
 	NSMapTable *_variableStorage;
 	BOOL _isIgnoringDamageNotifications;
 	BOOL _isIgnoringRelationshipConsistency;
@@ -214,7 +214,7 @@
  *
  * Raises an exception if any argument is nil.
  */
-- (void)becomePersistentInContext: (COPersistentRootEditingContext *)aContext;
+- (void)becomePersistentInContext: (COPersistentRoot *)aContext;
 - (id)copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription;
 
 /** taskunit Persistency Attributes */
@@ -231,7 +231,7 @@
  * Returns the persistent root editing context when the receiver is persistent,   
  * otherwise returns nil.
  */
-- (COPersistentRootEditingContext *)editingContext;
+- (COPersistentRoot *)editingContext;
 /** 
  * Returns the root object when the receiver is persistent, otherwise returns nil.
  *
@@ -653,7 +653,7 @@
  */
 - (id)initWithUUID: (ETUUID *)aUUID 
  entityDescription: (ETEntityDescription *)anEntityDescription
-           context: (COPersistentRootEditingContext *)aContext
+           context: (COPersistentRoot *)aContext
            isFault: (BOOL)isFault;
 /**
  * This method is only exposed to be used internally by CoreObject.
