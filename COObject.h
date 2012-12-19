@@ -228,8 +228,8 @@
 - (ETUUID *)UUID;
 - (ETEntityDescription *)entityDescription;
 /** 
- * Returns the persistent root editing context when the receiver is persistent,   
- * otherwise returns nil.
+ * Returns the persistent root when the receiver is persistent, otherwise 
+ * returns nil.
  */
 - (COPersistentRoot *)persistentRoot;
 /** 
