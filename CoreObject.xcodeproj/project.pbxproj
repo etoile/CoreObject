@@ -1213,7 +1213,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = "Performance/Performance-Info.plist";
-				INSTALL_PATH = "$(BUILT_PRODUCTS_DIR)";
+				INSTALL_PATH = "@rpath";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = framework;
 			};
@@ -1239,7 +1239,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = "SQLClient/SQLClient-Info.plist";
-				INSTALL_PATH = "$(BUILT_PRODUCTS_DIR)";
+				INSTALL_PATH = "@rpath";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = framework;
 			};
@@ -1282,7 +1282,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = "CoreObject-Info.plist";
-				INSTALL_PATH = "$(BUILT_PRODUCTS_DIR)";
+				INSTALL_PATH = "@rpath";
 				OTHER_CFLAGS = (
 					"-DSQLITE_ENABLE_FTS3",
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
