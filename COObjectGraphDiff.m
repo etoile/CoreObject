@@ -402,17 +402,17 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 {
 	for (COObject *obj in [_insertedObjectsByUUID allValues])
 	{
-		COPersistentRoot *persistentRootContext =
-			[ctx contextForPersistentRootUUID: [[obj editingContext] persistentRootUUID]];
+		COPersistentRoot *persistentRoot =
+			[ctx persistentRootForUUID: [[obj editingContext] persistentRootUUID]];
 
-		if (persistentRootContext == nil)
+		if (persistentRoot == nil)
 		{
-			persistentRootContext = [ctx insertNewPersistentRootWithRootObject: nil];
+			persistentRoot = [ctx insertNewPersistentRootWithRootObject: nil];
 		}
-		COObject *insertedObj = [persistentRootContext insertObject: obj withRelationshipConsistency: NO newUUID: NO];
-		if ([persistentRootContext rootObject] == nil)
+		COObject *insertedObj = [persistentRoot insertObject: obj withRelationshipConsistency: NO newUUID: NO];
+		if ([persistentRoot rootObject] == nil)
 		{
-			[persistentRootContext setRootObject: insertedObj];
+			[persistentRoot setRootObject: insertedObj];
 		}
 	}	
 	for (ETUUID *uuid in _deletedObjectUUIDs)

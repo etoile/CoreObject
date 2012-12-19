@@ -9,6 +9,8 @@
 
 @implementation COEditingContext
 
+@synthesize deletedPersistentRoots;
+
 + (COEditingContext *)contextWithURL: (NSURL *)aURL
 {
 	// TODO: Look up the store class based on the URL scheme and path extension
@@ -43,7 +45,8 @@ static COEditingContext *currentCtxt = nil;
 	_maxRevisionNumber = maxRevisionNumber;	
 	_latestRevisionNumber = [_store latestRevisionNumber];
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
-	_persistentRootContexts = [NSMutableDictionary new];
+	_loadedPersistentRoots = [NSMutableDictionary new];
+	_deletedPersistentRoots = [NSMutableSet new];
 
 	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
 	                                                    selector: @selector(didMakeCommit:) 
@@ -65,7 +68,8 @@ static COEditingContext *currentCtxt = nil;
 	DESTROY(_uuid);
 	DESTROY(_store);
 	DESTROY(_modelRepository);
-	DESTROY(_persistentRootContexts);
+	DESTROY(_loadedPersistentRoots);
+	DESTROY(_deletedPersistentRoots);
 	DESTROY(_error);
 	[super dealloc];
 }
@@ -87,7 +91,7 @@ store by other processes. */
 		CORevision *rev = [_store revisionWithRevisionNumber: [revNumber unsignedLongLongValue]];
 		ETUUID *rootObjectUUID = [rev objectUUID];
 		ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: rootObjectUUID];
-		COPersistentRoot *persistentRoot = [_persistentRootContexts objectForKey: persistentRootUUID];
+		COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: persistentRootUUID];
 
 		if ([persistentRoot loadedObjectForUUID: rootObjectUUID] == nil)
 		{
@@ -161,34 +165,37 @@ store by other processes. */
 	return _modelRepository; 
 }
 
-- (COPersistentRoot *)contextForPersistentRootUUID: (ETUUID *)aUUID
+- (COPersistentRoot *)persistentRootForUUID: (ETUUID *)aUUID
 {
-	return [_persistentRootContexts objectForKey: aUUID];
+	return [_loadedPersistentRoots objectForKey: aUUID];
 }
 
 // NOTE: Persistent root insertion or deletion are saved to the store at commit time.
 
-- (COPersistentRoot *)makePersistentRootContextWithRootObject: (COObject *)aRootObject
-														 persistentRootUUID: (ETUUID *)aPersistentRootUUID
-															commitTrackUUID: (ETUUID *)aTrackUUID
+- (COPersistentRoot *)makePersistentRootWithRootObject: (COObject *)aRootObject
+                                    persistentRootUUID: (ETUUID *)aPersistentRootUUID
+                                       commitTrackUUID: (ETUUID *)aTrackUUID
 {
-	COPersistentRoot *ctxt =
+	COPersistentRoot *persistentRoot =
 		[[COPersistentRoot alloc] initWithPersistentRootUUID: aPersistentRootUUID
-														   commitTrackUUID: aTrackUUID
-															 parentContext: self];
-	[_persistentRootContexts setObject: ctxt forKey: [ctxt persistentRootUUID]];
-	[ctxt release];
-	return ctxt;
+		                                     commitTrackUUID: aTrackUUID
+		                                       parentContext: self];
+	[_loadedPersistentRoots setObject: persistentRoot
+							   forKey: [persistentRoot persistentRootUUID]];
+	[persistentRoot release];
+	return persistentRoot;
 }
 
-- (COPersistentRoot *)makePersistentRootContextWithRootObject: (COObject *)aRootObject
+- (COPersistentRoot *)makePersistentRootWithRootObject: (COObject *)aRootObject
 {
-	return [self makePersistentRootContextWithRootObject: aRootObject persistentRootUUID: [ETUUID UUID] commitTrackUUID: [ETUUID UUID]];
+	return [self makePersistentRootWithRootObject: aRootObject
+	                           persistentRootUUID: [ETUUID UUID]
+	                              commitTrackUUID: [ETUUID UUID]];
 }
 
-- (COPersistentRoot *)makePersistentRootContext
+- (COPersistentRoot *)makePersistentRoot
 {
-	return [self makePersistentRootContextWithRootObject: nil];
+	return [self makePersistentRootWithRootObject: nil];
 }
 
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
@@ -200,12 +207,26 @@ store by other processes. */
 							entityDescription: desc
 							context: nil
 							isFault: NO];
-	COPersistentRoot *context = [self makePersistentRootContextWithRootObject: rootObject];
+	COPersistentRoot *persistentRoot = [self makePersistentRootWithRootObject: rootObject];
 
-	/* Will set the root object on the persistent root context */
-	[rootObject becomePersistentInContext: context];
+	/* Will set the root object on the persistent root */
+	[rootObject becomePersistentInContext: persistentRoot];
 
-	return context;
+	return persistentRoot;
+}
+
+- (NSSet *)insertedPersistentRoots
+{
+	NSMutableSet *insertedPersistentRoots = [NSMutableSet set];
+
+	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+	{
+		if ([persistentRoot revision] == nil)
+		{
+			[insertedPersistentRoots addObject: persistentRoot];
+		}
+	}
+	return insertedPersistentRoots;
 }
 
 - (id)insertObjectWithEntityName: (NSString *)anEntityName
@@ -217,17 +238,15 @@ store by other processes. */
 {
 	// FIXME: COObjectGraphDiff prevents us to detect an invalid root object...
 	//NILARG_EXCEPTION_TEST(aRootObject);
-	COPersistentRoot *context = [self makePersistentRootContextWithRootObject: aRootObject];
-	[aRootObject becomePersistentInContext: context];
-	return context;
+	COPersistentRoot *persistentRoot = [self makePersistentRootWithRootObject: aRootObject];
+	[aRootObject becomePersistentInContext: persistentRoot];
+	return persistentRoot;
 }
 
 - (void)deletePersistentRootForRootObject: (COObject *)aRootObject
 {
-	COPersistentRoot *context = [aRootObject editingContext];
-
-	[self discardLoadedObjectsForPersistentRootContexts: S(context)];
-	[_persistentRootContexts removeObjectForKey: [context persistentRootUUID]];
+	// NOTE: Deleted persistent roots are removed from the cache on commit.
+	[_deletedPersistentRoots addObject: [aRootObject editingContext]];
 }
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision
@@ -242,7 +261,7 @@ store by other processes. */
 	{
 		COObject *rootObject = nil;
 
-		for (COPersistentRoot *persistentRoot in [_persistentRootContexts objectEnumerator])
+		for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 		{
 			rootObject = [persistentRoot objectWithUUID: uuid entityName: name atRevision: revision];
 			if (rootObject != nil)
@@ -254,15 +273,15 @@ store by other processes. */
 	}
 
 	ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: rootUUID];
-	COPersistentRoot *persistentRoot = [self contextForPersistentRootUUID: persistentRootUUID];
+	COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID];
 
 	if (persistentRoot == nil)
 	{
 		ETUUID *trackUUID = [_store mainBranchUUIDForPersistentRootUUID: persistentRootUUID];
 
-		persistentRoot = [self makePersistentRootContextWithRootObject: nil
-											        persistentRootUUID: persistentRootUUID
-												       commitTrackUUID: trackUUID];
+		persistentRoot = [self makePersistentRootWithRootObject: nil
+		                                     persistentRootUUID: persistentRootUUID
+		                                        commitTrackUUID: trackUUID];
 		[persistentRoot setRootObject: [persistentRoot objectWithUUID: uuid atRevision: revision]];
 	}
 	
@@ -290,11 +309,11 @@ store by other processes. */
 }
 
 /* Remove from the cache all the objects that belong to discarded persistent roots */
-- (void)discardLoadedObjectsForPersistentRootContexts: (NSSet *)removedPersistentRootContexts
+- (void)discardLoadedObjectsForPersistentRoots: (NSSet *)removedPersistentRoots
 {
 	for (COObject *obj in [self loadedObjects])
 	{
-		if ([removedPersistentRootContexts containsObject: [obj editingContext]])
+		if ([removedPersistentRoots containsObject: [obj editingContext]])
 		{
 			[[obj editingContext] discardLoadedObjectForUUID: [obj UUID]];
 		}
@@ -306,7 +325,7 @@ store by other processes. */
 {
 	NSMutableSet *collectedObjects = [NSMutableSet set];
 
-	for (COPersistentRoot *context in [_persistentRootContexts objectEnumerator])
+	for (COPersistentRoot *context in [_loadedPersistentRoots objectEnumerator])
 	{
 		[collectedObjects unionSet: [context performSelector: aSelector]];
 	}
@@ -321,11 +340,6 @@ store by other processes. */
 - (NSSet *)updatedObjects
 {
 	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(updatedObjects)];
-}
-
-- (NSSet *)updatedObjectUUIDs
-{
-	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(updatedObjectUUIDs)];
 }
 
 - (BOOL)isUpdatedObject: (COObject *)anObject
@@ -345,7 +359,7 @@ store by other processes. */
 
 - (BOOL)hasChanges
 {
-	for (COPersistentRoot *context in [_persistentRootContexts objectEnumerator])
+	for (COPersistentRoot *context in [_loadedPersistentRoots objectEnumerator])
 	{
 		if ([context hasChanges])
 			return YES;
@@ -355,28 +369,26 @@ store by other processes. */
 
 - (void)discardAllChanges
 {
-	NSMutableSet *removedPersistentRootContexts = [NSMutableSet set];
+	/* Represents persistent roots inserted since the last commit */
+	NSSet *insertedPersistentRoots = [self insertedPersistentRoots];
 
 	/* Discard changes in persistent roots and collect discarded persistent roots */
-	for (ETUUID *uuid in _persistentRootContexts)
+	for (ETUUID *uuid in _loadedPersistentRoots)
 	{
-		COPersistentRoot *context = [_persistentRootContexts objectForKey: uuid];
+		COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: uuid];
+		BOOL isInserted = ([persistentRoot revision] == nil);
 
-		if ([context revision] != nil)
-		{
-			[context discardAllChanges];
-		}
-		else
-		{
-			[removedPersistentRootContexts addObject: context];
-		}
+		if (isInserted)
+			continue;
+
+		[persistentRoot discardAllChanges];
 	}
 
-	[self discardLoadedObjectsForPersistentRootContexts: removedPersistentRootContexts];
+	[self discardLoadedObjectsForPersistentRoots: insertedPersistentRoots];
 
 	/* Release the discarded persistent roots */
-	[_persistentRootContexts removeObjectsForKeys:
-		(id)[[[removedPersistentRootContexts allObjects] mappedCollection] persistentRootUUID]];
+	[_loadedPersistentRoots removeObjectsForKeys:
+		(id)[[[insertedPersistentRoots allObjects] mappedCollection] persistentRootUUID]];
 
 	assert([self hasChanges] == NO);
 }
@@ -435,6 +447,7 @@ store by other processes. */
 	ASSIGN(_error, anError);
 }
 
+/* Both COPersistentRoot or COEditingContext objects are valid arguments. */
 - (BOOL)validateChangedObjectsForContext: (id)aContext
 {
 	NSSet *insertionErrors = (id)[[[aContext insertedObjects] mappedCollection] validateForInsert];
@@ -454,7 +467,7 @@ store by other processes. */
 }
 
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
-	restrictedToPersistentRootContexts: (NSArray *)persistentRootContexts
+	restrictedToPersistentRoots: (NSArray *)persistentRoots
 {
 	// TODO: We could organize validation errors by persistent root. Each
 	// persistent root might result in a validation error that contains a
@@ -466,11 +479,27 @@ store by other processes. */
 
 	NSMutableArray *revisions = [NSMutableArray array];
 
+	/* Commit persistent root changes (deleted persistent roots included) */
+
 	// TODO: Add a batch commit UUID in the metadata
-	for (COPersistentRoot *ctxt in persistentRootContexts)
+	for (COPersistentRoot *ctxt in persistentRoots)
 	{
 		[revisions addObject: [ctxt saveCommitWithMetadata: metadata]];
 		_latestRevisionNumber = [[revisions lastObject] revisionNumber];
+	}
+	
+	/* Record persistent root deletions at the store level */
+	
+	for (COPersistentRoot *persistentRoot in persistentRoots)
+	{
+		BOOL isDeleted = [_deletedPersistentRoots containsObject: persistentRoot];
+		
+		if (isDeleted == NO)
+			continue;
+		
+		[self discardLoadedObjectsForPersistentRoots: S(persistentRoot)];
+		[_loadedPersistentRoots removeObjectForKey: [persistentRoot persistentRootUUID]];
+		// TODO: Save the deletion into the store
 	}
 
  	[self postCommitNotificationsWithRevisions: revisions];
@@ -480,7 +509,7 @@ store by other processes. */
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
 {
 	return [self commitWithMetadata: metadata
-		restrictedToPersistentRootContexts: [_persistentRootContexts allValues]];
+		restrictedToPersistentRoots: [_loadedPersistentRoots allValues]];
 }
 
 - (NSError *)error

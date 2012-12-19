@@ -22,8 +22,9 @@
 	int64_t _maxRevisionNumber;
 	int64_t _latestRevisionNumber;
 	ETModelDescriptionRepository *_modelRepository;
-	/** Persistent root contexts by UUID */
-	NSMutableDictionary *_persistentRootContexts;
+	/** Loaded (or inserted) persistent roots by UUID */
+	NSMutableDictionary *_loadedPersistentRoots;
+	NSMutableSet *_deletedPersistentRoots;
 	COError *_error;
 }
 
@@ -116,10 +117,13 @@
 
 /** @taskunit Managing Persistent Roots */
 
-- (COPersistentRoot *)contextForPersistentRootUUID: (ETUUID *)aUUID;
+- (COPersistentRoot *)persistentRootForUUID: (ETUUID *)aUUID;
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName;
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
 - (void)deletePersistentRootForRootObject: (COObject *)aRootObject;
+
+@property (nonatomic, copy) NSSet *insertedPersistentRoots;
+@property (nonatomic, copy) NSSet *deletedPersistentRoots;
 
 /** @taskunit Object Access and Loading */
 
@@ -190,10 +194,6 @@
  */
 - (NSSet *)updatedObjects;
 /**
- * Returns the UUIDs of the objects updated since the last commit. See -updatedObjects.
- */
-- (NSSet *)updatedObjectUUIDs;
-/**
  * Returns whether the object has been updated since the last commit. See 
  * -updatedObjects.
  *
@@ -245,7 +245,7 @@
  */
 - (void)discardChangesInObject: (COObject *)object;
 
-- (COPersistentRoot *)makePersistentRootContext;
+- (COPersistentRoot *)makePersistentRoot;
 
 /** @taskunit Committing Changes */
 
@@ -297,7 +297,7 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (COPersistentRoot *)makePersistentRootContextWithRootObject: (COObject *)aRootObject;
+- (COPersistentRoot *)makePersistentRootWithRootObject: (COObject *)aRootObject;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -334,7 +334,7 @@
  * won't be committed. -hasChanges can still be YES on return.
  */
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
-	restrictedToPersistentRootContexts: (NSArray *)persistentRootContexts;
+	restrictedToPersistentRoots: (NSArray *)persistentRoots;
 @end
 
 extern NSString *COEditingContextDidCommitNotification;

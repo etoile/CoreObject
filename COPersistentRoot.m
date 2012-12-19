@@ -484,7 +484,7 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 - (CORevision *)commitWithMetadata: (NSDictionary *)metadata
 {
 	NSArray *revs = [_parentContext commitWithMetadata: metadata
-	                restrictedToPersistentRootContexts: A(self)];
+	                restrictedToPersistentRoots: A(self)];
 	ETAssert([revs count] == 1);
 	return [revs lastObject];
 }

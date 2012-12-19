@@ -175,7 +175,7 @@
 	UKIntsEqual(1, [obj didCreateCalled]);
 	UKIntsEqual(1, [obj2 didCreateCalled]);
 
-	[obj2 becomePersistentInContext: [ctx makePersistentRootContext]];
+	[obj2 becomePersistentInContext: [ctx makePersistentRoot]];
 
 	UKIntsEqual(1, [obj2 didCreateCalled]);
 
