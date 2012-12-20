@@ -5,6 +5,7 @@
 #import "COContainer.h"
 #import "COGroup.h"
 #import "COObjectGraphDiff.h"
+#import "COPersistentRoot.h"
 #import "TestCommon.h"
 
 @interface TestObjectGraphDiff : TestCommon <UKTest>

@@ -10,6 +10,10 @@
 @interface TestEditingContext : TestCommon <UKTest>
 @end
 
+@interface COObject (Private)
+- (void)didCreate;
+@end
+
 /**
  * A class to test the -[COObject didCreate] method (unfortunately no anonymous 
  * classes in this language).
