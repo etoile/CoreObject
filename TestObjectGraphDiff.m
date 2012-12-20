@@ -310,7 +310,7 @@
 	COGroup *childCtx2 = [ctx2 insertObject: child];
 	
 	COGroup *tag1Ctx3 = [ctx3 insertObject: tag1];
-	COGroup *tag2Ctx3 = [ctx3 insertObject: tag2];
+	//COGroup *tag2Ctx3 = [ctx3 insertObject: tag2];
 	COGroup *childCtx3 = [ctx3 insertObject: child];	
 	
 	// ctx2: move child to tag2
@@ -768,11 +768,11 @@
 	
 	COGroup *tag1Ctx2 = [ctx2 insertObject: tag1];
 	COGroup *tag2Ctx2 = [ctx2 insertObject: tag2];
-	COGroup *tag3Ctx2 = [ctx2 insertObject: tag3];
+	//COGroup *tag3Ctx2 = [ctx2 insertObject: tag3];
 	COGroup *childCtx2 = [ctx2 insertObject: child];
 	
 	COGroup *tag1Ctx3 = [ctx3 insertObject: tag1];
-	COGroup *tag2Ctx3 = [ctx3 insertObject: tag2];
+	//COGroup *tag2Ctx3 = [ctx3 insertObject: tag2];
 	COGroup *tag3Ctx3 = [ctx3 insertObject: tag3];
 	COGroup *childCtx3 = [ctx3 insertObject: child];	
 	

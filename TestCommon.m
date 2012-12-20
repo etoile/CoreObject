@@ -161,7 +161,13 @@
 
 - (void)deleteStore
 {
-	[[NSFileManager defaultManager] removeFileAtPath: [[self storeURL] path] handler: nil];
+	if ([[NSFileManager defaultManager] fileExistsAtPath: [[self storeURL] path]] == NO)
+		 return;
+
+	NSError *error = nil;
+	[[NSFileManager defaultManager] removeItemAtPath: [[self storeURL] path]
+	                                           error: &error];
+	assert(error == nil);
 }
 
 - (void)dealloc
