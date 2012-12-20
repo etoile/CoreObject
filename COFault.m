@@ -34,7 +34,7 @@
 	return [[self UUID] hash];
 }
 
-- (COPersistentRoot *) editingContext
+- (COPersistentRoot *) persistentRoot
 {
 	return _persistentRoot;
 }

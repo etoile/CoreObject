@@ -122,8 +122,8 @@
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
 - (void)deletePersistentRootForRootObject: (COObject *)aRootObject;
 
-@property (nonatomic, copy) NSSet *insertedPersistentRoots;
-@property (nonatomic, copy) NSSet *deletedPersistentRoots;
+@property (nonatomic, copy, readonly) NSSet *insertedPersistentRoots;
+@property (nonatomic, copy, readonly) NSSet *deletedPersistentRoots;
 
 /** @taskunit Object Access and Loading */
 
