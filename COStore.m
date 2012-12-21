@@ -85,6 +85,12 @@
 	return nil;
 }
 
+- (BOOL)isPersistentRootUUID: (ETUUID *)aUUID
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return NO;
+}
+
 - (ETUUID *)persistentRootUUIDForCommitTrackUUID: (ETUUID *)aTrackUUId
 {
 	[self doesNotRecognizeSelector: _cmd];

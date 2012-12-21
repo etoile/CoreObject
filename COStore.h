@@ -128,6 +128,17 @@
  */
 - (ETUUID *)rootObjectUUIDForObjectUUID: (ETUUID *)aUUID;
 - (ETUUID *)rootObjectUUIDForPersistentRootUUID: (ETUUID *)aPersistentRootUUID;
+/**
+ * <override-subclass />
+ * Returns whether the UUID corresponds to a persistent root in the store.
+ *
+ * A persistent root UUID is never reused in a store. Since it is unique among 
+ * all the persistent roots and tracks in a single store, references to root  
+ * objects accross persistent roots can be resolved transparently.
+ *
+ * For a nil UUID, raises a NSInvalidArgumentException.
+ */
+- (BOOL)isPersistentRootUUID: (ETUUID *)aUUID;
 - (ETUUID *)persistentRootUUIDForCommitTrackUUID: (ETUUID *)aTrackUUId;
 - (ETUUID *)mainBranchUUIDForPersistentRootUUID: (ETUUID *)aUUID;
 // TODO: Remove
