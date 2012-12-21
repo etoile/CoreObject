@@ -453,6 +453,16 @@ void CHECK(id db)
 	return result;
 }
 
+- (BOOL)isPersistentRootUUID: (ETUUID *)uuid
+{
+	NILARG_EXCEPTION_TEST(uuid);
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM persistentRoots WHERE uuid = ?",
+					   [self keyForUUID: uuid]];
+	BOOL result = [rs next];
+	[rs close];
+	return result;
+}
+
 - (ETUUID *)persistentRootUUIDForCommitTrackUUID: (ETUUID *)aTrackUUID
 {
 	NILARG_EXCEPTION_TEST(aTrackUUID);
