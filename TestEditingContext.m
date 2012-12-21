@@ -219,6 +219,27 @@
 	UKObjectsEqual(@"hello", [o2 valueForProperty: @"label"]);
 }
 
+- (void)testRootObjectReferencesAccrossPersistentRoots
+{
+	COPersistentRoot *persistentRoot =
+		[[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] retain];
+	COPersistentRoot *persistentRoot2 =
+		[[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] retain];
+	COContainer *obj = [persistentRoot rootObject];
+	COContainer *obj2 = [persistentRoot2 rootObject];
+
+	/* Cross references require committed persistent roots */
+	[ctx commit];
+
+	UKObjectsSame(obj2, [persistentRoot objectWithUUID: [persistentRoot2 persistentRootUUID]]);
+	UKObjectsSame(obj, [persistentRoot2 objectWithUUID: [persistentRoot persistentRootUUID]]);
+	UKObjectsSame(obj2, [persistentRoot objectWithUUID: [[persistentRoot2 commitTrack] UUID]]);
+	UKObjectsSame(obj, [persistentRoot2 objectWithUUID: [[persistentRoot commitTrack] UUID]]);
+
+	[persistentRoot release];
+	[persistentRoot2 release];
+}
+
 // TODO: Rework copying accross editing contexts (not yet possible to copy a persistent root)
 
 - (void)testCopyingBetweenContextsWithNoStoreSimple

@@ -414,5 +414,16 @@
  * metadatas and returns the resulting revision.
  */
 - (CORevision *)saveCommitWithMetadata: (NSDictionary *)metadata;
-
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Returns the class that represents a reference to the provided root object
+ * argument.
+ *
+ * Valid reference kinds are COCommitTrack and COPersistentRoot classes.
+ *
+ * The root object argument must be belong to another persistent root, otherwise
+ * NSInvalidArgumentException is raised.
+ */
+- (Class)referenceClassForRootObject: (COObject *)aRootObject;
 @end

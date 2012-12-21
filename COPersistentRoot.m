@@ -122,6 +122,7 @@
 	ETModelDescriptionRepository *repo = [_parentContext modelRepository];
 	ETEntityDescription *desc = [repo descriptionForName: name];
 
+	/* If the entity name or description is nil */
 	if (desc == nil)
 	{
 		NSString *name = [self entityNameForObjectUUID: uuid];
@@ -166,6 +167,55 @@
 	[self setRevision: [self loadableRevisionForRevision: revision rootObjectUUID: rootObjectUUID]];
 }
 
+/** 
+ * To prevent branch mismatch, the best approach in document editors is to use
+ * a dedicate editing context per document. 
+ *
+ * COCustomTrack can then use a delegate to look up the context targeted by 
+ * undo/redo operations e.g. editingContextForPersistentRootUUID:.
+ */
+- (COObject *)rootObjectForPersistentRootWithUUID: (ETUUID *)aUUID
+{
+	ETUUID *persistentRootUUID = nil;
+	ETUUID *trackUUID = nil;
+
+	if ([[_parentContext store] isPersistentRootUUID: aUUID] == NO)
+	{
+		persistentRootUUID = [[_parentContext store] persistentRootUUIDForCommitTrackUUID: aUUID];
+		trackUUID = aUUID;
+	}
+	else
+	{
+		persistentRootUUID = aUUID;
+		trackUUID = [[_parentContext store] mainBranchUUIDForPersistentRootUUID: aUUID];
+	}
+
+	COPersistentRoot *persistentRoot = [_parentContext persistentRootForUUID: persistentRootUUID];
+	BOOL hasBranchMismatch = (persistentRoot != nil && [trackUUID isEqual: [[persistentRoot commitTrack] UUID]] == NO);
+
+	if (hasBranchMismatch)
+	{
+		// TODO:  Introduce COBranchMismatchException
+		[NSException raise: NSInternalInconsistencyException
+					format: _(@"Cannot load branch %@ because branch %@ in use doesn't match for %@"),
+		                    trackUUID, [persistentRoot commitTrack], persistentRoot];
+							  
+	}
+	/* Can return a root object object that bears the same UUID than the current 
+	   persistent root object if persistentRoot is derived from the receiver 
+	   through one or several cheap copies.
+	   This use case is supported because of -[COObject isEqual:] implementation 
+	   and COObject serialization of references accross persistent roots. */
+	return [persistentRoot rootObject];
+}
+
+- (BOOL)isInnerObjectUUID: (ETUUID *)aUUID
+{
+	NSSet *allInnerObjectUUIDs =
+		[[_parentContext store] objectUUIDsForCommitTrackUUID: [[self commitTrack] UUID]];
+	return [allInnerObjectUUIDs containsObject: aUUID];
+}
+
 - (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision
 {
 	// NOTE: We serialize UUIDs into strings in various places, this check
@@ -181,13 +231,18 @@
 
 	/* Otherwise instantiate the object */
 
-	ETEntityDescription *desc = [self descriptionForName: name objectUUID: uuid];
-	BOOL hasBeenCommitted = (desc != Nil);
+	// TODO: -isInnerObjectUUID: could be a bottleneck here, because we retrieve
+	// all the inner object UUIDs from the database each time a fault is created.
+	BOOL hasBeenCommitted = [self isInnerObjectUUID: uuid];
 
 	/* When the object is neither in the cache nor serialized in the store */
 	if (hasBeenCommitted == NO)
-		return nil;
+	{
+		/* Could be a reference to another persistent root */
+		return [self rootObjectForPersistentRootWithUUID: uuid];
+	}
 
+	ETEntityDescription *desc = [self descriptionForName: name objectUUID: uuid];
 	Class objClass = [[_parentContext modelRepository] classForEntityDescription: desc];
 
 	obj = [[objClass alloc] initWithUUID: uuid
@@ -761,6 +816,12 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	}
 	
 	[self discardLoadedObjectForUUID: [[self rootObject] UUID]];
+}
+
+- (Class)referenceClassForRootObject: (COObject *)aRootObject
+{
+	// TODO: When the user has selected a precise branch, just return COCommitTrack.
+	return [COPersistentRoot class];
 }
 
 @end

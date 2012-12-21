@@ -1335,7 +1335,14 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	{
 		if ([value isPersistent])
 		{
-			result = [value referencePropertyList];
+			if ([[value persistentRoot] isEqual: _persistentRoot])
+			{
+				result = [value referencePropertyList];
+			}
+			else
+			{
+				result = [value persistentRootReferencePropertyList];
+			}
 		}
 		else
 		{
@@ -1386,11 +1393,28 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	NSAssert1([self isPersistent], 
 		@"Usually means -becomePersistentInContext: hasn't been called on %@", self);
 
-	return [NSDictionary dictionaryWithObjectsAndKeys:
-			@"object-ref", @"type",
+	return D(@"object-ref", @"type",
 			[_uuid stringValue], @"uuid",
-			[_entityDescription fullName], @"entity",
-			nil];
+			[_entityDescription fullName], @"entity");
+}
+
+- (NSDictionary *)persistentRootReferencePropertyList
+{
+	NSAssert1([self isPersistent],
+			  @"Usually means -becomePersistentInContext: hasn't been called on %@", self);
+	
+	ETUUID *uuid = nil;
+
+	if ([[_persistentRoot referenceClassForRootObject: self] isEqual: [COPersistentRoot class]])
+	{
+		uuid = [_persistentRoot persistentRootUUID];
+	}
+	else
+	{
+		uuid = [[_persistentRoot commitTrack] UUID];
+	}
+	
+	return D(@"object-ref", @"type", [uuid stringValue], @"uuid", [_entityDescription fullName], @"entity");
 }
 
 - (NSObject *)valueForPropertyList: (NSObject *)plist
