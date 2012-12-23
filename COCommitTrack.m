@@ -18,7 +18,7 @@
 
 @implementation COCommitTrack
 
-@synthesize UUID, editingContext, label, parentTrack, isCopy, isMainBranch;
+@synthesize UUID, persistentRoot, label, parentTrack, isCopy, isMainBranch;
 
 /* Both root object and revision are lazily retrieved by the persistent root. 
    Until the loaded revision is known, it is useless to cache track nodes. */
@@ -37,7 +37,7 @@
 
 	ASSIGN(UUID, aUUID);
 	/* The persistent root retains us */
-	editingContext = aContext;
+	persistentRoot = aContext;
 
 	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
 	                                                    selector: @selector(currentNodeDidChangeInStore:) 
@@ -61,7 +61,7 @@
 	if ([rhs isKindOfClass: [COCommitTrack class]])
 	{
 		return ([UUID isEqual: [rhs UUID]]
-			&& [[editingContext persistentRootUUID] isEqual: [[rhs editingContext] persistentRootUUID]]);
+			&& [[persistentRoot persistentRootUUID] isEqual: [[rhs persistentRoot] persistentRootUUID]]);
 	}
 	return NO;
 }
@@ -112,7 +112,7 @@
 - (BOOL)isOurStoreForNotification: (NSNotification *)notif
 {
 	NSString *storeUUIDString = [[notif userInfo] objectForKey: kCOStoreUUIDStringKey];
-	return [storeUUIDString isEqual: [[[[self editingContext] store] UUID] stringValue]];
+	return [storeUUIDString isEqual: [[[[self persistentRoot] store] UUID] stringValue]];
 }
 
 /* This method is called back through distributed notifications in various cases:
@@ -138,7 +138,7 @@
 
 	NSParameterAssert([[[self UUID] stringValue] isEqual: [notif object]]);
 
-	COEditingContext *context = [[self editingContext] parentContext];
+	COEditingContext *context = [[self persistentRoot] parentContext];
 	int64_t revNumber = [[[notif userInfo] objectForKey: kCONewCurrentNodeRevisionNumberKey] longLongValue];
 	BOOL isBasicUndoRedoFromCurrentContext = (revNumber == [[[self currentNode] revision] revisionNumber]);
 	BOOL isCommitFromCurrentContext = (revNumber == [context latestRevisionNumber]);
@@ -173,7 +173,7 @@
 
 	/* For a commit in the receiver editing context, no reloading occurs 
 	   because the tracked object state matches the revision */
-	[[self editingContext] reloadAtRevision: [[self currentNode] revision]];
+	[[self persistentRoot] reloadAtRevision: [[self currentNode] revision]];
 
 	[self didUpdate];
 	RELEASE(oldCurrentNode);
@@ -194,9 +194,9 @@
 
 	assert([[self currentNode] isEqual: aNode]);
 
-	[[[self editingContext] store] setCurrentRevision: [aNode revision]
+	[[[self persistentRoot] store] setCurrentRevision: [aNode revision]
 	                                     forTrackUUID: [self UUID]];
-	[[self editingContext] reloadAtRevision: [aNode revision]];
+	[[self persistentRoot] reloadAtRevision: [aNode revision]];
 	[self didUpdate];
 }
 
@@ -205,7 +205,7 @@
 	if ([self currentNode] == nil)
 	{
 		[NSException raise: NSInternalInconsistencyException
-		            format: @"Cannot undo object %@ which does not have any commits", [self editingContext]];
+		            format: @"Cannot undo object %@ which does not have any commits", [self persistentRoot]];
 	}
 	/* If -canUndo returns YES, before returning it loads some previous nodes 
 	   to ensure currentNodeIndex is not zero and can be decremented */
@@ -224,10 +224,10 @@
 		&& ![[NSNull null] isEqual: [[self cachedNodes] objectAtIndex: currentNodeIndex]],
 		@"Record undone to is cached");
 
-	CORevision *currentRevision = [[[self editingContext] store] undoOnCommitTrack: [self UUID]];
+	CORevision *currentRevision = [[[self persistentRoot] store] undoOnCommitTrack: [self UUID]];
 
 	// TODO: Reset object state to old object.
-	[[self editingContext] reloadAtRevision: currentRevision];
+	[[self persistentRoot] reloadAtRevision: currentRevision];
 
 	[self didUpdate];
 }
@@ -237,7 +237,7 @@
 	if ([self currentNode] == nil)
 	{
 		[NSException raise: NSInternalInconsistencyException
-		            format: @"Cannot redo object %@ which does not have any commits", [self editingContext]];
+		            format: @"Cannot redo object %@ which does not have any commits", [self persistentRoot]];
 	}
 	/* If -canRedo returns YES, before returning it loads some next nodes 
 	   to ensure currentNodeIndex is not zero and can be incremented */
@@ -256,10 +256,10 @@
 		&& ![[NSNull null] isEqual: [[self cachedNodes] objectAtIndex: currentNodeIndex]],
 		@"Record redone to is cached");
 
-	CORevision *currentRevision = [[[self editingContext] store] redoOnCommitTrack: [self UUID]];
+	CORevision *currentRevision = [[[self persistentRoot] store] redoOnCommitTrack: [self UUID]];
 
 	// TODO: Reset object state to old object.
-	[[self editingContext] reloadAtRevision: currentRevision];
+	[[self persistentRoot] reloadAtRevision: currentRevision];
 
 	[self didUpdate];
 }
@@ -280,7 +280,7 @@
 	else
 	{
 		[self selectiveUndoWithRevision: [aNode revision] 
-		               inEditingContext: [[self editingContext] parentContext]];
+		               inEditingContext: [[self persistentRoot] parentContext]];
 	}
 }
 
@@ -369,7 +369,7 @@
 
 - (void)cacheNodesForward: (NSUInteger)forward backward: (NSUInteger)backward
 {
-	COStore *store = [[self editingContext] store];
+	COStore *store = [[self persistentRoot] store];
 	NSUInteger newCurrentNodeIndex = 0;
 	NSArray *revisions = [store revisionsForTrackUUID: [self UUID]
 	                                 currentNodeIndex: &newCurrentNodeIndex

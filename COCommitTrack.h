@@ -26,7 +26,7 @@
 {
 	@private
 	ETUUID *UUID;
-	COPersistentRoot *editingContext;
+	COPersistentRoot *persistentRoot;
 	COCommitTrack *parentTrack;
 	NSString *label;
 	BOOL isMainBranch;
@@ -70,7 +70,7 @@
 /**
  * The persistent root owning the commit track.
  */
-@property (readonly, nonatomic) COPersistentRoot *editingContext;
+@property (readonly, nonatomic) COPersistentRoot *persistentRoot;
 
 /** @taskunit Creating Branches and Cheap copies */
 
