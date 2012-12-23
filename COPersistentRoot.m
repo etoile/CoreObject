@@ -95,17 +95,21 @@
 	return [_parentContext store];
 }
 
-#if 0
 - (id)rootObject
 {
 	if (_rootObject == nil)
 	{
+		/* -rootObjectUUID could return nil (meaning the persistent root has  
+		   never been committed or has no root object)...
+		   But you cannot create a persistent root without assigning it a root
+		   object immediately. For -becomePersistentInContext:, -registerObject: 
+		   sets the root object before the method returns. 
+		   So -rootObject is never called when -rootObjectUUID could return nil. */
 		ASSIGN(_rootObject, [self objectWithUUID: [self rootObjectUUID]
 		                              atRevision: [self revision]]);
 	}
 	return _rootObject;
 }
-#endif
 
 - (NSString *)entityNameForObjectUUID: (ETUUID *)aUUID
 {
@@ -237,6 +241,7 @@
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision
 {
+	NILARG_EXCEPTION_TEST(uuid);
 	// NOTE: We serialize UUIDs into strings in various places, this check
 	// helps to intercept string objects that ought to be ETUUID objects.
 	NSParameterAssert([uuid isKindOfClass: [ETUUID class]]);
@@ -565,7 +570,6 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 
 - (CORevision *)saveCommitWithMetadata: (NSDictionary *)metadata
 {
-	NSParameterAssert(_rootObject != nil);
 	NSParameterAssert(_insertedObjects != nil);
 	NSParameterAssert(_updatedPropertiesByObject != nil);
 
@@ -579,17 +583,17 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	if (isNewPersistentRoot)
 	{
 
-		ETAssert([_insertedObjects containsObject: _rootObject]);
+		ETAssert([_insertedObjects containsObject: [self rootObject]]);
 
 		[store insertPersistentRootUUID: [self persistentRootUUID]
 						commitTrackUUID: [[self commitTrack] UUID]
-						 rootObjectUUID: [_rootObject UUID]];
+						 rootObjectUUID: [[self rootObject] UUID]];
 	}
 
 	[store beginCommitWithMetadata: metadata
 	            persistentRootUUID: [self persistentRootUUID]
 	               commitTrackUUID: [[self commitTrack] UUID]
-	                  baseRevision: [_rootObject revision]];
+	                  baseRevision: [self revision]];
 
 	for (COObject *obj in committedObjects)
 	{		

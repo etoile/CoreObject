@@ -89,18 +89,11 @@ store by other processes. */
 	for (NSNumber *revNumber in [[notif userInfo] objectForKey: kCORevisionNumbersKey])
 	{
 		CORevision *rev = [_store revisionWithRevisionNumber: [revNumber unsignedLongLongValue]];
-		ETUUID *rootObjectUUID = [rev objectUUID];
-		ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: rootObjectUUID];
+		// TODO: We should get the persistent root UUID from the notification
+		ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: [rev objectUUID]];
 		COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: persistentRootUUID];
 
-		if ([persistentRoot loadedObjectForUUID: rootObjectUUID] == nil)
-		{
-			continue;
-		}
-
-		COObject *rootObject = [self objectWithUUID: rootObjectUUID];
-
-		[[rootObject persistentRoot] reloadAtRevision: rev];
+		[persistentRoot reloadAtRevision: rev];
 	}
 }
 
@@ -185,7 +178,6 @@ store by other processes. */
 	                                     persistentRootUUID: persistentRootUUID
 	                                        commitTrackUUID: trackUUID
 												   revision: revision];
-	[persistentRoot setRootObject: [persistentRoot objectWithUUID: uuid atRevision: revision]];
 
 	return persistentRoot;
 }
