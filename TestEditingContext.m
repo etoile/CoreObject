@@ -124,7 +124,6 @@
 
 - (void)testBasicPersistence
 {
-	return;
 	COPersistentRoot *persistentRoot =
 		[[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] retain];
 	COObject *obj = [persistentRoot rootObject];
@@ -227,6 +226,8 @@
 		[[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] retain];
 	COContainer *obj = [persistentRoot rootObject];
 	COContainer *obj2 = [persistentRoot2 rootObject];
+	
+	[obj addObject: obj2];
 
 	/* Cross references require committed persistent roots */
 	[ctx commit];
@@ -235,6 +236,27 @@
 	UKObjectsSame(obj, [persistentRoot2 objectWithUUID: [persistentRoot persistentRootUUID]]);
 	UKObjectsSame(obj2, [persistentRoot objectWithUUID: [[persistentRoot2 commitTrack] UUID]]);
 	UKObjectsSame(obj, [persistentRoot2 objectWithUUID: [[persistentRoot commitTrack] UUID]]);
+
+	/* Recreate persistent root and root object */
+
+	[self instantiateNewContextAndStore];
+
+	COPersistentRoot *newPersistentRoot =
+		[ctx persistentRootForUUID: [persistentRoot persistentRootUUID]];
+	COPersistentRoot *newPersistentRoot2 =
+		[ctx persistentRootForUUID: [persistentRoot2 persistentRootUUID]];
+	COObject *newObj = [newPersistentRoot rootObject];
+	COObject *newObj2 = [newPersistentRoot2 rootObject];
+	return;
+	UKNotNil(newObj);
+	UKNotNil(newObj2);
+
+	UKObjectsSame(newObj2, [newPersistentRoot objectWithUUID: [persistentRoot2 persistentRootUUID]]);
+	UKObjectsSame(newObj, [newPersistentRoot2 objectWithUUID: [persistentRoot persistentRootUUID]]);
+	UKObjectsSame(newObj2, [newPersistentRoot objectWithUUID: [[persistentRoot2 commitTrack] UUID]]);
+	UKObjectsSame(newObj, [newPersistentRoot2 objectWithUUID: [[persistentRoot commitTrack] UUID]]);
+
+	UKObjectsSame(newObj2, [[obj contentArray] lastObject]);
 
 	[persistentRoot release];
 	[persistentRoot2 release];

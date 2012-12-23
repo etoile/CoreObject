@@ -44,6 +44,7 @@
 
 - (id)initWithPersistentRootUUID: (ETUUID *)aUUID
 				 commitTrackUUID: (ETUUID *)aTrackUUID
+                        revision: (CORevision *)aRevision
 				   parentContext: (COEditingContext *)aCtxt
 {
 	NILARG_EXCEPTION_TEST(aUUID);
@@ -57,6 +58,7 @@
 	{
 		_commitTrack = [[COCommitTrack alloc] initWithUUID: aTrackUUID editingContext: self];
 	}
+	ASSIGN(_revision, aRevision);
 
 	_loadedObjects = [NSMutableDictionary new];
 	_insertedObjects = [NSMutableSet new];
@@ -92,7 +94,17 @@
 {
 	return [_parentContext store];
 }
-
+#if 0
+- (id)rootObject
+{
+	if (_rootObject == nil)
+	{
+		ASSIGN(_rootObject, [persistentRoot objectWithUUID: [self rootObjectUUID]
+		                                        atRevision: revision]);
+	}
+	return _rootObject;
+}
+#endif
 - (NSString *)entityNameForObjectUUID: (ETUUID *)aUUID
 {
 	int64_t maxRevNumber = [_parentContext maxRevisionNumber];
@@ -176,6 +188,7 @@
  */
 - (COObject *)rootObjectForPersistentRootWithUUID: (ETUUID *)aUUID
 {
+	NILARG_EXCEPTION_TEST(aUUID);
 	ETUUID *persistentRootUUID = nil;
 	ETUUID *trackUUID = nil;
 
@@ -189,6 +202,10 @@
 		persistentRootUUID = aUUID;
 		trackUUID = [[_parentContext store] mainBranchUUIDForPersistentRootUUID: aUUID];
 	}
+
+	/* If the UUID matches no persistent root or track */
+	if (persistentRootUUID == nil || trackUUID == nil)
+		return nil;
 
 	COPersistentRoot *persistentRoot = [_parentContext persistentRootForUUID: persistentRootUUID];
 	BOOL hasBranchMismatch = (persistentRoot != nil && [trackUUID isEqual: [[persistentRoot commitTrack] UUID]] == NO);

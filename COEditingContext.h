@@ -296,10 +296,6 @@
 
 /**
  * This method is only exposed to be used internally by CoreObject.
- */
-- (COPersistentRoot *)makePersistentRootWithRootObject: (COObject *)aRootObject;
-/**
- * This method is only exposed to be used internally by CoreObject.
  *
  * Returns the object identified by the UUID, by loading it to the given 
  * revision when no instance managed by the receiver is present in memory, and 

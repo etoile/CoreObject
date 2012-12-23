@@ -165,9 +165,29 @@ store by other processes. */
 	return _modelRepository; 
 }
 
-- (COPersistentRoot *)persistentRootForUUID: (ETUUID *)aUUID
+- (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
 {
-	return [_loadedPersistentRoots objectForKey: aUUID];
+	return [self persistentRootForUUID: persistentRootUUID rootObjectUUID: nil atRevision: nil];
+}
+
+- (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
+							 rootObjectUUID: (ETUUID *)uuid
+                                 atRevision: (CORevision *)revision
+{
+	COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: persistentRootUUID];
+	
+	if (persistentRoot != nil || uuid == nil)
+		return persistentRoot;
+
+	ETUUID *trackUUID = [_store mainBranchUUIDForPersistentRootUUID: persistentRootUUID];
+		
+	persistentRoot = [self makePersistentRootWithRootObject: nil
+	                                     persistentRootUUID: persistentRootUUID
+	                                        commitTrackUUID: trackUUID
+												   revision: revision];
+	[persistentRoot setRootObject: [persistentRoot objectWithUUID: uuid atRevision: revision]];
+
+	return persistentRoot;
 }
 
 // NOTE: Persistent root insertion or deletion are saved to the store at commit time.
@@ -175,10 +195,12 @@ store by other processes. */
 - (COPersistentRoot *)makePersistentRootWithRootObject: (COObject *)aRootObject
                                     persistentRootUUID: (ETUUID *)aPersistentRootUUID
                                        commitTrackUUID: (ETUUID *)aTrackUUID
+                                              revision: (CORevision *)aRevision
 {
 	COPersistentRoot *persistentRoot =
 		[[COPersistentRoot alloc] initWithPersistentRootUUID: aPersistentRootUUID
 		                                     commitTrackUUID: aTrackUUID
+	                                                revision: aRevision
 		                                       parentContext: self];
 	[_loadedPersistentRoots setObject: persistentRoot
 							   forKey: [persistentRoot persistentRootUUID]];
@@ -186,16 +208,12 @@ store by other processes. */
 	return persistentRoot;
 }
 
-- (COPersistentRoot *)makePersistentRootWithRootObject: (COObject *)aRootObject
-{
-	return [self makePersistentRootWithRootObject: aRootObject
-	                           persistentRootUUID: [ETUUID UUID]
-	                              commitTrackUUID: [ETUUID UUID]];
-}
-
 - (COPersistentRoot *)makePersistentRoot
 {
-	return [self makePersistentRootWithRootObject: nil];
+	return [self makePersistentRootWithRootObject: nil
+	                           persistentRootUUID: [ETUUID UUID]
+	                              commitTrackUUID: [ETUUID UUID]
+										 revision: nil];
 }
 
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
@@ -207,7 +225,7 @@ store by other processes. */
 							entityDescription: desc
 							context: nil
 							isFault: NO];
-	COPersistentRoot *persistentRoot = [self makePersistentRootWithRootObject: rootObject];
+	COPersistentRoot *persistentRoot = [self makePersistentRoot];
 
 	/* Will set the root object on the persistent root */
 	[rootObject becomePersistentInContext: persistentRoot];
@@ -238,7 +256,7 @@ store by other processes. */
 {
 	// FIXME: COObjectGraphDiff prevents us to detect an invalid root object...
 	//NILARG_EXCEPTION_TEST(aRootObject);
-	COPersistentRoot *persistentRoot = [self makePersistentRootWithRootObject: aRootObject];
+	COPersistentRoot *persistentRoot = [self makePersistentRoot];
 	[aRootObject becomePersistentInContext: persistentRoot];
 	return persistentRoot;
 }
@@ -273,18 +291,8 @@ store by other processes. */
 	}
 
 	ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: rootUUID];
-	COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID];
+	COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID rootObjectUUID: uuid atRevision: revision];
 
-	if (persistentRoot == nil)
-	{
-		ETUUID *trackUUID = [_store mainBranchUUIDForPersistentRootUUID: persistentRootUUID];
-
-		persistentRoot = [self makePersistentRootWithRootObject: nil
-		                                     persistentRootUUID: persistentRootUUID
-		                                        commitTrackUUID: trackUUID];
-		[persistentRoot setRootObject: [persistentRoot objectWithUUID: uuid atRevision: revision]];
-	}
-	
 	return [persistentRoot objectWithUUID: uuid entityName: name atRevision: revision];
 }
 
