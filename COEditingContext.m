@@ -160,34 +160,35 @@ store by other processes. */
 
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
 {
-	return [self persistentRootForUUID: persistentRootUUID rootObjectUUID: nil atRevision: nil];
+	return [self persistentRootForUUID: persistentRootUUID atRevision: nil];
 }
 
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
-							 rootObjectUUID: (ETUUID *)uuid
                                  atRevision: (CORevision *)revision
 {
 	COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: persistentRootUUID];
 	
-	if (persistentRoot != nil || uuid == nil)
+	if (persistentRoot != nil)
 		return persistentRoot;
 
 	ETUUID *trackUUID = [_store mainBranchUUIDForPersistentRootUUID: persistentRootUUID];
-		
-	persistentRoot = [self makePersistentRootWithRootObject: nil
-	                                     persistentRootUUID: persistentRootUUID
-	                                        commitTrackUUID: trackUUID
-												   revision: revision];
+	BOOL persistentRootFound = (trackUUID != nil);
+
+	if (persistentRootFound == NO)
+		return nil;
+
+	persistentRoot = [self makePersistentRootWithUUID: persistentRootUUID
+	                                  commitTrackUUID: trackUUID
+	                                         revision: revision];
 
 	return persistentRoot;
 }
 
 // NOTE: Persistent root insertion or deletion are saved to the store at commit time.
 
-- (COPersistentRoot *)makePersistentRootWithRootObject: (COObject *)aRootObject
-                                    persistentRootUUID: (ETUUID *)aPersistentRootUUID
-                                       commitTrackUUID: (ETUUID *)aTrackUUID
-                                              revision: (CORevision *)aRevision
+- (COPersistentRoot *)makePersistentRootWithUUID: (ETUUID *)aPersistentRootUUID
+                                 commitTrackUUID: (ETUUID *)aTrackUUID
+                                        revision: (CORevision *)aRevision
 {
 	COPersistentRoot *persistentRoot =
 		[[COPersistentRoot alloc] initWithPersistentRootUUID: aPersistentRootUUID
@@ -202,10 +203,9 @@ store by other processes. */
 
 - (COPersistentRoot *)makePersistentRoot
 {
-	return [self makePersistentRootWithRootObject: nil
-	                           persistentRootUUID: [ETUUID UUID]
-	                              commitTrackUUID: [ETUUID UUID]
-										 revision: nil];
+	return [self makePersistentRootWithUUID: [ETUUID UUID]
+	                        commitTrackUUID: [ETUUID UUID]
+	                               revision: nil];
 }
 
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
@@ -283,7 +283,7 @@ store by other processes. */
 	}
 
 	ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: rootUUID];
-	COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID rootObjectUUID: uuid atRevision: revision];
+	COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID atRevision: revision];
 
 	return [persistentRoot objectWithUUID: uuid entityName: name atRevision: revision];
 }
