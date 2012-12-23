@@ -85,7 +85,7 @@
 {
 	if (_commitTrack == nil)
 	{
-		ASSIGN(_commitTrack, [COCommitTrack trackWithObject: [self rootObject]]);
+		_commitTrack = [[COCommitTrack alloc] init];
 	}
 	return _commitTrack;
 }
@@ -94,17 +94,19 @@
 {
 	return [_parentContext store];
 }
+
 #if 0
 - (id)rootObject
 {
 	if (_rootObject == nil)
 	{
-		ASSIGN(_rootObject, [persistentRoot objectWithUUID: [self rootObjectUUID]
-		                                        atRevision: revision]);
+		ASSIGN(_rootObject, [self objectWithUUID: [self rootObjectUUID]
+		                              atRevision: [self revision]]);
 	}
 	return _rootObject;
 }
 #endif
+
 - (NSString *)entityNameForObjectUUID: (ETUUID *)aUUID
 {
 	int64_t maxRevNumber = [_parentContext maxRevisionNumber];

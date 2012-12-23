@@ -35,13 +35,6 @@
 
 - (id)initWithUUID: (ETUUID *)aUUID editingContext: (COPersistentRoot *)aContext;
 
-/** @taskunit Tracked Objects */
-
-/**
- * The root object for which the commit track persists the history.
- */
-@property (readonly, nonatomic) COObject *trackedObject;
-
 /** @taskunit Track Kind */
 
 /**

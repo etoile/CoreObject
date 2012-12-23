@@ -60,12 +60,6 @@
  * initializer more than one time).
  */
 - (id)initWithUUID: (ETUUID *)aUUID editingContext: (COEditingContext *)aContext;
-/**
- * Releases the receiver and returns nil.
- *
- * You must use -initWithUUID:editingContext:.
- */
-- (id)initWithTrackedObjects: (NSSet *)objects;
 
 /**
  * The UUID bound to the track.

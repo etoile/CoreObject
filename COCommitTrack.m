@@ -33,9 +33,7 @@
 		            format: @"Cannot load commit track for %@ which does not have a store or editing context", aContext];
 	}
 
-	self = [super initWithTrackedObjects: nil];
-	if (self == nil)
-		return nil;
+	SUPERINIT;
 
 	ASSIGN(UUID, aUUID);
 	/* The persistent root retains us */
@@ -66,11 +64,6 @@
 			&& [[editingContext persistentRootUUID] isEqual: [[rhs editingContext] persistentRootUUID]]);
 	}
 	return NO;
-}
-
-- (COObject *)trackedObject
-{
-	return [editingContext rootObject];
 }
 
 - (BOOL)isBranch
@@ -212,7 +205,7 @@
 	if ([self currentNode] == nil)
 	{
 		[NSException raise: NSInternalInconsistencyException
-		            format: @"Cannot undo object %@ which does not have any commits", [self trackedObject]];
+		            format: @"Cannot undo object %@ which does not have any commits", [self editingContext]];
 	}
 	/* If -canUndo returns YES, before returning it loads some previous nodes 
 	   to ensure currentNodeIndex is not zero and can be decremented */
@@ -244,7 +237,7 @@
 	if ([self currentNode] == nil)
 	{
 		[NSException raise: NSInternalInconsistencyException
-		            format: @"Cannot redo object %@ which does not have any commits", [self trackedObject]];
+		            format: @"Cannot redo object %@ which does not have any commits", [self editingContext]];
 	}
 	/* If -canRedo returns YES, before returning it loads some next nodes 
 	   to ensure currentNodeIndex is not zero and can be incremented */

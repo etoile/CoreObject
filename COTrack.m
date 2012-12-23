@@ -29,12 +29,7 @@
 	[self applyTraitFromClass: [ETCollectionTrait class]];
 }
 
-+ (id)trackWithObject: (COObject *)anObject
-{
-	return AUTORELEASE([[self alloc] initWithTrackedObjects: S(anObject)]);
-}
-
-- (id)initWithTrackedObjects: (NSSet *)objects
+- (id)init
 {
 	SUPERINIT;
 	cachedNodes =  [[NSMutableArray alloc] init]; 

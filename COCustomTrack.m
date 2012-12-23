@@ -68,9 +68,7 @@
 
 - (id)initWithUUID: (ETUUID *)aUUID editingContext: (COEditingContext *)aContext
 {
-	self = [super initWithTrackedObjects: [NSSet set]];
-	if (self == nil)
-		return nil;
+	SUPERINIT;
 
 	ASSIGN(UUID, aUUID);
 	ASSIGN(editingContext, aContext);
@@ -93,12 +91,6 @@
 	DESTROY(editingContext);
 	DESTROY(allNodes);
 	[super dealloc];
-}
-
-- (id)initWithTrackedObjects: (NSSet *)objects
-{
-	DESTROY(self);
-	return nil;
 }
 
 - (NSSet *)trackedObjectUUIDs

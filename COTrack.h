@@ -39,11 +39,10 @@
 
 /** @taskunit Initialization */
 
-+ (id)trackWithObject: (COObject *)anObject;
 /**
  * <init />
  */
-- (id)initWithTrackedObjects: (NSSet *)objects;
+- (id)init;
 
 /** @taskunit Tracked Objects */
 
