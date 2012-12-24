@@ -220,6 +220,16 @@
 	                                                   deliverImmediately: YES];
 }
 
+- (void)createCommitTrackWithUUID: (ETUUID *)aBranchUUID
+							 name: (NSString *)aBranchName
+                   parentRevision: (CORevision *)aRevision
+				   rootObjectUUID: (ETUUID *)aRootObjectUUID
+               persistentRootUUID: (ETUUID *)aPersistentRootUUID
+              isNewPersistentRoot: (BOOL)isNewPersistentRoot
+{
+	[self doesNotRecognizeSelector: _cmd];
+}
+
 - (CORevision *)createCommitTrackForRootObjectUUID: (NSNumber *)uuidIndex
                                           revision: (CORevision *)aRevision
                                      currentNodeId: (int64_t *)pCurrentNodeId
@@ -232,6 +242,12 @@
                                      currentNodeId: (int64_t *)pCurrentNodeId
 {
 	return [self createCommitTrackForRootObjectUUID: uuidIndex revision: nil currentNodeId: pCurrentNodeId];
+}
+
+- (CORevision *)parentRevisionForCommitTrackUUID: (ETUUID *)aTrackUUID
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
 }
 
 - (CORevision *)commitTrackForRootObject: (NSNumber *)objectUUIDIndex

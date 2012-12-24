@@ -92,6 +92,7 @@
  * in EtoileUI.
  */
 @property (nonatomic, retain) id rootObject;
+@property (nonatomic, readonly) ETUUID *rootObjectUUID;
 /**
  * The persistent root revision.
  *

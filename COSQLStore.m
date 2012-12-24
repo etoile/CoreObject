@@ -817,6 +817,47 @@ void CHECK(id db)
 	                                                   deliverImmediately: YES];
 }
 
+- (void)createCommitTrackWithUUID: (ETUUID *)aBranchUUID
+							 name: (NSString *)aBranchName
+                   parentRevision: (CORevision *)aRevision
+				   rootObjectUUID: (ETUUID *)aRootObjectUUID
+               persistentRootUUID: (ETUUID *)aPersistentRootUUID
+              isNewPersistentRoot: (BOOL)isNewPersistentRoot
+{
+	NILARG_EXCEPTION_TEST(aPersistentRootUUID);
+	NILARG_EXCEPTION_TEST(aBranchUUID);
+
+	//ETUUID *parentTrackUUID = [aRevision trackUUID];
+
+	NSNumber *persistentRootIndex = [self keyForUUID: aPersistentRootUUID];
+	NSNumber *trackIndex = [self keyForUUID: aBranchUUID];
+	NSNumber *rootObjectIndex = [self keyForUUID: aRootObjectUUID];
+
+	if (isNewPersistentRoot)
+	{
+		ETAssert([self isPersistentRootUUID: aPersistentRootUUID] == NO);
+
+		[db executeUpdate: @"INSERT INTO persistentRoots VALUES(?, ?, ?, NULL)", persistentRootIndex, rootObjectIndex, trackIndex]; CHECK(db);
+	}
+	else
+	{
+		ETAssert([[self rootObjectUUIDForPersistentRootUUID: aPersistentRootUUID]
+			isEqual: aRootObjectUUID]);
+	}
+
+
+	BOOL isCheapCopy = (isNewPersistentRoot && aRevision != nil);
+	//NSNumber *parentTrackIndex = [self keyForUUID: parentTrackUUID];
+	NSNumber *parentRevNumber = nil;
+
+	if (aRevision != nil)
+	{
+		parentRevNumber = [NSNumber numberWithLongLong: [aRevision revisionNumber]];
+	}
+
+	[db executeUpdate: @"INSERT INTO branches VALUES(?, ?, ?, ?, NULL)", trackIndex, persistentRootIndex, parentRevNumber, [NSNumber numberWithBool: isCheapCopy]]; CHECK(db);
+}
+
 - (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)uuidIndex
                                          revision: (CORevision *)aRevision
                                     currentNodeId: (int64_t*)pCurrentNodeId
@@ -837,6 +878,21 @@ void CHECK(id db)
 	if (pCurrentNodeId)
 		*pCurrentNodeId = currentNodeId;
 	return revision;
+}
+
+- (CORevision *)parentRevisionForCommitTrackUUID: (ETUUID *)aTrackUUID
+{
+	NILARG_EXCEPTION_TEST(aTrackUUID);
+    FMResultSet *rs = [db executeQuery: @"SELECT parentrevisionnumber FROM branches WHERE uuid = ?",
+		[self keyForUUID: aTrackUUID]]; CHECK(db);
+	CORevision *rev = nil;
+
+	if ([rs next])
+	{
+		rev = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
+	}
+	[rs close];
+	return rev;
 }
 
 - (CORevision*)commitTrackForRootObject: (NSNumber*)objectUUIDIndex

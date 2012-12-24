@@ -73,22 +73,48 @@
 
 - (CORevision *)parentRevision
 {
-	return nil;
+	return [[[self persistentRoot] store] parentRevisionForCommitTrackUUID: [self UUID]];
 }
 
 - (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel
 {
-	return nil;
+	return [self makeBranchWithLabel: aLabel atRevision: [[self persistentRoot] revision]];
 }
 
 - (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
-	return nil;
+	NILARG_EXCEPTION_TEST(aRev);
+
+	ETUUID *branchUUID = [ETUUID UUID];
+	
+	[[[self persistentRoot] store] createCommitTrackWithUUID: branchUUID
+														name: aLabel
+	                                          parentRevision: aRev
+	                                          rootObjectUUID: [[self persistentRoot] rootObjectUUID]
+	                                      persistentRootUUID: [[self persistentRoot] persistentRootUUID]
+	                                     isNewPersistentRoot: NO];
+	
+	
+	return [[[COCommitTrack alloc] initWithUUID: branchUUID
+								 editingContext: [self persistentRoot]] autorelease];
+
 }
 
 - (COCommitTrack *)makeCopyFromRevision: (CORevision *)aRev
 {
-	return nil;
+	NILARG_EXCEPTION_TEST(aRev);
+	
+	ETUUID *branchUUID = [ETUUID UUID];
+	
+	[[[self persistentRoot] store] createCommitTrackWithUUID: branchUUID
+														name: nil
+	                                          parentRevision: aRev
+	                                          rootObjectUUID: [[self persistentRoot] rootObjectUUID]
+	                                      persistentRootUUID: [ETUUID UUID]
+	                                     isNewPersistentRoot: YES];
+	
+	return [[[COCommitTrack alloc] initWithUUID: branchUUID
+								 editingContext: [self persistentRoot]] autorelease];
 }
 
 - (BOOL)mergeChangesFromTrack: (COCommitTrack *)aSourceTrack

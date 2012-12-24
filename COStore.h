@@ -205,8 +205,22 @@
 /**
  * <override-subclass />
  */
+- (void)createCommitTrackWithUUID: (ETUUID *)aBranchUUID
+							 name: (NSString *)aBranchName
+                   parentRevision: (CORevision *)aRevision
+				   rootObjectUUID: (ETUUID *)aRootObjectUUID
+               persistentRootUUID: (ETUUID *)aPersistentRootUUID
+              isNewPersistentRoot: (BOOL)isNewPersistentRoot;
+
+/**
+ * <override-subclass />
+ */
 - (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)rootObjectUUID
                                     currentNodeId: (int64_t*)currentNodeId;
+/**
+ * <override-subclass />
+ */
+- (CORevision *)parentRevisionForCommitTrackUUID: (ETUUID *)aTrackUUID;
 /**
  * <override-subclass />
  */

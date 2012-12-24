@@ -221,6 +221,59 @@
 	UKObjectsEqual(o1, [store rootObjectUUIDForObjectUUID: o3]);
 }
 
+- (void)testBranch
+{
+	ETUUID *rootUUID = [ETUUID UUID];
+	ETUUID *trackUUID = [ETUUID UUID];
+	ETUUID *o1 = [ETUUID UUID];
+	ETUUID *o2 = [ETUUID UUID];
+	//ETUUID *o3 = [ETUUID UUID];
+	
+	[store insertPersistentRootUUID: rootUUID
+	                commitTrackUUID: trackUUID
+					 rootObjectUUID: o1];
+	
+	[store beginCommitWithMetadata: nil
+	            persistentRootUUID: rootUUID
+	               commitTrackUUID: trackUUID
+	                  baseRevision: nil];
+	
+	[store beginChangesForObjectUUID: o1];
+	[store setValue: @"birds" forProperty: @"name" ofObject: o1 shouldIndex: NO];
+	[store finishChangesForObjectUUID: o1];
+
+	CORevision *c1 = [store finishCommit];
+
+	[store beginCommitWithMetadata: nil
+	            persistentRootUUID: rootUUID
+	               commitTrackUUID: trackUUID
+	                  baseRevision: c1];
+
+	[store beginChangesForObjectUUID: o2];
+	[store setValue: @"cats" forProperty: @"name" ofObject: o2 shouldIndex: NO];
+	[store finishChangesForObjectUUID: o2];
+
+	CORevision *c2 = [store finishCommit];
+
+	ETUUID *branchUUID = [ETUUID UUID];
+
+	[store createCommitTrackWithUUID: branchUUID
+								name: @"Test"
+					  parentRevision: c2
+					  rootObjectUUID: o1
+				  persistentRootUUID: rootUUID
+				 isNewPersistentRoot: NO];
+
+	UKTrue([store isTrackUUID: trackUUID]);
+	// FIXME: UKTrue([store isTrackUUID: branchUUID]);
+	UKObjectsEqual(c2, [store currentRevisionForTrackUUID: trackUUID]);
+	UKObjectsEqual(c2, [store currentRevisionForTrackUUID: branchUUID]);
+	UKNil([store parentRevisionForCommitTrackUUID: trackUUID]);
+	UKObjectsEqual(c2, [store parentRevisionForCommitTrackUUID: branchUUID]);
+	UKObjectsEqual(rootUUID, [store persistentRootUUIDForCommitTrackUUID: trackUUID]);
+	UKObjectsEqual(rootUUID, [store persistentRootUUIDForCommitTrackUUID: branchUUID]);
+}
+
 - (void)testStoreNil
 {
 	ETUUID *rootUUID = [ETUUID UUID];
