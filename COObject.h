@@ -163,12 +163,15 @@
  */
 @interface COObject : NSObject <NSCopying, COObjectMatching>
 {
-	@package
+	@private
 	ETEntityDescription *_entityDescription;
 	ETUUID *_uuid;
 	COPersistentRoot *_persistentRoot; // weak reference
+	@protected
 	NSMapTable *_variableStorage;
+	@package
 	BOOL _isIgnoringDamageNotifications;
+	@private
 	BOOL _isIgnoringRelationshipConsistency;
 	BOOL _inDescription; // FIXME: remove; only for debugging
 	BOOL _isInitialized;
