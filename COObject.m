@@ -207,21 +207,30 @@
 	[super dealloc];
 }
 
+- (BOOL)isSharedInstance
+{
+	return [[[[self class] ifResponds] sharedInstance] isEqual: self];
+}
+
 - (void)becomePersistentInContext: (COPersistentRoot *)aContext
 {
 	NILARG_EXCEPTION_TEST(aContext);
-	INVALIDARG_EXCEPTION_TEST(aContext, [aContext conformsToProtocol: @protocol(COPersistentObjectContext)]);
-	if ([aContext isKindOfClass: [COPersistentRoot class]])
+	INVALIDARG_EXCEPTION_TEST(aContext, [aContext isKindOfClass: [COPersistentRoot class]]);
+
+	if ([self isSharedInstance])
 	{
-		//INVALIDARG_EXCEPTION_TEST(aContext, [(COPersistentRoot *)aContext rootObject] != self);
-	}
-	if (_persistentRoot != nil)
-	{
+		/* For example, EtoileUI aspects returned by -sharedInstance must remain transient */
 		[NSException raise: NSInternalInconsistencyException
-					format: _(@"You must not sent -becomePersistentInContext:, "
-		                       "to %@, the object is already persistent in %@"),
-		                     [self primitiveDescription], _persistentRoot];
+					format: @"Shared instance such as %@ must never become "
+		                     "persistent to prevent ownership and aliasing issues", self];
 	}
+
+	/* For transitively persisted objects, shared objects (e.g. action handlers
+	   in EtoileUI) can receive -becomePersistentInContent: multiple times. 
+	   In such a case, the receiver can belong or not to another persistent root 
+	   than the context argument. */
+	if ([self isPersistent])
+		return;
 	
 	/* Both transient and persistent objects must have a valid UUID */
 	ETAssert(_uuid != nil);
