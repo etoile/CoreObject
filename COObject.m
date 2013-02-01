@@ -237,7 +237,7 @@
 	_persistentRoot = aContext;
 	if (_entityDescription == nil)
 	{
-		ASSIGN(_entityDescription, [[(id)aContext modelRepository] entityDescriptionForClass: [self class]]);
+		ASSIGN(_entityDescription, [[[(id)aContext parentContext] modelRepository] entityDescriptionForClass: [self class]]);
 	}
 	[aContext registerObject: self];
 }
