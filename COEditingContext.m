@@ -79,6 +79,12 @@ object graphs present in memory, for which changes have been committed to the
 store by other processes. */
 - (void)didMakeCommit: (NSNotification *)notif
 {
+	// TODO: Write a test to ensure other store notifications are not handled
+	BOOL isOtherStore = ([[[_store UUID] stringValue] isEqual: [notif object]] == NO);
+
+	if (isOtherStore)
+		return;
+
 	// TODO: Take in account the editing context max revision number
 	ETUUID *posterUUID = [ETUUID UUIDWithString: [[notif userInfo] objectForKey: kCOEditingContextUUIDKey]];
 	BOOL isOurCommit = [_uuid isEqual: posterUUID];
