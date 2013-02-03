@@ -227,7 +227,7 @@
 	ETUUID *trackUUID = [ETUUID UUID];
 	ETUUID *o1 = [ETUUID UUID];
 	ETUUID *o2 = [ETUUID UUID];
-	//ETUUID *o3 = [ETUUID UUID];
+	ETUUID *o3 = [ETUUID UUID];
 	
 	[store insertPersistentRootUUID: rootUUID
 	                commitTrackUUID: trackUUID
@@ -272,6 +272,33 @@
 	UKObjectsEqual(c2, [store parentRevisionForCommitTrackUUID: branchUUID]);
 	UKObjectsEqual(rootUUID, [store persistentRootUUIDForCommitTrackUUID: trackUUID]);
 	UKObjectsEqual(rootUUID, [store persistentRootUUIDForCommitTrackUUID: branchUUID]);
+
+	UKObjectsEqual(S(o1, o2), [store objectUUIDsForCommitTrackUUID: trackUUID]);
+	UKObjectsEqual(S(o1, o2), [store objectUUIDsForCommitTrackUUID: branchUUID]);
+	UKObjectsEqual(S(o1), [store objectUUIDsForCommitTrackUUID: branchUUID atRevision: c1]);
+	UKObjectsEqual(S(o1), [store objectUUIDsForCommitTrackUUID: branchUUID atRevision: c1]);
+
+	[store beginCommitWithMetadata: nil
+	            persistentRootUUID: rootUUID
+	               commitTrackUUID: branchUUID
+	                  baseRevision: c2];
+
+	[store beginChangesForObjectUUID: o2];
+	[store setValue: @"dogs" forProperty: @"name" ofObject: o2 shouldIndex: NO];
+	[store finishChangesForObjectUUID: o2];
+
+	[store beginChangesForObjectUUID: o3];
+	[store setValue: @"mammals" forProperty: @"name" ofObject: o3 shouldIndex: NO];
+	[store finishChangesForObjectUUID: o3];
+
+	CORevision *c3 = [store finishCommit];
+								 
+	UKObjectsEqual(c2, [store currentRevisionForTrackUUID: trackUUID]);
+	UKObjectsEqual(c3, [store currentRevisionForTrackUUID: branchUUID]);
+	UKObjectsEqual(S(o1, o2), [store objectUUIDsForCommitTrackUUID: trackUUID]);
+	UKObjectsEqual(S(o1, o2, o3), [store objectUUIDsForCommitTrackUUID: branchUUID]);
+	UKObjectsEqual(S(o1), [store objectUUIDsForCommitTrackUUID: branchUUID atRevision: c1]);
+	// FIXME: UKObjectsEqual([NSSet set], [store objectUUIDsForCommitTrackUUID: branchUUID atRevision: c1]);
 }
 
 - (void)testStoreNil

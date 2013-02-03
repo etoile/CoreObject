@@ -63,8 +63,7 @@
 
 - (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID
 {
-	[self doesNotRecognizeSelector: _cmd];
-	return nil;
+	return [self objectUUIDsForCommitTrackUUID: aUUID atRevision: nil];
 }
 
 - (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID atRevision: (CORevision *)revision
@@ -250,6 +249,20 @@
 	return nil;
 }
 
+- (NSArray *)parentTrackUUIDsForCommitTrackUUID: (ETUUID *)aTrackUUID
+{
+	NSMutableArray *UUIDs = [NSMutableArray array];
+	ETUUID *trackUUID = aTrackUUID;
+	
+	// TODO: Optimize using a single query if needed
+	while ((trackUUID = [[self parentRevisionForCommitTrackUUID: trackUUID] trackUUID]) != nil)
+	{
+		[UUIDs addObject: trackUUID];
+	}
+	
+	return UUIDs;
+}
+
 - (CORevision *)commitTrackForRootObject: (NSNumber *)objectUUIDIndex
                              currentNode: (int64_t *)pCurrentNode
                             previousNode: (int64_t *)pPreviousNode
@@ -313,7 +326,7 @@
 	return nil;
 }
 
-- (CORevision *)maxRevision: (int64_t)maxRevNumber forRootObjectUUID: (ETUUID *)uuid
+- (CORevision *)maxRevision: (int64_t)maxRevNumber forCommitTrackUUID: (ETUUID *)aTrackUUID
 {
 	[self doesNotRecognizeSelector: _cmd];
 	return nil;

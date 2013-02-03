@@ -311,7 +311,9 @@
 /**
  * Returns the last time the receiver changes were committed.
  *
- * The returned date is the last root object revision date. See -[CORevision date].
+ * The returned date is the last current branch revision date. See -[CORevision date].
+ *
+ * The current branch is -[COPersistentRoot commitTrack].
  *
  * Can be more recent than the present receiver revision (see -revision).
  */

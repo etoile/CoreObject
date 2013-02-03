@@ -224,6 +224,10 @@
 /**
  * <override-subclass />
  */
+- (NSArray *)parentTrackUUIDsForCommitTrackUUID: (ETUUID *)aTrackUUID;
+/**
+ * <override-subclass />
+ */
 - (void)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID;
 /**
  * <override-subclass />
@@ -249,7 +253,7 @@
 /**
  * <override-subclass />
  */
-- (CORevision*)maxRevision: (int64_t)maxRevNumber forRootObjectUUID: (ETUUID*)uuid;
+- (CORevision *)maxRevision: (int64_t)maxRevNumber forCommitTrackUUID: (ETUUID *)aTrackUUID;
 /**
  * <override-subclass />
  * Returns whether the UUID corresponds to a track in the store. 

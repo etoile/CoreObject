@@ -415,15 +415,17 @@
 
 - (NSDate *)modificationDate
 {
-	CORevision *rev = [[[self persistentRoot] store] maxRevision: INT64_MAX 
-	                                           forRootObjectUUID: [[self rootObject] UUID]];
+	ETUUID *branchUUID = [[[self persistentRoot] commitTrack] UUID];
+	CORevision *rev = [[[self persistentRoot] store] maxRevision: INT64_MAX
+	                                          forCommitTrackUUID: branchUUID];
 	return [rev date];
 }
 
 - (NSDate *)creationDate
 {
+	ETUUID *branchUUID = [[[self persistentRoot] commitTrack] UUID];
 	CORevision *rev = [[[self persistentRoot] store] maxRevision: 0 
-	                                           forRootObjectUUID: [[self rootObject] UUID]];
+	                                          forCommitTrackUUID: branchUUID];
 	return [rev date];
 }
 

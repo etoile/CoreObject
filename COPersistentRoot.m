@@ -23,10 +23,8 @@
 		revNumber = maxRevNumber;
 	}
 	
-	
-	// TODO: Should use -maxRevision:forCommitTrackUUID: or -maxRevision:forTrackUUID:
 	return [[self store] maxRevision: revNumber
-	               forRootObjectUUID: aRootObjectUUID];
+	              forCommitTrackUUID: [[self commitTrack] UUID]];
 }
 
 - (ETUUID *)rootObjectUUID

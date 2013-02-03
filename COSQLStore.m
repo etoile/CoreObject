@@ -366,30 +366,35 @@ void CHECK(id db)
 	return result;
 }
 
-- (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID
+- (NSArray *)keysForUUIDs: (NSArray *)UUIDs
 {
-	NILARG_EXCEPTION_TEST(aUUID);
-    FMResultSet *rs = [db executeQuery: @"SELECT DISTINCT uuids.uuid FROM uuids JOIN commits ON uuids.uuidindex = commits.objectuuid WHERE commits.committrackuuid = ?", [self keyForUUID: aUUID]]; CHECK(db);
-	NSMutableSet *result = [NSMutableSet set];
+	NSMutableArray *keys = [NSMutableArray arrayWithCapacity: [UUIDs count]];
 
-	while ([rs next])
+	for (ETUUID *uuid in UUIDs)
 	{
-		[result addObject: [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]]];
+		[keys addObject: [self keyForUUID: uuid]];
 	}
-	ETAssert([result containsObject: aUUID] == NO);
-
-	[rs close];
-	return result;
+	return keys;
 }
 
 - (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID atRevision: (CORevision *)revision
 {
 	NILARG_EXCEPTION_TEST(aUUID);
-	NILARG_EXCEPTION_TEST(revision);
 
+	NSArray *trackUUIDs = [[self parentTrackUUIDsForCommitTrackUUID: aUUID] arrayByAddingObject: aUUID];
+	NSString *trackIndexes = [[self keysForUUIDs: trackUUIDs] componentsJoinedByString: @", "];
 	// FIXME: This may need to be optimised by storing a list of object UUIDs
 	// at some revisions.
-	FMResultSet *rs = [db executeQuery: @"SELECT DISTINCT uuids.uuid FROM uuids JOIN commits ON uuids.uuidindex = commits.objectuuid WHERE commits.committrackuuid = ? and revisionnumber <= ?", [self keyForUUID: aUUID], [NSNumber numberWithLongLong: [revision revisionNumber]]]; CHECK(db);
+	NSString *query = [NSString stringWithFormat: @"SELECT DISTINCT uuids.uuid FROM uuids JOIN commits ON uuids.uuidindex = commits.objectuuid WHERE commits.committrackuuid IN (%@)", trackIndexes];
+
+	if (revision != nil)
+	{
+		NSNumber *revNumber = [NSNumber numberWithLongLong: [revision revisionNumber]];
+		query = [query stringByAppendingString:
+			[NSString stringWithFormat: @" and revisionnumber <= %@", revNumber]];
+	}
+
+	FMResultSet *rs = [db executeQuery: query]; CHECK(db);
 	NSMutableSet *result = [NSMutableSet set];
 
 	while ([rs next])
@@ -1178,14 +1183,20 @@ void CHECK(id db)
 	}
 	return nil;
 }
-- (CORevision*)maxRevision: (int64_t)maxRevNumber forRootObjectUUID: (ETUUID*)uuid
+
+- (CORevision *)maxRevision: (int64_t)maxRevNumber forCommitTrackUUID: (ETUUID *)aTrackUUID
 {
-	if (maxRevNumber <= 0)
+	BOOL hasMaxRev = (maxRevNumber > 0);
+
+	if (hasMaxRev == NO)
+	{
 		maxRevNumber = [self latestRevisionNumber];
+	}
+
 	FMResultSet *rs = [db executeQuery: @"SELECT MAX(revisionnumber) FROM uuids "
-		"JOIN commits ON uuids.uuidIndex = commits.objectuuid "
-		"WHERE revisionnumber <= ? AND uuids.rootIndex = ?",
-		[NSNumber numberWithLongLong: maxRevNumber], [self keyForUUID: uuid]]; CHECK(db);
+		"JOIN commits ON uuids.uuidIndex = commits.committrackuuid "
+		"WHERE revisionnumber <= ? AND commits.committrackuuid = ?",
+		[NSNumber numberWithLongLong: maxRevNumber], [self keyForUUID: aTrackUUID]]; CHECK(db);
 	if ([rs next])
 	{
 		return [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];

@@ -268,7 +268,7 @@
 	if (useCommitTrackUndo)
 	{
 		CORevision *prevRev = [[editingContext store] maxRevision: [revToUndo revisionNumber] - 1 
-		                                        forRootObjectUUID: [object UUID]];
+		                                       forCommitTrackUUID: [self UUID]];
 		
 		if (prevRev != nil)
 		{
