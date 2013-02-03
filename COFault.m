@@ -69,8 +69,6 @@
 	_variableStorage = [(COObject *)self newVariableStorage];
 
 	[_persistentRoot loadObject: (COObject *)self];
-	// TODO: Move to -loadObject:atRevision: probably
-	[(COObject *)self awakeFromFetch];
 
 	// TODO: Return a NSError or report issues in another way
 	return nil;

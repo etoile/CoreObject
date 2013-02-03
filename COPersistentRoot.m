@@ -729,7 +729,9 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 		[NSException raise: NSInternalInconsistencyException
 		            format: @"Store is missing properties %@ for %@", propertiesToFetch, obj];
 	}
-	
+
+	[obj awakeFromFetch];
+
 	[_updatedPropertiesByObject removeObjectForKey: obj];
 	obj->_isIgnoringDamageNotifications = NO;
 	[obj setIgnoringRelationshipConsistency: NO];
