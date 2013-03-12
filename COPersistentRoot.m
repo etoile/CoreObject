@@ -614,6 +614,8 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 
 			propertiesToCommit = [NSMutableSet setWithArray: updatedProperties];
 			[(NSMutableSet *)propertiesToCommit intersectSet: [NSSet setWithArray: persistentProperties]];
+			
+			NSLog(@"Commit updated properties %@ for %@", propertiesToCommit, obj);
 		}
 
 		for (NSString *prop in propertiesToCommit)
@@ -673,7 +675,7 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	[_insertedObjects addObject: object];
 }
 
-- (void)markObjectUpdated: (COObject *)obj forProperty: (NSString *)aProperty
+- (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty
 {
 	if (nil == [_updatedPropertiesByObject objectForKey: obj])
 	{

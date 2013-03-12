@@ -153,7 +153,7 @@
 	}
 	else
 	{
-		[(id)_persistentRoot markObjectUpdated: self forProperty: nil];
+		[(id)_persistentRoot markObjectAsUpdated: self forProperty: nil];
 		_variableStorage = [self newVariableStorage];
 		[self didCreate];
 	}
@@ -214,6 +214,13 @@
 
 - (void)becomePersistentInContext: (COPersistentRoot *)aContext
 {
+	/* For transitively persisted objects, shared objects (e.g. action handlers
+	   in EtoileUI) can receive -becomePersistentInContext: multiple times.
+	   In such a case, the receiver can belong or not to another persistent root
+	   than the context argument. */
+	if ([self isPersistent])
+		return;
+
 	NILARG_EXCEPTION_TEST(aContext);
 	INVALIDARG_EXCEPTION_TEST(aContext, [aContext isKindOfClass: [COPersistentRoot class]]);
 
@@ -224,13 +231,6 @@
 					format: @"Shared instance such as %@ must never become "
 		                     "persistent to prevent ownership and aliasing issues", self];
 	}
-
-	/* For transitively persisted objects, shared objects (e.g. action handlers
-	   in EtoileUI) can receive -becomePersistentInContent: multiple times. 
-	   In such a case, the receiver can belong or not to another persistent root 
-	   than the context argument. */
-	if ([self isPersistent])
-		return;
 	
 	/* Both transient and persistent objects must have a valid UUID */
 	ETAssert(_uuid != nil);
@@ -454,6 +454,11 @@
 - (NSArray *) persistentPropertyNames
 {
 	return (id)[[[[self entityDescription] allPersistentPropertyDescriptions] mappedCollection] name];
+}
+
+- (BOOL)isPersistentProperty: (NSString *)key
+{
+	return [[self persistentPropertyNames] containsObject: key];
 }
 
 - (id) valueForProperty:(NSString *)key
@@ -803,12 +808,12 @@
 	[super willChangeValueForKey: key];
 }
 
-- (void) notifyContextOfDamageIfNeededForProperty: (NSString*)prop
+- (void) markAsUpdatedIfNeededForProperty: (NSString*)prop
 {
-	if (!_isIgnoringDamageNotifications)
-	{
-		[[self persistentRoot] markObjectUpdated: self forProperty: prop];
-	}
+	if (_isIgnoringDamageNotifications || [self isPersistent] == NO)
+		return;
+	
+	[[self persistentRoot] markObjectAsUpdated: self forProperty: prop];
 }
 
 - (void)didChangeValueForProperty: (NSString *)key
@@ -816,15 +821,26 @@
 	[self didChangeValueForProperty: key oldValue: nil];
 }
 
+- (void) becomePersistentAccordingToModelDescriptionForProperty: (NSString *)key
+{
+	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
+	
+	if ([propertyDesc isPersistent] && [propertyDesc isMultivalued] == NO && [[propertyDesc type] isPrimitive] == NO)
+	{
+		[[self valueForProperty: key] becomePersistentInContext: [self persistentRoot]];
+	}
+}
+
 - (void)didChangeValueForProperty: (NSString *)key oldValue: (id)oldValue
 {
 	// TODO: Evaluate whether -checkEditingContextForValue: is too costly
 	//[self checkEditingContextForValue: [self valueForProperty: key]];
 	[self updateRelationshipConsistencyForProperty: key oldValue: oldValue];
-	[self notifyContextOfDamageIfNeededForProperty: key];
+	[self markAsUpdatedIfNeededForProperty: key];
+	// FIXME: [self becomePersistentAccordingToModelDescriptionForProperty: key];
+	
 	[super didChangeValueForKey: key];
 }
-
 
 - (id)collectionForProperty: (NSString *)key insertionIndex: (NSInteger)index
 {

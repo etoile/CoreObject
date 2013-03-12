@@ -334,10 +334,10 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
- * Tells the context a property value has changed in a COObject class or
+ * Tells the persistent root a property value has changed in a COObject class or
  * subclass instance.
  */
-- (void)markObjectUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
+- (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
