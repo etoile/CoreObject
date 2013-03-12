@@ -243,6 +243,19 @@
 - (NSArray *)parentTrackUUIDsForCommitTrackUUID: (ETUUID *)aTrackUUID;
 /**
  * <override-subclass />
+ * Returns the name for the given commit track.
+ *
+ * Commit tracks bound to the same persistent root must each use distinct names. 
+ *
+ * The name is usually a branch label.
+ *
+ * If the branch hasn't been named, returns an empty string.
+ *
+ * For a nil UUID, raises an NSInvalidArgumentException.
+ */
+- (NSString *)nameForCommitTrackUUID: (ETUUID *)aTrackUUID;
+/**
+ * <override-subclass />
  */
 - (void)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID;
 /**

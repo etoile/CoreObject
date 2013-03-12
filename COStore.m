@@ -264,6 +264,12 @@
 	return UUIDs;
 }
 
+- (NSString *)nameForCommitTrackUUID: (ETUUID *)aTrackUUID
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return @"";
+}
+
 - (CORevision *)commitTrackForRootObject: (NSNumber *)objectUUIDIndex
                              currentNode: (int64_t *)pCurrentNode
                             previousNode: (int64_t *)pPreviousNode

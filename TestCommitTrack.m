@@ -6,6 +6,7 @@
 #import "COEditingContext.h"
 #import "COObject.h"
 #import "COContainer.h"
+#import "COPersistentRoot.h"
 
 @interface TestCommitTrack : TestCommon <UKTest>
 - (void)testNoExistingCommitTrack;
@@ -138,6 +139,51 @@
 	UKStringsEqual(@"paragraph 3", [[[object contentArray] objectAtIndex: 0] valueForProperty: @"label"]);
 
 	//UKIntsEqual(0, [para3 retainCount]);
+}
+
+- (void)testBranchCreation
+{
+	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
+	CORevision *rev1 = [[object persistentRoot] commit];
+
+	COCommitTrack *commitTrack = [object commitTrack];
+	COCommitTrack *branch = [commitTrack makeBranchWithLabel: @"Sandbox"];
+	/* The branch creation has created a new revision */
+	CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [[ctx store] latestRevisionNumber]];
+	// FXIME: CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [ctx latestRevisionNumber]];
+	
+	UKNotNil(branch);
+	UKObjectsNotEqual([branch UUID], [commitTrack UUID]);
+	UKStringsEqual(@"Sandbox", [branch label]);
+	UKObjectsEqual(rev1, [branch parentRevision]);
+	UKObjectsEqual(commitTrack, [branch parentTrack]);
+	UKObjectsEqual([object persistentRoot], [branch persistentRoot]);
+	/* Branch creation doesn't touch the current persistent root revision */
+	UKObjectsEqual([object revision], rev1);
+	UKTrue([rev1 isEqual: [rev2 baseRevision]]);
+	/* Branch creation doesn't switch the branch */
+	UKObjectsSame(commitTrack, [[object persistentRoot] commitTrack]);
+}
+
+- (void)testBranchSwitch
+{
+	/*COTrackNode *firstNode = [commitTrack currentNode];
+	UKNotNil(commitTrack);
+	UKNotNil(firstNode);
+	UKFalse([commitTrack canUndo]);
+	
+	[object setValue: @"Shopping List" forProperty: @"label"];
+	[ctx commit];
+	COTrackNode *secondNode = [commitTrack currentNode];
+	
+	UKObjectsNotEqual(firstNode, secondNode);
+	UKObjectsEqual([firstNode revision], [[secondNode revision] baseRevision]);
+	
+	[object setValue: @"Todo" forProperty: @"label"];
+	[ctx commit];
+	COTrackNode *thirdNode = [commitTrack currentNode];
+	UKObjectsNotEqual(thirdNode, secondNode);
+	UKObjectsEqual([[thirdNode revision] baseRevision], [secondNode revision]);*/
 }
 
 @end

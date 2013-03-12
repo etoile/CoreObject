@@ -141,7 +141,7 @@ void CHECK(id db)
 	success = success && [db executeUpdate: @"CREATE TABLE persistentRoots(uuid INTEGER PRIMARY KEY, rootobjectuuid INTEGER, mainbranchuuid INTEGER, deleted BOOLEAN)"]; CHECK(db);
 	
 	// Branch and Cheap Copy table
-	success = success && [db executeUpdate: @"CREATE TABLE branches(uuid INTEGER PRIMARY KEY, persistentrootuuid INTEGER, parentrevisionnumber INTEGER, copied BOOLEAN, deleted BOOLEAN)"]; CHECK(db);
+	success = success && [db executeUpdate: @"CREATE TABLE branches(uuid INTEGER PRIMARY KEY, persistentrootuuid INTEGER, parentrevisionnumber INTEGER, name STRING, copied BOOLEAN, deleted BOOLEAN)"]; CHECK(db);
 	
 	/* Commit Tables */
 	
@@ -570,7 +570,7 @@ void CHECK(id db)
 	NSNumber *trackIndex = [self keyForUUID: aMainBranchUUID];
 
 	[db executeUpdate: @"INSERT INTO persistentRoots VALUES(?, ?, ?, NULL)", persistentRootIndex, rootObjectIndex, trackIndex]; CHECK(db);
-	[db executeUpdate: @"INSERT INTO branches VALUES(?, ?, NULL, NULL, NULL)", trackIndex, persistentRootIndex]; CHECK(db);
+	[db executeUpdate: @"INSERT INTO branches VALUES(?, ?, NULL, '', NULL, NULL)", trackIndex, persistentRootIndex]; CHECK(db);
 }
 
 /* Committing Changes */
@@ -881,13 +881,14 @@ void CHECK(id db)
 
 
 	BOOL isCheapCopy = (isNewPersistentRoot && aRevision != nil);
+	NSString *branchName = (aBranchName != nil ? aBranchName : @"");
 	NSNumber *parentRevNumber = nil;
 
 	if (aRevision != nil)
 	{
 		parentRevNumber = [NSNumber numberWithLongLong: [aRevision revisionNumber]];
 	}
-	[db executeUpdate: @"INSERT INTO branches VALUES(?, ?, ?, ?, NULL)", trackIndex, persistentRootIndex, parentRevNumber, [NSNumber numberWithBool: isCheapCopy]]; CHECK(db);
+	[db executeUpdate: @"INSERT INTO branches VALUES(?, ?, ?, ?, ?, NULL)", trackIndex, persistentRootIndex, parentRevNumber, branchName, [NSNumber numberWithBool: isCheapCopy]]; CHECK(db);
 
 	return [self finishCommit];
 }
@@ -927,6 +928,23 @@ void CHECK(id db)
 	}
 	[rs close];
 	return rev;
+}
+
+- (NSString *)nameForCommitTrackUUID: (ETUUID *)aTrackUUID
+{
+	NILARG_EXCEPTION_TEST(aTrackUUID);
+    FMResultSet *rs = [db executeQuery: @"SELECT name FROM branches WHERE uuid = ?", [self keyForUUID: aTrackUUID]]; CHECK(db);
+	NSString *result;
+	
+	if ([rs next])
+	{
+		result = [rs stringForColumn: @"name"];
+		/* We expect a single result */
+		ETAssert([rs next] == NO);
+	}
+	
+	[rs close];
+	return result;
 }
 
 - (CORevision*)commitTrackForRootObject: (NSNumber*)objectUUIDIndex

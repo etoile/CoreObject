@@ -18,13 +18,14 @@
 
 @implementation COCommitTrack
 
-@synthesize UUID, persistentRoot, label, parentTrack, isCopy, isMainBranch;
+@synthesize UUID, label, persistentRoot, isCopy, isMainBranch;
 
 /* Both root object and revision are lazily retrieved by the persistent root. 
    Until the loaded revision is known, it is useless to cache track nodes. */
 - (id)initWithUUID: (ETUUID *)aUUID editingContext: (COPersistentRoot *)aContext;
 {
 	NILARG_EXCEPTION_TEST(aUUID);
+	NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
 	NILARG_EXCEPTION_TEST(aContext);
 
 	if ([[aContext parentContext] store] == nil)
@@ -71,9 +72,20 @@
 	return ([self isCopy] == NO && [self parentTrack] != nil);
 }
 
+- (NSString *)label
+{
+	return [[[self persistentRoot] store] nameForCommitTrackUUID: [self UUID]];
+}
+
 - (CORevision *)parentRevision
 {
 	return [[[self persistentRoot] store] parentRevisionForCommitTrackUUID: [self UUID]];
+}
+
+- (COCommitTrack *)parentTrack
+{
+	return [[[COCommitTrack alloc] initWithUUID: [[self parentRevision] trackUUID]
+	                             editingContext: [self persistentRoot]] autorelease];
 }
 
 - (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel
@@ -483,7 +495,5 @@
 		insertPoint++;
 	}
 }
-
-
 
 @end
