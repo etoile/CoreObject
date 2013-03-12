@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UKRunner.h>
 #import "COEditingContext.h"
+#import "CORevision.h"
 #import "COSQLStore.h"
 
 #define SA(x) [NSSet setWithArray: x]
@@ -66,6 +67,15 @@
  */
 - (void)deleteStore;
 
+@end
+
+
+@interface CORevision (TestCommon)
+/**
+ * Syntactic sugar over -valuesAndPropertiesForObjectUUID:fromRevision: to get 
+ * the current object state.
+ */
+- (NSDictionary *)allValuesAndPropertiesForObjectUUID: (ETUUID *)aUUID;
 @end
 
 

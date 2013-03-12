@@ -205,12 +205,12 @@
 /**
  * <override-subclass />
  */
-- (void)createCommitTrackWithUUID: (ETUUID *)aBranchUUID
-							 name: (NSString *)aBranchName
-                   parentRevision: (CORevision *)aRevision
-				   rootObjectUUID: (ETUUID *)aRootObjectUUID
-               persistentRootUUID: (ETUUID *)aPersistentRootUUID
-              isNewPersistentRoot: (BOOL)isNewPersistentRoot;
+- (CORevision *)createCommitTrackWithUUID: (ETUUID *)aBranchUUID
+							         name: (NSString *)aBranchName
+                           parentRevision: (CORevision *)aRevision
+				           rootObjectUUID: (ETUUID *)aRootObjectUUID
+                       persistentRootUUID: (ETUUID *)aPersistentRootUUID
+                      isNewPersistentRoot: (BOOL)isNewPersistentRoot;
 
 /**
  * <override-subclass />
@@ -219,10 +219,26 @@
                                     currentNodeId: (int64_t*)currentNodeId;
 /**
  * <override-subclass />
+ * Returns the parent track revision from which the commit track has been 
+ * derived.
+ * 
+ * This parent revision belongs to the immediate parent track in  
+ * -parentTracksUUIDsForCommitTrackUUID:.
  */
 - (CORevision *)parentRevisionForCommitTrackUUID: (ETUUID *)aTrackUUID;
 /**
  * <override-subclass />
+ * Returns the parent commit track UUIDs starting from the oldest parent to 
+ * the most recent one.
+ *
+ * The oldest parent is the initial track that has no parent track and starts 
+ * the parent track chain.
+ *
+ * The most recent parent is the immediate parent from which the commit track 
+ * has been derived. This is the same than 
+ * <code>[[self parentRevisionForCommitTrackUUID: aTrackUUID] trackUUID]</code>.
+ *
+ * The commit track UUID is not included in the returned array.
  */
 - (NSArray *)parentTrackUUIDsForCommitTrackUUID: (ETUUID *)aTrackUUID;
 /**

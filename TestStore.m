@@ -232,6 +232,8 @@
 	[store insertPersistentRootUUID: rootUUID
 	                commitTrackUUID: trackUUID
 					 rootObjectUUID: o1];
+
+	/* First revision in main track */
 	
 	[store beginCommitWithMetadata: nil
 	            persistentRootUUID: rootUUID
@@ -243,6 +245,8 @@
 	[store finishChangesForObjectUUID: o1];
 
 	CORevision *c1 = [store finishCommit];
+	
+	/* Second revision in main track */
 
 	[store beginCommitWithMetadata: nil
 	            persistentRootUUID: rootUUID
@@ -254,34 +258,40 @@
 	[store finishChangesForObjectUUID: o2];
 
 	CORevision *c2 = [store finishCommit];
+	
+	/* Third Revision in new branch (forked from first revision) */
 
 	ETUUID *branchUUID = [ETUUID UUID];
 
-	[store createCommitTrackWithUUID: branchUUID
-								name: @"Test"
-					  parentRevision: c2
-					  rootObjectUUID: o1
-				  persistentRootUUID: rootUUID
-				 isNewPersistentRoot: NO];
+	CORevision *c3 = [store createCommitTrackWithUUID: branchUUID
+								                 name: @"Test"
+					                   parentRevision: c1
+					                   rootObjectUUID: o1
+				                   persistentRootUUID: rootUUID
+				                  isNewPersistentRoot: NO];
 
 	UKTrue([store isTrackUUID: trackUUID]);
 	// FIXME: UKTrue([store isTrackUUID: branchUUID]);
 	UKObjectsEqual(c2, [store currentRevisionForTrackUUID: trackUUID]);
-	UKObjectsEqual(c2, [store currentRevisionForTrackUUID: branchUUID]);
+	UKObjectsEqual(c3, [store currentRevisionForTrackUUID: branchUUID]);
 	UKNil([store parentRevisionForCommitTrackUUID: trackUUID]);
-	UKObjectsEqual(c2, [store parentRevisionForCommitTrackUUID: branchUUID]);
+	UKObjectsEqual(c1, [store parentRevisionForCommitTrackUUID: branchUUID]);
 	UKObjectsEqual(rootUUID, [store persistentRootUUIDForCommitTrackUUID: trackUUID]);
 	UKObjectsEqual(rootUUID, [store persistentRootUUIDForCommitTrackUUID: branchUUID]);
 
 	UKObjectsEqual(S(o1, o2), [store objectUUIDsForCommitTrackUUID: trackUUID]);
-	UKObjectsEqual(S(o1, o2), [store objectUUIDsForCommitTrackUUID: branchUUID]);
+	UKObjectsEqual(S(o1), [store objectUUIDsForCommitTrackUUID: branchUUID]);
+	UKObjectsEqual(S(o1), [store objectUUIDsForCommitTrackUUID: trackUUID atRevision: c1]);
 	UKObjectsEqual(S(o1), [store objectUUIDsForCommitTrackUUID: branchUUID atRevision: c1]);
-	UKObjectsEqual(S(o1), [store objectUUIDsForCommitTrackUUID: branchUUID atRevision: c1]);
+	UKObjectsEqual(S(o1, o2), [store objectUUIDsForCommitTrackUUID: trackUUID atRevision: c2]);
+	UKObjectsEqual(S(o1), [store objectUUIDsForCommitTrackUUID: branchUUID atRevision: c2]);
+
+	/* Fourth revision in branch */
 
 	[store beginCommitWithMetadata: nil
 	            persistentRootUUID: rootUUID
 	               commitTrackUUID: branchUUID
-	                  baseRevision: c2];
+	                  baseRevision: c1];
 
 	[store beginChangesForObjectUUID: o2];
 	[store setValue: @"dogs" forProperty: @"name" ofObject: o2 shouldIndex: NO];
@@ -291,14 +301,44 @@
 	[store setValue: @"mammals" forProperty: @"name" ofObject: o3 shouldIndex: NO];
 	[store finishChangesForObjectUUID: o3];
 
-	CORevision *c3 = [store finishCommit];
+	CORevision *c4 = [store finishCommit];
 								 
 	UKObjectsEqual(c2, [store currentRevisionForTrackUUID: trackUUID]);
-	UKObjectsEqual(c3, [store currentRevisionForTrackUUID: branchUUID]);
+	UKObjectsEqual(c4, [store currentRevisionForTrackUUID: branchUUID]);
 	UKObjectsEqual(S(o1, o2), [store objectUUIDsForCommitTrackUUID: trackUUID]);
 	UKObjectsEqual(S(o1, o2, o3), [store objectUUIDsForCommitTrackUUID: branchUUID]);
+	UKObjectsEqual(S(o1), [store objectUUIDsForCommitTrackUUID: trackUUID atRevision: c1]);
 	UKObjectsEqual(S(o1), [store objectUUIDsForCommitTrackUUID: branchUUID atRevision: c1]);
-	// FIXME: UKObjectsEqual([NSSet set], [store objectUUIDsForCommitTrackUUID: branchUUID atRevision: c1]);
+	UKObjectsEqual(S(o1, o2), [store objectUUIDsForCommitTrackUUID: trackUUID atRevision: c2]);
+	UKObjectsEqual(S(o1), [store objectUUIDsForCommitTrackUUID: branchUUID atRevision: c2]);
+	UKObjectsEqual(S(o1, o2), [store objectUUIDsForCommitTrackUUID: trackUUID atRevision: c3]);
+	UKObjectsEqual(S(o1), [store objectUUIDsForCommitTrackUUID: branchUUID atRevision: c3]);
+	UKObjectsEqual(S(o1, o2), [store objectUUIDsForCommitTrackUUID: trackUUID atRevision: c4]);
+	UKObjectsEqual(S(o1, o2, o3), [store objectUUIDsForCommitTrackUUID: branchUUID atRevision: c4]);
+	
+	/* First revision state (main track and branch) */
+
+	UKStringsEqual(@"birds", [[c1 allValuesAndPropertiesForObjectUUID: o1] objectForKey: @"name"]);
+	UKNil([[c1 allValuesAndPropertiesForObjectUUID: o2] objectForKey: @"name"]);
+	UKNil([[c1 allValuesAndPropertiesForObjectUUID: o3] objectForKey: @"name"]);
+	
+	/* Second revision state (main track) */ 
+
+	UKStringsEqual(@"birds", [[c2 allValuesAndPropertiesForObjectUUID: o1] objectForKey: @"name"]);
+	UKStringsEqual(@"cats", [[c2 allValuesAndPropertiesForObjectUUID: o2] objectForKey: @"name"]);
+	UKNil([[c2 allValuesAndPropertiesForObjectUUID: o3] objectForKey: @"name"]);
+	 
+	/* Third revision state (branch) */
+
+	UKStringsEqual(@"birds", [[c3 allValuesAndPropertiesForObjectUUID: o1] objectForKey: @"name"]);
+	UKNil([[c3 allValuesAndPropertiesForObjectUUID: o2] objectForKey: @"name"]);
+	UKNil([[c3 allValuesAndPropertiesForObjectUUID: o3] objectForKey: @"name"]);
+
+	/* Fourth revision state (branch) */
+	
+	UKStringsEqual(@"birds", [[c4 allValuesAndPropertiesForObjectUUID: o1] objectForKey: @"name"]);
+	UKStringsEqual(@"dogs", [[c4 allValuesAndPropertiesForObjectUUID: o2] objectForKey: @"name"]);
+	UKStringsEqual(@"mammals", [[c4 allValuesAndPropertiesForObjectUUID: o3] objectForKey: @"name"]);
 }
 
 - (void)testStoreNil

@@ -182,6 +182,16 @@
 @end
 
 
+@implementation CORevision (TestCommon)
+
+- (NSDictionary *)allValuesAndPropertiesForObjectUUID: (ETUUID *)aUUID
+{
+	return [self valuesForProperties: nil ofObjectUUID: aUUID fromRevision: nil];
+}
+
+@end
+
+
 @implementation COEditingContext (TestCommon)
 
 - (id)insertObject: (COObject *)sourceObject

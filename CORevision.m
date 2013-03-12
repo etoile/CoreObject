@@ -203,6 +203,7 @@
 
 - (NSDictionary *)valuesAndPropertiesForObjectUUID: (ETUUID *)object
 {
+	NILARG_EXCEPTION_TEST(object);
 	NSMutableDictionary *result = [NSMutableDictionary dictionary];
 	
 	FMResultSet *rs = [store->db executeQuery:@"SELECT property, value FROM commits WHERE revisionnumber = ? AND objectuuid = ?",
@@ -225,6 +226,43 @@
 	}
 	[rs close];	
 	return [NSDictionary dictionaryWithDictionary: result];
+}
+
+- (NSDictionary *)valuesForProperties: (NSSet *)properties
+                         ofObjectUUID: (ETUUID *)aUUID
+                         fromRevision: (CORevision *)aRevision
+{
+	NILARG_EXCEPTION_TEST(aUUID);
+
+	int64_t minRevNumber = [aRevision revisionNumber];
+
+	if (aRevision == nil)
+	{
+		minRevNumber = [[store revisionWithRevisionNumber: 0] revisionNumber];
+	}
+
+	NSMutableDictionary *result = [NSMutableDictionary dictionary];
+	NSMutableSet *propertiesToFetch = [[properties mutableCopy] autorelease];
+	BOOL fetchAll = (properties == nil);
+	CORevision *rev = self;
+
+	while ((fetchAll || [propertiesToFetch count] > 0) && rev != nil && [rev revisionNumber] >= minRevNumber)
+	{
+		NSDictionary *dict = [rev valuesAndPropertiesForObjectUUID: aUUID] ;
+		
+		for (NSString *key in [dict allKeys])
+		{
+			if (fetchAll || [propertiesToFetch containsObject: key])
+			{
+				[result addEntriesFromDictionary: dict];
+				[propertiesToFetch removeObject: key];
+			}
+		}
+
+		rev = [rev baseRevision];
+	}
+
+	return result;
 }
 
 - (id)content

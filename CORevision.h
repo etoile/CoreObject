@@ -107,11 +107,43 @@
  */ 
 - (NSArray *)changedObjectUUIDs;
 /** 
- * Returns a property list listing the changed property values per object in the 
- * revision. 
+ * Returns the properties (along their values) changed for the given object at 
+ * this revision.
+ *
+ * If the object wasn't changed in the revision, returns an empty dictionary.
+ *
+ * For retrieving the object state bound to the revision (and not just the 
+ * properties changed at this revision), you must use 
+ * -valuesAndPropertiesForObjectUUID:fromRevision:.
+ *
+ * For a nil object UUID, raises a NSInvalidArgumentException.
  */
 - (NSDictionary *)valuesAndPropertiesForObjectUUID: (ETUUID *)objectUUID;
-
+/**
+ * Returns the properties and values for the given object at this revision, if 
+ * the object was changed between the receiver revision and the given past 
+ * revision.
+ *
+ * When no object changes exist between the receiver revision and the given past 
+ * revision, returns en empty dictionary.
+ *
+ * Passing nil as the properties argument means the returned properties are 
+ * determined by looking at serialized properties in each revision until the 
+ * given past revision is reached (this is a lot slower than passing a 
+ * predetermined property set since it involves deserializing all the commit 
+ * track revisions in the targeted revision range).
+ *
+ * Passing nil as the revision argument is the same than passing the result 
+ * of -[COStore revisionForRevisionNumber:] for 0 as revision number.
+ * 
+ * Passing the same revision than the receiver returns the same result than 
+ * -valuesAndPropertiesForObjectUUID:.
+ *
+ * For a nil object UUID, raises a NSInvalidArgumentException.
+ */
+- (NSDictionary *)valuesForProperties: (NSSet *)properties
+                         ofObjectUUID: (ETUUID *)aUUID
+                         fromRevision: (CORevision *)aRevision;
 /** @taskunit Private */
 
 /** 

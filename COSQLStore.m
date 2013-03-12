@@ -377,33 +377,47 @@ void CHECK(id db)
 	return keys;
 }
 
-- (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID atRevision: (CORevision *)revision
+- (NSSet *)objectUUIDsOutsideOfParentTracksForCommitTrackUUID: (ETUUID *)aUUID
+                                                   atRevision: (CORevision *)revision
 {
-	NILARG_EXCEPTION_TEST(aUUID);
-
-	NSArray *trackUUIDs = [[self parentTrackUUIDsForCommitTrackUUID: aUUID] arrayByAddingObject: aUUID];
-	NSString *trackIndexes = [[self keysForUUIDs: trackUUIDs] componentsJoinedByString: @", "];
-	// FIXME: This may need to be optimised by storing a list of object UUIDs
-	// at some revisions.
-	NSString *query = [NSString stringWithFormat: @"SELECT DISTINCT uuids.uuid FROM uuids JOIN commits ON uuids.uuidindex = commits.objectuuid WHERE commits.committrackuuid IN (%@)", trackIndexes];
-
+	NSString *query = [NSString stringWithFormat: @"SELECT DISTINCT uuids.uuid FROM uuids JOIN commits ON uuids.uuidindex = commits.objectuuid WHERE commits.committrackuuid  = %@", [self keyForUUID: aUUID]];
+	
 	if (revision != nil)
 	{
 		NSNumber *revNumber = [NSNumber numberWithLongLong: [revision revisionNumber]];
 		query = [query stringByAppendingString:
-			[NSString stringWithFormat: @" and revisionnumber <= %@", revNumber]];
+				 [NSString stringWithFormat: @" and revisionnumber <= %@", revNumber]];
 	}
-
+	
 	FMResultSet *rs = [db executeQuery: query]; CHECK(db);
 	NSMutableSet *result = [NSMutableSet set];
-
+	
 	while ([rs next])
 	{
 		[result addObject: [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]]];
 	}
 	ETAssert([result containsObject: aUUID] == NO);
-
+	
 	[rs close];
+	return result;
+}
+
+// TODO: This may need to be optimised by storing a list of object UUIDs at some revisions.
+- (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID atRevision: (CORevision *)revision
+{
+	NILARG_EXCEPTION_TEST(aUUID);
+
+	NSArray *trackUUIDs = [[self parentTrackUUIDsForCommitTrackUUID: aUUID] arrayByAddingObject: aUUID];
+	NSMutableSet *result = [NSMutableSet set];
+	CORevision *rev = revision;
+
+	for (ETUUID *trackUUID in [trackUUIDs reverseObjectEnumerator])
+	{
+		CORevision *parentRev = [self parentRevisionForCommitTrackUUID: trackUUID];
+		[result unionSet: [self objectUUIDsOutsideOfParentTracksForCommitTrackUUID: trackUUID
+		                                                                atRevision: rev]];
+		rev = parentRev;
+	}
 	return result;
 }
 
@@ -822,17 +836,32 @@ void CHECK(id db)
 	                                                   deliverImmediately: YES];
 }
 
-- (void)createCommitTrackWithUUID: (ETUUID *)aBranchUUID
-							 name: (NSString *)aBranchName
-                   parentRevision: (CORevision *)aRevision
-				   rootObjectUUID: (ETUUID *)aRootObjectUUID
-               persistentRootUUID: (ETUUID *)aPersistentRootUUID
-              isNewPersistentRoot: (BOOL)isNewPersistentRoot
+- (CORevision *)createCommitTrackWithUUID: (ETUUID *)aBranchUUID
+							         name: (NSString *)aBranchName
+                           parentRevision: (CORevision *)aRevision
+				           rootObjectUUID: (ETUUID *)aRootObjectUUID
+                       persistentRootUUID: (ETUUID *)aPersistentRootUUID
+                      isNewPersistentRoot: (BOOL)isNewPersistentRoot
 {
 	NILARG_EXCEPTION_TEST(aPersistentRootUUID);
 	NILARG_EXCEPTION_TEST(aBranchUUID);
 
-	//ETUUID *parentTrackUUID = [aRevision trackUUID];
+	ETUUID *parentTrackUUID = [aRevision trackUUID];
+	
+	if ([[self persistentRootUUIDForCommitTrackUUID: parentTrackUUID] isEqual: aPersistentRootUUID] == NO)
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: _(@"Persistent root UUID %@ doesn't match the parent "
+		                       "revision persistent root UUID %@. The parent "
+		                       "revision belongs to a commit track bound to "
+		                       "another persistent root UUID."), aPersistentRootUUID,
+		                    [self persistentRootUUIDForCommitTrackUUID: parentTrackUUID]];
+	}
+
+	[self beginCommitWithMetadata: nil
+	           persistentRootUUID: aPersistentRootUUID
+	              commitTrackUUID: aBranchUUID
+	                 baseRevision: aRevision];
 
 	NSNumber *persistentRootIndex = [self keyForUUID: aPersistentRootUUID];
 	NSNumber *trackIndex = [self keyForUUID: aBranchUUID];
@@ -852,15 +881,15 @@ void CHECK(id db)
 
 
 	BOOL isCheapCopy = (isNewPersistentRoot && aRevision != nil);
-	//NSNumber *parentTrackIndex = [self keyForUUID: parentTrackUUID];
 	NSNumber *parentRevNumber = nil;
 
 	if (aRevision != nil)
 	{
 		parentRevNumber = [NSNumber numberWithLongLong: [aRevision revisionNumber]];
 	}
-
 	[db executeUpdate: @"INSERT INTO branches VALUES(?, ?, ?, ?, NULL)", trackIndex, persistentRootIndex, parentRevNumber, [NSNumber numberWithBool: isCheapCopy]]; CHECK(db);
+
+	return [self finishCommit];
 }
 
 - (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)uuidIndex
