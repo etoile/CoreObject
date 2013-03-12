@@ -140,6 +140,11 @@
  * -valuesAndPropertiesForObjectUUID:.
  *
  * For a nil object UUID, raises a NSInvalidArgumentException.
+ *
+ * For properties that have never been serialized, raises an 
+ * NSInternalInconsistencyException. Usually this means you are passing 
+ * properties that don't belong to this object or there is a schema mismatch 
+ * between the object metamodel and the store content.
  */
 - (NSDictionary *)valuesForProperties: (NSSet *)properties
                          ofObjectUUID: (ETUUID *)aUUID

@@ -219,7 +219,8 @@
 													errorDescription: NULL];
 		if (plist == nil)
 		{
-			[NSException raise: NSInternalInconsistencyException format: @"Store contained an invalid property list"];
+			[NSException raise: NSInternalInconsistencyException
+			            format: @"Store contained an invalid property list for %@", object];
 		}
 		
 		[result setObject: plist forKey: property];
@@ -248,18 +249,25 @@
 
 	while ((fetchAll || [propertiesToFetch count] > 0) && rev != nil && [rev revisionNumber] >= minRevNumber)
 	{
-		NSDictionary *dict = [rev valuesAndPropertiesForObjectUUID: aUUID] ;
+		NSDictionary *revValues = [rev valuesAndPropertiesForObjectUUID: aUUID] ;
 		
-		for (NSString *key in [dict allKeys])
+		for (NSString *key in [revValues allKeys])
 		{
 			if (fetchAll || [propertiesToFetch containsObject: key])
 			{
-				[result addEntriesFromDictionary: dict];
+				[result setObject: [revValues objectForKey: key]
+				           forKey: key];
 				[propertiesToFetch removeObject: key];
 			}
 		}
 
 		rev = [rev baseRevision];
+	}
+
+	if (fetchAll == NO && [propertiesToFetch count] > 0)
+	{
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"Store is missing properties %@ for %@", propertiesToFetch, aUUID];
 	}
 
 	return result;

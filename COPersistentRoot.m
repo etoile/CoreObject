@@ -694,8 +694,7 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	CORevision *loadedRev = aRevision;
 	ETUUID *objUUID = [obj UUID];
 	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj persistentPropertyNames]];
-	//NSLog(@"Properties to fetch: %@", propertiesToFetch);
-	
+
 	obj->_isIgnoringDamageNotifications = YES;
 	[obj setIgnoringRelationshipConsistency: YES];
 	
@@ -704,9 +703,24 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 		loadedRev = [obj revision];
 	}
 	ETAssert(loadedRev != nil);
-	
-	//NSLog(@"Load object %@ at %i", objUUID, (int)revNum);
-	
+
+	//NSLog(@"Load object %@ at %@", objUUID, loadedRev);
+	//NSLog(@"Fetch properties %@", propertiesToFetch);
+
+#if 1
+	NSDictionary *serializedValues = [loadedRev valuesForProperties: propertiesToFetch
+	                                                   ofObjectUUID: objUUID
+	                                                   fromRevision: nil];
+		
+	for (NSString *key in serializedValues)
+	{
+		id plist = [serializedValues objectForKey: key];
+		id value = [obj valueForPropertyList: plist];
+		//NSLog(@"Load property %@, unparsed %@, parsed %@", key, plist, value);
+
+		[obj setSerializedValue: value forProperty: key];
+	}
+#else
 	while ([propertiesToFetch count] > 0 && loadedRev != nil)
 	{
 		NSDictionary *dict = [loadedRev valuesAndPropertiesForObjectUUID: objUUID];
@@ -717,7 +731,7 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 			{
 				id plist = [dict objectForKey: key];
 				id value = [obj valueForPropertyList: plist];
-				//NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
+				NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
 				[obj setSerializedValue: value forProperty: key];
 				[propertiesToFetch removeObject: key];
 			}
@@ -725,12 +739,7 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 		
 		loadedRev = [loadedRev baseRevision];
 	}
-	
-	if ([propertiesToFetch count] > 0)
-	{
-		[NSException raise: NSInternalInconsistencyException
-		            format: @"Store is missing properties %@ for %@", propertiesToFetch, obj];
-	}
+#endif
 
 	[obj awakeFromFetch];
 
