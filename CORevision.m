@@ -73,12 +73,12 @@
 
 - (ETUUID *)persistentRootUUID
 {
-	return [[self metadata] objectForKey: @"persistentRootUUID"];
+	return [ETUUID UUIDWithString: [[self metadata] objectForKey: @"persistentRootUUID"]];
 }
 
 - (ETUUID *)trackUUID
 {
-	return [[self metadata] objectForKey: @"commitTrackUUID"];
+	return [ETUUID UUIDWithString: [[self metadata] objectForKey: @"commitTrackUUID"]];
 }
 
 - (ETUUID *)objectUUID
