@@ -94,6 +94,5 @@
  * notification to update our cache.
  */
 - (void)didMakeNewCommitAtRevision: (CORevision *)revision;
-- (void)cacheNodesForward: (NSUInteger)forward backward: (NSUInteger)backward;
 
 @end

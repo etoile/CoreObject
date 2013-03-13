@@ -197,10 +197,7 @@
 
 	COTrackNode *oldCurrentNode = RETAIN([self currentNode]);
 
-	// TODO: Remove the two lines below to be handled by the caching code 
-	[[self cachedNodes] removeAllObjects];
-	currentNodeIndex = NSNotFound;
-	[self cacheNodesForward: CACHE_AMOUNT backward: CACHE_AMOUNT];
+	[self reloadAllNodes];
 
 	// FIXME: The currentNodeIndex assertion requires that distributed 
 	// notifications to be delivered (but the notification center might drop 
@@ -216,6 +213,22 @@
 	[self didUpdate];
 	RELEASE(oldCurrentNode);
 }
+
+#if 0
+- (COTrackNode *)currentNode
+{
+	COTrackNode *currentNode = [super currentNode];
+
+	if (currentNode == nil)
+	{
+		[self reloadAllNodes];
+		currentNode = [super currentNode];
+	}
+	ETAssert(currentNode != nil);
+
+	return currentNode;
+}
+#endif
 
 - (void)setCurrentNode: (COTrackNode *)aNode
 {
@@ -324,10 +337,7 @@
 
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
 {
-	/* -cacheNodesForward:backward: can release this cached node */
-	[aNode retain];
-	NSArray *cachedNodes = [self cachedNodes];
-	NSInteger nodeIndex = [cachedNodes indexOfObject: aNode];
+	NSInteger nodeIndex = [[self cachedNodes] indexOfObject: aNode];
 
 	if (nodeIndex == NSNotFound)
 	{
@@ -343,42 +353,13 @@
 		nodeIndex++;
 	}
 
-	/* Recache or return a cached node */
-
-	if (nodeIndex < 0)
-	{
-		[self cacheNodesForward: 0 backward: currentNodeIndex + CACHE_AMOUNT];
-	}
-	else if (nodeIndex >= [cachedNodes count])
-	{
-		[self cacheNodesForward: nodeIndex - currentNodeIndex + CACHE_AMOUNT backward: 0];
-	}
-	else
-	{
-		return [cachedNodes objectAtIndex: nodeIndex];
-	}
-
-	/* Get the node from the updated cache */
-
-	nodeIndex = [cachedNodes indexOfObject: aNode];
-	[aNode release];
-
-	if (back)
-	{
-		nodeIndex--;
-	}
-	else
-	{
-		nodeIndex++;
-	}
-
-	BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= [cachedNodes count]);
+	BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= [[self cachedNodes] count]);
 
 	if (hasNoPreviousOrNextNode)
 	{
 		return nil;
 	}
-	return [cachedNodes objectAtIndex: nodeIndex];
+	return [[self cachedNodes] objectAtIndex: nodeIndex];
 }
 
 - (void)didMakeNewCommitAtRevision: (CORevision *)revision
@@ -391,109 +372,37 @@
 
 	if (isTipNodeCached == NO)
 	{
-		[self cacheNodesForward: 0 backward: CACHE_AMOUNT];
+		[self reloadAllNodes];
 	}
 	[[self cachedNodes] addObject: newNode];
-
-	if ([[self cachedNodes] count] > CACHE_AMOUNT)
-	{
-		[[self cachedNodes] removeObjectAtIndex: 0];
-	}
 
 	currentNodeIndex = [[self cachedNodes] count] - 1;
 
 	[self didUpdate];
 }
 
-- (void)cacheNodesForward: (NSUInteger)forward backward: (NSUInteger)backward
+- (void)reloadAllNodes
 {
-	COStore *store = [[self persistentRoot] store];
-	NSUInteger newCurrentNodeIndex = 0;
-	NSArray *revisions = [store revisionsForTrackUUID: [self UUID]
-	                                 currentNodeIndex: &newCurrentNodeIndex
-	                                    backwardLimit: backward
-	                                     forwardLimit: forward];
-	NSArray *backwardRange = [revisions subarrayWithRange: NSMakeRange(0, backward)];
-	NSArray *forwardRange = [revisions subarrayWithRange: NSMakeRange(backward + 1, forward)];
+	ETAssert([[[self persistentRoot] store] isTrackUUID: [self UUID]]);
+
 	NSMutableArray *cachedNodes = [self cachedNodes];
-	NSUInteger insertPoint;
-
-	/* Recache before the current node */
-
-	if (currentNodeIndex == NSNotFound)
+	
+	[cachedNodes removeAllObjects];
+	currentNodeIndex = NSNotFound;
+	
+	COStore *store = [[self persistentRoot] store];
+	CORevision *currentRev = [store currentRevisionForTrackUUID: [self UUID]];
+	NSArray *revisions = [store revisionsForTrackUUID: [self UUID]
+									 currentNodeIndex: &currentNodeIndex
+										backwardLimit: NSUIntegerMax
+										 forwardLimit: NSUIntegerMax];
+	
+	for (CORevision *rev in revisions)
 	{
-		insertPoint = 0;
-		currentNodeIndex = 0;
+		COTrackNode *node = [COTrackNode nodeWithRevision: rev onTrack: self];
+		[cachedNodes addObject: node];
 	}
-	else
-	{
-		insertPoint = currentNodeIndex;
-	}
-
-	for (CORevision *revision in [backwardRange reverseObjectEnumerator])
-	{
-		if ([[NSNull null] isEqual: revision])
-			break;
-
-		COTrackNode *node = [COTrackNode nodeWithRevision: revision onTrack: self];
-
-		if (insertPoint == 0)
-		{
-			[cachedNodes insertObject: node atIndex: 0];
-			currentNodeIndex++;
-		}
-		else
-		{
-			[cachedNodes replaceObjectAtIndex: insertPoint withObject: node];
-			insertPoint--;
-		}
-	}
-
-	/* Check the current node revision exists */
-
-	CORevision *currentNodeRevision = [revisions objectAtIndex: backward];
-
-	if ([[NSNull null] isEqual: currentNodeRevision])
-	{
-		currentNodeIndex = NSNotFound;
-		return;
-	}
-
-	/* Recache the current node */
-
-	COTrackNode *currentNode = [COTrackNode nodeWithRevision: [revisions objectAtIndex: backward]
-	                                                 onTrack: self];
-
-	if (currentNodeIndex >= [cachedNodes count])
-	{
-		[cachedNodes addObject: currentNode];
-	}
-	else
-	{
-		[cachedNodes replaceObjectAtIndex: currentNodeIndex withObject: currentNode];
-	}
-
-	/* Recache after the current node */
-
-	insertPoint = currentNodeIndex + 1;
-
-	for (CORevision *revision in forwardRange)
-	{
-		if ([[NSNull null] isEqual: revision])
-			break;
-
-		COTrackNode *node = [COTrackNode nodeWithRevision: revision onTrack: self];
-
-		if (insertPoint >= [cachedNodes count])
-		{
-			[cachedNodes addObject: node];
-		}
-		else
-		{
-			[cachedNodes replaceObjectAtIndex: insertPoint withObject: node];
-		}
-		insertPoint++;
-	}
+	ETAssert([[[self currentNode] revision] isEqual: currentRev]);
 }
 
 @end
