@@ -155,35 +155,78 @@
 	UKNotNil(branch);
 	UKObjectsNotEqual([branch UUID], [commitTrack UUID]);
 	UKStringsEqual(@"Sandbox", [branch label]);
-	UKObjectsEqual(rev1, [branch parentRevision]);
 	UKObjectsEqual(commitTrack, [branch parentTrack]);
 	UKObjectsEqual([object persistentRoot], [branch persistentRoot]);
+	UKTrue([rev1 isEqual: [rev2 baseRevision]]);
+	
+	/* Branch creation revision doesn't belong to either the source commit track or new branch */
+	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
+	// FIXME: UKObjectsEqual(rev1, [[branch currentNode] revision]);
+	UKObjectsEqual(rev1, [branch parentRevision]);
+
 	/* Branch creation doesn't touch the current persistent root revision */
 	UKObjectsEqual([object revision], rev1);
-	UKTrue([rev1 isEqual: [rev2 baseRevision]]);
+
 	/* Branch creation doesn't switch the branch */
 	UKObjectsSame(commitTrack, [[object persistentRoot] commitTrack]);
 }
 
+// TODO: Implement - (void)testBranchCreationFromBranch
+
+#if 0
 - (void)testBranchSwitch
 {
-	/*COTrackNode *firstNode = [commitTrack currentNode];
-	UKNotNil(commitTrack);
-	UKNotNil(firstNode);
-	UKFalse([commitTrack canUndo]);
+	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
 	
-	[object setValue: @"Shopping List" forProperty: @"label"];
-	[ctx commit];
-	COTrackNode *secondNode = [commitTrack currentNode];
+	[object setValue: @"Untitled" forProperty: @"label"];
 	
-	UKObjectsNotEqual(firstNode, secondNode);
-	UKObjectsEqual([firstNode revision], [[secondNode revision] baseRevision]);
+	CORevision *rev1 = [[object persistentRoot] commit];
+	
+	COCommitTrack *commitTrack = [object commitTrack];
+	COCommitTrack *branch = [commitTrack makeBranchWithLabel: @"Sandbox"];
+	/* The branch creation has created a new revision */
+	CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [[ctx store] latestRevisionNumber]];
+	// FIXME: CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [ctx latestRevisionNumber]];
+
+	/* Switch to the Sandbox branch */
+
+	[[object persistentRoot] setCommitTrack: branch];
+
+	UKObjectsEqual([object commitTrack], branch);
+	UKObjectsEqual([object persistentRoot], [branch persistentRoot]);
+	UKObjectsEqual([object persistentRoot], [commitTrack persistentRoot]);
+
+	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
+	UKObjectsEqual(rev2, [[branch currentNode] revision]);
+	UKObjectsEqual(rev2, [object revision]);
+	
+	/* Commit some changes in the Sandbox branch */
 	
 	[object setValue: @"Todo" forProperty: @"label"];
-	[ctx commit];
-	COTrackNode *thirdNode = [commitTrack currentNode];
-	UKObjectsNotEqual(thirdNode, secondNode);
-	UKObjectsEqual([[thirdNode revision] baseRevision], [secondNode revision]);*/
+
+	[[object persistentRoot] commit];
+
+	[object setValue: @"Tidi" forProperty: @"label"];
+	
+	CORevision *rev4 = [[object persistentRoot] commit];
+	
+	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
+	UKObjectsEqual(rev4, [[branch currentNode] revision]);
+	UKObjectsEqual(rev4, [object revision]);
+	
+	/* Switch back to the main branch */
+	
+	[[object persistentRoot] setCommitTrack: branch];
+
+	UKObjectsEqual([object commitTrack],commitTrack);
+	UKObjectsEqual([object persistentRoot], [branch persistentRoot]);
+	UKObjectsEqual([object persistentRoot], [commitTrack persistentRoot]);
+	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
+	UKObjectsEqual(rev4, [[branch currentNode] revision]);
+	UKObjectsEqual(rev1, [object revision]);
+
+	UKObjectsEqual(@"Untitled", [object valueForProperty: @"label"]);
 }
+#endif
 
 @end
