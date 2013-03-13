@@ -88,6 +88,12 @@
 	return _commitTrack;
 }
 
+- (void)setCommitTrack: (COCommitTrack *)aTrack
+{
+	ASSIGN(_commitTrack, aTrack);
+	[self reloadAtRevision: [[aTrack currentNode] revision]];
+}
+
 - (COStore *)store
 {
 	return [_parentContext store];
@@ -707,7 +713,6 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	//NSLog(@"Load object %@ at %@", objUUID, loadedRev);
 	//NSLog(@"Fetch properties %@", propertiesToFetch);
 
-#if 1
 	NSDictionary *serializedValues = [loadedRev valuesForProperties: propertiesToFetch
 	                                                   ofObjectUUID: objUUID
 	                                                   fromRevision: nil];
@@ -720,26 +725,6 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 
 		[obj setSerializedValue: value forProperty: key];
 	}
-#else
-	while ([propertiesToFetch count] > 0 && loadedRev != nil)
-	{
-		NSDictionary *dict = [loadedRev valuesAndPropertiesForObjectUUID: objUUID];
-		
-		for (NSString *key in [dict allKeys])
-		{
-			if ([propertiesToFetch containsObject: key])
-			{
-				id plist = [dict objectForKey: key];
-				id value = [obj valueForPropertyList: plist];
-				NSLog(@"key %@, unparsed %@, parsed %@", key, plist, value);
-				[obj setSerializedValue: value forProperty: key];
-				[propertiesToFetch removeObject: key];
-			}
-		}
-		
-		loadedRev = [loadedRev baseRevision];
-	}
-#endif
 
 	[obj awakeFromFetch];
 
