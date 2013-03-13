@@ -59,7 +59,29 @@
 
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
 {
-	return nil;
+	NSInteger nodeIndex = [[self cachedNodes] indexOfObject: aNode];
+
+	if (nodeIndex == NSNotFound)
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"Node %@ must belong to the track %@ to retrieve the previous or next node", aNode, self];
+	}
+	if (back)
+	{
+		nodeIndex--;
+	}
+	else
+	{
+		nodeIndex++;
+	}
+
+	BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= [[self cachedNodes] count]);
+
+	if (hasNoPreviousOrNextNode)
+	{
+		return nil;
+	}
+	return [[self cachedNodes] objectAtIndex: nodeIndex];
 }
 
 - (void)didUpdate
