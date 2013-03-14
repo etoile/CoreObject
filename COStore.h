@@ -205,10 +205,13 @@
  */
 - (int64_t)latestRevisionNumber;
 
-/** @taskunit Private */
+/** @taskunit Managing Commit Tracks (Low-Level API) */
 
 /**
  * <override-subclass />
+ *
+ * The commit track creation revision is a store structure change and as such 
+ * doesn't appear in the commit track itself.
  */
 - (CORevision *)createCommitTrackWithUUID: (ETUUID *)aBranchUUID
 							         name: (NSString *)aBranchName
@@ -216,12 +219,6 @@
 				           rootObjectUUID: (ETUUID *)aRootObjectUUID
                        persistentRootUUID: (ETUUID *)aPersistentRootUUID
                       isNewPersistentRoot: (BOOL)isNewPersistentRoot;
-
-/**
- * <override-subclass />
- */
-- (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)rootObjectUUID
-                                    currentNodeId: (int64_t*)currentNodeId;
 /**
  * <override-subclass />
  * Returns the parent track revision from which the commit track has been 
@@ -259,18 +256,71 @@
  * For a nil UUID, raises an NSInvalidArgumentException.
  */
 - (NSString *)nameForCommitTrackUUID: (ETUUID *)aTrackUUID;
+
+/** @task Managing Tracks (Low-Level API) */
+
 /**
  * <override-subclass />
+ * Adds the revision as a new track node to the given track, and returns the new 
+ * track node ID.
+ *
+ * The new track node becomes the track current node.
+ *
+ * If there is no track for the given UUID, the track is created.<br />
+ * The track creation doesn't produce a revision, as custom tracks are usually 
+ * implementation details managed by programs and not directly exposed to the 
+ * user. As such the user doesn't need Undo/Redo on a custom track creation and 
+ * deletion unlike a commit track. 
+ *
+ * Take note implicit track creation doesn't create a commit track, but just the 
+ * most basic track structure in the store. For creating a commit track, see 
+ * -createCommitTrackWithUUID:name:parentRevision:rootObjectUUID:persistentRootUUID:isNewPersistentRoot:.
+ *
+ * If the track creation needs to be recorded, then -addRevision:toTrackUUID: 
+ * can be bracketed by -isTrackUUID: to detect a track creation. And a 
+ * synthesized revision can be pushed on the custom track used to record the 
+ * store structure changes.
+ *
+ * See also COTrack, COCustomTrack and COCommitTrack.
  */
 - (int64_t)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID;
 /**
  * <override-subclass />
+ * Removes the track content and any dedicated storage structure in the store.
+ */
+- (void)deleteTrackForUUID: (ETUUID *)aTrackUUID;
+/**
+ * <override-subclass />
+ * Returns track nodes ordered from oldest to last, belonging to the given track.
+ *
+ * If the returned array is not empty, it contains at least the track current 
+ * node.
+ *
+ * The backward and forward limit tells the store it should attempt to return 
+ * the given node count in addition to the current node. backwardLimit applies 
+ * to the node count before the current node, and forwardLimit to the node count 
+ * after the current node. For a track that doesn't contain enough nodes and 
+ * depending on the current node position on the track, the returned node counts 
+ * can be less than <em>backwardLimit + 1 (current node) + forwardLimit</em>.
+ *
+ * The track nodes are built by invoking -makeNodeWithID:revision: on 
+ * aNodeBuilder.
+ *
+ * On return, currentNodeIndex points to the track current node among the 
+ * returned nodes. For a track without a current node, currentNodeIndex is set 
+ * to NSNotFound. See -[COTrack currentNode].
+ *
+ * If the track doesn't exist, returns an empty array.
  */
 - (NSArray *)nodesForTrackUUID: (ETUUID *)objectUUID
                    nodeBuilder: (id <COTrackNodeBuilder>)aNodeBuilder
               currentNodeIndex: (NSUInteger *)currentNodeIndex
                  backwardLimit: (NSUInteger)backward
                   forwardLimit: (NSUInteger)forward;
+/**
+ * <override-subclass />
+ * Returns the current node revision for the given track. 
+ */
 - (CORevision *)currentRevisionForTrackUUID: (ETUUID *)aTrackUUID;
 /**
  * <override-subclass />

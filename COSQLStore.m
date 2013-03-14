@@ -897,28 +897,6 @@ void CHECK(id db)
 	return [self finishCommit];
 }
 
-- (CORevision*)createCommitTrackForRootObjectUUID: (NSNumber*)uuidIndex
-                                         revision: (CORevision *)aRevision
-                                    currentNodeId: (int64_t*)pCurrentNodeId
-{
-	int64_t currentNodeId;
-	// TODO: (Chris) Determine if we should use the latest revision number of the store
-	// or the last revision number the object occurs in. Really, if we create
-	// a commit track for every object, this issue shouldn't arise.
-	CORevision *revision = (aRevision != nil ? aRevision : [self revisionWithRevisionNumber: [self latestRevisionNumber]]);
-#ifdef GNUSTEP
-	NSDebugLLog(@"COStore", @"Creating commit track for object %@", [self UUIDForKey: [uuidIndex longLongValue]]);
-#endif
-	[db executeUpdate: @"INSERT INTO trackNodes(id, trackuuid, revisionnumber, nextnode, prevnode) VALUES (NULL, ?, ?, NULL, NULL)",
-		uuidIndex, [NSNumber numberWithLongLong: [revision revisionNumber]]]; CHECK(db);
-	currentNodeId = [db lastInsertRowId];
-	[db executeUpdate: @"INSERT INTO tracks(uuid, currentnode) VALUES (?, ?)",
-		uuidIndex, [NSNumber numberWithLongLong: currentNodeId]]; CHECK(db);
-	if (pCurrentNodeId)
-		*pCurrentNodeId = currentNodeId;
-	return revision;
-}
-
 - (CORevision *)parentRevisionForCommitTrackUUID: (ETUUID *)aTrackUUID
 {
 	NILARG_EXCEPTION_TEST(aTrackUUID);
@@ -1022,9 +1000,7 @@ void CHECK(id db)
 
 	if (nil == revision)
 	{
-		/* The commit track creation revision is ignored because it is a store 
-		   structure change and as such doesn't appear in the commit track itself. */
-		[self createCommitTrackForRootObjectUUID: objectUUIDIndex currentNodeId: &currentNode];
+		return [NSArray array];
 	}
 
 	/* Insert the middle mode (revision) or return */
@@ -1113,44 +1089,44 @@ void CHECK(id db)
 // TODO: Or should we name it -pushRevision:onTrackUUID:...
 - (int64_t)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID
 {
-	NSNumber *track = [self keyForUUID: aTrackUUID];
-	int64_t newNodeId;
-	int64_t oldNodeId;
-	CORevision *oldRev = 
-	[self currentRevisionForTrackIndex: track
-		                   currentNodeID: &oldNodeId
-				  previousNodeID: NULL
-		                      nextNodeID: NULL];
-	if (oldRev != nil)
+	NSNumber *trackIndex = [self keyForUUID: aTrackUUID];
+	NSNumber *revNumber = [NSNumber numberWithLongLong: [newRevision revisionNumber]];
+	NSNumber *newNode = nil;
+	int64_t oldNodeID = 0;
+	CORevision *oldRev = [self currentRevisionForTrackIndex: trackIndex
+	                                          currentNodeID: &oldNodeID
+	                                         previousNodeID: NULL
+	                                             nextNodeID: NULL];
+	BOOL isNewTrack = (oldRev == nil);
+
+	if (isNewTrack)
 	{
-		NSNumber *oldNode = [NSNumber numberWithLongLong: oldNodeId];
-		NSNumber *prevNode = [NSNumber numberWithLongLong: [newRevision revisionNumber]];
-		
-		[db executeUpdate: @"INSERT INTO trackNodes(id, trackuuid, revisionnumber, prevnode, nextnode) "
-			"VALUES (NULL, ?, ?, ?, NULL)", 
-			track, prevNode, oldNode]; CHECK(db);
-		
-		newNodeId = [db lastInsertRowId];
-	
-		NSNumber *newNode = [NSNumber numberWithLongLong: newNodeId];
+		//NSLog(@"Create track %@", aTrackUUID);
 
-		[db executeUpdate: @"UPDATE trackNodes SET nextnode = ? WHERE id = ? AND trackuuid = ?",
-			newNode, oldNode, track]; CHECK(db);
-		[db executeUpdate: @"UPDATE tracks SET currentnode = ? WHERE uuid = ?",
-			newNode, track]; CHECK(db);
+		[db executeUpdate: @"INSERT INTO trackNodes(id, trackuuid, revisionnumber, nextnode, prevnode) VALUES (NULL, ?, ?, NULL, NULL)", trackIndex, revNumber]; CHECK(db);
 
-#ifdef GNUSTEP
-		NSDebugLLog(@"COStore", @"Updated commit track for %@ - created new commit track node %@ pointed to by %@ for revision %@",
-			aTrackUUID, newNode, oldNode, newRevision); 
-#endif
+		NSNumber *newNode = [NSNumber numberWithLongLong: [db lastInsertRowId]];
 
-		[self didChangeCurrentNodeFromRevision: oldRev toNode: newNode revision: newRevision onTrackUUID: aTrackUUID];
+		[db executeUpdate: @"INSERT INTO tracks(uuid, currentnode) VALUES (?, ?)", trackIndex, newNode]; CHECK(db);
 	}
 	else
 	{
-		[self createCommitTrackForRootObjectUUID: track revision: newRevision currentNodeId: &newNodeId];
+		NSNumber *oldNode = [NSNumber numberWithLongLong: oldNodeID];
+		NSNumber *prevNode = revNumber;
+		
+		[db executeUpdate: @"INSERT INTO trackNodes(id, trackuuid, revisionnumber, prevnode, nextnode) VALUES (NULL, ?, ?, ?, NULL)", trackIndex, prevNode, oldNode]; CHECK(db);
+	
+		NSNumber *newNode = [NSNumber numberWithLongLong: [db lastInsertRowId]];
+
+		[db executeUpdate: @"UPDATE trackNodes SET nextnode = ? WHERE id = ? AND trackuuid = ?", newNode, oldNode, trackIndex]; CHECK(db);
+		[db executeUpdate: @"UPDATE tracks SET currentnode = ? WHERE uuid = ?", newNode, trackIndex]; CHECK(db);
+
+		//NSLog(@"Add revision %@ bound to node %@ pointed to by %@ to track %@ ", newRevision, newNode, oldNode, aTrackUUID); 
+
+		[self didChangeCurrentNodeFromRevision: oldRev toNode: newNode revision: newRevision onTrackUUID: aTrackUUID];
 	}
-	return newNodeId;
+
+	return [newNode longLongValue];
 }
 - (CORevision*)undoOnCommitTrack: (ETUUID*)rootObjectUUID
 {

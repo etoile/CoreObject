@@ -230,20 +230,6 @@
 	return nil;
 }
 
-- (CORevision *)createCommitTrackForRootObjectUUID: (NSNumber *)uuidIndex
-                                          revision: (CORevision *)aRevision
-                                     currentNodeId: (int64_t *)pCurrentNodeId
-{
-	[self doesNotRecognizeSelector: _cmd];
-	return nil;
-}
-
-- (CORevision *)createCommitTrackForRootObjectUUID: (NSNumber *)uuidIndex
-                                     currentNodeId: (int64_t *)pCurrentNodeId
-{
-	return [self createCommitTrackForRootObjectUUID: uuidIndex revision: nil currentNodeId: pCurrentNodeId];
-}
-
 - (CORevision *)parentRevisionForCommitTrackUUID: (ETUUID *)aTrackUUID
 {
 	[self doesNotRecognizeSelector: _cmd];
@@ -327,6 +313,11 @@
 {
 	[self doesNotRecognizeSelector: _cmd];
 	return 0;
+}
+
+- (void)deleteTrackForUUID: (ETUUID *)aTrackUUID
+{
+	[self doesNotRecognizeSelector: _cmd];
 }
 
 - (CORevision *)undoOnCommitTrack: (ETUUID *)rootObjectUUID
