@@ -14,12 +14,16 @@
 	[self applyTraitFromClass: [ETCollectionTrait class]];
 }
 
-- (id)initWithStore: (COStore *)aStore revisionNumber: (int64_t)aRevision baseRevisionNumber: (int64_t)aBaseRevision
+- (id)initWithStore: (COStore *)aStore
+     revisionNumber: (int64_t)aRevision
+ baseRevisionNumber: (int64_t)aBaseRevision
+       commitNodeID: (int64_t)aNodeID
 {
 	SUPERINIT;
 	ASSIGN(store, (COSQLStore *)aStore);
 	revisionNumber = aRevision;
 	baseRevisionNumber = aBaseRevision;
+	commitNodeID = aNodeID;
 	return self;
 }
 
@@ -32,6 +36,11 @@
 - (int64_t)baseRevisionNumber
 {
 	return baseRevisionNumber;
+}
+
+- (int64_t)commitNodeID
+{
+	return commitNodeID;
 }
 
 - (BOOL)isEqual: (id)rhs

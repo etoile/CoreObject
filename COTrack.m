@@ -84,6 +84,11 @@
 	return [[self cachedNodes] objectAtIndex: nodeIndex];
 }
 
+- (COTrackNode *)makeNodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision
+{
+	return [COTrackNode nodeWithID: aNodeID revision: aRevision onTrack: self];
+}
+
 - (void)didUpdate
 {
 	[[NSNotificationCenter defaultCenter] 
@@ -154,16 +159,22 @@
 
 @implementation COTrackNode
 
-+ (id)nodeWithRevision: (CORevision *)aRevision onTrack: (COTrack *)aTrack;
++ (id)nodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision onTrack: (COTrack *)aTrack;
 {
-	return AUTORELEASE([[self alloc] initWithRevision: aRevision onTrack: aTrack]);
+	return AUTORELEASE([[self alloc] initWithID: aNodeID revision: aRevision onTrack: aTrack]);
 }
 
-- (id)initWithRevision: (CORevision *)rev onTrack: (COTrack *)aTrack
++ (id)nodeWithRevision: (CORevision *)aRevision onTrack: (COTrack *)aTrack;
+{
+	return [self nodeWithRevision: aRevision onTrack: aTrack];
+}
+
+- (id)initWithID: (int64_t)aNodeID revision: (CORevision *)rev onTrack: (COTrack *)aTrack
 {
 	NILARG_EXCEPTION_TEST(rev);
 	NILARG_EXCEPTION_TEST(aTrack);
 	SUPERINIT;
+	nodeID = aNodeID;
 	ASSIGN(revision, rev);
 	track = aTrack;
 	return self;
@@ -193,6 +204,11 @@
 		return revision;
 	}
 	return nil;
+}
+
+- (int64_t)nodeID
+{
+	return nodeID;
 }
 
 - (CORevision *)revision

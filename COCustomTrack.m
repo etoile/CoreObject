@@ -30,30 +30,28 @@
 	if (wasPersisted == NO)
 		return;
 
-	NSMutableArray *cachedNodes = [self cachedNodes];
-
-	[cachedNodes removeAllObjects];
-	[allNodes removeAllObjects];
 
 	COStore *store = [editingContext store];
+
+	[allNodes setArray: [store nodesForTrackUUID: [self UUID]
+	                                 nodeBuilder: self
+	                            currentNodeIndex: &currentNodeIndex
+	                               backwardLimit: NSUIntegerMax
+	                                forwardLimit: NSUIntegerMax]];
+
+	NSMutableArray *cachedNodes = [self cachedNodes];
 	CORevision *currentRev = [store currentRevisionForTrackUUID: [self UUID]];
-	NSArray *revisions = [store revisionsForTrackUUID: [self UUID]
-	                                                  currentNodeIndex: &currentNodeIndex
-	                                                     backwardLimit: NSUIntegerMax
-	                                                      forwardLimit: NSUIntegerMax];
 
-	for (CORevision *rev in revisions)
+	[cachedNodes removeAllObjects];
+
+	for (COTrackNode *node in allNodes)
 	{
-		COTrackNode *node = [COTrackNode nodeWithRevision: rev onTrack: self];
-
-		[allNodes addObject: node];
-
 		// TODO: If necessary, we can cache the current rev per object UUID and 
 		// retrieve all the commit track current revisions in a single SQL query.
-		CORevision *commitTrackRev = [store currentRevisionForTrackUUID: [rev objectUUID]];
+		CORevision *commitTrackRev = [store currentRevisionForTrackUUID: [[node revision] objectUUID]];
 		int64_t commitTrackRevNumber = [commitTrackRev revisionNumber];
 		int64_t currentRevNumber = [currentRev revisionNumber];
-		int64_t revNumber = [rev revisionNumber];
+		int64_t revNumber = [[node revision] revisionNumber];
 
 		if ((revNumber > commitTrackRevNumber && revNumber < currentRevNumber)
 		 || (revNumber > currentRevNumber && revNumber < commitTrackRevNumber))
@@ -202,7 +200,9 @@
 
 - (void)addRevision: (CORevision *)rev
 {
-	[[self cachedNodes] addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
+	[[self cachedNodes] addObject: [COTrackNode nodeWithID: [rev commitNodeID]
+	                                              revision: rev
+	                                               onTrack: self]];
 
 	currentNodeIndex = (currentNodeIndex == NSNotFound ? 0 : currentNodeIndex + 1);
 

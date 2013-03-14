@@ -290,21 +290,28 @@
   * database (forward + backward + 1) time, once for each
   * revision on the commit track.
  */
-- (NSArray *)revisionsForTrackUUID: (ETUUID *)objectUUID
-                  currentNodeIndex: (NSUInteger *)currentNodeIndex
-                     backwardLimit: (NSUInteger)backward
-                      forwardLimit: (NSUInteger)forward
+- (NSArray *)nodesForTrackUUID: (ETUUID *)objectUUID
+                   nodeBuilder: (id <COTrackNodeBuilder>)aNodeBuilder
+              currentNodeIndex: (NSUInteger *)currentNodeIndex
+                 backwardLimit: (NSUInteger)backward
+                  forwardLimit: (NSUInteger)forward
 {
 	// TODO: Move some core logic here
 	return nil;
 }
 
+- (id)makeNodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision
+{
+	return aRevision;
+}
+
 - (CORevision *) currentRevisionForTrackUUID: (ETUUID *)aTrackUUID
 {
-	NSArray *revs = [self revisionsForTrackUUID: aTrackUUID
-	                           currentNodeIndex: NULL
-	                              backwardLimit: 0
-	                               forwardLimit: 0];
+	NSArray *revs = [self nodesForTrackUUID: aTrackUUID
+	                            nodeBuilder: (id <COTrackNodeBuilder>)self
+	                       currentNodeIndex: NULL
+	                          backwardLimit: 0
+	                           forwardLimit: 0];
 	assert([revs count] == 1);
 	return [revs firstObject];
 }
@@ -316,9 +323,10 @@
 }
 
 // TODO: Or should we name it -pushRevision:onTrackUUID:...
-- (void)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID
+- (int64_t)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID
 {
 	[self doesNotRecognizeSelector: _cmd];
+	return 0;
 }
 
 - (CORevision *)undoOnCommitTrack: (ETUUID *)rootObjectUUID

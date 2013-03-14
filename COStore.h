@@ -4,6 +4,11 @@
 
 @class FMDatabase;
 
+@protocol COTrackNodeBuilder <NSObject>
+- (id)makeNodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision;
+@end
+
+
 @interface COStore : NSObject
 {
 	@package
@@ -257,15 +262,16 @@
 /**
  * <override-subclass />
  */
-- (void)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID;
+- (int64_t)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID;
 /**
  * <override-subclass />
  */
-- (NSArray *)revisionsForTrackUUID: (ETUUID *)objectUUID
-                  currentNodeIndex: (NSUInteger *)currentNodeIndex
-                     backwardLimit: (NSUInteger)backward
-                      forwardLimit: (NSUInteger)forward;
-- (CORevision *) currentRevisionForTrackUUID: (ETUUID *)aTrackUUID;
+- (NSArray *)nodesForTrackUUID: (ETUUID *)objectUUID
+                   nodeBuilder: (id <COTrackNodeBuilder>)aNodeBuilder
+              currentNodeIndex: (NSUInteger *)currentNodeIndex
+                 backwardLimit: (NSUInteger)backward
+                  forwardLimit: (NSUInteger)forward;
+- (CORevision *)currentRevisionForTrackUUID: (ETUUID *)aTrackUUID;
 /**
  * <override-subclass />
  */
@@ -296,6 +302,7 @@ extern NSString *kCONewCurrentNodeIDKey;
 extern NSString *kCONewCurrentNodeRevisionNumberKey;
 extern NSString *kCOOldCurrentNodeRevisionNumberKey;
 extern NSString *kCOStoreUUIDStringKey;
+
 
 /** Wraps a dictionary into an object which is a value rather a collection.
 

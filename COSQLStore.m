@@ -689,14 +689,19 @@ void CHECK(id db)
 	}
 	
 	CORevision *result = [self revisionWithRevisionNumber: [commitInProgress unsignedLongLongValue]];
-	
-	[self addRevision: result toTrackUUID: [self UUIDForKey: [trackInProgress longLongValue]]];
+	int64_t commitNodeID = [self addRevision: result
+	                             toTrackUUID: [self UUIDForKey: [trackInProgress longLongValue]]];
+
 	[db commit];
 	
 	DESTROY(commitInProgress);
 	DESTROY(rootInProgress);
 	DESTROY(trackInProgress);
-	return result;
+
+	return [[[CORevision alloc] initWithStore: self
+	                           revisionNumber: [result revisionNumber]
+	                       baseRevisionNumber: [[result baseRevision] revisionNumber]
+	                             commitNodeID: commitNodeID] autorelease];
 }
 
 /* Accessing History Graph and Committed Changes */
@@ -711,7 +716,7 @@ void CHECK(id db)
 		if ([rs next])
 		{
 			int64_t baseRevisionNumber = [rs longLongIntForColumnIndex: 1];
-			CORevision *commitObject = [[[CORevision alloc] initWithStore: self revisionNumber: anID baseRevisionNumber: baseRevisionNumber] autorelease];
+			CORevision *commitObject = [[[CORevision alloc] initWithStore: self revisionNumber: anID baseRevisionNumber: baseRevisionNumber commitNodeID: NSIntegerMax] autorelease];
 			[commitObjectForID setObject: commitObject
 								  forKey: idNumber];
 			result = commitObject;
@@ -746,11 +751,10 @@ void CHECK(id db)
 	{
 		int64_t result = [rs longLongIntForColumnIndex: 0];
 		int64_t baseRevision = [rs longLongIntForColumnIndex: 1];
-		CORevision *rev = [[[CORevision alloc] 
-			     initWithStore: self 
-			    revisionNumber: result 
-			baseRevisionNumber: baseRevision] 
-				autorelease];
+		CORevision *rev = [[[CORevision alloc] initWithStore: self
+		                                      revisionNumber: result 
+		                                  baseRevisionNumber: baseRevision
+		                                        commitNodeID: NSIntegerMax] autorelease];
 
 		[revs addObject: rev];
 	}
@@ -979,10 +983,11 @@ void CHECK(id db)
   * database (forward + backward + 1) time, once for each
   * revision on the commit track.
  */
-- (NSArray *)revisionsForTrackUUID: (ETUUID *)objectUUID
-                  currentNodeIndex: (NSUInteger *)currentNodeIndex
-                     backwardLimit: (NSUInteger)backward
-                      forwardLimit: (NSUInteger)forward
+- (NSArray *)nodesForTrackUUID: (ETUUID *)objectUUID
+                   nodeBuilder: (id <COTrackNodeBuilder>)aNodeBuilder
+              currentNodeIndex: (NSUInteger *)currentNodeIndex
+                 backwardLimit: (NSUInteger)backward
+                  forwardLimit: (NSUInteger)forward
 {
 	NILARG_EXCEPTION_TEST(objectUUID);
 	// TODO: The check below is disabled to support COCustomTrack. We need to 
@@ -1005,72 +1010,73 @@ void CHECK(id db)
 	NSMutableArray *nodes = [NSMutableArray arrayWithCapacity: capacity];
 	NSNumber *objectUUIDIndex = [self keyForUUID: objectUUID];
 	int64_t currentNode = 0;
+	int64_t trackNode = 0;
 	int64_t nextNode = 0;
 	int64_t prevNode = 0;
 	CORevision *revision = [self commitTrackForRootObject: objectUUIDIndex currentNode: &currentNode previousNode: &prevNode nextNode: &nextNode];
 
 	if (nil == revision)
 	{
-		revision = [self createCommitTrackForRootObjectUUID: objectUUIDIndex currentNodeId: &currentNode];
+		/* The commit track creation revision is ignored because it is a store 
+		   structure change and as such doesn't appear in the commit track itself. */
+		[self createCommitTrackForRootObjectUUID: objectUUIDIndex currentNodeId: &currentNode];
 	}
 
-	// Insert the middle mode (revision)
-	[nodes addObject: revision];
+	/* Insert the middle mode (revision) or return */
+
+	BOOL isEmptyTrack = (revision == nil);
 	
-	// Retrieve the backward revisions along the track (starting at the middle node)
+	if (isEmptyTrack)
+	{
+		if (currentNodeIndex != NULL)
+		{
+			*currentNodeIndex = NSNotFound;
+		}
+		return nodes;
+	}
+	else
+	{
+		[nodes addObject: [aNodeBuilder makeNodeWithID: currentNode revision: revision]];
+	}
+
+	/* Retrieve the backward revisions along the track (starting at the middle node) */
+
 	for (int i = 0; i < backward; i++)
 	{
 		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, prevnode FROM commitTrackNode WHERE objectuuid = ? AND committracknodeid = ?", objectUUIDIndex, [NSNumber numberWithLongLong: prevNode]]; CHECK(db);
-		if ([rs next])
-		{
-			prevNode = [rs longLongIntForColumnIndex: 1];
-			revision = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
-			[nodes insertObject: revision atIndex: 0];
-		}
-		else
-		{
-			BOOL insertNullMarker = (backward != NSUIntegerMax);
 
-			if (insertNullMarker)
-			{
-				for (int j = i; j < backward; j++)
-				{
-					[nodes insertObject: [NSNull null] atIndex: 0];
-				}
-			}
+		if ([rs next] == NO)
 			break;
-		}
+	
+		trackNode = prevNode;
+		revision = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
+		prevNode = [rs longLongIntForColumnIndex: 1];
+
+		[nodes insertObject: [aNodeBuilder makeNodeWithID: trackNode revision: revision]
+		            atIndex: 0];
 	}
 
 	if (currentNodeIndex != NULL)
 	{
-		*currentNodeIndex = [nodes count] - 1;
+		*currentNodeIndex = ([nodes isEmpty] ? 0 : [nodes count] - 1);
 	}
 
-	// Retrieve the forward revisions on the track
+	/* Retrieve the forward revisions on the track */
+
 	for (int i = 0; i < forward; i++)
 	{
 		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, nextnode FROM commitTrackNode WHERE objectuuid = ? AND committracknodeid = ?", objectUUIDIndex, [NSNumber numberWithLongLong: nextNode]]; CHECK(db);
-		if ([rs next])
-		{
-			nextNode = [rs longLongIntForColumnIndex: 1];
-			revision = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
-			[nodes addObject: revision];
-		}
-		else
-		{
-			BOOL insertNullMarker = (forward != NSUIntegerMax);
 
-			if (insertNullMarker)
-			{
-				for (int j = i; j < forward; j++)
-				{
-					[nodes addObject: [NSNull null]];
-				}
-			}
+		if ([rs next] == NO)
 			break;
-		}
+
+		trackNode = nextNode;
+		revision = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
+		nextNode = [rs longLongIntForColumnIndex: 1];
+	
+		[nodes addObject: [aNodeBuilder makeNodeWithID: trackNode revision: revision]];
 	}
+
 	return nodes;
 }
 
@@ -1100,9 +1106,10 @@ void CHECK(id db)
 }
 
 // TODO: Or should we name it -pushRevision:onTrackUUID:...
-- (void)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID
+- (int64_t)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID
 {
 	NSNumber *track = [self keyForUUID: aTrackUUID];
+	int64_t newNodeId;
 	int64_t oldNodeId;
 	CORevision *oldRev = 
 		[self commitTrackForRootObject: track
@@ -1117,8 +1124,10 @@ void CHECK(id db)
 		[db executeUpdate: @"INSERT INTO commitTrackNode(committracknodeid, objectuuid, revisionnumber, prevnode, nextnode) "
 			"VALUES (NULL, ?, ?, ?, NULL)", 
 			track, prevNode, oldNode]; CHECK(db);
+		
+		newNodeId = [db lastInsertRowId];
 	
-		NSNumber *newNode = [NSNumber numberWithLongLong: [db lastInsertRowId]];
+		NSNumber *newNode = [NSNumber numberWithLongLong: newNodeId];
 
 		[db executeUpdate: @"UPDATE commitTrackNode SET nextnode = ? WHERE committracknodeid = ? AND objectuuid = ?",
 			newNode, oldNode, track]; CHECK(db);
@@ -1134,8 +1143,9 @@ void CHECK(id db)
 	}
 	else
 	{
-		[self createCommitTrackForRootObjectUUID: track revision: newRevision currentNodeId: NULL];
+		[self createCommitTrackForRootObjectUUID: track revision: newRevision currentNodeId: &newNodeId];
 	}
+	return newNodeId;
 }
 - (CORevision*)undoOnCommitTrack: (ETUUID*)rootObjectUUID
 {

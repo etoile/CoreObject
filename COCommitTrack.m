@@ -338,10 +338,12 @@
 - (void)didMakeNewCommitAtRevision: (CORevision *)revision
 {
 	NSParameterAssert(revision != nil);
+	NSParameterAssert([revision commitNodeID] != NSIntegerMax);
 
-	COTrackNode *newNode = [COTrackNode nodeWithRevision: revision onTrack: self];
+	COTrackNode *newNode = [COTrackNode nodeWithID: [revision commitNodeID] revision: revision onTrack: self];
 	/* At this point, revision is the max revision for the commit track */
-	BOOL isTipNodeCached = [[[[self cachedNodes] lastObject] revision] isEqual: [revision baseRevision]];
+	BOOL isFirstRevision = ([revision baseRevision] == nil);
+	BOOL isTipNodeCached = (isFirstRevision || [[[[self cachedNodes] lastObject] revision] isEqual: [revision baseRevision]]);
 
 	if (isTipNodeCached == NO)
 	{
@@ -357,24 +359,16 @@
 - (void)reloadAllNodes
 {
 	ETAssert([[[self persistentRoot] store] isTrackUUID: [self UUID]]);
-
-	NSMutableArray *cachedNodes = [self cachedNodes];
-	
-	[cachedNodes removeAllObjects];
-	currentNodeIndex = NSNotFound;
 	
 	COStore *store = [[self persistentRoot] store];
 	CORevision *currentRev = [store currentRevisionForTrackUUID: [self UUID]];
-	NSArray *revisions = [store revisionsForTrackUUID: [self UUID]
-									 currentNodeIndex: &currentNodeIndex
-										backwardLimit: NSUIntegerMax
-										 forwardLimit: NSUIntegerMax];
+
+	[[self cachedNodes] setArray: [store nodesForTrackUUID: [self UUID]
+	                                           nodeBuilder: self
+	                                      currentNodeIndex: &currentNodeIndex
+	                                         backwardLimit: NSUIntegerMax
+	                                          forwardLimit: NSUIntegerMax]];
 	
-	for (CORevision *rev in revisions)
-	{
-		COTrackNode *node = [COTrackNode nodeWithRevision: rev onTrack: self];
-		[cachedNodes addObject: node];
-	}
 	ETAssert([[[self currentNode] revision] isEqual: currentRev]);
 }
 

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
+#import <CoreObject/COStore.h>
 
 @class COObject, COEditingContext, CORevision;
 @class COTrackNode;
@@ -27,7 +28,7 @@
  * is a simple wrapper around a revision object. A track node allows to know to 
  * which track a revision object belongs to.
  */
-@interface COTrack : NSObject <ETCollection>
+@interface COTrack : NSObject <ETCollection, COTrackNodeBuilder>
 {
 	@private
 	NSMutableArray *cachedNodes;
@@ -78,6 +79,7 @@
  * Default implementation returns nil.
  */
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back;
+- (COTrackNode *)makeNodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision;
 /**
  * Posts ETSourceDidUpdateNotification.
  *
@@ -149,19 +151,25 @@
 @interface COTrackNode : NSObject <ETCollection>
 {
 	@private
+	int64_t nodeID;
 	CORevision *revision;
 	COTrack *track;
 }
 
 /** @taskunit Initialization */
 
++ (id)nodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision onTrack: (COTrack *)aTrack;
 + (id)nodeWithRevision: (CORevision *)aRevision onTrack: (COTrack *)aTrack;
 
 /** <init /> */
-- (id)initWithRevision: (CORevision *)rev onTrack: (COTrack *)aTrack;
+- (id)initWithID: (int64_t)aNodeID revision: (CORevision *)rev onTrack: (COTrack *)aTrack;
 
 /** @taskunit Basic Properties */
 
+/**
+ * Returns the track node ID.
+ */
+- (int64_t)nodeID;
 /**
  * Returns the revision wrapped by the track node.
  */

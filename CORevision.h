@@ -28,6 +28,7 @@
 	COSQLStore *store;
 	int64_t revisionNumber;
 	int64_t baseRevisionNumber;
+	int64_t commitNodeID;
 }
 
 /** @taskunit Store */
@@ -45,14 +46,24 @@
  * This number shouldn't be used to uniquely identify the revision, unlike -UUID. 
  */
 - (int64_t)revisionNumber;
-
 /**
  * The revision upon which this one is based i.e. the main previous revision. 
  * 
  * This is nil when this is the first revision for a root object.
  */
 - (CORevision *)baseRevision;
-
+/**
+ * Returns the track node ID that resulted from the revision commit.
+ *
+ * This is first track node ID that was associated to the revision. Through 
+ * Undo/Redo use, new node IDs might be associated, but the node ID from the 
+ * commit time doesn't change.
+ *
+ * For now, the node ID is set just for the revision of -[COStore finishCommit].
+ *
+ * If the commit node ID is unknown, returns NSIntegerMax.
+ */
+- (int64_t)commitNodeID;
 
 /** 
  * Returns the revision UUID. 
@@ -156,7 +167,10 @@
  * Initializes and returns a new revision object to represent a precise revision 
  * number in the given store. 
  */
-- (id)initWithStore: (COSQLStore *)aStore revisionNumber: (int64_t)anID baseRevisionNumber: (int64_t)baseID;
+- (id)initWithStore: (COStore *)aStore
+     revisionNumber: (int64_t)aRevision
+ baseRevisionNumber: (int64_t)aBaseRevision
+       commitNodeID: (int64_t)aNodeID;
 
 /**
  * Returns the next revision after this one. 
