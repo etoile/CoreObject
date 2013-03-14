@@ -157,7 +157,7 @@
    - a commit calling -addRevision:toTrackUUID:
    - a selective undo or redo (this is the same than the previous case since 
      this results in a new commit)
-   - an undo or redo calling -undoOnCommitTrack:
+   - an undo or redo calling -undoOnTrackUUID:
    In each case, the track posting the notification can be either the receiver 
    or another instance (in the same or another process) bearing the same UUID.
    For an undo/redo, when the track triggering the notification is the receiver, 
@@ -265,7 +265,7 @@
 		return;
 	}
 
-	/* We must update the current node before calling -undoOnCommitTrack: because
+	/* We must update the current node before calling -undoOnTrackUUID: because
 	   this last method posts a distributed notification that might be delivered 
 	   before returning (at least on GNUstep, but not Mac OS X where immediate 
 	   delivery behavior differs slightly). */
@@ -275,7 +275,7 @@
 		&& ![[NSNull null] isEqual: [[self cachedNodes] objectAtIndex: currentNodeIndex]],
 		@"Record undone to is cached");
 
-	CORevision *currentRevision = [[[self persistentRoot] store] undoOnCommitTrack: [self UUID]];
+	CORevision *currentRevision = [[[self persistentRoot] store] undoOnTrackUUID: [self UUID]];
 
 	// TODO: Reset object state to old object.
 	[[self persistentRoot] reloadAtRevision: currentRevision];
@@ -297,7 +297,7 @@
 		return;
 	}
 
-	/* We must update the current node before calling -redoOnCommitTrack: because
+	/* We must update the current node before calling -redoOnTrackUUID: because
 	   this last method posts a distributed notification that might be delivered 
 	   before returning (at least on GNUstep, but not Mac OS X where immediate 
 	   delivery behavior differs slightly). */
@@ -307,7 +307,7 @@
 		&& ![[NSNull null] isEqual: [[self cachedNodes] objectAtIndex: currentNodeIndex]],
 		@"Record redone to is cached");
 
-	CORevision *currentRevision = [[[self persistentRoot] store] redoOnCommitTrack: [self UUID]];
+	CORevision *currentRevision = [[[self persistentRoot] store] redoOnTrackUUID: [self UUID]];
 
 	// TODO: Reset object state to old object.
 	[[self persistentRoot] reloadAtRevision: currentRevision];

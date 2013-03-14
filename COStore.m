@@ -256,6 +256,12 @@
 	return @"";
 }
 
+- (CORevision *)maxRevision: (int64_t)maxRevNumber forCommitTrackUUID: (ETUUID *)aTrackUUID
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
+}
+
 - (CORevision *)currentRevisionForTrackIndex: (NSNumber *)aTrackIndex
                                currentNodeID: (int64_t *)currentNodeID
                               previousNodeID: (int64_t *)previousNodeID
@@ -265,17 +271,6 @@
 	return nil;
 }
 
-/**
-  * Load the revision numbers for a root object along its commit track.
-  * The resulting array of revisions will be (forward + backward + 1) elements
-  * long, with the revisions ordered from oldest to last.
-  * revision may optionally be nil to find a commit track for an object
-  * (or create one if it doesn't exist).
-  * 
-  * The current implementation is quite inefficient in that it hits the
-  * database (forward + backward + 1) time, once for each
-  * revision on the commit track.
- */
 - (NSArray *)nodesForTrackUUID: (ETUUID *)aTrackUUID
                    nodeBuilder: (id <COTrackNodeBuilder>)aNodeBuilder
               currentNodeIndex: (NSUInteger *)currentNodeIndex
@@ -308,7 +303,6 @@
 	[self doesNotRecognizeSelector: _cmd];
 }
 
-// TODO: Or should we name it -pushRevision:onTrackUUID:...
 - (int64_t)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID
 {
 	[self doesNotRecognizeSelector: _cmd];
@@ -320,19 +314,13 @@
 	[self doesNotRecognizeSelector: _cmd];
 }
 
-- (CORevision *)undoOnCommitTrack: (ETUUID *)rootObjectUUID
+- (CORevision *)undoOnTrackUUID: (ETUUID *)aTrackUUID;
 {
 	[self doesNotRecognizeSelector: _cmd];
 	return nil;
 }
 
-- (CORevision *)redoOnCommitTrack: (ETUUID *)rootObjectUUID
-{
-	[self doesNotRecognizeSelector: _cmd];
-	return nil;
-}
-
-- (CORevision *)maxRevision: (int64_t)maxRevNumber forCommitTrackUUID: (ETUUID *)aTrackUUID
+- (CORevision *)redoOnTrackUUID: (ETUUID *)aTrackUUID;
 {
 	[self doesNotRecognizeSelector: _cmd];
 	return nil;

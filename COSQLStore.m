@@ -929,6 +929,27 @@ void CHECK(id db)
 	return result;
 }
 
+- (CORevision *)maxRevision: (int64_t)maxRevNumber forCommitTrackUUID: (ETUUID *)aTrackUUID
+{
+	BOOL hasMaxRev = (maxRevNumber > 0);
+
+	if (hasMaxRev == NO)
+	{
+		maxRevNumber = [self latestRevisionNumber];
+	}
+
+	FMResultSet *rs = [db executeQuery: @"SELECT MAX(revisionnumber) FROM uuids "
+		"JOIN commits ON uuids.uuidIndex = commits.committrackuuid "
+		"WHERE revisionnumber <= ? AND commits.committrackuuid = ?",
+		[NSNumber numberWithLongLong: maxRevNumber], [self keyForUUID: aTrackUUID]]; CHECK(db);
+
+	if ([rs next])
+	{
+		return [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
+	}
+	return nil;
+}
+
 - (CORevision *)currentRevisionForTrackIndex: (NSNumber *)aTrackIndex
                                currentNodeID: (int64_t *)currentNodeID
                               previousNodeID: (int64_t *)previousNodeID
@@ -1074,7 +1095,6 @@ void CHECK(id db)
 	[self didChangeCurrentNodeFromRevision: oldRev toNode: node revision: newRev onTrackUUID: aTrackUUID];
 }
 
-// TODO: Or should we name it -pushRevision:onTrackUUID:...
 - (int64_t)addRevision: (CORevision *)newRevision toTrackUUID: (ETUUID *)aTrackUUID
 {
 	NSNumber *trackIndex = [self keyForUUID: aTrackUUID];
@@ -1116,121 +1136,114 @@ void CHECK(id db)
 
 	return [newNode longLongValue];
 }
-- (CORevision*)undoOnCommitTrack: (ETUUID*)rootObjectUUID
+
+- (CORevision *)undoOnTrackUUID: (ETUUID *)aTrackUUID
 {
-	CORevision *oldRev = [self currentRevisionForTrackIndex: [self keyForUUID: rootObjectUUID]
-		                   currentNodeID: NULL
-				  previousNodeID: NULL
-		                      nextNodeID: NULL];
- 	NSNumber *rootObjectIndex = [self keyForUUID: rootObjectUUID];
+	CORevision *oldRev = [self currentRevisionForTrackIndex: [self keyForUUID: aTrackUUID]
+	                                          currentNodeID: NULL
+	                                         previousNodeID: NULL
+	                                             nextNodeID: NULL];
+ 	NSNumber *trackIndex = [self keyForUUID: aTrackUUID];
+
+	/* Find the previous node */
+
 	FMResultSet *rs = [db executeQuery: @"SELECT prevnode FROM tracks ct "
 		"JOIN trackNodes ctn ON ct.currentNode = ctn.id "
-		"WHERE ct.uuid = ?", rootObjectIndex]; CHECK(db);
+		"WHERE ct.uuid = ?", trackIndex]; CHECK(db);
 
-	if ([rs next])
-	{
-		NSNumber *prevNode = [NSNumber numberWithLongLong: [rs longLongIntForColumnIndex: 0]];
-
-		if ([prevNode longLongValue] == 0)
-		{
-			[NSException raise: NSInvalidArgumentException
-			            format: @"Root Object UUID %@ is already at the beginning of its commit track and cannot be undone.", rootObjectUUID];
-		}
-
-		[db executeUpdate: @"UPDATE tracks SET currentnode = ? WHERE uuid = ?",
-			prevNode, rootObjectIndex]; CHECK(db);
-		rs = [db executeQuery: @"SELECT revisionnumber FROM trackNodes WHERE id = ?",
-		   prevNode]; CHECK(db);
-
-		if ([rs next])
-		{
-			CORevision *newRev = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
-
-			[self didChangeCurrentNodeFromRevision: oldRev toNode: prevNode revision: newRev onTrackUUID: rootObjectUUID];
-			return newRev;
-		}
-		else
-		{
-			[NSException raise: NSInternalInconsistencyException
-			            format: @"Unable to find node %qd in Commit Track %@ to retrieve revision number",
-				[prevNode longLongValue], rootObjectUUID]; 
-		}
-	}
-	else
+	if ([rs next] == NO)
 	{
 		[NSException raise: NSInvalidArgumentException
-		            format: @"Commit Track not found for object %@!", rootObjectUUID];
-	}
-	return nil;
-}
-- (CORevision*)redoOnCommitTrack: (ETUUID*)rootObjectUUID
-{
-	CORevision *oldRev = [self currentRevisionForTrackIndex: [self keyForUUID: rootObjectUUID]
-		                   currentNodeID: NULL
-				  previousNodeID: NULL
-		                      nextNodeID: NULL];
-	NSNumber *rootObjectIndex = [self keyForUUID: rootObjectUUID];
-	FMResultSet *rs = [db executeQuery: @"SELECT nextNode FROM tracks ct "
-		"JOIN trackNodes ctn ON ct.currentNode = ctn.id "
-		"WHERE ct.uuid = ?", rootObjectIndex]; CHECK(db);
-
-	if ([rs next])
-	{
-		NSNumber *nextNode = [NSNumber numberWithLongLong: [rs longLongIntForColumnIndex: 0]];
-	
-		if ([nextNode longLongValue] == 0)
-		{
-			[NSException raise: NSInvalidArgumentException
-			            format: @"Root Object UUID %@ is already at the end of its commit track and cannot be redone.", rootObjectUUID];
-		}
-
-		[db executeUpdate: @"UPDATE tracks SET currentnode = ? WHERE uuid = ?",
-			nextNode, rootObjectIndex]; CHECK(db);
-		rs = [db executeQuery: @"SELECT revisionnumber FROM trackNodes WHERE id = ?",
-			nextNode]; CHECK(db);
-
-		if ([rs next])
-		{
-			CORevision *newRev = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
-			[self didChangeCurrentNodeFromRevision: oldRev toNode: nextNode revision: newRev onTrackUUID: rootObjectUUID];
-			return newRev;
-		}
-		else
-		{
-			[NSException raise: NSInternalInconsistencyException
-			            format: @"Unable to find node %qd in Commit Track %@ to retrieve revision number",
-				[nextNode longLongValue], rootObjectUUID];
-		}
-	}
-	else
-	{
-		[NSException raise: NSInvalidArgumentException
-		            format: @"Commit Track not found for object %@!", rootObjectUUID];
-	}
-	return nil;
-}
-
-- (CORevision *)maxRevision: (int64_t)maxRevNumber forCommitTrackUUID: (ETUUID *)aTrackUUID
-{
-	BOOL hasMaxRev = (maxRevNumber > 0);
-
-	if (hasMaxRev == NO)
-	{
-		maxRevNumber = [self latestRevisionNumber];
-	}
-
-	FMResultSet *rs = [db executeQuery: @"SELECT MAX(revisionnumber) FROM uuids "
-		"JOIN commits ON uuids.uuidIndex = commits.committrackuuid "
-		"WHERE revisionnumber <= ? AND commits.committrackuuid = ?",
-		[NSNumber numberWithLongLong: maxRevNumber], [self keyForUUID: aTrackUUID]]; CHECK(db);
-	if ([rs next])
-	{
-		return [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
-	}
-	else
-	{
+		            format: @"Track not found for %@", aTrackUUID];
 		return nil;
 	}
+
+	/* Update the track current node and return its revision */
+
+	NSNumber *prevNode = [NSNumber numberWithLongLong: [rs longLongIntForColumnIndex: 0]];
+
+	if ([prevNode longLongValue] == 0)
+	{
+		[NSException raise: NSInvalidArgumentException
+					format: @"Track %@ is already at the beginning and undo is invalid.",
+		                    aTrackUUID];
+	}
+
+	[db executeUpdate: @"UPDATE tracks SET currentnode = ? WHERE uuid = ?",
+		prevNode, trackIndex]; CHECK(db);
+	rs = [db executeQuery: @"SELECT revisionnumber FROM trackNodes WHERE id = ?",
+		prevNode]; CHECK(db);
+
+	if ([rs next])
+	{
+		CORevision *newRev = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
+		[self didChangeCurrentNodeFromRevision: oldRev
+		                                toNode: prevNode
+		                              revision: newRev
+		                           onTrackUUID: aTrackUUID];
+		return newRev;
+	}
+	else
+	{
+		[NSException raise: NSInternalInconsistencyException
+					format: @"Unable to find node %@ on track %@", prevNode, aTrackUUID]; 
+	}
+
+	return nil;
+}
+
+- (CORevision *)redoOnTrackUUID: (ETUUID *)aTrackUUID
+{
+	CORevision *oldRev = [self currentRevisionForTrackIndex: [self keyForUUID: aTrackUUID]
+	                                          currentNodeID: NULL
+				                             previousNodeID: NULL
+		                                         nextNodeID: NULL];
+	NSNumber *trackIndex = [self keyForUUID: aTrackUUID];
+
+	/* Find the next node */
+
+	FMResultSet *rs = [db executeQuery: @"SELECT nextNode FROM tracks ct "
+		"JOIN trackNodes ctn ON ct.currentNode = ctn.id "
+		"WHERE ct.uuid = ?", trackIndex]; CHECK(db);
+
+	if ([rs next] == NO)
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"Track not found for %@", aTrackUUID];
+		return nil;
+	}
+
+	NSNumber *nextNode = [NSNumber numberWithLongLong: [rs longLongIntForColumnIndex: 0]];
+
+	if ([nextNode longLongValue] == 0)
+	{
+		[NSException raise: NSInvalidArgumentException
+					format: @"Track %@ is already at the end and redo is invalid.", aTrackUUID];
+	}
+	
+	/* Update the track current node and return its revision */
+
+	[db executeUpdate: @"UPDATE tracks SET currentnode = ? WHERE uuid = ?",
+		nextNode, trackIndex]; CHECK(db);
+	rs = [db executeQuery: @"SELECT revisionnumber FROM trackNodes WHERE id = ?",
+		nextNode]; CHECK(db);
+
+	if ([rs next])
+	{
+		CORevision *newRev = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
+		[self didChangeCurrentNodeFromRevision: oldRev
+		                                toNode: nextNode
+		                              revision: newRev
+		                           onTrackUUID: aTrackUUID];
+		return newRev;
+	}
+	else
+	{
+		[NSException raise: NSInternalInconsistencyException
+					format: @"Unable to find node %@ on track %@", nextNode, aTrackUUID];
+	}
+
+	return nil;
 }
 
 - (BOOL)isTrackUUID: (ETUUID *)uuid

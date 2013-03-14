@@ -256,6 +256,18 @@
  * For a nil UUID, raises an NSInvalidArgumentException.
  */
 - (NSString *)nameForCommitTrackUUID: (ETUUID *)aTrackUUID;
+/**
+ * <override-subclass />
+ * Returns the most recent revision on the commit track that is less than or 
+ * equal to the given revision.
+ *
+ * Passes 0 or NSIntegerMax as maxRevNumber to get the most recent revisions 
+ * with no upper bound among all revisions on the commit track.
+ *
+ * If the UUID is not a commit track UUID (but a custom track UUID or some other 
+ * UUID), returns nil.
+ */
+- (CORevision *)maxRevision: (int64_t)maxRevNumber forCommitTrackUUID: (ETUUID *)aTrackUUID;
 
 /** @task Managing Tracks (Low-Level API) */
 
@@ -331,16 +343,31 @@
               forTrackUUID: (ETUUID *)aTrackUUID;
 /**
  * <override-subclass />
+ * Changes the track current node to point on its previous node.
+ *
+ * The returned revision points to the state resulting from the undo.
+ * For a undo targeting a persistent root, you can pass this revision to
+ * -[COPersistentRoot reloadAtRevision:] to get the undo applied.
+ *
+ * The undo doesn't result in a new revision.
+ *
+ * Each undo is recorded on the track.
  */
-- (CORevision*)undoOnCommitTrack: (ETUUID*)commitTrack;
+- (CORevision *)undoOnTrackUUID: (ETUUID *)aTrackUUID;
 /**
  * <override-subclass />
+ * Changes the track current node to point on its next node, and returns this 
+ * next node revision.
+ *
+ * The returned revision points to the state resulting from the redo. 
+ * For a redo targeting a persistent root, you can pass this revision to 
+ * -[COPersistentRoot reloadAtRevision:] to get the redo applied.
+ *
+ * The redo doesn't result in a new revision.
+ *
+ * Each redo is recorded on the track.
  */
-- (CORevision*)redoOnCommitTrack: (ETUUID*)commitTrack;
-/**
- * <override-subclass />
- */
-- (CORevision *)maxRevision: (int64_t)maxRevNumber forCommitTrackUUID: (ETUUID *)aTrackUUID;
+- (CORevision *)redoOnTrackUUID: (ETUUID *)aTrackUUID;
 /**
  * <override-subclass />
  * Returns whether the UUID corresponds to a track in the store. 
