@@ -156,10 +156,10 @@ void CHECK(id db)
 	
 	/* Track Tables */
 	
-	// Commit Track Node table
-	success = success && [db executeUpdate: @"CREATE TABLE commitTrackNode(committracknodeid INTEGER PRIMARY KEY, objectuuid INTEGER, revisionnumber INTEGER, nextnode INTEGER, prevnode INTEGER)"]; CHECK(db);
-	// Commit Track table
-	success = success && [db executeUpdate: @"CREATE TABLE commitTrack(objectuuid INTEGER PRIMARY KEY, currentnode INTEGER)"]; CHECK(db);
+	// Track Node table
+	success = success && [db executeUpdate: @"CREATE TABLE trackNodes(id INTEGER PRIMARY KEY, trackuuid INTEGER, revisionnumber INTEGER, nextnode INTEGER, prevnode INTEGER)"]; CHECK(db);
+	// Track table
+	success = success && [db executeUpdate: @"CREATE TABLE tracks(uuid INTEGER PRIMARY KEY, currentnode INTEGER)"]; CHECK(db);
 	
 	return success;
 }
@@ -909,10 +909,10 @@ void CHECK(id db)
 #ifdef GNUSTEP
 	NSDebugLLog(@"COStore", @"Creating commit track for object %@", [self UUIDForKey: [uuidIndex longLongValue]]);
 #endif
-	[db executeUpdate: @"INSERT INTO commitTrackNode(committracknodeid, objectuuid, revisionnumber, nextnode, prevnode) VALUES (NULL, ?, ?, NULL, NULL)",
+	[db executeUpdate: @"INSERT INTO trackNodes(id, trackuuid, revisionnumber, nextnode, prevnode) VALUES (NULL, ?, ?, NULL, NULL)",
 		uuidIndex, [NSNumber numberWithLongLong: [revision revisionNumber]]]; CHECK(db);
 	currentNodeId = [db lastInsertRowId];
-	[db executeUpdate: @"INSERT INTO commitTrack(objectuuid, currentnode) VALUES (?, ?)", 
+	[db executeUpdate: @"INSERT INTO tracks(uuid, currentnode) VALUES (?, ?)",
 		uuidIndex, [NSNumber numberWithLongLong: currentNodeId]]; CHECK(db);
 	if (pCurrentNodeId)
 		*pCurrentNodeId = currentNodeId;
@@ -956,7 +956,7 @@ void CHECK(id db)
                            previousNode: (int64_t*)pPreviousNode
                                nextNode: (int64_t*)pNextNode
 {
-	FMResultSet *rs = [db executeQuery: @"SELECT commitTrack.objectuuid, currentnode, revisionnumber, nextnode, prevnode FROM commitTrack JOIN commitTrackNode ON committracknodeid = currentnode WHERE commitTrack.objectuuid = ?", objectUUIDIndex]; CHECK(db);
+	FMResultSet *rs = [db executeQuery: @"SELECT tracks.uuid, currentnode, revisionnumber, nextnode, prevnode FROM tracks JOIN trackNodes ON id = currentnode WHERE tracks.uuid = ?", objectUUIDIndex]; CHECK(db);
 	if ([rs next])
 	{
 		if (pCurrentNode)
@@ -1043,7 +1043,7 @@ void CHECK(id db)
 
 	for (int i = 0; i < backward; i++)
 	{
-		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, prevnode FROM commitTrackNode WHERE objectuuid = ? AND committracknodeid = ?", objectUUIDIndex, [NSNumber numberWithLongLong: prevNode]]; CHECK(db);
+		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, prevnode FROM trackNodes WHERE trackuuid = ? AND id = ?", objectUUIDIndex, [NSNumber numberWithLongLong: prevNode]]; CHECK(db);
 
 		if ([rs next] == NO)
 			break;
@@ -1065,7 +1065,7 @@ void CHECK(id db)
 
 	for (int i = 0; i < forward; i++)
 	{
-		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, nextnode FROM commitTrackNode WHERE objectuuid = ? AND committracknodeid = ?", objectUUIDIndex, [NSNumber numberWithLongLong: nextNode]]; CHECK(db);
+		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, nextnode FROM trackNodes WHERE trackuuid = ? AND id = ?", objectUUIDIndex, [NSNumber numberWithLongLong: nextNode]]; CHECK(db);
 
 		if ([rs next] == NO)
 			break;
@@ -1084,8 +1084,8 @@ void CHECK(id db)
               forTrackUUID: (ETUUID *)aTrackUUID
 {
 	CORevision *oldRev = [self currentRevisionForTrackUUID: aTrackUUID];
-	FMResultSet *resultSet = [db executeQuery: @"SELECT committracknodeid "
-		"FROM commitTrackNode WHERE objectuuid = ? AND revisionnumber = ?", 
+	FMResultSet *resultSet = [db executeQuery: @"SELECT id "
+		"FROM trackNode WHERE objectuuid = ? AND revisionnumber = ?", 
 		[self keyForUUID: aTrackUUID], [NSNumber numberWithLongLong: [newRev revisionNumber]]]; CHECK(db);
 	NSNumber *node = nil;
 
@@ -1099,7 +1099,7 @@ void CHECK(id db)
 					format: @"Unable to find revision number %qd in track %@ to retrieve the current node",
 		                    [newRev revisionNumber], aTrackUUID]; 
 	}
-	[db executeUpdate: @"UPDATE commitTrack SET currentnode = ? WHERE objectuuid = ?",
+	[db executeUpdate: @"UPDATE tracks SET currentnode = ? WHERE uuid = ?",
 		node, [self keyForUUID: aTrackUUID]]; CHECK(db);
 
 	[self didChangeCurrentNodeFromRevision: oldRev toNode: node revision: newRev onTrackUUID: aTrackUUID];
@@ -1121,7 +1121,7 @@ void CHECK(id db)
 		NSNumber *oldNode = [NSNumber numberWithLongLong: oldNodeId];
 		NSNumber *prevNode = [NSNumber numberWithLongLong: [newRevision revisionNumber]];
 		
-		[db executeUpdate: @"INSERT INTO commitTrackNode(committracknodeid, objectuuid, revisionnumber, prevnode, nextnode) "
+		[db executeUpdate: @"INSERT INTO trackNodes(id, trackuuid, revisionnumber, prevnode, nextnode) "
 			"VALUES (NULL, ?, ?, ?, NULL)", 
 			track, prevNode, oldNode]; CHECK(db);
 		
@@ -1129,9 +1129,9 @@ void CHECK(id db)
 	
 		NSNumber *newNode = [NSNumber numberWithLongLong: newNodeId];
 
-		[db executeUpdate: @"UPDATE commitTrackNode SET nextnode = ? WHERE committracknodeid = ? AND objectuuid = ?",
+		[db executeUpdate: @"UPDATE trackNodes SET nextnode = ? WHERE id = ? AND trackuuid = ?",
 			newNode, oldNode, track]; CHECK(db);
-		[db executeUpdate: @"UPDATE commitTrack SET currentnode = ? WHERE objectuuid = ?",
+		[db executeUpdate: @"UPDATE tracks SET currentnode = ? WHERE uuid = ?",
 			newNode, track]; CHECK(db);
 
 #ifdef GNUSTEP
@@ -1154,9 +1154,9 @@ void CHECK(id db)
 				  previousNode: NULL
 		                      nextNode: NULL];
  	NSNumber *rootObjectIndex = [self keyForUUID: rootObjectUUID];
-	FMResultSet *rs = [db executeQuery: @"SELECT prevnode FROM commitTrack ct "
-		"JOIN commitTrackNode ctn ON ct.currentNode = ctn.committracknodeid "
-		"WHERE ct.objectuuid = ?", rootObjectIndex]; CHECK(db);
+	FMResultSet *rs = [db executeQuery: @"SELECT prevnode FROM tracks ct "
+		"JOIN trackNodes ctn ON ct.currentNode = ctn.id "
+		"WHERE ct.uuid = ?", rootObjectIndex]; CHECK(db);
 
 	if ([rs next])
 	{
@@ -1168,9 +1168,9 @@ void CHECK(id db)
 			            format: @"Root Object UUID %@ is already at the beginning of its commit track and cannot be undone.", rootObjectUUID];
 		}
 
-		[db executeUpdate: @"UPDATE commitTrack SET currentnode = ? WHERE objectuuid = ?",
+		[db executeUpdate: @"UPDATE tracks SET currentnode = ? WHERE uuid = ?",
 			prevNode, rootObjectIndex]; CHECK(db);
-		rs = [db executeQuery: @"SELECT revisionnumber FROM committracknode WHERE committracknodeid = ?", 
+		rs = [db executeQuery: @"SELECT revisionnumber FROM trackNodes WHERE id = ?",
 		   prevNode]; CHECK(db);
 
 		if ([rs next])
@@ -1201,9 +1201,9 @@ void CHECK(id db)
 				  previousNode: NULL
 		                      nextNode: NULL];
 	NSNumber *rootObjectIndex = [self keyForUUID: rootObjectUUID];
-	FMResultSet *rs = [db executeQuery: @"SELECT nextNode FROM commitTrack ct "
-		"JOIN commitTrackNode ctn ON ct.currentNode = ctn.committracknodeid "
-		"WHERE ct.objectuuid = ?", rootObjectIndex]; CHECK(db);
+	FMResultSet *rs = [db executeQuery: @"SELECT nextNode FROM tracks ct "
+		"JOIN trackNodes ctn ON ct.currentNode = ctn.id "
+		"WHERE ct.uuid = ?", rootObjectIndex]; CHECK(db);
 
 	if ([rs next])
 	{
@@ -1215,9 +1215,9 @@ void CHECK(id db)
 			            format: @"Root Object UUID %@ is already at the end of its commit track and cannot be redone.", rootObjectUUID];
 		}
 
-		[db executeUpdate: @"UPDATE commitTrack SET currentnode = ? WHERE objectuuid = ?",
+		[db executeUpdate: @"UPDATE tracks SET currentnode = ? WHERE uuid = ?",
 			nextNode, rootObjectIndex]; CHECK(db);
-		rs = [db executeQuery: @"SELECT revisionnumber FROM committracknode WHERE committracknodeid = ?", 
+		rs = [db executeQuery: @"SELECT revisionnumber FROM trackNodes WHERE id = ?",
 			nextNode]; CHECK(db);
 
 		if ([rs next])
@@ -1267,7 +1267,7 @@ void CHECK(id db)
 - (BOOL)isTrackUUID: (ETUUID *)uuid
 {
 	NILARG_EXCEPTION_TEST(uuid);
-    FMResultSet *rs = [db executeQuery: @"SELECT objectuuid FROM committrack WHERE objectuuid = ?",
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM tracks WHERE uuid = ?",
 	                                    [self keyForUUID: uuid]];
 	BOOL result = [rs next];
 	[rs close];
