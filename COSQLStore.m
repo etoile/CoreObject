@@ -955,29 +955,14 @@ void CHECK(id db)
 	return nil;
 }
 
-/**
-  * Load the revision numbers for a root object along its commit track.
-  * The resulting array of revisions will be (forward + backward + 1) elements
-  * long, with the revisions ordered from oldest to last.
-  * revision may optionally be nil to find a commit track for an object
-  * (or create one if it doesn't exist).
-  * 
-  * The current implementation is quite inefficient in that it hits the
-  * database (forward + backward + 1) time, once for each
-  * revision on the commit track.
- */
-- (NSArray *)nodesForTrackUUID: (ETUUID *)objectUUID
+- (NSArray *)nodesForTrackUUID: (ETUUID *)aTrackUUID
                    nodeBuilder: (id <COTrackNodeBuilder>)aNodeBuilder
               currentNodeIndex: (NSUInteger *)currentNodeIndex
                  backwardLimit: (NSUInteger)backward
                   forwardLimit: (NSUInteger)forward
 {
-	NILARG_EXCEPTION_TEST(objectUUID);
-	// TODO: The check below is disabled to support COCustomTrack. We need to 
-	// rework the API and database schema to support both commit and custom 
-	// tracks cleanly.
-	//if (![self isRootObjectUUID: objectUUID])
-	//	[NSException raise: NSInvalidArgumentException format: @"The object with UUID %@ does not exist!", objectUUID];
+	NILARG_EXCEPTION_TEST(aTrackUUID);
+	NILARG_EXCEPTION_TEST(aNodeBuilder);
 
 	NSUInteger capacity = (forward + backward + 1);
 
@@ -991,12 +976,15 @@ void CHECK(id db)
 					format: @"Forward and backward limit sum must be below NSUIntegerMax."];
 	}
 	NSMutableArray *nodes = [NSMutableArray arrayWithCapacity: capacity];
-	NSNumber *objectUUIDIndex = [self keyForUUID: objectUUID];
-	int64_t currentNode = 0;
-	int64_t trackNode = 0;
-	int64_t nextNode = 0;
-	int64_t prevNode = 0;
-	CORevision *revision = [self currentRevisionForTrackIndex: objectUUIDIndex currentNodeID: &currentNode previousNodeID: &prevNode nextNodeID: &nextNode];
+	NSNumber *trackIndex = [self keyForUUID: aTrackUUID];
+	int64_t currentNodeID = 0;
+	int64_t trackNodeID = 0;
+	int64_t nextNodeID = 0;
+	int64_t prevNodeID = 0;
+	CORevision *revision = [self currentRevisionForTrackIndex: trackIndex
+	                                            currentNodeID: &currentNodeID
+	                                           previousNodeID: &prevNodeID
+	                                               nextNodeID: &nextNodeID];
 
 	if (nil == revision)
 	{
@@ -1017,23 +1005,23 @@ void CHECK(id db)
 	}
 	else
 	{
-		[nodes addObject: [aNodeBuilder makeNodeWithID: currentNode revision: revision]];
+		[nodes addObject: [aNodeBuilder makeNodeWithID: currentNodeID revision: revision]];
 	}
 
 	/* Retrieve the backward revisions along the track (starting at the middle node) */
 
 	for (int i = 0; i < backward; i++)
 	{
-		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, prevnode FROM trackNodes WHERE trackuuid = ? AND id = ?", objectUUIDIndex, [NSNumber numberWithLongLong: prevNode]]; CHECK(db);
+		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, prevnode FROM trackNodes WHERE trackuuid = ? AND id = ?", trackIndex, [NSNumber numberWithLongLong: prevNodeID]]; CHECK(db);
 
 		if ([rs next] == NO)
 			break;
 	
-		trackNode = prevNode;
+		trackNodeID = prevNodeID;
 		revision = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
-		prevNode = [rs longLongIntForColumnIndex: 1];
+		prevNodeID = [rs longLongIntForColumnIndex: 1];
 
-		[nodes insertObject: [aNodeBuilder makeNodeWithID: trackNode revision: revision]
+		[nodes insertObject: [aNodeBuilder makeNodeWithID: trackNodeID revision: revision]
 		            atIndex: 0];
 	}
 
@@ -1046,16 +1034,16 @@ void CHECK(id db)
 
 	for (int i = 0; i < forward; i++)
 	{
-		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, nextnode FROM trackNodes WHERE trackuuid = ? AND id = ?", objectUUIDIndex, [NSNumber numberWithLongLong: nextNode]]; CHECK(db);
+		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, nextnode FROM trackNodes WHERE trackuuid = ? AND id = ?", trackIndex, [NSNumber numberWithLongLong: nextNodeID]]; CHECK(db);
 
 		if ([rs next] == NO)
 			break;
 
-		trackNode = nextNode;
+		trackNodeID = nextNodeID;
 		revision = [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 0]];
-		nextNode = [rs longLongIntForColumnIndex: 1];
+		nextNodeID = [rs longLongIntForColumnIndex: 1];
 	
-		[nodes addObject: [aNodeBuilder makeNodeWithID: trackNode revision: revision]];
+		[nodes addObject: [aNodeBuilder makeNodeWithID: trackNodeID revision: revision]];
 	}
 
 	return nodes;

@@ -311,8 +311,10 @@
  * to NSNotFound. See -[COTrack currentNode].
  *
  * If the track doesn't exist, returns an empty array.
+ *
+ * For a nil track UUID or node builder, raises an NSInvalidArgumentException.
  */
-- (NSArray *)nodesForTrackUUID: (ETUUID *)objectUUID
+- (NSArray *)nodesForTrackUUID: (ETUUID *)aTrackUUID
                    nodeBuilder: (id <COTrackNodeBuilder>)aNodeBuilder
               currentNodeIndex: (NSUInteger *)currentNodeIndex
                  backwardLimit: (NSUInteger)backward

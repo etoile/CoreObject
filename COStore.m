@@ -276,7 +276,7 @@
   * database (forward + backward + 1) time, once for each
   * revision on the commit track.
  */
-- (NSArray *)nodesForTrackUUID: (ETUUID *)objectUUID
+- (NSArray *)nodesForTrackUUID: (ETUUID *)aTrackUUID
                    nodeBuilder: (id <COTrackNodeBuilder>)aNodeBuilder
               currentNodeIndex: (NSUInteger *)currentNodeIndex
                  backwardLimit: (NSUInteger)backward
