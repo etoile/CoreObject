@@ -951,23 +951,28 @@ void CHECK(id db)
 	return result;
 }
 
-- (CORevision*)commitTrackForRootObject: (NSNumber*)objectUUIDIndex
-                            currentNode: (int64_t*)pCurrentNode
-                           previousNode: (int64_t*)pPreviousNode
-                               nextNode: (int64_t*)pNextNode
+- (CORevision *)currentRevisionForTrackIndex: (NSNumber *)aTrackIndex
+                               currentNodeID: (int64_t *)currentNodeID
+                              previousNodeID: (int64_t *)previousNodeID
+                                  nextNodeID: (int64_t *)nextNodeID
 {
-	FMResultSet *rs = [db executeQuery: @"SELECT tracks.uuid, currentnode, revisionnumber, nextnode, prevnode FROM tracks JOIN trackNodes ON id = currentnode WHERE tracks.uuid = ?", objectUUIDIndex]; CHECK(db);
+	FMResultSet *rs = [db executeQuery: @"SELECT tracks.uuid, currentnode, revisionnumber, nextnode, prevnode FROM tracks JOIN trackNodes ON id = currentnode WHERE tracks.uuid = ?", aTrackIndex]; CHECK(db);
+
 	if ([rs next])
 	{
-		if (pCurrentNode)
-			*pCurrentNode = [rs longLongIntForColumnIndex: 1];
-
-		if (pPreviousNode) 
-			*pPreviousNode = [rs longLongIntForColumnIndex: 4];
-		if (pNextNode)
-			*pNextNode =[rs longLongIntForColumnIndex: 3];
-		int64_t revisionnumber = [rs longLongIntForColumnIndex: 2];
-		return [self revisionWithRevisionNumber: revisionnumber];
+		if (currentNodeID != NULL)
+		{
+			*currentNodeID = [rs longLongIntForColumnIndex: 1];
+		}
+		if (previousNodeID != NULL)
+		{
+			*previousNodeID = [rs longLongIntForColumnIndex: 4];
+		}
+		if (nextNodeID != NULL)
+		{
+			*nextNodeID =[rs longLongIntForColumnIndex: 3];
+		}
+		return [self revisionWithRevisionNumber: [rs longLongIntForColumnIndex: 2]];
 	}
 	return nil;
 }
@@ -1013,7 +1018,7 @@ void CHECK(id db)
 	int64_t trackNode = 0;
 	int64_t nextNode = 0;
 	int64_t prevNode = 0;
-	CORevision *revision = [self commitTrackForRootObject: objectUUIDIndex currentNode: &currentNode previousNode: &prevNode nextNode: &nextNode];
+	CORevision *revision = [self currentRevisionForTrackIndex: objectUUIDIndex currentNodeID: &currentNode previousNodeID: &prevNode nextNodeID: &nextNode];
 
 	if (nil == revision)
 	{
@@ -1112,10 +1117,10 @@ void CHECK(id db)
 	int64_t newNodeId;
 	int64_t oldNodeId;
 	CORevision *oldRev = 
-		[self commitTrackForRootObject: track
-		                   currentNode: &oldNodeId
-				  previousNode: NULL
-		                      nextNode: NULL];
+	[self currentRevisionForTrackIndex: track
+		                   currentNodeID: &oldNodeId
+				  previousNodeID: NULL
+		                      nextNodeID: NULL];
 	if (oldRev != nil)
 	{
 		NSNumber *oldNode = [NSNumber numberWithLongLong: oldNodeId];
@@ -1149,10 +1154,10 @@ void CHECK(id db)
 }
 - (CORevision*)undoOnCommitTrack: (ETUUID*)rootObjectUUID
 {
-	CORevision *oldRev = [self commitTrackForRootObject: [self keyForUUID: rootObjectUUID]
-		                   currentNode: NULL
-				  previousNode: NULL
-		                      nextNode: NULL];
+	CORevision *oldRev = [self currentRevisionForTrackIndex: [self keyForUUID: rootObjectUUID]
+		                   currentNodeID: NULL
+				  previousNodeID: NULL
+		                      nextNodeID: NULL];
  	NSNumber *rootObjectIndex = [self keyForUUID: rootObjectUUID];
 	FMResultSet *rs = [db executeQuery: @"SELECT prevnode FROM tracks ct "
 		"JOIN trackNodes ctn ON ct.currentNode = ctn.id "
@@ -1196,10 +1201,10 @@ void CHECK(id db)
 }
 - (CORevision*)redoOnCommitTrack: (ETUUID*)rootObjectUUID
 {
-	CORevision *oldRev = [self commitTrackForRootObject:[self keyForUUID: rootObjectUUID]
-		                   currentNode: NULL
-				  previousNode: NULL
-		                      nextNode: NULL];
+	CORevision *oldRev = [self currentRevisionForTrackIndex: [self keyForUUID: rootObjectUUID]
+		                   currentNodeID: NULL
+				  previousNodeID: NULL
+		                      nextNodeID: NULL];
 	NSNumber *rootObjectIndex = [self keyForUUID: rootObjectUUID];
 	FMResultSet *rs = [db executeQuery: @"SELECT nextNode FROM tracks ct "
 		"JOIN trackNodes ctn ON ct.currentNode = ctn.id "

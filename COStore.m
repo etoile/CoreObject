@@ -270,10 +270,10 @@
 	return @"";
 }
 
-- (CORevision *)commitTrackForRootObject: (NSNumber *)objectUUIDIndex
-                             currentNode: (int64_t *)pCurrentNode
-                            previousNode: (int64_t *)pPreviousNode
-                                nextNode: (int64_t *)pNextNode
+- (CORevision *)currentRevisionForTrackIndex: (NSNumber *)aTrackIndex
+                               currentNodeID: (int64_t *)currentNodeID
+                              previousNodeID: (int64_t *)previousNodeID
+                                  nextNodeID: (int64_t *)nextNodeID
 {
 	[self doesNotRecognizeSelector: _cmd];
 	return nil;
