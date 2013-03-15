@@ -259,7 +259,7 @@
 
 	CORevision *c2 = [store finishCommit];
 	
-	/* Third Revision in new branch (forked from first revision) */
+	/* Third Revision in store structure track (new branch) */
 
 	ETUUID *branchUUID = [ETUUID UUID];
 
@@ -273,7 +273,7 @@
 	UKTrue([store isTrackUUID: trackUUID]);
 	// FIXME: UKTrue([store isTrackUUID: branchUUID]);
 	UKObjectsEqual(c2, [store currentRevisionForTrackUUID: trackUUID]);
-	UKObjectsEqual(c3, [store currentRevisionForTrackUUID: branchUUID]);
+	UKObjectsEqual(c2, [store currentRevisionForTrackUUID: branchUUID]);
 	UKNil([store parentRevisionForCommitTrackUUID: trackUUID]);
 	UKObjectsEqual(c1, [store parentRevisionForCommitTrackUUID: branchUUID]);
 	UKObjectsEqual(rootUUID, [store persistentRootUUIDForCommitTrackUUID: trackUUID]);
@@ -328,7 +328,7 @@
 	UKStringsEqual(@"cats", [[c2 allValuesAndPropertiesForObjectUUID: o2] objectForKey: @"name"]);
 	UKNil([[c2 allValuesAndPropertiesForObjectUUID: o3] objectForKey: @"name"]);
 	 
-	/* Third revision state (branch) */
+	/* Third revision state (store structure track) */
 
 	UKStringsEqual(@"birds", [[c3 allValuesAndPropertiesForObjectUUID: o1] objectForKey: @"name"]);
 	UKNil([[c3 allValuesAndPropertiesForObjectUUID: o2] objectForKey: @"name"]);

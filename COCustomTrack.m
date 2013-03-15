@@ -23,56 +23,14 @@
 	return AUTORELEASE([[self alloc] initWithUUID: aUUID editingContext: aContext]);
 }
 
-- (void) reloadAllNodes
-{
-	BOOL wasPersisted = [[editingContext store] isTrackUUID: [self UUID]];
-
-	if (wasPersisted == NO)
-		return;
-
-
-	COStore *store = [editingContext store];
-
-	[allNodes setArray: [store nodesForTrackUUID: [self UUID]
-	                                 nodeBuilder: self
-	                            currentNodeIndex: &currentNodeIndex
-	                               backwardLimit: NSUIntegerMax
-	                                forwardLimit: NSUIntegerMax]];
-
-	NSMutableArray *cachedNodes = [self cachedNodes];
-	CORevision *currentRev = [store currentRevisionForTrackUUID: [self UUID]];
-
-	[cachedNodes removeAllObjects];
-
-	for (COTrackNode *node in allNodes)
-	{
-		// TODO: If necessary, we can cache the current rev per object UUID and 
-		// retrieve all the commit track current revisions in a single SQL query.
-		CORevision *commitTrackRev = [store currentRevisionForTrackUUID: [[node revision] objectUUID]];
-		int64_t commitTrackRevNumber = [commitTrackRev revisionNumber];
-		int64_t currentRevNumber = [currentRev revisionNumber];
-		int64_t revNumber = [[node revision] revisionNumber];
-
-		if ((revNumber > commitTrackRevNumber && revNumber < currentRevNumber)
-		 || (revNumber > currentRevNumber && revNumber < commitTrackRevNumber))
-		{
-			currentNodeIndex--;
-			continue;
-		}
-
-		[cachedNodes addObject: node];
-	}
-}
-
 - (id)initWithUUID: (ETUUID *)aUUID editingContext: (COEditingContext *)aContext
 {
 	SUPERINIT;
 
 	ASSIGN(UUID, aUUID);
 	ASSIGN(editingContext, aContext);
-	allNodes = [[NSMutableArray alloc] init];
 
-	[self reloadAllNodes];
+	[self reloadNodes];
 
 	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
 	                                                    selector: @selector(currentNodeDidChangeInStore:) 
@@ -87,7 +45,6 @@
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 	DESTROY(UUID);
 	DESTROY(editingContext);
-	DESTROY(allNodes);
 	[super dealloc];
 }
 
@@ -112,6 +69,47 @@
 		[objects addObject: [editingContext objectWithUUID: uuid]];
 	}
 	return objects;
+}
+
+- (NSArray *)allNodesAndCurrentNodeIndex: (NSUInteger *)aNodeIndex
+{
+	return [[editingContext store] nodesForTrackUUID: [self UUID]
+	                                     nodeBuilder: self
+	                                currentNodeIndex: aNodeIndex
+	                                   backwardLimit: NSUIntegerMax
+	                                    forwardLimit: NSUIntegerMax];
+}
+
+- (NSArray *)provideNodesAndCurrentNodeIndex:(NSUInteger *)aNodeIndex
+{
+	NSUInteger newNodeIndex = 0;
+	NSArray *allNodes = [self allNodesAndCurrentNodeIndex: &newNodeIndex];
+	NSMutableArray *nodes = [NSMutableArray array];
+	COStore *store = [editingContext store];
+	CORevision *currentRev = [store currentRevisionForTrackUUID: [self UUID]];
+	
+	
+	for (COTrackNode *node in allNodes)
+	{
+		// TODO: If necessary, we can cache the current rev per object UUID and
+		// retrieve all the commit track current revisions in a single SQL query.
+		CORevision *commitTrackRev = [store currentRevisionForTrackUUID: [[node revision] objectUUID]];
+		int64_t commitTrackRevNumber = [commitTrackRev revisionNumber];
+		int64_t currentRevNumber = [currentRev revisionNumber];
+		int64_t revNumber = [[node revision] revisionNumber];
+		
+		if ((revNumber > commitTrackRevNumber && revNumber < currentRevNumber)
+			|| (revNumber > currentRevNumber && revNumber < commitTrackRevNumber))
+		{
+			newNodeIndex--;
+			continue;
+		}
+		
+		[nodes addObject: node];
+	}
+	
+	*aNodeIndex = newNodeIndex;
+	return nodes;
 }
 
 - (BOOL)isOurStoreForNotification: (NSNotification *)notif
@@ -152,7 +150,7 @@
 		return;
 
 	// TODO: Reuse nodes (we reinstantiate every node currently)
-	[self reloadAllNodes];
+	[self reloadNodes];
 
 	CORevision *newRev = [[editingContext store] revisionWithRevisionNumber: newRevNumber];
 	ETUUID *commitTrackUUID = [newRev objectUUID];

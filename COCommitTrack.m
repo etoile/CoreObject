@@ -197,7 +197,7 @@
 
 	COTrackNode *oldCurrentNode = RETAIN([self currentNode]);
 
-	[self reloadAllNodes];
+	[self reloadNodes];
 
 	// FIXME: The currentNodeIndex assertion requires that distributed 
 	// notifications to be delivered (but the notification center might drop 
@@ -214,21 +214,33 @@
 	RELEASE(oldCurrentNode);
 }
 
-#if 0
-- (COTrackNode *)currentNode
+- (NSArray *)allNodesAndCurrentNodeIndex: (NSUInteger *)aNodeIndex
 {
-	COTrackNode *currentNode = [super currentNode];
-
-	if (currentNode == nil)
-	{
-		[self reloadAllNodes];
-		currentNode = [super currentNode];
-	}
-	ETAssert(currentNode != nil);
-
-	return currentNode;
+	// NOTE: For a new track, -[COSQLStore isTrackUUID:] would return NO
+	
+	COStore *store = [[self persistentRoot] store];
+	return [store nodesForTrackUUID: [self UUID]
+	                    nodeBuilder: self
+	               currentNodeIndex: aNodeIndex
+	                  backwardLimit: NSUIntegerMax
+	                   forwardLimit: NSUIntegerMax];
 }
-#endif
+
+- (NSArray *)provideNodesAndCurrentNodeIndex: (NSUInteger *)aNodeIndex
+{
+	return [self allNodesAndCurrentNodeIndex: aNodeIndex];
+}
+
+- (void)didRecacheNodes
+{
+	if ([self currentNode] == nil)
+		return;
+	
+	CORevision *currentRev =
+		[[[self persistentRoot] store] currentRevisionForTrackUUID: [self UUID]];
+	
+	ETAssert([[[self currentNode] revision] isEqual: currentRev]);
+}
 
 - (void)setCurrentNode: (COTrackNode *)aNode
 {
@@ -347,29 +359,13 @@
 
 	if (isTipNodeCached == NO)
 	{
-		[self reloadAllNodes];
+		[self reloadNodes];
 	}
 	[[self cachedNodes] addObject: newNode];
 
 	currentNodeIndex = [[self cachedNodes] count] - 1;
 
 	[self didUpdate];
-}
-
-- (void)reloadAllNodes
-{
-	ETAssert([[[self persistentRoot] store] isTrackUUID: [self UUID]]);
-	
-	COStore *store = [[self persistentRoot] store];
-	CORevision *currentRev = [store currentRevisionForTrackUUID: [self UUID]];
-
-	[[self cachedNodes] setArray: [store nodesForTrackUUID: [self UUID]
-	                                           nodeBuilder: self
-	                                      currentNodeIndex: &currentNodeIndex
-	                                         backwardLimit: NSUIntegerMax
-	                                          forwardLimit: NSUIntegerMax]];
-	
-	ETAssert([[[self currentNode] revision] isEqual: currentRev]);
 }
 
 @end

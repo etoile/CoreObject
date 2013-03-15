@@ -334,6 +334,8 @@
 /**
  * <override-subclass />
  * Returns the current node revision for the given track. 
+ *
+ * If the track doesn't exist or contains no revisions, returns nil.
  */
 - (CORevision *)currentRevisionForTrackUUID: (ETUUID *)aTrackUUID;
 /**

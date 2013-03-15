@@ -32,6 +32,7 @@
 {
 	@private
 	NSMutableArray *cachedNodes;
+	BOOL isLoading;
 	@protected
 	// TODO: Would be better to make the ivar below private rather than 
 	// protected but this makes the code much more verbose in subclasses.
@@ -71,6 +72,9 @@
  * Returns the cached track nodes. 
  */
 - (NSMutableArray *)cachedNodes;
+- (NSArray *)provideNodesAndCurrentNodeIndex: (NSUInteger *)aNodeIndex;
+- (void)reloadNodes;
+- (void)didRecacheNodes;
 /**
  * <override-subclass />
  * Returns the node that follows aNode on the track when back is NO, otherwise  

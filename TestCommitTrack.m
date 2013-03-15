@@ -161,7 +161,7 @@
 	
 	/* Branch creation revision doesn't belong to either the source commit track or new branch */
 	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
-	// FIXME: UKObjectsEqual(rev1, [[branch currentNode] revision]);
+	UKObjectsEqual(rev1, [[branch currentNode] revision]);
 	UKObjectsEqual(rev1, [branch parentRevision]);
 
 	/* Branch creation doesn't touch the current persistent root revision */

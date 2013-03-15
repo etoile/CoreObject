@@ -44,7 +44,10 @@
 
 - (COTrackNode *)currentNode
 {
-	return (currentNodeIndex != NSNotFound ? [cachedNodes objectAtIndex: currentNodeIndex] : nil);
+	/* Force node recache */
+	NSArray *nodes = [self cachedNodes];
+
+	return (currentNodeIndex != NSNotFound ? [nodes objectAtIndex: currentNodeIndex] : nil);
 }
 
 - (void)setCurrentNode: (COTrackNode *)node
@@ -52,9 +55,36 @@
 
 }
 
+- (BOOL)needsReloadNodes: (NSArray *)currentLoadedNodes
+{
+	return [currentLoadedNodes isEmpty];
+}
+
 - (NSMutableArray *)cachedNodes
 {
+	if ([self needsReloadNodes: cachedNodes] && isLoading == NO)
+	{
+		isLoading = YES;
+		[self reloadNodes];
+		isLoading = NO;
+	}
 	return cachedNodes;
+}
+
+- (NSArray *)provideNodes
+{
+	return [NSArray array];
+}
+
+- (void)reloadNodes
+{
+	[cachedNodes setArray: [self provideNodesAndCurrentNodeIndex: &currentNodeIndex]];
+	[self didRecacheNodes];
+}
+
+- (void)didRecacheNodes
+{
+
 }
 
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back

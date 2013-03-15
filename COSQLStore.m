@@ -862,9 +862,10 @@ void CHECK(id db)
 		                    [self persistentRootUUIDForCommitTrackUUID: parentTrackUUID]];
 	}
 
+	// TODO: Record the commit track creation details in the metadata
 	[self beginCommitWithMetadata: nil
-	           persistentRootUUID: aPersistentRootUUID
-	              commitTrackUUID: aBranchUUID
+	           persistentRootUUID: nil
+	              commitTrackUUID: [self UUID]
 	                 baseRevision: aRevision];
 
 	NSNumber *persistentRootIndex = [self keyForUUID: aPersistentRootUUID];
@@ -1007,11 +1008,6 @@ void CHECK(id db)
 	                                           previousNodeID: &prevNodeID
 	                                               nextNodeID: &nextNodeID];
 
-	if (nil == revision)
-	{
-		return [NSArray array];
-	}
-
 	/* Insert the middle mode (revision) or return */
 
 	BOOL isEmptyTrack = (revision == nil);
@@ -1022,7 +1018,19 @@ void CHECK(id db)
 		{
 			*currentNodeIndex = NSNotFound;
 		}
-		return nodes;
+
+		/* Fall back on the parent track content in case the track table doesn't 
+		   exist yet for the commit track (no revisions yet) */
+		ETUUID *parentTrackUUID = [[self parentRevisionForCommitTrackUUID: aTrackUUID] trackUUID];
+
+		if (parentTrackUUID == nil)
+			return nodes;
+		
+		return [self nodesForTrackUUID: parentTrackUUID
+		                   nodeBuilder: aNodeBuilder
+		              currentNodeIndex: currentNodeIndex
+		                 backwardLimit: backward
+		                  forwardLimit: forward];
 	}
 	else
 	{
@@ -1033,7 +1041,7 @@ void CHECK(id db)
 
 	for (int i = 0; i < backward; i++)
 	{
-		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, prevnode FROM trackNodes WHERE trackuuid = ? AND id = ?", trackIndex, [NSNumber numberWithLongLong: prevNodeID]]; CHECK(db);
+		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, prevnode FROM trackNodes WHERE id = ?", [NSNumber numberWithLongLong: prevNodeID]]; CHECK(db);
 
 		if ([rs next] == NO)
 			break;
@@ -1055,7 +1063,7 @@ void CHECK(id db)
 
 	for (int i = 0; i < forward; i++)
 	{
-		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, nextnode FROM trackNodes WHERE trackuuid = ? AND id = ?", trackIndex, [NSNumber numberWithLongLong: nextNodeID]]; CHECK(db);
+		FMResultSet *rs = [db executeQuery: @"SELECT revisionnumber, nextnode FROM trackNodes WHERE id = ?", [NSNumber numberWithLongLong: nextNodeID]]; CHECK(db);
 
 		if ([rs next] == NO)
 			break;

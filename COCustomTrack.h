@@ -38,7 +38,6 @@
 	@private
 	ETUUID *UUID;
 	COEditingContext *editingContext;
-	NSMutableArray *allNodes;
 }
 
 /** @taskunit Initialization */

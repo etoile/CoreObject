@@ -293,7 +293,6 @@
 	                       currentNodeIndex: NULL
 	                          backwardLimit: 0
 	                           forwardLimit: 0];
-	assert([revs count] == 1);
 	return [revs firstObject];
 }
 
