@@ -30,8 +30,6 @@
 	ASSIGN(UUID, aUUID);
 	ASSIGN(editingContext, aContext);
 
-	[self reloadNodes];
-
 	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
 	                                                    selector: @selector(currentNodeDidChangeInStore:) 
 	                                                        name: COStoreDidChangeCurrentNodeOnTrackNotification 
@@ -52,7 +50,7 @@
 {
 	// TODO: This is probably quite slow. We can query the store to compute the 
 	// the tracked object set.
-	NSArray *revs = (id)[[[self cachedNodes] mappedCollection] revision];
+	NSArray *revs = (id)[[[self loadedNodes] mappedCollection] revision];
 	// TODO: Should we skip UUIDs matching tracked objects which have been 
 	// deleted at this point, see -trackedObjects and -currentNodeDidChangeInStore:...
 	return [NSSet setWithArray: (id)[[revs mappedCollection] objectUUID]];
@@ -198,7 +196,7 @@
 
 - (void)addRevision: (CORevision *)rev
 {
-	[[self cachedNodes] addObject: [COTrackNode nodeWithID: [rev commitNodeID]
+	[[self loadedNodes] addObject: [COTrackNode nodeWithID: [rev commitNodeID]
 	                                              revision: rev
 	                                               onTrack: self]];
 

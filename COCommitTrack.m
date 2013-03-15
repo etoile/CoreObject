@@ -231,7 +231,7 @@
 	return [self allNodesAndCurrentNodeIndex: aNodeIndex];
 }
 
-- (void)didRecacheNodes
+- (void)didReloadNodes
 {
 	if ([self currentNode] == nil)
 		return;
@@ -246,7 +246,7 @@
 {
 	INVALIDARG_EXCEPTION_TEST(aNode, [aNode track] == self);
 
-	NSUInteger nodeIndex = [[self cachedNodes] indexOfObject: aNode];
+	NSUInteger nodeIndex = [[self loadedNodes] indexOfObject: aNode];
 
 	if (nodeIndex == NSNotFound)
 	{
@@ -284,7 +284,7 @@
 	currentNodeIndex--;
 	// Check to make sure new node was cached
 	NSAssert(currentNodeIndex != NSNotFound 
-		&& ![[NSNull null] isEqual: [[self cachedNodes] objectAtIndex: currentNodeIndex]],
+		&& ![[NSNull null] isEqual: [[self loadedNodes] objectAtIndex: currentNodeIndex]],
 		@"Record undone to is cached");
 
 	CORevision *currentRevision = [[[self persistentRoot] store] undoOnTrackUUID: [self UUID]];
@@ -315,8 +315,8 @@
 	   delivery behavior differs slightly). */
 	currentNodeIndex++;
 	// Check to make sure new node was cached
-	NSAssert([[self cachedNodes] count] > currentNodeIndex 
-		&& ![[NSNull null] isEqual: [[self cachedNodes] objectAtIndex: currentNodeIndex]],
+	NSAssert([[self loadedNodes] count] > currentNodeIndex 
+		&& ![[NSNull null] isEqual: [[self loadedNodes] objectAtIndex: currentNodeIndex]],
 		@"Record redone to is cached");
 
 	CORevision *currentRevision = [[[self persistentRoot] store] redoOnTrackUUID: [self UUID]];
@@ -355,15 +355,15 @@
 	COTrackNode *newNode = [COTrackNode nodeWithID: [revision commitNodeID] revision: revision onTrack: self];
 	/* At this point, revision is the max revision for the commit track */
 	BOOL isFirstRevision = ([revision baseRevision] == nil);
-	BOOL isTipNodeCached = (isFirstRevision || [[[[self cachedNodes] lastObject] revision] isEqual: [revision baseRevision]]);
+	BOOL isTipNodeCached = (isFirstRevision || [[[[self loadedNodes] lastObject] revision] isEqual: [revision baseRevision]]);
 
 	if (isTipNodeCached == NO)
 	{
 		[self reloadNodes];
 	}
-	[[self cachedNodes] addObject: newNode];
+	[[self loadedNodes] addObject: newNode];
 
-	currentNodeIndex = [[self cachedNodes] count] - 1;
+	currentNodeIndex = [[self loadedNodes] count] - 1;
 
 	[self didUpdate];
 }

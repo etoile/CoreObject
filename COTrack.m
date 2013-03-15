@@ -32,7 +32,7 @@
 - (id)init
 {
 	SUPERINIT;
-	cachedNodes =  [[NSMutableArray alloc] init]; 
+	loadedNodes =  [[NSMutableArray alloc] init]; 
 	currentNodeIndex = NSNotFound;
 	return self;	
 }
@@ -42,55 +42,42 @@
 	return [NSSet set];
 }
 
-- (COTrackNode *)currentNode
-{
-	/* Force node recache */
-	NSArray *nodes = [self cachedNodes];
-
-	return (currentNodeIndex != NSNotFound ? [nodes objectAtIndex: currentNodeIndex] : nil);
-}
-
-- (void)setCurrentNode: (COTrackNode *)node
-{
-
-}
-
 - (BOOL)needsReloadNodes: (NSArray *)currentLoadedNodes
 {
 	return [currentLoadedNodes isEmpty];
 }
 
-- (NSMutableArray *)cachedNodes
+- (NSMutableArray *)loadedNodes
 {
-	if ([self needsReloadNodes: cachedNodes] && isLoading == NO)
+	if ([self needsReloadNodes: loadedNodes] && isLoading == NO)
 	{
 		isLoading = YES;
 		[self reloadNodes];
 		isLoading = NO;
 	}
-	return cachedNodes;
+	return loadedNodes;
 }
 
-- (NSArray *)provideNodes
+- (NSArray *)provideNodesAndCurrentNodeIndex: (NSUInteger *)aNodeIndex
 {
 	return [NSArray array];
 }
 
 - (void)reloadNodes
 {
-	[cachedNodes setArray: [self provideNodesAndCurrentNodeIndex: &currentNodeIndex]];
-	[self didRecacheNodes];
+	[loadedNodes setArray: [self provideNodesAndCurrentNodeIndex: &currentNodeIndex]];
+	[self didReloadNodes];
 }
 
-- (void)didRecacheNodes
+- (void)didReloadNodes
 {
-
+	
 }
 
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back
 {
-	NSInteger nodeIndex = [[self cachedNodes] indexOfObject: aNode];
-
+	NSInteger nodeIndex = [[self loadedNodes] indexOfObject: aNode];
+	
 	if (nodeIndex == NSNotFound)
 	{
 		[NSException raise: NSInvalidArgumentException
@@ -104,19 +91,32 @@
 	{
 		nodeIndex++;
 	}
-
-	BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= [[self cachedNodes] count]);
-
+	
+	BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= [[self loadedNodes] count]);
+	
 	if (hasNoPreviousOrNextNode)
 	{
 		return nil;
 	}
-	return [[self cachedNodes] objectAtIndex: nodeIndex];
+	return [[self loadedNodes] objectAtIndex: nodeIndex];
 }
 
 - (COTrackNode *)makeNodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision
 {
 	return [COTrackNode nodeWithID: aNodeID revision: aRevision onTrack: self];
+}
+
+- (COTrackNode *)currentNode
+{
+	/* Force node recache */
+	NSArray *nodes = [self loadedNodes];
+
+	return (currentNodeIndex != NSNotFound ? [nodes objectAtIndex: currentNodeIndex] : nil);
+}
+
+- (void)setCurrentNode: (COTrackNode *)node
+{
+
 }
 
 - (void)didUpdate
@@ -176,12 +176,12 @@
 
 - (id) content
 {
-	return 	[self cachedNodes];
+	return 	[self loadedNodes];
 }
 
 - (NSArray *) contentArray
 {
-	return [NSArray arrayWithArray: [self cachedNodes]];
+	return [NSArray arrayWithArray: [self loadedNodes]];
 }
 
 @end

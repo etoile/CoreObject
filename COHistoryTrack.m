@@ -169,28 +169,28 @@
 	return [store revisionsForObjectUUIDs: rootAndInnerObjectUUIDs];
 }
 
-- (NSArray *)cachedNodes
+- (NSArray *)loadedNodes
 {
 	BOOL recache = (revNumberAtCacheTime != [[[trackObject persistentRoot] store] latestRevisionNumber]);
 
 	if (recache)
 	{
 		// TODO: Recache only the new revisions if possible
-		[[self cachedNodes] removeAllObjects];
+		[[self loadedNodes] removeAllObjects];
 
 		for (CORevision *rev in [self revisionsOnTrack])
 		{
-			[[self cachedNodes] addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
+			[[self loadedNodes] addObject: [COTrackNode nodeWithRevision: rev onTrack: self]];
 		}
 
 		revNumberAtCacheTime = [[[trackObject persistentRoot] store] latestRevisionNumber];
 	}
-	return [self cachedNodes];
+	return [self loadedNodes];
 }
 
 - (NSArray *)nodes
 {
-	return [self cachedNodes];
+	return [self loadedNodes];
 }
 
 - (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back

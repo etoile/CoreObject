@@ -270,6 +270,8 @@
 				                   persistentRootUUID: rootUUID
 				                  isNewPersistentRoot: NO];
 
+	UKObjectsEqual(c3, [store currentRevisionForTrackUUID: [store UUID]]);
+	
 	UKTrue([store isTrackUUID: trackUUID]);
 	// FIXME: UKTrue([store isTrackUUID: branchUUID]);
 	UKObjectsEqual(c2, [store currentRevisionForTrackUUID: trackUUID]);

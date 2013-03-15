@@ -31,7 +31,7 @@
 @interface COTrack : NSObject <ETCollection, COTrackNodeBuilder>
 {
 	@private
-	NSMutableArray *cachedNodes;
+	NSMutableArray *loadedNodes;
 	BOOL isLoading;
 	@protected
 	// TODO: Would be better to make the ivar below private rather than 
@@ -56,7 +56,67 @@
  */
 @property (readonly, nonatomic) NSSet *trackedObjects;
 
-/** @taskunit Track Nodes */
+/** @taskunit Loading and Providing Track Nodes */
+
+/**
+ * <override-never />
+ * Returns the loaded track nodes.
+ *
+ * The loaded nodes can be all the nodes on the track or a subset.
+ *
+ * This method is restricted to subclassing purpose. For other purposes, you 
+ * must use -[ETCollection content] or -[ETCollection contentArray].
+ *
+ * Subclasses are allowed to mutate the returned collection.
+ *
+ * For a new track, returns an empty array.
+ */
+- (NSMutableArray *)loadedNodes;
+/**
+ * <override-subclass />
+ * Returns track nodes that encloses the current node on the track.
+ *
+ * The returned track node range is undetermined. The returned range might vary
+ * to get a more responsive UI (e.g. browsing a track content).
+ *
+ * The current node index among these nodes is returned through aNodeIndex.
+ */
+- (NSArray *)provideNodesAndCurrentNodeIndex: (NSUInteger *)aNodeIndex;
+/**
+ * <override-never />
+ * Asks the receiver to discard the loaded track nodes and get the latest nodes 
+ * using -provideNodesAndCurrentNodeIndex:.
+ *
+ * The track nodes are usually provided by the store.
+ */
+- (void)reloadNodes;
+/**
+ * <override-dummy />
+ * Tells the receiver that the latest track nodes have been loaded using 
+ * -reloadNodes.
+ */
+- (void)didReloadNodes;
+/**
+ * <override-subclass />
+ * Returns the node that follows aNode on the track when back is NO, otherwise
+ * when back is YES, returns the node that precedes aNode.
+ *
+ * Default implementation returns nil.
+ */
+- (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back;
+/**
+ * Returns a new autoreleased track node based on the given node ID and revision.
+ *
+ * Default implementation returns a COTrackNode instance.
+ *
+ * Can be overriden to build objects from a COTrackNode subclass.
+ *
+ * See COTrackNodeBuilder and 
+ * -[COStore nodesForTrackUUID:nodeBuilder:currentNodeIndex:backwardLimit:forwardLimit:].
+ */
+- (COTrackNode *)makeNodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision;
+
+/** @taskunit Changing Track Nodes */
 
 /**
  * Returns the current track node that reflects the current position in the 
@@ -68,22 +128,6 @@
  * Sets the current position in the the track timeline to match the track node.
  */
 - (void)setCurrentNode: (COTrackNode *)node;
-/**
- * Returns the cached track nodes. 
- */
-- (NSMutableArray *)cachedNodes;
-- (NSArray *)provideNodesAndCurrentNodeIndex: (NSUInteger *)aNodeIndex;
-- (void)reloadNodes;
-- (void)didRecacheNodes;
-/**
- * <override-subclass />
- * Returns the node that follows aNode on the track when back is NO, otherwise  
- * when back is YES, returns the node that precedes aNode.
- *
- * Default implementation returns nil.
- */
-- (COTrackNode *)nextNodeOnTrackFrom: (COTrackNode *)aNode backwards: (BOOL)back;
-- (COTrackNode *)makeNodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision;
 /**
  * Posts ETSourceDidUpdateNotification.
  *
