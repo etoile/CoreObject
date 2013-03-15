@@ -173,7 +173,6 @@
 
 // TODO: Implement - (void)testBranchCreationFromBranch
 
-#if 0
 - (void)testBranchSwitch
 {
 	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
@@ -182,11 +181,13 @@
 	
 	CORevision *rev1 = [[object persistentRoot] commit];
 	
-	COCommitTrack *commitTrack = [object commitTrack];
+	COCommitTrack *commitTrack = [[object commitTrack] retain];
 	COCommitTrack *branch = [commitTrack makeBranchWithLabel: @"Sandbox"];
 	/* The branch creation has created a new revision */
 	CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [[ctx store] latestRevisionNumber]];
 	// FIXME: CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [ctx latestRevisionNumber]];
+	
+	UKObjectKindOf(rev2, [store currentRevisionForTrackUUID: [store UUID]]);
 
 	/* Switch to the Sandbox branch */
 
@@ -197,8 +198,8 @@
 	UKObjectsEqual([object persistentRoot], [commitTrack persistentRoot]);
 
 	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
-	UKObjectsEqual(rev2, [[branch currentNode] revision]);
-	UKObjectsEqual(rev2, [object revision]);
+	UKObjectsEqual(rev1, [[branch currentNode] revision]);
+	UKObjectsEqual(rev1, [object revision]);
 	
 	/* Commit some changes in the Sandbox branch */
 	
@@ -216,9 +217,9 @@
 	
 	/* Switch back to the main branch */
 	
-	[[object persistentRoot] setCommitTrack: branch];
+	[[object persistentRoot] setCommitTrack: commitTrack];
 
-	UKObjectsEqual([object commitTrack],commitTrack);
+	UKObjectsEqual([object commitTrack], commitTrack);
 	UKObjectsEqual([object persistentRoot], [branch persistentRoot]);
 	UKObjectsEqual([object persistentRoot], [commitTrack persistentRoot]);
 	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
@@ -226,7 +227,8 @@
 	UKObjectsEqual(rev1, [object revision]);
 
 	UKObjectsEqual(@"Untitled", [object valueForProperty: @"label"]);
+
+	[commitTrack release];
 }
-#endif
 
 @end
