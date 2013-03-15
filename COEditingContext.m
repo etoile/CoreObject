@@ -448,6 +448,11 @@ store by other processes. */
 #endif
 }
 
+- (void)didCommitRevision: (CORevision *)aRevision
+{
+	_latestRevisionNumber = [aRevision revisionNumber];
+}
+
 - (void)didFailValidationWithError: (COError *)anError
 {
 	ASSIGN(_error, anError);
@@ -491,7 +496,7 @@ store by other processes. */
 	for (COPersistentRoot *ctxt in persistentRoots)
 	{
 		[revisions addObject: [ctxt saveCommitWithMetadata: metadata]];
-		_latestRevisionNumber = [[revisions lastObject] revisionNumber];
+		[self didCommitRevision: [revisions lastObject]];
 	}
 	
 	/* Record persistent root deletions at the store level */

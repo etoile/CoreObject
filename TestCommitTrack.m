@@ -149,8 +149,7 @@
 	COCommitTrack *commitTrack = [object commitTrack];
 	COCommitTrack *branch = [commitTrack makeBranchWithLabel: @"Sandbox"];
 	/* The branch creation has created a new revision */
-	CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [[ctx store] latestRevisionNumber]];
-	// FXIME: CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [ctx latestRevisionNumber]];
+	CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [ctx latestRevisionNumber]];
 	
 	UKNotNil(branch);
 	UKObjectsNotEqual([branch UUID], [commitTrack UUID]);
@@ -184,8 +183,7 @@
 	COCommitTrack *commitTrack = [[object commitTrack] retain];
 	COCommitTrack *branch = [commitTrack makeBranchWithLabel: @"Sandbox"];
 	/* The branch creation has created a new revision */
-	CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [[ctx store] latestRevisionNumber]];
-	// FIXME: CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [ctx latestRevisionNumber]];
+	CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [ctx latestRevisionNumber]];
 	
 	UKObjectKindOf(rev2, [store currentRevisionForTrackUUID: [store UUID]]);
 

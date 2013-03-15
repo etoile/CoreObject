@@ -98,14 +98,15 @@
 	NILARG_EXCEPTION_TEST(aRev);
 
 	ETUUID *branchUUID = [ETUUID UUID];
-	
-	[[[self persistentRoot] store] createCommitTrackWithUUID: branchUUID
-														name: aLabel
-	                                          parentRevision: aRev
-	                                          rootObjectUUID: [[self persistentRoot] rootObjectUUID]
-	                                      persistentRootUUID: [[self persistentRoot] persistentRootUUID]
-	                                     isNewPersistentRoot: NO];
-	
+	COStore *store = [[self persistentRoot] store];
+	CORevision *rev = [store createCommitTrackWithUUID: branchUUID
+	                                              name: aLabel
+	                                    parentRevision: aRev
+	                                    rootObjectUUID: [[self persistentRoot] rootObjectUUID]
+	                                persistentRootUUID: [[self persistentRoot] persistentRootUUID]
+	                               isNewPersistentRoot: NO];
+
+	[[[self persistentRoot] parentContext] didCommitRevision: rev];
 	
 	return [[[COCommitTrack alloc] initWithUUID: branchUUID
 								 editingContext: [self persistentRoot]] autorelease];
@@ -117,13 +118,15 @@
 	NILARG_EXCEPTION_TEST(aRev);
 	
 	ETUUID *branchUUID = [ETUUID UUID];
-	
-	[[[self persistentRoot] store] createCommitTrackWithUUID: branchUUID
-														name: nil
-	                                          parentRevision: aRev
-	                                          rootObjectUUID: [[self persistentRoot] rootObjectUUID]
-	                                      persistentRootUUID: [ETUUID UUID]
-	                                     isNewPersistentRoot: YES];
+	COStore *store = [[self persistentRoot] store];
+	CORevision *rev = [store createCommitTrackWithUUID: branchUUID
+	                                              name: nil
+	                                    parentRevision: aRev
+	                                    rootObjectUUID: [[self persistentRoot] rootObjectUUID]
+	                                persistentRootUUID: [ETUUID UUID]
+	                               isNewPersistentRoot: YES];
+
+	[[[self persistentRoot] parentContext] didCommitRevision: rev];
 	
 	return [[[COCommitTrack alloc] initWithUUID: branchUUID
 								 editingContext: [self persistentRoot]] autorelease];

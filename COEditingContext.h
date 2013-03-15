@@ -94,7 +94,7 @@
  */
 - (COStore *)store;
 /**
- * Returns the latest revision number which might be the same than the one 
+ * Returns the latest revision number which might not be the same than the one 
  * returned by -[COStore latestRevisionNumber], when multiple editing contexts 
  * are accessing the store simultaneously.
  */
@@ -274,6 +274,17 @@
  */
 - (NSArray *)commitWithType: (NSString *)type
            shortDescription: (NSString *)shortDescription;
+/**
+ * <override-never />
+ * Tells the receiver that -[COStore finishCommit] just returned.
+ *
+ * You shouldn't use this method usually. Commit methods automatically calls 
+ * this method (for both COEditingContext and COPersistentRoot API). 
+ *
+ * If your code uses -[COStore finishCommit] directly (e.g. in a COTrack 
+ * subclass), you have to call this method explicitly.
+ */
+- (void)didCommitRevision: (CORevision *)aRevision;
 /** 
  * Returns the last commit error, usually involving one or several validation 
  * issues.
