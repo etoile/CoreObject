@@ -4,9 +4,6 @@ TODO
 First Release
 -------------
 
-- Refactor COStore into an abstract class and a COSQLStore subclass
-- Switch from FMDB to SQLClient
-- Rework COStore internal track representation to support branch and cheap copy
 - Extend COCommitTrack API to support branches and merging revisions accross tracks
 - Rewrite COHistoryTrack
 - Work out clear and well documented object copy model easy to extend in COObject subclasses (see COObject and COEditingContext copy methods)
@@ -22,6 +19,7 @@ First Release
 Future Work
 -----------
 
+- Switch from FMDB to an SQL abstraction backend 
 - Improve Diff API and code (probably reuse heavily NestedVersioning Diff implementation)
 - Improve Merging (move detection and custom attributed string merger)
 - Extract COCommitTrack node caching into a generic COCursor class
