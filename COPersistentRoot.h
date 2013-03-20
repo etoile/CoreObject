@@ -114,6 +114,17 @@
  * The persistent root revision.
  *
  * This revision applies to the root object and inner objects. See -[COObject revision].
+ *
+ * The revision is usually equal to 
+ * <code>[[self commitTrack] currentNode] revision]</code> but this doesn't hold 
+ * in the following cases:
+ *
+ * <list>
+ * <item>A max revision has been set on the parent context (as a result, the 
+ * revision is less than or equal to -[COEditingContext maxRevision]).</item>
+ * <item>The persistent root is not loaded or has been unloaded (the revision is 
+ * nil).</item>
+ * </list>
  */
 @property (nonatomic, retain) CORevision *revision;
 /**
@@ -158,7 +169,9 @@
  * Returns the object identified by the UUID, by loading it to the given
  * revision when no instance managed by the receiver is present in memory.
  *
- * When the UUID doesn't correspond to a persistent object, returns nil.
+ * When the UUID isn't bound to a persistent object owned by the persistent root, 
+ * returns nil (unless it is a commit track UUID or another persistent root UUID, 
+ * but these are special cases discussed in the last paragraphs).
  *
  * For a nil revision, the object is loaded is loaded at its last revision.
  *
@@ -167,6 +180,18 @@
  *
  * When the object is already loaded, and its revision is not the requested
  * revision, raises an invalid argument exception.
+ *
+ * When the UUID is a persistent root UUID, the root object of the persistent 
+ * root is returned (the persistent root is loaded if needed).
+ *
+ * When the UUID is a branch UUID, the persistent root for the branch is looked 
+ * up. If the persistent root is not available, it is loaded for the requested 
+ * branch. If the persistent root is already loaded, a branch mismatch is 
+ * possible between the current branch UUID and the given branch UUID. For a 
+ * mismatch, an exception is raised, otherwise the root object of the persistent 
+ * root is returned.<br />
+ * For a more detailed discussion about branching issues, see COCommitTrack 
+ * documentation.
  *
  * See also -loadedObjectForUUID:.
  */
@@ -283,8 +308,8 @@
 /** @taskunit Object Insertion */
 
 /**
- * Creates a new instance of the given entity name (assigning the instance a new UUID)
- * and returns the object.
+ * Creates a new instance of the given entity name (assigning the instance a new 
+ * UUID) and returns the object.
  *
  * The entity name must correspond to the COObject class or a subclass. Thereby
  * returned objects will be COObject class or subclass instances in all cases.
@@ -328,6 +353,10 @@
 
 /** @taskunit Framework Private */
 
+/**
+ * <init />
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (id)initWithPersistentRootUUID: (ETUUID *)aUUID
 				 commitTrackUUID: (ETUUID *)aTrackUUID
 						revision: (CORevision *)aRevision
@@ -342,8 +371,12 @@
 - (void)registerObject: (COObject *)object;
 /**
  * This method is only exposed to be used internally by CoreObject.
+ *
+ * See -objectWithUUID:entityName:.
  */
-- (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision;
+- (COObject *)objectWithUUID: (ETUUID *)uuid
+                  entityName: (NSString *)name
+                  atRevision: (CORevision *)revision;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -358,14 +391,14 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
- * Inserts the object into the context by checking the relationship consistency
- * if requested.
+ * Inserts the object into the persistent root by checking the relationship 
+ * consistency if requested.
  *
- * When the object is not yet persistent, it is inserted into the context and
- * the new UUID hint is ignored.
+ * When the object is not yet persistent, it is inserted into the persistent 
+ * root and the new UUID hint is ignored.
  *
  * When the object is already persistent, based on the new UUID hint, the new
- * object inserted into the context will be:
+ * object inserted into the persistent root will be:
  *
  * <deflist>
  * <item>newUUID is YES</item><desc>a copy (new instance and UUID)</desc>
@@ -376,7 +409,7 @@
  * For a persistent object, multiples instance can exist in the same process,
  * one per editing context.
  *
- * You can pass an object that belongs to another context to this method.
+ * You can pass an object that belongs to another editing context to this method.
  */
 - (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency newUUID: (BOOL)newUUID;
 /**

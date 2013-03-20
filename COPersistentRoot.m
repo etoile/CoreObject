@@ -20,21 +20,6 @@
 @synthesize persistentRootUUID = _persistentRootUUID, parentContext = _parentContext,
 	commitTrack = _commitTrack, rootObject = _rootObject, revision = _revision;
 
-- (CORevision *)loadableRevisionForRevision: (CORevision *)aRevision
-{
-	int64_t maxRevNumber = [_parentContext maxRevisionNumber];
-	BOOL hasMaxRev = (maxRevNumber > 0);
-	int64_t revNumber = (aRevision != nil ? [aRevision revisionNumber] : maxRevNumber);
-	
-	if (hasMaxRev && revNumber > maxRevNumber)
-	{
-		revNumber = maxRevNumber;
-	}
-	
-	return [[self store] maxRevision: revNumber
-	              forCommitTrackUUID: [[self commitTrack] UUID]];
-}
-
 - (id)initWithPersistentRootUUID: (ETUUID *)aUUID
 				 commitTrackUUID: (ETUUID *)aTrackUUID
                         revision: (CORevision *)aRevision
@@ -157,10 +142,12 @@
 	if (desc == nil)
 	{
 		NSString *name = [self entityNameForObjectUUID: uuid];
+	
 		if (name == nil)
 		{
-			//[NSException raise: NSGenericException format: @"Failed to find an entity name for %@", uuid];
-			//NSLog(@"WARNING: -[COEditingContext objectWithUUID:entityName:] failed to find an entity name for %@ (probably, the requested object does not exist)", uuid);
+			[NSException raise: NSInvalidArgumentException
+			            format: @"Failed to find an entity name for %@, the "
+			                     "requested object doesn't exist in %@.", uuid, [self store]];
 			return nil;
 		}
 		desc = [repo descriptionForName: name];
@@ -171,37 +158,22 @@
 - (COObject *)loadedObjectForUUID: (ETUUID *)uuid revision: (CORevision *)revision
 {
 	COObject *obj = [self loadedObjectForUUID: uuid];
-	
-	if (obj != nil && revision != nil)
+	BOOL hasRevisionMismatch = (obj != nil && revision != nil && ![[obj revision] isEqual: revision]);
+
+	if (hasRevisionMismatch)
 	{
-		CORevision *existingRevision = [obj revision];
-		
-		if (![existingRevision isEqual: revision])
-		{
-			[NSException raise: NSInternalInconsistencyException
-			            format: @"Object %@ requested at revision %@ but already loaded at revision %@",
-			                    obj, revision, existingRevision];
-		}
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"Object %@ requested at revision %@ but already loaded at %@",
+		                    obj, revision, [obj revision]];
 	}
 	return obj;
 }
 
-// NOTE: When this method is called, the root object might not be loaded.
-- (void)cacheLoadedRevisionForRevision: (CORevision *)revision
-{
-	if ([self revision] != nil)
-		return;
-
-	ETAssert([self rootObjectUUID] != nil);
-
-	[self setRevision: [self loadableRevisionForRevision: revision]];
-}
-
-/** 
+/**
  * To prevent branch mismatch, the best approach in document editors is to use
- * a dedicate editing context per document. 
+ * a dedicate editing context per document.
  *
- * COCustomTrack can then use a delegate to look up the context targeted by 
+ * COCustomTrack can then use a delegate to look up the context targeted by
  * undo/redo operations e.g. editingContextForPersistentRootUUID:.
  */
 - (COObject *)rootObjectForPersistentRootWithUUID: (ETUUID *)aUUID
@@ -226,7 +198,8 @@
 		return nil;
 
 	COPersistentRoot *persistentRoot = [_parentContext persistentRootForUUID: persistentRootUUID];
-	BOOL hasBranchMismatch = (persistentRoot != nil && [trackUUID isEqual: [[persistentRoot commitTrack] UUID]] == NO);
+	BOOL hasBranchMismatch =
+		(persistentRoot != nil && [trackUUID isEqual: [[persistentRoot commitTrack] UUID]] == NO);
 
 	if (hasBranchMismatch)
 	{
@@ -249,6 +222,22 @@
 	NSSet *allInnerObjectUUIDs =
 		[[_parentContext store] objectUUIDsForCommitTrackUUID: [[self commitTrack] UUID]];
 	return [allInnerObjectUUIDs containsObject: aUUID];
+}
+
+// TODO: Write tests ensuring -[COEditingContext maxRevision] forces past revision use.
+- (CORevision *)loadableRevisionForRevision: (CORevision *)aRevision
+{
+	int64_t maxRevNumber = [_parentContext maxRevisionNumber];
+	BOOL hasMaxRev = (maxRevNumber > 0);
+	int64_t revNumber = (aRevision != nil ? [aRevision revisionNumber] : maxRevNumber);
+	
+	if (hasMaxRev && revNumber > maxRevNumber)
+	{
+		revNumber = maxRevNumber;
+	}
+	
+	return [[self store] maxRevision: revNumber
+	              forCommitTrackUUID: [[self commitTrack] UUID]];
 }
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision
@@ -287,7 +276,8 @@
 			                    isFault: YES];
 	[self cacheLoadedObject: obj];
 	[obj release];
-	[self cacheLoadedRevisionForRevision: revision];
+	[self setRevision: [self loadableRevisionForRevision: revision]];
+	ETAssert([self rootObjectUUID] != nil);
 
 	return obj;
 }
@@ -448,9 +438,7 @@
 	return [self insertObject: sourceObject withRelationshipConsistency: YES newUUID: YES];
 }
 
-/**
- * Helper method for -insertObject:
- */
+// TODO: Move it into a ETCopier subclass and rewrite
 static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, BOOL consistency, BOOL newUUID)
 {
 	if ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]])
@@ -571,7 +559,6 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	return [self commitWithMetadata: D(shortDescription, @"shortDescription", commitType, @"type")];
 }
 
-
 - (CORevision *)commitWithMetadata: (NSDictionary *)metadata
 {
 	NSArray *revs = [_parentContext commitWithMetadata: metadata
@@ -582,10 +569,10 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 
 - (CORevision *)saveCommitWithMetadata: (NSDictionary *)metadata
 {
-	NSParameterAssert(_insertedObjects != nil);
-	NSParameterAssert(_updatedPropertiesByObject != nil);
+	ETAssert(_insertedObjects != nil);
+	ETAssert(_updatedPropertiesByObject != nil);
+	ETAssert([[self rootObject] isRoot]);
 
-	// TODO: ETAssert([rootObject isRoot]);
 	// TODO: We should add the deleted object UUIDs to the set below
 	NSSet *committedObjects = 
 		[_insertedObjects setByAddingObjectsFromArray: [_updatedPropertiesByObject allKeys]];
@@ -618,12 +605,12 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 
 		if ([_insertedObjects containsObject: obj])
 		{
-			// for the first commit, commit all property values
+			/* For the first commit, commit all property values */
 			propertiesToCommit = persistentProperties;
 		}
 		else
 		{
-			// otherwise just damaged values
+			/* Otherwise just damaged values */
 			NSArray *updatedProperties = [_updatedPropertiesByObject objectForKey: obj];
 
 			propertiesToCommit = [NSMutableSet setWithArray: updatedProperties];
@@ -702,22 +689,16 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	}
 }
 
-// FIXME: Probably need to turn off relationship consistency around loading.
 - (void)loadObject: (COObject *)obj atRevision: (CORevision *)aRevision
 {
-	CORevision *loadedRev = aRevision;
+	CORevision *loadedRev = (aRevision != nil ? aRevision : [obj revision]);
+	ETAssert(loadedRev != nil);
 	ETUUID *objUUID = [obj UUID];
 	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj persistentPropertyNames]];
 
 	obj->_isIgnoringDamageNotifications = YES;
 	[obj setIgnoringRelationshipConsistency: YES];
 	
-	if (loadedRev == nil)
-	{
-		loadedRev = [obj revision];
-	}
-	ETAssert(loadedRev != nil);
-
 	//NSLog(@"Load object %@ at %@", objUUID, loadedRev);
 	//NSLog(@"Fetch properties %@", propertiesToFetch);
 
