@@ -31,6 +31,7 @@
 	NSString *label;
 	BOOL isMainBranch;
 	BOOL isCopy;
+	BOOL isLoaded;
 }
 
 - (id)initWithUUID: (ETUUID *)aUUID editingContext: (COPersistentRoot *)aContext;

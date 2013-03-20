@@ -170,8 +170,6 @@
 	UKObjectsSame(commitTrack, [[object persistentRoot] commitTrack]);
 }
 
-// TODO: Implement - (void)testBranchCreationFromBranch
-
 - (void)testBranchSwitch
 {
 	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
@@ -227,6 +225,84 @@
 	UKObjectsEqual(@"Untitled", [object valueForProperty: @"label"]);
 
 	[commitTrack release];
+}
+
+- (NSArray *)revisionsForStoreTrack
+{
+	return [store nodesForTrackUUID: [store UUID] nodeBuilder: (id <COTrackNodeBuilder>)store
+		currentNodeIndex: NULL backwardLimit: NSUIntegerMax forwardLimit: NSUIntegerMax];
+}
+
+- (void)testBranchFromBranch
+{
+	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
+	COCommitTrack *initialTrack = [[object commitTrack] retain];
+	
+	UKTrue([[initialTrack loadedNodes] isEmpty]);
+
+	/* Commit some initial changes in the main branch */
+	
+	[object setValue: @"Red" forProperty: @"label"];
+	
+	CORevision *rev1 = [[object persistentRoot] commit];
+	
+	[object setValue: @"Blue" forProperty: @"label"];
+	
+	CORevision *rev2 = [[object persistentRoot] commit];
+
+	UKObjectsEqual(A(rev1, rev2), [[[initialTrack loadedNodes] mappedCollection] revision]);
+
+	/* Create branch 1 */
+	
+	COCommitTrack *branch1 = [initialTrack makeBranchWithLabel: @"Branch 1"];
+	CORevision *rev3 = [store revisionWithRevisionNumber: [ctx latestRevisionNumber]];
+
+	UKObjectsEqual(A(rev1, rev2), [[[branch1 loadedNodes] mappedCollection] revision]);
+
+	/* Switch to branch 1 */
+	
+	[[object persistentRoot] setCommitTrack: branch1]; //rev4 (not yet the case)
+	
+	/* Commit some  changes in branch 1 */
+	
+	[object setValue: @"Todo" forProperty: @"label"];
+	
+	CORevision *rev5 = [[object persistentRoot] commit];
+	
+	[object setValue: @"Tidi" forProperty: @"label"];
+	
+	CORevision *rev6 = [[object persistentRoot] commit];
+
+	UKObjectsEqual(A(rev1, rev2, rev5, rev6), [[[branch1 loadedNodes] mappedCollection] revision]);
+	
+	/* Create branch2 */
+	
+	COCommitTrack *branch2 = [branch1 makeBranchWithLabel: @"Branch 2" atRevision: rev5];
+	CORevision *rev7 = [store revisionWithRevisionNumber: [ctx latestRevisionNumber]];
+	
+	/* Switch to branch 2 */
+	
+	[[object persistentRoot] setCommitTrack: branch2]; //rev8 (not yet the case)
+	
+	UKObjectsEqual(rev2, [store currentRevisionForTrackUUID: [initialTrack UUID]]);
+	UKObjectsEqual(rev6, [store currentRevisionForTrackUUID: [branch1 UUID]]);
+	UKObjectsEqual(rev5, [store currentRevisionForTrackUUID: [branch2 UUID]]);
+	
+	NSArray *parentTrackUUIDs = A([initialTrack UUID], [branch1 UUID]);
+	
+	UKObjectsEqual(parentTrackUUIDs, [store parentTrackUUIDsForCommitTrackUUID: [branch2 UUID]]);
+	UKObjectsEqual(A(rev1, rev2, rev5), [[[branch2 loadedNodes] mappedCollection] revision]);
+	
+	[object setValue: @"Boum" forProperty: @"label"];
+	
+	CORevision *rev9 = [[object persistentRoot] commit];
+	
+	[object setValue: @"Bam" forProperty: @"label"];
+	
+	CORevision *rev10 = [[object persistentRoot] commit];
+	
+	UKObjectsEqual(A(rev1, rev2, rev5, rev9, rev10), [[[branch2 loadedNodes] mappedCollection] revision]);
+	UKObjectsEqual(A(rev3, rev7), [self revisionsForStoreTrack]);
 }
 
 @end

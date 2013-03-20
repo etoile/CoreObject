@@ -275,7 +275,7 @@
 	UKTrue([store isTrackUUID: trackUUID]);
 	// FIXME: UKTrue([store isTrackUUID: branchUUID]);
 	UKObjectsEqual(c2, [store currentRevisionForTrackUUID: trackUUID]);
-	UKObjectsEqual(c2, [store currentRevisionForTrackUUID: branchUUID]);
+	UKObjectsEqual(c1, [store currentRevisionForTrackUUID: branchUUID]);
 	UKNil([store parentRevisionForCommitTrackUUID: trackUUID]);
 	UKObjectsEqual(c1, [store parentRevisionForCommitTrackUUID: branchUUID]);
 	UKObjectsEqual(rootUUID, [store persistentRootUUIDForCommitTrackUUID: trackUUID]);

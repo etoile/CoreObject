@@ -8,7 +8,19 @@
 - (id)makeNodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision;
 @end
 
-
+/** 
+ * Two track nodes can point to the same revision, yet have different previous
+ * nodes and/or next nodes. In other words, base revision and previous track 
+ * node doesn't represent the same concept. 
+ * For example… Suppose a revision C is added to a commit track. The current node 
+ * now points to it and the previous node to its base revision B. For commit 
+ * tracks, base revision and previous track node represents the same idea.
+ * Now suppose the same revision C is added to a custom track (that doesn't 
+ * contain B or has additional revisions following B). For the commit track,  
+ * the current node and previous node remains the same. However for the 
+ * custom track, the current node is the same than commit track current node, 
+ * but the previous node doesn't point to the same revision B.
+ */
 @interface COStore : NSObject
 {
 	@package

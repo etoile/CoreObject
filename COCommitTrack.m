@@ -217,6 +217,11 @@
 	RELEASE(oldCurrentNode);
 }
 
+- (BOOL)needsReloadNodes: (NSArray *)currentLoadedNodes
+{
+	return (isLoaded == NO);
+}
+
 - (NSArray *)allNodesAndCurrentNodeIndex: (NSUInteger *)aNodeIndex
 {
 	// NOTE: For a new track, -[COSQLStore isTrackUUID:] would return NO
@@ -236,6 +241,8 @@
 
 - (void)didReloadNodes
 {
+	isLoaded = YES;
+
 	if ([self currentNode] == nil)
 		return;
 	
@@ -358,14 +365,22 @@
 	COTrackNode *newNode = [COTrackNode nodeWithID: [revision commitNodeID] revision: revision onTrack: self];
 	/* At this point, revision is the max revision for the commit track */
 	BOOL isFirstRevision = ([revision baseRevision] == nil);
-	BOOL isTipNodeCached = (isFirstRevision || [[[[self loadedNodes] lastObject] revision] isEqual: [revision baseRevision]]);
+
+	/* Prevent -loadedNodes to access the store */
+	if (isFirstRevision)
+	{
+		isLoaded = YES;
+	}
+
+	BOOL isTipNodeCached = (isFirstRevision
+		|| [[[[self loadedNodes] lastObject] revision] isEqual: [revision baseRevision]]);
 
 	if (isTipNodeCached == NO)
 	{
 		[self reloadNodes];
 	}
-	[[self loadedNodes] addObject: newNode];
 
+	[[self loadedNodes] addObject: newNode];
 	currentNodeIndex = [[self loadedNodes] count] - 1;
 
 	[self didUpdate];

@@ -56,7 +56,7 @@
  * Returns the track node ID that resulted from the revision commit.
  *
  * This is first track node ID that was associated to the revision. Through 
- * Undo/Redo use, new node IDs might be associated, but the node ID from the 
+ * custom track use, new node IDs might be associated, but the node ID from the 
  * commit time doesn't change.
  *
  * For now, the node ID is set just for the revision of -[COStore finishCommit].

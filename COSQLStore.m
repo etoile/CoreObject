@@ -1021,21 +1021,21 @@ void CHECK(id db)
 
 		/* Fall back on the parent track content in case the track table doesn't 
 		   exist yet for the commit track (no revisions yet) */
-		ETUUID *parentTrackUUID = [[self parentRevisionForCommitTrackUUID: aTrackUUID] trackUUID];
+		CORevision *parentRev = [self parentRevisionForCommitTrackUUID: aTrackUUID];
+		ETUUID *parentTrackUUID = [parentRev trackUUID];
 
 		if (parentTrackUUID == nil)
 			return nodes;
 		
-		return [self nodesForTrackUUID: parentTrackUUID
-		                   nodeBuilder: aNodeBuilder
-		              currentNodeIndex: currentNodeIndex
-		                 backwardLimit: backward
-		                  forwardLimit: forward];
+		revision = parentRev;
+		currentNodeID = [parentRev commitNodeID];
+		prevNodeID = [[parentRev baseRevision] commitNodeID];
+		/* Same as setting forward argument to 0 */
+		nextNodeID = NSIntegerMax;
+		ETAssert(currentNodeID != NSIntegerMax && prevNodeID != NSIntegerMax);
 	}
-	else
-	{
-		[nodes addObject: [aNodeBuilder makeNodeWithID: currentNodeID revision: revision]];
-	}
+
+	[nodes addObject: [aNodeBuilder makeNodeWithID: currentNodeID revision: revision]];
 
 	/* Retrieve the backward revisions along the track (starting at the middle node) */
 

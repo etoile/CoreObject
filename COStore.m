@@ -244,7 +244,7 @@
 	// TODO: Optimize using a single query if needed
 	while ((trackUUID = [[self parentRevisionForCommitTrackUUID: trackUUID] trackUUID]) != nil)
 	{
-		[UUIDs addObject: trackUUID];
+		[UUIDs insertObject: trackUUID atIndex: 0];
 	}
 	
 	return UUIDs;

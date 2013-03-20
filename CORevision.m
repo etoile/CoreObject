@@ -40,6 +40,18 @@
 
 - (int64_t)commitNodeID
 {
+	if (commitNodeID != NSIntegerMax)
+		return commitNodeID;
+
+	FMResultSet *rs = [store->db executeQuery: @"SELECT MIN(id) FROM trackNodes WHERE revisionnumber = ?",
+		[NSNumber numberWithUnsignedLongLong: revisionNumber]];
+
+	if ([rs next] == NO)
+	{
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"Found no node ID for %@", self];
+	}
+	commitNodeID = [rs longLongIntForColumnIndex: 0];
 	return commitNodeID;
 }
 
