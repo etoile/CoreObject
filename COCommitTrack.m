@@ -1,7 +1,8 @@
 /*
 	Copyright (C) 2011 Christopher Armstrong
 
-	Author:  Christopher Armstrong <carmstrong@fastmail.com.au>
+	Author:  Christopher Armstrong <carmstrong@fastmail.com.au>,
+	         Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  September 2011
 	License:  Modified BSD  (see COPYING)
  */
@@ -22,7 +23,7 @@
 
 /* Both root object and revision are lazily retrieved by the persistent root. 
    Until the loaded revision is known, it is useless to cache track nodes. */
-- (id)initWithUUID: (ETUUID *)aUUID editingContext: (COPersistentRoot *)aContext;
+- (id)initWithUUID: (ETUUID *)aUUID persistentRoot: (COPersistentRoot *)aContext;
 {
 	NILARG_EXCEPTION_TEST(aUUID);
 	NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
@@ -85,7 +86,7 @@
 - (COCommitTrack *)parentTrack
 {
 	return [[[COCommitTrack alloc] initWithUUID: [[self parentRevision] trackUUID]
-	                             editingContext: [self persistentRoot]] autorelease];
+	                             persistentRoot: [self persistentRoot]] autorelease];
 }
 
 - (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel
@@ -109,7 +110,7 @@
 	[[[self persistentRoot] parentContext] didCommitRevision: rev];
 	
 	return [[[COCommitTrack alloc] initWithUUID: branchUUID
-								 editingContext: [self persistentRoot]] autorelease];
+								 persistentRoot: [self persistentRoot]] autorelease];
 
 }
 
@@ -129,7 +130,7 @@
 	[[[self persistentRoot] parentContext] didCommitRevision: rev];
 	
 	return [[[COCommitTrack alloc] initWithUUID: branchUUID
-								 editingContext: [self persistentRoot]] autorelease];
+								 persistentRoot: [self persistentRoot]] autorelease];
 }
 
 - (BOOL)mergeChangesFromTrack: (COCommitTrack *)aSourceTrack

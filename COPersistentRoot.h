@@ -1,3 +1,12 @@
+/*
+	Copyright (C) 2012 Quentin Mathe
+ 
+	Author:  Quentin Mathe <quentin.mathe@gmail.com>, 
+	         Eric Wasylishen <ewasylishen@gmail.com>
+	Date:  November 2012
+	License:  Modified BSD  (see COPYING)
+ */
+
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COEditingContext.h>
@@ -92,6 +101,14 @@
  * in EtoileUI.
  */
 @property (nonatomic, retain) id rootObject;
+/**
+ * The UUID of the root object.
+ *
+ * Never returns nil even when -rootObject is nil. This method can query the 
+ * store to retrieve the UUID.
+ *
+ * See also -[COStore rootObjectUUIDForPersistentRootUUID:].
+ */
 @property (nonatomic, readonly) ETUUID *rootObjectUUID;
 /**
  * The persistent root revision.

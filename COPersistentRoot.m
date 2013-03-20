@@ -1,3 +1,12 @@
+/*
+	Copyright (C) 2012 Quentin Mathe
+ 
+	Author:  Quentin Mathe <quentin.mathe@gmail.com>, 
+	         Eric Wasylishen <ewasylishen@gmail.com>
+	Date:  November 2012
+	License:  Modified BSD  (see COPYING)
+ */
+
 #import "COPersistentRoot.h"
 #import "COEditingContext.h"
 #import "COError.h"
@@ -12,7 +21,6 @@
 	commitTrack = _commitTrack, rootObject = _rootObject, revision = _revision;
 
 - (CORevision *)loadableRevisionForRevision: (CORevision *)aRevision
-							 rootObjectUUID: (ETUUID *)aRootObjectUUID
 {
 	int64_t maxRevNumber = [_parentContext maxRevisionNumber];
 	BOOL hasMaxRev = (maxRevNumber > 0);
@@ -25,19 +33,6 @@
 	
 	return [[self store] maxRevision: revNumber
 	              forCommitTrackUUID: [[self commitTrack] UUID]];
-}
-
-- (ETUUID *)rootObjectUUID
-{
-	if (_rootObject != nil)
-	{
-		return [_rootObject UUID];
-	}
-	else
-	{
-		return [[_parentContext store]
-			rootObjectUUIDForPersistentRootUUID: [self persistentRootUUID]];
-	}
 }
 
 - (id)initWithPersistentRootUUID: (ETUUID *)aUUID
@@ -54,7 +49,7 @@
 	_parentContext = aCtxt;
 	if ([_parentContext store] != nil)
 	{
-		_commitTrack = [[COCommitTrack alloc] initWithUUID: aTrackUUID editingContext: self];
+		_commitTrack = [[COCommitTrack alloc] initWithUUID: aTrackUUID persistentRoot: self];
 	}
 	ASSIGN(_revision, aRevision);
 
@@ -115,6 +110,20 @@
 	return _rootObject;
 }
 
+- (ETUUID *)rootObjectUUID
+{
+	if (_rootObject != nil)
+	{
+		return [_rootObject UUID];
+	}
+	else
+	{
+		return [[_parentContext store]
+				rootObjectUUIDForPersistentRootUUID: [self persistentRootUUID]];
+	}
+}
+
+// TODO: Improve how we store the entity name. This is ugly and slow.
 - (NSString *)entityNameForObjectUUID: (ETUUID *)aUUID
 {
 	int64_t maxRevNumber = [_parentContext maxRevisionNumber];
@@ -171,22 +180,21 @@
 		{
 			[NSException raise: NSInternalInconsistencyException
 			            format: @"Object %@ requested at revision %@ but already loaded at revision %@",
-			 obj, revision, existingRevision];
+			                    obj, revision, existingRevision];
 		}
 	}
 	return obj;
 }
 
-/* When this method is called, the root object might not be loaded. */
+// NOTE: When this method is called, the root object might not be loaded.
 - (void)cacheLoadedRevisionForRevision: (CORevision *)revision
 {
 	if ([self revision] != nil)
 		return;
 
-	ETUUID *rootObjectUUID = [self rootObjectUUID];
-	ETAssert(rootObjectUUID != nil);
+	ETAssert([self rootObjectUUID] != nil);
 
-	[self setRevision: [self loadableRevisionForRevision: revision rootObjectUUID: rootObjectUUID]];
+	[self setRevision: [self loadableRevisionForRevision: revision]];
 }
 
 /** 

@@ -1,7 +1,8 @@
 /*
 	Copyright (C) 2011 Christopher Armstrong
 
-	Author:  Christopher Armstrong <carmstrong@fastmail.com.au>
+	Author:  Christopher Armstrong <carmstrong@fastmail.com.au>,
+	         Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  September 2011
 	License:  Modified BSD  (see COPYING)
  */
@@ -34,7 +35,7 @@
 	BOOL isLoaded;
 }
 
-- (id)initWithUUID: (ETUUID *)aUUID editingContext: (COPersistentRoot *)aContext;
+- (id)initWithUUID: (ETUUID *)aUUID persistentRoot: (COPersistentRoot *)aContext;
 
 /** @taskunit Track Kind */
 
