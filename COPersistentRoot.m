@@ -104,7 +104,7 @@
 	else
 	{
 		return [[_parentContext store]
-				rootObjectUUIDForPersistentRootUUID: [self persistentRootUUID]];
+			rootObjectUUIDForPersistentRootUUID: [self persistentRootUUID]];
 	}
 }
 
@@ -364,7 +364,7 @@
 
 - (void)discardAllChanges
 {
-	for (COObject *object in [[self parentContext] loadedObjects])
+	for (COObject *object in [self loadedObjects])
 	{
 		[self discardChangesInObject: object];
 	}
@@ -486,6 +486,7 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	}
 }
 
+// TODO: Remove or rewrite to use ETCopier
 - (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency  newUUID: (BOOL)newUUID
 {
 	NSParameterAssert([sourceObject persistentRoot] != nil);

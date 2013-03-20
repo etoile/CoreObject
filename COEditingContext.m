@@ -314,18 +314,6 @@ store by other processes. */
 	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(loadedRootObjects)];
 }
 
-/* Remove from the cache all the objects that belong to discarded persistent roots */
-- (void)discardLoadedObjectsForPersistentRoots: (NSSet *)removedPersistentRoots
-{
-	for (COObject *obj in [self loadedObjects])
-	{
-		if ([removedPersistentRoots containsObject: [obj persistentRoot]])
-		{
-			[[obj persistentRoot] discardLoadedObjectForUUID: [obj UUID]];
-		}
-	}
-}
-
 // NOTE: We could rewrite it using -foldWithBlock: or -leftFold (could be faster)
 - (NSSet *)setByCollectingObjectsFromPersistentRootsUsingSelector: (SEL)aSelector
 {
@@ -390,7 +378,8 @@ store by other processes. */
 		[persistentRoot discardAllChanges];
 	}
 
-	[self discardLoadedObjectsForPersistentRoots: insertedPersistentRoots];
+	/* Remove from the cache all the objects that belong to discarded persistent roots */
+	[(COPersistentRoot *)[insertedPersistentRoots mappedCollection] unload];
 
 	/* Release the discarded persistent roots */
 	[_loadedPersistentRoots removeObjectsForKeys:
@@ -508,7 +497,7 @@ store by other processes. */
 		if (isDeleted == NO)
 			continue;
 		
-		[self discardLoadedObjectsForPersistentRoots: S(persistentRoot)];
+		[persistentRoot unload];
 		[_loadedPersistentRoots removeObjectForKey: [persistentRoot persistentRootUUID]];
 		// TODO: Save the deletion into the store
 	}
