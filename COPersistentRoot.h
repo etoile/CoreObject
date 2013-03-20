@@ -379,10 +379,6 @@
                   atRevision: (CORevision *)revision;
 /**
  * This method is only exposed to be used internally by CoreObject.
- */
-- (void)discardLoadedObjectForUUID: (ETUUID *)aUUID;
-/**
- * This method is only exposed to be used internally by CoreObject.
  *
  * Tells the persistent root a property value has changed in a COObject class or
  * subclass instance.
