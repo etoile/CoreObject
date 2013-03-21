@@ -1,4 +1,13 @@
-#import <Cocoa/Cocoa.h>
+/*
+	Copyright (C) 2010 Eric Wasylishen
+
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
+	         Quentin Mathe <quentin.mathe@gmail.com>
+	Date:  November 2010
+	License:  Modified BSD  (see COPYING)
+ */
+
+#import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "CORevision.h"
 
@@ -90,61 +99,34 @@
  */
 - (void) setMetadata: (NSDictionary *)plist;
 
-/** @taskunit Persistent Roots  */
+/** @taskunit Listing Persistent Objects */
 
 /** 
- * <override-subclass />
- * Returns whether the UUID corresponds to a root object in the store.
+ * <override-never />
+ * Returns the object UUIDs that appear in changes recorded on the given commit 
+ * track.
  *
- * A root object is bound to a persistent root and its cheap copies (derived 
- * persistent roots).
- *
- * For a nil UUID, raises a NSInvalidArgumentException.
- */
-- (BOOL)isRootObjectUUID: (ETUUID *)aUUID;
-/**
- * <override-subclass />
- * Returns the UUIDs that correspond to the root objects in the store.
- *
- * When cheap copies exist in the store, the root object count and the 
- * persistent root count don't match, because root objects are shared accross 
- * a persistent root and its cheap copies.
- *
- * For a new store, will return an empty set. 
- */
-- (NSSet *)rootObjectUUIDs;
-/** 
- * <override-subclass />
- * Returns the UUIDs of the objects owned by the the persistent root UUID. 
- *
- * The persistent root UUID is included in the returned set.<br />
- * When the UUID is not a persistent root in the store, returns an empty set.
- *
- * The UUID must not be nil, otherwise raises a NSInvalidArgumentException.
+ * See -objectUUIDsForCommitTrackUUID:atRevision:.
  */
 - (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID;
-
 /**
  * <override-subclass />
- * Returns the persistent UUIDs of objects owned by root object, on the revision
- * track. This method is needed to reload an object a particular revision, where
- * some of its objects don't exist.
+ * Returns the object UUIDs that appear in changes recorded on the given commit
+ * track up to a certain revision.
+ *
+ * This method is needed to list the inner objects that exist at the given  
+ * revision for the persistent root owning the commit track.
+ *
+ * The root object UUID is included in the returned set.
+ *
+ * When the UUID is not a commit track UUID in the store, returns an empty set.
  *
  * The UUID must not be nil, otherwise raises a NSInvalidArgumentException.
  */
 - (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID atRevision: (CORevision *)revision;
 
-/** 
- *  <override-subclass />
- * Returns the UUID of the persistent root that owns the object UUID.
- *
- * For a persistent root UUID, returns the same UUID.<br />
- * When the UUID is not a persistent root in the store, returns nil.
- *
- * The UUID must not be nil, otherwise raises a NSInvalidArgumentException.
- */
-- (ETUUID *)rootObjectUUIDForObjectUUID: (ETUUID *)aUUID;
-- (ETUUID *)rootObjectUUIDForPersistentRootUUID: (ETUUID *)aPersistentRootUUID;
+/** @taskunit Persistent Roots  */
+
 /**
  * <override-subclass />
  * Returns whether the UUID corresponds to a persistent root in the store.
@@ -156,10 +138,34 @@
  * For a nil UUID, raises a NSInvalidArgumentException.
  */
 - (BOOL)isPersistentRootUUID: (ETUUID *)aUUID;
+/**
+ * <override-subclass />
+ * Returns the UUID of the persistent root that owns the given commit track.
+ *
+ * For a nil UUID, raises an NSInvalidArgumentException.
+ */
 - (ETUUID *)persistentRootUUIDForCommitTrackUUID: (ETUUID *)aTrackUUId;
+/**
+ * <override-subclass />
+ * Returns the main branch root UUID for a persistent root.
+ *
+ * For a nil UUID, raises an NSInvalidArgumentException.
+ *
+ * For explanations about the main branch concept, see COCommitTrack.
+ */
 - (ETUUID *)mainBranchUUIDForPersistentRootUUID: (ETUUID *)aUUID;
-// TODO: Remove
-- (ETUUID *)persistentRootUUIDForRootObjectUUID: (ETUUID *)aUUID;
+/**
+ * <override-subclass />
+ * Returns the root object UUID for a persistent root.
+ *
+ * For a nil UUID, raises an NSInvalidArgumentException.
+ *
+ * For explanations about the root object concept, see COPersistentRoot.
+ */
+- (ETUUID *)rootObjectUUIDForPersistentRootUUID: (ETUUID *)aPersistentRootUUID;
+
+/** @taskunit Inserting New Persistent Roots */
+
 /** 
  * <override-subclass />
  * Inserts new UUIDs marked as persistent roots. 
@@ -179,9 +185,7 @@
 			 persistentRootUUID: (ETUUID *)aPersistentRootUUID
 				commitTrackUUID: (ETUUID *)aTrackUUID
                    baseRevision: (CORevision *)baseRevision;
-
 - (void)beginChangesForObjectUUID: (ETUUID *)object;
-
 /**
  * <override-subclass />
  */
@@ -189,11 +193,15 @@
 	 forProperty: (NSString *)property
 		ofObject: (ETUUID *)object
 	 shouldIndex: (BOOL)shouldIndex;
-
 - (void)finishChangesForObjectUUID: (ETUUID *)object;
-
 - (CORevision *)finishCommit;
 
+/** @taskunit Accessing Revisions */
+
+/**
+ * <override-subclass />
+ */
+- (int64_t)latestRevisionNumber;
 /**
  * <override-subclass />
  */
@@ -202,6 +210,10 @@
  * <override-subclass />
  */
 - (NSArray *)revisionsForObjectUUIDs: (NSSet *)uuids;
+/**
+ * <override-subclass />
+ */
+- (int64_t)latestRevisionNumber;
 
 /** @taskunit Full-text Search */
 
@@ -209,13 +221,6 @@
  * <override-subclass />
  */
 - (NSArray *)resultDictionariesForQuery: (NSString *)query;
-
-/** @taskunit Revision history */
-
-/**
- * <override-subclass />
- */
-- (int64_t)latestRevisionNumber;
 
 /** @taskunit Managing Commit Tracks (Low-Level API) */
 
@@ -387,6 +392,54 @@
  * Returns whether the UUID corresponds to a track in the store. 
  */
 - (BOOL)isTrackUUID: (ETUUID *)aUUID;
+
+/** @taskunit Testing */
+
+/**
+ * <override-subclass />
+ * Returns whether the UUID corresponds to a root object in the store.
+ *
+ * A root object is bound to a persistent root and its cheap copies (derived
+ * persistent roots).
+ *
+ * For a nil UUID, raises a NSInvalidArgumentException.
+ */
+- (BOOL)isRootObjectUUID: (ETUUID *)aUUID;
+/**
+ * <override-subclass />
+ * Returns the UUIDs that correspond to the root objects in the store.
+ *
+ * When cheap copies exist in the store, the root object count and the
+ * persistent root count don't match, because root objects are shared accross
+ * a persistent root and its cheap copies.
+ *
+ * For a new store, will return an empty set.
+ */
+- (NSSet *)rootObjectUUIDs;
+/**
+ * <override-subclass />
+ * Returns the root object UUID bound to persistent roots that own the given
+ * persistent object.
+ *
+ * For a root object UUID, returns the same UUID.<br />
+ * When the UUID is not a persistent object in the store, returns nil.
+ *
+ * The UUID must not be nil, otherwise raises a NSInvalidArgumentException.
+ *
+ * Note: This method could be deprecated.
+ */
+- (ETUUID *)rootObjectUUIDForObjectUUID: (ETUUID *)aUUID;
+/**
+ * <override-subclass />
+ * Returns the UUID of the persistent root that owns the given root object.
+ *
+ * When the UUID is not a root object in the store, returns nil.
+ *
+ * The UUID must not be nil, otherwise raises a NSInvalidArgumentException.
+ *
+ * Note: This method could be deprecated.
+ */
+- (ETUUID *)persistentRootUUIDForRootObjectUUID: (ETUUID *)aUUID;
 
 @end
 

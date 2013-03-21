@@ -1,3 +1,12 @@
+/*
+	Copyright (C) 2010 Eric Wasylishen
+
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
+	         Quentin Mathe <quentin.mathe@gmail.com>
+	Date:  November 2010
+	License:  Modified BSD  (see COPYING)
+ */
+
 #import "COSQLStore.h"
 #import "FMDatabase.h"
 
@@ -228,6 +237,17 @@ void CHECK(id db)
 	return [NSNumber numberWithLongLong: key];
 }
 
+- (NSArray *)keysForUUIDs: (NSArray *)UUIDs
+{
+	NSMutableArray *keys = [NSMutableArray arrayWithCapacity: [UUIDs count]];
+
+	for (ETUUID *uuid in UUIDs)
+	{
+		[keys addObject: [self keyForUUID: uuid]];
+	}
+	return keys;
+}
+
 - (NSNumber*)keyForProperty: (NSString*)property
 {
 	if (property == nil)
@@ -276,7 +296,6 @@ void CHECK(id db)
 	[rs close];
 	return result;
 }
-
 
 - (int) currentStoreVersion
 {
@@ -340,42 +359,8 @@ void CHECK(id db)
 		plistData]; CHECK(db);
 }
 
-/* Persistent Roots */
-
-- (BOOL)isRootObjectUUID: (ETUUID *)uuid
-{
-	NILARG_EXCEPTION_TEST(uuid);
-    FMResultSet *rs = [db executeQuery: @"SELECT rootobjectuuid FROM persistentRoots WHERE rootobjectuuid = ?",
-	                                    [self keyForUUID: uuid]];
-	BOOL result = [rs next];
-	[rs close];
-	return result;
-}
-
-- (NSSet *)rootObjectUUIDs
-{
-    FMResultSet *rs = [db executeQuery: @"SELECT DISTINCT uuids.uuid FROM uuids JOIN persistentRoots ON uuids.uuidindex = persistentRoots.rootobjectuuid"];
-	NSMutableSet *result = [NSMutableSet set];
-
-	while ([rs next])
-	{
-		[result addObject: [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]]];
-	}
-
-	[rs close];
-	return result;
-}
-
-- (NSArray *)keysForUUIDs: (NSArray *)UUIDs
-{
-	NSMutableArray *keys = [NSMutableArray arrayWithCapacity: [UUIDs count]];
-
-	for (ETUUID *uuid in UUIDs)
-	{
-		[keys addObject: [self keyForUUID: uuid]];
-	}
-	return keys;
-}
+#pragma mark -
+#pragma mark Listing Persistent Objects
 
 - (NSSet *)objectUUIDsOutsideOfParentTracksForCommitTrackUUID: (ETUUID *)aUUID
                                                    atRevision: (CORevision *)revision
@@ -421,6 +406,33 @@ void CHECK(id db)
 	return result;
 }
 
+#pragma mark -
+#pragma mark Root Objects
+
+- (BOOL)isRootObjectUUID: (ETUUID *)uuid
+{
+	NILARG_EXCEPTION_TEST(uuid);
+    FMResultSet *rs = [db executeQuery: @"SELECT rootobjectuuid FROM persistentRoots WHERE rootobjectuuid = ?",
+	                                    [self keyForUUID: uuid]];
+	BOOL result = [rs next];
+	[rs close];
+	return result;
+}
+
+- (NSSet *)rootObjectUUIDs
+{
+    FMResultSet *rs = [db executeQuery: @"SELECT DISTINCT uuids.uuid FROM uuids JOIN persistentRoots ON uuids.uuidindex = persistentRoots.rootobjectuuid"];
+	NSMutableSet *result = [NSMutableSet set];
+
+	while ([rs next])
+	{
+		[result addObject: [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]]];
+	}
+
+	[rs close];
+	return result;
+}
+
 - (NSNumber *)anyTrackIndexForObjectUUID: (ETUUID *)aUUID
 {
 	FMResultSet *rs = [db executeQuery: @"SELECT committrackuuid FROM commits WHERE objectuuid = ? LIMIT 1", [self keyForUUID: aUUID]]; CHECK(db);
@@ -455,22 +467,8 @@ void CHECK(id db)
 	return result;
 }
 
-- (ETUUID *)rootObjectUUIDForPersistentRootUUID: (ETUUID *)aPersistentRootUUID
-{
-	NILARG_EXCEPTION_TEST(aPersistentRootUUID);
-    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = (SELECT rootobjectuuid FROM persistentRoots WHERE uuid = ?)", [self keyForUUID: aPersistentRootUUID]]; CHECK(db);
-	ETUUID *result = nil;
-	
-	if ([rs next])
-	{
-		result = [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]];
-		/* We expect a single result */
-		ETAssert([rs next] == NO);
-	}
-	
-	[rs close];
-	return result;
-}
+#pragma mark -
+#pragma mark Persistent Roots
 
 - (BOOL)isPersistentRootUUID: (ETUUID *)uuid
 {
@@ -503,6 +501,23 @@ void CHECK(id db)
 {
 	NILARG_EXCEPTION_TEST(aUUID);
     FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = (SELECT mainbranchuuid FROM persistentRoots WHERE uuid = ?)", [self keyForUUID: aUUID]]; CHECK(db);
+	ETUUID *result = nil;
+	
+	if ([rs next])
+	{
+		result = [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]];
+		/* We expect a single result */
+		ETAssert([rs next] == NO);
+	}
+	
+	[rs close];
+	return result;
+}
+
+- (ETUUID *)rootObjectUUIDForPersistentRootUUID: (ETUUID *)aPersistentRootUUID
+{
+	NILARG_EXCEPTION_TEST(aPersistentRootUUID);
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM uuids WHERE uuidIndex = (SELECT rootobjectuuid FROM persistentRoots WHERE uuid = ?)", [self keyForUUID: aPersistentRootUUID]]; CHECK(db);
 	ETUUID *result = nil;
 	
 	if ([rs next])
@@ -573,7 +588,8 @@ void CHECK(id db)
 	[db executeUpdate: @"INSERT INTO branches VALUES(?, ?, NULL, '', NULL, NULL)", trackIndex, persistentRootIndex]; CHECK(db);
 }
 
-/* Committing Changes */
+#pragma mark -
+#pragma mark Committing Changes
 
 - (void)beginCommitWithMetadata: (NSDictionary *)metadata
 			 persistentRootUUID: (ETUUID *)aPersistentRootUUID
@@ -704,7 +720,20 @@ void CHECK(id db)
 	                             commitNodeID: commitNodeID] autorelease];
 }
 
-/* Accessing History Graph and Committed Changes */
+#pragma mark -
+#pragma mark Accessing Revisions
+
+- (int64_t) latestRevisionNumber
+{
+	FMResultSet *rs = [db executeQuery:@"SELECT MAX(revisionnumber) FROM commitMetadata"];
+	int64_t num = 0;
+	if ([rs next])
+	{
+		num = [rs longLongIntForColumnIndex: 0];
+	}
+	[rs close];
+	return num;
+}
 
 - (CORevision*)revisionWithRevisionNumber: (int64_t)anID
 {
@@ -763,7 +792,8 @@ void CHECK(id db)
 	return revs;
 }
 
-/* Full-text Search */
+#pragma mark -
+#pragma mark Full-text Search
 
 - (NSArray*)resultDictionariesForQuery: (NSString*)query
 {
@@ -810,19 +840,8 @@ void CHECK(id db)
 	return results;
 }
 
-/* Revision history */
-
-- (int64_t) latestRevisionNumber
-{
-	FMResultSet *rs = [db executeQuery:@"SELECT MAX(revisionnumber) FROM commitMetadata"];
-	int64_t num = 0;
-	if ([rs next])
-	{
-		num = [rs longLongIntForColumnIndex: 0];
-	}
-	[rs close];
-	return num;
-}
+#pragma mark -
+#pragma mark Managing Commit Tracks (Low-Level API)
 
 - (void)didChangeCurrentNodeFromRevision: (CORevision *)oldRev 
                                   toNode: (NSNumber *)newNode 
@@ -950,6 +969,9 @@ void CHECK(id db)
 	}
 	return nil;
 }
+
+#pragma mark -
+#pragma mark Managing Tracks (Low-Level API)
 
 - (CORevision *)currentRevisionForTrackIndex: (NSNumber *)aTrackIndex
                                currentNodeID: (int64_t *)currentNodeID

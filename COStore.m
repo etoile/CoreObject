@@ -1,3 +1,12 @@
+/*
+	Copyright (C) 2010 Eric Wasylishen
+
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
+	         Quentin Mathe <quentin.mathe@gmail.com>
+	Date:  November 2010
+	License:  Modified BSD  (see COPYING)
+ */
+
 #import "COStore.h"
 #import "FMDatabase.h"
 
@@ -49,17 +58,8 @@
 	[self doesNotRecognizeSelector: _cmd];
 }
 
-- (BOOL)isRootObjectUUID: (ETUUID *)uuid
-{
-	[self doesNotRecognizeSelector: _cmd];
-	return NO;
-}
-
-- (NSSet *)rootObjectUUIDs
-{
-	[self doesNotRecognizeSelector: _cmd];
-	return nil;
-}
+#pragma mark -
+#pragma mark Listing Persistent Objects
 
 - (NSSet *)objectUUIDsForCommitTrackUUID: (ETUUID *)aUUID
 {
@@ -72,17 +72,29 @@
 	return nil;
 }
 
+#pragma mark -
+#pragma mark Root Objects
+
+- (BOOL)isRootObjectUUID: (ETUUID *)uuid
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return NO;
+}
+
+- (NSSet *)rootObjectUUIDs
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
+}
+
 - (ETUUID *)rootObjectUUIDForObjectUUID: (ETUUID *)aUUID
 {
 	[self doesNotRecognizeSelector: _cmd];
 	return nil;
 }
 
-- (ETUUID *)rootObjectUUIDForPersistentRootUUID: (ETUUID *)aPersistentRootUUID
-{
-	[self doesNotRecognizeSelector: _cmd];
-	return nil;
-}
+#pragma mark -
+#pragma mark Persistent Roots
 
 - (BOOL)isPersistentRootUUID: (ETUUID *)aUUID
 {
@@ -102,6 +114,12 @@
 	return nil;
 }
 
+- (ETUUID *)rootObjectUUIDForPersistentRootUUID: (ETUUID *)aPersistentRootUUID
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
+}
+
 - (ETUUID *)persistentRootUUIDForRootObjectUUID: (ETUUID *)aUUID
 {
 	[self doesNotRecognizeSelector: _cmd];
@@ -115,7 +133,8 @@
 	[self doesNotRecognizeSelector: _cmd];
 }
 
-/* Committing Changes */
+#pragma mark -
+#pragma mark Committing Changes 
 
 - (void)beginCommitWithMetadata: (NSDictionary *)metadata
 			 persistentRootUUID: (ETUUID *)aPersistentRootUUID
@@ -173,7 +192,14 @@
 	return nil;
 }
 
-/* Accessing History Graph and Committed Changes */
+#pragma mark -
+#pragma mark Accessing Revisions
+
+- (int64_t)latestRevisionNumber
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return 0;
+}
 
 - (CORevision *)revisionWithRevisionNumber: (int64_t)anID
 {
@@ -187,7 +213,8 @@
 	return nil;
 }
 
-/* Full-text Search */
+#pragma mark -
+#pragma mark Full-text Search
 
 - (NSArray*)resultDictionariesForQuery: (NSString*)query
 {
@@ -195,13 +222,8 @@
 	return nil;
 }
 
-/* Revision history */
-
-- (int64_t)latestRevisionNumber
-{
-	[self doesNotRecognizeSelector: _cmd];
-	return 0;
-}
+#pragma mark -
+#pragma mark Managing Commit Tracks (Low-Level API)
 
 - (void)didChangeCurrentNodeFromRevision: (CORevision *)oldRev 
                                   toNode: (NSNumber *)newNode 
@@ -261,6 +283,9 @@
 	[self doesNotRecognizeSelector: _cmd];
 	return nil;
 }
+
+#pragma mark -
+#pragma mark Managing Tracks (Low-Level API)
 
 - (CORevision *)currentRevisionForTrackIndex: (NSNumber *)aTrackIndex
                                currentNodeID: (int64_t *)currentNodeID
@@ -338,6 +363,8 @@ NSString *kCONewCurrentNodeIDKey = @"kCONewCurrentNodeIDKey";
 NSString *kCONewCurrentNodeRevisionNumberKey = @"kCONewCurrentNodeRevisionNumberKey";
 NSString *kCOOldCurrentNodeRevisionNumberKey = @"kCOOldCurrentNodeRevisionNumberKey";
 NSString *kCOStoreUUIDStringKey = @"kCOStoreUUIDStringKey";
+
+#pragma mark -
 
 @implementation CORecord
 
