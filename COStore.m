@@ -102,6 +102,12 @@
 	return NO;
 }
 
+- (NSSet *)persistentRootUUIDs
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
+}
+
 - (ETUUID *)persistentRootUUIDForCommitTrackUUID: (ETUUID *)aTrackUUId
 {
 	[self doesNotRecognizeSelector: _cmd];
@@ -131,6 +137,13 @@
 				  rootObjectUUID: (ETUUID *)aRootObjectUUID
 {
 	[self doesNotRecognizeSelector: _cmd];
+}
+
+- (CORevision *)deletePersistentRootForUUID: (ETUUID *)aPersistentRootUUID
+                                   eraseNow: (BOOL)eraseNow
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
 }
 
 #pragma mark -
@@ -194,6 +207,11 @@
 
 #pragma mark -
 #pragma mark Accessing Revisions
+
+- (CORevision *)latestRevision
+{
+	return [self revisionWithRevisionNumber: [self latestRevisionNumber]];
+}
 
 - (int64_t)latestRevisionNumber
 {

@@ -633,7 +633,17 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 		
 		if ([_deletedObjects containsObject: obj])
 		{
-			// TODO: Mark the object as deleted in the store
+			// TODO: Mark the object as deleted in the store.
+			// We need to introduce a 'deletedobjects' table that remembers the
+			// deletion revision and lets us decide if all commit rows involving  
+			// an object can be erased.
+			// If we don't mark the object, the last commit row for each
+			// property of the object must be kept because there is no way to
+			// know whether the object is still used. We could determine it
+			// by tracing the persistent root object graph and marking objects
+			// not traced as deletion candidates. But this could be heavy and
+			// would prevent us to reuse a dangling object accross persistent
+			// root loading (not sure we need this possibility though).
 			[self discardLoadedObjectForUUID: [obj UUID]];
 		}
 		

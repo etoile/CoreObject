@@ -140,6 +140,15 @@
 - (BOOL)isPersistentRootUUID: (ETUUID *)aUUID;
 /**
  * <override-subclass />
+ * Returns the UUIDs that correspond to the persistent roots in the store.
+ *
+ * Deleted persistent roots are not included among the returned UUIDs.
+ *
+ * For a new store, will return an empty set.
+ */
+- (NSSet *)persistentRootUUIDs;
+/**
+ * <override-subclass />
  * Returns the UUID of the persistent root that owns the given commit track.
  *
  * For a nil UUID, raises an NSInvalidArgumentException.
@@ -164,7 +173,7 @@
  */
 - (ETUUID *)rootObjectUUIDForPersistentRootUUID: (ETUUID *)aPersistentRootUUID;
 
-/** @taskunit Inserting New Persistent Roots */
+/** @taskunit Inserting and Deleting Persistent Roots */
 
 /** 
  * <override-subclass />
@@ -178,6 +187,24 @@
 - (void)insertPersistentRootUUID: (ETUUID *)aPersistentRootUUID
 				 commitTrackUUID: (ETUUID *)aMainBranchUUID
 				  rootObjectUUID: (ETUUID *)aRootObjectUUID;
+/**
+ * <override-subclass />
+ * Marks the persistent root as deleted and returns the resulting revision.
+ *
+ * Unless eraseNow argument is YES, all the persistent root data (commits,  
+ * commit tracks, etc.) remains until the CoreObject garbage collector is run.
+ *
+ * For now, there is no method to restore a deleted object (not yet erased).
+ *
+ * The returned revision is a store structure change and as such doesn't appear 
+ * in the persistent root commit track.
+ *
+ * If the UUID doesn't exist in the store, raises an NSInvalidArgumentException.
+ *
+ * For a nil UUID, raises a NSInvalidArgumentException.
+ */
+- (CORevision *)deletePersistentRootForUUID: (ETUUID *)aPersistentRootUUID
+                                   eraseNow: (BOOL)eraseNow;
 
 /** @taskunit Committing Changes */
 
@@ -199,6 +226,11 @@
 /** @taskunit Accessing Revisions */
 
 /**
+ * <override-never />
+ * Returns the latest store revision.
+ */
+- (CORevision *)latestRevision;
+/**
  * <override-subclass />
  */
 - (int64_t)latestRevisionNumber;
@@ -210,10 +242,6 @@
  * <override-subclass />
  */
 - (NSArray *)revisionsForObjectUUIDs: (NSSet *)uuids;
-/**
- * <override-subclass />
- */
-- (int64_t)latestRevisionNumber;
 
 /** @taskunit Full-text Search */
 

@@ -497,9 +497,13 @@ store by other processes. */
 		if (isDeleted == NO)
 			continue;
 		
+		ETUUID *uuid = [persistentRoot persistentRootUUID];
+					
+		[revisions addObject: [[self store] deletePersistentRootForUUID: uuid
+		                                                       eraseNow: NO]];
 		[persistentRoot unload];
-		[_loadedPersistentRoots removeObjectForKey: [persistentRoot persistentRootUUID]];
-		// TODO: Save the deletion into the store
+		[_loadedPersistentRoots removeObjectForKey: uuid];
+		[self didCommitRevision: [revisions lastObject]];
 	}
 
  	[self postCommitNotificationsWithRevisions: revisions];

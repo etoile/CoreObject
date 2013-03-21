@@ -480,6 +480,20 @@ void CHECK(id db)
 	return result;
 }
 
+- (NSSet *)persistentRootUUIDs
+{
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM persistentRoots WHERE deleted = 0"];
+	NSMutableSet *result = [NSMutableSet set];
+
+	while ([rs next])
+	{
+		[result addObject: [ETUUID UUIDWithString: [rs stringForColumn: @"uuid"]]];
+	}
+
+	[rs close];
+	return result;
+}
+
 - (ETUUID *)persistentRootUUIDForCommitTrackUUID: (ETUUID *)aTrackUUID
 {
 	NILARG_EXCEPTION_TEST(aTrackUUID);
@@ -586,6 +600,42 @@ void CHECK(id db)
 
 	[db executeUpdate: @"INSERT INTO persistentRoots VALUES(?, ?, ?, NULL)", persistentRootIndex, rootObjectIndex, trackIndex]; CHECK(db);
 	[db executeUpdate: @"INSERT INTO branches VALUES(?, ?, NULL, '', NULL, NULL)", trackIndex, persistentRootIndex]; CHECK(db);
+}
+
+- (CORevision *)deletePersistentRootForUUID: (ETUUID *)aPersistentRootUUID
+                                   eraseNow: (BOOL)eraseNow
+{
+	NILARG_EXCEPTION_TEST(aPersistentRootUUID);
+	
+	NSString *uuidString = [aPersistentRootUUID stringValue];
+	assert([uuidString isKindOfClass: [NSString class]]);
+	NSNumber *persistentRootIndex = [self keyForUUID: aPersistentRootUUID];
+    FMResultSet *rs = [db executeQuery: @"SELECT uuid FROM persistentRoots WHERE uuid = ?", persistentRootIndex];
+	BOOL nonExistentPersistentRoot = ([rs next] == NO);
+
+	[rs close];
+
+	if (nonExistentPersistentRoot)
+	{
+		[NSException raise: NSInvalidArgumentException 
+		            format: @"The persistent root UUID %@ doesn't exist.", aPersistentRootUUID];
+		return nil;
+	}
+
+	// TODO: Record the persistent root deletion details in the metadata
+	[self beginCommitWithMetadata: nil
+	           persistentRootUUID: nil
+	              commitTrackUUID: [self UUID]
+	                 baseRevision: [self latestRevision]];
+
+	[db executeUpdate: @"UPDATE persistentRoots SET deleted = ? WHERE uuid = ?", [NSNumber numberWithBool: YES], persistentRootIndex]; CHECK(db);
+
+	if (eraseNow)
+	{
+		NSLog(@"WARNING: Erasing a persistent root is not yet supported");
+	}
+
+	return [self finishCommit];
 }
 
 #pragma mark -
