@@ -340,9 +340,8 @@
  *
  * A commit on a single persistent root is atomic.
  *
- * Each root object that belong to -changedObjects results in a new revision.
- * We usually advice to commit a single root object at time to prevent multiple
- * revisions per commit.
+ * This method won't commit changes of other persistent roots loaded in the 
+ * parent context.
  *
  * The description will be visible at the UI level when browsing the history.
  *
