@@ -61,10 +61,6 @@
 
 - (COCommitTrack *)commitTrack
 {
-	if (_commitTrack == nil)
-	{
-		_commitTrack = [[COCommitTrack alloc] init];
-	}
 	return _commitTrack;
 }
 

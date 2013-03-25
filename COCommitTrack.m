@@ -21,6 +21,12 @@
 
 @synthesize UUID, label, persistentRoot, isCopy, isMainBranch;
 
+- (id)init
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
+}
+
 /* Both root object and revision are lazily retrieved by the persistent root. 
    Until the loaded revision is known, it is useless to cache track nodes. */
 - (id)initWithUUID: (ETUUID *)aUUID persistentRoot: (COPersistentRoot *)aContext;

@@ -35,6 +35,15 @@
 	BOOL isLoaded;
 }
 
+/** @taskunit Initialization */
+
+/**
+ * <init />
+ * Intializes and returns a new commit track known by the given UUID and bound 
+ * to a particular persistent root.
+ *
+ * For nil UUID or persistent root, raises a NSInvalidArgumentException.
+ */
 - (id)initWithUUID: (ETUUID *)aUUID persistentRoot: (COPersistentRoot *)aContext;
 
 /** @taskunit Track Kind */
@@ -65,12 +74,38 @@
 
 /** @taskunit Basic Properties */
 
+/**
+ * The commit track UUID.
+ *
+ * The UUID is never nil.
+ */
 @property (readonly, nonatomic) ETUUID *UUID;
+/**
+ * The commit track label, that serves a branch name in most cases.
+ */
 @property (retain, nonatomic) NSString *label;
+/**
+ * The parent commit track from which the receiver is derived.
+ *
+ * If the parent track is nil, this means the receiver is a commit track that 
+ * was created at the same time than its persistent root. The parent revision 
+ * is also nil in this case.
+ */
 @property (readonly, nonatomic) COCommitTrack *parentTrack;
+/**
+ * The revision at which the receiver was forked from the parent track.
+ *
+ * If the parent revision is nil, this means the receiver is a commit track that
+ * was created at the same time than its persistent root. The parent track 
+ * is also nil in this case.
+ */
 @property (readonly, nonatomic) CORevision *parentRevision;
 /**
  * The persistent root owning the commit track.
+ *
+ * The persistent doesn't retain the commit track unless the receiver is the 
+ * same than -[COPersistentRoot commitTrack]. The ownership implied here is at 
+ * the store level.
  */
 @property (readonly, nonatomic) COPersistentRoot *persistentRoot;
 

@@ -84,6 +84,8 @@
  * Changing the commit track switches the edited branch but not the current 
  * branch (the branch switch is not replicated to other applications). See 
  * COCommitTrack API to control the current branch.
+ *
+ * For a parent context without a store, the commit track can be nil .
  */
 @property (nonatomic, retain) COCommitTrack *commitTrack;
 /**
