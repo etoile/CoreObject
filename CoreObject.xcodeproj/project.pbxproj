@@ -51,6 +51,8 @@
 		609555DC1681CD520017C628 /* COPersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 609555DB1681CD520017C628 /* COPersistentRoot.m */; };
 		60988F17163B6B7A009C4F21 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F16163B6B7A009C4F21 /* Cocoa.framework */; };
 		60988F1D163B6B7A009C4F21 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 60988F1B163B6B7A009C4F21 /* InfoPlist.strings */; };
+		609CFF671701EF2900D01AAB /* COBookmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 609CFF651701EF2800D01AAB /* COBookmark.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		609CFF681701EF2900D01AAB /* COBookmark.m in Sources */ = {isa = PBXBuildFile; fileRef = 609CFF661701EF2800D01AAB /* COBookmark.m */; };
 		60A55DE114A25AC4007A9864 /* COTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60A55DDF14A25AC4007A9864 /* COTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60A55DE214A25AC4007A9864 /* COTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60A55DE014A25AC4007A9864 /* COTrack.m */; };
 		60C8BC5416322E2C00A2B4EE /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 669965351162E17500359BE6 /* libz.1.2.5.dylib */; };
@@ -278,6 +280,8 @@
 		60988F16163B6B7A009C4F21 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		60988F1A163B6B7A009C4F21 /* SQLClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "SQLClient-Info.plist"; path = "SQLClient/SQLClient-Info.plist"; sourceTree = "<group>"; };
 		60988F1C163B6B7A009C4F21 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		609CFF651701EF2800D01AAB /* COBookmark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COBookmark.h; sourceTree = "<group>"; };
+		609CFF661701EF2800D01AAB /* COBookmark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COBookmark.m; sourceTree = "<group>"; };
 		60A55DDF14A25AC4007A9864 /* COTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COTrack.h; sourceTree = "<group>"; };
 		60A55DE014A25AC4007A9864 /* COTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COTrack.m; sourceTree = "<group>"; };
 		60C913901653BE1400E0C5F4 /* COPersistentRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COPersistentRoot.h; sourceTree = "<group>"; };
@@ -668,6 +672,8 @@
 				79E5EE5812876FC200CDFA23 /* COContainer.m */,
 				66D09D54129CE470006BEDC3 /* COGroup.h */,
 				66D09D55129CE470006BEDC3 /* COGroup.m */,
+				609CFF651701EF2800D01AAB /* COBookmark.h */,
+				609CFF661701EF2800D01AAB /* COBookmark.m */,
 			);
 			name = "Model Objects";
 			sourceTree = "<group>";
@@ -775,6 +781,7 @@
 				6019B8A7163C41AB00D1986F /* COSQLStore.h in Headers */,
 				60C913921653BE1400E0C5F4 /* COPersistentRoot.h in Headers */,
 				60C913941656364700E0C5F4 /* COSynchronizer.h in Headers */,
+				609CFF671701EF2900D01AAB /* COBookmark.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1089,6 +1096,7 @@
 				6019B8A8163C41AB00D1986F /* COSQLStore.m in Sources */,
 				60C913951656364E00E0C5F4 /* COSynchronizer.m in Sources */,
 				609555DC1681CD520017C628 /* COPersistentRoot.m in Sources */,
+				609CFF681701EF2900D01AAB /* COBookmark.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

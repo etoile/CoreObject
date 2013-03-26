@@ -6,6 +6,7 @@
 	License:  Modified BSD  (see COPYING)
  */
 
+#import <CoreObject/COBookmark.h>
 #import <CoreObject/COCollection.h>
 #import <CoreObject/COCommitTrack.h>
 #import <CoreObject/COContainer.h>
