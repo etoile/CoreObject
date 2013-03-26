@@ -28,6 +28,7 @@ Future Work
 - Figure out basic undo/redo support on an object edited collaboratively, probably using selective undo
 - Tune object copy model to respect user expectations about copy/paste in various recurrent use cases
 - Improve Relationship Integrity and leverage it in more places (e.g. copy time, more aggressive checks or object graph integrity checking in a background thread etc.)
+- Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
 - Evaluate a CORevision cache per COStore or process
 - Evaluate a COTrackNode cache per track
 - Adopt or leverage NestedVersioning improvements to the property list serialization model

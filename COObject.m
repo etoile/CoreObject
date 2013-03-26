@@ -73,6 +73,7 @@
 	ETPropertyDescription *tagsProperty = 
 		[ETPropertyDescription descriptionWithName: @"tags" type: (id)@"Anonymous.COTag"];
 	[tagsProperty setMultivalued: YES];
+	[tagsProperty setOrdered: YES];
 
 	NSArray *transientProperties = A(displayNameProperty, modificationDateProperty, 
 		creationDateProperty, lastVersionDescProperty, tagDescProperty, typeDescProperty);
