@@ -196,6 +196,7 @@ store by other processes. */
                                  commitTrackUUID: (ETUUID *)aTrackUUID
                                         revision: (CORevision *)aRevision
 {
+	NSParameterAssert([[_loadedPersistentRoots allKeys] containsObject: aPersistentRootUUID] == NO);
 	COPersistentRoot *persistentRoot =
 		[[COPersistentRoot alloc] initWithPersistentRootUUID: aPersistentRootUUID
 		                                     commitTrackUUID: aTrackUUID

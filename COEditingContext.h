@@ -308,6 +308,20 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
+ * Instantiates, registers among the loaded persistent roots and returns the 
+ * persistent root known by the given UUID.
+ * Unlike -persistentRootForUUID:, this method doesn't access the store to 
+ * retrieve the main branch UUID, but just use the given commit track UUID.
+ *
+ * In addition, a past revision can be passed to prevent loading the persistent 
+ * root at the latest revision.
+ */
+- (COPersistentRoot *)makePersistentRootWithUUID: (ETUUID *)aPersistentRootUUID
+                                 commitTrackUUID: (ETUUID *)aTrackUUID
+                                        revision: (CORevision *)aRevision;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
  * Returns the object identified by the UUID, by loading it to the given 
  * revision when no instance managed by the receiver is present in memory, and 
  * initializing it to use the given entity in such a case.

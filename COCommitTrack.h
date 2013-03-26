@@ -111,24 +111,74 @@
 
 /** @taskunit Creating Branches and Cheap copies */
 
+/**
+ * Returns a new commit track by branching the receiver last revision and using 
+ * the given label.
+ *
+ * See also -makeBranchWithLabel:atRevision:.
+ */
 - (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel;
+/**
+ * Returns a new commit track by branching a particular revision and using
+ * the given label.
+ *
+ * The revision must belong to the receiver track, otherwise a 
+ * NSInvalidArgumentException is raised.
+ *
+ * The branch creation results in a new revision on the store structure track. 
+ * See -[COStore createCommitTrackWithUUID:name:parentRevision:rootObjectUUID:persistentRootUUID:isNewPersistentRoot:].
+ *
+ * You can assign the returned commit track to the receiver persistent root to 
+ * switch the current branch. For example:
+ *
+ * <example>
+ * [persistentRoot setCommitTrack: [[persistentRoot commitTrack] makeBranchWithLabel: @"Sandbox"]];
+ * </example>
+ */
 - (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev;
-- (COCommitTrack *)makeCopyFromRevision: (CORevision *)aRev;
+/**
+ * Returns a new persistent root bound to a new commit track by branching a 
+ * particular revision.
+ * 
+ * The resulting persistent root is known as a cheap copy, because the copy 
+ * doesn't cause the history leading to the new persistent root state to be 
+ * duplicated in the store.
+ *
+ * Although we usually don't call a cheap copy a branch, the new commit track 
+ * is a branch from the viewpoint of the history graph.
+ *
+ * The revision must belong to the receiver track, otherwise a
+ * NSInvalidArgumentException is raised.
+ */
+- (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev;
 
 /** @taskunit Merging Between Tracks */
 
+/**
+ * This method is not yet implemented.
+ */
 - (BOOL)mergeChangesFromTrack: (COCommitTrack *)aSourceTrack;
+/**
+ * This method is not yet implemented.
+ */
 - (BOOL)mergeChangesFromRevision: (CORevision *)startRev
 							  to: (CORevision *)endRev
 						 ofTrack: (COCommitTrack *)aSourceTrack;
+/**
+ * This method is not yet implemented.
+ */
 - (BOOL)mergeChangesFromRevisionSet: (NSSet *)revs
 							ofTrack: (COCommitTrack *)aSourceTrack;
 
 /** @taskunit Private */
 
 /**
- * COStore takes care of updating the database, so we just use this as a
- * notification to update our cache.
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Tells the receiver that its persistent root just committed a new revision. 
+ * 
+ * The committed revision is included among the loaded track nodes as a result,  
+ * and without accessing the store.
  */
 - (void)didMakeNewCommitAtRevision: (CORevision *)revision;
 

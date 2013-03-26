@@ -91,8 +91,14 @@
 
 - (COCommitTrack *)parentTrack
 {
-	return [[[COCommitTrack alloc] initWithUUID: [[self parentRevision] trackUUID]
-	                             persistentRoot: [self persistentRoot]] autorelease];
+	ETUUID *parentTrackUUID = [[self parentRevision] trackUUID];
+	ETUUID *persistentRootUUID = [[[self persistentRoot] store]
+		persistentRootUUIDForCommitTrackUUID: parentTrackUUID];
+	COPersistentRoot *parentPersistentRoot =
+		[[[self persistentRoot] parentContext] persistentRootForUUID: persistentRootUUID];
+
+	return [[[COCommitTrack alloc] initWithUUID: parentTrackUUID
+	                             persistentRoot: parentPersistentRoot] autorelease];
 }
 
 - (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel
@@ -120,23 +126,26 @@
 
 }
 
-- (COCommitTrack *)makeCopyFromRevision: (CORevision *)aRev
+- (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev
 {
 	NILARG_EXCEPTION_TEST(aRev);
+	INVALIDARG_EXCEPTION_TEST(aRev, [[aRev trackUUID] isEqual: [self UUID]]);
 	
 	ETUUID *branchUUID = [ETUUID UUID];
+	ETUUID *persistentRootUUID = [ETUUID UUID];
 	COStore *store = [[self persistentRoot] store];
 	CORevision *rev = [store createCommitTrackWithUUID: branchUUID
-	                                              name: nil
+	                                              name: @"Cheapcopy"
 	                                    parentRevision: aRev
 	                                    rootObjectUUID: [[self persistentRoot] rootObjectUUID]
-	                                persistentRootUUID: [ETUUID UUID]
+	                                persistentRootUUID: persistentRootUUID
 	                               isNewPersistentRoot: YES];
 
 	[[[self persistentRoot] parentContext] didCommitRevision: rev];
 	
-	return [[[COCommitTrack alloc] initWithUUID: branchUUID
-								 persistentRoot: [self persistentRoot]] autorelease];
+	return [[[self persistentRoot] parentContext] makePersistentRootWithUUID: persistentRootUUID
+	                                                         commitTrackUUID: branchUUID
+	                                                                revision: nil];
 }
 
 - (BOOL)mergeChangesFromTrack: (COCommitTrack *)aSourceTrack

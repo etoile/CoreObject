@@ -921,7 +921,7 @@ void CHECK(id db)
 
 	ETUUID *parentTrackUUID = [aRevision trackUUID];
 	
-	if ([[self persistentRootUUIDForCommitTrackUUID: parentTrackUUID] isEqual: aPersistentRootUUID] == NO)
+	if (isNewPersistentRoot == NO && [[self persistentRootUUIDForCommitTrackUUID: parentTrackUUID] isEqual: aPersistentRootUUID] == NO)
 	{
 		[NSException raise: NSInvalidArgumentException
 		            format: _(@"Persistent root UUID %@ doesn't match the parent "
