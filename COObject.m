@@ -1142,6 +1142,11 @@ static int indent = 0;
 	return [[self entityDescription] localizedDescription];
 }
 
+- (NSString *)revisionDescription
+{
+	return [NSString stringWithFormat: @"%llu", (unsigned long long)[[self revision] revisionNumber]];
+}
+
 - (NSString *)tagDescription
 {
 	return [(NSArray *)[[[self tags] mappedCollection] tagString] componentsJoinedByString: @", "];

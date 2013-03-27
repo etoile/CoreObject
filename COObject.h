@@ -636,6 +636,13 @@
  * presented to the user. 
  */
 - (NSString *)typeDescription;
+/**
+ * Returns the receiver revision number as a string.
+ *
+ * This is used to present the revision to the user in the UI.
+ */
+- (NSString *)revisionDescription;
+
 /** 
  * Returns the receiver tags in a coma separated list.
  *
