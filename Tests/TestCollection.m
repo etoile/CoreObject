@@ -8,6 +8,7 @@
 #import "COCollection.h"
 #import "COContainer.h"
 #import "COGroup.h"
+#import "COLibrary.h"
 #import "COPersistentRoot.h"
 
 @interface TestCollection : TestCommon <UKTest>

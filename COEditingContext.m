@@ -1,5 +1,5 @@
 #import "COEditingContext.h"
-#import "COContainer.h"
+#import "COLibrary.h"
 #import "COPersistentRoot.h"
 #import "COError.h"
 #import "COObject.h"

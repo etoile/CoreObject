@@ -14,7 +14,7 @@
 @class COSmartGroup;
 
 /**
- * @group Object Organization
+ * @group Object Collection and Organization
  *
  * COGroup is a mutable, ordered, weak (an object can be in any number of 
  * collections) collection class.
@@ -31,56 +31,6 @@
  * Returns YES.
  */
 - (BOOL)isGroup;
-
-@end
-
-
-/**
- * @group Object Collection and Organization
- *
- * COTag represents a tag attached to every object that belongs to it.
- */
-@interface COTag : COGroup
-{
-
-}
-
-/**
- * Returns YES.
- *
- * A tag is group that belongs to -[COEditingContext tagGroup].
- */
-- (BOOL)isTag;
-
-/** @taskunit Tagging */
-
-/**
- * Returns the tag the receiver represents.
- *
- * COTag can represent a tag attached to every object that belongs to it.
- *
- * By default, returns the name in lower case.
- */
-- (NSString *)tagString;
-
-@end
-
-
-
-/**
- * @group Object Collection and Organization
- *
- * COTagGroup is used to organize tags. 
- *
- * A tag group content is restricted to COTag objects.<br />
- * The content is ordered (to ensure the tag list order is  stable in the UI).
- *
- * Tags can be belong to multiple tag groups.
- */
-@interface COTagGroup : COGroup
-{
-
-}
 
 @end
 
@@ -108,12 +58,52 @@ typedef NSArray *(^COContentBlock)(void);
 
 /** @taskunit Controlling the Content */
 
+/**
+ * The target collection used to compute the smart group content.
+ *
+ * If a content block is provided, the target collection is not used.
+ *
+ * If a query is provided at the same time and the target collection supports 
+ * COObjectMatching protocol, then -objectsMatchingQuery: provides the smart 
+ * group content, otherwise the target collection is filtered as an array using 
+ * the query predicate.
+ *
+ * If no content block or query are set, the target collection is used as is as 
+ * the smart group content.
+ *
+ * See -query and -contentBlock.
+ */
 @property (nonatomic, retain) id <ETCollection> targetCollection;
+/**
+ * The query used to compute the smart group content.
+ *
+ * If a content block is provided, the query is not used.
+ *
+ * If no target collection is set, the query is evaluated directly against the 
+ * store (e.g. as a SQL query) rather than again the object graph in memory.
+ *
+ * If a target collection is provided, see -targetCollection to know how the 
+ * query is evaluated.
+ *
+ * See -targetCollection and -contentBlock.
+ */
 @property (nonatomic, retain) COQuery *query;
+/**
+ * The content block used to compute the smart group content.
+ *
+ * If a content block is set, both the target collection and query are not used.
+ *
+ * See -targetCollection and -query.
+ */
 @property (nonatomic, copy) COContentBlock contentBlock;
 
 /** @taskunit Accessing the Content */
 
+/**
+ * Returns the last computed smart group content.
+ *
+ * See -[ETCollection content].
+ */
 - (id) content;
 
 /** @taskunit Updating */

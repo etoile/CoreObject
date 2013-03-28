@@ -25,10 +25,20 @@ CoreObject_PRINCIPAL_CLASS = TestCommon
 endif
 LIBRARIES_DEPEND_UPON = -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
 
+CoreObject_HEADER_FILES_DIR = Headers
+OTHER_HEADER_DIRS = Model
+CoreObject_HEADER_FILES = $(notdir $(wildcard Headers/*.h))
+
 CoreObject_OBJC_FILES = $(wildcard CO*.m) $(wildcard NS*.m)
+CoreObject_OBJCC_FILES = $(wildcard *.mm)
+CoreObject_C_FILES= $(wildcard *.c)
+
+CoreObject_OBJC_FILES += $(wildcard Model/*.m)
+
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += \
 	TestArrayDiff.m \
+	TestCollection.m \
 	TestCommon.m \
 	TestCopy.m \
 	TestCommitTrack.m \
@@ -43,9 +53,6 @@ CoreObject_OBJC_FILES += \
 	TestStore.m \
 	TestUtilities.m
 endif
-CoreObject_OBJCC_FILES = $(wildcard *.mm)
-CoreObject_C_FILES= $(wildcard *.c)
-CoreObject_HEADER_FILES = $(wildcard *.h)
 
 clean : test=yes
 
