@@ -84,6 +84,9 @@
 - (COSmartGroup *)mainGroup;
 /**
  * Returns a group listing the libraries in the store.
+ *
+ * By default, it contains the libraries listed as methods among
+ * COEditingContext(COCommonLibraries).
  */
 - (COGroup *)libraryGroup;
 

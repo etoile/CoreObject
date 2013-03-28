@@ -1,4 +1,5 @@
 #import "COEditingContext.h"
+#import "COContainer.h"
 #import "COPersistentRoot.h"
 #import "COError.h"
 #import "COObject.h"
@@ -31,6 +32,20 @@ static COEditingContext *currentCtxt = nil;
 	ASSIGN(currentCtxt, aCtxt);
 }
 
+- (void)registerAdditionalEntityDescriptions
+{
+	NSSet *entityDescriptions = [COLibrary additionalEntityDescriptions];
+
+	for (ETEntityDescription *entity in entityDescriptions)
+	{
+		if ([[self modelRepository] descriptionForName: [entity fullName]] != nil)
+			continue;
+			
+		[[self modelRepository] addUnresolvedDescription: entity];
+	}
+	[[self modelRepository] resolveNamedObjectReferences];
+}
+
 - (id)initWithStore: (COStore *)store
 {
 	return [self initWithStore: store maxRevisionNumber: 0];
@@ -47,6 +62,8 @@ static COEditingContext *currentCtxt = nil;
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
 	_loadedPersistentRoots = [NSMutableDictionary new];
 	_deletedPersistentRoots = [NSMutableSet new];
+
+	[self registerAdditionalEntityDescriptions];
 
 	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
 	                                                    selector: @selector(didMakeCommit:) 
@@ -137,6 +154,9 @@ store by other processes. */
 		[metadata setObject: [[newGroup UUID] stringValue] 
 		             forKey: @"kCOLibraryGroupUUID"];
 		[_store setMetadata: metadata];
+		
+		[newGroup addObjects: A([self tagLibrary], [self bookmarkLibrary],
+			[self noteLibrary], [self photoLibrary], [self musicLibrary])];
 	
 		return newGroup;
 	}

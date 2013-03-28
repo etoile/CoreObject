@@ -51,6 +51,7 @@
 		609555DC1681CD520017C628 /* COPersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 609555DB1681CD520017C628 /* COPersistentRoot.m */; };
 		60988F17163B6B7A009C4F21 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F16163B6B7A009C4F21 /* Cocoa.framework */; };
 		60988F1D163B6B7A009C4F21 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 60988F1B163B6B7A009C4F21 /* InfoPlist.strings */; };
+		609C004B1703C7B100D01AAB /* TestCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00491703C7AC00D01AAB /* TestCollection.m */; };
 		609CFF671701EF2900D01AAB /* COBookmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 609CFF651701EF2800D01AAB /* COBookmark.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609CFF681701EF2900D01AAB /* COBookmark.m in Sources */ = {isa = PBXBuildFile; fileRef = 609CFF661701EF2800D01AAB /* COBookmark.m */; };
 		60A55DE114A25AC4007A9864 /* COTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60A55DDF14A25AC4007A9864 /* COTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -280,6 +281,7 @@
 		60988F16163B6B7A009C4F21 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		60988F1A163B6B7A009C4F21 /* SQLClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "SQLClient-Info.plist"; path = "SQLClient/SQLClient-Info.plist"; sourceTree = "<group>"; };
 		60988F1C163B6B7A009C4F21 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		609C00491703C7AC00D01AAB /* TestCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCollection.m; path = Tests/TestCollection.m; sourceTree = "<group>"; };
 		609CFF651701EF2800D01AAB /* COBookmark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COBookmark.h; sourceTree = "<group>"; };
 		609CFF661701EF2800D01AAB /* COBookmark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COBookmark.m; sourceTree = "<group>"; };
 		60A55DDF14A25AC4007A9864 /* COTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COTrack.h; sourceTree = "<group>"; };
@@ -684,6 +686,7 @@
 				791B4E271299C77700CCF472 /* main.m */,
 				66D09D02129C936E006BEDC3 /* TestCommon.h */,
 				66D09D03129C936E006BEDC3 /* TestCommon.m */,
+				609C00491703C7AC00D01AAB /* TestCollection.m */,
 				60F6A31A14444EDA00EFC711 /* TestCommitTrack.m */,
 				60980C5814C6F6FF001C05F2 /* TestCustomTrack.m */,
 				60F6A31B14444EDA00EFC711 /* TestRevisionNumber.m */,
@@ -1136,6 +1139,7 @@
 				60955580167B540A0017C628 /* TestHistoryTrack.m in Sources */,
 				60955581167B540A0017C628 /* TestObjectGraphDiff.m in Sources */,
 				60955582167B540A0017C628 /* TestCopy.m in Sources */,
+				609C004B1703C7B100D01AAB /* TestCollection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -7,6 +7,8 @@
  */
 
 #import "COCollection.h"
+#import "COEditingContext.h"
+#import "COPersistentRoot.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 
@@ -39,6 +41,15 @@
 		return collection;
 
 	return collection;	
+}
+
+- (ETUTI *)objectType
+{
+	ETPropertyDescription *propertyDesc =
+		[[self entityDescription] propertyDescriptionForName: [self contentKey]];
+	ETModelDescriptionRepository *repo = [[[self persistentRoot] parentContext] modelRepository];
+
+	return [ETUTI typeWithClass: [repo classForEntityDescription: [propertyDesc type]]];
 }
 
 - (void)addObjects: (NSArray *)anArray

@@ -52,7 +52,8 @@
  * 
  * Contained objects can only be one library.
  *
- * Unlike COContainer, it is unordered.
+ * The content is ordered (to ensure the object order remains stable in the UI 
+ * without sorting it).
  */
 @interface COLibrary : COContainer
 {
@@ -65,6 +66,10 @@
  * Returns YES.
  */
 - (BOOL)isLibrary;
+
+/** @taskunit Private */
+
++ (NSSet *)additionalEntityDescriptions;
 
 @end
 
@@ -100,6 +105,18 @@
  */
 - (COTagLibrary *)tagLibrary;
 /**
+ * Returns a library listing the bookmarks in the store.
+ *
+ * If the library doesn't exist yet, returns a new library but won't commit it.
+ */
+- (COLibrary *)bookmarkLibrary;
+/**
+ * Returns a library listing the notes in the store.
+ *
+ * If the library doesn't exist yet, returns a new library but won't commit it.
+ */
+- (COLibrary *)noteLibrary;
+/**
  * Returns a group listing the pictures in the store.
  *
  * If the library doesn't exist yet, returns a new library but won't commit it.
@@ -118,6 +135,14 @@
 
 See also -[COEditingContext tagLibrary]. */
 extern NSString * const kCOLibraryIdentifierTag;
+/** A unique identifier to mark the library listing the bookmarks in the store.
+ 
+See also -[COEditingContext bookmarkLibrary]. */
+extern NSString * const kCOLibraryIdentifierBookmark;
+/** A unique identifier to mark the library listing the notes in the store.
+ 
+See also -[COEditingContext noteLibrary]. */
+extern NSString * const kCOLibraryIdentifierNote;
 /** A unique identifier to mark the library listing the pictures in the store.
 
 See also -[COEditingContext photoLibrary]. */

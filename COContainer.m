@@ -36,12 +36,8 @@
 	if ([[collection name] isEqual: [COContainer className]] == NO) 
 		return collection;
 	
-	ETPropertyDescription *contentsProperty = 
-		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"COObject"];
-	
-	[contentsProperty setMultivalued: YES];
-	[contentsProperty setOrdered: YES];
-	[contentsProperty setPersistent: YES];
+	ETPropertyDescription *contentsProperty =
+		[self contentPropertyDescriptionWithName: @"contents" type: (id)@"COObject" opposite: nil];
 	
 	[collection setPropertyDescriptions: A(contentsProperty)];
 
@@ -85,6 +81,24 @@
 	return collection;	
 }
 
++ (ETEntityDescription *)makeEntityDescriptionWithName: (NSString *)aName contentType: (NSString *)aType
+{
+	ETEntityDescription *collection = [ETEntityDescription descriptionWithName: aName];
+	ETPropertyDescription *content =
+		[self contentPropertyDescriptionWithName: @"contents" type: (id)aType opposite: nil];
+
+	[collection setParent: (id)@"COLibrary"];
+	[collection addPropertyDescription: content];
+
+	return collection;
+}
+	 
++ (NSSet *)additionalEntityDescriptions
+{
+	return S([self makeEntityDescriptionWithName: @"COBookmarkLibrary" contentType: @"COBookmark"],
+			 [self makeEntityDescriptionWithName: @"CONoteLibrary" contentType: @"COContainer"]);
+}
+	 
 - (void)dealloc
 {
 	DESTROY(identifier);
@@ -94,11 +108,6 @@
 - (BOOL)isLibrary
 {
 	return YES;
-}
-
-- (BOOL) isOrdered
-{
-	return NO;
 }
 
 @end
@@ -173,6 +182,34 @@
 	return lib;
 }
 
+- (COLibrary *)bookmarkLibrary
+{
+	COLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierBookmark];
+	
+	if (lib == nil)
+	{
+		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COBookmarkLibrary"] rootObject];
+		[lib setName: _(@"Bookmarks")];
+		[lib setIdentifier: kCOLibraryIdentifierBookmark];
+		[[self libraryGroup] addObject: lib];
+	}
+	return lib;
+}
+
+- (COLibrary *)noteLibrary
+{
+	COLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierNote];
+	
+	if (lib == nil)
+	{
+		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.CONoteLibrary"] rootObject];
+		[lib setName: _(@"Notes")];
+		[lib setIdentifier: kCOLibraryIdentifierNote];
+		[[self libraryGroup] addObject: lib];
+	}
+	return lib;
+}
+
 - (COLibrary *)photoLibrary
 {
 	COLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierPhoto];
@@ -204,5 +241,7 @@
 @end
 
 NSString * const kCOLibraryIdentifierTag = @"kCOLibraryIdentifierTag";
+NSString * const kCOLibraryIdentifierBookmark = @"kCOLibraryIdentifierBookmark";
+NSString * const kCOLibraryIdentifierNote = @"kCOLibraryIdentifierNote";
 NSString * const kCOLibraryIdentifierPhoto = @"kCOLibraryIdentifierPhoto";
 NSString * const kCOLibraryIdentifierMusic = @"kCOLibraryIdentifierMusic";

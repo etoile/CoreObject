@@ -47,6 +47,20 @@
 + (ETPropertyDescription *)contentPropertyDescriptionWithName: (NSString *)aName
                                                          type: (NSString *)aType
                                                      opposite: (NSString *)oppositeType;
+/**
+ * <override-never />
+ * Returns UTI type for the collection elements.
+ *
+ * For inserting a new object in the collection, you can use this method to 
+ * known the object class to instantiate. 
+ *
+ * The returned UTI depends on -[ETPropertyDescription type] for the content 
+ * property description (looked up using -contentKey).<br />
+ * To customize the type, you must edit the receiver entity description.
+ *
+ * See also -[ETController currentObjectType] in EtoileUI.
+ */
+- (ETUTI *)objectType;
 
 /** @taskunit Content Access */
 
