@@ -61,6 +61,14 @@
  * See also -[ETController currentObjectType] in EtoileUI.
  */
 - (ETUTI *)objectType;
+/**
+ * <override-never />
+ * Returns whether the collection is ordered.
+ *
+ * The returned value is controlled by -[ETPropertyDescription isOrdered] for 
+ * the content property description (looked up using -contentKey).
+ */
+- (BOOL) isOrdered;
 
 /** @taskunit Content Access */
 

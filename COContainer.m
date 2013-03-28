@@ -49,11 +49,6 @@
 	return YES;
 }
 
-- (BOOL) isOrdered
-{
-	return YES;
-}
-
 @end
 
 

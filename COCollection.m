@@ -76,13 +76,11 @@
 	return @"contents";
 }
 
-#if 0
 - (BOOL) isOrdered
 {
 	// TODO: If too slow, return the boolean directly.
-	return [[[self entityDescription] propertyDescriptionForName: [self contentKey] isOrdered];
+	return [[[self entityDescription] propertyDescriptionForName: [self contentKey]] isOrdered];
 }
-#endif
 
 - (id) content
 {
