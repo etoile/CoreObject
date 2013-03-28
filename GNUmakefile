@@ -39,6 +39,7 @@ CoreObject_OBJC_FILES += $(wildcard fmdb/src/*.m)
 
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += \
+	Tests/main.m \
 	Tests/TestArrayDiff.m \
 	Tests/TestCollection.m \
 	Tests/TestCommon.m \
