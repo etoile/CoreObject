@@ -39,21 +39,21 @@ CoreObject_OBJC_FILES += $(wildcard fmdb/src/*.m)
 
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += \
-	TestArrayDiff.m \
-	TestCollection.m \
-	TestCommon.m \
-	TestCopy.m \
-	TestCommitTrack.m \
-	TestCustomTrack.m \
-	TestEditingContext.m \
-	TestHistoryTrack.m \
-	TestObjectGraphDiff.m \
-	TestPerformance.m \
-	TestRelationshipIntegrity.m \
-	TestRevisionNumber.m \
-	TestSynchronization.m \
-	TestStore.m \
-	TestUtilities.m
+	Tests/TestArrayDiff.m \
+	Tests/TestCollection.m \
+	Tests/TestCommon.m \
+	Tests/TestCopy.m \
+	Tests/TestCommitTrack.m \
+	Tests/TestCustomTrack.m \
+	Tests/TestEditingContext.m \
+	Tests/TestHistoryTrack.m \
+	Tests/TestObjectGraphDiff.m \
+	Tests/TestPerformance.m \
+	Tests/TestRelationshipIntegrity.m \
+	Tests/TestRevisionNumber.m \
+	Tests/TestSynchronization.m \
+	Tests/TestStore.m \
+	Tests/TestUtilities.m
 endif
 
 clean : test=yes
