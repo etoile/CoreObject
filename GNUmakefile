@@ -59,10 +59,10 @@ endif
 clean : test=yes
 
 include $(GNUSTEP_MAKEFILES)/aggregate.make
+-include ../../etoile.make
+-include etoile.make
 ifeq ($(test), yes)
   include $(GNUSTEP_MAKEFILES)/bundle.make
 else	
   include $(GNUSTEP_MAKEFILES)/framework.make
 endif
--include ../../etoile.make
--include etoile.make
