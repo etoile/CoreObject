@@ -14,19 +14,6 @@
 
 @implementation COContainer
 
-+ (ETPropertyDescription *)contentPropertyDescriptionWithName: (NSString *)aName
-                                                         type: (NSString *)aType
-                                                     opposite: (NSString *)oppositeType
-{
-	ETPropertyDescription *contentProperty = 
-		[ETPropertyDescription descriptionWithName: aName type: (id)aType];
-	[contentProperty setMultivalued: YES];
-	[contentProperty setOpposite: (id)oppositeType];
-	[contentProperty setOrdered: YES];
-	[contentProperty setPersistent: YES];
-	return contentProperty;
-}
-
 + (ETEntityDescription *) newEntityDescription
 {
 	ETEntityDescription *collection = [self newBasicEntityDescription];

@@ -15,19 +15,6 @@
 
 @implementation COGroup
 
-+ (ETPropertyDescription *)contentPropertyDescriptionWithName: (NSString *)aName
-                                                         type: (NSString *)aType
-                                                     opposite: (NSString *)oppositeType
-{
-	ETPropertyDescription *contentProperty = 
-		[ETPropertyDescription descriptionWithName: aName type: (id)aType];
-	[contentProperty setMultivalued: YES];
-	[contentProperty setOpposite: (id)oppositeType];
-	[contentProperty setOrdered: NO];
-	[contentProperty setPersistent: YES];
-	return contentProperty;
-}
-
 + (ETEntityDescription *) newEntityDescription
 {
 	ETEntityDescription *collection = [self newBasicEntityDescription];
@@ -46,10 +33,7 @@
 	[collection setLocalizedDescription: _(@"Group")];
 
 	ETPropertyDescription *contentProperty = 
-		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"COObject"];
-	[contentProperty setMultivalued: YES];
-	[contentProperty setOrdered: NO];
-	[contentProperty setPersistent: YES];
+		[self contentPropertyDescriptionWithName: @"contents" type: @"COObject" opposite: nil];
 
 	[collection setPropertyDescriptions: A(contentProperty)];
 
@@ -59,11 +43,6 @@
 - (BOOL)isGroup
 {
 	return YES;
-}
-
-- (BOOL) isOrdered
-{
-	return NO;
 }
 
 - (NSArray *) contentArray
@@ -140,17 +119,11 @@
 
 	ETPropertyDescription *contentProperty = 
 		[self contentPropertyDescriptionWithName: @"contents" type: @"COTag" opposite: nil];
-	[contentProperty setOrdered: YES];
 	//[contentProperty setOpposite: (id)@"COTag.parentTagGroups"]; // FIXME: just 'parentCollections' should work...
 
 	[collection setPropertyDescriptions: A(contentProperty)];
 
 	return collection;
-}
-
-- (BOOL) isOrdered
-{
-	return YES;
 }
 
 @end

@@ -16,28 +16,16 @@
 /**
  * @group Object Organization
  *
- * COGroup is a mutable, unordered, weak (an object can be in any number of 
+ * COGroup is a mutable, ordered, weak (an object can be in any number of 
  * collections) collection class.
+ *
+ * COGroup is not unordered, to ensure the element ordering remains stable in 
+ * the UI without sorting.
  */
 @interface COGroup : COCollection
 {
 
 }
-
-/** @taskunit Metamodel */
-
-/**
- * Returns a multivalued, non-ordered and persistent property.
- *
- * You can use this method to easily describe your collection content in a way 
- * that matches the superclass contraints. 
- *
- * See -[COCollection contentPropertyDescriptionWithName:type:opposite:] which 
- * documents the method precisely.
- */
-+ (ETPropertyDescription *)contentPropertyDescriptionWithName: (NSString *)aName
-                                                         type: (NSString *)aType
-                                                     opposite: (NSString *)oppositeType;
 
 /**
  * Returns YES.
@@ -84,9 +72,8 @@
  *
  * COTagGroup is used to organize tags. 
  *
- * A tag group content is restricted to COTag objects. 
- * Unlike COGroup, the content is ordered (to ensure the tag list order is  
- * stable in the UI on every use).
+ * A tag group content is restricted to COTag objects.<br />
+ * The content is ordered (to ensure the tag list order is  stable in the UI).
  *
  * Tags can be belong to multiple tag groups.
  */

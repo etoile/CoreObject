@@ -26,8 +26,9 @@
 /** @taskunit Metamodel */
 
 /**
- * <override-subclass />
- * Returns a persistent property that describes the collection content in a way 
+ * Returns a multivalued, ordered and persistent property.
+ *
+ * You can use this method to easily describe your collection content in a way
  * that matches the superclass contraints.
  * 
  * The returned property can be customized, then inserted into the entity built 
@@ -42,7 +43,7 @@
  * but are just registered at runtime directly, and belong to this Anonymous 
  * package as a result.
  *
- * The default implementation raises an exception.
+ * Can be overriden to change the constraints applying to the property.
  */
 + (ETPropertyDescription *)contentPropertyDescriptionWithName: (NSString *)aName
                                                          type: (NSString *)aType
