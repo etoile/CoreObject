@@ -17,6 +17,9 @@
  *
  * COContainer is a mutable, ordered, strong (contained objects can only be in 
  * one COContainer) collection class.
+ *
+ * Unlike COGroup, COContainer can the same object multiple times at various 
+ * indexes.
  */
 @interface COContainer : COCollection
 {

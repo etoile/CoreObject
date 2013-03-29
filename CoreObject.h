@@ -16,6 +16,7 @@
 #import <CoreObject/COFault.h>
 #import <CoreObject/COGroup.h>
 #import <CoreObject/COHistoryTrack.h>
+#import <CoreObject/COLibrary.h>
 #import <CoreObject/COObject.h>
 #import <CoreObject/COPersistentRoot.h>
 #import <CoreObject/COQuery.h>
@@ -23,6 +24,7 @@
 #import <CoreObject/COStore.h>
 #import <CoreObject/COSQLStore.h>
 #import <CoreObject/COSynchronizer.h>
+#import <CoreObject/COTag.h>
 #import <CoreObject/COTrack.h>
 
 /* Diff Framework (the Diff API is very unstable) */

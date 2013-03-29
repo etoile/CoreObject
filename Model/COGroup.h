@@ -19,6 +19,9 @@
  * COGroup is a mutable, ordered, weak (an object can be in any number of 
  * collections) collection class.
  *
+ * Unlike COContainer, COGroup contains distinct objects, an object cannot 
+ * appear multiple times at various indexes.
+ *
  * COGroup is not unordered, to ensure the element ordering remains stable in 
  * the UI without sorting.
  */

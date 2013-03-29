@@ -69,12 +69,12 @@
 @interface COTagLibrary : COLibrary
 {
 	@private
-	COGroup *tagGroups;
+	NSMutableArray *tagGroups;
 }
 
 /**
  * The tag categories used to organize the tags in the library.
  */
-@property (retain, nonatomic) COGroup *tagGroups;
+@property (copy, nonatomic) NSArray *tagGroups;
 
 @end

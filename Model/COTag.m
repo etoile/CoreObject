@@ -98,12 +98,16 @@
 	// property descriptions that we will inherit through the parent
 	if ([[collection name] isEqual: [COTagLibrary className]] == NO)
 		return collection;
-	
-	ETPropertyDescription *tagGroups =
-	[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"COGroup"];
+
+	 ETPropertyDescription *tagGroups =
+		[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"COTagGroup"];
+	[tagGroups setMultivalued: YES];
+	[tagGroups setOrdered: YES];
 	[tagGroups setPersistent: YES];
-	
-	[collection setPropertyDescriptions: A(tagGroups)];
+	ETPropertyDescription *content =
+		[self contentPropertyDescriptionWithName: @"contents" type: (id)@"COTag" opposite: nil];
+
+	[collection setPropertyDescriptions: A(tagGroups, content)];
 	
 	return collection;
 }
@@ -113,8 +117,7 @@
 	SUPERINIT;
 	[self setIdentifier: kCOLibraryIdentifierTag];
 	[self setName: _(@"Tags")];
-	tagGroups = [[COGroup alloc] init];
-	[tagGroups setName: _(@"Tag Groups")];
+	tagGroups = [[NSMutableArray alloc] init];
 	return self;
 }
 
@@ -128,8 +131,11 @@
 	// TODO: Leverage the model description rather than hardcoding the aspects
 	// TODO: Implement some strategy to recover in the case these aspects
 	// are already used as embedded objects in another root object.
-	ETAssert([[self tagGroups] isPersistent] == NO);
-	[[self tagGroups] becomePersistentInContext: aContext];
+	for (COTagGroup *group in tagGroups)
+	{
+		ETAssert([group isPersistent] == NO);
+		[group becomePersistentInContext: aContext];
+	}
 }
 
 - (void)dealloc

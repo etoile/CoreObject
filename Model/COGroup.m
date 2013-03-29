@@ -50,6 +50,15 @@
 	return [[self content] allObjects];
 }
 
+- (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+{
+	// TODO: Switch to NSMutableOrderedSet once implemented on GNUstep
+	if ([[self content] containsObject: object])
+		return;
+
+	[super insertObject: object atIndex: index hint: hint forProperty: key];
+}
+
 @end
 
 
