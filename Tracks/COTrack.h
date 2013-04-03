@@ -46,6 +46,15 @@
  */
 - (id)init;
 
+/** @taskunit Type Querying */
+
+/**
+ * Returns YES.
+ *
+ * See also -[NSObject isTrack].
+ */
+@property (nonatomic, readonly) BOOL isTrack;
+
 /** @taskunit Tracked Objects */
 
 /**

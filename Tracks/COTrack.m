@@ -37,6 +37,11 @@
 	return self;	
 }
 
+- (BOOL)isTrack
+{
+	return YES;
+}
+
 - (NSSet *)trackedObjects
 {
 	return [NSSet set];

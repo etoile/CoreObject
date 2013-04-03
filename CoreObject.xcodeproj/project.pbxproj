@@ -101,6 +101,8 @@
 		609C00EC1704C42200D01AAB /* NSData+sha1.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00E61704C42200D01AAB /* NSData+sha1.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00ED1704C42200D01AAB /* NSData+sha1.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00E71704C42200D01AAB /* NSData+sha1.m */; };
 		609C00EE1704C4D000D01AAB /* sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = 609C007E1704C2BA00D01AAB /* sqlite3.c */; };
+		609C01AC170AC93100D01AAB /* NSObject+CoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C01AA170AC93000D01AAB /* NSObject+CoreObject.h */; };
+		609C01AD170AC93100D01AAB /* NSObject+CoreObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C01AB170AC93100D01AAB /* NSObject+CoreObject.m */; };
 		60C8BC5416322E2C00A2B4EE /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 669965351162E17500359BE6 /* libz.1.2.5.dylib */; };
 		60C8BC5516322E3200A2B4EE /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
 		60C913B6165BBED000E0C5F4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60C913B5165BBED000E0C5F4 /* Foundation.framework */; };
@@ -347,6 +349,8 @@
 		609C00E51704C42200D01AAB /* NSData+compression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+compression.m"; path = "Utilities/NSData+compression.m"; sourceTree = "<group>"; };
 		609C00E61704C42200D01AAB /* NSData+sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+sha1.h"; path = "Utilities/NSData+sha1.h"; sourceTree = "<group>"; };
 		609C00E71704C42200D01AAB /* NSData+sha1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+sha1.m"; path = "Utilities/NSData+sha1.m"; sourceTree = "<group>"; };
+		609C01AA170AC93000D01AAB /* NSObject+CoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+CoreObject.h"; path = "Core/NSObject+CoreObject.h"; sourceTree = "<group>"; };
+		609C01AB170AC93100D01AAB /* NSObject+CoreObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+CoreObject.m"; path = "Core/NSObject+CoreObject.m"; sourceTree = "<group>"; };
 		60C913AD165BBE9E00E0C5F4 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Samples/BasicPersistence/main.m; sourceTree = "<group>"; };
 		60C913B3165BBED000E0C5F4 /* BasicPersistence */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BasicPersistence; sourceTree = BUILT_PRODUCTS_DIR; };
 		60C913B5165BBED000E0C5F4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -597,6 +601,8 @@
 		6686BDB612592C1B0065DE1A /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				609C01AA170AC93000D01AAB /* NSObject+CoreObject.h */,
+				609C01AB170AC93100D01AAB /* NSObject+CoreObject.m */,
 				609C00881704C3DA00D01AAB /* COEditingContext.h */,
 				609C00891704C3DA00D01AAB /* COEditingContext.m */,
 				609C008A1704C3DA00D01AAB /* COFault.h */,
@@ -797,6 +803,7 @@
 				609C00EA1704C42200D01AAB /* NSData+compression.h in Headers */,
 				609C00EC1704C42200D01AAB /* NSData+sha1.h in Headers */,
 				60C913C6165BBF5200E0C5F4 /* CoreObject.h in Headers */,
+				609C01AC170AC93100D01AAB /* NSObject+CoreObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1114,6 +1121,7 @@
 				609C00E91704C42200D01AAB /* COError.m in Sources */,
 				609C00EB1704C42200D01AAB /* NSData+compression.m in Sources */,
 				609C00ED1704C42200D01AAB /* NSData+sha1.m in Sources */,
+				609C01AD170AC93100D01AAB /* NSObject+CoreObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

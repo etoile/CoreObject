@@ -19,7 +19,7 @@
 
 @implementation COCommitTrack
 
-@synthesize UUID, label, persistentRoot, isCopy, isMainBranch;
+@synthesize UUID, persistentRoot, isCopy, isMainBranch;
 
 - (id)init
 {
@@ -60,7 +60,6 @@
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 	DESTROY(UUID);
 	DESTROY(parentTrack);
-	DESTROY(label);
 	[super dealloc];
 }
 
@@ -72,6 +71,18 @@
 			&& [[persistentRoot persistentRootUUID] isEqual: [[rhs persistentRoot] persistentRootUUID]]);
 	}
 	return NO;
+}
+
+- (NSString *)displayName
+{
+	NSString *label = [self label];
+	NSString *displayName = [[[self persistentRoot] rootObject] displayName];
+	
+	if (label != nil && [label isEqual: @""] == NO)
+	{
+		displayName = [displayName stringByAppendingFormat: @" (%@)", label];
+	}
+	return displayName;
 }
 
 - (BOOL)isBranch

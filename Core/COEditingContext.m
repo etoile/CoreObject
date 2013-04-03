@@ -91,6 +91,11 @@ static COEditingContext *currentCtxt = nil;
 	[super dealloc];
 }
 
+- (BOOL)isEditingContext
+{
+	return YES;
+}
+
 /* Handles distributed notifications about new revisions to refresh the root 
 object graphs present in memory, for which changes have been committed to the 
 store by other processes. */

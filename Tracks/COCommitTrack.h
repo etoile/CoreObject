@@ -29,7 +29,6 @@
 	ETUUID *UUID;
 	COPersistentRoot *persistentRoot;
 	COCommitTrack *parentTrack;
-	NSString *label;
 	BOOL isMainBranch;
 	BOOL isCopy;
 	BOOL isLoaded;

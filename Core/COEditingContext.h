@@ -76,6 +76,15 @@
  */
 - (id)init;
 
+/** @taskunit Type Querying */
+
+/**
+ * Returns YES.
+ *
+ * See also -[NSObject isEditingContext].
+ */
+@property (nonatomic, readonly) BOOL isEditingContext;
+
 /** @taskunit Special Groups and Libraries */
 
 /**

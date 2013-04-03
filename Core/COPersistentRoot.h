@@ -67,6 +67,12 @@
 /** @taskunit Persistent Root Properties */
 
 /**
+ * Returns YES.
+ *
+ * See also -[NSObject isPersistentRoot].
+ */
+@property (nonatomic, readonly) BOOL isPersistentRoot;
+/**
  * The UUID that is bound to a single persistent root per CoreObject store.
  *
  * Two persistent roots belonging to distinct CoreObject stores cannot use the 

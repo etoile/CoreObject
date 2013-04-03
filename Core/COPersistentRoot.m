@@ -59,6 +59,11 @@
 	[super dealloc];
 }
 
+- (BOOL)isPersistentRoot
+{
+	return YES;
+}
+
 - (COCommitTrack *)commitTrack
 {
 	return _commitTrack;
