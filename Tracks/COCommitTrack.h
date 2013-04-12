@@ -82,7 +82,7 @@
 /**
  * The commit track label, that serves a branch name in most cases.
  */
-@property (retain, nonatomic) NSString *label;
+@property (readonly, nonatomic) NSString *label;
 /**
  * The parent commit track from which the receiver is derived.
  *

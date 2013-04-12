@@ -986,7 +986,7 @@ void CHECK(id db)
 {
 	NILARG_EXCEPTION_TEST(aTrackUUID);
     FMResultSet *rs = [db executeQuery: @"SELECT name FROM branches WHERE uuid = ?", [self keyForUUID: aTrackUUID]]; CHECK(db);
-	NSString *result;
+	NSString *result = nil;
 	
 	if ([rs next])
 	{
