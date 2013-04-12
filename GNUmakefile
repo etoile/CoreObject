@@ -34,8 +34,8 @@ CoreObject_OBJC_FILES += $(wildcard Store/*.m)
 CoreObject_C_FILES = $(wildcard Store/*.c)
 CoreObject_OBJC_FILES += $(wildcard Tracks/*.m)
 CoreObject_OBJC_FILES += $(wildcard Utilities/*.m)
-
-CoreObject_OBJC_FILES += $(wildcard fmdb/src/*.m)
+# Don't compile fmdb/src/fmdb.m
+CoreObject_OBJC_FILES += $(wildcard fmdb/src/FM*.m)
 
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += \
