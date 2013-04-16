@@ -103,6 +103,7 @@
 		609C00EE1704C4D000D01AAB /* sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = 609C007E1704C2BA00D01AAB /* sqlite3.c */; };
 		609C01AC170AC93100D01AAB /* NSObject+CoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C01AA170AC93000D01AAB /* NSObject+CoreObject.h */; };
 		609C01AD170AC93100D01AAB /* NSObject+CoreObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C01AB170AC93100D01AAB /* NSObject+CoreObject.m */; };
+		60A792F6171C5E3100348EC7 /* TestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 60A792EC171C52BE00348EC7 /* TestObject.m */; };
 		60C8BC5416322E2C00A2B4EE /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 669965351162E17500359BE6 /* libz.1.2.5.dylib */; };
 		60C8BC5516322E3200A2B4EE /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
 		60C913B6165BBED000E0C5F4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60C913B5165BBED000E0C5F4 /* Foundation.framework */; };
@@ -351,6 +352,7 @@
 		609C00E71704C42200D01AAB /* NSData+sha1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+sha1.m"; path = "Utilities/NSData+sha1.m"; sourceTree = "<group>"; };
 		609C01AA170AC93000D01AAB /* NSObject+CoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+CoreObject.h"; path = "Core/NSObject+CoreObject.h"; sourceTree = "<group>"; };
 		609C01AB170AC93100D01AAB /* NSObject+CoreObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+CoreObject.m"; path = "Core/NSObject+CoreObject.m"; sourceTree = "<group>"; };
+		60A792EC171C52BE00348EC7 /* TestObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestObject.m; path = Tests/TestObject.m; sourceTree = "<group>"; };
 		60C913AD165BBE9E00E0C5F4 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Samples/BasicPersistence/main.m; sourceTree = "<group>"; };
 		60C913B3165BBED000E0C5F4 /* BasicPersistence */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BasicPersistence; sourceTree = BUILT_PRODUCTS_DIR; };
 		60C913B5165BBED000E0C5F4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -708,6 +710,7 @@
 				609C005B1704C24C00D01AAB /* TestCustomTrack.m */,
 				609C005C1704C24C00D01AAB /* TestEditingContext.m */,
 				609C005D1704C24C00D01AAB /* TestHistoryTrack.m */,
+				60A792EC171C52BE00348EC7 /* TestObject.m */,
 				609C005E1704C24C00D01AAB /* TestObjectGraphDiff.m */,
 				609C005F1704C24C00D01AAB /* TestPerformance.m */,
 				609C00601704C24C00D01AAB /* TestRelationshipIntegrity.m */,
@@ -1158,6 +1161,7 @@
 				609C00721704C24C00D01AAB /* TestStore.m in Sources */,
 				609C00731704C24C00D01AAB /* TestSynchronization.m in Sources */,
 				609C00741704C24C00D01AAB /* TestUtilities.m in Sources */,
+				60A792F6171C5E3100348EC7 /* TestObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

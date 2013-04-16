@@ -48,6 +48,7 @@ CoreObject_OBJC_FILES += \
 	Tests/TestCustomTrack.m \
 	Tests/TestEditingContext.m \
 	Tests/TestHistoryTrack.m \
+	Tests/TestObject.m \
 	Tests/TestObjectGraphDiff.m \
 	Tests/TestPerformance.m \
 	Tests/TestRelationshipIntegrity.m \

@@ -650,7 +650,7 @@
 {
 	/* We call the setter directly if implemented */
 
-	NSString *setterName = [@"set" stringByAppendingString: [key capitalizedString]];
+	NSString *setterName = [NSString stringWithFormat: @"set%@:", [key stringByCapitalizingFirstLetter]];
 	SEL setter = NSSelectorFromString(setterName);
 
 	if ([self respondsToSelector: setter])
@@ -727,7 +727,8 @@
 
 - (ETValidationResult *)validateValueUsingPVC: (id)value forProperty: (NSString *)key
 {
-	SEL keySelector = NSSelectorFromString([NSString stringWithFormat: @"validate%@:", [key capitalizedString]]);
+	SEL keySelector = NSSelectorFromString([NSString stringWithFormat: @"validate%@:",
+		[key stringByCapitalizingFirstLetter]]);
 
 	if ([self respondsToSelector: keySelector] == NO)
 		return [ETValidationResult validResult: value];
@@ -1197,9 +1198,7 @@ static int indent = 0;
 
 	/* First we try to use the getter named 'serialized' + 'key' */
 
-	// TODO: Probably a bit slow, rewrite in C a bit
-	NSString *capitalizedKey = [key stringByReplacingCharactersInRange: NSMakeRange(0, 1) 
-	                                                        withString: [[key substringToIndex: 1] uppercaseString]];
+	NSString *capitalizedKey = [key stringByCapitalizingFirstLetter];
 	SEL getter = NSSelectorFromString([@"serialized" stringByAppendingString: capitalizedKey]);
 
 	if ([self respondsToSelector: getter])
@@ -1230,11 +1229,8 @@ static int indent = 0;
 	
 	/* First we try to use the setter named 'setSerialized' + 'key' */
 
-	// TODO: Probably a bit slow, rewrite in C a bit
-	NSString *capitalizedKey = [key stringByReplacingCharactersInRange: NSMakeRange(0, 1) 
-	                                                        withString: [[key substringToIndex: 1] uppercaseString]];
 	SEL setter = NSSelectorFromString([NSString stringWithFormat: @"%@%@%@", 
-		@"setSerialized", capitalizedKey, @":"]);
+		@"setSerialized", [key stringByCapitalizingFirstLetter], @":"]);
 
 	if ([self respondsToSelector: setter])
 	{
