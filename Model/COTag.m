@@ -7,6 +7,7 @@
  */
 
 #import "COTag.h"
+#import "COPersistentRoot.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 
@@ -43,7 +44,7 @@
 
 - (BOOL)isTag
 {
-	assert([[[self persistentRoot] tagLibrary] containsObject: self]);
+	assert([[[[self persistentRoot] parentContext] tagLibrary] containsObject: self]);
 	return YES;
 }
 
