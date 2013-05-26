@@ -43,6 +43,9 @@
  * initialized instance), usually you have to override it to call the designated 
  * initializer. And secondary initializers must return valid instances or nil. 
  *
+ * Don't create singletons for COObject subclass in +initialize, because 
+ * -[COObject entityDescription] would return nil.
+ *
  * @section Persistency
  *
  * Whan an object becomes persistent, you invoke 
