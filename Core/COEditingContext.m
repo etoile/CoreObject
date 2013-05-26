@@ -96,6 +96,11 @@ static COEditingContext *currentCtxt = nil;
 	return YES;
 }
 
+- (COEditingContext *)editingContext
+{
+	return self;
+}
+
 /* Handles distributed notifications about new revisions to refresh the root 
 object graphs present in memory, for which changes have been committed to the 
 store by other processes. */

@@ -64,6 +64,16 @@
 	return YES;
 }
 
+- (BOOL)isEditingContext
+{
+	return NO;
+}
+
+- (COEditingContext *)editingContext
+{
+	return [self parentContext];
+}
+
 - (COCommitTrack *)commitTrack
 {
 	return _commitTrack;

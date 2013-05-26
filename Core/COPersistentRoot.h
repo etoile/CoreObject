@@ -158,6 +158,12 @@
  * The parent context is managed by the user.
  */
 @property (nonatomic, readonly) COEditingContext *parentContext;
+/**
+ * Returns -parentContext.
+ *
+ * See also -[COPersistentObjectContext editingContext].
+ */
+@property (nonatomic, readonly) COEditingContext *editingContext;
 
 /** @taskunit Object Access and Loading */
 

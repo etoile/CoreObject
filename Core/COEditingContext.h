@@ -1,10 +1,25 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COPersistentRoot;
+@class COPersistentRoot, COEditingContext;
 @class COStore, CORevision, COObject, COGroup, COSmartGroup, COCommitTrack, COError;
 
 @protocol COPersistentObjectContext <NSObject>
+/**
+ * Returns YES when the receiver is an editing context, otherwise returns NO
+ * when the receiver is a persistent root.
+ *
+ * See COEditingContext and COPersistentRoot.
+ */
+- (BOOL)isEditingContext;
+/**
+ * Returns the editing context for the receiver.
+ *
+ * Either returns self or a parent context.
+ *
+ * See COEditingContext and -[COPersistentRoot parentContext].
+ */
+- (COEditingContext *)editingContext;
 @end
 
 /**
@@ -84,6 +99,15 @@
  * See also -[NSObject isEditingContext].
  */
 @property (nonatomic, readonly) BOOL isEditingContext;
+
+/** @taskunit Editing Context Nesting */
+
+/**
+ * Returns self.
+ *
+ * See also -[COPersistentObjectContext editingContext].
+ */
+@property (nonatomic, readonly) COEditingContext *editingContext;
 
 /** @taskunit Special Groups and Libraries */
 
