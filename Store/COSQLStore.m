@@ -19,7 +19,7 @@
 	if (self == nil)
 		return nil;
 
-	db = [[FMDatabase alloc] initWithPath: [url path]];
+	db = [[FMDatabase alloc] initWithPath: [[url path] stringByStandardizingIntoAbsolutePath]];
 	if (![self setupDB])
 	{
 		[NSException raise: NSInternalInconsistencyException
