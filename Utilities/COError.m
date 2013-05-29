@@ -23,7 +23,7 @@
 		return nil;
 	}
 
-	BOOL isAggregate = (suberrors != nil && [suberrors isEmpty] == NO);
+	BOOL isAggregate = ([suberrors isEmpty] == NO);
 	self = [super initWithDomain: kCOCoreObjectErrorDomain 
 	                        code: (isAggregate ? kCOValidationMultipleErrorsError : kCOValidationError)
 	                    userInfo: nil];
@@ -49,7 +49,7 @@
 
 + (id)errorWithValidationResult: (ETValidationResult *)aResult
 {
-    return [[[self alloc] initWithValidationResult: aResult errors: nil] autorelease];
+    return [[[self alloc] initWithValidationResult: aResult errors: [NSArray array]] autorelease];
 }
 
 + (NSArray *)errorsWithValidationResults: (id <ETCollection>)results
