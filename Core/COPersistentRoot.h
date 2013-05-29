@@ -62,6 +62,8 @@
 	NSMutableSet *_deletedObjects;
 	/** Array of updated property names by inner object */
 	NSMapTable *_updatedPropertiesByObject;
+	/** All the objects being loaded inside -loadObject:AtRevision: */
+	NSMutableSet *_loadingObjects;
 }
 
 /** @taskunit Persistent Root Properties */

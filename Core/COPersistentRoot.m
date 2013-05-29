@@ -42,6 +42,7 @@
 	_insertedObjects = [NSMutableSet new];
 	_deletedObjects = [NSMutableSet new];
 	ASSIGN(_updatedPropertiesByObject, [NSMapTable mapTableWithStrongToStrongObjects]);
+	_loadingObjects = [NSMutableSet new];
 
 	return self;
 }
@@ -56,6 +57,7 @@
 	DESTROY(_insertedObjects);
 	DESTROY(_deletedObjects);
 	DESTROY(_updatedPropertiesByObject);
+	DESTROY(_loadingObjects);
 	[super dealloc];
 }
 
@@ -711,15 +713,34 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	}
 }
 
+- (void) willLoadObject: (COObject *)obj
+{
+	[_loadingObjects addObject: obj];
+}
+
+- (void) didLoadObject: (COObject *)obj isStillLoading: (BOOL)isStillLoading
+{
+	[obj awakeFromFetch];
+
+	if (isStillLoading)
+		return;
+
+	[[_loadingObjects mappedCollection] didLoad];
+	[_loadingObjects removeAllObjects];
+}
+
 - (void)loadObject: (COObject *)obj atRevision: (CORevision *)aRevision
 {
 	CORevision *loadedRev = (aRevision != nil ? aRevision : [obj revision]);
 	ETAssert(loadedRev != nil);
 	ETUUID *objUUID = [obj UUID];
 	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj persistentPropertyNames]];
+	BOOL isTriggeredLoad = ([_loadingObjects isEmpty] == NO);
 
 	obj->_isIgnoringDamageNotifications = YES;
 	[obj setIgnoringRelationshipConsistency: YES];
+
+	[self willLoadObject: obj];
 	
 	//NSLog(@"Load object %@ at %@", objUUID, loadedRev);
 	//NSLog(@"Fetch properties %@", propertiesToFetch);
@@ -737,7 +758,7 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 		[obj setSerializedValue: value forProperty: key];
 	}
 
-	[obj awakeFromFetch];
+	[self didLoadObject: obj isStillLoading: isTriggeredLoad];
 
 	[_updatedPropertiesByObject removeObjectForKey: obj];
 	obj->_isIgnoringDamageNotifications = NO;

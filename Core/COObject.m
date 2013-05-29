@@ -956,6 +956,11 @@
 
 }
 
+- (void)didLoad
+{
+	
+}
+
 - (void)didReload
 {
 
@@ -1040,6 +1045,20 @@
 {
 	// TODO: Check and traverse relationships to visit the object graph
 	return ([[aQuery predicate] evaluateWithObject: self] ? A(self) : [NSArray array]);
+}
+
+- (id)serializedRepresentation
+{
+	NSMutableDictionary *serializationRep = [NSMutableDictionary dictionary];
+
+	for (NSString *prop in [self persistentPropertyNames])
+	{
+		id value = [self serializedValueForProperty: prop];
+		id plist = [self propertyListForValue: value];
+
+		[serializationRep setObject: (plist != nil ? plist : [NSNull null]) forKey: prop];
+	}
+	return serializationRep;
 }
 
 - (id)roundTripValueForProperty: (NSString *)key
@@ -1218,6 +1237,7 @@ static int indent = 0;
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
 	}
+	// FIXME: Using -isCollection or -isMutableCollection unfaults the value.
 	if ([value isCollection] && [value isMutableCollection] == NO)
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to set immutable collection %@", key];

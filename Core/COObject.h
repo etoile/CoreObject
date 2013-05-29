@@ -149,8 +149,21 @@
  * attribute values have been deserialized, -awakeFromFetch is sent to the 
  * object to let it update its state before being used. You can thus override 
  * -awakeFromFetch to recreate transient properties, recompute correct property 
- * values based on the deserialized values, update relationships etc.<br />
- * Don't forget to call the superclass implementation first.<br />
+ * values based on the deserialized values, etc. But you must not access or 
+ * update persistent relationships in -awakeFromFetch directly. You can override 
+ * -didLoad to manipulate persistent relationships in a such way.<br />
+ * Loading an object can result in multiple objects being loaded if some 
+ * relationships are unfaulted. For example, an accessor can depend on or alter 
+ * a relationship object state (e.g. a parent object in a tree structure). 
+ * Although you should avoid to do so, in some cases it cannot be avoided. 
+ * To give a more concrete example in EtoileUI, -[ETLayoutItem setView:] uses   
+ * -[ETLayoutItemGroup handleAttacheViewOfItem:] to adjust the parent view.<br />
+ * For -loadObject:, the loaded object and all the relationships transitively 
+ * loaded receive -awakeFromFetch, then at the very end -didLoad is called. At 
+ * this point, you can be sure the objects are not in a partially 
+ * initialized/deserialized state.<br />
+ * Don't forget to call the superclass implementation first for both 
+ * -awakeFromFetch and -didLoad.<br />
  * In addition, navigating a root object history results in -awakeFromFetch 
  * being sent to each object loaded to a new revision in the object graph (not 
  * yet the case), rather being turned back into a fault. When every object in 
@@ -564,6 +577,7 @@
 - (void)awakeFromFetch;
 - (void)willTurnIntoFault;
 - (void)didTurnIntoFault;
+- (void)didLoad;
 - (void)didReload;
 
 /** @taskunit Object Equality */
@@ -604,6 +618,20 @@
 
 /** @taskunit Debugging and Description */
 
+/**
+ * <override-never />
+ * Returns the receiver serialized as a property list.
+ *
+ * Don't call -serializedRepresentation until the object has become persistent 
+ * (it has a been committed). See -isPersistent.
+ *
+ * The serialization is built using -serializedValueForProperty and 
+ * -propertyListForValue:.
+ *
+ * This method is useful to inspect the serialized representation that goes 
+ * into the store. CoreObject doesn't use this method.
+ */
+- (id)serializedRepresentation;
 /** 
  * Serializes the property value into the CoreObject serialized representation, 
  * then unserialize it back into a value that can be passed 
