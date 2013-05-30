@@ -8,6 +8,7 @@
 
 #import <CoreObject/COBookmark.h>
 #import <CoreObject/COCollection.h>
+#import <CoreObject/COCommitDescriptor.h>
 #import <CoreObject/COCommitTrack.h>
 #import <CoreObject/COContainer.h>
 #import <CoreObject/COCustomTrack.h>
