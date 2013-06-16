@@ -224,6 +224,13 @@
  * </example>
  */
 - (id)init;
+/**
+ * Initializes and returns a non-persistent object that uses a custom entity 
+ * description.
+ *
+ * See -init.
+ */
+- (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc;
 
 /** 
  * Makes the receiver persistent by inserting it into the given editing context.

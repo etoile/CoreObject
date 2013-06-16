@@ -199,6 +199,11 @@
 	return self;
 }
 
+- (id) initWithEntityDescription: (ETEntityDescription *)anEntityDesc
+{
+	return [self initWithUUID: [ETUUID UUID] entityDescription: anEntityDesc context: nil isFault: NO];
+}
+
 - (void)dealloc
 {
 	_persistentRoot = nil;

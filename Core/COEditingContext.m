@@ -10,7 +10,7 @@
 
 @implementation COEditingContext
 
-@synthesize deletedPersistentRoots;
+@synthesize deletedPersistentRoots = _deletedPersistentRoots;
 
 + (COEditingContext *)contextWithURL: (NSURL *)aURL
 {
