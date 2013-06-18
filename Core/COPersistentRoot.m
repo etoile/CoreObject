@@ -725,8 +725,13 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	if (isStillLoading)
 		return;
 
-	[[_loadingObjects mappedCollection] didLoad];
+	/* Snapshot the current loaded object batch, in case -didLoad loads other 
+	   objects, reenters this method and mutates _loadingObjects as a result. */
+	NSMutableSet *loadingObjects = [_loadingObjects copy];
+
 	[_loadingObjects removeAllObjects];
+	[[loadingObjects mappedCollection] didLoad];
+	RELEASE(loadingObjects);
 }
 
 - (void)loadObject: (COObject *)obj atRevision: (CORevision *)aRevision
