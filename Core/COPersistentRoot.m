@@ -61,6 +61,16 @@
 	[super dealloc];
 }
 
+- (NSString *)debugDescription
+{
+	// TODO: Improve the indenting
+	NSString *desc = [D([self insertedObjects], @"Inserted Objects",
+	                    [self deletedObjects], @"Deleted Objects",
+	                    _updatedPropertiesByObject, @"Updated Objects") debugDescription];
+	/* For Mac OS X, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
+	return [desc stringByReplacingOccurrencesOfString: @"\\n" withString: @"\n"];
+}
+
 - (BOOL)isPersistentRoot
 {
 	return YES;
@@ -355,6 +365,11 @@
 - (BOOL)isUpdatedObject: (COObject *)anObject
 {
 	return ([_updatedPropertiesByObject objectForKey: anObject] != nil);
+}
+
+- (NSMapTable *) updatedPropertiesByObject
+{
+	return _updatedPropertiesByObject;
 }
 
 - (NSSet *)deletedObjects
@@ -702,6 +717,9 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 
 - (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty
 {
+	/* Must never be called called during a load */
+	ETAssert([_loadingObjects isEmpty]);
+
 	if (nil == [_updatedPropertiesByObject objectForKey: obj])
 	{
 		[_updatedPropertiesByObject setObject: [NSMutableArray array] forKey: obj];
@@ -715,6 +733,8 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 
 - (void) willLoadObject: (COObject *)obj
 {
+	obj->_isIgnoringDamageNotifications = YES;
+	[obj setIgnoringRelationshipConsistency: YES];
 	[_loadingObjects addObject: obj];
 }
 
@@ -731,7 +751,18 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 
 	[_loadingObjects removeAllObjects];
 	[[loadingObjects mappedCollection] didLoad];
+	
+	// TODO: Write a test that checks unwanted damage notifications during batch loading
+	for (COObject *loadedObject in loadingObjects)
+	{
+		[_updatedPropertiesByObject removeObjectForKey: loadedObject];
+		loadedObject->_isIgnoringDamageNotifications = NO;
+		[loadedObject setIgnoringRelationshipConsistency: NO];
+	}
+	ETAssert([loadingObjects isEmpty] || [[self changedObjects] containsCollection: loadingObjects] == NO);
 	RELEASE(loadingObjects);
+
+	ETAssert([_loadingObjects isEmpty]);
 }
 
 - (void)loadObject: (COObject *)obj atRevision: (CORevision *)aRevision
@@ -741,9 +772,6 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	ETUUID *objUUID = [obj UUID];
 	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj persistentPropertyNames]];
 	BOOL isTriggeredLoad = ([_loadingObjects isEmpty] == NO);
-
-	obj->_isIgnoringDamageNotifications = YES;
-	[obj setIgnoringRelationshipConsistency: YES];
 
 	[self willLoadObject: obj];
 	
@@ -764,10 +792,6 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	}
 
 	[self didLoadObject: obj isStillLoading: isTriggeredLoad];
-
-	[_updatedPropertiesByObject removeObjectForKey: obj];
-	obj->_isIgnoringDamageNotifications = NO;
-	[obj setIgnoringRelationshipConsistency: NO];
 }
 
 - (void)loadObject: (COObject *)obj

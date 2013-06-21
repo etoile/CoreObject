@@ -20,6 +20,18 @@
  * See COEditingContext and -[COPersistentRoot parentContext].
  */
 - (COEditingContext *)editingContext;
+/**
+ * See -[COEditingContext debugDescription] and -[COPersistentRoot debugDescription].
+ */
+- (NSString *)debugDescription;
+/**
+ * See -[COEditingContext discardAllChanges] and -[COPersistentRoot discardAllChanges].
+ */
+- (void)discardAllChanges;
+/**
+ * See -[COEditingContext hasChanges] and -[COPersistentRoot hasChanges].
+ */
+- (BOOL)hasChanges;
 @end
 
 /**
@@ -90,6 +102,13 @@
  * As a result, the context content is not persisted.
  */
 - (id)init;
+
+/** @taskunit Debugging */
+
+/** 
+ * Returns a summary that describes the uncommitted changes.
+ */
+- (NSString *)debugDescription;
 
 /** @taskunit Type Querying */
 

@@ -66,6 +66,13 @@
 	NSMutableSet *_loadingObjects;
 }
 
+/** @taskunit Debugging */
+
+/**
+ * Returns a summary that describes the uncommitted changes.
+ */
+- (NSString *) debugDescription;
+
 /** @taskunit Persistent Root Properties */
 
 /**
