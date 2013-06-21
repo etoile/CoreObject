@@ -21,10 +21,6 @@
  */
 - (COEditingContext *)editingContext;
 /**
- * See -[COEditingContext debugDescription] and -[COPersistentRoot debugDescription].
- */
-- (NSString *)debugDescription;
-/**
  * See -[COEditingContext discardAllChanges] and -[COPersistentRoot discardAllChanges].
  */
 - (void)discardAllChanges;
@@ -108,7 +104,7 @@
 /** 
  * Returns a summary that describes the uncommitted changes.
  */
-- (NSString *)debugDescription;
+- (NSString *)description;
 
 /** @taskunit Type Querying */
 

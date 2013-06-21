@@ -71,7 +71,7 @@
 /**
  * Returns a summary that describes the uncommitted changes.
  */
-- (NSString *) debugDescription;
+- (NSString *)description;
 
 /** @taskunit Persistent Root Properties */
 

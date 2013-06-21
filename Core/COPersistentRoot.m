@@ -61,12 +61,12 @@
 	[super dealloc];
 }
 
-- (NSString *)debugDescription
+- (NSString *)description
 {
 	// TODO: Improve the indenting
 	NSString *desc = [D([self insertedObjects], @"Inserted Objects",
 	                    [self deletedObjects], @"Deleted Objects",
-	                    _updatedPropertiesByObject, @"Updated Objects") debugDescription];
+	                    _updatedPropertiesByObject, @"Updated Objects") description];
 	/* For Mac OS X, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
 	return [desc stringByReplacingOccurrencesOfString: @"\\n" withString: @"\n"];
 }

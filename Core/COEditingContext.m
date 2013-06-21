@@ -91,7 +91,7 @@ static COEditingContext *currentCtxt = nil;
 	[super dealloc];
 }
 
-- (NSString *)debugDescription
+- (NSString *)description
 {
 	NSMutableDictionary *changeSummary = [NSMutableDictionary dictionary];
 
@@ -100,11 +100,12 @@ static COEditingContext *currentCtxt = nil;
 		if ([persistentRoot hasChanges] == NO)
 			continue;
 		
-		[changeSummary setObject: [persistentRoot debugDescription]
+		[changeSummary setObject: [persistentRoot description]
 		                  forKey: [persistentRoot persistentRootUUID]];
 	}
+
 	/* For Mac OS X, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
-	NSString *desc = [changeSummary debugDescription];
+	NSString *desc = [changeSummary description];
 	desc = [desc stringByReplacingOccurrencesOfString: @"\\n" withString: @"\n"];
 	desc = [desc stringByReplacingOccurrencesOfString: @"\\\"" withString: @""];
 	return desc;
