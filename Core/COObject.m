@@ -21,6 +21,15 @@
 
 @implementation COObject
 
+/** <override-dummy />
+Returns <em>CO</em>.
+ 
+See +[NSObject typePrefix]. */
++ (NSString *) typePrefix
+{
+	return @"CO";
+}
+
 + (ETEntityDescription *) newEntityDescription
 {
 	ETEntityDescription *object = [self newBasicEntityDescription];
