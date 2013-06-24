@@ -1285,16 +1285,16 @@ static int indent = 0;
 	[self didChangeValueForProperty: key];
 }
 
-static NSArray *COArrayPropertyListForArray(NSArray *array)
+- (NSArray *) propertyListForArray: (NSArray *)array
 {
 	NSMutableArray *newArray = [NSMutableArray arrayWithCapacity: [array count]];
 	for (id value in array)
 	{
-		if ([value isKindOfClass: [COObject class]])
-		{
-			value = [(COObject*)value referencePropertyList];
-		}
-		[newArray addObject: value];
+		BOOL isPrimitiveCollection = ([value isCollection] && [value content] == value);
+		NSAssert(isPrimitiveCollection == NO, @"A multivalued property content "
+			"must not contain primitive collections such as NSArray or NSSet "
+			"as elements.");
+		[newArray addObject: [self propertyListForValue: value]];
 	}
 	return newArray;
 }
@@ -1415,13 +1415,13 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	}
 	else if ([value isKindOfClass: [NSArray class]])
 	{
-		result = (NSDictionary *)COArrayPropertyListForArray(value);
+		result = (NSDictionary *)[self propertyListForArray: value];
 	}
 	else if ([value isKindOfClass: [NSSet class]])
 	{
 		result = [NSDictionary dictionaryWithObjectsAndKeys:
 				 @"unorderedCollection", @"type",
-				 COArrayPropertyListForArray([value allObjects]), @"objects",
+		         [self propertyListForArray: [value allObjects]], @"objects",
 				 nil];
 	}
 	else if (value == nil)
