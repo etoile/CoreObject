@@ -1299,6 +1299,35 @@ static int indent = 0;
 	return newArray;
 }
 
+/* Converting dictionaries into arrays means a diff can be computed against the 
+serialized representation without having any support for keyed collections in 
+the diff code.
+ 
+For diffing the object graph directly, the same conversion is required in the 
+diff code though (not yet implemented). 
+  
+The conversion is slow, but keyed collections tend to be rather small unlike 
+arrays or sets, so it shouldn't cause performance issues in most cases.
+For faster performance, we could just serialize the dictionary keys and values 
+into two distinct arrays, and convert these into an array represention just at 
+diff time. */
+- (NSArray *) propertyListForDictionary: (NSDictionary *)dictionary
+{
+	/* We return an array rather than the set to prevent elements to appear 
+	   randomly reordered in the UI each time a reload occurs. */
+	NSMutableArray *newArray = [NSMutableArray arrayWithCapacity: [dictionary count]];
+	[dictionary enumerateKeysAndObjectsUsingBlock: ^(id key, id value, BOOL *stop)
+	{
+		BOOL isPrimitiveCollection = ([value isCollection] && [value content] == value);
+		NSAssert(isPrimitiveCollection == NO, @"A multivalued property content "
+			"must not contain primitive collections such as NSArray or NSSet "
+			"as elements.");
+		[newArray addObject: D(key, @"key", [self propertyListForValue: value], @"value")];
+	}];
+	return [NSDictionary dictionaryWithObjectsAndKeys: @"keyedCollection", @"type",
+	                                                   newArray, @"arrayRepresentation", nil];
+}
+
 /* Returns the CoreObject serialized type for a NSValue or NSNumber object.
 
 Nil is returned when the type is unsupported by CoreObject serialization. */
@@ -1424,6 +1453,10 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		         [self propertyListForArray: [value allObjects]], @"objects",
 				 nil];
 	}
+	else if ([value isKindOfClass: [NSDictionary class]])
+	{
+		result = (NSDictionary *)[self propertyListForDictionary: value];
+	}
 	else if (value == nil)
 	{
 		result = [NSDictionary dictionaryWithObject: @"nil" forKey: @"type"];
@@ -1506,6 +1539,17 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 				[set addObject: [self valueForPropertyList: [objects objectAtIndex:i]]];
 			}
 			return set;
+		}
+		else if ([type isEqualToString: @"keyedCollection"])
+		{
+			NSArray *arrayRepresentation = [plist valueForKey: @"arrayRepresentation"];
+			NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity: [arrayRepresentation count]];
+			for (NSDictionary *entry in arrayRepresentation)
+			{
+				[dict setObject: [self valueForPropertyList: [entry objectForKey: @"value"]]
+				         forKey: (id <NSCopying>)[entry objectForKey: @"key"]];
+			}
+			return dict;
 		}
 		else if ([type isEqualToString: @"nil"])
 		{
