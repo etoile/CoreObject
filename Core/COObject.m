@@ -423,6 +423,10 @@ See +[NSObject typePrefix]. */
 
 - (void)setName: (NSString *)aName
 {
+	if ([aName isEqual: @"Untitled"])
+	{
+		NSLog(@"bla");
+	}
 	[self willChangeValueForProperty: @"name"];
 	[self setValue: aName forUndefinedKey: @"name"];
 	[self didChangeValueForProperty: @"name"];
@@ -669,10 +673,9 @@ See +[NSObject typePrefix]. */
 
 	if ([self respondsToSelector: setter])
 	{
-		// NOTE: We could -setValue:forKey: to get a fallback on 
-		// -setValue:forUndefinedKey: if we have a type mistmatch between the 
-		// value and the setter argument.
-		[self performSelector: setter withObject: value];
+		// NOTE: Don't use -performSelector:withObject: because it doesn't
+		// support unboxing scalar values as Key-Value Coding does.
+		[self setValue: value forKey: key];
 		return YES;
 	}
 
