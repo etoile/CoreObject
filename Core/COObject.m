@@ -229,6 +229,7 @@ See +[NSObject typePrefix]. */
 	return [[[[self class] ifResponds] sharedInstance] isEqual: self];
 }
 
+// TODO: Remove 
 - (void)becomePersistentInContext: (COPersistentRoot *)aContext
 {
 	/* For transitively persisted objects, shared objects (e.g. action handlers
@@ -241,6 +242,7 @@ See +[NSObject typePrefix]. */
 	NILARG_EXCEPTION_TEST(aContext);
 	INVALIDARG_EXCEPTION_TEST(aContext, [aContext isKindOfClass: [COPersistentRoot class]]);
 
+    // i.e., a shared instance cannot _become_ persistent, it must have been created persistent
 	if ([self isSharedInstance])
 	{
 		/* For example, EtoileUI aspects returned by -sharedInstance must remain transient */
@@ -259,6 +261,10 @@ See +[NSObject typePrefix]. */
 	[aContext registerObject: self];
 }
 
+// TODO: Maybe add convenience copying method, - (COObject *) copyWithCopier: (COCopier *)aCopier
+// where the copier stores the state relating to copying, e.g. which context to copy into.
+
+// TODO: Remove; COObject should not respond to -copyWithZone
 - (id) copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription
 {
 	COObject *newObject = [[self class] allocWithZone: aZone];
