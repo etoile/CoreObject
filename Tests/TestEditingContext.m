@@ -10,33 +10,6 @@
 @interface TestEditingContext : TestCommon <UKTest>
 @end
 
-@interface COObject (Private)
-- (void)didCreate;
-@end
-
-/**
- * A class to test the -[COObject didCreate] method (unfortunately no anonymous 
- * classes in this language).
- */
-@interface TestCreateExample : COObject
-{
-	NSInteger didCreateCalled;
-}
-- (NSInteger)didCreateCalled;
-@end
-
-@implementation TestCreateExample
-- (NSInteger)didCreateCalled
-{
-	return didCreateCalled;
-}
-- (void)didCreate
-{
-	[super didCreate];
-	didCreateCalled++;
-}
-@end
-
 @implementation TestEditingContext
 
 - (void)testCreate
@@ -166,35 +139,6 @@
 	UKObjectsEqual([ctx loadedObjects], S(newObj));
 
 	[persistentRoot release];
-}
-
-- (void)testDidCreate
-{
-	/* Test the two COObject instantiation paths, 
-	   -[COEditingContext insertObjectWithEntityName:rootObject:] and -[COObject init] */
-	TestCreateExample *obj = (id)[ctx insertObjectWithEntityName: @"Anonymous.TestCreateExample"];
-	TestCreateExample *obj2 = [TestCreateExample new];
-
-	UKIntsEqual(1, [obj didCreateCalled]);
-	UKIntsEqual(1, [obj2 didCreateCalled]);
-
-	[obj2 becomePersistentInContext: [ctx makePersistentRoot]];
-
-	UKIntsEqual(1, [obj2 didCreateCalled]);
-
-	ETUUID *objUUID = [[obj UUID] retain];
-
-	[ctx commit];
-
-	[obj2 release];
-	[self instantiateNewContextAndStore];
-
-	obj = (id)[ctx objectWithUUID: objUUID];
-	
-	UKNotNil(obj);
-	UKIntsEqual(0, [obj didCreateCalled]);
-	
-	[objUUID release];
 }
 
 - (void)testDiscardChanges

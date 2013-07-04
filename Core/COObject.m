@@ -21,6 +21,7 @@
 
 @implementation COObject
 
+// For EtoileUI
 /** <override-dummy />
 Returns <em>CO</em>.
  
@@ -104,6 +105,7 @@ See +[NSObject typePrefix]. */
 	                                    capacity: 20];
 }
 
+// FIXME: Remove
 /* Puts mutable collections into multivalued properties. */
 - (void)didCreate
 {
@@ -947,6 +949,7 @@ See +[NSObject typePrefix]. */
 	[self didChangeValueForProperty: key oldValue: oldCollection];
 }
 
+// TODO: Change to new -didAwaken method called in a predetermined order
 - (void)awakeFromFetch
 {
 	// Debugging check that collections were set up properly
