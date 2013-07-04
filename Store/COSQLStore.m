@@ -933,7 +933,7 @@ void CHECK(id db)
 
 	// TODO: Record the commit track creation details in the metadata
 	[self beginCommitWithMetadata: nil
-	           persistentRootUUID: nil
+	           persistentRootUUID: aPersistentRootUUID
 	              commitTrackUUID: [self UUID]
 	                 baseRevision: aRevision];
 
