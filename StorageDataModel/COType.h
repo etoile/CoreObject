@@ -31,7 +31,7 @@ enum {
     kCOCommitUUIDType = 5,
 
     // Internal references (within a persistent root)
-    kCOEmbeddedItemType = 7,
+    kCOCompositeReferenceType = 7,
     kCOReferenceType = 9,
     
     // References across persistent roots

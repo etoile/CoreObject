@@ -186,7 +186,7 @@ serialization. */
 	{
 		if (value == nil || ([value persistentRoot] == [self persistentRoot]))
 		{
-			return ([aPropertyDesc isComposite] ? kCOEmbeddedItemType : kCOReferenceType);
+			return ([aPropertyDesc isComposite] ? kCOCompositeReferenceType : kCOReferenceType);
 		}
 		else
 		{

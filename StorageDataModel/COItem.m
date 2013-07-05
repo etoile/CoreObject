@@ -109,7 +109,7 @@ static id plistValueForPrimitiveValue(id aValue, COType aType)
         case kCOStringType: return aValue;
         case kCOBlobType: return aValue;
         case kCOReferenceType:
-        case kCOEmbeddedItemType:
+        case kCOCompositeReferenceType:
         case kCOCommitUUIDType:
             return [(ETUUID *)aValue stringValue];
         case kCOPathType: return [(COPath *)aValue stringValue];
@@ -146,7 +146,7 @@ static id valueForPrimitivePlistValue(id aValue, COType aType)
         case kCOStringType: return aValue;
         case kCOBlobType: return aValue;
         case kCOReferenceType:
-        case kCOEmbeddedItemType:
+        case kCOCompositeReferenceType:
         case kCOCommitUUIDType:
             return [ETUUID UUIDWithString: aValue];
         case kCOPathType: return [COPath pathWithString: aValue];
@@ -304,7 +304,7 @@ static id importValueFromPlist(id aPlist)
 	for (NSString *key in [self attributeNames])
 	{
 		COType type = [self typeForAttribute: key];
-		if (COPrimitiveType(type) == kCOEmbeddedItemType)
+		if (COPrimitiveType(type) == kCOCompositeReferenceType)
 		{		
 			for (ETUUID *embedded in [self allObjectsForAttribute: key])
 			{
@@ -434,7 +434,7 @@ static id importValueFromPlist(id aPlist)
 		id value = [aCopy valueForAttribute: attr];
 		COType type = [aCopy typeForAttribute: attr];
 		
-		if (COPrimitiveType(type) == kCOEmbeddedItemType)
+		if (COPrimitiveType(type) == kCOCompositeReferenceType)
 		{
 			if (COTypeIsPrimitive(type))
 			{
