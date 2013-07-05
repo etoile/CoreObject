@@ -1,7 +1,5 @@
-#import <EtoileFoundation/Macros.h>
-#import <EtoileFoundation/ETUUID.h>
-
 #import "COItem.h"
+#import <EtoileFoundation/Macros.h>
 #import "COPath.h"
 #import "COType.h"
 
@@ -45,6 +43,9 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 }
 
 @implementation COItem
+
+
+@synthesize schemaName;
 
 - (id) initWithUUID: (ETUUID *)aUUID
  typesForAttributes: (NSDictionary *)typesForAttributes
@@ -98,152 +99,6 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	return [values objectForKey: anAttribute];
 }
 
-/** @taskunit plist import/export */
-
-static id plistValueForPrimitiveValue(id aValue, COType aType)
-{
-    switch (COPrimitiveType(aType))
-    {
-        case kCOInt64Type: return aValue;
-        case kCODoubleType: return aValue;
-        case kCOStringType: return aValue;
-        case kCOBlobType: return aValue;
-        case kCOReferenceType:
-        case kCOCompositeReferenceType:
-        case kCOCommitUUIDType:
-            return [(ETUUID *)aValue stringValue];
-        case kCOPathType: return [(COPath *)aValue stringValue];
-        case kCOAttachmentType: return aValue;
-        default:
-            [NSException raise: NSInvalidArgumentException format: @"unknown type %d", aType];
-            return nil;
-    }
-}
-
-static id plistValueForValue(id aValue, COType aType)
-{
-    if (COTypeIsPrimitive(aType))
-    {
-        return plistValueForPrimitiveValue(aValue, aType);
-    }
-    else
-    {
-        NSMutableArray *collection = [NSMutableArray array];
-        for (id obj in aValue)
-        {
-            [collection addObject: plistValueForPrimitiveValue(obj, aType)];
-        }
-        return collection;
-    }
-}
-
-static id valueForPrimitivePlistValue(id aValue, COType aType)
-{
-    switch (COPrimitiveType(aType))
-    {
-        case kCOInt64Type: return aValue;
-        case kCODoubleType: return aValue;
-        case kCOStringType: return aValue;
-        case kCOBlobType: return aValue;
-        case kCOReferenceType:
-        case kCOCompositeReferenceType:
-        case kCOCommitUUIDType:
-            return [ETUUID UUIDWithString: aValue];
-        case kCOPathType: return [COPath pathWithString: aValue];
-        case kCOAttachmentType: return aValue;
-        default:
-            [NSException raise: NSInvalidArgumentException format: @"unknown type %d", aType];
-            return nil;
-    }
-}
-
-static id valueForPlistValue(id aValue, COType aType)
-{
-    if (COTypeIsPrimitive(aType))
-    {
-        return valueForPrimitivePlistValue(aValue, aType);
-    }
-    else
-    {
-        id collection;
-        if (COTypeIsOrdered(aType))
-        {
-            collection = [NSMutableArray array];
-        }
-        else
-        {
-            collection = [NSMutableSet set];
-        }
-        
-        for (id obj in aValue)
-        {
-            [collection addObject: valueForPrimitivePlistValue(obj, aType)];
-        }
-        return collection;
-    }
-}
-
-static id exportToPlist(id aValue, COType aType)
-{
-	NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity: 2];
-	[result setObject: [NSNumber numberWithInt: aType] forKey: @"type"];
-	[result setObject: plistValueForValue(aValue, aType) forKey: @"value"];
-	return result;
-}
-
-static COType importTypeFromPlist(id aPlist)
-{
-    return [[aPlist objectForKey: @"type"] intValue];
-}
-
-static id importValueFromPlist(id aPlist)
-{
-    return valueForPlistValue([aPlist objectForKey: @"value"],
-                              [[aPlist objectForKey: @"type"] intValue]);
-}
-
-- (id) plist
-{
-	NSMutableDictionary *plistValues = [NSMutableDictionary dictionaryWithCapacity: [values count]];
-	
-	for (NSString *key in values)
-	{
-		id plistValue = exportToPlist([values objectForKey: key], [[types objectForKey: key] intValue]);
-		[plistValues setObject: plistValue 
-						forKey: key];
-	}
-	
-	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-			plistValues, @"values",
-			[uuid stringValue], @"uuid",
-			nil];
-    
-    return dict;
-}
-
-- (id) initWithPlist: (id)aPlist
-{
-	ETUUID *aUUID = [ETUUID UUIDWithString: [aPlist objectForKey: @"uuid"]];
-		
-	NSMutableDictionary *importedValues = [NSMutableDictionary dictionary];
-	NSMutableDictionary *importedTypes = [NSMutableDictionary dictionary];
-	for (NSString *key in [aPlist objectForKey: @"values"])
-	{
-		id objPlist = [[aPlist objectForKey: @"values"] objectForKey: key];
-		
-		[importedValues setObject: importValueFromPlist(objPlist)
-						   forKey: key];
-		
-		[importedTypes setObject: [NSNumber numberWithInt: importTypeFromPlist(objPlist)]
-						  forKey: key];
-	}
-	
-	self = [self initWithUUID: aUUID
-		   typesForAttributes: importedTypes
-		  valuesForAttributes: importedValues];
-    
-    return self;
-}
 
 /** @taskunit equality testing */
 
@@ -262,6 +117,8 @@ static id importValueFromPlist(id aPlist)
 	if (![otherItem->uuid isEqual: uuid]) return NO;
 	if (![otherItem->types isEqual: types]) return NO;
 	if (![otherItem->values isEqual: values]) return NO;
+    if (!(otherItem->schemaName == nil && schemaName == nil)
+        && ![otherItem->schemaName isEqual: schemaName]) return NO;
 	return YES;
 }
 
@@ -361,11 +218,14 @@ static id importValueFromPlist(id aPlist)
 	for (NSString *key in [self attributeNames])
 	{
 		COType type = [self typeForAttribute: key];
-		if (COPrimitiveType(type) == kCOPathType)
+		if (COPrimitiveType(type) == kCOReferenceType)
 		{
-			for (COPath *path in [self allObjectsForAttribute: key])
+			for (id ref in [self allObjectsForAttribute: key])
 			{
-				[result addObject: [path persistentRoot]];
+                if ([ref isKindOfClass: [COPath class]])
+                {
+                    [result addObject: [ref persistentRoot]];
+                }
 			}
 		}
 	}
@@ -466,24 +326,34 @@ static id importValueFromPlist(id aPlist)
 						   type: type];
 			}
 		}
-		else if (COPrimitiveType(type) == kCOPathType)
+		else if (COPrimitiveType(type) == kCOReferenceType)
 		{
 			if (COTypeIsPrimitive(type))
 			{
-				COPath *pathValue = (COPath*)value;
-				
-				[aCopy setValue: [pathValue pathWithNameMapping: aMapping]
-				   forAttribute: attr
-						   type: type];
+                if ([value isKindOfClass: [COPath class]])
+                {
+                    COPath *pathValue = (COPath*)value;
+                    
+                    [aCopy setValue: [pathValue pathWithNameMapping: aMapping]
+                       forAttribute: attr
+                               type: type];
+                }
 			}
 			else
 			{ 
 				id newCollection = [[value mutableCopy] autorelease];
 				[newCollection removeAllObjects];
 				
-				for (COPath *pathValue in value)
+				for (id primitiveValue in value)
 				{
-					[newCollection addObject: [pathValue pathWithNameMapping:aMapping]];
+                    if ([primitiveValue isKindOfClass: [COPath class]])
+                    {
+                        [newCollection addObject: [primitiveValue pathWithNameMapping:aMapping]];
+                    }
+                    else
+                    {
+                        [newCollection addObject: primitiveValue];
+                    }
 				}
 				
 				[aCopy setValue: newCollection
@@ -545,7 +415,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 + (COMutableItem *) itemWithUUID: (ETUUID *)aUUID
 {
-	return [[(COMutableItem*)[self alloc] initWithUUID: aUUID] autorelease];
+	return [[[self alloc] initWithUUID: aUUID] autorelease];
 }
 
 - (void) setUUID: (ETUUID *)aUUID

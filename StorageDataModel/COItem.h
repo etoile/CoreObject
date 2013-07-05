@@ -1,7 +1,6 @@
 #import <Foundation/Foundation.h>
+#import <EtoileFoundation/ETUUID.h>
 #import "COType.h"
-
-@class ETUUID;
 
 /**
  * This is a low-level model object which makes up the contents of a commit's
@@ -28,7 +27,16 @@
     @protected
 	NSMutableDictionary *types;
     NSMutableDictionary *values;
+    /**
+     * I think this makes sense to store at the COItem level.
+     * My hunch is we should store this here, but don't persist the 
+     * schema names for individual properties.
+     *
+     */
+    NSString *schemaName;
 }
+
+@property (nonatomic, readwrite, copy) NSString *schemaName;
 
 /**
  * designated initializer.
@@ -49,11 +57,6 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
 - (COType) typeForAttribute: (NSString *)anAttribute;
 - (id) valueForAttribute: (NSString*)anAttribute;
-
-/** @taskunit plist import/export */
-
-- (id)plist;
-- (id)initWithPlist: (id)aPlist;
 
 /** @taskunit convenience */
 

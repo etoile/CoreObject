@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
+#import <EtoileFoundation/ETUUID.h>
 
-@class ETUUID;
 /**
  *
  */
@@ -11,6 +11,11 @@
 	ETUUID *branch_;
 	ETUUID *embeddedObject_;
 }
+
+/**
+ * Returns YES if embeddedObject is set
+ */
+- (BOOL) isCrossPersistentRoot;
 
 @property (readonly) ETUUID *persistentRoot;
 @property (readonly) ETUUID *branch;
@@ -27,6 +32,9 @@
 + (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
 							 branch: (ETUUID*)aBranch;
 
+/**
+ * Deprecated. COPath can only point at the root object.
+ */
 + (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
 							 branch: (ETUUID*)aBranch
 					embdeddedObject: (ETUUID *)anObject;

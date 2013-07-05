@@ -1,6 +1,6 @@
-#import <EtoileFoundation/ETUUID.h>
-#import <EtoileFoundation/Macros.h>
 #import "COItemGraph.h"
+#import <EtoileFoundation/Macros.h>
+#import <EtoileFoundation/ETUUID.h>
 #import "COItem.h"
 
 @implementation COItemGraph
