@@ -23,6 +23,8 @@
 		6043D4D31757B4F9002103CC /* COCommitDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 6043D4C717575D79002103CC /* COCommitDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
 		6043D4D51757B4FC002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
+		606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 606E3DBF1787A07E00ED42DA /* COSerialization.h */; };
+		606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 606E3DC01787A07E00ED42DA /* COSerialization.m */; };
 		60988F17163B6B7A009C4F21 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F16163B6B7A009C4F21 /* Cocoa.framework */; };
 		60988F1D163B6B7A009C4F21 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 60988F1B163B6B7A009C4F21 /* InfoPlist.strings */; };
 		609C00651704C24C00D01AAB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00541704C24C00D01AAB /* main.m */; };
@@ -282,6 +284,8 @@
 		6019B89E163C006E00D1986F /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = SQLClient/config.h; sourceTree = "<group>"; };
 		6043D4C717575D79002103CC /* COCommitDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCommitDescriptor.h; path = Utilities/COCommitDescriptor.h; sourceTree = "<group>"; };
 		6043D4C817575D7A002103CC /* COCommitDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCommitDescriptor.m; path = Utilities/COCommitDescriptor.m; sourceTree = "<group>"; };
+		606E3DBF1787A07E00ED42DA /* COSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSerialization.h; path = Core/COSerialization.h; sourceTree = "<group>"; };
+		606E3DC01787A07E00ED42DA /* COSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSerialization.m; path = Core/COSerialization.m; sourceTree = "<group>"; };
 		60988F0C163B6A90009C4F21 /* Postgres.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Postgres.m; path = SQLClient/Postgres.m; sourceTree = "<group>"; };
 		60988F0F163B6A90009C4F21 /* SQLite.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SQLite.m; path = SQLClient/SQLite.m; sourceTree = "<group>"; };
 		60988F15163B6B7A009C4F21 /* SQLClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SQLClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -655,6 +659,8 @@
 				609C008F1704C3DA00D01AAB /* COPersistentRoot.m */,
 				609C00901704C3DA00D01AAB /* COQuery.h */,
 				609C00911704C3DA00D01AAB /* COQuery.m */,
+				606E3DBF1787A07E00ED42DA /* COSerialization.h */,
+				606E3DC01787A07E00ED42DA /* COSerialization.m */,
 				609C00921704C3DA00D01AAB /* COSynchronizer.h */,
 				609C00931704C3DA00D01AAB /* COSynchronizer.m */,
 			);
@@ -855,6 +861,7 @@
 				6675F8C51785C02A001E5622 /* COPath.h in Headers */,
 				6675F8C71785C02A001E5622 /* COType.h in Headers */,
 				66094848178794D40049468B /* COItem+JSON.h in Headers */,
+				606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1178,6 +1185,7 @@
 				6675F8C41785C02A001E5622 /* COItemGraph.m in Sources */,
 				6675F8C61785C02A001E5622 /* COPath.m in Sources */,
 				66094847178794D40049468B /* COItem+JSON.m in Sources */,
+				606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
