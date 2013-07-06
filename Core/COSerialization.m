@@ -10,6 +10,7 @@
 #import "COObject.h"
 #import "COItem.h"
 #import "COPath.h"
+#import "COPersistentRoot.h"
 
 #include <objc/runtime.h>
 
@@ -45,7 +46,7 @@ serialization. */
 		|| (strcmp(type, @encode(NSRange)) == 0));
 }
 
-/* Returns the CoreObject serialization result for a NSValue.
+/* Returns a scalar string representation for a NSValue object if possible.
  
 Nil is returned when the value type is unsupported by CoreObject serialization. */
 - (id)serializedValueForScalarValue: (NSValue *)value
@@ -82,7 +83,12 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	}
 	else if (strcmp(type, @encode(NSRange)) == 0)
 	{
+		// TODO: Add null range support
 		return NSStringFromRange([value rangeValue]);
+	}
+	else
+	{
+		NSAssert(NO, @"Unsupported scalar serialization type %s for %@", type, value);
 	}
 	return nil;
 }
@@ -103,7 +109,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		{
 			NSAssert([value isRoot], @"A property must point to a root object "
 				"for references accross persistent roots");
-			return [COPath pathWithPersistentRoot: [[value persistentRoot] UUID]
+			return [COPath pathWithPersistentRoot: [[value persistentRoot] persistentRootUUID]
 			                               branch: [[[value persistentRoot] commitTrack] UUID]];
 		}
 	}
@@ -242,7 +248,6 @@ serialization. */
 	else
 	{
 		NSAssert(NO, @"Unsupported serialization type %@ for %@", type, value);
-		return 0;
 	}
 	return 0;
 }
@@ -276,6 +281,8 @@ serialization. */
 	return [NSNumber numberWithInteger: type];
 }
 
+// TODO: Could be changed to -serializedValueForProperty: once the previous
+// serialization format has been removed.
 - (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	id value = nil;
@@ -319,9 +326,201 @@ serialization. */
 	return [COItem itemWithTypesForAttributes: types valuesForAttributes: values];
 }
 
+/* Returns a NSValue object for a scalar string value if possible.
+ 
+Nil is returned when the value type is unsupported by CoreObject deserialization. */
+- (NSValue *)scalarValueForSerializedValue: (id)value typeName: (NSString *)typeName
+{
+	// NOTE: We should never receive a nil value, because scalar values are
+	// either special zero or null constants encoded as such but never equal to
+	// zero or nil.
+	NSParameterAssert(value != nil);
+	NSParameterAssert([value isKindOfClass: [NSString class]]);
+
+	if ([typeName isEqualToString: @"NSPoint"])
+	{
+		NSPoint point;
+		if ([value isEqualToString: @"null-point"])
+		{
+			point = CONullPoint;
+		}
+		else
+		{
+			point = NSPointFromString(value);
+		}
+		return [NSValue valueWithPoint: point];
+	}
+	else if ([typeName isEqualToString: @"NSSize"])
+	{
+		NSSize size;
+		if ([value isEqualToString: @"null-size"])
+		{
+			size = CONullSize;
+		}
+		else
+		{
+			size = NSSizeFromString(value);
+		}
+		return [NSValue valueWithSize: size];
+	}
+	else if ([typeName isEqualToString: @"NSRect"])
+	{
+		NSRect rect;
+		if ([value isEqualToString: @"null-rect"])
+		{
+			rect = CONullRect;
+		}
+		else
+		{
+			rect = NSRectFromString(value);
+		}
+		return [NSValue valueWithRect: rect];
+	}
+	else if ([typeName isEqualToString: @"NSRange"])
+	{
+		// TODO: Add null range support
+		return [NSValue valueWithRange: NSRangeFromString(value)];
+	}
+	else
+	{
+		NSAssert(NO, @"Unsupported scalar serialization type %@ for %@", typeName, value);
+	}
+	return nil;
+}
+
+- (id)valueForSerializedValue: (id)value
+                       ofType: (COType)type
+          propertyDescription: (ETPropertyDescription *)aPropertyDesc
+{
+	if (type == kCOReferenceType)
+	{
+		NSParameterAssert([value isKindOfClass: [ETUUID class]]);
+
+		if (value == nil)
+			return nil;
+
+		return [[[self persistentRoot] parentContext] objectWithUUID: value
+														  entityName: [[aPropertyDesc type] name]
+														  atRevision: nil];
+	}
+	else if (type == kCOArrayType)
+	{
+		NSAssert([aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
+			@"Serialization type doesn't match metamodel");
+
+		// TODO: Allocating a C array on the stack is probably premature
+		// optimization. Fast enumeration could even be faster.
+		NSUInteger count = [value count];
+		id mappedObjects[count];
+
+		for (int i = 0; i < count; i++)
+		{
+			mappedObjects[i] = [self valueForSerializedValue: [value objectAtIndex: i]
+													  ofType: COPrimitiveType(type)
+			                             propertyDescription: aPropertyDesc];
+		}
+
+		Class arrayClass = ([aPropertyDesc isReadOnly] ? [NSArray class] : [NSMutableArray class]);
+		return [arrayClass arrayWithObjects: mappedObjects count: count];
+	}
+	else if (type == kCOSetType)
+	{
+		NSAssert([aPropertyDesc isOrdered] == NO && [aPropertyDesc isMultivalued],
+			@"Serialization type doesn't match metamodel");
+
+		// TODO: Allocating a C array on the stack is probably premature
+		// optimization. Fast enumeration could even be faster.
+		NSUInteger count = [value count];
+		id mappedObjects[count];
+
+		for (int i = 0; i < count; i++)
+		{
+			mappedObjects[i] = [self valueForSerializedValue: [value objectAtIndex: i]
+													  ofType: COPrimitiveType(type)
+			                             propertyDescription: aPropertyDesc];
+		}
+
+		Class setClass = ([aPropertyDesc isReadOnly] ? [NSSet class] : [NSMutableSet class]);
+		return [setClass setWithObjects: mappedObjects count: count];
+	}
+	else if (COTypeIsPrimitive(type))
+	{
+		NSString *typeName = [[aPropertyDesc type] name];
+	
+		if ([self isSerializableScalarTypeName: typeName])
+		{
+			return [self scalarValueForSerializedValue: value typeName: typeName];
+		}
+		else if (type == kCOBlobType && [typeName isEqualToString: @"NSData"])
+		{
+			if (value == nil)
+				return nil;
+
+			NSParameterAssert([value isKindOfClass: [NSData class]]);
+			return [NSKeyedUnarchiver unarchiveObjectWithData: (NSData *)value];
+		}
+		return value;
+	}
+	else
+	{
+		NSAssert(NO, @"Unsupported serialization type %@ for %@", @(type), value);
+	}
+	return nil;
+}
+
+// TODO: Could be changed to -setSerializedValue:forProperty: once the previous
+// serialization format has been removed.
+- (void)setSerializedValue: (id)value forPropertyDescription: (ETPropertyDescription *)aPropertyDesc
+{
+	NSString *key = [aPropertyDesc name];
+
+	/* First we try to use the setter named 'setSerialized' + 'key' */
+
+	SEL setter = NSSelectorFromString([NSString stringWithFormat: @"%@%@%@", 
+		@"setSerialized", [key stringByCapitalizingFirstLetter], @":"]);
+
+	if ([self respondsToSelector: setter])
+	{
+		[self performSelector: setter withObject: value];
+		return;
+	}	
+	
+	/* When no custom setter can be found, we try to access the ivar with KVC semantics */
+
+	[self willChangeValueForProperty: key];
+
+	if (ETSetInstanceVariableValueForKey(self, value, key) == NO)
+	{
+		/* If no valid ivar can be found, we access the variable storage */
+		[self setPrimitiveValue: value forKey: key];
+	}
+
+	/* Persistent roots will post KVO notifications but won't record the changes */
+	[self didChangeValueForProperty: key];
+}
+								
 - (void)setSerializedItem: (COItem *)aSerializedItem
 {
-	// TODO: Implement
+	for (NSString *property in [aSerializedItem attributeNames])
+	{
+		ETPropertyDescription *propertyDesc =
+			[[self entityDescription] propertyDescriptionForName: property];
+		id serializedValue = [aSerializedItem valueForAttribute: property];
+		COType serializedType = [aSerializedItem typeForAttribute: property];
+	
+		if (propertyDesc == nil)
+		{
+			[NSException raise: NSInvalidArgumentException
+			            format: @"Tried to set serialized value %@ of type %@ "
+			                     "for property %@ missing in the metamodel %@",
+			                    serializedValue, @(serializedType), [propertyDesc name], [self entityDescription]];
+		}
+
+		id value = [self valueForSerializedValue: serializedValue
+		                                  ofType: serializedType
+		                     propertyDescription: propertyDesc];
+		[self setSerializedValue: value forProperty: property];
+	}
 }
 
 @end
