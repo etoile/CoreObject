@@ -192,7 +192,7 @@ serialization. */
 		{
 			NSAssert([value isRoot], @"A property must point to a root object "
 				"for references accross persistent roots");
-			return kCOPathType;
+			return kCOReferenceType;
 		}
 	}
 	else if ([typeName isEqualToString: @"BOOL"]
