@@ -222,7 +222,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		{
 			for (id ref in [self allObjectsForAttribute: key])
 			{
-                if ([ref isKindOfClass: [COPath class]])
+                if ([ref isKindOfClass: [COPath class]] && [ref isCrossPersistentRoot])
                 {
                     [result addObject: [ref persistentRoot]];
                 }

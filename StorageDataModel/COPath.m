@@ -7,6 +7,11 @@
 @synthesize branch = branch_;
 @synthesize embeddedObject = embeddedObject_;
 
+- (BOOL) isCrossPersistentRoot
+{
+    return persistentRoot_ != nil;
+}
+
 - (COPath *) initWithPersistentRoot: (ETUUID *)aRoot
 							 branch: (ETUUID*)aBranch
 					embdeddedObject: (ETUUID *)anObject

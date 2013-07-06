@@ -13,7 +13,7 @@
 }
 
 /**
- * Returns YES if embeddedObject is set
+ * Returns YES if persistentRoot is set
  */
 - (BOOL) isCrossPersistentRoot;
 
