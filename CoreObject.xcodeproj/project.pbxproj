@@ -122,6 +122,8 @@
 		60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		66094847178794D40049468B /* COItem+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 66094845178794D40049468B /* COItem+JSON.m */; };
 		66094848178794D40049468B /* COItem+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 66094846178794D40049468B /* COItem+JSON.h */; };
+		6609485E1787A1160049468B /* CORelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6609485C1787A1160049468B /* CORelationshipCache.m */; };
+		6609485F1787A1160049468B /* CORelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 6609485D1787A1160049468B /* CORelationshipCache.h */; };
 		6675F8C11785C02A001E5622 /* COItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BA1785C02A001E5622 /* COItem.h */; };
 		6675F8C21785C02A001E5622 /* COItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BB1785C02A001E5622 /* COItem.m */; };
 		6675F8C31785C02A001E5622 /* COItemGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BC1785C02A001E5622 /* COItemGraph.h */; };
@@ -378,6 +380,8 @@
 		6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		66094845178794D40049468B /* COItem+JSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "COItem+JSON.m"; sourceTree = "<group>"; };
 		66094846178794D40049468B /* COItem+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "COItem+JSON.h"; sourceTree = "<group>"; };
+		6609485C1787A1160049468B /* CORelationshipCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CORelationshipCache.m; path = Core/CORelationshipCache.m; sourceTree = "<group>"; };
+		6609485D1787A1160049468B /* CORelationshipCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CORelationshipCache.h; path = Core/CORelationshipCache.h; sourceTree = "<group>"; };
 		6614500F12B0127E000DB843 /* Design.rtfd */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; path = Design.rtfd; sourceTree = "<group>"; };
 		6675F8BA1785C02A001E5622 /* COItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItem.h; sourceTree = "<group>"; };
 		6675F8BB1785C02A001E5622 /* COItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COItem.m; sourceTree = "<group>"; };
@@ -651,6 +655,8 @@
 				609C01AB170AC93100D01AAB /* NSObject+CoreObject.m */,
 				609C00881704C3DA00D01AAB /* COEditingContext.h */,
 				609C00891704C3DA00D01AAB /* COEditingContext.m */,
+				6609485D1787A1160049468B /* CORelationshipCache.h */,
+				6609485C1787A1160049468B /* CORelationshipCache.m */,
 				609C008A1704C3DA00D01AAB /* COFault.h */,
 				609C008B1704C3DA00D01AAB /* COFault.m */,
 				609C008C1704C3DA00D01AAB /* COObject.h */,
@@ -862,6 +868,7 @@
 				6675F8C71785C02A001E5622 /* COType.h in Headers */,
 				66094848178794D40049468B /* COItem+JSON.h in Headers */,
 				606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */,
+				6609485F1787A1160049468B /* CORelationshipCache.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1186,6 +1193,7 @@
 				6675F8C61785C02A001E5622 /* COPath.m in Sources */,
 				66094847178794D40049468B /* COItem+JSON.m in Sources */,
 				606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */,
+				6609485E1787A1160049468B /* CORelationshipCache.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
