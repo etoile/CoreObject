@@ -73,9 +73,9 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
                 }
                 else
                 {
-                    [(COObject *)aValue addReferenceFromSourceObject: anObject
-                                                      sourceProperty: [aProperty name]
-                                                      targetProperty: [propertyInTarget name]];
+                    [[(COObject *)aValue relationshipCache] addReferenceFromSourceObject: anObject
+                                                                          sourceProperty: [aProperty name]
+                                                                          targetProperty: [propertyInTarget name]];
                 }
             }
         }

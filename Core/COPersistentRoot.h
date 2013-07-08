@@ -10,9 +10,8 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COEditingContext.h>
-#import "CORelationshipCache.h"
 
-@class COCommitTrack, COObject, CORevision, COStore;
+@class COCommitTrack, COObject, CORevision, COStore, CORelationshipCache;
 
 /**
  * A persistent root editing context exposes as a working copy a CoreObject 
