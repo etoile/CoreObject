@@ -184,7 +184,7 @@
 	ETUUID *_uuid;
 	COPersistentRoot *_persistentRoot; // weak reference
 	@protected
-	NSMapTable *_variableStorage;
+	NSMutableDictionary *_variableStorage;
 	@package
 	BOOL _isIgnoringDamageNotifications;
 	@private
@@ -693,9 +693,9 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
- * Returns a new map table to store properties.
+ * Returns a new mutable dictionary to store properties.
  */
- - (NSMapTable *)newVariableStorage;
+ - (NSMutableDictionary *)newVariableStorage;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

@@ -66,7 +66,7 @@ persistency-related. */
 	ETEntityDescription *_entityDescription;
 	ETUUID *_uuid;
 	COPersistentRoot *_persistentRoot; // weak reference
-	NSMapTable *_variableStorage;
+	NSMutableDictionary *_variableStorage;
 	BOOL _isIgnoringDamageNotifications;
 }
 

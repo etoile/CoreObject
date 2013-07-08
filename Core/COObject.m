@@ -98,11 +98,9 @@ See +[NSObject typePrefix]. */
 	return object;
 }
 
-- (NSMapTable *)newVariableStorage
+- (NSMutableDictionary *)newVariableStorage
 {
-	return [[NSMapTable alloc] initWithKeyOptions: NSMapTableStrongMemory 
-	                                 valueOptions: NSMapTableStrongMemory 
-	                                    capacity: 20];
+	return [[NSMutableDictionary alloc] initWithCapacity: 20];
 }
 
 // FIXME: Remove
