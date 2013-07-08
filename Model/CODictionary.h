@@ -21,11 +21,15 @@
  * low-level store representation for storing, diffing and merging entities 
  * and keyed collections.
  *
- * CODictionary is a mutable collection.
+ * CODictionary is a mutable collection. It is a low-level collection similar 
+ * to NSArray or NSDictionary and not a high-level collection such as 
+ * COCollection. As a result, CODictionary cannot be used as a root object for 
+ * a persistent root (e.g. you cannot tag it or change its modification date).
  */
 @interface CODictionary : COObject <ETKeyedCollection, ETCollectionMutation>
 {
-
+	@private
+	NSMutableDictionary *_content;
 }
 
 /** @taskunit Keyed Collection Protocol */

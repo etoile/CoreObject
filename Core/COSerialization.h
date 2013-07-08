@@ -19,7 +19,7 @@
 
 /** @taskunit Serialization */
 
-- (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
+- (id)serializedValueForValue: (id)aValue;
 - (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value;
 
 /** @taskunit Deserialization */

@@ -300,9 +300,7 @@ serialization. */
 	/* If no custom getter can be found, we use PVC which will in last resort
 	   access the variable storage with -primitiveValueForKey: */
 	
-	value = [self valueForProperty: [aPropertyDesc name]];
-	
-	return [self serializedValueForValue: value];
+	return [self valueForProperty: [aPropertyDesc name]];
 }
 
 - (COItem *)storeItem
@@ -316,11 +314,15 @@ serialization. */
 
 	for (ETPropertyDescription *propertyDesc in serializedPropertyDescs)
 	{
+		// TODO: Should change -serializedValueForPropertyDescription: to
+		// -serializedValueForProperty: once we remove the previous serialization support
 		id value = [self serializedValueForPropertyDescription: propertyDesc];
-		[values setObject: value
-		           forKey: [propertyDesc name]];
-		[types setObject: [self serializedTypeForPropertyDescription: propertyDesc value: value]
-		          forKey: [propertyDesc name]];
+		id serializedValue = [self serializedValueForValue: value];
+		NSNumber *serializedType = [self serializedTypeForPropertyDescription: propertyDesc
+		                                                                value: serializedValue];
+	
+		[values setObject: serializedValue forKey: [propertyDesc name]];
+		[types setObject: serializedType forKey: [propertyDesc name]];
 	}
 	
 	return [COItem itemWithTypesForAttributes: types valuesForAttributes: values];
@@ -519,7 +521,9 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 		id value = [self valueForSerializedValue: serializedValue
 		                                  ofType: serializedType
 		                     propertyDescription: propertyDesc];
-		[self setSerializedValue: value forProperty: property];
+		// TODO: Should change -setSerializedValue:forPropertyDescription: to
+		// -setSerializedValue:forProperty: once we remove the previous serialization support
+		[self setSerializedValue: value forPropertyDescription: propertyDesc];
 	}
 }
 

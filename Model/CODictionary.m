@@ -24,7 +24,7 @@
 	[self applyTraitFromClass: [ETMutableCollectionTrait class]];
 }
 
-+ (ETEntityDescription *) ewEntityDescription
++ (ETEntityDescription *) newEntityDescription
 {
 	ETEntityDescription *collection = [self newBasicEntityDescription];
 
@@ -36,37 +36,51 @@
 	return collection;	
 }
 
+- (id)init
+{
+	SUPERINIT;
+	_content = [NSMutableDictionary new];
+	return self;
+}
+
+- (void)dealloc
+{
+	DESTROY(_content);
+	[super dealloc];
+}
+
 #pragma mark Keyed Collection Protocol
 #pragma mark -
 
+
 - (NSArray *)allKeys
 {
-	return [_variableStorage allKeys];
+	return [_content allKeys];
 }
 
 - (NSArray *)allValues
 {
-	return [_variableStorage allValues];
+	return [_content allValues];
 }
 
 - (id)objectForKey: (id)aKey
 {
-	return [_variableStorage objectForKey: aKey];
+	return [_content objectForKey: aKey];
 }
 
 - (void)setObject: (id)anObject forKey: (id)aKey
 {
-	[_variableStorage setObject: anObject forKey: aKey];
+	[_content setObject: anObject forKey: aKey];
 }
 
 - (void)removeObjectForKey: (id)aKey
 {
-	[_variableStorage removeObjectForKey: aKey];
+	[_content removeObjectForKey: aKey];
 }
 
 - (void)removeAllObjects
 {
-	[_variableStorage removeAllObjects];
+	[_content removeAllObjects];
 }
 
 #pragma mark Collection Protocol
@@ -89,17 +103,17 @@
 
 - (id) content
 {
-	return _variableStorage;
+	return _content;
 }
 
 - (NSArray *)contentArray
 {
-	return [_variableStorage allValues];
+	return [_content allValues];
 }
 
 - (NSArray *)arrayRepresentation
 {
-	return [_variableStorage arrayRepresentation];
+	return [_content arrayRepresentation];
 }
 
 #pragma mark Collection Mutation Protocol
@@ -107,12 +121,12 @@
 
 - (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
 {
-	[_variableStorage setObject: object forKey: [[hint ifResponds] key]];
+	[_content setObject: object forKey: [[hint ifResponds] key]];
 }
 
 - (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
 {
-	[_variableStorage removeObjectForKey: [[hint ifResponds] key]];
+	[_content removeObjectForKey: [[hint ifResponds] key]];
 }
 
 #pragma mark Serialization
@@ -123,20 +137,20 @@
 	ETModelDescriptionRepository *repo = [[[self persistentRoot] parentContext] modelRepository];
 	ETEntityDescription *rootType = [repo descriptionForName: @"Object"];
 	NSMutableDictionary *types =
-		[NSMutableDictionary dictionaryWithCapacity: [_variableStorage count]];
+		[NSMutableDictionary dictionaryWithCapacity: [_content count]];
 	NSMutableDictionary *values =
-		[NSMutableDictionary dictionaryWithCapacity: [_variableStorage count]];
+		[NSMutableDictionary dictionaryWithCapacity: [_content count]];
 
-	for (NSString *key in [_variableStorage allKeys])
+	for (NSString *key in [_content allKeys])
 	{
 		ETPropertyDescription *propertyDesc =
 			[ETPropertyDescription descriptionWithName: key type: rootType];
-
-		id value = [self serializedValueForPropertyDescription: propertyDesc];
-		[values setObject: value
-		           forKey: [propertyDesc name]];
-		[types setObject: [self serializedTypeForPropertyDescription: propertyDesc value: value]
-		          forKey: [propertyDesc name]];
+		id serializedValue = [self serializedValueForValue: [_content objectForKey: key]];
+		NSNumber *serializedType =
+			[self serializedTypeForPropertyDescription: propertyDesc value: serializedValue];
+	
+		[values setObject: serializedValue forKey: [propertyDesc name]];
+		[types setObject: serializedType forKey: [propertyDesc name]];
 	}
 	
 	return [COItem itemWithTypesForAttributes: types valuesForAttributes: values];
@@ -166,7 +180,7 @@
 		id value = [self valueForSerializedValue: serializedValue
 		                                  ofType: serializedType
 		                     propertyDescription: propertyDesc];
-		[self setSerializedValue: value forProperty: property];
+		[_content setObject: value forKey: property];
 	}
 }
 
