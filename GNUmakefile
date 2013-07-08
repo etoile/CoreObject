@@ -5,14 +5,13 @@ include $(GNUSTEP_MAKEFILES)/common.make
 FRAMEWORK_NAME = CoreObject
 VERSION = 0.5
 
-LIBRARIES_DEPEND_UPON = -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
+LIBRARIES_DEPEND_UPON = $(shell pkg-config --libs sqlite3) -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
 
 CC = clang
 CXX = clang
 LD = $(CXX)
 
 CoreObject_INCLUDE_DIRS = -Ifmdb/src 
-CoreObject_CPPFLAGS = -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS
 CoreObject_LDFLAGS += -lstdc++ -lobjcxx
 
 ifeq ($(test), yes)
