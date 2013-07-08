@@ -51,6 +51,10 @@ return ret;
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSDate *, dateForColumnIndex);
 }
 
+- (NSNumber*)numberForQuery:(NSString*)query, ...; {
+    RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSNumber *, numberForColumnIndex);
+}
+
 
 //check if table exist in database (patch from OZLB)
 - (BOOL)tableExists:(NSString*)tableName {

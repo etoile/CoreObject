@@ -53,6 +53,9 @@
 - (long long int)longLongIntForColumn:(NSString*)columnName;
 - (long long int)longLongIntForColumnIndex:(int)columnIdx;
 
+- (int64_t)int64ForColumn:(NSString*)columnName;
+- (int64_t)int64ForColumnIndex:(int)columnIdx;
+
 - (BOOL)boolForColumn:(NSString*)columnName;
 - (BOOL)boolForColumnIndex:(int)columnIdx;
 
@@ -67,6 +70,9 @@
 
 - (NSData*)dataForColumn:(NSString*)columnName;
 - (NSData*)dataForColumnIndex:(int)columnIdx;
+
+- (NSNumber*)numberForColumn:(NSString*)columnName;
+- (NSNumber*)numberForColumnIndex:(int)columnIdx;
 
 - (const unsigned char *)UTF8StringForColumnIndex:(int)columnIdx;
 - (const unsigned char *)UTF8StringForColumnName:(NSString*)columnName;

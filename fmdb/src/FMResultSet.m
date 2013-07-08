@@ -95,7 +95,7 @@
                 // fetch according to type
                 switch (sqlite3_column_type(statement.statement, i)) {
                     case SQLITE_INTEGER: {
-                        value = [NSNumber numberWithInt:[self intForColumnIndex:i]];
+                        value = [NSNumber numberWithLongLong:[self longLongIntForColumnIndex:i]];
                         break;
                     }
                     case SQLITE_FLOAT: {
@@ -220,6 +220,13 @@
     return (long)sqlite3_column_int64(statement.statement, columnIdx);
 }
 
+- (int64_t)int64ForColumn:(NSString*)columnName {
+    return [self int64ForColumnIndex:[self columnIndexForName:columnName]];
+}
+- (int64_t)int64ForColumnIndex:(int)columnIdx {
+    return sqlite3_column_int64(statement.statement, columnIdx);
+}
+
 - (long long int)longLongIntForColumn:(NSString*)columnName {
     return [self longLongIntForColumnIndex:[self columnIndexForName:columnName]];
 }
@@ -233,7 +240,7 @@
 }
 
 - (BOOL)boolForColumnIndex:(int)columnIdx {
-    return ([self intForColumnIndex:columnIdx] != 0);
+    return sqlite3_column_int64(statement.statement, columnIdx) != 0;
 }
 
 - (double)doubleForColumn:(NSString*)columnName {
@@ -297,6 +304,18 @@
     return data;
 }
 
+- (NSNumber*)numberForColumn:(NSString*)columnName
+{
+    return [self numberForColumnIndex:[self columnIndexForName:columnName]];
+}
+- (NSNumber*)numberForColumnIndex:(int)columnIdx
+{
+    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_FLOAT) {
+        return [NSNumber numberWithDouble: sqlite3_column_double(statement.statement, columnIdx)];
+    } else {
+        return [NSNumber numberWithLongLong: sqlite3_column_int64(statement.statement, columnIdx)];
+    }
+}
 
 - (NSData*)dataNoCopyForColumn:(NSString*)columnName {
     return [self dataNoCopyForColumnIndex:[self columnIndexForName:columnName]];
