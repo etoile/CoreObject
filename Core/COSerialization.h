@@ -14,6 +14,6 @@
 
 @interface COObject (COSerialization)
 
-@property (nonatomic, copy) COItem *serializedItem;
+@property (nonatomic, copy) COItem *storeItem;
 
 @end

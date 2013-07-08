@@ -305,7 +305,7 @@ serialization. */
 	return [self serializedValueForValue: value];
 }
 
-- (COItem *)serializedItem
+- (COItem *)storeItem
 {
 	NSArray *serializedPropertyDescs =
 		[[self entityDescription] allPersistentPropertyDescriptions];
@@ -499,14 +499,14 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	[self didChangeValueForProperty: key];
 }
 								
-- (void)setSerializedItem: (COItem *)aSerializedItem
+- (void)setStoreItem: (COItem *)aStoreItem
 {
-	for (NSString *property in [aSerializedItem attributeNames])
+	for (NSString *property in [aStoreItem attributeNames])
 	{
 		ETPropertyDescription *propertyDesc =
 			[[self entityDescription] propertyDescriptionForName: property];
-		id serializedValue = [aSerializedItem valueForAttribute: property];
-		COType serializedType = [aSerializedItem typeForAttribute: property];
+		id serializedValue = [aStoreItem valueForAttribute: property];
+		COType serializedType = [aStoreItem typeForAttribute: property];
 	
 		if (propertyDesc == nil)
 		{
