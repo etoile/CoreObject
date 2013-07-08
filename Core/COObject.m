@@ -14,6 +14,7 @@
 #import "COError.h"
 #import "COFault.h"
 #import "COPersistentRoot.h"
+#import "COPersistentRoot+RelationshipCache.h"
 #import "COStore.h"
 #import "COTag.h"
 #import "COGroup.h"
@@ -165,6 +166,7 @@ See +[NSObject typePrefix]. */
 	{
 		[(id)_persistentRoot markObjectAsUpdated: self forProperty: nil];
 		_variableStorage = [self newVariableStorage];
+        _incomingRelationships = [[CORelationshipCache alloc] init];
 		[self didCreate];
 	}
 
@@ -219,6 +221,7 @@ See +[NSObject typePrefix]. */
 	DESTROY(_uuid);
 	DESTROY(_entityDescription);
 	DESTROY(_variableStorage);
+    DESTROY(_incomingRelationships);
 	[super dealloc];
 }
 
@@ -272,7 +275,8 @@ See +[NSObject typePrefix]. */
 	if (_variableStorage != nil)
 	{
 		newObject->_variableStorage = [self newVariableStorage];
-
+        newObject->_incomingRelationships = [[CORelationshipCache alloc] init];
+        
 		if (usesModelDescription)
 		{
 			// TODO: For variable storage properties, support a metamodel-driven copy
@@ -548,128 +552,6 @@ See +[NSObject typePrefix]. */
 	}
 }
 
-- (void)updateRelationshipConsistencyForProperty: (NSString *)key oldValue: (id)oldValue
-{
-	// FIXME: use the metamodel's validation support?
-	if (_isIgnoringRelationshipConsistency)
-		return;
-
-	[self setIgnoringRelationshipConsistency: YES]; // Needed to guard against recursion
-	
-	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	assert(desc != nil);
-	
-	if ([desc opposite] != nil)
-	{
-		NSString *oppositeName = [[desc opposite] name];
-		if (![desc isMultivalued]) // modifying the single-valued side of a relationship
-		{
-			COObject *oldContainer = oldValue;
-			COObject *newContainer = [self valueForProperty: key];
-			
-			if (newContainer != oldContainer)
-			{					
-				[oldContainer setIgnoringRelationshipConsistency: YES];
-				[newContainer setIgnoringRelationshipConsistency: YES];			
-				
-				if ([[desc opposite] isMultivalued])
-				{
-					[oldContainer removeObject: self atIndex: ETUndeterminedIndex hint: nil forProperty: oppositeName];
-					[newContainer insertObject: self atIndex: ETUndeterminedIndex hint: nil forProperty: oppositeName];			
-				}
-				else
-				{
-					[oldContainer setValue: nil forProperty: oppositeName];
-					[newContainer setValue: self forProperty: oppositeName];			
-				}
-
-				[oldContainer setIgnoringRelationshipConsistency: NO];
-				[newContainer setIgnoringRelationshipConsistency: NO];
-			}
-		}
-		else // modifying the multivalued side of a relationship
-		{
-			id newValue = [self valueForProperty: key];
-			NSMutableSet *newObjects;
-	
-			if ([newValue isKindOfClass: [NSSet class]])
-			{
-				newObjects = [NSMutableSet setWithSet: newValue];
-			}			
-			else if (newValue == nil)
-			{
-				newObjects = [NSMutableSet set]; // Should usually never happen
-			}
-			else
-			{
-				newObjects = [NSMutableSet setWithArray: newValue];
-			}
-			
-			NSMutableSet *oldObjects;
-			if ([oldValue isKindOfClass: [NSSet class]])
-			{
-				oldObjects = [NSMutableSet setWithSet: oldValue];
-			}
-			else if (oldValue == nil)
-			{
-				oldObjects = [NSMutableSet set]; // Should only happen when an object is first created
-			}
-			else
-			{
-				oldObjects = [NSMutableSet setWithArray: oldValue];
-			}
-			
-			NSMutableSet *commonObjects = [NSMutableSet setWithSet: oldObjects];
-			[commonObjects intersectSet: newObjects];
-			
-			[oldObjects minusSet: commonObjects]; 
-			[newObjects minusSet: commonObjects];
-			// Now newObjects is added objects, and oldObjects is removed objects
-			
-			for (COObject *obj in [oldObjects setByAddingObjectsFromSet: newObjects])
-			{
-				[obj setIgnoringRelationshipConsistency: YES];
-			}
-			
-			if ([[desc opposite] isMultivalued])
-			{
-				for (COObject *oldObj in oldObjects)
-				{
-					[oldObj removeObject: self atIndex: ETUndeterminedIndex hint: nil forProperty: oppositeName];
-				}
-				for (COObject *newObj in newObjects)
-				{
-					[newObj insertObject: self atIndex: ETUndeterminedIndex hint: nil forProperty: oppositeName];
-				}
-			}
-			else
-			{
-				for (COObject *oldObj in oldObjects)
-				{
-					[oldObj setValue: nil forProperty: oppositeName];
-				}
-				for (COObject *newObj in newObjects)
-				{
-					id oldContainer = [newObj valueForProperty: oppositeName];
-
-					[oldContainer setIgnoringRelationshipConsistency: YES];
-					
-					[oldContainer removeObject: newObj atIndex: ETUndeterminedIndex hint: nil forProperty: key];
-					[newObj setValue: self forProperty: oppositeName];
-				
-					[oldContainer setIgnoringRelationshipConsistency: NO];
-				}	
-			}
-
-			for (COObject *obj in [oldObjects setByAddingObjectsFromSet: newObjects])
-			{
-				[obj setIgnoringRelationshipConsistency: NO];
-			}
-		}
-	}
-	[self setIgnoringRelationshipConsistency: NO];
-}
-
 - (BOOL) setValue: (id)value forProperty: (NSString *)key
 {
 	/* We call the setter directly if implemented */
@@ -702,9 +584,22 @@ See +[NSObject typePrefix]. */
 	//}
 
  	BOOL isMultivalued = [[[self entityDescription] propertyDescriptionForName: key] isMultivalued];
+    
+    if (isMultivalued)
+    {
+        if (([value isKindOfClass: [NSArray class]] && ![value isKindOfClass: [NSMutableArray class]]))
+        {
+            value = [NSMutableArray arrayWithArray: value];
+        }
+        else if (([value isKindOfClass: [NSSet class]] && ![value isKindOfClass: [NSMutableSet class]]))
+        {
+            value = [NSSet setWithSet: value];
+        }
+    }
+    
 	id oldValue = [self valueForProperty: key];
 	 
-	 oldValue = (isMultivalued ? [oldValue mutableCopy] : [oldValue retain]);
+    oldValue = [(isMultivalued ? [oldValue mutableCopy] : [oldValue retain]) autorelease];
 
 	[self checkEditingContextForValue: value];
 
@@ -808,6 +703,23 @@ See +[NSObject typePrefix]. */
 
 - (id)primitiveValueForKey: (NSString *)key
 {
+    ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
+
+    // Special case for searching the relationship cache
+    if (![propDesc isPersistent]
+        && (nil != [propDesc opposite])
+        && ([[propDesc opposite] isPersistent]))
+    {
+        if ([propDesc isMultivalued])
+        {
+            NSSet *results = [_incomingRelationships referringObjectsForPropertyInTarget: key];
+            
+            return results;
+        }
+        COObject *result = [_incomingRelationships referringObjectForPropertyInTarget: key];
+        return result;
+    }
+
 	id value = [_variableStorage objectForKey: key];
 	return (value == [NSNull null] ? nil : value);
 }
@@ -818,6 +730,7 @@ See +[NSObject typePrefix]. */
 						 forKey: key];
 }
 
+// FIXME: Investigate whether this way of implementing KVC is really KVC compliant
 - (id)valueForUndefinedKey: (NSString *)key
 {
 	return [self primitiveValueForKey: key];
@@ -858,9 +771,40 @@ See +[NSObject typePrefix]. */
 
 - (void)didChangeValueForProperty: (NSString *)key oldValue: (id)oldValue
 {
+    ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
+    
 	// TODO: Evaluate whether -checkEditingContextForValue: is too costly
 	//[self checkEditingContextForValue: [self valueForProperty: key]];
-	[self updateRelationshipConsistencyForProperty: key oldValue: oldValue];
+    
+    // Remove objects in newValue from their old parents
+    // as perscribed by the COEditingContext class docs
+    // FIXME: Ugly implementation
+    if ([propertyDesc isComposite])
+    {
+        ETPropertyDescription *parentDesc = [propertyDesc opposite];
+        id aValue = [self valueForKey: key];
+        
+        for (COObject *objectBeingInserted in ([propertyDesc isMultivalued] ? aValue : [NSArray arrayWithObject: aValue]))
+        {
+            COObject *objectBeingInsertedParent = [[objectBeingInserted relationshipCache] referringObjectForPropertyInTarget: [parentDesc name]];
+            
+            // FIXME: Minor flaw, you can insert a composite twice if the collection is ordered.
+            // e.g.
+            // (a, b, c) => (a, b, c, a) since we only remove the objects from their old parents if the
+            // parent is different than the object we're inserting into
+            
+            if (objectBeingInsertedParent != nil && objectBeingInsertedParent != self)
+            {
+                [objectBeingInsertedParent removeObject: objectBeingInserted atIndex: ETUndeterminedIndex hint: nil forProperty: key];
+            }
+        }
+    }
+    
+    [_persistentRoot updateCachedOutgoingRelationshipsForOldValue: oldValue
+                                                         newValue: [self valueForKey: key]
+                                        ofPropertyWithDescription: [_entityDescription propertyDescriptionForName: key]
+                                                         ofObject: self];
+    
 	[self markAsUpdatedIfNeededForProperty: key];
 	// FIXME: [self becomePersistentAccordingToModelDescriptionForProperty: key];
 	
@@ -956,6 +900,8 @@ See +[NSObject typePrefix]. */
 // TODO: Change to new -didAwaken method called in a predetermined order
 - (void)awakeFromFetch
 {
+    [_persistentRoot addCachedOutgoingRelationshipsForObject: self];
+    
 	// Debugging check that collections were set up properly
 	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
 	{
@@ -1220,16 +1166,6 @@ static int indent = 0;
 {
 	ETAssert([self isFault] == NO);
 	return nil;
-}
-
-- (BOOL)isIgnoringRelationshipConsistency
-{
-	return _isIgnoringRelationshipConsistency;
-}
-
-- (void)setIgnoringRelationshipConsistency: (BOOL)ignore
-{
-	_isIgnoringRelationshipConsistency = ignore;
 }
 
 - (id)serializedValueForProperty: (NSString *)key
@@ -1638,6 +1574,11 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	}
 
 	return plist;
+}
+
+- (CORelationshipCache *)relationshipCache
+{
+    return _incomingRelationships;
 }
 
 @end

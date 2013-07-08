@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COEditingContext.h>
+#import "CORelationshipCache.h"
 
 @class COCommitTrack, COObject, CORevision, COStore;
 
@@ -64,6 +65,7 @@
 	NSMapTable *_updatedPropertiesByObject;
 	/** All the objects being loaded inside -loadObject:AtRevision: */
 	NSMutableSet *_loadingObjects;
+    CORelationshipCache *_relationshipCache;
 }
 
 /** @taskunit Debugging */

@@ -109,6 +109,7 @@
 
 - (void)testDivergentCommitTrack
 {
+    CREATE_AUTORELEASE_POOL(pool);
 	COContainer *object = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[object setValue: @"Document" forProperty: @"label"];
 	[ctx commit]; // Revision 1
@@ -137,7 +138,8 @@
 	[[object commitTrack] redo];
 	UKIntsEqual(1, [object count]);
 	UKStringsEqual(@"paragraph 3", [[[object contentArray] objectAtIndex: 0] valueForProperty: @"label"]);
-
+    DESTROY(pool);
+    
 	//UKIntsEqual(0, [para3 retainCount]);
 }
 

@@ -18,13 +18,11 @@
 	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
-	[o2 setValue: o1 forProperty: @"parentContainer"]; // should add o2 to o1's contents
-	[o2 setValue: A(o3) forProperty: @"contents"]; // should set parentContainer of o3
+	[o1 setValue: A(o2) forProperty: @"contents"];
+	[o2 setValue: A(o3) forProperty: @"contents"];
 
 	UKNil([o1 valueForProperty: @"parentContainer"]);
-	UKObjectsEqual(A(o2), [o1 valueForProperty: @"contents"]);
 	UKObjectsEqual(o1, [o2 valueForProperty: @"parentContainer"]);
-	UKObjectsEqual(A(o3), [o2 valueForProperty: @"contents"]);
 	UKObjectsEqual(o2, [o3 valueForProperty: @"parentContainer"]);
 	UKObjectsEqual([NSArray array], [o3 valueForProperty: @"contents"]);
 
@@ -39,8 +37,8 @@
 	
 	UKObjectsEqual(S(t1, t2), [o1 valueForProperty: @"parentCollections"]);
 	
-	[o2 insertObject: t2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"parentCollections"];
-	[o2 insertObject: t3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"parentCollections"];
+	[t2 insertObject: o2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	[t3 insertObject: o2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
 	UKObjectsEqual(S(o1), [t1 valueForProperty: @"contents"]);
 	UKObjectsEqual(S(o1, o2), [t2 valueForProperty: @"contents"]);
@@ -53,10 +51,8 @@
 	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COObject *o3 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
-	[o2 setValue: o1 forProperty: @"parentContainer"]; // should add o2 to o1's contents
-	UKObjectsEqual(A(o2), [o1 valueForProperty: @"contents"]);
-	UKObjectsEqual([NSArray array], [o3 valueForProperty: @"contents"]);
-	[o2 setValue: o3 forProperty: @"parentContainer"]; // should add o2 to o3's contents, and remove o2 from o1
+	[o1 setValue: A(o2) forProperty: @"contents"];
+	[o3 setValue: A(o2) forProperty: @"contents"]; // should add o2 to o3's contents, and remove o2 from o1
 	UKObjectsEqual([NSArray array], [o1 valueForProperty: @"contents"]);
 	UKObjectsEqual(A(o2), [o3 valueForProperty: @"contents"]);	
 
@@ -89,9 +85,9 @@
 	UKFalse([ctx isUpdatedObject: o2]);
 	UKFalse([ctx isUpdatedObject: o3]);
 			 
-	[o2 setValue: o1 forProperty: @"parentContainer"]; // should add o2 to o1's contents
+	[o1 setValue: A(o2) forProperty: @"contents"];
 	UKTrue([ctx isUpdatedObject: o1]);
-	UKTrue([ctx isUpdatedObject: o2]);
+	UKFalse([ctx isUpdatedObject: o2]);
 	UKFalse([ctx isUpdatedObject: o3]);
 	
 	[ctx commit];
@@ -99,33 +95,17 @@
 	UKFalse([ctx isUpdatedObject: o2]);
 	UKFalse([ctx isUpdatedObject: o3]);
 	
-	[o2 setValue: o3 forProperty: @"parentContainer"]; // should add o2 to o3's contents, and remove o2 from o1
+	[o3 setValue: A(o2) forProperty: @"contents"]; // should add o2 to o3's contents, and remove o2 from o1
 	UKTrue([ctx isUpdatedObject: o1]);
-	UKTrue([ctx isUpdatedObject: o2]);
+	UKFalse([ctx isUpdatedObject: o2]);
 	UKTrue([ctx isUpdatedObject: o3]);
 	
 	[ctx commit];
 	
 	[o3 removeObject: o2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]; // should make o2's parentContainer nil
 	UKFalse([ctx isUpdatedObject: o1]);
-	UKTrue([ctx isUpdatedObject: o2]);
+	UKFalse([ctx isUpdatedObject: o2]);
 	UKTrue([ctx isUpdatedObject: o3]);	
-}
-
-- (void)testOneToOneRelationship
-{
-	COObject *p1 = [ctx insertObjectWithEntityName: @"Anonymous.Person"];
-	COObject *p2 = [ctx insertObjectWithEntityName: @"Anonymous.Person"];
-	COObject *p3 = [ctx insertObjectWithEntityName: @"Anonymous.Person"];
-	
-	UKNil([p1 valueForProperty: @"spouse"]);
-	[p1 setValue: p2 forProperty: @"spouse"];
-	UKObjectsEqual(p1, [p2 valueForProperty: @"spouse"]);
-	UKObjectsEqual(p2, [p1 valueForProperty: @"spouse"]);	
-	[p2 setValue: p3 forProperty: @"spouse"];
-	UKNil([p1 valueForProperty: @"spouse"]);
-	UKObjectsEqual(p2, [p3 valueForProperty: @"spouse"]);
-	UKObjectsEqual(p3, [p2 valueForProperty: @"spouse"]);	
 }
 
 - (void)testShoppingList

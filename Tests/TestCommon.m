@@ -19,10 +19,12 @@
 		
 		ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
 																		  type: (id)@"Anonymous.NSString"];
+        [labelProperty setPersistent: YES];
 
 		ETPropertyDescription *contentsProperty = 
 			[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.OutlineItem"];
 	
+        [contentsProperty setPersistent: YES];
 		[contentsProperty setMultivalued: YES];
 		[contentsProperty setOrdered: YES];
 
@@ -33,14 +35,14 @@
 		[parentContainerProperty setMultivalued: NO];
 		[parentContainerProperty setOpposite: (id)@"Anonymous.OutlineItem.contents"];
 
-		ETPropertyDescription *parentCollectionsProperty = 
+		ETPropertyDescription *parentCollectionsProperty =
 			[ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.Tag"];
 
 		[parentCollectionsProperty setMultivalued: YES];
 		[parentCollectionsProperty setOpposite: (id)@"Anonymous.Tag.contents"];
 
 		[outlineEntity setPropertyDescriptions: A(labelProperty, contentsProperty, parentContainerProperty, parentCollectionsProperty)];
-		[[[outlineEntity propertyDescriptions] mappedCollection] setPersistent: YES];
+
 
 		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: outlineEntity];
 	}
@@ -52,36 +54,40 @@
 		
 		ETPropertyDescription *tagLabelProperty = [ETPropertyDescription descriptionWithName: @"label"
 																		  type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
+        [tagLabelProperty setPersistent: YES];
 
 		ETPropertyDescription *contentsProperty = 
 			[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.OutlineItem"];
 		[contentsProperty setMultivalued: YES];
 		[contentsProperty setOrdered: NO];
+        [contentsProperty setPersistent: YES];
 
 		[tagEntity setPropertyDescriptions: A(tagLabelProperty, contentsProperty)];
-		[[[tagEntity propertyDescriptions] mappedCollection] setPersistent: YES];
 		
 		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: tagEntity];
 	}
 	
 	// Person entity
-	{
-		ETEntityDescription *personEntity = [ETEntityDescription descriptionWithName: @"Person"];	
-		[personEntity setParent: (id)@"Anonymous.COObject"];
-		
-		ETPropertyDescription *spouseProperty = [ETPropertyDescription descriptionWithName: @"spouse"
-																					  type: (id)@"Anonymous.Person"];
-		[spouseProperty setMultivalued: NO];
-		[spouseProperty setOpposite: (id)@"Anonymous.Person.spouse"]; // This is a 1:1 relationship
-
-		ETPropertyDescription *personNameProperty = [ETPropertyDescription descriptionWithName: @"name"
-																						type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
-		
-		[personEntity setPropertyDescriptions: A(spouseProperty, personNameProperty)];
-		[[[personEntity propertyDescriptions] mappedCollection] setPersistent: YES];
-
-		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: personEntity];
-	}
+    
+    // We can't / don't want to support this
+    
+//	{
+//		ETEntityDescription *personEntity = [ETEntityDescription descriptionWithName: @"Person"];	
+//		[personEntity setParent: (id)@"Anonymous.COObject"];
+//		
+//		ETPropertyDescription *spouseProperty = [ETPropertyDescription descriptionWithName: @"spouse"
+//																					  type: (id)@"Anonymous.Person"];
+//		[spouseProperty setMultivalued: NO];
+//		[spouseProperty setOpposite: (id)@"Anonymous.Person.spouse"]; // This is a 1:1 relationship
+//
+//		ETPropertyDescription *personNameProperty = [ETPropertyDescription descriptionWithName: @"name"
+//																						type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
+//		
+//		[personEntity setPropertyDescriptions: A(spouseProperty, personNameProperty)];
+//		[[[personEntity propertyDescriptions] mappedCollection] setPersistent: YES];
+//
+//		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: personEntity];
+//	}
 	
 	// Bezier point entity
 	{

@@ -1,69 +1,35 @@
 #import <Foundation/Foundation.h>
 #import "COType.h"
 
-@class ETUUID;
+@class COObject;
 @class COItem;
 
-
-@interface CORelationshipRecord : NSObject
-{
-@private
-    ETUUID *uuid_;
-    NSString *property_;
-}
-
-+ (CORelationshipRecord *) recordWithUUID: (ETUUID *)aUUID property: (NSString *)aProp;
-
-// FIXME: Make not mutable to the public
-@property (readwrite, nonatomic, retain) ETUUID *uuid;
-@property (readwrite, nonatomic, retain) NSString *property;
-@end
-
 /**
- * Simple wrapper around an NSMutableDictionary mapping COUUID's to mutable sets of COUUID's.
+ * An instance of this class is owned by each COObject,
+ * to cache incoming relationships for that object.
  */
 @interface CORelationshipCache : NSObject
 {
-    NSMutableDictionary *embeddedObjectParentUUIDForUUID_;
-    NSMutableDictionary *referrerUUIDsForUUID_;
-    CORelationshipRecord *tempRecord_;
+@private
+    NSMutableArray *_cachedRelationships;
 }
 
 /**
- * @returns a set of CORelationshipRecord
+ * Returns an array of COObject which have a reference to the
+ * owning COObject through the given property in the owning COObject.
  */
-- (NSSet *) referrersForUUID: (ETUUID *)anObject;
+- (NSSet *) referringObjectsForPropertyInTarget: (NSString *)aProperty;
 
-- (CORelationshipRecord *) parentForUUID: (ETUUID *)anObject;
-
-/**
- * @returns a set of COUUID
- */
-- (NSSet *) referrersForUUID: (ETUUID *)anObject
-            propertyInParent: (NSString*)propInParent;
-
-#pragma mark modification
-
-- (void) updateRelationshipCacheWithOldValue: (id)oldVal
-                                     oldType: (COType)oldType
-                                    newValue: (id)newVal
-                                     newType: (COType)newType
-                                 forProperty: (NSString *)aProperty
-                                    ofObject: (ETUUID *)anObject;
-
-- (void) clearOldValue: (id)oldVal
-               oldType: (COType)oldType
-           forProperty: (NSString *)aProperty
-              ofObject: (ETUUID *)anObject;
-
-- (void) setNewValue: (id)newVal
-             newType: (COType)newType
-         forProperty: (NSString *)aProperty
-            ofObject: (ETUUID *)anObject;
-
-- (void) addItem: (COItem *)anItem;
-- (void) removeItem: (COItem *)anItem;
+- (COObject *) referringObjectForPropertyInTarget: (NSString *)aProperty;
 
 - (void) removeAllEntries;
+
+- (void) removeReferencesForPropertyInTarget: (NSString *)aTargetProperty;
+- (void) removeReferencesForPropertyInSource: (NSString *)aTargetProperty;
+- (void) removeReferencesForSourceObject: (COObject *)anObject;
+
+- (void) addReferenceFromSourceObject: (COObject *)aReferrer
+                       sourceProperty: (NSString *)aSource
+                       targetProperty: (NSString *)aTarget;
 
 @end

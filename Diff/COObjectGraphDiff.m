@@ -425,13 +425,10 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 		NSDictionary *propDict = [_editsByPropertyAndUUID objectForKey: uuid];
 		COObject *obj = [ctx objectWithUUID: uuid];
 		
-		assert(![obj isIgnoringRelationshipConsistency]);
-		[obj setIgnoringRelationshipConsistency: YES];
 		for (COObjectGraphEdit *edit in [propDict allValues])
 		{
 			[edit applyToObject: obj];
 		}
-		[obj setIgnoringRelationshipConsistency: NO];
 	}
 }
 

@@ -14,6 +14,7 @@
 #import "COStore.h"
 #import "CORevision.h"
 #import "COCommitTrack.h"
+#import "COPersistentRoot+RelationshipCache.h"
 
 @implementation COPersistentRoot
 
@@ -43,7 +44,8 @@
 	_deletedObjects = [NSMutableSet new];
 	ASSIGN(_updatedPropertiesByObject, [NSMapTable mapTableWithStrongToStrongObjects]);
 	_loadingObjects = [NSMutableSet new];
-
+    _relationshipCache = [[CORelationshipCache alloc] init];
+    
 	return self;
 }
 
@@ -58,6 +60,7 @@
 	DESTROY(_deletedObjects);
 	DESTROY(_updatedPropertiesByObject);
 	DESTROY(_loadingObjects);
+    DESTROY(_relationshipCache);
 	[super dealloc];
 }
 
@@ -542,12 +545,6 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 		copy = [self insertObjectWithEntityName: entityName UUID: [ETUUID UUID]];
 	}
 	
-	if (!consistency)
-	{
-		assert(![copy isIgnoringRelationshipConsistency]);
-		[copy setIgnoringRelationshipConsistency: YES];
-	}
-	
 	// FIXME: Copy transient properties if needed
 	for (NSString *prop in [sourceObject persistentPropertyNames])
 	{
@@ -557,11 +554,6 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 		id valueCopy = handle(value, self, desc, consistency, newUUID);
 		
 		[copy setValue: valueCopy forProperty: prop];
-	}
-	
-	if (!consistency)
-	{
-		[copy setIgnoringRelationshipConsistency: NO];
 	}
 	
 	return copy;
@@ -734,7 +726,6 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 - (void) willLoadObject: (COObject *)obj
 {
 	obj->_isIgnoringDamageNotifications = YES;
-	[obj setIgnoringRelationshipConsistency: YES];
 	[_loadingObjects addObject: obj];
 }
 
@@ -757,7 +748,6 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	{
 		[_updatedPropertiesByObject removeObjectForKey: loadedObject];
 		loadedObject->_isIgnoringDamageNotifications = NO;
-		[loadedObject setIgnoringRelationshipConsistency: NO];
 	}
 	ETAssert([loadingObjects isEmpty] || [[self changedObjects] containsCollection: loadingObjects] == NO);
 	RELEASE(loadingObjects);

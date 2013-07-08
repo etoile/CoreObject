@@ -30,7 +30,7 @@
 
 - (NSSet *)basicProperties
 {
-	return S(@"name", @"parentContainer", @"parentCollections", @"contents", @"label", @"tags");
+	return S(@"name", @"contents", @"label", @"tags");
 }
 
 - (void)testInsertObject
@@ -260,6 +260,9 @@
 	[ctx2 release];
 }
 
+
+// FIXME: Rewrite
+#if 0
 - (void)testCopyingBetweenContextsWithSharedStore
 {
 	COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: [ctx store]];
@@ -312,7 +315,7 @@
 
 	[ctx2 release];
 }
-
+#endif
 
 - (void)testCopyingBetweenContextsCornerCases
 {
@@ -333,6 +336,9 @@
 	[ctx2 release];
 }
 
+// FIXME: Rewrite
+
+#if 0
 - (void)testCopyingBetweenContextsWithManyToMany
 {
 	COEditingContext *ctx1 = [[COEditingContext alloc] init];
@@ -354,5 +360,6 @@
 	[ctx1 release];
 	[ctx2 release];
 }
+#endif
 
 @end

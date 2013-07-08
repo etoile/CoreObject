@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COQuery.h>
 
-@class COPersistentRoot, COEditingContext, CORevision, COCommitTrack;
+@class COPersistentRoot, COEditingContext, CORevision, COCommitTrack, CORelationshipCache;
 
 /**
  * Working copy of an object, owned by an editing context.
@@ -176,6 +176,13 @@
  * object is unloaded (property values are released and reset to a null value), 
  * in the end COFault becomes its class and the resulting fault receives 
  * the message -didTurnIntoFault.
+ *
+ * Property access TODO: 
+ * -valueForProperty: is overridden in a special case (ETLayoutItem).
+ * We need a special property getter that can never be overridden and has
+ * very precise behaviour:
+ * 1. call custom getter, if any
+ * 2. access variable storage.
  */
 @interface COObject : NSObject <NSCopying, COObjectMatching>
 {
@@ -185,10 +192,10 @@
 	COPersistentRoot *_persistentRoot; // weak reference
 	@protected
 	NSMutableDictionary *_variableStorage;
+    CORelationshipCache *_incomingRelationships;
 	@package
 	BOOL _isIgnoringDamageNotifications;
 	@private
-	BOOL _isIgnoringRelationshipConsistency;
 	BOOL _inDescription; // FIXME: remove; only for debugging
 	BOOL _isInitialized;
 }
@@ -565,7 +572,7 @@
  * Finally if the property is a relationship, this method updates the 
  * relationship consistency.
  *
- * See also ETCollectionMutation and -updateRelationshipConsistencyWithValue:.
+ * See also ETCollectionMutation.
  */
 - (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
 /** 
@@ -575,7 +582,7 @@
  * Finally if the property is a relationship, this method updates the 
  * relationship consistency.
  *
- * See also ETCollectionMutation and -updateRelationshipConsistencyWithValue:. 
+ * See also ETCollectionMutation. 
  */
 - (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
 
@@ -731,45 +738,6 @@
  */
 - (void)turnIntoFault;
 /**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Returns whether the receiver should skip the actions to ensure the 
- * relationship consistency based on the metamodel.
- *
- * Usually in reaction to changes, various checks and updates occur to ensure 
- * the metamodel constraints remain valid.
- *
- * See also -setIgnoringRelationshipConsistency:.
- */
-- (BOOL)isIgnoringRelationshipConsistency;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Sets whether the receiver should skip the actions to ensure relationship 
- * consistency based on the metamodel.
- *
- * Usually in reaction to changes, various checks and updates occur to ensure 
- * the metamodel constraints remain valid.
- *
- * To tolerate inconsistent state that might occur temporarily while editing 
- * the object graph, can be set to YES. The code where the inconsistent state 
- * occur should be bracketed by as below:
- *
- * <example>
- * [self setIgnoringRelationshipConsistency: YES];
- * // some changes
- * [self setIgnoringRelationshipConsistency: NO];
- * </example>
- */
-- (void)setIgnoringRelationshipConsistency: (BOOL)ignore;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Checks and updates the relationship consistency based on the metamodel to 
- * ensure the object graph remains valid with the new value.
- */
-- (void)updateRelationshipConsistencyForProperty: (NSString *)key oldValue: (id)oldValue;
-/**
  *
  */
 - (id)serializedValueForProperty: (NSString *)key;
@@ -802,5 +770,10 @@
  * deserializing a CoreObject serialized representation (the plist).
  */
 - (NSObject *)valueForPropertyList: (NSObject *)plist;
+
+/**
+ * Private.
+ */
+- (CORelationshipCache *)relationshipCache;
 
 @end

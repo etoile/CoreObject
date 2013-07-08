@@ -67,7 +67,8 @@
 	// space looks negligible (Quentin).
 	assert(_variableStorage == nil);
 	_variableStorage = [(COObject *)self newVariableStorage];
-
+    _incomingRelationships = [[CORelationshipCache alloc] init];
+    
 	[_persistentRoot loadObject: (COObject *)self];
 
 	// TODO: Return a NSError or report issues in another way

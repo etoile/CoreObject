@@ -35,9 +35,9 @@
 	[tag addObject: parent];
 	
 	COContainer *parentCopy = [ctx1 insertObjectCopy: parent];
-	UKObjectsEqual(S(tag), [parentCopy valueForProperty: @"parentCollections"]);
+	UKObjectsEqual([NSSet set], [parentCopy valueForProperty: @"parentCollections"]);
 	UKObjectsEqual(@"Shopping", [parentCopy valueForProperty: @"label"]);
-	UKObjectsEqual(S(parent, parentCopy), [tag content]);
+	UKObjectsEqual(S(parent), [tag content]);
 	UKObjectsNotEqual([parent UUID], [parentCopy UUID]);
 	
 	UKIntsEqual(1, [[parentCopy contentArray] count]);

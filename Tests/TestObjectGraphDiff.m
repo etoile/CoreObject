@@ -13,6 +13,8 @@
 
 @implementation TestObjectGraphDiff
 
+#if 0
+
 - (void)testBasic
 {
 	COEditingContext *ctx1 = [[COEditingContext alloc] init];
@@ -147,10 +149,10 @@
 	[ctx3 insertObject: parent];
 	
 	// ctx2: remove child2, set a label for subchild1
-	assert([[(id)[ctx2 objectWithUUID: [parent UUID]] contentArray] count] == 3);
+	UKIntsEqual(3, [[(id)[ctx2 objectWithUUID: [parent UUID]] contentArray] count]);
 	[[ctx2 objectWithUUID: [child2 UUID]] setValue: nil forProperty: @"parentContainer"];
-	assert([[(id)[ctx2 objectWithUUID: [parent UUID]] contentArray] count] == 2);
-	assert([[(id)[ctx1 objectWithUUID: [parent UUID]] contentArray] count] == 3);
+	UKIntsEqual(2, [[(id)[ctx2 objectWithUUID: [parent UUID]] contentArray] count]);
+	UKIntsEqual(3, [[(id)[ctx1 objectWithUUID: [parent UUID]] contentArray] count]);
 	
 	[[ctx2 objectWithUUID: [subchild1 UUID]] setValue: @"Groceries" forProperty: @"label"];
 	 
@@ -912,5 +914,7 @@
 	[ctx3 release];
 	[ctx2 release];
 }
+
+#endif
 
 @end
