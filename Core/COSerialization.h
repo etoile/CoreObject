@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COObject.h>
+#import <CoreObject/COType.h>
 
 @class COItem;
 
@@ -16,4 +17,14 @@
 
 @property (nonatomic, copy) COItem *storeItem;
 
+/** @taskunit Serialization */
+
+- (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
+- (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value;
+
+/** @taskunit Deserialization */
+
+- (id)valueForSerializedValue: (id)value
+                       ofType: (COType)type
+          propertyDescription: (ETPropertyDescription *)aPropertyDesc;
 @end

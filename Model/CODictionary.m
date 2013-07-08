@@ -7,6 +7,9 @@
  */
 
 #import "CODictionary.h"
+#import "COItem.h"
+#import "COPersistentRoot.h"
+#import "COSerialization.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 
@@ -104,16 +107,67 @@
 
 - (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
 {
-	// FIXME: NSMapTable doesn't implement the collection protocols
-	//[_variableStorage insertObject: object atIndex: index hint: hint];
 	[_variableStorage setObject: object forKey: [[hint ifResponds] key]];
 }
 
 - (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
 {
-	// FIXME: NSMapTable doesn't implement the collection protocol
-	//[_variableStorage removeObject: object atIndex: index hint: hint];
 	[_variableStorage removeObjectForKey: [[hint ifResponds] key]];
+}
+
+#pragma mark Serialization
+#pragma mark -
+
+- (COItem *) storeItem
+{
+	ETModelDescriptionRepository *repo = [[[self persistentRoot] parentContext] modelRepository];
+	ETEntityDescription *rootType = [repo descriptionForName: @"Object"];
+	NSMutableDictionary *types =
+		[NSMutableDictionary dictionaryWithCapacity: [_variableStorage count]];
+	NSMutableDictionary *values =
+		[NSMutableDictionary dictionaryWithCapacity: [_variableStorage count]];
+
+	for (NSString *key in [_variableStorage allKeys])
+	{
+		ETPropertyDescription *propertyDesc =
+			[ETPropertyDescription descriptionWithName: key type: rootType];
+
+		id value = [self serializedValueForPropertyDescription: propertyDesc];
+		[values setObject: value
+		           forKey: [propertyDesc name]];
+		[types setObject: [self serializedTypeForPropertyDescription: propertyDesc value: value]
+		          forKey: [propertyDesc name]];
+	}
+	
+	return [COItem itemWithTypesForAttributes: types valuesForAttributes: values];
+}
+
+- (void)setStoreItem: (COItem *)aStoreItem
+{
+	ETModelDescriptionRepository *repo = [[[self persistentRoot] parentContext] modelRepository];
+	ETEntityDescription *rootType = [repo descriptionForName: @"Object"];
+
+	for (NSString *property in [aStoreItem attributeNames])
+	{
+		ETPropertyDescription *propertyDesc =
+			[ETPropertyDescription descriptionWithName: property type: rootType];
+
+		id serializedValue = [aStoreItem valueForAttribute: property];
+		COType serializedType = [aStoreItem typeForAttribute: property];
+	
+		if (propertyDesc == nil)
+		{
+			[NSException raise: NSInvalidArgumentException
+			            format: @"Tried to set serialized value %@ of type %@ "
+			                     "for property %@ missing in the metamodel %@",
+			                    serializedValue, @(serializedType), [propertyDesc name], [self entityDescription]];
+		}
+
+		id value = [self valueForSerializedValue: serializedValue
+		                                  ofType: serializedType
+		                     propertyDescription: propertyDesc];
+		[self setSerializedValue: value forProperty: property];
+	}
 }
 
 @end
