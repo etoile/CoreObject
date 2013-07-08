@@ -25,7 +25,7 @@
 		6043D4D51757B4FC002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
 		606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 606E3DBF1787A07E00ED42DA /* COSerialization.h */; };
 		606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 606E3DC01787A07E00ED42DA /* COSerialization.m */; };
-		607EB349178881E60024B34D /* CODictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 607EB347178881E60024B34D /* CODictionary.h */; };
+		607EB349178881E60024B34D /* CODictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 607EB347178881E60024B34D /* CODictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		607EB34A178881E60024B34D /* CODictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 607EB348178881E60024B34D /* CODictionary.m */; };
 		60988F17163B6B7A009C4F21 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F16163B6B7A009C4F21 /* Cocoa.framework */; };
 		60988F1D163B6B7A009C4F21 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 60988F1B163B6B7A009C4F21 /* InfoPlist.strings */; };
