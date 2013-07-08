@@ -136,6 +136,25 @@
 		66D96C7E178AF68D00D1553C /* TestUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00641704C24C00D01AAB /* TestUtilities.m */; };
 		66D96CA0178B6E5600D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
 		66D96CA1178B6FBA00D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
+		66D96CB7178B717200D1553C /* COBinaryReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA2178B717000D1553C /* COBinaryReader.h */; };
+		66D96CB8178B717200D1553C /* COBinaryReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CA3178B717000D1553C /* COBinaryReader.m */; };
+		66D96CB9178B717200D1553C /* COBinaryWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA4178B717000D1553C /* COBinaryWriter.h */; };
+		66D96CBA178B717200D1553C /* COItem+Binary.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA5178B717000D1553C /* COItem+Binary.h */; };
+		66D96CBB178B717200D1553C /* COItem+Binary.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CA6178B717000D1553C /* COItem+Binary.m */; };
+		66D96CBE178B717200D1553C /* CORevisionID.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA9178B717000D1553C /* CORevisionID.h */; };
+		66D96CBF178B717200D1553C /* CORevisionID.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CAA178B717100D1553C /* CORevisionID.m */; };
+		66D96CC0178B717200D1553C /* CORevisionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CAB178B717100D1553C /* CORevisionInfo.h */; };
+		66D96CC1178B717200D1553C /* CORevisionInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CAC178B717100D1553C /* CORevisionInfo.m */; };
+		66D96CC2178B717200D1553C /* COSearchResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CAD178B717100D1553C /* COSearchResult.h */; };
+		66D96CC3178B717200D1553C /* COSearchResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CAE178B717100D1553C /* COSearchResult.m */; };
+		66D96CC4178B717200D1553C /* COSQLiteStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CAF178B717100D1553C /* COSQLiteStore.h */; };
+		66D96CC5178B717200D1553C /* COSQLiteStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CB0178B717100D1553C /* COSQLiteStore.m */; };
+		66D96CC6178B717200D1553C /* COSQLiteStore+Attachments.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CB1178B717100D1553C /* COSQLiteStore+Attachments.h */; };
+		66D96CC7178B717200D1553C /* COSQLiteStore+Attachments.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CB2178B717100D1553C /* COSQLiteStore+Attachments.m */; };
+		66D96CC8178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CB3178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.h */; };
+		66D96CC9178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CB4178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m */; };
+		66D96CCA178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CB5178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h */; };
+		66D96CCB178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CB6178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m */; };
 		791B4E4C1299C82200CCF472 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
 		791B4E721299C90900CCF472 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6C1299C90900CCF472 /* FMDatabase.m */; };
 		791B4E741299C90900CCF472 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6E1299C90900CCF472 /* FMDatabaseAdditions.m */; };
@@ -400,6 +419,25 @@
 		66D96C61178ABA5D00D1553C /* COPersistentRoot+RelationshipCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COPersistentRoot+RelationshipCache.h"; path = "Core/COPersistentRoot+RelationshipCache.h"; sourceTree = "<group>"; };
 		66D96C62178ABA5E00D1553C /* COPersistentRoot+RelationshipCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COPersistentRoot+RelationshipCache.m"; path = "Core/COPersistentRoot+RelationshipCache.m"; sourceTree = "<group>"; };
 		66D96C9F178B6E5600D1553C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		66D96CA2178B717000D1553C /* COBinaryReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBinaryReader.h; path = Store/COBinaryReader.h; sourceTree = "<group>"; };
+		66D96CA3178B717000D1553C /* COBinaryReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBinaryReader.m; path = Store/COBinaryReader.m; sourceTree = "<group>"; };
+		66D96CA4178B717000D1553C /* COBinaryWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBinaryWriter.h; path = Store/COBinaryWriter.h; sourceTree = "<group>"; };
+		66D96CA5178B717000D1553C /* COItem+Binary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COItem+Binary.h"; path = "Store/COItem+Binary.h"; sourceTree = "<group>"; };
+		66D96CA6178B717000D1553C /* COItem+Binary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COItem+Binary.m"; path = "Store/COItem+Binary.m"; sourceTree = "<group>"; };
+		66D96CA9178B717000D1553C /* CORevisionID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CORevisionID.h; path = Store/CORevisionID.h; sourceTree = "<group>"; };
+		66D96CAA178B717100D1553C /* CORevisionID.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CORevisionID.m; path = Store/CORevisionID.m; sourceTree = "<group>"; };
+		66D96CAB178B717100D1553C /* CORevisionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CORevisionInfo.h; path = Store/CORevisionInfo.h; sourceTree = "<group>"; };
+		66D96CAC178B717100D1553C /* CORevisionInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CORevisionInfo.m; path = Store/CORevisionInfo.m; sourceTree = "<group>"; };
+		66D96CAD178B717100D1553C /* COSearchResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSearchResult.h; path = Store/COSearchResult.h; sourceTree = "<group>"; };
+		66D96CAE178B717100D1553C /* COSearchResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSearchResult.m; path = Store/COSearchResult.m; sourceTree = "<group>"; };
+		66D96CAF178B717100D1553C /* COSQLiteStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSQLiteStore.h; path = Store/COSQLiteStore.h; sourceTree = "<group>"; };
+		66D96CB0178B717100D1553C /* COSQLiteStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSQLiteStore.m; path = Store/COSQLiteStore.m; sourceTree = "<group>"; };
+		66D96CB1178B717100D1553C /* COSQLiteStore+Attachments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COSQLiteStore+Attachments.h"; path = "Store/COSQLiteStore+Attachments.h"; sourceTree = "<group>"; };
+		66D96CB2178B717100D1553C /* COSQLiteStore+Attachments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COSQLiteStore+Attachments.m"; path = "Store/COSQLiteStore+Attachments.m"; sourceTree = "<group>"; };
+		66D96CB3178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSQLiteStorePersistentRootBackingStore.h; path = Store/COSQLiteStorePersistentRootBackingStore.h; sourceTree = "<group>"; };
+		66D96CB4178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSQLiteStorePersistentRootBackingStore.m; path = Store/COSQLiteStorePersistentRootBackingStore.m; sourceTree = "<group>"; };
+		66D96CB5178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSQLiteStorePersistentRootBackingStoreBinaryFormats.h; path = Store/COSQLiteStorePersistentRootBackingStoreBinaryFormats.h; sourceTree = "<group>"; };
+		66D96CB6178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSQLiteStorePersistentRootBackingStoreBinaryFormats.m; path = Store/COSQLiteStorePersistentRootBackingStoreBinaryFormats.m; sourceTree = "<group>"; };
 		791B4E2D1299C79300CCF472 /* Test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test; sourceTree = BUILT_PRODUCTS_DIR; };
 		791B4E6B1299C90900CCF472 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabase.h; path = fmdb/src/FMDatabase.h; sourceTree = "<group>"; };
 		791B4E6C1299C90900CCF472 /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FMDatabase.m; path = fmdb/src/FMDatabase.m; sourceTree = "<group>"; };
@@ -788,6 +826,25 @@
 				609C007B1704C2BA00D01AAB /* COSQLStore.m */,
 				609C007C1704C2BA00D01AAB /* COStore.h */,
 				609C007D1704C2BA00D01AAB /* COStore.m */,
+				66D96CA2178B717000D1553C /* COBinaryReader.h */,
+				66D96CA3178B717000D1553C /* COBinaryReader.m */,
+				66D96CA4178B717000D1553C /* COBinaryWriter.h */,
+				66D96CA5178B717000D1553C /* COItem+Binary.h */,
+				66D96CA6178B717000D1553C /* COItem+Binary.m */,
+				66D96CA9178B717000D1553C /* CORevisionID.h */,
+				66D96CAA178B717100D1553C /* CORevisionID.m */,
+				66D96CAB178B717100D1553C /* CORevisionInfo.h */,
+				66D96CAC178B717100D1553C /* CORevisionInfo.m */,
+				66D96CAD178B717100D1553C /* COSearchResult.h */,
+				66D96CAE178B717100D1553C /* COSearchResult.m */,
+				66D96CAF178B717100D1553C /* COSQLiteStore.h */,
+				66D96CB0178B717100D1553C /* COSQLiteStore.m */,
+				66D96CB1178B717100D1553C /* COSQLiteStore+Attachments.h */,
+				66D96CB2178B717100D1553C /* COSQLiteStore+Attachments.m */,
+				66D96CB3178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.h */,
+				66D96CB4178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m */,
+				66D96CB5178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h */,
+				66D96CB6178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m */,
 				791B4E6A1299C90200CCF472 /* fmdb */,
 			);
 			name = "Store (Low-level API)";
@@ -871,6 +928,16 @@
 				607EB349178881E60024B34D /* CODictionary.h in Headers */,
 				6609485F1787A1160049468B /* CORelationshipCache.h in Headers */,
 				66D96C63178ABA5E00D1553C /* COPersistentRoot+RelationshipCache.h in Headers */,
+				66D96CB7178B717200D1553C /* COBinaryReader.h in Headers */,
+				66D96CB9178B717200D1553C /* COBinaryWriter.h in Headers */,
+				66D96CBA178B717200D1553C /* COItem+Binary.h in Headers */,
+				66D96CBE178B717200D1553C /* CORevisionID.h in Headers */,
+				66D96CC0178B717200D1553C /* CORevisionInfo.h in Headers */,
+				66D96CC2178B717200D1553C /* COSearchResult.h in Headers */,
+				66D96CC4178B717200D1553C /* COSQLiteStore.h in Headers */,
+				66D96CC6178B717200D1553C /* COSQLiteStore+Attachments.h in Headers */,
+				66D96CC8178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.h in Headers */,
+				66D96CCA178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1195,6 +1262,15 @@
 				607EB34A178881E60024B34D /* CODictionary.m in Sources */,
 				6609485E1787A1160049468B /* CORelationshipCache.m in Sources */,
 				66D96C64178ABA5E00D1553C /* COPersistentRoot+RelationshipCache.m in Sources */,
+				66D96CB8178B717200D1553C /* COBinaryReader.m in Sources */,
+				66D96CBB178B717200D1553C /* COItem+Binary.m in Sources */,
+				66D96CBF178B717200D1553C /* CORevisionID.m in Sources */,
+				66D96CC1178B717200D1553C /* CORevisionInfo.m in Sources */,
+				66D96CC3178B717200D1553C /* COSearchResult.m in Sources */,
+				66D96CC5178B717200D1553C /* COSQLiteStore.m in Sources */,
+				66D96CC7178B717200D1553C /* COSQLiteStore+Attachments.m in Sources */,
+				66D96CC9178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m in Sources */,
+				66D96CCB178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
