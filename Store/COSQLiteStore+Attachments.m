@@ -123,7 +123,12 @@ static NSData *dataFromHexString(NSString *hexString)
 - (NSArray *) attachments
 {
     NSMutableArray *result = [NSMutableArray array];
-    NSArray *files = [[NSFileManager defaultManager] directoryContentsAtPath: [[self attachmentsURL] path]];
+	NSError *error = nil;
+    NSArray *files = [[NSFileManager defaultManager]
+		contentsOfDirectoryAtPath: [[self attachmentsURL] path] error: &error];
+	// TODO: Implement some recovery strategy and error reporting
+	assert(files != nil && error == nil);
+
     for (NSString *file in files)
     {
         NSString *attachmentHexString = [file stringByDeletingPathExtension];

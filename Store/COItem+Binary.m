@@ -55,7 +55,7 @@ typedef enum {
 
 static NSNull *NSNullCached;
 
-+ (id) initialize
++ (void) initialize
 {
     if (self == [COItem class])
     {

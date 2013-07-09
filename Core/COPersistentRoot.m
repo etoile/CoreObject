@@ -8,15 +8,16 @@
  */
 
 #import "COPersistentRoot.h"
+#import "COCommitTrack.h"
 #import "COEditingContext.h"
 #import "COError.h"
-#import "COObject.h"
-#import "COStore.h"
-#import "CORevision.h"
-#import "COCommitTrack.h"
-#import "COPersistentRoot+RelationshipCache.h"
 #import "COItem.h"
+#import "COObject.h"
+#import "COPersistentRoot+RelationshipCache.h"
+#import "CORelationshipCache.h"
+#import "CORevision.h"
 #import "COSerialization.h"
+#import "COStore.h"
 
 @implementation COPersistentRoot
 

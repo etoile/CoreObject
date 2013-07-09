@@ -15,6 +15,7 @@
 #import "COFault.h"
 #import "COPersistentRoot.h"
 #import "COPersistentRoot+RelationshipCache.h"
+#import "CORelationshipCache.h"
 #import "COStore.h"
 #import "COTag.h"
 #import "COGroup.h"
