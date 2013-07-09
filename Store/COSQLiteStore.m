@@ -868,7 +868,7 @@
 {
     ETUUID *backingUUID = [self backingUUIDForPersistentRootUUID: aRoot];
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID];
-    NSNumber *backingId = [self rootIdForPersistentRootUUID: backingUUID];
+    //NSNumber *backingId = [self rootIdForPersistentRootUUID: backingUUID];
     NSData *backingUUIDData = [backingUUID dataValue];
     
     [db_ beginTransaction];

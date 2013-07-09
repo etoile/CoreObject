@@ -60,7 +60,7 @@ co_buffer_ensure_available(co_buffer_t *dest, size_t len)
 
 static inline
 void
-co_buffer_write(co_buffer_t *dest, const char *data, size_t len)
+co_buffer_write(co_buffer_t *dest, const unsigned char *data, size_t len)
 {
     co_buffer_ensure_available(dest, len);
 
@@ -68,8 +68,9 @@ co_buffer_write(co_buffer_t *dest, const char *data, size_t len)
     dest->length += len;
 }
 
-#define WRITE(v) co_buffer_write(dest, (const char *)&v, sizeof(v))
-#define WRTITE_TYPE(t) co_buffer_write(dest, t, 1)
+// FIXME: Would be better to avoid these casts
+#define WRITE(v) co_buffer_write(dest, (const unsigned char *)&v, sizeof(v))
+#define WRTITE_TYPE(t) co_buffer_write(dest, (const unsigned char *)t, 1)
 
 static inline
 void
@@ -188,7 +189,7 @@ co_buffer_store_string(co_buffer_t *dest, NSString *value)
 
 static inline
 void
-co_buffer_store_bytes(co_buffer_t *dest, const char *bytes, size_t length)
+co_buffer_store_bytes(co_buffer_t *dest, const unsigned char *bytes, size_t length)
 {
     if (length <= UINT8_MAX)
     {

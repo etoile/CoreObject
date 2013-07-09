@@ -44,7 +44,6 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 
 @implementation COItem
 
-
 @synthesize schemaName;
 
 - (id) initWithUUID: (ETUUID *)aUUID
@@ -57,8 +56,9 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		
 	SUPERINIT;
 	ASSIGN(uuid, aUUID);
-	types = [[NSDictionary alloc] initWithDictionary: typesForAttributes];
-	values = copyValueDictionary(valuesForAttributes, NO);
+	// FIXME: These casts are not truly elegant
+	types = (NSMutableDictionary *)[[NSDictionary alloc] initWithDictionary: typesForAttributes];
+	values = (NSMutableDictionary *)copyValueDictionary(valuesForAttributes, NO);
 
 	return self;
 }
@@ -391,7 +391,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	SUPERINIT;
 	ASSIGN(uuid, aUUID);
 	types = [[NSMutableDictionary alloc] initWithDictionary: typesForAttributes];
-	values = copyValueDictionary(valuesForAttributes, YES);
+	values = (NSMutableDictionary *)copyValueDictionary(valuesForAttributes, YES);
 	
 	return self;
 }
@@ -415,7 +415,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 + (COMutableItem *) itemWithUUID: (ETUUID *)aUUID
 {
-	return [[[self alloc] initWithUUID: aUUID] autorelease];
+	return [[(COMutableItem *)[self alloc] initWithUUID: aUUID] autorelease];
 }
 
 - (void) setUUID: (ETUUID *)aUUID
@@ -500,7 +500,7 @@ toUnorderedAttribute: (NSString*)anAttribute
 - (void) addObject: (id)aValue
 	  forAttribute: (NSString*)anAttribute
 {
-	assert(COTypeIsMultivalued([types objectForKey: anAttribute]));
+	assert(COTypeIsMultivalued([[types objectForKey: anAttribute] integerValue]));
 	
     id container = [values objectForKey: anAttribute];
     if (![container isKindOfClass: [NSMutableArray class]]

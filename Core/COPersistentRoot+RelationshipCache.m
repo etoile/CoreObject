@@ -44,7 +44,7 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
             }
             else
             {
-                [(COObject *)aValue removeReferencesForPropertyInSource: [aProperty name]];
+                [[(COObject *)aValue relationshipCache] removeReferencesForPropertyInSource: [aProperty name]];
             }
         }
     }
