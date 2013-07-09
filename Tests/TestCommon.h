@@ -1,7 +1,9 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
 #import "COEditingContext.h"
+#import "COItemGraph.h"
 #import "CORevision.h"
+#import "CORevisionID.h"
 #import "COSQLStore.h"
 #import "COSQLiteStore.h"
 
