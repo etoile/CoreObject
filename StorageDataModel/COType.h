@@ -91,27 +91,33 @@ enum {
 };
 
 static inline
-BOOL COTypeIsMultivalued(COType type)
+COType COMultivaluedType(COType type)
 {
-    return (type & kCOMultivaluedTypeMask) != 0;
-}
-
-static inline
-BOOL COTypeIsPrimitive(COType type)
-{
-    return (type & kCOMultivaluedTypeMask) == 0;
-}
-
-static inline
-BOOL COTypeIsOrdered(COType type)
-{
-    return (type & kCOMultivaluedTypeMask) == kCOArrayType;
+    return type & kCOMultivaluedTypeMask;
 }
 
 static inline
 COType COPrimitiveType(COType type)
 {
     return type & kCOPrimitiveTypeMask;
+}
+
+static inline
+BOOL COTypeIsMultivalued(COType type)
+{
+    return COMultivaluedType(type) != 0;
+}
+
+static inline
+BOOL COTypeIsPrimitive(COType type)
+{
+    return COMultivaluedType(type) == 0;
+}
+
+static inline
+BOOL COTypeIsOrdered(COType type)
+{
+    return COMultivaluedType(type) == kCOArrayType;
 }
 
 static inline

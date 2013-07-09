@@ -16,6 +16,8 @@
 
 @implementation COObject (COSerialization)
 
+NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
+
 /* Returns whether the given value is a primitive type supported by CoreObject
 serialization. */
 - (BOOL) isSerializablePrimitiveValue: (id)value
@@ -329,7 +331,12 @@ serialization. */
 		[types setObject: serializedType forKey: [propertyDesc name]];
 	}
 	
-	return [COItem itemWithTypesForAttributes: types valuesForAttributes: values];
+    [values setObject: [[self entityDescription] name] forKey: kCOObjectEntityNameProperty];
+    [types setObject: [NSNumber numberWithInt: kCOStringType] forKey: kCOObjectEntityNameProperty];
+    
+	return [[[COItem alloc] initWithUUID: [self UUID]
+                      typesForAttributes: types
+                     valuesForAttributes: values] autorelease];
 }
 
 /* Returns a NSValue object for a scalar string value if possible.
@@ -398,7 +405,55 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
                        ofType: (COType)type
           propertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
-	if (type == kCOReferenceType)
+    if (COTypeIsMultivalued(type))
+    {
+        if (COMultivaluedType(type) == kCOArrayType)
+        {
+            NSAssert([aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
+                     @"Serialization type doesn't match metamodel");
+            
+            // TODO: Allocating a C array on the stack is probably premature
+            // optimization. Fast enumeration could even be faster.
+            NSUInteger count = [value count];
+            id mappedObjects[count];
+            
+            for (int i = 0; i < count; i++)
+            {
+                mappedObjects[i] = [self valueForSerializedValue: [value objectAtIndex: i]
+                                                          ofType: COPrimitiveType(type)
+                                             propertyDescription: aPropertyDesc];
+            }
+            
+            Class arrayClass = ([aPropertyDesc isReadOnly] ? [NSArray class] : [NSMutableArray class]);
+            return [arrayClass arrayWithObjects: mappedObjects count: count];
+        }
+        else if (COMultivaluedType(type) == kCOSetType)
+        {
+            NSAssert([aPropertyDesc isOrdered] == NO && [aPropertyDesc isMultivalued],
+                     @"Serialization type doesn't match metamodel");
+            
+            // TODO: Allocating a C array on the stack is probably premature
+            // optimization. Fast enumeration could even be faster.
+            NSUInteger count = [value count];
+            id mappedObjects[count];
+            
+            for (int i = 0; i < count; i++)
+            {
+                mappedObjects[i] = [self valueForSerializedValue: [value objectAtIndex: i]
+                                                          ofType: COPrimitiveType(type)
+                                             propertyDescription: aPropertyDesc];
+            }
+            
+            Class setClass = ([aPropertyDesc isReadOnly] ? [NSSet class] : [NSMutableSet class]);
+            return [setClass setWithObjects: mappedObjects count: count];
+        }
+        else
+        {
+            NSAssert(NO, @"Unsupported serialization type %@ for %@", @(type), value);
+        }
+    }
+    
+	if (type == kCOReferenceType || type == kCOCompositeReferenceType)
 	{
 		NSParameterAssert([value isKindOfClass: [ETUUID class]]);
 
@@ -409,47 +464,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 														  entityName: [[aPropertyDesc type] name]
 														  atRevision: nil];
 	}
-	else if (type == kCOArrayType)
-	{
-		NSAssert([aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
-			@"Serialization type doesn't match metamodel");
-
-		// TODO: Allocating a C array on the stack is probably premature
-		// optimization. Fast enumeration could even be faster.
-		NSUInteger count = [value count];
-		id mappedObjects[count];
-
-		for (int i = 0; i < count; i++)
-		{
-			mappedObjects[i] = [self valueForSerializedValue: [value objectAtIndex: i]
-													  ofType: COPrimitiveType(type)
-			                             propertyDescription: aPropertyDesc];
-		}
-
-		Class arrayClass = ([aPropertyDesc isReadOnly] ? [NSArray class] : [NSMutableArray class]);
-		return [arrayClass arrayWithObjects: mappedObjects count: count];
-	}
-	else if (type == kCOSetType)
-	{
-		NSAssert([aPropertyDesc isOrdered] == NO && [aPropertyDesc isMultivalued],
-			@"Serialization type doesn't match metamodel");
-
-		// TODO: Allocating a C array on the stack is probably premature
-		// optimization. Fast enumeration could even be faster.
-		NSUInteger count = [value count];
-		id mappedObjects[count];
-
-		for (int i = 0; i < count; i++)
-		{
-			mappedObjects[i] = [self valueForSerializedValue: [value objectAtIndex: i]
-													  ofType: COPrimitiveType(type)
-			                             propertyDescription: aPropertyDesc];
-		}
-
-		Class setClass = ([aPropertyDesc isReadOnly] ? [NSSet class] : [NSMutableSet class]);
-		return [setClass setWithObjects: mappedObjects count: count];
-	}
-	else if (COTypeIsPrimitive(type))
+    else
 	{
 		NSString *typeName = [[aPropertyDesc type] name];
 	
@@ -467,11 +482,6 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 		}
 		return value;
 	}
-	else
-	{
-		NSAssert(NO, @"Unsupported serialization type %@ for %@", @(type), value);
-	}
-	return nil;
 }
 
 // TODO: Could be changed to -setSerializedValue:forProperty: once the previous
@@ -507,8 +517,33 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 								
 - (void)setStoreItem: (COItem *)aStoreItem
 {
+    // Validate that the receiver is compatible with the provided store item
+    
+    if (![[aStoreItem UUID] isEqual: [self UUID]])
+    {
+        [NSException raise: NSInvalidArgumentException
+                    format: @"-setStoreItem: called with UUID %@ on COObject with UUID %@", [aStoreItem UUID], [self UUID]];
+    }
+    
+    if (![[aStoreItem valueForAttribute: kCOObjectEntityNameProperty] isEqual: [[self entityDescription] name]])
+    {
+        // FIXME: Relax this requirement
+        [NSException raise: NSInvalidArgumentException
+                    format: @"-setStoreItem: called with entity name %@ on COObject with entity name %@",
+                            [aStoreItem valueForAttribute: kCOObjectEntityNameProperty], [[self entityDescription] name]];
+
+    }
+    
+    // Set the properties
+    
 	for (NSString *property in [aStoreItem attributeNames])
 	{
+        if ([property isEqualToString: kCOObjectEntityNameProperty])
+        {
+            // HACK
+            continue;
+        }
+        
 		ETPropertyDescription *propertyDesc =
 			[[self entityDescription] propertyDescriptionForName: property];
 		id serializedValue = [aStoreItem valueForAttribute: property];
@@ -519,7 +554,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 			[NSException raise: NSInvalidArgumentException
 			            format: @"Tried to set serialized value %@ of type %@ "
 			                     "for property %@ missing in the metamodel %@",
-			                    serializedValue, @(serializedType), [propertyDesc name], [self entityDescription]];
+			                    serializedValue, @(serializedType), property, [self entityDescription]];
 		}
 
 		id value = [self valueForSerializedValue: serializedValue
@@ -529,6 +564,8 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 		// -setSerializedValue:forProperty: once we remove the previous serialization support
 		[self setSerializedValue: value forPropertyDescription: propertyDesc];
 	}
+    
+    // TODO: Decide whether to update relationship cache here. Document it.
 }
 
 @end

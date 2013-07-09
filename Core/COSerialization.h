@@ -13,6 +13,8 @@
 
 @class COItem;
 
+extern NSString *kCOObjectEntityNameProperty;
+
 @interface COObject (COSerialization)
 
 @property (nonatomic, copy) COItem *storeItem;

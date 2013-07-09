@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COEditingContext.h>
+#import <CoreObject/COItemGraph.h>
 
 @class COCommitTrack, COObject, CORevision, COStore, CORelationshipCache;
 
@@ -48,7 +49,7 @@
  * From a terminology standpoint, persistent root and core object can be used 
  * interchangeably.
  */
-@interface COPersistentRoot : NSObject <COPersistentObjectContext>
+@interface COPersistentRoot : NSObject <COPersistentObjectContext, COItemGraph>
 {
 	@private
 	COEditingContext *_parentContext;

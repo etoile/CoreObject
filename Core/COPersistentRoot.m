@@ -15,6 +15,8 @@
 #import "CORevision.h"
 #import "COCommitTrack.h"
 #import "COPersistentRoot+RelationshipCache.h"
+#import "COItem.h"
+#import "COSerialization.h"
 
 @implementation COPersistentRoot
 
@@ -899,6 +901,115 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 {
 	// TODO: When the user has selected a precise branch, just return COCommitTrack.
 	return [COPersistentRoot class];
+}
+
+/** @tasknuit COItem integration */
+
+- (NSString *)entityNameForItem: (COItem *)anItem
+{
+    return [anItem valueForAttribute: kCOObjectEntityNameProperty];
+}
+
+- (ETEntityDescription *)descriptionForItem: (COItem *)anItem
+{
+    NSString *name = [self entityNameForItem: anItem];
+    
+    if (name == nil)
+    {
+        [NSException raise: NSInvalidArgumentException
+                    format: @"COItem %@ lacks an entity name", anItem];
+    }
+    
+    ETModelDescriptionRepository *repo = [_parentContext modelRepository];
+	ETEntityDescription *desc = [repo descriptionForName: name];
+    
+    if (desc == nil)
+    {
+        desc = [repo descriptionForName: [self defaultEntityName]];
+    }
+    
+    return desc;
+}
+
+- (COObject *)objectWithStoreItem: (COItem *)anItem
+{
+	NILARG_EXCEPTION_TEST(anItem);
+    
+	ETEntityDescription *desc = [self descriptionForItem: anItem];
+	Class objClass = [[_parentContext modelRepository] classForEntityDescription: desc];
+    
+	COObject *obj = [[objClass alloc] initWithUUID: [anItem UUID]
+                                 entityDescription: desc
+                                           context: self
+                                           isFault: NO];
+	[self cacheLoadedObject: obj];
+    [obj setStoreItem: anItem];
+	[obj release];
+    
+    [self addCachedOutgoingRelationshipsForObject: obj];
+    
+	return obj;
+}
+
+/** @taskunit COItemGraph protocol */
+
+- (ETUUID *) rootItemUUID
+{
+    return [_rootObject UUID];
+}
+
+/**
+ * Returns immutable item
+ */
+- (COItem *) itemForUUID: (ETUUID *)aUUID
+{
+    COObject *object = [self objectWithUUID: aUUID];
+
+    COItem *item = [object storeItem];
+    
+    return item;
+}
+
+- (NSArray *) itemUUIDs
+{
+    // FIXME: This API should return all UUIDs, not just loaded ones.
+    return [_loadedObjects allKeys];
+}
+
+/**
+ * Insert or update an item.
+ */
+- (void) addItem: (COItem *)item markAsInserted: (BOOL)markInserted
+{
+    NSParameterAssert(item != nil);
+    
+    ETUUID *uuid = [item UUID];
+    COObject *currentObject = [_loadedObjects objectForKey: uuid];
+    
+    if (currentObject == nil)
+    {
+        currentObject = [self objectWithStoreItem: item];
+
+//        if (markInserted)
+//        {
+//            [
+//        }
+    }
+    else
+    {
+        [self removeCachedOutgoingRelationshipsForObject: currentObject];
+        [currentObject setStoreItem: item];
+        [self addCachedOutgoingRelationshipsForObject: currentObject];
+//        [modifiedObjects_ addObject: uuid];
+    }
+}
+
+/**
+ * Insert or update an item.
+ */
+- (void) addItem: (COItem *)anItem
+{
+    [self addItem: anItem markAsInserted: YES];
 }
 
 @end
