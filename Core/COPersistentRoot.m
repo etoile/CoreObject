@@ -140,7 +140,7 @@
 // TODO: Improve how we store the entity name. This is ugly and slow.
 - (NSString *)entityNameForObjectUUID: (ETUUID *)aUUID
 {
-	int64_t maxRevNumber = [_parentContext maxRevisionNumber];
+	int64_t maxRevNumber = 0;
 	int64_t maxNum = (maxRevNumber > 0 ? maxRevNumber : [[_parentContext store] latestRevisionNumber]);
 	
 	for (int64_t revNum = maxNum; revNum > 0; revNum--)
@@ -256,7 +256,7 @@
 // TODO: Write tests ensuring -[COEditingContext maxRevision] forces past revision use.
 - (CORevision *)loadableRevisionForRevision: (CORevision *)aRevision
 {
-	int64_t maxRevNumber = [_parentContext maxRevisionNumber];
+	int64_t maxRevNumber = 0;
 	BOOL hasMaxRev = (maxRevNumber > 0);
 	int64_t revNumber = (aRevision != nil ? [aRevision revisionNumber] : maxRevNumber);
 	

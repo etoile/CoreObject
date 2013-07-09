@@ -42,7 +42,6 @@
 	@private
 	ETUUID *_uuid;
 	COStore *_store;
-	int64_t _maxRevisionNumber;
 	int64_t _latestRevisionNumber;
 	ETModelDescriptionRepository *_modelRepository;
 	/** Loaded (or inserted) persistent roots by UUID */
@@ -73,7 +72,7 @@
  * Returns a new autoreleased context initialized with the store located at the 
  * given URL, and with no upper limit on the max revision number.
  *
- * See also -initWithStore:maxRevisionNumber: and -[COStore initWithURL:].
+ * See also -initWithStore: and -[COStore initWithURL:].
  */
 + (COEditingContext *)contextWithURL: (NSURL *)aURL;
 
@@ -82,17 +81,6 @@
  */
 - (id)initWithStore: (COStore *)store;
 
-/**
- * <init />
- * Initializes a context which persists its content in the given store, 
- * fixing the maximum revision number that can be loaded of an object.
- *
- * If the store is nil, the context content is not persisted.
- *
- * If maxRevisionNumber is zero, then there is no upper limit on the revision 
- * that can be loaded.
- */
-- (id)initWithStore: (COStore *)store maxRevisionNumber: (int64_t)maxRevisionNumber;
 /**
  * Initializes the context with no store. 
  * As a result, the context content is not persisted.
@@ -150,16 +138,6 @@
  * are accessing the store simultaneously.
  */
 - (int64_t)latestRevisionNumber;
-/**
- * Returns the maximun revision that can be loaded for objects in persistent 
- * roots.
- *
- * If the returned value is zero, there is no upper limit on the revision that
- * can be loaded.
- *
- * By default, returns zero. 
- */
-- (int64_t)maxRevisionNumber;
 /**
  * Returns the model description repository, which holds the metamodel that 
  * describes all the persistent objects editable in the context.

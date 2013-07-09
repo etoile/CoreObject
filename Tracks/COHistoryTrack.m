@@ -50,6 +50,8 @@
 
 - (void)undo
 {
+    NSLog(@"WARNING: -[COHistoryTrack undo] is disabled for now");
+#if 0
 	COTrackNode *currentNode = [self currentNode];
 	
 	if ([[currentNode metadata] valueForKey: @"undoMetadata"] != nil)
@@ -87,6 +89,7 @@
 																		forKey: @"undoMetadata" ]];
 	
 //	[self setCurrentNode: [[self currentNode] previousNode]];
+#endif
 }
 
 - (void)redo

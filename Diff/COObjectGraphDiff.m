@@ -600,10 +600,12 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 									   withContext: [[otherObject persistentRoot] parentContext]];
 }
 
+// Disabled because -maxRevisionNumber support was removed for now, while we migrate to NestedVersioning's store
+#if 0
 + (COObjectGraphDiff *)selectiveUndoDiffWithRootObject: (COObject *)aRootObject 
                                         revisionToUndo: (CORevision *)revToUndo
 {
-	// NOTE: Check the editing context is sane and we don't have an outdated 
+	// NOTE: Check the editing context is sane and we don't have an outdated
 	// root object instance.
 	assert(aRootObject == [[[aRootObject persistentRoot] parentContext] objectWithUUID: [aRootObject UUID]]);
 
@@ -651,6 +653,7 @@ static NSSet *SetWithCOObjectsReplacedWithUUIDs(NSSet *set)
 
 	return [COObjectGraphDiff diffRootObject: currentObj withRootObject: revToUndoObj];
 }
+#endif
 
 @end
 

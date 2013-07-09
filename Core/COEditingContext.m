@@ -48,16 +48,10 @@ static COEditingContext *currentCtxt = nil;
 
 - (id)initWithStore: (COStore *)store
 {
-	return [self initWithStore: store maxRevisionNumber: 0];
-}
-
-- (id)initWithStore: (COStore *)store maxRevisionNumber: (int64_t)maxRevisionNumber;
-{
 	SUPERINIT;
 
 	_uuid = [ETUUID new];
 	ASSIGN(_store, store);
-	_maxRevisionNumber = maxRevisionNumber;	
 	_latestRevisionNumber = [_store latestRevisionNumber];
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
 	_loadedPersistentRoots = [NSMutableDictionary new];
@@ -202,11 +196,6 @@ store by other processes. */
 - (int64_t)latestRevisionNumber
 {
 	return _latestRevisionNumber;
-}
-
-- (int64_t)maxRevisionNumber
-{
-	return _maxRevisionNumber;
 }
 
 - (ETModelDescriptionRepository *)modelRepository
