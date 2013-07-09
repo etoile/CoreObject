@@ -59,7 +59,7 @@
     return rootItemUUID_;
 }
 
-- (COItem *) itemForUUID: (ETUUID *)aUUID
+- (COMutableItem *) itemForUUID: (ETUUID *)aUUID
 {
     return [itemForUUID_ objectForKey: aUUID];
 }

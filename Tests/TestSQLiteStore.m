@@ -1,5 +1,6 @@
 #import "TestCommon.h"
 #import "COItem.h"
+#import "COSQLiteStore+Attachments.h"
 
 
 /**

@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 
 @class ETUUID;
-@class COItem;
+@class COItem, COMutableItem;
 
 
 /**
@@ -54,7 +54,7 @@
         rootItemUUID: (ETUUID *)root;
 
 - (ETUUID *) rootItemUUID;
-- (COItem *) itemForUUID: (ETUUID *)aUUID;
+- (COMutableItem *) itemForUUID: (ETUUID *)aUUID;
 
 - (NSArray *) itemUUIDs;
 

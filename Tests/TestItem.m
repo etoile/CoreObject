@@ -23,7 +23,6 @@
 	
 	// test round trip to JSON
 	{
-        NSString *err = nil;
 		id json = [i1 JSONData];
         
 		COMutableItem *i1clone = [[[COMutableItem alloc] initWithJSONData: json] autorelease];
@@ -58,9 +57,9 @@
 
 - (void) testMutability
 {	
-	COItem *immutable = [COItem itemWithTypesForAttributes: D(kCOStringType | kCOSetType, @"key1",
-															  kCOStringType | kCOArrayType, @"key2",
-															  kCOStringType, @"name")
+	COItem *immutable = [COItem itemWithTypesForAttributes: D(@(kCOStringType | kCOSetType), @"key1",
+															  @(kCOStringType | kCOArrayType), @"key2",
+															  @(kCOStringType), @"name")
 									   valuesForAttributes: D([NSMutableSet setWithObject: @"a"], @"key1",	
 															  [NSMutableArray arrayWithObject: @"A"], @"key2",
 															  @"my name", @"name")];

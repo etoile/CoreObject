@@ -351,7 +351,7 @@
  * the behaviour of -finalizeDeletionsForPersistentRoot:. It will garbage collect all unreferenced
  * revisions in the backing store of the passed in persistent root)
  */
-- (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (id<COItemGraph>)aRevision
+- (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
                                                            metadata: (NSDictionary *)metadata;
 
 

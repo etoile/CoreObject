@@ -190,7 +190,7 @@ static volatile char dest[2048];
         co_buffer_end_array(&buf);
         co_buffer_end_object(&buf);
         
-        memcpy(dest, co_buffer_get_data(&buf), co_buffer_get_length(&buf));
+        memcpy((void *)dest, co_buffer_get_data(&buf), co_buffer_get_length(&buf));
         
         co_buffer_free(&buf);
         

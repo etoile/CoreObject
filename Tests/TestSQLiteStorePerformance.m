@@ -1,5 +1,6 @@
 #import "TestCommon.h"
 #import "COItem.h"
+#import "CORevisionInfo.h"
 
 @interface TestSQLiteStorePerformance : COSQLiteStoreTestCase <UKTest>
 @end
@@ -293,8 +294,7 @@ static int itemChangedAtCommit(int i)
     [store beginTransaction];
     for (int i =0; i<NUM_PERSISTENT_ROOTS; i++)
     {
-        COPersistentRootInfo *proot = [store createPersistentRootWithInitialContents: it
-                                                                             metadata: nil];
+		[store createPersistentRootWithInitialContents: it metadata: nil];
     }
     [store commitTransaction];
     

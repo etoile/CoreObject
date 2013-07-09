@@ -1,6 +1,7 @@
 #import "TestCommon.h"
 #import "COSQLiteStorePersistentRootBackingStore.h"
 #import "COItem.h"
+#import "CORevisionInfo.h"
 
 @interface TestSQLiteStorePersistentRootBackingStore : NSObject <UKTest>
 {
