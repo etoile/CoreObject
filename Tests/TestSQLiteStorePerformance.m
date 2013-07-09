@@ -21,7 +21,7 @@ static const int NUM_PERSISTENT_ROOTS = 100;
 static const int NUM_CHILDREN_PER_PERSISTENT_ROOT = 100;
 static const int NUM_PERSISTENT_ROOT_COPIES = 200;
 
-static const int LOTS_OF_EMBEDDED_ITEMS = 200;
+static const int LOTS_OF_EMBEDDED_ITEMS = 10000;
 
 static ETUUID *rootUUID;
 static ETUUID *childUUIDs[NUM_CHILDREN];
@@ -157,6 +157,10 @@ static int itemChangedAtCommit(int i)
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         COMutableItem *item = [COMutableItem item];
         [item setValue: [NSNumber numberWithInt: i] forAttribute: @"name" type: kCOInt64Type];
+        [item setValue: @"blah blah 1" forAttribute: @"test1" type: kCOStringType];
+        [item setValue: @"blah blah 2" forAttribute: @"test2" type: kCOStringType];
+        [item setValue: @"blah blah 3" forAttribute: @"test3" type: kCOStringType];
+        [item setValue: @"blah blah 4" forAttribute: @"test4" type: kCOStringType];
         [dict setObject: item forKey: [item UUID]];
         [pool release];
     }
@@ -324,11 +328,32 @@ static int itemChangedAtCommit(int i)
 
 - (void) testMakeBigItemTree
 {
-    NSDate *startDate = [NSDate date];
+    // 1. create in-memory tree
     
+    NSDate *startDate = [NSDate date];
+
     COItemGraph *it = [self makeItemTreeWithChildCount: LOTS_OF_EMBEDDED_ITEMS];
     
     NSLog(@"creating %d item itemtree took %lf ms", LOTS_OF_EMBEDDED_ITEMS,
+          1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
+    
+    // 2. commit it
+    
+    startDate = [NSDate date];
+    
+    COPersistentRootInfo *proot = [store createPersistentRootWithInitialContents: it
+                                                                        metadata: nil];
+    
+    NSLog(@"committing %d item itemtree took %lf ms", LOTS_OF_EMBEDDED_ITEMS,
+          1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
+
+    // 3. read it back
+    
+    startDate = [NSDate date];
+    
+    COItemGraph *readBack = [store contentsForRevisionID: [[proot currentBranchInfo] currentRevisionID]];
+    
+    NSLog(@"reading %d item itemtree took %lf ms", (int)[[readBack itemUUIDs] count],
           1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
 
