@@ -924,7 +924,9 @@ See +[NSObject typePrefix]. */
 
 - (void)willLoad
 {
-	
+	assert(_variableStorage == nil);
+	_variableStorage = [self newVariableStorage];
+    _incomingRelationships = [[CORelationshipCache alloc] init];
 }
 
 - (void)didLoad

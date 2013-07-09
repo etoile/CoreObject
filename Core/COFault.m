@@ -63,12 +63,6 @@
 
 	object_setClass(self, NSClassFromString([self futureClassName]));
 
-	// NOTE: I would move that to COObject initialization rather, the spared 
-	// space looks negligible (Quentin).
-	assert(_variableStorage == nil);
-	_variableStorage = [(COObject *)self newVariableStorage];
-    _incomingRelationships = [[CORelationshipCache alloc] init];
-
     [(COObject *)self willLoad];
 	[_persistentRoot loadObject: (COObject *)self];
 
@@ -91,4 +85,3 @@
 }
 
 @end
-
