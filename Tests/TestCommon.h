@@ -1,13 +1,23 @@
 #import <Foundation/Foundation.h>
-#import <UnitKit/UKRunner.h>
+#import <UnitKit/UnitKit.h>
 #import "COEditingContext.h"
 #import "CORevision.h"
 #import "COSQLStore.h"
+#import "COSQLiteStore.h"
 
 #define SA(x) [NSSet setWithArray: x]
 
 #define STORE_CLASS [COSQLStore class]
 #define STORE_URL [NSURL fileURLWithPath: [@"~/TestStore.sqlite" stringByExpandingTildeInPath]]
+
+/**
+ * Temporary test for COSQLiteStore
+ */
+@interface COSQLiteStoreTestCase : NSObject
+{
+    COSQLiteStore *store;
+}
+@end
 
 /**
  * Base class for Core Object test classes.

@@ -5,6 +5,43 @@
 #import "TestCommon.h"
 
 
+@implementation COSQLiteStoreTestCase
+
+- (id) init
+{
+    self = [super init];
+    
+    [[NSFileManager defaultManager] removeItemAtPath: [STORE_URL path] error: NULL];
+    store = [[COSQLiteStore alloc] initWithURL: STORE_URL];
+    
+    return self;
+}
+
++ (NSUInteger) sizeOfPath: (NSString *)aPath
+{
+    NSUInteger result = 0;
+    for (NSString *subpath in [[NSFileManager defaultManager] subpathsAtPath: aPath])
+    {
+        NSDictionary *attribs = [[NSFileManager defaultManager] fileAttributesAtPath: [aPath stringByAppendingPathComponent: subpath]
+                                                                        traverseLink: NO];
+        result += [[attribs objectForKey: NSFileSize] longLongValue];
+    }
+    return result;
+}
+
+- (void) dealloc
+{
+    [store release];
+    
+    //NSLog(@"Store size is %lld K", (long long)[COSQLiteStoreTestCase sizeOfPath: [STORE_URL path]] / 1024);
+    
+    [[NSFileManager defaultManager] removeItemAtPath: [STORE_URL path] error: NULL];
+    
+    [super dealloc];
+}
+
+@end
+
 @implementation TestCommon
 
 // NOTE: The Xcode project includes a test suite limited to the store tests

@@ -122,7 +122,7 @@
  */
 - (BOOL) isEqual:(id)object
 {
-    NSLog(@"WARNING, COItemTree should be compared for debugging only");
+    //NSLog(@"WARNING, COItemGraph should be compared for debugging only");
     
     if (![object isKindOfClass: [self class]])
     {

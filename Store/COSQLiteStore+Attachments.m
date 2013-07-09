@@ -123,9 +123,15 @@ static NSData *dataFromHexString(NSString *hexString)
 - (NSArray *) attachments
 {
     NSMutableArray *result = [NSMutableArray array];
+    NSString *path = [[self attachmentsURL] path];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath: path])
+    {
+        return result;
+    }
+    
 	NSError *error = nil;
-    NSArray *files = [[NSFileManager defaultManager]
-		contentsOfDirectoryAtPath: [[self attachmentsURL] path] error: &error];
+    NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath: path error: &error];
 	// TODO: Implement some recovery strategy and error reporting
 	assert(files != nil && error == nil);
 
