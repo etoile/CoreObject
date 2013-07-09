@@ -95,6 +95,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
  * new item with new UIID
  */
 + (COMutableItem *) item;
++ (COMutableItem *) itemWithUUID: (ETUUID *)aUUID;
 
 - (void) setUUID: (ETUUID *)aUUID;
 

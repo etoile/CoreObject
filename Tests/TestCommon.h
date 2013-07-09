@@ -6,6 +6,9 @@
 #import "CORevisionID.h"
 #import "COSQLStore.h"
 #import "COSQLiteStore.h"
+#import "COCopier.h"
+#import "COType.h"
+#import "COItem.h"
 
 #define SA(x) [NSSet setWithArray: x]
 
