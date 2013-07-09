@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#import <CoreObject/COItem.h>
+#import "COItem.h"
 
 @interface COItem (Binary)
 
