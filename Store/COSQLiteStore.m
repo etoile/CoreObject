@@ -155,13 +155,14 @@
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS attachment_refs (root_id BLOB, revid INTEGER, attachment_hash BLOB)"];    
     
     // FIXME: This is a bit ugly. Verify that usage is consistent across fts3/4
-    if (sqlite3_libversion_number() >= 3007004)
+	if (sqlite3_libversion_number() >= 3007011)
     {
         [db_ executeUpdate: @"CREATE VIRTUAL TABLE IF NOT EXISTS fts USING fts4(content=\"\", text)"]; // implicit column docid
     }
     else
     {
-        [db_ executeUpdate: @"CREATE VIRTUAL TABLE IF NOT EXISTS fts USING fts3(text)"]; // implicit column docid
+		// FIXME: Should use IF NOT EXISTS if possible
+        [db_ executeUpdate: @"CREATE VIRTUAL TABLE fts USING fts3(text)"]; // implicit column docid
     }
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS fts_docid_to_revisionid ("
