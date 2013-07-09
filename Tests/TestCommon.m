@@ -196,28 +196,3 @@
 }
 
 @end
-
-
-@implementation COEditingContext (TestCommon)
-
-- (id)insertObject: (COObject *)sourceObject
-{
-	COPersistentRoot *context = [self makePersistentRoot];
-	COObject *rootObject = [context insertObject: sourceObject withRelationshipConsistency: YES newUUID: NO];
-
-	[context setRootObject: rootObject];
-
-	return rootObject;
-}
-
-- (id)insertObjectCopy: (COObject *)sourceObject
-{
-	COPersistentRoot *context = [self makePersistentRoot];
-	COObject *rootObject = [context insertObject: sourceObject withRelationshipConsistency: YES newUUID: YES];
-	
-	[context setRootObject: rootObject];
-	
-	return rootObject;
-}
-
-@end

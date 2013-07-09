@@ -411,45 +411,6 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
- * Inserts the object into the persistent root by checking the relationship 
- * consistency if requested.
- *
- * When the object is not yet persistent, it is inserted into the persistent 
- * root and the new UUID hint is ignored.
- *
- * When the object is already persistent, based on the new UUID hint, the new
- * object inserted into the persistent root will be:
- *
- * <deflist>
- * <item>newUUID is YES</item><desc>a copy (new instance and UUID)</desc>
- * <item>newUUID is NO</item><desc>a new context-relative instance (new
- * instance but same UUID)</desc>
- * </deflist>
- *
- * For a persistent object, multiples instance can exist in the same process,
- * one per editing context.
- *
- * You can pass an object that belongs to another editing context to this method.
- */
-- (id)insertObject: (COObject *)sourceObject withRelationshipConsistency: (BOOL)consistency newUUID: (BOOL)newUUID;
-/**
- * This method is deprecated but has no replacement yet.
- *
- * Copies an object from another context into this context.
- *
- * The copy refers to the same underlying persistent object (same UUID).
- */
-- (id)insertObject: (COObject *)sourceObject;
-/**
- * This method is deprecated but has no replacement yet.
- * 
- * Creates a copy of an object (assigning it a new UUID), including copying
- * all strongly contained objects (composite properties).
- */
-- (id)insertObjectCopy: (COObject *)sourceObject;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
  * Loads the object at its last revision.
  *
  * For a inner object, its last revision is its root object last revision.

@@ -11,6 +11,7 @@
 
 @implementation TestCopy
 
+#if 0
 - (void)testBasic
 {
 	COEditingContext *ctx1 = [[COEditingContext alloc] init];
@@ -69,5 +70,6 @@
 	
 	[ctx1 release];
 }
+#endif
 
 @end
