@@ -68,7 +68,8 @@
 	assert(_variableStorage == nil);
 	_variableStorage = [(COObject *)self newVariableStorage];
     _incomingRelationships = [[CORelationshipCache alloc] init];
-    
+
+    [(COObject *)self willLoad];
 	[_persistentRoot loadObject: (COObject *)self];
 
 	// TODO: Return a NSError or report issues in another way

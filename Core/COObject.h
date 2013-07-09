@@ -591,6 +591,7 @@
 - (void)awakeFromFetch;
 - (void)willTurnIntoFault;
 - (void)didTurnIntoFault;
+- (void)willLoad;
 - (void)didLoad;
 - (void)didReload;
 

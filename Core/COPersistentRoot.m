@@ -762,6 +762,13 @@ static id handle(id value, COPersistentRoot *ctx, ETPropertyDescription *desc, B
 	ETUUID *objUUID = [obj UUID];
 	NSMutableSet *propertiesToFetch = [NSMutableSet setWithArray: [obj persistentPropertyNames]];
 	BOOL isTriggeredLoad = ([_loadingObjects isEmpty] == NO);
+	
+
+	/* For CODictionary, fetch all the properties */
+	if ([propertiesToFetch isEmpty])
+	{
+		propertiesToFetch = nil;
+	}
 
 	[self willLoadObject: obj];
 	

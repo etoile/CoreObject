@@ -297,10 +297,14 @@ serialization. */
 		value = [self performSelector: getter];
 	}
 	
-	/* If no custom getter can be found, we use PVC which will in last resort
-	   access the variable storage with -primitiveValueForKey: */
+	/* If no custom getter can be found, we try to access the ivar with KVC semantics */
 	
-	return [self valueForProperty: [aPropertyDesc name]];
+	if (ETGetInstanceVariableValueForKey(self, &value, [aPropertyDesc name]) == NO)
+	{
+		/* If no valid ivar can be found, we access the variable storage */
+		value = [self primitiveValueForKey: [aPropertyDesc name]];
+	}
+	return value;
 }
 
 - (COItem *)storeItem

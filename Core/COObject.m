@@ -433,10 +433,6 @@ See +[NSObject typePrefix]. */
 
 - (void)setName: (NSString *)aName
 {
-	if ([aName isEqual: @"Untitled"])
-	{
-		NSLog(@"bla");
-	}
 	[self willChangeValueForProperty: @"name"];
 	[self setValue: aName forUndefinedKey: @"name"];
 	[self didChangeValueForProperty: @"name"];
@@ -926,6 +922,11 @@ See +[NSObject typePrefix]. */
 
 }
 
+- (void)willLoad
+{
+	
+}
+
 - (void)didLoad
 {
 	
@@ -1170,7 +1171,7 @@ static int indent = 0;
 
 - (id)serializedValueForProperty: (NSString *)key
 {
-	if (![[self propertyNames] containsObject: key])
+	if (![[self persistentPropertyNames] containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
 	}
@@ -1185,15 +1186,21 @@ static int indent = 0;
 		return [self performSelector: getter];
 	}	
 
-	/* If no custom getter can be found, we use PVC which will in last resort 
-	   access the variable storage with -primitiveValueForKey: */
+	/* If no custom getter can be found, we try to access the ivar with KVC semantics */
 
-	return [self valueForProperty: key];
+	id value = nil;
+
+	if (ETGetInstanceVariableValueForKey(self, &value, key) == NO)
+	{
+		/* If no valid ivar can be found, we access the variable storage */
+		value = [self primitiveValueForKey: key];
+	}
+	return value;
 }
 
 - (void)setSerializedValue: (id)value forProperty: (NSString *)key
 {
-	if (![[self propertyNames] containsObject: key])
+	if (![[self persistentPropertyNames] containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
 	}
@@ -1243,35 +1250,6 @@ static int indent = 0;
 		[newArray addObject: [self propertyListForValue: value]];
 	}
 	return newArray;
-}
-
-/* Converting dictionaries into arrays means a diff can be computed against the 
-serialized representation without having any support for keyed collections in 
-the diff code.
- 
-For diffing the object graph directly, the same conversion is required in the 
-diff code though (not yet implemented). 
-  
-The conversion is slow, but keyed collections tend to be rather small unlike 
-arrays or sets, so it shouldn't cause performance issues in most cases.
-For faster performance, we could just serialize the dictionary keys and values 
-into two distinct arrays, and convert these into an array represention just at 
-diff time. */
-- (NSArray *) propertyListForDictionary: (NSDictionary *)dictionary
-{
-	/* We return an array rather than the set to prevent elements to appear 
-	   randomly reordered in the UI each time a reload occurs. */
-	NSMutableArray *newArray = [NSMutableArray arrayWithCapacity: [dictionary count]];
-	[dictionary enumerateKeysAndObjectsUsingBlock: ^(id key, id value, BOOL *stop)
-	{
-		BOOL isPrimitiveCollection = ([value isCollection] && [value content] == value);
-		NSAssert(isPrimitiveCollection == NO, @"A multivalued property content "
-			"must not contain primitive collections such as NSArray or NSSet "
-			"as elements.");
-		[newArray addObject: D(key, @"key", [self propertyListForValue: value], @"value")];
-	}];
-	return [NSDictionary dictionaryWithObjectsAndKeys: @"keyedCollection", @"type",
-	                                                   newArray, @"arrayRepresentation", nil];
 }
 
 /* Returns the CoreObject serialized type for a NSValue or NSNumber object.
@@ -1401,7 +1379,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	}
 	else if ([value isKindOfClass: [NSDictionary class]])
 	{
-		result = (NSDictionary *)[self propertyListForDictionary: value];
+		ETAssertUnreachable();
 	}
 	else if (value == nil)
 	{
@@ -1485,17 +1463,6 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 				[set addObject: [self valueForPropertyList: [objects objectAtIndex:i]]];
 			}
 			return set;
-		}
-		else if ([type isEqualToString: @"keyedCollection"])
-		{
-			NSArray *arrayRepresentation = [plist valueForKey: @"arrayRepresentation"];
-			NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity: [arrayRepresentation count]];
-			for (NSDictionary *entry in arrayRepresentation)
-			{
-				[dict setObject: [self valueForPropertyList: [entry objectForKey: @"value"]]
-				         forKey: (id <NSCopying>)[entry objectForKey: @"key"]];
-			}
-			return dict;
 		}
 		else if ([type isEqualToString: @"nil"])
 		{

@@ -43,10 +43,23 @@
 	return self;
 }
 
+- (void)willLoad
+{
+	[super willLoad];
+	_content = [NSMutableDictionary new];
+}
+
 - (void)dealloc
 {
 	DESTROY(_content);
 	[super dealloc];
+}
+
+/* Prevent -[COObject awakeFromFetch] to check that -tags is a valid collection.
+For a loaded object, -tags return nil because tags are not serialized. */
+- (void)awakeFromFetch
+{
+	ETAssert(_content != nil);
 }
 
 #pragma mark Keyed Collection Protocol
@@ -132,7 +145,28 @@
 #pragma mark Serialization
 #pragma mark -
 
-- (COItem *) storeItem
+/* For -[COPersistentRoot saveCommitWithMetadata:] and old serialization */
+- (NSArray *)persistentPropertyNames
+{
+	return [self allKeys];
+}
+
+/* For old serialization */
+- (id)serializedValueForProperty: (NSString *)key
+{
+	return [self objectForKey: key];
+}
+
+/* For old serialization */
+- (void)setSerializedValue: (id)value forProperty: (NSString *)key
+{
+	if ([key isEqualToString: @"_entity"])
+		return;
+
+	[self setObject: value forKey: key];
+}
+
+- (COItem *)storeItem
 {
 	ETModelDescriptionRepository *repo = [[[self persistentRoot] parentContext] modelRepository];
 	ETEntityDescription *rootType = [repo descriptionForName: @"Object"];
