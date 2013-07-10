@@ -30,7 +30,7 @@
 @interface TestCommon : NSObject
 {
 	COEditingContext *ctx;
-	COStore *store;
+	COSQLiteStore *store;
 }
 
 /**
