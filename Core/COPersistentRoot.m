@@ -22,7 +22,7 @@
 @implementation COPersistentRoot
 
 @synthesize parentContext = _parentContext,
-	commitTrack = _commitTrack, rootObject = _rootObject, revision = _revision;
+	commitTrack = _commitTrack, rootObject = _rootObject;
 
 - (ETUUID *)persistentRootUUID
 {
@@ -598,7 +598,7 @@
                                  entityDescription: desc
                                            context: self
                                            isFault: NO];
-	[self cacheLoadedObject: obj];
+    [obj becomePersistentInContext: self];
     [obj setStoreItem: anItem];
 	[obj release];
     
@@ -679,8 +679,7 @@
     
     COObject *newRoot = [self objectWithUUID: [aGraph rootItemUUID]];
     assert(newRoot != nil);
-    
-    ASSIGN(_rootObject, newRoot);    
+    ASSIGN(_rootObject, newRoot);
 }
 
 /** @taskunit Persistent root info */
@@ -697,6 +696,17 @@
     {
         ASSIGN(_info, newInfo);
     }
+}
+
+- (CORevision *)revision
+{
+    return _revision;
+}
+
+- (void) setRevision:(CORevision *)revision
+{
+    ASSIGN(_revision, revision);
+    [self reloadAtRevision: _revision];
 }
 
 @end
