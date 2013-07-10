@@ -8,10 +8,15 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <CoreObject/COStore.h>
+#import <CoreObject/COSQLiteStore.h>
 
 @class COObject, COEditingContext, CORevision;
 @class COTrackNode;
+
+// TODO: Remove
+@protocol COTrackNodeBuilder <NSObject>
+- (id)makeNodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision;
+@end
 
 /** 
  * @group History Navigation
@@ -256,11 +261,7 @@
 /**
  * See -[CORevision branchUUID].
  */
-- (ETUUID *)branchkUUID;
-/**
- * See -[CORevision objectUUID].
- */
-- (ETUUID *)objectUUID;
+- (ETUUID *)branchUUID;
 /**
  * See -[CORevision date].
  */

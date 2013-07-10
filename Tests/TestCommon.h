@@ -1,18 +1,18 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
+#import "COCopier.h"
 #import "COEditingContext.h"
+#import "COItem.h"
 #import "COItemGraph.h"
+#import "COPersistentRoot.h"
 #import "CORevision.h"
 #import "CORevisionID.h"
-#import "COSQLStore.h"
 #import "COSQLiteStore.h"
-#import "COCopier.h"
 #import "COType.h"
-#import "COItem.h"
 
 #define SA(x) [NSSet setWithArray: x]
 
-#define STORE_CLASS [COSQLStore class]
+#define STORE_CLASS [COSQLiteStore class]
 #define STORE_URL [NSURL fileURLWithPath: [@"~/TestStore.sqlite" stringByExpandingTildeInPath]]
 
 /**

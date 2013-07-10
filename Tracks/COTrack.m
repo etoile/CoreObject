@@ -107,7 +107,7 @@
 
 - (COTrackNode *)makeNodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision
 {
-	return [COTrackNode nodeWithID: aNodeID revision: aRevision onTrack: self];
+	return [COTrackNode nodeWithRevision: aRevision onTrack: self];
 }
 
 - (COTrackNode *)currentNode

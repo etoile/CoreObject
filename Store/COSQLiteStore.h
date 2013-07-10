@@ -490,3 +490,10 @@
 - (void) commitTransaction;
 
 @end
+
+// TODO: Rethink the constants once we implement the new notification model
+extern NSString *COStoreDidChangeCurrentNodeOnTrackNotification;
+extern NSString *kCONewCurrentNodeIDKey;
+extern NSString *kCONewCurrentNodeRevisionNumberKey;
+extern NSString *kCOOldCurrentNodeRevisionNumberKey;
+extern NSString *kCOStoreUUIDStringKey;

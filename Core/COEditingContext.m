@@ -4,7 +4,7 @@
 #import "COError.h"
 #import "COObject.h"
 #import "COGroup.h"
-#import "COStore.h"
+#import "COSQLiteStore.h"
 #import "CORevision.h"
 #import "COCommitTrack.h"
 

@@ -4,7 +4,7 @@
 #import "COPersistentRoot.h"
 #import "COContainer.h"
 #import "COGroup.h"
-#import "COStore.h"
+#import "COSQLiteStore.h"
 #import "TestCommon.h"
 
 @interface TestEditingContext : TestCommon <UKTest>

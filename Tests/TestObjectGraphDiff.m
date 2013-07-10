@@ -1,12 +1,9 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
-#import "COStore.h"
-#import "COHistoryTrack.h"
+#import "TestCommon.h"
 #import "COContainer.h"
 #import "COGroup.h"
 #import "COObjectGraphDiff.h"
-#import "COPersistentRoot.h"
-#import "TestCommon.h"
 
 @interface TestObjectGraphDiff : TestCommon <UKTest>
 @end

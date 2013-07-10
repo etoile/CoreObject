@@ -1000,3 +1000,9 @@
 }
 
 @end
+
+NSString *COStoreDidChangeCurrentNodeOnTrackNotification = @"COStoreDidChangeCurrentNodeOnTrackNotification";
+NSString *kCONewCurrentNodeIDKey = @"kCONewCurrentNodeIDKey";
+NSString *kCONewCurrentNodeRevisionNumberKey = @"kCONewCurrentNodeRevisionNumberKey";
+NSString *kCOOldCurrentNodeRevisionNumberKey = @"kCOOldCurrentNodeRevisionNumberKey";
+NSString *kCOStoreUUIDStringKey = @"kCOStoreUUIDStringKey";

@@ -17,7 +17,7 @@
 #import "CORelationshipCache.h"
 #import "CORevision.h"
 #import "COSerialization.h"
-#import "COStore.h"
+#import "COSQLiteStore.h"
 
 @implementation COPersistentRoot
 

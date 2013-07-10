@@ -1,6 +1,5 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
-#import "COStore.h"
 #import "TestCommon.h"
 
 @interface TestStore : TestCommon <UKTest>

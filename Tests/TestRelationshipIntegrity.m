@@ -1,9 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
-#import "COEditingContext.h"
-#import "COContainer.h"
-#import "COStore.h"
 #import "TestCommon.h"
+#import "COContainer.h"
 
 @interface TestRelationshipIntegrity : TestCommon <UKTest>
 @end

@@ -12,7 +12,7 @@
 #import "COObject.h"
 #import "COObjectGraphDiff.h"
 #import "CORevision.h"
-#import "COStore.h"
+#import "COSQLiteStore.h"
 
 @implementation COCustomTrack
 

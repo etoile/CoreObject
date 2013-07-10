@@ -10,7 +10,7 @@
 #import "COCommitTrack.h"
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
-#import "COStore.h"
+#import "COSQLiteStore.h"
 #import "COObject.h"
 #import "CORevision.h"
 #import "FMDatabase.h"

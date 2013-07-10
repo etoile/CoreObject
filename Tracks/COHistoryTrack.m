@@ -14,7 +14,7 @@
 #import "COObject.h"
 #import "COContainer.h"
 #import "COObjectGraphDiff.h"
-#import "COStore.h"
+#import "COSQLitetore.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 

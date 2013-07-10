@@ -1,7 +1,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
 #import "COPersistentRoot.h"
-#import "COStore.h"
+#import "COSQLiteStore.h"
 #import "TestCommon.h"
 
 
