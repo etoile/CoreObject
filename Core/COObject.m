@@ -1138,7 +1138,7 @@ static int indent = 0;
 
 - (NSString *)revisionDescription
 {
-	return [NSString stringWithFormat: @"%llu", (unsigned long long)[[self revision] revisionNumber]];
+	return [[self revision] description];
 }
 
 - (NSString *)tagDescription
