@@ -1,53 +1,22 @@
 #import <Foundation/Foundation.h>
-#import "COSequenceDiff.h"
 
-@interface COArrayDiff : COSequenceDiff
-{
-	
-}
+@protocol CODiffArraysDelegate
 
-- (id) initWithFirstArray: (NSArray *)first
-              secondArray: (NSArray *)second;
+- (void)recordInsertionWithLocation: (NSUInteger)aLocation
+					insertedObjects: (id)anArray
+						   userInfo: (id)info;
 
-- (void) applyTo: (NSMutableArray*)array;
-- (NSArray *)arrayWithDiffAppliedTo: (NSArray *)array;
+- (void)recordDeletionWithRange: (NSRange)aRange
+					   userInfo: (id)info;
 
-@end
-
-
-
-
-
-@interface COArrayDiffOperationInsert : COSequenceDiffOperation 
-{
-	NSArray *insertedObjects;
-}
-
-@property (nonatomic, retain, readonly)  NSArray* insertedObjects;
-
-+ (COArrayDiffOperationInsert*)insertWithLocation: (NSUInteger)loc objects: (NSArray*)objs;
+- (void)recordModificationWithRange: (NSRange)aRange
+					insertedObjects: (id)anArray
+						   userInfo: (id)info;
 
 @end
 
+void CODiffArrays(NSArray *arrayA, NSArray *arrayB, id<CODiffArraysDelegate>delegate, id userInfo);
 
+void COApplyEditsToArray(NSMutableArray *array, NSArray *edits);
 
-@interface COArrayDiffOperationDelete : COSequenceDiffOperation
-{
-}
-
-+ (COArrayDiffOperationDelete*)deleteWithRange: (NSRange)range;
-
-@end
-
-
-
-@interface COArrayDiffOperationModify : COSequenceDiffOperation
-{
-	NSArray *insertedObjects;  
-}
-
-@property (nonatomic, retain, readonly)  NSArray* insertedObjects;
-
-+ (COArrayDiffOperationModify*)modifyWithRange: (NSRange)range newObjects: (NSArray*)objs;
-
-@end
+NSArray *COArrayByApplyingEditsToArray(NSArray *array, NSArray *edits);
