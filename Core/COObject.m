@@ -153,21 +153,14 @@ See +[NSObject typePrefix]. */
 		ASSIGN(_entityDescription, [[ETModelDescriptionRepository mainRepository] 
 			entityDescriptionForClass: [self class]]);
 	}
-	_variableStorage = nil;
+
 	_isIgnoringDamageNotifications = NO;
 	_isInitialized = YES;
 
-	if (isFault)
-	{
-		_persistentRoot = aContext;
-	}
-	else
-	{
-		[(id)_persistentRoot markObjectAsUpdated: self forProperty: nil];
-		_variableStorage = [self newVariableStorage];
-        _incomingRelationships = [[CORelationshipCache alloc] init];
-		[self didCreate];
-	}
+	[(id)_persistentRoot markObjectAsUpdated: self forProperty: nil];
+	_variableStorage = [self newVariableStorage];
+	_incomingRelationships = [[CORelationshipCache alloc] init];
+	[self didCreate];
 
 	return self;
 }
@@ -187,12 +180,7 @@ See +[NSObject typePrefix]. */
 	              entityDescription: anEntityDescription
 	                        context: aContext
 	                        isFault: isFault];
-
-	/* When the object is not reloaded, but instantiated for the first time */
-	if (isFault == NO)
-	{
-		[self init];
-	}
+	[self init];
 	return self;
 }
 
