@@ -275,15 +275,6 @@
  */
 - (COObject *)rootObject;
 /**
- * Returns NO when the object is loaded, otherwise returns YES.
- * 
- * When YES is returned, the receiver class is set to +faultClass.
- *
- * You can send a message that COFault doesn't implement to unfault the object 
- * (in other words, load the instance variable values).
- */
-- (BOOL)isFault;
-/**
  * Returns whether the receiver is saved on the disk.
  *
  * When persistent, the receiver has both a valid editing context and root object.
@@ -589,8 +580,6 @@
 /** @taskunit Overridable Notifications */
 
 - (void)awakeFromFetch;
-- (void)willTurnIntoFault;
-- (void)didTurnIntoFault;
 - (void)willLoad;
 - (void)didLoad;
 - (void)didReload;
@@ -715,31 +704,6 @@
  entityDescription: (ETEntityDescription *)anEntityDescription
            context: (COPersistentRoot *)aContext
            isFault: (BOOL)isFault;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Returns COObjectFault. 
- */
-+ (Class)faultClass;
-/**
- * This method is only exposed to be used internally by CoreObject.
- * See -[COFault unfaultIfNeeded].
- */
-- (NSError *)unfaultIfNeeded;
-/**
- * <override-never />
- * This method is only exposed to be used internally by CoreObject.
- *
- * Turns the receiver back into a fault, if previously loaded.
- *
- * Will release the variable storage values but not the instance variable values.
- *
- * This method invokes -willTurnIntoFault and -didTurnIntoFault which can be 
- * overriden in subclasses. For example, to release some instance variables.
- *
- * On return, the receiver class has been set to +faultClass.
- */
-- (void)turnIntoFault;
 /**
  * Private.
  */

@@ -14,7 +14,6 @@
 #import <CoreObject/COCustomTrack.h>
 #import <CoreObject/COEditingContext.h>
 #import <CoreObject/COError.h>
-#import <CoreObject/COFault.h>
 #import <CoreObject/COGroup.h>
 #import <CoreObject/COHistoryTrack.h>
 #import <CoreObject/COLibrary.h>

@@ -35,8 +35,6 @@
 		609C00811704C2BA00D01AAB /* CORevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00791704C2BA00D01AAB /* CORevision.m */; };
 		609C00941704C3DA00D01AAB /* COEditingContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00881704C3DA00D01AAB /* COEditingContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00951704C3DA00D01AAB /* COEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00891704C3DA00D01AAB /* COEditingContext.m */; };
-		609C00961704C3DA00D01AAB /* COFault.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C008A1704C3DA00D01AAB /* COFault.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		609C00971704C3DA00D01AAB /* COFault.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C008B1704C3DA00D01AAB /* COFault.m */; };
 		609C00981704C3DA00D01AAB /* COObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C008C1704C3DA00D01AAB /* COObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00991704C3DA00D01AAB /* COObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C008D1704C3DA00D01AAB /* COObject.m */; };
 		609C009A1704C3DA00D01AAB /* COPersistentRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C008E1704C3DA00D01AAB /* COPersistentRoot.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -313,8 +311,6 @@
 		609C007D1704C2BA00D01AAB /* COStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COStore.m; path = Store/COStore.m; sourceTree = "<group>"; };
 		609C00881704C3DA00D01AAB /* COEditingContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COEditingContext.h; path = Core/COEditingContext.h; sourceTree = "<group>"; };
 		609C00891704C3DA00D01AAB /* COEditingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COEditingContext.m; path = Core/COEditingContext.m; sourceTree = "<group>"; };
-		609C008A1704C3DA00D01AAB /* COFault.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COFault.h; path = Core/COFault.h; sourceTree = "<group>"; };
-		609C008B1704C3DA00D01AAB /* COFault.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COFault.m; path = Core/COFault.m; sourceTree = "<group>"; };
 		609C008C1704C3DA00D01AAB /* COObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COObject.h; path = Core/COObject.h; sourceTree = "<group>"; };
 		609C008D1704C3DA00D01AAB /* COObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COObject.m; path = Core/COObject.m; sourceTree = "<group>"; };
 		609C008E1704C3DA00D01AAB /* COPersistentRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COPersistentRoot.h; path = Core/COPersistentRoot.h; sourceTree = "<group>"; };
@@ -681,8 +677,6 @@
 				609C00891704C3DA00D01AAB /* COEditingContext.m */,
 				6609485D1787A1160049468B /* CORelationshipCache.h */,
 				6609485C1787A1160049468B /* CORelationshipCache.m */,
-				609C008A1704C3DA00D01AAB /* COFault.h */,
-				609C008B1704C3DA00D01AAB /* COFault.m */,
 				609C008C1704C3DA00D01AAB /* COObject.h */,
 				609C008D1704C3DA00D01AAB /* COObject.m */,
 				609C008E1704C3DA00D01AAB /* COPersistentRoot.h */,
@@ -920,7 +914,6 @@
 				66D96CC0178B717200D1553C /* CORevisionInfo.h in Headers */,
 				66D96CC2178B717200D1553C /* COSearchResult.h in Headers */,
 				66D96CC4178B717200D1553C /* COSQLiteStore.h in Headers */,
-				609C00961704C3DA00D01AAB /* COFault.h in Headers */,
 				66D96CC6178B717200D1553C /* COSQLiteStore+Attachments.h in Headers */,
 				66D96CC8178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.h in Headers */,
 				66D96CCA178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h in Headers */,
@@ -1219,7 +1212,6 @@
 				791B4E761299C90900CCF472 /* FMResultSet.m in Sources */,
 				609C00811704C2BA00D01AAB /* CORevision.m in Sources */,
 				609C00951704C3DA00D01AAB /* COEditingContext.m in Sources */,
-				609C00971704C3DA00D01AAB /* COFault.m in Sources */,
 				609C00991704C3DA00D01AAB /* COObject.m in Sources */,
 				609C009B1704C3DA00D01AAB /* COPersistentRoot.m in Sources */,
 				609C009D1704C3DA00D01AAB /* COQuery.m in Sources */,

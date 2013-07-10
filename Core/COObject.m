@@ -12,7 +12,6 @@
 
 #import "COObject.h"
 #import "COError.h"
-#import "COFault.h"
 #import "COPersistentRoot.h"
 #import "COPersistentRoot+RelationshipCache.h"
 #import "CORelationshipCache.h"
@@ -160,7 +159,6 @@ See +[NSObject typePrefix]. */
 
 	if (isFault)
 	{
-		object_setClass(self, [[self class] faultClass]);
 		_persistentRoot = aContext;
 	}
 	else
@@ -513,7 +511,6 @@ See +[NSObject typePrefix]. */
 		[value isKindOfClass: [NSData class]] ||
 		[value isKindOfClass: [NSString class]] ||
 		[value isKindOfClass: [COObject class]] ||
-		[value isKindOfClass: [COObjectFault class]] ||
 		value == nil;
 }
 
@@ -921,16 +918,6 @@ See +[NSObject typePrefix]. */
 	}
 }
 
-- (void)willTurnIntoFault
-{
-
-}
-
-- (void)didTurnIntoFault
-{
-
-}
-
 - (void)willLoad
 {
 	assert(_variableStorage == nil);
@@ -1130,15 +1117,8 @@ static int indent = 0;
 	}
 	
 	_inDescription = YES;
-	NSString *desc;
-	if ([self isFault])
-	{
-		desc = [NSString stringWithFormat: @"<Faulted %@(%@) %p UUID=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid];  
-	}
-	else
-	{
-		desc = [NSString stringWithFormat: @"<%@(%@) %p UUID=%@ properties=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid, [self propertyNames]];  
-	}
+	NSString *desc = [NSString stringWithFormat: @"<%@(%@) %p UUID=%@ properties=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _uuid, [self propertyNames]];
+
 	_inDescription = NO;
 	return desc;
 }
@@ -1161,28 +1141,6 @@ static int indent = 0;
 /* 
  * Private 
  */
-
-+ (Class)faultClass
-{
-	return [COObjectFault class];
-}
-
-- (void)turnIntoFault
-{
-	if ([self isFault])
-		return;
-
-	[self willTurnIntoFault];
-	ASSIGN(_variableStorage, nil);
-	object_setClass(self, [[self class] faultClass]);
-	[self didTurnIntoFault];
-}
-
-- (NSError *)unfaultIfNeeded
-{
-	ETAssert([self isFault] == NO);
-	return nil;
-}
 
 - (CORelationshipCache *)relationshipCache
 {
