@@ -31,6 +31,8 @@
 
 - (CORevisionInfo *) revisionForID: (CORevisionID *)aToken;
 
+- (ETUUID *) rootUUIDForRevid: (int64_t)revid;
+
 - (COItemGraph *) itemTreeForRevid: (int64_t)revid;
 
 - (COItemGraph *) itemTreeForRevid: (int64_t)revid restrictToItemUUIDs: (NSSet *)itemSet;

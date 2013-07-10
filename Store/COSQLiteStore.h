@@ -293,6 +293,11 @@
 - (COItemGraph *) contentsForRevisionID: (CORevisionID *)aToken;
 
 /**
+ * Returns the UUID of the root object at the given revision ID
+ */
+- (ETUUID *) rootObjectUUIDForRevisionID: (CORevisionID *)aToken;
+
+/**
  * Returns the state of a single embedded object at a given revision.
  */
 - (COItem *) item: (ETUUID *)anitem atRevisionID: (CORevisionID *)aToken;

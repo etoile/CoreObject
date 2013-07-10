@@ -351,6 +351,13 @@
     return result;
 }
 
+- (ETUUID *) rootObjectUUIDForRevisionID: (CORevisionID *)aToken
+{
+    NSParameterAssert(aToken != nil);
+    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
+    return [backing rootUUIDForRevid: [aToken revisionIndex]];
+}
+
 - (COItem *) item: (ETUUID *)anitem atRevisionID: (CORevisionID *)aToken
 {
     NSParameterAssert(aToken != nil);
