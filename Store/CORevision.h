@@ -61,10 +61,6 @@
  */
 - (CORevision *)parentRevision;
 
-/** 
- * Returns the revision UUID. 
- */
-- (ETUUID *)UUID;
 /**
  * Returns the persistent object UUID involved in the revision.
  */
