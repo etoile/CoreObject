@@ -280,16 +280,6 @@
  */
 - (NSError *)error;
 
-/** @taskunit Legacy */
- 
-/**
- * This method is deprecated.
- *
- * You must now use -insertNewPersistentRootWithEntityName: and sent -rootObject 
- * to the resulting context to get the same result.
- */
-- (id)insertObjectWithEntityName: (NSString *)anEntityName;
-
 /** @taskunit Private */
 
 /**

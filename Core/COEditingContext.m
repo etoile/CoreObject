@@ -286,11 +286,6 @@ store by other processes. */
 	return insertedPersistentRoots;
 }
 
-- (id)insertObjectWithEntityName: (NSString *)anEntityName
-{
-	return [[self insertNewPersistentRootWithEntityName: anEntityName] rootObject];
-}
-
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject
 {
 	// FIXME: COObjectGraphDiff prevents us to detect an invalid root object...
