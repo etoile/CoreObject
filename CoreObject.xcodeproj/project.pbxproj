@@ -104,6 +104,7 @@
 		66808492178DAFE3003A3CC6 /* diff.cc in Sources */ = {isa = PBXBuildFile; fileRef = 66808487178DAFE3003A3CC6 /* diff.cc */; };
 		66808493178DAFE3003A3CC6 /* diff.h in Headers */ = {isa = PBXBuildFile; fileRef = 66808488178DAFE3003A3CC6 /* diff.h */; };
 		66808494178DAFE3003A3CC6 /* diff.hh in Headers */ = {isa = PBXBuildFile; fileRef = 66808489178DAFE3003A3CC6 /* diff.hh */; };
+		66808498178DB4D5003A3CC6 /* TestCommitTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00571704C24C00D01AAB /* TestCommitTrack.m */; };
 		6686BE2A12592D7B0065DE1A /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
 		66D099FD129AE8A2006BEDC3 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6C1299C90900CCF472 /* FMDatabase.m */; };
 		66D099FE129AE8A2006BEDC3 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6E1299C90900CCF472 /* FMDatabaseAdditions.m */; };
@@ -1271,6 +1272,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66808498178DB4D5003A3CC6 /* TestCommitTrack.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				609C00651704C24C00D01AAB /* main.m in Sources */,
 				607EB6F2178D50610024B34D /* TestRevisionNumber.m in Sources */,

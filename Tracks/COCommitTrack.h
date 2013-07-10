@@ -23,7 +23,7 @@
  * undo/redo pointer in the track timeline</item>
  * </list>
  */
-@interface COCommitTrack : COTrack
+@interface COCommitTrack : NSObject
 {
 	@private
     ETUUID *UUID;
@@ -101,6 +101,7 @@
  * is also nil in this case.
  */
 @property (readonly, nonatomic) CORevision *parentRevision;
+@property (readonly, nonatomic) CORevision *currentRevision;
 /**
  * The persistent root owning the commit track.
  *

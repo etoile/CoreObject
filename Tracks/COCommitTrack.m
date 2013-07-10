@@ -100,6 +100,19 @@
     return branchInfo;
 }
 
+- (CORevisionInfo *) currentRevisionInfo
+{
+    // WARNING: Accesses store
+    CORevisionID *revid = [[self branchInfo] currentRevisionID];
+    COSQLiteStore *store = [[self persistentRoot] store];
+    
+    if (revid != nil)
+    {
+        return [store revisionInfoForRevisionID: revid];
+    }
+    return nil;
+}
+
 - (NSString *)label
 {
     // FIXME: Make a standardized metadata key for this
@@ -108,8 +121,30 @@
 
 - (CORevision *)parentRevision
 {
-    // FIXME: Add support for this to COSQLiteStore
-	return nil;
+    // WARNING: Accesses store
+    CORevisionID *revid = [[self currentRevisionInfo] parentRevisionId];
+    COSQLiteStore *store = [[self persistentRoot] store];
+    if (revid != nil)
+    {
+        CORevisionInfo *parentRevisionInfo = [store revisionInfoForRevisionID: revid];
+    
+        return [[[CORevision alloc] initWithStore: [[self persistentRoot] store]
+                                      revisionInfo: parentRevisionInfo] autorelease];
+    }
+    
+    return nil;
+}
+
+- (CORevision *)currentRevision
+{
+    // WARNING: Accesses store
+    CORevisionInfo *info = [self currentRevisionInfo];
+    if (info != nil)
+    {
+        return [[[CORevision alloc] initWithStore: [[self persistentRoot] store]
+                                     revisionInfo: info] autorelease];
+    }
+    return nil;
 }
 
 - (COCommitTrack *)parentTrack

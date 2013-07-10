@@ -326,6 +326,8 @@
 
 - (CORevisionInfo *) revisionInfoForRevisionID: (CORevisionID *)aToken
 {
+    NSParameterAssert(aToken != nil);
+    
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
     return [backing revisionForID: aToken];
 }

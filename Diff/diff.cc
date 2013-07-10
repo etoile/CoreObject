@@ -4,7 +4,6 @@
 class diffarray_wrapper
 {
 private:
-	size_t alength, blength;
 	diff_arraycomparefn_t comparefn;
 	void *userdata1, *userdata2;
 public:
@@ -12,10 +11,9 @@ public:
 	{
 		return comparefn(i, j, userdata1, userdata2);
 	}
-	diffarray_wrapper(size_t alength, size_t blength, diff_arraycomparefn_t comparefn,
+	diffarray_wrapper(diff_arraycomparefn_t comparefn,
 					  void *userdata1, void *userdata2) :
-		alength(alength), blength(blength), comparefn(comparefn),
-		userdata1(userdata1), userdata2(userdata2) {};
+        comparefn(comparefn), userdata1(userdata1), userdata2(userdata2) {};
 };
 
 typedef struct
@@ -27,7 +25,7 @@ typedef struct
 diffresult_t *diff_arrays(size_t alength, size_t blength, diff_arraycomparefn_t comparefn,
 						  void *userdata1, void *userdata2)
 {
-	diffarray_wrapper wrapper(alength, alength, comparefn, userdata1, userdata2);
+	diffarray_wrapper wrapper(comparefn, userdata1, userdata2);
 	
 	std::vector<ManagedFusion::DifferenceItem> items = 
 		ManagedFusion::Diff<diffarray_wrapper>(wrapper, alength, blength);
