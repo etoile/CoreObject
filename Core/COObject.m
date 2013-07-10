@@ -126,7 +126,6 @@ See +[NSObject typePrefix]. */
 - (id) commonInitWithUUID: (ETUUID *)aUUID 
         entityDescription: (ETEntityDescription *)anEntityDescription
                   context: (COPersistentRoot *)aContext
-                  isFault: (BOOL)isFault
 {
 	NSParameterAssert(aUUID != nil);
 	BOOL isPersistent = (aContext != nil);
@@ -168,7 +167,6 @@ See +[NSObject typePrefix]. */
 - (id)initWithUUID: (ETUUID *)aUUID 
  entityDescription: (ETEntityDescription *)anEntityDescription
            context: (COPersistentRoot *)aContext
-           isFault: (BOOL)isFault
 {
 	SUPERINIT;
 	
@@ -178,8 +176,7 @@ See +[NSObject typePrefix]. */
 
 	self = [self commonInitWithUUID: aUUID 
 	              entityDescription: anEntityDescription
-	                        context: aContext
-	                        isFault: isFault];
+	                        context: aContext];
 	[self init];
 	return self;
 }
@@ -191,15 +188,14 @@ See +[NSObject typePrefix]. */
 		SUPERINIT;
 		self = [self commonInitWithUUID: [ETUUID UUID]
 		              entityDescription: nil
-		                        context: nil
-		                        isFault: NO];
+		                        context: nil];
 	}
 	return self;
 }
 
 - (id) initWithEntityDescription: (ETEntityDescription *)anEntityDesc
 {
-	return [self initWithUUID: [ETUUID UUID] entityDescription: anEntityDesc context: nil isFault: NO];
+	return [self initWithUUID: [ETUUID UUID] entityDescription: anEntityDesc context: nil];
 }
 
 - (void)dealloc

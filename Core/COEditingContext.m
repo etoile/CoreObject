@@ -262,8 +262,7 @@ store by other processes. */
 	COObject *rootObject = [[cls alloc]
 							initWithUUID: [ETUUID UUID]
 							entityDescription: desc
-							context: nil
-							isFault: NO];
+							context: nil];
 	COPersistentRoot *persistentRoot = [self makePersistentRoot];
 
 	/* Will set the root object on the persistent root */

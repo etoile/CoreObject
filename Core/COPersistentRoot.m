@@ -330,8 +330,7 @@
 	COObject *result = [[cls alloc]
 			  initWithUUID: aUUID
 			  entityDescription: desc
-			  context: nil
-			  isFault: NO];
+			  context: nil];
 
 	[result becomePersistentInContext: self];
 	/* -becomePersistentInContent: calls -registerObject: that retains the object */
@@ -596,8 +595,7 @@
     
 	COObject *obj = [[objClass alloc] initWithUUID: [anItem UUID]
                                  entityDescription: desc
-                                           context: self
-                                           isFault: NO];
+                                           context: self];
     [obj becomePersistentInContext: self];
     [obj setStoreItem: anItem];
 	[obj release];

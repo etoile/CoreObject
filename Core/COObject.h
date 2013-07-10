@@ -697,13 +697,10 @@
  - (NSMutableDictionary *)newVariableStorage;
 /**
  * This method is only exposed to be used internally by CoreObject.
- *
- * If isFault is NO, the object is initialized as a newly inserted object.
  */
 - (id)initWithUUID: (ETUUID *)aUUID 
  entityDescription: (ETEntityDescription *)anEntityDescription
-           context: (COPersistentRoot *)aContext
-           isFault: (BOOL)isFault;
+           context: (COPersistentRoot *)aContext;
 /**
  * Private.
  */
