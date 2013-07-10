@@ -183,15 +183,34 @@
 /** @taskunit Object Access and Loading */
 
 /**
- * Returns the object identified by the UUID, by loading it to its last revision
- * when no instance managed by the receiver is present in memory.
+ * Returns the object identified by the UUID, by loading it to the given
+ * revision when no instance managed by the receiver is present in memory.
  *
- * When the UUID doesn't correspond to a persistent object, returns nil.
+ * When the UUID isn't bound to a persistent object owned by the persistent root,
+ * returns nil (unless it is a commit track UUID or another persistent root UUID,
+ * but these are special cases discussed in the last paragraphs).
+ *
+ * For a nil revision, the object is loaded is loaded at its last revision.
  *
  * When the object is a inner object, the last revision is the one that is tied
  * to its root object last revision.
  *
- * See also -objectWithUUID:atRevision: and -loadedObjectForUUID:.
+ * When the object is already loaded, and its revision is not the requested
+ * revision, raises an invalid argument exception.
+ *
+ * When the UUID is a persistent root UUID, the root object of the persistent
+ * root is returned (the persistent root is loaded if needed).
+ *
+ * When the UUID is a branch UUID, the persistent root for the branch is looked
+ * up. If the persistent root is not available, it is loaded for the requested
+ * branch. If the persistent root is already loaded, a branch mismatch is
+ * possible between the current branch UUID and the given branch UUID. For a
+ * mismatch, an exception is raised, otherwise the root object of the persistent
+ * root is returned.<br />
+ * For a more detailed discussion about branching issues, see COCommitTrack
+ * documentation.
+ *
+ * See also -loadedObjectForUUID:.
  */
 - (COObject *)objectWithUUID: (ETUUID *)uuid;
 
@@ -366,60 +385,12 @@
  */
 - (void)registerObject: (COObject *)object;
 /**
- * Returns the object identified by the UUID, by loading it to the given
- * revision when no instance managed by the receiver is present in memory.
- *
- * When the UUID isn't bound to a persistent object owned by the persistent root,
- * returns nil (unless it is a commit track UUID or another persistent root UUID,
- * but these are special cases discussed in the last paragraphs).
- *
- * For a nil revision, the object is loaded is loaded at its last revision.
- *
- * When the object is a inner object, the last revision is the one that is tied
- * to its root object last revision.
- *
- * When the object is already loaded, and its revision is not the requested
- * revision, raises an invalid argument exception.
- *
- * When the UUID is a persistent root UUID, the root object of the persistent
- * root is returned (the persistent root is loaded if needed).
- *
- * When the UUID is a branch UUID, the persistent root for the branch is looked
- * up. If the persistent root is not available, it is loaded for the requested
- * branch. If the persistent root is already loaded, a branch mismatch is
- * possible between the current branch UUID and the given branch UUID. For a
- * mismatch, an exception is raised, otherwise the root object of the persistent
- * root is returned.<br />
- * For a more detailed discussion about branching issues, see COCommitTrack
- * documentation.
- *
- * See also -loadedObjectForUUID:.
- */
-- (COObject *)objectWithUUID: (ETUUID *)uuid atRevision: (CORevision *)revision;
-
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * See -objectWithUUID:entityName:.
- */
-- (COObject *)objectWithUUID: (ETUUID *)uuid
-                  entityName: (NSString *)name
-                  atRevision: (CORevision *)revision;
-/**
  * This method is only exposed to be used internally by CoreObject.
  *
  * Tells the persistent root a property value has changed in a COObject class or
  * subclass instance.
  */
 - (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Loads the object at its last revision.
- *
- * For a inner object, its last revision is its root object last revision.
- */
-- (void)loadObject: (COObject *)obj;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

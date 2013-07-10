@@ -398,11 +398,11 @@ See +[NSObject typePrefix]. */
 		            format: @"Inner objects cannot be known until %@ has become persistent", self];
 	}
 
-	CORevision *loadedRev = [_persistentRoot revision];
-
-	ETUUID *trackUUID = [[[self persistentRoot] commitTrack] UUID];
-	NSSet *innerObjectUUIDs = [[[self persistentRoot] store] objectUUIDsForCommitTrackUUID: trackUUID
-	                                                                            atRevision: loadedRev];
+	// FIXME: Remove or reimplement without accessing the store directly
+	//CORevision *loadedRev = [_persistentRoot revision];
+	//ETUUID *trackUUID = [[[self persistentRoot] commitTrack] UUID];
+	//NSSet *innerObjectUUIDs = [[[self persistentRoot] store] objectUUIDsForCommitTrackUUID: trackUUID atRevision: loadedRev];
+	NSSet *innerObjectUUIDs = nil;
 	NSMutableSet *innerObjects = [NSMutableSet setWithCapacity: [innerObjectUUIDs count]];
 
 	for (ETUUID *uuid in innerObjectUUIDs)
@@ -441,18 +441,26 @@ See +[NSObject typePrefix]. */
 
 - (NSDate *)modificationDate
 {
+	return nil;
+	// FIXME: Port to the new store
+#if 0
 	ETUUID *branchUUID = [[[self persistentRoot] commitTrack] UUID];
 	CORevision *rev = [[[self persistentRoot] store] maxRevision: INT64_MAX
 	                                          forCommitTrackUUID: branchUUID];
 	return [rev date];
+#endif
 }
 
 - (NSDate *)creationDate
 {
+	return  nil;
+	// FIXME: Port to the new store
+#if 0
 	ETUUID *branchUUID = [[[self persistentRoot] commitTrack] UUID];
 	CORevision *rev = [[[self persistentRoot] store] maxRevision: 0 
 	                                          forCommitTrackUUID: branchUUID];
 	return [rev date];
+#endif
 }
 
 - (NSArray *)parentGroups
@@ -1021,6 +1029,9 @@ See +[NSObject typePrefix]. */
 	return ([[aQuery predicate] evaluateWithObject: self] ? A(self) : [NSArray array]);
 }
 
+// TODO: Remove or port to COSerialization. -serializedRepresentation is basically
+// the same than -storeItem.
+#if 0
 - (id)serializedRepresentation
 {
 	NSMutableDictionary *serializationRep = [NSMutableDictionary dictionary];
@@ -1040,6 +1051,7 @@ See +[NSObject typePrefix]. */
 	id plist = [self propertyListForValue: [self serializedValueForProperty: key]];
 	return [self valueForPropertyList: plist];
 }
+#endif
 
 static int indent = 0;
 
@@ -1170,380 +1182,6 @@ static int indent = 0;
 {
 	ETAssert([self isFault] == NO);
 	return nil;
-}
-
-- (id)serializedValueForProperty: (NSString *)key
-{
-	if (![[self persistentPropertyNames] containsObject: key])
-	{
-		[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
-	}
-
-	/* First we try to use the getter named 'serialized' + 'key' */
-
-	NSString *capitalizedKey = [key stringByCapitalizingFirstLetter];
-	SEL getter = NSSelectorFromString([@"serialized" stringByAppendingString: capitalizedKey]);
-
-	if ([self respondsToSelector: getter])
-	{
-		return [self performSelector: getter];
-	}	
-
-	/* If no custom getter can be found, we try to access the ivar with KVC semantics */
-
-	id value = nil;
-
-	if (ETGetInstanceVariableValueForKey(self, &value, key) == NO)
-	{
-		/* If no valid ivar can be found, we access the variable storage */
-		value = [self primitiveValueForKey: key];
-	}
-	return value;
-}
-
-- (void)setSerializedValue: (id)value forProperty: (NSString *)key
-{
-	if (![[self persistentPropertyNames] containsObject: key])
-	{
-		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
-	}
-	// FIXME: Using -isCollection or -isMutableCollection unfaults the value.
-	if ([value isCollection] && [value isMutableCollection] == NO)
-	{
-		[NSException raise: NSInvalidArgumentException format: @"Tried to set immutable collection %@", key];
-	}
-	// TODO: We should check (but not update) the relationship consistency in a 
-	// vein similar to [self updateRelationshipConsistencyWithValue: value forProperty: key];
-
-	[self checkEditingContextForValue: value];
-	
-	/* First we try to use the setter named 'setSerialized' + 'key' */
-
-	SEL setter = NSSelectorFromString([NSString stringWithFormat: @"%@%@%@", 
-		@"setSerialized", [key stringByCapitalizingFirstLetter], @":"]);
-
-	if ([self respondsToSelector: setter])
-	{
-		[self performSelector: setter withObject: value];
-		return;
-	}	
-	
-	/* When no custom setter can be found, we try to access the ivar with KVC semantics */
-
-	[self willChangeValueForProperty: key];
-
-	if (ETSetInstanceVariableValueForKey(self, value, key) == NO)
-	{
-		/* If no valid ivar can be found, we access the variable storage */
-		[self setPrimitiveValue: value forKey: key];
-	}
-
-	[self didChangeValueForProperty: key];
-}
-
-- (NSArray *) propertyListForArray: (NSArray *)array
-{
-	NSMutableArray *newArray = [NSMutableArray arrayWithCapacity: [array count]];
-	for (id value in array)
-	{
-		BOOL isPrimitiveCollection = ([value isCollection] && [value content] == value);
-		NSAssert(isPrimitiveCollection == NO, @"A multivalued property content "
-			"must not contain primitive collections such as NSArray or NSSet "
-			"as elements.");
-		[newArray addObject: [self propertyListForValue: value]];
-	}
-	return newArray;
-}
-
-/* Returns the CoreObject serialized type for a NSValue or NSNumber object.
-
-Nil is returned when the type is unsupported by CoreObject serialization. */
-- (NSString *)typeForValue: (id)value
-{
-	const char *type = [value objCType];
-
-	if  (strcmp(type, @encode(NSPoint)) == 0)
-	{
-		return @"point";
-	}
-	else if (strcmp(type, @encode(NSSize)) == 0)
-	{
-		return @"size";
-	}
-	else if (strcmp(type, @encode(NSRect)) == 0)
-	{
-		return @"rect";
-	}
-	else if (strcmp(type, @encode(NSRange)) == 0)
-	{
-		return @"range";
-	}
-	else if (strcmp(type, @encode(SEL)) == 0)
-	{
-		return @"sel";
-	}
-	return nil;
-}
-
-/* See ETGeometry.h in EtoileUI */
-static const NSPoint CONullPoint = {FLT_MIN, FLT_MIN};
-static const NSSize CONullSize = {FLT_MIN, FLT_MIN};
-static const NSRect CONullRect = {{FLT_MIN, FLT_MIN}, {FLT_MIN, FLT_MIN}};
-
-/* Returns the CoreObject serialization result for a NSValue or NSNumber object.
-
-Nil is returned when the value type is unsupported by CoreObject serialization. */
-- (NSString *)stringValueForValue: (id)value
-{
-	const char *type = [value objCType];
-
-	if  (strcmp(type, @encode(NSPoint)) == 0)
-	{
-		NSPoint point = [value pointValue];
-		if (NSEqualPoints(point, CONullPoint))
-		{
-			return @"null-point";
-		}
-		return NSStringFromPoint(point);
-	}
-	else if (strcmp(type, @encode(NSSize)) == 0)
-	{
-		NSSize size = [value sizeValue];
-		if (NSEqualSizes(size, CONullSize))
-		{
-			return @"null-size";
-		}
-		return NSStringFromSize(size);
-	}
-	else if (strcmp(type, @encode(NSRect)) == 0)
-	{
-		NSRect rect = [value rectValue];
-		if (NSEqualRects(rect, CONullRect))
-		{
-			return @"null-rect";
-		}
-		return NSStringFromRect(rect);
-	}
-	else if (strcmp(type, @encode(NSRange)) == 0)
-	{
-		return NSStringFromRange([value rangeValue]);
-	}
-	else if (strcmp(type, @encode(SEL)) == 0)
-	{
-		return NSStringFromSelector((SEL)[value pointerValue]);
-	}
-	return nil;
-}
-
-- (NSDictionary *)propertyListForValue: (id)value
-{
-	NSDictionary *result = nil;
-
-	/* Some root object relationships are special in the sense the value can be 
-	   a core object but its persistency isn't enabled. We interpret these 
-	   one-to-one relationships as transient.
-	   Usually a root object belongs to some other objects at run-time, in some 
-	   cases the root object  want to hold a backward pointer (inverse 
-	   relationship) to those non-persistent object(s).
-	   For example, a root object can be a layout item whose parent item is the 
-	   window group... In such a case, we don't want to persist the window 
-	   group, but ignore it. At deseserialiation time, the app is responsible 
-	   to add the item back to the window group (the parent item would be 
-	   restored then). */
-	if ([value isKindOfClass: [COObject class]])
-	{
-		if ([value isPersistent])
-		{
-			if ([[value persistentRoot] isEqual: _persistentRoot])
-			{
-				result = [value referencePropertyList];
-			}
-			else
-			{
-				result = [value persistentRootReferencePropertyList];
-			}
-		}
-		else
-		{
-			ETAssert([self isRoot]);
-			result = D(@"nil", @"type");
-		}
-	}
-	else if ([value isKindOfClass: [NSArray class]])
-	{
-		result = (NSDictionary *)[self propertyListForArray: value];
-	}
-	else if ([value isKindOfClass: [NSSet class]])
-	{
-		result = [NSDictionary dictionaryWithObjectsAndKeys:
-				 @"unorderedCollection", @"type",
-		         [self propertyListForArray: [value allObjects]], @"objects",
-				 nil];
-	}
-	else if ([value isKindOfClass: [NSDictionary class]])
-	{
-		ETAssertUnreachable();
-	}
-	else if (value == nil)
-	{
-		result = [NSDictionary dictionaryWithObject: @"nil" forKey: @"type"];
-	}
-	else if ([COObject isPrimitiveCoreObjectValue: value])
-	{
-		result = D(value, @"value", @"primitive", @"type");
-	}
-	else if ([value isKindOfClass: [NSValue class]] && [self typeForValue: value] != nil)
-	{
-		result = D([self stringValueForValue: value], @"value", [self typeForValue: value] , @"type");
-	}
-	else
-	{
-		// FIXME: Perhaps add a method which can be overriden to explicitly 
-		// declare which instances we can encode without raising an exception.
-		// For example... -validCoreObjectDataClasses.
-		// Would be better to get these from [ETPropertyDescription type].
-		result = (NSDictionary *)[NSKeyedArchiver archivedDataWithRootObject: value];
-	
-		//[NSException raise: NSInvalidArgumentException
-		//            format: @"value must of type COObject, NSArray, NSSet or nil"];
-		//return nil;
-	}
-	return result;
-}
-
-- (NSDictionary *)referencePropertyList
-{
-	NSAssert1([self isPersistent], 
-		@"Usually means -becomePersistentInContext: hasn't been called on %@", self);
-
-	return D(@"object-ref", @"type",
-			[_uuid stringValue], @"uuid",
-			[_entityDescription fullName], @"entity");
-}
-
-- (NSDictionary *)persistentRootReferencePropertyList
-{
-	NSAssert1([self isPersistent],
-			  @"Usually means -becomePersistentInContext: hasn't been called on %@", self);
-	
-	ETUUID *uuid = nil;
-
-	if ([[_persistentRoot referenceClassForRootObject: self] isEqual: [COPersistentRoot class]])
-	{
-		uuid = [_persistentRoot persistentRootUUID];
-	}
-	else
-	{
-		uuid = [[_persistentRoot commitTrack] UUID];
-	}
-	
-	return D(@"object-ref", @"type", [uuid stringValue], @"uuid", [_entityDescription fullName], @"entity");
-}
-
-- (NSObject *)valueForPropertyList: (NSObject *)plist
-{
-	// TODO: Could move the string to NSValue handling to a new method 
-	// -valueForString:... Would be more symetric if we allow subclasses to 
-	// declare new value types
-
-	if ([plist isKindOfClass: [NSDictionary class]])
-	{
-		NSString *type = [plist valueForKey: @"type"];
-
-		if ([type isEqualToString: @"object-ref"])
-		{
-			ETUUID *uuid = [ETUUID UUIDWithString: [plist valueForKey: @"uuid"]];
-			return [[[self persistentRoot] parentContext] objectWithUUID: uuid
-			                                                  entityName: [plist valueForKey: @"entity"]
-			                                                  atRevision: nil];
-		}
-		else if ([type isEqualToString: @"unorderedCollection"])
-		{
-			NSArray *objects = [plist valueForKey: @"objects"];
-			NSMutableSet *set = [NSMutableSet setWithCapacity: [objects count]];
-			for (int i = 0; i < [objects count]; i++)
-			{
-				[set addObject: [self valueForPropertyList: [objects objectAtIndex:i]]];
-			}
-			return set;
-		}
-		else if ([type isEqualToString: @"nil"])
-		{
-			return nil;
-		}
-		else if ([type isEqualToString: @"primitive"])
-		{
-			return [plist valueForKey: @"value"];
-		}
-		else if ([type isEqualToString: @"point"])
-		{
-			NSString *pointString = [plist valueForKey: @"value"];
-			NSPoint point;
-			if ([pointString isEqualToString: @"null-point"])
-			{
-				point = CONullPoint;
-			}
-			else
-			{
-				point = NSPointFromString(pointString);
-			}
-			return [NSValue valueWithPoint: point];
-		}
-		else if ([type isEqualToString: @"size"])
-		{
-			NSString *sizeString = [plist valueForKey: @"value"];
-			NSSize size;
-			if ([sizeString isEqualToString: @"null-size"])
-			{
-				size = CONullSize;
-			}
-			else
-			{
-				size = NSSizeFromString(sizeString);
-			}
-			return [NSValue valueWithSize: size];
-		}
-		else if ([type isEqualToString: @"rect"])
-		{
-			NSString *rectString = [plist valueForKey: @"value"];
-			NSRect rect;
-			if ([rectString isEqualToString: @"null-rect"])
-			{
-				rect = CONullRect;
-			}
-			else
-			{
-				rect = NSRectFromString(rectString);
-			}
-			return [NSValue valueWithRect: rect];
-		}
-		else if ([type isEqualToString: @"range"])
-		{
-			return [NSValue valueWithRange: NSRangeFromString([plist valueForKey: @"value"])];
-		}
-		else if ([type isEqualToString: @"sel"])
-		{
-			SEL sel = NSSelectorFromString([plist valueForKey: @"value"]);
-			return [NSValue valueWithBytes: &sel objCType: @encode(SEL)];
-		}
-	}
-	else if ([plist isKindOfClass: [NSArray class]])
-	{
-		NSUInteger count = [(NSArray*)plist count];
-		id mapped[count];
-		for (int i = 0; i < count; i++)
-		{
-			id obj = [self valueForPropertyList: [(NSArray*)plist objectAtIndex:i]];
-			mapped[i] = obj;
-		}
-		return [NSMutableArray arrayWithObjects: mapped count: count];
-	}
-	else if ([plist isKindOfClass: [NSData class]])
-	{
-		return [NSKeyedUnarchiver unarchiveObjectWithData: (NSData *)plist];
-	}
-
-	return plist;
 }
 
 - (CORelationshipCache *)relationshipCache

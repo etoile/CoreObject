@@ -633,6 +633,7 @@
 
 /** @taskunit Debugging and Description */
 
+#if 0
 /**
  * <override-never />
  * Returns the receiver serialized as a property list.
@@ -655,6 +656,7 @@
  * The property value is retrieved with -serializedValueForProperty:.
  */
 - (id)roundTripValueForProperty: (NSString *)key;
+#endif
 /** 
  * Returns a description that includes the receiver properties and their values. 
  */
@@ -738,40 +740,6 @@
  * On return, the receiver class has been set to +faultClass.
  */
 - (void)turnIntoFault;
-/**
- *
- */
-- (id)serializedValueForProperty: (NSString *)key;
-/**
- * 
- */
-- (void)setSerializedValue: (id)value forProperty: (NSString *)key;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Returns a CoreObject serialized representation by serializing into a plist 
- * the value that was retrieved with -serializedValueForProperty:.
- */
-- (NSDictionary *)propertyListForValue: (id)value;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Returns a marker to track or index the receiver in the CoreObject serialized 
- * representation.
- *
- * Every time a COObject or subclass instance is in relationship with the 
- * receiver, at serialization time -referencePropertyList is used to encode the 
- * relationship in the CoreObject serialized representation.
- */
-- (NSDictionary *)referencePropertyList;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Returns a value that can be passed to -setSerializedValue:forProperty: by 
- * deserializing a CoreObject serialized representation (the plist).
- */
-- (NSObject *)valueForPropertyList: (NSObject *)plist;
-
 /**
  * Private.
  */

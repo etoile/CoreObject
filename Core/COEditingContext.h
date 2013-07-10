@@ -304,22 +304,18 @@
  * root at the latest revision.
  */
 - (COPersistentRoot *)makePersistentRootWithInfo: (COPersistentRootInfo *)info;
-
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Returns the object identified by the UUID, by loading it to the given 
- * revision when no instance managed by the receiver is present in memory, and 
- * initializing it to use the given entity in such a case.
- * 
- * The class bound to the given entity name in the model repository is used to 
- * instantiate the loaded object (if loading is required).
- *
- * This method constraints are covered in -objectWithUUID:atRevision:.
- */
-- (COObject *)objectWithUUID: (ETUUID *)uuid 
-                  entityName: (NSString *)name 
-                  atRevision: (CORevision *)revision;
+ /**
+  * Returns the object identified by the UUID, by loading it to its last revision	 
+  * when no instance managed by the receiver is present in memory.	 
+  *	 
+  * When the UUID doesn't correspond to a persistent object, returns nil.	 
+  *	 
+  * When the object is a inner object, the last revision is the one that is tied	 
+  * to its root object last revision.	 
+  *	 
+  * See also -[COPersistentRoot objectWithUUID:].	 
+  */	 
+ - (COObject *)objectWithUUID: (ETUUID *)uuid;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

@@ -103,16 +103,35 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	}
 	else if ([value isKindOfClass: [COObject class]])
 	{
-		if ([value persistentRoot] == [self persistentRoot])
+		/* Some root object relationships are special in the sense the value can be 
+		   a core object but its persistency isn't enabled. We interpret these 
+		   one-to-one relationships as transient.
+		   Usually a root object belongs to some other objects at run-time, in some
+		   cases the root object  want to hold a backward pointer (inverse
+		   relationship) to those non-persistent object(s).
+		   For example, a root object can be a layout item whose parent item is the
+		   window group... In such a case, we don't want to persist the window
+		   group, but ignore it. At deseserialiation time, the app is responsible
+		   to add the item back to the window group (the parent item would be
+		   restored then). */
+		if ([value isPersistent])
 		{
-			return [value UUID];
+			if ([value persistentRoot] == [self persistentRoot])
+			{
+				return [value UUID];
+			}
+			else
+			{
+				NSAssert([value isRoot], @"A property must point to a root object "
+					"for references accross persistent roots");
+				return [COPath pathWithPersistentRoot: [[value persistentRoot] persistentRootUUID]
+			                                   branch: [[[value persistentRoot] commitTrack] UUID]];
+			}
 		}
 		else
 		{
-			NSAssert([value isRoot], @"A property must point to a root object "
-				"for references accross persistent roots");
-			return [COPath pathWithPersistentRoot: [[value persistentRoot] persistentRootUUID]
-			                               branch: [[[value persistentRoot] commitTrack] UUID]];
+			ETAssert([self isRoot]);
+			return [NSNull null];
 		}
 	}
 	else if ([value isKindOfClass: [NSArray class]])
@@ -460,9 +479,12 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 		if (value == nil)
 			return nil;
 
-		return [[[self persistentRoot] parentContext] objectWithUUID: value
-														  entityName: [[aPropertyDesc type] name]
-														  atRevision: nil];
+		id object =  [[[self persistentRoot] parentContext] objectWithUUID: value];
+		// FIXME: The assertion should check the object entity description
+		// matches the property description type exactly or is either a
+		// subentity or parent entity. For now, we just enforce the first case.
+		ETAssert([[[object entityDescription] name] isEqual: [[aPropertyDesc type] name]]);
+		return object;
 	}
     else
 	{
