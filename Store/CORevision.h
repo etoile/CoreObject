@@ -10,7 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COStore, COSQLStore;
+@class COSQLiteStore, CORevisionInfo, CORevisionID;
 
 /** 
  * @group Store
@@ -34,10 +34,9 @@
  */
 @interface CORevision : NSObject <ETCollection>
 {
-	COSQLStore *store;
-	int64_t revisionNumber;
-	int64_t baseRevisionNumber;
-	int64_t commitNodeID;
+	@private
+	COSQLiteStore *store;
+	CORevisionInfo *revisionInfo;
 }
 
 /** @taskunit Store */
@@ -45,7 +44,7 @@
 /** 
  * Returns the store to which the revision and its changed objects belongs to. 
  */
-- (COStore *)store;
+- (COSQLiteStore *)store;
 
 /** @taskunit History Properties and Metadata */
 
@@ -54,25 +53,13 @@
  *
  * This number shouldn't be used to uniquely identify the revision, unlike -UUID. 
  */
-- (int64_t)revisionNumber;
+- (CORevisionID *)revisionID;
 /**
  * The revision upon which this one is based i.e. the main previous revision. 
  * 
  * This is nil when this is the first revision for a root object.
  */
-- (CORevision *)baseRevision;
-/**
- * Returns the track node ID that resulted from the revision commit.
- *
- * This is first track node ID that was associated to the revision. Through 
- * custom track use, new node IDs might be associated, but the node ID from the 
- * commit time doesn't change.
- *
- * For now, the node ID is set just for the revision of -[COStore finishCommit].
- *
- * If the commit node ID is unknown, returns NSIntegerMax.
- */
-- (int64_t)commitNodeID;
+- (CORevision *)parentRevision;
 
 /** 
  * Returns the revision UUID. 
@@ -85,11 +72,7 @@
 /**
  * Returns the commit track UUID involved in the revision.
  */
-- (ETUUID *)trackUUID;
-/** 
- * Returns the root object UUID involved in the revision. 
- */
-- (ETUUID *)objectUUID;
+- (ETUUID *)branchUUID;
 /** 
  * Returns the date at which the revision was committed. 
  */
@@ -122,53 +105,13 @@
 
 /** @taskunit Changes */
 
+#if 0
 /** 
  * Returns the UUIDs that correspond to the objects changed by the revision. 
  */ 
 - (NSArray *)changedObjectUUIDs;
-/** 
- * Returns the properties (along their values) changed for the given object at 
- * this revision.
- *
- * If the object wasn't changed in the revision, returns an empty dictionary.
- *
- * For retrieving the object state bound to the revision (and not just the 
- * properties changed at this revision), you must use 
- * -valuesAndPropertiesForObjectUUID:fromRevision:.
- *
- * For a nil object UUID, raises a NSInvalidArgumentException.
- */
-- (NSDictionary *)valuesAndPropertiesForObjectUUID: (ETUUID *)objectUUID;
-/**
- * Returns the properties and values for the given object at this revision, if 
- * the object was changed between the receiver revision and the given past 
- * revision.
- *
- * When no object changes exist between the receiver revision and the given past 
- * revision, returns en empty dictionary.
- *
- * Passing nil as the properties argument means the returned properties are 
- * determined by looking at serialized properties in each revision until the 
- * given past revision is reached (this is a lot slower than passing a 
- * predetermined property set since it involves deserializing all the commit 
- * track revisions in the targeted revision range).
- *
- * Passing nil as the revision argument is the same than passing the result 
- * of -[COStore revisionForRevisionNumber:] for 0 as revision number.
- * 
- * Passing the same revision than the receiver returns the same result than 
- * -valuesAndPropertiesForObjectUUID:.
- *
- * For a nil object UUID, raises a NSInvalidArgumentException.
- *
- * For properties that have never been serialized, raises an 
- * NSInternalInconsistencyException. Usually this means you are passing 
- * properties that don't belong to this object or there is a schema mismatch 
- * between the object metamodel and the store content.
- */
-- (NSDictionary *)valuesForProperties: (NSSet *)properties
-                         ofObjectUUID: (ETUUID *)aUUID
-                         fromRevision: (CORevision *)aRevision;
+#endif
+
 /** @taskunit Private */
 
 /** 
@@ -176,22 +119,7 @@
  * Initializes and returns a new revision object to represent a precise revision 
  * number in the given store. 
  */
-- (id)initWithStore: (COStore *)aStore
-     revisionNumber: (int64_t)aRevision
- baseRevisionNumber: (int64_t)aBaseRevision
-       commitNodeID: (int64_t)aNodeID;
+- (id)initWithStore: (COSQLiteStore *)aStore
+       revisionInfo: (CORevisionInfo *)aRevInfo;
 
-/**
- * Returns the next revision after this one. 
- *
- * Note that in a non-linear history model, there are multiple <em>next 
- * revisions<em/>. Therefore this method is only meaningful in linear revision 
- * models, where each revision has only one next revision that calls it its 
- * <em>base revision</em>.<br />
- * In the non-linear case, it returns the <em>next revision</em> that has the 
- * highest revision number.
- *
- * See also -baseRevision.
- */
-- (CORevision *)nextRevision;
 @end

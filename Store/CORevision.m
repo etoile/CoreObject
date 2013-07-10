@@ -9,7 +9,8 @@
 
 #import "CORevision.h"
 #import "FMDatabase.h"
-#import "COSQLStore.h"
+#import "CORevisionInfo.h"
+#import "COSQLiteStore.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 
@@ -23,45 +24,20 @@
 	[self applyTraitFromClass: [ETCollectionTrait class]];
 }
 
-- (id)initWithStore: (COStore *)aStore
-     revisionNumber: (int64_t)aRevision
- baseRevisionNumber: (int64_t)aBaseRevision
-       commitNodeID: (int64_t)aNodeID
+- (id)initWithStore: (COSQLiteStore *)aStore
+       revisionInfo: (CORevisionInfo *)aRevInfo
 {
 	SUPERINIT;
-	ASSIGN(store, (COSQLStore *)aStore);
-	revisionNumber = aRevision;
-	baseRevisionNumber = aBaseRevision;
-	commitNodeID = aNodeID;
+	ASSIGN(store, aStore);
+	ASSIGN(revisionInfo, aRevInfo);
 	return self;
 }
 
 - (void)dealloc
 {
 	DESTROY(store);
+	DESTROY(revisionInfo);
 	[super dealloc];
-}
-
-- (int64_t)baseRevisionNumber
-{
-	return baseRevisionNumber;
-}
-
-- (int64_t)commitNodeID
-{
-	if (commitNodeID != NSIntegerMax)
-		return commitNodeID;
-
-	FMResultSet *rs = [store->db executeQuery: @"SELECT MIN(id) FROM trackNodes WHERE revisionnumber = ?",
-		[NSNumber numberWithUnsignedLongLong: revisionNumber]];
-
-	if ([rs next] == NO)
-	{
-		[NSException raise: NSInternalInconsistencyException
-		            format: @"Found no node ID for %@", self];
-	}
-	commitNodeID = [rs longLongIntForColumnIndex: 0];
-	return commitNodeID;
 }
 
 - (BOOL)isEqual: (id)rhs
@@ -69,8 +45,7 @@
 	if ([rhs isKindOfClass: [CORevision class]] == NO)
 		return NO;
 
-	return (revisionNumber == [rhs revisionNumber]
-		&& baseRevisionNumber == [rhs baseRevisionNumber]
+	return ([revisionInfo isEqual: ((CORevision *)rhs)->revisionInfo]
 		&& [[store URL] isEqual: [[rhs store] URL]]);
 }
 
@@ -81,48 +56,47 @@
 		@"longDescription", @"objectUUID", @"metadata", @"changedObjectUUIDs")];
 }
 
-- (COStore *)store
+- (COSQLiteStore *)store
 {
 	return store;
 }
 
-- (int64_t)revisionNumber
+- (CORevisionID *)revisionID
 {
-	return revisionNumber;
+	return [revisionInfo revisionID];
 }
 
-- (CORevision *)baseRevision
+- (CORevision *)parentRevision
 {
-	return [store revisionWithRevisionNumber: baseRevisionNumber];
-}
-
-- (ETUUID *)UUID
-{
-	return [ETUUID UUIDWithString: [[self metadata] objectForKey: @"UUID"]];
+	CORevisionInfo *parentRevInfo = [store revisionInfoForRevisionID: [revisionInfo parentRevisionID]];
+	return [[[[self class] alloc] initWithStore: store revisionInfo: parentRevInfo] autorelease];
 }
 
 - (ETUUID *)persistentRootUUID
 {
+	// TODO: Implement it in the metadata for the new store
 	return [ETUUID UUIDWithString: [[self metadata] objectForKey: @"persistentRootUUID"]];
 }
 
-- (ETUUID *)trackUUID
+- (ETUUID *)branchUUID
 {
+	// TODO: Implement it in the metadata for the new store
 	return [ETUUID UUIDWithString: [[self metadata] objectForKey: @"commitTrackUUID"]];
-}
-
-- (ETUUID *)objectUUID
-{
-	return [store rootObjectUUIDForPersistentRootUUID: [self persistentRootUUID]];
 }
 
 - (NSDate *)date
 {
+	// TODO: Implement it in the metadata for the new store
 	return [[self metadata] objectForKey: @"date"];
 }
 
 - (NSString *)type
 {
+	// TODO: Implement it in the metadata for the new store
+	// Formalize the concept of similar operations belonging to a common kind...
+	// For example:
+	// - major edit vs minor edit
+	// - Item Mutation that includes Add Item, Remove Item, Insert Item etc.
 	return [[self metadata] objectForKey: @"type"];
 }
 
@@ -136,37 +110,14 @@
 	return [[self metadata] objectForKey: @"longDescription"];
 }
 
-- (CORevision *)nextRevision
-{
-	FMResultSet *rs = [store->db executeQuery: 
-		@"SELECT MAX(revisionnumber) FROM commitMetadata WHERE baserevisionnumber = ?", revisionNumber];
-	if ([rs next])
-	{
-		int64_t nextRevisionNumber = [rs longLongIntForColumnIndex: 0];
-		return [store revisionWithRevisionNumber: nextRevisionNumber];
-	}
-	return nil;
-}
-
 - (NSDictionary *)metadata
 {
-	FMResultSet *rs = [store->db executeQuery: @"SELECT plist FROM commitMetadata WHERE revisionnumber = ?",
-						[NSNumber numberWithUnsignedLongLong: revisionNumber]];
-	if ([rs next])
-	{
-		NSData *data = [rs dataForColumnIndex: 0];
-		id plist = [NSPropertyListSerialization propertyListFromData: data
-													mutabilityOption: NSPropertyListImmutable
-															  format: NULL
-													errorDescription: NULL];
-		[rs close];
-		return plist;
-	}
-	[rs close];	
-	[NSException raise: NSInternalInconsistencyException format: @"COCommit -metadata failed"];
-	return nil;
+	return [revisionInfo metadata];
 }
 
+// TODO: Migrate the code below to the new store or reimplement similar ideas.
+
+#if 0
 - (NSArray *)changedObjectUUIDs
 {
 	NSMutableSet *result = [NSMutableSet set];
@@ -231,78 +182,6 @@
 	return objRecords;
 }
 
-- (NSDictionary *)valuesAndPropertiesForObjectUUID: (ETUUID *)object
-{
-	NILARG_EXCEPTION_TEST(object);
-	NSMutableDictionary *result = [NSMutableDictionary dictionary];
-	
-	FMResultSet *rs = [store->db executeQuery:@"SELECT property, value FROM commits WHERE revisionnumber = ? AND objectuuid = ?",
-					   [NSNumber numberWithUnsignedLongLong: revisionNumber],
-					   [store keyForUUID: object]];
-	while ([rs next])
-	{
-		NSString *property = [store propertyForKey: [rs longLongIntForColumnIndex: 0]];
-		NSData *data = [rs dataForColumnIndex: 1];
-		id plist = [NSPropertyListSerialization propertyListFromData: data
-													mutabilityOption: NSPropertyListImmutable
-															  format: NULL
-													errorDescription: NULL];
-		if (plist == nil)
-		{
-			[NSException raise: NSInternalInconsistencyException
-			            format: @"Store contained an invalid property list for %@", object];
-		}
-		
-		[result setObject: plist forKey: property];
-	}
-	[rs close];	
-	return [NSDictionary dictionaryWithDictionary: result];
-}
-
-- (NSDictionary *)valuesForProperties: (NSSet *)properties
-                         ofObjectUUID: (ETUUID *)aUUID
-                         fromRevision: (CORevision *)aRevision
-{
-	NILARG_EXCEPTION_TEST(aUUID);
-
-	int64_t minRevNumber = [aRevision revisionNumber];
-
-	if (aRevision == nil)
-	{
-		minRevNumber = [[store revisionWithRevisionNumber: 0] revisionNumber];
-	}
-
-	NSMutableDictionary *result = [NSMutableDictionary dictionary];
-	NSMutableSet *propertiesToFetch = [[properties mutableCopy] autorelease];
-	BOOL fetchAll = (properties == nil);
-	CORevision *rev = self;
-
-	while ((fetchAll || [propertiesToFetch count] > 0) && rev != nil && [rev revisionNumber] >= minRevNumber)
-	{
-		NSDictionary *revValues = [rev valuesAndPropertiesForObjectUUID: aUUID] ;
-		
-		for (NSString *key in [revValues allKeys])
-		{
-			if (fetchAll || [propertiesToFetch containsObject: key])
-			{
-				[result setObject: [revValues objectForKey: key]
-				           forKey: key];
-				[propertiesToFetch removeObject: key];
-			}
-		}
-
-		rev = [rev baseRevision];
-	}
-
-	if (fetchAll == NO && [propertiesToFetch count] > 0)
-	{
-		[NSException raise: NSInternalInconsistencyException
-		            format: @"Store is missing properties %@ for %@", propertiesToFetch, aUUID];
-	}
-
-	return result;
-}
-
 - (id)content
 {
 	return 	[self changedObjectRecords];
@@ -313,12 +192,19 @@
 	return [NSArray arrayWithArray: [self changedObjectRecords]];
 }
 
+#endif
+
 - (NSString *)description
 {
-	return [NSString stringWithFormat: @"%@ (%qi <= %@)", 
+	// FIXME: Test if the parent revision is the first revision ever made to the
+	// store correctly. For now we test nil, but this probably doesn't make
+	// sense for the new store.
+	// Could be better to print the parent revision ID rather than the
+	// parent revision objects, if the description is too verbose.
+	return [NSString stringWithFormat: @"%@ (%@ <= %@)", 
 		NSStringFromClass([self class]),
-		revisionNumber,
-		baseRevisionNumber != 0 ? [NSString stringWithFormat: @"%qi", baseRevisionNumber] : @"root"];
+		[self revisionID],
+		([self parentRevision] != nil ? [NSString stringWithFormat: @"%@", [self parentRevision]] : @"root")];
 }
 
 @end
