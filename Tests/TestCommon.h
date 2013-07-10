@@ -83,12 +83,3 @@
 - (void)deleteStore;
 
 @end
-
-
-@interface CORevision (TestCommon)
-/**
- * Syntactic sugar over -valuesAndPropertiesForObjectUUID:fromRevision: to get 
- * the current object state.
- */
-- (NSDictionary *)allValuesAndPropertiesForObjectUUID: (ETUUID *)aUUID;
-@end

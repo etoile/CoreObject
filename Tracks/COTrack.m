@@ -8,7 +8,6 @@
 
 #import "COTrack.h"
 #import "COEditingContext.h"
-#import "COObjectGraphDiff.h"
 #import "CORevision.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
@@ -151,6 +150,8 @@
 	NILARG_EXCEPTION_TEST(revToUndo);
 	NILARG_EXCEPTION_TEST(ctxt);
 
+	// TODO: Reimplement selective undo using the new Diff implementation
+#if 0
 	CORevision *revBeforeUndo = [revToUndo baseRevision];
 	COObject *object = [ctxt objectWithUUID: [revToUndo objectUUID]];
 	COObjectGraphDiff *undoDiff = [COObjectGraphDiff selectiveUndoDiffWithRootObject: object
@@ -161,6 +162,7 @@
 	/* The track nodes are going to be transparently updated, then 
 	  -didUpdate invoked by -newCommitAtRevision:  */
 	[ctxt commitWithMetadata: D([NSNumber numberWithInt: [revBeforeUndo revisionNumber]], @"undoMetadata")];
+#endif
 }
 
 - (BOOL)canUndo
