@@ -196,22 +196,16 @@
 
 @implementation COTrackNode
 
-+ (id)nodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision onTrack: (COTrack *)aTrack;
-{
-	return AUTORELEASE([[self alloc] initWithID: aNodeID revision: aRevision onTrack: aTrack]);
-}
-
 + (id)nodeWithRevision: (CORevision *)aRevision onTrack: (COTrack *)aTrack;
 {
-	return [self nodeWithRevision: aRevision onTrack: aTrack];
+	return [[[self alloc] initWithRevision: aRevision onTrack: aTrack] autorelease];
 }
 
-- (id)initWithID: (int64_t)aNodeID revision: (CORevision *)rev onTrack: (COTrack *)aTrack
+- (id)initWithRevision: (CORevision *)rev onTrack: (COTrack *)aTrack
 {
 	NILARG_EXCEPTION_TEST(rev);
 	NILARG_EXCEPTION_TEST(aTrack);
 	SUPERINIT;
-	nodeID = aNodeID;
 	ASSIGN(revision, rev);
 	track = aTrack;
 	return self;
@@ -243,11 +237,6 @@
 	return nil;
 }
 
-- (int64_t)nodeID
-{
-	return nodeID;
-}
-
 - (CORevision *)revision
 {
 	return revision;
@@ -273,14 +262,9 @@
 	return [revision metadata];
 }
 
-- (int64_t)revisionNumber
+- (CORevisionID *)revisionID
 {
-	return [revision revisionNumber];
-}
-
-- (ETUUID *)UUID
-{
-	return [revision UUID];
+	return [revision revisionID];
 }
 
 - (ETUUID *)persistentRootUUID
@@ -288,14 +272,9 @@
 	return [revision persistentRootUUID];
 }
 
-- (ETUUID *)trackUUID
+- (ETUUID *)branchUUID
 {
-	return [revision trackUUID];
-}
-
-- (ETUUID *)objectUUID
-{
-	return [revision objectUUID];
+	return [revision branchUUID];
 }
 
 - (NSDate *)date
@@ -318,10 +297,13 @@
 	return [revision longDescription];
 }
 
+// TODO: Enable again once CORevision supports something similar or remove
+#if 0
 - (NSArray *)changedObjectUUIDs
 {
 	return [revision changedObjectUUIDs];
 }
+#endif
 
 - (NSArray *)propertyNames
 {

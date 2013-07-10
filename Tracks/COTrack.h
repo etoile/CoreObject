@@ -208,25 +208,17 @@
 @interface COTrackNode : NSObject <ETCollection>
 {
 	@private
-	int64_t nodeID;
 	CORevision *revision;
 	COTrack *track;
 }
 
 /** @taskunit Initialization */
 
-+ (id)nodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision onTrack: (COTrack *)aTrack;
-+ (id)nodeWithRevision: (CORevision *)aRevision onTrack: (COTrack *)aTrack;
-
 /** <init /> */
-- (id)initWithID: (int64_t)aNodeID revision: (CORevision *)rev onTrack: (COTrack *)aTrack;
++ (id)nodeWithRevision: (CORevision *)aRevision onTrack: (COTrack *)aTrack;
 
 /** @taskunit Basic Properties */
 
-/**
- * Returns the track node ID.
- */
-- (int64_t)nodeID;
 /**
  * Returns the revision wrapped by the track node.
  */
@@ -254,21 +246,17 @@
  */
 - (NSDictionary *)metadata;
 /**
- * See -[CORevision revisionNumber].
- */
-- (int64_t)revisionNumber;
-/**
  * See -[CORevision UUID].
  */
-- (ETUUID *)UUID;
+- (CORevisionID *)revisionID;
 /**
  * See -[CORevision persistentRootUUID].
  */
 - (ETUUID *)persistentRootUUID;
 /**
- * See -[CORevision trackUUID].
+ * See -[CORevision branchUUID].
  */
-- (ETUUID *)trackUUID;
+- (ETUUID *)branchkUUID;
 /**
  * See -[CORevision objectUUID].
  */
@@ -289,9 +277,10 @@
  * See -[CORevision longDescription].
  */
 - (NSString *)longDescription;
+#if 0
 /**
  * See -[CORevision changedObjectUUIDs].
  */
 - (NSArray *)changedObjectUUIDs;
-
+#endif
 @end

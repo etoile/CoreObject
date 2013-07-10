@@ -258,8 +258,9 @@
 {
 	int64_t maxRevNumber = 0;
 	BOOL hasMaxRev = (maxRevNumber > 0);
-	int64_t revNumber = (aRevision != nil ? [aRevision revisionNumber] : maxRevNumber);
-	
+	// FIXME: int64_t revNumber = (aRevision != nil ? [aRevision revisionNumber] : maxRevNumber);
+	int64_t revNumber = 0;
+
 	if (hasMaxRev && revNumber > maxRevNumber)
 	{
 		revNumber = maxRevNumber;
