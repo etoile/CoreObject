@@ -697,13 +697,11 @@
                                                         branchUUID: (ETUUID *)aBranchUUID
                                                           metadata: (NSDictionary *)metadata
 {
-    ETUUID *uuid = [ETUUID UUID];
-    
     CORevisionID *revId = [self writeItemTreeWithNoParent: contents
                                              withMetadata: [NSDictionary dictionary]
-                                   inBackingStoreWithUUID: uuid];
+                                   inBackingStoreWithUUID: persistentRootUUID];
     
-    return [self createPersistentRootWithUUID: uuid
+    return [self createPersistentRootWithUUID: persistentRootUUID
                                    branchUUID: aBranchUUID
                                        isCopy: NO
                               initialRevision: revId

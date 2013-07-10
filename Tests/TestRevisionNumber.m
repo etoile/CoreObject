@@ -46,8 +46,10 @@
 	//       4
 	ETUUID *objectUUID;
 	
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    
 	// 1
-	COObject *obj = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *obj = [persistentRoot rootObject];
 	objectUUID = [obj UUID];
 	UKNil([obj revision]);
 	[ctx commit];
@@ -66,6 +68,19 @@
 	CORevision *thirdCommitRev = [obj revision];
 	UKObjectsEqual(secondCommitRev, [thirdCommitRev parentRevision]);
 
+    // Check that we can read the state 3 in another context
+    {
+        COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: store];
+        COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        UKNotNil(persistentRootInCtx2);
+        
+        COObject *thirdCommitObjectInCtx2 = [persistentRootInCtx2 objectWithUUID: [obj UUID]];
+        UKNotNil(thirdCommitObjectInCtx2);
+        UKObjectsEqual(@"Third Revision", [thirdCommitObjectInCtx2 valueForKey: @"label"]);
+        
+        [ctx2 release];
+    }
+    
 	// Load up 2 in another context
     
     // FIXME: Implement support for this

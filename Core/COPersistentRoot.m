@@ -73,6 +73,12 @@
 	ASSIGN(_updatedPropertiesByObject, [NSMapTable mapTableWithStrongToStrongObjects]);
     _relationshipCache = [[CORelationshipCache alloc] init];
     
+    // Load all of the objects
+    if (_revision != nil)
+    {
+        [self reloadAtRevision: _revision];
+    }
+    
 	return self;
 }
 
