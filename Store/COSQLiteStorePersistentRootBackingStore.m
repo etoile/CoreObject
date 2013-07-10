@@ -139,8 +139,10 @@
                                                          error: NULL];
         }
         
+        CORevisionID *parentId = parent != -1 ? [aToken revisionIDWithRevisionIndex: parent] : nil;
+        
         result = [[[CORevisionInfo alloc] initWithRevisionID: aToken
-                                        parentRevisionID: [aToken revisionIDWithRevisionIndex: parent]
+                                        parentRevisionID: parentId
                                                 metadata: metadata] autorelease];
 	}
     [rs close];

@@ -451,6 +451,13 @@ static ETUUID *childUUID2;
     // TODO: Expand, test using -setTail...
 }
 
+- (void) testRevisionInfo
+{
+    CORevisionInfo *info = [store revisionInfoForRevisionID: initialRevisionId];
+    UKNil([info parentRevisionID]);
+    UKObjectsEqual(initialRevisionId, [info revisionID]);
+}
+
 - (void) testDeletePersistentRoot
 {
     UKObjectsEqual([NSArray array], [store deletedPersistentRootUUIDs]);

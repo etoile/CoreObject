@@ -45,8 +45,17 @@ NSString *kCORevisionMetadata = @"CORevisionMetadata";
 {
     if ([object isKindOfClass: [CORevisionInfo class]])
     {
-        return [((CORevisionInfo *)object)->revisionID_ isEqual: revisionID_]
-            && [((CORevisionInfo *)object)->parentRevisionID_ isEqual: parentRevisionID_];
+        if (![((CORevisionInfo *)object)->revisionID_ isEqual: revisionID_])
+        {
+            return NO;
+        }
+        
+        if (!(parentRevisionID_ == nil && ((CORevisionInfo *)object)->parentRevisionID_ == nil)
+            && ![((CORevisionInfo *)object)->parentRevisionID_ isEqual: parentRevisionID_])
+        {
+            return NO;
+        }
+        return YES;
     }
     return NO;
 }
