@@ -337,6 +337,11 @@
 - (COPersistentRootInfo *) createPersistentRootWithInitialContents: (id<COItemGraph>)contents
                                                            metadata: (NSDictionary *)metadata;
 
+- (COPersistentRootInfo *) createPersistentRootWithInitialContents: (id<COItemGraph>)contents
+                                                              UUID: (ETUUID *)persistentRootUUID
+                                                        branchUUID: (ETUUID *)aBranchUUID
+                                                          metadata: (NSDictionary *)metadata;
+
 /**
  * "Cheap copy" method of creating a persistent root.
  *
@@ -355,7 +360,10 @@
                                                            metadata: (NSDictionary *)metadata;
 
 
-
+- (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
+                                                              UUID: (ETUUID *)persistentRootUUID
+                                                        branchUUID: (ETUUID *)aBranchUUID
+                                                          metadata: (NSDictionary *)metadata;
 
 /** @taskunit Persistent Root Reading */
 

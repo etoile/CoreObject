@@ -625,11 +625,11 @@
 }
 
 - (COPersistentRootInfo *) createPersistentRootWithUUID: (ETUUID *)uuid
-                                         initialRevision: (CORevisionID *)revId
+                                             branchUUID: (ETUUID *)aBranchUUID
+                                                 isCopy: (BOOL)isCopy
+                                        initialRevision: (CORevisionID *)revId
                                                 metadata: (NSDictionary *)metadata
 {
-    ETUUID *branchUUID = [ETUUID UUID];
-
     [self beginTransactionIfNeeded];
     
     [db_ executeUpdate: @"INSERT INTO persistentroots (uuid, "
@@ -641,7 +641,7 @@
     const int64_t root_id = [db_ lastInsertRowId];
     
     [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,?,0)",
-           [branchUUID dataValue],
+           [aBranchUUID dataValue],
            [NSNumber numberWithLongLong: root_id],
            [NSNumber numberWithLongLong: [revId revisionIndex]],
            [NSNumber numberWithLongLong: [revId revisionIndex]],
@@ -660,7 +660,7 @@
     // Return info
     
     COBranchInfo *branch = [[[COBranchInfo alloc] init] autorelease];
-    branch.UUID = branchUUID;
+    branch.UUID = aBranchUUID;
     branch.headRevisionID = revId;
     branch.tailRevisionID = revId;
     branch.currentRevisionID = revId;
@@ -669,9 +669,9 @@
                                   
     COPersistentRootInfo *plist = [[[COPersistentRootInfo alloc] init] autorelease];
     plist.UUID = uuid;
-    plist.branchForUUID = D(branch, branchUUID);
-    plist.currentBranchUUID = branchUUID;
-    plist.mainBranchUUID = branchUUID;
+    plist.branchForUUID = D(branch, aBranchUUID);
+    plist.currentBranchUUID = aBranchUUID;
+    plist.mainBranchUUID = aBranchUUID;
 
     return plist;
 }
@@ -679,24 +679,49 @@
 - (COPersistentRootInfo *) createPersistentRootWithInitialContents: (COItemGraph *)contents
                                                            metadata: (NSDictionary *)metadata
 {
+    return [self createPersistentRootWithInitialContents: contents
+                                                    UUID: [ETUUID UUID]
+                                              branchUUID: [ETUUID UUID]
+                                                metadata: metadata];
+}
+
+- (COPersistentRootInfo *) createPersistentRootWithInitialContents: (id<COItemGraph>)contents
+                                                              UUID: (ETUUID *)persistentRootUUID
+                                                        branchUUID: (ETUUID *)aBranchUUID
+                                                          metadata: (NSDictionary *)metadata
+{
     ETUUID *uuid = [ETUUID UUID];
     
     CORevisionID *revId = [self writeItemTreeWithNoParent: contents
                                              withMetadata: [NSDictionary dictionary]
                                    inBackingStoreWithUUID: uuid];
-
+    
     return [self createPersistentRootWithUUID: uuid
+                                   branchUUID: aBranchUUID
+                                       isCopy: NO
                               initialRevision: revId
                                      metadata: metadata];
 }
 
-
-- (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)revId
-                                                           metadata: (NSDictionary *)metadata
+- (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
+                                                          metadata: (NSDictionary *)metadata
 {
-    ETUUID *uuid = [ETUUID UUID];
-    return [self createPersistentRootWithUUID: uuid
-                              initialRevision: revId
+    return [self createPersistentRootWithUUID: [ETUUID UUID]
+                                   branchUUID: [ETUUID UUID]
+                                       isCopy: YES
+                              initialRevision: aRevision
+                                     metadata: metadata];
+}
+
+- (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
+                                                              UUID: (ETUUID *)persistentRootUUID
+                                                        branchUUID: (ETUUID *)aBranchUUID
+                                                          metadata: (NSDictionary *)metadata
+{
+    return [self createPersistentRootWithUUID: persistentRootUUID
+                                   branchUUID: aBranchUUID
+                                       isCopy: YES
+                              initialRevision: aRevision
                                      metadata: metadata];
 }
 
