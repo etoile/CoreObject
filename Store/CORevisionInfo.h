@@ -17,6 +17,9 @@
          parentRevisionID: (CORevisionID *)parentRevisionId
                  metadata: (NSDictionary *)metadata;
 
+/**
+ * The revision ID of the parent revision, or nil if this revision has no parent
+ */
 - (CORevisionID *)revisionID;
 - (CORevisionID *)parentRevisionID;
 - (NSDictionary *)metadata;
