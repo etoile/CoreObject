@@ -68,6 +68,11 @@
 
 - (CORevision *)parentRevision
 {
+    if ([revisionInfo parentRevisionID] == nil)
+    {
+        return nil;
+    }
+    
 	CORevisionInfo *parentRevInfo = [store revisionInfoForRevisionID: [revisionInfo parentRevisionID]];
 	return [[[[self class] alloc] initWithStore: store revisionInfo: parentRevInfo] autorelease];
 }

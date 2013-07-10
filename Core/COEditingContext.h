@@ -2,7 +2,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 
 @class COPersistentRoot, COEditingContext;
-@class COStore, CORevision, COObject, COGroup, COSmartGroup, COCommitTrack, COError;
+@class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COCommitTrack, COError, COPersistentRootInfo;
 
 @protocol COPersistentObjectContext <NSObject>
 /**
@@ -40,12 +40,13 @@
 @interface COEditingContext : NSObject <COPersistentObjectContext>
 {
 	@private
+    /** Editing context UUID is used to disambiguate notification sources */
 	ETUUID *_uuid;
-	COStore *_store;
-	int64_t _latestRevisionNumber;
+	COSQLiteStore *_store;
 	ETModelDescriptionRepository *_modelRepository;
 	/** Loaded (or inserted) persistent roots by UUID */
 	NSMutableDictionary *_loadedPersistentRoots;
+    /** Set of persistent roots pending deletion */
 	NSMutableSet *_deletedPersistentRoots;
 	COError *_error;
 }
@@ -79,7 +80,7 @@
 /**
  * Initializes a context which persists its content in the given store.
  */
-- (id)initWithStore: (COStore *)store;
+- (id)initWithStore: (COSQLiteStore *)store;
 
 /**
  * Initializes the context with no store. 
@@ -131,13 +132,8 @@
 /**
  * Returns the store for which the editing context acts a working copy.
  */
-- (COStore *)store;
-/**
- * Returns the latest revision number which might not be the same than the one 
- * returned by -[COStore latestRevisionNumber], when multiple editing contexts 
- * are accessing the store simultaneously.
- */
-- (int64_t)latestRevisionNumber;
+- (COSQLiteStore *)store;
+
 /**
  * Returns the model description repository, which holds the metamodel that 
  * describes all the persistent objects editable in the context.
@@ -155,36 +151,6 @@
 @property (nonatomic, copy, readonly) NSSet *deletedPersistentRoots;
 
 /** @taskunit Object Access and Loading */
-
-/** 
- * Returns the object identified by the UUID, by loading it to its last revision 
- * when no instance managed by the receiver is present in memory.
- *
- * When the UUID doesn't correspond to a persistent object, returns nil.
- *
- * When the object is a inner object, the last revision is the one that is tied  
- * to its root object last revision.
- *
- * See also -objectWithUUID:atRevision: and -loadedObjectForUUID:.
- */
-- (COObject *)objectWithUUID: (ETUUID *)uuid;
-/** 
- * Returns the object identified by the UUID, by loading it to the given 
- * revision when no instance managed by the receiver is present in memory.
- *
- * When the UUID doesn't correspond to a persistent object, returns nil.
- *
- * For a nil revision, the object is loaded is loaded at its last revision.
- *
- * When the object is a inner object, the last revision is the one that is tied  
- * to its root object last revision. 
- *
- * When the object is already loaded, and its revision is not the requested 
- * revision, raises an invalid argument exception.
- *
- * See also -loadedObjectForUUID:. 
- */
-- (COObject *)objectWithUUID: (ETUUID *)uuid atRevision: (CORevision *)revision;
 
 /**
  * Returns the objects presently managed by the receiver in memory.
@@ -264,22 +230,14 @@
  * See also -discardChangesInObject:.
  */
 - (void)discardAllChanges;
-/**
- * Discards the uncommitted changes in a particular object to restore the state  
- * it was in at the last commit.
- *
- * Every updated property in the object is reverted to its last committed value.
- *
- * See also -discardAllChanges:.
- */
-- (void)discardChangesInObject: (COObject *)object;
-
-- (COPersistentRoot *)makePersistentRoot;
 
 /** @taskunit Committing Changes */
 
 /**
  * Commits the current changes to the store and returns the resulting revisions.
+ *
+ * A batch commit UUID is added to the metadata of each commit to indicate that
+ * the individual persistent root commits were made as a batch.
  *
  * See -commitWithType:shortDescription: and -commitWithMetadata:.
  */
@@ -345,9 +303,8 @@
  * In addition, a past revision can be passed to prevent loading the persistent 
  * root at the latest revision.
  */
-- (COPersistentRoot *)makePersistentRootWithUUID: (ETUUID *)aPersistentRootUUID
-                                 commitTrackUUID: (ETUUID *)aTrackUUID
-                                        revision: (CORevision *)aRevision;
+- (COPersistentRoot *)makePersistentRootWithInfo: (COPersistentRootInfo *)info;
+
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

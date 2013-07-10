@@ -16,7 +16,7 @@
 {
 	// TODO: Look up the store class based on the URL scheme and path extension
 	COEditingContext *ctx = [[self alloc] initWithStore:
-		[[[NSClassFromString(@"COSQLStore") alloc] initWithURL: aURL] autorelease]];
+		[[[NSClassFromString(@"COSQLiteStore") alloc] initWithURL: aURL] autorelease]];
 	return [ctx autorelease];
 }
 
@@ -46,13 +46,12 @@ static COEditingContext *currentCtxt = nil;
 	[[self modelRepository] resolveNamedObjectReferences];
 }
 
-- (id)initWithStore: (COStore *)store
+- (id)initWithStore: (COSQLiteStore *)store
 {
 	SUPERINIT;
 
 	_uuid = [ETUUID new];
 	ASSIGN(_store, store);
-	_latestRevisionNumber = [_store latestRevisionNumber];
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
 	_loadedPersistentRoots = [NSMutableDictionary new];
 	_deletedPersistentRoots = [NSMutableSet new];
@@ -120,6 +119,8 @@ object graphs present in memory, for which changes have been committed to the
 store by other processes. */
 - (void)didMakeCommit: (NSNotification *)notif
 {
+    // FIXME: Re-enable
+#if 0
 	// TODO: Write a test to ensure other store notifications are not handled
 	BOOL isOtherStore = ([[[_store UUID] stringValue] isEqual: [notif object]] == NO);
 
@@ -142,10 +143,13 @@ store by other processes. */
 
 		[persistentRoot reloadAtRevision: rev];
 	}
+#endif
 }
 
 - (COSmartGroup *)mainGroup
 {
+    return nil; // FIXME: Rewrite
+#if 0
 	COSmartGroup *group = AUTORELEASE([[COSmartGroup alloc] init]);
 	COContentBlock block = ^() {
 		NSSet *rootUUIDs = [[self store] rootObjectUUIDs];
@@ -163,10 +167,13 @@ store by other processes. */
 	[group setName: _(@"All Objects")];
 
 	return group;
+#endif
 }
 
 - (COGroup *)libraryGroup
 {
+    return nil; // FIXME: Rewrite
+#if 0
 	NSString *UUIDString = [[_store metadata] objectForKey: @"kCOLibraryGroupUUID"];
 
 	if (UUIDString == nil)
@@ -186,16 +193,12 @@ store by other processes. */
 	}
 
 	return (id)[self objectWithUUID: [ETUUID UUIDWithString: UUIDString]];
+#endif
 }
 
-- (COStore *)store
+- (COSQLiteStore *)store
 {
 	return _store;
-}
-
-- (int64_t)latestRevisionNumber
-{
-	return _latestRevisionNumber;
 }
 
 - (ETModelDescriptionRepository *)modelRepository
@@ -208,6 +211,8 @@ store by other processes. */
 	return [self persistentRootForUUID: persistentRootUUID atRevision: nil];
 }
 
+// FIXME: Ugly semantics; ignores revision if the persistent root is already
+// loaded
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
                                  atRevision: (CORevision *)revision
 {
@@ -216,31 +221,29 @@ store by other processes. */
 	if (persistentRoot != nil)
 		return persistentRoot;
 
-	ETUUID *trackUUID = [_store mainBranchUUIDForPersistentRootUUID: persistentRootUUID];
-	BOOL persistentRootFound = (trackUUID != nil);
+    COPersistentRootInfo *info = [_store persistentRootWithUUID: persistentRootUUID];
+        
+	BOOL persistentRootFound = (info != nil);
 
 	if (persistentRootFound == NO)
 		return nil;
 
-	persistentRoot = [self makePersistentRootWithUUID: persistentRootUUID
-	                                  commitTrackUUID: trackUUID
-	                                         revision: revision];
+	persistentRoot = [self makePersistentRootWithInfo: info];
 
 	return persistentRoot;
 }
 
 // NOTE: Persistent root insertion or deletion are saved to the store at commit time.
 
-- (COPersistentRoot *)makePersistentRootWithUUID: (ETUUID *)aPersistentRootUUID
-                                 commitTrackUUID: (ETUUID *)aTrackUUID
-                                        revision: (CORevision *)aRevision
+- (COPersistentRoot *)makePersistentRootWithInfo: (COPersistentRootInfo *)info
 {
-	NSParameterAssert([[_loadedPersistentRoots allKeys] containsObject: aPersistentRootUUID] == NO);
-	COPersistentRoot *persistentRoot =
-		[[COPersistentRoot alloc] initWithPersistentRootUUID: aPersistentRootUUID
-		                                     commitTrackUUID: aTrackUUID
-	                                                revision: aRevision
-		                                       parentContext: self];
+    if (info != nil)
+    {
+        NSParameterAssert(nil == [_loadedPersistentRoots objectForKey: [info UUID]]);
+    }
+    
+	COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: info
+                                                                parentContext: self];
 	[_loadedPersistentRoots setObject: persistentRoot
 							   forKey: [persistentRoot persistentRootUUID]];
 	[persistentRoot release];
@@ -249,9 +252,7 @@ store by other processes. */
 
 - (COPersistentRoot *)makePersistentRoot
 {
-	return [self makePersistentRootWithUUID: [ETUUID UUID]
-	                        commitTrackUUID: [ETUUID UUID]
-	                               revision: nil];
+    return [self makePersistentRootWithInfo: nil];
 }
 
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
@@ -294,7 +295,7 @@ store by other processes. */
 {
 	// FIXME: COObjectGraphDiff prevents us to detect an invalid root object...
 	//NILARG_EXCEPTION_TEST(aRootObject);
-	COPersistentRoot *persistentRoot = [self makePersistentRoot];
+	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil];
 	[aRootObject becomePersistentInContext: persistentRoot];
 	return persistentRoot;
 }
@@ -303,45 +304,6 @@ store by other processes. */
 {
 	// NOTE: Deleted persistent roots are removed from the cache on commit.
 	[_deletedPersistentRoots addObject: [aRootObject persistentRoot]];
-}
-
-- (COObject *)objectWithUUID: (ETUUID *)uuid entityName: (NSString *)name atRevision: (CORevision *)revision
-{
-	// NOTE: We could resolve the root object at loading time, but since 
-	// it's going to should be available in memory, we rather resolve it now.
-	ETUUID *rootUUID = [_store rootObjectUUIDForObjectUUID: uuid];
-	BOOL isCommitted = (rootUUID != nil);
-	
-	// TODO: Remove
-	if (isCommitted == NO)
-	{
-		COObject *rootObject = nil;
-
-		for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
-		{
-			rootObject = [persistentRoot objectWithUUID: uuid entityName: name atRevision: revision];
-			if (rootObject != nil)
-			{
-				break;
-			}
-		}
-		return rootObject;
-	}
-
-	ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: rootUUID];
-	COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID atRevision: revision];
-
-	return [persistentRoot objectWithUUID: uuid entityName: name atRevision: revision];
-}
-
-- (COObject *)objectWithUUID: (ETUUID *)uuid
-{
-	return [self objectWithUUID: uuid entityName: nil atRevision: nil];
-}
-
-- (COObject *)objectWithUUID: (ETUUID *)uuid atRevision: (CORevision *)revision
-{
-	return [self objectWithUUID: uuid entityName: nil atRevision: revision];
 }
 
 - (NSSet *)loadedObjects
@@ -428,11 +390,6 @@ store by other processes. */
 	assert([self hasChanges] == NO);
 }
 
-- (void)discardChangesInObject: (COObject *)object
-{
-	[[object persistentRoot] discardChangesInObject: object];
-}
-
 - (NSArray *)commit
 {
 	return [self commitWithType: nil shortDescription: nil];
@@ -456,6 +413,8 @@ store by other processes. */
 
 - (void)postCommitNotificationsWithRevisions: (NSArray *)revisions
 {
+    // FIXME: Re-enable
+#if 0
 	NSDictionary *notifInfos = D(revisions, kCORevisionsKey);
 
 	[[NSNotificationCenter defaultCenter] postNotificationName: COEditingContextDidCommitNotification 
@@ -475,11 +434,11 @@ store by other processes. */
 	                                                             userInfo: notifInfos
 	                                                   deliverImmediately: YES];
 #endif
+#endif
 }
 
 - (void)didCommitRevision: (CORevision *)aRevision
 {
-	_latestRevisionNumber = [aRevision revisionNumber];
 }
 
 - (void)didFailValidationWithError: (COError *)anError
@@ -538,12 +497,10 @@ store by other processes. */
 			continue;
 		
 		ETUUID *uuid = [persistentRoot persistentRootUUID];
-					
-		[revisions addObject: [[self store] deletePersistentRootForUUID: uuid
-		                                                       eraseNow: NO]];
+		[_store deletePersistentRoot: uuid];
+
 		[persistentRoot unload];
 		[_loadedPersistentRoots removeObjectForKey: uuid];
-		[self didCommitRevision: [revisions lastObject]];
 	}
 
  	[self postCommitNotificationsWithRevisions: revisions];

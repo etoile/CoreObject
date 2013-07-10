@@ -9,14 +9,17 @@
 
 - (void)testBaseRevision
 {
-	COObject *obj = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    UKNotNil([persistentRoot persistentRootUUID]);
+    
+	COObject *obj = [persistentRoot rootObject];
 	UKNil([obj revision]);
 	
 	[ctx commit];
 	
 	CORevision *firstCommitRev = [obj revision];
 	UKNotNil(firstCommitRev);
-	
+    
 	[obj setValue: @"The hello world label!" forProperty: @"label"];
 	UKObjectsEqual(firstCommitRev, [obj revision]);
 
@@ -28,11 +31,11 @@
 	UKObjectsNotEqual(firstCommitRev, secondCommitRev);
 	
 	// The base revision should be equals to the first revision
-	UKNotNil([secondCommitRev baseRevision]);
-	UKObjectsEqual(firstCommitRev, [secondCommitRev baseRevision]);
+	UKNotNil([secondCommitRev parentRevision]);
+	UKObjectsEqual(firstCommitRev, [secondCommitRev parentRevision]);
 	
 	// The first commit revision's base revision should be nil
-	UKNil([firstCommitRev baseRevision]);
+	UKNil([firstCommitRev parentRevision]);
 }
 
 - (void)testNonLinearHistory
@@ -61,7 +64,7 @@
 	[obj setValue: @"Third Revision" forProperty: @"label"];
 	[ctx commit];
 	CORevision *thirdCommitRev = [obj revision];
-	UKObjectsEqual(secondCommitRev, [thirdCommitRev baseRevision]);
+	UKObjectsEqual(secondCommitRev, [thirdCommitRev parentRevision]);
 
 	// Load up 2 in another context
 	COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: store];
@@ -74,7 +77,7 @@
 	[ctx2 commit];
 	UKObjectsNotEqual(secondCommitRev, [obj2 revision]);
 	UKObjectsNotEqual(thirdCommitRev, [obj2 revision]);
-	UKObjectsEqual(secondCommitRev, [[obj2 revision] baseRevision]);
+	UKObjectsEqual(secondCommitRev, [[obj2 revision] parentRevision]);
 
 	[ctx2 release];
 }

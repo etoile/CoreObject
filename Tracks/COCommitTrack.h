@@ -10,7 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreObject/COTrack.h>
 
-@class COObject, CORevision, COPersistentRoot;
+@class COObject, CORevision, COPersistentRoot, COBranchInfo;
 
 /**
  * A persistent history track on an object.
@@ -26,12 +26,12 @@
 @interface COCommitTrack : COTrack
 {
 	@private
-	ETUUID *UUID;
+    ETUUID *UUID;
+    
+    /**
+     * Weak reference
+     */
 	COPersistentRoot *persistentRoot;
-	COCommitTrack *parentTrack;
-	BOOL isMainBranch;
-	BOOL isCopy;
-	BOOL isLoaded;
 }
 
 /** @taskunit Initialization */
@@ -53,6 +53,8 @@
  * When the receiver is a cheap copy, -isBranch returns NO.
  */
 @property (readonly, nonatomic) BOOL isCopy;
+
+// FIXME: Rename to isTrunk (opposite)
 /**
  * Returns whether the commit track represents a branch.
  *
@@ -109,6 +111,9 @@
 @property (readonly, nonatomic) COPersistentRoot *persistentRoot;
 
 /** @taskunit Creating Branches and Cheap copies */
+
+// TODO: Convert these methods to logging the change in the editing context and saving it
+// at commit time.
 
 /**
  * Returns a new commit track by branching the receiver last revision and using 

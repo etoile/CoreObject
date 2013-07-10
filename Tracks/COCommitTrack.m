@@ -15,7 +15,8 @@
 #import "CORevision.h"
 #import "FMDatabase.h"
 
-#define CACHE_AMOUNT 30
+
+//#define CACHE_AMOUNT 30
 
 @implementation COCommitTrack
 
@@ -43,6 +44,8 @@
 
 	SUPERINIT;
 
+    
+    
 	ASSIGN(UUID, aUUID);
 	/* The persistent root retains us */
 	persistentRoot = aContext;
@@ -59,7 +62,6 @@
 {
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 	DESTROY(UUID);
-	DESTROY(parentTrack);
 	[super dealloc];
 }
 
@@ -87,51 +89,56 @@
 
 - (BOOL)isBranch
 {
-	return ([self isCopy] == NO && [self parentTrack] != nil);
+    return YES;
+//	return ([self isCopy] == NO && [self parentTrack] != nil);
+}
+
+- (COBranchInfo *) branchInfo
+{
+    COPersistentRootInfo *persistentRootInfo = [[self persistentRoot] persistentRootInfo];
+    COBranchInfo *branchInfo = [persistentRootInfo branchInfoForUUID: UUID];
+    return branchInfo;
 }
 
 - (NSString *)label
 {
-	return [[[self persistentRoot] store] nameForCommitTrackUUID: [self UUID]];
+    // FIXME: Make a standardized metadata key for this
+	return [[[self branchInfo] metadata] objectForKey: @"label"];
 }
 
 - (CORevision *)parentRevision
 {
-	return [[[self persistentRoot] store] parentRevisionForCommitTrackUUID: [self UUID]];
+    // FIXME: Add support for this to COSQLiteStore
+	return nil;
 }
 
 - (COCommitTrack *)parentTrack
 {
-	ETUUID *parentTrackUUID = [[self parentRevision] trackUUID];
-	ETUUID *persistentRootUUID = [[[self persistentRoot] store]
-		persistentRootUUIDForCommitTrackUUID: parentTrackUUID];
-	COPersistentRoot *parentPersistentRoot =
-		[[[self persistentRoot] parentContext] persistentRootForUUID: persistentRootUUID];
-
-	return [[[COCommitTrack alloc] initWithUUID: parentTrackUUID
-	                             persistentRoot: parentPersistentRoot] autorelease];
+    // FIXME: Add support for this
+    return nil;
 }
 
 - (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel
 {
+    // FIXME: Enqueue in editing context rather than committing immediately
+    
 	return [self makeBranchWithLabel: aLabel atRevision: [[self persistentRoot] revision]];
 }
 
 - (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
+    // FIXME: Enqueue in editing context rather than committing immediately
+    
 	NILARG_EXCEPTION_TEST(aRev);
 
-	ETUUID *branchUUID = [ETUUID UUID];
-	COStore *store = [[self persistentRoot] store];
-	CORevision *rev = [store createCommitTrackWithUUID: branchUUID
-	                                              name: aLabel
-	                                    parentRevision: aRev
-	                                    rootObjectUUID: [[self persistentRoot] rootObjectUUID]
-	                                persistentRootUUID: [[self persistentRoot] persistentRootUUID]
-	                               isNewPersistentRoot: NO];
-
-	[[[self persistentRoot] parentContext] didCommitRevision: rev];
+	COSQLiteStore *store = [[self persistentRoot] store];
+    
+    ETUUID *branchUUID = [store createBranchWithInitialRevision: [aRev revisionID]
+                                                     setCurrent: YES
+                                              forPersistentRoot: [[self persistentRoot] persistentRootUUID]];
 	
+    [[self persistentRoot] reloadPersistentRootInfo];
+    
 	return [[[COCommitTrack alloc] initWithUUID: branchUUID
 								 persistentRoot: [self persistentRoot]] autorelease];
 
@@ -139,24 +146,15 @@
 
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev
 {
+    // FIXME: Enqueue in editing context rather than committing immediately
+    
 	NILARG_EXCEPTION_TEST(aRev);
-	INVALIDARG_EXCEPTION_TEST(aRev, [[aRev trackUUID] isEqual: [self UUID]]);
-	
-	ETUUID *branchUUID = [ETUUID UUID];
-	ETUUID *persistentRootUUID = [ETUUID UUID];
-	COStore *store = [[self persistentRoot] store];
-	CORevision *rev = [store createCommitTrackWithUUID: branchUUID
-	                                              name: @"Cheapcopy"
-	                                    parentRevision: aRev
-	                                    rootObjectUUID: [[self persistentRoot] rootObjectUUID]
-	                                persistentRootUUID: persistentRootUUID
-	                               isNewPersistentRoot: YES];
 
-	[[[self persistentRoot] parentContext] didCommitRevision: rev];
-	
-	return [[[self persistentRoot] parentContext] makePersistentRootWithUUID: persistentRootUUID
-	                                                         commitTrackUUID: branchUUID
-	                                                                revision: nil];
+	COPersistentRootInfo *info = [(COSQLiteStore *)[[self persistentRoot] store]
+                                  createPersistentRootWithInitialRevision: [aRev revisionID]
+                                  metadata: nil];
+    
+	return [[[self persistentRoot] parentContext] makePersistentRootWithInfo: info];
 }
 
 - (BOOL)mergeChangesFromTrack: (COCommitTrack *)aSourceTrack
@@ -179,8 +177,10 @@
 
 - (BOOL)isOurStoreForNotification: (NSNotification *)notif
 {
-	NSString *storeUUIDString = [[notif userInfo] objectForKey: kCOStoreUUIDStringKey];
-	return [storeUUIDString isEqual: [[[[self persistentRoot] store] UUID] stringValue]];
+    // FIXME: Implement
+    return YES;
+//	NSString *storeUUIDString = [[notif userInfo] objectForKey: kCOStoreUUIDStringKey];
+//	return [storeUUIDString isEqual: [[[[self persistentRoot] store] UUID] stringValue]];
 }
 
 /* This method is called back through distributed notifications in various cases:
@@ -197,6 +197,8 @@
    instances are not located in the same editing context. */
 - (void)currentNodeDidChangeInStore: (NSNotification *)notif
 {
+    // FIXME: Implement
+#if 0
 	/* Paranoid check in case something goes wrong and a core object UUID
 	   appear in multiple stores.
 	   For now, a core object UUID is bound to a single store. Hence a commit
@@ -242,23 +244,25 @@
 
 	[self didUpdate];
 	RELEASE(oldCurrentNode);
+#endif
 }
 
 - (BOOL)needsReloadNodes: (NSArray *)currentLoadedNodes
 {
-	return (isLoaded == NO);
+	return NO;
 }
 
 - (NSArray *)allNodesAndCurrentNodeIndex: (NSUInteger *)aNodeIndex
 {
-	// NOTE: For a new track, -[COSQLStore isTrackUUID:] would return NO
-	
-	COStore *store = [[self persistentRoot] store];
-	return [store nodesForTrackUUID: [self UUID]
-	                    nodeBuilder: self
-	               currentNodeIndex: aNodeIndex
-	                  backwardLimit: NSUIntegerMax
-	                   forwardLimit: NSUIntegerMax];
+    return [NSArray array];
+//	// NOTE: For a new track, -[COSQLStore isTrackUUID:] would return NO
+//	
+//	COStore *store = [[self persistentRoot] store];
+//	return [store nodesForTrackUUID: [self UUID]
+//	                    nodeBuilder: self
+//	               currentNodeIndex: aNodeIndex
+//	                  backwardLimit: NSUIntegerMax
+//	                   forwardLimit: NSUIntegerMax];
 }
 
 - (NSArray *)provideNodesAndCurrentNodeIndex: (NSUInteger *)aNodeIndex
@@ -268,6 +272,8 @@
 
 - (void)didReloadNodes
 {
+    // FIXME: Implement
+#if 0
 	isLoaded = YES;
 
 	if ([self currentNode] == nil)
@@ -277,10 +283,13 @@
 		[[[self persistentRoot] store] currentRevisionForTrackUUID: [self UUID]];
 	
 	ETAssert([[[self currentNode] revision] isEqual: currentRev]);
+#endif
 }
 
 - (void)setCurrentNode: (COTrackNode *)aNode
 {
+    // FIXME: Implement
+#if 0
 	INVALIDARG_EXCEPTION_TEST(aNode, [aNode track] == self);
 
 	NSUInteger nodeIndex = [[self loadedNodes] indexOfObject: aNode];
@@ -298,10 +307,13 @@
 	                                     forTrackUUID: [self UUID]];
 	[[self persistentRoot] reloadAtRevision: [aNode revision]];
 	[self didUpdate];
+#endif
 }
 
 - (void)undo
 {
+    // FIXME: Implement
+#if 0
 	if ([self currentNode] == nil)
 	{
 		[NSException raise: NSInternalInconsistencyException
@@ -330,10 +342,13 @@
 	[[self persistentRoot] reloadAtRevision: currentRevision];
 
 	[self didUpdate];
+#endif
 }
 
 - (void)redo
 {
+    // FIXME: Implement
+#if 0
 	if ([self currentNode] == nil)
 	{
 		[NSException raise: NSInternalInconsistencyException
@@ -362,10 +377,13 @@
 	[[self persistentRoot] reloadAtRevision: currentRevision];
 
 	[self didUpdate];
+#endif
 }
 
 - (void)undoNode: (COTrackNode *)aNode
 {
+    // FIXME: Implement
+#if 0
 	BOOL useCommitTrackUndo = ([[[self currentNode] previousNode] isEqual: aNode]);
 	BOOL useCommitTrackRedo = ([[[self currentNode] nextNode] isEqual: aNode]);
 
@@ -382,13 +400,14 @@
 		[self selectiveUndoWithRevision: [aNode revision] 
 		               inEditingContext: [[self persistentRoot] parentContext]];
 	}
+#endif
 }
 
 - (void)didMakeNewCommitAtRevision: (CORevision *)revision
 {
+#if 0
 	NSParameterAssert(revision != nil);
-	NSParameterAssert([revision commitNodeID] != NSIntegerMax);
-
+    
 	COTrackNode *newNode = [COTrackNode nodeWithID: [revision commitNodeID] revision: revision onTrack: self];
 	/* At this point, revision is the max revision for the commit track */
 	BOOL isFirstRevision = ([revision baseRevision] == nil);
@@ -411,6 +430,7 @@
 	currentNodeIndex = [[self loadedNodes] count] - 1;
 
 	[self didUpdate];
+#endif
 }
 
 @end

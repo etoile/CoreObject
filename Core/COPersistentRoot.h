@@ -12,7 +12,7 @@
 #import <CoreObject/COEditingContext.h>
 #import <CoreObject/COItemGraph.h>
 
-@class COCommitTrack, COObject, CORevision, COStore, CORelationshipCache;
+@class COCommitTrack, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo;
 
 /**
  * A persistent root editing context exposes as a working copy a CoreObject 
@@ -53,19 +53,19 @@
 {
 	@private
 	COEditingContext *_parentContext;
-	ETUUID *_persistentRootUUID;
+    COPersistentRootInfo *_info;
 	COCommitTrack *_commitTrack;
 	COObject *_rootObject;
-	CORevision *_revision;
+    /** If nil, we are a new persistent root */
+	CORevision *_revision; // Could be in _commitTrack, doesn't matter
 	/** Loaded (or inserted) objects by UUID */
 	NSMutableDictionary *_loadedObjects;
 	NSMutableSet *_insertedObjects;
 	NSMutableSet *_deletedObjects;
+    CORelationshipCache *_relationshipCache;
 	/** Array of updated property names by inner object */
 	NSMapTable *_updatedPropertiesByObject;
-	/** All the objects being loaded inside -loadObject:AtRevision: */
-	NSMutableSet *_loadingObjects;
-    CORelationshipCache *_relationshipCache;
+
 }
 
 /** @taskunit Debugging */
@@ -132,6 +132,10 @@
 /**
  * The persistent root revision.
  *
+ * If the persistent root is not yet committed, returns nil for a freshly
+ * created persistent root, or returns the parent revision for a persistent
+ * root created by copying.
+ *
  * This revision applies to the root object and inner objects. See -[COObject revision].
  *
  * The revision is usually equal to 
@@ -153,7 +157,7 @@
  *
  * See also -[COEditingContext store].
  */
-@property (nonatomic, readonly) COStore *store;
+@property (nonatomic, readonly) COSQLiteStore *store;
 
 /** @taskunit Editing Context Nesting */
 
@@ -190,37 +194,6 @@
  * See also -objectWithUUID:atRevision: and -loadedObjectForUUID:.
  */
 - (COObject *)objectWithUUID: (ETUUID *)uuid;
-/**
- * Returns the object identified by the UUID, by loading it to the given
- * revision when no instance managed by the receiver is present in memory.
- *
- * When the UUID isn't bound to a persistent object owned by the persistent root, 
- * returns nil (unless it is a commit track UUID or another persistent root UUID, 
- * but these are special cases discussed in the last paragraphs).
- *
- * For a nil revision, the object is loaded is loaded at its last revision.
- *
- * When the object is a inner object, the last revision is the one that is tied
- * to its root object last revision.
- *
- * When the object is already loaded, and its revision is not the requested
- * revision, raises an invalid argument exception.
- *
- * When the UUID is a persistent root UUID, the root object of the persistent 
- * root is returned (the persistent root is loaded if needed).
- *
- * When the UUID is a branch UUID, the persistent root for the branch is looked 
- * up. If the persistent root is not available, it is loaded for the requested 
- * branch. If the persistent root is already loaded, a branch mismatch is 
- * possible between the current branch UUID and the given branch UUID. For a 
- * mismatch, an exception is raised, otherwise the root object of the persistent 
- * root is returned.<br />
- * For a more detailed discussion about branching issues, see COCommitTrack 
- * documentation.
- *
- * See also -loadedObjectForUUID:.
- */
-- (COObject *)objectWithUUID: (ETUUID *)uuid atRevision: (CORevision *)revision;
 
 /**
  * Returns the objects presently managed by the receiver in memory.
@@ -345,6 +318,7 @@
 
 /** @taskunit Object Deletion */
 
+// TODO: Remove when we integrate embedded object GC
 /**
  * Schedules the object to be deleted both in memory and in store on the next
  * commit.
@@ -381,10 +355,8 @@
  * <init />
  * This method is only exposed to be used internally by CoreObject.
  */
-- (id)initWithPersistentRootUUID: (ETUUID *)aUUID
-				 commitTrackUUID: (ETUUID *)aTrackUUID
-						revision: (CORevision *)aRevision
-				   parentContext: (COEditingContext *)aCtxt;
+- (id)initWithInfo: (COPersistentRootInfo *)info
+     parentContext: (COEditingContext *)aCtxt;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -393,6 +365,38 @@
  * The first registered object becomes the root object.
  */
 - (void)registerObject: (COObject *)object;
+/**
+ * Returns the object identified by the UUID, by loading it to the given
+ * revision when no instance managed by the receiver is present in memory.
+ *
+ * When the UUID isn't bound to a persistent object owned by the persistent root,
+ * returns nil (unless it is a commit track UUID or another persistent root UUID,
+ * but these are special cases discussed in the last paragraphs).
+ *
+ * For a nil revision, the object is loaded is loaded at its last revision.
+ *
+ * When the object is a inner object, the last revision is the one that is tied
+ * to its root object last revision.
+ *
+ * When the object is already loaded, and its revision is not the requested
+ * revision, raises an invalid argument exception.
+ *
+ * When the UUID is a persistent root UUID, the root object of the persistent
+ * root is returned (the persistent root is loaded if needed).
+ *
+ * When the UUID is a branch UUID, the persistent root for the branch is looked
+ * up. If the persistent root is not available, it is loaded for the requested
+ * branch. If the persistent root is already loaded, a branch mismatch is
+ * possible between the current branch UUID and the given branch UUID. For a
+ * mismatch, an exception is raised, otherwise the root object of the persistent
+ * root is returned.<br />
+ * For a more detailed discussion about branching issues, see COCommitTrack
+ * documentation.
+ *
+ * See also -loadedObjectForUUID:.
+ */
+- (COObject *)objectWithUUID: (ETUUID *)uuid atRevision: (CORevision *)revision;
+
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -459,4 +463,11 @@
  * NSInvalidArgumentException is raised.
  */
 - (Class)referenceClassForRootObject: (COObject *)aRootObject;
+
+- (void) setItemGraph: (id <COItemGraph>)aGraph;
+
+- (COPersistentRootInfo *) persistentRootInfo;
+
+- (void) reloadPersistentRootInfo;
+
 @end
