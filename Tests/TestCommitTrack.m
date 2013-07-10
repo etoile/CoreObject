@@ -9,25 +9,43 @@
 #import "COPersistentRoot.h"
 
 @interface TestCommitTrack : TestCommon <UKTest>
+{
+    COPersistentRoot *persistentRoot;
+    COObject *rootObj;
+    COCommitTrack *commitTrack;
+}
 @end
 
 @implementation TestCommitTrack
 
+- (id) init
+{
+    SUPERINIT;
+    ASSIGN(persistentRoot, [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"]);
+    ASSIGN(rootObj, [persistentRoot rootObject]);
+    ASSIGN(commitTrack, [persistentRoot commitTrack]);
+    return self;
+}
+
+- (void) dealloc
+{
+    DESTROY(rootObj);
+    DESTROY(commitTrack);
+    DESTROY(persistentRoot);
+    [super dealloc];
+}
+
 - (void)testNoExistingCommitTrack
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-
-	COContainer *object = [persistentRoot rootObject];
-	[object setValue: @"Groceries" forProperty: @"label"];
+	[rootObj setValue: @"Groceries" forProperty: @"label"];
 	
-	COCommitTrack *commitTrack = [persistentRoot commitTrack];
 	UKNotNil(commitTrack);
 	UKNil([commitTrack currentRevision]);
 
 	[ctx commit];
 
 	UKNotNil([commitTrack currentRevision]);
-	UKObjectsEqual([commitTrack currentRevision], [object revision]);
+	UKObjectsEqual([commitTrack currentRevision], [rootObj revision]);
 }
 
 // FIXME: Port the rest of the tests
