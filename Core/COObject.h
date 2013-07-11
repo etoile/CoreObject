@@ -46,6 +46,13 @@
  * Don't create singletons for COObject subclass in +initialize, because 
  * -[COObject entityDescription] would return nil.
  *
+ * For multivalued properties stored in instance variables, you are responsible 
+ * to allocate the collections in each COObject subclass designed initializer, 
+ * and to release them in -dealloc. If a multivalued property is stored in the 
+ * the variable storage, COObject allocates the collections at initialization 
+ * time and releases them at deallocation time (you can access these collections 
+ * using -primitiveValueForKey: in your subclass initializers).
+ *
  * @section Persistency
  *
  * Whan an object becomes persistent, you invoke 
@@ -685,6 +692,10 @@
  * This method is only exposed to be used internally by CoreObject.
  *
  * Returns a new mutable dictionary to store properties.
+ *
+ * For multivalued properties not bound to an instance variable, the returned 
+ * dictionary contains mutable collections that matches the metamodel.
+ * 
  */
  - (NSMutableDictionary *)newVariableStorage;
 /**

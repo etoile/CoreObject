@@ -101,33 +101,35 @@ See +[NSObject typePrefix]. */
 
 - (NSMutableDictionary *)newVariableStorage
 {
-	return [[NSMutableDictionary alloc] initWithCapacity: 20];
-}
+	NSMutableDictionary *variableStorage = [[NSMutableDictionary alloc] initWithCapacity: 20];
 
-- (void)instantiateMultivaluedPropertiesUsingMetamodel
-{
 	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
 	{
-		if ([propDesc isMultivalued] == NO)
+		if ([propDesc isMultivalued] == NO || [propDesc isDerived])
 			continue;
-		
-		id collection = ([propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set]);
-		
-		if (ETSetInstanceVariableValueForKey(self, collection, [propDesc name]) == NO)
-		{
-			[self setValue: collection forKey: [propDesc name]];
-		}
-	}
-}
 
-// FIXME: Remove
-/* Puts mutable collections into multivalued properties. */
-- (void)didCreate
-{
-	BOOL wasIgnoringDamage = _isIgnoringDamageNotifications;
-	_isIgnoringDamageNotifications = YES;
-	[self instantiateMultivaluedPropertiesUsingMetamodel];
-	_isIgnoringDamageNotifications = wasIgnoringDamage;
+		id value = nil;
+		BOOL ivarExists = ETGetInstanceVariableValueForKey(self, &value, [propDesc name]);
+
+		if (ivarExists)
+			continue;
+
+		id collection = nil;
+
+		if ([propDesc isKeyed])
+		{
+			// TODO: Implement once we have removed -becomePersistentInContext:
+			continue;
+		}
+		else
+		{
+			collection = ([propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set]);
+		}
+		
+		[variableStorage setObject: collection forKey: [propDesc name]];
+	}
+
+	return variableStorage;
 }
 
 - (id) commonInitWithUUID: (ETUUID *)aUUID 
@@ -166,7 +168,6 @@ See +[NSObject typePrefix]. */
 	[(id)_persistentRoot markObjectAsUpdated: self forProperty: nil];
 	_variableStorage = [self newVariableStorage];
 	_incomingRelationships = [[CORelationshipCache alloc] init];
-	[self didCreate];
 
 	return self;
 }
@@ -894,15 +895,30 @@ See +[NSObject typePrefix]. */
 {
 	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
 	{
+		/* At validation time, derived properties should return a valid collection */
 		if ([propDesc isMultivalued] == NO)
 			continue;
 
-		Class class = ([propDesc isOrdered] ? [NSArray class] : [NSSet class]);
-		id collection = nil;
+		Class class = Nil;
 		
+		if ([propDesc isKeyed])
+		{
+			// TODO: Implement once -becomePersistentInContext: is removed
+			continue;
+		}
+		else
+		{
+			class = ([propDesc isOrdered] ? [NSArray class] : [NSSet class]);
+		}
+
+		id collection = nil;
+
+		/* We must access the instance variable or the primitive value, and we 
+		   cannot use -valueForKey:, because getters tend to return defensive 
+		   copies (immutable collections). */
 		if (ETGetInstanceVariableValueForKey(self, &collection, [propDesc name]) == NO)
 		{
-			collection = [self valueForKey: [propDesc name]];
+			collection = [self primitiveValueForKey: [propDesc name]];
 		}
 
 		if ([collection isKindOfClass: class] == NO)
