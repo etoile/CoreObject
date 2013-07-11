@@ -41,6 +41,9 @@ static const NSRect CONullRect = {{FLT_MIN, FLT_MIN}, {FLT_MIN, FLT_MIN}};
 serialization. */
 - (BOOL) isSerializableScalarValue: (id)value
 {
+	if ([value isKindOfClass: [NSValue class]] == NO)
+		return NO;
+
 	const char *type = [value objCType];
 	
 	return ((strcmp(type, @encode(NSPoint)) == 0)
