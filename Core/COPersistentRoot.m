@@ -417,7 +417,7 @@
     CORevision *rev = [[CORevision alloc] initWithStore: store
                                            revisionInfo: revInfo];
     
-	[self setRevision: rev];
+	ASSIGN(_revision, rev);
     
     // FIXME: Re-implement
 	//[[self commitTrack] didMakeNewCommitAtRevision: rev];
