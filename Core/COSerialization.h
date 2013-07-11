@@ -29,4 +29,17 @@ extern NSString *kCOObjectEntityNameProperty;
 - (id)valueForSerializedValue: (id)value
                        ofType: (COType)type
           propertyDescription: (ETPropertyDescription *)aPropertyDesc;
+
+/** @taskunit Testing */
+
+/**
+ * Serializes the property value into the CoreObject serialized representation,
+ * then unserialize it back into a value that can be passed
+ * -setSerializedValue:forPropertyDescription:.
+ *
+ * The property value is retrieved with -storeItem and deserialized using 
+ * -valueForSerializedValue:ofType:propertyDescription:.
+ */
+- (id)roundTripValueForProperty: (NSString *)key;
+
 @end

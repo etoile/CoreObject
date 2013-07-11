@@ -405,8 +405,8 @@
 		66D96CA2178B717000D1553C /* COBinaryReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBinaryReader.h; path = Store/COBinaryReader.h; sourceTree = "<group>"; };
 		66D96CA3178B717000D1553C /* COBinaryReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBinaryReader.m; path = Store/COBinaryReader.m; sourceTree = "<group>"; };
 		66D96CA4178B717000D1553C /* COBinaryWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBinaryWriter.h; path = Store/COBinaryWriter.h; sourceTree = "<group>"; };
-		66D96CA5178B717000D1553C /* COItem+Binary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COItem+Binary.h"; path = "Store/COItem+Binary.h"; sourceTree = "<group>"; };
-		66D96CA6178B717000D1553C /* COItem+Binary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COItem+Binary.m"; path = "Store/COItem+Binary.m"; sourceTree = "<group>"; };
+		66D96CA5178B717000D1553C /* COItem+Binary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COItem+Binary.h"; path = "../Store/COItem+Binary.h"; sourceTree = "<group>"; };
+		66D96CA6178B717000D1553C /* COItem+Binary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COItem+Binary.m"; path = "../Store/COItem+Binary.m"; sourceTree = "<group>"; };
 		66D96CA9178B717000D1553C /* CORevisionID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CORevisionID.h; path = Store/CORevisionID.h; sourceTree = "<group>"; };
 		66D96CAA178B717100D1553C /* CORevisionID.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CORevisionID.m; path = Store/CORevisionID.m; sourceTree = "<group>"; };
 		66D96CAB178B717100D1553C /* CORevisionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CORevisionInfo.h; path = Store/CORevisionInfo.h; sourceTree = "<group>"; };
@@ -649,6 +649,8 @@
 			children = (
 				6675F8BA1785C02A001E5622 /* COItem.h */,
 				6675F8BB1785C02A001E5622 /* COItem.m */,
+				66D96CA5178B717000D1553C /* COItem+Binary.h */,
+				66D96CA6178B717000D1553C /* COItem+Binary.m */,
 				66094846178794D40049468B /* COItem+JSON.h */,
 				66094845178794D40049468B /* COItem+JSON.m */,
 				6675F8BC1785C02A001E5622 /* COItemGraph.h */,
@@ -819,8 +821,6 @@
 				66D96CA2178B717000D1553C /* COBinaryReader.h */,
 				66D96CA3178B717000D1553C /* COBinaryReader.m */,
 				66D96CA4178B717000D1553C /* COBinaryWriter.h */,
-				66D96CA5178B717000D1553C /* COItem+Binary.h */,
-				66D96CA6178B717000D1553C /* COItem+Binary.m */,
 				66D96CA9178B717000D1553C /* CORevisionID.h */,
 				66D96CAA178B717100D1553C /* CORevisionID.m */,
 				66D96CAB178B717100D1553C /* CORevisionInfo.h */,

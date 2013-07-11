@@ -9,6 +9,7 @@
 #import "COSerialization.h"
 #import "COObject.h"
 #import "COItem.h"
+#import "COItem+Binary.h"
 #import "COPath.h"
 #import "COPersistentRoot.h"
 
@@ -588,6 +589,15 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	}
     
     // TODO: Decide whether to update relationship cache here. Document it.
+}
+
+- (id)roundTripValueForProperty: (NSString *)key
+{
+	COItem *deserializedItem = [[COItem alloc] initWithData: [[self storeItem] dataValue]];
+	
+	return [self valueForSerializedValue: [deserializedItem valueForAttribute: key]
+	                              ofType: [deserializedItem typeForAttribute: key]
+	                 propertyDescription: [[self entityDescription] propertyDescriptionForName: key]];
 }
 
 @end

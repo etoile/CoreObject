@@ -1016,12 +1016,6 @@ See +[NSObject typePrefix]. */
 	}
 	return serializationRep;
 }
-
-- (id)roundTripValueForProperty: (NSString *)key
-{
-	id plist = [self propertyListForValue: [self serializedValueForProperty: key]];
-	return [self valueForPropertyList: plist];
-}
 #endif
 
 static int indent = 0;

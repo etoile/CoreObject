@@ -637,14 +637,6 @@
  * into the store. CoreObject doesn't use this method.
  */
 - (id)serializedRepresentation;
-/** 
- * Serializes the property value into the CoreObject serialized representation, 
- * then unserialize it back into a value that can be passed 
- * -setSerializedValue:forProperty:.
- *
- * The property value is retrieved with -serializedValueForProperty:.
- */
-- (id)roundTripValueForProperty: (NSString *)key;
 #endif
 /** 
  * Returns a description that includes the receiver properties and their values. 
