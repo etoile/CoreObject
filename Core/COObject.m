@@ -104,22 +104,29 @@ See +[NSObject typePrefix]. */
 	return [[NSMutableDictionary alloc] initWithCapacity: 20];
 }
 
+- (void)instantiateMultivaluedPropertiesUsingMetamodel
+{
+	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+	{
+		if ([propDesc isMultivalued] == NO)
+			continue;
+		
+		id collection = ([propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set]);
+		
+		if (ETSetInstanceVariableValueForKey(self, collection, [propDesc name]) == NO)
+		{
+			[self setValue: collection forKey: [propDesc name]];
+		}
+	}
+}
+
 // FIXME: Remove
 /* Puts mutable collections into multivalued properties. */
 - (void)didCreate
 {
 	BOOL wasIgnoringDamage = _isIgnoringDamageNotifications;
 	_isIgnoringDamageNotifications = YES;
-	
-	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
-	{
-		if ([propDesc isMultivalued])
-		{
-			id container = ([propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set]);
-			[self setValue: container forProperty: [propDesc name]];
-		}
-	}
-	
+	[self instantiateMultivaluedPropertiesUsingMetamodel];
 	_isIgnoringDamageNotifications = wasIgnoringDamage;
 }
 
@@ -883,23 +890,37 @@ See +[NSObject typePrefix]. */
 	[self didChangeValueForProperty: key oldValue: oldCollection];
 }
 
+- (void) validateMultivaluedPropertiesUsingMetamodel
+{
+	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+	{
+		if ([propDesc isMultivalued] == NO)
+			continue;
+
+		Class class = ([propDesc isOrdered] ? [NSArray class] : [NSSet class]);
+		id collection = nil;
+		
+		if (ETGetInstanceVariableValueForKey(self, &collection, [propDesc name]) == NO)
+		{
+			collection = [self valueForKey: [propDesc name]];
+		}
+
+		if ([collection isKindOfClass: class] == NO)
+		{
+			[NSException raise: NSInternalInconsistencyException
+			            format: @"Property %@ of %@ is declared as a collection "
+			                     "in the metamodel but the value class is %@ and "
+			                     "doesn't match the requirements.",
+			                    [propDesc name], self, [collection class]];
+		}
+	}
+}
+
 // TODO: Change to new -didAwaken method called in a predetermined order
 - (void)awakeFromFetch
 {
     [_persistentRoot addCachedOutgoingRelationshipsForObject: self];
-    
-	// Debugging check that collections were set up properly
-	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
-	{
-		if ([propDesc isMultivalued])
-		{
-			Class cls = [propDesc isOrdered] ? [NSMutableArray class] : [NSMutableSet class];
-			if (![[self valueForProperty: [propDesc name]] isKindOfClass: cls])
-			{
-				[NSException raise: NSInternalInconsistencyException format: @"Property %@ of %@ is a collection but was not set up properly", [propDesc name], self];
-			}
-		}
-	}
+    [self validateMultivaluedPropertiesUsingMetamodel];
 }
 
 - (void)willLoad
