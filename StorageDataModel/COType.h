@@ -131,3 +131,27 @@ COType COArrayOfType(COType type)
 {
     return type | kCOArrayType;
 }
+
+static inline
+BOOL COTypeIsValid(COType type)
+{
+    if (!(COPrimitiveType(type) >= kCOInt64Type
+          && COPrimitiveType(type) <= kCOAttachmentType))
+    {
+        return NO;
+    }
+    
+    if (!(COMultivaluedType(type) == 0
+          || COMultivaluedType(type) == kCOArrayType
+          || COMultivaluedType(type) == kCOSetType))
+    {
+        return NO;
+    }
+    
+    if (0 != (type & (~(kCOMultivaluedTypeMask | kCOPrimitiveTypeMask))))
+    {
+        return NO;
+    }
+    
+    return YES;
+}
