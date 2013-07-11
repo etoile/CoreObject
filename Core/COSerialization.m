@@ -272,7 +272,10 @@ serialization. */
 	}
 	else
 	{
-		NSAssert(NO, @"Unsupported serialization type %@ for %@", type, value);
+		// FIXME: Don't encode using the keyed archiving unless the property
+		// description requires it explicitly.
+		//NSAssert(NO, @"Unsupported serialization type %@ for %@", type, value);
+		return kCOBlobType;
 	}
 	return 0;
 }
@@ -475,13 +478,14 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
             NSAssert(NO, @"Unsupported serialization type %@ for %@", @(type), value);
         }
     }
-    
+	
+	// TODO: Add a type check e.g. kCOIsValidType()
+	if ([value isEqual: [NSNull null]])
+		return nil;
+
 	if (type == kCOReferenceType || type == kCOCompositeReferenceType)
 	{
 		NSParameterAssert([value isKindOfClass: [ETUUID class]]);
-
-		if (value == nil)
-			return nil;
 
 		id object =  [[[self persistentRoot] parentContext] objectWithUUID: value];
 		// FIXME: The assertion should check the object entity description
@@ -493,18 +497,28 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
     else
 	{
 		NSString *typeName = [[aPropertyDesc type] name];
-	
-		if ([self isSerializableScalarTypeName: typeName])
+		
+		if (type == kCOInt64Type || type == kCODoubleType || type == kCOStringType)
+		{
+			/* The value is a NSNumber or NSString */
+			return value;
+		}
+		else if ([self isSerializableScalarTypeName: typeName])
 		{
 			return [self scalarValueForSerializedValue: value typeName: typeName];
 		}
-		else if (type == kCOBlobType && [typeName isEqualToString: @"NSData"])
+		else if (type == kCOBlobType)
 		{
-			if (value == nil)
-				return nil;
-
 			NSParameterAssert([value isKindOfClass: [NSData class]]);
+
+			if ([typeName isEqualToString: @"NSData"])
+				return value;
+
 			return [NSKeyedUnarchiver unarchiveObjectWithData: (NSData *)value];
+		}
+		else
+		{
+			 NSAssert(NO, @"Unsupported serialization type %@ for %@", @(type), value);
 		}
 		return value;
 	}
