@@ -15,14 +15,14 @@
 @implementation COPersistentRootInfo
 
 @synthesize UUID = uuid_;
-@synthesize currentBranchUUID = currentBranch_;
+@synthesize mainBranchUUID = mainBranch_;
 @synthesize branchForUUID = branchForUUID_;
 
 - (void) dealloc
 {
     [uuid_ release];
     [branchForUUID_ release];
-    [currentBranch_ release];
+    [mainBranch_ release];
     [super dealloc];
 }
 
@@ -35,9 +35,9 @@
 {
     return [branchForUUID_ objectForKey: aUUID];
 }
-- (COBranchInfo *)currentBranchInfo
+- (COBranchInfo *)mainBranchInfo
 {
-    return [self branchInfoForUUID: [self currentBranchUUID]];
+    return [self branchInfoForUUID: [self mainBranchUUID]];
 }
 
 @end
@@ -599,7 +599,7 @@
     COPersistentRootInfo *result = [[[COPersistentRootInfo alloc] init] autorelease];
     result.UUID = aUUID;
     result.branchForUUID = branchDict;
-    result.currentBranchUUID = currBranch;
+    result.mainBranchUUID = currBranch;
     
     return result;
 }
@@ -674,7 +674,7 @@
     COPersistentRootInfo *plist = [[[COPersistentRootInfo alloc] init] autorelease];
     plist.UUID = uuid;
     plist.branchForUUID = D(branch, aBranchUUID);
-    plist.currentBranchUUID = aBranchUUID;
+    plist.mainBranchUUID = aBranchUUID;
 
     return plist;
 }
@@ -746,7 +746,7 @@
     return NO;
 }
 
-- (BOOL) setCurrentBranch: (ETUUID *)aBranch
+- (BOOL) setMainBranch: (ETUUID *)aBranch
 		forPersistentRoot: (ETUUID *)aRoot
 {
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
@@ -779,7 +779,7 @@
     
     if (setCurrent)
     {
-        assert([self setCurrentBranch: branchUUID
+        assert([self setMainBranch: branchUUID
                     forPersistentRoot: aRoot]);
     }
     

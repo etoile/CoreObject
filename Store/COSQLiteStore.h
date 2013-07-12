@@ -33,19 +33,17 @@
 {
 @private
     ETUUID *uuid_;
-    ETUUID *currentBranch_;
+    ETUUID *mainBranch_;
     NSMutableDictionary *branchForUUID_; // COUUID : COBranchInfo
 }
 
 - (NSSet *) branchUUIDs;
 
 - (COBranchInfo *)branchInfoForUUID: (ETUUID *)aUUID;
-// FIXME: Refactor to mainBranchInfo
-- (COBranchInfo *)currentBranchInfo;
+- (COBranchInfo *)mainBranchInfo;
 
 @property (readwrite, nonatomic, retain) ETUUID *UUID;
-// FIXME: Refactor to mainBranchUUID
-@property (readwrite, nonatomic, retain) ETUUID *currentBranchUUID;
+@property (readwrite, nonatomic, retain) ETUUID *mainBranchUUID;
 @property (readwrite, nonatomic, retain) NSDictionary *branchForUUID;
 
 @end
@@ -399,7 +397,7 @@
  *
  * FIXME: Refactor to setMainBranch
  */
-- (BOOL) setCurrentBranch: (ETUUID *)aBranch
+- (BOOL) setMainBranch: (ETUUID *)aBranch
 		forPersistentRoot: (ETUUID *)aRoot;
 
 - (ETUUID *) createBranchWithInitialRevision: (CORevisionID *)aToken

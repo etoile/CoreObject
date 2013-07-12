@@ -43,7 +43,7 @@
         
         _info = [[COPersistentRootInfo alloc] init];
         _info.UUID = [ETUUID UUID];
-        _info.currentBranchUUID = branchInfo.UUID;
+        _info.mainBranchUUID = branchInfo.UUID;
         _info.branchForUUID = D(branchInfo, branchInfo.UUID);
     }
     else
@@ -54,10 +54,10 @@
 	_parentContext = aCtxt;
 	if ([_parentContext store] != nil)
 	{
-		_commitTrack = [[COCommitTrack alloc] initWithUUID: _info.currentBranchUUID persistentRoot: self];
+		_commitTrack = [[COCommitTrack alloc] initWithUUID: _info.mainBranchUUID persistentRoot: self];
 	}
 	
-    CORevisionID *revId = [[_info currentBranchInfo] currentRevisionID];
+    CORevisionID *revId = [[_info mainBranchInfo] currentRevisionID];
     if (revId != nil)
     {
         // FIXME: Ugly to have a store access here. Perhaps CORevision should do it lazily?
@@ -392,7 +392,7 @@
                                                                                UUID: [self persistentRootUUID]
                                                                          branchUUID: [[self commitTrack] UUID]
                                                                            metadata: metadata];
-        revId = [[info currentBranchInfo] currentRevisionID];
+        revId = [[info mainBranchInfo] currentRevisionID];
 	}
     else
     {
