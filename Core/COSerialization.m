@@ -498,23 +498,27 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	{
 		NSString *typeName = [[aPropertyDesc type] name];
 		
-		if (type == kCOInt64Type || type == kCODoubleType || type == kCOStringType)
+		if (type == kCOInt64Type || type == kCODoubleType)
 		{
-			/* The value is a NSNumber or NSString */
 			return value;
 		}
-		else if ([self isSerializableScalarTypeName: typeName])
+		else if (type == kCOStringType)
 		{
-			return [self scalarValueForSerializedValue: value typeName: typeName];
+			if ([self isSerializableScalarTypeName: typeName])
+			{
+				return [self scalarValueForSerializedValue: value typeName: typeName];
+			}
+			return value;
 		}
 		else if (type == kCOBlobType)
 		{
 			NSParameterAssert([value isKindOfClass: [NSData class]]);
 
-			if ([typeName isEqualToString: @"NSData"])
-				return value;
-
-			return [NSKeyedUnarchiver unarchiveObjectWithData: (NSData *)value];
+			if ([typeName isEqualToString: @"NSData"] == NO)
+			{
+				return [NSKeyedUnarchiver unarchiveObjectWithData: (NSData *)value];
+			}
+			return value;
 		}
 		else
 		{
@@ -610,10 +614,15 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 
 - (id)roundTripValueForProperty: (NSString *)key
 {
-	COItem *deserializedItem = [[COItem alloc] initWithData: [[self storeItem] dataValue]];
+	ETPropertyDescription *propertyDesc = [[self entityDescription] propertyDescriptionForName: key];
+	ETAssert([propertyDesc isPersistent]);
+	id value = [self serializedValueForPropertyDescription: propertyDesc];
+	id serializedValue = [self serializedValueForValue: value];
+	NSNumber *serializedType = [self serializedTypeForPropertyDescription: propertyDesc
+	                                                                value: serializedValue];
 	
-	return [self valueForSerializedValue: [deserializedItem valueForAttribute: key]
-	                              ofType: [deserializedItem typeForAttribute: key]
+	return [self valueForSerializedValue: serializedValue
+	                              ofType: [serializedType intValue]
 	                 propertyDescription: [[self entityDescription] propertyDescriptionForName: key]];
 }
 

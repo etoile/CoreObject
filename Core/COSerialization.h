@@ -37,7 +37,8 @@ extern NSString *kCOObjectEntityNameProperty;
  * then unserialize it back into a value that can be passed
  * -setSerializedValue:forPropertyDescription:.
  *
- * The property value is retrieved with -storeItem and deserialized using 
+ * The property value is retrieved with -serializedValueForPropertyDescription:, 
+ * serialized using -serializedValueForValue: and deserialized using
  * -valueForSerializedValue:ofType:propertyDescription:.
  */
 - (id)roundTripValueForProperty: (NSString *)key;
