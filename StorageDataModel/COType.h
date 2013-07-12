@@ -155,3 +155,6 @@ BOOL COTypeIsValid(COType type)
     
     return YES;
 }
+
+NSString *
+COTypeDescription(COType type);

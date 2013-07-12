@@ -254,9 +254,9 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	
 	for (NSString *attrib in [self attributeNames])
 	{
-		[result appendFormat: @"\t%@ <%d> = '%@'\n",
+		[result appendFormat: @"\t%@ <%@> = '%@'\n",
 			attrib,
-			[self typeForAttribute: attrib],
+			COTypeDescription([self typeForAttribute: attrib]),
 			[self valueForAttribute:attrib]];
 	}
 	
