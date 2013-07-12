@@ -16,7 +16,6 @@
 
 @synthesize UUID = uuid_;
 @synthesize currentBranchUUID = currentBranch_;
-@synthesize mainBranchUUID = mainBranch_;
 @synthesize branchForUUID = branchForUUID_;
 
 - (void) dealloc
@@ -24,7 +23,6 @@
     [uuid_ release];
     [branchForUUID_ release];
     [currentBranch_ release];
-    [mainBranch_ release];
     [super dealloc];
 }
 
@@ -139,7 +137,7 @@
     // Persistent Root and Branch tables
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots (root_id INTEGER PRIMARY KEY, "
-     "uuid BLOB, backingstore BLOB, currentbranch INTEGER, mainbranch INTEGER, metadata BLOB, deleted BOOLEAN DEFAULT 0)"];
+     "uuid BLOB, backingstore BLOB, currentbranch INTEGER, metadata BLOB, deleted BOOLEAN DEFAULT 0)"];
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (branch_id INTEGER PRIMARY KEY, "
      "uuid BLOB, proot INTEGER, head_revid INTEGER, tail_revid INTEGER, current_revid INTEGER, metadata BLOB, deleted BOOLEAN DEFAULT 0)"];
@@ -541,7 +539,6 @@
 - (COPersistentRootInfo *) persistentRootWithUUID: (ETUUID *)aUUID
 {
     ETUUID *currBranch = nil;
-    ETUUID *mainBranch = nil;
     ETUUID *backingUUID = nil;
     id meta = nil;
     BOOL deleted = NO;
@@ -552,15 +549,13 @@
     
     {
         FMResultSet *rs = [db_ executeQuery: @"SELECT (SELECT uuid FROM branches WHERE branch_id = currentbranch),"
-                                                    " (SELECT uuid FROM branches WHERE branch_id = mainbranch),"
                                                     " backingstore, metadata, deleted FROM persistentroots WHERE root_id = ?", root_id];
         if ([rs next])
         {
             currBranch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-            mainBranch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
-            backingUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
-            meta = [self readMetadata: [rs dataForColumnIndex: 3]];
-            deleted = [rs boolForColumnIndex: 4];
+            backingUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
+            meta = [self readMetadata: [rs dataForColumnIndex: 2]];
+            deleted = [rs boolForColumnIndex: 3];
         }
         else
         {
@@ -605,7 +600,6 @@
     result.UUID = aUUID;
     result.branchForUUID = branchDict;
     result.currentBranchUUID = currBranch;
-    result.mainBranchUUID = mainBranch;
     
     return result;
 }
@@ -644,7 +638,7 @@
     [self beginTransactionIfNeeded];
     
     [db_ executeUpdate: @"INSERT INTO persistentroots (uuid, "
-           "backingstore, currentbranch, mainbranch, metadata, deleted) VALUES(?,?,NULL,NULL,?,0)",
+           "backingstore, currentbranch, metadata, deleted) VALUES(?,?,NULL,?,0)",
            [uuid dataValue],
            [[revId backingStoreUUID] dataValue],
            [self writeMetadata: metadata]];
@@ -661,8 +655,7 @@
     
     const int64_t branch_id = [db_ lastInsertRowId];
     
-    [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ?, mainbranch = ? WHERE root_id = ?",
-      [NSNumber numberWithLongLong: branch_id],
+    [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE root_id = ?",
       [NSNumber numberWithLongLong: branch_id],
       [NSNumber numberWithLongLong: root_id]];
 
@@ -682,7 +675,6 @@
     plist.UUID = uuid;
     plist.branchForUUID = D(branch, aBranchUUID);
     plist.currentBranchUUID = aBranchUUID;
-    plist.mainBranchUUID = aBranchUUID;
 
     return plist;
 }
@@ -764,20 +756,6 @@
         return [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE root_id = ?",
                    branch_id,
                    root_id];
-    }
-    return NO;
-}
-
-- (BOOL) setMainBranch: (ETUUID *)aBranch
-     forPersistentRoot: (ETUUID *)aRoot
-{
-    NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
-    NSNumber *branch_id = [db_ numberForQuery: @"SELECT branch_id FROM branches WHERE proot = ? AND uuid = ? AND deleted = 0", root_id, [aBranch dataValue]];
-    if (branch_id != nil)
-    {
-        return [db_ executeUpdate: @"UPDATE persistentroots SET mainbranch = ? WHERE root_id = ?",
-                branch_id,
-                root_id];
     }
     return NO;
 }

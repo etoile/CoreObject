@@ -34,18 +34,18 @@
 @private
     ETUUID *uuid_;
     ETUUID *currentBranch_;
-    ETUUID *mainBranch_;
     NSMutableDictionary *branchForUUID_; // COUUID : COBranchInfo
 }
 
 - (NSSet *) branchUUIDs;
 
 - (COBranchInfo *)branchInfoForUUID: (ETUUID *)aUUID;
+// FIXME: Refactor to mainBranchInfo
 - (COBranchInfo *)currentBranchInfo;
 
 @property (readwrite, nonatomic, retain) ETUUID *UUID;
+// FIXME: Refactor to mainBranchUUID
 @property (readwrite, nonatomic, retain) ETUUID *currentBranchUUID;
-@property (readwrite, nonatomic, retain) ETUUID *mainBranchUUID;
 @property (readwrite, nonatomic, retain) NSDictionary *branchForUUID;
 
 @end
@@ -248,6 +248,8 @@
      * This flag tells us internally we don't need to create extra transactions.
      */
     BOOL inUserTransaction_;
+    
+    ETUUID *_uuid;
 }
 
 /**
@@ -390,23 +392,15 @@
 /** @taskunit Persistent Root Modification */
 
 /**
- * Sets the current branch. The current branch is not used internally but intended
- * to be used by COSQLiteStore users as the default branch to display when the user
- * opens a persistent root.
- *
- * Returns NO if the branch does not exist, or is deleted (finalized or not).
- */
-- (BOOL) setCurrentBranch: (ETUUID *)aBranch
-		forPersistentRoot: (ETUUID *)aRoot;
-
-/**
  * Sets the main branch. The main branch is used to resolve inter-persistent-root references
  * when no explicit branch is named.
  *
  * Returns NO if the branch does not exist, or is deleted (finalized or not).
+ *
+ * FIXME: Refactor to setMainBranch
  */
-- (BOOL) setMainBranch: (ETUUID *)aBranch
-     forPersistentRoot: (ETUUID *)aRoot;
+- (BOOL) setCurrentBranch: (ETUUID *)aBranch
+		forPersistentRoot: (ETUUID *)aRoot;
 
 - (ETUUID *) createBranchWithInitialRevision: (CORevisionID *)aToken
                                   setCurrent: (BOOL)setCurrent

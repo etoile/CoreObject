@@ -285,22 +285,6 @@ static ETUUID *childUUID2;
 
 }
 
-- (void) testSetMainBranch
-{
-    UKObjectsEqual(initialBranchUUID, [[store persistentRootWithUUID: prootUUID] mainBranchUUID]);
-    
-    UKTrue([store setMainBranch: branchAUUID
-              forPersistentRoot: prootUUID]);
-    
-    UKObjectsEqual(branchAUUID, [[store persistentRootWithUUID: prootUUID] mainBranchUUID]);
-    
-    UKTrue([store setMainBranch: branchBUUID
-              forPersistentRoot: prootUUID]);
-    
-    UKObjectsEqual(branchBUUID, [[store persistentRootWithUUID: prootUUID] mainBranchUUID]);
-    
-}
-
 - (void) testSetCurrentVersion
 {
     COBranchInfo *branchA = [[store persistentRootWithUUID: prootUUID] branchInfoForUUID: branchAUUID];

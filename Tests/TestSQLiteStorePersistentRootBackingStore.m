@@ -207,7 +207,7 @@ static ETUUID *childUUID2;
     
     [self setupExampleStore];
     
-    UKIntsEqual(-1, [self parentForRevid: 0]);
+    UKNil([[self revisionForRevid: 0] parentRevisionID]);
     
     for (int64_t i = 1; i<=BRANCH_LENGTH; i++)
     {

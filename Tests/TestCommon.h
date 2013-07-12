@@ -7,8 +7,10 @@
 #import "COPersistentRoot.h"
 #import "CORevision.h"
 #import "CORevisionID.h"
+#import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
 #import "COType.h"
+
 
 #define SA(x) [NSSet setWithArray: x]
 
