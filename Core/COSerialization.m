@@ -478,10 +478,12 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
             NSAssert(NO, @"Unsupported serialization type %@ for %@", @(type), value);
         }
     }
-	
-	// TODO: Add a type check e.g. kCOIsValidType()
+
 	if ([value isEqual: [NSNull null]])
+	{
+		ETAssert(COTypeIsValid(type));
 		return nil;
+	}
 
 	if (type == kCOReferenceType || type == kCOCompositeReferenceType)
 	{
