@@ -689,7 +689,7 @@
 
 - (void) reloadPersistentRootInfo
 {
-    COPersistentRootInfo *newInfo = [[self store] persistentRootWithUUID: [self persistentRootUUID]];
+    COPersistentRootInfo *newInfo = [[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
     if (newInfo != nil)
     {
         ASSIGN(_info, newInfo);

@@ -186,7 +186,7 @@ static int itemChangedAtCommit(int i)
 
     NSDate *startDate = [NSDate date];
     
-    COPersistentRootInfo *proot = [store persistentRootWithUUID: prootUUID];
+    COPersistentRootInfo *proot = [store persistentRootInfoForUUID: prootUUID];
     
     CORevisionID *lastCommitId = [[proot mainBranchInfo] currentRevisionID];
     
@@ -224,7 +224,7 @@ static int itemChangedAtCommit(int i)
     
     NSDate *startDate = [NSDate date];
 
-    COPersistentRootInfo *proot = [store persistentRootWithUUID: prootUUID];
+    COPersistentRootInfo *proot = [store persistentRootInfoForUUID: prootUUID];
     
     CORevisionID *lastCommitId = [[proot mainBranchInfo] currentRevisionID];
     
@@ -264,7 +264,7 @@ static int itemChangedAtCommit(int i)
 - (void) testFTS
 {
     ETUUID *prootUUID = [self makeDemoPersistentRoot];
-    COPersistentRootInfo *proot = [store persistentRootWithUUID: prootUUID];
+    COPersistentRootInfo *proot = [store persistentRootInfoForUUID: prootUUID];
     
     int itemIndex = itemChangedAtCommit(32);
     

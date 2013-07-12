@@ -536,7 +536,7 @@
     return result;
 }
 
-- (COPersistentRootInfo *) persistentRootWithUUID: (ETUUID *)aUUID
+- (COPersistentRootInfo *) persistentRootInfoForUUID: (ETUUID *)aUUID
 {
     ETUUID *currBranch = nil;
     ETUUID *backingUUID = nil;

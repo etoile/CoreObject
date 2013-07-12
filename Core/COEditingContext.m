@@ -221,7 +221,7 @@ store by other processes. */
 	if (persistentRoot != nil)
 		return persistentRoot;
 
-    COPersistentRootInfo *info = [_store persistentRootWithUUID: persistentRootUUID];
+    COPersistentRootInfo *info = [_store persistentRootInfoForUUID: persistentRootUUID];
         
 	BOOL persistentRootFound = (info != nil);
 

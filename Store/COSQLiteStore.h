@@ -382,7 +382,7 @@
  * @return  a snapshot of the state of a persistent root, or nil if
  *          the persistent root does not exist.
  */
-- (COPersistentRootInfo *) persistentRootWithUUID: (ETUUID *)aUUID;
+- (COPersistentRootInfo *) persistentRootInfoForUUID: (ETUUID *)aUUID;
 
 
 

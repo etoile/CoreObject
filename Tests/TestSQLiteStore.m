@@ -196,15 +196,15 @@ static ETUUID *childUUID2;
 
 - (void) testDeleteBranchA
 {
-    COBranchInfo *initialState = [[store persistentRootWithUUID: prootUUID] branchInfoForUUID: branchAUUID];
+    COBranchInfo *initialState = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     
-    UKObjectsEqual(S(branchAUUID, branchBUUID, initialBranchUUID), [[store persistentRootWithUUID: prootUUID] branchUUIDs]);
+    UKObjectsEqual(S(branchAUUID, branchBUUID, initialBranchUUID), [[store persistentRootInfoForUUID: prootUUID] branchUUIDs]);
     
     // Delete it
     UKTrue([store deleteBranch: branchAUUID ofPersistentRoot: prootUUID]);
     
     {
-        COBranchInfo *branchObj = [[store persistentRootWithUUID: prootUUID] branchInfoForUUID: branchAUUID];
+        COBranchInfo *branchObj = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
         UKTrue([branchObj isDeleted]);
     }
     
@@ -214,7 +214,7 @@ static ETUUID *childUUID2;
     // Undelete it
     UKTrue([store undeleteBranch: branchAUUID ofPersistentRoot: prootUUID]);
     {
-        COBranchInfo *branchObj = [[store persistentRootWithUUID: prootUUID] branchInfoForUUID: branchAUUID];
+        COBranchInfo *branchObj = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
         UKFalse([branchObj isDeleted]);
         UKObjectsEqual(initialState.currentRevisionID, branchObj.currentRevisionID);
     }
@@ -224,7 +224,7 @@ static ETUUID *childUUID2;
 
     // Verify the branch is still there
     {
-        COBranchInfo *branchObj = [[store persistentRootWithUUID: prootUUID] branchInfoForUUID: branchAUUID];
+        COBranchInfo *branchObj = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
         UKObjectsEqual(initialState.currentRevisionID, branchObj.currentRevisionID);
     }
     
@@ -232,8 +232,8 @@ static ETUUID *childUUID2;
     UKTrue([store deleteBranch: branchAUUID ofPersistentRoot: prootUUID]);
     
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID]);
-    UKNil([[store persistentRootWithUUID: prootUUID] branchInfoForUUID: branchAUUID]);
-    UKObjectsEqual(S(branchBUUID, initialBranchUUID), [[store persistentRootWithUUID: prootUUID] branchUUIDs]);
+    UKNil([[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID]);
+    UKObjectsEqual(S(branchBUUID, initialBranchUUID), [[store persistentRootInfoForUUID: prootUUID] branchUUIDs]);
 }
 
 - (void) testDeleteCurrentBranch
@@ -246,7 +246,7 @@ static ETUUID *childUUID2;
     
     // Verify the branch is still there
     {
-        COBranchInfo *branchObj = [[store persistentRootWithUUID: prootUUID] branchInfoForUUID: initialBranchUUID];
+        COBranchInfo *branchObj = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: initialBranchUUID];
         UKNotNil(branchObj);
         UKFalse([branchObj isDeleted]);
     }
@@ -254,40 +254,40 @@ static ETUUID *childUUID2;
 
 - (void) testBranchMetadata
 {
-    UKNil([[[store persistentRootWithUUID: prootUUID] mainBranchInfo] metadata]);
+    UKNil([[[store persistentRootInfoForUUID: prootUUID] mainBranchInfo] metadata]);
     
     UKTrue([store setMetadata: D(@"hello world", @"msg")
                     forBranch: initialBranchUUID
              ofPersistentRoot: prootUUID]);
     
-    UKObjectsEqual(D(@"hello world", @"msg"), [[[store persistentRootWithUUID: prootUUID] mainBranchInfo] metadata]);
+    UKObjectsEqual(D(@"hello world", @"msg"), [[[store persistentRootInfoForUUID: prootUUID] mainBranchInfo] metadata]);
     
     UKTrue([store setMetadata: nil
                     forBranch: initialBranchUUID
              ofPersistentRoot: prootUUID]);
     
-    UKNil([[[store persistentRootWithUUID: prootUUID] mainBranchInfo] metadata]);
+    UKNil([[[store persistentRootInfoForUUID: prootUUID] mainBranchInfo] metadata]);
 }
 
 - (void) testSetCurrentBranch
 {
-    UKObjectsEqual(initialBranchUUID, [[store persistentRootWithUUID: prootUUID] mainBranchUUID]);
+    UKObjectsEqual(initialBranchUUID, [[store persistentRootInfoForUUID: prootUUID] mainBranchUUID]);
     
     UKTrue([store setMainBranch: branchAUUID
                  forPersistentRoot: prootUUID]);
     
-    UKObjectsEqual(branchAUUID, [[store persistentRootWithUUID: prootUUID] mainBranchUUID]);
+    UKObjectsEqual(branchAUUID, [[store persistentRootInfoForUUID: prootUUID] mainBranchUUID]);
 
     UKTrue([store setMainBranch: branchBUUID
                  forPersistentRoot: prootUUID]);
     
-    UKObjectsEqual(branchBUUID, [[store persistentRootWithUUID: prootUUID] mainBranchUUID]);
+    UKObjectsEqual(branchBUUID, [[store persistentRootInfoForUUID: prootUUID] mainBranchUUID]);
 
 }
 
 - (void) testSetCurrentVersion
 {
-    COBranchInfo *branchA = [[store persistentRootWithUUID: prootUUID] branchInfoForUUID: branchAUUID];
+    COBranchInfo *branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKIntsEqual(0, [[branchA tailRevisionID] revisionIndex]);
     UKIntsEqual(BRANCH_LENGTH, [[branchA headRevisionID] revisionIndex]);
     UKIntsEqual(BRANCH_LENGTH, [[branchA currentRevisionID] revisionIndex]);
@@ -298,7 +298,7 @@ static ETUUID *childUUID2;
                           forBranch: branchAUUID
                    ofPersistentRoot: prootUUID]);
     
-    branchA = [[store persistentRootWithUUID: prootUUID] branchInfoForUUID: branchAUUID];
+    branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKIntsEqual(0, [[branchA tailRevisionID] revisionIndex]);
     UKIntsEqual(BRANCH_LENGTH, [[branchA headRevisionID] revisionIndex]);
     UKIntsEqual(BRANCH_LATER, [[branchA currentRevisionID] revisionIndex]);
@@ -309,7 +309,7 @@ static ETUUID *childUUID2;
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID]);
     
-    branchA = [[store persistentRootWithUUID: prootUUID] branchInfoForUUID: branchAUUID];
+    branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKIntsEqual(0, [[branchA tailRevisionID] revisionIndex]);
     UKIntsEqual(BRANCH_LATER, [[branchA headRevisionID] revisionIndex]);
     UKIntsEqual(BRANCH_LATER, [[branchA currentRevisionID] revisionIndex]);
@@ -320,7 +320,7 @@ static ETUUID *childUUID2;
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID]);
     
-    branchA = [[store persistentRootWithUUID: prootUUID] branchInfoForUUID: branchAUUID];
+    branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKIntsEqual(BRANCH_EARLY, [[branchA tailRevisionID] revisionIndex]);
     UKIntsEqual(BRANCH_LATER, [[branchA headRevisionID] revisionIndex]);
     UKIntsEqual(BRANCH_LATER, [[branchA currentRevisionID] revisionIndex]);
@@ -452,8 +452,8 @@ static ETUUID *childUUID2;
 
     UKObjectsEqual(A(prootUUID), [store deletedPersistentRootUUIDs]);
     UKObjectsEqual([NSArray array], [store persistentRootUUIDs]);
-    UKNotNil([store persistentRootWithUUID: prootUUID]);
-    UKFalse([[[store persistentRootWithUUID: prootUUID] mainBranchInfo] isDeleted]); // Deleting proot does not mark branch as deleted.
+    UKNotNil([store persistentRootInfoForUUID: prootUUID]);
+    UKFalse([[[store persistentRootInfoForUUID: prootUUID] mainBranchInfo] isDeleted]); // Deleting proot does not mark branch as deleted.
     
     // Undelete it
     UKTrue([store undeletePersistentRoot: prootUUID]);
@@ -467,7 +467,7 @@ static ETUUID *childUUID2;
     
     UKObjectsEqual([NSArray array], [store persistentRootUUIDs]);
     UKObjectsEqual([NSArray array], [store deletedPersistentRootUUIDs]);
-    UKNil([store persistentRootWithUUID: prootUUID]);
+    UKNil([store persistentRootInfoForUUID: prootUUID]);
     UKNil([store revisionInfoForRevisionID: initialRevisionId]);
     UKNil([store contentsForRevisionID: initialRevisionId]);
 }
@@ -500,7 +500,7 @@ static ETUUID *childUUID2;
 - (void) testPersistentRootBasic
 {
     UKObjectsEqual(S(prootUUID), [NSSet setWithArray:[store persistentRootUUIDs]]);
-    UKObjectsEqual(initialBranchUUID, [[store persistentRootWithUUID: prootUUID] mainBranchUUID]);
+    UKObjectsEqual(initialBranchUUID, [[store persistentRootInfoForUUID: prootUUID] mainBranchUUID]);
     UKObjectsEqual([self makeInitialItemTree], [store contentsForRevisionID: initialRevisionId]);
 }
 
@@ -536,8 +536,8 @@ static ETUUID *childUUID2;
     // Make sure the persistent root state returned from createPersistentRoot matches what the store
     // gives us when we read it back.
 
-    UKObjectsEqual(copy.branchUUIDs, [store persistentRootWithUUID: [copy UUID]].branchUUIDs);
-    UKObjectsEqual([[copy mainBranchInfo] currentRevisionID], [[store persistentRootWithUUID: [copy UUID]] mainBranchInfo].currentRevisionID);
+    UKObjectsEqual(copy.branchUUIDs, [store persistentRootInfoForUUID: [copy UUID]].branchUUIDs);
+    UKObjectsEqual([[copy mainBranchInfo] currentRevisionID], [[store persistentRootInfoForUUID: [copy UUID]] mainBranchInfo].currentRevisionID);
     
     // 2. try changing. Verify that proot and copy are totally independent
 
@@ -551,8 +551,8 @@ static ETUUID *childUUID2;
     
     // Reload proot's and copy's metadata
     
-    ASSIGN(proot, [store persistentRootWithUUID: prootUUID]);
-    copy = [store persistentRootWithUUID: [copy UUID]];
+    ASSIGN(proot, [store persistentRootInfoForUUID: prootUUID]);
+    copy = [store persistentRootInfoForUUID: [copy UUID]];
     UKObjectsEqual(rev1, [[proot mainBranchInfo] currentRevisionID]);
     UKObjectsEqual(rev1, [[proot mainBranchInfo] headRevisionID]);
     UKObjectsEqual(initialRevisionId, [[proot mainBranchInfo] tailRevisionID]);
@@ -572,8 +572,8 @@ static ETUUID *childUUID2;
     
     // Reload proot's and copy's metadata
     
-    ASSIGN(proot, [store persistentRootWithUUID: prootUUID]);
-    copy = [store persistentRootWithUUID: [copy UUID]];
+    ASSIGN(proot, [store persistentRootInfoForUUID: prootUUID]);
+    copy = [store persistentRootInfoForUUID: [copy UUID]];
     UKObjectsEqual(rev1, [[proot mainBranchInfo] currentRevisionID]);
     UKObjectsEqual(rev1, [[proot mainBranchInfo] headRevisionID]);
     UKObjectsEqual(initialRevisionId, [[proot mainBranchInfo] tailRevisionID]);
