@@ -134,6 +134,27 @@
     
     [db_ beginTransaction];
     
+    /* Store Metadata tables (including schema version) */
+    
+    if (![db_ tableExists: @"storeMetadata"])
+    {
+        ASSIGN(_uuid, [ETUUID UUID]);
+        [db_ executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, uuid BLOB)"];
+        [db_ executeUpdate: @"INSERT INTO storeMetadata VALUES(1, ?)", [_uuid dataValue]];
+    }
+    else
+    {
+        int version = [db_ intForQuery: @"SELECT version FROM storeMetadata"];
+        if (1 != version)
+        {
+            NSLog(@"Error, store version %d, only version 1 is supported", version);
+            [self release];
+            return nil;
+        }
+        
+        ASSIGN(_uuid, [ETUUID UUIDWithData: [db_ dataForQuery: @"SELECT uuid FROM storeMetadata"]]);
+    }
+    
     // Persistent Root and Branch tables
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots (root_id INTEGER PRIMARY KEY, "
@@ -188,6 +209,7 @@
 	[url_ release];
     [backingStores_ release];
     [backingStoreUUIDForPersistentRootUUID_ release];
+    [_uuid release];
 	[super dealloc];
 }
 
@@ -195,6 +217,8 @@
 {
 	return url_;
 }
+
+@synthesize UUID = _uuid;
 
 - (NSNumber *) rootIdForPersistentRootUUID: (ETUUID *)aUUID
 {

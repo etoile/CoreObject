@@ -260,7 +260,7 @@
  */
 - (NSURL*)URL;
 
-
+@property (readonly, nonatomic) ETUUID *UUID;
 
 
 /** @taskunit Revision Reading */

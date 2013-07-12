@@ -582,4 +582,15 @@ static ETUUID *childUUID2;
     UKObjectsEqual(initialRevisionId, [[copy mainBranchInfo] tailRevisionID]);
 }
 
+- (void) testStoreUUID
+{
+    ETUUID *uuid = [store UUID];
+    UKNotNil(uuid);
+    
+    COSQLiteStore *store2 = [[COSQLiteStore alloc] initWithURL: [store URL]];
+    UKObjectsEqual(uuid, [store2 UUID]);
+    
+    [store2 release];
+}
+
 @end
