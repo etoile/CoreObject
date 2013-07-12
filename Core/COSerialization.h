@@ -17,6 +17,11 @@ extern NSString *kCOObjectEntityNameProperty;
 
 @interface COObject (COSerialization)
 
+/** At the end of -setStoreItem: -awakeFromDeserialization is called to recreate 
+additional internal state based on the deserialization result. You must not 
+touch and attempt to access or recreated relationships during 
+-awakeFromDeserialization. For relationship restoration, you can implement 
+-didLoadObjectGraph. */
 @property (nonatomic, copy) COItem *storeItem;
 
 /** @taskunit Serialization */

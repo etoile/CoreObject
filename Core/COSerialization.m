@@ -286,7 +286,17 @@ serialization. */
 
 	if ([aPropertyDesc isMultivalued])
 	{
-		if ([aPropertyDesc isOrdered])
+		NSAssert(value != nil, @"Multivalued properties must not be nil");
+
+		/* Don't serialize CODictionary as multivalue but as COObject reference */
+		if ([aPropertyDesc isKeyed])
+		{
+			NSAssert([value persistentRoot] == [self persistentRoot],
+				@"A property must not point on a CODictionary object in another persistent root");
+
+			type = kCOReferenceType;
+		}
+		else if ([aPropertyDesc isOrdered])
 		{
 			// HACK: The ofValue param should be removed.
 			// Should not need to infer type based on an element of the collection.
@@ -351,7 +361,7 @@ serialization. */
 		id value = [self serializedValueForPropertyDescription: propertyDesc];
 		id serializedValue = [self serializedValueForValue: value];
 		NSNumber *serializedType = [self serializedTypeForPropertyDescription: propertyDesc
-		                                                                value: serializedValue];
+		                                                                value: value];
 	
 		[values setObject: serializedValue forKey: [propertyDesc name]];
 		[types setObject: serializedType forKey: [propertyDesc name]];
@@ -610,7 +620,8 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 		// -setSerializedValue:forProperty: once we remove the previous serialization support
 		[self setSerializedValue: value forPropertyDescription: propertyDesc];
 	}
-    
+
+	[self awakeFromFetch];
     // TODO: Decide whether to update relationship cache here. Document it.
 }
 
