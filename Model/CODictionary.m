@@ -186,7 +186,10 @@ For a loaded object, -tags return nil because tags are not serialized. */
 		[values setObject: serializedValue forKey: [propertyDesc name]];
 		[types setObject: serializedType forKey: [propertyDesc name]];
 	}
-	
+
+	[values setObject: [[self entityDescription] name] forKey: kCOObjectEntityNameProperty];
+    [types setObject: [NSNumber numberWithInt: kCOStringType] forKey: kCOObjectEntityNameProperty];
+
 	return [COItem itemWithTypesForAttributes: types valuesForAttributes: values];
 }
 
