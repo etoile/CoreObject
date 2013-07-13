@@ -1,9 +1,9 @@
-#import "COPersistentRoot+RelationshipCache.h"
+#import "COObject+RelationshipCache.h"
 #import "COObject.h"
 #import "CORelationshipCache.h"
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@implementation COPersistentRoot (RelationshipCache)
+@implementation COObject (RelationshipCache)
 
 // FIXME: Copied from COSerialization
 static BOOL isCoreObjectEntityType(ETEntityDescription *aType)
@@ -29,7 +29,6 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
 
 - (void) removeCachedOutgoingRelationshipsForValue: (id)aValue
                          ofPropertyWithDescription: (ETPropertyDescription *)aProperty
-                                          ofObject: (COObject *)anObject
 {
     if (aValue != nil)
     {
@@ -52,7 +51,6 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
 
 - (void) addCachedOutgoingRelationshipsForValue: (id)aValue
                       ofPropertyWithDescription: (ETPropertyDescription *)aProperty
-                                       ofObject: (COObject *)anObject
 
 {
     if (aValue != nil)
@@ -66,14 +64,14 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
                 {
                     for (COObject *obj in aValue)
                     {
-                        [[obj relationshipCache] addReferenceFromSourceObject: anObject
+                        [[obj relationshipCache] addReferenceFromSourceObject: self
                                                                sourceProperty: [aProperty name]
                                                                targetProperty: [propertyInTarget name]];
                     }
                 }
                 else
                 {
-                    [[(COObject *)aValue relationshipCache] addReferenceFromSourceObject: anObject
+                    [[(COObject *)aValue relationshipCache] addReferenceFromSourceObject: self
                                                                           sourceProperty: [aProperty name]
                                                                           targetProperty: [propertyInTarget name]];
                 }
@@ -85,46 +83,41 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
 - (void) updateCachedOutgoingRelationshipsForOldValue: (id)oldVal
                                              newValue: (id)newVal
                             ofPropertyWithDescription: (ETPropertyDescription *)aProperty
-                                             ofObject: (COObject *)anObject
 {
     if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
     {
         [self removeCachedOutgoingRelationshipsForValue: oldVal
-                              ofPropertyWithDescription: aProperty
-                                               ofObject: anObject];
+                              ofPropertyWithDescription: aProperty];
         
         [self addCachedOutgoingRelationshipsForValue: newVal
-                           ofPropertyWithDescription: aProperty
-                                            ofObject: anObject];
+                           ofPropertyWithDescription: aProperty];
     }
 }
 
-- (void) addCachedOutgoingRelationshipsForObject: (COObject *)anObject
+- (void) addCachedOutgoingRelationships
 {
-    for (ETPropertyDescription *prop in [[anObject entityDescription] propertyDescriptions])
+    for (ETPropertyDescription *prop in [[self entityDescription] propertyDescriptions])
     {
         if (isPersistentCoreObjectReferencePropertyDescription(prop))
         {
-            id value = [anObject valueForKey: [prop name]];
+            id value = [self valueForKey: [prop name]];
             
             [self addCachedOutgoingRelationshipsForValue: value
-                               ofPropertyWithDescription: prop
-                                                ofObject: anObject];
+                               ofPropertyWithDescription: prop];
         }
     }
 }
 
-- (void) removeCachedOutgoingRelationshipsForObject: (COObject *)anObject
+- (void) removeCachedOutgoingRelationships
 {
-    for (ETPropertyDescription *prop in [[anObject entityDescription] propertyDescriptions])
+    for (ETPropertyDescription *prop in [[self entityDescription] propertyDescriptions])
     {
         if (isPersistentCoreObjectReferencePropertyDescription(prop))
         {
-            id value = [anObject valueForKey: [prop name]];
+            id value = [self valueForKey: [prop name]];
             
             [self removeCachedOutgoingRelationshipsForValue: value
-                                  ofPropertyWithDescription: prop
-                                                   ofObject: anObject];
+                                  ofPropertyWithDescription: prop];
         }
     }
 }

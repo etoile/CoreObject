@@ -13,11 +13,12 @@
 #import "COObject.h"
 #import "COError.h"
 #import "COPersistentRoot.h"
-#import "COPersistentRoot+RelationshipCache.h"
+#import "COObject+RelationshipCache.h"
 #import "CORelationshipCache.h"
 #import "COSQLiteStore.h"
 #import "COTag.h"
 #import "COGroup.h"
+#import "COObjectGraphContext.h"
 #include <objc/runtime.h>
 
 @implementation COObject
@@ -165,7 +166,6 @@ See +[NSObject typePrefix]. */
 	_isIgnoringDamageNotifications = NO;
 	_isInitialized = YES;
 
-	[(id)_persistentRoot markObjectAsUpdated: self forProperty: nil];
 	_variableStorage = [self newVariableStorage];
 	_incomingRelationships = [[CORelationshipCache alloc] init];
 
@@ -208,7 +208,7 @@ See +[NSObject typePrefix]. */
 
 - (void)dealloc
 {
-	_persistentRoot = nil;
+	_objectGraphContext = nil;
 	DESTROY(_uuid);
 	DESTROY(_entityDescription);
 	DESTROY(_variableStorage);
@@ -245,12 +245,12 @@ See +[NSObject typePrefix]. */
 	
 	/* Both transient and persistent objects must have a valid UUID */
 	ETAssert(_uuid != nil);
-	_persistentRoot = aContext;
+	_objectGraphContext = [aContext objectGraph];
 	if (_entityDescription == nil)
 	{
 		ASSIGN(_entityDescription, [[[(id)aContext parentContext] modelRepository] entityDescriptionForClass: [self class]]);
 	}
-	[aContext registerObject: self];
+	[_objectGraphContext registerObject: self];
 }
 
 // TODO: Maybe add convenience copying method, - (COObject *) copyWithCopier: (COCopier *)aCopier
@@ -262,7 +262,7 @@ See +[NSObject typePrefix]. */
 	COObject *newObject = [[self class] allocWithZone: aZone];
 	
 	newObject->_uuid = [[ETUUID alloc] init];
-	newObject->_persistentRoot = _persistentRoot;
+	newObject->_objectGraphContext = _objectGraphContext;
 	if (_variableStorage != nil)
 	{
 		newObject->_variableStorage = [self newVariableStorage];
@@ -298,12 +298,17 @@ See +[NSObject typePrefix]. */
 
 - (COPersistentRoot *)persistentRoot
 {
-	return _persistentRoot;
+	return [_objectGraphContext persistentRoot];
+}
+
+- (COObjectGraphContext *)objectGraphContext
+{
+    return _objectGraphContext;
 }
 
 - (COObject *) rootObject
 {
-	return [_persistentRoot rootObject];
+	return [_objectGraphContext rootObject];
 }
 
 - (BOOL) isRoot
@@ -318,12 +323,12 @@ See +[NSObject typePrefix]. */
 
 - (CORevision *)revision
 {
-	return [_persistentRoot revision];
+	return [[self persistentRoot] revision];
 }
 
 - (BOOL) isPersistent
 {
-	return (_persistentRoot != nil);
+	return (_objectGraphContext != nil);
 	// TODO: Switch to the code below on root object are saved in the db
 	// return (_persistentRoot != nil && _rootObject != nil);
 }
@@ -372,6 +377,41 @@ See +[NSObject typePrefix]. */
 	return result;
 }
 
+- (NSArray*)embeddedOrReferencedObjects
+{
+	NSMutableArray *result = [NSMutableArray array];
+	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+	{
+        id value = [self valueForProperty: [propDesc name]];
+        
+        assert([propDesc isMultivalued] ==
+               ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]));
+        
+        if ([propDesc isMultivalued])
+        {
+            for (id subvalue in value)
+            {
+                if ([subvalue isKindOfClass: [COObject class]])
+                {
+                    [result addObject: subvalue];
+                    [result addObjectsFromArray: [subvalue allStronglyContainedObjects]];
+                }
+            }
+        }
+        else
+        {
+            if ([value isKindOfClass: [COObject class]])
+            {
+                [result addObject: value];
+                [result addObjectsFromArray: [value allStronglyContainedObjects]];
+            }
+            // Ignore non-COObject objects
+        }
+	}
+	return result;
+}
+
+
 - (NSArray*)allStronglyContainedObjectsIncludingSelf
 {
 	return [[self allStronglyContainedObjects] arrayByAddingObject: self];
@@ -397,7 +437,7 @@ See +[NSObject typePrefix]. */
 
 	for (ETUUID *uuid in innerObjectUUIDs)
 	{
-		[innerObjects addObject: [[_persistentRoot parentContext] objectWithUUID: uuid]];
+		[innerObjects addObject: [[[self persistentRoot] parentContext] objectWithUUID: uuid]];
 	}
 	return innerObjects;
 }
@@ -541,7 +581,7 @@ See +[NSObject typePrefix]. */
 	{
 		if ([value isKindOfClass: [COObject class]])
 		{
-			assert([[value persistentRoot] parentContext] == [_persistentRoot parentContext]);
+			assert([[value persistentRoot] parentContext] == [[self persistentRoot] parentContext]);
 		}    
 	}
 }
@@ -745,7 +785,7 @@ See +[NSObject typePrefix]. */
 	if (_isIgnoringDamageNotifications || [self isPersistent] == NO)
 		return;
 	
-	[[self persistentRoot] markObjectAsUpdated: self forProperty: prop];
+	[_objectGraphContext markObjectAsUpdated: self forProperty: prop];
 }
 
 - (void)didChangeValueForProperty: (NSString *)key
@@ -789,15 +829,15 @@ See +[NSObject typePrefix]. */
             
             if (objectBeingInsertedParent != nil && objectBeingInsertedParent != self)
             {
-                [objectBeingInsertedParent removeObject: objectBeingInserted atIndex: ETUndeterminedIndex hint: nil forProperty: key];
+                // TODO: This was breaking EtoileUI, Re-enable
+                //[objectBeingInsertedParent removeObject: objectBeingInserted atIndex: ETUndeterminedIndex hint: nil forProperty: key];
             }
         }
     }
     
-    [_persistentRoot updateCachedOutgoingRelationshipsForOldValue: oldValue
-                                                         newValue: [self valueForKey: key]
-                                        ofPropertyWithDescription: [_entityDescription propertyDescriptionForName: key]
-                                                         ofObject: self];
+    [self updateCachedOutgoingRelationshipsForOldValue: oldValue
+                                                  newValue: [self valueForKey: key]
+                                 ofPropertyWithDescription: [_entityDescription propertyDescriptionForName: key]];
     
 	[self markAsUpdatedIfNeededForProperty: key];
 	// FIXME: [self becomePersistentAccordingToModelDescriptionForProperty: key];
@@ -935,7 +975,7 @@ See +[NSObject typePrefix]. */
 // TODO: Change to new -didAwaken method called in a predetermined order
 - (void)awakeFromFetch
 {
-    [_persistentRoot addCachedOutgoingRelationshipsForObject: self];
+    [self addCachedOutgoingRelationships];
     [self validateMultivaluedPropertiesUsingMetamodel];
 }
 
@@ -1160,6 +1200,11 @@ static int indent = 0;
 - (CORelationshipCache *)relationshipCache
 {
     return _incomingRelationships;
+}
+
+- (void) markAsRemovedFromContext
+{
+    
 }
 
 @end

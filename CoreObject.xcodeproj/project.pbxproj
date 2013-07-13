@@ -112,12 +112,14 @@
 		668084C4178FFAFC003A3CC6 /* TestSQLiteStorePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B2178C431E00B78174 /* TestSQLiteStorePerformance.m */; };
 		668084C5178FFAFC003A3CC6 /* TestSQLiteStorePersistentRootBackingStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B3178C431E00B78174 /* TestSQLiteStorePersistentRootBackingStore.m */; };
 		668084CF17900C35003A3CC6 /* COType.m in Sources */ = {isa = PBXBuildFile; fileRef = 668084CE17900C35003A3CC6 /* COType.m */; };
+		668084EC1791FBA2003A3CC6 /* COObject+RelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 668084EA1791FBA2003A3CC6 /* COObject+RelationshipCache.m */; };
+		668084ED1791FBA2003A3CC6 /* COObject+RelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 668084EB1791FBA2003A3CC6 /* COObject+RelationshipCache.h */; };
+		668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 668084EE1791FBAB003A3CC6 /* COObjectGraphContext.h */; };
+		668084F11791FBAB003A3CC6 /* COObjectGraphContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 668084EF1791FBAB003A3CC6 /* COObjectGraphContext.m */; };
 		6686BE2A12592D7B0065DE1A /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
 		66D099FD129AE8A2006BEDC3 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6C1299C90900CCF472 /* FMDatabase.m */; };
 		66D099FE129AE8A2006BEDC3 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6E1299C90900CCF472 /* FMDatabaseAdditions.m */; };
 		66D099FF129AE8A2006BEDC3 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E701299C90900CCF472 /* FMResultSet.m */; };
-		66D96C63178ABA5E00D1553C /* COPersistentRoot+RelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96C61178ABA5D00D1553C /* COPersistentRoot+RelationshipCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		66D96C64178ABA5E00D1553C /* COPersistentRoot+RelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96C62178ABA5E00D1553C /* COPersistentRoot+RelationshipCache.m */; };
 		66D96C70178AE41500D1553C /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
 		66D96CA0178B6E5600D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
 		66D96CA1178B6FBA00D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
@@ -394,6 +396,10 @@
 		66808488178DAFE3003A3CC6 /* diff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = diff.h; path = Diff/diff.h; sourceTree = "<group>"; };
 		66808489178DAFE3003A3CC6 /* diff.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = diff.hh; path = Diff/diff.hh; sourceTree = "<group>"; };
 		668084CE17900C35003A3CC6 /* COType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COType.m; sourceTree = "<group>"; };
+		668084EA1791FBA2003A3CC6 /* COObject+RelationshipCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObject+RelationshipCache.m"; path = "Core/COObject+RelationshipCache.m"; sourceTree = "<group>"; };
+		668084EB1791FBA2003A3CC6 /* COObject+RelationshipCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObject+RelationshipCache.h"; path = "Core/COObject+RelationshipCache.h"; sourceTree = "<group>"; };
+		668084EE1791FBAB003A3CC6 /* COObjectGraphContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COObjectGraphContext.h; path = Core/COObjectGraphContext.h; sourceTree = "<group>"; };
+		668084EF1791FBAB003A3CC6 /* COObjectGraphContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COObjectGraphContext.m; path = Core/COObjectGraphContext.m; sourceTree = "<group>"; };
 		6686BDAC12592BDA0065DE1A /* CoreObject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CoreObject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6686BDAD12592BDA0065DE1A /* CoreObject-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CoreObject-Info.plist"; sourceTree = "<group>"; };
 		66982A1F11EBC2A0007154CD /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
@@ -407,8 +413,6 @@
 		66D09B26129B7448006BEDC3 /* SOLVEDPROBLEMS */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SOLVEDPROBLEMS; sourceTree = "<group>"; };
 		66D09B28129B7838006BEDC3 /* IMPLEMENTATION */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = IMPLEMENTATION; sourceTree = "<group>"; };
 		66D09B29129B78C8006BEDC3 /* NOTES */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NOTES; sourceTree = "<group>"; };
-		66D96C61178ABA5D00D1553C /* COPersistentRoot+RelationshipCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COPersistentRoot+RelationshipCache.h"; path = "Core/COPersistentRoot+RelationshipCache.h"; sourceTree = "<group>"; };
-		66D96C62178ABA5E00D1553C /* COPersistentRoot+RelationshipCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COPersistentRoot+RelationshipCache.m"; path = "Core/COPersistentRoot+RelationshipCache.m"; sourceTree = "<group>"; };
 		66D96C9F178B6E5600D1553C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		66D96CA2178B717000D1553C /* COBinaryReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBinaryReader.h; path = Store/COBinaryReader.h; sourceTree = "<group>"; };
 		66D96CA3178B717000D1553C /* COBinaryReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBinaryReader.m; path = Store/COBinaryReader.m; sourceTree = "<group>"; };
@@ -691,6 +695,10 @@
 				6609485C1787A1160049468B /* CORelationshipCache.m */,
 				609C008C1704C3DA00D01AAB /* COObject.h */,
 				609C008D1704C3DA00D01AAB /* COObject.m */,
+				668084EA1791FBA2003A3CC6 /* COObject+RelationshipCache.m */,
+				668084EB1791FBA2003A3CC6 /* COObject+RelationshipCache.h */,
+				668084EE1791FBAB003A3CC6 /* COObjectGraphContext.h */,
+				668084EF1791FBAB003A3CC6 /* COObjectGraphContext.m */,
 				609C008E1704C3DA00D01AAB /* COPersistentRoot.h */,
 				609C008F1704C3DA00D01AAB /* COPersistentRoot.m */,
 				609C00901704C3DA00D01AAB /* COQuery.h */,
@@ -699,8 +707,6 @@
 				606E3DC01787A07E00ED42DA /* COSerialization.m */,
 				609C00921704C3DA00D01AAB /* COSynchronizer.h */,
 				609C00931704C3DA00D01AAB /* COSynchronizer.m */,
-				66D96C61178ABA5D00D1553C /* COPersistentRoot+RelationshipCache.h */,
-				66D96C62178ABA5E00D1553C /* COPersistentRoot+RelationshipCache.m */,
 				6680846B178CD526003A3CC6 /* COCopier.h */,
 				6680846C178CD526003A3CC6 /* COCopier.m */,
 			);
@@ -916,7 +922,6 @@
 				66094848178794D40049468B /* COItem+JSON.h in Headers */,
 				606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */,
 				6609485F1787A1160049468B /* CORelationshipCache.h in Headers */,
-				66D96C63178ABA5E00D1553C /* COPersistentRoot+RelationshipCache.h in Headers */,
 				66D96CB7178B717200D1553C /* COBinaryReader.h in Headers */,
 				66D96CB9178B717200D1553C /* COBinaryWriter.h in Headers */,
 				66D96CBA178B717200D1553C /* COItem+Binary.h in Headers */,
@@ -934,6 +939,8 @@
 				66808490178DAFE3003A3CC6 /* COSubtreeEdits.h in Headers */,
 				66808493178DAFE3003A3CC6 /* diff.h in Headers */,
 				66808494178DAFE3003A3CC6 /* diff.hh in Headers */,
+				668084ED1791FBA2003A3CC6 /* COObject+RelationshipCache.h in Headers */,
+				668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1246,7 +1253,6 @@
 				606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */,
 				607EB34A178881E60024B34D /* CODictionary.m in Sources */,
 				6609485E1787A1160049468B /* CORelationshipCache.m in Sources */,
-				66D96C64178ABA5E00D1553C /* COPersistentRoot+RelationshipCache.m in Sources */,
 				66D96CB8178B717200D1553C /* COBinaryReader.m in Sources */,
 				66D96CBB178B717200D1553C /* COItem+Binary.m in Sources */,
 				66D96CBF178B717200D1553C /* CORevisionID.m in Sources */,
@@ -1263,6 +1269,8 @@
 				66808491178DAFE3003A3CC6 /* COSubtreeEdits.m in Sources */,
 				66808492178DAFE3003A3CC6 /* diff.cc in Sources */,
 				668084CF17900C35003A3CC6 /* COType.m in Sources */,
+				668084EC1791FBA2003A3CC6 /* COObject+RelationshipCache.m in Sources */,
+				668084F11791FBAB003A3CC6 /* COObjectGraphContext.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

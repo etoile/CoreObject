@@ -13,7 +13,7 @@
 #import "COError.h"
 #import "COItem.h"
 #import "COObject.h"
-#import "COPersistentRoot+RelationshipCache.h"
+#import "COObjectGraphContext.h"
 #import "CORelationshipCache.h"
 #import "CORevision.h"
 #import "COSerialization.h"
@@ -22,7 +22,7 @@
 @implementation COPersistentRoot
 
 @synthesize parentContext = _parentContext,
-	commitTrack = _commitTrack, rootObject = _rootObject;
+	commitTrack = _commitTrack, rootObject = _rootObject, objectGraph = _objectGraph;
 
 - (ETUUID *)persistentRootUUID
 {
@@ -66,12 +66,8 @@
         _revision = [[CORevision alloc] initWithStore: [_parentContext store]
                                          revisionInfo: revInfo];
     }
-    
-	_loadedObjects = [NSMutableDictionary new];
-	_insertedObjects = [NSMutableSet new];
-	_deletedObjects = [NSMutableSet new];
-	ASSIGN(_updatedPropertiesByObject, [NSMapTable mapTableWithStrongToStrongObjects]);
-    _relationshipCache = [[CORelationshipCache alloc] init];
+
+    _objectGraph = [[COObjectGraphContext alloc] initWithPersistentRoot: self];
     
     // Load all of the objects
     if (_revision != nil)
@@ -88,14 +84,11 @@
 	DESTROY(_commitTrack);
 	DESTROY(_rootObject);
 	DESTROY(_revision);
-	DESTROY(_loadedObjects);
-	DESTROY(_insertedObjects);
-	DESTROY(_deletedObjects);
-	DESTROY(_updatedPropertiesByObject);
-    DESTROY(_relationshipCache);
+    DESTROY(_objectGraph);
 	[super dealloc];
 }
 
+#if 0
 - (NSString *)description
 {
 	// TODO: Improve the indenting
@@ -105,6 +98,7 @@
 	/* For Mac OS X, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
 	return [desc stringByReplacingOccurrencesOfString: @"\\n" withString: @"\n"];
 }
+#endif
 
 - (BOOL)isPersistentRoot
 {
@@ -139,68 +133,27 @@
 
 - (id)rootObject
 {
-	if (_rootObject == nil)
-	{
-		/* -rootObjectUUID could return nil (meaning the persistent root has  
-		   never been committed or has no root object)...
-		   But you cannot create a persistent root without assigning it a root
-		   object immediately. For -becomePersistentInContext:, -registerObject: 
-		   sets the root object before the method returns. 
-		   So -rootObject is never called when -rootObjectUUID could return nil. */
-		ASSIGN(_rootObject, [self objectWithUUID: [self rootObjectUUID]]);
-	}
-	return _rootObject;
+	return [_objectGraph rootObject];
 }
 
 - (ETUUID *)rootObjectUUID
 {
-	if (_rootObject != nil)
-	{
-		return [_rootObject UUID];
-	}
-	else
-	{
-        if (_revision != nil)
-        {
-            ETUUID *rootUUID = [[_parentContext store]
-                               rootObjectUUIDForRevisionID: [_revision revisionID]];
-            return rootUUID;
-        }
-        else
-        {
-            return nil;
-        }
-	}
-}
-
-// NOTE: If we decide to make the method public, move it to COEditingContext
-- (NSString *)defaultEntityName
-{
-	return @"COObject";
+	return [_objectGraph rootItemUUID];
 }
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid
 {
-	NILARG_EXCEPTION_TEST(uuid);
-	// NOTE: We serialize UUIDs into strings in various places, this check
-	// helps to intercept string objects that ought to be ETUUID objects.
-	NSParameterAssert([uuid isKindOfClass: [ETUUID class]]);
-	
-	/* Check the object cache */
-
-	COObject *obj = [_loadedObjects objectForKey: uuid];
-    
-	return obj;
+	return [_objectGraph objectWithUUID: uuid];
 }
 
 - (NSSet *)loadedObjects
 {
-	return [NSSet setWithArray: [_loadedObjects allValues]];
+    return [NSSet setWithArray: [_objectGraph allObjects]];
 }
 
 - (NSSet *)loadedObjectUUIDs
 {
-	return [NSSet setWithArray: [_loadedObjects allKeys]];
+	return [NSSet setWithArray: [_objectGraph itemUUIDs]];
 }
 
 - (NSSet *)loadedRootObjects
@@ -212,76 +165,64 @@
 
 - (id)loadedObjectForUUID: (ETUUID *)uuid
 {
-	return [_loadedObjects objectForKey: uuid];
-}
-
-- (void)cacheLoadedObject: (COObject *)object
-{
-	[_loadedObjects setObject: object forKey: [object UUID]];
+	return [_objectGraph objectWithUUID: uuid];
 }
 
 - (void)discardLoadedObjectForUUID: (ETUUID *)aUUID
 {
-	[_loadedObjects removeObjectForKey: aUUID];
+    NSLog(@"-discardLoadedObjectForUUID: deprecated and has no effect");
 }
 
 - (NSSet *)insertedObjects
 {
-	return [NSSet setWithSet: _insertedObjects];
+	return [_objectGraph insertedObjects];
 }
 
 - (NSSet *)updatedObjects
 {
-	return [NSSet setWithArray: [_updatedPropertiesByObject allKeys]];
+	return [_objectGraph updatedObjects];
 }
 
 - (NSSet *)updatedObjectUUIDs
 {
-	return [NSSet setWithArray: (id)[[[_updatedPropertiesByObject allKeys] mappedCollection] UUID]];
+	return [NSSet setWithArray: (id)[[[self updatedObjects] mappedCollection] UUID]];
 }
-
 
 - (BOOL)isUpdatedObject: (COObject *)anObject
 {
-	return ([_updatedPropertiesByObject objectForKey: anObject] != nil);
+	return [[self updatedObjects] containsObject: anObject];
 }
 
 - (NSMapTable *) updatedPropertiesByObject
 {
-	return _updatedPropertiesByObject;
+	return [_objectGraph updatedPropertiesByObject];
 }
 
+// TODO: Deprecated; remove.
 - (NSSet *)deletedObjects
 {
-	return [NSSet setWithSet: _deletedObjects];
+	return [NSSet set];
 }
 
 - (NSSet *)changedObjects
 {
-	NSSet *changedObjects = [_insertedObjects setByAddingObjectsFromSet: _deletedObjects];
-	return [changedObjects setByAddingObjectsFromSet: [self updatedObjects]];
+    return [_objectGraph changedObjects];
 }
 
 - (NSSet *)changedObjectUUIDs
 {
-	NSMutableSet *changedObjects = [NSMutableSet setWithSet: _insertedObjects];
-    [changedObjects unionSet: _deletedObjects];
-    [changedObjects unionSet: [self updatedObjects]];
-
-    return (NSSet *)[[changedObjects mappedCollection] UUID];
+    return (NSSet *)[[[self changedObjects] mappedCollection] UUID];
 }
 
 
 - (BOOL)hasChanges
 {
-	return ([_updatedPropertiesByObject count] > 0
-			|| [_insertedObjects count] > 0
-			|| [_deletedObjects count] > 0);
+	return [[self changedObjects] count] > 0;
 }
 
 - (void)discardAllChanges
 {
-	for (COObject *object in [self loadedObjects])
+	for (COObject *object in [self changedObjects])
 	{
 		[self discardChangesInObject: object];
 	}
@@ -290,53 +231,28 @@
 
 - (void)discardChangesInObject: (COObject *)object
 {
-	BOOL isInsertedObject = [_insertedObjects containsObject: object];
-	BOOL isUpdatedObject = ([_updatedPropertiesByObject objectForKey: object] != nil);
-
-	if (isInsertedObject)
-	{
-		/* Remove the object from the cache because it has never been committed */
-		[self discardLoadedObjectForUUID: [object UUID]];
-	}
-	if (isUpdatedObject)
-	{
-		/* Revert the object state back to the current persistent root revision */
-		[self loadObject: object];
-	}
-	
-	[_insertedObjects removeObject: object];
-	[_updatedPropertiesByObject removeObjectForKey: object];
-	[_deletedObjects removeObject: object];
+    if (_revision != nil)
+    {
+        CORevisionID *revid = [_revision revisionID];
+        
+        COItem *item = [[self store] item: [object UUID]
+                             atRevisionID: revid];
+        
+        [_objectGraph addItem: item];        
+        [_objectGraph clearChangeTrackingForObject: object];
+    }
 }
 
 - (void)deleteObject: (COObject *)anObject
 {
-	// NOTE: Deleted objects are removed from the cache on commit.
-	[_deletedObjects addObject: anObject];
+    NSLog(@"deleteObject() is deprecated and has no effect");
 }
 
 - (COObject *)insertObjectWithEntityName: (NSString *)aFullName
                                     UUID: (ETUUID *)aUUID
 {
-	
-	ETEntityDescription *desc = [[_parentContext modelRepository] descriptionForName: aFullName];
-	if (desc == nil)
-	{
-		[NSException raise: NSInvalidArgumentException format: @"Entity name %@ invalid", aFullName];
-	}
-	
-	Class cls = [[_parentContext modelRepository] classForEntityDescription: desc];
-	/* Nil root object means the new object will be a root */
-	COObject *result = [[cls alloc]
-			  initWithUUID: aUUID
-			  entityDescription: desc
-			  context: nil];
-
-	[result becomePersistentInContext: self];
-	/* -becomePersistentInContent: calls -registerObject: that retains the object */
-	[result release];
-
-	return result;
+	return [_objectGraph insertObjectWithEntityName: aFullName
+                                               UUID: aUUID];
 }
 
 - (id)insertObjectWithEntityName: (NSString *)aFullName
@@ -375,8 +291,6 @@
 
 - (CORevision *)saveCommitWithMetadata: (NSDictionary *)metadata
 {
-	ETAssert(_insertedObjects != nil);
-	ETAssert(_updatedPropertiesByObject != nil);
 	ETAssert([[self rootObject] isRoot]);
     
 	COSQLiteStore *store = [_parentContext store];
@@ -386,9 +300,9 @@
     
 	if (isNewPersistentRoot)
 	{
-		ETAssert([_insertedObjects containsObject: [self rootObject]]);
+		ETAssert([[self insertedObjects] containsObject: [self rootObject]]);
 
-        COPersistentRootInfo *info = [store createPersistentRootWithInitialContents: self
+        COPersistentRootInfo *info = [store createPersistentRootWithInitialContents: _objectGraph
                                                                                UUID: [self persistentRootUUID]
                                                                          branchUUID: [[self commitTrack] UUID]
                                                                            metadata: metadata];
@@ -398,7 +312,7 @@
     {
         NSArray *itemUUIDs = [[self changedObjectUUIDs] allObjects];
         
-        revId = [store writeContents: self
+        revId = [store writeContents: _objectGraph
                         withMetadata: metadata
                     parentRevisionID: [_revision revisionID]
                        modifiedItems: itemUUIDs];
@@ -422,41 +336,12 @@
     // FIXME: Re-implement
 	//[[self commitTrack] didMakeNewCommitAtRevision: rev];
 	
-	[_insertedObjects removeAllObjects];
-	[_updatedPropertiesByObject removeAllObjects];
-	[_deletedObjects removeAllObjects];
+	[_objectGraph clearChangeTracking];
 
 	return rev;
 }
 
-- (void)registerObject: (COObject *)object
-{
-	NILARG_EXCEPTION_TEST(object);
-	INVALIDARG_EXCEPTION_TEST(object, [[_parentContext loadedObjects] containsObject: object] == NO);
 
-	/* If -becomePersistentInContext: receives -makePersistentRoot as argument.
-	   We must be sure no root object has ever been set (committed or not). */
-	if (_rootObject == nil && [self rootObjectUUID] == nil)
-	{
-		[self setRootObject: object];
-	}
-
-	[self cacheLoadedObject: object];
-	[_insertedObjects addObject: object];
-}
-
-- (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty
-{
-	if (nil == [_updatedPropertiesByObject objectForKey: obj])
-	{
-		[_updatedPropertiesByObject setObject: [NSMutableArray array] forKey: obj];
-	}
-	if (aProperty != nil)
-	{
-		assert([aProperty isKindOfClass: [NSString class]]);
-		[[_updatedPropertiesByObject objectForKey: obj] addObject: aProperty];
-	}
-}
 
 // FIXME: For reference...
 #if 0
@@ -536,11 +421,13 @@
 
 - (void)reloadAtRevision: (CORevision *)revision
 {
+    NSParameterAssert(revision != nil);
+    
     // TODO: Use optimized method on the store to get a delta for more performance
     
 	id<COItemGraph> aGraph = [[_parentContext store] contentsForRevisionID: [revision revisionID]];
     
-    [self setItemGraph: aGraph];
+    [_objectGraph setItemGraph: aGraph];
     
     // FIXME: Reimplement or remove
     //[[self rootObject] didReload];
@@ -548,136 +435,13 @@
 
 - (void)unload
 {
-	[self setRevision: nil];
-	[_loadedObjects removeAllObjects];
+	NSLog(@"-unload deprecated and has no effect");
 }
 
 - (Class)referenceClassForRootObject: (COObject *)aRootObject
 {
 	// TODO: When the user has selected a precise branch, just return COCommitTrack.
 	return [COPersistentRoot class];
-}
-
-/** @tasknuit COItem integration */
-
-- (NSString *)entityNameForItem: (COItem *)anItem
-{
-    return [anItem valueForAttribute: kCOObjectEntityNameProperty];
-}
-
-- (ETEntityDescription *)descriptionForItem: (COItem *)anItem
-{
-    NSString *name = [self entityNameForItem: anItem];
-    
-    if (name == nil)
-    {
-        [NSException raise: NSInvalidArgumentException
-                    format: @"COItem %@ lacks an entity name", anItem];
-    }
-    
-    ETModelDescriptionRepository *repo = [_parentContext modelRepository];
-	ETEntityDescription *desc = [repo descriptionForName: name];
-    
-    if (desc == nil)
-    {
-        desc = [repo descriptionForName: [self defaultEntityName]];
-    }
-    
-    return desc;
-}
-
-- (COObject *)objectWithStoreItem: (COItem *)anItem
-{
-	NILARG_EXCEPTION_TEST(anItem);
-    
-	ETEntityDescription *desc = [self descriptionForItem: anItem];
-	Class objClass = [[_parentContext modelRepository] classForEntityDescription: desc];
-    
-	COObject *obj = [[objClass alloc] initWithUUID: [anItem UUID]
-                                 entityDescription: desc
-                                           context: self];
-    [obj becomePersistentInContext: self];
-    [obj setStoreItem: anItem];
-	[obj release];
-    
-    [self addCachedOutgoingRelationshipsForObject: obj];
-    
-	return obj;
-}
-
-/** @taskunit COItemGraph protocol */
-
-- (ETUUID *) rootItemUUID
-{
-    return [_rootObject UUID];
-}
-
-/**
- * Returns immutable item
- */
-- (COItem *) itemForUUID: (ETUUID *)aUUID
-{
-    COObject *object = [self objectWithUUID: aUUID];
-
-    COItem *item = [object storeItem];
-    
-    return item;
-}
-
-- (NSArray *) itemUUIDs
-{
-    // FIXME: This API should return all UUIDs, not just loaded ones.
-    return [_loadedObjects allKeys];
-}
-
-/**
- * Insert or update an item.
- */
-- (void) addItem: (COItem *)item markAsInserted: (BOOL)markInserted
-{
-    NSParameterAssert(item != nil);
-    
-    ETUUID *uuid = [item UUID];
-    COObject *currentObject = [_loadedObjects objectForKey: uuid];
-    
-    if (currentObject == nil)
-    {
-        currentObject = [self objectWithStoreItem: item];
-
-//        if (markInserted)
-//        {
-//            [
-//        }
-    }
-    else
-    {
-        [self removeCachedOutgoingRelationshipsForObject: currentObject];
-        [currentObject setStoreItem: item];
-        [self addCachedOutgoingRelationshipsForObject: currentObject];
-//        [modifiedObjects_ addObject: uuid];
-    }
-}
-
-/**
- * Insert or update an item.
- */
-- (void) addItem: (COItem *)anItem
-{
-    [self addItem: anItem markAsInserted: YES];
-}
-
-/** @taskunit Setting entire graph */
-
-- (void) setItemGraph: (id <COItemGraph>)aGraph
-{
-    for (ETUUID *uuid in [aGraph itemUUIDs])
-    {
-        [self addItem: [aGraph itemForUUID: uuid] markAsInserted: NO];
-    }
-    
-    COObject *newRoot = [self objectWithUUID: [aGraph rootItemUUID]];
-    assert(newRoot != nil);
-    ASSIGN(_rootObject, newRoot);
 }
 
 /** @taskunit Persistent root info */

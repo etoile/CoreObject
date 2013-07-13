@@ -14,7 +14,7 @@
 #import "COObject.h"
 #import "CORevision.h"
 #import "FMDatabase.h"
-
+#import "CORevisionInfo.h"
 
 //#define CACHE_AMOUNT 30
 
@@ -122,7 +122,7 @@
 - (CORevision *)parentRevision
 {
     // WARNING: Accesses store
-    CORevisionID *revid = [[self currentRevisionInfo] parentRevisionId];
+    CORevisionID *revid = [[self currentRevisionInfo] parentRevisionID];
     COSQLiteStore *store = [[self persistentRoot] store];
     if (revid != nil)
     {

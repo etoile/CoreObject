@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COQuery.h>
 
-@class COPersistentRoot, COEditingContext, CORevision, COCommitTrack, CORelationshipCache;
+@class COPersistentRoot, COEditingContext, CORevision, COCommitTrack, CORelationshipCache, COObjectGraphContext;
 
 /**
  * Working copy of an object, owned by an editing context.
@@ -196,11 +196,12 @@
 	@private
 	ETEntityDescription *_entityDescription;
 	ETUUID *_uuid;
-	COPersistentRoot *_persistentRoot; // weak reference
+	COObjectGraphContext *_objectGraphContext; // weak reference
 	@protected
 	NSMutableDictionary *_variableStorage;
     CORelationshipCache *_incomingRelationships;
-	@package
+	// TODO: Remove if possible. We don't use setters when loading.
+    @package
 	BOOL _isIgnoringDamageNotifications;
 	@private
 	BOOL _inDescription; // FIXME: remove; only for debugging
@@ -272,6 +273,9 @@
  * returns nil.
  */
 - (COPersistentRoot *)persistentRoot;
+
+- (COObjectGraphContext *)objectGraphContext;
+
 /** 
  * Returns the root object when the receiver is persistent, otherwise returns nil.
  *
@@ -318,6 +322,8 @@
 - (NSArray *)allStronglyContainedObjects;
 - (NSArray *)allStronglyContainedObjectsIncludingSelf;
 - (NSSet *)allInnerObjectsIncludingSelf;
+
+- (NSArray*)embeddedOrReferencedObjects;
 
 /** @taskunit Basic Properties */
 
@@ -708,5 +714,5 @@
  * Private.
  */
 - (CORelationshipCache *)relationshipCache;
-
+- (void) markAsRemovedFromContext;
 @end

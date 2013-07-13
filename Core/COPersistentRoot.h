@@ -12,7 +12,7 @@
 #import <CoreObject/COEditingContext.h>
 #import <CoreObject/COItemGraph.h>
 
-@class COCommitTrack, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo;
+@class COCommitTrack, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo, COObjectGraphContext;
 
 /**
  * A persistent root editing context exposes as a working copy a CoreObject 
@@ -49,31 +49,18 @@
  * From a terminology standpoint, persistent root and core object can be used 
  * interchangeably.
  */
-@interface COPersistentRoot : NSObject <COPersistentObjectContext, COItemGraph>
+@interface COPersistentRoot : NSObject <COPersistentObjectContext>
 {
 	@private
 	COEditingContext *_parentContext;
     COPersistentRootInfo *_info;
 	COCommitTrack *_commitTrack;
-	COObject *_rootObject;
     /** If nil, we are a new persistent root */
 	CORevision *_revision; // Could be in _commitTrack, doesn't matter
-	/** Loaded (or inserted) objects by UUID */
-	NSMutableDictionary *_loadedObjects;
-	NSMutableSet *_insertedObjects;
-	NSMutableSet *_deletedObjects;
-    CORelationshipCache *_relationshipCache;
-	/** Array of updated property names by inner object */
-	NSMapTable *_updatedPropertiesByObject;
-
+    COObjectGraphContext *_objectGraph;
 }
 
 /** @taskunit Debugging */
-
-/**
- * Returns a summary that describes the uncommitted changes.
- */
-- (NSString *)description;
 
 /** @taskunit Persistent Root Properties */
 
@@ -179,6 +166,8 @@
  * See also -[COPersistentObjectContext editingContext].
  */
 @property (nonatomic, readonly) COEditingContext *editingContext;
+
+@property (nonatomic, readonly) COObjectGraphContext *objectGraph;
 
 /** @taskunit Object Access and Loading */
 
@@ -376,21 +365,7 @@
  */
 - (id)initWithInfo: (COPersistentRootInfo *)info
      parentContext: (COEditingContext *)aCtxt;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Declares the object as newly inserted and puts it among the loaded objects.
- *
- * The first registered object becomes the root object.
- */
-- (void)registerObject: (COObject *)object;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Tells the persistent root a property value has changed in a COObject class or
- * subclass instance.
- */
-- (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
+
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -434,8 +409,6 @@
  * NSInvalidArgumentException is raised.
  */
 - (Class)referenceClassForRootObject: (COObject *)aRootObject;
-
-- (void) setItemGraph: (id <COItemGraph>)aGraph;
 
 - (COPersistentRootInfo *) persistentRootInfo;
 
