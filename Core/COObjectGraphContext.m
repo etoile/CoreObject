@@ -167,7 +167,16 @@
 	COObject *obj = [[objClass alloc] initWithUUID: [anItem UUID]
                                  entityDescription: desc
                                            context: [self persistentRoot]];
-    [obj becomePersistentInContext: [self persistentRoot]];
+    
+    if (persistentRoot_ != nil)
+    {
+        [obj becomePersistentInContext: persistentRoot_];
+    }
+    else
+    {
+        [obj becomePersistentInObjectGraphContext: self];
+    }
+
     [obj setStoreItem: anItem];
 	[obj release];
     
@@ -202,6 +211,10 @@
     }
 }
 
+- (COObject *)insertObjectWithEntityName: (NSString *)aFullName
+{
+    return [self insertObjectWithEntityName: aFullName UUID: [ETUUID UUID]];
+}
 
 - (COObject *)insertObjectWithEntityName: (NSString *)aFullName
                                     UUID: (ETUUID *)aUUID
@@ -217,7 +230,14 @@
 	COObject *obj = [[objClass alloc] initWithUUID: aUUID
                                  entityDescription: desc
                                            context: nil];
-    [obj becomePersistentInContext: [self persistentRoot]];
+    if (persistentRoot_ != nil)
+    {
+        [obj becomePersistentInContext: persistentRoot_];
+    }
+    else
+    {
+        [obj becomePersistentInObjectGraphContext: self];
+    }
     
 	[obj release];
     
@@ -334,10 +354,6 @@
     return _updatedPropertiesByObject;
 }
 
-- (id)insertObjectWithEntityName: (NSString *)aFullName
-{
-	return [self insertObjectWithEntityName: aFullName UUID: [ETUUID UUID]];
-}
 #pragma mark access
 
 - (COObject *) objectWithUUID: (ETUUID *)aUUID

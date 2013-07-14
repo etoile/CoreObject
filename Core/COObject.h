@@ -256,6 +256,10 @@
  * Raises an exception if any argument is nil.
  */
 - (void)becomePersistentInContext: (COPersistentRoot *)aContext;
+
+// FIXME: Temporary hack, remove when -becomePersistentInContext is removed.
+- (void)becomePersistentInObjectGraphContext: (COObjectGraphContext *)aContext;
+
 - (id)copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription;
 
 /** taskunit Persistency Attributes */

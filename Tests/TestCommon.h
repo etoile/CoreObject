@@ -10,7 +10,9 @@
 #import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
 #import "COType.h"
-
+#import "COObjectGraphContext.h"
+#import "COObject.h"
+#import "COSerialization.h"
 
 #define SA(x) [NSSet setWithArray: x]
 

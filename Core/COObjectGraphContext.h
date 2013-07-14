@@ -99,6 +99,9 @@
 
 #pragma mark adding objects
 
+- (COObject *)insertObjectWithEntityName: (NSString *)aFullName;
+
+// FIXME: I don't think this should be public
 - (COObject *)insertObjectWithEntityName: (NSString *)aFullName
                                     UUID: (ETUUID *)aUUID;
 

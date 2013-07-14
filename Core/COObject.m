@@ -253,6 +253,13 @@ See +[NSObject typePrefix]. */
 	[_objectGraphContext registerObject: self];
 }
 
+// FIXME: Temporary hack, remove when -becomePersistentInContext is removed.
+- (void)becomePersistentInObjectGraphContext: (COObjectGraphContext *)aContext
+{
+    _objectGraphContext = aContext;
+	[_objectGraphContext registerObject: self];
+}
+
 // TODO: Maybe add convenience copying method, - (COObject *) copyWithCopier: (COCopier *)aCopier
 // where the copier stores the state relating to copying, e.g. which context to copy into.
 
@@ -1003,6 +1010,7 @@ See +[NSObject typePrefix]. */
 
 - (BOOL)isEqual: (id)anObject
 {
+    // FIXME: Replace with NestedVersioning's implementation
 	if (anObject == self)
 	{
 		return YES;
