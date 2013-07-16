@@ -20,7 +20,7 @@ ifeq ($(test), yes)
   CoreObject_PRINCIPAL_CLASS = TestCommon
 endif
 
-OTHER_HEADER_DIRS = . Core Diff Model Store Tracks Utilities
+OTHER_HEADER_DIRS = . Core Diff Model Store Tracks Utilities StorageDataModel
 
 CoreObject_HEADER_FILES_DIR = Headers
 CoreObject_HEADER_FILES = $(notdir $(wildcard Headers/*.h))
