@@ -170,7 +170,8 @@
     
     ETUUID *branchUUID = [store createBranchWithInitialRevision: [aRev revisionID]
                                                      setCurrent: YES
-                                              forPersistentRoot: [[self persistentRoot] persistentRootUUID]];
+                                              forPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                                                          error: NULL];
 	
     [[self persistentRoot] reloadPersistentRootInfo];
     
@@ -186,8 +187,9 @@
 	NILARG_EXCEPTION_TEST(aRev);
 
 	COPersistentRootInfo *info = [(COSQLiteStore *)[[self persistentRoot] store]
-                                  createPersistentRootWithInitialRevision: [aRev revisionID]
-                                  metadata: nil];
+                                    createPersistentRootWithInitialRevision: [aRev revisionID]
+                                    metadata: nil
+                                    error: NULL];
     
 	return [[[self persistentRoot] parentContext] makePersistentRootWithInfo: info];
 }

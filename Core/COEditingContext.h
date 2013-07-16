@@ -49,6 +49,9 @@
     /** Set of persistent roots pending deletion */
 	NSMutableSet *_deletedPersistentRoots;
 	COError *_error;
+    
+    /* COPath => COObjectGraphContext */
+    NSMutableDictionary *graphForPersistentRoot;
 }
 
 /** @taskunit Accessing the current context */

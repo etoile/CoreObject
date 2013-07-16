@@ -305,7 +305,8 @@
         COPersistentRootInfo *info = [store createPersistentRootWithInitialContents: _objectGraph
                                                                                UUID: [self persistentRootUUID]
                                                                          branchUUID: [[self commitTrack] UUID]
-                                                                           metadata: metadata];
+                                                                           metadata: metadata
+                                                                              error: NULL];
         revId = [[info mainBranchInfo] currentRevisionID];
 	}
     else
@@ -315,13 +316,15 @@
         revId = [store writeContents: _objectGraph
                         withMetadata: metadata
                     parentRevisionID: [_revision revisionID]
-                       modifiedItems: itemUUIDs];
+                       modifiedItems: itemUUIDs
+                               error: NULL];
         
         [store setCurrentRevision: revId
                      headRevision: revId
                      tailRevision: nil
                         forBranch: [[self commitTrack] UUID]
-                 ofPersistentRoot: [self persistentRootUUID]];
+                 ofPersistentRoot: [self persistentRootUUID]
+                            error: NULL];
     }
 
     [self reloadPersistentRootInfo];

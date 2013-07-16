@@ -512,7 +512,7 @@ store by other processes. */
 			continue;
 		
 		ETUUID *uuid = [persistentRoot persistentRootUUID];
-		[_store deletePersistentRoot: uuid];
+		[_store deletePersistentRoot: uuid error: NULL];
 
 		[persistentRoot unload];
 		[_loadedPersistentRoots removeObjectForKey: uuid];

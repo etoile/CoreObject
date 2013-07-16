@@ -105,7 +105,8 @@ static int itemChangedAtCommit(int i)
     // Commit them to a persistet root
     
     COPersistentRootInfo *proot = [store createPersistentRootWithInitialContents: initialTree
-                                                                         metadata: nil];
+                                                                        metadata: nil
+                                                                           error: NULL];
     
     // Commit a change to each object
     
@@ -124,8 +125,9 @@ static int itemChangedAtCommit(int i)
         
         lastCommitId = [store writeContents: initialTree
                                withMetadata: nil
-                       parentRevisionID: lastCommitId
-                              modifiedItems: A(childUUIDs[i])];
+                           parentRevisionID: lastCommitId
+                              modifiedItems: A(childUUIDs[i])
+                                      error: NULL];
     }
     
     // Set the persistent root's state to the last commit
@@ -134,7 +136,8 @@ static int itemChangedAtCommit(int i)
                  headRevision: lastCommitId
                  tailRevision: [[proot mainBranchInfo] currentRevisionID]
                     forBranch: [proot mainBranchUUID]
-             ofPersistentRoot: [proot UUID]];
+             ofPersistentRoot: [proot UUID]
+                        error: NULL];
     
     NSLog(@"committing a %d-item persistent root and then making %d commits which touched 1 item each took %lf ms",
           NUM_CHILDREN, NUM_COMMITS, 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
@@ -291,12 +294,12 @@ static int itemChangedAtCommit(int i)
     
     NSDate *startDate = [NSDate date];
     
-    [store beginTransaction];
+    [store beginTransactionWithError: NULL];
     for (int i =0; i<NUM_PERSISTENT_ROOTS; i++)
     {
-		[store createPersistentRootWithInitialContents: it metadata: nil];
+		[store createPersistentRootWithInitialContents: it metadata: nil error: NULL];
     }
-    [store commitTransaction];
+    [store commitTransactionWithError: NULL];
     
     UKPass();
     NSLog(@"creating %d persistent roots each containing a %d-item tree took %lf ms", NUM_PERSISTENT_ROOTS,
@@ -309,16 +312,18 @@ static int itemChangedAtCommit(int i)
     
     COItemGraph *it = [self makeItemTreeWithChildCount: NUM_CHILDREN_PER_PERSISTENT_ROOT];
 
-    [store beginTransaction];
+    [store beginTransactionWithError: NULL];
     COPersistentRootInfo *proot = [store createPersistentRootWithInitialContents: it
-                                                                         metadata: nil];
+                                                                        metadata: nil
+                                                                           error: NULL];
     
     for (int i =0; i<NUM_PERSISTENT_ROOT_COPIES; i++)
     {
         [store createPersistentRootWithInitialRevision: [[proot mainBranchInfo] currentRevisionID]
-                                              metadata: nil];
+                                              metadata: nil
+                                                 error: NULL];
     }
-    [store commitTransaction];
+    [store commitTransactionWithError: NULL];
     
     UKPass();
     NSLog(@"creating %d persistent root copies took %lf ms", NUM_PERSISTENT_ROOT_COPIES,
@@ -342,7 +347,8 @@ static int itemChangedAtCommit(int i)
     startDate = [NSDate date];
     
     COPersistentRootInfo *proot = [store createPersistentRootWithInitialContents: it
-                                                                        metadata: nil];
+                                                                        metadata: nil
+                                                                           error: NULL];
     
     NSLog(@"committing %d item itemtree took %lf ms", LOTS_OF_EMBEDDED_ITEMS,
           1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);

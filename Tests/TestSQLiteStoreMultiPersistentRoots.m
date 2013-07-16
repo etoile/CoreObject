@@ -49,9 +49,11 @@ static ETUUID *tagUUID;
     SUPERINIT;
     
     ASSIGN(docProot, [store createPersistentRootWithInitialContents: [self docItemTree]
-                                                         metadata: nil]);
+                                                           metadata: nil
+                                                              error: NULL]);
     ASSIGN(tagProot, [store createPersistentRootWithInitialContents: [self tagItemTreeWithDocProoUUID: [docProot UUID]]
-                                                         metadata: nil]);
+                                                            metadata: nil
+                                                              error: NULL]);
     return self;
 }
 

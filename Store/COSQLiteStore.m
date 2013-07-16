@@ -17,7 +17,7 @@
 @synthesize UUID = uuid_;
 @synthesize mainBranchUUID = mainBranch_;
 @synthesize branchForUUID = branchForUUID_;
-
+@synthesize changeCount = _changeCount;
 - (void) dealloc
 {
     [uuid_ release];
@@ -234,12 +234,12 @@
 
 /** @taskunit Transactions */
 
-- (void) beginTransaction
+- (void) beginTransactionWithError: (NSError **)error
 {
     [db_ beginDeferredTransaction];
     inUserTransaction_ = YES;
 }
-- (void) commitTransaction
+- (void) commitTransactionWithError: (NSError **)error
 {
     [db_ commit];
     inUserTransaction_ = NO;
@@ -485,8 +485,9 @@
 
 - (CORevisionID *) writeContents: (COItemGraph *)anItemTree
                     withMetadata: (NSDictionary *)metadata
-            parentRevisionID: (CORevisionID *)aParent
+                parentRevisionID: (CORevisionID *)aParent
                    modifiedItems: (NSArray*)modifiedItems // array of COUUID
+                           error: (NSError **)error
 {
     NSParameterAssert(anItemTree != nil);
     NSParameterAssert(aParent != nil);
@@ -657,7 +658,8 @@
                                              branchUUID: (ETUUID *)aBranchUUID
                                                  isCopy: (BOOL)isCopy
                                         initialRevision: (CORevisionID *)revId
-                                                metadata: (NSDictionary *)metadata
+                                               metadata: (NSDictionary *)metadata
+                                                  error: (NSError **)error
 {
     [self beginTransactionIfNeeded];
     
@@ -704,18 +706,21 @@
 }
 
 - (COPersistentRootInfo *) createPersistentRootWithInitialContents: (COItemGraph *)contents
-                                                           metadata: (NSDictionary *)metadata
+                                                          metadata: (NSDictionary *)metadata
+                                                             error: (NSError **)error
 {
     return [self createPersistentRootWithInitialContents: contents
                                                     UUID: [ETUUID UUID]
                                               branchUUID: [ETUUID UUID]
-                                                metadata: metadata];
+                                                metadata: metadata
+                                                   error: error];
 }
 
 - (COPersistentRootInfo *) createPersistentRootWithInitialContents: (id<COItemGraph>)contents
                                                               UUID: (ETUUID *)persistentRootUUID
                                                         branchUUID: (ETUUID *)aBranchUUID
                                                           metadata: (NSDictionary *)metadata
+                                                             error: (NSError **)error
 {
     CORevisionID *revId = [self writeItemTreeWithNoParent: contents
                                              withMetadata: [NSDictionary dictionary]
@@ -725,32 +730,38 @@
                                    branchUUID: aBranchUUID
                                        isCopy: NO
                               initialRevision: revId
-                                     metadata: metadata];
+                                     metadata: metadata
+                                        error: error];
 }
 
 - (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
                                                           metadata: (NSDictionary *)metadata
+                                                             error: (NSError **)error
 {
     return [self createPersistentRootWithUUID: [ETUUID UUID]
                                    branchUUID: [ETUUID UUID]
                                        isCopy: YES
                               initialRevision: aRevision
-                                     metadata: metadata];
+                                     metadata: metadata
+                                        error: error];
 }
 
 - (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
                                                               UUID: (ETUUID *)persistentRootUUID
                                                         branchUUID: (ETUUID *)aBranchUUID
                                                           metadata: (NSDictionary *)metadata
+                                                             error: (NSError **)error
 {
     return [self createPersistentRootWithUUID: persistentRootUUID
                                    branchUUID: aBranchUUID
                                        isCopy: YES
                               initialRevision: aRevision
-                                     metadata: metadata];
+                                     metadata: metadata
+                                        error: error];
 }
 
 - (BOOL) deletePersistentRoot: (ETUUID *)aRoot
+                        error: (NSError **)error
 {
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     if (root_id != nil)
@@ -761,6 +772,7 @@
 }
 
 - (BOOL) undeletePersistentRoot: (ETUUID *)aRoot
+                          error: (NSError **)error
 {
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     if (root_id != nil)
@@ -772,6 +784,7 @@
 
 - (BOOL) setMainBranch: (ETUUID *)aBranch
 		forPersistentRoot: (ETUUID *)aRoot
+                 error: (NSError **)error
 {
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     NSNumber *branch_id = [db_ numberForQuery: @"SELECT branch_id FROM branches WHERE proot = ? AND uuid = ? AND deleted = 0", root_id, [aBranch dataValue]];
@@ -787,6 +800,7 @@
 - (ETUUID *) createBranchWithInitialRevision: (CORevisionID *)revId
                                   setCurrent: (BOOL)setCurrent
                            forPersistentRoot: (ETUUID *)aRoot
+                                       error: (NSError **)error
 {
     [self beginTransactionIfNeeded];
     
@@ -804,7 +818,8 @@
     if (setCurrent)
     {
         assert([self setMainBranch: branchUUID
-                    forPersistentRoot: aRoot]);
+                 forPersistentRoot: aRoot
+                             error: NULL]);
     }
     
     [self commitTransactionIfNeeded];
@@ -817,6 +832,7 @@
                tailRevision: (CORevisionID*)tailRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot
+                      error: (NSError **)error
 {
     [db_ beginTransaction];
 
@@ -847,6 +863,7 @@
 
 - (BOOL) deleteBranch: (ETUUID *)aBranch
      ofPersistentRoot: (ETUUID *)aRoot
+                error: (NSError **)error
 {
     BOOL ok = [db_ executeUpdate: @"UPDATE branches SET deleted = 1 WHERE uuid = ? AND branch_id != (SELECT currentbranch FROM persistentroots WHERE root_id = proot)",
                [aBranch dataValue]];
@@ -859,6 +876,7 @@
 
 - (BOOL) undeleteBranch: (ETUUID *)aBranch
        ofPersistentRoot: (ETUUID *)aRoot
+                  error: (NSError **)error
 {
     BOOL ok = [db_ executeUpdate: @"UPDATE branches SET deleted = 0 WHERE uuid = ?",
                [aBranch dataValue]];
@@ -869,6 +887,7 @@
 - (BOOL) setMetadata: (NSDictionary *)meta
            forBranch: (ETUUID *)aBranch
     ofPersistentRoot: (ETUUID *)aRoot
+               error: (NSError **)error
 {
     NSData *data = [self writeMetadata: meta];    
     BOOL ok = [db_ executeUpdate: @"UPDATE branches SET metadata = ? WHERE uuid = ?",
@@ -880,6 +899,7 @@
 
 - (BOOL) setMetadata: (NSDictionary *)meta
    forPersistentRoot: (ETUUID *)aRoot
+               error: (NSError **)error
 {
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     NSData *data = [self writeMetadata: meta];
@@ -912,6 +932,7 @@
 }
 
 - (BOOL) finalizeDeletionsForPersistentRoot: (ETUUID *)aRoot
+                                      error: (NSError **)error
 {
     ETUUID *backingUUID = [self backingUUIDForPersistentRootUUID: aRoot];
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID];
