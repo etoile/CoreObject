@@ -27,6 +27,10 @@ return ret;
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSString *, stringForColumnIndex);
 }
 
+- (int64_t)int64ForQuery:(NSString*)query, ...; {
+    RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(int64_t, int64ForColumnIndex);
+}
+
 - (int)intForQuery:(NSString*)query, ...; {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(int, intForColumnIndex);
 }

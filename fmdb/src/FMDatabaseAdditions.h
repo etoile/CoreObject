@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 @interface FMDatabase (FMDatabaseAdditions)
 
-
+- (int64_t)int64ForQuery:(NSString*)query, ...;
 - (int)intForQuery:(NSString*)objs, ...;
 - (long)longForQuery:(NSString*)objs, ...; 
 - (BOOL)boolForQuery:(NSString*)objs, ...;
