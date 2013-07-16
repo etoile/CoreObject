@@ -705,17 +705,6 @@
     return plist;
 }
 
-- (COPersistentRootInfo *) createPersistentRootWithInitialContents: (COItemGraph *)contents
-                                                          metadata: (NSDictionary *)metadata
-                                                             error: (NSError **)error
-{
-    return [self createPersistentRootWithInitialContents: contents
-                                                    UUID: [ETUUID UUID]
-                                              branchUUID: [ETUUID UUID]
-                                                metadata: metadata
-                                                   error: error];
-}
-
 - (COPersistentRootInfo *) createPersistentRootWithInitialContents: (id<COItemGraph>)contents
                                                               UUID: (ETUUID *)persistentRootUUID
                                                         branchUUID: (ETUUID *)aBranchUUID
@@ -730,18 +719,6 @@
                                    branchUUID: aBranchUUID
                                        isCopy: NO
                               initialRevision: revId
-                                     metadata: metadata
-                                        error: error];
-}
-
-- (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
-                                                          metadata: (NSDictionary *)metadata
-                                                             error: (NSError **)error
-{
-    return [self createPersistentRootWithUUID: [ETUUID UUID]
-                                   branchUUID: [ETUUID UUID]
-                                       isCopy: YES
-                              initialRevision: aRevision
                                      metadata: metadata
                                         error: error];
 }

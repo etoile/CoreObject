@@ -105,6 +105,8 @@ static int itemChangedAtCommit(int i)
     // Commit them to a persistet root
     
     COPersistentRootInfo *proot = [store createPersistentRootWithInitialContents: initialTree
+                                                                            UUID: [ETUUID UUID]
+                                                                      branchUUID: [ETUUID UUID]
                                                                         metadata: nil
                                                                            error: NULL];
     
@@ -297,7 +299,11 @@ static int itemChangedAtCommit(int i)
     [store beginTransactionWithError: NULL];
     for (int i =0; i<NUM_PERSISTENT_ROOTS; i++)
     {
-		[store createPersistentRootWithInitialContents: it metadata: nil error: NULL];
+		[store createPersistentRootWithInitialContents: it
+                                                  UUID: [ETUUID UUID]
+                                            branchUUID: [ETUUID UUID]
+                                              metadata: nil
+                                                 error: NULL];
     }
     [store commitTransactionWithError: NULL];
     
@@ -314,12 +320,16 @@ static int itemChangedAtCommit(int i)
 
     [store beginTransactionWithError: NULL];
     COPersistentRootInfo *proot = [store createPersistentRootWithInitialContents: it
+                                                                            UUID: [ETUUID UUID]
+                                                                      branchUUID: [ETUUID UUID]
                                                                         metadata: nil
                                                                            error: NULL];
     
     for (int i =0; i<NUM_PERSISTENT_ROOT_COPIES; i++)
     {
         [store createPersistentRootWithInitialRevision: [[proot mainBranchInfo] currentRevisionID]
+                                                  UUID: [ETUUID UUID]
+                                            branchUUID: [ETUUID UUID]
                                               metadata: nil
                                                  error: NULL];
     }
@@ -347,6 +357,8 @@ static int itemChangedAtCommit(int i)
     startDate = [NSDate date];
     
     COPersistentRootInfo *proot = [store createPersistentRootWithInitialContents: it
+                                                                            UUID: [ETUUID UUID]
+                                                                      branchUUID: [ETUUID UUID]
                                                                         metadata: nil
                                                                            error: NULL];
     

@@ -126,6 +126,8 @@ static ETUUID *childUUID2;
     // First commit
     
     ASSIGN(proot, [store createPersistentRootWithInitialContents: [self makeInitialItemTree]
+                                                            UUID: [ETUUID UUID]
+                                                      branchUUID: [ETUUID UUID]
                                                         metadata: [self initialMetadata]
                                                            error: NULL]);
     ASSIGN(prootUUID, [proot UUID]);
@@ -530,6 +532,8 @@ static ETUUID *childUUID2;
 - (void)testPersistentRootCopies
 {
     COPersistentRootInfo *copy = [store createPersistentRootWithInitialRevision: initialRevisionId
+                                                                           UUID: [ETUUID UUID]
+                                                                     branchUUID: [ETUUID UUID]
                                                                         metadata: D(@"test2", @"name")
                                                                           error: NULL];
 

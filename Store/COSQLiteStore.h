@@ -378,10 +378,6 @@
  * persistent root, use -createPersistentRootWithInitialRevision:metadata: instead.
  */
 - (COPersistentRootInfo *) createPersistentRootWithInitialContents: (id<COItemGraph>)contents
-                                                           metadata: (NSDictionary *)metadata
-                                                             error: (NSError **)error;
-
-- (COPersistentRootInfo *) createPersistentRootWithInitialContents: (id<COItemGraph>)contents
                                                               UUID: (ETUUID *)persistentRootUUID
                                                         branchUUID: (ETUUID *)aBranchUUID
                                                           metadata: (NSDictionary *)metadata
@@ -401,11 +397,6 @@
  * the behaviour of -finalizeDeletionsForPersistentRoot:. It will garbage collect all unreferenced
  * revisions in the backing store of the passed in persistent root)
  */
-- (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
-                                                           metadata: (NSDictionary *)metadata
-                                                             error: (NSError **)error;
-
-
 - (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
                                                               UUID: (ETUUID *)persistentRootUUID
                                                         branchUUID: (ETUUID *)aBranchUUID

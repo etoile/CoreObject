@@ -188,6 +188,8 @@
 
 	COPersistentRootInfo *info = [(COSQLiteStore *)[[self persistentRoot] store]
                                     createPersistentRootWithInitialRevision: [aRev revisionID]
+                                    UUID: [ETUUID UUID]
+                                    branchUUID: [ETUUID UUID]
                                     metadata: nil
                                     error: NULL];
     
