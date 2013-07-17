@@ -20,7 +20,7 @@
 
 @implementation COCommitTrack
 
-@synthesize UUID, persistentRoot, isCopy, isMainBranch;
+@synthesize UUID, persistentRoot;
 
 - (id)init
 {
@@ -86,6 +86,12 @@
 {
     return YES;
 //	return ([self isCopy] == NO && [self parentTrack] != nil);
+}
+
+- (BOOL)isCopy
+{
+    // FIXME: Implement
+    return NO;
 }
 
 - (COBranchInfo *) branchInfo
