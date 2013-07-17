@@ -424,7 +424,6 @@
                  error: (NSError **)error;
 
 - (ETUUID *) createBranchWithInitialRevision: (CORevisionID *)aToken
-                                  setCurrent: (BOOL)setCurrent
                            forPersistentRoot: (ETUUID *)aRoot
                                        error: (NSError **)error;
 

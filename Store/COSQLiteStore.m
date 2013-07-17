@@ -812,31 +812,24 @@
 }
 
 - (ETUUID *) createBranchWithInitialRevision: (CORevisionID *)revId
-                                  setCurrent: (BOOL)setCurrent
                            forPersistentRoot: (ETUUID *)aRoot
                                        error: (NSError **)error
 {
-    [db_ savepoint: @"createBranchWithInitialRevision"];
-    
     ETUUID *branchUUID = [ETUUID UUID];
     
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
-    [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,?,0)",
+    BOOL ok = [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,?,0)",
      [branchUUID dataValue],
      root_id,
      [NSNumber numberWithLongLong: [revId revisionIndex]],
      [NSNumber numberWithLongLong: [revId revisionIndex]],
      [NSNumber numberWithLongLong: [revId revisionIndex]],
      nil];    
-    
-    if (setCurrent)
+  
+    if (!ok)
     {
-        assert([self setMainBranch: branchUUID
-                 forPersistentRoot: aRoot
-                             error: NULL]);
+        branchUUID = nil;
     }
-        
-    BOOL ok = [db_ releaseSavepoint: @"createBranchWithInitialRevision"];
     
     if (ok)
     {

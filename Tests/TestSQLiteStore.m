@@ -167,7 +167,6 @@ static ETUUID *childUUID2;
     ASSIGN(initialRevisionId, [[proot mainBranchInfo] currentRevisionID]);
     
     ASSIGN(branchAUUID, [store createBranchWithInitialRevision: initialRevisionId
-                                                    setCurrent: NO
                                              forPersistentRoot: prootUUID
                                                          error: NULL]);
     assert([store setCurrentRevision: [CORevisionID revisionWithBackinStoreUUID: [proot UUID] revisionIndex: BRANCH_LENGTH]
@@ -179,7 +178,6 @@ static ETUUID *childUUID2;
                                error: NULL]);
     
     ASSIGN(branchBUUID, [store createBranchWithInitialRevision: initialRevisionId
-                                                    setCurrent: NO
                                              forPersistentRoot: prootUUID
                                                          error: NULL]);
     

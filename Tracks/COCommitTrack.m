@@ -164,9 +164,12 @@
 	COSQLiteStore *store = [[self persistentRoot] store];
     
     ETUUID *branchUUID = [store createBranchWithInitialRevision: [aRev revisionID]
-                                                     setCurrent: YES
                                               forPersistentRoot: [[self persistentRoot] persistentRootUUID]
                                                           error: NULL];
+    
+    [store setMainBranch: branchUUID
+       forPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                   error: NULL];
 	
     [[self persistentRoot] reloadPersistentRootInfo];
     
