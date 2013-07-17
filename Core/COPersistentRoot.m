@@ -22,7 +22,7 @@
 @implementation COPersistentRoot
 
 @synthesize parentContext = _parentContext,
-	commitTrack = _commitTrack, rootObject = _rootObject, objectGraph = _objectGraph;
+	commitTrack = _commitTrack, objectGraph = _objectGraph;
 
 - (ETUUID *)persistentRootUUID
 {
@@ -82,7 +82,6 @@
 {
 	DESTROY(_info);
 	DESTROY(_commitTrack);
-	DESTROY(_rootObject);
 	DESTROY(_revision);
     DESTROY(_objectGraph);
 	[super dealloc];
