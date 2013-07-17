@@ -4,26 +4,78 @@ TODO
 First Release
 -------------
 
+- Tests
+  - Pass all tests, including all from NestedVersioning, rewriting them where needed.
+  - Test JSON serialization
+
+- COEditingContext: Implement new design with support for:
+  - support for loading the root object of a persistent root as a fault
+  - asychronous loading of persistent root contents / unfaulting faulted root object
+  - full support for cross-persistent root references
+  - support for having multiple branches of a persistent root loaded into memory at once
+  - batching persistent root mutations (revert current revision for branch to old revision,
+    change main branch, change branch metadata, etc.) rather than committing them immediately
+  - Maybe add method to get all persistent roots
+  - Use notifications posted by COSQLiteStore
+  - support "transient roots" in a COEditingContext. These are COObjectGraphContext wrappers.
+    Or, support creating a persistent root in code, then calling "freeze" which will make it 
+    read-only and prevent it from being committed to disk?
+  
+- COObjectGraphContext:
+  - Implement topological sort -didAwaken: method
+
+- Improve diff/merge API and code
+  - Improve Merging (move detection and custom attributed string merger)
+
+- Implement application-level undo/redo support
+
+- Work out clear and well documented object copy model easy to extend in COObject subclasses (see COObject and COEditingContext copy methods)
+  - Finish COCopier
+  - Support another reference type for copy: NOT a composite reference, but acts like one for the pruposes of copy. see the copy keynote, and the yellow arrows
+
+- Review metamodel constraints
+  - Add checks that derived properties are not persistent
+  - Add check that parent property (isContainer = YES) is derived
+  - Add check that one side of an opposite is derived
+  - Add a check that the derived side of a multivalued opposite is unordered
+
+- COObject
+  - Attempting to set a value for a readonly property should raise an exception
+  - Check COObject KVO semantics and documentation
+  - See if we can get rid of all of the properties that only make sense for root objects.
+    Maybe have a convention that the root embedded object is a subtype of COObject that
+    has all of these properties. If we want to make an arbitrary object a root object, 
+    we would actually make it a child of the real/wrapper root obejct with all of the
+    root object metadata.
+  - Clean out legacy code
+
+- COSQLiteStore
+  - Use change count for notifications. Make all mutations increment count.
+  - Actually use NSError
+  - Record in COPersistentRootInfo a copySource that records the persistent root UUID a cheap copy was made from (or just a flag, isCopy?)
+	- To avoid bloating the store, just store this in the root embedded object with the other metadata
+  - Force api users to pass in COPersistentRootInfo to all mutation methods?
+  - Switch to batch style api?
+  - Add "parent branch" metadata to a branch that records which branch a branch was forked from?
+  
 - Extend COCommitTrack API to support branches and merging revisions accross tracks
 - Rewrite COHistoryTrack
-- Work out clear and well documented object copy model easy to extend in COObject subclasses (see COObject and COEditingContext copy methods)
-- Check COObject KVO semantics and documentation
-- Check relationship integrity won't go against the developer needs
 - Fix COCustomTrack broken model
 - Make COQuery a bit more usable
 - Document COStore
 - Document COTrack class and subclasses
-- Implement deletion support in COStore, COObject and COEditingContext
+- Switch to NSUUID
+- Use NSSortedSet?
+
+x Check relationship integrity won't go against the developer needs
+x Implement deletion support in COStore, COObject and COEditingContext
 
 
 Future Work
 -----------
 
 - Switch from FMDB to an SQL abstraction backend 
-- Improve Diff API and code (probably reuse heavily NestedVersioning Diff implementation)
-- Improve Merging (move detection and custom attributed string merger)
-- Extract COCommitTrack node caching into a generic COCursor class
-- Figure out how to navigate large root object sets very quickly (evaluate writing a COSQLCursor class)
+
 - Implement Collaboration support (based on COSynchronizer and XMPP)
 - Figure out basic undo/redo support on an object edited collaboratively, probably using selective undo
 - Tune object copy model to respect user expectations about copy/paste in various recurrent use cases
@@ -31,7 +83,18 @@ Future Work
 - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
 - Evaluate a CORevision cache per COStore or process
 - Evaluate a COTrackNode cache per track
-- Adopt or leverage NestedVersioning improvements to the property list serialization model
+
+x Adopt or leverage NestedVersioning improvements to the property list serialization model
+x Figure out how to navigate large root object sets very quickly (evaluate writing a COSQLCursor class)/
+  How to scroll smoothly through 50 000 root objects in an Object Manager without loading all the objects in memory?
+  - I think we more or less have this figured out
+  
+
+Discarded (?)
+-------------
+
+- Extract COCommitTrack node caching into a generic COCursor class
+
 
 
 Missing Features
@@ -39,15 +102,14 @@ Missing Features
 
 - Schema Upgrade
 - NSPredicate to SQL generator using OMeta
-- History Compaction
-- Attachments to track imported files without importing all the data in the store (e.g. a photo or a song)
 - Import/Export
+
+x History Compaction
+x Attachments to track imported files without importing all the data in the store (e.g. a photo or a song)
 
 
 Open Questions
 --------------
-
-How to scroll smoothly through 50 000 root objects in an Object Manager without loading all the objects in memory? 
 
 - Adjust COEditingContext loaded object cache to use a strategy that matches which root objects are going to be accessed recurrently (e.g. photos in a Photo Manager should have priority over other root objects)
 - Write a COSQLCursor that can load root objects in advance
