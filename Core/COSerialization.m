@@ -94,7 +94,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	}
 	else
 	{
-		NSAssert(NO, @"Unsupported scalar serialization type %s for %@", type, value);
+		NSAssert2(NO, @"Unsupported scalar serialization type %s for %@", type, value);
 	}
 	return nil;
 }
@@ -432,7 +432,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	}
 	else
 	{
-		NSAssert(NO, @"Unsupported scalar serialization type %@ for %@", typeName, value);
+		NSAssert2(NO, @"Unsupported scalar serialization type %@ for %@", typeName, value);
 	}
 	return nil;
 }
@@ -485,7 +485,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
         }
         else
         {
-            NSAssert(NO, @"Unsupported serialization type %@ for %@", @(type), value);
+	    NSAssert2(NO, @"Unsupported serialization type %@ for %@", COTypeDescription(type), value);
         }
     }
 
@@ -534,7 +534,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 		}
 		else
 		{
-			 NSAssert(NO, @"Unsupported serialization type %@ for %@", @(type), value);
+		    NSAssert2(NO, @"Unsupported serialization type %@ for %@", COTypeDescription(type), value);
 		}
 		return value;
 	}
@@ -610,7 +610,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 			[NSException raise: NSInvalidArgumentException
 			            format: @"Tried to set serialized value %@ of type %@ "
 			                     "for property %@ missing in the metamodel %@",
-			                    serializedValue, @(serializedType), property, [self entityDescription]];
+			                    serializedValue, COTypeDescription(serializedType), property, [self entityDescription]];
 		}
 
 		id value = [self valueForSerializedValue: serializedValue

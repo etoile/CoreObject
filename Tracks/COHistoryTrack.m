@@ -7,6 +7,8 @@
 	License:  Modified BSD  (see COPYING)
  */
 
+#if 0
+
 #import "COHistoryTrack.h"
 #import "CORevision.h"
 #import "COEditingContext.h"
@@ -203,3 +205,5 @@
 }
 
 @end
+
+#endif

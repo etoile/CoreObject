@@ -7,6 +7,8 @@
 	License:  Modified BSD  (see COPYING)
  */
 
+#if 0
+
 #import "COSQLStore.h"
 #import "FMDatabase.h"
 
@@ -1337,3 +1339,5 @@ void CHECK(id db)
 }
 
 @end
+
+#endif

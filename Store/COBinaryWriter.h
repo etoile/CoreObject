@@ -83,7 +83,7 @@ static inline
 void
 co_buffer_store_uint16(co_buffer_t *dest, uint16_t value)
 {
-    uint16_t swapped = CFSwapInt16HostToBig(value);
+    uint16_t swapped = NSSwapHostShortToBig(value);
     WRITE(swapped);
 }
 
@@ -91,7 +91,7 @@ static inline
 void
 co_buffer_store_uint32(co_buffer_t *dest, uint32_t value)
 {
-    uint32_t swapped = CFSwapInt32HostToBig(value);
+    uint32_t swapped = NSSwapHostIntToBig(value);
     WRITE(swapped);
 }
 
@@ -99,7 +99,7 @@ static inline
 void
 co_buffer_store_uint64(co_buffer_t *dest, uint64_t value)
 {
-    uint64_t swapped = CFSwapInt64HostToBig(value);
+    uint64_t swapped = NSSwapHostLongLongToBig(value);
     WRITE(swapped);
 }
 
@@ -133,7 +133,7 @@ static inline
 void
 co_buffer_store_double(co_buffer_t *dest, double value)
 {
-	CFSwappedFloat64 swapped = CFConvertDoubleHostToSwapped(value);
+	NSSwappedDouble swapped = NSConvertHostDoubleToSwapped(value);
 	WRTITE_TYPE("F");
     WRITE(swapped);
 }

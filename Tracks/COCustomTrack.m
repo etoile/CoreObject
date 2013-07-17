@@ -6,6 +6,8 @@
 	License:  Modified BSD  (see COPYING)
  */
 
+#if 0
+
 #import "COCustomTrack.h"
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
@@ -306,3 +308,5 @@
 }
 
 @end
+
+#endif

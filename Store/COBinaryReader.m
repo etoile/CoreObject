@@ -10,21 +10,21 @@ static inline uint16_t readUint16(const unsigned char *bytes)
 {
     uint16_t unswapped;
     memcpy(&unswapped, bytes, 2);
-    return CFSwapInt16BigToHost(unswapped);
+    return NSSwapBigShortToHost(unswapped);
 }
 
 static inline uint32_t readUint32(const unsigned char *bytes)
 {
     uint32_t unswapped;
     memcpy(&unswapped, bytes, 4);
-    return CFSwapInt32BigToHost(unswapped);
+    return NSSwapBigIntToHost(unswapped);
 }
 
 static inline uint64_t readUint64(const unsigned char *bytes)
 {
     uint64_t unswapped;
     memcpy(&unswapped, bytes, 8);
-    return CFSwapInt64BigToHost(unswapped);
+    return NSSwapBigLongLongToHost(unswapped);
 }
 
 void co_reader_read(const unsigned char *bytes, size_t length, void *context, co_reader_callback_t callbacks)
@@ -56,9 +56,9 @@ void co_reader_read(const unsigned char *bytes, size_t length, void *context, co
                 break;
             case 'F':
             {
-                CFSwappedFloat64 swapped;
+                NSSwappedDouble swapped;
                 memcpy(&swapped, bytes + pos, 8);
-                const double value = CFConvertDoubleSwappedToHost(swapped);
+                const double value = NSConvertSwappedDoubleToHost(swapped);
                 callbacks.co_read_double(context, value);
                 pos += 8;
                 break;

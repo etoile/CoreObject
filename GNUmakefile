@@ -33,28 +33,22 @@ CoreObject_OBJC_FILES += $(wildcard Store/*.m)
 CoreObject_C_FILES = $(wildcard Store/*.c)
 CoreObject_OBJC_FILES += $(wildcard Tracks/*.m)
 CoreObject_OBJC_FILES += $(wildcard Utilities/*.m)
+CoreObject_OBJC_FILES += $(wildcard StorageDataModel/*.m)
 # Don't compile fmdb/src/fmdb.m
 CoreObject_OBJC_FILES += $(wildcard fmdb/src/FM*.m)
 
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += \
-	Tests/main.m \
-	Tests/TestArrayDiff.m \
-	Tests/TestCollection.m \
-	Tests/TestCommon.m \
-	Tests/TestCopy.m \
+	Tests/TestItem.m \
+	Tests/TestBinaryReadWrite.m \
+	Tests/TestSQLiteStore.m \
+	Tests/TestSQLiteStoreMultiPersistentRoots.m \
+	Tests/TestSQLiteStorePerformance.m \
+	Tests/TestSQLiteStorePersistentRootBackingStore.m \
 	Tests/TestCommitTrack.m \
-	Tests/TestCustomTrack.m \
-	Tests/TestEditingContext.m \
-	Tests/TestHistoryTrack.m \
-	Tests/TestObject.m \
-	Tests/TestObjectGraphDiff.m \
-	Tests/TestPerformance.m \
-	Tests/TestRelationshipIntegrity.m \
-	Tests/TestRevisionNumber.m \
-	Tests/TestSynchronization.m \
-	Tests/TestStore.m \
-	Tests/TestUtilities.m
+	Tests/TestCommon.m \
+	Tests/main.m \
+	Tests/TestRevisionNumber.m 
 endif
 
 clean : test=yes

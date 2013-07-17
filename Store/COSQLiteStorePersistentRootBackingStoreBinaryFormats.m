@@ -21,7 +21,7 @@ void ParseCombinedCommitDataInToUUIDToItemDataDictionary(NSMutableDictionary *de
         
         uint32_t length;
         memcpy(&length, bytes + offset, 4);
-        length = CFSwapInt32LittleToHost(length);
+        length = NSSwapLittleIntToHost(length);
         offset += 4;
         
         if ((replaceExisting
@@ -49,7 +49,7 @@ void AddCommitUUIDAndDataToCombinedCommitData(NSMutableData *combinedCommitData,
     {
         [NSException raise: NSInvalidArgumentException format: @"Can't write item data larger than 2^32-1 bytes"];
     }
-    uint32_t swappedInt = CFSwapInt32HostToLittle((uint32_t)len);
+    uint32_t swappedInt = NSSwapHostIntToLittle((uint32_t)len);
     
     [combinedCommitData appendBytes: &swappedInt
                              length: 4];

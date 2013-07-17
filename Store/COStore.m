@@ -7,6 +7,8 @@
 	License:  Modified BSD  (see COPYING)
  */
 
+#if 0
+
 #import "COStore.h"
 #import "FMDatabase.h"
 
@@ -434,3 +436,5 @@ NSString *kCOStoreUUIDStringKey = @"kCOStoreUUIDStringKey";
 }
 
 @end
+
+#endif
