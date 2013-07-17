@@ -574,34 +574,35 @@
 
 - (BOOL)rollback {
     BOOL b = [self executeUpdate:@"ROLLBACK TRANSACTION;"];
-    if (b) {
-        inTransaction = NO;
-    }
     return b;
 }
 
 - (BOOL)commit {
     BOOL b =  [self executeUpdate:@"COMMIT TRANSACTION;"];
-    if (b) {
-        inTransaction = NO;
-    }
     return b;
 }
 
 - (BOOL)beginDeferredTransaction {
     BOOL b =  [self executeUpdate:@"BEGIN DEFERRED TRANSACTION;"];
-    if (b) {
-        inTransaction = YES;
-    }
     return b;
 }
 
 - (BOOL)beginTransaction {
     BOOL b =  [self executeUpdate:@"BEGIN EXCLUSIVE TRANSACTION;"];
-    if (b) {
-        inTransaction = YES;
-    }
     return b;
+}
+
+- (BOOL)savepoint: (NSString *)aName
+{
+    return [self executeUpdate: [@"SAVEPOINT " stringByAppendingString: aName]];
+}
+- (BOOL)releaseSavepoint: (NSString *)aName
+{
+    return [self executeUpdate: [@"RELEASE SAVEPOINT " stringByAppendingString: aName]];
+}
+- (BOOL)rollbackToSavepoint: (NSString *)aName
+{
+    return [self executeUpdate: [@"ROLLBACK TRANSACTION TO SAVEPOINT " stringByAppendingString: aName]];   
 }
 
 - (BOOL)logsErrors {
@@ -619,7 +620,7 @@
 }
 
 - (BOOL)inUse {
-    return inUse || inTransaction;
+    return inUse || [self inTransaction];
 }
 
 - (void)setInUse:(BOOL)b {
@@ -627,10 +628,7 @@
 }
 
 - (BOOL)inTransaction {
-    return inTransaction;
-}
-- (void)setInTransaction:(BOOL)flag {
-    inTransaction = flag;
+    return sqlite3_get_autocommit(db) == 0;
 }
 
 - (BOOL)traceExecution {

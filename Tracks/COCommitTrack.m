@@ -50,11 +50,6 @@
 	/* The persistent root retains us */
 	persistentRoot = aContext;
 
-	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-	                                                    selector: @selector(currentNodeDidChangeInStore:) 
-	                                                        name: COStoreDidChangeCurrentNodeOnTrackNotification 
-	                                                      object: [[self UUID] stringValue]];
-
 	return self;	
 }
 

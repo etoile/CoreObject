@@ -9,7 +9,6 @@
     BOOL        logsErrors;
     BOOL        crashOnErrors;
     BOOL        inUse;
-    BOOL        inTransaction;
     BOOL        traceExecution;
     BOOL        checkedOut;
     int         busyRetryTimeout;
@@ -58,6 +57,10 @@
 - (BOOL)beginTransaction;
 - (BOOL)beginDeferredTransaction;
 
+- (BOOL)savepoint: (NSString *)aName;
+- (BOOL)releaseSavepoint: (NSString *)aName;
+- (BOOL)rollbackToSavepoint: (NSString *)aName;
+
 - (BOOL)logsErrors;
 - (void)setLogsErrors:(BOOL)flag;
 
@@ -68,7 +71,6 @@
 - (void)setInUse:(BOOL)value;
 
 - (BOOL)inTransaction;
-- (void)setInTransaction:(BOOL)flag;
 
 - (BOOL)traceExecution;
 - (void)setTraceExecution:(BOOL)flag;

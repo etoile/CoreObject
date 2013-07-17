@@ -250,6 +250,9 @@
     BOOL inUserTransaction_;
     
     ETUUID *_uuid;
+    
+    
+    NSMutableDictionary *notificationUserInfoToPostForPersistentRootUUID_;
 }
 
 /**
@@ -498,9 +501,10 @@
 
 @end
 
-// TODO: Rethink the constants once we implement the new notification model
-extern NSString *COStoreDidChangeCurrentNodeOnTrackNotification;
-extern NSString *kCONewCurrentNodeIDKey;
-extern NSString *kCONewCurrentNodeRevisionNumberKey;
-extern NSString *kCOOldCurrentNodeRevisionNumberKey;
-extern NSString *kCOStoreUUIDStringKey;
+extern NSString *COStorePersistentRootDidChangeNotification;
+extern NSString *kCOPersistentRootUUID;
+extern NSString *kCOPersistentRootChangeCount;
+extern NSString *kCOPersistentRootDeleted;
+extern NSString *kCOStoreUUID;
+extern NSString *kCOStoreURL;
+

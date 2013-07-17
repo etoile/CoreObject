@@ -80,6 +80,7 @@
 	url_ = [aURL retain];
 	backingStores_ = [[NSMutableDictionary alloc] init];
     backingStoreUUIDForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
+    notificationUserInfoToPostForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
     
 	BOOL isDirectory;
 	BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath: [url_ path]
@@ -209,6 +210,7 @@
 	[url_ release];
     [backingStores_ release];
     [backingStoreUUIDForPersistentRootUUID_ release];
+    [notificationUserInfoToPostForPersistentRootUUID_ release];
     [_uuid release];
 	[super dealloc];
 }
@@ -241,36 +243,15 @@
 }
 - (void) commitTransactionWithError: (NSError **)error
 {
-    [db_ commit];
+    BOOL ok = [db_ commit];
+    
+    if (ok)
+    {
+        [self postCommitNotifications];
+    }
+    
     inUserTransaction_ = NO;
 }
-
-- (BOOL) beginTransactionIfNeeded
-{
-    if (!inUserTransaction_)
-    {
-        return [db_ beginTransaction];
-    }
-    return YES;
-}
-- (BOOL) commitTransactionIfNeeded
-{
-    if (!inUserTransaction_)
-    {
-        return [db_ commit];
-    }
-    return YES;
-}
-
-- (BOOL) rollbackTransactionIfNeeded
-{
-    if (!inUserTransaction_)
-    {
-        return [db_ rollback];
-    }
-    return YES;
-}
-
 
 - (NSArray *) allBackingUUIDs
 {
@@ -421,11 +402,7 @@
         modifiedItems = [anItemTree itemUUIDs];
     }
     
-    const BOOL wasInTransaction = [db_ inTransaction];
-    if (!wasInTransaction)
-    {
-        [self beginTransactionIfNeeded];
-    }
+    [db_ savepoint: @"updateSearchIndexesForItemUUIDs"];
     
     NSData *backingUUIDData = [[aRevision backingStoreUUID] dataValue];
     
@@ -465,10 +442,7 @@
      [NSNumber numberWithLongLong: [db_ lastInsertRowId]],
      allItemsFtsContent];
     
-    if (!wasInTransaction)
-    {
-        [self commitTransactionIfNeeded];
-    }
+    [db_ releaseSavepoint: @"updateSearchIndexesForItemUUIDs"];
     
     //NSLog(@"Index text '%@' at revision id %@", allItemsFtsContent, aRevision);
     
@@ -691,7 +665,7 @@
                                                metadata: (NSDictionary *)metadata
                                                   error: (NSError **)error
 {
-    [self beginTransactionIfNeeded];
+    [db_ savepoint: @"createPersistentRootWithUUID"];
     
     [db_ executeUpdate: @"INSERT INTO persistentroots (uuid, "
            "backingstore, currentbranch, deleted) VALUES(?,?,NULL,0)",
@@ -714,7 +688,7 @@
       [NSNumber numberWithLongLong: branch_id],
       [NSNumber numberWithLongLong: root_id]];
 
-    [self commitTransactionIfNeeded];
+    [db_ releaseSavepoint: @"createPersistentRootWithUUID"];
     
     // Return info
     
@@ -769,38 +743,72 @@
 - (BOOL) deletePersistentRoot: (ETUUID *)aRoot
                         error: (NSError **)error
 {
+    BOOL ok = NO;
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     if (root_id != nil)
     {
-        return [db_ executeUpdate: @"UPDATE persistentroots SET deleted = 1 WHERE root_id = ?", root_id];
+        ok = [db_ executeUpdate: @"UPDATE persistentroots SET deleted = 1 WHERE root_id = ?", root_id];
     }
-    return NO;
+    
+    if (ok)
+    {
+        [self recordCommitNotificationsWithPersistentRootUUID: aRoot
+                                                  changeCount: 0
+                                                      deleted: YES];
+    }
+    
+    return ok;
 }
 
 - (BOOL) undeletePersistentRoot: (ETUUID *)aRoot
                           error: (NSError **)error
 {
+    BOOL ok = NO;
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     if (root_id != nil)
     {
-        return [db_ executeUpdate: @"UPDATE persistentroots SET deleted = 0 WHERE root_id = ?", root_id];
+        ok = [db_ executeUpdate: @"UPDATE persistentroots SET deleted = 0 WHERE root_id = ?", root_id];
     }
-    return NO;
+    
+    if (ok)
+    {
+        [self recordCommitNotificationsWithPersistentRootUUID: aRoot
+                                                  changeCount: 0
+                                                      deleted: NO];
+    }
+    
+    return ok;
 }
 
 - (BOOL) setMainBranch: (ETUUID *)aBranch
 		forPersistentRoot: (ETUUID *)aRoot
                  error: (NSError **)error
 {
+    [db_ savepoint: @"setMainBranch"];
+    
+    BOOL ok;
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     NSNumber *branch_id = [db_ numberForQuery: @"SELECT branch_id FROM branches WHERE proot = ? AND uuid = ? AND deleted = 0", root_id, [aBranch dataValue]];
     if (branch_id != nil)
     {
-        return [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE root_id = ?",
+        ok = [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE root_id = ?",
                    branch_id,
                    root_id];
     }
-    return NO;
+    else
+    {
+        ok = NO;
+    }
+    
+    [db_ releaseSavepoint: @"setMainBranch"];
+    
+    if (ok)
+    {
+        [self recordCommitNotificationsWithPersistentRootUUID: aRoot
+                                                  changeCount: 0
+                                                      deleted: NO];
+    }
+    return ok;
 }
 
 - (ETUUID *) createBranchWithInitialRevision: (CORevisionID *)revId
@@ -808,7 +816,7 @@
                            forPersistentRoot: (ETUUID *)aRoot
                                        error: (NSError **)error
 {
-    [self beginTransactionIfNeeded];
+    [db_ savepoint: @"createBranchWithInitialRevision"];
     
     ETUUID *branchUUID = [ETUUID UUID];
     
@@ -827,8 +835,15 @@
                  forPersistentRoot: aRoot
                              error: NULL]);
     }
+        
+    BOOL ok = [db_ releaseSavepoint: @"createBranchWithInitialRevision"];
     
-    [self commitTransactionIfNeeded];
+    if (ok)
+    {
+        [self recordCommitNotificationsWithPersistentRootUUID: aRoot
+                                                  changeCount: 0
+                                                      deleted: NO];
+    }
     
     return branchUUID;
 }
@@ -841,13 +856,13 @@
          currentChangeCount: (int64_t *)aChangeCountInOut
                       error: (NSError **)error
 {
-    [db_ beginTransaction];
+    [db_ savepoint: @"setCurrentRevision"];
 
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     if (![self checkAndUpdateChangeCount: aChangeCountInOut forPersistentRootId: root_id])
     {
-        [db_ rollback];
-        return nil;
+        [db_ releaseSavepoint: @"setCurrentRevision"];
+        return NO;
     }
     
     NSData *branchData = [aBranch dataValue];
@@ -871,7 +886,16 @@
                 branchData];
     }
 
-    return [db_ commit];
+    BOOL ok = [db_ releaseSavepoint: @"setCurrentRevision"];
+    
+    if (ok)
+    {
+        [self recordCommitNotificationsWithPersistentRootUUID: aRoot
+                                                  changeCount: 0
+                                                      deleted: NO];
+    }
+    
+    return ok;
 }
 
 
@@ -883,8 +907,16 @@
                [aBranch dataValue]];
     if (ok)
     {
-        return [db_ changes] > 0;
+        ok = [db_ changes] > 0;
     }
+    
+    if (ok)
+    {
+        [self recordCommitNotificationsWithPersistentRootUUID: aRoot
+                                                  changeCount: 0
+                                                      deleted: NO];
+    }
+    
     return ok;
 }
 
@@ -894,6 +926,13 @@
 {
     BOOL ok = [db_ executeUpdate: @"UPDATE branches SET deleted = 0 WHERE uuid = ?",
                [aBranch dataValue]];
+    
+    if (ok)
+    {
+        [self recordCommitNotificationsWithPersistentRootUUID: aRoot
+                                                  changeCount: 0
+                                                      deleted: NO];
+    }
     
     return ok;
 }
@@ -907,6 +946,13 @@
     BOOL ok = [db_ executeUpdate: @"UPDATE branches SET metadata = ? WHERE uuid = ?",
                data,
                [aBranch dataValue]];
+    
+    if (ok)
+    {
+        [self recordCommitNotificationsWithPersistentRootUUID: aRoot
+                                                  changeCount: 0
+                                                      deleted: NO];
+    }
     
     return ok;
 }
@@ -932,6 +978,7 @@
     return YES;
 }
 
+// Must not be wrapped in a transaction
 - (BOOL) finalizeDeletionsForPersistentRoot: (ETUUID *)aRoot
                                       error: (NSError **)error
 {
@@ -1025,10 +1072,53 @@
     return results;
 }
 
+- (void) recordCommitNotificationsWithPersistentRootUUID: (ETUUID *)aUUID
+                                             changeCount: (int64_t)changeCount
+                                                 deleted: (BOOL)deleted
+{
+    NSDictionary *userInfo = D(aUUID, kCOPersistentRootUUID,
+                               [NSNumber numberWithLongLong: changeCount], kCOPersistentRootChangeCount,
+                               [NSNumber numberWithBool: deleted], kCOPersistentRootDeleted,
+                               [[self UUID] stringValue], kCOStoreUUID,
+                               [[self URL] absoluteString], kCOStoreURL);
+    
+    [notificationUserInfoToPostForPersistentRootUUID_ setObject: userInfo forKey: aUUID];
+    
+    if (![db_ inTransaction])
+    {
+        [self postCommitNotifications];
+    }
+}
+- (void) mainThreadPostLocalNotification: (NSDictionary *)userInfo
+{
+    // TODO: Check if we need to use NSNotificationQueue?
+    [[NSNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
+                                                        object: self
+                                                      userInfo: userInfo];
+}
+
+- (void) postCommitNotifications
+{
+    for (NSDictionary *userInfo in [notificationUserInfoToPostForPersistentRootUUID_ allValues])
+    {
+        NSLog(@"Post: %@", userInfo);
+//        [self performSelectorOnMainThread: @selector(mainThreadPostLocalNotification:)
+//                               withObject: userInfo
+//                            waitUntilDone: NO];
+//        
+//        [[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
+//                                                                       object: [[self UUID] stringValue]
+//                                                                     userInfo: userInfo
+//                                                           deliverImmediately: NO];
+    }
+    [notificationUserInfoToPostForPersistentRootUUID_ removeAllObjects];
+}
+
 @end
 
-NSString *COStoreDidChangeCurrentNodeOnTrackNotification = @"COStoreDidChangeCurrentNodeOnTrackNotification";
-NSString *kCONewCurrentNodeIDKey = @"kCONewCurrentNodeIDKey";
-NSString *kCONewCurrentNodeRevisionNumberKey = @"kCONewCurrentNodeRevisionNumberKey";
-NSString *kCOOldCurrentNodeRevisionNumberKey = @"kCOOldCurrentNodeRevisionNumberKey";
-NSString *kCOStoreUUIDStringKey = @"kCOStoreUUIDStringKey";
+NSString *COStorePersistentRootDidChangeNotification = @"COStorePersistentRootDidChangeNotification";
+NSString *kCOPersistentRootUUID = @"COPersistentRootUUID";
+NSString *kCOPersistentRootChangeCount = @"COPersistentRootChangeCount";
+NSString *kCOPersistentRootDeleted = @"COPersistentRootDeleted";
+NSString *kCOStoreUUID = @"COStoreUUID";
+NSString *kCOStoreURL = @"COStoreURL";
