@@ -368,7 +368,6 @@
 		66094846178794D40049468B /* COItem+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "COItem+JSON.h"; sourceTree = "<group>"; };
 		6609485C1787A1160049468B /* CORelationshipCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CORelationshipCache.m; path = Core/CORelationshipCache.m; sourceTree = "<group>"; };
 		6609485D1787A1160049468B /* CORelationshipCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CORelationshipCache.h; path = Core/CORelationshipCache.h; sourceTree = "<group>"; };
-		6614500F12B0127E000DB843 /* Design.rtfd */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; path = Design.rtfd; sourceTree = "<group>"; };
 		664199A4178C3E1800B78174 /* TestItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestItem.m; path = Tests/TestItem.m; sourceTree = "<group>"; };
 		664199A5178C3E1800B78174 /* TestBinaryReadWrite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBinaryReadWrite.m; path = Tests/TestBinaryReadWrite.m; sourceTree = "<group>"; };
 		664199B0178C431D00B78174 /* TestSQLiteStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStore.m; path = Tests/TestSQLiteStore.m; sourceTree = "<group>"; };
@@ -405,16 +404,10 @@
 		6686BDAC12592BDA0065DE1A /* CoreObject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CoreObject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6686BDAD12592BDA0065DE1A /* CoreObject-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CoreObject-Info.plist"; sourceTree = "<group>"; };
 		66982A1F11EBC2A0007154CD /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
-		6699633C115F0C5E00359BE6 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		669963EB11600FD500359BE6 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		669965351162E17500359BE6 /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = /usr/lib/libz.1.2.5.dylib; sourceTree = "<absolute>"; };
 		6699653F1162E1C000359BE6 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
-		6699661A11632D3300359BE6 /* DESIGN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DESIGN; sourceTree = "<group>"; wrapsLines = 1; };
 		66D099C4129AE111006BEDC3 /* StoreTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = StoreTest; sourceTree = BUILT_PRODUCTS_DIR; };
-		66D09B25129B7440006BEDC3 /* UNSOLVEDPROBLEMS */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UNSOLVEDPROBLEMS; sourceTree = "<group>"; };
-		66D09B26129B7448006BEDC3 /* SOLVEDPROBLEMS */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SOLVEDPROBLEMS; sourceTree = "<group>"; };
-		66D09B28129B7838006BEDC3 /* IMPLEMENTATION */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = IMPLEMENTATION; sourceTree = "<group>"; };
-		66D09B29129B78C8006BEDC3 /* NOTES */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NOTES; sourceTree = "<group>"; };
 		66D96C9F178B6E5600D1553C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		66D96CA2178B717000D1553C /* COBinaryReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBinaryReader.h; path = Store/COBinaryReader.h; sourceTree = "<group>"; };
 		66D96CA3178B717000D1553C /* COBinaryReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBinaryReader.m; path = Store/COBinaryReader.m; sourceTree = "<group>"; };
@@ -759,15 +752,8 @@
 		6699633B115F0C4200359BE6 /* Documentation */ = {
 			isa = PBXGroup;
 			children = (
-				6614500F12B0127E000DB843 /* Design.rtfd */,
-				6699633C115F0C5E00359BE6 /* README */,
 				669963EB11600FD500359BE6 /* LICENSE */,
-				6699661A11632D3300359BE6 /* DESIGN */,
 				66982A1F11EBC2A0007154CD /* TODO */,
-				66D09B25129B7440006BEDC3 /* UNSOLVEDPROBLEMS */,
-				66D09B26129B7448006BEDC3 /* SOLVEDPROBLEMS */,
-				66D09B28129B7838006BEDC3 /* IMPLEMENTATION */,
-				66D09B29129B78C8006BEDC3 /* NOTES */,
 			);
 			name = Documentation;
 			sourceTree = "<group>";
