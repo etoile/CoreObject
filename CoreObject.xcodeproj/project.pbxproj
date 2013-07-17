@@ -84,6 +84,7 @@
 		66094848178794D40049468B /* COItem+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 66094846178794D40049468B /* COItem+JSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6609485E1787A1160049468B /* CORelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6609485C1787A1160049468B /* CORelationshipCache.m */; };
 		6609485F1787A1160049468B /* CORelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 6609485D1787A1160049468B /* CORelationshipCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		66455AAD1796E85A00E57127 /* TestCrossPersistentRootReferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */; };
 		6675F8C11785C02A001E5622 /* COItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BA1785C02A001E5622 /* COItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C21785C02A001E5622 /* COItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BB1785C02A001E5622 /* COItem.m */; };
 		6675F8C31785C02A001E5622 /* COItemGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BC1785C02A001E5622 /* COItemGraph.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -374,6 +375,7 @@
 		664199B1178C431D00B78174 /* TestSQLiteStoreMultiPersistentRoots.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStoreMultiPersistentRoots.m; path = Tests/TestSQLiteStoreMultiPersistentRoots.m; sourceTree = "<group>"; };
 		664199B2178C431E00B78174 /* TestSQLiteStorePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStorePerformance.m; path = Tests/TestSQLiteStorePerformance.m; sourceTree = "<group>"; };
 		664199B3178C431E00B78174 /* TestSQLiteStorePersistentRootBackingStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStorePersistentRootBackingStore.m; path = Tests/TestSQLiteStorePersistentRootBackingStore.m; sourceTree = "<group>"; };
+		66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCrossPersistentRootReferences.m; path = Tests/TestCrossPersistentRootReferences.m; sourceTree = "<group>"; };
 		6675F8BA1785C02A001E5622 /* COItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItem.h; sourceTree = "<group>"; };
 		6675F8BB1785C02A001E5622 /* COItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COItem.m; sourceTree = "<group>"; };
 		6675F8BC1785C02A001E5622 /* COItemGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItemGraph.h; sourceTree = "<group>"; };
@@ -795,6 +797,7 @@
 			isa = PBXGroup;
 			children = (
 				609C00541704C24C00D01AAB /* main.m */,
+				66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */,
 				609C00551704C24C00D01AAB /* TestArrayDiff.m */,
 				609C00561704C24C00D01AAB /* TestCollection.m */,
 				609C00571704C24C00D01AAB /* TestCommitTrack.m */,
@@ -1300,6 +1303,7 @@
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				609C00651704C24C00D01AAB /* main.m in Sources */,
 				607EB6F2178D50610024B34D /* TestRevisionNumber.m in Sources */,
+				66455AAD1796E85A00E57127 /* TestCrossPersistentRootReferences.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
