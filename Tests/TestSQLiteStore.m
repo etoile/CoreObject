@@ -11,6 +11,7 @@
 {
     COPersistentRootInfo *proot;
     ETUUID *prootUUID;
+    int64_t prootChangeCount;
     
     ETUUID *initialBranchUUID;
     ETUUID *branchAUUID;
@@ -131,6 +132,7 @@ static ETUUID *childUUID2;
                                                         metadata: [self initialMetadata]
                                                            error: NULL]);
     ASSIGN(prootUUID, [proot UUID]);
+    prootChangeCount = proot.changeCount;
     
     // Branch A
     
@@ -173,6 +175,7 @@ static ETUUID *childUUID2;
                         tailRevision: initialRevisionId
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID
+                  currentChangeCount: &prootChangeCount
                                error: NULL]);
     
     ASSIGN(branchBUUID, [store createBranchWithInitialRevision: initialRevisionId
@@ -185,6 +188,7 @@ static ETUUID *childUUID2;
                         tailRevision: initialRevisionId
                            forBranch: branchBUUID
                     ofPersistentRoot: prootUUID
+                  currentChangeCount: &prootChangeCount
                                error: NULL]);
     
     return self;
@@ -311,6 +315,7 @@ static ETUUID *childUUID2;
                         tailRevision: [branchA tailRevisionID]
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID
+                  currentChangeCount: &prootChangeCount
                                error: NULL]);
     
     branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
@@ -323,6 +328,7 @@ static ETUUID *childUUID2;
                         tailRevision: [branchA tailRevisionID]
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID
+                  currentChangeCount: &prootChangeCount
                                error: NULL]);
     
     branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
@@ -335,12 +341,62 @@ static ETUUID *childUUID2;
                         tailRevision: [[branchA currentRevisionID] revisionIDWithRevisionIndex: BRANCH_EARLY]
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID
+                  currentChangeCount: &prootChangeCount
                                error: NULL]);
     
     branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKIntsEqual(BRANCH_EARLY, [[branchA tailRevisionID] revisionIndex]);
     UKIntsEqual(BRANCH_LATER, [[branchA headRevisionID] revisionIndex]);
     UKIntsEqual(BRANCH_LATER, [[branchA currentRevisionID] revisionIndex]);
+}
+
+- (void) testSetCurrentVersionChangeCount
+{
+    COBranchInfo *branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
+    UKIntsEqual(0, [[branchA tailRevisionID] revisionIndex]);
+    UKIntsEqual(BRANCH_LENGTH, [[branchA headRevisionID] revisionIndex]);
+    UKIntsEqual(BRANCH_LENGTH, [[branchA currentRevisionID] revisionIndex]);
+
+    // Open another store and change the current revision
+    
+    int64_t store2ChangeCount = prootChangeCount;
+    {
+        COSQLiteStore *store2 = [[COSQLiteStore alloc] initWithURL: [store URL]];
+        
+        UKTrue([store2 setCurrentRevision: [[branchA currentRevisionID] revisionIDWithRevisionIndex: BRANCH_LATER]
+                             headRevision: [branchA headRevisionID]
+                             tailRevision: [branchA tailRevisionID]
+                                forBranch: branchAUUID
+                         ofPersistentRoot: prootUUID
+                       currentChangeCount: &store2ChangeCount
+                                    error: NULL]);
+        
+        [store2 release];
+    }
+    
+    // Try to change the revision again, pretending we didn't notice the
+    // store2 change
+
+    UKFalse([store setCurrentRevision: [[branchA currentRevisionID] revisionIDWithRevisionIndex: BRANCH_EARLY]
+                         headRevision: [branchA headRevisionID]
+                         tailRevision: [branchA tailRevisionID]
+                            forBranch: branchAUUID
+                     ofPersistentRoot: prootUUID
+                   currentChangeCount: &prootChangeCount
+                                error: NULL]);
+
+    // Reload our in-memory state, and the call should succeed
+    
+    ASSIGN(proot, [store persistentRootInfoForUUID: prootUUID]);
+    prootChangeCount = proot.changeCount;
+    
+    UKTrue([store setCurrentRevision: [[branchA currentRevisionID] revisionIDWithRevisionIndex: BRANCH_EARLY]
+                         headRevision: [branchA headRevisionID]
+                         tailRevision: [branchA tailRevisionID]
+                            forBranch: branchAUUID
+                     ofPersistentRoot: prootUUID
+                   currentChangeCount: &prootChangeCount
+                                error: NULL]);
 }
 
 - (void) testCrossPersistentRootReference
@@ -384,6 +440,7 @@ static ETUUID *childUUID2;
                         tailRevision: initialRevisionId
                            forBranch: initialBranchUUID
                     ofPersistentRoot: prootUUID
+                  currentChangeCount: &prootChangeCount
                                error: NULL]);
     
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
@@ -430,6 +487,7 @@ static ETUUID *childUUID2;
                         tailRevision: initialRevisionId
                            forBranch: initialBranchUUID
                     ofPersistentRoot: prootUUID
+                  currentChangeCount: &prootChangeCount
                                error: NULL]);
     
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
@@ -536,7 +594,8 @@ static ETUUID *childUUID2;
                                                                      branchUUID: [ETUUID UUID]
                                                                         metadata: D(@"test2", @"name")
                                                                           error: NULL];
-
+    int64_t copyChangeCount = copy.changeCount;
+    
     UKObjectsEqual(S(prootUUID, [copy UUID]), [NSSet setWithArray:[store persistentRootUUIDs]]);
 
     // 1. check setup
@@ -572,6 +631,7 @@ static ETUUID *childUUID2;
                         tailRevision: initialRevisionId
                            forBranch: [[proot mainBranchInfo] UUID]
                     ofPersistentRoot: prootUUID
+                  currentChangeCount: &prootChangeCount
                                error: NULL]);
     
     // Reload proot's and copy's metadata
@@ -594,6 +654,7 @@ static ETUUID *childUUID2;
                         tailRevision: initialRevisionId
                            forBranch: [[copy mainBranchInfo] UUID]
                     ofPersistentRoot: [copy UUID]
+                  currentChangeCount: &copyChangeCount
                                error: NULL]);
     
     // Reload proot's and copy's metadata

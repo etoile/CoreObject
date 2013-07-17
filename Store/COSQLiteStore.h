@@ -435,6 +435,7 @@
                tailRevision: (CORevisionID*)tailRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot
+         currentChangeCount: (int64_t *)aChangeCountInOut
                       error: (NSError **)error;
 
 

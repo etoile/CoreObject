@@ -158,7 +158,7 @@
     // Persistent Root and Branch tables
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots (root_id INTEGER PRIMARY KEY, "
-     "uuid BLOB, backingstore BLOB, currentbranch INTEGER, metadata BLOB, deleted BOOLEAN DEFAULT 0)"];
+     "uuid BLOB, backingstore BLOB, currentbranch INTEGER, metadata BLOB, deleted BOOLEAN DEFAULT 0, changecount INTEGER)"];
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (branch_id INTEGER PRIMARY KEY, "
      "uuid BLOB, proot INTEGER, head_revid INTEGER, tail_revid INTEGER, current_revid INTEGER, metadata BLOB, deleted BOOLEAN DEFAULT 0)"];
@@ -261,6 +261,16 @@
     }
     return YES;
 }
+
+- (BOOL) rollbackTransactionIfNeeded
+{
+    if (!inUserTransaction_)
+    {
+        return [db_ rollback];
+    }
+    return YES;
+}
+
 
 - (NSArray *) allBackingUUIDs
 {
@@ -536,6 +546,25 @@
 
 /** @taskunit persistent roots */
 
+- (BOOL) checkAndUpdateChangeCount: (int64_t *)aChangeCount forPersistentRootId: (NSNumber *)root_id
+{
+    const int64_t user = *aChangeCount;
+    const int64_t actual = [db_ int64ForQuery: @"SELECT changecount FROM persistentroots WHERE root_id = ?", root_id];
+    
+    if (actual == user)
+    {
+        const int64_t newCount = user + 1;
+        
+        [db_ executeUpdate: @"UPDATE persistentroots SET changecount = ? WHERE root_id = ?",
+         [NSNumber numberWithLongLong: newCount],
+         root_id];
+        
+        *aChangeCount = newCount;
+        return YES;
+    }
+    return NO;
+}
+
 - (NSArray *) persistentRootUUIDs
 {
     NSMutableArray *result = [NSMutableArray array];
@@ -567,6 +596,7 @@
     ETUUID *backingUUID = nil;
     id meta = nil;
     BOOL deleted = NO;
+    int64_t changecount = 0;
     
     [db_ beginTransaction]; // N.B. The transaction is so the two SELECTs see the same DB. Needed?
     
@@ -574,13 +604,14 @@
     
     {
         FMResultSet *rs = [db_ executeQuery: @"SELECT (SELECT uuid FROM branches WHERE branch_id = currentbranch),"
-                                                    " backingstore, metadata, deleted FROM persistentroots WHERE root_id = ?", root_id];
+                                                    " backingstore, metadata, deleted, changecount FROM persistentroots WHERE root_id = ?", root_id];
         if ([rs next])
         {
             currBranch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
             backingUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
             meta = [self readMetadata: [rs dataForColumnIndex: 2]];
             deleted = [rs boolForColumnIndex: 3];
+            changecount = [rs int64ForColumnIndex: 4];
         }
         else
         {
@@ -625,6 +656,7 @@
     result.UUID = aUUID;
     result.branchForUUID = branchDict;
     result.mainBranchUUID = currBranch;
+    result.changeCount = changecount;
     
     return result;
 }
@@ -809,10 +841,18 @@
                tailRevision: (CORevisionID*)tailRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot
+         currentChangeCount: (int64_t *)aChangeCountInOut
                       error: (NSError **)error
 {
     [db_ beginTransaction];
 
+    NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
+    if (![self checkAndUpdateChangeCount: aChangeCountInOut forPersistentRootId: root_id])
+    {
+        [db_ rollback];
+        return nil;
+    }
+    
     NSData *branchData = [aBranch dataValue];
     
     if (currentRev != nil)

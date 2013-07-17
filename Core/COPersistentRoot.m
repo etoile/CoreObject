@@ -319,11 +319,14 @@
                        modifiedItems: itemUUIDs
                                error: NULL];
         
+        int64_t changeCount = _info.changeCount;
+        
         [store setCurrentRevision: revId
                      headRevision: revId
                      tailRevision: nil
                         forBranch: [[self commitTrack] UUID]
                  ofPersistentRoot: [self persistentRootUUID]
+               currentChangeCount: &changeCount
                             error: NULL];
     }
 
