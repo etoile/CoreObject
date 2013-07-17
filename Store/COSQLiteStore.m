@@ -158,7 +158,7 @@
     // Persistent Root and Branch tables
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots (root_id INTEGER PRIMARY KEY, "
-     "uuid BLOB, backingstore BLOB, currentbranch INTEGER, metadata BLOB, deleted BOOLEAN DEFAULT 0, changecount INTEGER)"];
+     "uuid BLOB, backingstore BLOB, currentbranch INTEGER, deleted BOOLEAN DEFAULT 0, changecount INTEGER)"];
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (branch_id INTEGER PRIMARY KEY, "
      "uuid BLOB, proot INTEGER, head_revid INTEGER, tail_revid INTEGER, current_revid INTEGER, metadata BLOB, deleted BOOLEAN DEFAULT 0)"];
@@ -594,7 +594,6 @@
 {
     ETUUID *currBranch = nil;
     ETUUID *backingUUID = nil;
-    id meta = nil;
     BOOL deleted = NO;
     int64_t changecount = 0;
     
@@ -604,14 +603,13 @@
     
     {
         FMResultSet *rs = [db_ executeQuery: @"SELECT (SELECT uuid FROM branches WHERE branch_id = currentbranch),"
-                                                    " backingstore, metadata, deleted, changecount FROM persistentroots WHERE root_id = ?", root_id];
+                                                    " backingstore, deleted, changecount FROM persistentroots WHERE root_id = ?", root_id];
         if ([rs next])
         {
             currBranch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
             backingUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
-            meta = [self readMetadata: [rs dataForColumnIndex: 2]];
-            deleted = [rs boolForColumnIndex: 3];
-            changecount = [rs int64ForColumnIndex: 4];
+            deleted = [rs boolForColumnIndex: 2];
+            changecount = [rs int64ForColumnIndex: 3];
         }
         else
         {
@@ -696,10 +694,9 @@
     [self beginTransactionIfNeeded];
     
     [db_ executeUpdate: @"INSERT INTO persistentroots (uuid, "
-           "backingstore, currentbranch, metadata, deleted) VALUES(?,?,NULL,?,0)",
+           "backingstore, currentbranch, deleted) VALUES(?,?,NULL,0)",
            [uuid dataValue],
-           [[revId backingStoreUUID] dataValue],
-           [self writeMetadata: metadata]];
+           [[revId backingStoreUUID] dataValue]];
 
     const int64_t root_id = [db_ lastInsertRowId];
     
@@ -910,19 +907,6 @@
     BOOL ok = [db_ executeUpdate: @"UPDATE branches SET metadata = ? WHERE uuid = ?",
                data,
                [aBranch dataValue]];
-    
-    return ok;
-}
-
-- (BOOL) setMetadata: (NSDictionary *)meta
-   forPersistentRoot: (ETUUID *)aRoot
-               error: (NSError **)error
-{
-    NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
-    NSData *data = [self writeMetadata: meta];
-    BOOL ok = [db_ executeUpdate: @"UPDATE persistentroots SET metadata = ? WHERE root_id = ?",
-               data,
-               root_id];
     
     return ok;
 }
