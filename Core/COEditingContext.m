@@ -50,7 +50,6 @@ static COEditingContext *currentCtxt = nil;
 {
 	SUPERINIT;
 
-	_uuid = [ETUUID new];
 	ASSIGN(_store, store);
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
 	_loadedPersistentRoots = [NSMutableDictionary new];
@@ -60,7 +59,7 @@ static COEditingContext *currentCtxt = nil;
 
 	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
 	                                                    selector: @selector(didMakeCommit:) 
-	                                                        name: COEditingContextDidCommitNotification 
+	                                                        name: COStorePersistentRootDidChangeNotification
 	                                                      object: nil];
 
 	return self;
@@ -75,7 +74,6 @@ static COEditingContext *currentCtxt = nil;
 {
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 
-	DESTROY(_uuid);
 	DESTROY(_store);
 	DESTROY(_modelRepository);
 	DESTROY(_loadedPersistentRoots);
@@ -426,32 +424,6 @@ store by other processes. */
 	return [self commitWithMetadata: D(shortDescription, @"shortDescription", commitType, @"type")];
 }
 
-- (void)postCommitNotificationsWithRevisions: (NSArray *)revisions
-{
-    // FIXME: Re-enable
-#if 0
-	NSDictionary *notifInfos = D(revisions, kCORevisionsKey);
-
-	[[NSNotificationCenter defaultCenter] postNotificationName: COEditingContextDidCommitNotification 
-	                                                    object: self 
-	                                                  userInfo: notifInfos];
-
-	NSMutableArray *revNumbers = [NSMutableArray array];
-	for (CORevision *rev in revisions)
-	{
-		[revNumbers addObject: [NSNumber numberWithUnsignedLong: [rev revisionNumber]]];
-	}
-	notifInfos = D(revNumbers, kCORevisionNumbersKey, [_uuid stringValue], kCOEditingContextUUIDKey);
-
-#ifndef GNUSTEP
-	[(id)[NSDistributedNotificationCenter defaultCenter] postNotificationName: COEditingContextDidCommitNotification 
-	                                                               object: [[[self store] UUID] stringValue]
-	                                                             userInfo: notifInfos
-	                                                   deliverImmediately: YES];
-#endif
-#endif
-}
-
 - (void)didCommitRevision: (CORevision *)aRevision
 {
 }
@@ -518,7 +490,6 @@ store by other processes. */
 		[_loadedPersistentRoots removeObjectForKey: uuid];
 	}
 
- 	[self postCommitNotificationsWithRevisions: revisions];
 	return revisions;
 }
 
@@ -534,9 +505,3 @@ store by other processes. */
 }
 
 @end
-
-NSString *COEditingContextDidCommitNotification = @"COEditingContextDidCommitNotification";
-
-NSString *kCOEditingContextUUIDKey = @"kCOEditingContextUUIDKey";
-NSString *kCORevisionNumbersKey = @"kCORevisionNumbersKey";
-NSString *kCORevisionsKey = @"kCORevisionsKey";

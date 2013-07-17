@@ -40,8 +40,6 @@
 @interface COEditingContext : NSObject <COPersistentObjectContext>
 {
 	@private
-    /** Editing context UUID is used to disambiguate notification sources */
-	ETUUID *_uuid;
 	COSQLiteStore *_store;
 	ETModelDescriptionRepository *_modelRepository;
 	/** Loaded (or inserted) persistent roots by UUID */
@@ -49,9 +47,6 @@
     /** Set of persistent roots pending deletion */
 	NSMutableSet *_deletedPersistentRoots;
 	COError *_error;
-    
-    /* COPath => COObjectGraphContext */
-    NSMutableDictionary *graphForPersistentRoot;
 }
 
 /** @taskunit Accessing the current context */
@@ -332,9 +327,3 @@
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
 	restrictedToPersistentRoots: (NSArray *)persistentRoots;
 @end
-
-extern NSString *COEditingContextDidCommitNotification;
-
-extern NSString *kCOEditingContextUUIDKey;
-extern NSString *kCORevisionNumbersKey;
-extern NSString *kCORevisionsKey;

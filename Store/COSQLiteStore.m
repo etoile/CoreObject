@@ -1094,15 +1094,16 @@
 {
     for (NSDictionary *userInfo in [notificationUserInfoToPostForPersistentRootUUID_ allValues])
     {
-        NSLog(@"Post: %@", userInfo);
-//        [self performSelectorOnMainThread: @selector(mainThreadPostLocalNotification:)
-//                               withObject: userInfo
-//                            waitUntilDone: NO];
-//        
-//        [[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
-//                                                                       object: [[self UUID] stringValue]
-//                                                                     userInfo: userInfo
-//                                                           deliverImmediately: NO];
+        NSLog(@"store %@ posting notif: %@", [self UUID], userInfo);
+        
+        [self performSelectorOnMainThread: @selector(mainThreadPostLocalNotification:)
+                               withObject: userInfo
+                            waitUntilDone: NO];
+        
+        [[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
+                                                                       object: [[self UUID] stringValue]
+                                                                     userInfo: userInfo
+                                                           deliverImmediately: NO];
     }
     [notificationUserInfoToPostForPersistentRootUUID_ removeAllObjects];
 }
