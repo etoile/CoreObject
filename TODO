@@ -48,6 +48,10 @@ First Release
     we would actually make it a child of the real/wrapper root obejct with all of the
     root object metadata.
   - Clean out legacy code
+  - We should have dedicated array/set multivalue mutation methods rather than using:
+    -[COObject (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key]
+    for both, IMO (Eric)
+
 
 - COSQLiteStore
   - Use change count for notifications. Make all mutations increment count.
