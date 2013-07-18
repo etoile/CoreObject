@@ -1074,7 +1074,7 @@ See +[NSObject typePrefix]. */
 	return NO;
 }
 
-- (COCommitTrack *)commitTrack
+- (COBranch *)commitTrack
 {
 	return [[self persistentRoot] commitTrack];
 }

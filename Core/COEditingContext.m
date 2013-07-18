@@ -6,7 +6,7 @@
 #import "COGroup.h"
 #import "COSQLiteStore.h"
 #import "CORevision.h"
-#import "COCommitTrack.h"
+#import "COBranch.h"
 
 @implementation COEditingContext
 

@@ -2,7 +2,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 
 @class COPersistentRoot, COEditingContext;
-@class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COCommitTrack, COError, COPersistentRootInfo;
+@class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo;
 
 // I'm skeptical that there is ever a legitimate case where code is working
 // with an id<COPersistentObjectContext> and doesn't know whether it's an

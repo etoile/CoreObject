@@ -7,7 +7,7 @@
 	License:  Modified BSD  (see COPYING)
  */
 
-#import "COCommitTrack.h"
+#import "COBranch.h"
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
 #import "COSQLiteStore.h"
@@ -18,7 +18,7 @@
 
 //#define CACHE_AMOUNT 30
 
-@implementation COCommitTrack
+@implementation COBranch
 
 @synthesize UUID, persistentRoot;
 
@@ -62,7 +62,7 @@
 
 - (BOOL)isEqual: (id)rhs
 {
-	if ([rhs isKindOfClass: [COCommitTrack class]])
+	if ([rhs isKindOfClass: [COBranch class]])
 	{
 		return ([UUID isEqual: [rhs UUID]]
 			&& [[persistentRoot persistentRootUUID] isEqual: [[rhs persistentRoot] persistentRootUUID]]);
@@ -154,20 +154,20 @@
     return nil;
 }
 
-- (COCommitTrack *)parentTrack
+- (COBranch *)parentTrack
 {
     // FIXME: Add support for this
     return nil;
 }
 
-- (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel
+- (COBranch *)makeBranchWithLabel: (NSString *)aLabel
 {
     // FIXME: Enqueue in editing context rather than committing immediately
     
 	return [self makeBranchWithLabel: aLabel atRevision: [[self persistentRoot] revision]];
 }
 
-- (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
+- (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
     // FIXME: Enqueue in editing context rather than committing immediately
     
@@ -185,7 +185,7 @@
 	
     [[self persistentRoot] reloadPersistentRootInfo];
     
-	return [[[COCommitTrack alloc] initWithUUID: branchUUID
+	return [[[COBranch alloc] initWithUUID: branchUUID
 								 persistentRoot: [self persistentRoot]] autorelease];
 
 }
@@ -206,20 +206,20 @@
 	return [[[self persistentRoot] parentContext] makePersistentRootWithInfo: info];
 }
 
-- (BOOL)mergeChangesFromTrack: (COCommitTrack *)aSourceTrack
+- (BOOL)mergeChangesFromTrack: (COBranch *)aSourceTrack
 {
 	return NO;
 }
 
 - (BOOL)mergeChangesFromRevision: (CORevision *)startRev
 							  to: (CORevision *)endRev
-						 ofTrack: (COCommitTrack *)aSourceTrack
+						 ofTrack: (COBranch *)aSourceTrack
 {
 	return NO;
 }
 
 - (BOOL)mergeChangesFromRevisionSet: (NSSet *)revs
-							ofTrack: (COCommitTrack *)aSourceTrack
+							ofTrack: (COBranch *)aSourceTrack
 {
 	return NO;
 }

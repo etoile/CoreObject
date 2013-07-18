@@ -12,7 +12,7 @@
 #import <CoreObject/COEditingContext.h>
 #import <CoreObject/COItemGraph.h>
 
-@class COCommitTrack, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo, COObjectGraphContext;
+@class COBranch, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo, COObjectGraphContext;
 
 /**
  * A persistent root editing context exposes as a working copy a CoreObject 
@@ -54,7 +54,7 @@
 	@private
 	COEditingContext *_parentContext;
     COPersistentRootInfo *_info;
-	COCommitTrack *_commitTrack;
+	COBranch *_commitTrack;
     /** If nil, we are a new persistent root */
 	CORevision *_revision; // Could be in _commitTrack, doesn't matter
     COObjectGraphContext *_objectGraph;
@@ -91,7 +91,7 @@
  *
  * For a parent context without a store, the commit track can be nil .
  */
-@property (nonatomic, retain) COCommitTrack *commitTrack;
+@property (nonatomic, retain) COBranch *commitTrack;
 /**
  * The entry point to navigate the object graph bound to the persistent root.
  *

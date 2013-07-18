@@ -55,8 +55,8 @@
 		609C00B51704C3EF00D01AAB /* COLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00A91704C3EF00D01AAB /* COLibrary.m */; };
 		609C00B61704C3EF00D01AAB /* COTag.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00AA1704C3EF00D01AAB /* COTag.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00B71704C3EF00D01AAB /* COTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00AB1704C3EF00D01AAB /* COTag.m */; };
-		609C00C01704C3FF00D01AAB /* COCommitTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00B81704C3FF00D01AAB /* COCommitTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		609C00C11704C3FF00D01AAB /* COCommitTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00B91704C3FF00D01AAB /* COCommitTrack.m */; };
+		609C00C01704C3FF00D01AAB /* COBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00B81704C3FF00D01AAB /* COBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		609C00C11704C3FF00D01AAB /* COBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00B91704C3FF00D01AAB /* COBranch.m */; };
 		609C00C21704C3FF00D01AAB /* COCustomTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00BA1704C3FF00D01AAB /* COCustomTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00C41704C3FF00D01AAB /* COHistoryTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00BC1704C3FF00D01AAB /* COHistoryTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00C61704C3FF00D01AAB /* COTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00BE1704C3FF00D01AAB /* COTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -341,8 +341,8 @@
 		609C00A91704C3EF00D01AAB /* COLibrary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COLibrary.m; path = Model/COLibrary.m; sourceTree = "<group>"; };
 		609C00AA1704C3EF00D01AAB /* COTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COTag.h; path = Model/COTag.h; sourceTree = "<group>"; };
 		609C00AB1704C3EF00D01AAB /* COTag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COTag.m; path = Model/COTag.m; sourceTree = "<group>"; };
-		609C00B81704C3FF00D01AAB /* COCommitTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCommitTrack.h; path = Tracks/COCommitTrack.h; sourceTree = "<group>"; };
-		609C00B91704C3FF00D01AAB /* COCommitTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCommitTrack.m; path = Tracks/COCommitTrack.m; sourceTree = "<group>"; };
+		609C00B81704C3FF00D01AAB /* COBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBranch.h; path = Tracks/COBranch.h; sourceTree = "<group>"; };
+		609C00B91704C3FF00D01AAB /* COBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBranch.m; path = Tracks/COBranch.m; sourceTree = "<group>"; };
 		609C00BA1704C3FF00D01AAB /* COCustomTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCustomTrack.h; path = Tracks/COCustomTrack.h; sourceTree = "<group>"; };
 		609C00BB1704C3FF00D01AAB /* COCustomTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCustomTrack.m; path = Tracks/COCustomTrack.m; sourceTree = "<group>"; };
 		609C00BC1704C3FF00D01AAB /* COHistoryTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COHistoryTrack.h; path = Tracks/COHistoryTrack.h; sourceTree = "<group>"; };
@@ -597,8 +597,6 @@
 		60413A6D14B9F66800225D2A /* Tracks */ = {
 			isa = PBXGroup;
 			children = (
-				609C00B81704C3FF00D01AAB /* COCommitTrack.h */,
-				609C00B91704C3FF00D01AAB /* COCommitTrack.m */,
 				609C00BA1704C3FF00D01AAB /* COCustomTrack.h */,
 				609C00BB1704C3FF00D01AAB /* COCustomTrack.m */,
 				609C00BC1704C3FF00D01AAB /* COHistoryTrack.h */,
@@ -695,6 +693,8 @@
 				668084EF1791FBAB003A3CC6 /* COObjectGraphContext.m */,
 				609C008E1704C3DA00D01AAB /* COPersistentRoot.h */,
 				609C008F1704C3DA00D01AAB /* COPersistentRoot.m */,
+				609C00B81704C3FF00D01AAB /* COBranch.h */,
+				609C00B91704C3FF00D01AAB /* COBranch.m */,
 				609C00901704C3DA00D01AAB /* COQuery.h */,
 				609C00911704C3DA00D01AAB /* COQuery.m */,
 				606E3DBF1787A07E00ED42DA /* COSerialization.h */,
@@ -892,7 +892,7 @@
 				609C00B21704C3EF00D01AAB /* COGroup.h in Headers */,
 				609C00B41704C3EF00D01AAB /* COLibrary.h in Headers */,
 				609C00B61704C3EF00D01AAB /* COTag.h in Headers */,
-				609C00C01704C3FF00D01AAB /* COCommitTrack.h in Headers */,
+				609C00C01704C3FF00D01AAB /* COBranch.h in Headers */,
 				609C00C21704C3FF00D01AAB /* COCustomTrack.h in Headers */,
 				609C00C41704C3FF00D01AAB /* COHistoryTrack.h in Headers */,
 				609C00C61704C3FF00D01AAB /* COTrack.h in Headers */,
@@ -1227,7 +1227,7 @@
 				609C00B31704C3EF00D01AAB /* COGroup.m in Sources */,
 				609C00B51704C3EF00D01AAB /* COLibrary.m in Sources */,
 				609C00B71704C3EF00D01AAB /* COTag.m in Sources */,
-				609C00C11704C3FF00D01AAB /* COCommitTrack.m in Sources */,
+				609C00C11704C3FF00D01AAB /* COBranch.m in Sources */,
 				609C00C71704C3FF00D01AAB /* COTrack.m in Sources */,
 				609C00E91704C42200D01AAB /* COError.m in Sources */,
 				609C00EB1704C42200D01AAB /* NSData+compression.m in Sources */,

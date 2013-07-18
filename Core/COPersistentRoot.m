@@ -8,7 +8,7 @@
  */
 
 #import "COPersistentRoot.h"
-#import "COCommitTrack.h"
+#import "COBranch.h"
 #import "COEditingContext.h"
 #import "COError.h"
 #import "COItem.h"
@@ -54,7 +54,7 @@
 	_parentContext = aCtxt;
 	if ([_parentContext store] != nil)
 	{
-		_commitTrack = [[COCommitTrack alloc] initWithUUID: _info.mainBranchUUID persistentRoot: self];
+		_commitTrack = [[COBranch alloc] initWithUUID: _info.mainBranchUUID persistentRoot: self];
 	}
 	
     CORevisionID *revId = [[_info mainBranchInfo] currentRevisionID];
@@ -114,12 +114,12 @@
 	return [self parentContext];
 }
 
-- (COCommitTrack *)commitTrack
+- (COBranch *)commitTrack
 {
 	return _commitTrack;
 }
 
-- (void)setCommitTrack: (COCommitTrack *)aTrack
+- (void)setCommitTrack: (COBranch *)aTrack
 {
 	ASSIGN(_commitTrack, aTrack);
 	[self reloadAtRevision: [aTrack currentRevision]];

@@ -9,7 +9,7 @@
 #import <CoreObject/COBookmark.h>
 #import <CoreObject/COCollection.h>
 #import <CoreObject/COCommitDescriptor.h>
-#import <CoreObject/COCommitTrack.h>
+#import <CoreObject/COBranch.h>
 #import <CoreObject/COContainer.h>
 #import <CoreObject/COCustomTrack.h>
 #import <CoreObject/COEditingContext.h>

@@ -2,7 +2,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
-#import "COCommitTrack.h"
+#import "COBranch.h"
 #import "COEditingContext.h"
 #import "COObject.h"
 #import "COContainer.h"
@@ -12,7 +12,7 @@
 {
     COPersistentRoot *persistentRoot;
     COObject *rootObj;
-    COCommitTrack *commitTrack;
+    COBranch *commitTrack;
 }
 @end
 

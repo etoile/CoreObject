@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COQuery.h>
 
-@class COPersistentRoot, COEditingContext, CORevision, COCommitTrack, CORelationshipCache, COObjectGraphContext;
+@class COPersistentRoot, COEditingContext, CORevision, COBranch, CORelationshipCache, COObjectGraphContext;
 
 /**
  * Working copy of an object, owned by an editing context.
@@ -315,7 +315,7 @@
 /**
  * Returns the commit track for this object.
  */
-- (COCommitTrack *)commitTrack;
+- (COBranch *)commitTrack;
 
 /** @taskunit Contained Objects based on the Metamodel */
 

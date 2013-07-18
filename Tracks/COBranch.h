@@ -23,7 +23,7 @@
  * undo/redo pointer in the track timeline</item>
  * </list>
  */
-@interface COCommitTrack : NSObject
+@interface COBranch : NSObject
 {
 	@private
     ETUUID *UUID;
@@ -92,7 +92,7 @@
  * was created at the same time than its persistent root. The parent revision 
  * is also nil in this case.
  */
-@property (readonly, nonatomic) COCommitTrack *parentTrack;
+@property (readonly, nonatomic) COBranch *parentTrack;
 /**
  * The revision at which the receiver was forked from the parent track.
  *
@@ -122,7 +122,7 @@
  *
  * See also -makeBranchWithLabel:atRevision:.
  */
-- (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel;
+- (COBranch *)makeBranchWithLabel: (NSString *)aLabel;
 /**
  * Returns a new commit track by branching a particular revision and using
  * the given label.
@@ -140,7 +140,7 @@
  * [persistentRoot setCommitTrack: [[persistentRoot commitTrack] makeBranchWithLabel: @"Sandbox"]];
  * </example>
  */
-- (COCommitTrack *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev;
+- (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev;
 /**
  * Returns a new persistent root bound to a new commit track by branching a 
  * particular revision.
@@ -162,18 +162,18 @@
 /**
  * This method is not yet implemented.
  */
-- (BOOL)mergeChangesFromTrack: (COCommitTrack *)aSourceTrack;
+- (BOOL)mergeChangesFromTrack: (COBranch *)aSourceTrack;
 /**
  * This method is not yet implemented.
  */
 - (BOOL)mergeChangesFromRevision: (CORevision *)startRev
 							  to: (CORevision *)endRev
-						 ofTrack: (COCommitTrack *)aSourceTrack;
+						 ofTrack: (COBranch *)aSourceTrack;
 /**
  * This method is not yet implemented.
  */
 - (BOOL)mergeChangesFromRevisionSet: (NSSet *)revs
-							ofTrack: (COCommitTrack *)aSourceTrack;
+							ofTrack: (COBranch *)aSourceTrack;
 
 /** @taskunit Private */
 
