@@ -91,7 +91,7 @@
  *
  * For a parent context without a store, the commit track can be nil .
  */
-@property (nonatomic, retain) COBranch *commitTrack;
+@property (nonatomic, retain) COBranch *mainBranch;
 /**
  * The entry point to navigate the object graph bound to the persistent root.
  *

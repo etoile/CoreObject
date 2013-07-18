@@ -22,7 +22,7 @@
 @implementation COPersistentRoot
 
 @synthesize parentContext = _parentContext,
-	commitTrack = _commitTrack, objectGraph = _objectGraph;
+	mainBranch = _commitTrack, objectGraph = _objectGraph;
 
 - (ETUUID *)persistentRootUUID
 {
@@ -114,12 +114,12 @@
 	return [self parentContext];
 }
 
-- (COBranch *)commitTrack
+- (COBranch *)mainBranch
 {
 	return _commitTrack;
 }
 
-- (void)setCommitTrack: (COBranch *)aTrack
+- (void)setMainBranch: (COBranch *)aTrack
 {
 	ASSIGN(_commitTrack, aTrack);
 	[self reloadAtRevision: [aTrack currentRevision]];
@@ -308,7 +308,7 @@
 
         COPersistentRootInfo *info = [store createPersistentRootWithInitialContents: _objectGraph
                                                                                UUID: [self persistentRootUUID]
-                                                                         branchUUID: [[self commitTrack] UUID]
+                                                                         branchUUID: [[self mainBranch] UUID]
                                                                            metadata: metadata
                                                                               error: NULL];
         revId = [[info mainBranchInfo] currentRevisionID];
@@ -328,7 +328,7 @@
         [store setCurrentRevision: revId
                      headRevision: revId
                      tailRevision: nil
-                        forBranch: [[self commitTrack] UUID]
+                        forBranch: [[self mainBranch] UUID]
                  ofPersistentRoot: [self persistentRootUUID]
                currentChangeCount: &changeCount
                             error: NULL];

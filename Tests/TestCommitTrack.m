@@ -23,7 +23,7 @@
     SUPERINIT;
     ASSIGN(persistentRoot, [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"]);
     ASSIGN(rootObj, [persistentRoot rootObject]);
-    ASSIGN(commitTrack, [persistentRoot commitTrack]);
+    ASSIGN(commitTrack, [persistentRoot mainBranch]);
     return self;
 }
 

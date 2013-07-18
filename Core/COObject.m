@@ -1076,7 +1076,7 @@ See +[NSObject typePrefix]. */
 
 - (COBranch *)commitTrack
 {
-	return [[self persistentRoot] commitTrack];
+	return [[self persistentRoot] mainBranch];
 }
 
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
