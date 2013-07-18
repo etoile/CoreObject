@@ -82,16 +82,22 @@
 	return displayName;
 }
 
+- (BOOL)isCopy
+{
+    // FIXME: Implement
+    return NO;
+}
+
 - (BOOL)isBranch
 {
     return YES;
 //	return ([self isCopy] == NO && [self parentTrack] != nil);
 }
 
-- (BOOL)isCopy
+- (BOOL)isMainBranch
 {
-    // FIXME: Implement
-    return NO;
+	// FIXME: Implement
+	return NO;
 }
 
 - (COBranchInfo *) branchInfo

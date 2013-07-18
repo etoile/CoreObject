@@ -371,7 +371,7 @@
 															  attribute: [info objectForKey: @"attribute"]
 													   sourceIdentifier: [info objectForKey: @"sourceIdentifier"]
 															   location: aLocation
-																   type: [info objectForKey: @"type"]
+																   type: [[info objectForKey: @"type"] intValue]
 																objects: anArray];
 	[self addEdit: op];
 	[op release];
@@ -396,7 +396,7 @@
 																	attribute: [info objectForKey: @"attribute"]
 															 sourceIdentifier: [info objectForKey: @"sourceIdentifier"]
 																		range: aRange
-																		 type: [info objectForKey: @"type"]
+																		 type: [[info objectForKey: @"type"] intValue]
 																	  objects: anArray];
 	[self addEdit: op];
 	[op release];
@@ -460,7 +460,7 @@
 	}
 	else if (COTypeIsMultivalued(type) && COTypeIsOrdered(type))
 	{
-		CODiffArrays(valueA, valueB, self, D(itemUUID, @"UUID", anAttribute, @"attribute", aSource, @"sourceIdentifier", type, @"type"));
+		CODiffArrays(valueA, valueB, self, D(itemUUID, @"UUID", anAttribute, @"attribute", aSource, @"sourceIdentifier", @(type), @"type"));
 	}
 	else
 	{

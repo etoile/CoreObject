@@ -122,7 +122,7 @@
 - (void)setCommitTrack: (COCommitTrack *)aTrack
 {
 	ASSIGN(_commitTrack, aTrack);
-	[self reloadAtRevision: [[aTrack currentNode] revision]];
+	[self reloadAtRevision: [aTrack currentRevision]];
 }
 
 - (COSQLiteStore *)store
@@ -133,6 +133,11 @@
 - (id)rootObject
 {
 	return [_objectGraph rootObject];
+}
+
+- (void)setRootObject: (COObject *)aRootObject
+{
+	[_objectGraph setRootObject: aRootObject];
 }
 
 - (ETUUID *)rootObjectUUID
