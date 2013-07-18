@@ -1066,7 +1066,7 @@
                                              changeCount: (int64_t)changeCount
                                                  deleted: (BOOL)deleted
 {
-    NSDictionary *userInfo = D(aUUID, kCOPersistentRootUUID,
+    NSDictionary *userInfo = D([aUUID stringValue], kCOPersistentRootUUID,
                                [NSNumber numberWithLongLong: changeCount], kCOPersistentRootChangeCount,
                                [NSNumber numberWithBool: deleted], kCOPersistentRootDeleted,
                                [[self UUID] stringValue], kCOStoreUUID,
@@ -1091,7 +1091,7 @@
 {
     for (NSDictionary *userInfo in [notificationUserInfoToPostForPersistentRootUUID_ allValues])
     {
-        NSLog(@"store %@ posting notif: %@", [self UUID], userInfo);
+        //NSLog(@"store %@ posting notif: %@", [self UUID], userInfo);
         
         [self performSelectorOnMainThread: @selector(mainThreadPostLocalNotification:)
                                withObject: userInfo
