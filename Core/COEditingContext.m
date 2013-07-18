@@ -57,8 +57,14 @@ static COEditingContext *currentCtxt = nil;
 
 	[self registerAdditionalEntityDescriptions];
 
-	[[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-	                                                    selector: @selector(didMakeCommit:) 
+
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(storePersistentRootDidChange:)
+                                                 name: COStorePersistentRootDidChangeNotification
+                                               object: _store];
+
+	[[NSDistributedNotificationCenter defaultCenter] addObserver: self
+	                                                    selector: @selector(distributedStorePersistentRootDidChange:)
 	                                                        name: COStorePersistentRootDidChangeNotification
 	                                                      object: nil];
 
@@ -73,6 +79,7 @@ static COEditingContext *currentCtxt = nil;
 - (void)dealloc
 {
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
 
 	DESTROY(_store);
 	DESTROY(_modelRepository);
@@ -110,38 +117,6 @@ static COEditingContext *currentCtxt = nil;
 - (COEditingContext *)editingContext
 {
 	return self;
-}
-
-/* Handles distributed notifications about new revisions to refresh the root 
-object graphs present in memory, for which changes have been committed to the 
-store by other processes. */
-- (void)didMakeCommit: (NSNotification *)notif
-{
-    // FIXME: Re-enable
-#if 0
-	// TODO: Write a test to ensure other store notifications are not handled
-	BOOL isOtherStore = ([[[_store UUID] stringValue] isEqual: [notif object]] == NO);
-
-	if (isOtherStore)
-		return;
-
-	// TODO: Take in account the editing context max revision number
-	ETUUID *posterUUID = [ETUUID UUIDWithString: [[notif userInfo] objectForKey: kCOEditingContextUUIDKey]];
-	BOOL isOurCommit = [_uuid isEqual: posterUUID];
-
-	if (isOurCommit)
-		return;
-
-	for (NSNumber *revNumber in [[notif userInfo] objectForKey: kCORevisionNumbersKey])
-	{
-		CORevision *rev = [_store revisionWithRevisionNumber: [revNumber unsignedLongLongValue]];
-		// TODO: We should get the persistent root UUID from the notification
-		ETUUID *persistentRootUUID = [_store persistentRootUUIDForRootObjectUUID: [rev objectUUID]];
-		COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: persistentRootUUID];
-
-		[persistentRoot reloadAtRevision: rev];
-	}
-#endif
 }
 
 - (COSmartGroup *)mainGroup
@@ -502,6 +477,35 @@ store by other processes. */
 - (NSError *)error
 {
 	return _error;
+}
+
+// Notification handling
+
+/* Handles distributed notifications about new revisions to refresh the root
+ object graphs present in memory, for which changes have been committed to the
+ store by other processes. */
+- (void)distributedStorePersistentRootDidChange: (NSNotification *)notif
+{
+    // TODO: Write a test to ensure other store notifications are not handled
+    NSDictionary *userInfo = [notif userInfo];
+    NSString *storeURL = [userInfo objectForKey: kCOStoreURL];
+    NSString *storeUUID = [userInfo objectForKey: kCOStoreUUID];
+    
+    if ([[[_store UUID] stringValue] isEqual: storeUUID]
+        && [[[_store URL] absoluteString] isEqual: storeURL])
+    {
+        [self storePersistentRootDidChange: notif];
+    }
+}
+
+- (void)storePersistentRootDidChange: (NSNotification *)notif
+{
+    NSDictionary *userInfo = [notif userInfo];
+    ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [userInfo objectForKey: kCOPersistentRootUUID]];
+    
+    NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
+    
+    // TODO: Handle
 }
 
 @end
