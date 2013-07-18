@@ -239,7 +239,6 @@
 - (void) beginTransactionWithError: (NSError **)error
 {
     [db_ beginDeferredTransaction];
-    inUserTransaction_ = YES;
 }
 - (void) commitTransactionWithError: (NSError **)error
 {
@@ -249,8 +248,6 @@
     {
         [self postCommitNotifications];
     }
-    
-    inUserTransaction_ = NO;
 }
 
 - (NSArray *) allBackingUUIDs
