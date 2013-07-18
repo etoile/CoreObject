@@ -322,27 +322,6 @@ static COEditingContext *currentCtxt = nil;
 	return NO;
 }
 
-- (COObject *)objectWithUUID: (ETUUID *)uuid
-{
-	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
-	{
-		COObject *rootObject = [persistentRoot objectWithUUID: uuid];
-
-		if (rootObject != nil)
-			return rootObject;
-	}
-	
-	// FIXME: Slow path
-	for (ETUUID *uuid in [_store persistentRootUUIDs])
-	{
-		COPersistentRoot *persistentRoot = [self persistentRootForUUID: uuid];
-		
-		if ([[persistentRoot rootObjectUUID] isEqual: uuid])
-			return [persistentRoot rootObject];
-	}
-	return nil;
-}
-
 - (void)discardAllChanges
 {
 	/* Represents persistent roots inserted since the last commit */

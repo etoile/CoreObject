@@ -277,21 +277,6 @@
  */
 + (void)setCurrentContext: (COEditingContext *)aCtxt;
 
-// Deprecated because the 
-
-/**
- * Returns the object identified by the UUID, by loading it to its last revision
- * when no instance managed by the receiver is present in memory.
- *
- * When the UUID doesn't correspond to a persistent object, returns nil.
- *
- * When the object is a inner object, the last revision is the one that is tied
- * to its root object last revision.
- *
- * See also -[COPersistentRoot objectWithUUID:].
- */
-- (COObject *)objectWithUUID: (ETUUID *)uuid;
-
 @end
 
 
