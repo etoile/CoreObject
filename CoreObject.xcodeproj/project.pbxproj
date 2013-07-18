@@ -84,7 +84,6 @@
 		66094848178794D40049468B /* COItem+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 66094846178794D40049468B /* COItem+JSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6609485E1787A1160049468B /* CORelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6609485C1787A1160049468B /* CORelationshipCache.m */; };
 		6609485F1787A1160049468B /* CORelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 6609485D1787A1160049468B /* CORelationshipCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		66455AAD1796E85A00E57127 /* TestCrossPersistentRootReferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */; };
 		6675F8C11785C02A001E5622 /* COItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BA1785C02A001E5622 /* COItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C21785C02A001E5622 /* COItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BB1785C02A001E5622 /* COItem.m */; };
 		6675F8C31785C02A001E5622 /* COItemGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BC1785C02A001E5622 /* COItemGraph.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1289,7 +1288,6 @@
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				609C00651704C24C00D01AAB /* main.m in Sources */,
 				607EB6F2178D50610024B34D /* TestRevisionNumber.m in Sources */,
-				66455AAD1796E85A00E57127 /* TestCrossPersistentRootReferences.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
