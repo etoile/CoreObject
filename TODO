@@ -21,8 +21,9 @@ First Release
     Or, support creating a persistent root in code, then calling "freeze" which will make it 
     read-only and prevent it from being committed to disk?
   
-- COObjectGraphContext:
-  - Implement topological sort -didAwaken: method
+- didAwaken: replacement
+    - At the end of the setStoreItem:, call -awakeFromDeserialization
+    - At the end of object graph loading, -didLoadObjectGraph on each object in topological sort order
 
 - Improve diff/merge API and code
   - Improve Merging (move detection and custom attributed string merger)
@@ -51,6 +52,8 @@ First Release
   - We should have dedicated array/set multivalue mutation methods rather than using:
     -[COObject (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key]
     for both, IMO (Eric)
+  - I'd like to look at generating COObject subclasses for each entity description with 
+    generated KVC compliant property accessors and mutators. (Eric)
 
 
 - COSQLiteStore

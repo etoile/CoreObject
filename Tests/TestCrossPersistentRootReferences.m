@@ -5,11 +5,13 @@
 @interface TestCrossPersistentRootReferences : TestCommon <UKTest>
 @end
 
+/**
+ * None of these are expected to pass yet.
+ */
 @implementation TestCrossPersistentRootReferences
 
 /**
  * Most basic test of cross-persistent root references
- * Currently fails.
  */
 - (void) testBasic
 {
@@ -138,6 +140,11 @@
         
         
     }
+}
+
+- (void) testBranchSwitch
+{
+    
 }
 
 @end
