@@ -5,6 +5,7 @@
 #import "COItem.h"
 #import "COItemGraph.h"
 #import "COPersistentRoot.h"
+#import "COCommitTrack.h"
 #import "CORevision.h"
 #import "CORevisionID.h"
 #import "CORevisionInfo.h"
