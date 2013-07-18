@@ -181,14 +181,6 @@ static COEditingContext *currentCtxt = nil;
 
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
 {
-	return [self persistentRootForUUID: persistentRootUUID atRevision: nil];
-}
-
-// FIXME: Ugly semantics; ignores revision if the persistent root is already
-// loaded
-- (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
-                                 atRevision: (CORevision *)revision
-{
 	COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: persistentRootUUID];
 	
 	if (persistentRoot != nil)
