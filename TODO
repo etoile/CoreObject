@@ -41,6 +41,11 @@ First Release
   - Add a check that the derived side of a multivalued opposite is unordered
 
 - COObject
+  - Remove support for freestanding COObject not associated with a COObjectGraphContext,
+    and remove -becomePersistentInContext:. The rationale was that freestanding
+    COObjects would only make sense if they have no relationships. Since relationships
+    are such a central feature we might as well force COObjects to belong to a
+    COObjectGraphContext
   - Attempting to set a value for a readonly property should raise an exception
   - Check COObject KVO semantics and documentation
   - See if we can get rid of all of the properties that only make sense for root objects.
