@@ -324,8 +324,6 @@ serialization. */
 // serialization format has been removed.
 - (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
-	id value = nil;
-
 	/* First we try to use the getter named 'serialized' + 'key' */
 	
 	NSString *capitalizedKey = [[aPropertyDesc name] stringByCapitalizingFirstLetter];
@@ -333,11 +331,13 @@ serialization. */
 	
 	if ([self respondsToSelector: getter])
 	{
-		value = [self performSelector: getter];
+		return [self performSelector: getter];
 	}
 	
 	/* If no custom getter can be found, we try to access the ivar with KVC semantics */
-	
+
+	id value = nil;
+
 	if (ETGetInstanceVariableValueForKey(self, &value, [aPropertyDesc name]) == NO)
 	{
 		/* If no valid ivar can be found, we access the variable storage */
