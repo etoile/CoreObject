@@ -11,6 +11,7 @@
  */
 
 #import "COObject.h"
+#import "CODictionary.h"
 #import "COError.h"
 #import "COPersistentRoot.h"
 #import "COObject+RelationshipCache.h"
@@ -390,14 +391,24 @@ See +[NSObject typePrefix]. */
 	NSMutableArray *result = [NSMutableArray array];
 	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
 	{
-        id value = [self valueForProperty: [propDesc name]];
-        
-        assert([propDesc isMultivalued] ==
-               ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]));
+        id value = [self valueForKey: [propDesc name]];
         
         if ([propDesc isMultivalued])
         {
-            for (id subvalue in value)
+			if ([propDesc isKeyed])
+			{
+				assert([value isKindOfClass: [CODictionary class]] || [value isKindOfClass: [NSDictionary class]]);
+			}
+			else
+			{
+				assert([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]);
+				
+			}
+
+			/* We use -objectEnumerator, because subvalue can be a  CODictionary
+			   or a NSDictionary (if a getter exists to expose the CODictionary 
+			   as a NSDictionary for UI editing) */
+            for (id subvalue in [value objectEnumerator])
             {
                 if ([subvalue isKindOfClass: [COObject class]])
                 {
