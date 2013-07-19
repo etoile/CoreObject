@@ -158,3 +158,6 @@ BOOL COTypeIsValid(COType type)
 
 NSString *
 COTypeDescription(COType type);
+
+BOOL
+COTypeValidateObject(COType type, id anObject);

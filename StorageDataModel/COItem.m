@@ -59,6 +59,11 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	// FIXME: These casts are not truly elegant
 	types = (NSMutableDictionary *)[[NSDictionary alloc] initWithDictionary: typesForAttributes];
 	values = (NSMutableDictionary *)copyValueDictionary(valuesForAttributes, NO);
+    
+    for (NSString *key in values)
+    {
+        ETAssert(COTypeValidateObject([[types objectForKey: key] intValue], [values objectForKey: key]));
+    }
 
 	return self;
 }
@@ -393,6 +398,11 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	types = [[NSMutableDictionary alloc] initWithDictionary: typesForAttributes];
 	values = (NSMutableDictionary *)copyValueDictionary(valuesForAttributes, YES);
 	
+    for (NSString *key in values)
+    {
+        ETAssert(COTypeValidateObject([[types objectForKey: key] intValue], [values objectForKey: key]));
+    }
+    
 	return self;
 }
 
@@ -431,6 +441,8 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	NILARG_EXCEPTION_TEST(aValue);
 	NILARG_EXCEPTION_TEST(anAttribute);
 	
+    ETAssert(COTypeValidateObject(aType, aValue));
+    
 	[(NSMutableDictionary *)types setObject: [NSNumber numberWithInt: aType] forKey: anAttribute];
 	[(NSMutableDictionary *)values setObject: aValue forKey: anAttribute];
 }
