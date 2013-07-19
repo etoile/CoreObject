@@ -130,7 +130,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 				NSAssert([value isRoot], @"A property must point to a root object "
 					"for references accross persistent roots");
 				return [COPath pathWithPersistentRoot: [[value persistentRoot] persistentRootUUID]
-			                                   branch: [[[value persistentRoot] mainBranch] UUID]];
+			                                   branch: [[[value persistentRoot] trunkBranch] UUID]];
 			}
 		}
 		else
@@ -273,6 +273,17 @@ serialization. */
 	}
 	else
 	{
+        // For a case like ETShape.pathResizeSelector,
+        // the COObject subclass implements -serializedPathResizeSelector to return an NSString.
+        // However, the typeName is "SEL".
+        //
+        // Not sure of the correct fix.
+        // HACK:
+        if ([value isKindOfClass: [NSString class]])
+        {
+            return kCOStringType;
+        }
+        
 		// FIXME: Don't encode using the keyed archiving unless the property
 		// description requires it explicitly.
 		//NSAssert(NO, @"Unsupported serialization type %@ for %@", type, value);

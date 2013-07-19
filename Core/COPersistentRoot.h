@@ -52,12 +52,41 @@
 @interface COPersistentRoot : NSObject <COPersistentObjectContext>
 {
 	@private
+    ETUUID *_UUID;
+    
+    /**
+     * Weak reference
+     */
 	COEditingContext *_parentContext;
-    COPersistentRootInfo *_info;
-	COBranch *_commitTrack;
-    /** If nil, we are a new persistent root */
-	CORevision *_revision; // Could be in _commitTrack, doesn't matter
-    COObjectGraphContext *_objectGraph;
+    
+    /**
+     * State of the persistent root and its branches as loaded from the store.
+     * We don't modify this as changes are being staged in-memory (class should be immutable),
+     * but it is updaded when we make a commit or read from disk.
+     *
+     * If nil, this is a newly created persistent root
+     */
+    COPersistentRootInfo *_savedState;
+
+    /**
+     * COBranch objects indexed by ETUUID
+     */
+    NSMutableDictionary *_branchForUUID;
+    
+    /**
+     * Used to stage a change to the trunk branch
+     */
+    ETUUID *_trunkBranchUUID;
+    
+    /**
+     * Used to stage a change to the current branch
+     */
+    ETUUID *_currentBranchUUID;
+    
+    /**
+     * UUID of branch being edited. Not persistent.
+     */
+    ETUUID *_editingBranchUUID;
 }
 
 /** @taskunit Debugging */
@@ -91,7 +120,17 @@
  *
  * For a parent context without a store, the commit track can be nil .
  */
-@property (nonatomic, retain) COBranch *mainBranch;
+@property (nonatomic, readwrite, retain) COBranch *editingBranch;
+@property (nonatomic, readwrite, retain) COBranch *currentBranch;
+@property (nonatomic, readwrite, retain) COBranch *trunkBranch;
+
+@property (nonatomic, readonly) NSSet *branches;
+
+/**
+ * Returns the object graph for the edited branch
+ */
+@property (nonatomic, readonly) COObjectGraphContext *objectGraph;
+
 /**
  * The entry point to navigate the object graph bound to the persistent root.
  *
@@ -167,7 +206,7 @@
  */
 @property (nonatomic, readonly) COEditingContext *editingContext;
 
-@property (nonatomic, readonly) COObjectGraphContext *objectGraph;
+
 
 /** @taskunit Object Access and Loading */
 
@@ -267,15 +306,6 @@
  */
 - (BOOL)isUpdatedObject: (COObject *)anObject;
 /**
- * Returns the objects deleted in the context with -deleteObject: and to be
- * deleted in the store on the next commit.
- *
- * After a commit, returns an empty set.
- *
- * Doesn't include newly inserted or deleted objects.
- */
-- (NSSet *)deletedObjects;
-/**
  * Returns the union of the inserted, updated and deleted objects. See
  * -insertedObjects, -updatedObjects and -deletedObjects.
  *
@@ -324,14 +354,6 @@
  */
 - (id)insertObjectWithEntityName: (NSString *)aFullName;
 
-/** @taskunit Object Deletion */
-
-// TODO: Remove when we integrate embedded object GC
-/**
- * Schedules the object to be deleted both in memory and in store on the next
- * commit.
- */
-- (void)deleteObject: (COObject *)anObject;
 
 /** @taskunit Committing Changes */
 
@@ -362,24 +384,12 @@
 /**
  * <init />
  * This method is only exposed to be used internally by CoreObject.
+ *
+ * If info is nil, creates a new persistent root.
  */
 - (id)initWithInfo: (COPersistentRootInfo *)info
      parentContext: (COEditingContext *)aCtxt;
 
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Reloads the root object and its inner objects at a new revision.
- */
-- (void)reloadAtRevision: (CORevision *)revision;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Unloads the root object and its inner objects.
- *
- * Can be used to implement undo on root object creation.
- */
-- (void)unload;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -396,7 +406,7 @@
  * Extracts the current changes, saves them to the store with the provided 
  * metadatas and returns the resulting revision.
  */
-- (CORevision *)saveCommitWithMetadata: (NSDictionary *)metadata;
+- (void) saveCommitWithMetadata: (NSDictionary *)metadata;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -413,5 +423,7 @@
 - (COPersistentRootInfo *) persistentRootInfo;
 
 - (void) reloadPersistentRootInfo;
+
+- (void) addBranch: (COBranch*)aBranch;
 
 @end

@@ -453,9 +453,10 @@
      forPersistentRoot: (ETUUID *)aRoot
                  error: (NSError **)error;
 
-- (ETUUID *) createBranchWithInitialRevision: (CORevisionID *)aToken
-                           forPersistentRoot: (ETUUID *)aRoot
-                                       error: (NSError **)error;
+- (BOOL) createBranchWithUUID: (ETUUID *)branchUUID
+              initialRevision: (CORevisionID *)revId
+            forPersistentRoot: (ETUUID *)aRoot
+                        error: (NSError **)error;
 
 /**
  * All-in-one method for updating the current revision of a persistent root.

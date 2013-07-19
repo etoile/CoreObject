@@ -1088,7 +1088,8 @@ See +[NSObject typePrefix]. */
 
 - (COBranch *)commitTrack
 {
-	return [[self persistentRoot] mainBranch];
+    // FIXME: Not correct, should be the actual branch owning this COObject
+	return [[self persistentRoot] editingBranch];
 }
 
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery

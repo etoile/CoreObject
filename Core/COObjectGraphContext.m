@@ -353,7 +353,10 @@
 {
     return [insertedObjects_ setByAddingObjectsFromSet: modifiedObjects_];
 }
-
+- (BOOL)hasChanges
+{
+	return [[self changedObjects] count] > 0;
+}
 - (NSArray *) allObjects
 {
     return [objectsByUUID_ allValues];

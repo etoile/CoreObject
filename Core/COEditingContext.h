@@ -96,9 +96,10 @@
 /** @taskunit Special Groups and Libraries */
 
 /**
- * Returns a group listing every core object in the store.
+ * Returns a set of every persistent root in the store, plus those
+ * pending commit (and minus those pending deletion).
  */
-- (COSmartGroup *)mainGroup;
+- (NSSet *)persistentRoots;
 /**
  * Returns a group listing the libraries in the store.
  *

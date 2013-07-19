@@ -10,7 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreObject/COTrack.h>
 
-@class COObject, CORevision, COPersistentRoot, COBranchInfo;
+@class COObject, CORevision, COPersistentRoot, COBranchInfo, COObjectGraphContext;
 
 /**
  * A persistent history track on an object.
@@ -26,24 +26,35 @@
 @interface COBranch : NSObject
 {
 	@private
-    ETUUID *UUID;
+    ETUUID *_UUID;
     
     /**
      * Weak reference
      */
-	COPersistentRoot *persistentRoot;
+	COPersistentRoot *_persistentRoot;
+    
+    /**
+     * Only used when this is a new branch
+     */
+    CORevisionID *_parentRevisionID;
+    
+    /** 
+     * If nil, we are not yet committed.
+     *
+     * If this is different than the current revision for this branch
+     * recorded in _persistentRoot's _savedState, it means the user has reverted
+     * to a past revision.
+     */
+	CORevisionID *_currentRevisionID;
+    
+    /**
+     * If different than the metadata for this branch in _persistentRoot's _savedState,
+     * then a metadata change is staged for commit.     
+     */
+    NSDictionary *_metadata;
+    
+    COObjectGraphContext *_objectGraph;
 }
-
-/** @taskunit Initialization */
-
-/**
- * <init />
- * Intializes and returns a new commit track known by the given UUID and bound 
- * to a particular persistent root.
- *
- * For nil UUID or persistent root, raises a NSInvalidArgumentException.
- */
-- (id)initWithUUID: (ETUUID *)aUUID persistentRoot: (COPersistentRoot *)aContext;
 
 /** @taskunit Track Kind */
 
@@ -101,7 +112,7 @@
  * is also nil in this case.
  */
 @property (readonly, nonatomic) CORevision *parentRevision;
-@property (readonly, nonatomic) CORevision *currentRevision;
+@property (readwrite, retain, nonatomic) CORevision *currentRevision;
 /**
  * The persistent root owning the commit track.
  *
@@ -111,6 +122,10 @@
  */
 @property (readonly, nonatomic) COPersistentRoot *persistentRoot;
 
+/** @taskunit Object Graph */
+
+@property (readonly, nonatomic) COObjectGraphContext *objectGraph;
+
 /** @taskunit Creating Branches and Cheap copies */
 
 // TODO: Convert these methods to logging the change in the editing context and saving it
@@ -119,6 +134,8 @@
 /**
  * Returns a new commit track by branching the receiver last revision and using 
  * the given label.
+ *
+ * The receiver must be committed.
  *
  * See also -makeBranchWithLabel:atRevision:.
  */
@@ -139,6 +156,10 @@
  * <example>
  * [persistentRoot setCommitTrack: [[persistentRoot commitTrack] makeBranchWithLabel: @"Sandbox"]];
  * </example>
+ *
+ * One restriction is that the receiver must be committed - not a newly
+ * created branch, or the default branch of a persistent root. This is just for
+ * implementation simplicity, not a fundamental design limitation.
  */
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev;
 /**
@@ -154,6 +175,8 @@
  *
  * The revision must belong to the receiver track, otherwise a
  * NSInvalidArgumentException is raised.
+ *
+ * The receiver must be committed.
  */
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev;
 
@@ -177,6 +200,10 @@
 
 /** @taskunit Private */
 
+- (id)        initWithUUID: (ETUUID *)aUUID
+            persistentRoot: (COPersistentRoot *)aContext
+parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch;
+
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -186,5 +213,9 @@
  * and without accessing the store.
  */
 - (void)didMakeNewCommitAtRevision: (CORevision *)revision;
+- (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID;
+- (void) saveCommitWithMetadata: (NSDictionary *)metadata;
+- (void)discardAllChanges;
+- (void)discardChangesInObject: (COObject *)object;
 
 @end

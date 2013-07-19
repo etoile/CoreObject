@@ -119,28 +119,24 @@ static COEditingContext *currentCtxt = nil;
 	return self;
 }
 
-- (COSmartGroup *)mainGroup
+- (NSSet *)persistentRoots
 {
-    return nil; // FIXME: Rewrite
-#if 0
-	COSmartGroup *group = AUTORELEASE([[COSmartGroup alloc] init]);
-	COContentBlock block = ^() {
-		NSSet *rootUUIDs = [[self store] rootObjectUUIDs];
-		NSMutableArray *rootObjects = [NSMutableArray arrayWithCapacity: [rootUUIDs count]];
-
-		for (ETUUID *uuid in rootUUIDs)
-		{
-			[rootObjects addObject: [self objectWithUUID: uuid]];
-		}
-
-		return rootObjects;
-	};
-
-	[group setContentBlock: block];
-	[group setName: _(@"All Objects")];
-
-	return group;
-#endif
+    // Start with a list of persistent root UUIDs from the store
+    NSMutableSet *UUIDs = [NSMutableSet setWithArray: [_store persistentRootUUIDs]];
+    
+    // Subtract those pending deletion
+    for (COPersistentRoot *deleted in _deletedPersistentRoots)
+    {
+        [UUIDs removeObject: [deleted persistentRootUUID]];
+    }
+    
+    NSMutableSet *result = [NSMutableSet set];
+    for (ETUUID *uuid in UUIDs)
+    {
+        [result addObject: [self persistentRootForUUID: uuid]];
+    }
+    [result addObjectsFromArray: [_loadedPersistentRoots allValues]];
+    return result;
 }
 
 - (COGroup *)libraryGroup
@@ -361,7 +357,8 @@ static COEditingContext *currentCtxt = nil;
 	}
 
 	/* Remove from the cache all the objects that belong to discarded persistent roots */
-	[(COPersistentRoot *)[insertedPersistentRoots mappedCollection] unload];
+    // FIXME: Implement
+	//[(COPersistentRoot *)[insertedPersistentRoots mappedCollection] unload];
 
 	/* Release the discarded persistent roots */
 	[_loadedPersistentRoots removeObjectsForKeys:
@@ -403,6 +400,7 @@ static COEditingContext *currentCtxt = nil;
 /* Both COPersistentRoot or COEditingContext objects are valid arguments. */
 - (BOOL)validateChangedObjectsForContext: (id)aContext
 {
+#if 0
 	NSSet *insertionErrors = (id)[[[aContext insertedObjects] mappedCollection] validateForInsert];
 	NSSet *updateErrors = (id)[[[aContext updatedObjects] mappedCollection] validateForUpdate];
 	NSSet *deletionErrors = (id)[[[aContext deletedObjects] mappedCollection] validateForDelete];
@@ -417,6 +415,8 @@ static COEditingContext *currentCtxt = nil;
 	[aContext didFailValidationWithError: [COError errorWithErrors: validationErrors]];
 
 	return ([aContext error] == nil);
+#endif
+    return YES;
 }
 
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
@@ -437,7 +437,7 @@ static COEditingContext *currentCtxt = nil;
 	// TODO: Add a batch commit UUID in the metadata
 	for (COPersistentRoot *ctxt in persistentRoots)
 	{
-		[revisions addObject: [ctxt saveCommitWithMetadata: metadata]];
+		[ctxt saveCommitWithMetadata: metadata];
 		[self didCommitRevision: [revisions lastObject]];
 	}
 	
@@ -453,7 +453,8 @@ static COEditingContext *currentCtxt = nil;
 		ETUUID *uuid = [persistentRoot persistentRootUUID];
 		[_store deletePersistentRoot: uuid error: NULL];
 
-		[persistentRoot unload];
+        // FIXME: Implement.
+		//[persistentRoot unload];
 		[_loadedPersistentRoots removeObjectForKey: uuid];
 	}
 

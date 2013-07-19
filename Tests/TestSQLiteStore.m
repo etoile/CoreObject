@@ -166,9 +166,12 @@ static ETUUID *childUUID2;
     ASSIGN(initialBranchUUID, [proot mainBranchUUID]);
     ASSIGN(initialRevisionId, [[proot mainBranchInfo] currentRevisionID]);
     
-    ASSIGN(branchAUUID, [store createBranchWithInitialRevision: initialRevisionId
-                                             forPersistentRoot: prootUUID
-                                                         error: NULL]);
+    ASSIGN(branchAUUID, [ETUUID UUID]);
+    [store createBranchWithUUID: branchAUUID
+                initialRevision: initialRevisionId
+              forPersistentRoot: prootUUID
+                          error: NULL];
+    
     assert([store setCurrentRevision: [CORevisionID revisionWithBackinStoreUUID: [proot UUID] revisionIndex: BRANCH_LENGTH]
                         headRevision: [CORevisionID revisionWithBackinStoreUUID: [proot UUID] revisionIndex: BRANCH_LENGTH]
                         tailRevision: initialRevisionId
@@ -177,9 +180,11 @@ static ETUUID *childUUID2;
                   currentChangeCount: &prootChangeCount
                                error: NULL]);
     
-    ASSIGN(branchBUUID, [store createBranchWithInitialRevision: initialRevisionId
-                                             forPersistentRoot: prootUUID
-                                                         error: NULL]);
+    ASSIGN(branchBUUID, [ETUUID UUID]);
+    [store createBranchWithUUID: branchBUUID
+                initialRevision: initialRevisionId
+              forPersistentRoot: prootUUID
+                          error: NULL];
     
     assert([store setCurrentRevision: [CORevisionID revisionWithBackinStoreUUID: [proot UUID] revisionIndex: 2 * BRANCH_LENGTH]
                         headRevision: [CORevisionID revisionWithBackinStoreUUID: [proot UUID] revisionIndex: 2 * BRANCH_LENGTH]

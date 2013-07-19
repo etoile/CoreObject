@@ -93,6 +93,8 @@
 
 - (NSSet *) changedObjects;
 
+- (BOOL)hasChanges;
+
 - (void) clearChangeTracking;
 - (void) clearChangeTrackingForObject: (COObject *)anObject;
 

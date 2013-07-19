@@ -15,12 +15,15 @@
 #import "CORevision.h"
 #import "FMDatabase.h"
 #import "CORevisionInfo.h"
-
-//#define CACHE_AMOUNT 30
+#import "COObjectGraphContext.h"
 
 @implementation COBranch
 
-@synthesize UUID, persistentRoot;
+@synthesize UUID = _UUID;
+@synthesize persistentRoot = _persistentRoot;
+
+@synthesize objectGraph = _objectGraph;
+
 
 - (id)init
 {
@@ -30,7 +33,9 @@
 
 /* Both root object and revision are lazily retrieved by the persistent root. 
    Until the loaded revision is known, it is useless to cache track nodes. */
-- (id)initWithUUID: (ETUUID *)aUUID persistentRoot: (COPersistentRoot *)aContext;
+- (id)        initWithUUID: (ETUUID *)aUUID
+            persistentRoot: (COPersistentRoot *)aContext
+parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
 	NILARG_EXCEPTION_TEST(aUUID);
 	NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
@@ -44,28 +49,73 @@
 
 	SUPERINIT;
 
-    
-    
-	ASSIGN(UUID, aUUID);
+    ASSIGN(_UUID, aUUID);
+        
 	/* The persistent root retains us */
-	persistentRoot = aContext;
+	_persistentRoot = aContext;
 
+    // FIXME: COObjectGraphContext should keep a weak ref to the branch now, not the persistent root
+    _objectGraph = [[COObjectGraphContext alloc] initWithPersistentRoot: _persistentRoot];
+    
+    if ([_persistentRoot persistentRootInfo] != nil)
+    {
+        // Loading an existing branch
+        
+        ETAssert(parentRevisionForNewBranch == nil);
+        COBranchInfo *branchInfo = [self branchInfo];
+        ETAssert(branchInfo != nil);
+        
+        ASSIGN(_currentRevisionID, [branchInfo currentRevisionID]);
+        ASSIGN(_metadata, [branchInfo metadata]);
+                
+        id<COItemGraph> aGraph = [[_persistentRoot store] contentsForRevisionID: _currentRevisionID];
+        [_objectGraph setItemGraph: aGraph];
+    }
+    else
+    {
+        // Creating a new branch
+        
+        ASSIGN(_parentRevisionID, parentRevisionForNewBranch);
+        
+        // If _parentRevisionID is nil, we're a new branch for a new persistent root
+        // Otherwise, we're a new branch for an existing (committed) persistent root
+        
+        if (_parentRevisionID != nil)
+        {
+            id<COItemGraph> aGraph = [[_persistentRoot store] contentsForRevisionID: _parentRevisionID];
+            [_objectGraph setItemGraph: aGraph];
+        }
+    }
+    
 	return self;	
 }
 
+
 - (void)dealloc
 {
-	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
-	DESTROY(UUID);
+	DESTROY(_UUID);
+    DESTROY(_currentRevisionID);
+    DESTROY(_metadata);
+    DESTROY(_objectGraph);
 	[super dealloc];
+}
+
+- (BOOL) isBranchUncommitted
+{
+    return _currentRevisionID == nil;
+}
+
+- (BOOL) isBranchPersistentRootUncommitted
+{
+    return _currentRevisionID == nil && _parentRevisionID == nil;
 }
 
 - (BOOL)isEqual: (id)rhs
 {
 	if ([rhs isKindOfClass: [COBranch class]])
 	{
-		return ([UUID isEqual: [rhs UUID]]
-			&& [[persistentRoot persistentRootUUID] isEqual: [[rhs persistentRoot] persistentRootUUID]]);
+		return ([_UUID isEqual: [rhs UUID]]
+			&& [[_persistentRoot persistentRootUUID] isEqual: [[rhs persistentRoot] persistentRootUUID]]);
 	}
 	return NO;
 }
@@ -103,14 +153,14 @@
 - (COBranchInfo *) branchInfo
 {
     COPersistentRootInfo *persistentRootInfo = [[self persistentRoot] persistentRootInfo];
-    COBranchInfo *branchInfo = [persistentRootInfo branchInfoForUUID: UUID];
+    COBranchInfo *branchInfo = [persistentRootInfo branchInfoForUUID: _UUID];
     return branchInfo;
 }
 
 - (CORevisionInfo *) currentRevisionInfo
 {
     // WARNING: Accesses store
-    CORevisionID *revid = [[self branchInfo] currentRevisionID];
+    CORevisionID *revid = _currentRevisionID;
     COSQLiteStore *store = [[self persistentRoot] store];
     
     if (revid != nil)
@@ -154,6 +204,12 @@
     return nil;
 }
 
+- (void) setCurrentRevision:(CORevision *)currentRevision
+{
+    ASSIGN(_currentRevisionID, [currentRevision revisionID]);
+    [self reloadAtRevision: currentRevision];
+}
+
 - (COBranch *)parentTrack
 {
     // FIXME: Add support for this
@@ -162,36 +218,30 @@
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel
 {
-    // FIXME: Enqueue in editing context rather than committing immediately
+    if ([self isBranchUncommitted])
+    {
+        [NSException raise: NSGenericException format: @"uncommitted branches do not support -makeBranchWithLabel:"];
+    }
     
-	return [self makeBranchWithLabel: aLabel atRevision: [[self persistentRoot] revision]];
+	return [self makeBranchWithLabel: aLabel atRevision: [self currentRevision]];
 }
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
-    // FIXME: Enqueue in editing context rather than committing immediately
+    COBranch *newBranch = [[[COBranch alloc] initWithUUID: [ETUUID UUID]
+                                           persistentRoot: _persistentRoot
+                               parentRevisionForNewBranch: [aRev revisionID]] autorelease];
     
-	NILARG_EXCEPTION_TEST(aRev);
-
-	COSQLiteStore *store = [[self persistentRoot] store];
+    [_persistentRoot addBranch: newBranch];
     
-    ETUUID *branchUUID = [store createBranchWithInitialRevision: [aRev revisionID]
-                                              forPersistentRoot: [[self persistentRoot] persistentRootUUID]
-                                                          error: NULL];
-    
-    [store setMainBranch: branchUUID
-       forPersistentRoot: [[self persistentRoot] persistentRootUUID]
-                   error: NULL];
-	
-    [[self persistentRoot] reloadPersistentRootInfo];
-    
-	return [[[COBranch alloc] initWithUUID: branchUUID
-								 persistentRoot: [self persistentRoot]] autorelease];
-
+    return newBranch;
 }
 
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev
 {
+    ETAssert(0); // Not yet implemented.
+    return nil;
+#if 0
     // FIXME: Enqueue in editing context rather than committing immediately
     
 	NILARG_EXCEPTION_TEST(aRev);
@@ -204,6 +254,7 @@
                                     error: NULL];
     
 	return [[[self persistentRoot] parentContext] makePersistentRootWithInfo: info];
+#endif
 }
 
 - (BOOL)mergeChangesFromTrack: (COBranch *)aSourceTrack
@@ -480,6 +531,103 @@
 
 	[self didUpdate];
 #endif
+}
+
+- (COSQLiteStore *) store
+{
+    return [_persistentRoot store];
+}
+
+- (void)discardAllChanges
+{
+	for (COObject *object in [_objectGraph changedObjects])
+	{
+		[self discardChangesInObject: object];
+	}
+	assert([_objectGraph hasChanges] == NO);
+}
+
+- (void)discardChangesInObject: (COObject *)object
+{
+    if (_currentRevisionID != nil)
+    {
+        COItem *item = [[self store] item: [object UUID]
+                             atRevisionID: _currentRevisionID];
+        
+        [_objectGraph addItem: item];
+        [_objectGraph clearChangeTrackingForObject: object];
+    }
+}
+
+- (void)saveCommitWithMetadata: (NSDictionary *)metadata
+{
+	ETAssert([[_objectGraph rootObject] isRoot]);
+    ETAssert(![self isBranchPersistentRootUncommitted]);
+    
+	COSQLiteStore *store = [self store];
+    
+	if ([self isBranchUncommitted])
+	{
+        // N.B. - this only the case when we're adding a new branch to an existing persistent root.
+        
+        [store createBranchWithUUID: _UUID
+                    initialRevision: _parentRevisionID
+                  forPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                              error: NULL];
+        
+        [store setMetadata: _metadata
+                 forBranch: _UUID
+          ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                     error: NULL];
+        
+        ASSIGN(_currentRevisionID, _parentRevisionID);
+        ASSIGN(_parentRevisionID, nil);
+    }
+    
+    NSArray *changedItemUUIDs = [(NSSet *)[[[_objectGraph changedObjects] mappedCollection] UUID] allObjects];
+    if ([changedItemUUIDs count] > 0)
+    {
+        CORevisionID *revId = [store writeContents: _objectGraph
+                                      withMetadata: metadata
+                                  parentRevisionID: _currentRevisionID
+                                     modifiedItems: changedItemUUIDs
+                                             error: NULL];        
+        
+        int64_t changeCount = [[_persistentRoot persistentRootInfo] changeCount];
+        
+        BOOL ok = [store setCurrentRevision: revId
+                               headRevision: revId
+                               tailRevision: nil
+                                  forBranch: _UUID
+                           ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                         currentChangeCount: &changeCount
+                                      error: NULL];
+        ETAssert(ok);
+        
+        ASSIGN(_currentRevisionID, revId);
+    }
+	
+	[_objectGraph clearChangeTracking];
+}
+
+- (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID
+{
+    ASSIGN(_currentRevisionID, aRevisionID);
+    ASSIGN(_parentRevisionID, nil);
+}
+
+- (void)reloadAtRevision: (CORevision *)revision
+{
+    NSParameterAssert(revision != nil);
+    
+    // TODO: Use optimized method on the store to get a delta for more performance
+    
+	id<COItemGraph> aGraph = [[self store] contentsForRevisionID: [revision revisionID]];
+    
+    [_objectGraph setItemGraph: aGraph];
+    
+    // FIXME: Reimplement or remove
+    //[[self rootObject] didReload];
 }
 
 @end

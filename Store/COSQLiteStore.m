@@ -711,6 +711,10 @@
                                                           metadata: (NSDictionary *)metadata
                                                              error: (NSError **)error
 {
+    NILARG_EXCEPTION_TEST(contents);
+    NILARG_EXCEPTION_TEST(persistentRootUUID);
+    NILARG_EXCEPTION_TEST(aBranchUUID);
+    
     CORevisionID *revId = [self writeItemTreeWithNoParent: contents
                                              withMetadata: [NSDictionary dictionary]
                                    inBackingStoreWithUUID: persistentRootUUID];
@@ -729,6 +733,10 @@
                                                           metadata: (NSDictionary *)metadata
                                                              error: (NSError **)error
 {
+    NILARG_EXCEPTION_TEST(aRevision);
+    NILARG_EXCEPTION_TEST(persistentRootUUID);
+    NILARG_EXCEPTION_TEST(aBranchUUID);
+
     return [self createPersistentRootWithUUID: persistentRootUUID
                                    branchUUID: aBranchUUID
                                        isCopy: YES
@@ -808,12 +816,11 @@
     return ok;
 }
 
-- (ETUUID *) createBranchWithInitialRevision: (CORevisionID *)revId
-                           forPersistentRoot: (ETUUID *)aRoot
-                                       error: (NSError **)error
+- (BOOL) createBranchWithUUID: (ETUUID *)branchUUID
+              initialRevision: (CORevisionID *)revId
+            forPersistentRoot: (ETUUID *)aRoot
+                        error: (NSError **)error
 {
-    ETUUID *branchUUID = [ETUUID UUID];
-    
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     BOOL ok = [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,?,0)",
      [branchUUID dataValue],
@@ -835,7 +842,7 @@
                                                       deleted: NO];
     }
     
-    return branchUUID;
+    return ok;
 }
 
 - (BOOL) setCurrentRevision: (CORevisionID*)currentRev
@@ -851,6 +858,7 @@
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     if (![self checkAndUpdateChangeCount: aChangeCountInOut forPersistentRootId: root_id])
     {
+        NSLog(@"changeCount incorrect");
         [db_ releaseSavepoint: @"setCurrentRevision"];
         return NO;
     }

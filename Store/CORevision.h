@@ -118,4 +118,7 @@
 - (id)initWithStore: (COSQLiteStore *)aStore
        revisionInfo: (CORevisionInfo *)aRevInfo;
 
++ (CORevision *) revisionWithStore: (COSQLiteStore *)aStore
+                        revisionID: (CORevisionID *)anID;
+
 @end

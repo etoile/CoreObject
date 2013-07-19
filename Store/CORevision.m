@@ -24,6 +24,14 @@
 	[self applyTraitFromClass: [ETCollectionTrait class]];
 }
 
++ (CORevision *) revisionWithStore: (COSQLiteStore *)aStore revisionID: (CORevisionID *)anID
+{
+    CORevisionInfo *revInfo = [aStore revisionInfoForRevisionID: anID];
+    
+    return [[[CORevision alloc] initWithStore: aStore
+                                 revisionInfo: revInfo] autorelease];
+}
+
 - (id)initWithStore: (COSQLiteStore *)aStore
        revisionInfo: (CORevisionInfo *)aRevInfo
 {
