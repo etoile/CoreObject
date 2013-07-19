@@ -153,11 +153,21 @@
     return desc;
 }
 
-// TODO: Implement or remove to support deserialization
 - (id) objectReferenceWithUUID: (ETUUID *)aUUID
-			 entityDescription: (ETEntityDescription *)anEntityDescription
 {
-	return nil;
+	ETAssert(_loadingItemGraph != nil);
+	COObject *loadedObject = [objectsByUUID_ objectForKey: aUUID];
+
+	if (loadedObject != nil)
+		return loadedObject;
+
+	/* The metamodel cannot be used for the entity description because the 
+	   loaded object type could be a subtype of the type declared in the 
+	   metamodel. For example, a to-one relationship of type COObject could 
+	   point a COBookmark object, so allocating a COObject as declared in the 
+	   metamodel doesn't give us the right object. */
+	return [self objectWithUUID: aUUID
+	          entityDescription: [self descriptionForItem: [_loadingItemGraph itemForUUID: aUUID]]];
 }
 
 - (id) objectWithUUID: (ETUUID *)aUUID
@@ -290,13 +300,22 @@
     [self clearChangeTracking];
 
     // 1. Do updates.
-    
+
     ASSIGN(rootObjectUUID_, [aTree rootItemUUID]);
     
+	// TODO: To prevent caching the item graph during the loading, a better
+	// approach could be to allocate all the objects before loading them.
+	// We could also change -[COObjectGraphContext itemForUUID:] to search aTree
+	// during the loading rather than the loaded objects (but that's roughly the
+	// same than we do currently).
+	ASSIGN(_loadingItemGraph, aTree);
+
     for (ETUUID *uuid in [aTree itemUUIDs])
     {
         [self addItem: [aTree itemForUUID: uuid] markAsInserted: NO];
     }
+	
+	DESTROY(_loadingItemGraph);
     
     // 3. Do GC
     

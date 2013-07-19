@@ -15,6 +15,7 @@
 {
     ETUUID *rootObjectUUID_;
     NSMutableDictionary *objectsByUUID_;
+	id <COItemGraph> _loadingItemGraph;
     
     NSMutableSet *insertedObjects_;
     NSMutableSet *modifiedObjects_;
@@ -116,6 +117,7 @@
 
 #pragma mark COObject private
 
+- (id) objectReferenceWithUUID: (ETUUID *)aUUID;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

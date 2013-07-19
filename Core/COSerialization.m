@@ -10,6 +10,7 @@
 #import "COObject.h"
 #import "COItem.h"
 #import "COItem+Binary.h"
+#import "COObjectGraphContext.h"
 #import "COPath.h"
 #import "COPersistentRoot.h"
 
@@ -498,22 +499,22 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	if (type == kCOReferenceType || type == kCOCompositeReferenceType)
 	{
 		NSParameterAssert([value isKindOfClass: [ETUUID class]]);
-
+	
 		/* Look up a inner object reference in the receiver persistent root */
-		id object =  [[self persistentRoot] objectWithUUID: value];
+		id object = [[self objectGraphContext] objectReferenceWithUUID: value];
 
 		/* If no matching inner object exists, look up an outer object reference 
 		   (reference accross persistent roots) */
 		if (object == nil)
 		{
+			ETAssertUnreachable();
 			// TODO: Implement correctly
 			object = [[[self persistentRoot] parentContext] objectWithUUID: value];
 		}
-		
-		// FIXME: The assertion should check the object entity description
-		// matches the property description type exactly or is either a
-		// subentity or parent entity. For now, we just enforce the first case.
-		ETAssert([[[object entityDescription] name] isEqual: [[aPropertyDesc type] name]]);
+
+		/* See also -validateStoreItem: */
+		ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc type]]
+			|| [[[object entityDescription]name] isEqualToString: @"CODictionary"]);
 		return object;
 	}
     else
@@ -580,28 +581,37 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	/* Persistent roots will post KVO notifications but won't record the changes */
 	[self didChangeValueForProperty: key];
 }
-								
-- (void)setStoreItem: (COItem *)aStoreItem
+
+/* Validates that the receiver is compatible with the provided store item. */
+- (void)validateStoreItem: (COItem *)aStoreItem
 {
-    // Validate that the receiver is compatible with the provided store item
-    
     if (![[aStoreItem UUID] isEqual: [self UUID]])
     {
         [NSException raise: NSInvalidArgumentException
                     format: @"-setStoreItem: called with UUID %@ on COObject with UUID %@", [aStoreItem UUID], [self UUID]];
     }
-    
-    if (![[aStoreItem valueForAttribute: kCOObjectEntityNameProperty] isEqual: [[self entityDescription] name]])
+
+	NSString *entityName = [aStoreItem valueForAttribute: kCOObjectEntityNameProperty];
+	ETEntityDescription *entityDesc =
+		[[[self objectGraphContext] modelRepository] descriptionForName: entityName];
+
+	/* If B is a subclass of A, and a property description type is A but the 
+	   the property value is a B object, the deserialized property value is 
+	   accepted because [B isKindOfEntity: A] is true. */
+    if (![[self entityDescription] isKindOfEntity: entityDesc] && ![[self entityDescription] isRoot])
     {
-        // FIXME: Relax this requirement
+		// TODO: Rewrite this exception to provide a better explanation.
         [NSException raise: NSInvalidArgumentException
                     format: @"-setStoreItem: called with entity name %@ on COObject with entity name %@",
                             [aStoreItem valueForAttribute: kCOObjectEntityNameProperty], [[self entityDescription] name]];
 
     }
-    
-    // Set the properties
-    
+}
+
+- (void)setStoreItem: (COItem *)aStoreItem
+{
+	[self validateStoreItem: aStoreItem];
+
 	for (NSString *property in [aStoreItem attributeNames])
 	{
         if ([property isEqualToString: kCOObjectEntityNameProperty])
