@@ -710,12 +710,30 @@
  - (NSMutableDictionary *)newVariableStorage;
 /**
  * This method is only exposed to be used internally by CoreObject.
+ *
+ * COPersistentRoot uses this method to initialize a new object that was never 
+ * committed.
+ *
+ * For a subclass, this method results in the subclass designated initializer 
+ * being called.
  */
 - (id)initWithUUID: (ETUUID *)aUUID 
  entityDescription: (ETEntityDescription *)anEntityDescription
-           context: (COPersistentRoot *)aContext;
+           context: (COObjectGraphContext *)aContext;
 /**
- * Private.
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * COPersistentRoot uses this method to initialize a reloaded object that was 
+ * previously committed.
+ *
+ * For a subclass, this method doesn't result in the subclass designated 
+ * initializer being called.
+ */
+- (id)commonInitWithUUID: (ETUUID *)aUUID
+       entityDescription: (ETEntityDescription *)anEntityDescription
+                 context: (COObjectGraphContext *)aContext;
+/**
+ * This method is only exposed to be used internally by CoreObject.
  */
 - (CORelationshipCache *)relationshipCache;
 - (void) markAsRemovedFromContext;

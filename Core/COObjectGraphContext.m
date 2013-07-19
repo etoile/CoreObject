@@ -114,11 +114,7 @@
 - (COItem *) itemForUUID: (ETUUID *)aUUID
 {
     COObject *object = [objectsByUUID_ objectForKey: aUUID];
-    if (nil != object)
-    {
-        return [object storeItem];
-    }
-    return nil;
+	return [object storeItem];
 }
 
 - (NSArray *) itemUUIDs
@@ -157,31 +153,40 @@
     return desc;
 }
 
+// TODO: Implement or remove to support deserialization
+- (id) objectReferenceWithUUID: (ETUUID *)aUUID
+			 entityDescription: (ETEntityDescription *)anEntityDescription
+{
+	return nil;
+}
+
+- (id) objectWithUUID: (ETUUID *)aUUID
+    entityDescription: (ETEntityDescription *)anEntityDescription
+{
+	Class objClass = [modelRepository_ classForEntityDescription: anEntityDescription];
+	/* For a reloaded object, we must no call -initWithUUID:entityDescription:context:
+	   to prevent the normal initialization process to occur (the COObject
+	   subclass designed initializer being called). */
+	COObject *obj = [[objClass alloc] commonInitWithUUID: aUUID
+                                       entityDescription: anEntityDescription
+	                                             context: self];
+	
+	[objectsByUUID_ addObject: obj forKey: aUUID];
+	[obj release];
+	
+	return obj;
+}
+
 - (COObject *)objectWithStoreItem: (COItem *)anItem
 {
 	NILARG_EXCEPTION_TEST(anItem);
     
-	ETEntityDescription *desc = [self descriptionForItem: anItem];
-	Class objClass = [modelRepository_ classForEntityDescription: desc];
-    
-	COObject *obj = [[objClass alloc] initWithUUID: [anItem UUID]
-                                 entityDescription: desc
-                                           context: [self persistentRoot]];
-    
-    if (persistentRoot_ != nil)
-    {
-        [obj becomePersistentInContext: persistentRoot_];
-    }
-    else
-    {
-        [obj becomePersistentInObjectGraphContext: self];
-    }
+	COObject *obj = [self objectWithUUID: [anItem UUID]
+	                   entityDescription: [self descriptionForItem: anItem]];
 
     [obj setStoreItem: anItem];
-	[obj release];
-    
-    [obj addCachedOutgoingRelationships];
-    
+	[obj addCachedOutgoingRelationships];
+	
 	return obj;
 }
 
@@ -358,6 +363,9 @@
 
 - (COObject *) objectWithUUID: (ETUUID *)aUUID
 {
+	// NOTE: We serialize UUIDs into strings in various places, this check
+	// helps to intercept string objects that ought to be ETUUID objects.
+	NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
     return [objectsByUUID_ objectForKey: aUUID];
 }
 

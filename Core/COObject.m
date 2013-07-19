@@ -135,7 +135,7 @@ See +[NSObject typePrefix]. */
 
 - (id) commonInitWithUUID: (ETUUID *)aUUID 
         entityDescription: (ETEntityDescription *)anEntityDescription
-                  context: (COPersistentRoot *)aContext
+                  context: (COObjectGraphContext *)aContext
 {
 	NSParameterAssert(aUUID != nil);
 	BOOL isPersistent = (aContext != nil);
@@ -162,6 +162,7 @@ See +[NSObject typePrefix]. */
 		ASSIGN(_entityDescription, [[ETModelDescriptionRepository mainRepository] 
 			entityDescriptionForClass: [self class]]);
 	}
+	_objectGraphContext = aContext;
 
 	_isIgnoringDamageNotifications = NO;
 	_isInitialized = YES;
@@ -174,7 +175,7 @@ See +[NSObject typePrefix]. */
 
 - (id)initWithUUID: (ETUUID *)aUUID 
  entityDescription: (ETEntityDescription *)anEntityDescription
-           context: (COPersistentRoot *)aContext
+           context: (COObjectGraphContext *)aContext
 {
 	SUPERINIT;
 	

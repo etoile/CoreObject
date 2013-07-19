@@ -499,7 +499,17 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	{
 		NSParameterAssert([value isKindOfClass: [ETUUID class]]);
 
-		id object =  [[[self persistentRoot] parentContext] objectWithUUID: value];
+		/* Look up a inner object reference in the receiver persistent root */
+		id object =  [[self persistentRoot] objectWithUUID: value];
+
+		/* If no matching inner object exists, look up an outer object reference 
+		   (reference accross persistent roots) */
+		if (object == nil)
+		{
+			// TODO: Implement correctly
+			object = [[[self persistentRoot] parentContext] objectWithUUID: value];
+		}
+		
 		// FIXME: The assertion should check the object entity description
 		// matches the property description type exactly or is either a
 		// subentity or parent entity. For now, we just enforce the first case.
