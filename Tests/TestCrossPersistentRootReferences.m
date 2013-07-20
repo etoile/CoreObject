@@ -157,9 +157,13 @@
     //
     // Actually ignore that, we can do it all in memory, just calling -createBranch will create
     // a branch off of the first commit.
+    //
+    // ..But for simplicity, I won't allow branching from uncommitted branches.\
     
-    COCommitTrack *branchB = [[photo1 commitTrack] makeBranchWithLabel: @"branchB"];
-    COObject *photo1branchBroot = [branchB rootObject];
+    [photo1 commit];
+    
+    COBranch *branchB = [[photo1 currentBranch] makeBranchWithLabel: @"branchB"];
+    COObject *photo1branchBroot = [[branchB objectGraph] rootObject];
 
     [photo1branchBroot setValue: @"photo1, branch B" forKey: @"label"];
     
