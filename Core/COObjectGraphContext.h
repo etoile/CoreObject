@@ -92,6 +92,7 @@
  * Returns the set of objects modified since change tracking was cleared
  */
 - (NSSet *) updatedObjects;
+- (BOOL) isUpdatedObject: (COObject *)anObject;
 
 - (NSSet *) changedObjects;
 

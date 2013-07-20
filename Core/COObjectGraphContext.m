@@ -363,6 +363,10 @@
 {
     return [insertedObjects_ setByAddingObjectsFromSet: modifiedObjects_];
 }
+- (BOOL) isUpdatedObject: (COObject *)anObject
+{
+    return [modifiedObjects_ containsObject: anObject];
+}
 - (BOOL)hasChanges
 {
 	return [[self changedObjects] count] > 0;

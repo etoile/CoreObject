@@ -14,6 +14,7 @@
 #import "CODictionary.h"
 #import "COError.h"
 #import "COPersistentRoot.h"
+#import "COBranch.h"
 #import "COObject+RelationshipCache.h"
 #import "CORelationshipCache.h"
 #import "COSQLiteStore.h"
@@ -331,7 +332,7 @@ See +[NSObject typePrefix]. */
 
 - (CORevision *)revision
 {
-	return [[self persistentRoot] revision];
+	return [[self commitTrack] currentRevision];
 }
 
 - (BOOL) isPersistent
@@ -343,7 +344,7 @@ See +[NSObject typePrefix]. */
 
 - (BOOL) isDamaged
 {
-	return [[self persistentRoot] isUpdatedObject: self];
+	return [_objectGraphContext isUpdatedObject: self];
 }
 
 /* Helper methods based on the metamodel */
@@ -1087,8 +1088,7 @@ See +[NSObject typePrefix]. */
 
 - (COBranch *)commitTrack
 {
-    // FIXME: Not correct, should be the actual branch owning this COObject
-	return [[self persistentRoot] editingBranch];
+	return [_objectGraphContext branch];
 }
 
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
