@@ -569,7 +569,7 @@
     BOOL deleted = NO;
     int64_t changecount = 0;
     
-    [db_ beginTransaction]; // N.B. The transaction is so the two SELECTs see the same DB. Needed?
+    [db_ savepoint: @"persistentRootInfoForUUID"]; // N.B. The transaction is so the two SELECTs see the same DB. Needed?
     
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aUUID];
     
@@ -620,7 +620,7 @@
         [rs close];
     }
     
-    [db_ commit];
+    [db_ releaseSavepoint: @"persistentRootInfoForUUID"];
 
     COPersistentRootInfo *result = [[[COPersistentRootInfo alloc] init] autorelease];
     result.UUID = aUUID;
