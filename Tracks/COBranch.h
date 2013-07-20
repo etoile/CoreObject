@@ -110,6 +110,9 @@
  * If the parent revision is nil, this means the receiver is a commit track that
  * was created at the same time than its persistent root. The parent track 
  * is also nil in this case.
+ *
+ * FIXME: The name "parent" is confusing, it is not the same as the parent of
+ * a revision. In COSQLiteStore's terminology this is the "tail" of the branch.
  */
 @property (readonly, nonatomic) CORevision *parentRevision;
 @property (readwrite, retain, nonatomic) CORevision *currentRevision;

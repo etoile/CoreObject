@@ -184,14 +184,12 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 - (CORevision *)parentRevision
 {
     // WARNING: Accesses store
-    CORevisionID *revid = [[self currentRevisionInfo] parentRevisionID];
+    CORevisionID *revid = [[self branchInfo] tailRevisionID];
     COSQLiteStore *store = [[self persistentRoot] store];
+    
     if (revid != nil)
     {
-        CORevisionInfo *parentRevisionInfo = [store revisionInfoForRevisionID: revid];
-    
-        return [[[CORevision alloc] initWithStore: [[self persistentRoot] store]
-                                      revisionInfo: parentRevisionInfo] autorelease];
+        return [CORevision revisionWithStore: store revisionID: revid];
     }
     
     return nil;

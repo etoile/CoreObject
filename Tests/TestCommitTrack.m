@@ -324,6 +324,8 @@
 
 - (void)testCheapCopyCreation
 {
+    [rootObj setValue: @"Untitled" forProperty: @"label"];
+    
     [persistentRoot commit];
     
 	CORevision *rev1 = [originalBranch currentRevision];
@@ -339,20 +341,25 @@
     
     UKObjectsNotEqual([copyRootBranch UUID], [originalBranch UUID]);
     UKObjectsNotEqual([copyRoot persistentRootUUID], [persistentRoot persistentRootUUID]);
+    
+    UKObjectsEqual(rev1, [copyRootBranch parentRevision]);
+    UKObjectsEqual(rev1, [copyRootBranch currentRevision]);
+    UKObjectsEqual(rev1, [originalBranch currentRevision]);
 
+    /* Make a commit in the cheap copy */
+    
+   	[[copyRoot rootObject] setValue: @"Todo" forProperty: @"label"];
+
+    [ctx commit];
+    
+    // FIXME: Not yet supported by COBranch:
     //UKObjectsEqual(commitTrack, [branch parentTrack]);
-	//UKTrue([rev1 isEqual: [rev2 baseRevision]]);
 	
-	/* Branch creation revision doesn't belong to either the source commit track or new branch */
-//	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
-//	UKObjectsEqual(rev1, [[branch currentNode] revision]);
-//	UKObjectsEqual(rev1, [branch parentRevision]);
-//	
-//	/* Branch creation doesn't touch the current persistent root revision */
-//	UKObjectsEqual([object revision], rev1);
-//	
-//	/* Branch creation doesn't switch the branch */
-//	UKObjectsSame(commitTrack, [[object persistentRoot] commitTrack]);
+	/* Cheap copy creation doesn't touch the current persistent root revision */
+	UKObjectsEqual([[persistentRoot rootObject] revision], rev1);
+
+    /* Cheap copy creation doesn't switch the branch */
+    UKObjectsSame(originalBranch, [persistentRoot currentBranch]);
 }
 
 @end
