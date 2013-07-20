@@ -200,9 +200,6 @@
 	@protected
 	NSMutableDictionary *_variableStorage;
     CORelationshipCache *_incomingRelationships;
-	// TODO: Remove if possible. We don't use setters when loading.
-    @package
-	BOOL _isIgnoringDamageNotifications;
 	@private
 	BOOL _inDescription; // FIXME: remove; only for debugging
 	BOOL _isInitialized;

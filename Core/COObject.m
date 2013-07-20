@@ -165,7 +165,6 @@ See +[NSObject typePrefix]. */
 	}
 	_objectGraphContext = aContext;
 
-	_isIgnoringDamageNotifications = NO;
 	_isInitialized = YES;
 
 	_variableStorage = [self newVariableStorage];
@@ -801,7 +800,7 @@ See +[NSObject typePrefix]. */
 
 - (void) markAsUpdatedIfNeededForProperty: (NSString*)prop
 {
-	if (_isIgnoringDamageNotifications || [self isPersistent] == NO)
+	if ([self isPersistent] == NO)
 		return;
 	
 	[_objectGraphContext markObjectAsUpdated: self forProperty: prop];
