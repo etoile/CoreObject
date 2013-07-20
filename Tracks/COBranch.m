@@ -234,6 +234,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
+    // FIXME: Move implementation to a private method in COPersistentRoot
+    
     COBranch *newBranch = [[[COBranch alloc] initWithUUID: [ETUUID UUID]
                                            persistentRoot: _persistentRoot
                                parentRevisionForNewBranch: [aRev revisionID]] autorelease];
@@ -247,22 +249,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev
 {
-    ETAssert(0); // Not yet implemented.
-    return nil;
-#if 0
-    // FIXME: Enqueue in editing context rather than committing immediately
-    
-	NILARG_EXCEPTION_TEST(aRev);
-
-	COPersistentRootInfo *info = [(COSQLiteStore *)[[self persistentRoot] store]
-                                    createPersistentRootWithInitialRevision: [aRev revisionID]
-                                    UUID: [ETUUID UUID]
-                                    branchUUID: [ETUUID UUID]
-                                    metadata: nil
-                                    error: NULL];
-    
-	return [[[self persistentRoot] parentContext] makePersistentRootWithInfo: info];
-#endif
+    return [[[self persistentRoot] editingContext] insertNewPersistentRootWithRevisionID: [aRev revisionID]];
 }
 
 - (BOOL)mergeChangesFromTrack: (COBranch *)aSourceTrack

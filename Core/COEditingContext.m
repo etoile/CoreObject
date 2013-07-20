@@ -204,6 +204,7 @@ static COEditingContext *currentCtxt = nil;
     }
     
 	COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: info
+                                                          cheapCopyRevisionID: nil
                                                                 parentContext: self];
 	[_loadedPersistentRoots setObject: persistentRoot
 							   forKey: [persistentRoot persistentRootUUID]];
@@ -230,6 +231,18 @@ static COEditingContext *currentCtxt = nil;
 	[rootObject becomePersistentInContext: persistentRoot];
 
 	return persistentRoot;
+}
+
+- (COPersistentRoot *)insertNewPersistentRootWithRevisionID: (CORevisionID *)aRevid
+{
+    COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: nil
+                                                          cheapCopyRevisionID: aRevid
+                                                                parentContext: self];
+	[_loadedPersistentRoots setObject: persistentRoot
+							   forKey: [persistentRoot persistentRootUUID]];
+	[persistentRoot release];
+
+    return persistentRoot;
 }
 
 - (NSSet *)insertedPersistentRoots

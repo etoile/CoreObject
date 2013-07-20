@@ -28,8 +28,9 @@
     return _UUID;
 }
 
-- (id)initWithInfo: (COPersistentRootInfo *)info
-     parentContext: (COEditingContext *)aCtxt
+- (id) initWithInfo: (COPersistentRootInfo *)info
+cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
+      parentContext: (COEditingContext *)aCtxt
 {
 	NILARG_EXCEPTION_TEST(aCtxt);
 
@@ -62,11 +63,13 @@
         
         COBranch *branch = [[[COBranch alloc] initWithUUID: branchUUID
                                             persistentRoot: self
-                                parentRevisionForNewBranch: nil] autorelease];
+                                parentRevisionForNewBranch: cheapCopyRevisionID] autorelease];
         
         [_branchForUUID setObject: branch forKey: branchUUID];
         
         ASSIGN(_currentBranchUUID, branchUUID);
+        
+        ASSIGN(_cheapCopyRevisionID, cheapCopyRevisionID);
     }
 
 	return self;
@@ -310,16 +313,28 @@
     CORevisionID *revId;
     
 	if (![self isPersistentRootCommitted])
-	{
-		ETAssert([[self insertedObjects] containsObject: [self rootObject]]);
+	{		
         ETAssert([self editingBranch] != nil);
         ETAssert([self editingBranch] == [self currentBranch]);
         
-        COPersistentRootInfo *info = [store createPersistentRootWithInitialContents: [[self editingBranch] objectGraph]
-                                                                               UUID: [self persistentRootUUID]
-                                                                         branchUUID: [[self editingBranch] UUID]
-                                                                           metadata: metadata
-                                                                              error: NULL];
+        COPersistentRootInfo *info;
+        
+        if (_cheapCopyRevisionID == nil)
+        {
+            info = [store createPersistentRootWithInitialContents: [[self editingBranch] objectGraph]
+                                                                                   UUID: [self persistentRootUUID]
+                                                                             branchUUID: [[self editingBranch] UUID]
+                                                                               metadata: metadata
+                                                                                  error: NULL];
+        }
+        else
+        {
+            info = [store createPersistentRootWithInitialRevision: _cheapCopyRevisionID
+                                                             UUID: _UUID
+                                                       branchUUID: [[self editingBranch] UUID]
+                                                         metadata: metadata
+                                                            error: NULL];
+        }
         ETAssert(info != nil);
         
         revId = [[info currentBranchInfo] currentRevisionID];

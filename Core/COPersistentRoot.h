@@ -12,7 +12,7 @@
 #import <CoreObject/COEditingContext.h>
 #import <CoreObject/COItemGraph.h>
 
-@class COBranch, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo, COObjectGraphContext;
+@class COBranch, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo, COObjectGraphContext, CORevisionID;
 
 /**
  * A persistent root editing context exposes as a working copy a CoreObject 
@@ -83,6 +83,11 @@
      * If nil, means use _currentBranchUUID as the editing branch.
      */
     ETUUID *_editingBranchUUID;
+    
+    /**
+     * Only used when creating a persistent root as a cheap copy.
+     */
+    CORevisionID *_cheapCopyRevisionID;
 }
 
 /** @taskunit Debugging */
@@ -389,9 +394,13 @@
  * This method is only exposed to be used internally by CoreObject.
  *
  * If info is nil, creates a new persistent root.
+ *
+ * cheapCopyRevisionID is normally nil, and only set to create a cheap copy.
+ * See -[COBranch makeCopyFromRevision:]
  */
-- (id)initWithInfo: (COPersistentRootInfo *)info
-     parentContext: (COEditingContext *)aCtxt;
+- (id) initWithInfo: (COPersistentRootInfo *)info
+cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
+      parentContext: (COEditingContext *)aCtxt;
 
 /**
  * This method is only exposed to be used internally by CoreObject.

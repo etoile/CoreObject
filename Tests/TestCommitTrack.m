@@ -322,35 +322,37 @@
 }
 #endif
 
-#if 0
 - (void)testCheapCopyCreation
 {
-	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
-	CORevision *rev1 = [[object persistentRoot] commit];
-	
-	COCommitTrack *commitTrack = [object commitTrack];
-	COCommitTrack *branch = [[commitTrack makeCopyFromRevision: rev1] commitTrack];
-	/* The branch creation has created a new revision */
-	CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [ctx latestRevisionNumber]];
-	
-	UKNotNil(branch);
-	UKObjectsNotEqual([branch UUID], [commitTrack UUID]);
-	UKStringsEqual(@"Cheapcopy", [branch label]);
-	UKObjectsEqual(commitTrack, [branch parentTrack]);
-	UKObjectsNotEqual([object persistentRoot], [branch persistentRoot]);
-	UKObjectsNotEqual([[object persistentRoot] persistentRootUUID], [[branch persistentRoot] persistentRootUUID]);
-	UKTrue([rev1 isEqual: [rev2 baseRevision]]);
+    [persistentRoot commit];
+    
+	CORevision *rev1 = [originalBranch currentRevision];
+    COPersistentRoot *copyRoot = [originalBranch makeCopyFromRevision: rev1];
+    
+	COBranch *copyRootBranch = [copyRoot currentBranch];
+    
+    UKNil([store persistentRootInfoForUUID: [copyRoot persistentRootUUID]]);
+    
+    [ctx commit];
+    
+    UKNotNil([store persistentRootInfoForUUID: [copyRoot persistentRootUUID]]);
+    
+    UKObjectsNotEqual([copyRootBranch UUID], [originalBranch UUID]);
+    UKObjectsNotEqual([copyRoot persistentRootUUID], [persistentRoot persistentRootUUID]);
+
+    //UKObjectsEqual(commitTrack, [branch parentTrack]);
+	//UKTrue([rev1 isEqual: [rev2 baseRevision]]);
 	
 	/* Branch creation revision doesn't belong to either the source commit track or new branch */
-	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
-	UKObjectsEqual(rev1, [[branch currentNode] revision]);
-	UKObjectsEqual(rev1, [branch parentRevision]);
-	
-	/* Branch creation doesn't touch the current persistent root revision */
-	UKObjectsEqual([object revision], rev1);
-	
-	/* Branch creation doesn't switch the branch */
-	UKObjectsSame(commitTrack, [[object persistentRoot] commitTrack]);
+//	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
+//	UKObjectsEqual(rev1, [[branch currentNode] revision]);
+//	UKObjectsEqual(rev1, [branch parentRevision]);
+//	
+//	/* Branch creation doesn't touch the current persistent root revision */
+//	UKObjectsEqual([object revision], rev1);
+//	
+//	/* Branch creation doesn't switch the branch */
+//	UKObjectsSame(commitTrack, [[object persistentRoot] commitTrack]);
 }
-#endif
+
 @end
