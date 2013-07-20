@@ -72,17 +72,16 @@
  * When the receiver is a branch, -isCopy returns NO.
  */
 @property (readonly, nonatomic) BOOL isBranch;
+
 /**
- * Returns whether the commit track represents a persistent root main branch.
- *
- * Unless an explicit branch is requested, a persistent root uses the main 
- * branch as its current branch at loading time.<br />
- * For a nil commit track, COPersistentRoot initializer retrieves 
- * the main branch commit track and sets it as the current commit track (aka 
- * current branch). See 
- * -[COPersistentRoot initWithPersistentRootUUID:commitTrackUUID:rootObject:parentContext:].
+ * Returns whether the receiver is the current branch of its persistent root.
  */
-@property (readonly, nonatomic) BOOL isMainBranch;
+@property (readonly, nonatomic) BOOL isCurrentBranch;
+
+/**
+ * Returns whether the receiver was the first branch of its persistent root
+ */
+@property (readonly, nonatomic) BOOL isTrunkBranch;
 
 /** @taskunit Basic Properties */
 

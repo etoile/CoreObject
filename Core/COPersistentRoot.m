@@ -52,7 +52,6 @@
             [_branchForUUID setObject: branch forKey: [branchInfo UUID]];
         }
         
-        ASSIGN(_trunkBranchUUID, [_savedState currentBranchUUID]);
         ASSIGN(_currentBranchUUID, [_savedState currentBranchUUID]);
         ASSIGN(_editingBranchUUID, [_savedState currentBranchUUID]);
     }
@@ -68,7 +67,6 @@
         
         [_branchForUUID setObject: branch forKey: branchUUID];
         
-        ASSIGN(_trunkBranchUUID, branchUUID);
         ASSIGN(_currentBranchUUID, branchUUID);
         ASSIGN(_editingBranchUUID, branchUUID);        
     }
@@ -80,7 +78,6 @@
 {
 	DESTROY(_savedState);
 	DESTROY(_branchForUUID);
-	DESTROY(_trunkBranchUUID);
     DESTROY(_currentBranchUUID);
 	DESTROY(_editingBranchUUID);  
 	[super dealloc];
@@ -111,21 +108,6 @@
 - (COEditingContext *)editingContext
 {
 	return [self parentContext];
-}
-
-- (COBranch *)trunkBranch
-{
-	return [_branchForUUID objectForKey: _trunkBranchUUID];
-}
-
-- (void)setTrunkBranch: (COBranch *)aTrack
-{
-    if (![self isPersistentRootCommitted])
-    {
-        [NSException raise: NSGenericException format: @"A persistent root must be committed before you can add or change its branches"];
-    }
-    
-    ASSIGN(_trunkBranchUUID, [aTrack UUID]);
 }
 
 - (COBranch *)currentBranch
@@ -329,7 +311,6 @@
 		ETAssert([[self insertedObjects] containsObject: [self rootObject]]);
         ETAssert([self editingBranch] != nil);
         ETAssert([self editingBranch] == [self currentBranch]);
-        ETAssert([self editingBranch] == [self trunkBranch]);
         
         COPersistentRootInfo *info = [store createPersistentRootWithInitialContents: [[self editingBranch] objectGraph]
                                                                                UUID: [self persistentRootUUID]
@@ -346,20 +327,13 @@
 	}
     else
     {
+        // Commit a change to the current branch, if needed.
         if (![[_savedState currentBranchUUID] isEqual: _currentBranchUUID])
         {
             [store setCurrentBranch: _currentBranchUUID
                forPersistentRoot: [self persistentRootUUID]
                            error: NULL];
         }
-        
-        // FIXME: Re-add main branch concept to stpre
-//        if (![[_savedState mainBranchUUID] isEqual: _trunkBranchUUID])
-//        {
-//            [store setTrunkBranch: _trunkBranchUUID
-//               forPersistentRoot: [self persistentRootUUID]
-//                           error: NULL];
-//        }
         
         // Commit changes in our branches
         for (COBranch *branch in [self branches])

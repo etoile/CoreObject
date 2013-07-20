@@ -145,9 +145,14 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 //	return ([self isCopy] == NO && [self parentTrack] != nil);
 }
 
-- (BOOL)isMainBranch
+- (BOOL)isCurrentBranch
 {
-	// FIXME: Implement
+    return self == [_persistentRoot currentBranch];
+}
+
+- (BOOL)isTrunkBranch
+{
+	// FIXME: Implement by reading from our metadata dictionary
 	return NO;
 }
 

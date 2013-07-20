@@ -72,12 +72,7 @@
      * COBranch objects indexed by ETUUID
      */
     NSMutableDictionary *_branchForUUID;
-    
-    /**
-     * Used to stage a change to the trunk branch
-     */
-    ETUUID *_trunkBranchUUID;
-    
+
     /**
      * Used to stage a change to the current branch
      */
@@ -122,7 +117,6 @@
  */
 @property (nonatomic, readwrite, retain) COBranch *editingBranch;
 @property (nonatomic, readwrite, retain) COBranch *currentBranch;
-@property (nonatomic, readwrite, retain) COBranch *trunkBranch;
 
 @property (nonatomic, readonly) NSSet *branches;
 
