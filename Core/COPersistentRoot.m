@@ -52,9 +52,9 @@
             [_branchForUUID setObject: branch forKey: [branchInfo UUID]];
         }
         
-        ASSIGN(_trunkBranchUUID, [_savedState mainBranchUUID]);
-        ASSIGN(_currentBranchUUID, [_savedState mainBranchUUID]);
-        ASSIGN(_editingBranchUUID, [_savedState mainBranchUUID]);
+        ASSIGN(_trunkBranchUUID, [_savedState currentBranchUUID]);
+        ASSIGN(_currentBranchUUID, [_savedState currentBranchUUID]);
+        ASSIGN(_editingBranchUUID, [_savedState currentBranchUUID]);
     }
     else
     {
@@ -336,20 +336,19 @@
                                                                          branchUUID: [[self editingBranch] UUID]
                                                                            metadata: metadata
                                                                               error: NULL];
-        revId = [[info mainBranchInfo] currentRevisionID];
+        revId = [[info currentBranchInfo] currentRevisionID];
         
         // N.B., we don't call -saveCommitWithMetadata: on the branch,
         // because the store call -createPersistentRootWithInitialContents:
         // handles creating the initial branch.
         
-        [[self editingBranch] didMakeInitialCommitWithRevisionID: [[info mainBranchInfo] currentRevisionID]];
+        [[self editingBranch] didMakeInitialCommitWithRevisionID: [[info currentBranchInfo] currentRevisionID]];
 	}
     else
     {
-        // FIXME: Rename store's main branch to current branch
-        if (![[_savedState mainBranchUUID] isEqual: _currentBranchUUID])
+        if (![[_savedState currentBranchUUID] isEqual: _currentBranchUUID])
         {
-            [store setMainBranch: _currentBranchUUID
+            [store setCurrentBranch: _currentBranchUUID
                forPersistentRoot: [self persistentRootUUID]
                            error: NULL];
         }

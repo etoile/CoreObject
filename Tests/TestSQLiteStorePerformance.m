@@ -113,7 +113,7 @@ static int itemChangedAtCommit(int i)
     
     // Commit a change to each object
     
-    CORevisionID *lastCommitId = [[proot mainBranchInfo] currentRevisionID];
+    CORevisionID *lastCommitId = [[proot currentBranchInfo] currentRevisionID];
     for (int commit=1; commit<NUM_COMMITS; commit++)
     {
         int i = itemChangedAtCommit(commit);
@@ -137,8 +137,8 @@ static int itemChangedAtCommit(int i)
     
     [store setCurrentRevision: lastCommitId
                  headRevision: lastCommitId
-                 tailRevision: [[proot mainBranchInfo] currentRevisionID]
-                    forBranch: [proot mainBranchUUID]
+                 tailRevision: [[proot currentBranchInfo] currentRevisionID]
+                    forBranch: [proot currentBranchUUID]
              ofPersistentRoot: [proot UUID]
            currentChangeCount: &prootChangeCount
                         error: NULL];
@@ -195,7 +195,7 @@ static int itemChangedAtCommit(int i)
     
     COPersistentRootInfo *proot = [store persistentRootInfoForUUID: prootUUID];
     
-    CORevisionID *lastCommitId = [[proot mainBranchInfo] currentRevisionID];
+    CORevisionID *lastCommitId = [[proot currentBranchInfo] currentRevisionID];
     
     // Now traverse them in reverse order and test that the items are as expected.
     // There are NUM_CHILDREN + 1 commits (the initial one made by creating the persistent roots)
@@ -233,7 +233,7 @@ static int itemChangedAtCommit(int i)
 
     COPersistentRootInfo *proot = [store persistentRootInfoForUUID: prootUUID];
     
-    CORevisionID *lastCommitId = [[proot mainBranchInfo] currentRevisionID];
+    CORevisionID *lastCommitId = [[proot currentBranchInfo] currentRevisionID];
     
     int iters = 0;
     for (int rev=NUM_COMMITS-1; rev>=0; rev--)
@@ -329,7 +329,7 @@ static int itemChangedAtCommit(int i)
     
     for (int i =0; i<NUM_PERSISTENT_ROOT_COPIES; i++)
     {
-        [store createPersistentRootWithInitialRevision: [[proot mainBranchInfo] currentRevisionID]
+        [store createPersistentRootWithInitialRevision: [[proot currentBranchInfo] currentRevisionID]
                                                   UUID: [ETUUID UUID]
                                             branchUUID: [ETUUID UUID]
                                               metadata: nil
@@ -371,7 +371,7 @@ static int itemChangedAtCommit(int i)
     
     startDate = [NSDate date];
     
-    COItemGraph *readBack = [store contentsForRevisionID: [[proot mainBranchInfo] currentRevisionID]];
+    COItemGraph *readBack = [store contentsForRevisionID: [[proot currentBranchInfo] currentRevisionID]];
     
     NSLog(@"reading %d item itemtree took %lf ms", (int)[[readBack itemUUIDs] count],
           1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);

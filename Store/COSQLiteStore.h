@@ -73,7 +73,7 @@
 {
 @private
     ETUUID *uuid_;
-    ETUUID *mainBranch_;
+    ETUUID *currentBranch_;
     NSMutableDictionary *branchForUUID_; // COUUID : COBranchInfo
     int64_t _changeCount;
 }
@@ -81,10 +81,10 @@
 - (NSSet *) branchUUIDs;
 
 - (COBranchInfo *)branchInfoForUUID: (ETUUID *)aUUID;
-- (COBranchInfo *)mainBranchInfo;
+- (COBranchInfo *)currentBranchInfo;
 
 @property (readwrite, nonatomic, retain) ETUUID *UUID;
-@property (readwrite, nonatomic, retain) ETUUID *mainBranchUUID;
+@property (readwrite, nonatomic, retain) ETUUID *currentBranchUUID;
 @property (readwrite, nonatomic, retain) NSDictionary *branchForUUID;
 @property (readwrite, nonatomic, assign) int64_t changeCount;
  
@@ -444,12 +444,12 @@
 /** @taskunit Persistent Root Modification */
 
 /**
- * Sets the main branch. The main branch is used to resolve inter-persistent-root references
+ * Sets the current branch. The current branch is used to resolve inter-persistent-root references
  * when no explicit branch is named.
  *
  * Returns NO if the branch does not exist, or is deleted (finalized or not).
  */
-- (BOOL) setMainBranch: (ETUUID *)aBranch
+- (BOOL) setCurrentBranch: (ETUUID *)aBranch
      forPersistentRoot: (ETUUID *)aRoot
                  error: (NSError **)error;
 
