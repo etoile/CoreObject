@@ -12,7 +12,7 @@
 {
     COPersistentRoot *persistentRoot;
     COObject *rootObj;
-    COBranch *currentBranch;
+    COBranch *originalBranch;
 }
 @end
 
@@ -23,14 +23,14 @@
     SUPERINIT;
     ASSIGN(persistentRoot, [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"]);
     ASSIGN(rootObj, [persistentRoot rootObject]);
-    ASSIGN(currentBranch, [persistentRoot currentBranch]);
+    ASSIGN(originalBranch, [persistentRoot currentBranch]);
     return self;
 }
 
 - (void) dealloc
 {
     DESTROY(rootObj);
-    DESTROY(currentBranch);
+    DESTROY(originalBranch);
     DESTROY(persistentRoot);
     [super dealloc];
 }
@@ -39,13 +39,13 @@
 {
 	[rootObj setValue: @"Groceries" forProperty: @"label"];
 	
-	UKNotNil(currentBranch);
-	UKNil([currentBranch currentRevision]);
+	UKNotNil(originalBranch);
+	UKNil([originalBranch currentRevision]);
 
 	[ctx commit];
 
-	UKNotNil([currentBranch currentRevision]);
-	UKObjectsEqual([currentBranch currentRevision], [rootObj revision]);
+	UKNotNil([originalBranch currentRevision]);
+	UKObjectsEqual([originalBranch currentRevision], [rootObj revision]);
 }
 
 // FIXME: Port the rest of the tests
@@ -170,9 +170,9 @@
     
 	CORevision *rev1 = [[persistentRoot currentBranch] currentRevision];
 
-	COBranch *branch = [currentBranch makeBranchWithLabel: @"Sandbox"];
+	COBranch *branch = [originalBranch makeBranchWithLabel: @"Sandbox"];
 	UKNotNil(branch);
-	UKObjectsNotEqual([branch UUID], [currentBranch UUID]);
+	UKObjectsNotEqual([branch UUID], [originalBranch UUID]);
     
     /* Verify that the branch creation is not committed yet. */
     UKIntsEqual(1, [[[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] branchForUUID] allKeys] count]);
@@ -186,7 +186,7 @@
 	UKObjectsEqual([rootObj persistentRoot], [branch persistentRoot]);
 	//UKTrue([rev1 isEqual: [rev2 baseRevision]]);
 	
-	UKObjectsEqual(rev1, [currentBranch currentRevision]);
+	UKObjectsEqual(rev1, [originalBranch currentRevision]);
 	UKObjectsEqual(rev1, [branch currentRevision]);
 	//UKObjectsEqual(rev1, [branch parentRevision]);
 
@@ -194,66 +194,54 @@
 	UKObjectsEqual([rootObj revision], rev1);
 
 	/* Branch creation doesn't switch the branch */
-	UKObjectsSame(currentBranch, [[rootObj persistentRoot] currentBranch]);
+	UKObjectsSame(originalBranch, [[rootObj persistentRoot] currentBranch]);
 }
 
-#if 0
 - (void)testBranchSwitch
 {
-	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
+	[rootObj setValue: @"Untitled" forProperty: @"label"];
+	[persistentRoot commit];
+    
+	//CORevision *rev1 = [[persistentRoot currentBranch] currentRevision];
 	
-	[object setValue: @"Untitled" forProperty: @"label"];
-	
-	CORevision *rev1 = [[object persistentRoot] commit];
-	
-	COCommitTrack *commitTrack = [[object commitTrack] retain];
-	COCommitTrack *branch = [commitTrack makeBranchWithLabel: @"Sandbox"];
-	/* The branch creation has created a new revision */
-	CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [ctx latestRevisionNumber]];
-	
-	UKObjectKindOf(rev2, [store currentRevisionForTrackUUID: [store UUID]]);
-
+	COBranch *branch = [originalBranch makeBranchWithLabel: @"Sandbox"];
+    
 	/* Switch to the Sandbox branch */
 
-	[[object persistentRoot] setCommitTrack: branch];
+	[persistentRoot setCurrentBranch: branch];
 
-	UKObjectsEqual([object commitTrack], branch);
-	UKObjectsEqual([object persistentRoot], [branch persistentRoot]);
-	UKObjectsEqual([object persistentRoot], [commitTrack persistentRoot]);
-
-	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
-	UKObjectsEqual(rev1, [[branch currentNode] revision]);
-	UKObjectsEqual(rev1, [object revision]);
-	
+    UKObjectsEqual([originalBranch UUID],
+                   [[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] currentBranchUUID]);    
+    
 	/* Commit some changes in the Sandbox branch */
 	
-	[object setValue: @"Todo" forProperty: @"label"];
+    COObject *sandboxRootObj = [[branch objectGraph] rootObject];
+    
+	[sandboxRootObj setValue: @"Todo" forProperty: @"label"];
 
-	[[object persistentRoot] commit];
+    UKObjectsEqual(@"Todo", [[persistentRoot rootObject] valueForProperty: @"label"]);
+    
+	[persistentRoot commit];
 
-	[object setValue: @"Tidi" forProperty: @"label"];
+    UKObjectsEqual([branch UUID],
+                   [[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] currentBranchUUID]);
+    
+	[sandboxRootObj setValue: @"Tidi" forProperty: @"label"];
 	
-	CORevision *rev4 = [[object persistentRoot] commit];
-	
-	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
-	UKObjectsEqual(rev4, [[branch currentNode] revision]);
-	UKObjectsEqual(rev4, [object revision]);
+    [persistentRoot commit];
+    
+	//CORevision *rev3 = [branch currentRevision];
+    
+    UKObjectsEqual(@"Tidi", [[persistentRoot rootObject] valueForProperty: @"label"]);
 	
 	/* Switch back to the main branch */
 	
-	[[object persistentRoot] setCommitTrack: commitTrack];
-
-	UKObjectsEqual([object commitTrack], commitTrack);
-	UKObjectsEqual([object persistentRoot], [branch persistentRoot]);
-	UKObjectsEqual([object persistentRoot], [commitTrack persistentRoot]);
-	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
-	UKObjectsEqual(rev4, [[branch currentNode] revision]);
-	UKObjectsEqual(rev1, [object revision]);
-
-	UKObjectsEqual(@"Untitled", [object valueForProperty: @"label"]);
-
-	[commitTrack release];
+	[persistentRoot setCurrentBranch: originalBranch];
+    
+    UKObjectsEqual(@"Untitled", [[persistentRoot rootObject] valueForProperty: @"label"]);
 }
+
+#if 0
 
 - (NSArray *)revisionsForStoreTrack
 {

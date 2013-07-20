@@ -320,6 +320,8 @@
                                                                          branchUUID: [[self editingBranch] UUID]
                                                                            metadata: metadata
                                                                               error: NULL];
+        ETAssert(info != nil);
+        
         revId = [[info currentBranchInfo] currentRevisionID];
         
         // N.B., we don't call -saveCommitWithMetadata: on the branch,
@@ -330,14 +332,6 @@
 	}
     else
     {
-        // Commit a change to the current branch, if needed.
-        if (![[_savedState currentBranchUUID] isEqual: _currentBranchUUID])
-        {
-            [store setCurrentBranch: _currentBranchUUID
-               forPersistentRoot: [self persistentRootUUID]
-                           error: NULL];
-        }
-        
         // Commit changes in our branches
         for (COBranch *branch in [self branches])
         {
@@ -345,6 +339,15 @@
             
             // FIXME: Hack?
             [self reloadPersistentRootInfo];
+        }
+        
+        // Commit a change to the current branch, if needed.
+        // Needs to be done after because the above loop may create the branch
+        if (![[_savedState currentBranchUUID] isEqual: _currentBranchUUID])
+        {
+            ETAssert([store setCurrentBranch: _currentBranchUUID
+                           forPersistentRoot: [self persistentRootUUID]
+                                       error: NULL]);
         }
     }
 

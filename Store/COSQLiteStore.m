@@ -802,6 +802,7 @@
     }
     else
     {
+        NSLog(@"WARNING, %@ failed", NSStringFromSelector(_cmd));
         ok = NO;
     }
     
