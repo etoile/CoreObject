@@ -526,8 +526,8 @@
  * Starts a transaction, purely for improving performance when making a batch of changes.
  * Should not normally be used, except for in batch imports.
  */
-- (void) beginTransactionWithError: (NSError **)error;
-- (void) commitTransactionWithError: (NSError **)error;
+- (BOOL) beginTransactionWithError: (NSError **)error;
+- (BOOL) commitTransactionWithError: (NSError **)error;
 
 @end
 

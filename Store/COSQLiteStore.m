@@ -236,11 +236,11 @@
 
 /** @taskunit Transactions */
 
-- (void) beginTransactionWithError: (NSError **)error
+- (BOOL) beginTransactionWithError: (NSError **)error
 {
-    [db_ beginDeferredTransaction];
+    return [db_ beginTransaction];
 }
-- (void) commitTransactionWithError: (NSError **)error
+- (BOOL) commitTransactionWithError: (NSError **)error
 {
     BOOL ok = [db_ commit];
     
@@ -248,6 +248,7 @@
     {
         [self postCommitNotifications];
     }
+    return ok;
 }
 
 - (NSArray *) allBackingUUIDs

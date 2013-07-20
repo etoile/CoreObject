@@ -447,6 +447,8 @@ static COEditingContext *currentCtxt = nil;
 
 	/* Commit persistent root changes (deleted persistent roots included) */
 
+    [_store beginTransactionWithError: NULL];
+    
 	// TODO: Add a batch commit UUID in the metadata
 	for (COPersistentRoot *ctxt in persistentRoots)
 	{
@@ -471,6 +473,8 @@ static COEditingContext *currentCtxt = nil;
 		[_loadedPersistentRoots removeObjectForKey: uuid];
 	}
 
+    ETAssert([_store commitTransactionWithError: NULL]);
+    
 	return revisions;
 }
 
