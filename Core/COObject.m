@@ -332,7 +332,7 @@ See +[NSObject typePrefix]. */
 
 - (CORevision *)revision
 {
-	return [[self commitTrack] currentRevision];
+	return [[self branch] currentRevision];
 }
 
 - (BOOL) isPersistent
@@ -1086,7 +1086,7 @@ See +[NSObject typePrefix]. */
 	return NO;
 }
 
-- (COBranch *)commitTrack
+- (COBranch *)branch
 {
 	return [_objectGraphContext branch];
 }

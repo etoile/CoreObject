@@ -312,7 +312,7 @@
 /**
  * Returns the commit track for this object.
  */
-- (COBranch *)commitTrack;
+- (COBranch *)branch;
 
 /** @taskunit Contained Objects based on the Metamodel */
 
