@@ -53,8 +53,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	/* The persistent root retains us */
 	_persistentRoot = aContext;
 
-    // FIXME: COObjectGraphContext should keep a weak ref to the branch now, not the persistent root
-    _objectGraph = [[COObjectGraphContext alloc] initWithPersistentRoot: _persistentRoot];
+    _objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
     
     if ([_persistentRoot persistentRootInfo] != nil
         && parentRevisionForNewBranch == nil)

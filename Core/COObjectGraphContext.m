@@ -5,6 +5,7 @@
 #import "COObject+RelationshipCache.h"
 #import "COSerialization.h"
 #import "COPersistentRoot.h"
+#import "COBranch.h"
 
 /**
  * COEditingContext semantics:
@@ -35,32 +36,32 @@
 
 #pragma mark Creation
 
-- (id) initWithPersistentRoot: (COPersistentRoot *)aRoot
-              modelRepository: (ETModelDescriptionRepository *)aRepo
+- (id) initWithBranch: (COBranch *)aBranch
+      modelRepository: (ETModelDescriptionRepository *)aRepo
 {
     SUPERINIT;
     objectsByUUID_ = [[NSMutableDictionary alloc] init];
     insertedObjects_ = [[NSMutableSet alloc] init];
     modifiedObjects_ = [[NSMutableSet alloc] init];
     _updatedPropertiesByObject = [[NSMapTable alloc] init];
-    persistentRoot_ = aRoot;
+    branch_ = aBranch;
     if (aRepo == nil)
     {
-        aRepo = [[persistentRoot_ editingContext] modelRepository];
+        aRepo = [[[branch_ persistentRoot] editingContext] modelRepository];
     }
     
     ASSIGN(modelRepository_, aRepo);
     return self;
 }
 
-- (id) initWithPersistentRoot: (COPersistentRoot *)aRoot
+- (id) initWithBranch: (COBranch *)aBranch
 {
-    return [self initWithPersistentRoot: aRoot modelRepository: nil];
+    return [self initWithBranch: aBranch modelRepository: nil];
 }
 
 - (id) initWithModelRepository: (ETModelDescriptionRepository *)aRepo
 {
-    return [self initWithPersistentRoot: nil modelRepository: aRepo];
+    return [self initWithBranch: nil modelRepository: aRepo];
 }
 
 - (id) init
@@ -96,9 +97,14 @@
     return modelRepository_;
 }
 
+- (COBranch *) branch
+{
+    return branch_;
+}
+
 - (COPersistentRoot *) persistentRoot
 {
-    return persistentRoot_;
+    return [branch_ persistentRoot];
 }
 
 #pragma mark begin COItemGraph protocol
@@ -245,9 +251,9 @@
 	COObject *obj = [[objClass alloc] initWithUUID: aUUID
                                  entityDescription: desc
                                            context: nil];
-    if (persistentRoot_ != nil)
+    if ([self persistentRoot] != nil)
     {
-        [obj becomePersistentInContext: persistentRoot_];
+        [obj becomePersistentInContext: [self persistentRoot]];
     }
     else
     {

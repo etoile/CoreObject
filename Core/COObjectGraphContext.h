@@ -10,6 +10,7 @@
 @class COSchema;
 @class CORelationshipCache;
 @class COPersistentRoot;
+@class COBranch;
 
 @interface COObjectGraphContext : NSObject <COItemGraph>
 {
@@ -22,14 +23,14 @@
     
     ETModelDescriptionRepository *modelRepository_;
     
-    COPersistentRoot *persistentRoot_;
+    COBranch *branch_;
     
     NSMapTable *_updatedPropertiesByObject;
 }
 
 #pragma mark Creation
 
-- (id) initWithPersistentRoot: (COPersistentRoot *)aRoot;
+- (id) initWithBranch: (COBranch *)aBranch;
 - (id) initWithModelRepository: (ETModelDescriptionRepository *)aRepo;
 
 + (COObjectGraphContext *) objectGraphContext;
@@ -40,6 +41,7 @@
 
 - (ETModelDescriptionRepository *) modelRepository;
 
+- (COBranch *) branch;
 - (COPersistentRoot *) persistentRoot;
 
 #pragma mark begin COItemGraph protocol
