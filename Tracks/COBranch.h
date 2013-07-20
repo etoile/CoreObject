@@ -96,6 +96,7 @@
  * The commit track label, that serves a branch name in most cases.
  */
 @property (readonly, nonatomic) NSString *label;
+@property (readwrite, retain, nonatomic) NSDictionary *metadata;
 /**
  * The parent commit track from which the receiver is derived.
  *

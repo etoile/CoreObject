@@ -307,8 +307,9 @@
 {
 	NSArray *revs = [_parentContext commitWithMetadata: metadata
 	                restrictedToPersistentRoots: A(self)];
-	ETAssert([revs count] == 1);
-	return [revs lastObject];
+	//ETAssert([revs count] == 1);
+	//return [revs lastObject];
+    return nil;
 }
 
 - (BOOL) isPersistentRootCommitted
@@ -365,6 +366,9 @@
         for (COBranch *branch in [self branches])
         {
             [branch saveCommitWithMetadata: metadata];
+            
+            // FIXME: Hack?
+            [self reloadPersistentRootInfo];
         }
     }
 

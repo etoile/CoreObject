@@ -320,6 +320,10 @@
     // 3. Do GC
     
     [self gc_];
+    
+    // 4. Clear change tracking again.
+    
+    [self clearChangeTracking];
 }
 
 - (COObject *) rootObject

@@ -21,9 +21,8 @@
 
 @synthesize UUID = _UUID;
 @synthesize persistentRoot = _persistentRoot;
-
 @synthesize objectGraph = _objectGraph;
-
+@synthesize metadata = _metadata;
 
 - (id)init
 {
@@ -57,11 +56,11 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     // FIXME: COObjectGraphContext should keep a weak ref to the branch now, not the persistent root
     _objectGraph = [[COObjectGraphContext alloc] initWithPersistentRoot: _persistentRoot];
     
-    if ([_persistentRoot persistentRootInfo] != nil)
+    if ([_persistentRoot persistentRootInfo] != nil
+        && parentRevisionForNewBranch == nil)
     {
         // Loading an existing branch
         
-        ETAssert(parentRevisionForNewBranch == nil);
         COBranchInfo *branchInfo = [self branchInfo];
         ETAssert(branchInfo != nil);
         
@@ -84,6 +83,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         {
             id<COItemGraph> aGraph = [[_persistentRoot store] contentsForRevisionID: _parentRevisionID];
             [_objectGraph setItemGraph: aGraph];
+            
+            ETAssert(![_objectGraph hasChanges]);
         }
     }
     
@@ -173,7 +174,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 - (NSString *)label
 {
     // FIXME: Make a standardized metadata key for this
-	return [[[self branchInfo] metadata] objectForKey: @"label"];
+	return [_metadata objectForKey: @"COBranchLabel"];
 }
 
 - (CORevision *)parentRevision
@@ -231,6 +232,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     COBranch *newBranch = [[[COBranch alloc] initWithUUID: [ETUUID UUID]
                                            persistentRoot: _persistentRoot
                                parentRevisionForNewBranch: [aRev revisionID]] autorelease];
+    
+    [newBranch setMetadata: D(aLabel, @"COBranchLabel")];
     
     [_persistentRoot addBranch: newBranch];
     
@@ -614,6 +617,10 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
     ASSIGN(_currentRevisionID, aRevisionID);
     ASSIGN(_parentRevisionID, nil);
+    
+    [_objectGraph clearChangeTracking];
+    
+    ETAssert([[_objectGraph changedObjects] count] == 0);
 }
 
 - (void)reloadAtRevision: (CORevision *)revision

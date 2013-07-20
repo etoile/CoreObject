@@ -12,7 +12,7 @@
 {
     COPersistentRoot *persistentRoot;
     COObject *rootObj;
-    COBranch *commitTrack;
+    COBranch *currentBranch;
 }
 @end
 
@@ -23,14 +23,14 @@
     SUPERINIT;
     ASSIGN(persistentRoot, [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"]);
     ASSIGN(rootObj, [persistentRoot rootObject]);
-    ASSIGN(commitTrack, [persistentRoot currentBranch]);
+    ASSIGN(currentBranch, [persistentRoot currentBranch]);
     return self;
 }
 
 - (void) dealloc
 {
     DESTROY(rootObj);
-    DESTROY(commitTrack);
+    DESTROY(currentBranch);
     DESTROY(persistentRoot);
     [super dealloc];
 }
@@ -39,13 +39,13 @@
 {
 	[rootObj setValue: @"Groceries" forProperty: @"label"];
 	
-	UKNotNil(commitTrack);
-	UKNil([commitTrack currentRevision]);
+	UKNotNil(currentBranch);
+	UKNil([currentBranch currentRevision]);
 
 	[ctx commit];
 
-	UKNotNil([commitTrack currentRevision]);
-	UKObjectsEqual([commitTrack currentRevision], [rootObj revision]);
+	UKNotNil([currentBranch currentRevision]);
+	UKObjectsEqual([currentBranch currentRevision], [rootObj revision]);
 }
 
 // FIXME: Port the rest of the tests
@@ -162,36 +162,42 @@
     
 	//UKIntsEqual(0, [para3 retainCount]);
 }
+#endif
 
 - (void)testBranchCreation
 {
-	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
-	CORevision *rev1 = [[object persistentRoot] commit];
+    [persistentRoot commit];
+    
+	CORevision *rev1 = [[persistentRoot currentBranch] currentRevision];
 
-	COCommitTrack *commitTrack = [object commitTrack];
-	COCommitTrack *branch = [commitTrack makeBranchWithLabel: @"Sandbox"];
-	/* The branch creation has created a new revision */
-	CORevision *rev2 = [[ctx store] revisionWithRevisionNumber: [ctx latestRevisionNumber]];
-	
+	COBranch *branch = [currentBranch makeBranchWithLabel: @"Sandbox"];
 	UKNotNil(branch);
-	UKObjectsNotEqual([branch UUID], [commitTrack UUID]);
+	UKObjectsNotEqual([branch UUID], [currentBranch UUID]);
+    
+    /* Verify that the branch creation is not committed yet. */
+    UKIntsEqual(1, [[[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] branchForUUID] allKeys] count]);
+    
+    [persistentRoot commit];
+
+    UKIntsEqual(2, [[[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] branchForUUID] allKeys] count]);
 	UKStringsEqual(@"Sandbox", [branch label]);
-	UKObjectsEqual(commitTrack, [branch parentTrack]);
-	UKObjectsEqual([object persistentRoot], [branch persistentRoot]);
-	UKTrue([rev1 isEqual: [rev2 baseRevision]]);
+    
+	//UKObjectsEqual(commitTrack, [branch parentTrack]);
+	UKObjectsEqual([rootObj persistentRoot], [branch persistentRoot]);
+	//UKTrue([rev1 isEqual: [rev2 baseRevision]]);
 	
-	/* Branch creation revision doesn't belong to either the source commit track or new branch */
-	UKObjectsEqual(rev1, [[commitTrack currentNode] revision]);
-	UKObjectsEqual(rev1, [[branch currentNode] revision]);
-	UKObjectsEqual(rev1, [branch parentRevision]);
+	UKObjectsEqual(rev1, [currentBranch currentRevision]);
+	UKObjectsEqual(rev1, [branch currentRevision]);
+	//UKObjectsEqual(rev1, [branch parentRevision]);
 
 	/* Branch creation doesn't touch the current persistent root revision */
-	UKObjectsEqual([object revision], rev1);
+	UKObjectsEqual([rootObj revision], rev1);
 
 	/* Branch creation doesn't switch the branch */
-	UKObjectsSame(commitTrack, [[object persistentRoot] commitTrack]);
+	UKObjectsSame(currentBranch, [[rootObj persistentRoot] currentBranch]);
 }
 
+#if 0
 - (void)testBranchSwitch
 {
 	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
@@ -326,7 +332,9 @@
 	UKObjectsEqual(A(rev1, rev2, rev5, rev9, rev10), [[[branch2 loadedNodes] mappedCollection] revision]);
 	UKObjectsEqual(A(rev3, rev7), [self revisionsForStoreTrack]);
 }
+#endif
 
+#if 0
 - (void)testCheapCopyCreation
 {
 	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
