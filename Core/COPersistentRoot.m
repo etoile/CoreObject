@@ -53,7 +53,6 @@
         }
         
         ASSIGN(_currentBranchUUID, [_savedState currentBranchUUID]);
-        ASSIGN(_editingBranchUUID, [_savedState currentBranchUUID]);
     }
     else
     {
@@ -68,7 +67,6 @@
         [_branchForUUID setObject: branch forKey: branchUUID];
         
         ASSIGN(_currentBranchUUID, branchUUID);
-        ASSIGN(_editingBranchUUID, branchUUID);        
     }
 
 	return self;
@@ -127,6 +125,11 @@
 
 - (COBranch *)editingBranch
 {
+    if (_editingBranchUUID == nil)
+    {
+        return [self currentBranch];
+    }
+    
 	return [_branchForUUID objectForKey: _editingBranchUUID];
 }
 
@@ -147,7 +150,7 @@
 
 - (COObjectGraphContext *)objectGraph
 {
-    return [[_branchForUUID objectForKey: _editingBranchUUID] objectGraph];
+    return [[self editingBranch] objectGraph];
 }
 
 - (COSQLiteStore *)store

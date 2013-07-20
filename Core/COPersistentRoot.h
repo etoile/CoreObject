@@ -80,6 +80,7 @@
     
     /**
      * UUID of branch being edited. Not persistent.
+     * If nil, means use _currentBranchUUID as the editing branch.
      */
     ETUUID *_editingBranchUUID;
 }
@@ -104,18 +105,26 @@
  * is not supported and might never be.
  */
 @property (nonatomic, readonly) ETUUID *persistentRootUUID;
+
 /**
- * The persistent root branch edited in the editing context.
+ * The editingBranch is not a persistent value, but is used by 
+ * COPersistentRoot methods like -rootObject, -objectGraph, etc. as the
+ * default object graph presented by the COPersistentRoot.
  *
- * By default, it is the persistent root current branch.
- * 
- * Changing the commit track switches the edited branch but not the current 
- * branch (the branch switch is not replicated to other applications). See 
- * COCommitTrack API to control the current branch.
- *
- * For a parent context without a store, the commit track can be nil .
+ * By default, -editingBranch just returns -currentBranch. However, if you
+ * call -setEditingBranch: explicitly, then that branch will be used and
+ * -editingBranch will no longer track -currentBranch.
  */
 @property (nonatomic, readwrite, retain) COBranch *editingBranch;
+
+/**
+ * The branch that opens when double-clicking a persistent root to edit it.
+ * Also used to resolve inter-persistent root references to this persistent
+ * root when no explicit branch. 
+ *
+ * Changing this value stages it for commit; upon the next -commit,
+ * the change is saved to disk and replicated to other applications.
+ */
 @property (nonatomic, readwrite, retain) COBranch *currentBranch;
 
 @property (nonatomic, readonly) NSSet *branches;
