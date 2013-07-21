@@ -157,7 +157,7 @@ static ETUUID *childUUID2;
     {
         [store writeContents: [self makeBranchBItemTreeAtRevid: i]
                 withMetadata: [self branchBMetadata]
-            parentRevisionID: [CORevisionID revisionWithBackinStoreUUID: [proot UUID] revisionIndex: i]
+            parentRevisionID: [CORevisionID revisionWithBackinStoreUUID: [proot UUID] revisionIndex: i - 1]
                modifiedItems: A(childUUID2)
                        error: NULL];
     }

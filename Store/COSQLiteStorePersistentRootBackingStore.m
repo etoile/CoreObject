@@ -163,6 +163,11 @@
 	return result;
 }
 
+- (BOOL) hasRevid: (int64_t)revid
+{
+    return [db_ boolForQuery: @"SELECT 1 FROM commits WHERE revid = ?", [NSNumber numberWithLongLong: revid]];
+}
+
 /**
  * Returns the item tree 
  */

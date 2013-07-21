@@ -471,6 +471,8 @@
                    modifiedItems: (NSArray*)modifiedItems // array of COUUID
                            error: (NSError **)error
 {
+    [self validateRevision: aParent];
+    
     NSParameterAssert(anItemTree != nil);
     NSParameterAssert(aParent != nil);
     
@@ -564,6 +566,8 @@
 
 - (COPersistentRootInfo *) persistentRootInfoForUUID: (ETUUID *)aUUID
 {
+    NILARG_EXCEPTION_TEST(aUUID);
+    
     ETUUID *currBranch = nil;
     ETUUID *backingUUID = nil;
     BOOL deleted = NO;
@@ -737,7 +741,8 @@
     NILARG_EXCEPTION_TEST(aRevision);
     NILARG_EXCEPTION_TEST(persistentRootUUID);
     NILARG_EXCEPTION_TEST(aBranchUUID);
-
+    [self validateRevision: aRevision];
+    
     return [self createPersistentRootWithUUID: persistentRootUUID
                                    branchUUID: aBranchUUID
                                        isCopy: YES
@@ -749,6 +754,8 @@
 - (BOOL) deletePersistentRoot: (ETUUID *)aRoot
                         error: (NSError **)error
 {
+    NILARG_EXCEPTION_TEST(aRoot);
+    
     BOOL ok = NO;
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     if (root_id != nil)
@@ -769,6 +776,8 @@
 - (BOOL) undeletePersistentRoot: (ETUUID *)aRoot
                           error: (NSError **)error
 {
+    NILARG_EXCEPTION_TEST(aRoot);
+    
     BOOL ok = NO;
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     if (root_id != nil)
@@ -790,6 +799,9 @@
 		forPersistentRoot: (ETUUID *)aRoot
                  error: (NSError **)error
 {
+    NILARG_EXCEPTION_TEST(aBranch);
+    NILARG_EXCEPTION_TEST(aRoot);
+    
     [db_ savepoint: @"setCurrentBranch"];
     
     BOOL ok;
@@ -823,6 +835,11 @@
             forPersistentRoot: (ETUUID *)aRoot
                         error: (NSError **)error
 {
+    NILARG_EXCEPTION_TEST(branchUUID);
+    NILARG_EXCEPTION_TEST(revId);
+    NILARG_EXCEPTION_TEST(aRoot);
+    [self validateRevision: revId forPersistentRoot: aRoot];
+    
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
     BOOL ok = [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,?,0)",
      [branchUUID dataValue],
@@ -847,6 +864,43 @@
     return ok;
 }
 
+- (void) validateRevision: (CORevisionID*)aRev
+{
+    if (aRev == nil)
+    {
+        return;
+    }
+    
+    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: [aRev backingStoreUUID]];
+    
+    if (![backing hasRevid: [aRev revisionIndex]])
+    {
+        [NSException raise: NSInvalidArgumentException
+                    format: @"CORevisionID %@ has an index not present in the backing store", aRev];
+    }
+}
+
+- (void) validateRevision: (CORevisionID*)aRev
+        forPersistentRoot: (ETUUID *)aRoot
+{
+    if (aRev == nil)
+    {
+        return;
+    }
+    
+    ETUUID *backingUUID = [self backingUUIDForPersistentRootUUID: aRoot];
+    
+    if (![[aRev backingStoreUUID] isEqual: backingUUID])
+    {
+        [NSException raise: NSInvalidArgumentException
+                    format: @"CORevisionID %@ can not be used with persistent "
+         @"root %@ (backing store %@) because the backing "
+         @"stores do not match", aRev, aRoot, backingUUID];
+    }
+    
+    [self validateRevision: aRev];
+}
+
 - (BOOL) setCurrentRevision: (CORevisionID*)currentRev
                headRevision: (CORevisionID*)headRev
                tailRevision: (CORevisionID*)tailRev
@@ -855,6 +909,12 @@
          currentChangeCount: (int64_t *)aChangeCountInOut
                       error: (NSError **)error
 {
+    NILARG_EXCEPTION_TEST(aBranch);
+    NILARG_EXCEPTION_TEST(aRoot);
+    [self validateRevision: currentRev forPersistentRoot: aRoot];
+    [self validateRevision: headRev forPersistentRoot: aRoot];
+    [self validateRevision: tailRev forPersistentRoot: aRoot];
+    
     [db_ savepoint: @"setCurrentRevision"];
 
     NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
@@ -903,6 +963,9 @@
      ofPersistentRoot: (ETUUID *)aRoot
                 error: (NSError **)error
 {
+    NILARG_EXCEPTION_TEST(aBranch);
+    NILARG_EXCEPTION_TEST(aRoot);
+    
     BOOL ok = [db_ executeUpdate: @"UPDATE branches SET deleted = 1 WHERE uuid = ? AND branch_id != (SELECT currentbranch FROM persistentroots WHERE root_id = proot)",
                [aBranch dataValue]];
     if (ok)
@@ -924,6 +987,9 @@
        ofPersistentRoot: (ETUUID *)aRoot
                   error: (NSError **)error
 {
+    NILARG_EXCEPTION_TEST(aBranch);
+    NILARG_EXCEPTION_TEST(aRoot);
+    
     BOOL ok = [db_ executeUpdate: @"UPDATE branches SET deleted = 0 WHERE uuid = ?",
                [aBranch dataValue]];
     
@@ -982,6 +1048,8 @@
 - (BOOL) finalizeDeletionsForPersistentRoot: (ETUUID *)aRoot
                                       error: (NSError **)error
 {
+    NILARG_EXCEPTION_TEST(aRoot);
+    
     ETUUID *backingUUID = [self backingUUIDForPersistentRootUUID: aRoot];
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID];
     //NSNumber *backingId = [self rootIdForPersistentRootUUID: backingUUID];
