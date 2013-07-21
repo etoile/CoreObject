@@ -212,15 +212,6 @@
             persistentRoot: (COPersistentRoot *)aContext
 parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch;
 
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Tells the receiver that its persistent root just committed a new revision. 
- * 
- * The committed revision is included among the loaded track nodes as a result,  
- * and without accessing the store.
- */
-- (void)didMakeNewCommitAtRevision: (CORevision *)revision;
 - (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID;
 - (void) saveCommitWithMetadata: (NSDictionary *)metadata;
 - (void)discardAllChanges;

@@ -373,46 +373,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	return [self allNodesAndCurrentNodeIndex: aNodeIndex];
 }
 
-- (void)didReloadNodes
-{
-    // FIXME: Implement
-#if 0
-	isLoaded = YES;
-
-	if ([self currentNode] == nil)
-		return;
-	
-	CORevision *currentRev =
-		[[[self persistentRoot] store] currentRevisionForTrackUUID: [self UUID]];
-	
-	ETAssert([[[self currentNode] revision] isEqual: currentRev]);
-#endif
-}
-
-- (void)setCurrentNode: (COTrackNode *)aNode
-{
-    // FIXME: Implement
-#if 0
-	INVALIDARG_EXCEPTION_TEST(aNode, [aNode track] == self);
-
-	NSUInteger nodeIndex = [[self loadedNodes] indexOfObject: aNode];
-
-	if (nodeIndex == NSNotFound)
-	{
-		[NSException raise: NSInvalidArgumentException
-		            format: @"Cannot find %@ on %@ currently", aNode, self];
-	}
-	currentNodeIndex = nodeIndex;
-
-	assert([[self currentNode] isEqual: aNode]);
-
-	[[[self persistentRoot] store] setCurrentRevision: [aNode revision]
-	                                     forTrackUUID: [self UUID]];
-	[[self persistentRoot] reloadAtRevision: [aNode revision]];
-	[self didUpdate];
-#endif
-}
-
 - (void)undo
 {
     CORevision *revision = [[self currentRevision] parentRevision];
@@ -444,60 +404,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         revision = revisionParent;
     }
 }
-
-- (void)undoNode: (COTrackNode *)aNode
-{
-    // FIXME: Implement
-#if 0
-	BOOL useCommitTrackUndo = ([[[self currentNode] previousNode] isEqual: aNode]);
-	BOOL useCommitTrackRedo = ([[[self currentNode] nextNode] isEqual: aNode]);
-
-	if (useCommitTrackUndo)
-	{
-		[self undo];
-	}
-	else if (useCommitTrackRedo)
-	{
-		[self redo];
-	}
-	else
-	{
-		[self selectiveUndoWithRevision: [aNode revision] 
-		               inEditingContext: [[self persistentRoot] parentContext]];
-	}
-#endif
-}
-
-- (void)didMakeNewCommitAtRevision: (CORevision *)revision
-{
-#if 0
-	NSParameterAssert(revision != nil);
-    
-	COTrackNode *newNode = [COTrackNode nodeWithID: [revision commitNodeID] revision: revision onTrack: self];
-	/* At this point, revision is the max revision for the commit track */
-	BOOL isFirstRevision = ([revision baseRevision] == nil);
-
-	/* Prevent -loadedNodes to access the store */
-	if (isFirstRevision)
-	{
-		isLoaded = YES;
-	}
-
-	BOOL isTipNodeCached = (isFirstRevision
-		|| [[[[self loadedNodes] lastObject] revision] isEqual: [revision baseRevision]]);
-
-	if (isTipNodeCached == NO)
-	{
-		[self reloadNodes];
-	}
-
-	[[self loadedNodes] addObject: newNode];
-	currentNodeIndex = [[self loadedNodes] count] - 1;
-
-	[self didUpdate];
-#endif
-}
-
 - (COSQLiteStore *) store
 {
     return [_persistentRoot store];
