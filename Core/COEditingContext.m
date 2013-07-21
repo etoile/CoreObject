@@ -523,7 +523,7 @@ static COEditingContext *currentCtxt = nil;
     NSDictionary *userInfo = [notif userInfo];
     ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [userInfo objectForKey: kCOPersistentRootUUID]];
     
-    NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
+    // NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
     
     // TODO: Handle
 }
