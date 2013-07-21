@@ -116,6 +116,9 @@
  */
 @property (readonly, nonatomic) CORevision *parentRevision;
 @property (readwrite, retain, nonatomic) CORevision *currentRevision;
+
+@property (readonly, nonatomic) CORevision *newestRevision;
+
 /**
  * The persistent root owning the commit track.
  *
@@ -128,6 +131,11 @@
 /** @taskunit Object Graph */
 
 @property (readonly, nonatomic) COObjectGraphContext *objectGraph;
+
+/** @taskunit Undo / Redo */
+
+- (void)undo;
+- (void)redo;
 
 /** @taskunit Creating Branches and Cheap copies */
 

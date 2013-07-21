@@ -195,6 +195,20 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return nil;
 }
 
+- (CORevision *)newestRevision
+{
+    // WARNING: Accesses store
+    CORevisionID *revid = [[self branchInfo] headRevisionID];
+    COSQLiteStore *store = [[self persistentRoot] store];
+    
+    if (revid != nil)
+    {
+        return [CORevision revisionWithStore: store revisionID: revid];
+    }
+    
+    return nil;
+}
+
 - (CORevision *)currentRevision
 {
     // WARNING: Accesses store
@@ -404,72 +418,34 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (void)undo
 {
-    // FIXME: Implement
-#if 0
-	if ([self currentNode] == nil)
-	{
-		[NSException raise: NSInternalInconsistencyException
-		            format: @"Cannot undo object %@ which does not have any commits", [self persistentRoot]];
-	}
-	/* If -canUndo returns YES, before returning it loads some previous nodes 
-	   to ensure currentNodeIndex is not zero and can be decremented */
-	if ([self canUndo] == NO)
-	{
-		return;
-	}
-
-	/* We must update the current node before calling -undoOnTrackUUID: because
-	   this last method posts a distributed notification that might be delivered 
-	   before returning (at least on GNUstep, but not Mac OS X where immediate 
-	   delivery behavior differs slightly). */
-	currentNodeIndex--;
-	// Check to make sure new node was cached
-	NSAssert(currentNodeIndex != NSNotFound 
-		&& ![[NSNull null] isEqual: [[self loadedNodes] objectAtIndex: currentNodeIndex]],
-		@"Record undone to is cached");
-
-	CORevision *currentRevision = [[[self persistentRoot] store] undoOnTrackUUID: [self UUID]];
-
-	// TODO: Reset object state to old object.
-	[[self persistentRoot] reloadAtRevision: currentRevision];
-
-	[self didUpdate];
-#endif
+    CORevision *revision = [[self currentRevision] parentRevision];
+    if (revision == nil)
+    {
+        return;
+    }
+    [self setCurrentRevision: revision];
 }
 
 - (void)redo
 {
-    // FIXME: Implement
-#if 0
-	if ([self currentNode] == nil)
-	{
-		[NSException raise: NSInternalInconsistencyException
-		            format: @"Cannot redo object %@ which does not have any commits", [self persistentRoot]];
-	}
-	/* If -canRedo returns YES, before returning it loads some next nodes 
-	   to ensure currentNodeIndex is not zero and can be incremented */
-	if ([self canRedo] == NO)
-	{
-		return;
-	}
-
-	/* We must update the current node before calling -redoOnTrackUUID: because
-	   this last method posts a distributed notification that might be delivered 
-	   before returning (at least on GNUstep, but not Mac OS X where immediate 
-	   delivery behavior differs slightly). */
-	currentNodeIndex++;
-	// Check to make sure new node was cached
-	NSAssert([[self loadedNodes] count] > currentNodeIndex 
-		&& ![[NSNull null] isEqual: [[self loadedNodes] objectAtIndex: currentNodeIndex]],
-		@"Record redone to is cached");
-
-	CORevision *currentRevision = [[[self persistentRoot] store] redoOnTrackUUID: [self UUID]];
-
-	// TODO: Reset object state to old object.
-	[[self persistentRoot] reloadAtRevision: currentRevision];
-
-	[self didUpdate];
-#endif
+    CORevision *currentRevision = [self currentRevision];
+    CORevision *revision = [self newestRevision];
+    
+    if ([currentRevision isEqual: revision])
+    {
+        return;
+    }
+    
+    while (revision != nil)
+    {
+        CORevision *revisionParent = [revision parentRevision];
+        if ([revisionParent isEqual: currentRevision])
+        {
+            [self setCurrentRevision: revision];
+            return;
+        }
+        revision = revisionParent;
+    }
 }
 
 - (void)undoNode: (COTrackNode *)aNode
@@ -558,6 +534,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
 	COSQLiteStore *store = [self store];
     
+    int64_t changeCount = [[_persistentRoot persistentRootInfo] changeCount];
+    
 	if ([self isBranchUncommitted])
 	{
         // N.B. - this only the case when we're adding a new branch to an existing persistent root.
@@ -575,6 +553,22 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         ASSIGN(_currentRevisionID, _parentRevisionID);
         ASSIGN(_parentRevisionID, nil);
     }
+    else if (![[[self branchInfo] currentRevisionID] isEqual: _currentRevisionID])
+    {
+        // This is the case when the user does [self setCurrentRevision: ], and then commits
+        
+        BOOL ok = [store setCurrentRevision: _currentRevisionID
+                               headRevision: nil /* This is the case when we're reverting, so don't update headRevision */
+                               tailRevision: nil
+                                  forBranch: _UUID
+                           ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                         currentChangeCount: &changeCount
+                                      error: NULL];
+        ETAssert(ok);
+        
+        ASSIGN(_currentRevisionID, _currentRevisionID);
+
+    }
     
     NSArray *changedItemUUIDs = [(NSSet *)[[[_objectGraph changedObjects] mappedCollection] UUID] allObjects];
     if ([changedItemUUIDs count] > 0)
@@ -584,8 +578,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                                   parentRevisionID: _currentRevisionID
                                      modifiedItems: changedItemUUIDs
                                              error: NULL];        
-        
-        int64_t changeCount = [[_persistentRoot persistentRootInfo] changeCount];
         
         BOOL ok = [store setCurrentRevision: revId
                                headRevision: revId
