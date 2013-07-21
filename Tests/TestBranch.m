@@ -11,7 +11,7 @@
 @interface TestBranch : TestCommon <UKTest>
 {
     COPersistentRoot *persistentRoot;
-    COObject *rootObj;
+    COContainer *rootObj;
     COBranch *originalBranch;
 }
 @end
@@ -91,76 +91,85 @@
 	UKStringsEqual(@"Shopping List", [rootObj valueForProperty: @"label"]);
 	UKObjectsEqual(secondRevision, [originalBranch currentRevision]);
 
+    // Second redo (Shopping List -> Todo)
 	[originalBranch setCurrentRevision: thirdRevision];
 	UKStringsEqual(@"Todo", [rootObj valueForProperty: @"label"]);
 	UKObjectsEqual(thirdRevision, [originalBranch currentRevision]);
 }
-
-#if 0
 
 /**
  * Test a root object with sub-object's connected as properties.
  */
 - (void)testWithObjectPropertiesUndoRedo
 {
-	COContainer *object = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	[object setValue: @"Document" forProperty: @"label"];
+	[rootObj setValue: @"Document" forProperty: @"label"];
 	[ctx commit];
-
-	COContainer *para1 = [[object persistentRoot] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    CORevision *firstRevision = [originalBranch currentRevision];
+    UKNotNil(firstRevision);
+    
+	COContainer *para1 = [[originalBranch objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
-	COContainer *para2 = [[object persistentRoot] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para2 = [[originalBranch objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
-	[object addObject: para1];
-	[object addObject: para2];
+	[rootObj addObject: para1];
+	[rootObj addObject: para2];
 	[ctx commit];
+    CORevision *secondRevision = [originalBranch currentRevision];    
 
 	[para1 setValue: @"paragraph with different contents" forProperty: @"label"];
 	[ctx commit];
+    CORevision *thirdRevision = [originalBranch currentRevision];
 
-	[[object commitTrack] undo];
+    // Undo
+    [originalBranch setCurrentRevision: secondRevision];
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
 	
-	[[object commitTrack] redo];
+    // Redo
+    [originalBranch setCurrentRevision: thirdRevision];
 	UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
 }
 
 - (void)testDivergentCommitTrack
 {
-    CREATE_AUTORELEASE_POOL(pool);
-	COContainer *object = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	[object setValue: @"Document" forProperty: @"label"];
+	[rootObj setValue: @"Document" forProperty: @"label"];
 	[ctx commit]; // Revision 1
+    CORevision *firstRevision = [originalBranch currentRevision];
+    UKNotNil(firstRevision);
 
-	COContainer *para1 = [[object persistentRoot] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para1 = [[originalBranch objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
-	COContainer *para2 = [[object persistentRoot] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para2 = [[originalBranch objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
-	[object addObject: para1];
-	[object addObject: para2];
-	UKIntsEqual(2, [object count]);
+	[rootObj addObject: para1];
+	[rootObj addObject: para2];
+	UKIntsEqual(2, [rootObj count]);
 	[ctx commit]; // Revision 2 (base 1)
 
-	[[object commitTrack] undo]; // back to Revision 1
-	UKIntsEqual(0, [object count]);
-
-	COContainer *para3 = [[object persistentRoot] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	[para3 setValue: @"paragraph 3" forProperty: @"label"];
-	[object addObject: para3];
-	[ctx commit];
-	UKIntsEqual(1, [object count]); // Revision 3 (base 1)
-
-	[[object commitTrack] undo];
-	UKIntsEqual(0, [object count]);
-
-	[[object commitTrack] redo];
-	UKIntsEqual(1, [object count]);
-	UKStringsEqual(@"paragraph 3", [[[object contentArray] objectAtIndex: 0] valueForProperty: @"label"]);
-    DESTROY(pool);
+    CORevision *secondRevision = [originalBranch currentRevision];    
+    UKNotNil(secondRevision);
     
-	//UKIntsEqual(0, [para3 retainCount]);
+    // Undo
+    [originalBranch setCurrentRevision: firstRevision];
+	UKIntsEqual(0, [rootObj count]);
+
+	COContainer *para3 = [[originalBranch objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[para3 setValue: @"paragraph 3" forProperty: @"label"];
+	[rootObj addObject: para3];
+	[ctx commit];
+    CORevision *divergentRevision = [originalBranch currentRevision];
+    
+	UKIntsEqual(1, [rootObj count]); // Revision 3 (base 1)
+
+    // Undo
+    [originalBranch setCurrentRevision: firstRevision];
+	UKIntsEqual(0, [rootObj count]);
+
+    
+    // Redo
+    [originalBranch setCurrentRevision: divergentRevision];
+	UKIntsEqual(1, [rootObj count]);
+	UKStringsEqual(@"paragraph 3", [[[rootObj contentArray] objectAtIndex: 0] valueForProperty: @"label"]);
 }
-#endif
 
 - (void)testBranchCreation
 {

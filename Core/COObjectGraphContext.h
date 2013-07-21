@@ -105,11 +105,11 @@
 
 #pragma mark adding objects
 
-- (COObject *)insertObjectWithEntityName: (NSString *)aFullName;
+- (id)insertObjectWithEntityName: (NSString *)aFullName;
 
 // FIXME: I don't think this should be public
-- (COObject *)insertObjectWithEntityName: (NSString *)aFullName
-                                    UUID: (ETUUID *)aUUID;
+- (id)insertObjectWithEntityName: (NSString *)aFullName
+                            UUID: (ETUUID *)aUUID;
 
 - (void)registerObject: (COObject *)object;
 

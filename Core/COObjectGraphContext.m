@@ -232,13 +232,13 @@
     }
 }
 
-- (COObject *)insertObjectWithEntityName: (NSString *)aFullName
+- (id)insertObjectWithEntityName: (NSString *)aFullName
 {
     return [self insertObjectWithEntityName: aFullName UUID: [ETUUID UUID]];
 }
 
-- (COObject *)insertObjectWithEntityName: (NSString *)aFullName
-                                    UUID: (ETUUID *)aUUID
+- (id)insertObjectWithEntityName: (NSString *)aFullName
+                            UUID: (ETUUID *)aUUID
 {
     ETEntityDescription *desc = [modelRepository_ descriptionForName: aFullName];
     if (desc == nil)
