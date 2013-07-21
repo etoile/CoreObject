@@ -319,7 +319,7 @@ serialization. */
 		else
 		{
 			COType elementType = [self serializedTypeForUnivaluedPropertyDescription: aPropertyDesc
-			                                                                 ofValue: [value firstObject]];
+			                                                                 ofValue: [value anyObject]];
 			type = (kCOSetType | elementType);
 		}
 	}
@@ -484,12 +484,14 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
             // optimization. Fast enumeration could even be faster.
             NSUInteger count = [value count];
             id mappedObjects[count];
+            int i = 0;
             
-            for (int i = 0; i < count; i++)
+            for (id subvalue in value)
             {
-                mappedObjects[i] = [self valueForSerializedValue: [value objectAtIndex: i]
+                mappedObjects[i] = [self valueForSerializedValue: subvalue
                                                           ofType: COPrimitiveType(type)
                                              propertyDescription: aPropertyDesc];
+                i++;
             }
             
             Class setClass = ([aPropertyDesc isReadOnly] ? [NSSet class] : [NSMutableSet class]);
