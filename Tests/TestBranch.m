@@ -115,11 +115,13 @@
 	[rootObj addObject: para2];
 	[ctx commit];
     CORevision *secondRevision = [originalBranch currentRevision];    
-
+    UKNotNil(secondRevision);
+    
 	[para1 setValue: @"paragraph with different contents" forProperty: @"label"];
 	[ctx commit];
     CORevision *thirdRevision = [originalBranch currentRevision];
-
+    UKNotNil(thirdRevision);
+    
     // Undo
     [originalBranch undo]; //[originalBranch setCurrentRevision: secondRevision];
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
@@ -157,6 +159,7 @@
 	[rootObj addObject: para3];
 	[ctx commit];
     CORevision *divergentRevision = [originalBranch currentRevision];
+    UKNotNil(divergentRevision);
     
 	UKIntsEqual(1, [rootObj count]); // Revision 3 (base 1)
 
