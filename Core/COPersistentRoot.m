@@ -392,9 +392,18 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     }
 }
 
-- (void) addBranch: (COBranch*)aBranch
+
+- (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
-    [_branchForUUID addObject: aBranch forKey: [aBranch UUID]];
+    COBranch *newBranch = [[[COBranch alloc] initWithUUID: [ETUUID UUID]
+                                           persistentRoot: self
+                               parentRevisionForNewBranch: [aRev revisionID]] autorelease];
+    
+    [newBranch setMetadata: D(aLabel, @"COBranchLabel")];
+    
+    [_branchForUUID addObject: newBranch forKey: [newBranch UUID]];
+    
+    return newBranch;
 }
 
 - (CORevision *) revision

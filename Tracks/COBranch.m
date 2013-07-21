@@ -247,17 +247,12 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
-    // FIXME: Move implementation to a private method in COPersistentRoot
+    if ([self isBranchUncommitted])
+    {
+        [NSException raise: NSGenericException format: @"uncommitted branches do not support -makeBranchWithLabel:atRevision:"];
+    }
     
-    COBranch *newBranch = [[[COBranch alloc] initWithUUID: [ETUUID UUID]
-                                           persistentRoot: _persistentRoot
-                               parentRevisionForNewBranch: [aRev revisionID]] autorelease];
-    
-    [newBranch setMetadata: D(aLabel, @"COBranchLabel")];
-    
-    [_persistentRoot addBranch: newBranch];
-    
-    return newBranch;
+    return [_persistentRoot makeBranchWithLabel: aLabel atRevision: aRev];
 }
 
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev

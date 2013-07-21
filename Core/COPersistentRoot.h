@@ -436,6 +436,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (void) reloadPersistentRootInfo;
 
-- (void) addBranch: (COBranch*)aBranch;
+- (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev;
 
 @end
