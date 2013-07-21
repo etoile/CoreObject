@@ -48,57 +48,55 @@
 	UKObjectsEqual([originalBranch currentRevision], [rootObj revision]);
 }
 
-// FIXME: Port the rest of the tests
-
-#if 0
 - (void)testSimpleRootObjectPropertyUndoRedo
 {
-	COContainer *object = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	[object setValue: @"Groceries" forProperty: @"label"];
+	[rootObj setValue: @"Groceries" forProperty: @"label"];
 	[ctx commit];
 	
-	COCommitTrack *commitTrack = [object commitTrack];
-	COTrackNode *firstNode = [commitTrack currentNode];
-	UKNotNil(commitTrack);
-	UKNotNil(firstNode);
-	UKFalse([commitTrack canUndo]);
+	CORevision *firstRevision = [originalBranch currentRevision];
+	UKNotNil(originalBranch);
+	UKNotNil(firstRevision);
+	UKNil([firstRevision parentRevision]);
 
-	[object setValue: @"Shopping List" forProperty: @"label"];
+	[rootObj setValue: @"Shopping List" forProperty: @"label"];
 	[ctx commit];
-	COTrackNode *secondNode = [commitTrack currentNode];
+	CORevision *secondRevision = [originalBranch currentRevision];
 
-	UKObjectsNotEqual(firstNode, secondNode);
-	UKObjectsEqual([firstNode revision], [[secondNode revision] baseRevision]);
+    UKNotNil(secondRevision);
+	UKObjectsNotEqual(firstRevision, secondRevision);
 
-	[object setValue: @"Todo" forProperty: @"label"];
+	[rootObj setValue: @"Todo" forProperty: @"label"];
 	[ctx commit];
-	COTrackNode *thirdNode = [commitTrack currentNode];
-	UKObjectsNotEqual(thirdNode, secondNode);
-	UKObjectsEqual([[thirdNode revision] baseRevision], [secondNode revision]);
+	CORevision *thirdRevision = [originalBranch currentRevision];
+    
+    UKNotNil(thirdRevision);
+	UKObjectsNotEqual(thirdRevision, secondRevision);
 
 	// First undo (Todo -> Shopping List)
-	[commitTrack undo];
-	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
-	UKObjectsEqual(secondNode, [commitTrack currentNode]);
+	[originalBranch setCurrentRevision: secondRevision];
+	UKStringsEqual(@"Shopping List", [rootObj valueForProperty: @"label"]);
+	UKObjectsEqual(secondRevision, [originalBranch currentRevision]);
 
 	// Second undo (Shopping List -> Groceries)
-	[commitTrack undo];
-	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
-	UKObjectsEqual(firstNode, [commitTrack currentNode]);
+	[originalBranch setCurrentRevision: firstRevision];
+	UKStringsEqual(@"Groceries", [rootObj valueForProperty: @"label"]);
+	UKObjectsEqual(firstRevision, [originalBranch currentRevision]);
 
-	UKFalse([commitTrack canUndo]);
-
+    // Verify that the revert to firstRevision is not committed
+    UKObjectsEqual([thirdRevision revisionID],
+                   [[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] currentBranchInfo] currentRevisionID]);
+    
 	// First redo (Groceries -> Shopping List)
-	[commitTrack redo];
-	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
-	UKObjectsEqual(secondNode, [commitTrack currentNode]);
+	[originalBranch setCurrentRevision: secondRevision];
+	UKStringsEqual(@"Shopping List", [rootObj valueForProperty: @"label"]);
+	UKObjectsEqual(secondRevision, [originalBranch currentRevision]);
 
-	[commitTrack redo];
-	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
-	UKObjectsEqual(thirdNode, [commitTrack currentNode]);
-
-	UKFalse([commitTrack canRedo]);
+	[originalBranch setCurrentRevision: thirdRevision];
+	UKStringsEqual(@"Todo", [rootObj valueForProperty: @"label"]);
+	UKObjectsEqual(thirdRevision, [originalBranch currentRevision]);
 }
+
+#if 0
 
 /**
  * Test a root object with sub-object's connected as properties.
