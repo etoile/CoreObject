@@ -121,21 +121,15 @@ static COEditingContext *currentCtxt = nil;
 
 - (NSSet *)persistentRoots
 {
-    // Start with a list of persistent root UUIDs from the store
-    NSMutableSet *UUIDs = [NSMutableSet setWithArray: [_store persistentRootUUIDs]];
+    NSMutableSet *result = [NSMutableSet setWithArray: [_loadedPersistentRoots allValues]];
     
-    // Subtract those pending deletion
-    for (COPersistentRoot *deleted in _deletedPersistentRoots)
-    {
-        [UUIDs removeObject: [deleted persistentRootUUID]];
-    }
-    
-    NSMutableSet *result = [NSMutableSet set];
-    for (ETUUID *uuid in UUIDs)
+    for (ETUUID *uuid in [_store persistentRootUUIDs])
     {
         [result addObject: [self persistentRootForUUID: uuid]];
     }
-    [result addObjectsFromArray: [_loadedPersistentRoots allValues]];
+    
+    [result minusSet: _deletedPersistentRoots];
+    
     return result;
 }
 
@@ -350,8 +344,14 @@ static COEditingContext *currentCtxt = nil;
 
 - (BOOL)hasChanges
 {
+    if ([_deletedPersistentRoots count] > 0)
+        return YES;
+    
 	for (COPersistentRoot *context in [_loadedPersistentRoots objectEnumerator])
 	{
+        if (![context isPersistentRootCommitted])
+            return YES;
+        
 		if ([context hasChanges])
 			return YES;
 	}
@@ -466,15 +466,13 @@ static COEditingContext *currentCtxt = nil;
 	
 	for (COPersistentRoot *persistentRoot in persistentRoots)
 	{
-		BOOL isDeleted = [_deletedPersistentRoots containsObject: persistentRoot];
-		
-		if (isDeleted == NO)
-			continue;
-		
-		ETUUID *uuid = [persistentRoot persistentRootUUID];
-		[_store deletePersistentRoot: uuid error: NULL];
+		if ([_deletedPersistentRoots containsObject: persistentRoot])
+        {
+            ETUUID *uuid = [persistentRoot persistentRootUUID];
+            [_store deletePersistentRoot: uuid error: NULL];
 
-        [self unloadPersistentRoot: persistentRoot];
+            [self unloadPersistentRoot: persistentRoot];
+        }
     }
 
     ETAssert([_store commitTransactionWithError: NULL]);
@@ -497,6 +495,7 @@ static COEditingContext *currentCtxt = nil;
 {
     // FIXME: Implement.
 
+    [_deletedPersistentRoots removeObject: aPersistentRoot];
     [_loadedPersistentRoots removeObjectForKey: [aPersistentRoot persistentRootUUID]];
 }
 

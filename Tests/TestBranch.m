@@ -378,12 +378,48 @@
     ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];
     
     UKTrue([ctx hasChanges]);
+    UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
+    UKNil([store persistentRootInfoForUUID: uuid]);
     
     [ctx deletePersistentRoot: persistentRoot];
     
     UKFalse([ctx hasChanges]);
+    UKObjectsEqual([NSSet set], [ctx persistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
     UKNil([ctx persistentRootForUUID: uuid]);
+    UKNil([store persistentRootInfoForUUID: uuid]);
+}
+
+- (void)testDeleteCommittedPersistentRoot
+{
+    ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];
+        
+    
+    [ctx commit];
+    
+    UKFalse([ctx hasChanges]);
+    UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
+    UKNotNil([ctx persistentRootForUUID: uuid]);
+    UKNotNil([store persistentRootInfoForUUID: uuid]);
+    
+    [ctx deletePersistentRoot: persistentRoot];
+
+    UKTrue([ctx hasChanges]);
+    UKObjectsEqual([NSSet set], [ctx persistentRoots]);
+    UKObjectsEqual(S(persistentRoot), [ctx deletedPersistentRoots]);
+    UKNotNil([ctx persistentRootForUUID: uuid]);
+    UKNotNil([store persistentRootInfoForUUID: uuid]);
+    
+    [ctx commit];
+  
+    // FIXME: Need to straighten out how deletion affects these methods.
+    
+//    UKFalse([ctx hasChanges]);
+//    UKNil([ctx persistentRootForUUID: uuid]);
+//    UKNil([store persistentRootInfoForUUID: uuid]);
 }
 
 @end
