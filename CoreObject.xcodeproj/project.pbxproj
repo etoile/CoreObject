@@ -317,22 +317,10 @@
 		60988F1A163B6B7A009C4F21 /* SQLClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "SQLClient-Info.plist"; path = "SQLClient/SQLClient-Info.plist"; sourceTree = "<group>"; };
 		60988F1C163B6B7A009C4F21 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		609C00541704C24C00D01AAB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Tests/main.m; sourceTree = "<group>"; };
-		609C00551704C24C00D01AAB /* TestArrayDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestArrayDiff.m; path = Tests/TestArrayDiff.m; sourceTree = "<group>"; };
-		609C00561704C24C00D01AAB /* TestCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCollection.m; path = Tests/TestCollection.m; sourceTree = "<group>"; };
 		609C00571704C24C00D01AAB /* TestBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBranch.m; path = Tests/TestBranch.m; sourceTree = "<group>"; };
 		609C00581704C24C00D01AAB /* TestCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestCommon.h; path = Tests/TestCommon.h; sourceTree = "<group>"; };
 		609C00591704C24C00D01AAB /* TestCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCommon.m; path = Tests/TestCommon.m; sourceTree = "<group>"; };
-		609C005A1704C24C00D01AAB /* TestCopy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCopy.m; path = Tests/TestCopy.m; sourceTree = "<group>"; };
-		609C005B1704C24C00D01AAB /* TestCustomTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCustomTrack.m; path = Tests/TestCustomTrack.m; sourceTree = "<group>"; };
-		609C005C1704C24C00D01AAB /* TestEditingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestEditingContext.m; path = Tests/TestEditingContext.m; sourceTree = "<group>"; };
-		609C005D1704C24C00D01AAB /* TestHistoryTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestHistoryTrack.m; path = Tests/TestHistoryTrack.m; sourceTree = "<group>"; };
-		609C005E1704C24C00D01AAB /* TestObjectGraphDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestObjectGraphDiff.m; path = Tests/TestObjectGraphDiff.m; sourceTree = "<group>"; };
-		609C005F1704C24C00D01AAB /* TestPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestPerformance.m; path = Tests/TestPerformance.m; sourceTree = "<group>"; };
-		609C00601704C24C00D01AAB /* TestRelationshipIntegrity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestRelationshipIntegrity.m; path = Tests/TestRelationshipIntegrity.m; sourceTree = "<group>"; };
 		609C00611704C24C00D01AAB /* TestRevisionNumber.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestRevisionNumber.m; path = Tests/TestRevisionNumber.m; sourceTree = "<group>"; };
-		609C00621704C24C00D01AAB /* TestStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestStore.m; path = Tests/TestStore.m; sourceTree = "<group>"; };
-		609C00631704C24C00D01AAB /* TestSynchronization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSynchronization.m; path = Tests/TestSynchronization.m; sourceTree = "<group>"; };
-		609C00641704C24C00D01AAB /* TestUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUtilities.m; path = Tests/TestUtilities.m; sourceTree = "<group>"; };
 		609C00781704C2BA00D01AAB /* CORevision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CORevision.h; path = Core/CORevision.h; sourceTree = "<group>"; };
 		609C00791704C2BA00D01AAB /* CORevision.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CORevision.m; path = Core/CORevision.m; sourceTree = "<group>"; };
 		609C007A1704C2BA00D01AAB /* COSQLStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSQLStore.h; path = Store/COSQLStore.h; sourceTree = "<group>"; };
@@ -377,7 +365,6 @@
 		609C00E71704C42200D01AAB /* NSData+sha1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+sha1.m"; path = "Utilities/NSData+sha1.m"; sourceTree = "<group>"; };
 		609C01AA170AC93000D01AAB /* NSObject+CoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+CoreObject.h"; path = "Core/NSObject+CoreObject.h"; sourceTree = "<group>"; };
 		609C01AB170AC93100D01AAB /* NSObject+CoreObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+CoreObject.m"; path = "Core/NSObject+CoreObject.m"; sourceTree = "<group>"; };
-		60A792EC171C52BE00348EC7 /* TestObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestObject.m; path = Tests/TestObject.m; sourceTree = "<group>"; };
 		60C913AD165BBE9E00E0C5F4 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Samples/BasicPersistence/main.m; sourceTree = "<group>"; };
 		60C913B3165BBED000E0C5F4 /* BasicPersistence */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BasicPersistence; sourceTree = BUILT_PRODUCTS_DIR; };
 		60C913B5165BBED000E0C5F4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -401,6 +388,20 @@
 		6675F8BE1785C02A001E5622 /* COPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COPath.h; sourceTree = "<group>"; };
 		6675F8BF1785C02A001E5622 /* COPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COPath.m; sourceTree = "<group>"; };
 		6675F8C01785C02A001E5622 /* COType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COType.h; sourceTree = "<group>"; };
+		667F1ED0179C81E00083C3E6 /* TestArrayDiff.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestArrayDiff.m; sourceTree = "<group>"; };
+		667F1ED1179C81E00083C3E6 /* TestCollection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCollection.m; sourceTree = "<group>"; };
+		667F1ED2179C81E00083C3E6 /* TestCopy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCopy.m; sourceTree = "<group>"; };
+		667F1ED3179C81E00083C3E6 /* TestCustomTrack.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCustomTrack.m; sourceTree = "<group>"; };
+		667F1ED4179C81E00083C3E6 /* TestEditingContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestEditingContext.m; sourceTree = "<group>"; };
+		667F1ED5179C81E00083C3E6 /* TestHistoryTrack.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestHistoryTrack.m; sourceTree = "<group>"; };
+		667F1ED6179C81E00083C3E6 /* TestObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestObject.m; sourceTree = "<group>"; };
+		667F1ED7179C81E00083C3E6 /* TestObjectGraphDiff.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestObjectGraphDiff.m; sourceTree = "<group>"; };
+		667F1ED8179C81E00083C3E6 /* TestPerformance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestPerformance.m; sourceTree = "<group>"; };
+		667F1ED9179C81E00083C3E6 /* TestPersistentRoot.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestPersistentRoot.m; sourceTree = "<group>"; };
+		667F1EDA179C81E00083C3E6 /* TestRelationshipIntegrity.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestRelationshipIntegrity.m; sourceTree = "<group>"; };
+		667F1EDB179C81E00083C3E6 /* TestStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestStore.m; sourceTree = "<group>"; };
+		667F1EDC179C81E00083C3E6 /* TestSynchronization.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestSynchronization.m; sourceTree = "<group>"; };
+		667F1EDD179C81E00083C3E6 /* TestUtilities.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestUtilities.m; sourceTree = "<group>"; };
 		66808461178CD4FD003A3CC6 /* TestCopier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCopier.m; path = Tests/TestCopier.m; sourceTree = "<group>"; };
 		6680846B178CD526003A3CC6 /* COCopier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCopier.h; path = Core/COCopier.h; sourceTree = "<group>"; };
 		6680846C178CD526003A3CC6 /* COCopier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCopier.m; path = Core/COCopier.m; sourceTree = "<group>"; };
@@ -447,7 +448,6 @@
 		66D96CB4178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSQLiteStorePersistentRootBackingStore.m; path = Store/COSQLiteStorePersistentRootBackingStore.m; sourceTree = "<group>"; };
 		66D96CB5178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSQLiteStorePersistentRootBackingStoreBinaryFormats.h; path = Store/COSQLiteStorePersistentRootBackingStoreBinaryFormats.h; sourceTree = "<group>"; };
 		66D96CB6178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSQLiteStorePersistentRootBackingStoreBinaryFormats.m; path = Store/COSQLiteStorePersistentRootBackingStoreBinaryFormats.m; sourceTree = "<group>"; };
-		66D96CD2178C1AA500D1553C /* TestPersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestPersistentRoot.m; path = Tests/TestPersistentRoot.m; sourceTree = "<group>"; };
 		791B4E2D1299C79300CCF472 /* Test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test; sourceTree = BUILT_PRODUCTS_DIR; };
 		791B4E6B1299C90900CCF472 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabase.h; path = fmdb/src/FMDatabase.h; sourceTree = "<group>"; };
 		791B4E6C1299C90900CCF472 /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FMDatabase.m; path = fmdb/src/FMDatabase.m; sourceTree = "<group>"; };
@@ -689,6 +689,41 @@
 			path = StorageDataModel;
 			sourceTree = "<group>";
 		};
+		667F1ECE179C81BE0083C3E6 /* Store Tests */ = {
+			isa = PBXGroup;
+			children = (
+				664199A4178C3E1800B78174 /* TestItem.m */,
+				664199A5178C3E1800B78174 /* TestBinaryReadWrite.m */,
+				664199B0178C431D00B78174 /* TestSQLiteStore.m */,
+				664199B1178C431D00B78174 /* TestSQLiteStoreMultiPersistentRoots.m */,
+				664199B2178C431E00B78174 /* TestSQLiteStorePerformance.m */,
+				664199B3178C431E00B78174 /* TestSQLiteStorePersistentRootBackingStore.m */,
+			);
+			name = "Store Tests";
+			sourceTree = "<group>";
+		};
+		667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */ = {
+			isa = PBXGroup;
+			children = (
+				667F1ED0179C81E00083C3E6 /* TestArrayDiff.m */,
+				667F1ED1179C81E00083C3E6 /* TestCollection.m */,
+				667F1ED2179C81E00083C3E6 /* TestCopy.m */,
+				667F1ED3179C81E00083C3E6 /* TestCustomTrack.m */,
+				667F1ED4179C81E00083C3E6 /* TestEditingContext.m */,
+				667F1ED5179C81E00083C3E6 /* TestHistoryTrack.m */,
+				667F1ED6179C81E00083C3E6 /* TestObject.m */,
+				667F1ED7179C81E00083C3E6 /* TestObjectGraphDiff.m */,
+				667F1ED8179C81E00083C3E6 /* TestPerformance.m */,
+				667F1ED9179C81E00083C3E6 /* TestPersistentRoot.m */,
+				667F1EDA179C81E00083C3E6 /* TestRelationshipIntegrity.m */,
+				667F1EDB179C81E00083C3E6 /* TestStore.m */,
+				667F1EDC179C81E00083C3E6 /* TestSynchronization.m */,
+				667F1EDD179C81E00083C3E6 /* TestUtilities.m */,
+			);
+			name = "Old CoreObject trunk tests";
+			path = "Tests/Old CoreObject trunk tests";
+			sourceTree = "<group>";
+		};
 		6686BDB212592C1B0065DE1A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -807,31 +842,13 @@
 			children = (
 				609C00541704C24C00D01AAB /* main.m */,
 				66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */,
-				609C00551704C24C00D01AAB /* TestArrayDiff.m */,
-				609C00561704C24C00D01AAB /* TestCollection.m */,
 				609C00571704C24C00D01AAB /* TestBranch.m */,
 				609C00581704C24C00D01AAB /* TestCommon.h */,
 				609C00591704C24C00D01AAB /* TestCommon.m */,
-				609C005A1704C24C00D01AAB /* TestCopy.m */,
 				66808461178CD4FD003A3CC6 /* TestCopier.m */,
-				609C005B1704C24C00D01AAB /* TestCustomTrack.m */,
-				609C005C1704C24C00D01AAB /* TestEditingContext.m */,
-				609C005D1704C24C00D01AAB /* TestHistoryTrack.m */,
-				60A792EC171C52BE00348EC7 /* TestObject.m */,
-				609C005E1704C24C00D01AAB /* TestObjectGraphDiff.m */,
-				609C005F1704C24C00D01AAB /* TestPerformance.m */,
-				609C00601704C24C00D01AAB /* TestRelationshipIntegrity.m */,
 				609C00611704C24C00D01AAB /* TestRevisionNumber.m */,
-				609C00621704C24C00D01AAB /* TestStore.m */,
-				609C00631704C24C00D01AAB /* TestSynchronization.m */,
-				609C00641704C24C00D01AAB /* TestUtilities.m */,
-				66D96CD2178C1AA500D1553C /* TestPersistentRoot.m */,
-				664199A4178C3E1800B78174 /* TestItem.m */,
-				664199A5178C3E1800B78174 /* TestBinaryReadWrite.m */,
-				664199B0178C431D00B78174 /* TestSQLiteStore.m */,
-				664199B1178C431D00B78174 /* TestSQLiteStoreMultiPersistentRoots.m */,
-				664199B2178C431E00B78174 /* TestSQLiteStorePerformance.m */,
-				664199B3178C431E00B78174 /* TestSQLiteStorePersistentRootBackingStore.m */,
+				667F1ECE179C81BE0083C3E6 /* Store Tests */,
+				667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
