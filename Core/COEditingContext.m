@@ -268,10 +268,16 @@ static COEditingContext *currentCtxt = nil;
 	return persistentRoot;
 }
 
-- (void)deletePersistentRootForRootObject: (COObject *)aRootObject
+- (void)deletePersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
+    if (![aPersistentRoot isPersistentRootCommitted])
+    {
+        [self unloadPersistentRoot: aPersistentRoot];
+        return;
+    }
+    
 	// NOTE: Deleted persistent roots are removed from the cache on commit.
-	[_deletedPersistentRoots addObject: [aRootObject persistentRoot]];
+	[_deletedPersistentRoots addObject: aPersistentRoot];
 }
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid
@@ -468,10 +474,8 @@ static COEditingContext *currentCtxt = nil;
 		ETUUID *uuid = [persistentRoot persistentRootUUID];
 		[_store deletePersistentRoot: uuid error: NULL];
 
-        // FIXME: Implement.
-		//[persistentRoot unload];
-		[_loadedPersistentRoots removeObjectForKey: uuid];
-	}
+        [self unloadPersistentRoot: persistentRoot];
+    }
 
     ETAssert([_store commitTransactionWithError: NULL]);
     
@@ -487,6 +491,13 @@ static COEditingContext *currentCtxt = nil;
 - (NSError *)error
 {
 	return _error;
+}
+
+- (void) unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
+{
+    // FIXME: Implement.
+
+    [_loadedPersistentRoots removeObjectForKey: [aPersistentRoot persistentRootUUID]];
 }
 
 // Notification handling

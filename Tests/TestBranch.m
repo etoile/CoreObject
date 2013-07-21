@@ -373,4 +373,17 @@
     UKObjectsSame(originalBranch, [persistentRoot currentBranch]);
 }
 
+- (void)testDeleteUncommittedPersistentRoot
+{
+    ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];
+    
+    UKTrue([ctx hasChanges]);
+    UKNotNil([ctx persistentRootForUUID: uuid]);
+    
+    [ctx deletePersistentRoot: persistentRoot];
+    
+    UKFalse([ctx hasChanges]);
+    UKNil([ctx persistentRootForUUID: uuid]);
+}
+
 @end

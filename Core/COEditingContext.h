@@ -135,8 +135,7 @@
  */
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
 
-// TODO: Should probably change to take a COPersistentRoot
-- (void)deletePersistentRootForRootObject: (COObject *)aRootObject;
+- (void)deletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
 
 /** @taskunit Pending Changes */
 

@@ -438,4 +438,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev;
 
+- (BOOL) isPersistentRootCommitted;
+
 @end
