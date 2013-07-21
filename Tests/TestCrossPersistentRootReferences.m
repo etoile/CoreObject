@@ -34,15 +34,15 @@
     COPersistentRoot *photo2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [[photo2 rootObject] setValue: @"photo2" forKey: @"label"];
     
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[persistentRoot rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
-    [[persistentRoot rootObject] insertObject: [photo2 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    COPersistentRoot *library = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    [[library rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    [[library rootObject] insertObject: [photo2 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
     
-    UKObjectsEqual(A([photo1 rootObject], [photo2 rootObject]), [[persistentRoot rootObject] valueForKey: @"contents"]);
+    UKObjectsEqual(A([photo1 rootObject], [photo2 rootObject]), [[library rootObject] valueForKey: @"contents"]);
     
     // Do the computed parentContainer properties work across persistent root boundaries?
-    UKObjectsEqual([persistentRoot rootObject], [[photo1 rootObject] valueForKey: @"parentContainer"]);
-    UKObjectsEqual([persistentRoot rootObject], [[photo2 rootObject] valueForKey: @"parentContainer"]);
+    UKObjectsEqual([library rootObject], [[photo1 rootObject] valueForKey: @"parentContainer"]);
+    UKObjectsEqual([library rootObject], [[photo2 rootObject] valueForKey: @"parentContainer"]);
     
     // Check that nothing is committed yet
     UKObjectsEqual([NSArray array], [store persistentRootUUIDs]);
@@ -53,13 +53,13 @@
     
     {
         COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: store];
-        COPersistentRoot *persistentRoot2 = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COPersistentRoot *library2 = [ctx2 persistentRootForUUID: [library persistentRootUUID]];
         
-        NSArray *persistentRoot2contents = [[persistentRoot2 rootObject] valueForKey: @"contents"];
-        UKIntsEqual(2, [persistentRoot2contents count]);
+        NSArray *library2contents = [[library2 rootObject] valueForKey: @"contents"];
+        UKIntsEqual(2, [library2contents count]);
         
-        COPersistentRoot *photo1ctx2 = [[persistentRoot2contents objectAtIndex: 0] persistentRoot];
-        COPersistentRoot *photo2ctx2 = [[persistentRoot2contents objectAtIndex: 1] persistentRoot];
+        COPersistentRoot *photo1ctx2 = [[library2contents objectAtIndex: 0] persistentRoot];
+        COPersistentRoot *photo2ctx2 = [[library2contents objectAtIndex: 1] persistentRoot];
         
         UKObjectsEqual([photo1 persistentRootUUID], [photo1ctx2 persistentRootUUID]);
         UKObjectsEqual([photo2 persistentRootUUID], [photo2ctx2 persistentRootUUID]);
@@ -69,6 +69,8 @@
         UKObjectsEqual(@"photo2", [[photo2ctx2 rootObject] valueForKey: @"label"]);
     }
 }
+
+#if 0
 
 - (void) testAsyncFaulting
 {
@@ -196,6 +198,29 @@
  
  Same quiestion for the parent of photo1.
  
+ 
+ Idea: Two views of references.
+ 
+ 1. Basic
+ 
+ Cross-persistent root refs are indistinguishable from regular intra-persistent-root refs.
+ Whether the Cross-persistent-root ref is to the default branch or an explicit branch is indistinguishable.
+ Cross-persistent-root refs to a deleted persistent root are simply hidden.
+ 
+ 2. Show metadata
+ 
+ Basically raw access to the COItem level.
+ You get to see COPath objects, so you can see if it's a branch specific relationship,
+ an can check if they're broken. (Maybe a wrapper on top of COPath, instead of
+ raw COPath objects.)
+ 
+ => We need to keep the COItem-level representation for relationships in memory,
+ so if you delete a persistent root then restore it, the relationships in the
+ Basic level reappear automatically.
+ 
+ 
  */
+
+#endif
 
 @end
