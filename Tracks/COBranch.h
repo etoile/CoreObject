@@ -32,14 +32,11 @@
      * Weak reference
      */
 	COPersistentRoot *_persistentRoot;
-    
-    /**
-     * Only used when this is a new branch
-     */
-    CORevisionID *_parentRevisionID;
+
+    BOOL _isCreated;
     
     /** 
-     * If nil, we are not yet committed.
+     * If _isCreated is NO, this is the parent revision to use for the branch.
      *
      * If this is different than the current revision for this branch
      * recorded in _persistentRoot's _savedState, it means the user has reverted

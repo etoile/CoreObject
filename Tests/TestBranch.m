@@ -248,86 +248,87 @@
     UKObjectsEqual(@"Untitled", [[persistentRoot rootObject] valueForProperty: @"label"]);
 }
 
-#if 0
-
-- (NSArray *)revisionsForStoreTrack
-{
-	return [store nodesForTrackUUID: [store UUID] nodeBuilder: (id <COTrackNodeBuilder>)store
-		currentNodeIndex: NULL backwardLimit: NSUIntegerMax forwardLimit: NSUIntegerMax];
-}
-
 - (void)testBranchFromBranch
 {
-	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
-	COCommitTrack *initialTrack = [[object commitTrack] retain];
-	
-	UKTrue([[initialTrack loadedNodes] isEmpty]);
+	UKNil([originalBranch currentRevision]);
 
 	/* Commit some initial changes in the main branch */
 	
-	[object setValue: @"Red" forProperty: @"label"];
+	[rootObj setValue: @"Red" forProperty: @"label"];
 	
-	CORevision *rev1 = [[object persistentRoot] commit];
+    [persistentRoot commit];
+    CORevision *rev1 = [originalBranch currentRevision];
+	UKNotNil(rev1);
+    
+	[rootObj setValue: @"Blue" forProperty: @"label"];
 	
-	[object setValue: @"Blue" forProperty: @"label"];
-	
-	CORevision *rev2 = [[object persistentRoot] commit];
+    [persistentRoot commit];
+	CORevision *rev2 = [originalBranch currentRevision];
 
-	UKObjectsEqual(A(rev1, rev2), [[[initialTrack loadedNodes] mappedCollection] revision]);
+	//UKObjectsEqual(A(rev1, rev2), [[[initialTrack loadedNodes] mappedCollection] revision]);
 
 	/* Create branch 1 */
 	
-	COCommitTrack *branch1 = [initialTrack makeBranchWithLabel: @"Branch 1"];
-	CORevision *rev3 = [store revisionWithRevisionNumber: [ctx latestRevisionNumber]];
+	COBranch *branch1 = [originalBranch makeBranchWithLabel: @"Branch 1"];
+	CORevision *rev3 = [branch1 currentRevision];
 
-	UKObjectsEqual(A(rev1, rev2), [[[branch1 loadedNodes] mappedCollection] revision]);
+    UKObjectsEqual(rev2, rev3);
+    
+	//UKObjectsEqual(A(rev1, rev2), [[[branch1 loadedNodes] mappedCollection] revision]);
 
 	/* Switch to branch 1 */
 	
-	[[object persistentRoot] setCommitTrack: branch1]; //rev4 (not yet the case)
+	[persistentRoot setCurrentBranch: branch1];
 	
 	/* Commit some  changes in branch 1 */
 	
-	[object setValue: @"Todo" forProperty: @"label"];
+	[[persistentRoot rootObject] setValue: @"Todo" forProperty: @"label"];
 	
-	CORevision *rev5 = [[object persistentRoot] commit];
+	[persistentRoot commit];
+    CORevision *rev5 = [persistentRoot revision];
+    
+	[[persistentRoot rootObject] setValue: @"Tidi" forProperty: @"label"];
 	
-	[object setValue: @"Tidi" forProperty: @"label"];
-	
-	CORevision *rev6 = [[object persistentRoot] commit];
+	[persistentRoot commit];
+    CORevision *rev6 = [persistentRoot revision];
 
-	UKObjectsEqual(A(rev1, rev2, rev5, rev6), [[[branch1 loadedNodes] mappedCollection] revision]);
+	//UKObjectsEqual(A(rev1, rev2, rev5, rev6), [[[branch1 loadedNodes] mappedCollection] revision]);
 	
 	/* Create branch2 */
 	
-	COCommitTrack *branch2 = [branch1 makeBranchWithLabel: @"Branch 2" atRevision: rev5];
-	CORevision *rev7 = [store revisionWithRevisionNumber: [ctx latestRevisionNumber]];
-	
+	COBranch *branch2 = [branch1 makeBranchWithLabel: @"Branch 2" atRevision: rev5];
+	CORevision *rev7 = [branch2 currentRevision];
+	UKNotNil(rev7);
+    
 	/* Switch to branch 2 */
 	
-	[[object persistentRoot] setCommitTrack: branch2]; //rev8 (not yet the case)
+	[persistentRoot setCurrentBranch: branch2]; //rev8 (not yet the case)
 	
-	UKObjectsEqual(rev2, [store currentRevisionForTrackUUID: [initialTrack UUID]]);
-	UKObjectsEqual(rev6, [store currentRevisionForTrackUUID: [branch1 UUID]]);
-	UKObjectsEqual(rev5, [store currentRevisionForTrackUUID: [branch2 UUID]]);
+    [persistentRoot commit];
+    
+	UKObjectsEqual([rev2 revisionID], [[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]]
+                                            branchInfoForUUID: [originalBranch UUID]] currentRevisionID]);
+	UKObjectsEqual([rev6 revisionID], [[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]]
+                                         branchInfoForUUID: [branch1 UUID]] currentRevisionID]);
+	UKObjectsEqual([rev5 revisionID], [[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]]
+                                         branchInfoForUUID: [branch2 UUID]] currentRevisionID]);
 	
-	NSArray *parentTrackUUIDs = A([initialTrack UUID], [branch1 UUID]);
-	
-	UKObjectsEqual(parentTrackUUIDs, [store parentTrackUUIDsForCommitTrackUUID: [branch2 UUID]]);
-	UKObjectsEqual(A(rev1, rev2, rev5), [[[branch2 loadedNodes] mappedCollection] revision]);
-	
-	[object setValue: @"Boum" forProperty: @"label"];
-	
-	CORevision *rev9 = [[object persistentRoot] commit];
-	
-	[object setValue: @"Bam" forProperty: @"label"];
-	
-	CORevision *rev10 = [[object persistentRoot] commit];
-	
-	UKObjectsEqual(A(rev1, rev2, rev5, rev9, rev10), [[[branch2 loadedNodes] mappedCollection] revision]);
-	UKObjectsEqual(A(rev3, rev7), [self revisionsForStoreTrack]);
+//	NSArray *parentTrackUUIDs = A([initialTrack UUID], [branch1 UUID]);
+//	
+//	UKObjectsEqual(parentTrackUUIDs, [store parentTrackUUIDsForCommitTrackUUID: [branch2 UUID]]);
+//	UKObjectsEqual(A(rev1, rev2, rev5), [[[branch2 loadedNodes] mappedCollection] revision]);
+//	
+//	[object setValue: @"Boum" forProperty: @"label"];
+//	
+//	CORevision *rev9 = [[object persistentRoot] commit];
+//	
+//	[object setValue: @"Bam" forProperty: @"label"];
+//	
+//	CORevision *rev10 = [[object persistentRoot] commit];
+//	
+//	UKObjectsEqual(A(rev1, rev2, rev5, rev9, rev10), [[[branch2 loadedNodes] mappedCollection] revision]);
+//	UKObjectsEqual(A(rev3, rev7), [self revisionsForStoreTrack]);
 }
-#endif
 
 - (void)testCheapCopyCreation
 {

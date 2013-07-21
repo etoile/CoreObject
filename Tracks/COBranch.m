@@ -65,6 +65,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         
         ASSIGN(_currentRevisionID, [branchInfo currentRevisionID]);
         ASSIGN(_metadata, [branchInfo metadata]);
+        _isCreated = YES;
                 
         id<COItemGraph> aGraph = [[_persistentRoot store] contentsForRevisionID: _currentRevisionID];
         [_objectGraph setItemGraph: aGraph];
@@ -73,14 +74,15 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     {
         // Creating a new branch
         
-        ASSIGN(_parentRevisionID, parentRevisionForNewBranch);
+        ASSIGN(_currentRevisionID, parentRevisionForNewBranch);
+        _isCreated = NO;
         
         // If _parentRevisionID is nil, we're a new branch for a new persistent root
         // Otherwise, we're a new branch for an existing (committed) persistent root
         
-        if (_parentRevisionID != nil)
+        if (_currentRevisionID != nil)
         {
-            id<COItemGraph> aGraph = [[_persistentRoot store] contentsForRevisionID: _parentRevisionID];
+            id<COItemGraph> aGraph = [[_persistentRoot store] contentsForRevisionID: _currentRevisionID];
             [_objectGraph setItemGraph: aGraph];
             
             ETAssert(![_objectGraph hasChanges]);
@@ -102,12 +104,12 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (BOOL) isBranchUncommitted
 {
-    return _currentRevisionID == nil;
+    return _isCreated == NO;
 }
 
 - (BOOL) isBranchPersistentRootUncommitted
 {
-    return _currentRevisionID == nil && _parentRevisionID == nil;
+    return _currentRevisionID == nil && _isCreated == NO;
 }
 
 - (BOOL)isEqual: (id)rhs
@@ -531,6 +533,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
 	ETAssert([[_objectGraph rootObject] isRoot]);
     ETAssert(![self isBranchPersistentRootUncommitted]);
+    ETAssert(_currentRevisionID != nil);
     
 	COSQLiteStore *store = [self store];
     
@@ -541,7 +544,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         // N.B. - this only the case when we're adding a new branch to an existing persistent root.
         
         [store createBranchWithUUID: _UUID
-                    initialRevision: _parentRevisionID
+                    initialRevision: _currentRevisionID
                   forPersistentRoot: [[self persistentRoot] persistentRootUUID]
                               error: NULL];
         
@@ -550,8 +553,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
           ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
                      error: NULL];
         
-        ASSIGN(_currentRevisionID, _parentRevisionID);
-        ASSIGN(_parentRevisionID, nil);
+        _isCreated = YES;
     }
     else if (![[[self branchInfo] currentRevisionID] isEqual: _currentRevisionID])
     {
@@ -565,9 +567,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                          currentChangeCount: &changeCount
                                       error: NULL];
         ETAssert(ok);
-        
-        ASSIGN(_currentRevisionID, _currentRevisionID);
-
     }
     
     NSArray *changedItemUUIDs = [(NSSet *)[[[_objectGraph changedObjects] mappedCollection] UUID] allObjects];
@@ -596,8 +595,10 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID
 {
+    ETAssert(_isCreated == NO);
+    
     ASSIGN(_currentRevisionID, aRevisionID);
-    ASSIGN(_parentRevisionID, nil);
+    _isCreated = YES;
     
     [_objectGraph clearChangeTracking];
     
