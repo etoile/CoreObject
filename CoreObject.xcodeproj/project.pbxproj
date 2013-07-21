@@ -112,7 +112,7 @@
 		66808492178DAFE3003A3CC6 /* diff.cc in Sources */ = {isa = PBXBuildFile; fileRef = 66808487178DAFE3003A3CC6 /* diff.cc */; };
 		66808493178DAFE3003A3CC6 /* diff.h in Headers */ = {isa = PBXBuildFile; fileRef = 66808488178DAFE3003A3CC6 /* diff.h */; };
 		66808494178DAFE3003A3CC6 /* diff.hh in Headers */ = {isa = PBXBuildFile; fileRef = 66808489178DAFE3003A3CC6 /* diff.hh */; };
-		66808498178DB4D5003A3CC6 /* TestCommitTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00571704C24C00D01AAB /* TestCommitTrack.m */; };
+		66808498178DB4D5003A3CC6 /* TestBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00571704C24C00D01AAB /* TestBranch.m */; };
 		668084CF17900C35003A3CC6 /* COType.m in Sources */ = {isa = PBXBuildFile; fileRef = 668084CE17900C35003A3CC6 /* COType.m */; };
 		668084EC1791FBA2003A3CC6 /* COObject+RelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 668084EA1791FBA2003A3CC6 /* COObject+RelationshipCache.m */; };
 		668084ED1791FBA2003A3CC6 /* COObject+RelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 668084EB1791FBA2003A3CC6 /* COObject+RelationshipCache.h */; };
@@ -319,7 +319,7 @@
 		609C00541704C24C00D01AAB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Tests/main.m; sourceTree = "<group>"; };
 		609C00551704C24C00D01AAB /* TestArrayDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestArrayDiff.m; path = Tests/TestArrayDiff.m; sourceTree = "<group>"; };
 		609C00561704C24C00D01AAB /* TestCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCollection.m; path = Tests/TestCollection.m; sourceTree = "<group>"; };
-		609C00571704C24C00D01AAB /* TestCommitTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCommitTrack.m; path = Tests/TestCommitTrack.m; sourceTree = "<group>"; };
+		609C00571704C24C00D01AAB /* TestBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBranch.m; path = Tests/TestBranch.m; sourceTree = "<group>"; };
 		609C00581704C24C00D01AAB /* TestCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestCommon.h; path = Tests/TestCommon.h; sourceTree = "<group>"; };
 		609C00591704C24C00D01AAB /* TestCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCommon.m; path = Tests/TestCommon.m; sourceTree = "<group>"; };
 		609C005A1704C24C00D01AAB /* TestCopy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCopy.m; path = Tests/TestCopy.m; sourceTree = "<group>"; };
@@ -809,7 +809,7 @@
 				66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */,
 				609C00551704C24C00D01AAB /* TestArrayDiff.m */,
 				609C00561704C24C00D01AAB /* TestCollection.m */,
-				609C00571704C24C00D01AAB /* TestCommitTrack.m */,
+				609C00571704C24C00D01AAB /* TestBranch.m */,
 				609C00581704C24C00D01AAB /* TestCommon.h */,
 				609C00591704C24C00D01AAB /* TestCommon.m */,
 				609C005A1704C24C00D01AAB /* TestCopy.m */,
@@ -1308,7 +1308,7 @@
 			files = (
 				609C00651704C24C00D01AAB /* main.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
-				66808498178DB4D5003A3CC6 /* TestCommitTrack.m in Sources */,
+				66808498178DB4D5003A3CC6 /* TestBranch.m in Sources */,
 				607EB6F2178D50610024B34D /* TestRevisionNumber.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

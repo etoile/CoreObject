@@ -8,7 +8,7 @@
 #import "COContainer.h"
 #import "COPersistentRoot.h"
 
-@interface TestCommitTrack : TestCommon <UKTest>
+@interface TestBranch : TestCommon <UKTest>
 {
     COPersistentRoot *persistentRoot;
     COObject *rootObj;
@@ -16,7 +16,7 @@
 }
 @end
 
-@implementation TestCommitTrack
+@implementation TestBranch
 
 - (id) init
 {
