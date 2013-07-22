@@ -85,13 +85,18 @@
 
 - (void) removeReferencesForPropertyInTarget: (NSString *)aTargetProperty
 {
-    NSUInteger count = [_cachedRelationships count];
-    for (NSUInteger i = 0; i<count; i++)
+    // FIXME: Ugly, rewrite
+    
+    NSUInteger i = 0;
+    while (i < [_cachedRelationships count])
     {
         COCachedRelationship *entry = [_cachedRelationships objectAtIndex: i];
         if ([aTargetProperty isEqualToString: entry->_targetProperty])
         {
             [_cachedRelationships removeObjectAtIndex: i];
+        }
+        else
+        {
             i++;
         }
     }
@@ -99,13 +104,18 @@
 
 - (void) removeReferencesForPropertyInSource: (NSString *)aTargetProperty
 {
-    NSUInteger count = [_cachedRelationships count];
-    for (NSUInteger i = 0; i<count; i++)
+    // FIXME: Ugly, rewrite
+    
+    NSUInteger i = 0;
+    while (i < [_cachedRelationships count])
     {
         COCachedRelationship *entry = [_cachedRelationships objectAtIndex: i];
         if ([aTargetProperty isEqualToString: entry->_sourceProperty])
         {
             [_cachedRelationships removeObjectAtIndex: i];
+        }
+        else
+        {
             i++;
         }
     }
@@ -113,13 +123,18 @@
 
 - (void) removeReferencesForSourceObject: (COObject *)anObject
 {
-    NSUInteger count = [_cachedRelationships count];
-    for (NSUInteger i = 0; i<count; i++)
+    // FIXME: Ugly, rewrite
+    
+    NSUInteger i = 0;
+    while (i < [_cachedRelationships count])
     {
         COCachedRelationship *entry = [_cachedRelationships objectAtIndex: i];
         if (anObject == entry->_sourceObject)
         {
             [_cachedRelationships removeObjectAtIndex: i];
+        }
+        else
+        {
             i++;
         }
     }

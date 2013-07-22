@@ -126,6 +126,7 @@
         // FIXME: Check for the loaded contents
     }
 }
+#endif
 
 /*
  - Verify that for references to the current branch, the COObject is transparently
@@ -171,7 +172,7 @@
     // Actually ignore that, we can do it all in memory, just calling -createBranch will create
     // a branch off of the first commit.
     //
-    // ..But for simplicity, I won't allow branching from uncommitted branches.\
+    // ..But for simplicity, I won't allow branching from uncommitted branches.
     
     [photo1 commit];
     
@@ -180,12 +181,17 @@
 
     [photo1branchBroot setValue: @"photo1, branch B" forKey: @"label"];
     
-    COObject *childB = [branchB insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    [childA setValue: @"childB" forKey: @"label"];
+    COObject *childB = [[branchB objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    [childB setValue: @"childB" forKey: @"label"];
     
-    [photo1branchBroot insertObject: childA atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [photo1branchBroot insertObject: childB atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     
     [ctx commit];
+    
+    // Set up library
+    
+//    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+//    [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
 }
 
 
@@ -232,6 +238,5 @@
  
  */
 
-#endif
 
 @end
