@@ -38,11 +38,11 @@
     [[library rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
     [[library rootObject] insertObject: [photo2 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
     
-    UKObjectsEqual(A([photo1 rootObject], [photo2 rootObject]), [[library rootObject] valueForKey: @"contents"]);
+    UKObjectsEqual(S([photo1 rootObject], [photo2 rootObject]), [[library rootObject] valueForKey: @"contents"]);
     
-    // Do the computed parentContainer properties work across persistent root boundaries?
-    UKObjectsEqual([library rootObject], [[photo1 rootObject] valueForKey: @"parentContainer"]);
-    UKObjectsEqual([library rootObject], [[photo2 rootObject] valueForKey: @"parentContainer"]);
+    // Do the computed parentCollections properties work across persistent root boundaries?
+    UKObjectsEqual(S([library rootObject]), [[photo1 rootObject] valueForKey: @"parentCollections"]);
+    UKObjectsEqual(S([library rootObject]), [[photo2 rootObject] valueForKey: @"parentCollections"]);
     
     // Check that nothing is committed yet
     UKObjectsEqual([NSArray array], [store persistentRootUUIDs]);
@@ -50,7 +50,7 @@
     [ctx commit];
 
     // 2. Read it into another context
-    
+#if 0
     {
         COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: store];
         COPersistentRoot *library2 = [ctx2 persistentRootForUUID: [library persistentRootUUID]];
@@ -68,6 +68,7 @@
         UKObjectsEqual(@"photo1", [[photo1ctx2 rootObject] valueForKey: @"label"]);
         UKObjectsEqual(@"photo2", [[photo2ctx2 rootObject] valueForKey: @"label"]);
     }
+#endif
 }
 
 #if 0

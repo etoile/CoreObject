@@ -99,6 +99,7 @@
 		667F1E8D179ADA2A0083C3E6 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		667F1E8E179ADA2A0083C3E6 /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D01D0941646BEF400917AC8 /* UnitKit.framework */; };
 		667F1E8F179ADA360083C3E6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00541704C24C00D01AAB /* main.m */; };
+		667F1EF7179CB7080083C3E6 /* TestCrossPersistentRootReferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */; };
 		6680846D178CD526003A3CC6 /* COCopier.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680846B178CD526003A3CC6 /* COCopier.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6680846E178CD526003A3CC6 /* COCopier.m in Sources */ = {isa = PBXBuildFile; fileRef = 6680846C178CD526003A3CC6 /* COCopier.m */; };
 		6680848A178DAFE3003A3CC6 /* COArrayDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680847F178DAFE3003A3CC6 /* COArrayDiff.h */; };
@@ -1377,6 +1378,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				609C00651704C24C00D01AAB /* main.m in Sources */,
+				667F1EF7179CB7080083C3E6 /* TestCrossPersistentRootReferences.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66808498178DB4D5003A3CC6 /* TestBranch.m in Sources */,
 				607EB6F2178D50610024B34D /* TestRevisionNumber.m in Sources */,
