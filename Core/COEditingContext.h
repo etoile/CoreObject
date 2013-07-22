@@ -2,7 +2,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 
 @class COPersistentRoot, COEditingContext;
-@class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo, CORevisionID;
+@class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo, CORevisionID, COPath;
 
 // I'm skeptical that there is ever a legitimate case where code is working
 // with an id<COPersistentObjectContext> and doesn't know whether it's an
@@ -269,6 +269,8 @@
  * subclass), you have to call this method explicitly.
  */
 - (void)didCommitRevision: (CORevision *)aRevision;
+
+- (id)crossPersistentRootReferenceWithPath: (COPath *)aPath;
 
 /** @taskunit Deprecated, to be removed */
 

@@ -134,6 +134,8 @@
 
 @property (nonatomic, readonly) NSSet *branches;
 
+- (COBranch *)branchForUUID: (ETUUID *)aUUID;
+
 /**
  * Returns the object graph for the edited branch
  */

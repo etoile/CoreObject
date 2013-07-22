@@ -7,6 +7,8 @@
 #import "COSQLiteStore.h"
 #import "CORevision.h"
 #import "COBranch.h"
+#import "COPath.h"
+#import "COObjectGraphContext.h"
 
 @implementation COEditingContext
 
@@ -509,6 +511,33 @@ static COEditingContext *currentCtxt = nil;
 
     [_deletedPersistentRoots removeObject: aPersistentRoot];
     [_loadedPersistentRoots removeObjectForKey: [aPersistentRoot persistentRootUUID]];
+}
+
+- (id)crossPersistentRootReferenceWithPath: (COPath *)aPath
+{
+    ETUUID *persistentRootUUID = [aPath persistentRoot];
+    ETAssert(persistentRootUUID != nil);
+    
+    ETUUID *branchUUID = [aPath branch];
+    
+    /* Specifying an embedded object is unsupported and will be removed from COPath */
+    ETAssert([aPath embeddedObject] == nil);
+    
+    COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID];
+    ETAssert(persistentRoot != nil);
+    
+    COBranch *branch;
+    if (branchUUID != nil)
+    {
+        branch = [persistentRoot branchForUUID: branchUUID];
+    }
+    else
+    {
+        branch = [persistentRoot currentBranch];
+    }
+    
+    COObjectGraphContext *objectGraph = [branch objectGraph];
+    return [objectGraph rootObject];
 }
 
 // Notification handling

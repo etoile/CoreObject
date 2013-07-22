@@ -511,19 +511,34 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 
 	if (type == kCOReferenceType || type == kCOCompositeReferenceType)
 	{
-		NSParameterAssert([value isKindOfClass: [ETUUID class]]);
-	
-		/* Look up a inner object reference in the receiver persistent root */
-		id object = [[self objectGraphContext] objectReferenceWithUUID: value];
+        if (type == kCOCompositeReferenceType)
+        {
+            NSParameterAssert([value isKindOfClass: [ETUUID class]]);
+        }
+        else
+        {
+            NSParameterAssert([value isKindOfClass: [ETUUID class]]
+                              || [value isKindOfClass: [NSString class]]);
+        }
+ 	
+        id object;
+        if ([value isKindOfClass: [ETUUID class]])
+        {
+            /* Look up a inner object reference in the receiver persistent root */
+            object = [[self objectGraphContext] objectReferenceWithUUID: value];
+            
+        }
+        else /* COPath */
+        {
+            COPath *path = [COPath pathWithString: value];
+            object = [[[self persistentRoot] parentContext] crossPersistentRootReferenceWithPath: path];
+        }
 
-		/* If no matching inner object exists, look up an outer object reference 
-		   (reference accross persistent roots) */
-		if (object == nil)
-		{
-			ETAssertUnreachable();
-			// TODO: Implement correctly
-			object = [[[self persistentRoot] parentContext] objectWithUUID: value];
-		}
+        // FIXME: Only really an error for inner object references
+        // (we should never serialize an embedded object graph with broken inner
+        //  object references.) On the other hand, cross persistent root references
+        // can easily become broken.
+		ETAssert(object != nil);
 
 		/* See also -validateStoreItem: */
 		ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc type]]

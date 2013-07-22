@@ -50,7 +50,6 @@
     [ctx commit];
 
     // 2. Read it into another context
-#if 0
     {
         COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: store];
         COPersistentRoot *library2 = [ctx2 persistentRootForUUID: [library persistentRootUUID]];
@@ -58,8 +57,20 @@
         NSArray *library2contents = [[library2 rootObject] valueForKey: @"contents"];
         UKIntsEqual(2, [library2contents count]);
         
-        COPersistentRoot *photo1ctx2 = [[library2contents objectAtIndex: 0] persistentRoot];
-        COPersistentRoot *photo2ctx2 = [[library2contents objectAtIndex: 1] persistentRoot];
+        COPersistentRoot *photo1ctx2 = nil;
+        COPersistentRoot *photo2ctx2 = nil;
+        
+        for (COObject *obj in library2contents)
+        {
+            if ([[obj valueForKey: @"label"] isEqual: @"photo1"])
+            {
+                photo1ctx2 = [obj persistentRoot];
+            }
+            else if ([[obj valueForKey: @"label"] isEqual: @"photo2"])
+            {
+                photo2ctx2 = [obj persistentRoot];
+            }
+        }
         
         UKObjectsEqual([photo1 persistentRootUUID], [photo1ctx2 persistentRootUUID]);
         UKObjectsEqual([photo2 persistentRootUUID], [photo2ctx2 persistentRootUUID]);
@@ -68,7 +79,6 @@
         UKObjectsEqual(@"photo1", [[photo1ctx2 rootObject] valueForKey: @"label"]);
         UKObjectsEqual(@"photo2", [[photo2ctx2 rootObject] valueForKey: @"label"]);
     }
-#endif
 }
 
 #if 0

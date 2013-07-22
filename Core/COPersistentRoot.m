@@ -151,6 +151,11 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return [NSSet setWithArray: [_branchForUUID allValues]];
 }
 
+- (COBranch *)branchForUUID: (ETUUID *)aUUID
+{
+    return [_branchForUUID objectForKey: aUUID];
+}
+
 - (COObjectGraphContext *)objectGraph
 {
     return [[self editingBranch] objectGraph];
