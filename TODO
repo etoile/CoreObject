@@ -12,14 +12,17 @@ First Release
   - support for loading the root object of a persistent root as a fault
   - asychronous loading of persistent root contents / unfaulting faulted root object
   - full support for cross-persistent root references
-  - support for having multiple branches of a persistent root loaded into memory at once
-  - batching persistent root mutations (revert current revision for branch to old revision,
+  x support for having multiple branches of a persistent root loaded into memory at once
+  x batching persistent root mutations (revert current revision for branch to old revision,
     change main branch, change branch metadata, etc.) rather than committing them immediately
-  - Maybe add method to get all persistent roots
+  x Maybe add method to get all persistent roots
   - Use notifications posted by COSQLiteStore
   - support "transient roots" in a COEditingContext. These are COObjectGraphContext wrappers.
     Or, support creating a persistent root in code, then calling "freeze" which will make it 
     read-only and prevent it from being committed to disk?
+  - expose COSQLiteStore's undelete method
+  - make deleted persistent roots read-only?
+  - expose COSQLiteStore's finalize deletion method
   
 - didAwaken: replacement
     - At the end of the setStoreItem:, call -awakeFromDeserialization
