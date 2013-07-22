@@ -133,6 +133,18 @@ static COEditingContext *currentCtxt = nil;
     return result;
 }
 
+- (NSSet *)trashPersistentRoots
+{
+    NSMutableSet *result = [NSMutableSet set];
+    
+    for (ETUUID *uuid in [_store deletedPersistentRootUUIDs])
+    {
+        [result addObject: [self persistentRootForUUID: uuid]];
+    }
+    
+    return result;
+}
+
 - (COGroup *)libraryGroup
 {
     return nil; // FIXME: Rewrite

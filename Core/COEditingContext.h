@@ -96,10 +96,16 @@
 /** @taskunit Special Groups and Libraries */
 
 /**
- * Returns a set of every persistent root in the store, plus those
- * pending commit (and minus those pending deletion).
+ * Returns a set of all persistent root in the store (excluding those that are
+ * marked as deleted on disk), plus those pending commit (and minus those pending deletion).
  */
 - (NSSet *)persistentRoots;
+
+/**
+ * Returns the set of persistent roots marked as deleted on disk
+ */
+@property (nonatomic, copy, readonly) NSSet *trashPersistentRoots;
+
 /**
  * Returns a group listing the libraries in the store.
  *

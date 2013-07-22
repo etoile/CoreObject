@@ -395,13 +395,13 @@
 - (void)testDeleteCommittedPersistentRoot
 {
     ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];
-        
     
     [ctx commit];
     
     UKFalse([ctx hasChanges]);
     UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
     UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx trashPersistentRoots]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);
     
@@ -410,16 +410,20 @@
     UKTrue([ctx hasChanges]);
     UKObjectsEqual([NSSet set], [ctx persistentRoots]);
     UKObjectsEqual(S(persistentRoot), [ctx deletedPersistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx trashPersistentRoots]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);
     
     [ctx commit];
   
-    // FIXME: Need to straighten out how deletion affects these methods.
-    
-//    UKFalse([ctx hasChanges]);
-//    UKNil([ctx persistentRootForUUID: uuid]);
-//    UKNil([store persistentRootInfoForUUID: uuid]);
+    UKFalse([ctx hasChanges]);
+    UKObjectsEqual([NSSet set], [ctx persistentRoots]);
+    /* N.B.: -deletedPersistentRoots returns the pending deletions, which is why it's empty here  */
+    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
+    UKIntsEqual(1, [[ctx trashPersistentRoots] count]);
+    /* You can still retrieve a deleted persistent root, until the deletion is finalized */
+    UKNotNil([ctx persistentRootForUUID: uuid]);
+    UKNotNil([store persistentRootInfoForUUID: uuid]);
 }
 
 @end
