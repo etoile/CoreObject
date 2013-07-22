@@ -12,6 +12,12 @@ First Release
   - support for loading the root object of a persistent root as a fault
   - asychronous loading of persistent root contents / unfaulting faulted root object
   - full support for cross-persistent root references
+    - handle persistent roots unloading
+    - handle the current branch being changed, and references to the current branch
+      get updated
+    - handle the specific branch referenced being deleted
+      (the references should disappear if in a collection, or become null if
+      not multivalued)
   x support for having multiple branches of a persistent root loaded into memory at once
   x batching persistent root mutations (revert current revision for branch to old revision,
     change main branch, change branch metadata, etc.) rather than committing them immediately

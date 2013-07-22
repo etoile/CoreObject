@@ -5,9 +5,6 @@
 @interface TestCrossPersistentRootReferences : TestCommon <UKTest>
 @end
 
-/**
- * None of these are expected to pass yet.
- */
 @implementation TestCrossPersistentRootReferences
 
 /**
@@ -190,9 +187,36 @@
     
     // Set up library
     
-//    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-//    [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    /* This creates a reference to the current branch of photo1. */
+    // FIXME: What should the API for referring to a specific branch look loke?
+    [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+
+    [ctx commit];
+    
+    UKObjectsEqual(S(@"photo1, branch A"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(A(@"childA")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
+    
+    // Now switch the current branch of photo1. This should automatically update the cross-persistent reference
+    
+    [photo1 setCurrentBranch: branchB];
+    
+    UKObjectsEqual(S(@"photo1, branch B"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(A(@"childB")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
+    
+    [ctx commit];
+    
+    {
+        // Test that the cross-persistent reference uses branchB when we reopen the store
+        
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *library1ctx2 = [ctx2 persistentRootForUUID: [library1 persistentRootUUID]];
+        
+        UKObjectsEqual(S(@"photo1, branch B"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+        UKObjectsEqual(S(A(@"childB")), [[library1ctx2 rootObject] valueForKeyPath: @"contents.contents.label"]);
+    }
 }
+
 
 
 /*
