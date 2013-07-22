@@ -27,15 +27,27 @@ First Release
     Or, support creating a persistent root in code, then calling "freeze" which will make it 
     read-only and prevent it from being committed to disk?
   - expose COSQLiteStore's undelete method
+  x expose COSQLiteStore branch deletion / undeletion
   - make deleted persistent roots read-only?
   - expose COSQLiteStore's finalize deletion method
-  
+  - (aesthetic) decide to what extent COPersistentRoot, COBranch should
+    provide convenience methods that deletate to the COObjectGraphContext:
+      [[(COPersistentRoot *)self editingBranch] objectGraph]
+      
+    e.g. I think we should surely keep:
+     -[COPersistentRoot rootObject] = { return [[self editingBranch] rootObject]; }
+     -[COBranch rootObject] = { return [[self objectGraph] rootObject]; }
+     
+    All of the other methods, I don't know.
+     
+
 - didAwaken: replacement
     - At the end of the setStoreItem:, call -awakeFromDeserialization
     - At the end of object graph loading, -didLoadObjectGraph on each object in topological sort order
 
 - Improve diff/merge API and code
   - Improve Merging (move detection and custom attributed string merger)
+  - Need to support persisted partial merge resolutions.
 
 - Implement application-level undo/redo support
 
@@ -68,7 +80,7 @@ First Release
     for both, IMO (Eric)
   - I'd like to look at generating COObject subclasses for each entity description with 
     generated KVC compliant property accessors and mutators. (Eric)
-
+  - Use NSSortedSet for sorted composite relationships
 
 - COSQLiteStore
   - Use change count for notifications. Make all mutations increment count.
@@ -86,7 +98,6 @@ First Release
 - Document COStore
 - Document COTrack class and subclasses
 - Switch to NSUUID
-- Use NSSortedSet?
 
 x Check relationship integrity won't go against the developer needs
 x Implement deletion support in COStore, COObject and COEditingContext
