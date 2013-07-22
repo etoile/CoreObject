@@ -70,21 +70,19 @@
 
     // Check that we can read the state 3 in another context
     {
-        COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: store];
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
         UKNotNil(persistentRootInCtx2);
         
         COObject *obj2 = [persistentRootInCtx2 objectWithUUID: [obj UUID]];
         UKNotNil(obj2);
         UKObjectsEqual(@"Third Revision", [obj2 valueForKey: @"label"]);
-        
-        [ctx2 release];
     }
     
 	// Load up 2 in another context
     
     {
-        COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: store];
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
         [persistentRootInCtx2 setRevision: secondCommitRev];
         
@@ -98,20 +96,16 @@
         UKObjectsNotEqual(secondCommitRev, [obj2 revision]);
         UKObjectsNotEqual(thirdCommitRev, [obj2 revision]);
         UKObjectsEqual(secondCommitRev, [[obj2 revision] parentRevision]);
-        
-        [ctx2 release];
     }
     
     // Check that we can read the state 4 in another context
     {
-        COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: store];
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
 
         COObject *obj2 = [persistentRootInCtx2 objectWithUUID: [obj UUID]];
         UKNotNil(obj2);
         UKObjectsEqual(@"Fourth Revision", [obj2 valueForKey: @"label"]);
-        
-        [ctx2 release];
     }
 }
 @end
