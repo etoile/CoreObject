@@ -426,4 +426,44 @@
     UKNotNil([store persistentRootInfoForUUID: uuid]);
 }
 
+- (void) testDeleteUncommittedBranch
+{
+    [ctx commit];
+    
+    COBranch *branch = [originalBranch makeBranchWithLabel: @"branch"];
+    
+    UKObjectsEqual(S(branch, originalBranch), [persistentRoot branches]);
+    
+    [persistentRoot deleteBranch: branch];
+    
+    UKObjectsEqual(S(originalBranch), [persistentRoot branches]);
+    
+    [ctx commit];
+    
+    UKObjectsEqual(A([originalBranch UUID]), [[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] branchForUUID] allKeys]);
+}
+
+- (void) testDeleteCommittedBranch
+{
+    [ctx commit];
+    
+    COBranch *branch = [originalBranch makeBranchWithLabel: @"branch"];
+    
+    UKObjectsEqual(S(branch, originalBranch), [persistentRoot branches]);
+
+    [ctx commit];
+    
+    UKObjectsEqual(S([originalBranch UUID], [branch UUID]),
+                   SA([[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] branchForUUID] allKeys]));
+    
+    [persistentRoot deleteBranch: branch];
+    
+    UKObjectsEqual(S(originalBranch), [persistentRoot branches]);
+    UKObjectsEqual(S(branch), [persistentRoot deletedBranches]);
+    UKTrue([branch isDeleted]);
+    
+    [ctx commit];
+    
+}
+
 @end

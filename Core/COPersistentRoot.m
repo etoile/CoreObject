@@ -148,12 +148,36 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (NSSet *)branches
 {
-    return [NSSet setWithArray: [_branchForUUID allValues]];
+    return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock:
+                                        ^(id obj) { return (BOOL)![obj isDeleted]; }]];
+}
+
+- (NSSet *)deletedBranches
+{
+    return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock:
+                                 ^(id obj) { return [obj isDeleted]; }]];
+}
+
+- (NSSet *)insertedBranches
+{
+    return [[self branches] filteredCollectionWithBlock:
+            ^(id obj) { return [obj isBranchUncommitted]; }];
 }
 
 - (COBranch *)branchForUUID: (ETUUID *)aUUID
 {
     return [_branchForUUID objectForKey: aUUID];
+}
+
+- (void) deleteBranch: (COBranch *)aBranch
+{
+    [aBranch setDeleted: YES];
+    
+    if ([aBranch isBranchUncommitted])
+    {
+        [_branchForUUID removeObjectForKey: [aBranch UUID]];
+        return;
+    }
 }
 
 - (COObjectGraphContext *)objectGraph

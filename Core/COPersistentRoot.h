@@ -133,6 +133,11 @@
 @property (nonatomic, readwrite, retain) COBranch *currentBranch;
 
 @property (nonatomic, readonly) NSSet *branches;
+@property (nonatomic, readonly) NSSet *insertedBranches;
+@property (nonatomic, readonly) NSSet *deletedBranches;
+
+
+- (void) deleteBranch: (COBranch *)aBranch;
 
 - (COBranch *)branchForUUID: (ETUUID *)aUUID;
 

@@ -66,7 +66,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         ASSIGN(_currentRevisionID, [branchInfo currentRevisionID]);
         ASSIGN(_metadata, [branchInfo metadata]);
         _isCreated = YES;
-                
+        _deleted = [branchInfo isDeleted];
+        
         id<COItemGraph> aGraph = [[_persistentRoot store] contentsForRevisionID: _currentRevisionID];
         [_objectGraph setItemGraph: aGraph];
     }
@@ -112,10 +113,20 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return _currentRevisionID == nil && _isCreated == NO;
 }
 
+- (NSUInteger)hash
+{
+    return [_UUID hash];
+}
+
 - (BOOL)isEqual: (id)rhs
 {
 	if ([rhs isKindOfClass: [COBranch class]])
 	{
+        if (_persistentRoot == [rhs persistentRoot])
+        {
+            return self == rhs;
+        }
+        
 		return ([_UUID isEqual: [rhs UUID]]
 			&& [[_persistentRoot persistentRootUUID] isEqual: [[rhs persistentRoot] persistentRootUUID]]);
 	}
@@ -181,6 +192,28 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
     // FIXME: Make a standardized metadata key for this
 	return [_metadata objectForKey: @"COBranchLabel"];
+}
+
+- (BOOL)isDeleted
+{
+    return _deleted;
+}
+
+- (void) setDeleted:(BOOL)deleted
+{
+    if (deleted)
+    {
+        if ([self isCurrentBranch])
+        {
+            [NSException raise: NSGenericException format: @"Can't delete the current branch"];
+        }
+        if (self == [_persistentRoot editingBranch])
+        {
+            [NSException raise: NSGenericException format: @"Can't delete the editing branch"];
+        }
+    }
+    
+    _deleted = deleted;
 }
 
 - (CORevision *)parentRevision
@@ -491,6 +524,19 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         ASSIGN(_currentRevisionID, revId);
     }
 	
+    if (_deleted && ![[self branchInfo] isDeleted])
+    {
+        ETAssert([store deleteBranch: _UUID
+                    ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                               error: NULL]);
+    }
+    else if (!_deleted && [[self branchInfo] isDeleted])
+    {
+        ETAssert([store undeleteBranch: _UUID
+                      ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                                 error: NULL]);
+    }
+    
 	[_objectGraph clearChangeTracking];
 }
 

@@ -51,6 +51,8 @@
     NSDictionary *_metadata;
     
     COObjectGraphContext *_objectGraph;
+    
+    BOOL _deleted;
 }
 
 /** @taskunit Track Kind */
@@ -93,6 +95,7 @@
  */
 @property (readonly, nonatomic) NSString *label;
 @property (readwrite, retain, nonatomic) NSDictionary *metadata;
+@property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
 /**
  * The parent commit track from which the receiver is derived.
  *
@@ -216,5 +219,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch;
 - (void) saveCommitWithMetadata: (NSDictionary *)metadata;
 - (void)discardAllChanges;
 - (void)discardChangesInObject: (COObject *)object;
+- (BOOL) isBranchUncommitted;
 
 @end
