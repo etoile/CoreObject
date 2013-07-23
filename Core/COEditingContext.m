@@ -566,7 +566,11 @@ static COEditingContext *currentCtxt = nil;
     
     // NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
     
-    // TODO: Handle
+    COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
+    if (loaded != nil)
+    {
+        [loaded storePersistentRootDidChange: notif];
+    }
 }
 
 @end

@@ -447,4 +447,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (BOOL) isPersistentRootCommitted;
 
+- (void)storePersistentRootDidChange: (NSNotification *)notif;
+
 @end

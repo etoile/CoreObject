@@ -120,6 +120,7 @@
 		668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 668084EE1791FBAB003A3CC6 /* COObjectGraphContext.h */; };
 		668084F11791FBAB003A3CC6 /* COObjectGraphContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 668084EF1791FBAB003A3CC6 /* COObjectGraphContext.m */; };
 		6686BE2A12592D7B0065DE1A /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
+		66D43BB5179E170B008CE44E /* TestConcurrentChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */; };
 		66D96C70178AE41500D1553C /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
 		66D96CA0178B6E5600D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
 		66D96CA1178B6FBA00D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
@@ -451,6 +452,7 @@
 		669965351162E17500359BE6 /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = /usr/lib/libz.1.2.5.dylib; sourceTree = "<absolute>"; };
 		6699653F1162E1C000359BE6 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		66D099C4129AE111006BEDC3 /* StoreTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = StoreTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestConcurrentChanges.m; path = Tests/TestConcurrentChanges.m; sourceTree = "<group>"; };
 		66D96C9F178B6E5600D1553C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		66D96CA2178B717000D1553C /* COBinaryReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBinaryReader.h; path = Store/COBinaryReader.h; sourceTree = "<group>"; };
 		66D96CA3178B717000D1553C /* COBinaryReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBinaryReader.m; path = Store/COBinaryReader.m; sourceTree = "<group>"; };
@@ -900,6 +902,7 @@
 				609C00591704C24C00D01AAB /* TestCommon.m */,
 				66808461178CD4FD003A3CC6 /* TestCopier.m */,
 				609C00611704C24C00D01AAB /* TestRevisionNumber.m */,
+				66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */,
 				667F1ECE179C81BE0083C3E6 /* Store Tests */,
 				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */,
@@ -1382,6 +1385,7 @@
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66808498178DB4D5003A3CC6 /* TestBranch.m in Sources */,
 				607EB6F2178D50610024B34D /* TestRevisionNumber.m in Sources */,
+				66D43BB5179E170B008CE44E /* TestConcurrentChanges.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

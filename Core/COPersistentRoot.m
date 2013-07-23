@@ -445,4 +445,19 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     [[self editingBranch] setCurrentRevision: revision];
 }
 
+- (void)storePersistentRootDidChange: (NSNotification *)notif
+{
+    COPersistentRootInfo *info = [[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
+    
+    // FIXME: This is really incomplete... factor out into a persistent root merge method.
+    
+    for (ETUUID *uuid in [info branchUUIDs])
+    {
+        COBranchInfo *branchInfo = [info branchInfoForUUID: uuid];
+        
+        // FIXME: Don't use the user method -setCurrentRevision: because it might mark the branch as neededing to be committed!
+        [[self branchForUUID: uuid] setCurrentRevision: [CORevision revisionWithStore: [self store] revisionID: [branchInfo currentRevisionID]]];
+    }
+}
+
 @end
