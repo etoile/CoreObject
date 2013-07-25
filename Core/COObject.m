@@ -436,36 +436,6 @@ See +[NSObject typePrefix]. */
 	return [[self allStronglyContainedObjects] arrayByAddingObject: self];
 }
 
-- (NSSet *)allInnerObjects
-{
-	if ([self isRoot] == NO)
-		return nil;
-
-	if ([self isPersistent] == NO)
-	{
-		[NSException raise: NSInternalInconsistencyException
-		            format: @"Inner objects cannot be known until %@ has become persistent", self];
-	}
-
-	// FIXME: Remove or reimplement without accessing the store directly
-	//CORevision *loadedRev = [_persistentRoot revision];
-	//ETUUID *trackUUID = [[[self persistentRoot] commitTrack] UUID];
-	//NSSet *innerObjectUUIDs = [[[self persistentRoot] store] objectUUIDsForCommitTrackUUID: trackUUID atRevision: loadedRev];
-	NSSet *innerObjectUUIDs = nil;
-	NSMutableSet *innerObjects = [NSMutableSet setWithCapacity: [innerObjectUUIDs count]];
-
-	for (ETUUID *uuid in innerObjectUUIDs)
-	{
-		[innerObjects addObject: [[[self persistentRoot] parentContext] objectWithUUID: uuid]];
-	}
-	return innerObjects;
-}
-
-- (NSSet *)allInnerObjectsIncludingSelf
-{
-	return [[self allInnerObjects] setByAddingObject: self];
-}
-
 - (NSString *)displayName
 {
 	return [self name];
