@@ -1,5 +1,6 @@
-#import <EtoileFoundation/NSData+Hash.h>
 #import "COItem+JSON.h"
+#import <EtoileFoundation/NSData+Hash.h>
+#import <EtoileFoundation/ETUUID.h>
 #import "COPath.h"
 
 @implementation COItem (JSON)

@@ -6,7 +6,6 @@
 	License:  Modified BSD  (see COPYING)
  */
 
-
 #import "NSObject+CoreObject.h"
 
 @implementation NSObject (CoreObject)

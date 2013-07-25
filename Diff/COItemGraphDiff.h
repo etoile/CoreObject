@@ -1,8 +1,7 @@
 #import <Foundation/Foundation.h>
-
-#import "COArrayDiff.h"
-#import "COType.h"
-#import "COItemGraph.h"
+#import <CoreObject/COArrayDiff.h>
+#import <CoreObject/COType.h>
+#import <CoreObject/COItemGraph.h>
 
 @class ETUUID;
 @class COMutableItem;

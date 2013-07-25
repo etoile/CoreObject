@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#import "COType.h"
+#import <CoreObject/COType.h>
 
 @class COObject;
 @class COItem;

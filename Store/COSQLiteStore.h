@@ -2,12 +2,8 @@
 
 @protocol COItemGraph;
 @class ETUUID;
-@class COItem;
-@class CORevisionID;
-@class CORevisionInfo;
-@class COItemGraph;
+@class COItem, CORevisionID, CORevisionInfo, COItemGraph, COPersistentRootInfo;
 @class FMDatabase;
-@class COPersistentRootInfo;
 
 @interface COBranchInfo : NSObject
 {

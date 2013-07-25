@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#import "COItemGraph.h"
+#import <CoreObject/COItemGraph.h>
 
 @class FMDatabase;
 @class COItemGraph;

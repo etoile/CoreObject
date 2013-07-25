@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
-#import <EtoileFoundation/ETUUID.h>
-#import "COType.h"
+#import <CoreObject/COType.h>
+
+@class ETUUID;
 
 /**
  * This is a low-level model object which makes up the contents of a commit's

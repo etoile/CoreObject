@@ -1,4 +1,4 @@
-#import "COItem.h"
+#import <CoreObject/COItem.h>
 
 @interface COItem (JSON)
 

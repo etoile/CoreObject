@@ -9,7 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import "CORevision.h"
+#import <CoreObject/CORevision.h>
 
 @class FMDatabase;
 

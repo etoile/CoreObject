@@ -1,6 +1,5 @@
 #import "COCopier.h"
 #import "COItem.h"
-#import <EtoileFoundation/ETUUID.h>
 
 @implementation COCopier
 

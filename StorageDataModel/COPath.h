@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
-#import <EtoileFoundation/ETUUID.h>
+
+@class ETUUID;
 
 /**
  *

@@ -1,16 +1,10 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import "COItemGraph.h"
+#import <CoreObject/COItemGraph.h>
 
 @class ETUUID;
-@class COItemGraph;
-@class COObject;
-@class COItem;
-@class COSchemaRegistry;
-@class COSchema;
-@class CORelationshipCache;
-@class COPersistentRoot;
-@class COBranch;
+@class COPersistentRoot, COBranch, COObject, CORelationshipCache;
+@class COItemGraph, COItem, COSchemaRegistry , COSchema;
 
 @interface COObjectGraphContext : NSObject <COItemGraph>
 {

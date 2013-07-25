@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 
-@class CORevisionID, ETUUID;
+@class ETUUID;
+@class CORevisionID;
 
 @interface COSearchResult : NSObject
 {

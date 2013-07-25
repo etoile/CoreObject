@@ -1,6 +1,6 @@
-#import <EtoileFoundation/EtoileFoundation.h>
 #import <Foundation/Foundation.h>
-#import "COItemGraph.h"
+#import <EtoileFoundation/EtoileFoundation.h>
+#import <CoreObject/COItemGraph.h>
 
 // TODO: Store the state relating to copying, e.g. which context to copy into.
 

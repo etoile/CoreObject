@@ -1,7 +1,6 @@
 #import "COObject+RelationshipCache.h"
 #import "COObject.h"
 #import "CORelationshipCache.h"
-#import <EtoileFoundation/EtoileFoundation.h>
 
 @implementation COObject (RelationshipCache)
 

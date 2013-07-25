@@ -1,5 +1,6 @@
 #import "COPath.h"
 #import <EtoileFoundation/Macros.h>
+#import <EtoileFoundation/ETUUID.h>
 
 @implementation COPath
 

@@ -3,7 +3,6 @@
 @class ETUUID;
 @class COItem, COMutableItem;
 
-
 /**
  * Protocol for a mutable item graph
  *

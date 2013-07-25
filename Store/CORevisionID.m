@@ -1,5 +1,4 @@
 #import "CORevisionID.h"
-
 #import <EtoileFoundation/ETUUID.h>
 
 @implementation CORevisionID

@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#import "COObject.h"
+#import <CoreObject/COObject.h>
 
 @interface COObject (RelationshipCache)
 

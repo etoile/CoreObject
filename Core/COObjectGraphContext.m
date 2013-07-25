@@ -1,6 +1,5 @@
 #import "COObjectGraphContext.h"
 #import "COItemGraph.h"
-#import <EtoileFoundation/Macros.h>
 #import "CORelationshipCache.h"
 #import "COObject+RelationshipCache.h"
 #import "COSerialization.h"
