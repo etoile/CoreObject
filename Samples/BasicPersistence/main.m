@@ -145,28 +145,36 @@ int main(int argc, char **argv)
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
 	// Initialize the AppKit (for now CoreObject requires it)
 	[NSApplication sharedApplication];
-	COStore *store = [[COSQLStore alloc] initWithURL: [NSURL fileURLWithPath: @"TestStore.db"]];
 
-	// Create the calendar and appointment and persist them
+	COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: @"TestStore.db"]];
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
-	Calendar *calendar = [ctx insertObjectWithEntityName: @"Anonymous.Calendar"];
-	ETUUID *calendarID = [calendar UUID];
-	Appointment *firstAppt = [[Appointment alloc]
-		initWithStartDate: [NSDate date]
-		          endDate: [NSDate dateWithTimeIntervalSinceNow: 3600]];
-	[firstAppt becomePersistentInContext: [calendar persistentRoot]];
-	[calendar addAppointment: firstAppt]; 
+	
+	// Create the calendar and appointment and persist them
+
+	Calendar *calendar = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.Calendar"] rootObject];
+	ETUUID *persistentRootUUID = [[calendar persistentRoot] persistentRootUUID];
+	NSDate *futureDate = [NSDate dateWithTimeIntervalSinceNow: 3600];
+	Appointment *appointment = AUTORELEASE([[Appointment alloc] initWithStartDate: [NSDate date]
+	                                                                      endDate: futureDate]);
+
+	[appointment becomePersistentInContext: [calendar persistentRoot]];
+
+	[calendar addAppointment: appointment];
+
 	[ctx commit];
 	[ctx release];
 
 	// Reload the calendar from a new context
-	ctx = [[COEditingContext alloc] initWithStore: store];
-	calendar = (Calendar*)[ctx objectWithUUID: calendarID];
-	firstAppt = [[calendar appointments] objectAtIndex: 0];
-	NSLog(@"Reloaded calendar with date: %@", [calendar today]);
-	NSLog(@"First appointment: %@ - %@", [firstAppt startDate], [firstAppt endDate]);
-	[ctx release];
 
+	ctx = [[COEditingContext alloc] initWithStore: store];
+										
+	calendar = [[ctx persistentRootForUUID: persistentRootUUID] rootObject];
+	appointment = [[calendar appointments] firstObject];
+										
+	NSLog(@"Reloaded calendar with date: %@", [calendar today]);
+	NSLog(@"First appointment: %@ - %@", [appointment startDate], [appointment endDate]);
+
+	[ctx release];
 	[store release];
 	[pool drain];
 	return 0;
