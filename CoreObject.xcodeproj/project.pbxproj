@@ -78,14 +78,14 @@
 		60FB089813C3076200C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		66094847178794D40049468B /* COItem+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 66094845178794D40049468B /* COItem+JSON.m */; };
-		66094848178794D40049468B /* COItem+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 66094846178794D40049468B /* COItem+JSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		66094848178794D40049468B /* COItem+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 66094846178794D40049468B /* COItem+JSON.h */; settings = {ATTRIBUTES = (); }; };
 		6609485E1787A1160049468B /* CORelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6609485C1787A1160049468B /* CORelationshipCache.m */; };
 		6609485F1787A1160049468B /* CORelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 6609485D1787A1160049468B /* CORelationshipCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C11785C02A001E5622 /* COItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BA1785C02A001E5622 /* COItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C21785C02A001E5622 /* COItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BB1785C02A001E5622 /* COItem.m */; };
 		6675F8C31785C02A001E5622 /* COItemGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BC1785C02A001E5622 /* COItemGraph.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C41785C02A001E5622 /* COItemGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BD1785C02A001E5622 /* COItemGraph.m */; };
-		6675F8C51785C02A001E5622 /* COPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BE1785C02A001E5622 /* COPath.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6675F8C51785C02A001E5622 /* COPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BE1785C02A001E5622 /* COPath.h */; settings = {ATTRIBUTES = (); }; };
 		6675F8C61785C02A001E5622 /* COPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BF1785C02A001E5622 /* COPath.m */; };
 		6675F8C71785C02A001E5622 /* COType.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8C01785C02A001E5622 /* COType.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		667F1E85179AD9DD0083C3E6 /* TestItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199A4178C3E1800B78174 /* TestItem.m */; };
@@ -99,16 +99,15 @@
 		667F1E8D179ADA2A0083C3E6 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		667F1E8E179ADA2A0083C3E6 /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D01D0941646BEF400917AC8 /* UnitKit.framework */; };
 		667F1E8F179ADA360083C3E6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00541704C24C00D01AAB /* main.m */; };
-		667F1EF7179CB7080083C3E6 /* TestCrossPersistentRootReferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */; };
 		6680846D178CD526003A3CC6 /* COCopier.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680846B178CD526003A3CC6 /* COCopier.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6680846E178CD526003A3CC6 /* COCopier.m in Sources */ = {isa = PBXBuildFile; fileRef = 6680846C178CD526003A3CC6 /* COCopier.m */; };
-		6680848A178DAFE3003A3CC6 /* COArrayDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680847F178DAFE3003A3CC6 /* COArrayDiff.h */; };
+		6680848A178DAFE3003A3CC6 /* COArrayDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680847F178DAFE3003A3CC6 /* COArrayDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6680848B178DAFE3003A3CC6 /* COArrayDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66808480178DAFE3003A3CC6 /* COArrayDiff.m */; };
-		6680848C178DAFE3003A3CC6 /* COItemGraphDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 66808481178DAFE3003A3CC6 /* COItemGraphDiff.h */; };
+		6680848C178DAFE3003A3CC6 /* COItemGraphDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 66808481178DAFE3003A3CC6 /* COItemGraphDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6680848D178DAFE3003A3CC6 /* COItemGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66808482178DAFE3003A3CC6 /* COItemGraphDiff.m */; };
 		6680848E178DAFE3003A3CC6 /* COSequenceMerge.h in Headers */ = {isa = PBXBuildFile; fileRef = 66808483178DAFE3003A3CC6 /* COSequenceMerge.h */; };
 		6680848F178DAFE3003A3CC6 /* COSequenceMerge.m in Sources */ = {isa = PBXBuildFile; fileRef = 66808484178DAFE3003A3CC6 /* COSequenceMerge.m */; };
-		66808490178DAFE3003A3CC6 /* COSubtreeEdits.h in Headers */ = {isa = PBXBuildFile; fileRef = 66808485178DAFE3003A3CC6 /* COSubtreeEdits.h */; };
+		66808490178DAFE3003A3CC6 /* COSubtreeEdits.h in Headers */ = {isa = PBXBuildFile; fileRef = 66808485178DAFE3003A3CC6 /* COSubtreeEdits.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66808491178DAFE3003A3CC6 /* COSubtreeEdits.m in Sources */ = {isa = PBXBuildFile; fileRef = 66808486178DAFE3003A3CC6 /* COSubtreeEdits.m */; };
 		66808492178DAFE3003A3CC6 /* diff.cc in Sources */ = {isa = PBXBuildFile; fileRef = 66808487178DAFE3003A3CC6 /* diff.cc */; };
 		66808493178DAFE3003A3CC6 /* diff.h in Headers */ = {isa = PBXBuildFile; fileRef = 66808488178DAFE3003A3CC6 /* diff.h */; };
@@ -117,17 +116,17 @@
 		668084CF17900C35003A3CC6 /* COType.m in Sources */ = {isa = PBXBuildFile; fileRef = 668084CE17900C35003A3CC6 /* COType.m */; };
 		668084EC1791FBA2003A3CC6 /* COObject+RelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 668084EA1791FBA2003A3CC6 /* COObject+RelationshipCache.m */; };
 		668084ED1791FBA2003A3CC6 /* COObject+RelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 668084EB1791FBA2003A3CC6 /* COObject+RelationshipCache.h */; };
-		668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 668084EE1791FBAB003A3CC6 /* COObjectGraphContext.h */; };
+		668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 668084EE1791FBAB003A3CC6 /* COObjectGraphContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		668084F11791FBAB003A3CC6 /* COObjectGraphContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 668084EF1791FBAB003A3CC6 /* COObjectGraphContext.m */; };
 		6686BE2A12592D7B0065DE1A /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
 		66D43BB5179E170B008CE44E /* TestConcurrentChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */; };
 		66D96C70178AE41500D1553C /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
 		66D96CA0178B6E5600D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
 		66D96CA1178B6FBA00D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
-		66D96CB7178B717200D1553C /* COBinaryReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA2178B717000D1553C /* COBinaryReader.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		66D96CB7178B717200D1553C /* COBinaryReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA2178B717000D1553C /* COBinaryReader.h */; settings = {ATTRIBUTES = (); }; };
 		66D96CB8178B717200D1553C /* COBinaryReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CA3178B717000D1553C /* COBinaryReader.m */; };
 		66D96CB9178B717200D1553C /* COBinaryWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA4178B717000D1553C /* COBinaryWriter.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		66D96CBA178B717200D1553C /* COItem+Binary.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA5178B717000D1553C /* COItem+Binary.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		66D96CBA178B717200D1553C /* COItem+Binary.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA5178B717000D1553C /* COItem+Binary.h */; settings = {ATTRIBUTES = (); }; };
 		66D96CBB178B717200D1553C /* COItem+Binary.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CA6178B717000D1553C /* COItem+Binary.m */; };
 		66D96CBE178B717200D1553C /* CORevisionID.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA9178B717000D1553C /* CORevisionID.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66D96CBF178B717200D1553C /* CORevisionID.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CAA178B717100D1553C /* CORevisionID.m */; };
@@ -141,7 +140,7 @@
 		66D96CC7178B717200D1553C /* COSQLiteStore+Attachments.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CB2178B717100D1553C /* COSQLiteStore+Attachments.m */; };
 		66D96CC8178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CB3178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66D96CC9178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CB4178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m */; };
-		66D96CCA178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CB5178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		66D96CCA178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CB5178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h */; settings = {ATTRIBUTES = (); }; };
 		66D96CCB178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CB6178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m */; };
 		791B4E4C1299C82200CCF472 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
 		791B4E721299C90900CCF472 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6C1299C90900CCF472 /* FMDatabase.m */; };
@@ -1381,7 +1380,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				609C00651704C24C00D01AAB /* main.m in Sources */,
-				667F1EF7179CB7080083C3E6 /* TestCrossPersistentRootReferences.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66808498178DB4D5003A3CC6 /* TestBranch.m in Sources */,
 				607EB6F2178D50610024B34D /* TestRevisionNumber.m in Sources */,
