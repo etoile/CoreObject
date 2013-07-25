@@ -636,22 +636,6 @@
 
 /** @taskunit Debugging and Description */
 
-#if 0
-/**
- * <override-never />
- * Returns the receiver serialized as a property list.
- *
- * Don't call -serializedRepresentation until the object has become persistent 
- * (it has a been committed). See -isPersistent.
- *
- * The serialization is built using -serializedValueForProperty and 
- * -propertyListForValue:.
- *
- * This method is useful to inspect the serialized representation that goes 
- * into the store. CoreObject doesn't use this method.
- */
-- (id)serializedRepresentation;
-#endif
 /** 
  * Returns a description that includes the receiver properties and their values. 
  */

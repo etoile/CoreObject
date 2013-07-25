@@ -1097,24 +1097,6 @@ See +[NSObject typePrefix]. */
 	return ([[aQuery predicate] evaluateWithObject: self] ? A(self) : [NSArray array]);
 }
 
-// TODO: Remove or port to COSerialization. -serializedRepresentation is basically
-// the same than -storeItem.
-#if 0
-- (id)serializedRepresentation
-{
-	NSMutableDictionary *serializationRep = [NSMutableDictionary dictionary];
-
-	for (NSString *prop in [self persistentPropertyNames])
-	{
-		id value = [self serializedValueForProperty: prop];
-		id plist = [self propertyListForValue: value];
-
-		[serializationRep setObject: (plist != nil ? plist : [NSNull null]) forKey: prop];
-	}
-	return serializationRep;
-}
-#endif
-
 static int indent = 0;
 
 - (NSString *)detailedDescription

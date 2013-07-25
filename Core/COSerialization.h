@@ -17,11 +17,22 @@ extern NSString *kCOObjectEntityNameProperty;
 
 @interface COObject (COSerialization)
 
-/** At the end of -setStoreItem: -awakeFromDeserialization is called to recreate 
-additional internal state based on the deserialization result. You must not 
-touch and attempt to access or recreated relationships during 
--awakeFromDeserialization. For relationship restoration, you can implement 
--didLoadObjectGraph. */
+/**
+ * The receiver serialized representation.
+ *
+ * -storeItem is used to serialize a COObject state and -setStoreItem: to 
+ * deserialize a COObject state. COObjectGraphContext will call these accessors
+ * respectively at commit and loading times.
+ *
+ * At the end of -setStoreItem: -awakeFromDeserialization is called to recreate 
+ * additional internal state based on the deserialization result. You must not
+ * touch and attempt to access or recreated relationships during
+ * -awakeFromDeserialization. For relationship restoration, you can implement
+ * -didLoadObjectGraph. 
+ *
+ * -storeItem is also useful to inspect the serialized representation that goes
+ * into the store.
+ */
 @property (nonatomic, copy) COItem *storeItem;
 
 /** @taskunit Serialization */
