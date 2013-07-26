@@ -235,7 +235,7 @@
  * }
  * </example>
  */
-- (id)init;
+- (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext;
 /**
  * Initializes and returns a non-persistent object that uses a custom entity 
  * description.

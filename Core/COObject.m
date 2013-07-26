@@ -191,16 +191,23 @@ See +[NSObject typePrefix]. */
 	return self;
 }
 
-- (id) init
+- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
+	// TODO: Turn on NILARG_EXCEPTION_TEST(aContext);
+
 	if (_isInitialized == NO)
 	{
 		SUPERINIT;
 		self = [self commonInitWithUUID: [ETUUID UUID]
 		              entityDescription: nil
-		                        context: nil];
+		                        context: aContext];
 	}
 	return self;
+}
+
+- (id)init
+{
+	return [self initWithObjectGraphContext: nil];
 }
 
 - (id) initWithEntityDescription: (ETEntityDescription *)anEntityDesc
