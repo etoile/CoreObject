@@ -197,9 +197,14 @@ See +[NSObject typePrefix]. */
 
 	if (_isInitialized == NO)
 	{
+		// TODO: Remove the repository lookup once the context is never nil
+		ETModelDescriptionRepository *repo =
+			(aContext != nil ? [aContext modelRepository] : [ETModelDescriptionRepository mainRepository]);
+		ETEntityDescription *entityDesc = [repo entityDescriptionForClass: [self class]];
+
 		SUPERINIT;
 		self = [self commonInitWithUUID: [ETUUID UUID]
-		              entityDescription: nil
+		              entityDescription: entityDesc
 		                        context: aContext];
 	}
 	return self;
