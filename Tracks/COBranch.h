@@ -55,23 +55,12 @@
     BOOL _deleted;
 }
 
-/** @taskunit Track Kind */
+/** @taskunit Branch Kind */
 
 /**
- * Returns whether the commit track represents a cheap copy.
- *
- * When the receiver is a cheap copy, -isBranch returns NO.
+ * Returns whether the branch represents a cheap copy.
  */
 @property (readonly, nonatomic) BOOL isCopy;
-
-// FIXME: Rename to isTrunk (opposite)
-/**
- * Returns whether the commit track represents a branch.
- *
- * When the receiver is a branch, -isCopy returns NO.
- */
-@property (readonly, nonatomic) BOOL isBranch;
-
 /**
  * Returns whether the receiver is the current branch of its persistent root.
  */
@@ -85,51 +74,74 @@
 /** @taskunit Basic Properties */
 
 /**
- * The commit track UUID.
+ * The branch UUID.
  *
  * The UUID is never nil.
  */
 @property (readonly, nonatomic) ETUUID *UUID;
 /**
- * The commit track label, that serves a branch name in most cases.
+ * The branch label (used as the branch name in most cases).
  */
 @property (readonly, nonatomic) NSString *label;
-@property (readwrite, retain, nonatomic) NSDictionary *metadata;
-@property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
 /**
- * The parent commit track from which the receiver is derived.
+ * The metadata attached to the branch.
  *
- * If the parent track is nil, this means the receiver is a commit track that 
- * was created at the same time than its persistent root. The parent revision 
- * is also nil in this case.
+ * Any changes to the metadata is saved on the next object graph context commit.
  */
-@property (readonly, nonatomic) COBranch *parentTrack;
-/**
- * The revision at which the receiver was forked from the parent track.
+@property (readwrite, retain, nonatomic) NSDictionary *metadata;
+/** 
+ * The branch deletion status.
  *
- * If the parent revision is nil, this means the receiver is a commit track that
- * was created at the same time than its persistent root. The parent track 
- * is also nil in this case.
+ * If the branch is marked as deleted, the deletion is committed to the store 
+ * on the next object graph context commit.
+ */
+@property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
+
+/** @taskunit History */
+
+/**
+ * The parent branch from which the receiver is derived.
+ *
+ * If the parent branch is nil, this means the receiver is a branch that was 
+ * created at the same time than its persistent root. The parent revision is 
+ * also nil in this case.
+ *
+ * For a cheap copy, the parent branch is never nil.
+ */
+@property (readonly, nonatomic) COBranch *parentBranch;
+/**
+ * The revision at which the receiver was forked from the parent branch.
+ *
+ * If the parent revision is nil, this means the receiver is a branch that was 
+ * created at the same time than its persistent root. The parent branch is also 
+ * nil in this case.
  *
  * FIXME: The name "parent" is confusing, it is not the same as the parent of
  * a revision. In COSQLiteStore's terminology this is the "tail" of the branch.
  */
 @property (readonly, nonatomic) CORevision *parentRevision;
+/**
+ * The revision bound to the state loaded in the object graph context.
+ *
+ * If the branch is uncommitted, the current revision is nil.
+ */
 @property (readwrite, retain, nonatomic) CORevision *currentRevision;
-
+/**
+ * The revision bound to the most recent commit in the branch.
+ *
+ * In the store terminology, this is the branch head revision.
+ */
 @property (readonly, nonatomic) CORevision *newestRevision;
 
+/** @taskunit Persistent Root and Object Graph Context */
+
 /**
- * The persistent root owning the commit track.
- *
- * The persistent doesn't retain the commit track unless the receiver is the 
- * same than -[COPersistentRoot commitTrack]. The ownership implied here is at 
- * the store level.
+ * The persistent root owning the branch.
  */
 @property (readonly, nonatomic) COPersistentRoot *persistentRoot;
-
-/** @taskunit Object Graph */
-
+/**
+ * The object graph context owned by the branch.
+ */
 @property (readonly, nonatomic) COObjectGraphContext *objectGraph;
 
 /** @taskunit Undo / Redo */

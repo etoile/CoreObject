@@ -262,7 +262,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     [self reloadAtRevision: currentRevision];
 }
 
-- (COBranch *)parentTrack
+- (COBranch *)parentBranch
 {
     // FIXME: Add support for this
     return nil;
