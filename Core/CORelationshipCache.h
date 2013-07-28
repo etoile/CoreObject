@@ -24,9 +24,7 @@
 
 - (void) removeAllEntries;
 
-- (void) removeReferencesForPropertyInTarget: (NSString *)aTargetProperty;
 - (void) removeReferencesForPropertyInSource: (NSString *)aTargetProperty;
-- (void) removeReferencesForSourceObject: (COObject *)anObject;
 
 - (void) addReferenceFromSourceObject: (COObject *)aReferrer
                        sourceProperty: (NSString *)aSource
