@@ -22,7 +22,8 @@ First Release
   x batching persistent root mutations (revert current revision for branch to old revision,
     change main branch, change branch metadata, etc.) rather than committing them immediately
   x Maybe add method to get all persistent roots
-  - Use notifications posted by COSQLiteStore
+  x Use notifications posted by COSQLiteStore
+  - add -insertNewPersistentWithObjectGraphContext: method
   - support "transient roots" in a COEditingContext. These are COObjectGraphContext wrappers.
     Or, support creating a persistent root in code, then calling "freeze" which will make it 
     read-only and prevent it from being committed to disk?
@@ -60,7 +61,8 @@ First Release
   - Add check that parent property (isContainer = YES) is derived
   - Add check that one side of an opposite is derived
   - Add a check that the derived side of a multivalued opposite is unordered
-
+  - Move to CoreObject
+  
 - COObject
   - Remove support for freestanding COObject not associated with a COObjectGraphContext,
     and remove -becomePersistentInContext:. The rationale was that freestanding
