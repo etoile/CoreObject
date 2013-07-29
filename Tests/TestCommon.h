@@ -3,6 +3,7 @@
 #import "COCopier.h"
 #import "COEditingContext.h"
 #import "COItem.h"
+#import "COPath.h"
 #import "COItemGraph.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"

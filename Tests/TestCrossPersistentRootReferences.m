@@ -217,27 +217,140 @@
     }
 }
 
+- (void) testBranchDeletion
+{
+    // library1 <<persistent root>>
+	//  |
+	//  \--photo1 // cross-persistent-root link, branchB
+	//
+	// photo1 <<persistent root, branchA>>
+    //
+	// photo1 <<persistent root, branchB>>
+	//  |
+	//  \--childB
+    //
+    // Test the effect of deleting branchB
+    
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [photo1 commit];
+    
+    COBranch *branchB = [[photo1 currentBranch] makeBranchWithLabel: @"branchB"];
+    COObject *photo1branchBroot = [[branchB objectGraph] rootObject];
+    
+    [photo1branchBroot setValue: @"photo1, branch B" forKey: @"label"];
+    
+    COObject *childB = [[branchB objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    [childB setValue: @"childB" forKey: @"label"];
+    
+    [photo1branchBroot insertObject: childB atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    [ctx commit];
+    
+    // Set up library
+    
+    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    
+    /* This creates a reference to branch B of photo1. */
+    COPath *branchBRef = [COPath pathWithPersistentRoot: [photo1 persistentRootUUID] branch: [branchB UUID]];
+    COMutableItem *library1RootItem = [[[library1 objectGraph] itemForUUID: [[library1 objectGraph] rootItemUUID]] mutableCopy];
+    [library1RootItem setValue: S(branchBRef) forAttribute: @"contents"];
+    [[library1 objectGraph] addItem: library1RootItem];
+    
+    [ctx commit];
+    
+    UKObjectsEqual(S(@"photo1, branch B"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(A(@"childB")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
+    
+    // Now delete branch B. This should automatically update the cross-persistent reference
+    
+    [photo1 deleteBranch: branchB];
+    
+    UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    
+    [ctx commit];
+}
 
+- (void) testPersistentRootDeletion
+{
+    // library1 <<persistent root>>
+	//  |
+	//  \--photo1 // cross-persistent-root link,
+	//
+	// photo1 <<persistent root>>
+    //
+    // Test the effect of deleting photo1
+    
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [[photo1 rootObject] setValue: @"photo1" forKey: @"label"];
+    [photo1 commit];
+    
+    // Set up library
+    
+    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    /* This creates a reference to photo1. */
+    [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    [ctx commit];
+    
+    UKObjectsEqual(S(@"photo1"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+
+    // Now delete photo1. This should automatically update the cross-persistent reference
+    
+    [ctx deletePersistentRoot: photo1];
+    
+    UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    
+    [ctx commit];
+}
+
+- (void) testLibraryPersistentRootDeletion
+{
+    // library1 <<persistent root>>
+	//  |
+	//  \--photo1 // cross-persistent-root link,
+	//
+	// photo1 <<persistent root>>
+    //
+    // Test the effect of deleting library1
+    
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [[photo1 rootObject] setValue: @"photo1" forKey: @"label"];
+    [photo1 commit];
+    
+    // Set up library
+    
+    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    [[library1 rootObject] setValue: @"library1" forKey: @"label"];
+    [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    [ctx commit];
+    
+    UKObjectsEqual(S(@"photo1"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(@"library1"), [[photo1 rootObject] valueForKeyPath: @"parentCollections.label"]);
+    
+    // Now delete library1. This should automatically update the derived cross-persistent reference in photo1
+    
+    [ctx deletePersistentRoot: library1];
+    
+    UKObjectsEqual([NSSet set], [[photo1 rootObject] valueForKeyPath: @"parentCollections.label"]);
+    
+    [ctx commit];
+}
 
 /*
  
  List of some scenarios to test:
  
  - Performace for a library containing references to 50000 persistent roots
- - API for adding a cross-reference to a specific branch
- - How do we deal with possible broken relationships? Maybe need a special
- COBrokenLink object? What about relationships where the type of the destination
- is wrong?
- 
- Cases:
- - testBasic scenario, but photo1's persistent root is deleted
- - testBasic scenario, but photo1's persistent root's root object is changed
+ - (DONE) API for adding a cross-reference to a specific branch
+ - (DONE) How do we deal with possible broken relationships? Maybe need a special COBrokenLink object? => the reference will simply disappear
+ - (N/A) What about relationships where the type of the destination
+ is wrong? => not going to allow
+
+ - (DONE) testBasic scenario, but photo1's persistent root is deleted
+ - (N/A) testBasic scenario, but photo1's persistent root's root object is changed
  to something other than an OutlineItem.
+   => We're not going to allow doing that
  
- Should the contents property of the library still return it, even though
- the type is wrong, or should it return a COBrokenLink?
- 
- Same quiestion for the parent of photo1.
+ - (DONE) Test accessing the parent of photo1 when the library persistent root is deleted
  
  
  Idea: Two views of references.
