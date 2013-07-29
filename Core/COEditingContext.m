@@ -12,7 +12,7 @@
 
 @implementation COEditingContext
 
-@synthesize deletedPersistentRoots = _deletedPersistentRoots;
+@synthesize persistentRootsPendingDeletion = _deletedPersistentRoots;
 
 + (COEditingContext *)contextWithURL: (NSURL *)aURL
 {
@@ -135,7 +135,7 @@ static COEditingContext *currentCtxt = nil;
     return result;
 }
 
-- (NSSet *)trashPersistentRoots
+- (NSSet *)deletedPersistentRoots
 {
     NSMutableSet *result = [NSMutableSet set];
     
@@ -253,7 +253,7 @@ static COEditingContext *currentCtxt = nil;
     return persistentRoot;
 }
 
-- (NSSet *)insertedPersistentRoots
+- (NSSet *)persistentRootsPendingInsertion
 {
 	NSMutableSet *insertedPersistentRoots = [NSMutableSet set];
 
@@ -375,7 +375,7 @@ static COEditingContext *currentCtxt = nil;
 - (void)discardAllChanges
 {
 	/* Represents persistent roots inserted since the last commit */
-	NSSet *insertedPersistentRoots = [self insertedPersistentRoots];
+	NSSet *insertedPersistentRoots = [self persistentRootsPendingInsertion];
 
 	/* Discard changes in persistent roots and collect discarded persistent roots */
 	for (ETUUID *uuid in _loadedPersistentRoots)

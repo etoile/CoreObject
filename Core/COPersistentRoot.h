@@ -133,6 +133,10 @@
 @property (nonatomic, readwrite, retain) COBranch *currentBranch;
 
 @property (nonatomic, readonly) NSSet *branches;
+
+// TODO: Refactor to branchesPendingInsertion, branchesPendingDeletion, branchesPendingUndeletion.
+// Add deletedBranches property listing the branches
+// that are marked as deleted on disk.
 @property (nonatomic, readonly) NSSet *insertedBranches;
 @property (nonatomic, readonly) NSSet *deletedBranches;
 

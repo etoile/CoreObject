@@ -379,7 +379,7 @@
     
     UKTrue([ctx hasChanges]);
     UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
-    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNil([store persistentRootInfoForUUID: uuid]);
     
@@ -387,7 +387,7 @@
     
     UKFalse([ctx hasChanges]);
     UKObjectsEqual([NSSet set], [ctx persistentRoots]);
-    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
     UKNil([ctx persistentRootForUUID: uuid]);
     UKNil([store persistentRootInfoForUUID: uuid]);
 }
@@ -400,8 +400,8 @@
     
     UKFalse([ctx hasChanges]);
     UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
     UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
-    UKObjectsEqual([NSSet set], [ctx trashPersistentRoots]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);
     
@@ -409,8 +409,8 @@
 
     UKTrue([ctx hasChanges]);
     UKObjectsEqual([NSSet set], [ctx persistentRoots]);
-    UKObjectsEqual(S(persistentRoot), [ctx deletedPersistentRoots]);
-    UKObjectsEqual([NSSet set], [ctx trashPersistentRoots]);
+    UKObjectsEqual(S(persistentRoot), [ctx persistentRootsPendingDeletion]);
+    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);
     
@@ -419,8 +419,8 @@
     UKFalse([ctx hasChanges]);
     UKObjectsEqual([NSSet set], [ctx persistentRoots]);
     /* N.B.: -deletedPersistentRoots returns the pending deletions, which is why it's empty here  */
-    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
-    UKIntsEqual(1, [[ctx trashPersistentRoots] count]);
+    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
+    UKIntsEqual(1, [[ctx deletedPersistentRoots] count]);
     /* You can still retrieve a deleted persistent root, until the deletion is finalized */
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);

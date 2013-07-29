@@ -104,7 +104,7 @@
 /**
  * Returns the set of persistent roots marked as deleted on disk
  */
-@property (nonatomic, copy, readonly) NSSet *trashPersistentRoots;
+@property (nonatomic, copy, readonly) NSSet *deletedPersistentRoots;
 
 /**
  * Returns a group listing the libraries in the store.
@@ -145,8 +145,8 @@
 
 /** @taskunit Pending Changes */
 
-@property (nonatomic, copy, readonly) NSSet *insertedPersistentRoots;
-@property (nonatomic, copy, readonly) NSSet *deletedPersistentRoots;
+@property (nonatomic, copy, readonly) NSSet *persistentRootsPendingInsertion;
+@property (nonatomic, copy, readonly) NSSet *persistentRootsPendingDeletion;
 
 // TODO: updatedPersistentRoots?
 // TODO: changedPersistentRoots?
