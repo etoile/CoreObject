@@ -83,10 +83,13 @@
 	return result;
 }
 
-- (void) addItem: (COItem *)anItem
+- (void) insertOrUpdateItems: (NSArray *)items
 {
-    [itemForUUID_ setObject: anItem
-                     forKey: [anItem UUID]];
+    for (COItem *anItem in items)
+    {
+        [itemForUUID_ setObject: anItem
+                         forKey: [anItem UUID]];
+    }
 }
 
 /**

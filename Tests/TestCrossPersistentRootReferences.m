@@ -254,7 +254,7 @@
     COPath *branchBRef = [COPath pathWithPersistentRoot: [photo1 persistentRootUUID] branch: [branchB UUID]];
     COMutableItem *library1RootItem = [[[library1 objectGraph] itemForUUID: [[library1 objectGraph] rootItemUUID]] mutableCopy];
     [library1RootItem setValue: S(branchBRef) forAttribute: @"contents"];
-    [[library1 objectGraph] addItem: library1RootItem];
+    [[library1 objectGraph] insertOrUpdateItems: A(library1RootItem)];
     
     [ctx commit];
     

@@ -27,7 +27,7 @@
  * Behaviours:
  *  - record which objects were edited/inserted
  *  - maintain consistency of composite relationship, for edits
- *    made through the COObject api (but not through addItem: api)
+ *    made through the COObject api (but not through -insertOrUpdateItems: api)
  *  - maintain relationship cache, for all edits
  *  - post notifications
  */
@@ -284,9 +284,22 @@
 	[insertedObjects_ addObject: object];
 }
 
-- (void) addItem: (COItem *)item
+- (void) insertOrUpdateItems: (NSArray *)items
 {
-    [self addItem: item markAsInserted: YES];
+    if ([items count] == 0)
+        return;
+    
+    // Wrap the items array in a COItemGraph, so they can be located by
+    // -objectReferenceWithUUID:. The rootItemUUID is ignored.
+    ASSIGN(_loadingItemGraph, [[[COItemGraph alloc] initWithItems: items
+                                                     rootItemUUID: [[items objectAtIndex: 0] UUID]] autorelease]);
+    
+    for (COItem *item in items)
+    {
+        [self addItem: item markAsInserted: NO];
+    }
+	
+	DESTROY(_loadingItemGraph);
 }
 
 

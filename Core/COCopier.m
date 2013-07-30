@@ -75,12 +75,16 @@
                     forKey: oldUUID];
     }
     
+    NSMutableArray *result = [NSMutableArray array];
+    
     for (ETUUID *uuid in uuidsToCopy)
     {
         COItem *oldItem = [source itemForUUID: uuid];
         COItem *newItem = [[oldItem mutableCopyWithNameMapping: mapping] autorelease];
-        [dest addItem: newItem];
+        [result addObject: newItem];
     }
+    
+    [dest insertOrUpdateItems: result];
     
     return [mapping objectForKey: aUUID];
 }

@@ -389,6 +389,11 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	assert([_objectGraph hasChanges] == NO);
 }
 
+// WARNING: Not necessairily safe. Should we support this?
+//
+// e.g. A has a reference to B. Delete B, then call -discardChangesInObject:
+// on A. This will try to restore a reference to B which will be broken, and
+// throw an exception.
 - (void)discardChangesInObject: (COObject *)object
 {
     if (_currentRevisionID != nil)
@@ -396,7 +401,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         COItem *item = [[self store] item: [object UUID]
                              atRevisionID: _currentRevisionID];
         
-        [_objectGraph addItem: item];
+        [_objectGraph insertOrUpdateItems: [NSArray arrayWithObject: item]];
         [_objectGraph clearChangeTrackingForObject: object];
     }
 }

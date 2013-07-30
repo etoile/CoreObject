@@ -23,9 +23,11 @@
 
 - (NSArray *) itemUUIDs;
 /**
- * Insert or update an item
+ * Insert or updates the given items.
+ * When combined with the receiver, all inner references should be resolved.
+ * May broadcase a change notification, up to the subclass.
  */
-- (void) addItem: (COItem *)anItem;
+- (void) insertOrUpdateItems: (NSArray *)items;
 
 @end
 
@@ -57,6 +59,6 @@
 
 - (NSArray *) itemUUIDs;
 
-- (void) addItem: (COItem *)anItem;
+- (void) insertOrUpdateItems: (NSArray *)items;
 
 @end

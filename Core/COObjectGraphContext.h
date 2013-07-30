@@ -49,9 +49,10 @@
 - (NSArray *) itemUUIDs;
 
 /**
- * Insert or update an item.
+ * Insert or update a set of items. This must leave the object graph
+ * in a consistent state.
  */
-- (void) addItem: (COItem *)anItem;
+- (void) insertOrUpdateItems: (NSArray *)items;
 
 #pragma mark end COItemGraph protocol
 
