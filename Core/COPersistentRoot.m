@@ -124,6 +124,8 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     }
 
     ASSIGN(_currentBranchUUID, [aTrack UUID]);
+    
+    [[self parentContext] updateCrossPersistentRootReferencesToPersistentRoot: self];
 }
 
 - (COBranch *)editingBranch

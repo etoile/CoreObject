@@ -272,6 +272,8 @@
 
 - (id)crossPersistentRootReferenceWithPath: (COPath *)aPath;
 
+- (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot;
+
 /** @taskunit Deprecated, to be removed */
 
 // I think we agreed these are an "anti-pattern"

@@ -286,6 +286,8 @@ static COEditingContext *currentCtxt = nil;
     
 	// NOTE: Deleted persistent roots are removed from the cache on commit.
 	[_deletedPersistentRoots addObject: aPersistentRoot];
+    
+    [self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot];
 }
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid
@@ -538,6 +540,11 @@ static COEditingContext *currentCtxt = nil;
     
     COObjectGraphContext *objectGraph = [branch objectGraph];
     return [objectGraph rootObject];
+}
+
+- (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
+{
+    // TODO: Implement
 }
 
 // Notification handling
