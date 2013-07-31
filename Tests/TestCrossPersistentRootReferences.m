@@ -123,7 +123,6 @@
         // FIXME: Check for the loaded contents
     }
 }
-#endif
 
 /*
  - Verify that for references to the current branch, the COObject is transparently
@@ -334,7 +333,7 @@
     
     [ctx commit];
 }
-
+#endif
 /*
  
  List of some scenarios to test:

@@ -142,6 +142,7 @@
 		66D96CC9178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CB4178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m */; };
 		66D96CCA178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CB5178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h */; settings = {ATTRIBUTES = (); }; };
 		66D96CCB178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CB6178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m */; };
+		66FB154417A8BAA0003BFC9B /* TestCrossPersistentRootReferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */; };
 		791B4E4C1299C82200CCF472 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
 		791B4E721299C90900CCF472 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6C1299C90900CCF472 /* FMDatabase.m */; };
 		791B4E741299C90900CCF472 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6E1299C90900CCF472 /* FMDatabaseAdditions.m */; };
@@ -1384,6 +1385,7 @@
 				66808498178DB4D5003A3CC6 /* TestBranch.m in Sources */,
 				607EB6F2178D50610024B34D /* TestRevisionNumber.m in Sources */,
 				66D43BB5179E170B008CE44E /* TestConcurrentChanges.m in Sources */,
+				66FB154417A8BAA0003BFC9B /* TestCrossPersistentRootReferences.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

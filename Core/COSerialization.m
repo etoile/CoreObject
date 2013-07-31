@@ -518,7 +518,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
         else
         {
             NSParameterAssert([value isKindOfClass: [ETUUID class]]
-                              || [value isKindOfClass: [NSString class]]);
+                              || [value isKindOfClass: [COPath class]]);
         }
  	
         id object;
@@ -530,7 +530,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
         }
         else /* COPath */
         {
-            COPath *path = [COPath pathWithString: value];
+            COPath *path = value;
             object = [[[self persistentRoot] parentContext] crossPersistentRootReferenceWithPath: path];
         }
 
