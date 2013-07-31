@@ -6,9 +6,9 @@ First Release
 
 - Tests
   - Pass all tests, including all from NestedVersioning, rewriting them where needed.
-  - Test JSON serialization
+  x Test JSON serialization
 
-- COEditingContext: Implement new design with support for:
+- COEditingContext / COPersistentRoot / COBranch
   - support for loading the root object of a persistent root as a fault
   - asychronous loading of persistent root contents / unfaulting faulted root object
   - full support for cross-persistent root references
@@ -27,8 +27,12 @@ First Release
   - support "transient roots" in a COEditingContext. These are COObjectGraphContext wrappers.
     Or, support creating a persistent root in code, then calling "freeze" which will make it 
     read-only and prevent it from being committed to disk?
-  - expose COSQLiteStore's undelete method
+  x expose COSQLiteStore's undelete method
   x expose COSQLiteStore branch deletion / undeletion
+  - choose between -[COEditingContext deletePersistentRoot:]/-[COEditingContext undeletePersistentRoot:]
+    and COPersistentRoot's isDeleted property
+  - choose between -[COPersistentRoot deleteBranch:]/-[COPersistentRoot undeleteBranch:]
+    and COBranch's isDeleted property
   - make deleted persistent roots read-only?
   - expose COSQLiteStore's finalize deletion method
   - (aesthetic) decide to what extent COPersistentRoot, COBranch should
@@ -40,7 +44,7 @@ First Release
      -[COBranch rootObject] = { return [[self objectGraph] rootObject]; }
      
     All of the other methods, I don't know.
-     
+  - Extend COBranch API to support branches and merging revisions accross tracks
 
 - didAwaken: replacement
     - At the end of the setStoreItem:, call -awakeFromDeserialization
@@ -83,6 +87,10 @@ First Release
   - I'd like to look at generating COObject subclasses for each entity description with 
     generated KVC compliant property accessors and mutators. (Eric)
   - Use NSSortedSet for sorted composite relationships
+  - Use weak references to other COObject instances to prevent retain cycles
+
+- COItem
+  - tidy up ugly NSMutableDictionary / NSDictionary casting
 
 - COSQLiteStore
   - Use change count for notifications. Make all mutations increment count.
@@ -93,7 +101,7 @@ First Release
   - Switch to batch style api?
   - Add "parent branch" metadata to a branch that records which branch a branch was forked from?
   
-- Extend COCommitTrack API to support branches and merging revisions accross tracks
+
 - Rewrite COHistoryTrack
 - Fix COCustomTrack broken model
 - Make COQuery a bit more usable
