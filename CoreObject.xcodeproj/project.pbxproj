@@ -143,6 +143,8 @@
 		66D96CCA178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CB5178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h */; settings = {ATTRIBUTES = (); }; };
 		66D96CCB178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CB6178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m */; };
 		66FB154417A8BAA0003BFC9B /* TestCrossPersistentRootReferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */; };
+		66FB157117A8F53D003BFC9B /* TestObjectGraphContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB157017A8F53D003BFC9B /* TestObjectGraphContext.m */; };
+		66FB157A17A8F829003BFC9B /* TestCopier.m in Sources */ = {isa = PBXBuildFile; fileRef = 66808461178CD4FD003A3CC6 /* TestCopier.m */; };
 		791B4E4C1299C82200CCF472 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
 		791B4E721299C90900CCF472 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6C1299C90900CCF472 /* FMDatabase.m */; };
 		791B4E741299C90900CCF472 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6E1299C90900CCF472 /* FMDatabaseAdditions.m */; };
@@ -473,6 +475,7 @@
 		66D96CB4178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSQLiteStorePersistentRootBackingStore.m; path = Store/COSQLiteStorePersistentRootBackingStore.m; sourceTree = "<group>"; };
 		66D96CB5178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSQLiteStorePersistentRootBackingStoreBinaryFormats.h; path = Store/COSQLiteStorePersistentRootBackingStoreBinaryFormats.h; sourceTree = "<group>"; };
 		66D96CB6178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSQLiteStorePersistentRootBackingStoreBinaryFormats.m; path = Store/COSQLiteStorePersistentRootBackingStoreBinaryFormats.m; sourceTree = "<group>"; };
+		66FB157017A8F53D003BFC9B /* TestObjectGraphContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestObjectGraphContext.m; path = Tests/TestObjectGraphContext.m; sourceTree = "<group>"; };
 		791B4E2D1299C79300CCF472 /* Test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test; sourceTree = BUILT_PRODUCTS_DIR; };
 		791B4E6B1299C90900CCF472 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabase.h; path = fmdb/src/FMDatabase.h; sourceTree = "<group>"; };
 		791B4E6C1299C90900CCF472 /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FMDatabase.m; path = fmdb/src/FMDatabase.m; sourceTree = "<group>"; };
@@ -903,6 +906,7 @@
 				66808461178CD4FD003A3CC6 /* TestCopier.m */,
 				609C00611704C24C00D01AAB /* TestRevisionNumber.m */,
 				66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */,
+				66FB157017A8F53D003BFC9B /* TestObjectGraphContext.m */,
 				667F1ECE179C81BE0083C3E6 /* Store Tests */,
 				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */,
@@ -1386,6 +1390,8 @@
 				607EB6F2178D50610024B34D /* TestRevisionNumber.m in Sources */,
 				66D43BB5179E170B008CE44E /* TestConcurrentChanges.m in Sources */,
 				66FB154417A8BAA0003BFC9B /* TestCrossPersistentRootReferences.m in Sources */,
+				66FB157117A8F53D003BFC9B /* TestObjectGraphContext.m in Sources */,
+				66FB157A17A8F829003BFC9B /* TestCopier.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
