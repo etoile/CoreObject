@@ -9,6 +9,7 @@
 #import "COBranch.h"
 #import "COPath.h"
 #import "COObjectGraphContext.h"
+#import "COCrossPersistentRootReferenceCache.h"
 
 @implementation COEditingContext
 
@@ -58,7 +59,8 @@ static COEditingContext *currentCtxt = nil;
 	_loadedPersistentRoots = [NSMutableDictionary new];
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
-
+    _crossRefCache = [[COCrossPersistentRootReferenceCache alloc] init];
+    
 	[self registerAdditionalEntityDescriptions];
 
 
@@ -90,6 +92,7 @@ static COEditingContext *currentCtxt = nil;
 	DESTROY(_loadedPersistentRoots);
 	DESTROY(_persistentRootsPendingDeletion);
     DESTROY(_persistentRootsPendingUndeletion);
+    DESTROY(_crossRefCache);
 	DESTROY(_error);
 	[super dealloc];
 }
@@ -122,6 +125,10 @@ static COEditingContext *currentCtxt = nil;
 - (COEditingContext *)editingContext
 {
 	return self;
+}
+- (COCrossPersistentRootReferenceCache *) crossReferenceCache
+{
+    return _crossRefCache;
 }
 
 - (NSSet *)persistentRoots
@@ -578,13 +585,23 @@ static COEditingContext *currentCtxt = nil;
         branch = [persistentRoot currentBranch];
     }
     
+    if ([branch isDeleted])
+    {
+        return nil;
+    }
+    
     COObjectGraphContext *objectGraph = [branch objectGraph];
     return [objectGraph rootObject];
 }
 
 - (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
-    // TODO: Implement
+    NSArray *objs = [_crossRefCache affectedObjectsForChangeInPersistentRoot: [aPersistentRoot persistentRootUUID]];
+    
+    for (COObject *obj in objs)
+    {
+        [obj updateCrossPersistentRootReferences];
+    }
 }
 
 // Notification handling

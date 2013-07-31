@@ -4,7 +4,7 @@
 
 @class ETUUID;
 @class COPersistentRoot, COBranch, COObject, CORelationshipCache;
-@class COItemGraph, COItem, COSchemaRegistry , COSchema;
+@class COItemGraph, COItem, COSchemaRegistry , COSchema, COEditingContext;
 
 @interface COObjectGraphContext : NSObject <COItemGraph>
 {
@@ -37,6 +37,7 @@
 
 - (COBranch *) branch;
 - (COPersistentRoot *) persistentRoot;
+- (COEditingContext *) editingContext;
 
 #pragma mark begin COItemGraph protocol
 

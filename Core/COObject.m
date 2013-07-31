@@ -21,6 +21,7 @@
 #import "COTag.h"
 #import "COGroup.h"
 #import "COObjectGraphContext.h"
+#import "COSerialization.h"
 #include <objc/runtime.h>
 
 @implementation COObject
@@ -169,6 +170,7 @@ See +[NSObject typePrefix]. */
 	_isInitialized = YES;
 
 	_variableStorage = [self newVariableStorage];
+    _relationshipsAsCOPathOrETUUID = [self newVariableStorage];
 	_incomingRelationships = [[CORelationshipCache alloc] init];
 
 	return self;
@@ -287,6 +289,7 @@ See +[NSObject typePrefix]. */
 	if (_variableStorage != nil)
 	{
 		newObject->_variableStorage = [self newVariableStorage];
+        newObject->_relationshipsAsCOPathOrETUUID = [self newVariableStorage];
         newObject->_incomingRelationships = [[CORelationshipCache alloc] init];
         
 		if (usesModelDescription)
@@ -811,6 +814,22 @@ See +[NSObject typePrefix]. */
 	// TODO: Evaluate whether -checkEditingContextForValue: is too costly
 	//[self checkEditingContextForValue: [self valueForProperty: key]];
     
+    id originalRelationships = [_relationshipsAsCOPathOrETUUID objectForKey: key];
+    if (originalRelationships != nil)
+    {
+        id currentValue = [self valueForProperty: key];
+        
+        // Re-serialize the current value from COObject to ETUUID/COPath
+        
+        id serializedValue = [self serializedValueForValue: currentValue];
+        
+        //NSLog(@"_relationshipsAsCOPathOrETUUID: setting %@ from %@ to %@", key,
+        //     [_relationshipsAsCOPathOrETUUID objectForKey: key], serializedValue);
+        
+        [_relationshipsAsCOPathOrETUUID setObject: serializedValue
+                                           forKey: key];
+    }
+    
     // Remove objects in newValue from their old parents
     // as perscribed by the COEditingContext class docs
     // FIXME: Ugly implementation
@@ -984,6 +1003,7 @@ See +[NSObject typePrefix]. */
 {
 	assert(_variableStorage == nil);
 	_variableStorage = [self newVariableStorage];
+    _relationshipsAsCOPathOrETUUID = [self newVariableStorage];
     _incomingRelationships = [[CORelationshipCache alloc] init];
 }
 
@@ -1184,6 +1204,34 @@ static int indent = 0;
 - (CORelationshipCache *)relationshipCache
 {
     return _incomingRelationships;
+}
+
+- (COCrossPersistentRootReferenceCache *)crossReferenceCache
+{
+    return [[_objectGraphContext editingContext] crossReferenceCache];
+}
+
+- (void) updateCrossPersistentRootReferences
+{
+    for (NSString *key in [_relationshipsAsCOPathOrETUUID allKeys])
+    {
+        id serializedValue = [_relationshipsAsCOPathOrETUUID objectForKey: key];
+        ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
+        
+        // HACK
+        COType type = kCOReferenceType | ([propDesc isMultivalued]
+                                          ? ([propDesc isOrdered]
+                                             ? kCOArrayType
+                                             : kCOSetType)
+                                          : 0);
+        
+        id value = [self valueForSerializedValue: serializedValue ofType: type propertyDescription: propDesc];
+        
+        // N.B., we need to set this in a way that doesn't cause us to recalculate and overwrite
+        // the version stored in _relationshipsAsCOPathOrETUUID
+        [_variableStorage setValue: value
+                            forKey: key];
+    }
 }
 
 - (void) markAsRemovedFromContext

@@ -26,10 +26,10 @@
     // 1. Set it up in memory
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setValue: @"photo1" forKey: @"label"];
+    [[photo1 rootObject] setValue: @"photo1" forProperty: @"label"];
     
     COPersistentRoot *photo2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo2 rootObject] setValue: @"photo2" forKey: @"label"];
+    [[photo2 rootObject] setValue: @"photo2" forProperty: @"label"];
     
     COPersistentRoot *library = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
     [[library rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
@@ -96,7 +96,7 @@
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     COObject *child1 = [photo1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 
-    [[photo1 rootObject] setValue: @"photo1" forKey: @"label"];
+    [[photo1 rootObject] setValue: @"photo1" forProperty: @"label"];
     [[photo1 rootObject] insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
@@ -123,6 +123,8 @@
         // FIXME: Check for the loaded contents
     }
 }
+
+#endif
 
 /*
  - Verify that for references to the current branch, the COObject is transparently
@@ -152,10 +154,10 @@
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     COObject *photo1root = [photo1 rootObject];
-    [photo1root setValue: @"photo1, branch A" forKey: @"label"];
+    [photo1root setValue: @"photo1, branch A" forProperty: @"label"];
     
     COObject *childA = [photo1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    [childA setValue: @"childA" forKey: @"label"];
+    [childA setValue: @"childA" forProperty: @"label"];
     
     [photo1root insertObject: childA atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     
@@ -174,10 +176,11 @@
     
     COBranch *branchB = [[photo1 currentBranch] makeBranchWithLabel: @"branchB"];
     COObject *photo1branchBroot = [[branchB objectGraph] rootObject];
-    [photo1branchBroot setValue: @"photo1, branch B" forKey: @"label"];
+    [photo1branchBroot setValue: @"photo1, branch B" forProperty: @"label"];
     
     COObject *childB = [[photo1branchBroot valueForKey: @"contents"] firstObject];
-    [childB setValue: @"childB" forKey: @"label"];
+    // FIXME: Why was -setValue:forKey: appearing to work but not logging a change in the object graph?
+    [childB setValue: @"childB" forProperty: @"label"];
     
     [ctx commit];
     
@@ -238,13 +241,17 @@
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [photo1 commit];
     
-    COBranch *branchB = [[photo1 currentBranch] makeBranchWithLabel: @"branchB"];
+    COBranch *branchA = [photo1 currentBranch];
+    COBranch *branchB = [branchA makeBranchWithLabel: @"branchB"];
+    
+    [photo1 setEditingBranch: branchB]; // TODO: Workaround for -becomePersistentInContext: limitation, should be removed.
+    
     COObject *photo1branchBroot = [[branchB objectGraph] rootObject];
     
-    [photo1branchBroot setValue: @"photo1, branch B" forKey: @"label"];
+    [photo1branchBroot setValue: @"photo1, branch B" forProperty: @"label"];
     
     COObject *childB = [[branchB objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    [childB setValue: @"childB" forKey: @"label"];
+    [childB setValue: @"childB" forProperty: @"label"];
     
     [photo1branchBroot insertObject: childB atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     
@@ -267,6 +274,8 @@
     
     // Now delete branch B. This should automatically update the cross-persistent reference
     
+    [photo1 setEditingBranch: branchA]; // TODO: Workaround for -becomePersistentInContext: limitation, should be removed.
+
     [photo1 deleteBranch: branchB];
     
     UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
@@ -285,7 +294,7 @@
     // Test that deleting photo1 hides the child relationship in library1 to phtoto1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setValue: @"photo1" forKey: @"label"];
+    [[photo1 rootObject] setValue: @"photo1" forProperty: @"label"];
     [photo1 commit];
     
     // Set up library
@@ -317,13 +326,13 @@
     // Test that deleting library1 hides the parent relationship in photo1 to library1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setValue: @"photo1" forKey: @"label"];
+    [[photo1 rootObject] setValue: @"photo1" forProperty: @"label"];
     [photo1 commit];
     
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    [[library1 rootObject] setValue: @"library1" forKey: @"label"];
+    [[library1 rootObject] setValue: @"library1" forProperty: @"label"];
     [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
     [ctx commit];
     
@@ -352,7 +361,7 @@
     // Test that undeleting photo1 restores the child relationship in library1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setValue: @"photo1" forKey: @"label"];
+    [[photo1 rootObject] setValue: @"photo1" forProperty: @"label"];
     [photo1 commit];
         
     // Set up library
@@ -374,7 +383,7 @@
     // still present in library1.contents, it's just hidden.
     
     COObject *photo2 = [library1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    [photo2 setValue: @"photo2" forKey: @"label"];
+    [photo2 setValue: @"photo2" forProperty: @"label"];
     [[library1 rootObject] insertObject: photo2 atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
     
     UKObjectsEqual(S(@"photo2"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
@@ -411,13 +420,13 @@
     // Test that undeleting library1 restores the parent relationship in photo1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setValue: @"photo1" forKey: @"label"];
+    [[photo1 rootObject] setValue: @"photo1" forProperty: @"label"];
     [photo1 commit];
     
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    [[library1 rootObject] setValue: @"library1" forKey: @"label"];
+    [[library1 rootObject] setValue: @"library1" forProperty: @"label"];
     [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
     [ctx commit];
     
@@ -442,7 +451,7 @@
         UKObjectsEqual(S(@"photo1"), [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
     }
 }
-#endif
+
 /*
  
  List of some scenarios to test:

@@ -106,6 +106,11 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	{
 		return [NSNull null];
 	}
+	else if ([value isKindOfClass: [ETUUID class]]
+             || [value isKindOfClass: [COPath class]])
+	{
+        return value;
+	}
 	else if ([value isKindOfClass: [COObject class]])
 	{
 		/* Some root object relationships are special in the sense the value can be 
@@ -129,8 +134,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 			{
 				NSAssert([value isRoot], @"A property must point to a root object "
 					"for references accross persistent roots");
-				return [COPath pathWithPersistentRoot: [[value persistentRoot] persistentRootUUID]
-			                                   branch: [[[value persistentRoot] currentBranch] UUID]];
+				return [COPath pathWithPersistentRoot: [[value persistentRoot] persistentRootUUID]]; // Create path to the current branch by default
 			}
 		}
 		else
@@ -216,16 +220,16 @@ serialization. */
 
 	if ([self isCoreObjectEntityType: type])
 	{
-		if (value == nil || ([value persistentRoot] == [self persistentRoot]))
-		{
+		//if (value == nil || ([value persistentRoot] == [self persistentRoot]))
+		//{
 			return ([aPropertyDesc isComposite] ? kCOCompositeReferenceType : kCOReferenceType);
-		}
-		else
-		{
-			NSAssert([value isRoot], @"A property must point to a root object "
-				"for references accross persistent roots");
-			return kCOReferenceType;
-		}
+		//}
+		//else
+		//{
+		//	NSAssert([value isRoot], @"A property must point to a root object "
+		//		"for references accross persistent roots");
+		//	return kCOReferenceType;
+		//}
 	}
 	else if ([typeName isEqualToString: @"BOOL"]
 	      || [typeName isEqualToString: @"NSInteger"]
@@ -335,6 +339,14 @@ serialization. */
 // serialization format has been removed.
 - (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
+    /* Check the _relationshipsAsCOPathOrETUUID cache */
+    
+    id relationship = [_relationshipsAsCOPathOrETUUID objectForKey: [aPropertyDesc name]];
+    if (relationship != nil)
+    {
+        return relationship;
+    }
+    
 	/* First we try to use the getter named 'serialized' + 'key' */
 	
 	NSString *capitalizedKey = [[aPropertyDesc name] stringByCapitalizingFirstLetter];
@@ -460,42 +472,44 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
             NSAssert([aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
                      @"Serialization type doesn't match metamodel");
             
-            // TODO: Allocating a C array on the stack is probably premature
-            // optimization. Fast enumeration could even be faster.
-            NSUInteger count = [value count];
-            id mappedObjects[count];
+            id resultCollection = [NSMutableArray array];
             
-            for (int i = 0; i < count; i++)
+            for (id subvalue in value)
             {
-                mappedObjects[i] = [self valueForSerializedValue: [value objectAtIndex: i]
-                                                          ofType: COPrimitiveType(type)
-                                             propertyDescription: aPropertyDesc];
+                id deserializedValue = [self valueForSerializedValue: subvalue
+                                                              ofType: COPrimitiveType(type)
+                                                 propertyDescription: aPropertyDesc];
+                
+                if (deserializedValue != nil)
+                {
+                    [resultCollection addObject: deserializedValue];
+                }
             }
-            
-            Class arrayClass = ([aPropertyDesc isReadOnly] ? [NSArray class] : [NSMutableArray class]);
-            return [arrayClass arrayWithObjects: mappedObjects count: count];
+
+            // FIXME: Make read-only if needed
+            return resultCollection;
         }
         else if (COMultivaluedType(type) == kCOSetType)
         {
             NSAssert([aPropertyDesc isOrdered] == NO && [aPropertyDesc isMultivalued],
                      @"Serialization type doesn't match metamodel");
             
-            // TODO: Allocating a C array on the stack is probably premature
-            // optimization. Fast enumeration could even be faster.
-            NSUInteger count = [value count];
-            id mappedObjects[count];
-            int i = 0;
+            id resultCollection = [NSMutableSet set];
             
             for (id subvalue in value)
             {
-                mappedObjects[i] = [self valueForSerializedValue: subvalue
-                                                          ofType: COPrimitiveType(type)
-                                             propertyDescription: aPropertyDesc];
-                i++;
+                id deserializedValue = [self valueForSerializedValue: subvalue
+                                                              ofType: COPrimitiveType(type)
+                                                 propertyDescription: aPropertyDesc];
+                
+                if (deserializedValue != nil)
+                {
+                    [resultCollection addObject: deserializedValue];
+                }
             }
             
-            Class setClass = ([aPropertyDesc isReadOnly] ? [NSSet class] : [NSMutableSet class]);
-            return [setClass setWithObjects: mappedObjects count: count];
+            // FIXME: Make read-only if needed
+            return resultCollection;
         }
         else
         {
@@ -526,23 +540,22 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
         {
             /* Look up a inner object reference in the receiver persistent root */
             object = [[self objectGraphContext] objectReferenceWithUUID: value];
+            ETAssert(object != nil);
             
         }
         else /* COPath */
         {
-            COPath *path = value;
-            object = [[[self persistentRoot] parentContext] crossPersistentRootReferenceWithPath: path];
+            object = [[[self persistentRoot] parentContext] crossPersistentRootReferenceWithPath: (COPath *)value];
+            
+            // object may be nil
         }
 
-        // FIXME: Only really an error for inner object references
-        // (we should never serialize an embedded object graph with broken inner
-        //  object references.) On the other hand, cross persistent root references
-        // can easily become broken.
-		ETAssert(object != nil);
-
-		/* See also -validateStoreItem: */
-		ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc type]]
-			|| [[[object entityDescription]name] isEqualToString: @"CODictionary"]);
+        if (object != nil)
+        {
+            /* See also -validateStoreItem: */
+            ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc type]]
+                || [[[object entityDescription]name] isEqualToString: @"CODictionary"]);
+        }
 		return object;
 	}
     else
@@ -661,6 +674,19 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 			                    serializedValue, COTypeDescription(serializedType), property, [self entityDescription]];
 		}
 
+        // Cache ETUUID / COPath version of relationship
+        if ([self isCoreObjectEntityType: [propertyDesc type]])
+        {
+            if ([serializedValue isKindOfClass: [NSSet class]]
+                || [serializedValue isKindOfClass: [NSArray class]])
+            {
+                serializedValue = [[serializedValue mutableCopy] autorelease];
+            }
+
+            [_relationshipsAsCOPathOrETUUID setObject: serializedValue
+                                               forKey: property];
+        }
+        
 		id value = [self valueForSerializedValue: serializedValue
 		                                  ofType: serializedType
 		                     propertyDescription: propertyDesc];

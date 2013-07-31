@@ -106,6 +106,11 @@
     return [branch_ persistentRoot];
 }
 
+- (COEditingContext *) editingContext
+{
+    return [[branch_ persistentRoot] parentContext];
+}
+
 #pragma mark begin COItemGraph protocol
 
 - (ETUUID *) rootItemUUID

@@ -3,6 +3,7 @@
 
 @class COPersistentRoot, COEditingContext;
 @class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo, CORevisionID, COPath;
+@class COCrossPersistentRootReferenceCache;
 
 // I'm skeptical that there is ever a legitimate case where code is working
 // with an id<COPersistentObjectContext> and doesn't know whether it's an
@@ -53,6 +54,7 @@
     /** Set of persistent roots pending undeletion */
 	NSMutableSet *_persistentRootsPendingUndeletion;
 	COError *_error;
+    COCrossPersistentRootReferenceCache *_crossRefCache;
 }
 
 
@@ -277,6 +279,8 @@
 
 - (void)deletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
 - (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
+
+- (COCrossPersistentRootReferenceCache *) crossReferenceCache;
 
 /** @taskunit Deprecated, to be removed */
 

@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COQuery.h>
 
-@class COPersistentRoot, COEditingContext, CORevision, COBranch, CORelationshipCache, COObjectGraphContext;
+@class COPersistentRoot, COEditingContext, CORevision, COBranch, CORelationshipCache, COObjectGraphContext, COCrossPersistentRootReferenceCache;
 
 /**
  * Working copy of an object, owned by an editing context.
@@ -200,6 +200,7 @@
 	@protected
 	NSMutableDictionary *_variableStorage;
     CORelationshipCache *_incomingRelationships;
+    NSMutableDictionary *_relationshipsAsCOPathOrETUUID;
 	@private
 	BOOL _inDescription; // FIXME: remove; only for debugging
 	BOOL _isInitialized;
@@ -715,5 +716,10 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 - (CORelationshipCache *)relationshipCache;
+
+- (COCrossPersistentRootReferenceCache *)crossReferenceCache;
+
+- (void) updateCrossPersistentRootReferences;
+
 - (void) markAsRemovedFromContext;
 @end
