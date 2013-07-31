@@ -18,6 +18,8 @@
 @synthesize currentBranchUUID = currentBranch_;
 @synthesize branchForUUID = branchForUUID_;
 @synthesize changeCount = _changeCount;
+@synthesize deleted = _deleted;
+
 - (void) dealloc
 {
     [uuid_ release];
@@ -631,6 +633,7 @@
     result.branchForUUID = branchDict;
     result.currentBranchUUID = currBranch;
     result.changeCount = changecount;
+    result.deleted = deleted;
     
     return result;
 }
@@ -706,7 +709,8 @@
     plist.UUID = uuid;
     plist.branchForUUID = D(branch, aBranchUUID);
     plist.currentBranchUUID = aBranchUUID;
-
+    plist.deleted = NO;
+    
     return plist;
 }
 

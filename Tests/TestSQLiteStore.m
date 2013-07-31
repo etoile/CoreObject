@@ -528,10 +528,12 @@ static ETUUID *childUUID2;
 {
     UKObjectsEqual([NSArray array], [store deletedPersistentRootUUIDs]);
     UKObjectsEqual(A(prootUUID), [store persistentRootUUIDs]);
+    UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
 
     // Delete it
     UKTrue([store deletePersistentRoot: prootUUID error: NULL]);
 
+    UKTrue([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
     UKObjectsEqual(A(prootUUID), [store deletedPersistentRootUUIDs]);
     UKObjectsEqual([NSArray array], [store persistentRootUUIDs]);
     UKNotNil([store persistentRootInfoForUUID: prootUUID]);
@@ -539,7 +541,8 @@ static ETUUID *childUUID2;
     
     // Undelete it
     UKTrue([store undeletePersistentRoot: prootUUID error: NULL]);
-    
+
+    UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
     UKObjectsEqual([NSArray array], [store deletedPersistentRootUUIDs]);
     UKObjectsEqual(A(prootUUID), [store persistentRootUUIDs]);
     
@@ -584,6 +587,7 @@ static ETUUID *childUUID2;
     UKObjectsEqual(S(prootUUID), [NSSet setWithArray:[store persistentRootUUIDs]]);
     UKObjectsEqual(initialBranchUUID, [[store persistentRootInfoForUUID: prootUUID] currentBranchUUID]);
     UKObjectsEqual([self makeInitialItemTree], [store contentsForRevisionID: initialRevisionId]);
+    UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
 }
 
 /**
