@@ -251,6 +251,53 @@
     UKObjectsEqual(@"Untitled", [[persistentRoot rootObject] valueForProperty: @"label"]);
 }
 
+- (void) testBranchSwitchCommitted
+{
+	// photo1 <<persistent root, branchA>>
+	//  |
+	//  \--childA
+	//
+	// photo1 <<persistent root, branchB>>
+	//  |
+	//  \--childB
+    
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COObject *photo1root = [photo1 rootObject];
+    
+    COObject *childA = [photo1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    [childA setValue: @"childA" forKey: @"label"];
+    [photo1root insertObject: childA atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    [photo1 commit];
+    
+    COBranch *branchB = [[photo1 currentBranch] makeBranchWithLabel: @"branchB"];
+    COObject *photo1branchBroot = [[branchB objectGraph] rootObject];
+    
+    COObject *childB = [[photo1branchBroot valueForKey: @"contents"] firstObject];
+    [childB setValue: @"childB" forProperty: @"label"];
+    UKTrue([[branchB objectGraph] hasChanges]);
+    
+    [ctx commit];
+    
+    UKObjectsEqual(A(@"childA"), [[photo1 rootObject] valueForKeyPath: @"contents.label"]);
+    [photo1 setCurrentBranch: branchB];
+    
+    UKObjectsEqual(A(@"childB"), [[photo1 rootObject] valueForKeyPath: @"contents.label"]);
+    [ctx commit];
+    
+    {
+        // Test that the cross-persistent reference uses branchB when we reopen the store
+        
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: [photo1 persistentRootUUID]];
+        
+        // Sanity check
+        
+        UKObjectsEqual([branchB UUID], [[photo1ctx2 currentBranch] UUID]);
+        UKObjectsEqual(A(@"childB"), [[photo1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+    }
+}
+
 - (void)testBranchFromBranch
 {
 	UKNil([originalBranch currentRevision]);
