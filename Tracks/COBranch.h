@@ -93,7 +93,7 @@
  * The branch deletion status.
  *
  * If the branch is marked as deleted, the deletion is committed to the store 
- * on the next object graph context commit.
+ * on the next persistent root commit.
  */
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
 

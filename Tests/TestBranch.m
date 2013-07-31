@@ -382,6 +382,7 @@
     UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNil([store persistentRootInfoForUUID: uuid]);
+    UKFalse([persistentRoot isDeleted]);
     
     [ctx deletePersistentRoot: persistentRoot];
     
@@ -404,6 +405,7 @@
     UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);
+    UKFalse([persistentRoot isDeleted]);
     
     [ctx deletePersistentRoot: persistentRoot];
 
@@ -413,6 +415,7 @@
     UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);
+    UKTrue([persistentRoot isDeleted]);
     
     [ctx commit];
   
@@ -424,6 +427,36 @@
     /* You can still retrieve a deleted persistent root, until the deletion is finalized */
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);
+    UKTrue([persistentRoot isDeleted]);
+}
+
+- (void)testUndeleteCommittedPersistentRoot
+{
+    ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];    
+    [ctx commit];
+    
+    [ctx deletePersistentRoot: persistentRoot];
+    [ctx commit];
+    
+    [persistentRoot setDeleted: NO];
+
+    UKTrue([[store persistentRootInfoForUUID: uuid] isDeleted]);
+    UKTrue([ctx hasChanges]);
+    UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
+    UKObjectsEqual(S(persistentRoot), [ctx persistentRootsPendingUndeletion]);
+    UKObjectsEqual(S(persistentRoot), [ctx deletedPersistentRoots]);
+    UKFalse([persistentRoot isDeleted]);
+    
+    [ctx commit];
+    
+    UKFalse([[store persistentRootInfoForUUID: uuid] isDeleted]);
+    UKFalse([ctx hasChanges]);
+    UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
+    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingUndeletion]);
+    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
+    UKFalse([persistentRoot isDeleted]);
 }
 
 - (void) testDeleteUncommittedBranch

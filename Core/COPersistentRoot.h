@@ -112,6 +112,14 @@
 @property (nonatomic, readonly) ETUUID *persistentRootUUID;
 
 /**
+ * The persistent root deletion status.
+ *
+ * If the persistent root is marked as deleted, the deletion is committed to the store
+ * on the next editing context commit.
+ */
+@property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
+
+/**
  * The editingBranch is not a persistent value, but is used by 
  * COPersistentRoot methods like -rootObject, -objectGraph, etc. as the
  * default object graph presented by the COPersistentRoot.

@@ -111,6 +111,32 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	return [self parentContext];
 }
 
+- (BOOL)isDeleted
+{
+    if ([[_parentContext persistentRootsPendingUndeletion] containsObject: self])
+        return NO;
+    
+    if ([[_parentContext persistentRootsPendingDeletion] containsObject: self])
+        return YES;
+    
+    if ([[_parentContext deletedPersistentRoots] containsObject: self])
+        return YES;    
+    
+    return NO;
+}
+
+- (void) setDeleted:(BOOL)deleted
+{
+    if (deleted)
+    {
+        [_parentContext deletePersistentRoot: self];
+    }
+    else
+    {
+        [_parentContext undeletePersistentRoot: self];
+    }
+}
+
 - (COBranch *)currentBranch
 {
 	return [_branchForUUID objectForKey: _currentBranchUUID];

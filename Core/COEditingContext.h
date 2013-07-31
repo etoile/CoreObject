@@ -49,7 +49,9 @@
 	/** Loaded (or inserted) persistent roots by UUID */
 	NSMutableDictionary *_loadedPersistentRoots;
     /** Set of persistent roots pending deletion */
-	NSMutableSet *_deletedPersistentRoots;
+	NSMutableSet *_persistentRootsPendingDeletion;
+    /** Set of persistent roots pending undeletion */
+	NSMutableSet *_persistentRootsPendingUndeletion;
 	COError *_error;
 }
 
@@ -141,12 +143,11 @@
  */
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
 
-- (void)deletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
-
 /** @taskunit Pending Changes */
 
 @property (nonatomic, copy, readonly) NSSet *persistentRootsPendingInsertion;
 @property (nonatomic, copy, readonly) NSSet *persistentRootsPendingDeletion;
+@property (nonatomic, copy, readonly) NSSet *persistentRootsPendingUndeletion;
 
 // TODO: updatedPersistentRoots?
 // TODO: changedPersistentRoots?
@@ -273,6 +274,9 @@
 - (id)crossPersistentRootReferenceWithPath: (COPath *)aPath;
 
 - (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot;
+
+- (void)deletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
+- (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
 
 /** @taskunit Deprecated, to be removed */
 

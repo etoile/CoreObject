@@ -12,7 +12,8 @@
 
 @implementation COEditingContext
 
-@synthesize persistentRootsPendingDeletion = _deletedPersistentRoots;
+@synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
+@synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
 
 + (COEditingContext *)contextWithURL: (NSURL *)aURL
 {
@@ -55,7 +56,8 @@ static COEditingContext *currentCtxt = nil;
 	ASSIGN(_store, store);
 	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
 	_loadedPersistentRoots = [NSMutableDictionary new];
-	_deletedPersistentRoots = [NSMutableSet new];
+	_persistentRootsPendingDeletion = [NSMutableSet new];
+    _persistentRootsPendingUndeletion = [NSMutableSet new];
 
 	[self registerAdditionalEntityDescriptions];
 
@@ -86,7 +88,8 @@ static COEditingContext *currentCtxt = nil;
 	DESTROY(_store);
 	DESTROY(_modelRepository);
 	DESTROY(_loadedPersistentRoots);
-	DESTROY(_deletedPersistentRoots);
+	DESTROY(_persistentRootsPendingDeletion);
+    DESTROY(_persistentRootsPendingUndeletion);
 	DESTROY(_error);
 	[super dealloc];
 }
@@ -123,14 +126,17 @@ static COEditingContext *currentCtxt = nil;
 
 - (NSSet *)persistentRoots
 {
+    // TODO: Revisit once we introduce persistent root faulting. Assumes all persistent roots are loaded.
+    
     NSMutableSet *result = [NSMutableSet setWithArray: [_loadedPersistentRoots allValues]];
-    
-    for (ETUUID *uuid in [_store persistentRootUUIDs])
+
+    for (ETUUID *uuid in [_store deletedPersistentRootUUIDs])
     {
-        [result addObject: [self persistentRootForUUID: uuid]];
+        [result removeObject: [self persistentRootForUUID: uuid]];
     }
-    
-    [result minusSet: _deletedPersistentRoots];
+
+    [result minusSet: _persistentRootsPendingDeletion];
+    [result unionSet: _persistentRootsPendingUndeletion];
     
     return result;
 }
@@ -281,11 +287,31 @@ static COEditingContext *currentCtxt = nil;
     if (![aPersistentRoot isPersistentRootCommitted])
     {
         [self unloadPersistentRoot: aPersistentRoot];
-        return;
+    }
+    else if ([_persistentRootsPendingUndeletion containsObject: aPersistentRoot])
+    {
+        [_persistentRootsPendingUndeletion removeObject: aPersistentRoot];
+    }
+    else
+    {
+        // NOTE: Deleted persistent roots are removed from the cache on commit.
+        [_persistentRootsPendingDeletion addObject: aPersistentRoot];
+        
     }
     
-	// NOTE: Deleted persistent roots are removed from the cache on commit.
-	[_deletedPersistentRoots addObject: aPersistentRoot];
+    [self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot];
+}
+
+- (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot
+{
+    if ([_persistentRootsPendingDeletion containsObject: aPersistentRoot])
+    {
+        [_persistentRootsPendingDeletion removeObject: aPersistentRoot];
+    }
+    else
+    {
+        [_persistentRootsPendingUndeletion addObject: aPersistentRoot];
+    }
     
     [self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot];
 }
@@ -360,7 +386,10 @@ static COEditingContext *currentCtxt = nil;
 
 - (BOOL)hasChanges
 {
-    if ([_deletedPersistentRoots count] > 0)
+    if ([_persistentRootsPendingDeletion count] > 0)
+        return YES;
+    
+    if ([_persistentRootsPendingUndeletion count] > 0)
         return YES;
     
 	for (COPersistentRoot *context in [_loadedPersistentRoots objectEnumerator])
@@ -482,12 +511,19 @@ static COEditingContext *currentCtxt = nil;
 	
 	for (COPersistentRoot *persistentRoot in persistentRoots)
 	{
-		if ([_deletedPersistentRoots containsObject: persistentRoot])
+        ETUUID *uuid = [persistentRoot persistentRootUUID];
+        
+		if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
         {
-            ETUUID *uuid = [persistentRoot persistentRootUUID];
-            [_store deletePersistentRoot: uuid error: NULL];
-
+            ETAssert([_store deletePersistentRoot: uuid error: NULL]);
+            [_persistentRootsPendingDeletion removeObject: persistentRoot];
+            
             [self unloadPersistentRoot: persistentRoot];
+        }
+        else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
+        {
+            ETAssert([_store undeletePersistentRoot: uuid error: NULL]);            
+            [_persistentRootsPendingUndeletion removeObject: persistentRoot];
         }
     }
 
@@ -509,10 +545,14 @@ static COEditingContext *currentCtxt = nil;
 
 - (void) unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
-    // FIXME: Implement.
-
-    [_deletedPersistentRoots removeObject: aPersistentRoot];
-    [_loadedPersistentRoots removeObjectForKey: [aPersistentRoot persistentRootUUID]];
+    // FIXME: Implement. For now, since we don't support faulting persistent
+    // roots, only release a persistent root if it's uncommitted.
+    
+    if (![aPersistentRoot isPersistentRootCommitted])
+    {
+        [_loadedPersistentRoots removeObjectForKey:
+            [aPersistentRoot persistentRootUUID]];
+    }
 }
 
 - (id)crossPersistentRootReferenceWithPath: (COPath *)aPath
