@@ -6,12 +6,18 @@
 @implementation COItem (JSON)
 
 static id plistValueForPrimitiveValue(id aValue, COType aType)
-{    
+{
+    if (aValue == [NSNull null])
+    {
+        return aValue;
+    }
+    
     switch (COPrimitiveType(aType))
     {
         case kCOInt64Type: return aValue;
         case kCODoubleType: return aValue;
         case kCOStringType: return aValue;
+        case kCOAttachmentType:
         case kCOBlobType: return [aValue base64String];
         case kCOCompositeReferenceType:
             return [aValue stringValue];
@@ -24,7 +30,6 @@ static id plistValueForPrimitiveValue(id aValue, COType aType)
             {
                 return [aValue stringValue];
             }
-        case kCOAttachmentType: return aValue;
         default:
             [NSException raise: NSInvalidArgumentException format: @"unknown type %d", aType];
             return nil;
@@ -50,11 +55,17 @@ static id plistValueForValue(id aValue, COType aType)
 
 static id valueForPrimitivePlistValue(id aValue, COType aType)
 {
+    if (aValue == [NSNull null])
+    {
+        return aValue;
+    }
+    
     switch (COPrimitiveType(aType))
     {
         case kCOInt64Type: return aValue;
         case kCODoubleType: return aValue;
         case kCOStringType: return aValue;
+        case kCOAttachmentType:
         case kCOBlobType: return [aValue base64DecodedData];
         case kCOCompositeReferenceType:
             return [ETUUID UUIDWithString: aValue];
@@ -66,8 +77,7 @@ static id valueForPrimitivePlistValue(id aValue, COType aType)
             else
             {
                 return [ETUUID UUIDWithString: aValue];
-            }
-        case kCOAttachmentType: return aValue;
+            } 
         default:
             [NSException raise: NSInvalidArgumentException format: @"unknown type %d", aType];
             return nil;

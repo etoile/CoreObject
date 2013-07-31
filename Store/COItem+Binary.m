@@ -205,7 +205,18 @@ static void co_read_string(void *ctx, NSString *val)
     switch (state->state)
     {
         case co_reader_expect_value:
-            co_read_object_value(state, val);
+            if (COPrimitiveType(state->currentType) == kCOReferenceType)
+            {
+                co_read_object_value(state, [COPath pathWithString: val]);
+            }
+            else if (COPrimitiveType(state->currentType) == kCOStringType)
+            {
+                co_read_object_value(state, val);
+            }
+            else
+            {
+                state->state = co_reader_error;
+            }
             break;
         case co_reader_expect_property:
             ASSIGN(state->currentProperty, val);
