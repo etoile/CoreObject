@@ -258,7 +258,12 @@
 
 - (COItemGraph *) itemTreeForRevid: (int64_t)revid
 {
-    return [self partialItemTreeFromRevid: -1 toRevid: revid restrictToItemUUIDs: nil];
+    COItemGraph *result = [self partialItemTreeFromRevid: -1 toRevid: revid restrictToItemUUIDs: nil];
+
+    // TODO: For debugging only, remove
+    COValidateItemGraph(result);
+    
+    return result;
 }
 
 - (COItemGraph *) itemTreeForRevid: (int64_t)revid restrictToItemUUIDs: (NSSet *)itemSet
@@ -335,6 +340,9 @@ static NSData *contentsBLOBWithItemTree(COItemGraph *anItemTree, NSArray *modifi
                withParent: (int64_t)aParent
             modifiedItems: (NSArray*)modifiedItems
 {
+    // TODO: For debugging only, remove
+    COValidateItemGraph(anItemTree);
+    
     BOOL inTransaction = [db_ inTransaction];
     if (!inTransaction)
     {

@@ -140,3 +140,57 @@
 
 @end
 
+
+/**
+ * For debugging
+ */
+void COValidateItemGraph(id<COItemGraph> aGraph)
+{
+    if (nil == [aGraph itemForUUID: [aGraph rootItemUUID]])
+    {
+        [NSException raise: NSInvalidArgumentException
+                    format: @"Graph root item is missing"];
+    }
+    
+    NSSet *uuidSet = [NSSet setWithArray: [aGraph itemUUIDs]];
+    
+    for (ETUUID *uuid in [aGraph itemUUIDs])
+    {
+        COItem *item = [aGraph itemForUUID: uuid];
+        
+        for (NSString *key in [item attributeNames])
+        {
+            id value = [item valueForAttribute: key];
+            COType type = [item typeForAttribute: key];
+            
+            // Check that the value conforms to the COType
+            
+            if (!COTypeValidateObject(type, value))
+            {
+                [NSException raise: NSInvalidArgumentException
+                            format: @"Property value %@ for key %@ (type %@) of object %@ is not valid",
+                                    value, key, COTypeDescription(type), uuid];
+            }
+            
+            // Check that all inner references can be resolved
+            
+            if (COPrimitiveType(type) == kCOReferenceType
+                || COPrimitiveType(type) == kCOCompositeReferenceType)
+            {
+                for (id subValue in
+                     [value respondsToSelector: @selector(objectEnumerator)] ? value : [NSArray arrayWithObject: value])
+                {
+                    if ([subValue isKindOfClass: [ETUUID class]])
+                    {
+                        if (![uuidSet containsObject: subValue])
+                        {
+                            [NSException raise: NSInvalidArgumentException
+                                        format: @"Object %@ has broken inner object reference %@", uuid, subValue];
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

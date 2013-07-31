@@ -62,3 +62,8 @@
 - (void) insertOrUpdateItems: (NSArray *)items;
 
 @end
+
+/**
+ * For debugging
+ */
+void COValidateItemGraph(id<COItemGraph> aGraph);
