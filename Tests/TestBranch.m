@@ -562,6 +562,8 @@
     COBranch *branchA = [photo1 currentBranch];
     COBranch *branchB = [branchA makeBranchWithLabel: @"branchB"];
     
+    [photo1 setEditingBranch: branchB]; // TODO: Workaround for -becomePersistentInContext: limitation, should be removed.
+    
     UKObjectsNotSame([branchA objectGraph], [branchB objectGraph]);
     UKObjectsNotSame([[branchA objectGraph] rootObject], [[branchB objectGraph] rootObject]);
     UKFalse([[branchA objectGraph] hasChanges]);
