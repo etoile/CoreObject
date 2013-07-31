@@ -349,7 +349,7 @@ See +[NSObject typePrefix]. */
 
 - (BOOL) isPersistent
 {
-	return (_objectGraphContext != nil);
+	return ([self persistentRoot] != nil);
 	// TODO: Switch to the code below on root object are saved in the db
 	// return (_persistentRoot != nil && _rootObject != nil);
 }

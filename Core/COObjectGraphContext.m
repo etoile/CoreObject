@@ -346,6 +346,10 @@
 
 - (COObject *) rootObject
 {
+	/* To support -rootObject access during the root object instantiation */
+	if ([self rootItemUUID] == nil)
+		return nil;
+
     return [self objectWithUUID: [self rootItemUUID]];
 }
 

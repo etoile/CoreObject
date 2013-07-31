@@ -119,7 +119,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		   group, but ignore it. At deseserialiation time, the app is responsible
 		   to add the item back to the window group (the parent item would be
 		   restored then). */
-		if ([value isPersistent])
+		if ([value isPersistent] || [value objectGraphContext] == [self objectGraphContext])
 		{
 			if ([value persistentRoot] == [self persistentRoot])
 			{
