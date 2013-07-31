@@ -18,6 +18,7 @@
 #import "CORevision.h"
 #import "COSerialization.h"
 #import "COSQLiteStore.h"
+#import "COCrossPersistentRootReferenceCache.h"
 
 @implementation COPersistentRoot
 
@@ -151,7 +152,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
     ASSIGN(_currentBranchUUID, [aTrack UUID]);
     
-    [[self parentContext] updateCrossPersistentRootReferencesToPersistentRoot: self];
+    [self updateCrossPersistentRootReferences];
 }
 
 - (COBranch *)editingBranch
@@ -486,6 +487,35 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         // FIXME: Don't use the user method -setCurrentRevision: because it might mark the branch as neededing to be committed!
         [[self branchForUUID: uuid] setCurrentRevision: [CORevision revisionWithStore: [self store] revisionID: [branchInfo currentRevisionID]]];
     }
+}
+
+- (void)updateCrossPersistentRootReferences
+{
+    NSArray *objs = [[_parentContext crossReferenceCache] affectedObjectsForChangeInPersistentRoot: [self persistentRootUUID]];
+    
+    for (COObject *obj in objs)
+    {
+        [obj updateCrossPersistentRootReferences];
+    }
+    
+    // TODO: May need something like this?
+//    for (COBranch *branch in [_branchForUUID allValues])
+//    {
+//        COObjectGraphContext *graph = [branch objectGraph];
+//        for (COObject *obj in [graph allObjects])
+//        {
+//            NSArray *persistentRoots = [[_parentContext crossReferenceCache] referencedPersistentRootUUIDsForObject: obj];
+//            for (ETUUID *persistentRootUUID in persistentRoots)
+//            {
+//                COPersistentRoot *persistentRoot = [_parentContext persistentRootForUUID: persistentRootUUID];
+//                for (COBranch *otherBranch in [persistentRoot->_branchForUUID allValues])
+//                {
+//                    COObjectGraphContext *otherGraph = [otherBranch objectGraph];
+//                    [[otherGraph rootObject] updateCrossPersistentRootReferences];                    
+//                }
+//            }
+//        }
+//    }
 }
 
 @end

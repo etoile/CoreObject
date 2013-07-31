@@ -306,7 +306,7 @@ static COEditingContext *currentCtxt = nil;
         
     }
     
-    [self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot];
+    [aPersistentRoot updateCrossPersistentRootReferences];
 }
 
 - (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot
@@ -320,7 +320,7 @@ static COEditingContext *currentCtxt = nil;
         [_persistentRootsPendingUndeletion addObject: aPersistentRoot];
     }
     
-    [self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot];
+    [aPersistentRoot updateCrossPersistentRootReferences];
 }
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid
@@ -592,16 +592,6 @@ static COEditingContext *currentCtxt = nil;
     
     COObjectGraphContext *objectGraph = [branch objectGraph];
     return [objectGraph rootObject];
-}
-
-- (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
-{
-    NSArray *objs = [_crossRefCache affectedObjectsForChangeInPersistentRoot: [aPersistentRoot persistentRootUUID]];
-    
-    for (COObject *obj in objs)
-    {
-        [obj updateCrossPersistentRootReferences];
-    }
 }
 
 // Notification handling

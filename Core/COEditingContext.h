@@ -275,8 +275,6 @@
 
 - (id)crossPersistentRootReferenceWithPath: (COPath *)aPath;
 
-- (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot;
-
 - (void)deletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
 - (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
 

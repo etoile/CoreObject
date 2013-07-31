@@ -30,6 +30,7 @@
     NSMutableDictionary *_persistentRootToObjects;
 }
 
+- (NSArray *) referencedPersistentRootUUIDsForObject: (COObject *)anObject;
 - (NSArray *) affectedObjectsForChangeInPersistentRoot: (ETUUID *)aPersistentRoot;
 
 - (void) clearReferencedPersistentRootsForObject: (COObject *)anObject;

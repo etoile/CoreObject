@@ -461,4 +461,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (void)storePersistentRootDidChange: (NSNotification *)notif;
 
+- (void) updateCrossPersistentRootReferences;
+
 @end

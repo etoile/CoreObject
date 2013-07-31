@@ -215,7 +215,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     _deleted = deleted;
     
-    [[_persistentRoot parentContext] updateCrossPersistentRootReferencesToPersistentRoot: _persistentRoot];
+    [_persistentRoot updateCrossPersistentRootReferences];
 }
 
 - (CORevision *)parentRevision

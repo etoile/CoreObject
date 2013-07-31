@@ -24,7 +24,13 @@
 
 - (NSArray *) affectedObjectsForChangeInPersistentRoot: (ETUUID *)aPersistentRoot
 {
-    NSSet *set = [_persistentRootToObjects objectForKey: aPersistentRoot];
+    NSHashTable *set = [_persistentRootToObjects objectForKey: aPersistentRoot];
+    return [set allObjects];
+}
+
+- (NSArray *) referencedPersistentRootUUIDsForObject: (COObject *)anObject
+{
+    NSSet *set = [_objectToPersistentRoots objectForKey: anObject];
     return [set allObjects];
 }
 
