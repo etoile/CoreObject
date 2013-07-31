@@ -252,6 +252,11 @@
                                            context: nil];
     if ([self persistentRoot] != nil)
     {
+        // FIXME: -becomePersistentInContext: inserts the object into the editingBranch.
+        // This is an awkward restriction which we should fix, at which time we
+        // can remove this assertion.
+        ETAssert([[[self persistentRoot] editingBranch] objectGraph] == self);
+        
         [obj becomePersistentInContext: [self persistentRoot]];
     }
     else

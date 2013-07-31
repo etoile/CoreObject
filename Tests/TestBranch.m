@@ -546,4 +546,54 @@
     
 }
 
+/**
+ * Currently this test will fail due to an assertion in
+ * -insertObjectWithEntityName:UUID:. 
+ *
+ * The root problem is
+ * -becomePersistentInContext: only supports inserting objects
+ * into the editing branch.
+ */
+- (void) testBranchObjectGraphs
+{
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [photo1 commit];
+    
+    COBranch *branchA = [photo1 currentBranch];
+    COBranch *branchB = [branchA makeBranchWithLabel: @"branchB"];
+    
+    UKObjectsNotSame([branchA objectGraph], [branchB objectGraph]);
+    UKObjectsNotSame([[branchA objectGraph] rootObject], [[branchB objectGraph] rootObject]);
+    UKFalse([[branchA objectGraph] hasChanges]);
+    UKFalse([[branchB objectGraph] hasChanges]);
+    
+    COObject *branchBroot = [[branchB objectGraph] rootObject];
+    [branchBroot setValue: @"photo1, branch B" forProperty: @"label"];
+    
+    UKFalse([[branchA objectGraph] hasChanges]);
+    UKTrue([[branchB objectGraph] hasChanges]);
+    UKObjectsEqual(S([branchBroot UUID]), SA([[branchA objectGraph] itemUUIDs]));
+    UKObjectsEqual(S([branchBroot UUID]), SA([[branchB objectGraph] itemUUIDs]));
+    
+    COObject *childB = [[branchB objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    [childB setValue: @"childB" forProperty: @"label"];
+    
+    UKFalse([[branchA objectGraph] hasChanges]);
+    UKTrue([[branchB objectGraph] hasChanges]);
+    UKObjectsEqual(S([branchBroot UUID]),                SA([[branchA objectGraph] itemUUIDs]));
+    UKObjectsEqual(S([branchBroot UUID], [childB UUID]), SA([[branchB objectGraph] itemUUIDs]));
+    
+    [branchBroot insertObject: childB atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+
+    UKFalse([[branchA objectGraph] hasChanges]);
+    UKTrue([[branchB objectGraph] hasChanges]);
+    UKObjectsEqual(S([branchBroot UUID]),                SA([[branchA objectGraph] itemUUIDs]));
+    UKObjectsEqual(S([branchBroot UUID], [childB UUID]), SA([[branchB objectGraph] itemUUIDs]));
+    
+    [ctx commit];
+    
+    UKFalse([[branchA objectGraph] hasChanges]);
+    UKFalse([[branchB objectGraph] hasChanges]);
+}
+
 @end
