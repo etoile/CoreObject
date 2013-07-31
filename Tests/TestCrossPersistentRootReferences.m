@@ -277,7 +277,7 @@
 	//
 	// photo1 <<persistent root>>
     //
-    // Test the effect of deleting photo1
+    // Test that deleting photo1 hides the child relationship in library1 to phtoto1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [[photo1 rootObject] setValue: @"photo1" forKey: @"label"];
@@ -309,7 +309,7 @@
 	//
 	// photo1 <<persistent root>>
     //
-    // Test the effect of deleting library1
+    // Test that deleting library1 hides the parent relationship in photo1 to library1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [[photo1 rootObject] setValue: @"photo1" forKey: @"label"];
@@ -332,6 +332,95 @@
     UKObjectsEqual([NSSet set], [[photo1 rootObject] valueForKeyPath: @"parentCollections.label"]);
     
     [ctx commit];
+}
+
+- (void) testPersistentRootUndeletion
+{
+    // library1 <<persistent root>>
+	//  |
+	//  \--photo1 // cross-persistent-root link
+	//
+	// photo1 <<persistent root>>
+    //
+    // Test that undeleting photo1 restores the child relationship in library1
+    
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [[photo1 rootObject] setValue: @"photo1" forKey: @"label"];
+    [photo1 commit];
+        
+    // Set up library
+    
+    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    /* This creates a reference to photo1. */
+    [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    
+    [ctx commit];
+    
+    // Delete photo1
+    
+    [ctx deletePersistentRoot: photo1];
+    [ctx commit];
+    
+    {
+        // Re-open in an independent context, to make sure we're not cheating
+        
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *library1ctx2 = [ctx2 persistentRootForUUID: [library1 persistentRootUUID]];
+        
+        UKFalse([[library1ctx2 objectGraph] hasChanges]);
+        UKObjectsEqual([NSSet set], [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+        
+        // Undelete photo1, which should restore the cross-root relationship
+        
+        COPersistentRoot *photo1ctx2 = [[ctx2 deletedPersistentRoots] anyObject];
+        [photo1ctx2 setDeleted: NO];
+        
+        UKFalse([[library1ctx2 objectGraph] hasChanges]);
+        UKObjectsEqual(S(@"photo1"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+    }
+}
+
+- (void) testLibraryPersistentRootUndeletion
+{
+    // library1 <<persistent root>>
+	//  |
+	//  \--photo1 // cross-persistent-root link
+	//
+	// photo1 <<persistent root>>
+    //
+    // Test that undeleting library1 restores the parent relationship in photo1
+    
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [[photo1 rootObject] setValue: @"photo1" forKey: @"label"];
+    [photo1 commit];
+    
+    // Set up library
+    
+    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    [[library1 rootObject] setValue: @"library1" forKey: @"label"];
+    [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    [ctx commit];
+    
+    [ctx deletePersistentRoot: library1];
+    [ctx commit];
+    
+    {
+        // Re-open in an independent context, to make sure we're not cheating
+        
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: [photo1 persistentRootUUID]];
+        
+        UKFalse([[photo1ctx2 objectGraph] hasChanges]);
+        UKObjectsEqual([NSSet set], [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
+        
+        // Undelete library1, which should restore the cross-root inverse relationship
+        
+        COPersistentRoot *library1ctx2 = [[ctx2 deletedPersistentRoots] anyObject];
+        [library1ctx2 setDeleted: NO];
+
+        UKFalse([[photo1ctx2 objectGraph] hasChanges]);
+        UKObjectsEqual(S(@"photo1"), [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
+    }
 }
 #endif
 /*
