@@ -350,7 +350,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (CORevision *)commitWithMetadata: (NSDictionary *)metadata
 {
-	NSArray *revs = [_parentContext commitWithMetadata: metadata
+	[_parentContext commitWithMetadata: metadata
 	                restrictedToPersistentRoots: A(self)];
 	//ETAssert([revs count] == 1);
 	//return [revs lastObject];
