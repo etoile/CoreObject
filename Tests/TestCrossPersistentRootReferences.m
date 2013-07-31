@@ -174,13 +174,10 @@
     
     COBranch *branchB = [[photo1 currentBranch] makeBranchWithLabel: @"branchB"];
     COObject *photo1branchBroot = [[branchB objectGraph] rootObject];
-
     [photo1branchBroot setValue: @"photo1, branch B" forKey: @"label"];
     
-    COObject *childB = [[branchB objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COObject *childB = [[photo1branchBroot valueForKey: @"contents"] firstObject];
     [childB setValue: @"childB" forKey: @"label"];
-    
-    [photo1branchBroot insertObject: childB atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     
     [ctx commit];
     
@@ -210,6 +207,14 @@
         
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *library1ctx2 = [ctx2 persistentRootForUUID: [library1 persistentRootUUID]];
+        COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: [photo1 persistentRootUUID]];
+        
+        // Sanity check
+        
+        UKObjectsEqual([branchB UUID], [[photo1ctx2 currentBranch] UUID]);
+        UKObjectsEqual(A(@"childB"), [[photo1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+        
+        // Actual test of cross-persistent-root references
         
         UKObjectsEqual(S(@"photo1, branch B"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
         UKObjectsEqual(S(A(@"childB")), [[library1ctx2 rootObject] valueForKeyPath: @"contents.contents.label"]);
