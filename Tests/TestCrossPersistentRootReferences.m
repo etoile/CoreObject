@@ -339,7 +339,9 @@
     // library1 <<persistent root>>
 	//  |
 	//  \--photo1 // cross-persistent-root link
-	//
+	//  |
+    //  \--photo2 // inner reference to embedded object
+    //
 	// photo1 <<persistent root>>
     //
     // Test that undeleting photo1 restores the child relationship in library1
@@ -361,6 +363,19 @@
     [ctx deletePersistentRoot: photo1];
     [ctx commit];
     
+    UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    
+    // Add photo2 embedded item. Note that the photo1 cross-persistent-root reference is
+    // still present in library1.contents, it's just hidden.
+    
+    COObject *photo2 = [library1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    [photo2 setValue: @"photo2" forKey: @"label"];
+    [[library1 rootObject] insertObject: photo2 atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    
+    UKObjectsEqual(S(@"photo2"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    
+    [ctx commit];
+    
     {
         // Re-open in an independent context, to make sure we're not cheating
         
@@ -368,7 +383,7 @@
         COPersistentRoot *library1ctx2 = [ctx2 persistentRootForUUID: [library1 persistentRootUUID]];
         
         UKFalse([[library1ctx2 objectGraph] hasChanges]);
-        UKObjectsEqual([NSSet set], [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+        UKObjectsEqual(S(@"photo2"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
         
         // Undelete photo1, which should restore the cross-root relationship
         
@@ -376,7 +391,7 @@
         [photo1ctx2 setDeleted: NO];
         
         UKFalse([[library1ctx2 objectGraph] hasChanges]);
-        UKObjectsEqual(S(@"photo1"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+        UKObjectsEqual(S(@"photo1", @"photo2"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
     }
 }
 
