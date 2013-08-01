@@ -563,7 +563,12 @@
 		assert([aProperty isKindOfClass: [NSString class]]);
 		[[_updatedPropertiesByObject objectForKey: obj] addObject: aProperty];
 	}
-    [modifiedObjects_ addObject: obj];
+    
+    // If it's already marked as inserted, don't mark it as modified
+    if (![insertedObjects_ containsObject: obj])
+    {
+        [modifiedObjects_ addObject: obj];
+    }
 }
 
 @end

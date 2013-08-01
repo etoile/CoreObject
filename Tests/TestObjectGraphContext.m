@@ -169,18 +169,18 @@ static NSString *kCOParent = @"parentContainer";
     COObject *itemA = [self addObjectWithLabel: @"ItemA" toObject: list1];
 	COObject *itemB = [self addObjectWithLabel: @"ItemB" toObject: list2];
     
-    UKObjectsEqual([list1 valueForKey: kCOContents], S(itemA));
-    UKObjectsEqual([list2 valueForKey: kCOContents], S(itemB));
+    UKObjectsEqual(A(itemA), [list1 valueForKey: kCOContents]);
+    UKObjectsEqual(A(itemB), [list2 valueForKey: kCOContents]);
     UKObjectsSame(list1, [itemA valueForKey: kCOParent]);
     UKObjectsSame(list2, [itemB valueForKey: kCOParent]);
     
     // move itemA to list2
     
-    [list2 setValue: S(itemA, itemB) forProperty: kCOContents];
+    [list2 setValue: A(itemA, itemB) forProperty: kCOContents];
 
     UKObjectsSame(list2, [itemA valueForKey: kCOParent]);
-    UKObjectsEqual([list1 valueForKey: kCOContents], [NSSet set]);
-    UKObjectsEqual([list2 valueForKey: kCOContents], S(itemA, itemB));
+    UKObjectsEqual([NSArray array], [list1 valueForKey: kCOContents]);
+    UKObjectsEqual(A(itemA, itemB), [list2 valueForKey: kCOContents]);
 }
 
 
@@ -277,20 +277,22 @@ static NSString *kCOParent = @"parentContainer";
 
 - (void)testChangeTrackingBasic
 {
-	COObjectGraphContext *ctx2 = [COObjectGraphContext objectGraphContext];
-	
-    UKObjectsEqual([NSSet set], [ctx2 insertedObjects]);
+    // HACK: COObjectGraphContext change tracking is disabled for non-persistent contexts
+	COObjectGraphContext *ctx2 = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] objectGraph];
+	COObject *root = [ctx2 rootObject];
+    
+    UKObjectsEqual(S(root), [ctx2 insertedObjects]);
     UKObjectsEqual([NSSet set], [ctx2 updatedObjects]);
     
     COObject *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
-    [ctx2 setRootObject: root2];
+    //[ctx2 setRootObject: root2];
     
     // This modifies root2, but since root2 is still newly inserted, we don't
     // count it as modified
     COObject *list1 = [self addObjectWithLabel: @"List1" toObject: root2];
 
     
-    UKObjectsEqual(S(list1, root2), [ctx2 insertedObjects]);
+    UKObjectsEqual(S(root, list1, root2), [ctx2 insertedObjects]);
     UKObjectsEqual([NSSet set], [ctx2 updatedObjects]);
     
     [ctx2 clearChangeTracking];
