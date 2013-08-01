@@ -394,7 +394,7 @@
  * and which branches reference that revision ID, but that should be really fast.
  */
 - (void) updateSearchIndexesForItemUUIDs: (NSArray *)modifiedItems
-                              inItemTree: (COItemGraph *)anItemTree
+                              inItemTree: (id<COItemGraph>)anItemTree
                   revisionIDBeingWritten: (CORevisionID *)aRevision
 {
     if (modifiedItems == nil)
@@ -467,7 +467,7 @@
     return result;
 }
 
-- (CORevisionID *) writeContents: (COItemGraph *)anItemTree
+- (CORevisionID *) writeContents: (id<COItemGraph>)anItemTree
                     withMetadata: (NSDictionary *)metadata
                 parentRevisionID: (CORevisionID *)aParent
                    modifiedItems: (NSArray*)modifiedItems // array of COUUID
@@ -485,7 +485,7 @@
                  modifiedItems: modifiedItems];
 }
 
-- (CORevisionID *) writeItemTreeWithNoParent: (COItemGraph *)anItemTree
+- (CORevisionID *) writeItemTreeWithNoParent: (id<COItemGraph>)anItemTree
                                 withMetadata: (NSDictionary *)metadata
                       inBackingStoreWithUUID: (ETUUID *)aBacking
 {
@@ -497,7 +497,7 @@
 }
 
 
-- (CORevisionID *) writeItemTree: (COItemGraph *)anItemTree
+- (CORevisionID *) writeItemTree: (id<COItemGraph>)anItemTree
                     withMetadata: (NSDictionary *)metadata
                  withParentRevid: (int64_t)parentRevid
           inBackingStoreWithUUID: (ETUUID *)aBacking

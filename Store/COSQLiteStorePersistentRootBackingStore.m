@@ -275,7 +275,7 @@
 }
 
 
-static NSData *contentsBLOBWithItemTree(COItemGraph *anItemTree, NSArray *modifiedItems)
+static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *modifiedItems)
 {
     NSMutableData *result = [NSMutableData dataWithCapacity: 64536];
     
@@ -338,7 +338,7 @@ static NSData *contentsBLOBWithItemTree(COItemGraph *anItemTree, NSArray *modifi
  * @param aParent -1 for no parent, otherwise the parent of this commit
  * @param modifiedItems nil for all items in anItemTree, otherwise a subset
  */
-- (int64_t) writeItemTree: (COItemGraph *)anItemTree
+- (int64_t) writeItemTree: (id<COItemGraph>)anItemTree
              withMetadata: (NSDictionary *)metadata
                withParent: (int64_t)aParent
             modifiedItems: (NSArray*)modifiedItems

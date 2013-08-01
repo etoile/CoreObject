@@ -52,7 +52,7 @@
  * 
  * @returns 0 for the first commit on an empty backing store
  */
-- (int64_t) writeItemTree: (COItemGraph *)anItemTree
+- (int64_t) writeItemTree: (id<COItemGraph>)anItemTree
              withMetadata: (NSDictionary *)metadata
                withParent: (int64_t)aParent
             modifiedItems: (NSArray*)modifiedItems; // array of COUUID
