@@ -849,8 +849,21 @@ See +[NSObject typePrefix]. */
             
             if (objectBeingInsertedParent != nil && objectBeingInsertedParent != self)
             {
-                // TODO: This was breaking EtoileUI, Re-enable
-                //[objectBeingInsertedParent removeObject: objectBeingInserted atIndex: ETUndeterminedIndex hint: nil forProperty: key];
+                BOOL alreadyRemoved = NO;
+                
+                if (![[objectBeingInsertedParent valueForKey: key] containsObject: objectBeingInserted])
+                {
+                    // This is sort of a hack for EtoileUI.
+                    // It handles removing the object from its old parent for us.
+                    // In that case, don't try to do it ourselves.
+                    // TODO: Decide the correct way to handle this
+                    alreadyRemoved = YES;
+                }
+                
+                if (!alreadyRemoved)
+                {
+                    [objectBeingInsertedParent removeObject: objectBeingInserted atIndex: ETUndeterminedIndex hint: nil forProperty: key];
+                }
             }
         }
     }

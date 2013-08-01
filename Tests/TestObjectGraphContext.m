@@ -49,7 +49,7 @@ static NSString *kCOParent = @"parentContainer";
     COObject *obj = [aCtx insertObjectWithEntityName: @"OutlineItem"];
 
     [obj setValue: label
-           forKey: kCOLabel];
+           forProperty: kCOLabel];
     
     return obj;
 }
@@ -137,7 +137,7 @@ static NSString *kCOParent = @"parentContainer";
     
     // Check that changes in the COObject don't propagate to the item
     
-    [root1 setValue: @"another label" forKey: kCOLabel];
+    [root1 setValue: @"another label" forProperty: kCOLabel];
     
     UKObjectsEqual(@"root1", [root1Item valueForAttribute: kCOLabel]);
     UKObjectsEqual(@"another label", [root1 valueForKey: kCOLabel]);
@@ -176,7 +176,7 @@ static NSString *kCOParent = @"parentContainer";
     
     // move itemA to list2
     
-    [list2 setValue: S(itemA, itemB) forKey: kCOContents];
+    [list2 setValue: S(itemA, itemB) forProperty: kCOContents];
 
     UKObjectsSame(list2, [itemA valueForKey: kCOParent]);
     UKObjectsEqual([list1 valueForKey: kCOContents], [NSSet set]);
@@ -301,7 +301,7 @@ static NSString *kCOParent = @"parentContainer";
     // After calling -clearChangeTracking, further changes to those recently inserted
     // objects count as modifications.
     
-    [root2 setValue: @"test" forKey: kCOLabel];
+    [root2 setValue: @"test" forProperty: kCOLabel];
     
     UKObjectsEqual([NSSet set], [ctx2 insertedObjects]);
     UKObjectsEqual(S(root2), [ctx2 updatedObjects]);
@@ -318,6 +318,22 @@ static NSString *kCOParent = @"parentContainer";
 	COObject *leaf3 = [self addObjectWithLabel: @"Leaf3" toObject: group2];
 	
 	COObject *document2 = [self addObjectWithLabel: @"Document2" toObject: workspace];
+
+    UKNil([root1 valueForKey: kCOParent]);
+    UKObjectsSame(root1, [workspace valueForKey: kCOParent]);
+    UKObjectsSame(workspace, [document1 valueForKey: kCOParent]);
+	UKObjectsSame(document1, [group1 valueForKey: kCOParent]);
+    UKObjectsSame(group1, [leaf1 valueForKey: kCOParent]);
+    UKObjectsSame(group1, [leaf2 valueForKey: kCOParent]);
+    UKObjectsSame(document1, [group2 valueForKey: kCOParent]);
+    UKObjectsSame(group2, [leaf3 valueForKey: kCOParent]);
+	UKObjectsSame(workspace, [document2 valueForKey: kCOParent]);
+
+	UKObjectsEqual(A(document1, document2), [workspace valueForKey: kCOContents]);
+	UKObjectsEqual(A(group1, group2), [document1 valueForKey: kCOContents]);
+	UKObjectsEqual([NSArray array], [document2 valueForKey: kCOContents]);
+	UKObjectsEqual(A(leaf1, leaf2), [group1 valueForKey: kCOContents]);
+	UKObjectsEqual(A(leaf3), [group2 valueForKey: kCOContents]);
     
 	// Now make some changes
     
@@ -331,11 +347,11 @@ static NSString *kCOParent = @"parentContainer";
 	UKObjectsSame(group1, [leaf1 valueForKey: kCOParent]);
 	UKObjectsSame(group2, [leaf2 valueForKey: kCOParent]);
 	UKObjectsSame(group2, [leaf3 valueForKey: kCOParent]);
-	UKObjectsEqual(S(document1, document2), [workspace valueForKey: kCOContents]);
-	UKObjectsEqual(S(group1), [document1 valueForKey: kCOContents]);
-	UKObjectsEqual(S(group2), [document2 valueForKey: kCOContents]);
-	UKObjectsEqual(S(leaf1), [group1 valueForKey: kCOContents]);
-	UKObjectsEqual(S(leaf2, leaf3), [group2 valueForKey: kCOContents]);
+	UKObjectsEqual(A(document1, document2), [workspace valueForKey: kCOContents]);
+	UKObjectsEqual(A(group1), [document1 valueForKey: kCOContents]);
+	UKObjectsEqual(A(group2), [document2 valueForKey: kCOContents]);
+	UKObjectsEqual(A(leaf1), [group1 valueForKey: kCOContents]);
+	UKObjectsEqual(A(leaf3, leaf2), [group2 valueForKey: kCOContents]);
 }
 
 // Done up to this line....
