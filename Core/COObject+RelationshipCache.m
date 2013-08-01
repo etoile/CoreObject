@@ -41,12 +41,14 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
             {
                 for (COObject *obj in aValue)
                 {
-                    [[obj relationshipCache] removeReferencesForPropertyInSource: [aProperty name]];
+                    [[obj relationshipCache] removeReferencesForPropertyInSource: [aProperty name]
+                                                                    sourceObject: self];
                 }
             }
             else
             {
-                [[(COObject *)aValue relationshipCache] removeReferencesForPropertyInSource: [aProperty name]];
+                [[(COObject *)aValue relationshipCache] removeReferencesForPropertyInSource: [aProperty name]
+                                                                               sourceObject: self];
             }
             
             // Update the cross-persistent root reference cache

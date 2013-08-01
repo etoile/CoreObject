@@ -105,10 +105,6 @@ static NSString *kCOParent = @"parentContainer";
 	COObject *o2 = [self addObjectWithLabel: @"Gift" toObject: o1];
     UKNotNil(o1);
     
-    // FIXME: Right now this is failing because COObject tries to resolve
-    // all references on the first call to -[COObjectGraphContext addItem:].
-    //
-    // We need to defer that somehow
     ETUUID *o1copyUUID = [copier copyItemWithUUID: [o1 UUID]
                                             fromGraph: ctx1
                                               toGraph: ctx2];
@@ -219,27 +215,34 @@ static NSString *kCOParent = @"parentContainer";
 }
 
 - (void) testManyToMany
-{
-#if 0
-    COObject *t1 = [self addObjectWithLabel: @"tag1" toObject: root1];
-    COObject *t2 = [self addObjectWithLabel: @"tag2" toObject: root1];
-    COObject *t3 = [self addObjectWithLabel: @"tag3" toObject: root1];
+{    
+    COObject *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
+    COObject *tag2 = [ctx1 insertObjectWithEntityName: @"Tag"];
+    COObject *tag3 = [ctx1 insertObjectWithEntityName: @"Tag"];
+    [tag1 setValue: @"tag1" forProperty: kCOLabel];
+    [tag2 setValue: @"tag2" forProperty: kCOLabel];
+    [tag3 setValue: @"tag3" forProperty: kCOLabel];
     
-    COObject *o1 = [self addObjectWithLabel: @"object1" toObject: root1];
-    COObject *o2 = [self addObjectWithLabel: @"object2" toObject: root1];
+    COObject *o1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    COObject *o2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    [o1 setValue: @"o1" forProperty: kCOLabel];
+    [o2 setValue: @"o2" forProperty: kCOLabel];
     
-    [self addReferenceToObject: o1 toObject: t1];
-    [self addReferenceToObject: o1 toObject: t2];
+    [tag1 insertObject:o1 atIndex:ETUndeterminedIndex hint:nil forProperty:kCOContents];
+    [tag2 insertObject:o1 atIndex:ETUndeterminedIndex hint:nil forProperty:kCOContents];
+    
+	UKObjectsEqual(S(tag1, tag2),   [o1 valueForProperty: @"parentCollections"]);
+	UKObjectsEqual([NSSet set], [o2 valueForProperty: @"parentCollections"]);
 
-	UKObjectsEqual(S(t1, t2), [ctx1 objectsWithReferencesToObject:o1 inAttribute:kCOReferences]);
-	UKObjectsEqual([NSSet set], [ctx1 objectsWithReferencesToObject:o2 inAttribute:kCOReferences]);
+    [tag3 insertObject:o1 atIndex:ETUndeterminedIndex hint:nil forProperty:kCOContents];
+    
+    UKObjectsEqual(S(tag1, tag2, tag3), [o1 valueForProperty: @"parentCollections"]);
+    UKObjectsEqual([NSSet set], [o2 valueForProperty: @"parentCollections"]);
+    
+    [tag2 insertObject:o2 atIndex:ETUndeterminedIndex hint:nil forProperty:kCOContents];
 
-    [self addReferenceToObject: o1 toObject: t3];
-    [self addReferenceToObject: o2 toObject: t2];
-
-	UKObjectsEqual(S(t1, t2, t3), [ctx1 objectsWithReferencesToObject:o1 inAttribute:kCOReferences]);
-	UKObjectsEqual(S(t2), [ctx1 objectsWithReferencesToObject:o2 inAttribute:kCOReferences]);
-#endif
+	UKObjectsEqual(S(tag1, tag2, tag3), [o1 valueForProperty: @"parentCollections"]);
+	UKObjectsEqual(S(tag2),         [o2 valueForProperty: @"parentCollections"]);
 }
 
 - (void)testCopyingBetweenContextsWithManyToMany
