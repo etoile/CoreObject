@@ -135,4 +135,37 @@ static ETUUID *drawing2;
     UKObjectsEqual(style1, shape1CopyStyle1);
 }
 
+- (void)testCopyingBetweenContextsWithManyToMany
+{
+    // FIXME: Fix this test
+#if 0
+	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
+    
+	COObject *tag1 = [self addObjectWithLabel: @"tag1" toObject: root1];
+	COObject *child = [self addObjectWithLabel: @"OutlineItem" toObject: root1];
+    
+	[self addReferenceToObject: child toObject: tag1];
+    
+	// Copy the tag collection to ctx2.
+	
+    ETUUID *tag1copyUUID = [copier copyItemWithUUID: [tag1 UUID]
+                                          fromGraph: ctx1
+                                            toGraph: ctx2];
+    UKObjectsNotEqual(tag1copyUUID, [tag1 UUID]);
+    
+    COObject *tag1copy = [ctx2 objectWithUUID: tag1copyUUID];
+    
+    UKIntsEqual(2, [[ctx2 itemUUIDs] count]);
+    
+    NSSet *refs = [tag1copy valueForKey: kCOReferences];
+    UKIntsEqual(1, [refs count]);
+    
+    COObject *childcopy = [refs anyObject];
+    UKObjectsNotEqual([childcopy UUID], [child UUID]);
+    UKObjectsEqual(@"OutlineItem", [childcopy valueForKey: kCOLabel]);
+    
+    // FIXME: At first glance this looks like ugly behaviour.
+#endif
+}
+
 @end

@@ -2,6 +2,7 @@
 #import <EtoileFoundation/Macros.h>
 #import <EtoileFoundation/ETUUID.h>
 #import "COItem.h"
+#import "COItem+JSON.h"
 
 @implementation COItemGraph
 
@@ -95,34 +96,6 @@
 /**
  * For debugging/testing only
  */
-- (BOOL) isEqualToItemTree: (COItemGraph *)aTree
-         comparingItemUUID: (ETUUID *)aUUID
-{
-    COItem *my = [self itemForUUID: aUUID];
-    COItem *other = [aTree itemForUUID: aUUID];
-    if (![my isEqual: other])
-    {
-        return NO;
-    }
-    
-    if (![[my embeddedItemUUIDs] isEqual: [other embeddedItemUUIDs]])
-    {
-        return NO;
-    }
-    
-    for (ETUUID *aChild in [my embeddedItemUUIDs])
-    {
-        if (![self isEqualToItemTree: aTree comparingItemUUID: aChild])
-        {
-            return NO;
-        }
-    }
-    return YES;
-}
-
-/**
- * For debugging/testing only
- */
 - (BOOL) isEqual:(id)object
 {
     //NSLog(@"WARNING, COItemGraph should be compared for debugging only");
@@ -131,11 +104,8 @@
     {
         return NO;
     }
-    if (![[object rootItemUUID] isEqual: rootItemUUID_])
-    {
-        return NO;
-    }
-    return [self isEqualToItemTree: object comparingItemUUID: rootItemUUID_];
+    
+    return COItemGraphEqualToItemGraph(self, object);
 }
 
 @end
@@ -194,3 +164,76 @@ void COValidateItemGraph(id<COItemGraph> aGraph)
     }
 }
 
+NSData *COItemGraphToJSONData(id<COItemGraph> aGraph)
+{
+    NSMutableDictionary *objectsDict = [NSMutableDictionary dictionary];
+    for (ETUUID *uuid in [aGraph itemUUIDs])
+    {
+        COItem *item = [aGraph itemForUUID: uuid];
+        id objectPlist = [item JSONPlist];
+        [objectsDict setObject: objectPlist
+                        forKey: [uuid stringValue]];
+    }
+    
+    NSDictionary *graphDict = D(objectsDict, @"objects",
+                                [[aGraph rootItemUUID] stringValue], @"rootObjectUUID");
+    
+    return [NSJSONSerialization dataWithJSONObject: graphDict options: 0 error: NULL];
+}
+
+COItemGraph *COItemGraphFromJSONData(NSData *json)
+{
+    id plist = [NSJSONSerialization JSONObjectWithData: json options:0 error: NULL];
+    id objectsPlist = [plist objectForKey: @"objects"];
+    ETUUID *rootObjectUUID = [ETUUID UUIDWithString: [plist objectForKey: @"rootObjectUUID"]];
+    NSMutableDictionary *itemForUUID = [NSMutableDictionary dictionary];
+    
+    for (NSString *uuidString in objectsPlist)
+    {
+        COItem *item = [[COItem alloc] initWithJSONPlist: [objectsPlist objectForKey: uuidString]];
+        [itemForUUID setObject: item
+                        forKey: [item UUID]];
+        [item release];
+    }
+    
+    COItemGraph *graph = [[COItemGraph alloc] initWithItemForUUID: itemForUUID
+                                                     rootItemUUID: rootObjectUUID];
+    return graph;
+}
+
+/**
+ * For debugging/testing only
+ */
+static BOOL COItemGraphEqualToItemGraphComparingItemUUID(id<COItemGraph> first, id<COItemGraph> second, ETUUID *aUUID)
+{
+    COItem *my = [first itemForUUID: aUUID];
+    COItem *other = [second itemForUUID: aUUID];
+    if (![my isEqual: other])
+    {
+        return NO;
+    }
+    
+    if (![[my embeddedItemUUIDs] isEqual: [other embeddedItemUUIDs]])
+    {
+        return NO;
+    }
+    
+    for (ETUUID *aChild in [my embeddedItemUUIDs])
+    {
+        if (!COItemGraphEqualToItemGraphComparingItemUUID(first, second, aChild))
+        {
+            return NO;
+        }
+    }
+    return YES;
+}
+
+BOOL COItemGraphEqualToItemGraph(id<COItemGraph> first, id<COItemGraph> second)
+{
+    if (![[first rootItemUUID] isEqual: [second rootItemUUID]])
+    {
+        return NO;
+    }
+    
+    return COItemGraphEqualToItemGraphComparingItemUUID(first, second, [first rootItemUUID]);
+}

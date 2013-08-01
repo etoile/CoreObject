@@ -179,41 +179,6 @@ static NSString *kCOParent = @"parentContainer";
     UKObjectsEqual(A(itemA, itemB), [list2 valueForKey: kCOContents]);
 }
 
-
-- (void)testContextCopyContextEqualityAndObjectEquality
-{
-    // FIXME: Fix this test
-#if 0
-    COObject *list1 = [self addObjectWithLabel: @"List1" toObject: root1];
-    COObject *itemA = [self addObjectWithLabel: @"ItemA" toObject: list1];
-    COObject *itemA1 = [self addObjectWithLabel: @"ItemA1" toObject: itemA];
-    
-    COObjectGraphContext *ctx2 = [ctx1 copy];
-    
-    UKObjectsEqual(ctx1, ctx2);
-    UKObjectsEqual([ctx1 rootObject], [ctx2 rootObject]);
-    
-    // now make an edit in ctx2
-    
-    COObject *itemACtx2 = [ctx2 objectWithUUID: [itemA UUID]];
-    
-    [itemACtx2 setValue: @"modified" forKey: kCOLabel type: kCOStringType];
-    
-    UKObjectsNotEqual(ctx1, ctx2);
-    UKObjectsNotEqual([ctx1 rootObject], [ctx2 rootObject]);
-    UKObjectsNotEqual(list1, [ctx2 objectWithUUID: [list1 UUID]]);
-    UKObjectsNotEqual(itemA, [ctx2 objectWithUUID: [itemA UUID]]);
-    UKObjectsEqual(itemA1, [ctx2 objectWithUUID: [itemA1 UUID]]);
-    
-    // undo the change
-    
-    [itemACtx2 setValue: @"ItemA" forKey: kCOLabel];
-    
-    UKObjectsEqual(ctx1, ctx2);
-    UKObjectsEqual([ctx1 rootObject], [ctx2 rootObject]);
-#endif
-}
-
 - (void) testManyToMany
 {    
     COObject *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
@@ -243,39 +208,6 @@ static NSString *kCOParent = @"parentContainer";
 
 	UKObjectsEqual(S(tag1, tag2, tag3), [o1 valueForProperty: @"parentCollections"]);
 	UKObjectsEqual(S(tag2),         [o2 valueForProperty: @"parentCollections"]);
-}
-
-- (void)testCopyingBetweenContextsWithManyToMany
-{
-    // FIXME: Fix this test
-#if 0
-	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
-    
-	COObject *tag1 = [self addObjectWithLabel: @"tag1" toObject: root1];
-	COObject *child = [self addObjectWithLabel: @"OutlineItem" toObject: root1];
-    
-	[self addReferenceToObject: child toObject: tag1];
-    
-	// Copy the tag collection to ctx2.
-	
-    ETUUID *tag1copyUUID = [copier copyItemWithUUID: [tag1 UUID]
-                                          fromGraph: ctx1
-                                            toGraph: ctx2];
-    UKObjectsNotEqual(tag1copyUUID, [tag1 UUID]);
-    
-    COObject *tag1copy = [ctx2 objectWithUUID: tag1copyUUID];
-    
-    UKIntsEqual(2, [[ctx2 itemUUIDs] count]);
-    
-    NSSet *refs = [tag1copy valueForKey: kCOReferences];
-    UKIntsEqual(1, [refs count]);
-    
-    COObject *childcopy = [refs anyObject];
-    UKObjectsNotEqual([childcopy UUID], [child UUID]);
-    UKObjectsEqual(@"OutlineItem", [childcopy valueForKey: kCOLabel]);
-    
-    // FIXME: At first glance this looks like ugly behaviour.
-#endif
 }
 
 - (void)testChangeTrackingBasic
@@ -357,68 +289,59 @@ static NSString *kCOParent = @"parentContainer";
 	UKObjectsEqual(A(group2), [document2 valueForKey: kCOContents]);
 	UKObjectsEqual(A(leaf1), [group1 valueForKey: kCOContents]);
 	UKObjectsEqual(A(leaf3, leaf2), [group2 valueForKey: kCOContents]);
+    
+    // Test JSON roundtrip
+    
+    NSData *data = COItemGraphToJSONData(ctx1);
+    COItemGraph *graph = COItemGraphFromJSONData(data);
+    
+    UKTrue(COItemGraphEqualToItemGraph(ctx1, graph));
 }
+
 
 // Done up to this line....
 #if 0
 
-
-
-- (void) testSubtreeCreationFromItemsWithCycle
-{
-	COMutableItem *parent = [COMutableItem item];
-	COMutableItem *child = [COMutableItem item];
-	[parent setValue: [child UUID] forKey: @"cycle" type: kCOCompositeReferenceType];
-	[child setValue: [parent UUID] forKey: @"cycle" type: kCOCompositeReferenceType];
-    
-    UKRaisesException([COItemTree itemTreeWithItems: A(parent, child) rootItemUUID: [parent UUID]]);
-}
-
-
 - (void) testSubtreeBasic
 {
-	COEditingContext *ctx1 = [[COEditingContext alloc] init];
-    COObject *t1 = [ctx1 rootObject];
+	UKNotNil([root1 UUID]);
+	UKNil([root1 valueForProperty: kCOParent]);
+	UKObjectsSame(root1, [root1 rootObject]);
 	
-	UKNotNil([t1 UUID]);
-	UKNil([t1 parentObject]);
-	UKObjectsSame(t1, [t1 rootObject]);
-	UKTrue([t1 containsObject: t1]);
+    COObject *t2 = [root1 addObjectToContents: [self itemWithLabel: @"t2"]];
 	
-    COObject *t2 = [t1 addObjectToContents: [self itemWithLabel: @"t2"]];
+	UKObjectsSame(root1, [t2 parentObject]);
+	UKObjectsSame(root1, [t2 rootObject]);
+	UKNil([root1 parentObject]);
+	UKObjectsSame(root1, [root1 rootObject]);
 	
-	UKObjectsSame(t1, [t2 parentObject]);
-	UKObjectsSame(t1, [t2 rootObject]);
-	UKNil([t1 parentObject]);
-	UKObjectsSame(t1, [t1 rootObject]);
-	
-	UKTrue([t1 containsObject: t2]);
-	UKObjectsEqual(S([t1 UUID], [t2 UUID]), [t1 allObjectUUIDs]);
-	UKObjectsEqual(S([t2 UUID]), [t1 allDescendentObjectUUIDs]);
-	UKObjectsEqual(S([t2 UUID]), [t1 directDescendentObjectUUIDs]);
-	UKObjectsEqual(S(t2), [t1 valueForKey: kCOContents]);
-	UKIntsEqual(2, [[t1 allStoreItems] count]);
+	UKTrue([root1 containsObject: t2]);
+	UKObjectsEqual(S([root1 UUID], [t2 UUID]), [root1 allObjectUUIDs]);
+	UKObjectsEqual(S([t2 UUID]), [root1 allDescendentObjectUUIDs]);
+	UKObjectsEqual(S([t2 UUID]), [root1 directDescendentObjectUUIDs]);
+	UKObjectsEqual(S(t2), [root1 valueForKey: kCOContents]);
+	UKIntsEqual(2, [[root1 allStoreItems] count]);
 	UKIntsEqual(1, [[t2 allObjectUUIDs] count]);
-	UKTrue(t2 == [t1 descendentobjectWithUUID: [t2 UUID]]);
-	UKObjectsEqual([COItemPath pathWithItemUUID: [t1 UUID]
+	UKTrue(t2 == [root1 descendentobjectWithUUID: [t2 UUID]]);
+	UKObjectsEqual([COItemPath pathWithItemUUID: [root1 UUID]
                         unorderedCollectionName: kCOContents
                                            type: kCOCompositeReferenceType | kCOSetType],
-                   [t1 itemPathOfDescendentObjectWithUUID: [t2 UUID]]);
+                   [root1 itemPathOfDescendentObjectWithUUID: [t2 UUID]]);
 	
     COObject *t3 = [t2 addObjectToContents: [self itemWithLabel: @"t3"]];
 	
-	UKTrue([t1 containsObject: t3]);
-	UKObjectsEqual(S([t1 UUID], [t2 UUID], [t3 UUID]), [t1 allObjectUUIDs]);
-	UKObjectsEqual(S([t2 UUID], [t3 UUID]), [t1 allDescendentObjectUUIDs]);
-	UKObjectsEqual(S([t2 UUID]), [t1 directDescendentObjectUUIDs]);
-	UKObjectsEqual(S(t2), [t1 valueForKey: kCOContents]);
-	UKIntsEqual(3, [[t1 allStoreItems] count]);
+	UKTrue([root1 containsObject: t3]);
+	UKObjectsEqual(S([root1 UUID], [t2 UUID], [t3 UUID]), [root1 allObjectUUIDs]);
+	UKObjectsEqual(S([t2 UUID], [t3 UUID]), [root1 allDescendentObjectUUIDs]);
+	UKObjectsEqual(S([t2 UUID]), [root1 directDescendentObjectUUIDs]);
+	UKObjectsEqual(S(t2), [root1 valueForKey: kCOContents]);
+	UKIntsEqual(3, [[root1 allStoreItems] count]);
 	UKIntsEqual(2, [[t2 allObjectUUIDs] count]);
-	UKObjectsSame(t3, [t1 descendentobjectWithUUID: [t3 UUID]]);
+	UKObjectsSame(t3, [root1 descendentobjectWithUUID: [t3 UUID]]);
 	UKObjectsEqual([COItemPath pathWithItemUUID: [t2 UUID]
                         unorderedCollectionName: kCOContents
                                            type: kCOCompositeReferenceType | kCOSetType],
-                   [t1 itemPathOfDescendentObjectWithUUID: [t3 UUID]]);
+                   [root1 itemPathOfDescendentObjectWithUUID: [t3 UUID]]);
 }
 
 - (void) testSubtreeCreationFromItems
@@ -454,21 +377,6 @@ static NSString *kCOParent = @"parentContainer";
 	// illegal, because "shared" is embedded in two places
 	
 	UKRaisesException([COSubtree subtreeWithItemSet: S(parent, child1, child2, shared) rootUUID: [parent UUID]]);
-}
-
-- (void) testSubtreePlistRoundTrip
-{
-	COSubtree *t1 = [COSubtree subtree];
-	COSubtree *t2 = [COSubtree subtree];
-	COSubtree *t3 = [COSubtree subtree];
-	[t1 addTree: t2];
-	[t2 addTree: t3];
-	
-	COSubtree *t1a = [COSubtree subtreeWithPlist: [t1 plist]];
-	UKObjectsEqual(t1, t1a);
-	
-	COSubtree *t2a = [COSubtree subtreeWithPlist: [t2 plist]];
-	UKObjectsEqual(t2, t2a);
 }
 
 #endif

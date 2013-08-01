@@ -67,3 +67,9 @@
  * For debugging
  */
 void COValidateItemGraph(id<COItemGraph> aGraph);
+
+NSData *COItemGraphToJSONData(id<COItemGraph> aGraph);
+
+COItemGraph *COItemGraphFromJSONData(NSData *json);
+
+BOOL COItemGraphEqualToItemGraph(id<COItemGraph> first, id<COItemGraph> second);
