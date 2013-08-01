@@ -261,7 +261,10 @@
     COItemGraph *result = [self partialItemTreeFromRevid: -1 toRevid: revid restrictToItemUUIDs: nil];
 
     // TODO: For debugging only, remove
-    COValidateItemGraph(result);
+    if (result != nil)
+    {
+        COValidateItemGraph(result);
+    }
     
     return result;
 }
