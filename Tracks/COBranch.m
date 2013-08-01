@@ -33,13 +33,16 @@
 /* Both root object and revision are lazily retrieved by the persistent root. 
    Until the loaded revision is known, it is useless to cache track nodes. */
 - (id)        initWithUUID: (ETUUID *)aUUID
+        objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
             persistentRoot: (COPersistentRoot *)aContext
 parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
 	NILARG_EXCEPTION_TEST(aUUID);
 	NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
 	NILARG_EXCEPTION_TEST(aContext);
-
+	INVALIDARG_EXCEPTION_TEST(anObjectGraphContext,
+		anObjectGraphContext == nil || [anObjectGraphContext branch] == nil);
+							  
 	if ([[aContext parentContext] store] == nil)
 	{
 		[NSException raise: NSInvalidArgumentException
@@ -53,8 +56,16 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	/* The persistent root retains us */
 	_persistentRoot = aContext;
 
-    _objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
-    
+	if (anObjectGraphContext == nil)
+	{
+    	_objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
+    }
+	else
+	{
+		ASSIGN(_objectGraph, anObjectGraphContext);
+		[anObjectGraphContext setBranch: self];
+	}
+
     if ([_persistentRoot persistentRootInfo] != nil
         && parentRevisionForNewBranch == nil)
     {

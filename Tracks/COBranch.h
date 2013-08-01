@@ -224,7 +224,8 @@
 /** @taskunit Private */
 
 - (id)        initWithUUID: (ETUUID *)aUUID
-            persistentRoot: (COPersistentRoot *)aContext
+        objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
+            persistentRoot: (COPersistentRoot *)aPersistentRoot
 parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch;
 
 - (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID;

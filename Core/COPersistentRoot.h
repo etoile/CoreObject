@@ -419,6 +419,7 @@
  */
 - (id) initWithInfo: (COPersistentRootInfo *)info
 cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
+ objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
       parentContext: (COEditingContext *)aCtxt;
 
 /**

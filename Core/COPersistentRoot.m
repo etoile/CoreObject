@@ -31,8 +31,18 @@
 
 - (id) initWithInfo: (COPersistentRootInfo *)info
 cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
+ objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
       parentContext: (COEditingContext *)aCtxt
 {
+	if (info != nil)
+    {
+		INVALIDARG_EXCEPTION_TEST(anObjectGrapContext, anObjectGraphContext == nil);
+    }
+	if (anObjectGraphContext != nil)
+	{
+		INVALIDARG_EXCEPTION_TEST(info, info == nil);
+		INVALIDARG_EXCEPTION_TEST(anObjectGraphContext, [anObjectGraphContext branch] == nil);
+	}
 	NILARG_EXCEPTION_TEST(aCtxt);
 
 	SUPERINIT;
@@ -48,6 +58,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         for (COBranchInfo *branchInfo in [[_savedState branchForUUID] allValues])
         {
             COBranch *branch = [[[COBranch alloc] initWithUUID: [branchInfo UUID]
+			                                objectGraphContext: nil
                                                 persistentRoot: self
                                     parentRevisionForNewBranch: nil] autorelease];
             
@@ -63,6 +74,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         ETUUID *branchUUID = [ETUUID UUID];
         
         COBranch *branch = [[[COBranch alloc] initWithUUID: branchUUID
+		                                objectGraphContext: anObjectGraphContext
                                             persistentRoot: self
                                 parentRevisionForNewBranch: cheapCopyRevisionID] autorelease];
         
@@ -454,6 +466,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
     COBranch *newBranch = [[[COBranch alloc] initWithUUID: [ETUUID UUID]
+	                                   objectGraphContext: nil
                                            persistentRoot: self
                                parentRevisionForNewBranch: [aRev revisionID]] autorelease];
     

@@ -101,6 +101,11 @@
     return branch_;
 }
 
+- (void)setBranch: (COBranch *)aBranch
+{
+	branch_ = aBranch;
+}
+
 - (COPersistentRoot *) persistentRoot
 {
     return [branch_ persistentRoot];

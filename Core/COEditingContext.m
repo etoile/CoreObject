@@ -210,7 +210,7 @@ static COEditingContext *currentCtxt = nil;
 	if (persistentRootFound == NO)
 		return nil;
 
-	persistentRoot = [self makePersistentRootWithInfo: info];
+	persistentRoot = [self makePersistentRootWithInfo: info objectGraphContext: nil];
 
 	return persistentRoot;
 }
@@ -218,24 +218,21 @@ static COEditingContext *currentCtxt = nil;
 // NOTE: Persistent root insertion or deletion are saved to the store at commit time.
 
 - (COPersistentRoot *)makePersistentRootWithInfo: (COPersistentRootInfo *)info
+                              objectGraphContext: (COObjectGraphContext *)anObjectGrapContext
 {
     if (info != nil)
     {
         NSParameterAssert(nil == [_loadedPersistentRoots objectForKey: [info UUID]]);
     }
     
-	COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: info
+    COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: info
                                                           cheapCopyRevisionID: nil
+	                                                       objectGraphContext: anObjectGrapContext
                                                                 parentContext: self];
 	[_loadedPersistentRoots setObject: persistentRoot
 							   forKey: [persistentRoot persistentRootUUID]];
 	[persistentRoot release];
 	return persistentRoot;
-}
-
-- (COPersistentRoot *)makePersistentRoot
-{
-    return [self makePersistentRootWithInfo: nil];
 }
 
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
@@ -246,7 +243,8 @@ static COEditingContext *currentCtxt = nil;
 							initWithUUID: [ETUUID UUID]
 							entityDescription: desc
 							context: nil];
-	COPersistentRoot *persistentRoot = [self makePersistentRoot];
+	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
+	                                                 objectGraphContext: nil];
 
 	/* Will set the root object on the persistent root */
 	[rootObject becomePersistentInContext: persistentRoot];
@@ -258,6 +256,7 @@ static COEditingContext *currentCtxt = nil;
 {
     COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: nil
                                                           cheapCopyRevisionID: aRevid
+	                                                       objectGraphContext: nil 
                                                                 parentContext: self];
 	[_loadedPersistentRoots setObject: persistentRoot
 							   forKey: [persistentRoot persistentRootUUID]];
@@ -284,8 +283,25 @@ static COEditingContext *currentCtxt = nil;
 {
 	// FIXME: COObjectGraphDiff prevents us to detect an invalid root object...
 	//NILARG_EXCEPTION_TEST(aRootObject);
-	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil];
+	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
+	                                                 objectGraphContext: nil];
 	[aRootObject becomePersistentInContext: persistentRoot];
+	return persistentRoot;
+}
+
+- (COPersistentRoot *)experimentalInsertNewPersistentRootWithRootObject: (COObject *)aRootObject
+{
+	COObjectGraphContext *objectGraphContext = [aRootObject objectGraphContext];
+
+	INVALIDARG_EXCEPTION_TEST(objectGraphContext, [objectGraphContext persistentRoot] == nil);
+	INVALIDARG_EXCEPTION_TEST(objectGraphContext,
+		[objectGraphContext rootObject] == nil || [objectGraphContext rootObject] == aRootObject);
+
+	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
+	                                                 objectGraphContext: objectGraphContext];
+
+	[objectGraphContext setRootObject: aRootObject];
+
 	return persistentRoot;
 }
 

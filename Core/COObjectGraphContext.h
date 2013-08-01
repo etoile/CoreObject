@@ -118,6 +118,7 @@
 
 #pragma mark COObject private
 
+- (void)setBranch: (COBranch *)aBranch;
 - (id) objectReferenceWithUUID: (ETUUID *)aUUID;
 /**
  * This method is only exposed to be used internally by CoreObject.

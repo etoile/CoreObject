@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COPersistentRoot, COEditingContext;
+@class COPersistentRoot, COEditingContext, COObjectGraphContext;
 @class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo, CORevisionID, COPath;
 @class COCrossPersistentRootReferenceCache;
 
@@ -144,7 +144,7 @@
  * belonging to aRootObject
  */
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
-
+- (COPersistentRoot *)experimentalInsertNewPersistentRootWithRootObject: (COObject *)aRootObject;
 /** @taskunit Pending Changes */
 
 @property (nonatomic, copy, readonly) NSSet *persistentRootsPendingInsertion;
@@ -238,7 +238,8 @@
  * In addition, a past revision can be passed to prevent loading the persistent 
  * root at the latest revision.
  */
-- (COPersistentRoot *)makePersistentRootWithInfo: (COPersistentRootInfo *)info;
+- (COPersistentRoot *)makePersistentRootWithInfo: (COPersistentRootInfo *)info
+                              objectGraphContext: (COObjectGraphContext *)anObjectGraphContext;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
