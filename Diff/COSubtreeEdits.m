@@ -86,7 +86,7 @@
 - (BOOL) isEqualIgnoringSourceIdentifier: (id)other
 {
 	return [super isEqualIgnoringSourceIdentifier: other]
-	&&	type != ((COSetAttribute*)other).type
+	&&	type == ((COSetAttribute*)other).type
 	&&	[value isEqual: ((COSetAttribute*)other).value];
 }
 

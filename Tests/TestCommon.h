@@ -15,6 +15,7 @@
 #import "COObjectGraphContext.h"
 #import "COObject.h"
 #import "COSerialization.h"
+#import "COItemGraphDiff.h"
 
 #define SA(x) [NSSet setWithArray: x]
 

@@ -31,6 +31,18 @@
     return self;
 }
 
+- (id) initWithItemGraph: (id<COItemGraph>)aGraph
+{
+    NSMutableArray *array = [NSMutableArray array];
+    
+    for (ETUUID *uuid in [aGraph itemUUIDs])
+    {
+        COItem *item = [aGraph itemForUUID: uuid];
+        [array addObject: item];
+    }
+    
+    return [self initWithItems: array rootItemUUID: [aGraph rootItemUUID]];
+}
 
 + (COItemGraph *)treeWithItemsRootFirst: (NSArray*)items
 {

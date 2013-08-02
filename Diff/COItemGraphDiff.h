@@ -72,7 +72,9 @@
                      withItemTree: (id <COItemGraph>)b
                  sourceIdentifier: (id)aSource;
 
-- (COItemGraph *) itemTreeWithDiffAppliedToItemTree: (COItemGraph *)aSubtree;
+- (void) applyTo: (id<COItemGraph>)dest;
+
+- (COItemGraph *) itemTreeWithDiffAppliedToItemGraph: (id<COItemGraph>)aSubtree;
 
 - (COItemGraphDiff *)itemTreeDiffByMergingWithDiff: (COItemGraphDiff *)other;
 

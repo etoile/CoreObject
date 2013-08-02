@@ -54,6 +54,8 @@
 - (id) initWithItems: (NSArray *)items
         rootItemUUID: (ETUUID *)root;
 
+- (id) initWithItemGraph: (id<COItemGraph>)aGraph;
+
 - (ETUUID *) rootItemUUID;
 - (COMutableItem *) itemForUUID: (ETUUID *)aUUID;
 

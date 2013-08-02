@@ -1,43 +1,43 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
 #import "TestCommon.h"
-#import "COContainer.h"
-#import "COGroup.h"
-#import "COObjectGraphDiff.h"
 
-@interface TestObjectGraphDiff : TestCommon <UKTest>
+@interface TestItemGraphDiff : TestCommon <UKTest>
 @end
 
-@implementation TestObjectGraphDiff
-
-#if 0
+@implementation TestItemGraphDiff
 
 - (void)testBasic
 {
-	COEditingContext *ctx1 = [[COEditingContext alloc] init];
-	COEditingContext *ctx2 = [[COEditingContext alloc] init];
+	COObjectGraphContext *ctx1 = [[COObjectGraphContext alloc] init];
+	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
 	
-	COContainer *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *subchild2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *subchild3 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx1 setRootObject: parent];
+	COObject *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *subchild2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *subchild3 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
 	[parent setValue: @"Shopping" forProperty: @"label"];
 	[child setValue: @"Groceries" forProperty: @"label"];
 	[subchild1 setValue: @"Pizza" forProperty: @"label"];
 	[subchild2 setValue: @"Salad" forProperty: @"label"];
 	[subchild3 setValue: @"Chips" forProperty: @"label"];
-	[child addObject: subchild1];
-	[child addObject: subchild2];
-	[child addObject: subchild3];
-	[parent addObject: child];
+	[child insertObject: subchild1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	[child insertObject: subchild2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	[child insertObject: subchild3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	[parent insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
-	COContainer *parentCtx2 = [ctx2 insertObject: parent];
-	COContainer *childCtx2 = [ctx2 insertObject: child];
-	COContainer *subchild1Ctx2 = [ctx2 insertObject: subchild1];
-	COContainer *subchild2Ctx2 = [ctx2 insertObject: subchild2];
-	COContainer *subchild3Ctx2 = [ctx2 insertObject: subchild3];	
+    // Copy the items to ctx2
+    [ctx2 setItemGraph: ctx1];
+    [ctx2 setRootObject: [ctx2 objectWithUUID: [parent UUID]]];
+    
+	COObject *parentCtx2 = [ctx2 rootObject];
+	COObject *childCtx2 = [ctx2 objectWithUUID: [child UUID]];
+	COObject *subchild1Ctx2 = [ctx2 objectWithUUID: [subchild1 UUID]];
+	COObject *subchild2Ctx2 = [ctx2 objectWithUUID: [subchild2 UUID]];
+	COObject *subchild3Ctx2 = [ctx2 objectWithUUID: [subchild3 UUID]];
 
 	UKObjectsEqual([parent UUID], [parentCtx2 UUID]);
 	UKObjectsEqual([child UUID], [childCtx2 UUID]);
@@ -47,34 +47,37 @@
 	
 	// Now make some modifications to ctx2: 
 	
-	[childCtx2 removeObject: subchild2Ctx2]; // Remove "Salad"
-	COContainer *subchild4Ctx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[childCtx2 removeObject: subchild2Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty:@"contents"]; // Remove "Salad"
+	COObject *subchild4Ctx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	ETUUID *subchild4UUID = [subchild4Ctx2 UUID];
 	[subchild4Ctx2 setValue: @"Salsa" forProperty: @"label"];
-	[childCtx2 addObject: subchild4Ctx2]; // Add "Salsa"
+	[childCtx2 insertObject: subchild4Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]; // Add "Salsa"
 	[childCtx2 setValue: @"Snacks" forProperty: @"label"];
 	
 	// Now create a diff
-	COObjectGraphDiff *diff = [COObjectGraphDiff diffContainer: parent withContainer: parentCtx2];
-	UKNotNil(diff);
+	COItemGraphDiff *diff = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"exampleDiff"];
+    UKNotNil(diff);
 	
 	// Apply it to ctx1.
 	
-	[diff applyToContext: ctx1];
+	[diff applyTo: ctx1];
 	
 	// Now check that all of the changes were properly made.
 	
 	UKStringsEqual(@"Snacks", [child valueForProperty: @"label"]);
-	UKObjectsSame(subchild1, [[child contentArray] objectAtIndex: 0]);
-	UKObjectsSame(subchild3, [[child contentArray] objectAtIndex: 1]);
-	COContainer *subchild4 = [[child contentArray] objectAtIndex: 2];
-	UKStringsEqual(@"Salsa", [subchild4	valueForProperty: @"label"]);
+    COObject *subchild4 = [[child valueForProperty: @"contents"] objectAtIndex: 2];
+    
+	UKObjectsSame(subchild1, [[child valueForProperty: @"contents"] objectAtIndex: 0]);
+    UKObjectsSame(subchild3, [[child valueForProperty: @"contents"] objectAtIndex: 1]);
+    UKObjectsSame(subchild4, [[child valueForProperty: @"contents"] objectAtIndex: 2]);
+    
+	UKObjectsEqual(A(@"Pizza", @"Chips", @"Salsa"), [child valueForKeyPath: @"contents.label"]);
 	UKObjectsEqual(subchild4UUID, [subchild4 UUID]);
-	UKObjectsSame(ctx1, [(id)[subchild4 persistentRoot] parentContext]);
-	
 	[ctx2 release];
 	[ctx1 release];
 }
+
+#if 0
 
 - (void)testMove
 {

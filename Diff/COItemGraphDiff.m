@@ -583,7 +583,12 @@ static void COAssertEditsEquivelant(NSSet *edits)
 		COItemGraphEdit *anyEdit = [edits anyObject];
 		for (COItemGraphEdit *edit in edits)
 		{
-			assert([edit isEqualIgnoringSourceIdentifier: anyEdit]);
+            BOOL ok = [edit isEqualIgnoringSourceIdentifier: anyEdit];
+            if (!ok)
+            {
+                [edit isEqualIgnoringSourceIdentifier: anyEdit];
+            }
+			assert(ok);
 		}
 	}
 }
@@ -668,73 +673,69 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 				format: @"unknown edit type %@", anyEdit];
 }
 
-- (COItemGraph *) itemTreeWithDiffAppliedToItemTree: (COItemGraph *)anItemTree
+- (void) applyTo: (id<COItemGraph>)dest
 {
 	/**
-	does applying a diff to a subtree in-place even make sense?
+     does applying a diff to a subtree in-place even make sense?
 	 
 	 any pointers to within the tree might point at deallocated objects
 	 after applying the diff, since any object could be deallocated.
 	 hence all pointers to within the subtree must be discarded
 	 
 	 also, if the root changes UUID, we would have to keep the same
-	 COItemTree object but change its UUID. sounds like applying 
+	 COItemTree object but change its UUID. sounds like applying
 	 diff in-place doesn't make much sense.
 	 
-		 => or we could require that subtree diffs don't change the root UUID.
-		 so if you want to diff/merge two subtrees with different roots, 
-		 you would have to wrap them in a container. not sure if that is good....
+     => or we could require that subtree diffs don't change the root UUID.
+     so if you want to diff/merge two subtrees with different roots,
+     you would have to wrap them in a container. not sure if that is good....
 	 
 	 */
-
-	if (![[anItemTree rootItemUUID] isEqual: oldRoot])
+    
+	if (![[dest rootItemUUID] isEqual: oldRoot])
 	{
 		[NSException raise: NSInvalidArgumentException
-					format: @"diff was created from a subtree with UUID %@ and being applied to a subtree with UUID %@", oldRoot, [anItemTree rootItemUUID]];
+					format: @"diff was created from a subtree with UUID %@ and being applied to a subtree with UUID %@", oldRoot, [dest rootItemUUID]];
 	}
 	
 	if ([self hasConflicts])
 	{
 		[NSException raise: NSInvalidArgumentException
-					format: @"resolve conflicts before applying diff"];	
+					format: @"resolve conflicts before applying diff"];
 	}
-	
-	// set up dictionary to store items in
-	
-	NSMutableDictionary *newItems = [NSMutableDictionary dictionary];
-	
-	for (ETUUID *oldItemUUID in [anItemTree itemUUIDs])
-	{
-        COItem *oldItem = [anItemTree itemForUUID: oldItemUUID];
-		[newItems setObject: [[oldItem mutableCopy] autorelease]
-					 forKey: [oldItem UUID]];
-	}
-	
+    
+    NSMutableArray *insertedOrUpdated = [NSMutableArray array];
+    
 	// apply all of the edits
 	
 	for (ETUUID *modifiedUUID in [diffDict allEditedUUIDs])
 	{
-		COMutableItem *item = [newItems objectForKey: modifiedUUID];
+		COMutableItem *item = [[[dest itemForUUID: modifiedUUID] mutableCopy] autorelease];
 		
 		if (item == nil)
 		{
-			item = [[COMutableItem alloc] initWithUUID: modifiedUUID];
-			[newItems setObject: item forKey: modifiedUUID];
-			[item release];
-		}		
+			item = [[[COMutableItem alloc] initWithUUID: modifiedUUID] autorelease];
+		}
 		
 		for (NSString *modifiedAttribute in [diffDict modifiedAttributesForUUID: modifiedUUID])
 		{
 			NSSet *edits = [diffDict editsForUUID: modifiedUUID attribute: modifiedAttribute];
-			
 			assert([edits count] > 0);
-		
+            
 			COApplyEditsToMutableItem(edits, item);
 		}
+        
+        [insertedOrUpdated addObject: item];
 	}
 	
-	return [[[COItemGraph alloc] initWithItemForUUID: newItems
-                                       rootItemUUID: newRoot] autorelease];
+    [dest insertOrUpdateItems: insertedOrUpdated];
+}
+
+- (COItemGraph *) itemTreeWithDiffAppliedToItemGraph: (id<COItemGraph>)aGraph
+{
+    COItemGraph *result = [[[COItemGraph alloc] initWithItemGraph: aGraph] autorelease];    
+    [self applyTo: result];
+    return result;
 }
 
 - (void) mergeWith: (COItemGraphDiff *)other
