@@ -5,8 +5,14 @@
 - (id) init
 {
     SUPERINIT;
-    
-    _objectToPersistentRoots = [[NSMapTable alloc] initWithKeyOptions: NSMapTableWeakMemory
+
+	// FIXME: For versions prior to 10.8, objects must be explicitly removed
+	// from the map table if manual reference couting is used.
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
+	_objectToPersistentRoots = [[NSMapTable alloc] initWithKeyOptions: NSMapTableWeakMemory
+#else
+	_objectToPersistentRoots = [[NSMapTable alloc] initWithKeyOptions: NSMapTableZeroingWeakMemory							
+#endif
                                                          valueOptions: NSMapTableStrongMemory
                                                              capacity: 16];
     
@@ -51,7 +57,13 @@
         NSHashTable *objectSet = [_persistentRootToObjects objectForKey: aPersistentRoot];
         if (objectSet == nil)
         {
-            objectSet = [NSHashTable weakObjectsHashTable];
+			// FIXME: For versions prior to 10.8, objects must be explicitly
+			// removed from the hash table if manual reference couting is used.
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
+			objectSet = [NSHashTable weakObjectsHashTable];
+#else
+            objectSet = [NSHashTable hashTableWithWeakObjects];
+#endif
             [_persistentRootToObjects setObject: objectSet forKey: aPersistentRoot];
         }
         [objectSet addObject: anObject];
