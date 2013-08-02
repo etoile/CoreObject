@@ -170,12 +170,17 @@
 
 - (id) objectReferenceWithUUID: (ETUUID *)aUUID
 {
-	ETAssert(_loadingItemGraph != nil);
 	COObject *loadedObject = [objectsByUUID_ objectForKey: aUUID];
 
 	if (loadedObject != nil)
 		return loadedObject;
 
+    // FIXME: This assertion was moved from the top of the function because
+    // the cross-persistent root reference code uses -objectReferenceWithUUID:
+    // directly without setting _loadingItemGraph. It probably shouldn't,
+    // re-evaluate.
+    ETAssert(_loadingItemGraph != nil);
+    
 	/* The metamodel cannot be used for the entity description because the 
 	   loaded object type could be a subtype of the type declared in the 
 	   metamodel. For example, a to-one relationship of type COObject could 
