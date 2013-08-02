@@ -722,4 +722,7 @@
 - (void) updateCrossPersistentRootReferences;
 
 - (void) markAsRemovedFromContext;
+
+- (void) setValue: (id)value forPropertyWithoutSetter: (NSString *)key;
+
 @end
