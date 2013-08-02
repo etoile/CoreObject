@@ -58,10 +58,44 @@
     [self validateRoundTrips: item];    
 }
 
+/* See basicNumberFromDecimalNumber() in COItem+JSON.m */
+- (void) testJSONDoubleEquality
+{
+	NSNumber *value = [NSNumber numberWithDouble: 123.456789012];
+	NSNumber *decimalValue = [NSDecimalNumber numberWithDouble: 123.456789012];
+	NSData *data = [NSJSONSerialization dataWithJSONObject: D(value, @"number") options: 0 error: NULL];
+	NSNumber *roundTripValue =
+		[[NSJSONSerialization JSONObjectWithData: data options: 0 error: NULL] objectForKey: @"number"];
+	NSNumber *newValue = [NSNumber numberWithDouble: [roundTripValue doubleValue]];
+	NSNumber *newValueFromDesc = [NSNumber numberWithDouble: [[roundTripValue description] doubleValue]];
+
+	UKTrue([[NSDecimalNumber defaultBehavior] scale] == NSDecimalNoScale);
+
+	NSLog(@"Double representation in JSON: %@",
+		  [[[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding] autorelease]);
+
+	/* Rounding is visible in the ouput for numbers that contain more than two 
+	   decimals on 10.7 (e.g. 123.45 output is the same for all numbers). */
+	NSLog(@"value            doubleValue: %.20f, description: %@, class: %@",
+		  [value doubleValue], value, [value class]);
+	NSLog(@"decimalValue     doubleValue: %.20f, description: %@, class: %@",
+		  [decimalValue doubleValue], decimalValue, [decimalValue class]);
+	NSLog(@"roundTripValue   doubleValue: %.20f, description: %@, class: %@",
+		  [roundTripValue doubleValue], roundTripValue, [roundTripValue class]);
+	NSLog(@"newValue         doubleValue: %.20f, description: %@, class: %@",
+		  [newValue doubleValue], newValue, [newValue class]);
+	NSLog(@"newValueFromDesc doubleValue: %.20f, description: %@, class: %@",
+		  [newValueFromDesc doubleValue], newValueFromDesc, [newValueFromDesc class]);
+
+	UKTrue([value compare: newValueFromDesc] == NSOrderedSame);
+	UKTrue([newValueFromDesc compare: value] == NSOrderedSame);
+}
+
 - (void) testDouble
 {
 	COMutableItem *item = [COMutableItem item];
     [item setValue: [NSNumber numberWithDouble: 3.14] forAttribute: @"3.14" type: kCODoubleType];
+	[item setValue: [NSNumber numberWithDouble: 123.456789012] forAttribute: @"123.456789012" type: kCODoubleType];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCODoubleType];
     
     [item setValue: A([NSNumber numberWithDouble: 3.14], [NSNumber numberWithDouble: 123.456789012])
