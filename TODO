@@ -23,7 +23,7 @@ First Release
     change main branch, change branch metadata, etc.) rather than committing them immediately
   x Maybe add method to get all persistent roots
   x Use notifications posted by COSQLiteStore
-  - add -insertNewPersistentWithObjectGraphContext: method
+  x add -insertNewPersistentWithObjectGraphContext: method
   - support "transient roots" in a COEditingContext. These are COObjectGraphContext wrappers.
     Or, support creating a persistent root in code, then calling "freeze" which will make it 
     read-only and prevent it from being committed to disk?
@@ -60,11 +60,13 @@ First Release
   - Finish COCopier
   - Support another reference type for copy: NOT a composite reference, but acts like one for the pruposes of copy. see the copy keynote, and the yellow arrows
 
-- Review metamodel constraints
+- Metamodel
   - Add checks that derived properties are not persistent
   - Add check that parent property (isContainer = YES) is derived
   - Add check that one side of an opposite is derived
+  - Review other constraints
   - Add a check that the derived side of a multivalued opposite is unordered
+  - Add an "indexed" flag to ETPropertyDescription to tell the store whether to include values of that property in search indexes
   - Move to CoreObject
   
 - COObject
@@ -84,7 +86,7 @@ First Release
   - We should have dedicated array/set multivalue mutation methods rather than using:
     -[COObject (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key]
     for both, IMO (Eric)
-  - I'd like to look at generating COObject subclasses for each entity description with 
+  WIP I'd like to look at generating COObject subclasses for each entity description with 
     generated KVC compliant property accessors and mutators. (Eric)
   - Use NSSortedSet for sorted composite relationships
   - Use weak references to other COObject instances to prevent retain cycles
