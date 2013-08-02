@@ -53,6 +53,19 @@ COAddMethodIfDoesNotRespond(Class cls, SEL cmd, IMP imp, const char *type)
     }
 }
 
+static id genericGetter(id theSelf, SEL theCmd)
+{
+    id result = [theSelf primitiveValueForKey: NSStringFromSelector(theCmd)];
+    return result;
+}
+
+static void genericSetter(id theSelf, SEL theCmd, id value)
+{
+    NSString *key = SetterToProperty(NSStringFromSelector(theCmd));
+	
+    [theSelf setValue: value forPropertyWithoutSetter: key];
+}
+
 static Class
 CONewClassForEntityDescription(ETEntityDescription *entity, Class superclass, NSString *classname)
 {
@@ -87,19 +100,6 @@ CONewClassForEntityDescription(ETEntityDescription *entity, Class superclass, NS
     
     cls = CONewClassForEntityDescription(entity, superclass, key);
     return cls;
-}
-
-static id genericGetter(id theSelf, SEL theCmd)
-{
-    id result = [theSelf primitiveValueForKey: NSStringFromSelector(theCmd)];
-    return result;
-}
-
-static void genericSetter(id theSelf, SEL theCmd, id value)
-{
-    NSString *key = SetterToProperty(NSStringFromSelector(theCmd));
-   
-    [theSelf setValue: value forPropertyWithoutSetter: key];
 }
 
 @end
