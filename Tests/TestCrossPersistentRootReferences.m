@@ -127,14 +127,14 @@
 #endif
 
 /*
- - Verify that for references to the current branch, the COObject is transparently
- updated when the current branch switches
- - Test scenario where you have references to:
+ Verifies that when you have references to:
+ 
  * the current branch of photo1
  * branch A of photo1
- and when you change the main branch of photo1, the fist object changes to the
- root object for branch B, but the second stays on branch A.
  
+ and when you change the current branch of photo1, the cross-persistent root
+ reference to the current branch is updated, but the reference specifically
+ to branch A remains as-is.
 */
 - (void) testBranchSwitch
 {
@@ -160,18 +160,6 @@
     [childA setValue: @"childA" forProperty: @"label"];
     
     [photo1root insertObject: childA atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-    
-    // N.B. If we wanted to create a second branch in memory and also write some contents into that branch,
-    // the two branches will not have a common parent.
-    //
-    // COSQLiteStore doesn't permit that. So we'll have to commit the first branch, and create the
-    // second branch. This is probably a sensible restriction.
-    //
-    // Actually ignore that, we can do it all in memory, just calling -createBranch will create
-    // a branch off of the first commit.
-    //
-    // ..But for simplicity, I won't allow branching from uncommitted branches.
-    
     [photo1 commit];
     
     COBranch *branchB = [[photo1 currentBranch] makeBranchWithLabel: @"branchB"];

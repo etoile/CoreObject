@@ -295,6 +295,14 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
     if ([self isBranchUncommitted])
     {
+        /*
+         Explanation for this restriction: 
+         we could in theory support creating an arbitrary tree of uncommitted branches,
+         or branches on an uncommitted persistent root, and commit them all in one batch.
+         
+         The reason for not supporting it is it would just make the commit logic more complex, doing a
+         graph DFS on the branches and making a commit (if needed) as it visits each branch.
+         */
         [NSException raise: NSGenericException format: @"uncommitted branches do not support -makeBranchWithLabel:atRevision:"];
     }
     
