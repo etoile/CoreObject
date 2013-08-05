@@ -77,54 +77,61 @@
 	[ctx1 release];
 }
 
-#if 0
-
 - (void)testMove
 {
-	COEditingContext *ctx1 = [[COEditingContext alloc] init];
-	COEditingContext *ctx2 = [[COEditingContext alloc] init];
+	COObjectGraphContext *ctx1 = [[COObjectGraphContext alloc] init];
+	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
 	
-	COContainer *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx1 setRootObject: parent];
+	COObject *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
 	[parent setValue: @"Shopping" forProperty: @"label"];
 	[child1 setValue: @"Groceries" forProperty: @"label"];
 	[child2 setValue: @"Todo" forProperty: @"label"];
 	[subchild1 setValue: @"Salad" forProperty: @"label"];
-	[child1 addObject: subchild1];
-	[parent addObject: child1];
-	[parent addObject: child2];
+	[child1 insertObject: subchild1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	[parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
-	COContainer *parentCtx2 = [ctx2 insertObject: parent];
-	COContainer *child1Ctx2 = [ctx2 insertObject: child1];
-	COContainer *child2Ctx2 = [ctx2 insertObject: child2];
-	COContainer *subchild1Ctx2 = [ctx2 insertObject: subchild1];
+    // Copy the items to ctx2
+    [ctx2 setItemGraph: ctx1];
+    [ctx2 setRootObject: [ctx2 objectWithUUID: [parent UUID]]];
+    
+    COObject *parentCtx2 = [ctx2 rootObject];
+    UKNotNil(parentCtx2);
+	COObject *child1Ctx2 = [ctx2 objectWithUUID: [child1 UUID]];
+	COObject *child2Ctx2 = [ctx2 objectWithUUID: [child2 UUID]];
+	COObject *subchild1Ctx2 = [ctx2 objectWithUUID: [subchild1 UUID]];
 	
 	// Now make some modifications to ctx2: (move "Salad" from "Groceries" to "Todo")
 	
-	[child1Ctx2 removeObject: subchild1Ctx2];	
-	[child2Ctx2 addObject: subchild1Ctx2];
+	[child1Ctx2 removeObject: subchild1Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	[child2Ctx2 insertObject: subchild1Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
 	// Now create a diff
-	COObjectGraphDiff *diff = [COObjectGraphDiff diffContainer: parent withContainer: parentCtx2];
-	UKNotNil(diff);
+	COItemGraphDiff *diff = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"exampleDiff"];
+    UKNotNil(diff);
 	
 	// Apply it to ctx1.
 	
-	[diff applyToContext: ctx1];
+	[diff applyTo: ctx1];
 	
 	// Now check that all of the changes were properly made.
 	
-	UKIntsEqual(0, [[child1 contentArray] count]);
-	UKIntsEqual(1, [[child2 contentArray] count]);
-	UKObjectsSame(subchild1, [[child2 contentArray] objectAtIndex: 0]);
-	UKObjectsSame(ctx1, [(id)[[[child2 contentArray] objectAtIndex: 0] persistentRoot] parentContext]);
+	UKIntsEqual(0, [[child1 valueForProperty: @"contents"] count]);
+	UKIntsEqual(1, [[child2 valueForProperty: @"contents"] count]);
+	UKObjectsSame(subchild1, [[child2 valueForProperty: @"contents"] objectAtIndex: 0]);
 	
 	[ctx2 release];
-	[ctx1 release];	
+	[ctx1 release];
 }
+
+#if 0
+
+
 
 - (void)testSimpleNonconflictingMerge
 {
