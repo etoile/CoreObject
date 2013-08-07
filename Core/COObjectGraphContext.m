@@ -281,13 +281,6 @@
     
 	INVALIDARG_EXCEPTION_TEST(object, [objectsByUUID_ objectForKey: uuid] == nil);
     
-	/* If -becomePersistentInContext: receives -makePersistentRoot as argument.
-       We must be sure no root object has ever been set (committed or not). */
-	if (rootObjectUUID_ == nil)
-	{
-        ASSIGN(rootObjectUUID_, uuid);
-	}
-    
     [objectsByUUID_ setObject: object forKey: uuid];
 	[insertedObjects_ addObject: object];
 }
