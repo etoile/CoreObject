@@ -239,15 +239,13 @@ static COEditingContext *currentCtxt = nil;
 {
 	ETEntityDescription *desc = [[self modelRepository] descriptionForName: anEntityName];
 	Class cls = [[self modelRepository] classForEntityDescription: desc];
-	COObject *rootObject = [[cls alloc]
-							initWithUUID: [ETUUID UUID]
-							entityDescription: desc
-							context: nil];
+	COObject *rootObject = [[cls alloc] initWithUUID: [ETUUID UUID]
+	                               entityDescription: desc
+	                              objectGraphContext: [COObjectGraphContext objectGraphContext]];
 	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
-	                                                 objectGraphContext: nil];
+	                                                 objectGraphContext: [rootObject objectGraphContext]];
 
-	/* Will set the root object on the persistent root */
-	[rootObject becomePersistentInContext: persistentRoot];
+	[[rootObject objectGraphContext] setRootObject: rootObject];
 
 	return persistentRoot;
 }
@@ -280,16 +278,6 @@ static COEditingContext *currentCtxt = nil;
 }
 
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject
-{
-	// FIXME: COObjectGraphDiff prevents us to detect an invalid root object...
-	//NILARG_EXCEPTION_TEST(aRootObject);
-	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
-	                                                 objectGraphContext: nil];
-	[aRootObject becomePersistentInContext: persistentRoot];
-	return persistentRoot;
-}
-
-- (COPersistentRoot *)experimentalInsertNewPersistentRootWithRootObject: (COObject *)aRootObject
 {
 	COObjectGraphContext *objectGraphContext = [aRootObject objectGraphContext];
 

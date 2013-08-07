@@ -245,19 +245,6 @@
  */
 - (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc;
 
-/** 
- * Makes the receiver persistent by inserting it into the given editing context.
- *
- * If the context argument is a COEditingContext, then the receiver becomes 
- * a root object (bound to a new persistent root).
- *
- * Raises an exception if any argument is nil.
- */
-- (void)becomePersistentInContext: (COPersistentRoot *)aContext;
-
-// FIXME: Temporary hack, remove when -becomePersistentInContext is removed.
-- (void)becomePersistentInObjectGraphContext: (COObjectGraphContext *)aContext;
-
 - (id)copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription;
 
 /** taskunit Persistency Attributes */
@@ -699,7 +686,7 @@
  */
 - (id)initWithUUID: (ETUUID *)aUUID 
  entityDescription: (ETEntityDescription *)anEntityDescription
-           context: (COObjectGraphContext *)aContext;
+objectGraphContext: (COObjectGraphContext *)aContext;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -711,7 +698,7 @@
  */
 - (id)commonInitWithUUID: (ETUUID *)aUUID
        entityDescription: (ETEntityDescription *)anEntityDescription
-                 context: (COObjectGraphContext *)aContext;
+      objectGraphContext: (COObjectGraphContext *)aContext;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

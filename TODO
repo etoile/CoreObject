@@ -70,7 +70,7 @@ First Release
   - Move to CoreObject
   
 - COObject
-  - Remove support for freestanding COObject not associated with a COObjectGraphContext,
+  x Remove support for freestanding COObject not associated with a COObjectGraphContext,
     and remove -becomePersistentInContext:. The rationale was that freestanding
     COObjects would only make sense if they have no relationships. Since relationships
     are such a central feature we might as well force COObjects to belong to a

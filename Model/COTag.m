@@ -122,23 +122,6 @@
 	return self;
 }
 
-- (void) becomePersistentInContext: (COPersistentRoot *)aContext
-{
-	if ([self isPersistent])
-		return;
-	
-	[super becomePersistentInContext: aContext];
-	
-	// TODO: Leverage the model description rather than hardcoding the aspects
-	// TODO: Implement some strategy to recover in the case these aspects
-	// are already used as embedded objects in another root object.
-	for (COTagGroup *group in tagGroups)
-	{
-		ETAssert([group isPersistent] == NO);
-		[group becomePersistentInContext: aContext];
-	}
-}
-
 - (void)dealloc
 {
 	DESTROY(tagGroups);

@@ -144,7 +144,6 @@
  * belonging to aRootObject
  */
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
-- (COPersistentRoot *)experimentalInsertNewPersistentRootWithRootObject: (COObject *)aRootObject;
 /** @taskunit Pending Changes */
 
 @property (nonatomic, copy, readonly) NSSet *persistentRootsPendingInsertion;

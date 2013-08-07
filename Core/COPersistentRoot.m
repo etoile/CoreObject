@@ -472,7 +472,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     
     [newBranch setMetadata: D(aLabel, @"COBranchLabel")];
     
-    [_branchForUUID addObject: newBranch forKey: [newBranch UUID]];
+    [_branchForUUID setObject: newBranch forKey: [newBranch UUID]];
     
     return newBranch;
 }

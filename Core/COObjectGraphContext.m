@@ -199,9 +199,9 @@
 	   subclass designed initializer being called). */
 	COObject *obj = [[objClass alloc] commonInitWithUUID: aUUID
                                        entityDescription: anEntityDescription
-	                                             context: self];
+	                                  objectGraphContext: self];
 	
-	[objectsByUUID_ addObject: obj forKey: aUUID];
+	[objectsByUUID_ setObject: obj forKey: aUUID];
 	[obj release];
 	
 	return obj;
@@ -264,21 +264,7 @@
     /* Nil root object means the new object will be a root */
 	COObject *obj = [[objClass alloc] initWithUUID: aUUID
                                  entityDescription: desc
-                                           context: nil];
-    if ([self persistentRoot] != nil)
-    {
-        // FIXME: -becomePersistentInContext: inserts the object into the editingBranch.
-        // This is an awkward restriction which we should fix, at which time we
-        // can remove this assertion.
-        ETAssert([[[self persistentRoot] editingBranch] objectGraph] == self);
-        
-        [obj becomePersistentInContext: [self persistentRoot]];
-    }
-    else
-    {
-        [obj becomePersistentInObjectGraphContext: self];
-    }
-    
+                                objectGraphContext: self];
 	[obj release];
     
     [obj addCachedOutgoingRelationships];
@@ -289,18 +275,20 @@
 - (void)registerObject: (COObject *)object
 {
 	NILARG_EXCEPTION_TEST(object);
+	INVALIDARG_EXCEPTION_TEST(object, [object isKindOfClass: [COObject class]]);
+
     ETUUID *uuid = [object UUID];
     
 	INVALIDARG_EXCEPTION_TEST(object, [objectsByUUID_ objectForKey: uuid] == nil);
     
 	/* If -becomePersistentInContext: receives -makePersistentRoot as argument.
-     We must be sure no root object has ever been set (committed or not). */
+       We must be sure no root object has ever been set (committed or not). */
 	if (rootObjectUUID_ == nil)
 	{
         ASSIGN(rootObjectUUID_, uuid);
 	}
     
-    [objectsByUUID_ addObject: object forKey: uuid];
+    [objectsByUUID_ setObject: object forKey: uuid];
 	[insertedObjects_ addObject: object];
 }
 
@@ -438,7 +426,9 @@
 	// NOTE: We serialize UUIDs into strings in various places, this check
 	// helps to intercept string objects that ought to be ETUUID objects.
 	NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
-    return [objectsByUUID_ objectForKey: aUUID];
+    COObject *obj = [objectsByUUID_ objectForKey: aUUID];
+	ETAssert([obj isKindOfClass: [COObject class]]);
+	return obj;
 }
 
 #pragma mark garbage collection
