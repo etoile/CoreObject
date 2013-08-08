@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COTrack.h>
 
-@class CORevision, COObject, COStore;
+@class CORevision, COObject;
 @class COHistoryTrackNode;
 
 /**
