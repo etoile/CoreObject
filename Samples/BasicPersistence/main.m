@@ -15,8 +15,9 @@
 	NSDate *startDate, *endDate;
 	Calendar *calendar;
 }
-- (id)initWithStartDate: (NSDate*)startDate
-                endDate: (NSDate*)endDate;
+- (id)initWithStartDate: (NSDate*)aStartDate
+                endDate: (NSDate*)aEndDate
+            objectGraph: (COObjectGraphContext *)aGraph;
 @end
 
 
@@ -43,9 +44,9 @@
 	return desc;
 }
 
-- (id)init
+- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
-	SUPERINIT;
+	self = [super initWithObjectGraphContext: aContext];
 	appointments = [NSMutableArray new];
 	today = [[NSDate date] retain];
 	return self;
@@ -109,8 +110,9 @@
 
 - (id)initWithStartDate: (NSDate*)aStartDate
                 endDate: (NSDate*)aEndDate
+            objectGraph: (COObjectGraphContext *)aGraph
 {
-	SUPERINIT;
+	self = [super initWithObjectGraphContext:aGraph];
 	startDate = [aStartDate retain];
 	endDate = [aEndDate retain];
 	return self;
@@ -143,8 +145,6 @@
 int main(int argc, char **argv)
 {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
-	// Initialize the AppKit (for now CoreObject requires it)
-	[NSApplication sharedApplication];
 
 	COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: @"TestStore.db"]];
 	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
@@ -155,10 +155,8 @@ int main(int argc, char **argv)
 	ETUUID *persistentRootUUID = [[calendar persistentRoot] persistentRootUUID];
 	NSDate *futureDate = [NSDate dateWithTimeIntervalSinceNow: 3600];
 	Appointment *appointment = AUTORELEASE([[Appointment alloc] initWithStartDate: [NSDate date]
-	                                                                      endDate: futureDate]);
-
-	[appointment becomePersistentInContext: [calendar persistentRoot]];
-
+	                                                                      endDate: futureDate
+                                                                      objectGraph: [calendar objectGraphContext]]);
 	[calendar addAppointment: appointment];
 
 	[ctx commit];
