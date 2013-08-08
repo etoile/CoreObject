@@ -232,8 +232,6 @@
     COBranch *branchA = [photo1 currentBranch];
     COBranch *branchB = [branchA makeBranchWithLabel: @"branchB"];
     
-    [photo1 setEditingBranch: branchB]; // TODO: Workaround for -becomePersistentInContext: limitation, should be removed.
-    
     COObject *photo1branchBroot = [[branchB objectGraph] rootObject];
     
     [photo1branchBroot setValue: @"photo1, branch B" forProperty: @"label"];
@@ -262,8 +260,6 @@
     
     // Now delete branch B. This should automatically update the cross-persistent reference
     
-    [photo1 setEditingBranch: branchA]; // TODO: Workaround for -becomePersistentInContext: limitation, should be removed.
-
     [photo1 deleteBranch: branchB];
     
     UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
