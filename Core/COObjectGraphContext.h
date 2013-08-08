@@ -107,10 +107,6 @@
 - (id)insertObjectWithEntityName: (NSString *)aFullName
                             UUID: (ETUUID *)aUUID;
 
-- (void)registerObject: (COObject *)object;
-
-
-
 #pragma mark access
 
 - (COObject *) objectWithUUID: (ETUUID *)aUUID;
