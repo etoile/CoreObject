@@ -36,9 +36,12 @@
 	return collection;	
 }
 
-- (id)init
+- (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
-	SUPERINIT;
+	self = [super initWithObjectGraphContext: aContext];
+	if (self == nil)
+		return nil;
+
 	_content = [NSMutableDictionary new];
 	return self;
 }
