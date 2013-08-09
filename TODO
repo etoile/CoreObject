@@ -49,6 +49,8 @@ First Release
      
     All of the other methods, I don't know.
   - Extend COBranch API to support branches and merging revisions accross tracks
+  - Expose COSQLiteStore's attachments feature
+  x Document COBranch class
 
 - didAwaken: replacement
     - At the end of the setStoreItem:, call -awakeFromDeserialization
@@ -112,8 +114,6 @@ First Release
 - Rewrite COHistoryTrack
 - Fix COCustomTrack broken model
 - Make COQuery a bit more usable
-- Document COStore
-- Document COTrack class and subclasses
 - Switch to NSUUID
 
 x Check relationship integrity won't go against the developer needs
