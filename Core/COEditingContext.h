@@ -113,7 +113,7 @@
  * Returns all persistent roots in the store (excluding those that are marked as 
  * deleted on disk), plus those pending commit (and minus those pending deletion).
  */
-- (NSSet *)persistentRoots;
+@property (nonatomic, readonly) NSSet *persistentRoots;
 
 /**
  * Returns persistent roots marked as deleted on disk.
@@ -128,7 +128,7 @@
  *
  * See also COLibrary.
  */
-- (COGroup *)libraryGroup;
+@property (nonatomic, readonly) COGroup *libraryGroup;
 
 /** 
  * @taskunit Store and Metamodel Access 
@@ -137,12 +137,12 @@
 /**
  * Returns the store for which the editing context acts a working copy.
  */
-- (COSQLiteStore *)store;
+@property (nonatomic, readonly) COSQLiteStore *store;
 /**
  * Returns the model description repository, which holds the metamodel that 
  * describes all the persistent objects editable in the context.
  */
-- (ETModelDescriptionRepository *)modelRepository;
+@property (nonatomic, readonly) ETModelDescriptionRepository *modelRepository;
 
 /** 
  * @taskunit Managing Persistent Roots 
@@ -255,7 +255,7 @@
  *
  * When commit methods return a non-empty revision array, the error is nil.
  */
-- (NSError *)error;
+@property (nonatomic, readonly) NSError *error;
 
 /** 
  * @taskunit Framework Private 

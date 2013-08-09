@@ -13,6 +13,7 @@
 
 @implementation COEditingContext
 
+@synthesize store = _store, modelRepository = _modelRepository, error = _error;
 @synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
 @synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
 
@@ -114,6 +115,7 @@
 {
 	return self;
 }
+
 - (COCrossPersistentRootReferenceCache *) crossReferenceCache
 {
     return _crossRefCache;
@@ -172,16 +174,6 @@
 
 	return (id)[self objectWithUUID: [ETUUID UUIDWithString: UUIDString]];
 #endif
-}
-
-- (COSQLiteStore *)store
-{
-	return _store;
-}
-
-- (ETModelDescriptionRepository *)modelRepository
-{
-	return _modelRepository; 
 }
 
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
@@ -470,11 +462,6 @@
 {
 	return [self commitWithMetadata: metadata
 		restrictedToPersistentRoots: [_loadedPersistentRoots allValues]];
-}
-
-- (NSError *)error
-{
-	return _error;
 }
 
 - (void) unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
