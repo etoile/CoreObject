@@ -56,7 +56,6 @@
 #import <CoreObject/COSearchResult.h>
 #import <CoreObject/COSQLiteStore.h>
 #import <CoreObject/COSQLiteStore+Attachments.h>
-#import <CoreObject/COSQLiteStorePersistentRootBackingStore.h>
 
 /* Utilities */
 
