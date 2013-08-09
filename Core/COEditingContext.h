@@ -59,29 +59,33 @@
     COCrossPersistentRootReferenceCache *_crossRefCache;
 }
 
-
-/** @taskunit Creating a new context */
+/** 
+ * @taskunit Creating a new context 
+ */
 
 /**
  * Returns a new autoreleased context initialized with the store located at the 
- * given URL, and with no upper limit on the max revision number.
+ * given URL.
  *
- * See also -initWithStore: and -[COStore initWithURL:].
+ * See also -initWithStore: and -[COSQLiteStore initWithURL:].
  */
 + (COEditingContext *)contextWithURL: (NSURL *)aURL;
-
 /**
+ * <init />
  * Initializes a context which persists its content in the given store.
  */
 - (id)initWithStore: (COSQLiteStore *)store;
-
 /**
  * Initializes the context with no store. 
  * As a result, the context content is not persisted.
+ *
+ * See also -initWithStore:.
  */
 - (id)init;
 
-/** @taskunit Type Querying */
+/** 
+ * @taskunit Type Querying 
+ */
 
 /**
  * Returns YES.
@@ -90,7 +94,9 @@
  */
 @property (nonatomic, readonly) BOOL isEditingContext;
 
-/** @taskunit Editing Context Nesting */
+/** 
+ * @taskunit Editing Context Nesting 
+ */
 
 /**
  * Returns self.
@@ -99,16 +105,18 @@
  */
 @property (nonatomic, readonly) COEditingContext *editingContext;
 
-/** @taskunit Special Groups and Libraries */
+/** 
+ * @taskunit Accessing All Persistent Roots and Libraries 
+ */
 
 /**
- * Returns a set of all persistent root in the store (excluding those that are
- * marked as deleted on disk), plus those pending commit (and minus those pending deletion).
+ * Returns all persistent roots in the store (excluding those that are marked as 
+ * deleted on disk), plus those pending commit (and minus those pending deletion).
  */
 - (NSSet *)persistentRoots;
 
 /**
- * Returns the set of persistent roots marked as deleted on disk
+ * Returns persistent roots marked as deleted on disk.
  */
 @property (nonatomic, copy, readonly) NSSet *deletedPersistentRoots;
 
@@ -117,49 +125,76 @@
  *
  * By default, it contains the libraries listed as methods among
  * COEditingContext(COCommonLibraries).
+ *
+ * See also COLibrary.
  */
 - (COGroup *)libraryGroup;
 
-/** @taskunit Store and Metamodel Access */
+/** 
+ * @taskunit Store and Metamodel Access 
+ */
 
 /**
  * Returns the store for which the editing context acts a working copy.
  */
 - (COSQLiteStore *)store;
-
 /**
  * Returns the model description repository, which holds the metamodel that 
  * describes all the persistent objects editable in the context.
  */
 - (ETModelDescriptionRepository *)modelRepository;
 
-/** @taskunit Managing Persistent Roots */
+/** 
+ * @taskunit Managing Persistent Roots 
+ */
 
-- (COPersistentRoot *)persistentRootForUUID: (ETUUID *)aUUID;
-- (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName;
 /**
- * I'm assuming this is the mechanism for copying an embedded object and creating
- * a new persistent root with that copy as the root object?
+ * Returns the persistent root bound the the given UUID in the store or nil.
  *
- * We will need to clarify exactly how it works... presumable it does a regular
- * metamodel driven copy, potentially copying the entire tree of children
- * belonging to aRootObject
+ * The editing context retains the returned persistent root.
+ */
+- (COPersistentRoot *)persistentRootForUUID: (ETUUID *)aUUID;
+/**
+ * Returns a new persistent root that uses the given root object.
+ *
+ * The returned persistent root is added to -persistentRootsPendingInsertion 
+ * and will be saved to the store on the next commit.
+ *
+ * The object graph context of the root object must be transient, otherwise 
+ * a NSInvalidArgumentException is raised.
+ *
+ * For a nil root object, raises a NSInvalidArgumentException.
  */
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
-/** @taskunit Pending Changes */
 
+/** 
+ * @taskunit Pending Changes 
+ */
+
+/**
+ * The new persistent roots to be saved in the store on the next commit.
+ */
 @property (nonatomic, copy, readonly) NSSet *persistentRootsPendingInsertion;
+/**
+ * The persistent roots to be deleted in the store on the next commit.
+ */
 @property (nonatomic, copy, readonly) NSSet *persistentRootsPendingDeletion;
+/**
+ * The persistent roots to be undeleted in the store on the next commit.
+ */
 @property (nonatomic, copy, readonly) NSSet *persistentRootsPendingUndeletion;
 
 // TODO: updatedPersistentRoots?
 // TODO: changedPersistentRoots?
 
 /**
- * Returns whether any object has been inserted, deleted or updated since the
- * last commit.
+ * Returns whether the context contains uncommitted changes.
  *
- * See also -changedObjects.
+ * Persistent root insertions, deletions, and modifications (e.g., changing
+ * main branch, deleting branches, adding branches, editing branch metadata,
+ * reverting branch to a past revision) all count as uncommitted changes.
+ *
+ * See also -discardAllChanges.
  */
 - (BOOL)hasChanges;
 /**
@@ -172,12 +207,16 @@
  * All uncommitted embedded object edits in child persistent roots will be
  * cancelled.
  *
- * -insertedPersistentRoots, -deletedPersistentRoots  will
- * all return empty sets once the changes have been discarded.
+ * -insertedPersistentRoots, -deletedPersistentRoots  will all return empty sets 
+ * once the changes have been discarded.
+ *
+ * See also -hasChanges.
  */
 - (void)discardAllChanges;
 
-/** @taskunit Committing Changes */
+/** 
+ * @taskunit Committing Changes 
+ */
 
 // TODO: Change to -commitWithError:
 /**
@@ -199,9 +238,8 @@
  * Each returned revision results from an atomic commit on a single persistent 
  * root.
  *
- * Each root object that belong to -changedObjects results in a new revision.
- * We usually advice to commit a single root object at time to prevent multiple
- * revisions per commit.
+ * We usually advice to commit a single persistent root at time to prevent 
+ * multiple revisions per commit.
  *
  * The description will be visible at the UI level when browsing the history.
  *
@@ -219,13 +257,14 @@
  */
 - (NSError *)error;
 
-/** @taskunit Private */
+/** 
+ * @taskunit Framework Private 
+ */
 
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
 - (COPersistentRoot *)insertNewPersistentRootWithRevisionID: (CORevisionID *)aRevid;
-
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -272,13 +311,28 @@
  * subclass), you have to call this method explicitly.
  */
 - (void)didCommitRevision: (CORevision *)aRevision;
-
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (id)crossPersistentRootReferenceWithPath: (COPath *)aPath;
-
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (void)deletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
-
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (COCrossPersistentRootReferenceCache *) crossReferenceCache;
+
+/** 
+ * @taskunit Deprecated
+ */
+
+- (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName;
 
 @end
 
