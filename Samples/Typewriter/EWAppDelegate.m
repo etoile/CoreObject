@@ -1,0 +1,72 @@
+#import "EWAppDelegate.h"
+#import <EtoileFoundation/EtoileFoundation.h>
+
+@implementation EWAppDelegate
+
+#define STOREURL [NSURL fileURLWithPath: [@"~/typewriterTest.typewriter" stringByExpandingTildeInPath]]
+
+- (id) init
+{
+    SUPERINIT;
+    _store = [[COSQLiteStore alloc] initWithURL: STOREURL];
+    _context = [[COEditingContext alloc] initWithStore: _store];
+
+    // Set up application metamodel
+    
+    ETEntityDescription *docEntity = [[ETEntityDescription alloc] initWithName: @"TypewriterDocument"];
+    {
+        [docEntity setParent: (id)@"Anonymous.COObject"];
+        
+        ETPropertyDescription *paragraphsProperty =
+        [ETPropertyDescription descriptionWithName: @"paragraphs" type: (id)@"Anonymous.TypewriterParagraph"];
+        [paragraphsProperty setPersistent: YES];
+        [paragraphsProperty setMultivalued: YES];
+        [paragraphsProperty setOrdered: YES];
+        
+        [docEntity setPropertyDescriptions: A(paragraphsProperty)];
+    }
+    
+    ETEntityDescription *paragraphEntity = [[ETEntityDescription alloc] initWithName: @"TypewriterParagraph"];
+    {
+        [paragraphEntity setParent: (id)@"Anonymous.COObject"];
+        
+        ETPropertyDescription *documentProperty =
+        [ETPropertyDescription descriptionWithName: @"document" type: (id)@"Anonymous.TypewriterDocument"];
+        [documentProperty setIsContainer: YES];
+        [documentProperty setMultivalued: NO];
+        [documentProperty setOpposite: (id)@"Anonymous.TypewriterDocument.paragraphs"];
+        
+        [paragraphEntity setPropertyDescriptions: A(documentProperty)];
+    }
+    
+    [[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: docEntity];
+    [[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: paragraphEntity];
+    
+    [[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
+    
+    return self;
+}
+
+- (void)dealloc
+{
+    [_store release];
+    [_context release];
+    [super dealloc];
+}
+
+- (COSQLiteStore *) store
+{
+    return _store;
+}
+
+- (COEditingContext *) editingContext
+{
+    return _context;
+}
+
+- (void) applicationDidFinishLaunching: (NSNotification*)notif
+{
+    
+}
+
+@end
