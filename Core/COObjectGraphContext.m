@@ -320,11 +320,8 @@
  */
 - (void) setItemGraph: (id <COItemGraph>)aTree
 {
+	[self discardObjects: [self insertedObjects]];
     [self clearChangeTracking];
-
-	// TODO: Discard changed objects probably
-	//[objectsByUUID_ removeObjectsForKeys:
-	// 	[(NSSet *)[[[self changedObjects] mappedCollection] UUID] allObjects]];
 
     // 1. Do updates.
 
@@ -370,16 +367,24 @@
 
 #pragma mark change tracking
 
-/**
- * Returns the set of objects inserted since change tracking was cleared
- */
+- (void)rollback
+{
+	if ([self branch] == nil)
+	{
+		// TODO: Should turn the exception into a COInvalidBranchException or
+		// COTransientObjectGraphContextException
+		[NSException raise: NSInternalInconsistencyException
+					format: @"An object graph context without a branch doesn't "
+		                     "support rollback."];
+	}
+	[[self branch] reloadAtRevision: [[self branch] currentRevision]];
+}
+
 - (NSSet *) insertedObjects
 {
     return insertedObjects_;
 }
-/**
- * Returns the set of objects modified since change tracking was cleared
- */
+
 - (NSSet *) updatedObjects
 {
     return modifiedObjects_;
@@ -399,6 +404,11 @@
 - (NSArray *) allObjects
 {
     return [objectsByUUID_ allValues];
+}
+
+- (void)discardObjects: (NSSet *)objects
+{
+	[objectsByUUID_ removeObjectsForKeys: [(id)[[objects mappedCollection] UUID] allObjects]];
 }
 
 - (void) clearChangeTracking

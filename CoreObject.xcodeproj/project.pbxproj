@@ -2000,6 +2000,7 @@
 				66C366AF17B426C0009ACF2F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		66D099C1129AE111006BEDC3 /* Build configuration list for PBXNativeTarget "StoreTest" */ = {
 			isa = XCConfigurationList;

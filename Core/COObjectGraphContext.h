@@ -81,6 +81,17 @@
 #pragma mark change tracking
 
 /**
+ * Reloads to the current revision.
+ *
+ * All existing changes are cleared and all loaded objects are discarded 
+ * (references to these objects become invalid as a result).
+ *
+ * If the branch is nil, raises a NSInternalConsistencyException.
+ *
+ * See also -clearChangeTracking and -[COBranch reloadAtRevision:].
+ */
+- (void)rollback;
+/**
  * Returns the set of objects inserted since change tracking was cleared
  */
 - (NSSet *) insertedObjects;
@@ -93,7 +104,6 @@
 - (NSSet *) changedObjects;
 
 - (BOOL)hasChanges;
-
 - (void) clearChangeTracking;
 - (void) clearChangeTrackingForObject: (COObject *)anObject;
 
