@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		3D01D09F1646BF0200917AC8 /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D01D0941646BEF400917AC8 /* UnitKit.framework */; };
-		6019B881163BFD8400D1986F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F16163B6B7A009C4F21 /* Cocoa.framework */; };
-		6019B89D163BFF0E00D1986F /* Performance.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6019B880163BFD8400D1986F /* Performance.framework */; };
 		6043D4D31757B4F9002103CC /* COCommitDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 6043D4C717575D79002103CC /* COCommitDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
 		606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 606E3DBF1787A07E00ED42DA /* COSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -17,7 +15,6 @@
 		607EB349178881E60024B34D /* CODictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 607EB347178881E60024B34D /* CODictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		607EB34A178881E60024B34D /* CODictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 607EB348178881E60024B34D /* CODictionary.m */; };
 		607EB6F2178D50610024B34D /* TestRevisionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00611704C24C00D01AAB /* TestRevisionNumber.m */; };
-		60988F17163B6B7A009C4F21 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F16163B6B7A009C4F21 /* Cocoa.framework */; };
 		609C00651704C24C00D01AAB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00541704C24C00D01AAB /* main.m */; };
 		609C00801704C2BA00D01AAB /* CORevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00781704C2BA00D01AAB /* CORevision.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00811704C2BA00D01AAB /* CORevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00791704C2BA00D01AAB /* CORevision.m */; };
@@ -134,7 +131,6 @@
 		66D43BB5179E170B008CE44E /* TestConcurrentChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */; };
 		66D96C70178AE41500D1553C /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
 		66D96CA0178B6E5600D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
-		66D96CA1178B6FBA00D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
 		66D96CB7178B717200D1553C /* COBinaryReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA2178B717000D1553C /* COBinaryReader.h */; settings = {ATTRIBUTES = (); }; };
 		66D96CB8178B717200D1553C /* COBinaryReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D96CA3178B717000D1553C /* COBinaryReader.m */; };
 		66D96CB9178B717200D1553C /* COBinaryWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA4178B717000D1553C /* COBinaryWriter.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -217,13 +213,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = UnitKit;
-		};
-		6019B89B163BFEE800D1986F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 6019B87F163BFD8400D1986F;
-			remoteInfo = Performance;
 		};
 		60C8BC20163223D300A2B4EE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -329,14 +318,12 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		3D01D08A1646BEF400917AC8 /* UnitKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UnitKit.xcodeproj; path = ../UnitKit/Source/UnitKit.xcodeproj; sourceTree = "<group>"; };
-		6019B880163BFD8400D1986F /* Performance.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Performance.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6043D4C717575D79002103CC /* COCommitDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCommitDescriptor.h; path = Utilities/COCommitDescriptor.h; sourceTree = "<group>"; };
 		6043D4C817575D7A002103CC /* COCommitDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCommitDescriptor.m; path = Utilities/COCommitDescriptor.m; sourceTree = "<group>"; };
 		606E3DBF1787A07E00ED42DA /* COSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSerialization.h; path = Core/COSerialization.h; sourceTree = "<group>"; };
 		606E3DC01787A07E00ED42DA /* COSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSerialization.m; path = Core/COSerialization.m; sourceTree = "<group>"; };
 		607EB347178881E60024B34D /* CODictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODictionary.h; path = Model/CODictionary.h; sourceTree = "<group>"; };
 		607EB348178881E60024B34D /* CODictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODictionary.m; path = Model/CODictionary.m; sourceTree = "<group>"; };
-		60988F15163B6B7A009C4F21 /* SQLClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SQLClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		60988F16163B6B7A009C4F21 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		609C00541704C24C00D01AAB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Tests/main.m; sourceTree = "<group>"; };
 		609C00571704C24C00D01AAB /* TestBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBranch.m; path = Tests/TestBranch.m; sourceTree = "<group>"; };
@@ -538,24 +525,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		6019B87C163BFD8400D1986F /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				6019B881163BFD8400D1986F /* Cocoa.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		60988F11163B6B7A009C4F21 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				66D96CA1178B6FBA00D1553C /* libsqlite3.dylib in Frameworks */,
-				6019B89D163BFF0E00D1986F /* Performance.framework in Frameworks */,
-				60988F17163B6B7A009C4F21 /* Cocoa.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		60C913B0165BBED000E0C5F4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -638,8 +607,6 @@
 				6686BDAC12592BDA0065DE1A /* CoreObject.framework */,
 				791B4E2D1299C79300CCF472 /* Test */,
 				66D099C4129AE111006BEDC3 /* StoreTest */,
-				60988F15163B6B7A009C4F21 /* SQLClient.framework */,
-				6019B880163BFD8400D1986F /* Performance.framework */,
 				60C913B3165BBED000E0C5F4 /* BasicPersistence */,
 				66C3669A17B426BF009ACF2F /* Typewriter.app */,
 			);
@@ -1042,20 +1009,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		6019B87D163BFD8400D1986F /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		60988F12163B6B7A009C4F21 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6686BDA712592BDA0065DE1A /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1117,43 +1070,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		6019B87F163BFD8400D1986F /* Performance */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 6019B88C163BFD8500D1986F /* Build configuration list for PBXNativeTarget "Performance" */;
-			buildPhases = (
-				6019B87B163BFD8400D1986F /* Sources */,
-				6019B87C163BFD8400D1986F /* Frameworks */,
-				6019B87D163BFD8400D1986F /* Headers */,
-				6019B87E163BFD8400D1986F /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Performance;
-			productName = Performance;
-			productReference = 6019B880163BFD8400D1986F /* Performance.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		60988F14163B6B7A009C4F21 /* SQLClient */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 60988F22163B6B7A009C4F21 /* Build configuration list for PBXNativeTarget "SQLClient" */;
-			buildPhases = (
-				60988F10163B6B7A009C4F21 /* Sources */,
-				60988F11163B6B7A009C4F21 /* Frameworks */,
-				60988F12163B6B7A009C4F21 /* Headers */,
-				60988F13163B6B7A009C4F21 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				6019B89C163BFEE800D1986F /* PBXTargetDependency */,
-			);
-			name = SQLClient;
-			productName = SQLClient;
-			productReference = 60988F15163B6B7A009C4F21 /* SQLClient.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 		60C913B2165BBED000E0C5F4 /* BasicPersistence */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 60C913BE165BBED100E0C5F4 /* Build configuration list for PBXNativeTarget "BasicPersistence" */;
@@ -1283,8 +1199,6 @@
 			projectRoot = "";
 			targets = (
 				6686BDAB12592BDA0065DE1A /* CoreObject */,
-				60988F14163B6B7A009C4F21 /* SQLClient */,
-				6019B87F163BFD8400D1986F /* Performance */,
 				791B4E2C1299C79300CCF472 /* Test */,
 				66D099B6129AE111006BEDC3 /* StoreTest */,
 				60C913B2165BBED000E0C5F4 /* BasicPersistence */,
@@ -1360,20 +1274,6 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
-		6019B87E163BFD8400D1986F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		60988F13163B6B7A009C4F21 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6686BDA812592BDA0065DE1A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1397,20 +1297,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		6019B87B163BFD8400D1986F /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		60988F10163B6B7A009C4F21 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		60C913AF165BBED000E0C5F4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1539,11 +1425,6 @@
 			name = UnitKit;
 			targetProxy = 3D01D09D1646BEFE00917AC8 /* PBXContainerItemProxy */;
 		};
-		6019B89C163BFEE800D1986F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 6019B87F163BFD8400D1986F /* Performance */;
-			targetProxy = 6019B89B163BFEE800D1986F /* PBXContainerItemProxy */;
-		};
 		60C913C3165BBEED00E0C5F4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6686BDAB12592BDA0065DE1A /* CoreObject */;
@@ -1640,62 +1521,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		6019B88D163BFD8500D1986F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = "Performance/Performance-Info.plist";
-				INSTALL_PATH = "@rpath";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = framework;
-			};
-			name = Debug;
-		};
-		6019B88E163BFD8500D1986F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = "Performance/Performance-Info.plist";
-				INSTALL_PATH = "@rpath";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = framework;
-			};
-			name = Release;
-		};
-		60988F23163B6B7A009C4F21 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = "SQLClient/SQLClient-Info.plist";
-				INSTALL_PATH = "@rpath";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = framework;
-			};
-			name = Debug;
-		};
-		60988F24163B6B7A009C4F21 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = "SQLClient/SQLClient-Info.plist";
-				INSTALL_PATH = "@rpath";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = framework;
-			};
-			name = Release;
-		};
 		60C913BF165BBED100E0C5F4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1869,24 +1694,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6019B88C163BFD8500D1986F /* Build configuration list for PBXNativeTarget "Performance" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				6019B88D163BFD8500D1986F /* Debug */,
-				6019B88E163BFD8500D1986F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		60988F22163B6B7A009C4F21 /* Build configuration list for PBXNativeTarget "SQLClient" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				60988F23163B6B7A009C4F21 /* Debug */,
-				60988F24163B6B7A009C4F21 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		60C913BE165BBED100E0C5F4 /* Build configuration list for PBXNativeTarget "BasicPersistence" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
