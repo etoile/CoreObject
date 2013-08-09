@@ -280,24 +280,6 @@
 
 - (COCrossPersistentRootReferenceCache *) crossReferenceCache;
 
-/** @taskunit Deprecated, to be removed */
-
-// I think we agreed these are an "anti-pattern"
-
-/**
- * Returns the context that should be used when none is provided.
- *
- * Factories that create persistent instances in EtoileUI will use this method.
- * As an example, see -[ETLayoutItemFactory compoundDocument].
- */
-+ (COEditingContext *)currentContext;
-/**
- * Sets the context that should be used when none is provided.
- *
- * See also +currentContext.
- */
-+ (void)setCurrentContext: (COEditingContext *)aCtxt;
-
 @end
 
 
@@ -305,18 +287,6 @@
 
 /** @taskunit Object Access and Loading */
 
-/**	 
- * Returns the object identified by the UUID, by loading it to its last revision	 
- * when no instance managed by the receiver is present in memory.	 
- *	 
- * When the UUID doesn't correspond to a persistent object, returns nil.	 
- *	 
- * When the object is a inner object, the last revision is the one that is tied	 
- * to its root object last revision.	 
- *	 
- * See also -[COPersistentRoot objectWithUUID:].	 
- */
-- (COObject *)objectWithUUID: (ETUUID *)uuid;
 /**
  * Returns the objects presently managed by the receiver in memory.
  *

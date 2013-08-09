@@ -251,33 +251,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	return [[self objectGraph] objectWithUUID: uuid];
 }
 
-- (NSSet *)loadedObjects
-{
-    return [NSSet setWithArray: [[self objectGraph] allObjects]];
-}
-
-- (NSSet *)loadedObjectUUIDs
-{
-	return [NSSet setWithArray: [[self objectGraph] itemUUIDs]];
-}
-
-- (NSSet *)loadedRootObjects
-{
-	NSMutableSet *loadedRootObjects = [NSMutableSet setWithSet: [self loadedObjects]];
-	[[loadedRootObjects filter] isRoot];
-	return loadedRootObjects;
-}
-
-- (id)loadedObjectForUUID: (ETUUID *)uuid
-{
-	return [[self objectGraph] objectWithUUID: uuid];
-}
-
-- (void)discardLoadedObjectForUUID: (ETUUID *)aUUID
-{
-    NSLog(@"-discardLoadedObjectForUUID: deprecated and has no effect");
-}
-
 - (BOOL)hasChanges
 {
 	// TODO: Take in account pending branch insertion and deletion

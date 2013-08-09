@@ -24,18 +24,6 @@
 	return [ctx autorelease];
 }
 
-static COEditingContext *currentCtxt = nil;
-
-+ (COEditingContext *)currentContext
-{
-	return currentCtxt;
-}
-
-+ (void)setCurrentContext: (COEditingContext *)aCtxt
-{
-	ASSIGN(currentCtxt, aCtxt);
-}
-
 - (void)registerAdditionalEntityDescriptions
 {
 	NSSet *entityDescriptions = [COLibrary additionalEntityDescriptions];
@@ -327,27 +315,6 @@ static COEditingContext *currentCtxt = nil;
     [aPersistentRoot updateCrossPersistentRootReferences];
 }
 
-- (COObject *)objectWithUUID: (ETUUID *)uuid
-{
-	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
-	{
-		COObject *rootObject = [persistentRoot objectWithUUID: uuid];
-		
-		if (rootObject != nil)
-			return rootObject;
-	}
-	
-	// FIXME: Slow path
-	for (ETUUID *uuid in [_store persistentRootUUIDs])
-	{
-		COPersistentRoot *persistentRoot = [self persistentRootForUUID: uuid];
-		
-		if ([[persistentRoot rootObjectUUID] isEqual: uuid])
-			return [persistentRoot rootObject];
-	}
-	return nil;
-}
-
 - (NSSet *)loadedObjects
 {
 	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(loadedObjects)];
@@ -441,7 +408,7 @@ static COEditingContext *currentCtxt = nil;
 	NSArray *persistentRootsPendingInsertion = [[self persistentRootsPendingInsertion] allObjects];
 
 	[_loadedPersistentRoots removeObjectsForKeys:
-		[(id)[persistentRootsPendingInsertion mappedCollection] persistentRootUUID]];
+		(id)[[persistentRootsPendingInsertion mappedCollection] persistentRootUUID]];
 	ETAssert([[self persistentRootsPendingInsertion] isEmpty]);
 	
 	/* Clear other pending changes */
