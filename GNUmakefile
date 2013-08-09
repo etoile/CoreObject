@@ -12,7 +12,7 @@ CXX = clang
 LD = $(CXX)
 
 CoreObject_INCLUDE_DIRS = -Ifmdb/src 
-CoreObject_LDFLAGS += -lstdc++ -lobjcxx
+CoreObject_LDFLAGS += -lstdc++ -lobjcxx -lsqlite3
 
 ifeq ($(test), yes)
   BUNDLE_NAME = $(FRAMEWORK_NAME)
@@ -28,6 +28,7 @@ CoreObject_HEADER_FILES = $(notdir $(wildcard Headers/*.h))
 CoreObject_OBJC_FILES += $(wildcard Core/*.m)
 CoreObject_OBJC_FILES += $(wildcard Diff/*.m)
 CoreObject_OBJCC_FILES = $(wildcard Diff/*.mm)
+CoreObject_CC_FILES = $(wildcard Diff/*.cc)
 CoreObject_OBJC_FILES += $(wildcard Model/*.m)
 CoreObject_OBJC_FILES += $(wildcard Store/*.m)
 CoreObject_C_FILES = $(wildcard Store/*.c)
@@ -38,17 +39,7 @@ CoreObject_OBJC_FILES += $(wildcard StorageDataModel/*.m)
 CoreObject_OBJC_FILES += $(wildcard fmdb/src/FM*.m)
 
 ifeq ($(test), yes)
-CoreObject_OBJC_FILES += \
-	Tests/TestItem.m \
-	Tests/TestBinaryReadWrite.m \
-	Tests/TestSQLiteStore.m \
-	Tests/TestSQLiteStoreMultiPersistentRoots.m \
-	Tests/TestSQLiteStorePerformance.m \
-	Tests/TestSQLiteStorePersistentRootBackingStore.m \
-	Tests/TestCommitTrack.m \
-	Tests/TestCommon.m \
-	Tests/main.m \
-	Tests/TestRevisionNumber.m 
+CoreObject_OBJC_FILES += $(wildcard Tests/*.m)
 endif
 
 clean : test=yes

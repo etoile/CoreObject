@@ -138,6 +138,44 @@ co_buffer_store_double(co_buffer_t *dest, double value)
     WRITE(swapped);
 }
 
+// FIXME: Get rid of this when -getBytes:... is available on GNUstep
+#ifdef GNUSTEP
+static inline
+void
+co_buffer_store_string(co_buffer_t *dest, NSString *value)
+{
+    if (value == nil)
+    {
+        co_buffer_store_null(dest);
+        return;
+    }
+
+    const char *utf8bytes = [value UTF8String];  
+    NSUInteger length = strlen(utf8bytes);
+   
+    if (length <= UINT8_MAX)
+    {
+        WRTITE_TYPE("s");
+        co_buffer_store_uint8(dest, (uint8_t)length);
+    }
+    else if (length <= UINT32_MAX)
+    {
+        WRTITE_TYPE("S");
+        co_buffer_store_uint32(dest, (uint32_t)length);
+    }
+    else
+    {
+        [NSException raise: NSInvalidArgumentException
+                    format: @"Strings longer than 2^32-1 not supported."];
+    }
+    
+    co_buffer_ensure_available(dest, length);
+    
+    memcpy(dest->data + dest->length, utf8bytes, length);
+    
+    dest->length += length;
+}
+#else
 static inline
 void
 co_buffer_store_string(co_buffer_t *dest, NSString *value)
@@ -186,6 +224,7 @@ co_buffer_store_string(co_buffer_t *dest, NSString *value)
     
     dest->length += length;
 }
+#endif
 
 static inline
 void
