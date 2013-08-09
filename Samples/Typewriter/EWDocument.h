@@ -15,9 +15,9 @@
 - (IBAction) history: (id)sender;
 - (IBAction) pickboard: (id)sender;
 
-- (void) recordNewState: (COItemGraph*)aState;
+- (void) recordUpdatedItems: (NSArray *)items;
 
-- (COPersistentRootInfo *) currentPersistentRoot;
+- (COPersistentRoot *) currentPersistentRoot;
 - (COSQLiteStore *) store;
 
 - (ETUUID *) editingBranch;

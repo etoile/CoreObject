@@ -2,11 +2,13 @@
 
 @implementation EWTextStorage
 
-- (id) init
+- (id) initWithDocumentUUID: (ETUUID *)aUUID
 {
+    NILARG_EXCEPTION_TEST(aUUID);
+    
     self = [super init];
     
-    ASSIGN(_rootUUID, [ETUUID UUID]);
+    ASSIGN(_rootUUID, aUUID);
     backing_ = [[NSMutableAttributedString alloc] init];
     paragraphsChangedDuringEditing_ = [[NSMutableSet alloc] init];
     
@@ -313,6 +315,9 @@ static NSRange paragraphRangeForLocationInString(NSString *aString, NSUInteger a
     // Writes out the contents of the text storage as a typewriter document
     
     COMutableItem *result = [COMutableItem itemWithUUID: _rootUUID];
+    // HACK: This is an implementation detail of COObject
+    [result setValue: @"Anonymous.TypewriterDocument" forAttribute: @"org.etoile-project.coreobject.entityname" type: kCOStringType];
+    
     [items addObject: result];
     
     NSLog(@"dumping typewriterDocument");
@@ -341,6 +346,8 @@ static NSRange paragraphRangeForLocationInString(NSString *aString, NSUInteger a
     [paragraphTree setValue: paragraphAsRTF
                forAttribute: @"data"
                        type: kCOBlobType];
+    // HACK: This is an implementation detail of COObject
+    [paragraphTree setValue: @"Anonymous.TypewriterParagraph" forAttribute: @"org.etoile-project.coreobject.entityname" type: kCOStringType];
     
     return paragraphTree;
 }

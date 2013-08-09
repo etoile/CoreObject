@@ -14,7 +14,10 @@
 {
     NSLog(@"windowDidLoad %@", textView_);
     
-    textStorage_ = [[EWTextStorage alloc] init];
+    
+    
+    textStorage_ = [[EWTextStorage alloc] initWithDocumentUUID:
+                        [[[[self document] currentPersistentRoot] rootObject] UUID]];
     [textStorage_ setDelegate: self];
     
     [textView_ setDelegate: self];
@@ -37,7 +40,7 @@
     return NO;
 }
 
-/* NSTextStorage */
+/* NSTextStorage delegate */
 
 - (void)textStorageDidProcessEditing:(NSNotification *)aNotification
 {
@@ -52,9 +55,17 @@
     
     id <COItemGraph> subtree = [textStorage_ typewriterDocument];
 
-    // FIXME: should be "Record delata"
-    [[self document] recordNewState: subtree];
-
+    // Calculate set of updated items
+    NSMutableArray *updatedItems = [NSMutableArray array];
+    [updatedItems addObject: [subtree itemForUUID: [subtree rootItemUUID]]];
+    
+    for (ETUUID *updatedUUID in [textStorage_ paragraphUUIDsChangedDuringEditing])
+    {
+        [updatedItems addObject: [subtree itemForUUID: updatedUUID]];
+    }
+    
+    // Make a commit
+    [[self document] recordUpdatedItems: updatedItems];
     
 //    NSLog(@"subtree: %@", subtree);
 //    

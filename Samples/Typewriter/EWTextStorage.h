@@ -10,6 +10,8 @@
     NSMutableSet *paragraphsChangedDuringEditing_;
 }
 
+- (id) initWithDocumentUUID: (ETUUID *)aUUID;
+
 - (BOOL) setTypewriterDocument: (id <COItemGraph>)aTree;
 - (id <COItemGraph>) typewriterDocument;
 - (COItem *) paragraphTreeForUUID: (ETUUID *)aUUID;

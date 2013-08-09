@@ -36,7 +36,11 @@
         [documentProperty setMultivalued: NO];
         [documentProperty setOpposite: (id)@"Anonymous.TypewriterDocument.paragraphs"];
         
-        [paragraphEntity setPropertyDescriptions: A(documentProperty)];
+        ETPropertyDescription *dataProperty =
+        [ETPropertyDescription descriptionWithName: @"data" type: (id)@"Anonymous.NSData"];
+        [dataProperty setPersistent: YES];
+        
+        [paragraphEntity setPropertyDescriptions: A(documentProperty, dataProperty)];
     }
     
     [[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: docEntity];

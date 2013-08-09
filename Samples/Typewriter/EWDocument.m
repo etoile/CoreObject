@@ -103,18 +103,21 @@
     [[EWPickboardWindowController sharedController] show];
 }
 
-- (void) recordNewState: (id <COItemGraph>)aTree
+- (void) recordUpdatedItems: (NSArray *)items
 {
-//    
-//    
-//    CORevisionID *token = [[_persistentRoot currentBranch] currentRevisionID];
-//    
-//    CORevisionID *newState = [CORevisionID stateWithTree: aTree];
-//    CORevisionID *token2 = [store_ addState: newState parentState: token];
-//    
-//    [store_ setCurrentVersion: token2 forBranch: [[_persistentRoot currentBranch] UUID] ofPersistentRoot: [_persistentRoot UUID]];
-//    
-//    ASSIGN(_persistentRoot, [store_ persistentRootWithUUID: [_persistentRoot UUID]]);
+    NSLog(@"Object graph before : %@", [[_persistentRoot editingBranch] objectGraph]);
+    
+    assert(![_persistentRoot hasChanges]);
+    
+    [[[_persistentRoot editingBranch] objectGraph] insertOrUpdateItems: items];
+    
+    assert([_persistentRoot hasChanges]);
+    
+    [_persistentRoot commit];
+    
+    assert(![_persistentRoot hasChanges]);
+    
+    NSLog(@"Object graph after: %@", [[_persistentRoot editingBranch] objectGraph]);
 }
 
 - (void) validateCanLoadStateToken: (CORevisionID *)aToken

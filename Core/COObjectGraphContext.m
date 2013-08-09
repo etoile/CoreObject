@@ -564,4 +564,19 @@
     }
 }
 
+- (NSString *)description
+{
+	NSMutableString *result = [NSMutableString string];
+    
+	[result appendFormat: @"[COObjectGraphContext root: %@\n", [self rootItemUUID]];
+	for (ETUUID *uuid in [self itemUUIDs])
+	{
+        COItem *item = [self itemForUUID: uuid];
+		[result appendFormat: @"%@", item];
+	}
+	[result appendFormat: @"]"];
+	
+	return result;
+}
+
 @end
