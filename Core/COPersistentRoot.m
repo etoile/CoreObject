@@ -288,11 +288,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	return [[self objectGraph] updatedObjects];
 }
 
-- (NSSet *)updatedObjectUUIDs
-{
-	return [NSSet setWithArray: (id)[[[self updatedObjects] mappedCollection] UUID]];
-}
-
 - (BOOL)isUpdatedObject: (COObject *)anObject
 {
 	return [[self updatedObjects] containsObject: anObject];
@@ -311,16 +306,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 - (NSSet *)changedObjectUUIDs
 {
     return (NSSet *)[[[self changedObjects] mappedCollection] UUID];
-}
-
-- (void)discardAllChanges
-{
-	[[self editingBranch] discardAllChanges];
-}
-
-- (void)discardChangesInObject: (COObject *)object
-{
-    [[self editingBranch] discardChangesInObject: object];
 }
 
 - (BOOL)hasChanges

@@ -399,32 +399,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return [_persistentRoot store];
 }
 
-- (void)discardAllChanges
-{
-	for (COObject *object in [_objectGraph changedObjects])
-	{
-		[self discardChangesInObject: object];
-	}
-	assert([_objectGraph hasChanges] == NO);
-}
-
-// WARNING: Not necessairily safe. Should we support this?
-//
-// e.g. A has a reference to B. Delete B, then call -discardChangesInObject:
-// on A. This will try to restore a reference to B which will be broken, and
-// throw an exception.
-- (void)discardChangesInObject: (COObject *)object
-{
-    if (_currentRevisionID != nil)
-    {
-        COItem *item = [[self store] item: [object UUID]
-                             atRevisionID: _currentRevisionID];
-        
-        [_objectGraph insertOrUpdateItems: [NSArray arrayWithObject: item]];
-        [_objectGraph clearChangeTrackingForObject: object];
-    }
-}
-
 - (void)saveCommitWithMetadata: (NSDictionary *)metadata
 {
 	ETAssert([[_objectGraph rootObject] isRoot]);

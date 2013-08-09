@@ -322,10 +322,6 @@
  */
 - (NSSet *)updatedObjects;
 /**
- * Returns the UUIDs of the objects updated since the last commit. See -updatedObjects.
- */
-- (NSSet *)updatedObjectUUIDs;
-/**
  * Returns whether the object has been updated since the last commit. See
  * -updatedObjects.
  *
@@ -346,27 +342,6 @@
  * See also -changedObjects.
  */
 - (BOOL)hasChanges;
-/**
- * Discards the uncommitted changes to reset the context to its last commit state.
- *
- * Every object insertion or deletion is cancelled.<br />
- * Every updated property is reverted to its last committed value.
- *
- * -insertedObjects, -updatedObjects, -deletedObjects and -changedObjects will
- * all return empty sets once the changes have been discarded.
- *
- * See also -discardChangesInObject:.
- */
-- (void)discardAllChanges;
-/**
- * Discards the uncommitted changes in a particular object to restore the state
- * it was in at the last commit.
- *
- * Every updated property in the object is reverted to its last committed value.
- *
- * See also -discardAllChanges:.
- */
-- (void)discardChangesInObject: (COObject *)object;
 
 /** @taskunit Object Insertion */
 
