@@ -368,10 +368,6 @@
 		609C00611704C24C00D01AAB /* TestRevisionNumber.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestRevisionNumber.m; path = Tests/TestRevisionNumber.m; sourceTree = "<group>"; };
 		609C00781704C2BA00D01AAB /* CORevision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CORevision.h; path = Core/CORevision.h; sourceTree = "<group>"; };
 		609C00791704C2BA00D01AAB /* CORevision.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CORevision.m; path = Core/CORevision.m; sourceTree = "<group>"; };
-		609C007A1704C2BA00D01AAB /* COSQLStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSQLStore.h; path = Store/COSQLStore.h; sourceTree = "<group>"; };
-		609C007B1704C2BA00D01AAB /* COSQLStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSQLStore.m; path = Store/COSQLStore.m; sourceTree = "<group>"; };
-		609C007C1704C2BA00D01AAB /* COStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COStore.h; path = Store/COStore.h; sourceTree = "<group>"; };
-		609C007D1704C2BA00D01AAB /* COStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COStore.m; path = Store/COStore.m; sourceTree = "<group>"; };
 		609C00881704C3DA00D01AAB /* COEditingContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COEditingContext.h; path = Core/COEditingContext.h; sourceTree = "<group>"; };
 		609C00891704C3DA00D01AAB /* COEditingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COEditingContext.m; path = Core/COEditingContext.m; sourceTree = "<group>"; };
 		609C008C1704C3DA00D01AAB /* COObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COObject.h; path = Core/COObject.h; sourceTree = "<group>"; };
@@ -1060,10 +1056,6 @@
 		791B4E501299C8AF00CCF472 /* Store (Low-level API) */ = {
 			isa = PBXGroup;
 			children = (
-				609C007A1704C2BA00D01AAB /* COSQLStore.h */,
-				609C007B1704C2BA00D01AAB /* COSQLStore.m */,
-				609C007C1704C2BA00D01AAB /* COStore.h */,
-				609C007D1704C2BA00D01AAB /* COStore.m */,
 				66D96CA2178B717000D1553C /* COBinaryReader.h */,
 				66D96CA3178B717000D1553C /* COBinaryReader.m */,
 				66D96CA4178B717000D1553C /* COBinaryWriter.h */,
