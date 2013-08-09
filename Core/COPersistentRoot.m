@@ -278,41 +278,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     NSLog(@"-discardLoadedObjectForUUID: deprecated and has no effect");
 }
 
-- (NSSet *)insertedObjects
-{
-	return [[self objectGraph] insertedObjects];
-}
-
-- (NSSet *)updatedObjects
-{
-	return [[self objectGraph] updatedObjects];
-}
-
-- (BOOL)isUpdatedObject: (COObject *)anObject
-{
-	return [[self updatedObjects] containsObject: anObject];
-}
-
-- (NSMapTable *) updatedPropertiesByObject
-{
-	return [[self objectGraph] updatedPropertiesByObject];
-}
-
-- (NSSet *)changedObjects
-{
-    return [[self objectGraph] changedObjects];
-}
-
-- (NSSet *)changedObjectUUIDs
-{
-    return (NSSet *)[[[self changedObjects] mappedCollection] UUID];
-}
-
-- (BOOL)hasChanges
-{
-	return [[self changedObjects] count] > 0;
-}
-
 - (COObject *)insertObjectWithEntityName: (NSString *)aFullName
                                     UUID: (ETUUID *)aUUID
 {

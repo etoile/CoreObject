@@ -305,44 +305,6 @@
  */
 - (id)loadedObjectForUUID: (ETUUID *)uuid;
 
-/** @taskunit Pending Changes */
-
-/**
- * Returns the new objects added to the context with -insertObject: and to be
- * added to the store on the next commit.
- *
- * After a commit, returns an empty set.
- */
-- (NSSet *)insertedObjects;
-/**
- * Returns the objects whose properties have been edited in the context and to
- * be updated in the store on the next commit.
- *
- * After a commit, returns an empty set.
- */
-- (NSSet *)updatedObjects;
-/**
- * Returns whether the object has been updated since the last commit. See
- * -updatedObjects.
- *
- * Won't return YES if the object has just been inserted or deleted.
- */
-- (BOOL)isUpdatedObject: (COObject *)anObject;
-/**
- * Returns the union of the inserted, updated and deleted objects. See
- * -insertedObjects, -updatedObjects and -deletedObjects.
- *
- * After a commit, returns an empty set.
- */
-- (NSSet *)changedObjects;
-/**
- * Returns whether any object has been inserted, deleted or updated since the
- * last commit.
- *
- * See also -changedObjects.
- */
-- (BOOL)hasChanges;
-
 /** @taskunit Object Insertion */
 
 /**
