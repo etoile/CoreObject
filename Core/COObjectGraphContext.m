@@ -371,13 +371,14 @@
 {
 	if ([self branch] == nil)
 	{
-		// TODO: Should turn the exception into a COInvalidBranchException or
-		// COTransientObjectGraphContextException
-		[NSException raise: NSInternalInconsistencyException
-					format: @"An object graph context without a branch doesn't "
-		                     "support rollback."];
+		[self discardObjects: [self insertedObjects]];
+		[self clearChangeTracking];
+		ETAssert([[self allObjects] isEmpty]);
 	}
-	[[self branch] reloadAtRevision: [[self branch] currentRevision]];
+	else
+	{
+		[[self branch] reloadAtRevision: [[self branch] currentRevision]];
+	}
 }
 
 - (NSSet *) insertedObjects

@@ -133,6 +133,8 @@
  */
 @property (readonly, nonatomic) CORevision *newestRevision;
 
+- (void)reloadAtRevision: (CORevision *)revision;
+
 /** @taskunit Persistent Root and Object Graph Context */
 
 /**
