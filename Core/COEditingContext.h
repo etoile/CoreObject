@@ -285,7 +285,7 @@
 
 @interface COEditingContext (Debugging)
 
-/** @taskunit Object Access and Loading */
+/** @taskunit Loaded Objects */
 
 /**
  * Returns the objects presently managed by the receiver in memory.
@@ -322,13 +322,6 @@
  * After a commit, returns an empty set.
  */
 - (NSSet *)updatedObjects;
-/**
- * Returns whether the object has been updated since the last commit. See
- * -updatedObjects.
- *
- * Won't return YES if the object has just been inserted or deleted.
- */
-- (BOOL)isUpdatedObject: (COObject *)anObject;
 /**
  * Returns the union of the inserted, updated and deleted objects. See
  * -insertedObjects, -updatedObjects and -deletedObjects.

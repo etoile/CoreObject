@@ -315,60 +315,6 @@
     [aPersistentRoot updateCrossPersistentRootReferences];
 }
 
-- (NSSet *)loadedObjects
-{
-	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(loadedObjects)];
-}
-
-- (NSSet *)loadedRootObjects
-{
-	NSMutableSet *collectedObjects = [NSMutableSet set];
-	
-	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
-	{
-		for (COBranch *branch in [persistentRoot branches])
-		{
-			[collectedObjects addObject: [[branch objectGraph] rootObject]];
-		}
-	}
-	return collectedObjects;
-}
-
-// NOTE: We could rewrite it using -foldWithBlock: or -leftFold (could be faster)
-- (NSSet *)setByCollectingObjectsFromPersistentRootsUsingSelector: (SEL)aSelector
-{
-	NSMutableSet *collectedObjects = [NSMutableSet set];
-
-	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
-	{
-		for (COBranch *branch in [persistentRoot branches])
-		{
-			[collectedObjects unionSet: [[branch objectGraph] performSelector: aSelector]];
-		}
-	}
-	return collectedObjects;
-}
-
-- (NSSet *)insertedObjects
-{
-	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(insertedObjects)];
-}
-
-- (NSSet *)updatedObjects
-{
-	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(updatedObjects)];
-}
-
-- (BOOL)isUpdatedObject: (COObject *)anObject
-{
-	return [[self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(updatedObjects)] containsObject: anObject];
-}
-
-- (NSSet *)changedObjects
-{
-	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(changedObjects)];
-}
-
 - (BOOL)hasChanges
 {
     if ([_persistentRootsPendingDeletion count] > 0)
@@ -606,6 +552,60 @@
     {
         [loaded storePersistentRootDidChange: notif];
     }
+}
+
+@end
+
+
+@implementation COEditingContext (Debugging)
+
+- (NSSet *)loadedObjects
+{
+	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(loadedObjects)];
+}
+
+- (NSSet *)loadedRootObjects
+{
+	NSMutableSet *collectedObjects = [NSMutableSet set];
+	
+	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+	{
+		for (COBranch *branch in [persistentRoot branches])
+		{
+			[collectedObjects addObject: [[branch objectGraph] rootObject]];
+		}
+	}
+	return collectedObjects;
+}
+
+// NOTE: We could rewrite it using -foldWithBlock: or -leftFold (could be faster)
+- (NSSet *)setByCollectingObjectsFromPersistentRootsUsingSelector: (SEL)aSelector
+{
+	NSMutableSet *collectedObjects = [NSMutableSet set];
+
+	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+	{
+		for (COBranch *branch in [persistentRoot branches])
+		{
+			[collectedObjects unionSet: [[branch objectGraph] performSelector: aSelector]];
+		}
+	}
+	return collectedObjects;
+}
+
+- (NSSet *)insertedObjects
+{
+	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(insertedObjects)];
+}
+
+- (NSSet *)updatedObjects
+{
+	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(updatedObjects)];
+}
+
+- (NSSet *)changedObjects
+{
+	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(changedObjects)];
 }
 
 @end
