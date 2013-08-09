@@ -199,7 +199,8 @@
 	   subclass designed initializer being called). */
 	COObject *obj = [[objClass alloc] commonInitWithUUID: aUUID
                                        entityDescription: anEntityDescription
-	                                  objectGraphContext: self];
+	                                  objectGraphContext: self
+	                                               isNew: NO];
 	
 	[objectsByUUID_ setObject: obj forKey: aUUID];
 	[obj release];
@@ -272,7 +273,7 @@
 	return obj;
 }
 
-- (void)registerObject: (COObject *)object
+- (void)registerObject: (COObject *)object isNew: (BOOL)inserted
 {
 	NILARG_EXCEPTION_TEST(object);
 	INVALIDARG_EXCEPTION_TEST(object, [object isKindOfClass: [COObject class]]);
@@ -282,7 +283,10 @@
 	INVALIDARG_EXCEPTION_TEST(object, [objectsByUUID_ objectForKey: uuid] == nil);
     
     [objectsByUUID_ setObject: object forKey: uuid];
-	[insertedObjects_ addObject: object];
+	if (inserted)
+	{
+		[insertedObjects_ addObject: object];
+	}
 }
 
 - (void) insertOrUpdateItems: (NSArray *)items
@@ -317,6 +321,10 @@
 - (void) setItemGraph: (id <COItemGraph>)aTree
 {
     [self clearChangeTracking];
+
+	// TODO: Discard changed objects probably
+	//[objectsByUUID_ removeObjectsForKeys:
+	// 	[(NSSet *)[[[self changedObjects] mappedCollection] UUID] allObjects]];
 
     // 1. Do updates.
 

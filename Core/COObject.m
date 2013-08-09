@@ -140,6 +140,7 @@ See +[NSObject typePrefix]. */
 - (id) commonInitWithUUID: (ETUUID *)aUUID 
         entityDescription: (ETEntityDescription *)anEntityDescription
        objectGraphContext: (COObjectGraphContext *)aContext
+					isNew: (BOOL)inserted
 {
 	NILARG_EXCEPTION_TEST(aUUID);
 	NILARG_EXCEPTION_TEST(anEntityDescription);
@@ -161,7 +162,7 @@ See +[NSObject typePrefix]. */
     _relationshipsAsCOPathOrETUUID = [self newVariableStorage];
 	_incomingRelationships = [[CORelationshipCache alloc] init];
 
-	[_objectGraphContext registerObject: self];
+	[_objectGraphContext registerObject: self isNew: inserted];
 
 	return self;
 }
@@ -173,7 +174,8 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	SUPERINIT;
 	self = [self commonInitWithUUID: aUUID 
 	              entityDescription: anEntityDescription
-	             objectGraphContext: aContext];
+	             objectGraphContext: aContext
+	                          isNew: YES];
 	[self init];
 	return self;
 }
@@ -189,7 +191,8 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	ETModelDescriptionRepository *repo = [aContext modelRepository];
 	return [self commonInitWithUUID: [ETUUID UUID]
 	              entityDescription: [repo entityDescriptionForClass: [self class]]
-	             objectGraphContext: aContext];
+	             objectGraphContext: aContext
+	                          isNew: YES];
 }
 
 - (id)init

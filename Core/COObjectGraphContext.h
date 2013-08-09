@@ -119,11 +119,9 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
- * Declares the object as newly inserted and puts it among the loaded objects.
- *
- * The first registered object becomes the root object.
+ * Puts the object among the loaded objects.
  */
-- (void)registerObject: (COObject *)object;
+- (void)registerObject: (COObject *)object isNew: (BOOL)inserted;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

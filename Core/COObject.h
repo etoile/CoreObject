@@ -698,7 +698,8 @@ objectGraphContext: (COObjectGraphContext *)aContext;
  */
 - (id)commonInitWithUUID: (ETUUID *)aUUID
        entityDescription: (ETEntityDescription *)anEntityDescription
-      objectGraphContext: (COObjectGraphContext *)aContext;
+      objectGraphContext: (COObjectGraphContext *)aContext
+                   isNew: (BOOL)inserted;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
