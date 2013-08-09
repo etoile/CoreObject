@@ -278,6 +278,23 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     NSLog(@"-discardLoadedObjectForUUID: deprecated and has no effect");
 }
 
+- (BOOL)hasChanges
+{
+	// TODO: Take in account pending branch insertion and deletion
+	for (COBranch *branch in [self branches])
+	{
+		if ([branch hasChanges])
+			return YES;
+	}
+	return NO;
+}
+
+- (void)discardAllChanges
+{
+	// TODO: Cancel pending branch insertion and deletion
+	[[[self branches] mappedCollection] discardAllChanges];
+}
+
 - (COObject *)insertObjectWithEntityName: (NSString *)aFullName
                                     UUID: (ETUUID *)aUUID
 {

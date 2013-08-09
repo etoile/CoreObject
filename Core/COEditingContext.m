@@ -355,7 +355,16 @@ static COEditingContext *currentCtxt = nil;
 
 - (NSSet *)loadedRootObjects
 {
-	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(loadedRootObjects)];
+	NSMutableSet *collectedObjects = [NSMutableSet set];
+	
+	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+	{
+		for (COBranch *branch in [persistentRoot branches])
+		{
+			[collectedObjects addObject: [[branch objectGraph] rootObject]];
+		}
+	}
+	return collectedObjects;
 }
 
 // NOTE: We could rewrite it using -foldWithBlock: or -leftFold (could be faster)
@@ -363,9 +372,12 @@ static COEditingContext *currentCtxt = nil;
 {
 	NSMutableSet *collectedObjects = [NSMutableSet set];
 
-	for (COPersistentRoot *context in [_loadedPersistentRoots objectEnumerator])
+	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
-		[collectedObjects unionSet: [context performSelector: aSelector]];
+		for (COBranch *branch in [persistentRoot branches])
+		{
+			[collectedObjects unionSet: [[branch objectGraph] performSelector: aSelector]];
+		}
 	}
 	return collectedObjects;
 }
@@ -383,11 +395,6 @@ static COEditingContext *currentCtxt = nil;
 - (BOOL)isUpdatedObject: (COObject *)anObject
 {
 	return [[self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(updatedObjects)] containsObject: anObject];
-}
-
-- (NSSet *)deletedObjects
-{
-	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(deletedObjects)];
 }
 
 - (NSSet *)changedObjects
@@ -416,10 +423,8 @@ static COEditingContext *currentCtxt = nil;
 
 - (void)discardAllChanges
 {
-	/* Represents persistent roots inserted since the last commit */
-	NSSet *insertedPersistentRoots = [self persistentRootsPendingInsertion];
+	/* Discard changes in persistent roots */
 
-	/* Discard changes in persistent roots and collect discarded persistent roots */
 	for (ETUUID *uuid in _loadedPersistentRoots)
 	{
 		COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: uuid];
@@ -431,15 +436,20 @@ static COEditingContext *currentCtxt = nil;
 		[persistentRoot discardAllChanges];
 	}
 
-	/* Remove from the cache all the objects that belong to discarded persistent roots */
-    // FIXME: Implement
-	//[(COPersistentRoot *)[insertedPersistentRoots mappedCollection] unload];
+	/* Clear persistent roots pending insertion */
 
-	/* Release the discarded persistent roots */
+	NSArray *persistentRootsPendingInsertion = [[self persistentRootsPendingInsertion] allObjects];
+
 	[_loadedPersistentRoots removeObjectsForKeys:
-		(id)[[[insertedPersistentRoots allObjects] mappedCollection] persistentRootUUID]];
+		[(id)[persistentRootsPendingInsertion mappedCollection] persistentRootUUID]];
+	ETAssert([[self persistentRootsPendingInsertion] isEmpty]);
+	
+	/* Clear other pending changes */
 
-	assert([self hasChanges] == NO);
+	[_persistentRootsPendingDeletion removeAllObjects];
+	[_persistentRootsPendingUndeletion removeAllObjects];
+
+	ETAssert([self hasChanges] == NO);
 }
 
 - (NSArray *)commit

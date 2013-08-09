@@ -88,7 +88,7 @@
  *
  * See also -clearChangeTracking and -[COBranch reloadAtRevision:].
  */
-- (void)rollback;
+- (void)discardAllChanges;
 /**
  * Returns the set of objects inserted since change tracking was cleared
  */
@@ -118,7 +118,7 @@
 #pragma mark access
 
 - (COObject *) objectWithUUID: (ETUUID *)aUUID;
-- (NSArray *) allObjects;
+- (NSSet *)loadedObjects;
 
 #pragma mark COObject private
 

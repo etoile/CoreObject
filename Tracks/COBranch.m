@@ -281,6 +281,18 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return nil;
 }
 
+- (BOOL)hasChanges
+{
+	// TODO: Take in account branch renaming and metadata changes
+	return [[self objectGraph] hasChanges];
+}
+
+- (void)discardAllChanges
+{
+	// TODO: Cancel branch renaming and metadata changes
+	[[self objectGraph] discardAllChanges];
+}
+
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel
 {
     if ([self isBranchUncommitted])

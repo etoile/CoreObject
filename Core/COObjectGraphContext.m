@@ -367,13 +367,13 @@
 
 #pragma mark change tracking
 
-- (void)rollback
+- (void)discardAllChanges
 {
 	if ([self branch] == nil)
 	{
 		[self discardObjects: [self insertedObjects]];
 		[self clearChangeTracking];
-		ETAssert([[self allObjects] isEmpty]);
+		ETAssert([[self loadedObjects] isEmpty]);
 	}
 	else
 	{
@@ -402,9 +402,9 @@
 {
 	return [[self changedObjects] count] > 0;
 }
-- (NSArray *) allObjects
+- (NSSet *)loadedObjects
 {
-    return [objectsByUUID_ allValues];
+    return [NSSet setWithArray: [objectsByUUID_ allValues]];
 }
 
 - (void)discardObjects: (NSSet *)objects

@@ -26,11 +26,13 @@
  */
 - (COEditingContext *)editingContext;
 /**
- * See -[COEditingContext discardAllChanges] and -[COPersistentRoot discardAllChanges].
+ * See -[COEditingContext discardAllChanges], -[COPersistentRoot discardAllChanges], 
+ * -[COBranch discardAllChanges] and -[COObjectGraphContext discardAllChanges].
  */
 - (void)discardAllChanges;
 /**
- * See -[COEditingContext hasChanges] and -[COPersistentRoot hasChanges].
+ * See -[COEditingContext hasChanges], -[COPersistentRoot hasChanges], 
+ *  -[COBranch hasChanges] and -[COObjectGraphContext hasChanges].
  */
 - (BOOL)hasChanges;
 @end
@@ -160,7 +162,6 @@
  * See also -changedObjects.
  */
 - (BOOL)hasChanges;
-
 /**
  * Discards the uncommitted changes to reset the context to its last commit state.
  *
@@ -175,7 +176,6 @@
  * all return empty sets once the changes have been discarded.
  */
 - (void)discardAllChanges;
-
 
 /** @taskunit Committing Changes */
 
@@ -359,15 +359,6 @@
  * Won't return YES if the object has just been inserted or deleted.
  */
 - (BOOL)isUpdatedObject: (COObject *)anObject;
-/**
- * Returns the objects deleted in the context with -deleteObject: and to be
- * deleted in the store on the next commit.
- *
- * After a commit, returns an empty set.
- *
- * Doesn't include newly inserted or deleted objects.
- */
-- (NSSet *)deletedObjects;
 /**
  * Returns the union of the inserted, updated and deleted objects. See
  * -insertedObjects, -updatedObjects and -deletedObjects.

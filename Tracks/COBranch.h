@@ -146,6 +146,19 @@
  */
 @property (readonly, nonatomic) COObjectGraphContext *objectGraph;
 
+/**
+ * @taskunit Pending Changes
+ */
+
+/**
+ * Returns whether any object has been inserted, deleted or updated since the
+ * last commit.
+ *
+ * See also -changedObjects.
+ */
+- (BOOL)hasChanges;
+- (void)discardAllChanges;
+
 /** @taskunit Undo / Redo */
 
 - (void)undo;
