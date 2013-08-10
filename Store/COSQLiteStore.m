@@ -8,63 +8,11 @@
 #import "COItem.h"
 #import "COSQLiteStore+Attachments.h"
 #import "COSearchResult.h"
+#import "COBranchInfo.h"
+#import "COPersistentRootInfo.h"
 
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
-
-@implementation COPersistentRootInfo
-
-@synthesize UUID = uuid_;
-@synthesize currentBranchUUID = currentBranch_;
-@synthesize branchForUUID = branchForUUID_;
-@synthesize changeCount = _changeCount;
-@synthesize deleted = _deleted;
-
-- (void) dealloc
-{
-    [uuid_ release];
-    [branchForUUID_ release];
-    [currentBranch_ release];
-    [super dealloc];
-}
-
-- (NSSet *) branchUUIDs
-{
-    return [NSSet setWithArray: [branchForUUID_ allKeys]];
-}
-
-- (COBranchInfo *)branchInfoForUUID: (ETUUID *)aUUID
-{
-    return [branchForUUID_ objectForKey: aUUID];
-}
-- (COBranchInfo *)currentBranchInfo
-{
-    return [self branchInfoForUUID: [self currentBranchUUID]];
-}
-
-@end
-
-@implementation COBranchInfo
-
-@synthesize UUID = uuid_;
-@synthesize headRevisionID = headRevisionId_;
-@synthesize tailRevisionID = tailRevisionId_;
-@synthesize currentRevisionID = currentRevisionId_;
-@synthesize deleted = deleted_;
-@synthesize metadata = metadata_;
-
-- (void) dealloc
-{
-    [uuid_ release];
-    [headRevisionId_ release];
-    [tailRevisionId_ release];
-    [currentRevisionId_ release];
-    [metadata_ release];
-    [super dealloc];
-}
-
-@end
-
 
 @interface COSQLiteStore (AttachmentsPrivate)
 

@@ -11,6 +11,8 @@
 #import "CORevisionID.h"
 #import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
+#import "COBranchInfo.h"
+#import "COPersistentRootInfo.h"
 #import "COType.h"
 #import "COObjectGraphContext.h"
 #import "COObject.h"

@@ -53,6 +53,8 @@
 
 #import <CoreObject/CORevisionID.h>
 #import <CoreObject/CORevisionInfo.h>
+#import <CoreObject/COBranchInfo.h>
+#import <CoreObject/COPersistentRootInfo.h>
 #import <CoreObject/COSearchResult.h>
 #import <CoreObject/COSQLiteStore.h>
 #import <CoreObject/COSQLiteStore+Attachments.h>

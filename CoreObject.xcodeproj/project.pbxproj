@@ -128,6 +128,10 @@
 		66C366FB17B46046009ACF2F /* EWDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66C366BC17B42863009ACF2F /* EWDocument.xib */; };
 		66C366FC17B46046009ACF2F /* History.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66C366BF17B42878009ACF2F /* History.xib */; };
 		66C366FD17B46046009ACF2F /* Pickboard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66C366C117B42878009ACF2F /* Pickboard.xib */; };
+		66C3670B17B5F9B0009ACF2F /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; };
+		66C3670C17B5F9B0009ACF2F /* COBranchInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3670A17B5F9AF009ACF2F /* COBranchInfo.m */; };
+		66C3670F17B5FA0E009ACF2F /* COPersistentRootInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */; };
+		66C3671017B5FA0E009ACF2F /* COPersistentRootInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3670E17B5FA0D009ACF2F /* COPersistentRootInfo.m */; };
 		66D43BB5179E170B008CE44E /* TestConcurrentChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */; };
 		66D96C70178AE41500D1553C /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
 		66D96CA0178B6E5600D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
@@ -487,6 +491,10 @@
 		66C366DA17B4288C009ACF2F /* EWUndoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWUndoManager.m; path = Samples/Typewriter/EWUndoManager.m; sourceTree = SOURCE_ROOT; };
 		66C366DB17B4288C009ACF2F /* EWUtilityWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWUtilityWindowController.h; path = Samples/Typewriter/EWUtilityWindowController.h; sourceTree = SOURCE_ROOT; };
 		66C366DC17B4288C009ACF2F /* EWUtilityWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWUtilityWindowController.m; path = Samples/Typewriter/EWUtilityWindowController.m; sourceTree = SOURCE_ROOT; };
+		66C3670917B5F9AF009ACF2F /* COBranchInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBranchInfo.h; path = Store/COBranchInfo.h; sourceTree = "<group>"; };
+		66C3670A17B5F9AF009ACF2F /* COBranchInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBranchInfo.m; path = Store/COBranchInfo.m; sourceTree = "<group>"; };
+		66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COPersistentRootInfo.h; path = Store/COPersistentRootInfo.h; sourceTree = "<group>"; };
+		66C3670E17B5FA0D009ACF2F /* COPersistentRootInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COPersistentRootInfo.m; path = Store/COPersistentRootInfo.m; sourceTree = "<group>"; };
 		66D099C4129AE111006BEDC3 /* StoreTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = StoreTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestConcurrentChanges.m; path = Tests/TestConcurrentChanges.m; sourceTree = "<group>"; };
 		66D96C9F178B6E5600D1553C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
@@ -978,6 +986,10 @@
 				66D96CAA178B717100D1553C /* CORevisionID.m */,
 				66D96CAB178B717100D1553C /* CORevisionInfo.h */,
 				66D96CAC178B717100D1553C /* CORevisionInfo.m */,
+				66C3670917B5F9AF009ACF2F /* COBranchInfo.h */,
+				66C3670A17B5F9AF009ACF2F /* COBranchInfo.m */,
+				66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */,
+				66C3670E17B5FA0D009ACF2F /* COPersistentRootInfo.m */,
 				66D96CAD178B717100D1553C /* COSearchResult.h */,
 				66D96CAE178B717100D1553C /* COSearchResult.m */,
 				66D96CAF178B717100D1553C /* COSQLiteStore.h */,
@@ -1064,6 +1076,8 @@
 				668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */,
 				66FB156017A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.h in Headers */,
 				66FB15D917AB31F6003BFC9B /* COObject+Subclass.h in Headers */,
+				66C3670B17B5F9B0009ACF2F /* COBranchInfo.h in Headers */,
+				66C3670F17B5FA0E009ACF2F /* COPersistentRootInfo.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1358,6 +1372,8 @@
 				668084F11791FBAB003A3CC6 /* COObjectGraphContext.m in Sources */,
 				66FB156117A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.m in Sources */,
 				66FB15DA17AB31F6003BFC9B /* COObject+Subclass.m in Sources */,
+				66C3670C17B5F9B0009ACF2F /* COBranchInfo.m in Sources */,
+				66C3671017B5FA0E009ACF2F /* COPersistentRootInfo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

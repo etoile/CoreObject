@@ -11,10 +11,12 @@
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
 #import "COSQLiteStore.h"
+#import "COPersistentRootInfo.h"
 #import "COObject.h"
 #import "CORevision.h"
 #import "FMDatabase.h"
 #import "CORevisionInfo.h"
+#import "COBranchInfo.h"
 #import "COObjectGraphContext.h"
 
 @implementation COBranch

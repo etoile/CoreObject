@@ -18,7 +18,10 @@
 #import "CORevision.h"
 #import "COSerialization.h"
 #import "COSQLiteStore.h"
+#import "COPersistentRootInfo.h"
 #import "COCrossPersistentRootReferenceCache.h"
+#import "COPersistentRootInfo.h"
+#import "COBranchInfo.h"
 
 @implementation COPersistentRoot
 
