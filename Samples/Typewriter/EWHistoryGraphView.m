@@ -20,21 +20,47 @@
     [trackingRects release];
     [super dealloc];
 }
- 
-- (void) setPersistentRoot: (COPersistentRootInfo *)proot
+
+- (NSSet *) revisionIDsOnBranch: (COBranch *)aBranch
+{
+    NSMutableSet *revisionIDs = [NSMutableSet set];
+    if (![aBranch isBranchUncommitted])
+    {
+        CORevision *head = [aBranch newestRevision];
+        CORevision *tail = [aBranch parentRevision];
+        
+        ETAssert(head != nil);
+        ETAssert(tail != nil);
+        
+        CORevision *current = head;
+        while (![current isEqual: tail])
+        {
+            [revisionIDs addObject: [current revisionID]];
+            current = [current parentRevision];
+            
+            ETAssert(current != nil);
+        }
+        
+        [revisionIDs addObject: [current revisionID]];
+    }
+    return revisionIDs;
+}
+
+- (void) setPersistentRoot: (COPersistentRoot *)proot
                     branch: (COBranch*)aBranch
                      store: (COSQLiteStore*)aStore
 {
-    NSMutableArray *allCommitsOnAllBranches = [NSMutableArray array];
+    // Array of CORevisionID
+    NSMutableSet *allCommitsOnAllBranches = [NSMutableSet set];
 
     for (COBranch *branch in [proot branches])
     {
-        [allCommitsOnAllBranches addObjectsFromArray: [branch allCommits]];
+        [allCommitsOnAllBranches unionSet: [self revisionIDsOnBranch: aBranch]];
     }
     
     [self setGraphRenderer: [[[EWGraphRenderer alloc] initWithCommits: allCommitsOnAllBranches
-                                                        branchCommits: [aBranch allCommits]
-                                                        currentCommit: [aBranch currentRevisionID]
+                                                        branchCommits: [self revisionIDsOnBranch: aBranch]
+                                                        currentCommit: [[aBranch currentRevision] revisionID]
                                                                 store: aStore] autorelease]];
 }
 
@@ -55,7 +81,7 @@
 
 - (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)userData
 {
-	COSQLiteStore *store = [graphRenderer store];
+//	COSQLiteStore *store = [graphRenderer store];
 	CORevisionID *commit = [graphRenderer commitAtPoint: point];
 	
 	if (commit == nil)
@@ -220,7 +246,7 @@
     
     EWDocument *doc = [[NSDocumentController sharedDocumentController] currentDocument];
     
-    [doc loadStateToken: [[[doc currentPersistentRoot] currentBranch] currentRevisionID]];
+    [doc loadStateToken: [[[[doc currentPersistentRoot] editingBranch] currentRevision] revisionID]];
 }
 
 @end

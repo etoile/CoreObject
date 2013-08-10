@@ -77,7 +77,7 @@
 //    [self setPersistentRoot: [store persistentRootWithUUID: aUUID]];
 //}
 
-- (void) setPersistentRoot: (COPersistentRootInfo *)proot
+- (void) setPersistentRoot: (COPersistentRoot *)proot
 {
     ASSIGN(_persistentRoot, proot);
     

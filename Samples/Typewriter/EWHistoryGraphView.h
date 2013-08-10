@@ -12,7 +12,7 @@
     CORevisionID *mouseoverCommit;
 }
 
-- (void)  setPersistentRoot: (COPersistentRootInfo *)proot
+- (void)  setPersistentRoot: (COPersistentRoot *)proot
                      branch: (COBranch*)aBranch
                       store: (COSQLiteStore*)aStore;
 

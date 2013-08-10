@@ -154,8 +154,7 @@
     [editingBranchObject setCurrentRevision: [CORevision revisionWithStore: [self store]
                                                                 revisionID: aToken]];
     
-    CORevisionID *state = [[self store] fullStateForToken: aToken];
-    id <COItemGraph> tree = [state tree];
+    id <COItemGraph> tree = [[self store] contentsForRevisionID: aToken];
 
     NSArray *wcs = [self windowControllers];
     for (EWTypewriterWindowController *wc in wcs)
@@ -169,7 +168,7 @@
     assert(aMetadata != nil);
     
     ASSIGN(_persistentRoot, aMetadata);
-    [self loadStateToken: [[_persistentRoot currentBranch] currentRevisionID]];
+    [self loadStateToken: [[[_persistentRoot currentBranch] currentRevision] revisionID]];
     
     for (NSWindowController *wc in [self windowControllers])
     {

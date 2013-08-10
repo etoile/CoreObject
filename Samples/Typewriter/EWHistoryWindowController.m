@@ -44,12 +44,12 @@
                     store:[(EWDocument *)aDoc store]];
 }
 
-- (void) updateWithProot: (COPersistentRootInfo *)proot
+- (void) updateWithProot: (COPersistentRoot *)proot
                    store: (COSQLiteStore *)store
 {
     COBranch *branch = [proot currentBranch];
     
-    NSLog(@"current branch: %@ has %d commits.g v %@", branch, (int)[[branch allCommits] count], graphView_);
+    //NSLog(@"current branch: %@ has %d commits.g v %@", branch, (int)[[branch allCommits] count], graphView_);
     
     [graphView_ setPersistentRoot: proot branch: branch store: store];
 }

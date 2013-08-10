@@ -38,15 +38,25 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 	return MAX(currentLevel, maxLevelUsed);
 }
 
-- (id) initWithCommits: (NSArray*)stateTokens
-         branchCommits: (NSArray*)branchCommits
+- (NSArray *) sortedCommits: (NSSet *)commits
+{
+    return [[commits allObjects] sortedArrayUsingComparator: ^(id obj1, id obj2) {
+        CORevisionInfo *obj1Info = [store revisionInfoForRevisionID: obj1];
+        CORevisionInfo *obj2Info = [store revisionInfoForRevisionID: obj2];
+        
+        return [[obj1Info date] compare: [obj2Info date]];
+    }];
+}
+
+- (id) initWithCommits: (NSSet*)stateTokens
+         branchCommits: (NSSet*)branchCommits
          currentCommit: (CORevisionID*)currentCommit
                  store: (COSQLiteStore*)aStore
 {
 	SUPERINIT;
 	ASSIGN(store, aStore);
     
-    ASSIGN(allCommitsSorted, [NSMutableArray arrayWithArray: stateTokens]);
+    ASSIGN(allCommitsSorted, [NSMutableArray arrayWithArray: [self sortedCommits: stateTokens]]);
     ASSIGN(currentCommit_, currentCommit);
     ASSIGN(branchCommits_, branchCommits);
     
@@ -68,6 +78,12 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 	[super dealloc];
 }
 
+- (CORevisionID*) parentForRevisonID: (CORevisionID*)aRevID
+{
+    // N.B.: Accesses disk. Insert a cache / run graph rendering in a thread in the future
+    return [[store revisionInfoForRevisionID: aRevID] parentRevisionID];
+}
+
 - (void) layoutGraph
 {
 	//
@@ -85,7 +101,7 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 	}
 	for (CORevisionID *aCommit in allCommitsSorted)
 	{
-		CORevisionID *aParent = [store parentForStateToken: aCommit];
+		CORevisionID *aParent = [self parentForRevisonID: aCommit];
 		if (aParent != nil)
 		{
 			NSMutableArray *children = [childrenForUUID objectForKey: aParent];
@@ -99,7 +115,7 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 	for (CORevisionID *aCommit in [NSArray arrayWithArray: allCommitsSorted])
 	{
 		if ([[childrenForUUID objectForKey: aCommit] count] == 0 &&
-			[store parentForStateToken: aCommit] == nil)
+			[self parentForRevisonID: aCommit] == nil)
 		{
 			//NSLog(@"removed %@ because it had no parents/children (%d)", 
 			//	  aCommit, (int)[allCommitsSorted indexOfObject: aCommit]);
@@ -122,7 +138,7 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 	NSMutableArray *roots = [NSMutableArray array];
 	for (CORevisionID *aCommit in allCommitsSorted)
 	{
-		CORevisionID *aParent = [store parentForStateToken: aCommit];
+		CORevisionID *aParent = [self parentForRevisonID: aCommit];
 		if (nil == aParent)
 		{
 			[roots addObject: aCommit];
@@ -173,7 +189,7 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 		for (i=0; i<[allCommitsSorted count]; i++)
 		{
 			CORevisionID *aCommit = [allCommitsSorted objectAtIndex: i];
-			CORevisionID *aCommitParent = [store parentForStateToken: aCommit];
+			CORevisionID *aCommitParent = [self parentForRevisonID: aCommit];
 			
 			if (aCommitParent != nil)
 			{
