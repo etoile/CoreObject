@@ -6,6 +6,8 @@
 @class COPersistentRoot, COBranch, COObject, CORelationshipCache;
 @class COItemGraph, COItem, COSchemaRegistry , COSchema, COEditingContext;
 
+extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
+
 @interface COObjectGraphContext : NSObject <COItemGraph>
 {
     ETUUID *rootObjectUUID_;

@@ -6,6 +6,8 @@
 #import "COPersistentRoot.h"
 #import "COBranch.h"
 
+NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGraphContextObjectsDidChangeNotification";
+
 /**
  * COEditingContext semantics:
  *
@@ -581,6 +583,9 @@
     {
         [modifiedObjects_ addObject: obj];
     }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextObjectsDidChangeNotification
+                                                        object: self];
 }
 
 - (NSString *)description

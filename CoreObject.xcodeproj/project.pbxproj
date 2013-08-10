@@ -106,6 +106,8 @@
 		668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 668084EE1791FBAB003A3CC6 /* COObjectGraphContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		668084F11791FBAB003A3CC6 /* COObjectGraphContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 668084EF1791FBAB003A3CC6 /* COObjectGraphContext.m */; };
 		6686BE2A12592D7B0065DE1A /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
+		66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66C3669B17B426BF009ACF2F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F16163B6B7A009C4F21 /* Cocoa.framework */; };
 		66C366DE17B4288C009ACF2F /* EWAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C366C617B4288B009ACF2F /* EWAppDelegate.m */; };
 		66C366DF17B4288C009ACF2F /* EWBranchesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C366C817B4288C009ACF2F /* EWBranchesWindowController.m */; };
@@ -128,9 +130,7 @@
 		66C366FB17B46046009ACF2F /* EWDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66C366BC17B42863009ACF2F /* EWDocument.xib */; };
 		66C366FC17B46046009ACF2F /* History.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66C366BF17B42878009ACF2F /* History.xib */; };
 		66C366FD17B46046009ACF2F /* Pickboard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66C366C117B42878009ACF2F /* Pickboard.xib */; };
-		66C3670B17B5F9B0009ACF2F /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; };
 		66C3670C17B5F9B0009ACF2F /* COBranchInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3670A17B5F9AF009ACF2F /* COBranchInfo.m */; };
-		66C3670F17B5FA0E009ACF2F /* COPersistentRootInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */; };
 		66C3671017B5FA0E009ACF2F /* COPersistentRootInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3670E17B5FA0D009ACF2F /* COPersistentRootInfo.m */; };
 		66D43BB5179E170B008CE44E /* TestConcurrentChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */; };
 		66D96C70178AE41500D1553C /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
@@ -1056,6 +1056,8 @@
 				606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */,
 				6609485F1787A1160049468B /* CORelationshipCache.h in Headers */,
 				66D96CB7178B717200D1553C /* COBinaryReader.h in Headers */,
+				66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */,
+				66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */,
 				66D96CB9178B717200D1553C /* COBinaryWriter.h in Headers */,
 				66D96CBA178B717200D1553C /* COItem+Binary.h in Headers */,
 				66D96CBE178B717200D1553C /* CORevisionID.h in Headers */,
@@ -1076,8 +1078,6 @@
 				668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */,
 				66FB156017A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.h in Headers */,
 				66FB15D917AB31F6003BFC9B /* COObject+Subclass.h in Headers */,
-				66C3670B17B5F9B0009ACF2F /* COBranchInfo.h in Headers */,
-				66C3670F17B5FA0E009ACF2F /* COPersistentRootInfo.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

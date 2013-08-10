@@ -11,19 +11,13 @@
 	self = [super initWithWindowNibName: @"Branches"];
     if (self) {
         
-//        [[NSNotificationCenter defaultCenter] addObserver: self
-//                                                 selector: @selector(storePersistentRootMetadataDidChange:)
-//                                                     name: COStorePersistentRootMetadataDidChangeNotification
-//                                                   object: nil];
     }
     return self;
 }
 
 - (void) dealloc
 {
-//    [[NSNotificationCenter defaultCenter] removeObserver: self
-//                                                    name: COStorePersistentRootMetadataDidChangeNotification
-//                                                  object: nil];
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
     
     [super dealloc];
 }
@@ -67,19 +61,23 @@
     return sorted;
 }
 
-//- (void) storePersistentRootMetadataDidChange: (NSNotification *)notif
-//{
-//    NSLog(@"branches window: view did change: %@", notif);
-//    
-//    COStore *store = [notif object];
-//    
-//    ETUUID *aUUID = [[notif userInfo] objectForKey: COStoreNotificationUUID];
-//    [self setPersistentRoot: [store persistentRootWithUUID: aUUID]];
-//}
+- (void) storePersistentRootMetadataDidChange: (NSNotification *)notif
+{
+    NSLog(@"branches window: view did change: %@", notif);
+    
+    [table reloadData];
+}
 
 - (void) setPersistentRoot: (COPersistentRoot *)proot
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+        
     ASSIGN(_persistentRoot, proot);
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(storePersistentRootMetadataDidChange:)
+                                                 name: COPersistentRootDidChangeNotification
+                                               object: nil];    
     
     [table reloadData];
 }

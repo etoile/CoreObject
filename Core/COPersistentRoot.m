@@ -23,6 +23,8 @@
 #import "COPersistentRootInfo.h"
 #import "COBranchInfo.h"
 
+NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidChangeNotification";
+
 @implementation COPersistentRoot
 
 @synthesize parentContext = _parentContext;
@@ -151,6 +153,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     {
         [_parentContext undeletePersistentRoot: self];
     }
+    [self sendChangeNotification];
 }
 
 - (COBranch *)currentBranch
@@ -168,6 +171,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     ASSIGN(_currentBranchUUID, [aTrack UUID]);
     
     [self updateCrossPersistentRootReferences];
+    [self sendChangeNotification];
 }
 
 - (COBranch *)editingBranch
@@ -188,6 +192,8 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     }
 
     ASSIGN(_editingBranchUUID, [aTrack UUID]);
+    
+    [self sendChangeNotification];
 }
 
 - (NSSet *)branches
@@ -220,8 +226,9 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     if ([aBranch isBranchUncommitted])
     {
         [_branchForUUID removeObjectForKey: [aBranch UUID]];
-        return;
     }
+    
+    [self sendChangeNotification];
 }
 
 - (COObjectGraphContext *)objectGraph
@@ -443,6 +450,8 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         // FIXME: Don't use the user method -setCurrentRevision: because it might mark the branch as neededing to be committed!
         [[self branchForUUID: uuid] setCurrentRevision: [CORevision revisionWithStore: [self store] revisionID: [branchInfo currentRevisionID]]];
     }
+    
+    [self sendChangeNotification];
 }
 
 - (void)updateCrossPersistentRootReferences
@@ -472,6 +481,12 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 //            }
 //        }
 //    }
+}
+
+- (void) sendChangeNotification
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName: COPersistentRootDidChangeNotification
+                                                        object: self];
 }
 
 @end

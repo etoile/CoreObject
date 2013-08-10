@@ -14,6 +14,8 @@
 
 @class COBranch, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo, COObjectGraphContext, CORevisionID;
 
+extern NSString * const COPersistentRootDidChangeNotification;
+
 /**
  * A persistent root editing context exposes as a working copy a CoreObject 
  * store snapshot restricted to a single persistent root (see COEditingContext also).
@@ -377,5 +379,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 - (void)storePersistentRootDidChange: (NSNotification *)notif;
 
 - (void) updateCrossPersistentRootReferences;
+
+- (void) sendChangeNotification;
 
 @end
