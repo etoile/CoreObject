@@ -1,104 +1,43 @@
 #import "CORevisionInfo.h"
-#import <EtoileFoundation/Macros.h>
 
 @implementation CORevisionInfo
 
-NSString *kCORevisionID = @"CORevisionID";
-NSString *kCORevisionParentID = @"CORevisionParentID";
-NSString *kCORevisionMetadata = @"CORevisionMetadata";
-
-- (id) initWithRevisionID: (CORevisionID *)revisionId
-         parentRevisionID: (CORevisionID *)parentRevisionId
-                 metadata: (NSDictionary *)metadata
-{
-    NSParameterAssert(revisionId != nil);
-    
-    SUPERINIT;
-    ASSIGN(revisionID_, revisionId);
-    ASSIGN(parentRevisionID_, parentRevisionId);
-    ASSIGN(metadata_, metadata);
-    return self;
-}
+@synthesize revisionID = _revisionID;
+@synthesize parentRevisionID = _parentRevisionID;
+@synthesize metadata = _metadata;
+@synthesize date = _date;
 
 - (void) dealloc
 {
-    [revisionID_ release];
-    [parentRevisionID_ release];
-    [metadata_ release];
+    [_revisionID release];
+    [_parentRevisionID release];
+    [_metadata release];
+    [_date release];
     [super dealloc];
-}
-
-- (CORevisionID *)revisionID
-{
-    return revisionID_;
-}
-- (CORevisionID *)parentRevisionID
-{
-    return parentRevisionID_;
-}
-- (NSDictionary *)metadata
-{
-    return metadata_;
 }
 
 - (BOOL) isEqual:(id)object
 {
     if ([object isKindOfClass: [CORevisionInfo class]])
     {
-        if (![((CORevisionInfo *)object)->revisionID_ isEqual: revisionID_])
-        {
-            return NO;
-        }
-        
-        if (!(parentRevisionID_ == nil && ((CORevisionInfo *)object)->parentRevisionID_ == nil)
-            && ![((CORevisionInfo *)object)->parentRevisionID_ isEqual: parentRevisionID_])
-        {
-            return NO;
-        }
-        return YES;
+        CORevisionInfo *other = (CORevisionInfo *)object;
+        return [_revisionID isEqual: [other revisionID]];
     }
     return NO;
 }
 
 - (NSUInteger) hash
 {
-    return [revisionID_ hash] ^ 15497645834521126867ULL;
-}
-
-- (id) plist
-{
-    NSMutableDictionary *d = [NSMutableDictionary dictionary];
-    [d setObject: [revisionID_ plist] forKey: kCORevisionID];
-    if (parentRevisionID_ != nil)
-    {
-        [d setObject: [parentRevisionID_ plist] forKey: kCORevisionParentID];
-    }
-    if (metadata_ != nil)
-    {
-        [d setObject: metadata_ forKey: kCORevisionMetadata];
-    }
-    return d;
-}
-+ (CORevisionInfo *) revisionWithPlist: (id)plist
-{
-    return [[[self alloc] initWithRevisionID: [plist objectForKey:kCORevisionID]
-                            parentRevisionID: [plist objectForKey: kCORevisionParentID]
-                                    metadata: [plist objectForKey: kCORevisionMetadata]] autorelease];
-}
-
-- (id) copyWithZone:(NSZone *)zone
-{
-    return [self retain];
+    return [_revisionID hash] ^ 15497645834521126867ULL;
 }
 
 - (NSString *)description
 {
-    if (parentRevisionID_ != nil)
+    if (_parentRevisionID != nil)
     {
-        return [NSString stringWithFormat: @"(Revision %@, Parent %@)", revisionID_, parentRevisionID_];
+        return [NSString stringWithFormat: @"(Revision %@, Parent %@)", _revisionID, _parentRevisionID];
     }
-    return [NSString stringWithFormat: @"(Revision %@)", revisionID_];
+    return [NSString stringWithFormat: @"(Revision %@)", _revisionID];
 }
-
 
 @end

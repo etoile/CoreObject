@@ -6,25 +6,18 @@
  *  Info about a commit. Parent revision (maybe nil), metadata, etc.
  *  There's a 1:1 mapping between a CORevisionID and CORevision per store.
  */
-@interface CORevisionInfo : NSObject <NSCopying>
+@interface CORevisionInfo : NSObject
 {
-    CORevisionID *revisionID_;
-    CORevisionID *parentRevisionID_;
-    NSDictionary *metadata_;
+    @private
+    CORevisionID *_revisionID;
+    CORevisionID *_parentRevisionID;
+    NSDictionary *_metadata;
+    NSDate *_date;
 }
 
-- (id) initWithRevisionID: (CORevisionID *)revisionId
-         parentRevisionID: (CORevisionID *)parentRevisionId
-                 metadata: (NSDictionary *)metadata;
-
-/**
- * The revision ID of the parent revision, or nil if this revision has no parent
- */
-- (CORevisionID *)revisionID;
-- (CORevisionID *)parentRevisionID;
-- (NSDictionary *)metadata;
-
-- (id) plist;
-+ (CORevisionInfo *) revisionWithPlist: (id)plist;
+@property (readwrite, nonatomic, retain) CORevisionID *revisionID;
+@property (readwrite, nonatomic, retain) CORevisionID *parentRevisionID;
+@property (readwrite, nonatomic, copy) NSDictionary *metadata;
+@property (readwrite, nonatomic, retain) NSDate *date;
 
 @end

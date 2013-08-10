@@ -62,7 +62,7 @@
     // Set up schema
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS commits (revid INTEGER PRIMARY KEY ASC, "
-                        "contents BLOB, metadata BLOB, parent INTEGER, root BLOB, deltabase INTEGER, "
+                        "contents BLOB, metadata BLOB, timestamp REAL, parent INTEGER, root BLOB, deltabase INTEGER, "
                         "bytesInDeltaRun INTEGER, garbage BOOLEAN)"];
     
     if ([db_ hadError])
@@ -125,7 +125,7 @@
 - (CORevisionInfo *) revisionForID: (CORevisionID *)aToken
 {
     CORevisionInfo *result = nil;
-    FMResultSet *rs = [db_ executeQuery: @"SELECT parent, metadata FROM commits WHERE revid = ?",
+    FMResultSet *rs = [db_ executeQuery: @"SELECT parent, metadata, timestamp FROM commits WHERE revid = ?",
                        [NSNumber numberWithLongLong: [aToken revisionIndex]]];
 	if ([rs next])
 	{
@@ -142,9 +142,11 @@
         
         CORevisionID *parentId = parent != -1 ? [aToken revisionIDWithRevisionIndex: parent] : nil;
         
-        result = [[[CORevisionInfo alloc] initWithRevisionID: aToken
-                                        parentRevisionID: parentId
-                                                metadata: metadata] autorelease];
+        result = [[[CORevisionInfo alloc] init] autorelease];
+        result.revisionID = aToken;
+        result.parentRevisionID = parentId;
+        result.metadata = metadata;
+        result.date = [rs dateForColumnIndex: 2];
 	}
     [rs close];
     
@@ -388,11 +390,12 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     }
     
     [db_ executeUpdate: @"INSERT INTO commits(revid, "
-        "contents, metadata, parent, root, deltabase, "
-        "bytesInDeltaRun, garbage) VALUES (?, ?, ?, ?, ?, ?, ?, 0)",
+        "contents, metadata, timestamp, parent, root, deltabase, "
+        "bytesInDeltaRun, garbage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)",
         [NSNumber numberWithLongLong: rowid],
         contentsBlob,
         metadataBlob,
+        [NSDate date],
         [NSNumber numberWithLongLong: aParent],
         [[anItemTree rootItemUUID] dataValue],
         [NSNumber numberWithLongLong: deltabase],
