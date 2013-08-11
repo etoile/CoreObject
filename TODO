@@ -62,6 +62,20 @@ First Release
   - Build an example app with a merging UI
 
 - Implement application-level undo/redo support
+  - Requirements:
+    - I want restarting applications to be side-effect-free, which means all undo/redo stacks must be persistent.
+    - Applications/UI designers should have great flexibility in deciding on undo behaviour:
+      - Making selections in a graphics editor is either included in the undo stack or not, depending on the app developer's choice
+      - navigation (switching to a different section of the app) is either included in the undo stack or not, depending on the app developer's choice
+        (e.g. Lightroom includes switching between tabs in its undo stack)
+    - Support scenarios where subsections of a persistent root have their own undo stack
+      (in IDE's like Xcode or Eclipse, each source file has its own undo stack. If the project is one persistent root, and each class/file within the
+       project is just an embedded object, we need to implement separate undo/redo stacks for each file somehow)
+    - Support scenarios where an application can edit several persistent root, and unify the edits into a single undo/redo stack
+      (e.g., an object manager editing the names of different persistent roots. The CoreObject version of a filename is stored in the
+       root embedded object of a persistent root)
+    - selective undoing your commits in a collaborative editing scenario
+    - support undo/redo of branch/delete branch, create persistent root/delete persistent root, revert to old revision (if app desires)
 
 - Work out clear and well documented object copy model easy to extend in COObject subclasses (see COObject and COEditingContext copy methods)
   - Finish COCopier
