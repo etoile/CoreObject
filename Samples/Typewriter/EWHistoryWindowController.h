@@ -6,6 +6,7 @@
 @interface EWHistoryWindowController : EWUtilityWindowController
 {
     IBOutlet EWHistoryGraphView *graphView_;
+    COPersistentRoot *persistentRoot_;
 }
 
 + (EWHistoryWindowController *) sharedController;

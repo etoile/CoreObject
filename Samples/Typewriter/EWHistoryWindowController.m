@@ -8,21 +8,13 @@
 {
 	self = [super initWithWindowNibName: @"History"];
     if (self) {
-        
-//        [[NSNotificationCenter defaultCenter] addObserver: self
-//                                                 selector: @selector(storePersistentRootMetadataDidChange:)
-//                                                     name: COStorePersistentRootMetadataDidChangeNotification
-//                                                   object: nil];
     }
     return self;
 }
 
 - (void) dealloc
 {
-//    [[NSNotificationCenter defaultCenter] removeObserver: self
-//                                                    name: COStorePersistentRootMetadataDidChangeNotification
-//                                                  object: nil];
-    
+    [persistentRoot_ release];
     [super dealloc];
 }
 
@@ -40,8 +32,18 @@
 {
     NSLog(@"Inspect %@", aDoc);
     
-    [self updateWithProot:[(EWDocument *)aDoc currentPersistentRoot]
-                    store:[(EWDocument *)aDoc store]];
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
+    COPersistentRoot *proot = [(EWDocument *)aDoc currentPersistentRoot];
+    ASSIGN(persistentRoot_, proot);
+    
+    [self updateWithProot: proot
+                    store: [(EWDocument *)aDoc store]];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(storePersistentRootMetadataDidChange:)
+                                                 name: COPersistentRootDidChangeNotification
+                                               object: proot];
 }
 
 - (void) updateWithProot: (COPersistentRoot *)proot
@@ -66,11 +68,8 @@
 {
     NSLog(@"history window: view did change: %@", notif);
     
-//    COSQLiteStore *store = [notif object];
-//    ETUUID *aUUID = [[notif userInfo] objectForKey: COStoreNotificationUUID];
-//    COPersistentRootInfo *proot = [store persistentRootWithUUID: aUUID];
-//    
-//    [self updateWithProot: proot store: store];
+    [self updateWithProot: persistentRoot_
+                    store: [persistentRoot_ store]];
 }
 
 - (void) sliderChanged: (id)sender
