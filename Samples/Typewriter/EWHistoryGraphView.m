@@ -55,7 +55,7 @@
 
     for (COBranch *branch in [proot branches])
     {
-        [allCommitsOnAllBranches unionSet: [self revisionIDsOnBranch: aBranch]];
+        [allCommitsOnAllBranches unionSet: [self revisionIDsOnBranch: branch]];
     }
     
     [self setGraphRenderer: [[[EWGraphRenderer alloc] initWithCommits: allCommitsOnAllBranches
