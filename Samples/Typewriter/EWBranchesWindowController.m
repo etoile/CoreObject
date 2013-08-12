@@ -56,7 +56,7 @@
     NSArray *unsorted = [[_persistentRoot branches] allObjects];
     NSArray *sorted = [unsorted sortedArrayUsingDescriptors:
      A([NSSortDescriptor sortDescriptorWithKey: @"label" ascending: NO],
-       [NSSortDescriptor sortDescriptorWithKey: @"UUID" ascending: NO])];
+       [NSSortDescriptor sortDescriptorWithKey: @"UUID.stringValue" ascending: NO])];
     
     return sorted;
 }
@@ -70,7 +70,9 @@
 
 - (void) setPersistentRoot: (COPersistentRoot *)proot
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [[NSNotificationCenter defaultCenter] removeObserver: self
+                                                    name: COPersistentRootDidChangeNotification
+                                                  object: _persistentRoot];
         
     ASSIGN(_persistentRoot, proot);
     

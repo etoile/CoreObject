@@ -32,7 +32,9 @@
 {
     NSLog(@"Inspect %@", aDoc);
     
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [[NSNotificationCenter defaultCenter] removeObserver: self
+                                                    name: COPersistentRootDidChangeNotification
+                                                  object: persistentRoot_];
     
     COPersistentRoot *proot = [(EWDocument *)aDoc currentPersistentRoot];
     ASSIGN(persistentRoot_, proot);
@@ -76,5 +78,16 @@
 {
     NSLog(@"%lf", [sender doubleValue]);
 }
+
+- (void) windowDidLoad
+{
+    [super windowDidLoad];
+    
+    [self setShouldCascadeWindows: NO];
+    [self setWindowFrameAutosaveName: @"pannerWindow"];
+    
+    [self setDocument: [self document]];
+    
+} // windowDidLoad
 
 @end

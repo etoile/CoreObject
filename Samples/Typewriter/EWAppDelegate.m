@@ -1,6 +1,9 @@
 #import "EWAppDelegate.h"
 #import <EtoileFoundation/EtoileFoundation.h>
 
+#import "EWBranchesWindowController.h"
+#import "EWHistoryWindowController.h"
+
 @implementation EWAppDelegate
 
 #define STOREURL [NSURL fileURLWithPath: [@"~/typewriterTest.typewriter" stringByExpandingTildeInPath]]
@@ -70,7 +73,8 @@
 
 - (void) applicationDidFinishLaunching: (NSNotification*)notif
 {
-    
+    [[EWBranchesWindowController sharedController] showWindow: self];
+    [[EWHistoryWindowController sharedController] showWindow: self];
 }
 
 @end
