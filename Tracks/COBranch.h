@@ -82,7 +82,7 @@
 /**
  * The branch label (used as the branch name in most cases).
  */
-@property (readonly, nonatomic) NSString *label;
+@property (readwrite, nonatomic) NSString *label;
 /**
  * The metadata attached to the branch.
  *

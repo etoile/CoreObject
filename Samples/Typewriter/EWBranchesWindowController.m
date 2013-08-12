@@ -155,7 +155,8 @@
     COBranch *branch = [[self orderedBranches] objectAtIndex: row];
     if ([[tableColumn identifier] isEqual: @"name"])
     {
-        NSLog(@"fixme: rename");
+        [branch setLabel: object];
+        [[branch persistentRoot] commit];
     }
     else if ([[tableColumn identifier] isEqual: @"checked"])
     {

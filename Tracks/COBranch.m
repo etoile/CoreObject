@@ -207,6 +207,20 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	return [_metadata objectForKey: @"COBranchLabel"];
 }
 
+- (void)setLabel: (NSString *)aLabel
+{
+    // FIXME: Make a standardized metadata key for this
+    if (_metadata == nil)
+    {
+        _metadata = [[NSMutableDictionary alloc] init];
+    }
+    
+    // FIXME: dictionary may not be mutable
+	[_metadata setObject: aLabel forKey: @"COBranchLabel"];
+    // FIXME: Commit if changed
+}
+
+
 - (BOOL)isDeleted
 {
     return _deleted;
