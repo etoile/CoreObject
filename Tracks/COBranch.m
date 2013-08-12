@@ -317,7 +317,20 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (void)discardAllChanges
 {
-	// TODO: Cancel branch renaming and metadata changes
+	if (_metadataChanged)
+    {
+        if ([self isBranchUncommitted])
+        {
+            [_metadata removeAllObjects];
+        }
+        else
+        {
+            ASSIGN(_metadata, [NSMutableDictionary dictionaryWithDictionary:
+                               [[self branchInfo] metadata]]);
+        }
+        _metadataChanged = NO;
+    }
+    
 	[[self objectGraphContext] discardAllChanges];
 }
 

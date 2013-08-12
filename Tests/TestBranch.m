@@ -604,6 +604,13 @@
     UKTrue([persistentRoot hasChanges]);
     UKTrue([originalBranch hasChanges]);
     
+    [originalBranch discardAllChanges];
+    
+    UKNil([originalBranch label]);
+    UKFalse([originalBranch hasChanges]);
+    
+    [originalBranch setLabel: @"Hello world"];
+        
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         UKNil([[[ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]] currentBranch] label]);
@@ -620,6 +627,13 @@
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         UKObjectsEqual(@"Hello world", [[[ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]] currentBranch] label]);
     }
+    
+    [originalBranch setLabel: @"Hello world 2"];
+    UKObjectsEqual(@"Hello world 2", [originalBranch label]);
+    
+    [originalBranch discardAllChanges];
+    
+    UKObjectsEqual(@"Hello world", [originalBranch label]);
 }
 
 - (void) testBranchMetadata
@@ -639,6 +653,13 @@
     UKTrue([persistentRoot hasChanges]);
     UKTrue([originalBranch hasChanges]);
     
+    [originalBranch discardAllChanges];
+    
+    UKObjectsEqual([NSDictionary dictionary], [originalBranch metadata]);
+    UKFalse([originalBranch hasChanges]);
+    
+    [originalBranch setMetadata: D(@"value", @"key")];
+    
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         UKObjectsEqual([NSDictionary dictionary], [[[ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]] currentBranch] metadata]);
@@ -655,6 +676,13 @@
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         UKObjectsEqual(D(@"value", @"key"), [[[ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]] currentBranch] metadata]);
     }
+    
+    [originalBranch setMetadata: D(@"value2", @"key")];
+    UKObjectsEqual(D(@"value2", @"key"), [originalBranch metadata]);
+    
+    [originalBranch discardAllChanges];
+    
+    UKObjectsEqual(D(@"value", @"key"), [originalBranch metadata]);
 }
 
 @end
