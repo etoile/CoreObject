@@ -22,19 +22,19 @@
     [myUndoManager setDelegate: self];
     [self setUndoManager: (NSUndoManager *)myUndoManager];
     
-//        [[NSNotificationCenter defaultCenter] addObserver: self
-//                                                 selector: @selector(storePersistentRootMetadataDidChange:)
-//                                                     name: COStorePersistentRootMetadataDidChangeNotification
-//                                                   object: store_];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(storePersistentRootMetadataDidChange:)
+                                                 name: COPersistentRootDidChangeNotification
+                                               object: _persistentRoot];
     
     return self;
 }
 
 - (void) dealloc
 {
-//    [[NSNotificationCenter defaultCenter] removeObserver: self
-//                                                    name: COStorePersistentRootMetadataDidChangeNotification
-//                                                  object: store_];
+    [[NSNotificationCenter defaultCenter] removeObserver: self
+                                                    name: COPersistentRootDidChangeNotification
+                                                  object: _persistentRoot];
 
     [_persistentRoot release];
     [super dealloc];
@@ -87,8 +87,6 @@
     COBranch *branch = [[_persistentRoot editingBranch] makeBranchWithLabel: @"Untitled"];
     [_persistentRoot setCurrentBranch: branch];
     [_persistentRoot commit];
-    
-    [self reloadFromStore];
 }
 - (IBAction) showBranches: (id)sender
 {
@@ -138,10 +136,9 @@
 
 - (void) persistentSwitchToStateToken: (CORevisionID *)aToken
 {
-//    [store_ setCurrentVersion: aToken
-//                    forBranch: [self editingBranch]
-//             ofPersistentRoot: [self UUID]];
-//    [self reloadFromStore];
+    [[_persistentRoot editingBranch] setCurrentRevision: [CORevision revisionWithStore: [self store]
+                                                                            revisionID: aToken]];
+    [_persistentRoot commit];
 }
 
 // Doesn't write to DB...
@@ -160,6 +157,7 @@
     for (EWTypewriterWindowController *wc in wcs)
     {
         [wc loadDocumentTree: tree];
+        [wc synchronizeWindowTitleWithDocumentName];
     }
 }
 
@@ -169,11 +167,6 @@
     
     ASSIGN(_persistentRoot, aMetadata);
     [self loadStateToken: [[[_persistentRoot currentBranch] currentRevision] revisionID]];
-    
-    for (NSWindowController *wc in [self windowControllers])
-    {
-        [wc synchronizeWindowTitleWithDocumentName];
-    }
 }
 
 - (NSString *)displayName
@@ -217,20 +210,20 @@
 - (void) storePersistentRootMetadataDidChange: (NSNotification *)notif
 {
     NSLog(@"did change: %@", notif);
+    
+    [self loadStateToken: [[[_persistentRoot currentBranch] currentRevision] revisionID]];
 }
 
 - (void) switchToBranch: (ETUUID *)aBranchUUID
 {
     [_persistentRoot setCurrentBranch: [_persistentRoot branchForUUID: aBranchUUID]];
     [_persistentRoot commit];
-    [self reloadFromStore];
 }
 
 - (void) deleteBranch: (ETUUID *)aBranchUUID
 {
     [_persistentRoot deleteBranch: [_persistentRoot branchForUUID: aBranchUUID]];
     [_persistentRoot commit];
-    [self reloadFromStore];
 }
 
 /* EWUndoManagerDelegate */

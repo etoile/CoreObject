@@ -9,9 +9,18 @@
 - (id) initWithFrame:(NSRect)frame
 {
     self = [super initWithFrame:frame];
-    if (self) {        
+    if (self) {
+        trackingRects = [[NSMutableArray alloc] init];
     }
     
+    return self;
+}
+- (id)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        trackingRects = [[NSMutableArray alloc] init];
+    }
     return self;
 }
 
@@ -110,12 +119,22 @@
 
 - (void) setGraphRenderer: (EWGraphRenderer *)aRenderer
 {
+    assert(trackingRects != nil);
+    for (NSNumber *number in trackingRects)
+    {
+        NSLog(@"Removing tracking rect %ld", [number integerValue]);
+        [self removeTrackingRect: [number integerValue]];
+    }
+    [trackingRects removeAllObjects];
+    
 	ASSIGN(graphRenderer, aRenderer);
 	
 	//NSLog(@"Graph renderer size: %@", NSStringFromSize([graphRenderer size]));
 	
 	[self setFrameSize: [graphRenderer size]];
 	[self setNeedsDisplay: YES];
+    
+    [[self window] invalidateCursorRectsForView: self];
 }
 
 -(void)resetCursorRects
@@ -125,22 +144,20 @@
 	// Update tooltips
 	
 	[self removeAllToolTips];
-    if (trackingRects != nil)
-    {
-        for (NSNumber *number in trackingRects)
-        {
-            [self removeTrackingRect: [number integerValue]];
-        }
-    }
-    ASSIGN(trackingRects, [NSMutableArray array]);
     
 	for (CORevisionID *commit in [graphRenderer commits])
 	{
 		NSRect r = [graphRenderer rectForCommit: commit];
 		[self addToolTipRect:r owner:self userData:commit];
         
+        // Does not retain userData. We must be careful that we keep
+        // the objects returned by [graphRenderer commits] retained until the
+        // tracking rect is cleared.
+        
         NSInteger tag = [self addTrackingRect:r owner:self userData:commit assumeInside:NO];
         [trackingRects addObject: [NSNumber numberWithInteger: tag]];
+        
+        NSLog(@"Adding tracking rect %ld", tag);
 	}
 }
 
