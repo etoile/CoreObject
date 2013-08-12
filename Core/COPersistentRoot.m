@@ -461,7 +461,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     // TODO: May need something like this?
 //    for (COBranch *branch in [_branchForUUID allValues])
 //    {
-//        COObjectGraphContext *graph = [branch objectGraph];
+//        COObjectGraphContext *graph = [branch objectGraphContext];
 //        for (COObject *obj in [graph allObjects])
 //        {
 //            NSArray *persistentRoots = [[_parentContext crossReferenceCache] referencedPersistentRootUUIDsForObject: obj];
@@ -470,7 +470,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 //                COPersistentRoot *persistentRoot = [_parentContext persistentRootForUUID: persistentRootUUID];
 //                for (COBranch *otherBranch in [persistentRoot->_branchForUUID allValues])
 //                {
-//                    COObjectGraphContext *otherGraph = [otherBranch objectGraph];
+//                    COObjectGraphContext *otherGraph = [otherBranch objectGraphContext];
 //                    [[otherGraph rootObject] updateCrossPersistentRootReferences];                    
 //                }
 //            }

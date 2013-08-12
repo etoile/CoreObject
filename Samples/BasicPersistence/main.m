@@ -17,7 +17,7 @@
 }
 - (id)initWithStartDate: (NSDate*)aStartDate
                 endDate: (NSDate*)aEndDate
-            objectGraph: (COObjectGraphContext *)aGraph;
+            objectGraphContext: (COObjectGraphContext *)aGraph;
 @end
 
 
@@ -110,7 +110,7 @@
 
 - (id)initWithStartDate: (NSDate*)aStartDate
                 endDate: (NSDate*)aEndDate
-            objectGraph: (COObjectGraphContext *)aGraph
+            objectGraphContext: (COObjectGraphContext *)aGraph
 {
 	self = [super initWithObjectGraphContext:aGraph];
 	startDate = [aStartDate retain];
@@ -156,7 +156,7 @@ int main(int argc, char **argv)
 	NSDate *futureDate = [NSDate dateWithTimeIntervalSinceNow: 3600];
 	Appointment *appointment = AUTORELEASE([[Appointment alloc] initWithStartDate: [NSDate date]
 	                                                                      endDate: futureDate
-                                                                      objectGraph: [calendar objectGraphContext]]);
+                                                                      objectGraphContext: [calendar objectGraphContext]]);
 	[calendar addAppointment: appointment];
 
 	[ctx commit];

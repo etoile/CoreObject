@@ -103,11 +103,11 @@
 
 - (void) recordUpdatedItems: (NSArray *)items
 {
-    NSLog(@"Object graph before : %@", [[_persistentRoot editingBranch] objectGraph]);
+    NSLog(@"Object graph before : %@", [[_persistentRoot editingBranch] objectGraphContext]);
     
     assert(![_persistentRoot hasChanges]);
     
-    [[[_persistentRoot editingBranch] objectGraph] insertOrUpdateItems: items];
+    [[[_persistentRoot editingBranch] objectGraphContext] insertOrUpdateItems: items];
     
     assert([_persistentRoot hasChanges]);
     
@@ -115,7 +115,7 @@
     
     assert(![_persistentRoot hasChanges]);
     
-    NSLog(@"Object graph after: %@", [[_persistentRoot editingBranch] objectGraph]);
+    NSLog(@"Object graph after: %@", [[_persistentRoot editingBranch] objectGraphContext]);
 }
 
 - (void) validateCanLoadStateToken: (CORevisionID *)aToken

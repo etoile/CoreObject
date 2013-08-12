@@ -41,11 +41,11 @@ First Release
   - expose COSQLiteStore's finalize deletion method
   - (aesthetic) decide to what extent COPersistentRoot, COBranch should
     provide convenience methods that deletate to the COObjectGraphContext:
-      [[(COPersistentRoot *)self editingBranch] objectGraph]
+      [[(COPersistentRoot *)self editingBranch] objectGraphContext]
       
     e.g. I think we should surely keep:
      -[COPersistentRoot rootObject] = { return [[self editingBranch] rootObject]; }
-     -[COBranch rootObject] = { return [[self objectGraph] rootObject]; }
+     -[COBranch rootObject] = { return [[self objectGraphContext] rootObject]; }
      
     All of the other methods, I don't know.
   - Extend COBranch API to support branches and merging revisions accross tracks

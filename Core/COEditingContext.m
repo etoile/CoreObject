@@ -478,8 +478,8 @@
         return nil;
     }
     
-    COObjectGraphContext *objectGraph = [branch objectGraphContext];
-    return [objectGraph rootObject];
+    COObjectGraphContext *objectGraphContext = [branch objectGraphContext];
+    return [objectGraphContext rootObject];
 }
 
 // Notification handling

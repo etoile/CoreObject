@@ -123,7 +123,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
 
 /**
  * The editingBranch is not a persistent value, but is used by 
- * COPersistentRoot methods like -rootObject, -objectGraph, etc. as the
+ * COPersistentRoot methods like -rootObject, -objectGraphContext, etc. as the
  * default object graph presented by the COPersistentRoot.
  *
  * By default, -editingBranch just returns -currentBranch. However, if you
