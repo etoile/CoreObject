@@ -144,7 +144,7 @@
 /**
  * The object graph context owned by the branch.
  */
-@property (readonly, nonatomic) COObjectGraphContext *objectGraph;
+@property (readonly, nonatomic) COObjectGraphContext *objectGraphContext;
 
 /**
  * @taskunit Pending Changes

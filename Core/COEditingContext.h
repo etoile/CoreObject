@@ -9,14 +9,24 @@
 // with an id<COPersistentObjectContext> and doesn't know whether it's an
 // editing context or persistent root... but I guess it's harmless to keep for
 // now --Eric
-@protocol COPersistentObjectContext <NSObject>
-/**
- * Returns YES when the receiver is an editing context, otherwise returns NO
- * when the receiver is a persistent root.
+/** 
+ * Protocol to support managing either persistent roots or inner objects
+ * inside an object graph context without knowing the context type in advance.
  *
- * See COEditingContext and COPersistentRoot.
+ * For example, based on -[ETController persistentObjectContext:], a 
+ * ETController object can instantiate either persistent roots or inner objects.
+ */
+@protocol COPersistentObjectContext <NSObject>
+@optional
+/**
+ * See -[NSObject isEditingContext].
  */
 - (BOOL)isEditingContext;
+/**
+ * See -[NSObject isObjectGraphContext].
+ */
+- (BOOL)isObjectGraphContext;
+@required
 /**
  * Returns the editing context for the receiver.
  *

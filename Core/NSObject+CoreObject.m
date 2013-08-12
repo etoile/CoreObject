@@ -20,6 +20,11 @@
 	return NO;
 }
 
+- (BOOL)isObjectGraphContext
+{
+	return NO;
+}
+
 - (BOOL)isTrack
 {
 	return NO;

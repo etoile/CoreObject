@@ -213,7 +213,7 @@ static NSString *kCOParent = @"parentContainer";
 - (void)testChangeTrackingBasic
 {
     // HACK: COObjectGraphContext change tracking is disabled for non-persistent contexts
-	COObjectGraphContext *ctx2 = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] objectGraph];
+	COObjectGraphContext *ctx2 = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] objectGraphContext];
 	COObject *root = [ctx2 rootObject];
     
     UKObjectsEqual(S(root), [ctx2 insertedObjects]);

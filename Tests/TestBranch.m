@@ -107,9 +107,9 @@
     CORevision *firstRevision = [originalBranch currentRevision];
     UKNotNil(firstRevision);
     
-	COContainer *para1 = [[originalBranch objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para1 = [[originalBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
-	COContainer *para2 = [[originalBranch objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para2 = [[originalBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[rootObj addObject: para1];
 	[rootObj addObject: para2];
@@ -138,9 +138,9 @@
     CORevision *firstRevision = [originalBranch currentRevision];
     UKNotNil(firstRevision);
 
-	COContainer *para1 = [[originalBranch objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para1 = [[originalBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
-	COContainer *para2 = [[originalBranch objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para2 = [[originalBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[rootObj addObject: para1];
 	[rootObj addObject: para2];
@@ -154,7 +154,7 @@
     [originalBranch undo]; //[originalBranch setCurrentRevision: firstRevision];
 	UKIntsEqual(0, [rootObj count]);
 
-	COContainer *para3 = [[originalBranch objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para3 = [[originalBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para3 setValue: @"paragraph 3" forProperty: @"label"];
 	[rootObj addObject: para3];
 	[ctx commit];
@@ -225,7 +225,7 @@
     
 	/* Commit some changes in the Sandbox branch */
 	
-    COObject *sandboxRootObj = [[branch objectGraph] rootObject];
+    COObject *sandboxRootObj = [[branch objectGraphContext] rootObject];
     
 	[sandboxRootObj setValue: @"Todo" forProperty: @"label"];
 
@@ -271,11 +271,11 @@
     [photo1 commit];
     
     COBranch *branchB = [[photo1 currentBranch] makeBranchWithLabel: @"branchB"];
-    COObject *photo1branchBroot = [[branchB objectGraph] rootObject];
+    COObject *photo1branchBroot = [[branchB objectGraphContext] rootObject];
     
     COObject *childB = [[photo1branchBroot valueForKey: @"contents"] firstObject];
     [childB setValue: @"childB" forProperty: @"label"];
-    UKTrue([[branchB objectGraph] hasChanges]);
+    UKTrue([[branchB objectGraphContext] hasChanges]);
     
     [ctx commit];
     
@@ -554,38 +554,38 @@
     COBranch *branchA = [photo1 currentBranch];
     COBranch *branchB = [branchA makeBranchWithLabel: @"branchB"];
     
-    UKObjectsNotSame([branchA objectGraph], [branchB objectGraph]);
-    UKObjectsNotSame([[branchA objectGraph] rootObject], [[branchB objectGraph] rootObject]);
-    UKFalse([[branchA objectGraph] hasChanges]);
-    UKFalse([[branchB objectGraph] hasChanges]);
+    UKObjectsNotSame([branchA objectGraphContext], [branchB objectGraphContext]);
+    UKObjectsNotSame([[branchA objectGraphContext] rootObject], [[branchB objectGraphContext] rootObject]);
+    UKFalse([[branchA objectGraphContext] hasChanges]);
+    UKFalse([[branchB objectGraphContext] hasChanges]);
     
-    COObject *branchBroot = [[branchB objectGraph] rootObject];
+    COObject *branchBroot = [[branchB objectGraphContext] rootObject];
     [branchBroot setValue: @"photo1, branch B" forProperty: @"label"];
     
-    UKFalse([[branchA objectGraph] hasChanges]);
-    UKTrue([[branchB objectGraph] hasChanges]);
-    UKObjectsEqual(S([branchBroot UUID]), SA([[branchA objectGraph] itemUUIDs]));
-    UKObjectsEqual(S([branchBroot UUID]), SA([[branchB objectGraph] itemUUIDs]));
+    UKFalse([[branchA objectGraphContext] hasChanges]);
+    UKTrue([[branchB objectGraphContext] hasChanges]);
+    UKObjectsEqual(S([branchBroot UUID]), SA([[branchA objectGraphContext] itemUUIDs]));
+    UKObjectsEqual(S([branchBroot UUID]), SA([[branchB objectGraphContext] itemUUIDs]));
     
-    COObject *childB = [[branchB objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COObject *childB = [[branchB objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [childB setValue: @"childB" forProperty: @"label"];
     
-    UKFalse([[branchA objectGraph] hasChanges]);
-    UKTrue([[branchB objectGraph] hasChanges]);
-    UKObjectsEqual(S([branchBroot UUID]),                SA([[branchA objectGraph] itemUUIDs]));
-    UKObjectsEqual(S([branchBroot UUID], [childB UUID]), SA([[branchB objectGraph] itemUUIDs]));
+    UKFalse([[branchA objectGraphContext] hasChanges]);
+    UKTrue([[branchB objectGraphContext] hasChanges]);
+    UKObjectsEqual(S([branchBroot UUID]),                SA([[branchA objectGraphContext] itemUUIDs]));
+    UKObjectsEqual(S([branchBroot UUID], [childB UUID]), SA([[branchB objectGraphContext] itemUUIDs]));
     
     [branchBroot insertObject: childB atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 
-    UKFalse([[branchA objectGraph] hasChanges]);
-    UKTrue([[branchB objectGraph] hasChanges]);
-    UKObjectsEqual(S([branchBroot UUID]),                SA([[branchA objectGraph] itemUUIDs]));
-    UKObjectsEqual(S([branchBroot UUID], [childB UUID]), SA([[branchB objectGraph] itemUUIDs]));
+    UKFalse([[branchA objectGraphContext] hasChanges]);
+    UKTrue([[branchB objectGraphContext] hasChanges]);
+    UKObjectsEqual(S([branchBroot UUID]),                SA([[branchA objectGraphContext] itemUUIDs]));
+    UKObjectsEqual(S([branchBroot UUID], [childB UUID]), SA([[branchB objectGraphContext] itemUUIDs]));
     
     [ctx commit];
     
-    UKFalse([[branchA objectGraph] hasChanges]);
-    UKFalse([[branchB objectGraph] hasChanges]);
+    UKFalse([[branchA objectGraphContext] hasChanges]);
+    UKFalse([[branchB objectGraphContext] hasChanges]);
 }
 
 @end

@@ -163,7 +163,7 @@
     [photo1 commit];
     
     COBranch *branchB = [[photo1 currentBranch] makeBranchWithLabel: @"branchB"];
-    COObject *photo1branchBroot = [[branchB objectGraph] rootObject];
+    COObject *photo1branchBroot = [[branchB objectGraphContext] rootObject];
     [photo1branchBroot setValue: @"photo1, branch B" forProperty: @"label"];
     
     COObject *childB = [[photo1branchBroot valueForKey: @"contents"] firstObject];
@@ -232,11 +232,11 @@
     COBranch *branchA = [photo1 currentBranch];
     COBranch *branchB = [branchA makeBranchWithLabel: @"branchB"];
     
-    COObject *photo1branchBroot = [[branchB objectGraph] rootObject];
+    COObject *photo1branchBroot = [[branchB objectGraphContext] rootObject];
     
     [photo1branchBroot setValue: @"photo1, branch B" forProperty: @"label"];
     
-    COObject *childB = [[branchB objectGraph] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COObject *childB = [[branchB objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [childB setValue: @"childB" forProperty: @"label"];
     
     [photo1branchBroot insertObject: childB atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
@@ -249,9 +249,9 @@
     
     /* This creates a reference to branch B of photo1. */
     COPath *branchBRef = [COPath pathWithPersistentRoot: [photo1 persistentRootUUID] branch: [branchB UUID]];
-    COMutableItem *library1RootItem = [[[library1 objectGraph] itemForUUID: [[library1 objectGraph] rootItemUUID]] mutableCopy];
+    COMutableItem *library1RootItem = [[[library1 objectGraphContext] itemForUUID: [[library1 objectGraphContext] rootItemUUID]] mutableCopy];
     [library1RootItem setValue: S(branchBRef) forAttribute: @"contents"];
-    [[library1 objectGraph] insertOrUpdateItems: A(library1RootItem)];
+    [[library1 objectGraphContext] insertOrUpdateItems: A(library1RootItem)];
     
     [ctx commit];
     
@@ -380,7 +380,7 @@
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *library1ctx2 = [ctx2 persistentRootForUUID: [library1 persistentRootUUID]];
         
-        UKFalse([[library1ctx2 objectGraph] hasChanges]);
+        UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
         // FIXME: UKObjectsEqual(S(@"photo2"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
         
         // Undelete photo1, which should restore the cross-root relationship
@@ -388,7 +388,7 @@
         COPersistentRoot *photo1ctx2 = [[ctx2 deletedPersistentRoots] anyObject];
         [photo1ctx2 setDeleted: NO];
         
-        UKFalse([[library1ctx2 objectGraph] hasChanges]);
+        UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
         UKObjectsEqual(S(@"photo1", @"photo2"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
     }
 }
@@ -423,7 +423,7 @@
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: [photo1 persistentRootUUID]];
         
-        UKFalse([[photo1ctx2 objectGraph] hasChanges]);
+        UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
         UKObjectsEqual([NSSet set], [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
         
         // Undelete library1, which should restore the cross-root inverse relationship
@@ -431,7 +431,7 @@
         COPersistentRoot *library1ctx2 = [[ctx2 deletedPersistentRoots] anyObject];
         [library1ctx2 setDeleted: NO];
 
-        UKFalse([[photo1ctx2 objectGraph] hasChanges]);
+        UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
         //FIXME: UKObjectsEqual(S(@"photo1"), [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
     }
 }

@@ -23,7 +23,7 @@
 
 @synthesize UUID = _UUID;
 @synthesize persistentRoot = _persistentRoot;
-@synthesize objectGraph = _objectGraph;
+@synthesize objectGraphContext = _objectGraph;
 @synthesize metadata = _metadata;
 
 - (id)init
@@ -300,13 +300,13 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 - (BOOL)hasChanges
 {
 	// TODO: Take in account branch renaming and metadata changes
-	return [[self objectGraph] hasChanges];
+	return [[self objectGraphContext] hasChanges];
 }
 
 - (void)discardAllChanges
 {
 	// TODO: Cancel branch renaming and metadata changes
-	[[self objectGraph] discardAllChanges];
+	[[self objectGraphContext] discardAllChanges];
 }
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel

@@ -91,6 +91,11 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     [super dealloc];
 }
 
+- (BOOL)isObjectGraphContext
+{
+	return YES;
+}
+
 #pragma mark Schema
 
 - (ETModelDescriptionRepository *) modelRepository;

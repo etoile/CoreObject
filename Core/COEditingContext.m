@@ -478,7 +478,7 @@
         return nil;
     }
     
-    COObjectGraphContext *objectGraph = [branch objectGraph];
+    COObjectGraphContext *objectGraph = [branch objectGraphContext];
     return [objectGraph rootObject];
 }
 
@@ -533,7 +533,7 @@
 	{
 		for (COBranch *branch in [persistentRoot branches])
 		{
-			[collectedObjects addObject: [[branch objectGraph] rootObject]];
+			[collectedObjects addObject: [[branch objectGraphContext] rootObject]];
 		}
 	}
 	return collectedObjects;
@@ -548,7 +548,7 @@
 	{
 		for (COBranch *branch in [persistentRoot branches])
 		{
-			[collectedObjects unionSet: [[branch objectGraph] performSelector: aSelector]];
+			[collectedObjects unionSet: [[branch objectGraphContext] performSelector: aSelector]];
 		}
 	}
 	return collectedObjects;

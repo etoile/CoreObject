@@ -1,14 +1,15 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COItemGraph.h>
+#import <CoreObject/COEditingContext.h>
 
 @class ETUUID;
 @class COPersistentRoot, COBranch, COObject, CORelationshipCache;
-@class COItemGraph, COItem, COSchemaRegistry , COSchema, COEditingContext;
+@class COItemGraph, COItem, COSchemaRegistry , COSchema;
 
 extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 
-@interface COObjectGraphContext : NSObject <COItemGraph>
+@interface COObjectGraphContext : NSObject <COItemGraph, COPersistentObjectContext>
 {
     ETUUID *rootObjectUUID_;
     NSMutableDictionary *objectsByUUID_;
@@ -32,6 +33,17 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 + (COObjectGraphContext *) objectGraphContext;
 
 + (COObjectGraphContext *) objectGraphContextWithModelRepository: (ETModelDescriptionRepository *)aRegistry;
+
+/** 
+ * @taskunit Type Querying 
+ */
+
+/**
+ * Returns YES.
+ *
+ * See also -[NSObject isObjectGraphContext].
+ */
+@property (nonatomic, readonly) BOOL isObjectGraphContext;
 
 #pragma mark Schema
 

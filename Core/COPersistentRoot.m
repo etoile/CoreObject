@@ -119,11 +119,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	return YES;
 }
 
-- (BOOL)isEditingContext
-{
-	return NO;
-}
-
 - (COEditingContext *)editingContext
 {
 	return [self parentContext];
@@ -231,9 +226,9 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     [self sendChangeNotification];
 }
 
-- (COObjectGraphContext *)objectGraph
+- (COObjectGraphContext *)objectGraphContext
 {
-    return [[self editingBranch] objectGraph];
+    return [[self editingBranch] objectGraphContext];
 }
 
 - (COSQLiteStore *)store
@@ -243,22 +238,22 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (id)rootObject
 {
-	return [[self objectGraph] rootObject];
+	return [[self objectGraphContext] rootObject];
 }
 
 - (void)setRootObject: (COObject *)aRootObject
 {
-	[[self objectGraph] setRootObject: aRootObject];
+	[[self objectGraphContext] setRootObject: aRootObject];
 }
 
 - (ETUUID *)rootObjectUUID
 {
-	return [[self objectGraph] rootItemUUID];
+	return [[self objectGraphContext] rootItemUUID];
 }
 
 - (COObject *)objectWithUUID: (ETUUID *)uuid
 {
-	return [[self objectGraph] objectWithUUID: uuid];
+	return [[self objectGraphContext] objectWithUUID: uuid];
 }
 
 - (BOOL)hasChanges
@@ -281,7 +276,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 - (COObject *)insertObjectWithEntityName: (NSString *)aFullName
                                     UUID: (ETUUID *)aUUID
 {
-	return [[self objectGraph] insertObjectWithEntityName: aFullName
+	return [[self objectGraphContext] insertObjectWithEntityName: aFullName
                                                UUID: aUUID];
 }
 
@@ -341,7 +336,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         
         if (_cheapCopyRevisionID == nil)
         {
-            info = [store createPersistentRootWithInitialContents: [[self editingBranch] objectGraph]
+            info = [store createPersistentRootWithInitialContents: [[self editingBranch] objectGraphContext]
                                                                                    UUID: [self persistentRootUUID]
                                                                              branchUUID: [[self editingBranch] UUID]
                                                                                metadata: metadata

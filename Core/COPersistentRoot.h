@@ -158,7 +158,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /**
  * Returns the object graph for the edited branch
  */
-@property (nonatomic, readonly) COObjectGraphContext *objectGraph;
+@property (nonatomic, readonly) COObjectGraphContext *objectGraphContext;
 
 /**
  * The entry point to navigate the object graph bound to the persistent root.
