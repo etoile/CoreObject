@@ -39,6 +39,12 @@
  */
 + (COQuery *)queryWithPredicate: (NSPredicate *)aPredicate;
 /**
+ * Returns a new autoreleased query that uses a predicate based on a block.
+ *
+ * See -[NSPredicate predicateWithBlock:].
+ */
++ (COQuery *)queryWithPredicateBlock: (BOOL (^)(id object, NSDictionary *bindings))aBlock;
+/**
  * Returns a new autoreleased query that uses a SQL request.
  */
 + (COQuery *)queryWithSQLString: (NSString *)aSQLString;

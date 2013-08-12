@@ -20,6 +20,12 @@
 	return query;
 }
 
++ (COQuery *)queryWithPredicateBlock: (BOOL (^)(id object, NSDictionary *bindings))aBlock
+{
+	COQuery *query = AUTORELEASE([[COQuery alloc] init]);
+	[query setPredicate: [NSPredicate predicateWithBlock: aBlock]];
+	return query;
+}
 
 + (COQuery *)queryWithSQLString: (NSString *)aSQLString
 {
