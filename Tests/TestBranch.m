@@ -588,4 +588,73 @@
     UKFalse([[branchB objectGraphContext] hasChanges]);
 }
 
+- (void) testBranchLabel
+{
+    [ctx commit];
+    
+    UKNil([originalBranch label]);
+    UKFalse([ctx hasChanges]);
+    UKFalse([persistentRoot hasChanges]);
+    UKFalse([originalBranch hasChanges]);
+    
+    [originalBranch setLabel: @"Hello world"];
+    
+    UKObjectsEqual(@"Hello world", [originalBranch label]);
+    UKTrue([ctx hasChanges]);
+    UKTrue([persistentRoot hasChanges]);
+    UKTrue([originalBranch hasChanges]);
+    
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        UKNil([[[ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]] currentBranch] label]);
+    }
+    
+    [ctx commit];
+    
+    UKObjectsEqual(@"Hello world", [originalBranch label]);
+    UKFalse([ctx hasChanges]);
+    UKFalse([persistentRoot hasChanges]);
+    UKFalse([originalBranch hasChanges]);
+    
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        UKObjectsEqual(@"Hello world", [[[ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]] currentBranch] label]);
+    }
+}
+
+- (void) testBranchMetadata
+{
+    [ctx commit];
+
+    UKObjectsEqual([NSDictionary dictionary], [originalBranch metadata]);
+    UKFalse([ctx hasChanges]);
+    UKFalse([persistentRoot hasChanges]);
+    UKFalse([originalBranch hasChanges]);
+    
+    [originalBranch setMetadata: D(@"value", @"key")];
+    
+    UKObjectsEqual(D(@"value", @"key"), [originalBranch metadata]);
+    UKFalse([[originalBranch metadata] isKindOfClass: [NSMutableDictionary class]]);
+    UKTrue([ctx hasChanges]);
+    UKTrue([persistentRoot hasChanges]);
+    UKTrue([originalBranch hasChanges]);
+    
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        UKObjectsEqual([NSDictionary dictionary], [[[ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]] currentBranch] metadata]);
+    }
+    
+    [ctx commit];
+    
+    UKObjectsEqual(D(@"value", @"key"), [originalBranch metadata]);
+    UKFalse([ctx hasChanges]);
+    UKFalse([persistentRoot hasChanges]);
+    UKFalse([originalBranch hasChanges]);
+    
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        UKObjectsEqual(D(@"value", @"key"), [[[ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]] currentBranch] metadata]);
+    }
+}
+
 @end

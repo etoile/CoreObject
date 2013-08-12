@@ -12,6 +12,8 @@
 
 @class COObject, CORevision, COPersistentRoot, COBranchInfo, COObjectGraphContext;
 
+extern NSString * const kCOBranchLabel;
+
 /**
  * A persistent history track on an object.
  * 
@@ -48,7 +50,9 @@
      * If different than the metadata for this branch in _persistentRoot's _savedState,
      * then a metadata change is staged for commit.     
      */
-    NSDictionary *_metadata;
+    NSMutableDictionary *_metadata;
+    
+    BOOL _metadataChanged;
     
     COObjectGraphContext *_objectGraph;
     
@@ -82,13 +86,13 @@
 /**
  * The branch label (used as the branch name in most cases).
  */
-@property (readwrite, nonatomic) NSString *label;
+@property (readwrite, copy, nonatomic) NSString *label;
 /**
  * The metadata attached to the branch.
  *
  * Any changes to the metadata is saved on the next object graph context commit.
  */
-@property (readwrite, retain, nonatomic) NSDictionary *metadata;
+@property (readwrite, copy, nonatomic) NSDictionary *metadata;
 /** 
  * The branch deletion status.
  *

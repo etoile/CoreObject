@@ -19,12 +19,13 @@
 #import "COBranchInfo.h"
 #import "COObjectGraphContext.h"
 
+NSString * const kCOBranchLabel = @"COBranchLabel";
+
 @implementation COBranch
 
 @synthesize UUID = _UUID;
 @synthesize persistentRoot = _persistentRoot;
 @synthesize objectGraphContext = _objectGraph;
-@synthesize metadata = _metadata;
 
 - (id)init
 {
@@ -77,7 +78,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         ETAssert(branchInfo != nil);
         
         ASSIGN(_currentRevisionID, [branchInfo currentRevisionID]);
-        ASSIGN(_metadata, [branchInfo metadata]);
+        _metadata = [[NSMutableDictionary alloc] initWithDictionary:[branchInfo metadata]];
         _isCreated = YES;
         _deleted = [branchInfo isDeleted];
         
@@ -101,6 +102,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
             
             ETAssert(![_objectGraph hasChanges]);
         }
+        
+        _metadata = [[NSMutableDictionary alloc] init];
     }
     
 	return self;	
@@ -201,23 +204,26 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return nil;
 }
 
+- (NSDictionary *)metadata
+{
+	return [NSDictionary dictionaryWithDictionary: _metadata];
+}
+
+- (void)setMetadata: (NSDictionary *)aMetadata
+{
+    [_metadata setDictionary: aMetadata];
+    _metadataChanged = YES;
+}
+
 - (NSString *)label
 {
-    // FIXME: Make a standardized metadata key for this
-	return [_metadata objectForKey: @"COBranchLabel"];
+	return [_metadata objectForKey: kCOBranchLabel];
 }
 
 - (void)setLabel: (NSString *)aLabel
 {
-    // FIXME: Make a standardized metadata key for this
-    if (_metadata == nil)
-    {
-        _metadata = [[NSMutableDictionary alloc] init];
-    }
-    
-    // FIXME: dictionary may not be mutable
-	[_metadata setObject: aLabel forKey: @"COBranchLabel"];
-    // FIXME: Commit if changed
+	[_metadata setObject: aLabel forKey: kCOBranchLabel];
+    _metadataChanged = YES;
 }
 
 
@@ -299,7 +305,13 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (BOOL)hasChanges
 {
-	// TODO: Take in account branch renaming and metadata changes
+    if (_metadataChanged)
+    {
+        return YES;
+    }
+    
+    // TODO: Take into account reverts that change _currentRevisionID
+    
 	return [[self objectGraphContext] hasChanges];
 }
 
@@ -446,11 +458,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                   forPersistentRoot: [[self persistentRoot] persistentRootUUID]
                               error: NULL];
         
-        [store setMetadata: _metadata
-                 forBranch: _UUID
-          ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
-                     error: NULL];
-        
         _isCreated = YES;
     }
     else if (![[[self branchInfo] currentRevisionID] isEqual: _currentRevisionID])
@@ -466,6 +473,19 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                                       error: NULL];
         ETAssert(ok);
     }
+    
+    // Write metadata
+    
+    if (_metadataChanged)
+    {
+        BOOL ok = [store setMetadata: _metadata
+                           forBranch: _UUID
+                    ofPersistentRoot: [[self persistentRoot]    persistentRootUUID]
+                               error: NULL];
+        ETAssert(ok);
+        _metadataChanged = NO;
+    }
+    
     
     NSArray *changedItemUUIDs = [(NSSet *)[[[_objectGraph changedObjects] mappedCollection] UUID] allObjects];
     if ([changedItemUUIDs count] > 0)
