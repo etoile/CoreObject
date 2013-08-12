@@ -150,32 +150,6 @@
     return result;
 }
 
-- (COGroup *)libraryGroup
-{
-    return nil; // FIXME: Rewrite
-#if 0
-	NSString *UUIDString = [[_store metadata] objectForKey: @"kCOLibraryGroupUUID"];
-
-	if (UUIDString == nil)
-	{
-		COGroup *newGroup = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COGroup"] rootObject];
-		NSMutableDictionary *metadata = AUTORELEASE([[_store metadata] mutableCopy]);
-
-		[newGroup setName: _(@"Libraries")];
-		[metadata setObject: [[newGroup UUID] stringValue] 
-		             forKey: @"kCOLibraryGroupUUID"];
-		[_store setMetadata: metadata];
-		
-		[newGroup addObjects: A([self tagLibrary], [self bookmarkLibrary],
-			[self noteLibrary], [self photoLibrary], [self musicLibrary])];
-	
-		return newGroup;
-	}
-
-	return (id)[self objectWithUUID: [ETUUID UUIDWithString: UUIDString]];
-#endif
-}
-
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
 {
 	COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: persistentRootUUID];

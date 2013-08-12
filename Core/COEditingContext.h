@@ -106,7 +106,7 @@
 @property (nonatomic, readonly) COEditingContext *editingContext;
 
 /** 
- * @taskunit Accessing All Persistent Roots and Libraries 
+ * @taskunit Accessing All Persistent Roots 
  */
 
 /**
@@ -114,21 +114,10 @@
  * deleted on disk), plus those pending commit (and minus those pending deletion).
  */
 @property (nonatomic, readonly) NSSet *persistentRoots;
-
 /**
  * Returns persistent roots marked as deleted on disk.
  */
 @property (nonatomic, copy, readonly) NSSet *deletedPersistentRoots;
-
-/**
- * Returns a group listing the libraries in the store.
- *
- * By default, it contains the libraries listed as methods among
- * COEditingContext(COCommonLibraries).
- *
- * See also COLibrary.
- */
-@property (nonatomic, readonly) COGroup *libraryGroup;
 
 /** 
  * @taskunit Store and Metamodel Access 
@@ -339,7 +328,9 @@
 
 @interface COEditingContext (Debugging)
 
-/** @taskunit Loaded Objects */
+/** 
+ * @taskunit Loaded Objects 
+ */
 
 /**
  * Returns the objects presently managed by the receiver in memory.
@@ -360,7 +351,9 @@
  */
 - (NSSet *)loadedRootObjects;
 
-/** @taskunit Pending Changes */
+/** 
+ * @taskunit Pending Changes 
+ */
 
 /**
  * Returns the new objects added to the context with -insertObject: and to be

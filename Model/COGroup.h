@@ -119,4 +119,22 @@ typedef NSArray *(^COContentBlock)(void);
  */
 - (void) refresh;
 
+/** @taskunit Object Matching */
+
+/**
+ * Returns the first object whose identifier matches.
+ *
+ * The search is shallow, in other words limited to the objects in the receiver 
+ * content.
+ *
+ * See -[COObject identifier].
+ */
+- (id)objectForIdentifier: (NSString *)anId;
+/**
+ * See -[COObjectMatching objectsMatchingQuery:].
+ *
+ * Object graph traversal implementation for COObjectMatching protocol.
+ */
+- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
+
 @end

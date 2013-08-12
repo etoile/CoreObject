@@ -8,6 +8,7 @@
 
 #import "COLibrary.h"
 #import "COGroup.h"
+#import "COObjectGraphContext.h"
 #import "COTag.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
@@ -70,6 +71,22 @@
 
 @implementation COEditingContext (COCommonLibraries)
 
+// TODO: Probably need to be turned into a normal group or use some sorting to 
+// ensure the libraries don't appear in a random order in the UI (e.g. accross
+// application launches).
+- (COSmartGroup *)libraryGroup
+{
+	COSmartGroup *group = [[COSmartGroup alloc]
+		initWithObjectGraphContext: [COObjectGraphContext objectGraphContext]];
+	[group setName: _(@"All Objects")];
+	[group setTargetCollection: [[[[self persistentRoots] mappedCollection] rootObject] allObjects]];
+	[group setQuery: [COQuery queryWithPredicateBlock: ^ BOOL (id object, NSDictionary *bindings)
+	{
+		return [object isLibrary];
+	}]];
+	return group;
+}
+
 - (COTagLibrary *)tagLibrary
 {
 	COTagLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierTag];
@@ -77,7 +94,6 @@
 	if (lib == nil)
 	{
 		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COTagLibrary"] rootObject];
-		[[self libraryGroup] addObject: lib];
 	}
 	return lib;
 }
@@ -91,7 +107,6 @@
 		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COBookmarkLibrary"] rootObject];
 		[lib setName: _(@"Bookmarks")];
 		[lib setIdentifier: kCOLibraryIdentifierBookmark];
-		[[self libraryGroup] addObject: lib];
 	}
 	return lib;
 }
@@ -105,7 +120,6 @@
 		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.CONoteLibrary"] rootObject];
 		[lib setName: _(@"Notes")];
 		[lib setIdentifier: kCOLibraryIdentifierNote];
-		[[self libraryGroup] addObject: lib];
 	}
 	return lib;
 }
@@ -119,7 +133,6 @@
 		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COLibrary"] rootObject];
 		[lib setName: _(@"Photos")];
 		[lib setIdentifier: kCOLibraryIdentifierPhoto];
-		[[self libraryGroup] addObject: lib];
 	}
 	return lib;
 }
@@ -133,7 +146,6 @@
 		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COLibrary"] rootObject];
 		[lib setName: _(@"Music")];
 		[lib setIdentifier: kCOLibraryIdentifierMusic];
-		[[self libraryGroup] addObject: lib];
 	}
 	return lib;
 }

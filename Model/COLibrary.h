@@ -42,7 +42,7 @@
 @end
 
 /** 
- *@group Object Collection and Organization
+ * @group Object Collection and Organization
  *
  * COEditingContext category that gives access to various common libraries.
  *
@@ -53,6 +53,24 @@
  * </example>
  */
 @interface COEditingContext (COCommonLibraries)
+
+/**
+ * @taskunit Library List
+ */
+
+/**
+ * Returns a group listing the libraries in the store.
+ *
+ * By default, it contains the libraries listed as methods among
+ * COEditingContext(COCommonLibraries).
+ *
+ * See also COLibrary.
+ */
+@property (nonatomic, readonly) COGroup *libraryGroup;
+
+/**
+ * @taskunit Accessing Libraries Directly
+ */
 
 /**
  * Returns a library listing the tags in the store.

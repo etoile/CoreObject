@@ -176,6 +176,20 @@
 	ASSIGN(content, result);
 }
 
+// TODO: COGroup implements the same methods, put them in a COObjectMatchingTrait
+
+- (id)objectForIdentifier: (NSString *)anId
+{
+	for (id object in [self content])
+	{
+		if ([[object identifier] isEqualToString: anId])
+		{
+			return object;
+		}
+	}
+	return nil;
+}
+
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
 {
 	NSMutableArray *result = [NSMutableArray array];
