@@ -408,28 +408,22 @@
 		667F1ED9179C81E00083C3E6 /* TestPersistentRoot.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestPersistentRoot.m; sourceTree = "<group>"; };
 		667F1EDA179C81E00083C3E6 /* TestRelationshipIntegrity.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestRelationshipIntegrity.m; sourceTree = "<group>"; };
 		667F1EDB179C81E00083C3E6 /* TestStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestStore.m; sourceTree = "<group>"; };
-		667F1EDC179C81E00083C3E6 /* TestSynchronization.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestSynchronization.m; sourceTree = "<group>"; };
 		667F1EDD179C81E00083C3E6 /* TestUtilities.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestUtilities.m; sourceTree = "<group>"; };
 		667F1EDF179C83A20083C3E6 /* TestBranchesAndCopies.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestBranchesAndCopies.m; sourceTree = "<group>"; };
 		667F1EE0179C83A20083C3E6 /* TestCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestCommon.h; sourceTree = "<group>"; };
 		667F1EE1179C83A20083C3E6 /* TestCompositeDocument.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCompositeDocument.m; sourceTree = "<group>"; };
-		667F1EE2179C83A20083C3E6 /* TestConcurrentContextModification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestConcurrentContextModification.m; sourceTree = "<group>"; };
 		667F1EE3179C83A20083C3E6 /* TestCopyEmbeddedObjects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCopyEmbeddedObjects.m; sourceTree = "<group>"; };
 		667F1EE4179C83A20083C3E6 /* TestEditingContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestEditingContext.m; sourceTree = "<group>"; };
 		667F1EE5179C83A20083C3E6 /* TestGameEditor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestGameEditor.m; sourceTree = "<group>"; };
 		667F1EE6179C83A20083C3E6 /* TestHistoryTrack.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestHistoryTrack.m; sourceTree = "<group>"; };
-		667F1EE7179C83A20083C3E6 /* TestPersistentRootController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestPersistentRootController.m; sourceTree = "<group>"; };
-		667F1EE8179C83A20083C3E6 /* TestPersistentRootEditingContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestPersistentRootEditingContext.m; sourceTree = "<group>"; };
 		667F1EE9179C83A20083C3E6 /* TestPhotoManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestPhotoManager.m; sourceTree = "<group>"; };
 		667F1EEA179C83A20083C3E6 /* TestPhotoMontage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestPhotoMontage.m; sourceTree = "<group>"; };
 		667F1EEB179C83A20083C3E6 /* TestPull.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestPull.m; sourceTree = "<group>"; };
 		667F1EEC179C83A20083C3E6 /* TestReferencesBetweenPersistentRoots.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestReferencesBetweenPersistentRoots.m; sourceTree = "<group>"; };
 		667F1EED179C83A20083C3E6 /* TestRelationshipCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestRelationshipCache.m; sourceTree = "<group>"; };
 		667F1EEE179C83A20083C3E6 /* TestSimpleUseOfNestedPersistentRoots.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestSimpleUseOfNestedPersistentRoots.m; sourceTree = "<group>"; };
-		667F1EEF179C83A20083C3E6 /* TestStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestStore.m; sourceTree = "<group>"; };
 		667F1EF0179C83A20083C3E6 /* TestSubtreeDiffMerge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestSubtreeDiffMerge.m; sourceTree = "<group>"; };
 		667F1EF1179C83A20083C3E6 /* TestTagging.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestTagging.m; sourceTree = "<group>"; };
-		667F1EF2179C83A20083C3E6 /* TestUndo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestUndo.m; sourceTree = "<group>"; };
 		667F1EF3179C83A20083C3E6 /* TestUserRequirements.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestUserRequirements.m; sourceTree = "<group>"; };
 		667F1EF4179C83A20083C3E6 /* TestWorkspaces.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestWorkspaces.m; sourceTree = "<group>"; };
 		66808461178CD4FD003A3CC6 /* TestCopier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCopier.m; path = Tests/TestCopier.m; sourceTree = "<group>"; };
@@ -754,7 +748,6 @@
 				667F1ED9179C81E00083C3E6 /* TestPersistentRoot.m */,
 				667F1EDA179C81E00083C3E6 /* TestRelationshipIntegrity.m */,
 				667F1EDB179C81E00083C3E6 /* TestStore.m */,
-				667F1EDC179C81E00083C3E6 /* TestSynchronization.m */,
 				667F1EDD179C81E00083C3E6 /* TestUtilities.m */,
 			);
 			name = "Old CoreObject trunk tests";
@@ -767,23 +760,18 @@
 				667F1EDF179C83A20083C3E6 /* TestBranchesAndCopies.m */,
 				667F1EE0179C83A20083C3E6 /* TestCommon.h */,
 				667F1EE1179C83A20083C3E6 /* TestCompositeDocument.m */,
-				667F1EE2179C83A20083C3E6 /* TestConcurrentContextModification.m */,
 				667F1EE3179C83A20083C3E6 /* TestCopyEmbeddedObjects.m */,
 				667F1EE4179C83A20083C3E6 /* TestEditingContext.m */,
 				667F1EE5179C83A20083C3E6 /* TestGameEditor.m */,
 				667F1EE6179C83A20083C3E6 /* TestHistoryTrack.m */,
-				667F1EE7179C83A20083C3E6 /* TestPersistentRootController.m */,
-				667F1EE8179C83A20083C3E6 /* TestPersistentRootEditingContext.m */,
 				667F1EE9179C83A20083C3E6 /* TestPhotoManager.m */,
 				667F1EEA179C83A20083C3E6 /* TestPhotoMontage.m */,
 				667F1EEB179C83A20083C3E6 /* TestPull.m */,
 				667F1EEC179C83A20083C3E6 /* TestReferencesBetweenPersistentRoots.m */,
 				667F1EED179C83A20083C3E6 /* TestRelationshipCache.m */,
 				667F1EEE179C83A20083C3E6 /* TestSimpleUseOfNestedPersistentRoots.m */,
-				667F1EEF179C83A20083C3E6 /* TestStore.m */,
 				667F1EF0179C83A20083C3E6 /* TestSubtreeDiffMerge.m */,
 				667F1EF1179C83A20083C3E6 /* TestTagging.m */,
-				667F1EF2179C83A20083C3E6 /* TestUndo.m */,
 				667F1EF3179C83A20083C3E6 /* TestUserRequirements.m */,
 				667F1EF4179C83A20083C3E6 /* TestWorkspaces.m */,
 			);
