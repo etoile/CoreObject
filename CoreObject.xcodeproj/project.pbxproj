@@ -110,6 +110,7 @@
 		66B38C6417B98EE100D65771 /* TestPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B38C6317B98EDE00D65771 /* TestPerformance.m */; };
 		66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		66C18AD517BAB2EE00C5316F /* TestEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C18AD417BAB2EE00C5316F /* TestEditingContext.m */; };
 		66C3669B17B426BF009ACF2F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60988F16163B6B7A009C4F21 /* Cocoa.framework */; };
 		66C366DE17B4288C009ACF2F /* EWAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C366C617B4288B009ACF2F /* EWAppDelegate.m */; };
 		66C366DF17B4288C009ACF2F /* EWBranchesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C366C817B4288C009ACF2F /* EWBranchesWindowController.m */; };
@@ -451,6 +452,7 @@
 		6699653F1162E1C000359BE6 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		66B38C6117B98DFF00D65771 /* TestUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUtilities.m; path = Tests/TestUtilities.m; sourceTree = "<group>"; };
 		66B38C6317B98EDE00D65771 /* TestPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestPerformance.m; path = Tests/TestPerformance.m; sourceTree = "<group>"; };
+		66C18AD417BAB2EE00C5316F /* TestEditingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestEditingContext.m; path = Tests/TestEditingContext.m; sourceTree = "<group>"; };
 		66C3669A17B426BF009ACF2F /* Typewriter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Typewriter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66C3669E17B426C0009ACF2F /* Typewriter-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = "Typewriter-Info.plist"; path = "Samples/Typewriter/Typewriter-Info.plist"; sourceTree = "<group>"; };
 		66C366A017B426C0009ACF2F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -945,6 +947,7 @@
 			children = (
 				609C00541704C24C00D01AAB /* main.m */,
 				66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */,
+				66C18AD417BAB2EE00C5316F /* TestEditingContext.m */,
 				609C00571704C24C00D01AAB /* TestBranch.m */,
 				609C00581704C24C00D01AAB /* TestCommon.h */,
 				609C00591704C24C00D01AAB /* TestCommon.m */,
@@ -1413,6 +1416,7 @@
 				66FB15F117AB8D4D003BFC9B /* TestItemGraphDiff.m in Sources */,
 				66B38C6217B98E0400D65771 /* TestUtilities.m in Sources */,
 				66B38C6417B98EE100D65771 /* TestPerformance.m in Sources */,
+				66C18AD517BAB2EE00C5316F /* TestEditingContext.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
