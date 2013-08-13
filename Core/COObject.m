@@ -979,7 +979,6 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (BOOL)isEqual: (id)anObject
 {
-    // FIXME: Replace with NestedVersioning's implementation
 	if (anObject == self)
 	{
 		return YES;

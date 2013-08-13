@@ -53,6 +53,17 @@
  *
  * It queues changes and when the user requests it, it attempts to commit them 
  * to the store.
+ *
+ * FIXME: Expand
+ *
+ * @section Object Equality
+ *
+ * COEditingContext, COPersistentRoot, COBranch, and COObjectGraphContext
+ * do not override -hash or -isEqual:, so instances of these classes are only
+ * considered equal to the same instances.
+ *
+ * These classes form an in-memory view on a database, and the notion
+ * of two of these views being equal isn't useful or interesting.
  */
 @interface COEditingContext : NSObject <COPersistentObjectContext>
 {

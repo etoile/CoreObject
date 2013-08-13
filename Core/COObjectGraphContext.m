@@ -94,52 +94,6 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     [super dealloc];
 }
 
-// NOTE: I'm not sure overriding -isEqual: makes sense, because it seems
-// to complex to implement... In addition to the item UUIDs and root object UUID,
-// you need to ensure the branch and all pending changes are the same. Not sure
-// about the use case too. Quentin.
-- (BOOL)isEqual:(id)object
-{
-    if (object == self)
-    {
-        return YES;
-    }
-	if (![object isKindOfClass: [self class]])
-	{
-		return NO;
-	}
-    
-    COObjectGraphContext *otherContext = (COObjectGraphContext *)object;
-    
-    if (!((_rootObjectUUID == nil && otherContext->_rootObjectUUID == nil)
-          || [_rootObjectUUID isEqual: otherContext->_rootObjectUUID]))
-    {
-        return NO;
-    }
-    
-    if (![[NSSet setWithArray: [self itemUUIDs]]
-          isEqual: [NSSet setWithArray: [otherContext itemUUIDs]]])
-    {
-        return NO;
-    }
-    
-    for (ETUUID *aUUID in [self itemUUIDs])
-    {
-        COItem *selfItem = [[self objectWithUUID: aUUID] storeItem];
-        COItem *otherItem = [[otherContext objectWithUUID: aUUID] storeItem];
-        if (![selfItem isEqual: otherItem])
-        {
-            return NO;
-        }
-    }
-    return YES;
-}
-
-- (NSUInteger) hash
-{
-	return [_rootObjectUUID hash] ^ 13803254444065375360ULL;
-}
-
 - (NSString *)description
 {
 	NSMutableString *result = [NSMutableString string];

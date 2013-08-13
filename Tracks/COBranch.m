@@ -129,26 +129,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return _currentRevisionID == nil && _isCreated == NO;
 }
 
-- (NSUInteger)hash
-{
-    return [_UUID hash];
-}
-
-- (BOOL)isEqual: (id)rhs
-{
-	if ([rhs isKindOfClass: [COBranch class]])
-	{
-        if (_persistentRoot == [rhs persistentRoot])
-        {
-            return self == rhs;
-        }
-        
-		return ([_UUID isEqual: [rhs UUID]]
-			&& [[_persistentRoot persistentRootUUID] isEqual: [[rhs persistentRoot] persistentRootUUID]]);
-	}
-	return NO;
-}
-
 - (NSString *)displayName
 {
 	NSString *label = [self label];
