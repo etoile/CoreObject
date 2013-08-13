@@ -230,27 +230,31 @@
 
 - (void) undo
 {
+    [[_persistentRoot editingBranch] undo];
+    [_persistentRoot commit];
 }
 - (void) redo
 {
+    [[_persistentRoot editingBranch] redo];
+    [_persistentRoot commit];
 }
 
 - (BOOL) canUndo
 {
-    return NO;
+    return [[_persistentRoot editingBranch] canUndo];
 }
 - (BOOL) canRedo
 {
-    return NO;
+    return [[_persistentRoot editingBranch] canRedo];
 }
 
 - (NSString *) undoMenuItemTitle
 {
-    return @"Undo unavailable";
+    return @"Undo";
 }
 - (NSString *) redoMenuItemTitle
 {
-    return @"Redo unavailable";
+    return @"Redo";
 }
 
 @end

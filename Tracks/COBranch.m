@@ -273,6 +273,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (void) setCurrentRevision:(CORevision *)currentRevision
 {
+    NILARG_EXCEPTION_TEST(currentRevision);
+    
     ASSIGN(_currentRevisionID, [currentRevision revisionID]);
     [self reloadAtRevision: currentRevision];
 }
@@ -396,24 +398,35 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	return [self allNodesAndCurrentNodeIndex: aNodeIndex];
 }
 
-- (void)undo
+- (CORevision *)undoRevision
 {
-    CORevision *revision = [[self currentRevision] parentRevision];
-    if (revision == nil)
+    if ([[self parentRevision] isEqual: [self currentRevision]])
     {
-        return;
+        return nil;
     }
-    [self setCurrentRevision: revision];
+    
+    CORevision *revision = [[self currentRevision] parentRevision];
+    return revision;
 }
 
-- (void)redo
+- (BOOL)canUndo
+{
+    return [self undoRevision] != nil;
+}
+
+- (void)undo
+{
+    [self setCurrentRevision: [self undoRevision]];
+}
+
+- (CORevision *)redoRevision
 {
     CORevision *currentRevision = [self currentRevision];
     CORevision *revision = [self newestRevision];
     
     if ([currentRevision isEqual: revision])
     {
-        return;
+        return nil;
     }
     
     while (revision != nil)
@@ -421,12 +434,24 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         CORevision *revisionParent = [revision parentRevision];
         if ([revisionParent isEqual: currentRevision])
         {
-            [self setCurrentRevision: revision];
-            return;
+            return revision;
         }
         revision = revisionParent;
     }
+    return revision;
 }
+
+- (BOOL)canRedo
+{
+    return [self redoRevision] != nil;
+}
+
+- (void)redo
+{
+    [self setCurrentRevision: [self redoRevision]];
+}
+
+
 - (COSQLiteStore *) store
 {
     return [_persistentRoot store];

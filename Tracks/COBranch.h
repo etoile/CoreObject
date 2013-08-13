@@ -165,6 +165,8 @@ extern NSString * const kCOBranchLabel;
 
 /** @taskunit Undo / Redo */
 
+- (BOOL)canUndo;
+- (BOOL)canRedo;
 - (void)undo;
 - (void)redo;
 
