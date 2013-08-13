@@ -33,21 +33,21 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * See -[ETModelDescriptionRepository mainRepository].
  */
-+ (COObjectGraphContext *) objectGraphContext;
++ (COObjectGraphContext *)objectGraphContext;
 /**
  * Returns a new autoreleased transient object graph context using the given 
  * model description repository.
  */
-+ (COObjectGraphContext *) objectGraphContextWithModelRepository: (ETModelDescriptionRepository *)aRegistry;
++ (COObjectGraphContext *)objectGraphContextWithModelRepository: (ETModelDescriptionRepository *)aRegistry;
 /**
  * Initializes a persistent object graph context owned by a branch.
  */
-- (id) initWithBranch: (COBranch *)aBranch;
+- (id)initWithBranch: (COBranch *)aBranch;
 /**
  * Initializes a transient object graph context using the given model 
  * description repository.
  */
-- (id) initWithModelRepository: (ETModelDescriptionRepository *)aRepo;
+- (id)initWithModelRepository: (ETModelDescriptionRepository *)aRepo;
 
 /** 
  * @taskunit Type Querying 
@@ -122,19 +122,19 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * 
  * This must leave the object graph in a consistent state.
  */
-- (void) insertOrUpdateItems: (NSArray *)items;
+- (void)insertOrUpdateItems: (NSArray *)items;
 /**
  * Does the same than -insertOrUpdateItems:, but in addition discard changes and 
  * deleted objects (by running a GC phase).
  */
-- (void) setItemGraph: (id <COItemGraph>)aTree;
+- (void)setItemGraph: (id <COItemGraph>)aTree;
 /**
  * IDEA:
  * Though COEditingContext implements COItemGraph, this method returns
  * an independent snapshot of the editing context, suitable for passing
  * to a background thread
  */
-//- (id<COItemGraph>) itemGraphSnapshot;
+//- (id<COItemGraph>)itemGraphSnapshot;
 
 /**
  * @taskunit Accessing the Root Object
@@ -204,9 +204,10 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * After calling this method, -hasChanges returns NO.
  */
-- (void) clearChangeTracking;
+- (void)clearChangeTracking;
 // NOTE: I'm not sure this method is going to be useful. Quentin.
-- (void) clearChangeTrackingForObject: (COObject *)anObject;
+- (void)clearChangeTrackingForObject: (COObject *)anObject;
+
 /**
  * @taskunit Accessing Loaded Objects
  */
@@ -226,7 +227,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * You shouldn't need to use this method, unless you extend CoreObject API.
  */
-- (COObject *) objectWithUUID: (ETUUID *)aUUID;
+- (COObject *)objectWithUUID: (ETUUID *)aUUID;
 
 /** 
  * @taskunit Debugging 
@@ -279,7 +280,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * This method can resolve entity descriptions during an item graph 
  * deserialization without accessing the store.
  */
-- (id) objectReferenceWithUUID: (ETUUID *)aUUID;
+- (id)objectReferenceWithUUID: (ETUUID *)aUUID;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
