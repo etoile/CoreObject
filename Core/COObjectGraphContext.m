@@ -35,6 +35,8 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
  */
 @implementation COObjectGraphContext
 
+@synthesize branch = branch_, modelRepository = modelRepository_;
+
 #pragma mark Creation
 
 - (id) initWithBranch: (COBranch *)aBranch
@@ -97,16 +99,6 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 }
 
 #pragma mark Schema
-
-- (ETModelDescriptionRepository *) modelRepository;
-{
-    return modelRepository_;
-}
-
-- (COBranch *) branch
-{
-    return branch_;
-}
 
 - (void)setBranch: (COBranch *)aBranch
 {

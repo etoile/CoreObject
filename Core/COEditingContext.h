@@ -381,8 +381,8 @@
  */
 - (NSSet *)updatedObjects;
 /**
- * Returns the union of the inserted, updated and deleted objects. See
- * -insertedObjects, -updatedObjects and -deletedObjects.
+ * Returns the union of the inserted and updated objects. See -insertedObjects 
+ * and -updatedObjects.
  *
  * After a commit, returns an empty set.
  */
