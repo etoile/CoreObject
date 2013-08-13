@@ -11,17 +11,15 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 @interface COObjectGraphContext : NSObject <COItemGraph, COPersistentObjectContext>
 {
 	@private
-    ETUUID *rootObjectUUID_;
-    NSMutableDictionary *objectsByUUID_;
+	ETModelDescriptionRepository *_modelRepository;
+	COBranch *_branch;
+    ETUUID *_rootObjectUUID;
+	/** Loaded (or inserted) objects by UUID */
+    NSMutableDictionary *_loadedObjects;
+	/** Item graph exposed during loading (nil once the loading is done) */
 	id <COItemGraph> _loadingItemGraph;
-    
-    NSMutableSet *insertedObjects_;
-    NSMutableSet *modifiedObjects_;
-    
-    ETModelDescriptionRepository *modelRepository_;
-    
-    COBranch *branch_;
-    
+    NSMutableSet *_insertedObjects;
+    NSMutableSet *_updatedObjects;
     NSMapTable *_updatedPropertiesByObject;
 }
 

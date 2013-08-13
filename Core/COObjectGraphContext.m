@@ -35,7 +35,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
  */
 @implementation COObjectGraphContext
 
-@synthesize branch = branch_, modelRepository = modelRepository_;
+@synthesize branch = _branch, modelRepository = _modelRepository;
 
 #pragma mark Creation
 
@@ -43,17 +43,17 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
       modelRepository: (ETModelDescriptionRepository *)aRepo
 {
     SUPERINIT;
-    objectsByUUID_ = [[NSMutableDictionary alloc] init];
-    insertedObjects_ = [[NSMutableSet alloc] init];
-    modifiedObjects_ = [[NSMutableSet alloc] init];
+    _loadedObjects = [[NSMutableDictionary alloc] init];
+    _insertedObjects = [[NSMutableSet alloc] init];
+    _updatedObjects = [[NSMutableSet alloc] init];
     _updatedPropertiesByObject = [[NSMapTable alloc] init];
-    branch_ = aBranch;
+    _branch = aBranch;
     if (aRepo == nil)
     {
-        aRepo = [[[branch_ persistentRoot] editingContext] modelRepository];
+        aRepo = [[[_branch persistentRoot] editingContext] modelRepository];
     }
     
-    ASSIGN(modelRepository_, aRepo);
+    ASSIGN(_modelRepository, aRepo);
     return self;
 }
 
@@ -84,11 +84,11 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 - (void) dealloc
 {
-    [objectsByUUID_ release];
-    [rootObjectUUID_ release];
-    [insertedObjects_ release];
-    [modifiedObjects_ release];
-    [modelRepository_ release];
+    [_loadedObjects release];
+    [_rootObjectUUID release];
+    [_insertedObjects release];
+    [_updatedObjects release];
+    [_modelRepository release];
     [_updatedPropertiesByObject release];
     [super dealloc];
 }
@@ -102,24 +102,24 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 - (void)setBranch: (COBranch *)aBranch
 {
-	branch_ = aBranch;
+	_branch = aBranch;
 }
 
 - (COPersistentRoot *) persistentRoot
 {
-    return [branch_ persistentRoot];
+    return [_branch persistentRoot];
 }
 
 - (COEditingContext *) editingContext
 {
-    return [[branch_ persistentRoot] parentContext];
+    return [[_branch persistentRoot] parentContext];
 }
 
 #pragma mark begin COItemGraph protocol
 
 - (ETUUID *) rootItemUUID
 {
-    return rootObjectUUID_;
+    return _rootObjectUUID;
 }
 
 /**
@@ -127,13 +127,13 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
  */
 - (COItem *) itemForUUID: (ETUUID *)aUUID
 {
-    COObject *object = [objectsByUUID_ objectForKey: aUUID];
+    COObject *object = [_loadedObjects objectForKey: aUUID];
 	return [object storeItem];
 }
 
 - (NSArray *) itemUUIDs
 {
-    return [objectsByUUID_ allKeys];
+    return [_loadedObjects allKeys];
 }
 
 - (NSString *)entityNameForItem: (COItem *)anItem
@@ -157,11 +157,11 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
                     format: @"COItem %@ lacks an entity name", anItem];
     }
     
-	ETEntityDescription *desc = [modelRepository_ descriptionForName: name];
+	ETEntityDescription *desc = [_modelRepository descriptionForName: name];
     
     if (desc == nil)
     {
-        desc = [modelRepository_ descriptionForName: [self defaultEntityName]];
+        desc = [_modelRepository descriptionForName: [self defaultEntityName]];
     }
     
     return desc;
@@ -169,7 +169,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 - (id) objectReferenceWithUUID: (ETUUID *)aUUID
 {
-	COObject *loadedObject = [objectsByUUID_ objectForKey: aUUID];
+	COObject *loadedObject = [_loadedObjects objectForKey: aUUID];
 
 	if (loadedObject != nil)
 		return loadedObject;
@@ -192,7 +192,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 - (id) objectWithUUID: (ETUUID *)aUUID
     entityDescription: (ETEntityDescription *)anEntityDescription
 {
-	Class objClass = [modelRepository_ classForEntityDescription: anEntityDescription];
+	Class objClass = [_modelRepository classForEntityDescription: anEntityDescription];
 	/* For a reloaded object, we must no call -initWithUUID:entityDescription:context:
 	   to prevent the normal initialization process to occur (the COObject
 	   subclass designed initializer being called). */
@@ -201,7 +201,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	                                  objectGraphContext: self
 	                                               isNew: NO];
 	
-	[objectsByUUID_ setObject: obj forKey: aUUID];
+	[_loadedObjects setObject: obj forKey: aUUID];
 	[obj release];
 	
 	return obj;
@@ -228,21 +228,21 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     NSParameterAssert(item != nil);
     
     ETUUID *uuid = [item UUID];
-    COObject *currentObject = [objectsByUUID_ objectForKey: uuid];
+    COObject *currentObject = [_loadedObjects objectForKey: uuid];
     
     if (currentObject == nil)
     {
         currentObject = [self objectWithStoreItem: item];
         if (markInserted)
         {
-            [insertedObjects_ addObject: currentObject];
+            [_insertedObjects addObject: currentObject];
         }
     }
     else
     {
         [currentObject setStoreItem: item];
         [currentObject addCachedOutgoingRelationships];
-        [modifiedObjects_ addObject: currentObject];
+        [_updatedObjects addObject: currentObject];
     }
 }
 
@@ -254,12 +254,12 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 - (id)insertObjectWithEntityName: (NSString *)aFullName
                             UUID: (ETUUID *)aUUID
 {
-    ETEntityDescription *desc = [modelRepository_ descriptionForName: aFullName];
+    ETEntityDescription *desc = [_modelRepository descriptionForName: aFullName];
     if (desc == nil)
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Entity name %@ invalid", aFullName];
 	}
-	Class objClass = [modelRepository_ classForEntityDescription: desc];
+	Class objClass = [_modelRepository classForEntityDescription: desc];
     
     /* Nil root object means the new object will be a root */
 	COObject *obj = [[objClass alloc] initWithUUID: aUUID
@@ -279,12 +279,12 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
     ETUUID *uuid = [object UUID];
     
-	INVALIDARG_EXCEPTION_TEST(object, [objectsByUUID_ objectForKey: uuid] == nil);
+	INVALIDARG_EXCEPTION_TEST(object, [_loadedObjects objectForKey: uuid] == nil);
     
-    [objectsByUUID_ setObject: object forKey: uuid];
+    [_loadedObjects setObject: object forKey: uuid];
 	if (inserted)
 	{
-		[insertedObjects_ addObject: object];
+		[_insertedObjects addObject: object];
 	}
 }
 
@@ -324,7 +324,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
     // 1. Do updates.
 
-    ASSIGN(rootObjectUUID_, [aTree rootItemUUID]);
+    ASSIGN(_rootObjectUUID, [aTree rootItemUUID]);
     
 	// TODO: To prevent caching the item graph during the loading, a better
 	// approach could be to allocate all the objects before loading them.
@@ -361,7 +361,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 - (void) setRootObject: (COObject *)anObject
 {
     NSParameterAssert([anObject objectGraphContext] == self);
-    ASSIGN(rootObjectUUID_, [anObject UUID]);
+    ASSIGN(_rootObjectUUID, [anObject UUID]);
 }
 
 #pragma mark change tracking
@@ -382,20 +382,20 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 - (NSSet *) insertedObjects
 {
-    return insertedObjects_;
+    return _insertedObjects;
 }
 
 - (NSSet *) updatedObjects
 {
-    return modifiedObjects_;
+    return _updatedObjects;
 }
 - (NSSet *) changedObjects
 {
-    return [insertedObjects_ setByAddingObjectsFromSet: modifiedObjects_];
+    return [_insertedObjects setByAddingObjectsFromSet: _updatedObjects];
 }
 - (BOOL) isUpdatedObject: (COObject *)anObject
 {
-    return [modifiedObjects_ containsObject: anObject];
+    return [_updatedObjects containsObject: anObject];
 }
 - (BOOL)hasChanges
 {
@@ -403,25 +403,25 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 }
 - (NSSet *)loadedObjects
 {
-    return [NSSet setWithArray: [objectsByUUID_ allValues]];
+    return [NSSet setWithArray: [_loadedObjects allValues]];
 }
 
 - (void)discardObjects: (NSSet *)objects
 {
-	[objectsByUUID_ removeObjectsForKeys: [(id)[[objects mappedCollection] UUID] allObjects]];
+	[_loadedObjects removeObjectsForKeys: [(id)[[objects mappedCollection] UUID] allObjects]];
 }
 
 - (void) clearChangeTracking
 {
-    [insertedObjects_ removeAllObjects];
-    [modifiedObjects_ removeAllObjects];
+    [_insertedObjects removeAllObjects];
+    [_updatedObjects removeAllObjects];
     [_updatedPropertiesByObject removeAllObjects];
 }
 
 - (void) clearChangeTrackingForObject: (COObject *)anObject
 {
-    [insertedObjects_ removeObject: anObject];
-    [modifiedObjects_ removeObject: anObject];
+    [_insertedObjects removeObject: anObject];
+    [_updatedObjects removeObject: anObject];
     [_updatedPropertiesByObject removeObjectForKey: anObject];
 }
 
@@ -437,7 +437,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	// NOTE: We serialize UUIDs into strings in various places, this check
 	// helps to intercept string objects that ought to be ETUUID objects.
 	NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
-    COObject *obj = [objectsByUUID_ objectForKey: aUUID];
+    COObject *obj = [_loadedObjects objectForKey: aUUID];
 	ETAssert([obj isKindOfClass: [COObject class]]);
 	return obj;
 }
@@ -459,7 +459,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
  */
 - (void) removeSingleObject_: (ETUUID *)uuid
 {
-    COObject *anObject = [objectsByUUID_ objectForKey: uuid];
+    COObject *anObject = [_loadedObjects objectForKey: uuid];
     
     // Update relationship cache
     
@@ -467,8 +467,8 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     
     // Update change tracking
     
-    [insertedObjects_ removeObject: anObject];
-    [modifiedObjects_ removeObject: anObject];
+    [_insertedObjects removeObject: anObject];
+    [_updatedObjects removeObject: anObject];
     
     // Mark the object as a "zombie"
     
@@ -476,7 +476,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     
     // Release it from the objects dictionary (may release it)
     
-    [objectsByUUID_ removeObjectForKey: uuid];
+    [_loadedObjects removeObjectForKey: uuid];
     anObject = nil;
 }
 
@@ -503,7 +503,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
         return;
     }
     
-    NSArray *allKeys = [objectsByUUID_ allKeys];
+    NSArray *allKeys = [_loadedObjects allKeys];
     
     NSMutableSet *live = [NSMutableSet setWithCapacity: [allKeys count]];
     [self gcDfs_: [self rootObject] uuids: live];
@@ -532,8 +532,8 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     
     COObjectGraphContext *otherContext = (COObjectGraphContext *)object;
     
-    if (!((rootObjectUUID_ == nil && otherContext->rootObjectUUID_ == nil)
-          || [rootObjectUUID_ isEqual: otherContext->rootObjectUUID_]))
+    if (!((_rootObjectUUID == nil && otherContext->_rootObjectUUID == nil)
+          || [_rootObjectUUID isEqual: otherContext->_rootObjectUUID]))
     {
         return NO;
     }
@@ -558,7 +558,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 - (NSUInteger) hash
 {
-	return [rootObjectUUID_ hash] ^ 13803254444065375360ULL;
+	return [_rootObjectUUID hash] ^ 13803254444065375360ULL;
 }
 
 #pragma mark COObject private methods
@@ -576,9 +576,9 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	}
     
     // If it's already marked as inserted, don't mark it as modified
-    if (![insertedObjects_ containsObject: obj])
+    if (![_insertedObjects containsObject: obj])
     {
-        [modifiedObjects_ addObject: obj];
+        [_updatedObjects addObject: obj];
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextObjectsDidChangeNotification
