@@ -123,19 +123,18 @@
 
 - (NSSet *)persistentRoots
 {
-    // TODO: Revisit once we introduce persistent root faulting. Assumes all persistent roots are loaded.
-    
-    NSMutableSet *result = [NSMutableSet setWithArray: [_loadedPersistentRoots allValues]];
+	// TODO: Revisit once we introduce persistent root faulting. Assumes all persistent roots are loaded.
+    NSMutableSet *persistentRoots = [NSMutableSet set];
 
-    for (ETUUID *uuid in [_store deletedPersistentRootUUIDs])
+    for (ETUUID *uuid in [_store persistentRootUUIDs])
     {
-        [result removeObject: [self persistentRootForUUID: uuid]];
+        [persistentRoots addObject: [self persistentRootForUUID: uuid]];
     }
-
-    [result minusSet: _persistentRootsPendingDeletion];
-    [result unionSet: _persistentRootsPendingUndeletion];
+	[persistentRoots unionSet: [self persistentRootsPendingInsertion]];
+    [persistentRoots unionSet: _persistentRootsPendingUndeletion];
+	[persistentRoots minusSet: _persistentRootsPendingDeletion];
     
-    return result;
+    return persistentRoots;
 }
 
 - (NSSet *)deletedPersistentRoots

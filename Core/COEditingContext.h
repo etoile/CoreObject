@@ -121,7 +121,8 @@
 
 /**
  * Returns all persistent roots in the store (excluding those that are marked as 
- * deleted on disk), plus those pending commit (and minus those pending deletion).
+ * deleted on disk), plus those pending insertion and undeletion (and minus 
+ * those pending deletion).
  */
 @property (nonatomic, readonly) NSSet *persistentRoots;
 /**
