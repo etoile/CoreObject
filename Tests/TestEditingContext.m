@@ -158,6 +158,17 @@
     UKObjectsEqual(S(pendingInsertion), [ctx persistentRootsPendingInsertion]);
     UKObjectsEqual(S(pendingDeletion), [ctx persistentRootsPendingDeletion]);
     UKObjectsEqual(S(pendingUndeletion), [ctx persistentRootsPendingUndeletion]);
+    
+    // 3. Test what happens when we commit (all pending changes are made and no longer pending)
+    
+    [ctx commit];
+    
+    UKObjectsEqual(S(regular, pendingInsertion, pendingUndeletion), [ctx persistentRoots]);
+    UKObjectsEqual(S(deletedOnDisk, pendingDeletion), [ctx deletedPersistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingInsertion]);
+    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
+    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingUndeletion]);
+    
 }
 
 @end
