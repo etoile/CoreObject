@@ -5,7 +5,6 @@
 
 @interface TestEditingContext : TestCommon <UKTest>
 {
-    COPersistentRoot *persistentRoot;
 }
 @end
 
@@ -14,18 +13,17 @@
 - (id) init
 {
     SUPERINIT;
-    ASSIGN(persistentRoot, [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"]);
     return self;
 }
 
 - (void) dealloc
 {
-    DESTROY(persistentRoot);
     [super dealloc];
 }
 
 - (void)testDeleteUncommittedPersistentRoot
 {
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];
     
     UKTrue([ctx hasChanges]);
@@ -46,6 +44,7 @@
 
 - (void)testDeleteCommittedPersistentRoot
 {
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];
     
     [ctx commit];
@@ -83,7 +82,8 @@
 
 - (void)testUndeleteCommittedPersistentRoot
 {
-    ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];    
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];
     [ctx commit];
     
     [ctx deletePersistentRoot: persistentRoot];
@@ -96,7 +96,7 @@
     UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
     UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
     UKObjectsEqual(S(persistentRoot), [ctx persistentRootsPendingUndeletion]);
-    UKObjectsEqual(S(persistentRoot), [ctx deletedPersistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
     UKFalse([persistentRoot isDeleted]);
     
     [ctx commit];
@@ -108,6 +108,56 @@
     UKObjectsEqual([NSSet set], [ctx persistentRootsPendingUndeletion]);
     UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
     UKFalse([persistentRoot isDeleted]);
+}
+
+/**
+ * Try to test all of the requirements of -persistentRoots and the other accessors
+ */
+- (void) testPersistentRootsAccessors
+{
+    COPersistentRoot *regular;
+    COPersistentRoot *deletedOnDisk;
+    COPersistentRoot *pendingInsertion;
+    COPersistentRoot *pendingDeletion;
+    COPersistentRoot *pendingUndeletion;
+    
+    // 1. Setup the persistent roots
+    {
+        regular = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+        [regular commit];
+        
+        deletedOnDisk = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+        [deletedOnDisk commit];
+        [ctx deletePersistentRoot: deletedOnDisk];
+        [deletedOnDisk commit];
+        
+        pendingInsertion = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+        
+        pendingDeletion = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+        [pendingDeletion commit];
+        [ctx deletePersistentRoot: pendingDeletion];
+        
+        pendingUndeletion = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+        [pendingUndeletion commit];
+        [ctx deletePersistentRoot: pendingUndeletion];
+        [pendingUndeletion commit];
+        [ctx undeletePersistentRoot: pendingUndeletion];
+        
+        // Check that the constraints we wanted to set up hold
+        UKTrue([[store persistentRootUUIDs] containsObject: [regular persistentRootUUID]]);
+        UKTrue([[store deletedPersistentRootUUIDs] containsObject: [deletedOnDisk persistentRootUUID]]);
+        UKNil([store persistentRootInfoForUUID: [pendingInsertion persistentRootUUID]]);
+        UKTrue([[store persistentRootUUIDs] containsObject: [pendingDeletion persistentRootUUID]]);
+        UKTrue([[store deletedPersistentRootUUIDs] containsObject: [pendingUndeletion persistentRootUUID]]);
+    }
+    
+    // 2. Test the accessors
+    
+    UKObjectsEqual(S(regular, pendingInsertion, pendingUndeletion), [ctx persistentRoots]);
+    UKObjectsEqual(S(deletedOnDisk), [ctx deletedPersistentRoots]);
+    UKObjectsEqual(S(pendingInsertion), [ctx persistentRootsPendingInsertion]);
+    UKObjectsEqual(S(pendingDeletion), [ctx persistentRootsPendingDeletion]);
+    UKObjectsEqual(S(pendingUndeletion), [ctx persistentRootsPendingUndeletion]);
 }
 
 @end

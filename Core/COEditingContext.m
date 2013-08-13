@@ -145,6 +145,8 @@
     {
         [result addObject: [self persistentRootForUUID: uuid]];
     }
+
+    [result minusSet: _persistentRootsPendingUndeletion];
     
     return result;
 }

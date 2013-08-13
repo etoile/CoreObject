@@ -126,7 +126,8 @@
  */
 @property (nonatomic, readonly) NSSet *persistentRoots;
 /**
- * Returns persistent roots marked as deleted on disk.
+ * Returns persistent roots marked as deleted on disk, excluding those that
+ * are pending undeletion.
  */
 @property (nonatomic, copy, readonly) NSSet *deletedPersistentRoots;
 
