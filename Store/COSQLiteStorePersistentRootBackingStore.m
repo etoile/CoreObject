@@ -15,22 +15,12 @@
 
 - (id)initWithPath: (NSString *)aPath
 {
-    BOOL isDirectory;
-	BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath: aPath
-													   isDirectory: &isDirectory];
-	
-	if (!exists)
-	{
-		if (![[NSFileManager defaultManager] createDirectoryAtPath: aPath
-                                       withIntermediateDirectories: YES
-                                                        attributes: nil
-                                                             error: NULL])
-		{
-			[NSException raise: NSGenericException
-						format: @"Error creating backing store at %@", aPath];
-		}
-	}
-    
+    // Ignore if this fails (it will fail if the directory already exists.)
+	[[NSFileManager defaultManager] createDirectoryAtPath: aPath
+                              withIntermediateDirectories: YES
+                                               attributes: nil
+                                                    error: NULL];
+
     SUPERINIT;
     path_ = [aPath retain];
 	db_ = [[FMDatabase alloc] initWithPath: [aPath stringByAppendingPathComponent: @"revisions.sqlite"]];

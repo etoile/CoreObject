@@ -31,25 +31,13 @@
 	backingStores_ = [[NSMutableDictionary alloc] init];
     backingStoreUUIDForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
     notificationUserInfoToPostForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
-    
-	BOOL isDirectory;
-	BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath: [url_ path]
-													   isDirectory: &isDirectory];
-	
-	if (!exists)
-	{
-		if (![[NSFileManager defaultManager] createDirectoryAtPath: [url_ path]
-                                       withIntermediateDirectories: YES
-                                                        attributes: nil
-                                                             error: NULL])
-		{
-			[self release];
-			[NSException raise: NSGenericException
-						format: @"Error creating store at %@", [url_ path]];
-			return nil;
-		}
-	}
-	// assume it is a valid store if it exists... (may not be of course)
+
+    // Ignore if this fails (it will fail if the directory already exists.)
+    // If it really fails, we will notice later when we try to open the sqlite db
+	[[NSFileManager defaultManager] createDirectoryAtPath: [url_ path]
+                              withIntermediateDirectories: YES
+                                               attributes: nil
+                                                    error: NULL];
 	
     db_ = [[FMDatabase alloc] initWithPath: [[url_ path] stringByAppendingPathComponent: @"index.sqlite"]];
     

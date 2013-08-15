@@ -407,6 +407,38 @@ static ETUUID *childUUID2;
     
 }
 
+- (void) testAttachmentsBasic
+{
+    NSString *fakeAttachment1 = @"this is a large attachment";
+    NSString *fakeAttachment2 = @"this is another large attachment";
+    NSString *path1 = [NSTemporaryDirectory() stringByAppendingPathComponent: @"coreobject-test1.txt"];
+    NSString *path2 = [NSTemporaryDirectory() stringByAppendingPathComponent: @"coreobject-test2.txt"];
+    
+    [fakeAttachment1 writeToFile: path1
+                      atomically: YES
+                        encoding: NSUTF8StringEncoding
+                           error: NULL];
+    
+    [fakeAttachment2 writeToFile: path2
+                      atomically: YES
+                        encoding: NSUTF8StringEncoding
+                           error: NULL];
+    
+    NSData *hash1 = [store importAttachmentFromURL: [NSURL fileURLWithPath: path1]];
+    NSData *hash2 = [store importAttachmentFromURL: [NSURL fileURLWithPath: path2]];
+    
+    UKObjectsEqual(fakeAttachment1, [NSString stringWithContentsOfURL: [store URLForAttachmentID: hash1]
+                                                             encoding: NSUTF8StringEncoding
+                                                                error: NULL]);
+    
+    UKObjectsEqual(fakeAttachment2, [NSString stringWithContentsOfURL: [store URLForAttachmentID: hash2]
+                                                             encoding: NSUTF8StringEncoding
+                                                                error: NULL]);
+    
+    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: [[store URLForAttachmentID: hash1] path]]);
+    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: [[store URLForAttachmentID: hash2] path]]);
+}
+
 - (void) testAttachmentsGCDoesNotCollectReferenced
 {
     NSString *fakeAttachment = @"this is a large attachment";

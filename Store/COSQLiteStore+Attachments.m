@@ -96,13 +96,13 @@ static NSData *dataFromHexString(NSString *hexString)
 - (NSData *) importAttachmentFromURL: (NSURL *)aURL
 {
     NSFileManager *fm = [NSFileManager defaultManager];
-    if (![fm createDirectoryAtURL: [self attachmentsURL]
-      withIntermediateDirectories: NO
-                       attributes: nil
-                            error: NULL])
-    {
-        return nil;
-    }
+    
+    // Ignore if this fails
+    
+    [fm createDirectoryAtURL: [self attachmentsURL]
+ withIntermediateDirectories: NO
+                  attributes: nil
+                       error: NULL];
     
     // Hash it
     
@@ -111,8 +111,10 @@ static NSData *dataFromHexString(NSString *hexString)
     
     if (![fm fileExistsAtPath: [attachmentURL path]])
     {
-        if (NO == [fm copyItemAtURL: aURL toURL: attachmentURL error: NULL])
+        NSError *error = nil;
+        if (NO == [fm copyItemAtURL: aURL toURL: attachmentURL error: &error])
         {
+            // This is a real error, e.g. disk full, store not writable, filesystem not available, etc.
             return nil;
         }
     }
