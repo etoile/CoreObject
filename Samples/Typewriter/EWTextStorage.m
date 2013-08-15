@@ -251,7 +251,16 @@ static NSRange paragraphRangeForLocationInString(NSString *aString, NSUInteger a
     NSArray *modifiedParagraphs = [self paragraphUUIDSOverlappingRange: aRange];
     [paragraphsChangedDuringEditing_ addObjectsFromArray: modifiedParagraphs];
     //NSLog(@"---modified (attrs) paragraphs: %@", modifiedParagraphs);
-          
+    
+    // FIXME: Remove, this was just an experiment
+    NSTextAttachment *attachment = [attributes objectForKey: NSAttachmentAttributeName];
+    if (nil != attachment)
+    {
+        NSFileWrapper *wrapper = [attachment fileWrapper];
+        NSData *data = [wrapper regularFileContents];
+        NSLog(@"Attachment data: %lu bytes",(unsigned long) [data length]);
+    }
+    
     [self edited: NSTextStorageEditedAttributes
            range: aRange
   changeInLength: 0];

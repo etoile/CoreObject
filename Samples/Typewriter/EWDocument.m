@@ -147,9 +147,15 @@
     [self validateCanLoadStateToken: aToken];
          
     COBranch *editingBranchObject = [_persistentRoot editingBranch];
-
-    [editingBranchObject setCurrentRevision: [CORevision revisionWithStore: [self store]
-                                                                revisionID: aToken]];
+    CORevision *rev = [CORevision revisionWithStore: [self store]
+                                         revisionID: aToken];
+    
+    if ([rev isEqual: [editingBranchObject currentRevision]])
+    {
+        return;
+    }
+    
+    [editingBranchObject setCurrentRevision: rev];
     
     id <COItemGraph> tree = [[self store] contentsForRevisionID: aToken];
 
