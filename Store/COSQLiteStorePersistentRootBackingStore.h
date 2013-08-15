@@ -5,6 +5,7 @@
 @class COItemGraph;
 @class CORevisionInfo;
 @class CORevisionID;
+@class COSQLiteStore;
 
 /**
  * Database connection for manipulating a persistent root backing store.
@@ -13,8 +14,10 @@
  */
 @interface COSQLiteStorePersistentRootBackingStore : NSObject
 {
-    NSString *path_;
+    COSQLiteStore *_store; // weak reference
+    ETUUID *_uuid;
     FMDatabase *db_;
+    BOOL _shareDB;
 }
 
 /**
@@ -22,7 +25,9 @@
  *      aPath the pathn of a directory where the backing store
  *      should be opened or created.
  */
-- (id)initWithPath: (NSString *)aPath;
+- (id)initWithPersistentRootUUID: (ETUUID*)aUUID
+                           store: (COSQLiteStore *)store
+                      useStoreDB: (BOOL)share;
 
 - (BOOL)close;
 

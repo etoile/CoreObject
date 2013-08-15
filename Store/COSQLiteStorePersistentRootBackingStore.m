@@ -9,51 +9,81 @@
 #import "COItem+Binary.h"
 #import "CORevisionInfo.h"
 #import "CORevisionID.h"
+#import "COSQLiteStore.h"
 
+@interface COSQLiteStore (Private)
+
+- (FMDatabase *) database;
+
+@end
 
 @implementation COSQLiteStorePersistentRootBackingStore
 
-- (id)initWithPath: (NSString *)aPath
+- (NSString *) tableName
 {
-    // Ignore if this fails (it will fail if the directory already exists.)
-	[[NSFileManager defaultManager] createDirectoryAtPath: aPath
-                              withIntermediateDirectories: YES
-                                               attributes: nil
-                                                    error: NULL];
-
-    SUPERINIT;
-    path_ = [aPath retain];
-	db_ = [[FMDatabase alloc] initWithPath: [aPath stringByAppendingPathComponent: @"revisions.sqlite"]];
-    
-    [db_ setShouldCacheStatements: YES];
-	
-	if (![db_ open])
-	{
-        assert(0);
-        [self release];
-		return nil;
-	}
-    
-    // Use write-ahead-log mode
+    if (_shareDB)
     {
-        NSString *result = [db_ stringForQuery: @"PRAGMA journal_mode=WAL"];
+        return [NSString stringWithFormat: @"`commits-%@`", _uuid];
+    }
+    else
+    {
+        return @"commits";
+    }
+}
 
-        if ([@"wal" isEqualToString: result])
+- (void) setupDatabaseWithParentStore: (COSQLiteStore *)store
+{
+    if (_shareDB)
+    {
+        ASSIGN(db_, [store database]);
+    }
+    else
+    {    
+        NSString *path = [[[[store URL] path] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.sqlite", _uuid]] retain];
+        NILARG_EXCEPTION_TEST(path);
+        
+        db_ = [[FMDatabase alloc] initWithPath: path];
+        
+        [db_ setShouldCacheStatements: YES];
+        
+        if (![db_ open])
         {
-            // See comments in COSQiteStore
-            [db_ executeUpdate: @"PRAGMA synchronous=NORMAL"];
+            assert(0);
         }
-        else
+        
+        // Use write-ahead-log mode
         {
-            NSLog(@"Enabling WAL mode failed.");
+            NSString *result = [db_ stringForQuery: @"PRAGMA journal_mode=WAL"];
+            
+            if ([@"wal" isEqualToString: result])
+            {
+                // See comments in COSQiteStore
+                [db_ executeUpdate: @"PRAGMA synchronous=NORMAL"];
+            }
+            else
+            {
+                NSLog(@"Enabling WAL mode failed.");
+            }
         }
     }
     
-    // Set up schema
+    [db_ executeUpdate: [NSString stringWithFormat:
+                         @"CREATE TABLE IF NOT EXISTS %@ (revid INTEGER PRIMARY KEY ASC, "
+                         "contents BLOB, metadata BLOB, timestamp REAL, parent INTEGER, root BLOB, deltabase INTEGER, "
+                         "bytesInDeltaRun INTEGER, garbage BOOLEAN)", [self tableName]]];
+}
+
+- (id)initWithPersistentRootUUID: (ETUUID*)aUUID
+                           store: (COSQLiteStore *)store
+                      useStoreDB: (BOOL)share
+{
+    SUPERINIT;
     
-    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS commits (revid INTEGER PRIMARY KEY ASC, "
-                        "contents BLOB, metadata BLOB, timestamp REAL, parent INTEGER, root BLOB, deltabase INTEGER, "
-                        "bytesInDeltaRun INTEGER, garbage BOOLEAN)"];
+    _shareDB = share;
+    _store = store;
+    ASSIGN(_uuid, aUUID);
+    
+    [self setupDatabaseWithParentStore: store];
     
     if ([db_ hadError])
     {
@@ -67,12 +97,19 @@
 
 - (BOOL)close
 {
-    return [db_ close];
+    if (!_shareDB)
+    {
+        return [db_ close];
+    }
+    else
+    {
+        return YES;
+    }
 }
 
 - (void)dealloc
 {
-    [path_ release];
+    [_uuid release];
 	[db_ release];
 	[super dealloc];
 }
@@ -115,7 +152,8 @@
 - (CORevisionInfo *) revisionForID: (CORevisionID *)aToken
 {
     CORevisionInfo *result = nil;
-    FMResultSet *rs = [db_ executeQuery: @"SELECT parent, metadata, timestamp FROM commits WHERE revid = ?",
+    FMResultSet *rs = [db_ executeQuery:
+                       [NSString stringWithFormat: @"SELECT parent, metadata, timestamp FROM %@ WHERE revid = ?", [self tableName]],
                        [NSNumber numberWithLongLong: [aToken revisionIndex]]];
 	if ([rs next])
 	{
@@ -146,7 +184,8 @@
 - (ETUUID *) rootUUIDForRevid: (int64_t)revid
 {
     ETUUID *result = nil;
-    FMResultSet *rs = [db_ executeQuery: @"SELECT root FROM commits WHERE revid = ?", [NSNumber numberWithLongLong: revid]];
+    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT root FROM %@ WHERE revid = ?", [self tableName]],
+                       [NSNumber numberWithLongLong: revid]];
 	if ([rs next])
 	{
         result = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
@@ -158,7 +197,8 @@
 
 - (BOOL) hasRevid: (int64_t)revid
 {
-    return [db_ boolForQuery: @"SELECT 1 FROM commits WHERE revid = ?", [NSNumber numberWithLongLong: revid]];
+    return [db_ boolForQuery: [NSString stringWithFormat: @"SELECT 1 FROM %@ WHERE revid = ?", [self tableName]],
+            [NSNumber numberWithLongLong: revid]];
 }
 
 /**
@@ -174,10 +214,12 @@
     
     NSMutableDictionary *dataForUUID = [NSMutableDictionary dictionary];
     
-    FMResultSet *rs = [db_ executeQuery: @"SELECT revid, contents, parent, deltabase "
-                                          "FROM commits "
-                                          "WHERE revid <= ? AND revid >= (SELECT deltabase FROM commits WHERE revid = ?) "
-                                          "ORDER BY revid DESC", revidObj, revidObj];
+    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
+                                          @"SELECT revid, contents, parent, deltabase "
+                                          "FROM %@ "
+                                          "WHERE revid <= ? AND revid >= (SELECT deltabase FROM %@ WHERE revid = ?) "
+                                          "ORDER BY revid DESC", [self tableName], [self tableName]],
+                                        revidObj, revidObj];
     
     int64_t nextRevId = -1;
   
@@ -285,7 +327,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 - (int64_t) nextRowid
 {
     int64_t result = 0;
-    FMResultSet *rs = [db_ executeQuery: @"SELECT MAX(rowid) FROM commits"];
+    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT MAX(rowid) FROM %@", [self tableName]]];
 	if ([rs next])
 	{
         if (![rs columnIndexIsNull: 0])
@@ -302,7 +344,8 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 {
     int64_t deltabase = -1;
     
-    FMResultSet *rs = [db_ executeQuery: @"SELECT deltabase FROM commits WHERE rowid = ?", [NSNumber numberWithLongLong: aRowid]];
+    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT deltabase FROM %@ WHERE rowid = ?", [self tableName]],
+                       [NSNumber numberWithLongLong: aRowid]];
     if ([rs next])
     {
         deltabase = [rs longLongIntForColumnIndex: 0];
@@ -316,7 +359,8 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 {
     int64_t bytesInDeltaRun = 0;
     
-    FMResultSet *rs = [db_ executeQuery: @"SELECT bytesInDeltaRun FROM commits WHERE rowid = ?", [NSNumber numberWithLongLong: aRowid]];
+    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT bytesInDeltaRun FROM %@ WHERE rowid = ?", [self tableName]],
+                       [NSNumber numberWithLongLong: aRowid]];
     if ([rs next])
     {
         bytesInDeltaRun = [rs longLongIntForColumnIndex: 0];
@@ -379,9 +423,9 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
         metadataBlob = [NSJSONSerialization dataWithJSONObject: metadata options: 0 error: NULL];
     }
     
-    [db_ executeUpdate: @"INSERT INTO commits(revid, "
+    [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (revid, "
         "contents, metadata, timestamp, parent, root, deltabase, "
-        "bytesInDeltaRun, garbage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)",
+        "bytesInDeltaRun, garbage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)", [self tableName]],
         [NSNumber numberWithLongLong: rowid],
         contentsBlob,
         metadataBlob,
@@ -405,12 +449,13 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     
     NSMutableIndexSet *result = [NSMutableIndexSet indexSet];
 
-    FMResultSet *rs = [db_ executeQuery: @"SELECT revid, parent "
-                       "FROM commits "
-                       "WHERE revid <= ? AND revid >= ? "
-                       "ORDER BY revid DESC",
-                       [NSNumber numberWithLongLong: revid],
-                       [NSNumber numberWithLongLong: baseRevid]];
+    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
+                                          @"SELECT revid, parent "
+                                          "FROM %@ "
+                                          "WHERE revid <= ? AND revid >= ? "
+                                          "ORDER BY revid DESC", [self tableName]],
+                        [NSNumber numberWithLongLong: revid],
+                        [NSNumber numberWithLongLong: baseRevid]];
     
     int64_t nextRevId = revid;
     
@@ -457,7 +502,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     
     for (NSUInteger i = [revids firstIndex]; i != NSNotFound; i = [revids indexGreaterThanIndex: i])
     {
-        [db_ executeUpdate: @"UPDATE commits SET garbage = 1 WHERE revid = ?",
+        [db_ executeUpdate: [NSString stringWithFormat: @"UPDATE %@ SET garbage = 1 WHERE revid = ?", [self tableName]],
             [NSNumber numberWithUnsignedInteger: i]];
     }
 
@@ -472,7 +517,8 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     
     // Delete all commits where all rows with the same deltabase are marked as garbage.
     // Could be done at a later time
-    [db_ executeUpdate: @"DELETE FROM commits WHERE deltabase IN (SELECT deltabase FROM commits GROUP BY deltabase HAVING garbage = 1)"];
+    [db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE deltabase IN (SELECT deltabase FROM %@ GROUP BY deltabase HAVING garbage = 1)",
+                         [self tableName], [self tableName]]];
     
     // TODO: Vacuum here?
     
@@ -486,7 +532,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 
 - (NSIndexSet *) revidsUsedRange
 {
-    NSNumber *max = [db_ numberForQuery: @"SELECT MAX(rowid) FROM commits"];
+    NSNumber *max = [db_ numberForQuery: [NSString stringWithFormat: @"SELECT MAX(rowid) FROM %@", [self tableName]]];
     if (max != nil)
     {
         return [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [max longLongValue] + 1)];

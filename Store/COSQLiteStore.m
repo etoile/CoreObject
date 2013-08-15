@@ -235,18 +235,12 @@
             [self backingUUIDForPersistentRootUUID: aUUID]];
 }
 
-- (NSString *) backingStorePathForUUID: (ETUUID *)aUUID
-{
-    return [[url_ path] stringByAppendingPathComponent: [aUUID stringValue]];
-}
-
 - (COSQLiteStorePersistentRootBackingStore *) backingStoreForUUID: (ETUUID *)aUUID
 {
     COSQLiteStorePersistentRootBackingStore *result = [backingStores_ objectForKey: aUUID];
     if (result == nil)
     {
-        result = [[COSQLiteStorePersistentRootBackingStore alloc] initWithPath:
-                    [self backingStorePathForUUID: aUUID]];
+        result = [[COSQLiteStorePersistentRootBackingStore alloc] initWithPersistentRootUUID: aUUID store: self useStoreDB: NO];
         [backingStores_ setObject: result forKey: aUUID];
         [result release];
     }
@@ -268,6 +262,8 @@
             [backingStores_ removeObjectForKey: aUUID];
         }
     }
+    
+    // FIXME: This doesn't appear to ever be tested
     
     assert([[NSFileManager defaultManager] removeItemAtPath:
             [self backingStorePathForUUID: aUUID] error: NULL]);
@@ -1122,6 +1118,11 @@
                                                            deliverImmediately: NO];
     }
     [notificationUserInfoToPostForPersistentRootUUID_ removeAllObjects];
+}
+
+- (FMDatabase *) database
+{
+    return db_;
 }
 
 @end

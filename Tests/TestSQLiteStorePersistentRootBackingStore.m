@@ -5,11 +5,14 @@
 
 @interface TestSQLiteStorePersistentRootBackingStore : NSObject <UKTest>
 {
+    COSQLiteStore *parentStore;
     COSQLiteStorePersistentRootBackingStore *store;
 }
 @end
 
 @implementation TestSQLiteStorePersistentRootBackingStore
+
+static ETUUID *persistentRootUUID;
 
 static ETUUID *rootUUID;
 static ETUUID *childUUID1;
@@ -19,6 +22,7 @@ static ETUUID *childUUID2;
 {
     if (self == [TestSQLiteStorePersistentRootBackingStore class])
     {
+        persistentRootUUID = [[ETUUID alloc] init];
         rootUUID = [[ETUUID alloc] init];
         childUUID1 = [[ETUUID alloc] init];
         childUUID2 = [[ETUUID alloc] init];
@@ -152,15 +156,22 @@ static ETUUID *childUUID2;
 - (id) init
 {
     SUPERINIT;
-    
+
     [[NSFileManager defaultManager] removeItemAtPath: [STORE_URL path] error: NULL];
-    store = [[COSQLiteStorePersistentRootBackingStore alloc] initWithPath: [STORE_URL path]];
+    
+    parentStore = [[COSQLiteStore alloc] initWithURL: STORE_URL];
+    
+
+    store = [[COSQLiteStorePersistentRootBackingStore alloc] initWithPersistentRootUUID: persistentRootUUID
+                                                                                  store: parentStore
+                                                                             useStoreDB: NO];
     
     return self;
 }
 
 - (void) dealloc
 {
+    [parentStore release];
     [store release];
     [super dealloc];
 }
