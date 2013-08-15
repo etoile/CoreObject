@@ -59,7 +59,17 @@ First Release
 - Improve diff/merge API and code
   - Improve Merging (move detection and custom attributed string merger)
   - Need to support persisted partial merge resolutions.
+    - Thought about this a bit. I don't think we can provide it in general in the framework,
+      apps will have to implement support for it.
+      
+      Some apps may want to open a temporary persistent root, with its own
+      metamodel for managing the merge, others may want to do it only in memory.
+      
+      Also, though the diff/merge happens at the persistent root granularity,
+      there may be multiple embedded object trees with different merge UI's.
+      (e.g. several types of objects on a canvas in a composite documents)
   - Build an example app with a merging UI
+
 
 - Implement application-level undo/redo support
   - Requirements:
