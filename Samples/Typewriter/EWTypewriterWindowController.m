@@ -22,10 +22,22 @@
     
     [textView_ setDelegate: self];
     [[textView_ layoutManager] replaceTextStorage: textStorage_];
+    
+    EWDocument *doc = [self document];
+    [self displayRevision: [[[[doc currentPersistentRoot] editingBranch] currentRevision] revisionID]];
 }
 
-- (void) loadDocumentTree: (id <COItemGraph>)aTree
+- (void) displayRevision:(CORevisionID *)aRev
 {
+    if ([displayedRevision_ isEqual: aRev])
+    {
+        return;
+    }
+    
+    ASSIGN(displayedRevision_, aRev);
+    
+    id<COItemGraph> aTree = [[[self document] store] contentsForRevisionID: aRev];
+    
     isLoading_ = YES;
     [textStorage_ setTypewriterDocument: aTree];
     isLoading_ = NO;

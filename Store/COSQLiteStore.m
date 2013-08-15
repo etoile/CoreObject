@@ -1111,6 +1111,7 @@
     {
         //NSLog(@"store %@ posting notif: %@", [self UUID], userInfo);
         
+        // N.B., this will run the method on the next runloop iteration
         [self performSelectorOnMainThread: @selector(mainThreadPostLocalNotification:)
                                withObject: userInfo
                             waitUntilDone: NO];

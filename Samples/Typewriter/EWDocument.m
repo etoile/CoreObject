@@ -11,12 +11,11 @@
 
 @implementation EWDocument
 
-- (id)init
+- (id) initWithPersistentRoot: (COPersistentRoot *)aRoot
 {
     SUPERINIT;
     
-    ASSIGN(_persistentRoot, [[[NSApp delegate] editingContext] insertNewPersistentRootWithEntityName: @"Anonymous.TypewriterDocument"]);
-    [_persistentRoot commit];
+    ASSIGN(_persistentRoot, aRoot);
     
     EWUndoManager *myUndoManager = [[[EWUndoManager alloc] init] autorelease];
     [myUndoManager setDelegate: self];
@@ -28,6 +27,14 @@
                                                object: _persistentRoot];
     
     return self;
+}
+
+- (id)init
+{
+    COPersistentRoot *aRoot = [[[NSApp delegate] editingContext] insertNewPersistentRootWithEntityName: @"Anonymous.TypewriterDocument"];
+    [aRoot commit];
+    
+    return [self initWithPersistentRoot: aRoot];
 }
 
 - (void) dealloc
@@ -150,19 +157,12 @@
     CORevision *rev = [CORevision revisionWithStore: [self store]
                                          revisionID: aToken];
     
-    if ([rev isEqual: [editingBranchObject currentRevision]])
-    {
-        return;
-    }
-    
     [editingBranchObject setCurrentRevision: rev];
-    
-    id <COItemGraph> tree = [[self store] contentsForRevisionID: aToken];
 
     NSArray *wcs = [self windowControllers];
     for (EWTypewriterWindowController *wc in wcs)
     {
-        [wc loadDocumentTree: tree];
+        [wc displayRevision: aToken];
         [wc synchronizeWindowTitleWithDocumentName];
     }
 }
@@ -222,7 +222,8 @@
 
 - (void) switchToBranch: (ETUUID *)aBranchUUID
 {
-    [_persistentRoot setCurrentBranch: [_persistentRoot branchForUUID: aBranchUUID]];
+    COBranch *branch = [_persistentRoot branchForUUID: aBranchUUID];
+    [_persistentRoot setCurrentBranch: branch];
     [_persistentRoot commit];
 }
 

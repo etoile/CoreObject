@@ -3,6 +3,7 @@
 
 #import "EWBranchesWindowController.h"
 #import "EWHistoryWindowController.h"
+#import "EWDocument.h"
 
 @implementation EWAppDelegate
 
@@ -75,6 +76,24 @@
 {
     [[EWBranchesWindowController sharedController] showWindow: self];
     [[EWHistoryWindowController sharedController] showWindow: self];
+    
+    for (COPersistentRoot *root in [_context persistentRoots])
+    {
+        EWDocument *doc = [[[EWDocument alloc] initWithPersistentRoot: root] autorelease];
+        [[NSDocumentController sharedDocumentController] addDocument: doc];
+        [doc makeWindowControllers];
+        [doc showWindows];
+        
+    }
+}
+
+- (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
+{
+    return NO;
+}
+
+- (void)applicationWillTerminate:(NSNotification *)notification
+{
 }
 
 @end

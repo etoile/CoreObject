@@ -9,6 +9,7 @@
     COPersistentRoot  *_persistentRoot;
 }
 
+- (id) initWithPersistentRoot: (COPersistentRoot *)aRoot;
 
 - (IBAction) branch: (id)sender;
 - (IBAction) showBranches: (id)sender;

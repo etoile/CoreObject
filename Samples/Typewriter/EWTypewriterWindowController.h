@@ -10,10 +10,12 @@
     
     EWTextStorage *textStorage_;
     
-    BOOL isLoading_;    
+    BOOL isLoading_;
+    
+    CORevisionID *displayedRevision_;
 }
 
-- (void) loadDocumentTree: (id <COItemGraph>)aTree;
+- (void) displayRevision: (CORevisionID*)aRev;
 
 @end
 
