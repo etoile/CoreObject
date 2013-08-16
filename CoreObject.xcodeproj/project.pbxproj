@@ -408,7 +408,6 @@
 		667F1ED4179C81E00083C3E6 /* TestEditingContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestEditingContext.m; sourceTree = "<group>"; };
 		667F1ED5179C81E00083C3E6 /* TestHistoryTrack.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestHistoryTrack.m; sourceTree = "<group>"; };
 		667F1ED6179C81E00083C3E6 /* TestObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestObject.m; sourceTree = "<group>"; };
-		667F1ED9179C81E00083C3E6 /* TestPersistentRoot.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestPersistentRoot.m; sourceTree = "<group>"; };
 		667F1EDB179C81E00083C3E6 /* TestStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestStore.m; sourceTree = "<group>"; };
 		667F1EE1179C83A20083C3E6 /* TestCompositeDocument.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCompositeDocument.m; sourceTree = "<group>"; };
 		667F1EE3179C83A20083C3E6 /* TestCopyEmbeddedObjects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCopyEmbeddedObjects.m; sourceTree = "<group>"; };
@@ -748,7 +747,6 @@
 				667F1ED4179C81E00083C3E6 /* TestEditingContext.m */,
 				667F1ED5179C81E00083C3E6 /* TestHistoryTrack.m */,
 				667F1ED6179C81E00083C3E6 /* TestObject.m */,
-				667F1ED9179C81E00083C3E6 /* TestPersistentRoot.m */,
 				667F1EDB179C81E00083C3E6 /* TestStore.m */,
 			);
 			name = "Old CoreObject trunk tests";
