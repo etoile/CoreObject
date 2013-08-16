@@ -185,24 +185,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @property (nonatomic, readonly) ETUUID *rootObjectUUID;
 /**
- * The persistent root revision.
- *
- * If the persistent root is not yet committed, returns nil for a freshly
- * created persistent root, or returns the parent revision for a persistent
- * root created by copying.
- *
- * This revision applies to the root object and inner objects. See -[COObject revision].
- *
- * The revision is usually equal to 
- * <code>[[self commitTrack] currentNode] revision]</code> but this doesn't hold 
- * in the following cases:
- *
- * <list>
- * <item>A max revision has been set on the parent context (as a result, the 
- * revision is less than or equal to -[COEditingContext maxRevision]).</item>
- * <item>The persistent root is not loaded or has been unloaded (the revision is 
- * nil).</item>
- * </list>
+ * Shortcut for <code>[[self editingBranch] revision]</code>
  */
 @property (nonatomic, retain) CORevision *revision;
 /**
