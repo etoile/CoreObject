@@ -98,4 +98,34 @@ static ETUUID *rootUUID;
     UKObjectsEqual([self prooBitemTree], [store contentsForRevisionID: [prootB currentRevisionID]]);
 }
 
+- (void) testDeleteOriginalPersistentRoot
+{
+    UKTrue([store deletePersistentRoot: [prootA UUID] error: NULL]);
+    UKTrue([store finalizeDeletionsForPersistentRoot: [prootA UUID] error: NULL]);
+
+    UKNil([store persistentRootInfoForUUID: [prootA UUID]]);
+    
+    // prootB should be unaffected. Both commits should be accessible.
+    
+    UKNotNil([store persistentRootInfoForUUID: [prootB UUID]]);
+
+    UKObjectsEqual([self prootAitemTree], [store contentsForRevisionID: [prootA currentRevisionID]]);
+    UKObjectsEqual([self prooBitemTree], [store contentsForRevisionID: [prootB currentRevisionID]]);
+}
+
+- (void) testDeleteCopiedPersistentRoot
+{
+    UKTrue([store deletePersistentRoot: [prootB UUID] error: NULL]);
+    UKTrue([store finalizeDeletionsForPersistentRoot: [prootB UUID] error: NULL]);
+    
+    UKNil([store persistentRootInfoForUUID: [prootB UUID]]);
+    
+    // prootA should be unaffected. Only the first commit should be accessible.
+    
+    UKNotNil([store persistentRootInfoForUUID: [prootA UUID]]);
+    
+    UKObjectsEqual([self prootAitemTree], [store contentsForRevisionID: [prootA currentRevisionID]]);
+    UKNil([store contentsForRevisionID: [prootB currentRevisionID]]);
+}
+
 @end

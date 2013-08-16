@@ -284,7 +284,7 @@ static ETUUID *childUUID2;
                    [store revidsFromRevid: 0 toRevid: BRANCH_LENGTH + 3]);
 }
 
-- (void) testDeleteRevids
+- (void) testDeleteOldRevids
 {
     [self setupExampleStore];
     
@@ -310,6 +310,29 @@ static ETUUID *childUUID2;
     for (int64_t i = (BRANCH_LENGTH + 101); i <= (2 * BRANCH_LENGTH); i++)
     {
         UKObjectsEqual([self makeBranchBItemTreeAtRevid: i], [store itemTreeForRevid: i]);
+    }
+}
+
+- (void) testDeleteNewRevids
+{
+    [self setupExampleStore];
+    
+    UKObjectsEqual([self makeInitialItemTree], [store itemTreeForRevid: 0]);
+    
+    // Delete all above revision 0
+    
+    NSMutableIndexSet *toDelete = [NSMutableIndexSet indexSet];
+    [toDelete addIndexesInRange: NSMakeRange(1, 2 * BRANCH_LENGTH)];
+    
+    UKTrue([store deleteRevids: toDelete]);
+
+    // Verify that revision 0 can still be read
+    UKObjectsEqual([self makeInitialItemTree], [store itemTreeForRevid: 0]);
+    
+    // Verify that the remaining revisions are deleted
+    for (int64_t i = 1; i <= BRANCH_LENGTH * 2; i++)
+    {
+        UKNil([store itemTreeForRevid: i]);
     }
 }
 
