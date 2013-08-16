@@ -736,12 +736,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 }
 
 - (void) markAsUpdatedIfNeededForProperty: (NSString*)prop
-{
-    // FIXME: this if { return } should be removed,
-    // we should keep change tracking working on non-persistent contexts. -Eric
-	if ([self isPersistent] == NO)
-		return;
-	
+{	
 	[_objectGraphContext markObjectAsUpdated: self forProperty: prop];
 }
 

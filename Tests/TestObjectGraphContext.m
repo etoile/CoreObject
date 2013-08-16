@@ -244,6 +244,93 @@ static NSString *kCOParent = @"parentContainer";
     UKObjectsEqual(S(root2), [ctx2 updatedObjects]);
 }
 
+- (void)testBasicRelationshipIntegrity
+{
+	// Test one-to-many relationships
+	
+	COObject *o1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *o2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *o3 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	
+	[o1 setValue: A(o2) forProperty: kCOContents];
+	[o2 setValue: A(o3) forProperty: kCOContents];
+    
+	UKNil([o1 valueForProperty: kCOParent]);
+	UKObjectsEqual(o1, [o2 valueForProperty: kCOParent]);
+	UKObjectsEqual(o2, [o3 valueForProperty: kCOParent]);
+	UKObjectsEqual([NSArray array], [o3 valueForProperty: kCOContents]);
+    
+	// Test many-to-many relationships
+	
+	COObject *t1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COObject *t2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	COObject *t3 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	
+	[t1 insertObject: o1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	[t2 insertObject: o1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	
+	UKObjectsEqual(S(t1, t2), [o1 valueForProperty: @"parentCollections"]);
+	
+	[t2 insertObject: o2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	[t3 insertObject: o2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	
+	UKObjectsEqual(S(o1), [t1 valueForProperty: @"contents"]);
+	UKObjectsEqual(S(o1, o2), [t2 valueForProperty: @"contents"]);
+	UKObjectsEqual(S(o2), [t3 valueForProperty: @"contents"]);
+}
+
+- (void)testRelationshipIntegrityForMove
+{
+	COObject *o1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *o2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *o3 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	
+	[o1 setValue: A(o2) forProperty: @"contents"];
+	[o3 setValue: A(o2) forProperty: @"contents"]; // should add o2 to o3's contents, and remove o2 from o1
+	UKObjectsEqual([NSArray array], [o1 valueForProperty: @"contents"]);
+	UKObjectsEqual(A(o2), [o3 valueForProperty: @"contents"]);
+    
+	// Check that removing an object from a group nullifys that object's parent group pointer
+	
+	[o3 removeObject: o2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	UKNil([o2 valueForProperty: @"parentContainer"]);
+	
+	// Now test moving by modifying the multivalued side of the relationship
+	
+	COContainer *o4 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *o5 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *o6 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	
+	[o5 addObject: o4];
+	[o6 addObject: o4]; // Should move o4 from o5 to o6
+	UKObjectsEqual([NSArray array], [o5 contentArray]);
+	UKObjectsEqual(A(o4), [o6 contentArray]);
+	UKObjectsSame(o6, [o4 valueForProperty: @"parentContainer"]);
+}
+
+- (void)testRelationshipIntegrityMarksDamage
+{
+	COObject *o1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *o2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *o3 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	
+    [ctx1 clearChangeTracking];
+    UKObjectsEqual([NSSet set], [ctx1 changedObjects]);
+    
+	[o1 setValue: A(o2) forProperty: @"contents"];
+    UKObjectsEqual(S(o1), [ctx1 changedObjects]);
+    
+    [ctx1 clearChangeTracking];
+	
+	[o3 setValue: A(o2) forProperty: @"contents"]; // should add o2 to o3's contents, and remove o2 from o1
+    UKObjectsEqual(S(o1, o3), [ctx1 changedObjects]);
+
+    [ctx1 clearChangeTracking];
+    
+	[o3 removeObject: o2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]; // should make o2's parentContainer nil
+	UKObjectsEqual(S(o3), [ctx1 changedObjects]);
+}
+
 - (void)testShoppingList
 {
 	COObject *workspace = [self addObjectWithLabel: @"Workspace" toObject: root1];
