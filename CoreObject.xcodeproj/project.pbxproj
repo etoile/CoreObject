@@ -75,18 +75,6 @@
 		6675F8C51785C02A001E5622 /* COPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BE1785C02A001E5622 /* COPath.h */; settings = {ATTRIBUTES = (); }; };
 		6675F8C61785C02A001E5622 /* COPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BF1785C02A001E5622 /* COPath.m */; };
 		6675F8C71785C02A001E5622 /* COType.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8C01785C02A001E5622 /* COType.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		667F1E85179AD9DD0083C3E6 /* TestItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199A4178C3E1800B78174 /* TestItem.m */; };
-		667F1E86179AD9DD0083C3E6 /* TestBinaryReadWrite.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199A5178C3E1800B78174 /* TestBinaryReadWrite.m */; };
-		667F1E87179AD9DD0083C3E6 /* TestSQLiteStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B0178C431D00B78174 /* TestSQLiteStore.m */; };
-		667F1E88179AD9DD0083C3E6 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B1178C431D00B78174 /* TestSQLiteStoreMultiPersistentRoots.m */; };
-		667F1E89179AD9DD0083C3E6 /* TestSQLiteStorePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B2178C431E00B78174 /* TestSQLiteStorePerformance.m */; };
-		667F1E8A179AD9DD0083C3E6 /* TestSQLiteStorePersistentRootBackingStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B3178C431E00B78174 /* TestSQLiteStorePersistentRootBackingStore.m */; };
-		667F1E8B179AD9EF0083C3E6 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
-		667F1E8C179ADA1F0083C3E6 /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
-		667F1E8D179ADA2A0083C3E6 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
-		667F1E8E179ADA2A0083C3E6 /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D01D0941646BEF400917AC8 /* UnitKit.framework */; };
-		667F1E8F179ADA360083C3E6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00541704C24C00D01AAB /* main.m */; };
-		667F79ED17BDE00B00B6BF3A /* TestSQLiteStoreSharedPersistentRoots.m in Sources */ = {isa = PBXBuildFile; fileRef = 667F79EC17BDE00B00B6BF3A /* TestSQLiteStoreSharedPersistentRoots.m */; };
 		6680846D178CD526003A3CC6 /* COCopier.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680846B178CD526003A3CC6 /* COCopier.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6680846E178CD526003A3CC6 /* COCopier.m in Sources */ = {isa = PBXBuildFile; fileRef = 6680846C178CD526003A3CC6 /* COCopier.m */; };
 		6680848A178DAFE3003A3CC6 /* COArrayDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680847F178DAFE3003A3CC6 /* COArrayDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -106,6 +94,13 @@
 		668084ED1791FBA2003A3CC6 /* COObject+RelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 668084EB1791FBA2003A3CC6 /* COObject+RelationshipCache.h */; };
 		668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 668084EE1791FBAB003A3CC6 /* COObjectGraphContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		668084F11791FBAB003A3CC6 /* COObjectGraphContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 668084EF1791FBAB003A3CC6 /* COObjectGraphContext.m */; };
+		66860B9F17BED42900B24333 /* TestItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199A4178C3E1800B78174 /* TestItem.m */; };
+		66860BA017BED42900B24333 /* TestBinaryReadWrite.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199A5178C3E1800B78174 /* TestBinaryReadWrite.m */; };
+		66860BA117BED42900B24333 /* TestSQLiteStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B0178C431D00B78174 /* TestSQLiteStore.m */; };
+		66860BA217BED42900B24333 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B1178C431D00B78174 /* TestSQLiteStoreMultiPersistentRoots.m */; };
+		66860BA317BED42900B24333 /* TestSQLiteStorePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B2178C431E00B78174 /* TestSQLiteStorePerformance.m */; };
+		66860BA417BED42900B24333 /* TestSQLiteStorePersistentRootBackingStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B3178C431E00B78174 /* TestSQLiteStorePersistentRootBackingStore.m */; };
+		66860BA517BED42900B24333 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */ = {isa = PBXBuildFile; fileRef = 667F79EC17BDE00B00B6BF3A /* TestSQLiteStoreSharedPersistentRoots.m */; };
 		6686BE2A12592D7B0065DE1A /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
 		66B38C6217B98E0400D65771 /* TestUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B38C6117B98DFF00D65771 /* TestUtilities.m */; };
 		66B38C6417B98EE100D65771 /* TestPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B38C6317B98EDE00D65771 /* TestPerformance.m */; };
@@ -263,27 +258,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 603647AB0E409244003377E0;
 			remoteInfo = EtoileFoundation;
-		};
-		667F1E7F179AD9B10083C3E6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 6686BDAB12592BDA0065DE1A;
-			remoteInfo = CoreObject;
-		};
-		667F1E81179AD9B80083C3E6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 603647AB0E409244003377E0;
-			remoteInfo = EtoileFoundation;
-		};
-		667F1E83179AD9BB0083C3E6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3D01D08A1646BEF400917AC8 /* UnitKit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
-			remoteInfo = UnitKit;
 		};
 		66C366ED17B42BAE009ACF2F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -491,7 +465,6 @@
 		66C3670A17B5F9AF009ACF2F /* COBranchInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBranchInfo.m; path = Store/COBranchInfo.m; sourceTree = "<group>"; };
 		66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COPersistentRootInfo.h; path = Store/COPersistentRootInfo.h; sourceTree = "<group>"; };
 		66C3670E17B5FA0D009ACF2F /* COPersistentRootInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COPersistentRootInfo.m; path = Store/COPersistentRootInfo.m; sourceTree = "<group>"; };
-		66D099C4129AE111006BEDC3 /* StoreTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = StoreTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestConcurrentChanges.m; path = Tests/TestConcurrentChanges.m; sourceTree = "<group>"; };
 		66D96C9F178B6E5600D1553C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		66D96CA2178B717000D1553C /* COBinaryReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBinaryReader.h; path = Store/COBinaryReader.h; sourceTree = "<group>"; };
@@ -560,16 +533,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		66D099BF129AE111006BEDC3 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				667F1E8D179ADA2A0083C3E6 /* EtoileFoundation.framework in Frameworks */,
-				667F1E8E179ADA2A0083C3E6 /* UnitKit.framework in Frameworks */,
-				667F1E8B179AD9EF0083C3E6 /* CoreObject.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		791B4E2B1299C79300CCF472 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -610,7 +573,6 @@
 			children = (
 				6686BDAC12592BDA0065DE1A /* CoreObject.framework */,
 				791B4E2D1299C79300CCF472 /* Test */,
-				66D099C4129AE111006BEDC3 /* StoreTest */,
 				60C913B3165BBED000E0C5F4 /* BasicPersistence */,
 				66C3669A17B426BF009ACF2F /* Typewriter.app */,
 			);
@@ -1128,25 +1090,6 @@
 			productReference = 66C3669A17B426BF009ACF2F /* Typewriter.app */;
 			productType = "com.apple.product-type.application";
 		};
-		66D099B6129AE111006BEDC3 /* StoreTest */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 66D099C1129AE111006BEDC3 /* Build configuration list for PBXNativeTarget "StoreTest" */;
-			buildPhases = (
-				66D099B9129AE111006BEDC3 /* Sources */,
-				66D099BF129AE111006BEDC3 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				667F1E84179AD9BB0083C3E6 /* PBXTargetDependency */,
-				667F1E82179AD9B80083C3E6 /* PBXTargetDependency */,
-				667F1E80179AD9B10083C3E6 /* PBXTargetDependency */,
-			);
-			name = StoreTest;
-			productName = Test;
-			productReference = 66D099C4129AE111006BEDC3 /* StoreTest */;
-			productType = "com.apple.product-type.tool";
-		};
 		791B4E2C1299C79300CCF472 /* Test */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 791B4E311299C7C100CCF472 /* Build configuration list for PBXNativeTarget "Test" */;
@@ -1202,7 +1145,6 @@
 			targets = (
 				6686BDAB12592BDA0065DE1A /* CoreObject */,
 				791B4E2C1299C79300CCF472 /* Test */,
-				66D099B6129AE111006BEDC3 /* StoreTest */,
 				60C913B2165BBED000E0C5F4 /* BasicPersistence */,
 				66C3669917B426BF009ACF2F /* Typewriter */,
 			);
@@ -1385,27 +1327,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		66D099B9129AE111006BEDC3 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				667F1E8F179ADA360083C3E6 /* main.m in Sources */,
-				667F1E8C179ADA1F0083C3E6 /* TestCommon.m in Sources */,
-				667F1E85179AD9DD0083C3E6 /* TestItem.m in Sources */,
-				667F1E86179AD9DD0083C3E6 /* TestBinaryReadWrite.m in Sources */,
-				667F1E87179AD9DD0083C3E6 /* TestSQLiteStore.m in Sources */,
-				667F1E88179AD9DD0083C3E6 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */,
-				667F1E89179AD9DD0083C3E6 /* TestSQLiteStorePerformance.m in Sources */,
-				667F1E8A179AD9DD0083C3E6 /* TestSQLiteStorePersistentRootBackingStore.m in Sources */,
-				667F79ED17BDE00B00B6BF3A /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		791B4E2A1299C79300CCF472 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				609C00651704C24C00D01AAB /* main.m in Sources */,
+				66860B9F17BED42900B24333 /* TestItem.m in Sources */,
+				66860BA017BED42900B24333 /* TestBinaryReadWrite.m in Sources */,
+				66860BA117BED42900B24333 /* TestSQLiteStore.m in Sources */,
+				66860BA217BED42900B24333 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */,
+				66860BA317BED42900B24333 /* TestSQLiteStorePerformance.m in Sources */,
+				66860BA417BED42900B24333 /* TestSQLiteStorePersistentRootBackingStore.m in Sources */,
+				66860BA517BED42900B24333 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66808498178DB4D5003A3CC6 /* TestBranch.m in Sources */,
 				607EB6F2178D50610024B34D /* TestRevisionNumber.m in Sources */,
@@ -1442,21 +1375,6 @@
 			isa = PBXTargetDependency;
 			name = EtoileFoundation;
 			targetProxy = 60FB0A1A13C3264E00C2AB94 /* PBXContainerItemProxy */;
-		};
-		667F1E80179AD9B10083C3E6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 6686BDAB12592BDA0065DE1A /* CoreObject */;
-			targetProxy = 667F1E7F179AD9B10083C3E6 /* PBXContainerItemProxy */;
-		};
-		667F1E82179AD9B80083C3E6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = EtoileFoundation;
-			targetProxy = 667F1E81179AD9B80083C3E6 /* PBXContainerItemProxy */;
-		};
-		667F1E84179AD9BB0083C3E6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = UnitKit;
-			targetProxy = 667F1E83179AD9BB0083C3E6 /* PBXContainerItemProxy */;
 		};
 		66C366EE17B42BAE009ACF2F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1640,25 +1558,6 @@
 			};
 			name = Release;
 		};
-		66D099C2129AE111006BEDC3 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				OTHER_CFLAGS = (
-					"-DSTORE_TEST",
-					"-DSQLITE_ENABLE_FTS3",
-					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
-				);
-				PRODUCT_NAME = StoreTest;
-			};
-			name = Debug;
-		};
-		66D099C3129AE111006BEDC3 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = StoreTest;
-			};
-			name = Release;
-		};
 		791B4E2F1299C79300CCF472 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1725,15 +1624,6 @@
 			buildConfigurations = (
 				66C366AE17B426C0009ACF2F /* Debug */,
 				66C366AF17B426C0009ACF2F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		66D099C1129AE111006BEDC3 /* Build configuration list for PBXNativeTarget "StoreTest" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				66D099C2129AE111006BEDC3 /* Debug */,
-				66D099C3129AE111006BEDC3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
