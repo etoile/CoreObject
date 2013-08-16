@@ -178,8 +178,14 @@
  * For a nil root object, raises a NSInvalidArgumentException.
  */
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
+/**
+ * Creates a root object of the requested entity and returns a new persistent
+ * root using that root object.
+ */
+- (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName;
 
-/** 
+
+/**
  * @taskunit Pending Changes 
  */
 
@@ -329,12 +335,6 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 - (COCrossPersistentRootReferenceCache *) crossReferenceCache;
-
-/** 
- * @taskunit Deprecated
- */
-
-- (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName;
 
 @end
 
