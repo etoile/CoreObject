@@ -259,16 +259,6 @@
  */
 - (NSArray *)commitWithType: (NSString *)type
            shortDescription: (NSString *)shortDescription;
-// TODO: Remove, shouldn't we follow the regular cocoa pattern like:
-// -commitWithMetadata: (NSDictionary *) error: (NSError **)
-/** 
- * Returns the last commit error, usually involving one or several validation 
- * issues.
- *
- * When commit methods return a non-empty revision array, the error is nil.
- */
-@property (nonatomic, readonly) NSError *error;
-
 /** 
  * @taskunit Framework Private 
  */

@@ -13,7 +13,7 @@
 
 @implementation COEditingContext
 
-@synthesize store = _store, modelRepository = _modelRepository, error = _error;
+@synthesize store = _store, modelRepository = _modelRepository;
 @synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
 @synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
 
