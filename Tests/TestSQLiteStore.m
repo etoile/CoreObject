@@ -719,4 +719,59 @@ static ETUUID *childUUID2;
     [store2 release];
 }
 
+// The following are some tests ported from CoreObject's TestStore.m
+
+- (void)testPersistentRootInsertion
+{
+    ETUUID *cheapCopyUUID = [ETUUID UUID];
+    ETUUID *cheapCopyBranchUUID = [ETUUID UUID];
+
+    COPersistentRootInfo *cheapCopy = [store createPersistentRootWithInitialRevision: [CORevisionID revisionWithBackinStoreUUID: [proot UUID] revisionIndex: BRANCH_LENGTH + 1]
+                                                                                UUID: cheapCopyUUID
+                                                                          branchUUID: cheapCopyBranchUUID
+                                                                            metadata: nil
+                                                                               error: NULL];
+
+    UKObjectsEqual(rootUUID, [store rootObjectUUIDForRevisionID: [proot currentRevisionID]]);
+    UKObjectsEqual(rootUUID, [store rootObjectUUIDForRevisionID: [cheapCopy currentRevisionID]]);
+    UKObjectsEqual(initialBranchUUID, [[store persistentRootInfoForUUID: prootUUID] currentBranchUUID]);
+    UKObjectsEqual(cheapCopyBranchUUID, [[store persistentRootInfoForUUID: cheapCopyUUID] currentBranchUUID]);
+}
+
+- (void)testReopenStore
+{
+    COSQLiteStore *store2 = [[[COSQLiteStore alloc] initWithURL: [store URL]] autorelease];
+    
+    CORevisionID *currentRevisionID = [[store2 persistentRootInfoForUUID: prootUUID] currentRevisionID];
+    CORevisionID *branchARevisionID = [[[store2 persistentRootInfoForUUID: prootUUID]
+                                        branchInfoForUUID: branchAUUID] currentRevisionID];
+    CORevisionID *branchBRevisionID = [[[store2 persistentRootInfoForUUID: prootUUID]
+                                        branchInfoForUUID: branchBUUID] currentRevisionID];
+    
+    UKObjectsEqual([self makeInitialItemTree], [store2 itemGraphForRevisionID: currentRevisionID]);
+    UKObjectsEqual([self makeBranchAItemTreeAtRevid: BRANCH_LENGTH], [store2 itemGraphForRevisionID: branchARevisionID]);    
+    UKObjectsEqual([self makeBranchBItemTreeAtRevid: BRANCH_LENGTH * 2], [store2 itemGraphForRevisionID: branchBRevisionID]);
+
+    // FIXME: The metadata: param of -createPersistentRoot is currently unused. Should it set the branch metadata?
+    // Initial revision metadata? Remove it or add separate branch/revision metadata params?
+    
+//    UKObjectsEqual([self initialMetadata], [[store2 revisionInfoForRevisionID: currentRevisionID] metadata]);
+//    UKObjectsEqual([self branchAMetadata], [[store2 revisionInfoForRevisionID: branchARevisionID] metadata]);
+//    UKObjectsEqual([self branchBMetadata], [[store2 revisionInfoForRevisionID: branchBRevisionID] metadata]);    
+}
+
+- (void)testCommitWithNoChanges
+{
+    COItemGraph *graph = [[[COItemGraph alloc] initWithItemForUUID: [NSDictionary dictionary]
+                                                      rootItemUUID: rootUUID] autorelease];
+    UKNotNil(graph);
+    
+    // This isn't expected to work. If you want to make a commit with no changes, just pass in the same graph
+    UKRaisesException([store writeRevisionWithItemGraph: graph
+                                               metadata: nil
+                                       parentRevisionID: initialRevisionId
+                                          modifiedItems: nil
+                                                  error: NULL]);
+}
+
 @end

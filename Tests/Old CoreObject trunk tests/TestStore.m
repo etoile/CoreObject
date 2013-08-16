@@ -7,78 +7,6 @@
 
 @implementation TestStore
 
-- (void)testCreate
-{
-	UKNotNil(store);
-	UKIntsEqual(0, [store latestRevisionNumber]);
-}
-
-- (void)testPersistentRootInsertion
-{
-	ETUUID *rootUUID = [ETUUID UUID];
-	ETUUID *trackUUID = [ETUUID UUID];
-	ETUUID *o1 = [ETUUID UUID];
-	
-	[store insertPersistentRootUUID: rootUUID
-	                commitTrackUUID: trackUUID
-					 rootObjectUUID: o1];
-
-	ETUUID *cheapCopyUUID = [ETUUID UUID];
-	ETUUID *derivedTrackUUID = [ETUUID UUID];
-
-	[store insertPersistentRootUUID: cheapCopyUUID
-	                commitTrackUUID: derivedTrackUUID
-					 rootObjectUUID: o1];
-
-	UKObjectsEqual(o1, [store rootObjectUUIDForPersistentRootUUID: rootUUID]);
-	UKObjectsEqual(o1, [store rootObjectUUIDForPersistentRootUUID: cheapCopyUUID]);
-	UKObjectsEqual(rootUUID, [store persistentRootUUIDForCommitTrackUUID: trackUUID]);
-	UKObjectsEqual(cheapCopyUUID, [store persistentRootUUIDForCommitTrackUUID: derivedTrackUUID]);
-	UKObjectsEqual(trackUUID, [store mainBranchUUIDForPersistentRootUUID: rootUUID]);
-	UKObjectsEqual(derivedTrackUUID, [store mainBranchUUIDForPersistentRootUUID: cheapCopyUUID]);
-}
-
-- (void)testReopenStore
-{
-	ETUUID *rootUUID = [ETUUID UUID];
-	ETUUID *trackUUID = [ETUUID UUID];
-	ETUUID *o1 = [ETUUID UUID];
-	NSDictionary *sampleMetadata = D([NSNumber numberWithBool: YES], @"metadataWorks");
-
-	[store insertPersistentRootUUID: rootUUID
-	                commitTrackUUID: trackUUID
-					 rootObjectUUID: o1];
-	[store beginCommitWithMetadata: sampleMetadata
-	            persistentRootUUID: rootUUID
-	               commitTrackUUID: trackUUID
-	                  baseRevision: nil];
-	[store beginChangesForObjectUUID: o1];
-	[store setValue: @"bob"
-	    forProperty: @"name"
-	       ofObject: o1
-	    shouldIndex: NO];
-	[store finishChangesForObjectUUID: o1];
-
-	CORevision *c1 = [store finishCommit];
-	int64_t revisionNumber = [c1 revisionNumber];		
-
-	[self instantiateNewContextAndStore];
-
-	c1 = [store revisionWithRevisionNumber: revisionNumber];
-	
-	UKNotNil(c1);
-	UKIntsEqual(revisionNumber, [store latestRevisionNumber]);
-	
-	UKIntsEqual(1, [[c1 changedObjectUUIDs] count]);
-	if ([[c1 changedObjectUUIDs] count] == 1)
-	{
-		UKObjectsEqual(o1, [[c1 changedObjectUUIDs] objectAtIndex: 0]);
-	}
-
-	UKObjectsEqual([NSNumber numberWithBool: YES], [[c1 metadata] objectForKey: @"metadataWorks"]);
-	UKObjectsEqual(D(@"bob", @"name"), [c1 valuesAndPropertiesForObjectUUID: o1]);
-}
-
 - (void)testFullTextSearch
 {
 	ETUUID *rootUUID = [ETUUID UUID];
@@ -152,30 +80,6 @@
 		UKObjectsEqual(@"name", [result2 objectForKey: @"property"]);
 		UKObjectsEqual(@"dogpound", [result2 objectForKey: @"value"]);
 	}
-}
-
-- (void)testCommitWithNoChanges
-{
-	ETUUID *rootUUID = [ETUUID UUID];
-	ETUUID *trackUUID = [ETUUID UUID];
-	ETUUID *o1 = [ETUUID UUID];
-
-	[store insertPersistentRootUUID: rootUUID
-	                commitTrackUUID: trackUUID
-					 rootObjectUUID: o1];
-	[store beginCommitWithMetadata: nil
-	            persistentRootUUID: rootUUID
-	               commitTrackUUID: trackUUID
-	                  baseRevision: nil];
-	[store beginChangesForObjectUUID: o1];
-	[store finishChangesForObjectUUID: o1];
-	CORevision *c1 = [store finishCommit];
-
-	UKNotNil(c1);
-	UKIntsEqual(1, [c1 revisionNumber]);
-	UKIntsEqual(1, [store latestRevisionNumber]);
-	UKTrue([store isRootObjectUUID: o1]);
-	UKObjectsEqual(S(o1), [store rootObjectUUIDs]);
 }
 
 - (void)testRootObject
@@ -340,30 +244,6 @@
 	UKStringsEqual(@"birds", [[c4 allValuesAndPropertiesForObjectUUID: o1] objectForKey: @"name"]);
 	UKStringsEqual(@"dogs", [[c4 allValuesAndPropertiesForObjectUUID: o2] objectForKey: @"name"]);
 	UKStringsEqual(@"mammals", [[c4 allValuesAndPropertiesForObjectUUID: o3] objectForKey: @"name"]);
-}
-
-- (void)testStoreNil
-{
-	ETUUID *rootUUID = [ETUUID UUID];
-	ETUUID *trackUUID = [ETUUID UUID];
-	ETUUID *o1 = [ETUUID UUID];
-	
-	[store insertPersistentRootUUID: rootUUID
-	                commitTrackUUID: trackUUID
-					 rootObjectUUID: o1];
-	[store beginCommitWithMetadata: nil
-	            persistentRootUUID: rootUUID
-	               commitTrackUUID: trackUUID
-	                  baseRevision: nil];
-	[store beginChangesForObjectUUID: o1];
-	[store setValue: nil
-	    forProperty: @"name"
-	       ofObject: o1
-	    shouldIndex: NO];
-	[store finishChangesForObjectUUID: o1];
-	CORevision *c1 = [store finishCommit];
-
-	UKNotNil(c1);
 }
 
 @end
