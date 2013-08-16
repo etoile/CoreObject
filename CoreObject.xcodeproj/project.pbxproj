@@ -361,8 +361,8 @@
 		609C00A91704C3EF00D01AAB /* COLibrary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COLibrary.m; path = Model/COLibrary.m; sourceTree = "<group>"; };
 		609C00AA1704C3EF00D01AAB /* COTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COTag.h; path = Model/COTag.h; sourceTree = "<group>"; };
 		609C00AB1704C3EF00D01AAB /* COTag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COTag.m; path = Model/COTag.m; sourceTree = "<group>"; };
-		609C00B81704C3FF00D01AAB /* COBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBranch.h; path = Tracks/COBranch.h; sourceTree = "<group>"; };
-		609C00B91704C3FF00D01AAB /* COBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBranch.m; path = Tracks/COBranch.m; sourceTree = "<group>"; };
+		609C00B81704C3FF00D01AAB /* COBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBranch.h; path = Core/COBranch.h; sourceTree = "<group>"; };
+		609C00B91704C3FF00D01AAB /* COBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBranch.m; path = Core/COBranch.m; sourceTree = "<group>"; };
 		609C00BA1704C3FF00D01AAB /* COCustomTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCustomTrack.h; path = Tracks/COCustomTrack.h; sourceTree = "<group>"; };
 		609C00BB1704C3FF00D01AAB /* COCustomTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCustomTrack.m; path = Tracks/COCustomTrack.m; sourceTree = "<group>"; };
 		609C00BC1704C3FF00D01AAB /* COHistoryTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COHistoryTrack.h; path = Tracks/COHistoryTrack.h; sourceTree = "<group>"; };
