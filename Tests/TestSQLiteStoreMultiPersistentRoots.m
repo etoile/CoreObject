@@ -13,6 +13,7 @@
 
 @implementation TestSQLiteStoreMultiPersistentRoots
 
+// Embdedded item UUIDs
 static ETUUID *docUUID;
 static ETUUID *tagUUID;
 
@@ -38,7 +39,7 @@ static ETUUID *tagUUID;
 
 - (COItemGraph *) docItemTree
 {
-    COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: tagUUID] autorelease];
+    COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: docUUID] autorelease];
     [rootItem setValue: @"my document" forAttribute: @"name" type: kCOStringType];
     
     return [COItemGraph treeWithItemsRootFirst: A(rootItem)];
@@ -76,6 +77,16 @@ static ETUUID *tagUUID;
     COSearchResult *result = [results objectAtIndex: 0];
     UKObjectsEqual([[tagProot currentBranchInfo] currentRevisionID], [result revision]);
     UKObjectsEqual(tagUUID, [result embeddedObjectUUID]);
+}
+
+- (void) testDeletion
+{
+    UKTrue([store deletePersistentRoot: [docProot UUID]
+                                 error: NULL]);
+    UKTrue([store finalizeDeletionsForPersistentRoot: [docProot UUID]
+                                               error: NULL]);
+    
+    UKNil([store contentsForRevisionID: [[docProot currentBranchInfo] currentRevisionID]]);    
 }
 
 @end

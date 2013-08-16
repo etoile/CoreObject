@@ -29,5 +29,9 @@
 {
     return [self branchInfoForUUID: [self currentBranchUUID]];
 }
+- (CORevisionID *)currentRevisionID
+{
+    return [[self currentBranchInfo] currentRevisionID];
+}
 
 @end

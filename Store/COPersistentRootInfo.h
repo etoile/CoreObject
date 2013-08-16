@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-@class ETUUID, COBranchInfo;
+@class ETUUID, COBranchInfo, CORevisionID;
 
 /**
  * Simple data structure returned by -[COSQLiteStore persistentRootInfoForUUID:]
@@ -21,6 +21,10 @@
 
 - (COBranchInfo *)branchInfoForUUID: (ETUUID *)aUUID;
 - (COBranchInfo *)currentBranchInfo;
+/**
+ * Convenience method that returns the current branch's current revision ID
+ */
+- (CORevisionID *)currentRevisionID;
 
 @property (readwrite, nonatomic, retain) ETUUID *UUID;
 @property (readwrite, nonatomic, retain) ETUUID *currentBranchUUID;
