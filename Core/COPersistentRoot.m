@@ -336,7 +336,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         
         if (_cheapCopyRevisionID == nil)
         {
-            info = [store createPersistentRootWithInitialContents: [[self editingBranch] objectGraphContext]
+            info = [store createPersistentRootWithInitialItemGraph: [[self editingBranch] objectGraphContext]
                                                                                    UUID: [self persistentRootUUID]
                                                                              branchUUID: [[self editingBranch] UUID]
                                                                                metadata: metadata

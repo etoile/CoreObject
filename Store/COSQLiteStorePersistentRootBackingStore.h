@@ -39,28 +39,28 @@
 - (ETUUID *) rootUUIDForRevid: (int64_t)revid;
 - (BOOL) hasRevid: (int64_t)revid;
 
-- (COItemGraph *) itemTreeForRevid: (int64_t)revid;
+- (COItemGraph *) itemGraphForRevid: (int64_t)revid;
 
-- (COItemGraph *) itemTreeForRevid: (int64_t)revid restrictToItemUUIDs: (NSSet *)itemSet;
+- (COItemGraph *) itemGraphForRevid: (int64_t)revid restrictToItemUUIDs: (NSSet *)itemSet;
 
 /**
  * baseRevid must be < finalRevid.
  * returns nil if baseRevid or finalRevid are not valid revisions.
  */
-- (COItemGraph *) partialItemTreeFromRevid: (int64_t)baseRevid toRevid: (int64_t)finalRevid;
+- (COItemGraph *) partialItemGraphFromRevid: (int64_t)baseRevid toRevid: (int64_t)finalRevid;
 
-- (COItemGraph *) partialItemTreeFromRevid: (int64_t)baseRevid
-                                  toRevid: (int64_t)revid
-                      restrictToItemUUIDs: (NSSet *)itemSet;
+- (COItemGraph *) partialItemGraphFromRevid: (int64_t)baseRevid
+                                    toRevid: (int64_t)revid
+                        restrictToItemUUIDs: (NSSet *)itemSet;
 
 /**
  * 
  * @returns 0 for the first commit on an empty backing store
  */
-- (int64_t) writeItemTree: (id<COItemGraph>)anItemTree
-             withMetadata: (NSDictionary *)metadata
-               withParent: (int64_t)aParent
-            modifiedItems: (NSArray*)modifiedItems; // array of COUUID
+- (int64_t) writeItemGraph: (id<COItemGraph>)anItemTree
+              withMetadata: (NSDictionary *)metadata
+                withParent: (int64_t)aParent
+             modifiedItems: (NSArray*)modifiedItems; // array of COUUID
 
 - (NSIndexSet *) revidsFromRevid: (int64_t)baseRevid toRevid: (int64_t)finalRevid;
 

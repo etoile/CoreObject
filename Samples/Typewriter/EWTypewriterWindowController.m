@@ -36,7 +36,7 @@
     
     ASSIGN(displayedRevision_, aRev);
     
-    id<COItemGraph> aTree = [[[self document] store] contentsForRevisionID: aRev];
+    id<COItemGraph> aTree = [[[self document] store] itemGraphForRevisionID: aRev];
     
     isLoading_ = YES;
     [textStorage_ setTypewriterDocument: aTree];

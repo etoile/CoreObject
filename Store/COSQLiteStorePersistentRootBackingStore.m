@@ -204,9 +204,9 @@
 /**
  * Returns the item tree 
  */
-- (COItemGraph *) partialItemTreeFromRevid: (int64_t)baseRevid
-                                  toRevid: (int64_t)revid
-                      restrictToItemUUIDs: (NSSet *)itemSet
+- (COItemGraph *) partialItemGraphFromRevid: (int64_t)baseRevid
+                                    toRevid: (int64_t)revid
+                        restrictToItemUUIDs: (NSSet *)itemSet
 {
     NSParameterAssert(baseRevid < revid);
     
@@ -285,14 +285,14 @@
     return result;
 }
 
-- (COItemGraph *) partialItemTreeFromRevid: (int64_t)baseRevid toRevid: (int64_t)revid
+- (COItemGraph *) partialItemGraphFromRevid: (int64_t)baseRevid toRevid: (int64_t)revid
 {
-    return [self partialItemTreeFromRevid: baseRevid toRevid: revid restrictToItemUUIDs: nil];
+    return [self partialItemGraphFromRevid: baseRevid toRevid: revid restrictToItemUUIDs: nil];
 }
 
-- (COItemGraph *) itemTreeForRevid: (int64_t)revid
+- (COItemGraph *) itemGraphForRevid: (int64_t)revid
 {
-    COItemGraph *result = [self partialItemTreeFromRevid: -1 toRevid: revid restrictToItemUUIDs: nil];
+    COItemGraph *result = [self partialItemGraphFromRevid: -1 toRevid: revid restrictToItemUUIDs: nil];
 
     // TODO: For debugging only, remove
     if (result != nil)
@@ -303,9 +303,9 @@
     return result;
 }
 
-- (COItemGraph *) itemTreeForRevid: (int64_t)revid restrictToItemUUIDs: (NSSet *)itemSet
+- (COItemGraph *) itemGraphForRevid: (int64_t)revid restrictToItemUUIDs: (NSSet *)itemSet
 {
-    return [self partialItemTreeFromRevid: -1 toRevid: revid restrictToItemUUIDs: itemSet];
+    return [self partialItemGraphFromRevid: -1 toRevid: revid restrictToItemUUIDs: itemSet];
 }
 
 
@@ -374,10 +374,10 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
  * @param aParent -1 for no parent, otherwise the parent of this commit
  * @param modifiedItems nil for all items in anItemTree, otherwise a subset
  */
-- (int64_t) writeItemTree: (id<COItemGraph>)anItemTree
-             withMetadata: (NSDictionary *)metadata
-               withParent: (int64_t)aParent
-            modifiedItems: (NSArray*)modifiedItems
+- (int64_t) writeItemGraph: (id<COItemGraph>)anItemTree
+              withMetadata: (NSDictionary *)metadata
+                withParent: (int64_t)aParent
+             modifiedItems: (NSArray*)modifiedItems
 {
     // TODO: For debugging only, remove
     COValidateItemGraph(anItemTree);

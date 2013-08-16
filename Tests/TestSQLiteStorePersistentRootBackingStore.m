@@ -117,7 +117,7 @@ static ETUUID *childUUID2;
     
     // First commit
     
-    int64_t revid0 = [store writeItemTree: [self makeInitialItemTree]
+    int64_t revid0 = [store writeItemGraph: [self makeInitialItemTree]
                              withMetadata: [self initialMetadata]
                                withParent: -1
                             modifiedItems: nil];
@@ -127,7 +127,7 @@ static ETUUID *childUUID2;
     
     for (int64_t i = 1; i<=BRANCH_LENGTH; i++)
     {
-        int64_t revid = [store writeItemTree: [self makeBranchAItemTreeAtRevid: i]
+        int64_t revid = [store writeItemGraph: [self makeBranchAItemTreeAtRevid: i]
                                 withMetadata: [self branchAMetadata]
                                   withParent: i - 1
                                modifiedItems: A(childUUID1)];
@@ -136,14 +136,14 @@ static ETUUID *childUUID2;
     
     // Branch B
     
-    UKIntsEqual(BRANCH_LENGTH + 1, [store writeItemTree: [self makeBranchBItemTreeAtRevid: BRANCH_LENGTH + 1]
+    UKIntsEqual(BRANCH_LENGTH + 1, [store writeItemGraph: [self makeBranchBItemTreeAtRevid: BRANCH_LENGTH + 1]
                                            withMetadata: [self branchBMetadata]
                                              withParent: 0 
                                           modifiedItems: A(rootUUID, childUUID2)]);
     
     for (int64_t i = (BRANCH_LENGTH + 2); i <= (2 * BRANCH_LENGTH); i++)
     {
-        int64_t revid = [store writeItemTree: [self makeBranchBItemTreeAtRevid: i]
+        int64_t revid = [store writeItemGraph: [self makeBranchBItemTreeAtRevid: i]
                                 withMetadata: [self branchBMetadata]
                                   withParent: i - 1
                                modifiedItems: A(childUUID2)];
@@ -233,33 +233,33 @@ static ETUUID *childUUID2;
 
 - (void) testItemTreeForRevid
 {
-    UKNil([store itemTreeForRevid: 0]);
+    UKNil([store itemGraphForRevid: 0]);
     
     [self setupExampleStore];
     
-    UKObjectsEqual([self makeInitialItemTree], [store itemTreeForRevid: 0]);
+    UKObjectsEqual([self makeInitialItemTree], [store itemGraphForRevid: 0]);
     
     for (int64_t i = 1; i<=BRANCH_LENGTH; i++)
     {
-        UKObjectsEqual([self makeBranchAItemTreeAtRevid: i], [store itemTreeForRevid: i]);
+        UKObjectsEqual([self makeBranchAItemTreeAtRevid: i], [store itemGraphForRevid: i]);
     }
     
     for (int64_t i = (BRANCH_LENGTH + 1); i <= (2 * BRANCH_LENGTH); i++)
     {
-        UKObjectsEqual([self makeBranchBItemTreeAtRevid: i], [store itemTreeForRevid: i]);
+        UKObjectsEqual([self makeBranchBItemTreeAtRevid: i], [store itemGraphForRevid: i]);
     }
 }
 
 - (void) testPartialItemTree
 {    
-    UKNil([store partialItemTreeFromRevid: 0 toRevid: 1]);
+    UKNil([store partialItemGraphFromRevid: 0 toRevid: 1]);
     
     [self setupExampleStore];
     
     UKRaisesException([store partialItemTreeFromRevid: 2 toRevid: 1]);
     
     // The first commit on branch B to the second only modified childUUID2
-    COItemGraph *tree = [store partialItemTreeFromRevid: BRANCH_LENGTH + 1
+    COItemGraph *tree = [store partialItemGraphFromRevid: BRANCH_LENGTH + 1
                                                toRevid: BRANCH_LENGTH + 2];
     
     UKObjectsEqual(A(childUUID2), [tree itemUUIDs]);
@@ -288,7 +288,7 @@ static ETUUID *childUUID2;
 {
     [self setupExampleStore];
     
-    UKObjectsEqual([self makeInitialItemTree], [store itemTreeForRevid: 0]);
+    UKObjectsEqual([self makeInitialItemTree], [store itemGraphForRevid: 0]);
     
     NSMutableIndexSet *toDelete = [NSMutableIndexSet indexSet];
     [toDelete addIndex: 0];
@@ -298,18 +298,18 @@ static ETUUID *childUUID2;
     UKTrue([store deleteRevids: toDelete]);
     
     // NOTE: This test depends on the delta run length being less than 100
-    UKNil([store itemTreeForRevid: 0]);
+    UKNil([store itemGraphForRevid: 0]);
     
     // Verify that the remaining revisions are still correct
     
     for (int64_t i = 101; i<=BRANCH_LENGTH; i++)
     {
-        UKObjectsEqual([self makeBranchAItemTreeAtRevid: i], [store itemTreeForRevid: i]);
+        UKObjectsEqual([self makeBranchAItemTreeAtRevid: i], [store itemGraphForRevid: i]);
     }
     
     for (int64_t i = (BRANCH_LENGTH + 101); i <= (2 * BRANCH_LENGTH); i++)
     {
-        UKObjectsEqual([self makeBranchBItemTreeAtRevid: i], [store itemTreeForRevid: i]);
+        UKObjectsEqual([self makeBranchBItemTreeAtRevid: i], [store itemGraphForRevid: i]);
     }
 }
 
@@ -317,7 +317,7 @@ static ETUUID *childUUID2;
 {
     [self setupExampleStore];
     
-    UKObjectsEqual([self makeInitialItemTree], [store itemTreeForRevid: 0]);
+    UKObjectsEqual([self makeInitialItemTree], [store itemGraphForRevid: 0]);
     
     // Delete all above revision 0
     
@@ -327,12 +327,12 @@ static ETUUID *childUUID2;
     UKTrue([store deleteRevids: toDelete]);
 
     // Verify that revision 0 can still be read
-    UKObjectsEqual([self makeInitialItemTree], [store itemTreeForRevid: 0]);
+    UKObjectsEqual([self makeInitialItemTree], [store itemGraphForRevid: 0]);
     
     // Verify that the remaining revisions are deleted
     for (int64_t i = 1; i <= BRANCH_LENGTH * 2; i++)
     {
-        UKNil([store itemTreeForRevid: i]);
+        UKNil([store itemGraphForRevid: i]);
     }
 }
 

@@ -234,13 +234,13 @@
  * In the future if we add an internal in-memory revision cache to COSQLiteStore, this may
  * no longer be of much use.
  */
-- (COItemGraph *) partialContentsFromRevisionID: (CORevisionID *)baseRevid
-                                  toRevisionID: (CORevisionID *)finalRevid;
+- (COItemGraph *) partialItemGraphFromRevisionID: (CORevisionID *)baseRevid
+                                    toRevisionID: (CORevisionID *)finalRevid;
 
 /**
  * Returns the state the embedded object graph at a given revision.
  */
-- (COItemGraph *) contentsForRevisionID: (CORevisionID *)aToken;
+- (COItemGraph *) itemGraphForRevisionID: (CORevisionID *)aToken;
 
 /**
  * Returns the UUID of the root object at the given revision ID
@@ -304,11 +304,11 @@
  *
  * If an error occurred, returns nil and writes a reference to an NSError object in the error parameter.
  */
-- (CORevisionID *) writeContents: (id<COItemGraph>)anItemTree
-                    withMetadata: (NSDictionary *)metadata
-                parentRevisionID: (CORevisionID *)aParent
-                   modifiedItems: (NSArray*)modifiedItems
-                           error: (NSError **)error;
+- (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
+                                     metadata: (NSDictionary *)metadata
+                             parentRevisionID: (CORevisionID *)aParent
+                                modifiedItems: (NSArray*)modifiedItems
+                                        error: (NSError **)error;
 
 // TODO:
 //  changedPropertiesForItemUUID: (NSDictionary*)changedProperties { uuidA : (propA, propB), uuidB : (propC) }
@@ -325,11 +325,11 @@
  * persistent root. If the new persistent root is likely going to have content in common with another
  * persistent root, use -createPersistentRootWithInitialRevision:metadata: instead.
  */
-- (COPersistentRootInfo *) createPersistentRootWithInitialContents: (id<COItemGraph>)contents
-                                                              UUID: (ETUUID *)persistentRootUUID
-                                                        branchUUID: (ETUUID *)aBranchUUID
-                                                          metadata: (NSDictionary *)metadata
-                                                             error: (NSError **)error;
+- (COPersistentRootInfo *) createPersistentRootWithInitialItemGraph: (id<COItemGraph>)contents
+                                                               UUID: (ETUUID *)persistentRootUUID
+                                                         branchUUID: (ETUUID *)aBranchUUID
+                                                           metadata: (NSDictionary *)metadata
+                                                              error: (NSError **)error;
 
 /**
  * "Cheap copy" method of creating a persistent root.
@@ -365,8 +365,8 @@
  * Returns NO if the branch does not exist, or is deleted (finalized or not).
  */
 - (BOOL) setCurrentBranch: (ETUUID *)aBranch
-     forPersistentRoot: (ETUUID *)aRoot
-                 error: (NSError **)error;
+        forPersistentRoot: (ETUUID *)aRoot
+                    error: (NSError **)error;
 
 - (BOOL) createBranchWithUUID: (ETUUID *)branchUUID
               initialRevision: (CORevisionID *)revId

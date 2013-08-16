@@ -49,13 +49,13 @@ static ETUUID *tagUUID;
 {
     SUPERINIT;
     
-    ASSIGN(docProot, [store createPersistentRootWithInitialContents: [self docItemTree]
+    ASSIGN(docProot, [store createPersistentRootWithInitialItemGraph: [self docItemTree]
                                                                UUID: [ETUUID UUID]
                                                          branchUUID: [ETUUID UUID]
                                                            metadata: nil
                                                               error: NULL]);
     
-    ASSIGN(tagProot, [store createPersistentRootWithInitialContents: [self tagItemTreeWithDocProoUUID: [docProot UUID]]
+    ASSIGN(tagProot, [store createPersistentRootWithInitialItemGraph: [self tagItemTreeWithDocProoUUID: [docProot UUID]]
                                                                UUID: [ETUUID UUID]
                                                          branchUUID: [ETUUID UUID]
                                                            metadata: nil
@@ -86,7 +86,7 @@ static ETUUID *tagUUID;
     UKTrue([store finalizeDeletionsForPersistentRoot: [docProot UUID]
                                                error: NULL]);
     
-    UKNil([store contentsForRevisionID: [[docProot currentBranchInfo] currentRevisionID]]);    
+    UKNil([store itemGraphForRevisionID: [[docProot currentBranchInfo] currentRevisionID]]);    
 }
 
 @end

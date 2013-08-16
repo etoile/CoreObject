@@ -126,7 +126,7 @@ static ETUUID *childUUID2;
     
     // First commit
     
-    ASSIGN(proot, [store createPersistentRootWithInitialContents: [self makeInitialItemTree]
+    ASSIGN(proot, [store createPersistentRootWithInitialItemGraph: [self makeInitialItemTree]
                                                             UUID: [ETUUID UUID]
                                                       branchUUID: [ETUUID UUID]
                                                         metadata: [self initialMetadata]
@@ -138,8 +138,8 @@ static ETUUID *childUUID2;
     
     for (int64_t i = 1; i<=BRANCH_LENGTH; i++)
     {
-        [store writeContents: [self makeBranchAItemTreeAtRevid: i]
-                withMetadata: [self branchAMetadata]
+        [store writeRevisionWithItemGraph: [self makeBranchAItemTreeAtRevid: i]
+                metadata: [self branchAMetadata]
             parentRevisionID: [CORevisionID revisionWithBackinStoreUUID: [proot UUID] revisionIndex: i - 1]
                modifiedItems: A(childUUID1)
                        error: NULL];
@@ -147,16 +147,16 @@ static ETUUID *childUUID2;
     
     // Branch B
     
-    [store writeContents: [self makeBranchBItemTreeAtRevid: BRANCH_LENGTH + 1]    
-            withMetadata: [self branchBMetadata]
+    [store writeRevisionWithItemGraph: [self makeBranchBItemTreeAtRevid: BRANCH_LENGTH + 1]    
+            metadata: [self branchBMetadata]
         parentRevisionID: [[proot currentBranchInfo] currentRevisionID]
            modifiedItems: A(rootUUID, childUUID2)
                    error: NULL];
     
     for (int64_t i = (BRANCH_LENGTH + 2); i <= (2 * BRANCH_LENGTH); i++)
     {
-        [store writeContents: [self makeBranchBItemTreeAtRevid: i]
-                withMetadata: [self branchBMetadata]
+        [store writeRevisionWithItemGraph: [self makeBranchBItemTreeAtRevid: i]
+                metadata: [self branchBMetadata]
             parentRevisionID: [CORevisionID revisionWithBackinStoreUUID: [proot UUID] revisionIndex: i - 1]
                modifiedItems: A(childUUID2)
                        error: NULL];
@@ -468,7 +468,7 @@ static ETUUID *childUUID2;
     
     COItemGraph *tree = [self makeInitialItemTree];
     [[tree itemForUUID: childUUID1] setValue: hash forAttribute: @"attachment" type: kCOAttachmentType];
-    CORevisionID *withAttachment = [store writeContents: tree withMetadata: nil parentRevisionID: initialRevisionId modifiedItems: nil error: NULL];
+    CORevisionID *withAttachment = [store writeRevisionWithItemGraph: tree metadata: nil parentRevisionID: initialRevisionId modifiedItems: nil error: NULL];
     UKNotNil(withAttachment);
     UKTrue([store setCurrentRevision: withAttachment
                         headRevision: withAttachment
@@ -511,8 +511,8 @@ static ETUUID *childUUID2;
 - (void) testRevisionGCDoesNotCollectReferenced
 {
     COItemGraph *tree = [self makeInitialItemTree];
-    CORevisionID *referencedRevision = [store writeContents: tree
-                                               withMetadata: nil
+    CORevisionID *referencedRevision = [store writeRevisionWithItemGraph: tree
+                                               metadata: nil
                                            parentRevisionID: initialRevisionId
                                               modifiedItems: nil
                                                       error: NULL];
@@ -527,23 +527,23 @@ static ETUUID *childUUID2;
     
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
     
-    UKObjectsEqual(tree, [store contentsForRevisionID: referencedRevision]);
+    UKObjectsEqual(tree, [store itemGraphForRevisionID: referencedRevision]);
 }
 
 - (void) testRevisionGCCollectsUnReferenced
 {
     COItemGraph *tree = [self makeInitialItemTree];
-    CORevisionID *unreferencedRevision = [store writeContents: tree
-                                                 withMetadata: nil
+    CORevisionID *unreferencedRevision = [store writeRevisionWithItemGraph: tree
+                                                 metadata: nil
                                              parentRevisionID: initialRevisionId
                                                 modifiedItems: nil
                                                         error: NULL];
     
-    UKObjectsEqual(tree, [store contentsForRevisionID: unreferencedRevision]);
+    UKObjectsEqual(tree, [store itemGraphForRevisionID: unreferencedRevision]);
     
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
     
-    UKNil([store contentsForRevisionID: unreferencedRevision]);
+    UKNil([store itemGraphForRevisionID: unreferencedRevision]);
     UKNil([store revisionInfoForRevisionID: unreferencedRevision]);
     
     // TODO: Expand, test using -setTail...
@@ -586,7 +586,7 @@ static ETUUID *childUUID2;
     UKObjectsEqual([NSArray array], [store deletedPersistentRootUUIDs]);
     UKNil([store persistentRootInfoForUUID: prootUUID]);
     UKNil([store revisionInfoForRevisionID: initialRevisionId]);
-    UKNil([store contentsForRevisionID: initialRevisionId]);
+    UKNil([store itemGraphForRevisionID: initialRevisionId]);
 }
 
 // FIXME: Not sure if this is worth the bother
@@ -618,7 +618,7 @@ static ETUUID *childUUID2;
 {
     UKObjectsEqual(S(prootUUID), [NSSet setWithArray:[store persistentRootUUIDs]]);
     UKObjectsEqual(initialBranchUUID, [[store persistentRootInfoForUUID: prootUUID] currentBranchUUID]);
-    UKObjectsEqual([self makeInitialItemTree], [store contentsForRevisionID: initialRevisionId]);
+    UKObjectsEqual([self makeInitialItemTree], [store itemGraphForRevisionID: initialRevisionId]);
     UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
 }
 

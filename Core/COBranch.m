@@ -82,7 +82,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         _isCreated = YES;
         _deleted = [branchInfo isDeleted];
         
-        id<COItemGraph> aGraph = [[_persistentRoot store] contentsForRevisionID: _currentRevisionID];
+        id<COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionID: _currentRevisionID];
         [_objectGraph setItemGraph: aGraph];
     }
     else
@@ -97,7 +97,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         
         if (_currentRevisionID != nil)
         {
-            id<COItemGraph> aGraph = [[_persistentRoot store] contentsForRevisionID: _currentRevisionID];
+            id<COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionID: _currentRevisionID];
             [_objectGraph setItemGraph: aGraph];
             
             ETAssert(![_objectGraph hasChanges]);
@@ -508,8 +508,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     NSArray *changedItemUUIDs = [(NSSet *)[[[_objectGraph changedObjects] mappedCollection] UUID] allObjects];
     if ([changedItemUUIDs count] > 0)
     {
-        CORevisionID *revId = [store writeContents: _objectGraph
-                                      withMetadata: metadata
+        CORevisionID *revId = [store writeRevisionWithItemGraph: _objectGraph
+                                      metadata: metadata
                                   parentRevisionID: _currentRevisionID
                                      modifiedItems: changedItemUUIDs
                                              error: NULL];        
@@ -560,7 +560,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     // TODO: Use optimized method on the store to get a delta for more performance
     
-	id<COItemGraph> aGraph = [[self store] contentsForRevisionID: [revision revisionID]];
+	id<COItemGraph> aGraph = [[self store] itemGraphForRevisionID: [revision revisionID]];
     
     [_objectGraph setItemGraph: aGraph];
     

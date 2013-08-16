@@ -279,24 +279,24 @@
     return [backing revisionForID: aToken];
 }
 
-- (COItemGraph *) partialContentsFromRevisionID: (CORevisionID *)baseRevid
-                                  toRevisionID: (CORevisionID *)finalRevid
+- (COItemGraph *) partialItemGraphFromRevisionID: (CORevisionID *)baseRevid
+                                    toRevisionID: (CORevisionID *)finalRevid
 {
     NSParameterAssert(baseRevid != nil);
     NSParameterAssert(finalRevid != nil);
     NSParameterAssert([[baseRevid backingStoreUUID] isEqual: [finalRevid backingStoreUUID]]);
     
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: baseRevid];
-    COItemGraph *result = [backing partialItemTreeFromRevid: [baseRevid revisionIndex]
+    COItemGraph *result = [backing partialItemGraphFromRevid: [baseRevid revisionIndex]
                                                    toRevid: [finalRevid revisionIndex]];
     return result;
 }
 
-- (COItemGraph *) contentsForRevisionID: (CORevisionID *)aToken
+- (COItemGraph *) itemGraphForRevisionID: (CORevisionID *)aToken
 {
     NSParameterAssert(aToken != nil);
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-    COItemGraph *result = [backing itemTreeForRevid: [aToken revisionIndex]];
+    COItemGraph *result = [backing itemGraphForRevid: [aToken revisionIndex]];
     return result;
 }
 
@@ -311,7 +311,7 @@
 {
     NSParameterAssert(aToken != nil);
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-    COItemGraph *tree = [backing itemTreeForRevid: [aToken revisionIndex] restrictToItemUUIDs: S(anitem)];
+    COItemGraph *tree = [backing itemGraphForRevid: [aToken revisionIndex] restrictToItemUUIDs: S(anitem)];
     COItem *item = [tree itemForUUID: anitem];
     return item;
 }
@@ -399,11 +399,11 @@
     return result;
 }
 
-- (CORevisionID *) writeContents: (id<COItemGraph>)anItemTree
-                    withMetadata: (NSDictionary *)metadata
-                parentRevisionID: (CORevisionID *)aParent
-                   modifiedItems: (NSArray*)modifiedItems // array of COUUID
-                           error: (NSError **)error
+- (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
+                                     metadata: (NSDictionary *)metadata
+                             parentRevisionID: (CORevisionID *)aParent
+                                modifiedItems: (NSArray*)modifiedItems // array of COUUID
+                                        error: (NSError **)error
 {
     [self validateRevision: aParent];
     
@@ -436,7 +436,7 @@
                    modifiedItems: (NSArray*)modifiedItems // array of COUUID
 {
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: aBacking];
-    const int64_t revid = [backing writeItemTree: anItemTree
+    const int64_t revid = [backing writeItemGraph: anItemTree
                                     withMetadata: metadata
                                       withParent: parentRevid
                                    modifiedItems: modifiedItems];
@@ -646,11 +646,11 @@
     return plist;
 }
 
-- (COPersistentRootInfo *) createPersistentRootWithInitialContents: (id<COItemGraph>)contents
-                                                              UUID: (ETUUID *)persistentRootUUID
-                                                        branchUUID: (ETUUID *)aBranchUUID
-                                                          metadata: (NSDictionary *)metadata
-                                                             error: (NSError **)error
+- (COPersistentRootInfo *) createPersistentRootWithInitialItemGraph: (id<COItemGraph>)contents
+                                                               UUID: (ETUUID *)persistentRootUUID
+                                                         branchUUID: (ETUUID *)aBranchUUID
+                                                           metadata: (NSDictionary *)metadata
+                                                              error: (NSError **)error
 {
     NILARG_EXCEPTION_TEST(contents);
     NILARG_EXCEPTION_TEST(persistentRootUUID);
