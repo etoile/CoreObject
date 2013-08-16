@@ -167,13 +167,6 @@ x Adopt or leverage NestedVersioning improvements to the property list serializa
 x Figure out how to navigate large root object sets very quickly (evaluate writing a COSQLCursor class)/
   How to scroll smoothly through 50 000 root objects in an Object Manager without loading all the objects in memory?
   - I think we more or less have this figured out
-  
-
-Discarded (?)
--------------
-
-- Extract COCommitTrack node caching into a generic COCursor class
-
 
 
 Missing Features
