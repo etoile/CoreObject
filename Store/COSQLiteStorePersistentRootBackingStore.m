@@ -515,10 +515,46 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 //    }
 //    [rs close];
     
-    // Delete all commits where all rows with the same deltabase are marked as garbage.
+    // For each delta base, delete the contiguous range of garbage revids starting at the maximum
+    // and extending down to the first non-garbage revid
+    
+    // Example which can be pasted in the sqlite3 prompt to experiment with this query:
+    
+    /*
+     
+     drop table c;
+     create table c (revid integer, deltabase integer, garbage boolean);
+     
+     insert into c values(0,0,0);
+     insert into c values(1,0,1); -- marked as garbage, will be selected for deletion
+     
+     insert into c values(2,2,1); -- marked as garbage, will be selected for deletion
+     insert into c values(3,2,1); -- marked as garbage, will be selected for deletion
+     
+     insert into c values(4,4,0);
+     insert into c values(5,4,0);
+     
+     insert into c values(6,6,0);
+     insert into c values(7,6,1); -- marked as garbage, won't be deleted because there are higher non-garbage revids in this delta run
+     insert into c values(8,6,0);
+     
+     SELECT commits.revid
+     FROM c AS commits
+     LEFT OUTER JOIN (SELECT deltabase, MAX(revid) AS maxkeptrevid FROM c WHERE garbage = 0 GROUP BY deltabase) AS info
+     ON commits.deltabase = info.deltabase
+     WHERE (commits.revid > info.maxkeptrevid) OR info.maxkeptrevid IS NULL;
+     
+     -- The "OR info.maxkeptrevid IS NULL" part is so that we delete all commits in delta runs where all commits are garbage.
+     
+     */
+    
     // Could be done at a later time
-    [db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE deltabase IN (SELECT deltabase FROM %@ GROUP BY deltabase HAVING garbage = 1)",
-                         [self tableName], [self tableName]]];
+    [db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE revid IN (SELECT commits.revid "
+                         "FROM %@ AS commits "
+                         "LEFT OUTER JOIN (SELECT deltabase, MAX(revid) AS maxkeptrevid FROM %@ WHERE garbage = 0 GROUP BY deltabase) AS info "
+                         "  ON commits.deltabase = info.deltabase "
+                         "WHERE (commits.revid > info.maxkeptrevid) OR info.maxkeptrevid IS NULL)",
+                         [self tableName], [self tableName], [self tableName]]];
     
     // TODO: Vacuum here?
     
