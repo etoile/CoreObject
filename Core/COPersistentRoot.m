@@ -325,7 +325,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	ETAssert([[self rootObject] isRoot]);
     
 	COSQLiteStore *store = [_parentContext store];
-    CORevisionID *revId;
+    //CORevisionID *revId;
     
 	if (![self isPersistentRootCommitted])
 	{		
@@ -352,7 +352,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         }
         ETAssert(info != nil);
         
-        revId = [[info currentBranchInfo] currentRevisionID];
+        //revId = [[info currentBranchInfo] currentRevisionID];
         
         // N.B., we don't call -saveCommitWithMetadata: on the branch,
         // because the store call -createPersistentRootWithInitialContents:

@@ -76,8 +76,8 @@
 // application launches).
 - (COSmartGroup *)libraryGroup
 {
-	COSmartGroup *group = [[COSmartGroup alloc]
-		initWithObjectGraphContext: [COObjectGraphContext objectGraphContext]];
+	COSmartGroup *group = [[[COSmartGroup alloc]
+		initWithObjectGraphContext: [COObjectGraphContext objectGraphContext]] autorelease];
 	[group setName: _(@"All Objects")];
 	[group setTargetCollection: [[[[self persistentRoots] mappedCollection] rootObject] allObjects]];
 	[group setQuery: [COQuery queryWithPredicateBlock: ^ BOOL (id object, NSDictionary *bindings)

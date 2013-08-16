@@ -39,7 +39,7 @@
     }
     else
     {    
-        NSString *path = [[[[store URL] path] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.sqlite", _uuid]] retain];
+        NSString *path = [[[store URL] path] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.sqlite", _uuid]];
         NILARG_EXCEPTION_TEST(path);
         
         db_ = [[FMDatabase alloc] initWithPath: path];

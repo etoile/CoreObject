@@ -194,9 +194,9 @@
 {
 	ETEntityDescription *desc = [[self modelRepository] descriptionForName: anEntityName];
 	Class cls = [[self modelRepository] classForEntityDescription: desc];
-	COObject *rootObject = [[cls alloc] initWithUUID: [ETUUID UUID]
-	                               entityDescription: desc
-	                              objectGraphContext: [COObjectGraphContext objectGraphContext]];
+	COObject *rootObject = [[[cls alloc] initWithUUID: [ETUUID UUID]
+                                    entityDescription: desc
+                                   objectGraphContext: [COObjectGraphContext objectGraphContext]] autorelease];
 	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
 	                                                 objectGraphContext: [rootObject objectGraphContext]];
 

@@ -856,7 +856,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 {
 	[self checkEditingContextForValue: object];
 
-	id oldCollection = [[self valueForProperty: key] mutableCopy];
+	id oldCollection = [[[self valueForProperty: key] mutableCopy] autorelease];
 	id collection = [self collectionForProperty: key insertionIndex: index];
 
 	[self willChangeValueForProperty: key];
@@ -898,7 +898,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 {
 	[self checkEditingContextForValue: object];
 
-	id oldCollection = [[self valueForProperty: key] mutableCopy];
+	id oldCollection = [[[self valueForProperty: key] mutableCopy] autorelease];
 	id collection = [self collectionForProperty: key removalIndex: index];
 
 	[self willChangeValueForProperty: key];
