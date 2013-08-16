@@ -99,7 +99,8 @@ First Release
   - Add a check that the derived side of a multivalued opposite is unordered
   - Add an "indexed" flag to ETPropertyDescription to tell the store whether to include values of that property in search indexes
   - Move to CoreObject
-  
+  - It scans over every loaded ObjC class, this is really slow and should be removed
+
 - COObject
   x Remove support for freestanding COObject not associated with a COObjectGraphContext,
     and remove -becomePersistentInContext:. The rationale was that freestanding
@@ -121,6 +122,10 @@ First Release
     generated KVC compliant property accessors and mutators. (Eric)
   - Use NSSortedSet for sorted composite relationships
   - Use weak references to other COObject instances to prevent retain cycles
+  - Variable storage, relationship cache, relationship integrity implementations
+    are a mess and need to be rewritten. The variable storage is very
+    inefficient (makes mutable copy of collection even when using mutable
+    colelction mutation method, so n inserts in O(n^2).), which must be fixed.
 
 - COItem
   - tidy up ugly NSMutableDictionary / NSDictionary casting
