@@ -4,6 +4,12 @@ TODO
 First Release
 -------------
 
+- Major tasks
+  - App-level undo
+  - Diff/merge cleanup
+  - Cleanup COObject, synthesize accessors
+  - Copying support
+
 - Tests
   - Pass all tests, including all from NestedVersioning, rewriting them where needed.
   x Test JSON serialization
@@ -56,7 +62,7 @@ First Release
     - At the end of the setStoreItem:, call -awakeFromDeserialization
     - At the end of object graph loading, -didLoadObjectGraph on each object in topological sort order
 
-- Improve diff/merge API and code
+- diff/merge API and code
   - Improve Merging (move detection and custom attributed string merger)
   - Need to support persisted partial merge resolutions.
     - Thought about this a bit. I don't think we can provide it in general in the framework,
@@ -69,9 +75,11 @@ First Release
       there may be multiple embedded object trees with different merge UI's.
       (e.g. several types of objects on a canvas in a composite documents)
   - Build an example app with a merging UI
+  - Requirements:
+    - We will highlight the area where a conflict appeared. It will show the automatic result, and let the user make a manual edit
+    - allow both collapsed (like SourceTree) and expanded (like Xcode) diff view
 
-
-- Implement application-level undo/redo support
+- Undo/redo support (app-level)
   - Requirements:
     - I want restarting applications to be side-effect-free, which means all undo/redo stacks must be persistent.
     - Applications/UI designers should have great flexibility in deciding on undo behaviour:
@@ -86,10 +94,22 @@ First Release
        root embedded object of a persistent root)
     - selective undoing your commits in a collaborative editing scenario
     - support undo/redo of branch/delete branch, create persistent root/delete persistent root, revert to old revision (if app desires)
+    - want to be able to tell whether a branch creation came before or after a commit. Timestamps may not be enough if commits are made in a loop
+      This was why the earlier CoreObject used revision numbers for both undo/redo actions and regular commits.
+  - Implementation ideas:
+    - Reintroduce something like COCustomTrack which dynamically switches from
+      navigational undo/redo to selective undo/redo. This should be sufficient
+      to implement undo/redo for collaboration where the undo/redo commands only
+      affect your own actions, as well as undo/redo for applications
+    - Reintroduce something like COHistoryTrack which allows undo/redo on subsets of a persistent root using selective undo
+    - custom track that tracks all changes made to store (like in cambridge typewriter demo)
 
-- Work out clear and well documented object copy model easy to extend in COObject subclasses (see COObject and COEditingContext copy methods)
+- Oject copy model easy to extend in COObject subclasses (see COObject and COEditingContext copy methods)
   - Finish COCopier
   - Support another reference type for copy: NOT a composite reference, but acts like one for the pruposes of copy. see the copy keynote, and the yellow arrows
+    => 2013-08-13: Discussed with Quentin and we decided this is probably not so important
+  - Maybe need an "isShared" flag related to whether an object is copied when things that refer to it are copied.
+    I need to understand the use case a bit more
 
 - Metamodel
   - Add checks that derived properties are not persistent
@@ -118,8 +138,9 @@ First Release
   - We should have dedicated array/set multivalue mutation methods rather than using:
     -[COObject (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key]
     for both, IMO (Eric)
-  WIP I'd like to look at generating COObject subclasses for each entity description with 
-    generated KVC compliant property accessors and mutators. (Eric)
+  WIP Rather than dynamic subclassing which is flawed/broken (it's impossible to interact cleanly with KVO or other users of dynamic subclassing),
+    synthesize accessors for properties when the app developer has made a subclass and marked the property @dynamic. Either using +resolveInstanceMethod
+    or some earlier time when the metamodel/class are registered.
   - Use NSSortedSet for sorted composite relationships
   - Use weak references to other COObject instances to prevent retain cycles
   - Variable storage, relationship cache, relationship integrity implementations
@@ -141,8 +162,6 @@ First Release
   - The metadata: param of -createPersistentRoot is currently unused. Should it set the branch metadata? Initial revision metadata? Remove it or add separate branch/revision metadata params?
   
 
-- Rewrite COHistoryTrack
-- Fix COCustomTrack broken model
 - Make COQuery a bit more usable
 - Switch to NSUUID
 
