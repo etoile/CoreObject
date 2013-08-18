@@ -19,6 +19,7 @@
 #import "COSerialization.h"
 #import "COItemGraphDiff.h"
 #import "COContainer.h"
+#import "COUndoStackStore.h"
 
 #define SA(x) [NSSet setWithArray: x]
 

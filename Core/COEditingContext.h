@@ -3,7 +3,7 @@
 
 @class COPersistentRoot, COEditingContext, COObjectGraphContext;
 @class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo, CORevisionID, COPath;
-@class COCrossPersistentRootReferenceCache;
+@class COCrossPersistentRootReferenceCache, COUndoStackStore;
 
 // I'm skeptical that there is ever a legitimate case where code is working
 // with an id<COPersistentObjectContext> and doesn't know whether it's an
@@ -78,6 +78,8 @@
 	NSMutableSet *_persistentRootsPendingUndeletion;
 	COError *_error;
     COCrossPersistentRootReferenceCache *_crossRefCache;
+    
+    COUndoStackStore *_undoStackStore;
 }
 
 /** 

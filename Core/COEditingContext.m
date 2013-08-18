@@ -10,6 +10,7 @@
 #import "COPath.h"
 #import "COObjectGraphContext.h"
 #import "COCrossPersistentRootReferenceCache.h"
+#import "COUndoStackStore.h"
 
 @implementation COEditingContext
 
@@ -49,6 +50,7 @@
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
     _crossRefCache = [[COCrossPersistentRootReferenceCache alloc] init];
+    _undoStackStore = [[COUndoStackStore alloc] init];
     
 	[self registerAdditionalEntityDescriptions];
 
@@ -83,6 +85,7 @@
     DESTROY(_persistentRootsPendingUndeletion);
     DESTROY(_crossRefCache);
 	DESTROY(_error);
+    DESTROY(_undoStackStore);
 	[super dealloc];
 }
 
