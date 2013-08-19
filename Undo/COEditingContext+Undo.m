@@ -1,6 +1,9 @@
 #import "COEditingContext+Undo.h"
 #import "COUndoStackStore.h"
 #import "COEdit.h"
+#import "COEditGroup.h"
+#import <EtoileFoundation/Macros.h>
+
 
 @implementation COEditingContext (Undo)
 
@@ -76,6 +79,73 @@
 - (BOOL) commitWithStackNamed: (NSString *)aName
 {
     // Version of commit that automatically pushes a COEditGroup of the edits made
+}
+
+// Methods called during commit
+
+// Called from COEditingContext
+
+- (void) recordBeginUndoGroup
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+    if (_isRecordingUndo)
+    {
+        ASSIGN(_currentEditGroup, [[[COEditGroup alloc] init] autorelease]);
+    }
+    else
+    {
+        DESTROY(_currentEditGroup);
+    }
+}
+- (void) recordEndUndoGroup
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+
+- (void) recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd)); 
+}
+- (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+
+// Called from COPersistentRoot
+
+- (void) recordPersistentRootCreation: (COPersistentRootInfo *)info
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+- (void) recordPersistentRoot: (COPersistentRoot *)aPersistentRoot
+             setCurrentBranch: (COBranch *)aBranch
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+
+// Called from COBranch
+
+- (void) recordBranchCreation: (COBranch *)aBranch
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+- (void) recordBranchSetCurrentRevision: (COBranch *)aBranch
+                          oldRevisionID: (CORevisionID *)aRevisionID
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+- (void) recordBranchSetMetadata: (COBranch *)aBranch
+                     oldMetadata: (id)oldMetadata
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+- (void) recordBranchDeletion: (COBranch *)aBranch
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+- (void) recordBranchUndeletion: (COBranch *)aBranch
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 @end

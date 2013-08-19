@@ -18,6 +18,7 @@
 #import "CORevisionInfo.h"
 #import "COBranchInfo.h"
 #import "COObjectGraphContext.h"
+#import "COEditingContext+Undo.h"
 
 NSString * const kCOBranchLabel = @"COBranchLabel";
 
@@ -117,6 +118,11 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     DESTROY(_metadata);
     DESTROY(_objectGraph);
 	[super dealloc];
+}
+
+- (COEditingContext *) editingContext
+{
+    return [_persistentRoot editingContext];
 }
 
 - (BOOL) isBranchUncommitted
@@ -475,6 +481,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                     initialRevision: _currentRevisionID
                   forPersistentRoot: [[self persistentRoot] persistentRootUUID]
                               error: NULL];
+        [[self editingContext] recordBranchCreation: self];
         
         _isCreated = YES;
     }
@@ -490,6 +497,10 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                          currentChangeCount: &changeCount
                                       error: NULL];
         ETAssert(ok);
+        
+        CORevisionID *old = [[self branchInfo] currentRevisionID];
+        [[self editingContext] recordBranchSetCurrentRevision: self
+                                                oldRevisionID: old];
     }
     
     // Write metadata
@@ -501,9 +512,14 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                     ofPersistentRoot: [[self persistentRoot]    persistentRootUUID]
                                error: NULL];
         ETAssert(ok);
+        
+        [[self editingContext] recordBranchSetMetadata: self
+                                           oldMetadata: [[self branchInfo] metadata]];
+        
         _metadataChanged = NO;
     }
     
+    // Write a regular commit
     
     NSArray *changedItemUUIDs = [(NSSet *)[[[_objectGraph changedObjects] mappedCollection] UUID] allObjects];
     if ([changedItemUUIDs count] > 0)
@@ -524,19 +540,26 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         ETAssert(ok);
         
         ASSIGN(_currentRevisionID, revId);
+
+        [[self editingContext] recordBranchSetCurrentRevision: self
+                                                oldRevisionID: [[self branchInfo] currentRevisionID]];
     }
 	
+    // Write branch deletion / undeletion
+    
     if (_deleted && ![[self branchInfo] isDeleted])
     {
         ETAssert([store deleteBranch: _UUID
                     ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
                                error: NULL]);
+        [[self editingContext] recordBranchDeletion: self];
     }
     else if (!_deleted && [[self branchInfo] isDeleted])
     {
         ETAssert([store undeleteBranch: _UUID
                       ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
                                  error: NULL]);
+        [[self editingContext] recordBranchUndeletion: self];
     }
     
 	[_objectGraph clearChangeTracking];

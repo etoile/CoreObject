@@ -67,6 +67,8 @@
 		66094848178794D40049468B /* COItem+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 66094846178794D40049468B /* COItem+JSON.h */; settings = {ATTRIBUTES = (); }; };
 		6609485E1787A1160049468B /* CORelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6609485C1787A1160049468B /* CORelationshipCache.m */; };
 		6609485F1787A1160049468B /* CORelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 6609485D1787A1160049468B /* CORelationshipCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		662FFB7F17C2026000BA3F2F /* COEditUndeletePersistentRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB7D17C2026000BA3F2F /* COEditUndeletePersistentRoot.h */; };
+		662FFB8017C2026000BA3F2F /* COEditUndeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 662FFB7E17C2026000BA3F2F /* COEditUndeletePersistentRoot.m */; };
 		663CE29517C07ED800E729F5 /* COEdit.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28717C07ED800E729F5 /* COEdit.h */; };
 		663CE29617C07ED800E729F5 /* COEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE28817C07ED800E729F5 /* COEdit.m */; };
 		663CE29717C07ED800E729F5 /* COEditCreateBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28917C07ED800E729F5 /* COEditCreateBranch.h */; };
@@ -376,6 +378,8 @@
 		66094846178794D40049468B /* COItem+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "COItem+JSON.h"; sourceTree = "<group>"; };
 		6609485C1787A1160049468B /* CORelationshipCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CORelationshipCache.m; path = Core/CORelationshipCache.m; sourceTree = "<group>"; };
 		6609485D1787A1160049468B /* CORelationshipCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CORelationshipCache.h; path = Core/CORelationshipCache.h; sourceTree = "<group>"; };
+		662FFB7D17C2026000BA3F2F /* COEditUndeletePersistentRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEditUndeletePersistentRoot.h; sourceTree = "<group>"; };
+		662FFB7E17C2026000BA3F2F /* COEditUndeletePersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEditUndeletePersistentRoot.m; sourceTree = "<group>"; };
 		663CE28717C07ED800E729F5 /* COEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEdit.h; sourceTree = "<group>"; };
 		663CE28817C07ED800E729F5 /* COEdit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEdit.m; sourceTree = "<group>"; };
 		663CE28917C07ED800E729F5 /* COEditCreateBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEditCreateBranch.h; sourceTree = "<group>"; };
@@ -730,6 +734,8 @@
 				663CE2AF17C09DD800E729F5 /* COEditCreatePersistentRoot.m */,
 				663CE2B117C09DE700E729F5 /* COEditDeletePersistentRoot.h */,
 				663CE2B217C09DE700E729F5 /* COEditDeletePersistentRoot.m */,
+				662FFB7D17C2026000BA3F2F /* COEditUndeletePersistentRoot.h */,
+				662FFB7E17C2026000BA3F2F /* COEditUndeletePersistentRoot.m */,
 			);
 			path = Undo;
 			sourceTree = "<group>";
@@ -1106,6 +1112,7 @@
 				663CE2A117C07ED800E729F5 /* COUndoStackStore.h in Headers */,
 				663CE2B617C0B05900E729F5 /* COEditingContext+Undo.h in Headers */,
 				663CE2BC17C15A4800E729F5 /* COEditGroup.h in Headers */,
+				662FFB7F17C2026000BA3F2F /* COEditUndeletePersistentRoot.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1393,6 +1400,7 @@
 				663CE2A217C07ED800E729F5 /* COUndoStackStore.m in Sources */,
 				663CE2B717C0B05900E729F5 /* COEditingContext+Undo.m in Sources */,
 				663CE2BD17C15A4800E729F5 /* COEditGroup.m in Sources */,
+				662FFB8017C2026000BA3F2F /* COEditUndeletePersistentRoot.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

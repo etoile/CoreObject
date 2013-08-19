@@ -10,9 +10,31 @@
 
 /**
  * Replacement for -commit that also writes a COEdit to the requested undo stack
- *
- * TODO: Will require undo group object.
  */
 - (BOOL) commitWithStackNamed: (NSString *)aName;
+
+// Called from COEditingContext
+
+- (void) recordBeginUndoGroup;
+- (void) recordEndUndoGroup;
+
+- (void) recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot;
+- (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot;
+
+// Called from COPersistentRoot
+
+- (void) recordPersistentRootCreation: (COPersistentRootInfo *)info;
+- (void) recordPersistentRoot: (COPersistentRoot *)aPersistentRoot
+             setCurrentBranch: (COBranch *)aBranch;
+
+// Called from COBranch
+
+- (void) recordBranchCreation: (COBranch *)aBranch;
+- (void) recordBranchSetCurrentRevision: (COBranch *)aBranch
+                          oldRevisionID: (CORevisionID *)aRevisionID;
+- (void) recordBranchSetMetadata: (COBranch *)aBranch
+                     oldMetadata: (id)oldMetadata;
+- (void) recordBranchDeletion: (COBranch *)aBranch;
+- (void) recordBranchUndeletion: (COBranch *)aBranch;
 
 @end

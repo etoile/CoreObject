@@ -142,6 +142,10 @@ extern NSString * const kCOBranchLabel;
 /** @taskunit Persistent Root and Object Graph Context */
 
 /**
+ * The editing context owning the branch's persistent root
+ */
+@property (readonly, nonatomic) COEditingContext *editingContext;
+/**
  * The persistent root owning the branch.
  */
 @property (readonly, nonatomic) COPersistentRoot *persistentRoot;

@@ -22,6 +22,7 @@
 #import "COCrossPersistentRootReferenceCache.h"
 #import "COPersistentRootInfo.h"
 #import "COBranchInfo.h"
+#import "COEditingContext+Undo.h"
 
 NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidChangeNotification";
 
@@ -351,6 +352,8 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
                                                             error: NULL];
         }
         ETAssert(info != nil);
+        [_parentContext recordPersistentRootCreation: info];
+        
         
         //revId = [[info currentBranchInfo] currentRevisionID];
         
@@ -378,6 +381,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
             ETAssert([store setCurrentBranch: _currentBranchUUID
                            forPersistentRoot: [self persistentRootUUID]
                                        error: NULL]);
+            [_parentContext recordPersistentRoot: self setCurrentBranch: [self currentBranch]];
         }
     }
 

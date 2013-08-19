@@ -11,6 +11,7 @@
 #import "COObjectGraphContext.h"
 #import "COCrossPersistentRootReferenceCache.h"
 #import "COUndoStackStore.h"
+#import "COEditingContext+Undo.h"
 
 @implementation COEditingContext
 
@@ -51,6 +52,7 @@
     _persistentRootsPendingUndeletion = [NSMutableSet new];
     _crossRefCache = [[COCrossPersistentRootReferenceCache alloc] init];
     _undoStackStore = [[COUndoStackStore alloc] init];
+    _isRecordingUndo = YES;
     
 	[self registerAdditionalEntityDescriptions];
 
@@ -86,6 +88,7 @@
     DESTROY(_crossRefCache);
 	DESTROY(_error);
     DESTROY(_undoStackStore);
+    DESTROY(_currentEditGroup);
 	[super dealloc];
 }
 
@@ -403,6 +406,7 @@
 	/* Commit persistent root changes (deleted persistent roots included) */
 
     [_store beginTransactionWithError: NULL];
+    [self recordBeginUndoGroup];
     
 	// TODO: Add a batch commit UUID in the metadata
 	for (COPersistentRoot *ctxt in persistentRoots)
@@ -420,18 +424,23 @@
 		if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
         {
             ETAssert([_store deletePersistentRoot: uuid error: NULL]);
+            [self recordPersistentRootDeletion: persistentRoot];
+            
             [_persistentRootsPendingDeletion removeObject: persistentRoot];
             
             [self unloadPersistentRoot: persistentRoot];
         }
         else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
         {
-            ETAssert([_store undeletePersistentRoot: uuid error: NULL]);            
+            ETAssert([_store undeletePersistentRoot: uuid error: NULL]);
+            [self recordPersistentRootUndeletion: persistentRoot];
+            
             [_persistentRootsPendingUndeletion removeObject: persistentRoot];
         }
     }
 
     ETAssert([_store commitTransactionWithError: NULL]);
+    [self recordEndUndoGroup];
     
 	return revisions;
 }

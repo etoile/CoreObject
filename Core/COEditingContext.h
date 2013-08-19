@@ -3,7 +3,7 @@
 
 @class COPersistentRoot, COEditingContext, COObjectGraphContext;
 @class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo, CORevisionID, COPath;
-@class COCrossPersistentRootReferenceCache, COUndoStackStore;
+@class COCrossPersistentRootReferenceCache, COUndoStackStore, COEditGroup;
 
 // I'm skeptical that there is ever a legitimate case where code is working
 // with an id<COPersistentObjectContext> and doesn't know whether it's an
@@ -77,9 +77,11 @@
     /** Set of persistent roots pending undeletion */
 	NSMutableSet *_persistentRootsPendingUndeletion;
 	COError *_error;
-    COCrossPersistentRootReferenceCache *_crossRefCache;
-    
+    COCrossPersistentRootReferenceCache *_crossRefCache;     
+    /** Undo */
     COUndoStackStore *_undoStackStore;
+    BOOL _isRecordingUndo;
+    COEditGroup *_currentEditGroup;
 }
 
 /** 
