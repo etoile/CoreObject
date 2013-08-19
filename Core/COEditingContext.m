@@ -18,6 +18,7 @@
 @synthesize store = _store, modelRepository = _modelRepository;
 @synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
 @synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
+@synthesize undoStackName = _undoStackName;
 
 + (COEditingContext *)contextWithURL: (NSURL *)aURL
 {

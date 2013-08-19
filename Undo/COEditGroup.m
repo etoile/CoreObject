@@ -1,10 +1,18 @@
 #import "COEditGroup.h"
+#import <EtoileFoundation/Macros.h>
 
 static NSString * const kCOEditContents = @"COEditContents";
 
 @implementation COEditGroup
 
-@synthesize  contents = _contents;
+@synthesize contents = _contents;
+
+- (id)init
+{
+    SUPERINIT;
+    _contents = [[NSMutableArray alloc] init];
+    return self;
+}
 
 - (id) initWithPlist: (id)plist
 {

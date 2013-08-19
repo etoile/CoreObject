@@ -411,7 +411,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     }
 }
 
-
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
     COBranch *newBranch = [[[COBranch alloc] initWithUUID: [ETUUID UUID]
@@ -420,6 +419,23 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
                                parentRevisionForNewBranch: [aRev revisionID]] autorelease];
     
     [newBranch setMetadata: D(aLabel, @"COBranchLabel")];
+    
+    [_branchForUUID setObject: newBranch forKey: [newBranch UUID]];
+    
+    return newBranch;
+}
+
+- (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID metadata: (NSDictionary *)metadata atRevision: (CORevision *)aRev
+{
+    COBranch *newBranch = [[[COBranch alloc] initWithUUID: aUUID
+	                                   objectGraphContext: nil
+                                           persistentRoot: self
+                               parentRevisionForNewBranch: [aRev revisionID]] autorelease];
+    
+    if (metadata != nil)
+    {
+        [newBranch setMetadata: metadata];
+    }
     
     [_branchForUUID setObject: newBranch forKey: [newBranch UUID]];
     

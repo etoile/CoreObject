@@ -3,9 +3,9 @@
 
 @interface COEditGroup : COEdit
 {
-    NSArray *_contents;
+    NSMutableArray *_contents;
 }
 
-@property (nonatomic, readwrite, copy) NSArray *contents;
+@property (nonatomic, readwrite, copy) NSMutableArray *contents;
 
 @end

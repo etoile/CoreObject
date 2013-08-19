@@ -82,6 +82,7 @@
     COUndoStackStore *_undoStackStore;
     BOOL _isRecordingUndo;
     COEditGroup *_currentEditGroup;
+    NSString *_undoStackName;
 }
 
 /** 
@@ -269,6 +270,13 @@
  */
 - (NSArray *)commitWithType: (NSString *)type
            shortDescription: (NSString *)shortDescription;
+
+/**
+ * @taskunit Undo
+ */
+
+@property (readwrite, nonatomic, copy) NSString *undoStackName;
+
 /** 
  * @taskunit Framework Private 
  */

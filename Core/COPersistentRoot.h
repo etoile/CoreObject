@@ -357,6 +357,8 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev;
 
+- (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID metadata: (NSDictionary *)metadata atRevision: (CORevision *)aRev;
+
 - (BOOL) isPersistentRootCommitted;
 
 - (void)storePersistentRootDidChange: (NSNotification *)notif;
