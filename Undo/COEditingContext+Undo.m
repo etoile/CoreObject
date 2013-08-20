@@ -121,9 +121,9 @@
             return;
         }
 
-//        id plist = [_currentEditGroup plist];
+        id plist = [_currentEditGroup plist];
         
-//        NSLog(@"Undo event: %@", plist);
+        NSLog(@"Undo event: %@", plist);
         
 //        [_undoStackStore pushAction: plist stack: kCOUndoStack forName: self.undoStackName];
 //        

@@ -1,4 +1,4 @@
 #import <CoreObject/COEdit.h>
 
-@interface COEditDeletePersistentRoot : COEdit
+@interface COEditDeletePersistentRoot : COSingleEdit
 @end

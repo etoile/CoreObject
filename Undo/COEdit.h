@@ -5,20 +5,9 @@
 @class COEditingContext;
 
 @interface COEdit : NSObject
-{
-    ETUUID *_storeUUID;
-    ETUUID *_persistentRootUUID;
-    NSDate *_timestamp;
-    NSString *_displayName;
-}
 
 + (COEdit *) editWithPlist: (id)aPlist;
 - (id) plist;
-
-@property (readwrite, nonatomic, copy) ETUUID *storeUUID;
-@property (readwrite, nonatomic, copy) ETUUID *persistentRootUUID;
-@property (readwrite, nonatomic, copy) NSDate *timestamp;
-@property (readwrite, nonatomic, copy) NSString *displayName;
 
 - (COEdit *) inverse;
 
@@ -33,14 +22,25 @@
  */
 - (id) initWithPlist: (id)plist;
 
+
+@end
+
+@interface COSingleEdit : COEdit
+{
+    ETUUID *_storeUUID;
+    ETUUID *_persistentRootUUID;
+    NSDate *_timestamp;
+    NSString *_displayName;
+}
+
+@property (readwrite, nonatomic, copy) ETUUID *storeUUID;
+@property (readwrite, nonatomic, copy) ETUUID *persistentRootUUID;
+@property (readwrite, nonatomic, copy) NSDate *timestamp;
+@property (readwrite, nonatomic, copy) NSString *displayName;
 /**
  * Framework private, implemented by COEdit but not subclasses
  */
 - (id) copyWithZone:(NSZone *)zone;
 
 @end
-
-//@interface COSingleEdit : COEdit
-//
-//@end
 

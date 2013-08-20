@@ -539,10 +539,11 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                                       error: NULL];
         ETAssert(ok);
         
+        CORevisionID *oldRevid = [[_currentRevisionID retain] autorelease];
         ASSIGN(_currentRevisionID, revId);
-
+        
         [[self editingContext] recordBranchSetCurrentRevision: self
-                                                oldRevisionID: [[self branchInfo] currentRevisionID]];
+                                                oldRevisionID: oldRevid];
     }
 	
     // Write branch deletion / undeletion

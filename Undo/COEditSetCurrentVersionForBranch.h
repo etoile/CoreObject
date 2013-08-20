@@ -4,7 +4,7 @@
 /**
  * undo setting from old -> new (to apply, replace new by old)
  */
-@interface COEditSetCurrentVersionForBranch : COEdit
+@interface COEditSetCurrentVersionForBranch : COSingleEdit
 {
     ETUUID *_branchUUID;
     CORevisionID *_oldRevisionID;

@@ -11,8 +11,8 @@ static NSString * const kCOEditNewBranchUUID = @"COEditNewBranchUUID";
 
 @implementation COEditSetCurrentBranch
 
-@synthesize oldBranchUUID;
-@synthesize newBranchUUID;
+@synthesize oldBranchUUID = _oldBranchUUID;
+@synthesize newBranchUUID = _newBranchUUID;
 
 - (id) initWithPlist: (id)plist
 {

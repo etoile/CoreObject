@@ -10,9 +10,9 @@ static NSString * const kCOEditNewMetadata = @"COEditNewMetadata";
 
 @implementation COEditSetBranchMetadata 
 
-@synthesize branchUUID;
-@synthesize oldMetadata;
-@synthesize newMetadata;
+@synthesize branchUUID = _branchUUID;
+@synthesize oldMetadata = _oldMetadata;
+@synthesize newMetadata = _newMetadata;
 
 - (id) initWithPlist: (id)plist
 {
@@ -27,8 +27,14 @@ static NSString * const kCOEditNewMetadata = @"COEditNewMetadata";
 {
     NSMutableDictionary *result = [super plist];
     [result setObject: [_branchUUID stringValue] forKey: kCOEditBranchUUID];
-    [result setObject: oldMetadata forKey: kCOEditOldMetadata];
-    [result setObject: newMetadata forKey: kCOEditNewMetadata];
+    if (_oldMetadata != nil)
+    {
+        [result setObject: _oldMetadata forKey: kCOEditOldMetadata];
+    }
+    if (_newMetadata != nil)
+    {
+        [result setObject: _newMetadata forKey: kCOEditNewMetadata];
+    }
     return result;
 }
 
@@ -56,7 +62,7 @@ static NSString * const kCOEditNewMetadata = @"COEditNewMetadata";
     COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
     COBranch *branch = [proot branchForUUID: _branchUUID];
     
-    [branch setMetadata: newMetadata];
+    [branch setMetadata: _newMetadata];
 }
 
 @end

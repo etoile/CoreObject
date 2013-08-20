@@ -31,10 +31,17 @@ static NSString * const kCOEditDisplayName = @"COEditDisplayName";
 
 @implementation COEdit
 
-@synthesize storeUUID = _storeUUID;
-@synthesize persistentRootUUID = _persistentRootUUID;
-@synthesize timestamp = _timestamp;
-@synthesize displayName = _displayName;
++ (NSDictionary *) mapping
+{
+    return D([COEditGroup class], kCOEditTypeEditGroup,
+           [COEditDeleteBranch class], kCOEditTypeDeleteBranch,
+           [COEditUndeleteBranch class], kCOEditTypeUndeleteBranch,
+           [COEditSetBranchMetadata class], kCOEditTypeSetBranchMetadata,
+           [COEditSetCurrentBranch class], kCOEditTypeSetCurrentBranch,
+           [COEditSetCurrentVersionForBranch class], kCOEditTypeSetCurrentVersionForBranch,
+           [COEditDeletePersistentRoot class], kCOEditTypeDeletePersistentRoot,
+           [COEditUndeletePersistentRoot class], kCOEditTypeUndeletePersistentRoot);
+}
 
 + (COEdit *) editWithPlist: (id)aPlist
 {
@@ -42,16 +49,7 @@ static NSString * const kCOEditDisplayName = @"COEditDisplayName";
     
     // TODO: Allow for user defined types somehow
     
-    Class cls = [D([COEditGroup class], kCOEditTypeEditGroup,
-                   [COEditDeleteBranch class], kCOEditTypeDeleteBranch,
-                   [COEditUndeleteBranch class], kCOEditTypeUndeleteBranch,
-                   [COEditSetBranchMetadata class], kCOEditTypeSetBranchMetadata,
-                   [COEditSetCurrentBranch class], kCOEditTypeSetCurrentBranch,
-                   [COEditSetCurrentVersionForBranch class], kCOEditTypeSetCurrentVersionForBranch,
-                   [COEditDeletePersistentRoot class], kCOEditTypeDeletePersistentRoot,
-                   [COEditUndeletePersistentRoot class], kCOEditTypeUndeletePersistentRoot)
-                 objectForKey: type];
-    
+    Class cls = [[self mapping] objectForKey: type];
 
     if (cls != Nil)
     {
@@ -66,21 +64,25 @@ static NSString * const kCOEditDisplayName = @"COEditDisplayName";
 
 - (id) initWithPlist: (id)plist
 {
-    SUPERINIT;
-    self.storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditStoreUUID]];
-    self.persistentRootUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditPersistentRootUUID]];
-    self.timestamp = [[[[NSDateFormatter alloc] init] autorelease] dateFromString: [plist objectForKey: kCOEditTimestamp]];
-    self.displayName = [plist objectForKey: kCOEditDisplayName];
-    return self;
+    [NSException raise: NSInvalidArgumentException format: @"override"];
+    return nil;
 }
 
 - (id) plist
 {
     NSMutableDictionary *result = [NSMutableDictionary dictionary];
-    [result setObject: [_storeUUID stringValue] forKey: kCOEditStoreUUID];
-    [result setObject: [_persistentRootUUID stringValue] forKey: kCOEditPersistentRootUUID];
-    [result setObject: [[[[NSDateFormatter alloc] init] autorelease] stringFromDate: _timestamp] forKey: kCOEditTimestamp];
-    [result setObject: _displayName forKey: kCOEditDisplayName];
+ 
+    NSString *resultType = nil;
+    NSDictionary *typeToClass = [COEdit mapping];
+    for (NSString *type in typeToClass)
+    {
+        if ([self class] == [typeToClass objectForKey: type])
+        {
+            resultType = type;
+        }
+    }
+    
+    [result setObject: resultType forKey: kCOEditType];
     return result;
 }
 
@@ -101,9 +103,38 @@ static NSString * const kCOEditDisplayName = @"COEditDisplayName";
     [NSException raise: NSInvalidArgumentException format: @"override"];
 }
 
+@end
+
+@implementation COSingleEdit
+
+@synthesize storeUUID = _storeUUID;
+@synthesize persistentRootUUID = _persistentRootUUID;
+@synthesize timestamp = _timestamp;
+@synthesize displayName = _displayName;
+
+- (id) initWithPlist: (id)plist
+{
+    SUPERINIT;
+    self.storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditStoreUUID]];
+    self.persistentRootUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditPersistentRootUUID]];
+    self.timestamp = [[[[NSDateFormatter alloc] init] autorelease] dateFromString: [plist objectForKey: kCOEditTimestamp]];
+    self.displayName = [plist objectForKey: kCOEditDisplayName];
+    return self;
+}
+
+- (id) plist
+{
+    NSMutableDictionary *result = [super plist];
+    [result setObject: [_storeUUID stringValue] forKey: kCOEditStoreUUID];
+    [result setObject: [_persistentRootUUID stringValue] forKey: kCOEditPersistentRootUUID];
+    [result setObject: [[[[NSDateFormatter alloc] init] autorelease] stringFromDate: _timestamp] forKey: kCOEditTimestamp];
+    [result setObject: _displayName forKey: kCOEditDisplayName];
+    return result;
+}
+
 - (id) copyWithZone:(NSZone *)zone
 {
-    COEdit *aCopy = [[[self class] allocWithZone: zone] init];
+    COSingleEdit *aCopy = [[[self class] allocWithZone: zone] init];
     aCopy.storeUUID = _storeUUID;
     aCopy.persistentRootUUID = _persistentRootUUID;
     aCopy.timestamp = _timestamp;

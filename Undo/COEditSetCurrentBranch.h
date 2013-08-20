@@ -1,6 +1,6 @@
 #import <CoreObject/COEdit.h>
 
-@interface COEditSetCurrentBranch : COEdit
+@interface COEditSetCurrentBranch : COSingleEdit
 {
     ETUUID *_oldBranchUUID;
     ETUUID *_newBranchUUID;

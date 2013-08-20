@@ -16,7 +16,7 @@ static NSString * const kCOEditContents = @"COEditContents";
 
 - (id) initWithPlist: (id)plist
 {
-    self = [super initWithPlist: plist];
+    SUPERINIT;
     
     NSMutableArray *edits = [NSMutableArray array];
     for (id editPlist in [plist objectForKey: kCOEditContents])
@@ -45,7 +45,7 @@ static NSString * const kCOEditContents = @"COEditContents";
 
 - (COEdit *) inverse
 {
-    COEditGroup *inverse = [[super copyWithZone: NSDefaultMallocZone()] autorelease];
+    COEditGroup *inverse = [[[COEditGroup alloc] init] autorelease];
     
     NSMutableArray *edits = [NSMutableArray array];
     for (COEdit *subEdit in _contents)

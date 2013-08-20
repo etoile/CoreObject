@@ -10,11 +10,11 @@ static NSString * const kCOEditBranchUUID = @"COEditBranchUUID";
 static NSString * const kCOEditOldRevisionID = @"COEditOldRevisionID";
 static NSString * const kCOEditNewRevisionID = @"COEditNewRevisionID";
 
-@implementation COEditSetCurrentVersionForBranch : COEdit
+@implementation COEditSetCurrentVersionForBranch 
 
-@synthesize branchUUID;
-@synthesize oldRevisionID;
-@synthesize newRevisionID;
+@synthesize branchUUID = _branchUUID;
+@synthesize oldRevisionID = _oldRevisionID;
+@synthesize newRevisionID = _newRevisionID;
 
 - (id) initWithPlist: (id)plist
 {
