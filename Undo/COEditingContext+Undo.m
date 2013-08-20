@@ -8,13 +8,13 @@
 #import <EtoileFoundation/Macros.h>
 
 #import "COEditGroup.h"
-#import "COEditCreateBranch.h"
 #import "COEditDeleteBranch.h"
+#import "COEditUndeleteBranch.h"
 #import "COEditSetBranchMetadata.h"
 #import "COEditSetCurrentBranch.h"
 #import "COEditSetCurrentVersionForBranch.h"
-#import "COEditCreatePersistentRoot.h"
 #import "COEditDeletePersistentRoot.h"
+#import "COEditUndeletePersistentRoot.h"
 
 @implementation COEditingContext (Undo)
 
@@ -120,33 +120,79 @@
             DESTROY(_currentEditGroup);
             return;
         }
-        
+
 //        id plist = [_currentEditGroup plist];
+        
+//        NSLog(@"Undo event: %@", plist);
+        
 //        [_undoStackStore pushAction: plist stack: kCOUndoStack forName: self.undoStackName];
 //        
         DESTROY(_currentEditGroup);
     }
 }
 
+- (void) recordEditInverse: (COEdit*)anInverse
+{
+    [_currentEditGroup.contents addObject: anInverse];
+}
+
+// Called from COEditingContext
+
 - (void) recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd)); 
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+    
+    COEditUndeletePersistentRoot *edit = [[[COEditUndeletePersistentRoot alloc] init] autorelease];
+    edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
+    edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
+    edit.timestamp = [NSDate date];
+    edit.displayName = @"Delete Persistent Root";
+    
+    [self recordEditInverse: edit];
 }
 - (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    COEditDeletePersistentRoot *edit = [[[COEditDeletePersistentRoot alloc] init] autorelease];
+    edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
+    edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
+    edit.timestamp = [NSDate date];
+    edit.displayName = @"Undelete Persistent Root";
+    
+    [self recordEditInverse: edit];
 }
 
 // Called from COPersistentRoot
 
-- (void) recordPersistentRootCreation: (COPersistentRootInfo *)info
+- (void) recordPersistentRootCreation: (COPersistentRoot *)aPersistentRoot
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    COEditDeletePersistentRoot *edit = [[[COEditDeletePersistentRoot alloc] init] autorelease];
+    edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
+    edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
+    edit.timestamp = [NSDate date];
+    edit.displayName = @"Create Persistent Root";
+    
+    [self recordEditInverse: edit];
 }
 - (void) recordPersistentRoot: (COPersistentRoot *)aPersistentRoot
              setCurrentBranch: (COBranch *)aBranch
+                    oldBranch: (COBranch *)oldBranch
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    COEditSetCurrentBranch *edit = [[[COEditSetCurrentBranch alloc] init] autorelease];
+    edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
+    edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
+    edit.timestamp = [NSDate date];
+    edit.displayName = @"Switch Branch";
+    
+    edit.oldBranchUUID = [aBranch UUID];
+    edit.newBranchUUID = [oldBranch UUID];
+    
+    [self recordEditInverse: edit];
 }
 
 // Called from COBranch
@@ -154,62 +200,82 @@
 - (void) recordBranchCreation: (COBranch *)aBranch
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
-    
-    COEditCreateBranch *edit = [[[COEditCreateBranch alloc] init] autorelease];
+
+    COEditDeleteBranch *edit = [[[COEditDeleteBranch alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];
     edit.displayName = @"Create branch";
     
     edit.branchUUID = [aBranch UUID];
-    edit.revisionID = [[aBranch currentRevision] revisionID];
-    edit.metadata = [aBranch metadata];
-
-    [_currentEditGroup.contents addObject: edit];
+    
+    [self recordEditInverse: edit];
 }
 
 - (void) recordBranchSetCurrentRevision: (COBranch *)aBranch
                           oldRevisionID: (CORevisionID *)aRevisionID
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
+    
+    COEditSetCurrentVersionForBranch *edit = [[[COEditSetCurrentVersionForBranch alloc] init] autorelease];
+    edit.storeUUID = [[[aBranch editingContext] store] UUID];
+    edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
+    edit.timestamp = [NSDate date];
+    edit.displayName = @"Revert or Commit";
+    
+    edit.branchUUID = [aBranch UUID];
+    edit.oldRevisionID = [[aBranch currentRevision] revisionID];
+    edit.newRevisionID = aRevisionID;
+    
+    [self recordEditInverse: edit];
 }
+
 - (void) recordBranchSetMetadata: (COBranch *)aBranch
                      oldMetadata: (id)oldMetadata
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
+    
+    COEditSetBranchMetadata *edit = [[[COEditSetBranchMetadata alloc] init] autorelease];
+    edit.storeUUID = [[[aBranch editingContext] store] UUID];
+    edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
+    edit.timestamp = [NSDate date];
+    edit.displayName = @"Set Branch Metadata";
+    
+    edit.branchUUID = [aBranch UUID];
+    edit.oldMetadata = [aBranch metadata];
+    edit.newMetadata = oldMetadata;
+    
+    [self recordEditInverse: edit];
 }
+
 - (void) recordBranchDeletion: (COBranch *)aBranch
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
 
-    COEditDeleteBranch *edit = [[[COEditDeleteBranch alloc] init] autorelease];
+    COEditUndeleteBranch *edit = [[[COEditUndeleteBranch alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];
     edit.displayName = @"Delete branch";
     
     edit.branchUUID = [aBranch UUID];
-    edit.revisionID = [[aBranch currentRevision] revisionID];
-    edit.metadata = [aBranch metadata];
     
-    [_currentEditGroup.contents addObject: edit];
+    [self recordEditInverse: edit];
 }
 
 - (void) recordBranchUndeletion: (COBranch *)aBranch
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
-    
-    COEditCreateBranch *edit = [[[COEditCreateBranch alloc] init] autorelease];
+  
+    COEditDeleteBranch *edit = [[[COEditDeleteBranch alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];
-    edit.displayName = @"Create branch";
+    edit.displayName = @"Undelete branch";
     
     edit.branchUUID = [aBranch UUID];
-    edit.revisionID = [[aBranch currentRevision] revisionID];
-    edit.metadata = [aBranch metadata];
     
-    [_currentEditGroup.contents addObject: edit];
+    [self recordEditInverse: edit];
 }
 
 @end

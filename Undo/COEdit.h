@@ -40,3 +40,7 @@
 
 @end
 
+//@interface COSingleEdit : COEdit
+//
+//@end
+

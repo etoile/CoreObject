@@ -1,16 +1,14 @@
-#import "COEdit.h"
+#import <CoreObject/COEdit.h>
 
 @interface COEditSetBranchMetadata : COEdit
 {
-    ETUUID *branch_;
-    NSDictionary *old_;
-    NSDictionary *new_;
+    ETUUID *_branchUUID;
+    NSDictionary *_oldMetadata;
+    NSDictionary *_newMetadata;
 }
 
-- (id) initWithOldMetadata: (NSDictionary *)oldMeta
-               newMetadata: (NSDictionary *)newMeta
-                      UUID: (ETUUID*)aUUID
-                branchUUID: (ETUUID*)aBranch
-                      date: (NSDate*)aDate
-               displayName: (NSString*)aName;
+@property (readwrite, nonatomic, copy) ETUUID *branchUUID;
+@property (readwrite, nonatomic, copy) NSDictionary *oldMetadata;
+@property (readwrite, nonatomic, copy) NSDictionary *newMetadata;
+
 @end

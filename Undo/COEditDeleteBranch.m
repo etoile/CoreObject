@@ -1,24 +1,39 @@
+#import "COEditUndeleteBranch.h"
 #import "COEditDeleteBranch.h"
-#import "COEditCreateBranch.h"
-#import <EtoileFoundation/Macros.h>
+
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
-#import "CORevision.h"
+
+static NSString * const kCOEditBranchUUID = @"COEditBranchUUID";
 
 @implementation COEditDeleteBranch
 
+@synthesize branchUUID;
+
+- (id) initWithPlist: (id)plist
+{
+    self = [super initWithPlist: plist];
+    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditBranchUUID]];
+    return self;
+}
+
+- (id) plist
+{
+    NSMutableDictionary *result = [super plist];
+    [result setObject: [_branchUUID stringValue] forKey: kCOEditBranchUUID];
+    return result;
+}
+
 - (COEdit *) inverse
 {
-    COEditCreateBranch *inverse = [[[COEditCreateBranch alloc] init] autorelease];
+    COEditUndeleteBranch *inverse = [[[COEditUndeleteBranch alloc] init] autorelease];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;
     inverse.displayName = _displayName;
 
     inverse.branchUUID = _branchUUID;
-    inverse.revisionID = _revisionID;
-    inverse.metadata = _metadata;
     return inverse;
 }
 

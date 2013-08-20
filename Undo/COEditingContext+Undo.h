@@ -23,9 +23,10 @@
 
 // Called from COPersistentRoot
 
-- (void) recordPersistentRootCreation: (COPersistentRootInfo *)info;
+- (void) recordPersistentRootCreation: (COPersistentRoot *)info;
 - (void) recordPersistentRoot: (COPersistentRoot *)aPersistentRoot
-             setCurrentBranch: (COBranch *)aBranch;
+             setCurrentBranch: (COBranch *)aBranch
+                    oldBranch: (COBranch *)oldBranch;
 
 // Called from COBranch
 

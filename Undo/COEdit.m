@@ -2,24 +2,24 @@
 #import <EtoileFoundation/Macros.h>
 
 #import "COEditGroup.h"
-#import "COEditCreateBranch.h"
 #import "COEditDeleteBranch.h"
+#import "COEditUndeleteBranch.h"
 #import "COEditSetBranchMetadata.h"
 #import "COEditSetCurrentBranch.h"
 #import "COEditSetCurrentVersionForBranch.h"
-#import "COEditCreatePersistentRoot.h"
 #import "COEditDeletePersistentRoot.h"
+#import "COEditUndeletePersistentRoot.h"
 
 // Edit types
 
 static NSString * const kCOEditTypeEditGroup = @"COEditTypeEditGroup";
-static NSString * const kCOEditTypeCreateBranch = @"COEditTypeCreateBranch";
 static NSString * const kCOEditTypeDeleteBranch = @"COEditTypeDeleteBranch";
+static NSString * const kCOEditTypeUndeleteBranch = @"COEditTypeUndeleteBranch";
 static NSString * const kCOEditTypeSetBranchMetadata = @"COEditTypeSetBranchMetadata";
 static NSString * const kCOEditTypeSetCurrentBranch = @"COEditTypeSetCurrentBranch";
 static NSString * const kCOEditTypeSetCurrentVersionForBranch = @"COEditTypeSetCurrentVersionForBranch";
-static NSString * const kCOEditTypeCreatePersistentRoot = @"COEditTypeCreatePersistentRoot";
 static NSString * const kCOEditTypeDeletePersistentRoot = @"COEditTypeDeletePersistentRoot";
+static NSString * const kCOEditTypeUndeletePersistentRoot = @"COEditTypeUndeletePersistentRoot";
 
 // Edit properties
 
@@ -43,13 +43,13 @@ static NSString * const kCOEditDisplayName = @"COEditDisplayName";
     // TODO: Allow for user defined types somehow
     
     Class cls = [D([COEditGroup class], kCOEditTypeEditGroup,
-                   [COEditCreateBranch class], kCOEditTypeCreateBranch,
                    [COEditDeleteBranch class], kCOEditTypeDeleteBranch,
+                   [COEditUndeleteBranch class], kCOEditTypeUndeleteBranch,
                    [COEditSetBranchMetadata class], kCOEditTypeSetBranchMetadata,
                    [COEditSetCurrentBranch class], kCOEditTypeSetCurrentBranch,
                    [COEditSetCurrentVersionForBranch class], kCOEditTypeSetCurrentVersionForBranch,
-                   [COEditCreatePersistentRoot class], kCOEditTypeCreatePersistentRoot,
-                   [COEditDeletePersistentRoot class], kCOEditTypeDeletePersistentRoot)
+                   [COEditDeletePersistentRoot class], kCOEditTypeDeletePersistentRoot,
+                   [COEditUndeletePersistentRoot class], kCOEditTypeUndeletePersistentRoot)
                  objectForKey: type];
     
 

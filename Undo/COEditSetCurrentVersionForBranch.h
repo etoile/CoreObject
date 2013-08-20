@@ -7,15 +7,12 @@
 @interface COEditSetCurrentVersionForBranch : COEdit
 {
     ETUUID *_branchUUID;
-    CORevisionID *_oldCurrentRevision;
-    CORevisionID *_newCurrentRevision;
+    CORevisionID *_oldRevisionID;
+    CORevisionID *_newRevisionID;
 }
 
-- (id) initWithBranch: (ETUUID *)aBranch
-             oldToken: (CORevisionID *)oldToken
-             newToken: (CORevisionID *)newToken
-                 UUID: (ETUUID*)aUUID
-                 date: (NSDate*)aDate
-          displayName: (NSString*)aName;
+@property (readwrite, nonatomic, copy) ETUUID *branchUUID;
+@property (readwrite, nonatomic, copy) CORevisionID *oldRevisionID;
+@property (readwrite, nonatomic, copy) CORevisionID *newRevisionID;
 
 @end

@@ -352,7 +352,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
                                                             error: NULL];
         }
         ETAssert(info != nil);
-        [_parentContext recordPersistentRootCreation: info];
+        [_parentContext recordPersistentRootCreation: self];
         
         
         //revId = [[info currentBranchInfo] currentRevisionID];
@@ -381,7 +381,9 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
             ETAssert([store setCurrentBranch: _currentBranchUUID
                            forPersistentRoot: [self persistentRootUUID]
                                        error: NULL]);
-            [_parentContext recordPersistentRoot: self setCurrentBranch: [self currentBranch]];
+            [_parentContext recordPersistentRoot: self
+                                setCurrentBranch: [self currentBranch]
+                                       oldBranch: [self branchForUUID: [_savedState currentBranchUUID]]];
         }
     }
 

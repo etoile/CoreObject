@@ -1,15 +1,12 @@
-#import "COEdit.h"
+#import <CoreObject/COEdit.h>
 
 @interface COEditSetCurrentBranch : COEdit
 {
-    ETUUID *oldBranch_;
-    ETUUID *newBranch_;
-
+    ETUUID *_oldBranchUUID;
+    ETUUID *_newBranchUUID;
 }
 
-- (id) initWithOldBranchUUID: (ETUUID*)aOldBranchUUID
-               newBranchUUID: (ETUUID*)aNewBranchUUID
-                        UUID: (ETUUID*)aUUID
-                        date: (NSDate*)aDate
-                 displayName: (NSString*)aName;
+@property (readwrite, nonatomic, copy) ETUUID *oldBranchUUID;
+@property (readwrite, nonatomic, copy) ETUUID *newBranchUUID;
+
 @end

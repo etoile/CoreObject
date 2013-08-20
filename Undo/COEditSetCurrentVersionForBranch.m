@@ -6,75 +6,68 @@
 #import "COBranch.h"
 #import "CORevision.h"
 
+static NSString * const kCOEditBranchUUID = @"COEditBranchUUID";
+static NSString * const kCOEditOldRevisionID = @"COEditOldRevisionID";
+static NSString * const kCOEditNewRevisionID = @"COEditNewRevisionID";
+
 @implementation COEditSetCurrentVersionForBranch : COEdit
 
-static NSString *kCOBranchUUID = @"COBranchUUID";
-static NSString *kCOOldVersionToken = @"COOldVersionToken";
-static NSString *kCONewVersionToken = @"CONewVersionToken";
+@synthesize branchUUID;
+@synthesize oldRevisionID;
+@synthesize newRevisionID;
 
-//- (id) initWithBranch: (ETUUID *)aBranch
-//             oldToken: (CORevisionID *)oldToken
-//             newToken: (CORevisionID *)newToken
-//                 UUID: (ETUUID*)aUUID
-//                 date: (NSDate*)aDate
-//          displayName: (NSString*)aName
-//{
-//    NILARG_EXCEPTION_TEST(aBranch);
-//    NILARG_EXCEPTION_TEST(oldToken);
-//    NILARG_EXCEPTION_TEST(newToken);
-//    
-//    self = [super initWithUUID: aUUID date: aDate displayName: aName];
-//    ASSIGN(branch_, aBranch);
-//    ASSIGN(oldToken_, oldToken);
-//    ASSIGN(newToken_, newToken);
-//    return self;
-//}
-//
-//- (id) initWithPlist: (id)plist
-//{
-//    self = [super initWithPlist: plist];
-//
-//    ASSIGN(branch_, [ETUUID UUIDWithString: [plist objectForKey: kCOBranchUUID]]);
-//    ASSIGN(oldToken_, [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOOldVersionToken]]);
-//    ASSIGN(newToken_, [CORevisionID revisionIDWithPlist: [plist objectForKey: kCONewVersionToken]]);
-//    
-//    return self;
-//}
-//- (id)plist
-//{
-//    NSMutableDictionary *result = [NSMutableDictionary dictionary];
-//    [result addEntriesFromDictionary: [super plist]];
-//    [result setObject: [branch_ stringValue] forKey: kCOBranchUUID];
-//    [result setObject: [oldToken_ plist] forKey: kCOOldVersionToken];
-//    [result setObject: [newToken_ plist] forKey: kCONewVersionToken];
-//    [result setObject: kCOEditSetCurrentVersionForBranch forKey: kCOUndoAction];
-//    return result;
-//}
-//
-//- (COEdit *) inverseForApplicationTo: (COPersistentRootInfo *)aProot
-//{
-//    return [[[[self class] alloc] initWithBranch: branch_
-//                                        oldToken: newToken_
-//                                        newToken: oldToken_
-//                                            UUID: uuid_
-//                                            date: date_
-//                                     displayName: displayName_] autorelease];
-//}
+- (id) initWithPlist: (id)plist
+{
+    self = [super initWithPlist: plist];
+    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditBranchUUID]];
+    self.oldRevisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOEditOldRevisionID]];
+    self.newRevisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOEditNewRevisionID]];
+    return self;
+}
+
+- (id) plist
+{
+    NSMutableDictionary *result = [super plist];
+    [result setObject: [_branchUUID stringValue] forKey: kCOEditBranchUUID];
+    [result setObject: [_oldRevisionID plist] forKey:kCOEditOldRevisionID];
+    [result setObject: [_newRevisionID plist] forKey: kCOEditNewRevisionID];
+    return result;
+}
+
+- (COEdit *) inverse
+{
+    COEditSetCurrentVersionForBranch *inverse = [[[COEditSetCurrentVersionForBranch alloc] init] autorelease];
+    inverse.storeUUID = _storeUUID;
+    inverse.persistentRootUUID = _persistentRootUUID;
+    inverse.timestamp = _timestamp;
+    inverse.displayName = _displayName;
+    
+    inverse.branchUUID = _branchUUID;
+    inverse.oldRevisionID = _newRevisionID;
+    inverse.newRevisionID = _oldRevisionID;
+    return inverse;
+}
+
+- (BOOL) canApplyToContext: (COEditingContext *)aContext
+{
+    // FIXME: Actual logic here..
+    return YES;
+}
 
 - (void) applyToContext: (COEditingContext *)aContext
 {
     COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
     
     COBranch *branch = [proot branchForUUID: _branchUUID];
-    if ([[[branch currentRevision] revisionID] isEqual: _oldCurrentRevision])
+    if ([[[branch currentRevision] revisionID] isEqual: _oldRevisionID])
     {
         [branch setCurrentRevision: [CORevision revisionWithStore: [proot store]
-                                                       revisionID: _newCurrentRevision]];
+                                                       revisionID: _newRevisionID]];
     }
     else
     {
-        COItemGraph *oldGraph = [[proot store] itemGraphForRevisionID: _oldCurrentRevision];
-        COItemGraph *newGraph = [[proot store] itemGraphForRevisionID: _newCurrentRevision];
+        COItemGraph *oldGraph = [[proot store] itemGraphForRevisionID: _oldRevisionID];
+        COItemGraph *newGraph = [[proot store] itemGraphForRevisionID: _newRevisionID];
         
         // .. Selectively apply this patch to the current state of the editing context.
     }
