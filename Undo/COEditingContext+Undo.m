@@ -130,8 +130,13 @@
             return;
         }
 
-        id plist = [_currentEditGroup plist];
+        // Optimisation: collapse COEditGroups that contain only one child
+        COEdit *objectToSerialize =
+            (1 == [_currentEditGroup.contents count])
+            ? [_currentEditGroup.contents firstObject]
+            : _currentEditGroup;
         
+        id plist = [objectToSerialize plist];        
         NSLog(@"Undo event: %@", plist);
         
         // N.B. The kCOUndoStack contains COEdits that are the inverse of

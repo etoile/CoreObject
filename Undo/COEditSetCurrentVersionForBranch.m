@@ -6,6 +6,9 @@
 #import "COBranch.h"
 #import "CORevision.h"
 
+#import "COItemGraphDiff.h"
+#import "COObjectGraphContext.h"
+
 static NSString * const kCOEditBranchUUID = @"COEditBranchUUID";
 static NSString * const kCOEditOldRevisionID = @"COEditOldRevisionID";
 static NSString * const kCOEditNewRevisionID = @"COEditNewRevisionID";
@@ -66,10 +69,26 @@ static NSString * const kCOEditNewRevisionID = @"COEditNewRevisionID";
     }
     else
     {
+        // Selectively apply the _oldRevisionID -> _newRevisionID change
+     
+        // FIXME: Error handling
+        
         COItemGraph *oldGraph = [[proot store] itemGraphForRevisionID: _oldRevisionID];
         COItemGraph *newGraph = [[proot store] itemGraphForRevisionID: _newRevisionID];
         
-        // .. Selectively apply this patch to the current state of the editing context.
+        // Current state of the branch
+        
+        COItemGraph *currentGraph = [[proot store] itemGraphForRevisionID:
+                                     [[branch currentRevision] revisionID]];
+        
+        COItemGraphDiff *diff1 = [COItemGraphDiff diffItemTree: oldGraph withItemTree: newGraph sourceIdentifier: @"diff1"];
+        COItemGraphDiff *diff2 = [COItemGraphDiff diffItemTree: oldGraph withItemTree: currentGraph sourceIdentifier: @"diff2"];
+        
+        COItemGraphDiff *merged = [diff1 itemTreeDiffByMergingWithDiff: diff2];
+        
+        id<COItemGraph> result = [merged itemTreeWithDiffAppliedToItemGraph: oldGraph];
+        
+        [[branch objectGraphContext] setItemGraph: result];
     }
 }
 
