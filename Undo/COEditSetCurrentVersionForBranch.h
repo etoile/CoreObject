@@ -1,9 +1,6 @@
 #import "COEdit.h"
 #import "CORevisionID.h"
 
-/**
- * undo setting from old -> new (to apply, replace new by old)
- */
 @interface COEditSetCurrentVersionForBranch : COSingleEdit
 {
     ETUUID *_branchUUID;

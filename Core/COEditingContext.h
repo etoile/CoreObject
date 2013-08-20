@@ -275,6 +275,9 @@
  * @taskunit Undo
  */
 
+/**
+ * Deprecated
+ */
 @property (readwrite, nonatomic, copy) NSString *undoStackName;
 
 /** 
