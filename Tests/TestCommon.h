@@ -20,11 +20,17 @@
 #import "COItemGraphDiff.h"
 #import "COContainer.h"
 #import "COUndoStackStore.h"
+#import "COEditingContext+Undo.h"
 
 #define SA(x) [NSSet setWithArray: x]
 
 #define STORE_CLASS [COSQLiteStore class]
 #define STORE_URL [NSURL fileURLWithPath: [@"~/TestStore.sqlite" stringByExpandingTildeInPath]]
+
+extern NSString * const kCOLabel;
+extern NSString * const kCOContents;
+extern NSString * const kCOParent;
+
 
 /**
  * Temporary test for COSQLiteStore

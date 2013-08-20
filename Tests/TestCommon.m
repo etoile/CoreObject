@@ -4,6 +4,10 @@
 #import "COSQLiteStore.h"
 #import "TestCommon.h"
 
+NSString * const kCOLabel = @"label";
+NSString * const kCOContents = @"contents";
+NSString * const kCOParent = @"parentContainer";
+
 
 @implementation COSQLiteStoreTestCase
 

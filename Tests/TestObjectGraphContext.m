@@ -8,10 +8,6 @@
 
 @end
 
-static NSString *kCOLabel = @"label";
-static NSString *kCOContents = @"contents";
-static NSString *kCOParent = @"parentContainer";
-
 @implementation TestObjectGraphContext
 
 - (id) init

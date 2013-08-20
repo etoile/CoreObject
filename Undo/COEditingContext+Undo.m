@@ -45,51 +45,60 @@
 - (BOOL) canUndoForStackNamed: (NSString *)aName
 {
     COEdit *edit = [self peekEditFromStack: kCOUndoStack forName: aName];
-    COEdit *inverse = [edit inverse];
-    return [self canApplyEdit: inverse];
+    return [self canApplyEdit: edit];
 }
 
 - (BOOL) canRedoForStackNamed: (NSString *)aName
 {
     COEdit *edit = [self peekEditFromStack: kCOUndoStack forName: aName];
-    COEdit *inverse = [edit inverse];
-    return [self canApplyEdit: inverse];
+    return [self canApplyEdit: edit];
 }
 
-- (BOOL) undoForStackNamed: (NSString *)aName
+- (BOOL) popAndApplyFromStack: (NSString *)popStack pushToStack: (NSString*)pushStack name: (NSString *)aName
 {
     [_undoStackStore beginTransaction];
     
-    COEdit *edit = [self peekEditFromStack: kCOUndoStack forName: aName];
+    COEdit *edit = [self peekEditFromStack: popStack forName: aName];
     if (![self canApplyEdit: edit])
     {
         [_undoStackStore commitTransaction];
         [NSException raise: NSInvalidArgumentException format: @"Can't apply edit %@", edit];
     }
     
-    // Pop from undo stack, push the inverse onto the redo stack.
+    // Pop from undo stack    
+    [_undoStackStore popStack: popStack forName: aName];
     
-    [_undoStackStore popStack: kCOUndoStack forName: aName];
-    
-    COEdit *inverse = [edit inverse];
-    [inverse applyToContext: self];
+    // Apply the edit    
+    [edit applyToContext: self];
     
     // N.B. This must not automatically push a revision
+    _isRecordingUndo = NO;
     [self commit];
-    
-    [_undoStackStore pushAction: [inverse plist] stack: kCORedoStack forName: aName];
+    _isRecordingUndo = YES;
+
+    // Push the inverse onto the redo stack    
+    COEdit *inverse = [edit inverse];
+
+    [_undoStackStore pushAction: [inverse plist] stack: pushStack forName: aName];
 
     return [_undoStackStore commitTransaction];
 }
 
+- (BOOL) undoForStackNamed: (NSString *)aName
+{
+    return [self popAndApplyFromStack: kCOUndoStack pushToStack: kCORedoStack name: aName];
+}
+
 - (BOOL) redoForStackNamed: (NSString *)aName
 {
-    // Same as above but swap undo and redo
+    return [self popAndApplyFromStack: kCORedoStack pushToStack: kCOUndoStack name: aName];
 }
 
 - (BOOL) commitWithStackNamed: (NSString *)aName
 {
-    // Version of commit that automatically pushes a COEditGroup of the edits made
+    self.undoStackName = aName;
+    [self commit];
+    return YES;
 }
 
 // Methods called during commit
@@ -125,8 +134,13 @@
         
         NSLog(@"Undo event: %@", plist);
         
-//        [_undoStackStore pushAction: plist stack: kCOUndoStack forName: self.undoStackName];
-//        
+        // N.B. The kCOUndoStack contains COEdits that are the inverse of
+        // what the user did. So if the user creates a persistent root,
+        // we push an edit to kCOUndoStack that deletes that persistent root.
+        // => to perform an undo, pop from the kCOUndoStack and apply the edit.
+        
+        [_undoStackStore pushAction: plist stack: kCOUndoStack forName: self.undoStackName];
+        
         DESTROY(_currentEditGroup);
     }
 }

@@ -89,6 +89,7 @@
 		663CE2BD17C15A4800E729F5 /* COEditGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2BB17C15A4800E729F5 /* COEditGroup.m */; };
 		663CE2BF17C1815B00E729F5 /* COEditDeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2B217C09DE700E729F5 /* COEditDeletePersistentRoot.m */; };
 		663CE2CD17C1837700E729F5 /* TestUndoStackStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2CC17C1837700E729F5 /* TestUndoStackStore.m */; };
+		666ED56C17C3E78A00D148AA /* TestUndo.m in Sources */ = {isa = PBXBuildFile; fileRef = 666ED56B17C3E78A00D148AA /* TestUndo.m */; };
 		6675F8C11785C02A001E5622 /* COItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BA1785C02A001E5622 /* COItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C21785C02A001E5622 /* COItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BB1785C02A001E5622 /* COItem.m */; };
 		6675F8C31785C02A001E5622 /* COItemGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BC1785C02A001E5622 /* COItemGraph.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -407,6 +408,7 @@
 		664199B2178C431E00B78174 /* TestSQLiteStorePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStorePerformance.m; path = Tests/TestSQLiteStorePerformance.m; sourceTree = "<group>"; };
 		664199B3178C431E00B78174 /* TestSQLiteStorePersistentRootBackingStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStorePersistentRootBackingStore.m; path = Tests/TestSQLiteStorePersistentRootBackingStore.m; sourceTree = "<group>"; };
 		66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCrossPersistentRootReferences.m; path = Tests/TestCrossPersistentRootReferences.m; sourceTree = "<group>"; };
+		666ED56B17C3E78A00D148AA /* TestUndo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUndo.m; path = Tests/TestUndo.m; sourceTree = "<group>"; };
 		6675F8BA1785C02A001E5622 /* COItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItem.h; sourceTree = "<group>"; };
 		6675F8BB1785C02A001E5622 /* COItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COItem.m; sourceTree = "<group>"; };
 		6675F8BC1785C02A001E5622 /* COItemGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItemGraph.h; sourceTree = "<group>"; };
@@ -989,6 +991,7 @@
 				66B38C6117B98DFF00D65771 /* TestUtilities.m */,
 				66B38C6317B98EDE00D65771 /* TestPerformance.m */,
 				663CE2CC17C1837700E729F5 /* TestUndoStackStore.m */,
+				666ED56B17C3E78A00D148AA /* TestUndo.m */,
 				667F1ECE179C81BE0083C3E6 /* Store Tests */,
 				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */,
@@ -1436,6 +1439,7 @@
 				66B38C6417B98EE100D65771 /* TestPerformance.m in Sources */,
 				66C18AD517BAB2EE00C5316F /* TestEditingContext.m in Sources */,
 				663CE2CD17C1837700E729F5 /* TestUndoStackStore.m in Sources */,
+				666ED56C17C3E78A00D148AA /* TestUndo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
