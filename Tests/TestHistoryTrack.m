@@ -1,36 +1,50 @@
-#import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
-#import "COHistoryTrack.h"
-#import "COContainer.h"
-#import "COGroup.h"
+#import <Foundation/Foundation.h>
+#import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
-#if 0
-@interface TestHistoryTrack : NSObject <UKTest>
+
+@interface TestHistoryTrack : TestCommon <UKTest>
 @end
 
 @implementation TestHistoryTrack
 
+- (id)init
+{
+	SUPERINIT;
+    
+    // FIXME: Hack
+    [[NSFileManager defaultManager] removeItemAtPath: [@"~/coreobject-undo.sqlite" stringByExpandingTildeInPath] error: NULL];
+    
+	return self;
+}
+
+- (void)dealloc
+{
+	[super dealloc];
+}
+
 - (void)testBasic
 {
-	COContainer *workspace = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *document1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *group1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *leaf1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *leaf2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	COContainer *group2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	COContainer *leaf3 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *workspace = [persistentRoot rootObject];
+	COContainer *document1 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *group1 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *leaf1 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *leaf2 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
+	COContainer *group2 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
+	COContainer *leaf3 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 
-	COContainer *document2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *document2 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
 	// Set up the initial state
 	
-	[document1 setValue:@"Document 1" forProperty: @"label"];
-	[group1 setValue:@"Group 1" forProperty: @"label"];
-	[leaf1 setValue:@"Leaf 1" forProperty: @"label"];
-	[leaf2 setValue:@"Leaf 2" forProperty: @"label"];
-	[group2 setValue:@"Group 2" forProperty: @"label"];
-	[leaf3 setValue:@"Leaf 3" forProperty: @"label"];
-	[document2 setValue:@"Document 2" forProperty: @"label"];
+	[document1 setValue:@"Document 1" forProperty: kCOLabel];
+	[group1 setValue:@"Group 1" forProperty: kCOLabel];
+	[leaf1 setValue:@"Leaf 1" forProperty: kCOLabel];
+	[leaf2 setValue:@"Leaf 2" forProperty: kCOLabel];
+	[group2 setValue:@"Group 2" forProperty: kCOLabel];
+	[leaf3 setValue:@"Leaf 3" forProperty: kCOLabel];
+	[document2 setValue:@"Document 2" forProperty: kCOLabel];
 
 	[workspace addObject: document1];
 	[workspace addObject: document2];
@@ -40,7 +54,7 @@
 	[document1 addObject: group2];	
 	[group2 addObject: leaf3];
 	
-	[ctx commit];
+	[ctx commitWithStackNamed: @"workspace"];
 	
 	// workspace
 	//  |
@@ -61,15 +75,15 @@
 	
 	// Now make some changes
 		
-	[document2 setValue: @"My Shopping List" forProperty: @"label"]; [ctx commit];
+	[document2 setValue: @"My Shopping List" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc2"];
 	/* undo on workspace track, doc2 track: undo the last commit. */
 	
-	[document1 setValue: @"My Contacts" forProperty: @"label"]; [ctx commit];
+	[document1 setValue: @"My Contacts" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc1"];
 	/* undo on workspace track, doc1 track: undo the last commit. */
 	
-	[leaf2 setValue: @"Tomatoes" forProperty: @"label"]; [ctx commit];
+	[leaf2 setValue: @"Tomatoes" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc1"];
 	
-	[group2 addObject: leaf2]; [ctx commit];
+	[group2 addObject: leaf2]; [ctx commitWithStackNamed: @"doc1"];
 	
 	// workspace
 	//  |
@@ -88,7 +102,7 @@
 	//   \-document2
 	
 	
-	[document2 addObject: group2]; [ctx commit];
+	[document2 addObject: group2]; [ctx commitWithStackNamed: @"doc2"];
 	
 	// workspace
 	//  |
@@ -107,27 +121,27 @@
 	//          \-leaf2
 	
 	
-	[group2	setValue: @"Groceries" forProperty: @"label"]; [ctx commit];
-	[group1 setValue: @"Work Contacts" forProperty: @"label"]; [ctx commit];
-	[leaf3 setValue: @"Wine" forProperty: @"label"]; [ctx commit];
-	[leaf1 setValue: @"Alice" forProperty: @"label"]; [ctx commit];
-	[leaf3 setValue: @"Red wine" forProperty: @"label"]; [ctx commit];
-	[leaf2 setValue: @"Cheese" forProperty: @"label"]; [ctx commit];
-	[leaf1 setValue: @"Alice (cell)" forProperty: @"label"]; [ctx commit];
+	[group2	setValue: @"Groceries" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc2"];
+	[group1 setValue: @"Work Contacts" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc1"];
+	[leaf3 setValue: @"Wine" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc2"];
+	[leaf1 setValue: @"Alice" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc1"];
+	[leaf3 setValue: @"Red wine" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc2"];
+	[leaf2 setValue: @"Cheese" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc2"];
+	[leaf1 setValue: @"Alice (cell)" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc1"];
 	
 	// introduce some new objects
 	
-	COContainer *leaf4 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *leaf5 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	COContainer *leaf6 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *leaf4 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *leaf5 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *leaf6 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
-	[leaf4 setValue: @"Leaf 4" forProperty: @"label"]; [ctx commit];
-	[leaf5 setValue: @"Leaf 5" forProperty: @"label"]; [ctx commit];
-	[leaf6 setValue: @"Leaf 6" forProperty: @"label"]; [ctx commit];	
+	[leaf4 setValue: @"Leaf 4" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc1"];
+	[leaf5 setValue: @"Leaf 5" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc2"];
+	[leaf6 setValue: @"Leaf 6" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc2"];	
 	
 	// add them to the lists
 
-	[group1 addObject: leaf4]; [ctx commit];
+	[group1 addObject: leaf4]; [ctx commitWithStackNamed: @"doc1"];
 	
 	// workspace
 	//  |
@@ -149,7 +163,7 @@
 	
 	
 	
-	[group2 addObject: leaf5]; [ctx commit];
+	[group2 addObject: leaf5]; [ctx commitWithStackNamed: @"doc2"];
 
 	// workspace
 	//  |
@@ -173,7 +187,7 @@
 	
 	
 	
-	[group2 addObject: leaf6]; [ctx commit];
+	[group2 addObject: leaf6]; [ctx commitWithStackNamed: @"doc2"];
 
 	// workspace
 	//  |
@@ -198,35 +212,22 @@
 	//          \-leaf6
 	
 	
-	[leaf4 setValue: @"Carol" forProperty: @"label"]; [ctx commit];
-	[leaf5 setValue: @"Pizza" forProperty: @"label"]; [ctx commit];
-	[leaf6 setValue: @"Beer" forProperty: @"label"]; [ctx commit];	
+	[leaf4 setValue: @"Carol" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc1"];
+	[leaf5 setValue: @"Pizza" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc2"];
+	[leaf6 setValue: @"Beer" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc2"];
 	
 	UKFalse([ctx hasChanges]);
 	
-	// Finally, create some history tracks.
+
+    // Start with an easy test
 	
 	
-	COHistoryTrack *workspaceTrack = [[COHistoryTrack alloc] initTrackWithObject: workspace containedObjects: YES];
-	COHistoryTrack *doc1Track = [[COHistoryTrack alloc] initTrackWithObject: document1 containedObjects: YES];
-	COHistoryTrack *doc2Track = [[COHistoryTrack alloc] initTrackWithObject: document2 containedObjects: YES];
-	COHistoryTrack *leaf3Track = [[COHistoryTrack alloc] initTrackWithObject: leaf3 containedObjects: NO];
-	
-	UKNotNil(workspaceTrack);
-	UKNotNil(doc1Track);
-	UKNotNil(doc2Track);
-	UKNotNil(leaf3Track);
-	
-	
-	// Start with an easy test
-	
-	
-	UKObjectsEqual(@"Red wine", [leaf3 valueForProperty: @"label"]);
-	[leaf3Track undo];
-	UKObjectsEqual(@"Wine", [leaf3 valueForProperty: @"label"]);
+//	UKObjectsEqual(@"Red wine", [leaf3 valueForProperty: kCOLabel]);
+//	[leaf3Track undo];
+//	UKObjectsEqual(@"Wine", [leaf3 valueForProperty: kCOLabel]);
 
 	// FIXME: [leaf3Track undo];
-	//UKObjectsEqual(@"Leaf 3", [leaf3 valueForProperty: @"label"]);
+	//UKObjectsEqual(@"Leaf 3", [leaf3 valueForProperty: kCOLabel]);
 	//UKObjectsEqual(S([leaf3 UUID]), [ctx updatedObjectUUIDs]); // Ensure that no other objects were changed by the history track
 	
 	
@@ -235,13 +236,13 @@
 	
 	
 	// first undo should change leaf4's label from "Carol" -> "Leaf 4"
-	UKObjectsEqual(@"Carol", [leaf4 valueForProperty: @"label"]);
-	[doc1Track undo]; 
-	//UKObjectsEqual(@"Leaf 4", [leaf4 valueForProperty: @"label"]);
+//	UKObjectsEqual(@"Carol", [leaf4 valueForProperty: kCOLabel]);
+//	[doc1Track undo];
+	//UKObjectsEqual(@"Leaf 4", [leaf4 valueForProperty: kCOLabel]);
 	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID]), [ctx updatedObjectUUIDs]);
 	
 	// next undo should remove leaf4 from group1
-	UKObjectsEqual(S([leaf1 UUID], [leaf4 UUID]), [[[NSSet setWithArray: [group1 contentArray]] mappedCollection] UUID]);
+//	UKObjectsEqual(S([leaf1 UUID], [leaf4 UUID]), [[[NSSet setWithArray: [group1 contentArray]] mappedCollection] UUID]);
 	//[doc1Track undo]; 
 	//UKObjectsEqual(S([leaf1 UUID]), [[[NSSet setWithArray: [group1 contentArray]] mappedCollection] UUID]);	
 	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID]), [ctx updatedObjectUUIDs]);
@@ -250,15 +251,15 @@
 
 /*
 	// next undo should change leaf1's label from "Alice (cell)" -> "Alice"
-	UKObjectsEqual(@"Alice (cell)", [leaf1 valueForProperty: @"label"]);
+	UKObjectsEqual(@"Alice (cell)", [leaf1 valueForProperty: kCOLabel]);
 	[doc1Track undo]; 
-	UKObjectsEqual(@"Alice", [leaf1 valueForProperty: @"label"]);
+	UKObjectsEqual(@"Alice", [leaf1 valueForProperty: kCOLabel]);
 	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID]), [ctx updatedObjectUUIDs]);
 	
 	// next undo should change group1's label from "Work Contacts" -> "Group 1"
-	UKObjectsEqual(@"Work Contacts", [group1 valueForProperty: @"label"]);
+	UKObjectsEqual(@"Work Contacts", [group1 valueForProperty: kCOLabel]);
 	[doc1Track undo]; 
-	UKObjectsEqual(@"Group 1", [group1 valueForProperty: @"label"]);
+	UKObjectsEqual(@"Group 1", [group1 valueForProperty: kCOLabel]);
 	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID]), [ctx updatedObjectUUIDs]);
 	
 	// next undo should move group2 from document 2 back to document 1
@@ -287,15 +288,15 @@
 	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx updatedObjectUUIDs]);
 	
 	// next undo should rename leaf2 "Tomatoes" -> "Leaf 2"
-	UKObjectsEqual(@"Tomatoes", [leaf2 valueForProperty: @"label"]);
+	UKObjectsEqual(@"Tomatoes", [leaf2 valueForProperty: kCOLabel]);
 	[doc1Track undo]; 
-	UKObjectsEqual(@"Leaf 2", [leaf2 valueForProperty: @"label"]);
+	UKObjectsEqual(@"Leaf 2", [leaf2 valueForProperty: kCOLabel]);
 	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx updatedObjectUUIDs]);
 
 	// next undo should rename document 1 "My Contacts" -> "Document 1"
-	UKObjectsEqual(@"My Contacts", [document1 valueForProperty: @"label"]);
+	UKObjectsEqual(@"My Contacts", [document1 valueForProperty: kCOLabel]);
 	[doc1Track undo]; 
-	UKObjectsEqual(@"Document 1", [document1 valueForProperty: @"label"]);
+	UKObjectsEqual(@"Document 1", [document1 valueForProperty: kCOLabel]);
 	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx updatedObjectUUIDs]);
 	
 	// FIXME: The next undo would undo the initial commit of Document 1.
@@ -309,14 +310,10 @@
 	//
 	
 	
-	UKObjectsEqual(@"Groceries", [group2 valueForProperty: @"label"]); // Verify that the state of document2 wasn't changed (other than moving group2 back to document 1)
+	UKObjectsEqual(@"Groceries", [group2 valueForProperty: kCOLabel]); // Verify that the state of document2 wasn't changed (other than moving group2 back to document 1)
 	[doc2Track undo];
 	// FIXME
 */
-	
-	[workspaceTrack release];
-	[doc1Track release];
-	[doc2Track release];
 }
+
 @end
-#endif
