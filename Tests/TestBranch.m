@@ -458,6 +458,17 @@
     
     [ctx commit];
     
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COBranch *ctx2originalBranch = [ctx2persistentRoot branchForUUID: [originalBranch UUID]];
+        COBranch *ctx2branch = [ctx2persistentRoot branchForUUID: [branch UUID]];
+        
+        UKObjectsEqual(S(ctx2originalBranch), [ctx2persistentRoot branches]);
+        UKObjectsEqual(S(ctx2branch), [ctx2persistentRoot deletedBranches]);
+        UKTrue([ctx2branch isDeleted]);
+    }
 }
 
 - (void) testBranchObjectGraphs

@@ -366,7 +366,9 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     else
     {
         // Commit changes in our branches
-        for (COBranch *branch in [self branches])
+        
+        // N.B. Don't use -branches because that only returns non-deleted branches
+        for (COBranch *branch in [_branchForUUID allValues])
         {
             [branch saveCommitWithMetadata: metadata];
             
