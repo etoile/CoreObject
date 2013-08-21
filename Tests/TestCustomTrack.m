@@ -80,57 +80,53 @@ selective undo is involved. */
 	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
 	UKObjectsEqual(thirdRevision, [[object persistentRoot] revision]);
 }
-#if 0
+
 - (NSArray *)makeCommitsWithMultipleRootObjects
 {
 	/* First commit */
 
-	COContainer *object = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *objectPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *object = [objectPersistentRoot rootObject];
 	[object setValue: @"Groceries" forProperty: @"label"];
 
-	COTrackNode *firstNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
-	                                               previousNode: nil];
-
+    [ctx commitWithStackNamed: @"test"];
+    
 	/* Second commit */
 
-	COContainer *doc = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *docPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *doc = [docPersistentRoot rootObject];
 	[doc setValue: @"Document" forProperty: @"label"];
 
-	COTrackNode *secondNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
-	                                                previousNode: firstNode];
+	[ctx commitWithStackNamed: @"test"];
 
 	/* Third commit (two revisions) */
 
-	COContainer *para1 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: doc];
+	COContainer *para1 = [[doc objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
 	[object setValue: @"Shopping List" forProperty: @"label"];
 
-	COTrackNode *thirdNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
-	                                               previousNode: secondNode];
+	[ctx commitWithStackNamed: @"test"];
 
 	/* Fourth commit */
 
 	[object setValue: @"Todo" forProperty: @"label"];
 
-	COTrackNode *fourthNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
-	                                                previousNode: thirdNode];
+	[ctx commitWithStackNamed: @"test"];
 
 	/* Fifth commit */
 
-	COContainer *para2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem" rootObject: doc];
+	COContainer *para2 = [[doc objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[doc addObject: para1];
 	[doc addObject: para2];
 
-	COTrackNode *fifthNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
-	                                               previousNode: fourthNode];
+	[ctx commitWithStackNamed: @"test"];
 
 	/* Sixth commit */
 
 	[para1 setValue: @"paragraph with different contents" forProperty: @"label"];
 
-	COTrackNode *sixthNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
-	                                               previousNode: fifthNode];
+	[ctx commitWithStackNamed: @"test"];
 
 	return A(object, doc, para1, para2);
 }
@@ -138,7 +134,6 @@ selective undo is involved. */
 - (void)testWithMultipleRootObjects
 {
 	NSArray *objects = [self makeCommitsWithMultipleRootObjects];
-	NSArray *nodes = [track cachedNodes];
 
 	COContainer *object = [objects objectAtIndex: 0];
 	COContainer *doc = [objects objectAtIndex: 1];
@@ -147,47 +142,47 @@ selective undo is involved. */
 
 	/* Basic undo/redo check */
 
-	[track undo];
+	[ctx undoForStackNamed: @"test"];
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
 	
-	[track redo];
+	[ctx redoForStackNamed: @"test"];
 	UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
 
 	/* Sixth and fifth commit undone ('doc' revision) */
 
-	[track undo];
-	[track undo];
+	[ctx undoForStackNamed: @"test"];
+	[ctx undoForStackNamed: @"test"];
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
 	// FIXME: UKNil([ctx objectWithUUID: [para2 UUID]]);
 	UKTrue([[doc content] isEmpty]);
 
 	/* Fourth commit undone ('object' revision) */
 
-	[track undo];
+	[ctx undoForStackNamed: @"test"];
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
 
 	/* Third commit undone (two revisions one on 'doc' and one on 'object') */
 
-	[track undo];
+	[ctx undoForStackNamed: @"test"];
 	// FIXME: UKNil([ctx objectWithUUID: [para1 UUID]]);
 
-	[track undo];
+	[ctx undoForStackNamed: @"test"];
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
 	/* Second commit undone ('doc' revision) */
 
-	[track undo];
+	[ctx undoForStackNamed: @"test"];
 	// FIXME: UKNil([ctx objectWithUUID: [doc UUID]]);
 	
 	/* First commit reached (root object 'object') */
-
+#if 0    
 	// Just check the object creation hasn't been undone
 	UKNotNil([ctx objectWithUUID: [object UUID]]);
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
 	/* Second commit redone */
 
-	[track redo];
+	[ctx redoForStackNamed: @"test"];
 	UKNotNil([ctx objectWithUUID: [doc UUID]]);
 	UKObjectsNotSame(doc, [ctx objectWithUUID: [doc UUID]]);
 	// Get the new restored root object instance
@@ -196,20 +191,20 @@ selective undo is involved. */
 
 	/* Third commit redone (involve two revisions) */
 
-	[track redo];
-	[track redo];
+	[ctx redoForStackNamed: @"test"];
+	[ctx redoForStackNamed: @"test"];
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
 
 	/* Third commit undone (involve two revisions)  */
 
-	[track undo];
-	[track undo];
+	[ctx undoForStackNamed: @"test"];
+	[ctx undoForStackNamed: @"test"];
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
 	/* Third commit redone (involve two revisions) */
 
-	[track redo];
-	[track redo];
+	[ctx redoForStackNamed: @"test"];
+	[ctx redoForStackNamed: @"test"];
 	UKNotNil([ctx objectWithUUID: [para1 UUID]]);
 	UKObjectsNotSame(para1, [ctx objectWithUUID: [para1 UUID]]);
 
@@ -233,11 +228,12 @@ selective undo is involved. */
 	UKTrue([[doc allInnerObjectsIncludingSelf] containsObject: para2]);
 	UKStringsEqual(@"paragraph 2", [para2 valueForProperty: @"label"]);
 	UKObjectsEqual(A(para1, para2), [doc content]);
+#endif
 }
 
 - (void)testSelectiveUndo
 {
 	[self makeCommitsWithMultipleRootObjects];
 }
-#endif
+
 @end
