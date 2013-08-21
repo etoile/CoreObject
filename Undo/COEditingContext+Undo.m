@@ -50,7 +50,7 @@
 
 - (BOOL) canRedoForStackNamed: (NSString *)aName
 {
-    COEdit *edit = [self peekEditFromStack: kCOUndoStack forName: aName];
+    COEdit *edit = [self peekEditFromStack: kCORedoStack forName: aName];
     return [self canApplyEdit: edit];
 }
 
@@ -61,6 +61,10 @@
     COEdit *edit = [self peekEditFromStack: popStack forName: aName];
     if (![self canApplyEdit: edit])
     {
+        // DEBUG: Break here
+        edit = [self peekEditFromStack: popStack forName: aName];
+        [self canApplyEdit: edit];
+        
         [_undoStackStore commitTransaction];
         [NSException raise: NSInvalidArgumentException format: @"Can't apply edit %@", edit];
     }

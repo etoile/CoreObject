@@ -124,6 +124,7 @@
 		66860BA417BED42900B24333 /* TestSQLiteStorePersistentRootBackingStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B3178C431E00B78174 /* TestSQLiteStorePersistentRootBackingStore.m */; };
 		66860BA517BED42900B24333 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */ = {isa = PBXBuildFile; fileRef = 667F79EC17BDE00B00B6BF3A /* TestSQLiteStoreSharedPersistentRoots.m */; };
 		6686BE2A12592D7B0065DE1A /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
+		66ABC78E17C43FBA009FB925 /* TestCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66ABC78D17C43FBA009FB925 /* TestCustomTrack.m */; };
 		66B38C6217B98E0400D65771 /* TestUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B38C6117B98DFF00D65771 /* TestUtilities.m */; };
 		66B38C6417B98EE100D65771 /* TestPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B38C6317B98EDE00D65771 /* TestPerformance.m */; };
 		66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -419,7 +420,6 @@
 		667F1ED0179C81E00083C3E6 /* TestArrayDiff.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestArrayDiff.m; sourceTree = "<group>"; };
 		667F1ED1179C81E00083C3E6 /* TestCollection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCollection.m; sourceTree = "<group>"; };
 		667F1ED2179C81E00083C3E6 /* TestCopy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCopy.m; sourceTree = "<group>"; };
-		667F1ED3179C81E00083C3E6 /* TestCustomTrack.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCustomTrack.m; sourceTree = "<group>"; };
 		667F1ED4179C81E00083C3E6 /* TestEditingContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestEditingContext.m; sourceTree = "<group>"; };
 		667F1ED5179C81E00083C3E6 /* TestHistoryTrack.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestHistoryTrack.m; sourceTree = "<group>"; };
 		667F1ED6179C81E00083C3E6 /* TestObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestObject.m; sourceTree = "<group>"; };
@@ -465,6 +465,7 @@
 		669963EB11600FD500359BE6 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		669965351162E17500359BE6 /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = /usr/lib/libz.1.2.5.dylib; sourceTree = "<absolute>"; };
 		6699653F1162E1C000359BE6 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
+		66ABC78D17C43FBA009FB925 /* TestCustomTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCustomTrack.m; path = Tests/TestCustomTrack.m; sourceTree = "<group>"; };
 		66B38C6117B98DFF00D65771 /* TestUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUtilities.m; path = Tests/TestUtilities.m; sourceTree = "<group>"; };
 		66B38C6317B98EDE00D65771 /* TestPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestPerformance.m; path = Tests/TestPerformance.m; sourceTree = "<group>"; };
 		66C18AD417BAB2EE00C5316F /* TestEditingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestEditingContext.m; path = Tests/TestEditingContext.m; sourceTree = "<group>"; };
@@ -776,7 +777,6 @@
 				667F1ED0179C81E00083C3E6 /* TestArrayDiff.m */,
 				667F1ED1179C81E00083C3E6 /* TestCollection.m */,
 				667F1ED2179C81E00083C3E6 /* TestCopy.m */,
-				667F1ED3179C81E00083C3E6 /* TestCustomTrack.m */,
 				667F1ED4179C81E00083C3E6 /* TestEditingContext.m */,
 				667F1ED5179C81E00083C3E6 /* TestHistoryTrack.m */,
 				667F1ED6179C81E00083C3E6 /* TestObject.m */,
@@ -992,6 +992,7 @@
 				66B38C6317B98EDE00D65771 /* TestPerformance.m */,
 				663CE2CC17C1837700E729F5 /* TestUndoStackStore.m */,
 				666ED56B17C3E78A00D148AA /* TestUndo.m */,
+				66ABC78D17C43FBA009FB925 /* TestCustomTrack.m */,
 				667F1ECE179C81BE0083C3E6 /* Store Tests */,
 				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */,
@@ -1440,6 +1441,7 @@
 				66C18AD517BAB2EE00C5316F /* TestEditingContext.m in Sources */,
 				663CE2CD17C1837700E729F5 /* TestUndoStackStore.m in Sources */,
 				666ED56C17C3E78A00D148AA /* TestUndo.m in Sources */,
+				66ABC78E17C43FBA009FB925 /* TestCustomTrack.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

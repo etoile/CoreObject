@@ -82,12 +82,12 @@ NSString * const kCORedoStack = @"redo";
 
 - (void) popStack: (NSString *)aTable forName: (NSString *)aStack
 {
-    [_db executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE idx = (SELECT MAX(idx) FROM undo WHERE name = ?)", aTable], aStack];
+    [_db executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE idx = (SELECT MAX(idx) FROM %@ WHERE name = ?)", aTable, aTable], aStack];
 }
 
 - (NSDictionary *) peekStack: (NSString *)aTable forName: (NSString *)aStack
 {
-    NSData *data = [_db dataForQuery: [NSString stringWithFormat: @"SELECT data FROM %@ WHERE idx = (SELECT MAX(idx) FROM undo WHERE name = ?)", aTable], aStack];
+    NSData *data = [_db dataForQuery: [NSString stringWithFormat: @"SELECT data FROM %@ WHERE idx = (SELECT MAX(idx) FROM %@ WHERE name = ?)", aTable, aTable], aStack];
     if (data == nil)
     {
         return nil;

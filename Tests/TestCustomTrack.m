@@ -2,16 +2,8 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
-#import "COCustomTrack.h"
-#import "COEditingContext.h"
-#import "COObject.h"
-#import "COContainer.h"
 
 @interface TestCustomTrack : TestCommon <UKTest>
-{
-	COCustomTrack *track;
-}
-
 @end
 
 @implementation TestCustomTrack
@@ -19,135 +11,76 @@
 - (id)init
 {
 	SUPERINIT;
-	track = [[COCustomTrack alloc] initWithUUID: [ETUUID UUID] editingContext: ctx];
+    
+    // FIXME: Hack
+    [[NSFileManager defaultManager] removeItemAtPath: [@"~/coreobject-undo.sqlite" stringByExpandingTildeInPath] error: NULL];
+
 	return self;
 }
 
 - (void)dealloc
 {
-	DESTROY(track);
 	[super dealloc];
 }
 
-- (void)testCreateWithNoRevisionsInStore
-{
-	UKNotNil(track);
-	UKNil([track currentNode]);
-	UKRaisesException([track undo]);
-	UKRaisesException([track redo]);
-}
-
-- (COTrackNode *)pushAndCheckRevisionOnTrack: (CORevision *)rev 
-                                previousNode: (COTrackNode *)previousNode 
-{
-	[track addRevisions: A(rev)];
-	COTrackNode *currentNode = [track currentNode];
-
-	UKNotNil(currentNode);
-	UKObjectsSame(previousNode, [currentNode previousNode]);
-	UKNil([currentNode nextNode]);
-	UKObjectsEqual([currentNode revision], rev);
-
-	if (previousNode == nil)
-		return currentNode;
-
-	UKObjectsSame(currentNode, [previousNode nextNode]);
-
-	BOOL wasSameRootObjectForPreviousCommit = [[rev objectUUID] isEqual: [[previousNode revision] objectUUID]];
-	
-	if (wasSameRootObjectForPreviousCommit)
-	{
-		UKObjectsEqual([previousNode revision], [rev baseRevision]);
-	}
-	else
-	{
-		// TODO: Perhaps implement a check based on the object commit track
-		UKObjectsNotEqual([previousNode revision], [rev baseRevision]);
-	}
-
-	return currentNode;
-}
-
-- (COTrackNode *)pushAndCheckRevisionsOnTrack: (NSArray *)revs 
-                                 previousNode: (COTrackNode *)previousNode 
-{
-	COTrackNode *node = previousNode;
-
-	for (CORevision *rev in revs)
-	{
-		node = [self pushAndCheckRevisionOnTrack: rev previousNode: node];
-	}
-	return node;
-}
-
-#if 0
 /* The custom track uses the root object commit track to undo and redo, no 
 selective undo is involved. */
 - (void)testWithSingleRootObject
 {
 	/* First commit */
 
-	COContainer *object = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
 	[object setValue: @"Groceries" forProperty: @"label"];
-
-	COTrackNode *firstNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
-	                                               previousNode: nil];
-
+    [ctx commitWithStackNamed: @"setup"];
+    CORevision *firstRevision = [[[object persistentRoot] currentBranch] currentRevision];
+    
 	/* Second commit */
 
 	[object setValue: @"Shopping List" forProperty: @"label"];
-
-	COTrackNode *secondNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
-	                                                previousNode: firstNode];
-
+    [ctx commitWithStackNamed: @"test"];
+    CORevision *secondRevision = [[[object persistentRoot] currentBranch] currentRevision];
+    
 	/* Third commit */
 
 	[object setValue: @"Todo" forProperty: @"label"];
-
-	COTrackNode *thirdNode = [self pushAndCheckRevisionsOnTrack: [ctx commit] 
-	                                               previousNode: secondNode];
-
+    [ctx commitWithStackNamed: @"test"];
+    CORevision *thirdRevision = [[[object persistentRoot] currentBranch] currentRevision];
+    
 	/* First undo  (Todo -> Shopping List) */
 
-	[track undo];
-
+	UKTrue([ctx canUndoForStackNamed: @"test"]);
+	[ctx undoForStackNamed: @"test"];
+    
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
-	UKObjectsEqual(secondNode, [track currentNode]);
-	UKObjectsEqual([object revision], [[track currentNode] revision]);
+	UKObjectsEqual(secondRevision, [[object persistentRoot] revision]);
 
 	/*  Second undo (Shopping List -> Groceries) */
 
-	[track undo];
-
+    UKTrue([ctx canUndoForStackNamed: @"test"]);
+	[ctx undoForStackNamed: @"test"];
+	UKFalse([ctx canUndoForStackNamed: @"test"]);
+    
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
-	UKObjectsEqual(firstNode, [track currentNode]);
-	UKObjectsEqual([object revision], [[track currentNode] revision]);
-
-	[track undo];
-
-	UKObjectsEqual(firstNode, [track currentNode]);
+	UKObjectsEqual(firstRevision, [[object persistentRoot] revision]);
 
 	/* First redo (Groceries -> Shopping List) */
 
-	[track redo];
+	UKTrue([ctx canRedoForStackNamed: @"test"]);
+	[ctx redoForStackNamed: @"test"];
 
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
-	UKObjectsEqual(secondNode, [track currentNode]);
-	UKObjectsEqual([object revision], [[track currentNode] revision]);
+	UKObjectsEqual(secondRevision, [[object persistentRoot] revision]);
 
 	/* Second redo (Shopping List -> Todo) */
 
-	[track redo];
-
+	UKTrue([ctx canRedoForStackNamed: @"test"]);
+	[ctx redoForStackNamed: @"test"];
+	UKFalse([ctx canRedoForStackNamed: @"test"]);
+    
 	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
-	UKObjectsEqual(thirdNode, [track currentNode]);
-	UKObjectsEqual([object revision], [[track currentNode] revision]);
-
-	[track redo];
-
-	UKObjectsEqual(thirdNode, [track currentNode]);
+	UKObjectsEqual(thirdRevision, [[object persistentRoot] revision]);
 }
-
+#if 0
 - (NSArray *)makeCommitsWithMultipleRootObjects
 {
 	/* First commit */
@@ -307,5 +240,4 @@ selective undo is involved. */
 	[self makeCommitsWithMultipleRootObjects];
 }
 #endif
-
 @end
