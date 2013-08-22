@@ -70,6 +70,29 @@
     UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
 }
 
+- (void) testUndoCreateBranch
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
+    [ctx commit];
+    
+    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
+    
+    [[persistentRoot rootObject] setValue: @"hello2" forProperty: kCOLabel];
+    [ctx commitWithStackNamed: @"test"];
+        
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        
+        UKFalse([ctx2secondBranch isDeleted]);
+        [ctx2 undoForStackNamed: @"test"];
+        UKTrue([ctx2secondBranch isDeleted]);
+    }
+}
+
 - (void) testUndoDeleteBranch
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
@@ -91,14 +114,61 @@
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
         
         UKTrue([ctx2secondBranch isDeleted]);
-        BOOL canUndo = [ctx2 canUndoForStackNamed: @"test"];
-        UKTrue(canUndo);
-        if (canUndo)
-        {
-            [ctx2 undoForStackNamed: @"test"];
-        }
+        [ctx2 undoForStackNamed: @"test"];
         UKFalse([ctx2secondBranch isDeleted]);
     }
 }
+
+// Failing tests
+#if 0
+- (void) testUndoSetBranchMetadata
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [[persistentRoot currentBranch] setMetadata: D(@"world", @"hello")];
+    [ctx commit];
+    
+    [[persistentRoot currentBranch] setMetadata: D(@"world2", @"hello")];
+    [ctx commitWithStackNamed: @"test"];
+    
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        
+        UKObjectsEqual(D(@"world2", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
+        [ctx2 undoForStackNamed: @"test"];
+        UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
+    }
+}
+
+- (void) testUndoSetCurrentBranch
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COBranch *originalBranch = [persistentRoot currentBranch];
+    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
+    [ctx commit];
+    
+    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];    
+    [[persistentRoot rootObject] setValue: @"hello2" forProperty: kCOLabel];
+    [ctx commit];
+    
+    [persistentRoot setCurrentBranch: secondBranch];
+    [ctx commitWithStackNamed: @"test"];
+    
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COBranch *ctx2originalBranch = [ctx2persistentRoot branchForUUID: [originalBranch UUID]];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        
+        UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
+        UKObjectsEqual(@"hello2", [ctx2persistentRoot rootObject]);
+        [ctx2 undoForStackNamed: @"test"];
+        UKObjectsEqual(ctx2originalBranch, [ctx2persistentRoot currentBranch]);
+        UKObjectsEqual(@"hello", [ctx2persistentRoot rootObject]);
+    }
+}
+#endif
 
 @end

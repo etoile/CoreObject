@@ -610,4 +610,56 @@
     UKObjectsEqual(D(@"value", @"key"), [originalBranch metadata]);
 }
 
+// Failing test
+#if 0
+- (void) testBranchMetadataOnPersistentRootFirstCommit
+{
+    COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [[persistentRoot2 currentBranch] setMetadata: D(@"world", @"hello")];
+    [ctx commit];
+    
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot2 = [ctx2 persistentRootForUUID: [persistentRoot2 persistentRootUUID]];
+        
+        UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot2 currentBranch] metadata]);
+    }
+}
+#endif
+
+- (void) testBranchMetadataOnBranchFirstCommit
+{
+    [ctx commit];
+    
+    COBranch *branch2 = [[persistentRoot currentBranch] makeBranchWithLabel: @"test"];
+    [ctx commit];
+    
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        
+        UKObjectsEqual(D(@"test", kCOBranchLabel), [[ctx2persistentRoot branchForUUID: [branch2 UUID]] metadata]);
+    }
+}
+
+- (void) testBranchMetadataOnBranchSetOnFirstCommit
+{
+    [ctx commit];
+    
+    COBranch *branch2 = [[persistentRoot currentBranch] makeBranchWithLabel: @""];
+    [branch2 setMetadata: D(@"world", @"hello")];
+    [ctx commit];
+    
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        
+        UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot branchForUUID: [branch2 UUID]] metadata]);
+    }
+}
+
+
 @end
