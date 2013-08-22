@@ -610,8 +610,6 @@
     UKObjectsEqual(D(@"value", @"key"), [originalBranch metadata]);
 }
 
-// Failing test
-#if 0
 - (void) testBranchMetadataOnPersistentRootFirstCommit
 {
     COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
@@ -626,7 +624,6 @@
         UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot2 currentBranch] metadata]);
     }
 }
-#endif
 
 - (void) testBranchMetadataOnBranchFirstCommit
 {

@@ -568,6 +568,22 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID
 {
+    // Write metadata
+    // FIXME: Copied-n-pasted from above
+    if (_metadataChanged)
+    {
+        BOOL ok = [[_persistentRoot store] setMetadata: _metadata
+                                             forBranch: _UUID
+                                      ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                                                 error: NULL];
+        ETAssert(ok);
+        
+        [[self editingContext] recordBranchSetMetadata: self
+                                           oldMetadata: [[self branchInfo] metadata]];
+        
+        _metadataChanged = NO;
+    }
+    
     ETAssert(_isCreated == NO);
     
     ASSIGN(_currentRevisionID, aRevisionID);

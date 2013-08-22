@@ -119,8 +119,6 @@
     }
 }
 
-// Failing tests
-#if 0
 - (void) testUndoSetBranchMetadata
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
@@ -141,6 +139,7 @@
     }
 }
 
+#if 0
 - (void) testUndoSetCurrentBranch
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
@@ -163,10 +162,10 @@
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
         
         UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
-        UKObjectsEqual(@"hello2", [ctx2persistentRoot rootObject]);
+        UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
         [ctx2 undoForStackNamed: @"test"];
         UKObjectsEqual(ctx2originalBranch, [ctx2persistentRoot currentBranch]);
-        UKObjectsEqual(@"hello", [ctx2persistentRoot rootObject]);
+        UKObjectsEqual(@"hello", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
     }
 }
 #endif
