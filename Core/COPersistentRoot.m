@@ -340,7 +340,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
             info = [store createPersistentRootWithInitialItemGraph: [[self editingBranch] objectGraphContext]
                                                                                    UUID: [self persistentRootUUID]
                                                                              branchUUID: [[self editingBranch] UUID]
-                                                                               metadata: metadata
+                                                                               revisionMetadata: metadata
                                                                                   error: NULL];
         }
         else
@@ -348,7 +348,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
             info = [store createPersistentRootWithInitialRevision: _cheapCopyRevisionID
                                                              UUID: _UUID
                                                        branchUUID: [[self editingBranch] UUID]
-                                                         metadata: metadata
                                                             error: NULL];
         }
         ETAssert(info != nil);

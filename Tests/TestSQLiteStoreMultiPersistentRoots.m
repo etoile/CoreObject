@@ -52,13 +52,13 @@ static ETUUID *tagUUID;
     ASSIGN(docProot, [store createPersistentRootWithInitialItemGraph: [self docItemTree]
                                                                UUID: [ETUUID UUID]
                                                          branchUUID: [ETUUID UUID]
-                                                           metadata: nil
+                                                           revisionMetadata: nil
                                                               error: NULL]);
     
     ASSIGN(tagProot, [store createPersistentRootWithInitialItemGraph: [self tagItemTreeWithDocProoUUID: [docProot UUID]]
                                                                UUID: [ETUUID UUID]
                                                          branchUUID: [ETUUID UUID]
-                                                           metadata: nil
+                                                           revisionMetadata: nil
                                                               error: NULL]);
     return self;
 }

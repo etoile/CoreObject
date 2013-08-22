@@ -129,7 +129,7 @@ static ETUUID *childUUID2;
     ASSIGN(proot, [store createPersistentRootWithInitialItemGraph: [self makeInitialItemTree]
                                                             UUID: [ETUUID UUID]
                                                       branchUUID: [ETUUID UUID]
-                                                        metadata: [self initialMetadata]
+                                                        revisionMetadata: [self initialMetadata]
                                                            error: NULL]);
     ASSIGN(prootUUID, [proot UUID]);
     prootChangeCount = proot.changeCount;
@@ -631,7 +631,6 @@ static ETUUID *childUUID2;
     COPersistentRootInfo *copy = [store createPersistentRootWithInitialRevision: initialRevisionId
                                                                            UUID: [ETUUID UUID]
                                                                      branchUUID: [ETUUID UUID]
-                                                                        metadata: D(@"test2", @"name")
                                                                           error: NULL];
     int64_t copyChangeCount = copy.changeCount;
     
@@ -729,7 +728,6 @@ static ETUUID *childUUID2;
     COPersistentRootInfo *cheapCopy = [store createPersistentRootWithInitialRevision: [CORevisionID revisionWithBackinStoreUUID: [proot UUID] revisionIndex: BRANCH_LENGTH + 1]
                                                                                 UUID: cheapCopyUUID
                                                                           branchUUID: cheapCopyBranchUUID
-                                                                            metadata: nil
                                                                                error: NULL];
 
     UKObjectsEqual(rootUUID, [store rootObjectUUIDForRevisionID: [proot currentRevisionID]]);
@@ -772,6 +770,11 @@ static ETUUID *childUUID2;
                                        parentRevisionID: initialRevisionId
                                           modifiedItems: nil
                                                   error: NULL]);
+}
+
+- (void) testInitialRevisionMetadata
+{
+    UKObjectsEqual([self initialMetadata], [[store revisionInfoForRevisionID: initialRevisionId] metadata]);
 }
 
 @end

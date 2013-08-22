@@ -80,7 +80,7 @@
  * - The basic usage pattern is:
  *
  *    * Create a persistent root with -createPersistentRootWithInitialContents:metadata:,
- *      or -createPersistentRootWithInitialRevision:metadata: if a cheap copy is desired.
+ *      or -createPersistentRootWithInitialRevision: if a cheap copy is desired.
  *
  *    * Write an embedded object graph as a revision using -writeItemTree:withMetadata:withParentRevisionID:modifiedItems:.
  *
@@ -323,12 +323,12 @@
  *
  * Always creates a new backing store, so the contents will not be stored as a delta against another
  * persistent root. If the new persistent root is likely going to have content in common with another
- * persistent root, use -createPersistentRootWithInitialRevision:metadata: instead.
+ * persistent root, use -createPersistentRootWithInitialRevision: instead.
  */
 - (COPersistentRootInfo *) createPersistentRootWithInitialItemGraph: (id<COItemGraph>)contents
                                                                UUID: (ETUUID *)persistentRootUUID
                                                          branchUUID: (ETUUID *)aBranchUUID
-                                                           metadata: (NSDictionary *)metadata
+                                                   revisionMetadata: (NSDictionary *)metadata
                                                               error: (NSError **)error;
 
 /**
@@ -348,7 +348,6 @@
 - (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
                                                               UUID: (ETUUID *)persistentRootUUID
                                                         branchUUID: (ETUUID *)aBranchUUID
-                                                          metadata: (NSDictionary *)metadata
                                                              error: (NSError **)error;
 
 

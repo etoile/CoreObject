@@ -599,7 +599,6 @@
                                              branchUUID: (ETUUID *)aBranchUUID
                                                  isCopy: (BOOL)isCopy
                                         initialRevision: (CORevisionID *)revId
-                                               metadata: (NSDictionary *)metadata
                                                   error: (NSError **)error
 {
     [db_ savepoint: @"createPersistentRootWithUUID"];
@@ -649,7 +648,7 @@
 - (COPersistentRootInfo *) createPersistentRootWithInitialItemGraph: (id<COItemGraph>)contents
                                                                UUID: (ETUUID *)persistentRootUUID
                                                          branchUUID: (ETUUID *)aBranchUUID
-                                                           metadata: (NSDictionary *)metadata
+                                                   revisionMetadata: (NSDictionary *)metadata
                                                               error: (NSError **)error
 {
     NILARG_EXCEPTION_TEST(contents);
@@ -657,21 +656,19 @@
     NILARG_EXCEPTION_TEST(aBranchUUID);
     
     CORevisionID *revId = [self writeItemTreeWithNoParent: contents
-                                             withMetadata: [NSDictionary dictionary]
+                                             withMetadata: metadata
                                    inBackingStoreWithUUID: persistentRootUUID];
     
     return [self createPersistentRootWithUUID: persistentRootUUID
                                    branchUUID: aBranchUUID
                                        isCopy: NO
                               initialRevision: revId
-                                     metadata: metadata
                                         error: error];
 }
 
 - (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
                                                               UUID: (ETUUID *)persistentRootUUID
                                                         branchUUID: (ETUUID *)aBranchUUID
-                                                          metadata: (NSDictionary *)metadata
                                                              error: (NSError **)error
 {
     NILARG_EXCEPTION_TEST(aRevision);
@@ -683,7 +680,6 @@
                                    branchUUID: aBranchUUID
                                        isCopy: YES
                               initialRevision: aRevision
-                                     metadata: metadata
                                         error: error];
 }
 

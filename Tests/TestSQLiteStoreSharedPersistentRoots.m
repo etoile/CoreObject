@@ -52,14 +52,13 @@ static ETUUID *rootUUID;
     ASSIGN(prootA, [store createPersistentRootWithInitialItemGraph: [self prootAitemTree]
                                                                UUID: [ETUUID UUID]
                                                          branchUUID: [ETUUID UUID]
-                                                           metadata: nil
+                                                           revisionMetadata: nil
                                                               error: NULL]);
     prootAchangeCount = [prootA changeCount];
     
     ASSIGN(prootB, [store createPersistentRootWithInitialRevision: [[prootA currentBranchInfo] currentRevisionID]
                                                              UUID: [ETUUID UUID]
                                                        branchUUID: [ETUUID UUID]
-                                                         metadata: nil
                                                             error: NULL]);
 
     prootBchangeCount = [prootB changeCount];

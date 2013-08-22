@@ -107,7 +107,7 @@ static int itemChangedAtCommit(int i)
     COPersistentRootInfo *proot = [store createPersistentRootWithInitialItemGraph: initialTree
                                                                             UUID: [ETUUID UUID]
                                                                       branchUUID: [ETUUID UUID]
-                                                                        metadata: nil
+                                                                        revisionMetadata: nil
                                                                            error: NULL];
     int64_t prootChangeCount = proot.changeCount;
     
@@ -304,7 +304,7 @@ static int itemChangedAtCommit(int i)
 		[store createPersistentRootWithInitialItemGraph: it
                                                   UUID: [ETUUID UUID]
                                             branchUUID: [ETUUID UUID]
-                                              metadata: nil
+                                              revisionMetadata: nil
                                                  error: NULL];
     }
     [store commitTransactionWithError: NULL];
@@ -324,7 +324,7 @@ static int itemChangedAtCommit(int i)
     COPersistentRootInfo *proot = [store createPersistentRootWithInitialItemGraph: it
                                                                             UUID: [ETUUID UUID]
                                                                       branchUUID: [ETUUID UUID]
-                                                                        metadata: nil
+                                                                        revisionMetadata: nil
                                                                            error: NULL];
     
     for (int i =0; i<NUM_PERSISTENT_ROOT_COPIES; i++)
@@ -332,7 +332,6 @@ static int itemChangedAtCommit(int i)
         [store createPersistentRootWithInitialRevision: [[proot currentBranchInfo] currentRevisionID]
                                                   UUID: [ETUUID UUID]
                                             branchUUID: [ETUUID UUID]
-                                              metadata: nil
                                                  error: NULL];
     }
     [store commitTransactionWithError: NULL];
@@ -361,7 +360,7 @@ static int itemChangedAtCommit(int i)
     COPersistentRootInfo *proot = [store createPersistentRootWithInitialItemGraph: it
                                                                             UUID: [ETUUID UUID]
                                                                       branchUUID: [ETUUID UUID]
-                                                                        metadata: nil
+                                                                        revisionMetadata: nil
                                                                            error: NULL];
     
     NSLog(@"committing %d item itemtree took %lf ms", LOTS_OF_EMBEDDED_ITEMS,
