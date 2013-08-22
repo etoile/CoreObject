@@ -88,7 +88,14 @@ static NSString * const kCOEditNewRevisionID = @"COEditNewRevisionID";
         
         id<COItemGraph> result = [merged itemTreeWithDiffAppliedToItemGraph: oldGraph];
         
-        [[branch objectGraphContext] setItemGraph: result];
+        // FIXME: Works, but an ugly API mismatch when setting object graph context contents
+        NSMutableArray *items = [NSMutableArray array];
+        for (ETUUID *uuid in [result itemUUIDs])
+        {
+            [items addObject: [result itemForUUID: uuid]];
+        }
+        
+        [[branch objectGraphContext] insertOrUpdateItems: items];
     }
 }
 

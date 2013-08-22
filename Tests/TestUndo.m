@@ -49,25 +49,54 @@
 - (void)testSelectiveUndo
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    COObject *root = [persistentRoot rootObject];
-    COObject *child = [[[persistentRoot editingBranch] objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];    
-    [root insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: kCOContents];
-    [ctx commitWithStackNamed: @"setup"];
+    {
+        COObject *root = [persistentRoot rootObject];
+        COObject *child = [[[persistentRoot editingBranch] objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];    
+        [root insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: kCOContents];
+        [ctx commitWithStackNamed: @"setup"];
+        
+        [root setValue: @"root" forProperty: kCOLabel];
+        [ctx commitWithStackNamed: @"rootEdit"];
+        
+        [child setValue: @"child" forProperty: kCOLabel];
+        [ctx commitWithStackNamed: @"childEdit"];
+    }
     
-    [root setValue: @"root" forProperty: kCOLabel];
-    [ctx commitWithStackNamed: @"rootEdit"];
-    
-    [child setValue: @"child" forProperty: kCOLabel];
-    [ctx commitWithStackNamed: @"childEdit"];
-    
-    UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
-    UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
-    
-    // This will be a selective undo
-    [ctx undoForStackNamed: @"rootEdit"];
-    
-    UKNil([root valueForProperty: kCOLabel]);
-    UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+
+        COObject *root = [ctx2persistentRoot rootObject];
+        COObject *child = [[root valueForProperty: kCOContents] firstObject];
+        
+        UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
+        UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
+        
+        // Selective undo
+        [ctx2 undoForStackNamed: @"rootEdit"];
+        
+        UKNil([root valueForProperty: kCOLabel]);
+        UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
+        
+        // Selective undo    
+        [ctx2 undoForStackNamed: @"childEdit"];
+        
+        UKNil([root valueForProperty: kCOLabel]);
+        UKNil([child valueForProperty: kCOLabel]);
+        
+        // Selective Redo
+        [ctx2 redoForStackNamed: @"rootEdit"];
+        
+        UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
+        UKNil([child valueForProperty: kCOLabel]);
+        
+        // Selective Redo
+        [ctx2 redoForStackNamed: @"childEdit"];
+        
+        UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
+        UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
+    }
 }
 
 - (void) testUndoCreateBranch
@@ -87,6 +116,8 @@
         UKFalse([ctx2secondBranch isDeleted]);
         [ctx2 undoForStackNamed: @"test"];
         UKTrue([ctx2secondBranch isDeleted]);
+        [ctx2 redoForStackNamed: @"test"];
+        UKFalse([ctx2secondBranch isDeleted]);
     }
 }
 
@@ -110,6 +141,8 @@
         UKTrue([ctx2secondBranch isDeleted]);
         [ctx2 undoForStackNamed: @"test"];
         UKFalse([ctx2secondBranch isDeleted]);
+        [ctx2 redoForStackNamed: @"test"];
+        UKTrue([ctx2secondBranch isDeleted]);
     }
 }
 
@@ -130,6 +163,8 @@
         UKObjectsEqual(D(@"world2", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
         [ctx2 undoForStackNamed: @"test"];
         UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
+        [ctx2 redoForStackNamed: @"test"];
+        UKObjectsEqual(D(@"world2", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
     }
 }
 
@@ -156,9 +191,16 @@
         
         UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
         UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
+        
         [ctx2 undoForStackNamed: @"test"];
+        
         UKObjectsEqual(ctx2originalBranch, [ctx2persistentRoot currentBranch]);
         UKObjectsEqual(@"hello", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
+        
+        [ctx2 redoForStackNamed: @"test"];
+        
+        UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
+        UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
     }
 }
 
