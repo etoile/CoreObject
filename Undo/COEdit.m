@@ -103,6 +103,11 @@ static NSString * const kCOEditDisplayName = @"COEditDisplayName";
     [NSException raise: NSInvalidArgumentException format: @"override"];
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat: @"<%@: %p> %@", [self class], self, [self plist]];
+}
+
 @end
 
 @implementation COSingleEdit

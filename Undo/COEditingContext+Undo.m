@@ -111,7 +111,7 @@
 
 - (void) recordBeginUndoGroup
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
     if (_isRecordingUndo)
     {
         ASSIGN(_currentEditGroup, [[[COEditGroup alloc] init] autorelease]);
@@ -123,7 +123,7 @@
 }
 - (void) recordEndUndoGroup
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
     
     if (_isRecordingUndo)
     {
@@ -141,7 +141,7 @@
             : _currentEditGroup;
         
         id plist = [objectToSerialize plist];        
-        NSLog(@"Undo event: %@", plist);
+        //NSLog(@"Undo event: %@", plist);
         
         // N.B. The kCOUndoStack contains COEdits that are the inverse of
         // what the user did. So if the user creates a persistent root,
@@ -166,7 +166,7 @@
 
 - (void) recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
     
     COEditUndeletePersistentRoot *edit = [[[COEditUndeletePersistentRoot alloc] init] autorelease];
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
@@ -178,7 +178,7 @@
 }
 - (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
 
     COEditDeletePersistentRoot *edit = [[[COEditDeletePersistentRoot alloc] init] autorelease];
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
@@ -193,7 +193,7 @@
 
 - (void) recordPersistentRootCreation: (COPersistentRoot *)aPersistentRoot
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
 
     COEditDeletePersistentRoot *edit = [[[COEditDeletePersistentRoot alloc] init] autorelease];
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
@@ -207,7 +207,7 @@
              setCurrentBranch: (COBranch *)aBranch
                     oldBranch: (COBranch *)oldBranch
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
 
     COEditSetCurrentBranch *edit = [[[COEditSetCurrentBranch alloc] init] autorelease];
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
@@ -225,7 +225,7 @@
 
 - (void) recordBranchCreation: (COBranch *)aBranch
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
 
     COEditDeleteBranch *edit = [[[COEditDeleteBranch alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
@@ -241,7 +241,7 @@
 - (void) recordBranchSetCurrentRevision: (COBranch *)aBranch
                           oldRevisionID: (CORevisionID *)aRevisionID
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
     
     COEditSetCurrentVersionForBranch *edit = [[[COEditSetCurrentVersionForBranch alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
@@ -259,7 +259,7 @@
 - (void) recordBranchSetMetadata: (COBranch *)aBranch
                      oldMetadata: (id)oldMetadata
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
     
     COEditSetBranchMetadata *edit = [[[COEditSetBranchMetadata alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
@@ -276,7 +276,7 @@
 
 - (void) recordBranchDeletion: (COBranch *)aBranch
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
 
     COEditUndeleteBranch *edit = [[[COEditUndeleteBranch alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
@@ -291,7 +291,7 @@
 
 - (void) recordBranchUndeletion: (COBranch *)aBranch
 {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
   
     COEditDeleteBranch *edit = [[[COEditDeleteBranch alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
