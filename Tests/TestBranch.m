@@ -298,6 +298,30 @@
     }
 }
 
+- (void) testBranchSwitchPersistent
+{
+    COBranch *originalBranch = [persistentRoot currentBranch];
+    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
+    [ctx commit];
+    
+    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
+    [[[secondBranch objectGraphContext] rootObject] setValue: @"hello2" forProperty: kCOLabel];
+    [ctx commit];
+    
+    [persistentRoot setCurrentBranch: secondBranch];
+    [ctx commitWithStackNamed: @"test"];
+    
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        
+        UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
+        UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
+    }
+}
+
 - (void)testBranchFromBranch
 {
 	UKNil([originalBranch currentRevision]);
@@ -657,6 +681,5 @@
         UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot branchForUUID: [branch2 UUID]] metadata]);
     }
 }
-
 
 @end

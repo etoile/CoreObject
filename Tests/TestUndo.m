@@ -73,12 +73,9 @@
 - (void) testUndoCreateBranch
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
     [ctx commit];
     
     COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
-    
-    [[persistentRoot rootObject] setValue: @"hello2" forProperty: kCOLabel];
     [ctx commitWithStackNamed: @"test"];
         
     // Load in another context
@@ -96,12 +93,9 @@
 - (void) testUndoDeleteBranch
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
     [ctx commit];
     
     COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
-    
-    [[persistentRoot rootObject] setValue: @"hello2" forProperty: kCOLabel];
     [ctx commit];
     
     [secondBranch setDeleted: YES];
@@ -139,7 +133,6 @@
     }
 }
 
-#if 0
 - (void) testUndoSetCurrentBranch
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
@@ -148,7 +141,7 @@
     [ctx commit];
     
     COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];    
-    [[persistentRoot rootObject] setValue: @"hello2" forProperty: kCOLabel];
+    [[[secondBranch objectGraphContext] rootObject] setValue: @"hello2" forProperty: kCOLabel];
     [ctx commit];
     
     [persistentRoot setCurrentBranch: secondBranch];
@@ -168,6 +161,5 @@
         UKObjectsEqual(@"hello", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
     }
 }
-#endif
 
 @end
