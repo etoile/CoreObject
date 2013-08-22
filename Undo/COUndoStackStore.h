@@ -21,6 +21,7 @@ extern NSString * const kCORedoStack;
 
 - (NSArray *) stackContents: (NSString *)aTable forName: (NSString *)aStack;
 - (void) clearStack: (NSString *)aTable forName: (NSString *)aStack;
+- (void) clearStacksForName: (NSString *)aStack;
 
 - (void) popStack: (NSString *)aTable forName: (NSString *)aStack;
 - (NSDictionary *) peekStack: (NSString *)aTable forName: (NSString *)aStack;

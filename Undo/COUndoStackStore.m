@@ -80,6 +80,12 @@ NSString * const kCORedoStack = @"redo";
     [_db executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE name = ?", aTable], aStack];
 }
 
+- (void) clearStacksForName: (NSString *)aStack
+{
+    [self clearStack: kCOUndoStack forName: aStack];
+    [self clearStack: kCORedoStack forName: aStack];
+}
+
 - (void) popStack: (NSString *)aTable forName: (NSString *)aStack
 {
     [_db executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE idx = (SELECT MAX(idx) FROM %@ WHERE name = ?)", aTable, aTable], aStack];
@@ -97,6 +103,8 @@ NSString * const kCORedoStack = @"redo";
 
 - (void) pushAction: (NSDictionary *)anAction stack: (NSString *)aTable forName: (NSString *)aStack
 {
+    NILARG_EXCEPTION_TEST(aStack);
+    
     NSData *aBlob = [NSJSONSerialization dataWithJSONObject: anAction options: 0 error: NULL];
     BOOL ok = [_db executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (name, data) VALUES (?, ?)", aTable], aStack, aBlob];
     assert(ok);

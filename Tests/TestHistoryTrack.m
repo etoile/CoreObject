@@ -11,10 +11,14 @@
 - (id)init
 {
 	SUPERINIT;
-    
-    // FIXME: Hack
-    [[NSFileManager defaultManager] removeItemAtPath: [@"~/coreobject-undo.sqlite" stringByExpandingTildeInPath] error: NULL];
-    
+
+    COUndoStackStore *uss = [[COUndoStackStore alloc] init];
+    for (NSString *stack in A(@"workspace", @"doc2", @"doc1"))
+    {
+        [uss clearStacksForName: stack];
+    }
+    [uss release];
+
 	return self;
 }
 

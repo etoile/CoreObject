@@ -148,7 +148,10 @@
         // we push an edit to kCOUndoStack that deletes that persistent root.
         // => to perform an undo, pop from the kCOUndoStack and apply the edit.
         
-        [_undoStackStore pushAction: plist stack: kCOUndoStack forName: self.undoStackName];
+        if (self.undoStackName != nil)
+        {
+            [_undoStackStore pushAction: plist stack: kCOUndoStack forName: self.undoStackName];
+        }
         
         DESTROY(_currentEditGroup);
     }

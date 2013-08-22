@@ -14,8 +14,12 @@
 {
     SUPERINIT;
     
-    // FIXME: Hack
-    [[NSFileManager defaultManager] removeItemAtPath: [@"~/coreobject-undo.sqlite" stringByExpandingTildeInPath] error: NULL];
+    COUndoStackStore *uss = [[COUndoStackStore alloc] init];
+    for (NSString *stack in A(@"test", @"setup", @"rootEdit", @"childEdit"))
+    {
+        [uss clearStacksForName: stack];
+    }
+    [uss release];
     
     return self;
 }
@@ -64,6 +68,37 @@
     
     UKNil([root valueForProperty: kCOLabel]);
     UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
+}
+
+- (void) testUndoDeleteBranch
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
+    [ctx commit];
+    
+    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
+    
+    [[persistentRoot rootObject] setValue: @"hello2" forProperty: kCOLabel];
+    [ctx commit];
+    
+    [secondBranch setDeleted: YES];
+    [ctx commitWithStackNamed: @"test"];
+    
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        
+        UKTrue([ctx2secondBranch isDeleted]);
+        BOOL canUndo = [ctx2 canUndoForStackNamed: @"test"];
+        UKTrue(canUndo);
+        if (canUndo)
+        {
+            [ctx2 undoForStackNamed: @"test"];
+        }
+        UKFalse([ctx2secondBranch isDeleted]);
+    }
 }
 
 @end
