@@ -10,6 +10,6 @@
 
 @property (readwrite, nonatomic, copy) ETUUID *branchUUID;
 @property (readwrite, nonatomic, copy) CORevisionID *oldRevisionID;
-@property (readwrite, nonatomic, copy) CORevisionID *newRevisionID;
+@property (readwrite, nonatomic, copy) CORevisionID *revisionID;
 
 @end

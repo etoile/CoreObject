@@ -12,14 +12,14 @@ static NSString * const kCOEditNewMetadata = @"COEditNewMetadata";
 
 @synthesize branchUUID = _branchUUID;
 @synthesize oldMetadata = _oldMetadata;
-@synthesize newMetadata = _newMetadata;
+@synthesize metadata = _newMetadata;
 
 - (id) initWithPlist: (id)plist
 {
     self = [super initWithPlist: plist];
     self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditBranchUUID]];
     self.oldMetadata = [plist objectForKey: kCOEditOldMetadata];
-    self.newMetadata = [plist objectForKey: kCOEditNewMetadata];
+    self.metadata = [plist objectForKey: kCOEditNewMetadata];
     return self;
 }
 
@@ -48,7 +48,7 @@ static NSString * const kCOEditNewMetadata = @"COEditNewMetadata";
     
     inverse.branchUUID = _branchUUID;
     inverse.oldMetadata = _newMetadata;
-    inverse.newMetadata = _oldMetadata;
+    inverse.metadata = _oldMetadata;
     return inverse;
 }
 

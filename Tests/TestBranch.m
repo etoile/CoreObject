@@ -300,7 +300,6 @@
 
 - (void) testBranchSwitchPersistent
 {
-    COBranch *originalBranch = [persistentRoot currentBranch];
     [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
     [ctx commit];
     

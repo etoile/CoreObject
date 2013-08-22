@@ -9,6 +9,6 @@
 
 @property (readwrite, nonatomic, copy) ETUUID *branchUUID;
 @property (readwrite, nonatomic, copy) NSDictionary *oldMetadata;
-@property (readwrite, nonatomic, copy) NSDictionary *newMetadata;
+@property (readwrite, nonatomic, copy) NSDictionary *metadata;
 
 @end

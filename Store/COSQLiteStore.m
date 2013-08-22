@@ -252,21 +252,25 @@
     return [self backingStoreForUUID: [aToken backingStoreUUID]];
 }
 
+// FIXME: Implement this method for removing empty backing stores.
+// Currently the "furtherst" you can delete a persistent root leaves an
+// empty backing store (the SQLite DB should have zero rows)
 - (void) deleteBackingStoreWithUUID: (ETUUID *)aUUID
 {
-    {
-        COSQLiteStorePersistentRootBackingStore *backing = [backingStores_ objectForKey: aUUID];
-        if (backing != nil)
-        {
-            [backing close];
-            [backingStores_ removeObjectForKey: aUUID];
-        }
-    }
-    
-    // FIXME: This doesn't appear to ever be tested
-    
-    assert([[NSFileManager defaultManager] removeItemAtPath:
-            [self backingStorePathForUUID: aUUID] error: NULL]);
+    ETAssertUnreachable();
+//    {
+//        COSQLiteStorePersistentRootBackingStore *backing = [backingStores_ objectForKey: aUUID];
+//        if (backing != nil)
+//        {
+//            [backing close];
+//            [backingStores_ removeObjectForKey: aUUID];
+//        }
+//    }
+//    
+//    // FIXME: This doesn't appear to ever be tested
+//    
+//    assert([[NSFileManager defaultManager] removeItemAtPath:
+//            [self backingStorePathForUUID: aUUID] error: NULL]);
 }
 
 /** @taskunit reading states */

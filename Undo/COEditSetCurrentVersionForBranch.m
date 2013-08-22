@@ -17,14 +17,14 @@ static NSString * const kCOEditNewRevisionID = @"COEditNewRevisionID";
 
 @synthesize branchUUID = _branchUUID;
 @synthesize oldRevisionID = _oldRevisionID;
-@synthesize newRevisionID = _newRevisionID;
+@synthesize revisionID = _newRevisionID;
 
 - (id) initWithPlist: (id)plist
 {
     self = [super initWithPlist: plist];
     self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditBranchUUID]];
     self.oldRevisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOEditOldRevisionID]];
-    self.newRevisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOEditNewRevisionID]];
+    self.revisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOEditNewRevisionID]];
     return self;
 }
 
@@ -47,7 +47,7 @@ static NSString * const kCOEditNewRevisionID = @"COEditNewRevisionID";
     
     inverse.branchUUID = _branchUUID;
     inverse.oldRevisionID = _newRevisionID;
-    inverse.newRevisionID = _oldRevisionID;
+    inverse.revisionID = _oldRevisionID;
     return inverse;
 }
 

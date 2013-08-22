@@ -12,13 +12,13 @@ static NSString * const kCOEditNewBranchUUID = @"COEditNewBranchUUID";
 @implementation COEditSetCurrentBranch
 
 @synthesize oldBranchUUID = _oldBranchUUID;
-@synthesize newBranchUUID = _newBranchUUID;
+@synthesize branchUUID = _newBranchUUID;
 
 - (id) initWithPlist: (id)plist
 {
     self = [super initWithPlist: plist];
     self.oldBranchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditOldBranchUUID]];
-    self.newBranchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditNewBranchUUID]];
+    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditNewBranchUUID]];
     return self;
 }
 
@@ -39,7 +39,7 @@ static NSString * const kCOEditNewBranchUUID = @"COEditNewBranchUUID";
     inverse.displayName = _displayName;
     
     inverse.oldBranchUUID = _newBranchUUID;
-    inverse.newBranchUUID = _oldBranchUUID;
+    inverse.branchUUID = _oldBranchUUID;
     return inverse;
 }
 

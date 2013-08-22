@@ -216,7 +216,7 @@
     edit.displayName = @"Switch Branch";
     
     edit.oldBranchUUID = [aBranch UUID];
-    edit.newBranchUUID = [oldBranch UUID];
+    edit.branchUUID = [oldBranch UUID];
     
     [self recordEditInverse: edit];
 }
@@ -251,7 +251,7 @@
     
     edit.branchUUID = [aBranch UUID];
     edit.oldRevisionID = [[aBranch currentRevision] revisionID];
-    edit.newRevisionID = aRevisionID;
+    edit.revisionID = aRevisionID;
     
     [self recordEditInverse: edit];
 }
@@ -269,7 +269,7 @@
     
     edit.branchUUID = [aBranch UUID];
     edit.oldMetadata = [aBranch metadata];
-    edit.newMetadata = oldMetadata;
+    edit.metadata = oldMetadata;
     
     [self recordEditInverse: edit];
 }
