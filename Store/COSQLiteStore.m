@@ -614,13 +614,12 @@
 
     const int64_t root_id = [db_ lastInsertRowId];
     
-    [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,?,0)",
+    [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,NULL,0)",
            [aBranchUUID dataValue],
            [NSNumber numberWithLongLong: root_id],
            [NSNumber numberWithLongLong: [revId revisionIndex]],
            [NSNumber numberWithLongLong: [revId revisionIndex]],
-           [NSNumber numberWithLongLong: [revId revisionIndex]],
-           nil];
+           [NSNumber numberWithLongLong: [revId revisionIndex]]];
     
     const int64_t branch_id = [db_ lastInsertRowId];
     

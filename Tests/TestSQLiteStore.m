@@ -271,6 +271,11 @@ static ETUUID *childUUID2;
 
 - (void) testBranchMetadata
 {
+    // A plain call to -createPersistentRootWithInitialItemGraph: creates a default branch
+    // with nil metadata; this is intentional.
+    //
+    // If you want to give the branch initial metadata you can call -setMetadata:forBranch:...
+    // in a transaction with the -createPersistentRootWithInitialItemGraph: call.
     UKNil([[[store persistentRootInfoForUUID: prootUUID] currentBranchInfo] metadata]);
     
     UKTrue([store setMetadata: D(@"hello world", @"msg")
@@ -637,6 +642,9 @@ static ETUUID *childUUID2;
     UKObjectsEqual(S(prootUUID, [copy UUID]), [NSSet setWithArray:[store persistentRootUUIDs]]);
 
     // 1. check setup
+    
+    // Verify that the new branch metadata is nil
+    UKNil([[copy currentBranchInfo] metadata]);
     
     // Verify that new UUIDs were generated
     UKObjectsNotEqual(prootUUID, [copy UUID]);

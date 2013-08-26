@@ -324,6 +324,10 @@
  * Always creates a new backing store, so the contents will not be stored as a delta against another
  * persistent root. If the new persistent root is likely going to have content in common with another
  * persistent root, use -createPersistentRootWithInitialRevision: instead.
+ *
+ * Writes the item graph "contents" as an initial revision in the persistent root,
+ * and creates a default branch (with nil metadata) whose current revision is set to the
+ * initial revision.
  */
 - (COPersistentRootInfo *) createPersistentRootWithInitialItemGraph: (id<COItemGraph>)contents
                                                                UUID: (ETUUID *)persistentRootUUID
@@ -335,7 +339,7 @@
  * "Cheap copy" method of creating a persistent root.
  *
  * The created persistent root will have a single branch whose current revision is set to the
- * provided revision.
+ * provided revision, and whose metadata is nil.
  *
  * The persistent root will share its backing store with the backing store of aRevision,
  * but this is an implementation detail and otherwise it's completely isolated from other
