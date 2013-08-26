@@ -154,6 +154,7 @@
 		66C366FD17B46046009ACF2F /* Pickboard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66C366C117B42878009ACF2F /* Pickboard.xib */; };
 		66C3670C17B5F9B0009ACF2F /* COBranchInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3670A17B5F9AF009ACF2F /* COBranchInfo.m */; };
 		66C3671017B5FA0E009ACF2F /* COPersistentRootInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3670E17B5FA0D009ACF2F /* COPersistentRootInfo.m */; };
+		66C97DA817CBD31800898F80 /* TestSQLiteStoreErrorHandling.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C97DA717CBD31800898F80 /* TestSQLiteStoreErrorHandling.m */; };
 		66D32A9F17C49903004D006D /* TestHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D32A9E17C49903004D006D /* TestHistoryTrack.m */; };
 		66D96C70178AE41500D1553C /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
 		66D96CA0178B6E5600D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
@@ -507,6 +508,7 @@
 		66C3670A17B5F9AF009ACF2F /* COBranchInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBranchInfo.m; path = Store/COBranchInfo.m; sourceTree = "<group>"; };
 		66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COPersistentRootInfo.h; path = Store/COPersistentRootInfo.h; sourceTree = "<group>"; };
 		66C3670E17B5FA0D009ACF2F /* COPersistentRootInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COPersistentRootInfo.m; path = Store/COPersistentRootInfo.m; sourceTree = "<group>"; };
+		66C97DA717CBD31800898F80 /* TestSQLiteStoreErrorHandling.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStoreErrorHandling.m; path = Tests/TestSQLiteStoreErrorHandling.m; sourceTree = "<group>"; };
 		66D32A9E17C49903004D006D /* TestHistoryTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestHistoryTrack.m; path = Tests/TestHistoryTrack.m; sourceTree = "<group>"; };
 		66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestConcurrentChanges.m; path = Tests/TestConcurrentChanges.m; sourceTree = "<group>"; };
 		66D96C9F178B6E5600D1553C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
@@ -768,6 +770,7 @@
 				664199B2178C431E00B78174 /* TestSQLiteStorePerformance.m */,
 				664199B3178C431E00B78174 /* TestSQLiteStorePersistentRootBackingStore.m */,
 				667F79EC17BDE00B00B6BF3A /* TestSQLiteStoreSharedPersistentRoots.m */,
+				66C97DA717CBD31800898F80 /* TestSQLiteStoreErrorHandling.m */,
 			);
 			name = "Store Tests";
 			sourceTree = "<group>";
@@ -1444,6 +1447,7 @@
 				666ED56C17C3E78A00D148AA /* TestUndo.m in Sources */,
 				66ABC78E17C43FBA009FB925 /* TestCustomTrack.m in Sources */,
 				66D32A9F17C49903004D006D /* TestHistoryTrack.m in Sources */,
+				66C97DA817CBD31800898F80 /* TestSQLiteStoreErrorHandling.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
