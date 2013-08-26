@@ -231,16 +231,21 @@
 
 - (COSQLiteStorePersistentRootBackingStore *) backingStoreForPersistentRootUUID: (ETUUID *)aUUID
 {
-    return [self backingStoreForUUID:
-            [self backingUUIDForPersistentRootUUID: aUUID]];
+    return [self backingStoreForUUID: [self backingUUIDForPersistentRootUUID: aUUID]
+                               error: NULL];
 }
 
-- (COSQLiteStorePersistentRootBackingStore *) backingStoreForUUID: (ETUUID *)aUUID
+- (COSQLiteStorePersistentRootBackingStore *) backingStoreForUUID: (ETUUID *)aUUID error: (NSError **)error
 {
     COSQLiteStorePersistentRootBackingStore *result = [backingStores_ objectForKey: aUUID];
     if (result == nil)
     {
-        result = [[COSQLiteStorePersistentRootBackingStore alloc] initWithPersistentRootUUID: aUUID store: self useStoreDB: NO];
+        result = [[COSQLiteStorePersistentRootBackingStore alloc] initWithPersistentRootUUID: aUUID store: self useStoreDB: NO error: error];
+        if (result == nil)
+        {
+            return nil;
+        }
+        
         [backingStores_ setObject: result forKey: aUUID];
         [result release];
     }
@@ -249,7 +254,7 @@
 
 - (COSQLiteStorePersistentRootBackingStore *) backingStoreForRevisionID: (CORevisionID *)aToken
 {
-    return [self backingStoreForUUID: [aToken backingStoreUUID]];
+    return [self backingStoreForUUID: [aToken backingStoreUUID] error: NULL];
 }
 
 // FIXME: Implement this method for removing empty backing stores.
@@ -418,18 +423,21 @@
                   withMetadata: metadata
                withParentRevid: [aParent revisionIndex]
         inBackingStoreWithUUID: [aParent backingStoreUUID]
-                 modifiedItems: modifiedItems];
+                 modifiedItems: modifiedItems
+                         error: error];
 }
 
 - (CORevisionID *) writeItemTreeWithNoParent: (id<COItemGraph>)anItemTree
                                 withMetadata: (NSDictionary *)metadata
                       inBackingStoreWithUUID: (ETUUID *)aBacking
+                                       error: (NSError **)error
 {
     return [self writeItemTree: anItemTree
                   withMetadata: metadata
                withParentRevid: -1
         inBackingStoreWithUUID: aBacking
-                 modifiedItems: nil];
+                 modifiedItems: nil
+                         error: error];
 }
 
 
@@ -438,8 +446,14 @@
                  withParentRevid: (int64_t)parentRevid
           inBackingStoreWithUUID: (ETUUID *)aBacking
                    modifiedItems: (NSArray*)modifiedItems // array of COUUID
+                           error: (NSError **)error
 {
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: aBacking];
+    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: aBacking error: error];
+    if (backing == nil)
+    {
+        return nil;
+    }
+    
     const int64_t revid = [backing writeItemGraph: anItemTree
                                     withMetadata: metadata
                                       withParent: parentRevid
@@ -660,7 +674,12 @@
     
     CORevisionID *revId = [self writeItemTreeWithNoParent: contents
                                              withMetadata: metadata
-                                   inBackingStoreWithUUID: persistentRootUUID];
+                                   inBackingStoreWithUUID: persistentRootUUID
+                                                    error: error];
+    if (revId == nil)
+    {
+        return nil;
+    }
     
     return [self createPersistentRootWithUUID: persistentRootUUID
                                    branchUUID: aBranchUUID
@@ -806,7 +825,7 @@
         return;
     }
     
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: [aRev backingStoreUUID]];
+    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: [aRev backingStoreUUID] error: NULL];
     
     if (![backing hasRevid: [aRev revisionIndex]])
     {
@@ -986,7 +1005,7 @@
     NILARG_EXCEPTION_TEST(aRoot);
     
     ETUUID *backingUUID = [self backingUUIDForPersistentRootUUID: aRoot];
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID];
+    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID error: NULL];
     //NSNumber *backingId = [self rootIdForPersistentRootUUID: backingUUID];
     NSData *backingUUIDData = [backingUUID dataValue];
     

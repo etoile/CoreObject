@@ -31,14 +31,23 @@
     }
 }
 
-- (void) setupDatabaseWithParentStore: (COSQLiteStore *)store
+- (id)initWithPersistentRootUUID: (ETUUID*)aUUID
+                           store: (COSQLiteStore *)store
+                      useStoreDB: (BOOL)share
+                           error: (NSError **)error
 {
+    SUPERINIT;
+    
+    _shareDB = share;
+    _store = store;
+    ASSIGN(_uuid, aUUID);
+    
     if (_shareDB)
     {
         ASSIGN(db_, [store database]);
     }
     else
-    {    
+    {
         NSString *path = [[[store URL] path] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.sqlite", _uuid]];
         NILARG_EXCEPTION_TEST(path);
         
@@ -48,7 +57,9 @@
         
         if (![db_ open])
         {
-            assert(0);
+            NSLog(@"Error %d: %@", [db_ lastErrorCode], [db_ lastErrorMessage]);
+            [self release];
+            return nil;
         }
         
         // Use write-ahead-log mode
@@ -71,19 +82,6 @@
                          @"CREATE TABLE IF NOT EXISTS %@ (revid INTEGER PRIMARY KEY ASC, "
                          "contents BLOB, metadata BLOB, timestamp REAL, parent INTEGER, root BLOB, deltabase INTEGER, "
                          "bytesInDeltaRun INTEGER, garbage BOOLEAN)", [self tableName]]];
-}
-
-- (id)initWithPersistentRootUUID: (ETUUID*)aUUID
-                           store: (COSQLiteStore *)store
-                      useStoreDB: (BOOL)share
-{
-    SUPERINIT;
-    
-    _shareDB = share;
-    _store = store;
-    ASSIGN(_uuid, aUUID);
-    
-    [self setupDatabaseWithParentStore: store];
     
     if ([db_ hadError])
     {

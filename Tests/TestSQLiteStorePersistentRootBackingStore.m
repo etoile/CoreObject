@@ -164,7 +164,8 @@ static ETUUID *childUUID2;
 
     store = [[COSQLiteStorePersistentRootBackingStore alloc] initWithPersistentRootUUID: persistentRootUUID
                                                                                   store: parentStore
-                                                                             useStoreDB: NO];
+                                                                             useStoreDB: NO
+                                                                                  error: NULL];
     
     return self;
 }

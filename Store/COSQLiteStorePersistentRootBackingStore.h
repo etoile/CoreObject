@@ -27,7 +27,8 @@
  */
 - (id)initWithPersistentRootUUID: (ETUUID*)aUUID
                            store: (COSQLiteStore *)store
-                      useStoreDB: (BOOL)share;
+                      useStoreDB: (BOOL)share
+                           error: (NSError **)error;
 
 - (BOOL)close;
 
