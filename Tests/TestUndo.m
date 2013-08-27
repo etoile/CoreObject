@@ -29,7 +29,7 @@
     [super dealloc];
 }
 
-- (void)testBasic
+- (void)testUndoSetCurrentVersionForBranchBasic
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commitWithStackNamed: @"test"];
@@ -46,7 +46,7 @@
     UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
 }
 
-- (void)testSelectiveUndo
+- (void)testUndoSetCurrentVersionForBranchSelectiveUndo
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     {
@@ -201,6 +201,45 @@
         
         UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
         UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
+    }
+}
+
+- (void) testUndoCreatePersistentRoot
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx commitWithStackNamed: @"test"];
+    
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+                
+        UKFalse([ctx2persistentRoot isDeleted]);
+        [ctx2 undoForStackNamed: @"test"];
+        UKTrue([ctx2persistentRoot isDeleted]);
+        [ctx2 redoForStackNamed: @"test"];
+        UKFalse([ctx2persistentRoot isDeleted]);
+    }
+}
+
+- (void) testUndoDeletePersistentRoot
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx commit];
+    
+    [persistentRoot setDeleted: YES];
+    [ctx commitWithStackNamed: @"test"];
+    
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        
+        UKTrue([ctx2persistentRoot isDeleted]);
+        [ctx2 undoForStackNamed: @"test"];
+        UKFalse([ctx2persistentRoot isDeleted]);
+        [ctx2 redoForStackNamed: @"test"];
+        UKTrue([ctx2persistentRoot isDeleted]);
     }
 }
 
