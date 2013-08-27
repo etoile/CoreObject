@@ -69,21 +69,21 @@ static ETUUID *childUUID2;
 
 - (COItemGraph*) makeInitialItemTree
 {
-    return [COItemGraph treeWithItemsRootFirst: A([self initialRootItemForChildren: A(childUUID1)],
+    return [COItemGraph itemGraphWithItemsRootFirst: A([self initialRootItemForChildren: A(childUUID1)],
                                                  [self initialChildItemForUUID: childUUID1 name: @"initial child"])];
 }
 
 - (COItemGraph*) makeBranchAItemTreeAtRevid: (int64_t)aRev
 {
     NSString *name = [NSString stringWithFormat: @"child for commit %lld", (long long int)aRev];
-    return [COItemGraph treeWithItemsRootFirst: A([self initialRootItemForChildren: A(childUUID1)],
+    return [COItemGraph itemGraphWithItemsRootFirst: A([self initialRootItemForChildren: A(childUUID1)],
                                                  [self initialChildItemForUUID: childUUID1 name: name])];
 }
 
 - (COItemGraph*) makeBranchBItemTreeAtRevid: (int64_t)aRev
 {
     NSString *name = [NSString stringWithFormat: @"child for commit %lld", (long long int)aRev];
-    return [COItemGraph treeWithItemsRootFirst: A([self initialRootItemForChildren: A(childUUID2)],
+    return [COItemGraph itemGraphWithItemsRootFirst: A([self initialRootItemForChildren: A(childUUID2)],
                                                  [self initialChildItemForUUID: childUUID2 name: name])];
 }
 

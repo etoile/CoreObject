@@ -47,7 +47,7 @@
     NSMutableDictionary *itemForUUID_;
 }
 
-+ (COItemGraph *)treeWithItemsRootFirst: (NSArray*)items;
++ (COItemGraph *)itemGraphWithItemsRootFirst: (NSArray*)items;
 
 - (id) initWithItemForUUID: (NSDictionary *) itemForUUID
               rootItemUUID: (ETUUID *)root;

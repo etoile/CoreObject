@@ -44,7 +44,7 @@
     return [self initWithItems: array rootItemUUID: [aGraph rootItemUUID]];
 }
 
-+ (COItemGraph *)treeWithItemsRootFirst: (NSArray*)items
++ (COItemGraph *)itemGraphWithItemsRootFirst: (NSArray*)items
 {
     NSParameterAssert([items count] >= 1);
 
