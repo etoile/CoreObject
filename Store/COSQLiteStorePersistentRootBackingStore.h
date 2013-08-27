@@ -58,11 +58,11 @@
  * 
  * @returns 0 for the first commit on an empty backing store, -1 on error
  */
-- (int64_t) writeItemGraph: (id<COItemGraph>)anItemTree
-              withMetadata: (NSDictionary *)metadata
-                withParent: (int64_t)aParent
-             modifiedItems: (NSArray*)modifiedItems // array of COUUID
-                     error: (NSError **)error;
+- (CORevisionID *) writeItemGraph: (id<COItemGraph>)anItemTree
+                     withMetadata: (NSDictionary *)metadata
+                       withParent: (int64_t)aParent
+                    modifiedItems: (NSArray*)modifiedItems // array of COUUID
+                            error: (NSError **)error;
 
 - (NSIndexSet *) revidsFromRevid: (int64_t)baseRevid toRevid: (int64_t)finalRevid;
 

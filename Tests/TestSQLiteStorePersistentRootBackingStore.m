@@ -117,40 +117,40 @@ static ETUUID *childUUID2;
     
     // First commit
     
-    int64_t revid0 = [store writeItemGraph: [self makeInitialItemTree]
-                              withMetadata: [self initialMetadata]
-                                withParent: -1
-                             modifiedItems: nil
-                                     error: NULL];
+    int64_t revid0 = [[store writeItemGraph: [self makeInitialItemTree]
+                               withMetadata: [self initialMetadata]
+                                 withParent: -1
+                              modifiedItems: nil
+                                      error: NULL] revisionIndex];
     UKIntsEqual(0, revid0);
     
     // Branch A
     
     for (int64_t i = 1; i<=BRANCH_LENGTH; i++)
     {
-        int64_t revid = [store writeItemGraph: [self makeBranchAItemTreeAtRevid: i]
-                                 withMetadata: [self branchAMetadata]
-                                   withParent: i - 1
-                                modifiedItems: A(childUUID1)
-                                        error: NULL];
+        int64_t revid = [[store writeItemGraph: [self makeBranchAItemTreeAtRevid: i]
+                                  withMetadata: [self branchAMetadata]
+                                    withParent: i - 1
+                                 modifiedItems: A(childUUID1)
+                                         error: NULL] revisionIndex];
         UKIntsEqual(i, revid);
     }
     
     // Branch B
     
-    UKIntsEqual(BRANCH_LENGTH + 1, [store writeItemGraph: [self makeBranchBItemTreeAtRevid: BRANCH_LENGTH + 1]
-                                            withMetadata: [self branchBMetadata]
-                                              withParent: 0
-                                           modifiedItems: A(rootUUID, childUUID2)
-                                                   error: NULL]);
+    UKIntsEqual(BRANCH_LENGTH + 1, [[store writeItemGraph: [self makeBranchBItemTreeAtRevid: BRANCH_LENGTH + 1]
+                                             withMetadata: [self branchBMetadata]
+                                               withParent: 0
+                                            modifiedItems: A(rootUUID, childUUID2)
+                                                    error: NULL] revisionIndex]);
     
     for (int64_t i = (BRANCH_LENGTH + 2); i <= (2 * BRANCH_LENGTH); i++)
     {
-        int64_t revid = [store writeItemGraph: [self makeBranchBItemTreeAtRevid: i]
-                                 withMetadata: [self branchBMetadata]
-                                   withParent: i - 1
-                                modifiedItems: A(childUUID2)
-                                        error: NULL];
+        int64_t revid = [[store writeItemGraph: [self makeBranchBItemTreeAtRevid: i]
+                                  withMetadata: [self branchBMetadata]
+                                    withParent: i - 1
+                                 modifiedItems: A(childUUID2)
+                                         error: NULL] revisionIndex];
         UKIntsEqual(i, revid);
     }
     

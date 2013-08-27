@@ -372,11 +372,11 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
  * @param aParent -1 for no parent, otherwise the parent of this commit
  * @param modifiedItems nil for all items in anItemTree, otherwise a subset
  */
-- (int64_t) writeItemGraph: (id<COItemGraph>)anItemTree
-              withMetadata: (NSDictionary *)metadata
-                withParent: (int64_t)aParent
-             modifiedItems: (NSArray*)modifiedItems
-                     error: (NSError **)error
+- (CORevisionID *) writeItemGraph: (id<COItemGraph>)anItemTree
+                     withMetadata: (NSDictionary *)metadata
+                       withParent: (int64_t)aParent
+                    modifiedItems: (NSArray*)modifiedItems
+                            error: (NSError **)error
 {
     // TODO: For debugging only, remove
     COValidateItemGraph(anItemTree);
@@ -386,7 +386,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     {
         if (![db_ beginTransaction])
         {
-            return -1;
+            return nil;
         }
     }
     
@@ -444,10 +444,13 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     
     if (!ok)
     {
-        return -1;
+        return nil;
     }
     
-    return rowid;
+    CORevisionID *revidObject = [CORevisionID revisionWithBackinStoreUUID: _uuid
+                                                            revisionIndex: rowid];
+
+    return revidObject;
 }
 
 - (NSIndexSet *) revidsFromRevid: (int64_t)baseRevid toRevid: (int64_t)revid

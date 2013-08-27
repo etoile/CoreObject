@@ -454,25 +454,20 @@
         return nil;
     }
     
-    const int64_t revid = [backing writeItemGraph: anItemTree
+    CORevisionID *revid = [backing writeItemGraph: anItemTree
                                      withMetadata: metadata
                                        withParent: parentRevid
                                     modifiedItems: modifiedItems
                                             error: error];
     
-    if (revid < 0)
+    if (revid != nil)
     {
-        return nil;
+        [self updateSearchIndexesForItemUUIDs: modifiedItems
+                                   inItemTree: anItemTree
+                       revisionIDBeingWritten: revid];
     }
     
-    CORevisionID *revidObject = [CORevisionID revisionWithBackinStoreUUID: aBacking
-                                                            revisionIndex: revid];
-    
-    [self updateSearchIndexesForItemUUIDs: modifiedItems
-                               inItemTree: anItemTree
-                   revisionIDBeingWritten: revidObject];
-    
-    return revidObject;
+    return revid;
 }
 
 /** @taskunit persistent roots */
