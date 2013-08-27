@@ -21,6 +21,7 @@
 #import "COContainer.h"
 #import "COUndoStackStore.h"
 #import "COEditingContext+Undo.h"
+#import "OutlineItem.h"
 
 #define SA(x) [NSSet setWithArray: x]
 
