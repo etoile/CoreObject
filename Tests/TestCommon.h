@@ -1,26 +1,9 @@
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
-#import "COCopier.h"
-#import "COEditingContext.h"
-#import "COItem.h"
-#import "COPath.h"
-#import "COItemGraph.h"
-#import "COPersistentRoot.h"
-#import "COBranch.h"
-#import "CORevision.h"
-#import "CORevisionID.h"
-#import "CORevisionInfo.h"
-#import "COSQLiteStore.h"
-#import "COBranchInfo.h"
-#import "COPersistentRootInfo.h"
-#import "COType.h"
-#import "COObjectGraphContext.h"
-#import "COObject.h"
-#import "COSerialization.h"
-#import "COItemGraphDiff.h"
-#import "COContainer.h"
-#import "COUndoStackStore.h"
-#import "COEditingContext+Undo.h"
+#import <CoreObject/CoreObject.h>
+
+#import <CoreObject/COUndoStackStore.h>
+
 #import "OutlineItem.h"
 
 #define SA(x) [NSSet setWithArray: x]

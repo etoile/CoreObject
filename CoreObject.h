@@ -48,6 +48,7 @@
 #import <CoreObject/COItem.h>
 #import <CoreObject/COItemGraph.h>
 #import <CoreObject/COType.h>
+#import <CoreObject/COPath.h>
 
 /* Store */
 
@@ -58,6 +59,10 @@
 #import <CoreObject/COSearchResult.h>
 #import <CoreObject/COSQLiteStore.h>
 #import <CoreObject/COSQLiteStore+Attachments.h>
+
+/* Undo */
+
+#import <CoreObject/COEditingContext+Undo.h>
 
 /* Utilities */
 

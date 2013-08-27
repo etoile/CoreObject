@@ -47,6 +47,7 @@ NSString *SetterToProperty(NSString *prop)
             [prop substringWithRange: NSMakeRange(4,  [prop length] - 5)]];
 }
 
+#if 0
 static void
 COAddMethodIfDoesNotRespond(Class cls, SEL cmd, IMP imp, const char *type)
 {
@@ -55,6 +56,7 @@ COAddMethodIfDoesNotRespond(Class cls, SEL cmd, IMP imp, const char *type)
         class_addMethod(cls, cmd, imp, type);
     }
 }
+#endif
 
 static id genericGetter(id theSelf, SEL theCmd)
 {
