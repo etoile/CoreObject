@@ -376,6 +376,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
               withMetadata: (NSDictionary *)metadata
                 withParent: (int64_t)aParent
              modifiedItems: (NSArray*)modifiedItems
+                     error: (NSError **)error
 {
     // TODO: For debugging only, remove
     COValidateItemGraph(anItemTree);
@@ -383,7 +384,10 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     BOOL inTransaction = [db_ inTransaction];
     if (!inTransaction)
     {
-        [db_ beginTransaction];   
+        if (![db_ beginTransaction])
+        {
+            return -1;
+        }
     }
     
     const int64_t parent_deltabase = [self deltabaseForRowid: aParent];
@@ -421,7 +425,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
         metadataBlob = [NSJSONSerialization dataWithJSONObject: metadata options: 0 error: NULL];
     }
     
-    [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (revid, "
+    BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (revid, "
         "contents, metadata, timestamp, parent, root, deltabase, "
         "bytesInDeltaRun, garbage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)", [self tableName]],
         [NSNumber numberWithLongLong: rowid],
@@ -435,7 +439,12 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     
     if (!inTransaction)
     {
-        [db_ commit];
+        ok = ok && [db_ commit];
+    }
+    
+    if (!ok)
+    {
+        return -1;
     }
     
     return rowid;
@@ -539,7 +548,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
      SELECT commits.revid
      FROM c AS commits
      LEFT OUTER JOIN (SELECT deltabase, MAX(revid) AS maxkeptrevid FROM c WHERE garbage = 0 GROUP BY deltabase) AS info
-     ON commits.deltabase = info.deltabase
+     USING (deltabase)
      WHERE (commits.revid > info.maxkeptrevid) OR info.maxkeptrevid IS NULL;
      
      -- The "OR info.maxkeptrevid IS NULL" part is so that we delete all commits in delta runs where all commits are garbage.
@@ -550,7 +559,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     [db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE revid IN (SELECT commits.revid "
                          "FROM %@ AS commits "
                          "LEFT OUTER JOIN (SELECT deltabase, MAX(revid) AS maxkeptrevid FROM %@ WHERE garbage = 0 GROUP BY deltabase) AS info "
-                         "  ON commits.deltabase = info.deltabase "
+                         "USING (deltabase) "
                          "WHERE (commits.revid > info.maxkeptrevid) OR info.maxkeptrevid IS NULL)",
                          [self tableName], [self tableName], [self tableName]]];
     

@@ -26,6 +26,14 @@ static ETUUID *rootUUID;
     return [COItemGraph treeWithItemsRootFirst: A([[[COMutableItem alloc] initWithUUID: rootUUID] autorelease])];
 }
 
+- (COItemGraph *) makeChangedItemGraph
+{
+    COMutableItem *item = [[[COMutableItem alloc] initWithUUID: rootUUID] autorelease];
+    [item setValue: @"hello" forAttribute: @"name" type: kCOStringType];
+    return [COItemGraph treeWithItemsRootFirst: A(item)];
+}
+
+
 - (NSString *) tempPathWithName: (NSString *)aName
 {
     return [NSTemporaryDirectory() stringByAppendingPathComponent:
@@ -86,6 +94,62 @@ static ETUUID *rootUUID;
                                             ofItemAtPath: dir
                                                    error: NULL]);
     assert([[NSFileManager defaultManager] removeItemAtPath: dir error: NULL]);
+}
+
+- (void) testDatabasesBecomingReadonly
+{
+    NSString *dir = [self tempPathWithName: @"coreobject-index-become-readonly"];
+    
+    COPersistentRootInfo *info = nil;
+    
+    @autoreleasepool {
+        assert([[NSFileManager defaultManager] createDirectoryAtPath: dir
+                                         withIntermediateDirectories: NO
+                                                          attributes: nil
+                                                               error: NULL]);
+        
+        COSQLiteStore *store = [[[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir
+                                                                               isDirectory: YES]] autorelease];
+        UKNotNil(store);
+        
+        ASSIGN(info, [store createPersistentRootWithInitialItemGraph: [self makeInitialItemGraph]
+                                                                UUID: [ETUUID UUID]
+                                                          branchUUID: [ETUUID UUID]
+                                                    revisionMetadata: nil
+                                                               error: NULL]);
+        
+        UKNotNil(info);
+    }
+
+    // Make the SQLite files readonly
+    
+    for (NSString *filename in [[NSFileManager defaultManager] contentsOfDirectoryAtPath: dir error: NULL])
+    {
+        assert([[NSFileManager defaultManager] setAttributes: READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES
+                                                ofItemAtPath: [dir stringByAppendingPathComponent: filename]
+                                                       error: NULL]);
+    }
+
+    // Now, writing a revision should fail
+    
+    @autoreleasepool {
+        COSQLiteStore *store = [[[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir
+                                                                               isDirectory: YES]] autorelease];        
+        NSError *writeRevisionError = nil;
+        UKNil([store writeRevisionWithItemGraph: [self makeChangedItemGraph]
+                                       metadata: nil
+                               parentRevisionID: [info currentRevisionID]
+                                  modifiedItems: nil
+                                          error: &writeRevisionError]);
+        
+        // Check we can still read the initial revision
+        
+        UKObjectsEqual([self makeInitialItemGraph], [store itemGraphForRevisionID: [info currentRevisionID]]);
+    }
+    
+    assert([[NSFileManager defaultManager] removeItemAtPath: dir error: NULL]);
+    
+    DESTROY(info);
 }
 
 @end

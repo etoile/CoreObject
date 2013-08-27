@@ -71,7 +71,7 @@
     
     // Set up schema
     
-    [db_ beginTransaction];
+    [db_ beginDeferredTransaction];
     
     /* Store Metadata tables (including schema version) */
     
@@ -455,11 +455,16 @@
     }
     
     const int64_t revid = [backing writeItemGraph: anItemTree
-                                    withMetadata: metadata
-                                      withParent: parentRevid
-                                   modifiedItems: modifiedItems];
+                                     withMetadata: metadata
+                                       withParent: parentRevid
+                                    modifiedItems: modifiedItems
+                                            error: error];
     
-    assert(revid >= 0);
+    if (revid < 0)
+    {
+        return nil;
+    }
+    
     CORevisionID *revidObject = [CORevisionID revisionWithBackinStoreUUID: aBacking
                                                             revisionIndex: revid];
     
