@@ -40,5 +40,6 @@
 @dynamic contents;
 @dynamic parentContainer;
 @dynamic parentCollections;
+@dynamic checked;
 
 @end

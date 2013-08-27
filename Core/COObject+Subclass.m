@@ -1,6 +1,7 @@
 #import "COObject+Subclass.h"
 #include <objc/runtime.h>
 
+#if 0
 static
 const char *kCOOriginalClassKey = "COOriginalClassKey";
 
@@ -27,6 +28,8 @@ const char *kCOOriginalClassKey = "COOriginalClassKey";
 }
 
 @end
+
+#endif
 
 @implementation COObject (Subclass)
 
@@ -66,6 +69,7 @@ static void genericSetter(id theSelf, SEL theCmd, id value)
     [theSelf setValue: value forPropertyWithoutSetter: key];
 }
 
+#if 0
 static Class
 CONewClassForEntityDescription(ETEntityDescription *entity, Class superclass, NSString *classname)
 {
@@ -100,6 +104,40 @@ CONewClassForEntityDescription(ETEntityDescription *entity, Class superclass, NS
     
     cls = CONewClassForEntityDescription(entity, superclass, key);
     return cls;
+}
+#endif
+
++ (BOOL)resolveInstanceMethod:(SEL)sel
+{
+    Class classToCheck = [self class];//object_getClass(self);
+    
+    while (classToCheck != Nil)
+    {
+        unsigned int propertyCount;
+        objc_property_t *propertyList = class_copyPropertyList(classToCheck, &propertyCount);
+        for (unsigned int i=0; i<propertyCount; i++)
+        {
+            objc_property_t property = propertyList[i];
+            
+            NSString *propName = [NSString stringWithUTF8String: property_getName(property)];
+            NSString *setterName = PropertyToSetter(propName);
+            
+            if (NSSelectorFromString(propName) == sel)
+            {
+                class_addMethod(classToCheck, sel, (IMP)&genericGetter, "@@:");
+                return YES;
+            }
+            else if (NSSelectorFromString(setterName) == sel)
+            {
+                class_addMethod(classToCheck, sel, (IMP)&genericSetter, "v@:@");
+                return YES;
+            }
+        }
+        free(propertyList);
+        
+        classToCheck = class_getSuperclass(classToCheck);
+    }
+    return NO;
 }
 
 @end
