@@ -136,12 +136,8 @@
 	// introduce some new objects
 	
 	COContainer *leaf4 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *leaf5 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *leaf6 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
-	[leaf4 setValue: @"Leaf 4" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc1"];
-	[leaf5 setValue: @"Leaf 5" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc2"];
-	[leaf6 setValue: @"Leaf 6" forProperty: kCOLabel]; [ctx commitWithStackNamed: @"doc2"];	
+	[leaf4 setValue: @"Leaf 4" forProperty: kCOLabel];
 	
 	// add them to the lists
 
@@ -165,8 +161,10 @@
 	//          |
 	//          \-leaf2
 	
-	
-	
+    COContainer *leaf5 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    
+    [leaf5 setValue: @"Leaf 5" forProperty: kCOLabel];
+
 	[group2 addObject: leaf5]; [ctx commitWithStackNamed: @"doc2"];
 
 	// workspace
@@ -188,9 +186,11 @@
 	//          |-leaf2
 	//          |
 	//          \-leaf5
-	
-	
-	
+		
+    COContainer *leaf6 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    
+	[leaf6 setValue: @"Leaf 6" forProperty: kCOLabel];
+
 	[group2 addObject: leaf6]; [ctx commitWithStackNamed: @"doc2"];
 
 	// workspace
@@ -222,102 +222,90 @@
 	
 	UKFalse([ctx hasChanges]);
 	
+	// Now try undoing changes made to Document 1, using @"doc1" track.
 
-    // Start with an easy test
-	
-	
-//	UKObjectsEqual(@"Red wine", [leaf3 valueForProperty: kCOLabel]);
-//	[leaf3Track undo];
-//	UKObjectsEqual(@"Wine", [leaf3 valueForProperty: kCOLabel]);
-
-	// FIXME: [leaf3Track undo];
-	//UKObjectsEqual(@"Leaf 3", [leaf3 valueForProperty: kCOLabel]);
-	//UKObjectsEqual(S([leaf3 UUID]), [ctx updatedObjectUUIDs]); // Ensure that no other objects were changed by the history track
-	
-	
-	// Now try undoing changes made to Document 1, using doc1track. It shouldn't 
-	// affect leaf3 until seveal steps back in to the history.
-	
-	
 	// first undo should change leaf4's label from "Carol" -> "Leaf 4"
-//	UKObjectsEqual(@"Carol", [leaf4 valueForProperty: kCOLabel]);
-//	[doc1Track undo];
-	//UKObjectsEqual(@"Leaf 4", [leaf4 valueForProperty: kCOLabel]);
-	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID]), [ctx updatedObjectUUIDs]);
-	
+	UKObjectsEqual(@"Carol", [leaf4 valueForProperty: kCOLabel]);
+	[ctx undoForStackNamed: @"doc1"];
+    UKObjectsEqual(@"Leaf 4", [leaf4 valueForProperty: kCOLabel]);
+    
 	// next undo should remove leaf4 from group1
-//	UKObjectsEqual(S([leaf1 UUID], [leaf4 UUID]), [[[NSSet setWithArray: [group1 contentArray]] mappedCollection] UUID]);
-	//[doc1Track undo]; 
-	//UKObjectsEqual(S([leaf1 UUID]), [[[NSSet setWithArray: [group1 contentArray]] mappedCollection] UUID]);	
-	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID]), [ctx updatedObjectUUIDs]);
+    
+    UKObjectsEqual(S(leaf1, leaf4), SA([group1 contentArray]));
+	[ctx undoForStackNamed: @"doc1"];
+	UKObjectsEqual(S(leaf1), SA([group1 contentArray]));
 
-	// FIXME: Undo doesn't work in the code below.
-
-/*
 	// next undo should change leaf1's label from "Alice (cell)" -> "Alice"
+    
 	UKObjectsEqual(@"Alice (cell)", [leaf1 valueForProperty: kCOLabel]);
-	[doc1Track undo]; 
+	[ctx undoForStackNamed: @"doc1"];
 	UKObjectsEqual(@"Alice", [leaf1 valueForProperty: kCOLabel]);
-	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID]), [ctx updatedObjectUUIDs]);
-	
+
+	// next undo should change leaf1's label from "Alice" -> "Leaf 1"
+    
+	UKObjectsEqual(@"Alice", [leaf1 valueForProperty: kCOLabel]);
+	[ctx undoForStackNamed: @"doc1"];
+	UKObjectsEqual(@"Leaf 1", [leaf1 valueForProperty: kCOLabel]);
+
 	// next undo should change group1's label from "Work Contacts" -> "Group 1"
+    
 	UKObjectsEqual(@"Work Contacts", [group1 valueForProperty: kCOLabel]);
-	[doc1Track undo]; 
+	[ctx undoForStackNamed: @"doc1"];
 	UKObjectsEqual(@"Group 1", [group1 valueForProperty: kCOLabel]);
-	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID]), [ctx updatedObjectUUIDs]);
 	
-	// next undo should move group2 from document 2 back to document 1
-	UKTrue([[document2 contentArray] containsObject: group2]);
-	UKFalse([[document1 contentArray] containsObject: group2]);
-	UKObjectsSame(document2, [group2 valueForProperty: @"parentContainer"]);
-	[doc1Track undo]; 
-	UKFalse([[document2 contentArray] containsObject: group2]);
-	UKTrue([[document1 contentArray] containsObject: group2]);
-	UKObjectsSame(document1, [group2 valueForProperty: @"parentContainer"]);
-	//UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID]), [ctx updatedObjectUUIDs]);
-*/	
-	// FIXME: After group 2 is moved back to doc1, the next undo will actually
-	// be the newest changes in group 2 (e.g. Leaf 6 -> Beer, and Leaf 5 -> Pizza)
-	// So the following tests need to be rewritten.
-	
-/*	
-	// next undo should move leaf2 ("Tomatoes") from group 2 to group 1
+	// next undo should move leaf2 from group2 back to group1
+    
 	UKTrue([[group2 contentArray] containsObject: leaf2]);
 	UKFalse([[group1 contentArray] containsObject: leaf2]);
-	UKObjectsSame(group2, [leaf2 valueForProperty: @"parentContainer"]);
-	[doc1Track undo]; 
+	[ctx undoForStackNamed: @"doc1"];
 	UKFalse([[group2 contentArray] containsObject: leaf2]);
 	UKTrue([[group1 contentArray] containsObject: leaf2]);
-	UKObjectsSame(group1, [leaf2 valueForProperty: @"parentContainer"]);
-	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx updatedObjectUUIDs]);
-	
-	// next undo should rename leaf2 "Tomatoes" -> "Leaf 2"
-	UKObjectsEqual(@"Tomatoes", [leaf2 valueForProperty: kCOLabel]);
-	[doc1Track undo]; 
-	UKObjectsEqual(@"Leaf 2", [leaf2 valueForProperty: kCOLabel]);
-	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx updatedObjectUUIDs]);
 
-	// next undo should rename document 1 "My Contacts" -> "Document 1"
-	UKObjectsEqual(@"My Contacts", [document1 valueForProperty: kCOLabel]);
-	[doc1Track undo]; 
-	UKObjectsEqual(@"Document 1", [document1 valueForProperty: kCOLabel]);
-	UKObjectsEqual(S([leaf3 UUID], [leaf4 UUID], [group1 UUID], [leaf1 UUID], [document2 UUID], [group2 UUID], [document1 UUID], [leaf2 UUID]), [ctx updatedObjectUUIDs]);
-	
-	// FIXME: The next undo would undo the initial commit of Document 1.
-	// Need to decide what happens if you try to undo it
-	
-	
-	
-	//
-	// Now we will test a more complicated scenario: performing undo/redo on
-	// document 2.
-	//
-	
-	
-	UKObjectsEqual(@"Groceries", [group2 valueForProperty: kCOLabel]); // Verify that the state of document2 wasn't changed (other than moving group2 back to document 1)
-	[doc2Track undo];
-	// FIXME
-*/
+    // next undo would change leaf2's label from "Tomatoes" -> "Leaf 2"
+    // but we already changed it on doc2's track to "Cheese", so we can't undo
+    
+    UKFalse([ctx canUndoForStackNamed: @"doc1"]);
+    
+    // Undo some changes on doc2
+    
+	// next undo should change leaf6's label from "Beer" -> "Leaf 6"
+    
+	UKObjectsEqual(@"Beer", [leaf6 valueForProperty: kCOLabel]);
+	[ctx undoForStackNamed: @"doc2"];
+	UKObjectsEqual(@"Leaf 6", [leaf6 valueForProperty: kCOLabel]);
+    
+	// next undo should change leaf5's label from "Pizza" -> "Leaf 5"
+    
+	UKObjectsEqual(@"Pizza", [leaf5 valueForProperty: kCOLabel]);
+	[ctx undoForStackNamed: @"doc2"];
+	UKObjectsEqual(@"Leaf 5", [leaf5 valueForProperty: kCOLabel]);
+    
+    // next undo should remove leaf6 from group2.
+    // Note that an undo on doc1's track already removed leaf2
+    
+    UKObjectsEqual(S(leaf3, leaf5, leaf6), SA([group2 contentArray]));
+	[ctx undoForStackNamed: @"doc2"];
+    UKObjectsEqual(S(leaf3, leaf5), SA([group2 contentArray]));
+    
+    // next undo should remove leaf5 from group2.
+    
+    UKObjectsEqual(S(leaf3, leaf5), SA([group2 contentArray]));
+	[ctx undoForStackNamed: @"doc2"];
+    UKObjectsEqual(S(leaf3), SA([group2 contentArray]));
+    
+	// next undo should change leaf2's label from "Cheese" -> "Tomatoes"
+    
+	UKObjectsEqual(@"Cheese", [leaf2 valueForProperty: kCOLabel]);
+	[ctx undoForStackNamed: @"doc2"];
+	UKObjectsEqual(@"Tomatoes", [leaf2 valueForProperty: kCOLabel]);
+
+    // This should enable undo on doc1's track to proceed.
+    
+    UKTrue([ctx canUndoForStackNamed: @"doc1"]);
+    
+    UKObjectsEqual(@"Tomatoes", [leaf2 valueForProperty: kCOLabel]);
+	[ctx undoForStackNamed: @"doc1"];
+	UKObjectsEqual(@"Leaf 2", [leaf2 valueForProperty: kCOLabel]);
 }
 
 @end

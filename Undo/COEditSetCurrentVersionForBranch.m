@@ -51,10 +51,42 @@ static NSString * const kCOEditNewRevisionID = @"COEditNewRevisionID";
     return inverse;
 }
 
+- (COItemGraphDiff *) diffToSelectivelyApplyToContext: (COEditingContext *)aContext
+{
+    // Current state of the branch
+    COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
+    COBranch *branch = [proot branchForUUID: _branchUUID];
+    
+    COItemGraph *currentGraph = [[proot store] itemGraphForRevisionID:
+                                 [[branch currentRevision] revisionID]];
+    
+    COItemGraph *oldGraph = [[proot store] itemGraphForRevisionID: _oldRevisionID];
+    COItemGraph *newGraph = [[proot store] itemGraphForRevisionID: _newRevisionID];
+    
+    COItemGraphDiff *diff1 = [COItemGraphDiff diffItemTree: oldGraph withItemTree: newGraph sourceIdentifier: @"diff1"];
+    COItemGraphDiff *diff2 = [COItemGraphDiff diffItemTree: oldGraph withItemTree: currentGraph sourceIdentifier: @"diff2"];
+    
+    COItemGraphDiff *merged = [diff1 itemTreeDiffByMergingWithDiff: diff2];
+    return merged;
+}
+
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
-    // FIXME: Actual logic here..
-    return YES;
+    // FIXME: Recalculates merge, wasteful
+    
+    COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
+    
+    COBranch *branch = [proot branchForUUID: _branchUUID];
+    if ([[[branch currentRevision] revisionID] isEqual: _oldRevisionID])
+    {
+        return YES;
+    }
+    else
+    {
+        COItemGraphDiff *merged = [self diffToSelectivelyApplyToContext: aContext];
+        
+        return ![merged hasConflicts];
+    }
 }
 
 - (void) applyToContext: (COEditingContext *)aContext
@@ -69,22 +101,8 @@ static NSString * const kCOEditNewRevisionID = @"COEditNewRevisionID";
     }
     else
     {
-        // Selectively apply the _oldRevisionID -> _newRevisionID change
-     
-        // FIXME: Error handling
-        
+        COItemGraphDiff *merged = [self diffToSelectivelyApplyToContext: aContext];
         COItemGraph *oldGraph = [[proot store] itemGraphForRevisionID: _oldRevisionID];
-        COItemGraph *newGraph = [[proot store] itemGraphForRevisionID: _newRevisionID];
-        
-        // Current state of the branch
-        
-        COItemGraph *currentGraph = [[proot store] itemGraphForRevisionID:
-                                     [[branch currentRevision] revisionID]];
-        
-        COItemGraphDiff *diff1 = [COItemGraphDiff diffItemTree: oldGraph withItemTree: newGraph sourceIdentifier: @"diff1"];
-        COItemGraphDiff *diff2 = [COItemGraphDiff diffItemTree: oldGraph withItemTree: currentGraph sourceIdentifier: @"diff2"];
-        
-        COItemGraphDiff *merged = [diff1 itemTreeDiffByMergingWithDiff: diff2];
         
         id<COItemGraph> result = [merged itemTreeWithDiffAppliedToItemGraph: oldGraph];
         
