@@ -611,4 +611,20 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     //[[self rootObject] didReload];
 }
 
+- (CORevision *) revisionWithID: (CORevisionID *)aRevisionID
+{
+    CORevision *oldest = [self parentRevision];
+    CORevision *rev = [self newestRevision];
+    do
+    {
+        if ([[rev revisionID] isEqual: aRevisionID])
+        {
+            return rev;
+        }
+    }
+    while (![rev isEqual: oldest]);
+    
+    return nil;
+}
+
 @end

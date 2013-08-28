@@ -159,7 +159,8 @@ First Release
   - Force api users to pass in COPersistentRootInfo to all mutation methods?
   - Switch to batch style api?
   - Add "parent branch" metadata to a branch that records which branch a branch was forked from?
-  - The metadata: param of -createPersistentRoot is currently unused. Should it set the branch metadata? Initial revision metadata? Remove it or add separate branch/revision metadata params?
+  x The metadata: param of -createPersistentRoot is currently unused. Should it set the branch metadata? Initial revision metadata? Remove it or add separate branch/revision metadata params?
+  - For recording merges, the merged parent needs to be known when we gc commits.
   
 
 - Make COQuery a bit more usable

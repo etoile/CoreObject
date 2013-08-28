@@ -246,4 +246,13 @@ extern NSString * const kCOBranchLabel;
 - (BOOL)mergeChangesFromRevisionSet: (NSSet *)revs
 							ofTrack: (COBranch *)aSourceTrack;
 
+/**
+ * Searches for whether the given revision is on this branch.
+ * Returns the corresponding CORevision if it is, or nil if not.
+ *
+ * Note that this means nil will be returned if the given revision is not on
+ * this branch, even if it on another branch of this persistent root.
+ */
+- (CORevision *) revisionWithID: (CORevisionID *)aRevisionID;
+
 @end
