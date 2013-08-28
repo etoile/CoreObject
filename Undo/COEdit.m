@@ -27,7 +27,6 @@ static NSString * const kCOEditType = @"COEditType";
 static NSString * const kCOEditStoreUUID = @"COEditStoreUUID";
 static NSString * const kCOEditPersistentRootUUID = @"COEditPersistentRootUUID";
 static NSString * const kCOEditTimestamp = @"COEditTimestamp";
-static NSString * const kCOEditDisplayName = @"COEditDisplayName";
 
 @implementation COEdit
 
@@ -115,7 +114,6 @@ static NSString * const kCOEditDisplayName = @"COEditDisplayName";
 @synthesize storeUUID = _storeUUID;
 @synthesize persistentRootUUID = _persistentRootUUID;
 @synthesize timestamp = _timestamp;
-@synthesize displayName = _displayName;
 
 - (id) initWithPlist: (id)plist
 {
@@ -123,7 +121,6 @@ static NSString * const kCOEditDisplayName = @"COEditDisplayName";
     self.storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditStoreUUID]];
     self.persistentRootUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditPersistentRootUUID]];
     self.timestamp = [[[[NSDateFormatter alloc] init] autorelease] dateFromString: [plist objectForKey: kCOEditTimestamp]];
-    self.displayName = [plist objectForKey: kCOEditDisplayName];
     return self;
 }
 
@@ -133,7 +130,6 @@ static NSString * const kCOEditDisplayName = @"COEditDisplayName";
     [result setObject: [_storeUUID stringValue] forKey: kCOEditStoreUUID];
     [result setObject: [_persistentRootUUID stringValue] forKey: kCOEditPersistentRootUUID];
     [result setObject: [[[[NSDateFormatter alloc] init] autorelease] stringFromDate: _timestamp] forKey: kCOEditTimestamp];
-    [result setObject: _displayName forKey: kCOEditDisplayName];
     return result;
 }
 
@@ -143,7 +139,6 @@ static NSString * const kCOEditDisplayName = @"COEditDisplayName";
     aCopy.storeUUID = _storeUUID;
     aCopy.persistentRootUUID = _persistentRootUUID;
     aCopy.timestamp = _timestamp;
-    aCopy.displayName = _displayName;
     return aCopy;
 }
 

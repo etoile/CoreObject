@@ -44,7 +44,6 @@ static NSString * const kCOEditNewMetadata = @"COEditNewMetadata";
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;
-    inverse.displayName = _displayName;
     
     inverse.branchUUID = _branchUUID;
     inverse.oldMetadata = _newMetadata;

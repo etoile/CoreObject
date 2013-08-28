@@ -89,6 +89,9 @@
 		663CE2CD17C1837700E729F5 /* TestUndoStackStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2CC17C1837700E729F5 /* TestUndoStackStore.m */; };
 		6646974A17CDA78300A1B767 /* COEditingContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646974917CDA78300A1B767 /* COEditingContext+Private.h */; };
 		6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646975317CDA8DB00A1B767 /* COPersistentRoot+Private.h */; };
+		6646976317CDB94300A1B767 /* COUndoStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646976117CDB94300A1B767 /* COUndoStack.h */; };
+		6646976417CDB94300A1B767 /* COUndoStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646976217CDB94300A1B767 /* COUndoStack.m */; };
+		6646976F17CDBBF200A1B767 /* COUndoNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646976E17CDBBF200A1B767 /* COUndoNode.h */; };
 		666ED56C17C3E78A00D148AA /* TestUndo.m in Sources */ = {isa = PBXBuildFile; fileRef = 666ED56B17C3E78A00D148AA /* TestUndo.m */; };
 		6675F8C11785C02A001E5622 /* COItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BA1785C02A001E5622 /* COItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C21785C02A001E5622 /* COItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BB1785C02A001E5622 /* COItem.m */; };
@@ -412,6 +415,9 @@
 		6646974917CDA78300A1B767 /* COEditingContext+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COEditingContext+Private.h"; path = "Core/COEditingContext+Private.h"; sourceTree = "<group>"; };
 		6646975317CDA8DB00A1B767 /* COPersistentRoot+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COPersistentRoot+Private.h"; path = "Core/COPersistentRoot+Private.h"; sourceTree = "<group>"; };
 		6646975517CDA94000A1B767 /* COBranch+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "COBranch+Private.h"; path = "Core/COBranch+Private.h"; sourceTree = "<group>"; };
+		6646976117CDB94300A1B767 /* COUndoStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COUndoStack.h; sourceTree = "<group>"; };
+		6646976217CDB94300A1B767 /* COUndoStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COUndoStack.m; sourceTree = "<group>"; };
+		6646976E17CDBBF200A1B767 /* COUndoNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COUndoNode.h; sourceTree = "<group>"; };
 		666ED56B17C3E78A00D148AA /* TestUndo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUndo.m; path = Tests/TestUndo.m; sourceTree = "<group>"; };
 		6675F8BA1785C02A001E5622 /* COItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItem.h; sourceTree = "<group>"; };
 		6675F8BB1785C02A001E5622 /* COItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COItem.m; sourceTree = "<group>"; };
@@ -717,10 +723,21 @@
 		663CE28617C07ED800E729F5 /* Undo */ = {
 			isa = PBXGroup;
 			children = (
+				6646976D17CDB94900A1B767 /* Undo actions */,
 				663CE29317C07ED800E729F5 /* COUndoStackStore.h */,
 				663CE29417C07ED800E729F5 /* COUndoStackStore.m */,
 				663CE2B417C0B05800E729F5 /* COEditingContext+Undo.h */,
 				663CE2B517C0B05800E729F5 /* COEditingContext+Undo.m */,
+				6646976117CDB94300A1B767 /* COUndoStack.h */,
+				6646976217CDB94300A1B767 /* COUndoStack.m */,
+				6646976E17CDBBF200A1B767 /* COUndoNode.h */,
+			);
+			path = Undo;
+			sourceTree = "<group>";
+		};
+		6646976D17CDB94900A1B767 /* Undo actions */ = {
+			isa = PBXGroup;
+			children = (
 				663CE28717C07ED800E729F5 /* COEdit.h */,
 				663CE28817C07ED800E729F5 /* COEdit.m */,
 				663CE2BA17C15A4800E729F5 /* COEditGroup.h */,
@@ -740,7 +757,7 @@
 				662FFB7D17C2026000BA3F2F /* COEditUndeletePersistentRoot.h */,
 				662FFB7E17C2026000BA3F2F /* COEditUndeletePersistentRoot.m */,
 			);
-			path = Undo;
+			name = "Undo actions";
 			sourceTree = "<group>";
 		};
 		6675F8B91785C02A001E5622 /* StorageDataModel */ = {
@@ -1133,6 +1150,8 @@
 				668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */,
 				6646974A17CDA78300A1B767 /* COEditingContext+Private.h in Headers */,
 				6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */,
+				6646976317CDB94300A1B767 /* COUndoStack.h in Headers */,
+				6646976F17CDBBF200A1B767 /* COUndoNode.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1420,6 +1439,7 @@
 				663CE2BD17C15A4800E729F5 /* COEditGroup.m in Sources */,
 				662FFB8017C2026000BA3F2F /* COEditUndeletePersistentRoot.m in Sources */,
 				662FFB9F17C2DE8100BA3F2F /* COEditUndeleteBranch.m in Sources */,
+				6646976417CDB94300A1B767 /* COUndoStack.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -172,8 +172,6 @@
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
     edit.timestamp = [NSDate date];
-    edit.displayName = @"Delete Persistent Root";
-    
     [self recordEditInverse: edit];
 }
 - (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot
@@ -184,8 +182,6 @@
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
     edit.timestamp = [NSDate date];
-    edit.displayName = @"Undelete Persistent Root";
-    
     [self recordEditInverse: edit];
 }
 
@@ -199,7 +195,6 @@
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
     edit.timestamp = [NSDate date];
-    edit.displayName = @"Create Persistent Root";
     
     [self recordEditInverse: edit];
 }
@@ -213,7 +208,6 @@
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
     edit.timestamp = [NSDate date];
-    edit.displayName = @"Switch Branch";
     
     edit.oldBranchUUID = [aBranch UUID];
     edit.branchUUID = [oldBranch UUID];
@@ -231,7 +225,6 @@
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];
-    edit.displayName = @"Create branch";
     
     edit.branchUUID = [aBranch UUID];
     
@@ -247,7 +240,6 @@
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];
-    edit.displayName = @"Revert or Commit";
     
     edit.branchUUID = [aBranch UUID];
     edit.oldRevisionID = [[aBranch currentRevision] revisionID];
@@ -265,7 +257,6 @@
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];
-    edit.displayName = @"Set Branch Metadata";
     
     edit.branchUUID = [aBranch UUID];
     edit.oldMetadata = [aBranch metadata];
@@ -282,7 +273,6 @@
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];
-    edit.displayName = @"Delete branch";
     
     edit.branchUUID = [aBranch UUID];
     
@@ -297,7 +287,6 @@
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];
-    edit.displayName = @"Undelete branch";
     
     edit.branchUUID = [aBranch UUID];
     

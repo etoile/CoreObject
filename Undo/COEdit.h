@@ -30,13 +30,11 @@
     ETUUID *_storeUUID;
     ETUUID *_persistentRootUUID;
     NSDate *_timestamp;
-    NSString *_displayName;
 }
 
 @property (readwrite, nonatomic, copy) ETUUID *storeUUID;
 @property (readwrite, nonatomic, copy) ETUUID *persistentRootUUID;
 @property (readwrite, nonatomic, copy) NSDate *timestamp;
-@property (readwrite, nonatomic, copy) NSString *displayName;
 /**
  * Framework private, implemented by COEdit but not subclasses
  */

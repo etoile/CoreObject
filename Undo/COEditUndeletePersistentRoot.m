@@ -13,7 +13,6 @@
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;
-    inverse.displayName = _displayName;
     return inverse;
 }
 

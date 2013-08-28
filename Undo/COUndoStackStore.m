@@ -9,11 +9,32 @@ NSString * const kCORedoStack = @"redo";
 
 @implementation COUndoStackStore
 
++ (COUndoStackStore *) defaultStore
+{
+    static COUndoStackStore *store;
+    if (store == nil)
+    {
+        store = [[COUndoStackStore alloc] init];
+    }
+    return store;
+}
+
 - (id) init
 {
     SUPERINIT;
     
-    _db = [[FMDatabase alloc] initWithPath: [@"~/coreobject-undo.sqlite" stringByExpandingTildeInPath]];
+    NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+
+    NSString *dir = [[[libraryDirs objectAtIndex: 0]
+                      stringByAppendingPathComponent: @"CoreObject"]
+                        stringByAppendingPathComponent: @"Undo"];
+
+    [[NSFileManager defaultManager] createDirectoryAtPath: dir
+                              withIntermediateDirectories: YES
+                                               attributes: nil
+                                                    error: nil];
+        
+    _db = [[FMDatabase alloc] initWithPath: [dir stringByAppendingPathComponent: @"undo.sqlite"]];
     [_db setShouldCacheStatements: YES];
     assert([_db open]);
     

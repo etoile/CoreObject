@@ -36,7 +36,6 @@ static NSString * const kCOEditNewBranchUUID = @"COEditNewBranchUUID";
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;
-    inverse.displayName = _displayName;
     
     inverse.oldBranchUUID = _newBranchUUID;
     inverse.branchUUID = _oldBranchUUID;
