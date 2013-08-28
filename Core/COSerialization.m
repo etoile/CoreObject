@@ -13,6 +13,7 @@
 #import "COObjectGraphContext.h"
 #import "COPath.h"
 #import "COPersistentRoot.h"
+#import "COEditingContext+Private.h"
 
 #include <objc/runtime.h>
 

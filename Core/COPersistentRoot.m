@@ -9,6 +9,7 @@
 
 #import "COPersistentRoot.h"
 #import "COBranch.h"
+#import "COBranch+Private.h"
 #import "COEditingContext.h"
 #import "COError.h"
 #import "COItem.h"
@@ -23,6 +24,7 @@
 #import "COPersistentRootInfo.h"
 #import "COBranchInfo.h"
 #import "COEditingContext+Undo.h"
+#import "COEditingContext+Private.h"
 
 NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidChangeNotification";
 

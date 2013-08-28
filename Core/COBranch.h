@@ -246,15 +246,4 @@ extern NSString * const kCOBranchLabel;
 - (BOOL)mergeChangesFromRevisionSet: (NSSet *)revs
 							ofTrack: (COBranch *)aSourceTrack;
 
-/** @taskunit Private */
-
-- (id)        initWithUUID: (ETUUID *)aUUID
-        objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
-            persistentRoot: (COPersistentRoot *)aPersistentRoot
-parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch;
-
-- (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID;
-- (void) saveCommitWithMetadata: (NSDictionary *)metadata;
-- (BOOL) isBranchUncommitted;
-
 @end

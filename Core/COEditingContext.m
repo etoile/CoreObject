@@ -1,17 +1,20 @@
 #import "COEditingContext.h"
 #import "COLibrary.h"
 #import "COPersistentRoot.h"
+#import "COPersistentRoot+Private.h"
 #import "COError.h"
 #import "COObject.h"
 #import "COGroup.h"
 #import "COSQLiteStore.h"
 #import "CORevision.h"
 #import "COBranch.h"
+#import "COBranch+Private.h"
 #import "COPath.h"
 #import "COObjectGraphContext.h"
 #import "COCrossPersistentRootReferenceCache.h"
 #import "COUndoStackStore.h"
 #import "COEditingContext+Undo.h"
+#import "COEditingContext+Private.h"
 
 @implementation COEditingContext
 

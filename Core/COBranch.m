@@ -9,7 +9,9 @@
 
 #import "COBranch.h"
 #import "COEditingContext.h"
+#import "COEditingContext+Private.h"
 #import "COPersistentRoot.h"
+#import "COPersistentRoot+Private.h"
 #import "COSQLiteStore.h"
 #import "COPersistentRootInfo.h"
 #import "COObject.h"
