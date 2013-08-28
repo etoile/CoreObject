@@ -450,6 +450,7 @@
     CORevisionID *revid = [backing writeItemGraph: anItemTree
                                      withMetadata: metadata
                                        withParent: [backing revidForRevisionID: parentRevid]
+                                  withMergeParent: -1
                                     modifiedItems: modifiedItems
                                             error: error];
     

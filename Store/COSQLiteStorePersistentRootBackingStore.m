@@ -75,7 +75,7 @@
     
     [db_ executeUpdate: [NSString stringWithFormat:
                          @"CREATE TABLE IF NOT EXISTS %@ (revid INTEGER PRIMARY KEY ASC, "
-                         "contents BLOB, metadata BLOB, timestamp REAL, parent INTEGER, root BLOB, deltabase INTEGER, "
+                         "contents BLOB, metadata BLOB, timestamp REAL, parent INTEGER, mergeparent INTEGER, root BLOB, deltabase INTEGER, "
                          "bytesInDeltaRun INTEGER, garbage BOOLEAN, uuid BLOB)", [self tableName]]];
 
     [db_ executeUpdate: [NSString stringWithFormat:
@@ -145,20 +145,39 @@
 
  */
 
+- (CORevisionID *) revisionIDForRevid: (int64_t)aRevid
+{
+    NSData *revUUID = [db_ dataForQuery:
+                          [NSString stringWithFormat: @"SELECT uuid FROM %@ WHERE revid = ?", [self tableName]],
+                          [NSNumber numberWithLongLong: aRevid]];
+    
+    if (revUUID != nil)
+    {
+        return [CORevisionID revisionWithBackinStoreUUID: _uuid
+                                            revisionUUID: [ETUUID UUIDWithData: revUUID]];
+    }
+    else
+    {
+        return nil;
+    }
+}
+
 - (CORevisionInfo *) revisionForID: (CORevisionID *)aToken
 {
     NSParameterAssert([[aToken backingStoreUUID] isEqual: _uuid]);
     
     CORevisionInfo *result = nil;
     FMResultSet *rs = [db_ executeQuery:
-                       [NSString stringWithFormat: @"SELECT parent, metadata, timestamp FROM %@ WHERE uuid = ?", [self tableName]],
+                       [NSString stringWithFormat: @"SELECT parent, mergeparent, metadata, timestamp FROM %@ WHERE uuid = ?", [self tableName]],
                        [[aToken revisionUUID] dataValue]];
 	if ([rs next])
 	{
+        // N.B.: Watch for null being returned as 0
         int64_t parent = [rs longLongIntForColumnIndex: 0];
+        int64_t mergeparent = [rs longLongIntForColumnIndex: 1];
         
         NSDictionary *metadata = nil;
-        NSData *data = [rs dataForColumnIndex: 1];
+        NSData *data = [rs dataForColumnIndex: 2];
         if (data != nil)
         {
             metadata = [NSJSONSerialization JSONObjectWithData: data
@@ -166,20 +185,12 @@
                                                          error: NULL];
         }
         
-        CORevisionID *parentId = nil;
-        if (parent != -1)
-        {            
-            NSData *parentHash = [db_ dataForQuery:
-                                  [NSString stringWithFormat: @"SELECT uuid FROM %@ WHERE revid = ?", [self tableName]],
-                                  [NSNumber numberWithLongLong: parent]];
-            parentId = [aToken revisionIDWithRevisionUUID: [ETUUID UUIDWithData: parentHash]];
-        }
-        
         result = [[[CORevisionInfo alloc] init] autorelease];
         result.revisionID = aToken;
-        result.parentRevisionID = parentId;
+        result.parentRevisionID = [self revisionIDForRevid: parent];
+        result.mergeParentRevisionID = [self revisionIDForRevid: mergeparent];
         result.metadata = metadata;
-        result.date = [rs dateForColumnIndex: 2];
+        result.date = [rs dateForColumnIndex: 3];
 	}
     [rs close];
     
@@ -397,11 +408,15 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 - (CORevisionID *) writeItemGraph: (id<COItemGraph>)anItemTree
                      withMetadata: (NSDictionary *)metadata
                        withParent: (int64_t)aParent
+                  withMergeParent: (int64_t)aMergeParent
                     modifiedItems: (NSArray*)modifiedItems
                             error: (NSError **)error
 {
     // TODO: For debugging only, remove
     COValidateItemGraph(anItemTree);
+    
+    NSParameterAssert(aParent >= -1);
+    NSParameterAssert(aMergeParent >= -1);
     
     BOOL inTransaction = [db_ inTransaction];
     if (!inTransaction)
@@ -449,13 +464,14 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     
     ETUUID *revisionUUID = [ETUUID UUID];
     BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (revid, "
-        "contents, metadata, timestamp, parent, root, deltabase, "
-        "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", [self tableName]],
+        "contents, metadata, timestamp, parent, mergeparent, root, deltabase, "
+        "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", [self tableName]],
         [NSNumber numberWithLongLong: rowid],
         contentsBlob,
         metadataBlob,
         [NSDate date],
         [NSNumber numberWithLongLong: aParent],
+        [NSNumber numberWithLongLong: aMergeParent],
         [[anItemTree rootItemUUID] dataValue],
         [NSNumber numberWithLongLong: deltabase],
         [NSNumber numberWithLongLong: bytesInDeltaRun],

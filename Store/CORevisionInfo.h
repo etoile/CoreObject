@@ -11,12 +11,14 @@
     @private
     CORevisionID *_revisionID;
     CORevisionID *_parentRevisionID;
+    CORevisionID *_mergeParentRevisionID;
     NSDictionary *_metadata;
     NSDate *_date;
 }
 
 @property (readwrite, nonatomic, retain) CORevisionID *revisionID;
 @property (readwrite, nonatomic, retain) CORevisionID *parentRevisionID;
+@property (readwrite, nonatomic, retain) CORevisionID *mergeParentRevisionID;
 @property (readwrite, nonatomic, copy) NSDictionary *metadata;
 @property (readwrite, nonatomic, retain) NSDate *date;
 

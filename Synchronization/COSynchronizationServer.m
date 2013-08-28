@@ -14,10 +14,16 @@ static void SearchForRevisionsClientLacks(NSMutableSet *resultSet, CORevisionID 
     
     [resultSet addObject: rev];
     
+    // Recursively search the parent(s)
+    
     CORevisionInfo *info = [store revisionInfoForRevisionID: rev];
-    for (CORevisionID *parent in @[[info parentRevisionID]]) // FIXME: Include merge parents when we track those
+    if ([info parentRevisionID] != nil)
     {
-        SearchForRevisionsClientLacks(resultSet, parent, clientLatestRevisions, store);
+        SearchForRevisionsClientLacks(resultSet, [info parentRevisionID], clientLatestRevisions, store);
+    }
+    if ([info mergeParentRevisionID] != nil)
+    {
+        SearchForRevisionsClientLacks(resultSet, [info mergeParentRevisionID], clientLatestRevisions, store);
     }
 }
 

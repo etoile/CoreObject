@@ -61,7 +61,8 @@
 - (CORevisionID *) writeItemGraph: (id<COItemGraph>)anItemTree
                      withMetadata: (NSDictionary *)metadata
                        withParent: (int64_t)aParent
-                    modifiedItems: (NSArray*)modifiedItems // array of COUUID
+                  withMergeParent: (int64_t)aMergeParent
+                    modifiedItems: (NSArray *)modifiedItems // array of ETUUID
                             error: (NSError **)error;
 
 - (NSIndexSet *) revidsFromRevid: (int64_t)baseRevid toRevid: (int64_t)finalRevid;

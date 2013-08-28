@@ -5,6 +5,7 @@
 
 @synthesize revisionID = _revisionID;
 @synthesize parentRevisionID = _parentRevisionID;
+@synthesize mergeParentRevisionID = _mergeParentRevisionID;
 @synthesize metadata = _metadata;
 @synthesize date = _date;
 
@@ -12,6 +13,7 @@
 {
     [_revisionID release];
     [_parentRevisionID release];
+    [_mergeParentRevisionID release];
     [_metadata release];
     [_date release];
     [super dealloc];
@@ -45,6 +47,7 @@
 {
     return @{ @"revisionID" : [_revisionID plist],
               @"parentRevisionID" : _parentRevisionID != nil ? [_parentRevisionID plist] : [NSNull null],
+              @"mergeParentRevisionID" : _mergeParentRevisionID != nil ? [_mergeParentRevisionID plist] : [NSNull null],
               @"metadata" : _metadata != nil ? _metadata : [NSNull null],
               @"date" : [[[[NSDateFormatter alloc] init] autorelease] stringFromDate: _date]  };
 }
@@ -55,6 +58,8 @@
     info.revisionID = [CORevisionID revisionIDWithPlist: aPlist[@"revisionID"]];
     info.parentRevisionID = aPlist[@"parentRevisionID"] != [NSNull null] ?
         [CORevisionID revisionIDWithPlist: aPlist[@"parentRevisionID"]] : nil;
+    info.mergeParentRevisionID = aPlist[@"mergeParentRevisionID"] != [NSNull null] ?
+        [CORevisionID revisionIDWithPlist: aPlist[@"mergeParentRevisionID"]] : nil;
     info.metadata = aPlist[@"metadata"] != [NSNull null] ? aPlist[@"metadata"] : nil;
     info.date = [[[[NSDateFormatter alloc] init] autorelease] dateFromString: aPlist[@"date"]];
     return info;
