@@ -167,7 +167,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	for (NSString *key in [self attributeNames])
 	{
 		COType type = [self typeForAttribute: key];
-		if (COPrimitiveType(type) == kCOCompositeReferenceType)
+		if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
 		{		
 			for (ETUUID *embedded in [self allObjectsForAttribute: key])
 			{
@@ -185,7 +185,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	for (NSString *key in [self attributeNames])
 	{
 		COType type = [self typeForAttribute: key];
-		if (COPrimitiveType(type) == kCOReferenceType)
+		if (COTypePrimitivePart(type) == kCOTypeReference)
 		{
 			for (ETUUID *embedded in [self allObjectsForAttribute: key])
 			{
@@ -206,7 +206,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	for (NSString *key in [self attributeNames])
 	{
 		COType type = [self typeForAttribute: key];
-		if (COPrimitiveType(type) == kCOAttachmentType)
+		if (COTypePrimitivePart(type) == kCOTypeAttachment)
 		{
 			for (NSData *embedded in [self allObjectsForAttribute: key])
 			{
@@ -224,7 +224,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	for (NSString *key in [self attributeNames])
 	{
 		COType type = [self typeForAttribute: key];
-		if (COPrimitiveType(type) == kCOReferenceType)
+		if (COTypePrimitivePart(type) == kCOTypeReference)
 		{
 			for (id ref in [self allObjectsForAttribute: key])
 			{
@@ -244,7 +244,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
     for (NSString *key in [self attributeNames])
 	{
 		COType type = [self typeForAttribute: key];
-		if (COPrimitiveType(type) == kCOStringType)
+		if (COTypePrimitivePart(type) == kCOTypeString)
 		{
 			[result addObject: [self valueForAttribute: key]];
 		}
@@ -300,7 +300,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		id value = [aCopy valueForAttribute: attr];
 		COType type = [aCopy typeForAttribute: attr];
 		
-		if (COPrimitiveType(type) == kCOCompositeReferenceType)
+		if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
 		{
 			if (COTypeIsPrimitive(type))
 			{
@@ -332,7 +332,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 						   type: type];
 			}
 		}
-		else if (COPrimitiveType(type) == kCOReferenceType)
+		else if (COTypePrimitivePart(type) == kCOTypeReference)
 		{
 			if (COTypeIsPrimitive(type))
 			{

@@ -1169,10 +1169,10 @@ static int indent = 0;
         ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
         
         // HACK
-        COType type = kCOReferenceType | ([propDesc isMultivalued]
+        COType type = kCOTypeReference | ([propDesc isMultivalued]
                                           ? ([propDesc isOrdered]
-                                             ? kCOArrayType
-                                             : kCOSetType)
+                                             ? kCOTypeArray
+                                             : kCOTypeSet)
                                           : 0);
         
         id value = [self valueForSerializedValue: serializedValue ofType: type propertyDescription: propDesc];

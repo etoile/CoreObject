@@ -12,16 +12,16 @@ static id plistValueForPrimitiveValue(id aValue, COType aType)
         return aValue;
     }
     
-    switch (COPrimitiveType(aType))
+    switch (COTypePrimitivePart(aType))
     {
-        case kCOInt64Type: return aValue;
-        case kCODoubleType: return aValue;
-        case kCOStringType: return aValue;
-        case kCOAttachmentType:
-        case kCOBlobType: return [aValue base64String];
-        case kCOCompositeReferenceType:
+        case kCOTypeInt64: return aValue;
+        case kCOTypeDouble: return aValue;
+        case kCOTypeString: return aValue;
+        case kCOTypeAttachment:
+        case kCOTypeBlob: return [aValue base64String];
+        case kCOTypeCompositeReference:
             return [aValue stringValue];
-        case kCOReferenceType:
+        case kCOTypeReference:
             if ([aValue isKindOfClass: [COPath class]])
             {
                 return [@"path:" stringByAppendingString: [aValue stringValue]];
@@ -76,16 +76,16 @@ static id valueForPrimitivePlistValue(id aValue, COType aType)
         return aValue;
     }
     
-    switch (COPrimitiveType(aType))
+    switch (COTypePrimitivePart(aType))
     {
-        case kCOInt64Type: return aValue;
-        case kCODoubleType: return basicNumberFromDecimalNumber(aValue);
-        case kCOStringType: return aValue;
-        case kCOAttachmentType:
-        case kCOBlobType: return [aValue base64DecodedData];
-        case kCOCompositeReferenceType:
+        case kCOTypeInt64: return aValue;
+        case kCOTypeDouble: return basicNumberFromDecimalNumber(aValue);
+        case kCOTypeString: return aValue;
+        case kCOTypeAttachment:
+        case kCOTypeBlob: return [aValue base64DecodedData];
+        case kCOTypeCompositeReference:
             return [ETUUID UUIDWithString: aValue];
-        case kCOReferenceType:
+        case kCOTypeReference:
             if ([aValue hasPrefix: @"path:"])
             {
                return [COPath pathWithString: [aValue substringFromIndex: 5]];

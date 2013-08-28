@@ -48,10 +48,10 @@ static NSString *kCOReferences = @"references";
     COObject *obj = [ctx insertObject];
     [obj setValue: label
      forAttribute: kCOLabel
-             type: kCOStringType];
+             type: kCOTypeString];
     
-    [obj setValue: S() forAttribute: kCOContents type: kCOCompositeReferenceType | kCOSetType];
-    [obj setValue: S() forAttribute: kCOReferences type: kCOReferenceType | kCOSetType];
+    [obj setValue: S() forAttribute: kCOContents type: kCOTypeCompositeReference | kCOTypeSet];
+    [obj setValue: S() forAttribute: kCOReferences type: kCOTypeReference | kCOTypeSet];
     
     return obj;
 }
@@ -158,7 +158,7 @@ static NSString *kCOReferences = @"references";
     
     // Check that we can't change the COItem
     
-    UKRaisesException([root1Item setValue: @"foo" forAttribute: kCOLabel type: kCOStringType]);    
+    UKRaisesException([root1Item setValue: @"foo" forAttribute: kCOLabel type: kCOTypeString]);    
 }
 
 - (void)testAddItem
@@ -168,7 +168,7 @@ static NSString *kCOReferences = @"references";
     [ctx1 addItem: mutableItem];
     COObject *object = [ctx1 objectForUUID: [mutableItem UUID]];
     
-    [mutableItem setValue: @"hello" forAttribute: kCOLabel type: kCOStringType];
+    [mutableItem setValue: @"hello" forAttribute: kCOLabel type: kCOTypeString];
     
     // Ensure the change did not affect object in ctx1
     
@@ -215,7 +215,7 @@ static NSString *kCOReferences = @"references";
     
     COObject *itemACtx2 = [ctx2 objectForUUID: [itemA UUID]];
     
-    [itemACtx2 setValue: @"modified" forAttribute: kCOLabel type: kCOStringType];
+    [itemACtx2 setValue: @"modified" forAttribute: kCOLabel type: kCOTypeString];
     
     UKObjectsNotEqual(ctx1, ctx2);
     UKObjectsNotEqual([ctx1 rootObject], [ctx2 rootObject]);
@@ -359,8 +359,8 @@ static NSString *kCOReferences = @"references";
 {
 	COMutableItem *parent = [COMutableItem item];
 	COMutableItem *child = [COMutableItem item];
-	[parent setValue: [child UUID] forAttribute: @"cycle" type: kCOCompositeReferenceType];
-	[child setValue: [parent UUID] forAttribute: @"cycle" type: kCOCompositeReferenceType];
+	[parent setValue: [child UUID] forAttribute: @"cycle" type: kCOTypeCompositeReference];
+	[child setValue: [parent UUID] forAttribute: @"cycle" type: kCOTypeCompositeReference];
     
     UKRaisesException([COItemTree itemTreeWithItems: A(parent, child) rootItemUUID: [parent UUID]]);
 }
@@ -393,7 +393,7 @@ static NSString *kCOReferences = @"references";
 	UKTrue(t2 == [t1 descendentObjectForUUID: [t2 UUID]]);
 	UKObjectsEqual([COItemPath pathWithItemUUID: [t1 UUID]
                         unorderedCollectionName: kCOContents
-                                           type: kCOCompositeReferenceType | kCOSetType],
+                                           type: kCOTypeCompositeReference | kCOTypeSet],
                    [t1 itemPathOfDescendentObjectWithUUID: [t2 UUID]]);
 	
     COObject *t3 = [t2 addObjectToContents: [self itemWithLabel: @"t3"]];
@@ -408,7 +408,7 @@ static NSString *kCOReferences = @"references";
 	UKObjectsSame(t3, [t1 descendentObjectForUUID: [t3 UUID]]);
 	UKObjectsEqual([COItemPath pathWithItemUUID: [t2 UUID]
                         unorderedCollectionName: kCOContents
-                                           type: kCOCompositeReferenceType | kCOSetType],
+                                           type: kCOTypeCompositeReference | kCOTypeSet],
                    [t1 itemPathOfDescendentObjectWithUUID: [t3 UUID]]);
 }
 
@@ -438,9 +438,9 @@ static NSString *kCOReferences = @"references";
 	COMutableItem *child2 = [COMutableItem item];
 	COMutableItem *shared = [COMutableItem item];
 	
-	[parent setValue: S([child1 UUID], [child2 UUID]) forAttribute: kCOContents type: kCOCompositeReferenceType | kCOSetType];
-	[child1 setValue: [shared UUID] forAttribute: @"shared" type: kCOCompositeReferenceType];
-	[child2 setValue: [shared UUID] forAttribute: @"shared" type: kCOCompositeReferenceType];
+	[parent setValue: S([child1 UUID], [child2 UUID]) forAttribute: kCOContents type: kCOTypeCompositeReference | kCOTypeSet];
+	[child1 setValue: [shared UUID] forAttribute: @"shared" type: kCOTypeCompositeReference];
+	[child2 setValue: [shared UUID] forAttribute: @"shared" type: kCOTypeCompositeReference];
 	
 	// illegal, because "shared" is embedded in two places
 	

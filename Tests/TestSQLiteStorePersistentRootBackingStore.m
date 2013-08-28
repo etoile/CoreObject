@@ -51,10 +51,10 @@ static ETUUID *childUUID2;
 - (COItem *) initialRootItemForChildren: (NSArray *)children
 {
     COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: rootUUID] autorelease];
-    [rootItem setValue: @"root" forAttribute: @"name" type: kCOStringType];
+    [rootItem setValue: @"root" forAttribute: @"name" type: kCOTypeString];
     [rootItem setValue: children
           forAttribute: @"children"
-                  type: kCOCompositeReferenceType | kCOArrayType];
+                  type: kCOTypeCompositeReference | kCOTypeArray];
     return rootItem;
 }
 
@@ -64,7 +64,7 @@ static ETUUID *childUUID2;
     COMutableItem *child = [[[COMutableItem alloc] initWithUUID: aUUID] autorelease];
     [child setValue: name
        forAttribute: @"name"
-               type: kCOStringType];
+               type: kCOTypeString];
     return child;
 }
 

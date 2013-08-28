@@ -136,17 +136,17 @@
     
     // Check that we can't change the COItem
     
-    UKRaisesException([(COMutableItem *)root1Item setValue: @"foo" forAttribute: kCOLabel type: kCOStringType]);
+    UKRaisesException([(COMutableItem *)root1Item setValue: @"foo" forAttribute: kCOLabel type: kCOTypeString]);
 }
 
 - (void)testAddItem
 {
 	COMutableItem *mutableItem = [COMutableItem item];
-    [mutableItem setValue: @"OutlineItem" forAttribute: kCOObjectEntityNameProperty type: kCOStringType];
+    [mutableItem setValue: @"OutlineItem" forAttribute: kCOObjectEntityNameProperty type: kCOTypeString];
     [ctx1 insertOrUpdateItems: A(mutableItem)];
     COObject *object = [ctx1 objectWithUUID: [mutableItem UUID]];
     
-    [mutableItem setValue: @"hello" forAttribute: kCOLabel type: kCOStringType];
+    [mutableItem setValue: @"hello" forAttribute: kCOLabel type: kCOTypeString];
     
     // Ensure the change did not affect object in ctx1
     
@@ -408,7 +408,7 @@
 	UKTrue(t2 == [root1 descendentobjectWithUUID: [t2 UUID]]);
 	UKObjectsEqual([COItemPath pathWithItemUUID: [root1 UUID]
                         unorderedCollectionName: kCOContents
-                                           type: kCOCompositeReferenceType | kCOSetType],
+                                           type: kCOTypeCompositeReference | kCOTypeSet],
                    [root1 itemPathOfDescendentObjectWithUUID: [t2 UUID]]);
 	
     COObject *t3 = [t2 addObjectToContents: [self itemWithLabel: @"t3"]];
@@ -423,7 +423,7 @@
 	UKObjectsSame(t3, [root1 descendentobjectWithUUID: [t3 UUID]]);
 	UKObjectsEqual([COItemPath pathWithItemUUID: [t2 UUID]
                         unorderedCollectionName: kCOContents
-                                           type: kCOCompositeReferenceType | kCOSetType],
+                                           type: kCOTypeCompositeReference | kCOTypeSet],
                    [root1 itemPathOfDescendentObjectWithUUID: [t3 UUID]]);
 }
 
@@ -453,9 +453,9 @@
 	COMutableItem *child2 = [COMutableItem item];
 	COMutableItem *shared = [COMutableItem item];
 	
-	[parent setValue: S([child1 UUID], [child2 UUID]) forKey: kCOContents type: kCOCompositeReferenceType | kCOSetType];
-	[child1 setValue: [shared UUID] forKey: @"shared" type: kCOCompositeReferenceType];
-	[child2 setValue: [shared UUID] forKey: @"shared" type: kCOCompositeReferenceType];
+	[parent setValue: S([child1 UUID], [child2 UUID]) forKey: kCOContents type: kCOTypeCompositeReference | kCOTypeSet];
+	[child1 setValue: [shared UUID] forKey: @"shared" type: kCOTypeCompositeReference];
+	[child2 setValue: [shared UUID] forKey: @"shared" type: kCOTypeCompositeReference];
 	
 	// illegal, because "shared" is embedded in two places
 	

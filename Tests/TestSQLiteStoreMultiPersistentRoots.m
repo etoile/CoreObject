@@ -29,10 +29,10 @@ static ETUUID *tagUUID;
 - (COItemGraph *) tagItemTreeWithDocProoUUID: (ETUUID*)aUUID
 {
     COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: tagUUID] autorelease];
-    [rootItem setValue: @"favourites" forAttribute: @"name" type: kCOStringType];
+    [rootItem setValue: @"favourites" forAttribute: @"name" type: kCOTypeString];
     [rootItem setValue: S([COPath pathWithPersistentRoot: aUUID])
           forAttribute: @"taggedDocuments"
-                  type: kCOReferenceType | kCOSetType];
+                  type: kCOTypeReference | kCOTypeSet];
 
     return [COItemGraph itemGraphWithItemsRootFirst: A(rootItem)];
 }
@@ -40,7 +40,7 @@ static ETUUID *tagUUID;
 - (COItemGraph *) docItemTree
 {
     COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: docUUID] autorelease];
-    [rootItem setValue: @"my document" forAttribute: @"name" type: kCOStringType];
+    [rootItem setValue: @"my document" forAttribute: @"name" type: kCOTypeString];
     
     return [COItemGraph itemGraphWithItemsRootFirst: A(rootItem)];
 }

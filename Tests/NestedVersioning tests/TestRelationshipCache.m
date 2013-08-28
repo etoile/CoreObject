@@ -31,7 +31,7 @@
     [cache updateRelationshipCacheWithOldValue: nil
                                        oldType: nil
                                       newValue: u2
-                                       newType: kCOCompositeReferenceType
+                                       newType: kCOTypeCompositeReference
                                    forProperty: @"child"
                                       ofObject: u1];
     
@@ -41,16 +41,16 @@
     [cache updateRelationshipCacheWithOldValue: nil
                                        oldType: nil
                                       newValue: u2
-                                       newType: kCOCompositeReferenceType
+                                       newType: kCOTypeCompositeReference
                                    forProperty: @"child"
                                       ofObject: u3];
     
     UKObjectsEqual([CORelationshipRecord recordWithUUID: u3 property: @"child"], [cache parentForUUID: u2]);
     
     [cache updateRelationshipCacheWithOldValue: u2
-                                       oldType: kCOCompositeReferenceType
+                                       oldType: kCOTypeCompositeReference
                                       newValue: nil
-                                       newType: kCOCompositeReferenceType
+                                       newType: kCOTypeCompositeReference
                                    forProperty: @"child"
                                       ofObject: u3];
     
@@ -69,7 +69,7 @@
     [cache updateRelationshipCacheWithOldValue: nil
                                        oldType: nil
                                       newValue: S(u2, u3)
-                                       newType: kCOCompositeReferenceType | kCOSetType
+                                       newType: kCOTypeCompositeReference | kCOTypeSet
                                    forProperty: @"children"
                                       ofObject: p1];
     
@@ -78,9 +78,9 @@
     UKNil([cache parentForUUID: u4]);
     
     [cache updateRelationshipCacheWithOldValue: S(u2, u3)
-                                       oldType: kCOCompositeReferenceType | kCOSetType
+                                       oldType: kCOTypeCompositeReference | kCOTypeSet
                                       newValue: S(u2, u4)
-                                       newType: kCOCompositeReferenceType | kCOSetType
+                                       newType: kCOTypeCompositeReference | kCOTypeSet
                                    forProperty: @"children"
                                       ofObject: p1];
     
@@ -93,7 +93,7 @@
     [cache updateRelationshipCacheWithOldValue: nil
                                        oldType: nil
                                       newValue: S(u2)
-                                       newType: kCOCompositeReferenceType | kCOSetType
+                                       newType: kCOTypeCompositeReference | kCOTypeSet
                                    forProperty: @"children"
                                       ofObject: p2];
 
@@ -111,21 +111,21 @@
     [cache updateRelationshipCacheWithOldValue: nil
                                        oldType: nil
                                       newValue: u2
-                                       newType: kCOReferenceType
+                                       newType: kCOTypeReference
                                    forProperty: @"link1"
                                       ofObject: u1];
     
     [cache updateRelationshipCacheWithOldValue: nil
                                        oldType: nil
                                       newValue: u2
-                                       newType: kCOReferenceType
+                                       newType: kCOTypeReference
                                    forProperty: @"link2"
                                       ofObject: u1];
 
     [cache updateRelationshipCacheWithOldValue: nil
                                        oldType: nil
                                       newValue: u2
-                                       newType: kCOReferenceType
+                                       newType: kCOTypeReference
                                    forProperty: @"link1"
                                       ofObject: u3];
     
@@ -134,7 +134,7 @@
                      [CORelationshipRecord recordWithUUID: u3 property: @"link1"]), [cache referrersForUUID: u2]);
     
     [cache updateRelationshipCacheWithOldValue: u2
-                                       oldType: kCOReferenceType
+                                       oldType: kCOTypeReference
                                       newValue: nil
                                        newType: nil
                                    forProperty: @"link1"
@@ -157,21 +157,21 @@
     [cache updateRelationshipCacheWithOldValue: nil
                                        oldType: nil
                                       newValue: S(u1, u2)
-                                       newType: kCOReferenceType | kCOSetType
+                                       newType: kCOTypeReference | kCOTypeSet
                                    forProperty: @"groupContents"
                                       ofObject: g1];
     
     [cache updateRelationshipCacheWithOldValue: nil
                                        oldType: nil
                                       newValue: S(u2, u3)
-                                       newType: kCOReferenceType | kCOSetType
+                                       newType: kCOTypeReference | kCOTypeSet
                                    forProperty: @"groupContents"
                                       ofObject: g2];
     
     [cache updateRelationshipCacheWithOldValue: nil
                                        oldType: nil
                                       newValue: S(u3, g1)
-                                       newType: kCOReferenceType | kCOSetType
+                                       newType: kCOTypeReference | kCOTypeSet
                                    forProperty: @"taggedObjects"
                                       ofObject: t1];
     
@@ -189,16 +189,16 @@
     UKObjectsEqual(S(t1), [cache referrersForUUID: u3 propertyInParent: @"taggedObjects"]);
     
     [cache updateRelationshipCacheWithOldValue: S(u1, u2)
-                                       oldType: kCOReferenceType | kCOSetType
+                                       oldType: kCOTypeReference | kCOTypeSet
                                       newValue: S(u1, u3)
-                                       newType: kCOReferenceType | kCOSetType
+                                       newType: kCOTypeReference | kCOTypeSet
                                    forProperty: @"groupContents"
                                       ofObject: g1];
     
     [cache updateRelationshipCacheWithOldValue: S(u2, u3)
-                                       oldType: kCOReferenceType | kCOSetType
+                                       oldType: kCOTypeReference | kCOTypeSet
                                       newValue: [NSSet set]
-                                       newType: kCOReferenceType | kCOSetType
+                                       newType: kCOTypeReference | kCOTypeSet
                                    forProperty: @"groupContents"
                                       ofObject: g2];
     

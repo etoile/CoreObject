@@ -223,29 +223,29 @@ serialization. */
 	{
 		//if (value == nil || ([value persistentRoot] == [self persistentRoot]))
 		//{
-			return ([aPropertyDesc isComposite] ? kCOCompositeReferenceType : kCOReferenceType);
+			return ([aPropertyDesc isComposite] ? kCOTypeCompositeReference : kCOTypeReference);
 		//}
 		//else
 		//{
 		//	NSAssert([value isRoot], @"A property must point to a root object "
 		//		"for references accross persistent roots");
-		//	return kCOReferenceType;
+		//	return kCOTypeReference;
 		//}
 	}
 	else if ([typeName isEqualToString: @"BOOL"]
 	      || [typeName isEqualToString: @"NSInteger"]
 	      || [typeName isEqualToString: @"NSUInteger"])
 	{
-		return kCOInt64Type;
+		return kCOTypeInt64;
 	}
 	else if ([typeName isEqualToString: @"CGFloat"]
 		 || [typeName isEqualToString: @"Double"])
 	{
-		return kCODoubleType;
+		return kCOTypeDouble;
 	}
 	else if ([typeName isEqualToString: @"NSString"])
 	{
-		return kCOStringType;
+		return kCOTypeString;
 	}
 	else if ([typeName isEqualToString: @"NSNumber"])
 	{
@@ -254,27 +254,27 @@ serialization. */
 		// TODO: A bit ugly, would be better to add new entity descriptions
 		// such as NSBOOLNumber, NSCGFloatNumber etc.
 		if (value == nil)
-			return kCOStringType;
+			return kCOTypeString;
 
 		if (strcmp([value objCType], @encode(BOOL)) == 0
 		 || strcmp([value objCType], @encode(NSInteger)) == 0
 		 || strcmp([value objCType], @encode(NSUInteger)) == 0)
 		{
-			return kCOInt64Type;
+			return kCOTypeInt64;
 		}
 		else if (strcmp([value objCType], @encode(CGFloat)) == 0
 		      || strcmp([value objCType], @encode(double)) == 0)
 		{
-			return kCODoubleType;
+			return kCOTypeDouble;
 		}
 	}
 	else if ([typeName isEqualToString: @"NSData"])
 	{
-		return kCOBlobType;
+		return kCOTypeBlob;
 	}
 	else if ([self isSerializableScalarTypeName: typeName])
 	{
-		return kCOStringType;
+		return kCOTypeString;
 	}
 	else
 	{
@@ -286,13 +286,13 @@ serialization. */
         // HACK:
         if ([value isKindOfClass: [NSString class]])
         {
-            return kCOStringType;
+            return kCOTypeString;
         }
         
 		// FIXME: Don't encode using the keyed archiving unless the property
 		// description requires it explicitly.
 		//NSAssert(NO, @"Unsupported serialization type %@ for %@", type, value);
-		return kCOBlobType;
+		return kCOTypeBlob;
 	}
 	return 0;
 }
@@ -311,7 +311,7 @@ serialization. */
 			NSAssert([value persistentRoot] == [self persistentRoot],
 				@"A property must not point on a CODictionary object in another persistent root");
 
-			type = kCOReferenceType;
+			type = kCOTypeReference;
 		}
 		else if ([aPropertyDesc isOrdered])
 		{
@@ -319,13 +319,13 @@ serialization. */
 			// Should not need to infer type based on an element of the collection.
 			COType elementType = [self serializedTypeForUnivaluedPropertyDescription: aPropertyDesc
 			                                                                 ofValue: [value firstObject]];
-			type = (kCOArrayType | elementType);
+			type = (kCOTypeArray | elementType);
 		}
 		else
 		{
 			COType elementType = [self serializedTypeForUnivaluedPropertyDescription: aPropertyDesc
 			                                                                 ofValue: [value anyObject]];
-			type = (kCOSetType | elementType);
+			type = (kCOTypeSet | elementType);
 		}
 	}
 	else
@@ -393,7 +393,7 @@ serialization. */
 	}
 	
     [values setObject: [[self entityDescription] name] forKey: kCOObjectEntityNameProperty];
-    [types setObject: [NSNumber numberWithInt: kCOStringType] forKey: kCOObjectEntityNameProperty];
+    [types setObject: [NSNumber numberWithInt: kCOTypeString] forKey: kCOObjectEntityNameProperty];
     
 	return [[[COItem alloc] initWithUUID: [self UUID]
                       typesForAttributes: types
@@ -468,7 +468,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 {
     if (COTypeIsMultivalued(type))
     {
-        if (COMultivaluedType(type) == kCOArrayType)
+        if (COTypeMultivaluedPart(type) == kCOTypeArray)
         {
             NSAssert([aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
                      @"Serialization type doesn't match metamodel");
@@ -478,7 +478,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
             for (id subvalue in value)
             {
                 id deserializedValue = [self valueForSerializedValue: subvalue
-                                                              ofType: COPrimitiveType(type)
+                                                              ofType: COTypePrimitivePart(type)
                                                  propertyDescription: aPropertyDesc];
                 
                 if (deserializedValue != nil)
@@ -490,7 +490,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
             // FIXME: Make read-only if needed
             return resultCollection;
         }
-        else if (COMultivaluedType(type) == kCOSetType)
+        else if (COTypeMultivaluedPart(type) == kCOTypeSet)
         {
             NSAssert([aPropertyDesc isOrdered] == NO && [aPropertyDesc isMultivalued],
                      @"Serialization type doesn't match metamodel");
@@ -500,7 +500,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
             for (id subvalue in value)
             {
                 id deserializedValue = [self valueForSerializedValue: subvalue
-                                                              ofType: COPrimitiveType(type)
+                                                              ofType: COTypePrimitivePart(type)
                                                  propertyDescription: aPropertyDesc];
                 
                 if (deserializedValue != nil)
@@ -524,9 +524,9 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 		return nil;
 	}
 
-	if (type == kCOReferenceType || type == kCOCompositeReferenceType)
+	if (type == kCOTypeReference || type == kCOTypeCompositeReference)
 	{
-        if (type == kCOCompositeReferenceType)
+        if (type == kCOTypeCompositeReference)
         {
             NSParameterAssert([value isKindOfClass: [ETUUID class]]);
         }
@@ -563,11 +563,11 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	{
 		NSString *typeName = [[aPropertyDesc type] name];
 		
-		if (type == kCOInt64Type || type == kCODoubleType)
+		if (type == kCOTypeInt64 || type == kCOTypeDouble)
 		{
 			return value;
 		}
-		else if (type == kCOStringType)
+		else if (type == kCOTypeString)
 		{
 			if ([self isSerializableScalarTypeName: typeName])
 			{
@@ -575,7 +575,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 			}
 			return value;
 		}
-		else if (type == kCOBlobType)
+		else if (type == kCOTypeBlob)
 		{
 			NSParameterAssert([value isKindOfClass: [NSData class]]);
 

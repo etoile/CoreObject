@@ -82,10 +82,10 @@ static ETUUID *childUUID2;
 - (COItem *) initialRootItemForChildren: (NSArray *)children
 {
     COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: rootUUID] autorelease];
-    [rootItem setValue: @"root" forAttribute: @"name" type: kCOStringType];
+    [rootItem setValue: @"root" forAttribute: @"name" type: kCOTypeString];
     [rootItem setValue: children
           forAttribute: @"children"
-                  type: kCOCompositeReferenceType | kCOArrayType];
+                  type: kCOTypeCompositeReference | kCOTypeArray];
     return rootItem;
 }
 
@@ -95,7 +95,7 @@ static ETUUID *childUUID2;
     COMutableItem *child = [[[COMutableItem alloc] initWithUUID: aUUID] autorelease];
     [child setValue: name
        forAttribute: @"name"
-               type: kCOStringType];
+               type: kCOTypeString];
     return child;
 }
 
@@ -504,7 +504,7 @@ static ETUUID *childUUID2;
     // Test attachment GC
     
     COItemGraph *tree = [self makeInitialItemTree];
-    [[tree itemForUUID: childUUID1] setValue: hash forAttribute: @"attachment" type: kCOAttachmentType];
+    [[tree itemForUUID: childUUID1] setValue: hash forAttribute: @"attachment" type: kCOTypeAttachment];
     CORevisionID *withAttachment = [store writeRevisionWithItemGraph: tree metadata: nil parentRevisionID: initialRevisionId modifiedItems: nil error: NULL];
     UKNotNil(withAttachment);
     UKTrue([store setCurrentRevision: withAttachment

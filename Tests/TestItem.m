@@ -35,25 +35,25 @@
 - (void) testInt
 {
 	COMutableItem *item = [COMutableItem item];
-    [item setValue: [NSNumber numberWithInt: 1] forAttribute: @"1" type: kCOInt64Type];
-    [item setValue: [NSNumber numberWithInt: -1] forAttribute: @"-1" type: kCOInt64Type];
-    [item setValue: [NSNumber numberWithInt: 256] forAttribute: @"256" type: kCOInt64Type];
-    [item setValue: [NSNumber numberWithInt: -256] forAttribute: @"-256" type: kCOInt64Type];
-    [item setValue: [NSNumber numberWithInt: -65535] forAttribute: @"-65535" type: kCOInt64Type];
-    [item setValue: [NSNumber numberWithInt: 65535] forAttribute: @"65535" type: kCOInt64Type];
-    [item setValue: [NSNumber numberWithInt: 2000000000] forAttribute: @"2000000000" type: kCOInt64Type];
-    [item setValue: [NSNumber numberWithInt: -2000000000] forAttribute: @"-2000000000" type: kCOInt64Type];
-    [item setValue: [NSNumber numberWithLongLong: 8000000000] forAttribute: @"8000000000" type: kCOInt64Type];
-    [item setValue: [NSNumber numberWithLongLong: -8000000000] forAttribute: @"-8000000000" type: kCOInt64Type];
-    [item setValue: [NSNull null] forAttribute: @"null" type: kCOInt64Type];
+    [item setValue: [NSNumber numberWithInt: 1] forAttribute: @"1" type: kCOTypeInt64];
+    [item setValue: [NSNumber numberWithInt: -1] forAttribute: @"-1" type: kCOTypeInt64];
+    [item setValue: [NSNumber numberWithInt: 256] forAttribute: @"256" type: kCOTypeInt64];
+    [item setValue: [NSNumber numberWithInt: -256] forAttribute: @"-256" type: kCOTypeInt64];
+    [item setValue: [NSNumber numberWithInt: -65535] forAttribute: @"-65535" type: kCOTypeInt64];
+    [item setValue: [NSNumber numberWithInt: 65535] forAttribute: @"65535" type: kCOTypeInt64];
+    [item setValue: [NSNumber numberWithInt: 2000000000] forAttribute: @"2000000000" type: kCOTypeInt64];
+    [item setValue: [NSNumber numberWithInt: -2000000000] forAttribute: @"-2000000000" type: kCOTypeInt64];
+    [item setValue: [NSNumber numberWithLongLong: 8000000000] forAttribute: @"8000000000" type: kCOTypeInt64];
+    [item setValue: [NSNumber numberWithLongLong: -8000000000] forAttribute: @"-8000000000" type: kCOTypeInt64];
+    [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeInt64];
     
     [item setValue: A([NSNumber numberWithInt: 1], [NSNumber numberWithLongLong: 8000000000])
       forAttribute: @"[1, 8000000000]"
-              type: kCOArrayType | kCOInt64Type];
+              type: kCOTypeArray | kCOTypeInt64];
 
     [item setValue: S([NSNumber numberWithInt: 1], [NSNumber numberWithLongLong: 8000000000])
       forAttribute: @"(1, 8000000000)"
-              type: kCOSetType | kCOInt64Type];
+              type: kCOTypeSet | kCOTypeInt64];
 
     [self validateRoundTrips: item];    
 }
@@ -94,17 +94,17 @@
 - (void) testDouble
 {
 	COMutableItem *item = [COMutableItem item];
-    [item setValue: [NSNumber numberWithDouble: 3.14] forAttribute: @"3.14" type: kCODoubleType];
-	[item setValue: [NSNumber numberWithDouble: 123.456789012] forAttribute: @"123.456789012" type: kCODoubleType];
-    [item setValue: [NSNull null] forAttribute: @"null" type: kCODoubleType];
+    [item setValue: [NSNumber numberWithDouble: 3.14] forAttribute: @"3.14" type: kCOTypeDouble];
+	[item setValue: [NSNumber numberWithDouble: 123.456789012] forAttribute: @"123.456789012" type: kCOTypeDouble];
+    [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeDouble];
     
     [item setValue: A([NSNumber numberWithDouble: 3.14], [NSNumber numberWithDouble: 123.456789012])
       forAttribute: @"[3.14, 123.456789012]"
-              type: kCOArrayType | kCODoubleType];
+              type: kCOTypeArray | kCOTypeDouble];
     
     [item setValue: S([NSNumber numberWithDouble: 3.14], [NSNumber numberWithDouble: 123.456789012])
       forAttribute: @"(3.14, 123.456789012)"
-              type: kCOSetType | kCODoubleType];
+              type: kCOTypeSet | kCOTypeDouble];
     
     [self validateRoundTrips: item];
 }
@@ -112,16 +112,16 @@
 - (void) testString
 {
 	COMutableItem *item = [COMutableItem item];
-    [item setValue: @"abc" forAttribute: @"abc" type: kCOStringType];
-    [item setValue: [NSNull null] forAttribute: @"null" type: kCOStringType];
+    [item setValue: @"abc" forAttribute: @"abc" type: kCOTypeString];
+    [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeString];
     
     [item setValue: A(@"abc", @"def")
       forAttribute: @"[abc, def]"
-              type: kCOArrayType | kCOStringType];
+              type: kCOTypeArray | kCOTypeString];
     
     [item setValue: S(@"abc", @"def")
       forAttribute: @"(abc, def)"
-              type: kCOSetType | kCOStringType];
+              type: kCOTypeSet | kCOTypeString];
     
     [self validateRoundTrips: item];
 }
@@ -132,17 +132,17 @@
     NSData *zeroBytes = [NSData data];
     
 	COMutableItem *item = [COMutableItem item];
-    [item setValue: zeroBytes forAttribute: @"zeroBytes" type: kCOBlobType];
-    [item setValue: threeBytes forAttribute: @"xyz" type: kCOBlobType];
-    [item setValue: [NSNull null] forAttribute: @"null" type: kCOBlobType];
+    [item setValue: zeroBytes forAttribute: @"zeroBytes" type: kCOTypeBlob];
+    [item setValue: threeBytes forAttribute: @"xyz" type: kCOTypeBlob];
+    [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeBlob];
     
     [item setValue: A(zeroBytes, threeBytes)
       forAttribute: @"[zeroBytes, xyz]"
-              type: kCOArrayType | kCOBlobType];
+              type: kCOTypeArray | kCOTypeBlob];
     
     [item setValue: S(zeroBytes, threeBytes)
       forAttribute: @"(zeroBytes, xyz)"
-              type: kCOSetType | kCOBlobType];
+              type: kCOTypeSet | kCOTypeBlob];
     
     [self validateRoundTrips: item];
 }
@@ -157,18 +157,18 @@
     COPath *branchPath = [COPath pathWithPersistentRoot: persistentRoot branch: branch];
         
     COMutableItem *item = [COMutableItem item];
-    [item setValue: persistentRootPath forAttribute: @"persistentRootPath" type: kCOReferenceType];
-    [item setValue: branchPath forAttribute: @"branchPath" type: kCOReferenceType];
-    [item setValue: rootObject forAttribute: @"rootObject" type: kCOReferenceType];
-    [item setValue: [NSNull null] forAttribute: @"null" type: kCOReferenceType];
+    [item setValue: persistentRootPath forAttribute: @"persistentRootPath" type: kCOTypeReference];
+    [item setValue: branchPath forAttribute: @"branchPath" type: kCOTypeReference];
+    [item setValue: rootObject forAttribute: @"rootObject" type: kCOTypeReference];
+    [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeReference];
     
     [item setValue: A(persistentRootPath, branchPath, rootObject)
       forAttribute: @"[persistentRootPath, branchPath, rootObject]"
-              type: kCOArrayType | kCOReferenceType];
+              type: kCOTypeArray | kCOTypeReference];
     
     [item setValue: S(persistentRootPath, branchPath, rootObject)
       forAttribute: @"(persistentRootPath, branchPath, rootObject)"
-              type: kCOSetType | kCOReferenceType];
+              type: kCOTypeSet | kCOTypeReference];
     
     [self validateRoundTrips: item];
 }
@@ -179,16 +179,16 @@
     ETUUID *rootObject2 = [ETUUID UUID];
     
     COMutableItem *item = [COMutableItem item];
-    [item setValue: rootObject forAttribute: @"rootObject" type: kCOCompositeReferenceType];
-    [item setValue: [NSNull null] forAttribute: @"null" type: kCOCompositeReferenceType];
+    [item setValue: rootObject forAttribute: @"rootObject" type: kCOTypeCompositeReference];
+    [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeCompositeReference];
     
     [item setValue: A(rootObject, rootObject2)
       forAttribute: @"[rootObject, rootObject2]"
-              type: kCOArrayType | kCOCompositeReferenceType];
+              type: kCOTypeArray | kCOTypeCompositeReference];
     
     [item setValue: S(rootObject, rootObject2)
       forAttribute: @"(rootObject, rootObject2)"
-              type: kCOSetType | kCOCompositeReferenceType];
+              type: kCOTypeSet | kCOTypeCompositeReference];
     
     [self validateRoundTrips: item];
 }
@@ -199,17 +199,17 @@
     NSData *zeroBytes = [NSData data];
     
 	COMutableItem *item = [COMutableItem item];
-    [item setValue: zeroBytes forAttribute: @"zeroBytes" type: kCOAttachmentType];
-    [item setValue: threeBytes forAttribute: @"xyz" type: kCOAttachmentType];
-    [item setValue: [NSNull null] forAttribute: @"null" type: kCOAttachmentType];
+    [item setValue: zeroBytes forAttribute: @"zeroBytes" type: kCOTypeAttachment];
+    [item setValue: threeBytes forAttribute: @"xyz" type: kCOTypeAttachment];
+    [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeAttachment];
     
     [item setValue: A(zeroBytes, threeBytes)
       forAttribute: @"[zeroBytes, xyz]"
-              type: kCOArrayType | kCOAttachmentType];
+              type: kCOTypeArray | kCOTypeAttachment];
     
     [item setValue: S(zeroBytes, threeBytes)
       forAttribute: @"(zeroBytes, xyz)"
-              type: kCOSetType | kCOAttachmentType];
+              type: kCOTypeSet | kCOTypeAttachment];
     
     [self validateRoundTrips: item];
 }
@@ -236,14 +236,14 @@
 
 - (void) testMutability
 {	
-	COItem *immutable = [COItem itemWithTypesForAttributes: D(@(kCOStringType | kCOSetType), @"key1",
-															  @(kCOStringType | kCOArrayType), @"key2",
-															  @(kCOStringType), @"name")
+	COItem *immutable = [COItem itemWithTypesForAttributes: D(@(kCOTypeString | kCOTypeSet), @"key1",
+															  @(kCOTypeString | kCOTypeArray), @"key2",
+															  @(kCOTypeString), @"name")
 									   valuesForAttributes: D([NSMutableSet setWithObject: @"a"], @"key1",	
 															  [NSMutableArray arrayWithObject: @"A"], @"key2",
 															  @"my name", @"name")];
 
-	UKRaisesException([(COMutableItem *)immutable setValue: @"foo" forAttribute: @"bar" type: kCOStringType]);
+	UKRaisesException([(COMutableItem *)immutable setValue: @"foo" forAttribute: @"bar" type: kCOTypeString]);
 
 	UKRaisesException([[immutable valueForAttribute: @"key1"] addObject: @"b"]);
 	UKRaisesException([[immutable valueForAttribute: @"key2"] addObject: @"B"]);
@@ -264,9 +264,9 @@
 
 - (void) testEquality
 {
-	COItem *immutable = [COItem itemWithTypesForAttributes: D([NSNumber numberWithInt: kCOStringType | kCOSetType], @"key1",
-															  [NSNumber numberWithInt: kCOStringType | kCOArrayType], @"key2",
-															  [NSNumber numberWithInt: kCOStringType], @"name")
+	COItem *immutable = [COItem itemWithTypesForAttributes: D([NSNumber numberWithInt: kCOTypeString | kCOTypeSet], @"key1",
+															  [NSNumber numberWithInt: kCOTypeString | kCOTypeArray], @"key2",
+															  [NSNumber numberWithInt: kCOTypeString], @"name")
 									   valuesForAttributes: D([NSMutableSet setWithObject: @"a"], @"key1",	
 															  [NSMutableArray arrayWithObject: @"A"], @"key2",
 															  @"my name", @"name")];
@@ -283,7 +283,7 @@
 - (void) testEmptySet
 {
 	COMutableItem *item1 = [COMutableItem item];
-	[item1 setValue: [NSSet set] forAttribute: @"set" type: kCOStringType | kCOSetType];
+	[item1 setValue: [NSSet set] forAttribute: @"set" type: kCOTypeString | kCOTypeSet];
     [self validateRoundTrips: item1];
     
 	COMutableItem *item2 = [COMutableItem item];

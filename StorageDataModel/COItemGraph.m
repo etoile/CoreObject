@@ -156,8 +156,8 @@ void COValidateItemGraph(id<COItemGraph> aGraph)
             
             // Check that all inner references can be resolved
             
-            if (COPrimitiveType(type) == kCOReferenceType
-                || COPrimitiveType(type) == kCOCompositeReferenceType)
+            if (COTypePrimitivePart(type) == kCOTypeReference
+                || COTypePrimitivePart(type) == kCOTypeCompositeReference)
             {
                 for (id subValue in
                      [value respondsToSelector: @selector(objectEnumerator)] ? value : [NSArray arrayWithObject: value])

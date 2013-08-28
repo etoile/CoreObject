@@ -292,7 +292,7 @@ static NSRange paragraphRangeForLocationInString(NSString *aString, NSUInteger a
     for (ETUUID *paragraphUUID in [rootItem valueForAttribute: @"paragraphs"])
     {
         COItem *paragraph = [aTree itemForUUID: paragraphUUID];
-        if ([paragraph typeForAttribute: @"data"] != kCOBlobType)
+        if ([paragraph typeForAttribute: @"data"] != kCOTypeBlob)
         {
             return NO;
         }
@@ -325,7 +325,7 @@ static NSRange paragraphRangeForLocationInString(NSString *aString, NSUInteger a
     
     COMutableItem *result = [COMutableItem itemWithUUID: _rootUUID];
     // HACK: This is an implementation detail of COObject
-    [result setValue: @"Anonymous.TypewriterDocument" forAttribute: @"org.etoile-project.coreobject.entityname" type: kCOStringType];
+    [result setValue: @"Anonymous.TypewriterDocument" forAttribute: @"org.etoile-project.coreobject.entityname" type: kCOTypeString];
     
     [items addObject: result];
     
@@ -339,7 +339,7 @@ static NSRange paragraphRangeForLocationInString(NSString *aString, NSUInteger a
         [result addObject: [paragraphTree UUID]
        toOrderedAttribute: @"paragraphs"
                   atIndex: [[result valueForAttribute: @"paragraphs"] count]
-                     type: kCOCompositeReferenceType | kCOArrayType];
+                     type: kCOTypeCompositeReference | kCOTypeArray];
     }
     
     return [[COItemGraph alloc] initWithItems: items rootItemUUID: _rootUUID];
@@ -354,9 +354,9 @@ static NSRange paragraphRangeForLocationInString(NSString *aString, NSUInteger a
     COMutableItem *paragraphTree = [[[COMutableItem alloc] initWithUUID: paragraphUUID] autorelease];
     [paragraphTree setValue: paragraphAsRTF
                forAttribute: @"data"
-                       type: kCOBlobType];
+                       type: kCOTypeBlob];
     // HACK: This is an implementation detail of COObject
-    [paragraphTree setValue: @"Anonymous.TypewriterParagraph" forAttribute: @"org.etoile-project.coreobject.entityname" type: kCOStringType];
+    [paragraphTree setValue: @"Anonymous.TypewriterParagraph" forAttribute: @"org.etoile-project.coreobject.entityname" type: kCOTypeString];
     
     return paragraphTree;
 }

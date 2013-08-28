@@ -71,24 +71,24 @@ static void writePrimitiveValue(co_buffer_t *dest, id aValue, COType aType)
         return;
     }
     
-    switch (COPrimitiveType(aType))
+    switch (COTypePrimitivePart(aType))
     {
-        case kCOInt64Type:
+        case kCOTypeInt64:
             co_buffer_store_integer(dest, [aValue longLongValue]);
             break;
-        case kCODoubleType:
+        case kCOTypeDouble:
             co_buffer_store_double(dest, [aValue doubleValue]);
             break;
-        case kCOStringType:
+        case kCOTypeString:
             co_buffer_store_string(dest, aValue);
             break;
-        case kCOBlobType:
+        case kCOTypeBlob:
             co_buffer_store_bytes(dest, [aValue bytes], [aValue length]);
             break;
-        case kCOCompositeReferenceType:
+        case kCOTypeCompositeReference:
             co_buffer_store_uuid(dest, aValue);
             break;
-        case kCOReferenceType:
+        case kCOTypeReference:
             if ([aValue isKindOfClass: [COPath class]])
             {
                 co_buffer_store_string(dest, [(COPath *)aValue stringValue]);
@@ -98,7 +98,7 @@ static void writePrimitiveValue(co_buffer_t *dest, id aValue, COType aType)
                 co_buffer_store_uuid(dest, aValue);
             }
             break;
-        case kCOAttachmentType:
+        case kCOTypeAttachment:
             co_buffer_store_bytes(dest, [aValue bytes], [aValue length]);
             break;
         default:
@@ -205,11 +205,11 @@ static void co_read_string(void *ctx, NSString *val)
     switch (state->state)
     {
         case co_reader_expect_value:
-            if (COPrimitiveType(state->currentType) == kCOReferenceType)
+            if (COTypePrimitivePart(state->currentType) == kCOTypeReference)
             {
                 co_read_object_value(state, [COPath pathWithString: val]);
             }
-            else if (COPrimitiveType(state->currentType) == kCOStringType)
+            else if (COTypePrimitivePart(state->currentType) == kCOTypeString)
             {
                 co_read_object_value(state, val);
             }

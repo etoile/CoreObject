@@ -9,11 +9,11 @@ COTypeMultivalueDescription(COType type)
     {
         if (COTypeIsOrdered(type))
         {
-            return @"kCOArrayType | ";
+            return @"kCOTypeArray | ";
         }
         else
         {
-            return @"kCOSetType | ";
+            return @"kCOTypeSet | ";
         }
     }
     return @"";
@@ -22,15 +22,15 @@ COTypeMultivalueDescription(COType type)
 static NSString *
 COTypePrimitiveDescription(COType type)
 {
-    switch (COPrimitiveType(type))
+    switch (COTypePrimitivePart(type))
     {
-        case kCOInt64Type: return @"kCOInt64Type";
-        case kCODoubleType: return @"kCODoubleType";
-        case kCOStringType: return @"kCOStringType";
-        case kCOBlobType: return @"kCOBlobType";
-        case kCOReferenceType: return @"kCOReferenceType";
-        case kCOCompositeReferenceType: return @"kCOCompositeReferenceType";
-        case kCOAttachmentType: return @"kCOAttachmentType";
+        case kCOTypeInt64: return @"kCOTypeInt64";
+        case kCOTypeDouble: return @"kCOTypeDouble";
+        case kCOTypeString: return @"kCOTypeString";
+        case kCOTypeBlob: return @"kCOTypeBlob";
+        case kCOTypeReference: return @"kCOTypeReference";
+        case kCOTypeCompositeReference: return @"kCOTypeCompositeReference";
+        case kCOTypeAttachment: return @"kCOTypeAttachment";
     }
     return @"";
 }
@@ -51,20 +51,20 @@ COTypeDescription(COType type)
 BOOL
 COTypePrimitiveValidateObject(COType type, id anObject)
 {
-    switch (COPrimitiveType(type))
+    switch (COTypePrimitivePart(type))
     {
-        case kCOInt64Type:
-        case kCODoubleType: return [anObject isKindOfClass: [NSNumber class]]
+        case kCOTypeInt64:
+        case kCOTypeDouble: return [anObject isKindOfClass: [NSNumber class]]
             || anObject == [NSNull null];
-        case kCOStringType: return [anObject isKindOfClass: [NSString class]]
+        case kCOTypeString: return [anObject isKindOfClass: [NSString class]]
             || anObject == [NSNull null];
-        case kCOBlobType: return [anObject isKindOfClass: [NSData class]]
+        case kCOTypeBlob: return [anObject isKindOfClass: [NSData class]]
             || anObject == [NSNull null];
-        case kCOReferenceType:
-        case kCOCompositeReferenceType: return [anObject isKindOfClass: [ETUUID class]]
+        case kCOTypeReference:
+        case kCOTypeCompositeReference: return [anObject isKindOfClass: [ETUUID class]]
             || [anObject isKindOfClass: [COPath class]]
             || anObject == [NSNull null];
-        case kCOAttachmentType: return [anObject isKindOfClass: [NSData class]]
+        case kCOTypeAttachment: return [anObject isKindOfClass: [NSData class]]
             || anObject == [NSNull null];
     }
     return NO;

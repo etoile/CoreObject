@@ -45,10 +45,10 @@ static ETUUID *childUUIDs[NUM_CHILDREN];
 - (COItem *) initialRootItem
 {
     COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: rootUUID] autorelease];
-    [rootItem setValue: @"root" forAttribute: @"name" type: kCOStringType];
+    [rootItem setValue: @"root" forAttribute: @"name" type: kCOTypeString];
     [rootItem setValue: A()
           forAttribute: @"children"
-                  type: kCOCompositeReferenceType | kCOArrayType];
+                  type: kCOTypeCompositeReference | kCOTypeArray];
     
     for (int i=0; i<NUM_CHILDREN; i++)
     {
@@ -62,7 +62,7 @@ static ETUUID *childUUIDs[NUM_CHILDREN];
     COMutableItem *child = [[[COMutableItem alloc] initWithUUID: childUUIDs[i]] autorelease];
     [child setValue: [self labelForCommit: 0 child: i]
        forAttribute: @"name"
-               type: kCOStringType];
+               type: kCOTypeString];
     return child;
 }
 
@@ -168,18 +168,18 @@ static int itemChangedAtCommit(int i)
     {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         COMutableItem *item = [COMutableItem item];
-        [item setValue: [NSNumber numberWithInt: i] forAttribute: @"name" type: kCOInt64Type];
-        [item setValue: @"blah blah 1" forAttribute: @"test1" type: kCOStringType];
-        [item setValue: @"blah blah 2" forAttribute: @"test2" type: kCOStringType];
-        [item setValue: @"blah blah 3" forAttribute: @"test3" type: kCOStringType];
-        [item setValue: @"blah blah 4" forAttribute: @"test4" type: kCOStringType];
+        [item setValue: [NSNumber numberWithInt: i] forAttribute: @"name" type: kCOTypeInt64];
+        [item setValue: @"blah blah 1" forAttribute: @"test1" type: kCOTypeString];
+        [item setValue: @"blah blah 2" forAttribute: @"test2" type: kCOTypeString];
+        [item setValue: @"blah blah 3" forAttribute: @"test3" type: kCOTypeString];
+        [item setValue: @"blah blah 4" forAttribute: @"test4" type: kCOTypeString];
         [dict setObject: item forKey: [item UUID]];
         [pool release];
     }
     
     COMutableItem *rootItem = [COMutableItem item];
     [rootItem setValue: [dict allKeys]
-          forAttribute: @"children" type: kCOArrayType | kCOCompositeReferenceType];
+          forAttribute: @"children" type: kCOTypeArray | kCOTypeCompositeReference];
     [dict setObject: rootItem forKey: [rootItem UUID]];
     
     COItemGraph *it = [[[COItemGraph alloc] initWithItemForUUID: dict

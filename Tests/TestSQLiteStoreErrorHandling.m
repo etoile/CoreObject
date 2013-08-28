@@ -29,7 +29,7 @@ static ETUUID *rootUUID;
 - (COItemGraph *) makeChangedItemGraph
 {
     COMutableItem *item = [[[COMutableItem alloc] initWithUUID: rootUUID] autorelease];
-    [item setValue: @"hello" forAttribute: @"name" type: kCOStringType];
+    [item setValue: @"hello" forAttribute: @"name" type: kCOTypeString];
     return [COItemGraph itemGraphWithItemsRootFirst: A(item)];
 }
 

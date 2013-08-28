@@ -1,8 +1,5 @@
 #import <Foundation/Foundation.h>
 
-// TODO: Rename all symbols in this file to follow the patern COTypeXXX
-// or kCOTypeXXX
-
 /**
  * Each key/value pair of a COItem has a COType associated with it.
  *
@@ -27,22 +24,22 @@ enum {
     /**
      * Represented as NSNumber
      */
-    kCOInt64Type = 0x01,
+    kCOTypeInt64 = 0x01,
     
     /**
      * Represented as NSNumber
      */
-    kCODoubleType = 0x02,
+    kCOTypeDouble = 0x02,
     
     /**
      * Represented as NSString
      */
-    kCOStringType = 0x03,
+    kCOTypeString = 0x03,
     
     /**
      * A byte array. Represented as NSData
      */
-    kCOBlobType = 0x04,
+    kCOTypeBlob = 0x04,
 
     /**
      * A reference that does not necessairily model parent-child relationships -
@@ -51,20 +48,20 @@ enum {
      * Represented as COUUID for inner references and COPath for references
      * to other persistent roots.
      */
-    kCOReferenceType = 0x05,
+    kCOTypeReference = 0x05,
     
     /**
      * A composite reference from a parent to a child. The reference is stored
      * in the parent.
      *
-     * N.B. this could be lumped together with kCOReferenceType and 
+     * N.B. this could be lumped together with kCOTypeReference and 
      * distinguished at the metamodel level only, but they are kept separate
      * to enhance support for loading data with no metamodel available, and ease
      * debugging.
      *
      * Represented as COUUID.
      */
-    kCOCompositeReferenceType = 0x06,
+    kCOTypeCompositeReference = 0x06,
 
     /**
      * A token which can be given to COSQLiteStore to retrieve a local 
@@ -72,83 +69,83 @@ enum {
      *
      * Represented as NSData (a hash of the attached file's contents).
      */
-    kCOAttachmentType = 0x07,
+    kCOTypeAttachment = 0x07,
    
 #pragma mark Multivalued types
     
     /**
      * Represented as NSSet.
      */
-    kCOSetType = 0x10,
+    kCOTypeSet = 0x10,
     
     /**
      * Represented as NSArray
      */
-    kCOArrayType = 0x20,
+    kCOTypeArray = 0x20,
     
-    kCOPrimitiveTypeMask = 0x0f,
-    kCOMultivaluedTypeMask = 0xf0
+    kCOTypePrimitiveMask = 0x0f,
+    kCOTypeMultivaluedMask = 0xf0
 };
 
 static inline
-COType COMultivaluedType(COType type)
+COType COTypeMultivaluedPart(COType type)
 {
-    return type & kCOMultivaluedTypeMask;
+    return type & kCOTypeMultivaluedMask;
 }
 
 static inline
-COType COPrimitiveType(COType type)
+COType COTypePrimitivePart(COType type)
 {
-    return type & kCOPrimitiveTypeMask;
+    return type & kCOTypePrimitiveMask;
 }
 
 static inline
 BOOL COTypeIsMultivalued(COType type)
 {
-    return COMultivaluedType(type) != 0;
+    return COTypeMultivaluedPart(type) != 0;
 }
 
 static inline
 BOOL COTypeIsPrimitive(COType type)
 {
-    return COMultivaluedType(type) == 0;
+    return COTypeMultivaluedPart(type) == 0;
 }
 
 static inline
 BOOL COTypeIsOrdered(COType type)
 {
-    return COMultivaluedType(type) == kCOArrayType;
+    return COTypeMultivaluedPart(type) == kCOTypeArray;
 }
 
 static inline
-COType COSetOfType(COType type)
+COType COTypeMakeSetOf(COType type)
 {
-    return type | kCOSetType;
+    return type | kCOTypeSet;
 }
 
 static inline
-COType COArrayOfType(COType type)
+COType COTypeMakeArrayOf(COType type)
 {
-    return type | kCOArrayType;
+    return type | kCOTypeArray;
 }
 
 static inline
 BOOL COTypeIsValid(COType type)
 {
-    if (!(COPrimitiveType(type) >= kCOInt64Type
-          && COPrimitiveType(type) <= kCOAttachmentType))
+    if (!(COTypePrimitivePart(type) >= kCOTypeInt64
+          && COTypePrimitivePart(type) <= kCOTypeAttachment))
     {
         return NO;
     }
     
-    if (!(COMultivaluedType(type) == 0
-          || COMultivaluedType(type) == kCOArrayType
-          || COMultivaluedType(type) == kCOSetType))
+    if (!(COTypeMultivaluedPart(type) == 0
+          || COTypeMultivaluedPart(type) == kCOTypeArray
+          || COTypeMultivaluedPart(type) == kCOTypeSet))
     {
         return NO;
     }
     
-    if (0 != (type & (~(kCOMultivaluedTypeMask | kCOPrimitiveTypeMask))))
+    if (0 != (type & (~(kCOTypeMultivaluedMask | kCOTypePrimitiveMask))))
     {
         return NO;
     }
