@@ -64,5 +64,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (void) sendChangeNotification;
 
+- (void) setBranchDeleted: (COBranch *)aBranch;
 
 @end

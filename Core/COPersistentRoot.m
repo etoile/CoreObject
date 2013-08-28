@@ -217,11 +217,9 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return [_branchForUUID objectForKey: aUUID];
 }
 
-- (void) deleteBranch: (COBranch *)aBranch
+- (void) setBranchDeleted: (COBranch *)aBranch
 {
-    [aBranch setDeleted: YES];
-    
-    if ([aBranch isBranchUncommitted])
+    if (aBranch.deleted && [aBranch isBranchUncommitted])
     {
         [_branchForUUID removeObjectForKey: [aBranch UUID]];
     }
