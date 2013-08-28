@@ -95,6 +95,12 @@
 		6646977F17CE7E2600A1B767 /* COSynchronizationServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646977D17CE7E2600A1B767 /* COSynchronizationServer.h */; };
 		6646978017CE7E2600A1B767 /* COSynchronizationServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */; };
 		6646979017CEAFD800A1B767 /* TestSynchronization.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646978F17CEAFD800A1B767 /* TestSynchronization.m */; };
+		6646979117CEB01D00A1B767 /* TestCrossPersistentRootReferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */; };
+		6646979217CEB01D00A1B767 /* TestCopier.m in Sources */ = {isa = PBXBuildFile; fileRef = 66808461178CD4FD003A3CC6 /* TestCopier.m */; };
+		6646979317CEB01D00A1B767 /* TestRevisionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00611704C24C00D01AAB /* TestRevisionNumber.m */; };
+		6646979417CEB01D00A1B767 /* TestConcurrentChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */; };
+		6646979517CEB01D00A1B767 /* TestObjectGraphContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB157017A8F53D003BFC9B /* TestObjectGraphContext.m */; };
+		6646979617CEB01D00A1B767 /* TestItemGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15F017AB8D4D003BFC9B /* TestItemGraphDiff.m */; };
 		666ED56C17C3E78A00D148AA /* TestUndo.m in Sources */ = {isa = PBXBuildFile; fileRef = 666ED56B17C3E78A00D148AA /* TestUndo.m */; };
 		6675F8C11785C02A001E5622 /* COItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BA1785C02A001E5622 /* COItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C21785C02A001E5622 /* COItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BB1785C02A001E5622 /* COItem.m */; };
@@ -800,7 +806,6 @@
 		667F1ECE179C81BE0083C3E6 /* Store Tests */ = {
 			isa = PBXGroup;
 			children = (
-				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				664199A4178C3E1800B78174 /* TestItem.m */,
 				664199A5178C3E1800B78174 /* TestBinaryReadWrite.m */,
 				664199B0178C431D00B78174 /* TestSQLiteStore.m */,
@@ -1050,6 +1055,7 @@
 				66D32A9E17C49903004D006D /* TestHistoryTrack.m */,
 				66E451CA17CC456700205679 /* TestCOObjectSynthesizedAccessors.m */,
 				6646978F17CEAFD800A1B767 /* TestSynchronization.m */,
+				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				667F1ECE179C81BE0083C3E6 /* Store Tests */,
 				667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */,
 			);
@@ -1486,6 +1492,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6646979117CEB01D00A1B767 /* TestCrossPersistentRootReferences.m in Sources */,
+				6646979217CEB01D00A1B767 /* TestCopier.m in Sources */,
+				6646979317CEB01D00A1B767 /* TestRevisionNumber.m in Sources */,
+				6646979417CEB01D00A1B767 /* TestConcurrentChanges.m in Sources */,
+				6646979517CEB01D00A1B767 /* TestObjectGraphContext.m in Sources */,
+				6646979617CEB01D00A1B767 /* TestItemGraphDiff.m in Sources */,
 				609C00651704C24C00D01AAB /* main.m in Sources */,
 				66860B9F17BED42900B24333 /* TestItem.m in Sources */,
 				66860BA017BED42900B24333 /* TestBinaryReadWrite.m in Sources */,

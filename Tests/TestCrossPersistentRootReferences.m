@@ -260,7 +260,7 @@
     
     // Now delete branch B. This should automatically update the cross-persistent reference
     
-    [photo1 deleteBranch: branchB];
+    branchB.deleted = YES;
     
     UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
     
@@ -292,7 +292,7 @@
 
     // Now delete photo1. This should automatically update the cross-persistent reference
     
-    [ctx deletePersistentRoot: photo1];
+    photo1.deleted = YES;
     
     // FIXME: UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
     
@@ -325,7 +325,7 @@
     
     // Now delete library1. This should automatically update the derived cross-persistent reference in photo1
     
-    [ctx deletePersistentRoot: library1];
+    library1.deleted = YES;
     
     // FIXME: UKObjectsEqual([NSSet set], [[photo1 rootObject] valueForKeyPath: @"parentCollections.label"]);
     
@@ -358,7 +358,7 @@
     
     // Delete photo1
     
-    [ctx deletePersistentRoot: photo1];
+    photo1.deleted = YES;
     [ctx commit];
     
     // FIXME: UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
@@ -414,7 +414,7 @@
     [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
     [ctx commit];
     
-    [ctx deletePersistentRoot: library1];
+    library1.deleted = YES;
     [ctx commit];
     
     {
