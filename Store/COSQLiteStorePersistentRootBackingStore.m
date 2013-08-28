@@ -66,12 +66,7 @@
         {
             NSString *result = [db_ stringForQuery: @"PRAGMA journal_mode=WAL"];
             
-            if ([@"wal" isEqualToString: result])
-            {
-                // See comments in COSQiteStore
-                [db_ executeUpdate: @"PRAGMA synchronous=NORMAL"];
-            }
-            else
+            if (![@"wal" isEqualToString: result])
             {
                 NSLog(@"Enabling WAL mode failed.");
             }

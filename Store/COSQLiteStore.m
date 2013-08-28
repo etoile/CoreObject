@@ -55,15 +55,7 @@
     {
         NSString *result = [db_ stringForQuery: @"PRAGMA journal_mode=WAL"];
         
-        if ([@"wal" isEqualToString: result])
-        {
-            // The default setting is synchronous=FULL, but according to:
-            // http://www.sqlite.org/pragma.html#pragma_synchronous
-            // NORMAL is just as safe w.r.t. consistency. FULL only guarantees that the commits
-            // will block until data is safely on disk, which we don't need.
-            [db_ executeUpdate: @"PRAGMA synchronous=NORMAL"];
-        }
-        else
+        if (![@"wal" isEqualToString: result])
         {
             NSLog(@"Enabling WAL mode failed.");
         }
