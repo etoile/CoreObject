@@ -21,6 +21,11 @@
     return [NSSet setWithArray: [branchForUUID_ allKeys]];
 }
 
+- (NSArray *) branches
+{
+    return [branchForUUID_ allValues];
+}
+
 - (COBranchInfo *)branchInfoForUUID: (ETUUID *)aUUID
 {
     return [branchForUUID_ objectForKey: aUUID];

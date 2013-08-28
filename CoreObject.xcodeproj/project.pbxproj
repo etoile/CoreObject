@@ -90,6 +90,11 @@
 		6646976317CDB94300A1B767 /* COUndoStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646976117CDB94300A1B767 /* COUndoStack.h */; };
 		6646976417CDB94300A1B767 /* COUndoStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646976217CDB94300A1B767 /* COUndoStack.m */; };
 		6646976F17CDBBF200A1B767 /* COUndoNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646976E17CDBBF200A1B767 /* COUndoNode.h */; };
+		6646977B17CE7CAC00A1B767 /* COSynchronizationClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646977917CE7CAC00A1B767 /* COSynchronizationClient.h */; };
+		6646977C17CE7CAC00A1B767 /* COSynchronizationClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646977A17CE7CAC00A1B767 /* COSynchronizationClient.m */; };
+		6646977F17CE7E2600A1B767 /* COSynchronizationServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646977D17CE7E2600A1B767 /* COSynchronizationServer.h */; };
+		6646978017CE7E2600A1B767 /* COSynchronizationServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */; };
+		6646978617CEA6BC00A1B767 /* TestSynchronization.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646978517CEA6BC00A1B767 /* TestSynchronization.m */; };
 		666ED56C17C3E78A00D148AA /* TestUndo.m in Sources */ = {isa = PBXBuildFile; fileRef = 666ED56B17C3E78A00D148AA /* TestUndo.m */; };
 		6675F8C11785C02A001E5622 /* COItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BA1785C02A001E5622 /* COItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C21785C02A001E5622 /* COItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BB1785C02A001E5622 /* COItem.m */; };
@@ -414,6 +419,11 @@
 		6646976117CDB94300A1B767 /* COUndoStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COUndoStack.h; sourceTree = "<group>"; };
 		6646976217CDB94300A1B767 /* COUndoStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COUndoStack.m; sourceTree = "<group>"; };
 		6646976E17CDBBF200A1B767 /* COUndoNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COUndoNode.h; sourceTree = "<group>"; };
+		6646977917CE7CAC00A1B767 /* COSynchronizationClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizationClient.h; path = Synchronization/COSynchronizationClient.h; sourceTree = "<group>"; };
+		6646977A17CE7CAC00A1B767 /* COSynchronizationClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizationClient.m; path = Synchronization/COSynchronizationClient.m; sourceTree = "<group>"; };
+		6646977D17CE7E2600A1B767 /* COSynchronizationServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizationServer.h; path = Synchronization/COSynchronizationServer.h; sourceTree = "<group>"; };
+		6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizationServer.m; path = Synchronization/COSynchronizationServer.m; sourceTree = "<group>"; };
+		6646978517CEA6BC00A1B767 /* TestSynchronization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestSynchronization.m; sourceTree = "<group>"; };
 		666ED56B17C3E78A00D148AA /* TestUndo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUndo.m; path = Tests/TestUndo.m; sourceTree = "<group>"; };
 		6675F8BA1785C02A001E5622 /* COItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItem.h; sourceTree = "<group>"; };
 		6675F8BB1785C02A001E5622 /* COItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COItem.m; sourceTree = "<group>"; };
@@ -646,6 +656,7 @@
 				6686BDCB12592C1B0065DE1A /* Diff & Merge (Low-level API) */,
 				663CE28617C07ED800E729F5 /* Undo */,
 				6686BDC712592C1B0065DE1A /* Utilities */,
+				6646977017CE789700A1B767 /* Synchronization */,
 				6686BDB212592C1B0065DE1A /* Supporting Files */,
 				60C913AC165BBE7500E0C5F4 /* Examples */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
@@ -756,6 +767,17 @@
 			name = "Undo actions";
 			sourceTree = "<group>";
 		};
+		6646977017CE789700A1B767 /* Synchronization */ = {
+			isa = PBXGroup;
+			children = (
+				6646977917CE7CAC00A1B767 /* COSynchronizationClient.h */,
+				6646977A17CE7CAC00A1B767 /* COSynchronizationClient.m */,
+				6646977D17CE7E2600A1B767 /* COSynchronizationServer.h */,
+				6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */,
+			);
+			name = Synchronization;
+			sourceTree = "<group>";
+		};
 		6675F8B91785C02A001E5622 /* StorageDataModel */ = {
 			isa = PBXGroup;
 			children = (
@@ -778,6 +800,7 @@
 		667F1ECE179C81BE0083C3E6 /* Store Tests */ = {
 			isa = PBXGroup;
 			children = (
+				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				664199A4178C3E1800B78174 /* TestItem.m */,
 				664199A5178C3E1800B78174 /* TestBinaryReadWrite.m */,
 				664199B0178C431D00B78174 /* TestSQLiteStore.m */,
@@ -1026,8 +1049,8 @@
 				66ABC78D17C43FBA009FB925 /* TestCustomTrack.m */,
 				66D32A9E17C49903004D006D /* TestHistoryTrack.m */,
 				66E451CA17CC456700205679 /* TestCOObjectSynthesizedAccessors.m */,
+				6646978517CEA6BC00A1B767 /* TestSynchronization.m */,
 				667F1ECE179C81BE0083C3E6 /* Store Tests */,
-				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */,
 			);
 			name = Tests;
@@ -1145,6 +1168,8 @@
 				6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */,
 				6646976317CDB94300A1B767 /* COUndoStack.h in Headers */,
 				6646976F17CDBBF200A1B767 /* COUndoNode.h in Headers */,
+				6646977B17CE7CAC00A1B767 /* COSynchronizationClient.h in Headers */,
+				6646977F17CE7E2600A1B767 /* COSynchronizationServer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1432,6 +1457,8 @@
 				662FFB8017C2026000BA3F2F /* COEditUndeletePersistentRoot.m in Sources */,
 				662FFB9F17C2DE8100BA3F2F /* COEditUndeleteBranch.m in Sources */,
 				6646976417CDB94300A1B767 /* COUndoStack.m in Sources */,
+				6646977C17CE7CAC00A1B767 /* COSynchronizationClient.m in Sources */,
+				6646978017CE7E2600A1B767 /* COSynchronizationServer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1480,6 +1507,7 @@
 				66E451CB17CC456700205679 /* TestCOObjectSynthesizedAccessors.m in Sources */,
 				66E451D617CC461F00205679 /* OutlineItem.m in Sources */,
 				66E451D917CC565200205679 /* Tag.m in Sources */,
+				6646978617CEA6BC00A1B767 /* TestSynchronization.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

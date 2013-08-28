@@ -18,6 +18,7 @@
 }
 
 - (NSSet *) branchUUIDs;
+- (NSArray *) branches;
 
 - (COBranchInfo *)branchInfoForUUID: (ETUUID *)aUUID;
 - (COBranchInfo *)currentBranchInfo;

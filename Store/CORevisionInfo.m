@@ -1,4 +1,5 @@
 #import "CORevisionInfo.h"
+#import "CORevisionID.h"
 
 @implementation CORevisionInfo
 
@@ -38,6 +39,25 @@
         return [NSString stringWithFormat: @"(Revision %@, Parent %@)", _revisionID, _parentRevisionID];
     }
     return [NSString stringWithFormat: @"(Revision %@)", _revisionID];
+}
+
+- (id) plist
+{
+    return @{ @"revisionID" : [_revisionID plist],
+              @"parentRevisionID" : _parentRevisionID != nil ? [_parentRevisionID plist] : [NSNull null],
+              @"metadata" : _metadata != nil ? _metadata : [NSNull null],
+              @"date" : [[[[NSDateFormatter alloc] init] autorelease] stringFromDate: _date]  };
+}
+
++ (CORevisionInfo *) revisionInfoWithPlist: (id)aPlist
+{
+    CORevisionInfo *info = [[[CORevisionInfo alloc] init] autorelease];
+    info.revisionID = [CORevisionID revisionIDWithPlist: aPlist[@"revisionID"]];
+    info.parentRevisionID = aPlist[@"parentRevisionID"] != [NSNull null] ?
+        [CORevisionID revisionIDWithPlist: aPlist[@"parentRevisionID"]] : nil;
+    info.metadata = aPlist[@"metadata"] != [NSNull null] ? aPlist[@"metadata"] : nil;
+    info.date = [[[[NSDateFormatter alloc] init] autorelease] dateFromString: aPlist[@"date"]];
+    return info;
 }
 
 @end

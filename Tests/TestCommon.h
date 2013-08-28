@@ -4,6 +4,9 @@
 
 #import <CoreObject/COUndoStackStore.h>
 
+#import "COSynchronizationClient.h"
+#import "COSynchronizationServer.h"
+
 #import "OutlineItem.h"
 
 #define SA(x) [NSSet setWithArray: x]

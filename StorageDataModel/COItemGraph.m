@@ -176,7 +176,7 @@ void COValidateItemGraph(id<COItemGraph> aGraph)
     }
 }
 
-NSData *COItemGraphToJSONData(id<COItemGraph> aGraph)
+id COItemGraphToJSONPropertyList(id<COItemGraph> aGraph)
 {
     NSMutableDictionary *objectsDict = [NSMutableDictionary dictionary];
     for (ETUUID *uuid in [aGraph itemUUIDs])
@@ -187,15 +187,18 @@ NSData *COItemGraphToJSONData(id<COItemGraph> aGraph)
                         forKey: [uuid stringValue]];
     }
     
-    NSDictionary *graphDict = D(objectsDict, @"objects",
-                                [[aGraph rootItemUUID] stringValue], @"rootObjectUUID");
-    
+    return @{@"objects" : objectsDict,
+             @"rootObjectUUID" : [[aGraph rootItemUUID] stringValue]};
+}
+
+NSData *COItemGraphToJSONData(id<COItemGraph> aGraph)
+{
+    NSDictionary *graphDict = COItemGraphToJSONPropertyList(aGraph);    
     return [NSJSONSerialization dataWithJSONObject: graphDict options: 0 error: NULL];
 }
 
-COItemGraph *COItemGraphFromJSONData(NSData *json)
+COItemGraph *COItemGraphFromJSONPropertyLisy(id plist)
 {
-    id plist = [NSJSONSerialization JSONObjectWithData: json options:0 error: NULL];
     id objectsPlist = [plist objectForKey: @"objects"];
     ETUUID *rootObjectUUID = [ETUUID UUIDWithString: [plist objectForKey: @"rootObjectUUID"]];
     NSMutableDictionary *itemForUUID = [NSMutableDictionary dictionary];
@@ -211,6 +214,12 @@ COItemGraph *COItemGraphFromJSONData(NSData *json)
     COItemGraph *graph = [[COItemGraph alloc] initWithItemForUUID: itemForUUID
                                                      rootItemUUID: rootObjectUUID];
     return graph;
+}
+
+COItemGraph *COItemGraphFromJSONData(NSData *json)
+{
+    id plist = [NSJSONSerialization JSONObjectWithData: json options:0 error: NULL];
+    return COItemGraphFromJSONPropertyLisy(plist);
 }
 
 /**

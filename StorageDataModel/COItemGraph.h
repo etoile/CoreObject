@@ -70,8 +70,10 @@
  */
 void COValidateItemGraph(id<COItemGraph> aGraph);
 
+id COItemGraphToJSONPropertyList(id<COItemGraph> aGraph);
 NSData *COItemGraphToJSONData(id<COItemGraph> aGraph);
 
+COItemGraph *COItemGraphFromJSONPropertyLisy(id plist);
 COItemGraph *COItemGraphFromJSONData(NSData *json);
 
 BOOL COItemGraphEqualToItemGraph(id<COItemGraph> first, id<COItemGraph> second);

@@ -20,4 +20,7 @@
 @property (readwrite, nonatomic, copy) NSDictionary *metadata;
 @property (readwrite, nonatomic, retain) NSDate *date;
 
+- (id) plist;
++ (CORevisionInfo *) revisionInfoWithPlist: (id)aPlist;
+
 @end
