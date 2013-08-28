@@ -33,8 +33,6 @@
 /* Tracks */
 
 #import <CoreObject/COBranch.h>
-#import <CoreObject/COCustomTrack.h>
-#import <CoreObject/COHistoryTrack.h>
 #import <CoreObject/COTrack.h>
 
 /* Diff Framework (the Diff API is very unstable) */
