@@ -25,8 +25,6 @@
 		609C009B1704C3DA00D01AAB /* COPersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C008F1704C3DA00D01AAB /* COPersistentRoot.m */; };
 		609C009C1704C3DA00D01AAB /* COQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00901704C3DA00D01AAB /* COQuery.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C009D1704C3DA00D01AAB /* COQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00911704C3DA00D01AAB /* COQuery.m */; };
-		609C009E1704C3DA00D01AAB /* COSynchronizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00921704C3DA00D01AAB /* COSynchronizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		609C009F1704C3DA00D01AAB /* COSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00931704C3DA00D01AAB /* COSynchronizer.m */; };
 		609C00AC1704C3EF00D01AAB /* COBookmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00A01704C3EF00D01AAB /* COBookmark.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00AD1704C3EF00D01AAB /* COBookmark.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00A11704C3EF00D01AAB /* COBookmark.m */; };
 		609C00AE1704C3EF00D01AAB /* COCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00A21704C3EF00D01AAB /* COCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -347,8 +345,6 @@
 		609C008F1704C3DA00D01AAB /* COPersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COPersistentRoot.m; path = Core/COPersistentRoot.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		609C00901704C3DA00D01AAB /* COQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COQuery.h; path = Core/COQuery.h; sourceTree = "<group>"; };
 		609C00911704C3DA00D01AAB /* COQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COQuery.m; path = Core/COQuery.m; sourceTree = "<group>"; };
-		609C00921704C3DA00D01AAB /* COSynchronizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizer.h; path = Core/COSynchronizer.h; sourceTree = "<group>"; };
-		609C00931704C3DA00D01AAB /* COSynchronizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizer.m; path = Core/COSynchronizer.m; sourceTree = "<group>"; };
 		609C00A01704C3EF00D01AAB /* COBookmark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBookmark.h; path = Model/COBookmark.h; sourceTree = "<group>"; };
 		609C00A11704C3EF00D01AAB /* COBookmark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBookmark.m; path = Model/COBookmark.m; sourceTree = "<group>"; };
 		609C00A21704C3EF00D01AAB /* COCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCollection.h; path = Model/COCollection.h; sourceTree = "<group>"; };
@@ -870,8 +866,6 @@
 				609C00911704C3DA00D01AAB /* COQuery.m */,
 				606E3DBF1787A07E00ED42DA /* COSerialization.h */,
 				606E3DC01787A07E00ED42DA /* COSerialization.m */,
-				609C00921704C3DA00D01AAB /* COSynchronizer.h */,
-				609C00931704C3DA00D01AAB /* COSynchronizer.m */,
 				6680846B178CD526003A3CC6 /* COCopier.h */,
 				6680846C178CD526003A3CC6 /* COCopier.m */,
 				66FB155E17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.h */,
@@ -1093,7 +1087,6 @@
 				609C00981704C3DA00D01AAB /* COObject.h in Headers */,
 				609C009A1704C3DA00D01AAB /* COPersistentRoot.h in Headers */,
 				609C009C1704C3DA00D01AAB /* COQuery.h in Headers */,
-				609C009E1704C3DA00D01AAB /* COSynchronizer.h in Headers */,
 				609C00AC1704C3EF00D01AAB /* COBookmark.h in Headers */,
 				609C00AE1704C3EF00D01AAB /* COCollection.h in Headers */,
 				609C00B01704C3EF00D01AAB /* COContainer.h in Headers */,
@@ -1386,7 +1379,6 @@
 				609C00991704C3DA00D01AAB /* COObject.m in Sources */,
 				609C009B1704C3DA00D01AAB /* COPersistentRoot.m in Sources */,
 				609C009D1704C3DA00D01AAB /* COQuery.m in Sources */,
-				609C009F1704C3DA00D01AAB /* COSynchronizer.m in Sources */,
 				609C00AD1704C3EF00D01AAB /* COBookmark.m in Sources */,
 				609C00AF1704C3EF00D01AAB /* COCollection.m in Sources */,
 				609C00B11704C3EF00D01AAB /* COContainer.m in Sources */,
