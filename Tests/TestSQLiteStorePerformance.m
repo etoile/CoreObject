@@ -3,6 +3,9 @@
 #import "CORevisionInfo.h"
 
 @interface TestSQLiteStorePerformance : COSQLiteStoreTestCase <UKTest>
+{
+    NSMutableArray *revisionIDs;
+}
 @end
 
 
@@ -98,6 +101,7 @@ static int itemChangedAtCommit(int i)
 
 - (ETUUID *) makeDemoPersistentRoot
 {
+    ASSIGN(revisionIDs, [NSMutableArray array]);
     NSDate *startDate = [NSDate date];
     
     COItemGraph *initialTree = [self makeInitialItemTree];
@@ -113,7 +117,7 @@ static int itemChangedAtCommit(int i)
     
     // Commit a change to each object
     
-    CORevisionID *lastCommitId = [[proot currentBranchInfo] currentRevisionID];
+    [revisionIDs addObject: [[proot currentBranchInfo] currentRevisionID]];
     for (int commit=1; commit<NUM_COMMITS; commit++)
     {
         int i = itemChangedAtCommit(commit);
@@ -126,17 +130,17 @@ static int itemChangedAtCommit(int i)
         [item setValue:label
           forAttribute: @"name"];
         
-        lastCommitId = [store writeRevisionWithItemGraph: initialTree
-                               metadata: nil
-                           parentRevisionID: lastCommitId
-                              modifiedItems: A(childUUIDs[i])
-                                      error: NULL];
+        [revisionIDs addObject: [store writeRevisionWithItemGraph: initialTree
+                                                         metadata: nil
+                                                 parentRevisionID: [revisionIDs lastObject]
+                                                    modifiedItems: A(childUUIDs[i])
+                                                            error: NULL]];
     }
     
     // Set the persistent root's state to the last commit
     
-    [store setCurrentRevision: lastCommitId
-                 headRevision: lastCommitId
+    [store setCurrentRevision: [revisionIDs lastObject]
+                 headRevision: [revisionIDs lastObject]
                  tailRevision: [[proot currentBranchInfo] currentRevisionID]
                     forBranch: [proot currentBranchUUID]
              ofPersistentRoot: [proot UUID]
@@ -287,7 +291,7 @@ static int itemChangedAtCommit(int i)
     {
         CORevisionID *revid = [results objectAtIndex: 0];
         UKObjectsEqual([proot UUID], [revid backingStoreUUID]);
-        UKIntsEqual(32, [revid revisionIndex]);
+        UKObjectsEqual([revisionIDs objectAtIndex: 32], revid);
     }
 }
 

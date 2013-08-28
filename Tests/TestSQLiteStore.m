@@ -765,7 +765,7 @@ static ETUUID *childUUID2;
     ETUUID *cheapCopyUUID = [ETUUID UUID];
     ETUUID *cheapCopyBranchUUID = [ETUUID UUID];
 
-    COPersistentRootInfo *cheapCopy = [store createPersistentRootWithInitialRevision: [CORevisionID revisionWithBackinStoreUUID: [proot UUID] revisionIndex: BRANCH_LENGTH + 1]
+    COPersistentRootInfo *cheapCopy = [store createPersistentRootWithInitialRevision: [branchARevisionIDs lastObject]
                                                                                 UUID: cheapCopyUUID
                                                                           branchUUID: cheapCopyBranchUUID
                                                                                error: NULL];
