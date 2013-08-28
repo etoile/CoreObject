@@ -245,8 +245,13 @@
             sqlite3_bind_text(pStmt, idx, [[obj description] UTF8String], -1, SQLITE_TRANSIENT);
         }
     }
+    else if ([obj isKindOfClass:[NSString class]]) {
+        sqlite3_bind_text(pStmt, idx, [obj UTF8String], -1, SQLITE_TRANSIENT);
+    }
     else {
-        sqlite3_bind_text(pStmt, idx, [[obj description] UTF8String], -1, SQLITE_TRANSIENT);
+        [NSException raise: NSInvalidArgumentException
+                    format: @"Cannot bind object of class %@ (%@)",
+                            NSStringFromClass([obj class]), obj];
     }
 }
 

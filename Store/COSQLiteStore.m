@@ -100,7 +100,7 @@
      "uuid BLOB, backingstore BLOB, currentbranch INTEGER, deleted BOOLEAN DEFAULT 0, changecount INTEGER)"];
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (branch_id INTEGER PRIMARY KEY, "
-     "uuid BLOB, proot INTEGER, head_revid INTEGER, tail_revid INTEGER, current_revid INTEGER, metadata BLOB, deleted BOOLEAN DEFAULT 0)"];
+     "uuid BLOB, proot INTEGER, head_revid BLOB, tail_revid BLOB, current_revid BLOB, metadata BLOB, deleted BOOLEAN DEFAULT 0)"];
 
     [db_ executeUpdate: @"CREATE INDEX IF NOT EXISTS persistentroots_uuid_index ON persistentroots(uuid)"];
     [db_ executeUpdate: @"CREATE INDEX IF NOT EXISTS branches_proot_index ON branches(proot)"];
@@ -110,8 +110,8 @@
     /**
      * In embedded_object_uuid in revid of backing store root_id, there was a reference to dest_root_id
      */
-    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS proot_refs (root_id BLOB, revid INTEGER, embedded_object_uuid BLOB, dest_root_id BLOB)"];
-    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS attachment_refs (root_id BLOB, revid INTEGER, attachment_hash BLOB)"];    
+    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS proot_refs (root_id BLOB, revid BOLB, embedded_object_uuid BLOB, dest_root_id BLOB)"];
+    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS attachment_refs (root_id BLOB, revid BLOB, attachment_hash BLOB)"];    
     
     // FIXME: This is a bit ugly. Verify that usage is consistent across fts3/4
 	if (sqlite3_libversion_number() >= 3007011)
@@ -127,7 +127,7 @@
     }
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS fts_docid_to_revisionid ("
-     "docid INTEGER PRIMARY KEY, backingstore BLOB, revid INTEGER)"];
+     "docid INTEGER PRIMARY KEY, backingstore BLOB, revid BLOB)"];
     
     [db_ commit];
     
@@ -296,8 +296,8 @@
     NSParameterAssert([[baseRevid backingStoreUUID] isEqual: [finalRevid backingStoreUUID]]);
     
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: baseRevid];
-    COItemGraph *result = [backing partialItemGraphFromRevid: [baseRevid revisionIndex]
-                                                   toRevid: [finalRevid revisionIndex]];
+    COItemGraph *result = [backing partialItemGraphFromRevid: [backing revidForRevisionID: baseRevid]
+                                                     toRevid: [backing revidForRevisionID: finalRevid]];
     return result;
 }
 
@@ -305,7 +305,7 @@
 {
     NSParameterAssert(aToken != nil);
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-    COItemGraph *result = [backing itemGraphForRevid: [aToken revisionIndex]];
+    COItemGraph *result = [backing itemGraphForRevid: [backing revidForRevisionID: aToken]];
     return result;
 }
 
@@ -313,14 +313,15 @@
 {
     NSParameterAssert(aToken != nil);
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-    return [backing rootUUIDForRevid: [aToken revisionIndex]];
+    return [backing rootUUIDForRevid: [backing revidForRevisionID: aToken]];
 }
 
 - (COItem *) item: (ETUUID *)anitem atRevisionID: (CORevisionID *)aToken
 {
     NSParameterAssert(aToken != nil);
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-    COItemGraph *tree = [backing itemGraphForRevid: [aToken revisionIndex] restrictToItemUUIDs: S(anitem)];
+    COItemGraph *tree = [backing itemGraphForRevid: [backing revidForRevisionID: aToken]
+                               restrictToItemUUIDs: S(anitem)];
     COItem *item = [tree itemForUUID: anitem];
     return item;
 }
@@ -359,7 +360,7 @@
         {
             [db_ executeUpdate: @"INSERT INTO proot_refs(root_id, revid, embedded_object_uuid, dest_root_id) VALUES(?,?,?,?)",
                 backingUUIDData,
-                [NSNumber numberWithLongLong: [aRevision revisionIndex]],
+                [[aRevision revisionUUID] dataValue],
                 [uuid dataValue],
                 [referenced dataValue]];
         }
@@ -369,7 +370,7 @@
         {
             [db_ executeUpdate: @"INSERT INTO attachment_refs(root_id, revid, attachment_hash) VALUES(?,?,?)",
              backingUUIDData ,
-             [NSNumber numberWithLongLong: [aRevision revisionIndex]],
+             [[aRevision revisionUUID] dataValue],
              attachment];
         }
     }
@@ -377,7 +378,7 @@
     
     [db_ executeUpdate: @"INSERT INTO fts_docid_to_revisionid(backingstore, revid) VALUES(?, ?)",
      backingUUIDData,
-     [NSNumber numberWithLongLong: [aRevision revisionIndex]]];
+     [[aRevision revisionUUID] dataValue]];
     
     [db_ executeUpdate: @"INSERT INTO fts(docid, text) VALUES(?,?)",
      [NSNumber numberWithLongLong: [db_ lastInsertRowId]],
@@ -399,10 +400,9 @@
 
     while ([rs next])
     {
-        CORevisionID *revId = [[CORevisionID alloc] initWithPersistentRootBackingStoreUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]
-                                                                             revisionIndex: [rs int64ForColumnIndex: 1]];
+        CORevisionID *revId = [CORevisionID revisionWithBackinStoreUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]
+                                                           revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]]];
         [result addObject: revId];
-        [revId release];
     }
     [rs close];
     return result;
@@ -421,7 +421,7 @@
     
     return [self writeItemTree: anItemTree
                   withMetadata: metadata
-               withParentRevid: [aParent revisionIndex]
+          withParentRevisionID: aParent
         inBackingStoreWithUUID: [aParent backingStoreUUID]
                  modifiedItems: modifiedItems
                          error: error];
@@ -434,7 +434,7 @@
 {
     return [self writeItemTree: anItemTree
                   withMetadata: metadata
-               withParentRevid: -1
+          withParentRevisionID: nil
         inBackingStoreWithUUID: aBacking
                  modifiedItems: nil
                          error: error];
@@ -443,12 +443,13 @@
 
 - (CORevisionID *) writeItemTree: (id<COItemGraph>)anItemTree
                     withMetadata: (NSDictionary *)metadata
-                 withParentRevid: (int64_t)parentRevid
-          inBackingStoreWithUUID: (ETUUID *)aBacking
+            withParentRevisionID: (CORevisionID *)parentRevid
+          inBackingStoreWithUUID: (ETUUID *)backingUUID
                    modifiedItems: (NSArray*)modifiedItems // array of COUUID
                            error: (NSError **)error
 {
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: aBacking error: error];
+    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID
+                                                                           error: error];
     if (backing == nil)
     {
         return nil;
@@ -456,12 +457,19 @@
     
     CORevisionID *revid = [backing writeItemGraph: anItemTree
                                      withMetadata: metadata
-                                       withParent: parentRevid
+                                       withParent: [backing revidForRevisionID: parentRevid]
                                     modifiedItems: modifiedItems
                                             error: error];
     
+    if (revid == nil)
+    {
+        NSLog(@"Error creating revision");
+    }
+    
     if (revid != nil)
     {
+        assert([backing hasRevid: [backing revidForUUID: [revid revisionUUID]]]);
+        
         [self updateSearchIndexesForItemUUIDs: modifiedItems
                                    inItemTree: anItemTree
                        revisionIDBeingWritten: revid];
@@ -556,11 +564,11 @@
         {
             ETUUID *branch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
             CORevisionID *headRevid = [CORevisionID revisionWithBackinStoreUUID: backingUUID
-                                                                  revisionIndex: [rs int64ForColumnIndex: 1]];
+                                                                   revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]]];
             CORevisionID *tailRevid = [CORevisionID revisionWithBackinStoreUUID: backingUUID
-                                                                  revisionIndex: [rs int64ForColumnIndex: 2]];
+                                                                   revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]]];
             CORevisionID *currentRevid = [CORevisionID revisionWithBackinStoreUUID: backingUUID
-                                                                     revisionIndex: [rs int64ForColumnIndex: 3]];
+                                                                      revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 3]]];
             id branchMeta = [self readMetadata: [rs dataForColumnIndex: 4]];            
             
             COBranchInfo *state = [[[COBranchInfo alloc] init] autorelease];
@@ -619,6 +627,9 @@
                                         initialRevision: (CORevisionID *)revId
                                                   error: (NSError **)error
 {
+    NSParameterAssert(revId != nil);
+    NSParameterAssert([revId backingStoreUUID] != nil);
+    
     [db_ savepoint: @"createPersistentRootWithUUID"];
     
     [db_ executeUpdate: @"INSERT INTO persistentroots (uuid, "
@@ -631,9 +642,9 @@
     [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,NULL,0)",
            [aBranchUUID dataValue],
            [NSNumber numberWithLongLong: root_id],
-           [NSNumber numberWithLongLong: [revId revisionIndex]],
-           [NSNumber numberWithLongLong: [revId revisionIndex]],
-           [NSNumber numberWithLongLong: [revId revisionIndex]]];
+           [[revId revisionUUID] dataValue],
+           [[revId revisionUUID] dataValue],
+           [[revId revisionUUID] dataValue]];
     
     const int64_t branch_id = [db_ lastInsertRowId];
     
@@ -676,6 +687,7 @@
                                              withMetadata: metadata
                                    inBackingStoreWithUUID: persistentRootUUID
                                                     error: error];
+    
     if (revId == nil)
     {
         return nil;
@@ -798,9 +810,9 @@
     BOOL ok = [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,?,0)",
      [branchUUID dataValue],
      root_id,
-     [NSNumber numberWithLongLong: [revId revisionIndex]],
-     [NSNumber numberWithLongLong: [revId revisionIndex]],
-     [NSNumber numberWithLongLong: [revId revisionIndex]],
+     [[revId revisionUUID] dataValue],
+     [[revId revisionUUID] dataValue],
+     [[revId revisionUUID] dataValue],
      nil];    
   
     if (!ok)
@@ -827,7 +839,7 @@
     
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: [aRev backingStoreUUID] error: NULL];
     
-    if (![backing hasRevid: [aRev revisionIndex]])
+    if (![backing hasRevid: [backing revidForRevisionID: aRev]])
     {
         [NSException raise: NSInvalidArgumentException
                     format: @"CORevisionID %@ has an index not present in the backing store", aRev];
@@ -884,19 +896,19 @@
     if (currentRev != nil)
     {
         [db_ executeUpdate: @"UPDATE branches SET current_revid = ? WHERE uuid = ?",
-                [NSNumber numberWithLongLong: [currentRev revisionIndex]],
+                [[currentRev revisionUUID] dataValue],
                 branchData];
     }
     if (headRev != nil)
     {
         [db_ executeUpdate: @"UPDATE branches SET head_revid = ? WHERE uuid = ?",
-                [NSNumber numberWithLongLong: [headRev revisionIndex]],
+                [[headRev revisionUUID] dataValue],
                 branchData];
     }
     if (tailRev != nil)
     {
         [db_ executeUpdate: @"UPDATE branches SET tail_revid = ? WHERE uuid = ?",
-                [NSNumber numberWithLongLong: [tailRev revisionIndex]],
+                [[tailRev revisionUUID] dataValue],
                 branchData];
     }
 
@@ -1027,10 +1039,11 @@
                                             "WHERE persistentroots.backingstore = ?", backingUUIDData];
     while ([rs next])
     {
-        const int64_t head = [rs int64ForColumnIndex: 0];
-        const int64_t tail = [rs int64ForColumnIndex: 1];
+        ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+        ETUUID *tail = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
         
-        NSIndexSet *revs = [backing revidsFromRevid: tail toRevid: head];        
+        NSIndexSet *revs = [backing revidsFromRevid: [backing revidForUUID: tail]
+                                            toRevid: [backing revidForUUID: head]];
         [keptRevisions addIndexes: revs];
     }
     [rs close];
@@ -1042,15 +1055,15 @@
     [deletedRevisions addIndexes: [backing revidsUsedRange]];
     [deletedRevisions removeIndexes: keptRevisions];
     
-    for (NSUInteger i = [deletedRevisions firstIndex]; i != NSNotFound; i = [deletedRevisions indexGreaterThanIndex: i])
-    {
-        
-        [db_ executeUpdate: @"DELETE FROM attachment_refs WHERE root_id = ? AND revid = ?",
-         [backingUUID dataValue],
-         [NSNumber numberWithLongLong: i]];
-        
-        // FIXME: FTS, proot_refs
-    }
+//    for (NSUInteger i = [deletedRevisions firstIndex]; i != NSNotFound; i = [deletedRevisions indexGreaterThanIndex: i])
+//    {
+//        
+//        [db_ executeUpdate: @"DELETE FROM attachment_refs WHERE root_id = ? AND revid = ?",
+//         [backingUUID dataValue],
+//         [NSNumber numberWithLongLong: i]];
+//        
+//        // FIXME: FTS, proot_refs
+//    }
     
     if (![db_ commit])
     {
@@ -1079,13 +1092,13 @@
     while ([rs next])
     {
         ETUUID *root = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-        const int64_t revid = [rs int64ForColumnIndex: 1];
+        ETUUID *revUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
         ETUUID *embedded_object_uuid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
         
         COSearchResult *searchResult = [[COSearchResult alloc] init];
         searchResult.embeddedObjectUUID = embedded_object_uuid;
         searchResult.revision = [CORevisionID revisionWithBackinStoreUUID: root
-                                                            revisionIndex: revid];
+                                                             revisionUUID: revUUID];
         [results addObject: searchResult];
         [searchResult release];
     }

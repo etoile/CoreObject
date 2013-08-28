@@ -3,6 +3,7 @@
 #import "COItem.h"
 #import "CORevisionInfo.h"
 
+#if 0
 @interface TestSQLiteStorePersistentRootBackingStore : NSObject <UKTest>
 {
     COSQLiteStore *parentStore;
@@ -342,3 +343,4 @@ static ETUUID *childUUID2;
 }
 
 @end
+#endif

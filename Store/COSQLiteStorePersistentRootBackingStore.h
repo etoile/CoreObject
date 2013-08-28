@@ -73,4 +73,7 @@
 
 - (NSIndexSet *) revidsUsedRange;
 
+- (int64_t) revidForUUID: (ETUUID *)aUUID;
+- (int64_t) revidForRevisionID: (CORevisionID *)aToken;
+
 @end

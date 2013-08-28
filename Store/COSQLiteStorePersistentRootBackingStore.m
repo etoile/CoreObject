@@ -81,7 +81,10 @@
     [db_ executeUpdate: [NSString stringWithFormat:
                          @"CREATE TABLE IF NOT EXISTS %@ (revid INTEGER PRIMARY KEY ASC, "
                          "contents BLOB, metadata BLOB, timestamp REAL, parent INTEGER, root BLOB, deltabase INTEGER, "
-                         "bytesInDeltaRun INTEGER, garbage BOOLEAN)", [self tableName]]];
+                         "bytesInDeltaRun INTEGER, garbage BOOLEAN, uuid BLOB)", [self tableName]]];
+
+    [db_ executeUpdate: [NSString stringWithFormat:
+                         @"CREATE INDEX IF NOT EXISTS %@ ON %@ (uuid)", [[self tableName] stringByAppendingString: @"_uuid"], [self tableName]]];
     
     if ([db_ hadError])
     {
@@ -149,10 +152,12 @@
 
 - (CORevisionInfo *) revisionForID: (CORevisionID *)aToken
 {
+    NSParameterAssert([[aToken backingStoreUUID] isEqual: _uuid]);
+    
     CORevisionInfo *result = nil;
     FMResultSet *rs = [db_ executeQuery:
-                       [NSString stringWithFormat: @"SELECT parent, metadata, timestamp FROM %@ WHERE revid = ?", [self tableName]],
-                       [NSNumber numberWithLongLong: [aToken revisionIndex]]];
+                       [NSString stringWithFormat: @"SELECT parent, metadata, timestamp FROM %@ WHERE uuid = ?", [self tableName]],
+                       [[aToken revisionUUID] dataValue]];
 	if ([rs next])
 	{
         int64_t parent = [rs longLongIntForColumnIndex: 0];
@@ -166,7 +171,14 @@
                                                          error: NULL];
         }
         
-        CORevisionID *parentId = parent != -1 ? [aToken revisionIDWithRevisionIndex: parent] : nil;
+        CORevisionID *parentId = nil;
+        if (parent != -1)
+        {            
+            NSData *parentHash = [db_ dataForQuery:
+                                  [NSString stringWithFormat: @"SELECT uuid FROM %@ WHERE revid = ?", [self tableName]],
+                                  [NSNumber numberWithLongLong: parent]];
+            parentId = [aToken revisionIDWithRevisionUUID: [ETUUID UUIDWithData: parentHash]];
+        }
         
         result = [[[CORevisionInfo alloc] init] autorelease];
         result.revisionID = aToken;
@@ -177,6 +189,23 @@
     [rs close];
     
 	return result;
+}
+
+- (int64_t) revidForUUID: (ETUUID *)aUUID
+{
+    NSNumber *revid = [db_ numberForQuery:
+                       [NSString stringWithFormat: @"SELECT revid FROM %@ WHERE uuid = ?", [self tableName]], [aUUID dataValue]];
+    if (revid == nil)
+    {
+        return -1;
+    }
+    return [revid longLongValue];
+}
+
+- (int64_t) revidForRevisionID: (CORevisionID *)aToken
+{
+    NSParameterAssert(aToken == nil || [[aToken backingStoreUUID] isEqual: _uuid]);
+    return [self revidForUUID: [aToken revisionUUID]];
 }
 
 - (ETUUID *) rootUUIDForRevid: (int64_t)revid
@@ -206,8 +235,6 @@
                                     toRevid: (int64_t)revid
                         restrictToItemUUIDs: (NSSet *)itemSet
 {
-    NSParameterAssert(baseRevid < revid);
-    
     NSNumber *revidObj = [NSNumber numberWithLongLong: revid];
     
     NSMutableDictionary *dataForUUID = [NSMutableDictionary dictionary];
@@ -425,9 +452,10 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
         metadataBlob = [NSJSONSerialization dataWithJSONObject: metadata options: 0 error: NULL];
     }
     
+    ETUUID *revisionUUID = [ETUUID UUID];
     BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (revid, "
         "contents, metadata, timestamp, parent, root, deltabase, "
-        "bytesInDeltaRun, garbage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)", [self tableName]],
+        "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", [self tableName]],
         [NSNumber numberWithLongLong: rowid],
         contentsBlob,
         metadataBlob,
@@ -435,7 +463,8 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
         [NSNumber numberWithLongLong: aParent],
         [[anItemTree rootItemUUID] dataValue],
         [NSNumber numberWithLongLong: deltabase],
-        [NSNumber numberWithLongLong: bytesInDeltaRun]];
+        [NSNumber numberWithLongLong: bytesInDeltaRun],
+        [revisionUUID dataValue]];
     
     if (!inTransaction)
     {
@@ -448,7 +477,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     }
     
     CORevisionID *revidObject = [CORevisionID revisionWithBackinStoreUUID: _uuid
-                                                            revisionIndex: rowid];
+                                                             revisionUUID: revisionUUID];
 
     return revidObject;
 }

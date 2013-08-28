@@ -1,29 +1,34 @@
 #import "CORevisionID.h"
-#import <EtoileFoundation/ETUUID.h>
+#import <EtoileFoundation/EtoileFoundation.h>
 
 @implementation CORevisionID
 
+@synthesize backingStoreUUID = backingStoreUUID_;
+@synthesize revisionUUID = revisionUUID_;
+
++ (CORevisionID *) revisionWithBackinStoreUUID: (ETUUID *)aUUID
+                                  revisionUUID: (ETUUID *)revUUID
+{
+    return [[[self alloc] initWithPersistentRootBackingStoreUUID: aUUID
+                                                    revisionUUID: revUUID] autorelease];
+}
+
 - (id) initWithPersistentRootBackingStoreUUID: (ETUUID *)aUUID
-                                revisionIndex: (int64_t)anIndex
+                                 revisionUUID: (ETUUID *)revUUID
 {
     self = [super init];
     if (self != nil)
     {
         backingStoreUUID_ = [aUUID retain];
-        revisionIndex_ = anIndex;
+        revisionUUID_ = [revUUID retain];
     }
     return self;
-}
-
-+ (CORevisionID *) revisionWithBackinStoreUUID: (ETUUID *)aUUID
-                                 revisionIndex: (int64_t)anIndex
-{
-    return [[[self alloc] initWithPersistentRootBackingStoreUUID: aUUID revisionIndex: anIndex] autorelease];
 }
 
 - (void) dealloc
 {
     [backingStoreUUID_ release];
+    [revisionUUID_ release];
     [super dealloc];
 }
 
@@ -31,36 +36,28 @@
 {
     if ([object isKindOfClass: [CORevisionID class]])
     {
-        return ((CORevisionID *)object)->revisionIndex_ == revisionIndex_
-        && [((CORevisionID *)object)->backingStoreUUID_ isEqual: backingStoreUUID_];
+        return [((CORevisionID *)object)->backingStoreUUID_ isEqual: backingStoreUUID_]
+            && [((CORevisionID *)object)->revisionUUID_ isEqual: revisionUUID_];
     }
     return NO;
 }
 
 - (NSUInteger) hash
 {
-    return revisionIndex_ ^ [backingStoreUUID_ hash];
-}
-- (ETUUID *) backingStoreUUID
-{
-    return backingStoreUUID_;
-}
-- (int64_t) revisionIndex
-{
-    return revisionIndex_;
+    return [revisionUUID_ hash];
 }
 
-- (CORevisionID *) revisionIDWithRevisionIndex: (int64_t)anIndex
+- (CORevisionID *) revisionIDWithRevisionUUID: (ETUUID *)revUUID
 {
-    return [[[CORevisionID alloc] initWithPersistentRootBackingStoreUUID: backingStoreUUID_
-                                                           revisionIndex: anIndex] autorelease];
+    return [CORevisionID revisionWithBackinStoreUUID: backingStoreUUID_
+                                        revisionUUID: revUUID];
 }
 
 - (id) plist
 {
-    return [NSString stringWithFormat: @"%@:%@", backingStoreUUID_,
-            [NSNumber numberWithLongLong: (long long)revisionIndex_]];
+    return [NSString stringWithFormat: @"%@:%@", backingStoreUUID_, revisionUUID_];
 }
+
 + (CORevisionID *) revisionIDWithPlist: (id)plist
 {
     NSArray *comps = [(NSString *)plist componentsSeparatedByString:@":"];
@@ -68,7 +65,7 @@
     CORevisionID *result = [[[CORevisionID alloc] init] autorelease];
     
     result->backingStoreUUID_ = [[ETUUID UUIDWithString: [comps objectAtIndex: 0]] retain];
-    result->revisionIndex_ = [(NSString *)[comps objectAtIndex: 1] longLongValue];
+    result->revisionUUID_ = [[ETUUID UUIDWithString: [comps objectAtIndex: 1]] retain];
     
     return result;
 }
@@ -80,7 +77,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat: @"<State Token %@.%lld>", backingStoreUUID_, (long long int)revisionIndex_];
+    return [[self plist] description];
 }
 
 @end
