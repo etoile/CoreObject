@@ -451,7 +451,7 @@
     
     UKObjectsEqual(S(branch, originalBranch), [persistentRoot branches]);
     
-    [persistentRoot deleteBranch: branch];
+    branch.deleted = YES;
     
     UKObjectsEqual(S(originalBranch), [persistentRoot branches]);
     
@@ -473,7 +473,7 @@
     UKObjectsEqual(S([originalBranch UUID], [branch UUID]),
                    SA([[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] branchForUUID] allKeys]));
     
-    [persistentRoot deleteBranch: branch];
+    branch.deleted = YES;
     
     UKObjectsEqual(S(originalBranch), [persistentRoot branches]);
     UKObjectsEqual(S(branch), [persistentRoot deletedBranches]);

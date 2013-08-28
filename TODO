@@ -39,7 +39,7 @@ First Release
     read-only and prevent it from being committed to disk?
   x expose COSQLiteStore's undelete method
   x expose COSQLiteStore branch deletion / undeletion
-  - choose between -[COEditingContext deletePersistentRoot:]/-[COEditingContext undeletePersistentRoot:]
+  x choose between -[COEditingContext deletePersistentRoot:]/-[COEditingContext undeletePersistentRoot:]
     and COPersistentRoot's isDeleted property
   - choose between -[COPersistentRoot deleteBranch:]/-[COPersistentRoot undeleteBranch:]
     and COBranch's isDeleted property

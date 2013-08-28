@@ -33,7 +33,7 @@
     UKNil([store persistentRootInfoForUUID: uuid]);
     UKFalse([persistentRoot isDeleted]);
     
-    [ctx deletePersistentRoot: persistentRoot];
+    persistentRoot.deleted = YES;
     
     UKFalse([ctx hasChanges]);
     UKObjectsEqual([NSSet set], [ctx persistentRoots]);
@@ -57,7 +57,7 @@
     UKNotNil([store persistentRootInfoForUUID: uuid]);
     UKFalse([persistentRoot isDeleted]);
     
-    [ctx deletePersistentRoot: persistentRoot];
+    persistentRoot.deleted = YES;
 
     UKTrue([ctx hasChanges]);
     UKObjectsEqual([NSSet set], [ctx persistentRoots]);
@@ -86,7 +86,7 @@
     ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];
     [ctx commit];
     
-    [ctx deletePersistentRoot: persistentRoot];
+    persistentRoot.deleted = YES;
     [ctx commit];
     
     [persistentRoot setDeleted: NO];
@@ -128,20 +128,20 @@
         
         deletedOnDisk = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
         [deletedOnDisk commit];
-        [ctx deletePersistentRoot: deletedOnDisk];
+        deletedOnDisk.deleted = YES;
         [deletedOnDisk commit];
         
         pendingInsertion = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
         
         pendingDeletion = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
         [pendingDeletion commit];
-        [ctx deletePersistentRoot: pendingDeletion];
+        pendingDeletion.deleted = YES;
         
         pendingUndeletion = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
         [pendingUndeletion commit];
-        [ctx deletePersistentRoot: pendingUndeletion];
+        pendingUndeletion.deleted = YES;
         [pendingUndeletion commit];
-        [ctx undeletePersistentRoot: pendingUndeletion];
+        pendingUndeletion.deleted = NO;
         
         // Check that the constraints we wanted to set up hold
         UKTrue([[store persistentRootUUIDs] containsObject: [regular persistentRootUUID]]);
