@@ -386,6 +386,15 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
                                 setCurrentBranch: [self currentBranch]
                                        oldBranch: [self branchForUUID: [_savedState currentBranchUUID]]];
         }
+        
+        // N.B.: Ugly, the ordering of changes needs to be carefully controlled
+        for (COBranch *branch in [_branchForUUID allValues])
+        {
+            [branch saveDeletion];
+            
+            // FIXME: Hack?
+            [self reloadPersistentRootInfo];
+        }
     }
 
     // FIXME: Hack?

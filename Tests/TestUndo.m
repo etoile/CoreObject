@@ -121,6 +121,30 @@
     }
 }
 
+- (void) testUndoCreateBranchAndSetCurrent
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx commit];
+    
+    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
+    [persistentRoot setCurrentBranch: secondBranch];
+    [ctx commitWithStackNamed: @"test"];
+    
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        
+        UKNotNil(ctx2secondBranch);
+        UKFalse([ctx2secondBranch isDeleted]);
+        [ctx2 undoForStackNamed: @"test"];
+        UKTrue([ctx2secondBranch isDeleted]);
+        [ctx2 redoForStackNamed: @"test"];
+        UKFalse([ctx2secondBranch isDeleted]);
+    }
+}
+
 - (void) testUndoDeleteBranch
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];

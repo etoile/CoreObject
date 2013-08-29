@@ -159,7 +159,8 @@
 
 - (void) recordEditInverse: (COEdit*)anInverse
 {
-    [_currentEditGroup.contents addObject: anInverse];
+    // Insert the inverses back to front, so the inverse of the most recent action will be first.
+    [_currentEditGroup.contents insertObject: anInverse atIndex: 0];
 }
 
 // Called from COEditingContext

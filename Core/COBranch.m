@@ -548,17 +548,10 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         [[self editingContext] recordBranchSetCurrentRevision: self
                                                 oldRevisionID: oldRevid];
     }
-	
-    // Write branch deletion / undeletion
+
+    // Write branch undeletion
     
-    if (_deleted && ![[self branchInfo] isDeleted])
-    {
-        ETAssert([store deleteBranch: _UUID
-                    ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
-                               error: NULL]);
-        [[self editingContext] recordBranchDeletion: self];
-    }
-    else if (!_deleted && [[self branchInfo] isDeleted])
+    if (!_deleted && [[self branchInfo] isDeleted])
     {
         ETAssert([store undeleteBranch: _UUID
                       ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
@@ -567,6 +560,21 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     }
     
 	[_objectGraph clearChangeTracking];
+}
+
+- (void)saveDeletion
+{
+    COSQLiteStore *store = [self store];
+    
+    // Write branch deletion
+    
+    if (_deleted && ![[self branchInfo] isDeleted])
+    {
+        ETAssert([store deleteBranch: _UUID
+                    ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                               error: NULL]);
+        [[self editingContext] recordBranchDeletion: self];
+    }    
 }
 
 - (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID

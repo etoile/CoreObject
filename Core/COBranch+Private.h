@@ -11,6 +11,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch;
 
 - (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID;
 - (void) saveCommitWithMetadata: (NSDictionary *)metadata;
+- (void)saveDeletion;
 - (BOOL) isBranchUncommitted;
 
 @end

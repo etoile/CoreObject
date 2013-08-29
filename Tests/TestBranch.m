@@ -494,6 +494,22 @@
     }
 }
 
+- (void) testSetCurrentBranchAndDeleteBranch
+{
+    UKObjectsEqual(originalBranch, [persistentRoot currentBranch]);
+    [ctx commit];
+    
+    COBranch *branch = [originalBranch makeBranchWithLabel: @"branch"];
+    [persistentRoot setCurrentBranch: branch];
+    [ctx commit];
+    
+    [persistentRoot setCurrentBranch: originalBranch];
+    branch.deleted = YES;
+    [ctx commit];
+    
+    UKPass();
+}
+
 - (void) testBranchObjectGraphs
 {
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
