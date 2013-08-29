@@ -156,7 +156,8 @@
     if ([[tableColumn identifier] isEqual: @"name"])
     {
         [branch setLabel: object];
-        [[branch editingContext] commitWithStackNamed: @"typewriter"];
+        [(EWDocument *)[[NSDocumentController sharedDocumentController]
+                        currentDocument] commit];
     }
     else if ([[tableColumn identifier] isEqual: @"checked"])
     {

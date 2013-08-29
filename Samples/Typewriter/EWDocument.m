@@ -93,7 +93,7 @@
 {
     COBranch *branch = [[_persistentRoot editingBranch] makeBranchWithLabel: @"Untitled"];
     [_persistentRoot setCurrentBranch: branch];
-    [[_persistentRoot editingContext] canUndoForStackNamed: @"typewriter"];
+    [self commit];
 }
 - (IBAction) showBranches: (id)sender
 {
@@ -118,7 +118,7 @@
     
     assert([_persistentRoot hasChanges]);
     
-    [[_persistentRoot editingContext] commitWithStackNamed: @"typewriter"];
+    [self commit];
     
     assert(![_persistentRoot hasChanges]);
     
@@ -145,7 +145,7 @@
 {
     [[_persistentRoot editingBranch] setCurrentRevision: [CORevision revisionWithStore: [self store]
                                                                             revisionID: aToken]];
-    [[_persistentRoot editingContext] commitWithStackNamed: @"typewriter"];
+    [self commit];
 }
 
 // Doesn't write to DB...
@@ -224,32 +224,44 @@
 {
     COBranch *branch = [_persistentRoot branchForUUID: aBranchUUID];
     [_persistentRoot setCurrentBranch: branch];
-    [[_persistentRoot editingContext] commitWithStackNamed: @"typewriter"];
+    [self commit];
 }
 
 - (void) deleteBranch: (ETUUID *)aBranchUUID
 {
-    [_persistentRoot deleteBranch: [_persistentRoot branchForUUID: aBranchUUID]];
-    [[_persistentRoot editingContext] commitWithStackNamed: @"typewriter"];
+    [_persistentRoot branchForUUID: aBranchUUID].deleted = YES;
+    [self commit];
+}
+
+- (NSString *)stackName
+{
+    return [NSString stringWithFormat: @"typewriter-%@",
+                [_persistentRoot persistentRootUUID]];
+}
+
+- (void) commit
+{
+    [[_persistentRoot editingContext] commitWithStackNamed: [self stackName]];
 }
 
 /* EWUndoManagerDelegate */
 
 - (void) undo
 {
-    [[_persistentRoot editingContext] undoForStackNamed: @"typewriter"];
+    [[_persistentRoot editingContext] undoForStackNamed: [self stackName]];
 }
 - (void) redo
 {
-    [[_persistentRoot editingContext] redoForStackNamed: @"typewriter"];}
+    [[_persistentRoot editingContext] redoForStackNamed: [self stackName]];
+}
 
 - (BOOL) canUndo
 {
-    return [[_persistentRoot editingContext] canUndoForStackNamed: @"typewriter"];
+    return [[_persistentRoot editingContext] canUndoForStackNamed: [self stackName]];
 }
 - (BOOL) canRedo
 {
-    return [[_persistentRoot editingContext] canRedoForStackNamed: @"typewriter"];
+    return [[_persistentRoot editingContext] canRedoForStackNamed: [self stackName]];
 }
 
 - (NSString *) undoMenuItemTitle
