@@ -13,37 +13,20 @@ First Release
 
 - Tests
   - Pass all tests, including all from NestedVersioning, rewriting them where needed.
-  x Test JSON serialization
 
 - COEditingContext / COPersistentRoot / COBranch
   - support for loading the root object of a persistent root as a fault
   - asychronous loading of persistent root contents / unfaulting faulted root object
   - full support for cross-persistent root references
     - handle persistent roots unloading
-    x handle the current branch being changed, and references to the current branch
-      get updated
-    x handle the specific branch referenced being deleted
-      (the references should disappear if in a collection, or become null if
-      not multivalued)
     - all other corner cases in TestCrossPersistentRootReferences.m
-  x support for having multiple branches of a persistent root loaded into memory at once
-  x batching persistent root mutations (revert current revision for branch to old revision,
-    change main branch, change branch metadata, etc.) rather than committing them immediately
-  x add method to get all persistent roots
   x Use notifications posted by COSQLiteStore (very basic support)
     - complete support
     - full set of test cases
     - think of all corner cases
-  x add -insertNewPersistentWithObjectGraphContext: method
   - support "transient roots" in a COEditingContext. These are COObjectGraphContext wrappers.
     Or, support creating a persistent root in code, then calling "freeze" which will make it 
     read-only and prevent it from being committed to disk?
-  x expose COSQLiteStore's undelete method
-  x expose COSQLiteStore branch deletion / undeletion
-  x choose between -[COEditingContext deletePersistentRoot:]/-[COEditingContext undeletePersistentRoot:]
-    and COPersistentRoot's isDeleted property
-  x choose between -[COPersistentRoot deleteBranch:]/-[COPersistentRoot undeleteBranch:]
-    and COBranch's isDeleted property
   - make deleted persistent roots read-only?
   - expose COSQLiteStore's finalize deletion method
   - (aesthetic) decide to what extent COPersistentRoot, COBranch should
@@ -172,16 +155,10 @@ x Undo/redo support (app-level)
   - Force api users to pass in COPersistentRootInfo to all mutation methods?
   - Switch to batch style api?
   - Add "parent branch" metadata to a branch that records which branch a branch was forked from?
-  x The metadata: param of -createPersistentRoot is currently unused. Should it set the branch metadata? Initial revision metadata? Remove it or add separate branch/revision metadata params?
   - For recording merges, the merged parent needs to be known when we gc commits.
-  
 
 - Make COQuery a bit more usable
 - Switch to NSUUID
-
-x Check relationship integrity won't go against the developer needs
-x Implement deletion support in COStore, COObject and COEditingContext
-
 
 Future Work
 -----------
@@ -189,14 +166,12 @@ Future Work
 - Switch from FMDB to an SQL abstraction backend 
 
 - Implement Collaboration support (based on COSynchronizer and XMPP)
-- Figure out basic undo/redo support on an object edited collaboratively, probably using selective undo
 - Tune object copy model to respect user expectations about copy/paste in various recurrent use cases
 - Improve Relationship Integrity and leverage it in more places (e.g. copy time, more aggressive checks or object graph integrity checking in a background thread etc.)
 - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
 - Evaluate a CORevision cache per COStore or process
 - Evaluate a COTrackNode cache per track
 
-x Adopt or leverage NestedVersioning improvements to the property list serialization model
 x Figure out how to navigate large root object sets very quickly (evaluate writing a COSQLCursor class)/
   How to scroll smoothly through 50 000 root objects in an Object Manager without loading all the objects in memory?
   - I think we more or less have this figured out
@@ -208,9 +183,6 @@ Missing Features
 - Schema Upgrade
 - NSPredicate to SQL generator using OMeta
 - Import/Export
-
-x History Compaction
-x Attachments to track imported files without importing all the data in the store (e.g. a photo or a song)
 
 
 Open Questions
