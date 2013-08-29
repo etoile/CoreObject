@@ -73,7 +73,15 @@
     
     for (ETUUID *updatedUUID in [textStorage_ paragraphUUIDsChangedDuringEditing])
     {
-        [updatedItems addObject: [subtree itemForUUID: updatedUUID]];
+        COItem *item = [subtree itemForUUID: updatedUUID];
+        
+        if (item == nil)
+        {
+            // Sometimes the text storage will report spurious changes
+            continue;
+        }
+        
+        [updatedItems addObject: item];
     }
     
     // Make a commit

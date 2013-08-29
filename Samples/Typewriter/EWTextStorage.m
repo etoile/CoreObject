@@ -146,6 +146,11 @@ static NSRange paragraphRangeForLocationInString(NSString *aString, NSUInteger a
 {
     //NSLog(@"EWTextStorage -replaceCharactersInRange:withString:");
     
+    if ([[[backing_ string] substringWithRange: replacementRange] isEqual: replacementString])
+    {
+        return;
+    }
+    
     // Count up modified paragraphs
     
     NSMutableSet *modifiedParagraphs = [NSMutableSet set];
