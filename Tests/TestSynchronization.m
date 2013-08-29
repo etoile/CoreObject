@@ -3,7 +3,12 @@
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
 
+#define SERVER_STORE_URL [NSURL fileURLWithPath: [@"~/TestStore2.sqlite" stringByExpandingTildeInPath]]
+
 @interface TestSynchronization : TestCommon <UKTest>
+{
+    COSQLiteStore *serverStore;
+}
 @end
 
 @implementation TestSynchronization
@@ -36,24 +41,33 @@ static ETUUID *branchBUUID;
 - (id)init
 {
 	SUPERINIT;
+    [[NSFileManager defaultManager] removeItemAtPath: [SERVER_STORE_URL path] error: NULL];
+    serverStore = [[COSQLiteStore alloc] initWithURL: SERVER_STORE_URL];
 	return self;
 }
 
 - (void)dealloc
 {
+    DESTROY(serverStore);
+    [[NSFileManager defaultManager] removeItemAtPath: [SERVER_STORE_URL path] error: NULL];
 	[super dealloc];
 }
 
 - (void)testBasic
 {
-    COPersistentRootInfo *info = [store createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
-                                                                            UUID: persistentRootUUID
-                                                                      branchUUID: branchAUUID
-                                                                revisionMetadata: nil
-                                                                           error: NULL];
+    COPersistentRootInfo *info = [serverStore createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
+                                                                                  UUID: persistentRootUUID
+                                                                            branchUUID: branchAUUID
+                                                                      revisionMetadata: nil
+                                                                                 error: NULL];
     UKNotNil(info);
     
+    COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
+    COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
     
+    id request = [client updateRequestForPersistentRoot: persistentRootUUID store: store];
+    id response = [server handleUpdateRequest: request store: serverStore];
+    [client handleUpdateResponse: response store: store];    
 }
 
 @end

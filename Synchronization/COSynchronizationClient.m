@@ -11,6 +11,7 @@
 - (NSDictionary *) updateRequestForPersistentRoot: (ETUUID *)aRoot
                                             store: (COSQLiteStore *)aStore
 {
+    // info may be nil
     COPersistentRootInfo *info = [aStore persistentRootInfoForUUID: aRoot];
     
     NSMutableDictionary *clientNewestRevisionIDForBranchUUID = [NSMutableDictionary dictionary];

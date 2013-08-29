@@ -37,11 +37,13 @@ Next, start depth-first searches rooted at the latest revisions on each of our b
 stop a branch of the search when we hit one of their revisions. This should collect the
 set of revisions we want to send to the client.
  
+ The client has to tell us all of its branches, but we don't need to sync everything down to them.
+ 
  */
 - (NSDictionary *) handleUpdateRequest: (NSDictionary *)aRequest
                                  store: (COSQLiteStore *)aStore
 {
-    ETUUID *persistentRoot = aRequest[@"persistentRoot"];
+    ETUUID *persistentRoot = [ETUUID UUIDWithString: aRequest[@"persistentRoot"]];
     
     NSMutableSet *clientLatestRevisions = [NSMutableSet set];
     for (NSString *revString in [[aRequest objectForKey: @"clientNewestRevisionIDForBranchUUID"] allValues])
