@@ -1,0 +1,29 @@
+This is an attempt to write a demonstration of a project UI with all of the
+neat things we want:
+
+ - revision control / checkpointing / branching / merging / selective undo
+ - collaborative editing
+
+It uses my CoreObject rewrite as its persistence layer.
+
+The library is saved in ~/ProjectDemoStore
+
+What's working:
+
+ - creating / editing outline documents
+ - commiting changes
+ - making checkpoints
+ - restoring to a previous revision (altough the implementation is flawed and needs to be redone)
+ - chat with other ProjectDemo instances running on the local network
+ 
+What's not yet working:
+
+ - other document types (drawing, text)
+ - no way to delete a document once it's created
+ - saving document positions on the screen
+ - collaborative editing
+ - selective undo
+ - normal undo/redo
+ - ...
+ 
+ 
