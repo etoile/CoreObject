@@ -156,7 +156,7 @@
     if ([[tableColumn identifier] isEqual: @"name"])
     {
         [branch setLabel: object];
-        [[branch persistentRoot] commit];
+        [[branch editingContext] commitWithStackNamed: @"typewriter"];
     }
     else if ([[tableColumn identifier] isEqual: @"checked"])
     {

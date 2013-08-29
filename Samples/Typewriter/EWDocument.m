@@ -93,7 +93,7 @@
 {
     COBranch *branch = [[_persistentRoot editingBranch] makeBranchWithLabel: @"Untitled"];
     [_persistentRoot setCurrentBranch: branch];
-    [_persistentRoot commit];
+    [[_persistentRoot editingContext] canUndoForStackNamed: @"typewriter"];
 }
 - (IBAction) showBranches: (id)sender
 {
@@ -118,7 +118,7 @@
     
     assert([_persistentRoot hasChanges]);
     
-    [_persistentRoot commit];
+    [[_persistentRoot editingContext] commitWithStackNamed: @"typewriter"];
     
     assert(![_persistentRoot hasChanges]);
     
@@ -145,7 +145,7 @@
 {
     [[_persistentRoot editingBranch] setCurrentRevision: [CORevision revisionWithStore: [self store]
                                                                             revisionID: aToken]];
-    [_persistentRoot commit];
+    [[_persistentRoot editingContext] commitWithStackNamed: @"typewriter"];
 }
 
 // Doesn't write to DB...
@@ -224,35 +224,32 @@
 {
     COBranch *branch = [_persistentRoot branchForUUID: aBranchUUID];
     [_persistentRoot setCurrentBranch: branch];
-    [_persistentRoot commit];
+    [[_persistentRoot editingContext] commitWithStackNamed: @"typewriter"];
 }
 
 - (void) deleteBranch: (ETUUID *)aBranchUUID
 {
     [_persistentRoot deleteBranch: [_persistentRoot branchForUUID: aBranchUUID]];
-    [_persistentRoot commit];
+    [[_persistentRoot editingContext] commitWithStackNamed: @"typewriter"];
 }
 
 /* EWUndoManagerDelegate */
 
 - (void) undo
 {
-    [[_persistentRoot editingBranch] undo];
-    [_persistentRoot commit];
+    [[_persistentRoot editingContext] undoForStackNamed: @"typewriter"];
 }
 - (void) redo
 {
-    [[_persistentRoot editingBranch] redo];
-    [_persistentRoot commit];
-}
+    [[_persistentRoot editingContext] redoForStackNamed: @"typewriter"];}
 
 - (BOOL) canUndo
 {
-    return [[_persistentRoot editingBranch] canUndo];
+    return [[_persistentRoot editingContext] canUndoForStackNamed: @"typewriter"];
 }
 - (BOOL) canRedo
 {
-    return [[_persistentRoot editingBranch] canRedo];
+    return [[_persistentRoot editingContext] canRedoForStackNamed: @"typewriter"];
 }
 
 - (NSString *) undoMenuItemTitle
