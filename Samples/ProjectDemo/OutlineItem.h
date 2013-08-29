@@ -1,5 +1,5 @@
 #import <Cocoa/Cocoa.h>
-#import "COObject.h"
+#import <CoreObject/CoreObject.h>
 
 @interface OutlineItem : COObject //FIXME: DocumentItem has a 'document' property
 {

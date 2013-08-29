@@ -1,6 +1,5 @@
 #import "SharingServerPeer.h"
-#import "COStoreCoordinator.h"
-#import "COHistoryNode.h"
+#import <CoreObject/CoreObject.h>
 #import "NetworkController.h"
 
 @implementation SharingServerPeer

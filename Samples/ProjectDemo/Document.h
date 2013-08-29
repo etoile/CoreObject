@@ -1,5 +1,5 @@
 #import <Cocoa/Cocoa.h>
-#import "COObject.h"
+#import <CoreObject/CoreObject.h>
 #import "Tag.h"
 
 @interface Document : COObject

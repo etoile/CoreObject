@@ -3,7 +3,7 @@
 //
 
 #import <AppKit/AppKit.h>
-#import "COObject.h"
+#import <CoreObject/CoreObject.h>
 
 @class SKTGraphic;
 
