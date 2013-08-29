@@ -11,6 +11,12 @@
  *
  * The concept behind the app-level undo system is, there is a per-user database
  * (separate from any CoreObject stores) that stores the user's undo/redo stacks.
+ * (stored in ~/Library/CoreObject/Undo/undo.sqlite)
+ *
+ * When saving a batch of changes with a COEditingContext, you can optionally
+ * record the edits in an undo stack. You can pass any string you want to
+ * -commitWithStackNamed: and the inverse edit (or edit group) will be pushed onto that
+ * persistent stack, creating it if needed.
  *
  * The undo stack database (COUndoStackStore) stores pairs of undo/redo stacks
  * indexed by name. The name is just a flat string; we may want to have suggested 
@@ -22,11 +28,7 @@
  * "<application id>:<persistent root UUID>:<tab/pane name>" -- for a multipane editor
  *
  * Importantly, the names are just treated as opaque identifiers to CoreObject,
- * and the behaviour comes from which edits apps 
- *
- * When saving a batch of changes with a COEditingContext, you can optionally
- * record the edit in an undo stack. Currently I'm liking an API like
- * -commitWithStackNamed: best, although it could be a property of COEditingContext.
+ * and the behaviour comes from which edits apps put in which stacks.
  *
  * This design should support all of these use-cases:
  *
