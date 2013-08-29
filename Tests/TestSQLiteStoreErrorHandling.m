@@ -139,6 +139,7 @@ static ETUUID *rootUUID;
         UKNil([store writeRevisionWithItemGraph: [self makeChangedItemGraph]
                                        metadata: nil
                                parentRevisionID: [info currentRevisionID]
+                          mergeParentRevisionID: nil
                                   modifiedItems: nil
                                           error: &writeRevisionError]);
         

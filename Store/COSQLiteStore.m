@@ -403,6 +403,7 @@
 - (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
                                      metadata: (NSDictionary *)metadata
                              parentRevisionID: (CORevisionID *)aParent
+                        mergeParentRevisionID: (CORevisionID *)aMergeParent
                                 modifiedItems: (NSArray*)modifiedItems // array of COUUID
                                         error: (NSError **)error
 {
@@ -414,6 +415,7 @@
     return [self writeItemTree: anItemTree
                   withMetadata: metadata
           withParentRevisionID: aParent
+         mergeParentRevisionID: aMergeParent
         inBackingStoreWithUUID: [aParent backingStoreUUID]
                  modifiedItems: modifiedItems
                          error: error];
@@ -427,6 +429,7 @@
     return [self writeItemTree: anItemTree
                   withMetadata: metadata
           withParentRevisionID: nil
+         mergeParentRevisionID: nil
         inBackingStoreWithUUID: aBacking
                  modifiedItems: nil
                          error: error];
@@ -436,6 +439,7 @@
 - (CORevisionID *) writeItemTree: (id<COItemGraph>)anItemTree
                     withMetadata: (NSDictionary *)metadata
             withParentRevisionID: (CORevisionID *)parentRevid
+           mergeParentRevisionID: (CORevisionID *)aMergeParent
           inBackingStoreWithUUID: (ETUUID *)backingUUID
                    modifiedItems: (NSArray*)modifiedItems // array of COUUID
                            error: (NSError **)error
@@ -450,7 +454,7 @@
     CORevisionID *revid = [backing writeItemGraph: anItemTree
                                      withMetadata: metadata
                                        withParent: [backing revidForRevisionID: parentRevid]
-                                  withMergeParent: -1
+                                  withMergeParent: [backing revidForRevisionID: aMergeParent]
                                     modifiedItems: modifiedItems
                                             error: error];
     

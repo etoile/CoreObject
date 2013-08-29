@@ -63,7 +63,12 @@ static ETUUID *rootUUID;
 
     prootBchangeCount = [prootB changeCount];
     
-    CORevisionID *prootBRev = [store writeRevisionWithItemGraph: [self prooBitemTree] metadata: nil parentRevisionID: [[prootA currentBranchInfo] currentRevisionID] modifiedItems: A(rootUUID) error: NULL];
+    CORevisionID *prootBRev = [store writeRevisionWithItemGraph: [self prooBitemTree]
+                                                       metadata: nil
+                                               parentRevisionID: [[prootA currentBranchInfo] currentRevisionID]
+                                          mergeParentRevisionID: nil
+                                                  modifiedItems: A(rootUUID)
+                                                          error: NULL];
 
     [store setCurrentRevision: prootBRev headRevision: prootBRev tailRevision: nil forBranch: [prootB currentBranchUUID] ofPersistentRoot: [prootB UUID] currentChangeCount: &prootBchangeCount error: NULL];
 

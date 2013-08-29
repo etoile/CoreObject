@@ -176,6 +176,7 @@ static ETUUID *childUUID2;
         CORevisionID *revid = [store writeRevisionWithItemGraph: [self makeBranchAItemTreeAtIndex: i]
                                                        metadata: [self branchAMetadata]
                                                parentRevisionID: (i == 0) ? initialRevisionId : [branchARevisionIDs lastObject]
+                                          mergeParentRevisionID: nil
                                                   modifiedItems: A(childUUID1)
                                                           error: NULL];        
         [branchARevisionIDs addObject: revid];
@@ -188,6 +189,7 @@ static ETUUID *childUUID2;
         CORevisionID *revid = [store writeRevisionWithItemGraph: [self makeBranchBItemTreeAtIndex: i]
                                                        metadata: [self branchBMetadata]
                                                parentRevisionID: (i == 0) ? initialRevisionId : [branchBRevisionIDs lastObject]
+                                          mergeParentRevisionID: nil
                                                   modifiedItems: nil
                                                           error: NULL];
         [branchBRevisionIDs addObject: revid];
@@ -505,7 +507,12 @@ static ETUUID *childUUID2;
     
     COItemGraph *tree = [self makeInitialItemTree];
     [[tree itemForUUID: childUUID1] setValue: hash forAttribute: @"attachment" type: kCOTypeAttachment];
-    CORevisionID *withAttachment = [store writeRevisionWithItemGraph: tree metadata: nil parentRevisionID: initialRevisionId modifiedItems: nil error: NULL];
+    CORevisionID *withAttachment = [store writeRevisionWithItemGraph: tree
+                                                            metadata: nil
+                                                    parentRevisionID: initialRevisionId
+                                               mergeParentRevisionID: nil
+                                                       modifiedItems: nil
+                                                               error: NULL];
     UKNotNil(withAttachment);
     UKTrue([store setCurrentRevision: withAttachment
                         headRevision: withAttachment
@@ -549,10 +556,11 @@ static ETUUID *childUUID2;
 {
     COItemGraph *tree = [self makeInitialItemTree];
     CORevisionID *referencedRevision = [store writeRevisionWithItemGraph: tree
-                                               metadata: nil
-                                           parentRevisionID: initialRevisionId
-                                              modifiedItems: nil
-                                                      error: NULL];
+                                                                metadata: nil
+                                                        parentRevisionID: initialRevisionId
+                                                   mergeParentRevisionID: nil
+                                                           modifiedItems: nil
+                                                                   error: NULL];
     
     UKTrue([store setCurrentRevision: referencedRevision
                         headRevision: referencedRevision
@@ -571,10 +579,11 @@ static ETUUID *childUUID2;
 {
     COItemGraph *tree = [self makeInitialItemTree];
     CORevisionID *unreferencedRevision = [store writeRevisionWithItemGraph: tree
-                                                 metadata: nil
-                                             parentRevisionID: initialRevisionId
-                                                modifiedItems: nil
-                                                        error: NULL];
+                                                                  metadata: nil
+                                                          parentRevisionID: initialRevisionId
+                                                     mergeParentRevisionID: nil
+                                                             modifiedItems: nil
+                                                                     error: NULL];
     
     UKObjectsEqual(tree, [store itemGraphForRevisionID: unreferencedRevision]);
     
@@ -801,6 +810,7 @@ static ETUUID *childUUID2;
     UKRaisesException([store writeRevisionWithItemGraph: graph
                                                metadata: nil
                                        parentRevisionID: initialRevisionId
+                                  mergeParentRevisionID: nil
                                           modifiedItems: nil
                                                   error: NULL]);
 }

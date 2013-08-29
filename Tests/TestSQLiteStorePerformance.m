@@ -133,6 +133,7 @@ static int itemChangedAtCommit(int i)
         [revisionIDs addObject: [store writeRevisionWithItemGraph: initialTree
                                                          metadata: nil
                                                  parentRevisionID: [revisionIDs lastObject]
+                                            mergeParentRevisionID: nil 
                                                     modifiedItems: A(childUUIDs[i])
                                                             error: NULL]];
     }

@@ -307,6 +307,7 @@
 - (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
                                      metadata: (NSDictionary *)metadata
                              parentRevisionID: (CORevisionID *)aParent
+                        mergeParentRevisionID: (CORevisionID *)aMergeParent
                                 modifiedItems: (NSArray*)modifiedItems
                                         error: (NSError **)error;
 

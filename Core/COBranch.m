@@ -528,9 +528,10 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     if ([changedItemUUIDs count] > 0)
     {
         CORevisionID *revId = [store writeRevisionWithItemGraph: _objectGraph
-                                      metadata: metadata
-                                  parentRevisionID: _currentRevisionID
-                                     modifiedItems: changedItemUUIDs
+                                                       metadata: metadata
+                                               parentRevisionID: _currentRevisionID
+                                          mergeParentRevisionID: nil
+                                                  modifiedItems: changedItemUUIDs
                                              error: NULL];        
         
         BOOL ok = [store setCurrentRevision: revId
