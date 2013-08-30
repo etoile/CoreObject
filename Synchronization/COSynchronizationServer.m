@@ -79,8 +79,21 @@ For now we do.
         id<COItemGraph> graph = [aStore itemGraphForRevisionID: revid];
         CORevisionInfo *revInfo = [aStore revisionInfoForRevisionID: revid];
         
+        NSMutableDictionary *revInfoPlist = [NSMutableDictionary dictionary];
+        if (revInfo.parentRevisionID != nil)
+        {
+            revInfoPlist[@"parent"] = [revInfo.parentRevisionID.revisionUUID stringValue];
+        }
+        if (revInfo.mergeParentRevisionID != nil)
+        {
+            revInfoPlist[@"mergeParent"] = [revInfo.mergeParentRevisionID.revisionUUID stringValue];
+        }
+        if (revInfo.metadata != nil)
+        {
+            revInfoPlist[@"metadata"] = revInfo.metadata;
+        }        
+        
         id graphPlist = COItemGraphToJSONPropertyList(graph);
-        id revInfoPlist = [revInfo plist];
         
         [contentsForRevisionID setObject: @{ @"graph" : graphPlist, @"info" : revInfoPlist }
                                   forKey: [[revid revisionUUID] stringValue]];
@@ -88,7 +101,8 @@ For now we do.
     
     return @{@"persistentRoot" : [persistentRoot stringValue],
              @"serverNewestRevisionIDForBranchUUID" : serverNewestRevisionIDForBranchUUID,
-             @"revisions" : contentsForRevisionID};
+             @"revisions" : contentsForRevisionID,
+             @"serverID" : aRequest[@"serverID"]};
 }
 
 @end

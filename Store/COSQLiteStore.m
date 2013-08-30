@@ -430,6 +430,27 @@
                          error: error];
 }
 
+- (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
+                                     metadata: (NSDictionary *)metadata
+                             parentRevisionID: (CORevisionID *)aParent
+                        mergeParentRevisionID: (CORevisionID *)aMergeParent
+                           persistentRootUUID: (ETUUID *)aUUID
+                                modifiedItems: (NSArray*)modifiedItems // array of COUUID
+                                        error: (NSError **)error
+{
+    [self validateRevision: aParent];
+    
+    NSParameterAssert(anItemTree != nil);
+    
+    return [self writeItemTree: anItemTree
+                  withMetadata: metadata
+          withParentRevisionID: aParent
+         mergeParentRevisionID: aMergeParent
+        inBackingStoreWithUUID: [self backingUUIDForPersistentRootUUID: aUUID]
+                 modifiedItems: modifiedItems
+                         error: error];
+}
+
 - (CORevisionID *) writeItemTreeWithNoParent: (id<COItemGraph>)anItemTree
                                 withMetadata: (NSDictionary *)metadata
                       inBackingStoreWithUUID: (ETUUID *)aBacking
@@ -632,10 +653,7 @@
                                                  isCopy: (BOOL)isCopy
                                         initialRevision: (CORevisionID *)revId
                                                   error: (NSError **)error
-{
-    NSParameterAssert(revId != nil);
-    NSParameterAssert([revId backingStoreUUID] != nil);
-    
+{    
     [db_ savepoint: @"createPersistentRootWithUUID"];
     
     [db_ executeUpdate: @"INSERT INTO persistentroots (uuid, "
@@ -645,36 +663,45 @@
 
     const int64_t root_id = [db_ lastInsertRowId];
     
-    [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,NULL,0)",
-           [aBranchUUID dataValue],
-           [NSNumber numberWithLongLong: root_id],
-           [[revId revisionUUID] dataValue],
-           [[revId revisionUUID] dataValue],
-           [[revId revisionUUID] dataValue]];
+    if (aBranchUUID != nil)
+    {    
+        [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,NULL,0)",
+               [aBranchUUID dataValue],
+               [NSNumber numberWithLongLong: root_id],
+               [[revId revisionUUID] dataValue],
+               [[revId revisionUUID] dataValue],
+               [[revId revisionUUID] dataValue]];
+        
+        const int64_t branch_id = [db_ lastInsertRowId];
+        
+        [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE root_id = ?",
+          [NSNumber numberWithLongLong: branch_id],
+          [NSNumber numberWithLongLong: root_id]];
+    }
     
-    const int64_t branch_id = [db_ lastInsertRowId];
-    
-    [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE root_id = ?",
-      [NSNumber numberWithLongLong: branch_id],
-      [NSNumber numberWithLongLong: root_id]];
-
     [db_ releaseSavepoint: @"createPersistentRootWithUUID"];
     
     // Return info
     
-    COBranchInfo *branch = [[[COBranchInfo alloc] init] autorelease];
-    branch.UUID = aBranchUUID;
-    branch.headRevisionID = revId;
-    branch.tailRevisionID = revId;
-    branch.currentRevisionID = revId;
-    branch.metadata = nil;
-    branch.deleted = NO;
+
                                   
     COPersistentRootInfo *plist = [[[COPersistentRootInfo alloc] init] autorelease];
     plist.UUID = uuid;
-    plist.branchForUUID = D(branch, aBranchUUID);
-    plist.currentBranchUUID = aBranchUUID;
     plist.deleted = NO;
+    
+    if (aBranchUUID != nil)
+    {
+        COBranchInfo *branch = [[[COBranchInfo alloc] init] autorelease];
+        branch.UUID = aBranchUUID;
+        branch.headRevisionID = revId;
+        branch.tailRevisionID = revId;
+        branch.currentRevisionID = revId;
+        branch.metadata = nil;
+        branch.deleted = NO;
+        
+        plist.currentBranchUUID = aBranchUUID;
+        plist.branchForUUID = @{aBranchUUID : branch};
+    }
     
     return plist;
 }
@@ -726,7 +753,16 @@
 - (COPersistentRootInfo *) createPersistentRootWithUUID: (ETUUID *)persistentRootUUID
                                                   error: (NSError **)error
 {
+    [db_ executeUpdate: @"INSERT INTO persistentroots (uuid, "
+     "backingstore, currentbranch, deleted) VALUES(?,?,NULL,0)",
+     [persistentRootUUID dataValue],
+     [persistentRootUUID dataValue]];
     
+    COPersistentRootInfo *plist = [[[COPersistentRootInfo alloc] init] autorelease];
+    plist.UUID = persistentRootUUID;
+    plist.deleted = NO;
+    
+    return plist;
 }
 
 - (BOOL) deletePersistentRoot: (ETUUID *)aRoot

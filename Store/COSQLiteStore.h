@@ -320,6 +320,15 @@
                                 modifiedItems: (NSArray*)modifiedItems
                                         error: (NSError **)error;
 
+- (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
+                                     metadata: (NSDictionary *)metadata
+                             parentRevisionID: (CORevisionID *)aParent
+                        mergeParentRevisionID: (CORevisionID *)aMergeParent
+                           persistentRootUUID: (ETUUID *)aUUID
+                                modifiedItems: (NSArray*)modifiedItems // array of COUUID
+                                        error: (NSError **)error;
+
+
 // TODO:
 //  changedPropertiesForItemUUID: (NSDictionary*)changedProperties { uuidA : (propA, propB), uuidB : (propC) }
 

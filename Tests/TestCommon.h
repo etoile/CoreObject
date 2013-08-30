@@ -8,6 +8,7 @@
 #import "COSynchronizationServer.h"
 
 #import "OutlineItem.h"
+#import "COSQLiteStore+Private.h"
 
 #define SA(x) [NSSet setWithArray: x]
 

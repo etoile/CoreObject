@@ -67,7 +67,9 @@ static ETUUID *branchBUUID;
     COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
     COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
     
-    id request = [client updateRequestForPersistentRoot: persistentRootUUID store: store];
+    id request = [client updateRequestForPersistentRoot: persistentRootUUID
+                                               serverID: @"server"
+                                                  store: store];
     id response = [server handleUpdateRequest: request store: serverStore];
     [client handleUpdateResponse: response store: store];
     
@@ -105,13 +107,23 @@ static ETUUID *branchBUUID;
                                                     mergeParentRevisionID: nil
                                                             modifiedItems: nil
                                                                     error: NULL];
+    int64_t changeCount = serverInfo.changeCount;
+    UKTrue([serverStore setCurrentRevision: serverCommit2
+                              headRevision: serverCommit2
+                              tailRevision: nil
+                                 forBranch: branchAUUID
+                          ofPersistentRoot: persistentRootUUID
+                        currentChangeCount: &changeCount
+                                     error: NULL]);
     
     // Pull from server to client
     
     COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
     COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
     
-    id request = [client updateRequestForPersistentRoot: persistentRootUUID store: store];
+    id request = [client updateRequestForPersistentRoot: persistentRootUUID
+                                               serverID: @"server"
+                                                  store: store];
     id response = [server handleUpdateRequest: request store: serverStore];
     [client handleUpdateResponse: response store: store];
     
@@ -132,6 +144,68 @@ static ETUUID *branchBUUID;
     
     UKObjectsEqual([self itemGraphWithLabel: @"2"], [store itemGraphForRevisionID: [replicatedBranch currentRevisionID]]);
     UKObjectsEqual([self itemGraphWithLabel: @"1"], [store itemGraphForRevisionID: [clientInfo2 currentRevisionID]]);
+}
+
+- (void)testPullCheapCopy
+{
+    COPersistentRootInfo *serverInfo = [serverStore createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
+                                                                                        UUID: persistentRootUUID
+                                                                                  branchUUID: branchAUUID
+                                                                            revisionMetadata: nil
+                                                                                       error: NULL];
+    
+    ETUUID *cheapCopyUUID = [ETUUID UUID];
+    ETUUID *cheapCopyBranchUUID = [ETUUID UUID];
+    COPersistentRootInfo *serverCheapCopyInfo = [serverStore createPersistentRootWithInitialRevision: [serverInfo currentRevisionID]
+                                                                                                UUID: cheapCopyUUID
+                                                                                          branchUUID: cheapCopyBranchUUID
+                                                                                               error: NULL];    
+    // Server writes a second commit.
+    
+    CORevisionID *serverCommit2 = [serverStore writeRevisionWithItemGraph: [self itemGraphWithLabel: @"2"]
+                                                                 metadata: nil
+                                                         parentRevisionID: [serverCheapCopyInfo currentRevisionID]
+                                                    mergeParentRevisionID: nil
+                                                            modifiedItems: nil
+                                                                    error: NULL];
+
+    int64_t changeCount = serverInfo.changeCount;
+    UKTrue([serverStore setCurrentRevision: serverCommit2
+                              headRevision: serverCommit2
+                              tailRevision: nil
+                                 forBranch: cheapCopyBranchUUID
+                          ofPersistentRoot: cheapCopyUUID
+                        currentChangeCount: &changeCount
+                                     error: NULL]);
+    
+    // Replicate the original persistent root on the client
+    
+    COPersistentRootInfo *clientInfo = [store createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
+                                                                                  UUID: persistentRootUUID
+                                                                            branchUUID: branchAUUID
+                                                                      revisionMetadata: nil
+                                                                                 error: NULL];
+
+    // Pull "cheapCopyUUID" persistent root from server to client
+    
+    COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
+    COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
+    
+    id request = [client updateRequestForPersistentRoot: cheapCopyUUID
+                                               serverID: @"server"
+                                                  store: store];
+    id response = [server handleUpdateRequest: request store: serverStore];
+    [client handleUpdateResponse: response store: store];
+    
+    // "cheapCopyUUID" persistent root has been replicated to the client.
+    
+    COPersistentRootInfo *clientCheapCopyInfo = [store persistentRootInfoForUUID: cheapCopyUUID];
+    UKObjectsEqual([self itemGraphWithLabel: @"2"], [store itemGraphForRevisionID: [clientCheapCopyInfo currentRevisionID]]);
+    
+    // Ideally it shares the same backing store as the original persistent root.
+    
+    UKObjectsEqual([store backingUUIDForPersistentRootUUID: persistentRootUUID],
+                   [store backingUUIDForPersistentRootUUID: cheapCopyUUID]);
 }
 
 @end

@@ -5,6 +5,7 @@
 @interface COSynchronizationClient : NSObject
 
 - (NSDictionary *) updateRequestForPersistentRoot: (ETUUID *)aRoot
+                                         serverID: (NSString*)anID
                                             store: (COSQLiteStore *)aStore;
 
 - (void) handleUpdateResponse: (NSDictionary *)aResponse
