@@ -156,6 +156,8 @@ x Undo/redo support (app-level)
   - Switch to batch style api?
   - Add "parent branch" metadata to a branch that records which branch a branch was forked from?
   - For recording merges, the merged parent needs to be known when we gc commits.
+  - exportRevisions: and importRevisions: that take a set of CORevisionID an returns a delta-compressed NSData
+    suitable for network transport.
 
 - Make COQuery a bit more usable
 - Switch to NSUUID

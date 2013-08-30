@@ -202,6 +202,15 @@
     return result;
 }
 
+- (CORevisionID *) revisionIDForRevisionUUID: (ETUUID *)aRevisionUUID
+                          persistentRootUUID: (ETUUID *)aPersistentRoot
+{
+    ETUUID *backingUUID = [self backingUUIDForPersistentRootUUID: aPersistentRoot];
+    
+    return [CORevisionID revisionWithBackinStoreUUID: backingUUID
+                                        revisionUUID: aRevisionUUID];
+}
+
 - (ETUUID *) backingUUIDForPersistentRootUUID: (ETUUID *)aUUID
 {
     ETUUID *backingUUID = [backingStoreUUIDForPersistentRootUUID_ objectForKey: aUUID];
@@ -712,6 +721,12 @@
                                        isCopy: YES
                               initialRevision: aRevision
                                         error: error];
+}
+
+- (COPersistentRootInfo *) createPersistentRootWithUUID: (ETUUID *)persistentRootUUID
+                                                  error: (NSError **)error
+{
+    
 }
 
 - (BOOL) deletePersistentRoot: (ETUUID *)aRoot

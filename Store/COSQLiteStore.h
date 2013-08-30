@@ -226,6 +226,15 @@
 - (CORevisionInfo *) revisionInfoForRevisionID: (CORevisionID *)aToken;
 
 /**
+ * CORevisionID are not portable across stores (since different stores may
+ * store a persistent root under different backing store UUIDs)
+ * but a (persistent root UUID, revision UUID) pair is. This method is
+ * for converting from that representation back to a CORevisionID.
+ */
+- (CORevisionID *) revisionIDForRevisionUUID: (ETUUID *)aRevisionUUID
+                          persistentRootUUID: (ETUUID *)aPersistentRoot;
+
+/**
  * Returns a delta between the given revision IDs.
  * The delta is uses the granularity of single embedded objects, but not individual properties.
  *
@@ -355,6 +364,8 @@
                                                         branchUUID: (ETUUID *)aBranchUUID
                                                              error: (NSError **)error;
 
+- (COPersistentRootInfo *) createPersistentRootWithUUID: (ETUUID *)persistentRootUUID
+                                                  error: (NSError **)error;
 
 
 

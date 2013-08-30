@@ -17,7 +17,11 @@
     NSMutableDictionary *clientNewestRevisionIDForBranchUUID = [NSMutableDictionary dictionary];
     for (COBranchInfo *branch in [info branches])
     {
-        [clientNewestRevisionIDForBranchUUID setObject: [[branch headRevisionID] plist]
+        // N.B. Only send the server the revision UUID - backing store UUIDs are implementation details of the store
+        // and two stores may not use the same backing UUID for a persistent root.
+        //
+        // Note that we tell the server end the persistent root that the revisions belong to.
+        [clientNewestRevisionIDForBranchUUID setObject: [[[branch headRevisionID] revisionUUID] stringValue]
                                                 forKey: [[branch UUID] stringValue]];
     }
     

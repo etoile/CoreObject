@@ -37,22 +37,27 @@ Next, start depth-first searches rooted at the latest revisions on each of our b
 stop a branch of the search when we hit one of their revisions. This should collect the
 set of revisions we want to send to the client.
  
- The client has to tell us all of its branches, but we don't need to sync everything down to them.
+The client has to tell us all of its branches, but we don't need to sync everything down to them.
+For now we do.
  
  */
 - (NSDictionary *) handleUpdateRequest: (NSDictionary *)aRequest
                                  store: (COSQLiteStore *)aStore
 {
     ETUUID *persistentRoot = [ETUUID UUIDWithString: aRequest[@"persistentRoot"]];
+    COPersistentRootInfo *serverInfo = [aStore persistentRootInfoForUUID: persistentRoot];
     
+    // 1. Gather a set of CORevisionID that represent the "heads" of all of the clients' branches
     NSMutableSet *clientLatestRevisions = [NSMutableSet set];
-    for (NSString *revString in [[aRequest objectForKey: @"clientNewestRevisionIDForBranchUUID"] allValues])
+    for (NSString *revisionUUIDString in [[aRequest objectForKey: @"clientNewestRevisionIDForBranchUUID"] allValues])
     {
-        [clientLatestRevisions addObject: [CORevisionID revisionIDWithPlist: revString]];
+        CORevisionID *revid = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: revisionUUIDString]
+                                             persistentRootUUID: persistentRoot];
+
+        [clientLatestRevisions addObject: revid];
     }
     
-    COPersistentRootInfo *serverInfo = [aStore persistentRootInfoForUUID: persistentRoot];
-
+    // 2. Calculate the set of CORevisionID that the client lacks
     NSMutableSet *revisionsClientLacks = [NSMutableSet set];
     for (COBranchInfo *branch in [serverInfo branches])
     {
@@ -64,7 +69,7 @@ set of revisions we want to send to the client.
     NSMutableDictionary *serverNewestRevisionIDForBranchUUID = [NSMutableDictionary dictionary];
     for (COBranchInfo *branch in [serverInfo branches])
     {
-        [serverNewestRevisionIDForBranchUUID setObject: [[branch currentRevisionID] plist]
+        [serverNewestRevisionIDForBranchUUID setObject: [[[branch headRevisionID] revisionUUID] stringValue]
                                                 forKey: [[branch UUID] stringValue]];
     }
     
@@ -78,7 +83,7 @@ set of revisions we want to send to the client.
         id revInfoPlist = [revInfo plist];
         
         [contentsForRevisionID setObject: @{ @"graph" : graphPlist, @"info" : revInfoPlist }
-                                  forKey: [revid plist]];
+                                  forKey: [[revid revisionUUID] stringValue]];
     }
     
     return @{@"persistentRoot" : [persistentRoot stringValue],
