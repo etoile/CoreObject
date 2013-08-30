@@ -1,9 +1,8 @@
 #import "HistoryInspectorController.h"
-#import "COEditingContext.h"
-#import "COHistoryNode.h"
+#import <CoreObject/CoreObject.h>
 
 @implementation HistoryInspectorController
-
+#if 0
 - (void)awakeFromNib
 {
 	[[NSNotificationCenter defaultCenter] addObserver:self
@@ -22,39 +21,39 @@
 {
 	context = ctx;
 }
-
-static void collectNodes(COHistoryNode *node, NSMutableArray *collection)
-{
-	[collection addObject: node];
-	for (COHistoryNode *children in [node branches])
-	{
-		collectNodes(children, collection);
-	}
-}
+//
+//static void collectNodes(COHistoryNode *node, NSMutableArray *collection)
+//{
+//	[collection addObject: node];
+//	for (COHistoryNode *children in [node branches])
+//	{
+//		collectNodes(children, collection);
+//	}
+//}
 
 - (NSArray*)allHistoryGraphNodes
 {
-	COHistoryNode *node = [context baseHistoryGraphNode];
-	while ([node parent] != nil)
-	{
-		if ([node isEqual: [node parent]])
-		{
-			assert(0); 
-		}
-		node = [node parent];
-	}
+//	COHistoryNode *node = [context baseHistoryGraphNode];
+//	while ([node parent] != nil)
+//	{
+//		if ([node isEqual: [node parent]])
+//		{
+//			assert(0); 
+//		}
+//		node = [node parent];
+//	}
+//	
+//	NSMutableArray *allNodes = [NSMutableArray array];
+//	if (node != nil)
+//		collectNodes(node, allNodes);
+//	
+//	NSArray *sortedArray = [allNodes sortedArrayUsingComparator: ^(id obj1, id obj2) {
+//		NSDate *d1 = [[obj1 properties] objectForKey: kCODateHistoryGraphNodeProperty];
+//		NSDate *d2 = [[obj2 properties] objectForKey: kCODateHistoryGraphNodeProperty];
+//		return (NSComparisonResult)[d1 compare: d2];
+//	}];
 	
-	NSMutableArray *allNodes = [NSMutableArray array];
-	if (node != nil)
-		collectNodes(node, allNodes);
-	
-	NSArray *sortedArray = [allNodes sortedArrayUsingComparator: ^(id obj1, id obj2) {
-		NSDate *d1 = [[obj1 properties] objectForKey: kCODateHistoryGraphNodeProperty];
-		NSDate *d2 = [[obj2 properties] objectForKey: kCODateHistoryGraphNodeProperty];
-		return (NSComparisonResult)[d1 compare: d2];
-	}];
-	
-	return sortedArray;
+	return [NSArray array];
 }
 
 /* COStoreCoordinator notification */
@@ -148,5 +147,5 @@ static void collectNodes(COHistoryNode *node, NSMutableArray *collection)
 	[historyInspectorWindow setTitle: 
 	 [NSString stringWithFormat: @"Document %@ History", [aDocument uuid]]];
 }
-
+#endif
 @end

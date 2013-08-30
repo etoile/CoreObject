@@ -41,7 +41,7 @@
 
 - (id)initWithParent: (OutlineItem*)p context: (COEditingContext*)ctx
 {
-	self = [super initWithContext: ctx];
+	self = [super initWithObjectGraphContext: ctx];
 	contents = [[NSMutableArray alloc] init];
 	[self setParent: p];
 	[self setLabel:@"Untitled Item"];

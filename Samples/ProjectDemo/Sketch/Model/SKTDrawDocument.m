@@ -67,30 +67,12 @@ NSString *SKTDrawDocumentType = @"Apple Sketch Graphic Format";
 	}
 }
 
-- (id)initWithContext: (COEditingContext*)ctx
-{
-	self = [super initWithContext: ctx];
-    if (self) {
-        _graphics = [[NSMutableArray allocWithZone:[self zone]] init];
-    }
-	return self;
-}
-
-- (void) didAwaken
-{
-	// FIXME: hack
-	if (_graphics == nil)
-	{
-		_graphics = [[NSMutableArray allocWithZone:[self zone]] init];
-	}
-}
-
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [_graphics release];
-    
     [super dealloc];
 }
+
+@dynamic graphics;
 
 static NSString *SKTGraphicsListKey = @"GraphicsList";
 static NSString *SKTDrawDocumentVersionKey = @"DrawDocumentVersion";
@@ -290,22 +272,6 @@ static int SKTCurrentDrawDocumentVersion = 1;
 
 }
 
-- (NSArray *)graphics {
-	[self willAccessValueForProperty: @"graphics"];
-    return _graphics;
-}
-
-- (void)setGraphics:(NSArray *)graphics {
-    unsigned i = [[self graphics] count];
-    while (i-- > 0) {
-        [self removeGraphicAtIndex:i];
-    }
-    i = [graphics count];
-    while (i-- > 0) {
-        [self insertGraphic:[graphics objectAtIndex:i] atIndex:0];
-    }
-}
-
 - (void)invalidateGraphic:(SKTGraphic *)graphic
 {
 	// FIXME: call invalidateGraphic: on the graphic view
@@ -313,22 +279,18 @@ static int SKTCurrentDrawDocumentVersion = 1;
 
 - (void)insertGraphic:(SKTGraphic *)graphic atIndex:(unsigned)index {
     //[[[self undoManager] prepareWithInvocationTarget:self] removeGraphicAtIndex:index];
-	[self willChangeValueForProperty: @"graphics"];
-    [_graphics insertObject:graphic atIndex:index];
-	[self didChangeValueForProperty: @"graphics"];
-    [graphic setDocument:self];
-    [self invalidateGraphic:graphic];
+    
+    NSMutableArray *array = [[self.graphics mutableCopy] autorelease];
+    [array insertObject: graphic atIndex: index];
+
+    self.graphics = array;
 }
 
 - (void)removeGraphicAtIndex:(unsigned)index {
-    id graphic = [[[self graphics] objectAtIndex:index] retain];
-	[self willChangeValueForProperty: @"graphics"];
-    [_graphics removeObjectAtIndex:index];
-	[self didChangeValueForProperty: @"graphics"];
-	
-    [self invalidateGraphic:graphic];
-    //[[[self undoManager] prepareWithInvocationTarget:self] insertGraphic:graphic atIndex:index];
-    [graphic release];
+    NSMutableArray *array = [[self.graphics mutableCopy] autorelease];
+    [array removeObjectAtIndex: index];
+    
+    self.graphics = array;
 }
 
 - (void)removeGraphic:(SKTGraphic *)graphic {
@@ -341,19 +303,12 @@ static int SKTCurrentDrawDocumentVersion = 1;
 - (void)moveGraphic:(SKTGraphic *)graphic toIndex:(unsigned)newIndex {
     unsigned curIndex = [[self graphics] indexOfObjectIdenticalTo:graphic];
     if (curIndex != newIndex) {
-        //[[[self undoManager] prepareWithInvocationTarget:self] moveGraphic:graphic toIndex:((curIndex > newIndex) ? curIndex+1 : curIndex)];
         if (curIndex < newIndex) {
             newIndex--;
         }
-        [graphic retain];
-		
-		[self willChangeValueForProperty: @"graphics"];
-        [_graphics removeObjectAtIndex:curIndex];
-        [_graphics insertObject:graphic atIndex:newIndex];
-		[self didChangeValueForProperty: @"graphics"];
-		
-        [graphic release];
-        [self invalidateGraphic:graphic];
+        
+        [self removeGraphicAtIndex: curIndex];
+        [self insertGraphic: graphic atIndex: newIndex];
     }
 }
 

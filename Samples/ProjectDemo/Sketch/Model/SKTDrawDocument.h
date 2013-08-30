@@ -8,8 +8,6 @@
 @class SKTGraphic;
 
 @interface SKTDrawDocument : COObject {
-    @private
-    NSMutableArray *_graphics;
 }
 
 - (NSDictionary *)drawDocumentDictionaryForGraphics:(NSArray *)graphics;
@@ -21,8 +19,7 @@
 - (NSData *)TIFFRepresentationForGraphics:(NSArray *)graphics error:(NSError **)outError;
 - (NSData *)PDFRepresentationForGraphics:(NSArray *)graphics;
 
-- (NSArray *)graphics;
-- (void)setGraphics:(NSArray *)graphics;
+@property (readwrite, nonatomic, retain) NSArray *graphics;
 
 - (void)invalidateGraphic:(SKTGraphic *)graphic;
 

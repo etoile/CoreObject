@@ -34,7 +34,7 @@
 
 - (id)initWithParent: (OutlineItem*)p referencedItem: (OutlineItem*)ref context: (COEditingContext*)ctx
 {
-	self = [super initWithContext: ctx];
+	self = [super initWithObjectGraphContext: ctx];
 	[self setParent: p];
   [self setReferencedItem: ref];
 	return self;

@@ -1,5 +1,5 @@
 #import <Cocoa/Cocoa.h>
-#import "COEditingContext.h"
+#import <CoreObject/CoreObject.h>
 #import "Document.h"
 
 @interface HistoryInspectorController : NSObject

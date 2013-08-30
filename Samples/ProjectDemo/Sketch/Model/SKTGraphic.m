@@ -22,11 +22,10 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 }
 
 // =================================== Initialization ===================================
-- (id)initWithContext: (COEditingContext*)ctx
+- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
-    self = [super initWithContext: ctx];
+	self = [super initWithObjectGraphContext: aContext];
     if (self) {
-        _document = nil;
         [self setBounds:NSMakeRect(0.0, 0.0, 1.0, 1.0)];
         //[self setFillColor:[NSColor whiteColor]];
         [self setFillColor:[NSColor colorWithCalibratedRed: 1.0 green: 1.0 blue: 1.0 alpha: 0.5]];
@@ -47,7 +46,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    id newObj = [[[self class] allocWithZone:zone] initWithContext: [self objectContext]];
+    id newObj = [[[self class] allocWithZone:zone] initWithObjectGraphContext: [self objectGraphContext]];
 
     // Document is not "copied".  The new graphic will need to be inserted into a document.
     [newObj setBounds:[self bounds]];
@@ -61,13 +60,8 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 }
 
 // ========================= Document accessors and conveniences =========================
-- (void)setDocument:(SKTDrawDocument *)document {
-    _document = document;
-}
 
-- (SKTDrawDocument *)document {
-    return _document;
-}
+@dynamic document;
 
 - (NSString *)graphicType {
     return NSStringFromClass([self class]);
@@ -75,7 +69,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 // =================================== Primitives ===================================
 - (void)didChange {
-    [_document invalidateGraphic:self];
+    [self.document invalidateGraphic:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:SKTGraphicDidChangeNotification object:self];
 }
     

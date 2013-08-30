@@ -341,7 +341,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 
 - (void)createGraphicOfClass:(Class)theClass withEvent:(NSEvent *)theEvent {
     SKTDrawDocument *document = [self drawDocument];
-    _creatingGraphic = [[theClass allocWithZone:[document zone]] initWithContext: [document objectContext]];
+    _creatingGraphic = [[theClass allocWithZone:[document zone]] initWithObjectGraphContext: [document objectGraphContext]];
     if ([_creatingGraphic createWithEvent:theEvent inView:self]) {
         [document insertGraphic:_creatingGraphic atIndex:0];
         [self selectGraphic:_creatingGraphic];
@@ -349,9 +349,12 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
             [self startEditingGraphic:_creatingGraphic withEvent:nil ];
         }
         //[[document undoManager] setActionName:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Create %@", @"UndoStrings", @"Action name for newly created graphics.  Class name is inserted at the substitution."), [[NSBundle mainBundle] localizedStringForKey:NSStringFromClass(theClass) value:@"" table:@"GraphicClassNames"]]];
-		[[document objectContext] commitWithType: kCOTypeMinorEdit
-								shortDescription: @"Insert Shape"
-								  longDescription: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Create %@", @"UndoStrings", @"Action name for newly created graphics.  Class name is inserted at the substitution."), [[NSBundle mainBundle] localizedStringForKey:NSStringFromClass(theClass) value:@"" table:@"GraphicClassNames"]]];
+        
+        [[[document objectGraphContext] editingContext] commit];
+        
+//		[[document objectContext] commitWithType: kCOTypeMinorEdit
+//								shortDescription: @"Insert Shape"
+//								  longDescription: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Create %@", @"UndoStrings", @"Action name for newly created graphics.  Class name is inserted at the substitution."), [[NSBundle mainBundle] localizedStringForKey:NSStringFromClass(theClass) value:@"" table:@"GraphicClassNames"]]];
     }
     [_creatingGraphic release];
     _creatingGraphic = nil;

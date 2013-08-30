@@ -69,9 +69,11 @@
 	assert([[doc objectContext] objectHasChanges: [doc uuid]]);
 	assert([[doc valueForProperty: @"screenRect"] isEqual: NSStringFromRect([[self window] frame])]);
 	
-	[[doc objectContext] commitWithType: kCOTypeMinorEdit
-		shortDescription: @"Move Window"
-		 longDescription: [NSString stringWithFormat: @"Move to %@", NSStringFromRect([doc screenRectValue])]];	
+    [[[doc objectGraphContext] editingContext] commit];
+    
+//	[[doc objectContext] commitWithType: kCOTypeMinorEdit
+//		shortDescription: @"Move Window"
+//		 longDescription: [NSString stringWithFormat: @"Move to %@", NSStringFromRect([doc screenRectValue])]];	
 }
 
 

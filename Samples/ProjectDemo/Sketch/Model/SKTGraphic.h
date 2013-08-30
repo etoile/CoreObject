@@ -37,7 +37,6 @@ extern NSString *SKTGraphicDidChangeNotification;
 
 @interface SKTGraphic : COObject <NSCopying> {
     @private
-    SKTDrawDocument *_document;
     NSRect _bounds;
     NSRect _origBounds;
     float _lineWidth;
@@ -54,8 +53,9 @@ extern NSString *SKTGraphicDidChangeNotification;
 - (id)init;
 
 // ========================= Document accessors and conveniences =========================
-- (void)setDocument:(SKTDrawDocument *)document;
-- (SKTDrawDocument *)document;
+
+@property (readonly, nonatomic) SKTDrawDocument *document;
+
 - (NSUndoManager *)undoManager;
 
 // =================================== Primitives ===================================

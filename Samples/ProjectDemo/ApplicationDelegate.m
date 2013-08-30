@@ -8,6 +8,7 @@
 #import "HistoryInspectorController.h"
 #import "SharingServer.h"
 #import "SKTDrawDocument.h"
+#import <CoreObject/CoreObject.h>
 
 #define STORE_URL [NSURL URLWithString: [@"~/ProjectDemoStore" stringByExpandingTildeInPath]]
 
@@ -59,26 +60,28 @@
 
 - (void)awakeFromNib
 {
-	context = [[COEditingContext alloc] initWithStoreCoordinator: 
-			   [[[COStoreCoordinator alloc] initWithURL: STORE_URL] autorelease]];
+	context = [[COEditingContext alloc] initWithStore:
+			   [[[COSQLiteStore alloc] initWithURL: STORE_URL] autorelease]];
 	
 	ETUUID *uuid = [[NSUserDefaults standardUserDefaults] UUIDForKey: @"projectDemoProjectUUID"];
 	
-	Project *loaded = [context objectForUUID: uuid];
+	Project *loaded = [[context persistentRootForUUID: uuid] rootObject];
 	NSLog(@"Got UUID %@ from user defaults. The context returns: %@", uuid, loaded);
 	
 	if (nil != uuid && nil != loaded)
 	{
-		ASSIGN(project, (Project*)[context objectForUUID: uuid]);
+		ASSIGN(project, (Project *)[[context persistentRootForUUID: uuid] rootObject]);
 		NSLog(@"Loading existing project %@ = %@", uuid, project);
 		NSLog(@"It has %@ documents", [project documents]);
 	}
 	else
 	{
-		project = [[Project alloc] initWithContext: context];
+        COPersistentRoot *proot = [context insertNewPersistentRootWithEntityName: @"Anonymous.Project"];
+        
+		ASSIGN(project, [proot rootObject]);
 		[context commit];
-		NSLog(@"Creating a new project %@ = %@", [project uuid], project); 
-		[[NSUserDefaults standardUserDefaults] setUUID: [project uuid]
+		NSLog(@"Creating a new project %@", [proot persistentRootUUID]);
+		[[NSUserDefaults standardUserDefaults] setUUID: [proot persistentRootUUID]
 												forKey: @"projectDemoProjectUUID"];
 	}
 	
@@ -119,7 +122,7 @@
 
 - (void) newDocumentWithType: (NSString*)type rootObject: (COObject*)rootObj
 {
-	Document *document = [[[Document alloc] initWithContext: context] autorelease];
+	Document *document = [[[Document alloc] initWithObjectGraphContext: context] autorelease];
 	[document setRootObject: rootObj];
 	[document setDocumentName: [NSString stringWithFormat: @"Document %@", [[document uuid] stringValue]]];
 	[document setDocumentType: type];
@@ -136,17 +139,17 @@
 - (IBAction) newTextDocument: (id)sender
 {
 	[self newDocumentWithType: @"text"
-				   rootObject: [[[TextItem alloc] initWithContext: context] autorelease]];	
+				   rootObject: [[[TextItem alloc] initWithObjectGraphContext: context] autorelease]];	
 }
 - (IBAction) newOutline: (id)sender
 {
 	[self newDocumentWithType: @"outline"
-				   rootObject: [[[OutlineItem alloc] initWithContext: context] autorelease]];
+				   rootObject: [[[OutlineItem alloc] initWithObjectGraphContext: context] autorelease]];
 }
 - (IBAction) newDrawing: (id)sender
 {
 	[self newDocumentWithType: @"drawing"
-				   rootObject: [[[SKTDrawDocument alloc] initWithContext: context] autorelease]];
+				   rootObject: [[[SKTDrawDocument alloc] initWithObjectGraphContext: context] autorelease]];
 }
 
 /* Convenience */
@@ -190,9 +193,13 @@
 	{
 		name = @"Untitled Checkpoint";
 	}
-	[context commitWithType: kCOTypeCheckpoint
-		   shortDescription: @"Checkpoint"
-			longDescription: name];
+    
+//    [[[doc objectGraphContext] editingContext] commit];
+//    
+//	[context commitWithType: kCOTypeCheckpoint
+//		   shortDescription: @"Checkpoint"
+//			longDescription: name];
+    [context commit];
 }
 
 - (void)undo:(id)sender
@@ -207,7 +214,7 @@
 
 - (IBAction)newProject: (id)sender
 {
-	Project *newProject = [[Project alloc] initWithContext: context];
+	Project *newProject = [[Project alloc] initWithObjectGraphContext: context];
 	[context commit];
 	NSLog(@"Creating a new project %@ = %@", [newProject uuid], newProject); 
 	[newProject setDelegate: self];

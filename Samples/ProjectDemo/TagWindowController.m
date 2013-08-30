@@ -68,7 +68,7 @@
 		else
 		{
 			// create a new tag
-			newTag = [[[Tag alloc] initWithContext: ctx] autorelease];
+			newTag = [[[Tag alloc] initWithObjectGraphContext: ctx] autorelease];
 			[newTag setLabel: label];
 			[[[NSApp delegate] project] addTag: newTag];
 			NSLog(@"Creating new tag %@", newTag);
@@ -76,9 +76,10 @@
 		
 		[document addTag: newTag];
 		
-		[ctx commitWithType:kCOTypeMinorEdit
-		   shortDescription:@"Add tag"
-			longDescription:[NSString stringWithFormat: @"Add tag '%@' to document '%@'", label, [document documentName]]];
+        [ctx commit];
+//		[ctx commitWithType:kCOTypeMinorEdit
+//		   shortDescription:@"Add tag"
+//			longDescription:[NSString stringWithFormat: @"Add tag '%@' to document '%@'", label, [document documentName]]];
 		
 		[tagNameField setStringValue: @""];
 		[table reloadData];
@@ -97,9 +98,11 @@
 		COEditingContext *ctx = [[NSApp delegate] editingContext];
 		[document removeTag: tagToRemove];
 
-		[ctx commitWithType:kCOTypeMinorEdit
-		   shortDescription:@"Remove tag"
-			longDescription:[NSString stringWithFormat: @"Remove tag '%@' from document '%@'", [tagToRemove label], [document documentName]]];
+        [ctx commit];
+        
+//		[ctx commitWithType:kCOTypeMinorEdit
+//		   shortDescription:@"Remove tag"
+//			longDescription:[NSString stringWithFormat: @"Remove tag '%@' from document '%@'", [tagToRemove label], [document documentName]]];
 	}
 	[table reloadData];
 }

@@ -39,9 +39,9 @@
 
 - (void)setStartsAtLowerLeft:(BOOL)flag {
     if (_startsAtLowerLeft != flag) {
-        //[[[self undoManager] prepareWithInvocationTarget:self] setStartsAtLowerLeft:_startsAtLowerLeft];
+        [self willChangeValueForProperty: @"startsAtLowerLeft"];
         _startsAtLowerLeft = flag;
-        [self didChange];
+        [self didChangeValueForProperty: @"startsAtLowerLeft"];
     }
 }
 

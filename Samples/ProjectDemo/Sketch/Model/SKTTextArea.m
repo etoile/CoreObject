@@ -26,9 +26,9 @@
 }
 
 
-- (id)initWithContext: (COEditingContext*)ctx
+- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
-	self = [super initWithContext: ctx];
+	self = [super initWithObjectGraphContext: aContext];
 	if (self) 
 	{
 		_contents = [[NSTextStorage allocWithZone:[self zone]] init];

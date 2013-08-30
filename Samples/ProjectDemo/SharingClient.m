@@ -4,7 +4,7 @@
 #import "ApplicationDelegate.h"
 
 @implementation SharingClient
-
+#if 0
 - (id)initWithInvitationMessage: (NSDictionary*)msg
 {
 	self = [super init];
@@ -212,6 +212,6 @@
 	 toPeerNamed: serverName]; 
 	NSLog(@"Sent to %@: %@", serverName, msg);    
 }
-
+#endif
 
 @end

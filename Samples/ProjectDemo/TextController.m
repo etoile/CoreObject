@@ -1,5 +1,5 @@
 #import "TextController.h"
-#import "COEditingContext.h"
+#import <CoreObject/CoreObject.h>
 
 @implementation TextController
 
@@ -36,9 +36,13 @@
 - (void)textDidChange:(NSNotification*)notif
 {
 	[[doc rootObject] setLabel: [[textView textStorage] string]];
-	[[doc objectContext] commitWithType:kCOTypeMinorEdit
-					   shortDescription:@"Edit Text"
-						longDescription:@"Edit Text"];
+    
+    // FIXME: Use Metadata
+//	[[doc objectContext] commitWithType:kCOTypeMinorEdit
+//					   shortDescription:@"Edit Text"
+//						longDescription:@"Edit Text"];
+    
+    [[[doc objectGraphContext] editingContext] commit];
 }
 
 @end

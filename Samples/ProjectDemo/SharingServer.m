@@ -1,5 +1,5 @@
 #import "SharingServer.h"
-#import "COStoreCoordinator.h"
+#import <CoreObject/CoreObject.h>
 #import "NetworkController.h"
 
 @implementation SharingServer
@@ -9,11 +9,12 @@
 	self = [super init];
 	ASSIGN(doc, d);
 	peers = [[NSMutableDictionary alloc] init];
-	
-	[[NSNotificationCenter defaultCenter] addObserver: self
-											 selector: @selector(didCommit:)
-												 name: COEditingContextBaseHistoryGraphNodeDidChangeNotification
-											   object: [[NSApp delegate] editingContext]];
+
+	// FIXME:
+//	[[NSNotificationCenter defaultCenter] addObserver: self
+//											 selector: @selector(didCommit:)
+//												 name: COEditingContextBaseHistoryGraphNodeDidChangeNotification
+//											   object: [[NSApp delegate] editingContext]];
 	
 	ASSIGN(sessionID, [ETUUID UUID]);
 	return self;
