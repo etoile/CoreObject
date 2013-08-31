@@ -13,6 +13,7 @@
 #import <CoreObject/COObject.h>
 #import <CoreObject/COObjectGraphContext.h>
 #import <CoreObject/COPersistentRoot.h>
+#import <CoreObject/COBranch.h>
 #import <CoreObject/COQuery.h>
 #import <CoreObject/CORevision.h>
 #import <CoreObject/COSerialization.h>
@@ -28,11 +29,6 @@
 #import <CoreObject/COGroup.h>
 #import <CoreObject/COLibrary.h>
 #import <CoreObject/COTag.h>
-
-/* Tracks */
-
-#import <CoreObject/COBranch.h>
-#import <CoreObject/COTrack.h>
 
 /* Diff Framework (the Diff API is very unstable) */
 

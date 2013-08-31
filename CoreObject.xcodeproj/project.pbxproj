@@ -39,8 +39,6 @@
 		609C00B71704C3EF00D01AAB /* COTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00AB1704C3EF00D01AAB /* COTag.m */; };
 		609C00C01704C3FF00D01AAB /* COBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00B81704C3FF00D01AAB /* COBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00C11704C3FF00D01AAB /* COBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00B91704C3FF00D01AAB /* COBranch.m */; };
-		609C00C61704C3FF00D01AAB /* COTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00BE1704C3FF00D01AAB /* COTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		609C00C71704C3FF00D01AAB /* COTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00BF1704C3FF00D01AAB /* COTrack.m */; };
 		609C00E81704C42200D01AAB /* COError.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00E21704C42200D01AAB /* COError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00E91704C42200D01AAB /* COError.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00E31704C42200D01AAB /* COError.m */; };
 		609C01AC170AC93100D01AAB /* NSObject+CoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C01AA170AC93000D01AAB /* NSObject+CoreObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -366,8 +364,6 @@
 		609C00AB1704C3EF00D01AAB /* COTag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COTag.m; path = Model/COTag.m; sourceTree = "<group>"; };
 		609C00B81704C3FF00D01AAB /* COBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBranch.h; path = Core/COBranch.h; sourceTree = "<group>"; };
 		609C00B91704C3FF00D01AAB /* COBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBranch.m; path = Core/COBranch.m; sourceTree = "<group>"; };
-		609C00BE1704C3FF00D01AAB /* COTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COTrack.h; path = Tracks/COTrack.h; sourceTree = "<group>"; };
-		609C00BF1704C3FF00D01AAB /* COTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COTrack.m; path = Tracks/COTrack.m; sourceTree = "<group>"; };
 		609C00E21704C42200D01AAB /* COError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COError.h; path = Utilities/COError.h; sourceTree = "<group>"; };
 		609C00E31704C42200D01AAB /* COError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COError.m; path = Utilities/COError.m; sourceTree = "<group>"; };
 		609C01AA170AC93000D01AAB /* NSObject+CoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+CoreObject.h"; path = "Core/NSObject+CoreObject.h"; sourceTree = "<group>"; };
@@ -649,7 +645,6 @@
 				6675F8B91785C02A001E5622 /* StorageDataModel */,
 				6686BDB612592C1B0065DE1A /* Core */,
 				66D09D58129CE477006BEDC3 /* Model */,
-				60413A6D14B9F66800225D2A /* Tracks */,
 				791B4E501299C8AF00CCF472 /* Store (Low-level API) */,
 				6686BDCB12592C1B0065DE1A /* Diff & Merge (Low-level API) */,
 				663CE28617C07ED800E729F5 /* Undo */,
@@ -686,15 +681,6 @@
 				3D01D09C1646BEF400917AC8 /* TestFramework.framework */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		60413A6D14B9F66800225D2A /* Tracks */ = {
-			isa = PBXGroup;
-			children = (
-				609C00BE1704C3FF00D01AAB /* COTrack.h */,
-				609C00BF1704C3FF00D01AAB /* COTrack.m */,
-			);
-			name = Tracks;
 			sourceTree = "<group>";
 		};
 		60C913AC165BBE7500E0C5F4 /* Examples */ = {
@@ -1103,7 +1089,6 @@
 				609C00B41704C3EF00D01AAB /* COLibrary.h in Headers */,
 				609C00B61704C3EF00D01AAB /* COTag.h in Headers */,
 				609C00C01704C3FF00D01AAB /* COBranch.h in Headers */,
-				609C00C61704C3FF00D01AAB /* COTrack.h in Headers */,
 				609C00E81704C42200D01AAB /* COError.h in Headers */,
 				60C913C6165BBF5200E0C5F4 /* CoreObject.h in Headers */,
 				6043D4D31757B4F9002103CC /* COCommitDescriptor.h in Headers */,
@@ -1396,7 +1381,6 @@
 				609C00B51704C3EF00D01AAB /* COLibrary.m in Sources */,
 				609C00B71704C3EF00D01AAB /* COTag.m in Sources */,
 				609C00C11704C3FF00D01AAB /* COBranch.m in Sources */,
-				609C00C71704C3FF00D01AAB /* COTrack.m in Sources */,
 				609C00E91704C42200D01AAB /* COError.m in Sources */,
 				609C01AD170AC93100D01AAB /* NSObject+CoreObject.m in Sources */,
 				6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */,
