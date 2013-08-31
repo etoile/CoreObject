@@ -40,20 +40,27 @@
     UKObjectsEqual(A(child1, child2), [item contents]);
 }
 
-#if 0
 - (void) testMutableProxy
 {
     OutlineItem *item = [persistentRoot rootObject];
 
     OutlineItem *child1 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-
+    
+    // At first I didn't think this would work right now, but
+    // when -mutableArrayValueForKey: does its accessor search, it causes
+    // +resolveInstanceMethod: to be invoked, which lets us auto-generate
+    // acecssors.
+    //
+    // Currently we only generate -XXX and -setXXX:, but that's sufficient
+    // for -mutableArrayValueForKey: to work. We will need to add support
+    // for generating the indexed ones for good performance, though.
+    
     // FIXME: Change to mutableOrderedSetValueForKey
-    [[item mutableArrayValueForKey: @"children"] addObject: child1];
+    [[item mutableArrayValueForKey: @"contents"] addObject: child1];
     UKObjectsEqual(@[child1], [item contents]);
 
-    [[item mutableArrayValueForKey: @"children"] removeObject: child1];
+    [[item mutableArrayValueForKey: @"contents"] removeObject: child1];
     UKObjectsEqual(@[], [item contents]);
 }
-#endif
 
 @end
