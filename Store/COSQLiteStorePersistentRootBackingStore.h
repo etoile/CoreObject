@@ -59,6 +59,7 @@
  * @returns 0 for the first commit on an empty backing store, -1 on error
  */
 - (CORevisionID *) writeItemGraph: (id<COItemGraph>)anItemTree
+                     revisionUUID: (ETUUID *)aRevisionUUID
                      withMetadata: (NSDictionary *)metadata
                        withParent: (int64_t)aParent
                   withMergeParent: (int64_t)aMergeParent
@@ -76,5 +77,7 @@
 
 - (int64_t) revidForUUID: (ETUUID *)aUUID;
 - (int64_t) revidForRevisionID: (CORevisionID *)aToken;
+
+- (CORevisionID *) revisionIDForRevid: (int64_t)aRevid;
 
 @end

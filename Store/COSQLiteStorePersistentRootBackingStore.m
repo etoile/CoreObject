@@ -406,6 +406,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
  * @param modifiedItems nil for all items in anItemTree, otherwise a subset
  */
 - (CORevisionID *) writeItemGraph: (id<COItemGraph>)anItemTree
+                     revisionUUID: (ETUUID *)aRevisionUUID
                      withMetadata: (NSDictionary *)metadata
                        withParent: (int64_t)aParent
                   withMergeParent: (int64_t)aMergeParent
@@ -417,6 +418,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     
     NSParameterAssert(aParent >= -1);
     NSParameterAssert(aMergeParent >= -1);
+    NSParameterAssert(aRevisionUUID != nil);
     
     BOOL inTransaction = [db_ inTransaction];
     if (!inTransaction)
@@ -462,7 +464,6 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
         metadataBlob = [NSJSONSerialization dataWithJSONObject: metadata options: 0 error: NULL];
     }
     
-    ETUUID *revisionUUID = [ETUUID UUID];
     BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (revid, "
         "contents, metadata, timestamp, parent, mergeparent, root, deltabase, "
         "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", [self tableName]],
@@ -475,7 +476,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
         [[anItemTree rootItemUUID] dataValue],
         [NSNumber numberWithLongLong: deltabase],
         [NSNumber numberWithLongLong: bytesInDeltaRun],
-        [revisionUUID dataValue]];
+        [aRevisionUUID dataValue]];
     
     if (!inTransaction)
     {
@@ -488,7 +489,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     }
     
     CORevisionID *revidObject = [CORevisionID revisionWithBackinStoreUUID: _uuid
-                                                             revisionUUID: revisionUUID];
+                                                             revisionUUID: aRevisionUUID];
 
     return revidObject;
 }

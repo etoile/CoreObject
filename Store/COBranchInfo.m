@@ -1,4 +1,5 @@
 #import "COBranchInfo.h"
+#import "CORevisionID.h"
 
 @implementation COBranchInfo
 

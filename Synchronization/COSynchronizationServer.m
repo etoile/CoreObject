@@ -66,11 +66,21 @@ For now we do.
     
     // Now prepare the property list output
     
-    NSMutableDictionary *serverNewestRevisionIDForBranchUUID = [NSMutableDictionary dictionary];
+    NSMutableDictionary *branches = [NSMutableDictionary dictionary];
     for (COBranchInfo *branch in [serverInfo branches])
     {
-        [serverNewestRevisionIDForBranchUUID setObject: [[[branch headRevisionID] revisionUUID] stringValue]
-                                                forKey: [[branch UUID] stringValue]];
+        NSMutableDictionary *branchPlist = [NSMutableDictionary dictionary];
+        branchPlist[@"uuid"] = [branch.UUID stringValue];
+        branchPlist[@"headRevisionID"] = [[branch.headRevisionID revisionUUID] stringValue];
+        branchPlist[@"tailRevisionID"] = [[branch.tailRevisionID revisionUUID] stringValue];
+        branchPlist[@"currentRevisionID"] = [[branch.currentRevisionID revisionUUID] stringValue];
+        if (branch.metadata != nil)
+        {
+            branchPlist[@"metadata"] = branch.metadata;
+        }
+        
+        [branches setObject: branchPlist
+                     forKey: [[branch UUID] stringValue]];
     }
     
     NSMutableDictionary *contentsForRevisionID = [NSMutableDictionary dictionary];
@@ -100,7 +110,7 @@ For now we do.
     }
     
     return @{@"persistentRoot" : [persistentRoot stringValue],
-             @"serverNewestRevisionIDForBranchUUID" : serverNewestRevisionIDForBranchUUID,
+             @"branches" : branches,
              @"revisions" : contentsForRevisionID,
              @"serverID" : aRequest[@"serverID"]};
 }

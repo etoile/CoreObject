@@ -321,6 +321,7 @@
                                         error: (NSError **)error;
 
 - (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
+                                 revisionUUID: (ETUUID *)aRevisionUUID
                                      metadata: (NSDictionary *)metadata
                              parentRevisionID: (CORevisionID *)aParent
                         mergeParentRevisionID: (CORevisionID *)aMergeParent

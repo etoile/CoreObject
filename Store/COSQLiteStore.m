@@ -184,7 +184,7 @@
 - (NSArray *) allBackingUUIDs
 {
     NSMutableArray *result = [NSMutableArray array];
-    FMResultSet *rs = [db_ executeQuery: @"SELECT UNIQUE backingstore FROM persistentroots"];
+    FMResultSet *rs = [db_ executeQuery: @"SELECT DISTINCT backingstore FROM persistentroots"];
     sqlite3_stmt *statement = [[rs statement] statement];
     
     while ([rs next])
@@ -422,6 +422,7 @@
     NSParameterAssert(aParent != nil);
     
     return [self writeItemTree: anItemTree
+                  revisionUUID: [ETUUID UUID]
                   withMetadata: metadata
           withParentRevisionID: aParent
          mergeParentRevisionID: aMergeParent
@@ -431,6 +432,7 @@
 }
 
 - (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
+                                 revisionUUID: (ETUUID *)aRevisionUUID
                                      metadata: (NSDictionary *)metadata
                              parentRevisionID: (CORevisionID *)aParent
                         mergeParentRevisionID: (CORevisionID *)aMergeParent
@@ -443,6 +445,7 @@
     NSParameterAssert(anItemTree != nil);
     
     return [self writeItemTree: anItemTree
+                  revisionUUID: aRevisionUUID
                   withMetadata: metadata
           withParentRevisionID: aParent
          mergeParentRevisionID: aMergeParent
@@ -457,6 +460,7 @@
                                        error: (NSError **)error
 {
     return [self writeItemTree: anItemTree
+                  revisionUUID: [ETUUID UUID]
                   withMetadata: metadata
           withParentRevisionID: nil
          mergeParentRevisionID: nil
@@ -467,6 +471,7 @@
 
 
 - (CORevisionID *) writeItemTree: (id<COItemGraph>)anItemTree
+                    revisionUUID: (ETUUID *)aRevisionUUID
                     withMetadata: (NSDictionary *)metadata
             withParentRevisionID: (CORevisionID *)parentRevid
            mergeParentRevisionID: (CORevisionID *)aMergeParent
@@ -482,6 +487,7 @@
     }
     
     CORevisionID *revid = [backing writeItemGraph: anItemTree
+                                     revisionUUID: aRevisionUUID
                                      withMetadata: metadata
                                        withParent: [backing revidForRevisionID: parentRevid]
                                   withMergeParent: [backing revidForRevisionID: aMergeParent]
@@ -569,7 +575,9 @@
                                                     " backingstore, deleted, changecount FROM persistentroots WHERE root_id = ?", root_id];
         if ([rs next])
         {
-            currBranch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+            currBranch = [rs dataForColumnIndex: 0] != nil
+                ? [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]
+                : nil;
             backingUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
             deleted = [rs boolForColumnIndex: 2];
             changecount = [rs int64ForColumnIndex: 3];
@@ -1202,6 +1210,38 @@
 - (FMDatabase *) database
 {
     return db_;
+}
+
+- (NSString *) description
+{
+    NSMutableString *result = [NSMutableString string];
+    [result appendFormat: @"<COSQLiteStore at %@ (UUID: %@)\n", self.URL, self.UUID];
+    for (ETUUID *backingUUID in [self allBackingUUIDs])
+    {
+        [result appendFormat: @"\t backing UUID %@ (containing ", backingUUID];
+        
+        for (ETUUID *persistentRoot in  [[NSSet setWithArray: [self persistentRootUUIDs]]
+                                         objectsPassingTest: ^(id obj, BOOL *stop) {
+                                             return [[self backingUUIDForPersistentRootUUID: obj] isEqual: backingUUID];
+                                         }])
+        {
+            [result appendFormat: @"%@ ", persistentRoot];
+        }
+        
+        [result appendFormat: @")\n"];
+        
+        COSQLiteStorePersistentRootBackingStore *bs = [self backingStoreForUUID: backingUUID error: NULL];
+        for (int64_t i=0 ;; i++)
+        {
+            CORevisionID *revisionID = [bs revisionIDForRevid: i];
+            if (revisionID == nil)
+            {
+                break;
+            }
+            [result appendFormat: @"\t\t %lld (UUID: %@)\n", (long long int)i, [revisionID revisionUUID]];
+        }
+    }
+    return result;
 }
 
 @end

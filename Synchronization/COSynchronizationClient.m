@@ -77,12 +77,15 @@ static void DFSInsertRevisions(NSMutableSet *revisionUUIDsToHandle, ETUUID *revi
     CORevisionID *mergeParentRevid = RevisionIDForRevisionUUID(mergeParentString, persistentRoot, store);
     
     CORevisionID *revid = [store writeRevisionWithItemGraph: graph
+                                               revisionUUID: revisionUUID
                                                    metadata: metadata
                                            parentRevisionID: parentRevid
                                       mergeParentRevisionID: mergeParentRevid
                                          persistentRootUUID: persistentRoot
                                               modifiedItems: nil
                                                       error: NULL];
+    
+    assert([[revid revisionUUID] isEqual: revisionUUID]);
     assert(revid != nil);
 }
 
@@ -109,24 +112,78 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
 - (void) handleUpdateResponse: (NSDictionary *)aResponse
                         store: (COSQLiteStore *)aStore
 {
+    NSString *serverID = aResponse[@"serverID"];
     ETUUID *persistentRoot = [ETUUID UUIDWithString: aResponse[@"persistentRoot"]];
     
     // 1. Do we have this persistent root?
     
     COPersistentRootInfo *info = [aStore persistentRootInfoForUUID: persistentRoot];
+    int64_t changeCount = info.changeCount;
     if (info == nil)
     {
         // No: create it
         
         info = [aStore createPersistentRootWithUUID: persistentRoot error: NULL];
         assert(info != nil);
+        
+        changeCount = info.changeCount;
     }
     
     // Insert the revisions the server sent us.
     
     InsertRevisions(aResponse[@"revisions"], aStore, persistentRoot);
+
+    for (NSString *branchUUIDString in aResponse[@"branches"])
+    {
+        NSDictionary *branchPlist = aResponse[@"branches"][branchUUIDString];
     
-    // Update the branch
+        // Search for a previously synced branch to update
+        
+        COBranchInfo *branchToUpdate = nil;
+        
+        for (COBranchInfo *branch in [info branches])
+        {
+            if ([[branch metadata][@"source"] isEqual: serverID]
+                && [[branch metadata][@"replcatedBranch"] isEqual: branchUUIDString])
+            {
+                branchToUpdate = branch;
+                break;
+            }
+        }
+        
+        CORevisionID *currentRevisionID = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: branchPlist[@"currentRevisionID"]]
+                                                         persistentRootUUID: persistentRoot];
+        CORevisionID *headRevid = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: branchPlist[@"headRevisionID"]]
+                                                 persistentRootUUID: persistentRoot];
+        CORevisionID *tailRevisionID = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: branchPlist[@"tailRevisionID"]]
+                                                 persistentRootUUID: persistentRoot];
+        
+        ETUUID *branchUUID;
+        
+        if (branchToUpdate == nil)
+        {
+            // None found, create a new one
+            
+            branchUUID = [ETUUID UUID];
+            
+            assert([aStore createBranchWithUUID: branchUUID
+                                initialRevision: currentRevisionID
+                              forPersistentRoot: persistentRoot
+                                          error: NULL]);
+        }
+        else
+        {
+            branchUUID = [branchToUpdate UUID];
+        }
+        
+        assert([aStore setCurrentRevision: currentRevisionID
+                              headRevision: headRevid
+                              tailRevision: tailRevisionID
+                                 forBranch: branchUUID
+                          ofPersistentRoot: persistentRoot
+                        currentChangeCount: &changeCount
+                                    error: NULL]);
+    }
 }
 
 @end
