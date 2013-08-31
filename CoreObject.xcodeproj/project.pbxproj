@@ -187,8 +187,7 @@
 		66E451D917CC565200205679 /* Tag.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E451D817CC565100205679 /* Tag.m */; };
 		66FB156017A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FB155E17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66FB156117A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB155F17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.m */; };
-		66FB15D917AB31F6003BFC9B /* COObject+Subclass.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FB15D717AB31F5003BFC9B /* COObject+Subclass.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		66FB15DA17AB31F6003BFC9B /* COObject+Subclass.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15D817AB31F5003BFC9B /* COObject+Subclass.m */; };
+		66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */; };
 		791B4E4C1299C82200CCF472 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
 		791B4E721299C90900CCF472 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6C1299C90900CCF472 /* FMDatabase.m */; };
 		791B4E741299C90900CCF472 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6E1299C90900CCF472 /* FMDatabaseAdditions.m */; };
@@ -546,8 +545,7 @@
 		66FB155E17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCrossPersistentRootReferenceCache.h; path = Core/COCrossPersistentRootReferenceCache.h; sourceTree = "<group>"; };
 		66FB155F17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCrossPersistentRootReferenceCache.m; path = Core/COCrossPersistentRootReferenceCache.m; sourceTree = "<group>"; };
 		66FB157017A8F53D003BFC9B /* TestObjectGraphContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestObjectGraphContext.m; path = Tests/TestObjectGraphContext.m; sourceTree = "<group>"; };
-		66FB15D717AB31F5003BFC9B /* COObject+Subclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObject+Subclass.h"; path = "Core/COObject+Subclass.h"; sourceTree = "<group>"; };
-		66FB15D817AB31F5003BFC9B /* COObject+Subclass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObject+Subclass.m"; path = "Core/COObject+Subclass.m"; sourceTree = "<group>"; };
+		66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObject+Accessors.m"; path = "Core/COObject+Accessors.m"; sourceTree = "<group>"; };
 		66FB15F017AB8D4D003BFC9B /* TestItemGraphDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestItemGraphDiff.m; path = Tests/TestItemGraphDiff.m; sourceTree = "<group>"; };
 		791B4E2D1299C79300CCF472 /* Test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test; sourceTree = BUILT_PRODUCTS_DIR; };
 		791B4E6B1299C90900CCF472 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabase.h; path = src/FMDatabase.h; sourceTree = "<group>"; };
@@ -854,8 +852,7 @@
 				6609485C1787A1160049468B /* CORelationshipCache.m */,
 				609C008C1704C3DA00D01AAB /* COObject.h */,
 				609C008D1704C3DA00D01AAB /* COObject.m */,
-				66FB15D717AB31F5003BFC9B /* COObject+Subclass.h */,
-				66FB15D817AB31F5003BFC9B /* COObject+Subclass.m */,
+				66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */,
 				668084EB1791FBA2003A3CC6 /* COObject+RelationshipCache.h */,
 				668084EA1791FBA2003A3CC6 /* COObject+RelationshipCache.m */,
 				668084EE1791FBAB003A3CC6 /* COObjectGraphContext.h */,
@@ -1121,7 +1118,6 @@
 				66808494178DAFE3003A3CC6 /* diff.hh in Headers */,
 				668084ED1791FBA2003A3CC6 /* COObject+RelationshipCache.h in Headers */,
 				66FB156017A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.h in Headers */,
-				66FB15D917AB31F6003BFC9B /* COObject+Subclass.h in Headers */,
 				663CE29517C07ED800E729F5 /* COEdit.h in Headers */,
 				663CE29917C07ED800E729F5 /* COEditDeleteBranch.h in Headers */,
 				663CE29B17C07ED800E729F5 /* COEditSetBranchMetadata.h in Headers */,
@@ -1411,7 +1407,7 @@
 				668084EC1791FBA2003A3CC6 /* COObject+RelationshipCache.m in Sources */,
 				668084F11791FBAB003A3CC6 /* COObjectGraphContext.m in Sources */,
 				66FB156117A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.m in Sources */,
-				66FB15DA17AB31F6003BFC9B /* COObject+Subclass.m in Sources */,
+				66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */,
 				66C3670C17B5F9B0009ACF2F /* COBranchInfo.m in Sources */,
 				66C3671017B5FA0E009ACF2F /* COPersistentRootInfo.m in Sources */,
 				663CE29617C07ED800E729F5 /* COEdit.m in Sources */,
