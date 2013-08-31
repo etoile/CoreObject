@@ -69,6 +69,10 @@ For now we do.
     NSMutableDictionary *branches = [NSMutableDictionary dictionary];
     for (COBranchInfo *branch in [serverInfo branches])
     {
+        if (branch.metadata[@"source"] != nil)
+        {
+            continue;
+        }
         NSMutableDictionary *branchPlist = [NSMutableDictionary dictionary];
         branchPlist[@"uuid"] = [branch.UUID stringValue];
         branchPlist[@"headRevisionID"] = [[branch.headRevisionID revisionUUID] stringValue];

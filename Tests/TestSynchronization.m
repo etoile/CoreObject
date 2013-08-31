@@ -203,8 +203,8 @@ static ETUUID *branchBUUID;
     COPersistentRootInfo *clientInfo = [store persistentRootInfoForUUID: persistentRootUUID];
     UKNotNil(clientInfo);
 
-    NSLog(@"Server: %@", serverStore);
-    NSLog(@"Client: %@", store);
+    //NSLog(@"Server: %@", serverStore);
+    //NSLog(@"Client: %@", store);
     
     // Pull "cheapCopyUUID" persistent root from server to client
         

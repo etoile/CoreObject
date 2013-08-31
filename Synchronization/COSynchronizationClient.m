@@ -170,6 +170,12 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
                                 initialRevision: currentRevisionID
                               forPersistentRoot: persistentRoot
                                           error: NULL]);
+            
+            BOOL ok = [aStore setMetadata: @{ @"source" : serverID, @"replcatedBranch" : branchUUIDString }
+                                forBranch: branchUUID
+                         ofPersistentRoot: persistentRoot
+                                    error: NULL];
+            assert(ok);
         }
         else
         {
