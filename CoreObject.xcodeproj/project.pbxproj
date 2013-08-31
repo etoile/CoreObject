@@ -43,10 +43,6 @@
 		609C00C71704C3FF00D01AAB /* COTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00BF1704C3FF00D01AAB /* COTrack.m */; };
 		609C00E81704C42200D01AAB /* COError.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00E21704C42200D01AAB /* COError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00E91704C42200D01AAB /* COError.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00E31704C42200D01AAB /* COError.m */; };
-		609C00EA1704C42200D01AAB /* NSData+compression.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00E41704C42200D01AAB /* NSData+compression.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		609C00EB1704C42200D01AAB /* NSData+compression.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00E51704C42200D01AAB /* NSData+compression.m */; };
-		609C00EC1704C42200D01AAB /* NSData+sha1.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00E61704C42200D01AAB /* NSData+sha1.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		609C00ED1704C42200D01AAB /* NSData+sha1.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00E71704C42200D01AAB /* NSData+sha1.m */; };
 		609C01AC170AC93100D01AAB /* NSObject+CoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C01AA170AC93000D01AAB /* NSObject+CoreObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C01AD170AC93100D01AAB /* NSObject+CoreObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C01AB170AC93100D01AAB /* NSObject+CoreObject.m */; };
 		60C8BC5416322E2C00A2B4EE /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 669965351162E17500359BE6 /* libz.1.2.5.dylib */; };
@@ -137,7 +133,6 @@
 		66860BA517BED42900B24333 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */ = {isa = PBXBuildFile; fileRef = 667F79EC17BDE00B00B6BF3A /* TestSQLiteStoreSharedPersistentRoots.m */; };
 		6686BE2A12592D7B0065DE1A /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
 		66ABC78E17C43FBA009FB925 /* TestCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66ABC78D17C43FBA009FB925 /* TestCustomTrack.m */; };
-		66B38C6217B98E0400D65771 /* TestUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B38C6117B98DFF00D65771 /* TestUtilities.m */; };
 		66B38C6417B98EE100D65771 /* TestPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B38C6317B98EDE00D65771 /* TestPerformance.m */; };
 		66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -375,10 +370,6 @@
 		609C00BF1704C3FF00D01AAB /* COTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COTrack.m; path = Tracks/COTrack.m; sourceTree = "<group>"; };
 		609C00E21704C42200D01AAB /* COError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COError.h; path = Utilities/COError.h; sourceTree = "<group>"; };
 		609C00E31704C42200D01AAB /* COError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COError.m; path = Utilities/COError.m; sourceTree = "<group>"; };
-		609C00E41704C42200D01AAB /* NSData+compression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+compression.h"; path = "Utilities/NSData+compression.h"; sourceTree = "<group>"; };
-		609C00E51704C42200D01AAB /* NSData+compression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+compression.m"; path = "Utilities/NSData+compression.m"; sourceTree = "<group>"; };
-		609C00E61704C42200D01AAB /* NSData+sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+sha1.h"; path = "Utilities/NSData+sha1.h"; sourceTree = "<group>"; };
-		609C00E71704C42200D01AAB /* NSData+sha1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+sha1.m"; path = "Utilities/NSData+sha1.m"; sourceTree = "<group>"; };
 		609C01AA170AC93000D01AAB /* NSObject+CoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+CoreObject.h"; path = "Core/NSObject+CoreObject.h"; sourceTree = "<group>"; };
 		609C01AB170AC93100D01AAB /* NSObject+CoreObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+CoreObject.m"; path = "Core/NSObject+CoreObject.m"; sourceTree = "<group>"; };
 		60C913AD165BBE9E00E0C5F4 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = main.m; path = Samples/BasicPersistence/main.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -488,7 +479,6 @@
 		669965351162E17500359BE6 /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = /usr/lib/libz.1.2.5.dylib; sourceTree = "<absolute>"; };
 		6699653F1162E1C000359BE6 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		66ABC78D17C43FBA009FB925 /* TestCustomTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCustomTrack.m; path = Tests/TestCustomTrack.m; sourceTree = "<group>"; };
-		66B38C6117B98DFF00D65771 /* TestUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUtilities.m; path = Tests/TestUtilities.m; sourceTree = "<group>"; };
 		66B38C6317B98EDE00D65771 /* TestPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestPerformance.m; path = Tests/TestPerformance.m; sourceTree = "<group>"; };
 		66C18AD417BAB2EE00C5316F /* TestEditingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestEditingContext.m; path = Tests/TestEditingContext.m; sourceTree = "<group>"; };
 		66C3669A17B426BF009ACF2F /* Typewriter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Typewriter.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -911,7 +901,6 @@
 				609C00E31704C42200D01AAB /* COError.m */,
 				6043D4C717575D79002103CC /* COCommitDescriptor.h */,
 				6043D4C817575D7A002103CC /* COCommitDescriptor.m */,
-				6686BDD712592C1B0065DE1A /* Compression and Hashing */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -932,17 +921,6 @@
 				66808489178DAFE3003A3CC6 /* diff.hh */,
 			);
 			name = "Diff & Merge (Low-level API)";
-			sourceTree = "<group>";
-		};
-		6686BDD712592C1B0065DE1A /* Compression and Hashing */ = {
-			isa = PBXGroup;
-			children = (
-				609C00E41704C42200D01AAB /* NSData+compression.h */,
-				609C00E51704C42200D01AAB /* NSData+compression.m */,
-				609C00E61704C42200D01AAB /* NSData+sha1.h */,
-				609C00E71704C42200D01AAB /* NSData+sha1.m */,
-			);
-			name = "Compression and Hashing";
 			sourceTree = "<group>";
 		};
 		6699633B115F0C4200359BE6 /* Documentation */ = {
@@ -1049,7 +1027,6 @@
 				66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */,
 				66FB157017A8F53D003BFC9B /* TestObjectGraphContext.m */,
 				66FB15F017AB8D4D003BFC9B /* TestItemGraphDiff.m */,
-				66B38C6117B98DFF00D65771 /* TestUtilities.m */,
 				66B38C6317B98EDE00D65771 /* TestPerformance.m */,
 				663CE2CC17C1837700E729F5 /* TestUndoStackStore.m */,
 				666ED56B17C3E78A00D148AA /* TestUndo.m */,
@@ -1128,8 +1105,6 @@
 				609C00C01704C3FF00D01AAB /* COBranch.h in Headers */,
 				609C00C61704C3FF00D01AAB /* COTrack.h in Headers */,
 				609C00E81704C42200D01AAB /* COError.h in Headers */,
-				609C00EA1704C42200D01AAB /* NSData+compression.h in Headers */,
-				609C00EC1704C42200D01AAB /* NSData+sha1.h in Headers */,
 				60C913C6165BBF5200E0C5F4 /* CoreObject.h in Headers */,
 				6043D4D31757B4F9002103CC /* COCommitDescriptor.h in Headers */,
 				6675F8C31785C02A001E5622 /* COItemGraph.h in Headers */,
@@ -1423,8 +1398,6 @@
 				609C00C11704C3FF00D01AAB /* COBranch.m in Sources */,
 				609C00C71704C3FF00D01AAB /* COTrack.m in Sources */,
 				609C00E91704C42200D01AAB /* COError.m in Sources */,
-				609C00EB1704C42200D01AAB /* NSData+compression.m in Sources */,
-				609C00ED1704C42200D01AAB /* NSData+sha1.m in Sources */,
 				609C01AD170AC93100D01AAB /* NSObject+CoreObject.m in Sources */,
 				6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */,
 				6675F8C21785C02A001E5622 /* COItem.m in Sources */,
@@ -1512,7 +1485,6 @@
 				66860BA517BED42900B24333 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66808498178DB4D5003A3CC6 /* TestBranch.m in Sources */,
-				66B38C6217B98E0400D65771 /* TestUtilities.m in Sources */,
 				66B38C6417B98EE100D65771 /* TestPerformance.m in Sources */,
 				66C18AD517BAB2EE00C5316F /* TestEditingContext.m in Sources */,
 				663CE2CD17C1837700E729F5 /* TestUndoStackStore.m in Sources */,
