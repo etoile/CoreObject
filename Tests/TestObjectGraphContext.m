@@ -381,6 +381,30 @@
     UKTrue(COItemGraphEqualToItemGraph(ctx1, graph));
 }
 
+- (void) testRelationshipInverseAfterInsertOrUpdateItems
+{
+    OutlineItem *group1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *group2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    [root1 insertObject: group1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [root1 insertObject: group2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [group1 insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    UKObjectsSame(group1, [child parentContainer]);
+    
+    // Move child from group1 to group2 at the COItem level
+    
+    COMutableItem *group1item = [[[ctx1 itemForUUID: [group1 UUID]] mutableCopy] autorelease];
+    COMutableItem *group2item = [[[ctx1 itemForUUID: [group2 UUID]] mutableCopy] autorelease];
+    [group1item setValue: @[] forAttribute: @"contents" type: kCOTypeArray | kCOTypeCompositeReference];
+    [group2item setValue: @[[child UUID]] forAttribute: @"contents" type: kCOTypeArray | kCOTypeCompositeReference];
+    
+    [ctx1 insertOrUpdateItems: @[group1item, group2item]];
+    
+    // Check that inverses were recalculated
+    
+    UKObjectsSame(group2, [child parentContainer]);
+}
 
 // Done up to this line....
 #if 0
