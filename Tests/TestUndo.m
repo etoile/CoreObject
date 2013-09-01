@@ -46,6 +46,27 @@
     UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
 }
 
+- (void)testUndoSetCurrentVersionForBranchMultiplePersistentRoots
+{
+    COPersistentRoot *persistentRoot1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx commitWithStackNamed: @"test"];
+    
+    [[persistentRoot1 rootObject] setLabel: @"hello1"];
+    [[persistentRoot2 rootObject] setLabel: @"hello2"];
+    [ctx commitWithStackNamed: @"test"];
+    
+    CORevision *persistentRoot1Revision = [persistentRoot1 revision];
+    CORevision *persistentRoot2Revision = [persistentRoot2 revision];
+    
+    [ctx undoForStackNamed: @"test"];
+    
+    UKObjectsNotEqual([persistentRoot1 revision], persistentRoot1Revision);
+    UKObjectsNotEqual([persistentRoot2 revision], persistentRoot2Revision);
+    UKObjectsEqual([persistentRoot1 revision], [persistentRoot1Revision parentRevision]);
+    UKObjectsEqual([persistentRoot2 revision], [persistentRoot2Revision parentRevision]);
+}
+
 - (void)testUndoSetCurrentVersionForBranchSelectiveUndo
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
