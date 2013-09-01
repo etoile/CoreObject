@@ -7,10 +7,9 @@
 	License:  Modified BSD  (see COPYING)
  */
 
-#import <Foundation/Foundation.h>
-#import <CoreObject/COTrack.h>
+#import <EtoileFoundation/EtoileFoundation.h>
 
-@class COObject, CORevision, COPersistentRoot, COBranchInfo, COObjectGraphContext;
+@class COObject, CORevision, CORevisionID, COPersistentRoot, COBranchInfo, COObjectGraphContext, COEditingContext;
 
 extern NSString * const kCOBranchLabel;
 
