@@ -40,4 +40,11 @@
  */
 - (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
 
+
+/**
+ * This method is deprecated and private.
+ */
+- (id)insertObjectWithEntityName: (NSString *)aFullName
+                            UUID: (ETUUID *)aUUID;
+
 @end

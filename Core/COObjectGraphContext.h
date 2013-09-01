@@ -262,13 +262,20 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 /**
  * This method is deprecated, you must now use 
  * -[COObject initWithEntityDecription:objectGraphContext:].
+ *
+ * FIMXE: One problem with -[COObject initWithEntityDecription:objectGraphContext:]
+ * is the caller has to provide duplicate information: the class they alloc, and
+ * the entitiy description, which opens the possibility for these to be incompatible.
+ *
+ * e.g. [[SomeClass alloc] initWithEntityDecription: [...: @"NotSomeClass"] objectGraphContext:...]
+ *
+ * whereas -insertObjectWithEntityName: prevents that. I don't think
+ * -[COObject initWithEntityDecription:objectGraphContext:] is an acceptable
+ * solution as-is. One solution is to only allow -[[class alloc] init...] style
+ * creation if the class is registered with an entity description.
+ *
+ * --Eric
  */
 - (id)insertObjectWithEntityName: (NSString *)aFullName;
-/**
- * This method is deprecated and private.
- */
-- (id)insertObjectWithEntityName: (NSString *)aFullName
-                            UUID: (ETUUID *)aUUID;
-
 
 @end

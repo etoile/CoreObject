@@ -304,7 +304,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     
     // 3. Do GC
     
-    [self gc_];
+    [self removeUnreachableObjects];
     
     // 4. Clear change tracking again.
     
@@ -504,24 +504,23 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     anObject = nil;
 }
 
-// TODO: Rename. The last part in the name sounds a bit obscure :-) Quentin.
-- (void) gcDfs_: (COObject *)anObject uuids: (NSMutableSet *)set
+static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *collectedUUIDSet)
 {
     ETUUID *uuid = [anObject UUID];
-    if ([set containsObject: uuid])
+    if ([collectedUUIDSet containsObject: uuid])
     {
         return;
     }
-    [set addObject: uuid];
+    [collectedUUIDSet addObject: uuid];
     
     // Call recursively on all composite and referenced objects
     for (COObject *obj in [anObject embeddedOrReferencedObjects])
     {
-        [self gcDfs_: obj uuids: set];
+        FindReachableObjectsFromObject(obj, collectedUUIDSet);
     }
 }
 
-- (void) gc_
+- (void) removeUnreachableObjects
 {
     if ([self rootObject] == nil)
     {
@@ -531,7 +530,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     NSArray *allKeys = [_loadedObjects allKeys];
     
     NSMutableSet *live = [NSMutableSet setWithCapacity: [allKeys count]];
-    [self gcDfs_: [self rootObject] uuids: live];
+    FindReachableObjectsFromObject([self rootObject], live);
     
     NSMutableSet *dead = [NSMutableSet setWithArray: allKeys];
     [dead minusSet: live];
