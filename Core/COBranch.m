@@ -20,6 +20,7 @@
 #import "CORevisionInfo.h"
 #import "COBranchInfo.h"
 #import "COObjectGraphContext.h"
+#import "COObjectGraphContext+Private.h"
 #import "COEditingContext+Undo.h"
 
 NSString * const kCOBranchLabel = @"COBranchLabel";

@@ -92,14 +92,10 @@ extern NSString * const COPersistentRootDidChangeNotification;
     CORevisionID *_cheapCopyRevisionID;
 }
 
+
 /** @taskunit Persistent Root Properties */
 
-/**
- * Returns YES.
- *
- * See also -[NSObject isPersistentRoot].
- */
-@property (nonatomic, readonly) BOOL isPersistentRoot;
+
 /**
  * The UUID that is bound to a single persistent root per CoreObject store.
  *
@@ -148,52 +144,11 @@ extern NSString * const COPersistentRootDidChangeNotification;
 @property (nonatomic, readonly) NSSet *insertedBranches;
 @property (nonatomic, readonly) NSSet *deletedBranches;
 
-
 - (COBranch *)branchForUUID: (ETUUID *)aUUID;
 
-/**
- * Returns the object graph for the edited branch
- */
-@property (nonatomic, readonly) COObjectGraphContext *objectGraphContext;
-
-/**
- * The entry point to navigate the object graph bound to the persistent root.
- *
- * The returned object is COObject class or subclass instance.
- *
- * A root object isn't a core object and doesn't represent a core object either. 
- * The persistent root represents the core object. As such, use the persistent 
- * root UUID to refer to core objects and never 
- * <code>[[self rootObject] UUID]</code>.
- *
- * For now, this object must remain the same in the entire persistent root 
- * history including the branches (and derived cheap copies) due to limitations 
- * in EtoileUI.
- */
-@property (nonatomic, retain) id rootObject;
-/**
- * The UUID of the root object.
- *
- * Never returns nil even when -rootObject is nil. This method can query the 
- * store to retrieve the UUID.
- *
- * See also -[COStore rootObjectUUIDForPersistentRootUUID:].
- */
-@property (nonatomic, readonly) ETUUID *rootObjectUUID;
-/**
- * Shortcut for <code>[[self editingBranch] revision]</code>
- */
-@property (nonatomic, retain) CORevision *revision;
-/**
- * The store for which the editing context acts a working copy.
- *
- * The store is the same than the parent context.
- *
- * See also -[COEditingContext store].
- */
-@property (nonatomic, readonly) COSQLiteStore *store;
 
 /** @taskunit Editing Context Nesting */
+
 
 /**
  * The editing context managing the receiver.
@@ -215,40 +170,8 @@ extern NSString * const COPersistentRootDidChangeNotification;
 @property (nonatomic, readonly) COEditingContext *editingContext;
 
 
-
 /** @taskunit Object Access and Loading */
 
-/**
- * Returns the object identified by the UUID, by loading it to the given
- * revision when no instance managed by the receiver is present in memory.
- *
- * When the UUID isn't bound to a persistent object owned by the persistent root,
- * returns nil (unless it is a commit track UUID or another persistent root UUID,
- * but these are special cases discussed in the last paragraphs).
- *
- * For a nil revision, the object is loaded is loaded at its last revision.
- *
- * When the object is a inner object, the last revision is the one that is tied
- * to its root object last revision.
- *
- * When the object is already loaded, and its revision is not the requested
- * revision, raises an invalid argument exception.
- *
- * When the UUID is a persistent root UUID, the root object of the persistent
- * root is returned (the persistent root is loaded if needed).
- *
- * When the UUID is a branch UUID, the persistent root for the branch is looked
- * up. If the persistent root is not available, it is loaded for the requested
- * branch. If the persistent root is already loaded, a branch mismatch is
- * possible between the current branch UUID and the given branch UUID. For a
- * mismatch, an exception is raised, otherwise the root object of the persistent
- * root is returned.<br />
- * For a more detailed discussion about branching issues, see COCommitTrack
- * documentation.
- *
- * See also -loadedObjectForUUID:.
- */
-- (COObject *)objectWithUUID: (ETUUID *)uuid;
 
 /** 
  * @taskunit Pending Changes 
@@ -263,21 +186,56 @@ extern NSString * const COPersistentRootDidChangeNotification;
 - (BOOL)hasChanges;
 - (void)discardAllChanges;
 
-/** @taskunit Object Insertion */
+
+/** @taskunit Convenience */
+
 
 /**
- * Creates a new instance of the given entity name (assigning the instance a new 
- * UUID) and returns the object.
+ * The entry point to navigate the object graph bound to the persistent root.
  *
- * The entity name must correspond to the COObject class or a subclass. Thereby
- * returned objects will be COObject class or subclass instances in all cases.
+ * The returned object is COObject class or subclass instance.
  *
- * This is the factory method for COObject class hierarchy.
+ * A root object isn't a core object and doesn't represent a core object either.
+ * The persistent root represents the core object. As such, use the persistent
+ * root UUID to refer to core objects and never
+ * <code>[[self rootObject] UUID]</code>.
+ *
+ * For now, this object must remain the same in the entire persistent root
+ * history including the branches (and derived cheap copies) due to limitations
+ * in EtoileUI.
+ *
+ * Shorthand for [[[self editingBranch] objectGraphContext] rootObject]
+ */
+@property (nonatomic, retain) id rootObject;
+
+/**
+ * Shorthand for [[[self editingBranch] objectGraphContext] insertObjectWithEntityName:]
  */
 - (id)insertObjectWithEntityName: (NSString *)aFullName;
 
+/**
+ * Shorthand for [[[self editingBranch] objectGraphContext] objectWithUUID:]
+ */
+- (COObject *)objectWithUUID: (ETUUID *)uuid;
+
+/**
+ * Shortcut for <code>[[self editingBranch] revision]</code>
+ */
+@property (nonatomic, retain) CORevision *revision;
+
+/**
+ * Shorthand for [[self editingContext] store]
+ */
+@property (nonatomic, readonly) COSQLiteStore *store;
+
+/**
+ * Returns the object graph for the edited branch
+ */
+@property (nonatomic, readonly) COObjectGraphContext *objectGraphContext;
+
 
 /** @taskunit Committing Changes */
+
 
 /**
  * Commits the current changes to the store and returns the resulting revision.
@@ -300,5 +258,30 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 - (CORevision *)commitWithType: (NSString *)type
               shortDescription: (NSString *)shortDescription;
+
+
+/** @taskunit Deprecated */
+
+
+/**
+ * Returns YES.
+ *
+ * See also -[NSObject isPersistentRoot].
+ *
+ * Reason for deprecating: I don't like NSObject+CoreObject idea, violates tell-don't-ask principle.
+ */
+@property (nonatomic, readonly) BOOL isPersistentRoot;
+
+/**
+ * The UUID of the root object.
+ *
+ * Never returns nil even when -rootObject is nil. This method can query the
+ * store to retrieve the UUID.
+ *
+ * See also -[COStore rootObjectUUIDForPersistentRootUUID:].
+ *
+ * Reason for deprecating: redundancy, unused.
+ */
+@property (nonatomic, readonly) ETUUID *rootObjectUUID;
 
 @end

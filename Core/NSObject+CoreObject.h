@@ -11,6 +11,9 @@
 
 /** 
  * @group Object Collection and Organization
+ *
+ * I'd like to deprecate this, these encourage bad style (violating the tell-don't-ask principle
+ * http://pragprog.com/articles/tell-dont-ask ) and methods should almost never be added to NSObject IMHO.
  */
 @interface NSObject (CoreObject)
 

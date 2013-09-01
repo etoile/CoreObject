@@ -15,6 +15,7 @@
 #import "COItem.h"
 #import "COObject.h"
 #import "COObjectGraphContext.h"
+#import "COObjectGraphContext+Private.h"
 #import "CORelationshipCache.h"
 #import "CORevision.h"
 #import "COSerialization.h"

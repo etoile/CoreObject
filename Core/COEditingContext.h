@@ -109,27 +109,7 @@
  */
 - (id)init;
 
-/** 
- * @taskunit Type Querying 
- */
 
-/**
- * Returns YES.
- *
- * See also -[NSObject isEditingContext].
- */
-@property (nonatomic, readonly) BOOL isEditingContext;
-
-/** 
- * @taskunit Editing Context Nesting 
- */
-
-/**
- * Returns self.
- *
- * See also -[COPersistentObjectContext editingContext].
- */
-@property (nonatomic, readonly) COEditingContext *editingContext;
 
 /** 
  * @taskunit Accessing All Persistent Roots 
@@ -272,12 +252,26 @@
            shortDescription: (NSString *)shortDescription;
 
 /**
- * @taskunit Undo
+ * @taskunit Deprecated
  */
 
 /**
  * Deprecated
  */
 @property (readwrite, nonatomic, copy) NSString *undoStackName;
+
+/**
+ * Returns YES.
+ *
+ * See also -[NSObject isEditingContext].
+ */
+@property (nonatomic, readonly) BOOL isEditingContext;
+
+/**
+ * Returns self.
+ *
+ * See also -[COPersistentObjectContext editingContext].
+ */
+@property (nonatomic, readonly) COEditingContext *editingContext;
 
 @end

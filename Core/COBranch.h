@@ -59,7 +59,9 @@ extern NSString * const kCOBranchLabel;
     BOOL _deleted;
 }
 
+
 /** @taskunit Branch Kind */
+
 
 /**
  * Returns whether the branch represents a cheap copy.
@@ -75,7 +77,9 @@ extern NSString * const kCOBranchLabel;
  */
 @property (readonly, nonatomic) BOOL isTrunkBranch;
 
+
 /** @taskunit Basic Properties */
+
 
 /**
  * The branch UUID.
@@ -101,7 +105,9 @@ extern NSString * const kCOBranchLabel;
  */
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
 
+
 /** @taskunit History */
+
 
 /**
  * The parent branch from which the receiver is derived.
@@ -139,7 +145,9 @@ extern NSString * const kCOBranchLabel;
 
 - (void)reloadAtRevision: (CORevision *)revision;
 
+
 /** @taskunit Persistent Root and Object Graph Context */
+
 
 /**
  * The editing context owning the branch's persistent root
@@ -154,9 +162,11 @@ extern NSString * const kCOBranchLabel;
  */
 @property (readonly, nonatomic) COObjectGraphContext *objectGraphContext;
 
+
 /**
  * @taskunit Pending Changes
  */
+
 
 /**
  * Returns whether any object has been inserted, deleted or updated since the
@@ -167,17 +177,18 @@ extern NSString * const kCOBranchLabel;
 - (BOOL)hasChanges;
 - (void)discardAllChanges;
 
+
 /** @taskunit Undo / Redo */
+
 
 - (BOOL)canUndo;
 - (BOOL)canRedo;
 - (void)undo;
 - (void)redo;
 
+
 /** @taskunit Creating Branches and Cheap copies */
 
-// TODO: Convert these methods to logging the change in the editing context and saving it
-// at commit time.
 
 /**
  * Returns a new commit track by branching the receiver last revision and using 
@@ -228,7 +239,9 @@ extern NSString * const kCOBranchLabel;
  */
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev;
 
+
 /** @taskunit Merging Between Tracks */
+
 
 /**
  * This method is not yet implemented.
