@@ -29,7 +29,7 @@
 
 /* The custom track uses the root object commit track to undo and redo, no 
 selective undo is involved. */
-- (void)testWithSingleRootObject
+- (void)testUndoWithSinglePersistentRoot
 {
 	/* First commit */
 
@@ -85,8 +85,18 @@ selective undo is involved. */
 	UKObjectsEqual(thirdRevision, [[object persistentRoot] revision]);
 }
 
-- (NSArray *)makeCommitsWithMultipleRootObjects
+- (NSArray *)makeCommitsWithMultiplePersistentRoots
 {
+    /*
+                 commit #:    1   2   3   4   5   6
+     
+     objectPersistentRoot:    x-------x---x--------
+     
+        docPersistentRoot:        x---x-------x---x
+     
+     */
+    
+    
 	/* First commit */
 
 	COPersistentRoot *objectPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
@@ -103,10 +113,11 @@ selective undo is involved. */
 
 	[ctx commitWithStackNamed: @"test"];
 
-	/* Third commit (two revisions) */
+	/* Third commit call (creates commits in objectPersistentRoot and docPersistentRoot) */
 
 	COContainer *para1 = [[doc objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
+    [doc addObject: para1];
 	[object setValue: @"Shopping List" forProperty: @"label"];
 
 	[ctx commitWithStackNamed: @"test"];
@@ -121,7 +132,6 @@ selective undo is involved. */
 
 	COContainer *para2 = [[doc objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
-	[doc addObject: para1];
 	[doc addObject: para2];
 
 	[ctx commitWithStackNamed: @"test"];
@@ -135,15 +145,23 @@ selective undo is involved. */
 	return A(object, doc, para1, para2);
 }
 
-- (void)testWithMultipleRootObjects
+- (void)testUndoWithMultiplePersistentRoots
 {
-	NSArray *objects = [self makeCommitsWithMultipleRootObjects];
+	NSArray *objects = [self makeCommitsWithMultiplePersistentRoots];
 
-	COContainer *object = [objects objectAtIndex: 0];
-	COContainer *doc = [objects objectAtIndex: 1];
-	COContainer *para1 = [objects objectAtIndex: 2];
-	COContainer *para2 = [objects objectAtIndex: 3];
+	OutlineItem *object = [objects objectAtIndex: 0];
+	OutlineItem *doc = [objects objectAtIndex: 1];
+	OutlineItem *para1 = [objects objectAtIndex: 2];
+	OutlineItem *para2 = [objects objectAtIndex: 3];
 
+    COPersistentRoot *objectPersistentRoot = [object persistentRoot];
+    UKNotNil(objectPersistentRoot);
+    
+    COPersistentRoot *docPersistentRoot = [doc persistentRoot];
+    UKNotNil(docPersistentRoot);
+    
+    UKObjectsNotEqual(docPersistentRoot, objectPersistentRoot);
+    
 	/* Basic undo/redo check */
 
 	[ctx undoForStackNamed: @"test"];
@@ -151,93 +169,87 @@ selective undo is involved. */
 	
 	[ctx redoForStackNamed: @"test"];
 	UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
-
+    
 	/* Sixth and fifth commit undone ('doc' revision) */
-
+    
+    UKNotNil([docPersistentRoot objectWithUUID: [para2 UUID]]);
+    UKObjectsEqual((@[para1, para2]), [doc contents]);
 	[ctx undoForStackNamed: @"test"];
 	[ctx undoForStackNamed: @"test"];
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
-	// FIXME: UKNil([ctx objectWithUUID: [para2 UUID]]);
-	UKTrue([[doc content] isEmpty]);
+	UKNil([docPersistentRoot objectWithUUID: [para2 UUID]]);
+	UKObjectsEqual(@[para1], [doc contents]);
 
 	/* Fourth commit undone ('object' revision) */
 
 	[ctx undoForStackNamed: @"test"];
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
 
-	/* Third commit undone (two revisions one on 'doc' and one on 'object') */
+	/* Third commit call undone (two underlying commits, one on 'doc' and one on 'object') */
 
+    UKNotNil([docPersistentRoot objectWithUUID: [para1 UUID]]);
 	[ctx undoForStackNamed: @"test"];
-	// FIXME: UKNil([ctx objectWithUUID: [para1 UUID]]);
-
-	[ctx undoForStackNamed: @"test"];
+	UKNil([docPersistentRoot objectWithUUID: [para1 UUID]]);
+    UKObjectsEqual(@[], [doc contents]);
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
 	/* Second commit undone ('doc' revision) */
 
 	[ctx undoForStackNamed: @"test"];
-	// FIXME: UKNil([ctx objectWithUUID: [doc UUID]]);
-	
+    UKTrue(docPersistentRoot.isDeleted);
+    
+	/***********************************************/
 	/* First commit reached (root object 'object') */
-#if 0    
+    /***********************************************/
+    
 	// Just check the object creation hasn't been undone
-	UKNotNil([ctx objectWithUUID: [object UUID]]);
+	UKNotNil([objectPersistentRoot objectWithUUID: [object UUID]]);
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
 	/* Second commit redone */
 
 	[ctx redoForStackNamed: @"test"];
-	UKNotNil([ctx objectWithUUID: [doc UUID]]);
-	UKObjectsNotSame(doc, [ctx objectWithUUID: [doc UUID]]);
-	// Get the new restored root object instance
-	doc = (COContainer *)[ctx objectWithUUID: [doc UUID]];
+    UKFalse(docPersistentRoot.isDeleted);
+	UKNotNil([docPersistentRoot objectWithUUID: [doc UUID]]);
+	UKObjectsSame(doc, [docPersistentRoot objectWithUUID: [doc UUID]]);
 	UKStringsEqual(@"Document", [doc valueForProperty: @"label"]);
 
-	/* Third commit redone (involve two revisions) */
+	/* Third commit redone (involve two underlying commits) */
 
-	[ctx redoForStackNamed: @"test"];
 	[ctx redoForStackNamed: @"test"];
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
 
-	/* Third commit undone (involve two revisions)  */
+	/* Third commit undone (involve two underlying commits)  */
 
-	[ctx undoForStackNamed: @"test"];
 	[ctx undoForStackNamed: @"test"];
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
-	/* Third commit redone (involve two revisions) */
+	/* Third commit redone (involve two underlying commits) */
 
 	[ctx redoForStackNamed: @"test"];
-	[ctx redoForStackNamed: @"test"];
-	UKNotNil([ctx objectWithUUID: [para1 UUID]]);
-	UKObjectsNotSame(para1, [ctx objectWithUUID: [para1 UUID]]);
+	UKNotNil([docPersistentRoot objectWithUUID: [para1 UUID]]);
+	UKObjectsNotSame(para1, [docPersistentRoot objectWithUUID: [para1 UUID]]);
 
 	// Get the new restored object instance
-	para1 = (COContainer *)[ctx objectWithUUID: [para1 UUID]];
-	UKTrue([[doc allInnerObjectsIncludingSelf] containsObject: para1]);
+	para1 = (OutlineItem *)[docPersistentRoot objectWithUUID: [para1 UUID]];
+    UKObjectsEqual(@[para1], [doc contents]);
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
 
 	/* Fourth, fifth and sixth commits redone */
 
-	[track redo];
-	[track redo];
-	[track redo];
+	[ctx redoForStackNamed: @"test"];
+    [ctx redoForStackNamed: @"test"];
+    [ctx redoForStackNamed: @"test"];
+    UKFalse([ctx canRedoForStackNamed: @"test"]);
 	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
 	UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
-	UKNotNil([ctx objectWithUUID: [para2 UUID]]);
-	UKObjectsNotSame(para2, [ctx objectWithUUID: [para2 UUID]]);
+	UKNotNil([docPersistentRoot objectWithUUID: [para2 UUID]]);
+	UKObjectsNotSame(para2, [docPersistentRoot objectWithUUID: [para2 UUID]]);
 
 	// Get the new restored object instance
-	para2 = (COContainer *)[ctx objectWithUUID: [para2 UUID]];
-	UKTrue([[doc allInnerObjectsIncludingSelf] containsObject: para2]);
+	para2 = (OutlineItem *)[docPersistentRoot objectWithUUID: [para2 UUID]];
+    UKObjectsEqual((@[para1, para2]), [doc contents]);
 	UKStringsEqual(@"paragraph 2", [para2 valueForProperty: @"label"]);
-	UKObjectsEqual(A(para1, para2), [doc content]);
-#endif
-}
-
-- (void)testSelectiveUndo
-{
-	[self makeCommitsWithMultipleRootObjects];
 }
 
 @end

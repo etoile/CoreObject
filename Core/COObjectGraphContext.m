@@ -463,7 +463,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	// helps to intercept string objects that ought to be ETUUID objects.
 	NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
     COObject *obj = [_loadedObjects objectForKey: aUUID];
-	ETAssert([obj isKindOfClass: [COObject class]]);
+	ETAssert(obj == nil || [obj isKindOfClass: [COObject class]]);
 	return obj;
 }
 
