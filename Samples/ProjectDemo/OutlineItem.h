@@ -1,22 +1,15 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreObject/CoreObject.h>
+#import "DocumentItem.h"
 
-@interface OutlineItem : COObject //FIXME: DocumentItem has a 'document' property
-{
-	NSMutableArray *contents;
-	NSString *label;
-	OutlineItem *parent;
-}
+@interface OutlineItem : DocumentItem
 
-- (NSString*)label;
-- (void)setLabel:(NSString*)l;
-
-- (OutlineItem*)parent;
-- (void)setParent:(OutlineItem *)p;
+@property (readwrite, nonatomic, retain) NSString *label;
+@property (readwrite, nonatomic, retain) OutlineItem *parent;
+@property (readwrite, nonatomic, retain) NSArray *contents;
 
 - (OutlineItem*)root;
 
-- (NSArray *)contents;
 - (NSArray *)allContents;
 
 - (void) addItem: (OutlineItem*)item;

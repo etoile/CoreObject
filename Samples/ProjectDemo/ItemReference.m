@@ -11,16 +11,17 @@
 	if (self == [ItemReference class])
 	{
 		ETEntityDescription *itemReference = [ETEntityDescription descriptionWithName: @"ItemReference"];
-		
-		[Document class]; // FIXME: ugly hack to ensure the DocumentItem (superentity of OutlineItem) is registered
 		[itemReference setParent: (id)@"DocumentItem"];
 		
+        // FIXME: Hack; we need a common superclass for OutlineItem and ItemReference, or make
+        // ItemReference a subclass of OutlineItem
+        
 		ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
 																					  type: (id)@"Anonymous.OutlineItem"];
 		[parentProperty setIsContainer: YES];
 		
-    ETPropertyDescription *referencedItemProperty = [ETPropertyDescription descriptionWithName: @"referencedItem"
-																					 type: (id)@"Anonymous.OutlineItem"];
+        ETPropertyDescription *referencedItemProperty = [ETPropertyDescription descriptionWithName: @"referencedItem"
+                                                                                              type: (id)@"Anonymous.OutlineItem"];
 		
 		[itemReference setPropertyDescriptions: A(parentProperty, referencedItemProperty)];
 		
@@ -32,39 +33,24 @@
 	}
 }
 
-- (id)initWithParent: (OutlineItem*)p referencedItem: (OutlineItem*)ref context: (COEditingContext*)ctx
+- (id)initWithParent: (OutlineItem*)p referencedItem: (OutlineItem*)ref context: (COObjectGraphContext*)ctx
 {
 	self = [super initWithObjectGraphContext: ctx];
 	[self setParent: p];
-  [self setReferencedItem: ref];
+    [self setReferencedItem: ref];
 	return self;
 }
 
 - (void)dealloc
 {
-  DESTROY(referencedItem);
 	[super dealloc];
 }
 
 /* Accessor Methods */
 
-- (OutlineItem*)referencedItem
-{
-	[self willAccessValueForProperty: @"referencedItem"];
-	return referencedItem;
-}
-- (void)setReferencedItem:(OutlineItem *)r
-{
-	[self willChangeValueForProperty: @"referencedItem"];
-	ASSIGN(referencedItem, r);
-	[self didChangeValueForProperty: @"referencedItem"];
-}
+@dynamic parent;
+@dynamic referencedItem;
 
-- (OutlineItem*)parent
-{
-	[self willAccessValueForProperty: @"parent"];
-	return parent;
-}
 - (OutlineItem*)root
 {
 	id root = self;
@@ -74,20 +60,10 @@
 	}
 	return root;
 }
-- (void)setParent:(OutlineItem *)p
-{
-	[self willChangeValueForProperty: @"parent"];
-	parent = p;
-	[self didChangeValueForProperty: @"parent"];
-}
-
-- (void)didAwaken
-{
-}
 
 - (NSString*)label
 {
-	return [NSString stringWithFormat: @"Link to %@", [[self referencedItem] uuid]];	
+	return [NSString stringWithFormat: @"Link to %@", [[self referencedItem] UUID]];
 }
 
 @end

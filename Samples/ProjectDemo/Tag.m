@@ -11,7 +11,7 @@
 		ETEntityDescription *tag = [ETEntityDescription descriptionWithName: @"Tag"];
 		
 		ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-																							  type: (id)@"Anonymous.NSString"];
+                                                                                     type: (id)@"Anonymous.NSString"];
 		
 		[tag setPropertyDescriptions: A(labelProperty)];
 		
@@ -26,16 +26,6 @@
 
 /* Accessor Methods */
 
-- (NSString*)label
-{
-	[self willAccessValueForProperty: @"label"];
-	return label;
-}
-- (void)setLabel:(NSString *)l
-{
-	[self willChangeValueForProperty: @"label"];
-	ASSIGN(label, l);
-	[self didChangeValueForProperty: @"label"];
-}
+@dynamic label;
 
 @end

@@ -8,26 +8,12 @@
 	{
 		ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
 		
-		// DocumentItem entity (super-entity of OutlineItem, DraawingItem, TextItem)
-		{
-			ETEntityDescription *docItemEntity = [ETEntityDescription descriptionWithName: @"DocumentItem"];
-			
-			ETPropertyDescription *documentProperty = [ETPropertyDescription descriptionWithName: @"document"
-																							type: (id)@"Document"];
-			[documentProperty setIsContainer: YES];
-			
-			[docItemEntity setPropertyDescriptions: A(documentProperty)];
-			
-			[repo addUnresolvedDescription: docItemEntity];
-		}
-		
-		
 		// Document entity
 		{
 			ETEntityDescription *docEntity = [ETEntityDescription descriptionWithName: @"Document"];
 			
 			ETPropertyDescription *screenRectProperty = [ETPropertyDescription descriptionWithName: @"screenRect"
-																							  type: (id)@"NSString"];
+																							  type: (id)@"NSRect"];
 			ETPropertyDescription *isOpenProperty = [ETPropertyDescription descriptionWithName: @"isOpen"
 																						  type: (id)@"NSNumber"];
 			ETPropertyDescription *documentTypeProperty = [ETPropertyDescription descriptionWithName: @"documentType"
@@ -55,91 +41,39 @@
 	}
 }
 
-- (NSRect) screenRectValue
+- (NSRect) screenRect
 {
-	[self willAccessValueForProperty: @"screenRect"]; // FIXME: shouldn't need, valueForProperty: is broken
-	return NSRectFromString([self valueForProperty:@"screenRect"]);
+	return [[self valueForProperty:@"screenRect"] rectValue];
 }
-- (void) setScreenRectValue:(NSRect)r
+- (void) setScreenRect:(NSRect)r
 {
-	[self willChangeValueForProperty: @"screenRect"]; // FIXME: shouldn't need; setValue:forProperty: is broken
-	[self setValue: NSStringFromRect(r) forProperty:@"screenRect"];
-	[self didChangeValueForProperty: @"screenRect"]; // FIXME: shouldn't need; setValue:forProperty: is broken
+    [self willChangeValueForProperty: @"screenRect"];
+    [self setPrimitiveValue: [NSValue valueWithRect: r] forKey: @"screenRect"];
+	[self didChangeValueForProperty: @"screenRect"];
 }
 
 - (BOOL) isOpen
 {
-	[self willAccessValueForProperty: @"isOpen"];
-	return isOpen;
+	return [[self valueForProperty: @"isOpen"] boolValue];
 }
 - (void) setIsOpen:(BOOL)i
 {
 	[self willChangeValueForProperty: @"isOpen"];
-	isOpen = i;
+    [self setPrimitiveValue: @(i) forKey: @"isOpen"];
 	[self didChangeValueForProperty: @"isOpen"];
 }
 
-- (NSString*) documentType
-{
-	[self willAccessValueForProperty: @"documentType"];
-	return documentType;
-}
-- (void) setDocumentType:(NSString*)t
-{
-	[self willChangeValueForProperty: @"documentType"];
-	ASSIGN(documentType, t);
-	[self didChangeValueForProperty: @"documentType"];
-}
+@dynamic documentType;
+@dynamic rootObject;
+@dynamic documentName;
+@dynamic tags;
 
-- (id) rootObject
-{
-	[self willAccessValueForProperty: @"rootObject"];
-	return rootObject;
-}
-- (void) setRootObject:(id)r
-{
-	[self willChangeValueForProperty: @"rootObject"];
-	ASSIGN(rootObject, r);
-	[self didChangeValueForProperty: @"rootObject"];
-}
-
-- (NSString*) documentName
-{
-	[self willAccessValueForProperty: @"documentName"];
-	return documentName;
-}
-- (void) setDocumentName:(NSString*)n
-{
-	[self willChangeValueForProperty: @"documentName"];
-	ASSIGN(documentName, n);
-	[self didChangeValueForProperty: @"documentName"];
-}
-
-- (NSSet*) tags
-{
-	[self willAccessValueForProperty: @"tags"];
-	return tags;
-}
 - (void) addTag: (Tag *)tag
 {
-	[self willChangeValueForProperty: @"tags"];
-	[tags addObject: tag];
-	[self didChangeValueForProperty: @"tags"];
+    [[self mutableSetValueForKey: @"tags"] addObject: tag];
 }
 - (void) removeTag: (Tag *)tag
 {
-	[self willChangeValueForProperty: @"tags"];
-	[tags removeObject: tag];
-	[self didChangeValueForProperty: @"tags"];
-}
-
-- (void)dealloc
-{
-	[documentType release];
-	[documentName release];
-	[rootObject release];
-	[tags release];
-	[super dealloc];
-}
+    [[self mutableSetValueForKey: @"tags"] removeObject: tag];}
 
 @end

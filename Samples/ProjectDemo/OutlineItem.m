@@ -12,7 +12,7 @@
 		ETEntityDescription *outlineEntity = [ETEntityDescription descriptionWithName: @"OutlineItem"];
 		
 		[Document class]; // FIXME: ugly hack to ensure the DocumentItem (superentity of OutlineItem) is registered
-		[outlineEntity setParent: @"DocumentItem"];
+		[outlineEntity setParent: (id)@"DocumentItem"];
 		
 		ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
 																					  type: outlineEntity];
@@ -39,41 +39,24 @@
 	}
 }
 
-- (id)initWithParent: (OutlineItem*)p context: (COEditingContext*)ctx
+- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
-	self = [super initWithObjectGraphContext: ctx];
-	contents = [[NSMutableArray alloc] init];
-	[self setParent: p];
+	self = [super initWithObjectGraphContext: aContext];
 	[self setLabel:@"Untitled Item"];
 	return self;
 }
 
 - (void)dealloc
 {
-	[contents release];
-	[label release];
 	[super dealloc];
 }
 
 /* Accessor Methods */
 
-- (NSString*)label
-{
-	[self willAccessValueForProperty: @"label"];
-	return label;
-}
-- (void)setLabel:(NSString*)l
-{
-	[self willChangeValueForProperty: @"label"];
-	ASSIGN(label, l);
-	[self didChangeValueForProperty: @"label"];
-}
+@dynamic label;
+@dynamic parent;
+@dynamic contents;
 
-- (OutlineItem*)parent
-{
-	[self willAccessValueForProperty: @"parent"];
-	return parent;
-}
 - (OutlineItem*)root
 {
 	id root = self;
@@ -84,19 +67,6 @@
 	return root;
 }
 
-- (void)setParent:(OutlineItem *)p
-{
-	[self willChangeValueForProperty: @"parent"];
-	parent = p;
-	[self didChangeValueForProperty: @"parent"];
-}
-
-
-- (NSArray *)contents
-{
-	[self willAccessValueForProperty: @"contents"];
-	return contents;
-}
 - (NSArray *)allContents
 {
 	NSMutableSet *all = [NSMutableSet setWithArray: [self contents]];
@@ -106,26 +76,19 @@
 	}
 	return [all allObjects];
 }
+
 - (void) addItem: (OutlineItem*)item
 {
 	[self addItem: item atIndex: [[self contents] count]];
 }
+
 - (void) addItem: (OutlineItem*)item atIndex: (NSUInteger)index
 {
-	[self willChangeValueForProperty: @"contents"];
-	[contents insertObject: item atIndex: index];
-	[self didChangeValueForProperty: @"contents"];
-	[item setParent: self];
-}
-- (void) removeItemAtIndex: (NSUInteger)index
-{
-	[self willChangeValueForProperty: @"contents"];
-	[contents removeObjectAtIndex: index];
-	[self didChangeValueForProperty: @"contents"];
+	[[self mutableArrayValueForKey: @"contents"] insertObject: item atIndex: index];
 }
 
-- (void)didAwaken
+- (void) removeItemAtIndex: (NSUInteger)index
 {
-}
+	[[self mutableArrayValueForKey: @"contents"] removeObjectAtIndex: index];}
 
 @end

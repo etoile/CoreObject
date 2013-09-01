@@ -2,8 +2,6 @@
 
 @implementation Project
 
-@synthesize delegate; // notification hack - remove when we can use KVO
-
 + (void)initialize
 {
 	if (self == [Project class])
@@ -29,49 +27,27 @@
 	}
 }
 
-- (NSSet*) documents
-{
-	[self willAccessValueForProperty: @"documents"];
-	return documents;
-}
+@dynamic documents;
+@dynamic tags;
+
 - (void) addDocument: (Document *)document
 {
-	[self willChangeValueForProperty: @"documents"];
-	[documents addObject: document];
-	[self didChangeValueForProperty: @"documents"];
-	
-	[delegate projectDocumentsDidChange: self]; // notification hack - remove when we can use KVO
+    [[self mutableSetValueForKey: @"document"] addObject: document];
 }
+
 - (void) removeDocument: (Document *)document
 {
-	[self willChangeValueForProperty: @"documents"];
-	[documents removeObject: document];
-	[self didChangeValueForProperty: @"documents"];
-	
-	[delegate projectDocumentsDidChange: self];// notification hack - remove when we can use KVO
+    [[self mutableSetValueForKey: @"document"] removeObject: document];
 }
 
-- (NSSet*) tags
-{
-	[self willAccessValueForProperty: @"tags"];
-	return tags;
-}
 - (void) addTag: (Tag *)tag
 {
-	[self willChangeValueForProperty: @"tags"];
-	[tags addObject: tag];
-	[self didChangeValueForProperty: @"tags"];
-}
-- (void) removeTag: (Tag *)tag
-{
-	[self willChangeValueForProperty: @"tags"];
-	[tags removeObject: tag];
-	[self didChangeValueForProperty: @"tags"];
+	[[self mutableSetValueForKey: @"tags"] addObject: tag];
 }
 
-- (void)didAwaken
+- (void) removeTag: (Tag *)tag
 {
-	[delegate projectDocumentsDidChange: self];// notification hack - remove when we can use KVO
+	[[self mutableSetValueForKey: @"tags"] removeObject: tag];
 }
 
 @end

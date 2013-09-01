@@ -1,6 +1,7 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreObject/CoreObject.h>
 #import "OutlineItem.h"
+#import "DocumentItem.h"
 
 /**
  * ItemReference is a reference/link object used when embedding (in the
@@ -8,20 +9,12 @@
  *
  * 
  */
-@interface ItemReference : COObject //FIXME: DocumentItem has a 'document' property
-{
-	OutlineItem *referencedItem;
-	OutlineItem *parent;
-}
+@interface ItemReference : DocumentItem
 
-- (id)initWithParent: (OutlineItem*)p referencedItem: (OutlineItem*)ref context: (COEditingContext*)ctx;
+- (id)initWithParent: (OutlineItem*)p referencedItem: (OutlineItem*)ref context: (COObjectGraphContext*)ctx;
 
-- (OutlineItem*)parent;
-- (void)setParent:(OutlineItem *)p;
-
-- (OutlineItem*)referencedItem;
-- (void)setReferencedItem:(OutlineItem *)p;
-
-- (NSString*)label;
+@property (readwrite, nonatomic, retain) OutlineItem *parent;
+@property (readwrite, nonatomic, retain) OutlineItem *referencedItem;
+@property (readonly, nonatomic, retain) NSString *label;
 
 @end

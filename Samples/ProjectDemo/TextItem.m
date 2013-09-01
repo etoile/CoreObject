@@ -27,16 +27,6 @@
 
 /* Accessor Methods */
 
-- (NSString*)label
-{
-	[self willAccessValueForProperty: @"label"];
-	return text;
-}
-- (void)setLabel:(NSString*)l
-{
-	[self willChangeValueForProperty: @"label"];
-	ASSIGN(text, l);
-	[self didChangeValueForProperty: @"label"];
-}
+@dynamic label;
 
 @end

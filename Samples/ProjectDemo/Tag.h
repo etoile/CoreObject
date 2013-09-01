@@ -2,11 +2,7 @@
 #import <CoreObject/CoreObject.h>
 
 @interface Tag : COObject
-{
-	NSString *label;
-}
 
-- (NSString*)label;
-- (void)setLabel:(NSString *)l;
+@property (readwrite, nonatomic, retain) NSString *label;
 
 @end
