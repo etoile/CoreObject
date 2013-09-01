@@ -8,9 +8,11 @@
 
 #import "COSerialization.h"
 #import "COObject.h"
+#import "COObject+RelationshipCache.h"
 #import "COItem.h"
 #import "COItem+Binary.h"
 #import "COObjectGraphContext.h"
+#import "COObjectGraphContext+Private.h"
 #import "COPath.h"
 #import "COPersistentRoot.h"
 #import "COEditingContext+Private.h"

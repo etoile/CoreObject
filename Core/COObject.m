@@ -21,6 +21,7 @@
 #import "COTag.h"
 #import "COGroup.h"
 #import "COObjectGraphContext.h"
+#import "COObjectGraphContext+Private.h"
 #import "COSerialization.h"
 #import "COEditingContext+Private.h"
 #include <objc/runtime.h>
