@@ -12,7 +12,10 @@
 {
 @private
     NSMutableArray *_cachedRelationships;
+    COObject *_owner;
 }
+
+- (id) initWithOwner: (COObject *)owner;
 
 /**
  * Returns an array of COObject which have a reference to the

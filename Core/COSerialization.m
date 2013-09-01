@@ -652,6 +652,8 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 
 - (void)setStoreItem: (COItem *)aStoreItem
 {
+    [self removeCachedOutgoingRelationships];
+
 	[self validateStoreItem: aStoreItem];
 
 	for (NSString *property in [aStoreItem attributeNames])

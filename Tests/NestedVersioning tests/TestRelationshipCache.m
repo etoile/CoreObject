@@ -11,7 +11,7 @@
 - (id)init
 {
     self = [super init];
-    cache = [[CORelationshipCache alloc] init];
+    cache = [[CORelationshipCache alloc] initWithOwner: self];
     return self;
 }
 - (void)dealloc

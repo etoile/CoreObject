@@ -1,8 +1,8 @@
 #import "CORelationshipCache.h"
-#import <EtoileFoundation/ETUUID.h>
-#import <EtoileFoundation/Macros.h>
+#import <EtoileFoundation/EtoileFoundation.h>
 #import "COType.h"
 #import "COItem.h"
+#import "COObject.h"
 
 @interface COCachedRelationship : NSObject
 {
@@ -40,10 +40,11 @@
 
 #define INITIAL_ARRAY_CAPACITY 8
 
-- (id) init
+- (id) initWithOwner: (COObject *)owner
 {
     SUPERINIT;
     _cachedRelationships = [[NSMutableArray alloc] initWithCapacity: INITIAL_ARRAY_CAPACITY];
+    _owner = owner;
     return self;
 }
 
@@ -68,14 +69,24 @@
 
 - (COObject *) referringObjectForPropertyInTarget: (NSString *)aProperty
 {
+    NSMutableArray *results = [NSMutableArray array];
+    
     for (COCachedRelationship *entry in _cachedRelationships)
     {
         if ([aProperty isEqualToString: entry->_targetProperty])
         {
-            return entry->_sourceObject;
+            [results addObject: entry->_sourceObject];
         }
     }
-    return nil;
+    
+    assert([results count] == 0
+           || [results count] == 1);
+    
+    if ([results count] == 0)
+    {
+        return nil;
+    }
+    return [results firstObject];
 }
 
 - (void) removeAllEntries
@@ -108,6 +119,17 @@
                        sourceProperty: (NSString *)aSource
                        targetProperty: (NSString *)aTarget
 {
+    ETPropertyDescription *prop = [[_owner entityDescription] propertyDescriptionForName: aTarget];
+    if (![prop isMultivalued])
+    {
+        // We are setting the value of a non-multivalued property, so assert
+        // that it is currently not already set.
+        for (COCachedRelationship *entry in _cachedRelationships)
+        {
+            assert(![aTarget isEqualToString: entry->_targetProperty]);
+        }
+    }
+    
     COCachedRelationship *record = [[COCachedRelationship alloc] init];
     record.sourceObject = aReferrer;
     record.sourceProperty = aSource;

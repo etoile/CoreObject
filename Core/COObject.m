@@ -160,7 +160,7 @@ See +[NSObject typePrefix]. */
 	_isInitialized = YES;
 	_variableStorage = [self newVariableStorage];
     _relationshipsAsCOPathOrETUUID = [self newVariableStorage];
-	_incomingRelationships = [[CORelationshipCache alloc] init];
+	_incomingRelationships = [[CORelationshipCache alloc] initWithOwner: self];
 
 	[_objectGraphContext registerObject: self isNew: inserted];
 
@@ -236,7 +236,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	{
 		newObject->_variableStorage = [self newVariableStorage];
         newObject->_relationshipsAsCOPathOrETUUID = [self newVariableStorage];
-        newObject->_incomingRelationships = [[CORelationshipCache alloc] init];
+        newObject->_incomingRelationships = [[CORelationshipCache alloc] initWithOwner: self];
         
 		if (usesModelDescription)
 		{
@@ -945,7 +945,6 @@ objectGraphContext: (COObjectGraphContext *)aContext
 // TODO: Change to new -didAwaken method called in a predetermined order
 - (void)awakeFromFetch
 {
-    [self addCachedOutgoingRelationships];
     [self validateMultivaluedPropertiesUsingMetamodel];
 }
 
@@ -954,7 +953,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	assert(_variableStorage == nil);
 	_variableStorage = [self newVariableStorage];
     _relationshipsAsCOPathOrETUUID = [self newVariableStorage];
-    _incomingRelationships = [[CORelationshipCache alloc] init];
+    _incomingRelationships = [[CORelationshipCache alloc] initWithOwner: self];
 }
 
 - (void)didLoad

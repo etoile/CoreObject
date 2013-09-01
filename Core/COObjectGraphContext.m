@@ -217,8 +217,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	                   entityDescription: [self descriptionForItem: anItem]];
 
     [obj setStoreItem: anItem];
-	[obj addCachedOutgoingRelationships];
-	
+
 	return obj;
 }
 
@@ -258,7 +257,6 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     else
     {
         [currentObject setStoreItem: item];
-        [currentObject addCachedOutgoingRelationships];
         [_updatedObjects addObject: currentObject];
     }
 }
