@@ -311,14 +311,13 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 /* Helper methods based on the metamodel */
 
-- (NSArray*)allStronglyContainedObjects
-{
-	NSMutableArray *result = [NSMutableArray array];
-	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+static void FindAllStronglyContainedObjects(COObject *anObj, NSMutableSet *dest)
+{    
+	for (ETPropertyDescription *propDesc in [[anObj entityDescription] allPropertyDescriptions])
 	{
 		if ([propDesc isComposite])
 		{
-			id value = [self valueForProperty: [propDesc name]];
+			id value = [anObj valueForProperty: [propDesc name]];
 			
 			assert([propDesc isMultivalued] ==
 				   ([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]));
@@ -329,8 +328,9 @@ objectGraphContext: (COObjectGraphContext *)aContext
 				{
 					if ([subvalue isKindOfClass: [COObject class]])
 					{
-						[result addObject: subvalue];
-						[result addObjectsFromArray: [subvalue allStronglyContainedObjects]];
+                        assert(![dest containsObject: subvalue] && ![anObj isEqual: subvalue]);
+						[dest addObject: subvalue];
+						FindAllStronglyContainedObjects(subvalue, dest);
 					}
 				}
 			}
@@ -338,14 +338,21 @@ objectGraphContext: (COObjectGraphContext *)aContext
 			{
 				if ([value isKindOfClass: [COObject class]])
 				{
-					[result addObject: value];
-					[result addObjectsFromArray: [value allStronglyContainedObjects]];
+                    assert(![dest containsObject: value] && ![anObj isEqual: value]);
+					[dest addObject: value];
+                    FindAllStronglyContainedObjects(value, dest);
 				}
 				// Ignore non-COObject objects
 			}
 		}
 	}
-	return result;
+}
+
+- (NSArray*)allStronglyContainedObjects
+{
+	NSMutableSet *result = [NSMutableSet set];
+    FindAllStronglyContainedObjects(self, result);
+    return [result allObjects];
 }
 
 - (NSArray*)embeddedOrReferencedObjects

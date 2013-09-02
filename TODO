@@ -106,6 +106,7 @@ First Release
     are a mess and need to be rewritten. The variable storage is very
     inefficient (makes mutable copy of collection even when using mutable
     colelction mutation method, so n inserts in O(n^2).), which must be fixed.
+  - Throw an exception if the developer names a property that conflicts with a NSObject/COObject method
 
 - COItem
   - tidy up ugly NSMutableDictionary / NSDictionary casting

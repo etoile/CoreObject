@@ -27,11 +27,11 @@
 
 - (void)windowDidLoad
 {
-	if (!NSIsEmptyRect([doc screenRectValue]))
+	if (!NSIsEmptyRect([doc screenRect]))
 	{
 		// Disable automatic positioning
 		[self setShouldCascadeWindows: NO];
-		[[self window] setFrame: [doc screenRectValue] display: NO];		
+		[[self window] setFrame: [doc screenRect] display: NO];		
 	}
 	
 	
@@ -115,7 +115,7 @@
 
 - (SKTDrawDocument *)drawDocument
 {
-	SKTDrawDocument *drawDoc = [doc rootObject];
+	SKTDrawDocument *drawDoc = [doc rootDocObject];
 	assert([drawDoc isKindOfClass: [SKTDrawDocument class]]);
 	return drawDoc;
 }

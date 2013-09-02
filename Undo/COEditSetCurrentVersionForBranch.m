@@ -8,6 +8,7 @@
 
 #import "COItemGraphDiff.h"
 #import "COObjectGraphContext.h"
+#import "COSQLiteStore.h"
 
 static NSString * const kCOEditBranchUUID = @"COEditBranchUUID";
 static NSString * const kCOEditOldRevisionID = @"COEditOldRevisionID";

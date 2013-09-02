@@ -1,6 +1,7 @@
 #import "TagWindowController.h"
 #import "Tag.h"
 #import "ApplicationDelegate.h"
+#import "Project.h"
 
 @implementation TagWindowController
 

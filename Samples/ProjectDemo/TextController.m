@@ -29,13 +29,13 @@
 {
 	[textView setDelegate: self];
 	
-	NSString *label = [[doc rootObject] label];
+	NSString *label = [[doc rootDocObject] label];
 	[[textView textStorage] setAttributedString: [[[NSAttributedString alloc] initWithString: label] autorelease]];	
 }
 
 - (void)textDidChange:(NSNotification*)notif
 {
-	[[doc rootObject] setLabel: [[textView textStorage] string]];
+	[[doc rootDocObject] setLabel: [[textView textStorage] string]];
     
     // FIXME: Use Metadata
 //	[[doc objectContext] commitWithType:kCOTypeMinorEdit

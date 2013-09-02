@@ -4,18 +4,18 @@
 
 @interface Document : COObject
 
-- (NSRect) screenRectValue;
-- (void) setScreenRectValue:(NSRect)r;
+- (NSRect) screenRect;
+- (void) setScreenRect:(NSRect)r;
 
 - (BOOL) isOpen;
 - (void) setIsOpen:(BOOL)i;
 
 @property (readwrite, nonatomic, retain) NSString *documentType;
-@property (readwrite, nonatomic, retain) COObject *rootObject;
+@property (readwrite, nonatomic, retain) COObject *rootDocObject;
 @property (readwrite, nonatomic, retain) NSString *documentName;
-@property (readwrite, nonatomic, retain) NSSet *tags;
+@property (readwrite, nonatomic, retain) NSSet *docTags;
 
-- (void) addTag: (Tag *)tag;
-- (void) removeTag: (Tag *)tag;
+- (void) addDocTagToDocument: (Tag *)tag;
+- (void) removeDocTagFromDocument: (Tag *)tag;
 
 @end

@@ -23,12 +23,12 @@
                                                                                         type: (id)@"NSString"];
     [documentNameProperty setPersistent: YES];
     
-    ETPropertyDescription *rootObjectProperty = [ETPropertyDescription descriptionWithName: @"rootObject"
+    ETPropertyDescription *rootObjectProperty = [ETPropertyDescription descriptionWithName: @"rootDocObject"
                                                                                       type: (id)@"NSObject"];
     [rootObjectProperty setPersistent: YES];
     [rootObjectProperty setOpposite: (id)@"DocumentItem.document"];
     
-    ETPropertyDescription *tagsProperty = [ETPropertyDescription descriptionWithName: @"tags"
+    ETPropertyDescription *tagsProperty = [ETPropertyDescription descriptionWithName: @"docTags"
                                                                                 type: (id)@"Tag"];
     [tagsProperty setPersistent: YES];
     [tagsProperty setMultivalued: YES];
@@ -41,7 +41,7 @@
 
 - (NSRect) screenRect
 {
-	return [[self valueForProperty:@"screenRect"] rectValue];
+	return [[self primitiveValueForKey:@"screenRect"] rectValue];
 }
 - (void) setScreenRect:(NSRect)r
 {
@@ -52,7 +52,7 @@
 
 - (BOOL) isOpen
 {
-	return [[self valueForProperty: @"isOpen"] boolValue];
+	return [[self primitiveValueForKey: @"isOpen"] boolValue];
 }
 - (void) setIsOpen:(BOOL)i
 {
@@ -62,16 +62,16 @@
 }
 
 @dynamic documentType;
-@dynamic rootObject;
+@dynamic rootDocObject;
 @dynamic documentName;
-@dynamic tags;
+@dynamic docTags;
 
-- (void) addTag: (Tag *)tag
+- (void) addDocTagToDocument: (Tag *)tag
 {
-    [[self mutableSetValueForKey: @"tags"] addObject: tag];
+    [[self mutableSetValueForKey: @"docTags"] addObject: tag];
 }
-- (void) removeTag: (Tag *)tag
+- (void) removeDocTagFromDocument: (Tag *)tag
 {
-    [[self mutableSetValueForKey: @"tags"] removeObject: tag];}
+    [[self mutableSetValueForKey: @"docTags"] removeObject: tag];}
 
 @end

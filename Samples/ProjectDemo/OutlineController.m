@@ -51,7 +51,7 @@
 }
 - (OutlineItem *)rootObject
 {
-	return (OutlineItem *)[[self projectDocument] rootObject];
+	return (OutlineItem *)[[self projectDocument] rootDocObject];
 } 
 - (void) commitWithType: (NSString*)type
        shortDescription: (NSString*)shortDescription
@@ -70,11 +70,11 @@
 	
 	//NSLog(@"Got rect %@ for doc %@", NSStringFromRect([doc screenRectValue]), [doc uuid]);
 	
-	if (!NSIsEmptyRect([doc screenRectValue]))
+	if (!NSIsEmptyRect([doc screenRect]))
 	{
 		// Disable automatic positioning
 		[self setShouldCascadeWindows: NO];
-		[[self window] setFrame: [doc screenRectValue] display: NO];		
+		[[self window] setFrame: [doc screenRect] display: NO];
 	}
 
 	
@@ -119,13 +119,13 @@
 
 - (void)windowFrameDidChange:(NSNotification*)notification
 {
-	[doc setScreenRectValue: [[self window] frame]];
+	[doc setScreenRect: [[self window] frame]];
 	
-	assert([[doc objectGraphContext] objectHasChanges: [doc UUID]]);
+//	assert([[doc objectGraphContext] objectHasChanges: [doc UUID]]);
 	
 	[self commitWithType: @"kCOTypeMinorEdit"
 		shortDescription: @"Move Window"
-		 longDescription: [NSString stringWithFormat: @"Move to %@", NSStringFromRect([doc screenRectValue])]];	
+		 longDescription: [NSString stringWithFormat: @"Move to %@", NSStringFromRect([doc screenRect])]];	
 }
 
 - (void)windowWillClose:(NSNotification *)notification
@@ -528,7 +528,7 @@ static int i = 0;
 	 }*/
 	
 	/*
-	 if (item == [self rootObject])
+	 if (item == [self rootDocObject])
 	 {
 	 NSLog(@"root didchange");
 	 [outlineView reloadData];  

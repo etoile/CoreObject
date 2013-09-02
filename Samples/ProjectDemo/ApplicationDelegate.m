@@ -8,6 +8,7 @@
 #import "HistoryInspectorController.h"
 #import "SharingServer.h"
 #import "SKTDrawDocument.h"
+#import "Project.h"
 #import <CoreObject/CoreObject.h>
 
 #define STORE_URL [NSURL URLWithString: [@"~/ProjectDemoStore" stringByExpandingTildeInPath]]
@@ -84,12 +85,10 @@
 		[[NSUserDefaults standardUserDefaults] setUUID: [proot persistentRootUUID]
 												forKey: @"projectDemoProjectUUID"];
 	}
-	
-	[project setDelegate: self];
-	
+		
 	controllerForDocumentUUID = [[NSMutableDictionary alloc] init];
 	
-	[historyController setContext: context];
+	//[historyController setContext: context];
 	
 	// UI Setup
 	[self addStatusBarButtons];
@@ -120,36 +119,42 @@
 	[super dealloc];
 }
 
-- (void) newDocumentWithType: (NSString*)type rootObject: (COObject*)rootObj
+- (void) newDocumentWithType: (NSString*)type rootObjectEntity: (NSString*)rootObjEntity
 {
-	Document *document = [[[Document alloc] initWithObjectGraphContext: context] autorelease];
-	[document setRootObject: rootObj];
-	[document setDocumentName: [NSString stringWithFormat: @"Document %@", [[document uuid] stringValue]]];
+    COPersistentRoot *persistentRoot = [context insertNewPersistentRootWithEntityName: @"Anonymous.Document"];
+    assert(persistentRoot != nil);
+    
+    COObject *rootObj = [persistentRoot insertObjectWithEntityName: rootObjEntity];
+    
+	Document *document = [persistentRoot rootObject];
+	[document setRootDocObject: rootObj];
+    assert([document rootDocObject] == rootObj);
+	[document setDocumentName: [NSString stringWithFormat: @"Document %@", [[persistentRoot persistentRootUUID] stringValue]]];
 	[document setDocumentType: type];
 	
-	[project addDocument: document];
+	[project addDocument_hack: document];
 	
 	NSLog(@"Added a document model object %@, outline item %@", document, rootObj);
 	NSLog(@"Changed objects %@", [context changedObjects]);
 	[context commit];
 	
 	[newDocumentTypeWindow orderOut: nil];
+    
+    // FIXME: Hack
+    [self projectDocumentsDidChange: project];
 }
 
 - (IBAction) newTextDocument: (id)sender
 {
-	[self newDocumentWithType: @"text"
-				   rootObject: [[[TextItem alloc] initWithObjectGraphContext: context] autorelease]];	
+	[self newDocumentWithType: @"text" rootObjectEntity: @"TextItem"];
 }
 - (IBAction) newOutline: (id)sender
 {
-	[self newDocumentWithType: @"outline"
-				   rootObject: [[[OutlineItem alloc] initWithObjectGraphContext: context] autorelease]];
+	[self newDocumentWithType: @"outline" rootObjectEntity: @"OutlineItem"];
 }
 - (IBAction) newDrawing: (id)sender
 {
-	[self newDocumentWithType: @"drawing"
-				   rootObject: [[[SKTDrawDocument alloc] initWithObjectGraphContext: context] autorelease]];
+	[self newDocumentWithType: @"drawing" rootObjectEntity: @"SKTDrawDocument"];
 }
 
 /* Convenience */
@@ -272,9 +277,9 @@
 	
 	for (Document *doc in [p documents])
 	{
-		[unwantedDocumentUUIDs removeObject: [doc uuid]];
+		[unwantedDocumentUUIDs removeObject: [doc UUID]];
 		
-		OutlineController *controller = [controllerForDocumentUUID objectForKey: [doc uuid]];
+		OutlineController *controller = [controllerForDocumentUUID objectForKey: [doc UUID]];
 		if (controller == nil)
 		{
 			Class cls = [classForType objectForKey: [doc documentType]];
@@ -283,7 +288,7 @@
 			// Create a new document controller
 			controller = [[[cls alloc] initWithDocument: doc] autorelease];
 			[controller showWindow: nil];
-			[controllerForDocumentUUID setObject: controller forKey: [doc uuid]];
+			[controllerForDocumentUUID setObject: controller forKey: [doc UUID]];
 			// Observe key document changes
 			[[NSNotificationCenter defaultCenter] addObserver: self
 													 selector: @selector(keyDocumentChanged:)

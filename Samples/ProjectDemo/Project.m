@@ -23,14 +23,14 @@
 @dynamic documents;
 @dynamic tags;
 
-- (void) addDocument: (Document *)document
+- (void) addDocument_hack: (Document *)document
 {
-    [[self mutableSetValueForKey: @"document"] addObject: document];
+    [[self mutableSetValueForKey: @"documents"] addObject: document];
 }
 
 - (void) removeDocument: (Document *)document
 {
-    [[self mutableSetValueForKey: @"document"] removeObject: document];
+    [[self mutableSetValueForKey: @"documents"] removeObject: document];
 }
 
 - (void) addTag: (Tag *)tag
