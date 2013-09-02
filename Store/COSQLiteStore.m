@@ -559,7 +559,10 @@
 
 - (COPersistentRootInfo *) persistentRootInfoForUUID: (ETUUID *)aUUID
 {
-    NILARG_EXCEPTION_TEST(aUUID);
+    if (aUUID == nil)
+    {
+        return nil;
+    }
     
     ETUUID *currBranch = nil;
     ETUUID *backingUUID = nil;

@@ -173,7 +173,7 @@
 
 - (void) testRequestNilPersistentRoot
 {
-    UKRaisesException([ctx persistentRootForUUID: nil]);
+    UKNil([ctx persistentRootForUUID: nil]);
 }
 
 @end

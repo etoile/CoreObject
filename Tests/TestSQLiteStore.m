@@ -822,7 +822,7 @@ static ETUUID *childUUID2;
 
 - (void) testPersistentRootInfoForUUID
 {
-    UKRaisesException([store persistentRootInfoForUUID: nil]);
+    UKNil([store persistentRootInfoForUUID: nil]);
 }
 
 @end
