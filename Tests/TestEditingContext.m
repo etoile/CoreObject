@@ -171,4 +171,9 @@
     
 }
 
+- (void) testRequestNilPersistentRoot
+{
+    UKRaisesException([ctx persistentRootForUUID: nil]);
+}
+
 @end

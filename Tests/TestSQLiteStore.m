@@ -820,4 +820,9 @@ static ETUUID *childUUID2;
     UKObjectsEqual([self initialMetadata], [[store revisionInfoForRevisionID: initialRevisionId] metadata]);
 }
 
+- (void) testPersistentRootInfoForUUID
+{
+    UKRaisesException([store persistentRootInfoForUUID: nil]);
+}
+
 @end

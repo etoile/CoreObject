@@ -163,6 +163,8 @@
 
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
 {
+    NSParameterAssert(persistentRootUUID != nil);
+    
 	COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: persistentRootUUID];
 	
 	if (persistentRoot != nil)
