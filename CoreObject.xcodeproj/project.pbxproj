@@ -1187,9 +1187,9 @@
 			productReference = 66C3669A17B426BF009ACF2F /* Typewriter.app */;
 			productType = "com.apple.product-type.application";
 		};
-		791B4E2C1299C79300CCF472 /* Test */ = {
+		791B4E2C1299C79300CCF472 /* TestCoreObject */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 791B4E311299C7C100CCF472 /* Build configuration list for PBXNativeTarget "Test" */;
+			buildConfigurationList = 791B4E311299C7C100CCF472 /* Build configuration list for PBXNativeTarget "TestCoreObject" */;
 			buildPhases = (
 				791B4E2A1299C79300CCF472 /* Sources */,
 				791B4E2B1299C79300CCF472 /* Frameworks */,
@@ -1201,7 +1201,7 @@
 				3D01D0521646BE2900917AC8 /* PBXTargetDependency */,
 				791B4E4B1299C81F00CCF472 /* PBXTargetDependency */,
 			);
-			name = Test;
+			name = TestCoreObject;
 			productName = Test;
 			productReference = 791B4E2D1299C79300CCF472 /* Test */;
 			productType = "com.apple.product-type.tool";
@@ -1241,7 +1241,7 @@
 			projectRoot = "";
 			targets = (
 				6686BDAB12592BDA0065DE1A /* CoreObject */,
-				791B4E2C1299C79300CCF472 /* Test */,
+				791B4E2C1299C79300CCF472 /* TestCoreObject */,
 				60C913B2165BBED000E0C5F4 /* BasicPersistence */,
 				66C3669917B426BF009ACF2F /* Typewriter */,
 			);
@@ -1743,7 +1743,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		791B4E311299C7C100CCF472 /* Build configuration list for PBXNativeTarget "Test" */ = {
+		791B4E311299C7C100CCF472 /* Build configuration list for PBXNativeTarget "TestCoreObject" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				791B4E2F1299C79300CCF472 /* Debug */,
