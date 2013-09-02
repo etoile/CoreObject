@@ -1,4 +1,5 @@
 #import "COUndoStackStore.h"
+#import "COUndoStack.h"
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
@@ -6,6 +7,11 @@
 NSString * const kCOUndoStack = @"undo";
 NSString * const kCORedoStack = @"redo";
 
+@interface COUndoStack ()
+
+- (id) initWithStore: (COUndoStackStore *)aStore name: (NSString *)aName;
+
+@end
 
 @implementation COUndoStackStore
 
@@ -17,6 +23,11 @@ NSString * const kCORedoStack = @"redo";
         store = [[COUndoStackStore alloc] init];
     }
     return store;
+}
+
+- (COUndoStack *) stackForName: (NSString *)aName
+{
+    return [[[COUndoStack alloc] initWithStore: self name: aName] autorelease];
 }
 
 - (id) init

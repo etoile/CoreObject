@@ -288,4 +288,30 @@
     }
 }
 
+- (void) testStackAPI
+{
+    COUndoStack *testStack = [[COUndoStackStore defaultStore] stackForName: @"test"];
+    UKObjectsEqual(@[], [testStack undoNodes]);
+    UKObjectsEqual(@[], [testStack redoNodes]);
+    UKFalse([testStack canRedoWithEditingContext: ctx]);
+    UKFalse([testStack canUndoWithEditingContext: ctx]);
+    
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx commitWithUndoStack: testStack];
+    
+    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
+    [ctx commitWithUndoStack: testStack];
+    
+    UKIntsEqual(2, [[testStack undoNodes] count]);
+    UKObjectsEqual(@[], [testStack redoNodes]);
+    UKFalse([testStack canRedoWithEditingContext: ctx]);
+    UKTrue([testStack canUndoWithEditingContext: ctx]);
+    
+    UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: kCOLabel]);
+    
+    [testStack undoWithEditingContext: ctx];
+    
+    UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
+}
+
 @end

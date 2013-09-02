@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-@class COUndoStackStore;
+@class COUndoStackStore, COEditingContext;
 
 @interface COUndoStack : NSObject
 {
@@ -14,8 +14,10 @@
 @property (readonly, nonatomic) NSArray *undoNodes;
 @property (readonly, nonatomic) NSArray *redoNodes;
 
-/** @taskunit Framework Private */
+- (BOOL) canUndoWithEditingContext: (COEditingContext *)aContext;
+- (BOOL) canRedoWithEditingContext: (COEditingContext *)aContext;
 
-- (id) initWithStore: (COUndoStackStore *)aStore name: (NSString *)aName;
+- (void) undoWithEditingContext: (COEditingContext *)aContext;
+- (void) redoWithEditingContext: (COEditingContext *)aContext;
 
 @end

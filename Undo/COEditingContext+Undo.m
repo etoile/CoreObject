@@ -3,6 +3,7 @@
 #import "COBranch.h"
 #import "CORevision.h"
 #import "COUndoStackStore.h"
+#import "COUndoStack.h"
 #import "COCommand.h"
 #import "COCommandGroup.h"
 #import <EtoileFoundation/Macros.h>
@@ -103,6 +104,11 @@
     self.undoStackName = aName;
     [self commit];
     return YES;
+}
+
+- (void) commitWithUndoStack: (COUndoStack *)aStack
+{
+    [self commitWithStackNamed: aStack.name];
 }
 
 // Methods called during commit

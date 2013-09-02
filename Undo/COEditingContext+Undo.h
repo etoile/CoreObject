@@ -1,5 +1,7 @@
 #import <CoreObject/COEditingContext.h>
 
+@class COUndoStack;
+
 /**
  * Goals for the app level undo system:
  *
@@ -43,6 +45,10 @@
 @interface COEditingContext (Undo)
 
 /** @taskunit App-level undo/redo */
+
+- (void) commitWithUndoStack: (COUndoStack *)aStack;
+
+/** @taskunit Deprecated */
 
 - (BOOL) canUndoForStackNamed: (NSString *)aName;
 - (BOOL) canRedoForStackNamed: (NSString *)aName;

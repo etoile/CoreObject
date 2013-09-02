@@ -63,6 +63,7 @@
 
 /* Undo */
 
+#import <CoreObject/COUndoStack.h>
 #import <CoreObject/COEditingContext+Undo.h>
 
 /* Utilities */
