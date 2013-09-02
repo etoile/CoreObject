@@ -325,11 +325,12 @@
 {
     COItemGraph *result = [self partialItemGraphFromRevid: -1 toRevid: revid restrictToItemUUIDs: nil];
 
-    // TODO: For debugging only, remove
+#ifdef DEBUG
     if (result != nil)
     {
         COValidateItemGraph(result);
     }
+#endif
     
     return result;
 }
@@ -413,8 +414,9 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
                     modifiedItems: (NSArray*)modifiedItems
                             error: (NSError **)error
 {
-    // TODO: For debugging only, remove
+#ifdef DEBUG
     COValidateItemGraph(anItemTree);
+#endif
     
     NSParameterAssert(aParent >= -1);
     NSParameterAssert(aMergeParent >= -1);

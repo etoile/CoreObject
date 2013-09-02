@@ -11,9 +11,6 @@
 
 @implementation TestSQLiteStorePerformance
 
-#define TEST_PERFORMANCE 1
-#if TEST_PERFORMANCE
-
 // --------------------------------------------
 // Test case setup
 // --------------------------------------------
@@ -380,7 +377,5 @@ static int itemChangedAtCommit(int i)
     NSLog(@"reading %d item itemtree took %lf ms", (int)[[readBack itemUUIDs] count],
           1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
-
-#endif
 
 @end
