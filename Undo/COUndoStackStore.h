@@ -8,7 +8,7 @@ extern NSString * const kCORedoStack;
 
 /**
  * Simple persistent store of named pairs of stacks of NSDictionary (undo and redo stacks).
- * The NSDictionary's are property list representations of COEdit objects
+ * The NSDictionary's are property list representations of COCommand objects
  */
 @interface COUndoStackStore : NSObject
 {

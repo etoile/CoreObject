@@ -57,27 +57,27 @@
 		66094848178794D40049468B /* COItem+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 66094846178794D40049468B /* COItem+JSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6609485E1787A1160049468B /* CORelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6609485C1787A1160049468B /* CORelationshipCache.m */; };
 		6609485F1787A1160049468B /* CORelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 6609485D1787A1160049468B /* CORelationshipCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		662FFB7F17C2026000BA3F2F /* COEditUndeletePersistentRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB7D17C2026000BA3F2F /* COEditUndeletePersistentRoot.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		662FFB8017C2026000BA3F2F /* COEditUndeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 662FFB7E17C2026000BA3F2F /* COEditUndeletePersistentRoot.m */; };
-		662FFB9E17C2DE8100BA3F2F /* COEditUndeleteBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB9C17C2DE8100BA3F2F /* COEditUndeleteBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		662FFB9F17C2DE8100BA3F2F /* COEditUndeleteBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 662FFB9D17C2DE8100BA3F2F /* COEditUndeleteBranch.m */; };
-		663CE29517C07ED800E729F5 /* COEdit.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28717C07ED800E729F5 /* COEdit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		663CE29617C07ED800E729F5 /* COEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE28817C07ED800E729F5 /* COEdit.m */; };
-		663CE29917C07ED800E729F5 /* COEditDeleteBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28B17C07ED800E729F5 /* COEditDeleteBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		663CE29A17C07ED800E729F5 /* COEditDeleteBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE28C17C07ED800E729F5 /* COEditDeleteBranch.m */; };
-		663CE29B17C07ED800E729F5 /* COEditSetBranchMetadata.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28D17C07ED800E729F5 /* COEditSetBranchMetadata.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		663CE29C17C07ED800E729F5 /* COEditSetBranchMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE28E17C07ED800E729F5 /* COEditSetBranchMetadata.m */; };
-		663CE29D17C07ED800E729F5 /* COEditSetCurrentBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28F17C07ED800E729F5 /* COEditSetCurrentBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		663CE29E17C07ED800E729F5 /* COEditSetCurrentBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE29017C07ED800E729F5 /* COEditSetCurrentBranch.m */; };
-		663CE29F17C07ED800E729F5 /* COEditSetCurrentVersionForBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE29117C07ED800E729F5 /* COEditSetCurrentVersionForBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		663CE2A017C07ED800E729F5 /* COEditSetCurrentVersionForBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE29217C07ED800E729F5 /* COEditSetCurrentVersionForBranch.m */; };
+		662FFB7F17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB7D17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		662FFB8017C2026000BA3F2F /* COCommandUndeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */; };
+		662FFB9E17C2DE8100BA3F2F /* COCommandUndeleteBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		662FFB9F17C2DE8100BA3F2F /* COCommandUndeleteBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 662FFB9D17C2DE8100BA3F2F /* COCommandUndeleteBranch.m */; };
+		663CE29517C07ED800E729F5 /* COCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28717C07ED800E729F5 /* COCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		663CE29617C07ED800E729F5 /* COCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE28817C07ED800E729F5 /* COCommand.m */; };
+		663CE29917C07ED800E729F5 /* COCommandDeleteBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28B17C07ED800E729F5 /* COCommandDeleteBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		663CE29A17C07ED800E729F5 /* COCommandDeleteBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE28C17C07ED800E729F5 /* COCommandDeleteBranch.m */; };
+		663CE29B17C07ED800E729F5 /* COCommandSetBranchMetadata.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28D17C07ED800E729F5 /* COCommandSetBranchMetadata.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		663CE29C17C07ED800E729F5 /* COCommandSetBranchMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE28E17C07ED800E729F5 /* COCommandSetBranchMetadata.m */; };
+		663CE29D17C07ED800E729F5 /* COCommandSetCurrentBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28F17C07ED800E729F5 /* COCommandSetCurrentBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		663CE29E17C07ED800E729F5 /* COCommandSetCurrentBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE29017C07ED800E729F5 /* COCommandSetCurrentBranch.m */; };
+		663CE29F17C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE29117C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		663CE2A017C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE29217C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.m */; };
 		663CE2A117C07ED800E729F5 /* COUndoStackStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE29317C07ED800E729F5 /* COUndoStackStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		663CE2A217C07ED800E729F5 /* COUndoStackStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE29417C07ED800E729F5 /* COUndoStackStore.m */; };
 		663CE2B617C0B05900E729F5 /* COEditingContext+Undo.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE2B417C0B05800E729F5 /* COEditingContext+Undo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		663CE2B717C0B05900E729F5 /* COEditingContext+Undo.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2B517C0B05800E729F5 /* COEditingContext+Undo.m */; };
-		663CE2BC17C15A4800E729F5 /* COEditGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE2BA17C15A4800E729F5 /* COEditGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		663CE2BD17C15A4800E729F5 /* COEditGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2BB17C15A4800E729F5 /* COEditGroup.m */; };
-		663CE2BF17C1815B00E729F5 /* COEditDeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2B217C09DE700E729F5 /* COEditDeletePersistentRoot.m */; };
+		663CE2BC17C15A4800E729F5 /* COCommandGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE2BA17C15A4800E729F5 /* COCommandGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		663CE2BD17C15A4800E729F5 /* COCommandGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2BB17C15A4800E729F5 /* COCommandGroup.m */; };
+		663CE2BF17C1815B00E729F5 /* COCommandDeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2B217C09DE700E729F5 /* COCommandDeletePersistentRoot.m */; };
 		663CE2CD17C1837700E729F5 /* TestUndoStackStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2CC17C1837700E729F5 /* TestUndoStackStore.m */; };
 		6646974A17CDA78300A1B767 /* COEditingContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646974917CDA78300A1B767 /* COEditingContext+Private.h */; };
 		6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646975317CDA8DB00A1B767 /* COPersistentRoot+Private.h */; };
@@ -393,28 +393,28 @@
 		66094846178794D40049468B /* COItem+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "COItem+JSON.h"; sourceTree = "<group>"; };
 		6609485C1787A1160049468B /* CORelationshipCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CORelationshipCache.m; path = Core/CORelationshipCache.m; sourceTree = "<group>"; };
 		6609485D1787A1160049468B /* CORelationshipCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CORelationshipCache.h; path = Core/CORelationshipCache.h; sourceTree = "<group>"; };
-		662FFB7D17C2026000BA3F2F /* COEditUndeletePersistentRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEditUndeletePersistentRoot.h; sourceTree = "<group>"; };
-		662FFB7E17C2026000BA3F2F /* COEditUndeletePersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEditUndeletePersistentRoot.m; sourceTree = "<group>"; };
-		662FFB9C17C2DE8100BA3F2F /* COEditUndeleteBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEditUndeleteBranch.h; sourceTree = "<group>"; };
-		662FFB9D17C2DE8100BA3F2F /* COEditUndeleteBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEditUndeleteBranch.m; sourceTree = "<group>"; };
-		663CE28717C07ED800E729F5 /* COEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEdit.h; sourceTree = "<group>"; };
-		663CE28817C07ED800E729F5 /* COEdit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEdit.m; sourceTree = "<group>"; };
-		663CE28B17C07ED800E729F5 /* COEditDeleteBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEditDeleteBranch.h; sourceTree = "<group>"; };
-		663CE28C17C07ED800E729F5 /* COEditDeleteBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEditDeleteBranch.m; sourceTree = "<group>"; };
-		663CE28D17C07ED800E729F5 /* COEditSetBranchMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEditSetBranchMetadata.h; sourceTree = "<group>"; };
-		663CE28E17C07ED800E729F5 /* COEditSetBranchMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEditSetBranchMetadata.m; sourceTree = "<group>"; };
-		663CE28F17C07ED800E729F5 /* COEditSetCurrentBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEditSetCurrentBranch.h; sourceTree = "<group>"; };
-		663CE29017C07ED800E729F5 /* COEditSetCurrentBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEditSetCurrentBranch.m; sourceTree = "<group>"; };
-		663CE29117C07ED800E729F5 /* COEditSetCurrentVersionForBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEditSetCurrentVersionForBranch.h; sourceTree = "<group>"; };
-		663CE29217C07ED800E729F5 /* COEditSetCurrentVersionForBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEditSetCurrentVersionForBranch.m; sourceTree = "<group>"; };
-		663CE29317C07ED800E729F5 /* COUndoStackStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COUndoStackStore.h; sourceTree = "<group>"; };
+		662FFB7D17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandUndeletePersistentRoot.h; sourceTree = "<group>"; };
+		662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommandUndeletePersistentRoot.m; sourceTree = "<group>"; };
+		662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandUndeleteBranch.h; sourceTree = "<group>"; };
+		662FFB9D17C2DE8100BA3F2F /* COCommandUndeleteBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = COCommandUndeleteBranch.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		663CE28717C07ED800E729F5 /* COCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommand.h; sourceTree = "<group>"; };
+		663CE28817C07ED800E729F5 /* COCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = COCommand.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		663CE28B17C07ED800E729F5 /* COCommandDeleteBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandDeleteBranch.h; sourceTree = "<group>"; };
+		663CE28C17C07ED800E729F5 /* COCommandDeleteBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = COCommandDeleteBranch.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		663CE28D17C07ED800E729F5 /* COCommandSetBranchMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandSetBranchMetadata.h; sourceTree = "<group>"; };
+		663CE28E17C07ED800E729F5 /* COCommandSetBranchMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = COCommandSetBranchMetadata.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		663CE28F17C07ED800E729F5 /* COCommandSetCurrentBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandSetCurrentBranch.h; sourceTree = "<group>"; };
+		663CE29017C07ED800E729F5 /* COCommandSetCurrentBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = COCommandSetCurrentBranch.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		663CE29117C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandSetCurrentVersionForBranch.h; sourceTree = "<group>"; };
+		663CE29217C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = COCommandSetCurrentVersionForBranch.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		663CE29317C07ED800E729F5 /* COUndoStackStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = COUndoStackStore.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		663CE29417C07ED800E729F5 /* COUndoStackStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COUndoStackStore.m; sourceTree = "<group>"; };
-		663CE2B117C09DE700E729F5 /* COEditDeletePersistentRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEditDeletePersistentRoot.h; sourceTree = "<group>"; };
-		663CE2B217C09DE700E729F5 /* COEditDeletePersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEditDeletePersistentRoot.m; sourceTree = "<group>"; };
-		663CE2B417C0B05800E729F5 /* COEditingContext+Undo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "COEditingContext+Undo.h"; sourceTree = "<group>"; };
-		663CE2B517C0B05800E729F5 /* COEditingContext+Undo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "COEditingContext+Undo.m"; sourceTree = "<group>"; };
-		663CE2BA17C15A4800E729F5 /* COEditGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEditGroup.h; sourceTree = "<group>"; };
-		663CE2BB17C15A4800E729F5 /* COEditGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEditGroup.m; sourceTree = "<group>"; };
+		663CE2B117C09DE700E729F5 /* COCommandDeletePersistentRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandDeletePersistentRoot.h; sourceTree = "<group>"; };
+		663CE2B217C09DE700E729F5 /* COCommandDeletePersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommandDeletePersistentRoot.m; sourceTree = "<group>"; };
+		663CE2B417C0B05800E729F5 /* COEditingContext+Undo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "COEditingContext+Undo.h"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		663CE2B517C0B05800E729F5 /* COEditingContext+Undo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "COEditingContext+Undo.m"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		663CE2BA17C15A4800E729F5 /* COCommandGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandGroup.h; sourceTree = "<group>"; };
+		663CE2BB17C15A4800E729F5 /* COCommandGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = COCommandGroup.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		663CE2CC17C1837700E729F5 /* TestUndoStackStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUndoStackStore.m; path = Tests/TestUndoStackStore.m; sourceTree = "<group>"; };
 		664199A4178C3E1800B78174 /* TestItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestItem.m; path = Tests/TestItem.m; sourceTree = "<group>"; };
 		664199A5178C3E1800B78174 /* TestBinaryReadWrite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBinaryReadWrite.m; path = Tests/TestBinaryReadWrite.m; sourceTree = "<group>"; };
@@ -462,11 +462,11 @@
 		6680846B178CD526003A3CC6 /* COCopier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCopier.h; path = Core/COCopier.h; sourceTree = "<group>"; };
 		6680846C178CD526003A3CC6 /* COCopier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCopier.m; path = Core/COCopier.m; sourceTree = "<group>"; };
 		6680847F178DAFE3003A3CC6 /* COArrayDiff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COArrayDiff.h; path = Diff/COArrayDiff.h; sourceTree = "<group>"; };
-		66808480178DAFE3003A3CC6 /* COArrayDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COArrayDiff.m; path = Diff/COArrayDiff.m; sourceTree = "<group>"; };
-		66808481178DAFE3003A3CC6 /* COItemGraphDiff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COItemGraphDiff.h; path = Diff/COItemGraphDiff.h; sourceTree = "<group>"; };
-		66808482178DAFE3003A3CC6 /* COItemGraphDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COItemGraphDiff.m; path = Diff/COItemGraphDiff.m; sourceTree = "<group>"; };
-		66808483178DAFE3003A3CC6 /* COSequenceMerge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSequenceMerge.h; path = Diff/COSequenceMerge.h; sourceTree = "<group>"; };
-		66808484178DAFE3003A3CC6 /* COSequenceMerge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSequenceMerge.m; path = Diff/COSequenceMerge.m; sourceTree = "<group>"; };
+		66808480178DAFE3003A3CC6 /* COArrayDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COArrayDiff.m; path = Diff/COArrayDiff.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		66808481178DAFE3003A3CC6 /* COItemGraphDiff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = COItemGraphDiff.h; path = Diff/COItemGraphDiff.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		66808482178DAFE3003A3CC6 /* COItemGraphDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COItemGraphDiff.m; path = Diff/COItemGraphDiff.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		66808483178DAFE3003A3CC6 /* COSequenceMerge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = COSequenceMerge.h; path = Diff/COSequenceMerge.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		66808484178DAFE3003A3CC6 /* COSequenceMerge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COSequenceMerge.m; path = Diff/COSequenceMerge.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		66808485178DAFE3003A3CC6 /* COItemGraphEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COItemGraphEdit.h; path = Diff/COItemGraphEdit.h; sourceTree = "<group>"; };
 		66808486178DAFE3003A3CC6 /* COItemGraphEdit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COItemGraphEdit.m; path = Diff/COItemGraphEdit.m; sourceTree = "<group>"; };
 		66808487178DAFE3003A3CC6 /* diff.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = diff.cc; path = Diff/diff.cc; sourceTree = "<group>"; };
@@ -753,24 +753,24 @@
 		6646976D17CDB94900A1B767 /* Undo actions */ = {
 			isa = PBXGroup;
 			children = (
-				663CE28717C07ED800E729F5 /* COEdit.h */,
-				663CE28817C07ED800E729F5 /* COEdit.m */,
-				663CE2BA17C15A4800E729F5 /* COEditGroup.h */,
-				663CE2BB17C15A4800E729F5 /* COEditGroup.m */,
-				663CE28B17C07ED800E729F5 /* COEditDeleteBranch.h */,
-				663CE28C17C07ED800E729F5 /* COEditDeleteBranch.m */,
-				662FFB9C17C2DE8100BA3F2F /* COEditUndeleteBranch.h */,
-				662FFB9D17C2DE8100BA3F2F /* COEditUndeleteBranch.m */,
-				663CE28D17C07ED800E729F5 /* COEditSetBranchMetadata.h */,
-				663CE28E17C07ED800E729F5 /* COEditSetBranchMetadata.m */,
-				663CE28F17C07ED800E729F5 /* COEditSetCurrentBranch.h */,
-				663CE29017C07ED800E729F5 /* COEditSetCurrentBranch.m */,
-				663CE29117C07ED800E729F5 /* COEditSetCurrentVersionForBranch.h */,
-				663CE29217C07ED800E729F5 /* COEditSetCurrentVersionForBranch.m */,
-				663CE2B117C09DE700E729F5 /* COEditDeletePersistentRoot.h */,
-				663CE2B217C09DE700E729F5 /* COEditDeletePersistentRoot.m */,
-				662FFB7D17C2026000BA3F2F /* COEditUndeletePersistentRoot.h */,
-				662FFB7E17C2026000BA3F2F /* COEditUndeletePersistentRoot.m */,
+				663CE28717C07ED800E729F5 /* COCommand.h */,
+				663CE28817C07ED800E729F5 /* COCommand.m */,
+				663CE2BA17C15A4800E729F5 /* COCommandGroup.h */,
+				663CE2BB17C15A4800E729F5 /* COCommandGroup.m */,
+				663CE28B17C07ED800E729F5 /* COCommandDeleteBranch.h */,
+				663CE28C17C07ED800E729F5 /* COCommandDeleteBranch.m */,
+				662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */,
+				662FFB9D17C2DE8100BA3F2F /* COCommandUndeleteBranch.m */,
+				663CE28D17C07ED800E729F5 /* COCommandSetBranchMetadata.h */,
+				663CE28E17C07ED800E729F5 /* COCommandSetBranchMetadata.m */,
+				663CE28F17C07ED800E729F5 /* COCommandSetCurrentBranch.h */,
+				663CE29017C07ED800E729F5 /* COCommandSetCurrentBranch.m */,
+				663CE29117C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.h */,
+				663CE29217C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.m */,
+				663CE2B117C09DE700E729F5 /* COCommandDeletePersistentRoot.h */,
+				663CE2B217C09DE700E729F5 /* COCommandDeletePersistentRoot.m */,
+				662FFB7D17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h */,
+				662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */,
 			);
 			name = "Undo actions";
 			sourceTree = "<group>";
@@ -1165,16 +1165,16 @@
 				66808494178DAFE3003A3CC6 /* diff.hh in Headers */,
 				668084ED1791FBA2003A3CC6 /* COObject+RelationshipCache.h in Headers */,
 				66FB156017A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.h in Headers */,
-				663CE29517C07ED800E729F5 /* COEdit.h in Headers */,
-				663CE29917C07ED800E729F5 /* COEditDeleteBranch.h in Headers */,
-				663CE29B17C07ED800E729F5 /* COEditSetBranchMetadata.h in Headers */,
-				663CE29D17C07ED800E729F5 /* COEditSetCurrentBranch.h in Headers */,
-				663CE29F17C07ED800E729F5 /* COEditSetCurrentVersionForBranch.h in Headers */,
+				663CE29517C07ED800E729F5 /* COCommand.h in Headers */,
+				663CE29917C07ED800E729F5 /* COCommandDeleteBranch.h in Headers */,
+				663CE29B17C07ED800E729F5 /* COCommandSetBranchMetadata.h in Headers */,
+				663CE29D17C07ED800E729F5 /* COCommandSetCurrentBranch.h in Headers */,
+				663CE29F17C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.h in Headers */,
 				663CE2A117C07ED800E729F5 /* COUndoStackStore.h in Headers */,
 				663CE2B617C0B05900E729F5 /* COEditingContext+Undo.h in Headers */,
-				663CE2BC17C15A4800E729F5 /* COEditGroup.h in Headers */,
-				662FFB7F17C2026000BA3F2F /* COEditUndeletePersistentRoot.h in Headers */,
-				662FFB9E17C2DE8100BA3F2F /* COEditUndeleteBranch.h in Headers */,
+				663CE2BC17C15A4800E729F5 /* COCommandGroup.h in Headers */,
+				662FFB7F17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h in Headers */,
+				662FFB9E17C2DE8100BA3F2F /* COCommandUndeleteBranch.h in Headers */,
 				66808490178DAFE3003A3CC6 /* COItemGraphEdit.h in Headers */,
 				669724D517D4610E0090B31A /* COSetAttribute.h in Headers */,
 				669724D917D4614F0090B31A /* CODeleteAttribute.h in Headers */,
@@ -1414,7 +1414,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				663CE2BF17C1815B00E729F5 /* COEditDeletePersistentRoot.m in Sources */,
+				663CE2BF17C1815B00E729F5 /* COCommandDeletePersistentRoot.m in Sources */,
 				791B4E721299C90900CCF472 /* FMDatabase.m in Sources */,
 				791B4E741299C90900CCF472 /* FMDatabaseAdditions.m in Sources */,
 				791B4E761299C90900CCF472 /* FMResultSet.m in Sources */,
@@ -1462,16 +1462,16 @@
 				66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */,
 				66C3670C17B5F9B0009ACF2F /* COBranchInfo.m in Sources */,
 				66C3671017B5FA0E009ACF2F /* COPersistentRootInfo.m in Sources */,
-				663CE29617C07ED800E729F5 /* COEdit.m in Sources */,
-				663CE29A17C07ED800E729F5 /* COEditDeleteBranch.m in Sources */,
-				663CE29C17C07ED800E729F5 /* COEditSetBranchMetadata.m in Sources */,
-				663CE29E17C07ED800E729F5 /* COEditSetCurrentBranch.m in Sources */,
-				663CE2A017C07ED800E729F5 /* COEditSetCurrentVersionForBranch.m in Sources */,
+				663CE29617C07ED800E729F5 /* COCommand.m in Sources */,
+				663CE29A17C07ED800E729F5 /* COCommandDeleteBranch.m in Sources */,
+				663CE29C17C07ED800E729F5 /* COCommandSetBranchMetadata.m in Sources */,
+				663CE29E17C07ED800E729F5 /* COCommandSetCurrentBranch.m in Sources */,
+				663CE2A017C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.m in Sources */,
 				663CE2A217C07ED800E729F5 /* COUndoStackStore.m in Sources */,
 				663CE2B717C0B05900E729F5 /* COEditingContext+Undo.m in Sources */,
-				663CE2BD17C15A4800E729F5 /* COEditGroup.m in Sources */,
-				662FFB8017C2026000BA3F2F /* COEditUndeletePersistentRoot.m in Sources */,
-				662FFB9F17C2DE8100BA3F2F /* COEditUndeleteBranch.m in Sources */,
+				663CE2BD17C15A4800E729F5 /* COCommandGroup.m in Sources */,
+				662FFB8017C2026000BA3F2F /* COCommandUndeletePersistentRoot.m in Sources */,
+				662FFB9F17C2DE8100BA3F2F /* COCommandUndeleteBranch.m in Sources */,
 				6646976417CDB94300A1B767 /* COUndoStack.m in Sources */,
 				6646977C17CE7CAC00A1B767 /* COSynchronizationClient.m in Sources */,
 				6646978017CE7E2600A1B767 /* COSynchronizationServer.m in Sources */,

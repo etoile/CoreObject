@@ -1,4 +1,4 @@
-#import "COEditSetCurrentBranch.h"
+#import "COCommandSetCurrentBranch.h"
 
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
@@ -6,10 +6,10 @@
 
 #import <EtoileFoundation/Macros.h>
 
-static NSString * const kCOEditOldBranchUUID = @"COEditOldBranchUUID";
-static NSString * const kCOEditNewBranchUUID = @"COEditNewBranchUUID";
+static NSString * const kCOCommandOldBranchUUID = @"COCommandOldBranchUUID";
+static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
 
-@implementation COEditSetCurrentBranch
+@implementation COCommandSetCurrentBranch
 
 @synthesize oldBranchUUID = _oldBranchUUID;
 @synthesize branchUUID = _newBranchUUID;
@@ -17,22 +17,22 @@ static NSString * const kCOEditNewBranchUUID = @"COEditNewBranchUUID";
 - (id) initWithPlist: (id)plist
 {
     self = [super initWithPlist: plist];
-    self.oldBranchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditOldBranchUUID]];
-    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditNewBranchUUID]];
+    self.oldBranchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandOldBranchUUID]];
+    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandNewBranchUUID]];
     return self;
 }
 
 - (id) plist
 {
     NSMutableDictionary *result = [super plist];
-    [result setObject: [_oldBranchUUID stringValue] forKey: kCOEditOldBranchUUID];
-    [result setObject: [_newBranchUUID stringValue] forKey: kCOEditNewBranchUUID];
+    [result setObject: [_oldBranchUUID stringValue] forKey: kCOCommandOldBranchUUID];
+    [result setObject: [_newBranchUUID stringValue] forKey: kCOCommandNewBranchUUID];
     return result;
 }
 
-- (COEdit *) inverse
+- (COCommand *) inverse
 {
-    COEditSetCurrentBranch *inverse = [[[COEditSetCurrentBranch alloc] init] autorelease];
+    COCommandSetCurrentBranch *inverse = [[[COCommandSetCurrentBranch alloc] init] autorelease];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;

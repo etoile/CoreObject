@@ -1,14 +1,14 @@
-#import "COEditSetBranchMetadata.h"
+#import "COCommandSetBranchMetadata.h"
 
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
 
-static NSString * const kCOEditBranchUUID = @"COEditBranchUUID";
-static NSString * const kCOEditOldMetadata = @"COEditOldMetadata";
-static NSString * const kCOEditNewMetadata = @"COEditNewMetadata";
+static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
+static NSString * const kCOCommandOldMetadata = @"COCommandOldMetadata";
+static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 
-@implementation COEditSetBranchMetadata 
+@implementation COCommandSetBranchMetadata 
 
 @synthesize branchUUID = _branchUUID;
 @synthesize oldMetadata = _oldMetadata;
@@ -17,30 +17,30 @@ static NSString * const kCOEditNewMetadata = @"COEditNewMetadata";
 - (id) initWithPlist: (id)plist
 {
     self = [super initWithPlist: plist];
-    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditBranchUUID]];
-    self.oldMetadata = [plist objectForKey: kCOEditOldMetadata];
-    self.metadata = [plist objectForKey: kCOEditNewMetadata];
+    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandBranchUUID]];
+    self.oldMetadata = [plist objectForKey: kCOCommandOldMetadata];
+    self.metadata = [plist objectForKey: kCOCommandNewMetadata];
     return self;
 }
 
 - (id) plist
 {
     NSMutableDictionary *result = [super plist];
-    [result setObject: [_branchUUID stringValue] forKey: kCOEditBranchUUID];
+    [result setObject: [_branchUUID stringValue] forKey: kCOCommandBranchUUID];
     if (_oldMetadata != nil)
     {
-        [result setObject: _oldMetadata forKey: kCOEditOldMetadata];
+        [result setObject: _oldMetadata forKey: kCOCommandOldMetadata];
     }
     if (_newMetadata != nil)
     {
-        [result setObject: _newMetadata forKey: kCOEditNewMetadata];
+        [result setObject: _newMetadata forKey: kCOCommandNewMetadata];
     }
     return result;
 }
 
-- (COEdit *) inverse
+- (COCommand *) inverse
 {
-    COEditSetBranchMetadata *inverse = [[[COEditSetBranchMetadata alloc] init] autorelease];
+    COCommandSetBranchMetadata *inverse = [[[COCommandSetBranchMetadata alloc] init] autorelease];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;

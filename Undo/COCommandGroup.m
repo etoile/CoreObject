@@ -1,9 +1,9 @@
-#import "COEditGroup.h"
+#import "COCommandGroup.h"
 #import <EtoileFoundation/Macros.h>
 
-static NSString * const kCOEditContents = @"COEditContents";
+static NSString * const kCOCommandContents = @"COCommandContents";
 
-@implementation COEditGroup
+@implementation COCommandGroup
 
 @synthesize contents = _contents;
 
@@ -19,9 +19,9 @@ static NSString * const kCOEditContents = @"COEditContents";
     SUPERINIT;
     
     NSMutableArray *edits = [NSMutableArray array];
-    for (id editPlist in [plist objectForKey: kCOEditContents])
+    for (id editPlist in [plist objectForKey: kCOCommandContents])
     {
-        COEdit *subEdit = [COEdit editWithPlist: editPlist];
+        COCommand *subEdit = [COCommand commandWithPlist: editPlist];
         [edits addObject: subEdit];
     }
     
@@ -34,23 +34,23 @@ static NSString * const kCOEditContents = @"COEditContents";
     NSMutableDictionary *result = [super plist];
     
     NSMutableArray *edits = [NSMutableArray array];
-    for (COEdit *subEdit in _contents)
+    for (COCommand *subEdit in _contents)
     {
         id subEditPlist = [subEdit plist];
         [edits addObject: subEditPlist];
     }
-    [result setObject: edits forKey: kCOEditContents];
+    [result setObject: edits forKey: kCOCommandContents];
     return result;
 }
 
-- (COEdit *) inverse
+- (COCommand *) inverse
 {
-    COEditGroup *inverse = [[[COEditGroup alloc] init] autorelease];
+    COCommandGroup *inverse = [[[COCommandGroup alloc] init] autorelease];
     
     NSMutableArray *edits = [NSMutableArray array];
-    for (COEdit *subEdit in _contents)
+    for (COCommand *subEdit in _contents)
     {
-        COEdit *subEditInverse = [subEdit inverse];
+        COCommand *subEditInverse = [subEdit inverse];
         [edits addObject: subEditInverse];
     }
     inverse.contents = edits;
@@ -60,7 +60,7 @@ static NSString * const kCOEditContents = @"COEditContents";
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
-    for (COEdit *subEdit in _contents)
+    for (COCommand *subEdit in _contents)
     {
         if (![subEdit canApplyToContext: aContext])
         {
@@ -72,7 +72,7 @@ static NSString * const kCOEditContents = @"COEditContents";
 
 - (void) applyToContext: (COEditingContext *)aContext
 {
-    for (COEdit *subEdit in _contents)
+    for (COCommand *subEdit in _contents)
     {
         [subEdit applyToContext: aContext];
     }

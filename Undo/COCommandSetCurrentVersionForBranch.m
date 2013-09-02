@@ -1,4 +1,4 @@
-#import "COEditSetCurrentVersionForBranch.h"
+#import "COCommandSetCurrentVersionForBranch.h"
 #import <EtoileFoundation/Macros.h>
 
 #import "COEditingContext.h"
@@ -10,11 +10,11 @@
 #import "COObjectGraphContext.h"
 #import "COSQLiteStore.h"
 
-static NSString * const kCOEditBranchUUID = @"COEditBranchUUID";
-static NSString * const kCOEditOldRevisionID = @"COEditOldRevisionID";
-static NSString * const kCOEditNewRevisionID = @"COEditNewRevisionID";
+static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
+static NSString * const kCOCommandOldRevisionID = @"COCommandOldRevisionID";
+static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
 
-@implementation COEditSetCurrentVersionForBranch 
+@implementation COCommandSetCurrentVersionForBranch 
 
 @synthesize branchUUID = _branchUUID;
 @synthesize oldRevisionID = _oldRevisionID;
@@ -23,24 +23,24 @@ static NSString * const kCOEditNewRevisionID = @"COEditNewRevisionID";
 - (id) initWithPlist: (id)plist
 {
     self = [super initWithPlist: plist];
-    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditBranchUUID]];
-    self.oldRevisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOEditOldRevisionID]];
-    self.revisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOEditNewRevisionID]];
+    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandBranchUUID]];
+    self.oldRevisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOCommandOldRevisionID]];
+    self.revisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOCommandNewRevisionID]];
     return self;
 }
 
 - (id) plist
 {
     NSMutableDictionary *result = [super plist];
-    [result setObject: [_branchUUID stringValue] forKey: kCOEditBranchUUID];
-    [result setObject: [_oldRevisionID plist] forKey:kCOEditOldRevisionID];
-    [result setObject: [_newRevisionID plist] forKey: kCOEditNewRevisionID];
+    [result setObject: [_branchUUID stringValue] forKey: kCOCommandBranchUUID];
+    [result setObject: [_oldRevisionID plist] forKey:kCOCommandOldRevisionID];
+    [result setObject: [_newRevisionID plist] forKey: kCOCommandNewRevisionID];
     return result;
 }
 
-- (COEdit *) inverse
+- (COCommand *) inverse
 {
-    COEditSetCurrentVersionForBranch *inverse = [[[COEditSetCurrentVersionForBranch alloc] init] autorelease];
+    COCommandSetCurrentVersionForBranch *inverse = [[[COCommandSetCurrentVersionForBranch alloc] init] autorelease];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;

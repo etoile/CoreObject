@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
-#import <CoreObject/COEdit.h>
+#import <CoreObject/COCommand.h>
 
-@interface COEditGroup : COEdit
+@interface COCommandGroup : COCommand
 {
     NSMutableArray *_contents;
 }

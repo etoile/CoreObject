@@ -172,7 +172,7 @@
 }
 
 /**
- * @returns a set of COEdit objects owned by the parent
+ * @returns a set of COCommand objects owned by the parent
  * diff. the caller could for example, modify them, 
  * or remove some from the parent diff
  */

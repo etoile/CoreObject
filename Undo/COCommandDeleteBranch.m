@@ -1,33 +1,33 @@
-#import "COEditUndeleteBranch.h"
-#import "COEditDeleteBranch.h"
+#import "COCommandUndeleteBranch.h"
+#import "COCommandDeleteBranch.h"
 
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
 
-static NSString * const kCOEditBranchUUID = @"COEditBranchUUID";
+static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
 
-@implementation COEditDeleteBranch
+@implementation COCommandDeleteBranch
 
 @synthesize branchUUID = _branchUUID;
 
 - (id) initWithPlist: (id)plist
 {
     self = [super initWithPlist: plist];
-    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOEditBranchUUID]];
+    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandBranchUUID]];
     return self;
 }
 
 - (id) plist
 {
     NSMutableDictionary *result = [super plist];
-    [result setObject: [_branchUUID stringValue] forKey: kCOEditBranchUUID];
+    [result setObject: [_branchUUID stringValue] forKey: kCOCommandBranchUUID];
     return result;
 }
 
-- (COEdit *) inverse
+- (COCommand *) inverse
 {
-    COEditUndeleteBranch *inverse = [[[COEditUndeleteBranch alloc] init] autorelease];
+    COCommandUndeleteBranch *inverse = [[[COCommandUndeleteBranch alloc] init] autorelease];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;

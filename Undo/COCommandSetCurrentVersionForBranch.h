@@ -1,7 +1,7 @@
-#import "COEdit.h"
+#import "COCommand.h"
 #import "CORevisionID.h"
 
-@interface COEditSetCurrentVersionForBranch : COSingleEdit
+@interface COCommandSetCurrentVersionForBranch : COSingleCommand
 {
     ETUUID *_branchUUID;
     CORevisionID *_oldRevisionID;

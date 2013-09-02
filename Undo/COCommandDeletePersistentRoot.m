@@ -1,15 +1,15 @@
-#import "COEditUndeletePersistentRoot.h"
-#import "COEditDeletePersistentRoot.h"
+#import "COCommandUndeletePersistentRoot.h"
+#import "COCommandDeletePersistentRoot.h"
 
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
 
-@implementation COEditDeletePersistentRoot
+@implementation COCommandDeletePersistentRoot
 
-- (COEdit *) inverse
+- (COCommand *) inverse
 {
-    COEditUndeletePersistentRoot *inverse = [[[COEditUndeletePersistentRoot alloc] init] autorelease];
+    COCommandUndeletePersistentRoot *inverse = [[[COCommandUndeletePersistentRoot alloc] init] autorelease];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;

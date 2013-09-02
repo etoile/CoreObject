@@ -3,22 +3,22 @@
 #import "COBranch.h"
 #import "CORevision.h"
 #import "COUndoStackStore.h"
-#import "COEdit.h"
-#import "COEditGroup.h"
+#import "COCommand.h"
+#import "COCommandGroup.h"
 #import <EtoileFoundation/Macros.h>
 
-#import "COEditGroup.h"
-#import "COEditDeleteBranch.h"
-#import "COEditUndeleteBranch.h"
-#import "COEditSetBranchMetadata.h"
-#import "COEditSetCurrentBranch.h"
-#import "COEditSetCurrentVersionForBranch.h"
-#import "COEditDeletePersistentRoot.h"
-#import "COEditUndeletePersistentRoot.h"
+#import "COCommandGroup.h"
+#import "COCommandDeleteBranch.h"
+#import "COCommandUndeleteBranch.h"
+#import "COCommandSetBranchMetadata.h"
+#import "COCommandSetCurrentBranch.h"
+#import "COCommandSetCurrentVersionForBranch.h"
+#import "COCommandDeletePersistentRoot.h"
+#import "COCommandUndeletePersistentRoot.h"
 
 @implementation COEditingContext (Undo)
 
-- (COEdit *) peekEditFromStack: (NSString *)aStack forName: (NSString *)aName
+- (COCommand *) peekEditFromStack: (NSString *)aStack forName: (NSString *)aName
 {
     id plist = [_undoStackStore peekStack: aStack forName: aName];
     if (plist == nil)
@@ -26,11 +26,11 @@
         return nil;
     }
     
-    COEdit *edit = [COEdit editWithPlist: plist];
+    COCommand *edit = [COCommand commandWithPlist: plist];
     return edit;
 }
 
-- (BOOL) canApplyEdit: (COEdit*)anEdit
+- (BOOL) canApplyEdit: (COCommand*)anEdit
 {
     if (anEdit == nil)
     {
@@ -44,13 +44,13 @@
 
 - (BOOL) canUndoForStackNamed: (NSString *)aName
 {
-    COEdit *edit = [self peekEditFromStack: kCOUndoStack forName: aName];
+    COCommand *edit = [self peekEditFromStack: kCOUndoStack forName: aName];
     return [self canApplyEdit: edit];
 }
 
 - (BOOL) canRedoForStackNamed: (NSString *)aName
 {
-    COEdit *edit = [self peekEditFromStack: kCORedoStack forName: aName];
+    COCommand *edit = [self peekEditFromStack: kCORedoStack forName: aName];
     return [self canApplyEdit: edit];
 }
 
@@ -58,7 +58,7 @@
 {
     [_undoStackStore beginTransaction];
     
-    COEdit *edit = [self peekEditFromStack: popStack forName: aName];
+    COCommand *edit = [self peekEditFromStack: popStack forName: aName];
     if (![self canApplyEdit: edit])
     {
         // DEBUG: Break here
@@ -81,7 +81,7 @@
     _isRecordingUndo = YES;
 
     // Push the inverse onto the redo stack    
-    COEdit *inverse = [edit inverse];
+    COCommand *inverse = [edit inverse];
 
     [_undoStackStore pushAction: [inverse plist] stack: pushStack forName: aName];
 
@@ -114,7 +114,7 @@
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     if (_isRecordingUndo)
     {
-        ASSIGN(_currentEditGroup, [[[COEditGroup alloc] init] autorelease]);
+        ASSIGN(_currentEditGroup, [[[COCommandGroup alloc] init] autorelease]);
     }
     else
     {
@@ -134,8 +134,8 @@
             return;
         }
 
-        // Optimisation: collapse COEditGroups that contain only one child
-        COEdit *objectToSerialize =
+        // Optimisation: collapse COCommandGroups that contain only one child
+        COCommand *objectToSerialize =
             (1 == [_currentEditGroup.contents count])
             ? [_currentEditGroup.contents firstObject]
             : _currentEditGroup;
@@ -143,7 +143,7 @@
         id plist = [objectToSerialize plist];        
         //NSLog(@"Undo event: %@", plist);
         
-        // N.B. The kCOUndoStack contains COEdits that are the inverse of
+        // N.B. The kCOUndoStack contains COCommands that are the inverse of
         // what the user did. So if the user creates a persistent root,
         // we push an edit to kCOUndoStack that deletes that persistent root.
         // => to perform an undo, pop from the kCOUndoStack and apply the edit.
@@ -157,7 +157,7 @@
     }
 }
 
-- (void) recordEditInverse: (COEdit*)anInverse
+- (void) recordEditInverse: (COCommand*)anInverse
 {
     // Insert the inverses back to front, so the inverse of the most recent action will be first.
     [_currentEditGroup.contents insertObject: anInverse atIndex: 0];
@@ -169,7 +169,7 @@
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     
-    COEditUndeletePersistentRoot *edit = [[[COEditUndeletePersistentRoot alloc] init] autorelease];
+    COCommandUndeletePersistentRoot *edit = [[[COCommandUndeletePersistentRoot alloc] init] autorelease];
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
     edit.timestamp = [NSDate date];
@@ -179,7 +179,7 @@
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
-    COEditDeletePersistentRoot *edit = [[[COEditDeletePersistentRoot alloc] init] autorelease];
+    COCommandDeletePersistentRoot *edit = [[[COCommandDeletePersistentRoot alloc] init] autorelease];
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
     edit.timestamp = [NSDate date];
@@ -192,7 +192,7 @@
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
-    COEditDeletePersistentRoot *edit = [[[COEditDeletePersistentRoot alloc] init] autorelease];
+    COCommandDeletePersistentRoot *edit = [[[COCommandDeletePersistentRoot alloc] init] autorelease];
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
     edit.timestamp = [NSDate date];
@@ -205,7 +205,7 @@
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
-    COEditSetCurrentBranch *edit = [[[COEditSetCurrentBranch alloc] init] autorelease];
+    COCommandSetCurrentBranch *edit = [[[COCommandSetCurrentBranch alloc] init] autorelease];
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
     edit.timestamp = [NSDate date];
@@ -222,7 +222,7 @@
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
-    COEditDeleteBranch *edit = [[[COEditDeleteBranch alloc] init] autorelease];
+    COCommandDeleteBranch *edit = [[[COCommandDeleteBranch alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];
@@ -237,7 +237,7 @@
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     
-    COEditSetCurrentVersionForBranch *edit = [[[COEditSetCurrentVersionForBranch alloc] init] autorelease];
+    COCommandSetCurrentVersionForBranch *edit = [[[COCommandSetCurrentVersionForBranch alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];
@@ -254,7 +254,7 @@
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     
-    COEditSetBranchMetadata *edit = [[[COEditSetBranchMetadata alloc] init] autorelease];
+    COCommandSetBranchMetadata *edit = [[[COCommandSetBranchMetadata alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];
@@ -270,7 +270,7 @@
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
-    COEditUndeleteBranch *edit = [[[COEditUndeleteBranch alloc] init] autorelease];
+    COCommandUndeleteBranch *edit = [[[COCommandUndeleteBranch alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];
@@ -284,7 +284,7 @@
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
   
-    COEditDeleteBranch *edit = [[[COEditDeleteBranch alloc] init] autorelease];
+    COCommandDeleteBranch *edit = [[[COCommandDeleteBranch alloc] init] autorelease];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] persistentRootUUID];
     edit.timestamp = [NSDate date];

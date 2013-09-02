@@ -1,6 +1,6 @@
-#import <CoreObject/COEdit.h>
+#import <CoreObject/COCommand.h>
 
-@interface COEditSetBranchMetadata : COSingleEdit
+@interface COCommandSetBranchMetadata : COSingleCommand
 {
     ETUUID *_branchUUID;
     NSDictionary *_oldMetadata;

@@ -4,12 +4,12 @@
 
 @class COEditingContext;
 
-@interface COEdit : NSObject
+@interface COCommand : NSObject
 
-+ (COEdit *) editWithPlist: (id)aPlist;
++ (COCommand *) commandWithPlist: (id)aPlist;
 - (id) plist;
 
-- (COEdit *) inverse;
+- (COCommand *) inverse;
 
 // FIXME: Perhaps distinguish between edits that can't be applied and edits that are already applied. (e.g. "create branch", but that branch already exists)
 
@@ -25,7 +25,7 @@
 
 @end
 
-@interface COSingleEdit : COEdit
+@interface COSingleCommand : COCommand
 {
     ETUUID *_storeUUID;
     ETUUID *_persistentRootUUID;
@@ -36,7 +36,7 @@
 @property (readwrite, nonatomic, copy) ETUUID *persistentRootUUID;
 @property (readwrite, nonatomic, copy) NSDate *timestamp;
 /**
- * Framework private, implemented by COEdit but not subclasses
+ * Framework private, implemented by COCommand but not subclasses
  */
 - (id) copyWithZone:(NSZone *)zone;
 

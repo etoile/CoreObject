@@ -51,7 +51,7 @@
 - (BOOL) redoForStackNamed: (NSString *)aName;
 
 /**
- * Replacement for -commit that also writes a COEdit to the requested undo stack
+ * Replacement for -commit that also writes a COCommand to the requested undo stack
  */
 - (BOOL) commitWithStackNamed: (NSString *)aName;
 
