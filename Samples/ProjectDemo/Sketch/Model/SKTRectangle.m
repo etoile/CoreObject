@@ -6,21 +6,13 @@
 
 @implementation SKTRectangle
 
-+ (void)initialize
++ (ETEntityDescription*)newEntityDescription
 {
-	if (self == [SKTRectangle class])
-	{
-		ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
-		ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTRectangle"];
-		
-		[repo addUnresolvedDescription: entity];
-		
-		[repo setEntityDescription: entity
-						  forClass: [SKTRectangle class]];		
-		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-	}
+    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTRectangle"];
+	[entity setParent: (id)@"SKTGraphic"];
+	
+    return entity;
 }
-
 
 - (NSBezierPath *)bezierPath {
     NSBezierPath *path = [NSBezierPath bezierPathWithRect:[self bounds]];

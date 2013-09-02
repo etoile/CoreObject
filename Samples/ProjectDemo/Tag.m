@@ -4,25 +4,18 @@
 
 @implementation Tag
 
-+ (void)initialize
++ (ETEntityDescription*)newEntityDescription
 {
-	if (self == [Tag class])
-	{
-		ETEntityDescription *tag = [ETEntityDescription descriptionWithName: @"Tag"];
-		
-		ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                     type: (id)@"Anonymous.NSString"];
-		
-		[tag setPropertyDescriptions: A(labelProperty)];
-		
-		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: tag];
-		[[ETModelDescriptionRepository mainRepository] setEntityDescription: tag
-																   forClass: self];
-		
-		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-	}
+    ETEntityDescription *tag = [ETEntityDescription descriptionWithName: @"Tag"];
+    [tag setParent: (id)@"COObject"];
+    
+    ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
+                                                                                 type: (id)@"Anonymous.NSString"];
+    [labelProperty setPersistent: YES];
+    
+    [tag setPropertyDescriptions: A(labelProperty)];
+    return tag;
 }
-
 
 /* Accessor Methods */
 

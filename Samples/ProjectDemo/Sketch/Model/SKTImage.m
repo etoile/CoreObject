@@ -6,21 +6,13 @@
 
 @implementation SKTImage
 
-+ (void)initialize
++ (ETEntityDescription*)newEntityDescription
 {
-	if (self == [SKTImage class])
-	{
-		ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
-		ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTImage"];
-		
-		// FIXME: image data property
-		
-		[repo addUnresolvedDescription: entity];
-		
-		[repo setEntityDescription: entity
-						  forClass: [SKTImage class]];		
-		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-	}
+    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTImage"];
+	[entity setParent: (id)@"SKTGraphic"];
+	
+    // FIXME: image data property    
+    return entity;
 }
 
 - (id)init {

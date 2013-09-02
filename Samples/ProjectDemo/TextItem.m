@@ -3,26 +3,16 @@
 
 @implementation TextItem
 
-+ (void)initialize
++ (ETEntityDescription*)newEntityDescription
 {
-	if (self == [TextItem class])
-	{
-		ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"TextItem"];
-		
-		[Document class]; // FIXME: ugly hack to ensure the DocumentItem (superentity of OutlineItem) is registered
-		[entity setParent: @"DocumentItem"];
-		
-		ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-																					 type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
-		
-		[entity setPropertyDescriptions: A(labelProperty)];
-		
-		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: entity];
-		[[ETModelDescriptionRepository mainRepository] setEntityDescription: entity
-																   forClass: self];
-		
-		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-	}
+    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"TextItem"];
+    [entity setParent: (id)@"DocumentItem"];
+    
+    ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
+                                                                                 type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
+    [labelProperty setPersistent: YES];
+    [entity setPropertyDescriptions: A(labelProperty)];
+    return entity;
 }
 
 /* Accessor Methods */

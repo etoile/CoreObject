@@ -2,29 +2,22 @@
 
 @implementation Project
 
-+ (void)initialize
++ (ETEntityDescription*)newEntityDescription
 {
-	if (self == [Project class])
-	{
-		ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"Project"];
-		
-		ETPropertyDescription *documentsProperty = [ETPropertyDescription descriptionWithName: @"documents"
-																						 type: (id)@"Document"];
-		[documentsProperty setMultivalued: YES];
+    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"Project"];
+    
+    ETPropertyDescription *documentsProperty = [ETPropertyDescription descriptionWithName: @"documents"
+                                                                                     type: (id)@"Document"];
+    [documentsProperty setPersistent: YES];
+    [documentsProperty setMultivalued: YES];
 
-		[Tag class];
-		ETPropertyDescription *tagsProperty = [ETPropertyDescription descriptionWithName: @"tags"
-																						 type: (id)@"Tag"];
-		[tagsProperty setMultivalued: YES];
-		
-		[entity setPropertyDescriptions: A(documentsProperty, tagsProperty)];
-		
-		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: entity];
-		[[ETModelDescriptionRepository mainRepository] setEntityDescription: entity
-																   forClass: self];
-		
-		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-	}
+    ETPropertyDescription *tagsProperty = [ETPropertyDescription descriptionWithName: @"tags"
+                                                                                type: (id)@"Tag"];
+    [tagsProperty setMultivalued: YES];
+    [tagsProperty setPersistent: YES];
+    
+    [entity setPropertyDescriptions: A(documentsProperty, tagsProperty)];
+	return entity;
 }
 
 @dynamic documents;

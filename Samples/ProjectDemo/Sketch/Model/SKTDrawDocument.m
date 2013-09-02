@@ -22,49 +22,20 @@ NSString *SKTDrawDocumentType = @"Apple Sketch Graphic Format";
 
 @implementation SKTDrawDocument
 
-+ (void)initialize
++ (ETEntityDescription*)newEntityDescription
 {
-	if (self == [SKTDrawDocument class])
-	{
-		ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
-
-		// SKTDrawDocument metamodel
-		{
-			ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTDrawDocument"];
-			
-			ETPropertyDescription *graphicsProperty = [ETPropertyDescription descriptionWithName: @"graphics"
-																							  type: (id)@"SKTGraphic"];
-			[graphicsProperty setMultivalued: YES];
-			[graphicsProperty setOrdered: YES];
-			[graphicsProperty setOpposite: (id)@"SKTGraphic.document"];
-			
-			[entity setPropertyDescriptions: A(graphicsProperty)];
-			
-			[repo addUnresolvedDescription: entity];
-			
-			[repo setEntityDescription: entity
-							  forClass: [SKTDrawDocument class]];
-		}
-		
-		// SKTGraphic metamodel
-		{
-			ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTGraphic"];
-			
-			ETPropertyDescription *documentProperty = [ETPropertyDescription descriptionWithName: @"document"
-																							type: (id)@"SKTDrawDocument"];
-			[documentProperty setOpposite: (id)@"SKTDrawDocument.graphics"];
-			[documentProperty setIsContainer: YES];
-			
-			[entity setPropertyDescriptions: A(documentProperty)];
-			
-			[repo addUnresolvedDescription: entity];
-			
-			[repo setEntityDescription: entity
-							  forClass: [SKTGraphic class]];
-		}
-	
-		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-	}
+    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTDrawDocument"];
+    
+    ETPropertyDescription *graphicsProperty = [ETPropertyDescription descriptionWithName: @"graphics"
+                                                                                      type: (id)@"SKTGraphic"];
+    [graphicsProperty setMultivalued: YES];
+    [graphicsProperty setOrdered: YES];
+    [graphicsProperty setOpposite: (id)@"SKTGraphic.document"];
+    [graphicsProperty setPersistent: YES];
+    
+    [entity setPropertyDescriptions: A(graphicsProperty)];
+    
+    return entity;
 }
 
 - (void)dealloc {

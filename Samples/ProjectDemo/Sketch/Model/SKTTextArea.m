@@ -8,23 +8,13 @@
 
 @implementation SKTTextArea
 
-+ (void)initialize
++ (ETEntityDescription*)newEntityDescription
 {
-	if (self == [SKTTextArea class])
-	{
-		ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
-		ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTTextArea"];
-		
-		// FIXME: 
-		
-		[repo addUnresolvedDescription: entity];
-		
-		[repo setEntityDescription: entity
-						  forClass: [SKTTextArea class]];		
-		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-	}
+    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTTextArea"];
+	[entity setParent: (id)@"SKTGraphic"];
+	
+    return entity;
 }
-
 
 - (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {

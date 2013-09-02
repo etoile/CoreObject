@@ -12,14 +12,20 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 @implementation SKTGraphic
 
-+ (void)initialize
++ (ETEntityDescription*)newEntityDescription
 {
-	if (self == [SKTGraphic class])
-	{
-		// FIXME: Hack
-		[SKTDrawDocument class]; // Our metamodel is set up in SKTDrawDocument
-	}
+    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTGraphic"];
+    
+    ETPropertyDescription *documentProperty = [ETPropertyDescription descriptionWithName: @"document"
+                                                                                    type: (id)@"SKTDrawDocument"];
+    [documentProperty setOpposite: (id)@"SKTDrawDocument.graphics"];
+    [documentProperty setIsContainer: YES];
+    
+    [entity setPropertyDescriptions: A(documentProperty)];
+    
+    return entity;
 }
+
 
 // =================================== Initialization ===================================
 - (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext

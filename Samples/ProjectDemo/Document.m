@@ -2,43 +2,41 @@
 
 @implementation Document
 
-+ (void)initialize
++ (ETEntityDescription*)newEntityDescription
 {
-	if (self == [Document class])
-	{
-		ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
-		
-		// Document entity
-		{
-			ETEntityDescription *docEntity = [ETEntityDescription descriptionWithName: @"Document"];
-			
-			ETPropertyDescription *screenRectProperty = [ETPropertyDescription descriptionWithName: @"screenRect"
-																							  type: (id)@"NSRect"];
-			ETPropertyDescription *isOpenProperty = [ETPropertyDescription descriptionWithName: @"isOpen"
-																						  type: (id)@"NSNumber"];
-			ETPropertyDescription *documentTypeProperty = [ETPropertyDescription descriptionWithName: @"documentType"
-																								type: (id)@"NSString"];                                                                                            
-			ETPropertyDescription *documentNameProperty = [ETPropertyDescription descriptionWithName: @"documentName"
-																								type: (id)@"NSString"];                                                                                            
-			ETPropertyDescription *rootObjectProperty = [ETPropertyDescription descriptionWithName: @"rootObject"
-																							  type: (id)@"NSObject"];
-			[rootObjectProperty setOpposite: (id)@"DocumentItem.document"];
-			
-			[Tag class];
-			ETPropertyDescription *tagsProperty = [ETPropertyDescription descriptionWithName: @"tags"
-																						type: (id)@"Tag"];
-			[tagsProperty setMultivalued: YES];
-			
-			
-			[docEntity setPropertyDescriptions: A(screenRectProperty, isOpenProperty, documentTypeProperty, rootObjectProperty, documentNameProperty, tagsProperty)];
-			
-			[repo addUnresolvedDescription: docEntity];
-			
-			[repo setEntityDescription: docEntity
-							  forClass: [Document class]];
-		}
-		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-	}
+    ETEntityDescription *docEntity = [ETEntityDescription descriptionWithName: @"Document"];
+    [docEntity setParent: (id)@"COObject"];
+    
+    ETPropertyDescription *screenRectProperty = [ETPropertyDescription descriptionWithName: @"screenRect"
+                                                                                      type: (id)@"NSRect"];
+    [screenRectProperty setPersistent: YES];
+    
+    ETPropertyDescription *isOpenProperty = [ETPropertyDescription descriptionWithName: @"isOpen"
+                                                                                  type: (id)@"NSNumber"];
+    [isOpenProperty setPersistent: YES];
+    
+    ETPropertyDescription *documentTypeProperty = [ETPropertyDescription descriptionWithName: @"documentType"
+                                                                                        type: (id)@"NSString"];
+    [documentTypeProperty setPersistent: YES];
+    
+    ETPropertyDescription *documentNameProperty = [ETPropertyDescription descriptionWithName: @"documentName"
+                                                                                        type: (id)@"NSString"];
+    [documentNameProperty setPersistent: YES];
+    
+    ETPropertyDescription *rootObjectProperty = [ETPropertyDescription descriptionWithName: @"rootObject"
+                                                                                      type: (id)@"NSObject"];
+    [rootObjectProperty setPersistent: YES];
+    [rootObjectProperty setOpposite: (id)@"DocumentItem.document"];
+    
+    ETPropertyDescription *tagsProperty = [ETPropertyDescription descriptionWithName: @"tags"
+                                                                                type: (id)@"Tag"];
+    [tagsProperty setPersistent: YES];
+    [tagsProperty setMultivalued: YES];
+    
+    
+    [docEntity setPropertyDescriptions: A(screenRectProperty, isOpenProperty, documentTypeProperty, rootObjectProperty, documentNameProperty, tagsProperty)];
+    
+    return docEntity;
 }
 
 - (NSRect) screenRect

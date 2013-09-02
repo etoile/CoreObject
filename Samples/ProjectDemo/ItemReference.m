@@ -6,31 +6,24 @@
 
 @implementation ItemReference
 
-+ (void)initialize
++ (ETEntityDescription*)newEntityDescription
 {
-	if (self == [ItemReference class])
-	{
-		ETEntityDescription *itemReference = [ETEntityDescription descriptionWithName: @"ItemReference"];
-		[itemReference setParent: (id)@"DocumentItem"];
-		
-        // FIXME: Hack; we need a common superclass for OutlineItem and ItemReference, or make
-        // ItemReference a subclass of OutlineItem
-        
-		ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
-																					  type: (id)@"Anonymous.OutlineItem"];
-		[parentProperty setIsContainer: YES];
-		
-        ETPropertyDescription *referencedItemProperty = [ETPropertyDescription descriptionWithName: @"referencedItem"
-                                                                                              type: (id)@"Anonymous.OutlineItem"];
-		
-		[itemReference setPropertyDescriptions: A(parentProperty, referencedItemProperty)];
-		
-		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: itemReference];
-		[[ETModelDescriptionRepository mainRepository] setEntityDescription: itemReference
-																   forClass: self];
-		
-		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-	}
+    ETEntityDescription *itemReference = [ETEntityDescription descriptionWithName: @"ItemReference"];
+    [itemReference setParent: (id)@"DocumentItem"];
+    
+    // FIXME: Hack; we need a common superclass for OutlineItem and ItemReference, or make
+    // ItemReference a subclass of OutlineItem
+    
+    ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
+                                                                                  type: (id)@"Anonymous.OutlineItem"];
+    [parentProperty setIsContainer: YES];
+    
+    ETPropertyDescription *referencedItemProperty = [ETPropertyDescription descriptionWithName: @"referencedItem"
+                                                                                          type: (id)@"Anonymous.OutlineItem"];
+    [referencedItemProperty setPersistent: YES];
+    
+    [itemReference setPropertyDescriptions: A(parentProperty, referencedItemProperty)];
+    return itemReference;
 }
 
 - (id)initWithParent: (OutlineItem*)p referencedItem: (OutlineItem*)ref context: (COObjectGraphContext*)ctx

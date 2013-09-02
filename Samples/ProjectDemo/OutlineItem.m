@@ -5,38 +5,30 @@
 
 @implementation OutlineItem
 
-+ (void)initialize
++ (ETEntityDescription*)newEntityDescription
 {
-	if (self == [OutlineItem class])
-	{
-		ETEntityDescription *outlineEntity = [ETEntityDescription descriptionWithName: @"OutlineItem"];
-		
-		[Document class]; // FIXME: ugly hack to ensure the DocumentItem (superentity of OutlineItem) is registered
-		[outlineEntity setParent: (id)@"DocumentItem"];
-		
-		ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
-																					  type: outlineEntity];
-		[parentProperty setIsContainer: YES];
-		
-		
-		ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
-																						type: outlineEntity];
-		[contentsProperty setMultivalued: YES];
-		[contentsProperty setOpposite: parentProperty];
-		[contentsProperty setOrdered: YES];
-		assert([contentsProperty isComposite]);
-		
-		ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-																					 type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
-		
-		[outlineEntity setPropertyDescriptions: A(parentProperty, contentsProperty, labelProperty)];
-		
-		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: outlineEntity];
-		[[ETModelDescriptionRepository mainRepository] setEntityDescription: outlineEntity
-																   forClass: self];
-		
-		[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-	}
+    ETEntityDescription *outlineEntity = [ETEntityDescription descriptionWithName: @"OutlineItem"];
+    [outlineEntity setParent: (id)@"DocumentItem"];
+    
+    ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
+                                                                                  type: outlineEntity];
+    [parentProperty setIsContainer: YES];
+    
+    
+    ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
+                                                                                    type: outlineEntity];
+    [contentsProperty setMultivalued: YES];
+    [contentsProperty setOpposite: parentProperty];
+    [contentsProperty setOrdered: YES];
+    [contentsProperty setPersistent: YES];
+    assert([contentsProperty isComposite]);
+    
+    ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
+                                                                                 type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
+    [labelProperty setPersistent: YES];
+    
+    [outlineEntity setPropertyDescriptions: A(parentProperty, contentsProperty, labelProperty)];
+    return outlineEntity;
 }
 
 - (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext

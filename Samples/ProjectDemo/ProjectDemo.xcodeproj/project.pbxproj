@@ -8,14 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		6627ED9B12761EBC00E06946 /* CheckpointAsSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627ED9A12761EBC00E06946 /* CheckpointAsSheetController.m */; };
-		6627EDFA12762B8C00E06946 /* SharingServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627EDF912762B8C00E06946 /* SharingServer.m */; };
-		6627EE361276317A00E06946 /* SharingServerPeer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627EE351276317A00E06946 /* SharingServerPeer.m */; };
-		6627EE9812777D6300E06946 /* SharingClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627EE9712777D6300E06946 /* SharingClient.m */; };
 		6627EEDD1278A55A00E06946 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 6627EEDC1278A55A00E06946 /* README */; };
-		6627EF531278EE8400E06946 /* SharingController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627EF521278EE8400E06946 /* SharingController.m */; };
 		664697F417CFF82100A1B767 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664697EA17CFF7FD00A1B767 /* CoreObject.framework */; };
 		6646980617CFF8AA00A1B767 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664697FF17CFF8A200A1B767 /* EtoileFoundation.framework */; };
 		6646987F17D3FF6500A1B767 /* DocumentItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646987E17D3FF6000A1B767 /* DocumentItem.m */; };
+		6646988717D407A400A1B767 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6646988617D407A000A1B767 /* AppKit.framework */; };
 		66708F9C12486F0400E65F00 /* ProjectDemoMainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* ProjectDemoMainMenu.xib */; };
 		66708F9F12486F0400E65F00 /* OutlineWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66708F9412486E9D00E65F00 /* OutlineWindow.xib */; };
 		66708FAB12486F0400E65F00 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
@@ -32,9 +29,6 @@
 		6686BEE812593D800065DE1A /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BEE712593D800065DE1A /* Project.m */; };
 		6686BEEB12593D900065DE1A /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BEEA12593D900065DE1A /* Document.m */; };
 		6686BFF5125CF0200065DE1A /* ChatWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6686BFF4125CF0200065DE1A /* ChatWindow.xib */; };
-		6686BFFA125CF1B90065DE1A /* ChatWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BFF9125CF1B90065DE1A /* ChatWindowController.m */; };
-		6686C046125CF9E70065DE1A /* CONetworkPeer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BFDD125AE7730065DE1A /* CONetworkPeer.m */; };
-		6686C128125D7F140065DE1A /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686C127125D7F140065DE1A /* NetworkController.m */; };
 		6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686C341125EC5070065DE1A /* ProjectDocument.m */; };
 		66983346126BB1150011C7FC /* HistoryInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66983345126BB1150011C7FC /* HistoryInspectorController.m */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
@@ -177,6 +171,7 @@
 		664697F517CFF8A100A1B767 /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../../../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		6646987D17D3FF5B00A1B767 /* DocumentItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DocumentItem.h; sourceTree = "<group>"; };
 		6646987E17D3FF6000A1B767 /* DocumentItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DocumentItem.m; sourceTree = "<group>"; };
+		6646988617D407A000A1B767 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = ../../../../../../System/Library/Frameworks/AppKit.framework; sourceTree = "<group>"; };
 		66708F7112486CD300E65F00 /* OutlineController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutlineController.h; sourceTree = "<group>"; };
 		66708F7212486CD300E65F00 /* OutlineController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutlineController.m; sourceTree = "<group>"; };
 		66708F9412486E9D00E65F00 /* OutlineWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OutlineWindow.xib; sourceTree = "<group>"; };
@@ -273,6 +268,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6646988717D407A400A1B767 /* AppKit.framework in Frameworks */,
 				6646980617CFF8AA00A1B767 /* EtoileFoundation.framework in Frameworks */,
 				664697F417CFF82100A1B767 /* CoreObject.framework in Frameworks */,
 			);
@@ -284,6 +280,7 @@
 		29B97314FDCFA39411CA2CEA /* ObjectMerging */ = {
 			isa = PBXGroup;
 			children = (
+				6646988617D407A000A1B767 /* AppKit.framework */,
 				664697F517CFF8A100A1B767 /* EtoileFoundation.xcodeproj */,
 				664697DF17CFF7FC00A1B767 /* CoreObject.xcodeproj */,
 				66708FEF124870CB00E65F00 /* ProjectDemo */,
@@ -737,7 +734,6 @@
 				79911A5312CDAECD009D28C0 /* SKTGridView.m in Sources */,
 				79911A5412CDAECD009D28C0 /* SKTInspectorController.m in Sources */,
 				66C33D90128F449400E5B15B /* ItemReference.m in Sources */,
-				6686C046125CF9E70065DE1A /* CONetworkPeer.m in Sources */,
 				6686B80F125513D80065DE1A /* OutlineItem.m in Sources */,
 				6686B810125513D80065DE1A /* DrawingItem.m in Sources */,
 				6686B811125513D80065DE1A /* TextItem.m in Sources */,
@@ -748,15 +744,9 @@
 				6686B814125513D80065DE1A /* ApplicationDelegate.m in Sources */,
 				6686BEE812593D800065DE1A /* Project.m in Sources */,
 				6686BEEB12593D900065DE1A /* Document.m in Sources */,
-				6686BFFA125CF1B90065DE1A /* ChatWindowController.m in Sources */,
-				6686C128125D7F140065DE1A /* NetworkController.m in Sources */,
 				6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */,
 				66983346126BB1150011C7FC /* HistoryInspectorController.m in Sources */,
 				6627ED9B12761EBC00E06946 /* CheckpointAsSheetController.m in Sources */,
-				6627EDFA12762B8C00E06946 /* SharingServer.m in Sources */,
-				6627EE361276317A00E06946 /* SharingServerPeer.m in Sources */,
-				6627EE9812777D6300E06946 /* SharingClient.m in Sources */,
-				6627EF531278EE8400E06946 /* SharingController.m in Sources */,
 				799118FD12CD3C82009D28C0 /* DesktopWindow.m in Sources */,
 				7991190512CD3D75009D28C0 /* ProjectNavWindow.m in Sources */,
 				7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */,
@@ -797,17 +787,21 @@
 		66708FBA12486F0400E65F00 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				INFOPLIST_FILE = "ProjectDemo-Info.plist";
 				PRODUCT_NAME = ProjectDemo;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
 		66708FBB12486F0400E65F00 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				INFOPLIST_FILE = "ProjectDemo-Info.plist";
 				PRODUCT_NAME = ProjectDemo;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};

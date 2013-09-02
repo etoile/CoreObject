@@ -1,6 +1,7 @@
 #import "OutlineController.h"
 #import "SharingController.h"
 #import "ItemReference.h"
+#import "Document.h"
 
 @implementation OutlineController
 
@@ -15,10 +16,10 @@
 	
 	assert([self rootObject] != nil);
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector: @selector(didCommit:)
-												 name: COEditingContextBaseHistoryGraphNodeDidChangeNotification 
-											   object: nil];
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(objectGraphContextObjectsDidChange:)
+												 name: COObjectGraphContextObjectsDidChangeNotification
+											   object: [document objectGraphContext]];
 	
 	return self;
 }
@@ -34,37 +35,29 @@
 	[super dealloc];
 }
 
-- (void)didCommit: (NSNotification*)notif
+- (void)objectGraphContextObjectsDidChange: (NSNotification*)notif
 {
-	COHistoryNode *node = [notif userInfo];
-	NSMutableSet *updateObjectUUIDs = [NSMutableSet setWithArray: [[node uuidToObjectVersionMaping] allKeys]];
-	NSArray *allObjectsUUIDsInDocument = 
-    [[[[doc allStronglyContainedObjects] mappedCollection] uuid]
-	 arrayByAddingObject: [doc uuid]];
-	//  NSLog(@"Did commit. update %@, all %@", updateObjectUUIDs, allObjectsUUIDsInDocument);
-	[updateObjectUUIDs intersectSet: [NSSet setWithArray: allObjectsUUIDsInDocument]];
-	//  NSLog(@"intersect %@", updateObjectUUIDs);
+    COObjectGraphContext *objGraph = [notif object];
+    assert(objGraph != nil);
+    assert([objGraph isKindOfClass: [COObjectGraphContext class]]);
     
-	if ([updateObjectUUIDs count] > 0)
-	{
-		NSLog(@"Reloading outline for %@", doc);
-		[outlineView reloadData];  
-	}
+    NSLog(@"Reloading outline for %@", doc);
+    [outlineView reloadData];
 }
 
-- (Document*)projectDocument
+- (Document *)projectDocument
 {
 	return doc;
 }
-- (OutlineItem*)rootObject
+- (OutlineItem *)rootObject
 {
-	return [[self projectDocument] rootObject];
+	return (OutlineItem *)[[self projectDocument] rootObject];
 } 
 - (void) commitWithType: (NSString*)type
        shortDescription: (NSString*)shortDescription
         longDescription: (NSString*)longDescription;
 {
-	[[[self rootObject] objectContext] commitWithType:type shortDescription:shortDescription longDescription:longDescription];
+	[[[doc objectGraphContext] editingContext] commit]; // FIXME:
 }
 
 - (void)windowDidLoad
@@ -102,7 +95,7 @@
 		{
 			title = [NSString stringWithFormat: @"Shared Document %@ From %@",
 					 [doc documentName],
-					 [[SharingController sharedSharingController] fullNameOfUserSharingDocument: doc]];
+					 [[NSClassFromString(@"SharingController") sharedSharingController] fullNameOfUserSharingDocument: doc]];
 		}
 		else
 		{
@@ -128,10 +121,9 @@
 {
 	[doc setScreenRectValue: [[self window] frame]];
 	
-	assert([[doc objectContext] objectHasChanges: [doc uuid]]);
-	assert([[doc valueForProperty: @"screenRect"] isEqual: NSStringFromRect([[self window] frame])]);
+	assert([[doc objectGraphContext] objectHasChanges: [doc UUID]]);
 	
-	[self commitWithType: kCOTypeMinorEdit
+	[self commitWithType: @"kCOTypeMinorEdit"
 		shortDescription: @"Move Window"
 		 longDescription: [NSString stringWithFormat: @"Move to %@", NSStringFromRect([doc screenRectValue])]];	
 }
@@ -145,9 +137,7 @@ static int i = 0;
 
 - (OutlineItem *) newItem
 {
-	OutlineItem *item = [[OutlineItem alloc] initWithParent: nil
-													context: [[self rootObject] objectContext]];
-	[item autorelease];
+	OutlineItem *item = [[[self rootObject] objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[item setLabel: [NSString stringWithFormat: @"Item %d", i++]];
 	return item;
 }
@@ -176,7 +166,7 @@ static int i = 0;
 	
 	[outlineView expandItem: dest];
 	
-	[self commitWithType: kCOTypeMinorEdit
+	[self commitWithType: @"kCOTypeMinorEdit"
 		shortDescription: @"Add Item"
 		 longDescription: [NSString stringWithFormat: @"Add item %@", [item label]]];
 }
@@ -192,7 +182,7 @@ static int i = 0;
 		
 		[outlineView expandItem: dest];
 		
-		[self commitWithType: kCOTypeMinorEdit
+		[self commitWithType: @"kCOTypeMinorEdit"
 			shortDescription: @"Add Child Item"
 			 longDescription: [NSString stringWithFormat: @"Add child item %@ to %@", [item label], [dest label]]];
 	}
@@ -213,7 +203,7 @@ static int i = 0;
 		[grandparent addItem: item atIndex: [[grandparent contents] indexOfObject: parent] + 1];
 		[item release];
 		
-		[self commitWithType: kCOTypeMinorEdit
+		[self commitWithType: @"kCOTypeMinorEdit"
 			shortDescription: @"Shift Left"
 			 longDescription: [NSString stringWithFormat: @"Shift left item %@", [item label]]];
 		
@@ -239,7 +229,7 @@ static int i = 0;
 			[newParent addItem: item];
 			[item release];
 			
-			[self commitWithType: kCOTypeMinorEdit
+			[self commitWithType: @"kCOTypeMinorEdit"
 				shortDescription: @"Shift Right"
 				 longDescription: [NSString stringWithFormat: @"Shift right item %@", [item label]]];
 			
@@ -293,7 +283,7 @@ static int i = 0;
 		NSString *label = [[itemToDelete label] retain];
 		[[itemToDelete parent] removeItemAtIndex: index];
 		
-		[self commitWithType: kCOTypeMinorEdit
+		[self commitWithType: @"kCOTypeMinorEdit"
 			shortDescription: @"Delete Item"
 			 longDescription: [NSString stringWithFormat: @"Delete Item %@", label]];
 
@@ -401,7 +391,7 @@ static int i = 0;
 		NSString *oldLabel = [[item label] retain];
 		[item setLabel: object];
 	
-		[self commitWithType: kCOTypeMinorEdit
+		[self commitWithType: @"kCOTypeMinorEdit"
 			shortDescription: @"Edit Label"
 			 longDescription: [NSString stringWithFormat: @"Edit label from %@ to %@", oldLabel, [item label]]];
 	
@@ -483,7 +473,7 @@ static int i = 0;
 		[newParent addItem: ref 
 				   atIndex: insertionIndex]; 
 		
-		[self commitWithType: kCOTypeMinorEdit
+		[self commitWithType: @"kCOTypeMinorEdit"
 			shortDescription: @"Drop Link"
 			 longDescription: [NSString stringWithFormat: @"Drop Link to %@ on %@", [itemToLinkTo label], [newParent label]]];
 		
@@ -512,7 +502,7 @@ static int i = 0;
 		}
 	}
 	
-	[self commitWithType: kCOTypeMinorEdit
+	[self commitWithType: @"kCOTypeMinorEdit"
 		shortDescription: @"Drop Items"
 		 longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
 	
