@@ -97,6 +97,16 @@
 		6646979617CEB01D00A1B767 /* TestItemGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15F017AB8D4D003BFC9B /* TestItemGraphDiff.m */; };
 		6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */; };
 		6646985A17D3C55600A1B767 /* COObjectGraphContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */; };
+		66550BF717D51CB100327657 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550BF617D51CB100327657 /* main.m */; };
+		66550BF817D51CB800327657 /* TestObjectGraphPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550BE817D51C6100327657 /* TestObjectGraphPerformance.m */; };
+		66550BF917D51CBD00327657 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
+		66550BFD17D51CF600327657 /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D01D0941646BEF400917AC8 /* UnitKit.framework */; };
+		66550BFE17D51D0300327657 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
+		66550C0317D51D1800327657 /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
+		66550C0417D51D2700327657 /* OutlineItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E451D517CC461F00205679 /* OutlineItem.m */; };
+		66550C0517D51D2700327657 /* Tag.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E451D817CC565100205679 /* Tag.m */; };
+		66550C0717D51D9000327657 /* TestSQLiteStorePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550C0617D51D9000327657 /* TestSQLiteStorePerformance.m */; };
+		66550C0917D51E8F00327657 /* TestBinaryReadWritePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */; };
 		666ED56C17C3E78A00D148AA /* TestUndo.m in Sources */ = {isa = PBXBuildFile; fileRef = 666ED56B17C3E78A00D148AA /* TestUndo.m */; };
 		6675F8C11785C02A001E5622 /* COItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BA1785C02A001E5622 /* COItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C21785C02A001E5622 /* COItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BB1785C02A001E5622 /* COItem.m */; };
@@ -127,7 +137,6 @@
 		66860BA017BED42900B24333 /* TestBinaryReadWrite.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199A5178C3E1800B78174 /* TestBinaryReadWrite.m */; };
 		66860BA117BED42900B24333 /* TestSQLiteStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B0178C431D00B78174 /* TestSQLiteStore.m */; };
 		66860BA217BED42900B24333 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B1178C431D00B78174 /* TestSQLiteStoreMultiPersistentRoots.m */; };
-		66860BA317BED42900B24333 /* TestSQLiteStorePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B2178C431E00B78174 /* TestSQLiteStorePerformance.m */; };
 		66860BA417BED42900B24333 /* TestSQLiteStorePersistentRootBackingStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 664199B3178C431E00B78174 /* TestSQLiteStorePersistentRootBackingStore.m */; };
 		66860BA517BED42900B24333 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */ = {isa = PBXBuildFile; fileRef = 667F79EC17BDE00B00B6BF3A /* TestSQLiteStoreSharedPersistentRoots.m */; };
 		6686BE2A12592D7B0065DE1A /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
@@ -148,7 +157,6 @@
 		669724F117D4646E0090B31A /* COSequenceModification.h in Headers */ = {isa = PBXBuildFile; fileRef = 669724EF17D4646D0090B31A /* COSequenceModification.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		669724F217D4646E0090B31A /* COSequenceModification.m in Sources */ = {isa = PBXBuildFile; fileRef = 669724F017D4646D0090B31A /* COSequenceModification.m */; };
 		66ABC78E17C43FBA009FB925 /* TestCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66ABC78D17C43FBA009FB925 /* TestCustomTrack.m */; };
-		66B38C6417B98EE100D65771 /* TestPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B38C6317B98EDE00D65771 /* TestPerformance.m */; };
 		66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66C18AD517BAB2EE00C5316F /* TestEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C18AD417BAB2EE00C5316F /* TestEditingContext.m */; };
@@ -303,6 +311,27 @@
 			remoteGlobalIDString = 603647AB0E409244003377E0;
 			remoteInfo = EtoileFoundation;
 		};
+		66550BFA17D51CC000327657 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6686BDAB12592BDA0065DE1A;
+			remoteInfo = CoreObject;
+		};
+		66550BFF17D51D0500327657 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 603647AB0E409244003377E0;
+			remoteInfo = EtoileFoundation;
+		};
+		66550C0117D51D0800327657 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3D01D08A1646BEF400917AC8 /* UnitKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = UnitKit;
+		};
 		66C366ED17B42BAE009ACF2F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -328,6 +357,15 @@
 
 /* Begin PBXCopyFilesBuildPhase section */
 		60C913B1165BBED000E0C5F4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		66550BEB17D51C8800327657 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -420,7 +458,6 @@
 		664199A5178C3E1800B78174 /* TestBinaryReadWrite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBinaryReadWrite.m; path = Tests/TestBinaryReadWrite.m; sourceTree = "<group>"; };
 		664199B0178C431D00B78174 /* TestSQLiteStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStore.m; path = Tests/TestSQLiteStore.m; sourceTree = "<group>"; };
 		664199B1178C431D00B78174 /* TestSQLiteStoreMultiPersistentRoots.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStoreMultiPersistentRoots.m; path = Tests/TestSQLiteStoreMultiPersistentRoots.m; sourceTree = "<group>"; };
-		664199B2178C431E00B78174 /* TestSQLiteStorePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStorePerformance.m; path = Tests/TestSQLiteStorePerformance.m; sourceTree = "<group>"; };
 		664199B3178C431E00B78174 /* TestSQLiteStorePersistentRootBackingStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStorePersistentRootBackingStore.m; path = Tests/TestSQLiteStorePersistentRootBackingStore.m; sourceTree = "<group>"; };
 		66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCrossPersistentRootReferences.m; path = Tests/TestCrossPersistentRootReferences.m; sourceTree = "<group>"; };
 		6646974917CDA78300A1B767 /* COEditingContext+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COEditingContext+Private.h"; path = "Core/COEditingContext+Private.h"; sourceTree = "<group>"; };
@@ -436,6 +473,11 @@
 		6646978F17CEAFD800A1B767 /* TestSynchronization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSynchronization.m; path = Tests/TestSynchronization.m; sourceTree = "<group>"; };
 		6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COSQLiteStore+Private.h"; path = "Store/COSQLiteStore+Private.h"; sourceTree = "<group>"; };
 		6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Private.h"; path = "Core/COObjectGraphContext+Private.h"; sourceTree = "<group>"; };
+		66550BE817D51C6100327657 /* TestObjectGraphPerformance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TestObjectGraphPerformance.m; path = Benchmark/TestObjectGraphPerformance.m; sourceTree = "<group>"; };
+		66550BED17D51C8800327657 /* BenchmarkCoreObject */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BenchmarkCoreObject; sourceTree = BUILT_PRODUCTS_DIR; };
+		66550BF617D51CB100327657 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Benchmark/main.m; sourceTree = "<group>"; };
+		66550C0617D51D9000327657 /* TestSQLiteStorePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStorePerformance.m; path = Benchmark/TestSQLiteStorePerformance.m; sourceTree = "<group>"; };
+		66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBinaryReadWritePerformance.m; path = Benchmark/TestBinaryReadWritePerformance.m; sourceTree = "<group>"; };
 		666ED56B17C3E78A00D148AA /* TestUndo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUndo.m; path = Tests/TestUndo.m; sourceTree = "<group>"; };
 		6675F8BA1785C02A001E5622 /* COItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItem.h; sourceTree = "<group>"; };
 		6675F8BB1785C02A001E5622 /* COItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COItem.m; sourceTree = "<group>"; };
@@ -500,7 +542,6 @@
 		669965351162E17500359BE6 /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = /usr/lib/libz.1.2.5.dylib; sourceTree = "<absolute>"; };
 		6699653F1162E1C000359BE6 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		66ABC78D17C43FBA009FB925 /* TestCustomTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCustomTrack.m; path = Tests/TestCustomTrack.m; sourceTree = "<group>"; };
-		66B38C6317B98EDE00D65771 /* TestPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestPerformance.m; path = Tests/TestPerformance.m; sourceTree = "<group>"; };
 		66C18AD417BAB2EE00C5316F /* TestEditingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestEditingContext.m; path = Tests/TestEditingContext.m; sourceTree = "<group>"; };
 		66C3669A17B426BF009ACF2F /* Typewriter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Typewriter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66C3669E17B426C0009ACF2F /* Typewriter-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = "Typewriter-Info.plist"; path = "Samples/Typewriter/Typewriter-Info.plist"; sourceTree = "<group>"; };
@@ -594,6 +635,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		66550BEA17D51C8800327657 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66550BFE17D51D0300327657 /* EtoileFoundation.framework in Frameworks */,
+				66550BFD17D51CF600327657 /* UnitKit.framework in Frameworks */,
+				66550BF917D51CBD00327657 /* CoreObject.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6686BDAA12592BDA0065DE1A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -656,6 +707,7 @@
 				791B4E2D1299C79300CCF472 /* Test */,
 				60C913B3165BBED000E0C5F4 /* BasicPersistence */,
 				66C3669A17B426BF009ACF2F /* Typewriter.app */,
+				66550BED17D51C8800327657 /* BenchmarkCoreObject */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -665,6 +717,7 @@
 			children = (
 				66D96C9F178B6E5600D1553C /* libsqlite3.dylib */,
 				6699633B115F0C4200359BE6 /* Documentation */,
+				66550BE717D51C5000327657 /* Benchmark */,
 				791B4DF41299C56900CCF472 /* Tests */,
 				6675F8B91785C02A001E5622 /* StorageDataModel */,
 				6686BDB612592C1B0065DE1A /* Core */,
@@ -786,6 +839,17 @@
 			name = Synchronization;
 			sourceTree = "<group>";
 		};
+		66550BE717D51C5000327657 /* Benchmark */ = {
+			isa = PBXGroup;
+			children = (
+				66550C0617D51D9000327657 /* TestSQLiteStorePerformance.m */,
+				66550BF617D51CB100327657 /* main.m */,
+				66550BE817D51C6100327657 /* TestObjectGraphPerformance.m */,
+				66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */,
+			);
+			name = Benchmark;
+			sourceTree = "<group>";
+		};
 		6675F8B91785C02A001E5622 /* StorageDataModel */ = {
 			isa = PBXGroup;
 			children = (
@@ -812,7 +876,6 @@
 				664199A5178C3E1800B78174 /* TestBinaryReadWrite.m */,
 				664199B0178C431D00B78174 /* TestSQLiteStore.m */,
 				664199B1178C431D00B78174 /* TestSQLiteStoreMultiPersistentRoots.m */,
-				664199B2178C431E00B78174 /* TestSQLiteStorePerformance.m */,
 				664199B3178C431E00B78174 /* TestSQLiteStorePersistentRootBackingStore.m */,
 				667F79EC17BDE00B00B6BF3A /* TestSQLiteStoreSharedPersistentRoots.m */,
 				66C97DA717CBD31800898F80 /* TestSQLiteStoreErrorHandling.m */,
@@ -1053,7 +1116,6 @@
 				66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */,
 				66FB157017A8F53D003BFC9B /* TestObjectGraphContext.m */,
 				66FB15F017AB8D4D003BFC9B /* TestItemGraphDiff.m */,
-				66B38C6317B98EDE00D65771 /* TestPerformance.m */,
 				663CE2CC17C1837700E729F5 /* TestUndoStackStore.m */,
 				666ED56B17C3E78A00D148AA /* TestUndo.m */,
 				66ABC78D17C43FBA009FB925 /* TestCustomTrack.m */,
@@ -1213,6 +1275,26 @@
 			productReference = 60C913B3165BBED000E0C5F4 /* BasicPersistence */;
 			productType = "com.apple.product-type.tool";
 		};
+		66550BEC17D51C8800327657 /* BenchmarkCoreObject */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 66550BF317D51C8800327657 /* Build configuration list for PBXNativeTarget "BenchmarkCoreObject" */;
+			buildPhases = (
+				66550BE917D51C8800327657 /* Sources */,
+				66550BEA17D51C8800327657 /* Frameworks */,
+				66550BEB17D51C8800327657 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				66550C0217D51D0800327657 /* PBXTargetDependency */,
+				66550C0017D51D0500327657 /* PBXTargetDependency */,
+				66550BFB17D51CC000327657 /* PBXTargetDependency */,
+			);
+			name = BenchmarkCoreObject;
+			productName = BenchmarkCoreObject;
+			productReference = 66550BED17D51C8800327657 /* BenchmarkCoreObject */;
+			productType = "com.apple.product-type.tool";
+		};
 		6686BDAB12592BDA0065DE1A /* CoreObject */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6686BDB012592BDC0065DE1A /* Build configuration list for PBXNativeTarget "CoreObject" */;
@@ -1306,6 +1388,7 @@
 			targets = (
 				6686BDAB12592BDA0065DE1A /* CoreObject */,
 				791B4E2C1299C79300CCF472 /* TestCoreObject */,
+				66550BEC17D51C8800327657 /* BenchmarkCoreObject */,
 				60C913B2165BBED000E0C5F4 /* BasicPersistence */,
 				66C3669917B426BF009ACF2F /* Typewriter */,
 			);
@@ -1407,6 +1490,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				60C913C4165BBF2B00E0C5F4 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66550BE917D51C8800327657 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66550C0417D51D2700327657 /* OutlineItem.m in Sources */,
+				66550C0517D51D2700327657 /* Tag.m in Sources */,
+				66550C0317D51D1800327657 /* TestCommon.m in Sources */,
+				66550BF817D51CB800327657 /* TestObjectGraphPerformance.m in Sources */,
+				66550BF717D51CB100327657 /* main.m in Sources */,
+				66550C0717D51D9000327657 /* TestSQLiteStorePerformance.m in Sources */,
+				66550C0917D51E8F00327657 /* TestBinaryReadWritePerformance.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1521,12 +1618,10 @@
 				66860BA017BED42900B24333 /* TestBinaryReadWrite.m in Sources */,
 				66860BA117BED42900B24333 /* TestSQLiteStore.m in Sources */,
 				66860BA217BED42900B24333 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */,
-				66860BA317BED42900B24333 /* TestSQLiteStorePerformance.m in Sources */,
 				66860BA417BED42900B24333 /* TestSQLiteStorePersistentRootBackingStore.m in Sources */,
 				66860BA517BED42900B24333 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66808498178DB4D5003A3CC6 /* TestBranch.m in Sources */,
-				66B38C6417B98EE100D65771 /* TestPerformance.m in Sources */,
 				66C18AD517BAB2EE00C5316F /* TestEditingContext.m in Sources */,
 				663CE2CD17C1837700E729F5 /* TestUndoStackStore.m in Sources */,
 				666ED56C17C3E78A00D148AA /* TestUndo.m in Sources */,
@@ -1562,6 +1657,21 @@
 			isa = PBXTargetDependency;
 			name = EtoileFoundation;
 			targetProxy = 60FB0A1A13C3264E00C2AB94 /* PBXContainerItemProxy */;
+		};
+		66550BFB17D51CC000327657 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6686BDAB12592BDA0065DE1A /* CoreObject */;
+			targetProxy = 66550BFA17D51CC000327657 /* PBXContainerItemProxy */;
+		};
+		66550C0017D51D0500327657 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = EtoileFoundation;
+			targetProxy = 66550BFF17D51D0500327657 /* PBXContainerItemProxy */;
+		};
+		66550C0217D51D0800327657 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = UnitKit;
+			targetProxy = 66550C0117D51D0800327657 /* PBXContainerItemProxy */;
 		};
 		66C366EE17B42BAE009ACF2F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1644,6 +1754,59 @@
 		60C913C0165BBED100E0C5F4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		66550BF417D51C8800327657 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		66550BF517D51C8800327657 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -1796,6 +1959,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		66550BF317D51C8800327657 /* Build configuration list for PBXNativeTarget "BenchmarkCoreObject" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66550BF417D51C8800327657 /* Debug */,
+				66550BF517D51C8800327657 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		6686BDB012592BDC0065DE1A /* Build configuration list for PBXNativeTarget "CoreObject" */ = {
 			isa = XCConfigurationList;

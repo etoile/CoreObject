@@ -4,10 +4,10 @@
 #import "TestCommon.h"
 #import "COContainer.h"
 
-@interface TestPerformance : TestCommon <UKTest>
+@interface TestObjectGraphPerformance : TestCommon <UKTest>
 @end
 
-@implementation TestPerformance
+@implementation TestObjectGraphPerformance
 
 - (void)testManyObjects
 {

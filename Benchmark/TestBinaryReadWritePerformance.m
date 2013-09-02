@@ -3,6 +3,9 @@
 #import "COBinaryReader.h"
 #import "COBinaryWriter.h"
 
+#define WRITE_ITERATIONS 10000LL
+#define READ_ITERATIONS 10000LL
+
 @interface TestBinaryReadWrite : NSObject <UKTest>
 {
     NSMutableArray *readObjects;
@@ -77,6 +80,8 @@ static void test_read_null(void *ctx)
 
 - (void)testBasic
 {
+    NSDate *startDate = [NSDate date];
+    
     ETUUID *uuid = [ETUUID UUID];
     
     co_buffer_t buf;
@@ -136,13 +141,22 @@ static void test_read_null(void *ctx)
         test_read_null
     };
     
-    co_reader_read(co_buffer_get_data(&buf),
-                   co_buffer_get_length(&buf),
-                   self,
-                   cb);
-    UKObjectsEqual(expected, readObjects);
-
+    for (NSUInteger i=0; i<READ_ITERATIONS; i++)
+    {
+        [readObjects removeAllObjects];
+        co_reader_read(co_buffer_get_data(&buf),
+                       co_buffer_get_length(&buf),
+                       self,
+                       cb);
+        
+        if (i==0)
+        {
+            UKObjectsEqual(expected, readObjects);
+        }
+    }
     co_buffer_free(&buf);
+    
+    NSLog(@"reading %lld iterations of the reading test took %lf ms", READ_ITERATIONS, 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
 
 
@@ -151,31 +165,39 @@ static volatile char dest[2048];
 - (void) testWritePerf
 {
     ETUUID *uuid = [ETUUID UUID];
-
-    co_buffer_t buf;
-    co_buffer_init(&buf);
-    co_buffer_begin_object(&buf);
-    co_buffer_begin_array(&buf);
-    co_buffer_store_integer(&buf, 0);
-    co_buffer_store_integer(&buf, -1);
-    co_buffer_store_integer(&buf, 1);
-    co_buffer_store_integer(&buf, -255);
-    co_buffer_store_integer(&buf, 255);
-    co_buffer_store_integer(&buf, -256);
-    co_buffer_store_integer(&buf, 256);
-    co_buffer_store_integer(&buf, -65535);
-    co_buffer_store_integer(&buf, 65535);
-    co_buffer_store_integer(&buf, -65536);
-    co_buffer_store_integer(&buf, 65536);
-    co_buffer_store_double(&buf, 3.14159);
-    co_buffer_store_string(&buf, @"hello world!");
-    co_buffer_store_uuid(&buf, uuid);
-    co_buffer_end_array(&buf);
-    co_buffer_end_object(&buf);
+    NSDate *startDate = [NSDate date];
+    int64_t iter = 0;
+    for (int64_t i=0; i<WRITE_ITERATIONS; i++)
+    {
+        co_buffer_t buf;
+        co_buffer_init(&buf);
+        co_buffer_begin_object(&buf);
+        co_buffer_begin_array(&buf);
+        co_buffer_store_integer(&buf, 0);
+        co_buffer_store_integer(&buf, -1);
+        co_buffer_store_integer(&buf, 1);
+        co_buffer_store_integer(&buf, -255);
+        co_buffer_store_integer(&buf, 255);
+        co_buffer_store_integer(&buf, -256);
+        co_buffer_store_integer(&buf, 256);
+        co_buffer_store_integer(&buf, -65535);
+        co_buffer_store_integer(&buf, 65535);
+        co_buffer_store_integer(&buf, -65536);
+        co_buffer_store_integer(&buf, 65536);
+        co_buffer_store_double(&buf, 3.14159);
+        co_buffer_store_string(&buf, @"hello world!");
+        co_buffer_store_uuid(&buf, uuid);
+        co_buffer_end_array(&buf);
+        co_buffer_end_object(&buf);
+        
+        memcpy((void *)dest, co_buffer_get_data(&buf), co_buffer_get_length(&buf));
+        
+        co_buffer_free(&buf);
+        
+        iter++;
+    }
     
-    memcpy((void *)dest, co_buffer_get_data(&buf), co_buffer_get_length(&buf));
-    
-    co_buffer_free(&buf);
+    NSLog(@"writing %lld iterations of the writing test took %lf ms", iter, 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
 
 @end
