@@ -467,6 +467,13 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (void)storePersistentRootDidChange: (NSNotification *)notif
 {
+    // FIXME: Make sure this works properly
+    int64_t notifChangeCount = [[[notif userInfo] objectForKey: kCOPersistentRootChangeCount] longLongValue];
+    if (_savedState.changeCount == notifChangeCount)
+    {
+        return;
+    }
+    
     COPersistentRootInfo *info = [[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
     
     // FIXME: This is really incomplete... factor out into a persistent root merge method.

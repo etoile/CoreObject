@@ -52,7 +52,7 @@
               @"date" : [[[[NSDateFormatter alloc] init] autorelease] stringFromDate: _date]  };
 }
 
-+ (CORevisionInfo *) revisionInfoWithPlist: (id)aPlist
++ (CORevisionInfo *) revisionInfoWithPlist: (NSDictionary *)aPlist
 {
     CORevisionInfo *info = [[[CORevisionInfo alloc] init] autorelease];
     info.revisionID = [CORevisionID revisionIDWithPlist: aPlist[@"revisionID"]];
