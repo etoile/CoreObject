@@ -34,7 +34,15 @@
 
 #import <CoreObject/COArrayDiff.h>
 #import <CoreObject/COItemGraphDiff.h>
-#import <CoreObject/COSubtreeEdits.h>
+#import <CoreObject/COItemGraphEdit.h>
+#import <CoreObject/COSetAttribute.h>
+#import <CoreObject/CODeleteAttribute.h>
+#import <CoreObject/COSetInsertion.h>
+#import <CoreObject/COSetDeletion.h>
+#import <CoreObject/COSequenceEdit.h>
+#import <CoreObject/COSequenceDeletion.h>
+#import <CoreObject/COSequenceInsertion.h>
+#import <CoreObject/COSequenceModification.h>
 
 /* Storage Data Model */
 

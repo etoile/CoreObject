@@ -4,7 +4,7 @@
 #import "COItem.h"
 #import "COItemGraph.h"
 #import "COArrayDiff.h"
-#import "COSubtreeEdits.h"
+#import <CoreObject/CoreObject.h>
 
 
 #pragma mark diff dictionary
