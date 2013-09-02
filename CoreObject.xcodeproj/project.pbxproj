@@ -1968,6 +1968,7 @@
 				66550BF517D51C8800327657 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6686BDB012592BDC0065DE1A /* Build configuration list for PBXNativeTarget "CoreObject" */ = {
 			isa = XCConfigurationList;
