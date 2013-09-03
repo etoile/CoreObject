@@ -524,4 +524,12 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
                                                         object: self];
 }
 
+- (COObjectGraphContext *) objectGraphContextForPreviewingRevision: (CORevision *)aRevision
+{
+    COObjectGraphContext *ctx = [[[COObjectGraphContext alloc] initWithModelRepository: [[self editingContext] modelRepository]] autorelease];
+    id<COItemGraph> items = [[self store] itemGraphForRevisionID: [aRevision revisionID]];
+    [ctx setItemGraph: items];
+    return ctx;
+}
+
 @end

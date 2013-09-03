@@ -259,6 +259,11 @@ extern NSString * const COPersistentRootDidChangeNotification;
 - (CORevision *)commitWithType: (NSString *)type
               shortDescription: (NSString *)shortDescription;
 
+/**
+ * Returns a read-only object graph context of the contents of a revision.
+ * Tentative API...
+ */
+- (COObjectGraphContext *) objectGraphContextForPreviewingRevision: (CORevision *)aRevision;
 
 /** @taskunit Deprecated */
 
