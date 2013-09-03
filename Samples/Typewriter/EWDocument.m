@@ -233,35 +233,37 @@
     [self commit];
 }
 
-- (NSString *)stackName
+- (COUndoStack *)undoStack
 {
-    return [NSString stringWithFormat: @"typewriter-%@",
-                [_persistentRoot persistentRootUUID]];
+    NSString *name = [NSString stringWithFormat: @"typewriter-%@",
+                      [_persistentRoot persistentRootUUID]];
+    
+    return [[COUndoStackStore defaultStore] stackForName: name];
 }
 
 - (void) commit
 {
-    [[_persistentRoot editingContext] commitWithStackNamed: [self stackName]];
+    [[_persistentRoot editingContext] commitWithUndoStack: [self undoStack]];
 }
 
 /* EWUndoManagerDelegate */
 
 - (void) undo
 {
-    [[_persistentRoot editingContext] undoForStackNamed: [self stackName]];
+    [[self undoStack] undoWithEditingContext: [_persistentRoot editingContext]];
 }
 - (void) redo
 {
-    [[_persistentRoot editingContext] redoForStackNamed: [self stackName]];
+    [[self undoStack] redoWithEditingContext: [_persistentRoot editingContext]];
 }
 
 - (BOOL) canUndo
 {
-    return [[_persistentRoot editingContext] canUndoForStackNamed: [self stackName]];
+    return [[self undoStack] canUndoWithEditingContext: [_persistentRoot editingContext]];
 }
 - (BOOL) canRedo
 {
-    return [[_persistentRoot editingContext] canRedoForStackNamed: [self stackName]];
+    return [[self undoStack] canRedoWithEditingContext: [_persistentRoot editingContext]];
 }
 
 - (NSString *) undoMenuItemTitle
