@@ -10,6 +10,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 
 @class COObject, CORevision, CORevisionID, COPersistentRoot, COBranchInfo, COObjectGraphContext, COEditingContext;
+@class COItemGraphDiff, COMergeInfo;
 
 extern NSString * const kCOBranchLabel;
 
@@ -241,22 +242,16 @@ extern NSString * const kCOBranchLabel;
 
 /** @taskunit Merging Between Tracks */
 
+/**
+ * Branch that is currently being merged. Always returns nil unless explicitly
+ * set. If it is set at commit time, records the _current revision_ of the
+ * mergingBranch as the merge parent of the new commit.
+ */
+@property (readwrite, nonatomic, retain) COBranch *mergingBranch;
 
-/**
- * This method is not yet implemented.
- */
-- (BOOL)mergeChangesFromTrack: (COBranch *)aSourceTrack;
-/**
- * This method is not yet implemented.
- */
-- (BOOL)mergeChangesFromRevision: (CORevision *)startRev
-							  to: (CORevision *)endRev
-						 ofTrack: (COBranch *)aSourceTrack;
-/**
- * This method is not yet implemented.
- */
-- (BOOL)mergeChangesFromRevisionSet: (NSSet *)revs
-							ofTrack: (COBranch *)aSourceTrack;
+- (COMergeInfo *) mergeInfoForMergingBranch: (COBranch *)aBranch;
+
+- (COMergeInfo *) mergeInfoForMergingRevision:(CORevision *)aRevision;
 
 /**
  * Searches for whether the given revision is on this branch.

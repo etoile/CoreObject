@@ -22,6 +22,9 @@
 #import "COObjectGraphContext.h"
 #import "COObjectGraphContext+Private.h"
 #import "COEditingContext+Undo.h"
+#import "COLeastCommonAncestor.h"
+#import "COItemGraphDiff.h"
+#import "COMergeInfo.h"
 
 NSString * const kCOBranchLabel = @"COBranchLabel";
 
@@ -30,6 +33,7 @@ NSString * const kCOBranchLabel = @"COBranchLabel";
 @synthesize UUID = _UUID;
 @synthesize persistentRoot = _persistentRoot;
 @synthesize objectGraphContext = _objectGraph;
+@synthesize mergingBranch;
 
 - (id)init
 {
@@ -528,10 +532,16 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     NSArray *changedItemUUIDs = [(NSSet *)[[[_objectGraph changedObjects] mappedCollection] UUID] allObjects];
     if ([changedItemUUIDs count] > 0)
     {
+        CORevisionID *mergeParent = nil;
+        if (self.mergingBranch != nil)
+        {
+            mergeParent = [[self.mergingBranch currentRevision] revisionID];
+        }
+        
         CORevisionID *revId = [store writeRevisionWithItemGraph: _objectGraph
                                                        metadata: metadata
                                                parentRevisionID: _currentRevisionID
-                                          mergeParentRevisionID: nil
+                                          mergeParentRevisionID: mergeParent
                                                   modifiedItems: changedItemUUIDs
                                              error: NULL];        
         
@@ -635,6 +645,51 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     while (![rev isEqual: oldest]);
     
     return nil;
+}
+
+- (COMergeInfo *) mergeInfoForMergingBranch: (COBranch *)aBranch
+{
+    CORevisionID *lca = [COLeastCommonAncestor commonAncestorForCommit: [[aBranch currentRevision] revisionID]
+                                                             andCommit: [[self currentRevision] revisionID]
+                                                                 store: [self store]];
+    id <COItemGraph> baseGraph = [[self store] itemGraphForRevisionID: lca];
+    
+    return [self diffForMergingGraphWithSelf: [aBranch objectGraphContext]
+                                  revisionID: [[aBranch currentRevision] revisionID]
+                                   baseGraph: baseGraph
+                              baseRevisionID: lca];
+}
+
+- (COMergeInfo *) mergeInfoForMergingRevision:(CORevision *)aRevision
+{
+    CORevisionID *lca = [COLeastCommonAncestor commonAncestorForCommit: [aRevision revisionID]
+                                                             andCommit: [[self currentRevision] revisionID]
+                                                                 store: [self store]];
+    id <COItemGraph> baseGraph = [[self store] itemGraphForRevisionID: lca];
+    id <COItemGraph> mergeGraph = [[self store] itemGraphForRevisionID: [aRevision revisionID]];
+
+    return [self diffForMergingGraphWithSelf: mergeGraph
+                                  revisionID: [aRevision revisionID]
+                                   baseGraph: baseGraph
+                              baseRevisionID: lca];
+}
+
+- (COMergeInfo *) diffForMergingGraphWithSelf: (id <COItemGraph>) mergeGraph
+                                       revisionID: (CORevisionID *) mergeRevisionID
+                                        baseGraph: (id <COItemGraph>) baseGraph
+                                   baseRevisionID: (CORevisionID *)aBaseRevisionID
+{
+    COItemGraphDiff *mergingBranchDiff = [COItemGraphDiff diffItemTree: baseGraph withItemTree: mergeGraph sourceIdentifier: @"merged"];
+    COItemGraphDiff *selfDiff = [COItemGraphDiff diffItemTree: baseGraph withItemTree: [self objectGraphContext] sourceIdentifier: @"self"];
+    
+    COItemGraphDiff *merged = [selfDiff itemTreeDiffByMergingWithDiff: mergingBranchDiff];
+
+    COMergeInfo *result = [[[COMergeInfo alloc] init] autorelease];
+    result.mergeDestinationRevision = [self currentRevision];
+    result.mergeSourceRevision = [CORevision revisionWithStore: [self store] revisionID: mergeRevisionID];
+    result.baseRevision =[CORevision revisionWithStore: [self store] revisionID: aBaseRevisionID];
+    result.diff = merged;
+    return result;
 }
 
 @end

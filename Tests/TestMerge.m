@@ -8,12 +8,6 @@
 
 @implementation TestMerge
 
-/*
- 
- 
- 
- */
-
 - (void) testSimpleMerge
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
@@ -62,8 +56,14 @@
         UKObjectsEqual(@"0", [(OutlineItem *)[[persistentRootCtx2 objectGraphContextForPreviewingRevision: initialRev] rootObject] label]);
         UKObjectsEqual(@"0", [(OutlineItem *)[[persistentRootCtx2 objectGraphContextForPreviewingRevision: initialRev] objectWithUUID: [childObj UUID]] label]);
     }
-    
-    // TODO: continue
+
+    [initialBranch setMergingBranch: secondBranch];
+
+    COMergeInfo *mergeInfo = [initialBranch mergeInfoForMergingBranch: secondBranch];
+    UKFalse([mergeInfo.diff hasConflicts]);
+
+    [mergeInfo.diff applyTo: [initialBranch objectGraphContext]];
+    [persistentRoot commit];
 }
 
 @end

@@ -57,6 +57,10 @@
 		66094848178794D40049468B /* COItem+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 66094846178794D40049468B /* COItem+JSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6609485E1787A1160049468B /* CORelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6609485C1787A1160049468B /* CORelationshipCache.m */; };
 		6609485F1787A1160049468B /* CORelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 6609485D1787A1160049468B /* CORelationshipCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		660D4CD917D5C7CB003C9ACC /* COLeastCommonAncestor.h in Headers */ = {isa = PBXBuildFile; fileRef = 660D4CD717D5C7CB003C9ACC /* COLeastCommonAncestor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		660D4CDA17D5C7CB003C9ACC /* COLeastCommonAncestor.m in Sources */ = {isa = PBXBuildFile; fileRef = 660D4CD817D5C7CB003C9ACC /* COLeastCommonAncestor.m */; };
+		660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 660D4CE317D689FC003C9ACC /* COMergeInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		660D4CE617D689FC003C9ACC /* COMergeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 660D4CE417D689FC003C9ACC /* COMergeInfo.m */; };
 		662FFB7F17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB7D17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		662FFB8017C2026000BA3F2F /* COCommandUndeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */; };
 		662FFB9E17C2DE8100BA3F2F /* COCommandUndeleteBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -432,6 +436,10 @@
 		66094846178794D40049468B /* COItem+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "COItem+JSON.h"; sourceTree = "<group>"; };
 		6609485C1787A1160049468B /* CORelationshipCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CORelationshipCache.m; path = Core/CORelationshipCache.m; sourceTree = "<group>"; };
 		6609485D1787A1160049468B /* CORelationshipCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CORelationshipCache.h; path = Core/CORelationshipCache.h; sourceTree = "<group>"; };
+		660D4CD717D5C7CB003C9ACC /* COLeastCommonAncestor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COLeastCommonAncestor.h; path = Diff/COLeastCommonAncestor.h; sourceTree = "<group>"; };
+		660D4CD817D5C7CB003C9ACC /* COLeastCommonAncestor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COLeastCommonAncestor.m; path = Diff/COLeastCommonAncestor.m; sourceTree = "<group>"; };
+		660D4CE317D689FC003C9ACC /* COMergeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COMergeInfo.h; path = Diff/COMergeInfo.h; sourceTree = "<group>"; };
+		660D4CE417D689FC003C9ACC /* COMergeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COMergeInfo.m; path = Diff/COMergeInfo.m; sourceTree = "<group>"; };
 		662FFB7D17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandUndeletePersistentRoot.h; sourceTree = "<group>"; };
 		662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommandUndeletePersistentRoot.m; sourceTree = "<group>"; };
 		662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandUndeleteBranch.h; sourceTree = "<group>"; };
@@ -944,8 +952,8 @@
 				609C008E1704C3DA00D01AAB /* COPersistentRoot.h */,
 				6646975317CDA8DB00A1B767 /* COPersistentRoot+Private.h */,
 				609C008F1704C3DA00D01AAB /* COPersistentRoot.m */,
-				609C00B81704C3FF00D01AAB /* COBranch.h */,
 				6646975517CDA94000A1B767 /* COBranch+Private.h */,
+				609C00B81704C3FF00D01AAB /* COBranch.h */,
 				609C00B91704C3FF00D01AAB /* COBranch.m */,
 				609C00781704C2BA00D01AAB /* CORevision.h */,
 				609C00791704C2BA00D01AAB /* CORevision.m */,
@@ -985,6 +993,10 @@
 				66808487178DAFE3003A3CC6 /* diff.cc */,
 				66808488178DAFE3003A3CC6 /* diff.h */,
 				66808489178DAFE3003A3CC6 /* diff.hh */,
+				660D4CD717D5C7CB003C9ACC /* COLeastCommonAncestor.h */,
+				660D4CD817D5C7CB003C9ACC /* COLeastCommonAncestor.m */,
+				660D4CE317D689FC003C9ACC /* COMergeInfo.h */,
+				660D4CE417D689FC003C9ACC /* COMergeInfo.m */,
 			);
 			name = "Diff & Merge (Low-level API)";
 			sourceTree = "<group>";
@@ -1249,6 +1261,8 @@
 				669724E917D464170090B31A /* COSequenceDeletion.h in Headers */,
 				669724ED17D464400090B31A /* COSequenceInsertion.h in Headers */,
 				669724F117D4646E0090B31A /* COSequenceModification.h in Headers */,
+				660D4CD917D5C7CB003C9ACC /* COLeastCommonAncestor.h in Headers */,
+				660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */,
 				668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */,
 				6646974A17CDA78300A1B767 /* COEditingContext+Private.h in Headers */,
 				6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */,
@@ -1583,6 +1597,8 @@
 				669724EA17D464170090B31A /* COSequenceDeletion.m in Sources */,
 				669724EE17D464400090B31A /* COSequenceInsertion.m in Sources */,
 				669724F217D4646E0090B31A /* COSequenceModification.m in Sources */,
+				660D4CDA17D5C7CB003C9ACC /* COLeastCommonAncestor.m in Sources */,
+				660D4CE617D689FC003C9ACC /* COMergeInfo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
