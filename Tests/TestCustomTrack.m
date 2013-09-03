@@ -4,6 +4,10 @@
 #import "TestCommon.h"
 
 @interface TestCustomTrack : TestCommon <UKTest>
+{
+    COUndoStack *_testStack;
+    COUndoStack *_setupStack;
+}
 @end
 
 @implementation TestCustomTrack
@@ -12,19 +16,20 @@
 {
 	SUPERINIT;
     
-    COUndoStackStore *uss = [[COUndoStackStore alloc] init];
-    for (NSString *stack in A(@"test", @"setup"))
-    {
-        [uss clearStacksForName: stack];
-    }
-    [uss release];
+    ASSIGN(_testStack, [[COUndoStackStore defaultStore] stackForName: @"test"]);
+    ASSIGN(_setupStack, [[COUndoStackStore defaultStore] stackForName: @"setup"]);
+    
+    [_testStack clear];
+    [_setupStack clear];
     
 	return self;
 }
 
 - (void)dealloc
 {
-	[super dealloc];
+    [_testStack release];
+    [_setupStack release];
+    [super dealloc];
 }
 
 /* The custom track uses the root object commit track to undo and redo, no 
@@ -35,51 +40,51 @@ selective undo is involved. */
 
 	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
 	[object setValue: @"Groceries" forProperty: @"label"];
-    [ctx commitWithStackNamed: @"setup"];
+    [ctx commitWithUndoStack: _setupStack];
     CORevision *firstRevision = [[[object persistentRoot] currentBranch] currentRevision];
     
 	/* Second commit */
 
 	[object setValue: @"Shopping List" forProperty: @"label"];
-    [ctx commitWithStackNamed: @"test"];
+    [ctx commitWithUndoStack: _testStack];
     CORevision *secondRevision = [[[object persistentRoot] currentBranch] currentRevision];
     
 	/* Third commit */
 
 	[object setValue: @"Todo" forProperty: @"label"];
-    [ctx commitWithStackNamed: @"test"];
+    [ctx commitWithUndoStack: _testStack];
     CORevision *thirdRevision = [[[object persistentRoot] currentBranch] currentRevision];
     
 	/* First undo  (Todo -> Shopping List) */
 
-	UKTrue([ctx canUndoForStackNamed: @"test"]);
-	[ctx undoForStackNamed: @"test"];
+	UKTrue([_testStack canUndoWithEditingContext: ctx]);
+	[_testStack undoWithEditingContext: ctx];
     
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
 	UKObjectsEqual(secondRevision, [[object persistentRoot] revision]);
 
 	/*  Second undo (Shopping List -> Groceries) */
 
-    UKTrue([ctx canUndoForStackNamed: @"test"]);
-	[ctx undoForStackNamed: @"test"];
-	UKFalse([ctx canUndoForStackNamed: @"test"]);
+    UKTrue([_testStack canUndoWithEditingContext: ctx]);
+	[_testStack undoWithEditingContext: ctx];
+	UKFalse([_testStack canUndoWithEditingContext: ctx]);
     
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 	UKObjectsEqual(firstRevision, [[object persistentRoot] revision]);
 
 	/* First redo (Groceries -> Shopping List) */
 
-	UKTrue([ctx canRedoForStackNamed: @"test"]);
-	[ctx redoForStackNamed: @"test"];
+	UKTrue([_testStack canRedoWithEditingContext: ctx]);
+	[_testStack redoWithEditingContext: ctx];
 
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
 	UKObjectsEqual(secondRevision, [[object persistentRoot] revision]);
 
 	/* Second redo (Shopping List -> Todo) */
 
-	UKTrue([ctx canRedoForStackNamed: @"test"]);
-	[ctx redoForStackNamed: @"test"];
-	UKFalse([ctx canRedoForStackNamed: @"test"]);
+	UKTrue([_testStack canRedoWithEditingContext: ctx]);
+	[_testStack redoWithEditingContext: ctx];
+	UKFalse([_testStack canRedoWithEditingContext: ctx]);
     
 	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
 	UKObjectsEqual(thirdRevision, [[object persistentRoot] revision]);
@@ -103,7 +108,7 @@ selective undo is involved. */
 	COContainer *object = [objectPersistentRoot rootObject];
 	[object setValue: @"Groceries" forProperty: @"label"];
 
-    [ctx commitWithStackNamed: @"test"];
+    [ctx commitWithUndoStack: _testStack];
     
 	/* Second commit */
 
@@ -111,7 +116,7 @@ selective undo is involved. */
 	COContainer *doc = [docPersistentRoot rootObject];
 	[doc setValue: @"Document" forProperty: @"label"];
 
-	[ctx commitWithStackNamed: @"test"];
+	[ctx commitWithUndoStack: _testStack];
 
 	/* Third commit call (creates commits in objectPersistentRoot and docPersistentRoot) */
 
@@ -120,13 +125,13 @@ selective undo is involved. */
     [doc addObject: para1];
 	[object setValue: @"Shopping List" forProperty: @"label"];
 
-	[ctx commitWithStackNamed: @"test"];
+	[ctx commitWithUndoStack: _testStack];
 
 	/* Fourth commit */
 
 	[object setValue: @"Todo" forProperty: @"label"];
 
-	[ctx commitWithStackNamed: @"test"];
+	[ctx commitWithUndoStack: _testStack];
 
 	/* Fifth commit */
 
@@ -134,13 +139,13 @@ selective undo is involved. */
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[doc addObject: para2];
 
-	[ctx commitWithStackNamed: @"test"];
+	[ctx commitWithUndoStack: _testStack];
 
 	/* Sixth commit */
 
 	[para1 setValue: @"paragraph with different contents" forProperty: @"label"];
 
-	[ctx commitWithStackNamed: @"test"];
+	[ctx commitWithUndoStack: _testStack];
 
 	return A(object, doc, para1, para2);
 }
@@ -164,38 +169,38 @@ selective undo is involved. */
     
 	/* Basic undo/redo check */
 
-	[ctx undoForStackNamed: @"test"];
+	[_testStack undoWithEditingContext: ctx];
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
 	
-	[ctx redoForStackNamed: @"test"];
+	[_testStack redoWithEditingContext: ctx];
 	UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
     
 	/* Sixth and fifth commit undone ('doc' revision) */
     
     UKNotNil([docPersistentRoot objectWithUUID: [para2 UUID]]);
     UKObjectsEqual((@[para1, para2]), [doc contents]);
-	[ctx undoForStackNamed: @"test"];
-	[ctx undoForStackNamed: @"test"];
+	[_testStack undoWithEditingContext: ctx];
+	[_testStack undoWithEditingContext: ctx];
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
 	UKNil([docPersistentRoot objectWithUUID: [para2 UUID]]);
 	UKObjectsEqual(@[para1], [doc contents]);
 
 	/* Fourth commit undone ('object' revision) */
 
-	[ctx undoForStackNamed: @"test"];
+	[_testStack undoWithEditingContext: ctx];
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
 
 	/* Third commit call undone (two underlying commits, one on 'doc' and one on 'object') */
 
     UKNotNil([docPersistentRoot objectWithUUID: [para1 UUID]]);
-	[ctx undoForStackNamed: @"test"];
+	[_testStack undoWithEditingContext: ctx];
 	UKNil([docPersistentRoot objectWithUUID: [para1 UUID]]);
     UKObjectsEqual(@[], [doc contents]);
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
 	/* Second commit undone ('doc' revision) */
 
-	[ctx undoForStackNamed: @"test"];
+	[_testStack undoWithEditingContext: ctx];
     UKTrue(docPersistentRoot.isDeleted);
     
 	/***********************************************/
@@ -208,7 +213,7 @@ selective undo is involved. */
 
 	/* Second commit redone */
 
-	[ctx redoForStackNamed: @"test"];
+	[_testStack redoWithEditingContext: ctx];
     UKFalse(docPersistentRoot.isDeleted);
 	UKNotNil([docPersistentRoot objectWithUUID: [doc UUID]]);
 	UKObjectsSame(doc, [docPersistentRoot objectWithUUID: [doc UUID]]);
@@ -216,17 +221,17 @@ selective undo is involved. */
 
 	/* Third commit redone (involve two underlying commits) */
 
-	[ctx redoForStackNamed: @"test"];
+	[_testStack redoWithEditingContext: ctx];
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
 
 	/* Third commit undone (involve two underlying commits)  */
 
-	[ctx undoForStackNamed: @"test"];
+	[_testStack undoWithEditingContext: ctx];
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
 	/* Third commit redone (involve two underlying commits) */
 
-	[ctx redoForStackNamed: @"test"];
+	[_testStack redoWithEditingContext: ctx];
 	UKNotNil([docPersistentRoot objectWithUUID: [para1 UUID]]);
 	UKObjectsNotSame(para1, [docPersistentRoot objectWithUUID: [para1 UUID]]);
 
@@ -237,10 +242,10 @@ selective undo is involved. */
 
 	/* Fourth, fifth and sixth commits redone */
 
-	[ctx redoForStackNamed: @"test"];
-    [ctx redoForStackNamed: @"test"];
-    [ctx redoForStackNamed: @"test"];
-    UKFalse([ctx canRedoForStackNamed: @"test"]);
+	[_testStack redoWithEditingContext: ctx];
+    [_testStack redoWithEditingContext: ctx];
+    [_testStack redoWithEditingContext: ctx];
+    UKFalse([_testStack canRedoWithEditingContext: ctx]);
 	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
 	UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
 	UKNotNil([docPersistentRoot objectWithUUID: [para2 UUID]]);

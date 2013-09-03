@@ -13,6 +13,7 @@
     COPersistentRoot *persistentRoot;
     COContainer *rootObj;
     COBranch *originalBranch;
+    COUndoStack *_testStack;
 }
 @end
 
@@ -24,11 +25,16 @@
     ASSIGN(persistentRoot, [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"]);
     ASSIGN(rootObj, [persistentRoot rootObject]);
     ASSIGN(originalBranch, [persistentRoot currentBranch]);
+    
+    ASSIGN(_testStack, [[COUndoStackStore defaultStore] stackForName: @"test"]);
+    [_testStack clear];
+    
     return self;
 }
 
 - (void) dealloc
 {
+    DESTROY(_testStack);
     DESTROY(rootObj);
     DESTROY(originalBranch);
     DESTROY(persistentRoot);
@@ -308,7 +314,7 @@
     [ctx commit];
     
     [persistentRoot setCurrentBranch: secondBranch];
-    [ctx commitWithStackNamed: @"test"];
+    [ctx commitWithUndoStack: _testStack];
     
     // Load in another context
     {
