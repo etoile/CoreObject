@@ -56,6 +56,19 @@
 {
 	[overlayShelf setIgnoresMouseEvents: YES];
 	[[overlayShelf animator] setAlphaValue:0.0];
+
+}
+
+- (void)toggleShelf: (id)sender
+{
+    if ([overlayShelf alphaValue] == 1.0)
+    {
+        [self hideShelf: sender];
+    }
+    else
+    {
+        [self showShelf: sender];
+    }
 }
 
 
@@ -93,7 +106,7 @@
 	// UI Setup
 	[self addStatusBarButtons];
 	desktopWindow = [[DesktopWindow alloc] init];
-	projectNavWindow = [[ProjectNavWindow alloc] init];
+	//projectNavWindow = [[ProjectNavWindow alloc] init];
 	overlayShelf = [[OverlayShelf alloc] init];
 	
 	// Show existing documents

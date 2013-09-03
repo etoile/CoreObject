@@ -52,4 +52,10 @@
     [aContext redoForStackNamed: _name];
 }
 
+- (void) clear
+{
+    [_store clearStack: kCOUndoStack forName: _name];
+    [_store clearStack: kCORedoStack forName: _name];
+}
+
 @end

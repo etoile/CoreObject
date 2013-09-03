@@ -11,13 +11,9 @@
 		if ([[event charactersIgnoringModifiers] isEqualToString:
 			 [NSString stringWithCharacters: &F1 length:1]])
 		{
-			if ([event type] == NSKeyDown)
+			if ([event type] == NSKeyUp)
 			{
-				[[NSApp delegate] showShelf: self];
-			}
-			else
-			{
-				[[NSApp delegate] hideShelf: self];
+				[[NSApp delegate] toggleShelf: self];
 			}
 		}
 	}

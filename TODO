@@ -8,7 +8,9 @@ First Release
   x App-level undo
     - polish, fine-tune api
   - Diff/merge cleanup
-  - Cleanup COObject, synthesize accessors
+  - Cleanup COObject
+    x synthesize accessors (started)
+    - synthesize all accessors
   - Copying support
 
 - Tests
@@ -125,6 +127,13 @@ First Release
 
 - Make COQuery a bit more usable
 - Switch to NSUUID
+
+- General
+  - Migrate to ARC?
+  - COItem: use a std::unordered_map<NSString *, std::pair<uint32_t, id>>
+    (i.e. map from string to (COType, object) pair). We could also
+    use SEL instead of NSString *, or some other uniqued property ID.
+
 
 Future Work
 -----------

@@ -14,6 +14,8 @@
 @property (readonly, nonatomic) NSArray *undoNodes;
 @property (readonly, nonatomic) NSArray *redoNodes;
 
+- (void) clear;
+
 - (BOOL) canUndoWithEditingContext: (COEditingContext *)aContext;
 - (BOOL) canRedoWithEditingContext: (COEditingContext *)aContext;
 
