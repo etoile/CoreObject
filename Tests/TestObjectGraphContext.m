@@ -1,6 +1,6 @@
 #import "TestCommon.h"
 
-@interface TestObjectGraphContext : EditingContextTestCase <UKTest> {
+@interface TestObjectGraphContext : NSObject <UKTest> {
     COCopier *copier;
     COObjectGraphContext *ctx1;
     COObject *root1;
@@ -208,8 +208,8 @@
 
 - (void)testChangeTrackingBasic
 {
-    // HACK: COObjectGraphContext change tracking is disabled for non-persistent contexts
-	COObjectGraphContext *ctx2 = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] objectGraphContext];
+	COObjectGraphContext *ctx2 = [[[COObjectGraphContext alloc] init] autorelease];
+    [ctx2 setRootObject: [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"]];
 	COObject *root = [ctx2 rootObject];
     
     UKObjectsEqual(S(root), [ctx2 insertedObjects]);
