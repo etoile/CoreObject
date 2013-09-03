@@ -7,7 +7,7 @@
  * For each execution of a test method, the store is recreated and a persistent root
  * is created in -init with a single commit, with the contents returned by -makeInitialItemTree.
  */
-@interface TestSQLiteStore : COSQLiteStoreTestCase <UKTest>
+@interface TestSQLiteStore : SQLiteStoreTestCase <UKTest>
 {
     COPersistentRootInfo *proot;
     ETUUID *prootUUID;

@@ -5,7 +5,7 @@
 
 #define SERVER_STORE_URL [NSURL fileURLWithPath: [@"~/TestStore2.sqlite" stringByExpandingTildeInPath]]
 
-@interface TestSynchronization : TestCommon <UKTest>
+@interface TestSynchronization : EditingContextTestCase <UKTest>
 {
     COSQLiteStore *serverStore;
 }

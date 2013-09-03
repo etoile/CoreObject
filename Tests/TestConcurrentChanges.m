@@ -2,7 +2,7 @@
 #import <CoreObject/COObject.h>
 #import <UnitKit/UnitKit.h>
 
-@interface TestConcurrentChanges : TestCommon <UKTest>
+@interface TestConcurrentChanges : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestConcurrentChanges

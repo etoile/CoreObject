@@ -2,7 +2,7 @@
 #import <CoreObject/COObject.h>
 #import <UnitKit/UnitKit.h>
 
-@interface TestRevisionNumber : TestCommon <UKTest>
+@interface TestRevisionNumber : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestRevisionNumber

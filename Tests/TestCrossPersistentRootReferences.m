@@ -2,7 +2,7 @@
 #import <UnitKit/UnitKit.h>
 #import "TestCommon.h"
 
-@interface TestCrossPersistentRootReferences : TestCommon <UKTest>
+@interface TestCrossPersistentRootReferences : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestCrossPersistentRootReferences

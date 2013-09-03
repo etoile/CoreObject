@@ -156,6 +156,7 @@
 		669724EE17D464400090B31A /* COSequenceInsertion.m in Sources */ = {isa = PBXBuildFile; fileRef = 669724EC17D464400090B31A /* COSequenceInsertion.m */; };
 		669724F117D4646E0090B31A /* COSequenceModification.h in Headers */ = {isa = PBXBuildFile; fileRef = 669724EF17D4646D0090B31A /* COSequenceModification.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		669724F217D4646E0090B31A /* COSequenceModification.m in Sources */ = {isa = PBXBuildFile; fileRef = 669724F017D4646D0090B31A /* COSequenceModification.m */; };
+		66AB075F17D5846000ADDA17 /* TestMerge.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AB075E17D5846000ADDA17 /* TestMerge.m */; };
 		66ABC78E17C43FBA009FB925 /* TestCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66ABC78D17C43FBA009FB925 /* TestCustomTrack.m */; };
 		66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -541,6 +542,7 @@
 		669963EB11600FD500359BE6 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		669965351162E17500359BE6 /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = /usr/lib/libz.1.2.5.dylib; sourceTree = "<absolute>"; };
 		6699653F1162E1C000359BE6 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
+		66AB075E17D5846000ADDA17 /* TestMerge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestMerge.m; path = Tests/TestMerge.m; sourceTree = "<group>"; };
 		66ABC78D17C43FBA009FB925 /* TestCustomTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCustomTrack.m; path = Tests/TestCustomTrack.m; sourceTree = "<group>"; };
 		66C18AD417BAB2EE00C5316F /* TestEditingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestEditingContext.m; path = Tests/TestEditingContext.m; sourceTree = "<group>"; };
 		66C3669A17B426BF009ACF2F /* Typewriter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Typewriter.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1106,11 +1108,11 @@
 			children = (
 				66E451DA17CC565F00205679 /* Model Objects */,
 				609C00541704C24C00D01AAB /* main.m */,
+				609C00581704C24C00D01AAB /* TestCommon.h */,
+				609C00591704C24C00D01AAB /* TestCommon.m */,
 				66455AAC1796E85A00E57127 /* TestCrossPersistentRootReferences.m */,
 				66C18AD417BAB2EE00C5316F /* TestEditingContext.m */,
 				609C00571704C24C00D01AAB /* TestBranch.m */,
-				609C00581704C24C00D01AAB /* TestCommon.h */,
-				609C00591704C24C00D01AAB /* TestCommon.m */,
 				66808461178CD4FD003A3CC6 /* TestCopier.m */,
 				609C00611704C24C00D01AAB /* TestRevisionNumber.m */,
 				66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */,
@@ -1122,6 +1124,7 @@
 				66D32A9E17C49903004D006D /* TestHistoryTrack.m */,
 				66E451CA17CC456700205679 /* TestCOObjectSynthesizedAccessors.m */,
 				6646978F17CEAFD800A1B767 /* TestSynchronization.m */,
+				66AB075E17D5846000ADDA17 /* TestMerge.m */,
 				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				667F1ECE179C81BE0083C3E6 /* Store Tests */,
 				667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */,
@@ -1632,6 +1635,7 @@
 				66E451D617CC461F00205679 /* OutlineItem.m in Sources */,
 				66E451D917CC565200205679 /* Tag.m in Sources */,
 				6646979017CEAFD800A1B767 /* TestSynchronization.m in Sources */,
+				66AB075F17D5846000ADDA17 /* TestMerge.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

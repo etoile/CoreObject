@@ -8,7 +8,7 @@
 #import "COContainer.h"
 #import "COPersistentRoot.h"
 
-@interface TestBranch : TestCommon <UKTest>
+@interface TestBranch : EditingContextTestCase <UKTest>
 {
     COPersistentRoot *persistentRoot;
     COContainer *rootObj;

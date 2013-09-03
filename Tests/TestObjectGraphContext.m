@@ -1,6 +1,6 @@
 #import "TestCommon.h"
 
-@interface TestObjectGraphContext : TestCommon <UKTest> {
+@interface TestObjectGraphContext : EditingContextTestCase <UKTest> {
     COCopier *copier;
     COObjectGraphContext *ctx1;
     COObject *root1;
@@ -15,7 +15,7 @@
     self = [super init];
     copier = [[COCopier alloc] init];
     
-    /* Create a context which uses the main model repository. In +[TestCommon setUp], 
+    /* Create a context which uses the main model repository. In +[EditingContextTestCase setUp], 
        we add OutlineItem and other metamodels to the main repository. */
     ctx1 = [[COObjectGraphContext alloc] init];
     root1 = [self addObjectWithLabel: @"root1" toContext: ctx1];

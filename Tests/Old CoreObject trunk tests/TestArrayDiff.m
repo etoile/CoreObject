@@ -4,7 +4,7 @@
 #import "COStringDiff.h"
 #import "TestCommon.h"
 
-@interface TestDiff : TestCommon <UKTest>
+@interface TestDiff : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestDiff

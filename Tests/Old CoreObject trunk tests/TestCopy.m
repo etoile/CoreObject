@@ -4,7 +4,7 @@
 #import "COGroup.h"
 #import "TestCommon.h"
 
-@interface TestCopy : TestCommon <UKTest>
+@interface TestCopy : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestCopy

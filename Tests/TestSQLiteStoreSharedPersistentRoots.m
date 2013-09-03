@@ -6,7 +6,7 @@
 /**
  * Tests two persistent roots sharing the same backing store behave correctly
  */
-@interface TestSQLiteStoreSharedPersistentRoots : COSQLiteStoreTestCase <UKTest>
+@interface TestSQLiteStoreSharedPersistentRoots : SQLiteStoreTestCase <UKTest>
 {
     COPersistentRootInfo *prootA;
     COPersistentRootInfo *prootB;

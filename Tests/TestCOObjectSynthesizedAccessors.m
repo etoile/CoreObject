@@ -1,6 +1,6 @@
 #import "TestCommon.h"
 
-@interface TestCOObjectSynthesizedAccessors : TestCommon <UKTest>
+@interface TestCOObjectSynthesizedAccessors : EditingContextTestCase <UKTest>
 {
     COPersistentRoot *persistentRoot;
 }

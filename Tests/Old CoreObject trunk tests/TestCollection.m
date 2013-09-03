@@ -12,7 +12,7 @@
 #import "COPersistentRoot.h"
 #import "COTag.h"
 
-@interface TestCollection : TestCommon <UKTest>
+@interface TestCollection : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestCollection

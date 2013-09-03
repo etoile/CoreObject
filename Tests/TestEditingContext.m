@@ -3,7 +3,7 @@
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
 
-@interface TestEditingContext : TestCommon <UKTest>
+@interface TestEditingContext : EditingContextTestCase <UKTest>
 {
 }
 @end

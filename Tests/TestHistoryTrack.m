@@ -3,7 +3,7 @@
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
 
-@interface TestHistoryTrack : TestCommon <UKTest>
+@interface TestHistoryTrack : EditingContextTestCase <UKTest>
 {
     COUndoStack *_workspaceStack;
     COUndoStack *_doc1Stack;

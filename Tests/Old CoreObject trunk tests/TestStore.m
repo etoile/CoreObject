@@ -2,7 +2,7 @@
 #import <UnitKit/UnitKit.h>
 #import "TestCommon.h"
 
-@interface TestStore : TestCommon <UKTest>
+@interface TestStore : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestStore

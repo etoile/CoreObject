@@ -16,7 +16,7 @@
 
 @end
 
-@interface TestObject : TestCommon <UKTest>
+@interface TestObject : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestObject

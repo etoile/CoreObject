@@ -4,7 +4,7 @@
 #import "COSearchResult.h"
 
 
-@interface TestSQLiteStoreMultiPersistentRoots : COSQLiteStoreTestCase <UKTest>
+@interface TestSQLiteStoreMultiPersistentRoots : SQLiteStoreTestCase <UKTest>
 {
     COPersistentRootInfo *docProot;
     COPersistentRootInfo *tagProot;

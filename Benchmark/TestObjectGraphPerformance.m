@@ -4,7 +4,7 @@
 #import "TestCommon.h"
 #import "COContainer.h"
 
-@interface TestObjectGraphPerformance : TestCommon <UKTest>
+@interface TestObjectGraphPerformance : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestObjectGraphPerformance

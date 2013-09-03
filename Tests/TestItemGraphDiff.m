@@ -2,7 +2,7 @@
 #import <UnitKit/UnitKit.h>
 #import "TestCommon.h"
 
-@interface TestItemGraphDiff : TestCommon <UKTest>
+@interface TestItemGraphDiff : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestItemGraphDiff

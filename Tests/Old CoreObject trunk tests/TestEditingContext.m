@@ -7,7 +7,7 @@
 #import "COSQLiteStore.h"
 #import "TestCommon.h"
 
-@interface TestEditingContext : TestCommon <UKTest>
+@interface TestEditingContext : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestEditingContext

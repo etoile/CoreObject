@@ -1,0 +1,28 @@
+	// Person entity
+    
+    // We can't / don't want to support this...
+
+One-to-one symmetric relationships don't fit in to our DB model because they don't have a
+persistent and computed side like parent->child relationship.
+
+For one-to-one symmetric, both objects have to persist the reference to the other.
+Then, when you modify either side, you have to be careful to keep the other
+in sync. This could be implemented in app logic, but we won't support it out of the box.
+    
+//	{
+//		ETEntityDescription *personEntity = [ETEntityDescription descriptionWithName: @"Person"];	
+//		[personEntity setParent: (id)@"Anonymous.COObject"];
+//		
+//		ETPropertyDescription *spouseProperty = [ETPropertyDescription descriptionWithName: @"spouse"
+//																					  type: (id)@"Anonymous.Person"];
+//		[spouseProperty setMultivalued: NO];
+//		[spouseProperty setOpposite: (id)@"Anonymous.Person.spouse"]; // This is a 1:1 relationship
+//
+//		ETPropertyDescription *personNameProperty = [ETPropertyDescription descriptionWithName: @"name"
+//																						type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
+//		
+//		[personEntity setPropertyDescriptions: A(spouseProperty, personNameProperty)];
+//		[[[personEntity propertyDescriptions] mappedCollection] setPersistent: YES];
+//
+//		[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: personEntity];
+//	}

@@ -2,7 +2,7 @@
 #import "COItem.h"
 #import "CORevisionInfo.h"
 
-@interface TestSQLiteStorePerformance : COSQLiteStoreTestCase <UKTest>
+@interface TestSQLiteStorePerformance : SQLiteStoreTestCase <UKTest>
 {
     NSMutableArray *revisionIDs;
 }
