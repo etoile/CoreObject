@@ -99,6 +99,15 @@
 {
     //NSLog(@"EWTextStorage -attributesAtIndex:effectiveRange:");
     
+    if (index >= [[backing_ string] length])
+    {
+        if (aRange != NULL)
+        {
+            *aRange = NSMakeRange(index, 0);
+        }
+        return @{};
+    }
+    
     NSMutableDictionary *result = [NSMutableDictionary dictionaryWithDictionary:
                                     [backing_ attributesAtIndex: index effectiveRange: aRange]];
     
@@ -304,21 +313,26 @@ static NSRange paragraphRangeForLocationInString(NSString *aString, NSUInteger a
         
         NSData *rtf = [paragraph valueForAttribute: @"data"];
         
-        NSAttributedString *paragraphAttrString = [[NSAttributedString alloc] initWithRTF: rtf
-                                                                       documentAttributes: NULL];
+        NSMutableAttributedString *paragraphAttrString = [[NSMutableAttributedString alloc] initWithRTF: rtf
+                                                                              documentAttributes: NULL];
         
         if (paragraphAttrString == nil)
         {
             return NO;
         }
         
+        [paragraphAttrString addAttribute: kCOParagraphUUIDAttribute
+                                    value: paragraphUUID
+                                    range: NSMakeRange(0, [[paragraphAttrString string] length])];
+        
         NSLog(@"appending paragraph: '%@'", [paragraphAttrString string]);
         [result appendAttributedString: paragraphAttrString];
     }
 
-    [self beginEditing];
-    [self setAttributedString: result];
-    [self endEditing];
+    NSUInteger oldLength = [backing_ length];
+    
+    [backing_ setAttributedString: result];
+    [self edited:NSTextStorageEditedAttributes range:NSMakeRange(0,oldLength) changeInLength: [result length] - oldLength];
 
     return YES;
 }

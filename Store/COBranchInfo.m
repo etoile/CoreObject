@@ -41,4 +41,9 @@
     return nil;
 }
 
+- (NSString *) description
+{
+    return [NSString stringWithFormat: @"<Branch %@ <curr. rev.: %@> %@>", uuid_, currentRevisionId_, metadata_];
+}
+
 @end

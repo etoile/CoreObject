@@ -32,4 +32,20 @@
 	return nil;
 }
 
++ (BOOL)        isRevision: (CORevisionID *)commitA
+ equalToOrParentOfRevision: (CORevisionID *)commitB
+                     store: (COSQLiteStore *)aStore
+{
+    CORevisionID *rev = commitB;
+    while (rev != nil)
+    {
+        if ([rev isEqual: commitA])
+        {
+            return YES;
+        }
+        rev = [[aStore revisionInfoForRevisionID: rev] parentRevisionID];
+    }
+    return NO;
+}
+
 @end

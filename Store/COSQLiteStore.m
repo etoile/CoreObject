@@ -515,21 +515,23 @@
 
 - (BOOL) checkAndUpdateChangeCount: (int64_t *)aChangeCount forPersistentRootId: (NSNumber *)root_id
 {
-    const int64_t user = *aChangeCount;
-    const int64_t actual = [db_ int64ForQuery: @"SELECT changecount FROM persistentroots WHERE root_id = ?", root_id];
-    
-    if (actual == user)
-    {
-        const int64_t newCount = user + 1;
-        
-        [db_ executeUpdate: @"UPDATE persistentroots SET changecount = ? WHERE root_id = ?",
-         [NSNumber numberWithLongLong: newCount],
-         root_id];
-        
-        *aChangeCount = newCount;
-        return YES;
-    }
-    return NO;
+    return YES;
+//    
+//    const int64_t user = *aChangeCount;
+//    const int64_t actual = [db_ int64ForQuery: @"SELECT changecount FROM persistentroots WHERE root_id = ?", root_id];
+//    
+//    if (actual == user)
+//    {
+//        const int64_t newCount = user + 1;
+//        
+//        [db_ executeUpdate: @"UPDATE persistentroots SET changecount = ? WHERE root_id = ?",
+//         [NSNumber numberWithLongLong: newCount],
+//         root_id];
+//        
+//        *aChangeCount = newCount;
+//        return YES;
+//    }
+//    return NO;
 }
 
 - (NSArray *) persistentRootUUIDs
@@ -979,6 +981,8 @@
                                                   changeCount: 0
                                                       deleted: NO];
     }
+    
+    assert(ok);
     
     return ok;
 }

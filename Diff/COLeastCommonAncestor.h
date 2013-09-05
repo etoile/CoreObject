@@ -9,5 +9,8 @@
                                 andCommit: (CORevisionID *)commitB
                                     store: (COSQLiteStore *)aStore;
 
++ (BOOL)        isRevision: (CORevisionID *)commitA
+ equalToOrParentOfRevision: (CORevisionID *)commitB
+                     store: (COSQLiteStore *)aStore;
 
 @end

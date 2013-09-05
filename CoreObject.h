@@ -44,6 +44,7 @@
 #import <CoreObject/COSequenceDeletion.h>
 #import <CoreObject/COSequenceInsertion.h>
 #import <CoreObject/COSequenceModification.h>
+#import <CoreObject/COLeastCommonAncestor.h>
 
 /* Storage Data Model */
 

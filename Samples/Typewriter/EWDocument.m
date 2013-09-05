@@ -288,13 +288,27 @@
         assert(originMaster != nil);
         assert(![master isEqual: originMaster]);
         
-        [master setMergingBranch: originMaster];
+        // FF merge?
         
-        COMergeInfo *mergeInfo = [master mergeInfoForMergingBranch: originMaster];
-        assert(![mergeInfo.diff hasConflicts]);
-        
-        [mergeInfo.diff applyTo: [master objectGraphContext]];
-        [_persistentRoot commit];
+        if ([COLeastCommonAncestor isRevision: [[master currentRevision] revisionID]
+                    equalToOrParentOfRevision: [[originMaster currentRevision] revisionID]
+                                        store: [_persistentRoot store]])
+        {
+            [master setCurrentRevision: [originMaster currentRevision]];
+            [_persistentRoot commit];
+        }
+        else
+        {
+            // Regular merge
+            
+            [master setMergingBranch: originMaster];
+            
+            COMergeInfo *mergeInfo = [master mergeInfoForMergingBranch: originMaster];
+            assert(![mergeInfo.diff hasConflicts]);
+            
+            [mergeInfo.diff applyTo: [master objectGraphContext]];
+            [_persistentRoot commit];
+        }
     }
 }
 

@@ -419,13 +419,15 @@ static ETUUID *childUUID2;
     // Try to change the revision again, pretending we didn't notice the
     // store2 change
 
-    UKFalse([store setCurrentRevision: [self earlyBranchA]
-                         headRevision: [branchA headRevisionID]
-                         tailRevision: [branchA tailRevisionID]
-                            forBranch: branchAUUID
-                     ofPersistentRoot: prootUUID
-                   currentChangeCount: &prootChangeCount
-                                error: NULL]);
+    // FIXME: Change count support is currently disabled. Need to
+    // more carefully specify the behaviour and test it.
+//    UKFalse([store setCurrentRevision: [self earlyBranchA]
+//                         headRevision: [branchA headRevisionID]
+//                         tailRevision: [branchA tailRevisionID]
+//                            forBranch: branchAUUID
+//                     ofPersistentRoot: prootUUID
+//                   currentChangeCount: &prootChangeCount
+//                                error: NULL]);
 
     // Reload our in-memory state, and the call should succeed
     
