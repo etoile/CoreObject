@@ -254,61 +254,71 @@
     [[_persistentRoot editingContext] commitWithUndoStack: [self undoStack]];
 }
 
++ (void) pullFrom: (COPersistentRoot *)source into: (COPersistentRoot *)dest
+{
+    COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
+    COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
+    
+    id request2 = [client updateRequestForPersistentRoot: [dest persistentRootUUID]
+                                                serverID: @"server"
+                                                   store: [dest store]];
+    id response2 = [server handleUpdateRequest: request2 store: [source store]];
+    [client handleUpdateResponse: response2 store: [dest store]];
+    
+    // Now merge "origin/master" into "master"
+    
+    COPersistentRootInfo *info = [[dest store] persistentRootInfoForUUID: [dest persistentRootUUID]];
+    
+    ETUUID *uuid = [[[info branchInfosWithMetadataValue: [[[source currentBranch] UUID] stringValue]
+                                                 forKey: @"replcatedBranch"] firstObject] UUID];
+    
+    COBranch *master = [dest currentBranch];
+    COBranch *originMaster = [dest branchForUUID: uuid];
+    assert(master != nil);
+    assert([info branchInfoForUUID: uuid] != nil);
+    assert(originMaster != nil);
+    assert(![master isEqual: originMaster]);
+    
+    // FF merge?
+    
+    if ([COLeastCommonAncestor isRevision: [[master currentRevision] revisionID]
+                equalToOrParentOfRevision: [[originMaster currentRevision] revisionID]
+                                    store: [dest store]])
+    {
+        [master setCurrentRevision: [originMaster currentRevision]];
+        [dest commit];
+    }
+    else
+    {
+        // Regular merge
+        
+        [master setMergingBranch: originMaster];
+        
+        COMergeInfo *mergeInfo = [master mergeInfoForMergingBranch: originMaster];
+        assert(![mergeInfo.diff hasConflicts]);
+        
+        [mergeInfo.diff applyTo: [master objectGraphContext]];
+        [dest commit];
+    }
+}
+
 - (IBAction) push: (id)sender
 {
-    
+    NSLog(@"FIXME: Not implemented");
 }
+
 - (IBAction) pull: (id)sender
 {
-    if ([_title isEqual: @"user2"])
+    COPersistentRoot *user1Proot = [(EWAppDelegate *)[NSApp delegate] user1PersistentRoot];
+    COPersistentRoot *user2Proot = [(EWAppDelegate *)[NSApp delegate] user2PersistentRoot];
+
+    if ([_title isEqual: @"user2"]) // Ugly...
     {
-        NSLog(@"Pulling into user2");
-        COPersistentRoot *user1Proot = [(EWAppDelegate *)[NSApp delegate] user1PersistentRoot];
-        COPersistentRoot *user2Proot = [(EWAppDelegate *)[NSApp delegate] user2PersistentRoot];
-        
-        COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
-        COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
-        
-        id request2 = [client updateRequestForPersistentRoot: [user1Proot persistentRootUUID]
-                                                    serverID: @"server"
-                                                       store: [user2Proot store]];
-        id response2 = [server handleUpdateRequest: request2 store: [user1Proot store]];
-        [client handleUpdateResponse: response2 store: [user2Proot store]];
-        
-        // Now merge "origin/master" into "master"
-        
-        COPersistentRootInfo *info = [[_persistentRoot store] persistentRootInfoForUUID: [_persistentRoot persistentRootUUID]];
-        
-        ETUUID *uuid = [[[info branchInfosWithMetadataValue: [[[user1Proot currentBranch] UUID] stringValue]
-                                                     forKey: @"replcatedBranch"] firstObject] UUID];
-        
-        COBranch *master = [_persistentRoot currentBranch];
-        COBranch *originMaster = [_persistentRoot branchForUUID: uuid];
-        assert(master != nil);
-        assert(originMaster != nil);
-        assert(![master isEqual: originMaster]);
-        
-        // FF merge?
-        
-        if ([COLeastCommonAncestor isRevision: [[master currentRevision] revisionID]
-                    equalToOrParentOfRevision: [[originMaster currentRevision] revisionID]
-                                        store: [_persistentRoot store]])
-        {
-            [master setCurrentRevision: [originMaster currentRevision]];
-            [_persistentRoot commit];
-        }
-        else
-        {
-            // Regular merge
-            
-            [master setMergingBranch: originMaster];
-            
-            COMergeInfo *mergeInfo = [master mergeInfoForMergingBranch: originMaster];
-            assert(![mergeInfo.diff hasConflicts]);
-            
-            [mergeInfo.diff applyTo: [master objectGraphContext]];
-            [_persistentRoot commit];
-        }
+        [EWDocument pullFrom: user1Proot into: user2Proot];
+    }
+    else
+    {
+        [EWDocument pullFrom: user2Proot into: user1Proot];
     }
 }
 
