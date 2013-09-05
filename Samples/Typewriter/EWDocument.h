@@ -6,15 +6,19 @@
 
 @interface EWDocument : NSDocument <EWUndoManagerDelegate>
 {
+    NSString *_title;
     COPersistentRoot  *_persistentRoot;
 }
 
-- (id) initWithPersistentRoot: (COPersistentRoot *)aRoot;
+- (id) initWithPersistentRoot: (COPersistentRoot *)aRoot title: (NSString *)aTitle;
 
 - (IBAction) branch: (id)sender;
 - (IBAction) showBranches: (id)sender;
 - (IBAction) history: (id)sender;
 - (IBAction) pickboard: (id)sender;
+
+- (IBAction) push: (id)sender;
+- (IBAction) pull: (id)sender;
 
 - (void) recordUpdatedItems: (NSArray *)items;
 

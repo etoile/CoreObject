@@ -11,10 +11,14 @@
 
 @implementation EWDocument
 
-- (id) initWithPersistentRoot: (COPersistentRoot *)aRoot
+- (id) initWithPersistentRoot: (COPersistentRoot *)aRoot title: (NSString *)aTitle
 {
     SUPERINIT;
     
+    assert(aRoot != nil);
+    assert([aRoot rootObject] != nil);
+    
+    ASSIGN(_title, aTitle);
     ASSIGN(_persistentRoot, aRoot);
     
     EWUndoManager *myUndoManager = [[[EWUndoManager alloc] init] autorelease];
@@ -31,10 +35,13 @@
 
 - (id)init
 {
-    COPersistentRoot *aRoot = [[[NSApp delegate] editingContext] insertNewPersistentRootWithEntityName: @"Anonymous.TypewriterDocument"];
-    [aRoot commit];
-    
-    return [self initWithPersistentRoot: aRoot];
+    [NSException raise: NSIllegalSelectorException format: @"use -initWithPersistentRoot:, not -init"];
+    return nil;
+//    
+//    COPersistentRoot *aRoot = [[[NSApp delegate] editingContext] insertNewPersistentRootWithEntityName: @"Anonymous.TypewriterDocument"];
+//    [aRoot commit];
+//    
+//    return [self initWithPersistentRoot: aRoot];
 }
 
 - (void) dealloc
@@ -177,11 +184,12 @@
 
 - (NSString *)displayName
 {
-    NSString *branchName = [[_persistentRoot currentBranch] label];
-    
-    // FIXME: Get proper persistent root name
-    return [NSString stringWithFormat: @"Untitled (on branch '%@')",
-            branchName];
+    return _title;
+//    NSString *branchName = [[_persistentRoot currentBranch] label];
+//    
+//    // FIXME: Get proper persistent root name
+//    return [NSString stringWithFormat: @"Untitled (on branch '%@')",
+//            branchName];
 }
 
 - (void) reloadFromStore
@@ -210,7 +218,7 @@
 
 - (COSQLiteStore *) store
 {
-    return [[NSApp delegate] store];
+    return [_persistentRoot store];
 }
 
 - (void) storePersistentRootMetadataDidChange: (NSNotification *)notif
@@ -244,6 +252,50 @@
 - (void) commit
 {
     [[_persistentRoot editingContext] commitWithUndoStack: [self undoStack]];
+}
+
+- (IBAction) push: (id)sender
+{
+    
+}
+- (IBAction) pull: (id)sender
+{
+    if ([_title isEqual: @"user2"])
+    {
+        NSLog(@"Pulling into user2");
+        COPersistentRoot *user1Proot = [(EWAppDelegate *)[NSApp delegate] user1PersistentRoot];
+        COPersistentRoot *user2Proot = [(EWAppDelegate *)[NSApp delegate] user2PersistentRoot];
+        
+        COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
+        COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
+        
+        id request2 = [client updateRequestForPersistentRoot: [user1Proot persistentRootUUID]
+                                                    serverID: @"server"
+                                                       store: [user2Proot store]];
+        id response2 = [server handleUpdateRequest: request2 store: [user1Proot store]];
+        [client handleUpdateResponse: response2 store: [user2Proot store]];
+        
+        // Now merge "origin/master" into "master"
+        
+        COPersistentRootInfo *info = [[_persistentRoot store] persistentRootInfoForUUID: [_persistentRoot persistentRootUUID]];
+        
+        ETUUID *uuid = [[[info branchInfosWithMetadataValue: [[[user1Proot currentBranch] UUID] stringValue]
+                                                     forKey: @"replcatedBranch"] firstObject] UUID];
+        
+        COBranch *master = [_persistentRoot currentBranch];
+        COBranch *originMaster = [_persistentRoot branchForUUID: uuid];
+        assert(master != nil);
+        assert(originMaster != nil);
+        assert(![master isEqual: originMaster]);
+        
+        [master setMergingBranch: originMaster];
+        
+        COMergeInfo *mergeInfo = [master mergeInfoForMergingBranch: originMaster];
+        assert(![mergeInfo.diff hasConflicts]);
+        
+        [mergeInfo.diff applyTo: [master objectGraphContext]];
+        [_persistentRoot commit];
+    }
 }
 
 /* EWUndoManagerDelegate */

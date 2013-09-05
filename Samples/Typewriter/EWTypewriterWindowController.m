@@ -14,7 +14,7 @@
 {
     NSLog(@"windowDidLoad %@", textView_);
     
-    
+    [[self window] setRestorable: NO];
     
     textStorage_ = [[EWTextStorage alloc] initWithDocumentUUID:
                         [[[[self document] currentPersistentRoot] rootObject] UUID]];

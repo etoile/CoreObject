@@ -3,11 +3,14 @@
 
 @interface EWAppDelegate : NSObject
 {
-    COSQLiteStore *_store;
-    COEditingContext *_context;
+    /**
+     * Each context has its own store
+     */
+    COEditingContext *_user1Ctx;
+    COEditingContext *_user2Ctx;
 }
 
-- (COSQLiteStore *) store;
-- (COEditingContext *) editingContext;
+- (COPersistentRoot *) user1PersistentRoot;
+- (COPersistentRoot *) user2PersistentRoot;
 
 @end
