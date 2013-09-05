@@ -1,4 +1,5 @@
 #import "COPersistentRootInfo.h"
+#import "COBranchInfo.h"
 
 @implementation COPersistentRootInfo
 
@@ -37,6 +38,19 @@
 - (CORevisionID *)currentRevisionID
 {
     return [[self currentBranchInfo] currentRevisionID];
+}
+
+- (NSArray *)branchInfosWithMetadataValue: (id)aValue forKey: (NSString *)aKey
+{
+    NSMutableArray *result = [NSMutableArray array];
+    for (COBranchInfo *info in [branchForUUID_ allValues])
+    {
+        if ([[[info metadata] objectForKey: aKey] isEqual: aValue])
+        {
+            [result addObject: info];
+        }
+    }
+    return result;
 }
 
 @end

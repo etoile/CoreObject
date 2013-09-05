@@ -125,7 +125,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
         
         info = [aStore createPersistentRootWithUUID: persistentRoot error: NULL];
         assert(info != nil);
-        
+                
         changeCount = info.changeCount;
     }
     
@@ -189,6 +189,24 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
                           ofPersistentRoot: persistentRoot
                         currentChangeCount: &changeCount
                                     error: NULL]);
+    }
+    
+    // Set a default current branch if there is not one
+    ETUUID *currentBranchUUID = [ETUUID UUIDWithString: aResponse[@"currentBranchUUID"]];
+    info = [aStore persistentRootInfoForUUID: persistentRoot];
+    if ([info currentBranchUUID] == nil)
+    {
+        COBranchInfo *replicatedCurrentBranch = [[info branchInfosWithMetadataValue: [currentBranchUUID stringValue]
+                                                                            forKey: @"replcatedBranch"] firstObject];
+        
+        assert([aStore createBranchWithUUID: currentBranchUUID
+                            initialRevision: [replicatedCurrentBranch currentRevisionID]
+                          forPersistentRoot: persistentRoot
+                                      error: NULL]);
+        
+        assert([aStore setCurrentBranch: currentBranchUUID
+                      forPersistentRoot: persistentRoot
+                                  error: NULL]);
     }
 }
 

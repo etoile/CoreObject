@@ -134,13 +134,17 @@ First Release
     (i.e. map from string to (COType, object) pair). We could also
     use SEL instead of NSString *, or some other uniqued property ID.
 
+- Collaboration
+  - to initially share something, we need to decide between:
+    a) the user who wants to do the "clone" creates an empty persistent root and then calls the "pull" code
+    b) the user who wants to do the "clone" calls the "pull" code which handles creating the persistent root
+
 
 Future Work
 -----------
 
 - Switch from FMDB to an SQL abstraction backend 
 
-- Implement Collaboration support (based on COSynchronizer and XMPP)
 - Tune object copy model to respect user expectations about copy/paste in various recurrent use cases
 - Improve Relationship Integrity and leverage it in more places (e.g. copy time, more aggressive checks or object graph integrity checking in a background thread etc.)
 - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)

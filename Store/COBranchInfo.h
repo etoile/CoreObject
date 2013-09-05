@@ -55,4 +55,16 @@
 @property (readwrite, nonatomic, retain) NSDictionary *metadata;
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
 
+/**
+ * In git terminology, if the receiver is "master", returns "origin/master", or
+ * nil if there is no corresponding "origin/master"
+ */
+- (ETUUID *) remoteMirror;
+
+/**
+ * In git terminology, if the receiver is "origin/master", returns the UUID
+ * of the "master" branch in the remote store "origin". Otherwise, returns nil.
+ */
+- (ETUUID *) replcatedBranch;
+
 @end

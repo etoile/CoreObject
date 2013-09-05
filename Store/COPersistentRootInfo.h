@@ -33,4 +33,6 @@
 @property (readwrite, nonatomic, assign) int64_t changeCount;
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
 
+- (NSArray *)branchInfosWithMetadataValue: (id)aValue forKey: (NSString *)aKey;
+
 @end

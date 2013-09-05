@@ -115,6 +115,7 @@ For now we do.
     
     return @{@"persistentRoot" : [persistentRoot stringValue],
              @"branches" : branches,
+             @"currentBranchUUID" : [serverInfo.currentBranchUUID stringValue],
              @"revisions" : contentsForRevisionID,
              @"serverID" : aRequest[@"serverID"]};
 }

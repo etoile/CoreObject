@@ -61,6 +61,19 @@ static ETUUID *branchBUUID;
                                                                             revisionMetadata: nil
                                                                                        error: NULL];
     UKNotNil(serverInfo);
+    UKTrue([serverStore createBranchWithUUID: branchBUUID
+                             initialRevision: [serverInfo currentRevisionID]
+                           forPersistentRoot: persistentRootUUID
+                                       error: NULL]);
+    UKObjectsEqual(branchAUUID, [serverInfo currentBranchUUID]);
+
+    /* 
+       * = current branch
+     
+       Server: persistent root { branch A *, branch B }
+    
+       Client: nothing
+     */
     
     // Client doesn't have the persistent root. It asks to pull from the server.
     
@@ -74,21 +87,50 @@ static ETUUID *branchBUUID;
     [client handleUpdateResponse: response store: store];
     
     // Persistent root has been replicated to the client
+
+    /*
+       * = current branch
+     
+       Server: persistent root { branch A *, branch B }
+     
+       Client: persistent root { branch A *, branch C (mirror of server's branch A), branch D (mirror of server's branch B) }
+     */
     
     COPersistentRootInfo *clientInfo = [store persistentRootInfoForUUID: persistentRootUUID];
     UKNotNil(clientInfo);
     
-    UKIntsEqual(1, [[clientInfo branches] count]);
-    UKNil([clientInfo currentBranchUUID]);
+    UKIntsEqual(3, [[clientInfo branches] count]);
     
-    COBranchInfo *replicatedBranch = [clientInfo branches][0];
+    COBranchInfo *currentBranch = [clientInfo currentBranchInfo];
+    COBranchInfo *replicatedBranchA = [[clientInfo branchInfosWithMetadataValue: [branchAUUID stringValue]
+                                                                         forKey: @"replcatedBranch"] firstObject];
     
-    UKObjectsEqual([[serverInfo currentRevisionID] revisionUUID], [[replicatedBranch currentRevisionID] revisionUUID]);
-    UKObjectsEqual([self itemGraphWithLabel: @"1"], [store itemGraphForRevisionID: [replicatedBranch currentRevisionID]]);
+
+    COBranchInfo *replicatedBranchB = [[clientInfo branchInfosWithMetadataValue: [branchBUUID stringValue]
+                                                                         forKey: @"replcatedBranch"] firstObject];
+
+    // Check out the 3 branches
+    UKObjectsEqual(branchAUUID, [currentBranch UUID]);
     
-    UKTrue([[[replicatedBranch metadata] objectForKey: @"source"] isEqual: @"server"]);
-    UKTrue([[[replicatedBranch metadata] objectForKey: @"replcatedBranch"] isEqual: [branchAUUID stringValue]]);
-    UKFalse([[replicatedBranch UUID] isEqual: branchAUUID]);
+    UKNotNil(replicatedBranchB);
+    UKObjectsNotEqual(branchBUUID, [replicatedBranchB UUID]);
+
+    UKNotNil(replicatedBranchA);
+    UKObjectsNotEqual(branchAUUID, [replicatedBranchA UUID]);
+    
+    // Check out the revisions of the branches
+    
+    UKObjectsEqual([[serverInfo currentRevisionID] revisionUUID], [[currentBranch currentRevisionID] revisionUUID]);
+    UKObjectsEqual([[serverInfo currentRevisionID] revisionUUID], [[replicatedBranchA currentRevisionID] revisionUUID]);
+    UKObjectsEqual([[serverInfo currentRevisionID] revisionUUID], [[replicatedBranchB currentRevisionID] revisionUUID]);
+    
+    UKObjectsEqual([self itemGraphWithLabel: @"1"], [store itemGraphForRevisionID: [currentBranch currentRevisionID]]);
+    UKObjectsEqual([self itemGraphWithLabel: @"1"], [store itemGraphForRevisionID: [replicatedBranchA currentRevisionID]]);
+    UKObjectsEqual([self itemGraphWithLabel: @"1"], [store itemGraphForRevisionID: [replicatedBranchB currentRevisionID]]);
+    
+    UKNil([[currentBranch metadata] objectForKey: @"source"]);
+    UKObjectsEqual(@"server", [[replicatedBranchA metadata] objectForKey: @"source"]);
+    UKObjectsEqual(@"server", [[replicatedBranchB metadata] objectForKey: @"source"]);
 }
 
 - (void)testPullUpdates
@@ -143,16 +185,19 @@ static ETUUID *branchBUUID;
     clientInfo = [store persistentRootInfoForUUID: persistentRootUUID];
     UKNotNil(clientInfo);
     
-    UKIntsEqual(1, [[clientInfo branches] count]);
-    UKNil([clientInfo currentBranchUUID]);
+    UKIntsEqual(2, [[clientInfo branches] count]);
+
+    COBranchInfo *currentBranch = [clientInfo currentBranchInfo];
     
-    COBranchInfo *replicatedBranch = [clientInfo branches][0];
-    UKTrue([[[replicatedBranch metadata] objectForKey: @"source"] isEqual: @"server"]);
-    UKTrue([[[replicatedBranch metadata] objectForKey: @"replcatedBranch"] isEqual: [branchAUUID stringValue]]);
+    COBranchInfo *replicatedBranchA = [[clientInfo branchInfosWithMetadataValue: [branchAUUID stringValue]
+                                                                         forKey: @"replcatedBranch"] firstObject];
     
-    // The replicated branch should have been update.
+    UKTrue([[[replicatedBranchA metadata] objectForKey: @"source"] isEqual: @"server"]);
     
-    UKObjectsEqual([self itemGraphWithLabel: @"2"], [store itemGraphForRevisionID: [replicatedBranch currentRevisionID]]);
+    // The replicated branch should have been update, but the other branch should not have
+    
+    UKObjectsEqual([self itemGraphWithLabel: @"1"], [store itemGraphForRevisionID: [currentBranch currentRevisionID]]);
+    UKObjectsEqual([self itemGraphWithLabel: @"2"], [store itemGraphForRevisionID: [replicatedBranchA currentRevisionID]]);
 }
 
 - (void)testPullCheapCopy
@@ -217,9 +262,19 @@ static ETUUID *branchBUUID;
     // "cheapCopyUUID" persistent root has been replicated to the client.
     
     COPersistentRootInfo *clientCheapCopyInfo = [store persistentRootInfoForUUID: cheapCopyUUID];
-    UKIntsEqual(1, [[clientCheapCopyInfo branches] count]);
+    UKIntsEqual(2, [[clientCheapCopyInfo branches] count]);
+    
+    COBranchInfo *currentBranch = [clientCheapCopyInfo currentBranchInfo];
+    COBranchInfo *replicatedCheapCopyBranch = [[clientCheapCopyInfo branchInfosWithMetadataValue: [cheapCopyBranchUUID stringValue]
+                                                                                          forKey: @"replcatedBranch"] firstObject];
+
+    UKObjectsEqual(cheapCopyBranchUUID, [currentBranch UUID]);
+    UKObjectsNotEqual(cheapCopyBranchUUID, [replicatedCheapCopyBranch UUID]);
+    
     UKObjectsEqual([self itemGraphWithLabel: @"2"],
-                   [store itemGraphForRevisionID: [[clientCheapCopyInfo branches][0] currentRevisionID]]);
+                   [store itemGraphForRevisionID: [currentBranch currentRevisionID]]);
+    UKObjectsEqual([self itemGraphWithLabel: @"2"],
+                   [store itemGraphForRevisionID: [replicatedCheapCopyBranch currentRevisionID]]);
     
     // Ideally it shares the same backing store as the original persistent root. But that's not going to be easy to do.
 }

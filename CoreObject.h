@@ -68,6 +68,11 @@
 #import <CoreObject/COUndoStack.h>
 #import <CoreObject/COEditingContext+Undo.h>
 
+/* Synchronization */
+
+#import <CoreObject/COSynchronizationClient.h>
+#import <CoreObject/COSynchronizationServer.h>
+
 /* Utilities */
 
 #import <CoreObject/COCommitDescriptor.h>
