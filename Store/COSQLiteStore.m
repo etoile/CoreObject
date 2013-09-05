@@ -1187,13 +1187,13 @@
         [self postCommitNotifications];
     }
 }
-- (void) mainThreadPostLocalNotification: (NSDictionary *)userInfo
-{
-    // TODO: Check if we need to use NSNotificationQueue?
-    [[NSNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
-                                                        object: self
-                                                      userInfo: userInfo];
-}
+//- (void) mainThreadPostLocalNotification: (NSDictionary *)userInfo
+//{
+//    // TODO: Check if we need to use NSNotificationQueue?
+//    [[NSNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
+//                                                        object: self
+//                                                      userInfo: userInfo];
+//}
 
 - (void) postCommitNotifications
 {
@@ -1202,9 +1202,15 @@
         //NSLog(@"store %@ posting notif: %@", [self UUID], userInfo);
         
         // N.B., this will run the method on the next runloop iteration
-        [self performSelectorOnMainThread: @selector(mainThreadPostLocalNotification:)
-                               withObject: userInfo
-                            waitUntilDone: NO];
+//        [self performSelectorOnMainThread: @selector(mainThreadPostLocalNotification:)
+//                               withObject: userInfo
+//                            waitUntilDone: NO];
+        
+        // FIXME: switch back to version that posts on main thread above.
+        [[NSNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
+                                                            object: self
+                                                          userInfo: userInfo];
+
         
         [[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
                                                                        object: [[self UUID] stringValue]
