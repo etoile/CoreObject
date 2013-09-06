@@ -593,6 +593,19 @@ static void COAssertEditsEquivelant(NSSet *edits)
 	}
 }
 
+static BOOL COEditsEquivelant(NSSet *edits)
+{
+    COItemGraphEdit *anyEdit = [edits anyObject];
+    for (COItemGraphEdit *edit in edits)
+    {
+        if (![edit isEqualIgnoringSourceIdentifier: anyEdit])
+        {
+            return NO;
+        }
+	}
+    return YES;
+}
+
 static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 {
 	COItemGraphEdit *anyEdit = [edits anyObject];
@@ -649,6 +662,8 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	
 	if ([anyEdit isKindOfClass: [COSequenceEdit class]])
 	{
+        // Assert they are all sequence edits
+        
 		for (COItemGraphEdit *edit in [edits allObjects])
 		{
 			if (![edit isKindOfClass: [COSequenceEdit class]])
@@ -657,15 +672,33 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 							format: @"all edits should be sequence edits"];
 			}
 		}
-		
-		NSArray *editsSorted = [[edits allObjects] sortedArrayUsingSelector: @selector(compare:)];
-		
-		NSArray *originalArray = [anItem valueForAttribute: [anyEdit attribute]];
-		NSArray *newArray = COArrayByApplyingEditsToArray(originalArray, editsSorted);
-		
-		[anItem setValue: newArray
-			forAttribute: [anyEdit attribute]
-					type: [anItem typeForAttribute: [anyEdit attribute]]];
+        
+        // This is wrong and will only work for two cases:
+        //
+        // 1) all edits for the sequence are the same
+        // 2) all edits are different, and interleave in a non-conflicting way
+        //
+        // We need to handle a more general case where the two uses may
+        // have made some edits that are the same, and some that interleave
+        
+        NSArray *editsSorted;
+        
+        if (COEditsEquivelant(edits))
+        {
+            editsSorted = @[[edits anyObject]];
+        }
+        else
+        {
+            editsSorted = [[edits allObjects] sortedArrayUsingSelector: @selector(compare:)];
+        }
+        
+        NSArray *originalArray = [anItem valueForAttribute: [anyEdit attribute]];
+        NSArray *newArray = COArrayByApplyingEditsToArray(originalArray, editsSorted);
+        
+        [anItem setValue: newArray
+            forAttribute: [anyEdit attribute]
+                    type: [anItem typeForAttribute: [anyEdit attribute]]];
+
 		return;
 	}
 	

@@ -213,8 +213,6 @@
 	UKObjectsEqual(S(tag2), [child valueForProperty: @"parentCollections"]);
 }
 
-#if 0
-
 //
 // Insert/Insert tests: (merging two diffs, where both diffs insert the same object, possibly in different places)
 //
@@ -222,11 +220,8 @@
 
 - (void)testConflictingInsertInsertOnOneToManyRelationship
 {
-	COObjectGraphContext *ctx1 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx3 = [[COObjectGraphContext alloc] init];
-	
 	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx1 setRootObject: parent];
 	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
@@ -241,8 +236,7 @@
 	//  |
 	//   \-child2
 	
-	[ctx2 insertObject: parent];
-	[ctx3 insertObject: parent];
+	[ctx2 setItemGraph: ctx1];	
 	
 	// ctx2: insert subchild1 in child1
 	OutlineItem *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -263,7 +257,7 @@
 	
 	
 	// ctx3: insert subchild1 in child2
-	[ctx3 insertObject: subchild1Ctx2];
+    [ctx3 setItemGraph: ctx2];
 	[(id)[ctx3 objectWithUUID: [child2 UUID]] insertObject: [ctx3 objectWithUUID: [subchild1Ctx2 UUID]] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	UKObjectsSame([ctx3 objectWithUUID: [child2 UUID]], [[ctx3 objectWithUUID: [subchild1Ctx2 UUID]] valueForProperty: @"parentContainer"]);
 	UKIntsEqual(0, [[(id)[ctx3 objectWithUUID: [child1 UUID]] contentArray] count]);
@@ -279,28 +273,19 @@
 	//      |
 	//      \-subchild1
 	
-	COItemGraphDiff *diff1vs2 = [COItemGraphDiff diffContainer: parent withContainer: (id)[ctx2 objectWithUUID: [parent UUID]]];
-	UKNotNil(diff1vs2);
-	COItemGraphDiff *diff1vs3 = [COItemGraphDiff diffContainer: parent withContainer: (id)[ctx3 objectWithUUID: [parent UUID]]];
-	UKNotNil(diff1vs3);
-	
-	[COItemGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
-	// FIXME: Test that the changes are conflicting
-	
-	[ctx3 release];
-	[ctx2 release];
-	[ctx1 release];
+    COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
+    COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
+	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+
+    UKTrue([merged hasConflicts]);
 }
 
 - (void)testNonconflictingInsertInsertOnOneToManyRelationship
 {
 	// Expected: both succeed
-	
-	COObjectGraphContext *ctx1 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx3 = [[COObjectGraphContext alloc] init];
-	
+
 	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx1 setRootObject: parent];
 	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	
 	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
@@ -311,8 +296,7 @@
 	//  |
 	//   \-child1
 	
-	[ctx2 insertObject: parent];
-	[ctx3 insertObject: parent];
+	[ctx2 setItemGraph: ctx1];
 	
 	// ctx2: insert subchild1 in child1
 	OutlineItem *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -330,10 +314,9 @@
 	
 	
 	// ctx3: insert subchild1 in child1
-	[ctx3 insertObject: subchild1Ctx2];
-	[(id)[ctx3 objectWithUUID: [child1 UUID]] insertObject: [ctx3 objectWithUUID: [subchild1Ctx2 UUID]] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [ctx3 setItemGraph: ctx2];
 	UKObjectsSame([ctx3 objectWithUUID: [child1 UUID]], [[ctx3 objectWithUUID: [subchild1Ctx2 UUID]] valueForProperty: @"parentContainer"]);
-	// FIXME: UKIntsEqual(1, [[(id)[ctx3 objectWithUUID: [child1 UUID]] contentArray] count]);
+    UKIntsEqual(1, [[(id)[ctx3 objectWithUUID: [child1 UUID]] contents] count]);
 	
 	// ctx3:
 	//
@@ -343,32 +326,26 @@
 	//      |
 	//      \-subchild1
 	
-	COItemGraphDiff *diff1vs2 = [COItemGraphDiff diffContainer: parent withContainer: (id)[ctx2 objectWithUUID: [parent UUID]]];
-	UKNotNil(diff1vs2);
-	COItemGraphDiff *diff1vs3 = [COItemGraphDiff diffContainer: parent withContainer: (id)[ctx3 objectWithUUID: [parent UUID]]];
-	UKNotNil(diff1vs3);
+    COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
+    COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
+	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    UKFalse([merged hasConflicts]);
 	
-	[COItemGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
-	// FIXME: Test that the changes are nonconflicting
-	
+    [merged applyTo: ctx1];
+    
 	OutlineItem *subchild1 = (id)[ctx1 objectWithUUID: [subchild1Ctx2 UUID]];
-	// FIXME: UKObjectsSame(child1, [subchild1 valueForProperty: @"parentContainer"]);
-	// UKIntsEqual(1, [[child1 contentArray] count]);
-	//UKObjectsEqual(A(subchild1), [child1 contentArray]);
-	
-	[ctx3 release];
-	[ctx2 release];
-	[ctx1 release];
+    UKNotNil(subchild1);
+	UKObjectsSame(child1, [subchild1 valueForProperty: @"parentContainer"]);
+    UKIntsEqual(1, [[child1 contents] count]);
+	UKObjectsEqual(A(subchild1), [child1 contents]);
 }
+
+#if 0
 
 - (void)testInsertInsertOnManyToManyRelationship
 {
 	// Expected: both succeed
-	
-	COObjectGraphContext *ctx1 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx3 = [[COObjectGraphContext alloc] init];
-	
+
 	COGroup *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
 	COGroup *tag2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
     
@@ -377,6 +354,9 @@
 	//
 	// tag1         tag2
 	
+    [ctx2 setItemGraph: ctx1];
+    [ctx3 setItemGraph: ctx1];
+    
 	OutlineItem *childCtx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COGroup *tag1Ctx2 = [ctx2 insertObject: tag1];
 	COGroup *tag2Ctx2 = [ctx2 insertObject: tag2];
@@ -412,15 +392,13 @@
 	
 	// Now do the merge
 	NSArray *uuids = (id)[[A(tag1, tag2, childCtx2) mappedCollection] UUID];
-	COItemGraphDiff *diff1vs2 = [COItemGraphDiff diffObjectsWithUUIDs:uuids  inContext:ctx1 withContext:ctx2];
-	UKNotNil(diff1vs2);
-	COItemGraphDiff *diff1vs3 = [COItemGraphDiff diffObjectsWithUUIDs:uuids  inContext:ctx1 withContext:ctx3];
-	UKNotNil(diff1vs3);
-	COItemGraphDiff *merged = [COItemGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
-	// FIXME: Test that there are no conflicts
+    COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
+    COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
+	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    UKFalse([merged hasConflicts]);
 	
 	// Apply the resulting diff to ctx1
-	[merged applyToContext: ctx1];
+	[merged applyTo: ctx1];
 	
 	// Expected result:
 	//
@@ -437,10 +415,6 @@
 	UKObjectsEqual(A(child), [tag2 contentArray]);
 	UKObjectsEqual(S(child), [tag1 content]);
 	UKObjectsEqual(S(child), [tag2 content]);
-	
-	[ctx3 release];
-	[ctx2 release];
-	[ctx1 release];
 }
 
 
@@ -451,10 +425,6 @@
 
 - (void)testConflictingMoveAndMoveOnOneToManyRelationship
 {
-	COObjectGraphContext *ctx1 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx3 = [[COObjectGraphContext alloc] init];
-	
 	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -478,8 +448,8 @@
 	//  |
 	//   \-child3
 	
-	[ctx2 insertObject: parent];
-	[ctx3 insertObject: parent];
+	[ctx2 setItemGraph: ctx1];
+	[ctx3 setItemGraph: ctx1];
     
 	// ctx2: move subchild1 to child2
 	[(id)[ctx2 objectWithUUID: [child2 UUID]] insertObject: [ctx2 objectWithUUID: [subchild1 UUID]] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
@@ -512,25 +482,15 @@
 	//      |
 	//      \-subchild1
 	
-	COItemGraphDiff *diff1vs2 = [COItemGraphDiff diffContainer: parent withContainer: (id)[ctx2 objectWithUUID: [parent UUID]]];
-	UKNotNil(diff1vs2);
-	COItemGraphDiff *diff1vs3 = [COItemGraphDiff diffContainer: parent withContainer: (id)[ctx3 objectWithUUID: [parent UUID]]];
-	UKNotNil(diff1vs3);
-	
-	[COItemGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
-	// FIXME: Test that the changes are conflicting
-	
-	[ctx3 release];
-	[ctx2 release];
-	[ctx1 release];
+    COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
+    COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
+	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    
+    UKTrue([merged hasConflicts]);
 }
 
 - (void)testNonconflictingMoveAndMoveOnOneToManyRelationship
 {
-	COObjectGraphContext *ctx1 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx3 = [[COObjectGraphContext alloc] init];
-	
 	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -550,8 +510,8 @@
 	//  |
 	//   \-child2
 	
-	[ctx2 insertObject: parent];
-	[ctx3 insertObject: parent];
+	[ctx2 setItemGraph: ctx1];
+	[ctx3 setItemGraph: ctx1];
 	
 	// ctx2: move subchild1 to child2
 	[(id)[ctx2 objectWithUUID: [child2 UUID]] insertObject: [ctx2 objectWithUUID: [subchild1 UUID]] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
@@ -579,13 +539,11 @@
 	//      |
 	//      \-subchild1
 	
-	COItemGraphDiff *diff1vs2 = [COItemGraphDiff diffContainer: parent withContainer: (id)[ctx2 objectWithUUID: [parent UUID]]];
-	UKNotNil(diff1vs2);
-	COItemGraphDiff *diff1vs3 = [COItemGraphDiff diffContainer: parent withContainer: (id)[ctx3 objectWithUUID: [parent UUID]]];
-	UKNotNil(diff1vs3);
-	
-	[COItemGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
-	// FIXME: Test that the changes are nonconflicting
+    COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
+    COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
+	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    
+    UKFalse([merged hasConflicts]);
 	
 	UKIntsEqual(2, [[parent contentArray] count]);
 	// FIXME: UKIntsEqual(0, [[child1 contentArray] count]);
@@ -593,20 +551,12 @@
 	// UKObjectsEqual(child2, [subchild1 valueForProperty: @"parentContainer"]);
 	UKObjectsEqual(A(child1, child2), [parent contentArray]);
 	// FIXME: UKObjectsEqual(A(subchild1), [child2 contentArray]);
-	
-	[ctx3 release];
-	[ctx2 release];
-	[ctx1 release];
 }
 
 - (void)testMoveAndMoveOnManyToManyRelationship
 {
 	// Expected: both succeed
-	
-	COObjectGraphContext *ctx1 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx3 = [[COObjectGraphContext alloc] init];
-	
+
 	COGroup *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
 	COGroup *tag2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
 	COGroup *tag3 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
@@ -620,6 +570,9 @@
 	//  |
 	//   \--child
 	
+    [ctx2 setItemGraph: ctx1];
+    [ctx3 setItemGraph: ctx1];
+    
 	COGroup *tag1Ctx2 = [ctx2 insertObject: tag1];
 	COGroup *tag2Ctx2 = [ctx2 insertObject: tag2];
 	//COGroup *tag3Ctx2 = [ctx2 insertObject: tag3];
@@ -632,7 +585,7 @@
 	
 	// ctx2: move child to tag2
 	UKTrue([[tag1Ctx2 contentArray] containsObject: childCtx2]);
-	[tag1Ctx2 removeObject: childCtx2];
+	[tag1Ctx2 removeObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]];
 	[tag2Ctx2 insertObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
 	// ctx2:
@@ -643,7 +596,7 @@
 	
 	// ctx3: move child to tag3
 	UKTrue([[tag1Ctx3 contentArray] containsObject: childCtx3]);
-	[tag1Ctx3 removeObject: childCtx3];
+	[tag1Ctx3 removeObject: childCtx3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]];
 	[tag3Ctx3 insertObject: childCtx3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
 	// ctx3:
@@ -654,15 +607,14 @@
 	
 	// Now do the merge
 	NSArray *uuids = (id)[[A(tag1, tag2, tag3, child) mappedCollection] UUID];
-	COItemGraphDiff *diff1vs2 = [COItemGraphDiff diffObjectsWithUUIDs:uuids  inContext:ctx1 withContext:ctx2];
-	UKNotNil(diff1vs2);
-	COItemGraphDiff *diff1vs3 = [COItemGraphDiff diffObjectsWithUUIDs:uuids  inContext:ctx1 withContext:ctx3];
-	UKNotNil(diff1vs3);
-	COItemGraphDiff *merged = [COItemGraphDiff mergeDiff:diff1vs2 withDiff: diff1vs3];
-	// FIXME: Test that there are no conflicts
-	
+    COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
+    COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
+	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    
+    UKFalse([merged hasConflicts]);
+    
 	// Apply the resulting diff to ctx1
-	[merged applyToContext: ctx1];
+	[merged applyTo: ctx1];
 	
 	// Expected result:
 	//
@@ -676,18 +628,10 @@
 	// FIXME: UKObjectsEqual(S(tag2, tag3), [child valueForProperty: @"parentCollections"]);
 	UKObjectsEqual(A(child), [tag2 contentArray]);
 	UKObjectsEqual(A(child), [tag3 contentArray]);
-	
-	[ctx3 release];
-	[ctx2 release];
-	[ctx1 release];
 }
 
 - (void)testSelectiveUndoOfGroupOperation
 {
-	COObjectGraphContext *ctx1 = ctx;
-	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
-	COObjectGraphContext *ctx3 = [[COObjectGraphContext alloc] init];
-	
 	OutlineItem *doc = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *line1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *circle1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -746,7 +690,7 @@
 	
 	// Apply the resulting diff to ctx3
 	UKFalse([ctx1 hasChanges]);
-	[merged applyToContext: ctx3];
+	[merged applyTo: ctx3];
 	
 	UKIntsEqual(5, [[(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray] count]);
 	if (5 == [[doc contentArray] count])
@@ -762,9 +706,6 @@
 	{
 		UKObjectsSame([ctx3 objectWithUUID: [doc UUID]], [object valueForProperty: @"parentContainer"]);
 	}
-	
-	[ctx3 release];
-	[ctx2 release];
 }
 #endif
 @end
