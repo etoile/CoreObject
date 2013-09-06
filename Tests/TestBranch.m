@@ -707,35 +707,4 @@
 {
 }
 
-- (void) testsDetectsStoreSetCurrentRevision
-{
-    [ctx commit];
-    CORevisionID *firstRevid = [[persistentRoot revision] revisionID];
-    UKNotNil(firstRevid);
-    
-    [rootObj setLabel: @"change"];
-    [ctx commit];
-    CORevisionID *secondRevid = [[persistentRoot revision] revisionID];
-    UKNotNil(secondRevid);
-    UKObjectsNotEqual(firstRevid, secondRevid);
-    
-    int64_t changeCount;
-    COPersistentRootInfo *info = [store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]];
-    changeCount = info.changeCount;
-    
-    // Revert persistentRoot back to the first revision using the store API
-    UKTrue([store setCurrentRevision: firstRevid
-                        headRevision: nil
-                        tailRevision: nil
-                           forBranch: [originalBranch UUID]
-                    ofPersistentRoot: [persistentRoot persistentRootUUID]
-                  currentChangeCount: &changeCount
-                               error: NULL]);
-    
-    // N.B.: If we make the store async, we'll need to wait here a bit.
-    
-    // Check that a notification was sent to the editing context, and it automatically updated.
-    UKObjectsEqual(firstRevid, [[persistentRoot revision] revisionID]);
-}
-
 @end

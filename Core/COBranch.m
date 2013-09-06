@@ -82,16 +82,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     {
         // Loading an existing branch
         
-        COBranchInfo *branchInfo = [self branchInfo];
-        ETAssert(branchInfo != nil);
-        
-        ASSIGN(_currentRevisionID, [branchInfo currentRevisionID]);
-        _metadata = [[NSMutableDictionary alloc] initWithDictionary:[branchInfo metadata]];
-        _isCreated = YES;
-        _deleted = [branchInfo isDeleted];
-        
-        id<COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionID: _currentRevisionID];
-        [_objectGraph setItemGraph: aGraph];
+        [self updateWithBranchInfo: [self branchInfo]];
     }
     else
     {
@@ -690,6 +681,19 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     result.baseRevision =[CORevision revisionWithStore: [self store] revisionID: aBaseRevisionID];
     result.diff = merged;
     return result;
+}
+
+- (void) updateWithBranchInfo: (COBranchInfo *)branchInfo
+{
+    ETAssert(branchInfo != nil);
+    
+    ASSIGN(_currentRevisionID, [branchInfo currentRevisionID]);
+    ASSIGN(_metadata, [NSMutableDictionary dictionaryWithDictionary:[branchInfo metadata]]);
+    _isCreated = YES;
+    _deleted = [branchInfo isDeleted];
+    
+    id<COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionID: _currentRevisionID];
+    [_objectGraph setItemGraph: aGraph];
 }
 
 @end

@@ -9,6 +9,8 @@
             persistentRoot: (COPersistentRoot *)aPersistentRoot
 parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch;
 
+- (void)updateWithBranchInfo: (COBranchInfo *)branchInfo;
+
 - (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID;
 - (void) saveCommitWithMetadata: (NSDictionary *)metadata;
 - (void)saveDeletion;

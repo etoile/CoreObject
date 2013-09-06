@@ -66,12 +66,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         
         for (COBranchInfo *branchInfo in [[_savedState branchForUUID] allValues])
         {
-            COBranch *branch = [[[COBranch alloc] initWithUUID: [branchInfo UUID]
-			                                objectGraphContext: nil
-                                                persistentRoot: self
-                                    parentRevisionForNewBranch: nil] autorelease];
-            
-            [_branchForUUID setObject: branch forKey: [branchInfo UUID]];
+            [self updateBranchWithBranchInfo: branchInfo];
         }
         
         ASSIGN(_currentBranchUUID, [_savedState currentBranchUUID]);
@@ -465,6 +460,25 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     [[self editingBranch] setCurrentRevision: revision];
 }
 
+- (void) updateBranchWithBranchInfo: (COBranchInfo *)branchInfo
+{
+    COBranch *branch = [_branchForUUID objectForKey: [branchInfo UUID]];
+    
+    if (branch == nil)
+    {
+        branch = [[[COBranch alloc] initWithUUID: [branchInfo UUID]
+                                        objectGraphContext: nil
+                                            persistentRoot: self
+                                parentRevisionForNewBranch: nil] autorelease];
+        
+        [_branchForUUID setObject: branch forKey: [branchInfo UUID]];
+    }
+    else
+    {
+        [branch updateWithBranchInfo: branchInfo];
+    }
+}
+
 - (void)storePersistentRootDidChange: (NSNotification *)notif
 {
     // FIXME: This currently breaks TestConcurrentChanges
@@ -475,16 +489,15 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 //    }
     
     COPersistentRootInfo *info = [[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
-    
-    // FIXME: This is really incomplete... factor out into a persistent root merge method.
+    ASSIGN(_savedState, info);
     
     for (ETUUID *uuid in [info branchUUIDs])
     {
         COBranchInfo *branchInfo = [info branchInfoForUUID: uuid];
-        
-        // FIXME: Don't use the user method -setCurrentRevision: because it might mark the branch as neededing to be committed!
-        [[self branchForUUID: uuid] setCurrentRevision: [CORevision revisionWithStore: [self store] revisionID: [branchInfo currentRevisionID]]];
+        [self updateBranchWithBranchInfo: branchInfo];
     }
+    
+    ASSIGN(_currentBranchUUID, [_savedState currentBranchUUID]);
     
     [self sendChangeNotification];
 }
