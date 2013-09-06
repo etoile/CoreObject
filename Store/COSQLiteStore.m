@@ -590,7 +590,7 @@
         else
         {
             [rs close];
-            [db_ commit];
+            [db_ releaseSavepoint: @"persistentRootInfoForUUID"];
             return nil;
         }
         [rs close];

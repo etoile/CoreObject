@@ -105,7 +105,7 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 		if (aParent != nil)
 		{
 			NSMutableArray *children = [childrenForUUID objectForKey: aParent];
-			assert(children != nil);
+			assert(children != nil); // i.e., assert([allCommitsSorted containsObject: aParent])
 			[children addObject: aCommit];
 		}
 	}

@@ -243,8 +243,9 @@
 
 - (COUndoStack *)undoStack
 {
-    NSString *name = [NSString stringWithFormat: @"typewriter-%@",
-                      [_persistentRoot persistentRootUUID]];
+    NSString *name = [NSString stringWithFormat: @"typewriter-%@-%@",
+                      [_persistentRoot persistentRootUUID],
+                      _title];
     
     return [[COUndoStackStore defaultStore] stackForName: name];
 }
@@ -298,7 +299,11 @@
         assert(![mergeInfo.diff hasConflicts]);
         
         [mergeInfo.diff applyTo: [master objectGraphContext]];
-        [dest commit];
+        
+        // HACK: should be a regular -commit, I guess, but there's a bug where
+        // -commit uses the last used undo stack, instead of none. So explicitly pass nil,
+        // so this commit doesn't record an undo command.
+        [[dest editingContext] commitWithUndoStack: nil];
     }
 }
 

@@ -112,6 +112,8 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
 - (void) handleUpdateResponse: (NSDictionary *)aResponse
                         store: (COSQLiteStore *)aStore
 {
+    assert([aStore beginTransactionWithError: NULL]);
+    
     NSString *serverID = aResponse[@"serverID"];
     ETUUID *persistentRoot = [ETUUID UUIDWithString: aResponse[@"persistentRoot"]];
     
@@ -208,6 +210,8 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
                       forPersistentRoot: persistentRoot
                                   error: NULL]);
     }
+    
+    assert([aStore commitTransactionWithError: NULL]);
 }
 
 @end
