@@ -7,7 +7,7 @@ First Release
 - Major tasks
   x App-level undo
     - polish, fine-tune api
-  - Diff/merge cleanup
+  WIP Diff/merge cleanup
   - Cleanup COObject
     x synthesize accessors (started)
     - synthesize all accessors
@@ -23,8 +23,6 @@ First Release
     - handle persistent roots unloading
     - all other corner cases in TestCrossPersistentRootReferences.m
   x Use notifications posted by COSQLiteStore (very basic support)
-    - complete support
-    - full set of test cases
     - think of all corner cases
   - support "transient roots" in a COEditingContext. These are COObjectGraphContext wrappers.
     Or, support creating a persistent root in code, then calling "freeze" which will make it 
@@ -40,9 +38,8 @@ First Release
      -[COBranch rootObject] = { return [[self objectGraphContext] rootObject]; }
      
     All of the other methods, I don't know.
-  - Extend COBranch API to support branches and merging revisions accross tracks
+  WIP Extend COBranch API to support branches and merging revisions accross tracks
   - Expose COSQLiteStore's attachments feature
-  x Document COBranch class
 
 - didAwaken: replacement
     - At the end of the setStoreItem:, call -awakeFromDeserialization
@@ -83,11 +80,6 @@ First Release
   - It scans over every loaded ObjC class, this is really slow and should be removed
 
 - COObject
-  x Remove support for freestanding COObject not associated with a COObjectGraphContext,
-    and remove -becomePersistentInContext:. The rationale was that freestanding
-    COObjects would only make sense if they have no relationships. Since relationships
-    are such a central feature we might as well force COObjects to belong to a
-    COObjectGraphContext
   - Attempting to set a value for a readonly property should raise an exception
   - Check COObject KVO semantics and documentation
   - See if we can get rid of all of the properties that only make sense for root objects.
@@ -112,6 +104,11 @@ First Release
 
 - COItem
   - tidy up ugly NSMutableDictionary / NSDictionary casting
+  - use a std::unordered_map<NSString *, std::pair<uint32_t, id>>
+    (i.e. map from string to (COType, object) pair). 
+    
+    (Well, use a simple wrapper class instead of std::pair.) We could also
+    use SEL instead of NSString* for better performance, probably.
 
 - COSQLiteStore
   - Use change count for notifications. Make all mutations increment count.
@@ -124,32 +121,27 @@ First Release
   - For recording merges, the merged parent needs to be known when we gc commits.
   - exportRevisions: and importRevisions: that take a set of CORevisionID an returns a delta-compressed NSData
     suitable for network transport.
+  - Review error handling, especially handling of errors within transactions
 
 - Make COQuery a bit more usable
-- Switch to NSUUID
 
 - General
-  - Migrate to ARC?
-  - COItem: use a std::unordered_map<NSString *, std::pair<uint32_t, id>>
-    (i.e. map from string to (COType, object) pair). We could also
-    use SEL instead of NSString *, or some other uniqued property ID.
-
+  - Migrate to ARC
+  - Switch to NSUUID
+  
 - Collaboration
-  - to initially share something, we need to decide between:
-    a) the user who wants to do the "clone" creates an empty persistent root and then calls the "pull" code
-    b) the user who wants to do the "clone" calls the "pull" code which handles creating the persistent root
-
 
 Future Work
 -----------
 
-- Switch from FMDB to an SQL abstraction backend 
+- Switch from FMDB to an SQL abstraction backend
 
 - Tune object copy model to respect user expectations about copy/paste in various recurrent use cases
 - Improve Relationship Integrity and leverage it in more places (e.g. copy time, more aggressive checks or object graph integrity checking in a background thread etc.)
 - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
 - Evaluate a CORevision cache per COStore or process
 - Evaluate a COTrackNode cache per track
+- Investigate how we can use GCD, and generally how to make the API asynchronous.
 
 x Figure out how to navigate large root object sets very quickly (evaluate writing a COSQLCursor class)/
   How to scroll smoothly through 50 000 root objects in an Object Manager without loading all the objects in memory?
