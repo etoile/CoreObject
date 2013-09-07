@@ -748,6 +748,10 @@ static void FindAllStronglyContainedObjects(COObject *anObj, NSMutableSet *dest)
 	[_objectGraphContext markObjectAsUpdated: self forProperty: prop];
 }
 
+/**
+ * FIXME: This API is broken, see note in -[CORelationshipCache addReferenceFromSourceObject:sourceProperty:targetProperty:]
+ * I'm not sure if we can support it. --Eric 
+ */
 - (void)didChangeValueForProperty: (NSString *)key
 {
 	[self didChangeValueForProperty: key oldValue: nil];

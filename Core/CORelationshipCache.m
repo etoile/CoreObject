@@ -124,9 +124,19 @@
     {
         // We are setting the value of a non-multivalued property, so assert
         // that it is currently not already set.
-        for (COCachedRelationship *entry in _cachedRelationships)
+        
+        // HACK: The assertion fails when code uses -didChangeValueForProperty:
+        // instead of -didChangeValueForProperty:oldValue:, because we can't clear the old
+        // relationships from the cache if -didChangeValueForProperty: is used.
+        //
+        // So the assetion was removed and this hack added to remove stale entries from
+        // the cache, only for one-many relationships. 
+        for (COCachedRelationship *entry in [NSArray arrayWithArray: _cachedRelationships])
         {
-            assert(![aTarget isEqualToString: entry->_targetProperty]);
+            if ([aTarget isEqualToString: entry->_targetProperty])
+            {
+                [_cachedRelationships removeObject: entry];
+            }
         }
     }
     
