@@ -745,11 +745,10 @@
 	UKObjectsEqual(A(child), [tag3 contentArray]);
 }
 
-#if 0
-
 - (void)testSelectiveUndoOfGroupOperation
 {
 	OutlineItem *doc = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx1 setRootObject: doc];
 	OutlineItem *line1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *circle1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *square1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -765,64 +764,46 @@
 	[doc insertObject: square1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	[doc insertObject: image1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
-	[ctx1 commit];
-	
 	// snapshot the state: (line1, circle1, square1, image1) into ctx2
-	[ctx2 insertObject: doc];
+	[ctx2 setItemGraph: ctx1];
 	
 	OutlineItem *group1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[group1 setValue: @"group1" forProperty: @"label"];
-	[doc insertObject: group1 atIndex: 1];
+	[doc insertObject: group1 atIndex: 1 hint: nil forProperty: @"contents"];
 	[group1 insertObject: circle1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	[group1 insertObject: square1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[ctx1 commit];
-	
+	UKObjectsEqual((@[line1, group1, image1]), [doc contents]);
+    
 	// snapshot the state:  (line1, group1=(circle1, square1), image1) into ctx3
-	[ctx3 insertObject: doc];
+	[ctx3 setItemGraph: ctx1];
 	
 	OutlineItem *triangle1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[triangle1 setValue: @"triangle1" forProperty: @"label"];
-	[doc insertObject: triangle1 atIndex: 0];
-	[ctx1 commit];
+	[doc insertObject: triangle1 atIndex: 0];	
 	
+	// ctx1 state:  (triangle1, line1, group1=(circle1, square1), image1)
 	
-	// ctx1 state:  (triangl1, line1, group1=(circle1, square1), image1)
+	// Now do the merge, which selectively undoes the group operation
 	
+    COItemGraphDiff *diff32 = [COItemGraphDiff diffItemTree: ctx3 withItemTree: ctx2 sourceIdentifier: @"diff32"];
+    COItemGraphDiff *diff31 = [COItemGraphDiff diffItemTree: ctx3 withItemTree: ctx1 sourceIdentifier: @"diff31"];
+	COItemGraphDiff *merged = [diff32 itemTreeDiffByMergingWithDiff: diff31];
 	
-	// Now do the merge
-	
-	COItemGraphDiff *diff_ctx3_vs_ctx2 = [COItemGraphDiff diffContainer: (id)[ctx3 objectWithUUID: [doc UUID]]
-                                                          withContainer: (id)[ctx2 objectWithUUID: [doc UUID]]];
-	UKNotNil(diff_ctx3_vs_ctx2);
-    
-	COItemGraphDiff *diff_ctx3_vs_ctx1 = [COItemGraphDiff diffContainer: (id)[ctx3 objectWithUUID: [doc UUID]]
-                                                          withContainer: (id)[ctx1 objectWithUUID: [doc UUID]]];
-	UKNotNil(diff_ctx3_vs_ctx2);
-	
-    
-	COItemGraphDiff *merged = [COItemGraphDiff mergeDiff: diff_ctx3_vs_ctx2
-                                                withDiff: diff_ctx3_vs_ctx1];
-	// FIXME: Test that there are no conflicts
-	
-	
-	// Apply the resulting diff to ctx3
-	UKFalse([ctx1 hasChanges]);
+    UKFalse([merged hasConflicts]);
 	[merged applyTo: ctx3];
 	
 	UKIntsEqual(5, [[(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray] count]);
-	if (5 == [[doc contentArray] count])
-	{
-		UKStringsEqual(@"triangle1", [[[(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 0] valueForProperty: @"label"]);
-		UKStringsEqual(@"line1", [[[(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 1] valueForProperty: @"label"]);
-		UKStringsEqual(@"circle1", [[[(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 2] valueForProperty: @"label"]);
-		UKStringsEqual(@"square1", [[[(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 3] valueForProperty: @"label"]);
-		UKStringsEqual(@"image1", [[[(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 4] valueForProperty: @"label"]);
-	}
+
+    UKStringsEqual(@"triangle1", [[[(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 0] valueForProperty: @"label"]);
+    UKStringsEqual(@"line1", [[[(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 1] valueForProperty: @"label"]);
+    UKStringsEqual(@"circle1", [[[(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 2] valueForProperty: @"label"]);
+    UKStringsEqual(@"square1", [[[(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 3] valueForProperty: @"label"]);
+    UKStringsEqual(@"image1", [[[(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray] objectAtIndex: 4] valueForProperty: @"label"]);
 	
 	for (OutlineItem *object in [(OutlineItem *)[ctx3 objectWithUUID: [doc UUID]] contentArray])
 	{
 		UKObjectsSame([ctx3 objectWithUUID: [doc UUID]], [object valueForProperty: @"parentContainer"]);
 	}
 }
-#endif
+
 @end
