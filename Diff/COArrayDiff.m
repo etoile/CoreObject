@@ -47,14 +47,30 @@ void CODiffArrays(NSArray *a, NSArray *b, id<CODiffArraysDelegate>delegate, id u
 	diff_free(result);
 }
 
-
+/**
+ * Note: automatically handles "false conflicts", that is, when both
+ * diffs make the same edit, this will (correctly) only perform that edit once.
+ */
 void COApplyEditsToArray(NSMutableArray *array, NSArray *edits)
 {
-	NSArray *uniqueEdits = COEditsByUniquingNonconflictingDuplicates(edits);
+	//NSArray *uniqueEdits = COEditsByUniquingNonconflictingDuplicates(edits);
 	
+    const NSUInteger editsCount = [edits count];
+    
 	NSInteger i = 0;
-	for (COSequenceEdit *op in uniqueEdits)
+    for (NSUInteger whichEdit = 0; whichEdit < editsCount; whichEdit++)
 	{
+        COSequenceEdit *op = [edits objectAtIndex: whichEdit];
+        if ((whichEdit + 1) < editsCount)
+        {
+            COSequenceEdit *nextOp = [edits objectAtIndex: whichEdit + 1];
+            if ([op isEqualIgnoringSourceIdentifier: nextOp])
+            {
+                // Skip "false conflicts"
+                continue;
+            }
+        }
+        
 		if ([op isMemberOfClass: [COSequenceInsertion class]])
 		{
 			COSequenceInsertion *opp = (COSequenceInsertion*)op;

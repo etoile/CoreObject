@@ -374,9 +374,16 @@
 	OutlineItem *child1a = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *child4 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     
-	[[ctx2 rootObject] insertObject: child0 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[[ctx2 rootObject] insertObject: child1a atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-    [[ctx2 rootObject] insertObject: child4 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	[[ctx2 rootObject] insertObject: child0 atIndex: 0 hint: nil forProperty: @"contents"];
+	[[ctx2 rootObject] insertObject: child1a atIndex: 2 hint: nil forProperty: @"contents"];
+    [[ctx2 rootObject] insertObject: child4 atIndex: 5 hint: nil forProperty: @"contents"];
+    
+    UKObjectsEqual((@[[child0 UUID],
+                    [child1 UUID],
+                    [child1a UUID],
+                    [child2 UUID],
+                    [child3 UUID],
+                    [child4 UUID]]), [[[(OutlineItem *)[ctx2 rootObject] contents] mappedCollection] UUID]);
     
 	// ctx2:
 	//
@@ -402,6 +409,13 @@
     [[[ctx3 rootObject] mutableArrayValueForKey: @"contents"] removeObjectAtIndex: 2];
     [[[ctx3 rootObject] mutableArrayValueForKey: @"contents"] insertObject: child2a atIndex: 3];
 
+    UKObjectsEqual((@[[child0 UUID],
+                    [child1 UUID],
+                    [child2 UUID],
+                    [child2a UUID],
+                    [child3 UUID],
+                    [child4 UUID]]), [[[(OutlineItem *)[ctx3 rootObject] contents] mappedCollection] UUID]);
+    
 	// ctx3:
 	//
 	// parent
@@ -422,8 +436,6 @@
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
 	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
     
-    // FIXME: Currently failing
-#if 0
     UKFalse([merged hasConflicts]);
 	   
     [merged applyTo: ctx1];
@@ -453,8 +465,52 @@
                       [child2a UUID],
                       [child3 UUID],
                       [child4 UUID]]), [[[parent contents] mappedCollection] UUID]);
+}
+
+/**
+ * This is the example from "A formal investigation of diff3"
+ */
+- (void)testConflictingMixedSequenceEdit
+{
+	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx1 setRootObject: parent];
+    
+	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child4 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child5 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *child6 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+
+    parent.contents = @[child1, child2, child3, child4, child5, child6];
+
+    
+	[ctx2 setItemGraph: ctx1];
+    ((OutlineItem *)[ctx2 rootObject]).contents = @[[ctx2 objectWithUUID: [child1 UUID]],
+                                                    [ctx2 objectWithUUID: [child4 UUID]],
+                                                    [ctx2 objectWithUUID: [child5 UUID]],
+                                                    [ctx2 objectWithUUID: [child2 UUID]],
+                                                    [ctx2 objectWithUUID: [child3 UUID]],
+                                                    [ctx2 objectWithUUID: [child6 UUID]]];
+    
+    [ctx3 setItemGraph: ctx1];
+    ((OutlineItem *)[ctx3 rootObject]).contents = @[[ctx3 objectWithUUID: [child1 UUID]],
+                                                    [ctx3 objectWithUUID: [child2 UUID]],
+                                                    [ctx3 objectWithUUID: [child4 UUID]],
+                                                    [ctx3 objectWithUUID: [child5 UUID]],
+                                                    [ctx3 objectWithUUID: [child3 UUID]],
+                                                    [ctx3 objectWithUUID: [child6 UUID]]];
+    
+    COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
+    COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
+	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    
+    // FIXME: Not detected as a conflict.
+#if 0
+    UKTrue([merged hasConflicts]);
 #endif
 }
+
 
 - (void)testInsertInsertOnManyToManyRelationship
 {

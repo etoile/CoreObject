@@ -6,6 +6,7 @@ BOOL COOverlappingRanges(NSRange r1, NSRange r2)
 		|| (r2.location >= r1.location && r2.location < (r1.location + r1.length) && r2.length > 0);
 }
 
+#if 0
 NSSet *COFindConflicts(NSArray *sortedOps)
 {
 	NSMutableSet *conflicts = [NSMutableSet set];
@@ -89,3 +90,4 @@ NSArray *COEditsByUniquingNonconflictingDuplicates(NSArray *edits)
 	}
 	return result;
 }
+#endif

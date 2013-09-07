@@ -593,18 +593,18 @@ static void COAssertEditsEquivelant(NSSet *edits)
 	}
 }
 
-static BOOL COEditsEquivelant(NSSet *edits)
-{
-    COItemGraphEdit *anyEdit = [edits anyObject];
-    for (COItemGraphEdit *edit in edits)
-    {
-        if (![edit isEqualIgnoringSourceIdentifier: anyEdit])
-        {
-            return NO;
-        }
-	}
-    return YES;
-}
+//static BOOL COEditsEquivelant(NSSet *edits)
+//{
+//    COItemGraphEdit *anyEdit = [edits anyObject];
+//    for (COItemGraphEdit *edit in edits)
+//    {
+//        if (![edit isEqualIgnoringSourceIdentifier: anyEdit])
+//        {
+//            return NO;
+//        }
+//	}
+//    return YES;
+//}
 
 static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 {
@@ -673,25 +673,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 			}
 		}
         
-        // This is wrong and will only work for two cases:
-        //
-        // 1) all edits for the sequence are the same
-        // 2) all edits are different, and interleave in a non-conflicting way
-        //
-        // We need to handle a more general case where the two uses may
-        // have made some edits that are the same, and some that interleave
-        
-        NSArray *editsSorted;
-        
-        if (COEditsEquivelant(edits))
-        {
-            editsSorted = @[[edits anyObject]];
-        }
-        else
-        {
-            editsSorted = [[edits allObjects] sortedArrayUsingSelector: @selector(compare:)];
-        }
-        
+        NSArray *editsSorted = [[edits allObjects] sortedArrayUsingSelector: @selector(compare:)];
         NSArray *originalArray = [anItem valueForAttribute: [anyEdit attribute]];
         NSArray *newArray = COArrayByApplyingEditsToArray(originalArray, editsSorted);
         
