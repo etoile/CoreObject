@@ -278,6 +278,14 @@
 	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
 
     UKTrue([merged hasConflicts]);
+    
+    [merged resolveConflictsFavoringSourceIdentifier: @"diff12"];
+    
+    UKFalse([merged hasConflicts]);
+    
+    [merged applyTo: ctx1];
+    
+    UKTrue(COItemGraphEqualToItemGraph(ctx1, ctx2));
 }
 
 - (void)testNonconflictingInsertInsertOnOneToManyRelationship

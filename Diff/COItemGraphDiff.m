@@ -1068,5 +1068,20 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	[diffDict removeEdit: anEdit];
 }
 
+- (void) resolveConflictsFavoringSourceIdentifier: (NSString*)anIdentifier
+{
+    for (COItemGraphConflict *conflict in [self conflicts])
+    {
+        NSSet *edits = [NSSet setWithSet: [conflict editsForSourceIdentifier: anIdentifier]];
+        [self removeConflict: conflict];
+        
+        for (COItemGraphEdit *edit in edits)
+        {
+            [self addEdit: edit];
+        }
+    }
+    assert(![self hasConflicts]);
+}
+
 @end
 

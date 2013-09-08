@@ -113,5 +113,7 @@
 - (void) addEdit: (COItemGraphEdit *)anEdit;
 - (void) removeEdit: (COItemGraphEdit *)anEdit;
 
+- (void) resolveConflictsFavoringSourceIdentifier: (NSString*)anIdentifier;
+
 @end
 
