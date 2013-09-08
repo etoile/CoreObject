@@ -161,7 +161,10 @@ extern NSString * const kCOBranchLabel;
  * The object graph context owned by the branch.
  */
 @property (readonly, nonatomic) COObjectGraphContext *objectGraphContext;
-
+/**
+ * The root object of the object graph context owned by the branch.
+ */
+@property (nonatomic, retain) id rootObject;
 
 /**
  * @taskunit Pending Changes

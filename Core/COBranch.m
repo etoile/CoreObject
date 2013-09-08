@@ -292,18 +292,36 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (BOOL)hasChanges
 {
+    if ([self isBranchUncommitted])
+    {
+        return YES;
+    }
+    
     if (_metadataChanged)
     {
         return YES;
     }
     
-    // TODO: Take into account reverts that change _currentRevisionID
+    if (![[[self branchInfo] currentRevisionID] isEqual: _currentRevisionID])
+    {
+        return YES;
+    }
+    
+    if (_deleted != [[self branchInfo] isDeleted])
+    {
+        return YES;
+    }
     
 	return [[self objectGraphContext] hasChanges];
 }
 
 - (void)discardAllChanges
 {
+    if ([self isBranchUncommitted])
+    {
+        [NSException raise: NSGenericException format: @"uncommitted branches do not support -discardAllChanges"];
+    }
+    
 	if (_metadataChanged)
     {
         if ([self isBranchUncommitted])
@@ -316,6 +334,18 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                                [[self branchInfo] metadata]]);
         }
         _metadataChanged = NO;
+    }
+    
+    if (![[[self branchInfo] currentRevisionID] isEqual: _currentRevisionID])
+    {
+        [self setCurrentRevision:
+         [CORevision revisionWithStore: [self store]
+                            revisionID: [[self branchInfo] currentRevisionID]]];
+    }
+    
+    if (_deleted != [[self branchInfo] isDeleted])
+    {
+        [self setDeleted: [[self branchInfo] isDeleted]];
     }
     
 	[[self objectGraphContext] discardAllChanges];
@@ -372,35 +402,9 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	return NO;
 }
 
-- (BOOL)isOurStoreForNotification: (NSNotification *)notif
-{
-    // FIXME: Implement
-    return YES;
-//	NSString *storeUUIDString = [[notif userInfo] objectForKey: kCOStoreUUIDStringKey];
-//	return [storeUUIDString isEqual: [[[[self persistentRoot] store] UUID] stringValue]];
-}
-
 - (BOOL)needsReloadNodes: (NSArray *)currentLoadedNodes
 {
 	return NO;
-}
-
-- (NSArray *)allNodesAndCurrentNodeIndex: (NSUInteger *)aNodeIndex
-{
-    return [NSArray array];
-//	// NOTE: For a new track, -[COSQLStore isTrackUUID:] would return NO
-//	
-//	COStore *store = [[self persistentRoot] store];
-//	return [store nodesForTrackUUID: [self UUID]
-//	                    nodeBuilder: self
-//	               currentNodeIndex: aNodeIndex
-//	                  backwardLimit: NSUIntegerMax
-//	                   forwardLimit: NSUIntegerMax];
-}
-
-- (NSArray *)provideNodesAndCurrentNodeIndex: (NSUInteger *)aNodeIndex
-{
-	return [self allNodesAndCurrentNodeIndex: aNodeIndex];
 }
 
 - (CORevision *)undoRevision
@@ -455,7 +459,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
     [self setCurrentRevision: [self redoRevision]];
 }
-
 
 - (COSQLiteStore *) store
 {
@@ -617,9 +620,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	id<COItemGraph> aGraph = [[self store] itemGraphForRevisionID: [revision revisionID]];
     
     [_objectGraph setItemGraph: aGraph];
-    
-    // FIXME: Reimplement or remove
-    //[[self rootObject] didReload];
 }
 
 - (CORevision *) revisionWithID: (CORevisionID *)aRevisionID
@@ -694,6 +694,11 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     id<COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionID: _currentRevisionID];
     [_objectGraph setItemGraph: aGraph];
+}
+
+- (id) rootObject
+{
+    return [_objectGraph rootObject];
 }
 
 @end

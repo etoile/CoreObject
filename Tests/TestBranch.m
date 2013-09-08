@@ -764,4 +764,56 @@
     [persistentRoot commit];
 }
 
+- (void) testRevertToRevision
+{
+    
+}
+
+- (void) testDiscardAllChangesAndHasChanges
+{
+    // -discardAllChanges raises an exception on uncommitted branches
+    UKRaisesException([originalBranch discardAllChanges]);
+    UKTrue([originalBranch hasChanges]);
+    
+    [persistentRoot commit];
+    UKDoesNotRaiseException([originalBranch discardAllChanges]);
+    UKFalse([originalBranch hasChanges]);
+}
+
+- (void) testDiscardAllChangesAndHasChangesForSetCurrentRevision
+{
+    [persistentRoot commit];
+    CORevision *firstRevision = [originalBranch currentRevision];
+    
+    [[originalBranch rootObject] setLabel: @"test"];
+    [persistentRoot commit];
+    CORevision *secondRevision = [originalBranch currentRevision];
+    
+    UKFalse([originalBranch hasChanges]);
+    UKObjectsEqual(@"test", [[originalBranch rootObject] label]);
+    
+    [originalBranch setCurrentRevision: firstRevision];
+    UKTrue([originalBranch hasChanges]);
+    UKFalse([[originalBranch objectGraphContext] hasChanges]);
+    UKNil([[originalBranch rootObject] label]);
+
+    [originalBranch discardAllChanges];
+    UKFalse([originalBranch hasChanges]);
+    UKObjectsEqual(secondRevision, [originalBranch currentRevision]);
+    UKObjectsEqual(@"test", [[originalBranch rootObject] label]);
+}
+
+- (void) testDiscardAllChangesAndHasChangesForDelete
+{
+    [persistentRoot commit];
+
+    COBranch *branch = [originalBranch makeBranchWithLabel: @"test"];
+    [persistentRoot commit];
+    
+    branch.deleted = YES;
+    UKTrue([branch hasChanges]);
+    [branch discardAllChanges];
+    UKFalse(branch.deleted);
+}
+
 @end
