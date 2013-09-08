@@ -36,6 +36,28 @@
 	return COOverlappingRanges(range, other.range);
 }
 
+- (BOOL) touches: (COSequenceEdit *)other
+{
+    if (COOverlappingRanges(range, other.range))
+    {
+        return YES;
+    }
+    
+    if (range.location == NSMaxRange(other.range))
+        return YES;
+    
+    if (range.location == other.range.location)
+        return YES;
+    
+    if (NSMaxRange(range) == NSMaxRange(other.range))
+        return YES;
+    
+    if (NSMaxRange(range) == other.range.location)
+        return YES;
+
+    return NO;
+}
+
 - (BOOL) isEqualIgnoringSourceIdentifier:(id)other
 {
 	return [super isEqualIgnoringSourceIdentifier: other]

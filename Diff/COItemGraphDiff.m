@@ -986,6 +986,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 			{
 				if ([edit isKindOfClass: [COSequenceEdit class]])
 				{
+                    // N.B.: change to -touches: to emulate diff3
 					if ([(COSequenceEdit *)anEdit overlaps: (COSequenceEdit *)edit])
 					{
 						[self recordSequenceEditConflictEdit: anEdit withEdit: edit];

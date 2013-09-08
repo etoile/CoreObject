@@ -8,6 +8,7 @@
 
 - (NSComparisonResult) compare: (id)otherObject;
 - (BOOL) overlaps: (COSequenceEdit *)other;
+- (BOOL) touches: (COSequenceEdit *)other;
 
 - (id) initWithUUID: (ETUUID *)aUUID
 		  attribute: (NSString *)anAttribute
