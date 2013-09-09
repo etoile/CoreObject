@@ -108,6 +108,13 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 			assert(children != nil); // i.e., assert([allCommitsSorted containsObject: aParent])
 			[children addObject: aCommit];
 		}
+        
+        CORevisionID *mergeParent = [[store revisionInfoForRevisionID: aCommit] mergeParentRevisionID];
+        if (mergeParent != nil)
+        {
+            NSLog(@"merge parent of %@ is %@", aCommit, mergeParent);
+            [[childrenForUUID objectForKey: mergeParent] addObject: aCommit];
+        }
 	}
 
 	// remove commits which have no children/parents

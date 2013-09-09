@@ -530,6 +530,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         if (self.mergingBranch != nil)
         {
             mergeParent = [[self.mergingBranch currentRevision] revisionID];
+            self.mergingBranch = nil;
         }
         
         CORevisionID *revId = [store writeRevisionWithItemGraph: _objectGraph
