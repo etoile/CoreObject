@@ -7,7 +7,7 @@ VERSION = 0.5
 
 LIBRARIES_DEPEND_UPON = $(shell pkg-config --libs sqlite3) -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
 
-CoreObject_INCLUDE_DIRS = -Ifmdb/src 
+CoreObject_INCLUDE_DIRS = -IStore/fmdb/src
 CoreObject_LDFLAGS += -lstdc++ -lobjcxx -lsqlite3
 
 ifeq ($(test), yes)
@@ -16,7 +16,7 @@ ifeq ($(test), yes)
   CoreObject_PRINCIPAL_CLASS = TestCommon
 endif
 
-OTHER_HEADER_DIRS = . Core Diff Model Store Tracks Utilities StorageDataModel
+OTHER_HEADER_DIRS = . Core Diff Model Store Undo Synchronization Utilities StorageDataModel
 
 CoreObject_HEADER_FILES_DIR = Headers
 CoreObject_HEADER_FILES = $(notdir $(wildcard Headers/*.h))
