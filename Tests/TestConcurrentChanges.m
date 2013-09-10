@@ -67,6 +67,7 @@
     COPersistentRootInfo *info = [store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]];
     changeCount = info.changeCount;
     
+    [store beginTransactionWithError: NULL];
     // Revert persistentRoot back to the first revision using the store API
     UKTrue([store setCurrentRevision: firstRevid
                         tailRevision: nil
@@ -74,6 +75,7 @@
                     ofPersistentRoot: [persistentRoot persistentRootUUID]
                   currentChangeCount: &changeCount
                                error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     // N.B.: If we make the store async, we'll need to wait here a bit.
     
@@ -90,10 +92,12 @@
     
     ETUUID *secondbranchUUID = [ETUUID UUID];
     
+    [store beginTransactionWithError: NULL];
     UKTrue([store createBranchWithUUID: secondbranchUUID
                        initialRevision: [[persistentRoot revision] revisionID]
                      forPersistentRoot: [persistentRoot persistentRootUUID]
                                  error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     // N.B.: If we make the store async, we'll need to wait here a bit.
     
@@ -106,9 +110,11 @@
 
 - (void) testsDetectsStoreDeleteBranch
 {
+    [store beginTransactionWithError: NULL];
     UKTrue([store deleteBranch: [testBranch UUID]
               ofPersistentRoot: [persistentRoot persistentRootUUID]
                          error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     // N.B.: If we make the store async, we'll need to wait here a bit.
     
@@ -127,9 +133,11 @@
              branchInfoForUUID: [testBranch UUID]]
             isDeleted]);
     
+    [store beginTransactionWithError: NULL];
     UKTrue([store undeleteBranch: [testBranch UUID]
                 ofPersistentRoot: [persistentRoot persistentRootUUID]
                            error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     // N.B.: If we make the store async, we'll need to wait here a bit.
     
@@ -143,10 +151,12 @@
 {
     NSDictionary *metadata = @{ @"hello" : @"world" };
     
+    [store beginTransactionWithError: NULL];
     UKTrue([store setMetadata: metadata
                     forBranch: [testBranch UUID]
              ofPersistentRoot: [persistentRoot persistentRootUUID]
                         error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     // N.B.: If we make the store async, we'll need to wait here a bit.
     
@@ -157,9 +167,11 @@
 
 - (void) testsDetectsStoreSetCurrentBranch
 {
+    [store beginTransactionWithError: NULL];
     UKTrue([store setCurrentBranch: [testBranch UUID]
                  forPersistentRoot: [persistentRoot persistentRootUUID]
                              error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     // N.B.: If we make the store async, we'll need to wait here a bit.
     
@@ -185,7 +197,9 @@
 
 - (void) testsDetectsStoreDeletePersistentRoot
 {
+    [store beginTransactionWithError: NULL];
     UKTrue([store deletePersistentRoot: [persistentRoot persistentRootUUID] error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     // N.B.: If we make the store async, we'll need to wait here a bit.
     
@@ -200,7 +214,9 @@
     persistentRoot.deleted = YES;
     [ctx commit];
     
+    [store beginTransactionWithError: NULL];
     UKTrue([store undeletePersistentRoot: [persistentRoot persistentRootUUID] error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     // N.B.: If we make the store async, we'll need to wait here a bit.
     
@@ -212,10 +228,12 @@
 
 - (void) testsDetectsStoreCreatePersistentRoot
 {
+    [store beginTransactionWithError: NULL];
     COPersistentRootInfo *info = [store createPersistentRootWithInitialRevision: [[persistentRoot revision] revisionID]
                                                                            UUID: [ETUUID UUID]
                                                                      branchUUID: [ETUUID UUID]
                                                                           error: NULL];
+    [store commitTransactionWithError: NULL];
     UKNotNil(info);
     
     // N.B.: If we make the store async, we'll need to wait here a bit.

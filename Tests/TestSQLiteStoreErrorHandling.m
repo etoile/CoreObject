@@ -82,11 +82,13 @@ static ETUUID *rootUUID;
         // fail since it's readonly, so creating new persistent roots should fail.
         
         NSError *error = nil;
+        [store beginTransactionWithError: NULL];
         BOOL ok = [store createPersistentRootWithInitialItemGraph: [self makeInitialItemGraph]
                                                              UUID: [ETUUID UUID]
                                                        branchUUID: [ETUUID UUID]
                                                  revisionMetadata: nil
                                                             error: &error];
+        ok = ok && [store commitTransactionWithError: NULL];
         UKFalse(ok);
     }
     
@@ -112,11 +114,13 @@ static ETUUID *rootUUID;
                                                                                isDirectory: YES]] autorelease];
         UKNotNil(store);
         
+        [store beginTransactionWithError: NULL];
         ASSIGN(info, [store createPersistentRootWithInitialItemGraph: [self makeInitialItemGraph]
                                                                 UUID: [ETUUID UUID]
                                                           branchUUID: [ETUUID UUID]
                                                     revisionMetadata: nil
                                                                error: NULL]);
+        [store commitTransactionWithError: NULL];
         
         UKNotNil(info);
     }
@@ -136,12 +140,16 @@ static ETUUID *rootUUID;
         COSQLiteStore *store = [[[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir
                                                                                isDirectory: YES]] autorelease];        
         NSError *writeRevisionError = nil;
-        UKNil([store writeRevisionWithItemGraph: [self makeChangedItemGraph]
-                                       metadata: nil
-                               parentRevisionID: [info currentRevisionID]
-                          mergeParentRevisionID: nil
-                                  modifiedItems: nil
-                                          error: &writeRevisionError]);
+        if ([store beginTransactionWithError: NULL])
+        {
+            UKNil([store writeRevisionWithItemGraph: [self makeChangedItemGraph]
+                                           metadata: nil
+                                   parentRevisionID: [info currentRevisionID]
+                              mergeParentRevisionID: nil
+                                      modifiedItems: nil
+                                              error: &writeRevisionError]);
+            [store commitTransactionWithError: NULL];
+        }
         
         // Check we can still read the initial revision
         

@@ -55,6 +55,7 @@ static ETUUID *branchBUUID;
 
 - (void)testReplicateToClientWithoutPersistentRoot
 {
+    [serverStore beginTransactionWithError: NULL];
     COPersistentRootInfo *serverInfo = [serverStore createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
                                                                                         UUID: persistentRootUUID
                                                                                   branchUUID: branchAUUID
@@ -66,7 +67,8 @@ static ETUUID *branchBUUID;
                            forPersistentRoot: persistentRootUUID
                                        error: NULL]);
     UKObjectsEqual(branchAUUID, [serverInfo currentBranchUUID]);
-
+    [serverStore commitTransactionWithError: NULL];
+    
     /* 
        * = current branch
      
@@ -138,11 +140,13 @@ static ETUUID *branchBUUID;
     COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
     COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
     
+    [serverStore beginTransactionWithError: NULL];
     COPersistentRootInfo *serverInfo = [serverStore createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
                                                                                         UUID: persistentRootUUID
                                                                                   branchUUID: branchAUUID
                                                                             revisionMetadata: nil
                                                                                        error: NULL];
+    [serverStore commitTransactionWithError: NULL];
 
     // Pull from server to client
         
@@ -157,6 +161,7 @@ static ETUUID *branchBUUID;
     
     // Server writes a second commit.
     
+    [serverStore beginTransactionWithError: NULL];
     CORevisionID *serverCommit2 = [serverStore writeRevisionWithItemGraph: [self itemGraphWithLabel: @"2"]
                                                                  metadata: nil
                                                          parentRevisionID: [serverInfo currentRevisionID]
@@ -170,6 +175,7 @@ static ETUUID *branchBUUID;
                           ofPersistentRoot: persistentRootUUID
                         currentChangeCount: &changeCount
                                      error: NULL]);
+    [serverStore commitTransactionWithError: NULL];
     
     // Pull from server to client
     
@@ -204,6 +210,7 @@ static ETUUID *branchBUUID;
     COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
     COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
 
+    [serverStore beginTransactionWithError: NULL];
     COPersistentRootInfo *serverInfo = [serverStore createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
                                                                                         UUID: persistentRootUUID
                                                                                   branchUUID: branchAUUID
@@ -232,6 +239,8 @@ static ETUUID *branchBUUID;
                           ofPersistentRoot: cheapCopyUUID
                         currentChangeCount: &changeCount
                                      error: NULL]);
+    
+    [serverStore commitTransactionWithError: NULL];
     
     // Replicate the original persistent root on the client
     

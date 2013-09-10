@@ -169,6 +169,11 @@
     return ok;
 }
 
+- (void) checkInTransaction
+{
+    assert([db_ inTransaction]);
+}
+
 - (NSArray *) allBackingUUIDs
 {
     NSMutableArray *result = [NSMutableArray array];
@@ -404,6 +409,7 @@
                                 modifiedItems: (NSArray*)modifiedItems // array of COUUID
                                         error: (NSError **)error
 {
+    [self checkInTransaction];
     [self validateRevision: aParent];
     
     NSParameterAssert(anItemTree != nil);
@@ -428,6 +434,7 @@
                                 modifiedItems: (NSArray*)modifiedItems // array of COUUID
                                         error: (NSError **)error
 {
+    [self checkInTransaction];
     [self validateRevision: aParent];
     
     NSParameterAssert(anItemTree != nil);
@@ -700,6 +707,7 @@
                                                    revisionMetadata: (NSDictionary *)metadata
                                                               error: (NSError **)error
 {
+    [self checkInTransaction];
     NILARG_EXCEPTION_TEST(contents);
     NILARG_EXCEPTION_TEST(persistentRootUUID);
     NILARG_EXCEPTION_TEST(aBranchUUID);
@@ -726,6 +734,7 @@
                                                         branchUUID: (ETUUID *)aBranchUUID
                                                              error: (NSError **)error
 {
+    [self checkInTransaction];
     NILARG_EXCEPTION_TEST(aRevision);
     NILARG_EXCEPTION_TEST(persistentRootUUID);
     NILARG_EXCEPTION_TEST(aBranchUUID);
@@ -741,6 +750,7 @@
 - (COPersistentRootInfo *) createPersistentRootWithUUID: (ETUUID *)persistentRootUUID
                                                   error: (NSError **)error
 {
+    [self checkInTransaction];
     [db_ executeUpdate: @"INSERT INTO persistentroots (uuid, "
      "backingstore, currentbranch, deleted) VALUES(?,?,NULL,0)",
      [persistentRootUUID dataValue],
@@ -756,6 +766,7 @@
 - (BOOL) deletePersistentRoot: (ETUUID *)aRoot
                         error: (NSError **)error
 {
+    [self checkInTransaction];
     NILARG_EXCEPTION_TEST(aRoot);
     
     BOOL ok = [db_ executeUpdate: @"UPDATE persistentroots SET deleted = 1 WHERE uuid = ?",
@@ -774,6 +785,7 @@
 - (BOOL) undeletePersistentRoot: (ETUUID *)aRoot
                           error: (NSError **)error
 {
+    [self checkInTransaction];
     NILARG_EXCEPTION_TEST(aRoot);
     
     BOOL ok = [db_ executeUpdate: @"UPDATE persistentroots SET deleted = 0 WHERE uuid = ?",
@@ -793,6 +805,7 @@
 		forPersistentRoot: (ETUUID *)aRoot
                  error: (NSError **)error
 {
+    [self checkInTransaction];
     NILARG_EXCEPTION_TEST(aBranch);
     NILARG_EXCEPTION_TEST(aRoot);
     
@@ -816,6 +829,7 @@
             forPersistentRoot: (ETUUID *)aRoot
                         error: (NSError **)error
 {
+    [self checkInTransaction];
     NILARG_EXCEPTION_TEST(branchUUID);
     NILARG_EXCEPTION_TEST(revId);
     NILARG_EXCEPTION_TEST(aRoot);
@@ -937,6 +951,7 @@
      ofPersistentRoot: (ETUUID *)aRoot
                 error: (NSError **)error
 {
+    [self checkInTransaction];
     NILARG_EXCEPTION_TEST(aBranch);
     NILARG_EXCEPTION_TEST(aRoot);
     
@@ -962,6 +977,7 @@
        ofPersistentRoot: (ETUUID *)aRoot
                   error: (NSError **)error
 {
+    [self checkInTransaction];
     NILARG_EXCEPTION_TEST(aBranch);
     NILARG_EXCEPTION_TEST(aRoot);
     
@@ -983,6 +999,7 @@
     ofPersistentRoot: (ETUUID *)aRoot
                error: (NSError **)error
 {
+    [self checkInTransaction];
     NSData *data = [self writeMetadata: meta];    
     BOOL ok = [db_ executeUpdate: @"UPDATE branches SET metadata = ? WHERE uuid = ?",
                data,

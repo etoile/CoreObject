@@ -158,6 +158,7 @@ static ETUUID *childUUID2;
     
     // First commit
     
+    [store beginTransactionWithError: NULL];
     ASSIGN(proot, [store createPersistentRootWithInitialItemGraph: [self makeInitialItemTree]
                                                             UUID: [ETUUID UUID]
                                                       branchUUID: [ETUUID UUID]
@@ -221,6 +222,8 @@ static ETUUID *childUUID2;
                   currentChangeCount: &prootChangeCount
                                error: NULL]);
     
+    [store commitTransactionWithError: NULL];
+    
     return self;
 }
 
@@ -247,7 +250,9 @@ static ETUUID *childUUID2;
     UKObjectsEqual(S(branchAUUID, branchBUUID, initialBranchUUID), [[store persistentRootInfoForUUID: prootUUID] branchUUIDs]);
     
     // Delete it
+    [store beginTransactionWithError: NULL];
     UKTrue([store deleteBranch: branchAUUID ofPersistentRoot: prootUUID error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     {
         COBranchInfo *branchObj = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
@@ -255,10 +260,14 @@ static ETUUID *childUUID2;
     }
     
     // Ensure we can't switch to it, since it is deleted
+    [store beginTransactionWithError: NULL];
     UKFalse([store setCurrentBranch: branchAUUID forPersistentRoot: prootUUID error: NULL]);
-
+    [store commitTransactionWithError: NULL];
+    
     // Undelete it
+    [store beginTransactionWithError: NULL];
     UKTrue([store undeleteBranch: branchAUUID ofPersistentRoot: prootUUID error: NULL]);
+    [store commitTransactionWithError: NULL];    
     {
         COBranchInfo *branchObj = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
         UKFalse([branchObj isDeleted]);
@@ -275,7 +284,9 @@ static ETUUID *childUUID2;
     }
     
     // Really delete it
+    [store beginTransactionWithError: NULL];
     UKTrue([store deleteBranch: branchAUUID ofPersistentRoot: prootUUID error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
     UKNil([[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID]);
@@ -285,8 +296,10 @@ static ETUUID *childUUID2;
 - (void) testDeleteCurrentBranch
 {
     // Delete it - should return NO because you can't delete the current branch
+    [store beginTransactionWithError: NULL];
     UKFalse([store deleteBranch: initialBranchUUID ofPersistentRoot: prootUUID error: NULL]);
-
+    [store commitTransactionWithError: NULL];
+    
     // Should have no effect
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
     
@@ -307,18 +320,21 @@ static ETUUID *childUUID2;
     // in a transaction with the -createPersistentRootWithInitialItemGraph: call.
     UKNil([[[store persistentRootInfoForUUID: prootUUID] currentBranchInfo] metadata]);
     
+    [store beginTransactionWithError: NULL];
     UKTrue([store setMetadata: D(@"hello world", @"msg")
                     forBranch: initialBranchUUID
              ofPersistentRoot: prootUUID
                         error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     UKObjectsEqual(D(@"hello world", @"msg"), [[[store persistentRootInfoForUUID: prootUUID] currentBranchInfo] metadata]);
     
+    [store beginTransactionWithError: NULL];
     UKTrue([store setMetadata: nil
                     forBranch: initialBranchUUID
              ofPersistentRoot: prootUUID
                         error: NULL]);
-    
+    [store commitTransactionWithError: NULL];
     UKNil([[[store persistentRootInfoForUUID: prootUUID] currentBranchInfo] metadata]);
 }
 
@@ -326,15 +342,19 @@ static ETUUID *childUUID2;
 {
     UKObjectsEqual(initialBranchUUID, [[store persistentRootInfoForUUID: prootUUID] currentBranchUUID]);
     
+    [store beginTransactionWithError: NULL];
     UKTrue([store setCurrentBranch: branchAUUID
               forPersistentRoot: prootUUID
                           error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     UKObjectsEqual(branchAUUID, [[store persistentRootInfoForUUID: prootUUID] currentBranchUUID]);
 
+    [store beginTransactionWithError: NULL];
     UKTrue([store setCurrentBranch: branchBUUID
               forPersistentRoot: prootUUID
                           error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     UKObjectsEqual(branchBUUID, [[store persistentRootInfoForUUID: prootUUID] currentBranchUUID]);
 
@@ -349,34 +369,40 @@ static ETUUID *childUUID2;
     UKObjectsEqual(initialRevisionId, [branchA tailRevisionID]);
     UKObjectsEqual([branchARevisionIDs lastObject], [branchA currentRevisionID]);
 
+    [store beginTransactionWithError: NULL];    
     UKTrue([store setCurrentRevision: [self lateBranchA]
                         tailRevision: [branchA tailRevisionID]
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID
                   currentChangeCount: &prootChangeCount
                                error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKObjectsEqual(initialRevisionId, [branchA tailRevisionID]);
     UKObjectsEqual([self lateBranchA], [branchA currentRevisionID]);
 
+    [store beginTransactionWithError: NULL];
     UKTrue([store setCurrentRevision: [self lateBranchA]
                         tailRevision: [branchA tailRevisionID]
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID
                   currentChangeCount: &prootChangeCount
                                error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKObjectsEqual(initialRevisionId, [branchA tailRevisionID]);
     UKObjectsEqual([self lateBranchA], [branchA currentRevisionID]);
 
+    [store beginTransactionWithError: NULL];
     UKTrue([store setCurrentRevision: [self lateBranchA]
                         tailRevision: [self earlyBranchA]
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID
                   currentChangeCount: &prootChangeCount
                                error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKObjectsEqual([self earlyBranchA], [branchA tailRevisionID]);
@@ -394,14 +420,14 @@ static ETUUID *childUUID2;
     int64_t store2ChangeCount = prootChangeCount;
     {
         COSQLiteStore *store2 = [[COSQLiteStore alloc] initWithURL: [store URL]];
-        
+        [store2 beginTransactionWithError: NULL];
         UKTrue([store2 setCurrentRevision: [self lateBranchA]
                              tailRevision: [branchA tailRevisionID]
                                 forBranch: branchAUUID
                          ofPersistentRoot: prootUUID
                        currentChangeCount: &store2ChangeCount
                                     error: NULL]);
-        
+        [store2 commitTransactionWithError: NULL];
         [store2 release];
     }
     
@@ -422,12 +448,14 @@ static ETUUID *childUUID2;
     ASSIGN(proot, [store persistentRootInfoForUUID: prootUUID]);
     prootChangeCount = proot.changeCount;
     
+    [store beginTransactionWithError: NULL];
     UKTrue([store setCurrentRevision:  [self earlyBranchA]
                          tailRevision: [branchA tailRevisionID]
                             forBranch: branchAUUID
                      ofPersistentRoot: prootUUID
                    currentChangeCount: &prootChangeCount
                                 error: NULL]);
+    [store commitTransactionWithError: NULL];
 }
 
 - (void) testCrossPersistentRootReference
@@ -496,6 +524,8 @@ static ETUUID *childUUID2;
     
     COItemGraph *tree = [self makeInitialItemTree];
     [[tree itemForUUID: childUUID1] setValue: hash forAttribute: @"attachment" type: kCOTypeAttachment];
+    
+    [store beginTransactionWithError: NULL];
     CORevisionID *withAttachment = [store writeRevisionWithItemGraph: tree
                                                             metadata: nil
                                                     parentRevisionID: initialRevisionId
@@ -509,6 +539,7 @@ static ETUUID *childUUID2;
                     ofPersistentRoot: prootUUID
                   currentChangeCount: &prootChangeCount
                                error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
     
@@ -543,6 +574,7 @@ static ETUUID *childUUID2;
 - (void) testRevisionGCDoesNotCollectReferenced
 {
     COItemGraph *tree = [self makeInitialItemTree];
+    [store beginTransactionWithError: NULL];
     CORevisionID *referencedRevision = [store writeRevisionWithItemGraph: tree
                                                                 metadata: nil
                                                         parentRevisionID: initialRevisionId
@@ -556,6 +588,7 @@ static ETUUID *childUUID2;
                     ofPersistentRoot: prootUUID
                   currentChangeCount: &prootChangeCount
                                error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
     
@@ -565,13 +598,14 @@ static ETUUID *childUUID2;
 - (void) testRevisionGCCollectsUnReferenced
 {
     COItemGraph *tree = [self makeInitialItemTree];
+    [store beginTransactionWithError: NULL];
     CORevisionID *unreferencedRevision = [store writeRevisionWithItemGraph: tree
                                                                   metadata: nil
                                                           parentRevisionID: initialRevisionId
                                                      mergeParentRevisionID: nil
                                                              modifiedItems: nil
                                                                      error: NULL];
-    
+    [store commitTransactionWithError: NULL];
     UKObjectsEqual(tree, [store itemGraphForRevisionID: unreferencedRevision]);
     
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
@@ -596,7 +630,9 @@ static ETUUID *childUUID2;
     UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
 
     // Delete it
+    [store beginTransactionWithError: NULL];
     UKTrue([store deletePersistentRoot: prootUUID error: NULL]);
+    [store commitTransactionWithError: NULL];
 
     UKTrue([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
     UKObjectsEqual(A(prootUUID), [store deletedPersistentRootUUIDs]);
@@ -605,14 +641,18 @@ static ETUUID *childUUID2;
     UKFalse([[[store persistentRootInfoForUUID: prootUUID] currentBranchInfo] isDeleted]); // Deleting proot does not mark branch as deleted.
     
     // Undelete it
+    [store beginTransactionWithError: NULL];
     UKTrue([store undeletePersistentRoot: prootUUID error: NULL]);
-
+    [store commitTransactionWithError: NULL];
+    
     UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
     UKObjectsEqual([NSArray array], [store deletedPersistentRootUUIDs]);
     UKObjectsEqual(A(prootUUID), [store persistentRootUUIDs]);
     
     // Delete it, and finalize the deletion
+    [store beginTransactionWithError: NULL];
     UKTrue([store deletePersistentRoot: prootUUID error: NULL]);
+    [store commitTransactionWithError: NULL];
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
     
     UKObjectsEqual([NSArray array], [store persistentRootUUIDs]);
@@ -661,10 +701,12 @@ static ETUUID *childUUID2;
  */
 - (void)testPersistentRootCopies
 {
+    [store beginTransactionWithError: NULL];
     COPersistentRootInfo *copy = [store createPersistentRootWithInitialRevision: initialRevisionId
                                                                            UUID: [ETUUID UUID]
                                                                      branchUUID: [ETUUID UUID]
                                                                           error: NULL];
+    [store commitTransactionWithError: NULL];
     int64_t copyChangeCount = copy.changeCount;
     
     UKObjectsEqual(S(prootUUID, [copy UUID]), [NSSet setWithArray:[store persistentRootUUIDs]]);
@@ -753,10 +795,12 @@ static ETUUID *childUUID2;
     ETUUID *cheapCopyUUID = [ETUUID UUID];
     ETUUID *cheapCopyBranchUUID = [ETUUID UUID];
 
+    [store beginTransactionWithError: NULL];
     COPersistentRootInfo *cheapCopy = [store createPersistentRootWithInitialRevision: [branchARevisionIDs lastObject]
                                                                                 UUID: cheapCopyUUID
                                                                           branchUUID: cheapCopyBranchUUID
                                                                                error: NULL];
+    [store commitTransactionWithError: NULL];
 
     UKObjectsEqual(rootUUID, [store rootObjectUUIDForRevisionID: [proot currentRevisionID]]);
     UKObjectsEqual(rootUUID, [store rootObjectUUIDForRevisionID: [cheapCopy currentRevisionID]]);

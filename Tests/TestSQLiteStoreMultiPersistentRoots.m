@@ -49,6 +49,7 @@ static ETUUID *tagUUID;
 {
     SUPERINIT;
     
+    [store beginTransactionWithError: NULL];
     ASSIGN(docProot, [store createPersistentRootWithInitialItemGraph: [self docItemTree]
                                                                UUID: [ETUUID UUID]
                                                          branchUUID: [ETUUID UUID]
@@ -60,6 +61,8 @@ static ETUUID *tagUUID;
                                                          branchUUID: [ETUUID UUID]
                                                            revisionMetadata: nil
                                                               error: NULL]);
+    [store commitTransactionWithError: NULL];
+    
     return self;
 }
 
@@ -81,8 +84,11 @@ static ETUUID *tagUUID;
 
 - (void) testDeletion
 {
+    [store beginTransactionWithError: NULL];
     UKTrue([store deletePersistentRoot: [docProot UUID]
                                  error: NULL]);
+    [store commitTransactionWithError: NULL];
+    
     UKTrue([store finalizeDeletionsForPersistentRoot: [docProot UUID]
                                                error: NULL]);
     

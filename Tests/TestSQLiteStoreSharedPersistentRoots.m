@@ -49,6 +49,7 @@ static ETUUID *rootUUID;
 {
     SUPERINIT;
     
+    [store beginTransactionWithError: NULL];
     ASSIGN(prootA, [store createPersistentRootWithInitialItemGraph: [self prootAitemTree]
                                                                UUID: [ETUUID UUID]
                                                          branchUUID: [ETUUID UUID]
@@ -73,6 +74,8 @@ static ETUUID *rootUUID;
     [store setCurrentRevision: prootBRev tailRevision: nil forBranch: [prootB currentBranchUUID] ofPersistentRoot: [prootB UUID] currentChangeCount: &prootBchangeCount error: NULL];
 
     ASSIGN(prootB, [store persistentRootInfoForUUID: [prootB UUID]]);
+    
+    [store commitTransactionWithError: NULL];
     
     return self;
 }
@@ -104,7 +107,10 @@ static ETUUID *rootUUID;
 
 - (void) testDeleteOriginalPersistentRoot
 {
+    [store beginTransactionWithError: NULL];
     UKTrue([store deletePersistentRoot: [prootA UUID] error: NULL]);
+    [store commitTransactionWithError: NULL];
+    
     UKTrue([store finalizeDeletionsForPersistentRoot: [prootA UUID] error: NULL]);
 
     UKNil([store persistentRootInfoForUUID: [prootA UUID]]);
@@ -119,7 +125,10 @@ static ETUUID *rootUUID;
 
 - (void) testDeleteCopiedPersistentRoot
 {
+    [store beginTransactionWithError: NULL];
     UKTrue([store deletePersistentRoot: [prootB UUID] error: NULL]);
+    [store commitTransactionWithError: NULL];
+    
     UKTrue([store finalizeDeletionsForPersistentRoot: [prootB UUID] error: NULL]);
     
     UKNil([store persistentRootInfoForUUID: [prootB UUID]]);
