@@ -62,12 +62,14 @@ static void genericSetter(id theSelf, SEL theCmd, id value)
             NSString *propName = [NSString stringWithUTF8String: property_getName(property)];
             NSString *setterName = PropertyToSetter(propName);
             
-            if (NSSelectorFromString(propName) == sel)
+            NSString *selName = NSStringFromSelector(sel);
+            
+            if ([selName isEqual: propName])
             {
                 class_addMethod(classToCheck, sel, (IMP)&genericGetter, "@@:");
                 return YES;
             }
-            else if (NSSelectorFromString(setterName) == sel)
+            else if ([selName isEqual: setterName])
             {
                 class_addMethod(classToCheck, sel, (IMP)&genericSetter, "v@:@");
                 return YES;
