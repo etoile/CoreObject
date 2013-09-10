@@ -35,7 +35,7 @@
     NSMutableSet *revisionIDs = [NSMutableSet set];
     if (![aBranch isBranchUncommitted])
     {
-        CORevision *head = [aBranch newestRevision];
+        CORevision *head = [aBranch currentRevision];
         CORevision *tail = [aBranch parentRevision];
         
         ETAssert(head != nil);

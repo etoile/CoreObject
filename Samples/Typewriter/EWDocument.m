@@ -296,7 +296,11 @@
         [master setMergingBranch: originMaster];
         
         COMergeInfo *mergeInfo = [master mergeInfoForMergingBranch: originMaster];
-        assert(![mergeInfo.diff hasConflicts]);
+        if([mergeInfo.diff hasConflicts])
+        {
+            NSLog(@"Attempting to auto-resolve conflicts favouring the other user...");
+            [mergeInfo.diff resolveConflictsFavoringSourceIdentifier: @"merged"]; // FIXME: Hardcoded
+        }
         
         [mergeInfo.diff applyTo: [master objectGraphContext]];
         
