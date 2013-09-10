@@ -88,14 +88,14 @@
     
     // Persistent Root and Branch tables
     
-    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots (root_id INTEGER PRIMARY KEY, "
-     "uuid BLOB, backingstore BLOB, currentbranch INTEGER, deleted BOOLEAN DEFAULT 0, changecount INTEGER)"];
+    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots ("
+     "uuid BLOB PRIMARY KEY NOT NULL, backingstore BLOB NOT NULL, "
+     "currentbranch BLOB, deleted BOOLEAN DEFAULT 0)"]; //, transactionuuid BLOB NOT NULL
     
-    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (branch_id INTEGER PRIMARY KEY, "
-     "uuid BLOB, proot INTEGER, head_revid BLOB, tail_revid BLOB, current_revid BLOB, metadata BLOB, deleted BOOLEAN DEFAULT 0)"];
-
-    [db_ executeUpdate: @"CREATE INDEX IF NOT EXISTS persistentroots_uuid_index ON persistentroots(uuid)"];
-    [db_ executeUpdate: @"CREATE INDEX IF NOT EXISTS branches_proot_index ON branches(proot)"];
+    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL, "
+     "proot BLOB NOT NULL, tail_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
+     "metadata BLOB, deleted BOOLEAN DEFAULT 0, "
+     "PRIMARY KEY (uuid, proot))"];
 
     // FTS indexes & reference caching tables (in theory, could be regenerated - although not supported)
     
@@ -151,18 +151,6 @@
 }
 
 @synthesize UUID = _uuid;
-
-- (NSNumber *) rootIdForPersistentRootUUID: (ETUUID *)aUUID
-{
-    return [db_ numberForQuery: @"SELECT root_id FROM persistentroots WHERE uuid = ?", [aUUID dataValue]];
-}
-
-- (ETUUID *) UUIDForPersistentRootId: (int64_t)anId
-{
-    NSData *backingstore = [db_ dataForQuery: @"SELECT uuid FROM persistentroots WHERE root_id = ?", [NSNumber numberWithLongLong: anId]];
-    
-    return [ETUUID UUIDWithData: backingstore];
-}
 
 /** @taskunit Transactions */
 
@@ -569,15 +557,11 @@
     ETUUID *currBranch = nil;
     ETUUID *backingUUID = nil;
     BOOL deleted = NO;
-    int64_t changecount = 0;
     
     [db_ savepoint: @"persistentRootInfoForUUID"]; // N.B. The transaction is so the two SELECTs see the same DB. Needed?
-    
-    NSNumber *root_id = [self rootIdForPersistentRootUUID: aUUID];
-    
+
     {
-        FMResultSet *rs = [db_ executeQuery: @"SELECT (SELECT uuid FROM branches WHERE branch_id = currentbranch),"
-                                                    " backingstore, deleted, changecount FROM persistentroots WHERE root_id = ?", root_id];
+        FMResultSet *rs = [db_ executeQuery: @"SELECT currentbranch, backingstore, deleted FROM persistentroots WHERE uuid = ?", [aUUID dataValue]];
         if ([rs next])
         {
             currBranch = [rs dataForColumnIndex: 0] != nil
@@ -585,7 +569,6 @@
                 : nil;
             backingUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
             deleted = [rs boolForColumnIndex: 2];
-            changecount = [rs int64ForColumnIndex: 3];
         }
         else
         {
@@ -599,25 +582,23 @@
     NSMutableDictionary *branchDict = [NSMutableDictionary dictionary];
     
     {
-        FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, head_revid, tail_revid, current_revid, metadata, deleted FROM branches WHERE proot = ?",  root_id];
+        FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, tail_revid, current_revid, metadata, deleted FROM branches WHERE proot = ?", [aUUID dataValue]];
         while ([rs next])
         {
             ETUUID *branch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-            CORevisionID *headRevid = [CORevisionID revisionWithBackinStoreUUID: backingUUID
-                                                                   revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]]];
             CORevisionID *tailRevid = [CORevisionID revisionWithBackinStoreUUID: backingUUID
-                                                                   revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]]];
+                                                                   revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]]];
             CORevisionID *currentRevid = [CORevisionID revisionWithBackinStoreUUID: backingUUID
-                                                                      revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 3]]];
-            id branchMeta = [self readMetadata: [rs dataForColumnIndex: 4]];            
+                                                                      revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]]];
+            id branchMeta = [self readMetadata: [rs dataForColumnIndex: 3]];
             
             COBranchInfo *state = [[[COBranchInfo alloc] init] autorelease];
             state.UUID = branch;
-            state.headRevisionID = headRevid;
+            state.headRevisionID = currentRevid;
             state.tailRevisionID = tailRevid;
             state.currentRevisionID = currentRevid;
             state.metadata = branchMeta;
-            state.deleted = [rs boolForColumnIndex: 5];
+            state.deleted = [rs boolForColumnIndex: 4];
             
             [branchDict setObject: state forKey: branch];
         }
@@ -630,7 +611,7 @@
     result.UUID = aUUID;
     result.branchForUUID = branchDict;
     result.currentBranchUUID = currBranch;
-    result.changeCount = changecount;
+    result.changeCount = 0;
     result.deleted = deleted;
     
     return result;
@@ -674,22 +655,18 @@
            [uuid dataValue],
            [[revId backingStoreUUID] dataValue]];
 
-    const int64_t root_id = [db_ lastInsertRowId];
-    
     if (aBranchUUID != nil)
     {    
-        [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,NULL,0)",
+        [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,NULL,0)",
                [aBranchUUID dataValue],
-               [NSNumber numberWithLongLong: root_id],
-               [[revId revisionUUID] dataValue],
+               [uuid dataValue],
                [[revId revisionUUID] dataValue],
                [[revId revisionUUID] dataValue]];
         
-        const int64_t branch_id = [db_ lastInsertRowId];
         
-        [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE root_id = ?",
-          [NSNumber numberWithLongLong: branch_id],
-          [NSNumber numberWithLongLong: root_id]];
+        [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE uuid = ?",
+          [aBranchUUID dataValue],
+          [uuid dataValue]];
     }
     
     [db_ releaseSavepoint: @"createPersistentRootWithUUID"];
@@ -783,13 +760,9 @@
 {
     NILARG_EXCEPTION_TEST(aRoot);
     
-    BOOL ok = NO;
-    NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
-    if (root_id != nil)
-    {
-        ok = [db_ executeUpdate: @"UPDATE persistentroots SET deleted = 1 WHERE root_id = ?", root_id];
-    }
-    
+    BOOL ok = [db_ executeUpdate: @"UPDATE persistentroots SET deleted = 1 WHERE uuid = ?",
+               [aRoot dataValue]];
+
     if (ok)
     {
         [self recordCommitNotificationsWithPersistentRootUUID: aRoot
@@ -805,13 +778,9 @@
 {
     NILARG_EXCEPTION_TEST(aRoot);
     
-    BOOL ok = NO;
-    NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
-    if (root_id != nil)
-    {
-        ok = [db_ executeUpdate: @"UPDATE persistentroots SET deleted = 0 WHERE root_id = ?", root_id];
-    }
-    
+    BOOL ok = [db_ executeUpdate: @"UPDATE persistentroots SET deleted = 0 WHERE uuid = ?",
+               [aRoot dataValue]];
+
     if (ok)
     {
         [self recordCommitNotificationsWithPersistentRootUUID: aRoot
@@ -829,24 +798,11 @@
     NILARG_EXCEPTION_TEST(aBranch);
     NILARG_EXCEPTION_TEST(aRoot);
     
-    [db_ savepoint: @"setCurrentBranch"];
-    
-    BOOL ok;
-    NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
-    NSNumber *branch_id = [db_ numberForQuery: @"SELECT branch_id FROM branches WHERE proot = ? AND uuid = ? AND deleted = 0", root_id, [aBranch dataValue]];
-    if (branch_id != nil)
-    {
-        ok = [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE root_id = ?",
-                   branch_id,
-                   root_id];
-    }
-    else
-    {
-        NSLog(@"WARNING, %@ failed", NSStringFromSelector(_cmd));
-        ok = NO;
-    }
-    
-    [db_ releaseSavepoint: @"setCurrentBranch"];
+    BOOL ok = [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE uuid = ? AND 0 = (SELECT deleted FROM branches WHERE uuid = ? AND proot = ?)",
+               [aBranch dataValue], [aRoot dataValue],
+               [aBranch dataValue], [aRoot dataValue]];
+
+    ok = ok && ([db_ changes] > 0);
     
     if (ok)
     {
@@ -867,14 +823,11 @@
     NILARG_EXCEPTION_TEST(aRoot);
     [self validateRevision: revId forPersistentRoot: aRoot];
     
-    NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
-    BOOL ok = [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, head_revid, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,?,?,0)",
+    BOOL ok = [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,NULL,0)",
      [branchUUID dataValue],
-     root_id,
+     [aRoot dataValue],
      [[revId revisionUUID] dataValue],
-     [[revId revisionUUID] dataValue],
-     [[revId revisionUUID] dataValue],
-     nil];    
+     [[revId revisionUUID] dataValue]];    
   
     if (!ok)
     {
@@ -944,33 +897,29 @@
     
     [db_ savepoint: @"setCurrentRevision"];
 
-    NSNumber *root_id = [self rootIdForPersistentRootUUID: aRoot];
-    if (![self checkAndUpdateChangeCount: aChangeCountInOut forPersistentRootId: root_id])
-    {
-        NSLog(@"changeCount incorrect");
-        [db_ releaseSavepoint: @"setCurrentRevision"];
-        return NO;
-    }
+//    if (![self checkAndUpdateChangeCount: aChangeCountInOut forPersistentRootId: root_id])
+//    {
+//        NSLog(@"changeCount incorrect");
+//        [db_ releaseSavepoint: @"setCurrentRevision"];
+//        return NO;
+//    }
     
     NSData *branchData = [aBranch dataValue];
+    NSData *prootData = [aRoot dataValue];
     
     if (currentRev != nil)
     {
-        [db_ executeUpdate: @"UPDATE branches SET current_revid = ? WHERE uuid = ?",
+        [db_ executeUpdate: @"UPDATE branches SET current_revid = ? WHERE uuid = ? AND proot = ?",
                 [[currentRev revisionUUID] dataValue],
-                branchData];
-    }
-    if (headRev != nil)
-    {
-        [db_ executeUpdate: @"UPDATE branches SET head_revid = ? WHERE uuid = ?",
-                [[headRev revisionUUID] dataValue],
-                branchData];
+                branchData,
+                prootData];
     }
     if (tailRev != nil)
     {
-        [db_ executeUpdate: @"UPDATE branches SET tail_revid = ? WHERE uuid = ?",
+        [db_ executeUpdate: @"UPDATE branches SET tail_revid = ? WHERE uuid = ? AND proot = ?",
                 [[tailRev revisionUUID] dataValue],
-                branchData];
+                branchData,
+                prootData];
     }
 
     BOOL ok = [db_ releaseSavepoint: @"setCurrentRevision"];
@@ -995,8 +944,9 @@
     NILARG_EXCEPTION_TEST(aBranch);
     NILARG_EXCEPTION_TEST(aRoot);
     
-    BOOL ok = [db_ executeUpdate: @"UPDATE branches SET deleted = 1 WHERE uuid = ? AND branch_id != (SELECT currentbranch FROM persistentroots WHERE root_id = proot)",
-               [aBranch dataValue]];
+    BOOL ok = [db_ executeUpdate: @"UPDATE branches SET deleted = 1 WHERE uuid = ? AND proot = ? AND uuid != (SELECT currentbranch FROM persistentroots WHERE persistentroots.uuid = proot)",
+               [aBranch dataValue],
+               [aRoot dataValue]];
     if (ok)
     {
         ok = [db_ changes] > 0;
@@ -1088,17 +1038,17 @@
     
     // Delete branches / the persistent root
     
-    [db_ executeUpdate: @"DELETE FROM branches WHERE proot IN (SELECT root_id FROM persistentroots WHERE deleted = 1 AND backingstore = ?)", backingUUIDData];
-    [db_ executeUpdate: @"DELETE FROM branches WHERE deleted = 1 AND proot IN (SELECT root_id FROM persistentroots WHERE backingstore = ?)", backingUUIDData];
+    [db_ executeUpdate: @"DELETE FROM branches WHERE proot IN (SELECT uuid FROM persistentroots WHERE deleted = 1 AND backingstore = ?)", backingUUIDData];
+    [db_ executeUpdate: @"DELETE FROM branches WHERE deleted = 1 AND proot IN (SELECT uuid FROM persistentroots WHERE backingstore = ?)", backingUUIDData];
     [db_ executeUpdate: @"DELETE FROM persistentroots WHERE deleted = 1 AND backingstore = ?", backingUUIDData];
     
     NSMutableIndexSet *keptRevisions = [NSMutableIndexSet indexSet];
     
     FMResultSet *rs = [db_ executeQuery: @"SELECT "
-                                            "branches.head_revid, "
+                                            "branches.current_revid, "
                                             "branches.tail_revid "
                                             "FROM persistentroots "
-                                            "INNER JOIN branches ON persistentroots.root_id = branches.proot "
+                                            "INNER JOIN branches ON persistentroots.uuid = branches.proot "
                                             "WHERE persistentroots.backingstore = ?", backingUUIDData];
     while ([rs next])
     {

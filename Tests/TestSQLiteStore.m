@@ -362,7 +362,6 @@ static ETUUID *childUUID2;
     
     branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKObjectsEqual(initialRevisionId, [branchA tailRevisionID]);
-    UKObjectsEqual([branchARevisionIDs lastObject], [branchA headRevisionID]);
     UKObjectsEqual([self lateBranchA], [branchA currentRevisionID]);
 
     UKTrue([store setCurrentRevision: [self lateBranchA]
