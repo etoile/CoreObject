@@ -70,7 +70,7 @@ static ETUUID *rootUUID;
                                                   modifiedItems: A(rootUUID)
                                                           error: NULL];
 
-    [store setCurrentRevision: prootBRev headRevision: prootBRev tailRevision: nil forBranch: [prootB currentBranchUUID] ofPersistentRoot: [prootB UUID] currentChangeCount: &prootBchangeCount error: NULL];
+    [store setCurrentRevision: prootBRev tailRevision: nil forBranch: [prootB currentBranchUUID] ofPersistentRoot: [prootB UUID] currentChangeCount: &prootBchangeCount error: NULL];
 
     ASSIGN(prootB, [store persistentRootInfoForUUID: [prootB UUID]]);
     

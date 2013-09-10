@@ -22,7 +22,7 @@
         // and two stores may not use the same backing UUID for a persistent root.
         //
         // Note that we tell the server end the persistent root that the revisions belong to.
-        [clientNewestRevisionIDForBranchUUID setObject: [[[branch headRevisionID] revisionUUID] stringValue]
+        [clientNewestRevisionIDForBranchUUID setObject: [[[branch currentRevisionID] revisionUUID] stringValue]
                                                 forKey: [[branch UUID] stringValue]];
     }
     
@@ -155,8 +155,6 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
         
         CORevisionID *currentRevisionID = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: branchPlist[@"currentRevisionID"]]
                                                          persistentRootUUID: persistentRoot];
-        CORevisionID *headRevid = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: branchPlist[@"headRevisionID"]]
-                                                 persistentRootUUID: persistentRoot];
         CORevisionID *tailRevisionID = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: branchPlist[@"tailRevisionID"]]
                                                  persistentRootUUID: persistentRoot];
         
@@ -185,7 +183,6 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
         }
         
         assert([aStore setCurrentRevision: currentRevisionID
-                              headRevision: headRevid
                               tailRevision: tailRevisionID
                                  forBranch: branchUUID
                           ofPersistentRoot: persistentRoot

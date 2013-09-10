@@ -138,7 +138,6 @@ static int itemChangedAtCommit(int i)
     // Set the persistent root's state to the last commit
     
     [store setCurrentRevision: [revisionIDs lastObject]
-                 headRevision: [revisionIDs lastObject]
                  tailRevision: [[proot currentBranchInfo] currentRevisionID]
                     forBranch: [proot currentBranchUUID]
              ofPersistentRoot: [proot UUID]

@@ -61,7 +61,7 @@ For now we do.
     NSMutableSet *revisionsClientLacks = [NSMutableSet set];
     for (COBranchInfo *branch in [serverInfo branches])
     {
-        SearchForRevisionsClientLacks(revisionsClientLacks, [branch headRevisionID], clientLatestRevisions, aStore);
+        SearchForRevisionsClientLacks(revisionsClientLacks, [branch currentRevisionID], clientLatestRevisions, aStore);
     }
     
     // Now prepare the property list output
@@ -75,7 +75,6 @@ For now we do.
         }
         NSMutableDictionary *branchPlist = [NSMutableDictionary dictionary];
         branchPlist[@"uuid"] = [branch.UUID stringValue];
-        branchPlist[@"headRevisionID"] = [[branch.headRevisionID revisionUUID] stringValue];
         branchPlist[@"tailRevisionID"] = [[branch.tailRevisionID revisionUUID] stringValue];
         branchPlist[@"currentRevisionID"] = [[branch.currentRevisionID revisionUUID] stringValue];
         if (branch.metadata != nil)

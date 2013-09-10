@@ -404,7 +404,6 @@
  * Passing nil for any revision params means to keep the current value
  */
 - (BOOL) setCurrentRevision: (CORevisionID*)currentRev
-               headRevision: (CORevisionID*)headRev
                tailRevision: (CORevisionID*)tailRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot

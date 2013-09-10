@@ -594,7 +594,6 @@
             
             COBranchInfo *state = [[[COBranchInfo alloc] init] autorelease];
             state.UUID = branch;
-            state.headRevisionID = currentRevid;
             state.tailRevisionID = tailRevid;
             state.currentRevisionID = currentRevid;
             state.metadata = branchMeta;
@@ -683,7 +682,6 @@
     {
         COBranchInfo *branch = [[[COBranchInfo alloc] init] autorelease];
         branch.UUID = aBranchUUID;
-        branch.headRevisionID = revId;
         branch.tailRevisionID = revId;
         branch.currentRevisionID = revId;
         branch.metadata = nil;
@@ -882,7 +880,6 @@
 }
 
 - (BOOL) setCurrentRevision: (CORevisionID*)currentRev
-               headRevision: (CORevisionID*)headRev
                tailRevision: (CORevisionID*)tailRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot
@@ -892,7 +889,6 @@
     NILARG_EXCEPTION_TEST(aBranch);
     NILARG_EXCEPTION_TEST(aRoot);
     [self validateRevision: currentRev forPersistentRoot: aRoot];
-    [self validateRevision: headRev forPersistentRoot: aRoot];
     [self validateRevision: tailRev forPersistentRoot: aRoot];
     
     [db_ savepoint: @"setCurrentRevision"];

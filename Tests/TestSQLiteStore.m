@@ -202,7 +202,6 @@ static ETUUID *childUUID2;
                           error: NULL];
     
     assert([store setCurrentRevision: [branchARevisionIDs lastObject]
-                        headRevision: [branchARevisionIDs lastObject]
                         tailRevision: initialRevisionId
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID
@@ -216,7 +215,6 @@ static ETUUID *childUUID2;
                           error: NULL];
     
     assert([store setCurrentRevision: [branchBRevisionIDs lastObject]
-                        headRevision: [branchBRevisionIDs lastObject]
                         tailRevision: initialRevisionId
                            forBranch: branchBUUID
                     ofPersistentRoot: prootUUID
@@ -349,11 +347,9 @@ static ETUUID *childUUID2;
 {
     COBranchInfo *branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKObjectsEqual(initialRevisionId, [branchA tailRevisionID]);
-    UKObjectsEqual([branchARevisionIDs lastObject], [branchA headRevisionID]);
     UKObjectsEqual([branchARevisionIDs lastObject], [branchA currentRevisionID]);
 
     UKTrue([store setCurrentRevision: [self lateBranchA]
-                        headRevision: [branchA headRevisionID]
                         tailRevision: [branchA tailRevisionID]
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID
@@ -365,7 +361,6 @@ static ETUUID *childUUID2;
     UKObjectsEqual([self lateBranchA], [branchA currentRevisionID]);
 
     UKTrue([store setCurrentRevision: [self lateBranchA]
-                        headRevision: [self lateBranchA]
                         tailRevision: [branchA tailRevisionID]
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID
@@ -374,11 +369,9 @@ static ETUUID *childUUID2;
     
     branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKObjectsEqual(initialRevisionId, [branchA tailRevisionID]);
-    UKObjectsEqual([self lateBranchA], [branchA headRevisionID]);
     UKObjectsEqual([self lateBranchA], [branchA currentRevisionID]);
 
     UKTrue([store setCurrentRevision: [self lateBranchA]
-                        headRevision: [self lateBranchA]
                         tailRevision: [self earlyBranchA]
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID
@@ -387,7 +380,6 @@ static ETUUID *childUUID2;
     
     branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKObjectsEqual([self earlyBranchA], [branchA tailRevisionID]);
-    UKObjectsEqual([self lateBranchA], [branchA headRevisionID]);
     UKObjectsEqual([self lateBranchA], [branchA currentRevisionID]);
 }
 
@@ -395,7 +387,6 @@ static ETUUID *childUUID2;
 {
     COBranchInfo *branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     UKObjectsEqual(initialRevisionId, [branchA tailRevisionID]);
-    UKObjectsEqual([branchARevisionIDs lastObject], [branchA headRevisionID]);
     UKObjectsEqual([branchARevisionIDs lastObject], [branchA currentRevisionID]);
 
     // Open another store and change the current revision
@@ -405,7 +396,6 @@ static ETUUID *childUUID2;
         COSQLiteStore *store2 = [[COSQLiteStore alloc] initWithURL: [store URL]];
         
         UKTrue([store2 setCurrentRevision: [self lateBranchA]
-                             headRevision: [branchA headRevisionID]
                              tailRevision: [branchA tailRevisionID]
                                 forBranch: branchAUUID
                          ofPersistentRoot: prootUUID
@@ -421,7 +411,6 @@ static ETUUID *childUUID2;
     // FIXME: Change count support is currently disabled. Need to
     // more carefully specify the behaviour and test it.
 //    UKFalse([store setCurrentRevision: [self earlyBranchA]
-//                         headRevision: [branchA headRevisionID]
 //                         tailRevision: [branchA tailRevisionID]
 //                            forBranch: branchAUUID
 //                     ofPersistentRoot: prootUUID
@@ -434,7 +423,6 @@ static ETUUID *childUUID2;
     prootChangeCount = proot.changeCount;
     
     UKTrue([store setCurrentRevision:  [self earlyBranchA]
-                         headRevision: [branchA headRevisionID]
                          tailRevision: [branchA tailRevisionID]
                             forBranch: branchAUUID
                      ofPersistentRoot: prootUUID
@@ -516,7 +504,6 @@ static ETUUID *childUUID2;
                                                                error: NULL];
     UKNotNil(withAttachment);
     UKTrue([store setCurrentRevision: withAttachment
-                        headRevision: withAttachment
                         tailRevision: initialRevisionId
                            forBranch: initialBranchUUID
                     ofPersistentRoot: prootUUID
@@ -564,7 +551,6 @@ static ETUUID *childUUID2;
                                                                    error: NULL];
     
     UKTrue([store setCurrentRevision: referencedRevision
-                        headRevision: referencedRevision
                         tailRevision: initialRevisionId
                            forBranch: initialBranchUUID
                     ofPersistentRoot: prootUUID
@@ -697,10 +683,8 @@ static ETUUID *childUUID2;
     UKObjectsEqual([[copy branchUUIDs] anyObject], [copy currentBranchUUID]);
     
     // Check that the branch data is the same
-    UKNotNil([[proot currentBranchInfo] headRevisionID]);
     UKNotNil([[proot currentBranchInfo] tailRevisionID]);
     UKNotNil(initialRevisionId);
-    UKObjectsEqual([[proot currentBranchInfo] headRevisionID], [[copy currentBranchInfo] headRevisionID]);
     UKObjectsEqual([[proot currentBranchInfo] tailRevisionID], [[copy currentBranchInfo] tailRevisionID]);
     UKObjectsEqual(initialRevisionId, [[copy currentBranchInfo] currentRevisionID]);
     
@@ -715,7 +699,6 @@ static ETUUID *childUUID2;
     CORevisionID *rev1 = [self earlyBranchA];
     
     UKTrue([store setCurrentRevision: rev1
-                        headRevision: rev1
                         tailRevision: initialRevisionId
                            forBranch: [[proot currentBranchInfo] UUID]
                     ofPersistentRoot: prootUUID
@@ -727,10 +710,8 @@ static ETUUID *childUUID2;
     ASSIGN(proot, [store persistentRootInfoForUUID: prootUUID]);
     copy = [store persistentRootInfoForUUID: [copy UUID]];
     UKObjectsEqual(rev1, [[proot currentBranchInfo] currentRevisionID]);
-    UKObjectsEqual(rev1, [[proot currentBranchInfo] headRevisionID]);
     UKObjectsEqual(initialRevisionId, [[proot currentBranchInfo] tailRevisionID]);
     UKObjectsEqual(initialRevisionId, [[copy currentBranchInfo] currentRevisionID]);
-    UKObjectsEqual(initialRevisionId, [[copy currentBranchInfo] headRevisionID]);
     UKObjectsEqual(initialRevisionId, [[copy currentBranchInfo] tailRevisionID]);
     
     // Commit to copy as well.
@@ -738,7 +719,6 @@ static ETUUID *childUUID2;
     CORevisionID *rev2 = [self lateBranchA];
     
     UKTrue([store setCurrentRevision: rev2
-                        headRevision: rev2
                         tailRevision: initialRevisionId
                            forBranch: [[copy currentBranchInfo] UUID]
                     ofPersistentRoot: [copy UUID]
@@ -750,10 +730,8 @@ static ETUUID *childUUID2;
     ASSIGN(proot, [store persistentRootInfoForUUID: prootUUID]);
     copy = [store persistentRootInfoForUUID: [copy UUID]];
     UKObjectsEqual(rev1, [[proot currentBranchInfo] currentRevisionID]);
-    UKObjectsEqual(rev1, [[proot currentBranchInfo] headRevisionID]);
     UKObjectsEqual(initialRevisionId, [[proot currentBranchInfo] tailRevisionID]);
     UKObjectsEqual(rev2, [[copy currentBranchInfo] currentRevisionID]);
-    UKObjectsEqual(rev2, [[copy currentBranchInfo] headRevisionID]);
     UKObjectsEqual(initialRevisionId, [[copy currentBranchInfo] tailRevisionID]);
 }
 

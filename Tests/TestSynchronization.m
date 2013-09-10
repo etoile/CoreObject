@@ -165,7 +165,6 @@ static ETUUID *branchBUUID;
                                                                     error: NULL];
     int64_t changeCount = serverInfo.changeCount;
     UKTrue([serverStore setCurrentRevision: serverCommit2
-                              headRevision: serverCommit2
                               tailRevision: nil
                                  forBranch: branchAUUID
                           ofPersistentRoot: persistentRootUUID
@@ -228,7 +227,6 @@ static ETUUID *branchBUUID;
 
     int64_t changeCount = serverInfo.changeCount;
     UKTrue([serverStore setCurrentRevision: serverCommit2
-                              headRevision: serverCommit2
                               tailRevision: nil
                                  forBranch: cheapCopyBranchUUID
                           ofPersistentRoot: cheapCopyUUID

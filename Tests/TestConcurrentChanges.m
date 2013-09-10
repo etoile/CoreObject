@@ -69,7 +69,6 @@
     
     // Revert persistentRoot back to the first revision using the store API
     UKTrue([store setCurrentRevision: firstRevid
-                        headRevision: nil
                         tailRevision: nil
                            forBranch: [[persistentRoot currentBranch] UUID]
                     ofPersistentRoot: [persistentRoot persistentRootUUID]

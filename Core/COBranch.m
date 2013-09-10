@@ -250,20 +250,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return nil;
 }
 
-- (CORevision *)newestRevision
-{
-    // WARNING: Accesses store
-    CORevisionID *revid = [[self branchInfo] headRevisionID];
-    COSQLiteStore *store = [[self persistentRoot] store];
-    
-    if (revid != nil)
-    {
-        return [CORevision revisionWithStore: store revisionID: revid];
-    }
-    
-    return nil;
-}
-
 - (CORevision *)currentRevision
 {
     // WARNING: Accesses store
@@ -407,59 +393,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	return NO;
 }
 
-- (CORevision *)undoRevision
-{
-    if ([[self parentRevision] isEqual: [self currentRevision]])
-    {
-        return nil;
-    }
-    
-    CORevision *revision = [[self currentRevision] parentRevision];
-    return revision;
-}
-
-- (BOOL)canUndo
-{
-    return [self undoRevision] != nil;
-}
-
-- (void)undo
-{
-    [self setCurrentRevision: [self undoRevision]];
-}
-
-- (CORevision *)redoRevision
-{
-    CORevision *currentRevision = [self currentRevision];
-    CORevision *revision = [self newestRevision];
-    
-    if ([currentRevision isEqual: revision])
-    {
-        return nil;
-    }
-    
-    while (revision != nil)
-    {
-        CORevision *revisionParent = [revision parentRevision];
-        if ([revisionParent isEqual: currentRevision])
-        {
-            return revision;
-        }
-        revision = revisionParent;
-    }
-    return revision;
-}
-
-- (BOOL)canRedo
-{
-    return [self redoRevision] != nil;
-}
-
-- (void)redo
-{
-    [self setCurrentRevision: [self redoRevision]];
-}
-
 - (COSQLiteStore *) store
 {
     return [_persistentRoot store];
@@ -492,7 +425,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         // This is the case when the user does [self setCurrentRevision: ], and then commits
         
         BOOL ok = [store setCurrentRevision: _currentRevisionID
-                               headRevision: nil /* This is the case when we're reverting, so don't update headRevision */
                                tailRevision: nil
                                   forBranch: _UUID
                            ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
@@ -541,7 +473,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                                              error: NULL];        
         
         BOOL ok = [store setCurrentRevision: revId
-                               headRevision: revId
                                tailRevision: nil
                                   forBranch: _UUID
                            ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
@@ -626,7 +557,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 - (CORevision *) revisionWithID: (CORevisionID *)aRevisionID
 {
     CORevision *oldest = [self parentRevision];
-    CORevision *rev = [self newestRevision];
+    CORevision *rev = [self currentRevision];
     do
     {
         if ([[rev revisionID] isEqual: aRevisionID])
