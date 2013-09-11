@@ -63,17 +63,12 @@
     UKNotNil(secondRevid);
     UKObjectsNotEqual(firstRevid, secondRevid);
     
-    int64_t changeCount;
-    COPersistentRootInfo *info = [store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]];
-    changeCount = info.changeCount;
-    
     [store beginTransactionWithError: NULL];
     // Revert persistentRoot back to the first revision using the store API
     UKTrue([store setCurrentRevision: firstRevid
                         tailRevision: nil
                            forBranch: [[persistentRoot currentBranch] UUID]
                     ofPersistentRoot: [persistentRoot persistentRootUUID]
-                  currentChangeCount: &changeCount
                                error: NULL]);
     [store commitTransactionWithError: NULL];
     
@@ -86,10 +81,6 @@
 
 - (void) testsDetectsStoreCreateBranch
 {
-    int64_t changeCount;
-    COPersistentRootInfo *info = [store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]];
-    changeCount = info.changeCount;
-    
     ETUUID *secondbranchUUID = [ETUUID UUID];
     
     [store beginTransactionWithError: NULL];

@@ -636,7 +636,6 @@
     result.UUID = aUUID;
     result.branchForUUID = branchDict;
     result.currentBranchUUID = currBranch;
-    result.changeCount = 0;
     result.deleted = deleted;
     
     return result;
@@ -903,7 +902,6 @@
                tailRevision: (CORevisionID*)tailRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot
-         currentChangeCount: (int64_t *)aChangeCountInOut
                       error: (NSError **)error
 {
     [self checkInTransaction];
@@ -915,13 +913,6 @@
     [self validateRevision: tailRev forPersistentRoot: aRoot];
     
     [db_ savepoint: @"setCurrentRevision"];
-
-//    if (![self checkAndUpdateChangeCount: aChangeCountInOut forPersistentRootId: root_id])
-//    {
-//        NSLog(@"changeCount incorrect");
-//        [db_ releaseSavepoint: @"setCurrentRevision"];
-//        return NO;
-//    }
     
     NSData *branchData = [aBranch dataValue];
     NSData *prootData = [aRoot dataValue];

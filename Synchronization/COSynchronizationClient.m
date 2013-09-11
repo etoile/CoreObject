@@ -120,15 +120,12 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
     // 1. Do we have this persistent root?
     
     COPersistentRootInfo *info = [aStore persistentRootInfoForUUID: persistentRoot];
-    int64_t changeCount = info.changeCount;
     if (info == nil)
     {
         // No: create it
         
         info = [aStore createPersistentRootWithUUID: persistentRoot error: NULL];
         assert(info != nil);
-                
-        changeCount = info.changeCount;
     }
     
     // Insert the revisions the server sent us.
@@ -186,7 +183,6 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
                               tailRevision: tailRevisionID
                                  forBranch: branchUUID
                           ofPersistentRoot: persistentRoot
-                        currentChangeCount: &changeCount
                                     error: NULL]);
     }
     

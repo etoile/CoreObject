@@ -10,9 +10,6 @@
 {
     COPersistentRootInfo *prootA;
     COPersistentRootInfo *prootB;
-    
-    int64_t prootAchangeCount;
-    int64_t prootBchangeCount;
 }
 @end
 
@@ -55,14 +52,11 @@ static ETUUID *rootUUID;
                                                          branchUUID: [ETUUID UUID]
                                                            revisionMetadata: nil
                                                               error: NULL]);
-    prootAchangeCount = [prootA changeCount];
     
     ASSIGN(prootB, [store createPersistentRootWithInitialRevision: [[prootA currentBranchInfo] currentRevisionID]
                                                              UUID: [ETUUID UUID]
                                                        branchUUID: [ETUUID UUID]
                                                             error: NULL]);
-
-    prootBchangeCount = [prootB changeCount];
     
     CORevisionID *prootBRev = [store writeRevisionWithItemGraph: [self prooBitemTree]
                                                        metadata: nil
@@ -71,7 +65,7 @@ static ETUUID *rootUUID;
                                                   modifiedItems: A(rootUUID)
                                                           error: NULL];
 
-    [store setCurrentRevision: prootBRev tailRevision: nil forBranch: [prootB currentBranchUUID] ofPersistentRoot: [prootB UUID] currentChangeCount: &prootBchangeCount error: NULL];
+    [store setCurrentRevision: prootBRev tailRevision: nil forBranch: [prootB currentBranchUUID] ofPersistentRoot: [prootB UUID] error: NULL];
 
     ASSIGN(prootB, [store persistentRootInfoForUUID: [prootB UUID]]);
     

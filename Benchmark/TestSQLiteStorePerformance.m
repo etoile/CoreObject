@@ -110,8 +110,6 @@ static int itemChangedAtCommit(int i)
                                                                       branchUUID: [ETUUID UUID]
                                                                         revisionMetadata: nil
                                                                            error: NULL];
-    int64_t prootChangeCount = proot.changeCount;
-    
     // Commit a change to each object
     
     [revisionIDs addObject: [[proot currentBranchInfo] currentRevisionID]];
@@ -141,7 +139,6 @@ static int itemChangedAtCommit(int i)
                  tailRevision: [[proot currentBranchInfo] currentRevisionID]
                     forBranch: [proot currentBranchUUID]
              ofPersistentRoot: [proot UUID]
-           currentChangeCount: &prootChangeCount
                         error: NULL];
     
     NSLog(@"committing a %d-item persistent root and then making %d commits which touched 1 item each took %lf ms",

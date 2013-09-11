@@ -406,8 +406,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
 	COSQLiteStore *store = [self store];
     
-    int64_t changeCount = [[_persistentRoot persistentRootInfo] changeCount];
-    
 	if ([self isBranchUncommitted])
 	{
         // N.B. - this only the case when we're adding a new branch to an existing persistent root.
@@ -428,7 +426,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                                tailRevision: nil
                                   forBranch: _UUID
                            ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
-                         currentChangeCount: &changeCount
                                       error: NULL];
         ETAssert(ok);
         
@@ -476,7 +473,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                                tailRevision: nil
                                   forBranch: _UUID
                            ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
-                         currentChangeCount: &changeCount
                                       error: NULL];
         ETAssert(ok);
         

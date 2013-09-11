@@ -6,7 +6,6 @@
 @synthesize UUID = uuid_;
 @synthesize currentBranchUUID = currentBranch_;
 @synthesize branchForUUID = branchForUUID_;
-@synthesize changeCount = _changeCount;
 @synthesize deleted = _deleted;
 
 - (void) dealloc

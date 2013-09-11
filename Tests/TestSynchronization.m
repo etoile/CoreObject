@@ -168,12 +168,11 @@ static ETUUID *branchBUUID;
                                                     mergeParentRevisionID: nil
                                                             modifiedItems: nil
                                                                     error: NULL];
-    int64_t changeCount = serverInfo.changeCount;
+
     UKTrue([serverStore setCurrentRevision: serverCommit2
                               tailRevision: nil
                                  forBranch: branchAUUID
                           ofPersistentRoot: persistentRootUUID
-                        currentChangeCount: &changeCount
                                      error: NULL]);
     [serverStore commitTransactionWithError: NULL];
     
@@ -232,12 +231,10 @@ static ETUUID *branchBUUID;
                                                             modifiedItems: nil
                                                                     error: NULL];
 
-    int64_t changeCount = serverInfo.changeCount;
     UKTrue([serverStore setCurrentRevision: serverCommit2
                               tailRevision: nil
                                  forBranch: cheapCopyBranchUUID
                           ofPersistentRoot: cheapCopyUUID
-                        currentChangeCount: &changeCount
                                      error: NULL]);
     
     [serverStore commitTransactionWithError: NULL];
