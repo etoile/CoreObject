@@ -317,8 +317,10 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return _savedState != nil;
 }
 
-- (void) saveCommitWithMetadata: (NSDictionary *)metadata
+- (void) saveCommitWithMetadata: (NSDictionary *)metadata  transactionUUID: (ETUUID *)transactionUUID
 {
+    ASSIGN(_lastTransactionUUID, transactionUUID);
+    
 	ETAssert([[self rootObject] isRoot]);
     
 	COSQLiteStore *store = [_parentContext store];
@@ -481,12 +483,11 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (void)storePersistentRootDidChange: (NSNotification *)notif
 {
-    // FIXME: This currently breaks TestConcurrentChanges
-//    int64_t notifChangeCount = [[[notif userInfo] objectForKey: kCOPersistentRootChangeCount] longLongValue];
-//    if (_savedState.changeCount == notifChangeCount)
-//    {
-//        return;
-//    }
+    ETUUID *notifTransaction = [ETUUID UUIDWithString: [[notif userInfo] objectForKey: kCOPersistentRootTransactionUUID]];
+    if ([_lastTransactionUUID isEqual: notifTransaction])
+    {
+        return;
+    }
     
     COPersistentRootInfo *info = [[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
     ASSIGN(_savedState, info);

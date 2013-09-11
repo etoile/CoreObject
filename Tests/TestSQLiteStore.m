@@ -739,13 +739,15 @@ static ETUUID *childUUID2;
     // 2. try changing. Verify that proot and copy are totally independent
 
     CORevisionID *rev1 = [self earlyBranchA];
-    
+
+    [store beginTransactionWithError: NULL];
     UKTrue([store setCurrentRevision: rev1
                         tailRevision: initialRevisionId
                            forBranch: [[proot currentBranchInfo] UUID]
                     ofPersistentRoot: prootUUID
                   currentChangeCount: &prootChangeCount
                                error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     // Reload proot's and copy's metadata
     
@@ -760,12 +762,14 @@ static ETUUID *childUUID2;
     
     CORevisionID *rev2 = [self lateBranchA];
     
+    [store beginTransactionWithError: NULL];
     UKTrue([store setCurrentRevision: rev2
                         tailRevision: initialRevisionId
                            forBranch: [[copy currentBranchInfo] UUID]
                     ofPersistentRoot: [copy UUID]
                   currentChangeCount: &copyChangeCount
                                error: NULL]);
+    [store commitTransactionWithError: NULL];
     
     // Reload proot's and copy's metadata
     

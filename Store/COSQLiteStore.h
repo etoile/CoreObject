@@ -197,7 +197,7 @@
     FMDatabase *db_;
     NSMutableDictionary *backingStores_; // COUUID (backing store UUID => COCQLiteStorePersistentRootBackingStore)
     NSMutableDictionary *backingStoreUUIDForPersistentRootUUID_;
-    NSMutableDictionary *notificationUserInfoToPostForPersistentRootUUID_;
+    NSMutableSet *modifiedPersistentRootsUUIDs_;
 }
 
 /**
@@ -467,13 +467,13 @@
  */
 - (BOOL) beginTransactionWithError: (NSError **)error;
 - (BOOL) commitTransactionWithError: (NSError **)error;
+- (BOOL) commitTransactionWithUUID: (ETUUID *)transactionUUID withError: (NSError **)error;
 
 @end
 
 extern NSString *COStorePersistentRootDidChangeNotification;
 extern NSString *kCOPersistentRootUUID;
-extern NSString *kCOPersistentRootChangeCount;
-extern NSString *kCOPersistentRootDeleted;
+extern NSString *kCOPersistentRootTransactionUUID;
 extern NSString *kCOStoreUUID;
 extern NSString *kCOStoreURL;
 

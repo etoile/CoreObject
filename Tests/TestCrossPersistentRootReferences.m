@@ -241,7 +241,7 @@
     
     [photo1branchBroot insertObject: childB atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     
-    [ctx commit];
+    //[ctx commit];
     
     // Set up library
     
@@ -253,7 +253,7 @@
     [library1RootItem setValue: S(branchBRef) forAttribute: @"contents"];
     [[library1 objectGraphContext] insertOrUpdateItems: A(library1RootItem)];
     
-    [ctx commit];
+    //[ctx commit];
     
     UKObjectsEqual(S(@"photo1, branch B"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
     UKObjectsEqual(S(A(@"childB")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);

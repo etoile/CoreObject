@@ -34,7 +34,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
  * Extracts the current changes, saves them to the store with the provided
  * metadatas and returns the resulting revision.
  */
-- (void) saveCommitWithMetadata: (NSDictionary *)metadata;
+- (void) saveCommitWithMetadata: (NSDictionary *)metadata transactionUUID: (ETUUID *)transactionUUID;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

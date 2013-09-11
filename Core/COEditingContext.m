@@ -407,6 +407,8 @@
 
 	NSMutableArray *revisions = [NSMutableArray array];
 
+    ETUUID *transactionUUID = [ETUUID UUID];
+    
 	/* Commit persistent root changes (deleted persistent roots included) */
 
     [_store beginTransactionWithError: NULL];
@@ -415,7 +417,7 @@
 	// TODO: Add a batch commit UUID in the metadata
 	for (COPersistentRoot *ctxt in persistentRoots)
 	{
-		[ctxt saveCommitWithMetadata: metadata];
+		[ctxt saveCommitWithMetadata: metadata transactionUUID: transactionUUID];
 		[self didCommitRevision: [revisions lastObject]];
 	}
 	
@@ -443,7 +445,7 @@
         }
     }
 
-    ETAssert([_store commitTransactionWithError: NULL]);
+    ETAssert([_store commitTransactionWithUUID: transactionUUID withError: NULL]);
     [self recordEndUndoGroup];
     
 	return revisions;
