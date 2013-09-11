@@ -331,11 +331,10 @@
     COPersistentRoot *doc2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commitWithUndoStack: _setupStack];
 
-    COUndoStack *workspaceStack = [[COUndoStackStore defaultStore] stackForName: @"workspace.%"];
+    COUndoStack *workspaceStack = [[COUndoStackStore defaultStore] stackForPattern: @"workspace.%"];
     COUndoStack *workspaceDoc1Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc1"];
     COUndoStack *workspaceDoc2Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc2"];
-    [workspaceDoc1Stack clear];
-    [workspaceDoc2Stack clear];
+    [workspaceStack clear];
 
     // doc1 commits
     
@@ -352,27 +351,38 @@
     [ctx commitWithUndoStack: workspaceDoc2Stack];
 
     // experiment...
-    
-    UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
-    [workspaceDoc1Stack undoWithEditingContext: ctx];
-    UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
-    
+
     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
-    [workspaceDoc2Stack undoWithEditingContext: ctx];
+    [workspaceStack undoWithEditingContext: ctx];
     UKObjectsEqual(@"doc2", [[doc2 rootObject] label]);
     
     [workspaceStack undoWithEditingContext: ctx];
-    UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
     UKNil([[doc2 rootObject] label]);
+
+    UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
+    [workspaceStack undoWithEditingContext: ctx];
+    UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
+    
     [workspaceStack undoWithEditingContext: ctx];
     UKNil([[doc1 rootObject] label]);
-    UKNil([[doc2 rootObject] label]);
     
-    [workspaceStack redoWithEditingContext: ctx];
-    [workspaceStack redoWithEditingContext: ctx];
-    [workspaceStack redoWithEditingContext: ctx];
-    [workspaceStack redoWithEditingContext: ctx];
+    // redo on doc2
     
+    [workspaceDoc2Stack redoWithEditingContext: ctx];
+    UKNil([[doc1 rootObject] label]);
+    UKObjectsEqual(@"doc2", [[doc2 rootObject] label]);
+
+    [workspaceDoc2Stack redoWithEditingContext: ctx];
+    UKNil([[doc1 rootObject] label]);
+    UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+
+    // redo on doc1
+    
+    [workspaceDoc1Stack redoWithEditingContext: ctx];
+    UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
+    UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+
+    [workspaceDoc1Stack redoWithEditingContext: ctx];
     UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
 }
