@@ -43,9 +43,9 @@ static ETUUID *childUUID2;
 // --- Example data setup
 // FIXME: Factor out to ExampleStore class shared by the backing store test and this and others.
 // FIXME: Test another isolated persistent root with its own backing store.
-#define BRANCH_LENGTH 15
-#define BRANCH_EARLY 4
-#define BRANCH_LATER 7
+#define BRANCH_LENGTH 4
+#define BRANCH_EARLY 1
+#define BRANCH_LATER 2
 
 - (CORevisionID *) lateBranchA
 {

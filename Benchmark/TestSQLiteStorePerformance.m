@@ -105,6 +105,7 @@ static int itemChangedAtCommit(int i)
     
     // Commit them to a persistet root
     
+    [store beginTransactionWithError: NULL];
     COPersistentRootInfo *proot = [store createPersistentRootWithInitialItemGraph: initialTree
                                                                             UUID: [ETUUID UUID]
                                                                       branchUUID: [ETUUID UUID]
@@ -149,6 +150,8 @@ static int itemChangedAtCommit(int i)
 //        NSLog(@"label: %@", [self labelForCommit: NUM_COMMITS - 1
 //                                           child: i]);
 //    }
+    
+    [store commitTransactionWithError: NULL];
     
     return [proot UUID];
 }
@@ -355,11 +358,13 @@ static int itemChangedAtCommit(int i)
     
     startDate = [NSDate date];
     
+    [store beginTransactionWithError: NULL];
     COPersistentRootInfo *proot = [store createPersistentRootWithInitialItemGraph: it
                                                                             UUID: [ETUUID UUID]
                                                                       branchUUID: [ETUUID UUID]
                                                                         revisionMetadata: nil
                                                                            error: NULL];
+    [store commitTransactionWithError: NULL];
     
     NSLog(@"committing %d item itemtree took %lf ms", LOTS_OF_EMBEDDED_ITEMS,
           1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
