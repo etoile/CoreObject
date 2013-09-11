@@ -501,7 +501,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     
     ASSIGN(_currentBranchUUID, [_savedState currentBranchUUID]);
     
-    [self sendChangeNotification];
+    //[self sendChangeNotification];
 }
 
 - (void)updateCrossPersistentRootReferences

@@ -121,6 +121,7 @@
 		6675F8C71785C02A001E5622 /* COType.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8C01785C02A001E5622 /* COType.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		667C24D517E106C900FFFC85 /* COPatternUndoStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 667C24D317E106C900FFFC85 /* COPatternUndoStack.h */; };
 		667C24D617E106C900FFFC85 /* COPatternUndoStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C24D417E106C900FFFC85 /* COPatternUndoStack.m */; };
+		667C250017E1207F00FFFC85 /* TestNotifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C24F517E11FC900FFFC85 /* TestNotifications.m */; };
 		6680846D178CD526003A3CC6 /* COCopier.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680846B178CD526003A3CC6 /* COCopier.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6680846E178CD526003A3CC6 /* COCopier.m in Sources */ = {isa = PBXBuildFile; fileRef = 6680846C178CD526003A3CC6 /* COCopier.m */; };
 		6680848A178DAFE3003A3CC6 /* COArrayDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680847F178DAFE3003A3CC6 /* COArrayDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -499,6 +500,7 @@
 		6675F8C01785C02A001E5622 /* COType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COType.h; sourceTree = "<group>"; };
 		667C24D317E106C900FFFC85 /* COPatternUndoStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COPatternUndoStack.h; sourceTree = "<group>"; };
 		667C24D417E106C900FFFC85 /* COPatternUndoStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COPatternUndoStack.m; sourceTree = "<group>"; };
+		667C24F517E11FC900FFFC85 /* TestNotifications.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestNotifications.m; path = Tests/TestNotifications.m; sourceTree = "<group>"; };
 		667F1ED0179C81E00083C3E6 /* TestArrayDiff.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestArrayDiff.m; sourceTree = "<group>"; };
 		667F1ED1179C81E00083C3E6 /* TestCollection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCollection.m; sourceTree = "<group>"; };
 		667F1ED2179C81E00083C3E6 /* TestCopy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCopy.m; sourceTree = "<group>"; };
@@ -1143,6 +1145,7 @@
 				66E451CA17CC456700205679 /* TestCOObjectSynthesizedAccessors.m */,
 				6646978F17CEAFD800A1B767 /* TestSynchronization.m */,
 				66AB075E17D5846000ADDA17 /* TestMerge.m */,
+				667C24F517E11FC900FFFC85 /* TestNotifications.m */,
 				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				667F1ECE179C81BE0083C3E6 /* Store Tests */,
 				667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */,
@@ -1634,6 +1637,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				667C250017E1207F00FFFC85 /* TestNotifications.m in Sources */,
 				6646979117CEB01D00A1B767 /* TestCrossPersistentRootReferences.m in Sources */,
 				6646979217CEB01D00A1B767 /* TestCopier.m in Sources */,
 				6646979317CEB01D00A1B767 /* TestRevisionNumber.m in Sources */,

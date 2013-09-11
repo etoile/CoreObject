@@ -548,6 +548,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	id<COItemGraph> aGraph = [[self store] itemGraphForRevisionID: [revision revisionID]];
     
     [_objectGraph setItemGraph: aGraph];
+    
+    [_persistentRoot sendChangeNotification];
 }
 
 - (CORevision *) revisionWithID: (CORevisionID *)aRevisionID
