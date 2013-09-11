@@ -325,4 +325,56 @@
     UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
 }
 
+- (void) testPatternStack
+{
+    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *doc2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx commitWithUndoStack: _setupStack];
+
+    COUndoStack *workspaceStack = [[COUndoStackStore defaultStore] stackForName: @"workspace.%"];
+    COUndoStack *workspaceDoc1Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc1"];
+    COUndoStack *workspaceDoc2Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc2"];
+    [workspaceDoc1Stack clear];
+    [workspaceDoc2Stack clear];
+
+    // doc1 commits
+    
+    [[doc1 rootObject] setLabel: @"doc1"];
+    [ctx commitWithUndoStack: workspaceDoc1Stack];
+    [[doc1 rootObject] setLabel: @"sketch"];
+    [ctx commitWithUndoStack: workspaceDoc1Stack];
+
+    // doc2 commits
+    
+    [[doc2 rootObject] setLabel: @"doc2"];
+    [ctx commitWithUndoStack: workspaceDoc2Stack];
+    [[doc2 rootObject] setLabel: @"photo"];
+    [ctx commitWithUndoStack: workspaceDoc2Stack];
+
+    // experiment...
+    
+    UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
+    [workspaceDoc1Stack undoWithEditingContext: ctx];
+    UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
+    
+    UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+    [workspaceDoc2Stack undoWithEditingContext: ctx];
+    UKObjectsEqual(@"doc2", [[doc2 rootObject] label]);
+    
+    [workspaceStack undoWithEditingContext: ctx];
+    UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
+    UKNil([[doc2 rootObject] label]);
+    [workspaceStack undoWithEditingContext: ctx];
+    UKNil([[doc1 rootObject] label]);
+    UKNil([[doc2 rootObject] label]);
+    
+    [workspaceStack redoWithEditingContext: ctx];
+    [workspaceStack redoWithEditingContext: ctx];
+    [workspaceStack redoWithEditingContext: ctx];
+    [workspaceStack redoWithEditingContext: ctx];
+    
+    UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
+    UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+}
+
 @end

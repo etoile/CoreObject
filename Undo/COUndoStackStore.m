@@ -86,7 +86,7 @@ NSString * const kCORedoStack = @"redo";
 
 - (NSArray *) stackContents: (NSString *)aTable forName: (NSString *)aStack
 {
-    FMResultSet *rs = [_db executeQuery: [NSString stringWithFormat: @"SELECT data FROM %@ WHERE name = ?", aTable], aStack];
+    FMResultSet *rs = [_db executeQuery: [NSString stringWithFormat: @"SELECT data FROM %@ WHERE name LIKE ?", aTable], aStack];
     NSMutableArray *result = [NSMutableArray array];
     while ([rs next])
     {
@@ -109,7 +109,7 @@ NSString * const kCORedoStack = @"redo";
 
 - (void) clearStack: (NSString *)aTable forName: (NSString *)aStack
 {
-    [_db executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE name = ?", aTable], aStack];
+    [_db executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE name LIKE ?", aTable], aStack];
 }
 
 - (void) clearStacksForName: (NSString *)aStack
@@ -120,12 +120,12 @@ NSString * const kCORedoStack = @"redo";
 
 - (void) popStack: (NSString *)aTable forName: (NSString *)aStack
 {
-    [_db executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE idx = (SELECT MAX(idx) FROM %@ WHERE name = ?)", aTable, aTable], aStack];
+    [_db executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE idx = (SELECT MAX(idx) FROM %@ WHERE name LIKE ?)", aTable, aTable], aStack];
 }
 
 - (NSDictionary *) peekStack: (NSString *)aTable forName: (NSString *)aStack
 {
-    NSData *data = [_db dataForQuery: [NSString stringWithFormat: @"SELECT data FROM %@ WHERE idx = (SELECT MAX(idx) FROM %@ WHERE name = ?)", aTable, aTable], aStack];
+    NSData *data = [_db dataForQuery: [NSString stringWithFormat: @"SELECT data FROM %@ WHERE idx = (SELECT MAX(idx) FROM %@ WHERE name LIKE ?)", aTable, aTable], aStack];
     if (data == nil)
     {
         return nil;
