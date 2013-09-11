@@ -4,6 +4,7 @@
 @class COPersistentRoot, COEditingContext, COObjectGraphContext;
 @class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo, CORevisionID, COPath;
 @class COCrossPersistentRootReferenceCache, COUndoStackStore, COCommandGroup;
+@class COUndoStack;
 
 // I'm skeptical that there is ever a legitimate case where code is working
 // with an id<COPersistentObjectContext> and doesn't know whether it's an
@@ -79,10 +80,8 @@
 	COError *_error;
     COCrossPersistentRootReferenceCache *_crossRefCache;     
     /** Undo */
-    COUndoStackStore *_undoStackStore;
     BOOL _isRecordingUndo;
     COCommandGroup *_currentEditGroup;
-    NSString *_undoStackName;
 }
 
 /** 
@@ -231,6 +230,9 @@
  * See -commitWithType:shortDescription: and -commitWithMetadata:.
  */
 - (NSArray *)commit;
+
+- (void) commitWithUndoStack: (COUndoStack *)aStack;
+
 // TODO: Change to -commitWithType:shortDescription:error:
 /**
  * Commits the current changes to the store with some basic metadatas and 
@@ -254,11 +256,6 @@
 /**
  * @taskunit Deprecated
  */
-
-/**
- * Deprecated
- */
-@property (readwrite, nonatomic, copy) NSString *undoStackName;
 
 /**
  * Returns YES.

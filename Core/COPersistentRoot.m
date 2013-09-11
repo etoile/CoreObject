@@ -306,7 +306,8 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 - (CORevision *)commitWithMetadata: (NSDictionary *)metadata
 {
 	[_parentContext commitWithMetadata: metadata
-	                restrictedToPersistentRoots: A(self)];
+           restrictedToPersistentRoots: A(self)
+                         withUndoStack: nil];
 	//ETAssert([revs count] == 1);
 	//return [revs lastObject];
     return nil;

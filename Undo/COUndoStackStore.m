@@ -3,6 +3,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
+#import "COPatternUndoStack.h"
 
 NSString * const kCOUndoStack = @"undo";
 NSString * const kCORedoStack = @"redo";
@@ -28,6 +29,11 @@ NSString * const kCORedoStack = @"redo";
 - (COUndoStack *) stackForName: (NSString *)aName
 {
     return [[[COUndoStack alloc] initWithStore: self name: aName] autorelease];
+}
+
+- (COUndoStack *) stackForPattern: (NSString *)aPattern
+{
+    return [[[COPatternUndoStack alloc] initWithStore: self name: aPattern] autorelease];
 }
 
 - (id) init
@@ -132,6 +138,12 @@ NSString * const kCORedoStack = @"redo";
     }
     return [NSJSONSerialization JSONObjectWithData: data options: 0 error: NULL];
 }
+
+- (NSString *) peekStackName: (NSString *)aTable forName: (NSString *)aStack
+{
+    return [_db stringForQuery: [NSString stringWithFormat: @"SELECT name FROM %@ WHERE idx = (SELECT MAX(idx) FROM %@ WHERE name LIKE ?)", aTable, aTable], aStack];
+}
+
 
 - (void) pushAction: (NSDictionary *)anAction stack: (NSString *)aTable forName: (NSString *)aStack
 {

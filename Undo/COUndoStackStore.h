@@ -18,6 +18,7 @@ extern NSString * const kCORedoStack;
 + (COUndoStackStore *) defaultStore;
 
 - (COUndoStack *) stackForName: (NSString *)aName;
+- (COUndoStack *) stackForPattern: (NSString *)aPattern;
 
 /** @taskunit Framework Private */
 
@@ -32,6 +33,7 @@ extern NSString * const kCORedoStack;
 
 - (void) popStack: (NSString *)aTable forName: (NSString *)aStack;
 - (NSDictionary *) peekStack: (NSString *)aTable forName: (NSString *)aStack;
+- (NSString *) peekStackName: (NSString *)aTable forName: (NSString *)aStack;
 - (void) pushAction: (NSDictionary *)anAction stack: (NSString *)aTable forName: (NSString *)aStack;
 
 @end

@@ -44,29 +44,12 @@
  */
 @interface COEditingContext (Undo)
 
-/** @taskunit App-level undo/redo */
-
-- (void) commitWithUndoStack: (COUndoStack *)aStack;
-
-/** @taskunit Deprecated */
-
-- (BOOL) canUndoForStackNamed: (NSString *)aName;
-- (BOOL) canRedoForStackNamed: (NSString *)aName;
-
-- (BOOL) undoForStackNamed: (NSString *)aName;
-- (BOOL) redoForStackNamed: (NSString *)aName;
-
-/**
- * Replacement for -commit that also writes a COCommand to the requested undo stack
- */
-- (BOOL) commitWithStackNamed: (NSString *)aName;
-
 /** @taskunit Framework Private */
 
 // Called from COEditingContext
 
 - (void) recordBeginUndoGroup;
-- (void) recordEndUndoGroup;
+- (void) recordEndUndoGroupWithUndoStack: (COUndoStack *)aStack;
 
 - (void) recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot;
 - (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot;

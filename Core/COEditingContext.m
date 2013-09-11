@@ -21,7 +21,7 @@
 @synthesize store = _store, modelRepository = _modelRepository;
 @synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
 @synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
-@synthesize undoStackName = _undoStackName;
+@synthesize isRecordingUndo = _isRecordingUndo;
 
 + (COEditingContext *)contextWithURL: (NSURL *)aURL
 {
@@ -55,7 +55,6 @@
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
     _crossRefCache = [[COCrossPersistentRootReferenceCache alloc] init];
-    _undoStackStore = [[COUndoStackStore alloc] init];
     _isRecordingUndo = YES;
     
 	[self registerAdditionalEntityDescriptions];
@@ -91,7 +90,6 @@
     DESTROY(_persistentRootsPendingUndeletion);
     DESTROY(_crossRefCache);
 	DESTROY(_error);
-    DESTROY(_undoStackStore);
     DESTROY(_currentEditGroup);
 	[super dealloc];
 }
@@ -396,6 +394,7 @@
 
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
 	restrictedToPersistentRoots: (NSArray *)persistentRoots
+                  withUndoStack: (COUndoStack *)aStack
 {
 	// TODO: We could organize validation errors by persistent root. Each
 	// persistent root might result in a validation error that contains a
@@ -446,15 +445,23 @@
     }
 
     ETAssert([_store commitTransactionWithUUID: transactionUUID withError: NULL]);
-    [self recordEndUndoGroup];
+    [self recordEndUndoGroupWithUndoStack: aStack];
     
 	return revisions;
+}
+
+- (void) commitWithUndoStack: (COUndoStack *)aStack
+{
+    [self commitWithMetadata: nil
+ restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
+               withUndoStack: aStack];
 }
 
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
 {
 	return [self commitWithMetadata: metadata
-		restrictedToPersistentRoots: [_loadedPersistentRoots allValues]];
+		restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
+                      withUndoStack: nil];
 }
 
 - (void) unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot

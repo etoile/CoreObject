@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-@class COUndoStackStore, COEditingContext;
+@class COUndoStackStore, COEditingContext, COCommand;
 
 @interface COUndoStack : NSObject
 {
@@ -21,5 +21,9 @@
 
 - (void) undoWithEditingContext: (COEditingContext *)aContext;
 - (void) redoWithEditingContext: (COEditingContext *)aContext;
+
+// Private
+
+- (void) recordCommandInverse: (COCommand *)aCommand;
 
 @end

@@ -1,6 +1,10 @@
 #import <CoreObject/COEditingContext.h>
 
+@class COUndoStack;
+
 @interface COEditingContext ()
+
+@property (readwrite, nonatomic) BOOL isRecordingUndo;
 
 /**
  * @taskunit Framework Private
@@ -44,7 +48,8 @@
  * won't be committed. -hasChanges can still be YES on return.
  */
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
-	restrictedToPersistentRoots: (NSArray *)persistentRoots;
+	restrictedToPersistentRoots: (NSArray *)persistentRoots
+                  withUndoStack: (COUndoStack *)aStack;
 /**
  * <override-never />
  * Tells the receiver that -[COStore finishCommit] just returned.
