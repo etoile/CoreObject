@@ -105,7 +105,7 @@
 	
 	// UI Setup
 	[self addStatusBarButtons];
-	desktopWindow = [[DesktopWindow alloc] init];
+//	desktopWindow = [[DesktopWindow alloc] init];
 	//projectNavWindow = [[ProjectNavWindow alloc] init];
 	overlayShelf = [[OverlayShelf alloc] init];
 	
