@@ -398,6 +398,8 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
     // FIXME: Hack?
     [self reloadPersistentRootInfo];
+    
+    [self sendChangeNotification];
 }
 
 - (Class)referenceClassForRootObject: (COObject *)aRootObject

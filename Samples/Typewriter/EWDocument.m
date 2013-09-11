@@ -160,11 +160,11 @@
 {
     [self validateCanLoadStateToken: aToken];
          
-    COBranch *editingBranchObject = [_persistentRoot editingBranch];
-    CORevision *rev = [CORevision revisionWithStore: [self store]
-                                         revisionID: aToken];
+//    COBranch *editingBranchObject = [_persistentRoot editingBranch];
+//    CORevision *rev = [CORevision revisionWithStore: [self store]
+//                                         revisionID: aToken];
     
-    [editingBranchObject setCurrentRevision: rev];
+    //[editingBranchObject setCurrentRevision: rev];
 
     NSArray *wcs = [self windowControllers];
     for (EWTypewriterWindowController *wc in wcs)
