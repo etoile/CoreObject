@@ -222,13 +222,25 @@
 
 - (void)undo:(id)sender
 {
-	
+    COUndoStack *stack = [self undoStack];
+    if ([stack canUndoWithEditingContext: context])
+    {
+        [stack undoWithEditingContext: context];
+    }
 }
 - (void)redo:(id)sender
 {
-	
+    COUndoStack *stack = [self undoStack];
+    if ([stack canRedoWithEditingContext: context])
+    {
+        [stack redoWithEditingContext: context];
+    }
 }
 
+- (COUndoStack *) undoStack
+{
+    return [[COUndoStackStore defaultStore] stackForPattern: @"org.etoile.projectdemo-%"];
+}
 
 - (IBAction)newProject: (id)sender
 {
