@@ -562,6 +562,11 @@ static int i = 0;
         }
 	}
 	
+    // FIXME: We should make the commit to the drag destination persistent root
+    // on its undo stack, and make the commit to the drag source on its undo stack.
+    //
+    // Currently the whole commit is put on the drag destination's undo stack
+    
 	[self commitWithType: @"kCOTypeMinorEdit"
 		shortDescription: @"Drop Items"
 		 longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
