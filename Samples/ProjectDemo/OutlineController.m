@@ -519,22 +519,47 @@ static int i = 0;
 	
 	for (OutlineItem *outlineItem in outlineItems)
 	{
-		OutlineItem *oldParent = [outlineItem parent];
-		NSUInteger oldIndex = [[oldParent contents] indexOfObject: outlineItem];
-		
-		NSLog(@"Dropping %@ from %@", [outlineItem label], [oldParent label]);
-		if (insertionIndex == -1) { insertionIndex = [[newParent contents] count]; }
-		
-		if (oldParent == newParent && insertionIndex > oldIndex)
-		{
-			[oldParent removeItemAtIndex: oldIndex];
-			[newParent addItem: outlineItem atIndex: insertionIndex-1]; 
-		}
-		else
-		{
-			[oldParent removeItemAtIndex: oldIndex];
-			[newParent addItem: outlineItem atIndex: insertionIndex++]; 
-		}
+        if ([[outlineItem persistentRoot] isEqual: [doc persistentRoot]])
+        {
+            OutlineItem *oldParent = [outlineItem parent];
+            NSUInteger oldIndex = [[oldParent contents] indexOfObject: outlineItem];
+            
+            NSLog(@"Dropping %@ from %@", [outlineItem label], [oldParent label]);
+            if (insertionIndex == -1) { insertionIndex = [[newParent contents] count]; }
+            
+            if (oldParent == newParent && insertionIndex > oldIndex)
+            {
+                [oldParent removeItemAtIndex: oldIndex];
+                [newParent addItem: outlineItem atIndex: insertionIndex-1];
+            }
+            else
+            {
+                [oldParent removeItemAtIndex: oldIndex];
+                [newParent addItem: outlineItem atIndex: insertionIndex++]; 
+            }
+        }
+        else
+        {
+            // User dragged cross-peristent root
+            
+            COCopier *copier = [[[COCopier alloc] init] autorelease];
+
+            ETUUID *destUUID = [copier copyItemWithUUID: [outlineItem UUID]
+                                              fromGraph: [outlineItem objectGraphContext]
+                                                toGraph: [doc objectGraphContext]];
+            
+            OutlineItem *copy = (OutlineItem *)[[doc objectGraphContext] objectWithUUID: destUUID];
+
+            if (insertionIndex == -1) { insertionIndex = [[newParent contents] count]; }
+            
+            [newParent addItem: copy atIndex: insertionIndex++];
+            
+            // Remove from source
+
+            OutlineItem *oldParent = [outlineItem parent];
+            NSUInteger oldIndex = [[oldParent contents] indexOfObject: outlineItem];
+            [oldParent removeItemAtIndex: oldIndex];
+        }
 	}
 	
 	[self commitWithType: @"kCOTypeMinorEdit"
