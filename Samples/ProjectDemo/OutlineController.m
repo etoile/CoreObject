@@ -423,14 +423,14 @@ static int i = 0;
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pb
 {
 	NSMutableArray *pbItems = [NSMutableArray array];
-	
+    
 	for (OutlineItem *outlineItem in items)
-	{    
-		NSPasteboardItem *item = [[[NSPasteboardItem alloc] init] autorelease];
-		[item setPropertyList: [NSDictionary dictionaryWithObjectsAndKeys:
-                                [NSNumber numberWithInteger: (NSInteger)outlineItem], @"outlineItemPointer",
-                                [NSNumber numberWithInteger: (NSInteger)outlineView], @"outlineViewPointer",
-                                nil]
+	{
+        NSPasteboardItem *item = [[[NSPasteboardItem alloc] init] autorelease];
+        
+        // FIXME: Pass editing branch?
+		[item setPropertyList: @{ @"persistentRoot" : [[[outlineItem persistentRoot] persistentRootUUID] stringValue],
+                                  @"uuid" : [[outlineItem UUID] stringValue] }
 					  forType: @"org.etoile.outlineItem"];
 		[pbItems addObject: item];
 	}
@@ -439,17 +439,29 @@ static int i = 0;
 	return [pb writeObjects: pbItems];
 }
 
+- (OutlineItem *) outlineItemForPasteboardPropertyList: (id)plist
+{
+    ETUUID *persistentRootUUID = [ETUUID UUIDWithString: plist[@"persistentRoot"]];
+    ETUUID *objectUUID = [ETUUID UUIDWithString: plist[@"uuid"]];
+    
+    COPersistentRoot *persistentRoot = [[[doc persistentRoot] parentContext] persistentRootForUUID: persistentRootUUID];
+    return (OutlineItem *)[persistentRoot objectWithUUID: objectUUID];
+}
+
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
 {
 	if (item != nil && ![item isKindOfClass: [OutlineItem class]])
 	{
 		return NSDragOperationNone;
 	}
+    
+    // Ensure the destination isn't a child of, or equal to, the source
+    
 	for (NSPasteboardItem *pbItem in [[info draggingPasteboard] pasteboardItems])
 	{
-		OutlineItem *srcItem = (OutlineItem*)[[[pbItem propertyListForType: @"org.etoile.outlineItem"] valueForKey:@"outlineItemPointer"] integerValue];
-		
-		// Ensure the destination isn't a child of, or equal to, the source    
+        id plist = [pbItem propertyListForType: @"org.etoile.outlineItem"];	
+        OutlineItem *srcItem = [self outlineItemForPasteboardPropertyList: plist];
+        
 		for (OutlineItem *tempDest = item; tempDest != nil; tempDest = [tempDest parent])
 		{
 			if ([tempDest isEqual: srcItem])
@@ -473,7 +485,9 @@ static int i = 0;
 	
 	for (NSPasteboardItem *pbItem in [[info draggingPasteboard] pasteboardItems])
 	{
-		[outlineItems addObject: (OutlineItem*)[[[pbItem propertyListForType: @"org.etoile.outlineItem"] valueForKey:@"outlineItemPointer"] integerValue]];
+        id plist = [pbItem propertyListForType: @"org.etoile.outlineItem"];	
+        OutlineItem *srcItem = [self outlineItemForPasteboardPropertyList: plist];
+		[outlineItems addObject: srcItem];
 	}
 	
 	
