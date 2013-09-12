@@ -7,13 +7,13 @@
 
 static bool comparefn(size_t i, size_t j, void *userdata1, void *userdata2)
 {
-	return [[(NSArray*)userdata1 objectAtIndex: i] isEqual:
-			[(NSArray*)userdata2 objectAtIndex: j]];
+	return [[(__bridge NSArray*)userdata1 objectAtIndex: i] isEqual:
+			[(__bridge NSArray*)userdata2 objectAtIndex: j]];
 }
 
 void CODiffArrays(NSArray *a, NSArray *b, id<CODiffArraysDelegate>delegate, id userInfo)
 {
-	diffresult_t *result = diff_arrays([a count], [b count], comparefn, a, b);
+	diffresult_t *result = diff_arrays([a count], [b count], comparefn, (__bridge void *)(a), (__bridge void *)(b));
 	
 	for (size_t i=0; i<diff_editcount(result); i++)
 	{

@@ -16,11 +16,11 @@
     NSDate *_date;
 }
 
-@property (readwrite, nonatomic, retain) CORevisionID *revisionID;
-@property (readwrite, nonatomic, retain) CORevisionID *parentRevisionID;
-@property (readwrite, nonatomic, retain) CORevisionID *mergeParentRevisionID;
+@property (readwrite, nonatomic, strong) CORevisionID *revisionID;
+@property (readwrite, nonatomic, strong) CORevisionID *parentRevisionID;
+@property (readwrite, nonatomic, strong) CORevisionID *mergeParentRevisionID;
 @property (readwrite, nonatomic, copy) NSDictionary *metadata;
-@property (readwrite, nonatomic, retain) NSDate *date;
+@property (readwrite, nonatomic, strong) NSDate *date;
 
 - (id) plist;
 + (CORevisionInfo *) revisionInfoWithPlist: (id)aPlist;

@@ -6,15 +6,14 @@
 
 int main (int argc, const char *argv[])
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	UKRunner *runner = [UKRunner new];
+    @autoreleasepool {
+		UKRunner *runner = [UKRunner new];
 
-	[[UKTestHandler handler] setQuiet: YES];
+		[[UKTestHandler handler] setQuiet: YES];
 
-	[runner runTestsInBundle: [NSBundle mainBundle] principalClass: [EditingContextTestCase class]];
-	[runner reportTestResults];
-	
-	[runner release];
-    [pool drain];
+		[runner runTestsInBundle: [NSBundle mainBundle] principalClass: [EditingContextTestCase class]];
+		[runner reportTestResults];
+		
+    }
     return 0;
 }

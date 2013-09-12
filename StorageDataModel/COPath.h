@@ -18,9 +18,9 @@
  */
 - (BOOL) isCrossPersistentRoot;
 
-@property (readonly) ETUUID *persistentRoot;
-@property (readonly) ETUUID *branch;
-@property (readonly) ETUUID *embeddedObject;
+@property (strong, readonly) ETUUID *persistentRoot;
+@property (strong, readonly) ETUUID *branch;
+@property (strong, readonly) ETUUID *embeddedObject;
 
 /**
  * Implicitly points to the root object of the current branch

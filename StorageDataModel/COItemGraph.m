@@ -48,7 +48,7 @@
 {
     NSParameterAssert([items count] >= 1);
 
-    COItemGraph *result = [[[self alloc] init] autorelease];
+    COItemGraph *result = [[self alloc] init];
     result->rootItemUUID_ = [[[items objectAtIndex: 0] UUID] copy];
     result->itemForUUID_ = [[NSMutableDictionary alloc] initWithCapacity: [items count]];
     
@@ -59,12 +59,6 @@
     return result;
 }
 
-- (void) dealloc
-{
-    [itemForUUID_ release];
-    [rootItemUUID_ release];
-    [super dealloc];
-}
 
 
 - (ETUUID *) rootItemUUID
@@ -208,7 +202,6 @@ COItemGraph *COItemGraphFromJSONPropertyLisy(id plist)
         COItem *item = [[COItem alloc] initWithJSONPlist: [objectsPlist objectForKey: uuidString]];
         [itemForUUID setObject: item
                         forKey: [item UUID]];
-        [item release];
     }
     
     COItemGraph *graph = [[COItemGraph alloc] initWithItemForUUID: itemForUUID

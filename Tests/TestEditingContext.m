@@ -16,15 +16,11 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [super dealloc];
-}
 
 - (void)testDeleteUncommittedPersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];
+    ETUUID *uuid = [persistentRoot persistentRootUUID];
     
     UKTrue([ctx hasChanges]);
     UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
@@ -45,7 +41,7 @@
 - (void)testDeleteCommittedPersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];
+    ETUUID *uuid = [persistentRoot persistentRootUUID];
     
     [ctx commit];
     
@@ -83,7 +79,7 @@
 - (void)testUndeleteCommittedPersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    ETUUID *uuid = [[[persistentRoot persistentRootUUID] retain] autorelease];
+    ETUUID *uuid = [persistentRoot persistentRootUUID];
     [ctx commit];
     
     persistentRoot.deleted = YES;

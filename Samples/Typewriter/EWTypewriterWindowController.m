@@ -4,11 +4,6 @@
 
 @implementation EWTypewriterWindowController
 
-- (void)dealloc
-{
-    [textStorage_ release];
-    [super dealloc];
-}
 
 - (void)windowDidLoad
 {
@@ -34,7 +29,7 @@
         return;
     }
     
-    ASSIGN(displayedRevision_, aRev);
+    displayedRevision_ =  aRev;
     
     id<COItemGraph> aTree = [[[self document] store] itemGraphForRevisionID: aRev];
     

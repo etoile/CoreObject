@@ -80,7 +80,7 @@
     for (ETUUID *uuid in uuidsToCopy)
     {
         COItem *oldItem = [source itemForUUID: uuid];
-        COItem *newItem = [[oldItem mutableCopyWithNameMapping: mapping] autorelease];
+        COItem *newItem = [oldItem mutableCopyWithNameMapping: mapping];
         [result addObject: newItem];
     }
     

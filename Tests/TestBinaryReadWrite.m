@@ -23,43 +23,43 @@ static NSString *endArray = @"<<end array>>";
 
 static void test_read_int64(void *ctx, int64_t val)
 {
-    [((TestBinaryReadWrite*)ctx) readObject: [NSNumber numberWithLongLong: val]];
+    [((__bridge TestBinaryReadWrite*)ctx) readObject: [NSNumber numberWithLongLong: val]];
 }
 static void test_read_double(void *ctx, double val)
 {
-    [((TestBinaryReadWrite*)ctx) readObject: [NSNumber numberWithDouble: val]];
+    [((__bridge TestBinaryReadWrite*)ctx) readObject: [NSNumber numberWithDouble: val]];
 }
 static void test_read_string(void *ctx, NSString *val)
 {
-    [((TestBinaryReadWrite*)ctx) readObject: val];
+    [((__bridge TestBinaryReadWrite*)ctx) readObject: val];
 }
 static void test_read_uuid(void *ctx, ETUUID *uuid)
 {
-    [((TestBinaryReadWrite*)ctx) readObject: uuid];
+    [((__bridge TestBinaryReadWrite*)ctx) readObject: uuid];
 }
 static void test_read_bytes(void *ctx, const unsigned char *val, size_t size)
 {
-    [((TestBinaryReadWrite*)ctx) readObject: [NSData dataWithBytes: val length: size]];
+    [((__bridge TestBinaryReadWrite*)ctx) readObject: [NSData dataWithBytes: val length: size]];
 }
 static void test_read_begin_object(void *ctx)
 {
-    [((TestBinaryReadWrite*)ctx) readObject: beginObject];
+    [((__bridge TestBinaryReadWrite*)ctx) readObject: beginObject];
 }
 static void test_read_end_object(void *ctx)
 {
-    [((TestBinaryReadWrite*)ctx) readObject: endObject];
+    [((__bridge TestBinaryReadWrite*)ctx) readObject: endObject];
 }
 static void test_read_begin_array(void *ctx)
 {
-    [((TestBinaryReadWrite*)ctx) readObject: beginArray];
+    [((__bridge TestBinaryReadWrite*)ctx) readObject: beginArray];
 }
 static void test_read_end_array(void *ctx)
 {
-    [((TestBinaryReadWrite*)ctx) readObject: endArray];
+    [((__bridge TestBinaryReadWrite*)ctx) readObject: endArray];
 }
 static void test_read_null(void *ctx)
 {
-    [((TestBinaryReadWrite*)ctx) readObject: [NSNull null]];
+    [((__bridge TestBinaryReadWrite*)ctx) readObject: [NSNull null]];
 }
 
 - (id) init
@@ -67,12 +67,6 @@ static void test_read_null(void *ctx)
     SUPERINIT;
     readObjects = [[NSMutableArray alloc] init];
     return self;
-}
-
-- (void) dealloc
-{
-    DESTROY(readObjects);
-    [super dealloc];
 }
 
 - (void)testBasic
@@ -138,7 +132,7 @@ static void test_read_null(void *ctx)
     
     co_reader_read(co_buffer_get_data(&buf),
                    co_buffer_get_length(&buf),
-                   self,
+                   (__bridge void *)(self),
                    cb);
     UKObjectsEqual(expected, readObjects);
 

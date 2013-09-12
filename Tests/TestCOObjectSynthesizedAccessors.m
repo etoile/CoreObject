@@ -11,16 +11,11 @@
 - (id) init
 {
     SUPERINIT;
-    ASSIGN(persistentRoot, [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"]);
+    persistentRoot =  [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     
     return self;
 }
 
-- (void)dealloc
-{
-    [persistentRoot release];
-    [super dealloc];
-}
 
 - (void) testAttributeGetterAndSetter
 {

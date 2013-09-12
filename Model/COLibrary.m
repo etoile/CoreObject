@@ -10,6 +10,7 @@
 #import "COGroup.h"
 #import "COObjectGraphContext.h"
 #import "COTag.h"
+#import "COPersistentRoot.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 
@@ -54,12 +55,6 @@
 	return S([self makeEntityDescriptionWithName: @"COBookmarkLibrary" contentType: @"COBookmark"],
 			 [self makeEntityDescriptionWithName: @"CONoteLibrary" contentType: @"COContainer"]);
 }
-	 
-- (void)dealloc
-{
-	DESTROY(identifier);
-	[super dealloc];
-}
 
 - (BOOL)isLibrary
 {
@@ -76,8 +71,8 @@
 // application launches).
 - (COSmartGroup *)libraryGroup
 {
-	COSmartGroup *group = [[[COSmartGroup alloc]
-		initWithObjectGraphContext: [COObjectGraphContext objectGraphContext]] autorelease];
+	COSmartGroup *group = [[COSmartGroup alloc]
+		initWithObjectGraphContext: [COObjectGraphContext objectGraphContext]];
 	[group setName: _(@"All Objects")];
 	[group setTargetCollection: [[[[self persistentRoots] mappedCollection] rootObject] allObjects]];
 	[group setQuery: [COQuery queryWithPredicateBlock: ^ BOOL (id object, NSDictionary *bindings)

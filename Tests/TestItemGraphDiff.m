@@ -73,8 +73,6 @@
     
 	UKObjectsEqual(A(@"Pizza", @"Chips", @"Salsa"), [child valueForKeyPath: @"contents.label"]);
 	UKObjectsEqual(subchild4UUID, [subchild4 UUID]);
-	[ctx2 release];
-	[ctx1 release];
 }
 
 - (void)testMove
@@ -125,8 +123,6 @@
 	UKIntsEqual(1, [[child2 valueForProperty: @"contents"] count]);
 	UKObjectsSame(subchild1, [[child2 valueForProperty: @"contents"] objectAtIndex: 0]);
 	
-	[ctx2 release];
-	[ctx1 release];
 }
 
 @end

@@ -34,7 +34,6 @@ void ParseCombinedCommitDataInToUUIDToItemDataDictionary(NSMutableDictionary *de
             [dest setObject: data
                      forKey: uuid];
         }
-        [uuid release];
         offset += length;
     }
 }

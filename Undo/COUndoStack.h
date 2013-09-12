@@ -8,11 +8,11 @@
     NSString *_name;
 }
 
-@property (readonly, nonatomic) COUndoStackStore *store;
-@property (readonly, nonatomic) NSString *name;
+@property (strong, readonly, nonatomic) COUndoStackStore *store;
+@property (strong, readonly, nonatomic) NSString *name;
 
-@property (readonly, nonatomic) NSArray *undoNodes;
-@property (readonly, nonatomic) NSArray *redoNodes;
+@property (weak, readonly, nonatomic) NSArray *undoNodes;
+@property (weak, readonly, nonatomic) NSArray *redoNodes;
 
 - (void) clear;
 

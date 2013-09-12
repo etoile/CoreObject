@@ -22,13 +22,6 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [ctx1 release];
-    [ctx2 release];
-    [ctx3 release];
-    [super dealloc];
-}
 
 - (void)testSimpleNonconflictingMerge
 {

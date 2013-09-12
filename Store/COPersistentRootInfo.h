@@ -26,9 +26,9 @@
  */
 - (CORevisionID *)currentRevisionID;
 
-@property (readwrite, nonatomic, retain) ETUUID *UUID;
-@property (readwrite, nonatomic, retain) ETUUID *currentBranchUUID;
-@property (readwrite, nonatomic, retain) NSDictionary *branchForUUID;
+@property (readwrite, nonatomic, strong) ETUUID *UUID;
+@property (readwrite, nonatomic, strong) ETUUID *currentBranchUUID;
+@property (readwrite, nonatomic, strong) NSDictionary *branchForUUID;
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
 
 - (NSArray *)branchInfosWithMetadataValue: (id)aValue forKey: (NSString *)aKey;

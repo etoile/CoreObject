@@ -8,8 +8,8 @@
 
 @interface COUndoStack ()
 
-@property (readwrite, retain, nonatomic) COUndoStackStore *store;
-@property (readwrite, retain, nonatomic) NSString *name;
+@property (strong, readwrite, nonatomic) COUndoStackStore *store;
+@property (strong, readwrite, nonatomic) NSString *name;
 
 @end
 

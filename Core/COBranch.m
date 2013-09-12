@@ -25,6 +25,8 @@
 #import "COLeastCommonAncestor.h"
 #import "COItemGraphDiff.h"
 #import "COMergeInfo.h"
+#import "CORevisionID.h"
+
 
 NSString * const kCOBranchLabel = @"COBranchLabel";
 
@@ -62,7 +64,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 	SUPERINIT;
 
-    ASSIGN(_UUID, aUUID);
+    _UUID =  aUUID;
         
 	/* The persistent root retains us */
 	_persistentRoot = aContext;
@@ -73,7 +75,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     }
 	else
 	{
-		ASSIGN(_objectGraph, anObjectGraphContext);
+		_objectGraph =  anObjectGraphContext;
 		[anObjectGraphContext setBranch: self];
 	}
 
@@ -88,7 +90,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     {
         // Creating a new branch
         
-        ASSIGN(_currentRevisionID, parentRevisionForNewBranch);
+        _currentRevisionID =  parentRevisionForNewBranch;
         _isCreated = NO;
         
         // If _parentRevisionID is nil, we're a new branch for a new persistent root
@@ -106,16 +108,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     }
     
 	return self;	
-}
-
-
-- (void)dealloc
-{
-	DESTROY(_UUID);
-    DESTROY(_currentRevisionID);
-    DESTROY(_metadata);
-    DESTROY(_objectGraph);
-	[super dealloc];
 }
 
 - (COEditingContext *) editingContext
@@ -256,8 +248,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     CORevisionInfo *info = [self currentRevisionInfo];
     if (info != nil)
     {
-        return [[[CORevision alloc] initWithStore: [[self persistentRoot] store]
-                                     revisionInfo: info] autorelease];
+        return [[CORevision alloc] initWithStore: [[self persistentRoot] store]
+                                     revisionInfo: info];
     }
     return nil;
 }
@@ -266,7 +258,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
     NILARG_EXCEPTION_TEST(currentRevision);
     
-    ASSIGN(_currentRevisionID, [currentRevision revisionID]);
+    _currentRevisionID =  [currentRevision revisionID];
     [self reloadAtRevision: currentRevision];
 }
 
@@ -316,8 +308,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         }
         else
         {
-            ASSIGN(_metadata, [NSMutableDictionary dictionaryWithDictionary:
-                               [[self branchInfo] metadata]]);
+            _metadata = [NSMutableDictionary dictionaryWithDictionary:
+                               [[self branchInfo] metadata]];
         }
         _metadataChanged = NO;
     }
@@ -476,8 +468,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                                       error: NULL];
         ETAssert(ok);
         
-        CORevisionID *oldRevid = [[_currentRevisionID retain] autorelease];
-        ASSIGN(_currentRevisionID, revId);
+        CORevisionID *oldRevid = _currentRevisionID;
+        _currentRevisionID =  revId;
         
         [[self editingContext] recordBranchSetCurrentRevision: self
                                                 oldRevisionID: oldRevid];
@@ -531,7 +523,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     ETAssert(_isCreated == NO);
     
-    ASSIGN(_currentRevisionID, aRevisionID);
+    _currentRevisionID =  aRevisionID;
     _isCreated = YES;
     
     [_objectGraph clearChangeTracking];
@@ -605,7 +597,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     COItemGraphDiff *merged = [selfDiff itemTreeDiffByMergingWithDiff: mergingBranchDiff];
 
-    COMergeInfo *result = [[[COMergeInfo alloc] init] autorelease];
+    COMergeInfo *result = [[COMergeInfo alloc] init];
     result.mergeDestinationRevision = [self currentRevision];
     result.mergeSourceRevision = [CORevision revisionWithStore: [self store] revisionID: mergeRevisionID];
     result.baseRevision =[CORevision revisionWithStore: [self store] revisionID: aBaseRevisionID];
@@ -617,8 +609,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
     ETAssert(branchInfo != nil);
     
-    ASSIGN(_currentRevisionID, [branchInfo currentRevisionID]);
-    ASSIGN(_metadata, [NSMutableDictionary dictionaryWithDictionary:[branchInfo metadata]]);
+    _currentRevisionID =  [branchInfo currentRevisionID];
+    _metadata =  [NSMutableDictionary dictionaryWithDictionary:[branchInfo metadata]];
     _isCreated = YES;
     _deleted = [branchInfo isDeleted];
     

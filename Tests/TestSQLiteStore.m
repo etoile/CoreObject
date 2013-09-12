@@ -81,7 +81,7 @@ static ETUUID *childUUID2;
 
 - (COItem *) initialRootItemForChildren: (NSArray *)children
 {
-    COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: rootUUID] autorelease];
+    COMutableItem *rootItem = [[COMutableItem alloc] initWithUUID: rootUUID];
     [rootItem setValue: @"root" forAttribute: @"name" type: kCOTypeString];
     [rootItem setValue: children
           forAttribute: @"children"
@@ -92,7 +92,7 @@ static ETUUID *childUUID2;
 - (COItem *) initialChildItemForUUID: (ETUUID*)aUUID
                                 name: (NSString *)name
 {
-    COMutableItem *child = [[[COMutableItem alloc] initWithUUID: aUUID] autorelease];
+    COMutableItem *child = [[COMutableItem alloc] initWithUUID: aUUID];
     [child setValue: name
        forAttribute: @"name"
                type: kCOTypeString];
@@ -159,14 +159,14 @@ static ETUUID *childUUID2;
     // First commit
     
     [store beginTransactionWithError: NULL];
-    ASSIGN(proot, [store createPersistentRootWithInitialItemGraph: [self makeInitialItemTree]
+    proot = [store createPersistentRootWithInitialItemGraph: [self makeInitialItemTree]
                                                             UUID: [ETUUID UUID]
                                                       branchUUID: [ETUUID UUID]
                                                         revisionMetadata: [self initialMetadata]
-                                                           error: NULL]);
-    ASSIGN(prootUUID, [proot UUID]);
-    ASSIGN(initialBranchUUID, [proot currentBranchUUID]);
-    ASSIGN(initialRevisionId, [[proot currentBranchInfo] currentRevisionID]);
+                                                           error: NULL];
+    prootUUID =  [proot UUID];
+    initialBranchUUID =  [proot currentBranchUUID];
+    initialRevisionId =  [[proot currentBranchInfo] currentRevisionID];
     
     // Branch A
     
@@ -194,7 +194,7 @@ static ETUUID *childUUID2;
         [branchBRevisionIDs addObject: revid];
     }
     
-    ASSIGN(branchAUUID, [ETUUID UUID]);
+    branchAUUID =  [ETUUID UUID];
     [store createBranchWithUUID: branchAUUID
                 initialRevision: initialRevisionId
               forPersistentRoot: prootUUID
@@ -207,7 +207,7 @@ static ETUUID *childUUID2;
 
                                error: NULL]);
     
-    ASSIGN(branchBUUID, [ETUUID UUID]);
+    branchBUUID =  [ETUUID UUID];
     [store createBranchWithUUID: branchBUUID
                 initialRevision: initialRevisionId
               forPersistentRoot: prootUUID
@@ -225,18 +225,6 @@ static ETUUID *childUUID2;
     return self;
 }
 
-- (void) dealloc
-{
-    [proot release];
-    [prootUUID release];
-    [initialBranchUUID release];
-    [initialRevisionId release];
-    [branchAUUID release];
-    [branchBUUID release];
-    [branchARevisionIDs release];
-    [branchBRevisionIDs release];
-    [super dealloc];
-}
 
 
 // --- The tests themselves
@@ -424,7 +412,6 @@ static ETUUID *childUUID2;
                          ofPersistentRoot: prootUUID
                                     error: NULL]);
         [store2 commitTransactionWithError: NULL];
-        [store2 release];
     }
     
     // Try to change the revision again, pretending we didn't notice the
@@ -441,7 +428,7 @@ static ETUUID *childUUID2;
 
     // Reload our in-memory state, and the call should succeed
     
-    ASSIGN(proot, [store persistentRootInfoForUUID: prootUUID]);
+    proot =  [store persistentRootInfoForUUID: prootUUID];
     
     [store beginTransactionWithError: NULL];
     UKTrue([store setCurrentRevision:  [self earlyBranchA]
@@ -744,7 +731,7 @@ static ETUUID *childUUID2;
     
     // Reload proot's and copy's metadata
     
-    ASSIGN(proot, [store persistentRootInfoForUUID: prootUUID]);
+    proot =  [store persistentRootInfoForUUID: prootUUID];
     copy = [store persistentRootInfoForUUID: [copy UUID]];
     UKObjectsEqual(rev1, [[proot currentBranchInfo] currentRevisionID]);
     UKObjectsEqual(initialRevisionId, [[proot currentBranchInfo] tailRevisionID]);
@@ -765,7 +752,7 @@ static ETUUID *childUUID2;
     
     // Reload proot's and copy's metadata
     
-    ASSIGN(proot, [store persistentRootInfoForUUID: prootUUID]);
+    proot =  [store persistentRootInfoForUUID: prootUUID];
     copy = [store persistentRootInfoForUUID: [copy UUID]];
     UKObjectsEqual(rev1, [[proot currentBranchInfo] currentRevisionID]);
     UKObjectsEqual(initialRevisionId, [[proot currentBranchInfo] tailRevisionID]);
@@ -781,7 +768,6 @@ static ETUUID *childUUID2;
     COSQLiteStore *store2 = [[COSQLiteStore alloc] initWithURL: [store URL]];
     UKObjectsEqual(uuid, [store2 UUID]);
     
-    [store2 release];
 }
 
 // The following are some tests ported from CoreObject's TestStore.m
@@ -806,7 +792,7 @@ static ETUUID *childUUID2;
 
 - (void)testReopenStore
 {
-    COSQLiteStore *store2 = [[[COSQLiteStore alloc] initWithURL: [store URL]] autorelease];
+    COSQLiteStore *store2 = [[COSQLiteStore alloc] initWithURL: [store URL]];
     
     CORevisionID *currentRevisionID = [[store2 persistentRootInfoForUUID: prootUUID] currentRevisionID];
     CORevisionID *branchARevisionID = [[[store2 persistentRootInfoForUUID: prootUUID]
@@ -821,8 +807,8 @@ static ETUUID *childUUID2;
 
 - (void)testCommitWithNoChanges
 {
-    COItemGraph *graph = [[[COItemGraph alloc] initWithItemForUUID: [NSDictionary dictionary]
-                                                      rootItemUUID: rootUUID] autorelease];
+    COItemGraph *graph = [[COItemGraph alloc] initWithItemForUUID: [NSDictionary dictionary]
+                                                      rootItemUUID: rootUUID];
     UKNotNil(graph);
     
     // This isn't expected to work. If you want to make a commit with no changes, just pass in the same graph

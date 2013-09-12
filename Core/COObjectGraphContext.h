@@ -25,7 +25,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 {
 	@private
 	ETModelDescriptionRepository *_modelRepository;
-	COBranch *_branch;
+	COBranch *__weak _branch;
     ETUUID *_rootObjectUUID;
 	/** Loaded (or inserted) objects by UUID */
     NSMutableDictionary *_loadedObjects;
@@ -81,7 +81,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * Returns the model description repository, which holds the metamodel that 
  * describes all the objects managed by the context.
  */
-@property (readonly, nonatomic) ETModelDescriptionRepository *modelRepository;
+@property (strong, readonly, nonatomic) ETModelDescriptionRepository *modelRepository;
 
 /**
  * @taskunit Related Persistency Management Objects
@@ -92,19 +92,19 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * For a transient object graph context, returns nil.
  */
-@property (readonly, nonatomic) COBranch *branch;
+@property (weak, readonly, nonatomic) COBranch *branch;
 /**
  * The persistent root owning the branch.
  *
  * For a transient object graph context, returns nil.
  */
-@property (readonly, nonatomic)  COPersistentRoot *persistentRoot;
+@property (weak, readonly, nonatomic)  COPersistentRoot *persistentRoot;
 /**
  * The editing context owing the persistent root.
  *
  * For a transient object graph context, returns nil.
  */
-@property (readonly, nonatomic) COEditingContext *editingContext;
+@property (weak, readonly, nonatomic) COEditingContext *editingContext;
 
 /**
  * @taskunit Item Graph Protocol 
@@ -163,7 +163,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * See also -rootItemUUID.
  */
-@property (nonatomic, retain) COObject *rootObject;
+@property (nonatomic, strong) COObject *rootObject;
 
 /**
  * @taskunit Change Tracking
@@ -194,7 +194,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * After a commit, returns an empty set.
  */
-@property (nonatomic, readonly) NSSet *changedObjects;
+@property (weak, nonatomic, readonly) NSSet *changedObjects;
 /**
  * Returns whether the context contains uncommitted changes.
  *
@@ -232,7 +232,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * See also -objectWithUUID: and -rootObject.
  */
-@property (nonatomic, readonly) NSSet *loadedObjects;
+@property (weak, nonatomic, readonly) NSSet *loadedObjects;
 /**
  * Returns the inner object bound to the given UUID in the object graph.
  *

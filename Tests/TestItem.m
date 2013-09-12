@@ -15,14 +15,14 @@
 - (void) validateJSONRoundTrip: (COItem*)item
 {
     NSData *data = [item JSONData];
-    COItem *roundTrip = [[[COItem alloc] initWithJSONData: data] autorelease];
+    COItem *roundTrip = [[COItem alloc] initWithJSONData: data];
     UKObjectsEqual(item, roundTrip);
 }
 
 - (void) validateBinaryRoundTrip: (COItem*)item
 {
     NSData *data = [item dataValue];
-    COItem *roundTrip = [[[COItem alloc] initWithData: data] autorelease];
+    COItem *roundTrip = [[COItem alloc] initWithData: data];
     UKObjectsEqual(item, roundTrip);
 }
 
@@ -72,7 +72,7 @@
 	UKTrue([[NSDecimalNumber defaultBehavior] scale] == NSDecimalNoScale);
 
 	NSLog(@"Double representation in JSON: %@",
-		  [[[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding] autorelease]);
+		  [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding]);
 
 	/* Rounding is visible in the ouput for numbers that contain more than two 
 	   decimals on 10.7 (e.g. 123.45 output is the same for all numbers). */
@@ -217,7 +217,7 @@
 
 - (COItem *) roundTrip: (COItem *)anItem
 {
-    return [[[COMutableItem alloc] initWithData: [anItem dataValue]] autorelease];
+    return [[COMutableItem alloc] initWithData: [anItem dataValue]];
 }
 
 - (void) testSchemaName
@@ -248,7 +248,7 @@
 	UKRaisesException([[immutable valueForAttribute: @"key1"] addObject: @"b"]);
 	UKRaisesException([[immutable valueForAttribute: @"key2"] addObject: @"B"]);
 	
-	COMutableItem *mutable = [[immutable mutableCopy] autorelease];
+	COMutableItem *mutable = [immutable mutableCopy];
 	
 	UKDoesNotRaiseException([[mutable valueForAttribute: @"key1"] addObject: @"b"]);
 	UKDoesNotRaiseException([[mutable valueForAttribute: @"key2"] addObject: @"B"]);
@@ -270,7 +270,7 @@
 									   valuesForAttributes: D([NSMutableSet setWithObject: @"a"], @"key1",	
 															  [NSMutableArray arrayWithObject: @"A"], @"key2",
 															  @"my name", @"name")];
-	COMutableItem *mutable = [[immutable mutableCopy] autorelease];
+	COMutableItem *mutable = [immutable mutableCopy];
 	
 	UKObjectsEqual(immutable, mutable);
 	UKObjectsEqual(mutable, immutable);

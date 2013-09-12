@@ -76,7 +76,7 @@ typedef NSArray *(^COContentBlock)(void);
  *
  * See -query and -contentBlock.
  */
-@property (nonatomic, retain) id <ETCollection> targetCollection;
+@property (nonatomic, strong) id <ETCollection> targetCollection;
 /**
  * The query used to compute the smart group content.
  *
@@ -90,7 +90,7 @@ typedef NSArray *(^COContentBlock)(void);
  *
  * See -targetCollection and -contentBlock.
  */
-@property (nonatomic, retain) COQuery *query;
+@property (nonatomic, strong) COQuery *query;
 /**
  * The content block used to compute the smart group content.
  *

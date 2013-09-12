@@ -122,10 +122,4 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	DESTROY(tagGroups);
-	[super dealloc];
-}
-
 @end

@@ -5,6 +5,7 @@
 #import "COSerialization.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
+#import "COItem.h"
 
 NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGraphContextObjectsDidChangeNotification";
 
@@ -54,7 +55,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     {
         aRepo = [[[_branch persistentRoot] editingContext] modelRepository];
     }
-    ASSIGN(_modelRepository, aRepo);
+    _modelRepository =  aRepo;
     return self;
 }
 
@@ -75,24 +76,14 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 + (COObjectGraphContext *)objectGraphContext
 {
-    return [[[self alloc] init] autorelease];
+    return [[self alloc] init];
 }
 
 + (COObjectGraphContext *)objectGraphContextWithModelRepository: (ETModelDescriptionRepository *)aRepo
 {
-    return [[[self alloc] initWithModelRepository: aRepo] autorelease];
+    return [[self alloc] initWithModelRepository: aRepo];
 }
 
-- (void)dealloc
-{
-    [_loadedObjects release];
-    [_rootObjectUUID release];
-    [_insertedObjects release];
-    [_updatedObjects release];
-    [_modelRepository release];
-    [_updatedPropertiesByObject release];
-    [super dealloc];
-}
 
 - (NSString *)description
 {
@@ -182,7 +173,6 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	                                               isNew: NO];
 	
 	[_loadedObjects setObject: obj forKey: aUUID];
-	[obj release];
 	
 	return obj;
 }
@@ -268,15 +258,15 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     
     // Wrap the items array in a COItemGraph, so they can be located by
     // -objectReferenceWithUUID:. The rootItemUUID is ignored.
-    ASSIGN(_loadingItemGraph, [[[COItemGraph alloc] initWithItems: items
-                                                     rootItemUUID: [[items objectAtIndex: 0] UUID]] autorelease]);
+    _loadingItemGraph = [[COItemGraph alloc] initWithItems: items
+                                              rootItemUUID: [[items objectAtIndex: 0] UUID]];
     
     for (COItem *item in items)
     {
         [self addItem: item markAsInserted: NO];
     }
 	
-	DESTROY(_loadingItemGraph);
+	_loadingItemGraph = nil;
 }
 
 - (void)setItemGraph: (id <COItemGraph>)aTree
@@ -286,21 +276,21 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
     // 1. Do updates.
 
-    ASSIGN(_rootObjectUUID, [aTree rootItemUUID]);
+    _rootObjectUUID =  [aTree rootItemUUID];
     
 	// TODO: To prevent caching the item graph during the loading, a better
 	// approach could be to allocate all the objects before loading them.
 	// We could also change -[COObjectGraphContext itemForUUID:] to search aTree
 	// during the loading rather than the loaded objects (but that's roughly the
 	// same than we do currently).
-	ASSIGN(_loadingItemGraph, aTree);
+	_loadingItemGraph =  aTree;
 
     for (ETUUID *uuid in [aTree itemUUIDs])
     {
         [self addItem: [aTree itemForUUID: uuid] markAsInserted: NO];
     }
 	
-	DESTROY(_loadingItemGraph);
+	_loadingItemGraph = nil;
     
     // 3. Do GC
     
@@ -326,7 +316,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 - (void)setRootObject: (COObject *)anObject
 {
     NSParameterAssert([anObject objectGraphContext] == self);
-    ASSIGN(_rootObjectUUID, [anObject UUID]);
+    _rootObjectUUID =  [anObject UUID];
 }
 
 #pragma mark -
@@ -367,7 +357,6 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	COObject *obj = [[objClass alloc] initWithUUID: aUUID
                                  entityDescription: desc
                                 objectGraphContext: self];
-	[obj release];
     
     [obj addCachedOutgoingRelationships];
     

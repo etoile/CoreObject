@@ -10,14 +10,6 @@
 @synthesize deleted = deleted_;
 @synthesize metadata = metadata_;
 
-- (void) dealloc
-{
-    [uuid_ release];
-    [tailRevisionId_ release];
-    [currentRevisionId_ release];
-    [metadata_ release];
-    [super dealloc];
-}
 
 - (ETUUID *) remoteMirror
 {

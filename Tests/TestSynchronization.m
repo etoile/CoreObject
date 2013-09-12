@@ -31,7 +31,7 @@ static ETUUID *branchBUUID;
 
 - (COItemGraph *) itemGraphWithLabel: (NSString *)aLabel
 {
-    COMutableItem *child = [[[COMutableItem alloc] initWithUUID: rootItemUUID] autorelease];
+    COMutableItem *child = [[COMutableItem alloc] initWithUUID: rootItemUUID];
     [child setValue: aLabel
        forAttribute: @"label"
                type: kCOTypeString];
@@ -48,9 +48,7 @@ static ETUUID *branchBUUID;
 
 - (void)dealloc
 {
-    DESTROY(serverStore);
     [[NSFileManager defaultManager] removeItemAtPath: [SERVER_STORE_URL path] error: NULL];
-	[super dealloc];
 }
 
 - (void)testReplicateToClientWithoutPersistentRoot
@@ -79,8 +77,8 @@ static ETUUID *branchBUUID;
     
     // Client doesn't have the persistent root. It asks to pull from the server.
     
-    COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
-    COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
+    COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
+    COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
     
     id request = [client updateRequestForPersistentRoot: persistentRootUUID
                                                serverID: @"server"
@@ -137,8 +135,8 @@ static ETUUID *branchBUUID;
 
 - (void)testPullUpdates
 {
-    COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
-    COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
+    COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
+    COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
     
     [serverStore beginTransactionWithError: NULL];
     COPersistentRootInfo *serverInfo = [serverStore createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
@@ -206,8 +204,8 @@ static ETUUID *branchBUUID;
 
 - (void)testPullCheapCopy
 {
-    COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
-    COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
+    COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
+    COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
 
     [serverStore beginTransactionWithError: NULL];
     COPersistentRootInfo *serverInfo = [serverStore createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]

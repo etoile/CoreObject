@@ -18,8 +18,6 @@
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-    
-    [super dealloc];
 }
 
 + (EWBranchesWindowController *) sharedController
@@ -74,7 +72,7 @@
                                                     name: COPersistentRootDidChangeNotification
                                                   object: _persistentRoot];
         
-    ASSIGN(_persistentRoot, proot);
+    _persistentRoot =  proot;
     
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(storePersistentRootMetadataDidChange:)

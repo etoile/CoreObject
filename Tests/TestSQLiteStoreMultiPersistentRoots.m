@@ -28,7 +28,7 @@ static ETUUID *tagUUID;
 
 - (COItemGraph *) tagItemTreeWithDocProoUUID: (ETUUID*)aUUID
 {
-    COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: tagUUID] autorelease];
+    COMutableItem *rootItem = [[COMutableItem alloc] initWithUUID: tagUUID];
     [rootItem setValue: @"favourites" forAttribute: @"name" type: kCOTypeString];
     [rootItem setValue: S([COPath pathWithPersistentRoot: aUUID])
           forAttribute: @"taggedDocuments"
@@ -39,7 +39,7 @@ static ETUUID *tagUUID;
 
 - (COItemGraph *) docItemTree
 {
-    COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: docUUID] autorelease];
+    COMutableItem *rootItem = [[COMutableItem alloc] initWithUUID: docUUID];
     [rootItem setValue: @"my document" forAttribute: @"name" type: kCOTypeString];
     
     return [COItemGraph itemGraphWithItemsRootFirst: A(rootItem)];
@@ -50,28 +50,22 @@ static ETUUID *tagUUID;
     SUPERINIT;
     
     [store beginTransactionWithError: NULL];
-    ASSIGN(docProot, [store createPersistentRootWithInitialItemGraph: [self docItemTree]
+    docProot = [store createPersistentRootWithInitialItemGraph: [self docItemTree]
                                                                UUID: [ETUUID UUID]
                                                          branchUUID: [ETUUID UUID]
                                                            revisionMetadata: nil
-                                                              error: NULL]);
+                                                              error: NULL];
     
-    ASSIGN(tagProot, [store createPersistentRootWithInitialItemGraph: [self tagItemTreeWithDocProoUUID: [docProot UUID]]
+    tagProot = [store createPersistentRootWithInitialItemGraph: [self tagItemTreeWithDocProoUUID: [docProot UUID]]
                                                                UUID: [ETUUID UUID]
                                                          branchUUID: [ETUUID UUID]
                                                            revisionMetadata: nil
-                                                              error: NULL]);
+                                                              error: NULL];
     [store commitTransactionWithError: NULL];
     
     return self;
 }
 
-- (void) dealloc
-{
-    [tagProot release];
-    [docProot release];
-    [super dealloc];
-}
 
 - (void) testSearch
 {

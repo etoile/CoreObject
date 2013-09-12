@@ -19,7 +19,6 @@
 	
 	if (aResult == nil && [suberrors isEmpty])
 	{
-		[self release];
 		return nil;
 	}
 
@@ -30,26 +29,19 @@
 	if (self == nil)
 		return nil;
 
-	ASSIGN(validationResult, aResult);
-	ASSIGN(errors, [suberrors contentArray]);
+	validationResult =  aResult;
+	errors =  [suberrors contentArray];
 	return self;
-}
-
-- (void)dealloc
-{
-	DESTROY(errors);
-	DESTROY(validationResult);
-	[super dealloc];
 }
 
 + (id)errorWithErrors: (id <ETCollection>)errors
 {
-    return [[[self alloc] initWithValidationResult: nil errors: errors] autorelease];
+    return [[self alloc] initWithValidationResult: nil errors: errors];
 }
 
 + (id)errorWithValidationResult: (ETValidationResult *)aResult
 {
-    return [[[self alloc] initWithValidationResult: aResult errors: [NSArray array]] autorelease];
+    return [[self alloc] initWithValidationResult: aResult errors: [NSArray array]];
 }
 
 + (NSArray *)errorsWithValidationResults: (id <ETCollection>)results

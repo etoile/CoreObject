@@ -27,7 +27,7 @@
         NSLog(@"------- attaching URL: %@ >>>>> attachment hash: %@", urlString, attachmentKey);
         
         NSFileWrapper *wrapper = [[NSFileWrapper alloc] initWithPath: [url path]];
-        NSTextAttachment *attachment = [[[NSTextAttachment alloc] initWithFileWrapper: wrapper] autorelease];
+        NSTextAttachment *attachment = [[NSTextAttachment alloc] initWithFileWrapper: wrapper];
         NSAttributedString *attributedString = [NSAttributedString attributedStringWithAttachment: attachment];
 
         [[self textStorage] replaceCharactersInRange: [self selectedRange]

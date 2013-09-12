@@ -101,30 +101,21 @@
 	return group;	
 }
 
-- (void)dealloc
-{
-	DESTROY(targetCollection);
-	DESTROY(query);
-	DESTROY(contentBlock);
-	[super dealloc];
-}
-
 - (void) setTargetCollection: (id <ETCollection>)aGroup
 {
-	ASSIGN(targetCollection, (id)aGroup);
+	targetCollection =  (id)aGroup;
 	[self refresh];
 }
 
 - (void) setContentBlock: (COContentBlock)aBlock
 {
-	[contentBlock release];
 	contentBlock = [aBlock copy];
 	[self refresh];
 }
 
 - (void) setQuery: (COQuery *)aQuery
 {
-	ASSIGN(query, aQuery);
+	query =  aQuery;
 	[self refresh];
 }
 
@@ -173,7 +164,7 @@
 
 	ETAssert([result isKindOfClass: [NSArray class]]);
 
-	ASSIGN(content, result);
+	content =  result;
 }
 
 // TODO: COGroup implements the same methods, put them in a COObjectMatchingTrait

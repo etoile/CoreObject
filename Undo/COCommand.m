@@ -52,7 +52,7 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
     if (cls != Nil)
     {
-        return [[[cls alloc] initWithPlist: aPlist] autorelease];
+        return [[cls alloc] initWithPlist: aPlist];
     }
     else
     {
@@ -120,7 +120,7 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
     SUPERINIT;
     self.storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandStoreUUID]];
     self.persistentRootUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandPersistentRootUUID]];
-    self.timestamp = [[[[NSDateFormatter alloc] init] autorelease] dateFromString: [plist objectForKey: kCOCommandTimestamp]];
+    self.timestamp = [[[NSDateFormatter alloc] init] dateFromString: [plist objectForKey: kCOCommandTimestamp]];
     return self;
 }
 
@@ -129,7 +129,7 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
     NSMutableDictionary *result = [super plist];
     [result setObject: [_storeUUID stringValue] forKey: kCOCommandStoreUUID];
     [result setObject: [_persistentRootUUID stringValue] forKey: kCOCommandPersistentRootUUID];
-    [result setObject: [[[[NSDateFormatter alloc] init] autorelease] stringFromDate: _timestamp] forKey: kCOCommandTimestamp];
+    [result setObject: [[[NSDateFormatter alloc] init] stringFromDate: _timestamp] forKey: kCOCommandTimestamp];
     return result;
 }
 

@@ -27,7 +27,7 @@
 {
 	SUPERINIT;
     
-	url_ = [aURL retain];
+	url_ = aURL;
 	backingStores_ = [[NSMutableDictionary alloc] init];
     backingStoreUUIDForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
     modifiedPersistentRootsUUIDs_ = [[NSMutableSet alloc] init];
@@ -47,7 +47,6 @@
     
 	if (![db_ open])
 	{
-        [self release];
 		return nil;
 	}
     
@@ -69,7 +68,7 @@
     
     if (![db_ tableExists: @"storeMetadata"])
     {
-        ASSIGN(_uuid, [ETUUID UUID]);
+        _uuid =  [ETUUID UUID];
         [db_ executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, uuid BLOB)"];
         [db_ executeUpdate: @"INSERT INTO storeMetadata VALUES(1, ?)", [_uuid dataValue]];
     }
@@ -79,11 +78,10 @@
         if (1 != version)
         {
             NSLog(@"Error, store version %d, only version 1 is supported", version);
-            [self release];
             return nil;
         }
         
-        ASSIGN(_uuid, [ETUUID UUIDWithData: [db_ dataForQuery: @"SELECT uuid FROM storeMetadata"]]);
+        _uuid =  [ETUUID UUIDWithData: [db_ dataForQuery: @"SELECT uuid FROM storeMetadata"]];
     }
     
     // Persistent Root and Branch tables
@@ -126,7 +124,6 @@
     if ([db_ hadError])
     {
 		NSLog(@"Error %d: %@", [db_ lastErrorCode], [db_ lastErrorMessage]);
-        [self release];
 		return nil;
 	}
 
@@ -134,16 +131,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-    [db_ release];
-	[url_ release];
-    [backingStores_ release];
-    [backingStoreUUIDForPersistentRootUUID_ release];
-    [modifiedPersistentRootsUUIDs_ release];
-    [_uuid release];
-	[super dealloc];
-}
 
 - (NSURL*)URL
 {
@@ -208,7 +195,6 @@
         
         ETUUID *uuid = [[ETUUID alloc] initWithUUID: data];
         [result addObject: uuid];
-        [uuid release];
     }
     [rs close];
     return result;
@@ -260,7 +246,6 @@
         }
         
         [backingStores_ setObject: result forKey: aUUID];
-        [result release];
     }
     return result;
 }
@@ -618,7 +603,7 @@
                                                                       revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]]];
             id branchMeta = [self readMetadata: [rs dataForColumnIndex: 3]];
             
-            COBranchInfo *state = [[[COBranchInfo alloc] init] autorelease];
+            COBranchInfo *state = [[COBranchInfo alloc] init];
             state.UUID = branch;
             state.tailRevisionID = tailRevid;
             state.currentRevisionID = currentRevid;
@@ -632,7 +617,7 @@
     
     [db_ releaseSavepoint: @"persistentRootInfoForUUID"];
 
-    COPersistentRootInfo *result = [[[COPersistentRootInfo alloc] init] autorelease];
+    COPersistentRootInfo *result = [[COPersistentRootInfo alloc] init];
     result.UUID = aUUID;
     result.branchForUUID = branchDict;
     result.currentBranchUUID = currBranch;
@@ -699,13 +684,13 @@
     
 
                                   
-    COPersistentRootInfo *plist = [[[COPersistentRootInfo alloc] init] autorelease];
+    COPersistentRootInfo *plist = [[COPersistentRootInfo alloc] init];
     plist.UUID = uuid;
     plist.deleted = NO;
     
     if (aBranchUUID != nil)
     {
-        COBranchInfo *branch = [[[COBranchInfo alloc] init] autorelease];
+        COBranchInfo *branch = [[COBranchInfo alloc] init];
         branch.UUID = aBranchUUID;
         branch.tailRevisionID = revId;
         branch.currentRevisionID = revId;
@@ -780,7 +765,7 @@
      [persistentRootUUID dataValue],
      [persistentRootUUID dataValue]];
     
-    COPersistentRootInfo *plist = [[[COPersistentRootInfo alloc] init] autorelease];
+    COPersistentRootInfo *plist = [[COPersistentRootInfo alloc] init];
     plist.UUID = persistentRootUUID;
     plist.deleted = NO;
     
@@ -1104,7 +1089,6 @@
         searchResult.revision = [CORevisionID revisionWithBackinStoreUUID: root
                                                              revisionUUID: revUUID];
         [results addObject: searchResult];
-        [searchResult release];
     }
     [rs close];
     

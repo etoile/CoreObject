@@ -52,12 +52,6 @@
 	_content = [NSMutableDictionary new];
 }
 
-- (void)dealloc
-{
-	DESTROY(_content);
-	[super dealloc];
-}
-
 /* Prevent -[COObject awakeFromFetch] to check that -tags is a valid collection.
 For a loaded object, -tags return nil because tags are not serialized. */
 - (void)awakeFromFetch

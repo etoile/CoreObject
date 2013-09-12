@@ -15,30 +15,23 @@
 
 + (COQuery *)queryWithPredicate: (NSPredicate *)aPredicate
 {
-	COQuery *query = AUTORELEASE([[COQuery alloc] init]);
+	COQuery *query = [[COQuery alloc] init];
 	[query setPredicate: aPredicate];
 	return query;
 }
 
 + (COQuery *)queryWithPredicateBlock: (BOOL (^)(id object, NSDictionary *bindings))aBlock
 {
-	COQuery *query = AUTORELEASE([[COQuery alloc] init]);
+	COQuery *query = [[COQuery alloc] init];
 	[query setPredicate: [NSPredicate predicateWithBlock: aBlock]];
 	return query;
 }
 
 + (COQuery *)queryWithSQLString: (NSString *)aSQLString
 {
-	COQuery *query = AUTORELEASE([[COQuery alloc] init]);
-	ASSIGN(query->SQLString, aSQLString);
+	COQuery *query = [[COQuery alloc] init];
+	query->SQLString =  aSQLString;
 	return query;
-}
-
-- (void)dealloc
-{
-	DESTROY(predicate);
-	DESTROY(SQLString);
-	[super dealloc];
 }
 
 - (NSString *) SQLString

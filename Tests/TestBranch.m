@@ -22,23 +22,14 @@
 - (id) init
 {
     SUPERINIT;
-    ASSIGN(persistentRoot, [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"]);
-    ASSIGN(rootObj, [persistentRoot rootObject]);
-    ASSIGN(originalBranch, [persistentRoot currentBranch]);
+    persistentRoot =  [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    rootObj =  [persistentRoot rootObject];
+    originalBranch =  [persistentRoot currentBranch];
     
-    ASSIGN(_testStack, [[COUndoStackStore defaultStore] stackForName: @"test"]);
+    _testStack =  [[COUndoStackStore defaultStore] stackForName: @"test"];
     [_testStack clear];
     
     return self;
-}
-
-- (void) dealloc
-{
-    DESTROY(_testStack);
-    DESTROY(rootObj);
-    DESTROY(originalBranch);
-    DESTROY(persistentRoot);
-    [super dealloc];
 }
 
 - (void)testNoExistingCommitTrack

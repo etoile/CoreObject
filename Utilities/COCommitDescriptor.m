@@ -44,17 +44,10 @@ static NSMutableDictionary *descriptorTable = nil;
 	return [descriptorTable objectForKey: key];
 }
 
-- (void)dealloc
-{
-	DESTROY(_typeDescription);
-	DESTROY(_shortDescription);
-	[super dealloc];
-}
-
 - (void) setTypeDescription: (NSString *)aDescription
 {
 	NILARG_EXCEPTION_TEST(aDescription);
-	ASSIGN(_typeDescription, aDescription);
+	_typeDescription =  aDescription;
 }
 
 - (NSString *)localizedTypeDescription
@@ -67,7 +60,7 @@ static NSMutableDictionary *descriptorTable = nil;
 - (void) setShortDescription: (NSString *)aDescription
 {
 	NILARG_EXCEPTION_TEST(aDescription);
-	ASSIGN(_shortDescription, aDescription);
+	_shortDescription =  aDescription;
 }
 
 - (NSString *)localizedShortDescription

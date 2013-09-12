@@ -41,7 +41,7 @@ static ETUUID *childUUIDs[NUM_CHILDREN];
 
 - (COItem *) initialRootItem
 {
-    COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: rootUUID] autorelease];
+    COMutableItem *rootItem = [[COMutableItem alloc] initWithUUID: rootUUID];
     [rootItem setValue: @"root" forAttribute: @"name" type: kCOTypeString];
     [rootItem setValue: A()
           forAttribute: @"children"
@@ -56,7 +56,7 @@ static ETUUID *childUUIDs[NUM_CHILDREN];
 
 - (COItem *) initialChildItem: (int)i
 {
-    COMutableItem *child = [[[COMutableItem alloc] initWithUUID: childUUIDs[i]] autorelease];
+    COMutableItem *child = [[COMutableItem alloc] initWithUUID: childUUIDs[i]];
     [child setValue: [self labelForCommit: 0 child: i]
        forAttribute: @"name"
                type: kCOTypeString];
@@ -91,14 +91,14 @@ static int itemChangedAtCommit(int i)
         [dict setObject: [self initialChildItem: i]
                  forKey: childUUIDs[i]];
     }
-    COItemGraph *it = [[[COItemGraph alloc] initWithItemForUUID: dict rootItemUUID: rootUUID] autorelease];
+    COItemGraph *it = [[COItemGraph alloc] initWithItemForUUID: dict rootItemUUID: rootUUID];
     return it;
 }
 
 
 - (ETUUID *) makeDemoPersistentRoot
 {
-    ASSIGN(revisionIDs, [NSMutableArray array]);
+    revisionIDs =  [NSMutableArray array];
     NSDate *startDate = [NSDate date];
     
     COItemGraph *initialTree = [self makeInitialItemTree];
@@ -163,15 +163,15 @@ static int itemChangedAtCommit(int i)
     
     for (int i=0; i<numChildren; i++)
     {
-        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        COMutableItem *item = [COMutableItem item];
-        [item setValue: [NSNumber numberWithInt: i] forAttribute: @"name" type: kCOTypeInt64];
-        [item setValue: @"blah blah 1" forAttribute: @"test1" type: kCOTypeString];
-        [item setValue: @"blah blah 2" forAttribute: @"test2" type: kCOTypeString];
-        [item setValue: @"blah blah 3" forAttribute: @"test3" type: kCOTypeString];
-        [item setValue: @"blah blah 4" forAttribute: @"test4" type: kCOTypeString];
-        [dict setObject: item forKey: [item UUID]];
-        [pool release];
+        @autoreleasepool {
+            COMutableItem *item = [COMutableItem item];
+            [item setValue: [NSNumber numberWithInt: i] forAttribute: @"name" type: kCOTypeInt64];
+            [item setValue: @"blah blah 1" forAttribute: @"test1" type: kCOTypeString];
+            [item setValue: @"blah blah 2" forAttribute: @"test2" type: kCOTypeString];
+            [item setValue: @"blah blah 3" forAttribute: @"test3" type: kCOTypeString];
+            [item setValue: @"blah blah 4" forAttribute: @"test4" type: kCOTypeString];
+            [dict setObject: item forKey: [item UUID]];
+        }
     }
     
     COMutableItem *rootItem = [COMutableItem item];
@@ -179,8 +179,8 @@ static int itemChangedAtCommit(int i)
           forAttribute: @"children" type: kCOTypeArray | kCOTypeCompositeReference];
     [dict setObject: rootItem forKey: [rootItem UUID]];
     
-    COItemGraph *it = [[[COItemGraph alloc] initWithItemForUUID: dict
-                                                 rootItemUUID: [rootItem UUID]] autorelease];
+    COItemGraph *it = [[COItemGraph alloc] initWithItemForUUID: dict
+                                                 rootItemUUID: [rootItem UUID]];
     return it;
 }
 

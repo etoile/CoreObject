@@ -77,7 +77,7 @@
 - (void)setDate: (NSDate*)date
 {
 	[self willChangeValueForProperty: @"date"];
-	ASSIGN(today, date);
+	today =  date;
 	[self didChangeValueForProperty: @"date"];
 }
 

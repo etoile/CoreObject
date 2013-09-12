@@ -27,8 +27,8 @@
 {
 	// TODO: Look up the store class based on the URL scheme and path extension
 	COEditingContext *ctx = [[self alloc] initWithStore:
-		[[[NSClassFromString(@"COSQLiteStore") alloc] initWithURL: aURL] autorelease]];
-	return [ctx autorelease];
+		[[NSClassFromString(@"COSQLiteStore") alloc] initWithURL: aURL]];
+	return ctx;
 }
 
 - (void)registerAdditionalEntityDescriptions
@@ -49,8 +49,8 @@
 {
 	SUPERINIT;
 
-	ASSIGN(_store, store);
-	_modelRepository = [[ETModelDescriptionRepository mainRepository] retain];
+	_store =  store;
+	_modelRepository = [ETModelDescriptionRepository mainRepository];
 	_loadedPersistentRoots = [NSMutableDictionary new];
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
@@ -82,16 +82,6 @@
 {
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-
-	DESTROY(_store);
-	DESTROY(_modelRepository);
-	DESTROY(_loadedPersistentRoots);
-	DESTROY(_persistentRootsPendingDeletion);
-    DESTROY(_persistentRootsPendingUndeletion);
-    DESTROY(_crossRefCache);
-	DESTROY(_error);
-    DESTROY(_currentEditGroup);
-	[super dealloc];
 }
 
 - (NSString *)description
@@ -194,7 +184,6 @@
                                                                 parentContext: self];
 	[_loadedPersistentRoots setObject: persistentRoot
 							   forKey: [persistentRoot persistentRootUUID]];
-	[persistentRoot release];
 	return persistentRoot;
 }
 
@@ -202,9 +191,9 @@
 {
 	ETEntityDescription *desc = [[self modelRepository] descriptionForName: anEntityName];
 	Class cls = [[self modelRepository] classForEntityDescription: desc];
-	COObject *rootObject = [[[cls alloc] initWithUUID: [ETUUID UUID]
+	COObject *rootObject = [[cls alloc] initWithUUID: [ETUUID UUID]
                                     entityDescription: desc
-                                   objectGraphContext: [COObjectGraphContext objectGraphContext]] autorelease];
+                                   objectGraphContext: [COObjectGraphContext objectGraphContext]];
 	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
 	                                                 objectGraphContext: [rootObject objectGraphContext]];
 
@@ -221,7 +210,6 @@
                                                                 parentContext: self];
 	[_loadedPersistentRoots setObject: persistentRoot
 							   forKey: [persistentRoot persistentRootUUID]];
-	[persistentRoot release];
 
     return persistentRoot;
 }
@@ -367,7 +355,7 @@
 
 - (void)didFailValidationWithError: (COError *)anError
 {
-	ASSIGN(_error, anError);
+	_error =  anError;
 }
 
 /* Both COPersistentRoot or COEditingContext objects are valid arguments. */

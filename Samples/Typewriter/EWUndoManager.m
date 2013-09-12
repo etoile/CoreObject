@@ -7,10 +7,6 @@
     delegate_ = delegate;
 }
 
-- (void) dealloc
-{
-	[super dealloc];
-}
 
 - (BOOL) canUndo
 {

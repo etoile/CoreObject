@@ -40,11 +40,11 @@
     
     _shareDB = share;
     _store = store;
-    ASSIGN(_uuid, aUUID);
+    _uuid =  aUUID;
     
     if (_shareDB)
     {
-        ASSIGN(db_, [store database]);
+        db_ =  [store database];
     }
     else
     {
@@ -58,7 +58,6 @@
         if (![db_ open])
         {
             NSLog(@"Error %d: %@", [db_ lastErrorCode], [db_ lastErrorMessage]);
-            [self release];
             return nil;
         }
         
@@ -84,7 +83,6 @@
     if ([db_ hadError])
     {
 		NSLog(@"Error %d: %@", [db_ lastErrorCode], [db_ lastErrorMessage]);
-        [self release];
 		return nil;
 	}
 
@@ -103,12 +101,6 @@
     }
 }
 
-- (void)dealloc
-{
-    [_uuid release];
-	[db_ release];
-	[super dealloc];
-}
 
 - (BOOL) beginTransaction
 {
@@ -185,7 +177,7 @@
                                                          error: NULL];
         }
         
-        result = [[[CORevisionInfo alloc] init] autorelease];
+        result = [[CORevisionInfo alloc] init];
         result.revisionID = aToken;
         result.parentRevisionID = [self revisionIDForRevid: parent];
         result.mergeParentRevisionID = [self revisionIDForRevid: mergeparent];
@@ -308,11 +300,10 @@
         COItem *item = [[COItem alloc] initWithData: data];
         [resultDict setObject: item
                        forKey: uuid];
-        [item release];
     }
     
-    COItemGraph *result = [[[COItemGraph alloc] initWithItemForUUID: resultDict
-                                                                   rootItemUUID: root] autorelease];
+    COItemGraph *result = [[COItemGraph alloc] initWithItemForUUID: resultDict
+                                                                   rootItemUUID: root];
     return result;
 }
 

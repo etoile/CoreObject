@@ -86,7 +86,7 @@
  *     [self willChangeValueForProperty: @"name"];
  *     // When no ivar is provided, you can use the variable storage as below
  *     // [self setPrimitiveValue: aName: forKey: @"name"];
- *     ASSIGN(name, aName);
+ *     name =  aName;
  *     [self didChangeValueForProperty: @"name"];
  * }
  * </example>
@@ -124,7 +124,7 @@
  * {
  *     id oldCollection = [[names mutableCopy] autorelease];
  *     [self willChangeValueForProperty: @"names"];
- *     ASSIGN(names, newNames);
+ *     names =  newNames;
  *     [self didChangeValueForProperty: @"names" oldValue: oldCollection];
  * }
  * </example>
@@ -196,7 +196,7 @@
 	@private
 	ETEntityDescription *_entityDescription;
 	ETUUID *_uuid;
-	COObjectGraphContext *_objectGraphContext; // weak reference
+	COObjectGraphContext *__weak _objectGraphContext; // weak reference
 	@protected
 	NSMutableDictionary *_variableStorage;
     CORelationshipCache *_incomingRelationships;
@@ -317,7 +317,7 @@
 /**
  * The object name.
  */
-@property (nonatomic, retain) NSString *name;
+@property (nonatomic, strong) NSString *name;
 
 /**
  * <override-dummy />

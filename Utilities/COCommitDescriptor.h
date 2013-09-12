@@ -83,7 +83,7 @@
  *                                                  inDomain: kETUIBuilderDomain];
  * </example>
  */
-@property (nonatomic, retain) NSString *identifier;
+@property (nonatomic, strong) NSString *identifier;
 /**
  * Few words that summarizes the action that triggered the commit.
  *
@@ -91,13 +91,13 @@
  *
  * For a nil description, the setter raises a NSInvalidArgumentException.
  */
-@property (nonatomic, retain) NSString *typeDescription;
+@property (nonatomic, strong) NSString *typeDescription;
 /**
  * A localized description for -typeDescription.
  *
  * This is usually presented in a history browser UI.
  */
-@property (nonatomic, readonly) NSString *localizedTypeDescription;
+@property (weak, nonatomic, readonly) NSString *localizedTypeDescription;
 /**
  * A description that fits on a single line.
  *
@@ -105,13 +105,13 @@
  *
  * For a nil description, the setter raises a NSInvalidArgumentException.
  */
-@property (nonatomic, retain) NSString *shortDescription;
+@property (nonatomic, strong) NSString *shortDescription;
 /**
  * A localized description for -shortDescription.
  *
  * This is usually presented in a history browser UI.
  */
-@property (nonatomic, readonly) NSString *localizedShortDescription;
+@property (weak, nonatomic, readonly) NSString *localizedShortDescription;
 
 /** @taskunit Commit Integration */
 
@@ -123,7 +123,7 @@
  * If -shortDescription or -typeDescription returns nil, a 
  * NSInternalInconsistencyException is raised.
  */
-@property (nonatomic, readonly) NSDictionary *persistentMetadata;
+@property (weak, nonatomic, readonly) NSDictionary *persistentMetadata;
 
 @end
 

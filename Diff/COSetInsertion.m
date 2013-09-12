@@ -19,11 +19,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[object release];
-	[super dealloc];
-}
 
 - (BOOL) isEqualIgnoringSourceIdentifier: (id)other
 {

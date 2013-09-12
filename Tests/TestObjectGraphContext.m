@@ -26,11 +26,8 @@
 
 - (void)dealloc
 {
-    [copier release];
-    [ctx1 release];
     root1 = nil;
     
-    [super dealloc];
 }
 
 - (void)testCreate
@@ -208,7 +205,7 @@
 
 - (void)testChangeTrackingBasic
 {
-	COObjectGraphContext *ctx2 = [[[COObjectGraphContext alloc] init] autorelease];
+	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
     [ctx2 setRootObject: [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"]];
 	COObject *root = [ctx2 rootObject];
     
@@ -394,8 +391,8 @@
     
     // Move child from group1 to group2 at the COItem level
     
-    COMutableItem *group1item = [[[ctx1 itemForUUID: [group1 UUID]] mutableCopy] autorelease];
-    COMutableItem *group2item = [[[ctx1 itemForUUID: [group2 UUID]] mutableCopy] autorelease];
+    COMutableItem *group1item = [[ctx1 itemForUUID: [group1 UUID]] mutableCopy];
+    COMutableItem *group2item = [[ctx1 itemForUUID: [group2 UUID]] mutableCopy];
     [group1item setValue: @[] forAttribute: @"contents" type: kCOTypeArray | kCOTypeCompositeReference];
     [group2item setValue: @[[child UUID]] forAttribute: @"contents" type: kCOTypeArray | kCOTypeCompositeReference];
     

@@ -9,20 +9,13 @@
     
     self = [super init];
     
-    ASSIGN(_rootUUID, aUUID);
+    _rootUUID =  aUUID;
     backing_ = [[NSMutableAttributedString alloc] init];
     paragraphsChangedDuringEditing_ = [[NSMutableSet alloc] init];
     
     return self;
 }
 
-- (void) dealloc
-{
-    [_rootUUID release];
-    [paragraphsChangedDuringEditing_ release];
-    [backing_ release];
-    [super dealloc];
-}
 
 // Model access
 
@@ -298,9 +291,9 @@ static NSRange paragraphRangeForLocationInString(NSString *aString, NSUInteger a
 
 - (BOOL) setTypewriterDocument: (id <COItemGraph>)aTree
 {
-    NSMutableAttributedString *result = [[[NSMutableAttributedString alloc] init] autorelease];
+    NSMutableAttributedString *result = [[NSMutableAttributedString alloc] init];
 
-    ASSIGN(_rootUUID, [aTree rootItemUUID]);
+    _rootUUID =  [aTree rootItemUUID];
     
     COItem *rootItem = [aTree itemForUUID: [aTree rootItemUUID]];
     
@@ -371,7 +364,7 @@ static NSRange paragraphRangeForLocationInString(NSString *aString, NSUInteger a
     NSData *paragraphAsRTF = [paragraphAttrString RTFFromRange: NSMakeRange(0, [paragraphAttrString length])
                                             documentAttributes: nil];
     
-    COMutableItem *paragraphTree = [[[COMutableItem alloc] initWithUUID: paragraphUUID] autorelease];
+    COMutableItem *paragraphTree = [[COMutableItem alloc] initWithUUID: paragraphUUID];
     [paragraphTree setValue: paragraphAsRTF
                forAttribute: @"data"
                        type: kCOTypeBlob];

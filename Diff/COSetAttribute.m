@@ -6,11 +6,6 @@
 @synthesize type;
 @synthesize value;
 
-- (void)dealloc
-{
-	[value release];
-	[super dealloc];
-}
 
 - (BOOL) isEqualIgnoringSourceIdentifier: (id)other
 {

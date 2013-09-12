@@ -57,48 +57,39 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	SUPERINIT;
     
     _parentContext = aCtxt;
-    ASSIGN(_savedState, info);
+    _savedState =  info;
     _branchForUUID = [[NSMutableDictionary alloc] init];
     
     if (_savedState != nil)
     {
-        ASSIGN(_UUID, [_savedState UUID]);
+        _UUID =  [_savedState UUID];
         
         for (COBranchInfo *branchInfo in [[_savedState branchForUUID] allValues])
         {
             [self updateBranchWithBranchInfo: branchInfo];
         }
         
-        ASSIGN(_currentBranchUUID, [_savedState currentBranchUUID]);
+        _currentBranchUUID =  [_savedState currentBranchUUID];
     }
     else
     {
-        ASSIGN(_UUID, [ETUUID UUID]);
+        _UUID =  [ETUUID UUID];
         
         ETUUID *branchUUID = [ETUUID UUID];
         
-        COBranch *branch = [[[COBranch alloc] initWithUUID: branchUUID
+        COBranch *branch = [[COBranch alloc] initWithUUID: branchUUID
 		                                objectGraphContext: anObjectGraphContext
                                             persistentRoot: self
-                                parentRevisionForNewBranch: cheapCopyRevisionID] autorelease];
+                                parentRevisionForNewBranch: cheapCopyRevisionID];
         
         [_branchForUUID setObject: branch forKey: branchUUID];
         
-        ASSIGN(_currentBranchUUID, branchUUID);
+        _currentBranchUUID =  branchUUID;
         
-        ASSIGN(_cheapCopyRevisionID, cheapCopyRevisionID);
+        _cheapCopyRevisionID =  cheapCopyRevisionID;
     }
 
 	return self;
-}
-
-- (void)dealloc
-{
-	DESTROY(_savedState);
-	DESTROY(_branchForUUID);
-    DESTROY(_currentBranchUUID);
-	DESTROY(_editingBranchUUID);  
-	[super dealloc];
 }
 
 #if 0
@@ -162,7 +153,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         [NSException raise: NSGenericException format: @"A persistent root must be committed before you can add or change its branches"];
     }
 
-    ASSIGN(_currentBranchUUID, [aTrack UUID]);
+    _currentBranchUUID =  [aTrack UUID];
     
     [self updateCrossPersistentRootReferences];
     [self sendChangeNotification];
@@ -185,7 +176,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         [NSException raise: NSGenericException format: @"A persistent root must be committed before you can add or change its branches"];
     }
 
-    ASSIGN(_editingBranchUUID, [aTrack UUID]);
+    _editingBranchUUID =  [aTrack UUID];
     
     [self sendChangeNotification];
 }
@@ -320,7 +311,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (void) saveCommitWithMetadata: (NSDictionary *)metadata  transactionUUID: (ETUUID *)transactionUUID
 {
-    ASSIGN(_lastTransactionUUID, transactionUUID);
+    _lastTransactionUUID =  transactionUUID;
     
 	ETAssert([[self rootObject] isRoot]);
     
@@ -420,16 +411,16 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     COPersistentRootInfo *newInfo = [[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
     if (newInfo != nil)
     {
-        ASSIGN(_savedState, newInfo);
+        _savedState =  newInfo;
     }
 }
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
-    COBranch *newBranch = [[[COBranch alloc] initWithUUID: [ETUUID UUID]
+    COBranch *newBranch = [[COBranch alloc] initWithUUID: [ETUUID UUID]
 	                                   objectGraphContext: nil
                                            persistentRoot: self
-                               parentRevisionForNewBranch: [aRev revisionID]] autorelease];
+                               parentRevisionForNewBranch: [aRev revisionID]];
     
     [newBranch setMetadata: D(aLabel, @"COBranchLabel")];
     
@@ -440,10 +431,10 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID metadata: (NSDictionary *)metadata atRevision: (CORevision *)aRev
 {
-    COBranch *newBranch = [[[COBranch alloc] initWithUUID: aUUID
+    COBranch *newBranch = [[COBranch alloc] initWithUUID: aUUID
 	                                   objectGraphContext: nil
                                            persistentRoot: self
-                               parentRevisionForNewBranch: [aRev revisionID]] autorelease];
+                               parentRevisionForNewBranch: [aRev revisionID]];
     
     if (metadata != nil)
     {
@@ -471,10 +462,10 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     
     if (branch == nil)
     {
-        branch = [[[COBranch alloc] initWithUUID: [branchInfo UUID]
+        branch = [[COBranch alloc] initWithUUID: [branchInfo UUID]
                                         objectGraphContext: nil
                                             persistentRoot: self
-                                parentRevisionForNewBranch: nil] autorelease];
+                                parentRevisionForNewBranch: nil];
         
         [_branchForUUID setObject: branch forKey: [branchInfo UUID]];
     }
@@ -493,7 +484,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     }
     
     COPersistentRootInfo *info = [[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
-    ASSIGN(_savedState, info);
+    _savedState =  info;
     
     for (ETUUID *uuid in [info branchUUIDs])
     {
@@ -501,7 +492,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         [self updateBranchWithBranchInfo: branchInfo];
     }
     
-    ASSIGN(_currentBranchUUID, [_savedState currentBranchUUID]);
+    _currentBranchUUID =  [_savedState currentBranchUUID];
     
     //[self sendChangeNotification];
 }
@@ -543,7 +534,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (COObjectGraphContext *) objectGraphContextForPreviewingRevision: (CORevision *)aRevision
 {
-    COObjectGraphContext *ctx = [[[COObjectGraphContext alloc] initWithModelRepository: [[self editingContext] modelRepository]] autorelease];
+    COObjectGraphContext *ctx = [[COObjectGraphContext alloc] initWithModelRepository: [[self editingContext] modelRepository]];
     id<COItemGraph> items = [[self store] itemGraphForRevisionID: [aRevision revisionID]];
     [ctx setItemGraph: items];
     return ctx;

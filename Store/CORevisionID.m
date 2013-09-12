@@ -9,8 +9,8 @@
 + (CORevisionID *) revisionWithBackinStoreUUID: (ETUUID *)aUUID
                                   revisionUUID: (ETUUID *)revUUID
 {
-    return [[[self alloc] initWithPersistentRootBackingStoreUUID: aUUID
-                                                    revisionUUID: revUUID] autorelease];
+    return [[self alloc] initWithPersistentRootBackingStoreUUID: aUUID
+                                                    revisionUUID: revUUID];
 }
 
 - (id) initWithPersistentRootBackingStoreUUID: (ETUUID *)aUUID
@@ -19,18 +19,12 @@
     self = [super init];
     if (self != nil)
     {
-        backingStoreUUID_ = [aUUID retain];
-        revisionUUID_ = [revUUID retain];
+        backingStoreUUID_ = aUUID;
+        revisionUUID_ = revUUID;
     }
     return self;
 }
 
-- (void) dealloc
-{
-    [backingStoreUUID_ release];
-    [revisionUUID_ release];
-    [super dealloc];
-}
 
 - (BOOL) isEqual:(id)object
 {
@@ -62,17 +56,17 @@
 {
     NSArray *comps = [(NSString *)plist componentsSeparatedByString:@":"];
     
-    CORevisionID *result = [[[CORevisionID alloc] init] autorelease];
+    CORevisionID *result = [[CORevisionID alloc] init];
     
-    result->backingStoreUUID_ = [[ETUUID UUIDWithString: [comps objectAtIndex: 0]] retain];
-    result->revisionUUID_ = [[ETUUID UUIDWithString: [comps objectAtIndex: 1]] retain];
+    result->backingStoreUUID_ = [ETUUID UUIDWithString: [comps objectAtIndex: 0]];
+    result->revisionUUID_ = [ETUUID UUIDWithString: [comps objectAtIndex: 1]];
     
     return result;
 }
 
 - (id) copyWithZone:(NSZone *)zone
 {
-    return [self retain];
+    return self;
 }
 
 - (NSString *)description

@@ -17,9 +17,9 @@
 {
 	SUPERINIT;
 
-    ASSIGN(_workspaceStack, [[COUndoStackStore defaultStore] stackForName: @"workspace"]);
-    ASSIGN(_doc1Stack, [[COUndoStackStore defaultStore] stackForName: @"doc1"]);
-    ASSIGN(_doc2Stack, [[COUndoStackStore defaultStore] stackForName: @"doc2"]);
+    _workspaceStack =  [[COUndoStackStore defaultStore] stackForName: @"workspace"];
+    _doc1Stack =  [[COUndoStackStore defaultStore] stackForName: @"doc1"];
+    _doc2Stack =  [[COUndoStackStore defaultStore] stackForName: @"doc2"];
 
     [_workspaceStack clear];
     [_doc1Stack clear];
@@ -28,13 +28,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-    [_workspaceStack release];
-    [_doc1Stack release];
-    [_doc2Stack release];
-	[super dealloc];
-}
 
 - (void)testBasic
 {

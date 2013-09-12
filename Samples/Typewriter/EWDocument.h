@@ -43,4 +43,6 @@
 
 - (void) deleteBranch: (ETUUID *)aBranchUUID;
 
+- (void) commit;
+
 @end

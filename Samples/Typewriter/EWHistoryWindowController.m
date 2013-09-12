@@ -12,11 +12,6 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [persistentRoot_ release];
-    [super dealloc];
-}
 
 
 + (EWHistoryWindowController *) sharedController
@@ -37,7 +32,7 @@
                                                   object: persistentRoot_];
     
     COPersistentRoot *proot = [(EWDocument *)aDoc currentPersistentRoot];
-    ASSIGN(persistentRoot_, proot);
+    persistentRoot_ =  proot;
     
     [self updateWithProot: proot
                     store: [(EWDocument *)aDoc store]];

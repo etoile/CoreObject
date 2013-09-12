@@ -28,7 +28,7 @@
 	NSString *identifier;
 }
 
-@property (retain, nonatomic) NSString *identifier;
+@property (strong, nonatomic) NSString *identifier;
 
 /**
  * Returns YES.

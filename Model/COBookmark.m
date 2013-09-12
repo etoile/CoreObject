@@ -43,8 +43,8 @@
 {
 	NILARG_EXCEPTION_TEST(aURL);
 	SUPERINIT;
-	ASSIGN(_URL, aURL);
-	ASSIGN(_favIconData, [aURL favIconData]);
+	_URL =  aURL;
+	_favIconData =  [aURL favIconData];
 	return self;
 }
 
@@ -55,18 +55,10 @@
 	return [self initWithURL: URL];
 }
 
-- (void)dealloc
-{
-	DESTROY(_URL);
-	DESTROY(_lastVisitedDate);
-	DESTROY(_favIconData);
-	[super dealloc];
-}
-
 - (void)setURL: (NSURL *)aURL
 {
 	[self willChangeValueForProperty: @"URL"];
-	ASSIGN(_URL, aURL);
+	_URL =  aURL;
 	[self didChangeValueForProperty: @"URL"];
 }
 
@@ -79,20 +71,20 @@ support bookmark search based on URL text. */
 
 - (void)setSerializedURL: (NSString *)aURLString
 {
-	ASSIGN(_URL, [NSURL URLWithString: aURLString]);
+	_URL =  [NSURL URLWithString: aURLString];
 }
 
 - (void)setLastVisitedDate:(NSDate *)aDate
 {
 	[self willChangeValueForProperty: @"lastVisitedDate"];
-	ASSIGN(_lastVisitedDate, aDate);
+	_lastVisitedDate =  aDate;
 	[self didChangeValueForProperty: @"lastVisitedDate"];
 }
 
 - (void)setFavIconData: (NSData *)favIconData
 {
 	[self willChangeValueForProperty: @"favIconData"];
-	ASSIGN(_favIconData, favIconData);
+	_favIconData =  favIconData;
 	[self didChangeValueForProperty: @"favIconData"];
 }
 

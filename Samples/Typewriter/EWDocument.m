@@ -18,10 +18,10 @@
     assert(aRoot != nil);
     assert([aRoot rootObject] != nil);
     
-    ASSIGN(_title, aTitle);
-    ASSIGN(_persistentRoot, aRoot);
+    _title =  aTitle;
+    _persistentRoot =  aRoot;
     
-    EWUndoManager *myUndoManager = [[[EWUndoManager alloc] init] autorelease];
+    EWUndoManager *myUndoManager = [[EWUndoManager alloc] init];
     [myUndoManager setDelegate: self];
     [self setUndoManager: (NSUndoManager *)myUndoManager];
     
@@ -50,13 +50,11 @@
                                                     name: COPersistentRootDidChangeNotification
                                                   object: _persistentRoot];
 
-    [_persistentRoot release];
-    [super dealloc];
 }
 
 - (void)makeWindowControllers
 {
-    EWTypewriterWindowController *windowController = [[[EWTypewriterWindowController alloc] initWithWindowNibName: [self windowNibName]] autorelease];
+    EWTypewriterWindowController *windowController = [[EWTypewriterWindowController alloc] initWithWindowNibName: [self windowNibName]];
     [self addWindowController: windowController];
 }
 
@@ -178,7 +176,7 @@
 {
     assert(aMetadata != nil);
     
-    ASSIGN(_persistentRoot, aMetadata);
+    _persistentRoot =  aMetadata;
     [self loadStateToken: [[[_persistentRoot currentBranch] currentRevision] revisionID]];
 }
 
@@ -257,8 +255,8 @@
 
 + (void) pullFrom: (COPersistentRoot *)source into: (COPersistentRoot *)dest
 {
-    COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
-    COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
+    COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
+    COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
     
     id request2 = [client updateRequestForPersistentRoot: [dest persistentRootUUID]
                                                 serverID: @"server"

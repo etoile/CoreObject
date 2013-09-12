@@ -28,16 +28,9 @@
 
 - (id) copyWithZone: (NSZone *)aZone
 {
-	return [self retain];
+	return self;
 }
 
-- (void) dealloc
-{
-	[UUID release];
-	[attribute release];
-	[sourceIdentifier release];
-	[super dealloc];
-}
 
 - (BOOL) isEqualIgnoringSourceIdentifier: (id)other
 {

@@ -28,7 +28,7 @@ static ETUUID *rootUUID;
 
 - (COItemGraph *) prooBitemTree
 {
-    COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: rootUUID] autorelease];
+    COMutableItem *rootItem = [[COMutableItem alloc] initWithUUID: rootUUID];
     [rootItem setValue: @"prootB" forAttribute: @"name" type: kCOTypeString];
     
     return [COItemGraph itemGraphWithItemsRootFirst: A(rootItem)];
@@ -36,7 +36,7 @@ static ETUUID *rootUUID;
 
 - (COItemGraph *) prootAitemTree
 {
-    COMutableItem *rootItem = [[[COMutableItem alloc] initWithUUID: rootUUID] autorelease];
+    COMutableItem *rootItem = [[COMutableItem alloc] initWithUUID: rootUUID];
     [rootItem setValue: @"prootA" forAttribute: @"name" type: kCOTypeString];
     
     return [COItemGraph itemGraphWithItemsRootFirst: A(rootItem)];
@@ -47,16 +47,16 @@ static ETUUID *rootUUID;
     SUPERINIT;
     
     [store beginTransactionWithError: NULL];
-    ASSIGN(prootA, [store createPersistentRootWithInitialItemGraph: [self prootAitemTree]
+    prootA = [store createPersistentRootWithInitialItemGraph: [self prootAitemTree]
                                                                UUID: [ETUUID UUID]
                                                          branchUUID: [ETUUID UUID]
                                                            revisionMetadata: nil
-                                                              error: NULL]);
+                                                              error: NULL];
     
-    ASSIGN(prootB, [store createPersistentRootWithInitialRevision: [[prootA currentBranchInfo] currentRevisionID]
+    prootB = [store createPersistentRootWithInitialRevision: [[prootA currentBranchInfo] currentRevisionID]
                                                              UUID: [ETUUID UUID]
                                                        branchUUID: [ETUUID UUID]
-                                                            error: NULL]);
+                                                            error: NULL];
     
     CORevisionID *prootBRev = [store writeRevisionWithItemGraph: [self prooBitemTree]
                                                        metadata: nil
@@ -67,19 +67,13 @@ static ETUUID *rootUUID;
 
     [store setCurrentRevision: prootBRev tailRevision: nil forBranch: [prootB currentBranchUUID] ofPersistentRoot: [prootB UUID] error: NULL];
 
-    ASSIGN(prootB, [store persistentRootInfoForUUID: [prootB UUID]]);
+    prootB =  [store persistentRootInfoForUUID: [prootB UUID]];
     
     [store commitTransactionWithError: NULL];
     
     return self;
 }
 
-- (void) dealloc
-{
-    [prootA release];
-    [prootB release];
-    [super dealloc];
-}
 
 - (void) testBasic
 {

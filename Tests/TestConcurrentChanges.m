@@ -14,20 +14,14 @@
 - (id) init
 {
     self = [super init];
-    ASSIGN(persistentRoot, [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"]);
+    persistentRoot =  [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commit];
     
-    ASSIGN(testBranch, [[persistentRoot currentBranch] makeBranchWithLabel: @"test"]);
+    testBranch =  [[persistentRoot currentBranch] makeBranchWithLabel: @"test"];
     [ctx commit];
     return self;
 }
 
-- (void) dealloc
-{
-    [persistentRoot release];
-    [testBranch release];
-    [super dealloc];
-}
 
 - (void)testsDetectsStoreSetCurrentRevisionDistributedNotification
 {

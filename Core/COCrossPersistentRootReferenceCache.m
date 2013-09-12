@@ -21,12 +21,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [_objectToPersistentRoots release];
-    [_persistentRootToObjects release];
-    [super dealloc];
-}
 
 - (NSArray *) affectedObjectsForChangeInPersistentRoot: (ETUUID *)aPersistentRoot
 {

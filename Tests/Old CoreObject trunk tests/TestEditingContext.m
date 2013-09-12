@@ -24,8 +24,6 @@
 	UKNil([ctx2 store]);
 	/* In case, -latestRevisionNumber sent to a nil store doesn't behave correctly */
 	UKIntsEqual(0, [ctx2 latestRevisionNumber]);
-
-	DESTROY(ctx2);
 }
 
 - (NSSet *)basicProperties

@@ -27,7 +27,7 @@ static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
 
 - (COCommand *) inverse
 {
-    COCommandDeleteBranch *inverse = [[[COCommandDeleteBranch alloc] init] autorelease];
+    COCommandDeleteBranch *inverse = [[COCommandDeleteBranch alloc] init];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;

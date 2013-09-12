@@ -4,6 +4,8 @@
 
 #import "EWDocument.h"
 
+#import "COBranch+Private.h"
+
 @implementation EWHistoryGraphView
 
 - (id) initWithFrame:(NSRect)frame
@@ -24,11 +26,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [trackingRects release];
-    [super dealloc];
-}
 
 - (NSSet *) revisionIDsOnBranch: (COBranch *)aBranch
 {
@@ -67,10 +64,10 @@
         [allCommitsOnAllBranches unionSet: [self revisionIDsOnBranch: branch]];
     }
     
-    [self setGraphRenderer: [[[EWGraphRenderer alloc] initWithCommits: allCommitsOnAllBranches
+    [self setGraphRenderer: [[EWGraphRenderer alloc] initWithCommits: allCommitsOnAllBranches
                                                         branchCommits: [self revisionIDsOnBranch: aBranch]
                                                         currentCommit: [[aBranch currentRevision] revisionID]
-                                                                store: aStore] autorelease]];
+                                                                store: aStore]];
 }
 
 - (void) drawRect:(NSRect)dirtyRect
@@ -127,7 +124,7 @@
     }
     [trackingRects removeAllObjects];
     
-	ASSIGN(graphRenderer, aRenderer);
+	graphRenderer =  aRenderer;
 	
 	//NSLog(@"Graph renderer size: %@", NSStringFromSize([graphRenderer size]));
 	
@@ -148,13 +145,13 @@
 	for (CORevisionID *commit in [graphRenderer commits])
 	{
 		NSRect r = [graphRenderer rectForCommit: commit];
-		[self addToolTipRect:r owner:self userData:commit];
+		[self addToolTipRect:r owner:self userData:(__bridge void *)(commit)];
         
         // Does not retain userData. We must be careful that we keep
         // the objects returned by [graphRenderer commits] retained until the
         // tracking rect is cleared.
         
-        NSInteger tag = [self addTrackingRect:r owner:self userData:commit assumeInside:NO];
+        NSInteger tag = [self addTrackingRect:r owner:self userData:(__bridge void *)(commit) assumeInside:NO];
         [trackingRects addObject: [NSNumber numberWithInteger: tag]];
         
         NSLog(@"Adding tracking rect %ld", tag);
@@ -175,7 +172,7 @@
 	
 	if (nil != commit)
 	{
-		NSMenu *menu = [[[NSMenu alloc] initWithTitle: @""] autorelease];
+		NSMenu *menu = [[NSMenu alloc] initWithTitle: @""];
 
 //		{
 //			NSMenuItem *item = [[[NSMenuItem alloc] initWithTitle: @"Diff with Current Commit" 
@@ -186,17 +183,17 @@
 //		}		
 		
 		{
-			NSMenuItem *item = [[[NSMenuItem alloc] initWithTitle: @"Selective Undo" 
+			NSMenuItem *item = [[NSMenuItem alloc] initWithTitle: @"Selective Undo" 
 														   action: @selector(selectiveUndo:) 
-													keyEquivalent: @""] autorelease];
+													keyEquivalent: @""];
 			[item setRepresentedObject: commit];
 			[menu addItem: item];
 		}
 
 		{
-			NSMenuItem *item = [[[NSMenuItem alloc] initWithTitle: @"Selective Apply" 
+			NSMenuItem *item = [[NSMenuItem alloc] initWithTitle: @"Selective Apply" 
 														   action: @selector(selectiveApply:) 
-													keyEquivalent: @""] autorelease];
+													keyEquivalent: @""];
 			[item setRepresentedObject: commit];
 			[menu addItem: item];
 		}
@@ -204,9 +201,9 @@
 		[menu addItem: [NSMenuItem separatorItem]];
 		
 		{
-			NSMenuItem *item = [[[NSMenuItem alloc] initWithTitle: @"Switch To Commit" 
+			NSMenuItem *item = [[NSMenuItem alloc] initWithTitle: @"Switch To Commit" 
 														   action: @selector(switchToCommit:) 
-													keyEquivalent: @""] autorelease];
+													keyEquivalent: @""];
 			[item setRepresentedObject: commit];
 			[menu addItem: item];
 		}
@@ -241,7 +238,7 @@
 - (void)mouseEntered:(NSEvent *)theEvent
 {    
     CORevisionID *commit = [theEvent userData];
-    ASSIGN(mouseoverCommit, commit);
+    mouseoverCommit =  commit;
     [self setNeedsDisplay: YES];
     NSLog(@"show %@", commit);
     
@@ -255,7 +252,7 @@
 -(void)mouseExited:(NSEvent *)theEvent
 {
     NSLog(@"restore current state");
-    DESTROY(mouseoverCommit);
+    mouseoverCommit = nil;
     [self setNeedsDisplay: YES];
     
     

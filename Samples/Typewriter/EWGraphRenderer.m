@@ -54,11 +54,11 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
                  store: (COSQLiteStore*)aStore
 {
 	SUPERINIT;
-	ASSIGN(store, aStore);
+	store =  aStore;
     
-    ASSIGN(allCommitsSorted, [NSMutableArray arrayWithArray: [self sortedCommits: stateTokens]]);
-    ASSIGN(currentCommit_, currentCommit);
-    ASSIGN(branchCommits_, branchCommits);
+    allCommitsSorted =  [NSMutableArray arrayWithArray: [self sortedCommits: stateTokens]];
+    currentCommit_ =  currentCommit;
+    branchCommits_ =  branchCommits;
     
     [self layoutGraph];
 	return self;
@@ -69,14 +69,6 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 	return store;
 }
 
-- (void) dealloc
-{
-	[allCommitsSorted release];
-	[childrenForUUID release];
-	[levelForUUID release];
-	[store release];
-	[super dealloc];
-}
 
 - (CORevisionID*) parentForRevisonID: (CORevisionID*)aRevID
 {
@@ -93,7 +85,7 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 	// find children for each commit (retaining sorted order)
 	// this is the "display" graph
 		
-	ASSIGN(childrenForUUID, [NSMutableDictionary dictionaryWithCapacity: [allCommitsSorted count]]);
+	childrenForUUID =  [NSMutableDictionary dictionaryWithCapacity: [allCommitsSorted count]];
 	
 	for (CORevisionID *aCommit in allCommitsSorted)
 	{
@@ -167,7 +159,7 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 	// because it means you merged two projects that started from scratch with no common
 	// ancestor. but we should still support drawing graphs with that.
 
-	ASSIGN(levelForUUID, [NSMutableDictionary dictionary]);
+	levelForUUID =  [NSMutableDictionary dictionary];
 
 	NSInteger maxLevel = 0;
 	for (CORevisionID *root in roots)

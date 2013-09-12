@@ -16,8 +16,8 @@
 {
 	SUPERINIT;
     
-    ASSIGN(_testStack, [[COUndoStackStore defaultStore] stackForName: @"test"]);
-    ASSIGN(_setupStack, [[COUndoStackStore defaultStore] stackForName: @"setup"]);
+    _testStack =  [[COUndoStackStore defaultStore] stackForName: @"test"];
+    _setupStack =  [[COUndoStackStore defaultStore] stackForName: @"setup"];
     
     [_testStack clear];
     [_setupStack clear];
@@ -25,12 +25,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-    [_testStack release];
-    [_setupStack release];
-    [super dealloc];
-}
 
 /* The custom track uses the root object commit track to undo and redo, no 
 selective undo is involved. */

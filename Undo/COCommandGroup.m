@@ -45,7 +45,7 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 
 - (COCommand *) inverse
 {
-    COCommandGroup *inverse = [[[COCommandGroup alloc] init] autorelease];
+    COCommandGroup *inverse = [[COCommandGroup alloc] init];
     
     NSMutableArray *edits = [NSMutableArray array];
     for (COCommand *subEdit in _contents)

@@ -73,7 +73,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
     /**
      * Weak reference
      */
-	COEditingContext *_parentContext;
+	COEditingContext *__weak _parentContext;
     
     /**
      * State of the persistent root and its branches as loaded from the store.
@@ -121,7 +121,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * For now, persistent root replication accross distinct CoreObject stores 
  * is not supported and might never be.
  */
-@property (nonatomic, readonly) ETUUID *persistentRootUUID;
+@property (weak, nonatomic, readonly) ETUUID *persistentRootUUID;
 
 /**
  * The persistent root deletion status.
@@ -140,7 +140,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * call -setEditingBranch: explicitly, then that branch will be used and
  * -editingBranch will no longer track -currentBranch.
  */
-@property (nonatomic, readwrite, retain) COBranch *editingBranch;
+@property (nonatomic, readwrite, strong) COBranch *editingBranch;
 
 /**
  * The branch that opens when double-clicking a persistent root to edit it.
@@ -150,15 +150,15 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * Changing this value stages it for commit; upon the next -commit,
  * the change is saved to disk and replicated to other applications.
  */
-@property (nonatomic, readwrite, retain) COBranch *currentBranch;
+@property (nonatomic, readwrite, strong) COBranch *currentBranch;
 
-@property (nonatomic, readonly) NSSet *branches;
+@property (weak, nonatomic, readonly) NSSet *branches;
 
 // TODO: Refactor to branchesPendingInsertion, branchesPendingDeletion, branchesPendingUndeletion.
 // Add deletedBranches property listing the branches
 // that are marked as deleted on disk.
-@property (nonatomic, readonly) NSSet *insertedBranches;
-@property (nonatomic, readonly) NSSet *deletedBranches;
+@property (weak, nonatomic, readonly) NSSet *insertedBranches;
+@property (weak, nonatomic, readonly) NSSet *deletedBranches;
 
 - (COBranch *)branchForUUID: (ETUUID *)aUUID;
 
@@ -177,13 +177,13 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * The parent context is managed by the user.
  */
-@property (nonatomic, readonly) COEditingContext *parentContext;
+@property (weak, nonatomic, readonly) COEditingContext *parentContext;
 /**
  * Returns -parentContext.
  *
  * See also -[COPersistentObjectContext editingContext].
  */
-@property (nonatomic, readonly) COEditingContext *editingContext;
+@property (weak, nonatomic, readonly) COEditingContext *editingContext;
 
 
 /** @taskunit Object Access and Loading */
@@ -222,7 +222,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * Shorthand for [[[self editingBranch] objectGraphContext] rootObject]
  */
-@property (nonatomic, retain) id rootObject;
+@property (nonatomic, strong) id rootObject;
 
 /**
  * Shorthand for [[[self editingBranch] objectGraphContext] insertObjectWithEntityName:]
@@ -237,17 +237,17 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /**
  * Shortcut for <code>[[self editingBranch] revision]</code>
  */
-@property (nonatomic, retain) CORevision *revision;
+@property (nonatomic, strong) CORevision *revision;
 
 /**
  * Shorthand for [[self editingContext] store]
  */
-@property (nonatomic, readonly) COSQLiteStore *store;
+@property (weak, nonatomic, readonly) COSQLiteStore *store;
 
 /**
  * Returns the object graph for the edited branch
  */
-@property (nonatomic, readonly) COObjectGraphContext *objectGraphContext;
+@property (weak, nonatomic, readonly) COObjectGraphContext *objectGraphContext;
 
 
 /** @taskunit Committing Changes */
@@ -303,6 +303,6 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * Reason for deprecating: redundancy, unused.
  */
-@property (nonatomic, readonly) ETUUID *rootObjectUUID;
+@property (weak, nonatomic, readonly) ETUUID *rootObjectUUID;
 
 @end

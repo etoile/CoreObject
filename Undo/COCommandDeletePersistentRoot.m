@@ -9,7 +9,7 @@
 
 - (COCommand *) inverse
 {
-    COCommandUndeletePersistentRoot *inverse = [[[COCommandUndeletePersistentRoot alloc] init] autorelease];
+    COCommandUndeletePersistentRoot *inverse = [[COCommandUndeletePersistentRoot alloc] init];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;

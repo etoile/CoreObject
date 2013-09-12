@@ -210,7 +210,7 @@
  */
 - (NSURL*)URL;
 
-@property (readonly, nonatomic) ETUUID *UUID;
+@property (strong, readonly, nonatomic) ETUUID *UUID;
 
 
 /** @taskunit Revision Reading */

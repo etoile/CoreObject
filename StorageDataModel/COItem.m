@@ -37,7 +37,6 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 	if (!mutable)
 	{
 		NSDictionary *immutable = [[NSDictionary alloc] initWithDictionary: result];
-		[result release];
 		return immutable;
 	}
 	return result;
@@ -56,7 +55,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	NILARG_EXCEPTION_TEST(valuesForAttributes);
 		
 	SUPERINIT;
-	ASSIGN(uuid, aUUID);
+	uuid =  aUUID;
 	// FIXME: These casts are not truly elegant
 	types = (NSMutableDictionary *)[[NSDictionary alloc] initWithDictionary: typesForAttributes];
 	values = (NSMutableDictionary *)copyValueDictionary(valuesForAttributes, NO);
@@ -69,20 +68,13 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	return self;
 }
 
-- (void) dealloc
-{
-	[uuid release];
-	[types release];
-	[values release];
-	[super dealloc];
-}
 
 + (COItem *) itemWithTypesForAttributes: (NSDictionary *)typesForAttributes
 						 valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
-	return [[[self alloc] initWithUUID: [ETUUID UUID]
+	return [[self alloc] initWithUUID: [ETUUID UUID]
 					typesForAttributes: typesForAttributes
-				   valuesForAttributes: valuesForAttributes] autorelease];
+				   valuesForAttributes: valuesForAttributes];
 }
 
 - (ETUUID *)UUID
@@ -275,7 +267,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 - (id) copyWithZone: (NSZone *)zone
 {
-	return [self retain];
+	return self;
 }
 
 - (id) mutableCopyWithZone: (NSZone *)zone
@@ -314,7 +306,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 			}
 			else
 			{ 
-				id newCollection = [[value mutableCopy] autorelease];
+				id newCollection = [value mutableCopy];
 				[newCollection removeAllObjects];
 				
 				for (ETUUID *UUIDValue in value)
@@ -347,7 +339,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 			}
 			else
 			{ 
-				id newCollection = [[value mutableCopy] autorelease];
+				id newCollection = [value mutableCopy];
 				[newCollection removeAllObjects];
 				
 				for (id primitiveValue in value)
@@ -395,7 +387,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	NILARG_EXCEPTION_TEST(valuesForAttributes);
 	
 	SUPERINIT;
-	ASSIGN(uuid, aUUID);
+	uuid =  aUUID;
 	types = [[NSMutableDictionary alloc] initWithDictionary: typesForAttributes];
 	values = (NSMutableDictionary *)copyValueDictionary(valuesForAttributes, YES);
 	
@@ -421,18 +413,18 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 + (COMutableItem *) item
 {
-	return [[[self alloc] init] autorelease];
+	return [[self alloc] init];
 }
 
 + (COMutableItem *) itemWithUUID: (ETUUID *)aUUID
 {
-	return [[(COMutableItem *)[self alloc] initWithUUID: aUUID] autorelease];
+	return [(COMutableItem *)[self alloc] initWithUUID: aUUID];
 }
 
 - (void) setUUID: (ETUUID *)aUUID
 {
 	NILARG_EXCEPTION_TEST(aUUID);
-	ASSIGN(uuid, aUUID);
+	uuid =  aUUID;
 }
 
 - (void) setValue: (id)aValue
@@ -479,7 +471,6 @@ toUnorderedAttribute: (NSString*)anAttribute
 	[self setValue: set
 	  forAttribute: anAttribute
 			  type: aType];
-	[set release];
 }
 
 - (void)   addObject: (id)aValue
@@ -507,7 +498,6 @@ toUnorderedAttribute: (NSString*)anAttribute
 	[self setValue: array
 	  forAttribute: anAttribute
 			  type: aType];
-	[array release];
 }
 
 - (void) addObject: (id)aValue
@@ -519,7 +509,7 @@ toUnorderedAttribute: (NSString*)anAttribute
     if (![container isKindOfClass: [NSMutableArray class]]
         && ![container isKindOfClass: [NSMutableSet class]])
     {
-        container = [[container mutableCopy] autorelease];
+        container = [container mutableCopy];
         [(NSMutableDictionary *)values setObject: container forKey: anAttribute];
         
     }

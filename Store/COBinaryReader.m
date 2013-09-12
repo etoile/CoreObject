@@ -72,7 +72,6 @@ void co_reader_read(const unsigned char *bytes, size_t length, void *context, co
                                                          length: dataLen
                                                        encoding: NSUTF8StringEncoding];
                 callbacks.co_read_string(context, str);
-                [str release];
                 pos += dataLen;
                 break;
             }
@@ -85,7 +84,6 @@ void co_reader_read(const unsigned char *bytes, size_t length, void *context, co
                                                          length: dataLen
                                                        encoding: NSUTF8StringEncoding];
                 callbacks.co_read_string(context, str);
-                [str release];
                 pos += dataLen;
                 break;
             }
@@ -109,7 +107,6 @@ void co_reader_read(const unsigned char *bytes, size_t length, void *context, co
             {
                 ETUUID *uuid = [[ETUUID alloc] initWithUUID: bytes + pos];
                 callbacks.co_read_uuid(context, uuid);
-                [uuid release];
                 pos += 16;
                 break;
             }

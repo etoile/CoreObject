@@ -19,19 +19,12 @@
 {	
 	SUPERINIT;
 	NILARG_EXCEPTION_TEST(aRoot);
-	ASSIGN(persistentRoot_, aRoot);
-	ASSIGN(branch_, aBranch);
-	ASSIGN(embeddedObject_, anObject);
+	persistentRoot_ =  aRoot;
+	branch_ =  aBranch;
+	embeddedObject_ =  anObject;
 	return self;
 }
 
-- (void)dealloc
-{
-	[persistentRoot_ release];
-	[branch_ release];
-	[embeddedObject_ release];
-	[super dealloc];
-}
 
 + (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
 {
@@ -48,7 +41,7 @@
 							 branch: (ETUUID*)aBranch
 					embdeddedObject: (ETUUID *)anObject
 {
-	return [[[self alloc] initWithPersistentRoot: aRoot branch: aBranch embdeddedObject: anObject] autorelease];
+	return [[self alloc] initWithPersistentRoot: aRoot branch: aBranch embdeddedObject: anObject];
 }
 
 + (COPath *) pathWithString: (NSString*) pathString
@@ -110,7 +103,7 @@
 
 - (id) copyWithZone: (NSZone *)zone
 {
-	return [self retain];
+	return self;
 }
 
 - (NSString *) stringValue

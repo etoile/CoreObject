@@ -38,17 +38,12 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[diffDictStorage release];
-	[super dealloc];
-}
 
 - (id) copyWithZone:(NSZone *)zone
 {
 	CODiffDictionary *result = [[[self class] alloc] init];
 	
-	ASSIGN(result->diffDictStorage, [[NSMutableSet alloc] initWithSet: diffDictStorage copyItems: YES]);
+	result->diffDictStorage =  [[NSMutableSet alloc] initWithSet: diffDictStorage copyItems: YES];
 	
 	//for (COUUIDAttributeTuple *tuple in dict)
 	//{
@@ -155,11 +150,6 @@
 	return aCopy;
 }
 
-- (void) dealloc
-{
-	[editsForSourceIdentifier release];
-	[super dealloc];
-}
 
 - (COItemGraphDiff *) parentDiff
 {
@@ -263,8 +253,8 @@
 			   newRootUUID: (ETUUID*)aNewRoot
 {
 	SUPERINIT;
-	ASSIGN(oldRoot, anOldRoot);
-	ASSIGN(newRoot, aNewRoot);
+	oldRoot =  anOldRoot;
+	newRoot =  aNewRoot;
 	diffDict = [[CODiffDictionary alloc] init];
 	embeddedItemInsertionConflicts = [[NSMutableSet alloc] init];
 	equalEditConflicts = [[NSMutableSet alloc] init];
@@ -274,18 +264,6 @@
 	return self;
 }
 
-- (void) dealloc
-{
-	[oldRoot release];
-	[newRoot release];
-	[diffDict release];
-	[embeddedItemInsertionConflicts release];
-	[equalEditConflicts release];
-	[sequenceEditConflicts release];
-	[editTypeConflicts release];
-	[valueConflicts release];
-	[super dealloc];
-}
 
 - (id) copyWithZone:(NSZone *)zone
 {
@@ -374,7 +352,6 @@
 																   type: [[info objectForKey: @"type"] intValue]
 																objects: anArray];
 	[self addEdit: op];
-	[op release];
 }
 
 - (void)recordDeletionWithRange: (NSRange)aRange
@@ -385,7 +362,6 @@
 													 sourceIdentifier: [info objectForKey: @"sourceIdentifier"]
 																range: aRange];
 	[self addEdit: op];
-	[op release];
 }
 
 - (void)recordModificationWithRange: (NSRange)aRange
@@ -399,7 +375,6 @@
 																		 type: [[info objectForKey: @"type"] intValue]
 																	  objects: anArray];
 	[self addEdit: op];
-	[op release];
 }
 
 // end CODiffArraysDelegate
@@ -408,28 +383,24 @@
 {
 	COSetAttribute *op = [[COSetAttribute alloc] initWithUUID: aUUID attribute: anAttribute sourceIdentifier: aSourceIdentifier type: aType value: aValue];
 	[self addEdit: op];
-	[op release];
 }
 
 - (void) _recordDeleteAttribute: (NSString*)anAttribute UUID: (ETUUID *)aUUID sourceIdentifier: (id)aSourceIdentifier
 {
 	CODeleteAttribute *op = [[CODeleteAttribute alloc] initWithUUID: aUUID attribute: anAttribute sourceIdentifier: aSourceIdentifier];
 	[self addEdit: op];
-	[op release];
 }
 
 - (void) _recordSetInsertionOfValue: (id)aValue type: (COType)aType forAttribute: (NSString*)anAttribute UUID: (ETUUID *)aUUID sourceIdentifier: (id)aSourceIdentifier
 {
 	COSetInsertion *op = [[COSetInsertion alloc] initWithUUID: aUUID attribute: anAttribute sourceIdentifier: aSourceIdentifier type: aType object: aValue];
 	[self addEdit: op];
-	[op release];
 }
 
 - (void) _recordSetDeletionOfValue: (id)aValue type: (COType)aType forAttribute: (NSString*)anAttribute UUID: (ETUUID *)aUUID sourceIdentifier: (id)aSourceIdentifier
 {
 	COSetDeletion *op = [[COSetDeletion alloc] initWithUUID: aUUID attribute: anAttribute sourceIdentifier: aSourceIdentifier type: aType object: aValue];
 	[self addEdit: op];
-	[op release];
 }
 
 
@@ -550,8 +521,8 @@
 					withItemTree: (COItemGraph *)b
                 sourceIdentifier: (id)aSource
 {
-	COItemGraphDiff *result = [[[self alloc] initWithOldRootUUID: [a rootItemUUID]
-												   newRootUUID: [b rootItemUUID]] autorelease];
+	COItemGraphDiff *result = [[self alloc] initWithOldRootUUID: [a rootItemUUID]
+												   newRootUUID: [b rootItemUUID]];
 
 	for (ETUUID *aUUID in [b itemUUIDs])
 	{
@@ -725,11 +696,11 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	
 	for (ETUUID *modifiedUUID in [diffDict allEditedUUIDs])
 	{
-		COMutableItem *item = [[[dest itemForUUID: modifiedUUID] mutableCopy] autorelease];
+		COMutableItem *item = [[dest itemForUUID: modifiedUUID] mutableCopy];
 		
 		if (item == nil)
 		{
-			item = [[[COMutableItem alloc] initWithUUID: modifiedUUID] autorelease];
+			item = [[COMutableItem alloc] initWithUUID: modifiedUUID];
 		}
 		
 		for (NSString *modifiedAttribute in [diffDict modifiedAttributesForUUID: modifiedUUID])
@@ -748,7 +719,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (COItemGraph *) itemTreeWithDiffAppliedToItemGraph: (id<COItemGraph>)aGraph
 {
-    COItemGraph *result = [[[COItemGraph alloc] initWithItemGraph: aGraph] autorelease];    
+    COItemGraph *result = [[COItemGraph alloc] initWithItemGraph: aGraph];    
     [self applyTo: result];
     return result;
 }
@@ -770,7 +741,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (COItemGraphDiff *)itemTreeDiffByMergingWithDiff: (COItemGraphDiff *)other
 {
-	COItemGraphDiff *result = [[self copy] autorelease];
+	COItemGraphDiff *result = [self copy];
 	[result mergeWith: other];
 	return result;
 }
@@ -866,7 +837,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	
 	if (conflict == nil)
 	{
-		conflict = [[[COItemGraphConflict alloc] initWithParentDiff: self] autorelease];
+		conflict = [[COItemGraphConflict alloc] initWithParentDiff: self];
 		[conflict addEdit: existingEdit];
 		[aSet addObject: conflict];
 	}

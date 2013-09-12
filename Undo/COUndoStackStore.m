@@ -28,12 +28,12 @@ NSString * const kCORedoStack = @"redo";
 
 - (COUndoStack *) stackForName: (NSString *)aName
 {
-    return [[[COUndoStack alloc] initWithStore: self name: aName] autorelease];
+    return [[COUndoStack alloc] initWithStore: self name: aName];
 }
 
 - (COUndoStack *) stackForPattern: (NSString *)aPattern
 {
-    return [[[COPatternUndoStack alloc] initWithStore: self name: aPattern] autorelease];
+    return [[COPatternUndoStack alloc] initWithStore: self name: aPattern];
 }
 
 - (id) init
@@ -74,8 +74,6 @@ NSString * const kCORedoStack = @"redo";
 - (void) dealloc
 {
     [_db close];
-    [_db release];
-    [super dealloc];
 }
 
 - (NSSet *) stackNames

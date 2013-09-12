@@ -33,7 +33,7 @@ extern NSString * const kCOBranchLabel;
     /**
      * Weak reference
      */
-	COPersistentRoot *_persistentRoot;
+	COPersistentRoot *__weak _persistentRoot;
 
     BOOL _isCreated;
     
@@ -86,7 +86,7 @@ extern NSString * const kCOBranchLabel;
  *
  * The UUID is never nil.
  */
-@property (readonly, nonatomic) ETUUID *UUID;
+@property (strong, readonly, nonatomic) ETUUID *UUID;
 /**
  * The branch label (used as the branch name in most cases).
  */
@@ -118,7 +118,7 @@ extern NSString * const kCOBranchLabel;
  *
  * For a cheap copy, the parent branch is never nil.
  */
-@property (readonly, nonatomic) COBranch *parentBranch;
+@property (strong, readonly, nonatomic) COBranch *parentBranch;
 /**
  * The revision at which the receiver was forked from the parent branch.
  *
@@ -129,13 +129,13 @@ extern NSString * const kCOBranchLabel;
  * FIXME: The name "parent" is confusing, it is not the same as the parent of
  * a revision. In COSQLiteStore's terminology this is the "tail" of the branch.
  */
-@property (readonly, nonatomic) CORevision *parentRevision;
+@property (strong, readonly, nonatomic) CORevision *parentRevision;
 /**
  * The revision bound to the state loaded in the object graph context.
  *
  * If the branch is uncommitted, the current revision is nil.
  */
-@property (readwrite, retain, nonatomic) CORevision *currentRevision;
+@property (readwrite, strong, nonatomic) CORevision *currentRevision;
 
 - (void)reloadAtRevision: (CORevision *)revision;
 
@@ -146,11 +146,11 @@ extern NSString * const kCOBranchLabel;
 /**
  * The editing context owning the branch's persistent root
  */
-@property (readonly, nonatomic) COEditingContext *editingContext;
+@property (weak, readonly, nonatomic) COEditingContext *editingContext;
 /**
  * The persistent root owning the branch.
  */
-@property (readonly, nonatomic) COPersistentRoot *persistentRoot;
+@property (weak, readonly, nonatomic) COPersistentRoot *persistentRoot;
 /**
  * The object graph context owned by the branch.
  */
@@ -158,7 +158,7 @@ extern NSString * const kCOBranchLabel;
 /**
  * The root object of the object graph context owned by the branch.
  */
-@property (nonatomic, retain) id rootObject;
+@property (nonatomic, strong) id rootObject;
 
 /**
  * @taskunit Pending Changes
@@ -234,7 +234,7 @@ extern NSString * const kCOBranchLabel;
  * set. If it is set at commit time, records the _current revision_ of the
  * mergingBranch as the merge parent of the new commit.
  */
-@property (readwrite, nonatomic, retain) COBranch *mergingBranch;
+@property (readwrite, nonatomic, strong) COBranch *mergingBranch;
 
 - (COMergeInfo *) mergeInfoForMergingBranch: (COBranch *)aBranch;
 

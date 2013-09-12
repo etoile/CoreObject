@@ -11,11 +11,11 @@
     /**
      * Weak reference.
      */
-    COObject *_sourceObject;
+    COObject *__weak _sourceObject;
     NSString *_sourceProperty;
 }
 
-@property (readwrite, nonatomic, assign) COObject *sourceObject;
+@property (readwrite, nonatomic, weak) COObject *sourceObject;
 @property (readwrite, nonatomic, copy) NSString *sourceProperty;
 @property (readwrite, nonatomic, copy) NSString *targetProperty;
 
@@ -27,12 +27,6 @@
 @synthesize sourceProperty = _sourceProperty;
 @synthesize targetProperty = _targetProperty;
 
-- (void) dealloc
-{
-    [_sourceProperty release];
-    [_targetProperty release];
-    [super dealloc];
-}
 
 @end
 
@@ -48,11 +42,6 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [_cachedRelationships release];
-    [super dealloc];
-}
 
 - (NSSet *) referringObjectsForPropertyInTarget: (NSString *)aProperty
 {
@@ -145,7 +134,6 @@
     record.sourceProperty = aSource;
     record.targetProperty = aTarget;
     [_cachedRelationships addObject: record];
-    [record release];
 }
 
 @end

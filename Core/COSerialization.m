@@ -397,9 +397,9 @@ serialization. */
     [values setObject: [[self entityDescription] name] forKey: kCOObjectEntityNameProperty];
     [types setObject: [NSNumber numberWithInt: kCOTypeString] forKey: kCOObjectEntityNameProperty];
     
-	return [[[COItem alloc] initWithUUID: [self UUID]
+	return [[COItem alloc] initWithUUID: [self UUID]
                       typesForAttributes: types
-                     valuesForAttributes: values] autorelease];
+                     valuesForAttributes: values];
 }
 
 /* Returns a NSValue object for a scalar string value if possible.
@@ -685,7 +685,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
             if ([serializedValue isKindOfClass: [NSSet class]]
                 || [serializedValue isKindOfClass: [NSArray class]])
             {
-                serializedValue = [[serializedValue mutableCopy] autorelease];
+                serializedValue = [serializedValue mutableCopy];
             }
 
             [_relationshipsAsCOPathOrETUUID setObject: serializedValue

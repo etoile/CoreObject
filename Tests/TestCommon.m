@@ -20,11 +20,6 @@ NSString * const kCOParent = @"parentContainer";
     return self;
 }
 
-- (void) dealloc
-{
-    [store release];
-    [super dealloc];
-}
 
 - (void) deleteStore
 {
@@ -47,10 +42,5 @@ NSString * const kCOParent = @"parentContainer";
     return self;
 }
 
-- (void) dealloc
-{
-    [ctx release];
-	[super dealloc];
-}
 
 @end

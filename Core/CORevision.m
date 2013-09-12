@@ -28,24 +28,17 @@
 {
     CORevisionInfo *revInfo = [aStore revisionInfoForRevisionID: anID];
     
-    return [[[CORevision alloc] initWithStore: aStore
-                                 revisionInfo: revInfo] autorelease];
+    return [[CORevision alloc] initWithStore: aStore
+                                 revisionInfo: revInfo];
 }
 
 - (id)initWithStore: (COSQLiteStore *)aStore
        revisionInfo: (CORevisionInfo *)aRevInfo
 {
 	SUPERINIT;
-	ASSIGN(store, aStore);
-	ASSIGN(revisionInfo, aRevInfo);
+	store =  aStore;
+	revisionInfo =  aRevInfo;
 	return self;
-}
-
-- (void)dealloc
-{
-	DESTROY(store);
-	DESTROY(revisionInfo);
-	[super dealloc];
 }
 
 - (BOOL)isEqual: (id)rhs
@@ -82,7 +75,7 @@
     }
     
 	CORevisionInfo *parentRevInfo = [store revisionInfoForRevisionID: [revisionInfo parentRevisionID]];
-	return [[[[self class] alloc] initWithStore: store revisionInfo: parentRevInfo] autorelease];
+	return [[[self class] alloc] initWithStore: store revisionInfo: parentRevInfo];
 }
 
 - (ETUUID *)persistentRootUUID

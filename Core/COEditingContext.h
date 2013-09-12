@@ -119,7 +119,7 @@
  * deleted on disk), plus those pending insertion and undeletion (and minus 
  * those pending deletion).
  */
-@property (nonatomic, readonly) NSSet *persistentRoots;
+@property (weak, nonatomic, readonly) NSSet *persistentRoots;
 /**
  * Returns persistent roots marked as deleted on disk, excluding those that
  * are pending undeletion.
@@ -133,7 +133,7 @@
 /**
  * Returns the store for which the editing context acts a working copy.
  */
-@property (nonatomic, readonly) COSQLiteStore *store;
+@property (strong, nonatomic, readonly) COSQLiteStore *store;
 /**
  * Returns the model description repository, which holds the metamodel that 
  * describes all the persistent objects editable in the context.
@@ -269,6 +269,6 @@
  *
  * See also -[COPersistentObjectContext editingContext].
  */
-@property (nonatomic, readonly) COEditingContext *editingContext;
+@property (weak, nonatomic, readonly) COEditingContext *editingContext;
 
 @end

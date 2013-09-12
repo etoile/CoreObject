@@ -12,17 +12,17 @@
     BOOL deleted_;
 }
 
-@property (readwrite, nonatomic, retain) ETUUID *UUID;
+@property (readwrite, nonatomic, strong) ETUUID *UUID;
 
 /**
  * The oldest revision on the branch. Indicates "where a feature branch was
  * forked from master"
  */
-@property (readwrite, nonatomic, retain) CORevisionID *tailRevisionID;
+@property (readwrite, nonatomic, strong) CORevisionID *tailRevisionID;
 /**
  * The current revision of this branch.
  */
-@property (readwrite, nonatomic, retain) CORevisionID *currentRevisionID;
+@property (readwrite, nonatomic, strong) CORevisionID *currentRevisionID;
 /**
  * Metadata, like the user-facing name of the branch.
  * Note that branches have metadata while persistent roots do not. Persistent
@@ -30,7 +30,7 @@
  * (If there is a real use case for unversioned persistent root metadata,
  *  we can easily re-add it)
  */
-@property (readwrite, nonatomic, retain) NSDictionary *metadata;
+@property (readwrite, nonatomic, strong) NSDictionary *metadata;
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
 
 /**

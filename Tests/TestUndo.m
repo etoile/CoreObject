@@ -18,10 +18,10 @@
 {
     SUPERINIT;
     
-    ASSIGN(_testStack, [[COUndoStackStore defaultStore] stackForName: @"test"]);
-    ASSIGN(_setupStack, [[COUndoStackStore defaultStore] stackForName: @"setup"]);
-    ASSIGN(_rootEditStack, [[COUndoStackStore defaultStore] stackForName: @"rootEdit"]);
-    ASSIGN(_childEditStack, [[COUndoStackStore defaultStore] stackForName: @"childEdit"]);
+    _testStack =  [[COUndoStackStore defaultStore] stackForName: @"test"];
+    _setupStack =  [[COUndoStackStore defaultStore] stackForName: @"setup"];
+    _rootEditStack =  [[COUndoStackStore defaultStore] stackForName: @"rootEdit"];
+    _childEditStack =  [[COUndoStackStore defaultStore] stackForName: @"childEdit"];
     
     [_testStack clear];
     [_setupStack clear];
@@ -31,14 +31,6 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [_testStack release];
-    [_setupStack release];
-    [_rootEditStack release];
-    [_childEditStack release];
-    [super dealloc];
-}
 
 - (void)testUndoSetCurrentVersionForBranchBasic
 {

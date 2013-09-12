@@ -39,14 +39,6 @@ typedef enum {
     return self;
 }
 
-- (void) dealloc
-{
-    [uuid release];
-    [values release];
-    [types release];
-    [currentProperty release];
-    [super dealloc];
-}
 
 @end
 
@@ -59,7 +51,7 @@ static NSNull *NSNullCached;
 {
     if (self == [COItem class])
     {
-        NSNullCached = [[NSNull null] retain];
+        NSNullCached = [NSNull null];
     }
 }
 
@@ -168,7 +160,7 @@ static void co_read_object_value(COReaderState *state, id obj) {
 
 static void co_read_int64(void *ctx, int64_t val)
 {
-    COReaderState *state = (COReaderState *)ctx;
+    COReaderState *state = (__bridge COReaderState *)ctx;
     switch (state->state)
     {
         case co_reader_expect_value:
@@ -187,7 +179,7 @@ static void co_read_int64(void *ctx, int64_t val)
 }
 static void co_read_double(void *ctx, double val)
 {
-    COReaderState *state = (COReaderState *)ctx;
+    COReaderState *state = (__bridge COReaderState *)ctx;
     switch (state->state)
     {
         case co_reader_expect_value:
@@ -201,7 +193,7 @@ static void co_read_double(void *ctx, double val)
 
 static void co_read_string(void *ctx, NSString *val)
 {
-    COReaderState *state = (COReaderState *)ctx;
+    COReaderState *state = (__bridge COReaderState *)ctx;
     switch (state->state)
     {
         case co_reader_expect_value:
@@ -219,11 +211,11 @@ static void co_read_string(void *ctx, NSString *val)
             }
             break;
         case co_reader_expect_property:
-            ASSIGN(state->currentProperty, val);
+            state->currentProperty =  val;
             state->state = co_reader_expect_type;
             break;
         case co_reader_expect_object_schemaname:
-            ASSIGN(state->schemaName, val);
+            state->schemaName =  val;
             state->state = co_reader_expect_property;
             break;
         default:
@@ -234,14 +226,14 @@ static void co_read_string(void *ctx, NSString *val)
 
 static void co_read_uuid(void *ctx, ETUUID *uuid)
 {
-    COReaderState *state = (COReaderState *)ctx;
+    COReaderState *state = (__bridge COReaderState *)ctx;
     switch (state->state)
     {
         case co_reader_expect_value:
             co_read_object_value(state, uuid);
             break;
         case co_reader_expect_object_uuid:
-            ASSIGN(state->uuid, uuid);
+            state->uuid =  uuid;
             state->state = co_reader_expect_object_schemaname;
             break;
         default:
@@ -252,7 +244,7 @@ static void co_read_uuid(void *ctx, ETUUID *uuid)
 
 static void co_read_bytes(void *ctx, const unsigned char *val, size_t size)
 {
-    COReaderState *state = (COReaderState *)ctx;
+    COReaderState *state = (__bridge COReaderState *)ctx;
     switch (state->state)
     {
         case co_reader_expect_value:
@@ -273,7 +265,7 @@ static void co_read_end_object(void *ctx)
 
 static void co_read_begin_array(void *ctx)
 {
-    COReaderState *state = (COReaderState *)ctx;
+    COReaderState *state = (__bridge COReaderState *)ctx;
     state->isReadingMultivalue = YES;
     
     assert(COTypeIsMultivalued(state->currentType));
@@ -289,27 +281,27 @@ static void co_read_begin_array(void *ctx)
 }
 static void co_read_end_array(void *ctx)
 {
-    COReaderState *state = (COReaderState *)ctx;
+    COReaderState *state = (__bridge COReaderState *)ctx;
     state->isReadingMultivalue = NO;
     
     // Save the value
     [state->values setObject: state->multivalue
                       forKey: state->currentProperty];
-    ASSIGN(state->multivalue, nil);
+    state->multivalue =  nil;
     
     // Do state transition
     state->state = co_reader_expect_property;
 }
 static void co_read_null(void *ctx)
 {
-    COReaderState *state = (COReaderState *)ctx;
+    COReaderState *state = (__bridge COReaderState *)ctx;
     switch (state->state)
     {
         case co_reader_expect_value:
             co_read_object_value(state, NSNullCached);
             break;            
         case co_reader_expect_object_schemaname:
-            ASSIGN(state->schemaName, nil);
+            state->schemaName =  nil;
             state->state = co_reader_expect_property;
             break;
         default:
@@ -336,15 +328,14 @@ static void co_read_null(void *ctx)
     };
     co_reader_read([aData bytes],
                    [aData length],
-                   state,
+                   (__bridge void *)state,
                    cb);
     
     SUPERINIT;
-    ASSIGN(uuid, state->uuid);
-    ASSIGN(types, state->types);
-    ASSIGN(values, state->values);
-    ASSIGN(schemaName, state->schemaName);
-    [state release];
+    uuid =  state->uuid;
+    types =  state->types;
+    values =  state->values;
+    schemaName =  state->schemaName;
     
     return self;
 }

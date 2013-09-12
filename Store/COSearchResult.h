@@ -9,7 +9,7 @@
     ETUUID *embeddedObjectUUID_;
 }
 
-@property (nonatomic, readwrite, retain) CORevisionID *revision;
-@property (nonatomic, readwrite, retain) ETUUID *embeddedObjectUUID;
+@property (nonatomic, readwrite, strong) CORevisionID *revision;
+@property (nonatomic, readwrite, strong) ETUUID *embeddedObjectUUID;
 
 @end

@@ -18,17 +18,11 @@
     {
         [uss clearStacksForName: stack];
     }
-    [uss release];
 
     _store = [[COUndoStackStore alloc] init];
     return self;
 }
 
-- (void) dealloc
-{
-    [_store release];
-    [super dealloc];
-}
 
 - (void) testBasic
 {

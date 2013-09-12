@@ -53,8 +53,8 @@
     
     [[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
     
-    ASSIGN(_user1Ctx, [COEditingContext contextWithURL: STOREURL1]);
-    ASSIGN(_user2Ctx, [COEditingContext contextWithURL: STOREURL2]);
+    _user1Ctx = [COEditingContext contextWithURL: STOREURL1];
+    _user2Ctx = [COEditingContext contextWithURL: STOREURL2];
     
     return self;
 }
@@ -67,13 +67,6 @@
 - (COPersistentRoot *) user2PersistentRoot
 {
     return [[_user2Ctx persistentRoots] anyObject];
-}
-
-- (void)dealloc
-{
-    [_user1Ctx release];
-    [_user2Ctx release];
-    [super dealloc];
 }
 
 - (void) applicationDidFinishLaunching: (NSNotification*)notif
@@ -89,8 +82,8 @@
         user1Proot = [_user1Ctx insertNewPersistentRootWithEntityName: @"Anonymous.TypewriterDocument"];
         [_user1Ctx commit];
         
-        COSynchronizationClient *client = [[[COSynchronizationClient alloc] init] autorelease];
-        COSynchronizationServer *server = [[[COSynchronizationServer alloc] init] autorelease];
+        COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
+        COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
         
         id request2 = [client updateRequestForPersistentRoot: [user1Proot persistentRootUUID]
                                                     serverID: @"server"
@@ -113,7 +106,7 @@
     for (NSDictionary *dict in @[@{@"proot" : user1Proot, @"title" : @"user1"},
                                  @{@"proot" : user2Proot, @"title" : @"user2"}])
     {
-        EWDocument *doc = [[[EWDocument alloc] initWithPersistentRoot: dict[@"proot"] title: dict[@"title"]] autorelease];
+        EWDocument *doc = [[EWDocument alloc] initWithPersistentRoot: dict[@"proot"] title: dict[@"title"]];
         [[NSDocumentController sharedDocumentController] addDocument: doc];
         [doc makeWindowControllers];
         [doc showWindows];

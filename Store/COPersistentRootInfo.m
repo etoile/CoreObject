@@ -1,5 +1,6 @@
 #import "COPersistentRootInfo.h"
 #import "COBranchInfo.h"
+#import <EtoileFoundation/EtoileFoundation.h>
 
 @implementation COPersistentRootInfo
 
@@ -8,13 +9,6 @@
 @synthesize branchForUUID = branchForUUID_;
 @synthesize deleted = _deleted;
 
-- (void) dealloc
-{
-    [uuid_ release];
-    [branchForUUID_ release];
-    [currentBranch_ release];
-    [super dealloc];
-}
 
 - (NSSet *) branchUUIDs
 {
