@@ -198,7 +198,7 @@
 
 + (id)nodeWithRevision: (CORevision *)aRevision onTrack: (COTrack *)aTrack;
 {
-	return [[[self alloc] initWithRevision: aRevision onTrack: aTrack] autorelease];
+	return [[self alloc] initWithRevision: aRevision onTrack: aTrack];
 }
 
 - (id)initWithRevision: (CORevision *)rev onTrack: (COTrack *)aTrack
@@ -206,15 +206,9 @@
 	NILARG_EXCEPTION_TEST(rev);
 	NILARG_EXCEPTION_TEST(aTrack);
 	SUPERINIT;
-	ASSIGN(revision, rev);
+	revision = rev;
 	track = aTrack;
 	return self;
-}
-
-- (void)dealloc
-{
-	[revision release];
-	[super dealloc];
 }
 
 - (BOOL)isEqual: (id)rhs
