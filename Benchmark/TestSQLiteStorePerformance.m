@@ -287,7 +287,7 @@ static int itemChangedAtCommit(int i)
     if ([results count] == 1)
     {
         CORevisionID *revid = [results objectAtIndex: 0];
-        UKObjectsEqual([proot UUID], [revid backingStoreUUID]);
+        UKObjectsEqual([proot UUID], revid.revisionPersistentRootUUID);
         UKObjectsEqual([revisionIDs objectAtIndex: 32], revid);
     }
 }

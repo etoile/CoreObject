@@ -15,22 +15,18 @@
  * 
  */
 @interface CORevisionID : NSObject <NSCopying>
-{
-    ETUUID *backingStoreUUID_;
-    ETUUID *revisionUUID_;
-}
 
-+ (CORevisionID *) revisionWithBackinStoreUUID: (ETUUID *)aUUID
-                                  revisionUUID: (ETUUID *)revUUID;
++ (CORevisionID *) revisionWithPersistentRootUUID: (ETUUID *)aUUID
+                                     revisionUUID: (ETUUID *)revUUID;
 
-- (id) initWithPersistentRootBackingStoreUUID: (ETUUID *)aUUID
-                                 revisionUUID: (ETUUID *)revUUID;
+- (id) initWithPersistentRootUUID: (ETUUID *)aUUID
+                     revisionUUID: (ETUUID *)revUUID;
 
-@property (readonly, nonatomic) ETUUID *backingStoreUUID;
+@property (readonly, nonatomic) ETUUID *revisionPersistentRootUUID;
 @property (readonly, nonatomic) ETUUID *revisionUUID;
 
 /**
- * Returns a new CORevisionID with the stame backing store UUID but the given revid
+ * Returns a new CORevisionID with the stame persistent root UUID but the given revision UUID
  */
 - (CORevisionID *) revisionIDWithRevisionUUID: (ETUUID *)revUUID;
 

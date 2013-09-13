@@ -145,7 +145,7 @@
     
     if (revUUID != nil)
     {
-        return [CORevisionID revisionWithBackinStoreUUID: _uuid
+        return [CORevisionID revisionWithPersistentRootUUID: _uuid
                                             revisionUUID: [ETUUID UUIDWithData: revUUID]];
     }
     else
@@ -156,8 +156,6 @@
 
 - (CORevisionInfo *) revisionForID: (CORevisionID *)aToken
 {
-    NSParameterAssert([[aToken backingStoreUUID] isEqual: _uuid]);
-    
     CORevisionInfo *result = nil;
     FMResultSet *rs = [db_ executeQuery:
                        [NSString stringWithFormat: @"SELECT parent, mergeparent, metadata, timestamp FROM %@ WHERE uuid = ?", [self tableName]],
@@ -202,7 +200,6 @@
 
 - (int64_t) revidForRevisionID: (CORevisionID *)aToken
 {
-    NSParameterAssert(aToken == nil || [[aToken backingStoreUUID] isEqual: _uuid]);
     return [self revidForUUID: [aToken revisionUUID]];
 }
 
@@ -481,7 +478,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
         return nil;
     }
     
-    CORevisionID *revidObject = [CORevisionID revisionWithBackinStoreUUID: _uuid
+    CORevisionID *revidObject = [CORevisionID revisionWithPersistentRootUUID: _uuid
                                                              revisionUUID: aRevisionUUID];
 
     return revidObject;
