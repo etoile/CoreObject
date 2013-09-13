@@ -12,7 +12,7 @@
 {
 @private
     NSMutableArray *_cachedRelationships;
-    COObject *_owner;
+    COObject *__weak _owner;
 }
 
 - (id) initWithOwner: (COObject *)owner;

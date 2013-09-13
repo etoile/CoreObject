@@ -14,7 +14,7 @@
  */
 @interface COSQLiteStorePersistentRootBackingStore : NSObject
 {
-    COSQLiteStore *_store; // weak reference
+    COSQLiteStore *__weak _store; // weak reference
     ETUUID *_uuid;
     FMDatabase *db_;
     BOOL _shareDB;

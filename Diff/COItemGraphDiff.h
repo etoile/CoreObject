@@ -16,7 +16,7 @@
 @interface COItemGraphConflict : NSObject // not publically copyable.
 {
 	@public
-	COItemGraphDiff *parentDiff; /* weak reference */
+	COItemGraphDiff *__weak parentDiff; /* weak reference */
 	NSMutableDictionary *editsForSourceIdentifier; /* id => NSMutableSet of COSubtreeEdit*/
 }
 

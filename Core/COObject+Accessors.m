@@ -67,11 +67,13 @@ static void genericSetter(id theSelf, SEL theCmd, id value)
             if ([selName isEqual: propName])
             {
                 class_addMethod(classToCheck, sel, (IMP)&genericGetter, "@@:");
+                free(propertyList);
                 return YES;
             }
             else if ([selName isEqual: setterName])
             {
                 class_addMethod(classToCheck, sel, (IMP)&genericSetter, "v@:@");
+                free(propertyList);
                 return YES;
             }
         }
