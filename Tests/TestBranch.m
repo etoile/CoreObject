@@ -597,6 +597,12 @@
     UKObjectsEqual(@"Hello world", [originalBranch label]);
 }
 
+// NOTE: All dictionaries are reported as mutable on 10.7.
+- (BOOL) reportsImmutableDictionaryCorrectly
+{
+	return ([[NSDictionary dictionary] isKindOfClass: [NSMutableDictionary class]] == NO);
+}
+
 - (void) testBranchMetadata
 {
     [ctx commit];
@@ -609,7 +615,11 @@
     [originalBranch setMetadata: D(@"value", @"key")];
     
     UKObjectsEqual(D(@"value", @"key"), [originalBranch metadata]);
-    UKFalse([[originalBranch metadata] isKindOfClass: [NSMutableDictionary class]]);
+
+	if ([self reportsImmutableDictionaryCorrectly])
+	{
+    	UKFalse([[originalBranch metadata] isKindOfClass: [NSMutableDictionary class]]);
+	}
     UKTrue([ctx hasChanges]);
     UKTrue([persistentRoot hasChanges]);
     UKTrue([originalBranch hasChanges]);
