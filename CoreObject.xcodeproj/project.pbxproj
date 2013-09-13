@@ -1860,6 +1860,10 @@
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);
 				PRODUCT_NAME = CoreObject;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wno-arc-performSelector-leaks",
+				);
 			};
 			name = Debug;
 		};
@@ -1878,6 +1882,10 @@
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);
 				PRODUCT_NAME = CoreObject;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wno-arc-performSelector-leaks",
+				);
 			};
 			name = Release;
 		};
@@ -1909,7 +1917,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Samples/Typewriter/Typewriter-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -1940,7 +1947,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Samples/Typewriter/Typewriter-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
