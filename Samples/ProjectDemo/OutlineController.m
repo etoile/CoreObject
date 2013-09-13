@@ -2,6 +2,7 @@
 #import "SharingController.h"
 #import "ItemReference.h"
 #import "Document.h"
+#import "ApplicationDelegate.h"
 
 @implementation OutlineController
 
@@ -537,6 +538,10 @@ static int i = 0;
                 [oldParent removeItemAtIndex: oldIndex];
                 [newParent addItem: outlineItem atIndex: insertionIndex++]; 
             }
+            
+            [self commitWithType: @"kCOTypeMinorEdit"
+                shortDescription: @"Drop Items"
+                 longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
         }
         else
         {
@@ -554,22 +559,25 @@ static int i = 0;
             
             [newParent addItem: copy atIndex: insertionIndex++];
             
+            [self commitWithType: @"kCOTypeMinorEdit"
+                shortDescription: @"Drop Items"
+                 longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
+            
             // Remove from source
 
             OutlineItem *oldParent = [outlineItem parent];
             NSUInteger oldIndex = [[oldParent contents] indexOfObject: outlineItem];
             [oldParent removeItemAtIndex: oldIndex];
+            
+            OutlineController *sourceController = [(ApplicationDelegate *)[NSApp delegate] controllerForDocumentRootObject: [oldParent document]];
+            [sourceController commitWithType: @"kCOTypeMinorEdit"
+                            shortDescription: @"Drag Items"
+                             longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
+
         }
 	}
 	
-    // FIXME: We should make the commit to the drag destination persistent root
-    // on its undo stack, and make the commit to the drag source on its undo stack.
-    //
-    // Currently the whole commit is put on the drag destination's undo stack
-    
-	[self commitWithType: @"kCOTypeMinorEdit"
-		shortDescription: @"Drop Items"
-		 longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
+
 	
 	[outlineView expandItem: newParent];
 	

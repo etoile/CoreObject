@@ -264,9 +264,9 @@
 {
 	for (Document *doc in [project documents])
 	{
-		if ([[[doc rootObject] uuid] isEqual: [rootObject uuid]])
+		if ([[[doc rootObject] UUID] isEqual: [rootObject UUID]])
 		{
-			return [controllerForDocumentUUID objectForKey: [doc uuid]];
+			return [controllerForDocumentUUID objectForKey: [doc UUID]];
 		}
 	}
 	return nil;
