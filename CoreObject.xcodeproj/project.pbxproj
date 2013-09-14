@@ -103,6 +103,7 @@
 		6646979617CEB01D00A1B767 /* TestItemGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15F017AB8D4D003BFC9B /* TestItemGraphDiff.m */; };
 		6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */; };
 		6646985A17D3C55600A1B767 /* COObjectGraphContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */; };
+		66470C7217E3D4B200A7E0A9 /* TestHistoryInspection.m in Sources */ = {isa = PBXBuildFile; fileRef = 66470C7117E3D4B200A7E0A9 /* TestHistoryInspection.m */; };
 		66550BF717D51CB100327657 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550BF617D51CB100327657 /* main.m */; };
 		66550BF817D51CB800327657 /* TestObjectGraphPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550BE817D51C6100327657 /* TestObjectGraphPerformance.m */; };
 		66550BF917D51CBD00327657 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
@@ -489,6 +490,7 @@
 		6646978F17CEAFD800A1B767 /* TestSynchronization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSynchronization.m; path = Tests/TestSynchronization.m; sourceTree = "<group>"; };
 		6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COSQLiteStore+Private.h"; path = "Store/COSQLiteStore+Private.h"; sourceTree = "<group>"; };
 		6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Private.h"; path = "Core/COObjectGraphContext+Private.h"; sourceTree = "<group>"; };
+		66470C7117E3D4B200A7E0A9 /* TestHistoryInspection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestHistoryInspection.m; path = Tests/TestHistoryInspection.m; sourceTree = "<group>"; };
 		66550BE817D51C6100327657 /* TestObjectGraphPerformance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TestObjectGraphPerformance.m; path = Benchmark/TestObjectGraphPerformance.m; sourceTree = "<group>"; };
 		66550BED17D51C8800327657 /* BenchmarkCoreObject */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BenchmarkCoreObject; sourceTree = BUILT_PRODUCTS_DIR; };
 		66550BF617D51CB100327657 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Benchmark/main.m; sourceTree = "<group>"; };
@@ -1161,6 +1163,7 @@
 				6646978F17CEAFD800A1B767 /* TestSynchronization.m */,
 				66AB075E17D5846000ADDA17 /* TestMerge.m */,
 				667C24F517E11FC900FFFC85 /* TestNotifications.m */,
+				66470C7117E3D4B200A7E0A9 /* TestHistoryInspection.m */,
 				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				667F1ECE179C81BE0083C3E6 /* Store Tests */,
 				667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */,
@@ -1681,6 +1684,7 @@
 				66E451D917CC565200205679 /* Tag.m in Sources */,
 				6646979017CEAFD800A1B767 /* TestSynchronization.m in Sources */,
 				66AB075F17D5846000ADDA17 /* TestMerge.m in Sources */,
+				66470C7217E3D4B200A7E0A9 /* TestHistoryInspection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
