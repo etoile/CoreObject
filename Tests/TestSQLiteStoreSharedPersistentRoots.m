@@ -52,7 +52,8 @@ static ETUUID *rootUUID;
                                                          branchUUID: [ETUUID UUID]
                                                            revisionMetadata: nil
                                                               error: NULL];
-    
+
+	ETUUID *prootBBranchUUID = [ETUUID UUID];
     prootB = [store createPersistentRootWithInitialRevision: [[prootA currentBranchInfo] currentRevisionID]
                                                              UUID: [ETUUID UUID]
                                                        branchUUID: [ETUUID UUID]
@@ -62,10 +63,15 @@ static ETUUID *rootUUID;
                                                        metadata: nil
                                                parentRevisionID: [[prootA currentBranchInfo] currentRevisionID]
                                           mergeParentRevisionID: nil
+	                                                 branchUUID: prootBBranchUUID
                                                   modifiedItems: A(rootUUID)
                                                           error: NULL];
 
-    [store setCurrentRevision: prootBRev tailRevision: nil forBranch: [prootB currentBranchUUID] ofPersistentRoot: [prootB UUID] error: NULL];
+    [store setCurrentRevision: prootBRev
+	             tailRevision: nil
+	                forBranch: [prootB currentBranchUUID]
+	         ofPersistentRoot: [prootB UUID]
+	                    error: NULL];
 
     prootB =  [store persistentRootInfoForUUID: [prootB UUID]];
     

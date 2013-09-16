@@ -146,6 +146,7 @@ static ETUUID *rootUUID;
                                            metadata: nil
                                    parentRevisionID: [info currentRevisionID]
                               mergeParentRevisionID: nil
+			                             branchUUID: [info currentBranchUUID]
                                       modifiedItems: nil
                                               error: &writeRevisionError]);
             [store commitTransactionWithError: NULL];

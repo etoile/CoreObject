@@ -6,6 +6,7 @@
 @synthesize revisionID = _revisionID;
 @synthesize parentRevisionID = _parentRevisionID;
 @synthesize mergeParentRevisionID = _mergeParentRevisionID;
+@synthesize branchUUID = _branchUUID;
 @synthesize metadata = _metadata;
 @synthesize date = _date;
 
@@ -39,6 +40,7 @@
     return @{ @"revisionID" : [_revisionID plist],
               @"parentRevisionID" : _parentRevisionID != nil ? [_parentRevisionID plist] : [NSNull null],
               @"mergeParentRevisionID" : _mergeParentRevisionID != nil ? [_mergeParentRevisionID plist] : [NSNull null],
+			  @"branchUUID" : [_branchUUID stringValue],
               @"metadata" : _metadata != nil ? _metadata : [NSNull null],
               @"date" : [[[NSDateFormatter alloc] init] stringFromDate: _date]  };
 }
@@ -51,6 +53,7 @@
         [CORevisionID revisionIDWithPlist: aPlist[@"parentRevisionID"]] : nil;
     info.mergeParentRevisionID = aPlist[@"mergeParentRevisionID"] != [NSNull null] ?
         [CORevisionID revisionIDWithPlist: aPlist[@"mergeParentRevisionID"]] : nil;
+	info.branchUUID = [ETUUID UUIDWithString: aPlist[@"branchUUID"]],
     info.metadata = aPlist[@"metadata"] != [NSNull null] ? aPlist[@"metadata"] : nil;
     info.date = [[[NSDateFormatter alloc] init] dateFromString: aPlist[@"date"]];
     return info;

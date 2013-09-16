@@ -168,6 +168,18 @@ static ETUUID *childUUID2;
     initialBranchUUID =  [proot currentBranchUUID];
     initialRevisionId =  [[proot currentBranchInfo] currentRevisionID];
     
+    branchAUUID =  [ETUUID UUID];
+    [store createBranchWithUUID: branchAUUID
+                initialRevision: initialRevisionId
+              forPersistentRoot: prootUUID
+                          error: NULL];
+    
+    branchBUUID =  [ETUUID UUID];
+    [store createBranchWithUUID: branchBUUID
+                initialRevision: initialRevisionId
+              forPersistentRoot: prootUUID
+                          error: NULL];
+	
     // Branch A
     
     for (int i = 0; i < BRANCH_LENGTH; i++)
@@ -176,6 +188,7 @@ static ETUUID *childUUID2;
                                                        metadata: [self branchAMetadata]
                                                parentRevisionID: (i == 0) ? initialRevisionId : [branchARevisionIDs lastObject]
                                           mergeParentRevisionID: nil
+		                                             branchUUID: branchAUUID
                                                   modifiedItems: A(childUUID1)
                                                           error: NULL];        
         [branchARevisionIDs addObject: revid];
@@ -189,37 +202,24 @@ static ETUUID *childUUID2;
                                                        metadata: [self branchBMetadata]
                                                parentRevisionID: (i == 0) ? initialRevisionId : [branchBRevisionIDs lastObject]
                                           mergeParentRevisionID: nil
+		                                             branchUUID: branchBUUID
                                                   modifiedItems: nil
                                                           error: NULL];
         [branchBRevisionIDs addObject: revid];
     }
-    
-    branchAUUID =  [ETUUID UUID];
-    [store createBranchWithUUID: branchAUUID
-                initialRevision: initialRevisionId
-              forPersistentRoot: prootUUID
-                          error: NULL];
-    
+
     assert([store setCurrentRevision: [branchARevisionIDs lastObject]
                         tailRevision: initialRevisionId
                            forBranch: branchAUUID
                     ofPersistentRoot: prootUUID
-
                                error: NULL]);
-    
-    branchBUUID =  [ETUUID UUID];
-    [store createBranchWithUUID: branchBUUID
-                initialRevision: initialRevisionId
-              forPersistentRoot: prootUUID
-                          error: NULL];
-    
+
     assert([store setCurrentRevision: [branchBRevisionIDs lastObject]
                         tailRevision: initialRevisionId
                            forBranch: branchBUUID
                     ofPersistentRoot: prootUUID
-
                                error: NULL]);
-    
+
     [store commitTransactionWithError: NULL];
     
     return self;
@@ -511,6 +511,7 @@ static ETUUID *childUUID2;
                                                             metadata: nil
                                                     parentRevisionID: initialRevisionId
                                                mergeParentRevisionID: nil
+	                                                      branchUUID: branchAUUID
                                                        modifiedItems: nil
                                                                error: NULL];
     UKNotNil(withAttachment);
@@ -560,6 +561,7 @@ static ETUUID *childUUID2;
                                                                 metadata: nil
                                                         parentRevisionID: initialRevisionId
                                                    mergeParentRevisionID: nil
+	                                                          branchUUID: branchAUUID
                                                            modifiedItems: nil
                                                                    error: NULL];
     
@@ -584,6 +586,7 @@ static ETUUID *childUUID2;
                                                                   metadata: nil
                                                           parentRevisionID: initialRevisionId
                                                      mergeParentRevisionID: nil
+	                                                            branchUUID: branchAUUID
                                                              modifiedItems: nil
                                                                      error: NULL];
     [store commitTransactionWithError: NULL];
@@ -602,6 +605,7 @@ static ETUUID *childUUID2;
     CORevisionInfo *info = [store revisionInfoForRevisionID: initialRevisionId];
     UKNil([info parentRevisionID]);
     UKObjectsEqual(initialRevisionId, [info revisionID]);
+	UKObjectsEqual([proot currentBranchUUID], [info branchUUID]);
 }
 
 - (void) testDeletePersistentRoot

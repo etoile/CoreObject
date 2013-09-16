@@ -74,7 +74,7 @@
     
     [db_ executeUpdate: [NSString stringWithFormat:
                          @"CREATE TABLE IF NOT EXISTS %@ (revid INTEGER PRIMARY KEY ASC, "
-                         "contents BLOB, metadata BLOB, timestamp REAL, parent INTEGER, mergeparent INTEGER, root BLOB, deltabase INTEGER, "
+                         "contents BLOB, metadata BLOB, timestamp REAL, parent INTEGER, mergeparent INTEGER, branchuuid BLOB, root BLOB, deltabase INTEGER, "
                          "bytesInDeltaRun INTEGER, garbage BOOLEAN, uuid BLOB)", [self tableName]]];
 
     [db_ executeUpdate: [NSString stringWithFormat:
@@ -158,16 +158,15 @@
 {
     CORevisionInfo *result = nil;
     FMResultSet *rs = [db_ executeQuery:
-                       [NSString stringWithFormat: @"SELECT parent, mergeparent, metadata, timestamp FROM %@ WHERE uuid = ?", [self tableName]],
+                       [NSString stringWithFormat: @"SELECT parent, mergeparent, branchuuid, metadata, timestamp FROM %@ WHERE uuid = ?", [self tableName]],
                        [[aToken revisionUUID] dataValue]];
 	if ([rs next])
 	{
         // N.B.: Watch for null being returned as 0
         int64_t parent = [rs longLongIntForColumnIndex: 0];
         int64_t mergeparent = [rs longLongIntForColumnIndex: 1];
-        
         NSDictionary *metadata = nil;
-        NSData *data = [rs dataForColumnIndex: 2];
+        NSData *data = [rs dataForColumnIndex: 3];
         if (data != nil)
         {
             metadata = [NSJSONSerialization JSONObjectWithData: data
@@ -179,8 +178,9 @@
         result.revisionID = aToken;
         result.parentRevisionID = [self revisionIDForRevid: parent];
         result.mergeParentRevisionID = [self revisionIDForRevid: mergeparent];
+		result.branchUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
         result.metadata = metadata;
-        result.date = [rs dateForColumnIndex: 3];
+        result.date = [rs dateForColumnIndex: 4];
 	}
     [rs close];
     
@@ -399,6 +399,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
                      withMetadata: (NSDictionary *)metadata
                        withParent: (int64_t)aParent
                   withMergeParent: (int64_t)aMergeParent
+                       branchUUID: (ETUUID *)aBranchUUID
                     modifiedItems: (NSArray*)modifiedItems
                             error: (NSError **)error
 {
@@ -455,8 +456,8 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     }
     
     BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (revid, "
-        "contents, metadata, timestamp, parent, mergeparent, root, deltabase, "
-        "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", [self tableName]],
+        "contents, metadata, timestamp, parent, mergeparent, root, branchuuid, deltabase, "
+        "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", [self tableName]],
         [NSNumber numberWithLongLong: rowid],
         contentsBlob,
         metadataBlob,
@@ -464,6 +465,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
         [NSNumber numberWithLongLong: aParent],
         [NSNumber numberWithLongLong: aMergeParent],
         [[anItemTree rootItemUUID] dataValue],
+		[aBranchUUID dataValue],
         [NSNumber numberWithLongLong: deltabase],
         [NSNumber numberWithLongLong: bytesInDeltaRun],
         [aRevisionUUID dataValue]];

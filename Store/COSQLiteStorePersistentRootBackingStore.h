@@ -63,6 +63,7 @@
                      withMetadata: (NSDictionary *)metadata
                        withParent: (int64_t)aParent
                   withMergeParent: (int64_t)aMergeParent
+                       branchUUID: (ETUUID *)aBranchUUID
                     modifiedItems: (NSArray *)modifiedItems // array of ETUUID
                             error: (NSError **)error;
 

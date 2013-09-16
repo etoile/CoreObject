@@ -164,6 +164,7 @@ static ETUUID *branchBUUID;
                                                                  metadata: nil
                                                          parentRevisionID: [serverInfo currentRevisionID]
                                                     mergeParentRevisionID: nil
+															   branchUUID: branchAUUID
                                                             modifiedItems: nil
                                                                     error: NULL];
 
@@ -226,6 +227,7 @@ static ETUUID *branchBUUID;
                                                                  metadata: nil
                                                          parentRevisionID: [serverCheapCopyInfo currentRevisionID]
                                                     mergeParentRevisionID: nil
+	                                                           branchUUID: branchAUUID
                                                             modifiedItems: nil
                                                                     error: NULL];
 

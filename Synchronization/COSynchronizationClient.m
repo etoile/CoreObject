@@ -75,12 +75,14 @@ static void DFSInsertRevisions(NSMutableSet *revisionUUIDsToHandle, ETUUID *revi
     
     CORevisionID *parentRevid = RevisionIDForRevisionUUID(parentString, persistentRoot, store);
     CORevisionID *mergeParentRevid = RevisionIDForRevisionUUID(mergeParentString, persistentRoot, store);
-    
+	ETUUID *branchUUID = [ETUUID UUIDWithString: revDict[@"info"][@"branchUUID"]];
+	
     CORevisionID *revid = [store writeRevisionWithItemGraph: graph
                                                revisionUUID: revisionUUID
                                                    metadata: metadata
                                            parentRevisionID: parentRevid
                                       mergeParentRevisionID: mergeParentRevid
+												 branchUUID: branchUUID
                                          persistentRootUUID: persistentRoot
                                               modifiedItems: nil
                                                       error: NULL];

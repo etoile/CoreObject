@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <EtoileFoundation/ETUUID.h>
 
 @class CORevisionID;
 
@@ -12,6 +13,7 @@
     CORevisionID *_revisionID;
     CORevisionID *_parentRevisionID;
     CORevisionID *_mergeParentRevisionID;
+	ETUUID *_branchUUID;
     NSDictionary *_metadata;
     NSDate *_date;
 }
@@ -19,6 +21,7 @@
 @property (readwrite, nonatomic, strong) CORevisionID *revisionID;
 @property (readwrite, nonatomic, strong) CORevisionID *parentRevisionID;
 @property (readwrite, nonatomic, strong) CORevisionID *mergeParentRevisionID;
+@property (readwrite, nonatomic, strong) ETUUID *branchUUID;
 @property (readwrite, nonatomic, copy) NSDictionary *metadata;
 @property (readwrite, nonatomic, strong) NSDate *date;
 

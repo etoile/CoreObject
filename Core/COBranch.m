@@ -462,8 +462,9 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                                                        metadata: mdCopy
                                                parentRevisionID: _currentRevisionID
                                           mergeParentRevisionID: mergeParent
+		                                             branchUUID: _UUID
                                                   modifiedItems: changedItemUUIDs
-                                             error: NULL];        
+                                                          error: NULL];        
         
         BOOL ok = [store setCurrentRevision: revId
                                tailRevision: nil

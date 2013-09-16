@@ -104,7 +104,8 @@ For now we do.
         if (revInfo.metadata != nil)
         {
             revInfoPlist[@"metadata"] = revInfo.metadata;
-        }        
+        }
+		revInfoPlist[@"branchUUID"] = [revInfo.branchUUID stringValue];
         
         id graphPlist = COItemGraphToJSONPropertyList(graph);
         

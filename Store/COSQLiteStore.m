@@ -414,14 +414,16 @@
                                      metadata: (NSDictionary *)metadata
                              parentRevisionID: (CORevisionID *)aParent
                         mergeParentRevisionID: (CORevisionID *)aMergeParent
+                                   branchUUID: (ETUUID *)aBranchUUID
                                 modifiedItems: (NSArray*)modifiedItems // array of COUUID
                                         error: (NSError **)error
 {
     [self checkInTransaction];
     [self validateRevision: aParent];
     
-    NSParameterAssert(anItemTree != nil);
-    NSParameterAssert(aParent != nil);
+   	NILARG_EXCEPTION_TEST(anItemTree);
+	NILARG_EXCEPTION_TEST(aParent);
+	NILARG_EXCEPTION_TEST(aBranchUUID);
     
     ETUUID *backingStoreUUID = [self backingUUIDForPersistentRootUUID: [aParent revisionPersistentRootUUID]];
     
@@ -431,6 +433,7 @@
                   withMetadata: metadata
           withParentRevisionID: aParent
          mergeParentRevisionID: aMergeParent
+                    branchUUID: aBranchUUID
         inBackingStoreWithUUID: backingStoreUUID
                  modifiedItems: modifiedItems
                          error: error];
@@ -441,6 +444,7 @@
                                      metadata: (NSDictionary *)metadata
                              parentRevisionID: (CORevisionID *)aParent
                         mergeParentRevisionID: (CORevisionID *)aMergeParent
+								   branchUUID: (ETUUID *)aBranchUUID
                            persistentRootUUID: (ETUUID *)aUUID
                                 modifiedItems: (NSArray*)modifiedItems // array of COUUID
                                         error: (NSError **)error
@@ -448,13 +452,15 @@
     [self checkInTransaction];
     [self validateRevision: aParent];
     
-    NSParameterAssert(anItemTree != nil);
+   	NILARG_EXCEPTION_TEST(anItemTree);
+	NILARG_EXCEPTION_TEST(aBranchUUID);
     
     return [self writeItemTree: anItemTree
                   revisionUUID: aRevisionUUID
                   withMetadata: metadata
           withParentRevisionID: aParent
          mergeParentRevisionID: aMergeParent
+                    branchUUID: aBranchUUID
         inBackingStoreWithUUID: [self backingUUIDForPersistentRootUUID: aUUID]
                  modifiedItems: modifiedItems
                          error: error];
@@ -462,14 +468,20 @@
 
 - (CORevisionID *) writeItemTreeWithNoParent: (id<COItemGraph>)anItemTree
                                 withMetadata: (NSDictionary *)metadata
+                                  branchUUID: (ETUUID *)aBranchUUID
                       inBackingStoreWithUUID: (ETUUID *)aBacking
                                        error: (NSError **)error
 {
+	NILARG_EXCEPTION_TEST(anItemTree);
+	NILARG_EXCEPTION_TEST(aBranchUUID);
+	NILARG_EXCEPTION_TEST(aBacking);
+	
     return [self writeItemTree: anItemTree
                   revisionUUID: [ETUUID UUID]
                   withMetadata: metadata
           withParentRevisionID: nil
          mergeParentRevisionID: nil
+                    branchUUID: aBranchUUID
         inBackingStoreWithUUID: aBacking
                  modifiedItems: nil
                          error: error];
@@ -481,10 +493,16 @@
                     withMetadata: (NSDictionary *)metadata
             withParentRevisionID: (CORevisionID *)parentRevid
            mergeParentRevisionID: (CORevisionID *)aMergeParent
+					  branchUUID: (ETUUID *)aBranchUUID
           inBackingStoreWithUUID: (ETUUID *)backingUUID
                    modifiedItems: (NSArray*)modifiedItems // array of COUUID
                            error: (NSError **)error
 {
+	// TODO: At this point, the branch must exist. Just by changing
+	// -backingStoreForUUID:error: to -backingStoreForUUID:proposedBranchUUID:error:
+	// we could validate the branch UUID. For methods that call
+	// -backingStoreForUUID:error: without working with a particular branch, we
+	// would just make no validation if the proposed branch UUID is nil.
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID
                                                                            error: error];
     if (backing == nil)
@@ -497,6 +515,7 @@
                                      withMetadata: metadata
                                        withParent: [backing revidForRevisionID: parentRevid]
                                   withMergeParent: [backing revidForRevisionID: aMergeParent]
+	                                   branchUUID: aBranchUUID
                                     modifiedItems: modifiedItems
                                             error: error];
     
@@ -728,6 +747,7 @@
     
     CORevisionID *revId = [self writeItemTreeWithNoParent: contents
                                              withMetadata: metadata
+	                                           branchUUID: aBranchUUID
                                    inBackingStoreWithUUID: persistentRootUUID
                                                     error: error];
     

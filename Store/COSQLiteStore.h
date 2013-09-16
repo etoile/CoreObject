@@ -317,6 +317,7 @@
                                      metadata: (NSDictionary *)metadata
                              parentRevisionID: (CORevisionID *)aParent
                         mergeParentRevisionID: (CORevisionID *)aMergeParent
+                                   branchUUID: (ETUUID *)aBranchUUID
                                 modifiedItems: (NSArray*)modifiedItems
                                         error: (NSError **)error;
 
@@ -325,6 +326,7 @@
                                      metadata: (NSDictionary *)metadata
                              parentRevisionID: (CORevisionID *)aParent
                         mergeParentRevisionID: (CORevisionID *)aMergeParent
+                                   branchUUID: (ETUUID *)aUUID
                            persistentRootUUID: (ETUUID *)aUUID
                                 modifiedItems: (NSArray*)modifiedItems // array of COUUID
                                         error: (NSError **)error;
