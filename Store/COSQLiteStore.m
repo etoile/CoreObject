@@ -90,10 +90,9 @@
      "uuid BLOB PRIMARY KEY NOT NULL, backingstore BLOB NOT NULL, "
      "currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionuuid BLOB)"];
     
-    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL, "
+    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL PRIMARY KEY, "
      "proot BLOB NOT NULL, tail_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
-     "metadata BLOB, deleted BOOLEAN DEFAULT 0, "
-     "PRIMARY KEY (uuid, proot))"];
+     "metadata BLOB, deleted BOOLEAN DEFAULT 0)"];
 
     // FTS indexes & reference caching tables (in theory, could be regenerated - although not supported)
     

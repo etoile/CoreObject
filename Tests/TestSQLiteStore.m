@@ -832,4 +832,22 @@ static ETUUID *childUUID2;
     UKNil([store persistentRootInfoForUUID: nil]);
 }
 
+- (void) testDuplicateBranchesDisallowed
+{
+    [store beginTransactionWithError: NULL];
+    COPersistentRootInfo *otherPersistentRoot = [store createPersistentRootWithInitialItemGraph: [self makeInitialItemTree]
+                                                                                           UUID: [ETUUID UUID]
+                                                                                     branchUUID: [ETUUID UUID]
+                                                                               revisionMetadata: nil
+                                                                                          error: NULL];
+    BOOL commandOK = [store createBranchWithUUID: branchBUUID
+                                 initialRevision: [otherPersistentRoot currentRevisionID]
+                               forPersistentRoot: [otherPersistentRoot UUID]
+                                           error: NULL];
+    
+    BOOL commitOK = [store commitTransactionWithError: NULL];
+    
+    UKFalse(commandOK && commitOK);
+}
+
 @end
