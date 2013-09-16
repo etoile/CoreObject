@@ -40,7 +40,9 @@ First Release
     All of the other methods, I don't know.
   WIP Extend COBranch API to support branches and merging revisions accross tracks
   - Expose COSQLiteStore's attachments feature
-
+  - test [[persistentRoot currentBranch] currentRevision] on a newly created
+    persistent root
+    
 - didAwaken: replacement
     - At the end of the setStoreItem:, call -awakeFromDeserialization
     - At the end of object graph loading, -didLoadObjectGraph on each object in topological sort order

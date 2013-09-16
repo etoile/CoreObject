@@ -268,7 +268,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
     return _objectGraphContext;
 }
 
-- (COObject *) rootObject
+- (id) rootObject
 {
 	return [_objectGraphContext rootObject];
 }

@@ -304,7 +304,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 #pragma mark -
 #pragma mark Accessing the Root Object
 
-- (COObject *)rootObject
+- (id)rootObject
 {
 	/* To support -rootObject access during the root object instantiation */
 	if ([self rootItemUUID] == nil)

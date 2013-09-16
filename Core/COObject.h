@@ -273,7 +273,7 @@
  *
  * See also -isRoot.
  */
-- (COObject *)rootObject;
+- (id)rootObject;
 /**
  * Returns whether the receiver is saved on the disk.
  *

@@ -5,10 +5,17 @@
 @interface TestHistoryInspection : EditingContextTestCase <UKTest>
 {
     COPersistentRoot *p1;
-    COBranch *br1;
-    COBranch *br2;
+    COBranch *br1a;
+    COBranch *br1b;
     
     COPersistentRoot *p2;
+    COBranch *br2a;
+    
+    CORevision *r0;
+    CORevision *r1;
+    CORevision *r2;
+    CORevision *r3;
+    CORevision *r4;
 }
 @end
 
@@ -16,29 +23,34 @@
 
 /*
 
-                                             __________ <<persistent root p1, branch br2>>
-                                            /
+                                              __________ <<persistent root p1, branch br1b>>
+                                             /
+                                            v
                       
                                ------------0
                               /
-                    0--------0------0
+                    0--------0------0--------------0
+ 
+                                    ^              ^
+                                     \              \_______  <<persistent root p2>>
                                       \
-                                       \______________ <<persistent root p1, branch br1>>
-                                        \
-                                         \____________ <<persistent root p2>>
+                                       \_____________________ <<persistent root p1, branch br1a>>
  
  
  
- root obj label:  "null"    "1"    "2"   "2alt"
+                    r0       r1     r2     r3      r4
  
-     initially
-  committed on     br1      br1    br1    br2
-        branch:
+ 
+ root obj label:  "null"    "1"    "2"    "3"     "4"
  
      initially
-     committed     p1       p1     p1     p1
+     committed     p1        p1     p1     p1      p2
  in persistent
           root:
+
+     initially
+  committed on    br1a      br1a   br1a   br1b    br2a
+        branch:
  
  */
 
@@ -46,20 +58,48 @@
 {
     SUPERINIT;
     p1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    br1 = [p1 currentBranch];
+    [ctx commit];
+    
+    br1a = [p1 currentBranch];
+    r0 = [br1a currentRevision];
     [[p1 rootObject] setLabel: @"1"];
     [ctx commit];
+    r1 = [br1a currentRevision];
     
-    br2 = [br1 makeBranchWithLabel: @"alternate"];
-    [[br2 rootObject] setLabel: @"2alt"];
-    
-    [[br1 rootObject] setLabel: @"2"];
+    [[br1a rootObject] setLabel: @"2"];
     [ctx commit];
+    r2 = [br1a currentRevision];
     
-    p2 = [br1 makeCopyFromRevision: [br1 currentRevision]];
+    br1b = [br1a makeBranchWithLabel: @"alternate" atRevision: r1];
+    [[br1b rootObject] setLabel: @"3"];
     [ctx commit];
+    r3 = [br1b currentRevision];
+    
+    p2 = [br1a makeCopyFromRevision: r2];
+    [ctx commit]; // FIXME: This commit is a hack, should be removed. add test and fix.
+    br2a = [p2 currentBranch];
+    [[p2 rootObject] setLabel: @"4"];
+    [ctx commit];
+    r4 = [br2a currentRevision];
     
     return self;
+}
+
+- (void) testRevisionContents
+{
+    UKObjectsEqual(@"4", [[[p2 objectGraphContextForPreviewingRevision: r4] rootObject] label]);
+    UKObjectsEqual(@"3", [[[p1 objectGraphContextForPreviewingRevision: r3] rootObject] label]);
+    UKObjectsEqual(@"2", [[[p1 objectGraphContextForPreviewingRevision: r2] rootObject] label]);
+    UKObjectsEqual(@"1", [[[p1 objectGraphContextForPreviewingRevision: r1] rootObject] label]);
+    UKNil([[[p1 objectGraphContextForPreviewingRevision: r0] rootObject] label]);
+}
+
+- (void) testRevisionParentRevision
+{
+   UKObjectsEqual(r1, [r3 parentRevision]);
+   UKObjectsEqual(r2, [r4 parentRevision]);
+   UKObjectsEqual(r1, [r2 parentRevision]);
+   UKObjectsEqual(r0, [r1 parentRevision]);
 }
 
 @end

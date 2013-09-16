@@ -163,7 +163,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * See also -rootItemUUID.
  */
-@property (nonatomic, strong) COObject *rootObject;
+@property (nonatomic, strong) id rootObject;
 
 /**
  * @taskunit Change Tracking
