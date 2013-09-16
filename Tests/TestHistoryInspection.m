@@ -102,7 +102,6 @@
    UKObjectsEqual(r0, [r1 parentRevision]);
 }
 
-#if 0
 - (void) testRevisionPersistentRootUUID
 {
     UKObjectsEqual([p1 persistentRootUUID], [r0 persistentRootUUID]);
@@ -120,6 +119,5 @@
     UKObjectsEqual([br1b UUID], [r3 branchUUID]);
     UKObjectsEqual([br2a UUID], [r4 branchUUID]);
 }
-#endif
 
 @end

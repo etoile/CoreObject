@@ -476,3 +476,8 @@ extern NSString *kCOPersistentRootTransactionUUID;
 extern NSString *kCOStoreUUID;
 extern NSString *kCOStoreURL;
 
+// Standard metadata keys
+
+extern NSString *kCOMetadataBranchUUID;
+extern NSString *kCOMetadataPersistentRootUUID;
+

@@ -327,10 +327,14 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         
         if (_cheapCopyRevisionID == nil)
         {
+            NSMutableDictionary *mdCopy = [[NSMutableDictionary alloc] initWithDictionary: metadata];
+            mdCopy[kCOMetadataPersistentRootUUID] = [[self persistentRootUUID] stringValue];
+            mdCopy[kCOMetadataBranchUUID] = [[[self editingBranch] UUID] stringValue];
+            
             info = [store createPersistentRootWithInitialItemGraph: [[self editingBranch] objectGraphContext]
                                                                                    UUID: [self persistentRootUUID]
                                                                              branchUUID: [[self editingBranch] UUID]
-                                                                               revisionMetadata: metadata
+                                                                               revisionMetadata: mdCopy
                                                                                   error: NULL];
         }
         else
