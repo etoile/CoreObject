@@ -102,4 +102,24 @@
    UKObjectsEqual(r0, [r1 parentRevision]);
 }
 
+#if 0
+- (void) testRevisionPersistentRootUUID
+{
+    UKObjectsEqual([p1 persistentRootUUID], [r0 persistentRootUUID]);
+    UKObjectsEqual([p1 persistentRootUUID], [r1 persistentRootUUID]);
+    UKObjectsEqual([p1 persistentRootUUID], [r2 persistentRootUUID]);
+    UKObjectsEqual([p1 persistentRootUUID], [r3 persistentRootUUID]);
+    UKObjectsEqual([p2 persistentRootUUID], [r4 persistentRootUUID]);
+}
+
+- (void) testRevisionBranchUUID
+{
+    UKObjectsEqual([br1a UUID], [r0 branchUUID]);
+    UKObjectsEqual([br1a UUID], [r1 branchUUID]);
+    UKObjectsEqual([br1a UUID], [r2 branchUUID]);
+    UKObjectsEqual([br1b UUID], [r3 branchUUID]);
+    UKObjectsEqual([br2a UUID], [r4 branchUUID]);
+}
+#endif
+
 @end
