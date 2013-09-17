@@ -5,6 +5,13 @@
 @class COItem, CORevisionID, CORevisionInfo, COItemGraph, COBranchInfo, COPersistentRootInfo;
 @class FMDatabase;
 
+enum COBranchRevisionReadingOptions
+{
+	COBranchRevisionReadingParentBranches = 2,
+	COBranchRevisionReadingDivergentRevisions = 4
+};
+typedef NSUInteger COBranchRevisionReadingOptions;
+
 /**
  * This class implements a Core Object store using SQLite databases.
  *
@@ -233,6 +240,8 @@
  */
 - (CORevisionID *) revisionIDForRevisionUUID: (ETUUID *)aRevisionUUID
                           persistentRootUUID: (ETUUID *)aPersistentRoot;
+- (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
+                                options: (COBranchRevisionReadingOptions)options;
 
 /**
  * Returns a delta between the given revision IDs.
@@ -262,8 +271,6 @@
 - (COItem *) item: (ETUUID *)anitem atRevisionID: (CORevisionID *)aToken;
 
 
-
-
 /** @taskunit Persistent Root Reading */
 
 /**
@@ -277,9 +284,7 @@
  *          the persistent root does not exist.
  */
 - (COPersistentRootInfo *) persistentRootInfoForUUID: (ETUUID *)aUUID;
-
-
-
+- (ETUUID *)persistentRootUUIDForBranchUUID: (ETUUID *)aBranchUUID;
 
 /** @taskunit Search. API not final. */
 

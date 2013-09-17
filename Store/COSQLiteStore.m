@@ -208,6 +208,16 @@
                                         revisionUUID: aRevisionUUID];
 }
 
+- (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
+                                options: (COBranchRevisionReadingOptions)options
+{
+	ETUUID *prootUUID = [self persistentRootUUIDForBranchUUID: aBranchUUID];
+	COSQLiteStorePersistentRootBackingStore *backingStore = 
+		[self backingStoreForPersistentRootUUID: prootUUID];
+
+	return [backingStore revisionInfosForBranchUUID: aBranchUUID options: options];
+}
+
 - (ETUUID *) backingUUIDForPersistentRootUUID: (ETUUID *)aUUID
 {
     ETUUID *backingUUID = [backingStoreUUIDForPersistentRootUUID_ objectForKey: aUUID];
@@ -652,7 +662,23 @@
     return result;
 }
 
+- (ETUUID *)persistentRootUUIDForBranchUUID: (ETUUID *)aBranchUUID
+{
+	NILARG_EXCEPTION_TEST(aBranchUUID);
 
+	FMResultSet *rs = [db_ executeQuery: @"SELECT proot FROM branches WHERE uuid = ?",
+		[aBranchUUID dataValue]];
+	ETUUID *prootUUID = nil;
+
+	if ([rs next])
+	{
+		prootUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+        ETAssert([rs next] == NO);
+    }
+
+	[rs close];
+	return prootUUID;
+}
 
 /** @taskunit writing persistent roots */
 

@@ -619,4 +619,102 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     return nil;
 }
 
+- (CORevisionInfo *)revisionInfoWithResultSet: (FMResultSet *)rs revisionIDs: (NSMutableDictionary *)revIDs
+{
+	ETUUID *uuid = [ETUUID UUIDWithData: [rs dataForColumn: @"uuid"]];
+	// N.B.: Watch for null being returned as 0
+	int64_t parent = [rs longLongIntForColumn: @"parent"];
+	int64_t mergeparent = [rs longLongIntForColumn: @"mergeParent"];
+	NSData *data = [rs dataForColumn: @"metadata"];
+	NSDictionary *metadata = nil;
+
+	if (data != nil)
+	{
+		// TODO: Handle error
+		NSError *error = nil;
+		metadata = [NSJSONSerialization JSONObjectWithData: data
+												   options: 0
+													 error: &error];
+		ETAssert(error == nil);
+	}
+	
+	CORevisionInfo *rev = [CORevisionInfo new];
+
+	[rev setRevisionID: [CORevisionID revisionWithPersistentRootUUID: _uuid revisionUUID: uuid]];
+	[rev setParentRevisionID: (id)[NSNumber numberWithLongLong: parent]];
+	[rev setMergeParentRevisionID: (id)[NSNumber numberWithLongLong: mergeparent]];
+	[rev setBranchUUID: [ETUUID UUIDWithData: [rs dataForColumn: @"branchUUID"]]];
+	[rev setMetadata: metadata];
+	[rev setDate: [rs dateForColumn: @"timestamp"]];
+
+	int64_t revid = [rs longLongIntForColumn: @"revid"];
+
+	/* Memorize the revision ID to support resolving parent and merge parent 
+	   revision IDs once revIDs contains all the revisions */
+
+	[revIDs setObject: [rev revisionID]
+			   forKey: [NSNumber numberWithLongLong: revid]];
+
+	 return rev;
+}
+
+- (void)resolveRevisionIDsInRevisionsInfos: (NSArray *)revInfos
+                          usingRevisionIDs: (NSDictionary *)revIDs
+{
+	for (CORevisionInfo *revInfo in revInfos)
+	{
+		[revInfo setParentRevisionID: [revIDs objectForKey: [revInfo parentRevisionID]]];
+		[revInfo setMergeParentRevisionID: [revIDs objectForKey: [revInfo mergeParentRevisionID]]];
+		ETAssert([revInfo parentRevisionID] != nil);
+		ETAssert([revInfo mergeParentRevisionID] != nil);
+	}
+}
+
+- (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
+                                options: (COBranchRevisionReadingOptions)options
+{
+	NILARG_EXCEPTION_TEST(aBranchUUID);
+
+	FMResultSet *rs = [db_ executeQuery: @"SELECT revid, parent, branchuuid, "
+		"metadata, timestamp, mergeparent, uuid FROM %@", [self tableName]];
+
+	NSUInteger suggestedMaxRevCount = 50000;
+	NSMutableArray *revInfos = [NSMutableArray arrayWithCapacity: suggestedMaxRevCount];
+	NSMutableDictionary *revIDs = [NSMutableDictionary dictionaryWithCapacity: suggestedMaxRevCount];
+	NSData *branchUUIDData = [aBranchUUID dataValue];
+	int64_t parentRevid = 0;
+	BOOL isFirstResult = YES;
+	BOOL isValidBranch = NO;
+
+	while ([rs next])
+	{
+		isValidBranch = ([[rs dataForColumnIndex: 2] isEqualToData: branchUUIDData] == NO);
+
+		int64_t revid = [rs longLongIntForColumnIndex: 0];
+		BOOL isParentRev = (revid == parentRevid);
+		BOOL isSearchingParentRevOnParentBranch = (isValidBranch == NO && isParentRev == NO);
+	
+		if (isValidBranch == NO && (options & COBranchRevisionReadingParentBranches) == NO)
+			break;
+
+		if (isSearchingParentRevOnParentBranch)
+			continue;
+
+		if (isFirstResult || isParentRev || (options & COBranchRevisionReadingDivergentRevisions))
+		{
+			[revInfos insertObject: [self revisionInfoWithResultSet: rs revisionIDs: revIDs]
+			               atIndex: 0];
+		}
+		
+		parentRevid = [rs longLongIntForColumnIndex: 1];
+		isFirstResult = NO;
+    }
+	[rs close];
+
+	[self resolveRevisionIDsInRevisionsInfos: revInfos
+							usingRevisionIDs: revIDs];
+
+	return revInfos;
+}
+
 @end
