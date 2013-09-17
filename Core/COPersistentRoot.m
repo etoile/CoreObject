@@ -80,6 +80,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         COBranch *branch = [[COBranch alloc] initWithUUID: branchUUID
 		                                objectGraphContext: anObjectGraphContext
                                             persistentRoot: self
+                                         parentBranchUUID: nil
                                 parentRevisionForNewBranch: cheapCopyRevisionID];
         
         [_branchForUUID setObject: branch forKey: branchUUID];
@@ -419,12 +420,13 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     }
 }
 
-- (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
+- (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev parentBranch: (COBranch *)aParent
 {
     COBranch *newBranch = [[COBranch alloc] initWithUUID: [ETUUID UUID]
-	                                   objectGraphContext: nil
-                                           persistentRoot: self
-                               parentRevisionForNewBranch: [aRev revisionID]];
+	                                  objectGraphContext: nil
+                                          persistentRoot: self
+                                        parentBranchUUID: [aParent UUID]
+                              parentRevisionForNewBranch: [aRev revisionID]];
     
     [newBranch setMetadata: D(aLabel, @"COBranchLabel")];
     
@@ -433,12 +435,13 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return newBranch;
 }
 
-- (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID metadata: (NSDictionary *)metadata atRevision: (CORevision *)aRev
+- (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID metadata: (NSDictionary *)metadata atRevision: (CORevision *)aRev parentBranch: (COBranch *)aParent
 {
     COBranch *newBranch = [[COBranch alloc] initWithUUID: aUUID
-	                                   objectGraphContext: nil
-                                           persistentRoot: self
-                               parentRevisionForNewBranch: [aRev revisionID]];
+                                      objectGraphContext: nil
+                                          persistentRoot: self
+                                        parentBranchUUID: [aParent UUID]
+                              parentRevisionForNewBranch: [aRev revisionID]];
     
     if (metadata != nil)
     {
@@ -467,9 +470,10 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     if (branch == nil)
     {
         branch = [[COBranch alloc] initWithUUID: [branchInfo UUID]
-                                        objectGraphContext: nil
-                                            persistentRoot: self
-                                parentRevisionForNewBranch: nil];
+                             objectGraphContext: nil
+                                 persistentRoot: self
+                               parentBranchUUID: branchInfo.parentBranchUUID
+                     parentRevisionForNewBranch: nil];
         
         [_branchForUUID setObject: branch forKey: [branchInfo UUID]];
     }

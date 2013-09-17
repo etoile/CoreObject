@@ -7,6 +7,7 @@
 - (id)        initWithUUID: (ETUUID *)aUUID
         objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
             persistentRoot: (COPersistentRoot *)aPersistentRoot
+          parentBranchUUID: (ETUUID *)aParentBranchUUID
 parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch;
 
 - (void)updateWithBranchInfo: (COBranchInfo *)branchInfo;

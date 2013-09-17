@@ -10,6 +10,7 @@
     CORevisionID *currentRevisionId_;
     NSDictionary *metadata_;
     BOOL deleted_;
+    ETUUID *parentBranchUUID_;
 }
 
 @property (readwrite, nonatomic, strong) ETUUID *UUID;
@@ -32,6 +33,8 @@
  */
 @property (readwrite, nonatomic, strong) NSDictionary *metadata;
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
+
+@property (readwrite, nonatomic, strong) ETUUID *parentBranchUUID;
 
 /**
  * In git terminology, if the receiver is "master", returns "origin/master", or

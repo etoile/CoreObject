@@ -120,4 +120,15 @@
     UKObjectsEqual([br2a UUID], [r4 branchUUID]);
 }
 
+- (void) testParentBranch
+{
+    UKObjectsEqual(br1a, [br1b parentBranch]);
+    UKNil([br1a parentBranch]);
+
+    // FIXME: Decide what we want this to be
+    UKNil([br2a parentBranch]);
+}
+
+// FIXME: Test these things when reloading from a store
+
 @end

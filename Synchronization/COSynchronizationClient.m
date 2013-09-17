@@ -166,6 +166,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
             branchUUID = [ETUUID UUID];
             
             assert([aStore createBranchWithUUID: branchUUID
+                                   parentBranch: nil
                                 initialRevision: currentRevisionID
                               forPersistentRoot: persistentRoot
                                           error: NULL]);
@@ -197,6 +198,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
                                                                             forKey: @"replcatedBranch"] firstObject];
         
         assert([aStore createBranchWithUUID: currentBranchUUID
+                               parentBranch: nil
                             initialRevision: [replicatedCurrentBranch currentRevisionID]
                           forPersistentRoot: persistentRoot
                                       error: NULL]);

@@ -52,9 +52,9 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (void) reloadPersistentRootInfo;
 
-- (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev;
+- (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev parentBranch: (COBranch *)aParent;
 
-- (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID metadata: (NSDictionary *)metadata atRevision: (CORevision *)aRev;
+- (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID metadata: (NSDictionary *)metadata atRevision: (CORevision *)aRev parentBranch: (COBranch *)aParent;
 
 - (BOOL) isPersistentRootCommitted;
 

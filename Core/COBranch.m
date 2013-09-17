@@ -48,6 +48,7 @@ NSString * const kCOBranchLabel = @"COBranchLabel";
 - (id)        initWithUUID: (ETUUID *)aUUID
         objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
             persistentRoot: (COPersistentRoot *)aContext
+          parentBranchUUID: (ETUUID *)aParentBranchUUID
 parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
 	NILARG_EXCEPTION_TEST(aUUID);
@@ -68,7 +69,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         
 	/* The persistent root retains us */
 	_persistentRoot = aContext;
-
+    _parentBranchUUID = aParentBranchUUID;
+    
 	if (anObjectGraphContext == nil)
 	{
     	_objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
@@ -264,8 +266,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (COBranch *)parentBranch
 {
-    // FIXME: Add support for this
-    return nil;
+    return [_persistentRoot branchForUUID: _parentBranchUUID];
 }
 
 - (BOOL)hasChanges
@@ -354,7 +355,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         [NSException raise: NSGenericException format: @"uncommitted branches do not support -makeBranchWithLabel:atRevision:"];
     }
     
-    return [_persistentRoot makeBranchWithLabel: aLabel atRevision: aRev];
+    return [_persistentRoot makeBranchWithLabel: aLabel atRevision: aRev parentBranch: self];
 }
 
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev
@@ -403,9 +404,11 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         // N.B. - this only the case when we're adding a new branch to an existing persistent root.
         
         [store createBranchWithUUID: _UUID
+                       parentBranch: _parentBranchUUID
                     initialRevision: _currentRevisionID
                   forPersistentRoot: [[self persistentRoot] persistentRootUUID]
                               error: NULL];
+        
         [[self editingContext] recordBranchCreation: self];
         
         _isCreated = YES;

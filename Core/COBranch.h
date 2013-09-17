@@ -57,6 +57,8 @@ extern NSString * const kCOBranchLabel;
     COObjectGraphContext *_objectGraph;
     
     BOOL _deleted;
+    
+    ETUUID *_parentBranchUUID;
 }
 
 

@@ -170,12 +170,14 @@ static ETUUID *childUUID2;
     
     branchAUUID =  [ETUUID UUID];
     [store createBranchWithUUID: branchAUUID
+                   parentBranch: nil
                 initialRevision: initialRevisionId
               forPersistentRoot: prootUUID
                           error: NULL];
     
     branchBUUID =  [ETUUID UUID];
     [store createBranchWithUUID: branchBUUID
+                   parentBranch: nil
                 initialRevision: initialRevisionId
               forPersistentRoot: prootUUID
                           error: NULL];
@@ -845,6 +847,7 @@ static ETUUID *childUUID2;
                                                                                revisionMetadata: nil
                                                                                           error: NULL];
     BOOL commandOK = [store createBranchWithUUID: branchBUUID
+                                    parentBranch: nil
                                  initialRevision: [otherPersistentRoot currentRevisionID]
                                forPersistentRoot: [otherPersistentRoot UUID]
                                            error: NULL];

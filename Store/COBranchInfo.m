@@ -9,7 +9,7 @@
 @synthesize currentRevisionID = currentRevisionId_;
 @synthesize deleted = deleted_;
 @synthesize metadata = metadata_;
-
+@synthesize parentBranchUUID = parentBranchUUID_;
 
 - (ETUUID *) remoteMirror
 {

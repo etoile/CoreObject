@@ -92,7 +92,7 @@
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL PRIMARY KEY, "
      "proot BLOB NOT NULL, tail_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
-     "metadata BLOB, deleted BOOLEAN DEFAULT 0)"];
+     "metadata BLOB, deleted BOOLEAN DEFAULT 0, parentbranch BLOB)"];
 
     // FTS indexes & reference caching tables (in theory, could be regenerated - although not supported)
     
@@ -849,6 +849,7 @@
 }
 
 - (BOOL) createBranchWithUUID: (ETUUID *)branchUUID
+                 parentBranch: (ETUUID *)aParentBranch
               initialRevision: (CORevisionID *)revId
             forPersistentRoot: (ETUUID *)aRoot
                         error: (NSError **)error
@@ -861,11 +862,12 @@
     NILARG_EXCEPTION_TEST(aRoot);
     [self validateRevision: revId forPersistentRoot: aRoot];
     
-    BOOL ok = [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,NULL,0)",
+    BOOL ok = [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, tail_revid, current_revid, metadata, deleted, parentbranch) VALUES(?,?,?,?,NULL,0,?)",
      [branchUUID dataValue],
      [aRoot dataValue],
      [[revId revisionUUID] dataValue],
-     [[revId revisionUUID] dataValue]];    
+     [[revId revisionUUID] dataValue],
+     [aParentBranch dataValue]];
   
     if (!ok)
     {

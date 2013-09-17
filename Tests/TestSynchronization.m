@@ -61,6 +61,7 @@ static ETUUID *branchBUUID;
                                                                                        error: NULL];
     UKNotNil(serverInfo);
     UKTrue([serverStore createBranchWithUUID: branchBUUID
+                                parentBranch: nil
                              initialRevision: [serverInfo currentRevisionID]
                            forPersistentRoot: persistentRootUUID
                                        error: NULL]);

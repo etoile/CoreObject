@@ -79,6 +79,7 @@
     
     [store beginTransactionWithError: NULL];
     UKTrue([store createBranchWithUUID: secondbranchUUID
+                          parentBranch: nil
                        initialRevision: [[persistentRoot revision] revisionID]
                      forPersistentRoot: [persistentRoot persistentRootUUID]
                                  error: NULL]);

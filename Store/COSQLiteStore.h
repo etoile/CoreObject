@@ -396,6 +396,7 @@
                     error: (NSError **)error;
 
 - (BOOL) createBranchWithUUID: (ETUUID *)branchUUID
+                 parentBranch: (ETUUID *)aParentBranch
               initialRevision: (CORevisionID *)revId
             forPersistentRoot: (ETUUID *)aRoot
                         error: (NSError **)error;
