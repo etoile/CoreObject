@@ -1,6 +1,7 @@
 #import "COSQLiteStorePersistentRootBackingStore.h"
 #import <EtoileFoundation/Macros.h>
 #import <EtoileFoundation/ETUUID.h>
+#import <EtoileFoundation/ETCollection.h>
 #import "COItemGraph.h"
 #import "COItem.h"
 #import "FMDatabase.h"
@@ -665,40 +666,44 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 	{
 		[revInfo setParentRevisionID: [revIDs objectForKey: [revInfo parentRevisionID]]];
 		[revInfo setMergeParentRevisionID: [revIDs objectForKey: [revInfo mergeParentRevisionID]]];
-		ETAssert([revInfo parentRevisionID] != nil);
-		ETAssert([revInfo mergeParentRevisionID] != nil);
+
+		ETAssert([revInfo parentRevisionID] != nil || [revInfo isEqual: [revInfos firstObject]]);
 	}
 }
 
 - (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
+                       headRevisionUUID: (ETUUID *)aHeadRevUUID
                                 options: (COBranchRevisionReadingOptions)options
 {
 	NILARG_EXCEPTION_TEST(aBranchUUID);
 
-	FMResultSet *rs = [db_ executeQuery: @"SELECT revid, parent, branchuuid, "
-		"metadata, timestamp, mergeparent, uuid FROM %@", [self tableName]];
+	int64_t headRevid = [self revidForUUID: aHeadRevUUID];
+	FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
+		@"SELECT revid, parent, branchuuid, metadata, timestamp, mergeparent, uuid "
+		 "FROM %@ WHERE revid BETWEEN 0 AND ? ORDER BY revid DESC",
+		[self tableName]], [NSNumber numberWithLongLong: headRevid]];
 
 	NSUInteger suggestedMaxRevCount = 50000;
 	NSMutableArray *revInfos = [NSMutableArray arrayWithCapacity: suggestedMaxRevCount];
 	NSMutableDictionary *revIDs = [NSMutableDictionary dictionaryWithCapacity: suggestedMaxRevCount];
 	NSData *branchUUIDData = [aBranchUUID dataValue];
-	int64_t parentRevid = 0;
+	int64_t parentRevid = -1;
 	BOOL isFirstResult = YES;
 	BOOL isValidBranch = NO;
 
 	while ([rs next])
 	{
-		isValidBranch = ([[rs dataForColumnIndex: 2] isEqualToData: branchUUIDData] == NO);
+		isValidBranch = ([[rs dataForColumnIndex: 2] isEqualToData: branchUUIDData]);
 
 		int64_t revid = [rs longLongIntForColumnIndex: 0];
 		BOOL isParentRev = (revid == parentRevid);
-		BOOL isSearchingParentRevOnParentBranch = (isValidBranch == NO && isParentRev == NO);
+		BOOL skippingUnrelatedBranchRevisions = (isValidBranch == NO && isParentRev == NO);
+		
+		if (skippingUnrelatedBranchRevisions)
+			continue;
 	
 		if (isValidBranch == NO && (options & COBranchRevisionReadingParentBranches) == NO)
 			break;
-
-		if (isSearchingParentRevOnParentBranch)
-			continue;
 
 		if (isFirstResult || isParentRev || (options & COBranchRevisionReadingDivergentRevisions))
 		{

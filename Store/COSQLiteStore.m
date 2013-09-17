@@ -208,14 +208,35 @@
                                         revisionUUID: aRevisionUUID];
 }
 
+- (ETUUID *)currentRevisionUUIDForBranchUUID: (ETUUID *)aBranchUUID
+{
+	NILARG_EXCEPTION_TEST(aBranchUUID);
+
+	FMResultSet *rs = [db_ executeQuery: @"SELECT current_revid FROM branches WHERE uuid = ?",
+		[aBranchUUID dataValue]];
+	ETUUID *prootUUID = nil;
+
+	if ([rs next])
+	{
+		prootUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+        ETAssert([rs next] == NO);
+    }
+
+	[rs close];
+	return prootUUID;
+}
+
 - (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
                                 options: (COBranchRevisionReadingOptions)options
 {
 	ETUUID *prootUUID = [self persistentRootUUIDForBranchUUID: aBranchUUID];
+	ETUUID *currentRevUUID = [self currentRevisionUUIDForBranchUUID: aBranchUUID];
 	COSQLiteStorePersistentRootBackingStore *backingStore = 
 		[self backingStoreForPersistentRootUUID: prootUUID];
 
-	return [backingStore revisionInfosForBranchUUID: aBranchUUID options: options];
+	return [backingStore revisionInfosForBranchUUID: aBranchUUID
+	                               headRevisionUUID: currentRevUUID
+	                                        options: options];
 }
 
 - (ETUUID *) backingUUIDForPersistentRootUUID: (ETUUID *)aUUID

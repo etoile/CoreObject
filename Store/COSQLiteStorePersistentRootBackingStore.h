@@ -82,6 +82,7 @@
 - (CORevisionID *) revisionIDForRevid: (int64_t)aRevid;
 
 - (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
+                       headRevisionUUID: (ETUUID *)aHeadRevUUID
                                 options: (NSUInteger)options;
 
 @end
