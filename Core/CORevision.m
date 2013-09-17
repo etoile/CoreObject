@@ -80,14 +80,12 @@
 
 - (ETUUID *)persistentRootUUID
 {
-	// TODO: Implement it in the metadata for the new store
 	return [ETUUID UUIDWithString: [[self metadata] objectForKey: kCOMetadataPersistentRootUUID]];
 }
 
 - (ETUUID *)branchUUID
 {
-	// TODO: Implement it in the metadata for the new store
-	return [ETUUID UUIDWithString: [[self metadata] objectForKey: kCOMetadataBranchUUID]];
+	return [revisionInfo branchUUID];
 }
 
 - (NSDate *)date

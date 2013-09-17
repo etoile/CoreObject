@@ -1183,5 +1183,4 @@ NSString *kCOPersistentRootTransactionUUID = @"COPersistentRootTransactionUUID";
 NSString *kCOStoreUUID = @"COStoreUUID";
 NSString *kCOStoreURL = @"COStoreURL";
 
-NSString *kCOMetadataBranchUUID = @"COMetadataBranchUUID";
 NSString *kCOMetadataPersistentRootUUID = @"COMetadataPersistentRootUUID";

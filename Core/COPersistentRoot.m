@@ -330,7 +330,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         {
             NSMutableDictionary *mdCopy = [[NSMutableDictionary alloc] initWithDictionary: metadata];
             mdCopy[kCOMetadataPersistentRootUUID] = [[self persistentRootUUID] stringValue];
-            mdCopy[kCOMetadataBranchUUID] = [[[self editingBranch] UUID] stringValue];
             
             info = [store createPersistentRootWithInitialItemGraph: [[self editingBranch] objectGraphContext]
                                                                                    UUID: [self persistentRootUUID]
