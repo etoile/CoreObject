@@ -73,7 +73,7 @@ static ETUUID *rootUUID;
 	         ofPersistentRoot: [prootB UUID]
 	                    error: NULL];
 
-    prootB =  [store persistentRootInfoForUUID: [prootB UUID]];
+    prootB.currentBranchInfo.currentRevisionID = prootBRev;
     
     [store commitTransactionWithError: NULL];
     

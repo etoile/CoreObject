@@ -10,6 +10,8 @@
 #import "COSearchResult.h"
 #import "COBranchInfo.h"
 #import "COPersistentRootInfo.h"
+#import "COStoreTransaction.h"
+#import "COStoreAction.h"
 
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
@@ -22,6 +24,8 @@
 @end
 
 @implementation COSQLiteStore
+
+@synthesize transactionUUID;
 
 - (id)initWithURL: (NSURL*)aURL
 {
@@ -143,7 +147,10 @@
 - (BOOL) beginTransactionWithError: (NSError **)error
 {
     [modifiedPersistentRootsUUIDs_ removeAllObjects];
-    return [db_ beginTransaction];
+    
+    transaction_ = [[COStoreTransaction alloc] init];
+    
+    return YES;
 }
 
 - (BOOL) commitTransactionWithError: (NSError **)error
@@ -151,21 +158,51 @@
     return [self commitTransactionWithUUID: [ETUUID UUID] withError: error];
 }
 
-- (BOOL) commitTransactionWithUUID: (ETUUID *)transactionUUID withError: (NSError **)error
+- (BOOL) commitTransactionWithUUID: (ETUUID *)transaction withError: (NSError **)error
 {
+    [db_ beginTransaction];
+    
+    self.transactionUUID = transaction_.transactionUUID;
+    
     // update the last transaction field before we commit.
-
+    
     for (ETUUID *modifiedUUID in modifiedPersistentRootsUUIDs_)
     {
         [db_ executeUpdate: @"UPDATE persistentroots SET transactionuuid = ? WHERE uuid = ?", [transactionUUID dataValue], [modifiedUUID dataValue]];
     }
-
-    BOOL ok = [db_ commit];
-
-    if (ok)
+    
+    
+    BOOL ok = YES;
+    for (id<COStoreAction> op in transaction_.operations)
     {
-        [self postCommitNotificationsForTransaction: transactionUUID];
+        BOOL opOk = [op execute: self];
+        if (!opOk)
+        {
+            NSLog(@"store action failed: %@", op);
+        }
+        ok = ok && opOk;
     }
+    
+    if (!ok)
+    {
+        [db_ rollback];
+        ok = NO;
+    }
+    else
+    {
+        ok = [db_ commit];
+        if (ok)
+        {
+            [self postCommitNotificationsForTransaction: transactionUUID];
+        }
+        else
+        {
+            NSLog(@"Commit failed");
+        }
+    }
+
+    self.transactionUUID = nil;
+    
     return ok;
 }
 
@@ -176,7 +213,7 @@
 
 - (void) checkInTransaction
 {
-    assert([db_ inTransaction]);
+    assert(transaction_ != nil);
 }
 
 - (NSArray *) allBackingUUIDs
@@ -439,6 +476,17 @@
     }
     [rs close];
     return result;
+}
+
+- (BOOL) writeRevisionWithModifiedItems: (COItemGraph *)anItemTree
+                           revisionUUID: (ETUUID *)aRevisionUUID
+                               metadata: (NSDictionary *)metadata
+                       parentRevisionID: (ETUUID *)aParent
+                  mergeParentRevisionID: (ETUUID *)aMergeParent
+                     persistentRootUUID: (ETUUID *)aUUID
+                             branchUUID: (ETUUID*)branch
+{
+    return NO;
 }
 
 - (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
@@ -730,35 +778,16 @@
                                         initialRevision: (CORevisionID *)aRevision
                                                   error: (NSError **)error
 {    
-    [db_ savepoint: @"createPersistentRootWithUUID"];
+    [transaction_ createPersistentRootWithUUID: uuid
+                         persistentRootForCopy: isCopy ? aRevision.revisionPersistentRootUUID : nil];
     
-    ETUUID *backingStoreUUID = [self backingUUIDForPersistentRootUUID: [aRevision revisionPersistentRootUUID]];
+    [transaction_ createBranchWithUUID: aBranchUUID
+                       initialRevision: aRevision.revisionUUID
+                     forPersistentRoot: uuid];
     
-    [db_ executeUpdate: @"INSERT INTO persistentroots (uuid, "
-           "backingstore, currentbranch, deleted) VALUES(?,?,NULL,0)",
-           [uuid dataValue],
-           [backingStoreUUID dataValue]];
-
-    if (aBranchUUID != nil)
-    {    
-        [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, tail_revid, current_revid, metadata, deleted) VALUES(?,?,?,?,NULL,0)",
-               [aBranchUUID dataValue],
-               [uuid dataValue],
-               [[aRevision revisionUUID] dataValue],
-               [[aRevision revisionUUID] dataValue]];
-        
-        
-        [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE uuid = ?",
-          [aBranchUUID dataValue],
-          [uuid dataValue]];
-    }
-    
-    [db_ releaseSavepoint: @"createPersistentRootWithUUID"];
-    
-    // Return info
-    
-
-                                  
+    [transaction_ setCurrentBranch: aBranchUUID
+                 forPersistentRoot: uuid];
+                                      
     COPersistentRootInfo *plist = [[COPersistentRootInfo alloc] init];
     plist.UUID = uuid;
     plist.deleted = NO;
@@ -836,10 +865,8 @@
     [self checkInTransaction];
     [self recordModifiedPersistentRoot: persistentRootUUID];
     
-    [db_ executeUpdate: @"INSERT INTO persistentroots (uuid, "
-     "backingstore, currentbranch, deleted) VALUES(?,?,NULL,0)",
-     [persistentRootUUID dataValue],
-     [persistentRootUUID dataValue]];
+    [transaction_ createPersistentRootWithUUID: persistentRootUUID
+                         persistentRootForCopy: nil];
     
     COPersistentRootInfo *plist = [[COPersistentRootInfo alloc] init];
     plist.UUID = persistentRootUUID;
@@ -854,12 +881,9 @@
     [self checkInTransaction];
     [self recordModifiedPersistentRoot: aRoot];
     
-    NILARG_EXCEPTION_TEST(aRoot);
+    [transaction_ deletePersistentRoot: aRoot];
     
-    BOOL ok = [db_ executeUpdate: @"UPDATE persistentroots SET deleted = 1 WHERE uuid = ?",
-               [aRoot dataValue]];
-    
-    return ok;
+    return YES;
 }
 
 - (BOOL) undeletePersistentRoot: (ETUUID *)aRoot
@@ -868,12 +892,9 @@
     [self checkInTransaction];
     [self recordModifiedPersistentRoot: aRoot];
     
-    NILARG_EXCEPTION_TEST(aRoot);
+    [transaction_ undeletePersistentRoot: aRoot];
     
-    BOOL ok = [db_ executeUpdate: @"UPDATE persistentroots SET deleted = 0 WHERE uuid = ?",
-               [aRoot dataValue]];
-    
-    return ok;
+    return YES;
 }
 
 - (BOOL) setCurrentBranch: (ETUUID *)aBranch
@@ -883,16 +904,10 @@
     [self checkInTransaction];
     [self recordModifiedPersistentRoot: aRoot];
     
-    NILARG_EXCEPTION_TEST(aBranch);
-    NILARG_EXCEPTION_TEST(aRoot);
+    [transaction_ setCurrentBranch: aBranch
+                 forPersistentRoot: aRoot];
     
-    BOOL ok = [db_ executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE uuid = ? AND 0 = (SELECT deleted FROM branches WHERE uuid = ? AND proot = ?)",
-               [aBranch dataValue], [aRoot dataValue],
-               [aBranch dataValue], [aRoot dataValue]];
-
-    ok = ok && ([db_ changes] > 0);
-    
-    return ok;
+    return YES;
 }
 
 - (BOOL) createBranchWithUUID: (ETUUID *)branchUUID
@@ -904,24 +919,11 @@
     [self checkInTransaction];
     [self recordModifiedPersistentRoot: aRoot];
     
-    NILARG_EXCEPTION_TEST(branchUUID);
-    NILARG_EXCEPTION_TEST(revId);
-    NILARG_EXCEPTION_TEST(aRoot);
-    [self validateRevision: revId forPersistentRoot: aRoot];
+    [transaction_ createBranchWithUUID: branchUUID
+                       initialRevision: revId.revisionUUID
+                     forPersistentRoot: aRoot];
     
-    BOOL ok = [db_ executeUpdate: @"INSERT INTO branches (uuid, proot, tail_revid, current_revid, metadata, deleted, parentbranch) VALUES(?,?,?,?,NULL,0,?)",
-     [branchUUID dataValue],
-     [aRoot dataValue],
-     [[revId revisionUUID] dataValue],
-     [[revId revisionUUID] dataValue],
-     [aParentBranch dataValue]];
-  
-    if (!ok)
-    {
-        branchUUID = nil;
-    }
-
-    return ok;
+    return YES;
 }
 
 - (void) validateRevision: (CORevisionID*)aRev
@@ -960,36 +962,11 @@
     [self checkInTransaction];
     [self recordModifiedPersistentRoot: aRoot];
     
-    NILARG_EXCEPTION_TEST(aBranch);
-    NILARG_EXCEPTION_TEST(aRoot);
-    [self validateRevision: currentRev forPersistentRoot: aRoot];
-    [self validateRevision: tailRev forPersistentRoot: aRoot];
+    [transaction_ setCurrentRevision: currentRev.revisionUUID
+                           forBranch: aBranch
+                    ofPersistentRoot: aRoot];
     
-    [db_ savepoint: @"setCurrentRevision"];
-    
-    NSData *branchData = [aBranch dataValue];
-    NSData *prootData = [aRoot dataValue];
-    
-    if (currentRev != nil)
-    {
-        [db_ executeUpdate: @"UPDATE branches SET current_revid = ? WHERE uuid = ? AND proot = ?",
-                [[currentRev revisionUUID] dataValue],
-                branchData,
-                prootData];
-    }
-    if (tailRev != nil)
-    {
-        [db_ executeUpdate: @"UPDATE branches SET tail_revid = ? WHERE uuid = ? AND proot = ?",
-                [[tailRev revisionUUID] dataValue],
-                branchData,
-                prootData];
-    }
-
-    BOOL ok = [db_ releaseSavepoint: @"setCurrentRevision"];
-    
-    assert(ok);
-    
-    return ok;
+    return YES;
 }
 
 
@@ -1000,18 +977,10 @@
     [self checkInTransaction];
     [self recordModifiedPersistentRoot: aRoot];
     
-    NILARG_EXCEPTION_TEST(aBranch);
-    NILARG_EXCEPTION_TEST(aRoot);
+    [transaction_ deleteBranch: aBranch
+              ofPersistentRoot: aRoot];
     
-    BOOL ok = [db_ executeUpdate: @"UPDATE branches SET deleted = 1 WHERE uuid = ? AND proot = ? AND uuid != (SELECT currentbranch FROM persistentroots WHERE persistentroots.uuid = proot)",
-               [aBranch dataValue],
-               [aRoot dataValue]];
-    if (ok)
-    {
-        ok = [db_ changes] > 0;
-    }
-
-    return ok;
+    return YES;
 }
 
 - (BOOL) undeleteBranch: (ETUUID *)aBranch
@@ -1021,13 +990,10 @@
     [self checkInTransaction];
     [self recordModifiedPersistentRoot: aRoot];
     
-    NILARG_EXCEPTION_TEST(aBranch);
-    NILARG_EXCEPTION_TEST(aRoot);
+    [transaction_ undeleteBranch: aBranch
+                ofPersistentRoot: aRoot];
     
-    BOOL ok = [db_ executeUpdate: @"UPDATE branches SET deleted = 0 WHERE uuid = ?",
-               [aBranch dataValue]];
-    
-    return ok;
+    return YES;
 }
 
 - (BOOL) setMetadata: (NSDictionary *)meta
@@ -1038,12 +1004,11 @@
     [self checkInTransaction];
     [self recordModifiedPersistentRoot: aRoot];
     
-    NSData *data = [self writeMetadata: meta];    
-    BOOL ok = [db_ executeUpdate: @"UPDATE branches SET metadata = ? WHERE uuid = ?",
-               data,
-               [aBranch dataValue]];
-
-    return ok;
+    [transaction_ setMetadata: meta
+                    forBranch: aBranch
+             ofPersistentRoot: aRoot];
+    
+    return YES;
 }
 
 - (BOOL) finalizeGarbageAttachments

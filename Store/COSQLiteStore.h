@@ -3,7 +3,7 @@
 @protocol COItemGraph;
 @class ETUUID;
 @class COItem, CORevisionID, CORevisionInfo, COItemGraph, COBranchInfo, COPersistentRootInfo;
-@class FMDatabase;
+@class FMDatabase, COStoreTransaction;
 
 enum COBranchRevisionReadingOptions
 {
@@ -205,6 +205,8 @@ typedef NSUInteger COBranchRevisionReadingOptions;
     NSMutableDictionary *backingStores_; // COUUID (backing store UUID => COCQLiteStorePersistentRootBackingStore)
     NSMutableDictionary *backingStoreUUIDForPersistentRootUUID_;
     NSMutableSet *modifiedPersistentRootsUUIDs_;
+    
+    COStoreTransaction *transaction_;
 }
 
 /**
@@ -475,6 +477,9 @@ typedef NSUInteger COBranchRevisionReadingOptions;
 - (BOOL) beginTransactionWithError: (NSError **)error;
 - (BOOL) commitTransactionWithError: (NSError **)error;
 - (BOOL) commitTransactionWithUUID: (ETUUID *)transactionUUID withError: (NSError **)error;
+
+@property (readwrite, nonatomic, strong) ETUUID *transactionUUID;
+
 
 @end
 

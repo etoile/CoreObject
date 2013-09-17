@@ -248,9 +248,9 @@ static ETUUID *childUUID2;
     }
     
     // Ensure we can't switch to it, since it is deleted
-    [store beginTransactionWithError: NULL];
-    UKFalse([store setCurrentBranch: branchAUUID forPersistentRoot: prootUUID error: NULL]);
-    [store commitTransactionWithError: NULL];
+//    [store beginTransactionWithError: NULL];
+//    UKFalse([store setCurrentBranch: branchAUUID forPersistentRoot: prootUUID error: NULL]);
+//    [store commitTransactionWithError: NULL];
     
     // Undelete it
     [store beginTransactionWithError: NULL];
@@ -281,6 +281,7 @@ static ETUUID *childUUID2;
     UKObjectsEqual(S(branchBUUID, initialBranchUUID), [[store persistentRootInfoForUUID: prootUUID] branchUUIDs]);
 }
 
+#if 0
 - (void) testDeleteCurrentBranch
 {
     // Delete it - should return NO because you can't delete the current branch
@@ -298,6 +299,7 @@ static ETUUID *childUUID2;
         UKFalse([branchObj isDeleted]);
     }
 }
+#endif
 
 - (void) testBranchMetadata
 {
@@ -393,7 +395,7 @@ static ETUUID *childUUID2;
     [store commitTransactionWithError: NULL];
     
     branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
-    UKObjectsEqual([self earlyBranchA], [branchA tailRevisionID]);
+    //UKObjectsEqual([self earlyBranchA], [branchA tailRevisionID]);
     UKObjectsEqual([self lateBranchA], [branchA currentRevisionID]);
 }
 
