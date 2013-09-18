@@ -293,16 +293,4 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @property (nonatomic, readonly) BOOL isPersistentRoot;
 
-/**
- * The UUID of the root object.
- *
- * Never returns nil even when -rootObject is nil. This method can query the
- * store to retrieve the UUID.
- *
- * See also -[COStore rootObjectUUIDForPersistentRootUUID:].
- *
- * Reason for deprecating: redundancy, unused.
- */
-@property (weak, nonatomic, readonly) ETUUID *rootObjectUUID;
-
 @end

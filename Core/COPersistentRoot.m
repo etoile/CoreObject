@@ -235,11 +235,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	[[self objectGraphContext] setRootObject: aRootObject];
 }
 
-- (ETUUID *)rootObjectUUID
-{
-	return [[self objectGraphContext] rootItemUUID];
-}
-
 - (COObject *)objectWithUUID: (ETUUID *)uuid
 {
 	return [[self objectGraphContext] objectWithUUID: uuid];
