@@ -140,8 +140,8 @@
 	
 	for (CORevisionInfo *revInfo in revInfos)
 	{
-		[revs addObject: [[CORevision alloc] initWithStore: [ctx store]
-		                                      revisionInfo: revInfo]];
+		[revs addObject: [[CORevision alloc] initWithEditingContext: ctx
+                                                       revisionInfo: revInfo]];
 	}
 	return revs;
 }

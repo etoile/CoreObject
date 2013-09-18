@@ -11,6 +11,9 @@
 #import "FMDatabase.h"
 #import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
+#import "COEditingContext.h"
+#import "COEditingContext+Private.h"
+#import "CORevisionID.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 
@@ -24,20 +27,13 @@
 	[self applyTraitFromClass: [ETCollectionTrait class]];
 }
 
-+ (CORevision *) revisionWithStore: (COSQLiteStore *)aStore revisionID: (CORevisionID *)anID
-{
-    CORevisionInfo *revInfo = [aStore revisionInfoForRevisionID: anID];
-    
-    return [[CORevision alloc] initWithStore: aStore
-                                 revisionInfo: revInfo];
-}
-
-- (id)initWithStore: (COSQLiteStore *)aStore
-       revisionInfo: (CORevisionInfo *)aRevInfo
+- (id)initWithEditingContext: (COEditingContext *)aContext
+                revisionInfo: (CORevisionInfo *)aRevInfo
 {
 	SUPERINIT;
-	store =  aStore;
+	editingContext = aContext;
 	revisionInfo =  aRevInfo;
+    assert([revisionInfo revisionID] != nil);
 	return self;
 }
 
@@ -46,8 +42,7 @@
 	if ([rhs isKindOfClass: [CORevision class]] == NO)
 		return NO;
 
-	return ([revisionInfo isEqual: ((CORevision *)rhs)->revisionInfo]
-		&& [[store URL] isEqual: [[rhs store] URL]]);
+	return [revisionInfo.revisionID isEqual: ((CORevision *)rhs)->revisionInfo.revisionID];
 }
 
 - (NSArray *)propertyNames
@@ -57,13 +52,14 @@
 		@"longDescription", @"objectUUID", @"metadata", @"changedObjectUUIDs")];
 }
 
-- (COSQLiteStore *)store
+- (COEditingContext *)editingContext
 {
-	return store;
+	return editingContext;
 }
 
 - (CORevisionID *)revisionID
 {
+    assert([revisionInfo revisionID] != nil);
 	return [revisionInfo revisionID];
 }
 
@@ -74,8 +70,8 @@
         return nil;
     }
     
-	CORevisionInfo *parentRevInfo = [store revisionInfoForRevisionID: [revisionInfo parentRevisionID]];
-	return [[[self class] alloc] initWithStore: store revisionInfo: parentRevInfo];
+	CORevisionID *parentRevID = [revisionInfo parentRevisionID];
+    return [editingContext revisionForRevisionID: parentRevID];
 }
 
 - (ETUUID *)persistentRootUUID
@@ -90,8 +86,7 @@
 
 - (NSDate *)date
 {
-	// TODO: Implement it in the metadata for the new store
-	return [[self metadata] objectForKey: @"date"];
+	return [revisionInfo date];
 }
 
 - (NSString *)type

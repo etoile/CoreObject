@@ -8,6 +8,7 @@
 #import <EtoileFoundation/Macros.h>
 
 #import <CoreObject/CoreObject.h>
+#import <CoreObject/COEditingContext+Private.h>
 
 @implementation EWDocument
 
@@ -148,8 +149,7 @@
 
 - (void) persistentSwitchToStateToken: (CORevisionID *)aToken
 {
-    [[_persistentRoot editingBranch] setCurrentRevision: [CORevision revisionWithStore: [self store]
-                                                                            revisionID: aToken]];
+    [[_persistentRoot editingBranch] setCurrentRevision: [[_persistentRoot editingContext] revisionForRevisionID: aToken]];
     [self commit];
 }
 

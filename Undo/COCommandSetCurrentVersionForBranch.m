@@ -2,6 +2,7 @@
 #import <EtoileFoundation/Macros.h>
 
 #import "COEditingContext.h"
+#import "COEditingContext+Private.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
 #import "CORevision.h"
@@ -96,8 +97,8 @@ static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
     COBranch *branch = [proot branchForUUID: _branchUUID];
     if ([[[branch currentRevision] revisionID] isEqual: _oldRevisionID])
     {
-        [branch setCurrentRevision: [CORevision revisionWithStore: [proot store]
-                                                       revisionID: _newRevisionID]];
+        [branch setCurrentRevision:
+            [aContext revisionForRevisionID: _newRevisionID]];
     }
     else
     {

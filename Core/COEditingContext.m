@@ -15,6 +15,7 @@
 #import "COUndoStackStore.h"
 #import "COEditingContext+Undo.h"
 #import "COEditingContext+Private.h"
+#import "CORevisionCache.h"
 
 @implementation COEditingContext
 
@@ -50,6 +51,7 @@
 	SUPERINIT;
 
 	_store =  store;
+    _revisionCache = [[CORevisionCache alloc] initWithEditingContext: self];
 	_modelRepository = [ETModelDescriptionRepository mainRepository];
 	_loadedPersistentRoots = [NSMutableDictionary new];
 	_persistentRootsPendingDeletion = [NSMutableSet new];
@@ -527,6 +529,11 @@
     {
         [loaded storePersistentRootDidChange: notif];
     }
+}
+
+- (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid
+{
+    return [_revisionCache revisionForRevisionID: aRevid];
 }
 
 @end

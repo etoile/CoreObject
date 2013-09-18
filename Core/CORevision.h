@@ -10,7 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COSQLiteStore, CORevisionInfo, CORevisionID;
+@class COEditingContext, CORevisionInfo, CORevisionID;
 
 /** 
  * @group Store
@@ -35,16 +35,16 @@
 @interface CORevision : NSObject <ETCollection>
 {
 	@private
-	COSQLiteStore *store;
+	COEditingContext * __weak editingContext;
 	CORevisionInfo *revisionInfo;
 }
 
-/** @taskunit Store */
+/** @taskunit Editing Context */
 
 /** 
- * Returns the store to which the revision and its changed objects belongs to. 
+ * Returns the editing context to which the revision and its changed objects belongs to. 
  */
-- (COSQLiteStore *)store;
+- (COEditingContext *)editingContext;
 
 /** @taskunit History Properties and Metadata */
 
@@ -115,10 +115,7 @@
  * Initializes and returns a new revision object to represent a precise revision 
  * number in the given store. 
  */
-- (id)initWithStore: (COSQLiteStore *)aStore
-       revisionInfo: (CORevisionInfo *)aRevInfo;
-
-+ (CORevision *) revisionWithStore: (COSQLiteStore *)aStore
-                        revisionID: (CORevisionID *)anID;
+- (id)initWithEditingContext: (COEditingContext *)aContext
+                revisionInfo: (CORevisionInfo *)aRevInfo;
 
 @end

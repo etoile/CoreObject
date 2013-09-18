@@ -169,19 +169,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return branchInfo;
 }
 
-- (CORevisionInfo *) currentRevisionInfo
-{
-    // WARNING: Accesses store
-    CORevisionID *revid = _currentRevisionID;
-    COSQLiteStore *store = [[self persistentRoot] store];
-    
-    if (revid != nil)
-    {
-        return [store revisionInfoForRevisionID: revid];
-    }
-    return nil;
-}
-
 - (NSDictionary *)metadata
 {
 	return [NSDictionary dictionaryWithDictionary: _metadata];
@@ -232,13 +219,11 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (CORevision *)parentRevision
 {
-    // WARNING: Accesses store
     CORevisionID *revid = [[self branchInfo] tailRevisionID];
-    COSQLiteStore *store = [[self persistentRoot] store];
     
     if (revid != nil)
     {
-        return [CORevision revisionWithStore: store revisionID: revid];
+        return [[self editingContext] revisionForRevisionID: revid];
     }
     
     return nil;
@@ -246,12 +231,9 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (CORevision *)currentRevision
 {
-    // WARNING: Accesses store
-    CORevisionInfo *info = [self currentRevisionInfo];
-    if (info != nil)
+    if (_currentRevisionID != nil)
     {
-        return [[CORevision alloc] initWithStore: [[self persistentRoot] store]
-                                     revisionInfo: info];
+        return [[self editingContext] revisionForRevisionID: _currentRevisionID];
     }
     return nil;
 }
@@ -318,8 +300,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     if (![[[self branchInfo] currentRevisionID] isEqual: _currentRevisionID])
     {
         [self setCurrentRevision:
-         [CORevision revisionWithStore: [self store]
-                            revisionID: [[self branchInfo] currentRevisionID]]];
+            [[self editingContext] revisionForRevisionID: [[self branchInfo] currentRevisionID]]];
     }
     
     if (_deleted != [[self branchInfo] isDeleted])
@@ -611,8 +592,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
     COMergeInfo *result = [[COMergeInfo alloc] init];
     result.mergeDestinationRevision = [self currentRevision];
-    result.mergeSourceRevision = [CORevision revisionWithStore: [self store] revisionID: mergeRevisionID];
-    result.baseRevision =[CORevision revisionWithStore: [self store] revisionID: aBaseRevisionID];
+    result.mergeSourceRevision = [[self editingContext] revisionForRevisionID: mergeRevisionID];
+    result.baseRevision = [[self editingContext] revisionForRevisionID: aBaseRevisionID];
     result.diff = merged;
     return result;
 }

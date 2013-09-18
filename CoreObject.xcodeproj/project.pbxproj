@@ -108,7 +108,9 @@
 		66457FC917E8BFE5003C51A8 /* COStoreWriteRevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 66457FB317E8BFE5003C51A8 /* COStoreWriteRevision.h */; };
 		66457FCA17E8BFE5003C51A8 /* COStoreWriteRevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 66457FB417E8BFE5003C51A8 /* COStoreWriteRevision.m */; };
 		66457FCF17E8C9D0003C51A8 /* COStoreAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 66457FCD17E8C9CF003C51A8 /* COStoreAction.h */; };
-		6646974A17CDA78300A1B767 /* COEditingContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646974917CDA78300A1B767 /* COEditingContext+Private.h */; };
+		66457FEC17E9683F003C51A8 /* CORevisionCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 66457FEA17E9683E003C51A8 /* CORevisionCache.h */; };
+		66457FED17E9683F003C51A8 /* CORevisionCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 66457FEB17E9683F003C51A8 /* CORevisionCache.m */; };
+		6646974A17CDA78300A1B767 /* COEditingContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646974917CDA78300A1B767 /* COEditingContext+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646975317CDA8DB00A1B767 /* COPersistentRoot+Private.h */; };
 		6646976317CDB94300A1B767 /* COUndoStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646976117CDB94300A1B767 /* COUndoStack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6646976417CDB94300A1B767 /* COUndoStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646976217CDB94300A1B767 /* COUndoStack.m */; };
@@ -523,6 +525,8 @@
 		66457FB317E8BFE5003C51A8 /* COStoreWriteRevision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COStoreWriteRevision.h; path = Store/COStoreWriteRevision.h; sourceTree = "<group>"; };
 		66457FB417E8BFE5003C51A8 /* COStoreWriteRevision.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COStoreWriteRevision.m; path = Store/COStoreWriteRevision.m; sourceTree = "<group>"; };
 		66457FCD17E8C9CF003C51A8 /* COStoreAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COStoreAction.h; path = Store/COStoreAction.h; sourceTree = "<group>"; };
+		66457FEA17E9683E003C51A8 /* CORevisionCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CORevisionCache.h; path = Core/CORevisionCache.h; sourceTree = "<group>"; };
+		66457FEB17E9683F003C51A8 /* CORevisionCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CORevisionCache.m; path = Core/CORevisionCache.m; sourceTree = "<group>"; };
 		6646974917CDA78300A1B767 /* COEditingContext+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COEditingContext+Private.h"; path = "Core/COEditingContext+Private.h"; sourceTree = "<group>"; };
 		6646975317CDA8DB00A1B767 /* COPersistentRoot+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COPersistentRoot+Private.h"; path = "Core/COPersistentRoot+Private.h"; sourceTree = "<group>"; };
 		6646975517CDA94000A1B767 /* COBranch+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "COBranch+Private.h"; path = "Core/COBranch+Private.h"; sourceTree = "<group>"; };
@@ -912,6 +916,17 @@
 			name = Actions;
 			sourceTree = "<group>";
 		};
+		66457FEE17E968F1003C51A8 /* Private */ = {
+			isa = PBXGroup;
+			children = (
+				6609485D1787A1160049468B /* CORelationshipCache.h */,
+				6609485C1787A1160049468B /* CORelationshipCache.m */,
+				66457FEA17E9683E003C51A8 /* CORevisionCache.h */,
+				66457FEB17E9683F003C51A8 /* CORevisionCache.m */,
+			);
+			name = Private;
+			sourceTree = "<group>";
+		};
 		6646976D17CDB94900A1B767 /* Undo actions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1033,13 +1048,12 @@
 		6686BDB612592C1B0065DE1A /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				66457FEE17E968F1003C51A8 /* Private */,
 				609C01AA170AC93000D01AAB /* NSObject+CoreObject.h */,
 				609C01AB170AC93100D01AAB /* NSObject+CoreObject.m */,
 				609C00881704C3DA00D01AAB /* COEditingContext.h */,
 				6646974917CDA78300A1B767 /* COEditingContext+Private.h */,
 				609C00891704C3DA00D01AAB /* COEditingContext.m */,
-				6609485D1787A1160049468B /* CORelationshipCache.h */,
-				6609485C1787A1160049468B /* CORelationshipCache.m */,
 				609C008C1704C3DA00D01AAB /* COObject.h */,
 				609C008D1704C3DA00D01AAB /* COObject.m */,
 				66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */,
@@ -1386,6 +1400,7 @@
 				66457FC717E8BFE5003C51A8 /* COStoreUndeletePersistentRoot.h in Headers */,
 				66457FC917E8BFE5003C51A8 /* COStoreWriteRevision.h in Headers */,
 				66457FCF17E8C9D0003C51A8 /* COStoreAction.h in Headers */,
+				66457FEC17E9683F003C51A8 /* CORevisionCache.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1730,6 +1745,7 @@
 				66457FC617E8BFE5003C51A8 /* COStoreUndeleteBranch.m in Sources */,
 				66457FC817E8BFE5003C51A8 /* COStoreUndeletePersistentRoot.m in Sources */,
 				66457FCA17E8BFE5003C51A8 /* COStoreWriteRevision.m in Sources */,
+				66457FED17E9683F003C51A8 /* CORevisionCache.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

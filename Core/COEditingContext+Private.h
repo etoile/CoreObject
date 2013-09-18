@@ -78,6 +78,8 @@
  */
 - (COCrossPersistentRootReferenceCache *) crossReferenceCache;
 
+- (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid;
+
 @end
 
 @interface COEditingContext (Debugging)
