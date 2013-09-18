@@ -700,15 +700,16 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 	NSUInteger suggestedMaxRevCount = 50000;
 	NSMutableArray *revInfos = [NSMutableArray arrayWithCapacity: suggestedMaxRevCount];
 	NSMutableDictionary *revIDs = [NSMutableDictionary dictionaryWithCapacity: suggestedMaxRevCount];
-	NSData *branchUUIDData = [aBranchUUID dataValue];
+	/* Represents a branch in the path leading to the end branch, while 
+	   navigating the history backwards to collect branch revisions. */
+	NSData *visitedBranchUUIDData = [aBranchUUID dataValue];
 	int64_t parentRevid = -1;
 	BOOL isFirstResult = YES;
-	BOOL isValidBranch = NO;
 
 	while ([rs next])
 	{
-		isValidBranch = ([[rs dataForColumnIndex: 2] isEqualToData: branchUUIDData]);
-
+		NSData *branchUUIDData = [rs dataForColumnIndex: 2];
+		BOOL isValidBranch = ([branchUUIDData isEqualToData: visitedBranchUUIDData]);
 		int64_t revid = [rs longLongIntForColumnIndex: 0];
 		BOOL isParentRev = (revid == parentRevid);
 		BOOL skippingUnrelatedBranchRevisions = (isValidBranch == NO && isParentRev == NO);
@@ -723,9 +724,10 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 		{
 			[revInfos insertObject: [self revisionInfoWithResultSet: rs revisionIDs: revIDs]
 			               atIndex: 0];
+			parentRevid = [rs longLongIntForColumnIndex: 1];
+			visitedBranchUUIDData = branchUUIDData;
 		}
-		
-		parentRevid = [rs longLongIntForColumnIndex: 1];
+
 		isFirstResult = NO;
     }
 	[rs close];

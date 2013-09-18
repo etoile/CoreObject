@@ -19,6 +19,10 @@
     CORevision *r4;
     CORevision *r5;
 	CORevision *r6;
+    CORevision *r7;
+    CORevision *r8;
+	CORevision *r9;
+	CORevision *r10;
 }
 @end
 
@@ -26,25 +30,52 @@
 
 /*
 
-															------6 <-- persistent root p1, branch 1C
-                                                           /
-                               -------------3-------------5  <-- persistent root p1, branch 1B
-                              /
-                     0-------1-------2  <-- persistent root p1, branch 1A
-                                      \
-                                       ------------4  <-- persistent root p2, branch 2A
+		 persistent root p1, branch 1C -->    ----[7]-----------[9]-----10  
+		                                     /
+		   ------------3------------[5]-----6------------[8]    <-- persistent root p1, branch 1B
+		  /
+  0------1------2    <-- persistent root p1, branch 1A
+				 \
+				  ------------4    <-- persistent root p2, branch 2A
 
  
 
-          revision:  r0      r1      r2     r3     r4     r5     r6
+           revision:  r0      r1      r2     r3     r4     r5     r6     r7     r8     r9     r10
  
- root object label:  "null"  "1"     "2"    "3"    "4"    "5"    "6"
+  root object label:  "null"  "1"     "2"    "3"    "4"    "5"    "6"    "7"    "8"    "9"    "10"
  
-   persistent root:  p1      p1      p1     p1     p2     p1     p1
+    persistent root:  p1      p1      p1     p1     p2     p1     p1     p1     p1     p1     p1
  
-            branch:  1A      1A      1A     1B     2A     1B     1C
+             branch:  1A      1A      1A     1B     2A     1B     1B     1C     1B     1C     1C
+ 
+
+  Notes: Divergent revisions are enclosed in []. 
+ 
+  For grouped divergent revisions such as r7 and r9, multiple current revision  
+  transitions are possible in the diagram above: 
+
+  - 6 -> 7 -> 9 -> 6 -> 10 (the test suite scenario)
+  - 6 -> 7 -> 6 -> 9 -> 6 -> 10
+
+  In other words, r9 parent revision is either 7 or 6.
+ 
+  A commit creates a new revision and changes the current revision, but changing
+  the current revision doesn't result in a new revision.
  
  */
+
+- (void)setCurrentRevision: (CORevision *)aRev forBranch: (COBranch *)aBranch
+{
+	NSError *error = nil;
+	[[ctx store] beginTransactionWithError: NULL];
+	[[ctx store] setCurrentRevision: [aRev revisionID]
+	                   tailRevision: nil
+	                      forBranch: [aBranch UUID]
+	               ofPersistentRoot: [[aBranch persistentRoot] persistentRootUUID]
+	                          error: &error];
+	ETAssert(error == nil);
+	ETAssert([[ctx store] commitTransactionWithUUID: [ETUUID UUID] withError: NULL]);
+}
 
 - (id) init
 {
@@ -63,12 +94,14 @@
     r2 = [branch1A currentRevision];
     
     branch1B = [branch1A makeBranchWithLabel: @"1B" atRevision: r1];
+
     [[branch1B rootObject] setLabel: @"3"];
     [ctx commit];
     r3 = [branch1B currentRevision];
     
     p2 = [branch1A makeCopyFromRevision: r2];
     [ctx commit]; // FIXME: This commit is a hack, should be removed. add test and fix.
+
     branch2A = [p2 currentBranch];
     [[p2 rootObject] setLabel: @"4"];
     [ctx commit];
@@ -77,11 +110,34 @@
 	[[branch1B rootObject] setLabel: @"5"];
     [ctx commit];
     r5 = [branch1B currentRevision];
-
-	branch1C = [branch1B makeBranchWithLabel: @"1C" atRevision: r5];
-    [[branch1C rootObject] setLabel: @"6"];
+	
+	[self setCurrentRevision: r3 forBranch: branch1B];
+	
+	[[branch1B rootObject] setLabel: @"6"];
     [ctx commit];
-    r6 = [branch1C currentRevision];
+    r6 = [branch1B currentRevision];
+
+	branch1C = [branch1B makeBranchWithLabel: @"1C" atRevision: r6];
+
+    [[branch1C rootObject] setLabel: @"7"];
+    [ctx commit];
+    r7 = [branch1C currentRevision];
+
+	[[branch1B rootObject] setLabel: @"8"];
+    [ctx commit];
+    r8 = [branch1B currentRevision];
+
+	[[branch1C rootObject] setLabel: @"9"];
+    [ctx commit];
+    r9 = [branch1C currentRevision];
+
+	[self setCurrentRevision: r6 forBranch: branch1C];
+
+	[[branch1C rootObject] setLabel: @"10"];
+    [ctx commit];
+    r10 = [branch1C currentRevision];
+
+	[self setCurrentRevision: r6 forBranch: branch1B];
 
     return self;
 }
@@ -101,7 +157,11 @@
 	UKObjectsEqual(r1, [r3 parentRevision]);
 	UKObjectsEqual(r2, [r4 parentRevision]);
 	UKObjectsEqual(r3, [r5 parentRevision]);
-	UKObjectsEqual(r5, [r6 parentRevision]);
+	UKObjectsEqual(r3, [r6 parentRevision]);
+	UKObjectsEqual(r6, [r7 parentRevision]);
+	UKObjectsEqual(r6, [r8 parentRevision]);
+	UKObjectsEqual(r7, [r9 parentRevision]);
+	UKObjectsEqual(r6, [r10 parentRevision]);
 }
 
 - (void) testRevisionPersistentRootUUID
@@ -146,21 +206,33 @@
 	return revs;
 }
 
-- (void) testBasicBranchRevisions
+- (void)testBasicBranchRevisions
 {
 	UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: 0]);
-	UKObjectsEqual(A(r3, r5), [self revisionsForBranch: branch1B options: 0]);
-	UKObjectsEqual(A(r6), [self revisionsForBranch: branch1C options: 0]);
+	UKObjectsEqual(A(r3, r6), [self revisionsForBranch: branch1B options: 0]);
+	UKObjectsEqual(A(r10), [self revisionsForBranch: branch1C options: 0]);
 	UKObjectsEqual(A(r4), [self revisionsForBranch: branch2A options: 0]);
 }
 
-- (void) testBranchRevisionsIncludingParentBranches
+- (void)testBranchRevisionsIncludingParentBranches
 {
 	COBranchRevisionReadingOptions options = COBranchRevisionReadingParentBranches;
 
 	UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: options]);
-	UKObjectsEqual(A(r0, r1, r3, r5), [self revisionsForBranch: branch1B options: options]);
-	UKObjectsEqual(A(r0, r1, r3, r5, r6), [self revisionsForBranch: branch1C options: options]);
+	UKObjectsEqual(A(r0, r1, r3, r6), [self revisionsForBranch: branch1B options: options]);
+	UKObjectsEqual(A(r0, r1, r3, r6, r10), [self revisionsForBranch: branch1C options: options]);
+	UKObjectsEqual(A(r0, r1, r2, r4), [self revisionsForBranch: branch2A options: options]);
+}
+
+- (void)testBranchRevisionsIncludingParentBranchesAndDivergentRevisions
+{
+	COBranchRevisionReadingOptions options =
+		(COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions);
+	
+	UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: options]);
+	/* Divergent revisions that follow the head revision are ignored (e.g. r8) */
+	UKObjectsEqual(A(r0, r1, r3, r5, r6), [self revisionsForBranch: branch1B options: options]);
+	UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
 	UKObjectsEqual(A(r0, r1, r2, r4), [self revisionsForBranch: branch2A options: options]);
 }
 
