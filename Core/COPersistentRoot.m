@@ -31,12 +31,7 @@ NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidCh
 
 @implementation COPersistentRoot
 
-@synthesize parentContext = _parentContext;
-
-- (ETUUID *)persistentRootUUID
-{
-    return _UUID;
-}
+@synthesize parentContext = _parentContext, persistentRootUUID = _UUID;
 
 - (id) initWithInfo: (COPersistentRootInfo *)info
 cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
@@ -76,7 +71,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         _UUID =  [ETUUID UUID];
         
         ETUUID *branchUUID = [ETUUID UUID];
-        
         COBranch *branch = [[COBranch alloc] initWithUUID: branchUUID
 		                                objectGraphContext: anObjectGraphContext
                                             persistentRoot: self
@@ -86,7 +80,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         [_branchForUUID setObject: branch forKey: branchUUID];
         
         _currentBranchUUID =  branchUUID;
-        
         _cheapCopyRevisionID =  cheapCopyRevisionID;
     }
 
@@ -129,7 +122,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return NO;
 }
 
-- (void) setDeleted:(BOOL)deleted
+- (void)setDeleted: (BOOL)deleted
 {
     if (deleted)
     {
@@ -147,14 +140,17 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	return [_branchForUUID objectForKey: _currentBranchUUID];
 }
 
-- (void)setCurrentBranch: (COBranch *)aTrack
+- (void)setCurrentBranch: (COBranch *)aBranch
 {
     if (![self isPersistentRootCommitted])
     {
-        [NSException raise: NSGenericException format: @"A persistent root must be committed before you can add or change its branches"];
+		// TODO: Use a CoreObject exception type
+        [NSException raise: NSGenericException
+		            format: @"A persistent root must be committed before you "
+		                     "can add or change its branches"];
     }
 
-    _currentBranchUUID =  [aTrack UUID];
+    _currentBranchUUID = [aBranch UUID];
     
     [self updateCrossPersistentRootReferences];
     [self sendChangeNotification];
@@ -170,14 +166,17 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	return [_branchForUUID objectForKey: _editingBranchUUID];
 }
 
-- (void)setEditingBranch: (COBranch *)aTrack
+- (void)setEditingBranch: (COBranch *)aBranch
 {
     if (![self isPersistentRootCommitted])
     {
-        [NSException raise: NSGenericException format: @"A persistent root must be committed before you can add or change its branches"];
+		// TODO: Use a CoreObject exception type
+        [NSException raise: NSGenericException
+		            format: @"A persistent root must be committed before you "
+		                     "can add or change its branches"];
     }
 
-    _editingBranchUUID =  [aTrack UUID];
+    _editingBranchUUID = [aBranch UUID];
     
     [self sendChangeNotification];
 }
@@ -205,7 +204,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return [_branchForUUID objectForKey: aUUID];
 }
 
-- (void) setBranchDeleted: (COBranch *)aBranch
+- (void)setBranchDeleted: (COBranch *)aBranch
 {
     if (aBranch.deleted && [aBranch isBranchUncommitted])
     {
@@ -263,7 +262,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 }
 
 - (CORevision *)commitWithType: (NSString *)type
-           shortDescription: (NSString *)shortDescription
+              shortDescription: (NSString *)shortDescription
 {
 	NSString *commitType = type;
 	
@@ -288,12 +287,13 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return nil;
 }
 
-- (BOOL) isPersistentRootCommitted
+- (BOOL)isPersistentRootCommitted
 {
     return _savedState != nil;
 }
 
-- (void) saveCommitWithMetadata: (NSDictionary *)metadata  transactionUUID: (ETUUID *)transactionUUID
+- (void)saveCommitWithMetadata: (NSDictionary *)metadata
+               transactionUUID: (ETUUID *)transactionUUID
 {
     _lastTransactionUUID =  transactionUUID;
     
@@ -380,29 +380,24 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     [self sendChangeNotification];
 }
 
-- (Class)referenceClassForRootObject: (COObject *)aRootObject
-{
-	// TODO: When the user has selected a precise branch, just return COCommitTrack.
-	return [COPersistentRoot class];
-}
-
-/** @taskunit Persistent root info */
-
-- (COPersistentRootInfo *) persistentRootInfo
+- (COPersistentRootInfo *)persistentRootInfo
 {
     return _savedState;
 }
 
-- (void) reloadPersistentRootInfo
+- (void)reloadPersistentRootInfo
 {
-    COPersistentRootInfo *newInfo = [[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
+    COPersistentRootInfo *newInfo =
+		[[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
     if (newInfo != nil)
     {
         _savedState =  newInfo;
     }
 }
 
-- (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev parentBranch: (COBranch *)aParent
+- (COBranch *)makeBranchWithLabel: (NSString *)aLabel
+                       atRevision: (CORevision *)aRev
+                     parentBranch: (COBranch *)aParent
 {
     COBranch *newBranch = [[COBranch alloc] initWithUUID: [ETUUID UUID]
 	                                  objectGraphContext: nil
@@ -417,7 +412,10 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return newBranch;
 }
 
-- (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID metadata: (NSDictionary *)metadata atRevision: (CORevision *)aRev parentBranch: (COBranch *)aParent
+- (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID
+                        metadata: (NSDictionary *)metadata
+                      atRevision: (CORevision *)aRev
+                    parentBranch: (COBranch *)aParent
 {
     COBranch *newBranch = [[COBranch alloc] initWithUUID: aUUID
                                       objectGraphContext: nil
@@ -435,17 +433,17 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return newBranch;
 }
 
-- (CORevision *) revision
+- (CORevision *)revision
 {
     return [[self editingBranch] currentRevision];
 }
 
-- (void) setRevision:(CORevision *)revision
+- (void)setRevision: (CORevision *)revision
 {
     [[self editingBranch] setCurrentRevision: revision];
 }
 
-- (void) updateBranchWithBranchInfo: (COBranchInfo *)branchInfo
+- (void)updateBranchWithBranchInfo: (COBranchInfo *)branchInfo
 {
     COBranch *branch = [_branchForUUID objectForKey: [branchInfo UUID]];
     
@@ -454,7 +452,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         branch = [[COBranch alloc] initWithUUID: [branchInfo UUID]
                              objectGraphContext: nil
                                  persistentRoot: self
-                               parentBranchUUID: branchInfo.parentBranchUUID
+                               parentBranchUUID: [branchInfo parentBranchUUID]
                      parentRevisionForNewBranch: nil];
         
         [_branchForUUID setObject: branch forKey: [branchInfo UUID]];
@@ -467,13 +465,15 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (void)storePersistentRootDidChange: (NSNotification *)notif
 {
-    ETUUID *notifTransaction = [ETUUID UUIDWithString: [[notif userInfo] objectForKey: kCOPersistentRootTransactionUUID]];
+    ETUUID *notifTransaction = [ETUUID UUIDWithString:
+		[[notif userInfo] objectForKey: kCOPersistentRootTransactionUUID]];
     if ([_lastTransactionUUID isEqual: notifTransaction])
     {
         return;
     }
     
-    COPersistentRootInfo *info = [[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
+    COPersistentRootInfo *info =
+		[[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
     _savedState =  info;
     
     for (ETUUID *uuid in [info branchUUIDs])
@@ -484,6 +484,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     
     _currentBranchUUID =  [_savedState currentBranchUUID];
     
+	// TODO: Remove or support
     //[self sendChangeNotification];
 }
 
@@ -516,17 +517,21 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 //    }
 }
 
-- (void) sendChangeNotification
+- (void)sendChangeNotification
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName: COPersistentRootDidChangeNotification
-                                                        object: self];
+    [[NSNotificationCenter defaultCenter]
+		postNotificationName: COPersistentRootDidChangeNotification
+		              object: self];
 }
 
-- (COObjectGraphContext *) objectGraphContextForPreviewingRevision: (CORevision *)aRevision
+- (COObjectGraphContext *)objectGraphContextForPreviewingRevision: (CORevision *)aRevision
 {
-    COObjectGraphContext *ctx = [[COObjectGraphContext alloc] initWithModelRepository: [[self editingContext] modelRepository]];
-    id<COItemGraph> items = [[self store] itemGraphForRevisionID: [aRevision revisionID]];
+    COObjectGraphContext *ctx = [[COObjectGraphContext alloc]
+		initWithModelRepository: [[self editingContext] modelRepository]];
+    id <COItemGraph> items = [[self store] itemGraphForRevisionID: [aRevision revisionID]];
+
     [ctx setItemGraph: items];
+
     return ctx;
 }
 

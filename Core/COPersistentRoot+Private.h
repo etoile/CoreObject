@@ -35,18 +35,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
  * metadatas and returns the resulting revision.
  */
 - (void) saveCommitWithMetadata: (NSDictionary *)metadata transactionUUID: (ETUUID *)transactionUUID;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Returns the class that represents a reference to the provided root object
- * argument.
- *
- * Valid reference kinds are COCommitTrack and COPersistentRoot classes.
- *
- * The root object argument must be belong to another persistent root, otherwise
- * NSInvalidArgumentException is raised.
- */
-- (Class)referenceClassForRootObject: (COObject *)aRootObject;
 
 - (COPersistentRootInfo *) persistentRootInfo;
 

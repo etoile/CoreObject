@@ -121,7 +121,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * For now, persistent root replication accross distinct CoreObject stores 
  * is not supported and might never be.
  */
-@property (weak, nonatomic, readonly) ETUUID *persistentRootUUID;
+@property (nonatomic, readonly) ETUUID *persistentRootUUID;
 
 /**
  * The persistent root deletion status.
