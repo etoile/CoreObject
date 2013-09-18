@@ -156,7 +156,7 @@
     COObject *photo1root = [photo1 rootObject];
     [photo1root setValue: @"photo1, branch A" forProperty: @"label"];
     
-    COObject *childA = [photo1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COObject *childA = [[photo1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [childA setValue: @"childA" forProperty: @"label"];
     
     [photo1root insertObject: childA atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
@@ -366,7 +366,7 @@
     // Add photo2 embedded item. Note that the photo1 cross-persistent-root reference is
     // still present in library1.contents, it's just hidden.
     
-    COObject *photo2 = [library1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COObject *photo2 = [[library1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [photo2 setValue: @"photo2" forProperty: @"label"];
     [[library1 rootObject] insertObject: photo2 atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
     

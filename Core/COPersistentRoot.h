@@ -225,11 +225,6 @@ extern NSString * const COPersistentRootDidChangeNotification;
 @property (nonatomic, strong) id rootObject;
 
 /**
- * Shorthand for [[[self editingBranch] objectGraphContext] insertObjectWithEntityName:]
- */
-- (id)insertObjectWithEntityName: (NSString *)aFullName;
-
-/**
  * Shorthand for [[[self editingBranch] objectGraphContext] objectWithUUID:]
  */
 - (COObject *)objectWithUUID: (ETUUID *)uuid;

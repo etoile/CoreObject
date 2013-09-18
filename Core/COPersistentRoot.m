@@ -257,18 +257,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	[[[self branches] mappedCollection] discardAllChanges];
 }
 
-- (COObject *)insertObjectWithEntityName: (NSString *)aFullName
-                                    UUID: (ETUUID *)aUUID
-{
-	return [[self objectGraphContext] insertObjectWithEntityName: aFullName
-                                               UUID: aUUID];
-}
-
-- (id)insertObjectWithEntityName: (NSString *)aFullName
-{
-	return [self insertObjectWithEntityName: aFullName UUID: [ETUUID UUID]];
-}
-
 - (CORevision *)commit
 {
 	return [self commitWithType: nil shortDescription: nil];

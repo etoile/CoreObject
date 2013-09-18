@@ -261,7 +261,7 @@
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     COObject *photo1root = [photo1 rootObject];
     
-    COObject *childA = [photo1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COObject *childA = [[photo1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [childA setValue: @"childA" forKey: @"label"];
     [photo1root insertObject: childA atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     
@@ -711,7 +711,7 @@
 
 - (void) testSimpleMerge
 {
-    OutlineItem *childObj = [persistentRoot insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *childObj = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [rootObj insertObject: childObj atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     [rootObj setLabel: @"0"];
     [childObj setLabel: @"0"];
