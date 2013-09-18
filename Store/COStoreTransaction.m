@@ -12,7 +12,6 @@
 #import "COStoreWriteRevision.h"
 
 @interface COStoreTransaction ()
-@property (readwrite, nonatomic, strong) ETUUID *transactionUUID;
 @property (nonatomic, readwrite, strong) NSMutableArray *operations;
 @end
 

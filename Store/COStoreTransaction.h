@@ -2,7 +2,7 @@
 
 @interface COStoreTransaction : NSObject
 
-@property (readonly, nonatomic, strong) ETUUID *transactionUUID;
+@property (readwrite, nonatomic, strong) ETUUID *transactionUUID;
 @property (readwrite, nonatomic, strong) ETUUID *previousTransactionUUID;
 
 @property (nonatomic, readonly, strong) NSMutableArray *operations;

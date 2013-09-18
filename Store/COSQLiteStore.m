@@ -158,11 +158,11 @@
     return [self commitTransactionWithUUID: [ETUUID UUID] withError: error];
 }
 
-- (BOOL) commitTransactionWithUUID: (ETUUID *)transaction withError: (NSError **)error
+- (BOOL) commitStoreTransaction: (COStoreTransaction *)aTransaction
 {
     [db_ beginTransaction];
     
-    self.transactionUUID = transaction_.transactionUUID;
+    self.transactionUUID = aTransaction.transactionUUID;
     
     // update the last transaction field before we commit.
     
@@ -173,7 +173,7 @@
     
     
     BOOL ok = YES;
-    for (id<COStoreAction> op in transaction_.operations)
+    for (id<COStoreAction> op in aTransaction.operations)
     {
         BOOL opOk = [op execute: self];
         if (!opOk)
@@ -200,10 +200,15 @@
             NSLog(@"Commit failed");
         }
     }
-
+    
     self.transactionUUID = nil;
     
     return ok;
+}
+
+- (BOOL) commitTransactionWithUUID: (ETUUID *)uuid withError: (NSError **)error
+{
+    return [self commitStoreTransaction: transaction_];
 }
 
 - (void) recordModifiedPersistentRoot: (ETUUID *)persistentRootUUID

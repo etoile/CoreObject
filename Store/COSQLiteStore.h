@@ -477,6 +477,7 @@ typedef NSUInteger COBranchRevisionReadingOptions;
 - (BOOL) beginTransactionWithError: (NSError **)error;
 - (BOOL) commitTransactionWithError: (NSError **)error;
 - (BOOL) commitTransactionWithUUID: (ETUUID *)transactionUUID withError: (NSError **)error;
+- (BOOL) commitStoreTransaction: (COStoreTransaction *)aTransaction;
 
 @property (readwrite, nonatomic, strong) ETUUID *transactionUUID;
 
