@@ -395,19 +395,18 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
  * @param aParent -1 for no parent, otherwise the parent of this commit
  * @param modifiedItems nil for all items in anItemTree, otherwise a subset
  */
-- (CORevisionID *) writeItemGraph: (id<COItemGraph>)anItemTree
+- (CORevisionID *) writeItemGraph: (COItemGraph*)anItemTree
                      revisionUUID: (ETUUID *)aRevisionUUID
                      withMetadata: (NSDictionary *)metadata
                        withParent: (int64_t)aParent
                   withMergeParent: (int64_t)aMergeParent
                        branchUUID: (ETUUID *)aBranchUUID
-                    modifiedItems: (NSArray*)modifiedItems
                             error: (NSError **)error
 {
 #ifdef DEBUG
     COValidateItemGraph(anItemTree);
 #endif
-    
+
     NSParameterAssert(aParent >= -1);
     NSParameterAssert(aMergeParent >= -1);
     NSParameterAssert(aRevisionUUID != nil);
@@ -436,17 +435,32 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     if (delta)
     {
         deltabase = parent_deltabase;
-        if (modifiedItems == nil)
-        {
-            modifiedItems = [anItemTree itemUUIDs];
-        }
-        contentsBlob = contentsBLOBWithItemTree(anItemTree, modifiedItems);
+        contentsBlob = contentsBLOBWithItemTree(anItemTree, [anItemTree itemUUIDs]);
         bytesInDeltaRun = lastBytesInDeltaRun + [contentsBlob length];
     }
     else
     {
         deltabase = rowid;
-        contentsBlob = contentsBLOBWithItemTree(anItemTree, [anItemTree itemUUIDs]);
+        
+        // Load the parent into memory, merge the provided items with the parent's.
+        //
+        // Previous iterations of COSQLiteStore required the caller to always
+        // provide the full item tree, and so we didn't need to do this
+        
+        COItemGraph *parentGraph = [self itemGraphForRevid: aParent];
+        COItemGraph *combinedGraph;
+        
+        if (parentGraph != nil)
+        {
+            combinedGraph = parentGraph;
+            [combinedGraph addItemGraph: anItemTree];
+        }
+        else
+        {
+            combinedGraph = anItemTree;
+        }
+        
+        contentsBlob = contentsBLOBWithItemTree(combinedGraph, [combinedGraph itemUUIDs]);
         bytesInDeltaRun = [contentsBlob length];
     }
 

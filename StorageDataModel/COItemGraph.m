@@ -114,6 +114,19 @@
     return COItemGraphEqualToItemGraph(self, object);
 }
 
+- (void) addItemGraph: (id<COItemGraph>)aGraph
+{
+    rootItemUUID_ = [aGraph rootItemUUID];
+    for (ETUUID *uuid in [aGraph itemUUIDs])
+    {
+        COItem *item = [aGraph itemForUUID: uuid];
+        if (item != nil)
+        {
+            [itemForUUID_ setObject: item forKey: uuid];
+        }
+    }
+}
+
 @end
 
 

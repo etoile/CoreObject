@@ -63,6 +63,8 @@
 
 - (void) insertOrUpdateItems: (NSArray *)items;
 
+- (void) addItemGraph: (id<COItemGraph>)aGraph;
+
 @end
 
 /**

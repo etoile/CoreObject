@@ -600,7 +600,6 @@
                                        withParent: [backing revidForRevisionID: parentRevid]
                                   withMergeParent: [backing revidForRevisionID: aMergeParent]
 	                                   branchUUID: aBranchUUID
-                                    modifiedItems: modifiedItems
                                             error: error];
     
     if (revid == nil)
