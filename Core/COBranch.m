@@ -425,8 +425,9 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         ETAssert(ok);
         
         CORevisionID *old = [[self branchInfo] currentRevisionID];
-        [[self editingContext] recordBranchSetCurrentRevision: self
-                                                oldRevisionID: old];
+        [[self editingContext] recordBranchSetCurrentRevisionID: _currentRevisionID
+                                                  oldRevisionID: old
+                                                       ofBranch: self];
     }
     
     // Write metadata
@@ -460,12 +461,13 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         NSMutableDictionary *mdCopy = [[NSMutableDictionary alloc] initWithDictionary: metadata];
         mdCopy[kCOMetadataPersistentRootUUID] = [[[self persistentRoot] persistentRootUUID] stringValue];
         
-        CORevisionID *revId = [store writeRevisionWithItemGraph: _objectGraph
+        CORevisionID *revId = [store writeRevisionWithItemGraph: [self modifiedItemsSnapshot]
+                                                   revisionUUID: [ETUUID UUID]
                                                        metadata: mdCopy
                                                parentRevisionID: _currentRevisionID
                                           mergeParentRevisionID: mergeParent
 		                                             branchUUID: _UUID
-                                                  modifiedItems: changedItemUUIDs
+                                             persistentRootUUID: [_persistentRoot persistentRootUUID]
                                                           error: NULL];        
         
         BOOL ok = [store setCurrentRevision: revId
@@ -476,10 +478,13 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         ETAssert(ok);
         
         CORevisionID *oldRevid = _currentRevisionID;
+        assert(oldRevid != nil);
+        assert(revId != nil);
         _currentRevisionID =  revId;
         
-        [[self editingContext] recordBranchSetCurrentRevision: self
-                                                oldRevisionID: oldRevid];
+        [[self editingContext] recordBranchSetCurrentRevisionID: _currentRevisionID
+                                                  oldRevisionID: oldRevid
+                                                       ofBranch: self];
     }
 
     // Write branch undeletion
@@ -630,4 +635,27 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return [_objectGraph rootObject];
 }
 
+- (COItemGraph *) modifiedItemsSnapshot
+{
+    NSSet *objects;
+    
+    if (_currentRevisionID == nil)
+    {
+        objects = [_objectGraph loadedObjects];
+    }
+    else
+    {
+        objects = [_objectGraph changedObjects];
+    }
+    
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    
+    for (COObject *obj in objects)
+    {
+        COItem *item = [_objectGraph itemForUUID: [obj UUID]];
+        [dict setObject: item forKey: [obj UUID]];
+    }
+    
+    return [[COItemGraph alloc] initWithItemForUUID: dict rootItemUUID: [[self objectGraphContext] rootItemUUID]];
+}
 @end

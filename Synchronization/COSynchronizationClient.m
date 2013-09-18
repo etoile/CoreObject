@@ -71,7 +71,7 @@ static void DFSInsertRevisions(NSMutableSet *revisionUUIDsToHandle, ETUUID *revi
     // Now both parents are inserted, or were already in our store.
     
     id metadata = revDict[@"info"][@"metadata"];
-    id<COItemGraph> graph = COItemGraphFromJSONPropertyLisy(revDict[@"graph"]);
+    COItemGraph *graph = COItemGraphFromJSONPropertyLisy(revDict[@"graph"]);
     
     CORevisionID *parentRevid = RevisionIDForRevisionUUID(parentString, persistentRoot, store);
     CORevisionID *mergeParentRevid = RevisionIDForRevisionUUID(mergeParentString, persistentRoot, store);
@@ -84,7 +84,6 @@ static void DFSInsertRevisions(NSMutableSet *revisionUUIDsToHandle, ETUUID *revi
                                       mergeParentRevisionID: mergeParentRevid
 												 branchUUID: branchUUID
                                          persistentRootUUID: persistentRoot
-                                              modifiedItems: nil
                                                       error: NULL];
     
     assert([[revid revisionUUID] isEqual: revisionUUID]);

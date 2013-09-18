@@ -64,6 +64,8 @@
 
 - (void) recordEditInverse: (COCommand*)anInverse
 {
+    [anInverse plist];
+    
     // Insert the inverses back to front, so the inverse of the most recent action will be first.
     [_currentEditGroup.contents insertObject: anInverse atIndex: 0];
 }
@@ -137,8 +139,10 @@
     [self recordEditInverse: edit];
 }
 
-- (void) recordBranchSetCurrentRevision: (COBranch *)aBranch
-                          oldRevisionID: (CORevisionID *)aRevisionID
+- (void) recordBranchSetCurrentRevisionID: (CORevisionID *)current
+                            oldRevisionID: (CORevisionID *)old
+                                 ofBranch: (COBranch *)aBranch
+
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     
@@ -148,8 +152,8 @@
     edit.timestamp = [NSDate date];
     
     edit.branchUUID = [aBranch UUID];
-    edit.oldRevisionID = [[aBranch currentRevision] revisionID];
-    edit.revisionID = aRevisionID;
+    edit.oldRevisionID = current;
+    edit.revisionID = old;
     
     [self recordEditInverse: edit];
 }

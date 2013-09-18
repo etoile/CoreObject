@@ -320,22 +320,13 @@ typedef NSUInteger COBranchRevisionReadingOptions;
  *
  * If an error occurred, returns nil and writes a reference to an NSError object in the error parameter.
  */
-- (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
-                                     metadata: (NSDictionary *)metadata
-                             parentRevisionID: (CORevisionID *)aParent
-                        mergeParentRevisionID: (CORevisionID *)aMergeParent
-                                   branchUUID: (ETUUID *)aBranchUUID
-                                modifiedItems: (NSArray*)modifiedItems
-                                        error: (NSError **)error;
-
-- (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
+- (CORevisionID *) writeRevisionWithItemGraph: (COItemGraph*)anItemTree
                                  revisionUUID: (ETUUID *)aRevisionUUID
                                      metadata: (NSDictionary *)metadata
                              parentRevisionID: (CORevisionID *)aParent
                         mergeParentRevisionID: (CORevisionID *)aMergeParent
                                    branchUUID: (ETUUID *)aUUID
                            persistentRootUUID: (ETUUID *)aUUID
-                                modifiedItems: (NSArray*)modifiedItems // array of COUUID
                                         error: (NSError **)error;
 
 

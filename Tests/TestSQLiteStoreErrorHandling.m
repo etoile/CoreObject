@@ -142,14 +142,15 @@ static ETUUID *rootUUID;
         NSError *writeRevisionError = nil;
         if ([store beginTransactionWithError: NULL])
         {
-            UKNil([store writeRevisionWithItemGraph: [self makeChangedItemGraph]
+            [store writeRevisionWithItemGraph: [self makeChangedItemGraph]
+                                       revisionUUID: [ETUUID UUID]
                                            metadata: nil
                                    parentRevisionID: [info currentRevisionID]
                               mergeParentRevisionID: nil
 			                             branchUUID: [info currentBranchUUID]
-                                      modifiedItems: nil
-                                              error: &writeRevisionError]);
-            [store commitTransactionWithError: NULL];
+                                 persistentRootUUID: [info UUID]
+                                              error: &writeRevisionError];
+            UKFalse([store commitTransactionWithError: NULL]);
         }
         
         // Check we can still read the initial revision

@@ -64,8 +64,9 @@
 // Called from COBranch
 
 - (void) recordBranchCreation: (COBranch *)aBranch;
-- (void) recordBranchSetCurrentRevision: (COBranch *)aBranch
-                          oldRevisionID: (CORevisionID *)aRevisionID;
+- (void) recordBranchSetCurrentRevisionID: (CORevisionID *)current
+                            oldRevisionID: (CORevisionID *)old
+                                 ofBranch: (COBranch *)aBranch;
 - (void) recordBranchSetMetadata: (COBranch *)aBranch
                      oldMetadata: (id)oldMetadata;
 - (void) recordBranchDeletion: (COBranch *)aBranch;

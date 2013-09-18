@@ -162,11 +162,12 @@ static ETUUID *branchBUUID;
     
     [serverStore beginTransactionWithError: NULL];
     CORevisionID *serverCommit2 = [serverStore writeRevisionWithItemGraph: [self itemGraphWithLabel: @"2"]
+                                                             revisionUUID: [ETUUID UUID]
                                                                  metadata: nil
                                                          parentRevisionID: [serverInfo currentRevisionID]
                                                     mergeParentRevisionID: nil
 															   branchUUID: branchAUUID
-                                                            modifiedItems: nil
+                                                       persistentRootUUID: persistentRootUUID
                                                                     error: NULL];
 
     UKTrue([serverStore setCurrentRevision: serverCommit2
@@ -225,11 +226,12 @@ static ETUUID *branchBUUID;
     // Server writes a second commit.
     
     CORevisionID *serverCommit2 = [serverStore writeRevisionWithItemGraph: [self itemGraphWithLabel: @"2"]
+                                                             revisionUUID: [ETUUID UUID]
                                                                  metadata: nil
                                                          parentRevisionID: [serverCheapCopyInfo currentRevisionID]
                                                     mergeParentRevisionID: nil
 	                                                           branchUUID: branchAUUID
-                                                            modifiedItems: nil
+                                                       persistentRootUUID: cheapCopyUUID
                                                                     error: NULL];
 
     UKTrue([serverStore setCurrentRevision: serverCommit2

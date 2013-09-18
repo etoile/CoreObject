@@ -179,6 +179,7 @@
         if (!opOk)
         {
             NSLog(@"store action failed: %@", op);
+            [op execute: self];
         }
         ok = ok && opOk;
     }
@@ -409,22 +410,18 @@
  * We'll then have to search to see which persistent roots
  * and which branches reference that revision ID, but that should be really fast.
  */
-- (void) updateSearchIndexesForItemUUIDs: (NSArray *)modifiedItems
-                              inItemTree: (id<COItemGraph>)anItemTree
-                  revisionIDBeingWritten: (CORevisionID *)aRevision
+- (void) updateSearchIndexesForItemTree: (id<COItemGraph>)anItemTree
+                 revisionIDBeingWritten: (CORevisionID *)aRevision
 {
-    if (modifiedItems == nil)
-    {
-        modifiedItems = [anItemTree itemUUIDs];
-    }
-    
     [db_ savepoint: @"updateSearchIndexesForItemUUIDs"];
+    
+    
     
     ETUUID *backingStoreUUID = [self backingUUIDForPersistentRootUUID: [aRevision revisionPersistentRootUUID]];
     NSData *backingUUIDData = [backingStoreUUID dataValue];
     
     NSMutableArray *ftsContent = [NSMutableArray array];
-    for (ETUUID *uuid in modifiedItems)
+    for (ETUUID *uuid in [anItemTree itemUUIDs])
     {
         COItem *itemToIndex = [anItemTree itemForUUID: uuid];
         NSString *itemFtsContent = [itemToIndex fullTextSearchContent];
@@ -483,6 +480,7 @@
     return result;
 }
 
+// Actual implementation used by action
 - (BOOL) writeRevisionWithModifiedItems: (COItemGraph *)anItemTree
                            revisionUUID: (ETUUID *)aRevisionUUID
                                metadata: (NSDictionary *)metadata
@@ -491,116 +489,20 @@
                      persistentRootUUID: (ETUUID *)aUUID
                              branchUUID: (ETUUID*)branch
 {
-    return NO;
-}
 
-- (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
-                                     metadata: (NSDictionary *)metadata
-                             parentRevisionID: (CORevisionID *)aParent
-                        mergeParentRevisionID: (CORevisionID *)aMergeParent
-                                   branchUUID: (ETUUID *)aBranchUUID
-                                modifiedItems: (NSArray*)modifiedItems // array of COUUID
-                                        error: (NSError **)error
-{
-    [self checkInTransaction];
-    [self validateRevision: aParent];
-    
-   	NILARG_EXCEPTION_TEST(anItemTree);
-	NILARG_EXCEPTION_TEST(aParent);
-	NILARG_EXCEPTION_TEST(aBranchUUID);
-    
-    ETUUID *backingStoreUUID = [self backingUUIDForPersistentRootUUID: [aParent revisionPersistentRootUUID]];
-    
-    
-    return [self writeItemTree: anItemTree
-                  revisionUUID: [ETUUID UUID]
-                  withMetadata: metadata
-          withParentRevisionID: aParent
-         mergeParentRevisionID: aMergeParent
-                    branchUUID: aBranchUUID
-        inBackingStoreWithUUID: backingStoreUUID
-                 modifiedItems: modifiedItems
-                         error: error];
-}
-
-- (CORevisionID *) writeRevisionWithItemGraph: (id<COItemGraph>)anItemTree
-                                 revisionUUID: (ETUUID *)aRevisionUUID
-                                     metadata: (NSDictionary *)metadata
-                             parentRevisionID: (CORevisionID *)aParent
-                        mergeParentRevisionID: (CORevisionID *)aMergeParent
-								   branchUUID: (ETUUID *)aBranchUUID
-                           persistentRootUUID: (ETUUID *)aUUID
-                                modifiedItems: (NSArray*)modifiedItems // array of COUUID
-                                        error: (NSError **)error
-{
-    [self checkInTransaction];
-    [self validateRevision: aParent];
-    
-   	NILARG_EXCEPTION_TEST(anItemTree);
-	NILARG_EXCEPTION_TEST(aBranchUUID);
-    
-    return [self writeItemTree: anItemTree
-                  revisionUUID: aRevisionUUID
-                  withMetadata: metadata
-          withParentRevisionID: aParent
-         mergeParentRevisionID: aMergeParent
-                    branchUUID: aBranchUUID
-        inBackingStoreWithUUID: [self backingUUIDForPersistentRootUUID: aUUID]
-                 modifiedItems: modifiedItems
-                         error: error];
-}
-
-- (CORevisionID *) writeItemTreeWithNoParent: (id<COItemGraph>)anItemTree
-                                withMetadata: (NSDictionary *)metadata
-                                  branchUUID: (ETUUID *)aBranchUUID
-                      inBackingStoreWithUUID: (ETUUID *)aBacking
-                                       error: (NSError **)error
-{
-	NILARG_EXCEPTION_TEST(anItemTree);
-	NILARG_EXCEPTION_TEST(aBranchUUID);
-	NILARG_EXCEPTION_TEST(aBacking);
-	
-    return [self writeItemTree: anItemTree
-                  revisionUUID: [ETUUID UUID]
-                  withMetadata: metadata
-          withParentRevisionID: nil
-         mergeParentRevisionID: nil
-                    branchUUID: aBranchUUID
-        inBackingStoreWithUUID: aBacking
-                 modifiedItems: nil
-                         error: error];
-}
-
-
-- (CORevisionID *) writeItemTree: (id<COItemGraph>)anItemTree
-                    revisionUUID: (ETUUID *)aRevisionUUID
-                    withMetadata: (NSDictionary *)metadata
-            withParentRevisionID: (CORevisionID *)parentRevid
-           mergeParentRevisionID: (CORevisionID *)aMergeParent
-					  branchUUID: (ETUUID *)aBranchUUID
-          inBackingStoreWithUUID: (ETUUID *)backingUUID
-                   modifiedItems: (NSArray*)modifiedItems // array of COUUID
-                           error: (NSError **)error
-{
-	// TODO: At this point, the branch must exist. Just by changing
-	// -backingStoreForUUID:error: to -backingStoreForUUID:proposedBranchUUID:error:
-	// we could validate the branch UUID. For methods that call
-	// -backingStoreForUUID:error: without working with a particular branch, we
-	// would just make no validation if the proposed branch UUID is nil.
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID
-                                                                           error: error];
+    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aUUID];
     if (backing == nil)
     {
-        return nil;
+        return NO;
     }
     
     CORevisionID *revid = [backing writeItemGraph: anItemTree
                                      revisionUUID: aRevisionUUID
                                      withMetadata: metadata
-                                       withParent: [backing revidForRevisionID: parentRevid]
-                                  withMergeParent: [backing revidForRevisionID: aMergeParent]
-	                                   branchUUID: aBranchUUID
-                                            error: error];
+                                       withParent: [backing revidForUUID: aParent]
+                                  withMergeParent: [backing revidForUUID: aMergeParent]
+	                                   branchUUID: branch
+                                            error: NULL];
     
     if (revid == nil)
     {
@@ -611,12 +513,36 @@
     {
         assert([backing hasRevid: [backing revidForUUID: [revid revisionUUID]]]);
         
-        [self updateSearchIndexesForItemUUIDs: modifiedItems
-                                   inItemTree: anItemTree
-                       revisionIDBeingWritten: revid];
+        [self updateSearchIndexesForItemTree: anItemTree
+                      revisionIDBeingWritten: revid];
+        return YES;
     }
+    else
+    {
+        return NO;
+    }
+}
+
+// Public method
+- (CORevisionID *) writeRevisionWithItemGraph: (COItemGraph*)anItemTree
+                                 revisionUUID: (ETUUID *)aRevisionUUID
+                                     metadata: (NSDictionary *)metadata
+                             parentRevisionID: (CORevisionID *)aParent
+                        mergeParentRevisionID: (CORevisionID *)aMergeParent
+                                   branchUUID: (ETUUID *)aBranchUUID
+                           persistentRootUUID: (ETUUID *)aPersistentRootUUID
+                                        error: (NSError **)error
+{
+    [transaction_ writeRevisionWithModifiedItems: anItemTree
+                                    revisionUUID: aRevisionUUID
+                                        metadata: metadata
+                                parentRevisionID: aParent.revisionUUID
+                           mergeParentRevisionID: aMergeParent.revisionUUID
+                              persistentRootUUID: aPersistentRootUUID
+                                      branchUUID: aBranchUUID];
     
-    return revid;
+    return [CORevisionID revisionWithPersistentRootUUID: aPersistentRootUUID
+                                           revisionUUID: aRevisionUUID];
 }
 
 /** @taskunit persistent roots */
@@ -825,11 +751,14 @@
     NILARG_EXCEPTION_TEST(persistentRootUUID);
     NILARG_EXCEPTION_TEST(aBranchUUID);
     
-    CORevisionID *revId = [self writeItemTreeWithNoParent: contents
-                                             withMetadata: metadata
-	                                           branchUUID: aBranchUUID
-                                   inBackingStoreWithUUID: persistentRootUUID
-                                                    error: error];
+    CORevisionID *revId = [self writeRevisionWithItemGraph: contents
+                                                  revisionUUID: [ETUUID UUID]
+                                                      metadata: metadata
+                                              parentRevisionID: nil
+                                         mergeParentRevisionID: nil
+                                                branchUUID: aBranchUUID
+                                            persistentRootUUID: persistentRootUUID
+                                                     error: error];
     
     if (revId == nil)
     {
@@ -854,7 +783,7 @@
     NILARG_EXCEPTION_TEST(aRevision);
     NILARG_EXCEPTION_TEST(persistentRootUUID);
     NILARG_EXCEPTION_TEST(aBranchUUID);
-    [self validateRevision: aRevision];
+    //[self validateRevision: aRevision];
     
     return [self createPersistentRootWithUUID: persistentRootUUID
                                    branchUUID: aBranchUUID

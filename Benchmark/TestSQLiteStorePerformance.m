@@ -127,10 +127,12 @@ static int itemChangedAtCommit(int i)
           forAttribute: @"name"];
         
         [revisionIDs addObject: [store writeRevisionWithItemGraph: initialTree
+                                                     revisionUUID: [ETUUID UUID]
                                                          metadata: nil
                                                  parentRevisionID: [revisionIDs lastObject]
                                             mergeParentRevisionID: nil 
-                                                    modifiedItems: A(childUUIDs[i])
+                                                       branchUUID: [proot currentBranchUUID]
+                                               persistentRootUUID: [proot UUID]
                                                             error: NULL]];
     }
     
