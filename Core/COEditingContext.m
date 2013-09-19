@@ -192,16 +192,21 @@
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
 {
 	ETEntityDescription *desc = [[self modelRepository] descriptionForName: anEntityName];
+    
+    COObjectGraphContext *graph = [COObjectGraphContext objectGraphContext];
+    
 	Class cls = [[self modelRepository] classForEntityDescription: desc];
 	COObject *rootObject = [[cls alloc] initWithUUID: [ETUUID UUID]
                                     entityDescription: desc
-                                   objectGraphContext: [COObjectGraphContext objectGraphContext]];
+                                   objectGraphContext: graph];
 	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
 	                                                 objectGraphContext: [rootObject objectGraphContext]];
 
 	[[rootObject objectGraphContext] setRootObject: rootObject];
-
-	return persistentRoot;
+    
+    ETAssert([[persistentRoot rootObject] isRoot]);
+	
+    return persistentRoot;
 }
 
 - (COPersistentRoot *)insertNewPersistentRootWithRevisionID: (CORevisionID *)aRevid
