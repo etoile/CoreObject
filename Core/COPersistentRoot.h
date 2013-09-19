@@ -69,42 +69,33 @@ extern NSString * const COPersistentRootDidChangeNotification;
 {
 	@private
     ETUUID *_UUID;
-    
-    /**
-     * Weak reference
-     */
 	COEditingContext *__weak _parentContext;
-    
     /**
      * State of the persistent root and its branches as loaded from the store.
-     * We don't modify this as changes are being staged in-memory (class should be immutable),
-     * but it is updaded when we make a commit or read from disk.
+     * We don't modify this as changes are being staged in-memory (class should 
+	 * be immutable), but it is updaded when we make a commit or read from disk.
      *
-     * If nil, this is a newly created persistent root
+     * If nil, this is a newly created persistent root.
      */
     COPersistentRootInfo *_savedState;
-
     /**
      * COBranch objects indexed by ETUUID
      */
     NSMutableDictionary *_branchForUUID;
-
     /**
-     * Used to stage a change to the current branch
+     * Used to stage a change to the current branch.
      */
     ETUUID *_currentBranchUUID;
-    
     /**
      * UUID of branch being edited. Not persistent.
+	 *
      * If nil, means use _currentBranchUUID as the editing branch.
      */
     ETUUID *_editingBranchUUID;
-    
     /**
      * Only used when creating a persistent root as a cheap copy.
      */
     CORevisionID *_cheapCopyRevisionID;
-    
     ETUUID *_lastTransactionUUID;
 }
 
@@ -117,41 +108,44 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * Two persistent roots belonging to distinct CoreObject stores cannot use the 
  * same UUID unless they point to the same persistent root replicated accross 
- * stores.
+ * stores.<br />
  * For now, persistent root replication accross distinct CoreObject stores 
- * is not supported and might never be.
+ * is used during collaborative editing (there is no public replication API 
+ * though).
  */
 @property (nonatomic, readonly) ETUUID *persistentRootUUID;
-
 /**
  * The persistent root deletion status.
  *
- * If the persistent root is marked as deleted, the deletion is committed to the store
- * on the next editing context commit.
+ * If the persistent root is marked as deleted, the deletion is committed to the 
+ * store on the next editing context commit.
  */
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
-
 /**
- * The editingBranch is not a persistent value, but is used by 
- * COPersistentRoot methods like -rootObject, -objectGraphContext, etc. as the
- * default object graph presented by the COPersistentRoot.
+ * The editingBranch is not a persistent value, but is used by COPersistentRoot 
+ * methods like -rootObject, -objectGraphContext, etc. as the default object 
+ * graph presented by the persistent root.
  *
  * By default, -editingBranch just returns -currentBranch. However, if you
  * call -setEditingBranch: explicitly, then that branch will be used and
  * -editingBranch will no longer track -currentBranch.
  */
 @property (nonatomic, readwrite, strong) COBranch *editingBranch;
-
 /**
  * The branch that opens when double-clicking a persistent root to edit it.
- * Also used to resolve inter-persistent root references to this persistent
- * root when no explicit branch. 
  *
- * Changing this value stages it for commit; upon the next -commit,
- * the change is saved to disk and replicated to other applications.
+ * Also used to resolve inter-persistent root references to this persistent root 
+ * when no explicit branch.
+ *
+ * Changing this value stages it for commit; upon the next -commit, the change 
+ * is saved to disk and replicated to other applications.
  */
 @property (nonatomic, readwrite, strong) COBranch *currentBranch;
-
+/**
+ * All the branches owned by the persistent root in the store (excluding those 
+ * that are marked as deleted on disk), plus those pending insertion (and minus
+ * those pending deletion).
+ */
 @property (weak, nonatomic, readonly) NSSet *branches;
 
 // TODO: Refactor to branchesPendingInsertion, branchesPendingDeletion, branchesPendingUndeletion.
@@ -172,8 +166,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * The parent context makes possible to edit multiple persistent roots 
  * simultaneously and provide an aggregate view on the editing underway.
  *
- * COPersistentRoot objects are instantiated and released by the
- * parent context.
+ * COPersistentRoot objects are instantiated and released by the parent context.
  *
  * The parent context is managed by the user.
  */
@@ -186,20 +179,32 @@ extern NSString * const COPersistentRootDidChangeNotification;
 @property (weak, nonatomic, readonly) COEditingContext *editingContext;
 
 
-/** @taskunit Object Access and Loading */
+/** @taskunit Pending Changes */
 
-
-/** 
- * @taskunit Pending Changes 
- */
 
 /**
- * Returns whether any object has been inserted, deleted or updated since the
- * last commit.
+ * Returns whether the persistent root contains uncommitted changes.
  *
- * See also -changedObjects.
+ * Branch insertions, deletions, and modifications (e.g. editing branch metadata,
+ * reverting branch to a past revision) all count as uncommitted changes.
+ *
+ * See also -discardAllChanges.
  */
 - (BOOL)hasChanges;
+/**
+ * Discards the uncommitted changes to reset the branch to its last commit state.
+ *
+ * Branch insertions, deletions, and modifications (e.g. editing branch metadata,
+ * reverting branch to a past revision) will be cancelled.
+ *
+ * All uncommitted embedded object edits in the object graphs owned by the 
+ * branches will be cancelled.
+ *
+ * -branchesPendingInsertion, -branchesPendingDeletion  will all return empty 
+ * sets once the changes have been discarded.
+ *
+ * See also -hasChanges.
+ */
 - (void)discardAllChanges;
 
 
@@ -207,38 +212,21 @@ extern NSString * const COPersistentRootDidChangeNotification;
 
 
 /**
- * The entry point to navigate the object graph bound to the persistent root.
- *
- * The returned object is COObject class or subclass instance.
- *
- * A root object isn't a core object and doesn't represent a core object either.
- * The persistent root represents the core object. As such, use the persistent
- * root UUID to refer to core objects and never
- * <code>[[self rootObject] UUID]</code>.
- *
- * For now, this object must remain the same in the entire persistent root
- * history including the branches (and derived cheap copies) due to limitations
- * in EtoileUI.
- *
  * Shorthand for [[[self editingBranch] objectGraphContext] rootObject]
  */
 @property (nonatomic, strong) id rootObject;
-
 /**
  * Shorthand for [[[self editingBranch] objectGraphContext] objectWithUUID:]
  */
 - (COObject *)objectWithUUID: (ETUUID *)uuid;
-
 /**
  * Shortcut for <code>[[self editingBranch] revision]</code>
  */
 @property (nonatomic, strong) CORevision *revision;
-
 /**
  * Shorthand for [[self editingContext] store]
  */
 @property (weak, nonatomic, readonly) COSQLiteStore *store;
-
 /**
  * Returns the object graph for the edited branch
  */
@@ -270,11 +258,16 @@ extern NSString * const COPersistentRootDidChangeNotification;
 - (CORevision *)commitWithType: (NSString *)type
               shortDescription: (NSString *)shortDescription;
 
+
+/** @taskunit Previewing Old Revision */
+ 
+ 
 /**
  * Returns a read-only object graph context of the contents of a revision.
  * Tentative API...
  */
-- (COObjectGraphContext *) objectGraphContextForPreviewingRevision: (CORevision *)aRevision;
+- (COObjectGraphContext *)objectGraphContextForPreviewingRevision: (CORevision *)aRevision;
+
 
 /** @taskunit Deprecated */
 
