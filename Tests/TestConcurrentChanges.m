@@ -106,7 +106,7 @@
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKTrue(testBranch.deleted);
-    UKTrue([[persistentRoot deletedBranches] containsObject: testBranch]);
+    UKTrue([[persistentRoot branchesPendingDeletion] containsObject: testBranch]);
     UKFalse([ctx hasChanges]);
 }
 
@@ -129,7 +129,7 @@
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKFalse(testBranch.deleted);
-    UKFalse([[persistentRoot deletedBranches] containsObject: testBranch]);
+    UKFalse([[persistentRoot branchesPendingDeletion] containsObject: testBranch]);
     UKFalse([ctx hasChanges]);
 }
 

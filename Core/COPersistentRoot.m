@@ -189,14 +189,8 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (NSSet *)deletedBranches
 {
-    return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock:
-                                 ^(id obj) { return [obj isDeleted]; }]];
-}
-
-- (NSSet *)insertedBranches
-{
-    return [[self branches] filteredCollectionWithBlock:
-            ^(id obj) { return [obj isBranchUncommitted]; }];
+	// TODO: Implement
+	return [NSSet set];
 }
 
 - (COBranch *)branchForUUID: (ETUUID *)aUUID
@@ -237,6 +231,27 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 - (COObject *)objectWithUUID: (ETUUID *)uuid
 {
 	return [[self objectGraphContext] objectWithUUID: uuid];
+}
+
+// TODO: Follow what COEditingContext does for persistent roots to track and
+// commit branch insertion, deletion and undeletion
+
+- (NSSet *)branchesPendingDeletion
+{
+    return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock:
+                                 ^(id obj) { return [obj isDeleted]; }]];
+}
+
+- (NSSet *)branchesPendingInsertion
+{
+    return [[self branches] filteredCollectionWithBlock:
+            ^(id obj) { return [obj isBranchUncommitted]; }];
+}
+
+- (NSSet *)branchesPendingUndeletion
+{
+	// TODO: Implement
+    return [NSSet set];
 }
 
 - (BOOL)hasChanges

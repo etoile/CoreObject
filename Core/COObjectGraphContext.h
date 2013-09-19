@@ -156,10 +156,18 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 /**
  * The object serving as an entry point in the object graph.
  *
+ * The returned object is COObject class or subclass instance.
+ *
  * For a transient object graph context, can be nil.
  *
  * For a persistent object graph context, a valid root object must be set before 
  * committing it.
+ *
+ * This object UUID must remain the same in the entire persistent root history 
+ * including the branches (and derived cheap copies).
+ *
+ * The root object doesn't represent the core object. As such, use the persistent
+ * root UUID to refer to core objects and never <code>[[self rootObject] UUID]</code>.
  *
  * See also -rootItemUUID.
  */

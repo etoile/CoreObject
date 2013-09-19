@@ -121,6 +121,11 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * store on the next editing context commit.
  */
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
+
+
+/** @taskunit Accessing Branches */
+
+
 /**
  * The editingBranch is not a persistent value, but is used by COPersistentRoot 
  * methods like -rootObject, -objectGraphContext, etc. as the default object 
@@ -142,18 +147,24 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @property (nonatomic, readwrite, strong) COBranch *currentBranch;
 /**
- * All the branches owned by the persistent root in the store (excluding those 
- * that are marked as deleted on disk), plus those pending insertion (and minus
- * those pending deletion).
+ * All the branches owned by the persistent root (excluding those that are 
+ * marked as deleted on disk), plus those pending insertion and undeletion (and 
+ * minus those pending deletion).
  */
 @property (weak, nonatomic, readonly) NSSet *branches;
-
-// TODO: Refactor to branchesPendingInsertion, branchesPendingDeletion, branchesPendingUndeletion.
-// Add deletedBranches property listing the branches
-// that are marked as deleted on disk.
-@property (weak, nonatomic, readonly) NSSet *insertedBranches;
+/**
+ * All the branches marked as deleted on disk, excluding those that are pending 
+ * undeletion.
+ *
+ * -branchesPendingDeletion are not included in the returned set.
+ */
 @property (weak, nonatomic, readonly) NSSet *deletedBranches;
-
+/**
+ * Returns the branch using the given UUID.
+ *
+ * TODO: Document if this method can return branches among deleted branches and 
+ * branches pending insertion, deletion and undeletion.
+ */
 - (COBranch *)branchForUUID: (ETUUID *)aUUID;
 
 
@@ -182,6 +193,18 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /** @taskunit Pending Changes */
 
 
+/**
+ * The new branches to be saved in the store on the next commit.
+ */
+@property (weak, nonatomic, readonly) NSSet *branchesPendingInsertion;
+/**
+ * The branche to be deleted in the store on the next commit.
+ */
+@property (weak, nonatomic, readonly) NSSet *branchesPendingDeletion;
+/**
+ * The branches to be undeleted in the store on the next commit.
+ */
+@property (weak, nonatomic, readonly) NSSet *branchesPendingUndeletion;
 /**
  * Returns whether the persistent root contains uncommitted changes.
  *
