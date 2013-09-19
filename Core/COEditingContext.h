@@ -85,9 +85,9 @@
     COCommandGroup *_currentEditGroup;
 }
 
-/** 
- * @taskunit Creating a new context 
- */
+
+/** @taskunit Creating a New Context */
+
 
 /**
  * Returns a new autoreleased context initialized with the store located at the 
@@ -110,10 +110,8 @@
 - (id)init;
 
 
+/** @taskunit Accessing All Persistent Roots */
 
-/** 
- * @taskunit Accessing All Persistent Roots 
- */
 
 /**
  * Returns all persistent roots in the store (excluding those that are marked as 
@@ -129,9 +127,9 @@
  */
 @property (nonatomic, copy, readonly) NSSet *deletedPersistentRoots;
 
-/** 
- * @taskunit Store and Metamodel Access 
- */
+
+/** @taskunit Store and Metamodel Access */
+
 
 /**
  * Returns the store for which the editing context acts a working copy.
@@ -143,9 +141,9 @@
  */
 @property (nonatomic, readonly) ETModelDescriptionRepository *modelRepository;
 
-/** 
- * @taskunit Managing Persistent Roots 
- */
+
+/** @taskunit Managing Persistent Roots */
+
 
 /**
  * Returns the persistent root bound the the given UUID in the store or nil.
@@ -172,9 +170,10 @@
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName;
 
 
-/**
- * @taskunit Pending Changes 
- */
+/** @taskunit Pending Changes */
+
+// TODO: updatedPersistentRoots?
+// TODO: changedPersistentRoots?
 
 /**
  * The new persistent roots to be saved in the store on the next commit.
@@ -188,16 +187,13 @@
  * The persistent roots to be undeleted in the store on the next commit.
  */
 @property (nonatomic, copy, readonly) NSSet *persistentRootsPendingUndeletion;
-
-// TODO: updatedPersistentRoots?
-// TODO: changedPersistentRoots?
-
 /**
  * Returns whether the context contains uncommitted changes.
  *
- * Persistent root insertions, deletions, and modifications (e.g., changing
- * main branch, deleting branches, adding branches, editing branch metadata,
- * reverting branch to a past revision) all count as uncommitted changes.
+ * Persistent root insertions, deletions, undeletions, and modifications (e.g., 
+ * changing main branch, deleting branches, adding branches, editing branch 
+ * metadata, reverting branch to a past revision) all count as uncommitted 
+ * changes.
  *
  * See also -discardAllChanges.
  */
@@ -205,9 +201,9 @@
 /**
  * Discards the uncommitted changes to reset the context to its last commit state.
  *
- * Persistent root insertions, deletions, and modifications (e.g., changing
- * main branch, deleting branches, adding branches, editing branch metadata,
- * reverting branch to a past revision) will be cancelled.
+ * Persistent root insertions, deletions, undeletions and modifications (e.g., 
+ * changing main branch, deleting branches, adding branches, editing branch 
+ * metadata, reverting branch to a past revision) will be cancelled.
  *
  * All uncommitted embedded object edits in child persistent roots will be
  * cancelled.
@@ -219,9 +215,9 @@
  */
 - (void)discardAllChanges;
 
-/** 
- * @taskunit Committing Changes 
- */
+
+/** @taskunit Committing Changes */
+
 
 // TODO: Change to -commitWithError:
 /**
@@ -256,9 +252,9 @@
 - (NSArray *)commitWithType: (NSString *)type
            shortDescription: (NSString *)shortDescription;
 
-/**
- * @taskunit Deprecated
- */
+
+/** @taskunit Deprecated */
+
 
 /**
  * Returns YES.

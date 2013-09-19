@@ -160,7 +160,9 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @property (weak, nonatomic, readonly) NSSet *deletedBranches;
 /**
- * Returns the branch using the given UUID.
+ * Returns the branch using the given UUID or nil.
+ *
+ * The persistent root retains the returned branch.
  *
  * TODO: Document if this method can return branches among deleted branches and 
  * branches pending insertion, deletion and undeletion.
