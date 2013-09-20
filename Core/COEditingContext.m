@@ -225,7 +225,7 @@
 
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
-		if ([persistentRoot revision] == nil)
+		if ([persistentRoot isPersistentRootUncommitted])
 		{
 			[insertedPersistentRoots addObject: persistentRoot];
 		}

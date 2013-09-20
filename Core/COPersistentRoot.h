@@ -249,6 +249,9 @@ extern NSString * const COPersistentRootDidChangeNotification;
 - (COObject *)objectWithUUID: (ETUUID *)uuid;
 /**
  * Shortcut for <code>[[self editingBranch] revision]</code>
+ *
+ * For a new persistent root, the revision is nil, unless it is a cheap copy. 
+ * See -[COBranch makeCopyFromRevision:].
  */
 @property (nonatomic, strong) CORevision *revision;
 /**
