@@ -218,8 +218,9 @@
  * All uncommitted embedded object edits in child persistent roots will be
  * cancelled.
  *
- * -insertedPersistentRoots, -deletedPersistentRoots  will all return empty sets 
- * once the changes have been discarded.
+ * -persistentRootsPendingInsertion, -persistentRootsPendingDeletion, 
+ * -persistentRootsPendingUndeletion and -persistentRootsPendingUpdate  will all 
+ * return empty sets once the changes have been discarded.
  *
  * See also -hasChanges.
  */
