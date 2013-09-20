@@ -60,17 +60,6 @@
 	restrictedToPersistentRoots: (NSArray *)persistentRoots
                   withUndoStack: (COUndoStack *)aStack;
 /**
- * <override-never />
- * Tells the receiver that -[COStore finishCommit] just returned.
- *
- * You shouldn't use this method usually. Commit methods automatically calls
- * this method (for both COEditingContext and COPersistentRoot API).
- *
- * If your code uses -[COStore finishCommit] directly (e.g. in a COTrack
- * subclass), you have to call this method explicitly.
- */
-- (void)didCommitRevision: (CORevision *)aRevision;
-/**
  * This method is only exposed to be used internally by CoreObject.
  */
 - (id)crossPersistentRootReferenceWithPath: (COPath *)aPath;

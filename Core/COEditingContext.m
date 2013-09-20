@@ -376,10 +376,6 @@
 	return [self commitWithMetadata: D(shortDescription, @"shortDescription", commitType, @"type")];
 }
 
-- (void)didCommitRevision: (CORevision *)aRevision
-{
-}
-
 - (void)didFailValidationWithError: (COError *)anError
 {
 	_error =  anError;
@@ -432,7 +428,6 @@
 	for (COPersistentRoot *ctxt in persistentRoots)
 	{
 		[ctxt saveCommitWithMetadata: metadata transactionUUID: transactionUUID];
-		[self didCommitRevision: [revisions lastObject]];
 	}
 	
 	/* Record persistent root deletions at the store level */
