@@ -82,7 +82,6 @@ extern NSString * const COPersistentRootDidChangeNotification;
      * COBranch objects indexed by ETUUID
      */
     NSMutableDictionary *_branchForUUID;
-	NSMutableSet *_branchesPendingInsertion;
 	NSMutableSet *_branchesPendingDeletion;
 	NSMutableSet *_branchesPendingUndeletion;
     /**

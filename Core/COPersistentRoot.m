@@ -56,7 +56,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     _parentContext = aCtxt;
     _savedState =  info;
     _branchForUUID = [[NSMutableDictionary alloc] init];
-	_branchesPendingInsertion = [NSMutableSet new];
 	_branchesPendingDeletion = [NSMutableSet new];
 	_branchesPendingUndeletion = [NSMutableSet new];
     
@@ -295,8 +294,29 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (void)discardAllChanges
 {
-	// TODO: Cancel pending branch insertion and deletion
-	[[[self branches] mappedCollection] discardAllChanges];
+	/* Discard changes in branches */
+
+	for (COBranch *branch in [self branches])
+	{
+		if ([branch isBranchUncommitted])
+			continue;
+		
+		[branch discardAllChanges];
+	}
+
+	/* Clear branches pending insertion */
+	
+	NSArray *branchesPendingInsertion = [[self branchesPendingInsertion] allObjects];
+	
+	[_branchForUUID removeObjectsForKeys: (id)[[branchesPendingInsertion mappedCollection] UUID]];
+	ETAssert([[self branchesPendingInsertion] isEmpty]);
+
+	/* Clear other pending changes */
+
+	[_branchesPendingDeletion removeAllObjects];
+	[_branchesPendingUndeletion removeAllObjects];
+
+	ETAssert([self hasChanges] == NO);
 }
 
 - (CORevision *)commit
@@ -416,8 +436,8 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
             [self reloadPersistentRootInfo];
         }
     }
-	
-	[_branchesPendingInsertion removeAllObjects];
+
+	ETAssert([[self branchesPendingInsertion] isEmpty]);
 	[_branchesPendingDeletion removeAllObjects];
 	[_branchesPendingUndeletion removeAllObjects];
 
