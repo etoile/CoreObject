@@ -55,7 +55,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (BOOL) isPersistentRootUncommitted;
 
-- (void)storePersistentRootDidChange: (NSNotification *)notif;
+- (void)storePersistentRootDidChange: (NSNotification *)notif isDistributed: (BOOL)isDistributed;
 
 - (void) updateCrossPersistentRootReferences;
 

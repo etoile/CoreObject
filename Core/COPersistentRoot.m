@@ -370,24 +370,22 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         ETAssert([self editingBranch] != nil);
         ETAssert([self editingBranch] == [self currentBranch]);
         
-        COPersistentRootInfo *info;
-        
         if (_cheapCopyRevisionID == nil)
         {
-            info = [store createPersistentRootWithInitialItemGraph: [[self editingBranch] objectGraphContext]
-                                                              UUID: [self persistentRootUUID]
-                                                        branchUUID: [[self editingBranch] UUID]
-                                                  revisionMetadata: metadata
-                                                             error: NULL];
+            _savedState = [store createPersistentRootWithInitialItemGraph: [[self editingBranch] objectGraphContext]
+                                                                     UUID: [self persistentRootUUID]
+                                                               branchUUID: [[self editingBranch] UUID]
+                                                         revisionMetadata: metadata
+                                                                    error: NULL];
         }
         else
         {
-            info = [store createPersistentRootWithInitialRevision: _cheapCopyRevisionID
+            _savedState = [store createPersistentRootWithInitialRevision: _cheapCopyRevisionID
                                                              UUID: _UUID
                                                        branchUUID: [[self editingBranch] UUID]
                                                             error: NULL];
         }
-        ETAssert(info != nil);
+        ETAssert(_savedState != nil);
         [_parentContext recordPersistentRootCreation: self];
         
         
@@ -397,7 +395,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         // because the store call -createPersistentRootWithInitialContents:
         // handles creating the initial branch.
         
-        [[self editingBranch] didMakeInitialCommitWithRevisionID: [[info currentBranchInfo] currentRevisionID]];
+        [[self editingBranch] didMakeInitialCommitWithRevisionID: [[_savedState currentBranchInfo] currentRevisionID]];
 	}
     else
     {
@@ -407,9 +405,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         for (COBranch *branch in [_branchForUUID allValues])
         {
             [branch saveCommitWithMetadata: metadata];
-            
-            // FIXME: Hack?
-            [self reloadPersistentRootInfo];
         }
         
         // Commit a change to the current branch, if needed.
@@ -428,20 +423,12 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         for (COBranch *branch in [_branchForUUID allValues])
         {
             [branch saveDeletion];
-            
-            // FIXME: Hack?
-            [self reloadPersistentRootInfo];
         }
     }
 
 	ETAssert([[self branchesPendingInsertion] isEmpty]);
 	[_branchesPendingDeletion removeAllObjects];
 	[_branchesPendingUndeletion removeAllObjects];
-
-    // FIXME: Hack?
-    [self reloadPersistentRootInfo];
-    
-    [self sendChangeNotification];
 }
 
 - (COPersistentRootInfo *)persistentRootInfo
@@ -528,13 +515,16 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 }
 
 - (void)storePersistentRootDidChange: (NSNotification *)notif
+                       isDistributed: (BOOL)isDistributed
 {
     ETUUID *notifTransaction = [ETUUID UUIDWithString:
 		[[notif userInfo] objectForKey: kCOPersistentRootTransactionUUID]];
     if ([_lastTransactionUUID isEqual: notifTransaction])
     {
+//        NSLog(@"----Ignoring update notif %@ %d", _lastTransactionUUID, (int)isDistributed);
         return;
     }
+//    NSLog(@"++++Not Ignoring update notif (%@, %@, %d)", _lastTransactionUUID, notifTransaction, (int)isDistributed);
     
     COPersistentRootInfo *info =
 		[[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
@@ -547,6 +537,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     }
     
     _currentBranchUUID =  [_savedState currentBranchUUID];
+    _lastTransactionUUID = notifTransaction;
     
 	// TODO: Remove or support
     //[self sendChangeNotification];

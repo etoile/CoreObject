@@ -31,7 +31,7 @@
 	if ([rhs isKindOfClass: [CORevision class]] == NO)
 		return NO;
 
-	return [revisionInfo.revisionID isEqual: ((CORevision *)rhs)->revisionInfo.revisionID];
+	return [revisionInfo.revisionID.revisionUUID isEqual: ((CORevision *)rhs)->revisionInfo.revisionID.revisionUUID];
 }
 
 - (NSArray *)propertyNames

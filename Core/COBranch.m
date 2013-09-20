@@ -339,6 +339,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
+    NILARG_EXCEPTION_TEST(aRev);
+    
     if ([self isBranchUncommitted])
     {
         /*
@@ -412,6 +414,9 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     }
     else if (![[[self branchInfo] currentRevisionID] isEqual: _currentRevisionID])
     {
+        CORevisionID *old = [[self branchInfo] currentRevisionID];
+        assert(old != nil);
+        
         // This is the case when the user does [self setCurrentRevision: ], and then commits
         
         BOOL ok = [store setCurrentRevision: _currentRevisionID
@@ -421,7 +426,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                                       error: NULL];
         ETAssert(ok);
         
-        CORevisionID *old = [[self branchInfo] currentRevisionID];
+
         [[self editingContext] recordBranchSetCurrentRevisionID: _currentRevisionID
                                                   oldRevisionID: old
                                                        ofBranch: self];
@@ -511,6 +516,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID
 {
+    assert(aRevisionID != nil);
+    
     // Write metadata
     // FIXME: Copied-n-pasted from above
     if (_metadataChanged)

@@ -149,6 +149,7 @@
     [modifiedPersistentRootsUUIDs_ removeAllObjects];
     
     transaction_ = [[COStoreTransaction alloc] init];
+    self.transactionUUID = transaction_.transactionUUID;
     
     return YES;
 }

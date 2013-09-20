@@ -42,6 +42,8 @@ First Release
   - Expose COSQLiteStore's attachments feature
   - test [[persistentRoot currentBranch] currentRevision] on a newly created
     persistent root
+  - Making additional changes to an uncomitted cheap copy persistent root is broken (we
+    don't look at the COObjectGraphContext)
     
 - didAwaken: replacement
     - At the end of the setStoreItem:, call -awakeFromDeserialization
@@ -128,10 +130,18 @@ First Release
 - Make COQuery a bit more usable
 
 - General
-  - Migrate to ARC
   - Switch to NSUUID
   
+- History browser
+  x Initial APIs
+  x Initial CORevision cache
+  x Initial graph UI in Typewriter
+  - Asychronous fetching
+  - Complete UI
+
 - Collaboration
+  x Initial prototype working in Typewriter
+
 
 Future Work
 -----------
@@ -141,7 +151,6 @@ Future Work
 - Tune object copy model to respect user expectations about copy/paste in various recurrent use cases
 - Improve Relationship Integrity and leverage it in more places (e.g. copy time, more aggressive checks or object graph integrity checking in a background thread etc.)
 - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
-- Evaluate a CORevision cache per COStore or process
 - Evaluate a COTrackNode cache per track
 - Investigate how we can use GCD, and generally how to make the API asynchronous.
 

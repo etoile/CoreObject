@@ -417,8 +417,6 @@
 
 	NSMutableArray *revisions = [NSMutableArray array];
 
-    ETUUID *transactionUUID = [ETUUID UUID];
-    
 	/* Commit persistent root changes (deleted persistent roots included) */
 
     [_store beginTransactionWithError: NULL];
@@ -427,7 +425,7 @@
 	// TODO: Add a batch commit UUID in the metadata
 	for (COPersistentRoot *ctxt in persistentRoots)
 	{
-		[ctxt saveCommitWithMetadata: metadata transactionUUID: transactionUUID];
+		[ctxt saveCommitWithMetadata: metadata transactionUUID: _store.transactionUUID];
 	}
 	
 	/* Record persistent root deletions at the store level */
@@ -454,8 +452,22 @@
         }
     }
 
-    ETAssert([_store commitTransactionWithUUID: transactionUUID withError: NULL]);
+    ETAssert([_store commitTransactionWithUUID: _store.transactionUUID withError: NULL]);
     [self recordEndUndoGroupWithUndoStack: aStack];
+    
+    // FIXME: This was moved here because Typewriter expects changes to be
+    // committed to store when it receives the notification. Decide if that
+    // is valid or not, and add a test case.
+    
+    for (COPersistentRoot *ctxt in persistentRoots)
+	{
+		[ctxt reloadPersistentRootInfo];
+	}
+    
+    for (COPersistentRoot *ctxt in persistentRoots)
+	{
+		[ctxt sendChangeNotification];
+	}
     
 	return revisions;
 }
@@ -533,11 +545,16 @@
     if ([[[_store UUID] stringValue] isEqual: storeUUID]
         && [[[_store URL] absoluteString] isEqual: storeURL])
     {
-        [self storePersistentRootDidChange: notif];
+        [self storePersistentRootDidChange: notif isDistributed: YES];
     }
 }
 
 - (void)storePersistentRootDidChange: (NSNotification *)notif
+{
+    [self storePersistentRootDidChange: notif isDistributed: NO];
+}
+
+- (void)storePersistentRootDidChange: (NSNotification *)notif isDistributed: (BOOL)isDistributed
 {
     NSDictionary *userInfo = [notif userInfo];
     ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [userInfo objectForKey: kCOPersistentRootUUID]];
@@ -547,7 +564,7 @@
     COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
     if (loaded != nil)
     {
-        [loaded storePersistentRootDidChange: notif];
+        [loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
     }
 }
 
