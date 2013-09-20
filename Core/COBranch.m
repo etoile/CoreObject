@@ -233,7 +233,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     }
 }
 
-- (CORevision *)parentRevision
+- (CORevision *)initialRevision
 {
     CORevisionID *revid = [[self branchInfo] initialRevisionID];
     
@@ -555,7 +555,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (CORevision *) revisionWithID: (CORevisionID *)aRevisionID
 {
-    CORevision *oldest = [self parentRevision];
+    CORevision *oldest = [self initialRevision];
     CORevision *rev = [self currentRevision];
     do
     {

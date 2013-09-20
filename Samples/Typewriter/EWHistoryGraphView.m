@@ -33,7 +33,7 @@
     if (![aBranch isBranchUncommitted])
     {
         CORevision *head = [aBranch currentRevision];
-        CORevision *initial = [aBranch parentRevision];
+        CORevision *initial = [aBranch initialRevision];
         
         ETAssert(head != nil);
         ETAssert(initial != nil);

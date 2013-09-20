@@ -127,7 +127,7 @@ extern NSString * const kCOBranchLabel;
  * created at the same time than its persistent root. The parent branch is also 
  * nil in this case.
  */
-@property (strong, readonly, nonatomic) CORevision *parentRevision;
+@property (strong, readonly, nonatomic) CORevision *initialRevision;
 /**
  * The revision bound to the state loaded in the object graph context.
  *

@@ -423,7 +423,7 @@
     UKObjectsNotEqual([copyRootBranch UUID], [originalBranch UUID]);
     UKObjectsNotEqual([copyRoot persistentRootUUID], [persistentRoot persistentRootUUID]);
     
-    UKObjectsEqual(rev1, [copyRootBranch parentRevision]);
+    UKObjectsEqual(rev1, [copyRootBranch initialRevision]);
     UKObjectsEqual(rev1, [copyRootBranch currentRevision]);
     UKObjectsEqual(rev1, [originalBranch currentRevision]);
 
