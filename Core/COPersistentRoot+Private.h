@@ -44,7 +44,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID metadata: (NSDictionary *)metadata atRevision: (CORevision *)aRev parentBranch: (COBranch *)aParent;
 
-- (BOOL) isPersistentRootCommitted;
+- (BOOL) isPersistentRootUncommitted;
 
 - (void)storePersistentRootDidChange: (NSNotification *)notif;
 

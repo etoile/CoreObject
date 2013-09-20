@@ -253,7 +253,7 @@
 
 - (void)deletePersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
-    if (![aPersistentRoot isPersistentRootCommitted])
+    if ([aPersistentRoot isPersistentRootUncommitted])
     {
         [self unloadPersistentRoot: aPersistentRoot];
     }
@@ -265,7 +265,6 @@
     {
         // NOTE: Deleted persistent roots are removed from the cache on commit.
         [_persistentRootsPendingDeletion addObject: aPersistentRoot];
-        
     }
     
     [aPersistentRoot updateCrossPersistentRootReferences];
@@ -295,7 +294,7 @@
     
 	for (COPersistentRoot *context in [_loadedPersistentRoots objectEnumerator])
 	{
-        if (![context isPersistentRootCommitted])
+        if ([context isPersistentRootUncommitted])
             return YES;
         
 		if ([context hasChanges])
@@ -464,7 +463,7 @@
     // FIXME: Implement. For now, since we don't support faulting persistent
     // roots, only release a persistent root if it's uncommitted.
     
-    if (![aPersistentRoot isPersistentRootCommitted])
+    if ([aPersistentRoot isPersistentRootUncommitted])
     {
         [_loadedPersistentRoots removeObjectForKey:
             [aPersistentRoot persistentRootUUID]];

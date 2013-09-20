@@ -147,7 +147,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (void)setCurrentBranch: (COBranch *)aBranch
 {
-    if (![self isPersistentRootCommitted])
+    if ([self isPersistentRootUncommitted])
     {
 		// TODO: Use a CoreObject exception type
         [NSException raise: NSGenericException
@@ -173,7 +173,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (void)setEditingBranch: (COBranch *)aBranch
 {
-    if (![self isPersistentRootCommitted])
+    if ([self isPersistentRootUncommitted])
     {
 		// TODO: Use a CoreObject exception type
         [NSException raise: NSGenericException
@@ -316,9 +316,9 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return nil;
 }
 
-- (BOOL)isPersistentRootCommitted
+- (BOOL)isPersistentRootUncommitted
 {
-    return _savedState != nil;
+    return _savedState == nil;
 }
 
 - (void)saveCommitWithMetadata: (NSDictionary *)metadata
@@ -331,7 +331,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	COSQLiteStore *store = [_parentContext store];
     //CORevisionID *revId;
     
-	if (![self isPersistentRootCommitted])
+	if ([self isPersistentRootUncommitted])
 	{		
         ETAssert([self editingBranch] != nil);
         ETAssert([self editingBranch] == [self currentBranch]);
