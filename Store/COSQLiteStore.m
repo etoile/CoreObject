@@ -95,7 +95,7 @@
      "currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionuuid BLOB)"];
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL PRIMARY KEY, "
-     "proot BLOB NOT NULL, tail_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
+     "proot BLOB NOT NULL, initial_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
      "metadata BLOB, deleted BOOLEAN DEFAULT 0, parentbranch BLOB)"];
 
     // FTS indexes & reference caching tables (in theory, could be regenerated - although not supported)
@@ -628,11 +628,11 @@
     NSMutableDictionary *branchDict = [NSMutableDictionary dictionary];
     
     {
-        FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, tail_revid, current_revid, metadata, deleted FROM branches WHERE proot = ?", [aUUID dataValue]];
+        FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, initial_revid, current_revid, metadata, deleted FROM branches WHERE proot = ?", [aUUID dataValue]];
         while ([rs next])
         {
             ETUUID *branch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-            CORevisionID *tailRevid = [CORevisionID revisionWithPersistentRootUUID: backingUUID
+            CORevisionID *initialRevid = [CORevisionID revisionWithPersistentRootUUID: backingUUID
                                                                    revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]]];
             CORevisionID *currentRevid = [CORevisionID revisionWithPersistentRootUUID: backingUUID
                                                                       revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]]];
@@ -640,7 +640,7 @@
             
             COBranchInfo *state = [[COBranchInfo alloc] init];
             state.UUID = branch;
-            state.tailRevisionID = tailRevid;
+            state.initialRevisionID = initialRevid;
             state.currentRevisionID = currentRevid;
             state.metadata = branchMeta;
             state.deleted = [rs boolForColumnIndex: 4];
@@ -726,7 +726,7 @@
     {
         COBranchInfo *branch = [[COBranchInfo alloc] init];
         branch.UUID = aBranchUUID;
-        branch.tailRevisionID = aRevision;
+        branch.initialRevisionID = aRevision;
         branch.currentRevisionID = aRevision;
         branch.metadata = nil;
         branch.deleted = NO;
@@ -887,7 +887,7 @@
 }
 
 - (BOOL) setCurrentRevision: (CORevisionID*)currentRev
-               tailRevision: (CORevisionID*)tailRev
+               initialRevision: (CORevisionID*)initialRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot
                       error: (NSError **)error
@@ -988,16 +988,16 @@
     
     FMResultSet *rs = [db_ executeQuery: @"SELECT "
                                             "branches.current_revid, "
-                                            "branches.tail_revid "
+                                            "branches.initial_revid "
                                             "FROM persistentroots "
                                             "INNER JOIN branches ON persistentroots.uuid = branches.proot "
                                             "WHERE persistentroots.backingstore = ?", backingUUIDData];
     while ([rs next])
     {
         ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-        ETUUID *tail = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
+        ETUUID *initial = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
         
-        NSIndexSet *revs = [backing revidsFromRevid: [backing revidForUUID: tail]
+        NSIndexSet *revs = [backing revidsFromRevid: [backing revidForUUID: initial]
                                             toRevid: [backing revidForUUID: head]];
         [keptRevisions addIndexes: revs];
     }

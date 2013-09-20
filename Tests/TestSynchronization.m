@@ -171,7 +171,7 @@ static ETUUID *branchBUUID;
                                                                     error: NULL];
 
     UKTrue([serverStore setCurrentRevision: serverCommit2
-                              tailRevision: nil
+                              initialRevision: nil
                                  forBranch: branchAUUID
                           ofPersistentRoot: persistentRootUUID
                                      error: NULL]);
@@ -235,7 +235,7 @@ static ETUUID *branchBUUID;
                                                                     error: NULL];
 
     UKTrue([serverStore setCurrentRevision: serverCommit2
-                              tailRevision: nil
+                              initialRevision: nil
                                  forBranch: cheapCopyBranchUUID
                           ofPersistentRoot: cheapCopyUUID
                                      error: NULL]);

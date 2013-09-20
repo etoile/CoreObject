@@ -33,13 +33,13 @@
     if (![aBranch isBranchUncommitted])
     {
         CORevision *head = [aBranch currentRevision];
-        CORevision *tail = [aBranch parentRevision];
+        CORevision *initial = [aBranch parentRevision];
         
         ETAssert(head != nil);
-        ETAssert(tail != nil);
+        ETAssert(initial != nil);
         
         CORevision *current = head;
-        while (![current isEqual: tail])
+        while (![current isEqual: initial])
         {
             [revisionIDs addObject: [current revisionID]];
             current = [current parentRevision];

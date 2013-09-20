@@ -75,7 +75,7 @@ For now we do.
         }
         NSMutableDictionary *branchPlist = [NSMutableDictionary dictionary];
         branchPlist[@"uuid"] = [branch.UUID stringValue];
-        branchPlist[@"tailRevisionID"] = [[branch.tailRevisionID revisionUUID] stringValue];
+        branchPlist[@"initialRevisionID"] = [[branch.initialRevisionID revisionUUID] stringValue];
         branchPlist[@"currentRevisionID"] = [[branch.currentRevisionID revisionUUID] stringValue];
         if (branch.metadata != nil)
         {

@@ -36,14 +36,14 @@ typedef NSUInteger COBranchRevisionReadingOptions;
  *   sequential edits to the _contents_ of the persistent root.
  *
  *   There is a  marker indicating the current revision, as well as two special revsions called
- *   "head" and "tail".
+ *   "head" and "initial".
  *
  *   oldest           newest
  *     o--------o--------o
- *    tail    current   head
+ *    initial current   head
  *
- *   The purpose of the head and tail pointers is to keep track of all revisions that have ever
- *   been committed to a branch. The tail represents the start of the recorded history of the branch,
+ *   The purpose of the head and initial pointers is to keep track of all revisions that have ever
+ *   been committed to a branch. The initial represents the start of the recorded history of the branch,
  *   the head represents the newest. Normally the current revision is the same as the head,
  *   but the current revision could be moved to an older revision if the user wants to revert to an
  *   older sate.
@@ -57,10 +57,10 @@ typedef NSUInteger COBranchRevisionReadingOptions;
  *               /------------o
  *              /            new head
  *     o--------o . . . . o
- *    tail    current   (lost head)
+ *    initial    current   (lost head)
  *
  *   (Note that if -finalizeDeletionsForPersistentRoot: is called in this state, the dotted revisions
- *   will be lost forever.) History compaction is accomplished by moving the tail pointer forward,
+ *   will be lost forever.) History compaction is accomplished by moving the initial pointer forward,
  *   and calling -finalizeDeletionsForPersistentRoot:.
  *
  *   The contents of a revision consists of a graph of
@@ -405,7 +405,7 @@ typedef NSUInteger COBranchRevisionReadingOptions;
  * Passing nil for any revision params means to keep the current value
  */
 - (BOOL) setCurrentRevision: (CORevisionID*)currentRev
-               tailRevision: (CORevisionID*)tailRev
+               initialRevision: (CORevisionID*)initialRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot
                       error: (NSError **)error;
@@ -446,7 +446,7 @@ typedef NSUInteger COBranchRevisionReadingOptions;
                   error: (NSError **)error;
 
 /**
- * Finalizes the deletion of any unreachable commits (whether due to -setTailRevision:... moving the tail pointer,
+ * Finalizes the deletion of any unreachable commits (whether due to -setInitialRevision:... moving the initial pointer,
  * or branches being deleted), any deleted branches, or the persistent root itself, as well as all unreachable
  * attachments.
  */

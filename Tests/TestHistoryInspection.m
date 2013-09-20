@@ -67,7 +67,7 @@
 	NSError *error = nil;
 	[[ctx store] beginTransactionWithError: NULL];
 	[[ctx store] setCurrentRevision: [aRev revisionID]
-	                   tailRevision: nil
+	                   initialRevision: nil
 	                      forBranch: [aBranch UUID]
 	               ofPersistentRoot: [[aBranch persistentRoot] persistentRootUUID]
 	                          error: &error];

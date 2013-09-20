@@ -6,7 +6,7 @@
 {
 @private
     ETUUID *uuid_;
-    CORevisionID *tailRevisionId_;
+    CORevisionID *initialRevisionId_;
     CORevisionID *currentRevisionId_;
     NSDictionary *metadata_;
     BOOL deleted_;
@@ -19,7 +19,7 @@
  * The oldest revision on the branch. Indicates "where a feature branch was
  * forked from master"
  */
-@property (readwrite, nonatomic, strong) CORevisionID *tailRevisionID;
+@property (readwrite, nonatomic, strong) CORevisionID *initialRevisionID;
 /**
  * The current revision of this branch.
  */

@@ -126,9 +126,6 @@ extern NSString * const kCOBranchLabel;
  * If the parent revision is nil, this means the receiver is a branch that was 
  * created at the same time than its persistent root. The parent branch is also 
  * nil in this case.
- *
- * FIXME: The name "parent" is confusing, it is not the same as the parent of
- * a revision. In COSQLiteStore's terminology this is the "tail" of the branch.
  */
 @property (strong, readonly, nonatomic) CORevision *parentRevision;
 /**

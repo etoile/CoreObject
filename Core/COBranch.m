@@ -235,7 +235,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (CORevision *)parentRevision
 {
-    CORevisionID *revid = [[self branchInfo] tailRevisionID];
+    CORevisionID *revid = [[self branchInfo] initialRevisionID];
     
     if (revid != nil)
     {
@@ -415,7 +415,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         // This is the case when the user does [self setCurrentRevision: ], and then commits
         
         BOOL ok = [store setCurrentRevision: _currentRevisionID
-                               tailRevision: nil
+                               initialRevision: nil
                                   forBranch: _UUID
                            ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
                                       error: NULL];
@@ -468,7 +468,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                                                           error: NULL];        
         
         BOOL ok = [store setCurrentRevision: revId
-                               tailRevision: nil
+                               initialRevision: nil
                                   forBranch: _UUID
                            ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
                                       error: NULL];

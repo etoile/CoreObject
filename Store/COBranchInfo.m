@@ -5,7 +5,7 @@
 @implementation COBranchInfo
 
 @synthesize UUID = uuid_;
-@synthesize tailRevisionID = tailRevisionId_;
+@synthesize initialRevisionID = initialRevisionId_;
 @synthesize currentRevisionID = currentRevisionId_;
 @synthesize deleted = deleted_;
 @synthesize metadata = metadata_;

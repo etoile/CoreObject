@@ -156,7 +156,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
         
         CORevisionID *currentRevisionID = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: branchPlist[@"currentRevisionID"]]
                                                          persistentRootUUID: persistentRoot];
-        CORevisionID *tailRevisionID = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: branchPlist[@"tailRevisionID"]]
+        CORevisionID *initialRevisionID = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: branchPlist[@"initialRevisionID"]]
                                                  persistentRootUUID: persistentRoot];
         
         ETUUID *branchUUID;
@@ -185,7 +185,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
         }
         
         assert([aStore setCurrentRevision: currentRevisionID
-                              tailRevision: tailRevisionID
+                              initialRevision: initialRevisionID
                                  forBranch: branchUUID
                           ofPersistentRoot: persistentRoot
                                     error: NULL]);
