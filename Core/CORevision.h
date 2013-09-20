@@ -13,10 +13,12 @@
 @class COEditingContext, CORevisionInfo, CORevisionID;
 
 /** 
- * @group Store
+ * @group Core
  * @abstract A revision represents a commit in the store history.
  *
- * A revision corresponds to various changes, that were committed at the same 
+ * A revision represents a set of changes to 
+ 
+ to various changes, that were committed at the same
  * time and belong to a single root object and its inner objects. See 
  * -[COStore finishCommit]. 
  *
@@ -32,7 +34,7 @@
  * <item>properties</item><desc>The properties changed in the object</desc>
  * </deflist>
  */
-@interface CORevision : NSObject <ETCollection>
+@interface CORevision : NSObject
 {
 	@private
 	COEditingContext * __weak editingContext;
@@ -42,7 +44,7 @@
 /** @taskunit Editing Context */
 
 /** 
- * Returns the editing context to which the revision and its changed objects belongs to. 
+ * Returns the editing context to which the revision belongs to.
  */
 - (COEditingContext *)editingContext;
 
@@ -60,53 +62,26 @@
  * This is nil when this is the first revision for a root object.
  */
 - (CORevision *)parentRevision;
-
 /**
  * Returns the persistent object UUID involved in the revision.
+ * It is possible that this persistent root no longer exists.
  */
 - (ETUUID *)persistentRootUUID;
 /**
  * Returns the commit track UUID involved in the revision.
+ * It is possible that this branch no longer exists.
  */
 - (ETUUID *)branchUUID;
 /** 
  * Returns the date at which the revision was committed. 
  */
 - (NSDate *)date;
-/** 
- * Returns the revision type.
- *
- * e.g. merge, persistent root creation, minor edit, etc.
- * 
- * Note: This type notion is a bit vague currently. 
- */
-- (NSString *)type;
-/** 
- * Returns the revision short description.
- * 
- * This description is optional.
- */
-- (NSString *)shortDescription;
-/** 
- * Returns the revision long description.
- * 
- * This description is optional.
- */
-- (NSString *)longDescription;
-
-/** 
+/**
  * Returns the metadata attached to the revision at commit time. 
  */
 - (NSDictionary *)metadata;
 
-/** @taskunit Changes */
-
-#if 0
-/** 
- * Returns the UUIDs that correspond to the objects changed by the revision. 
- */ 
-- (NSArray *)changedObjectUUIDs;
-#endif
+// TODO: Reintroduce methods like -localizedTitle that use COCommitDescriptor?
 
 /** @taskunit Private */
 

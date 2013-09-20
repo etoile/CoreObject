@@ -8,24 +8,13 @@
  */
 
 #import "CORevision.h"
-#import "FMDatabase.h"
 #import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
 #import "COEditingContext.h"
 #import "COEditingContext+Private.h"
 #import "CORevisionID.h"
 
-#pragma GCC diagnostic ignored "-Wprotocol"
-
 @implementation CORevision
-
-+ (void) initialize
-{
-	if (self != [CORevision class])
-		return;
-
-	[self applyTraitFromClass: [ETCollectionTrait class]];
-}
 
 - (id)initWithEditingContext: (COEditingContext *)aContext
                 revisionInfo: (CORevisionInfo *)aRevInfo
@@ -89,109 +78,16 @@
 	return [revisionInfo date];
 }
 
-- (NSString *)type
-{
-	// TODO: Implement it in the metadata for the new store
-	// Formalize the concept of similar operations belonging to a common kind...
-	// For example:
-	// - major edit vs minor edit
-	// - Item Mutation that includes Add Item, Remove Item, Insert Item etc.
-	return [[self metadata] objectForKey: @"type"];
-}
-
-- (NSString *)shortDescription;
-{
-	return [[self metadata] objectForKey: @"shortDescription"];
-}
-
-- (NSString *)longDescription
-{
-	return [[self metadata] objectForKey: @"longDescription"];
-}
+// TODO: Implement it in the metadata for the new store
+// Formalize the concept of similar operations belonging to a common kind...
+// For example:
+// - major edit vs minor edit
+// - Item Mutation that includes Add Item, Remove Item, Insert Item etc.
 
 - (NSDictionary *)metadata
 {
 	return [revisionInfo metadata];
 }
-
-// TODO: Migrate the code below to the new store or reimplement similar ideas.
-
-#if 0
-- (NSArray *)changedObjectUUIDs
-{
-	NSMutableSet *result = [NSMutableSet set];
-	FMResultSet *rs = [store->db executeQuery: @"SELECT objectuuid FROM commits WHERE revisionnumber = ?",
-					   [NSNumber numberWithUnsignedLongLong: revisionNumber]];
-	while ([rs next])
-	{
-		[result addObject: [store UUIDForKey: [rs longLongIntForColumnIndex: 0]]];
-	}
-	[rs close];
-	return [result allObjects];
-}
-
-- (NSArray *)changedPropertiesForObjectUUID: (ETUUID *)objectUUID
-{
-	NSMutableArray *result = [NSMutableArray array];
-	FMResultSet *rs = [store->db executeQuery: @"SELECT property FROM commits WHERE revisionnumber = ? AND objectuuid = ?",
-					   [NSNumber numberWithUnsignedLongLong: revisionNumber],
-					   [store keyForUUID: objectUUID]];
-
-	while ([rs next])
-	{
-		[result addObject: [store propertyForKey: [rs longLongIntForColumnIndex: 0]]];
-	}
-	[rs close];
-
-	return result;
-}
-
-- (NSString *)formattedChangedPropertiesForObjectUUID: (ETUUID *)objectUUID
-{
-	NSArray *changedProperties = [self changedPropertiesForObjectUUID: objectUUID];
-	NSMutableString *description = [NSMutableString string];
-	BOOL isList = NO;
-
-	for (NSString *property in changedProperties)
-	{
-		if (isList)
-		{
-			[description appendString: @", "];
-		}
-		[description appendString: property];
-		isList = YES;
-	}
-
-	return description;
-}
-
-- (NSArray *)changedObjectRecords
-{
-	NSMutableArray *objRecords = [NSMutableArray array];
-
-	for (ETUUID *objectUUID in [self changedObjectUUIDs])
-	{
-		NSString *changedProperties = [self formattedChangedPropertiesForObjectUUID: objectUUID];
-		CORecord *record = AUTORELEASE([[CORecord alloc] initWithDictionary: 
-			D(objectUUID, @"objectUUID", changedProperties, @"properties")]);
-
-		[objRecords addObject: record];
-	}
-
-	return objRecords;
-}
-
-- (id)content
-{
-	return 	[self changedObjectRecords];
-}
-
-- (NSArray *)contentArray
-{
-	return [NSArray arrayWithArray: [self changedObjectRecords]];
-}
-
-#endif
 
 - (NSString *)description
 {

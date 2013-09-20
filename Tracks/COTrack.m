@@ -278,17 +278,17 @@
 
 - (NSString *)type
 {
-	return [revision type];
+	return nil;
 }
 
 - (NSString *)shortDescription;
 {
-	return [revision shortDescription];
+	return nil;
 }
 
 - (NSString *)longDescription
 {
-	return [revision longDescription];
+	return nil;
 }
 
 // TODO: Enable again once CORevision supports something similar or remove
