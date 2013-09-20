@@ -1,3 +1,11 @@
+/*
+	Copyright (C) 2013 Eric Wasylishen
+
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>
+	Date:  July 2013
+	License:  Modified BSD  (see COPYING)
+ */
+
 #import "COObject+RelationshipCache.h"
 #import "COObject.h"
 #import "CORelationshipCache.h"

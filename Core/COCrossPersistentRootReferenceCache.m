@@ -1,3 +1,11 @@
+/*
+	Copyright (C) 2013 Eric Wasylishen
+
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>
+	Date:  August 2013
+	License:  Modified BSD  (see COPYING)
+ */
+
 #import "COCrossPersistentRootReferenceCache.h"
 
 @implementation COCrossPersistentRootReferenceCache

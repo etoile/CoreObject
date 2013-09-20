@@ -4,7 +4,6 @@
 	Author:  Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  November 2011
 	License:  Modified BSD  (see COPYING)
-
  */
 
 #import "COQuery.h"
