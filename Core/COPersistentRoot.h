@@ -82,10 +82,6 @@ extern NSString * const COPersistentRootDidChangeNotification;
      * COBranch objects indexed by ETUUID
      */
     NSMutableDictionary *_branchForUUID;
-	/** 
-	 * The branches deleted on disk. 
-	 */
-	NSMutableSet *_deletedBranches;
 	NSMutableSet *_branchesPendingInsertion;
 	NSMutableSet *_branchesPendingDeletion;
 	NSMutableSet *_branchesPendingUndeletion;

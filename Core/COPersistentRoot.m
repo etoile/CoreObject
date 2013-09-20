@@ -32,7 +32,6 @@ NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidCh
 @implementation COPersistentRoot
 
 @synthesize parentContext = _parentContext, persistentRootUUID = _UUID;
-@synthesize deletedBranches = _deletedBranches;
 @synthesize branchesPendingDeletion = _branchesPendingDeletion;
 @synthesize branchesPendingUndeletion = _branchesPendingUndeletion;
 
@@ -57,7 +56,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     _parentContext = aCtxt;
     _savedState =  info;
     _branchForUUID = [[NSMutableDictionary alloc] init];
-	_deletedBranches = [NSMutableSet new];
 	_branchesPendingInsertion = [NSMutableSet new];
 	_branchesPendingDeletion = [NSMutableSet new];
 	_branchesPendingUndeletion = [NSMutableSet new];
