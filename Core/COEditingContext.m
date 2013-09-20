@@ -233,6 +233,20 @@
 	return insertedPersistentRoots;
 }
 
+- (NSSet *)persistentRootsPendingUpdate
+{
+	NSMutableSet *updatedPersistentRoots = [NSMutableSet set];
+
+	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+	{
+		if ([persistentRoot hasChanges])
+		{
+			[updatedPersistentRoots addObject: persistentRoot];
+		}
+	}
+	return updatedPersistentRoots;
+}
+
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject
 {
 	COObjectGraphContext *objectGraphContext = [aRootObject objectGraphContext];

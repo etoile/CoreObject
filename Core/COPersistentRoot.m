@@ -268,6 +268,12 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 		                    ^(id obj) { return [obj isBranchUncommitted]; }];
 }
 
+- (NSSet *)branchesPendingUpdate
+{
+    return [[self branches] filteredCollectionWithBlock:
+		                    ^(id obj) { return [obj hasChanges]; }];
+}
+
 - (BOOL)hasChanges
 {
 	// TODO: Take in account pending branch insertion and deletion

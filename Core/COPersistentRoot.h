@@ -211,6 +211,10 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @property (nonatomic, copy, readonly) NSSet *branchesPendingUndeletion;
 /**
+ * The branches to be updated in the store on the next commit.
+ */
+@property (nonatomic, copy, readonly) NSSet *branchesPendingUpdate;
+/**
  * Returns whether the persistent root contains uncommitted changes.
  *
  * Branch insertions, deletions, and modifications (e.g. editing branch metadata,

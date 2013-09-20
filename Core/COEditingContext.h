@@ -172,9 +172,6 @@
 
 /** @taskunit Pending Changes */
 
-// TODO: updatedPersistentRoots?
-// TODO: changedPersistentRoots?
-
 /**
  * The new persistent roots to be saved in the store on the next commit.
  */
@@ -187,6 +184,10 @@
  * The persistent roots to be undeleted in the store on the next commit.
  */
 @property (nonatomic, copy, readonly) NSSet *persistentRootsPendingUndeletion;
+/**
+ * The persistent roots to be updated in the store on the next commit.
+ */
+@property (nonatomic, copy, readonly) NSSet *persistentRootsPendingUpdate;
 /**
  * Returns whether the context contains uncommitted changes.
  *
