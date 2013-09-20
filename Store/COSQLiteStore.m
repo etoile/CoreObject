@@ -502,6 +502,7 @@
                                        withParent: [backing revidForUUID: aParent]
                                   withMergeParent: [backing revidForUUID: aMergeParent]
 	                                   branchUUID: branch
+                               persistentrootUUID: aUUID
                                             error: NULL];
     
     if (revid == nil)
@@ -1127,5 +1128,3 @@ NSString *kCOPersistentRootUUID = @"COPersistentRootUUID";
 NSString *kCOPersistentRootTransactionUUID = @"COPersistentRootTransactionUUID";
 NSString *kCOStoreUUID = @"COStoreUUID";
 NSString *kCOStoreURL = @"COStoreURL";
-
-NSString *kCOMetadataPersistentRootUUID = @"COMetadataPersistentRootUUID";

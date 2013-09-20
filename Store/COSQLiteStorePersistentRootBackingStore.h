@@ -64,6 +64,7 @@
                        withParent: (int64_t)aParent
                   withMergeParent: (int64_t)aMergeParent
                        branchUUID: (ETUUID *)aBranchUUID
+               persistentrootUUID: (ETUUID *)aPersistentRootUUID
                             error: (NSError **)error;
 
 - (NSIndexSet *) revidsFromRevid: (int64_t)baseRevid toRevid: (int64_t)finalRevid;

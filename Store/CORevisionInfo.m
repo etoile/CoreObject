@@ -6,6 +6,7 @@
 @synthesize revisionID = _revisionID;
 @synthesize parentRevisionID = _parentRevisionID;
 @synthesize mergeParentRevisionID = _mergeParentRevisionID;
+@synthesize persistentRootUUID = _persistentRootUUID;
 @synthesize branchUUID = _branchUUID;
 @synthesize metadata = _metadata;
 @synthesize date = _date;

@@ -65,7 +65,7 @@
 
 - (ETUUID *)persistentRootUUID
 {
-	return [ETUUID UUIDWithString: [[self metadata] objectForKey: kCOMetadataPersistentRootUUID]];
+	return [revisionInfo persistentRootUUID];
 }
 
 - (ETUUID *)branchUUID
