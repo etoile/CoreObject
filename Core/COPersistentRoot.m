@@ -79,7 +79,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         COBranch *branch = [[COBranch alloc] initWithUUID: branchUUID
 		                                objectGraphContext: anObjectGraphContext
                                             persistentRoot: self
-                                         parentBranchUUID: nil
+                                          parentBranchUUID: nil
                                 parentRevisionForNewBranch: cheapCopyRevisionID];
         
         [_branchForUUID setObject: branch forKey: branchUUID];

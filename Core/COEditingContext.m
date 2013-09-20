@@ -27,9 +27,7 @@
 + (COEditingContext *)contextWithURL: (NSURL *)aURL
 {
 	// TODO: Look up the store class based on the URL scheme and path extension
-	COEditingContext *ctx = [[self alloc] initWithStore:
-		[[NSClassFromString(@"COSQLiteStore") alloc] initWithURL: aURL]];
-	return ctx;
+	return [[self alloc] initWithStore: [[COSQLiteStore alloc] initWithURL: aURL]];
 }
 
 - (void)registerAdditionalEntityDescriptions
