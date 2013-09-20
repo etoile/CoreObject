@@ -29,14 +29,17 @@
 @implementation TestHistoryInspection
 
 /*
-
-		 persistent root p1, branch 1C -->    ----[7]-----------[9]-----10  
-		                                     /
-		   ------------3------------[5]-----6------------[8]    <-- persistent root p1, branch 1B
+                                                    -[7]-----------[9]         )
+                                                   /                           }--  persistent root p1, branch 1C
+                                                --------------------------10   )       (current revision: r10)
+		                                       /
+		                        ---[5]        /   ------[8]    )
+                               /             /   /             }-- persistent root p1, branch 1B
+		   ------------3-----------------6-------              )      (current revision: r6)
 		  /
-  0------1------2    <-- persistent root p1, branch 1A
+  0------1------2    }-- persistent root p1, branch 1A (current revision: r2)
 				 \
-				  ------------4    <-- persistent root p2, branch 2A
+				  ------------4    <-- persistent root p2, branch 2A (current revision: r4)
 
  
 
@@ -48,16 +51,11 @@
  
              branch:  1A      1A      1A     1B     2A     1B     1B     1C     1B     1C     1C
  
-
-  Notes: Divergent revisions are enclosed in []. 
  
-  For grouped divergent revisions such as r7 and r9, multiple current revision  
-  transitions are possible in the diagram above: 
-
-  - 6 -> 7 -> 9 -> 6 -> 10 (the test suite scenario)
-  - 6 -> 7 -> 6 -> 9 -> 6 -> 10
-
-  In other words, r9 parent revision is either 7 or 6.
+ 
+  Notes: Divergent revisions are enclosed in [].
+  Divergent revisions are revisions which are not ancestors of the current revision
+  of a branch, but in the past they were comitted on that branch.
  
   A commit creates a new revision and changes the current revision, but changing
   the current revision doesn't result in a new revision.
