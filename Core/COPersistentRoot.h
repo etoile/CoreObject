@@ -82,6 +82,13 @@ extern NSString * const COPersistentRootDidChangeNotification;
      * COBranch objects indexed by ETUUID
      */
     NSMutableDictionary *_branchForUUID;
+	/** 
+	 * The branches deleted on disk. 
+	 */
+	NSMutableSet *_deletedBranches;
+	NSMutableSet *_branchesPendingInsertion;
+	NSMutableSet *_branchesPendingDeletion;
+	NSMutableSet *_branchesPendingUndeletion;
     /**
      * Used to stage a change to the current branch.
      */
@@ -158,7 +165,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * -branchesPendingDeletion are not included in the returned set.
  */
-@property (weak, nonatomic, readonly) NSSet *deletedBranches;
+@property (nonatomic, copy, readonly) NSSet *deletedBranches;
 /**
  * Returns the branch using the given UUID or nil.
  *
@@ -198,15 +205,15 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /**
  * The new branches to be saved in the store on the next commit.
  */
-@property (weak, nonatomic, readonly) NSSet *branchesPendingInsertion;
+@property (nonatomic, copy, readonly) NSSet *branchesPendingInsertion;
 /**
  * The branche to be deleted in the store on the next commit.
  */
-@property (weak, nonatomic, readonly) NSSet *branchesPendingDeletion;
+@property (nonatomic, copy, readonly) NSSet *branchesPendingDeletion;
 /**
  * The branches to be undeleted in the store on the next commit.
  */
-@property (weak, nonatomic, readonly) NSSet *branchesPendingUndeletion;
+@property (nonatomic, copy, readonly) NSSet *branchesPendingUndeletion;
 /**
  * Returns whether the persistent root contains uncommitted changes.
  *

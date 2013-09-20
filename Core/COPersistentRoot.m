@@ -32,6 +32,9 @@ NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidCh
 @implementation COPersistentRoot
 
 @synthesize parentContext = _parentContext, persistentRootUUID = _UUID;
+@synthesize deletedBranches = _deletedBranches;
+@synthesize branchesPendingDeletion = _branchesPendingDeletion;
+@synthesize branchesPendingUndeletion = _branchesPendingUndeletion;
 
 - (id) initWithInfo: (COPersistentRootInfo *)info
 cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
@@ -54,6 +57,10 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     _parentContext = aCtxt;
     _savedState =  info;
     _branchForUUID = [[NSMutableDictionary alloc] init];
+	_deletedBranches = [NSMutableSet new];
+	_branchesPendingInsertion = [NSMutableSet new];
+	_branchesPendingDeletion = [NSMutableSet new];
+	_branchesPendingUndeletion = [NSMutableSet new];
     
     if (_savedState != nil)
     {
@@ -189,8 +196,8 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (NSSet *)deletedBranches
 {
-	// TODO: Implement
-	return [NSSet set];
+    return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock:
+                                        ^(id obj) { return (BOOL)[[obj branchInfo] isDeleted]; }]];
 }
 
 - (COBranch *)branchForUUID: (ETUUID *)aUUID
@@ -198,14 +205,38 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return [_branchForUUID objectForKey: aUUID];
 }
 
-- (void)setBranchDeleted: (COBranch *)aBranch
+- (void)deleteBranch: (COBranch *)aBranch
 {
-    if (aBranch.deleted && [aBranch isBranchUncommitted])
+    if ([aBranch isBranchUncommitted])
     {
         [_branchForUUID removeObjectForKey: [aBranch UUID]];
     }
+	else if ([_branchesPendingUndeletion containsObject: aBranch])
+	{
+		[_branchesPendingUndeletion removeObject: aBranch];
+	}
+	else
+	{
+		[_branchesPendingDeletion addObject: aBranch];
+	}
     
-    [self sendChangeNotification];
+    [self updateCrossPersistentRootReferences];
+	[self sendChangeNotification];
+}
+
+- (void)undeleteBranch: (COBranch *)aBranch
+{
+    if ([_branchesPendingDeletion containsObject: aBranch])
+    {
+        [_branchesPendingDeletion removeObject: aBranch];
+    }
+    else
+    {
+        [_branchesPendingUndeletion addObject: aBranch];
+    }
+
+    [self updateCrossPersistentRootReferences];
+	[self sendChangeNotification];
 }
 
 - (COObjectGraphContext *)objectGraphContext
@@ -233,25 +264,10 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	return [[self objectGraphContext] objectWithUUID: uuid];
 }
 
-// TODO: Follow what COEditingContext does for persistent roots to track and
-// commit branch insertion, deletion and undeletion
-
-- (NSSet *)branchesPendingDeletion
-{
-    return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock:
-                                 ^(id obj) { return [obj isDeleted]; }]];
-}
-
 - (NSSet *)branchesPendingInsertion
 {
     return [[self branches] filteredCollectionWithBlock:
-            ^(id obj) { return [obj isBranchUncommitted]; }];
-}
-
-- (NSSet *)branchesPendingUndeletion
-{
-	// TODO: Implement
-    return [NSSet set];
+		                    ^(id obj) { return [obj isBranchUncommitted]; }];
 }
 
 - (BOOL)hasChanges
@@ -388,6 +404,10 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
             [self reloadPersistentRootInfo];
         }
     }
+	
+	[_branchesPendingInsertion removeAllObjects];
+	[_branchesPendingDeletion removeAllObjects];
+	[_branchesPendingUndeletion removeAllObjects];
 
     // FIXME: Hack?
     [self reloadPersistentRootInfo];

@@ -474,6 +474,7 @@
     
     UKObjectsEqual(S(originalBranch), [persistentRoot branches]);
     UKObjectsEqual(S(branch), [persistentRoot branchesPendingDeletion]);
+	UKTrue([[persistentRoot deletedBranches] isEmpty]);
     UKTrue([branch isDeleted]);
     
     [ctx commit];
@@ -486,7 +487,8 @@
         COBranch *ctx2branch = [ctx2persistentRoot branchForUUID: [branch UUID]];
         
         UKObjectsEqual(S(ctx2originalBranch), [ctx2persistentRoot branches]);
-        UKObjectsEqual(S(ctx2branch), [ctx2persistentRoot branchesPendingDeletion]);
+		UKTrue([[ctx2persistentRoot branchesPendingDeletion] isEmpty]);
+		UKObjectsEqual(S(ctx2branch), [ctx2persistentRoot deletedBranches]);
         UKTrue([ctx2branch isDeleted]);
     }
 }

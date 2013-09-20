@@ -191,30 +191,45 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     _metadataChanged = YES;
 }
 
-
 - (BOOL)isDeleted
 {
-    return _deleted;
+    if ([[_persistentRoot branchesPendingUndeletion] containsObject: self])
+        return NO;
+    
+    if ([[_persistentRoot branchesPendingDeletion] containsObject: self])
+        return YES;
+
+    if ([[_persistentRoot deletedBranches] containsObject: self])
+        return YES;
+    
+    return NO;
 }
 
 - (void) setDeleted:(BOOL)deleted
 {
     if (deleted)
     {
+		// TODO: Use a CoreObject exception type
         if ([self isCurrentBranch])
         {
-            [NSException raise: NSGenericException format: @"Can't delete the current branch"];
+            [NSException raise: NSGenericException
+			            format: @"Can't delete the current branch"];
         }
         if (self == [_persistentRoot editingBranch])
         {
-            [NSException raise: NSGenericException format: @"Can't delete the editing branch"];
+            [NSException raise: NSGenericException
+			            format: @"Can't delete the editing branch"];
         }
     }
     
-    _deleted = deleted;
-    
-    [_persistentRoot setBranchDeleted: self];
-    [_persistentRoot updateCrossPersistentRootReferences];
+    if (deleted)
+    {
+        [_persistentRoot deleteBranch: self];
+    }
+    else
+    {
+        [_persistentRoot undeleteBranch: self];
+    }
 }
 
 - (CORevision *)parentRevision
@@ -268,7 +283,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         return YES;
     }
     
-    if (_deleted != [[self branchInfo] isDeleted])
+    if ([self isDeleted] != [[self branchInfo] isDeleted])
     {
         return YES;
     }
@@ -303,7 +318,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
             [[self editingContext] revisionForRevisionID: [[self branchInfo] currentRevisionID]]];
     }
     
-    if (_deleted != [[self branchInfo] isDeleted])
+    if ([self isDeleted] != [[self branchInfo] isDeleted])
     {
         [self setDeleted: [[self branchInfo] isDeleted]];
     }
@@ -470,7 +485,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
     // Write branch undeletion
     
-    if (!_deleted && [[self branchInfo] isDeleted])
+    if (![self isDeleted] && [[self branchInfo] isDeleted])
     {
         ETAssert([store undeleteBranch: _UUID
                       ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
@@ -487,7 +502,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     // Write branch deletion
     
-    if (_deleted && ![[self branchInfo] isDeleted])
+    if ([self isDeleted] && ![[self branchInfo] isDeleted])
     {
         ETAssert([store deleteBranch: _UUID
                     ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
@@ -605,7 +620,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     _currentRevisionID =  [branchInfo currentRevisionID];
     _metadata =  [NSMutableDictionary dictionaryWithDictionary:[branchInfo metadata]];
     _isCreated = YES;
-    _deleted = [branchInfo isDeleted];
     
     id<COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionID: _currentRevisionID];
     [_objectGraph setItemGraph: aGraph];
