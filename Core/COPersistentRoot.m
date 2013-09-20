@@ -276,9 +276,17 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (BOOL)hasChanges
 {
-	// TODO: Take in account pending branch insertion and deletion
+	if ([_branchesPendingDeletion count] > 0)
+        return YES;
+    
+    if ([_branchesPendingUndeletion count] > 0)
+        return YES;
+
 	for (COBranch *branch in [self branches])
 	{
+		if ([branch isBranchUncommitted])
+            return YES;
+
 		if ([branch hasChanges])
 			return YES;
 	}

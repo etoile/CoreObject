@@ -217,8 +217,9 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /**
  * Returns whether the persistent root contains uncommitted changes.
  *
- * Branch insertions, deletions, and modifications (e.g. editing branch metadata,
- * reverting branch to a past revision) all count as uncommitted changes.
+ * Branch insertions, deletions, undeletions, and modifications (e.g. editing 
+ * branch metadata, reverting branch to a past revision) all count as 
+ * uncommitted changes.
  *
  * See also -discardAllChanges.
  */
@@ -226,13 +227,14 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /**
  * Discards the uncommitted changes to reset the branch to its last commit state.
  *
- * Branch insertions, deletions, and modifications (e.g. editing branch metadata,
- * reverting branch to a past revision) will be cancelled.
+ * Branch insertions, deletions, undeletions and modifications (e.g. editing 
+ * branch metadata, reverting branch to a past revision) will be cancelled.
  *
  * All uncommitted embedded object edits in the object graphs owned by the 
  * branches will be cancelled.
  *
- * -branchesPendingInsertion, -branchesPendingDeletion  will all return empty 
+ * -branchesPendingInsertion, -branchesPendingDeletion, 
+ * -branchesPendingUndeletion and -branchesPendingUpdate  will all return empty
  * sets once the changes have been discarded.
  *
  * See also -hasChanges.
