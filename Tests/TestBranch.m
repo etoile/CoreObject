@@ -408,15 +408,14 @@
     
 	CORevision *rev1 = [originalBranch currentRevision];
     COPersistentRoot *copyRoot = [originalBranch makeCopyFromRevision: rev1];
+    UKNil([store persistentRootInfoForUUID: [copyRoot persistentRootUUID]]);
+	UKTrue([[ctx persistentRootsPendingInsertion] containsObject: copyRoot]);
     
 	COBranch *copyRootBranch = [copyRoot currentBranch];
 
-    UKNil([store persistentRootInfoForUUID: [copyRoot persistentRootUUID]]);
-	UKTrue([[ctx persistentRootsPendingInsertion] containsObject: copyRoot]);
-    // FIXME: Due the persistent root UUID mistmatch, revision ID equality doesn't work correctly
-	//UKObjectsEqual(rev1, [copyRoot revision]);
-
     [ctx commit];
+    
+    UKObjectsEqual(rev1, [copyRoot revision]);
     
     UKNotNil([store persistentRootInfoForUUID: [copyRoot persistentRootUUID]]);
     

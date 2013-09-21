@@ -31,6 +31,8 @@
 {
 	SUPERINIT;
     
+    queue_ = dispatch_queue_create([[NSString stringWithFormat: @"COSQLiteStore-%p", self] UTF8String], NULL);
+    
 	url_ = aURL;
 	backingStores_ = [[NSMutableDictionary alloc] init];
     backingStoreUUIDForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
@@ -43,93 +45,102 @@
                                                attributes: nil
                                                     error: NULL];
 	
-    db_ = [[FMDatabase alloc] initWithPath: [[url_ path] stringByAppendingPathComponent: @"index.sqlite"]];
+    __block BOOL ok = YES;
     
-    [db_ setShouldCacheStatements: YES];
-	[db_ setCrashOnErrors: YES];
-    [db_ setLogsErrors: YES];
-    
-	if (![db_ open])
-	{
-		return nil;
-	}
-    
-    // Use write-ahead-log mode
-    {
-        NSString *result = [db_ stringForQuery: @"PRAGMA journal_mode=WAL"];
+    dispatch_sync(queue_, ^() {
+        db_ = [[FMDatabase alloc] initWithPath: [[url_ path] stringByAppendingPathComponent: @"index.sqlite"]];
         
-        if (![@"wal" isEqualToString: result])
+        [db_ setShouldCacheStatements: YES];
+        [db_ setCrashOnErrors: NO];
+        [db_ setLogsErrors: YES];
+        
+        [db_ open];
+        
+        // Use write-ahead-log mode
         {
-            NSLog(@"Enabling WAL mode failed.");
-        }
-    }    
-    
-    // Set up schema
-    
-    [db_ beginDeferredTransaction];
-    
-    /* Store Metadata tables (including schema version) */
-    
-    if (![db_ tableExists: @"storeMetadata"])
-    {
-        _uuid =  [ETUUID UUID];
-        [db_ executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, uuid BLOB)"];
-        [db_ executeUpdate: @"INSERT INTO storeMetadata VALUES(1, ?)", [_uuid dataValue]];
-    }
-    else
-    {
-        int version = [db_ intForQuery: @"SELECT version FROM storeMetadata"];
-        if (1 != version)
-        {
-            NSLog(@"Error, store version %d, only version 1 is supported", version);
-            return nil;
+            NSString *result = [db_ stringForQuery: @"PRAGMA journal_mode=WAL"];
+            
+            if (![@"wal" isEqualToString: result])
+            {
+                NSLog(@"Enabling WAL mode failed.");
+            }
         }
         
-        _uuid =  [ETUUID UUIDWithData: [db_ dataForQuery: @"SELECT uuid FROM storeMetadata"]];
-    }
-    
-    // Persistent Root and Branch tables
-    
-    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots ("
-     "uuid BLOB PRIMARY KEY NOT NULL, backingstore BLOB NOT NULL, "
-     "currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionuuid BLOB)"];
-    
-    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL PRIMARY KEY, "
-     "proot BLOB NOT NULL, initial_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
-     "metadata BLOB, deleted BOOLEAN DEFAULT 0, parentbranch BLOB)"];
-
-    // FTS indexes & reference caching tables (in theory, could be regenerated - although not supported)
-    
-    /**
-     * In embedded_object_uuid in revid of backing store root_id, there was a reference to dest_root_id
-     */
-    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS proot_refs (root_id BLOB, revid BOLB, embedded_object_uuid BLOB, dest_root_id BLOB)"];
-    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS attachment_refs (root_id BLOB, revid BLOB, attachment_hash BLOB)"];    
-    
-    // FIXME: This is a bit ugly. Verify that usage is consistent across fts3/4
-	if (sqlite3_libversion_number() >= 3007011)
-    {
-        [db_ executeUpdate: @"CREATE VIRTUAL TABLE IF NOT EXISTS fts USING fts4(content=\"\", text)"]; // implicit column docid
-    }
-    else
-    {
-        if (nil == [db_ stringForQuery: @"SELECT name FROM sqlite_master WHERE type = 'table' and name = 'fts'"])
+        // Set up schema
+        
+        [db_ beginDeferredTransaction];
+        
+        /* Store Metadata tables (including schema version) */
+        
+        if (![db_ tableExists: @"storeMetadata"])
         {
-            [db_ executeUpdate: @"CREATE VIRTUAL TABLE fts USING fts3(text)"]; // implicit column docid
+            _uuid =  [ETUUID UUID];
+            [db_ executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, uuid BLOB)"];
+            [db_ executeUpdate: @"INSERT INTO storeMetadata VALUES(1, ?)", [_uuid dataValue]];
         }
-    }
-    
-    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS fts_docid_to_revisionid ("
-     "docid INTEGER PRIMARY KEY, backingstore BLOB, revid BLOB)"];
-    
-    [db_ commit];
-    
-    if ([db_ hadError])
-    {
-		NSLog(@"Error %d: %@", [db_ lastErrorCode], [db_ lastErrorMessage]);
-		return nil;
-	}
+        else
+        {
+            int version = [db_ intForQuery: @"SELECT version FROM storeMetadata"];
+            if (1 != version)
+            {
+                NSLog(@"Error, store version %d, only version 1 is supported", version);
+                [db_ rollback];
+                ok = NO;
+                return;
+            }
+            
+            _uuid =  [ETUUID UUIDWithData: [db_ dataForQuery: @"SELECT uuid FROM storeMetadata"]];
+        }
+        
+        // Persistent Root and Branch tables
+        
+        [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots ("
+         "uuid BLOB PRIMARY KEY NOT NULL, backingstore BLOB NOT NULL, "
+         "currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionuuid BLOB)"];
+        
+        [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL PRIMARY KEY, "
+         "proot BLOB NOT NULL, initial_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
+         "metadata BLOB, deleted BOOLEAN DEFAULT 0, parentbranch BLOB)"];
+        
+        // FTS indexes & reference caching tables (in theory, could be regenerated - although not supported)
+        
+        /**
+         * In embedded_object_uuid in revid of backing store root_id, there was a reference to dest_root_id
+         */
+        [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS proot_refs (root_id BLOB, revid BOLB, embedded_object_uuid BLOB, dest_root_id BLOB)"];
+        [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS attachment_refs (root_id BLOB, revid BLOB, attachment_hash BLOB)"];
+        
+        // FIXME: This is a bit ugly. Verify that usage is consistent across fts3/4
+        if (sqlite3_libversion_number() >= 3007011)
+        {
+            [db_ executeUpdate: @"CREATE VIRTUAL TABLE IF NOT EXISTS fts USING fts4(content=\"\", text)"]; // implicit column docid
+        }
+        else
+        {
+            if (nil == [db_ stringForQuery: @"SELECT name FROM sqlite_master WHERE type = 'table' and name = 'fts'"])
+            {
+                [db_ executeUpdate: @"CREATE VIRTUAL TABLE fts USING fts3(text)"]; // implicit column docid
+            }
+        }
+        
+        [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS fts_docid_to_revisionid ("
+         "docid INTEGER PRIMARY KEY, backingstore BLOB, revid BLOB)"];
+        
+        [db_ commit];
+        
+        if ([db_ hadError])
+        {
+            NSLog(@"Error %d: %@", [db_ lastErrorCode], [db_ lastErrorMessage]);
+            ok = NO;
+            return;
+        }
 
+    });
+    
+    if (!ok)
+    {
+        return nil;
+    }
     
 	return self;
 }
@@ -161,49 +172,55 @@
 
 - (BOOL) commitStoreTransaction: (COStoreTransaction *)aTransaction
 {
-    [db_ beginTransaction];
+    __block BOOL ok = YES;
     
-    self.transactionUUID = aTransaction.transactionUUID;
+    assert(dispatch_get_current_queue() != queue_);
     
-    // update the last transaction field before we commit.
-    
-    for (ETUUID *modifiedUUID in modifiedPersistentRootsUUIDs_)
-    {
-        [db_ executeUpdate: @"UPDATE persistentroots SET transactionuuid = ? WHERE uuid = ?", [transactionUUID dataValue], [modifiedUUID dataValue]];
-    }
-    
-    
-    BOOL ok = YES;
-    for (id<COStoreAction> op in aTransaction.operations)
-    {
-        BOOL opOk = [op execute: self];
-        if (!opOk)
+    dispatch_sync(queue_, ^() {
+        [db_ beginTransaction];
+        
+        self.transactionUUID = aTransaction.transactionUUID;
+        
+        // update the last transaction field before we commit.
+        
+        for (ETUUID *modifiedUUID in modifiedPersistentRootsUUIDs_)
         {
-            NSLog(@"store action failed: %@", op);
-            [op execute: self];
+            [db_ executeUpdate: @"UPDATE persistentroots SET transactionuuid = ? WHERE uuid = ?", [transactionUUID dataValue], [modifiedUUID dataValue]];
         }
-        ok = ok && opOk;
-    }
-    
-    if (!ok)
-    {
-        [db_ rollback];
-        ok = NO;
-    }
-    else
-    {
-        ok = [db_ commit];
-        if (ok)
+        
+        
+
+        for (id<COStoreAction> op in aTransaction.operations)
         {
-            [self postCommitNotificationsForTransaction: transactionUUID];
+            BOOL opOk = [op execute: self];
+            if (!opOk)
+            {
+                NSLog(@"store action failed: %@", op);
+                [op execute: self];
+            }
+            ok = ok && opOk;
+        }
+        
+        if (!ok)
+        {
+            [db_ rollback];
+            ok = NO;
         }
         else
         {
-            NSLog(@"Commit failed");
+            ok = [db_ commit];
+            if (ok)
+            {
+                [self postCommitNotificationsForTransaction: transactionUUID];
+            }
+            else
+            {
+                NSLog(@"Commit failed");
+            }
         }
-    }
-    
-    self.transactionUUID = nil;
+        
+        self.transactionUUID = nil;
+    });
     
     return ok;
 }
@@ -226,27 +243,39 @@
 - (NSArray *) allBackingUUIDs
 {
     NSMutableArray *result = [NSMutableArray array];
-    FMResultSet *rs = [db_ executeQuery: @"SELECT DISTINCT backingstore FROM persistentroots"];
-    sqlite3_stmt *statement = [[rs statement] statement];
     
-    while ([rs next])
-    {
-        const void *data = sqlite3_column_blob(statement, 0);
-        const int dataSize = sqlite3_column_bytes(statement, 0);
-      
-        assert(dataSize == 16);
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        FMResultSet *rs = [db_ executeQuery: @"SELECT DISTINCT backingstore FROM persistentroots"];
+        sqlite3_stmt *statement = [[rs statement] statement];
         
-        ETUUID *uuid = [[ETUUID alloc] initWithUUID: data];
-        [result addObject: uuid];
-    }
-    [rs close];
+        while ([rs next])
+        {
+            const void *data = sqlite3_column_blob(statement, 0);
+            const int dataSize = sqlite3_column_bytes(statement, 0);
+          
+            assert(dataSize == 16);
+            
+            ETUUID *uuid = [[ETUUID alloc] initWithUUID: data];
+            [result addObject: uuid];
+        }
+        [rs close];
+    });
+    
     return result;
 }
 
 - (CORevisionID *) revisionIDForRevisionUUID: (ETUUID *)aRevisionUUID
                           persistentRootUUID: (ETUUID *)aPersistentRoot
 {
-    ETUUID *backingUUID = [self backingUUIDForPersistentRootUUID: aPersistentRoot];
+    __block ETUUID *backingUUID;
+    
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        backingUUID = [self backingUUIDForPersistentRootUUID: aPersistentRoot];
+    });
     
     return [CORevisionID revisionWithPersistentRootUUID: backingUUID
                                         revisionUUID: aRevisionUUID];
@@ -256,17 +285,23 @@
 {
 	NILARG_EXCEPTION_TEST(aBranchUUID);
 
-	FMResultSet *rs = [db_ executeQuery: @"SELECT current_revid FROM branches WHERE uuid = ?",
-		[aBranchUUID dataValue]];
-	ETUUID *prootUUID = nil;
+    __block ETUUID *prootUUID = nil;
+    
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        FMResultSet *rs = [db_ executeQuery: @"SELECT current_revid FROM branches WHERE uuid = ?",
+            [aBranchUUID dataValue]];
 
-	if ([rs next])
-	{
-		prootUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-        ETAssert([rs next] == NO);
-    }
+        if ([rs next])
+        {
+            prootUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+            ETAssert([rs next] == NO);
+        }
 
-	[rs close];
+        [rs close];
+    });
+                  
 	return prootUUID;
 }
 
@@ -275,16 +310,27 @@
 {
 	ETUUID *prootUUID = [self persistentRootUUIDForBranchUUID: aBranchUUID];
 	ETUUID *currentRevUUID = [self currentRevisionUUIDForBranchUUID: aBranchUUID];
-	COSQLiteStorePersistentRootBackingStore *backingStore = 
+
+    __block NSArray *result = nil;
+    
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        COSQLiteStorePersistentRootBackingStore *backingStore =
 		[self backingStoreForPersistentRootUUID: prootUUID];
 
-	return [backingStore revisionInfosForBranchUUID: aBranchUUID
-	                               headRevisionUUID: currentRevUUID
-	                                        options: options];
+        result = [backingStore revisionInfosForBranchUUID: aBranchUUID
+                                         headRevisionUUID: currentRevUUID
+                                                  options: options];
+    });
+    
+    return result;
 }
 
 - (ETUUID *) backingUUIDForPersistentRootUUID: (ETUUID *)aUUID
 {
+    assert(dispatch_get_current_queue() == queue_);
+    
     ETUUID *backingUUID = [backingStoreUUIDForPersistentRootUUID_ objectForKey: aUUID];
     if (backingUUID == nil)
     {
@@ -298,7 +344,8 @@
             // HACK
             backingUUID = aUUID;
             //[NSException raise: NSInvalidArgumentException format: @"persistent root %@ not found", aUUID];
-        }        
+        }
+        
         [backingStoreUUIDForPersistentRootUUID_ setObject: backingUUID forKey: aUUID];
     }
     return backingUUID;
@@ -306,6 +353,8 @@
 
 - (COSQLiteStorePersistentRootBackingStore *) backingStoreForPersistentRootUUID: (ETUUID *)aUUID
 {
+    assert(dispatch_get_current_queue() == queue_);
+    
     return [self backingStoreForUUID: [self backingUUIDForPersistentRootUUID: aUUID]
                                error: NULL];
 }
@@ -357,9 +406,17 @@
 - (CORevisionInfo *) revisionInfoForRevisionID: (CORevisionID *)aToken
 {
     NSParameterAssert(aToken != nil);
+   
+    __block CORevisionInfo *result = nil;
     
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-    return [backing revisionForID: aToken];
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
+        result = [backing revisionForID: aToken];
+    });
+    
+    return result;
 }
 
 - (COItemGraph *) partialItemGraphFromRevisionID: (CORevisionID *)baseRevid
@@ -368,37 +425,67 @@
     NSParameterAssert(baseRevid != nil);
     NSParameterAssert(finalRevid != nil);
     
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: baseRevid];
-    COSQLiteStorePersistentRootBackingStore *backing2 = [self backingStoreForRevisionID: finalRevid];
-    NSParameterAssert(backing == backing2);
+    __block COItemGraph *result = nil;
     
-    COItemGraph *result = [backing partialItemGraphFromRevid: [backing revidForRevisionID: baseRevid]
-                                                     toRevid: [backing revidForRevisionID: finalRevid]];
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: baseRevid];
+        COSQLiteStorePersistentRootBackingStore *backing2 = [self backingStoreForRevisionID: finalRevid];
+        NSParameterAssert(backing == backing2);
+        
+        result = [backing partialItemGraphFromRevid: [backing revidForRevisionID: baseRevid]
+                                            toRevid: [backing revidForRevisionID: finalRevid]];
+    });
+    
     return result;
 }
 
 - (COItemGraph *) itemGraphForRevisionID: (CORevisionID *)aToken
 {
     NSParameterAssert(aToken != nil);
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-    COItemGraph *result = [backing itemGraphForRevid: [backing revidForRevisionID: aToken]];
+    
+    __block COItemGraph *result = nil;
+    
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
+        result = [backing itemGraphForRevid: [backing revidForRevisionID: aToken]];
+    });
     return result;
 }
 
 - (ETUUID *) rootObjectUUIDForRevisionID: (CORevisionID *)aToken
 {
     NSParameterAssert(aToken != nil);
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-    return [backing rootUUIDForRevid: [backing revidForRevisionID: aToken]];
+    
+    __block ETUUID *result = nil;
+    
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
+        result = [backing rootUUIDForRevid: [backing revidForRevisionID: aToken]];
+    });
+    
+    return result;
 }
 
 - (COItem *) item: (ETUUID *)anitem atRevisionID: (CORevisionID *)aToken
 {
     NSParameterAssert(aToken != nil);
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-    COItemGraph *tree = [backing itemGraphForRevid: [backing revidForRevisionID: aToken]
-                               restrictToItemUUIDs: S(anitem)];
-    COItem *item = [tree itemForUUID: anitem];
+
+    __block COItem *item = nil;
+    
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
+        COItemGraph *tree = [backing itemGraphForRevid: [backing revidForRevisionID: aToken]
+                                   restrictToItemUUIDs: S(anitem)];
+        item = [tree itemForUUID: anitem];
+    });
     return item;
 }
 
@@ -414,8 +501,9 @@
 - (void) updateSearchIndexesForItemTree: (id<COItemGraph>)anItemTree
                  revisionIDBeingWritten: (CORevisionID *)aRevision
 {
-    [db_ savepoint: @"updateSearchIndexesForItemUUIDs"];
+    assert(dispatch_get_current_queue() == queue_);
     
+    [db_ savepoint: @"updateSearchIndexesForItemUUIDs"];
     
     
     ETUUID *backingStoreUUID = [self backingUUIDForPersistentRootUUID: [aRevision revisionPersistentRootUUID]];
@@ -467,17 +555,23 @@
 - (NSArray *) revisionIDsMatchingQuery: (NSString *)aQuery
 {
     NSMutableArray *result = [NSMutableArray array];
-    FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, revid FROM "
-                       "(SELECT backingstore, revid FROM fts_docid_to_revisionid WHERE docid IN (SELECT docid FROM fts WHERE text MATCH ?)) "
-                       "INNER JOIN persistentroots USING(backingstore)", aQuery];
+    
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, revid FROM "
+                           "(SELECT backingstore, revid FROM fts_docid_to_revisionid WHERE docid IN (SELECT docid FROM fts WHERE text MATCH ?)) "
+                           "INNER JOIN persistentroots USING(backingstore)", aQuery];
 
-    while ([rs next])
-    {
-        CORevisionID *revId = [CORevisionID revisionWithPersistentRootUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]
-                                                           revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]]];
-        [result addObject: revId];
-    }
-    [rs close];
+        while ([rs next])
+        {
+            CORevisionID *revId = [CORevisionID revisionWithPersistentRootUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]
+                                                               revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]]];
+            [result addObject: revId];
+        }
+        [rs close];
+    });
+    
     return result;
 }
 
@@ -490,7 +584,8 @@
                      persistentRootUUID: (ETUUID *)aUUID
                              branchUUID: (ETUUID*)branch
 {
-
+    assert(dispatch_get_current_queue() == queue_);
+    
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aUUID];
     if (backing == nil)
     {
@@ -573,25 +668,33 @@
 - (NSArray *) persistentRootUUIDs
 {
     NSMutableArray *result = [NSMutableArray array];
-    // FIXME: Benchmark vs join
-    FMResultSet *rs = [db_ executeQuery: @"SELECT uuid FROM persistentroots WHERE deleted = 0"];
-    while ([rs next])
-    {
-        [result addObject: [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]];
-    }
-    [rs close];
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        FMResultSet *rs = [db_ executeQuery: @"SELECT uuid FROM persistentroots WHERE deleted = 0"];
+        while ([rs next])
+        {
+            [result addObject: [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]];
+        }
+        [rs close];
+    });
     return result;
 }
 
 - (NSArray *) deletedPersistentRootUUIDs
 {
     NSMutableArray *result = [NSMutableArray array];
-    FMResultSet *rs = [db_ executeQuery: @"SELECT uuid FROM persistentroots WHERE deleted = 1"];
-    while ([rs next])
-    {
-        [result addObject: [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]];
-    }
-    [rs close];
+    
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        FMResultSet *rs = [db_ executeQuery: @"SELECT uuid FROM persistentroots WHERE deleted = 1"];
+        while ([rs next])
+        {
+            [result addObject: [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]];
+        }
+        [rs close];
+    });
     return result;
 }
 
@@ -602,63 +705,71 @@
         return nil;
     }
     
-    ETUUID *currBranch = nil;
-    ETUUID *backingUUID = nil;
-    BOOL deleted = NO;
+    __block COPersistentRootInfo *result = nil;
     
-    [db_ savepoint: @"persistentRootInfoForUUID"]; // N.B. The transaction is so the two SELECTs see the same DB. Needed?
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        
+        ETUUID *currBranch = nil;
+        ETUUID *backingUUID = nil;
+        BOOL deleted = NO;
+        NSMutableDictionary *branchDict = [NSMutableDictionary dictionary];
 
-    {
-        FMResultSet *rs = [db_ executeQuery: @"SELECT currentbranch, backingstore, deleted FROM persistentroots WHERE uuid = ?", [aUUID dataValue]];
-        if ([rs next])
+        
+        [db_ savepoint: @"persistentRootInfoForUUID"]; // N.B. The transaction is so the two SELECTs see the same DB. Needed?
+
         {
-            currBranch = [rs dataForColumnIndex: 0] != nil
-                ? [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]
-                : nil;
-            backingUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
-            deleted = [rs boolForColumnIndex: 2];
-        }
-        else
-        {
+            FMResultSet *rs = [db_ executeQuery: @"SELECT currentbranch, backingstore, deleted FROM persistentroots WHERE uuid = ?", [aUUID dataValue]];
+            if ([rs next])
+            {
+                currBranch = [rs dataForColumnIndex: 0] != nil
+                    ? [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]
+                    : nil;
+                backingUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
+                deleted = [rs boolForColumnIndex: 2];
+            }
+            else
+            {
+                [rs close];
+                [db_ releaseSavepoint: @"persistentRootInfoForUUID"];
+                
+                return;
+            }
             [rs close];
-            [db_ releaseSavepoint: @"persistentRootInfoForUUID"];
-            return nil;
         }
-        [rs close];
-    }
-    
-    NSMutableDictionary *branchDict = [NSMutableDictionary dictionary];
-    
-    {
-        FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, initial_revid, current_revid, metadata, deleted FROM branches WHERE proot = ?", [aUUID dataValue]];
-        while ([rs next])
+        
         {
-            ETUUID *branch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-            CORevisionID *initialRevid = [CORevisionID revisionWithPersistentRootUUID: backingUUID
-                                                                   revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]]];
-            CORevisionID *currentRevid = [CORevisionID revisionWithPersistentRootUUID: backingUUID
-                                                                      revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]]];
-            id branchMeta = [self readMetadata: [rs dataForColumnIndex: 3]];
-            
-            COBranchInfo *state = [[COBranchInfo alloc] init];
-            state.UUID = branch;
-            state.initialRevisionID = initialRevid;
-            state.currentRevisionID = currentRevid;
-            state.metadata = branchMeta;
-            state.deleted = [rs boolForColumnIndex: 4];
-            
-            [branchDict setObject: state forKey: branch];
+            FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, initial_revid, current_revid, metadata, deleted FROM branches WHERE proot = ?", [aUUID dataValue]];
+            while ([rs next])
+            {
+                ETUUID *branch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+                CORevisionID *initialRevid = [CORevisionID revisionWithPersistentRootUUID: backingUUID
+                                                                       revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]]];
+                CORevisionID *currentRevid = [CORevisionID revisionWithPersistentRootUUID: backingUUID
+                                                                          revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]]];
+                id branchMeta = [self readMetadata: [rs dataForColumnIndex: 3]];
+                
+                COBranchInfo *state = [[COBranchInfo alloc] init];
+                state.UUID = branch;
+                state.initialRevisionID = initialRevid;
+                state.currentRevisionID = currentRevid;
+                state.metadata = branchMeta;
+                state.deleted = [rs boolForColumnIndex: 4];
+                
+                [branchDict setObject: state forKey: branch];
+            }
+            [rs close];
         }
-        [rs close];
-    }
-    
-    [db_ releaseSavepoint: @"persistentRootInfoForUUID"];
-
-    COPersistentRootInfo *result = [[COPersistentRootInfo alloc] init];
-    result.UUID = aUUID;
-    result.branchForUUID = branchDict;
-    result.currentBranchUUID = currBranch;
-    result.deleted = deleted;
+        
+        [db_ releaseSavepoint: @"persistentRootInfoForUUID"];
+        
+        result = [[COPersistentRootInfo alloc] init];
+        result.UUID = aUUID;
+        result.branchForUUID = branchDict;
+        result.currentBranchUUID = currBranch;
+        result.deleted = deleted;
+    });
     
     return result;
 }
@@ -667,17 +778,23 @@
 {
 	NILARG_EXCEPTION_TEST(aBranchUUID);
 
-	FMResultSet *rs = [db_ executeQuery: @"SELECT proot FROM branches WHERE uuid = ?",
-		[aBranchUUID dataValue]];
-	ETUUID *prootUUID = nil;
+	__block ETUUID *prootUUID = nil;
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        FMResultSet *rs = [db_ executeQuery: @"SELECT proot FROM branches WHERE uuid = ?",
+            [aBranchUUID dataValue]];
 
-	if ([rs next])
-	{
-		prootUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-        ETAssert([rs next] == NO);
-    }
 
-	[rs close];
+        if ([rs next])
+        {
+            prootUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+            ETAssert([rs next] == NO);
+        }
+
+        [rs close];
+    });
+    
 	return prootUUID;
 }
 
@@ -948,6 +1065,8 @@
 
 - (BOOL) finalizeGarbageAttachments
 {
+    assert(dispatch_get_current_queue() == queue_);
+    
     NSMutableSet *garbage = [NSMutableSet setWithArray: [self attachments]];
     
     FMResultSet *rs = [db_ executeQuery: @"SELECT attachment_hash FROM attachment_refs"];
@@ -973,67 +1092,66 @@
 {
     NILARG_EXCEPTION_TEST(aRoot);
     
-    ETUUID *backingUUID = [self backingUUIDForPersistentRootUUID: aRoot];
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID error: NULL];
-    //NSNumber *backingId = [self rootIdForPersistentRootUUID: backingUUID];
-    NSData *backingUUIDData = [backingUUID dataValue];
+    assert(dispatch_get_current_queue() != queue_);
     
-    [db_ beginTransaction];
-    
-    // Delete branches / the persistent root
-    
-    [db_ executeUpdate: @"DELETE FROM branches WHERE proot IN (SELECT uuid FROM persistentroots WHERE deleted = 1 AND backingstore = ?)", backingUUIDData];
-    [db_ executeUpdate: @"DELETE FROM branches WHERE deleted = 1 AND proot IN (SELECT uuid FROM persistentroots WHERE backingstore = ?)", backingUUIDData];
-    [db_ executeUpdate: @"DELETE FROM persistentroots WHERE deleted = 1 AND backingstore = ?", backingUUIDData];
-    
-    NSMutableIndexSet *keptRevisions = [NSMutableIndexSet indexSet];
-    
-    FMResultSet *rs = [db_ executeQuery: @"SELECT "
-                                            "branches.current_revid, "
-                                            "branches.initial_revid "
-                                            "FROM persistentroots "
-                                            "INNER JOIN branches ON persistentroots.uuid = branches.proot "
-                                            "WHERE persistentroots.backingstore = ?", backingUUIDData];
-    while ([rs next])
-    {
-        ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-        ETUUID *initial = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
+    dispatch_sync(queue_, ^(){
         
-        NSIndexSet *revs = [backing revidsFromRevid: [backing revidForUUID: initial]
-                                            toRevid: [backing revidForUUID: head]];
-        [keptRevisions addIndexes: revs];
-    }
-    [rs close];
-    
-    // Now for each index set in deletedRevisionsForBackingStore, subtract the index set
-    // in keptRevisionsForBackingStore
-    
-    NSMutableIndexSet *deletedRevisions = [NSMutableIndexSet indexSet];
-    [deletedRevisions addIndexes: [backing revidsUsedRange]];
-    [deletedRevisions removeIndexes: keptRevisions];
-    
-//    for (NSUInteger i = [deletedRevisions firstIndex]; i != NSNotFound; i = [deletedRevisions indexGreaterThanIndex: i])
-//    {
-//        
-//        [db_ executeUpdate: @"DELETE FROM attachment_refs WHERE root_id = ? AND revid = ?",
-//         [backingUUID dataValue],
-//         [NSNumber numberWithLongLong: i]];
-//        
-//        // FIXME: FTS, proot_refs
-//    }
-    
-    if (![db_ commit])
-    {
-        return NO;
-    }
-    
-    // Delete the actual revisions
-    if (![backing deleteRevids: deletedRevisions])
-    {
-        return NO;
-    }
+        ETUUID *backingUUID = [self backingUUIDForPersistentRootUUID: aRoot];
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID error: NULL];
+        //NSNumber *backingId = [self rootIdForPersistentRootUUID: backingUUID];
+        NSData *backingUUIDData = [backingUUID dataValue];
+        
+        [db_ beginTransaction];
+        
+        // Delete branches / the persistent root
+        
+        [db_ executeUpdate: @"DELETE FROM branches WHERE proot IN (SELECT uuid FROM persistentroots WHERE deleted = 1 AND backingstore = ?)", backingUUIDData];
+        [db_ executeUpdate: @"DELETE FROM branches WHERE deleted = 1 AND proot IN (SELECT uuid FROM persistentroots WHERE backingstore = ?)", backingUUIDData];
+        [db_ executeUpdate: @"DELETE FROM persistentroots WHERE deleted = 1 AND backingstore = ?", backingUUIDData];
+        
+        NSMutableIndexSet *keptRevisions = [NSMutableIndexSet indexSet];
+        
+        FMResultSet *rs = [db_ executeQuery: @"SELECT "
+                                                "branches.current_revid, "
+                                                "branches.initial_revid "
+                                                "FROM persistentroots "
+                                                "INNER JOIN branches ON persistentroots.uuid = branches.proot "
+                                                "WHERE persistentroots.backingstore = ?", backingUUIDData];
+        while ([rs next])
+        {
+            ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+            ETUUID *initial = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
+            
+            NSIndexSet *revs = [backing revidsFromRevid: [backing revidForUUID: initial]
+                                                toRevid: [backing revidForUUID: head]];
+            [keptRevisions addIndexes: revs];
+        }
+        [rs close];
+        
+        // Now for each index set in deletedRevisionsForBackingStore, subtract the index set
+        // in keptRevisionsForBackingStore
+        
+        NSMutableIndexSet *deletedRevisions = [NSMutableIndexSet indexSet];
+        [deletedRevisions addIndexes: [backing revidsUsedRange]];
+        [deletedRevisions removeIndexes: keptRevisions];
+        
+    //    for (NSUInteger i = [deletedRevisions firstIndex]; i != NSNotFound; i = [deletedRevisions indexGreaterThanIndex: i])
+    //    {
+    //        
+    //        [db_ executeUpdate: @"DELETE FROM attachment_refs WHERE root_id = ? AND revid = ?",
+    //         [backingUUID dataValue],
+    //         [NSNumber numberWithLongLong: i]];
+    //        
+    //        // FIXME: FTS, proot_refs
+    //    }
+        
+        assert([db_ commit]);
+        
+        // Delete the actual revisions
+        assert([backing deleteRevids: deletedRevisions]);
 
-    [self finalizeGarbageAttachments];
+        [self finalizeGarbageAttachments];
+    });
     
     return YES;
 }
@@ -1045,20 +1163,24 @@
 {
     NSMutableArray *results = [NSMutableArray array];
     
-    FMResultSet *rs = [db_ executeQuery: @"SELECT root_id, revid, embedded_object_uuid FROM proot_refs WHERE dest_root_id = ?", [aUUID dataValue]];
-    while ([rs next])
-    {
-        ETUUID *root = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-        ETUUID *revUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
-        ETUUID *embedded_object_uuid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
-        
-        COSearchResult *searchResult = [[COSearchResult alloc] init];
-        searchResult.embeddedObjectUUID = embedded_object_uuid;
-        searchResult.revision = [CORevisionID revisionWithPersistentRootUUID: root
-                                                             revisionUUID: revUUID];
-        [results addObject: searchResult];
-    }
-    [rs close];
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        FMResultSet *rs = [db_ executeQuery: @"SELECT root_id, revid, embedded_object_uuid FROM proot_refs WHERE dest_root_id = ?", [aUUID dataValue]];
+        while ([rs next])
+        {
+            ETUUID *root = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+            ETUUID *revUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
+            ETUUID *embedded_object_uuid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
+            
+            COSearchResult *searchResult = [[COSearchResult alloc] init];
+            searchResult.embeddedObjectUUID = embedded_object_uuid;
+            searchResult.revision = [CORevisionID revisionWithPersistentRootUUID: root
+                                                                 revisionUUID: revUUID];
+            [results addObject: searchResult];
+        }
+        [rs close];
+    });
     
     return results;
 }
@@ -1072,21 +1194,23 @@
                                    kCOStoreUUID : [[self UUID] stringValue],
                                    kCOStoreURL : [[self URL] absoluteString]};
                 
-        // FIXME: switch back to version that posts on main thread above.
-        [[NSNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
-                                                            object: self
-                                                          userInfo: userInfo];
+        dispatch_async(dispatch_get_main_queue(), ^() {
+            [[NSNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
+                                                                object: self
+                                                              userInfo: userInfo];
 
-        
-        [[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
-                                                                       object: [[self UUID] stringValue]
-                                                                     userInfo: userInfo
-                                                           deliverImmediately: NO];
+            
+            [[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
+                                                                           object: [[self UUID] stringValue]
+                                                                         userInfo: userInfo
+                                                               deliverImmediately: NO];
+        });
     }
 }
 
 - (FMDatabase *) database
 {
+    assert(dispatch_get_current_queue() == queue_);
     return db_;
 }
 

@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#include <dispatch/dispatch.h>
 
 @protocol COItemGraph;
 @class ETUUID;
@@ -207,6 +208,7 @@ typedef NSUInteger COBranchRevisionReadingOptions;
     NSMutableSet *modifiedPersistentRootsUUIDs_;
     
     COStoreTransaction *transaction_;
+    dispatch_queue_t queue_;
 }
 
 /**

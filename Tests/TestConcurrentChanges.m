@@ -22,6 +22,11 @@
     return self;
 }
 
+- (void) wait
+{
+    NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+    [runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+}
 
 - (void)testsDetectsStoreSetCurrentRevisionDistributedNotification
 {
@@ -38,9 +43,7 @@
     }
 
     // Wait a bit for a distributed notification to arrive to ctx
-    
-    NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-    [runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+    [self wait];
 
     UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: @"label"]);
     UKFalse([ctx hasChanges]);
@@ -66,7 +69,7 @@
                                error: NULL]);
     [store commitTransactionWithError: NULL];
     
-    // N.B.: If we make the store async, we'll need to wait here a bit.
+    [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKObjectsEqual(firstRevid, [[persistentRoot revision] revisionID]);
@@ -85,7 +88,7 @@
                                  error: NULL]);
     [store commitTransactionWithError: NULL];
     
-    // N.B.: If we make the store async, we'll need to wait here a bit.
+    [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     COBranch *secondBranch = [persistentRoot branchForUUID: secondbranchUUID];
@@ -102,7 +105,7 @@
                          error: NULL]);
     [store commitTransactionWithError: NULL];
     
-    // N.B.: If we make the store async, we'll need to wait here a bit.
+    [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKTrue(testBranch.deleted);
@@ -125,7 +128,7 @@
                            error: NULL]);
     [store commitTransactionWithError: NULL];
     
-    // N.B.: If we make the store async, we'll need to wait here a bit.
+    [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKFalse(testBranch.deleted);
@@ -144,7 +147,7 @@
                         error: NULL]);
     [store commitTransactionWithError: NULL];
     
-    // N.B.: If we make the store async, we'll need to wait here a bit.
+    [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKObjectsEqual(metadata, [testBranch metadata]);
@@ -159,7 +162,7 @@
                              error: NULL]);
     [store commitTransactionWithError: NULL];
     
-    // N.B.: If we make the store async, we'll need to wait here a bit.
+    [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKObjectsEqual(testBranch, [persistentRoot currentBranch]);
@@ -174,7 +177,7 @@
                              error: NULL]);
     UKTrue([store commitTransactionWithError: NULL]);
     
-    // N.B.: If we make the store async, we'll need to wait here a bit.
+    [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKObjectsEqual(testBranch, [persistentRoot currentBranch]);
@@ -187,7 +190,7 @@
     UKTrue([store deletePersistentRoot: [persistentRoot persistentRootUUID] error: NULL]);
     [store commitTransactionWithError: NULL];
     
-    // N.B.: If we make the store async, we'll need to wait here a bit.
+    [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKTrue(persistentRoot.deleted);
@@ -204,7 +207,7 @@
     UKTrue([store undeletePersistentRoot: [persistentRoot persistentRootUUID] error: NULL]);
     [store commitTransactionWithError: NULL];
     
-    // N.B.: If we make the store async, we'll need to wait here a bit.
+    [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKFalse(persistentRoot.deleted);
@@ -222,7 +225,7 @@
     [store commitTransactionWithError: NULL];
     UKNotNil(info);
     
-    // N.B.: If we make the store async, we'll need to wait here a bit.
+    [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     
