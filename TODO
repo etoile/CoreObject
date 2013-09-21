@@ -7,6 +7,7 @@ Current tasks
 history graph UI
  - summarization (hiding minor revisions)
  - use async fetching of revision info
+ - also make a COUndoStack UI
 
 collaboration
  - interation btn. sync and branching
