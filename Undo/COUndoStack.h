@@ -2,6 +2,10 @@
 
 @class COUndoStackStore, COEditingContext, COCommand;
 
+extern NSString * const COUndoStackDidChangeNotification;
+
+extern NSString * const kCOUndoStackName;
+
 @interface COUndoStack : NSObject
 {
     COUndoStackStore *_store;

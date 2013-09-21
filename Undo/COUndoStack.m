@@ -6,6 +6,9 @@
 #import "COEditingContext+Private.h"
 #import "COCommand.h"
 
+NSString * const COUndoStackDidChangeNotification = @"COUndoStackDidChangeNotification";
+NSString * const kCOUndoStackName = @"COUndoStackName";
+
 @interface COUndoStack ()
 
 @property (strong, readwrite, nonatomic) COUndoStackStore *store;
@@ -134,6 +137,22 @@
     // => to perform an undo, pop from the kCOUndoStack and apply the edit.
     
     [_store pushAction: plist stack: kCOUndoStack forName: _name];
+    
+    [self postNotificationsForStackName: _name];
+}
+
+- (void) postNotificationsForStackName: (NSString *)aStack
+{
+    NSDictionary *userInfo = @{kCOUndoStackName : aStack};
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: COUndoStackDidChangeNotification
+                                                        object: self
+                                                      userInfo: userInfo];
+    
+    //    [[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
+    //                                                                   object: [[self UUID] stringValue]
+    //                                                                 userInfo: userInfo
+    //                                                       deliverImmediately: NO];
 }
 
 @end

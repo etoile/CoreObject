@@ -5,6 +5,7 @@
 
 #import "EWBranchesWindowController.h"
 #import "EWHistoryWindowController.h"
+#import "EWUndoWindowController.h"
 #import "EWDocument.h"
 
 @implementation EWAppDelegate
@@ -120,6 +121,11 @@
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
+}
+
+-(void)undoHistory:(id)sender
+{
+    [[EWUndoWindowController sharedController] showWindow: self];
 }
 
 @end

@@ -13,4 +13,6 @@
 - (COPersistentRoot *) user1PersistentRoot;
 - (COPersistentRoot *) user2PersistentRoot;
 
+- (IBAction)undoHistory:(id)sender;
+
 @end

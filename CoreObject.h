@@ -67,6 +67,7 @@
 
 #import <CoreObject/COUndoStackStore.h>
 #import <CoreObject/COUndoStack.h>
+#import <CoreObject/COUndoNode.h>
 #import <CoreObject/COEditingContext+Undo.h>
 
 /* Synchronization */

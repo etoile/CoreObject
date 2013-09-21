@@ -223,6 +223,8 @@
 		66C97DA817CBD31800898F80 /* TestSQLiteStoreErrorHandling.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C97DA717CBD31800898F80 /* TestSQLiteStoreErrorHandling.m */; };
 		66D32A9F17C49903004D006D /* TestHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D32A9E17C49903004D006D /* TestHistoryTrack.m */; };
 		66D7980917ED18A200B07A2A /* BenchmarkItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D7980817ED18A200B07A2A /* BenchmarkItem.m */; };
+		66D7982C17EE367A00B07A2A /* Undo.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66D7982B17EE367A00B07A2A /* Undo.xib */; };
+		66D7983A17EE389900B07A2A /* EWUndoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D7983917EE389900B07A2A /* EWUndoWindowController.m */; };
 		66D96C70178AE41500D1553C /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
 		66D96CA0178B6E5600D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
 		66D96CB7178B717200D1553C /* COBinaryReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA2178B717000D1553C /* COBinaryReader.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -658,6 +660,9 @@
 		66D32A9E17C49903004D006D /* TestHistoryTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestHistoryTrack.m; path = Tests/TestHistoryTrack.m; sourceTree = "<group>"; };
 		66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestConcurrentChanges.m; path = Tests/TestConcurrentChanges.m; sourceTree = "<group>"; };
 		66D7980817ED18A200B07A2A /* BenchmarkItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BenchmarkItem.m; path = Tests/Benchmark/BenchmarkItem.m; sourceTree = "<group>"; };
+		66D7982B17EE367A00B07A2A /* Undo.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = Undo.xib; path = Samples/Typewriter/Undo.xib; sourceTree = SOURCE_ROOT; };
+		66D7983817EE389900B07A2A /* EWUndoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWUndoWindowController.h; path = Samples/Typewriter/EWUndoWindowController.h; sourceTree = SOURCE_ROOT; };
+		66D7983917EE389900B07A2A /* EWUndoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWUndoWindowController.m; path = Samples/Typewriter/EWUndoWindowController.m; sourceTree = SOURCE_ROOT; };
 		66D96C9F178B6E5600D1553C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		66D96CA2178B717000D1553C /* COBinaryReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBinaryReader.h; path = Store/COBinaryReader.h; sourceTree = "<group>"; };
 		66D96CA3178B717000D1553C /* COBinaryReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBinaryReader.m; path = Store/COBinaryReader.m; sourceTree = "<group>"; };
@@ -1159,12 +1164,15 @@
 				66C366BC17B42863009ACF2F /* EWDocument.xib */,
 				66C366BF17B42878009ACF2F /* History.xib */,
 				66C366C117B42878009ACF2F /* Pickboard.xib */,
+				66D7982B17EE367A00B07A2A /* Undo.xib */,
 				66C366C517B4288B009ACF2F /* EWAppDelegate.h */,
 				66C366C617B4288B009ACF2F /* EWAppDelegate.m */,
 				66C366C917B4288C009ACF2F /* EWDocument.h */,
 				66C366CA17B4288C009ACF2F /* EWDocument.m */,
 				66C366C717B4288C009ACF2F /* EWBranchesWindowController.h */,
 				66C366C817B4288C009ACF2F /* EWBranchesWindowController.m */,
+				66D7983817EE389900B07A2A /* EWUndoWindowController.h */,
+				66D7983917EE389900B07A2A /* EWUndoWindowController.m */,
 				66C366CB17B4288C009ACF2F /* EWGraphRenderer.h */,
 				66C366CC17B4288C009ACF2F /* EWGraphRenderer.m */,
 				66C366CD17B4288C009ACF2F /* EWHistoryGraphView.h */,
@@ -1626,6 +1634,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66D7982C17EE367A00B07A2A /* Undo.xib in Resources */,
 				66C366F917B46046009ACF2F /* MainMenu.xib in Resources */,
 				66C366FA17B46046009ACF2F /* Branches.xib in Resources */,
 				66C366FB17B46046009ACF2F /* EWDocument.xib in Resources */,
@@ -1758,6 +1767,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				66C366EB17B429D5009ACF2F /* main.m in Sources */,
+				66D7983A17EE389900B07A2A /* EWUndoWindowController.m in Sources */,
 				66C366DE17B4288C009ACF2F /* EWAppDelegate.m in Sources */,
 				66C366DF17B4288C009ACF2F /* EWBranchesWindowController.m in Sources */,
 				66C366E017B4288C009ACF2F /* EWDocument.m in Sources */,

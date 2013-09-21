@@ -45,4 +45,6 @@
 
 - (void) commit;
 
+- (COUndoStack *)undoStack;
+
 @end
