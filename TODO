@@ -1,8 +1,37 @@
 TODO
 ====
 
-First Release
+Current tasks
 -------------
+
+history graph UI
+ - summarization (hiding minor revisions)
+ - use async fetching of revision info
+
+collaboration
+ - interation btn. sync and branching
+ - automatic / continuous sync
+ - more test cases
+ - use delta compression
+
+deletion
+ - preserving merge info
+ - cross refs shouldn't be tracked?
+
+cross refs
+ - switch to url? support cross-store use case?
+ - async faulting
+
+typewriter / ProjDemo
+ - supply commit metadata
+ - use deletion
+ - use cross refs
+ - use attachments
+ - merge UI
+
+
+Backlog
+-------
 
 - Major tasks
   x App-level undo
@@ -67,6 +96,7 @@ First Release
     - allow both collapsed (like SourceTree) and expanded (like Xcode) diff view
 
 - Oject copy model easy to extend in COObject subclasses (see COObject and COEditingContext copy methods)
+  - Tune object copy model to respect user expectations about copy/paste in various recurrent use cases
   - Finish COCopier
   - Support another reference type for copy: NOT a composite reference, but acts like one for the pruposes of copy. see the copy keynote, and the yellow arrows
     => 2013-08-13: Discussed with Quentin and we decided this is probably not so important
@@ -118,11 +148,6 @@ First Release
   - Use change count for notifications. Make all mutations increment count.
   - Actually use NSError
   - Record in COPersistentRootInfo a copySource that records the persistent root UUID a cheap copy was made from (or just a flag, isCopy?)
-	- To avoid bloating the store API, just store this in the root embedded object with the other metadata
-  - Force api users to pass in COPersistentRootInfo to all mutation methods?
-  - Switch to batch style api?
-  - Add "parent branch" metadata to a branch that records which branch a branch was forked from?
-  - For recording merges, the merged parent needs to be known when we gc commits.
   - exportRevisions: and importRevisions: that take a set of CORevisionID an returns a delta-compressed NSData
     suitable for network transport.
   - Review error handling, especially handling of errors within transactions
@@ -147,13 +172,8 @@ Future Work
 -----------
 
 - Switch from FMDB to an SQL abstraction backend
-
-- Tune object copy model to respect user expectations about copy/paste in various recurrent use cases
 - Improve Relationship Integrity and leverage it in more places (e.g. copy time, more aggressive checks or object graph integrity checking in a background thread etc.)
 - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
-- Evaluate a COTrackNode cache per track
-- Investigate how we can use GCD, and generally how to make the API asynchronous.
-
 x Figure out how to navigate large root object sets very quickly (evaluate writing a COSQLCursor class)/
   How to scroll smoothly through 50 000 root objects in an Object Manager without loading all the objects in memory?
   - I think we more or less have this figured out
