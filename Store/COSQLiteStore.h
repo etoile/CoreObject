@@ -474,6 +474,7 @@ typedef NSUInteger COBranchRevisionReadingOptions;
 
 @property (readwrite, nonatomic, strong) ETUUID *transactionUUID;
 
+- (void) clearStore;
 
 @end
 

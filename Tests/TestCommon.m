@@ -10,23 +10,30 @@ NSString * const kCOParent = @"parentContainer";
 
 @implementation SQLiteStoreTestCase
 
++ (void) initialize
+{
+    if (self == [SQLiteStoreTestCase class])
+    {
+        [self deleteStore];
+    }
+}
+
 - (id) init
 {
     self = [super init];
     
-    [self deleteStore];
-    store = [[COSQLiteStore alloc] initWithURL: [self storeURL]];
+    store = [[COSQLiteStore alloc] initWithURL: [SQLiteStoreTestCase storeURL]];
+    [store clearStore];
     
     return self;
 }
 
-
-- (void) deleteStore
++ (void) deleteStore
 {
 	[[NSFileManager defaultManager] removeItemAtURL: [self storeURL] error: NULL];
 }
 
-- (NSURL *) storeURL
++ (NSURL *) storeURL
 {
 	return [NSURL fileURLWithPath: [@"~/TestStore.sqlite" stringByExpandingTildeInPath]];
 }

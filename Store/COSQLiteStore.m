@@ -37,17 +37,17 @@
 	backingStores_ = [[NSMutableDictionary alloc] init];
     backingStoreUUIDForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
     modifiedPersistentRootsUUIDs_ = [[NSMutableSet alloc] init];
-    
-    // Ignore if this fails (it will fail if the directory already exists.)
-    // If it really fails, we will notice later when we try to open the sqlite db
-	[[NSFileManager defaultManager] createDirectoryAtPath: [url_ path]
-                              withIntermediateDirectories: YES
-                                               attributes: nil
-                                                    error: NULL];
-	
+    	
     __block BOOL ok = YES;
     
     dispatch_sync(queue_, ^() {
+        // Ignore if this fails (it will fail if the directory already exists.)
+        // If it really fails, we will notice later when we try to open the sqlite db
+        [[NSFileManager defaultManager] createDirectoryAtPath: [url_ path]
+                                  withIntermediateDirectories: YES
+                                                   attributes: nil
+                                                        error: NULL];
+        
         db_ = [[FMDatabase alloc] initWithPath: [[url_ path] stringByAppendingPathComponent: @"index.sqlite"]];
         
         [db_ setShouldCacheStatements: YES];
@@ -1244,6 +1244,24 @@
         }
     }
     return result;
+}
+
+- (void) clearStore
+{
+    dispatch_sync(queue_, ^() {
+        [db_ beginDeferredTransaction];
+        
+        [db_ executeUpdate: @"DELETE FROM persistentroots"];
+        
+        [db_ executeUpdate: @"DELETE FROM branches"];
+        
+        [db_ executeUpdate: @"DELETE FROM proot_refs"];
+        [db_ executeUpdate: @"DELETE FROM attachment_refs"];
+                
+        [db_ executeUpdate: @"DELETE FROM fts_docid_to_revisionid"];
+        [db_ executeUpdate: @"DELETE FROM fts"];
+        [db_ commit];
+    });
 }
 
 @end

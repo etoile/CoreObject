@@ -27,14 +27,14 @@ extern NSString * const kCOParent;
 /**
  * Returns the URL used for the store.
  */
-- (NSURL *)storeURL;
++ (NSURL *)storeURL;
 
 /**
  * Deletes all saved datas related to the store.
  *
  * Saved datas are usually .sqlitedb files.
  */
-- (void)deleteStore;
++ (void)deleteStore;
 
 @end
 
