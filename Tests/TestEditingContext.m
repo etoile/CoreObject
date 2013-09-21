@@ -67,7 +67,6 @@
   
     UKFalse([ctx hasChanges]);
     UKObjectsEqual([NSSet set], [ctx persistentRoots]);
-    /* N.B.: -deletedPersistentRoots returns the pending deletions, which is why it's empty here  */
     UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
     UKIntsEqual(1, [[ctx deletedPersistentRoots] count]);
     /* You can still retrieve a deleted persistent root, until the deletion is finalized */
