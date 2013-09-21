@@ -78,3 +78,4 @@
 
 #import <CoreObject/COCommitDescriptor.h>
 #import <CoreObject/COError.h>
+#import <CoreObject/COTrack.h>

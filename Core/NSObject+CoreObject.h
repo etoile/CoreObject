@@ -37,11 +37,5 @@
  * See also -[COObjectGraphContext isObjectGraphContext].
  */
 - (BOOL)isObjectGraphContext;
-/**
- * Returns whether the receiver is a track or not.
- *
- * See also -[COTrack isTrack].
- */
-- (BOOL)isTrack;
 
 @end

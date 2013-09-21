@@ -69,7 +69,7 @@
 	[self registerAdditionalEntityDescriptions];
 
 
-    [[NSNotificationCenter defaultCenter] addObserver: self
+    /*[[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(storePersistentRootDidChange:)
                                                  name: COStorePersistentRootDidChangeNotification
                                                object: _store];
@@ -77,7 +77,7 @@
 	[[NSDistributedNotificationCenter defaultCenter] addObserver: self
 	                                                    selector: @selector(distributedStorePersistentRootDidChange:)
 	                                                        name: COStorePersistentRootDidChangeNotification
-	                                                      object: nil];
+	                                                      object: nil];*/
 
 	return self;
 }

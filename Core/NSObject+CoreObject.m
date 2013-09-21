@@ -25,9 +25,4 @@
 	return NO;
 }
 
-- (BOOL)isTrack
-{
-	return NO;
-}
-
 @end

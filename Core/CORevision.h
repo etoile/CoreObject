@@ -9,6 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
+#import <CoreObject/COTrack.h>
 
 @class COEditingContext, CORevisionInfo, CORevisionID;
 
@@ -34,7 +35,7 @@
  * <item>properties</item><desc>The properties changed in the object</desc>
  * </deflist>
  */
-@interface CORevision : NSObject
+@interface CORevision : NSObject <COTrackNode>
 {
 	@private
 	COEditingContext * __weak editingContext;

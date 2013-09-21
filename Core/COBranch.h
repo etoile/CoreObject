@@ -9,6 +9,7 @@
  */
 
 #import <EtoileFoundation/EtoileFoundation.h>
+#import <CoreObject/COTrack.h>
 
 @class COObject, CORevision, CORevisionID, COPersistentRoot, COBranchInfo, COObjectGraphContext, COEditingContext;
 @class COItemGraphDiff, COMergeInfo;
@@ -26,7 +27,7 @@ extern NSString * const kCOBranchLabel;
  * undo/redo pointer in the track timeline</item>
  * </list>
  */
-@interface COBranch : NSObject
+@interface COBranch : NSObject <COTrack>
 {
 	@private
     ETUUID *_UUID;
@@ -58,6 +59,7 @@ extern NSString * const kCOBranchLabel;
     COObjectGraphContext *_objectGraph;
 
     ETUUID *_parentBranchUUID;
+	NSMutableArray *_revisions;
 }
 
 

@@ -51,7 +51,7 @@
         db_ = [[FMDatabase alloc] initWithPath: [[url_ path] stringByAppendingPathComponent: @"index.sqlite"]];
         
         [db_ setShouldCacheStatements: YES];
-        [db_ setCrashOnErrors: NO];
+        [db_ setCrashOnErrors: YES];
         [db_ setLogsErrors: YES];
         
         [db_ open];

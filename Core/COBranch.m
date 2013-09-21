@@ -38,6 +38,14 @@ NSString * const kCOBranchLabel = @"COBranchLabel";
 @synthesize objectGraphContext = _objectGraph;
 @synthesize mergingBranch;
 
++ (void) initialize
+{
+	if (self != [COBranch class])
+		return;
+
+	[self applyTraitFromClass: [ETCollectionTrait class]];
+}
+
 - (id)init
 {
 	[self doesNotRecognizeSelector: _cmd];
@@ -658,4 +666,86 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     return [[COItemGraph alloc] initWithItemForUUID: dict rootItemUUID: [[self objectGraphContext] rootItemUUID]];
 }
+
+- (NSMutableArray *)revisionsWithOptions: (COBranchRevisionReadingOptions)options
+{
+	NSArray *revInfos = [[self store] revisionInfosForBranchUUID: [self UUID]
+	                                                     options: options];
+	NSMutableArray *revs = [NSMutableArray array];
+	
+	for (CORevisionInfo *revInfo in revInfos)
+	{
+		[revs addObject: [[CORevision alloc] initWithEditingContext: [self editingContext]
+                                                       revisionInfo: revInfo]];
+	}
+	return revs;
+}
+
+- (NSArray *)nodes
+{
+	if (_revisions == nil)
+	{
+		_revisions = [self revisionsWithOptions: COBranchRevisionReadingParentBranches];
+	}
+	return _revisions;
+}
+
+- (id)nextNodeOnTrackFrom: (id <COTrackNode>)aNode backwards: (BOOL)back
+{
+	NSInteger nodeIndex = [[self nodes] indexOfObject: aNode];
+	
+	if (nodeIndex == NSNotFound)
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"Node %@ must belong to the track %@ to retrieve the previous or next node", aNode, self];
+	}
+	if (back)
+	{
+		nodeIndex--;
+	}
+	else
+	{
+		nodeIndex++;
+	}
+	
+	BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= [[self nodes] count]);
+	
+	if (hasNoPreviousOrNextNode)
+	{
+		return nil;
+	}
+	return [[self nodes] objectAtIndex: nodeIndex];
+}
+
+- (id <COTrackNode>)currentNode
+{
+	return [self currentRevision];
+}
+
+- (void)setCurrentNode: (id <COTrackNode>)node
+{
+	INVALIDARG_EXCEPTION_TEST(node, [node isKindOfClass: [CORevision class]]);
+	[self setCurrentRevision: (CORevision *)node];
+}
+
+- (void)undoNode: (id <COTrackNode>)aNode
+{
+	// TODO: Implement Selective Undo
+}
+
+- (BOOL)isOrdered
+{
+	return YES;
+}
+
+- (id)content
+{
+	return [self nodes];
+}
+
+- (NSArray *)contentArray
+{
+	return [NSArray arrayWithArray: [self nodes]];
+}
+
 @end
