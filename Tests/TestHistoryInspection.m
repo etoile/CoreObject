@@ -62,19 +62,6 @@
  
  */
 
-- (void)setCurrentRevision: (CORevision *)aRev forBranch: (COBranch *)aBranch
-{
-	NSError *error = nil;
-	[[ctx store] beginTransactionWithError: NULL];
-	[[ctx store] setCurrentRevision: [aRev revisionID]
-	                   initialRevision: nil
-	                      forBranch: [aBranch UUID]
-	               ofPersistentRoot: [[aBranch persistentRoot] persistentRootUUID]
-	                          error: &error];
-	ETAssert(error == nil);
-	ETAssert([[ctx store] commitTransactionWithUUID: [ETUUID UUID] withError: NULL]);
-}
-
 - (id) init
 {
     SUPERINIT;
@@ -109,7 +96,8 @@
     [ctx commit];
     r5 = [branch1B currentRevision];
 	
-	[self setCurrentRevision: r3 forBranch: branch1B];
+    branch1B.currentRevision = r3;
+    [ctx commit];
 	
 	[[branch1B rootObject] setLabel: @"6"];
     [ctx commit];
@@ -129,13 +117,15 @@
     [ctx commit];
     r9 = [branch1C currentRevision];
 
-	[self setCurrentRevision: r6 forBranch: branch1C];
-
+	branch1C.currentRevision = r6;
+    [ctx commit];
+    
 	[[branch1C rootObject] setLabel: @"10"];
     [ctx commit];
     r10 = [branch1C currentRevision];
 
-	[self setCurrentRevision: r6 forBranch: branch1B];
+	branch1B.currentRevision = r6;
+    [ctx commit];
 
     return self;
 }
