@@ -222,6 +222,7 @@
 		66C3671017B5FA0E009ACF2F /* COPersistentRootInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3670E17B5FA0D009ACF2F /* COPersistentRootInfo.m */; };
 		66C97DA817CBD31800898F80 /* TestSQLiteStoreErrorHandling.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C97DA717CBD31800898F80 /* TestSQLiteStoreErrorHandling.m */; };
 		66D32A9F17C49903004D006D /* TestHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D32A9E17C49903004D006D /* TestHistoryTrack.m */; };
+		66D7980917ED18A200B07A2A /* BenchmarkItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D7980817ED18A200B07A2A /* BenchmarkItem.m */; };
 		66D96C70178AE41500D1553C /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
 		66D96CA0178B6E5600D1553C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D96C9F178B6E5600D1553C /* libsqlite3.dylib */; };
 		66D96CB7178B717200D1553C /* COBinaryReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D96CA2178B717000D1553C /* COBinaryReader.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -656,6 +657,7 @@
 		66C97DA717CBD31800898F80 /* TestSQLiteStoreErrorHandling.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStoreErrorHandling.m; path = Tests/TestSQLiteStoreErrorHandling.m; sourceTree = "<group>"; };
 		66D32A9E17C49903004D006D /* TestHistoryTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestHistoryTrack.m; path = Tests/TestHistoryTrack.m; sourceTree = "<group>"; };
 		66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestConcurrentChanges.m; path = Tests/TestConcurrentChanges.m; sourceTree = "<group>"; };
+		66D7980817ED18A200B07A2A /* BenchmarkItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BenchmarkItem.m; path = Tests/Benchmark/BenchmarkItem.m; sourceTree = "<group>"; };
 		66D96C9F178B6E5600D1553C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		66D96CA2178B717000D1553C /* COBinaryReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBinaryReader.h; path = Store/COBinaryReader.h; sourceTree = "<group>"; };
 		66D96CA3178B717000D1553C /* COBinaryReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBinaryReader.m; path = Store/COBinaryReader.m; sourceTree = "<group>"; };
@@ -970,6 +972,7 @@
 				66550BF617D51CB100327657 /* main.m */,
 				66550BE817D51C6100327657 /* TestObjectGraphPerformance.m */,
 				66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */,
+				66D7980817ED18A200B07A2A /* BenchmarkItem.m */,
 			);
 			name = Benchmark;
 			sourceTree = "<group>";
@@ -1651,6 +1654,7 @@
 				66550C0517D51D2700327657 /* Tag.m in Sources */,
 				66550C0317D51D1800327657 /* TestCommon.m in Sources */,
 				66550BF817D51CB800327657 /* TestObjectGraphPerformance.m in Sources */,
+				66D7980917ED18A200B07A2A /* BenchmarkItem.m in Sources */,
 				66550BF717D51CB100327657 /* main.m in Sources */,
 				66550C0717D51D9000327657 /* TestSQLiteStorePerformance.m in Sources */,
 				66550C0917D51E8F00327657 /* TestBinaryReadWritePerformance.m in Sources */,
