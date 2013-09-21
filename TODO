@@ -47,6 +47,7 @@ Backlog
   - Pass all tests, including all from NestedVersioning, rewriting them where needed.
 
 - COEditingContext / COPersistentRoot / COBranch
+  - Add tests for Quentin's improvements to -[COPersistentRoot hasChanges] on 
   - support for loading the root object of a persistent root as a fault
   - asychronous loading of persistent root contents / unfaulting faulted root object
   - full support for cross-persistent root references
