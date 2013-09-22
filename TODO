@@ -4,6 +4,30 @@ TODO
 Current tasks
 -------------
 
+current questions:
+    - what is the best represent a user's save action (cmd+s) in the current
+    store model?
+
+
+revision identifiers:
+ - We've settled on a UUID for identifying revisions. Quentin was saying there
+   are too many revision abstractions.
+   
+   - CORevision should be used by framework users
+   
+   - ETUUID should be used within CoreObject, with the caveat that, in oder
+
+   -  CORevisionID should be avoided and may be removed
+
+   - CORevisionInfo is used only as a dumb "property list" to send data from
+     COSQLiteStore to COEditingContext.
+
+   - int64_t as revision IDs is an optimization for SQLite only, and is
+     used only between COSQLiteStore and the BackingStore, never exposed.
+     When a SQLite table has a primary key other than "integer primary key",
+     SQLite internally creates an "integer primary key" column
+
+
 history graph UI
  - summarization (hiding minor revisions)
  - use async fetching of revision info
