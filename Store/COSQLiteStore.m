@@ -68,73 +68,7 @@
         
         // Set up schema
         
-        [db_ beginDeferredTransaction];
-        
-        /* Store Metadata tables (including schema version) */
-        
-        if (![db_ tableExists: @"storeMetadata"])
-        {
-            _uuid =  [ETUUID UUID];
-            [db_ executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, uuid BLOB)"];
-            [db_ executeUpdate: @"INSERT INTO storeMetadata VALUES(1, ?)", [_uuid dataValue]];
-        }
-        else
-        {
-            int version = [db_ intForQuery: @"SELECT version FROM storeMetadata"];
-            if (1 != version)
-            {
-                NSLog(@"Error, store version %d, only version 1 is supported", version);
-                [db_ rollback];
-                ok = NO;
-                return;
-            }
-            
-            _uuid =  [ETUUID UUIDWithData: [db_ dataForQuery: @"SELECT uuid FROM storeMetadata"]];
-        }
-        
-        // Persistent Root and Branch tables
-        
-        [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots ("
-         "uuid BLOB PRIMARY KEY NOT NULL, backingstore BLOB NOT NULL, "
-         "currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionuuid BLOB)"];
-        
-        [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL PRIMARY KEY, "
-         "proot BLOB NOT NULL, initial_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
-         "metadata BLOB, deleted BOOLEAN DEFAULT 0, parentbranch BLOB)"];
-        
-        // FTS indexes & reference caching tables (in theory, could be regenerated - although not supported)
-        
-        /**
-         * In embedded_object_uuid in revid of backing store root_id, there was a reference to dest_root_id
-         */
-        [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS proot_refs (root_id BLOB, revid BOLB, embedded_object_uuid BLOB, dest_root_id BLOB)"];
-        [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS attachment_refs (root_id BLOB, revid BLOB, attachment_hash BLOB)"];
-        
-        // FIXME: This is a bit ugly. Verify that usage is consistent across fts3/4
-        if (sqlite3_libversion_number() >= 3007011)
-        {
-            [db_ executeUpdate: @"CREATE VIRTUAL TABLE IF NOT EXISTS fts USING fts4(content=\"\", text)"]; // implicit column docid
-        }
-        else
-        {
-            if (nil == [db_ stringForQuery: @"SELECT name FROM sqlite_master WHERE type = 'table' and name = 'fts'"])
-            {
-                [db_ executeUpdate: @"CREATE VIRTUAL TABLE fts USING fts3(text)"]; // implicit column docid
-            }
-        }
-        
-        [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS fts_docid_to_revisionid ("
-         "docid INTEGER PRIMARY KEY, backingstore BLOB, revid BLOB)"];
-        
-        [db_ commit];
-        
-        if ([db_ hadError])
-        {
-            NSLog(@"Error %d: %@", [db_ lastErrorCode], [db_ lastErrorMessage]);
-            ok = NO;
-            return;
-        }
-
+        ok = [self setupSchema];
     });
     
     if (!ok)
@@ -145,6 +79,75 @@
 	return self;
 }
 
+- (BOOL) setupSchema
+{
+    [db_ beginDeferredTransaction];
+    
+    /* Store Metadata tables (including schema version) */
+    
+    if (![db_ tableExists: @"storeMetadata"])
+    {
+        _uuid =  [ETUUID UUID];
+        [db_ executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, uuid BLOB)"];
+        [db_ executeUpdate: @"INSERT INTO storeMetadata VALUES(1, ?)", [_uuid dataValue]];
+    }
+    else
+    {
+        int version = [db_ intForQuery: @"SELECT version FROM storeMetadata"];
+        if (1 != version)
+        {
+            NSLog(@"Error, store version %d, only version 1 is supported", version);
+            [db_ rollback];
+            return NO;
+        }
+        
+        _uuid =  [ETUUID UUIDWithData: [db_ dataForQuery: @"SELECT uuid FROM storeMetadata"]];
+    }
+    
+    // Persistent Root and Branch tables
+    
+    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots ("
+     "uuid BLOB PRIMARY KEY NOT NULL, backingstore BLOB NOT NULL, "
+     "currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionuuid BLOB)"];
+    
+    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL PRIMARY KEY, "
+     "proot BLOB NOT NULL, initial_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
+     "metadata BLOB, deleted BOOLEAN DEFAULT 0, parentbranch BLOB)"];
+    
+    // FTS indexes & reference caching tables (in theory, could be regenerated - although not supported)
+    
+    /**
+     * In embedded_object_uuid in revid of backing store root_id, there was a reference to dest_root_id
+     */
+    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS proot_refs (root_id BLOB, revid BOLB, embedded_object_uuid BLOB, dest_root_id BLOB)"];
+    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS attachment_refs (root_id BLOB, revid BLOB, attachment_hash BLOB)"];
+    
+    // FIXME: This is a bit ugly. Verify that usage is consistent across fts3/4
+    if (sqlite3_libversion_number() >= 3007011)
+    {
+        [db_ executeUpdate: @"CREATE VIRTUAL TABLE IF NOT EXISTS fts USING fts4(content=\"\", text)"]; // implicit column docid
+    }
+    else
+    {
+        if (nil == [db_ stringForQuery: @"SELECT name FROM sqlite_master WHERE type = 'table' and name = 'fts'"])
+        {
+            [db_ executeUpdate: @"CREATE VIRTUAL TABLE fts USING fts3(text)"]; // implicit column docid
+        }
+    }
+    
+    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS fts_docid_to_revisionid ("
+     "docid INTEGER PRIMARY KEY, backingstore BLOB, revid BLOB)"];
+    
+    [db_ commit];
+    
+    if ([db_ hadError])
+    {
+        NSLog(@"Error %d: %@", [db_ lastErrorCode], [db_ lastErrorMessage]);
+        return NO;
+    }
+    
+    return YES;
+}
 
 - (NSURL*)URL
 {
@@ -1249,18 +1252,16 @@
 - (void) clearStore
 {
     dispatch_sync(queue_, ^() {
-        [db_ beginDeferredTransaction];
-        
-        [db_ executeUpdate: @"DELETE FROM persistentroots"];
-        
-        [db_ executeUpdate: @"DELETE FROM branches"];
-        
-        [db_ executeUpdate: @"DELETE FROM proot_refs"];
-        [db_ executeUpdate: @"DELETE FROM attachment_refs"];
-                
-        [db_ executeUpdate: @"DELETE FROM fts_docid_to_revisionid"];
-        [db_ executeUpdate: @"DELETE FROM fts"];
+        [db_ beginDeferredTransaction];        
+        [db_ executeUpdate: @"DROP TABLE IF EXISTS persistentroots"];
+        [db_ executeUpdate: @"DROP TABLE IF EXISTS branches"];
+        [db_ executeUpdate: @"DROP TABLE IF EXISTS proot_refs"];
+        [db_ executeUpdate: @"DROP TABLE IF EXISTS attachment_refs"];
+        [db_ executeUpdate: @"DROP TABLE IF EXISTS fts_docid_to_revisionid"];
+        [db_ executeUpdate: @"DROP TABLE IF EXISTS fts"];
         [db_ commit];
+        
+        [self setupSchema];
     });
 }
 
