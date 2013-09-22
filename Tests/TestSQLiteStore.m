@@ -818,21 +818,29 @@ static ETUUID *childUUID2;
     UKTrue(COItemGraphEqualToItemGraph([self makeBranchBItemTreeAtIndex: BRANCH_LENGTH - 1], [store2 itemGraphForRevisionID: branchBRevisionID]));
 }
 
-- (void)testCommitWithNoChanges
+- (void)testEmptyCommitWithNoChanges
 {
     COItemGraph *graph = [[COItemGraph alloc] initWithItemForUUID: [NSDictionary dictionary]
                                                       rootItemUUID: rootUUID];
     UKNotNil(graph);
+
+
+    [store beginTransactionWithError: NULL];
+    CORevisionID *revid = [store writeRevisionWithItemGraph: graph
+                                                 revisionUUID: [ETUUID UUID]
+                                                     metadata: nil
+                                             parentRevisionID: initialRevisionId
+                                        mergeParentRevisionID: nil
+                                                   branchUUID: branchAUUID
+                                           persistentRootUUID: prootUUID
+                                                        error: NULL];
+    [store commitTransactionWithError: NULL];
     
-    // This isn't expected to work. If you want to make a commit with no changes, just pass in the same graph
+    // This could be useful for committing markers/tags. The very first
+    // ObjectMerging prototype used this approach for marking points when the
+    // user pressed cmd+S
     
-    // FIXME: Not currently checking this
-//    UKRaisesException([store writeRevisionWithItemGraph: graph
-//                                               metadata: nil
-//                                       parentRevisionID: initialRevisionId
-//                                  mergeParentRevisionID: nil
-//                                          modifiedItems: nil
-//                                                  error: NULL]);
+    UKObjectsEqual([self makeInitialItemTree], [store itemGraphForRevisionID: revid]);
 }
 
 - (void) testInitialRevisionMetadata
