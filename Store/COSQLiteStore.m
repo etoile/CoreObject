@@ -79,6 +79,13 @@
 	return self;
 }
 
+- (void) dealloc
+{
+    // N.B.: We are using deployment target 10.7, so ARC does not manage libdispatch objects.
+    // If we switch to deployment target 10.8, ARC will manage libdispatch objects automatically.
+    dispatch_release(queue_);
+}
+
 - (BOOL) setupSchema
 {
     [db_ beginDeferredTransaction];
