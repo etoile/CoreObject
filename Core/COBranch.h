@@ -173,6 +173,14 @@ extern NSString * const kCOBranchLabel;
  */
 - (BOOL)hasChanges;
 - (void)discardAllChanges;
+/**
+ * If set to YES, the next  commit in the editing context will write a
+ * new revision on this branch, even if there are no changes to be written.
+ *
+ * Would be used to cause a "tag" revision to be written.
+ */
+@property (readwrite, nonatomic) BOOL shouldMakeEmptyCommit;
+
 
 /** @taskunit Creating Branches and Cheap copies */
 

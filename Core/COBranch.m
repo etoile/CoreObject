@@ -37,6 +37,7 @@ NSString * const kCOBranchLabel = @"COBranchLabel";
 @synthesize persistentRoot = _persistentRoot;
 @synthesize objectGraphContext = _objectGraph;
 @synthesize mergingBranch;
+@synthesize shouldMakeEmptyCommit;
 
 + (void) initialize
 {
@@ -297,6 +298,11 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         return YES;
     }
     
+    if (self.shouldMakeEmptyCommit)
+    {
+        return YES;
+    }
+    
 	return [[self objectGraphContext] hasChanges];
 }
 
@@ -331,6 +337,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     {
         [self setDeleted: [[self branchInfo] isDeleted]];
     }
+    
+    self.shouldMakeEmptyCommit = NO;
     
 	[[self objectGraphContext] discardAllChanges];
 }
@@ -459,7 +467,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     // Write a regular commit
     
     NSArray *changedItemUUIDs = [(NSSet *)[[[_objectGraph changedObjects] mappedCollection] UUID] allObjects];
-    if ([changedItemUUIDs count] > 0)
+    if ([changedItemUUIDs count] > 0 || self.shouldMakeEmptyCommit)
     {
         CORevisionID *mergeParent = nil;
         if (self.mergingBranch != nil)
@@ -488,6 +496,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         assert(oldRevid != nil);
         assert(revId != nil);
         _currentRevisionID = revId;
+        self.shouldMakeEmptyCommit = NO;
         
         [[self editingContext] recordBranchSetCurrentRevisionID: _currentRevisionID
                                                   oldRevisionID: oldRevid

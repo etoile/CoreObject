@@ -821,4 +821,31 @@
     UKFalse(branch.deleted);
 }
 
+/**
+ * Tests writing a "tag" revision - that is, a revision with no changes
+ * to embededd objects, but revision metadata that mark the revision as being
+ * a point where the user invoked a save command.
+ */
+- (void) testSaveTagRevision
+{
+    NSDictionary *expectedMetadata = @{ @"type" : @"save",
+                                        @"shortDescription" : @"user pressed save" };
+    
+    [ctx commit];
+    CORevision *r1 = [originalBranch currentRevision];
+    
+    // This should cause a new revision to be written, even though there
+    // are no changes in the embedded objects.
+    originalBranch.shouldMakeEmptyCommit = YES;
+    [ctx commitWithType: @"save"  shortDescription: @"user pressed save"];
+    
+    CORevision *r2 = [originalBranch currentRevision];
+    
+    UKNotNil(r1);
+    UKNotNil(r2);
+    UKObjectsNotEqual(r1, r2);
+    UKObjectsNotEqual(expectedMetadata, [r1 metadata]);
+    UKObjectsEqual(expectedMetadata, [r2 metadata]);
+}
+
 @end
