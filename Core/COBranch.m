@@ -626,6 +626,26 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return result;
 }
 
+- (void)updateRevisions
+{
+	CORevision *currentRev = [[self editingContext] revisionForRevisionID: _currentRevisionID];
+
+	if ([currentRev isEqual: [_revisions lastObject]] || _revisions == nil)
+		return;
+
+	BOOL isNewCommit = [[currentRev parentRevision] isEqual: [_revisions lastObject]];
+
+	if (isNewCommit)
+	{
+		[_revisions addObject: currentRev];
+	}
+	else
+	{
+		// TODO: Optimize to reload just the new nodes
+		[self reloadRevisions];
+	}	
+}
+
 - (void) updateWithBranchInfo: (COBranchInfo *)branchInfo
 {
     ETAssert(branchInfo != nil);
@@ -636,6 +656,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     id<COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionID: _currentRevisionID];
     [_objectGraph setItemGraph: aGraph];
+	
+	[self updateRevisions];
 }
 
 - (id) rootObject
@@ -681,11 +703,16 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	return revs;
 }
 
+- (void)reloadRevisions
+{
+	_revisions = [self revisionsWithOptions: COBranchRevisionReadingParentBranches];
+}
+
 - (NSArray *)nodes
 {
 	if (_revisions == nil)
 	{
-		_revisions = [self revisionsWithOptions: COBranchRevisionReadingParentBranches];
+		[self reloadRevisions];
 	}
 	return _revisions;
 }

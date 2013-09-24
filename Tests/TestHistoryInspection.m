@@ -224,6 +224,34 @@
 	UKObjectsEqual(A(r0, r1, r2, r4), [self revisionsForBranch: branch2A options: options]);
 }
 
+- (void) wait
+{
+	NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+	[runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+}
+
+- (void)testBranchNodes
+{
+	UKObjectsEqual(A(r0, r1, r2, r4), [branch2A nodes]);
+}
+
+- (void)testBranchNodeUpdateForNewCommit
+{
+	/* Load the revision history (to support testing it it is updated in 
+	   reaction to a commit) */
+	[branch2A nodes];
+
+    [[branch2A rootObject] setLabel: @"11"];
+    [ctx commit];
+    CORevision *r11 = [branch2A currentRevision];
+
+	// FIXME: We shouldn't have to call -wait, this would be more convenient,
+	// and more consistent with -currentRevision being updated immediately.
+	[self wait];
+
+	UKObjectsEqual(A(r0, r1, r2, r4, r11), [branch2A nodes]);
+}
+
 // FIXME: Test these things when reloading from a store
 
 @end
