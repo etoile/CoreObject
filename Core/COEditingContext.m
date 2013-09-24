@@ -461,7 +461,7 @@
     
     for (COPersistentRoot *ctxt in persistentRoots)
 	{
-		[ctxt reloadPersistentRootInfo];
+		[ctxt didMakeNewCommit];
 	}
     
     for (COPersistentRoot *ctxt in persistentRoots)
@@ -559,7 +559,7 @@
     NSDictionary *userInfo = [notif userInfo];
     ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [userInfo objectForKey: kCOPersistentRootUUID]];
     
-    // NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
+    //NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
     
     COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
     if (loaded != nil)

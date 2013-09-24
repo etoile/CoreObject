@@ -446,6 +446,16 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     }
 }
 
+- (void)didMakeNewCommit
+{
+	[self reloadPersistentRootInfo];
+	
+	for (COBranch *branch in [self branches])
+	{
+		[branch updateRevisions];
+	}
+}
+
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel
                        atRevision: (CORevision *)aRev
                      parentBranch: (COBranch *)aParent

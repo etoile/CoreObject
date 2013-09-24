@@ -245,10 +245,6 @@
     [ctx commit];
     CORevision *r11 = [branch2A currentRevision];
 
-	// FIXME: We shouldn't have to call -wait, this would be more convenient,
-	// and more consistent with -currentRevision being updated immediately.
-	[self wait];
-
 	UKObjectsEqual(A(r0, r1, r2, r4, r11), [branch2A nodes]);
 }
 

@@ -487,7 +487,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         CORevisionID *oldRevid = _currentRevisionID;
         assert(oldRevid != nil);
         assert(revId != nil);
-        _currentRevisionID =  revId;
+        _currentRevisionID = revId;
         
         [[self editingContext] recordBranchSetCurrentRevisionID: _currentRevisionID
                                                   oldRevisionID: oldRevid
@@ -714,7 +714,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	{
 		[self reloadRevisions];
 	}
-	return _revisions;
+	return [_revisions copy];
 }
 
 - (id)nextNodeOnTrackFrom: (id <COTrackNode>)aNode backwards: (BOOL)back

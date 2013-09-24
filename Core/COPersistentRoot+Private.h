@@ -47,7 +47,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (COPersistentRootInfo *) persistentRootInfo;
 
-- (void) reloadPersistentRootInfo;
+- (void)didMakeNewCommit;
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev parentBranch: (COBranch *)aParent;
 

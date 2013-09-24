@@ -1,5 +1,6 @@
 #import "TestCommon.h"
 #import <CoreObject/COObject.h>
+#import <Coreobject/COEditingContext+Private.h>
 #import <UnitKit/UnitKit.h>
 
 @interface TestConcurrentChanges : EditingContextTestCase <UKTest>
@@ -30,6 +31,10 @@
 
 - (void)testsDetectsStoreSetCurrentRevisionDistributedNotification
 {
+	// Load the revision history (to support testing it it is updated in reaction to a commit)
+	NSArray *revs = [[persistentRoot editingBranch] nodes];
+	CORevisionID *newRevID = nil;
+
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
@@ -40,11 +45,15 @@
         
         //NSLog(@"Committing change to %@", [persistentRoot persistentRootUUID]);
         [ctx2 commit];
+		newRevID = [[rootObj revision] revisionID];
     }
 
     // Wait a bit for a distributed notification to arrive to ctx
     [self wait];
 
+	CORevision *newRev = [ctx revisionForRevisionID: newRevID];
+
+	UKObjectsEqual([revs arrayByAddingObject: newRev], [[persistentRoot editingBranch] nodes]);
     UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: @"label"]);
     UKFalse([ctx hasChanges]);
 }

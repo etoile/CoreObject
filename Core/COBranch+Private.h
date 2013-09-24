@@ -27,4 +27,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch;
 - (void)saveDeletion;
 - (BOOL) isBranchUncommitted;
 
+- (void)updateRevisions;
+
 @end

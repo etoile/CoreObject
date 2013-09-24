@@ -113,8 +113,8 @@
 	// parent revision objects, if the description is too verbose.
 	return [NSString stringWithFormat: @"%@ (%@ <= %@)", 
 		NSStringFromClass([self class]),
-		[self revisionID],
-		([self parentRevision] != nil ? [NSString stringWithFormat: @"%@", [self parentRevision]] : @"root")];
+		[self UUID],
+		([self parentRevision] != nil ? [[self parentRevision] UUID] : @"root")];
 }
 
 @end
