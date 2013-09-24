@@ -137,9 +137,9 @@
     {
         return [branch label];
     }
-    else if ([[tableColumn identifier] isEqual: @"date"])
+    else if ([[tableColumn identifier] isEqual: @"important"])
     {
-        return [branch UUID];
+        return [[branch metadata] objectForKey: @"important"];
     }
     else if ([[tableColumn identifier] isEqual: @"checked"])
     {
@@ -156,6 +156,14 @@
         [branch setLabel: object];
         [(EWDocument *)[[NSDocumentController sharedDocumentController]
                         currentDocument] commit];
+    }
+    else if ([[tableColumn identifier] isEqual: @"important"])
+    {
+        ETAssert([object isKindOfClass: [NSNumber class]]);
+        NSMutableDictionary *metadata = [NSMutableDictionary dictionaryWithDictionary: [branch metadata]];
+        metadata[@"important"] = object;
+        [branch setMetadata: metadata];
+        [(EWDocument *)[[NSDocumentController sharedDocumentController] currentDocument] commit];
     }
     else if ([[tableColumn identifier] isEqual: @"checked"])
     {
