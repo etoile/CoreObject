@@ -42,34 +42,41 @@
 	CORevisionInfo *revisionInfo;
 }
 
+
 /** @taskunit Editing Context */
+
 
 /** 
  * Returns the editing context to which the revision belongs to.
  */
 - (COEditingContext *)editingContext;
 
+
 /** @taskunit History Properties and Metadata */
 
+
 /** 
- * Returns the revision number.
+ * Returns the revision identifier.
  *
- * This number shouldn't be used to uniquely identify the revision, unlike -UUID. 
+ * This revision UUID is unique accross all CoreObject stores.
  */
-- (CORevisionID *)revisionID;
+- (ETUUID *)UUID;
 /**
  * The revision upon which this one is based i.e. the main previous revision. 
  * 
- * This is nil when this is the first revision for a root object.
+ * For the first revision in a persistent root, returns nil (unless the 
+ * persistent root is a cheap copy).
  */
 - (CORevision *)parentRevision;
 /**
- * Returns the persistent object UUID involved in the revision.
+ * Returns the persistent root UUID involved in the revision.
+ *
  * It is possible that this persistent root no longer exists.
  */
 - (ETUUID *)persistentRootUUID;
 /**
- * Returns the commit track UUID involved in the revision.
+ * Returns the branch UUID involved in the revision.
+ *
  * It is possible that this branch no longer exists.
  */
 - (ETUUID *)branchUUID;
@@ -84,7 +91,9 @@
 
 // TODO: Reintroduce methods like -localizedTitle that use COCommitDescriptor?
 
-/** @taskunit Private */
+
+/** @taskunit Framework Private */
+
 
 /** 
  * <init />
@@ -93,5 +102,24 @@
  */
 - (id)initWithEditingContext: (COEditingContext *)aContext
                 revisionInfo: (CORevisionInfo *)aRevInfo;
+- (CORevisionID *)revisionID;
+
+
+/** @taskunit Deprecated */
+
+/** 
+ * Returns the revision type.
+ *
+ * e.g. merge, persistent root creation, minor edit, etc.
+ * 
+ * Note: This type notion is a bit vague currently. 
+ */
+- (NSString *)type;
+/** 
+ * Returns the revision short description.
+ * 
+ * This description is optional.
+ */
+- (NSString *)shortDescription;
 
 @end

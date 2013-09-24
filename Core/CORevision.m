@@ -52,6 +52,11 @@
 	return [revisionInfo revisionID];
 }
 
+- (ETUUID *)UUID
+{
+	return [[self revisionID] revisionUUID];
+}
+
 - (CORevision *)parentRevision
 {
     if ([revisionInfo parentRevisionID] == nil)
@@ -87,6 +92,16 @@
 - (NSDictionary *)metadata
 {
 	return [revisionInfo metadata];
+}
+
+- (NSString *)type
+{
+	return [[self metadata] objectForKey: @"type"];
+}
+
+- (NSString *)shortDescription;
+{
+	return [[self metadata] objectForKey: @"shortDescription"];
 }
 
 - (NSString *)description
