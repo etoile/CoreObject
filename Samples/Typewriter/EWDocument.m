@@ -92,7 +92,10 @@
 
 - (void)saveDocument:(id)sender
 {
-    NSLog(@"save");
+    [_persistentRoot editingBranch].shouldMakeEmptyCommit = YES;
+    
+    // Since we don't push it on an undo stack, the user can't undo "saving"
+    [_persistentRoot commitWithType: @"userInvokedSave" shortDescription: @"Save"];
 }
 
 - (IBAction) branch: (id)sender
