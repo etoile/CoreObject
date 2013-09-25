@@ -17,6 +17,13 @@
 
 @implementation TestCollection
 
+- (void)testLibraryForContentType
+{
+	ETEntityDescription *bookmarkType = [[ctx modelRepository] descriptionForName: @"COBookmark"];
+
+	UKObjectsEqual([ctx bookmarkLibrary], [ctx libraryForContentType: bookmarkType]);
+}
+
 - (void)testBookmarkLibrary
 {
 	COLibrary *library = [ctx bookmarkLibrary];

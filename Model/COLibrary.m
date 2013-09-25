@@ -82,6 +82,21 @@
 	return group;
 }
 
+- (COLibrary *)libraryForContentType: (ETEntityDescription *)aType
+{
+	NILARG_EXCEPTION_TEST(aType);
+
+	for (COLibrary *lib in [self libraryGroup])
+	{
+		ETEntityDescription *contentType =
+			[[[lib entityDescription] propertyDescriptionForName: @"contents"] type];
+											
+		if ([aType isKindOfEntity: contentType])
+			return lib;
+	}
+	return nil;
+}
+
 - (COTagLibrary *)tagLibrary
 {
 	COTagLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierTag];

@@ -72,6 +72,16 @@
  * @taskunit Accessing Libraries Directly
  */
 
+/** 
+ * Returns the library used to collect together the objects using the given 
+ * entity description.
+ *
+ * For example, COBookmark entity or some subentity description would return 
+ * -bookmarkLibrary.
+ * 
+ * For a nil entity description, raises an NSInvalidArgumentException.
+ */
+- (COLibrary *)libraryForContentType: (ETEntityDescription *)aType;
 /**
  * Returns a library listing the tags in the store.
  *
