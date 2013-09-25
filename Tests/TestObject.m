@@ -27,6 +27,32 @@
 
 @implementation TestObject
 
+- (void) testCreationAndModificationDates
+{
+	COObject *object =
+		[[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+
+	UKNil([object creationDate]);
+	UKNil([object modificationDate]);
+
+	[object setName: @"Bing"];
+	[ctx commit];
+
+	CORevision *firstRev = [object revision];
+
+	UKObjectsEqual([firstRev date], [object creationDate]);
+	UKObjectsEqual([firstRev date], [object modificationDate]);
+
+	[object setName: @"Bong"];
+	[ctx commit];
+
+	CORevision *lastRev = [object revision];
+
+	UKObjectsEqual([firstRev date], [object creationDate]);
+	UKObjectsEqual([lastRev date], [object modificationDate]);
+	UKObjectsNotEqual(lastRev, firstRev);
+}
+
 - (void) testKVCForSynthesizedSetterName
 {
 	COOverridenSetterBookmark *bookmark =

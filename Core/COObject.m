@@ -15,6 +15,7 @@
 #import "COError.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
+#import "COBranch+Private.h"
 #import "COObject+RelationshipCache.h"
 #import "CORelationshipCache.h"
 #import "COSQLiteStore.h"
@@ -351,7 +352,18 @@ static void FindAllStronglyContainedObjects(COObject *anObj, NSMutableSet *dest)
 	NSMutableArray *result = [NSMutableArray array];
 	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
 	{
-        id value = [self valueForKey: [propDesc name]];
+		NSString *propertyName = [propDesc name];
+
+		// FIXME: Accessing -modification and -creationDate is slow currently.
+		// We can probably skip all transient property descriptions or at least
+		// property descriptions that are attributes...
+		if ([propertyName isEqualToString: @"modificationDate"]
+			|| [propertyName isEqualToString: @"creationDate"])
+		{
+			continue;
+		}
+	
+        id value = [self valueForKey: propertyName];
         
         if ([propDesc isMultivalued])
         {
@@ -420,26 +432,20 @@ static void FindAllStronglyContainedObjects(COObject *anObj, NSMutableSet *dest)
 
 - (NSDate *)modificationDate
 {
-	return nil;
-	// FIXME: Port to the new store
-#if 0
-	ETUUID *branchUUID = [[[self persistentRoot] commitTrack] UUID];
-	CORevision *rev = [[[self persistentRoot] store] maxRevision: INT64_MAX
-	                                          forCommitTrackUUID: branchUUID];
-	return [rev date];
-#endif
+	if ([[self branch] isBranchUncommitted])
+		return nil;
+
+	// TODO: Avoid loading all the branch revisions just to get the last revision
+	return [[[[self branch] nodes] lastObject] date];
 }
 
 - (NSDate *)creationDate
 {
-	return  nil;
-	// FIXME: Port to the new store
-#if 0
-	ETUUID *branchUUID = [[[self persistentRoot] commitTrack] UUID];
-	CORevision *rev = [[[self persistentRoot] store] maxRevision: 0 
-	                                          forCommitTrackUUID: branchUUID];
-	return [rev date];
-#endif
+	if ([[self branch] isBranchUncommitted])
+		return nil;
+
+	// TODO: Avoid loading all the branch revisions just to get the first revision
+	return [[[[self branch] nodes] firstObject] date];
 }
 
 - (NSArray *)parentGroups
