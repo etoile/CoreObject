@@ -635,6 +635,12 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return result;
 }
 
+- (void)didUpdate
+{
+	[[NSNotificationCenter defaultCenter] 
+		postNotificationName: ETCollectionDidUpdateNotification object: self];
+}
+
 - (void)updateRevisions
 {
 	CORevision *currentRev = [[self editingContext] revisionForRevisionID: _currentRevisionID];
@@ -652,7 +658,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	{
 		// TODO: Optimize to reload just the new nodes
 		[self reloadRevisions];
-	}	
+	}
+	[self didUpdate];
 }
 
 - (void) updateWithBranchInfo: (COBranchInfo *)branchInfo
@@ -762,6 +769,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
 	INVALIDARG_EXCEPTION_TEST(node, [node isKindOfClass: [CORevision class]]);
 	[self setCurrentRevision: (CORevision *)node];
+	[self didUpdate];
 }
 
 - (void)undoNode: (id <COTrackNode>)aNode
