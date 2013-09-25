@@ -13,6 +13,7 @@
 		606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 606E3DBF1787A07E00ED42DA /* COSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 606E3DC01787A07E00ED42DA /* COSerialization.m */; };
 		607B90E717F2D5AD00D8BDEA /* TestCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 667F1ED1179C81E00083C3E6 /* TestCollection.m */; };
+		607B90E817F2D72700D8BDEA /* TestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 667F1ED6179C81E00083C3E6 /* TestObject.m */; };
 		607EB349178881E60024B34D /* CODictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 607EB347178881E60024B34D /* CODictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		607EB34A178881E60024B34D /* CODictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 607EB348178881E60024B34D /* CODictionary.m */; };
 		609C00651704C24C00D01AAB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00541704C24C00D01AAB /* main.m */; };
@@ -565,7 +566,7 @@
 		667F1ED1179C81E00083C3E6 /* TestCollection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TestCollection.m; path = Tests/TestCollection.m; sourceTree = "<group>"; };
 		667F1ED2179C81E00083C3E6 /* TestCopy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCopy.m; sourceTree = "<group>"; };
 		667F1ED4179C81E00083C3E6 /* TestEditingContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestEditingContext.m; sourceTree = "<group>"; };
-		667F1ED6179C81E00083C3E6 /* TestObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestObject.m; sourceTree = "<group>"; };
+		667F1ED6179C81E00083C3E6 /* TestObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TestObject.m; path = Tests/TestObject.m; sourceTree = "<group>"; };
 		667F1EDB179C81E00083C3E6 /* TestStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestStore.m; sourceTree = "<group>"; };
 		667F1EE3179C83A20083C3E6 /* TestCopyEmbeddedObjects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCopyEmbeddedObjects.m; sourceTree = "<group>"; };
 		667F1EE4179C83A20083C3E6 /* TestEditingContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestEditingContext.m; sourceTree = "<group>"; };
@@ -1022,7 +1023,6 @@
 				667F1ED0179C81E00083C3E6 /* TestArrayDiff.m */,
 				667F1ED2179C81E00083C3E6 /* TestCopy.m */,
 				667F1ED4179C81E00083C3E6 /* TestEditingContext.m */,
-				667F1ED6179C81E00083C3E6 /* TestObject.m */,
 				667F1EDB179C81E00083C3E6 /* TestStore.m */,
 			);
 			name = "Old CoreObject trunk tests";
@@ -1253,6 +1253,7 @@
 				66808461178CD4FD003A3CC6 /* TestCopier.m */,
 				609C00611704C24C00D01AAB /* TestRevisionNumber.m */,
 				66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */,
+				667F1ED6179C81E00083C3E6 /* TestObject.m */,
 				66FB157017A8F53D003BFC9B /* TestObjectGraphContext.m */,
 				66FB15F017AB8D4D003BFC9B /* TestItemGraphDiff.m */,
 				663CE2CC17C1837700E729F5 /* TestUndoStackStore.m */,
@@ -1817,6 +1818,7 @@
 				66AB075F17D5846000ADDA17 /* TestMerge.m in Sources */,
 				66470C7217E3D4B200A7E0A9 /* TestHistoryInspection.m in Sources */,
 				607B90E717F2D5AD00D8BDEA /* TestCollection.m in Sources */,
+				607B90E817F2D72700D8BDEA /* TestObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

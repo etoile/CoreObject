@@ -4,6 +4,12 @@
 #import "TestCommon.h"
 #import "COObject.h"
 #import "COBookmark.h"
+#import "COSerialization.h"
+
+@interface COObject (COSerializationPrivate)
+- (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
+- (void)setSerializedValue: (id)value forPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
+@end
 
 @interface COOverridenSetterBookmark : COBookmark
 {
@@ -49,8 +55,10 @@
 	COOverridenSetterBookmark *bookmark =
 		[[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"] rootObject];
 	[bookmark setLastVisitedDate: [NSDate date]];
+	ETPropertyDescription *propertyDesc =
+		[[bookmark entityDescription] propertyDescriptionForName: @"lastVisitedDate"];
 
-	NSString *dateString = [bookmark serializedValueForProperty: @"lastVisitedDate"];
+	NSString *dateString = [bookmark serializedValueForPropertyDescription: propertyDesc];
 
 	UKObjectsEqual([[bookmark lastVisitedDate] stringValue], dateString);
 	UKTrue(bookmark->serialized);
@@ -61,8 +69,10 @@
 	COOverridenSetterBookmark *bookmark =
 		[[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"] rootObject];
 	NSDate *date = [NSDate date];
+	ETPropertyDescription *propertyDesc =
+		[[bookmark entityDescription] propertyDescriptionForName: @"lastVisitedDate"];
 
-	[bookmark setSerializedValue: date forProperty: @"lastVisitedDate"];
+	[bookmark setSerializedValue: date forPropertyDescription: propertyDesc];
 	
 	UKObjectsEqual(date, [bookmark lastVisitedDate]);
 	UKTrue(bookmark->deserialized);
