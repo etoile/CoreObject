@@ -1,0 +1,10 @@
+based on r9135
+
+add support for pushing an undo action undo several stacks at once. This allows some interesting undo behaviour where two documents have separate undo stacks but certain actions that span both documents (like drag and drop) can be pushed to both stacks.
+
+Problems:
+- I'm not aware of any apps that do this
+- It's ugly because we have to handle duplicate actions cleanly. e.g., drag from doc1 to doc2. undo in doc2 will undo the drag. The next undo in doc1 will also be an action which should undo the drag, but we have to figure out that the change is already applied (and not apply it twice), and then possibly skip to the next thing in the stack
+- Interferes with unioning several stacks together, as COPatternUndoStack does. That is much cleaner if actions are written to only one stack
+
+So based on those, this looks like a dead end, although it's probably doable if the use case comes up.

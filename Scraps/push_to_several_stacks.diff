@@ -1,0 +1,218 @@
+Index: Core/COEditingContext+Private.h
+===================================================================
+--- Core/COEditingContext+Private.h	(revision 9135)
++++ Core/COEditingContext+Private.h	(working copy)
+@@ -58,7 +58,7 @@
+  */
+ - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
+ 	restrictedToPersistentRoots: (NSArray *)persistentRoots
+-                  withUndoStack: (COUndoStack *)aStack;
++                 withUndoStacks: (NSArray *)stacks;
+ /**
+  * This method is only exposed to be used internally by CoreObject.
+  */
+Index: Core/COEditingContext.h
+===================================================================
+--- Core/COEditingContext.h	(revision 9135)
++++ Core/COEditingContext.h	(working copy)
+@@ -242,6 +242,7 @@
+ - (NSArray *)commit;
+ 
+ - (void) commitWithUndoStack: (COUndoStack *)aStack;
++- (void) commitWithUndoStacks: (NSArray *)stacks;
+ 
+ // TODO: Change to -commitWithType:shortDescription:error:
+ /**
+Index: Core/COEditingContext.m
+===================================================================
+--- Core/COEditingContext.m	(revision 9135)
++++ Core/COEditingContext.m	(working copy)
+@@ -405,7 +405,7 @@
+ 
+ - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
+ 	restrictedToPersistentRoots: (NSArray *)persistentRoots
+-                  withUndoStack: (COUndoStack *)aStack
++                 withUndoStacks: (NSArray *)aStack
+ {
+ 	// TODO: We could organize validation errors by persistent root. Each
+ 	// persistent root might result in a validation error that contains a
+@@ -453,7 +453,7 @@
+     }
+ 
+     ETAssert([_store commitTransactionWithUUID: _store.transactionUUID withError: NULL]);
+-    [self recordEndUndoGroupWithUndoStack: aStack];
++    [self recordEndUndoGroupWithUndoStacks: aStack];
+     
+     // FIXME: This was moved here because Typewriter expects changes to be
+     // committed to store when it receives the notification. Decide if that
+@@ -476,14 +476,21 @@
+ {
+     [self commitWithMetadata: nil
+  restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
+-               withUndoStack: aStack];
++              withUndoStacks: @[aStack]];
+ }
+ 
++- (void) commitWithUndoStacks: (NSArray *)stacks
++{
++    [self commitWithMetadata: nil
++ restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
++              withUndoStacks: stacks];
++}
++
+ - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
+ {
+ 	return [self commitWithMetadata: metadata
+ 		restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
+-                      withUndoStack: nil];
++                     withUndoStacks: nil];
+ }
+ 
+ - (void) unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
+Index: Core/COPersistentRoot.m
+===================================================================
+--- Core/COPersistentRoot.m	(revision 9135)
++++ Core/COPersistentRoot.m	(working copy)
+@@ -344,7 +344,7 @@
+ {
+ 	[_parentContext commitWithMetadata: metadata
+            restrictedToPersistentRoots: A(self)
+-                         withUndoStack: nil];
++                        withUndoStacks: nil];
+ 	//ETAssert([revs count] == 1);
+ 	//return [revs lastObject];
+     return nil;
+Index: Tests/TestUndo.m
+===================================================================
+--- Tests/TestUndo.m	(revision 9135)
++++ Tests/TestUndo.m	(working copy)
+@@ -379,4 +379,91 @@
+     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+ }
+ 
++- (NSArray *) setupDragAndDropTest
++{
++    COUndoStack *doc1Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc1"];
++    COUndoStack *doc2Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc2"];
++    [doc1Stack clear];
++    [doc2Stack clear];
++    
++    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
++    COPersistentRoot *doc2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
++    [[doc1 rootObject] addObject: [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"]];
++    ETUUID *childUUID = [[[[doc1 rootObject] contents] firstObject] UUID];
++    UKNotNil(childUUID);
++    [ctx commitWithUndoStack: _setupStack];
++    
++    UKIntsEqual(1, [[[doc1 rootObject] contents] count]);
++    UKIntsEqual(0, [[[doc2 rootObject] contents] count]);
++    
++    // Make commits in doc1 and doc2, together in one transaction,
++    // that move 'child' from doc1 to doc2,
++    // and push that undo action onto each document's stack
++    
++    {
++        COCopier *copier = [[COCopier alloc] init];
++        ETUUID *destUUID = [copier copyItemWithUUID: childUUID fromGraph: [doc1 objectGraphContext] toGraph: [doc2 objectGraphContext]];
++        
++        [[doc1 rootObject] removeObject: [doc1 objectWithUUID: childUUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
++        [[doc2 rootObject] insertObject: [doc2 objectWithUUID: destUUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
++        [ctx commitWithUndoStacks: @[doc1Stack, doc2Stack]];
++    }
++    
++    UKIntsEqual(0, [[[doc1 rootObject] contents] count]);
++    UKIntsEqual(1, [[[doc2 rootObject] contents] count]);
++    
++    return @[doc1Stack, doc2Stack, doc1, doc2];
++}
++
++- (void) testUndoDragAndDropA
++{
++    NSArray *objects = [self setupDragAndDropTest];
++    COUndoStack *doc1Stack = objects[0];
++    COUndoStack *doc2Stack = objects[1];
++    COPersistentRoot *doc1 = objects[2];
++    COPersistentRoot *doc2 = objects[3];
++
++    [doc1Stack undoWithEditingContext: ctx];
++
++    UKIntsEqual(1, [[[doc1 rootObject] contents] count]);
++    UKIntsEqual(0, [[[doc2 rootObject] contents] count]);
++    
++    UKNotNil(doc2Stack);
++}
++
++- (void) testUndoDragAndDropB
++{
++    NSArray *objects = [self setupDragAndDropTest];
++    COUndoStack *doc1Stack = objects[0];
++    COUndoStack *doc2Stack = objects[1];
++    COPersistentRoot *doc1 = objects[2];
++    COPersistentRoot *doc2 = objects[3];
++    
++    [doc2Stack undoWithEditingContext: ctx];
++    
++    UKIntsEqual(1, [[[doc1 rootObject] contents] count]);
++    UKIntsEqual(0, [[[doc2 rootObject] contents] count]);
++    
++    UKNotNil(doc1Stack);
++}
++
++- (void) testUndoDragAndDropC
++{
++    NSArray *objects = [self setupDragAndDropTest];
++    COUndoStack *doc1Stack = objects[0];
++    COUndoStack *doc2Stack = objects[1];
++    COPersistentRoot *doc1 = objects[2];
++    COPersistentRoot *doc2 = objects[3];
++    
++    [doc1Stack undoWithEditingContext: ctx];
++    
++    // FIXME: Since the change is already undone, this should undo the next thing
++    // in doc2Stack
++    [doc2Stack undoWithEditingContext: ctx];
++    
++    UKIntsEqual(1, [[[doc1 rootObject] contents] count]);
++    UKIntsEqual(0, [[[doc2 rootObject] contents] count]);
++}
++
++
+ @end
+Index: Undo/COEditingContext+Undo.h
+===================================================================
+--- Undo/COEditingContext+Undo.h	(revision 9135)
++++ Undo/COEditingContext+Undo.h	(working copy)
+@@ -49,7 +49,7 @@
+ // Called from COEditingContext
+ 
+ - (void) recordBeginUndoGroup;
+-- (void) recordEndUndoGroupWithUndoStack: (COUndoStack *)aStack;
++- (void) recordEndUndoGroupWithUndoStacks: (NSArray *)stacks;
+ 
+ - (void) recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot;
+ - (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot;
+Index: Undo/COEditingContext+Undo.m
+===================================================================
+--- Undo/COEditingContext+Undo.m	(revision 9135)
++++ Undo/COEditingContext+Undo.m	(working copy)
+@@ -37,7 +37,7 @@
+     }
+ }
+ 
+-- (void) recordEndUndoGroupWithUndoStack: (COUndoStack *)aStack
++- (void) recordEndUndoGroupWithUndoStacks: (NSArray *)stacks
+ {
+ //    NSLog(@"%@", NSStringFromSelector(_cmd));
+     
+@@ -56,7 +56,10 @@
+             ? [_currentEditGroup.contents firstObject]
+             : _currentEditGroup;
+         
+-        [aStack recordCommandInverse: objectToSerialize];
++        for (COUndoStack *aStack in stacks)
++        {
++            [aStack recordCommandInverse: objectToSerialize];
++        }
+         
+         _currentEditGroup = nil;
+     }
