@@ -137,7 +137,7 @@
     COPersistentRoot *persistentRoot = [context insertNewPersistentRootWithEntityName: @"Anonymous.Document"];
     assert(persistentRoot != nil);
     
-    COObject *rootObj = [persistentRoot insertObjectWithEntityName: rootObjEntity];
+    COObject *rootObj = [[persistentRoot objectGraphContext] insertObjectWithEntityName: rootObjEntity];
     
 	Document *document = [persistentRoot rootObject];
 	[document setRootDocObject: rootObj];
