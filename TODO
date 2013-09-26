@@ -7,7 +7,7 @@ Current tasks
 current questions:
     - what is the best represent a user's save action (cmd+s) in the current
     store model?
-
+		=> Using empty commits with metadata, for now.
 
 revision identifiers:
  - We've settled on a UUID for identifying revisions. Quentin was saying there
@@ -15,9 +15,11 @@ revision identifiers:
    
    - CORevision should be used by framework users
    
-   - ETUUID should be used within CoreObject, with the caveat that, in oder
+   - ETUUID should be used within CoreObject, with the caveat that, in order
+     to load the revision contents, you also need to know the persistent root
+	 id (any persistent root sharing the backing store works.)
 
-   -  CORevisionID should be avoided and may be removed
+   - CORevisionID should be avoided and may be removed
 
    - CORevisionInfo is used only as a dumb "property list" to send data from
      COSQLiteStore to COEditingContext.

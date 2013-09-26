@@ -244,6 +244,11 @@ typedef NSUInteger COBranchRevisionReadingOptions;
  */
 - (CORevisionID *) revisionIDForRevisionUUID: (ETUUID *)aRevisionUUID
                           persistentRootUUID: (ETUUID *)aPersistentRoot;
+
+/**
+ * N.B. This is the only API for discovering divergent revisions
+ * (revisions which aren't ancestors of the current revision of a branch)
+ */
 - (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
                                 options: (COBranchRevisionReadingOptions)options;
 
