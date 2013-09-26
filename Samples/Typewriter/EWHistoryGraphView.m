@@ -29,27 +29,17 @@
 
 - (NSSet *) revisionIDsOnBranch: (COBranch *)aBranch
 {
+	COSQLiteStore *store = [[aBranch persistentRoot] store];
+	
+	NSArray *infos = [store revisionInfosForBranchUUID: [aBranch UUID]
+											   options: COBranchRevisionReadingDivergentRevisions];
+	
     NSMutableSet *revisionIDs = [NSMutableSet set];
-    if (![aBranch isBranchUncommitted])
+	for (CORevisionInfo *info in infos)
     {
-        CORevision *head = [aBranch currentRevision];
-        CORevision *initial = [aBranch initialRevision];
-        
-        ETAssert(head != nil);
-        ETAssert(initial != nil);
-        
-        CORevision *current = head;
-        while (![current isEqual: initial])
-        {
-            [revisionIDs addObject: [current revisionID]];
-            current = [current parentRevision];
-            
-            ETAssert(current != nil);
-        }
-        
-        [revisionIDs addObject: [current revisionID]];
-    }
-    return revisionIDs;
+		[revisionIDs addObject: [info revisionID]];
+	}	
+	return revisionIDs;
 }
 
 - (void) setPersistentRoot: (COPersistentRoot *)proot
