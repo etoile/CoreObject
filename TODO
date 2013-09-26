@@ -195,6 +195,9 @@ Backlog
 - Collaboration
   x Initial prototype working in Typewriter
 
+- Error handling
+  - Better error message if you try to use a composite relationship across persistent roots, 
+    currently you get a COPath does not respond to UUIDValue exception.
 
 Future Work
 -----------

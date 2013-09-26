@@ -2,6 +2,8 @@
 #import <CoreObject/CoreObject.h>
 #import "Tag.h"
 
+@class Project;
+
 @interface Document : COObject
 
 - (NSRect) screenRect;
@@ -10,6 +12,7 @@
 - (BOOL) isOpen;
 - (void) setIsOpen:(BOOL)i;
 
+@property (readonly, nonatomic, retain) Project *project;
 @property (readwrite, nonatomic, retain) NSString *documentType;
 @property (readwrite, nonatomic, retain) COObject *rootDocObject;
 @property (readwrite, nonatomic, retain) NSString *documentName;

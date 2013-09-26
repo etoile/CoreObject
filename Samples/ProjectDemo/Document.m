@@ -7,6 +7,11 @@
     ETEntityDescription *docEntity = [ETEntityDescription descriptionWithName: @"Document"];
     [docEntity setParent: (id)@"COObject"];
     
+	ETPropertyDescription *projectProperty = [ETPropertyDescription descriptionWithName: @"project"
+                                                                                  type: (id)@"Project"];
+	[projectProperty setOpposite: (id)@"Project.documents"];
+    [projectProperty setPersistent: NO];
+	
     ETPropertyDescription *screenRectProperty = [ETPropertyDescription descriptionWithName: @"screenRect"
                                                                                       type: (id)@"NSRect"];
     [screenRectProperty setPersistent: YES];
@@ -34,7 +39,7 @@
     [tagsProperty setMultivalued: YES];
     
     
-    [docEntity setPropertyDescriptions: A(screenRectProperty, isOpenProperty, documentTypeProperty, rootObjectProperty, documentNameProperty, tagsProperty)];
+    [docEntity setPropertyDescriptions: A(projectProperty, screenRectProperty, isOpenProperty, documentTypeProperty, rootObjectProperty, documentNameProperty, tagsProperty)];
     
     return docEntity;
 }
@@ -61,6 +66,7 @@
 	[self didChangeValueForProperty: @"isOpen"];
 }
 
+@dynamic project;
 @dynamic documentType;
 @dynamic rootDocObject;
 @dynamic documentName;

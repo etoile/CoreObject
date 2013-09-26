@@ -10,6 +10,8 @@
                                                                                      type: (id)@"Document"];
     [documentsProperty setPersistent: YES];
     [documentsProperty setMultivalued: YES];
+    [documentsProperty setOpposite: (id)@"Document.project"];
+    [documentsProperty setOrdered: NO];
 
     ETPropertyDescription *tagsProperty = [ETPropertyDescription descriptionWithName: @"tags"
                                                                                 type: (id)@"Tag"];

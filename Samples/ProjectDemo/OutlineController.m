@@ -261,8 +261,14 @@ static int i = 0;
 	NSLog(@"Trash %@", self);
 	
 	[doc persistentRoot].deleted = YES;
+	
+	NSMutableSet *docs = [[doc project] mutableSetValueForKey: @"documents"];
+	assert([docs containsObject: doc]);
+	[docs removeObject: doc];
+	
 	[[[doc persistentRoot] editingContext] commit];
 	
+	// FIXME: Hack
 	[self close];
 }
 
