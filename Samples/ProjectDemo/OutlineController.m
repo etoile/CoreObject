@@ -256,6 +256,16 @@ static int i = 0;
 	[[[NSApplication sharedApplication] delegate] shareWithInspectorForDocument: doc];
 }
 
+- (IBAction)moveToTrash:(id)sender
+{
+	NSLog(@"Trash %@", self);
+	
+	[doc persistentRoot].deleted = YES;
+	[[[doc persistentRoot] editingContext] commit];
+	
+	[self close];
+}
+
 /* History stuff */
 
 - (IBAction) undo: (id)sender

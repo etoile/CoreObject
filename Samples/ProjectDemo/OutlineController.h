@@ -25,4 +25,6 @@
 
 - (IBAction) shareWith: (id)sender;
 
+- (IBAction)moveToTrash:(id)sender;
+
 @end
