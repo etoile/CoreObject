@@ -18,7 +18,10 @@
 - (IBAction) pickboard: (id)sender;
 
 - (IBAction) push: (id)sender;
-- (IBAction) pull: (id)sender;
+
+- (IBAction) pull1: (id)sender;
+- (IBAction) pull2: (id)sender;
+- (IBAction) pull3: (id)sender;
 
 - (void) recordUpdatedItems: (NSArray *)items;
 
@@ -46,5 +49,7 @@
 - (void) commit;
 
 - (COUndoStack *)undoStack;
+
+- (COPersistentRoot *)persistentRoot;
 
 @end

@@ -1,9 +1,9 @@
 #import <Cocoa/Cocoa.h>
 #import "EWTypewriterWindowController.h"
 #import "EWDocument.h"
+#import "EWAppDelegate.h"
 
 @implementation EWTypewriterWindowController
-
 
 - (void)windowDidLoad
 {
@@ -20,6 +20,22 @@
     
     EWDocument *doc = [self document];
     [self displayRevision: [[[[doc currentPersistentRoot] editingBranch] currentRevision] revisionID]];
+	
+	
+	if ([[self document] persistentRoot] == [(EWAppDelegate *)[NSApp delegate] user1PersistentRoot])
+	{
+		[_pull1 setEnabled: NO];
+	}
+	else if ([[self document] persistentRoot] == [(EWAppDelegate *)[NSApp delegate] user2PersistentRoot])
+	{
+		[_pull2 setEnabled: NO];
+		[_pull3 setEnabled: NO];
+	}
+	else
+	{
+		[_pull2 setEnabled: NO];
+		[_pull3 setEnabled: NO];
+	}
 }
 
 - (void) displayRevision:(CORevisionID *)aRev

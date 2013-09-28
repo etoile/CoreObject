@@ -317,19 +317,17 @@
     NSLog(@"FIXME: Not implemented");
 }
 
-- (IBAction) pull: (id)sender
+- (IBAction) pull1: (id)sender
 {
-    COPersistentRoot *user1Proot = [(EWAppDelegate *)[NSApp delegate] user1PersistentRoot];
-    COPersistentRoot *user2Proot = [(EWAppDelegate *)[NSApp delegate] user2PersistentRoot];
-
-    if ([_title isEqual: @"user2"]) // Ugly...
-    {
-        [EWDocument pullFrom: user1Proot into: user2Proot];
-    }
-    else
-    {
-        [EWDocument pullFrom: user2Proot into: user1Proot];
-    }
+	[EWDocument pullFrom: [(EWAppDelegate *)[NSApp delegate] user1PersistentRoot] into: _persistentRoot];
+}
+- (IBAction) pull2: (id)sender
+{
+	[EWDocument pullFrom: [(EWAppDelegate *)[NSApp delegate] user2PersistentRoot] into: _persistentRoot];
+}
+- (IBAction) pull3: (id)sender
+{
+	[EWDocument pullFrom: [(EWAppDelegate *)[NSApp delegate] user3PersistentRoot] into: _persistentRoot];
 }
 
 /* EWUndoManagerDelegate */
@@ -359,6 +357,13 @@
 - (NSString *) redoMenuItemTitle
 {
     return @"Redo";
+}
+
+// Misc
+
+- (COPersistentRoot *)persistentRoot
+{
+	return _persistentRoot;
 }
 
 @end
