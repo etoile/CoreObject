@@ -1,6 +1,6 @@
 #import "TestCommon.h"
 #import <CoreObject/COObject.h>
-#import <Coreobject/COEditingContext+Private.h>
+#import <CoreObject/COEditingContext+Private.h>
 #import <UnitKit/UnitKit.h>
 
 @interface TestConcurrentChanges : EditingContextTestCase <UKTest>

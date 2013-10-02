@@ -8,7 +8,8 @@ VERSION = 0.5
 LIBRARIES_DEPEND_UPON = $(shell pkg-config --libs sqlite3) -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
 
 CoreObject_INCLUDE_DIRS = -IStore/fmdb/src
-CoreObject_LDFLAGS += -lstdc++ -lobjcxx -lsqlite3
+CoreObject_LDFLAGS += -lstdc++ -lobjcxx -lsqlite3 -ldispatch
+CoreObject_OBJCFLAGS += -fobjc-arc
 
 ifeq ($(test), yes)
   BUNDLE_NAME = $(FRAMEWORK_NAME)
