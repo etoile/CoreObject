@@ -104,12 +104,16 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     [_store beginTransaction];
     
     NSString *actualStackName = [_store peekStackName: popStack forName: aName];
+	BOOL isUndo = [popStack isEqual: kCOUndoStack];
     COCommand *edit = [self peekEditFromStack: popStack forName: aName];
-    if (![self canApplyEdit: edit toContext: aContext])
+	COCommand *appliedEdit = (isUndo ? [edit inverse] : edit);
+
+    if (![self canApplyEdit: appliedEdit toContext: aContext])
     {
         // DEBUG: Break here
         edit = [self peekEditFromStack: popStack forName: aName];
-        [self canApplyEdit: edit toContext: aContext];
+		appliedEdit =  (isUndo ? [edit inverse] : edit);
+        [self canApplyEdit: appliedEdit toContext: aContext];
         
         [_store commitTransaction];
         [NSException raise: NSInvalidArgumentException format: @"Can't apply edit %@", edit];
@@ -119,17 +123,18 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     [_store popStack: popStack forName: aName];
     
     // Apply the edit
-    [edit applyToContext: aContext];
+    [appliedEdit applyToContext: aContext];
     
     // N.B. This must not automatically push a revision
     aContext.isRecordingUndo = NO;
+	// TODO: If we can detect a non-selective undo and -commit returns a command,
+	// we could implement -validateUndoCommitWithCommand: to ensure there is no
+	// command COCommandCreatePersistentRoot or COCommandNewRevisionForBranch
+	// that create new revisions in the store.
     [aContext commit];
     aContext.isRecordingUndo = YES;
     
-    // Push the inverse onto the redo stack
-    COCommand *inverse = [edit inverse];
-    
-    [_store pushAction: [inverse plist] stack: pushStack forName: actualStackName];
+    [_store pushAction: [edit plist] stack: pushStack forName: actualStackName];
     
     return [_store commitTransaction];
 }

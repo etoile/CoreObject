@@ -62,7 +62,8 @@ static NSString * const kCOCommandContents = @"COCommandContents";
     for (COCommand *subEdit in _contents)
     {
         COCommand *subEditInverse = [subEdit inverse];
-        [edits addObject: subEditInverse];
+		// Insert the inverses back to front, so the inverse of the most recent action will be first.
+        [edits insertObject: subEditInverse atIndex: 0];
     }
     inverse.contents = edits;
     

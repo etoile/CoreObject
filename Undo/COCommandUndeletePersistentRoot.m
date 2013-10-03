@@ -31,3 +31,15 @@
 }
 
 @end
+
+
+@implementation COCommandCreatePersistentRoot
+
+- (COCommand *) inverse
+{
+    COCommandDeletePersistentRoot *inverse = (id)[super inverse];
+	inverse.revisionID = _revisionID;
+    return inverse;
+}
+
+@end

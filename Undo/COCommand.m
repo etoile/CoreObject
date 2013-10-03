@@ -20,6 +20,7 @@ static NSString * const kCOCommandTypeSetCurrentBranch = @"COCommandTypeSetCurre
 static NSString * const kCOCommandTypeSetCurrentVersionForBranch = @"COCommandTypeSetCurrentVersionForBranch";
 static NSString * const kCOCommandTypeDeletePersistentRoot = @"COCommandTypeDeletePersistentRoot";
 static NSString * const kCOCommandTypeUndeletePersistentRoot = @"COCommandTypeUndeletePersistentRoot";
+static NSString * const kCOCommandTypeCreatePersistentRoot = @"COCommandTypeCreatePersistentRoot";
 
 // Edit properties
 
@@ -39,7 +40,8 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
            [COCommandSetCurrentBranch class], kCOCommandTypeSetCurrentBranch,
            [COCommandSetCurrentVersionForBranch class], kCOCommandTypeSetCurrentVersionForBranch,
            [COCommandDeletePersistentRoot class], kCOCommandTypeDeletePersistentRoot,
-           [COCommandUndeletePersistentRoot class], kCOCommandTypeUndeletePersistentRoot);
+           [COCommandUndeletePersistentRoot class], kCOCommandTypeUndeletePersistentRoot, 
+	       [COCommandCreatePersistentRoot class], kCOCommandTypeCreatePersistentRoot);
 }
 
 + (COCommand *) commandWithPlist: (id)aPlist
