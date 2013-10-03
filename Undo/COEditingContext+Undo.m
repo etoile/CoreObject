@@ -106,7 +106,7 @@
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
     edit.timestamp = [NSDate date];
-	edit.revisionID = aRevID;
+	edit.initialRevisionID = aRevID;
     
     [self recordEditInverse: edit];
 }

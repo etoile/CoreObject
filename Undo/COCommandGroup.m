@@ -1,6 +1,7 @@
 #import "COCommandGroup.h"
 #import "COCommand.h"
 #import "COCommandSetCurrentVersionForBranch.h"
+#import "COCommandUndeletePersistentRoot.h"
 #import "CORevision.h"
 #import <EtoileFoundation/Macros.h>
 
@@ -117,10 +118,11 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 {
 	for (COCommand *command in _contents)
 	{
-		BOOL hasRevision =
-			[command isKindOfClass: [COCommandSetCurrentVersionForBranch class]];
+		BOOL hasNewRevision =
+			([command isKindOfClass: [COCommandSetCurrentVersionForBranch class]]
+		  || [command isKindOfClass: [COCommandCreatePersistentRoot class]]);
 
-		if (hasRevision)
+		if (hasNewRevision)
 		{
 			return [(COCommandSetCurrentVersionForBranch *)command metadata];
 		}

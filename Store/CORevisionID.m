@@ -54,6 +54,8 @@
 
 + (CORevisionID *) revisionIDWithPlist: (id)plist
 {
+	NILARG_EXCEPTION_TEST(plist);
+
     NSArray *comps = [(NSString *)plist componentsSeparatedByString:@":"];
     
     CORevisionID *result = [[CORevisionID alloc] init];

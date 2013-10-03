@@ -136,7 +136,7 @@ static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
 
 - (ETUUID *)UUID
 {
-	return [_oldRevisionID revisionUUID];
+	return [_newRevisionID revisionUUID];
 }
 
 - (ETUUID *)branchUUID
@@ -146,8 +146,7 @@ static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
 
 - (NSDictionary *)metadata
 {
-	// TODO: Use -revision once no inverse is pushed on the stack
-	return [[self oldRevision] metadata];
+	return [[self revision] metadata];
 }
 
 - (NSString *)type

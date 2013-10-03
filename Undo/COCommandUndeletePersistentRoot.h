@@ -6,12 +6,12 @@
 @interface COCommandCreatePersistentRoot : COCommandUndeletePersistentRoot
 {
 	@private
-    CORevisionID *_revisionID;
+    CORevisionID *_initialRevisionID;
 }
 
 /**
- * The initial revision ID that is never nil.
+ * The persistent root initial revision ID (never nil).
  */
-@property (nonatomic, strong) CORevisionID *revisionID;
+@property (nonatomic, strong) CORevisionID *initialRevisionID;
 
 @end

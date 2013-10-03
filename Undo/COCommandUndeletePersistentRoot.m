@@ -4,6 +4,9 @@
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
+#import "CORevision.h"
+#import "CORevisionCache.h"
+#import "CORevisionID.h"
 
 @implementation COCommandUndeletePersistentRoot
 
@@ -33,13 +36,52 @@
 @end
 
 
+static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevisionID";
+
 @implementation COCommandCreatePersistentRoot
+
+- (id) initWithPlist: (id)plist
+{
+    self = [super initWithPlist: plist];
+	if (self == nil)
+		return nil;
+
+   	_initialRevisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOCommandInitialRevisionID]];
+    return self;
+}
+
+- (id) plist
+{
+    NSMutableDictionary *result = [super plist];
+    [result setObject: [_initialRevisionID plist] forKey: kCOCommandInitialRevisionID];
+    return result;
+}
 
 - (COCommand *) inverse
 {
     COCommandDeletePersistentRoot *inverse = (id)[super inverse];
-	inverse.revisionID = _revisionID;
+	inverse.initialRevisionID = _initialRevisionID;
     return inverse;
+}
+
+- (CORevision *)revision
+{
+	return [CORevisionCache revisionForRevisionID: _initialRevisionID
+	                                    storeUUID: [self storeUUID]];
+}
+
+#pragma mark -
+#pragma mark Track Node Protocol
+
+
+- (NSDictionary *)metadata
+{
+	return [[self revision] metadata];
+}
+
+- (ETUUID *)UUID
+{
+	return [_initialRevisionID revisionUUID];
 }
 
 @end
