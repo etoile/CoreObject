@@ -58,14 +58,14 @@
 	SUPERINIT;
 
 	_store =  store;
-    _revisionCache = [[CORevisionCache alloc] initWithEditingContext: self];
 	_modelRepository = [ETModelDescriptionRepository mainRepository];
 	_loadedPersistentRoots = [NSMutableDictionary new];
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
     _crossRefCache = [[COCrossPersistentRootReferenceCache alloc] init];
     _isRecordingUndo = YES;
-    
+
+	[CORevisionCache prepareCacheForStore: store];
 	[self registerAdditionalEntityDescriptions];
 
 
@@ -403,6 +403,31 @@
     return YES;
 }
 
+// FIXME: This was moved here because Typewriter expects changes to be
+// committed to store when it receives the notification. Decide if that
+// is valid or not, and add a test case.
+- (void)didCommitWithCommand: (COCommand *)command
+             persistentRoots: (NSArray *)persistentRoots
+{
+	for (COPersistentRoot *ctxt in persistentRoots)
+	{
+		[ctxt didMakeNewCommit];
+	}
+    
+    for (COPersistentRoot *ctxt in persistentRoots)
+	{
+		[ctxt sendChangeNotification];
+	}
+
+	NSDictionary *userInfo =
+		(command != nil ? D(command, kCOCommandKey) : [NSDictionary dictionary]);
+
+	[[NSNotificationCenter defaultCenter]
+		postNotificationName: COEditingContextDidCommitNotification
+		              object: self
+		            userInfo: userInfo];
+}
+
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
 	restrictedToPersistentRoots: (NSArray *)persistentRoots
                   withUndoStack: (COUndoStack *)aStack
@@ -453,21 +478,9 @@
     }
 
     ETAssert([_store commitTransactionWithUUID: _store.transactionUUID withError: NULL]);
-    [self recordEndUndoGroupWithUndoStack: aStack];
+	COCommand *command = [self recordEndUndoGroupWithUndoStack: aStack];
     
-    // FIXME: This was moved here because Typewriter expects changes to be
-    // committed to store when it receives the notification. Decide if that
-    // is valid or not, and add a test case.
-    
-    for (COPersistentRoot *ctxt in persistentRoots)
-	{
-		[ctxt didMakeNewCommit];
-	}
-    
-    for (COPersistentRoot *ctxt in persistentRoots)
-	{
-		[ctxt sendChangeNotification];
-	}
+	[self didCommitWithCommand: command persistentRoots: persistentRoots];
     
 	return revisions;
 }
@@ -570,7 +583,7 @@
 
 - (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid
 {
-    return [_revisionCache revisionForRevisionID: aRevid];
+    return [CORevisionCache revisionForRevisionID: aRevid storeUUID: [_store UUID]];
 }
 
 @end
@@ -628,3 +641,7 @@
 }
 
 @end
+
+NSString * const COEditingContextDidCommitNotification =
+	@"COEditingContextDidCommitNotification";
+NSString * const kCOCommandKey = @"kCOCommandKey";

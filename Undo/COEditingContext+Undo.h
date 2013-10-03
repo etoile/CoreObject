@@ -1,6 +1,6 @@
 #import <CoreObject/COEditingContext.h>
 
-@class COUndoStack;
+@class COUndoStack, COCommand;
 
 /**
  * Goals for the app level undo system:
@@ -49,14 +49,15 @@
 // Called from COEditingContext
 
 - (void) recordBeginUndoGroup;
-- (void) recordEndUndoGroupWithUndoStack: (COUndoStack *)aStack;
+- (COCommand *) recordEndUndoGroupWithUndoStack: (COUndoStack *)aStack;
 
 - (void) recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot;
 - (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot;
 
 // Called from COPersistentRoot
 
-- (void) recordPersistentRootCreation: (COPersistentRoot *)info;
+- (void) recordPersistentRootCreation: (COPersistentRoot *)aPersistentRoot
+                  atInitialRevisionID: (CORevisionID *)aRevID;
 - (void) recordPersistentRoot: (COPersistentRoot *)aPersistentRoot
              setCurrentBranch: (COBranch *)aBranch
                     oldBranch: (COBranch *)oldBranch;

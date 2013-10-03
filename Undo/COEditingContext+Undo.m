@@ -37,7 +37,7 @@
     }
 }
 
-- (void) recordEndUndoGroupWithUndoStack: (COUndoStack *)aStack
+- (COCommand *) recordEndUndoGroupWithUndoStack: (COUndoStack *)aStack
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     
@@ -47,7 +47,7 @@
         {
             NSLog(@"-recordEndUndoGroup contents is empty!");
             _currentEditGroup = nil;
-            return;
+            return nil;
         }
 
         // Optimisation: collapse COCommandGroups that contain only one child
@@ -59,7 +59,10 @@
         [aStack recordCommandInverse: objectToSerialize];
         
         _currentEditGroup = nil;
+		
+		return objectToSerialize;
     }
+	return nil;
 }
 
 - (void) recordEditInverse: (COCommand*)anInverse
@@ -96,6 +99,7 @@
 // Called from COPersistentRoot
 
 - (void) recordPersistentRootCreation: (COPersistentRoot *)aPersistentRoot
+                  atInitialRevisionID: (CORevisionID *)aRevID
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
@@ -103,6 +107,8 @@
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
     edit.timestamp = [NSDate date];
+
+	// TODO: Record the initial revision ID once we don't push an inverse on the stack
     
     [self recordEditInverse: edit];
 }

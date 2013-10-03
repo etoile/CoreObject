@@ -386,7 +386,11 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
                                                             error: NULL];
         }
         ETAssert(_savedState != nil);
-        [_parentContext recordPersistentRootCreation: self];
+		CORevisionID *initialRevID = [[_savedState currentBranchInfo] currentRevisionID];
+		ETAssert(initialRevID != nil);
+
+        [_parentContext recordPersistentRootCreation: self
+		                         atInitialRevisionID: initialRevID];
         
         
         //revId = [[info currentBranchInfo] currentRevisionID];
@@ -395,7 +399,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         // because the store call -createPersistentRootWithInitialContents:
         // handles creating the initial branch.
         
-        [[self editingBranch] didMakeInitialCommitWithRevisionID: [[_savedState currentBranchInfo] currentRevisionID]];
+        [[self editingBranch] didMakeInitialCommitWithRevisionID: initialRevID];
 	}
     else
     {

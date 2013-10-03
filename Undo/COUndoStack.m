@@ -18,6 +18,16 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 @implementation COUndoStack
 
+@synthesize name = _name, store = _store, editingContext = _editingContext;
+
++ (void) initialize
+{
+	if (self != [COUndoStack class])
+		return;
+
+	[self applyTraitFromClass: [ETCollectionTrait class]];
+}
+
 - (id) initWithStore: (COUndoStackStore *)aStore name: (NSString *)aName
 {
     SUPERINIT;
@@ -25,8 +35,6 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     self.store = aStore;
     return self;
 }
-
-@synthesize name = _name, store = _store;
 
 - (NSArray *) undoNodes
 {
@@ -153,6 +161,119 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     //                                                                   object: [[self UUID] stringValue]
     //                                                                 userInfo: userInfo
     //                                                       deliverImmediately: NO];
+}
+
+#pragma mark -
+#pragma mark Track Protocol
+
+- (void)didUpdate
+{
+	[[NSNotificationCenter defaultCenter] 
+		postNotificationName: ETCollectionDidUpdateNotification object: self];
+}
+
+- (COCommand *)currentCommand
+{
+	return [self peekEditFromStack: kCOUndoStack forName: _name];
+}
+
+- (void)setCurrentCommand: (COCommand *)aCommand
+{
+	INVALIDARG_EXCEPTION_TEST(aCommand, [[self nodes] containsObject: aCommand]);
+
+	// TODO: Write an optimized version. For store operation commands
+	// (e.g. create branch etc.), just apply the inverse. For commit-based
+	// commands, track the set revision per persistent root in the loop,
+	// and just revert persistent roots to the collected revisions at exit time. 
+	// The collected revisions follows or matches the current command.
+	while ([[self currentCommand] isEqual: aCommand] == NO)
+	{
+    	[self popAndApplyFromStack: kCOUndoStack pushToStack: kCORedoStack name: _name toContext: [self editingContext]];
+	}
+}
+
+- (void)reloadCommands
+{
+	_commands = [[NSMutableArray alloc] initWithCapacity: 5000];
+
+	for (NSDictionary *plist in [_store stackContents: kCOUndoStack forName: _name])
+	{
+		[_commands addObject: [COCommand commandWithPlist: plist]];
+	}
+
+	// FIXME: Simplistic and invalid redo stack loading
+	for (NSDictionary *plist in [_store stackContents: kCORedoStack forName: _name])
+	{
+		[_commands addObject: [COCommand commandWithPlist: plist]];
+	}
+}
+
+- (NSArray *)nodes
+{
+	if (_commands == nil)
+	{
+		[self reloadCommands];
+	}
+	return [_commands copy];
+}
+
+- (id)nextNodeOnTrackFrom: (id <COTrackNode>)aNode backwards: (BOOL)back
+{
+	NSInteger nodeIndex = [[self nodes] indexOfObject: aNode];
+	
+	if (nodeIndex == NSNotFound)
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"Node %@ must belong to the track %@ to retrieve the previous or next node", aNode, self];
+	}
+	if (back)
+	{
+		nodeIndex--;
+	}
+	else
+	{
+		nodeIndex++;
+	}
+	
+	BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= [[self nodes] count]);
+	
+	if (hasNoPreviousOrNextNode)
+	{
+		return nil;
+	}
+	return [[self nodes] objectAtIndex: nodeIndex];
+}
+
+- (id <COTrackNode>)currentNode
+{
+	return (id)[self currentCommand];
+}
+
+- (void)setCurrentNode: (id <COTrackNode>)node
+{
+	INVALIDARG_EXCEPTION_TEST(node, [node isKindOfClass: [COCommand class]]);
+	[self setCurrentCommand: (COCommand *)node];
+	[self didUpdate];
+}
+
+- (void)undoNode: (id <COTrackNode>)aNode
+{
+	// TODO: Implement Selective Undo
+}
+
+- (BOOL)isOrdered
+{
+	return YES;
+}
+
+- (id)content
+{
+	return [self nodes];
+}
+
+- (NSArray *)contentArray
+{
+	return [NSArray arrayWithArray: [self nodes]];
 }
 
 @end

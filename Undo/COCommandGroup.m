@@ -1,4 +1,7 @@
 #import "COCommandGroup.h"
+#import "COCommand.h"
+#import "COCommandSetCurrentVersionForBranch.h"
+#import "CORevision.h"
 #import <EtoileFoundation/Macros.h>
 
 static NSString * const kCOCommandContents = @"COCommandContents";
@@ -6,6 +9,14 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 @implementation COCommandGroup
 
 @synthesize contents = _contents;
+
++ (void) initialize
+{
+	if (self != [COCommandGroup class])
+		return;
+	
+	[self applyTraitFromClass: [ETCollectionTrait class]];
+}
 
 - (id)init
 {
@@ -76,6 +87,72 @@ static NSString * const kCOCommandContents = @"COCommandContents";
     {
         [subEdit applyToContext: aContext];
     }
+}
+
+#pragma mark -
+#pragma mark Track Node Protocol
+
+- (ETUUID *)UUID
+{
+	return nil;
+}
+
+- (ETUUID *)persistentRootUUID
+{
+	return nil;
+}
+
+- (ETUUID *)branchUUID
+{
+	return nil;
+}
+
+- (NSDate *)date
+{
+	return [[_contents firstObject] date];
+}
+
+- (NSDictionary *)metadata
+{
+	for (COCommand *command in _contents)
+	{
+		BOOL hasRevision =
+			[command isKindOfClass: [COCommandSetCurrentVersionForBranch class]];
+
+		if (hasRevision)
+		{
+			return [(COCommandSetCurrentVersionForBranch *)command metadata];
+		}
+	}
+	return nil;
+}
+
+- (NSString *)type
+{
+	return [(COCommand *)[_contents firstObject] type];
+}
+
+- (NSString *)shortDescription;
+{
+	return [[self metadata] objectForKey: @"shortDescription"];
+}
+
+#pragma mark -
+#pragma mark Collection Protocol
+
+- (BOOL)isOrdered
+{
+	return YES;
+}
+
+- (id)content
+{
+	return _contents;
+}
+
+- (NSArray *)contentArray
+{
+	return [NSArray arrayWithArray: [self content]];
 }
 
 @end

@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COTrack.h>
 
-@class COEditingContext, CORevisionInfo, CORevisionID;
+@class COEditingContext, CORevisionInfo, CORevisionID, CORevisionCache;
 
 /** 
  * @group Core
@@ -38,18 +38,9 @@
 @interface CORevision : NSObject <COTrackNode>
 {
 	@private
-	COEditingContext * __weak editingContext;
+	CORevisionCache * __weak cache;
 	CORevisionInfo *revisionInfo;
 }
-
-
-/** @taskunit Editing Context */
-
-
-/** 
- * Returns the editing context to which the revision belongs to.
- */
-- (COEditingContext *)editingContext;
 
 
 /** @taskunit History Properties and Metadata */
@@ -98,10 +89,9 @@
 /** 
  * <init />
  * Initializes and returns a new revision object to represent a precise revision 
- * number in the given store. 
+ * number in the given revision cache. 
  */
-- (id)initWithEditingContext: (COEditingContext *)aContext
-                revisionInfo: (CORevisionInfo *)aRevInfo;
+- (id)initWithCache: (CORevisionCache *)aCache revisionInfo: (CORevisionInfo *)aRevInfo;
 - (CORevisionID *)revisionID;
 
 

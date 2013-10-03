@@ -80,7 +80,7 @@
 /**
  * See -[CORevision UUID].
  */
-- (CORevisionID *)revisionID;
+- (CORevisionID *)UUID;
 /**
  * See -[CORevision persistentRootUUID].
  */

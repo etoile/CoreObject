@@ -6,6 +6,7 @@
 #import "COPersistentRoot.h"
 #import "COBranch.h"
 #import "CORevision.h"
+#import "CORevisionCache.h"
 
 #import "COItemGraphDiff.h"
 #import "COObjectGraphContext.h"
@@ -116,6 +117,48 @@ static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
         
         [[branch objectGraphContext] insertOrUpdateItems: items];
     }
+}
+
+- (CORevision *)oldRevision
+{
+	return [CORevisionCache revisionForRevisionID: _oldRevisionID
+	                                    storeUUID: [self storeUUID]];
+}
+
+- (CORevision *)revision
+{
+	return [CORevisionCache revisionForRevisionID: _newRevisionID
+	                                    storeUUID: [self storeUUID]];
+}
+
+#pragma mark -
+#pragma mark Track Node Protocol
+
+- (ETUUID *)UUID
+{
+	return [_oldRevisionID revisionUUID];
+}
+
+- (ETUUID *)branchUUID
+{
+	return _branchUUID;
+}
+
+- (NSDictionary *)metadata
+{
+	// TODO: Use -revision once no inverse is pushed on the stack
+	return [[self oldRevision] metadata];
+}
+
+- (NSString *)type
+{
+	return [[self metadata] objectForKey: @"type"];
+}
+
+
+- (NSString *)shortDescription;
+{
+	return [[self metadata] objectForKey: @"shortDescription"];
 }
 
 @end

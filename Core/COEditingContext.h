@@ -282,3 +282,6 @@
 @property (weak, nonatomic, readonly) COEditingContext *editingContext;
 
 @end
+
+extern NSString * const COEditingContextDidCommitNotification;
+extern NSString * const kCOCommandKey;

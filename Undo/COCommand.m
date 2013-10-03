@@ -107,6 +107,52 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
     return [NSString stringWithFormat: @"<%@: %p> %@", [self class], self, [self plist]];
 }
 
+- (NSArray *)propertyNames
+{
+	return [[super propertyNames] arrayByAddingObjectsFromArray: 
+		A(@"metadata", @"UUID", @"persistentRootUUID", @"branchUUID", @"date",
+		  @"type", @"shortDescription")];
+}
+
+#pragma mark -
+#pragma mark Track Node Protocol
+
+- (ETUUID *)UUID
+{
+	return nil;
+}
+
+- (ETUUID *)persistentRootUUID
+{
+	return nil;
+}
+
+- (ETUUID *)branchUUID
+{
+	return nil;
+}
+
+- (NSDate *)date
+{
+	return nil;
+}
+
+- (NSDictionary *)metadata
+{
+	return nil;
+}
+
+- (NSString *)type
+{
+	// TODO: Override in subclasses to return a human-readable description
+	return [self className];
+}
+
+- (NSString *)shortDescription;
+{
+	return [[self metadata] objectForKey: @"shortDescription"];
+}
+
 @end
 
 @implementation COSingleCommand
@@ -140,6 +186,39 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
     aCopy.persistentRootUUID = _persistentRootUUID;
     aCopy.timestamp = _timestamp;
     return aCopy;
+}
+
+- (BOOL)isEqual: (id)object
+{
+	if ([object isKindOfClass: [COSingleCommand class]] == NO)
+		return NO;
+
+	return ([((COSingleCommand *)object)->_storeUUID isEqual: _storeUUID]
+		 && [((COSingleCommand *)object)->_persistentRootUUID isEqual: _persistentRootUUID]
+		 && [((COSingleCommand *)object)->_timestamp isEqualTo: _timestamp]);
+}
+
+#pragma mark -
+#pragma mark Track Node Protocol
+
+- (ETUUID *)UUID
+{
+	return nil;
+}
+
+- (ETUUID *)persistentRootUUID
+{
+	return _persistentRootUUID;
+}
+
+- (ETUUID *)branchUUID
+{
+	return nil;
+}
+
+- (NSDate *)date
+{
+	return _timestamp;
 }
 
 @end

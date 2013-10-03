@@ -5,20 +5,40 @@
 	Date:  September 2013
 	License:  Modified BSD  (see COPYING)
  */
-#import <Foundation/Foundation.h>
 
-@class CORevision;
-@class CORevisionID;
-@class COEditingContext;
+#import <Foundation/Foundation.h>
+#import <EtoileFoundation/ETUUID.h>
+
+@class CORevisionID, COSQLiteStore, CORevision;
+
 
 @interface CORevisionCache : NSObject
 {
-    COEditingContext * __weak _owner;
+	@private
+    COSQLiteStore *_store;
     NSMutableDictionary *_revisionForRevisionID;
 }
 
-- (instancetype) initWithEditingContext: (COEditingContext *)aContext;
+/** @taskunit Revision Access */
 
+
++ (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid
+                             storeUUID: (ETUUID *)aStoreUUID;
+
+
+/** @taskunit Subclassing */
+
+
+- (id) initWithStore: (COSQLiteStore *)aStore;
 - (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid;
+
+@property (nonatomic, readonly) COSQLiteStore *store;
+
+
+/** @taskunit Framework Private */
+
++ (void) prepareCacheForStore: (COSQLiteStore *)aStore;
+// TODO: Don't expose. It is a cache implementation detail.
++ (id)cacheForStoreUUID: (ETUUID *)aUUID;
 
 @end

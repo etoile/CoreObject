@@ -27,7 +27,7 @@
 #import "COItemGraphDiff.h"
 #import "COMergeInfo.h"
 #import "CORevisionID.h"
-
+#import "CORevisionCache.h"
 
 NSString * const kCOBranchLabel = @"COBranchLabel";
 
@@ -710,11 +710,13 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	NSArray *revInfos = [[self store] revisionInfosForBranchUUID: [self UUID]
 	                                                     options: options];
 	NSMutableArray *revs = [NSMutableArray array];
-	
+	CORevisionCache *cache =
+		[CORevisionCache cacheForStoreUUID: [[[self editingContext] store] UUID]];
+
 	for (CORevisionInfo *revInfo in revInfos)
 	{
-		[revs addObject: [[CORevision alloc] initWithEditingContext: [self editingContext]
-                                                       revisionInfo: revInfo]];
+		[revs addObject: [[CORevision alloc] initWithCache: cache
+		                                      revisionInfo: revInfo]];
 	}
 	return revs;
 }

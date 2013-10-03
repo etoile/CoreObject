@@ -10,17 +10,17 @@
 #import "CORevision.h"
 #import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
-#import "COEditingContext.h"
-#import "COEditingContext+Private.h"
+#import "CORevisionCache.h"
 #import "CORevisionID.h"
+
 
 @implementation CORevision
 
-- (id)initWithEditingContext: (COEditingContext *)aContext
-                revisionInfo: (CORevisionInfo *)aRevInfo
+- (id)initWithCache: (CORevisionCache *)aCache
+       revisionInfo: (CORevisionInfo *)aRevInfo
 {
 	SUPERINIT;
-	editingContext = aContext;
+	cache = aCache;
 	revisionInfo =  aRevInfo;
     assert([revisionInfo revisionID] != nil);
 	return self;
@@ -39,11 +39,6 @@
 	return [[super propertyNames] arrayByAddingObjectsFromArray: 
 		A(@"revisionNumber", @"UUID", @"date", @"type", @"shortDescription", 
 		@"longDescription", @"objectUUID", @"metadata", @"changedObjectUUIDs")];
-}
-
-- (COEditingContext *)editingContext
-{
-	return editingContext;
 }
 
 - (CORevisionID *)revisionID
@@ -65,7 +60,7 @@
     }
     
 	CORevisionID *parentRevID = [revisionInfo parentRevisionID];
-    return [editingContext revisionForRevisionID: parentRevID];
+    return [cache revisionForRevisionID: parentRevID];
 }
 
 - (ETUUID *)persistentRootUUID

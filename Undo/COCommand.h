@@ -1,10 +1,10 @@
 #import <Foundation/Foundation.h>
-
 #import <EtoileFoundation/ETUUID.h>
+#import <CoreObject/COTrack.h>
 
 @class COEditingContext;
 
-@interface COCommand : NSObject
+@interface COCommand : NSObject <COTrackNode>
 
 + (COCommand *) commandWithPlist: (id)aPlist;
 - (id) plist;

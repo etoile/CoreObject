@@ -1,6 +1,7 @@
 #import <UnitKit/UnitKit.h>
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
+#import "CORevisionCache.h"
 
 @interface TestHistoryInspection : EditingContextTestCase <UKTest>
 {
@@ -185,11 +186,12 @@
 	NSArray *revInfos = [[ctx store] revisionInfosForBranchUUID: [aBranch UUID]
 	                                                    options: options];
 	NSMutableArray *revs = [NSMutableArray array];
+	CORevisionCache *cache = [CORevisionCache cacheForStoreUUID: [[ctx store] UUID]];
 	
 	for (CORevisionInfo *revInfo in revInfos)
 	{
-		[revs addObject: [[CORevision alloc] initWithEditingContext: ctx
-                                                       revisionInfo: revInfo]];
+		[revs addObject: [[CORevision alloc] initWithCache: cache
+                                              revisionInfo: revInfo]];
 	}
 	return revs;
 }

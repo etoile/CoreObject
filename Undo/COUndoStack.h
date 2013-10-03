@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <CoreObject/COTrack.h>
 
 @class COUndoStackStore, COEditingContext, COCommand;
 
@@ -6,10 +7,13 @@ extern NSString * const COUndoStackDidChangeNotification;
 
 extern NSString * const kCOUndoStackName;
 
-@interface COUndoStack : NSObject
+@interface COUndoStack : NSObject <COTrack>
 {
+	@private
     COUndoStackStore *_store;
     NSString *_name;
+	NSMutableArray *_commands;
+	COEditingContext *_editingContext;
 }
 
 @property (strong, readonly, nonatomic) COUndoStackStore *store;
@@ -17,6 +21,12 @@ extern NSString * const kCOUndoStackName;
 
 @property (weak, readonly, nonatomic) NSArray *undoNodes;
 @property (weak, readonly, nonatomic) NSArray *redoNodes;
+
+// TODO: We need to decide whether we allow to use the same stack with multiple
+// editing contexts at the same time, or if we change -setCurrentNode: to
+// -setCurrentNode:withEditingContext:. Using multiple editing contexts with
+// the same stack seems dangerous to me.
+@property (nonatomic, strong) COEditingContext *editingContext;
 
 - (void) clear;
 
