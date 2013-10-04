@@ -46,6 +46,14 @@
 	return self;
 }
 
+- (id) copyWithZone: (NSZone *)aZone
+{
+	CODictionary *newObject = [super copyWithZone: aZone];
+	newObject->_content = [_content mutableCopyWithZone: aZone];
+	ETAssert([[newObject allKeys] isEqualToArray: [self allKeys]]);
+	return newObject;
+}
+
 - (void)willLoad
 {
 	[super willLoad];
