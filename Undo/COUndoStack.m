@@ -61,10 +61,12 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 - (void) undoWithEditingContext: (COEditingContext *)aContext
 {
     [self popAndApplyFromStack: kCOUndoStack pushToStack: kCORedoStack name: _name toContext: aContext];
+	[self didUpdate];
 }
 - (void) redoWithEditingContext: (COEditingContext *)aContext
 {
     [self popAndApplyFromStack: kCORedoStack pushToStack: kCOUndoStack name: _name toContext: aContext];
+	[self didUpdate];
 }
 
 - (void) clear
@@ -141,6 +143,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 - (void) recordCommandInverse: (COCommand *)aCommand
 {
+	NILARG_EXCEPTION_TEST(aCommand);
     id plist = [aCommand plist];
     //NSLog(@"Undo event: %@", plist);
     
@@ -151,6 +154,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     
     [_store pushAction: plist stack: kCOUndoStack forName: _name];
     
+	[self updateCommandsWithNewCommand: aCommand];
     [self postNotificationsForStackName: _name];
 }
 
@@ -177,6 +181,28 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 		postNotificationName: ETCollectionDidUpdateNotification object: self];
 }
 
+- (void)updateCommandsWithNewCommand: (COCommand *)newCommand
+{
+	COCommand *currentCommand = [self currentCommand];
+	NSParameterAssert(newCommand == nil || [newCommand isEqual: currentCommand]);
+	BOOL currentCommandUnchanged =
+		(newCommand == nil && [currentCommand isEqual: [_commands lastObject]]);
+	
+	if (currentCommandUnchanged || _commands == nil)
+		return;
+
+	if (newCommand != nil)
+	{
+		[_commands addObject: newCommand];
+	}
+	else
+	{
+		// TODO: Optimize to reload just the new nodes
+		[self reloadCommands];
+	}
+	[self didUpdate];
+}
+
 - (COCommand *)currentCommand
 {
 	return [self peekEditFromStack: kCOUndoStack forName: _name];
@@ -186,15 +212,32 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 {
 	INVALIDARG_EXCEPTION_TEST(aCommand, [[self nodes] containsObject: aCommand]);
 
-	// TODO: Write an optimized version. For store operation commands
-	// (e.g. create branch etc.), just apply the inverse. For commit-based
-	// commands, track the set revision per persistent root in the loop,
-	// and just revert persistent roots to the collected revisions at exit time. 
-	// The collected revisions follows or matches the current command.
-	while ([[self currentCommand] isEqual: aCommand] == NO)
+	NSUInteger oldIndex = [[self nodes] indexOfObject: [self currentCommand]];
+	NSUInteger newIndex = [[self nodes] indexOfObject: aCommand];
+	BOOL isUndo = (newIndex < oldIndex);
+	BOOL isRedo = (newIndex > oldIndex);
+
+	if (isUndo)
 	{
-    	[self popAndApplyFromStack: kCOUndoStack pushToStack: kCORedoStack name: _name toContext: [self editingContext]];
+		// TODO: Write an optimized version. For store operation commands
+		// (e.g. create branch etc.), just apply the inverse. For commit-based
+		// commands, track the set revision per persistent root in the loop,
+		// and just revert persistent roots to the collected revisions at exit time.
+		// The collected revisions follows or matches the current command.
+		while ([[self currentCommand] isEqual: aCommand] == NO)
+		{
+			[self popAndApplyFromStack: kCOUndoStack pushToStack: kCORedoStack name: _name toContext: [self editingContext]];
+		}
 	}
+	else if (isRedo)
+	{
+		// TODO: Write an optimized version (see above).
+		while ([[self currentCommand] isEqual: aCommand] == NO)
+		{
+			[self popAndApplyFromStack: kCORedoStack pushToStack: kCOUndoStack name: _name toContext: [self editingContext]];
+		}
+	}
+	[self didUpdate];
 }
 
 - (void)reloadCommands
@@ -207,7 +250,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	}
 
 	// FIXME: Simplistic and invalid redo stack loading
-	for (NSDictionary *plist in [_store stackContents: kCORedoStack forName: _name])
+	for (NSDictionary *plist in [[_store stackContents: kCORedoStack forName: _name] reverseObjectEnumerator])
 	{
 		[_commands addObject: [COCommand commandWithPlist: plist]];
 	}
@@ -258,7 +301,6 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 {
 	INVALIDARG_EXCEPTION_TEST(node, [node isKindOfClass: [COCommand class]]);
 	[self setCurrentCommand: (COCommand *)node];
-	[self didUpdate];
 }
 
 - (void)undoNode: (id <COTrackNode>)aNode
