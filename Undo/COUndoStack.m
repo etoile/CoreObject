@@ -144,17 +144,10 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 - (void) recordCommand: (COCommand *)aCommand
 {
 	NILARG_EXCEPTION_TEST(aCommand);
-    id plist = [aCommand plist];
-    //NSLog(@"Undo event: %@", plist);
-    
-    // N.B. The kCOUndoStack contains COCommands that are the inverse of
-    // what the user did. So if the user creates a persistent root,
-    // we push an edit to kCOUndoStack that deletes that persistent root.
-    // => to perform an undo, pop from the kCOUndoStack and apply the edit.
-    
-    [_store pushAction: plist stack: kCOUndoStack forName: _name];
-    
-	[self updateCommandsWithNewCommand: aCommand];
+
+	[self discardRedoCommands];
+	[self addNewUndoCommand: aCommand];
+
     [self postNotificationsForStackName: _name];
 }
 
@@ -181,25 +174,30 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 		postNotificationName: ETCollectionDidUpdateNotification object: self];
 }
 
-- (void)updateCommandsWithNewCommand: (COCommand *)newCommand
+- (void)discardRedoCommands
 {
+	[_store clearStack: kCORedoStack forName: _name];
+
+	if (_commands == nil)
+		return;
+
+	NSUInteger currentIndex = [_commands indexOfObject: [self currentCommand]];
+	[_commands removeObjectsFromIndex: currentIndex + 1];
+}
+
+- (void)addNewUndoCommand: (COCommand *)newCommand
+{
+	[_store pushAction: [newCommand plist] stack: kCOUndoStack forName: _name];
+
 	COCommand *currentCommand = [self currentCommand];
-	NSParameterAssert(newCommand == nil || [newCommand isEqual: currentCommand]);
-	BOOL currentCommandUnchanged =
-		(newCommand == nil && [currentCommand isEqual: [_commands lastObject]]);
+	NSParameterAssert([newCommand isEqual: currentCommand]);
+	BOOL currentCommandUnchanged = [currentCommand isEqual: [_commands lastObject]];
 	
 	if (currentCommandUnchanged || _commands == nil)
 		return;
 
-	if (newCommand != nil)
-	{
-		[_commands addObject: newCommand];
-	}
-	else
-	{
-		// TODO: Optimize to reload just the new nodes
-		[self reloadCommands];
-	}
+	[_commands addObject: newCommand];
+	
 	[self didUpdate];
 }
 
