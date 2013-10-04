@@ -60,16 +60,6 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 	if ([object isKindOfClass: [COCommandGroup class]] == NO)
 		return NO;
 
-	for (int i = 0; i < [_contents count]; i++)
-	{
-		id obj = [_contents objectAtIndex: i];
-		id otherObj = [((COCommandGroup *)object)->_contents objectAtIndex: i];
-		
-		if ([obj isEqual: otherObj] == NO)
-		{
-			NSLog(@"Not equal");
-		}
-	}
 	return ([((COCommandGroup *)object)->_contents isEqual: _contents]);
 }
 
