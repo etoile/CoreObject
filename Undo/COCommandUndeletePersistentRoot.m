@@ -21,6 +21,7 @@
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
+	NILARG_EXCEPTION_TEST(aContext);
     if (nil == [aContext persistentRootForUUID: _persistentRootUUID])
     {
         return NO;
@@ -30,6 +31,7 @@
 
 - (void) applyToContext: (COEditingContext *)aContext
 {
+	NILARG_EXCEPTION_TEST(aContext);
     [[aContext persistentRootForUUID: _persistentRootUUID] setDeleted: NO];
 }
 

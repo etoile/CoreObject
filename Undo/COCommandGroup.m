@@ -81,6 +81,7 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
+	NILARG_EXCEPTION_TEST(aContext);
     for (COCommand *subEdit in _contents)
     {
         if (![subEdit canApplyToContext: aContext])
@@ -93,6 +94,7 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 
 - (void) applyToContext: (COEditingContext *)aContext
 {
+	NILARG_EXCEPTION_TEST(aContext);
     for (COCommand *subEdit in _contents)
     {
         [subEdit applyToContext: aContext];

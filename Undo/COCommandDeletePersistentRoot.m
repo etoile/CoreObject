@@ -60,6 +60,7 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
+	NILARG_EXCEPTION_TEST(aContext);
     if (nil == [aContext persistentRootForUUID: _persistentRootUUID])
     {
         return NO;
@@ -69,6 +70,7 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 - (void) applyToContext: (COEditingContext *)aContext
 {
+	NILARG_EXCEPTION_TEST(aContext);
     [[aContext persistentRootForUUID: _persistentRootUUID] setDeleted: YES];
 }
 

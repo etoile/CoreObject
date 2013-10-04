@@ -44,14 +44,18 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
+	NILARG_EXCEPTION_TEST(aContext);
     return YES;
 }
 
 - (void) applyToContext: (COEditingContext *)aContext
 {
+	NILARG_EXCEPTION_TEST(aContext);
+
     COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
     COBranch *branch = [proot branchForUUID: _newBranchUUID];
-    
+    ETAssert(branch != nil);
+
     [proot setCurrentBranch: branch];
 }
 
