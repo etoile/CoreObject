@@ -163,12 +163,76 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 @synthesize persistentRootUUID = _persistentRootUUID;
 @synthesize timestamp = _timestamp;
 
+#pragma mark -
+#pragma mark Date Serialization
+
++ (void)initialize
+{
+	if (self != [COSingleCommand class])
+		return;
+
+	/* Ensure -[NSDate isEqual:] compares -timeIntervalSinceReferenceDate, and 
+	   we can convert -timeIntervalSinceReferenceDate to NSDate and back without 
+	   any rounding. */
+	NSDate *date = [NSDate date];
+	ETAssert([date isEqual:
+		[NSDate dateWithTimeIntervalSinceReferenceDate: [date timeIntervalSinceReferenceDate]]]);
+}
+
+// TODO: Factor basicNumberForDecimalNumber() in a common place so we can reuse it in COItem+JSON
+
+/* 
+ * Returning the parsed value as a NSNumber rather a NSDecimalNumber to ensure 
+ * the rounding is the same than the serialized NSNumber object.
+ *
+ * Without this workaround, 123.456789012 roundtrip doesn't succeed on 10.7 (see
+ * -testJSONDoubleEquality in TestItem.m)).
+ *
+ * For 123.456789012, NSJSONSerialization returns a NSDecimalNumber, but the 
+ * rounding doesn't produce the same internal representation than a NSNumber 
+ * initialized with the same double value.
+ */
+static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
+{
+	return [NSNumber numberWithDouble: [[aValue description] doubleValue]];
+}
+
+// NOTE: We serialize date objects as NSTimeInterval number to get a subsecond
+// precision.
+// Serializing dates as real dates strings using NSDateFormatter is very complex
+// so we don't do it. See http://oleb.net/blog/2011/11/working-with-date-and-time-in-cocoa-part-2/
+
+- (NSDate *)dateFromNumber: (NSNumber *)aNumber
+{
+	NILARG_EXCEPTION_TEST(aNumber);
+	NSNumber *basicNumber = basicNumberFromDecimalNumber(aNumber);
+	NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate: [basicNumber doubleValue]];
+
+	ETAssert(date != nil);
+	ETAssert([date timeIntervalSinceReferenceDate] == [basicNumber doubleValue]);
+	return date;
+}
+
+- (NSNumber *)numberFromDate: (NSDate *)aDate
+{
+	NILARG_EXCEPTION_TEST(aDate);
+	NSNumber *dateNumber = [NSNumber numberWithDouble: [aDate timeIntervalSinceReferenceDate]];
+
+	ETAssert(dateNumber != nil);
+	ETAssert([aDate timeIntervalSinceReferenceDate] == [dateNumber doubleValue]);
+	return dateNumber;
+}
+
+#pragma mark -
+#pragma mark Initialization
+
 - (id) initWithPlist: (id)plist
 {
     SUPERINIT;
     self.storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandStoreUUID]];
     self.persistentRootUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandPersistentRootUUID]];
-    self.timestamp = [[[NSDateFormatter alloc] init] dateFromString: [plist objectForKey: kCOCommandTimestamp]];
+	ETAssert([plist objectForKey: kCOCommandTimestamp] != nil);
+    self.timestamp = [self dateFromNumber: [plist objectForKey: kCOCommandTimestamp]];
     return self;
 }
 
@@ -177,7 +241,7 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
     NSMutableDictionary *result = [super plist];
     [result setObject: [_storeUUID stringValue] forKey: kCOCommandStoreUUID];
     [result setObject: [_persistentRootUUID stringValue] forKey: kCOCommandPersistentRootUUID];
-    [result setObject: [[[NSDateFormatter alloc] init] stringFromDate: _timestamp] forKey: kCOCommandTimestamp];
+    [result setObject: [self numberFromDate: _timestamp] forKey: kCOCommandTimestamp];
     return result;
 }
 
@@ -197,7 +261,7 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
 	return ([((COSingleCommand *)object)->_storeUUID isEqual: _storeUUID]
 		 && [((COSingleCommand *)object)->_persistentRootUUID isEqual: _persistentRootUUID]
-		 && [((COSingleCommand *)object)->_timestamp isEqualTo: _timestamp]);
+		 && [((COSingleCommand *)object)->_timestamp isEqual: _timestamp]);
 }
 
 #pragma mark -
