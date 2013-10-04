@@ -141,7 +141,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     return [_store commitTransaction];
 }
 
-- (void) recordCommandInverse: (COCommand *)aCommand
+- (void) recordCommand: (COCommand *)aCommand
 {
 	NILARG_EXCEPTION_TEST(aCommand);
     id plist = [aCommand plist];

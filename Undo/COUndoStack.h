@@ -36,8 +36,8 @@ extern NSString * const kCOUndoStackName;
 - (void) undoWithEditingContext: (COEditingContext *)aContext;
 - (void) redoWithEditingContext: (COEditingContext *)aContext;
 
-// Private
+/** @taskunit Framework Private */
 
-- (void) recordCommandInverse: (COCommand *)aCommand;
+- (void) recordCommand: (COCommand *)aCommand;
 
 @end

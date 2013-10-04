@@ -56,7 +56,7 @@
             ? [_currentEditGroup.contents firstObject]
             : _currentEditGroup;
         
-        [aStack recordCommandInverse: objectToSerialize];
+        [aStack recordCommand: objectToSerialize];
         
         _currentEditGroup = nil;
 		
@@ -65,11 +65,9 @@
 	return nil;
 }
 
-- (void) recordEditInverse: (COCommand*)anInverse
+- (void) recordCommand: (COCommand *)aCommand
 {
-    [anInverse plist];
-    
-    [_currentEditGroup.contents addObject: anInverse];
+    [_currentEditGroup.contents addObject: aCommand];
 }
 
 // Called from COEditingContext
@@ -82,7 +80,7 @@
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
     edit.timestamp = [NSDate date];
-    [self recordEditInverse: edit];
+    [self recordCommand: edit];
 }
 - (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot
 {
@@ -92,7 +90,7 @@
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot persistentRootUUID];
     edit.timestamp = [NSDate date];
-    [self recordEditInverse: edit];
+    [self recordCommand: edit];
 }
 
 // Called from COPersistentRoot
@@ -108,7 +106,7 @@
     edit.timestamp = [NSDate date];
 	edit.initialRevisionID = aRevID;
     
-    [self recordEditInverse: edit];
+    [self recordCommand: edit];
 }
 - (void) recordPersistentRoot: (COPersistentRoot *)aPersistentRoot
              setCurrentBranch: (COBranch *)aBranch
@@ -124,7 +122,7 @@
     edit.oldBranchUUID = [oldBranch UUID];
     edit.branchUUID = [aBranch UUID];
     
-    [self recordEditInverse: edit];
+    [self recordCommand: edit];
 }
 
 // Called from COBranch
@@ -141,7 +139,7 @@
     
     edit.branchUUID = [aBranch UUID];
     
-    [self recordEditInverse: edit];
+    [self recordCommand: edit];
 }
 
 - (void) recordBranchSetCurrentRevisionID: (CORevisionID *)current
@@ -160,7 +158,7 @@
     edit.oldRevisionID = old;
     edit.revisionID = current;
     
-    [self recordEditInverse: edit];
+    [self recordCommand: edit];
 }
 
 - (void) recordBranchSetMetadata: (COBranch *)aBranch
@@ -177,7 +175,7 @@
     edit.oldMetadata = oldMetadata;
     edit.metadata = [aBranch metadata];
     
-    [self recordEditInverse: edit];
+    [self recordCommand: edit];
 }
 
 - (void) recordBranchDeletion: (COBranch *)aBranch
@@ -191,7 +189,7 @@
     
     edit.branchUUID = [aBranch UUID];
     
-    [self recordEditInverse: edit];
+    [self recordCommand: edit];
 }
 
 - (void) recordBranchUndeletion: (COBranch *)aBranch
@@ -205,7 +203,7 @@
     
     edit.branchUUID = [aBranch UUID];
     
-    [self recordEditInverse: edit];
+    [self recordCommand: edit];
 }
 
 @end
