@@ -25,6 +25,7 @@
 - (void)testNotificationOnUndo
 {
     COUndoStack *stack = [[COUndoStackStore defaultStore] stackForName: @"test"];
+	[stack setEditingContext: ctx];
     [stack clear];
     
     [[persistentRoot rootObject] setLabel: @"world"];
@@ -39,7 +40,7 @@
                                                                     timesNotified++;
                                                                 }];
     
-    [stack undoWithEditingContext: ctx];
+    [stack undo];
     
     [[NSNotificationCenter defaultCenter] removeObserver: observer];
     

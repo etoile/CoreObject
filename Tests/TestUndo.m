@@ -19,9 +19,13 @@
     SUPERINIT;
     
     _testStack =  [[COUndoStackStore defaultStore] stackForName: @"test"];
+	[_testStack setEditingContext: ctx];
     _setupStack =  [[COUndoStackStore defaultStore] stackForName: @"setup"];
+	[_setupStack setEditingContext: ctx];
     _rootEditStack =  [[COUndoStackStore defaultStore] stackForName: @"rootEdit"];
+	[_rootEditStack setEditingContext: ctx];
     _childEditStack =  [[COUndoStackStore defaultStore] stackForName: @"childEdit"];
+	[_childEditStack setEditingContext: ctx];
     
     [_testStack clear];
     [_setupStack clear];
@@ -44,7 +48,7 @@
     
     UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: kCOLabel]);
     
-    [_testStack undoWithEditingContext: ctx];
+    [_testStack undo];
     
     UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
 }
@@ -62,7 +66,7 @@
     CORevision *persistentRoot1Revision = [persistentRoot1 revision];
     CORevision *persistentRoot2Revision = [persistentRoot2 revision];
     
-    [_testStack undoWithEditingContext: ctx];
+    [_testStack undo];
     
     UKObjectsNotEqual([persistentRoot1 revision], persistentRoot1Revision);
     UKObjectsNotEqual([persistentRoot2 revision], persistentRoot2Revision);
@@ -91,6 +95,9 @@
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
 
+		[_rootEditStack setEditingContext: ctx2];
+		[_childEditStack setEditingContext: ctx2];
+
         COObject *root = [ctx2persistentRoot rootObject];
         COObject *child = [[root valueForProperty: kCOContents] firstObject];
         
@@ -98,25 +105,25 @@
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
         
         // Selective undo
-        [_rootEditStack undoWithEditingContext: ctx2];
+        [_rootEditStack undo];
         
         UKNil([root valueForProperty: kCOLabel]);
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
         
         // Selective undo    
-        [_childEditStack undoWithEditingContext: ctx2];
+        [_childEditStack undo];
         
         UKNil([root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
         
         // Selective Redo
-        [_rootEditStack redoWithEditingContext: ctx2];
+        [_rootEditStack redo];
         
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
         
         // Selective Redo
-        [_childEditStack redoWithEditingContext: ctx2];
+        [_childEditStack redo];
         
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
@@ -136,11 +143,13 @@
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
-        
+
+		[_testStack setEditingContext: ctx2];
+
         UKFalse([ctx2secondBranch isDeleted]);
-        [_testStack undoWithEditingContext: ctx2];
+        [_testStack undo];
         UKTrue([ctx2secondBranch isDeleted]);
-        [_testStack redoWithEditingContext: ctx2];
+        [_testStack redo];
         UKFalse([ctx2secondBranch isDeleted]);
     }
 }
@@ -159,12 +168,14 @@
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
-        
+
+		[_testStack setEditingContext: ctx2];
+
         UKNotNil(ctx2secondBranch);
         UKFalse([ctx2secondBranch isDeleted]);
-        [_testStack undoWithEditingContext: ctx2];
+        [_testStack undo];
         UKTrue([ctx2secondBranch isDeleted]);
-        [_testStack redoWithEditingContext: ctx2];
+        [_testStack redo];
         UKFalse([ctx2secondBranch isDeleted]);
     }
 }
@@ -185,11 +196,13 @@
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
-        
+		
+		[_testStack setEditingContext: ctx2];
+		
         UKTrue([ctx2secondBranch isDeleted]);
-        [_testStack undoWithEditingContext: ctx2];
+        [_testStack undo];
         UKFalse([ctx2secondBranch isDeleted]);
-        [_testStack redoWithEditingContext: ctx2];
+        [_testStack redo];
         UKTrue([ctx2secondBranch isDeleted]);
     }
 }
@@ -207,11 +220,13 @@
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
-        
+
+		[_testStack setEditingContext: ctx2];
+
         UKObjectsEqual(D(@"world2", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
-        [_testStack undoWithEditingContext: ctx2];
+        [_testStack undo];
         UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
-        [_testStack redoWithEditingContext: ctx2];
+        [_testStack redo];
         UKObjectsEqual(D(@"world2", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
     }
 }
@@ -236,16 +251,18 @@
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
         COBranch *ctx2originalBranch = [ctx2persistentRoot branchForUUID: [originalBranch UUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
-        
+
+		[_testStack setEditingContext: ctx2];
+
         UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
         UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
         
-        [_testStack undoWithEditingContext: ctx2];
+        [_testStack undo];
         
         UKObjectsEqual(ctx2originalBranch, [ctx2persistentRoot currentBranch]);
         UKObjectsEqual(@"hello", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
         
-        [_testStack redoWithEditingContext: ctx2];
+        [_testStack redo];
         
         UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
         UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
@@ -261,11 +278,13 @@
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
-                
+		
+		[_testStack setEditingContext: ctx2];
+		
         UKFalse([ctx2persistentRoot isDeleted]);
-        [_testStack undoWithEditingContext: ctx2];
+        [_testStack undo];
         UKTrue([ctx2persistentRoot isDeleted]);
-        [_testStack redoWithEditingContext: ctx2];
+        [_testStack redo];
         UKFalse([ctx2persistentRoot isDeleted]);
     }
 }
@@ -282,11 +301,13 @@
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
-        
-        UKTrue([ctx2persistentRoot isDeleted]);
-        [_testStack undoWithEditingContext: ctx2];
+
+		[_testStack setEditingContext: ctx2];
+
+		UKTrue([ctx2persistentRoot isDeleted]);
+        [_testStack undo];
         UKFalse([ctx2persistentRoot isDeleted]);
-        [_testStack redoWithEditingContext: ctx2];
+        [_testStack redo];
         UKTrue([ctx2persistentRoot isDeleted]);
     }
 }
@@ -294,10 +315,11 @@
 - (void) testStackAPI
 {
     COUndoStack *testStack = [[COUndoStackStore defaultStore] stackForName: @"test"];
+	[testStack setEditingContext: ctx];
     UKObjectsEqual(@[], [testStack undoNodes]);
     UKObjectsEqual(@[], [testStack redoNodes]);
-    UKFalse([testStack canRedoWithEditingContext: ctx]);
-    UKFalse([testStack canUndoWithEditingContext: ctx]);
+    UKFalse([testStack canRedo]);
+    UKFalse([testStack canUndo]);
     
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commitWithUndoStack: testStack];
@@ -307,12 +329,12 @@
     
     UKIntsEqual(2, [[testStack undoNodes] count]);
     UKObjectsEqual(@[], [testStack redoNodes]);
-    UKFalse([testStack canRedoWithEditingContext: ctx]);
-    UKTrue([testStack canUndoWithEditingContext: ctx]);
+    UKFalse([testStack canRedo]);
+    UKTrue([testStack canUndo]);
     
     UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: kCOLabel]);
     
-    [testStack undoWithEditingContext: ctx];
+    [testStack undo];
     
     UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
 }
@@ -324,8 +346,11 @@
     [ctx commitWithUndoStack: _setupStack];
 
     COUndoStack *workspaceStack = [[COUndoStackStore defaultStore] stackForPattern: @"workspace.%"];
+	[workspaceStack setEditingContext: ctx];
     COUndoStack *workspaceDoc1Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc1"];
+	[workspaceDoc1Stack setEditingContext: ctx];
     COUndoStack *workspaceDoc2Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc2"];
+	[workspaceDoc2Stack setEditingContext: ctx];
     [workspaceStack clear];
 
     // doc1 commits
@@ -345,36 +370,36 @@
     // experiment...
 
     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
-    [workspaceStack undoWithEditingContext: ctx];
+    [workspaceStack undo];
     UKObjectsEqual(@"doc2", [[doc2 rootObject] label]);
     
-    [workspaceStack undoWithEditingContext: ctx];
+    [workspaceStack undo];
     UKNil([[doc2 rootObject] label]);
 
     UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
-    [workspaceStack undoWithEditingContext: ctx];
+    [workspaceStack undo];
     UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
     
-    [workspaceStack undoWithEditingContext: ctx];
+    [workspaceStack undo];
     UKNil([[doc1 rootObject] label]);
     
     // redo on doc2
     
-    [workspaceDoc2Stack redoWithEditingContext: ctx];
+    [workspaceDoc2Stack redo];
     UKNil([[doc1 rootObject] label]);
     UKObjectsEqual(@"doc2", [[doc2 rootObject] label]);
 
-    [workspaceDoc2Stack redoWithEditingContext: ctx];
+    [workspaceDoc2Stack redo];
     UKNil([[doc1 rootObject] label]);
     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
 
     // redo on doc1
     
-    [workspaceDoc1Stack redoWithEditingContext: ctx];
+    [workspaceDoc1Stack redo];
     UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
 
-    [workspaceDoc1Stack redoWithEditingContext: ctx];
+    [workspaceDoc1Stack redo];
     UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
 }

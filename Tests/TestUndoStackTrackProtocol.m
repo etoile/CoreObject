@@ -22,6 +22,7 @@
 {
     SUPERINIT;
 	stack = [[COUndoStackStore defaultStore] stackForName: @"test"];
+	[stack setEditingContext: ctx];
 	[stack clear];
 	
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
@@ -73,21 +74,21 @@
 	
 	// Now perform an undo with the COUndoStack API
 	
-	[stack undoWithEditingContext: ctx];
+	[stack undo];
 	current = [stack currentNode];
 	[self checkCommand: current isSetVersionFrom: r2 to: r3];
 	
 	// Perform another few undos
 	
-	[stack undoWithEditingContext: ctx];
+	[stack undo];
 	current = [stack currentNode];
 	[self checkCommand: current isSetVersionFrom: r1 to: r2];
 
-	[stack undoWithEditingContext: ctx];
+	[stack undo];
 	current = [stack currentNode];
 	[self checkCommand: current isSetVersionFrom: r0 to: r1];
 	
-	[stack undoWithEditingContext: ctx];
+	[stack undo];
 	current = [stack currentNode];
 	// FIXME: Not sure what to check here. It probaly should be some placeholder
 	// for being at the beginning of the stack.
@@ -108,7 +109,7 @@
 	
 	// Perform an undo
 	
-	[stack undoWithEditingContext: ctx];
+	[stack undo];
 	current = [stack currentNode];
 		
 	[self checkCommand: current isSetVersionFrom: r2 to: r3];
@@ -123,7 +124,7 @@
 
 	// Perform another undo
 
-	[stack undoWithEditingContext: ctx];
+	[stack undo];
 	current = [stack currentNode];
 	
 	[self checkCommand: current isSetVersionFrom: r1 to: r2];
@@ -144,10 +145,10 @@
 #if 0
 - (void) testNextNodeOnTrackFromNil
 {
-	[stack undoWithEditingContext: ctx];
-	[stack undoWithEditingContext: ctx];
-	[stack undoWithEditingContext: ctx];
-	[stack undoWithEditingContext: ctx];
+	[stack undo];
+	[stack undo];
+	[stack undo];
+	[stack undo];
 
 	id <COTrackNode> current = [stack currentNode];
 	
@@ -180,22 +181,22 @@
 
 - (void) testNodesUnaffectedBy1Undo
 {
-	[stack undoWithEditingContext: ctx];
+	[stack undo];
 	[self checkNodes: [stack nodes]];
 }
 
 - (void) testNodesUnaffectedBy2Undos
 {
-	[stack undoWithEditingContext: ctx];
-	[stack undoWithEditingContext: ctx];
+	[stack undo];
+	[stack undo];
 	[self checkNodes: [stack nodes]];
 }
 
 - (void) testNodesUnaffectedBy3Undos
 {
-	[stack undoWithEditingContext: ctx];
-	[stack undoWithEditingContext: ctx];
-	[stack undoWithEditingContext: ctx];
+	[stack undo];
+	[stack undo];
+	[stack undo];
 	[self checkNodes: [stack nodes]];
 	// FIXME: Should work after one more undo?
 }

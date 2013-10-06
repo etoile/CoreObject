@@ -18,8 +18,11 @@
 	SUPERINIT;
 
     _workspaceStack =  [[COUndoStackStore defaultStore] stackForName: @"workspace"];
+	[_workspaceStack setEditingContext: ctx];
     _doc1Stack =  [[COUndoStackStore defaultStore] stackForName: @"doc1"];
+	[_doc1Stack setEditingContext: ctx];
     _doc2Stack =  [[COUndoStackStore defaultStore] stackForName: @"doc2"];
+	[_doc2Stack setEditingContext: ctx];
 
     [_workspaceStack clear];
     [_doc1Stack clear];
@@ -228,85 +231,85 @@
 
 	// first undo should change leaf4's label from "Carol" -> "Leaf 4"
 	UKObjectsEqual(@"Carol", [leaf4 valueForProperty: kCOLabel]);
-	[_doc1Stack undoWithEditingContext: ctx];
+	[_doc1Stack undo];
     UKObjectsEqual(@"Leaf 4", [leaf4 valueForProperty: kCOLabel]);
     
 	// next undo should remove leaf4 from group1
     
     UKObjectsEqual(S(leaf1, leaf4), SA([group1 contentArray]));
-	[_doc1Stack undoWithEditingContext: ctx];
+	[_doc1Stack undo];
 	UKObjectsEqual(S(leaf1), SA([group1 contentArray]));
 
 	// next undo should change leaf1's label from "Alice (cell)" -> "Alice"
     
 	UKObjectsEqual(@"Alice (cell)", [leaf1 valueForProperty: kCOLabel]);
-	[_doc1Stack undoWithEditingContext: ctx];
+	[_doc1Stack undo];
 	UKObjectsEqual(@"Alice", [leaf1 valueForProperty: kCOLabel]);
 
 	// next undo should change leaf1's label from "Alice" -> "Leaf 1"
     
 	UKObjectsEqual(@"Alice", [leaf1 valueForProperty: kCOLabel]);
-	[_doc1Stack undoWithEditingContext: ctx];
+	[_doc1Stack undo];
 	UKObjectsEqual(@"Leaf 1", [leaf1 valueForProperty: kCOLabel]);
 
 	// next undo should change group1's label from "Work Contacts" -> "Group 1"
     
 	UKObjectsEqual(@"Work Contacts", [group1 valueForProperty: kCOLabel]);
-	[_doc1Stack undoWithEditingContext: ctx];
+	[_doc1Stack undo];
 	UKObjectsEqual(@"Group 1", [group1 valueForProperty: kCOLabel]);
 	
 	// next undo should move leaf2 from group2 back to group1
     
 	UKTrue([[group2 contentArray] containsObject: leaf2]);
 	UKFalse([[group1 contentArray] containsObject: leaf2]);
-	[_doc1Stack undoWithEditingContext: ctx];
+	[_doc1Stack undo];
 	UKFalse([[group2 contentArray] containsObject: leaf2]);
 	UKTrue([[group1 contentArray] containsObject: leaf2]);
 
     // next undo would change leaf2's label from "Tomatoes" -> "Leaf 2"
     // but we already changed it on doc2's track to "Cheese", so we can't undo
     
-    UKFalse([_doc1Stack canUndoWithEditingContext: ctx]);
+    UKFalse([_doc1Stack canUndo]);
     
     // Undo some changes on doc2
     
 	// next undo should change leaf6's label from "Beer" -> "Leaf 6"
     
 	UKObjectsEqual(@"Beer", [leaf6 valueForProperty: kCOLabel]);
-	[_doc2Stack undoWithEditingContext: ctx];
+	[_doc2Stack undo];
 	UKObjectsEqual(@"Leaf 6", [leaf6 valueForProperty: kCOLabel]);
     
 	// next undo should change leaf5's label from "Pizza" -> "Leaf 5"
     
 	UKObjectsEqual(@"Pizza", [leaf5 valueForProperty: kCOLabel]);
-	[_doc2Stack undoWithEditingContext: ctx];
+	[_doc2Stack undo];
 	UKObjectsEqual(@"Leaf 5", [leaf5 valueForProperty: kCOLabel]);
     
     // next undo should remove leaf6 from group2.
     // Note that an undo on doc1's track already removed leaf2
     
     UKObjectsEqual(S(leaf3, leaf5, leaf6), SA([group2 contentArray]));
-	[_doc2Stack undoWithEditingContext: ctx];
+	[_doc2Stack undo];
     UKObjectsEqual(S(leaf3, leaf5), SA([group2 contentArray]));
     
     // next undo should remove leaf5 from group2.
     
     UKObjectsEqual(S(leaf3, leaf5), SA([group2 contentArray]));
-	[_doc2Stack undoWithEditingContext: ctx];
+	[_doc2Stack undo];
     UKObjectsEqual(S(leaf3), SA([group2 contentArray]));
     
 	// next undo should change leaf2's label from "Cheese" -> "Tomatoes"
     
 	UKObjectsEqual(@"Cheese", [leaf2 valueForProperty: kCOLabel]);
-	[_doc2Stack undoWithEditingContext: ctx];
+	[_doc2Stack undo];
 	UKObjectsEqual(@"Tomatoes", [leaf2 valueForProperty: kCOLabel]);
 
     // This should enable undo on doc1's track to proceed.
     
-    UKTrue([_doc1Stack canUndoWithEditingContext: ctx]);
+    UKTrue([_doc1Stack canUndo]);
     
     UKObjectsEqual(@"Tomatoes", [leaf2 valueForProperty: kCOLabel]);
-	[_doc1Stack undoWithEditingContext: ctx];
+	[_doc1Stack undo];
 	UKObjectsEqual(@"Leaf 2", [leaf2 valueForProperty: kCOLabel]);
 }
 
