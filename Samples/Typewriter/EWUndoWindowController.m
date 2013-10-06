@@ -58,7 +58,7 @@
     [stackLabel setStringValue: [[_inspectedDocument undoStack] name]];
 }
 
-- (void) setUndoStack: (COUndoStack *)stack
+- (void) setUndoStack: (COUndoTrack *)stack
 {
     [table reloadData];
 }
@@ -89,14 +89,14 @@
 
 - (void) undoStackDidChange: (NSNotification *)notif
 {
-    NSLog(@"Undo stack did change: %@", [notif userInfo]);
+    NSLog(@"undo track did change: %@", [notif userInfo]);
     
     NSString *stackName = [notif userInfo][kCOUndoStackName];
     
     [table reloadData];
 }
 
-- (COUndoStack *)undoStack
+- (COUndoTrack *)undoStack
 {
     return [_inspectedDocument undoStack];
 }
@@ -105,7 +105,7 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    COUndoStack *stack = [self undoStack];
+    COUndoTrack *stack = [self undoStack];
     
     NSUInteger undoNodes = [[stack undoNodes] count];
     NSUInteger redoNodes = [[stack redoNodes] count];
@@ -115,7 +115,7 @@
 
 - (id<COUndoNode>) nodeAtIndex: (NSUInteger)anIndex
 {
-    COUndoStack *stack = [self undoStack];
+    COUndoTrack *stack = [self undoStack];
     
     NSArray *undoNodes = [stack undoNodes];
     NSArray *redoNodes = [stack redoNodes];

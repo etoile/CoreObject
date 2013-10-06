@@ -13,7 +13,7 @@
 @class COPersistentRoot, COEditingContext, COObjectGraphContext;
 @class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo, CORevisionID, COPath;
 @class COCrossPersistentRootReferenceCache, COUndoStackStore, COCommandGroup;
-@class COUndoStack, CORevisionCache;
+@class COUndoTrack, CORevisionCache;
 
 // I'm skeptical that there is ever a legitimate case where code is working
 // with an id<COPersistentObjectContext> and doesn't know whether it's an
@@ -241,7 +241,7 @@
  */
 - (NSArray *)commit;
 
-- (void) commitWithUndoStack: (COUndoStack *)aStack;
+- (void) commitWithUndoStack: (COUndoTrack *)aStack;
 
 // TODO: Change to -commitWithType:shortDescription:error:
 /**

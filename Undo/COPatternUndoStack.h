@@ -1,5 +1,5 @@
-#import "COUndoStack.h"
+#import "COUndoTrack.h"
 
-@interface COPatternUndoStack : COUndoStack
+@interface COPatternUndoStack : COUndoTrack
 
 @end

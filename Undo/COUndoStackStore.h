@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-@class COUndoStack;
+@class COUndoTrack;
 @class FMDatabase;
 
 extern NSString * const kCOUndoStack;
@@ -17,8 +17,8 @@ extern NSString * const kCORedoStack;
 
 + (COUndoStackStore *) defaultStore;
 
-- (COUndoStack *) stackForName: (NSString *)aName;
-- (COUndoStack *) stackForPattern: (NSString *)aPattern;
+- (COUndoTrack *) stackForName: (NSString *)aName;
+- (COUndoTrack *) stackForPattern: (NSString *)aPattern;
 
 /** @taskunit Framework Private */
 

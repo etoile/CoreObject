@@ -5,9 +5,9 @@
 
 @interface TestHistoryTrack : EditingContextTestCase <UKTest>
 {
-    COUndoStack *_workspaceStack;
-    COUndoStack *_doc1Stack;
-    COUndoStack *_doc2Stack;
+    COUndoTrack *_workspaceStack;
+    COUndoTrack *_doc1Stack;
+    COUndoTrack *_doc2Stack;
 }
 @end
 

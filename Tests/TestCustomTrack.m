@@ -5,8 +5,8 @@
 
 @interface TestCustomTrack : EditingContextTestCase <UKTest>
 {
-    COUndoStack *_testStack;
-    COUndoStack *_setupStack;
+    COUndoTrack *_testStack;
+    COUndoTrack *_setupStack;
 }
 @end
 

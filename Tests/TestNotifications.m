@@ -24,7 +24,7 @@
 
 - (void)testNotificationOnUndo
 {
-    COUndoStack *stack = [[COUndoStackStore defaultStore] stackForName: @"test"];
+    COUndoTrack *stack = [[COUndoStackStore defaultStore] stackForName: @"test"];
 	[stack setEditingContext: ctx];
     [stack clear];
     

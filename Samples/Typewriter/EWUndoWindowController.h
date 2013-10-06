@@ -3,7 +3,7 @@
 #import "EWUtilityWindowController.h"
 
 @class COPersistentRoot;
-@class COUndoStack;
+@class COUndoTrack;
 @class EWDocument;
 
 @interface EWUndoWindowController : EWUtilityWindowController <NSTableViewDelegate, NSTableViewDataSource>

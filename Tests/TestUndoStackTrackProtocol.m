@@ -6,7 +6,7 @@
 @interface TestUndoStackTrackProtocol : EditingContextTestCase <UKTest>
 {
     COPersistentRoot *persistentRoot;
-	COUndoStack *stack;
+	COUndoTrack *stack;
 	
 	CORevision *r0; // not on stack
 	CORevision *r1;

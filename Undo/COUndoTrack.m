@@ -10,7 +10,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 
 #import "COUndoStackStore.h"
-#import "COUndoStack.h"
+#import "COUndoTrack.h"
 #import "COEditingContext+Undo.h"
 #import "COEditingContext+Private.h"
 #import "COCommand.h"
@@ -18,12 +18,12 @@
 NSString * const COUndoStackDidChangeNotification = @"COUndoStackDidChangeNotification";
 NSString * const kCOUndoStackName = @"COUndoStackName";
 
-@interface COUndoStack ()
+@interface COUndoTrack ()
 @property (strong, readwrite, nonatomic) COUndoStackStore *store;
 @property (strong, readwrite, nonatomic) NSString *name;
 @end
 
-@implementation COUndoStack
+@implementation COUndoTrack
 
 @synthesize name = _name, store = _store, editingContext = _editingContext;
 
@@ -32,7 +32,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 + (void) initialize
 {
-	if (self != [COUndoStack class])
+	if (self != [COUndoTrack class])
 		return;
 
 	[self applyTraitFromClass: [ETCollectionTrait class]];
@@ -157,7 +157,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
         [NSException raise: NSInvalidArgumentException format: @"Can't apply edit %@", edit];
     }
     
-    // Pop from undo stack
+    // Pop from undo track
     [_store popStack: popStack forName: aName];
     
     // Apply the edit

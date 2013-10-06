@@ -1,6 +1,6 @@
 #import <CoreObject/COEditingContext.h>
 
-@class COUndoStack, COCommand;
+@class COUndoTrack, COCommand;
 
 /**
  * Goals for the app level undo system:
@@ -16,11 +16,11 @@
  * (stored in ~/Library/CoreObject/Undo/undo.sqlite)
  *
  * When saving a batch of changes with a COEditingContext, you can optionally
- * record the edits in an undo stack. You can pass any string you want to
+ * record the edits in an undo track. You can pass any string you want to
  * -commitWithStackNamed: and the inverse edit (or edit group) will be pushed onto that
  * persistent stack, creating it if needed.
  *
- * The undo stack database (COUndoStackStore) stores pairs of undo/redo stacks
+ * The undo track database (COUndoStackStore) stores pairs of undo/redo stacks
  * indexed by name. The name is just a flat string; we may want to have suggested 
  * naming schemes. Examples could be:
  *
@@ -34,13 +34,13 @@
  *
  * This design should support all of these use-cases:
  *
- *  - per-window/tab/pane undo stacks when editing a single persistent root
+ *  - per-window/tab/pane undo tracks when editing a single persistent root
  *    (e.g. for a graphics editor with split views editing two different parts
  *     of a a document, each pane can have its own stack)
  *
- *  - per-app undo stack for a manager application editing many persistent roots
+ *  - per-app undo track for a manager application editing many persistent roots
  *
- *  - per-user undo stacks when editing a shared document.
+ *  - per-user undo tracks when editing a shared document.
  */
 @interface COEditingContext (Undo)
 
@@ -49,7 +49,7 @@
 // Called from COEditingContext
 
 - (void) recordBeginUndoGroup;
-- (COCommand *) recordEndUndoGroupWithUndoStack: (COUndoStack *)aStack;
+- (COCommand *) recordEndUndoGroupWithUndoStack: (COUndoTrack *)aStack;
 
 - (void) recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot;
 - (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot;

@@ -430,7 +430,7 @@
 
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
 	restrictedToPersistentRoots: (NSArray *)persistentRoots
-                  withUndoStack: (COUndoStack *)aStack
+                  withUndoStack: (COUndoTrack *)aStack
 {
 	// TODO: We could organize validation errors by persistent root. Each
 	// persistent root might result in a validation error that contains a
@@ -485,7 +485,7 @@
 	return revisions;
 }
 
-- (void) commitWithUndoStack: (COUndoStack *)aStack
+- (void) commitWithUndoStack: (COUndoTrack *)aStack
 {
     [self commitWithMetadata: nil
  restrictedToPersistentRoots: [_loadedPersistentRoots allValues]

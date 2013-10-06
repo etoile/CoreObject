@@ -94,7 +94,7 @@
 {
     [_persistentRoot editingBranch].shouldMakeEmptyCommit = YES;
     
-    // Since we don't push it on an undo stack, the user can't undo "saving"
+    // Since we don't push it on an undo track, the user can't undo "saving"
     [_persistentRoot commitWithType: @"userInvokedSave" shortDescription: @"Save"];
 }
 
@@ -242,7 +242,7 @@
     [self commit];
 }
 
-- (COUndoStack *)undoStack
+- (COUndoTrack *)undoStack
 {
     NSString *name = [NSString stringWithFormat: @"typewriter-%@-%@",
                       [_persistentRoot persistentRootUUID],
@@ -306,7 +306,7 @@
         [mergeInfo.diff applyTo: [master objectGraphContext]];
         
         // HACK: should be a regular -commit, I guess, but there's a bug where
-        // -commit uses the last used undo stack, instead of none. So explicitly pass nil,
+        // -commit uses the last used undo track, instead of none. So explicitly pass nil,
         // so this commit doesn't record an undo command.
         [[dest editingContext] commitWithUndoStack: nil];
     }

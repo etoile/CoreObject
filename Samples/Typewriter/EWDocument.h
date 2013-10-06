@@ -48,7 +48,7 @@
 
 - (void) commit;
 
-- (COUndoStack *)undoStack;
+- (COUndoTrack *)undoStack;
 
 - (COPersistentRoot *)persistentRoot;
 

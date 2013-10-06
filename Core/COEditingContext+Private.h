@@ -9,7 +9,7 @@
 
 #import <CoreObject/COEditingContext.h>
 
-@class COUndoStack;
+@class COUndoTrack;
 
 @interface COEditingContext ()
 
@@ -58,7 +58,7 @@
  */
 - (NSArray *)commitWithMetadata: (NSDictionary *)metadata
 	restrictedToPersistentRoots: (NSArray *)persistentRoots
-                  withUndoStack: (COUndoStack *)aStack;
+                  withUndoStack: (COUndoTrack *)aStack;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

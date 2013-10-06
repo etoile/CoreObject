@@ -13,7 +13,7 @@
     COPersistentRoot *persistentRoot;
     OutlineItem *rootObj;
     COBranch *originalBranch;
-    COUndoStack *_testStack;
+    COUndoTrack *_testStack;
 }
 @end
 

@@ -5,10 +5,10 @@
 
 @interface TestUndo : EditingContextTestCase <UKTest>
 {
-    COUndoStack *_testStack;
-    COUndoStack *_setupStack;
-    COUndoStack *_rootEditStack;
-    COUndoStack *_childEditStack;
+    COUndoTrack *_testStack;
+    COUndoTrack *_setupStack;
+    COUndoTrack *_rootEditStack;
+    COUndoTrack *_childEditStack;
 }
 @end
 
@@ -314,7 +314,7 @@
 
 - (void) testStackAPI
 {
-    COUndoStack *testStack = [[COUndoStackStore defaultStore] stackForName: @"test"];
+    COUndoTrack *testStack = [[COUndoStackStore defaultStore] stackForName: @"test"];
 	[testStack setEditingContext: ctx];
     UKObjectsEqual(@[], [testStack undoNodes]);
     UKObjectsEqual(@[], [testStack redoNodes]);
@@ -345,11 +345,11 @@
     COPersistentRoot *doc2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commitWithUndoStack: _setupStack];
 
-    COUndoStack *workspaceStack = [[COUndoStackStore defaultStore] stackForPattern: @"workspace.%"];
+    COUndoTrack *workspaceStack = [[COUndoStackStore defaultStore] stackForPattern: @"workspace.%"];
 	[workspaceStack setEditingContext: ctx];
-    COUndoStack *workspaceDoc1Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc1"];
+    COUndoTrack *workspaceDoc1Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc1"];
 	[workspaceDoc1Stack setEditingContext: ctx];
-    COUndoStack *workspaceDoc2Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc2"];
+    COUndoTrack *workspaceDoc2Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc2"];
 	[workspaceDoc2Stack setEditingContext: ctx];
     [workspaceStack clear];
 

@@ -3,7 +3,7 @@
 #import "COBranch.h"
 #import "CORevision.h"
 #import "COUndoStackStore.h"
-#import "COUndoStack.h"
+#import "COUndoTrack.h"
 #import "COCommand.h"
 #import "COCommandGroup.h"
 #import <EtoileFoundation/Macros.h>
@@ -37,7 +37,7 @@
     }
 }
 
-- (COCommand *) recordEndUndoGroupWithUndoStack: (COUndoStack *)aStack
+- (COCommand *) recordEndUndoGroupWithUndoStack: (COUndoTrack *)aStack
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     
