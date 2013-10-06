@@ -1,3 +1,12 @@
+/*
+	Copyright (C) 2013 Eric Wasylishen
+
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
+	         Quentin Mathe <quentin.mathe@gmail.com>
+	Date:  September 2013
+	License:  Modified BSD  (see COPYING)
+ */
+
 #import <EtoileFoundation/EtoileFoundation.h>
 
 #import "COUndoStackStore.h"
@@ -10,15 +19,16 @@ NSString * const COUndoStackDidChangeNotification = @"COUndoStackDidChangeNotifi
 NSString * const kCOUndoStackName = @"COUndoStackName";
 
 @interface COUndoStack ()
-
 @property (strong, readwrite, nonatomic) COUndoStackStore *store;
 @property (strong, readwrite, nonatomic) NSString *name;
-
 @end
 
 @implementation COUndoStack
 
 @synthesize name = _name, store = _store, editingContext = _editingContext;
+
+#pragma mark -
+#pragma mark Initialization
 
 + (void) initialize
 {
@@ -46,6 +56,29 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     return [_store stackContents: kCORedoStack forName: _name];
 }
 
+#pragma mark -
+#pragma mark Undo and Redo
+
+- (BOOL)canUndo
+{
+	return [self canUndoWithEditingContext: [self editingContext]];
+}
+
+- (BOOL)canRedo
+{
+	return [self canRedoWithEditingContext: [self editingContext]];
+}
+
+- (void)undo
+{
+	[self undoWithEditingContext: [self editingContext]];
+}
+
+- (void)redo
+{
+	[self redoWithEditingContext: [self editingContext]];
+}
+
 - (BOOL) canUndoWithEditingContext: (COEditingContext *)aContext
 {
     COCommand *edit = [self peekEditFromStack: kCOUndoStack forName: _name];
@@ -69,12 +102,15 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	[self didUpdate];
 }
 
+#pragma mark -
+#pragma mark Managing Commands
+
 - (void) clear
 {
     [_store clearStack: kCOUndoStack forName: _name];
     [_store clearStack: kCORedoStack forName: _name];
+	[_commands removeAllObjects];
 }
-
 
 - (COCommand *) peekEditFromStack: (NSString *)aStack forName: (NSString *)aName
 {
@@ -147,8 +183,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 	[self discardRedoCommands];
 	[self addNewUndoCommand: aCommand];
-
-    [self postNotificationsForStackName: _name];
+	[self didUpdate];
 }
 
 - (void) postNotificationsForStackName: (NSString *)aStack
@@ -172,6 +207,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 {
 	[[NSNotificationCenter defaultCenter] 
 		postNotificationName: ETCollectionDidUpdateNotification object: self];
+    [self postNotificationsForStackName: _name];
 }
 
 - (void)discardRedoCommands
@@ -197,8 +233,6 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 		return;
 
 	[_commands addObject: newCommand];
-	
-	[self didUpdate];
 }
 
 - (COCommand *)currentCommand
@@ -247,8 +281,6 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 		[_commands addObject: [COCommand commandWithPlist: plist]];
 	}
 
-	// FIXME: Simplistic and invalid redo stack loading
-	// How is this invalid? The tests of -node pass in TestUndoStackProtocol. --Eric
 	for (NSDictionary *plist in [[_store stackContents: kCORedoStack forName: _name] reverseObjectEnumerator])
 	{
 		[_commands addObject: [COCommand commandWithPlist: plist]];
