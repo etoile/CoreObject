@@ -65,6 +65,7 @@
 		660D4CDA17D5C7CB003C9ACC /* COLeastCommonAncestor.m in Sources */ = {isa = PBXBuildFile; fileRef = 660D4CD817D5C7CB003C9ACC /* COLeastCommonAncestor.m */; };
 		660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 660D4CE317D689FC003C9ACC /* COMergeInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660D4CE617D689FC003C9ACC /* COMergeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 660D4CE417D689FC003C9ACC /* COMergeInfo.m */; };
+		6612A8A01800B5A700530847 /* TestUndoStackTrackProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 6612A89F1800B5A700530847 /* TestUndoStackTrackProtocol.m */; };
 		662FFB7F17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB7D17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		662FFB8017C2026000BA3F2F /* COCommandUndeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */; };
 		662FFB9E17C2DE8100BA3F2F /* COCommandUndeleteBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -478,6 +479,7 @@
 		660D4CD817D5C7CB003C9ACC /* COLeastCommonAncestor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COLeastCommonAncestor.m; path = Diff/COLeastCommonAncestor.m; sourceTree = "<group>"; };
 		660D4CE317D689FC003C9ACC /* COMergeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COMergeInfo.h; path = Diff/COMergeInfo.h; sourceTree = "<group>"; };
 		660D4CE417D689FC003C9ACC /* COMergeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COMergeInfo.m; path = Diff/COMergeInfo.m; sourceTree = "<group>"; };
+		6612A89F1800B5A700530847 /* TestUndoStackTrackProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUndoStackTrackProtocol.m; path = Tests/TestUndoStackTrackProtocol.m; sourceTree = "<group>"; };
 		662FFB7D17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandUndeletePersistentRoot.h; sourceTree = "<group>"; };
 		662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommandUndeletePersistentRoot.m; sourceTree = "<group>"; };
 		662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandUndeleteBranch.h; sourceTree = "<group>"; };
@@ -854,6 +856,7 @@
 		60C913C9165BD51800E0C5F4 /* BasicPersistence */ = {
 			isa = PBXGroup;
 			children = (
+				66C3669D17B426C0009ACF2F /* Supporting Files */,
 				60C913AD165BBE9E00E0C5F4 /* main.m */,
 			);
 			name = BasicPersistence;
@@ -1191,7 +1194,6 @@
 				66C366DA17B4288C009ACF2F /* EWUndoManager.m */,
 				66C366DB17B4288C009ACF2F /* EWUtilityWindowController.h */,
 				66C366DC17B4288C009ACF2F /* EWUtilityWindowController.m */,
-				66C3669D17B426C0009ACF2F /* Supporting Files */,
 			);
 			path = Typewriter;
 			sourceTree = "<group>";
@@ -1205,6 +1207,7 @@
 				66C366A417B426C0009ACF2F /* Typewriter-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			path = Typewriter;
 			sourceTree = "<group>";
 		};
 		66D09D58129CE477006BEDC3 /* Model */ = {
@@ -1265,6 +1268,7 @@
 				66AB075E17D5846000ADDA17 /* TestMerge.m */,
 				667C24F517E11FC900FFFC85 /* TestNotifications.m */,
 				66470C7117E3D4B200A7E0A9 /* TestHistoryInspection.m */,
+				6612A89F1800B5A700530847 /* TestUndoStackTrackProtocol.m */,
 				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				667F1ECE179C81BE0083C3E6 /* Store Tests */,
 				667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */,
@@ -1804,6 +1808,7 @@
 				66860BA417BED42900B24333 /* TestSQLiteStorePersistentRootBackingStore.m in Sources */,
 				66860BA517BED42900B24333 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
+				6612A8A01800B5A700530847 /* TestUndoStackTrackProtocol.m in Sources */,
 				66808498178DB4D5003A3CC6 /* TestBranch.m in Sources */,
 				66C18AD517BAB2EE00C5316F /* TestEditingContext.m in Sources */,
 				663CE2CD17C1837700E729F5 /* TestUndoStackStore.m in Sources */,

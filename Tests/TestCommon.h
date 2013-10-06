@@ -5,6 +5,15 @@
 #import "COSynchronizationClient.h"
 #import "COSynchronizationServer.h"
 
+#import "COCommandGroup.h"
+#import "COCommandDeleteBranch.h"
+#import "COCommandUndeleteBranch.h"
+#import "COCommandSetBranchMetadata.h"
+#import "COCommandSetCurrentBranch.h"
+#import "COCommandSetCurrentVersionForBranch.h"
+#import "COCommandDeletePersistentRoot.h"
+#import "COCommandUndeletePersistentRoot.h"
+
 #import "OutlineItem.h"
 #import "Tag.h"
 

@@ -7,6 +7,9 @@ extern NSString * const COUndoStackDidChangeNotification;
 
 extern NSString * const kCOUndoStackName;
 
+// FIXME: Confusing name, because a COUndoStack actually represents
+// a pair of stacks (undo and redo). Rename to "COUndoLog" ?
+// COUndoHistory ?
 @interface COUndoStack : NSObject <COTrack>
 {
 	@private
