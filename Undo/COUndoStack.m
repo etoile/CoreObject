@@ -248,6 +248,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	}
 
 	// FIXME: Simplistic and invalid redo stack loading
+	// How is this invalid? The tests of -node pass in TestUndoStackProtocol. --Eric
 	for (NSDictionary *plist in [[_store stackContents: kCORedoStack forName: _name] reverseObjectEnumerator])
 	{
 		[_commands addObject: [COCommand commandWithPlist: plist]];
