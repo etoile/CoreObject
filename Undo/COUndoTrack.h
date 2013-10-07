@@ -132,11 +132,6 @@ extern NSString * const kCOUndoStackName;
 /** @taskunit Deprecated */
 
 
-- (BOOL) canUndoWithEditingContext: (COEditingContext *)aContext;
-- (BOOL) canRedoWithEditingContext: (COEditingContext *)aContext;
-- (void) undoWithEditingContext: (COEditingContext *)aContext;
-- (void) redoWithEditingContext: (COEditingContext *)aContext;
-
 @property (weak, readonly, nonatomic) NSArray *undoNodes;
 @property (weak, readonly, nonatomic) NSArray *redoNodes;
 

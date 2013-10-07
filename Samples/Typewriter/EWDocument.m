@@ -335,20 +335,20 @@
 
 - (void) undo
 {
-    [[self undoStack] undoWithEditingContext: [_persistentRoot editingContext]];
+    [[self undoStack] undo];
 }
 - (void) redo
 {
-    [[self undoStack] redoWithEditingContext: [_persistentRoot editingContext]];
+    [[self undoStack] redo];
 }
 
 - (BOOL) canUndo
 {
-    return [[self undoStack] canUndoWithEditingContext: [_persistentRoot editingContext]];
+    return [[self undoStack] canUndo];
 }
 - (BOOL) canRedo
 {
-    return [[self undoStack] canRedoWithEditingContext: [_persistentRoot editingContext]];
+    return [[self undoStack] canRedo];
 }
 
 - (NSString *) undoMenuItemTitle
