@@ -85,44 +85,25 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 - (BOOL)canUndo
 {
-	return [self canUndoWithEditingContext: [self editingContext]];
+    COCommand *edit = [self peekEditFromStack: kCOUndoStack forName: _name];
+    return [self canApplyEdit: edit toContext: _editingContext];
 }
 
 - (BOOL)canRedo
 {
-	return [self canRedoWithEditingContext: [self editingContext]];
+    COCommand *edit = [self peekEditFromStack: kCORedoStack forName: _name];
+    return [self canApplyEdit: edit toContext: _editingContext];
 }
 
 - (void)undo
 {
-	[self undoWithEditingContext: [self editingContext]];
+    [self popAndApplyFromStack: kCOUndoStack pushToStack: kCORedoStack name: _name toContext: _editingContext];
+	[self didUpdate];
 }
 
 - (void)redo
 {
-	[self redoWithEditingContext: [self editingContext]];
-}
-
-- (BOOL) canUndoWithEditingContext: (COEditingContext *)aContext
-{
-    COCommand *edit = [self peekEditFromStack: kCOUndoStack forName: _name];
-    return [self canApplyEdit: edit toContext: aContext];
-}
-
-- (BOOL) canRedoWithEditingContext: (COEditingContext *)aContext
-{
-    COCommand *edit = [self peekEditFromStack: kCORedoStack forName: _name];
-    return [self canApplyEdit: edit toContext: aContext];
-}
-
-- (void) undoWithEditingContext: (COEditingContext *)aContext
-{
-    [self popAndApplyFromStack: kCOUndoStack pushToStack: kCORedoStack name: _name toContext: aContext];
-	[self didUpdate];
-}
-- (void) redoWithEditingContext: (COEditingContext *)aContext
-{
-    [self popAndApplyFromStack: kCORedoStack pushToStack: kCOUndoStack name: _name toContext: aContext];
+    [self popAndApplyFromStack: kCORedoStack pushToStack: kCOUndoStack name: _name toContext: _editingContext];
 	[self didUpdate];
 }
 

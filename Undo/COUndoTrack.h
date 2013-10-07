@@ -56,6 +56,8 @@ extern NSString * const kCOUndoStackName;
  * You can navigate the command sequence to change the editing context state 
  * using -undo, -redo and -setCurrentNode:. COUndoStack supports the same 
  * history navigation protocol than COBranch.
+ *
+ * You shouldn't subclass COUndoTrack.
  */
 @interface COUndoTrack : NSObject <COTrack>
 {
@@ -70,8 +72,24 @@ extern NSString * const kCOUndoStackName;
 /** @taskunit Track Access and Creation */
 
 
+/**
+ * Returns the persistent track bound to the given name, or creates it in case 
+ * it doesn't exist yet. 
+ *
+ * See -editingContext.
+ */
 + (COUndoTrack *)trackForName: (NSString *)aName
            withEditingContext: (COEditingContext *)aContext;
+/**
+ * Returns a non-recordable track that provides a union view over all persistent 
+ * tracks that match the given pattern.
+ *
+ * The returned track must not be passed to commit methods e.g.  
+ * -[COEditingContext commmitWithIdentitifer:undoTrack:], otherwise the commit 
+ * raises an exception.
+ *
+ * See -editingContext.
+ */
 + (COUndoTrack *)trackForPattern: (NSString *)aPattern
               withEditingContext: (COEditingContext *)aContext;
 
