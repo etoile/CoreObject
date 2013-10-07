@@ -344,7 +344,8 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 {
 	return [_parentContext commitWithMetadata: metadata
                   restrictedToPersistentRoots: A(self)
-                               withUndoTracks: nil];
+                               withUndoTracks: nil
+	                                    error: NULL];
 }
 
 - (BOOL)isPersistentRootUncommitted

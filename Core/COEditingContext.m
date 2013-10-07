@@ -355,36 +355,7 @@
 	ETAssert([self hasChanges] == NO);
 }
 
-#pragma mark Committing Changes
-#pragma mark -
-
-- (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
-                  undoTracks: (NSArray *)undoTracks
-                       error: (NSError **)anError
-{
-	return NO;
-}
-
-- (BOOL)commit
-{
-	return [self commitWithType: nil shortDescription: nil];
-}
-
-- (BOOL)commitWithType: (NSString *)type
-      shortDescription: (NSString *)shortDescription
-{
-	NSString *commitType = type;
-	
-	if (type == nil)
-	{
-		commitType = @"Unknown";
-	}
-	if (shortDescription == nil)
-	{
-		shortDescription = @"";
-	}
-	return [self commitWithMetadata: D(shortDescription, @"shortDescription", commitType, @"type")];
-}
+#pragma Validation
 
 - (void)didFailValidationWithError: (COError *)anError
 {
@@ -411,6 +382,42 @@
 	return ([aContext error] == nil);
 #endif
     return YES;
+}
+
+#pragma mark Committing Changes
+#pragma mark -
+
+- (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
+                  undoTracks: (NSArray *)undoTracks
+                       error: (NSError **)anError
+{
+	NILARG_EXCEPTION_TEST(aCommitDescriptorId);
+
+	return [self commitWithMetadata: D(aCommitDescriptorId, kCOCommitMetadataIdentifier)
+		restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
+	                 withUndoTracks: undoTracks
+	                          error: anError];
+}
+
+- (BOOL)commit
+{
+	return [self commitWithType: nil shortDescription: nil];
+}
+
+- (BOOL)commitWithType: (NSString *)type
+      shortDescription: (NSString *)shortDescription
+{
+	NSString *commitType = type;
+	
+	if (type == nil)
+	{
+		commitType = @"Unknown";
+	}
+	if (shortDescription == nil)
+	{
+		shortDescription = @"";
+	}
+	return [self commitWithMetadata: D(shortDescription, @"shortDescription", commitType, @"type")];
 }
 
 // FIXME: This was moved here because Typewriter expects changes to be
@@ -441,6 +448,7 @@
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
 	restrictedToPersistentRoots: (NSArray *)persistentRoots
 	             withUndoTracks: (NSArray *)tracks
+                          error: (NSError **)anError
 {
 	// TODO: We could organize validation errors by persistent root. Each
 	// persistent root might result in a validation error that contains a
@@ -449,8 +457,6 @@
 	// inner object.
 	if ([self validateChangedObjectsForContext: self] == NO)
 		return NO;
-
-	NSMutableArray *revisions = [NSMutableArray array];
 
 	/* Commit persistent root changes (deleted persistent roots included) */
 
@@ -500,14 +506,16 @@
 {
     return [self commitWithMetadata: nil
         restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
-	                 withUndoTracks: A(aTrack)];
+	                 withUndoTracks: A(aTrack)
+	                          error: NULL];
 }
 
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
 {
 	return [self commitWithMetadata: metadata
 		restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
-                     withUndoTracks: nil];
+                     withUndoTracks: nil
+	                          error: NULL];
 }
 
 - (void) unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
