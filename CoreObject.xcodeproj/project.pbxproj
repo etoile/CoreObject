@@ -66,6 +66,8 @@
 		660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 660D4CE317D689FC003C9ACC /* COMergeInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660D4CE617D689FC003C9ACC /* COMergeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 660D4CE417D689FC003C9ACC /* COMergeInfo.m */; };
 		6612A8A01800B5A700530847 /* TestUndoStackTrackProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 6612A89F1800B5A700530847 /* TestUndoStackTrackProtocol.m */; };
+		662AC93D1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 662AC93B1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h */; };
+		662AC93E1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 662AC93C1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m */; };
 		662FFB7F17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB7D17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		662FFB8017C2026000BA3F2F /* COCommandUndeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */; };
 		662FFB9E17C2DE8100BA3F2F /* COCommandUndeleteBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -480,6 +482,8 @@
 		660D4CE317D689FC003C9ACC /* COMergeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COMergeInfo.h; path = Diff/COMergeInfo.h; sourceTree = "<group>"; };
 		660D4CE417D689FC003C9ACC /* COMergeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COMergeInfo.m; path = Diff/COMergeInfo.m; sourceTree = "<group>"; };
 		6612A89F1800B5A700530847 /* TestUndoStackTrackProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUndoStackTrackProtocol.m; path = Tests/TestUndoStackTrackProtocol.m; sourceTree = "<group>"; };
+		662AC93B1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEndOfUndoTrackPlaceholderNode.h; sourceTree = "<group>"; };
+		662AC93C1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEndOfUndoTrackPlaceholderNode.m; sourceTree = "<group>"; };
 		662FFB7D17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandUndeletePersistentRoot.h; sourceTree = "<group>"; };
 		662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommandUndeletePersistentRoot.m; sourceTree = "<group>"; };
 		662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandUndeleteBranch.h; sourceTree = "<group>"; };
@@ -896,6 +900,8 @@
 				667C24D317E106C900FFFC85 /* COPatternUndoStack.h */,
 				667C24D417E106C900FFFC85 /* COPatternUndoStack.m */,
 				6646976E17CDBBF200A1B767 /* COUndoNode.h */,
+				662AC93B1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h */,
+				662AC93C1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m */,
 			);
 			path = Undo;
 			sourceTree = "<group>";
@@ -1381,6 +1387,7 @@
 				663CE29917C07ED800E729F5 /* COCommandDeleteBranch.h in Headers */,
 				663CE29B17C07ED800E729F5 /* COCommandSetBranchMetadata.h in Headers */,
 				663CE29D17C07ED800E729F5 /* COCommandSetCurrentBranch.h in Headers */,
+				662AC93D1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h in Headers */,
 				663CE29F17C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.h in Headers */,
 				663CE2A117C07ED800E729F5 /* COUndoStackStore.h in Headers */,
 				663CE2B617C0B05900E729F5 /* COEditingContext+Undo.h in Headers */,
@@ -1750,6 +1757,7 @@
 				669724EE17D464400090B31A /* COSequenceInsertion.m in Sources */,
 				669724F217D4646E0090B31A /* COSequenceModification.m in Sources */,
 				660D4CDA17D5C7CB003C9ACC /* COLeastCommonAncestor.m in Sources */,
+				662AC93E1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m in Sources */,
 				660D4CE617D689FC003C9ACC /* COMergeInfo.m in Sources */,
 				667C24D617E106C900FFFC85 /* COPatternUndoStack.m in Sources */,
 				60CAAC6517E3117E00E8E2B1 /* COTrack.m in Sources */,

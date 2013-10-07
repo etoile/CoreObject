@@ -90,9 +90,7 @@
 	
 	[stack undo];
 	current = [stack currentNode];
-	// FIXME: Not sure what to check here. It probaly should be some placeholder
-	// for being at the beginning of the stack.
-	UKNil(current);
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], current);
 }
 
 - (void) testPreviousAndNextNodeWithUndo
@@ -139,11 +137,7 @@
 
 }
 
-// FIXME: This doesn't work because [stack currentNode] returns nil when
-// we have undone back to the start of the track, and -nextNodeOnTrackFrom:backwards:
-// does not handle that
-#if 0
-- (void) testNextNodeOnTrackFromNil
+- (void) testNextNodeOnTrackFromPlaceholder
 {
 	[stack undo];
 	[stack undo];
@@ -151,22 +145,23 @@
 	[stack undo];
 
 	id <COTrackNode> current = [stack currentNode];
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], current);
 	
 	current = [stack nextNodeOnTrackFrom: current backwards: NO];
 	[self checkCommand: current isSetVersionFrom: r0 to: r1];
 }
-#endif
 
 - (void) checkNodes: (NSArray *)nodes
 {
 	// FIXME: This will need to be adjusted if we add the placeholder start
 	// node as discussed above
 	
-	UKIntsEqual(4, [nodes count]);
-	[self checkCommand: nodes[0] isSetVersionFrom: r0 to: r1];
-	[self checkCommand: nodes[1] isSetVersionFrom: r1 to: r2];
-	[self checkCommand: nodes[2] isSetVersionFrom: r2 to: r3];
-	[self checkCommand: nodes[3] isSetVersionFrom: r3 to: r4];
+	UKIntsEqual(5, [nodes count]);
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], nodes[0]);
+	[self checkCommand: nodes[1] isSetVersionFrom: r0 to: r1];
+	[self checkCommand: nodes[2] isSetVersionFrom: r1 to: r2];
+	[self checkCommand: nodes[3] isSetVersionFrom: r2 to: r3];
+	[self checkCommand: nodes[4] isSetVersionFrom: r3 to: r4];
 }
 
 - (void) testNodes
@@ -198,7 +193,15 @@
 	[stack undo];
 	[stack undo];
 	[self checkNodes: [stack nodes]];
-	// FIXME: Should work after one more undo?
+}
+
+- (void) testNodesUnaffectedBy4Undos
+{
+	[stack undo];
+	[stack undo];
+	[stack undo];
+	[stack undo];
+	[self checkNodes: [stack nodes]];
 }
 
 - (void) testSetCurrentNode
@@ -224,6 +227,38 @@
 
 	[self checkCommand: [stack currentNode] isSetVersionFrom: r3 to: r4];
 	UKObjectsEqual(r4, [persistentRoot revision]);
+}
+
+- (void) testSetCurrentNodeToPlaceholder
+{
+	id <COTrackNode> target = [stack currentNode];
+	target = [stack nextNodeOnTrackFrom: target backwards: YES];
+	target = [stack nextNodeOnTrackFrom: target backwards: YES];
+	target = [stack nextNodeOnTrackFrom: target backwards: YES];
+	target = [stack nextNodeOnTrackFrom: target backwards: YES];
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], target);
+	
+	// Undo back 4 nodes
+	
+	stack.editingContext = ctx;
+	[stack setCurrentNode: target];
+
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [stack currentNode]);
+	UKFalse([stack canUndo]);
+	UKTrue([stack canRedo]);
+	UKObjectsEqual(@"0", [[persistentRoot rootObject] label]);
+	UKObjectsEqual(r0, [persistentRoot revision]);
+	
+	// Redo 1 node
+	
+	target = [stack nextNodeOnTrackFrom: target backwards: NO];
+	[stack setCurrentNode: target];
+	
+	[self checkCommand: [stack currentNode] isSetVersionFrom: r0 to: r1];
+	UKTrue([stack canUndo]);
+	UKTrue([stack canRedo]);
+	UKObjectsEqual(@"1", [[persistentRoot rootObject] label]);
+	UKObjectsEqual(r1, [persistentRoot revision]);
 }
 
 @end

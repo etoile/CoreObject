@@ -104,19 +104,6 @@ extern NSString * const kCOUndoStackName;
  */
 - (void)redo;
 
-
-/** @taskunit Managing Commands */
-
-
-/**
- * The command closest to the current state in the editing context.
- *
- * If no undo and redo has occurred since the last commit, the current command 
- * is the last object among -[COTrack nodes].
- *
- * See also -[COTrack currentNode] and -[COTrack nodes].
- */
-@property (nonatomic, readonly) COCommand *currentCommand;
 /**
  * Discards all the commands.
  */

@@ -13,6 +13,7 @@
 #import "COCommandSetCurrentVersionForBranch.h"
 #import "COCommandDeletePersistentRoot.h"
 #import "COCommandUndeletePersistentRoot.h"
+#import "COEndOfUndoTrackPlaceholderNode.h"
 
 #import "OutlineItem.h"
 #import "Tag.h"

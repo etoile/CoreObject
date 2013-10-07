@@ -14,6 +14,7 @@
 #import "COEditingContext+Undo.h"
 #import "COEditingContext+Private.h"
 #import "COCommand.h"
+#import "COEndOfUndoTrackPlaceholderNode.h"
 
 NSString * const COUndoStackDidChangeNotification = @"COUndoStackDidChangeNotification";
 NSString * const kCOUndoStackName = @"COUndoStackName";
@@ -244,7 +245,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 {
 	INVALIDARG_EXCEPTION_TEST(aCommand, [[self nodes] containsObject: aCommand]);
 
-	NSUInteger oldIndex = [[self nodes] indexOfObject: [self currentCommand]];
+	NSUInteger oldIndex = [[self nodes] indexOfObject: [self currentNode]];
 	NSUInteger newIndex = [[self nodes] indexOfObject: aCommand];
 	BOOL isUndo = (newIndex < oldIndex);
 	BOOL isRedo = (newIndex > oldIndex);
@@ -256,7 +257,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 		// commands, track the set revision per persistent root in the loop,
 		// and just revert persistent roots to the collected revisions at exit time.
 		// The collected revisions follows or matches the current command.
-		while ([[self currentCommand] isEqual: aCommand] == NO)
+		while ([[self currentNode] isEqual: aCommand] == NO)
 		{
 			[self popAndApplyFromStack: kCOUndoStack pushToStack: kCORedoStack name: _name toContext: [self editingContext]];
 		}
@@ -264,7 +265,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	else if (isRedo)
 	{
 		// TODO: Write an optimized version (see above).
-		while ([[self currentCommand] isEqual: aCommand] == NO)
+		while ([[self currentNode] isEqual: aCommand] == NO)
 		{
 			[self popAndApplyFromStack: kCORedoStack pushToStack: kCOUndoStack name: _name toContext: [self editingContext]];
 		}
@@ -276,6 +277,8 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 {
 	_commands = [[NSMutableArray alloc] initWithCapacity: 5000];
 
+	[_commands addObject: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
+	
 	for (NSDictionary *plist in [_store stackContents: kCOUndoStack forName: _name])
 	{
 		[_commands addObject: [COCommand commandWithPlist: plist]];
@@ -325,12 +328,18 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 - (id <COTrackNode>)currentNode
 {
-	return (id)[self currentCommand];
+	id <COTrackNode> command = [self currentCommand];
+	if (command == nil)
+	{
+		command = [COEndOfUndoTrackPlaceholderNode sharedInstance];
+	}
+	return command;
 }
 
 - (void)setCurrentNode: (id <COTrackNode>)node
 {
-	INVALIDARG_EXCEPTION_TEST(node, [node isKindOfClass: [COCommand class]]);
+	INVALIDARG_EXCEPTION_TEST(node, [node isKindOfClass: [COCommand class]]
+							|| [node isKindOfClass: [COEndOfUndoTrackPlaceholderNode class]]);
 	[self setCurrentCommand: (COCommand *)node];
 }
 
