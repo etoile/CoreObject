@@ -120,6 +120,8 @@ static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
             [items addObject: [result itemForUUID: uuid]];
         }
         
+		// FIXME: Handle cross-persistent root relationship constraint violations,
+		// if we introduce those
         [[branch objectGraphContext] insertOrUpdateItems: items];
     }
 }
