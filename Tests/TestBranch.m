@@ -13,7 +13,7 @@
     COPersistentRoot *persistentRoot;
     OutlineItem *rootObj;
     COBranch *originalBranch;
-    COUndoTrack *_testStack;
+    COUndoTrack *_testTrack;
 }
 @end
 
@@ -26,8 +26,8 @@
     rootObj =  [persistentRoot rootObject];
     originalBranch =  [persistentRoot currentBranch];
     
-    _testStack =  [[COUndoStackStore defaultStore] stackForName: @"test"];
-    [_testStack clear];
+    _testTrack = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
+    [_testTrack clear];
     
     return self;
 }
@@ -305,7 +305,7 @@
     [ctx commit];
     
     [persistentRoot setCurrentBranch: secondBranch];
-    [ctx commitWithUndoStack: _testStack];
+    [ctx commitWithUndoStack: _testTrack];
     
     // Load in another context
     {

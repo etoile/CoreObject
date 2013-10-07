@@ -5,9 +5,9 @@
 
 @interface TestHistoryTrack : EditingContextTestCase <UKTest>
 {
-    COUndoTrack *_workspaceStack;
-    COUndoTrack *_doc1Stack;
-    COUndoTrack *_doc2Stack;
+    COUndoTrack *_workspaceTrack;
+    COUndoTrack *_doc1Track;
+    COUndoTrack *_doc2Track;
 }
 @end
 
@@ -17,16 +17,13 @@
 {
 	SUPERINIT;
 
-    _workspaceStack =  [[COUndoStackStore defaultStore] stackForName: @"workspace"];
-	[_workspaceStack setEditingContext: ctx];
-    _doc1Stack =  [[COUndoStackStore defaultStore] stackForName: @"doc1"];
-	[_doc1Stack setEditingContext: ctx];
-    _doc2Stack =  [[COUndoStackStore defaultStore] stackForName: @"doc2"];
-	[_doc2Stack setEditingContext: ctx];
+    _workspaceTrack = [COUndoTrack trackForName: @"workspace" withEditingContext: ctx];
+    _doc1Track = [COUndoTrack trackForName: @"doc1" withEditingContext: ctx];
+    _doc2Track = [COUndoTrack trackForName: @"doc2" withEditingContext: ctx];
 
-    [_workspaceStack clear];
-    [_doc1Stack clear];
-    [_doc2Stack clear];
+    [_workspaceTrack clear];
+    [_doc1Track clear];
+    [_doc2Track clear];
     
 	return self;
 }
@@ -63,7 +60,7 @@
 	[document1 addObject: group2];	
 	[group2 addObject: leaf3];
 	
-	[ctx commitWithUndoStack: _workspaceStack];
+	[ctx commitWithUndoStack: _workspaceTrack];
 	
 	// workspace
 	//  |
@@ -84,15 +81,15 @@
 	
 	// Now make some changes
 		
-	[document2 setValue: @"My Shopping List" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Stack];
+	[document2 setValue: @"My Shopping List" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
 	/* undo on workspace track, doc2 track: undo the last commit. */
 	
-	[document1 setValue: @"My Contacts" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Stack];
+	[document1 setValue: @"My Contacts" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Track];
 	/* undo on workspace track, doc1 track: undo the last commit. */
 	
-	[leaf2 setValue: @"Tomatoes" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Stack];
+	[leaf2 setValue: @"Tomatoes" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Track];
 	
-	[group2 addObject: leaf2]; [ctx commitWithUndoStack: _doc1Stack];
+	[group2 addObject: leaf2]; [ctx commitWithUndoStack: _doc1Track];
 	
 	// workspace
 	//  |
@@ -111,7 +108,7 @@
 	//   \-document2
 	
 	
-	[document2 addObject: group2]; [ctx commitWithUndoStack: _doc2Stack];
+	[document2 addObject: group2]; [ctx commitWithUndoStack: _doc2Track];
 	
 	// workspace
 	//  |
@@ -130,13 +127,13 @@
 	//          \-leaf2
 	
 	
-	[group2	setValue: @"Groceries" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Stack];
-	[group1 setValue: @"Work Contacts" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Stack];
-	[leaf3 setValue: @"Wine" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Stack];
-	[leaf1 setValue: @"Alice" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Stack];
-	[leaf3 setValue: @"Red wine" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Stack];
-	[leaf2 setValue: @"Cheese" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Stack];
-	[leaf1 setValue: @"Alice (cell)" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Stack];
+	[group2	setValue: @"Groceries" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
+	[group1 setValue: @"Work Contacts" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Track];
+	[leaf3 setValue: @"Wine" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
+	[leaf1 setValue: @"Alice" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Track];
+	[leaf3 setValue: @"Red wine" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
+	[leaf2 setValue: @"Cheese" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
+	[leaf1 setValue: @"Alice (cell)" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Track];
 	
 	// introduce some new objects
 	
@@ -146,7 +143,7 @@
 	
 	// add them to the lists
 
-	[group1 addObject: leaf4]; [ctx commitWithUndoStack: _doc1Stack];
+	[group1 addObject: leaf4]; [ctx commitWithUndoStack: _doc1Track];
 	
 	// workspace
 	//  |
@@ -170,7 +167,7 @@
     
     [leaf5 setValue: @"Leaf 5" forProperty: kCOLabel];
 
-	[group2 addObject: leaf5]; [ctx commitWithUndoStack: _doc2Stack];
+	[group2 addObject: leaf5]; [ctx commitWithUndoStack: _doc2Track];
 
 	// workspace
 	//  |
@@ -196,7 +193,7 @@
     
 	[leaf6 setValue: @"Leaf 6" forProperty: kCOLabel];
 
-	[group2 addObject: leaf6]; [ctx commitWithUndoStack: _doc2Stack];
+	[group2 addObject: leaf6]; [ctx commitWithUndoStack: _doc2Track];
 
 	// workspace
 	//  |
@@ -221,9 +218,9 @@
 	//          \-leaf6
 	
 	
-	[leaf4 setValue: @"Carol" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Stack];
-	[leaf5 setValue: @"Pizza" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Stack];
-	[leaf6 setValue: @"Beer" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Stack];
+	[leaf4 setValue: @"Carol" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Track];
+	[leaf5 setValue: @"Pizza" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
+	[leaf6 setValue: @"Beer" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
 	
 	UKFalse([ctx hasChanges]);
 	
@@ -231,85 +228,85 @@
 
 	// first undo should change leaf4's label from "Carol" -> "Leaf 4"
 	UKObjectsEqual(@"Carol", [leaf4 valueForProperty: kCOLabel]);
-	[_doc1Stack undo];
+	[_doc1Track undo];
     UKObjectsEqual(@"Leaf 4", [leaf4 valueForProperty: kCOLabel]);
     
 	// next undo should remove leaf4 from group1
     
     UKObjectsEqual(S(leaf1, leaf4), SA([group1 contentArray]));
-	[_doc1Stack undo];
+	[_doc1Track undo];
 	UKObjectsEqual(S(leaf1), SA([group1 contentArray]));
 
 	// next undo should change leaf1's label from "Alice (cell)" -> "Alice"
     
 	UKObjectsEqual(@"Alice (cell)", [leaf1 valueForProperty: kCOLabel]);
-	[_doc1Stack undo];
+	[_doc1Track undo];
 	UKObjectsEqual(@"Alice", [leaf1 valueForProperty: kCOLabel]);
 
 	// next undo should change leaf1's label from "Alice" -> "Leaf 1"
     
 	UKObjectsEqual(@"Alice", [leaf1 valueForProperty: kCOLabel]);
-	[_doc1Stack undo];
+	[_doc1Track undo];
 	UKObjectsEqual(@"Leaf 1", [leaf1 valueForProperty: kCOLabel]);
 
 	// next undo should change group1's label from "Work Contacts" -> "Group 1"
     
 	UKObjectsEqual(@"Work Contacts", [group1 valueForProperty: kCOLabel]);
-	[_doc1Stack undo];
+	[_doc1Track undo];
 	UKObjectsEqual(@"Group 1", [group1 valueForProperty: kCOLabel]);
 	
 	// next undo should move leaf2 from group2 back to group1
     
 	UKTrue([[group2 contentArray] containsObject: leaf2]);
 	UKFalse([[group1 contentArray] containsObject: leaf2]);
-	[_doc1Stack undo];
+	[_doc1Track undo];
 	UKFalse([[group2 contentArray] containsObject: leaf2]);
 	UKTrue([[group1 contentArray] containsObject: leaf2]);
 
     // next undo would change leaf2's label from "Tomatoes" -> "Leaf 2"
     // but we already changed it on doc2's track to "Cheese", so we can't undo
     
-    UKFalse([_doc1Stack canUndo]);
+    UKFalse([_doc1Track canUndo]);
     
     // Undo some changes on doc2
     
 	// next undo should change leaf6's label from "Beer" -> "Leaf 6"
     
 	UKObjectsEqual(@"Beer", [leaf6 valueForProperty: kCOLabel]);
-	[_doc2Stack undo];
+	[_doc2Track undo];
 	UKObjectsEqual(@"Leaf 6", [leaf6 valueForProperty: kCOLabel]);
     
 	// next undo should change leaf5's label from "Pizza" -> "Leaf 5"
     
 	UKObjectsEqual(@"Pizza", [leaf5 valueForProperty: kCOLabel]);
-	[_doc2Stack undo];
+	[_doc2Track undo];
 	UKObjectsEqual(@"Leaf 5", [leaf5 valueForProperty: kCOLabel]);
     
     // next undo should remove leaf6 from group2.
     // Note that an undo on doc1's track already removed leaf2
     
     UKObjectsEqual(S(leaf3, leaf5, leaf6), SA([group2 contentArray]));
-	[_doc2Stack undo];
+	[_doc2Track undo];
     UKObjectsEqual(S(leaf3, leaf5), SA([group2 contentArray]));
     
     // next undo should remove leaf5 from group2.
     
     UKObjectsEqual(S(leaf3, leaf5), SA([group2 contentArray]));
-	[_doc2Stack undo];
+	[_doc2Track undo];
     UKObjectsEqual(S(leaf3), SA([group2 contentArray]));
     
 	// next undo should change leaf2's label from "Cheese" -> "Tomatoes"
     
 	UKObjectsEqual(@"Cheese", [leaf2 valueForProperty: kCOLabel]);
-	[_doc2Stack undo];
+	[_doc2Track undo];
 	UKObjectsEqual(@"Tomatoes", [leaf2 valueForProperty: kCOLabel]);
 
     // This should enable undo on doc1's track to proceed.
     
-    UKTrue([_doc1Stack canUndo]);
+    UKTrue([_doc1Track canUndo]);
     
     UKObjectsEqual(@"Tomatoes", [leaf2 valueForProperty: kCOLabel]);
-	[_doc1Stack undo];
+	[_doc1Track undo];
 	UKObjectsEqual(@"Leaf 2", [leaf2 valueForProperty: kCOLabel]);
 }
 

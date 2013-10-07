@@ -24,12 +24,11 @@
 
 - (void)testNotificationOnUndo
 {
-    COUndoTrack *stack = [[COUndoStackStore defaultStore] stackForName: @"test"];
-	[stack setEditingContext: ctx];
-    [stack clear];
+    COUndoTrack *track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
+    [track clear];
     
     [[persistentRoot rootObject] setLabel: @"world"];
-    [ctx commitWithUndoStack: stack];
+    [ctx commitWithUndoStack: track];
     
     __block int timesNotified = 0;
     id observer = [[NSNotificationCenter defaultCenter] addObserverForName: COPersistentRootDidChangeNotification
@@ -40,7 +39,7 @@
                                                                     timesNotified++;
                                                                 }];
     
-    [stack undo];
+    [track undo];
     
     [[NSNotificationCenter defaultCenter] removeObserver: observer];
     

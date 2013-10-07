@@ -248,7 +248,8 @@
                       [_persistentRoot persistentRootUUID],
                       _title];
     
-    return [[COUndoStackStore defaultStore] stackForName: name];
+    return [COUndoTrack trackForName: name
+	              withEditingContext: [_persistentRoot editingContext]];;
 }
 
 - (void) commit

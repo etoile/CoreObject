@@ -19,6 +19,10 @@
 NSString * const COUndoStackDidChangeNotification = @"COUndoStackDidChangeNotification";
 NSString * const kCOUndoStackName = @"COUndoStackName";
 
+@interface COPatternUndoTrack : COUndoTrack
+@end
+
+
 @interface COUndoTrack ()
 @property (strong, readwrite, nonatomic) COUndoStackStore *store;
 @property (strong, readwrite, nonatomic) NSString *name;
@@ -39,11 +43,30 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	[self applyTraitFromClass: [ETCollectionTrait class]];
 }
 
-- (id) initWithStore: (COUndoStackStore *)aStore name: (NSString *)aName
++ (COUndoTrack *)trackForName: (NSString *)aName
+           withEditingContext: (COEditingContext *)aContext
+{
+	return [[self alloc] initWithStore: [COUndoStackStore defaultStore]
+	                              name: aName
+	                    editingContext: aContext];
+}
+
++ (COUndoTrack *)trackForPattern: (NSString *)aPattern
+              withEditingContext: (COEditingContext *)aContext
+{
+	return [[COPatternUndoTrack alloc] initWithStore: [COUndoStackStore defaultStore]
+	                                            name: aPattern
+	                                  editingContext: aContext];
+}
+
+- (id) initWithStore: (COUndoStackStore *)aStore
+                name: (NSString *)aName
+	  editingContext: (COEditingContext *)aContext
 {
     SUPERINIT;
-    self.name = aName;
-    self.store = aStore;
+    _name = aName;
+    _store = aStore;
+	_editingContext = aContext;
     return self;
 }
 
@@ -364,3 +387,15 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 }
 
 @end
+
+
+@implementation COPatternUndoTrack
+
+- (void) recordCommand: (COCommand *)aCommand
+{
+    [NSException raise: NSGenericException
+	            format: @"You can't push actions to a %@", [self className]];
+}
+
+@end
+

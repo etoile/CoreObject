@@ -17,9 +17,6 @@ extern NSString * const kCORedoStack;
 
 + (COUndoStackStore *) defaultStore;
 
-- (COUndoTrack *) stackForName: (NSString *)aName;
-- (COUndoTrack *) stackForPattern: (NSString *)aPattern;
-
 /** @taskunit Framework Private */
 
 - (NSSet *) stackNames;

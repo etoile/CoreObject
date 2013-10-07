@@ -67,6 +67,14 @@ extern NSString * const kCOUndoStackName;
 }
 
 
+/** @taskunit Track Access and Creation */
+
+
++ (COUndoTrack *)trackForName: (NSString *)aName
+           withEditingContext: (COEditingContext *)aContext;
++ (COUndoTrack *)trackForPattern: (NSString *)aPattern
+              withEditingContext: (COEditingContext *)aContext;
+
 /** @taskunit Basic Properties */
 
 
@@ -82,7 +90,7 @@ extern NSString * const kCOUndoStackName;
  * then usually you want undo and redo to apply to the same editing context. 
  * To do so, just set up the undo track using -[COUndoStack setEditingContext:].
  */
-@property (nonatomic, strong) COEditingContext *editingContext;
+@property (nonatomic, readonly) COEditingContext *editingContext;
 
 
 /** @taskunit Undo and Redo */

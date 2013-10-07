@@ -152,8 +152,6 @@
 		6675F8C51785C02A001E5622 /* COPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BE1785C02A001E5622 /* COPath.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C61785C02A001E5622 /* COPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BF1785C02A001E5622 /* COPath.m */; };
 		6675F8C71785C02A001E5622 /* COType.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8C01785C02A001E5622 /* COType.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		667C24D517E106C900FFFC85 /* COPatternUndoStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 667C24D317E106C900FFFC85 /* COPatternUndoStack.h */; };
-		667C24D617E106C900FFFC85 /* COPatternUndoStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C24D417E106C900FFFC85 /* COPatternUndoStack.m */; };
 		667C250017E1207F00FFFC85 /* TestNotifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C24F517E11FC900FFFC85 /* TestNotifications.m */; };
 		6680846D178CD526003A3CC6 /* COCopier.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680846B178CD526003A3CC6 /* COCopier.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6680846E178CD526003A3CC6 /* COCopier.m in Sources */ = {isa = PBXBuildFile; fileRef = 6680846C178CD526003A3CC6 /* COCopier.m */; };
@@ -565,8 +563,6 @@
 		6675F8BE1785C02A001E5622 /* COPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COPath.h; sourceTree = "<group>"; };
 		6675F8BF1785C02A001E5622 /* COPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COPath.m; sourceTree = "<group>"; };
 		6675F8C01785C02A001E5622 /* COType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COType.h; sourceTree = "<group>"; };
-		667C24D317E106C900FFFC85 /* COPatternUndoStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COPatternUndoStack.h; sourceTree = "<group>"; };
-		667C24D417E106C900FFFC85 /* COPatternUndoStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COPatternUndoStack.m; sourceTree = "<group>"; };
 		667C24F517E11FC900FFFC85 /* TestNotifications.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestNotifications.m; path = Tests/TestNotifications.m; sourceTree = "<group>"; };
 		667F1ED0179C81E00083C3E6 /* TestArrayDiff.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestArrayDiff.m; sourceTree = "<group>"; };
 		667F1ED1179C81E00083C3E6 /* TestCollection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TestCollection.m; path = Tests/TestCollection.m; sourceTree = "<group>"; };
@@ -897,8 +893,6 @@
 				663CE2B517C0B05800E729F5 /* COEditingContext+Undo.m */,
 				6646976117CDB94300A1B767 /* COUndoTrack.h */,
 				6646976217CDB94300A1B767 /* COUndoTrack.m */,
-				667C24D317E106C900FFFC85 /* COPatternUndoStack.h */,
-				667C24D417E106C900FFFC85 /* COPatternUndoStack.m */,
 				6646976E17CDBBF200A1B767 /* COUndoNode.h */,
 				662AC93B1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h */,
 				662AC93C1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m */,
@@ -1410,7 +1404,6 @@
 				6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */,
 				6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */,
 				6646985A17D3C55600A1B767 /* COObjectGraphContext+Private.h in Headers */,
-				667C24D517E106C900FFFC85 /* COPatternUndoStack.h in Headers */,
 				60CAAC6417E3117E00E8E2B1 /* COTrack.h in Headers */,
 				66457FB517E8BFE5003C51A8 /* COStoreCreateBranch.h in Headers */,
 				66457FB717E8BFE5003C51A8 /* COStoreCreatePersistentRoot.h in Headers */,
@@ -1759,7 +1752,6 @@
 				660D4CDA17D5C7CB003C9ACC /* COLeastCommonAncestor.m in Sources */,
 				662AC93E1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m in Sources */,
 				660D4CE617D689FC003C9ACC /* COMergeInfo.m in Sources */,
-				667C24D617E106C900FFFC85 /* COPatternUndoStack.m in Sources */,
 				60CAAC6517E3117E00E8E2B1 /* COTrack.m in Sources */,
 				66457FB617E8BFE5003C51A8 /* COStoreCreateBranch.m in Sources */,
 				66457FB817E8BFE5003C51A8 /* COStoreCreatePersistentRoot.m in Sources */,

@@ -3,15 +3,12 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
-#import "COPatternUndoStack.h"
 
 NSString * const kCOUndoStack = @"undo";
 NSString * const kCORedoStack = @"redo";
 
 @interface COUndoTrack ()
-
 - (id) initWithStore: (COUndoStackStore *)aStore name: (NSString *)aName;
-
 @end
 
 @implementation COUndoStackStore
@@ -24,16 +21,6 @@ NSString * const kCORedoStack = @"redo";
         store = [[COUndoStackStore alloc] init];
     }
     return store;
-}
-
-- (COUndoTrack *) stackForName: (NSString *)aName
-{
-    return [[COUndoTrack alloc] initWithStore: self name: aName];
-}
-
-- (COUndoTrack *) stackForPattern: (NSString *)aPattern
-{
-    return [[COPatternUndoStack alloc] initWithStore: self name: aPattern];
 }
 
 - (id) init

@@ -3,12 +3,16 @@
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
 
+@interface COUndoTrack (TestAdditions)
+- (COUndoTrack *)trackWithEditingContext: (COEditingContext *)aContext;
+@end
+
 @interface TestUndo : EditingContextTestCase <UKTest>
 {
-    COUndoTrack *_testStack;
-    COUndoTrack *_setupStack;
-    COUndoTrack *_rootEditStack;
-    COUndoTrack *_childEditStack;
+    COUndoTrack *_testTrack;
+    COUndoTrack *_setupTrack;
+    COUndoTrack *_rootEditTrack;
+    COUndoTrack *_childEditTrack;
 }
 @end
 
@@ -18,19 +22,15 @@
 {
     SUPERINIT;
     
-    _testStack =  [[COUndoStackStore defaultStore] stackForName: @"test"];
-	[_testStack setEditingContext: ctx];
-    _setupStack =  [[COUndoStackStore defaultStore] stackForName: @"setup"];
-	[_setupStack setEditingContext: ctx];
-    _rootEditStack =  [[COUndoStackStore defaultStore] stackForName: @"rootEdit"];
-	[_rootEditStack setEditingContext: ctx];
-    _childEditStack =  [[COUndoStackStore defaultStore] stackForName: @"childEdit"];
-	[_childEditStack setEditingContext: ctx];
+    _testTrack = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
+    _setupTrack = [COUndoTrack trackForName: @"setup" withEditingContext: ctx];
+    _rootEditTrack = [COUndoTrack trackForName: @"rootEdit" withEditingContext: ctx];
+    _childEditTrack = [COUndoTrack trackForName: @"childEdit" withEditingContext: ctx];
     
-    [_testStack clear];
-    [_setupStack clear];
-    [_rootEditStack clear];
-    [_childEditStack clear];
+    [_testTrack clear];
+    [_setupTrack clear];
+    [_rootEditTrack clear];
+    [_childEditTrack clear];
     
     return self;
 }
@@ -39,16 +39,16 @@
 - (void)testUndoSetCurrentVersionForBranchBasic
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [ctx commitWithUndoStack: _testStack];
+    [ctx commitWithUndoStack: _testTrack];
 
     UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
     
     [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
-    [ctx commitWithUndoStack: _testStack];
+    [ctx commitWithUndoStack: _testTrack];
     
     UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: kCOLabel]);
     
-    [_testStack undo];
+    [_testTrack undo];
     
     UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
 }
@@ -57,16 +57,16 @@
 {
     COPersistentRoot *persistentRoot1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [ctx commitWithUndoStack: _testStack];
+    [ctx commitWithUndoStack: _testTrack];
     
     [[persistentRoot1 rootObject] setLabel: @"hello1"];
     [[persistentRoot2 rootObject] setLabel: @"hello2"];
-    [ctx commitWithUndoStack: _testStack];
+    [ctx commitWithUndoStack: _testTrack];
     
     CORevision *persistentRoot1Revision = [persistentRoot1 revision];
     CORevision *persistentRoot2Revision = [persistentRoot2 revision];
     
-    [_testStack undo];
+    [_testTrack undo];
     
     UKObjectsNotEqual([persistentRoot1 revision], persistentRoot1Revision);
     UKObjectsNotEqual([persistentRoot2 revision], persistentRoot2Revision);
@@ -81,13 +81,13 @@
         COObject *root = [persistentRoot rootObject];
         COObject *child = [[[persistentRoot editingBranch] objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];    
         [root insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: kCOContents];
-        [ctx commitWithUndoStack: _setupStack];
+        [ctx commitWithUndoStack: _setupTrack];
         
         [root setValue: @"root" forProperty: kCOLabel];
-        [ctx commitWithUndoStack: _rootEditStack];
+        [ctx commitWithUndoStack: _rootEditTrack];
         
         [child setValue: @"child" forProperty: kCOLabel];
-        [ctx commitWithUndoStack: _childEditStack];
+        [ctx commitWithUndoStack: _childEditTrack];
     }
     
     // Load in another context
@@ -95,8 +95,8 @@
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
 
-		[_rootEditStack setEditingContext: ctx2];
-		[_childEditStack setEditingContext: ctx2];
+		COUndoTrack *rootEditTrack = [_rootEditTrack trackWithEditingContext: ctx2];
+		COUndoTrack *childEditTrack = [_childEditTrack trackWithEditingContext: ctx2];
 
         COObject *root = [ctx2persistentRoot rootObject];
         COObject *child = [[root valueForProperty: kCOContents] firstObject];
@@ -105,25 +105,25 @@
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
         
         // Selective undo
-        [_rootEditStack undo];
+        [rootEditTrack undo];
         
         UKNil([root valueForProperty: kCOLabel]);
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
         
         // Selective undo    
-        [_childEditStack undo];
+        [childEditTrack undo];
         
         UKNil([root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
         
         // Selective Redo
-        [_rootEditStack redo];
+        [rootEditTrack redo];
         
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
         
         // Selective Redo
-        [_childEditStack redo];
+        [childEditTrack redo];
         
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
@@ -136,7 +136,7 @@
     [ctx commit];
     
     COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
-    [ctx commitWithUndoStack: _testStack];
+    [ctx commitWithUndoStack: _testTrack];
         
     // Load in another context
     {
@@ -144,12 +144,12 @@
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
 
-		[_testStack setEditingContext: ctx2];
+		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKFalse([ctx2secondBranch isDeleted]);
-        [_testStack undo];
+        [testTrack undo];
         UKTrue([ctx2secondBranch isDeleted]);
-        [_testStack redo];
+        [testTrack redo];
         UKFalse([ctx2secondBranch isDeleted]);
     }
 }
@@ -161,7 +161,7 @@
     
     COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
     [persistentRoot setCurrentBranch: secondBranch];
-    [ctx commitWithUndoStack: _testStack];
+    [ctx commitWithUndoStack: _testTrack];
     
     // Load in another context
     {
@@ -169,13 +169,13 @@
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
 
-		[_testStack setEditingContext: ctx2];
+		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKNotNil(ctx2secondBranch);
         UKFalse([ctx2secondBranch isDeleted]);
-        [_testStack undo];
+        [testTrack undo];
         UKTrue([ctx2secondBranch isDeleted]);
-        [_testStack redo];
+        [testTrack redo];
         UKFalse([ctx2secondBranch isDeleted]);
     }
 }
@@ -189,20 +189,20 @@
     [ctx commit];
     
     [secondBranch setDeleted: YES];
-    [ctx commitWithUndoStack: _testStack];
+    [ctx commitWithUndoStack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
-		
-		[_testStack setEditingContext: ctx2];
+
+		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
         UKTrue([ctx2secondBranch isDeleted]);
-        [_testStack undo];
+        [testTrack undo];
         UKFalse([ctx2secondBranch isDeleted]);
-        [_testStack redo];
+        [testTrack redo];
         UKTrue([ctx2secondBranch isDeleted]);
     }
 }
@@ -214,19 +214,19 @@
     [ctx commit];
     
     [[persistentRoot currentBranch] setMetadata: D(@"world2", @"hello")];
-    [ctx commitWithUndoStack: _testStack];
+    [ctx commitWithUndoStack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
 
-		[_testStack setEditingContext: ctx2];
+		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKObjectsEqual(D(@"world2", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
-        [_testStack undo];
+        [testTrack undo];
         UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
-        [_testStack redo];
+        [testTrack redo];
         UKObjectsEqual(D(@"world2", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
     }
 }
@@ -243,7 +243,7 @@
     [ctx commit];
     
     [persistentRoot setCurrentBranch: secondBranch];
-    [ctx commitWithUndoStack: _testStack];
+    [ctx commitWithUndoStack: _testTrack];
     
     // Load in another context
     {
@@ -252,17 +252,17 @@
         COBranch *ctx2originalBranch = [ctx2persistentRoot branchForUUID: [originalBranch UUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
 
-		[_testStack setEditingContext: ctx2];
+		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
         UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
         
-        [_testStack undo];
+        [testTrack undo];
         
         UKObjectsEqual(ctx2originalBranch, [ctx2persistentRoot currentBranch]);
         UKObjectsEqual(@"hello", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
         
-        [_testStack redo];
+        [testTrack redo];
         
         UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
         UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
@@ -272,19 +272,19 @@
 - (void) testUndoCreatePersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [ctx commitWithUndoStack: _testStack];
+    [ctx commitWithUndoStack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
 		
-		[_testStack setEditingContext: ctx2];
+		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
         UKFalse([ctx2persistentRoot isDeleted]);
-        [_testStack undo];
+        [testTrack undo];
         UKTrue([ctx2persistentRoot isDeleted]);
-        [_testStack redo];
+        [testTrack redo];
         UKFalse([ctx2persistentRoot isDeleted]);
     }
 }
@@ -295,113 +295,121 @@
     [ctx commit];
     
     [persistentRoot setDeleted: YES];
-    [ctx commitWithUndoStack: _testStack];
+    [ctx commitWithUndoStack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
 
-		[_testStack setEditingContext: ctx2];
+		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
 		UKTrue([ctx2persistentRoot isDeleted]);
-        [_testStack undo];
+        [testTrack undo];
         UKFalse([ctx2persistentRoot isDeleted]);
-        [_testStack redo];
+        [testTrack redo];
         UKTrue([ctx2persistentRoot isDeleted]);
     }
 }
 
-- (void) testStackAPI
+- (void) testTrackAPI
 {
-    COUndoTrack *testStack = [[COUndoStackStore defaultStore] stackForName: @"test"];
-	[testStack setEditingContext: ctx];
-    UKObjectsEqual(@[], [testStack undoNodes]);
-    UKObjectsEqual(@[], [testStack redoNodes]);
-    UKFalse([testStack canRedo]);
-    UKFalse([testStack canUndo]);
+    UKObjectsEqual(@[], [_testTrack undoNodes]);
+    UKObjectsEqual(@[], [_testTrack redoNodes]);
+    UKFalse([_testTrack canRedo]);
+    UKFalse([_testTrack canUndo]);
     
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [ctx commitWithUndoStack: testStack];
+    [ctx commitWithUndoStack: _testTrack];
     
     [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
-    [ctx commitWithUndoStack: testStack];
+    [ctx commitWithUndoStack: _testTrack];
     
-    UKIntsEqual(2, [[testStack undoNodes] count]);
-    UKObjectsEqual(@[], [testStack redoNodes]);
-    UKFalse([testStack canRedo]);
-    UKTrue([testStack canUndo]);
+    UKIntsEqual(2, [[_testTrack undoNodes] count]);
+    UKObjectsEqual(@[], [_testTrack redoNodes]);
+    UKFalse([_testTrack canRedo]);
+    UKTrue([_testTrack canUndo]);
     
     UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: kCOLabel]);
     
-    [testStack undo];
+    [_testTrack undo];
     
     UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
 }
 
-- (void) testPatternStack
+- (void) testPatternTrack
 {
     COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     COPersistentRoot *doc2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [ctx commitWithUndoStack: _setupStack];
+    [ctx commitWithUndoStack: _setupTrack];
 
-    COUndoTrack *workspaceStack = [[COUndoStackStore defaultStore] stackForPattern: @"workspace.%"];
-	[workspaceStack setEditingContext: ctx];
-    COUndoTrack *workspaceDoc1Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc1"];
-	[workspaceDoc1Stack setEditingContext: ctx];
-    COUndoTrack *workspaceDoc2Stack = [[COUndoStackStore defaultStore] stackForName: @"workspace.doc2"];
-	[workspaceDoc2Stack setEditingContext: ctx];
-    [workspaceStack clear];
+    COUndoTrack *workspaceTrack = [COUndoTrack trackForPattern: @"workspace.%"
+	                                        withEditingContext: ctx];
+    COUndoTrack *workspaceDoc1Track = [COUndoTrack trackForName: @"workspace.doc1"
+	                                         withEditingContext: ctx];
+    COUndoTrack *workspaceDoc2Track = [COUndoTrack trackForName: @"workspace.doc2"
+	                                         withEditingContext: ctx];
+    [workspaceTrack clear];
 
     // doc1 commits
     
     [[doc1 rootObject] setLabel: @"doc1"];
-    [ctx commitWithUndoStack: workspaceDoc1Stack];
+    [ctx commitWithUndoStack: workspaceDoc1Track];
     [[doc1 rootObject] setLabel: @"sketch"];
-    [ctx commitWithUndoStack: workspaceDoc1Stack];
+    [ctx commitWithUndoStack: workspaceDoc1Track];
 
     // doc2 commits
     
     [[doc2 rootObject] setLabel: @"doc2"];
-    [ctx commitWithUndoStack: workspaceDoc2Stack];
+    [ctx commitWithUndoStack: workspaceDoc2Track];
     [[doc2 rootObject] setLabel: @"photo"];
-    [ctx commitWithUndoStack: workspaceDoc2Stack];
+    [ctx commitWithUndoStack: workspaceDoc2Track];
 
     // experiment...
 
     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
-    [workspaceStack undo];
+    [workspaceTrack undo];
     UKObjectsEqual(@"doc2", [[doc2 rootObject] label]);
     
-    [workspaceStack undo];
+    [workspaceTrack undo];
     UKNil([[doc2 rootObject] label]);
 
     UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
-    [workspaceStack undo];
+    [workspaceTrack undo];
     UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
     
-    [workspaceStack undo];
+    [workspaceTrack undo];
     UKNil([[doc1 rootObject] label]);
     
     // redo on doc2
     
-    [workspaceDoc2Stack redo];
+    [workspaceDoc2Track redo];
     UKNil([[doc1 rootObject] label]);
     UKObjectsEqual(@"doc2", [[doc2 rootObject] label]);
 
-    [workspaceDoc2Stack redo];
+    [workspaceDoc2Track redo];
     UKNil([[doc1 rootObject] label]);
     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
 
     // redo on doc1
     
-    [workspaceDoc1Stack redo];
+    [workspaceDoc1Track redo];
     UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
 
-    [workspaceDoc1Stack redo];
+    [workspaceDoc1Track redo];
     UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+}
+
+@end
+
+
+@implementation COUndoTrack (TestAdditions)
+
+- (COUndoTrack *)trackWithEditingContext: (COEditingContext *)aContext
+{
+	return [[self class] trackForName: [self name] withEditingContext: aContext];
 }
 
 @end

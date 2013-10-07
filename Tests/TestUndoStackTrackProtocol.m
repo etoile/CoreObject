@@ -6,7 +6,7 @@
 @interface TestUndoStackTrackProtocol : EditingContextTestCase <UKTest>
 {
     COPersistentRoot *persistentRoot;
-	COUndoTrack *stack;
+	COUndoTrack *track;
 	
 	CORevision *r0; // not on stack
 	CORevision *r1;
@@ -21,9 +21,8 @@
 - (id) init
 {
     SUPERINIT;
-	stack = [[COUndoStackStore defaultStore] stackForName: @"test"];
-	[stack setEditingContext: ctx];
-	[stack clear];
+	track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
+	[track clear];
 	
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 	[[persistentRoot rootObject] setLabel: @"0"];
@@ -31,19 +30,19 @@
 	r0 = [persistentRoot revision];
 	
 	[[persistentRoot rootObject] setLabel: @"1"];
-	[ctx commitWithUndoStack: stack];
+	[ctx commitWithUndoStack: track];
 	r1 = [persistentRoot revision];
 	
 	[[persistentRoot rootObject] setLabel: @"2"];
-	[ctx commitWithUndoStack: stack];
+	[ctx commitWithUndoStack: track];
 	r2 = [persistentRoot revision];
 	
 	[[persistentRoot rootObject] setLabel: @"3"];
-	[ctx commitWithUndoStack: stack];
+	[ctx commitWithUndoStack: track];
 	r3 = [persistentRoot revision];
 	
 	[[persistentRoot rootObject] setLabel: @"4"];
-	[ctx commitWithUndoStack: stack];
+	[ctx commitWithUndoStack: track];
 	r4 = [persistentRoot revision];
 	
     return self;
@@ -69,69 +68,69 @@
 	//
 	// Performing a redo would apply the change after cuurentNode
 	
-	id <COTrackNode> current = [stack currentNode];
+	id <COTrackNode> current = [track currentNode];
 	[self checkCommand: current isSetVersionFrom: r3 to: r4];
 	
 	// Now perform an undo with the COUndoStack API
 	
-	[stack undo];
-	current = [stack currentNode];
+	[track undo];
+	current = [track currentNode];
 	[self checkCommand: current isSetVersionFrom: r2 to: r3];
 	
 	// Perform another few undos
 	
-	[stack undo];
-	current = [stack currentNode];
+	[track undo];
+	current = [track currentNode];
 	[self checkCommand: current isSetVersionFrom: r1 to: r2];
 
-	[stack undo];
-	current = [stack currentNode];
+	[track undo];
+	current = [track currentNode];
 	[self checkCommand: current isSetVersionFrom: r0 to: r1];
 	
-	[stack undo];
-	current = [stack currentNode];
+	[track undo];
+	current = [track currentNode];
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], current);
 }
 
 - (void) testPreviousAndNextNodeWithUndo
 {
-	id <COTrackNode> current = [stack currentNode];
+	id <COTrackNode> current = [track currentNode];
 	
 	[self checkCommand: current isSetVersionFrom: r3 to: r4];
 	
-	[self checkCommand: [stack nextNodeOnTrackFrom: current backwards: YES]
+	[self checkCommand: [track nextNodeOnTrackFrom: current backwards: YES]
 	  isSetVersionFrom: r2
 					to: r3];
 	
-	UKNil([stack nextNodeOnTrackFrom: current backwards: NO]);
+	UKNil([track nextNodeOnTrackFrom: current backwards: NO]);
 	
 	// Perform an undo
 	
-	[stack undo];
-	current = [stack currentNode];
+	[track undo];
+	current = [track currentNode];
 		
 	[self checkCommand: current isSetVersionFrom: r2 to: r3];
 	
-	[self checkCommand: [stack nextNodeOnTrackFrom: current backwards: YES]
+	[self checkCommand: [track nextNodeOnTrackFrom: current backwards: YES]
 	  isSetVersionFrom: r1
 					to: r2];
 	
-	[self checkCommand: [stack nextNodeOnTrackFrom: current backwards: NO]
+	[self checkCommand: [track nextNodeOnTrackFrom: current backwards: NO]
 	  isSetVersionFrom: r3
 					to: r4];
 
 	// Perform another undo
 
-	[stack undo];
-	current = [stack currentNode];
+	[track undo];
+	current = [track currentNode];
 	
 	[self checkCommand: current isSetVersionFrom: r1 to: r2];
 	
-	[self checkCommand: [stack nextNodeOnTrackFrom: current backwards: YES]
+	[self checkCommand: [track nextNodeOnTrackFrom: current backwards: YES]
 	  isSetVersionFrom: r0
 					to: r1];
 	
-	[self checkCommand: [stack nextNodeOnTrackFrom: current backwards: NO]
+	[self checkCommand: [track nextNodeOnTrackFrom: current backwards: NO]
 	  isSetVersionFrom: r2
 					to: r3];
 
@@ -139,15 +138,15 @@
 
 - (void) testNextNodeOnTrackFromPlaceholder
 {
-	[stack undo];
-	[stack undo];
-	[stack undo];
-	[stack undo];
+	[track undo];
+	[track undo];
+	[track undo];
+	[track undo];
 
-	id <COTrackNode> current = [stack currentNode];
+	id <COTrackNode> current = [track currentNode];
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], current);
 	
-	current = [stack nextNodeOnTrackFrom: current backwards: NO];
+	current = [track nextNodeOnTrackFrom: current backwards: NO];
 	[self checkCommand: current isSetVersionFrom: r0 to: r1];
 }
 
@@ -166,7 +165,7 @@
 
 - (void) testNodes
 {
-	NSArray *nodes = [stack nodes];
+	NSArray *nodes = [track nodes];
 	[self checkNodes: nodes];
 }
 
@@ -176,87 +175,85 @@
 
 - (void) testNodesUnaffectedBy1Undo
 {
-	[stack undo];
-	[self checkNodes: [stack nodes]];
+	[track undo];
+	[self checkNodes: [track nodes]];
 }
 
 - (void) testNodesUnaffectedBy2Undos
 {
-	[stack undo];
-	[stack undo];
-	[self checkNodes: [stack nodes]];
+	[track undo];
+	[track undo];
+	[self checkNodes: [track nodes]];
 }
 
 - (void) testNodesUnaffectedBy3Undos
 {
-	[stack undo];
-	[stack undo];
-	[stack undo];
-	[self checkNodes: [stack nodes]];
+	[track undo];
+	[track undo];
+	[track undo];
+	[self checkNodes: [track nodes]];
 }
 
 - (void) testNodesUnaffectedBy4Undos
 {
-	[stack undo];
-	[stack undo];
-	[stack undo];
-	[stack undo];
-	[self checkNodes: [stack nodes]];
+	[track undo];
+	[track undo];
+	[track undo];
+	[track undo];
+	[self checkNodes: [track nodes]];
 }
 
 - (void) testSetCurrentNode
 {
-	id <COTrackNode> startNode = [stack currentNode];
-	id <COTrackNode> target = [stack currentNode];
-	target = [stack nextNodeOnTrackFrom: target backwards: YES];
-	target = [stack nextNodeOnTrackFrom: target backwards: YES];
+	id <COTrackNode> startNode = [track currentNode];
+	id <COTrackNode> target = [track currentNode];
+	target = [track nextNodeOnTrackFrom: target backwards: YES];
+	target = [track nextNodeOnTrackFrom: target backwards: YES];
 	
 	[self checkCommand: target isSetVersionFrom: r1 to: r2];
 	
 	// Undo back 2 nodes
 	
-	stack.editingContext = ctx;
-	[stack setCurrentNode: target];
+	[track setCurrentNode: target];
 	
-	[self checkCommand: [stack currentNode] isSetVersionFrom: r1 to: r2];
+	[self checkCommand: [track currentNode] isSetVersionFrom: r1 to: r2];
 	UKObjectsEqual(r2, [persistentRoot revision]);
 	
 	// Redo back to the start
 	
-	[stack setCurrentNode: startNode];
+	[track setCurrentNode: startNode];
 
-	[self checkCommand: [stack currentNode] isSetVersionFrom: r3 to: r4];
+	[self checkCommand: [track currentNode] isSetVersionFrom: r3 to: r4];
 	UKObjectsEqual(r4, [persistentRoot revision]);
 }
 
 - (void) testSetCurrentNodeToPlaceholder
 {
-	id <COTrackNode> target = [stack currentNode];
-	target = [stack nextNodeOnTrackFrom: target backwards: YES];
-	target = [stack nextNodeOnTrackFrom: target backwards: YES];
-	target = [stack nextNodeOnTrackFrom: target backwards: YES];
-	target = [stack nextNodeOnTrackFrom: target backwards: YES];
+	id <COTrackNode> target = [track currentNode];
+	target = [track nextNodeOnTrackFrom: target backwards: YES];
+	target = [track nextNodeOnTrackFrom: target backwards: YES];
+	target = [track nextNodeOnTrackFrom: target backwards: YES];
+	target = [track nextNodeOnTrackFrom: target backwards: YES];
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], target);
 	
 	// Undo back 4 nodes
 	
-	stack.editingContext = ctx;
-	[stack setCurrentNode: target];
+	[track setCurrentNode: target];
 
-	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [stack currentNode]);
-	UKFalse([stack canUndo]);
-	UKTrue([stack canRedo]);
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [track currentNode]);
+	UKFalse([track canUndo]);
+	UKTrue([track canRedo]);
 	UKObjectsEqual(@"0", [[persistentRoot rootObject] label]);
 	UKObjectsEqual(r0, [persistentRoot revision]);
 	
 	// Redo 1 node
 	
-	target = [stack nextNodeOnTrackFrom: target backwards: NO];
-	[stack setCurrentNode: target];
+	target = [track nextNodeOnTrackFrom: target backwards: NO];
+	[track setCurrentNode: target];
 	
-	[self checkCommand: [stack currentNode] isSetVersionFrom: r0 to: r1];
-	UKTrue([stack canUndo]);
-	UKTrue([stack canRedo]);
+	[self checkCommand: [track currentNode] isSetVersionFrom: r0 to: r1];
+	UKTrue([track canUndo]);
+	UKTrue([track canRedo]);
 	UKObjectsEqual(@"1", [[persistentRoot rootObject] label]);
 	UKObjectsEqual(r1, [persistentRoot revision]);
 }
