@@ -36,7 +36,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
  * The commit procedure is the parent context responsability, the parent context
  * calls back -saveCommitWithMetadata:.
  */
-- (CORevision *)commitWithMetadata: (NSDictionary *)metadata;
+- (BOOL)commitWithMetadata: (NSDictionary *)metadata;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

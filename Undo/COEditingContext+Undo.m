@@ -37,32 +37,34 @@
     }
 }
 
-- (COCommand *) recordEndUndoGroupWithUndoStack: (COUndoTrack *)aStack
+- (COCommand *) recordEndUndoGroupWithUndoTracks: (NSArray *)tracks
 {
-//    NSLog(@"%@", NSStringFromSelector(_cmd));
-    
-    if (_isRecordingUndo)
-    {
-        if ([_currentEditGroup.contents isEmpty])
-        {
-            NSLog(@"-recordEndUndoGroup contents is empty!");
-            _currentEditGroup = nil;
-            return nil;
-        }
+    if (_isRecordingUndo == NO)
+		return nil;
 
-        // Optimisation: collapse COCommandGroups that contain only one child
-        COCommand *objectToSerialize =
-            (1 == [_currentEditGroup.contents count])
-            ? [_currentEditGroup.contents firstObject]
-            : _currentEditGroup;
-        
-        [aStack recordCommand: objectToSerialize];
-        
-        _currentEditGroup = nil;
-		
-		return objectToSerialize;
-    }
-	return nil;
+	if ([_currentEditGroup.contents isEmpty])
+	{
+		// TODO: Raise an exception
+		NSLog(@"-recordEndUndoGroup contents is empty!");
+		_currentEditGroup = nil;
+		return nil;
+	}
+
+	COCommand *recordedCommand = _currentEditGroup;
+
+	// Optimisation: collapse COCommandGroups that contain only one child
+	if ([_currentEditGroup.contents count] == 1)
+	{
+		recordedCommand = [_currentEditGroup.contents firstObject];
+	}
+
+	for (COUndoTrack *undoTrack in tracks)
+	{
+		[undoTrack recordCommand: recordedCommand];
+	}
+	_currentEditGroup = nil;
+	
+	return recordedCommand;
 }
 
 - (void) recordCommand: (COCommand *)aCommand

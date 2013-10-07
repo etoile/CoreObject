@@ -254,7 +254,7 @@
 
 - (void) commit
 {
-    [[_persistentRoot editingContext] commitWithUndoStack: [self undoStack]];
+    [[_persistentRoot editingContext] commitWithUndoTrack: [self undoStack]];
 }
 
 + (void) pullFrom: (COPersistentRoot *)source into: (COPersistentRoot *)dest
@@ -309,7 +309,7 @@
         // HACK: should be a regular -commit, I guess, but there's a bug where
         // -commit uses the last used undo track, instead of none. So explicitly pass nil,
         // so this commit doesn't record an undo command.
-        [[dest editingContext] commitWithUndoStack: nil];
+        [[dest editingContext] commitWithUndoTrack: nil];
     }
 }
 

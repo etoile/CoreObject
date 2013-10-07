@@ -30,19 +30,19 @@
 	r0 = [persistentRoot revision];
 	
 	[[persistentRoot rootObject] setLabel: @"1"];
-	[ctx commitWithUndoStack: track];
+	[ctx commitWithUndoTrack: track];
 	r1 = [persistentRoot revision];
 	
 	[[persistentRoot rootObject] setLabel: @"2"];
-	[ctx commitWithUndoStack: track];
+	[ctx commitWithUndoTrack: track];
 	r2 = [persistentRoot revision];
 	
 	[[persistentRoot rootObject] setLabel: @"3"];
-	[ctx commitWithUndoStack: track];
+	[ctx commitWithUndoTrack: track];
 	r3 = [persistentRoot revision];
 	
 	[[persistentRoot rootObject] setLabel: @"4"];
-	[ctx commitWithUndoStack: track];
+	[ctx commitWithUndoTrack: track];
 	r4 = [persistentRoot revision];
 	
     return self;

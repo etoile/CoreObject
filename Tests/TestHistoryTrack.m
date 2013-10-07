@@ -60,7 +60,7 @@
 	[document1 addObject: group2];	
 	[group2 addObject: leaf3];
 	
-	[ctx commitWithUndoStack: _workspaceTrack];
+	[ctx commitWithUndoTrack: _workspaceTrack];
 	
 	// workspace
 	//  |
@@ -81,15 +81,15 @@
 	
 	// Now make some changes
 		
-	[document2 setValue: @"My Shopping List" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
+	[document2 setValue: @"My Shopping List" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc2Track];
 	/* undo on workspace track, doc2 track: undo the last commit. */
 	
-	[document1 setValue: @"My Contacts" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Track];
+	[document1 setValue: @"My Contacts" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc1Track];
 	/* undo on workspace track, doc1 track: undo the last commit. */
 	
-	[leaf2 setValue: @"Tomatoes" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Track];
+	[leaf2 setValue: @"Tomatoes" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc1Track];
 	
-	[group2 addObject: leaf2]; [ctx commitWithUndoStack: _doc1Track];
+	[group2 addObject: leaf2]; [ctx commitWithUndoTrack: _doc1Track];
 	
 	// workspace
 	//  |
@@ -108,7 +108,7 @@
 	//   \-document2
 	
 	
-	[document2 addObject: group2]; [ctx commitWithUndoStack: _doc2Track];
+	[document2 addObject: group2]; [ctx commitWithUndoTrack: _doc2Track];
 	
 	// workspace
 	//  |
@@ -127,13 +127,13 @@
 	//          \-leaf2
 	
 	
-	[group2	setValue: @"Groceries" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
-	[group1 setValue: @"Work Contacts" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Track];
-	[leaf3 setValue: @"Wine" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
-	[leaf1 setValue: @"Alice" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Track];
-	[leaf3 setValue: @"Red wine" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
-	[leaf2 setValue: @"Cheese" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
-	[leaf1 setValue: @"Alice (cell)" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Track];
+	[group2	setValue: @"Groceries" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc2Track];
+	[group1 setValue: @"Work Contacts" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc1Track];
+	[leaf3 setValue: @"Wine" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc2Track];
+	[leaf1 setValue: @"Alice" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc1Track];
+	[leaf3 setValue: @"Red wine" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc2Track];
+	[leaf2 setValue: @"Cheese" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc2Track];
+	[leaf1 setValue: @"Alice (cell)" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc1Track];
 	
 	// introduce some new objects
 	
@@ -143,7 +143,7 @@
 	
 	// add them to the lists
 
-	[group1 addObject: leaf4]; [ctx commitWithUndoStack: _doc1Track];
+	[group1 addObject: leaf4]; [ctx commitWithUndoTrack: _doc1Track];
 	
 	// workspace
 	//  |
@@ -167,7 +167,7 @@
     
     [leaf5 setValue: @"Leaf 5" forProperty: kCOLabel];
 
-	[group2 addObject: leaf5]; [ctx commitWithUndoStack: _doc2Track];
+	[group2 addObject: leaf5]; [ctx commitWithUndoTrack: _doc2Track];
 
 	// workspace
 	//  |
@@ -193,7 +193,7 @@
     
 	[leaf6 setValue: @"Leaf 6" forProperty: kCOLabel];
 
-	[group2 addObject: leaf6]; [ctx commitWithUndoStack: _doc2Track];
+	[group2 addObject: leaf6]; [ctx commitWithUndoTrack: _doc2Track];
 
 	// workspace
 	//  |
@@ -218,9 +218,9 @@
 	//          \-leaf6
 	
 	
-	[leaf4 setValue: @"Carol" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc1Track];
-	[leaf5 setValue: @"Pizza" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
-	[leaf6 setValue: @"Beer" forProperty: kCOLabel]; [ctx commitWithUndoStack: _doc2Track];
+	[leaf4 setValue: @"Carol" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc1Track];
+	[leaf5 setValue: @"Pizza" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc2Track];
+	[leaf6 setValue: @"Beer" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc2Track];
 	
 	UKFalse([ctx hasChanges]);
 	

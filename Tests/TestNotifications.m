@@ -28,7 +28,7 @@
     [track clear];
     
     [[persistentRoot rootObject] setLabel: @"world"];
-    [ctx commitWithUndoStack: track];
+    [ctx commitWithUndoTrack: track];
     
     __block int timesNotified = 0;
     id observer = [[NSNotificationCenter defaultCenter] addObserverForName: COPersistentRootDidChangeNotification

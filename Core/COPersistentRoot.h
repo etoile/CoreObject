@@ -277,7 +277,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * See -commitWithType:shortDescription: and -commitWithMetadata:.
  */
-- (CORevision *)commit;
+- (BOOL)commit;
 /**
  * Commits the current changes to the store with some basic metadatas and
  * returns the resulting revision.
@@ -291,8 +291,8 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * See -commitWithMetadata:.
  */
-- (CORevision *)commitWithType: (NSString *)type
-              shortDescription: (NSString *)shortDescription;
+- (BOOL)commitWithType: (NSString *)type
+      shortDescription: (NSString *)shortDescription;
 
 
 /** @taskunit Previewing Old Revision */

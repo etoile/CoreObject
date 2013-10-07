@@ -33,19 +33,19 @@ selective undo is involved. */
 
 	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
 	[object setValue: @"Groceries" forProperty: @"label"];
-    [ctx commitWithUndoStack: _setupTrack];
+    [ctx commitWithUndoTrack: _setupTrack];
     CORevision *firstRevision = [[[object persistentRoot] currentBranch] currentRevision];
     
 	/* Second commit */
 
 	[object setValue: @"Shopping List" forProperty: @"label"];
-    [ctx commitWithUndoStack: _testTrack];
+    [ctx commitWithUndoTrack: _testTrack];
     CORevision *secondRevision = [[[object persistentRoot] currentBranch] currentRevision];
     
 	/* Third commit */
 
 	[object setValue: @"Todo" forProperty: @"label"];
-    [ctx commitWithUndoStack: _testTrack];
+    [ctx commitWithUndoTrack: _testTrack];
     CORevision *thirdRevision = [[[object persistentRoot] currentBranch] currentRevision];
     
 	/* First undo  (Todo -> Shopping List) */
@@ -101,7 +101,7 @@ selective undo is involved. */
 	COContainer *object = [objectPersistentRoot rootObject];
 	[object setValue: @"Groceries" forProperty: @"label"];
 
-    [ctx commitWithUndoStack: _testTrack];
+    [ctx commitWithUndoTrack: _testTrack];
     
 	/* Second commit */
 
@@ -109,7 +109,7 @@ selective undo is involved. */
 	COContainer *doc = [docPersistentRoot rootObject];
 	[doc setValue: @"Document" forProperty: @"label"];
 
-	[ctx commitWithUndoStack: _testTrack];
+	[ctx commitWithUndoTrack: _testTrack];
 
 	/* Third commit call (creates commits in objectPersistentRoot and docPersistentRoot) */
 
@@ -118,13 +118,13 @@ selective undo is involved. */
     [doc addObject: para1];
 	[object setValue: @"Shopping List" forProperty: @"label"];
 
-	[ctx commitWithUndoStack: _testTrack];
+	[ctx commitWithUndoTrack: _testTrack];
 
 	/* Fourth commit */
 
 	[object setValue: @"Todo" forProperty: @"label"];
 
-	[ctx commitWithUndoStack: _testTrack];
+	[ctx commitWithUndoTrack: _testTrack];
 
 	/* Fifth commit */
 
@@ -132,13 +132,13 @@ selective undo is involved. */
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[doc addObject: para2];
 
-	[ctx commitWithUndoStack: _testTrack];
+	[ctx commitWithUndoTrack: _testTrack];
 
 	/* Sixth commit */
 
 	[para1 setValue: @"paragraph with different contents" forProperty: @"label"];
 
-	[ctx commitWithUndoStack: _testTrack];
+	[ctx commitWithUndoTrack: _testTrack];
 
 	return A(object, doc, para1, para2);
 }

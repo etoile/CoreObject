@@ -319,12 +319,12 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	ETAssert([self hasChanges] == NO);
 }
 
-- (CORevision *)commit
+- (BOOL)commit
 {
 	return [self commitWithType: nil shortDescription: nil];
 }
 
-- (CORevision *)commitWithType: (NSString *)type
+- (BOOL)commitWithType: (NSString *)type
               shortDescription: (NSString *)shortDescription
 {
 	NSString *commitType = type;
@@ -340,14 +340,11 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	return [self commitWithMetadata: D(shortDescription, @"shortDescription", commitType, @"type")];
 }
 
-- (CORevision *)commitWithMetadata: (NSDictionary *)metadata
+- (BOOL)commitWithMetadata: (NSDictionary *)metadata
 {
-	[_parentContext commitWithMetadata: metadata
-           restrictedToPersistentRoots: A(self)
-                         withUndoStack: nil];
-	//ETAssert([revs count] == 1);
-	//return [revs lastObject];
-    return nil;
+	return [_parentContext commitWithMetadata: metadata
+                  restrictedToPersistentRoots: A(self)
+                               withUndoTracks: nil];
 }
 
 - (BOOL)isPersistentRootUncommitted

@@ -355,13 +355,23 @@
 	ETAssert([self hasChanges] == NO);
 }
 
-- (NSArray *)commit
+#pragma mark Committing Changes
+#pragma mark -
+
+- (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
+                  undoTracks: (NSArray *)undoTracks
+                       error: (NSError **)anError
+{
+	return NO;
+}
+
+- (BOOL)commit
 {
 	return [self commitWithType: nil shortDescription: nil];
 }
 
-- (NSArray *)commitWithType: (NSString *)type
-           shortDescription: (NSString *)shortDescription
+- (BOOL)commitWithType: (NSString *)type
+      shortDescription: (NSString *)shortDescription
 {
 	NSString *commitType = type;
 	
@@ -428,9 +438,9 @@
 		            userInfo: userInfo];
 }
 
-- (NSArray *)commitWithMetadata: (NSDictionary *)metadata
+- (BOOL)commitWithMetadata: (NSDictionary *)metadata
 	restrictedToPersistentRoots: (NSArray *)persistentRoots
-                  withUndoStack: (COUndoTrack *)aStack
+	             withUndoTracks: (NSArray *)tracks
 {
 	// TODO: We could organize validation errors by persistent root. Each
 	// persistent root might result in a validation error that contains a
@@ -438,7 +448,7 @@
 	// a suberror per validation result. For now, we just aggregate errors per
 	// inner object.
 	if ([self validateChangedObjectsForContext: self] == NO)
-		return [NSArray array];
+		return NO;
 
 	NSMutableArray *revisions = [NSMutableArray array];
 
@@ -478,25 +488,26 @@
     }
 
     ETAssert([_store commitTransactionWithUUID: _store.transactionUUID withError: NULL]);
-	COCommand *command = [self recordEndUndoGroupWithUndoStack: aStack];
+	COCommand *command = [self recordEndUndoGroupWithUndoTracks: tracks];
     
+	/* For a commit triggered by undo/redo on a COUndoTrack, the command is nil */
 	[self didCommitWithCommand: command persistentRoots: persistentRoots];
     
-	return revisions;
+	return YES;
 }
 
-- (void) commitWithUndoStack: (COUndoTrack *)aStack
+- (BOOL)commitWithUndoTrack: (COUndoTrack *)aTrack
 {
-    [self commitWithMetadata: nil
- restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
-               withUndoStack: aStack];
+    return [self commitWithMetadata: nil
+        restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
+	                 withUndoTracks: A(aTrack)];
 }
 
-- (NSArray *)commitWithMetadata: (NSDictionary *)metadata
+- (BOOL)commitWithMetadata: (NSDictionary *)metadata
 {
 	return [self commitWithMetadata: metadata
 		restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
-                      withUndoStack: nil];
+                     withUndoTracks: nil];
 }
 
 - (void) unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot

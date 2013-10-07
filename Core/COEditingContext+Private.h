@@ -46,7 +46,7 @@
  * Commits the current changes to the store with the provided metadatas and
  * returns the resulting revisions.
  */
-- (NSArray *)commitWithMetadata: (NSDictionary *)metadata;
+- (BOOL)commitWithMetadata: (NSDictionary *)metadata;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -56,9 +56,9 @@
  * Changes must belong to the given persistent root subset, otherwise they
  * won't be committed. -hasChanges can still be YES on return.
  */
-- (NSArray *)commitWithMetadata: (NSDictionary *)metadata
+- (BOOL)commitWithMetadata: (NSDictionary *)metadata
 	restrictedToPersistentRoots: (NSArray *)persistentRoots
-                  withUndoStack: (COUndoTrack *)aStack;
+				 withUndoTracks: (NSArray *)tracks;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

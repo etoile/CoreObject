@@ -305,7 +305,7 @@
     [ctx commit];
     
     [persistentRoot setCurrentBranch: secondBranch];
-    [ctx commitWithUndoStack: _testTrack];
+    [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context
     {

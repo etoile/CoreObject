@@ -230,7 +230,9 @@
 /** @taskunit Committing Changes */
 
 
-// TODO: Change to -commitWithError:
+- (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
+                  undoTracks: (NSArray *)undoTracks
+                       error: (NSError **)anError;
 /**
  * Commits the current changes to the store and returns the resulting revisions.
  *
@@ -239,9 +241,10 @@
  *
  * See -commitWithType:shortDescription: and -commitWithMetadata:.
  */
-- (NSArray *)commit;
+- (BOOL)commit;
 
-- (void) commitWithUndoStack: (COUndoTrack *)aStack;
+
+- (BOOL)commitWithUndoTrack: (COUndoTrack *)aStack;
 
 // TODO: Change to -commitWithType:shortDescription:error:
 /**
@@ -260,8 +263,8 @@
  *
  * See -commitWithMetadata:.
  */
-- (NSArray *)commitWithType: (NSString *)type
-           shortDescription: (NSString *)shortDescription;
+- (BOOL)commitWithType: (NSString *)type
+      shortDescription: (NSString *)shortDescription;
 
 
 /** @taskunit Deprecated */
