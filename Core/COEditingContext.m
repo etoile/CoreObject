@@ -355,7 +355,8 @@
 	ETAssert([self hasChanges] == NO);
 }
 
-#pragma Validation
+#pragma mark Validation
+#pragma mark -
 
 - (void)didFailValidationWithError: (COError *)anError
 {
@@ -391,10 +392,39 @@
                   undoTracks: (NSArray *)undoTracks
                        error: (NSError **)anError
 {
-	NILARG_EXCEPTION_TEST(aCommitDescriptorId);
+	return [self commitWithIdentifier: aCommitDescriptorId
+	                         metadata: nil
+	                       undoTracks: undoTracks
+	                            error: anError];
+}
 
-	return [self commitWithMetadata: D(aCommitDescriptorId, kCOCommitMetadataIdentifier)
-		restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
+- (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
+					metadata: (NSDictionary *)additionalMetadata
+                  undoTracks: (NSArray *)undoTracks
+                       error: (NSError **)anError
+{
+	NILARG_EXCEPTION_TEST(aCommitDescriptorId);
+	INVALIDARG_EXCEPTION_TEST(additionalMetadata, [additionalMetadata containsKey: aCommitDescriptorId] == NO);
+
+	NSMutableDictionary *metadata =
+		[D(aCommitDescriptorId, kCOCommitMetadataIdentifier) mutableCopy];
+
+	if (additionalMetadata != nil)
+	{
+		[metadata addEntriesFromDictionary: additionalMetadata];
+	}
+	return [self commitWithMetadata: metadata
+	    restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
+	                 withUndoTracks: undoTracks
+	                          error: anError];
+}
+
+- (BOOL)commitWithMetadata: (NSDictionary *)metadata
+                undoTracks: (NSArray *)undoTracks
+                     error: (NSError **)anError
+{
+	return [self commitWithMetadata: metadata
+	    restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
 	                 withUndoTracks: undoTracks
 	                          error: anError];
 }
@@ -450,6 +480,9 @@
 	             withUndoTracks: (NSArray *)tracks
                           error: (NSError **)anError
 {
+	INVALIDARG_EXCEPTION_TEST(metadata, metadata == nil
+		|| [NSJSONSerialization isValidJSONObject: metadata]);
+
 	// TODO: We could organize validation errors by persistent root. Each
 	// persistent root might result in a validation error that contains a
 	// suberror per inner object, then each suberror could in turn contain
@@ -498,7 +531,11 @@
     
 	/* For a commit triggered by undo/redo on a COUndoTrack, the command is nil */
 	[self didCommitWithCommand: command persistentRoots: persistentRoots];
-    
+
+	if (anError != NULL)
+	{
+		*anError = nil;
+	}
 	return YES;
 }
 

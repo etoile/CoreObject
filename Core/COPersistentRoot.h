@@ -272,27 +272,27 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /** @taskunit Committing Changes */
 
 
-/**
- * Commits the current changes to the store and returns the resulting revision.
+/** 
+ * Commits this persistent root changes to the store, bound to a commit 
+ * descriptor identifier along the additional metadatas, and returns whether it
+ * succeeds.
  *
- * See -commitWithType:shortDescription: and -commitWithMetadata:.
+ * See -[COEditingContext commitWithIdentifier:metadata:undoTracks:error:].
+ */
+- (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
+                    metadata: (NSDictionary *)additionalMetadata
+                  undoTracks: (NSArray *)undoTracks
+                       error: (NSError **)anError;
+/**
+ * Commits this persistent root changes to the store and returns whether it 
+ * succeeds.
+ *
+ * You should avoid using this method in release code, it is mainly useful for 
+ * debugging and quick development.
+ *
+ * See -commitWithIdentifier:metadata:undoTracks:error:.
  */
 - (BOOL)commit;
-/**
- * Commits the current changes to the store with some basic metadatas and
- * returns the resulting revision.
- *
- * A commit on a single persistent root is atomic.
- *
- * This method won't commit changes of other persistent roots loaded in the 
- * parent context.
- *
- * The description will be visible at the UI level when browsing the history.
- *
- * See -commitWithMetadata:.
- */
-- (BOOL)commitWithType: (NSString *)type
-      shortDescription: (NSString *)shortDescription;
 
 
 /** @taskunit Previewing Old Revision */
@@ -315,6 +315,20 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * Reason for deprecating: I don't like NSObject+CoreObject idea, violates tell-don't-ask principle.
  */
-@property (nonatomic, readonly) BOOL isPersistentRoot;
+@property (nonatomic, readonly) BOOL isPersistentRoot;/**
+ * Commits the current changes to the store with some basic metadatas and
+ * returns the resulting revision.
+ *
+ * A commit on a single persistent root is atomic.
+ *
+ * This method won't commit changes of other persistent roots loaded in the 
+ * parent context.
+ *
+ * The description will be visible at the UI level when browsing the history.
+ *
+ * See -commitWithMetadata:.
+ */
+- (BOOL)commitWithType: (NSString *)type
+      shortDescription: (NSString *)shortDescription;
 
 @end

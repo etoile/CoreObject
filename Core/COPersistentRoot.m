@@ -319,13 +319,39 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	ETAssert([self hasChanges] == NO);
 }
 
+#pragma mark Committing Changes
+#pragma mark -
+
+- (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
+					metadata: (NSDictionary *)additionalMetadata
+                  undoTracks: (NSArray *)undoTracks
+                       error: (NSError **)anError
+{
+	NILARG_EXCEPTION_TEST(aCommitDescriptorId);
+	INVALIDARG_EXCEPTION_TEST(additionalMetadata, [additionalMetadata containsKey: aCommitDescriptorId] == NO);
+
+	NSMutableDictionary *metadata =
+		[D(aCommitDescriptorId, kCOCommitMetadataIdentifier) mutableCopy];
+
+	if (additionalMetadata != nil)
+	{
+		[metadata addEntriesFromDictionary: additionalMetadata];
+	}
+	return [_parentContext commitWithMetadata: metadata
+		          restrictedToPersistentRoots: A(self)
+	                           withUndoTracks: undoTracks
+	                                    error: anError];
+}
+
 - (BOOL)commit
 {
+	// TODO: Should call -commitWithIdentifier:metadata:undoTracks:error:
 	return [self commitWithType: nil shortDescription: nil];
 }
 
+// TODO: Remove
 - (BOOL)commitWithType: (NSString *)type
-              shortDescription: (NSString *)shortDescription
+      shortDescription: (NSString *)shortDescription
 {
 	NSString *commitType = type;
 	

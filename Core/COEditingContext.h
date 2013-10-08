@@ -74,6 +74,20 @@
  *
  * These classes form an in-memory view on a database, and the notion
  * of two of these views being equal isn't useful or interesting.
+ *
+ * @section Commits
+ *
+ * A commit involving multiple persistent roots or branches is not atomic, it 
+ * results in a new revision per persistent root branch that was containing 
+ * changes.
+ * In addition to branch content changes that result in new revisions, a commit 
+ * can create various store stucture changes (e.g. renaming a branch, deleting a 
+ * persistent root) not visible in the store history. You can use COUndoTrack 
+ * to record all these changes as commands.
+ * 
+ * We usually advice to commit a single persistent root at time to prevent
+ * multiple revisions per commit. In this way, you can provide precise undo/redo 
+ * support matching the user expectations.
  */
 @interface COEditingContext : NSObject <COPersistentObjectContext>
 {
@@ -229,47 +243,90 @@
 
 /** @taskunit Committing Changes */
 
-
+/**
+ * Commits the current changes to the store bound to a commit descriptor
+ * identifier, and returns whether it succeeds.
+ *
+ * See -commitWithIdentitifer:metadata:undoTracks:error.
+ */
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
                   undoTracks: (NSArray *)undoTracks
                        error: (NSError **)anError;
 /**
- * Commits the current changes to the store and returns the resulting revisions.
+ * Commits the current changes to the store, bound to a commit descriptor 
+ * identifier along the additional metadatas, and returns whether it 
+ * succeeds.
  *
- * A batch commit UUID is added to the metadata of each commit to indicate that
- * the individual persistent root commits were made as a batch.
+ * The metadata dictionary must be a valid property list or nil, otherwise a
+ * serialization exception is raised.
  *
- * See -commitWithType:shortDescription: and -commitWithMetadata:.
+ * If the method returns NO, the error argument is set, otherwise it is nil.
+ *
+ * One or more undo tracks can be passed to record the commit as a command.
+ *
+ * For programs exposing the history to an end user, you must use this method 
+ * that supports history localization through COCommitDescriptor and not 
+ * -commitWithMetadata:undoTracks:error:.
+ *
+ * See COCommitDescriptor to understand how the localization works.
+ */
+- (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
+					metadata: (NSDictionary *)additionalMetadata
+                  undoTracks: (NSArray *)undoTracks
+                       error: (NSError **)anError;
+/**
+ * Commits the current changes to the store along the metadatas and returns 
+ * whether it succeeds.
+ *
+ * The metadata dictionary must be a valid JSON object or nil, otherwise a 
+ * serialization exception is raised.
+ *
+ * If the method returns NO, the error argument is set, otherwise it is nil.
+ *
+ * One or more undo tracks can be passed to record the commit as a command.
+ *
+ * For programs exposing the history to an end user, you must not use this 
+ * method, but -commitWithIdentifier:metadata:undoTracks:error: or 
+ * -commitWithIdentifier:undoTracks:error: that both support history 
+ * localization through COCommitDescriptor.
+ */
+- (BOOL)commitWithMetadata: (NSDictionary *)metadata
+                undoTracks: (NSArray *)undoTracks
+                     error: (NSError **)anError;
+/**
+ * Commits the current changes to the store and returns whether it succeeds.
+ *
+ * You should avoid using this method in release code, it is mainly useful for 
+ * debugging and quick development.
+ *
+ * See also -commitWithMetadata:undoTracks:error:.
  */
 - (BOOL)commit;
-
-
-- (BOOL)commitWithUndoTrack: (COUndoTrack *)aStack;
-
-// TODO: Change to -commitWithType:shortDescription:error:
 /**
- * Commits the current changes to the store with some basic metadatas and 
- * returns the resulting revisions.
+ * Commits the current changes to the store, records them on the undo track and 
+ * returns whether it succeeds.
+ * 
+ * You should avoid using this method in release code, it is mainly useful for
+ * debugging and quick development.
  *
- * A commit involving multiple persistent roots is not atomic (more than a single 
- * revision in the returned array).<br />
- * Each returned revision results from an atomic commit on a single persistent 
- * root.
- *
- * We usually advice to commit a single persistent root at time to prevent 
- * multiple revisions per commit.
- *
- * The description will be visible at the UI level when browsing the history.
- *
- * See -commitWithMetadata:.
+ *  See also -commitWithMetadata:undoTracks:error:.
  */
-- (BOOL)commitWithType: (NSString *)type
-      shortDescription: (NSString *)shortDescription;
+- (BOOL)commitWithUndoTrack: (COUndoTrack *)aStack;
 
 
 /** @taskunit Deprecated */
 
 
+/**
+ * Commits the current changes to the store with some basic metadatas and 
+ * returns whether it succeeds.
+ *
+ * The description will be visible at the UI level when browsing the history.
+ *
+ * See -commitWithMetadata:undoTracks:error:.
+ */
+- (BOOL)commitWithType: (NSString *)type
+      shortDescription: (NSString *)shortDescription;
 /**
  * Returns YES.
  *
