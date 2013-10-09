@@ -475,13 +475,31 @@
 		            userInfo: userInfo];
 }
 
+- (void)validateMetadata: (NSDictionary *)metadata
+{
+	INVALIDARG_EXCEPTION_TEST(metadata, metadata == nil
+		|| [NSJSONSerialization isValidJSONObject: metadata]);
+	
+	/* Validate short description related metadata */
+
+	NSArray *shortDescriptionArgs =
+		[metadata objectForKey: kCOCommitMetadataShortDescriptionArguments];
+	BOOL containsValidArgs = YES;
+
+	for (id obj in shortDescriptionArgs)
+	{
+		containsValidArgs &= [obj isString];
+	}
+	INVALIDARG_EXCEPTION_TEST(metadata, shortDescriptionArgs == nil
+		|| ([shortDescriptionArgs isKindOfClass: [NSArray class]] && containsValidArgs));
+}
+
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
 	restrictedToPersistentRoots: (NSArray *)persistentRoots
 	             withUndoTracks: (NSArray *)tracks
                           error: (NSError **)anError
 {
-	INVALIDARG_EXCEPTION_TEST(metadata, metadata == nil
-		|| [NSJSONSerialization isValidJSONObject: metadata]);
+	[self validateMetadata: metadata];
 
 	// TODO: We could organize validation errors by persistent root. Each
 	// persistent root might result in a validation error that contains a

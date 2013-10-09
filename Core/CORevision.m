@@ -8,6 +8,7 @@
  */
 
 #import "CORevision.h"
+#import "COCommitDescriptor.h"
 #import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
 #import "CORevisionCache.h"
@@ -37,8 +38,8 @@
 - (NSArray *)propertyNames
 {
 	return [[super propertyNames] arrayByAddingObjectsFromArray: 
-		A(@"revisionNumber", @"UUID", @"date", @"type", @"shortDescription", 
-		@"longDescription", @"objectUUID", @"metadata", @"changedObjectUUIDs")];
+		A(@"UUID", @"date", @"type", @"localizedTypeDescription",
+		@"localizedShortDescription", @"metadata")];
 }
 
 - (CORevisionID *)revisionID
@@ -87,6 +88,38 @@
 - (NSDictionary *)metadata
 {
 	return [revisionInfo metadata];
+}
+
+- (COCommitDescriptor *)commitDescriptor
+{
+	NSString *commitDescriptorId =
+		[[self metadata] objectForKey: kCOCommitMetadataIdentifier];
+
+	if (commitDescriptorId == nil)
+		return nil;
+
+	return [COCommitDescriptor registeredDescriptorForIdentifier: commitDescriptorId];
+}
+
+- (NSString *)localizedTypeDescription
+{
+	COCommitDescriptor *descriptor = [self commitDescriptor];
+
+	if (descriptor == nil)
+		return [[self metadata] objectForKey: kCOCommitMetadataTypeDescription];
+
+	return [descriptor localizedTypeDescription];
+}
+
+- (NSString *)localizedShortDescription
+{
+	COCommitDescriptor *descriptor = [self commitDescriptor];
+
+	if (descriptor == nil)
+		return [[self metadata] objectForKey: kCOCommitMetadataShortDescription];
+	
+	return [descriptor localizedShortDescriptionWithArguments:
+		[[self metadata] objectForKey: kCOCommitMetadataShortDescriptionArguments]];
 }
 
 - (NSString *)type

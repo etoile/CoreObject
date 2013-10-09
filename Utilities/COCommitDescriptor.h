@@ -36,7 +36,7 @@
 {
 	@private
 	NSString *_identifier;
-	NSString *_typeDescription;
+	NSString *_type;
 	NSString *_shortDescription;
 }
 
@@ -50,8 +50,7 @@
  *
  * See also -identifier and +registeredDescriptorForIdentifier:inDomain:.
  */
-+ (void) registerDescriptor: (COCommitDescriptor *)aDescriptor
-                   inDomain: (NSString *)aDomain;
++ (void) registerDescriptor: (COCommitDescriptor *)aDescriptor;
 /**
  * Returns the commit descriptor previously registered for the given combination 
  * of domain and descriptor identifier.
@@ -62,8 +61,7 @@
  *
  * See also +registerDescriptor:inDomain:.
  */
-+ (COCommitDescriptor *) registeredDescriptorForIdentifier: (NSString *)anIdentifier
-                                                  inDomain: (NSString *)aDomain;
++ (COCommitDescriptor *) registeredDescriptorForIdentifier: (NSString *)anIdentifier;
 
 /** @taskunit Transient and Persistent Metadata */
 
@@ -84,6 +82,9 @@
  * </example>
  */
 @property (nonatomic, strong) NSString *identifier;
+@property (nonatomic, readonly) NSString *domain;
+@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, strong) NSString *type;
 /**
  * Few words that summarizes the action that triggered the commit.
  *
@@ -91,13 +92,13 @@
  *
  * For a nil description, the setter raises a NSInvalidArgumentException.
  */
-@property (nonatomic, strong) NSString *typeDescription;
+@property (nonatomic, readonly) NSString *typeDescription;
 /**
  * A localized description for -typeDescription.
  *
  * This is usually presented in a history browser UI.
  */
-@property (weak, nonatomic, readonly) NSString *localizedTypeDescription;
+@property (nonatomic, readonly) NSString *localizedTypeDescription;
 /**
  * A description that fits on a single line.
  *
@@ -111,7 +112,7 @@
  *
  * This is usually presented in a history browser UI.
  */
-@property (weak, nonatomic, readonly) NSString *localizedShortDescription;
+- (NSString *)localizedShortDescriptionWithArguments: (NSArray *)args;
 
 /** @taskunit Commit Integration */
 
@@ -123,7 +124,7 @@
  * If -shortDescription or -typeDescription returns nil, a 
  * NSInternalInconsistencyException is raised.
  */
-@property (weak, nonatomic, readonly) NSDictionary *persistentMetadata;
+@property (nonatomic, readonly) NSDictionary *persistentMetadata;
 
 @end
 
@@ -142,3 +143,12 @@ extern NSString *kCOCommitMetadataTypeDescription;
  * commit metadata.
  */
 extern NSString *kCOCommitMetadataShortDescription;
+/**
+ * The optional key used to identify -[COCommitDescriptor shortDescriptionArguments] 
+ * among the commit metadata.
+ *
+ * The value must be a string array that can used to interpolate the format 
+ * string of -shortDescription and -localizedShortDescription.
+ */
+extern NSString *kCOCommitMetadataShortDescriptionArguments;
+

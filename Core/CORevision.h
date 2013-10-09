@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COTrack.h>
 
-@class COEditingContext, CORevisionInfo, CORevisionID, CORevisionCache;
+@class COEditingContext, CORevisionInfo, CORevisionID, CORevisionCache, COCommitDescriptor;
 
 /** 
  * @group Core
@@ -79,8 +79,22 @@
  * Returns the metadata attached to the revision at commit time. 
  */
 - (NSDictionary *)metadata;
-
-// TODO: Reintroduce methods like -localizedTitle that use COCommitDescriptor?
+/**
+ * Returns the commit descriptor matching the commit identifier in -metadata.
+ */
+- (COCommitDescriptor *)commitDescriptor;
+/**
+ * Returns -[COCommitDescription localizedTypeDescription].
+ */
+- (NSString *)localizedTypeDescription;
+/**
+ * Returns the commit descriptor short description evaluated with the arguments 
+ * provided under the key kCOCommitMetadataShortDescriptionArguments in 
+ * -metadata.
+ *
+ * See -[COCommitDescription localizedShortDescriptionWithArguments:]
+ */
+- (NSString *)localizedShortDescription;
 
 
 /** @taskunit Framework Private */
