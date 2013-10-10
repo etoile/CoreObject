@@ -343,7 +343,7 @@
     COPersistentRoot *doc2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commitWithUndoTrack: _setupTrack];
 
-    COUndoTrack *workspaceTrack = [COUndoTrack trackForPattern: @"workspace.%"
+    COUndoTrack *workspaceTrack = [COUndoTrack trackForPattern: @"workspace.*"
 	                                        withEditingContext: ctx];
     COUndoTrack *workspaceDoc1Track = [COUndoTrack trackForName: @"workspace.doc1"
 	                                         withEditingContext: ctx];
