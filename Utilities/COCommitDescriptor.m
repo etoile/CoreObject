@@ -190,7 +190,7 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 	NSString *localizationKey =
 		[NSString stringWithFormat: @"types/%@/TypeDescription", [self type]];
 	return [self localizedStringForKey: localizationKey
-	                             value: [self shortDescription]
+	                             value: [self typeDescription]
 	                         arguments: nil];
 }
 
