@@ -277,11 +277,11 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * descriptor identifier along the additional metadatas, and returns whether it
  * succeeds.
  *
- * See -[COEditingContext commitWithIdentifier:metadata:undoTracks:error:].
+ * See -[COEditingContext commitWithIdentifier:metadata:undoTrack:error:].
  */
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
                     metadata: (NSDictionary *)additionalMetadata
-                  undoTracks: (NSArray *)undoTracks
+				   undoTrack: (COUndoTrack *)undoTrack
                        error: (NSError **)anError;
 /**
  * Commits this persistent root changes to the store and returns whether it 
@@ -290,7 +290,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * You should avoid using this method in release code, it is mainly useful for 
  * debugging and quick development.
  *
- * See -commitWithIdentifier:metadata:undoTracks:error:.
+ * See -commitWithIdentifier:metadata:undoTrack:error:.
  */
 - (BOOL)commit;
 

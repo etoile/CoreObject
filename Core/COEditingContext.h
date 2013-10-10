@@ -247,10 +247,10 @@
  * Commits the current changes to the store bound to a commit descriptor
  * identifier, and returns whether it succeeds.
  *
- * See -commitWithIdentitifer:metadata:undoTracks:error.
+ * See -commitWithIdentitifer:metadata:undoTrack:error.
  */
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
-                  undoTracks: (NSArray *)undoTracks
+				   undoTrack: (COUndoTrack *)undoTrack
                        error: (NSError **)anError;
 /**
  * Commits the current changes to the store, bound to a commit descriptor 
@@ -266,13 +266,13 @@
  *
  * For programs exposing the history to an end user, you must use this method 
  * that supports history localization through COCommitDescriptor and not 
- * -commitWithMetadata:undoTracks:error:.
+ * -commitWithMetadata:undoTrack:error:.
  *
  * See COCommitDescriptor to understand how the localization works.
  */
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
 					metadata: (NSDictionary *)additionalMetadata
-                  undoTracks: (NSArray *)undoTracks
+				   undoTrack: (COUndoTrack *)undoTrack
                        error: (NSError **)anError;
 /**
  * Commits the current changes to the store along the metadatas and returns 
@@ -286,12 +286,12 @@
  * One or more undo tracks can be passed to record the commit as a command.
  *
  * For programs exposing the history to an end user, you must not use this 
- * method, but -commitWithIdentifier:metadata:undoTracks:error: or 
- * -commitWithIdentifier:undoTracks:error: that both support history 
+ * method, but -commitWithIdentifier:metadata:undoTrack:error: or 
+ * -commitWithIdentifier:undoTrack:error: that both support history 
  * localization through COCommitDescriptor.
  */
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
-                undoTracks: (NSArray *)undoTracks
+				 undoTrack: (COUndoTrack *)undoTrack
                      error: (NSError **)anError;
 /**
  * Commits the current changes to the store and returns whether it succeeds.
@@ -299,7 +299,7 @@
  * You should avoid using this method in release code, it is mainly useful for 
  * debugging and quick development.
  *
- * See also -commitWithMetadata:undoTracks:error:.
+ * See also -commitWithMetadata:undoTrack:error:.
  */
 - (BOOL)commit;
 /**
@@ -309,7 +309,7 @@
  * You should avoid using this method in release code, it is mainly useful for
  * debugging and quick development.
  *
- *  See also -commitWithMetadata:undoTracks:error:.
+ *  See also -commitWithMetadata:undoTrack:error:.
  */
 - (BOOL)commitWithUndoTrack: (COUndoTrack *)aStack;
 
@@ -323,7 +323,7 @@
  *
  * The description will be visible at the UI level when browsing the history.
  *
- * See -commitWithMetadata:undoTracks:error:.
+ * See -commitWithMetadata:undoTrack:error:.
  */
 - (BOOL)commitWithType: (NSString *)type
       shortDescription: (NSString *)shortDescription;

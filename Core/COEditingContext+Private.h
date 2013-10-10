@@ -57,9 +57,9 @@
  * won't be committed. -hasChanges can still be YES on return.
  */
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
-	restrictedToPersistentRoots: (NSArray *)persistentRoots
-				 withUndoTracks: (NSArray *)tracks
-                          error: (NSError **)anError;
+restrictedToPersistentRoots: (NSArray *)persistentRoots
+			 withUndoTrack: (COUndoTrack *)track
+					 error: (NSError **)anError;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

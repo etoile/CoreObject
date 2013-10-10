@@ -389,18 +389,18 @@
 #pragma mark -
 
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
-                  undoTracks: (NSArray *)undoTracks
+				   undoTrack: (COUndoTrack *)undoTrack
                        error: (NSError **)anError
 {
 	return [self commitWithIdentifier: aCommitDescriptorId
 	                         metadata: nil
-	                       undoTracks: undoTracks
+							undoTrack: undoTrack
 	                            error: anError];
 }
 
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
 					metadata: (NSDictionary *)additionalMetadata
-                  undoTracks: (NSArray *)undoTracks
+				   undoTrack: (COUndoTrack *)undoTrack
                        error: (NSError **)anError
 {
 	NILARG_EXCEPTION_TEST(aCommitDescriptorId);
@@ -415,17 +415,17 @@
 	}
 	return [self commitWithMetadata: metadata
 	    restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
-	                 withUndoTracks: undoTracks
+					  withUndoTrack: undoTrack
 	                          error: anError];
 }
 
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
-                undoTracks: (NSArray *)undoTracks
+				 undoTrack: (COUndoTrack *)undoTrack
                      error: (NSError **)anError
 {
 	return [self commitWithMetadata: metadata
 	    restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
-	                 withUndoTracks: undoTracks
+					  withUndoTrack: undoTrack
 	                          error: anError];
 }
 
@@ -495,9 +495,9 @@
 }
 
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
-	restrictedToPersistentRoots: (NSArray *)persistentRoots
-	             withUndoTracks: (NSArray *)tracks
-                          error: (NSError **)anError
+restrictedToPersistentRoots: (NSArray *)persistentRoots
+			 withUndoTrack: (COUndoTrack *)track
+					 error: (NSError **)anError
 {
 	[self validateMetadata: metadata];
 
@@ -545,7 +545,7 @@
     }
 
     ETAssert([_store commitTransactionWithUUID: _store.transactionUUID withError: NULL]);
-	COCommand *command = [self recordEndUndoGroupWithUndoTracks: tracks];
+	COCommand *command = [self recordEndUndoGroupWithUndoTrack: track];
     
 	/* For a commit triggered by undo/redo on a COUndoTrack, the command is nil */
 	[self didCommitWithCommand: command persistentRoots: persistentRoots];
@@ -561,7 +561,7 @@
 {
     return [self commitWithMetadata: nil
         restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
-	                 withUndoTracks: A(aTrack)
+					  withUndoTrack: aTrack
 	                          error: NULL];
 }
 
@@ -569,7 +569,7 @@
 {
 	return [self commitWithMetadata: metadata
 		restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
-                     withUndoTracks: nil
+					  withUndoTrack: nil
 	                          error: NULL];
 }
 

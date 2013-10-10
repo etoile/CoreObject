@@ -37,7 +37,7 @@
     }
 }
 
-- (COCommand *) recordEndUndoGroupWithUndoTracks: (NSArray *)tracks
+- (COCommand *) recordEndUndoGroupWithUndoTrack: (COUndoTrack *)track
 {
     if (_isRecordingUndo == NO)
 		return nil;
@@ -58,10 +58,8 @@
 		recordedCommand = [_currentEditGroup.contents firstObject];
 	}
 
-	for (COUndoTrack *undoTrack in tracks)
-	{
-		[undoTrack recordCommand: recordedCommand];
-	}
+	[track recordCommand: recordedCommand];
+	
 	_currentEditGroup = nil;
 	
 	return recordedCommand;

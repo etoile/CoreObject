@@ -324,7 +324,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
 					metadata: (NSDictionary *)additionalMetadata
-                  undoTracks: (NSArray *)undoTracks
+				   undoTrack: (COUndoTrack *)undoTrack
                        error: (NSError **)anError
 {
 	NILARG_EXCEPTION_TEST(aCommitDescriptorId);
@@ -339,13 +339,13 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	}
 	return [_parentContext commitWithMetadata: metadata
 		          restrictedToPersistentRoots: A(self)
-	                           withUndoTracks: undoTracks
+								withUndoTrack: undoTrack
 	                                    error: anError];
 }
 
 - (BOOL)commit
 {
-	// TODO: Should call -commitWithIdentifier:metadata:undoTracks:error:
+	// TODO: Should call -commitWithIdentifier:metadata:undoTrack:error:
 	return [self commitWithType: nil shortDescription: nil];
 }
 
@@ -370,7 +370,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 {
 	return [_parentContext commitWithMetadata: metadata
                   restrictedToPersistentRoots: A(self)
-                               withUndoTracks: nil
+								withUndoTrack: nil
 	                                    error: NULL];
 }
 

@@ -49,7 +49,7 @@
 // Called from COEditingContext
 
 - (void) recordBeginUndoGroup;
-- (COCommand *) recordEndUndoGroupWithUndoTracks: (NSArray *)tracks;
+- (COCommand *) recordEndUndoGroupWithUndoTrack: (COUndoTrack *)track;
 
 - (void) recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot;
 - (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot;
