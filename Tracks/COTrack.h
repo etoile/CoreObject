@@ -80,7 +80,7 @@
 /**
  * See -[CORevision UUID].
  */
-- (CORevisionID *)UUID;
+- (ETUUID *)UUID;
 /**
  * See -[CORevision persistentRootUUID].
  */
@@ -93,17 +93,12 @@
  * See -[CORevision date].
  */
 - (NSDate *)date;
-@optional
 /**
- * See -[CORevision type].
+ * See -[CORevision localizedTypeDescription].
  */
-- (NSString *)type;
+- (NSString *)localizedTypeDescription;
 /** 
- * See -[CORevision shortDescription].
+ * See -[CORevision localizedShortDescription].
  */
-- (NSString *)shortDescription;
-/** 
- * See -[CORevision longDescription].
- */
-- (NSString *)longDescription;
+- (NSString *)localizedShortDescription;
 @end

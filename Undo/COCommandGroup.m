@@ -106,6 +106,7 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 
 - (ETUUID *)UUID
 {
+	// TODO: Return a transaction/batch UUID probably
 	return nil;
 }
 
@@ -124,30 +125,25 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 	return [[_contents firstObject] date];
 }
 
-- (NSDictionary *)metadata
+- (CORevision *)revisionWithMetadata
 {
 	for (COCommand *command in _contents)
 	{
 		BOOL hasNewRevision =
 			([command isKindOfClass: [COCommandSetCurrentVersionForBranch class]]
-		  || [command isKindOfClass: [COCommandCreatePersistentRoot class]]);
+		 		|| [command isKindOfClass: [COCommandCreatePersistentRoot class]]);
 
 		if (hasNewRevision)
 		{
-			return [(COCommandSetCurrentVersionForBranch *)command metadata];
+			return [(COCommandSetCurrentVersionForBranch *)command revision];
 		}
 	}
 	return nil;
 }
 
-- (NSString *)type
+- (NSString *)localizedShortDescription
 {
-	return [(COCommand *)[_contents firstObject] type];
-}
-
-- (NSString *)shortDescription;
-{
-	return [[self metadata] objectForKey: @"shortDescription"];
+	return [[self revisionWithMetadata] localizedShortDescription];
 }
 
 #pragma mark -

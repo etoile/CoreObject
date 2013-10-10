@@ -156,15 +156,14 @@ static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
 	return [[self revision] metadata];
 }
 
-- (NSString *)type
+- (NSString *)localizedTypeDescription
 {
-	return [[self metadata] objectForKey: @"type"];
+	return [[self revision] localizedTypeDescription];
 }
 
-
-- (NSString *)shortDescription;
+- (NSString *)localizedShortDescription;
 {
-	return [[self metadata] objectForKey: @"shortDescription"];
+	return [[self revision] localizedShortDescription];
 }
 
 @end

@@ -9,6 +9,7 @@
 #import "COCommandSetCurrentVersionForBranch.h"
 #import "COCommandDeletePersistentRoot.h"
 #import "COCommandUndeletePersistentRoot.h"
+#import "COCommitDescriptor.h"
 
 // Edit types
 
@@ -113,7 +114,7 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 {
 	return [[super propertyNames] arrayByAddingObjectsFromArray: 
 		A(@"metadata", @"UUID", @"persistentRootUUID", @"branchUUID", @"date",
-		  @"type", @"shortDescription")];
+		  @"localizedTypeDescription", @"localizedShortDescription")];
 }
 
 #pragma mark -
@@ -144,15 +145,15 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 	return nil;
 }
 
-- (NSString *)type
+- (NSString *)localizedTypeDescription
 {
 	// TODO: Override in subclasses to return a human-readable description
 	return [self className];
 }
 
-- (NSString *)shortDescription;
+- (NSString *)localizedShortDescription;
 {
-	return [[self metadata] objectForKey: @"shortDescription"];
+	return [[self metadata] objectForKey: kCOCommitMetadataShortDescription];
 }
 
 @end

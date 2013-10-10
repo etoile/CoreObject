@@ -185,6 +185,8 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 - (void) recordCommand: (COCommand *)aCommand
 {
 	NILARG_EXCEPTION_TEST(aCommand);
+	// TODO: A SQL constraint and batch UUID would prevent pushing a command twice more strictly.
+	INVALIDARG_EXCEPTION_TEST(aCommand, [aCommand isEqual: [self currentCommand]] == NO);
 
 	[self discardRedoCommands];
 	[self addNewUndoCommand: aCommand];
