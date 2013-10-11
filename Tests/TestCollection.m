@@ -66,16 +66,16 @@
 - (void)testTagGroup
 {
 	COTagGroup *tagGroup = [[ctx insertNewPersistentRootWithEntityName: @"COTagGroup"] rootObject];
+	COTag *tag = [[ctx insertNewPersistentRootWithEntityName: @"COTag"] rootObject];
 
 	UKObjectsEqual([ETUTI typeWithClass: [COTag class]], [tagGroup objectType]);
 	UKTrue([[tagGroup content] isKindOfClass: [NSMutableArray class]]);
-}
-
-- (void)testTag
-{
-	COTag *tag = [[ctx insertNewPersistentRootWithEntityName: @"COTag"] rootObject];
-
 	UKTrue([[tag tagGroups] isKindOfClass: [NSSet class]]);
+
+	[tagGroup addObject: tag];
+
+	UKObjectsEqual(A(tag), [tagGroup content]);
+	UKObjectsEqual(S(tagGroup), [tag tagGroups]);
 }
 
 @end
