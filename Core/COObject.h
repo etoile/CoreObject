@@ -195,7 +195,7 @@
 {
 	@private
 	ETEntityDescription *_entityDescription;
-	ETUUID *_uuid;
+	ETUUID *_UUID;
 	COObjectGraphContext *__weak _objectGraphContext; // weak reference
 	@protected
 	NSMutableDictionary *_variableStorage;
@@ -247,7 +247,7 @@
 
 - (id)copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription;
 
-/** taskunit Persistency Attributes */
+/** @taskunit Persistency Attributes */
 
 /** 
  * Returns the UUID that uniquely identifies the persistent object that 
@@ -255,16 +255,23 @@
  *
  * A persistent object has a single instance per editing context.
  */
-- (ETUUID *)UUID;
-- (ETEntityDescription *)entityDescription;
+@property (nonatomic, readonly) ETUUID *UUID;
+/**
+ * Returns the metamodel that declares all the object properties (persistent and 
+ * transient).
+ *
+ * See also -propertyNames and -persistentPropertyNames.
+ */
+@property (nonatomic, readonly) ETEntityDescription *entityDescription;
 /** 
  * Returns the persistent root when the receiver is persistent, otherwise 
  * returns nil.
  */
-- (COPersistentRoot *)persistentRoot;
-
-- (COObjectGraphContext *)objectGraphContext;
-
+@property (nonatomic, readonly) COPersistentRoot *persistentRoot;
+/**
+ * Returns the object graph context owning the receiver.
+ */
+@property (nonatomic, readonly) COObjectGraphContext *objectGraphContext;
 /** 
  * Returns the root object when the receiver is persistent, otherwise returns nil.
  *
@@ -273,13 +280,13 @@
  *
  * See also -isRoot.
  */
-- (id)rootObject;
+@property (nonatomic, readonly) id rootObject;
 /**
  * Returns whether the receiver is saved on the disk.
  *
  * When persistent, the receiver has both a valid editing context and root object.
  */
-- (BOOL)isPersistent;
+@property (nonatomic, readonly) BOOL isPersistent;
 /** 
  * Returns whether the receiver is a root object that can enclose embedded 
  * objects.
@@ -288,8 +295,7 @@
  *
  * See also -rootObject.
  */
-- (BOOL)isRoot;
-- (BOOL)isDamaged;
+@property (nonatomic, readonly) BOOL isRoot;
 
 /** @taskunit History Attributes */
 
@@ -349,14 +355,6 @@
  * Returns -name.
  */
 - (NSString *)displayName;
-/**
- * Returns the groups to which the receiver belongs to.
- *
- * Groups are COGroup or subclass instances.
- *
- * See also -tags.
- */
-- (NSArray *)parentGroups;
 /**
  * Returns the tags attached to the receiver. 
  *
