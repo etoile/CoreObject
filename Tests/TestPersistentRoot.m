@@ -13,6 +13,9 @@
     COPersistentRoot *persistentRoot;
 	OutlineItem *rootObj;
     COBranch *originalBranch;
+	
+	CORevision *r0;
+	CORevision *r1;
 }
 @end
 
@@ -25,6 +28,13 @@
 	rootObj = [persistentRoot rootObject];
     originalBranch =  [persistentRoot currentBranch];
     
+	[ctx commit];
+	r0 = persistentRoot.revision;
+	
+	[[persistentRoot rootObject] setLabel: @"hello"];
+	[ctx commit];
+	r1 = persistentRoot.revision;
+	
     return self;
 }
 
@@ -285,6 +295,171 @@
 		UKObjectsEqual(S(ctx2branch), [ctx2persistentRoot deletedBranches]);
         UKTrue([ctx2branch isDeleted]);
     }
+}
+
+// Check that attempting to commit modifications to a deleted persistent root
+// raises an exception
+
+// FIXME: Refactor the tests so each test is only expressed once (in a block?)
+// which is then run on both ctx and a fresh context. At present, each test
+// is copied & pasted.
+
+- (void) testExceptionOnDeletedPersistentRootSetRevision
+{
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	persistentRoot.revision = r0;
+	UKRaisesException([ctx commit]);
+}
+
+- (void) testExceptionOnDeletedPersistentRootSetRevisionInSecondContext
+{
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	// Load in another context
+	{
+		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+		ctx2persistentRoot.revision = r0;
+		UKRaisesException([ctx2 commit]);
+	}
+}
+
+- (void) testExceptionOnDeletedPersistentRootModifyEmbeddedObject
+{
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	[[persistentRoot rootObject] setLabel: @"hi"];
+	UKRaisesException([ctx commit]);
+}
+
+- (void) testExceptionOnDeletedPersistentRootModifyEmbeddedObjectInSecondContext
+{
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	// Load in another context
+	{
+		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+		[[ctx2persistentRoot rootObject] setLabel: @"hi"];
+		UKRaisesException([ctx2 commit]);
+	}
+}
+
+- (void) testExceptionOnDeletedPersistentRootCreateBranch
+{
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	COBranch *shouldFailToCommit = [originalBranch makeBranchWithLabel: @"shouldFailToCommit"];
+	UKNotNil(shouldFailToCommit);
+	UKRaisesException([ctx commit]);
+}
+
+- (void) testExceptionOnDeletedPersistentRootCreateBranchInSecondContext
+{
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	// Load in another context
+	{
+		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+		COBranch *shouldFailToCommit = [[ctx2persistentRoot currentBranch] makeBranchWithLabel: @"shouldFailToCommit"];
+		UKNotNil(shouldFailToCommit);
+		UKRaisesException([ctx2 commit]);
+	}
+}
+
+- (void) testExceptionOnDeletedPersistentRootDeleteBranch
+{
+	COBranch *altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
+	[ctx commit];
+	
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	altBranch.deleted = YES;
+	UKRaisesException([ctx commit]);
+}
+
+- (void) testExceptionOnDeletedPersistentRootDeleteBranchInSecondContext
+{
+	COBranch *altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
+	[ctx commit];
+
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	// Load in another context
+	{
+		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+		[ctx2persistentRoot branchForUUID: [altBranch UUID]].deleted = YES;
+		UKRaisesException([ctx2 commit]);
+	}
+}
+
+- (void) testExceptionOnDeletedPersistentRootUndeleteBranch
+{
+	COBranch *deletedBranch = [originalBranch makeBranchWithLabel: @"deletedBranch"];
+	[ctx commit];
+	
+	deletedBranch.deleted = YES;
+	[ctx commit];
+	
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	deletedBranch.deleted = NO;
+	UKRaisesException([ctx commit]);
+}
+
+- (void) testExceptionOnDeletedPersistentRootUndeleteBranchInSecondContext
+{
+	COBranch *deletedBranch = [originalBranch makeBranchWithLabel: @"deletedBranch"];
+	[ctx commit];
+	
+	deletedBranch.deleted = YES;
+	[ctx commit];
+	
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	// Load in another context
+	{
+		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+		[ctx2persistentRoot branchForUUID: [deletedBranch UUID]].deleted = NO;
+		UKRaisesException([ctx2 commit]);
+	}
+}
+
+- (void) testExceptionOnDeletedPersistentRootSetBranchMetadata
+{
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	originalBranch.metadata = @{@"hello" : @"world"};
+	UKRaisesException([ctx commit]);
+}
+
+- (void) testExceptionOnDeletedPersistentRootSetBranchMetadataInSecondContext
+{
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	// Load in another context
+	{
+		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+		[ctx2persistentRoot branchForUUID: [originalBranch UUID]].metadata = @{@"hello" : @"world"};
+		UKRaisesException([ctx2 commit]);
+	}
 }
 
 @end

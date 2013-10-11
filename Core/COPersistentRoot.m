@@ -382,6 +382,12 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 - (void)saveCommitWithMetadata: (NSDictionary *)metadata
                transactionUUID: (ETUUID *)transactionUUID
 {
+	if ([self hasChanges] && self.isDeleted)
+	{
+		[NSException raise: NSGenericException
+					format: @"Attempted to commit changes to deleted persistent root %@", self];
+	}
+	
     _lastTransactionUUID =  transactionUUID;
     
 	ETAssert([[self rootObject] isRoot]);
