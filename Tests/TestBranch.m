@@ -564,11 +564,11 @@
 }
 
 /**
- * Tests writing a "tag" revision - that is, a revision with no changes
+ * Tests writing a "checkpoint" revision - that is, a revision with no changes
  * to embededd objects, but revision metadata that mark the revision as being
  * a point where the user invoked a save command.
  */
-- (void) testSaveTagRevision
+- (void) testSaveCheckpointRevision
 {
     NSDictionary *expectedMetadata = @{ @"type" : @"save",
                                         @"shortDescription" : @"user pressed save" };

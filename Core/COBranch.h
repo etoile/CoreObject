@@ -177,7 +177,7 @@ extern NSString * const kCOBranchLabel;
  * If set to YES, the next  commit in the editing context will write a
  * new revision on this branch, even if there are no changes to be written.
  *
- * Would be used to cause a "tag" revision to be written.
+ * Would be used to cause a "checkpoint" revision to be written.
  */
 @property (readwrite, nonatomic) BOOL shouldMakeEmptyCommit;
 
