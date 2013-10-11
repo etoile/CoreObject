@@ -23,6 +23,8 @@
     NSString *_sourceProperty;
 }
 
+@property (nonatomic, readonly) NSDictionary *descriptionDictionary;
+
 @property (readwrite, nonatomic, weak) COObject *sourceObject;
 @property (readwrite, nonatomic, copy) NSString *sourceProperty;
 @property (readwrite, nonatomic, copy) NSString *targetProperty;
@@ -35,6 +37,17 @@
 @synthesize sourceProperty = _sourceProperty;
 @synthesize targetProperty = _targetProperty;
 
+- (NSDictionary *)descriptionDictionary
+{
+	return D(_targetProperty, @"property",
+	         _sourceProperty, @"opposite property",
+	        [_sourceObject UUID], @"opposite object");
+}
+
+- (NSString *)description
+{
+	return [[self descriptionDictionary] description];
+}
 
 @end
 
@@ -50,6 +63,12 @@
     return self;
 }
 
+- (NSString *)description
+{
+	NSArray *relationships =
+		(id)[[_cachedRelationships mappedCollection] descriptionDictionary];
+	return [D([_owner UUID], @"owner", relationships, @"relationships") description];
+}
 
 - (NSSet *) referringObjectsForPropertyInTarget: (NSString *)aProperty
 {
