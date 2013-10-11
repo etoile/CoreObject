@@ -283,6 +283,11 @@
     
     [ctx commit];
     
+	UKObjectsEqual(S(originalBranch), [persistentRoot branches]);
+	UKTrue([[persistentRoot branchesPendingDeletion] isEmpty]);
+	UKObjectsEqual(S(branch), [persistentRoot deletedBranches]);
+	UKTrue([branch isDeleted]);
+	
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
@@ -461,5 +466,8 @@
 		UKRaisesException([ctx2 commit]);
 	}
 }
+
+// TODO: Test these behaviours during deleted->undeleted and undeleted->deleted
+// transitions.
 
 @end

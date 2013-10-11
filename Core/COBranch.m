@@ -276,7 +276,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return [_persistentRoot branchForUUID: _parentBranchUUID];
 }
 
-- (BOOL)hasChanges
+- (BOOL)hasChangesOtherThanDeletionOrUndeletion
 {
     if ([self isBranchUncommitted])
     {
@@ -293,17 +293,21 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         return YES;
     }
     
-    if ([self isDeleted] != [[self branchInfo] isDeleted])
-    {
-        return YES;
-    }
-    
     if (self.shouldMakeEmptyCommit)
     {
         return YES;
     }
     
 	return [[self objectGraphContext] hasChanges];
+}
+
+- (BOOL)hasChanges
+{
+    if ([self isDeleted] != [[self branchInfo] isDeleted])
+    {
+        return YES;
+    }
+	return [self hasChangesOtherThanDeletionOrUndeletion];
 }
 
 - (void)discardAllChanges
@@ -408,6 +412,14 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (void)saveCommitWithMetadata: (NSDictionary *)metadata
 {
+	if ([self hasChangesOtherThanDeletionOrUndeletion]
+		&& [[self branchInfo] isDeleted]
+		&& self.isDeleted)
+	{
+		[NSException raise: NSGenericException
+					format: @"Attempted to commit changes to deleted branch %@", self];
+	}
+	
 	ETAssert([[_objectGraph rootObject] isRoot]);
     ETAssert(![self isBranchPersistentRootUncommitted]);
     ETAssert(_currentRevisionID != nil);

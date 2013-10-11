@@ -13,6 +13,7 @@
     COPersistentRoot *persistentRoot;
     OutlineItem *rootObj;
     COBranch *originalBranch;
+	COBranch *altBranch;
     COUndoTrack *_testTrack;
 }
 @end
@@ -26,6 +27,11 @@
     rootObj =  [persistentRoot rootObject];
     originalBranch =  [persistentRoot currentBranch];
     
+	[ctx commit];
+	
+	altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
+	[ctx commit];
+	
     _testTrack = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
     [_testTrack clear];
     
@@ -37,7 +43,6 @@
 	[rootObj setValue: @"Groceries" forProperty: @"label"];
 	
 	UKNotNil(originalBranch);
-	UKNil([originalBranch currentRevision]);
 
 	[ctx commit];
 
@@ -47,13 +52,18 @@
 
 - (void)testSimpleRootObjectPropertyUndoRedo
 {
+	CORevision *zerothRevision = [originalBranch currentRevision];
+	UKNotNil(originalBranch);
+	UKNotNil(zerothRevision);
+	UKNil([zerothRevision parentRevision]);
+	
 	[rootObj setValue: @"Groceries" forProperty: @"label"];
 	[ctx commit];
 	
 	CORevision *firstRevision = [originalBranch currentRevision];
 	UKNotNil(originalBranch);
 	UKNotNil(firstRevision);
-	UKNil([firstRevision parentRevision]);
+	UKNotNil([firstRevision parentRevision]);
 
 	[rootObj setValue: @"Shopping List" forProperty: @"label"];
 	[ctx commit];
@@ -173,8 +183,6 @@
 
 - (void)testBranchFromBranch
 {
-	UKNil([originalBranch currentRevision]);
-
 	/* Commit some initial changes in the main branch */
 	
 	[rootObj setValue: @"Red" forProperty: @"label"];
@@ -518,13 +526,15 @@
 
 - (void) testDiscardAllChangesAndHasChanges
 {
+	COBranch *uncommittedBranch = [originalBranch makeBranchWithLabel: @"uncommitted"];
+
     // -discardAllChanges raises an exception on uncommitted branches
-    UKRaisesException([originalBranch discardAllChanges]);
-    UKTrue([originalBranch hasChanges]);
+    UKRaisesException([uncommittedBranch discardAllChanges]);
+    UKTrue([uncommittedBranch hasChanges]);
     
     [persistentRoot commit];
-    UKDoesNotRaiseException([originalBranch discardAllChanges]);
-    UKFalse([originalBranch hasChanges]);
+    UKDoesNotRaiseException([uncommittedBranch discardAllChanges]);
+    UKFalse([uncommittedBranch hasChanges]);
 }
 
 - (void) testDiscardAllChangesAndHasChangesForSetCurrentRevision
@@ -589,5 +599,94 @@
     UKObjectsNotEqual(expectedMetadata, [r1 metadata]);
     UKObjectsEqual(expectedMetadata, [r2 metadata]);
 }
+
+// Check that attempting to commit modifications to a deleted branch
+// raises an exception
+
+// FIXME: Refactor the tests so each test is only expressed once (in a block?)
+// which is then run on both ctx and a fresh context. At present, each test
+// is copied & pasted.
+
+- (void) testExceptionOnDeletedBranchSetRevision
+{
+	CORevision *r0 = altBranch.currentRevision;
+	[[altBranch rootObject] setLabel: @"hi"];
+	[ctx commit];
+	
+	altBranch.deleted = YES;
+	[ctx commit];
+	
+	altBranch.currentRevision = r0;
+	UKRaisesException([ctx commit]);
+}
+
+- (void) testExceptionOnDeletedBranchSetRevisionInSecondContext
+{
+	CORevision *r0 = altBranch.currentRevision;
+	[[altBranch rootObject] setLabel: @"hi"];
+	[ctx commit];
+	
+	altBranch.deleted = YES;
+	[ctx commit];
+	
+	// Load in another context
+	{
+		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+		[ctx2persistentRoot branchForUUID: [altBranch UUID]].currentRevision = r0;
+		UKRaisesException([ctx2 commit]);
+	}
+}
+
+- (void) testExceptionOnDeletedBranchModifyEmbeddedObject
+{
+	altBranch.deleted = YES;
+	[ctx commit];
+	UKTrue(altBranch.isDeleted);
+	
+	[[altBranch rootObject] setLabel: @"hi"];
+	UKTrue([altBranch hasChanges]);
+	UKRaisesException([ctx commit]);
+}
+
+- (void) testExceptionOnDeletedBranchModifyEmbeddedObjectInSecondContext
+{
+	altBranch.deleted = YES;
+	[ctx commit];
+	
+	// Load in another context
+	{
+		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+		[[[ctx2persistentRoot branchForUUID: [altBranch UUID]] rootObject] setLabel: @"hi"];
+		UKRaisesException([ctx2 commit]);
+	}
+}
+
+- (void) testExceptionOnDeletedBranchSetBranchMetadata
+{
+	altBranch.deleted = YES;
+	[ctx commit];
+	
+	altBranch.metadata = @{@"hello" : @"world"};
+	UKRaisesException([ctx commit]);
+}
+
+- (void) testExceptionOnDeletedBranchSetBranchMetadataInSecondContext
+{
+	altBranch.deleted = YES;
+	[ctx commit];
+	
+	// Load in another context
+	{
+		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+		[ctx2persistentRoot branchForUUID: [altBranch UUID]].metadata = @{@"hello" : @"world"};
+		UKRaisesException([ctx2 commit]);
+	}
+}
+
+// TODO: Test these behaviours during deleted->undeleted and undeleted->deleted
+// transitions.
 
 @end

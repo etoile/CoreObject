@@ -382,6 +382,10 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 - (void)saveCommitWithMetadata: (NSDictionary *)metadata
                transactionUUID: (ETUUID *)transactionUUID
 {
+	// FIXME: This also rejects changes during undeleted->deleted transition,
+	// while COBranch's equivelant doesn't. Probably should allow changes
+	// to be combined with delet sion in a single commit; change that
+	// and add tests for that.
 	if ([self hasChanges] && self.isDeleted)
 	{
 		[NSException raise: NSGenericException
