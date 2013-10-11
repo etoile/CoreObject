@@ -41,11 +41,13 @@
 + (ETEntityDescription *)makeEntityDescriptionWithName: (NSString *)aName contentType: (NSString *)aType
 {
 	ETEntityDescription *collection = [ETEntityDescription descriptionWithName: aName];
-	ETPropertyDescription *content =
-		[self contentPropertyDescriptionWithName: @"contents" type: (id)aType opposite: nil];
+	ETPropertyDescription *objects =
+		[self contentPropertyDescriptionWithName: @"objects"
+		                                    type: (id)aType
+		                                opposite: nil];
 
 	[collection setParent: (id)@"COLibrary"];
-	[collection addPropertyDescription: content];
+	[collection addPropertyDescription: objects];
 
 	return collection;
 }
@@ -89,7 +91,7 @@
 	for (COLibrary *lib in [self libraryGroup])
 	{
 		ETEntityDescription *contentType =
-			[[[lib entityDescription] propertyDescriptionForName: @"contents"] type];
+			[[[lib entityDescription] propertyDescriptionForName: [lib contentKey]] type];
 											
 		if ([aType isKindOfEntity: contentType])
 			return lib;

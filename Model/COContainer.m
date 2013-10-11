@@ -23,10 +23,10 @@
 	if ([[collection name] isEqual: [COContainer className]] == NO) 
 		return collection;
 	
-	ETPropertyDescription *contentsProperty =
-		[self contentPropertyDescriptionWithName: @"contents" type: (id)@"COObject" opposite: nil];
+	ETPropertyDescription *objects =
+		[self contentPropertyDescriptionWithName: @"objects" type: (id)@"COObject" opposite: nil];
 	
-	[collection setPropertyDescriptions: A(contentsProperty)];
+	[collection setPropertyDescriptions: A(objects)];
 
 	return collection;	
 }

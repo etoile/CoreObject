@@ -78,7 +78,7 @@
 
 - (NSString *) contentKey
 {
-	return @"contents";
+	return @"objects";
 }
 
 - (BOOL) isOrdered

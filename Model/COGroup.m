@@ -32,10 +32,12 @@
 
 	[collection setLocalizedDescription: _(@"Group")];
 
-	ETPropertyDescription *contentProperty = 
-		[self contentPropertyDescriptionWithName: @"contents" type: @"COObject" opposite: nil];
+	ETPropertyDescription *objects =
+		[self contentPropertyDescriptionWithName: @"objects"
+		                                    type: @"COObject"
+		                                opposite: nil];
 
-	[collection setPropertyDescriptions: A(contentProperty)];
+	[collection setPropertyDescriptions: A(objects)];
 
 	return collection;
 }
@@ -91,12 +93,12 @@
 
 	[group setLocalizedDescription: _(@"Smart Group")];
 
-	ETPropertyDescription *contentProperty = 
+	ETPropertyDescription *content = 
 		[ETPropertyDescription descriptionWithName: @"content" type: (id)@"COObject"];
-	[contentProperty setMultivalued: YES];
-	[contentProperty setOrdered: YES];
+	[content setMultivalued: YES];
+	[content setOrdered: YES];
 
-	[group setPropertyDescriptions: A(contentProperty)];
+	[group setPropertyDescriptions: A(content)];
 
 	return group;	
 }

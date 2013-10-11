@@ -84,7 +84,7 @@
  * For example, -insertObject:atIndex:hint: implementation uses the content key 
  * to invoke -[COObject insertObject:atIndex:hint:forProperty:].
  *
- * By default, returns <em>contents</em>.
+ * By default, returns <em>objects</em>.
  */
 - (NSString *)contentKey;
 

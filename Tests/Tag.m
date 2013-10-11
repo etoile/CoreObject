@@ -32,6 +32,11 @@
     return tagEntity;
 }
 
+- (NSString *)contentKey
+{
+	return @"contents";
+}
+
 @dynamic label;
 @dynamic contents;
 @dynamic parentTag;

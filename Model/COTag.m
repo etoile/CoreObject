@@ -30,21 +30,18 @@
 
 	[collection setLocalizedDescription: _(@"Tag")];
 
-	ETPropertyDescription *contentProperty = 
-		[self contentPropertyDescriptionWithName: @"objects" type: @"COObject" opposite: @"COObject.tags"];
-	ETPropertyDescription *tagGroupsProperty =
+	ETPropertyDescription *objects =
+		[self contentPropertyDescriptionWithName: @"objects"
+		                                    type: @"COObject"
+		                                opposite: @"COObject.tags"];
+	ETPropertyDescription *tagGroups =
 		[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"COTagGroup"];
-	[tagGroupsProperty setMultivalued: YES];
-	[tagGroupsProperty setOpposite: (id)@"COTagGroup.contents"];
+	[tagGroups setMultivalued: YES];
+	[tagGroups setOpposite: (id)@"COTagGroup.objects"];
 
-	[collection setPropertyDescriptions: A(contentProperty, tagGroupsProperty)];
+	[collection setPropertyDescriptions: A(objects, tagGroups)];
 
 	return collection;
-}
-
-- (NSString *)contentKey
-{
-	return @"objects";
 }
 
 - (BOOL)isTag
@@ -85,10 +82,12 @@
 
 	[collection setLocalizedDescription: _(@"Tag Group")];
 
-	ETPropertyDescription *contentProperty = 
-		[self contentPropertyDescriptionWithName: @"contents" type: @"COTag" opposite: @"COTag.tagGroups"];
+	ETPropertyDescription *objects =
+		[self contentPropertyDescriptionWithName: @"objects"
+		                                    type: @"COTag"
+		                                opposite: @"COTag.tagGroups"];
 
-	[collection setPropertyDescriptions: A(contentProperty)];
+	[collection setPropertyDescriptions: A(objects)];
 
 	return collection;
 }
@@ -114,10 +113,12 @@
 	[tagGroups setMultivalued: YES];
 	[tagGroups setOrdered: YES];
 	[tagGroups setPersistent: YES];
-	ETPropertyDescription *content =
-		[self contentPropertyDescriptionWithName: @"contents" type: (id)@"COTag" opposite: nil];
+	ETPropertyDescription *objects =
+		[self contentPropertyDescriptionWithName: @"objects"
+		                                    type: (id)@"COTag"
+		                                opposite: nil];
 
-	[collection setPropertyDescriptions: A(tagGroups, content)];
+	[collection setPropertyDescriptions: A(tagGroups, objects)];
 	
 	return collection;
 }
