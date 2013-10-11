@@ -134,6 +134,12 @@
 	return [NSArray arrayWithArray: content];
 }
 
+- (void)didUpdate
+{
+	[[NSNotificationCenter defaultCenter]
+		postNotificationName: ETCollectionDidUpdateNotification object: self];
+}
+
 - (void)refresh
 {
 	NSArray *result = nil;
@@ -165,6 +171,7 @@
 	ETAssert([result isKindOfClass: [NSArray class]]);
 
 	content =  result;
+	[self didUpdate];
 }
 
 // TODO: COGroup implements the same methods, put them in a COObjectMatchingTrait
