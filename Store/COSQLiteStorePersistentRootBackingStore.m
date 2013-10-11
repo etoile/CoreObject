@@ -32,6 +32,18 @@
     }
 }
 
+- (NSString *) metadataTableName
+{
+    if (_shareDB)
+    {
+        return [NSString stringWithFormat: @"`metadata-%@`", _uuid];
+    }
+    else
+    {
+        return @"metadata";
+    }
+}
+
 - (id)initWithPersistentRootUUID: (ETUUID*)aUUID
                            store: (COSQLiteStore *)store
                       useStoreDB: (BOOL)share
@@ -75,12 +87,16 @@
     
     [db_ executeUpdate: [NSString stringWithFormat:
                          @"CREATE TABLE IF NOT EXISTS %@ (revid INTEGER PRIMARY KEY ASC, "
-                         "contents BLOB, metadata BLOB, timestamp REAL, parent INTEGER, mergeparent INTEGER, branchuuid BLOB, persistentrootuuid BLOB, root BLOB, deltabase INTEGER, "
+                         "contents BLOB, metadata BLOB, timestamp REAL, parent INTEGER, mergeparent INTEGER, branchuuid BLOB, persistentrootuuid BLOB, deltabase INTEGER, "
                          "bytesInDeltaRun INTEGER, garbage BOOLEAN, uuid BLOB)", [self tableName]]];
 
     [db_ executeUpdate: [NSString stringWithFormat:
                          @"CREATE INDEX IF NOT EXISTS %@ ON %@ (uuid)", [[self tableName] stringByAppendingString: @"_uuid"], [self tableName]]];
     
+	[db_ executeUpdate: [NSString stringWithFormat:
+						 @"CREATE TABLE IF NOT EXISTS %@ (root BLOB CHECK (length(root) = 16))", [self metadataTableName]]];
+	
+	// FIXME: -hadError only looks at the success of the last statement.
     if ([db_ hadError])
     {
 		NSLog(@"Error %d: %@", [db_ lastErrorCode], [db_ lastErrorMessage]);
@@ -206,8 +222,7 @@
 - (ETUUID *) rootUUIDForRevid: (int64_t)revid
 {
     ETUUID *result = nil;
-    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT root FROM %@ WHERE revid = ?", [self tableName]],
-                       [NSNumber numberWithLongLong: revid]];
+    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT root FROM %@", [self metadataTableName]]];
 	if ([rs next])
 	{
         result = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
@@ -473,21 +488,37 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     }
     
     BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (revid, "
-        "contents, metadata, timestamp, parent, mergeparent, root, branchuuid, persistentrootuuid, deltabase, "
-        "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", [self tableName]],
+        "contents, metadata, timestamp, parent, mergeparent, branchuuid, persistentrootuuid, deltabase, "
+        "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", [self tableName]],
         [NSNumber numberWithLongLong: rowid],
         contentsBlob,
         metadataBlob,
         [NSDate date],
         [NSNumber numberWithLongLong: aParent],
         [NSNumber numberWithLongLong: aMergeParent],
-        [[anItemTree rootItemUUID] dataValue],
 		[aBranchUUID dataValue],
 		[aPersistentRootUUID dataValue],
         [NSNumber numberWithLongLong: deltabase],
         [NSNumber numberWithLongLong: bytesInDeltaRun],
         [aRevisionUUID dataValue]];
-    
+	
+	
+	// Update the root object UUID
+	ETUUID *currentRoot = [self rootUUIDForRevid: 0]; // FIXME: revid parameter is ignored and should be ignored
+	if (currentRoot == nil)
+	{
+		ok = ok && [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (root) VALUES (?)", [self metadataTableName]],
+		 [[anItemTree rootItemUUID] dataValue]];
+	}
+	else if (![currentRoot isEqual: [anItemTree rootItemUUID]])
+	{
+		if (!inTransaction)
+		{
+			[db_ rollback];
+		}
+		return NO;
+	}
+	
     if (!inTransaction)
     {
         ok = ok && [db_ commit];

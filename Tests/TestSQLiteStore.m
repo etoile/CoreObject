@@ -872,4 +872,28 @@ static ETUUID *childUUID2;
     UKFalse(commandOK && commitOK);
 }
 
+/**
+ * The precise constraint is: for every revision, the root object UUID of that
+ * revision's object graph must equal the root object UUID of that revision's
+ * parent's object graph
+ */
+- (void) testChangeRootObjectUUIDDisallowed
+{
+	// Make a "bad" item graph where the root item UUID is not rootUUID
+	ETUUID *newRootUUID = [ETUUID UUID];
+	COItem *newRootItem = [[COItem alloc] initWithUUID: newRootUUID typesForAttributes: @{} valuesForAttributes: @{}];
+	COItemGraph *graph = [[COItemGraph alloc] initWithItems: @[newRootItem] rootItemUUID: newRootUUID];
+	
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+	[txn writeRevisionWithModifiedItems: graph
+						   revisionUUID: [ETUUID UUID]
+							   metadata: nil
+					   parentRevisionID: [initialRevisionId revisionUUID]
+				  mergeParentRevisionID: nil
+					 persistentRootUUID: prootUUID
+							 branchUUID: branchAUUID];
+	
+    UKFalse([store commitStoreTransaction: txn]);
+}
+
 @end

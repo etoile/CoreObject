@@ -5,6 +5,8 @@
 #import "COSynchronizationClient.h"
 #import "COSynchronizationServer.h"
 
+#import "COStoreTransaction.h"
+
 #import "COCommandGroup.h"
 #import "COCommandDeleteBranch.h"
 #import "COCommandUndeleteBranch.h"
