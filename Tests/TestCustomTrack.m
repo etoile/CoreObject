@@ -54,7 +54,7 @@ selective undo is involved. */
 	[_testTrack undo];
     
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
-	UKObjectsEqual(secondRevision, [[object persistentRoot] revision]);
+	UKObjectsEqual(secondRevision, [[object persistentRoot] currentRevision]);
 
 	/*  Second undo (Shopping List -> Groceries) */
 
@@ -63,7 +63,7 @@ selective undo is involved. */
 	UKFalse([_testTrack canUndo]);
     
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
-	UKObjectsEqual(firstRevision, [[object persistentRoot] revision]);
+	UKObjectsEqual(firstRevision, [[object persistentRoot] currentRevision]);
 
 	/* First redo (Groceries -> Shopping List) */
 
@@ -71,7 +71,7 @@ selective undo is involved. */
 	[_testTrack redo];
 
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
-	UKObjectsEqual(secondRevision, [[object persistentRoot] revision]);
+	UKObjectsEqual(secondRevision, [[object persistentRoot] currentRevision]);
 
 	/* Second redo (Shopping List -> Todo) */
 
@@ -80,7 +80,7 @@ selective undo is involved. */
 	UKFalse([_testTrack canRedo]);
     
 	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
-	UKObjectsEqual(thirdRevision, [[object persistentRoot] revision]);
+	UKObjectsEqual(thirdRevision, [[object persistentRoot] currentRevision]);
 }
 
 - (NSArray *)makeCommitsWithMultiplePersistentRoots

@@ -60,12 +60,12 @@
 
 - (void) testsDetectsStoreSetCurrentRevision
 {
-    CORevisionID *firstRevid = [[persistentRoot revision] revisionID];
+    CORevisionID *firstRevid = [[persistentRoot currentRevision] revisionID];
     UKNotNil(firstRevid);
     
     [[persistentRoot rootObject] setLabel: @"change"];
     [ctx commit];
-    CORevisionID *secondRevid = [[persistentRoot revision] revisionID];
+    CORevisionID *secondRevid = [[persistentRoot currentRevision] revisionID];
     UKNotNil(secondRevid);
     UKObjectsNotEqual(firstRevid, secondRevid);
     
@@ -81,7 +81,7 @@
     [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
-    UKObjectsEqual(firstRevid, [[persistentRoot revision] revisionID]);
+    UKObjectsEqual(firstRevid, [[persistentRoot currentRevision] revisionID]);
     UKFalse([ctx hasChanges]);
 }
 
@@ -92,7 +92,7 @@
     [store beginTransactionWithError: NULL];
     UKTrue([store createBranchWithUUID: secondbranchUUID
                           parentBranch: nil
-                       initialRevision: [[persistentRoot revision] revisionID]
+                       initialRevision: [[persistentRoot currentRevision] revisionID]
                      forPersistentRoot: [persistentRoot UUID]
                                  error: NULL]);
     [store commitTransactionWithError: NULL];
@@ -102,7 +102,7 @@
     // Check that a notification was sent to the editing context, and it automatically updated.
     COBranch *secondBranch = [persistentRoot branchForUUID: secondbranchUUID];
     UKNotNil(secondBranch);
-    UKObjectsEqual([persistentRoot revision], [secondBranch currentRevision]);
+    UKObjectsEqual([persistentRoot currentRevision], [secondBranch currentRevision]);
     UKFalse([ctx hasChanges]);
 }
 
@@ -227,7 +227,7 @@
 - (void) testsDetectsStoreCreatePersistentRoot
 {
     [store beginTransactionWithError: NULL];
-    COPersistentRootInfo *info = [store createPersistentRootWithInitialRevision: [[persistentRoot revision] revisionID]
+    COPersistentRootInfo *info = [store createPersistentRootWithInitialRevision: [[persistentRoot currentRevision] revisionID]
                                                                            UUID: [ETUUID UUID]
                                                                      branchUUID: [ETUUID UUID]
                                                                           error: NULL];

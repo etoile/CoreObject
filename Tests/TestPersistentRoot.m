@@ -29,11 +29,11 @@
     originalBranch =  [persistentRoot currentBranch];
     
 	[ctx commit];
-	r0 = persistentRoot.revision;
+	r0 = persistentRoot.currentRevision;
 	
 	[[persistentRoot rootObject] setLabel: @"hello"];
 	[ctx commit];
-	r1 = persistentRoot.revision;
+	r1 = persistentRoot.currentRevision;
 	
     return self;
 }
@@ -217,7 +217,7 @@
 	
     [ctx commit];
     
-    UKObjectsEqual(rev1, [copyRoot revision]);
+    UKObjectsEqual(rev1, [copyRoot currentRevision]);
     
     UKNotNil([store persistentRootInfoForUUID: [copyRoot UUID]]);
     
@@ -314,7 +314,7 @@
 	persistentRoot.deleted = YES;
 	[ctx commit];
 	
-	persistentRoot.revision = r0;
+	persistentRoot.currentRevision = r0;
 	UKRaisesException([ctx commit]);
 }
 
@@ -327,7 +327,7 @@
 	{
 		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
 		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-		ctx2persistentRoot.revision = r0;
+		ctx2persistentRoot.currentRevision = r0;
 		UKRaisesException([ctx2 commit]);
 	}
 }

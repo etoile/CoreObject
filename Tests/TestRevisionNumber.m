@@ -84,7 +84,7 @@
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        [persistentRootInCtx2 setRevision: secondCommitRev];
+        [persistentRootInCtx2 setCurrentRevision: secondCommitRev];
         
         COObject *obj2 = [persistentRootInCtx2 objectWithUUID: [obj UUID]];
         UKNotNil(obj2);

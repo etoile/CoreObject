@@ -331,7 +331,7 @@
 	for (ETUUID *uuid in _loadedPersistentRoots)
 	{
 		COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: uuid];
-		BOOL isInserted = ([persistentRoot revision] == nil);
+		BOOL isInserted = ([persistentRoot currentRevision] == nil);
 
 		if (isInserted)
 			continue;

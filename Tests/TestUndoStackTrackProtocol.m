@@ -27,23 +27,23 @@
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 	[[persistentRoot rootObject] setLabel: @"0"];
 	[ctx commit]; // not on stack
-	r0 = [persistentRoot revision];
+	r0 = [persistentRoot currentRevision];
 	
 	[[persistentRoot rootObject] setLabel: @"1"];
 	[ctx commitWithUndoTrack: track];
-	r1 = [persistentRoot revision];
+	r1 = [persistentRoot currentRevision];
 	
 	[[persistentRoot rootObject] setLabel: @"2"];
 	[ctx commitWithUndoTrack: track];
-	r2 = [persistentRoot revision];
+	r2 = [persistentRoot currentRevision];
 	
 	[[persistentRoot rootObject] setLabel: @"3"];
 	[ctx commitWithUndoTrack: track];
-	r3 = [persistentRoot revision];
+	r3 = [persistentRoot currentRevision];
 	
 	[[persistentRoot rootObject] setLabel: @"4"];
 	[ctx commitWithUndoTrack: track];
-	r4 = [persistentRoot revision];
+	r4 = [persistentRoot currentRevision];
 	
     return self;
 }
@@ -217,14 +217,14 @@
 	[track setCurrentNode: target];
 	
 	[self checkCommand: [track currentNode] isSetVersionFrom: r1 to: r2];
-	UKObjectsEqual(r2, [persistentRoot revision]);
+	UKObjectsEqual(r2, [persistentRoot currentRevision]);
 	
 	// Redo back to the start
 	
 	[track setCurrentNode: startNode];
 
 	[self checkCommand: [track currentNode] isSetVersionFrom: r3 to: r4];
-	UKObjectsEqual(r4, [persistentRoot revision]);
+	UKObjectsEqual(r4, [persistentRoot currentRevision]);
 }
 
 - (void) testSetCurrentNodeToPlaceholder
@@ -244,7 +244,7 @@
 	UKFalse([track canUndo]);
 	UKTrue([track canRedo]);
 	UKObjectsEqual(@"0", [[persistentRoot rootObject] label]);
-	UKObjectsEqual(r0, [persistentRoot revision]);
+	UKObjectsEqual(r0, [persistentRoot currentRevision]);
 	
 	// Redo 1 node
 	
@@ -255,7 +255,7 @@
 	UKTrue([track canUndo]);
 	UKTrue([track canRedo]);
 	UKObjectsEqual(@"1", [[persistentRoot rootObject] label]);
-	UKObjectsEqual(r1, [persistentRoot revision]);
+	UKObjectsEqual(r1, [persistentRoot currentRevision]);
 }
 
 @end

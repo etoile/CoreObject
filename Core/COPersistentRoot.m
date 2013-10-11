@@ -532,12 +532,12 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return newBranch;
 }
 
-- (CORevision *)revision
+- (CORevision *)currentRevision
 {
     return [[self editingBranch] currentRevision];
 }
 
-- (void)setRevision: (CORevision *)revision
+- (void)setCurrentRevision: (CORevision *)revision
 {
     [[self editingBranch] setCurrentRevision: revision];
 }

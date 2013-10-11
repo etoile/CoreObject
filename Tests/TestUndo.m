@@ -63,15 +63,15 @@
     [[persistentRoot2 rootObject] setLabel: @"hello2"];
     [ctx commitWithUndoTrack: _testTrack];
     
-    CORevision *persistentRoot1Revision = [persistentRoot1 revision];
-    CORevision *persistentRoot2Revision = [persistentRoot2 revision];
+    CORevision *persistentRoot1Revision = [persistentRoot1 currentRevision];
+    CORevision *persistentRoot2Revision = [persistentRoot2 currentRevision];
     
     [_testTrack undo];
     
-    UKObjectsNotEqual([persistentRoot1 revision], persistentRoot1Revision);
-    UKObjectsNotEqual([persistentRoot2 revision], persistentRoot2Revision);
-    UKObjectsEqual([persistentRoot1 revision], [persistentRoot1Revision parentRevision]);
-    UKObjectsEqual([persistentRoot2 revision], [persistentRoot2Revision parentRevision]);
+    UKObjectsNotEqual([persistentRoot1 currentRevision], persistentRoot1Revision);
+    UKObjectsNotEqual([persistentRoot2 currentRevision], persistentRoot2Revision);
+    UKObjectsEqual([persistentRoot1 currentRevision], [persistentRoot1Revision parentRevision]);
+    UKObjectsEqual([persistentRoot2 currentRevision], [persistentRoot2Revision parentRevision]);
 }
 
 - (void)testUndoSetCurrentVersionForBranchSelectiveUndo

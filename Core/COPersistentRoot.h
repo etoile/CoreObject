@@ -258,7 +258,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * For a new persistent root, the revision is nil, unless it is a cheap copy. 
  * See -[COBranch makeCopyFromRevision:].
  */
-@property (nonatomic, strong) CORevision *revision;
+@property (nonatomic, strong) CORevision *currentRevision;
 /**
  * Shorthand for [[self editingContext] store]
  */

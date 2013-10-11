@@ -216,12 +216,12 @@
 	[[persistentRoot rootObject] setValue: @"Todo" forProperty: @"label"];
 	
 	[persistentRoot commit];
-    CORevision *rev5 = [persistentRoot revision];
+    CORevision *rev5 = [persistentRoot currentRevision];
     
 	[[persistentRoot rootObject] setValue: @"Tidi" forProperty: @"label"];
 	
 	[persistentRoot commit];
-    CORevision *rev6 = [persistentRoot revision];
+    CORevision *rev6 = [persistentRoot currentRevision];
 
 	//UKObjectsEqual(A(rev1, rev2, rev5, rev6), [[[branch1 loadedNodes] mappedCollection] revision]);
 	
@@ -486,7 +486,7 @@
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *persistentRootCtx2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         
-        CORevision *initialBranchRev = [persistentRootCtx2 revision];
+        CORevision *initialBranchRev = [persistentRootCtx2 currentRevision];
         CORevision *secondBranchRev = [[persistentRootCtx2 branchForUUID: [secondBranch UUID]] currentRevision];
         CORevision *initialRev = [initialBranchRev parentRevision];
         
