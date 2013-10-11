@@ -32,7 +32,12 @@
 
 	ETPropertyDescription *contentProperty = 
 		[self contentPropertyDescriptionWithName: @"objects" type: @"COObject" opposite: @"COObject.tags"];
-	[collection setPropertyDescriptions: A(contentProperty)];
+	ETPropertyDescription *tagGroupsProperty =
+		[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"COTagGroup"];
+	[tagGroupsProperty setMultivalued: YES];
+	[tagGroupsProperty setOpposite: (id)@"COTagGroup.contents"];
+
+	[collection setPropertyDescriptions: A(contentProperty, tagGroupsProperty)];
 
 	return collection;
 }
@@ -51,6 +56,11 @@
 - (NSString *)tagString
 {
 	return [[self name] lowercaseString];
+}
+
+- (NSSet *)tagGroups
+{
+	return [self primitiveValueForKey: @"tagGroups"];
 }
 
 @end
@@ -76,8 +86,7 @@
 	[collection setLocalizedDescription: _(@"Tag Group")];
 
 	ETPropertyDescription *contentProperty = 
-		[self contentPropertyDescriptionWithName: @"contents" type: @"COTag" opposite: nil];
-	//[contentProperty setOpposite: (id)@"COTag.parentTagGroups"]; // FIXME: just 'parentCollections' should work...
+		[self contentPropertyDescriptionWithName: @"contents" type: @"COTag" opposite: @"COTag.tagGroups"];
 
 	[collection setPropertyDescriptions: A(contentProperty)];
 
@@ -89,7 +98,7 @@
 
 @implementation COTagLibrary
 
-@synthesize tagGroups;
+@synthesize tagGroups = _tagGroups;
 
 + (ETEntityDescription *)newEntityDescription
 {
@@ -113,12 +122,15 @@
 	return collection;
 }
 
-- (id)init
+- (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
-	SUPERINIT;
+	self = [super initWithObjectGraphContext: aContext];
+	if (self == nil)
+		return nil;
+
 	[self setIdentifier: kCOLibraryIdentifierTag];
 	[self setName: _(@"Tags")];
-	tagGroups = [[NSMutableArray alloc] init];
+	_tagGroups = [[NSMutableArray alloc] init];
 	return self;
 }
 

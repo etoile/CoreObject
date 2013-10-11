@@ -71,4 +71,11 @@
 	UKTrue([[tagGroup content] isKindOfClass: [NSMutableArray class]]);
 }
 
+- (void)testTag
+{
+	COTag *tag = [[ctx insertNewPersistentRootWithEntityName: @"COTag"] rootObject];
+
+	UKTrue([[tag tagGroups] isKindOfClass: [NSSet class]]);
+}
+
 @end

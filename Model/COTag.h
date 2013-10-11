@@ -39,6 +39,13 @@
  */
 - (NSString *)tagString;
 
+/* @taskunit Tag Categories */
+
+/**
+ * The tag categories to which the tag belongs to.
+ */
+@property (nonatomic, readonly) NSSet *tagGroups;
+
 @end
 
 /**
@@ -69,7 +76,7 @@
 @interface COTagLibrary : COLibrary
 {
 	@private
-	NSMutableArray *tagGroups;
+	NSMutableArray *_tagGroups;
 }
 
 /**
