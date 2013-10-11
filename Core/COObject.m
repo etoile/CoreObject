@@ -269,7 +269,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (CORevision *)revision
 {
-	return [[self branch] currentRevision];
+	return [[_objectGraphContext branch] currentRevision];
 }
 
 - (BOOL) isPersistent
@@ -380,12 +380,6 @@ static void FindAllStronglyContainedObjects(COObject *anObj, NSMutableSet *dest)
 	return result;
 }
 
-
-- (NSArray*)allStronglyContainedObjectsIncludingSelf
-{
-	return [[self allStronglyContainedObjects] arrayByAddingObject: self];
-}
-
 - (NSString *)displayName
 {
 	return [self name];
@@ -410,20 +404,20 @@ static void FindAllStronglyContainedObjects(COObject *anObj, NSMutableSet *dest)
 
 - (NSDate *)modificationDate
 {
-	if ([[self branch] isBranchUncommitted])
+	if ([[_objectGraphContext branch] isBranchUncommitted])
 		return nil;
 
 	// TODO: Avoid loading all the branch revisions just to get the last revision
-	return [[[[self branch] nodes] lastObject] date];
+	return [[[[_objectGraphContext branch] nodes] lastObject] date];
 }
 
 - (NSDate *)creationDate
 {
-	if ([[self branch] isBranchUncommitted])
+	if ([[_objectGraphContext branch] isBranchUncommitted])
 		return nil;
 
 	// TODO: Avoid loading all the branch revisions just to get the first revision
-	return [[[[self branch] nodes] firstObject] date];
+	return [[[[_objectGraphContext branch] nodes] firstObject] date];
 }
 
 - (NSArray *)tags
@@ -1020,11 +1014,6 @@ static void FindAllStronglyContainedObjects(COObject *anObj, NSMutableSet *dest)
 		return YES;
 	}
 	return NO;
-}
-
-- (COBranch *)branch
-{
-	return [_objectGraphContext branch];
 }
 
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery

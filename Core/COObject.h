@@ -303,10 +303,6 @@
  * Return the revision of this object in the editing context.
  */
 - (CORevision *)revision;
-/**
- * Returns the commit track for this object.
- */
-- (COBranch *)branch;
 
 /** @taskunit Contained Objects based on the Metamodel */
 
@@ -315,7 +311,6 @@
  * This means objects which are values for "composite" properties.
  */
 - (NSArray *)allStronglyContainedObjects;
-- (NSArray *)allStronglyContainedObjectsIncludingSelf;
 - (NSArray*)embeddedOrReferencedObjects;
 
 /** @taskunit Basic Properties */
