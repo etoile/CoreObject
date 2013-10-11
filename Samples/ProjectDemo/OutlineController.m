@@ -55,19 +55,19 @@
 	return (OutlineItem *)[[self projectDocument] rootDocObject];
 }
 
-- (COUndoStack *) undoStack
+- (COUndoTrack *) undoStack
 {
     NSString *name = [NSString stringWithFormat: @"org.etoile.projectdemo-%@",
                       [[doc persistentRoot] persistentRootUUID]];
     
-    return [[COUndoStackStore defaultStore] stackForName: name];
+    return [COUndoTrack trackForName: name  withEditingContext: [[doc persistentRoot] editingContext]];
 }
 
 - (void) commitWithType: (NSString*)type
        shortDescription: (NSString*)shortDescription
         longDescription: (NSString*)longDescription;
 {
-	[[[doc objectGraphContext] editingContext] commitWithUndoStack: [self undoStack]]; // FIXME:
+	[[[doc objectGraphContext] editingContext] commitWithUndoTrack: [self undoStack]]; // FIXME:
 }
 
 - (void)windowDidLoad
@@ -276,22 +276,22 @@ static int i = 0;
 
 - (IBAction) undo: (id)sender
 {
-    COUndoStack *stack = [self undoStack];
+    COUndoTrack *stack = [self undoStack];
     COEditingContext *ctx = [[doc persistentRoot] editingContext];
     
-    if ([stack canUndoWithEditingContext: ctx])
+    if ([stack canUndo])
     {
-        [stack undoWithEditingContext: ctx];
+        [stack undo];
     }
 }
 - (IBAction) redo: (id)sender
 {
-    COUndoStack *stack = [self undoStack];
+    COUndoTrack *stack = [self undoStack];
     COEditingContext *ctx = [[doc persistentRoot] editingContext];
     
-    if ([stack canRedoWithEditingContext: ctx])
+    if ([stack canRedo])
     {
-        [stack redoWithEditingContext: ctx];
+        [stack redo];
     }
 }
 - (IBAction) history: (id)sender

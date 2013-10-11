@@ -222,24 +222,24 @@
 
 - (void)undo:(id)sender
 {
-    COUndoStack *stack = [self undoStack];
-    if ([stack canUndoWithEditingContext: context])
+    COUndoTrack *stack = [self undoStack];
+    if ([stack canUndo])
     {
-        [stack undoWithEditingContext: context];
+        [stack undo];
     }
 }
 - (void)redo:(id)sender
 {
-    COUndoStack *stack = [self undoStack];
-    if ([stack canRedoWithEditingContext: context])
+    COUndoTrack *stack = [self undoStack];
+    if ([stack canRedo])
     {
-        [stack redoWithEditingContext: context];
+        [stack redo];
     }
 }
 
-- (COUndoStack *) undoStack
+- (COUndoTrack *) undoStack
 {
-    return [[COUndoStackStore defaultStore] stackForPattern: @"org.etoile.projectdemo-%"];
+    return [COUndoTrack trackForPattern: @"org.etoile.projectdemo-*" withEditingContext: context];
 }
 
 - (IBAction)newProject: (id)sender
