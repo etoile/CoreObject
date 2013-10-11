@@ -102,7 +102,6 @@
 	NSMutableSet *_persistentRootsPendingUndeletion;
 	COError *_error;
     COCrossPersistentRootReferenceCache *_crossRefCache;
-    CORevisionCache *_revisionCache;
     /** Undo */
     BOOL _isRecordingUndo;
     COCommandGroup *_currentEditGroup;
