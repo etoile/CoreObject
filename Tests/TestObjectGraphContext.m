@@ -237,6 +237,21 @@
     UKObjectsEqual(S(root2), [ctx2 updatedObjects]);
 }
 
+- (void)testRelationshipsForNewInstance
+{
+	COObject *o1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+
+	UKObjectsEqual([NSArray array], [o1 valueForProperty: kCOContents]);
+	UKNil([o1 valueForProperty: kCOParent]);
+	UKObjectsEqual([NSSet set], [o1 valueForProperty: @"parentCollections"]);
+
+	COObject *t1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+
+	UKObjectsEqual([NSSet set], [t1 valueForProperty: kCOContents]);
+	UKObjectsEqual([NSSet set], [t1 valueForProperty: @"childTags"]);
+	UKNil([t1 valueForProperty: @"parentTag"]);
+}
+
 - (void)testBasicRelationshipIntegrity
 {
 	// Test one-to-many relationships
