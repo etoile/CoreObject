@@ -115,7 +115,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * is used during collaborative editing (there is no public replication API 
  * though).
  */
-@property (nonatomic, readonly) ETUUID *persistentRootUUID;
+@property (nonatomic, readonly) ETUUID *UUID;
 /**
  * The persistent root deletion status.
  *

@@ -10,7 +10,7 @@
 - (void)testBaseRevision
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    UKNotNil([persistentRoot persistentRootUUID]);
+    UKNotNil([persistentRoot UUID]);
     
 	COObject *obj = [persistentRoot rootObject];
 	UKNil([obj revision]);
@@ -71,7 +71,7 @@
     // Check that we can read the state 3 in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         UKNotNil(persistentRootInCtx2);
         
         COObject *obj2 = [persistentRootInCtx2 objectWithUUID: [obj UUID]];
@@ -83,7 +83,7 @@
     
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         [persistentRootInCtx2 setRevision: secondCommitRev];
         
         COObject *obj2 = [persistentRootInCtx2 objectWithUUID: [obj UUID]];
@@ -101,7 +101,7 @@
     // Check that we can read the state 4 in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
 
         COObject *obj2 = [persistentRootInCtx2 objectWithUUID: [obj UUID]];
         UKNotNil(obj2);

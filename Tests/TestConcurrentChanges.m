@@ -38,7 +38,7 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         COObject *rootObj = [ctx2persistentRoot rootObject];
         
         [rootObj setValue: @"hello" forProperty: @"label"];
@@ -74,7 +74,7 @@
     UKTrue([store setCurrentRevision: firstRevid
                         initialRevision: nil
                            forBranch: [[persistentRoot currentBranch] UUID]
-                    ofPersistentRoot: [persistentRoot persistentRootUUID]
+                    ofPersistentRoot: [persistentRoot UUID]
                                error: NULL]);
     [store commitTransactionWithError: NULL];
     
@@ -93,7 +93,7 @@
     UKTrue([store createBranchWithUUID: secondbranchUUID
                           parentBranch: nil
                        initialRevision: [[persistentRoot revision] revisionID]
-                     forPersistentRoot: [persistentRoot persistentRootUUID]
+                     forPersistentRoot: [persistentRoot UUID]
                                  error: NULL]);
     [store commitTransactionWithError: NULL];
     
@@ -110,7 +110,7 @@
 {
     [store beginTransactionWithError: NULL];
     UKTrue([store deleteBranch: [testBranch UUID]
-              ofPersistentRoot: [persistentRoot persistentRootUUID]
+              ofPersistentRoot: [persistentRoot UUID]
                          error: NULL]);
     [store commitTransactionWithError: NULL];
     
@@ -127,13 +127,13 @@
     testBranch.deleted = YES;
     [ctx commit];
 
-    UKTrue([[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]]
+    UKTrue([[[store persistentRootInfoForUUID: [persistentRoot UUID]]
              branchInfoForUUID: [testBranch UUID]]
             isDeleted]);
     
     [store beginTransactionWithError: NULL];
     UKTrue([store undeleteBranch: [testBranch UUID]
-                ofPersistentRoot: [persistentRoot persistentRootUUID]
+                ofPersistentRoot: [persistentRoot UUID]
                            error: NULL]);
     [store commitTransactionWithError: NULL];
     
@@ -152,7 +152,7 @@
     [store beginTransactionWithError: NULL];
     UKTrue([store setMetadata: metadata
                     forBranch: [testBranch UUID]
-             ofPersistentRoot: [persistentRoot persistentRootUUID]
+             ofPersistentRoot: [persistentRoot UUID]
                         error: NULL]);
     [store commitTransactionWithError: NULL];
     
@@ -167,7 +167,7 @@
 {
     [store beginTransactionWithError: NULL];
     UKTrue([store setCurrentBranch: [testBranch UUID]
-                 forPersistentRoot: [persistentRoot persistentRootUUID]
+                 forPersistentRoot: [persistentRoot UUID]
                              error: NULL]);
     [store commitTransactionWithError: NULL];
     
@@ -182,7 +182,7 @@
 {
     UKTrue([store beginTransactionWithError: NULL]);
     UKTrue([store setCurrentBranch: [testBranch UUID]
-                 forPersistentRoot: [persistentRoot persistentRootUUID]
+                 forPersistentRoot: [persistentRoot UUID]
                              error: NULL]);
     UKTrue([store commitTransactionWithError: NULL]);
     
@@ -196,7 +196,7 @@
 - (void) testsDetectsStoreDeletePersistentRoot
 {
     [store beginTransactionWithError: NULL];
-    UKTrue([store deletePersistentRoot: [persistentRoot persistentRootUUID] error: NULL]);
+    UKTrue([store deletePersistentRoot: [persistentRoot UUID] error: NULL]);
     [store commitTransactionWithError: NULL];
     
     [self wait];
@@ -213,7 +213,7 @@
     [ctx commit];
     
     [store beginTransactionWithError: NULL];
-    UKTrue([store undeletePersistentRoot: [persistentRoot persistentRootUUID] error: NULL]);
+    UKTrue([store undeletePersistentRoot: [persistentRoot UUID] error: NULL]);
     [store commitTransactionWithError: NULL];
     
     [self wait];
@@ -241,7 +241,7 @@
     BOOL found = NO;
     for (COPersistentRoot *root in [ctx persistentRoots])
     {
-        if ([[root persistentRootUUID] isEqual: [info UUID]])
+        if ([[root UUID] isEqual: [info UUID]])
         {
             found = YES;
         }

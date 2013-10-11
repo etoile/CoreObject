@@ -20,7 +20,7 @@
 - (void)testDeleteUncommittedPersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    ETUUID *uuid = [persistentRoot persistentRootUUID];
+    ETUUID *uuid = [persistentRoot UUID];
     
     UKTrue([ctx hasChanges]);
     UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
@@ -41,7 +41,7 @@
 - (void)testDeleteCommittedPersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    ETUUID *uuid = [persistentRoot persistentRootUUID];
+    ETUUID *uuid = [persistentRoot UUID];
     
     [ctx commit];
     
@@ -78,7 +78,7 @@
 - (void)testUndeleteCommittedPersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    ETUUID *uuid = [persistentRoot persistentRootUUID];
+    ETUUID *uuid = [persistentRoot UUID];
     [ctx commit];
     
     persistentRoot.deleted = YES;
@@ -139,11 +139,11 @@
         pendingUndeletion.deleted = NO;
         
         // Check that the constraints we wanted to set up hold
-        UKTrue([[store persistentRootUUIDs] containsObject: [regular persistentRootUUID]]);
-        UKTrue([[store deletedPersistentRootUUIDs] containsObject: [deletedOnDisk persistentRootUUID]]);
-        UKNil([store persistentRootInfoForUUID: [pendingInsertion persistentRootUUID]]);
-        UKTrue([[store persistentRootUUIDs] containsObject: [pendingDeletion persistentRootUUID]]);
-        UKTrue([[store deletedPersistentRootUUIDs] containsObject: [pendingUndeletion persistentRootUUID]]);
+        UKTrue([[store persistentRootUUIDs] containsObject: [regular UUID]]);
+        UKTrue([[store deletedPersistentRootUUIDs] containsObject: [deletedOnDisk UUID]]);
+        UKNil([store persistentRootInfoForUUID: [pendingInsertion UUID]]);
+        UKTrue([[store persistentRootUUIDs] containsObject: [pendingDeletion UUID]]);
+        UKTrue([[store deletedPersistentRootUUIDs] containsObject: [pendingUndeletion UUID]]);
     }
     
     // 2. Test the accessors

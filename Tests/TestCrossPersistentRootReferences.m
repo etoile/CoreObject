@@ -49,7 +49,7 @@
     // 2. Read it into another context
     {
         COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: store];
-        COPersistentRoot *library2 = [ctx2 persistentRootForUUID: [library persistentRootUUID]];
+        COPersistentRoot *library2 = [ctx2 persistentRootForUUID: [library UUID]];
         
         NSArray *library2contents = [[library2 rootObject] valueForKey: @"contents"];
         UKIntsEqual(2, [library2contents count]);
@@ -69,8 +69,8 @@
             }
         }
         
-        UKObjectsEqual([photo1 persistentRootUUID], [photo1ctx2 persistentRootUUID]);
-        UKObjectsEqual([photo2 persistentRootUUID], [photo2ctx2 persistentRootUUID]);
+        UKObjectsEqual([photo1 UUID], [photo1ctx2 UUID]);
+        UKObjectsEqual([photo2 UUID], [photo2ctx2 UUID]);
         UKObjectsEqual([[photo1 rootObject] UUID], [[photo1ctx2 rootObject] UUID]);
         UKObjectsEqual([[photo2 rootObject] UUID], [[photo2ctx2 rootObject] UUID]);
         UKObjectsEqual(@"photo1", [[photo1ctx2 rootObject] valueForKey: @"label"]);
@@ -197,8 +197,8 @@
         // Test that the cross-persistent reference uses branchB when we reopen the store
         
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *library1ctx2 = [ctx2 persistentRootForUUID: [library1 persistentRootUUID]];
-        COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: [photo1 persistentRootUUID]];
+        COPersistentRoot *library1ctx2 = [ctx2 persistentRootForUUID: [library1 UUID]];
+        COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: [photo1 UUID]];
         
         // Sanity check
         
@@ -248,7 +248,7 @@
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
     
     /* This creates a reference to branch B of photo1. */
-    COPath *branchBRef = [COPath pathWithPersistentRoot: [photo1 persistentRootUUID] branch: [branchB UUID]];
+    COPath *branchBRef = [COPath pathWithPersistentRoot: [photo1 UUID] branch: [branchB UUID]];
     COMutableItem *library1RootItem = [[[library1 objectGraphContext] itemForUUID: [[library1 objectGraphContext] rootItemUUID]] mutableCopy];
     [library1RootItem setValue: S(branchBRef) forAttribute: @"contents"];
     [[library1 objectGraphContext] insertOrUpdateItems: A(library1RootItem)];
@@ -378,7 +378,7 @@
         // Re-open in an independent context, to make sure we're not cheating
         
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *library1ctx2 = [ctx2 persistentRootForUUID: [library1 persistentRootUUID]];
+        COPersistentRoot *library1ctx2 = [ctx2 persistentRootForUUID: [library1 UUID]];
         
         UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
         // FIXME: UKObjectsEqual(S(@"photo2"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
@@ -421,7 +421,7 @@
         // Re-open in an independent context, to make sure we're not cheating
         
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: [photo1 persistentRootUUID]];
+        COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: [photo1 UUID]];
         
         UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
         UKObjectsEqual([NSSet set], [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);

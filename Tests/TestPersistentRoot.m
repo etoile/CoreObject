@@ -39,11 +39,11 @@
 	UKObjectsNotEqual([branch UUID], [originalBranch UUID]);
     
     /* Verify that the branch creation is not committed yet. */
-    UKIntsEqual(1, [[[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] branchForUUID] allKeys] count]);
+    UKIntsEqual(1, [[[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys] count]);
     
     [persistentRoot commit];
 	
-    UKIntsEqual(2, [[[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] branchForUUID] allKeys] count]);
+    UKIntsEqual(2, [[[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys] count]);
 	UKStringsEqual(@"Sandbox", [branch label]);
     
 	//UKObjectsEqual(commitTrack, [branch parentTrack]);
@@ -75,7 +75,7 @@
 	[persistentRoot setCurrentBranch: branch];
 	
     UKObjectsEqual([originalBranch UUID],
-                   [[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] currentBranchUUID]);
+                   [[store persistentRootInfoForUUID: [persistentRoot UUID]] currentBranchUUID]);
     
 	/* Commit some changes in the Sandbox branch */
 	
@@ -88,7 +88,7 @@
 	[persistentRoot commit];
 	
     UKObjectsEqual([branch UUID],
-                   [[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] currentBranchUUID]);
+                   [[store persistentRootInfoForUUID: [persistentRoot UUID]] currentBranchUUID]);
     
 	[sandboxRootObj setValue: @"Tidi" forProperty: @"label"];
 	
@@ -143,7 +143,7 @@
         // Test that the cross-persistent reference uses branchB when we reopen the store
         
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: [photo1 persistentRootUUID]];
+        COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: [photo1 UUID]];
         
         // Sanity check
         
@@ -167,7 +167,7 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
         
         UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
@@ -200,7 +200,7 @@
     
 	CORevision *rev1 = [originalBranch currentRevision];
     COPersistentRoot *copyRoot = [originalBranch makeCopyFromRevision: rev1];
-    UKNil([store persistentRootInfoForUUID: [copyRoot persistentRootUUID]]);
+    UKNil([store persistentRootInfoForUUID: [copyRoot UUID]]);
 	UKTrue([[ctx persistentRootsPendingInsertion] containsObject: copyRoot]);
     
 	COBranch *copyRootBranch = [copyRoot currentBranch];
@@ -209,10 +209,10 @@
     
     UKObjectsEqual(rev1, [copyRoot revision]);
     
-    UKNotNil([store persistentRootInfoForUUID: [copyRoot persistentRootUUID]]);
+    UKNotNil([store persistentRootInfoForUUID: [copyRoot UUID]]);
     
     UKObjectsNotEqual([copyRootBranch UUID], [originalBranch UUID]);
-    UKObjectsNotEqual([copyRoot persistentRootUUID], [persistentRoot persistentRootUUID]);
+    UKObjectsNotEqual([copyRoot UUID], [persistentRoot UUID]);
     
     UKObjectsEqual(rev1, [copyRootBranch initialRevision]);
     UKObjectsEqual(rev1, [copyRootBranch currentRevision]);
@@ -248,7 +248,7 @@
     
     [ctx commit];
     
-    UKObjectsEqual(A([originalBranch UUID]), [[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] branchForUUID] allKeys]);
+    UKObjectsEqual(A([originalBranch UUID]), [[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys]);
 }
 
 - (void) testDeleteCommittedBranch
@@ -262,7 +262,7 @@
     [ctx commit];
     
     UKObjectsEqual(S([originalBranch UUID], [branch UUID]),
-                   SA([[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] branchForUUID] allKeys]));
+                   SA([[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys]));
     
     branch.deleted = YES;
     
@@ -276,7 +276,7 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         COBranch *ctx2originalBranch = [ctx2persistentRoot branchForUUID: [originalBranch UUID]];
         COBranch *ctx2branch = [ctx2persistentRoot branchForUUID: [branch UUID]];
         

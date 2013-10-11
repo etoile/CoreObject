@@ -31,7 +31,7 @@ NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidCh
 
 @implementation COPersistentRoot
 
-@synthesize parentContext = _parentContext, persistentRootUUID = _UUID;
+@synthesize parentContext = _parentContext, UUID = _UUID;
 @synthesize branchesPendingDeletion = _branchesPendingDeletion;
 @synthesize branchesPendingUndeletion = _branchesPendingUndeletion;
 
@@ -397,7 +397,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         if (_cheapCopyRevisionID == nil)
         {
             _savedState = [store createPersistentRootWithInitialItemGraph: [[self editingBranch] objectGraphContext]
-                                                                     UUID: [self persistentRootUUID]
+                                                                     UUID: [self UUID]
                                                                branchUUID: [[self editingBranch] UUID]
                                                          revisionMetadata: metadata
                                                                     error: NULL];
@@ -440,7 +440,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         if (![[_savedState currentBranchUUID] isEqual: _currentBranchUUID])
         {
             ETAssert([store setCurrentBranch: _currentBranchUUID
-                           forPersistentRoot: [self persistentRootUUID]
+                           forPersistentRoot: [self UUID]
                                        error: NULL]);
             [_parentContext recordPersistentRoot: self
                                 setCurrentBranch: [self currentBranch]
@@ -467,7 +467,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 - (void)reloadPersistentRootInfo
 {
     COPersistentRootInfo *newInfo =
-		[[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
+		[[self store] persistentRootInfoForUUID: [self UUID]];
     if (newInfo != nil)
     {
         _savedState =  newInfo;
@@ -565,7 +565,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 //    NSLog(@"++++Not Ignoring update notif (%@, %@, %d)", _lastTransactionUUID, notifTransaction, (int)isDistributed);
     
     COPersistentRootInfo *info =
-		[[self store] persistentRootInfoForUUID: [self persistentRootUUID]];
+		[[self store] persistentRootInfoForUUID: [self UUID]];
     _savedState =  info;
     
     for (ETUUID *uuid in [info branchUUIDs])
@@ -583,7 +583,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 - (void)updateCrossPersistentRootReferences
 {
-    NSArray *objs = [[_parentContext crossReferenceCache] affectedObjectsForChangeInPersistentRoot: [self persistentRootUUID]];
+    NSArray *objs = [[_parentContext crossReferenceCache] affectedObjectsForChangeInPersistentRoot: [self UUID]];
     
     for (COObject *obj in objs)
     {

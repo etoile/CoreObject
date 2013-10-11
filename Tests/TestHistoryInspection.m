@@ -155,11 +155,11 @@
 
 - (void) testRevisionPersistentRootUUID
 {
-    UKObjectsEqual([p1 persistentRootUUID], [r0 persistentRootUUID]);
-    UKObjectsEqual([p1 persistentRootUUID], [r1 persistentRootUUID]);
-    UKObjectsEqual([p1 persistentRootUUID], [r2 persistentRootUUID]);
-    UKObjectsEqual([p1 persistentRootUUID], [r3 persistentRootUUID]);
-    UKObjectsEqual([p2 persistentRootUUID], [r4 persistentRootUUID]);
+    UKObjectsEqual([p1 UUID], [r0 persistentRootUUID]);
+    UKObjectsEqual([p1 UUID], [r1 persistentRootUUID]);
+    UKObjectsEqual([p1 UUID], [r2 persistentRootUUID]);
+    UKObjectsEqual([p1 UUID], [r3 persistentRootUUID]);
+    UKObjectsEqual([p2 UUID], [r4 persistentRootUUID]);
 }
 
 - (void) testRevisionBranchUUID

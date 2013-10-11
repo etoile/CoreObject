@@ -58,7 +58,7 @@
 - (COUndoTrack *) undoStack
 {
     NSString *name = [NSString stringWithFormat: @"org.etoile.projectdemo-%@",
-                      [[doc persistentRoot] persistentRootUUID]];
+                      [[doc persistentRoot] UUID]];
     
     return [COUndoTrack trackForName: name  withEditingContext: [[doc persistentRoot] editingContext]];
 }
@@ -446,7 +446,7 @@ static int i = 0;
         NSPasteboardItem *item = [[[NSPasteboardItem alloc] init] autorelease];
         
         // FIXME: Pass editing branch?
-		[item setPropertyList: @{ @"persistentRoot" : [[[outlineItem persistentRoot] persistentRootUUID] stringValue],
+		[item setPropertyList: @{ @"persistentRoot" : [[[outlineItem persistentRoot] UUID] stringValue],
                                   @"uuid" : [[outlineItem UUID] stringValue] }
 					  forType: @"org.etoile.outlineItem"];
 		[pbItems addObject: item];

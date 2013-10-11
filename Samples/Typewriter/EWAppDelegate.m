@@ -95,24 +95,24 @@
         COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
         
 		{
-			id request2 = [client updateRequestForPersistentRoot: [user1Proot persistentRootUUID]
+			id request2 = [client updateRequestForPersistentRoot: [user1Proot UUID]
 														serverID: @"server"
 														   store: [_user2Ctx store]];
 			id response2 = [server handleUpdateRequest: request2 store: [_user1Ctx store]];
 			[client handleUpdateResponse: response2 store: [_user2Ctx store]];
 			
-			user2Proot = [_user2Ctx persistentRootForUUID: [user1Proot persistentRootUUID]];
+			user2Proot = [_user2Ctx persistentRootForUUID: [user1Proot UUID]];
 			assert(user2Proot != nil);
 		}
 		
 		{
-			id request2 = [client updateRequestForPersistentRoot: [user1Proot persistentRootUUID]
+			id request2 = [client updateRequestForPersistentRoot: [user1Proot UUID]
 														serverID: @"server"
 														   store: [_user3Ctx store]];
 			id response2 = [server handleUpdateRequest: request2 store: [_user1Ctx store]];
 			[client handleUpdateResponse: response2 store: [_user3Ctx store]];
 			
-			user3Proot = [_user3Ctx persistentRootForUUID: [user1Proot persistentRootUUID]];
+			user3Proot = [_user3Ctx persistentRootForUUID: [user1Proot UUID]];
 			assert(user3Proot != nil);
 		}
     }
@@ -125,8 +125,8 @@
         user2Proot = [[_user2Ctx persistentRoots] anyObject];
         user3Proot = [[_user3Ctx persistentRoots] anyObject];
     }
-    assert([[user1Proot persistentRootUUID] isEqual: [user2Proot persistentRootUUID]]);
-    assert([[user1Proot persistentRootUUID] isEqual: [user3Proot persistentRootUUID]]);
+    assert([[user1Proot UUID] isEqual: [user2Proot UUID]]);
+    assert([[user1Proot UUID] isEqual: [user3Proot UUID]]);
     
     for (NSDictionary *dict in @[@{@"proot" : user1Proot, @"title" : @"user1"},
                                  @{@"proot" : user2Proot, @"title" : @"user2"},

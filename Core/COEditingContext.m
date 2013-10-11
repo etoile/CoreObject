@@ -103,7 +103,7 @@
 			continue;
 		
 		[changeSummary setObject: [persistentRoot description]
-		                  forKey: [persistentRoot persistentRootUUID]];
+		                  forKey: [persistentRoot UUID]];
 	}
 
 	/* For Mac OS X, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
@@ -192,7 +192,7 @@
 	                                                       objectGraphContext: anObjectGrapContext
                                                                 parentContext: self];
 	[_loadedPersistentRoots setObject: persistentRoot
-							   forKey: [persistentRoot persistentRootUUID]];
+							   forKey: [persistentRoot UUID]];
 	return persistentRoot;
 }
 
@@ -223,7 +223,7 @@
 	                                                       objectGraphContext: nil 
                                                                 parentContext: self];
 	[_loadedPersistentRoots setObject: persistentRoot
-							   forKey: [persistentRoot persistentRootUUID]];
+							   forKey: [persistentRoot UUID]];
 
     return persistentRoot;
 }
@@ -344,7 +344,7 @@
 	NSArray *persistentRootsPendingInsertion = [[self persistentRootsPendingInsertion] allObjects];
 
 	[_loadedPersistentRoots removeObjectsForKeys:
-		(id)[[persistentRootsPendingInsertion mappedCollection] persistentRootUUID]];
+		(id)[[persistentRootsPendingInsertion mappedCollection] UUID]];
 	ETAssert([[self persistentRootsPendingInsertion] isEmpty]);
 	
 	/* Clear other pending changes */
@@ -524,7 +524,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 	
 	for (COPersistentRoot *persistentRoot in persistentRoots)
 	{
-        ETUUID *uuid = [persistentRoot persistentRootUUID];
+        ETUUID *uuid = [persistentRoot UUID];
         
 		if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
         {
@@ -581,7 +581,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
     if ([aPersistentRoot isPersistentRootUncommitted])
     {
         [_loadedPersistentRoots removeObjectForKey:
-            [aPersistentRoot persistentRootUUID]];
+            [aPersistentRoot UUID]];
     }
 }
 

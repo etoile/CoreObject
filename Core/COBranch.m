@@ -421,7 +421,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         [store createBranchWithUUID: _UUID
                        parentBranch: _parentBranchUUID
                     initialRevision: _currentRevisionID
-                  forPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                  forPersistentRoot: [[self persistentRoot] UUID]
                               error: NULL];
         
         [[self editingContext] recordBranchCreation: self];
@@ -438,7 +438,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         BOOL ok = [store setCurrentRevision: _currentRevisionID
                                initialRevision: nil
                                   forBranch: _UUID
-                           ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                           ofPersistentRoot: [[self persistentRoot] UUID]
                                       error: NULL];
         ETAssert(ok);
         
@@ -454,7 +454,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     {
         BOOL ok = [store setMetadata: _metadata
                            forBranch: _UUID
-                    ofPersistentRoot: [[self persistentRoot]    persistentRootUUID]
+                    ofPersistentRoot: [[self persistentRoot]    UUID]
                                error: NULL];
         ETAssert(ok);
         
@@ -482,13 +482,13 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
                                                parentRevisionID: _currentRevisionID
                                           mergeParentRevisionID: mergeParent
 		                                             branchUUID: _UUID
-                                             persistentRootUUID: [_persistentRoot persistentRootUUID]
+                                             persistentRootUUID: [_persistentRoot UUID]
                                                           error: NULL];        
         
         BOOL ok = [store setCurrentRevision: revId
                                initialRevision: nil
                                   forBranch: _UUID
-                           ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                           ofPersistentRoot: [[self persistentRoot] UUID]
                                       error: NULL];
         ETAssert(ok);
         
@@ -508,7 +508,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     if (![self isDeleted] && [[self branchInfo] isDeleted])
     {
         ETAssert([store undeleteBranch: _UUID
-                      ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                      ofPersistentRoot: [[self persistentRoot] UUID]
                                  error: NULL]);
         [[self editingContext] recordBranchUndeletion: self];
     }
@@ -525,7 +525,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     if ([self isDeleted] && ![[self branchInfo] isDeleted])
     {
         ETAssert([store deleteBranch: _UUID
-                    ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                    ofPersistentRoot: [[self persistentRoot] UUID]
                                error: NULL]);
         [[self editingContext] recordBranchDeletion: self];
     }    
@@ -541,7 +541,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     {
         BOOL ok = [[_persistentRoot store] setMetadata: _metadata
                                              forBranch: _UUID
-                                      ofPersistentRoot: [[self persistentRoot] persistentRootUUID]
+                                      ofPersistentRoot: [[self persistentRoot] UUID]
                                                  error: NULL];
         ETAssert(ok);
         

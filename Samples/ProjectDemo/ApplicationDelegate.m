@@ -94,8 +94,8 @@
         
 		ASSIGN(project, [proot rootObject]);
 		[context commit];
-		NSLog(@"Creating a new project %@", [proot persistentRootUUID]);
-		[[NSUserDefaults standardUserDefaults] setUUID: [proot persistentRootUUID]
+		NSLog(@"Creating a new project %@", [proot UUID]);
+		[[NSUserDefaults standardUserDefaults] setUUID: [proot UUID]
 												forKey: @"projectDemoProjectUUID"];
 	}
 		
@@ -142,7 +142,7 @@
 	Document *document = [persistentRoot rootObject];
 	[document setRootDocObject: rootObj];
     assert([document rootDocObject] == rootObj);
-	[document setDocumentName: [NSString stringWithFormat: @"Document %@", [[persistentRoot persistentRootUUID] stringValue]]];
+	[document setDocumentName: [NSString stringWithFormat: @"Document %@", [[persistentRoot UUID] stringValue]]];
 	[document setDocumentType: type];
 	
 	[project addDocument_hack: document];

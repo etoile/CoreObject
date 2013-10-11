@@ -214,7 +214,7 @@
 
 - (ETUUID *) UUID
 {
-    return [_persistentRoot persistentRootUUID];
+    return [_persistentRoot UUID];
 }
 
 - (COSQLiteStore *) store
@@ -245,7 +245,7 @@
 - (COUndoTrack *)undoStack
 {
     NSString *name = [NSString stringWithFormat: @"typewriter-%@-%@",
-                      [_persistentRoot persistentRootUUID],
+                      [_persistentRoot UUID],
                       _title];
     
     return [COUndoTrack trackForName: name
@@ -262,7 +262,7 @@
     COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
     COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
     
-    id request2 = [client updateRequestForPersistentRoot: [dest persistentRootUUID]
+    id request2 = [client updateRequestForPersistentRoot: [dest UUID]
                                                 serverID: @"server"
                                                    store: [dest store]];
     id response2 = [server handleUpdateRequest: request2 store: [source store]];
@@ -270,7 +270,7 @@
     
     // Now merge "origin/master" into "master"
     
-    COPersistentRootInfo *info = [[dest store] persistentRootInfoForUUID: [dest persistentRootUUID]];
+    COPersistentRootInfo *info = [[dest store] persistentRootInfoForUUID: [dest UUID]];
     
     ETUUID *uuid = [[[info branchInfosWithMetadataValue: [[[source currentBranch] UUID] stringValue]
                                                  forKey: @"replcatedBranch"] firstObject] UUID];

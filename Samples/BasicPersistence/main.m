@@ -152,7 +152,7 @@ int main(int argc, char **argv)
 	// Create the calendar and appointment and persist them
 
 	Calendar *calendar = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.Calendar"] rootObject];
-	ETUUID *persistentRootUUID = [[calendar persistentRoot] persistentRootUUID];
+	ETUUID *persistentRootUUID = [[calendar persistentRoot] UUID];
 	NSDate *futureDate = [NSDate dateWithTimeIntervalSinceNow: 3600];
 	Appointment *appointment = AUTORELEASE([[Appointment alloc] initWithStartDate: [NSDate date]
 	                                                                      endDate: futureDate

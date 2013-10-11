@@ -81,7 +81,7 @@
 
     // Verify that the revert to firstRevision is not committed
     UKObjectsEqual([thirdRevision revisionID],
-                   [[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]] currentBranchInfo] currentRevisionID]);
+                   [[[store persistentRootInfoForUUID: [persistentRoot UUID]] currentBranchInfo] currentRevisionID]);
     
 	// First redo (Groceries -> Shopping List)
     [originalBranch setCurrentRevision: secondRevision];
@@ -229,11 +229,11 @@
 	
     [persistentRoot commit];
     
-	UKObjectsEqual([rev2 revisionID], [[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]]
+	UKObjectsEqual([rev2 revisionID], [[[store persistentRootInfoForUUID: [persistentRoot UUID]]
                                             branchInfoForUUID: [originalBranch UUID]] currentRevisionID]);
-	UKObjectsEqual([rev6 revisionID], [[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]]
+	UKObjectsEqual([rev6 revisionID], [[[store persistentRootInfoForUUID: [persistentRoot UUID]]
                                          branchInfoForUUID: [branch1 UUID]] currentRevisionID]);
-	UKObjectsEqual([rev5 revisionID], [[[store persistentRootInfoForUUID: [persistentRoot persistentRootUUID]]
+	UKObjectsEqual([rev5 revisionID], [[[store persistentRootInfoForUUID: [persistentRoot UUID]]
                                          branchInfoForUUID: [branch2 UUID]] currentRevisionID]);
 	
 //	NSArray *parentTrackUUIDs = A([initialTrack UUID], [branch1 UUID]);
@@ -320,7 +320,7 @@
         
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        UKNil([[[ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]] currentBranch] label]);
+        UKNil([[[ctx2 persistentRootForUUID: [persistentRoot UUID]] currentBranch] label]);
     }
     
     [ctx commit];
@@ -332,7 +332,7 @@
     
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        UKObjectsEqual(@"Hello world", [[[ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]] currentBranch] label]);
+        UKObjectsEqual(@"Hello world", [[[ctx2 persistentRootForUUID: [persistentRoot UUID]] currentBranch] label]);
     }
     
     [originalBranch setLabel: @"Hello world 2"];
@@ -379,7 +379,7 @@
     
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        UKObjectsEqual([NSDictionary dictionary], [[[ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]] currentBranch] metadata]);
+        UKObjectsEqual([NSDictionary dictionary], [[[ctx2 persistentRootForUUID: [persistentRoot UUID]] currentBranch] metadata]);
     }
     
     [ctx commit];
@@ -391,7 +391,7 @@
     
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        UKObjectsEqual(D(@"value", @"key"), [[[ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]] currentBranch] metadata]);
+        UKObjectsEqual(D(@"value", @"key"), [[[ctx2 persistentRootForUUID: [persistentRoot UUID]] currentBranch] metadata]);
     }
     
     [originalBranch setMetadata: D(@"value2", @"key")];
@@ -411,7 +411,7 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *ctx2persistentRoot2 = [ctx2 persistentRootForUUID: [persistentRoot2 persistentRootUUID]];
+        COPersistentRoot *ctx2persistentRoot2 = [ctx2 persistentRootForUUID: [persistentRoot2 UUID]];
         
         UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot2 currentBranch] metadata]);
     }
@@ -427,7 +427,7 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         
         UKObjectsEqual(D(@"test", kCOBranchLabel), [[ctx2persistentRoot branchForUUID: [branch2 UUID]] metadata]);
     }
@@ -444,7 +444,7 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         
         UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot branchForUUID: [branch2 UUID]] metadata]);
     }
@@ -476,7 +476,7 @@
     {
         // Quick check that the commits worked
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *persistentRootCtx2 = [ctx2 persistentRootForUUID: [persistentRoot persistentRootUUID]];
+        COPersistentRoot *persistentRootCtx2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         
         CORevision *initialBranchRev = [persistentRootCtx2 revision];
         CORevision *secondBranchRev = [[persistentRootCtx2 branchForUUID: [secondBranch UUID]] currentRevision];

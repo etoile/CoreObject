@@ -137,7 +137,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 			{
 				NSAssert([value isRoot], @"A property must point to a root object "
 					"for references accross persistent roots");
-				return [COPath pathWithPersistentRoot: [[value persistentRoot] persistentRootUUID]]; // Create path to the current branch by default
+				return [COPath pathWithPersistentRoot: [[value persistentRoot] UUID]]; // Create path to the current branch by default
 			}
 		}
 		else
