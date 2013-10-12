@@ -175,7 +175,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * This object UUID must remain the same in the entire persistent root history 
  * including the branches (and derived cheap copies). This is enforced in the store
  * as well as in this property - it is a "set-once" property. An exception will
- * be raised if the caller attempts to set it to something else. 
+ * be raised if the caller attempts to set it to something else.
  *
  * The root object doesn't represent the core object. As such, use the persistent
  * root UUID to refer to core objects and never <code>[[self rootObject] UUID]</code>.
@@ -237,8 +237,6 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * After calling this method, -hasChanges returns NO.
  */
 - (void)clearChangeTracking;
-// NOTE: I'm not sure this method is going to be useful. Quentin.
-- (void)clearChangeTrackingForObject: (COObject *)anObject;
 
 /**
  * @taskunit Accessing Loaded Objects

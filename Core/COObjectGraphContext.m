@@ -442,13 +442,6 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     [_updatedPropertiesByObject removeAllObjects];
 }
 
-- (void) clearChangeTrackingForObject: (COObject *)anObject
-{
-    [_insertedObjects removeObject: anObject];
-    [_updatedObjects removeObject: anObject];
-    [_updatedPropertiesByObject removeObjectForKey: anObject];
-}
-
 #pragma mark -
 #pragma mark Accessing Loaded Objects
 
