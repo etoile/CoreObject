@@ -150,11 +150,17 @@
 	[self checkCommand: current isSetVersionFrom: r0 to: r1];
 }
 
+- (void) testEmptyTrack
+{
+	COUndoTrack *emptyTrack = [COUndoTrack trackForName: @"emptyTrack" withEditingContext: ctx];
+	[emptyTrack clear];
+	
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [emptyTrack currentNode]);
+	UKObjectsEqual(@[[COEndOfUndoTrackPlaceholderNode sharedInstance]], [emptyTrack nodes]);
+}
+
 - (void) checkNodes: (NSArray *)nodes
 {
-	// FIXME: This will need to be adjusted if we add the placeholder start
-	// node as discussed above
-	
 	UKIntsEqual(5, [nodes count]);
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], nodes[0]);
 	[self checkCommand: nodes[1] isSetVersionFrom: r0 to: r1];
