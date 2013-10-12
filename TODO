@@ -1,13 +1,60 @@
 TODO
 ====
 
-Current tasks
--------------
+First alpha release blockers
+----------------------------
 
-current questions:
-    - what is the best represent a user's save action (cmd+s) in the current
-    store model?
-		=> Using empty commits with metadata, for now.
+-- add items here --
+
+
+
+Backlog from Oct 2nd
+--------------------
+
+- For CORevisionID, does -persistentRootUUID match exactly each persistent root or does it just correspond to the first persistent root in the backing store
+
+- CORevisionID equality involving persistent root UUID (-persistentRootUUID should be the backing store UUID probably)
+
+- Undo changes the current revision is that happens to be recorded by the Undo stack
+
+- To many revision abstractions imo: CORevision, CORevisionInfo, CORevisionID, ETUUID, int64_t.  The code and architecture is more complex than it ought to be.
+Ideally we should have just 3, but we should at least remove one.
+
+- Skip transient property descriptions or at least attributes in -[COObject embeddedOrReferencedObjects]
+
+- Implement -persistentEntityDescription to support partial loading
+
+- Rename COTrack to COHistoryTrack protocol
+
+- Implement something like COSelectiveHistoryTrack (using a query to select revisions based on criterias e.g. inner object subset)
+- Do we want something to aggregate the history of multiple persistent roots in this same class?
+
+- COSearchResult vs COQuery
+
+- Selective Undo for -undoNode: or elsewhere… Should I create a COCommand and call -inverse then compute and apply the selective undo result from this inverse command?
+
+- Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
+
+- Store: revert to integer commit id's
+
+- COCommandSetCurrentVersionForBranch: extract selective undo code to COBranch
+
+- COLibrary: sepcial COContainer, one CoreObject can only belong to a single library
+
+- GC: only collect divergent revisions older than X days
+
+- Fix COObjectGraphContext GC following cross-object-graph-context references
+
+- A generic object manager than can open any store and display any COObject
+  - Should support displaying all key/values (like past StoreBorwser prototypes)
+  - Not blocking release, but critical for ObjectManager
+
+Backlog
+-------
+
+x what is the best represent a user's save action (cmd+s) in the current
+store model?
+	=> Using empty commits with metadata, for now.
 
 revision identifiers:
  - We've settled on a UUID for identifying revisions. Quentin was saying there
@@ -33,7 +80,7 @@ revision identifiers:
 history graph UI
  - summarization (hiding minor revisions)
  - use async fetching of revision info
- - also make a COUndoStack UI
+ x also make a COUndoStack UI (ObjectManager has one)
 
 collaboration
  - interation btn. sync and branching
@@ -56,9 +103,6 @@ typewriter / ProjDemo
  - use attachments
  - merge UI
 
-
-Backlog
--------
 
 - Major tasks
   x App-level undo
