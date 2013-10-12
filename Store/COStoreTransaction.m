@@ -107,6 +107,7 @@
  * All-in-one method for updating the current revision of a persistent root.
  */
 - (void) setCurrentRevision: (ETUUID *)currentRev
+			   headRevision: (ETUUID *)headRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot
 {
@@ -116,6 +117,7 @@
     
     COStoreSetCurrentRevision *op = [[COStoreSetCurrentRevision alloc] init];
     op.currentRevision = currentRev;
+	op.headRevision = headRev;
     op.branch = aBranch;
     op.persistentRoot = aRoot;
     [self addOperation: op];

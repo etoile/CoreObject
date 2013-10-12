@@ -412,7 +412,8 @@ typedef NSUInteger COBranchRevisionReadingOptions;
  * Passing nil for any revision params means to keep the current value
  */
 - (BOOL) setCurrentRevision: (CORevisionID*)currentRev
-               initialRevision: (CORevisionID*)initialRev
+			initialRevision: (CORevisionID*)initialRev
+               headRevision: (CORevisionID*)headRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot
                       error: (NSError **)error;

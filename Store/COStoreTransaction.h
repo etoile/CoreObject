@@ -39,6 +39,7 @@
  * All-in-one method for updating the current revision of a persistent root.
  */
 - (void) setCurrentRevision: (ETUUID *)currentRev
+			   headRevision: (ETUUID *)headRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot;
 

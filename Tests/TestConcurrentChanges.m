@@ -72,7 +72,8 @@
     [store beginTransactionWithError: NULL];
     // Revert persistentRoot back to the first revision using the store API
     UKTrue([store setCurrentRevision: firstRevid
-                        initialRevision: nil
+					 initialRevision: nil
+                        headRevision: nil
                            forBranch: [[persistentRoot currentBranch] UUID]
                     ofPersistentRoot: [persistentRoot UUID]
                                error: NULL]);

@@ -69,7 +69,8 @@ static ETUUID *rootUUID;
                                                           error: NULL];
 
     [store setCurrentRevision: prootBRev
-	             initialRevision: nil
+			  initialRevision: nil
+				 headRevision: prootBRev
 	                forBranch: [prootB currentBranchUUID]
 	         ofPersistentRoot: [prootB UUID]
 	                    error: NULL];

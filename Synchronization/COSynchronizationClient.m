@@ -186,6 +186,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
         
         assert([aStore setCurrentRevision: currentRevisionID
                               initialRevision: initialRevisionID
+							 headRevision: initialRevisionID // FIXME: What should headRevision be set to? nil ot initialRevisionID?
                                  forBranch: branchUUID
                           ofPersistentRoot: persistentRoot
                                     error: NULL]);

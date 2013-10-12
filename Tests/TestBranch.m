@@ -80,12 +80,12 @@
 	UKObjectsNotEqual(thirdRevision, secondRevision);
 
 	// First undo (Todo -> Shopping List)
-    [originalBranch setCurrentRevision: secondRevision];
+	[originalBranch undo]; //[originalBranch setCurrentRevision: secondRevision];
 	UKStringsEqual(@"Shopping List", [rootObj valueForProperty: @"label"]);
 	UKObjectsEqual(secondRevision, [originalBranch currentRevision]);
 
 	// Second undo (Shopping List -> Groceries)
-    [originalBranch setCurrentRevision: firstRevision];
+	[originalBranch undo]; //[originalBranch setCurrentRevision: firstRevision];
 	UKStringsEqual(@"Groceries", [rootObj valueForProperty: @"label"]);
 	UKObjectsEqual(firstRevision, [originalBranch currentRevision]);
 
@@ -94,12 +94,12 @@
                    [[[store persistentRootInfoForUUID: [persistentRoot UUID]] currentBranchInfo] currentRevisionID]);
     
 	// First redo (Groceries -> Shopping List)
-    [originalBranch setCurrentRevision: secondRevision];
+	[originalBranch redo]; //[originalBranch setCurrentRevision: secondRevision];
 	UKStringsEqual(@"Shopping List", [rootObj valueForProperty: @"label"]);
 	UKObjectsEqual(secondRevision, [originalBranch currentRevision]);
 
     // Second redo (Shopping List -> Todo)
-    [originalBranch setCurrentRevision: thirdRevision];
+	[originalBranch redo]; //[originalBranch setCurrentRevision: thirdRevision];
 	UKStringsEqual(@"Todo", [rootObj valueForProperty: @"label"]);
 	UKObjectsEqual(thirdRevision, [originalBranch currentRevision]);
 }
@@ -130,11 +130,11 @@
     UKNotNil(thirdRevision);
     
     // Undo
-    [originalBranch setCurrentRevision: secondRevision];
+    [originalBranch undo]; //[originalBranch setCurrentRevision: secondRevision];
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
 	
     // Redo
-    [originalBranch setCurrentRevision: thirdRevision];
+    [originalBranch redo]; //[originalBranch setCurrentRevision: thirdRevision];
 	UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
 }
 
@@ -158,7 +158,7 @@
     UKNotNil(secondRevision);
     
     // Undo
-    [originalBranch setCurrentRevision: firstRevision];
+    [originalBranch undo]; //[originalBranch setCurrentRevision: firstRevision];
 	UKIntsEqual(0, [rootObj count]);
 
 	COContainer *para3 = [[originalBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -171,12 +171,12 @@
 	UKIntsEqual(1, [rootObj count]); // Revision 3 (base 1)
 
     // Undo
-    [originalBranch setCurrentRevision: firstRevision];
+    [originalBranch undo]; //[originalBranch setCurrentRevision: firstRevision];
 	UKIntsEqual(0, [rootObj count]);
 
     
     // Redo
-    [originalBranch setCurrentRevision: divergentRevision];
+    [originalBranch redo]; //[originalBranch setCurrentRevision: divergentRevision];
 	UKIntsEqual(1, [rootObj count]);
 	UKStringsEqual(@"paragraph 3", [[[rootObj contentArray] objectAtIndex: 0] valueForProperty: @"label"]);
 }

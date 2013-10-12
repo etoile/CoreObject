@@ -136,6 +136,12 @@ extern NSString * const kCOBranchLabel;
  * If the branch is uncommitted, the current revision is nil.
  */
 @property (readwrite, strong, nonatomic) CORevision *currentRevision;
+/**
+ * The revision bound to the most recent commit in the branch.
+ *
+ * In the store terminology, this is the branch head revision.
+ */
+@property (readonly, nonatomic) CORevision *newestRevision;
 
 - (void)reloadAtRevision: (CORevision *)revision;
 
@@ -180,6 +186,16 @@ extern NSString * const kCOBranchLabel;
  * Would be used to cause a "checkpoint" revision to be written.
  */
 @property (readwrite, nonatomic) BOOL shouldMakeEmptyCommit;
+
+
+
+/** @taskunit Undo / Redo */
+
+
+- (BOOL)canUndo;
+- (BOOL)canRedo;
+- (void)undo;
+- (void)redo;
 
 
 /** @taskunit Creating Branches and Cheap copies */

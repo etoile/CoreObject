@@ -119,7 +119,7 @@
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL PRIMARY KEY, "
      "proot BLOB NOT NULL, initial_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
-     "metadata BLOB, deleted BOOLEAN DEFAULT 0, parentbranch BLOB)"];
+     "head_revid BLOB NOT NULL, metadata BLOB, deleted BOOLEAN DEFAULT 0, parentbranch BLOB)"];
     
     // FTS indexes & reference caching tables (in theory, could be regenerated - although not supported)
     
@@ -750,7 +750,7 @@
         }
         
         {
-            FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, initial_revid, current_revid, metadata, deleted FROM branches WHERE proot = ?", [aUUID dataValue]];
+            FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, initial_revid, current_revid, head_revid, metadata, deleted FROM branches WHERE proot = ?", [aUUID dataValue]];
             while ([rs next])
             {
                 ETUUID *branch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
@@ -758,14 +758,17 @@
                                                                        revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]]];
                 CORevisionID *currentRevid = [CORevisionID revisionWithPersistentRootUUID: backingUUID
                                                                           revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]]];
-                id branchMeta = [self readMetadata: [rs dataForColumnIndex: 3]];
+                CORevisionID *headRevid = [CORevisionID revisionWithPersistentRootUUID: backingUUID
+																			 revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 3]]];
+                id branchMeta = [self readMetadata: [rs dataForColumnIndex: 4]];
                 
                 COBranchInfo *state = [[COBranchInfo alloc] init];
                 state.UUID = branch;
                 state.initialRevisionID = initialRevid;
                 state.currentRevisionID = currentRevid;
+				state.headRevisionID = headRevid;
                 state.metadata = branchMeta;
-                state.deleted = [rs boolForColumnIndex: 4];
+                state.deleted = [rs boolForColumnIndex: 5];
                 
                 [branchDict setObject: state forKey: branch];
             }
@@ -857,6 +860,7 @@
         branch.UUID = aBranchUUID;
         branch.initialRevisionID = aRevision;
         branch.currentRevisionID = aRevision;
+        branch.headRevisionID = aRevision;
         branch.metadata = nil;
         branch.deleted = NO;
         
@@ -1016,15 +1020,17 @@
 }
 
 - (BOOL) setCurrentRevision: (CORevisionID*)currentRev
-               initialRevision: (CORevisionID*)initialRev
+			initialRevision: (CORevisionID*)initialRev
+               headRevision: (CORevisionID*)headRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot
                       error: (NSError **)error
 {
     [self checkInTransaction];
     [self recordModifiedPersistentRoot: aRoot];
-    
+
     [transaction_ setCurrentRevision: currentRev.revisionUUID
+						headRevision: headRev.revisionUUID
                            forBranch: aBranch
                     ofPersistentRoot: aRoot];
     
