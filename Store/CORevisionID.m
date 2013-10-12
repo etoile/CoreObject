@@ -30,8 +30,7 @@
 {
     if ([object isKindOfClass: [CORevisionID class]])
     {
-        return [((CORevisionID *)object)->revisionPersistentRootUUID isEqual: revisionPersistentRootUUID]
-            && [((CORevisionID *)object)->revisionUUID isEqual: revisionUUID];
+        return [((CORevisionID *)object)->revisionUUID isEqual: revisionUUID];
     }
     return NO;
 }
