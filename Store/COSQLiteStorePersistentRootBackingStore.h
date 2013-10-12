@@ -37,7 +37,7 @@
 
 - (CORevisionInfo *) revisionForID: (CORevisionID *)aToken;
 
-- (ETUUID *) rootUUIDForRevid: (int64_t)revid;
+- (ETUUID *) rootUUID;
 - (BOOL) hasRevid: (int64_t)revid;
 
 - (COItemGraph *) itemGraphForRevid: (int64_t)revid;

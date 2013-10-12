@@ -219,7 +219,7 @@
     return [self revidForUUID: [aToken revisionUUID]];
 }
 
-- (ETUUID *) rootUUIDForRevid: (int64_t)revid
+- (ETUUID *) rootUUID
 {
     ETUUID *result = nil;
     FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT root FROM %@", [self metadataTableName]]];
@@ -300,7 +300,7 @@
         return nil;
     }
     
-    ETUUID *root = [self rootUUIDForRevid: revid];
+    ETUUID *root = [self rootUUID];
     
     // Convert dataForUUID to a UUID -> COItem mapping.
     // TODO: Eliminate this by giving COItem to be created with a serialized NSData of itself,
@@ -504,7 +504,8 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 	
 	
 	// Update the root object UUID
-	ETUUID *currentRoot = [self rootUUIDForRevid: 0]; // FIXME: revid parameter is ignored and should be ignored
+	ETUUID *currentRoot = [self rootUUID];
+	
 	if (currentRoot == nil)
 	{
 		ok = ok && [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (root) VALUES (?)", [self metadataTableName]],

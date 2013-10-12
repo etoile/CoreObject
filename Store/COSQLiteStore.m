@@ -476,7 +476,7 @@
     
     dispatch_sync(queue_, ^(){
         COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-        result = [backing rootUUIDForRevid: [backing revidForRevisionID: aToken]];
+        result = [backing rootUUID];
     });
     
     return result;
