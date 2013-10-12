@@ -47,6 +47,7 @@ extern NSString * const kCOBranchLabel;
      * to a past revision.
      */
 	CORevisionID *_currentRevisionID;
+	CORevisionID *_newestRevisionID;
     
     /**
      * If different than the metadata for this branch in _persistentRoot's _savedState,

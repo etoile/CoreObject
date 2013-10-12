@@ -29,6 +29,9 @@
     
 	[ctx commit];
 	
+	UKNotNil(originalBranch.currentRevision);
+	UKNotNil(originalBranch.newestRevision);
+	
 	altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
 	[ctx commit];
 	

@@ -5,6 +5,7 @@
 #import "COEditingContext+Private.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
+#import "COBranch+Private.h"
 #import "CORevision.h"
 #import "CORevisionCache.h"
 
@@ -15,6 +16,9 @@
 static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
 static NSString * const kCOCommandOldRevisionID = @"COCommandOldRevisionID";
 static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
+static NSString * const kCOCommandOldHeadRevisionID = @"COCommandOldHeadRevisionID";
+static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevisionID";
+
 
 @implementation COCommandSetCurrentVersionForBranch 
 
@@ -22,12 +26,18 @@ static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
 @synthesize oldRevisionID = _oldRevisionID;
 @synthesize revisionID = _newRevisionID;
 
+@synthesize oldHeadRevisionID = _oldHeadRevisionID;
+@synthesize headRevisionID = _newHeadRevisionID;
+
+
 - (id) initWithPlist: (id)plist
 {
     self = [super initWithPlist: plist];
     self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandBranchUUID]];
     self.oldRevisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOCommandOldRevisionID]];
     self.revisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOCommandNewRevisionID]];
+	self.oldHeadRevisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOCommandOldHeadRevisionID]];
+    self.headRevisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOCommandNewHeadRevisionID]];
     return self;
 }
 
@@ -37,6 +47,8 @@ static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
     [result setObject: [_branchUUID stringValue] forKey: kCOCommandBranchUUID];
     [result setObject: [_oldRevisionID plist] forKey:kCOCommandOldRevisionID];
     [result setObject: [_newRevisionID plist] forKey: kCOCommandNewRevisionID];
+	[result setObject: [_oldHeadRevisionID plist] forKey:kCOCommandOldHeadRevisionID];
+    [result setObject: [_newHeadRevisionID plist] forKey: kCOCommandNewHeadRevisionID];
     return result;
 }
 
@@ -50,6 +62,8 @@ static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
     inverse.branchUUID = _branchUUID;
     inverse.oldRevisionID = _newRevisionID;
     inverse.revisionID = _oldRevisionID;
+	inverse.oldHeadRevisionID = _newHeadRevisionID;
+    inverse.headRevisionID = _oldHeadRevisionID;
     return inverse;
 }
 
@@ -105,6 +119,9 @@ static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
     {
         [branch setCurrentRevision:
             [aContext revisionForRevisionID: _newRevisionID]];
+		
+		[branch setNewestRevision:
+			[aContext revisionForRevisionID: _newHeadRevisionID]];
     }
     else
     {
@@ -123,6 +140,9 @@ static NSString * const kCOCommandNewRevisionID = @"COCommandNewRevisionID";
 		// FIXME: Handle cross-persistent root relationship constraint violations,
 		// if we introduce those
         [[branch objectGraphContext] insertOrUpdateItems: items];
+		
+		// N.B. newHeadRevisionID is intentionally ignored here, it only applies
+		// if we were able to do a non-selective undo.
     }
 }
 

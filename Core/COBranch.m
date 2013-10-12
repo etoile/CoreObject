@@ -102,7 +102,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     {
         // Creating a new branch
         
-        _currentRevisionID =  parentRevisionForNewBranch;
+        _currentRevisionID = parentRevisionForNewBranch;
+		_newestRevisionID = parentRevisionForNewBranch;
         _isCreated = NO;
         
         // If _parentRevisionID is nil, we're a new branch for a new persistent root
@@ -256,15 +257,21 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (CORevision *)newestRevision
 {
-    CORevisionID *revid = [[self branchInfo] headRevisionID];
-    
-    if (revid != nil)
+    if (_newestRevisionID != nil)
     {
-        return [[self editingContext] revisionForRevisionID: revid];
+        return [[self editingContext] revisionForRevisionID: _newestRevisionID];
     }
     
     return nil;
 }
+
+- (void)setNewestRevision: (CORevision *)aRevision
+{
+	NILARG_EXCEPTION_TEST(aRevision);
+
+	_newestRevisionID = [aRevision revisionID];
+}
+
 
 - (CORevision *)currentRevision
 {
@@ -305,6 +312,11 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         return YES;
     }
     
+	if (![[[self branchInfo] headRevisionID] isEqual: _newestRevisionID])
+    {
+        return YES;
+    }
+	
     if (self.shouldMakeEmptyCommit)
     {
         return YES;
@@ -348,7 +360,13 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         [self setCurrentRevision:
             [[self editingContext] revisionForRevisionID: [[self branchInfo] currentRevisionID]]];
     }
-    
+
+	if (![[[self branchInfo] headRevisionID] isEqual: _newestRevisionID])
+    {
+        [self setNewestRevision:
+		 [[self editingContext] revisionForRevisionID: [[self branchInfo] headRevisionID]]];
+    }
+	
     if ([self isDeleted] != [[self branchInfo] isDeleted])
     {
         [self setDeleted: [[self branchInfo] isDeleted]];
@@ -488,6 +506,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	ETAssert([[_objectGraph rootObject] isRoot]);
     ETAssert(![self isBranchPersistentRootUncommitted]);
     ETAssert(_currentRevisionID != nil);
+    ETAssert(_newestRevisionID != nil);
     
 	COSQLiteStore *store = [self store];
     
@@ -505,16 +524,19 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         
         _isCreated = YES;
     }
-    else if (![[[self branchInfo] currentRevisionID] isEqual: _currentRevisionID])
+    else if (![[[self branchInfo] currentRevisionID] isEqual: _currentRevisionID]
+			 || ![[[self branchInfo] headRevisionID] isEqual: _newestRevisionID] )
     {
         CORevisionID *old = [[self branchInfo] currentRevisionID];
         assert(old != nil);
+		
+		CORevisionID *oldHead = [[self branchInfo] headRevisionID];
         
         // This is the case when the user does [self setCurrentRevision: ], and then commits
         
         BOOL ok = [store setCurrentRevision: _currentRevisionID
 							initialRevision: nil
-                               headRevision: nil /* This is the case when we're reverting, so don't update headRevision */
+                               headRevision: _newestRevisionID
                                   forBranch: _UUID
                            ofPersistentRoot: [[self persistentRoot] UUID]
                                       error: NULL];
@@ -523,6 +545,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
         [[self editingContext] recordBranchSetCurrentRevisionID: _currentRevisionID
                                                   oldRevisionID: old
+												 headRevisionID: _newestRevisionID
+											  oldHeadRevisionID: oldHead
                                                        ofBranch: self];
     }
     
@@ -572,13 +596,18 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         ETAssert(ok);
         
         CORevisionID *oldRevid = _currentRevisionID;
+		CORevisionID *oldHeadRevid = _newestRevisionID;
         assert(oldRevid != nil);
+        assert(oldHeadRevid != nil);
         assert(revId != nil);
         _currentRevisionID = revId;
+		_newestRevisionID = revId;
         self.shouldMakeEmptyCommit = NO;
         
         [[self editingContext] recordBranchSetCurrentRevisionID: _currentRevisionID
                                                   oldRevisionID: oldRevid
+												 headRevisionID: _currentRevisionID
+											  oldHeadRevisionID: oldHeadRevid
                                                        ofBranch: self];
     }
 
@@ -633,6 +662,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     ETAssert(_isCreated == NO);
     
     _currentRevisionID =  aRevisionID;
+	_newestRevisionID = aRevisionID;
     _isCreated = YES;
     
     [_objectGraph clearChangeTracking];
@@ -746,6 +776,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     ETAssert(branchInfo != nil);
     
     _currentRevisionID =  [branchInfo currentRevisionID];
+	_newestRevisionID = [branchInfo headRevisionID];
     _metadata =  [NSMutableDictionary dictionaryWithDictionary:[branchInfo metadata]];
     _isCreated = YES;
     

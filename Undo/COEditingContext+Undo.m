@@ -144,6 +144,8 @@
 
 - (void) recordBranchSetCurrentRevisionID: (CORevisionID *)current
                             oldRevisionID: (CORevisionID *)old
+						   headRevisionID: (CORevisionID *)head
+                        oldHeadRevisionID: (CORevisionID *)oldHead
                                  ofBranch: (COBranch *)aBranch
 
 {
@@ -157,6 +159,8 @@
     edit.branchUUID = [aBranch UUID];
     edit.oldRevisionID = old;
     edit.revisionID = current;
+	edit.headRevisionID = head;
+	edit.oldHeadRevisionID = oldHead;
     
     [self recordCommand: edit];
 }

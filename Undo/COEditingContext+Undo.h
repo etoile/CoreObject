@@ -67,6 +67,8 @@
 - (void) recordBranchCreation: (COBranch *)aBranch;
 - (void) recordBranchSetCurrentRevisionID: (CORevisionID *)current
                             oldRevisionID: (CORevisionID *)old
+						   headRevisionID: (CORevisionID *)head
+                        oldHeadRevisionID: (CORevisionID *)oldHead
                                  ofBranch: (COBranch *)aBranch;
 - (void) recordBranchSetMetadata: (COBranch *)aBranch
                      oldMetadata: (id)oldMetadata;
