@@ -418,6 +418,14 @@
     UKObjectsSame(group2, [child parentContainer]);
 }
 
+- (void) testRootObjectIsSetOnceOnly
+{
+	UKObjectsEqual(root1, [ctx1 rootObject]);
+	
+	COObject *root2 = [self addObjectWithLabel: @"root1" toContext: ctx1];
+    UKRaisesException([ctx1 setRootObject: root2]);
+}
+
 // Done up to this line....
 #if 0
 

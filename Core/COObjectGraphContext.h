@@ -66,7 +66,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  */
 - (id)initWithBranch: (COBranch *)aBranch;
 /**
- * Initializes a transient object graph context using the given model 
+ * Initializes a transient object graph context using the given model
  * description repository.
  */
 - (id)initWithModelRepository: (ETModelDescriptionRepository *)aRepo;
@@ -173,7 +173,9 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * committing it.
  *
  * This object UUID must remain the same in the entire persistent root history 
- * including the branches (and derived cheap copies).
+ * including the branches (and derived cheap copies). This is enforced in the store
+ * as well as in this property - it is a "set-once" property. An exception will
+ * be raised if the caller attempts to set it to something else. 
  *
  * The root object doesn't represent the core object. As such, use the persistent
  * root UUID to refer to core objects and never <code>[[self rootObject] UUID]</code>.
