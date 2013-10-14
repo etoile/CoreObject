@@ -123,6 +123,23 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * store on the next editing context commit.
  */
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
+/**
+ * The newest revision date among all branches.
+ *
+ * Changing a branch current revision doesn't alter the returned date. See 
+ * -[COBranch currentRevision].
+ *
+ * See -[COBranch newestRevision] and -[CORevision date].
+ */
+@property (nonatomic, readonly) NSDate *modificationDate;
+/**
+ * The first revision date.
+ *
+ * The first revision is the same accross all branches in a persistent root.
+ *
+ * See -[COBranch firstRevision] and -[CORevision date].
+ */
+@property (nonatomic, readonly) NSDate *creationDate;
 
 
 /** @taskunit Accessing Branches */

@@ -243,6 +243,22 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     }
 }
 
+- (NSDate *)modificationDate
+{
+	if ([self isBranchUncommitted])
+		return nil;
+
+	return [[self newestRevision] date];
+}
+
+- (NSDate *)creationDate
+{
+	if ([self isBranchUncommitted])
+		return nil;
+
+	return [[self initialRevision] date];
+}
+
 - (CORevision *)initialRevision
 {
     CORevisionID *revid = [[self branchInfo] initialRevisionID];
@@ -253,6 +269,17 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     }
     
     return nil;
+}
+
+- (CORevision *)firstRevision
+{
+	COBranch *branch = self;
+
+	while ([branch parentBranch] != nil)
+	{
+		branch = [branch parentBranch];
+	}
+	return [branch initialRevision];
 }
 
 - (CORevision *)newestRevision

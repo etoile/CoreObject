@@ -66,10 +66,6 @@ See +[NSObject typePrefix]. */
 	// a persistent property.
 	//ETPropertyDescription *idProperty = 
 	//	[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"Anonymous.NSString"];
-	ETPropertyDescription *modificationDateProperty = 
-		[ETPropertyDescription descriptionWithName: @"modificationDate" type: (id)@"Anonymous.NSDate"];
-	ETPropertyDescription *creationDateProperty = 
-		[ETPropertyDescription descriptionWithName: @"creationDate" type: (id)@"Anonymous.NSDate"];
 	ETPropertyDescription *lastVersionDescProperty = 
 		[ETPropertyDescription descriptionWithName: @"lastVersionDescription" type: (id)@"Anonymous.NSString"];
 	ETPropertyDescription *tagDescProperty = 
@@ -97,8 +93,7 @@ See +[NSObject typePrefix]. */
 	[tagsProperty setMultivalued: YES];
 	[tagsProperty setOrdered: YES];
 
-	NSArray *transientProperties = A(displayNameProperty, modificationDateProperty, 
-		creationDateProperty, lastVersionDescProperty, tagDescProperty, typeDescProperty);
+	NSArray *transientProperties = A(displayNameProperty, lastVersionDescProperty, tagDescProperty, typeDescProperty);
 #ifndef GNUSTEP
 	transientProperties = [transientProperties arrayByAddingObject: iconProperty];
 #endif
@@ -286,24 +281,6 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	[self willChangeValueForProperty: @"name"];
 	[self setValue: aName forUndefinedKey: @"name"];
 	[self didChangeValueForProperty: @"name"];
-}
-
-- (NSDate *)modificationDate
-{
-	if ([[_objectGraphContext branch] isBranchUncommitted])
-		return nil;
-
-	// TODO: Avoid loading all the branch revisions just to get the last revision
-	return [[[[_objectGraphContext branch] nodes] lastObject] date];
-}
-
-- (NSDate *)creationDate
-{
-	if ([[_objectGraphContext branch] isBranchUncommitted])
-		return nil;
-
-	// TODO: Avoid loading all the branch revisions just to get the first revision
-	return [[[[_objectGraphContext branch] nodes] firstObject] date];
 }
 
 - (NSArray *)tags

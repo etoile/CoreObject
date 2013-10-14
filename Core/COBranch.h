@@ -132,6 +132,21 @@ extern NSString * const kCOBranchLabel;
  */
 @property (strong, readonly, nonatomic) CORevision *initialRevision;
 /**
+ * The oldest revision in the entire branch history.
+ *
+ * To find the first revision, parent branches are traversed until reaching a 
+ * branch without a parent branch, then the last examined branch initial 
+ * revision is returned.
+ *
+ * If -parentBranch is nil, then the first revision is the same than the initial 
+ * revision.
+ *
+ * For all branches in a persistent root, returns the same revision.
+ *
+ * This is the same than <code>[[self nodes] firstObject]</code>.
+ */
+@property (nonatomic, readonly) CORevision *firstRevision;
+/**
  * The revision bound to the state loaded in the object graph context.
  *
  * If the branch is uncommitted, the current revision is nil.
@@ -141,6 +156,8 @@ extern NSString * const kCOBranchLabel;
  * The revision bound to the most recent commit in the branch.
  *
  * In the store terminology, this is the branch head revision.
+ *
+ * This is the same than <code>[[self nodes] lastObject]</code>.
  */
 @property (readonly, nonatomic) CORevision *newestRevision;
 

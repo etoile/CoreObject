@@ -328,22 +328,6 @@
  */
 @property (nonatomic, readonly) NSString *identifier;
 /**
- * Returns the last time the receiver changes were committed.
- *
- * The returned date is the last current branch revision date. See -[CORevision date].
- *
- * The current branch is -[COPersistentRoot commitTrack].
- *
- * Can be more recent than the present receiver revision (see -revision).
- */
-@property (nonatomic, readonly) NSDate *modificationDate;
-/**
- * Returns the first time the receiver changes were committed.
- *
- * The returned date is the first root object revision date. See -[CORevision date].
- */
-@property (nonatomic, readonly) NSDate *creationDate;
-/**
  * Returns -name.
  */
 - (NSString *)displayName;

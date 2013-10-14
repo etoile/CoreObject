@@ -140,6 +140,27 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     [self sendChangeNotification];
 }
 
+- (NSDate *)modificationDate
+{
+	NSDate *maxDate = nil;
+
+	for (COBranch *branch in [self branches])
+	{
+		NSDate *date = [[branch newestRevision] date];
+
+		if (maxDate != nil && [[date earlierDate: maxDate] isEqualToDate: date])
+			continue;
+
+		maxDate = date;
+	}
+	return maxDate;
+}
+
+- (NSDate *)creationDate
+{
+	return [[[self currentBranch] firstRevision] date];
+}
+
 - (COBranch *)currentBranch
 {
 	return [_branchForUUID objectForKey: _currentBranchUUID];

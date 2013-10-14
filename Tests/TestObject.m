@@ -29,27 +29,27 @@
 
 - (void) testCreationAndModificationDates
 {
-	COObject *object =
-		[[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
+	COObject *object = [proot rootObject];
 
-	UKNil([object creationDate]);
-	UKNil([object modificationDate]);
+	UKNil([proot creationDate]);
+	UKNil([proot modificationDate]);
 
 	[object setName: @"Bing"];
 	[ctx commit];
 
 	CORevision *firstRev = [object revision];
 
-	UKObjectsEqual([firstRev date], [object creationDate]);
-	UKObjectsEqual([firstRev date], [object modificationDate]);
+	UKObjectsEqual([firstRev date], [proot creationDate]);
+	UKObjectsEqual([firstRev date], [proot modificationDate]);
 
 	[object setName: @"Bong"];
 	[ctx commit];
 
 	CORevision *lastRev = [object revision];
 
-	UKObjectsEqual([firstRev date], [object creationDate]);
-	UKObjectsEqual([lastRev date], [object modificationDate]);
+	UKObjectsEqual([firstRev date], [proot creationDate]);
+	UKObjectsEqual([lastRev date], [proot modificationDate]);
 	UKObjectsNotEqual(lastRev, firstRev);
 }
 
