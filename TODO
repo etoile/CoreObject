@@ -4,8 +4,11 @@ TODO
 First alpha release blockers
 ----------------------------
 
--- add items here --
+- Clean COGarbageCollection.m and rename -embeddedOrReferencedObjects to use a more descriptive name
 
+- Check and update all Core API documentation (underway)
+
+- Check code quality for all Core classes (underway)
 
 
 Backlog from Oct 2nd

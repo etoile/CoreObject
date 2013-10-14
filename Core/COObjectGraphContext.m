@@ -9,6 +9,7 @@
 
 #import "COObjectGraphContext.h"
 #import "COItemGraph.h"
+#import "COGarbageCollection.h"
 #import "CORelationshipCache.h"
 #import "COObject+Private.h"
 #import "COObject+RelationshipCache.h"

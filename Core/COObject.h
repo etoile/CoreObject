@@ -308,15 +308,6 @@
  */
 - (CORevision *)revision;
 
-/** @taskunit Contained Objects based on the Metamodel */
-
-/**
- * Returns an array containing all COObjects "strongly contained" by this one.
- * This means objects which are values for "composite" properties.
- */
-- (NSArray *)allStronglyContainedObjects;
-- (NSArray*)embeddedOrReferencedObjects;
-
 /** @taskunit Basic Properties */
 
 /**
