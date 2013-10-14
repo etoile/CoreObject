@@ -199,10 +199,10 @@
 	COObjectGraphContext *__weak _objectGraphContext; // weak reference
 	@protected
 	NSMutableDictionary *_variableStorage;
+	@private
 	/** Cache for inverse or incoming relationships e.g. parent(s) */
     CORelationshipCache *_relationshipCache;
     NSMutableDictionary *_relationshipsAsCOPathOrETUUID;
-	@private
 	BOOL _inDescription; // FIXME: remove; only for debugging
 	BOOL _isInitialized;
 }
@@ -307,7 +307,7 @@
  *
  * See also -[COBranch currentRevision].
  */
-- (CORevision *)revision;
+@property (nonatomic, readonly) CORevision *revision;
 
 
 /** @taskunit Basic Properties */
@@ -317,7 +317,6 @@
  * The object name.
  */
 @property (nonatomic, strong) NSString *name;
-
 /**
  * <override-dummy />
  * Returns the object identifier.
@@ -327,7 +326,7 @@
  *
  * Can be overriden to return a custom string.
  */
-- (NSString *)identifier;
+@property (nonatomic, readonly) NSString *identifier;
 /**
  * Returns the last time the receiver changes were committed.
  *
@@ -337,13 +336,13 @@
  *
  * Can be more recent than the present receiver revision (see -revision).
  */
-- (NSDate *)modificationDate;
+@property (nonatomic, readonly) NSDate *modificationDate;
 /**
  * Returns the first time the receiver changes were committed.
  *
  * The returned date is the first root object revision date. See -[CORevision date].
  */
-- (NSDate *)creationDate;
+@property (nonatomic, readonly) NSDate *creationDate;
 /**
  * Returns -name.
  */
@@ -354,7 +353,7 @@
  * This method returns a -parentGroups subset. Groups which don't belong to 
  * -[COEditingContext tagGroup] are filtered out.
  */
-- (NSArray *)tags;
+@property (nonatomic, readonly) NSArray *tags;
 
 
 /** @taskunit Property-Value Coding */
@@ -657,18 +656,18 @@
  * <em>Core Object</em>, it is more accurate but not simple enough to be 
  * presented to the user. 
  */
-- (NSString *)typeDescription;
+@property (nonatomic, readonly) NSString *typeDescription;
 /**
- * Returns the receiver revision number as a string.
+ * Returns the receiver revision as a string.
  *
  * This is used to present the revision to the user in the UI.
  */
-- (NSString *)revisionDescription;
+@property (nonatomic, readonly) NSString *revisionDescription;
 /** 
  * Returns the receiver tags in a coma separated list.
  *
  * This is used to present -tags to the user in the UI.
  */
-- (NSString *)tagDescription;
+@property (nonatomic, readonly) NSString *tagDescription;
 
 @end
