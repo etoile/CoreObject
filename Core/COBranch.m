@@ -243,22 +243,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     }
 }
 
-- (NSDate *)modificationDate
-{
-	if ([self isBranchUncommitted])
-		return nil;
-
-	return [[self newestRevision] date];
-}
-
-- (NSDate *)creationDate
-{
-	if ([self isBranchUncommitted])
-		return nil;
-
-	return [[self initialRevision] date];
-}
-
 - (CORevision *)initialRevision
 {
     CORevisionID *revid = [[self branchInfo] initialRevisionID];
