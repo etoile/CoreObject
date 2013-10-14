@@ -191,7 +191,7 @@
  * 1. call custom getter, if any
  * 2. access variable storage.
  */
-@interface COObject : NSObject <NSCopying, COObjectMatching>
+@interface COObject : NSObject <COObjectMatching>
 {
 	@private
 	ETEntityDescription *_entityDescription;
@@ -207,7 +207,9 @@
 	BOOL _isInitialized;
 }
 
+
 /** @taskunit Initialization */
+
 
 /** <init />
  * Initializes and returns object that is owned and managed by the given object 
@@ -243,9 +245,9 @@
 - (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
              objectGraphContext: (COObjectGraphContext *)aContext;
 
-- (id)copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription;
 
 /** @taskunit Persistency Attributes */
+
 
 /** 
  * Returns the UUID that uniquely identifies the persistent object that 
@@ -295,7 +297,9 @@
  */
 @property (nonatomic, readonly) BOOL isRoot;
 
+
 /** @taskunit History Attributes */
+
 
 /**
  * Return the revision of this object in the branch owning the object graph 
@@ -305,7 +309,9 @@
  */
 - (CORevision *)revision;
 
+
 /** @taskunit Basic Properties */
+
 
 /**
  * The object name.
@@ -350,7 +356,9 @@
  */
 - (NSArray *)tags;
 
+
 /** @taskunit Property-Value Coding */
+
 
 /** 
  * Returns the properties declared in the receiver entity description.
@@ -386,7 +394,9 @@
  */
 - (BOOL)setValue: (id)value forProperty: (NSString *)key;
 
+
 /** @taskunit Validation */
+
 
 /**
  * Validates every persistent property, then returns a validation result array.
@@ -491,7 +501,9 @@
  */
 - (BOOL)validateValue:(id *)aValue forKey:(NSString *)key error:(NSError **)anError;
 
+
 /** @taskunit Direct Access to the Variable Storage */
+
 
 /**
  * Returns a value from the variable storage.
@@ -516,7 +528,9 @@
  */
 - (void)setPrimitiveValue: (id)value forKey: (NSString *)key;
 
+
 /** @taskunit Notifications to be called by Accessors */
+
 
 /**
  * Tells the receiver that the value of the property (transient or persistent) 
@@ -539,7 +553,9 @@
 - (void)didChangeValueForProperty: (NSString *)key;
 - (void)didChangeValueForProperty: (NSString *)key oldValue: (id)oldValue;
 
+
 /** @taskunit Collection Mutation with Integrity Check */
+
 
 /** 
  * Checks the insertion and the object that goes along respect the metamodel 
@@ -562,14 +578,18 @@
  */
 - (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
 
+
 /** @taskunit Overridable Notifications */
+
 
 - (void)awakeFromFetch;
 - (void)willLoad;
 - (void)didLoad;
 - (void)didReload;
 
+
 /** @taskunit Object Equality */
+
 
 /** Returns a hash based on the UUID. */
 - (NSUInteger)hash;
@@ -597,7 +617,9 @@
  */
 - (BOOL)isTemporalInstance: (id)anObject;
 
+
 /** @taskunit Object Matching */
+
 
 /**
  * Returns the receiver put in an array when it matches the query, otherwise 
@@ -605,7 +627,9 @@
  */
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
 
+
 /** @taskunit Debugging and Description */
+
 
 /** 
  * Returns a description that includes the receiver properties and their values. 
@@ -640,7 +664,6 @@
  * This is used to present the revision to the user in the UI.
  */
 - (NSString *)revisionDescription;
-
 /** 
  * Returns the receiver tags in a coma separated list.
  *

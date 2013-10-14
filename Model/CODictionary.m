@@ -13,6 +13,10 @@
 
 #pragma GCC diagnostic ignored "-Wprotocol"
 
+@interface COObject ()
+- (id) copyWithZone: (NSZone *)aZone;
+@end
+
 @implementation CODictionary
 
 + (void)initialize
@@ -46,6 +50,7 @@
 	return self;
 }
 
+// TODO: Migrate EtoileUI to COCopier and remove.
 - (id) copyWithZone: (NSZone *)aZone
 {
 	CODictionary *newObject = [super copyWithZone: aZone];

@@ -217,8 +217,9 @@ objectGraphContext: (COObjectGraphContext *)aContext
 // TODO: Maybe add convenience copying method, - (COObject *) copyWithCopier: (COCopier *)aCopier
 // where the copier stores the state relating to copying, e.g. which context to copy into.
 
-// TODO: Remove; COObject should not respond to -copyWithZone
-- (id) copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription
+// TODO: Migrate EtoileUI to COCopier and remove. COObject should not respond to
+// -copyWithZone:
+- (id) copyWithZone: (NSZone *)aZone
 {
 	COObject *newObject = [[self class] allocWithZone: aZone];
 	
@@ -229,21 +230,9 @@ objectGraphContext: (COObjectGraphContext *)aContext
 		newObject->_variableStorage = [self newVariableStorage];
         newObject->_relationshipsAsCOPathOrETUUID = [self newVariableStorage];
         newObject->_relationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
-        
-		if (usesModelDescription)
-		{
-			// TODO: For variable storage properties, support a metamodel-driven copy
-			// Share support code with -insertObjectCopy: or make -insertObjectCopy: 
-			// uses -copyWithZone:
-		}
 	}
 
 	return newObject;
-}
-
-- (id) copyWithZone: (NSZone *)aZone
-{
-	return [self copyWithZone: aZone usesModelDescription: NO];
 }
 
 #pragma mark - Persistency Attributes
