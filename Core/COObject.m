@@ -202,10 +202,11 @@ objectGraphContext: (COObjectGraphContext *)aContext
 }
 
 - (id) initWithEntityDescription: (ETEntityDescription *)anEntityDesc
+              objectGraphContext: (COObjectGraphContext *)aContext
 {
 	return [self initWithUUID: [ETUUID UUID]
 	        entityDescription: anEntityDesc
-	       objectGraphContext: nil];
+	       objectGraphContext: aContext];
 }
 
 - (BOOL)isSharedInstance

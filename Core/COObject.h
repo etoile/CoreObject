@@ -210,41 +210,38 @@
 /** @taskunit Initialization */
 
 /** <init />
- * Initializes and returns a non-persistent object.
+ * Initializes and returns object that is owned and managed by the given object 
+ * graph context.
+ * 
+ * During the initialization, the receiver is automatically inserted into
+ * the object graph context. As a result, the receiver appears in
+ * -[COObjectGraphContext insertedObjects] on return.
  *
- * The receiver can be made persistent later, by inserting it into an editing 
- * context with -becomePersistentInContext:.<br />
- * Its identity will remain stable once persistency has been enabled, because 
- * this initializer gives a UUID to the object.
- *
- * You should use insertion methods provided by COEditingContext to create 
- * objects that are immediately persistent. Take note that these insertion 
- * methods use -init to initialize the object.
- *
- * For the initializer in subclasses, you must never create entity objects that 
- * correspond to relationships with insertion methods provided by 
- * COEditingContext (this ensures your subclasses support both immediate and 
- * late persistency with -becomePersistentInContext:). For example,
- * you must write:
+ * If the object graph context is transient (not owned by any branch), the
+ * returned object is transient, otherwise it is persistent.<br />
+ * It is possible to turn a transient object into a persistent one, by making 
+ * the object graph context persistent with 
+ * -[COEditingContext insertPersistentRootWithRootObject:]. For example:
  *
  * <example>
- * - (id)init
- * {
- *     SUPERINIT;
- *     // Don't instantiate the group with -[COEditingContext insertObjectWithEntityName:]
- *     personGroup = [[COGroup alloc] init];
- *     return self;
- * }
+ * COObjectGraphContext *graphContext = [COObjectGraphContext new];
+ * COObject *object = [[COObject alloc] initWithObjectGraphContext: graphContext];
+ *
+ * [editingContext insertPersistentRootWithRootObject: [graphContext rootObject]];
  * </example>
+ *
+ * You cannot use -init to create a COObject instance.
+ *
+ * For a nil context, raises an NSInvalidArgumentException.
  */
 - (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext;
 /**
- * Initializes and returns a non-persistent object that uses a custom entity 
- * description.
+ * Initializes and returns an object that uses a custom entity description.
  *
- * See -init.
+ * See -initWithObjectGraphContext:.
  */
-- (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc;
+- (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
+             objectGraphContext: (COObjectGraphContext *)aContext;
 
 - (id)copyWithZone: (NSZone *)aZone usesModelDescription: (BOOL)usesModelDescription;
 

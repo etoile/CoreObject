@@ -4,6 +4,8 @@ TODO
 First alpha release blockers
 ----------------------------
 
+- Turn on validation on commit
+
 - Clean COGarbageCollection.m and rename -embeddedOrReferencedObjects to use a more descriptive name
 
 - Check and update all Core API documentation (underway)
@@ -250,7 +252,6 @@ Future Work
 -----------
 
 - Switch from FMDB to an SQL abstraction backend
-- Improve Relationship Integrity and leverage it in more places (e.g. copy time, more aggressive checks or object graph integrity checking in a background thread etc.)
 - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
 x Figure out how to navigate large root object sets very quickly (evaluate writing a COSQLCursor class)/
   How to scroll smoothly through 50 000 root objects in an Object Manager without loading all the objects in memory?
