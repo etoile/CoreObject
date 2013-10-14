@@ -199,7 +199,8 @@
 	COObjectGraphContext *__weak _objectGraphContext; // weak reference
 	@protected
 	NSMutableDictionary *_variableStorage;
-    CORelationshipCache *_incomingRelationships;
+	/** Cache for inverse or incoming relationships e.g. parent(s) */
+    CORelationshipCache *_relationshipCache;
     NSMutableDictionary *_relationshipsAsCOPathOrETUUID;
 	@private
 	BOOL _inDescription; // FIXME: remove; only for debugging
@@ -300,7 +301,10 @@
 /** @taskunit History Attributes */
 
 /**
- * Return the revision of this object in the editing context.
+ * Return the revision of this object in the branch owning the object graph 
+ * context.
+ *
+ * See also -[COBranch currentRevision].
  */
 - (CORevision *)revision;
 
