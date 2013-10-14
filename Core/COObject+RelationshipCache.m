@@ -8,6 +8,7 @@
 
 #import "COObject+RelationshipCache.h"
 #import "COObject.h"
+#import "COObject+Private.h"
 #import "CORelationshipCache.h"
 #import "COObjectGraphContext.h"
 #import "COEditingContext.h"

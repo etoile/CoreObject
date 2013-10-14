@@ -13,6 +13,7 @@
 #import "COPersistentRoot+Private.h"
 #import "COError.h"
 #import "COObject.h"
+#import "COObject+Private.h"
 #import "COGroup.h"
 #import "COSQLiteStore.h"
 #import "CORevision.h"

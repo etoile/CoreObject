@@ -10,6 +10,7 @@
 #import "COObjectGraphContext.h"
 #import "COItemGraph.h"
 #import "CORelationshipCache.h"
+#import "COObject+Private.h"
 #import "COObject+RelationshipCache.h"
 #import "COSerialization.h"
 #import "COPersistentRoot.h"

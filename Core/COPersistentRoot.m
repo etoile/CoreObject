@@ -14,6 +14,7 @@
 #import "COError.h"
 #import "COItem.h"
 #import "COObject.h"
+#import "COObject+Private.h"
 #import "COObjectGraphContext.h"
 #import "COObjectGraphContext+Private.h"
 #import "CORelationshipCache.h"

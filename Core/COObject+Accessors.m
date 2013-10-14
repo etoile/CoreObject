@@ -7,6 +7,7 @@
  */
 
 #import "COObject.h"
+#import "COObject+Private.h"
 #include <objc/runtime.h>
 
 @interface COObject (Accessors)
