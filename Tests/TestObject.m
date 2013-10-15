@@ -6,6 +6,8 @@
 #import "COBookmark.h"
 #import "COSerialization.h"
 
+#pragma GCC diagnostic ignored "-Wunused"
+
 @interface COObject (COSerializationPrivate)
 - (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
 - (void)setSerializedValue: (id)value forPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
@@ -26,6 +28,21 @@
 @end
 
 @implementation TestObject
+
+- (void) testEntityDescriptionMismatch
+{
+	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
+	ETEntityDescription *groupEntity = [repo entityDescriptionForClass: [COGroup class]];
+	ETEntityDescription *libraryEntity = [repo entityDescriptionForClass: [COLibrary class]];
+	ETEntityDescription *objectEntity = [repo entityDescriptionForClass: [COObject class]];
+
+	UKRaisesException([[COContainer alloc] initWithEntityDescription: groupEntity
+											      objectGraphContext: [COObjectGraphContext new]]);
+	UKDoesNotRaiseException([[COContainer alloc] initWithEntityDescription: libraryEntity
+											            objectGraphContext: [COObjectGraphContext new]]);
+	UKDoesNotRaiseException([[COContainer alloc] initWithEntityDescription: objectEntity
+											            objectGraphContext: [COObjectGraphContext new]]);
+}
 
 - (void) testCreationAndModificationDates
 {
