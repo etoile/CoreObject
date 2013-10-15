@@ -140,6 +140,23 @@ See +[NSObject typePrefix]. */
 	return variableStorage;
 }
 
+- (void)validateEntityDescription: (ETEntityDescription *)anEntityDescription
+     inModelDescriptionRepository: (ETModelDescriptionRepository *)repo
+{
+	Class entityClass = [repo classForEntityDescription: anEntityDescription];
+
+	if ([entityClass isSubclassOfClass: [self class]] == NO
+	 && [[self class] isSubclassOfClass: entityClass] == NO)
+	{
+		[NSException raise: NSInvalidArgumentException
+					format: @"There is mismatch between the entity description "
+		                     "%@ and the class %@. For this entity description, "
+		                     "the class must be a %@ class, subclass or superclass.",
+		                     [anEntityDescription fullName], [self className],
+		                     NSStringFromClass(entityClass)];
+	}
+}
+
 - (id) commonInitWithUUID: (ETUUID *)aUUID 
         entityDescription: (ETEntityDescription *)anEntityDescription
        objectGraphContext: (COObjectGraphContext *)aContext
@@ -149,6 +166,9 @@ See +[NSObject typePrefix]. */
 	NILARG_EXCEPTION_TEST(anEntityDescription);
 	NILARG_EXCEPTION_TEST(aContext);
 	INVALIDARG_EXCEPTION_TEST(aContext, [aContext isKindOfClass: [COObjectGraphContext class]]);
+
+	[self validateEntityDescription: anEntityDescription
+	   inModelDescriptionRepository: [aContext modelRepository]];
 
 	_UUID = aUUID;
 	_entityDescription =  anEntityDescription;

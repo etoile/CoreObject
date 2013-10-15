@@ -332,7 +332,8 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * Reason for deprecating: I don't like NSObject+CoreObject idea, violates tell-don't-ask principle.
  */
-@property (nonatomic, readonly) BOOL isPersistentRoot;/**
+@property (nonatomic, readonly) BOOL isPersistentRoot;
+/**
  * Commits the current changes to the store with some basic metadatas and
  * returns the resulting revision.
  *

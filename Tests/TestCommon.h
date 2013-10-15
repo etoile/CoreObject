@@ -59,3 +59,7 @@ extern NSString * const kCOParent;
 }
 
 @end
+
+@interface COObjectGraphContext (TestCommon)
+- (id)insertObjectWithEntityName: (NSString *)aFullName;
+@end

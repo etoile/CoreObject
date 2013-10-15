@@ -353,31 +353,6 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	}
 }
 
-- (id)insertObjectWithEntityName: (NSString *)aFullName
-{
-    return [self insertObjectWithEntityName: aFullName UUID: [ETUUID UUID]];
-}
-
-- (id)insertObjectWithEntityName: (NSString *)aFullName
-                            UUID: (ETUUID *)aUUID
-{
-    ETEntityDescription *desc = [_modelRepository descriptionForName: aFullName];
-    if (desc == nil)
-	{
-		[NSException raise: NSInvalidArgumentException format: @"Entity name %@ invalid", aFullName];
-	}
-	Class objClass = [_modelRepository classForEntityDescription: desc];
-    
-    /* Nil root object means the new object will be a root */
-	COObject *obj = [[objClass alloc] initWithUUID: aUUID
-                                 entityDescription: desc
-                                objectGraphContext: self];
-    
-    [obj addCachedOutgoingRelationships];
-    
-	return obj;
-}
-
 #pragma mark -
 #pragma mark Change Tracking
 
