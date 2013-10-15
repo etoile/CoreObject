@@ -100,7 +100,6 @@
 	NSMutableSet *_persistentRootsPendingDeletion;
     /** Set of persistent roots pending undeletion */
 	NSMutableSet *_persistentRootsPendingUndeletion;
-	COError *_error;
     COCrossPersistentRootReferenceCache *_crossRefCache;
     /** Undo */
     BOOL _isRecordingUndo;

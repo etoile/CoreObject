@@ -482,7 +482,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	return result;
 }
 
-- (ETValidationResult *)validateValueUsingPVC: (id)value forProperty: (NSString *)key
+- (ETValidationResult *)validateValueUsingModel: (id)value forProperty: (NSString *)key
 {
 	SEL keySelector = NSSelectorFromString([NSString stringWithFormat: @"validate%@:",
 		[key stringByCapitalizingFirstLetter]]);
@@ -493,22 +493,23 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	return [self performSelector: keySelector withObject: value];
 }
 
-// TODO: If we want to support -validateValue:forKey:error: too, implement 
-// -validateUsingKVC:forProperty:
 // TODO: Would be cleaner to return an aggregate validation result
 - (NSArray *)validateValue: (id)value forProperty: (NSString *)key
 {
-	ETValidationResult *result = [self validateValueUsingMetamodel: value forProperty: key];
-	ETValidationResult *pvcResult = [self validateValueUsingPVC: value forProperty: key];
+	ETValidationResult *metamodelResult =
+		[self validateValueUsingMetamodel: value forProperty: key];
+	ETValidationResult *modelResult =
+		[self validateValueUsingModel: value forProperty: key];
+
 	NSMutableArray *results = [NSMutableArray arrayWithCapacity: 2];
 
-	if ([result isValid] == NO)
+	if ([metamodelResult isValid] == NO)
 	{
-		[results addObject: result];
+		[results addObject: metamodelResult];
 	}
-	if ([pvcResult isValid] == NO)
+	if ([modelResult isValid] == NO)
 	{
-		[results addObject: pvcResult];
+		[results addObject: modelResult];
 	}
 	return results;
 }
@@ -528,7 +529,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	return nil;
 }
 
-- (BOOL)validateValue:(id *)aValue forKey:(NSString *)key error:(NSError **)anError
+- (BOOL)validateValue: (id *)aValue forKey: (NSString *)key error: (NSError **)anError
 {
 	NSParameterAssert(aValue != NULL);
 	NSArray *results = [self validateValue: *aValue forProperty: key];

@@ -359,31 +359,26 @@
 #pragma mark Validation
 #pragma mark -
 
-- (void)didFailValidationWithError: (COError *)anError
-{
-	_error =  anError;
-}
-
 /* Both COPersistentRoot or COEditingContext objects are valid arguments. */
-- (BOOL)validateChangedObjectsForContext: (id)aContext
+- (BOOL)validateChangedObjectsForContext: (id)aContext error: (NSError **)error
 {
-#if 0
 	NSSet *insertionErrors = (id)[[[aContext insertedObjects] mappedCollection] validateForInsert];
 	NSSet *updateErrors = (id)[[[aContext updatedObjects] mappedCollection] validateForUpdate];
-	NSSet *deletionErrors = (id)[[[aContext deletedObjects] mappedCollection] validateForDelete];
+	// FIXME: -validateForDelete and GC integration
+	//NSSet *deletionErrors = (id)[[[aContext deletedObjects] mappedCollection] validateForDelete];
 	NSMutableSet *validationErrors = [NSMutableSet setWithSet: insertionErrors];
 	
 	[validationErrors unionSet: updateErrors];
-	[validationErrors unionSet: deletionErrors];
+	//[validationErrors unionSet: deletionErrors];
 
 	// NOTE: We have a null value because -validateXXX returns nil on validation success
 	[validationErrors removeObject: [NSNull null]];
 
-	[aContext didFailValidationWithError: [COError errorWithErrors: validationErrors]];
-
-	return ([aContext error] == nil);
-#endif
-    return YES;
+	if (error != NULL)
+	{
+		*error = [COError errorWithErrors: validationErrors];
+	}
+    return [validationErrors isEmpty];
 }
 
 #pragma mark Committing Changes
@@ -507,7 +502,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 	// suberror per inner object, then each suberror could in turn contain
 	// a suberror per validation result. For now, we just aggregate errors per
 	// inner object.
-	if ([self validateChangedObjectsForContext: self] == NO)
+	if ([self validateChangedObjectsForContext: self error: anError] == NO)
 		return NO;
 
 	/* Commit persistent root changes (deleted persistent roots included) */

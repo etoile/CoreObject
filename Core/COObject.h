@@ -402,17 +402,20 @@
  * result array.
  *
  * Valid results are not included in the returned array. On success, returns 
- * an emtpy array.
+ * an empty array.
  *
  * The validation is divided in two steps that occurs in the order below:
  *
  * <list>
- * <item>Metamodel validation using -[ETPropertyDescription validateValue:forKey:],  
+ * <item><em>Metamodel Validation</em> using -[ETPropertyDescription validateValue:forKey:],  
  * (for relationships, the opposite property is validated too)</item>
- * <item>Custom validation when a method validate<em>PropertyName</em>: returning 
- * validation result is implemented (this validation scheme is not the same one 
- * that the Key-Value Coding one)</item>
+ * <item><em>Model Validation</em>, when a method -validate<em>PropertyName</em>: 
+ * is implemented (e.g. the method signature must be match 
+ * <code>-(ETValidationResult *)validateName</code>).</item>
  * </list>
+ *
+ * The Model validation scheme doesn't support Key-Value Coding custom 
+ * validation methods (e.g. -validateName:error:).
  *
  * See -validateValue:forProperty: and ETValidationResult.
  */
@@ -424,18 +427,16 @@
  *
  * By default, returns nil.
  *
- * Because this method is invoked at commit time, you can be sure that 
- * -becomePersistentInContext: was called previously.
- *
  * This method must return nil on validation success, otherwise it must return 
  * suberrors (or a single error) that include their validation results in the 
  * user info under the key kCOValidationResultKey.
  *
  * The superclass implementation must be called, then the returned error is 
  * either returned directly, or when validation doesn't succeed locally 
- * combined with the new errors through +[NSError errorWithErrors:].
+ * combined with the new errors through +[COError errorWithErrors:].
  *
- * See also -[COEditingContext insertedObjects] and example in -validateForUpdate.
+ * See also -[COObjectGraphContext insertedObjects] and example in 
+ * -validateForUpdate.
  */
 - (NSError *)validateForInsert;
 /**
@@ -454,11 +455,11 @@
  *
  * The superclass implementation must be called, then the returned error is 
  * either returned directly, or when validation doesn't succeed locally 
- * combined with the new errors through +[NSError errorWithErrors:].
+ * combined with the new errors through +[COError errorWithErrors:].
  *
- * <example>return [[super validateForUpdate] errorWithErrors: [NSError errorsWithValidationResults: results]];</example>
+ * <example>return [[super validateForUpdate] errorWithErrors: [COError errorsWithValidationResults: results]];</example>
  *
- * See also -[COEditingContext updatedObjects].
+ * See also -[COObjectGraphContext updatedObjects].
  */
 - (NSError *)validateForUpdate;
 /**
@@ -474,9 +475,10 @@
  *
  * The superclass implementation must be called, then the returned error is 
  * either returned directly, or when validation doesn't succeed locally 
- * combined with the new errors through +[NSError errorWithErrors:].
+ * combined with the new errors through +[COError errorWithErrors:].
  *
- * See also -[COEditingContext deletedObjects] and example in -validateForUpdate.
+ * See also -[COObjectGraphContext deletedObjects] and example in 
+ * -validateForUpdate.
  */
 - (NSError *)validateForDelete;
 /**

@@ -24,7 +24,9 @@
 	NSArray *errors;
 }
 
+
 /** @taskunit Initialization */
+
 
 /**
  * Returns a new autoreleased error that includes suberrors.
@@ -47,16 +49,18 @@
  */
 + (id)errorWithValidationResults: (id <ETCollection>)errors;
 
+
 /** @taskunit Basic Properties */
+
 
 /**
  * Returns the suberrors.
  */
-@property (strong, nonatomic, readonly) NSArray *errors;
+@property (nonatomic, readonly) NSArray *errors;
 /**
  * Returns an validation result if the receiver is a validation error.
  */
-@property (strong, nonatomic, readonly) ETValidationResult *validationResult;
+@property (nonatomic, readonly) ETValidationResult *validationResult;
 
 @end
 
