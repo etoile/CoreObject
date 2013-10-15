@@ -275,8 +275,6 @@ objectGraphContext: (COObjectGraphContext *)aContext
 - (BOOL) isPersistent
 {
 	return ([self persistentRoot] != nil);
-	// TODO: Switch to the code below on root object are saved in the db
-	// return (_persistentRoot != nil && _rootObject != nil);
 }
 
 #pragma mark - Basic Properties
@@ -889,7 +887,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	return NO;
 }
 
-- (BOOL) isTemporalInstance: (id)anObject
+- (BOOL)isTemporallyEqual: (id)anObject
 {
 	if (anObject == self)
 	{

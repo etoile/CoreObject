@@ -282,14 +282,19 @@
  */
 @property (nonatomic, readonly) id rootObject;
 /**
- * Returns whether the receiver is saved on the disk.
+ * Returns whether the receiver is owned by a persistent root.
  *
- * When persistent, the receiver has both a valid editing context and root object.
+ * This doesn't mean the object has been saved to the disk yet.
+ *
+ * When persistent, the receiver has a valid root object and its object 
+ * graph context is owned by a branch.
+ *
+ * See also -persistentRoot.
  */
 @property (nonatomic, readonly) BOOL isPersistent;
 /** 
- * Returns whether the receiver is a root object that can enclose embedded 
- * objects.
+ * Returns whether the receiver is a root object that provides access to 
+ * other embedded objects (in the object graph context).
  *
  * Embedded or non-persistent objects returns NO.
  *
@@ -324,7 +329,8 @@
  * By default, returns -name which can be nil and might not be unique even 
  * within a COCollection content.
  *
- * Can be overriden to return a custom string.
+ * Can be overriden to return a custom string. See 
+ * -[COCollection objectForIdentifier:].
  */
 @property (nonatomic, readonly) NSString *identifier;
 /**
@@ -334,8 +340,7 @@
 /**
  * Returns the tags attached to the receiver. 
  *
- * This method returns a -parentGroups subset. Groups which don't belong to 
- * -[COEditingContext tagGroup] are filtered out.
+ * The returned collection contains COTag objects.
  */
 @property (nonatomic, readonly) NSArray *tags;
 
@@ -574,31 +579,29 @@
 /** @taskunit Object Equality */
 
 
-/** Returns a hash based on the UUID. */
+/** 
+ * Returns a hash based on the UUID. 
+ */
 - (NSUInteger)hash;
 /**
  * Returns whether anObject is equal to the receiver.
  *
- * Two persistent objects are equal if they share the same UUID.<br />
- * For now, returns YES even when the two object revisions don't match (this 
- * is subject to change).
+ * Two persistent objects are equal if they share the same UUID (even when the 
+ * two object revisions don't match).
  *
- * Use <code>[a isEqual: b] && ![a isTemporalInstance: b]</code> to check 
- * temporal equality. For example, when the same object is in use in multiple 
- * editing contexts simultaneously.
- *
- * See also -isTemporalInstance:.
+ * Use -isTemporallyEqual: to check both UUID and revision match. For example, 
+ * when the same object is in use in multiple editing contexts simultaneously.
  */
 - (BOOL)isEqual: (id)anObject;
 /** 
- * Returns whether anObject is a temporal instance of the receiver. 
+ * Returns whether anObject saved state is equal the receiver saved state. 
  *
- * Two persistent objects are temporal instances of each other if they share the 
- * same UUID but differ by their revision. 
+ * Two persistent objects are temporally equal if they share the same UUID and 
+ * revision.
  *
  * See also -isEqual:.
  */
-- (BOOL)isTemporalInstance: (id)anObject;
+- (BOOL)isTemporallyEqual: (id)anObject;
 
 
 /** @taskunit Object Matching */

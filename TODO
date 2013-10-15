@@ -4,6 +4,14 @@ TODO
 First alpha release blockers
 ----------------------------
 
+- Shorten -[COObject description] output
+
+- Improve -[COObject detailedDescription] code and make output more readable
+
+- Remove or finish -isDeeplyEqual: in COObject
+
+- Decide on embedded vs inner and update all API doc
+
 - Turn on validation on commit
 
 - Clean COGarbageCollection.m and rename -embeddedOrReferencedObjects to use a more descriptive name
