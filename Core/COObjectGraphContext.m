@@ -327,7 +327,6 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 - (void)setRootObject: (COObject *)anObject
 {
     NSParameterAssert([anObject objectGraphContext] == self);
-
 	// i.e., the root object can be set once and never changed.
 	NSParameterAssert(_rootObjectUUID == nil || [_rootObjectUUID isEqual: [anObject UUID]]);
 	
@@ -374,7 +373,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	}
 	if (aProperty != nil)
 	{
-		assert([aProperty isKindOfClass: [NSString class]]);
+		ETAssert([aProperty isKindOfClass: [NSString class]]);
 		[[_updatedPropertiesByObject objectForKey: obj] addObject: aProperty];
 	}
     
@@ -453,7 +452,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
  *    and the COEditingContext will release it, so it will be deallocated if
  *    no user code holds a reference to it.
  */
-- (void) removeSingleObject_: (ETUUID *)uuid
+- (void) removeSingleObject: (ETUUID *)uuid
 {
     COObject *anObject = [_loadedObjects objectForKey: uuid];
     
@@ -509,7 +508,7 @@ static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *col
     
     for (ETUUID *deadUUID in dead)
     {
-        [self removeSingleObject_: deadUUID];
+        [self removeSingleObject: deadUUID];
     }
 }
 

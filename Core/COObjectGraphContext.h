@@ -45,20 +45,22 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
     NSMapTable *_updatedPropertiesByObject;
 }
 
-/**
- * @taskunit Creation
- */
+
+/** @taskunit Creation */
+
 
 /**
  * Returns a new autoreleased transient object graph context using the main 
  * model description repository.
  *
- * See -[ETModelDescriptionRepository mainRepository].
+ * See also -[ETModelDescriptionRepository mainRepository] and -init.
  */
 + (COObjectGraphContext *)objectGraphContext;
 /**
  * Returns a new autoreleased transient object graph context using the given 
  * model description repository.
+ *
+ * See also -initWithModelRepository:.
  */
 + (COObjectGraphContext *)objectGraphContextWithModelRepository: (ETModelDescriptionRepository *)aRegistry;
 /**
@@ -70,60 +72,66 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * description repository.
  */
 - (id)initWithModelRepository: (ETModelDescriptionRepository *)aRepo;
-
-/** 
- * @taskunit Type Querying 
+/**
+ * Returns a new transient object graph context using the main model description 
+ * repository.
+ *
+ * See also -[ETModelDescriptionRepository mainRepository].
  */
+- (id)init;
+
+
+/** @taskunit Type Querying */
+
 
 /**
  * Returns YES.
  *
  * See also -[NSObject isObjectGraphContext].
  */
-@property (readonly, nonatomic) BOOL isObjectGraphContext;
+@property (nonatomic, readonly) BOOL isObjectGraphContext;
 
-/**
- * @taskunit Metamodel Access
- */
+
+/** @taskunit Metamodel Access */
+
 
 /**
  * Returns the model description repository, which holds the metamodel that 
  * describes all the objects managed by the context.
  */
-@property (strong, readonly, nonatomic) ETModelDescriptionRepository *modelRepository;
+@property (nonatomic, readonly) ETModelDescriptionRepository *modelRepository;
 
-/**
- * @taskunit Related Persistency Management Objects
- */
+
+/** @taskunit Related Persistency Management Objects */
+
 
 /**
  * The branch owning the object graph context.
  *
  * For a transient object graph context, returns nil.
  */
-@property (weak, readonly, nonatomic) COBranch *branch;
+@property (nonatomic, readonly) COBranch *branch;
 /**
  * The persistent root owning the branch.
  *
  * For a transient object graph context, returns nil.
  */
-@property (weak, readonly, nonatomic)  COPersistentRoot *persistentRoot;
+@property (nonatomic, readonly)  COPersistentRoot *persistentRoot;
 /**
  * The editing context owing the persistent root.
  *
  * For a transient object graph context, returns nil.
  */
-@property (weak, readonly, nonatomic) COEditingContext *editingContext;
+@property (nonatomic, readonly) COEditingContext *editingContext;
 
-/**
- * @taskunit Item Graph Protocol 
- */
+
+/** @taskunit Item Graph Protocol */
+
 
 /**
  * Returns the root object UUID.
  */
 - (ETUUID *)rootItemUUID;
-
 /**
  * Returns the immutable item that corresponds to the given inner object UUID.
  */
@@ -150,7 +158,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * deleted objects (by running a GC phase).
  */
 - (void)setItemGraph: (id <COItemGraph>)aTree;
-/**
+/*
  * IDEA:
  * Though COEditingContext implements COItemGraph, this method returns
  * an independent snapshot of the editing context, suitable for passing
@@ -158,9 +166,9 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  */
 //- (id<COItemGraph>)itemGraphSnapshot;
 
-/**
- * @taskunit Accessing the Root Object
- */
+
+/** @taskunit Accessing the Root Object */
+
 
 /**
  * The object serving as an entry point in the object graph.
@@ -184,9 +192,9 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  */
 @property (nonatomic, strong) id rootObject;
 
-/**
- * @taskunit Change Tracking
- */
+
+/** @taskunit Change Tracking */
+
 
 /**
  * Returns the objects inserted since change tracking was cleared.
@@ -213,7 +221,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * After a commit, returns an empty set.
  */
-@property (weak, nonatomic, readonly) NSSet *changedObjects;
+@property (nonatomic, readonly) NSSet *changedObjects;
 /**
  * Returns whether the context contains uncommitted changes.
  *
@@ -238,9 +246,9 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  */
 - (void)clearChangeTracking;
 
-/**
- * @taskunit Accessing Loaded Objects
- */
+
+/** @taskunit Accessing Loaded Objects */
+
 
 /**
  * All the inner objects loaded in memory.
@@ -249,7 +257,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * See also -objectWithUUID: and -rootObject.
  */
-@property (weak, nonatomic, readonly) NSSet *loadedObjects;
+@property (nonatomic, readonly) NSSet *loadedObjects;
 /**
  * Returns the inner object bound to the given UUID in the object graph.
  *
@@ -259,9 +267,9 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  */
 - (COObject *)objectWithUUID: (ETUUID *)aUUID;
 
-/** 
- * @taskunit Debugging 
- */
+
+/** @taskunit Debugging */
+
 
 /**
  * A table listing the properties updated per object since change tracking was

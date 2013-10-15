@@ -8,6 +8,8 @@ First alpha release blockers
 
 - Clean COGarbageCollection.m and rename -embeddedOrReferencedObjects to use a more descriptive name
 
+- Could move GC related code in COObjectGraphContext to COGarbageCollection (not sure)
+
 - Check and update all Core API documentation (underway)
 
 - Check code quality for all Core classes (underway)

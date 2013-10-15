@@ -12,10 +12,6 @@
 @interface COObjectGraphContext ()
 
 /**
- * @taskunit Framework Private
- */
-
-/**
  * This method is only exposed to be used internally by CoreObject.
  *
  * Sets the branch owning the object graph.
@@ -48,12 +44,5 @@
  * instance.
  */
 - (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
-
-
-/**
- * This method is deprecated and private.
- */
-- (id)insertObjectWithEntityName: (NSString *)aFullName
-                            UUID: (ETUUID *)aUUID;
 
 @end
