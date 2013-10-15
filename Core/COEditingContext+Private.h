@@ -38,10 +38,6 @@
                               objectGraphContext: (COObjectGraphContext *)anObjectGraphContext;
 /**
  * This method is only exposed to be used internally by CoreObject.
- */
-- (void)didFailValidationWithError: (NSError *)anError;
-/**
- * This method is only exposed to be used internally by CoreObject.
  *
  * Commits the current changes to the store with the provided metadatas and
  * returns the resulting revisions.
