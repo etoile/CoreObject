@@ -355,6 +355,9 @@ typedef NSUInteger COBranchRevisionReadingOptions;
  * Writes the item graph "contents" as an initial revision in the persistent root,
  * and creates a default branch (with nil metadata) whose current revision is set to the
  * initial revision.
+ *
+ * WARNING: with the current semantics, "contents" is not copied. After calling this
+ * method you must not modify it. The should probably be changed.
  */
 - (COPersistentRootInfo *) createPersistentRootWithInitialItemGraph: (id<COItemGraph>)contents
                                                                UUID: (ETUUID *)persistentRootUUID

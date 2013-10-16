@@ -26,7 +26,6 @@
     {
         [itemForUUID_ setObject: item forKey: [item UUID]];
     }
-    NSParameterAssert([itemForUUID_ objectForKey: root] != nil);
     
     return self;
 }

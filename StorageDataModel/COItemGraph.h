@@ -49,8 +49,15 @@
 
 + (COItemGraph *)itemGraphWithItemsRootFirst: (NSArray*)items;
 
+/**
+ * N.B. items doesn't need to contain rootItemUUID
+ */
 - (id) initWithItemForUUID: (NSDictionary *) itemForUUID
               rootItemUUID: (ETUUID *)root;
+
+/**
+ * N.B. items doesn't need to contain rootItemUUID
+ */
 - (id) initWithItems: (NSArray *)items
         rootItemUUID: (ETUUID *)root;
 

@@ -62,12 +62,15 @@ static id values[ATTRIBUTES];
                   type: types[i]];
     }
     
+	BOOL ok = YES;
     for (NSUInteger i=0; i<ITERATIONS; i++)
     {
-        UKObjectsEqual(values[i % ATTRIBUTES], [item valueForAttribute: attributes[i % ATTRIBUTES]]);
-        UKIntsEqual(types[i % ATTRIBUTES], [item typeForAttribute: attributes[i % ATTRIBUTES]]);
+		// N.B. These could be UKObjectsEqual checks, but this test case would become about 100x slower
+        ok = ok && [values[i % ATTRIBUTES] isEqual: [item valueForAttribute: attributes[i % ATTRIBUTES]]];
+        ok = ok && (types[i % ATTRIBUTES] == [item typeForAttribute: attributes[i % ATTRIBUTES]]);
     }
-    
+    UKTrue(ok);
+	
     NSLog(@"reading %d attributes in COItem took %lf ms", ITERATIONS, 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
 

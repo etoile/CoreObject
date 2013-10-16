@@ -111,8 +111,13 @@ static int itemChangedAtCommit(int i)
                                                                       branchUUID: [ETUUID UUID]
                                                                         revisionMetadata: nil
                                                                            error: NULL];
-    // Commit a change to each object
-    
+	
+	// Make another copy of the item graph because we're going to modify it
+	// (currently you can't modify a graph passed in to -createPersistentRootWithInitialItemGraph)
+    initialTree = [self makeInitialItemTree];
+	
+	// Commit a change to each object
+	
     [revisionIDs addObject: [[proot currentBranchInfo] currentRevisionID]];
     for (int commit=1; commit<NUM_COMMITS; commit++)
     {
@@ -126,7 +131,10 @@ static int itemChangedAtCommit(int i)
         [item setValue:label
           forAttribute: @"name"];
         
-        [revisionIDs addObject: [store writeRevisionWithItemGraph: initialTree
+		COItemGraph *deltaGraph = [[COItemGraph alloc] initWithItems: @[item]
+														rootItemUUID: [initialTree rootItemUUID]];
+		
+        [revisionIDs addObject: [store writeRevisionWithItemGraph: deltaGraph
                                                      revisionUUID: [ETUUID UUID]
                                                          metadata: nil
                                                  parentRevisionID: [revisionIDs lastObject]
@@ -239,15 +247,17 @@ static int itemChangedAtCommit(int i)
     
     CORevisionID *lastCommitId = [[proot currentBranchInfo] currentRevisionID];
     
-    int iters = 0;
     for (int rev=NUM_COMMITS-1; rev>=0; rev--)
     {
         COItemGraph *tree = [store itemGraphForRevisionID: lastCommitId];
         
         // Check the state
         UKObjectsEqual(rootUUID, [tree rootItemUUID]);
-        UKObjectsEqual([initialTree itemForUUID: rootUUID],
-                       [tree itemForUUID: rootUUID]);
+		
+		// TODO: Should be UKObjectsEqual - UnitKit has performance problems
+		// cause by generating output messages that are never displayed
+        assert([[initialTree itemForUUID: rootUUID] isEqual:
+                       [tree itemForUUID: rootUUID]]);
         
         for (int i=0; i<NUM_CHILDREN; i++)
         {
@@ -255,16 +265,13 @@ static int itemChangedAtCommit(int i)
             
             NSString *expectedLabel = [self labelForCommit: rev child: i];
             
-            UKObjectsEqual(expectedLabel,
-                           [[tree itemForUUID: childUUIDs[i]] valueForAttribute: @"name"]);
+            assert([expectedLabel isEqualToString:
+                           [[tree itemForUUID: childUUIDs[i]] valueForAttribute: @"name"]]);
         }
         
         // Step back one revision
         
         lastCommitId = [[store revisionInfoForRevisionID: lastCommitId] parentRevisionID];
-        
-        iters++;
-        if (iters > 25) break; // This is the slowest test, so only read 25 revisions
     }
     
     NSLog(@"reading back %d full snapshots of a %d-item persistent root took %lf ms",
