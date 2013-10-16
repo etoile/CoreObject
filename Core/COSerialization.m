@@ -8,6 +8,7 @@
 
 #import "COSerialization.h"
 #import "COObject.h"
+#import "COObject+Private.h"
 #import "COObject+RelationshipCache.h"
 #import "COItem.h"
 #import "COItem+Binary.h"
@@ -360,16 +361,10 @@ serialization. */
 		return [self performSelector: getter];
 	}
 	
-	/* If no custom getter can be found, we try to access the ivar with KVC semantics */
+	/* If no custom getter can be found, we access the stored value directly 
+	   (ivar and variable storage) */
 
-	id value = nil;
-
-	if (ETGetInstanceVariableValueForKey(self, &value, [aPropertyDesc name]) == NO)
-	{
-		/* If no valid ivar can be found, we access the variable storage */
-		value = [self primitiveValueForKey: [aPropertyDesc name]];
-	}
-	return value;
+	return [self valueForStorageKey: [aPropertyDesc name]];
 }
 
 - (COItem *)storeItem
@@ -612,16 +607,10 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 		return;
 	}	
 	
-	/* When no custom setter can be found, we try to access the ivar with KVC semantics */
+	/* When no custom setter can be found, we access the stored value directly */
 
 	[self willChangeValueForProperty: key];
-
-	if (ETSetInstanceVariableValueForKey(self, value, key) == NO)
-	{
-		/* If no valid ivar can be found, we access the variable storage */
-		[self setPrimitiveValue: value forKey: key];
-	}
-
+	[self setValue: value forStorageKey: key];
 	/* Persistent roots will post KVO notifications but won't record the changes */
 	[self didChangeValueForProperty: key];
 }

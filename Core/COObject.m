@@ -613,6 +613,26 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	[self setPrimitiveValue: value forKey: key];
 }
 
+- (id)valueForStorageKey: (NSString *)key
+{
+	id value = nil;
+
+	if (ETGetInstanceVariableValueForKey(self, &value, key) == NO)
+	{
+		value = [self primitiveValueForKey: key];
+	}
+	return value;
+}
+
+- (void)setValue: (id)value forStorageKey: (NSString *)key
+{
+	if (ETSetInstanceVariableValueForKey(self, value, key) == NO)
+	{
+		/* If no valid ivar can be found, we access the variable storage */
+		[self setPrimitiveValue: value forKey: key];
+	}
+}
+
 #pragma mark - Notifications to be called by Accessors
 
 - (void)willChangeValueForProperty: (NSString *)key
@@ -813,15 +833,10 @@ objectGraphContext: (COObjectGraphContext *)aContext
 			class = ([propDesc isOrdered] ? [NSArray class] : [NSSet class]);
 		}
 
-		id collection = nil;
-
 		/* We must access the instance variable or the primitive value, and we 
 		   cannot use -valueForKey:, because getters tend to return defensive 
 		   copies (immutable collections). */
-		if (ETGetInstanceVariableValueForKey(self, &collection, [propDesc name]) == NO)
-		{
-			collection = [self primitiveValueForKey: [propDesc name]];
-		}
+		id collection = [self valueForStorageKey: [propDesc name]];
 
 		if ([collection isKindOfClass: class] == NO)
 		{
