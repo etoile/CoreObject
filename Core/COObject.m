@@ -358,8 +358,42 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	return (id)[[[[self entityDescription] allPersistentPropertyDescriptions] mappedCollection] name];
 }
 
-- (id) valueForProperty:(NSString *)key
+- (SEL)getterForKey: (NSString *)key useIsPrefix: (BOOL)useIsPrefix
 {
+	NSString *getterName = nil;
+
+	if (useIsPrefix)
+	{
+		getterName = [NSString stringWithFormat: @"is%@", [key stringByCapitalizingFirstLetter]];
+	}
+	else
+	{
+		getterName = [NSString stringWithFormat: @"%@", key];
+	}
+	return NSSelectorFromString(getterName);
+}
+
+- (SEL)setterForKey: (NSString *)key
+{
+	NSString *setterName =
+		[NSString stringWithFormat: @"set%@:", [key stringByCapitalizingFirstLetter]];
+	return NSSelectorFromString(setterName);
+}
+
+- (id) valueForProperty: (NSString *)key
+{
+	/* We call the getter directly if implemented */
+
+	if ([self respondsToSelector: [self getterForKey: key useIsPrefix: NO]]
+	 || [self respondsToSelector: [self getterForKey: key useIsPrefix: YES]])
+	{
+		// NOTE: Don't use -performSelector:withObject: because it doesn't
+		// support unboxing scalar values as Key-Value Coding does.
+		return [self valueForKey: key];
+	}
+
+	/* Otherwise access ivar or variable storage */
+
 	if (![[self propertyNames] containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException
@@ -367,7 +401,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 		return nil;
 	}
 	
-	return [super valueForKey: key];
+	return [self valueForStorageKey: key];
 }
 
 + (BOOL) isPrimitiveCoreObjectValue: (id)value
@@ -424,10 +458,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 {
 	/* We call the setter directly if implemented */
 
-	NSString *setterName = [NSString stringWithFormat: @"set%@:", [key stringByCapitalizingFirstLetter]];
-	SEL setter = NSSelectorFromString(setterName);
-
-	if ([self respondsToSelector: setter])
+	if ([self respondsToSelector: [self setterForKey: key]])
 	{
 		// NOTE: Don't use -performSelector:withObject: because it doesn't
 		// support unboxing scalar values as Key-Value Coding does.
@@ -435,12 +466,13 @@ objectGraphContext: (COObjectGraphContext *)aContext
 		return YES;
 	}
 
-	/* Otherwise we do the integrity check, update the variable storage, and 
-	   trigger the change notifications */
+	/* Otherwise update ivar or variable storage (relationship caches, object 
+	   graph context and observer objects are notified) */
 
 	if (![[self propertyNames] containsObject: key])
 	{
-		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
+		[NSException raise: NSInvalidArgumentException
+		            format: @"Tried to set value for invalid property %@", key];
 		return NO;
 	}
 
