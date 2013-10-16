@@ -443,44 +443,12 @@ objectGraphContext: (COObjectGraphContext *)aContext
 		[NSException raise: NSInvalidArgumentException format: @"Tried to set value for invalid property %@", key];
 		return NO;
 	}
-    
-    [self setValue: value forPropertyWithoutSetter: key];
-
-	return YES;
-}
-
-- (void) setValue: (id)value forPropertyWithoutSetter: (NSString *)key
-{
-	// FIXME: Move this check elsewhere or rework it because it can break on
-	// transient values or archived objects such as NSColor, NSView.
-	//if (![COObject isCoreObjectValue: value])
-	//{
-	//	[NSException raise: NSInvalidArgumentException format: @"Invalid property type"];
-	//}
-
- 	BOOL isMultivalued = [[[self entityDescription] propertyDescriptionForName: key] isMultivalued];
-    
-    if (isMultivalued)
-    {
-        if (([value isKindOfClass: [NSArray class]] && ![value isKindOfClass: [NSMutableArray class]]))
-        {
-            value = [NSMutableArray arrayWithArray: value];
-        }
-        else if (([value isKindOfClass: [NSSet class]] && ![value isKindOfClass: [NSMutableSet class]]))
-        {
-            value = [NSSet setWithSet: value];
-        }
-    }
-    
-	id oldValue = [self valueForProperty: key];
-	 
-    oldValue = (isMultivalued ? [oldValue mutableCopy] : oldValue);
-
-	[self checkEditingContextForValue: value];
 
 	[self willChangeValueForProperty: key];
-	[self setValue: value forVariableStorageKey: key];
-	[self didChangeValueForProperty: key oldValue: oldValue];
+    [self setValue: value forStorageKey: key];
+	[self didChangeValueForProperty: key];
+
+	return YES;
 }
 
 #pragma mark - Validation
@@ -670,7 +638,14 @@ objectGraphContext: (COObjectGraphContext *)aContext
     
 	// TODO: Evaluate whether -checkEditingContextForValue: is too costly
 	//[self checkEditingContextForValue: [self valueForProperty: key]];
-    
+
+  	// FIXME: Move this check elsewhere or rework it because it can break on
+	// transient values or archived objects such as NSColor, NSView.
+	//if (![COObject isCoreObjectValue: value])
+	//{
+	//	[NSException raise: NSInvalidArgumentException format: @"Invalid property type"];
+	//}
+
     id originalRelationships = [_relationshipsAsCOPathOrETUUID objectForKey: key];
     if (originalRelationships != nil)
     {

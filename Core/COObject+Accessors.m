@@ -41,13 +41,33 @@ static id genericGetter(id theSelf, SEL theCmd)
     return result;
 }
 
-static void genericSetter(id theSelf, SEL theCmd, id value)
+static void genericSetter(id self, SEL theCmd, id value)
 {
     // FIXME: Same comment as the genericGetter
     
     NSString *key = SetterToProperty(NSStringFromSelector(theCmd));
 	
-    [theSelf setValue: value forPropertyWithoutSetter: key];
+ 	BOOL isMultivalued = [[[self entityDescription] propertyDescriptionForName: key] isMultivalued];
+    
+    if (isMultivalued)
+    {
+        if (([value isKindOfClass: [NSArray class]] && ![value isKindOfClass: [NSMutableArray class]]))
+        {
+            value = [NSMutableArray arrayWithArray: value];
+        }
+        else if (([value isKindOfClass: [NSSet class]] && ![value isKindOfClass: [NSMutableSet class]]))
+        {
+            value = [NSSet setWithSet: value];
+        }
+    }
+    
+	id oldValue = [self valueForProperty: key];
+	
+    oldValue = (isMultivalued ? [oldValue mutableCopy] : oldValue);
+	
+	[self willChangeValueForProperty: key];
+	[self setValue: value forVariableStorageKey: key];
+	[self didChangeValueForProperty: key oldValue: oldValue];
 }
 
 + (BOOL)resolveInstanceMethod:(SEL)sel

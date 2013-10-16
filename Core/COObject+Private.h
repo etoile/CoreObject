@@ -74,9 +74,5 @@ objectGraphContext: (COObjectGraphContext *)aContext;
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void)setValue: (id)value forStorageKey: (NSString *)key;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-- (void) setValue: (id)value forPropertyWithoutSetter: (NSString *)key;
 
 @end
