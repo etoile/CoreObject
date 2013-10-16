@@ -1071,23 +1071,21 @@ static int indent = 0;
 {
     for (NSString *key in [_relationshipsAsCOPathOrETUUID allKeys])
     {
-        id serializedValue = [_relationshipsAsCOPathOrETUUID objectForKey: key];
         ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
 		ETAssert([propDesc isPersistent]);
 
-        // HACK
-        COType type = kCOTypeReference | ([propDesc isMultivalued]
-                                          ? ([propDesc isOrdered]
-                                             ? kCOTypeArray
-                                             : kCOTypeSet)
-                                          : 0);
-        
-        id value = [self valueForSerializedValue: serializedValue ofType: type propertyDescription: propDesc];
+		// HACK
+		COType collectionType = ([propDesc isOrdered] ? kCOTypeArray : kCOTypeSet);
+        COType type = kCOTypeReference | ([propDesc isMultivalued] ? collectionType : 0);
+
+		id serializedValue = [_relationshipsAsCOPathOrETUUID objectForKey: key];
+        id value = [self valueForSerializedValue: serializedValue
+		                                  ofType: type
+		                     propertyDescription: propDesc];
         
         // N.B., we need to set this in a way that doesn't cause us to recalculate and overwrite
         // the version stored in _relationshipsAsCOPathOrETUUID
-        [_variableStorage setValue: value
-                            forKey: key];
+        [_variableStorage setValue: value forKey: key];
     }
 }
 
