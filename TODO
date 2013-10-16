@@ -8,13 +8,9 @@ First alpha release blockers
 
 - Figure out how to handle inner object deletion vs -validateForDelete
 
-- Fix BenchmarkCoreObject
-
 - Shorten -[COObject description] output
 
 - Improve -[COObject detailedDescription] code and make output more readable
-
-- Remove or finish -isDeeplyEqual: in COObject
 
 - Decide on embedded vs inner and update all API doc
 

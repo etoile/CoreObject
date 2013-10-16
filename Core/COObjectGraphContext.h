@@ -158,13 +158,6 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * deleted objects (by running a GC phase).
  */
 - (void)setItemGraph: (id <COItemGraph>)aTree;
-/*
- * IDEA:
- * Though COEditingContext implements COItemGraph, this method returns
- * an independent snapshot of the editing context, suitable for passing
- * to a background thread
- */
-//- (id<COItemGraph>)itemGraphSnapshot;
 
 
 /** @taskunit Accessing the Root Object */
