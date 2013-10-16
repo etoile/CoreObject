@@ -301,9 +301,9 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     [self reloadAtRevision: currentRevision];
 }
 
-- (COBranch *)parentBranch
+- (COBranch *) parentBranch
 {
-    return [_persistentRoot branchForUUID: _parentBranchUUID];
+    return [[self editingContext] branchForUUID: _parentBranchUUID];
 }
 
 - (BOOL)hasChangesOtherThanDeletionOrUndeletion
@@ -420,7 +420,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev
 {
-    return [[[self persistentRoot] editingContext] insertNewPersistentRootWithRevisionID: [aRev revisionID]];
+    return [[[self persistentRoot] editingContext] insertNewPersistentRootWithRevisionID: [aRev revisionID]
+																			parentBranch: self];
 }
 
 - (BOOL)mergeChangesFromTrack: (COBranch *)aSourceTrack
@@ -790,7 +791,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	_newestRevisionID = [branchInfo headRevisionID];
     _metadata =  [NSMutableDictionary dictionaryWithDictionary:[branchInfo metadata]];
     _isCreated = YES;
-    
+    _parentBranchUUID = [branchInfo parentBranchUUID];
+	
     id<COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionID: _currentRevisionID];
     [_objectGraph setItemGraph: aGraph];
 	

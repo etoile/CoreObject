@@ -24,6 +24,7 @@
  */
 - (id) initWithInfo: (COPersistentRootInfo *)info
 cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
+   parentBranchUUID: (ETUUID *)aBranchUUID
  objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
       parentContext: (COEditingContext *)aCtxt;
 

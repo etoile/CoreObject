@@ -231,6 +231,7 @@
     COPersistentRootInfo *info = [store createPersistentRootWithInitialRevision: [[persistentRoot currentRevision] revisionID]
                                                                            UUID: [ETUUID UUID]
                                                                      branchUUID: [ETUUID UUID]
+															   parentBranchUUID: nil
                                                                           error: NULL];
     [store commitTransactionWithError: NULL];
     UKNotNil(info);

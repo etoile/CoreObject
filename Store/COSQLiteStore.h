@@ -382,6 +382,7 @@ typedef NSUInteger COBranchRevisionReadingOptions;
 - (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
                                                               UUID: (ETUUID *)persistentRootUUID
                                                         branchUUID: (ETUUID *)aBranchUUID
+												  parentBranchUUID: (ETUUID *)aParentBranch
                                                              error: (NSError **)error;
 
 - (COPersistentRootInfo *) createPersistentRootWithUUID: (ETUUID *)persistentRootUUID

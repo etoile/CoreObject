@@ -89,6 +89,7 @@
 }
 
 - (void) createBranchWithUUID: (ETUUID *)branchUUID
+				 parentBranch: (ETUUID *)aParentBranch
               initialRevision: (ETUUID *)revId
             forPersistentRoot: (ETUUID *)aRoot
 {
@@ -99,6 +100,7 @@
     COStoreCreateBranch *op = [[COStoreCreateBranch alloc] init];
     op.persistentRoot = aRoot;
     op.branch = branchUUID;
+	op.parentBranch = aParentBranch;
     op.initialRevision = revId;
     [self addOperation: op];
 }

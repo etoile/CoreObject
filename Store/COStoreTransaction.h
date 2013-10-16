@@ -32,6 +32,7 @@
         forPersistentRoot: (ETUUID *)aRoot;
 
 - (void) createBranchWithUUID: (ETUUID *)branchUUID
+				 parentBranch: (ETUUID *)aParentBranch
               initialRevision: (ETUUID *)revId
             forPersistentRoot: (ETUUID *)aRoot;
 

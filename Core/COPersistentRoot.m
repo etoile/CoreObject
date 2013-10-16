@@ -38,6 +38,7 @@ NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidCh
 
 - (id) initWithInfo: (COPersistentRootInfo *)info
 cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
+   parentBranchUUID: (ETUUID *)aBranchUUID
  objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
       parentContext: (COEditingContext *)aCtxt
 {
@@ -79,7 +80,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         COBranch *branch = [[COBranch alloc] initWithUUID: branchUUID
 		                                objectGraphContext: anObjectGraphContext
                                             persistentRoot: self
-                                          parentBranchUUID: nil
+                                          parentBranchUUID: aBranchUUID
                                 parentRevisionForNewBranch: cheapCopyRevisionID];
         
         [_branchForUUID setObject: branch forKey: branchUUID];
@@ -436,10 +437,15 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         }
         else
         {
+			// Committing a cheap copy, so there must be a parent branch
+			ETUUID *parentBranchUUID = [[[self editingBranch] parentBranch] UUID];
+			ETAssert(parentBranchUUID != nil);
+			
             _savedState = [store createPersistentRootWithInitialRevision: _cheapCopyRevisionID
-                                                             UUID: _UUID
-                                                       branchUUID: [[self editingBranch] UUID]
-                                                            error: NULL];
+																	UUID: _UUID
+															  branchUUID: [[self editingBranch] UUID]
+														parentBranchUUID: parentBranchUUID
+																   error: NULL];
         }
         ETAssert(_savedState != nil);
 		CORevisionID *initialRevID = [[_savedState currentBranchInfo] currentRevisionID];

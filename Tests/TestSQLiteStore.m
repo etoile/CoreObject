@@ -715,6 +715,7 @@ static ETUUID *childUUID2;
     COPersistentRootInfo *copy = [store createPersistentRootWithInitialRevision: initialRevisionId
                                                                            UUID: [ETUUID UUID]
                                                                      branchUUID: [ETUUID UUID]
+															   parentBranchUUID: nil
                                                                           error: NULL];
     [store commitTransactionWithError: NULL];
     
@@ -817,6 +818,7 @@ static ETUUID *childUUID2;
     COPersistentRootInfo *cheapCopy = [store createPersistentRootWithInitialRevision: [branchARevisionIDs lastObject]
                                                                                 UUID: cheapCopyUUID
                                                                           branchUUID: cheapCopyBranchUUID
+																	parentBranchUUID: nil
                                                                                error: NULL];
     [store commitTransactionWithError: NULL];
 

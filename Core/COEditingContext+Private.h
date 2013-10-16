@@ -22,7 +22,8 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (COPersistentRoot *)insertNewPersistentRootWithRevisionID: (CORevisionID *)aRevid;
+- (COPersistentRoot *)insertNewPersistentRootWithRevisionID: (CORevisionID *)aRevid
+											   parentBranch: (COBranch *)aParentBranch;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -74,6 +75,8 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 - (COCrossPersistentRootReferenceCache *) crossReferenceCache;
 
 - (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid;
+
+- (COBranch *) branchForUUID: (ETUUID *)aBranch;
 
 @end
 

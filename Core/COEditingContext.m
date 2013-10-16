@@ -190,6 +190,7 @@
     
     COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: info
                                                           cheapCopyRevisionID: nil
+															 parentBranchUUID: nil
 	                                                       objectGraphContext: anObjectGrapContext
                                                                 parentContext: self];
 	[_loadedPersistentRoots setObject: persistentRoot
@@ -218,9 +219,11 @@
 }
 
 - (COPersistentRoot *)insertNewPersistentRootWithRevisionID: (CORevisionID *)aRevid
+											   parentBranch: (COBranch *)aParentBranch
 {
     COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: nil
                                                           cheapCopyRevisionID: aRevid
+															 parentBranchUUID: [aParentBranch UUID]
 	                                                       objectGraphContext: nil 
                                                                 parentContext: self];
 	[_loadedPersistentRoots setObject: persistentRoot
@@ -654,6 +657,17 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 - (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid
 {
     return [CORevisionCache revisionForRevisionID: aRevid storeUUID: [_store UUID]];
+}
+
+- (COBranch *) branchForUUID: (ETUUID *)aBranch
+{
+	if (aBranch != nil)
+	{
+		ETUUID *prootUUID = [_store persistentRootUUIDForBranchUUID: aBranch];
+		COPersistentRoot *proot = [self persistentRootForUUID: prootUUID];
+		return [proot branchForUUID: aBranch];
+	}
+	return nil;
 }
 
 @end

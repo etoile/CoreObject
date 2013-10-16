@@ -751,7 +751,7 @@
         }
         
         {
-            FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, initial_revid, current_revid, head_revid, metadata, deleted FROM branches WHERE proot = ?", [aUUID dataValue]];
+            FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, initial_revid, current_revid, head_revid, metadata, deleted, parentbranch FROM branches WHERE proot = ?", [aUUID dataValue]];
             while ([rs next])
             {
                 ETUUID *branch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
@@ -770,6 +770,9 @@
 				state.headRevisionID = headRevid;
                 state.metadata = branchMeta;
                 state.deleted = [rs boolForColumnIndex: 5];
+				state.parentBranchUUID = [rs dataForColumnIndex: 6] != nil
+					? [ETUUID UUIDWithData: [rs dataForColumnIndex: 6]]
+					: nil;
                 
                 [branchDict setObject: state forKey: branch];
             }
@@ -837,6 +840,7 @@
 
 - (COPersistentRootInfo *) createPersistentRootWithUUID: (ETUUID *)uuid
                                              branchUUID: (ETUUID *)aBranchUUID
+									   parentBranchUUID: (ETUUID *)aParentBranch
                                                  isCopy: (BOOL)isCopy
                                         initialRevision: (CORevisionID *)aRevision
                                                   error: (NSError **)error
@@ -845,6 +849,7 @@
                          persistentRootForCopy: isCopy ? aRevision.revisionPersistentRootUUID : nil];
     
     [transaction_ createBranchWithUUID: aBranchUUID
+						  parentBranch: aParentBranch
                        initialRevision: aRevision.revisionUUID
                      forPersistentRoot: uuid];
     
@@ -864,7 +869,8 @@
         branch.headRevisionID = aRevision;
         branch.metadata = nil;
         branch.deleted = NO;
-        
+        branch.parentBranchUUID = aParentBranch;
+		
         plist.currentBranchUUID = aBranchUUID;
         plist.branchForUUID = @{aBranchUUID : branch};
     }
@@ -901,6 +907,7 @@
     
     return [self createPersistentRootWithUUID: persistentRootUUID
                                    branchUUID: aBranchUUID
+							 parentBranchUUID: nil
                                        isCopy: NO
                               initialRevision: revId
                                         error: error];
@@ -909,6 +916,7 @@
 - (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
                                                               UUID: (ETUUID *)persistentRootUUID
                                                         branchUUID: (ETUUID *)aBranchUUID
+												  parentBranchUUID: (ETUUID *)aParentBranch
                                                              error: (NSError **)error
 {
     [self checkInTransaction];
@@ -921,6 +929,7 @@
     
     return [self createPersistentRootWithUUID: persistentRootUUID
                                    branchUUID: aBranchUUID
+							 parentBranchUUID: aParentBranch
                                        isCopy: YES
                               initialRevision: aRevision
                                         error: error];
@@ -987,6 +996,7 @@
     [self recordModifiedPersistentRoot: aRoot];
     
     [transaction_ createBranchWithUUID: branchUUID
+						  parentBranch: aParentBranch
                        initialRevision: revId.revisionUUID
                      forPersistentRoot: aRoot];
     

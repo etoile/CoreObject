@@ -175,9 +175,17 @@
 {
     UKObjectsEqual(branch1A, [branch1B parentBranch]);
     UKNil([branch1A parentBranch]);
-
-	// FIXME: Make this pass
-	// UKObjectsEqual(branch1A, [branch2A parentBranch]);
+	{
+		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: [ctx store]];
+		UKObjectsEqual([branch1A UUID], [[[[ctx2 persistentRootForUUID: [p1 UUID]]
+										   branchForUUID: [branch1B UUID]] parentBranch] UUID]);
+	}
+	
+	UKObjectsEqual(branch1A, [branch2A parentBranch]);
+	{
+		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: [ctx store]];
+		UKObjectsEqual([branch1A UUID], [[[[ctx2 persistentRootForUUID: [p2 UUID]] currentBranch] parentBranch] UUID]);
+	}
 }
 
 - (NSArray *)revisionsForBranch: (COBranch *)aBranch

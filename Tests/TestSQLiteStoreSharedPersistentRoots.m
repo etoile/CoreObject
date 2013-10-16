@@ -57,6 +57,7 @@ static ETUUID *rootUUID;
     prootB = [store createPersistentRootWithInitialRevision: [[prootA currentBranchInfo] currentRevisionID]
                                                        UUID: [ETUUID UUID]
                                                  branchUUID: [ETUUID UUID]
+										   parentBranchUUID: nil
                                                       error: NULL];
     
     CORevisionID *prootBRev = [store writeRevisionWithItemGraph: [self prooBitemTree]

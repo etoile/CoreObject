@@ -223,6 +223,7 @@ static ETUUID *branchBUUID;
     COPersistentRootInfo *serverCheapCopyInfo = [serverStore createPersistentRootWithInitialRevision: [serverInfo currentRevisionID]
                                                                                                 UUID: cheapCopyUUID
                                                                                           branchUUID: cheapCopyBranchUUID
+																					parentBranchUUID: nil
                                                                                                error: NULL];    
     // Server writes a second commit.
     
