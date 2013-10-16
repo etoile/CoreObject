@@ -27,8 +27,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * object graph context is only considered equal to itself.
  *
  * To compare the contents of two COObjectGraphContext instances you can do:
- * [[ctx rootObject] isDeeplyEqual: [ctx2 rootObject]] (FIXME: That method
- * is not exposed in the header and incomplete)
+ * COItemGraphEqualToItemGraph(ctx1, ctx2)
  */
 @interface COObjectGraphContext : NSObject <COItemGraph, COPersistentObjectContext>
 {

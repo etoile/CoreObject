@@ -24,6 +24,7 @@ First alpha release blockers
 
 - Check code quality for all Core classes (underway)
 
+- Store/COSQLiteStore.m: Fix -revisionInfosForBranchUUID:... to use head revision ID
 
 Backlog from Oct 2nd
 --------------------

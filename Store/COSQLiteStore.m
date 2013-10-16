@@ -319,6 +319,7 @@
                                 options: (COBranchRevisionReadingOptions)options
 {
 	ETUUID *prootUUID = [self persistentRootUUIDForBranchUUID: aBranchUUID];
+	// FIXME: Change to headRevisionUUID
 	ETUUID *currentRevUUID = [self currentRevisionUUIDForBranchUUID: aBranchUUID];
 
     __block NSArray *result = nil;
