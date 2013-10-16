@@ -107,6 +107,32 @@ See +[NSObject typePrefix]. */
 
 #pragma mark - Initialization
 
+- (Class)collectionClassForPropertyDescription: (ETPropertyDescription *)propDesc
+{
+	NSParameterAssert([propDesc isMultivalued]);
+
+	if ([propDesc isKeyed])
+	{
+		return ([propDesc isPersistent] ? [CODictionary class] : [NSDictionary class]);
+	}
+	else
+	{
+		return ([propDesc isOrdered] ? [NSArray class] : [NSSet class]);
+	}
+}
+
+- (id)newCollectionForPropertyDescription: (ETPropertyDescription *)propDesc
+{
+	Class class = [self collectionClassForPropertyDescription: propDesc];
+	ETAssert([class conformsToProtocol: @protocol(ETCollection)]);
+
+	if ([class isSubclassOfClass: [CODictionary class]])
+	{
+		return [[CODictionary alloc] initWithObjectGraphContext: _objectGraphContext];
+	}
+	return [[class mutableClass] new];
+}
+
 - (NSMutableDictionary *)newVariableStorage
 {
 	NSMutableDictionary *variableStorage = [[NSMutableDictionary alloc] initWithCapacity: 20];
@@ -122,23 +148,7 @@ See +[NSObject typePrefix]. */
 		if (ivarExists)
 			continue;
 
-		id collection = nil;
-
-		if ([propDesc isKeyed])
-		{
-			if ([propDesc isPersistent])
-			{
-				collection = [[CODictionary alloc] initWithObjectGraphContext: _objectGraphContext];
-			}
-			else
-			{
-				collection = [NSMutableDictionary dictionary];
-			}
-		}
-		else
-		{
-			collection = ([propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set]);
-		}
+		id collection = [self newCollectionForPropertyDescription: propDesc];
 		
 		[variableStorage setObject: collection forKey: [propDesc name]];
 	}
@@ -157,7 +167,7 @@ See +[NSObject typePrefix]. */
 
 		ETAssert([propDesc isDerived] == NO);
 
-		id collection = ([propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set]);
+		id collection = [self newCollectionForPropertyDescription: propDesc];
 
 		[variableStorage setObject: collection forKey: [propDesc name]];
 	}
@@ -822,20 +832,10 @@ objectGraphContext: (COObjectGraphContext *)aContext
 		if ([propDesc isMultivalued] == NO)
 			continue;
 
-		Class class = Nil;
-		
-		if ([propDesc isKeyed])
-		{
-			class = ([propDesc isPersistent] ? [CODictionary class] : [NSDictionary class]);
-		}
-		else
-		{
-			class = ([propDesc isOrdered] ? [NSArray class] : [NSSet class]);
-		}
-
+		Class class = [self collectionClassForPropertyDescription: propDesc];
 		/* We must access the instance variable or the primitive value, and we 
-		   cannot use -valueForKey:, because getters tend to return defensive 
-		   copies (immutable collections). */
+		   cannot use -valueForProperty:, because getters tend to return 
+		   defensive copies (immutable collections). */
 		id collection = [self valueForStorageKey: [propDesc name]];
 
 		if ([collection isKindOfClass: class] == NO)
@@ -1083,8 +1083,8 @@ static int indent = 0;
 		                                  ofType: type
 		                     propertyDescription: propDesc];
         
-        // N.B., we need to set this in a way that doesn't cause us to recalculate and overwrite
-        // the version stored in _relationshipsAsCOPathOrETUUID
+        // N.B., we need to set this in a way that doesn't cause us to recalculate
+		// and overwrite the version stored in _relationshipsAsCOPathOrETUUID
         [_variableStorage setValue: value forKey: key];
     }
 }
