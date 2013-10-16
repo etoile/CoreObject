@@ -382,6 +382,13 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (id) valueForProperty: (NSString *)key
 {
+	if (![[self propertyNames] containsObject: key])
+	{
+		[NSException raise: NSInvalidArgumentException
+					format: @"Tried to get value for invalid property %@", key];
+		return nil;
+	}
+	
 	/* We call the getter directly if implemented */
 
 	if ([self respondsToSelector: [self getterForKey: key useIsPrefix: NO]]
@@ -394,13 +401,6 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 	/* Otherwise access ivar or variable storage */
 
-	if (![[self propertyNames] containsObject: key])
-	{
-		[NSException raise: NSInvalidArgumentException
-					format: @"Tried to get value for invalid property %@", key];
-		return nil;
-	}
-	
 	return [self valueForStorageKey: key];
 }
 
@@ -456,6 +456,13 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (BOOL) setValue: (id)value forProperty: (NSString *)key
 {
+	if (![[self propertyNames] containsObject: key])
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"Tried to set value for invalid property %@", key];
+		return NO;
+	}
+
 	/* We call the setter directly if implemented */
 
 	if ([self respondsToSelector: [self setterForKey: key]])
@@ -468,13 +475,6 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 	/* Otherwise update ivar or variable storage (relationship caches, object 
 	   graph context and observer objects are notified) */
-
-	if (![[self propertyNames] containsObject: key])
-	{
-		[NSException raise: NSInvalidArgumentException
-		            format: @"Tried to set value for invalid property %@", key];
-		return NO;
-	}
 
 	[self willChangeValueForProperty: key];
     [self setValue: value forStorageKey: key];
