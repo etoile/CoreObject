@@ -664,82 +664,99 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	[self didChangeValueForProperty: key oldValue: nil];
 }
 
-- (void)didChangeValueForProperty: (NSString *)key oldValue: (id)oldValue
+- (void)validateNewValue: (id)newValue
 {
-    ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
-    
-	// TODO: Evaluate whether -checkEditingContextForValue: is too costly
-	//[self checkEditingContextForValue: [self valueForProperty: key]];
-
+	// NOTE: For the CoreObject benchmark, no visible slowdowns but breaks
+	// EtoileUI currently.
+	//[self checkEditingContextForValue: newValue];
+	
   	// FIXME: Move this check elsewhere or rework it because it can break on
 	// transient values or archived objects such as NSColor, NSView.
 	//if (![COObject isCoreObjectValue: value])
 	//{
 	//	[NSException raise: NSInvalidArgumentException format: @"Invalid property type"];
 	//}
+}
 
-    id originalRelationships = [_relationshipsAsCOPathOrETUUID objectForKey: key];
-    if (originalRelationships != nil)
-    {
-		// TODO: Use -serializedValueForProperty: instead of
-		// -serializedValueForValue:.
-		id currentValue = [self valueForProperty: key];
+- (void)updateOutgoingSerializedRelationshipCacheForProperty: (NSString *)key
+{
+	id originalRelationships = [_relationshipsAsCOPathOrETUUID objectForKey: key];
 
-        // Re-serialize the current value from COObject to ETUUID/COPath
-        
-        id serializedValue = [self serializedValueForValue: currentValue];
-        
-        //NSLog(@"_relationshipsAsCOPathOrETUUID: setting %@ from %@ to %@", key,
-        //     [_relationshipsAsCOPathOrETUUID objectForKey: key], serializedValue);
-        
-        [_relationshipsAsCOPathOrETUUID setObject: serializedValue
-                                           forKey: key];
-    }
-    
-    // Remove objects in newValue from their old parents
+    if (originalRelationships == nil)
+		return;
+
+	// TODO: Use -serializedValueForProperty: instead of -serializedValueForValue:.
+	id currentValue = [self valueForProperty: key];
+	
+	// Re-serialize the current value from COObject to ETUUID/COPath
+	
+	id serializedValue = [self serializedValueForValue: currentValue];
+	
+	//NSLog(@"_relationshipsAsCOPathOrETUUID: setting %@ from %@ to %@", key,
+	//     [_relationshipsAsCOPathOrETUUID objectForKey: key], serializedValue);
+	
+	[_relationshipsAsCOPathOrETUUID setObject: serializedValue forKey: key];
+}
+
+- (void)updateCompositeRelationshipForPropertyDescription: (ETPropertyDescription *)propertyDesc
+{
+	// Remove objects in newValue from their old parents
     // as perscribed by the COEditingContext class docs
     // FIXME: Ugly implementation
-    if ([propertyDesc isComposite])
-    {
-        ETPropertyDescription *parentDesc = [propertyDesc opposite];
-        id aValue = [self valueForKey: key];
-        
-        for (COObject *objectBeingInserted in ([propertyDesc isMultivalued] ? aValue : [NSArray arrayWithObject: aValue]))
-        {
-            COObject *objectBeingInsertedParent = [[objectBeingInserted relationshipCache] referringObjectForPropertyInTarget: [parentDesc name]];
-            
-            // FIXME: Minor flaw, you can insert a composite twice if the collection is ordered.
-            // e.g.
-            // (a, b, c) => (a, b, c, a) since we only remove the objects from their old parents if the
-            // parent is different than the object we're inserting into
-            
-            if (objectBeingInsertedParent != nil && objectBeingInsertedParent != self)
-            {
-                BOOL alreadyRemoved = NO;
-                
-                if (![[objectBeingInsertedParent valueForKey: key] containsObject: objectBeingInserted])
-                {
-                    // This is sort of a hack for EtoileUI.
-                    // It handles removing the object from its old parent for us.
-                    // In that case, don't try to do it ourselves.
-                    // TODO: Decide the correct way to handle this
-                    alreadyRemoved = YES;
-                }
-                
-                if (!alreadyRemoved)
-                {
-                    [objectBeingInsertedParent removeObject: objectBeingInserted atIndex: ETUndeterminedIndex hint: nil forProperty: key];
-                }
-            }
-        }
-    }
-    
-    [self updateCachedOutgoingRelationshipsForOldValue: oldValue
-                                                  newValue: [self valueForKey: key]
-                                 ofPropertyWithDescription: [_entityDescription propertyDescriptionForName: key]];
-    
-	[self markAsUpdatedIfNeededForProperty: key];
+    if ([propertyDesc isComposite] == NO)
+		return;
+
+	NSString *key = [propertyDesc name];
+
+	ETPropertyDescription *parentDesc = [propertyDesc opposite];
+	id aValue = [self valueForKey: key];
 	
+	for (COObject *objectBeingInserted in ([propertyDesc isMultivalued] ? aValue : [NSArray arrayWithObject: aValue]))
+	{
+		COObject *objectBeingInsertedParent = [[objectBeingInserted relationshipCache] referringObjectForPropertyInTarget: [parentDesc name]];
+		
+		// FIXME: Minor flaw, you can insert a composite twice if the collection is ordered.
+		// e.g.
+		// (a, b, c) => (a, b, c, a) since we only remove the objects from their old parents if the
+		// parent is different than the object we're inserting into
+		
+		if (objectBeingInsertedParent != nil && objectBeingInsertedParent != self)
+		{
+			BOOL alreadyRemoved = NO;
+			
+			if (![[objectBeingInsertedParent valueForKey: key] containsObject: objectBeingInserted])
+			{
+				// This is sort of a hack for EtoileUI.
+				// It handles removing the object from its old parent for us.
+				// In that case, don't try to do it ourselves.
+				// TODO: Decide the correct way to handle this
+				alreadyRemoved = YES;
+			}
+			
+			if (!alreadyRemoved)
+			{
+				[objectBeingInsertedParent removeObject: objectBeingInserted atIndex: ETUndeterminedIndex hint: nil forProperty: key];
+			}
+		}
+	}
+}
+
+- (void)didChangeValueForProperty: (NSString *)key oldValue: (id)oldValue
+{
+	id newValue = [self valueForStorageKey: key];
+
+	[self validateNewValue: newValue];
+
+	[self updateOutgoingSerializedRelationshipCacheForProperty: key];
+	
+    ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
+    
+	[self updateCompositeRelationshipForPropertyDescription: propertyDesc];
+    [self updateCachedOutgoingRelationshipsForOldValue: oldValue
+	                                          newValue: newValue
+                             ofPropertyWithDescription: propertyDesc];
+
+	[self markAsUpdatedIfNeededForProperty: key];	
 	[super didChangeValueForKey: key];
 }
 
