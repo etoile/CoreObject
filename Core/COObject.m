@@ -126,14 +126,39 @@ See +[NSObject typePrefix]. */
 
 		if ([propDesc isKeyed])
 		{
-			// TODO: Implement once we have removed -becomePersistentInContext:
-			continue;
+			if ([propDesc isPersistent])
+			{
+				collection = [[CODictionary alloc] initWithObjectGraphContext: _objectGraphContext];
+			}
+			else
+			{
+				collection = [NSMutableDictionary dictionary];
+			}
 		}
 		else
 		{
 			collection = ([propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set]);
 		}
 		
+		[variableStorage setObject: collection forKey: [propDesc name]];
+	}
+
+	return variableStorage;
+}
+
+- (NSMutableDictionary *)newOutgoingRelationshipCache
+{
+	NSMutableDictionary *variableStorage = [[NSMutableDictionary alloc] initWithCapacity: 5];
+
+	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+	{
+		if ([propDesc isMultivalued] == NO || [propDesc isKeyed] || [propDesc isPersistent] == NO)
+			continue;
+
+		ETAssert([propDesc isDerived] == NO);
+
+		id collection = ([propDesc isOrdered] ? [NSMutableArray array] : [NSMutableSet set]);
+
 		[variableStorage setObject: collection forKey: [propDesc name]];
 	}
 
@@ -175,7 +200,7 @@ See +[NSObject typePrefix]. */
 	_objectGraphContext = aContext;
 	_isInitialized = YES;
 	_variableStorage = [self newVariableStorage];
-    _relationshipsAsCOPathOrETUUID = [self newVariableStorage];
+    _relationshipsAsCOPathOrETUUID = [self newOutgoingRelationshipCache];
 	_relationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
 
 	[_objectGraphContext registerObject: self isNew: inserted];
@@ -243,7 +268,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	if (_variableStorage != nil)
 	{
 		newObject->_variableStorage = [self newVariableStorage];
-        newObject->_relationshipsAsCOPathOrETUUID = [self newVariableStorage];
+        newObject->_relationshipsAsCOPathOrETUUID = [self newOutgoingRelationshipCache];
         newObject->_relationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
 	}
 
@@ -286,7 +311,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (NSString *)name
 {
-	return [self valueForUndefinedKey: @"name"];
+	return [self primitiveValueForKey: @"name"];
 }
 
 - (NSString *)identifier
@@ -297,7 +322,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 - (void)setName: (NSString *)aName
 {
 	[self willChangeValueForProperty: @"name"];
-	[self setValue: aName forUndefinedKey: @"name"];
+	[self setPrimitiveValue: aName forKey: @"name"];
 	[self didChangeValueForProperty: @"name"];
 }
 
@@ -310,7 +335,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (NSSet *) observableKeyPaths
 {
-	return S(@"name", @"lastVersionDescription", @"tagDescription");
+	return S(@"name", @"revisionDescription", @"tagDescription");
 }
 
 - (NSArray *)propertyNames
@@ -327,7 +352,8 @@ objectGraphContext: (COObjectGraphContext *)aContext
 {
 	if (![[self propertyNames] containsObject: key])
 	{
-		[NSException raise: NSInvalidArgumentException format: @"Tried to get value for invalid property %@", key];
+		[NSException raise: NSInvalidArgumentException
+					format: @"Tried to get value for invalid property %@", key];
 		return nil;
 	}
 	
@@ -618,8 +644,10 @@ objectGraphContext: (COObjectGraphContext *)aContext
     id originalRelationships = [_relationshipsAsCOPathOrETUUID objectForKey: key];
     if (originalRelationships != nil)
     {
-        id currentValue = [self valueForProperty: key];
-        
+		// TODO: Use -serializedValueForProperty: instead of
+		// -serializedValueForValue:.
+		id currentValue = [self valueForProperty: key];
+
         // Re-serialize the current value from COObject to ETUUID/COPath
         
         id serializedValue = [self serializedValueForValue: currentValue];
@@ -778,8 +806,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 		
 		if ([propDesc isKeyed])
 		{
-			// TODO: Implement once -becomePersistentInContext: is removed
-			continue;
+			class = ([propDesc isPersistent] ? [CODictionary class] : [NSDictionary class]);
 		}
 		else
 		{
@@ -819,7 +846,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 {
 	assert(_variableStorage == nil);
 	_variableStorage = [self newVariableStorage];
-    _relationshipsAsCOPathOrETUUID = [self newVariableStorage];
+    _relationshipsAsCOPathOrETUUID = [self newOutgoingRelationshipCache];
     _relationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
 }
 
@@ -1031,7 +1058,8 @@ static int indent = 0;
     {
         id serializedValue = [_relationshipsAsCOPathOrETUUID objectForKey: key];
         ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
-        
+		ETAssert([propDesc isPersistent]);
+
         // HACK
         COType type = kCOTypeReference | ([propDesc isMultivalued]
                                           ? ([propDesc isOrdered]

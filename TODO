@@ -4,6 +4,8 @@ TODO
 First alpha release blockers
 ----------------------------
 
+- Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
+
 - Figure out how to handle inner object deletion vs -validateForDelete
 
 - Fix BenchmarkCoreObject
@@ -49,8 +51,6 @@ Ideally we should have just 3, but we should at least remove one.
 - COSearchResult vs COQuery
 
 - Selective Undo for -undoNode: or elsewhere… Should I create a COCommand and call -inverse then compute and apply the selective undo result from this inverse command?
-
-- Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
 
 - Store: revert to integer commit id's
 

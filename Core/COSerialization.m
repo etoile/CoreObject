@@ -142,7 +142,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		}
 		else
 		{
-			ETAssert([self isRoot]);
+			ETAssert([value isRoot]);
 			return [NSNull null];
 		}
 	}

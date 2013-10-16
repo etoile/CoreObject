@@ -489,7 +489,7 @@
  * GNUstep programs.<br />
  * For Etoile programs or new projects, you should use -validateValue:forProperty:.
  */
-- (BOOL)validateValue:(id *)aValue forKey:(NSString *)key error:(NSError **)anError;
+- (BOOL)validateValue: (id *)aValue forKey: (NSString *)key error: (NSError **)anError;
 
 
 /** @taskunit Direct Access to the Variable Storage */
