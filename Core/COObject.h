@@ -51,7 +51,7 @@
  * and to release them in -dealloc. If a multivalued property is stored in the 
  * the variable storage, COObject allocates the collections at initialization 
  * time and releases them at deallocation time (you can access these collections 
- * using -primitiveValueForKey: in your subclass initializers).
+ * using -valueForVariableStorageKey: in your subclass initializers).
  *
  * @section Persistency
  *
@@ -77,7 +77,7 @@
  * - (void)name
  * {
  *     // When no ivar is provided, you can use the variable storage as below
- *     // return [self primitiveValueForKey: @"name"];
+ *     // return [self valueForVariableStorageKey: @"name"];
  *     return name;
  * }
  *
@@ -85,7 +85,7 @@
  * {
  *     [self willChangeValueForProperty: @"name"];
  *     // When no ivar is provided, you can use the variable storage as below
- *     // [self setPrimitiveValue: aName: forKey: @"name"];
+ *     // [self setValue: aName: forVariableStorageKey: @"name"];
  *     name =  aName;
  *     [self didChangeValueForProperty: @"name"];
  * }
@@ -95,8 +95,8 @@
  *
  * The example below is based on a COObject subclass using a<em>names</em> 
  * instance variable. If the value is stored in the variable storage, the 
- * example must be adjusted to use -primitiveValueForKey: and 
- * -setPrimitiveValue:forKey:.<br />
+ * example must be adjusted to use -valueForVariableStorageKey: and 
+ * -setValue:forVariableStorageKey:.<br />
  * -removeObject:atIndex:hint:forProperty: and 
  * -insertObject:atIndex:hint:forProperty: use the instance variable whose 
  * name matches the property (based on Key-Value Coding ivar search rules), or 
@@ -503,7 +503,7 @@
  * This is a low-level method whose use should be restricted to serialization 
  * code and accessors that expose properties with no related instance variable.
  */
-- (id)primitiveValueForKey: (NSString *)key;
+- (id)valueForVariableStorageKey: (NSString *)key;
 /**
  * Sets a value in the variable storage.
  *
@@ -516,7 +516,7 @@
  * It won't invoke -willChangeValueForProperty: and -didChangeValueForProperty: 
  * (or -willChangeValueForKey: and -didChangeValueForKey:).
  */
-- (void)setPrimitiveValue: (id)value forKey: (NSString *)key;
+- (void)setValue: (id)value forVariableStorageKey: (NSString *)key;
 
 
 /** @taskunit Notifications to be called by Accessors */

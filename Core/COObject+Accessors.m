@@ -37,7 +37,7 @@ static id genericGetter(id theSelf, SEL theCmd)
     // rewritten to use a hashmap lookup which maps theCmd to an index in the
     // array.
     
-    id result = [theSelf primitiveValueForKey: NSStringFromSelector(theCmd)];
+    id result = [theSelf valueForVariableStorageKey: NSStringFromSelector(theCmd)];
     return result;
 }
 

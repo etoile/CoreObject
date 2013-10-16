@@ -57,7 +57,7 @@
 
 - (NSSet *)tagGroups
 {
-	return [self primitiveValueForKey: @"tagGroups"];
+	return [self valueForVariableStorageKey: @"tagGroups"];
 }
 
 @end

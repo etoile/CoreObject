@@ -311,7 +311,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (NSString *)name
 {
-	return [self primitiveValueForKey: @"name"];
+	return [self valueForVariableStorageKey: @"name"];
 }
 
 - (NSString *)identifier
@@ -322,13 +322,13 @@ objectGraphContext: (COObjectGraphContext *)aContext
 - (void)setName: (NSString *)aName
 {
 	[self willChangeValueForProperty: @"name"];
-	[self setPrimitiveValue: aName forKey: @"name"];
+	[self setValue: aName forVariableStorageKey: @"name"];
 	[self didChangeValueForProperty: @"name"];
 }
 
 - (NSArray *)tags
 {
-	return [self primitiveValueForKey: @"tags"];
+	return [self valueForVariableStorageKey: @"tags"];
 }
 
 #pragma mark - Property-Value Coding
@@ -469,7 +469,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	[self checkEditingContextForValue: value];
 
 	[self willChangeValueForProperty: key];
-	[self setPrimitiveValue: value forKey: key];
+	[self setValue: value forVariableStorageKey: key];
 	[self didChangeValueForProperty: key oldValue: oldValue];
 }
 
@@ -571,9 +571,9 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	return NO;
 }
 
-#pragma mark - Direct Access to the Variable Storage
+#pragma mark - Direct Access to Property Storage
 
-- (id)primitiveValueForKey: (NSString *)key
+- (id)valueForVariableStorageKey: (NSString *)key
 {
     ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
 
@@ -596,7 +596,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	return (value == [NSNull null] ? nil : value);
 }
 
-- (void)setPrimitiveValue: (id)value forKey: (NSString *)key
+- (void)setValue: (id)value forVariableStorageKey: (NSString *)key
 {
 	[_variableStorage setObject: (value == nil ? [NSNull null] : value)
 						 forKey: key];
@@ -605,12 +605,12 @@ objectGraphContext: (COObjectGraphContext *)aContext
 // FIXME: Investigate whether this way of implementing KVC is really KVC compliant
 - (id)valueForUndefinedKey: (NSString *)key
 {
-	return [self primitiveValueForKey: key];
+	return [self valueForVariableStorageKey: key];
 }
 
 - (void)setValue: (id)value forUndefinedKey: (NSString *)key
 {
-	[self setPrimitiveValue: value forKey: key];
+	[self setValue: value forVariableStorageKey: key];
 }
 
 - (id)valueForStorageKey: (NSString *)key
@@ -619,7 +619,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 	if (ETGetInstanceVariableValueForKey(self, &value, key) == NO)
 	{
-		value = [self primitiveValueForKey: key];
+		value = [self valueForVariableStorageKey: key];
 	}
 	return value;
 }
@@ -629,7 +629,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	if (ETSetInstanceVariableValueForKey(self, value, key) == NO)
 	{
 		/* If no valid ivar can be found, we access the variable storage */
-		[self setPrimitiveValue: value forKey: key];
+		[self setValue: value forVariableStorageKey: key];
 	}
 }
 
