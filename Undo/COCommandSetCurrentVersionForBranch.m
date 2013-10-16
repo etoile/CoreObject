@@ -120,7 +120,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
         [branch setCurrentRevision:
             [aContext revisionForRevisionID: _newRevisionID]];
 		
-		[branch setNewestRevision:
+		[branch setHeadRevision:
 			[aContext revisionForRevisionID: _newHeadRevisionID]];
     }
     else

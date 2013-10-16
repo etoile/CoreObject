@@ -127,8 +127,8 @@
 	[[persistentRoot rootObject] setLabel: @"r2b"];
 	[ctx commitWithUndoTrack: _testTrack];
 	CORevision *r2b = [persistentRoot currentRevision];
-	UKObjectsEqual(r2b, [[persistentRoot currentBranch] newestRevision]);
-	UKObjectsNotEqual(r3, [[persistentRoot currentBranch] newestRevision]);
+	UKObjectsEqual(r2b, [[persistentRoot currentBranch] headRevision]);
+	UKObjectsNotEqual(r3, [[persistentRoot currentBranch] headRevision]);
 	
 	[[persistentRoot currentBranch] undo];
 	[ctx commitWithUndoTrack: _testTrack];
@@ -144,8 +144,8 @@
 	UKObjectsEqual(r1, [persistentRoot currentRevision]);
 	[_testTrack undo];
 	UKObjectsEqual(r2b, [persistentRoot currentRevision]);
-	UKObjectsEqual(r2b, [[persistentRoot currentBranch] newestRevision]);
-	UKObjectsNotEqual(r3, [[persistentRoot currentBranch] newestRevision]);
+	UKObjectsEqual(r2b, [[persistentRoot currentBranch] headRevision]);
+	UKObjectsNotEqual(r3, [[persistentRoot currentBranch] headRevision]);
 	
 	// The main point of the test is that the following -undo restores the
 	// branch head_revid (-newestRevision) to point to r3, which means
@@ -153,8 +153,8 @@
 	
 	[_testTrack undo];
 	UKObjectsEqual(r1, [persistentRoot currentRevision]);
-	UKObjectsNotEqual(r2b, [[persistentRoot currentBranch] newestRevision]);
-	UKObjectsEqual(r3, [[persistentRoot currentBranch] newestRevision]);
+	UKObjectsNotEqual(r2b, [[persistentRoot currentBranch] headRevision]);
+	UKObjectsEqual(r3, [[persistentRoot currentBranch] headRevision]);
 
 	[[persistentRoot currentBranch] redo];
 	[ctx commitWithUndoTrack: _testTrack];

@@ -29,6 +29,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch;
 
 - (void)updateRevisions;
 
-@property (readwrite, nonatomic) CORevision *newestRevision;
+@property (readwrite, nonatomic) CORevision *headRevision;
 
 @end

@@ -159,7 +159,7 @@ extern NSString * const kCOBranchLabel;
  *
  * This is the same than <code>[[self nodes] lastObject]</code>.
  */
-@property (readonly, nonatomic) CORevision *newestRevision;
+@property (readonly, nonatomic) CORevision *headRevision;
 
 - (void)reloadAtRevision: (CORevision *)revision;
 

@@ -146,7 +146,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 
 	for (COBranch *branch in [self branches])
 	{
-		NSDate *date = [[branch newestRevision] date];
+		NSDate *date = [[branch headRevision] date];
 
 		if (maxDate != nil && [[date earlierDate: maxDate] isEqualToDate: date])
 			continue;

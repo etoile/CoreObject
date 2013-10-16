@@ -266,7 +266,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	return [branch initialRevision];
 }
 
-- (CORevision *)newestRevision
+- (CORevision *)headRevision
 {
     if (_newestRevisionID != nil)
     {
@@ -276,7 +276,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return nil;
 }
 
-- (void)setNewestRevision: (CORevision *)aRevision
+- (void)setHeadRevision: (CORevision *)aRevision
 {
 	NILARG_EXCEPTION_TEST(aRevision);
 
@@ -374,7 +374,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 	if (![[[self branchInfo] headRevisionID] isEqual: _newestRevisionID])
     {
-        [self setNewestRevision:
+        [self setHeadRevision:
 		 [[self editingContext] revisionForRevisionID: [[self branchInfo] headRevisionID]]];
     }
 	
@@ -470,7 +470,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 - (CORevision *)redoRevision
 {
     CORevision *currentRevision = [self currentRevision];
-    CORevision *revision = [self newestRevision];
+    CORevision *revision = [self headRevision];
     
     if ([currentRevision isEqual: revision])
     {

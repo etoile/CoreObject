@@ -30,7 +30,7 @@
 	[ctx commit];
 	
 	UKNotNil(originalBranch.currentRevision);
-	UKNotNil(originalBranch.newestRevision);
+	UKNotNil(originalBranch.headRevision);
 	
 	altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
 	[ctx commit];
