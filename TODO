@@ -6,6 +6,8 @@ First alpha release blockers
 
 - Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
 
+- Fixed -parentBranch (see -testParentBranch)
+
 - Figure out how to handle inner object deletion vs -validateForDelete
 
 - Shorten -[COObject description] output
