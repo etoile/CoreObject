@@ -113,8 +113,6 @@ NSString * const kCOParent = @"parentContainer";
                                  entityDescription: desc
                                 objectGraphContext: self];
     
-    [obj addCachedOutgoingRelationships];
-    
 	return obj;
 }
 
