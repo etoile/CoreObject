@@ -729,45 +729,62 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	[_outgoingSerializedRelationshipCache setObject: serializedValue forKey: key];
 }
 
+/**
+ * Removes objects from their old parents (the new parent is the receiver).
+ *
+ * From a metamodel viewpoint, composite = children (incoming relationship) and
+ * container = parent (outgoing relationship).
+ *
+ * When moving objects into a composite relationship, if they are already 
+ * children in another composite relationship, we must remove them from the 
+ * previous composite relationship, since objects are limited to a single 
+ * parent in such a relationship.
+ *
+ * If the relationship is a composite (the children are the property value),
+ * and a child parent doesn't match the receiver, we remove the child from
+ * the children collection owned by its parent.
+ *
+ * For the inverse relationship (the parent property for each child), we have 
+ * nothing to do. COObject manages incoming relationships on our behalf.
+ */
 - (void)updateCompositeRelationshipForPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	// Remove objects in newValue from their old parents
-    // as perscribed by the COEditingContext class docs
-    // FIXME: Ugly implementation
     if ([propertyDesc isComposite] == NO)
 		return;
 
 	NSString *key = [propertyDesc name];
 	ETPropertyDescription *parentDesc = [propertyDesc opposite];
-	id aValue = [self valueForStorageKey: key];
-	
-	for (COObject *objectBeingInserted in ([propertyDesc isMultivalued] ? aValue : [NSArray arrayWithObject: aValue]))
+	id value = [self valueForStorageKey: key];
+	/* For parent-to-children relationship, just handle to-one or to-many in the same way  */
+	id <ETCollection> children =
+		([propertyDesc isMultivalued] ? value : [NSArray arrayWithObject: value]);
+
+	for (COObject *child in children)
 	{
-		COObject *objectBeingInsertedParent = [[objectBeingInserted incomingRelationshipCache] referringObjectForPropertyInTarget: [parentDesc name]];
+		/* From the child viewpoint (the child as target), the parent is a referring object */
+		COObject *oldParent = [[child incomingRelationshipCache]
+				referringObjectForPropertyInTarget: [parentDesc name]];
 		
 		// FIXME: Minor flaw, you can insert a composite twice if the collection is ordered.
 		// e.g.
-		// (a, b, c) => (a, b, c, a) since we only remove the objects from their old parents if the
-		// parent is different than the object we're inserting into
+		// (a, b, c) => (a, b, c, a) since we only remove the objects from their
+		// old parents if the parent is different than the object we're inserting into
+
+		if (oldParent == nil || oldParent == self)
+			continue;
 		
-		if (objectBeingInsertedParent != nil && objectBeingInsertedParent != self)
-		{
-			BOOL alreadyRemoved = NO;
-			
-			if (![[objectBeingInsertedParent valueForStorageKey: key] containsObject: objectBeingInserted])
-			{
-				// This is sort of a hack for EtoileUI.
-				// It handles removing the object from its old parent for us.
-				// In that case, don't try to do it ourselves.
-				// TODO: Decide the correct way to handle this
-				alreadyRemoved = YES;
-			}
-			
-			if (!alreadyRemoved)
-			{
-				[objectBeingInsertedParent removeObject: objectBeingInserted atIndex: ETUndeterminedIndex hint: nil forProperty: key];
-			}
-		}
+		// FIXME: EtoileUI handles removing the object from its old parent.
+		// In that case, don't try to do it ourselves.
+		id <ETCollection> oldParentChildren = [oldParent valueForStorageKey: key];
+		BOOL alreadyRemoved = (![oldParentChildren containsObject: child]);
+		
+		if (alreadyRemoved)
+			continue;
+
+		[oldParent removeObject: child
+		                atIndex: ETUndeterminedIndex
+		                   hint: nil
+		            forProperty: key];
 	}
 }
 
