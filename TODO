@@ -20,8 +20,6 @@ First alpha release blockers
 
 - Check code quality for all Core classes (underway)
 
-- Store/COSQLiteStore.m: Fix -revisionInfosForBranchUUID:... to use head revision ID
-
 - Support dictionaries in -collectionForProperty:removalIndex: and -collectionForProperty:insertionIndex: (write some tests too)
 
 Backlog from Oct 2nd
