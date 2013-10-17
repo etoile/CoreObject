@@ -53,7 +53,7 @@ objectGraphContext: (COObjectGraphContext *)aContext;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (CORelationshipCache *)relationshipCache;
+- (CORelationshipCache *)incomingRelationshipCache;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

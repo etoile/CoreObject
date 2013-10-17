@@ -343,9 +343,9 @@ serialization. */
 // serialization format has been removed.
 - (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
-    /* Check the _relationshipsAsCOPathOrETUUID cache */
+    /* Check the outgoing serialized relationship cache */
     
-    id relationship = [_relationshipsAsCOPathOrETUUID objectForKey: [aPropertyDesc name]];
+    id relationship = [_outgoingSerializedRelationshipCache objectForKey: [aPropertyDesc name]];
     if (relationship != nil)
     {
         return relationship;
@@ -677,7 +677,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
                 serializedValue = [serializedValue mutableCopy];
             }
 
-            [_relationshipsAsCOPathOrETUUID setObject: serializedValue
+            [_outgoingSerializedRelationshipCache setObject: serializedValue
                                                forKey: property];
         }
         

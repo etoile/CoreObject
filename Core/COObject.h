@@ -200,9 +200,19 @@
 	@protected
 	NSMutableDictionary *_variableStorage;
 	@private
-	/** Cache for inverse or incoming relationships e.g. parent(s) */
-    CORelationshipCache *_relationshipCache;
-    NSMutableDictionary *_relationshipsAsCOPathOrETUUID;
+	/** 
+	 * Storage for incoming relationships e.g. parent(s). CoreObject doesn't
+	 * allow storing incoming relationships in ivars or variable storage. 
+	 */
+    CORelationshipCache *_incomingRelationshipCache;
+	/** 
+	 * Cache keyed by property names for outgoing relationships represented as 
+	 * ETUUID or COPath object collections (sets or arrays). 
+	 * This cache is used to resolve references pointing to objects in other 
+	 * persistent roots, if these other persistent roots undergo a state switch 
+	 * (current revision change, branch switch etc.).
+	 */
+    NSMutableDictionary *_outgoingSerializedRelationshipCache;
 	BOOL _inDescription; // FIXME: remove; only for debugging
 	BOOL _isInitialized;
 }

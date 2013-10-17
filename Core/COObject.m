@@ -224,8 +224,8 @@ See +[NSObject typePrefix]. */
 	_objectGraphContext = aContext;
 	_isInitialized = YES;
 	_variableStorage = [self newVariableStorage];
-    _relationshipsAsCOPathOrETUUID = [self newOutgoingRelationshipCache];
-	_relationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
+    _outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
+	_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
 
 	[_objectGraphContext registerObject: self isNew: inserted];
 
@@ -292,8 +292,8 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	if (_variableStorage != nil)
 	{
 		newObject->_variableStorage = [self newVariableStorage];
-        newObject->_relationshipsAsCOPathOrETUUID = [self newOutgoingRelationshipCache];
-        newObject->_relationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
+        newObject->_outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
+        newObject->_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
 	}
 
 	return newObject;
@@ -616,9 +616,9 @@ objectGraphContext: (COObjectGraphContext *)aContext
     {
         if ([propDesc isMultivalued])
         {
-            return [_relationshipCache referringObjectsForPropertyInTarget: key];
+            return [_incomingRelationshipCache referringObjectsForPropertyInTarget: key];
         }
-        return [_relationshipCache referringObjectForPropertyInTarget: key];
+        return [_incomingRelationshipCache referringObjectForPropertyInTarget: key];
     }
 
 	id value = [_variableStorage objectForKey: key];
@@ -699,7 +699,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (void)updateOutgoingSerializedRelationshipCacheForProperty: (NSString *)key
 {
-	id originalRelationships = [_relationshipsAsCOPathOrETUUID objectForKey: key];
+	id originalRelationships = [_outgoingSerializedRelationshipCache objectForKey: key];
 
     if (originalRelationships == nil)
 		return;
@@ -712,10 +712,10 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	// -serializedValueForPropertyDescription: doesn't matter.
 	id serializedValue = [self serializedValueForValue: [self valueForStorageKey: key]];
 	
-	//NSLog(@"_relationshipsAsCOPathOrETUUID: setting %@ from %@ to %@", key,
-	//     [_relationshipsAsCOPathOrETUUID objectForKey: key], serializedValue);
+	//NSLog(@"Outgoing Relationship Cache: setting %@ from %@ to %@", key,
+	//     [_outgoingSerializedRelationshipCache objectForKey: key], serializedValue);
 	
-	[_relationshipsAsCOPathOrETUUID setObject: serializedValue forKey: key];
+	[_outgoingSerializedRelationshipCache setObject: serializedValue forKey: key];
 }
 
 - (void)updateCompositeRelationshipForPropertyDescription: (ETPropertyDescription *)propertyDesc
@@ -733,7 +733,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	
 	for (COObject *objectBeingInserted in ([propertyDesc isMultivalued] ? aValue : [NSArray arrayWithObject: aValue]))
 	{
-		COObject *objectBeingInsertedParent = [[objectBeingInserted relationshipCache] referringObjectForPropertyInTarget: [parentDesc name]];
+		COObject *objectBeingInsertedParent = [[objectBeingInserted incomingRelationshipCache] referringObjectForPropertyInTarget: [parentDesc name]];
 		
 		// FIXME: Minor flaw, you can insert a composite twice if the collection is ordered.
 		// e.g.
@@ -905,8 +905,8 @@ objectGraphContext: (COObjectGraphContext *)aContext
 {
 	assert(_variableStorage == nil);
 	_variableStorage = [self newVariableStorage];
-    _relationshipsAsCOPathOrETUUID = [self newOutgoingRelationshipCache];
-    _relationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
+    _outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
+    _incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
 }
 
 - (void)didLoad
@@ -1070,9 +1070,9 @@ static int indent = 0;
 
 #pragma mark - Framework Private
 
-- (CORelationshipCache *)relationshipCache
+- (CORelationshipCache *)incomingRelationshipCache
 {
-    return _relationshipCache;
+    return _incomingRelationshipCache;
 }
 
 - (COCrossPersistentRootReferenceCache *)crossReferenceCache
@@ -1080,9 +1080,29 @@ static int indent = 0;
     return [[_objectGraphContext editingContext] crossReferenceCache];
 }
 
+/**
+ * Cross persistent root references can become invalid, if other persistent 
+ * roots undergo a state switch (current revision change, branch switch etc.).
+ *
+ * An invalid reference points either to:
+ * - an outdated instance (although COObject are reused if loaded in memory)
+ * - a past object (or deleted object)
+ * - a future object (an object that doesn't exist yet in the current state)
+ *
+ * Calling -updateCrossPersistentRootReferences on every state switch ensures 
+ * the outdated instance case never occurs. CoreObject does it, so the problem 
+ * shouldn't arise.
+ *
+ * For a persistent root state switch, we use 
+ * -valueForSerializedValue:ofType:propertyDescription: to recreate each 
+ * persistent outgoing relationship in the receiver. This deserialization method 
+ * will hide or skip objects that corresponds to UUID or COPath elements that 
+ * cannot be resolved in the editing context (because their corresponding object 
+ * doesn't exist yet or has been deleted in the currently loaded state).
+ */
 - (void) updateCrossPersistentRootReferences
 {
-    for (NSString *key in [_relationshipsAsCOPathOrETUUID allKeys])
+    for (NSString *key in [_outgoingSerializedRelationshipCache allKeys])
     {
         ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
 		ETAssert([propDesc isPersistent]);
@@ -1091,13 +1111,13 @@ static int indent = 0;
 		COType collectionType = ([propDesc isOrdered] ? kCOTypeArray : kCOTypeSet);
         COType type = kCOTypeReference | ([propDesc isMultivalued] ? collectionType : 0);
 
-		id serializedValue = [_relationshipsAsCOPathOrETUUID objectForKey: key];
+		id serializedValue = [_outgoingSerializedRelationshipCache objectForKey: key];
         id value = [self valueForSerializedValue: serializedValue
 		                                  ofType: type
 		                     propertyDescription: propDesc];
         
         // N.B., we need to set this in a way that doesn't cause us to recalculate
-		// and overwrite the version stored in _relationshipsAsCOPathOrETUUID
+		// and overwrite the version stored in _outgoingSerializedRelationshipCache
         [self setValue: value forStorageKey: key];
     }
 }

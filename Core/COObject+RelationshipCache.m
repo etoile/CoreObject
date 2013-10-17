@@ -50,13 +50,13 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
             {
                 for (COObject *obj in aValue)
                 {
-                    [[obj relationshipCache] removeReferencesForPropertyInSource: [aProperty name]
+                    [[obj incomingRelationshipCache] removeReferencesForPropertyInSource: [aProperty name]
                                                                     sourceObject: self];
                 }
             }
             else
             {
-                [[(COObject *)aValue relationshipCache] removeReferencesForPropertyInSource: [aProperty name]
+                [[(COObject *)aValue incomingRelationshipCache] removeReferencesForPropertyInSource: [aProperty name]
                                                                                sourceObject: self];
             }
             
@@ -82,14 +82,14 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
                 {
                     for (COObject *obj in aValue)
                     {
-                        [[obj relationshipCache] addReferenceFromSourceObject: self
+                        [[obj incomingRelationshipCache] addReferenceFromSourceObject: self
                                                                sourceProperty: [aProperty name]
                                                                targetProperty: [propertyInTarget name]];
                     }
                 }
                 else
                 {
-                    [[(COObject *)aValue relationshipCache] addReferenceFromSourceObject: self
+                    [[(COObject *)aValue incomingRelationshipCache] addReferenceFromSourceObject: self
                                                                           sourceProperty: [aProperty name]
                                                                           targetProperty: [propertyInTarget name]];
                 }
@@ -97,7 +97,7 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
             
             // Update the cross-persistent root reference cache
             
-            id relationshipAsCOPathOrETUUID = [_relationshipsAsCOPathOrETUUID objectForKey: [aProperty name]];
+            id relationshipAsCOPathOrETUUID = [_outgoingSerializedRelationshipCache objectForKey: [aProperty name]];
             if ([aProperty isMultivalued])
             {
                 for (id refObject in relationshipAsCOPathOrETUUID)
