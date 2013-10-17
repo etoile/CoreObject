@@ -291,36 +291,35 @@
                                         revisionUUID: aRevisionUUID];
 }
 
-- (ETUUID *)currentRevisionUUIDForBranchUUID: (ETUUID *)aBranchUUID
+- (ETUUID *)headRevisionUUIDForBranchUUID: (ETUUID *)aBranchUUID
 {
 	NILARG_EXCEPTION_TEST(aBranchUUID);
 
-    __block ETUUID *prootUUID = nil;
+    __block ETUUID *revUUID = nil;
     
     assert(dispatch_get_current_queue() != queue_);
     
     dispatch_sync(queue_, ^(){
-        FMResultSet *rs = [db_ executeQuery: @"SELECT current_revid FROM branches WHERE uuid = ?",
+        FMResultSet *rs = [db_ executeQuery: @"SELECT head_revid FROM branches WHERE uuid = ?",
             [aBranchUUID dataValue]];
 
         if ([rs next])
         {
-            prootUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+            revUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
             ETAssert([rs next] == NO);
         }
 
         [rs close];
     });
                   
-	return prootUUID;
+	return revUUID;
 }
 
 - (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
                                 options: (COBranchRevisionReadingOptions)options
 {
 	ETUUID *prootUUID = [self persistentRootUUIDForBranchUUID: aBranchUUID];
-	// FIXME: Change to headRevisionUUID
-	ETUUID *currentRevUUID = [self currentRevisionUUIDForBranchUUID: aBranchUUID];
+	ETUUID *headRevUUID = [self headRevisionUUIDForBranchUUID: aBranchUUID];
 
     __block NSArray *result = nil;
     
@@ -331,7 +330,7 @@
 		[self backingStoreForPersistentRootUUID: prootUUID];
 
         result = [backingStore revisionInfosForBranchUUID: aBranchUUID
-                                         headRevisionUUID: currentRevUUID
+                                         headRevisionUUID: headRevUUID
                                                   options: options];
     });
     

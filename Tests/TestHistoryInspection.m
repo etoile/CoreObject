@@ -207,7 +207,7 @@
 - (void)testBasicBranchRevisions
 {
 	UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: 0]);
-	UKObjectsEqual(A(r3, r6), [self revisionsForBranch: branch1B options: 0]);
+	UKObjectsEqual(A(r3, r6, r8), [self revisionsForBranch: branch1B options: 0]);
 	UKObjectsEqual(A(r10), [self revisionsForBranch: branch1C options: 0]);
 	UKObjectsEqual(A(r4), [self revisionsForBranch: branch2A options: 0]);
 }
@@ -217,7 +217,7 @@
 	COBranchRevisionReadingOptions options = COBranchRevisionReadingParentBranches;
 
 	UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: options]);
-	UKObjectsEqual(A(r0, r1, r3, r6), [self revisionsForBranch: branch1B options: options]);
+	UKObjectsEqual(A(r0, r1, r3, r6, r8), [self revisionsForBranch: branch1B options: options]);
 	UKObjectsEqual(A(r0, r1, r3, r6, r10), [self revisionsForBranch: branch1C options: options]);
 	UKObjectsEqual(A(r0, r1, r2, r4), [self revisionsForBranch: branch2A options: options]);
 }
@@ -228,8 +228,7 @@
 		(COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions);
 	
 	UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: options]);
-	/* Divergent revisions that follow the head revision are ignored (e.g. r8) */
-	UKObjectsEqual(A(r0, r1, r3, r5, r6), [self revisionsForBranch: branch1B options: options]);
+	UKObjectsEqual(A(r0, r1, r3, r5, r6, r8), [self revisionsForBranch: branch1B options: options]);
 	UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
 	UKObjectsEqual(A(r0, r1, r2, r4), [self revisionsForBranch: branch2A options: options]);
 }
@@ -242,7 +241,10 @@
 
 - (void)testBranchNodes
 {
-	UKObjectsEqual(A(r0, r1, r2, r4), [branch2A nodes]);
+	UKObjectsEqual((@[r0, r1, r2]), [branch1A nodes]);
+	UKObjectsEqual((@[r0, r1, r3, r6, r8]), [branch1B nodes]);
+	UKObjectsEqual((@[r0, r1, r3, r6, r10]), [branch1C nodes]);
+	UKObjectsEqual((@[r0, r1, r2, r4]), [branch2A nodes]);
 }
 
 - (void)testBranchNodeUpdateForNewCommit
