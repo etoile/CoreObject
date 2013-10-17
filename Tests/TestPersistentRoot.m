@@ -305,54 +305,30 @@
 // Check that attempting to commit modifications to a deleted persistent root
 // raises an exception
 
-// FIXME: Refactor the tests so each test is only expressed once (in a block?)
-// which is then run on both ctx and a fresh context. At present, each test
-// is copied & pasted.
-
 - (void) testExceptionOnDeletedPersistentRootSetRevision
 {
 	persistentRoot.deleted = YES;
 	[ctx commit];
 	
-	persistentRoot.currentRevision = r0;
-	UKRaisesException([ctx commit]);
-}
-
-- (void) testExceptionOnDeletedPersistentRootSetRevisionInSecondContext
-{
-	persistentRoot.deleted = YES;
-	[ctx commit];
-	
-	// Load in another context
-	{
-		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-		ctx2persistentRoot.currentRevision = r0;
-		UKRaisesException([ctx2 commit]);
-	}
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 testProot.currentRevision = r0;
+		 UKRaisesException([testCtx commit]);
+	 }];
 }
 
 - (void) testExceptionOnDeletedPersistentRootModifyEmbeddedObject
 {
 	persistentRoot.deleted = YES;
 	[ctx commit];
-	
-	[[persistentRoot rootObject] setLabel: @"hi"];
-	UKRaisesException([ctx commit]);
-}
 
-- (void) testExceptionOnDeletedPersistentRootModifyEmbeddedObjectInSecondContext
-{
-	persistentRoot.deleted = YES;
-	[ctx commit];
-	
-	// Load in another context
-	{
-		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-		[[ctx2persistentRoot rootObject] setLabel: @"hi"];
-		UKRaisesException([ctx2 commit]);
-	}
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 [[testProot rootObject] setLabel: @"hi"];
+		 UKRaisesException([testCtx commit]);
+	 }];
 }
 
 - (void) testExceptionOnDeletedPersistentRootCreateBranch
@@ -360,53 +336,29 @@
 	persistentRoot.deleted = YES;
 	[ctx commit];
 	
-	COBranch *shouldFailToCommit = [originalBranch makeBranchWithLabel: @"shouldFailToCommit"];
-	UKNotNil(shouldFailToCommit);
-	UKRaisesException([ctx commit]);
-}
-
-- (void) testExceptionOnDeletedPersistentRootCreateBranchInSecondContext
-{
-	persistentRoot.deleted = YES;
-	[ctx commit];
-	
-	// Load in another context
-	{
-		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-		COBranch *shouldFailToCommit = [[ctx2persistentRoot currentBranch] makeBranchWithLabel: @"shouldFailToCommit"];
-		UKNotNil(shouldFailToCommit);
-		UKRaisesException([ctx2 commit]);
-	}
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 COBranch *shouldFailToCommit = [testBranch makeBranchWithLabel: @"shouldFailToCommit"];
+		 UKNotNil(shouldFailToCommit);
+		 UKRaisesException([testCtx commit]);
+	 }];
 }
 
 - (void) testExceptionOnDeletedPersistentRootDeleteBranch
 {
 	COBranch *altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
 	[ctx commit];
-	
-	persistentRoot.deleted = YES;
-	[ctx commit];
-	
-	altBranch.deleted = YES;
-	UKRaisesException([ctx commit]);
-}
-
-- (void) testExceptionOnDeletedPersistentRootDeleteBranchInSecondContext
-{
-	COBranch *altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
-	[ctx commit];
 
 	persistentRoot.deleted = YES;
 	[ctx commit];
 	
-	// Load in another context
-	{
-		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-		[ctx2persistentRoot branchForUUID: [altBranch UUID]].deleted = YES;
-		UKRaisesException([ctx2 commit]);
-	}
+	[self testBranchWithExistingAndNewContext: altBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 testBranch.deleted = YES;
+		 UKRaisesException([testCtx commit]);
+	 }];
 }
 
 - (void) testExceptionOnDeletedPersistentRootUndeleteBranch
@@ -420,28 +372,12 @@
 	persistentRoot.deleted = YES;
 	[ctx commit];
 	
-	deletedBranch.deleted = NO;
-	UKRaisesException([ctx commit]);
-}
-
-- (void) testExceptionOnDeletedPersistentRootUndeleteBranchInSecondContext
-{
-	COBranch *deletedBranch = [originalBranch makeBranchWithLabel: @"deletedBranch"];
-	[ctx commit];
-	
-	deletedBranch.deleted = YES;
-	[ctx commit];
-	
-	persistentRoot.deleted = YES;
-	[ctx commit];
-	
-	// Load in another context
-	{
-		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-		[ctx2persistentRoot branchForUUID: [deletedBranch UUID]].deleted = NO;
-		UKRaisesException([ctx2 commit]);
-	}
+	[self testBranchWithExistingAndNewContext: deletedBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 testBranch.deleted = NO;
+		 UKRaisesException([testCtx commit]);
+	 }];
 }
 
 - (void) testExceptionOnDeletedPersistentRootSetBranchMetadata
@@ -449,22 +385,12 @@
 	persistentRoot.deleted = YES;
 	[ctx commit];
 	
-	originalBranch.metadata = @{@"hello" : @"world"};
-	UKRaisesException([ctx commit]);
-}
-
-- (void) testExceptionOnDeletedPersistentRootSetBranchMetadataInSecondContext
-{
-	persistentRoot.deleted = YES;
-	[ctx commit];
-	
-	// Load in another context
+	[self testBranchWithExistingAndNewContext: originalBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	{
-		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-		[ctx2persistentRoot branchForUUID: [originalBranch UUID]].metadata = @{@"hello" : @"world"};
-		UKRaisesException([ctx2 commit]);
-	}
+		testBranch.metadata = @{@"hello" : @"world"};
+		UKRaisesException([testCtx commit]);
+	}];
 }
 
 // TODO: Test these behaviours during deleted->undeleted and undeleted->deleted

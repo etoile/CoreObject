@@ -51,6 +51,30 @@ NSString * const kCOParent = @"parentContainer";
     return self;
 }
 
+- (void) testBranchWithExistingAndNewContext: (COBranch *)aBranch
+									 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block
+{
+	block([aBranch editingContext], [aBranch persistentRoot], aBranch, NO);
+	
+	// Create a second, isolated context that opens a new store object
+	// at the current one's URL
+	
+	COEditingContext *ctx2 = [COEditingContext contextWithURL: [[[aBranch persistentRoot] store] URL]];
+	COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: [[aBranch persistentRoot] UUID]];
+	COBranch *ctx2Branch = [ctx2PersistentRoot branchForUUID: [aBranch UUID]];
+	
+	// Run the tests again
+	
+	block(ctx2, ctx2PersistentRoot, ctx2Branch, YES);
+}
+
+- (void) testPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
+											 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block
+{
+	[self testBranchWithExistingAndNewContext: [aPersistentRoot editingBranch]
+									  inBlock: block];
+}
+
 @end
 
 @implementation COObjectGraphContext (TestCommon)

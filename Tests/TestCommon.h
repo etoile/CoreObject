@@ -58,6 +58,29 @@ extern NSString * const kCOParent;
 	COEditingContext *ctx;
 }
 
+/**
+ * Execute the given block once, passing in to the block the context and persistent
+ * root of the provided branch. Then, open a new editing context and store object,
+ * and run the block again.
+ *
+ * The intended use is for cases when you want to check some properties of an
+ * editing context/persistent root/branch after a commit. If the commit was
+ * successful, the observable state should be the same on the existing context
+ * that made the commit, as well as a freshly created context.
+ *
+ * The isNewContext flag is NO when the block is executing with aBranch's
+ * context/store, and YES when the block is executing with the reloaded context.
+ */
+- (void) testBranchWithExistingAndNewContext: (COBranch *)aBranch
+									 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
+
+/**
+ * Same as above but uses the provided persistent root's editing branch
+ */
+- (void) testPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
+											 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
+
+
 @end
 
 @interface COObjectGraphContext (TestCommon)
