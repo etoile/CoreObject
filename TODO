@@ -263,6 +263,10 @@ Future Work
 - Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
 - Switch from FMDB to an SQL abstraction backend
 - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
+- Figure out how to compute and present each core object size... Possible choices would be:
+	- a raw size including the object history data
+	- a snapshot size (excluding the history data)
+	- a directory or file size to be expected if the object is exported
 x Figure out how to navigate large root object sets very quickly (evaluate writing a COSQLCursor class)/
   How to scroll smoothly through 50 000 root objects in an Object Manager without loading all the objects in memory?
   - I think we more or less have this figured out

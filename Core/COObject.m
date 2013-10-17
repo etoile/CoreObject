@@ -60,47 +60,45 @@ See +[NSObject typePrefix]. */
 
 	[object setLocalizedDescription: _(@"Basic Object")];
 
-	ETPropertyDescription *nameProperty = 
-		[ETPropertyDescription descriptionWithName: @"name" type: (id)@"Anonymous.NSString"];
-	// TODO: Declare as a transient property... ETLayoutItem overrides it to be 
-	// a persistent property.
-	//ETPropertyDescription *idProperty = 
-	//	[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"Anonymous.NSString"];
-	ETPropertyDescription *lastVersionDescProperty = 
-		[ETPropertyDescription descriptionWithName: @"lastVersionDescription" type: (id)@"Anonymous.NSString"];
-	ETPropertyDescription *tagDescProperty = 
-		[ETPropertyDescription descriptionWithName: @"tagDescription" type: (id)@"Anonymous.NSString"];
-	ETPropertyDescription *typeDescProperty = 
-		[ETPropertyDescription descriptionWithName: @"typeDescription" type: (id)@"Anonymous.NSString"];
-
-	// TODO: Figure out how to compute and present each core object size...
-	// Possible choices would be:
-	// - a raw size including the object history data
-	// - a snapshot size (excluding the history data)
-	// - a directory or file size to be expected if the object is exported
+	ETPropertyDescription *name = 
+		[ETPropertyDescription descriptionWithName: @"name" type: (id)@"NSString"];
+	ETPropertyDescription *identifier =
+		[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"NSString"];
+	[identifier setReadOnly: YES];
+	ETPropertyDescription *revisionDescription =
+		[ETPropertyDescription descriptionWithName: @"revisionDescription" type: (id)@"NSString"];
+	[revisionDescription setReadOnly: YES];
+	ETPropertyDescription *tagDescription =
+		[ETPropertyDescription descriptionWithName: @"tagDescription" type: (id)@"NSString"];
+	[tagDescription setReadOnly: YES];
+	ETPropertyDescription *typeDescription =
+		[ETPropertyDescription descriptionWithName: @"typeDescription" type: (id)@"NSString"];
+	[typeDescription setReadOnly: YES];
 
 	// TODO: Move these properties to EtoileFoundation... See -[NSObject propertyNames].
 	// We should create a NSObject entity description and use it as our parent entity probably.
 #ifndef GNUSTEP // We don't link NSImage on GNUstep because AppKit won't work
-	ETPropertyDescription *iconProperty = 
-		[ETPropertyDescription descriptionWithName: @"icon" type: (id)@"Anonymous.NSImage"];
+	ETPropertyDescription *icon = 
+		[ETPropertyDescription descriptionWithName: @"icon" type: (id)@"NSImage"];
 #endif // GNUSTEP
-	ETPropertyDescription *displayNameProperty = 
-		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"Anonymous.NSString"];
+	ETPropertyDescription *displayName = 
+		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"NSString"];
 
-	ETPropertyDescription *tagsProperty = 
-		[ETPropertyDescription descriptionWithName: @"tags" type: (id)@"Anonymous.COTag"];
-	[tagsProperty setMultivalued: YES];
-	[tagsProperty setOrdered: YES];
+	ETPropertyDescription *tags  = 
+		[ETPropertyDescription descriptionWithName: @"tags" type: (id)@"COTag"];
+	[tags setMultivalued: YES];
+	[tags setOrdered: YES];
 
-	NSArray *transientProperties = A(displayNameProperty, lastVersionDescProperty, tagDescProperty, typeDescProperty);
+	NSArray *transientProperties = A(identifier, displayName,
+		revisionDescription, tagDescription, typeDescription);
 #ifndef GNUSTEP
-	transientProperties = [transientProperties arrayByAddingObject: iconProperty];
+	transientProperties = [transientProperties arrayByAddingObject: icon];
 #endif
-	NSArray *persistentProperties = A(nameProperty, tagsProperty);
+	NSArray *persistentProperties = A(name, tags);
 
 	[[persistentProperties mappedCollection] setPersistent: YES];
-	[object setPropertyDescriptions: [transientProperties arrayByAddingObjectsFromArray: persistentProperties]];
+	[object setPropertyDescriptions:
+	 	[transientProperties arrayByAddingObjectsFromArray: persistentProperties]];
 
 	return object;
 }
