@@ -129,6 +129,14 @@
  * }
  * </example>
  *
+ * To implement a getter that returns an incoming relationships e.g. parent(s), 
+ * just use -valueForVariableStorageKey: (see the -name getter example above).
+ *
+ * You must never implement incoming relationship setters. 
+ *
+ * To access incoming relationships when no accessors are available, just 
+ * use -valueForProperty: as you would do it for other properties.
+ *
  * @section Notifications
  *
  * To better control persistency, -awakeFromFetch, -didReload, -willTurnIntoFault

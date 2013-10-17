@@ -89,7 +89,7 @@
 
 - (id) content
 {
-	return [self valueForProperty: [self contentKey]];
+	return [self valueForVariableStorageKey: [self contentKey]];
 }
 
 - (NSArray *) contentArray

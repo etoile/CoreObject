@@ -603,6 +603,11 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	return (![propDesc isPersistent] && nil != [propDesc opposite] && [[propDesc opposite] isPersistent]);
 }
 
+/**
+ * Can return incoming relationships, although they are not stored in the 
+ * variable storage, just to ensure that both -valueForStorageKey: and 
+ * -valueForProperty: return incoming relationships.
+ */
 - (id)valueForVariableStorageKey: (NSString *)key
 {
     ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
@@ -657,7 +662,6 @@ objectGraphContext: (COObjectGraphContext *)aContext
 {
 	if (ETSetInstanceVariableValueForKey(self, value, key) == NO)
 	{
-		/* If no valid ivar can be found, we access the variable storage */
 		[self setValue: value forVariableStorageKey: key];
 	}
 }

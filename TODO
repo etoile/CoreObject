@@ -267,6 +267,7 @@ Future Work
 	- a raw size including the object history data
 	- a snapshot size (excluding the history data)
 	- a directory or file size to be expected if the object is exported
+- Turn COObject into zombies once garbage collected (see -markAsRemovedFromContext)
 x Figure out how to navigate large root object sets very quickly (evaluate writing a COSQLCursor class)/
   How to scroll smoothly through 50 000 root objects in an Object Manager without loading all the objects in memory?
   - I think we more or less have this figured out
