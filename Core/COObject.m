@@ -60,45 +60,61 @@ See +[NSObject typePrefix]. */
 
 	[object setLocalizedDescription: _(@"Basic Object")];
 
-	ETPropertyDescription *name = 
+	/* Persistency Attributes (subset) */
+
+	ETPropertyDescription *UUID =
+		[ETPropertyDescription descriptionWithName: @"UUID" type: (id)@"ETUUID"];
+	ETPropertyDescription *isPersistent =
+		[ETPropertyDescription descriptionWithName: @"isPersistent" type: (id)@"BOOL"];
+	ETPropertyDescription *isRoot =
+		[ETPropertyDescription descriptionWithName: @"isRoot" type: (id)@"BOOL"];
+
+	/* Basic Properties */
+
+	ETPropertyDescription *name =
 		[ETPropertyDescription descriptionWithName: @"name" type: (id)@"NSString"];
 	ETPropertyDescription *identifier =
 		[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"NSString"];
-	[identifier setReadOnly: YES];
-	ETPropertyDescription *revisionDescription =
-		[ETPropertyDescription descriptionWithName: @"revisionDescription" type: (id)@"NSString"];
-	[revisionDescription setReadOnly: YES];
-	ETPropertyDescription *tagDescription =
-		[ETPropertyDescription descriptionWithName: @"tagDescription" type: (id)@"NSString"];
-	[tagDescription setReadOnly: YES];
-	ETPropertyDescription *typeDescription =
-		[ETPropertyDescription descriptionWithName: @"typeDescription" type: (id)@"NSString"];
-	[typeDescription setReadOnly: YES];
-
-	// TODO: Move these properties to EtoileFoundation... See -[NSObject propertyNames].
-	// We should create a NSObject entity description and use it as our parent entity probably.
-#ifndef GNUSTEP // We don't link NSImage on GNUstep because AppKit won't work
-	ETPropertyDescription *icon = 
-		[ETPropertyDescription descriptionWithName: @"icon" type: (id)@"NSImage"];
-#endif // GNUSTEP
-	ETPropertyDescription *displayName = 
-		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"NSString"];
-
-	ETPropertyDescription *tags  = 
+	ETPropertyDescription *tags  =
 		[ETPropertyDescription descriptionWithName: @"tags" type: (id)@"COTag"];
 	[tags setMultivalued: YES];
 	[tags setOrdered: YES];
 
-	NSArray *transientProperties = A(identifier, displayName,
-		revisionDescription, tagDescription, typeDescription);
+	// TODO: Move these properties to EtoileFoundation (by adding a NSObject
+	// entity description) or just use -basicPropertyNames in
+	//-[COObject propertyNames]... See -[NSObject propertyNames] and remove
+	// some properties in -basicPropertyNames (e.g. hash or superclass).
+
+#ifndef GNUSTEP 
+	// FIXME: We don't link NSImage on GNUstep because AppKit won't work
+	ETPropertyDescription *icon = 
+		[ETPropertyDescription descriptionWithName: @"icon" type: (id)@"NSImage"];
+#endif
+	ETPropertyDescription *displayName = 
+		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"NSString"];
+
+	/* Description Properties */
+
+	ETPropertyDescription *revisionDescription =
+		[ETPropertyDescription descriptionWithName: @"revisionDescription" type: (id)@"NSString"];
+	ETPropertyDescription *tagDescription =
+		[ETPropertyDescription descriptionWithName: @"tagDescription" type: (id)@"NSString"];
+	ETPropertyDescription *typeDescription =
+		[ETPropertyDescription descriptionWithName: @"typeDescription" type: (id)@"NSString"];
+
+	NSArray *transientProperties = A(UUID, isPersistent, isRoot, identifier,
+		displayName, revisionDescription, tagDescription, typeDescription);
 #ifndef GNUSTEP
 	transientProperties = [transientProperties arrayByAddingObject: icon];
 #endif
 	NSArray *persistentProperties = A(name, tags);
+	NSArray *properties =
+		[transientProperties arrayByAddingObjectsFromArray: persistentProperties];
 
+	[[[properties arrayByRemovingObject: @"name"] mappedCollection] setReadOnly: YES];
 	[[persistentProperties mappedCollection] setPersistent: YES];
-	[object setPropertyDescriptions:
-	 	[transientProperties arrayByAddingObjectsFromArray: persistentProperties]];
+
+	[object setPropertyDescriptions: properties];
 
 	return object;
 }
@@ -343,7 +359,8 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (NSSet *) observableKeyPaths
 {
-	return S(@"name", @"revisionDescription", @"tagDescription");
+	return S(@"isPersistent", @"name", @"displayName", @"tags",
+		@"revisionDescription", @"tagDescription");
 }
 
 - (NSArray *)propertyNames
