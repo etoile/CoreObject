@@ -464,7 +464,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	{
 		if ([value isKindOfClass: [COObject class]])
 		{
-			assert([[value persistentRoot] parentContext] == [[self persistentRoot] parentContext]);
+			ETAssert([[value persistentRoot] parentContext] == [[self persistentRoot] parentContext]);
 		}    
 	}
 }
@@ -605,8 +605,8 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 /**
  * Can return incoming relationships, although they are not stored in the 
- * variable storage, just to ensure that both -valueForStorageKey: and 
- * -valueForProperty: return incoming relationships.
+ * variable storage. This allows -valueForStorageKey: and -valueForProperty: to 
+ * both return incoming relationships.
  */
 - (id)valueForVariableStorageKey: (NSString *)key
 {
@@ -701,24 +701,31 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	//}
 }
 
+/**
+ * For an outgoing relationship, turns COObject elements into ETUUID and COPath 
+ * collections that we keep cached.
+ *
+ * For attributes, and incoming or transient relationships, does nothing.
+ *
+ * See -updateCrossPersistentRootReferences.
+ */
 - (void)updateOutgoingSerializedRelationshipCacheForProperty: (NSString *)key
 {
-	id originalRelationships = [_outgoingSerializedRelationshipCache objectForKey: key];
+	BOOL isOutgoingPersistentRelationship =
+		([_outgoingSerializedRelationshipCache objectForKey: key] != nil);
 
-    if (originalRelationships == nil)
+    if (isOutgoingPersistentRelationship == NO)
 		return;
-
-	// Re-serialize the current value from COObject to ETUUID/COPath
 	
-	// NOTE: We cannot -serializedValueForPropertyDescription: since this method
-	// attempts to access the cache we want to update.
+	// NOTE: We cannot use -serializedValueForPropertyDescription: since the
+	// latter method attempts to access the cache we want to update.
 	// For relationships, serialization accessors are not allowed, so skipping  
 	// -serializedValueForPropertyDescription: doesn't matter.
 	id serializedValue = [self serializedValueForValue: [self valueForStorageKey: key]];
 	
 	//NSLog(@"Outgoing Relationship Cache: setting %@ from %@ to %@", key,
 	//     [_outgoingSerializedRelationshipCache objectForKey: key], serializedValue);
-	
+
 	[_outgoingSerializedRelationshipCache setObject: serializedValue forKey: key];
 }
 
@@ -731,7 +738,6 @@ objectGraphContext: (COObjectGraphContext *)aContext
 		return;
 
 	NSString *key = [propertyDesc name];
-
 	ETPropertyDescription *parentDesc = [propertyDesc opposite];
 	id aValue = [self valueForStorageKey: key];
 	
@@ -796,9 +802,12 @@ objectGraphContext: (COObjectGraphContext *)aContext
 		if (![desc isMultivalued])
 		{
 			[NSException raise: NSInvalidArgumentException 
-						format: @"Attempt to call addObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
+						format: @"Attempt to call addObject:forProperty: for %@ "
+			                     "which is not a multivalued property of %@",
+			                     key, self];
 		}
-		if (!([collection isKindOfClass: [NSMutableArray class]] || [collection isKindOfClass: [NSMutableSet class]]))
+		if (!([collection isKindOfClass: [NSMutableArray class]]
+		   || [collection isKindOfClass: [NSMutableSet class]]))
 		{
 			[NSException raise: NSInternalInconsistencyException 
 						format: @"Multivalued property not set up properly"];
@@ -808,11 +817,15 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	{
 		if (!([desc isMultivalued] && [desc isOrdered]))
 		{
-			[NSException raise: NSInvalidArgumentException format: @"Attempt to call insertObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
+			[NSException raise: NSInvalidArgumentException
+						format: @"Attempt to call insertObject:atIndex:forProperty: "
+			                     "for %@ which is not an ordered multivalued property of %@",
+			                     key, self];
 		}
 		if (!([collection isKindOfClass: [NSMutableArray class]]))
 		{
-			[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+			[NSException raise: NSInternalInconsistencyException
+			            format: @"Multivalued property not set up properly"];
 		}
 	}
 	return collection;
@@ -839,22 +852,31 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	{
 		if (![desc isMultivalued])
 		{
-			[NSException raise: NSInvalidArgumentException format: @"Attempt to call removeObject:forProperty: for %@ which is not a multivalued property of %@", key, self];
+			[NSException raise: NSInvalidArgumentException
+			            format: @"Attempt to call removeObject:forProperty: for "
+			                     "%@ which is not a multivalued property of %@",
+			                     key, self];
 		}
-		if (!([collection isKindOfClass: [NSMutableArray class]] || [collection isKindOfClass: [NSMutableSet class]]))
+		if (!([collection isKindOfClass: [NSMutableArray class]]
+		   || [collection isKindOfClass: [NSMutableSet class]]))
 		{
-			[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+			[NSException raise: NSInternalInconsistencyException
+			            format: @"Multivalued property not set up properly"];
 		}
 	}
 	else
 	{
 		if (!([desc isMultivalued] && [desc isOrdered]))
 		{
-			[NSException raise: NSInvalidArgumentException format: @"Attempt to call removeObject:atIndex:forProperty: for %@ which is not an ordered multivalued property of %@", key, self];
+			[NSException raise: NSInvalidArgumentException
+			            format: @"Attempt to call removeObject:atIndex:forProperty: "
+			                     "for %@ which is not an ordered multivalued property of %@",
+			                     key, self];
 		}
 		if (!([collection isKindOfClass: [NSMutableArray class]]))
 		{
-			[NSException raise: NSInternalInconsistencyException format: @"Multivalued property not set up properly"];
+			[NSException raise: NSInternalInconsistencyException
+			            format: @"Multivalued property not set up properly"];
 		}
 	}
 	return collection;
@@ -907,7 +929,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (void)willLoad
 {
-	assert(_variableStorage == nil);
+	ETAssert(_variableStorage == nil);
 	_variableStorage = [self newVariableStorage];
     _outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
     _incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];

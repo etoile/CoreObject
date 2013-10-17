@@ -6,8 +6,6 @@ First alpha release blockers
 
 - Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
 
-- Figure out how to handle inner object deletion vs -validateForDelete
-
 - Shorten -[COObject description] output
 
 - Improve -[COObject detailedDescription] code and make output more readable
@@ -23,6 +21,8 @@ First alpha release blockers
 - Check code quality for all Core classes (underway)
 
 - Store/COSQLiteStore.m: Fix -revisionInfosForBranchUUID:... to use head revision ID
+
+- Support dictionaries in -collectionForProperty:removalIndex: and -collectionForProperty:insertionIndex: (write some tests too)
 
 Backlog from Oct 2nd
 --------------------
