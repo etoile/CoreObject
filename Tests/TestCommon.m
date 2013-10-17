@@ -71,8 +71,22 @@ NSString * const kCOParent = @"parentContainer";
 - (void) testPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
 											 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block
 {
-	[self testBranchWithExistingAndNewContext: [aPersistentRoot editingBranch]
-									  inBlock: block];
+	// N.B. This method is not merely a wrapper around -testBranchWithExistingAndNewContext:
+	// because for the second execution of the block I want to pass in the current branch that
+	// was persistent.
+	
+	block([aPersistentRoot editingContext], aPersistentRoot, [aPersistentRoot currentBranch], NO);
+	
+	// Create a second, isolated context that opens a new store object
+	// at the current one's URL
+	
+	COEditingContext *ctx2 = [COEditingContext contextWithURL: [[aPersistentRoot store] URL]];
+	COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: [aPersistentRoot UUID]];
+	COBranch *ctx2Branch = [ctx2PersistentRoot currentBranch];
+	
+	// Run the tests again
+	
+	block(ctx2, ctx2PersistentRoot, ctx2Branch, YES);
 }
 
 @end

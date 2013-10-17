@@ -75,7 +75,7 @@ extern NSString * const kCOParent;
 									 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
 
 /**
- * Same as above but uses the provided persistent root's editing branch
+ * Same as above but uses the provided persistent root's current branch
  */
 - (void) testPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
 											 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;

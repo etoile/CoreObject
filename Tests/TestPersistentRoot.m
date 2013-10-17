@@ -53,22 +53,24 @@
     
     [persistentRoot commit];
 	
-    UKIntsEqual(2, [[[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys] count]);
-	UKStringsEqual(@"Sandbox", [branch label]);
-    
-	//UKObjectsEqual(commitTrack, [branch parentTrack]);
-	UKObjectsEqual([rootObj persistentRoot], [branch persistentRoot]);
-	//UKTrue([rev1 isEqual: [rev2 baseRevision]]);
-	
-	UKObjectsEqual(rev1, [originalBranch currentRevision]);
-	UKObjectsEqual(rev1, [branch currentRevision]);
-	//UKObjectsEqual(rev1, [branch parentRevision]);
+	[self testBranchWithExistingAndNewContext: branch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKIntsEqual(2, [[testProot branches] count]);
+		 UKStringsEqual(@"Sandbox", [testBranch label]);
+		 UKObjectsEqual([originalBranch UUID], [[testBranch parentBranch] UUID]);
+		 
+		 UKObjectsEqual(testProot, [testBranch persistentRoot]);
+		 
+		 UKObjectsEqual(rev1, [testBranch currentRevision]);
+	 }];
+
+	/* Branch creation doesn't switch the branch */
+	UKObjectsEqual(originalBranch, [persistentRoot currentBranch]);
 	
 	/* Branch creation doesn't touch the current persistent root revision */
-	UKObjectsEqual([rootObj revision], rev1);
-	
-	/* Branch creation doesn't switch the branch */
-	UKObjectsSame(originalBranch, [[rootObj persistentRoot] currentBranch]);
+	UKObjectsEqual(rev1, [rootObj revision]);
+	UKObjectsEqual(rev1, [originalBranch currentRevision]);
 }
 
 - (void)testBranchSwitch
@@ -149,17 +151,14 @@
     UKObjectsEqual(A(@"childB"), [[photo1 rootObject] valueForKeyPath: @"contents.label"]);
     [ctx commit];
     
-    {
-        // Test that the cross-persistent reference uses branchB when we reopen the store
+    // Test that the cross-persistent reference uses branchB when we reopen the store
         
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: [photo1 UUID]];
-        
-        // Sanity check
-        
-        UKObjectsEqual([branchB UUID], [[photo1ctx2 currentBranch] UUID]);
-        UKObjectsEqual(A(@"childB"), [[photo1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
-    }
+	[self testPersistentRootWithExistingAndNewContext: photo1
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPhoto1, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual([branchB UUID], [[testPhoto1 currentBranch] UUID]);
+		 UKObjectsEqual(A(@"childB"), [[testPhoto1 rootObject] valueForKeyPath: @"contents.label"]);
+	 }];
 }
 
 - (void) testBranchSwitchPersistent
@@ -174,15 +173,13 @@
     [persistentRoot setCurrentBranch: secondBranch];
     [ctx commit];
     
-    // Load in another context
-    {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
-        
-        UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
-        UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
-    }
+	[self testBranchWithExistingAndNewContext: secondBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testSecondBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual(testSecondBranch, [testProot currentBranch]);
+		 UKObjectsEqual(@"hello2", [[testProot rootObject] label]);
+		 UKObjectsEqual(@"hello", [[[testProot branchForUUID: [originalBranch UUID]] rootObject] label]);
+	 }];
 }
 
 - (void) testSetCurrentBranchAndDeleteBranch
@@ -234,8 +231,7 @@
 	
     [ctx commit];
     
-    // FIXME: Not yet supported by COBranch:
-    //UKObjectsEqual(commitTrack, [branch parentTrack]);
+	UKObjectsEqual(originalBranch, [copyRootBranch parentBranch]);
 	
 	/* Cheap copy creation doesn't touch the current persistent root revision */
 	UKObjectsEqual([[persistentRoot rootObject] revision], rev1);
@@ -283,23 +279,16 @@
     
     [ctx commit];
     
-	UKObjectsEqual(S(originalBranch), [persistentRoot branches]);
-	UKTrue([[persistentRoot branchesPendingDeletion] isEmpty]);
-	UKObjectsEqual(S(branch), [persistentRoot deletedBranches]);
-	UKTrue([branch isDeleted]);
-	
-    // Load in another context
-    {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        COBranch *ctx2originalBranch = [ctx2persistentRoot branchForUUID: [originalBranch UUID]];
-        COBranch *ctx2branch = [ctx2persistentRoot branchForUUID: [branch UUID]];
-        
-        UKObjectsEqual(S(ctx2originalBranch), [ctx2persistentRoot branches]);
-		UKTrue([[ctx2persistentRoot branchesPendingDeletion] isEmpty]);
-		UKObjectsEqual(S(ctx2branch), [ctx2persistentRoot deletedBranches]);
-        UKTrue([ctx2branch isDeleted]);
-    }
+	[self testBranchWithExistingAndNewContext: branch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 COBranch *testOriginalBranch = [testProot branchForUUID: [originalBranch UUID]];
+		 
+		 UKObjectsEqual(S(testOriginalBranch), [testProot branches]);
+		 UKTrue([[testProot branchesPendingDeletion] isEmpty]);
+		 UKObjectsEqual(S(testBranch), [testProot deletedBranches]);
+		 UKTrue([testBranch isDeleted]);
+	 }];
 }
 
 // Check that attempting to commit modifications to a deleted persistent root
