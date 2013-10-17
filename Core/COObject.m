@@ -598,23 +598,27 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 #pragma mark - Direct Access to Property Storage
 
+- (BOOL)isIncomingRelationship: (ETPropertyDescription *)propDesc
+{
+	return (![propDesc isPersistent] && nil != [propDesc opposite] && [[propDesc opposite] isPersistent]);
+}
+
 - (id)valueForVariableStorageKey: (NSString *)key
 {
     ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
 
-    // Special case for searching the relationship cache
-    if (![propDesc isPersistent]
-        && (nil != [propDesc opposite])
-        && ([[propDesc opposite] isPersistent]))
+	// NOTE: In CoreObject, incoming relationships (e.g. parent(s)) are stored 
+	// in an incoming relationship cache per object and not persisted, unlike
+	// outgoing relationships (e.g. children).
+	//
+	// For the relationship cache API, parent(s) = referringObject(s) and self = target
+    if ([self isIncomingRelationship: propDesc])
     {
         if ([propDesc isMultivalued])
         {
-            NSSet *results = [_relationshipCache referringObjectsForPropertyInTarget: key];
-            
-            return results;
+            return [_relationshipCache referringObjectsForPropertyInTarget: key];
         }
-        COObject *result = [_relationshipCache referringObjectForPropertyInTarget: key];
-        return result;
+        return [_relationshipCache referringObjectForPropertyInTarget: key];
     }
 
 	id value = [_variableStorage objectForKey: key];
@@ -700,12 +704,13 @@ objectGraphContext: (COObjectGraphContext *)aContext
     if (originalRelationships == nil)
 		return;
 
-	// TODO: Use -serializedValueForProperty: instead of -serializedValueForValue:.
-	id currentValue = [self valueForProperty: key];
-	
 	// Re-serialize the current value from COObject to ETUUID/COPath
 	
-	id serializedValue = [self serializedValueForValue: currentValue];
+	// NOTE: We cannot -serializedValueForPropertyDescription: since this method
+	// attempts to access the cache we want to update.
+	// For relationships, serialization accessors are not allowed, so skipping  
+	// -serializedValueForPropertyDescription: doesn't matter.
+	id serializedValue = [self serializedValueForValue: [self valueForStorageKey: key]];
 	
 	//NSLog(@"_relationshipsAsCOPathOrETUUID: setting %@ from %@ to %@", key,
 	//     [_relationshipsAsCOPathOrETUUID objectForKey: key], serializedValue);
@@ -724,7 +729,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	NSString *key = [propertyDesc name];
 
 	ETPropertyDescription *parentDesc = [propertyDesc opposite];
-	id aValue = [self valueForKey: key];
+	id aValue = [self valueForStorageKey: key];
 	
 	for (COObject *objectBeingInserted in ([propertyDesc isMultivalued] ? aValue : [NSArray arrayWithObject: aValue]))
 	{
@@ -739,7 +744,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 		{
 			BOOL alreadyRemoved = NO;
 			
-			if (![[objectBeingInsertedParent valueForKey: key] containsObject: objectBeingInserted])
+			if (![[objectBeingInsertedParent valueForStorageKey: key] containsObject: objectBeingInserted])
 			{
 				// This is sort of a hack for EtoileUI.
 				// It handles removing the object from its old parent for us.
@@ -780,7 +785,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 - (id)collectionForProperty: (NSString *)key insertionIndex: (NSInteger)index
 {
 	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	id collection = [self valueForProperty: key];
+	id collection = [self valueForStorageKey: key];
 
 	if (index == ETUndeterminedIndex)
 	{
@@ -813,7 +818,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 {
 	[self checkEditingContextForValue: object];
 
-	id oldCollection = [[self valueForProperty: key] mutableCopy];
+	id oldCollection = [[self valueForStorageKey: key] mutableCopy];
 	id collection = [self collectionForProperty: key insertionIndex: index];
 
 	[self willChangeValueForProperty: key];
@@ -824,7 +829,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 - (id)collectionForProperty: (NSString *)key removalIndex: (NSInteger)index
 {
 	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	id collection = [self valueForProperty: key];
+	id collection = [self valueForStorageKey: key];
 
 	if (index == ETUndeterminedIndex)
 	{
@@ -855,7 +860,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 {
 	[self checkEditingContextForValue: object];
 
-	id oldCollection = [[self valueForProperty: key] mutableCopy];
+	id oldCollection = [[self valueForStorageKey: key] mutableCopy];
 	id collection = [self collectionForProperty: key removalIndex: index];
 
 	[self willChangeValueForProperty: key];
@@ -1093,7 +1098,7 @@ static int indent = 0;
         
         // N.B., we need to set this in a way that doesn't cause us to recalculate
 		// and overwrite the version stored in _relationshipsAsCOPathOrETUUID
-        [_variableStorage setValue: value forKey: key];
+        [self setValue: value forStorageKey: key];
     }
 }
 
