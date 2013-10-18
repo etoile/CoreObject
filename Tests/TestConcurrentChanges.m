@@ -23,12 +23,6 @@
     return self;
 }
 
-- (void) wait
-{
-    NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-    [runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-}
-
 - (void)testsDetectsStoreSetCurrentRevisionDistributedNotification
 {
 	// Load the revision history (to support testing it it is updated in reaction to a commit)

@@ -25,17 +25,21 @@
 
 	[ctx commit];
 
-	CORevision *secondCommitRev = [obj revision];
-
-	UKNotNil(secondCommitRev);
-	UKObjectsNotEqual(firstCommitRev, secondCommitRev);
-	
-	// The base revision should be equals to the first revision
-	UKNotNil([secondCommitRev parentRevision]);
-	UKObjectsEqual(firstCommitRev, [secondCommitRev parentRevision]);
-	
-	// The first commit revision's base revision should be nil
-	UKNil([firstCommitRev parentRevision]);
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 CORevision *secondCommitRev = [[testProot rootObject] revision];
+		 
+		 UKNotNil(secondCommitRev);
+		 UKObjectsNotEqual(firstCommitRev, secondCommitRev);
+		 
+		 // The base revision should be equals to the first revision
+		 UKNotNil([secondCommitRev parentRevision]);
+		 UKObjectsEqual(firstCommitRev, [secondCommitRev parentRevision]);
+		 
+		 // The first commit revision's base revision should be nil
+		 UKNil([firstCommitRev parentRevision]);
+	 }];
 }
 
 - (void)testNonLinearHistory
@@ -69,15 +73,15 @@
 	UKObjectsEqual(secondCommitRev, [thirdCommitRev parentRevision]);
 
     // Check that we can read the state 3 in another context
-    {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        UKNotNil(persistentRootInCtx2);
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+        UKNotNil(testProot);
         
-        COObject *obj2 = [persistentRootInCtx2 objectWithUUID: [obj UUID]];
-        UKNotNil(obj2);
-        UKObjectsEqual(@"Third Revision", [obj2 valueForKey: @"label"]);
-    }
+        COObject *testObj2 = [testProot objectWithUUID: [obj UUID]];
+        UKNotNil(testObj2);
+        UKObjectsEqual(@"Third Revision", [testObj2 valueForKey: @"label"]);
+	 }];
     
 	// Load up 2 in another context
     
@@ -98,15 +102,17 @@
         UKObjectsEqual(secondCommitRev, [[obj2 revision] parentRevision]);
     }
     
+	[self wait];
+	
     // Check that we can read the state 4 in another context
-    {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-
-        COObject *obj2 = [persistentRootInCtx2 objectWithUUID: [obj UUID]];
-        UKNotNil(obj2);
-        UKObjectsEqual(@"Fourth Revision", [obj2 valueForKey: @"label"]);
-    }
+	
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 COObject *testObj2 = [testProot objectWithUUID: [obj UUID]];
+		 UKNotNil(testObj2);
+		 UKObjectsEqual(@"Fourth Revision", [testObj2 valueForKey: @"label"]);
+	 }];
 }
 
 - (void) testRevisionIDEquality

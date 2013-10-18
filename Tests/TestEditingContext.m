@@ -45,13 +45,17 @@
     
     [ctx commit];
     
-    UKFalse([ctx hasChanges]);
-    UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
-    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
-    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
-    UKNotNil([ctx persistentRootForUUID: uuid]);
-    UKNotNil([store persistentRootInfoForUUID: uuid]);
-    UKFalse([persistentRoot isDeleted]);
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKFalse([testCtx hasChanges]);
+		 UKObjectsEqual(S(testProot), [testCtx persistentRoots]);
+		 UKObjectsEqual([NSSet set], [testCtx persistentRootsPendingDeletion]);
+		 UKObjectsEqual([NSSet set], [testCtx deletedPersistentRoots]);
+		 UKNotNil([testCtx persistentRootForUUID: uuid]);
+		 UKNotNil([[testCtx store] persistentRootInfoForUUID: uuid]);
+		 UKFalse([testProot isDeleted]);
+	 }];
     
     persistentRoot.deleted = YES;
 
@@ -64,15 +68,19 @@
     UKTrue([persistentRoot isDeleted]);
     
     [ctx commit];
-  
-    UKFalse([ctx hasChanges]);
-    UKObjectsEqual([NSSet set], [ctx persistentRoots]);
-    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
-    UKIntsEqual(1, [[ctx deletedPersistentRoots] count]);
-    /* You can still retrieve a deleted persistent root, until the deletion is finalized */
-    UKNotNil([ctx persistentRootForUUID: uuid]);
-    UKNotNil([store persistentRootInfoForUUID: uuid]);
-    UKTrue([persistentRoot isDeleted]);
+	
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKFalse([testCtx hasChanges]);
+		 UKObjectsEqual([NSSet set], [testCtx persistentRoots]);
+		 UKObjectsEqual([NSSet set], [testCtx persistentRootsPendingDeletion]);
+		 UKIntsEqual(1, [[testCtx deletedPersistentRoots] count]);
+		 /* You can still retrieve a deleted persistent root, until the deletion is finalized */
+		 UKNotNil([testCtx persistentRootForUUID: uuid]);
+		 UKNotNil([[testCtx store] persistentRootInfoForUUID: uuid]);
+		 UKTrue([testProot isDeleted]);
+	 }];
 }
 
 - (void)testUndeleteCommittedPersistentRoot
@@ -96,13 +104,17 @@
     
     [ctx commit];
     
-    UKFalse([[store persistentRootInfoForUUID: uuid] isDeleted]);
-    UKFalse([ctx hasChanges]);
-    UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
-    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
-    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingUndeletion]);
-    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
-    UKFalse([persistentRoot isDeleted]);
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		UKFalse([[[testCtx store] persistentRootInfoForUUID: uuid] isDeleted]);
+		UKFalse([testCtx hasChanges]);
+		UKObjectsEqual(S(testProot), [testCtx persistentRoots]);
+		UKObjectsEqual([NSSet set], [testCtx persistentRootsPendingDeletion]);
+		UKObjectsEqual([NSSet set], [testCtx persistentRootsPendingUndeletion]);
+		UKObjectsEqual([NSSet set], [testCtx deletedPersistentRoots]);
+		UKFalse([testProot isDeleted]);
+	 }];
 }
 
 /**
@@ -158,12 +170,20 @@
     
     [ctx commit];
     
-    UKObjectsEqual(S(regular, pendingInsertion, pendingUndeletion), [ctx persistentRoots]);
-    UKObjectsEqual(S(deletedOnDisk, pendingDeletion), [ctx deletedPersistentRoots]);
-    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingInsertion]);
-    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
-    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingUndeletion]);
-    
+	[self testPersistentRootWithExistingAndNewContext: regular
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testRegular, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 COPersistentRoot *testDeletedOnDisk = [testCtx persistentRootForUUID: [deletedOnDisk UUID]];
+		 COPersistentRoot *testPendingInsertion = [testCtx persistentRootForUUID: [pendingInsertion UUID]];
+		 COPersistentRoot *testPendingDeletion = [testCtx persistentRootForUUID: [pendingDeletion UUID]];
+		 COPersistentRoot *testPendingUndeletion = [testCtx persistentRootForUUID: [pendingUndeletion UUID]];
+		 
+		 UKObjectsEqual(S(testRegular, testPendingInsertion, testPendingUndeletion), [testCtx persistentRoots]);
+		 UKObjectsEqual(S(testDeletedOnDisk, testPendingDeletion), [testCtx deletedPersistentRoots]);
+		 UKObjectsEqual([NSSet set], [testCtx persistentRootsPendingInsertion]);
+		 UKObjectsEqual([NSSet set], [testCtx persistentRootsPendingDeletion]);
+		 UKObjectsEqual([NSSet set], [testCtx persistentRootsPendingUndeletion]);
+	 }];
 }
 
 - (void) testRequestNilPersistentRoot

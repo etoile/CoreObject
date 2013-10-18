@@ -45,12 +45,20 @@
     
     [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
     [ctx commitWithUndoTrack: _testTrack];
-    
-    UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: kCOLabel]);
+	
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual(@"hello", [[testProot rootObject] valueForProperty: kCOLabel]);
+	 }];
     
     [_testTrack undo];
-    
-    UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
+
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKNil([[testProot rootObject] valueForProperty: kCOLabel]);
+	 }];
 }
 
 - (void)testUndoSetCurrentVersionForBranchMultiplePersistentRoots
@@ -68,10 +76,16 @@
     
     [_testTrack undo];
     
-    UKObjectsNotEqual([persistentRoot1 currentRevision], persistentRoot1Revision);
-    UKObjectsNotEqual([persistentRoot2 currentRevision], persistentRoot2Revision);
-    UKObjectsEqual([persistentRoot1 currentRevision], [persistentRoot1Revision parentRevision]);
-    UKObjectsEqual([persistentRoot2 currentRevision], [persistentRoot2Revision parentRevision]);
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot1
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot1, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 COPersistentRoot *testProot2 = [testCtx persistentRootForUUID: [persistentRoot2 UUID]];
+		 
+		 UKObjectsNotEqual([testProot1 currentRevision], persistentRoot1Revision);
+		 UKObjectsNotEqual([testProot2 currentRevision], persistentRoot2Revision);
+		 UKObjectsEqual([testProot1 currentRevision], [persistentRoot1Revision parentRevision]);
+		 UKObjectsEqual([testProot2 currentRevision], [persistentRoot2Revision parentRevision]);
+	 }];
 }
 
 - (void)testUndoSetCurrentVersionForBranchSelectiveUndo

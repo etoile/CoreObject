@@ -49,8 +49,12 @@
 
 	[ctx commit];
 
-	UKNotNil([originalBranch currentRevision]);
-	UKObjectsEqual([originalBranch currentRevision], [rootObj revision]);
+	[self testBranchWithExistingAndNewContext: originalBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKNotNil([testBranch currentRevision]);
+		 UKObjectsEqual([testBranch currentRevision], [[testProot rootObject] revision]);
+	 }];
 }
 
 - (void)testSimpleRootObjectPropertyUndoRedo
@@ -335,16 +339,15 @@
     }
     
     [ctx commit];
-    
-    UKObjectsEqual(@"Hello world", [originalBranch label]);
-    UKFalse([ctx hasChanges]);
-    UKFalse([persistentRoot hasChanges]);
-    UKFalse([originalBranch hasChanges]);
-    
-    {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        UKObjectsEqual(@"Hello world", [[[ctx2 persistentRootForUUID: [persistentRoot UUID]] currentBranch] label]);
-    }
+	
+	[self testBranchWithExistingAndNewContext: originalBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual(@"Hello world", [testBranch label]);
+		 UKFalse([testCtx hasChanges]);
+		 UKFalse([testProot hasChanges]);
+		 UKFalse([testBranch hasChanges]);
+	 }];
     
     [originalBranch setLabel: @"Hello world 2"];
     UKObjectsEqual(@"Hello world 2", [originalBranch label]);
@@ -364,10 +367,14 @@
 {
     [ctx commit];
 
-    UKObjectsEqual([NSDictionary dictionary], [originalBranch metadata]);
-    UKFalse([ctx hasChanges]);
-    UKFalse([persistentRoot hasChanges]);
-    UKFalse([originalBranch hasChanges]);
+	[self testBranchWithExistingAndNewContext: originalBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual([NSDictionary dictionary], [testBranch metadata]);
+		 UKFalse([testCtx hasChanges]);
+		 UKFalse([testProot hasChanges]);
+		 UKFalse([testBranch hasChanges]);
+	 }];
     
     [originalBranch setMetadata: D(@"value", @"key")];
     
@@ -395,15 +402,14 @@
     
     [ctx commit];
     
-    UKObjectsEqual(D(@"value", @"key"), [originalBranch metadata]);
-    UKFalse([ctx hasChanges]);
-    UKFalse([persistentRoot hasChanges]);
-    UKFalse([originalBranch hasChanges]);
-    
-    {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        UKObjectsEqual(D(@"value", @"key"), [[[ctx2 persistentRootForUUID: [persistentRoot UUID]] currentBranch] metadata]);
-    }
+	[self testBranchWithExistingAndNewContext: originalBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual((@{@"key" : @"value"}), [testBranch metadata]);
+		 UKFalse([testCtx hasChanges]);
+		 UKFalse([testProot hasChanges]);
+		 UKFalse([testBranch hasChanges]);
+	 }];
     
     [originalBranch setMetadata: D(@"value2", @"key")];
     UKObjectsEqual(D(@"value2", @"key"), [originalBranch metadata]);
@@ -419,13 +425,11 @@
     [[persistentRoot2 currentBranch] setMetadata: D(@"world", @"hello")];
     [ctx commit];
     
-    // Load in another context
-    {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *ctx2persistentRoot2 = [ctx2 persistentRootForUUID: [persistentRoot2 UUID]];
-        
-        UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot2 currentBranch] metadata]);
-    }
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot2
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+        UKObjectsEqual(D(@"world", @"hello"), [testBranch metadata]);
+	 }];
 }
 
 - (void) testBranchMetadataOnBranchFirstCommit
@@ -435,13 +439,11 @@
     COBranch *branch2 = [[persistentRoot currentBranch] makeBranchWithLabel: @"test"];
     [ctx commit];
     
-    // Load in another context
-    {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        
-        UKObjectsEqual(D(@"test", kCOBranchLabel), [[ctx2persistentRoot branchForUUID: [branch2 UUID]] metadata]);
-    }
+	[self testBranchWithExistingAndNewContext: branch2
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual(D(@"test", kCOBranchLabel), [testBranch metadata]);
+	 }];
 }
 
 - (void) testBranchMetadataOnBranchSetOnFirstCommit
@@ -452,13 +454,11 @@
     [branch2 setMetadata: D(@"world", @"hello")];
     [ctx commit];
     
-    // Load in another context
-    {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        
-        UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot branchForUUID: [branch2 UUID]] metadata]);
-    }
+	[self testBranchWithExistingAndNewContext: branch2
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+        UKObjectsEqual(D(@"world", @"hello"), [testBranch metadata]);
+	 }];
 }
 
 - (void) testRevisionWithID
@@ -484,34 +484,34 @@
     [(OutlineItem *)[[secondBranch objectGraphContext] objectWithUUID: [childObj UUID]] setLabel: @"2"];
     [ctx commit];
     
-    {
-        // Quick check that the commits worked
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *persistentRootCtx2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        
-        CORevision *initialBranchRev = [persistentRootCtx2 currentRevision];
-        CORevision *secondBranchRev = [[persistentRootCtx2 branchForUUID: [secondBranch UUID]] currentRevision];
-        CORevision *initialRev = [initialBranchRev parentRevision];
-        
-        // Check for the proper relationship
-        
-        UKObjectsEqual(initialRev, [secondBranchRev parentRevision]);
-        
-        UKObjectsNotEqual(initialBranchRev, secondBranchRev);
-        UKObjectsNotEqual(initialBranchRev, initialRev);
-        UKObjectsNotEqual(initialRev, secondBranchRev);
-        
-        // Check for the proper contents
-        
-        UKObjectsEqual(@"1", [(OutlineItem *)[[persistentRootCtx2 objectGraphContextForPreviewingRevision: initialBranchRev] rootObject] label]);
-        UKObjectsEqual(@"0", [(OutlineItem *)[[persistentRootCtx2 objectGraphContextForPreviewingRevision: initialBranchRev] objectWithUUID: [childObj UUID]] label]);
-        
-        UKObjectsEqual(@"0", [(OutlineItem *)[[persistentRootCtx2 objectGraphContextForPreviewingRevision: secondBranchRev] rootObject] label]);
-        UKObjectsEqual(@"2", [(OutlineItem *)[[persistentRootCtx2 objectGraphContextForPreviewingRevision: secondBranchRev] objectWithUUID: [childObj UUID]] label]);
-        
-        UKObjectsEqual(@"0", [(OutlineItem *)[[persistentRootCtx2 objectGraphContextForPreviewingRevision: initialRev] rootObject] label]);
-        UKObjectsEqual(@"0", [(OutlineItem *)[[persistentRootCtx2 objectGraphContextForPreviewingRevision: initialRev] objectWithUUID: [childObj UUID]] label]);
-    }
+	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 // Quick check that the commits worked
+		 
+		 CORevision *initialBranchRev = [testProot currentRevision];
+		 CORevision *secondBranchRev = [[testProot branchForUUID: [secondBranch UUID]] currentRevision];
+		 CORevision *initialRev = [initialBranchRev parentRevision];
+		 
+		 // Check for the proper relationship
+		 
+		 UKObjectsEqual(initialRev, [secondBranchRev parentRevision]);
+		 
+		 UKObjectsNotEqual(initialBranchRev, secondBranchRev);
+		 UKObjectsNotEqual(initialBranchRev, initialRev);
+		 UKObjectsNotEqual(initialRev, secondBranchRev);
+		 
+		 // Check for the proper contents
+		 
+		 UKObjectsEqual(@"1", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialBranchRev] rootObject] label]);
+		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialBranchRev] objectWithUUID: [childObj UUID]] label]);
+		 
+		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: secondBranchRev] rootObject] label]);
+		 UKObjectsEqual(@"2", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: secondBranchRev] objectWithUUID: [childObj UUID]] label]);
+		 
+		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialRev] rootObject] label]);
+		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialRev] objectWithUUID: [childObj UUID]] label]);
+	 }];
     
     [initialBranch setMergingBranch: secondBranch];
     
@@ -536,8 +536,13 @@
     UKTrue([uncommittedBranch hasChanges]);
     
     [persistentRoot commit];
-    UKDoesNotRaiseException([uncommittedBranch discardAllChanges]);
-    UKFalse([uncommittedBranch hasChanges]);
+	
+	[self testBranchWithExistingAndNewContext: uncommittedBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKDoesNotRaiseException([testBranch discardAllChanges]);
+		 UKFalse([testBranch hasChanges]);
+	 }];
 }
 
 - (void) testDiscardAllChangesAndHasChangesForSetCurrentRevision
@@ -549,18 +554,22 @@
     [persistentRoot commit];
     CORevision *secondRevision = [originalBranch currentRevision];
     
-    UKFalse([originalBranch hasChanges]);
-    UKObjectsEqual(@"test", [[originalBranch rootObject] label]);
-    
-    [originalBranch setCurrentRevision: firstRevision];
-    UKTrue([originalBranch hasChanges]);
-    UKFalse([[originalBranch objectGraphContext] hasChanges]);
-    UKNil([[originalBranch rootObject] label]);
+	[self testBranchWithExistingAndNewContext: originalBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKFalse([testBranch hasChanges]);
+		 UKObjectsEqual(@"test", [[testBranch rootObject] label]);
+		
+		 [testBranch setCurrentRevision: firstRevision];
+		 UKTrue([testBranch hasChanges]);
+		 UKFalse([[testBranch objectGraphContext] hasChanges]);
+		 UKNil([[testBranch rootObject] label]);
 
-    [originalBranch discardAllChanges];
-    UKFalse([originalBranch hasChanges]);
-    UKObjectsEqual(secondRevision, [originalBranch currentRevision]);
-    UKObjectsEqual(@"test", [[originalBranch rootObject] label]);
+		 [testBranch discardAllChanges];
+		 UKFalse([testBranch hasChanges]);
+		 UKObjectsEqual(secondRevision, [testBranch currentRevision]);
+		 UKObjectsEqual(@"test", [[testBranch rootObject] label]);
+	 }];
 }
 
 - (void) testDiscardAllChangesAndHasChangesForDelete
@@ -570,10 +579,14 @@
     COBranch *branch = [originalBranch makeBranchWithLabel: @"test"];
     [persistentRoot commit];
     
-    branch.deleted = YES;
-    UKTrue([branch hasChanges]);
-    [branch discardAllChanges];
-    UKFalse(branch.deleted);
+	[self testBranchWithExistingAndNewContext: branch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 testBranch.deleted = YES;
+		 UKTrue([testBranch hasChanges]);
+		 [testBranch discardAllChanges];
+		 UKFalse(testBranch.deleted);
+	 }];
 }
 
 /**
@@ -594,21 +607,21 @@
     originalBranch.shouldMakeEmptyCommit = YES;
     [ctx commitWithType: @"save"  shortDescription: @"user pressed save"];
     
-    CORevision *r2 = [originalBranch currentRevision];
+	[self testBranchWithExistingAndNewContext: originalBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 CORevision *r2 = [testBranch currentRevision];
     
-    UKNotNil(r1);
-    UKNotNil(r2);
-    UKObjectsNotEqual(r1, r2);
-    UKObjectsNotEqual(expectedMetadata, [r1 metadata]);
-    UKObjectsEqual(expectedMetadata, [r2 metadata]);
+		 UKNotNil(r1);
+		 UKNotNil(r2);
+		 UKObjectsNotEqual(r1, r2);
+		 UKObjectsNotEqual(expectedMetadata, [r1 metadata]);
+		 UKObjectsEqual(expectedMetadata, [r2 metadata]);
+	 }];
 }
 
 // Check that attempting to commit modifications to a deleted branch
 // raises an exception
-
-// FIXME: Refactor the tests so each test is only expressed once (in a block?)
-// which is then run on both ctx and a fresh context. At present, each test
-// is copied & pasted.
 
 - (void) testExceptionOnDeletedBranchSetRevision
 {
@@ -619,51 +632,28 @@
 	altBranch.deleted = YES;
 	[ctx commit];
 	
-	altBranch.currentRevision = r0;
-	UKRaisesException([ctx commit]);
-}
-
-- (void) testExceptionOnDeletedBranchSetRevisionInSecondContext
-{
-	CORevision *r0 = altBranch.currentRevision;
-	[[altBranch rootObject] setLabel: @"hi"];
-	[ctx commit];
-	
-	altBranch.deleted = YES;
-	[ctx commit];
-	
-	// Load in another context
-	{
-		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-		[ctx2persistentRoot branchForUUID: [altBranch UUID]].currentRevision = r0;
-		UKRaisesException([ctx2 commit]);
-	}
+	[self testBranchWithExistingAndNewContext: altBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 testBranch.currentRevision = r0;
+		 UKRaisesException([testCtx commit]);
+	 }];
 }
 
 - (void) testExceptionOnDeletedBranchModifyEmbeddedObject
 {
 	altBranch.deleted = YES;
 	[ctx commit];
-	UKTrue(altBranch.isDeleted);
 	
-	[[altBranch rootObject] setLabel: @"hi"];
-	UKTrue([altBranch hasChanges]);
-	UKRaisesException([ctx commit]);
-}
-
-- (void) testExceptionOnDeletedBranchModifyEmbeddedObjectInSecondContext
-{
-	altBranch.deleted = YES;
-	[ctx commit];
-	
-	// Load in another context
-	{
-		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-		[[[ctx2persistentRoot branchForUUID: [altBranch UUID]] rootObject] setLabel: @"hi"];
-		UKRaisesException([ctx2 commit]);
-	}
+	[self testBranchWithExistingAndNewContext: altBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKTrue(testBranch.isDeleted);
+		 
+		 [[testBranch rootObject] setLabel: @"hi"];
+		 UKTrue([testBranch hasChanges]);
+		 UKRaisesException([testCtx commit]);
+	 }];
 }
 
 - (void) testExceptionOnDeletedBranchSetBranchMetadata
@@ -671,22 +661,12 @@
 	altBranch.deleted = YES;
 	[ctx commit];
 	
-	altBranch.metadata = @{@"hello" : @"world"};
-	UKRaisesException([ctx commit]);
-}
-
-- (void) testExceptionOnDeletedBranchSetBranchMetadataInSecondContext
-{
-	altBranch.deleted = YES;
-	[ctx commit];
-	
-	// Load in another context
-	{
-		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-		COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-		[ctx2persistentRoot branchForUUID: [altBranch UUID]].metadata = @{@"hello" : @"world"};
-		UKRaisesException([ctx2 commit]);
-	}
+	[self testBranchWithExistingAndNewContext: altBranch
+									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 testBranch.metadata = @{@"hello" : @"world"};
+		 UKRaisesException([testCtx commit]);
+	 }];
 }
 
 // TODO: Test these behaviours during deleted->undeleted and undeleted->deleted

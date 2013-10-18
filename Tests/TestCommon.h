@@ -80,6 +80,12 @@ extern NSString * const kCOParent;
 - (void) testPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
 											 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
 
+/**
+ * Runs the default runloop for a short period of time.
+ * If you make changes in one editing context, you should call this to give
+ * other editing contexts time to process the change notification
+ */
+- (void) wait;
 
 @end
 

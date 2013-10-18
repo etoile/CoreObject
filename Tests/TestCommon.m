@@ -89,6 +89,12 @@ NSString * const kCOParent = @"parentContainer";
 	block(ctx2, ctx2PersistentRoot, ctx2Branch, YES);
 }
 
+- (void) wait
+{
+    NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+    [runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.001]];
+}
+
 @end
 
 @implementation COObjectGraphContext (TestCommon)

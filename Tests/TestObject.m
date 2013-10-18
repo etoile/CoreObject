@@ -64,10 +64,14 @@
 	[ctx commit];
 
 	CORevision *lastRev = [object revision];
-
-	UKObjectsEqual([firstRev date], [proot creationDate]);
-	UKObjectsEqual([lastRev date], [proot modificationDate]);
 	UKObjectsNotEqual(lastRev, firstRev);
+	
+	[self testPersistentRootWithExistingAndNewContext: proot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual([firstRev date], [testProot creationDate]);
+		 UKObjectsEqual([lastRev date], [testProot modificationDate]);
+	 }];
 }
 
 - (void) testKVCForSynthesizedSetterName
