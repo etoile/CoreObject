@@ -480,7 +480,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
  * Given a COObject, returns an array of all of the COObjects directly reachable
  * from that COObject.
  */
-static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject)
+static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectGraphContext *restrictToObjectGraph)
 {
 	NSMutableArray *result = [NSMutableArray array];
 	for (ETPropertyDescription *propDesc in [[anObject entityDescription] allPropertyDescriptions])
@@ -511,7 +511,8 @@ static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject)
 			 as a NSDictionary for UI editing) */
             for (id subvalue in [value objectEnumerator])
             {
-                if ([subvalue isKindOfClass: [COObject class]])
+                if ([subvalue isKindOfClass: [COObject class]]
+					&& [subvalue objectGraphContext] == restrictToObjectGraph)
                 {
                     [result addObject: subvalue];
                 }
@@ -519,7 +520,8 @@ static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject)
         }
         else
         {
-            if ([value isKindOfClass: [COObject class]])
+            if ([value isKindOfClass: [COObject class]]
+				&& [value objectGraphContext] == restrictToObjectGraph)
             {
                 [result addObject: value];
             }
@@ -529,7 +531,7 @@ static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject)
 	return result;
 }
 
-static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *collectedUUIDSet)
+static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *collectedUUIDSet, COObjectGraphContext *restrictToObjectGraph)
 {
     ETUUID *uuid = [anObject UUID];
     if ([collectedUUIDSet containsObject: uuid])
@@ -539,9 +541,9 @@ static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *col
     [collectedUUIDSet addObject: uuid];
     
     // Call recursively on all composite and referenced objects
-    for (COObject *obj in DirectlyReachableObjectsFromObject(anObject))
+    for (COObject *obj in DirectlyReachableObjectsFromObject(anObject, restrictToObjectGraph))
     {
-        FindReachableObjectsFromObject(obj, collectedUUIDSet);
+        FindReachableObjectsFromObject(obj, collectedUUIDSet, restrictToObjectGraph);
     }
 }
 
@@ -555,7 +557,7 @@ static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *col
     NSArray *allKeys = [_loadedObjects allKeys];
     
     NSMutableSet *live = [NSMutableSet setWithCapacity: [allKeys count]];
-    FindReachableObjectsFromObject([self rootObject], live);
+    FindReachableObjectsFromObject([self rootObject], live, self);
     
     NSMutableSet *dead = [NSMutableSet setWithArray: allKeys];
     [dead minusSet: live];
