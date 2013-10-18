@@ -343,6 +343,7 @@ static int itemChangedAtCommit(int i)
         [store createPersistentRootWithInitialRevision: [[proot currentBranchInfo] currentRevisionID]
                                                   UUID: [ETUUID UUID]
                                             branchUUID: [ETUUID UUID]
+									  parentBranchUUID:	nil
                                                  error: NULL];
     }
     [store commitTransactionWithError: NULL];
