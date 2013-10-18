@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		3D01D09F1646BF0200917AC8 /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D01D0941646BEF400917AC8 /* UnitKit.framework */; };
 		601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D44180C0F5300CED07E /* COObject+Private.h */; };
-		601C1D4F180C115D00CED07E /* COGarbageCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D4D180C115900CED07E /* COGarbageCollection.h */; };
-		601C1D50180C115D00CED07E /* COGarbageCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 601C1D4E180C115B00CED07E /* COGarbageCollection.m */; };
+		601C1D4F180C115D00CED07E /* COObjectGraphContext+GarbageCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */; };
+		601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */; };
 		6043D4D31757B4F9002103CC /* COCommitDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 6043D4C717575D79002103CC /* COCommitDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
 		606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 606E3DBF1787A07E00ED42DA /* COSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -430,8 +430,8 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		3D01D08A1646BEF400917AC8 /* UnitKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UnitKit.xcodeproj; path = ../UnitKit/Source/UnitKit.xcodeproj; sourceTree = "<group>"; };
 		601C1D44180C0F5300CED07E /* COObject+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObject+Private.h"; path = "Core/COObject+Private.h"; sourceTree = "<group>"; };
-		601C1D4D180C115900CED07E /* COGarbageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COGarbageCollection.h; path = Core/COGarbageCollection.h; sourceTree = "<group>"; };
-		601C1D4E180C115B00CED07E /* COGarbageCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COGarbageCollection.m; path = Core/COGarbageCollection.m; sourceTree = "<group>"; };
+		601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+GarbageCollection.h"; path = "Core/COObjectGraphContext+GarbageCollection.h"; sourceTree = "<group>"; };
+		601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObjectGraphContext+GarbageCollection.m"; path = "Core/COObjectGraphContext+GarbageCollection.m"; sourceTree = "<group>"; };
 		6043D4C717575D79002103CC /* COCommitDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCommitDescriptor.h; path = Utilities/COCommitDescriptor.h; sourceTree = "<group>"; };
 		6043D4C817575D7A002103CC /* COCommitDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCommitDescriptor.m; path = Utilities/COCommitDescriptor.m; sourceTree = "<group>"; };
 		606E3DBF1787A07E00ED42DA /* COSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSerialization.h; path = Core/COSerialization.h; sourceTree = "<group>"; };
@@ -1095,8 +1095,8 @@
 				609C00791704C2BA00D01AAB /* CORevision.m */,
 				609C00901704C3DA00D01AAB /* COQuery.h */,
 				609C00911704C3DA00D01AAB /* COQuery.m */,
-				601C1D4D180C115900CED07E /* COGarbageCollection.h */,
-				601C1D4E180C115B00CED07E /* COGarbageCollection.m */,
+				601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */,
+				601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */,
 				606E3DBF1787A07E00ED42DA /* COSerialization.h */,
 				606E3DC01787A07E00ED42DA /* COSerialization.m */,
 				6680846B178CD526003A3CC6 /* COCopier.h */,
@@ -1436,7 +1436,7 @@
 				66457FCF17E8C9D0003C51A8 /* COStoreAction.h in Headers */,
 				66457FEC17E9683F003C51A8 /* CORevisionCache.h in Headers */,
 				601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */,
-				601C1D4F180C115D00CED07E /* COGarbageCollection.h in Headers */,
+				601C1D4F180C115D00CED07E /* COObjectGraphContext+GarbageCollection.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1784,7 +1784,7 @@
 				66457FC817E8BFE5003C51A8 /* COStoreUndeletePersistentRoot.m in Sources */,
 				66457FCA17E8BFE5003C51A8 /* COStoreWriteRevision.m in Sources */,
 				66457FED17E9683F003C51A8 /* CORevisionCache.m in Sources */,
-				601C1D50180C115D00CED07E /* COGarbageCollection.m in Sources */,
+				601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

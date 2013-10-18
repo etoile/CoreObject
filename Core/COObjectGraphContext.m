@@ -9,7 +9,7 @@
 
 #import "COObjectGraphContext.h"
 #import "COItemGraph.h"
-#import "COGarbageCollection.h"
+#import "COObjectGraphContext+GarbageCollection.h"
 #import "CORelationshipCache.h"
 #import "COObject+Private.h"
 #import "COObject+RelationshipCache.h"
@@ -453,7 +453,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
  *    and the COEditingContext will release it, so it will be deallocated if
  *    no user code holds a reference to it.
  */
-- (void) removeSingleObject: (ETUUID *)uuid
+- (void) removeSingleObjectWithUUID: (ETUUID *)uuid
 {
     COObject *anObject = [_loadedObjects objectForKey: uuid];
     
@@ -476,77 +476,6 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     anObject = nil;
 }
 
-/**
- * Given a COObject, returns an array of all of the COObjects directly reachable
- * from that COObject.
- */
-static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectGraphContext *restrictToObjectGraph)
-{
-	NSMutableArray *result = [NSMutableArray array];
-	for (ETPropertyDescription *propDesc in [[anObject entityDescription] allPropertyDescriptions])
-	{
-		// FIXME: This should be uncommented, but it causes test failures.
-//		if (![propDesc isPersistent])
-//		{
-//			continue;
-//		}
-		
-		NSString *propertyName = [propDesc name];
-		id value = [anObject valueForKey: propertyName];
-        
-        if ([propDesc isMultivalued])
-        {
-			if ([propDesc isKeyed])
-			{
-				assert([value isKindOfClass: [CODictionary class]] || [value isKindOfClass: [NSDictionary class]]);
-			}
-			else
-			{
-				assert([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]);
-				
-			}
-			
-			/* We use -objectEnumerator, because subvalue can be a  CODictionary
-			 or a NSDictionary (if a getter exists to expose the CODictionary
-			 as a NSDictionary for UI editing) */
-            for (id subvalue in [value objectEnumerator])
-            {
-                if ([subvalue isKindOfClass: [COObject class]]
-					&& [subvalue objectGraphContext] == restrictToObjectGraph)
-                {
-                    [result addObject: subvalue];
-                }
-            }
-        }
-        else
-        {
-            if ([value isKindOfClass: [COObject class]]
-				&& [value objectGraphContext] == restrictToObjectGraph)
-            {
-                [result addObject: value];
-            }
-            // Ignore non-COObject objects
-        }
-	}
-	return result;
-}
-
-static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *collectedUUIDSet, COObjectGraphContext *restrictToObjectGraph)
-{
-    ETUUID *uuid = [anObject UUID];
-    if ([collectedUUIDSet containsObject: uuid])
-    {
-        return;
-    }
-    [collectedUUIDSet addObject: uuid];
-    
-    // Call recursively on all composite and referenced objects
-    for (COObject *obj in DirectlyReachableObjectsFromObject(anObject, restrictToObjectGraph))
-    {
-        FindReachableObjectsFromObject(obj, collectedUUIDSet, restrictToObjectGraph);
-    }
-}
-
 - (void) removeUnreachableObjects
 {
     if ([self rootObject] == nil)
@@ -554,17 +483,13 @@ static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *col
         return;
     }
     
-    NSArray *allKeys = [_loadedObjects allKeys];
+    NSMutableSet *deadUUIDs = [NSMutableSet setWithArray: [_loadedObjects allKeys]];
+	NSSet *liveUUIDs = [self allReachableObjectUUIDs];
+    [deadUUIDs minusSet: liveUUIDs];
     
-    NSMutableSet *live = [NSMutableSet setWithCapacity: [allKeys count]];
-    FindReachableObjectsFromObject([self rootObject], live, self);
-    
-    NSMutableSet *dead = [NSMutableSet setWithArray: allKeys];
-    [dead minusSet: live];
-    
-    for (ETUUID *deadUUID in dead)
+    for (ETUUID *deadUUID in deadUUIDs)
     {
-        [self removeSingleObject: deadUUID];
+        [self removeSingleObjectWithUUID: deadUUID];
     }
 }
 
