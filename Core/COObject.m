@@ -565,19 +565,9 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	return results;
 }
 
-- (NSError *)validateForInsert
+- (NSArray *)validate
 {
-	return nil;
-}
-
-- (NSError *)validateForUpdate
-{
-	return [COError errorWithValidationResults: [self validateAllValues]];
-}
-
-- (NSError *)validateForDelete
-{
-	return nil;
+	return [COError errorsWithValidationResults: [self validateAllValues]];
 }
 
 - (BOOL)validateValue: (id *)aValue forKey: (NSString *)key error: (NSError **)anError

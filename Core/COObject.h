@@ -440,65 +440,46 @@
 - (NSArray *)validateValue: (id)value forProperty: (NSString *)key;
 /**
  * <override-dummy />
- * Validates the receiver when it belongs to the inserted objects in the commit 
- * underway.
+ * Validates the receiver when it belongs to the inserted or updated objects in 
+ * the commit under way, then returns an error array.
  *
- * By default, returns nil.
+ * By default, returns -validateAllValues result (as an error array).
  *
- * This method must return nil on validation success, otherwise it must return 
- * suberrors (or a single error) that include their validation results in the 
- * user info under the key kCOValidationResultKey.
+ * This method must return an empty array on validation success, otherwise it 
+ * must return an error array. Each error (usually a COError object) can wrap a 
+ * validation result in -[NSError userInfo] under the key kCOValidationResultKey. 
+ * For wrapping validation result, you should use 
+ * -[COError errorWithValidationResult:].
  *
- * The superclass implementation must be called, then the returned error is 
+ * The superclass implementation must be called, then the returned array is 
  * either returned directly, or when validation doesn't succeed locally 
- * combined with the new errors through +[COError errorWithErrors:].
+ * combined with the new array through -[NSArray arrayByAddingObjectsFromArray:].
  *
- * See also -[COObjectGraphContext insertedObjects] and example in 
- * -validateForUpdate.
+ * <example>
+ * NSArray *errors = [COError errorsWithValidationResults: results];
+ * 
+ * // additionalErrors would contain errors that don't wrap a validation result 
+ * // (without a kCOValidationResultKey in their user info)
+ * errors = [errors arrayByAddingObjectsFromArray: additionalErrors];
+ *
+ * return [[super validate] arrayByAddingObjectsFromArray: errors];
+ * </example>
+ *
+ * To know if the receiver is validated for an insertion or an update, pass 
+ * the receiver to -[COObjectGraphContext isUpdatedObject:].
+ *
+ * For objects collected during a GC phase by COObjectGraphContext, no 
+ * special validation occurs. You cannot override -validate to cancel a 
+ * receiver deletion (you can override -dealloc to react to it though).<br />
+ * For cancelling deletions, override -validate to detect invalid object 
+ * removals in outgoing relationships (e.g. the receiver is a parent). 
+ * For a removed object, if no incoming relationships retains it, the object is 
+ * going to be deleted (collected in the next GC phase).
+ *
+ * See also COError, -[COObjectGraphContext insertedObjects], 
+ * -[COObjectGraphContext updatedObjects] and -[COObjectGraphContext changedObjects].
  */
-- (NSError *)validateForInsert;
-/**
- * <override-dummy />
- * Validates the receiver when it belongs to the updated objects in the commit 
- * under way. 
- *
- * By default, returns nil.
- *
- * Will be invoked when the receiver property values have been changed since 
- * the last commit.
- *
- * This method must return nil on validation success, otherwise it must return 
- * suberrors (or a single error) that include their validation results in the 
- * user info under the key kCOValidationResultKey.
- *
- * The superclass implementation must be called, then the returned error is 
- * either returned directly, or when validation doesn't succeed locally 
- * combined with the new errors through +[COError errorWithErrors:].
- *
- * <example>return [[super validateForUpdate] errorWithErrors: [COError errorsWithValidationResults: results]];</example>
- *
- * See also -[COObjectGraphContext updatedObjects].
- */
-- (NSError *)validateForUpdate;
-/**
- * <override-dummy />
- * Validates the receiver when it belongs to the deleted objects in the commit 
- * underway.
- *
- * By default, returns nil.
- *
- * This method must return nil on validation success, otherwise it must return 
- * suberrors (or a single error) that include their validation results in the 
- * user info under the key kCOValidationResultKey.
- *
- * The superclass implementation must be called, then the returned error is 
- * either returned directly, or when validation doesn't succeed locally 
- * combined with the new errors through +[COError errorWithErrors:].
- *
- * See also -[COObjectGraphContext deletedObjects] and example in 
- * -validateForUpdate.
- */
-- (NSError *)validateForDelete;
+- (NSArray *)validate;
 /**
  * Calls -validateValue:forProperty: to validate the value, and returns the 
  * validation result through aValue and anError.

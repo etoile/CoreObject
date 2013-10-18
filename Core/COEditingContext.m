@@ -365,17 +365,13 @@
 /* Both COPersistentRoot or COEditingContext objects are valid arguments. */
 - (BOOL)validateChangedObjectsForContext: (id)aContext error: (NSError **)error
 {
-	NSSet *insertionErrors = (id)[[[aContext insertedObjects] mappedCollection] validateForInsert];
-	NSSet *updateErrors = (id)[[[aContext updatedObjects] mappedCollection] validateForUpdate];
-	// FIXME: -validateForDelete and GC integration
-	//NSSet *deletionErrors = (id)[[[aContext deletedObjects] mappedCollection] validateForDelete];
-	NSMutableSet *validationErrors = [NSMutableSet setWithSet: insertionErrors];
-	
-	[validationErrors unionSet: updateErrors];
-	//[validationErrors unionSet: deletionErrors];
+	NSMutableArray *validationErrors = [NSMutableArray array];
 
-	// NOTE: We have a null value because -validateXXX returns nil on validation success
-	[validationErrors removeObject: [NSNull null]];
+	for (COObject *object in [aContext changedObjects])
+	{
+		[validationErrors addObjectsFromArray: [object validate]];
+	}
+	ETAssert([validationErrors containsObject: [NSNull null]] == NO);
 
 	if (error != NULL)
 	{
