@@ -339,6 +339,14 @@ serialization. */
 	return [NSNumber numberWithInteger: type];
 }
 
+- (SEL)serializationGetterForProperty: (NSString *)property
+{
+	NSString *capitalizedKey = [property stringByCapitalizingFirstLetter];
+	SEL getter = NSSelectorFromString([@"serialized" stringByAppendingString: capitalizedKey]);
+	
+	return ([self respondsToSelector: getter] ? getter : NULL);
+}
+
 // TODO: Could be changed to -serializedValueForProperty: once the previous
 // serialization format has been removed.
 - (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
@@ -352,11 +360,10 @@ serialization. */
     }
     
 	/* First we try to use the getter named 'serialized' + 'key' */
-	
-	NSString *capitalizedKey = [[aPropertyDesc name] stringByCapitalizingFirstLetter];
-	SEL getter = NSSelectorFromString([@"serialized" stringByAppendingString: capitalizedKey]);
-	
-	if ([self respondsToSelector: getter])
+
+	SEL getter = [self serializationGetterForProperty: [aPropertyDesc name]];
+
+	if (getter != NULL)
 	{
 		return [self performSelector: getter];
 	}

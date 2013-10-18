@@ -419,53 +419,53 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	return [self valueForStorageKey: key];
 }
 
-+ (BOOL) isPrimitiveCoreObjectValue: (id)value
+- (BOOL)isCoreObjectValue: (id)value
 {  
-	return [value isKindOfClass: [NSNumber class]] ||
-		[value isKindOfClass: [NSDate class]] ||
-		[value isKindOfClass: [NSData class]] ||
-		[value isKindOfClass: [NSString class]] ||
-		[value isKindOfClass: [COObject class]] ||
-		value == nil;
+	return ([value isKindOfClass: [COObject class]]
+	     || [self isSerializablePrimitiveValue: value]
+	     || [self isSerializableScalarValue: value]
+		 || value == nil);
 }
 
-+ (BOOL) isCoreObjectValue: (id)value
+- (BOOL)isEditingContextValidForObject: (COObject *)value
 {
-	if ([value isKindOfClass: [NSArray class]] ||
-		[value isKindOfClass: [NSSet class]])
-	{
-		for (id subvalue in value)
-		{
-			if (![COObject isPrimitiveCoreObjectValue: subvalue])
-			{
-				return NO;
-			}
-		}
-		return YES;
-	}
-	else 
-	{
-		return [COObject isPrimitiveCoreObjectValue: value];
-	}
+	COEditingContext *valueEditingContext = [[value persistentRoot] parentContext];
+	COEditingContext *currentEditingContext = [[self persistentRoot] parentContext];
+	BOOL involvesTransientObject = (valueEditingContext == nil || currentEditingContext == nil);
+	
+	return (involvesTransientObject || valueEditingContext == currentEditingContext);
 }
 
-/* Makes sure the value is in the same context as us. */
-- (void)checkEditingContextForValue:(id)value
+- (BOOL)isCoreObjectRelationship: (ETPropertyDescription *)propertyDesc
 {
-	if ([value isKindOfClass: [NSArray class]] ||
-		[value isKindOfClass: [NSSet class]])
+	if ([propertyDesc isPersistent] == NO)
+		return NO;
+
+	ETModelDescriptionRepository *repo = [_objectGraphContext modelRepository];
+	ETEntityDescription *rootCoreObjectEntity =
+		[repo entityDescriptionForClass: [COObject class]];
+
+	return [[propertyDesc type] isKindOfEntity: rootCoreObjectEntity];
+}
+
+- (void)validateEditingContextForNewValue: (id)value
+                      propertyDescription: (ETPropertyDescription *)propertyDesc
+{
+	if ([self isCoreObjectRelationship: propertyDesc] == NO)
+		return;
+
+	if ([value isCollection])
 	{
-		for (id subvalue in value)
+		ETAssert([propertyDesc isMultivalued]);
+
+		for (COObject *object in [value objectEnumerator])
 		{
-			[self checkEditingContextForValue: subvalue];
+			ETAssert([self isEditingContextValidForObject: object]);
 		}
 	}
-	else 
+	else
 	{
-		if ([value isKindOfClass: [COObject class]])
-		{
-			ETAssert([[value persistentRoot] parentContext] == [[self persistentRoot] parentContext]);
-		}    
+		ETAssert([self isEditingContextValidForObject: (COObject *)value]);
 	}
 }
 
@@ -677,18 +677,46 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	[self didChangeValueForProperty: key oldValue: nil];
 }
 
-- (void)validateNewValue: (id)newValue
+- (void)validateTypeForNewValue: (id)newValue
+            propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	// NOTE: For the CoreObject benchmark, no visible slowdowns but breaks
-	// EtoileUI currently.
-	//[self checkEditingContextForValue: newValue];
-	
-  	// FIXME: Move this check elsewhere or rework it because it can break on
-	// transient values or archived objects such as NSColor, NSView.
-	//if (![COObject isCoreObjectValue: value])
-	//{
-	//	[NSException raise: NSInvalidArgumentException format: @"Invalid property type"];
-	//}
+	if ([propertyDesc isPersistent] == NO)
+		return;
+
+	if ([self serializationGetterForProperty: [propertyDesc name]] != NULL)
+		return;
+
+	if ([newValue isCollection])
+	{
+		ETAssert([propertyDesc isMultivalued]);
+
+		Class expectedCollectionClass =
+			[self collectionClassForPropertyDescription: propertyDesc];
+
+		ETAssert([newValue isKindOfClass: expectedCollectionClass]);
+
+		for (id object in [newValue objectEnumerator])
+		{
+			ETAssert([self isCoreObjectValue: object]);
+		}
+	}
+	else
+	{
+		ETAssert([self isCoreObjectValue: newValue]);
+	}
+}
+
+- (void)validateNewValue: (id)newValue
+     propertyDescription: (ETPropertyDescription *)propertyDesc
+{
+	// NOTE: For the CoreObject benchmark, no visible slowdowns.
+	[self validateEditingContextForNewValue: newValue
+                        propertyDescription: propertyDesc];
+
+	// FIXME: Won't work with EtoileUI until  all serialization accessors are
+	// implemented (e.g. -[ETShape serializedPath])
+	//[self validateTypeForNewValue: newValue
+	//          propertyDescription: propertyDesc];
 }
 
 /**
@@ -781,13 +809,11 @@ objectGraphContext: (COObjectGraphContext *)aContext
 - (void)didChangeValueForProperty: (NSString *)key oldValue: (id)oldValue
 {
 	id newValue = [self valueForStorageKey: key];
+	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
 
-	[self validateNewValue: newValue];
+	[self validateNewValue: newValue propertyDescription: propertyDesc];
 
 	[self updateOutgoingSerializedRelationshipCacheForProperty: key];
-	
-    ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
-    
 	[self updateCompositeRelationshipForPropertyDescription: propertyDesc];
     [self updateCachedOutgoingRelationshipsForOldValue: oldValue
 	                                          newValue: newValue
@@ -840,7 +866,8 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
 {
-	[self checkEditingContextForValue: object];
+	// NOTE: We validate the entire collection in -didChangeValueForProperty:oldValue:
+	// We could possibly validate just the inserted objects here.
 
 	id oldCollection = [[self valueForStorageKey: key] mutableCopy];
 	id collection = [self collectionForProperty: key insertionIndex: index];
@@ -891,7 +918,8 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
 {
-	[self checkEditingContextForValue: object];
+	// NOTE: We validate the entire collection in -didChangeValueForProperty:oldValue:
+	// We could possibly validate just the removed objects here.
 
 	id oldCollection = [[self valueForStorageKey: key] mutableCopy];
 	id collection = [self collectionForProperty: key removalIndex: index];

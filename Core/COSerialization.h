@@ -35,10 +35,16 @@ extern NSString *kCOObjectEntityNameProperty;
  */
 @property (nonatomic, copy) COItem *storeItem;
 
+/** @taskunit Querying Serialization Types */
+
+- (BOOL) isSerializablePrimitiveValue: (id)value;
+- (BOOL) isSerializableScalarValue: (id)value;
+
 /** @taskunit Serialization */
 
 - (id)serializedValueForValue: (id)aValue;
 - (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value;
+- (SEL)serializationGetterForProperty: (NSString *)property;
 
 /** @taskunit Deserialization */
 

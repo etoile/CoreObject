@@ -22,6 +22,8 @@ First alpha release blockers
 
 - Support dictionaries in -collectionForProperty:removalIndex: and -collectionForProperty:insertionIndex: (write some tests too)
 
+- Remove automatic keyed archiving in COSerialization and require explicit serialization accessors (containing code such as [NSKeyedArchiver archivedDataWithRootObject: value])
+
 Backlog from Oct 2nd
 --------------------
 
