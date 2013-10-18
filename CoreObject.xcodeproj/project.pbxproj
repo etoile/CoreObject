@@ -565,6 +565,7 @@
 		66550C0617D51D9000327657 /* TestSQLiteStorePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStorePerformance.m; path = Benchmark/TestSQLiteStorePerformance.m; sourceTree = "<group>"; };
 		66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBinaryReadWritePerformance.m; path = Benchmark/TestBinaryReadWritePerformance.m; sourceTree = "<group>"; };
 		6660945618072F6C0051E9F1 /* TestPersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestPersistentRoot.m; path = Tests/TestPersistentRoot.m; sourceTree = "<group>"; };
+		66618A8B1811C065001FA004 /* TERMINOLOGY */ = {isa = PBXFileReference; lastKnownFileType = text; name = TERMINOLOGY; path = Documentation/TERMINOLOGY; sourceTree = "<group>"; };
 		666ED56B17C3E78A00D148AA /* TestUndo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUndo.m; path = Tests/TestUndo.m; sourceTree = "<group>"; };
 		6675F8BA1785C02A001E5622 /* COItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItem.h; sourceTree = "<group>"; };
 		6675F8BB1785C02A001E5622 /* COItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COItem.m; sourceTree = "<group>"; };
@@ -1168,6 +1169,7 @@
 			children = (
 				669963EB11600FD500359BE6 /* LICENSE */,
 				66982A1F11EBC2A0007154CD /* TODO */,
+				66618A8B1811C065001FA004 /* TERMINOLOGY */,
 			);
 			name = Documentation;
 			sourceTree = "<group>";
