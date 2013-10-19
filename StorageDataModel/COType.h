@@ -7,7 +7,7 @@
  * that attribute, and possibly additional semantics of the value
  * which aren't captured by the Objective-C object alone - for example,
  * one value in a COItem might be an NSArray instance, but the corresponding
- * COType might additionally indicate that the array contains embedded item
+ * COType might additionally indicate that the array contains inner item
  * UUIDs, and the array has a restriction that its elements must be unique.
  *
  * COType is designed with a few things in mind:

@@ -37,7 +37,7 @@
 	return [NSString stringWithFormat: @"insert into set %@.%@ value %@ (%@)", UUID, attribute, object, sourceIdentifier];
 }
 
-- (NSSet *) insertedEmbeddedItemUUIDs
+- (NSSet *) insertedInnerItemUUIDs
 {
 	if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
 	{

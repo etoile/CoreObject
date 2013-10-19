@@ -65,9 +65,9 @@ typedef NSUInteger COBranchRevisionReadingOptions;
  *   and calling -finalizeDeletionsForPersistentRoot:.
  *
  *   The contents of a revision consists of a graph of
- *   _embedded objects_, along with one designated as the _root embedded object_. The designation
- *   of _root embedded object_ is for users' convenience; the intent is that this object is what
- *   the persistent root represents. Note that the root embedded object does not have the same UUID
+ *   _inner objects_, along with one designated as the _root inner object_. The designation
+ *   of _root inner object_ is for users' convenience; the intent is that this object is what
+ *   the persistent root represents. Note that the root inner object does not have the same UUID
  *   as the _persistent root_ that contains it.
  *
  *   Persistent roots and branches are mutable, and any changes made are unversioned (only the current
@@ -79,7 +79,7 @@ typedef NSUInteger COBranchRevisionReadingOptions;
  *   A hash, like git and other dvcs's use, could be used instead - the current scheme was chosen for
  *   simplicity and speculated better performance but we may switch to a hash.
  *
- *   TODO: Explain the propety types of embedded objects that are relevant to COSQLiteStore:
+ *   TODO: Explain the propety types of inner objects that are relevant to COSQLiteStore:
  *   Attachment ID, path (inter-persistent root reference)
  *
  * Basic Usage
@@ -90,12 +90,12 @@ typedef NSUInteger COBranchRevisionReadingOptions;
  *    * Create a persistent root with -createPersistentRootWithInitialContents:metadata:,
  *      or -createPersistentRootWithInitialRevision: if a cheap copy is desired.
  *
- *    * Write an embedded object graph as a revision using -writeItemTree:withMetadata:withParentRevisionID:modifiedItems:.
+ *    * Write an inner object graph as a revision using -writeItemTree:withMetadata:withParentRevisionID:modifiedItems:.
  *
  *    * Set the current version of the persistent root's current version to the newly committed
  *      revision using -setCurrentVersion:forBranch:ofPersistentRoot:updateHead:
  *
- *    * Read back the embedded object graph at an old revision using -itemTreeForRevisionID:
+ *    * Read back the inner object graph at an old revision using -itemTreeForRevisionID:
  *
  * - Note that there is no deliberatly no support for copying persistent roots.
  *
@@ -254,7 +254,7 @@ typedef NSUInteger COBranchRevisionReadingOptions;
 
 /**
  * Returns a delta between the given revision IDs.
- * The delta is uses the granularity of single embedded objects, but not individual properties.
+ * The delta is uses the granularity of single inner objects, but not individual properties.
  *
  * This is only useful if the caller has the state of baseRevid in memory.
  * 
@@ -265,7 +265,7 @@ typedef NSUInteger COBranchRevisionReadingOptions;
                                     toRevisionID: (CORevisionID *)finalRevid;
 
 /**
- * Returns the state the embedded object graph at a given revision.
+ * Returns the state the inner object graph at a given revision.
  */
 - (COItemGraph *) itemGraphForRevisionID: (CORevisionID *)aToken;
 
@@ -275,7 +275,7 @@ typedef NSUInteger COBranchRevisionReadingOptions;
 - (ETUUID *) rootObjectUUIDForRevisionID: (CORevisionID *)aToken;
 
 /**
- * Returns the state of a single embedded object at a given revision.
+ * Returns the state of a single inner object at a given revision.
  */
 - (COItem *) item: (ETUUID *)anitem atRevisionID: (CORevisionID *)aToken;
 
@@ -314,11 +314,11 @@ typedef NSUInteger COBranchRevisionReadingOptions;
 /** @taskunit Revision Writing */
 
 /**
- * Writes an embedded object graph as a revision in the store.
+ * Writes an inner object graph as a revision in the store.
  *
  * aParent determines the backing store to write the revision to; must be non-null.
  * modifiedItems is an array of the UUIDs of objects in anItemTree that were either added or changed from their state
- *     in aParent. nil can be passed to indicate that all embedded objects were new/changed. This parameter
+ *     in aParent. nil can be passed to indicate that all inner objects were new/changed. This parameter
  *     is the delta compression, so it should be provided and must be accurate.
  *
  *     For optimal ease-of-use, this paramater would be removed, and the aParent revision would be feteched

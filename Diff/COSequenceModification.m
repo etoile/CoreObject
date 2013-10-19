@@ -38,7 +38,7 @@
 	return [NSString stringWithFormat: @"replace %@.%@[%d:%d] with %@ (%@)", UUID, attribute, (int)range.location, (int)range.length, objects, sourceIdentifier];
 }
 
-- (NSSet *) insertedEmbeddedItemUUIDs
+- (NSSet *) insertedInnerItemUUIDs
 {
 	if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
 	{

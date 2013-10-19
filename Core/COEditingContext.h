@@ -227,7 +227,7 @@
  * changing main branch, deleting branches, adding branches, editing branch 
  * metadata, reverting branch to a past revision) will be cancelled.
  *
- * All uncommitted embedded object edits in child persistent roots will be
+ * All uncommitted inner object edits in child persistent roots will be
  * cancelled.
  *
  * -persistentRootsPendingInsertion, -persistentRootsPendingDeletion, 

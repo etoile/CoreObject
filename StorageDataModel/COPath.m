@@ -6,7 +6,7 @@
 
 @synthesize persistentRoot = persistentRoot_;
 @synthesize branch = branch_;
-@synthesize embeddedObject = embeddedObject_;
+@synthesize innerObject = innerObject_;
 
 - (BOOL) isCrossPersistentRoot
 {
@@ -21,7 +21,7 @@
 	NILARG_EXCEPTION_TEST(aRoot);
 	persistentRoot_ =  aRoot;
 	branch_ =  aBranch;
-	embeddedObject_ =  anObject;
+	innerObject_ =  anObject;
 	return self;
 }
 
@@ -48,7 +48,7 @@
 {
 	NILARG_EXCEPTION_TEST(pathString);
 	
-	ETUUID *embeddedObject = nil;
+	ETUUID *innerObject = nil;
 	ETUUID *branch = nil;
 	ETUUID *persistentRoot = nil;
 	
@@ -59,7 +59,7 @@
 		switch ([components count])
 		{
 			case 3:
-				embeddedObject = [ETUUID UUIDWithString: [components objectAtIndex: 2]];
+				innerObject = [ETUUID UUIDWithString: [components objectAtIndex: 2]];
 			case 2:
 				branch = [ETUUID UUIDWithString: [components objectAtIndex: 1]];
 			case 1:
@@ -69,19 +69,19 @@
 				[NSException raise: NSInvalidArgumentException format: @"unsupported COPath string '%@'", pathString];
 		}
 	}
-	return [COPath pathWithPersistentRoot: persistentRoot branch: branch embdeddedObject: embeddedObject];
+	return [COPath pathWithPersistentRoot: persistentRoot branch: branch embdeddedObject: innerObject];
 }
 
 - (COPath *) pathWithNameMapping: (NSDictionary *)aMapping
 {
-	ETUUID *embeddedObject = embeddedObject_;
+	ETUUID *innerObject = innerObject_;
 	ETUUID *branch = branch_;
 	ETUUID *persistentRoot = persistentRoot_;
     
-    if (embeddedObject != nil
-        && [aMapping objectForKey: embeddedObject])
+    if (innerObject != nil
+        && [aMapping objectForKey: innerObject])
     {
-        embeddedObject = [aMapping objectForKey: embeddedObject];
+        innerObject = [aMapping objectForKey: innerObject];
     }
     
     if (branch != nil
@@ -98,7 +98,7 @@
     
     return [COPath pathWithPersistentRoot: persistentRoot
                                    branch: branch
-                          embdeddedObject: embeddedObject];
+                          embdeddedObject: innerObject];
 }
 
 - (id) copyWithZone: (NSZone *)zone
@@ -114,9 +114,9 @@
 	{
 		[value appendFormat: @":%@", branch_];
 	}
-	if (embeddedObject_ != nil)
+	if (innerObject_ != nil)
 	{
-		[value appendFormat: @".%@", embeddedObject_];
+		[value appendFormat: @".%@", innerObject_];
 	}
 	
 	return [NSString stringWithString: value];

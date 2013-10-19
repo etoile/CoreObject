@@ -3,6 +3,6 @@
 @implementation COSearchResult
 
 @synthesize revision = revision_;
-@synthesize embeddedObjectUUID = embeddedObjectUUID_;
+@synthesize innerObjectUUID = innerObjectUUID_;
 
 @end

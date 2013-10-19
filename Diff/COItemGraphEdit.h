@@ -28,7 +28,7 @@
 
 // information
 
-- (NSSet *) insertedEmbeddedItemUUIDs;
+- (NSSet *) insertedInnerItemUUIDs;
 
 - (BOOL) isSameKindOfEdit: (COItemGraphEdit*)anEdit;
 

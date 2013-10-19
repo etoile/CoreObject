@@ -61,7 +61,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 // allows treating primitive or container, unordered or ordered as NSArray
 - (NSArray*) allObjectsForAttribute: (NSString*)attribute;
 
-- (NSSet *) embeddedItemUUIDs;
+- (NSSet *) compositeReferencedItemUUIDs;
 - (NSSet *) referencedItemUUIDs;
 
 // GC helper methods

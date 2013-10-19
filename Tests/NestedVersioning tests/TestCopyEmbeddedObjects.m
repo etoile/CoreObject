@@ -92,7 +92,7 @@ void test()
 	
 	
 	/* method to test is:
-	- (COUUID *) copyEmbeddedObject: (COUUID *)src
+	- (COUUID *) copyInnerObject: (COUUID *)src
 fromContext: (id<COEditingContext>)srcCtx;
 insertInto: (COUUID *)dest
 inContext: (id<COEditingContext>)destCtx

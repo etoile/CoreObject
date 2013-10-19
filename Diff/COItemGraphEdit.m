@@ -50,7 +50,7 @@
 		&& [sourceIdentifier isEqual: ((COItemGraphEdit*)other).sourceIdentifier];
 }
 
-- (NSSet *) insertedEmbeddedItemUUIDs
+- (NSSet *) insertedInnerItemUUIDs
 {
 	return [NSSet set];
 }

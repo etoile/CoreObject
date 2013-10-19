@@ -12,7 +12,7 @@
 	return [NSString stringWithFormat: @"delete from set %@.%@ value %@ (%@)", UUID, attribute, object, sourceIdentifier];
 }
 
-- (NSSet *) insertedEmbeddedItemUUIDs
+- (NSSet *) insertedInnerItemUUIDs
 {
 	return [NSSet set];
 }

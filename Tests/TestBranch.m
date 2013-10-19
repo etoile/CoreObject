@@ -603,7 +603,7 @@
     CORevision *r1 = [originalBranch currentRevision];
     
     // This should cause a new revision to be written, even though there
-    // are no changes in the embedded objects.
+    // are no changes in the inner objects.
     originalBranch.shouldMakeEmptyCommit = YES;
     [ctx commitWithType: @"save"  shortDescription: @"user pressed save"];
     
@@ -640,7 +640,7 @@
 	 }];
 }
 
-- (void) testExceptionOnDeletedBranchModifyEmbeddedObject
+- (void) testExceptionOnDeletedBranchModifyInnerObject
 {
 	altBranch.deleted = YES;
 	[ctx commit];

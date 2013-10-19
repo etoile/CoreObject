@@ -124,9 +124,9 @@
     // FTS indexes & reference caching tables (in theory, could be regenerated - although not supported)
     
     /**
-     * In embedded_object_uuid in revid of backing store root_id, there was a reference to dest_root_id
+     * In inner_object_uuid in revid of backing store root_id, there was a reference to dest_root_id
      */
-    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS proot_refs (root_id BLOB, revid BOLB, embedded_object_uuid BLOB, dest_root_id BLOB)"];
+    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS proot_refs (root_id BLOB, revid BOLB, inner_object_uuid BLOB, dest_root_id BLOB)"];
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS attachment_refs (root_id BLOB, revid BLOB, attachment_hash BLOB)"];
     
     // FIXME: This is a bit ugly. Verify that usage is consistent across fts3/4
@@ -529,7 +529,7 @@
         // Look for references to other persistent roots.
         for (ETUUID *referenced in [itemToIndex allReferencedPersistentRootUUIDs])
         {
-            [db_ executeUpdate: @"INSERT INTO proot_refs(root_id, revid, embedded_object_uuid, dest_root_id) VALUES(?,?,?,?)",
+            [db_ executeUpdate: @"INSERT INTO proot_refs(root_id, revid, inner_object_uuid, dest_root_id) VALUES(?,?,?,?)",
                 backingUUIDData,
                 [[aRevision revisionUUID] dataValue],
                 [uuid dataValue],
@@ -1192,15 +1192,15 @@
     assert(dispatch_get_current_queue() != queue_);
     
     dispatch_sync(queue_, ^(){
-        FMResultSet *rs = [db_ executeQuery: @"SELECT root_id, revid, embedded_object_uuid FROM proot_refs WHERE dest_root_id = ?", [aUUID dataValue]];
+        FMResultSet *rs = [db_ executeQuery: @"SELECT root_id, revid, inner_object_uuid FROM proot_refs WHERE dest_root_id = ?", [aUUID dataValue]];
         while ([rs next])
         {
             ETUUID *root = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
             ETUUID *revUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
-            ETUUID *embedded_object_uuid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
+            ETUUID *inner_object_uuid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
             
             COSearchResult *searchResult = [[COSearchResult alloc] init];
-            searchResult.embeddedObjectUUID = embedded_object_uuid;
+            searchResult.innerObjectUUID = inner_object_uuid;
             searchResult.revision = [CORevisionID revisionWithPersistentRootUUID: root
                                                                  revisionUUID: revUUID];
             [results addObject: searchResult];

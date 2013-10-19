@@ -14,8 +14,6 @@ First alpha release blockers
 
 - Improve -[COObject detailedDescription] code and make output more readable
 
-- Update all API doc from "embedded object" to "inner object"
-
 - Check and update all Core API documentation (underway)
 
 - Check code quality for all Core classes (underway)
@@ -174,7 +172,7 @@ typewriter / ProjDemo
       metamodel for managing the merge, others may want to do it only in memory.
       
       Also, though the diff/merge happens at the persistent root granularity,
-      there may be multiple embedded object trees with different merge UI's.
+      there may be multiple inner object trees with different merge UI's.
       (e.g. several types of objects on a canvas in a composite documents)
   - Build an example app with a merging UI
   - Requirements:
@@ -203,7 +201,7 @@ typewriter / ProjDemo
   - Attempting to set a value for a readonly property should raise an exception
   - Check COObject KVO semantics and documentation
   - See if we can get rid of all of the properties that only make sense for root objects.
-    Maybe have a convention that the root embedded object is a subtype of COObject that
+    Maybe have a convention that the root inner object is a subtype of COObject that
     has all of these properties. If we want to make an arbitrary object a root object, 
     we would actually make it a child of the real/wrapper root obejct with all of the
     root object metadata.

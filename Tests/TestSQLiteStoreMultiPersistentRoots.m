@@ -73,7 +73,7 @@ static ETUUID *tagUUID;
     
     COSearchResult *result = [results objectAtIndex: 0];
     UKObjectsEqual([[tagProot currentBranchInfo] currentRevisionID], [result revision]);
-    UKObjectsEqual(tagUUID, [result embeddedObjectUUID]);
+    UKObjectsEqual(tagUUID, [result innerObjectUUID]);
 }
 
 - (void) testDeletion

@@ -307,7 +307,7 @@
 	 }];
 }
 
-- (void) testExceptionOnDeletedPersistentRootModifyEmbeddedObject
+- (void) testExceptionOnDeletedPersistentRootModifyInnerObject
 {
 	persistentRoot.deleted = YES;
 	[ctx commit];

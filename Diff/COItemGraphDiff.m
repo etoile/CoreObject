@@ -851,7 +851,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	return embeddedItemInsertionConflicts;
 }
 
-- (void) recordEmbeddedItemInsertionConflictEdit: (COItemGraphEdit *)newEdit withEdit: (COItemGraphEdit *)existingEdit
+- (void) recordInnerItemInsertionConflictEdit: (COItemGraphEdit *)newEdit withEdit: (COItemGraphEdit *)existingEdit
 {
 	COItemGraphConflict *conflict = [self findOrCreateConflictInMutableSet: embeddedItemInsertionConflicts containingEdit: existingEdit];
 	[conflict addEdit: newEdit];
@@ -908,13 +908,13 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	  - A. all edits in the conflict belong to the same UUID.attribute
 	  - B. not all edits in the conflict belong to the same UUID.attribute
 	 
-	 -type B conflicts are all "embedded item inserted in more than one place" conflicts.
-	 -"embedded item inserted in more than one place" conflicts can also be type A conflicts
+	 -type B conflicts are all "inner item inserted in more than one place" conflicts.
+	 -"inner item inserted in more than one place" conflicts can also be type A conflicts
 	   (diff x inserts Q at index 0, diff y inserts Q at index 3...)
 	 
 	 -conflict uniqueness:
 	 
-		= each edit can belong to at most 1 "embedded item inserted in more than one place" conflict
+		= each edit can belong to at most 1 "inner item inserted in more than one place" conflict
 	    = "equal edit" conflicts should be separate from other conflicts
         = overlapping, but non-equal, sequence edit conflicts should be separate from other conflicts (?)
 		= "conflicting edit types for UUID.attribute" conflicts should be separate from other conflicts.
@@ -993,18 +993,18 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 		}
 	}
 
-	// check for same embedded item inserted in more than one place
+	// check for same inner item inserted in more than one place
 	
-	NSSet *anEditEmbeddedItemInsertions = [anEdit insertedEmbeddedItemUUIDs];
+	NSSet *anEditInnerItemInsertions = [anEdit insertedInnerItemUUIDs];
 	for (COItemGraphEdit *edit in [self allEdits])
 	{
 		if (![edit isEqual: anEdit])
 		{
-			NSSet *editEmbeddedItemInsertions = [edit insertedEmbeddedItemUUIDs];
-			if ([anEditEmbeddedItemInsertions intersectsSet: editEmbeddedItemInsertions])
+			NSSet *editInnerItemInsertions = [edit insertedInnerItemUUIDs];
+			if ([anEditInnerItemInsertions intersectsSet: editInnerItemInsertions])
 			{
 				// edit and anEdit conflict! create a new conflict or update an existing one.
-				[self recordEmbeddedItemInsertionConflictEdit: anEdit withEdit: edit];
+				[self recordInnerItemInsertionConflictEdit: anEdit withEdit: edit];
 			}
 		}
 	}

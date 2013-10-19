@@ -490,7 +490,7 @@
 }
 
 
-- (void) testSubtreeCreationFromItemsWithEmbeddedItemUsedTwice
+- (void) testSubtreeCreationFromItemsWithInnerItemUsedTwice
 {
 	COMutableItem *parent = [COMutableItem item];
 	COMutableItem *child1 = [COMutableItem item];

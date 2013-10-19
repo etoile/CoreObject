@@ -239,12 +239,12 @@ static BOOL COItemGraphEqualToItemGraphComparingItemUUID(id<COItemGraph> first, 
         return NO;
     }
     
-    if (![[my embeddedItemUUIDs] isEqual: [other embeddedItemUUIDs]])
+    if (![[my compositeReferencedItemUUIDs] isEqual: [other compositeReferencedItemUUIDs]])
     {
         return NO;
     }
     
-    for (ETUUID *aChild in [my embeddedItemUUIDs])
+    for (ETUUID *aChild in [my compositeReferencedItemUUIDs])
     {
         if (!COItemGraphEqualToItemGraphComparingItemUUID(first, second, aChild))
         {

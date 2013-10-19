@@ -6,10 +6,10 @@
 @interface COSearchResult : NSObject
 {
     CORevisionID *revision_;
-    ETUUID *embeddedObjectUUID_;
+    ETUUID *innerObjectUUID_;
 }
 
 @property (nonatomic, readwrite, strong) CORevisionID *revision;
-@property (nonatomic, readwrite, strong) ETUUID *embeddedObjectUUID;
+@property (nonatomic, readwrite, strong) ETUUID *innerObjectUUID;
 
 @end

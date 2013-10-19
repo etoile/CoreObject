@@ -50,7 +50,7 @@
 /**
  * Metadata, like the user-facing name of the branch.
  * Note that branches have metadata while persistent roots do not. Persistent
- * root metadata should be stored in the embedded objects as versioned data.
+ * root metadata should be stored in the inner objects as versioned data.
  * (If there is a real use case for unversioned persistent root metadata,
  *  we can easily re-add it)
  */

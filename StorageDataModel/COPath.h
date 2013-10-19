@@ -10,7 +10,7 @@
 @private
 	ETUUID *persistentRoot_;
 	ETUUID *branch_;
-	ETUUID *embeddedObject_;
+	ETUUID *innerObject_;
 }
 
 /**
@@ -20,7 +20,7 @@
 
 @property (strong, readonly) ETUUID *persistentRoot;
 @property (strong, readonly) ETUUID *branch;
-@property (strong, readonly) ETUUID *embeddedObject;
+@property (strong, readonly) ETUUID *innerObject;
 
 /**
  * Implicitly points to the root object of the current branch

@@ -294,7 +294,7 @@
  * Returns the root object when the receiver is persistent, otherwise returns nil.
  *
  * When the receiver is persistent, returns either self or the root object that 
- * encloses the receiver as an embedded object.
+ * encloses the receiver as an inner object.
  *
  * See also -isRoot.
  */
@@ -312,9 +312,9 @@
 @property (nonatomic, readonly) BOOL isPersistent;
 /** 
  * Returns whether the receiver is a root object that provides access to 
- * other embedded objects (in the object graph context).
+ * other inner objects (in the object graph context).
  *
- * Embedded or non-persistent objects returns NO.
+ * Inner or non-persistent objects returns NO.
  *
  * See also -rootObject.
  */

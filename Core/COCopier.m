@@ -16,7 +16,7 @@
                             fromGraph: (id<COItemGraph>)source
 {
     [dest addObject: aUUID];
-    for (ETUUID *child in [[source itemForUUID: aUUID] embeddedItemUUIDs])
+    for (ETUUID *child in [[source itemForUUID: aUUID] compositeReferencedItemUUIDs])
     {
         if (![dest containsObject: child])
         {

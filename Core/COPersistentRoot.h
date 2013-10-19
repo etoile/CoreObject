@@ -23,7 +23,7 @@
  *  - TODO: complete this list
  *
  * But not:
- *  - editing an embedded object
+ *  - editing an inner object
  *
  * The userInfo dictionary is nil. The sender is the affected COPersistentRoot
  * object.
@@ -246,7 +246,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * Branch insertions, deletions, undeletions and modifications (e.g. editing 
  * branch metadata, reverting branch to a past revision) will be cancelled.
  *
- * All uncommitted embedded object edits in the object graphs owned by the 
+ * All uncommitted inner object edits in the object graphs owned by the 
  * branches will be cancelled.
  *
  * -branchesPendingInsertion, -branchesPendingDeletion, 

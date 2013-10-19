@@ -185,14 +185,14 @@ static NSString *kCOReferences = @"references";
     
     UKObjectsEqual([list1 directDescendentObjects], S(itemA));
     UKObjectsEqual([list2 directDescendentObjects], S(itemB));
-    UKObjectsSame(list1, [itemA embeddedObjectParent]);
-    UKObjectsSame(list2, [itemB embeddedObjectParent]);
+    UKObjectsSame(list1, [itemA innerObjectParent]);
+    UKObjectsSame(list2, [itemB innerObjectParent]);
     
     // move itemA to list2
     
     [list2 setValue: S(itemA, itemB) forAttribute: kCOContents];
 
-    UKObjectsSame(list2, [itemA embeddedObjectParent]);
+    UKObjectsSame(list2, [itemA innerObjectParent]);
     UKObjectsEqual([list1 directDescendentObjects], [NSSet set]);
     UKObjectsEqual([list2 directDescendentObjects], S(itemA, itemB));
 }
@@ -336,13 +336,13 @@ static NSString *kCOReferences = @"references";
 	[self addObject: leaf2 toObject: group2];
 	[self addObject: group2 toObject: document2];
 	
-	UKObjectsSame(workspace, [document1 embeddedObjectParent]);
-	UKObjectsSame(workspace, [document2 embeddedObjectParent]);
-	UKObjectsSame(document1, [group1 embeddedObjectParent]);
-	UKObjectsSame(document2, [group2 embeddedObjectParent]);
-	UKObjectsSame(group1, [leaf1 embeddedObjectParent]);
-	UKObjectsSame(group2, [leaf2 embeddedObjectParent]);
-	UKObjectsSame(group2, [leaf3 embeddedObjectParent]);
+	UKObjectsSame(workspace, [document1 innerObjectParent]);
+	UKObjectsSame(workspace, [document2 innerObjectParent]);
+	UKObjectsSame(document1, [group1 innerObjectParent]);
+	UKObjectsSame(document2, [group2 innerObjectParent]);
+	UKObjectsSame(group1, [leaf1 innerObjectParent]);
+	UKObjectsSame(group2, [leaf2 innerObjectParent]);
+	UKObjectsSame(group2, [leaf3 innerObjectParent]);
 	UKObjectsEqual(S(document1, document2), [workspace valueForAttribute: kCOContents]);
 	UKObjectsEqual(S(group1), [document1 valueForAttribute: kCOContents]);
 	UKObjectsEqual(S(group2), [document2 valueForAttribute: kCOContents]);
@@ -431,7 +431,7 @@ static NSString *kCOReferences = @"references";
 }
 
 
-- (void) testSubtreeCreationFromItemsWithEmbeddedItemUsedTwice
+- (void) testSubtreeCreationFromItemsWithInnerItemUsedTwice
 {
 	COMutableItem *parent = [COMutableItem item];
 	COMutableItem *child1 = [COMutableItem item];

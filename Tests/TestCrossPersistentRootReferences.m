@@ -336,7 +336,7 @@
 	//  |
 	//  \--photo1 // cross-persistent-root link
 	//  |
-    //  \--photo2 // inner reference to embedded object
+    //  \--photo2 // inner reference to inner object
     //
 	// photo1 <<persistent root>>
     //
@@ -361,7 +361,7 @@
     
     // FIXME: UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
     
-    // Add photo2 embedded item. Note that the photo1 cross-persistent-root reference is
+    // Add photo2 inner item. Note that the photo1 cross-persistent-root reference is
     // still present in library1.contents, it's just hidden.
     
     COObject *photo2 = [[library1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];

@@ -57,7 +57,7 @@
     UKNil([cache parentForUUID: u2]);
 }
 
-- (void) testParentWithEmbeddedItemSet
+- (void) testParentWithInnerItemSet
 {
     ETUUID *p1 = [ETUUID UUID];
     ETUUID *p2 = [ETUUID UUID];

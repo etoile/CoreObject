@@ -152,7 +152,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	}
 }
 
-- (NSSet *) embeddedItemUUIDs
+- (NSSet *) compositeReferencedItemUUIDs
 {
 	NSMutableSet *result = [NSMutableSet set];
 	
