@@ -4,17 +4,17 @@ TODO
 First alpha release blockers
 ----------------------------
 
+- isShared support in COCopier, COItem
+
+- Support for composite cross-persistent root references as we discussed
+
 - Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
 
 - Shorten -[COObject description] output
 
 - Improve -[COObject detailedDescription] code and make output more readable
 
-- Decide on embedded vs inner and update all API doc
-
-- Clean COGarbageCollection.m and rename -embeddedOrReferencedObjects to use a more descriptive name
-
-- Could move GC related code in COObjectGraphContext to COGarbageCollection (not sure)
+- Update all API doc from "embedded object" to "inner object"
 
 - Check and update all Core API documentation (underway)
 
