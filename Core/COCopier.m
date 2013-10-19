@@ -8,15 +8,48 @@
 
 #import "COCopier.h"
 #import "COItem.h"
+#import "COSerialization.h"
 
 @implementation COCopier
+
+- (NSArray *) directDescendentItemUUIDsForUUID: (ETUUID *)aUUID
+									 fromGraph: (id<COItemGraph>)source
+{
+	NSMutableSet *result = [NSMutableSet set];
+	
+	COItem *item = [source itemForUUID: aUUID];
+	for (NSString *key in [item attributeNames])
+	{
+		COType type = [item typeForAttribute: key];
+		if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
+		{
+			[result addObjectsFromArray: [item allObjectsForAttribute: key]];
+		}
+		else if (COTypePrimitivePart(type) == kCOTypeReference)
+		{
+			for (ETUUID *refUUID in [item allObjectsForAttribute: key])
+			{
+				if ([refUUID isKindOfClass: [ETUUID class]])
+				{
+					COItem *refItem = [source itemForUUID: refUUID];
+					if ([[refItem valueForAttribute: kCOObjectIsSharedProperty] isEqual: @NO])
+					{
+						[result addObject: refUUID];
+					}
+				}
+			}
+		}
+	}
+	
+	return [result allObjects];
+}
 
 - (void) collectItemAndAllDescendents: (ETUUID *)aUUID
                                 inSet: (NSMutableSet *)dest
                             fromGraph: (id<COItemGraph>)source
 {
     [dest addObject: aUUID];
-    for (ETUUID *child in [[source itemForUUID: aUUID] compositeReferencedItemUUIDs])
+    for (ETUUID *child in [self directDescendentItemUUIDsForUUID: aUUID fromGraph: source])
     {
         if (![dest containsObject: child])
         {

@@ -292,72 +292,51 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		id value = [aCopy valueForAttribute: attr];
 		COType type = [aCopy typeForAttribute: attr];
 		
-		if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
+		if (COTypeIsPrimitive(type))
 		{
-			if (COTypeIsPrimitive(type))
+			if ([value isKindOfClass: [ETUUID class]])
 			{
-				ETUUID *UUIDValue = (ETUUID*)value;
-				if ([aMapping objectForKey: UUIDValue] != nil)
+				if ([aMapping objectForKey: value] != nil)
 				{
-					[aCopy setValue: [aMapping objectForKey: UUIDValue]
-						 forAttribute: attr
-								 type: type];
+					[aCopy setValue: [aMapping objectForKey: value]
+					   forAttribute: attr
+							   type: type];
 				}
 			}
-			else
-			{ 
-				id newCollection = [value mutableCopy];
-				[newCollection removeAllObjects];
-				
-				for (ETUUID *UUIDValue in value)
-				{
-					ETUUID *newUUIDValue = UUIDValue;
-					if ([aMapping objectForKey: UUIDValue] != nil)
-					{
-						newUUIDValue = [aMapping objectForKey: UUIDValue];
-					}
-					[newCollection addObject: newUUIDValue];
-				}
-				
-				[aCopy setValue: newCollection
+			if ([value isKindOfClass: [COPath class]])
+			{
+				[aCopy setValue: [value pathWithNameMapping: aMapping]
 				   forAttribute: attr
 						   type: type];
 			}
 		}
-		else if (COTypePrimitivePart(type) == kCOTypeReference)
+		else
 		{
-			if (COTypeIsPrimitive(type))
+			id newCollection = [value mutableCopy];
+			[newCollection removeAllObjects];
+			
+			for (id subValue in value)
 			{
-                if ([value isKindOfClass: [COPath class]])
-                {
-                    COPath *pathValue = (COPath*)value;
-                    
-                    [aCopy setValue: [pathValue pathWithNameMapping: aMapping]
-                       forAttribute: attr
-                               type: type];
-                }
-			}
-			else
-			{ 
-				id newCollection = [value mutableCopy];
-				[newCollection removeAllObjects];
-				
-				for (id primitiveValue in value)
+				if ([subValue isKindOfClass: [ETUUID class]])
 				{
-                    if ([primitiveValue isKindOfClass: [COPath class]])
-                    {
-                        [newCollection addObject: [primitiveValue pathWithNameMapping:aMapping]];
-                    }
-                    else
-                    {
-                        [newCollection addObject: primitiveValue];
-                    }
+					if ([aMapping objectForKey: subValue] != nil)
+					{
+						[newCollection addObject: [aMapping objectForKey: subValue]];
+					}
+					else
+					{
+						[newCollection addObject: subValue];
+					}
 				}
-				
-				[aCopy setValue: newCollection
-				   forAttribute: attr
-						   type: type];
+				else if ([subValue isKindOfClass: [COPath class]])
+				{
+					[newCollection addObject: [subValue pathWithNameMapping: aMapping]];
+				}
 			}
+			
+			[aCopy setValue: newCollection
+			   forAttribute: attr
+					   type: type];
 		}
 	}
 	

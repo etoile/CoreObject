@@ -23,6 +23,7 @@
 @implementation COObject (COSerialization)
 
 NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
+NSString *kCOObjectIsSharedProperty = @"org.etoile-project.coreobject.isshared";
 
 /* Returns whether the given value is a primitive type supported by CoreObject
 serialization. */

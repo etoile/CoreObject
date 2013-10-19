@@ -14,6 +14,7 @@
 @class COItem;
 
 extern NSString *kCOObjectEntityNameProperty;
+extern NSString *kCOObjectIsSharedProperty;
 
 @interface COObject (COSerialization)
 
