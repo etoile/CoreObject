@@ -150,6 +150,7 @@
 		66550C0917D51E8F00327657 /* TestBinaryReadWritePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */; };
 		6660945718072F6C0051E9F1 /* TestPersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 6660945618072F6C0051E9F1 /* TestPersistentRoot.m */; };
 		66618A9518130F5B001FA004 /* TestCopierWithIsShared.m in Sources */ = {isa = PBXBuildFile; fileRef = 66618A9418130F5B001FA004 /* TestCopierWithIsShared.m */; };
+		66618A97181334F8001FA004 /* TestCopierWithIsSharedFalseAndMultipleReferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 66618A96181334F8001FA004 /* TestCopierWithIsSharedFalseAndMultipleReferences.m */; };
 		666ED56C17C3E78A00D148AA /* TestUndo.m in Sources */ = {isa = PBXBuildFile; fileRef = 666ED56B17C3E78A00D148AA /* TestUndo.m */; };
 		6675F8C11785C02A001E5622 /* COItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BA1785C02A001E5622 /* COItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C21785C02A001E5622 /* COItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BB1785C02A001E5622 /* COItem.m */; };
@@ -567,7 +568,8 @@
 		66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBinaryReadWritePerformance.m; path = Benchmark/TestBinaryReadWritePerformance.m; sourceTree = "<group>"; };
 		6660945618072F6C0051E9F1 /* TestPersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestPersistentRoot.m; path = Tests/TestPersistentRoot.m; sourceTree = "<group>"; };
 		66618A8B1811C065001FA004 /* TERMINOLOGY */ = {isa = PBXFileReference; lastKnownFileType = text; name = TERMINOLOGY; path = Documentation/TERMINOLOGY; sourceTree = "<group>"; };
-		66618A9418130F5B001FA004 /* TestCopierWithIsShared.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCopierWithIsShared.m; sourceTree = "<group>"; };
+		66618A9418130F5B001FA004 /* TestCopierWithIsShared.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCopierWithIsShared.m; path = Tests/TestCopierWithIsShared.m; sourceTree = "<group>"; };
+		66618A96181334F8001FA004 /* TestCopierWithIsSharedFalseAndMultipleReferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestCopierWithIsSharedFalseAndMultipleReferences.m; path = Tests/TestCopierWithIsSharedFalseAndMultipleReferences.m; sourceTree = "<group>"; };
 		666ED56B17C3E78A00D148AA /* TestUndo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUndo.m; path = Tests/TestUndo.m; sourceTree = "<group>"; };
 		6675F8BA1785C02A001E5622 /* COItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItem.h; sourceTree = "<group>"; };
 		6675F8BB1785C02A001E5622 /* COItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COItem.m; sourceTree = "<group>"; };
@@ -1273,6 +1275,7 @@
 				6660945618072F6C0051E9F1 /* TestPersistentRoot.m */,
 				66808461178CD4FD003A3CC6 /* TestCopier.m */,
 				66618A9418130F5B001FA004 /* TestCopierWithIsShared.m */,
+				66618A96181334F8001FA004 /* TestCopierWithIsSharedFalseAndMultipleReferences.m */,
 				609C00611704C24C00D01AAB /* TestRevisionNumber.m */,
 				66D43BB4179E170B008CE44E /* TestConcurrentChanges.m */,
 				667F1ED6179C81E00083C3E6 /* TestObject.m */,
@@ -1833,6 +1836,7 @@
 				66860BA417BED42900B24333 /* TestSQLiteStorePersistentRootBackingStore.m in Sources */,
 				66860BA517BED42900B24333 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
+				66618A97181334F8001FA004 /* TestCopierWithIsSharedFalseAndMultipleReferences.m in Sources */,
 				6612A8A01800B5A700530847 /* TestUndoStackTrackProtocol.m in Sources */,
 				66808498178DB4D5003A3CC6 /* TestBranch.m in Sources */,
 				66C18AD517BAB2EE00C5316F /* TestEditingContext.m in Sources */,

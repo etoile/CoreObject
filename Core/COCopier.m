@@ -48,20 +48,18 @@
                                 inSet: (NSMutableSet *)dest
                             fromGraph: (id<COItemGraph>)source
 {
+	if ([dest containsObject: aUUID])
+	{
+		return;
+	}
+
     [dest addObject: aUUID];
+	
     for (ETUUID *child in [self directDescendentItemUUIDsForUUID: aUUID fromGraph: source])
     {
-        if (![dest containsObject: child])
-        {
-            [self collectItemAndAllDescendents: child
-                                         inSet: dest
-                                     fromGraph: source];
-        }
-        else
-        {
-            [NSException raise: NSInvalidArgumentException
-                        format: @"Cycle detected"];
-        }
+		[self collectItemAndAllDescendents: child
+									 inSet: dest
+								 fromGraph: source];
     }
 }
 
