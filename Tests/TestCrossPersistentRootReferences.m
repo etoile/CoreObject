@@ -431,6 +431,66 @@
 #endif
 }
 
+#if 0
+- (void) testCompositeCrossReference
+{
+    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *doc2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *child1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [[doc1 rootObject] insertObject: [child1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+	[[doc1 rootObject] setLabel: @"doc1 with child1"];
+	[[doc2 rootObject] setLabel: @"doc2"];
+	[[child1 rootObject] setLabel: @"child1"];
+	[ctx commit];
+	
+	// Check setup
+	
+	[self testPersistentRootWithExistingAndNewContext: doc1
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 id testDoc1root = [testPersistentRoot rootObject];
+		 UKTrue([[[testDoc1root entityDescription] propertyDescriptionForName: @"contents"] isComposite]);
+		 id testChild1rootObj = [[testDoc1root contents] objectAtIndex: 0];
+		 UKObjectsEqual(@"child1", [testChild1rootObj label]);
+		 UKObjectsEqual([child1 UUID], [[testChild1rootObj persistentRoot] UUID]);
+	 }];
+	
+	// Move child1 to doc2. Expected that it is automatically removed from doc1.
+
+	UKFalse([doc1 hasChanges]);
+    [[doc2 rootObject] insertObject: [child1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+	UKTrue([doc1 hasChanges]);
+	[[doc1 rootObject] setLabel: @"doc1"];
+	[[doc2 rootObject] setLabel: @"doc2 with child1"];
+	[ctx commit];
+	
+	[self testPersistentRootWithExistingAndNewContext: doc1
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKTrue([[[testPersistentRoot rootObject] contents] isEmpty]);
+		 UKObjectsEqual(@"doc1", [[testPersistentRoot rootObject] label]);
+	 }];
+	[self testPersistentRootWithExistingAndNewContext: doc2
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 id testDoc2root = [testPersistentRoot rootObject];
+		 id testChild1rootObj = [[testDoc2root contents] objectAtIndex: 0];
+		 UKObjectsEqual(@"child1", [testChild1rootObj label]);
+		 UKObjectsEqual([child1 UUID], [[testChild1rootObj persistentRoot] UUID]);
+	 }];
+	
+	// Now, revert doc1
+	
+	[[doc1 currentBranch] undo];
+	UKTrue([doc1 hasConsistencyViolation]); // not sure about this?
+	UKObjectsEqual(@"doc1 with child1", [[doc1 rootObject] label]);
+	
+	// chil1 should still be in doc2, and doc1.contents should be empty
+	
+	UKRaisesException([ctx commit]);
+}
+#endif
+
 /*
  
  List of some scenarios to test:
