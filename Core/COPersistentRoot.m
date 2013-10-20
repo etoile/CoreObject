@@ -570,6 +570,16 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     [[self editingBranch] setCurrentRevision: revision];
 }
 
+- (CORevision *)headRevision
+{
+    return [[self editingBranch] headRevision];
+}
+
+- (void)setHeadRevision: (CORevision *)revision
+{
+    [[self editingBranch] setHeadRevision: revision];
+}
+
 - (void)updateBranchWithBranchInfo: (COBranchInfo *)branchInfo
 {
     COBranch *branch = [_branchForUUID objectForKey: [branchInfo UUID]];

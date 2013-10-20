@@ -93,6 +93,16 @@
 	UKFalse([_testTrack canRedo]);
 }
 
+- (void) checkPersistentRoot: (COPersistentRoot *)proot hasCurrentRevision: (CORevision *)currentExpected head: (CORevision *)headExpected
+{
+	[self testPersistentRootWithExistingAndNewContext: proot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual(currentExpected, [testProot currentRevision]);
+		 UKObjectsEqual(headExpected, [testProot headRevision]);
+	 }];
+}
+
 /*
         ----r2b
        /
@@ -118,51 +128,57 @@
 	
 	[[persistentRoot currentBranch] undo];
 	[ctx commitWithUndoTrack: _testTrack];
-	UKObjectsEqual(r2, [persistentRoot currentRevision]);
-
+	
+	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r2 head: r3];
+	
 	[[persistentRoot currentBranch] undo];
 	[ctx commitWithUndoTrack: _testTrack];
-	UKObjectsEqual(r1, [persistentRoot currentRevision]);
+
+	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r1 head: r3];
 
 	[[persistentRoot rootObject] setLabel: @"r2b"];
 	[ctx commitWithUndoTrack: _testTrack];
 	CORevision *r2b = [persistentRoot currentRevision];
-	UKObjectsEqual(r2b, [[persistentRoot currentBranch] headRevision]);
-	UKObjectsNotEqual(r3, [[persistentRoot currentBranch] headRevision]);
+
+	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r2b head: r2b];
 	
 	[[persistentRoot currentBranch] undo];
 	[ctx commitWithUndoTrack: _testTrack];
-	UKObjectsEqual(r1, [persistentRoot currentRevision]);
+	
+	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r1 head: r2b];
 
 	[[persistentRoot currentBranch] redo];
 	[ctx commitWithUndoTrack: _testTrack];
-	UKObjectsEqual(r2b, [persistentRoot currentRevision]);
+
+	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r2b head: r2b];
 
 	// Switch to using track undo, instead of branch navigation
 	
 	[_testTrack undo];
-	UKObjectsEqual(r1, [persistentRoot currentRevision]);
+	
+	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r1 head: r2b];
+	
 	[_testTrack undo];
-	UKObjectsEqual(r2b, [persistentRoot currentRevision]);
-	UKObjectsEqual(r2b, [[persistentRoot currentBranch] headRevision]);
-	UKObjectsNotEqual(r3, [[persistentRoot currentBranch] headRevision]);
+
+	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r2b head: r2b];
 	
 	// The main point of the test is that the following -undo restores the
 	// branch head_revid (-newestRevision) to point to r3, which means
 	// [[persistentRoot currentBranch] redo] moves towards r3 instead of r2b.
 	
 	[_testTrack undo];
-	UKObjectsEqual(r1, [persistentRoot currentRevision]);
-	UKObjectsNotEqual(r2b, [[persistentRoot currentBranch] headRevision]);
-	UKObjectsEqual(r3, [[persistentRoot currentBranch] headRevision]);
-
-	[[persistentRoot currentBranch] redo];
-	[ctx commitWithUndoTrack: _testTrack];
-	UKObjectsEqual(r2, [persistentRoot currentRevision]);
+	
+	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r1 head: r3];
 	
 	[[persistentRoot currentBranch] redo];
 	[ctx commitWithUndoTrack: _testTrack];
-	UKObjectsEqual(r3, [persistentRoot currentRevision]);
+	
+	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r2 head: r3];
+	
+	[[persistentRoot currentBranch] redo];
+	[ctx commitWithUndoTrack: _testTrack];
+	
+	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r3 head: r3];
 }
 
 @end
