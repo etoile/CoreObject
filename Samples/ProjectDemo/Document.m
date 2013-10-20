@@ -46,23 +46,23 @@
 
 - (NSRect) screenRect
 {
-	return [[self primitiveValueForKey:@"screenRect"] rectValue];
+	return [[self valueForStorageKey: @"screenRect"] rectValue];
 }
 - (void) setScreenRect:(NSRect)r
 {
     [self willChangeValueForProperty: @"screenRect"];
-    [self setPrimitiveValue: [NSValue valueWithRect: r] forKey: @"screenRect"];
+    [self setValue: [NSValue valueWithRect: r] forStorageKey: @"screenRect"];
 	[self didChangeValueForProperty: @"screenRect"];
 }
 
 - (BOOL) isOpen
 {
-	return [[self primitiveValueForKey: @"isOpen"] boolValue];
+	return [[self valueForStorageKey: @"isOpen"] boolValue];
 }
 - (void) setIsOpen:(BOOL)i
 {
 	[self willChangeValueForProperty: @"isOpen"];
-    [self setPrimitiveValue: @(i) forKey: @"isOpen"];
+    [self setValue: @(i) forStorageKey: @"isOpen"];
 	[self didChangeValueForProperty: @"isOpen"];
 }
 

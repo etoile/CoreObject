@@ -137,7 +137,10 @@
     COPersistentRoot *persistentRoot = [context insertNewPersistentRootWithEntityName: @"Anonymous.Document"];
     assert(persistentRoot != nil);
     
-    COObject *rootObj = [[persistentRoot objectGraphContext] insertObjectWithEntityName: rootObjEntity];
+	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
+	ETEntityDescription *desc = [repo descriptionForName: rootObjEntity];
+    COObject *rootObj = [[[repo classForEntityDescription: desc] alloc] initWithEntityDescription:desc
+																			   objectGraphContext: [persistentRoot objectGraphContext]];
     
 	Document *document = [persistentRoot rootObject];
 	[document setRootDocObject: rootObj];
