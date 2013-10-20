@@ -33,6 +33,8 @@
 		66983346126BB1150011C7FC /* HistoryInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66983345126BB1150011C7FC /* HistoryInspectorController.m */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
+		66DBB3781813B1A80047301A /* PreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66DBB3771813B1A80047301A /* PreferencesController.m */; };
+		66DBB3831813B1BB0047301A /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66DBB3821813B1BB0047301A /* Preferences.xib */; };
 		799118FD12CD3C82009D28C0 /* DesktopWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 799118FC12CD3C82009D28C0 /* DesktopWindow.m */; };
 		7991190512CD3D75009D28C0 /* ProjectNavWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 7991190412CD3D75009D28C0 /* ProjectNavWindow.m */; };
 		7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7991191412CD3F3C009D28C0 /* 2560x1600.jpg */; };
@@ -138,6 +140,13 @@
 			remoteGlobalIDString = 603647AB0E409244003377E0;
 			remoteInfo = EtoileFoundation;
 		};
+		66DBB37D1813B1A90047301A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 664697DF17CFF7FC00A1B767 /* CoreObject.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 66550BED17D51C8800327657;
+			remoteInfo = BenchmarkCoreObject;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -235,6 +244,9 @@
 		66C33E0A1290BC7700E5B15B /* SKTGridView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTGridView.m; sourceTree = "<group>"; };
 		66C33E0B1290BC7700E5B15B /* SKTInspectorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKTInspectorController.h; sourceTree = "<group>"; };
 		66C33E0C1290BC7700E5B15B /* SKTInspectorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTInspectorController.m; sourceTree = "<group>"; };
+		66DBB3761813B1A80047301A /* PreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesController.h; sourceTree = "<group>"; };
+		66DBB3771813B1A80047301A /* PreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesController.m; sourceTree = "<group>"; };
+		66DBB3821813B1BB0047301A /* Preferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
 		799118FB12CD3C82009D28C0 /* DesktopWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DesktopWindow.h; sourceTree = "<group>"; };
 		799118FC12CD3C82009D28C0 /* DesktopWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DesktopWindow.m; sourceTree = "<group>"; };
 		7991190312CD3D75009D28C0 /* ProjectNavWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectNavWindow.h; sourceTree = "<group>"; };
@@ -322,6 +334,7 @@
 			children = (
 				664697EA17CFF7FD00A1B767 /* CoreObject.framework */,
 				664697EC17CFF7FD00A1B767 /* Test */,
+				66DBB37E1813B1A90047301A /* BenchmarkCoreObject */,
 				664697EE17CFF7FD00A1B767 /* BasicPersistence */,
 				664697F017CFF7FD00A1B767 /* Typewriter.app */,
 			);
@@ -356,10 +369,13 @@
 				6686BF431259476B0065DE1A /* History Inspector */,
 				1DDD58140DA1D0A300B32029 /* ProjectDemoMainMenu.xib */,
 				667090001248726900E65F00 /* OutlineInspector.xib */,
+				66DBB3821813B1BB0047301A /* Preferences.xib */,
 				8D1107310486CEB800E47090 /* ProjectDemo-Info.plist */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				6686B80B12550FE90065DE1A /* ApplicationDelegate.h */,
 				6686B80C12550FE90065DE1A /* ApplicationDelegate.m */,
+				66DBB3761813B1A80047301A /* PreferencesController.h */,
+				66DBB3771813B1A80047301A /* PreferencesController.m */,
 				6686C340125EC5070065DE1A /* ProjectDocument.h */,
 				6686C341125EC5070065DE1A /* ProjectDocument.m */,
 				6627ED9912761EBC00E06946 /* CheckpointAsSheetController.h */,
@@ -595,6 +611,8 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "ProjectDemo" */;
 			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
@@ -682,6 +700,13 @@
 			remoteRef = 6646980217CFF8A200A1B767 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		66DBB37E1813B1A90047301A /* BenchmarkCoreObject */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = BenchmarkCoreObject;
+			remoteRef = 66DBB37D1813B1A90047301A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -707,6 +732,7 @@
 				7991198A12CD4B72009D28C0 /* stamp.png in Resources */,
 				79911A6312CDB215009D28C0 /* Arrow.tiff in Resources */,
 				79911A6412CDB215009D28C0 /* Circle.tiff in Resources */,
+				66DBB3831813B1BB0047301A /* Preferences.xib in Resources */,
 				79911A6512CDB215009D28C0 /* Line.tiff in Resources */,
 				79911A6612CDB215009D28C0 /* Rectangle.tiff in Resources */,
 				79911A6712CDB215009D28C0 /* TextGraphic.tiff in Resources */,
@@ -725,6 +751,7 @@
 				79911A4912CDAECD009D28C0 /* SKTGraphic.m in Sources */,
 				79911A4A12CDAECD009D28C0 /* SKTImage.m in Sources */,
 				79911A4B12CDAECD009D28C0 /* SKTLine.m in Sources */,
+				66DBB3781813B1A80047301A /* PreferencesController.m in Sources */,
 				79911A4C12CDAECD009D28C0 /* SKTRectangle.m in Sources */,
 				79911A4D12CDAECD009D28C0 /* SKTRenderingView.m in Sources */,
 				79911A4E12CDAECD009D28C0 /* SKTTextArea.m in Sources */,

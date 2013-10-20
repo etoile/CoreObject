@@ -54,6 +54,7 @@
 
 - (Project *)project;
 
+- (IBAction) orderFrontPreferencesPanel: (id)sender;
 
 /* Convenience */
 
