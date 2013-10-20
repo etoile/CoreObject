@@ -4,8 +4,6 @@ TODO
 First alpha release blockers
 ----------------------------
 
-- isShared support in COCopier, COItem
-
 - Support for composite cross-persistent root references as we discussed
 
 - Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.

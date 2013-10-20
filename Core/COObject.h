@@ -223,6 +223,7 @@
     NSMutableDictionary *_outgoingSerializedRelationshipCache;
 	BOOL _inDescription; // FIXME: remove; only for debugging
 	BOOL _isInitialized;
+	BOOL _isShared;
 }
 
 
@@ -320,6 +321,11 @@
  */
 @property (nonatomic, readonly) BOOL isRoot;
 
+/**
+ * Whether it is permissible to make an alias to the receiver when copying
+ * an object graph. Default is YES.
+ */
+@property (nonatomic, readwrite) BOOL isShared;
 
 /** @taskunit History Attributes */
 

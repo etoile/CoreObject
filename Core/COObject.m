@@ -226,7 +226,8 @@ See +[NSObject typePrefix]. */
 	_variableStorage = [self newVariableStorage];
     _outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
 	_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
-
+	_isShared = YES;
+	
 	[_objectGraphContext registerObject: self isNew: inserted];
 
 	return self;
@@ -314,6 +315,20 @@ objectGraphContext: (COObjectGraphContext *)aContext
 - (BOOL) isRoot
 {
 	return ([self rootObject] == self);
+}
+
+- (BOOL) isShared
+{
+	return _isShared;
+}
+
+- (void) setIsShared:(BOOL)isShared
+{
+	if (_isShared != isShared)
+	{
+		_isShared = isShared;
+		[self markAsUpdatedIfNeededForProperty: nil];
+	}
 }
 
 - (CORevision *)revision

@@ -22,6 +22,7 @@
     [childTagsProperty setPersistent: YES];
     [childTagsProperty setMultivalued: YES];
     [childTagsProperty setOrdered: NO];
+	// isComposite will be YES
     
     ETPropertyDescription *parentTagProperty =
     [ETPropertyDescription descriptionWithName: @"parentTag" type: (id)@"Anonymous.Tag"];

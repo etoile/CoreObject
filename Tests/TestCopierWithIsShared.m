@@ -142,4 +142,56 @@ static NSArray *initialUUIDs;
 	UKObjectsEqual([shape3CopyItem UUID], [shape4CopyItem valueForAttribute: @"refs"][0]);
 }
 
+- (void) testCOObjectCopyWithIsSharedUnset
+{
+	COObjectGraphContext *ctx = [[COObjectGraphContext alloc] init];
+	
+	Tag *a = [ctx insertObjectWithEntityName: @"Anonymous.Tag"];
+	OutlineItem *b = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[[a mutableSetValueForKey: @"contents"] addObject: b];
+	
+	ETUUID *aCopyUUID = [copier copyItemWithUUID: [a UUID] fromGraph: ctx toGraph: ctx];
+	id aCopy = [ctx objectWithUUID: aCopyUUID];
+	
+	UKIntsEqual(3, [[ctx itemUUIDs] count]);
+	UKObjectsNotEqual(a, aCopy);
+	UKObjectsEqual([a contents], [aCopy contents]);
+}
+
+- (void) testCOObjectCopyWithIsSharedYES
+{
+	COObjectGraphContext *ctx = [[COObjectGraphContext alloc] init];
+	
+	Tag *a = [ctx insertObjectWithEntityName: @"Anonymous.Tag"];
+	OutlineItem *b = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[[a mutableSetValueForKey: @"contents"] addObject: b];
+	
+	b.isShared = YES;
+	
+	ETUUID *aCopyUUID = [copier copyItemWithUUID: [a UUID] fromGraph: ctx toGraph: ctx];
+	id aCopy = [ctx objectWithUUID: aCopyUUID];
+	
+	UKIntsEqual(3, [[ctx itemUUIDs] count]);
+	UKObjectsNotEqual(a, aCopy);
+	UKObjectsEqual([a contents], [aCopy contents]);
+}
+
+- (void) testCOObjectCopyWithIsSharedNO
+{
+	COObjectGraphContext *ctx = [[COObjectGraphContext alloc] init];
+	
+	Tag *a = [ctx insertObjectWithEntityName: @"Anonymous.Tag"];
+	OutlineItem *b = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[[a mutableSetValueForKey: @"contents"] addObject: b];
+	
+	b.isShared = NO;
+	
+	ETUUID *aCopyUUID = [copier copyItemWithUUID: [a UUID] fromGraph: ctx toGraph: ctx];
+	id aCopy = [ctx objectWithUUID: aCopyUUID];
+	
+	UKIntsEqual(4, [[ctx itemUUIDs] count]);
+	UKObjectsNotEqual(a, aCopy);
+	UKObjectsNotEqual([a contents], [aCopy contents]);
+}
+
 @end
