@@ -57,10 +57,21 @@
 
 - (COUndoTrack *) undoStack
 {
-    NSString *name = [NSString stringWithFormat: @"org.etoile.projectdemo-%@",
-                      [[doc persistentRoot] UUID]];
-    
-    return [COUndoTrack trackForName: name  withEditingContext: [[doc persistentRoot] editingContext]];
+    NSString *name = nil;
+	NSString *mode = [[NSUserDefaults standardUserDefaults] valueForKey: @"UndoMode"];
+	
+	if (mode == nil || [mode isEqualToString: @"Project"])
+	{
+		name = @"org.etoile.projectdemo";
+	}
+	else if ([mode isEqualToString: @"Document"])
+	{
+		name = [NSString stringWithFormat: @"org.etoile.projectdemo-%@",
+			[[doc persistentRoot] UUID]];
+	}
+	   
+    return [COUndoTrack trackForName: name
+				  withEditingContext: [[doc persistentRoot] editingContext]];
 }
 
 - (void) commitWithType: (NSString*)type
@@ -276,26 +287,48 @@ static int i = 0;
 
 /* History stuff */
 
-- (IBAction) undo: (id)sender
+- (IBAction) projectDemoUndo: (id)sender
 {
     COUndoTrack *stack = [self undoStack];
-    COEditingContext *ctx = [[doc persistentRoot] editingContext];
     
     if ([stack canUndo])
     {
         [stack undo];
     }
 }
-- (IBAction) redo: (id)sender
+- (IBAction) projectDemoRedo: (id)sender
 {
     COUndoTrack *stack = [self undoStack];
-    COEditingContext *ctx = [[doc persistentRoot] editingContext];
-    
+
     if ([stack canRedo])
     {
         [stack redo];
     }
 }
+
+- (IBAction) stepBackward: (id)sender
+{
+	NSLog(@"Step back");
+	
+	if ([[[doc persistentRoot] editingBranch] canUndo])
+		[[[doc persistentRoot] editingBranch] undo];
+	
+	[self commitWithType: @"kCOTypeMinorEdit"
+		shortDescription: @"Step Back"
+		 longDescription: [NSString stringWithFormat: @"Step Back"]];
+}
+- (IBAction) stepForward: (id)sender
+{
+	NSLog(@"Step forward");
+	
+	if ([[[doc persistentRoot] editingBranch] canRedo])
+		[[[doc persistentRoot] editingBranch] redo];
+	
+	[self commitWithType: @"kCOTypeMinorEdit"
+		shortDescription: @"Step Forward"
+		 longDescription: [NSString stringWithFormat: @"Step Forward"]];
+}
+
 - (IBAction) history: (id)sender
 {
 	[[[NSApp delegate] historyController] showHistoryForDocument: doc];

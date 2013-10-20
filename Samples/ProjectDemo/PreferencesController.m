@@ -26,7 +26,7 @@
 - (void) defaultsChanged: (NSNotification*)notif
 {
 	NSString *mode = [[NSUserDefaults standardUserDefaults] stringForKey: @"UndoMode"];
-	if ([mode isEqual: @"Project"])
+	if ([mode isEqual: @"Project"] || mode == nil)
 	{
 		[undoMode selectCellWithTag: PER_PROJECT];
 	}

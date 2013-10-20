@@ -42,9 +42,6 @@
 
 - (void) shareWithInspectorForDocument: (Document*)doc;
 
-- (void)undo:(id)sender;
-- (void)redo:(id)sender;
-
 - (IBAction)newProject: (id)sender;
 - (IBAction)deleteProject: (id)sender;
 

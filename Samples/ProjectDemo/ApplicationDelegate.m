@@ -223,28 +223,6 @@
     [context commit];
 }
 
-- (void)undo:(id)sender
-{
-    COUndoTrack *stack = [self undoStack];
-    if ([stack canUndo])
-    {
-        [stack undo];
-    }
-}
-- (void)redo:(id)sender
-{
-    COUndoTrack *stack = [self undoStack];
-    if ([stack canRedo])
-    {
-        [stack redo];
-    }
-}
-
-- (COUndoTrack *) undoStack
-{
-    return [COUndoTrack trackForPattern: @"org.etoile.projectdemo-*" withEditingContext: context];
-}
-
 - (IBAction)newProject: (id)sender
 {
 	Project *newProject = [[Project alloc] initWithObjectGraphContext: context];
