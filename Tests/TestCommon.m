@@ -51,7 +51,7 @@ NSString * const kCOParent = @"parentContainer";
     return self;
 }
 
-- (void) testBranchWithExistingAndNewContext: (COBranch *)aBranch
+- (void) checkBranchWithExistingAndNewContext: (COBranch *)aBranch
 									 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block
 {
 	block([aBranch editingContext], [aBranch persistentRoot], aBranch, NO);
@@ -68,7 +68,7 @@ NSString * const kCOParent = @"parentContainer";
 	block(ctx2, ctx2PersistentRoot, ctx2Branch, YES);
 }
 
-- (void) testPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
+- (void) checkPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
 											 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block
 {
 	// N.B. This method is not merely a wrapper around -testBranchWithExistingAndNewContext:

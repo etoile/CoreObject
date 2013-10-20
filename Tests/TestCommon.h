@@ -71,14 +71,14 @@ extern NSString * const kCOParent;
  * The isNewContext flag is NO when the block is executing with aBranch's
  * context/store, and YES when the block is executing with the reloaded context.
  */
-- (void) testBranchWithExistingAndNewContext: (COBranch *)aBranch
-									 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
+- (void) checkBranchWithExistingAndNewContext: (COBranch *)aBranch
+									  inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
 
 /**
  * Same as above but uses the provided persistent root's current branch
  */
-- (void) testPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
-											 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
+- (void) checkPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
+											  inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
 
 /**
  * Runs the default runloop for a short period of time.

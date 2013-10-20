@@ -95,7 +95,7 @@
 
 - (void) checkPersistentRoot: (COPersistentRoot *)proot hasCurrentRevision: (CORevision *)currentExpected head: (CORevision *)headExpected
 {
-	[self testPersistentRootWithExistingAndNewContext: proot
+	[self checkPersistentRootWithExistingAndNewContext: proot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual(currentExpected, [testProot currentRevision]);

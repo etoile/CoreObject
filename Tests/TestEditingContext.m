@@ -45,7 +45,7 @@
     
     [ctx commit];
     
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKFalse([testCtx hasChanges]);
@@ -69,7 +69,7 @@
     
     [ctx commit];
 	
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKFalse([testCtx hasChanges]);
@@ -104,7 +104,7 @@
     
     [ctx commit];
     
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		UKFalse([[[testCtx store] persistentRootInfoForUUID: uuid] isDeleted]);
@@ -170,7 +170,7 @@
     
     [ctx commit];
     
-	[self testPersistentRootWithExistingAndNewContext: regular
+	[self checkPersistentRootWithExistingAndNewContext: regular
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testRegular, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 COPersistentRoot *testDeletedOnDisk = [testCtx persistentRootForUUID: [deletedOnDisk UUID]];

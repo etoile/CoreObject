@@ -46,7 +46,7 @@
     
     [ctx commit];
 
-	[self testPersistentRootWithExistingAndNewContext: library
+	[self checkPersistentRootWithExistingAndNewContext: library
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testLibrary, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 NSArray *library2contents = [[testLibrary rootObject] valueForKey: @"contents"];
@@ -191,7 +191,7 @@
     
     [ctx commit];
     
-	[self testPersistentRootWithExistingAndNewContext: library1
+	[self checkPersistentRootWithExistingAndNewContext: library1
 											  inBlock: ^(COEditingContext *ctx2, COPersistentRoot *library1ctx2, COBranch *testBranch, BOOL isNewContext)
 	 {
         // Test that the cross-persistent reference uses branchB when we reopen the store
@@ -372,7 +372,7 @@
     
     [ctx commit];
     
-	[self testPersistentRootWithExistingAndNewContext: library1
+	[self checkPersistentRootWithExistingAndNewContext: library1
 											  inBlock: ^(COEditingContext *ctx2, COPersistentRoot *library1ctx2, COBranch *testBranch, BOOL isNewContext)
 	 {
         UKFalse([[library1ctx2 objectGraphContext] hasChanges]);

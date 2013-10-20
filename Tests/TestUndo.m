@@ -46,7 +46,7 @@
     [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
     [ctx commitWithUndoTrack: _testTrack];
 	
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual(@"hello", [[testProot rootObject] valueForProperty: kCOLabel]);
@@ -54,7 +54,7 @@
     
     [_testTrack undo];
 
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKNil([[testProot rootObject] valueForProperty: kCOLabel]);
@@ -76,7 +76,7 @@
     
     [_testTrack undo];
     
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot1
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot1
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot1, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 COPersistentRoot *testProot2 = [testCtx persistentRootForUUID: [persistentRoot2 UUID]];

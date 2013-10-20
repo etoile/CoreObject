@@ -53,7 +53,7 @@
     
     [persistentRoot commit];
 	
-	[self testBranchWithExistingAndNewContext: branch
+	[self checkBranchWithExistingAndNewContext: branch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKIntsEqual(2, [[testProot branches] count]);
@@ -153,7 +153,7 @@
     
     // Test that the cross-persistent reference uses branchB when we reopen the store
         
-	[self testPersistentRootWithExistingAndNewContext: photo1
+	[self checkPersistentRootWithExistingAndNewContext: photo1
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPhoto1, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual([branchB UUID], [[testPhoto1 currentBranch] UUID]);
@@ -173,7 +173,7 @@
     [persistentRoot setCurrentBranch: secondBranch];
     [ctx commit];
     
-	[self testBranchWithExistingAndNewContext: secondBranch
+	[self checkBranchWithExistingAndNewContext: secondBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testSecondBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual(testSecondBranch, [testProot currentBranch]);
@@ -279,7 +279,7 @@
     
     [ctx commit];
     
-	[self testBranchWithExistingAndNewContext: branch
+	[self checkBranchWithExistingAndNewContext: branch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 COBranch *testOriginalBranch = [testProot branchForUUID: [originalBranch UUID]];
@@ -299,7 +299,7 @@
 	persistentRoot.deleted = YES;
 	[ctx commit];
 	
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 testProot.currentRevision = r0;
@@ -312,7 +312,7 @@
 	persistentRoot.deleted = YES;
 	[ctx commit];
 
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 [[testProot rootObject] setLabel: @"hi"];
@@ -325,7 +325,7 @@
 	persistentRoot.deleted = YES;
 	[ctx commit];
 	
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 COBranch *shouldFailToCommit = [testBranch makeBranchWithLabel: @"shouldFailToCommit"];
@@ -342,7 +342,7 @@
 	persistentRoot.deleted = YES;
 	[ctx commit];
 	
-	[self testBranchWithExistingAndNewContext: altBranch
+	[self checkBranchWithExistingAndNewContext: altBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 testBranch.deleted = YES;
@@ -361,7 +361,7 @@
 	persistentRoot.deleted = YES;
 	[ctx commit];
 	
-	[self testBranchWithExistingAndNewContext: deletedBranch
+	[self checkBranchWithExistingAndNewContext: deletedBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 testBranch.deleted = NO;
@@ -374,7 +374,7 @@
 	persistentRoot.deleted = YES;
 	[ctx commit];
 	
-	[self testBranchWithExistingAndNewContext: originalBranch
+	[self checkBranchWithExistingAndNewContext: originalBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	{
 		testBranch.metadata = @{@"hello" : @"world"};

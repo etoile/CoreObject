@@ -49,7 +49,7 @@
 
 	[ctx commit];
 
-	[self testBranchWithExistingAndNewContext: originalBranch
+	[self checkBranchWithExistingAndNewContext: originalBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKNotNil([testBranch currentRevision]);
@@ -340,7 +340,7 @@
     
     [ctx commit];
 	
-	[self testBranchWithExistingAndNewContext: originalBranch
+	[self checkBranchWithExistingAndNewContext: originalBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual(@"Hello world", [testBranch label]);
@@ -367,7 +367,7 @@
 {
     [ctx commit];
 
-	[self testBranchWithExistingAndNewContext: originalBranch
+	[self checkBranchWithExistingAndNewContext: originalBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual([NSDictionary dictionary], [testBranch metadata]);
@@ -402,7 +402,7 @@
     
     [ctx commit];
     
-	[self testBranchWithExistingAndNewContext: originalBranch
+	[self checkBranchWithExistingAndNewContext: originalBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual((@{@"key" : @"value"}), [testBranch metadata]);
@@ -425,7 +425,7 @@
     [[persistentRoot2 currentBranch] setMetadata: D(@"world", @"hello")];
     [ctx commit];
     
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot2
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot2
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
         UKObjectsEqual(D(@"world", @"hello"), [testBranch metadata]);
@@ -439,7 +439,7 @@
     COBranch *branch2 = [[persistentRoot currentBranch] makeBranchWithLabel: @"test"];
     [ctx commit];
     
-	[self testBranchWithExistingAndNewContext: branch2
+	[self checkBranchWithExistingAndNewContext: branch2
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual(D(@"test", kCOBranchLabel), [testBranch metadata]);
@@ -454,7 +454,7 @@
     [branch2 setMetadata: D(@"world", @"hello")];
     [ctx commit];
     
-	[self testBranchWithExistingAndNewContext: branch2
+	[self checkBranchWithExistingAndNewContext: branch2
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
         UKObjectsEqual(D(@"world", @"hello"), [testBranch metadata]);
@@ -484,7 +484,7 @@
     [(OutlineItem *)[[secondBranch objectGraphContext] objectWithUUID: [childObj UUID]] setLabel: @"2"];
     [ctx commit];
     
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 // Quick check that the commits worked
@@ -537,7 +537,7 @@
     
     [persistentRoot commit];
 	
-	[self testBranchWithExistingAndNewContext: uncommittedBranch
+	[self checkBranchWithExistingAndNewContext: uncommittedBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKDoesNotRaiseException([testBranch discardAllChanges]);
@@ -554,7 +554,7 @@
     [persistentRoot commit];
     CORevision *secondRevision = [originalBranch currentRevision];
     
-	[self testBranchWithExistingAndNewContext: originalBranch
+	[self checkBranchWithExistingAndNewContext: originalBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKFalse([testBranch hasChanges]);
@@ -579,7 +579,7 @@
     COBranch *branch = [originalBranch makeBranchWithLabel: @"test"];
     [persistentRoot commit];
     
-	[self testBranchWithExistingAndNewContext: branch
+	[self checkBranchWithExistingAndNewContext: branch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 testBranch.deleted = YES;
@@ -607,7 +607,7 @@
     originalBranch.shouldMakeEmptyCommit = YES;
     [ctx commitWithType: @"save"  shortDescription: @"user pressed save"];
     
-	[self testBranchWithExistingAndNewContext: originalBranch
+	[self checkBranchWithExistingAndNewContext: originalBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 CORevision *r2 = [testBranch currentRevision];
@@ -632,7 +632,7 @@
 	altBranch.deleted = YES;
 	[ctx commit];
 	
-	[self testBranchWithExistingAndNewContext: altBranch
+	[self checkBranchWithExistingAndNewContext: altBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 testBranch.currentRevision = r0;
@@ -645,7 +645,7 @@
 	altBranch.deleted = YES;
 	[ctx commit];
 	
-	[self testBranchWithExistingAndNewContext: altBranch
+	[self checkBranchWithExistingAndNewContext: altBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKTrue(testBranch.isDeleted);
@@ -661,7 +661,7 @@
 	altBranch.deleted = YES;
 	[ctx commit];
 	
-	[self testBranchWithExistingAndNewContext: altBranch
+	[self checkBranchWithExistingAndNewContext: altBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 testBranch.metadata = @{@"hello" : @"world"};

@@ -25,7 +25,7 @@
 
 	[ctx commit];
 
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 CORevision *secondCommitRev = [[testProot rootObject] revision];
@@ -73,7 +73,7 @@
 	UKObjectsEqual(secondCommitRev, [thirdCommitRev parentRevision]);
 
     // Check that we can read the state 3 in another context
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
         UKNotNil(testProot);
@@ -106,7 +106,7 @@
 	
     // Check that we can read the state 4 in another context
 	
-	[self testPersistentRootWithExistingAndNewContext: persistentRoot
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 COObject *testObj2 = [testProot objectWithUUID: [obj UUID]];

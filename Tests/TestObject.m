@@ -66,7 +66,7 @@
 	CORevision *lastRev = [object revision];
 	UKObjectsNotEqual(lastRev, firstRev);
 	
-	[self testPersistentRootWithExistingAndNewContext: proot
+	[self checkPersistentRootWithExistingAndNewContext: proot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual([firstRev date], [testProot creationDate]);
