@@ -259,7 +259,17 @@
 /**
  * Initializes and returns an object that uses a custom entity description.
  *
- * See -initWithObjectGraphContext:.
+ * For initialization, you should usually just use -initWithObjectGraphContext:.
+ *
+ * If you have subclassed COObject, in most cases, you just want to instantiate 
+ * you subclass using the entity description whose name matches your subclass, 
+ * and -initWithObjectGraphContext: does it.
+ *
+ * For some use cases (e.g. custom object representation or partial object 
+ * loading), you might want to use a subentity or parent entity description 
+ * rather than the entity description registered for the receiver class in
+ * -[COObjectGraphContext modelRepository], and this initializer is the only way 
+ * to do that.
  */
 - (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
              objectGraphContext: (COObjectGraphContext *)aContext;

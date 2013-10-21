@@ -165,8 +165,8 @@ static int i = 0;
 
 - (OutlineItem *) newItem
 {
-	OutlineItem *item = [[OutlineItem alloc] initWithEntityDescription: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.OutlineItem"]
-												 objectGraphContext: [[self rootObject] objectGraphContext]];
+	OutlineItem *item = [[OutlineItem alloc]
+		initWithObjectGraphContext: [[self rootObject] objectGraphContext]];
 
 	[item setLabel: [NSString stringWithFormat: @"Item %d", i++]];
 	return item;
