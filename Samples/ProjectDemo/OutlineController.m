@@ -140,13 +140,14 @@
 
 - (void)windowFrameDidChange:(NSNotification*)notification
 {
-	[doc setScreenRect: [[self window] frame]];
-	
-//	assert([[doc objectGraphContext] objectHasChanges: [doc UUID]]);
-	
-	[self commitWithType: @"kCOTypeMinorEdit"
-		shortDescription: @"Move Window"
-		 longDescription: [NSString stringWithFormat: @"Move to %@", NSStringFromRect([doc screenRect])]];	
+	// This was rather annoying so I disabled it
+//	[doc setScreenRect: [[self window] frame]];
+//	
+////	assert([[doc objectGraphContext] objectHasChanges: [doc UUID]]);
+//	
+//	[self commitWithType: @"kCOTypeMinorEdit"
+//		shortDescription: @"Move Window"
+//		 longDescription: [NSString stringWithFormat: @"Move to %@", NSStringFromRect([doc screenRect])]];	
 }
 
 - (void)windowWillClose:(NSNotification *)notification
