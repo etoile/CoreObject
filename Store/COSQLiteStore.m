@@ -25,8 +25,6 @@
 
 @implementation COSQLiteStore
 
-@synthesize transactionUUID;
-
 - (id)initWithURL: (NSURL*)aURL
 {
 	SUPERINIT;
@@ -36,8 +34,6 @@
 	url_ = aURL;
 	backingStores_ = [[NSMutableDictionary alloc] init];
     backingStoreUUIDForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
-    modifiedPersistentRootsUUIDs_ = [[NSMutableSet alloc] init];
-    	
     __block BOOL ok = YES;
     
     dispatch_sync(queue_, ^() {
@@ -115,7 +111,7 @@
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots ("
      "uuid BLOB PRIMARY KEY NOT NULL, backingstore BLOB NOT NULL, "
-     "currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionuuid BLOB)"];
+     "currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionid INTEGER)"];
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL PRIMARY KEY, "
      "proot BLOB NOT NULL, initial_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
@@ -167,17 +163,13 @@
 
 - (BOOL) beginTransactionWithError: (NSError **)error
 {
-    [modifiedPersistentRootsUUIDs_ removeAllObjects];
-    
-    transaction_ = [[COStoreTransaction alloc] init];
-    self.transactionUUID = transaction_.transactionUUID;
-    
+	transaction_ = [[COStoreTransaction alloc] init];
     return YES;
 }
 
 - (BOOL) commitTransactionWithError: (NSError **)error
 {
-    return [self commitTransactionWithUUID: [ETUUID UUID] withError: error];
+    return [self commitStoreTransaction: transaction_];
 }
 
 - (BOOL) commitStoreTransaction: (COStoreTransaction *)aTransaction
@@ -189,24 +181,28 @@
     dispatch_sync(queue_, ^() {
         [db_ beginTransaction];
         
-        self.transactionUUID = aTransaction.transactionUUID;
-        
-        // update the last transaction field before we commit.
-        
-        for (ETUUID *modifiedUUID in modifiedPersistentRootsUUIDs_)
+		// update the last transaction field before we commit.
+        // FIXME: Validate transaction ID
+		
+		NSMutableDictionary *txnIDForPersistentRoot = [[NSMutableDictionary alloc] init];
+		
+        for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
         {
-            [db_ executeUpdate: @"UPDATE persistentroots SET transactionuuid = ? WHERE uuid = ?", [transactionUUID dataValue], [modifiedUUID dataValue]];
+			int64_t txnId = [aTransaction oldTransactionIDForPersistentRoot: modifiedUUID] + 1;
+            [db_ executeUpdate: @"UPDATE persistentroots SET transactionid = ? WHERE uuid = ?",
+			 @(txnId), [modifiedUUID dataValue]];
+			
+			txnIDForPersistentRoot[modifiedUUID] = @(txnId);
         }
         
-        
-
         for (id<COStoreAction> op in aTransaction.operations)
         {
-            BOOL opOk = [op execute: self];
+            BOOL opOk = [op execute: self inTransaction: aTransaction];
             if (!opOk)
             {
                 NSLog(@"store action failed: %@", op);
-                [op execute: self];
+				ok = NO;
+				break;
             }
             ok = ok && opOk;
         }
@@ -221,28 +217,16 @@
             ok = [db_ commit];
             if (ok)
             {
-                [self postCommitNotificationsForTransaction: transactionUUID];
+                [self postCommitNotificationsWithTransactionIDForPersistentRootUUID: txnIDForPersistentRoot];
             }
             else
             {
                 NSLog(@"Commit failed");
             }
         }
-        
-        self.transactionUUID = nil;
     });
     
     return ok;
-}
-
-- (BOOL) commitTransactionWithUUID: (ETUUID *)uuid withError: (NSError **)error
-{
-    return [self commitStoreTransaction: transaction_];
-}
-
-- (void) recordModifiedPersistentRoot: (ETUUID *)persistentRootUUID
-{
-    [modifiedPersistentRootsUUIDs_ addObject: persistentRootUUID];
 }
 
 - (void) checkInTransaction
@@ -724,13 +708,14 @@
         ETUUID *currBranch = nil;
         ETUUID *backingUUID = nil;
         BOOL deleted = NO;
+		int64_t transactionID = -1;
         NSMutableDictionary *branchDict = [NSMutableDictionary dictionary];
 
         
         [db_ savepoint: @"persistentRootInfoForUUID"]; // N.B. The transaction is so the two SELECTs see the same DB. Needed?
 
         {
-            FMResultSet *rs = [db_ executeQuery: @"SELECT currentbranch, backingstore, deleted FROM persistentroots WHERE uuid = ?", [aUUID dataValue]];
+            FMResultSet *rs = [db_ executeQuery: @"SELECT currentbranch, backingstore, deleted, transactionid FROM persistentroots WHERE uuid = ?", [aUUID dataValue]];
             if ([rs next])
             {
                 currBranch = [rs dataForColumnIndex: 0] != nil
@@ -738,6 +723,7 @@
                     : nil;
                 backingUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
                 deleted = [rs boolForColumnIndex: 2];
+				transactionID = [rs int64ForColumnIndex: 3];
             }
             else
             {
@@ -785,6 +771,7 @@
         result.branchForUUID = branchDict;
         result.currentBranchUUID = currBranch;
         result.deleted = deleted;
+		result.transactionID = transactionID;
     });
     
     return result;
@@ -843,38 +830,12 @@
                                                  isCopy: (BOOL)isCopy
                                         initialRevision: (CORevisionID *)aRevision
                                                   error: (NSError **)error
-{    
-    [transaction_ createPersistentRootWithUUID: uuid
-                         persistentRootForCopy: isCopy ? aRevision.revisionPersistentRootUUID : nil];
-    
-    [transaction_ createBranchWithUUID: aBranchUUID
-						  parentBranch: aParentBranch
-                       initialRevision: aRevision.revisionUUID
-                     forPersistentRoot: uuid];
-    
-    [transaction_ setCurrentBranch: aBranchUUID
-                 forPersistentRoot: uuid];
-                                      
-    COPersistentRootInfo *plist = [[COPersistentRootInfo alloc] init];
-    plist.UUID = uuid;
-    plist.deleted = NO;
-    
-    if (aBranchUUID != nil)
-    {
-        COBranchInfo *branch = [[COBranchInfo alloc] init];
-        branch.UUID = aBranchUUID;
-        branch.initialRevisionID = aRevision;
-        branch.currentRevisionID = aRevision;
-        branch.headRevisionID = aRevision;
-        branch.metadata = nil;
-        branch.deleted = NO;
-        branch.parentBranchUUID = aParentBranch;
-		
-        plist.currentBranchUUID = aBranchUUID;
-        plist.branchForUUID = @{aBranchUUID : branch};
-    }
-    
-    return plist;
+{
+	return [transaction_ createPersistentRootWithUUID: uuid
+										   branchUUID: aBranchUUID
+									 parentBranchUUID: aParentBranch
+											   isCopy: isCopy
+									  initialRevision: aRevision];
 }
 
 - (COPersistentRootInfo *) createPersistentRootWithInitialItemGraph: (id<COItemGraph>)contents
@@ -884,32 +845,11 @@
                                                               error: (NSError **)error
 {
     [self checkInTransaction];
-    [self recordModifiedPersistentRoot: persistentRootUUID];
-    
-    NILARG_EXCEPTION_TEST(contents);
-    NILARG_EXCEPTION_TEST(persistentRootUUID);
-    NILARG_EXCEPTION_TEST(aBranchUUID);
-    
-    CORevisionID *revId = [self writeRevisionWithItemGraph: contents
-                                                  revisionUUID: [ETUUID UUID]
-                                                      metadata: metadata
-                                              parentRevisionID: nil
-                                         mergeParentRevisionID: nil
-                                                branchUUID: aBranchUUID
-                                            persistentRootUUID: persistentRootUUID
-                                                     error: error];
-    
-    if (revId == nil)
-    {
-        return nil;
-    }
-    
-    return [self createPersistentRootWithUUID: persistentRootUUID
-                                   branchUUID: aBranchUUID
-							 parentBranchUUID: nil
-                                       isCopy: NO
-                              initialRevision: revId
-                                        error: error];
+
+	return [transaction_ createPersistentRootWithInitialItemGraph: contents
+															 UUID: persistentRootUUID
+													   branchUUID: aBranchUUID
+												 revisionMetadata: metadata];
 }
 
 - (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
@@ -919,7 +859,6 @@
                                                              error: (NSError **)error
 {
     [self checkInTransaction];
-    [self recordModifiedPersistentRoot: persistentRootUUID];
     
     NILARG_EXCEPTION_TEST(aRevision);
     NILARG_EXCEPTION_TEST(persistentRootUUID);
@@ -938,8 +877,6 @@
                                                   error: (NSError **)error
 {
     [self checkInTransaction];
-    [self recordModifiedPersistentRoot: persistentRootUUID];
-    
     [transaction_ createPersistentRootWithUUID: persistentRootUUID
                          persistentRootForCopy: nil];
     
@@ -954,8 +891,6 @@
                         error: (NSError **)error
 {
     [self checkInTransaction];
-    [self recordModifiedPersistentRoot: aRoot];
-    
     [transaction_ deletePersistentRoot: aRoot];
     
     return YES;
@@ -965,8 +900,6 @@
                           error: (NSError **)error
 {
     [self checkInTransaction];
-    [self recordModifiedPersistentRoot: aRoot];
-    
     [transaction_ undeletePersistentRoot: aRoot];
     
     return YES;
@@ -977,7 +910,6 @@
                  error: (NSError **)error
 {
     [self checkInTransaction];
-    [self recordModifiedPersistentRoot: aRoot];
     
     [transaction_ setCurrentBranch: aBranch
                  forPersistentRoot: aRoot];
@@ -992,7 +924,6 @@
                         error: (NSError **)error
 {
     [self checkInTransaction];
-    [self recordModifiedPersistentRoot: aRoot];
     
     [transaction_ createBranchWithUUID: branchUUID
 						  parentBranch: aParentBranch
@@ -1037,8 +968,6 @@
                       error: (NSError **)error
 {
     [self checkInTransaction];
-    [self recordModifiedPersistentRoot: aRoot];
-
     [transaction_ setCurrentRevision: currentRev.revisionUUID
 						headRevision: headRev.revisionUUID
                            forBranch: aBranch
@@ -1053,8 +982,6 @@
                 error: (NSError **)error
 {
     [self checkInTransaction];
-    [self recordModifiedPersistentRoot: aRoot];
-    
     [transaction_ deleteBranch: aBranch
               ofPersistentRoot: aRoot];
     
@@ -1066,8 +993,6 @@
                   error: (NSError **)error
 {
     [self checkInTransaction];
-    [self recordModifiedPersistentRoot: aRoot];
-    
     [transaction_ undeleteBranch: aBranch
                 ofPersistentRoot: aRoot];
     
@@ -1080,8 +1005,6 @@
                error: (NSError **)error
 {
     [self checkInTransaction];
-    [self recordModifiedPersistentRoot: aRoot];
-    
     [transaction_ setMetadata: meta
                     forBranch: aBranch
              ofPersistentRoot: aRoot];
@@ -1211,12 +1134,12 @@
     return results;
 }
 
-- (void) postCommitNotificationsForTransaction: (ETUUID *)aTransaction
+- (void) postCommitNotificationsWithTransactionIDForPersistentRootUUID: (NSDictionary *)txnIDForPersistentRoot
 {
-    for (ETUUID *persistentRoot in modifiedPersistentRootsUUIDs_)
+    for (ETUUID *persistentRoot in txnIDForPersistentRoot)
     {
         NSDictionary *userInfo = @{kCOPersistentRootUUID : [persistentRoot stringValue],
-                                   kCOPersistentRootTransactionUUID : [aTransaction stringValue],
+                                   kCOPersistentRootTransactionID : txnIDForPersistentRoot[persistentRoot],
                                    kCOStoreUUID : [[self UUID] stringValue],
                                    kCOStoreURL : [[self URL] absoluteString]};
                 
@@ -1292,6 +1215,6 @@
 
 NSString *COStorePersistentRootDidChangeNotification = @"COStorePersistentRootDidChangeNotification";
 NSString *kCOPersistentRootUUID = @"COPersistentRootUUID";
-NSString *kCOPersistentRootTransactionUUID = @"COPersistentRootTransactionUUID";
+NSString *kCOPersistentRootTransactionID = @"COPersistentRootTransactionID";
 NSString *kCOStoreUUID = @"COStoreUUID";
 NSString *kCOStoreURL = @"COStoreURL";

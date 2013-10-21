@@ -20,6 +20,7 @@
 #import "OutlineItem.h"
 #import "Tag.h"
 
+#import "COPersistentRoot+Private.h"
 #import "COSQLiteStore+Private.h"
 
 #define SA(x) [NSSet setWithArray: x]

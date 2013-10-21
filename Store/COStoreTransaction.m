@@ -10,6 +10,7 @@
 #import "COStoreDeleteBranch.h"
 #import "COStoreUndeleteBranch.h"
 #import "COStoreWriteRevision.h"
+#import "COStoreAction.h"
 
 @interface COStoreTransaction ()
 @property (nonatomic, readwrite, strong) NSMutableArray *operations;
@@ -18,21 +19,42 @@
 
 @implementation COStoreTransaction
 
-@synthesize transactionUUID;
-@synthesize previousTransactionUUID;
 @synthesize operations;
 
 - (id) init
 {
     SUPERINIT;
     self.operations = [NSMutableArray arrayWithCapacity: 16];
-    self.transactionUUID = [ETUUID UUID];
+	_oldTransactionIDForPersistentRootUUID = [[NSMutableDictionary alloc] init];
     return self;
 }
 
 - (void) addOperation: (id)anOperation
 {
     [operations addObject: anOperation];
+}
+
+- (NSArray *) persistentRootUUIDs
+{
+	NSMutableSet *results = [[NSMutableSet alloc] init];
+	for (id <COStoreAction> action in operations)
+	{
+		[results addObject: action.persistentRoot];
+	}
+	return [results allObjects];
+}
+
+/** @taskunit Transaction ID */
+
+- (int64_t) oldTransactionIDForPersistentRoot: (ETUUID *)aPersistentRoot
+{
+	return [_oldTransactionIDForPersistentRootUUID[aPersistentRoot] longLongValue];
+}
+
+- (int64_t) setOldTransactionID: (int64_t)oldID forPersistentRoot: (ETUUID *)aPersistentRoot
+{
+	_oldTransactionIDForPersistentRootUUID[aPersistentRoot] = @(oldID);
+	return oldID + 1;
 }
 
 /** @taskunit Revision Writing */
@@ -72,6 +94,78 @@
     op.persistentRoot = persistentRootUUID;
     op.persistentRootForCopy = persistentRootForCopyUUID;
     [self addOperation: op];
+}
+
+/**
+ * Convenience method
+ */
+- (COPersistentRootInfo *) createPersistentRootWithUUID: (ETUUID *)uuid
+                                             branchUUID: (ETUUID *)aBranchUUID
+									   parentBranchUUID: (ETUUID *)aParentBranch
+                                                 isCopy: (BOOL)isCopy
+                                        initialRevision: (CORevisionID *)aRevision
+{
+    [self createPersistentRootWithUUID: uuid
+                         persistentRootForCopy: isCopy ? aRevision.revisionPersistentRootUUID : nil];
+    
+    [self createBranchWithUUID: aBranchUUID
+						  parentBranch: aParentBranch
+                       initialRevision: aRevision.revisionUUID
+                     forPersistentRoot: uuid];
+    
+    [self setCurrentBranch: aBranchUUID
+                 forPersistentRoot: uuid];
+	
+    COPersistentRootInfo *plist = [[COPersistentRootInfo alloc] init];
+    plist.UUID = uuid;
+    plist.deleted = NO;
+    
+    if (aBranchUUID != nil)
+    {
+        COBranchInfo *branch = [[COBranchInfo alloc] init];
+        branch.UUID = aBranchUUID;
+        branch.initialRevisionID = aRevision;
+        branch.currentRevisionID = aRevision;
+        branch.headRevisionID = aRevision;
+        branch.metadata = nil;
+        branch.deleted = NO;
+        branch.parentBranchUUID = aParentBranch;
+		
+        plist.currentBranchUUID = aBranchUUID;
+        plist.branchForUUID = @{aBranchUUID : branch};
+    }
+    
+    return plist;
+}
+
+/**
+ * Convenience method
+ */
+- (COPersistentRootInfo *) createPersistentRootWithInitialItemGraph: (COItemGraph *)contents
+                                                               UUID: (ETUUID *)persistentRootUUID
+                                                         branchUUID: (ETUUID *)aBranchUUID
+                                                   revisionMetadata: (NSDictionary *)metadata
+{
+    NILARG_EXCEPTION_TEST(contents);
+    NILARG_EXCEPTION_TEST(persistentRootUUID);
+    NILARG_EXCEPTION_TEST(aBranchUUID);
+    
+	ETUUID *revisionUUID = [ETUUID UUID];
+	CORevisionID *revisionID = [CORevisionID revisionWithPersistentRootUUID: persistentRootUUID
+															   revisionUUID: revisionUUID];
+	[self writeRevisionWithModifiedItems: contents
+							revisionUUID: revisionUUID
+								metadata: metadata
+						parentRevisionID: nil
+				   mergeParentRevisionID: nil
+					  persistentRootUUID: persistentRootUUID
+							  branchUUID: aBranchUUID];
+    
+    return [self createPersistentRootWithUUID: persistentRootUUID
+                                   branchUUID: aBranchUUID
+							 parentBranchUUID: nil
+                                       isCopy: NO
+                              initialRevision: revisionID];
 }
 
 /** @taskunit Persistent Root Modification */

@@ -14,6 +14,7 @@
     ETUUID *currentBranch_;
     NSMutableDictionary *branchForUUID_; // COUUID : COBranchInfo
     BOOL _deleted;
+	int64_t _transactionID;
 }
 
 - (NSSet *) branchUUIDs;
@@ -30,6 +31,7 @@
 @property (readwrite, nonatomic, strong) ETUUID *currentBranchUUID;
 @property (readwrite, nonatomic, strong) NSDictionary *branchForUUID;
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
+@property (readwrite, nonatomic, assign) int64_t transactionID;
 
 - (NSArray *)branchInfosWithMetadataValue: (id)aValue forKey: (NSString *)aKey;
 

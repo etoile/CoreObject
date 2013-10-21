@@ -26,6 +26,7 @@
 #import "COEditingContext+Undo.h"
 #import "COEditingContext+Private.h"
 #import "CORevisionCache.h"
+#import "COStoreTransaction.h"
 
 @implementation COEditingContext
 
@@ -506,13 +507,13 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 
 	/* Commit persistent root changes (deleted persistent roots included) */
 
-    [_store beginTransactionWithError: NULL];
+    COStoreTransaction *transaction = [[COStoreTransaction alloc] init];
     [self recordBeginUndoGroup];
     
 	// TODO: Add a batch commit UUID in the metadata
-	for (COPersistentRoot *ctxt in persistentRoots)
+	for (COPersistentRoot *persistentRoot in persistentRoots)
 	{
-		[ctxt saveCommitWithMetadata: metadata transactionUUID: _store.transactionUUID];
+		[persistentRoot saveCommitWithMetadata: metadata transaction: transaction];
 	}
 	
 	/* Record persistent root deletions at the store level */
@@ -523,7 +524,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
         
 		if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
         {
-            ETAssert([_store deletePersistentRoot: uuid error: NULL]);
+            [transaction deletePersistentRoot: uuid];
             [self recordPersistentRootDeletion: persistentRoot];
             
             [_persistentRootsPendingDeletion removeObject: persistentRoot];
@@ -532,14 +533,14 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
         }
         else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
         {
-            ETAssert([_store undeletePersistentRoot: uuid error: NULL]);
+            [transaction undeletePersistentRoot: uuid];
             [self recordPersistentRootUndeletion: persistentRoot];
             
             [_persistentRootsPendingUndeletion removeObject: persistentRoot];
         }
     }
 
-    ETAssert([_store commitTransactionWithUUID: _store.transactionUUID withError: NULL]);
+    ETAssert([_store commitStoreTransaction: transaction]);
 	COCommand *command = [self recordEndUndoGroupWithUndoTrack: track];
     
 	/* For a commit triggered by undo/redo on a COUndoTrack, the command is nil */

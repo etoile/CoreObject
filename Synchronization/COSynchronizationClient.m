@@ -2,6 +2,7 @@
 
 
 #import "COSQLiteStore.h"
+#import "COSQLiteStore+Private.h"
 
 @implementation COSynchronizationClient
 

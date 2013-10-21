@@ -92,7 +92,7 @@ NSString * const kCOParent = @"parentContainer";
 - (void) wait
 {
     NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-    [runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.001]];
+    [runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 }
 
 @end

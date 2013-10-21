@@ -9,9 +9,13 @@
 
 #import <CoreObject/COPersistentRoot.h>
 
+@class COStoreTransaction;
+
 @interface COPersistentRoot ()
 
 /** @taskunit Framework Private */
+
+@property (nonatomic, readonly) int64_t lastTransactionID;
 
 /**
  * <init />
@@ -44,7 +48,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
  * Extracts the current changes, saves them to the store with the provided
  * metadatas and returns the resulting revision.
  */
-- (void) saveCommitWithMetadata: (NSDictionary *)metadata transactionUUID: (ETUUID *)transactionUUID;
+- (void) saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn;
 
 - (COPersistentRootInfo *) persistentRootInfo;
 

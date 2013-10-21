@@ -8,7 +8,7 @@
 @synthesize currentBranchUUID = currentBranch_;
 @synthesize branchForUUID = branchForUUID_;
 @synthesize deleted = _deleted;
-
+@synthesize transactionID = _transactionID;
 
 - (NSSet *) branchUUIDs
 {

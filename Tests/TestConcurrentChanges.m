@@ -33,6 +33,7 @@
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+		UKIntsEqual(persistentRoot.lastTransactionID, ctx2persistentRoot.lastTransactionID);
         COObject *rootObj = [ctx2persistentRoot rootObject];
         
         [rootObj setValue: @"hello" forProperty: @"label"];
@@ -63,15 +64,18 @@
     UKNotNil(secondRevid);
     UKObjectsNotEqual(firstRevid, secondRevid);
     
-    [store beginTransactionWithError: NULL];
+
     // Revert persistentRoot back to the first revision using the store API
-    UKTrue([store setCurrentRevision: firstRevid
-					 initialRevision: nil
-                        headRevision: nil
-                           forBranch: [[persistentRoot currentBranch] UUID]
-                    ofPersistentRoot: [persistentRoot UUID]
-                               error: NULL]);
-    [store commitTransactionWithError: NULL];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+	
+	[txn setCurrentRevision: [firstRevid revisionUUID]
+			   headRevision: nil
+				  forBranch: [[persistentRoot currentBranch] UUID]
+		   ofPersistentRoot: [persistentRoot UUID]];
+    
+	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: [persistentRoot UUID]];
+	
+    UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
     
@@ -84,13 +88,15 @@
 {
     ETUUID *secondbranchUUID = [ETUUID UUID];
     
-    [store beginTransactionWithError: NULL];
-    UKTrue([store createBranchWithUUID: secondbranchUUID
-                          parentBranch: nil
-                       initialRevision: [[persistentRoot currentRevision] revisionID]
-                     forPersistentRoot: [persistentRoot UUID]
-                                 error: NULL]);
-    [store commitTransactionWithError: NULL];
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+	[txn createBranchWithUUID: secondbranchUUID
+				 parentBranch: nil
+			  initialRevision: [[[persistentRoot currentRevision] revisionID] revisionUUID]
+			forPersistentRoot: [persistentRoot UUID]];
+
+	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: [persistentRoot UUID]];
+	
+    UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
     
@@ -103,11 +109,11 @@
 
 - (void) testsDetectsStoreDeleteBranch
 {
-    [store beginTransactionWithError: NULL];
-    UKTrue([store deleteBranch: [testBranch UUID]
-              ofPersistentRoot: [persistentRoot UUID]
-                         error: NULL]);
-    [store commitTransactionWithError: NULL];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    [txn deleteBranch: [testBranch UUID]
+	 ofPersistentRoot: [persistentRoot UUID]];
+	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: [persistentRoot UUID]];
+    UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
     
@@ -126,11 +132,11 @@
              branchInfoForUUID: [testBranch UUID]]
             isDeleted]);
     
-    [store beginTransactionWithError: NULL];
-    UKTrue([store undeleteBranch: [testBranch UUID]
-                ofPersistentRoot: [persistentRoot UUID]
-                           error: NULL]);
-    [store commitTransactionWithError: NULL];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    [txn undeleteBranch: [testBranch UUID]
+	   ofPersistentRoot: [persistentRoot UUID]];
+	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: [persistentRoot UUID]];
+    UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
     
@@ -144,12 +150,12 @@
 {
     NSDictionary *metadata = @{ @"hello" : @"world" };
     
-    [store beginTransactionWithError: NULL];
-    UKTrue([store setMetadata: metadata
-                    forBranch: [testBranch UUID]
-             ofPersistentRoot: [persistentRoot UUID]
-                        error: NULL]);
-    [store commitTransactionWithError: NULL];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    [txn setMetadata: metadata
+		   forBranch: [testBranch UUID]
+	ofPersistentRoot: [persistentRoot UUID]];
+	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: [persistentRoot UUID]];
+    UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
     
@@ -160,11 +166,11 @@
 
 - (void) testsDetectsStoreSetCurrentBranch
 {
-    [store beginTransactionWithError: NULL];
-    UKTrue([store setCurrentBranch: [testBranch UUID]
-                 forPersistentRoot: [persistentRoot UUID]
-                             error: NULL]);
-    [store commitTransactionWithError: NULL];
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    [txn setCurrentBranch: [testBranch UUID]
+		forPersistentRoot: [persistentRoot UUID]];
+	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: [persistentRoot UUID]];
+    UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
     
@@ -175,11 +181,11 @@
 
 - (void) testsDetectsStoreSetCurrentBranchInTransaction
 {
-    UKTrue([store beginTransactionWithError: NULL]);
-    UKTrue([store setCurrentBranch: [testBranch UUID]
-                 forPersistentRoot: [persistentRoot UUID]
-                             error: NULL]);
-    UKTrue([store commitTransactionWithError: NULL]);
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    [txn setCurrentBranch: [testBranch UUID]
+		forPersistentRoot: [persistentRoot UUID]];
+	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: [persistentRoot UUID]];
+    UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
     
@@ -190,9 +196,10 @@
 
 - (void) testsDetectsStoreDeletePersistentRoot
 {
-    [store beginTransactionWithError: NULL];
-    UKTrue([store deletePersistentRoot: [persistentRoot UUID] error: NULL]);
-    [store commitTransactionWithError: NULL];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+	[txn deletePersistentRoot: [persistentRoot UUID]];
+	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: [persistentRoot UUID]];
+    UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
     
@@ -207,9 +214,10 @@
     persistentRoot.deleted = YES;
     [ctx commit];
     
-    [store beginTransactionWithError: NULL];
-    UKTrue([store undeletePersistentRoot: [persistentRoot UUID] error: NULL]);
-    [store commitTransactionWithError: NULL];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    [txn undeletePersistentRoot: [persistentRoot UUID]];
+	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: [persistentRoot UUID]];
+	UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
     
@@ -221,13 +229,14 @@
 
 - (void) testsDetectsStoreCreatePersistentRoot
 {
-    [store beginTransactionWithError: NULL];
-    COPersistentRootInfo *info = [store createPersistentRootWithInitialRevision: [[persistentRoot currentRevision] revisionID]
-                                                                           UUID: [ETUUID UUID]
-                                                                     branchUUID: [ETUUID UUID]
-															   parentBranchUUID: nil
-                                                                          error: NULL];
-    [store commitTransactionWithError: NULL];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    COPersistentRootInfo *info = [txn createPersistentRootWithUUID: [ETUUID UUID]
+														branchUUID: [ETUUID UUID]
+												  parentBranchUUID: nil
+															isCopy: YES
+												   initialRevision: [[persistentRoot currentRevision] revisionID]];
+	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: [persistentRoot UUID]];
+	UKTrue([store commitStoreTransaction: txn]);
     UKNotNil(info);
     
     [self wait];

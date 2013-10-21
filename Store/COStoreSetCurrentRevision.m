@@ -6,7 +6,7 @@
 
 @synthesize branch, persistentRoot, currentRevision, headRevision;
 
-- (BOOL) execute: (COSQLiteStore *)store
+- (BOOL) execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction
 {
     BOOL ok = [[store database] executeUpdate: @"UPDATE branches SET current_revid = ? WHERE uuid = ?",
             [currentRevision dataValue], [branch dataValue]];

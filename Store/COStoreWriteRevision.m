@@ -5,7 +5,7 @@
 
 @synthesize modifiedItems, revisionUUID, parentRevisionUUID, mergeParentRevisionUUID, persistentRoot, branch, metadata;
 
-- (BOOL) execute: (COSQLiteStore *)store
+- (BOOL) execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction
 {
     return [store writeRevisionWithModifiedItems: modifiedItems
                                     revisionUUID: revisionUUID

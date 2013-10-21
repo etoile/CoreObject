@@ -22,9 +22,9 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch;
 - (void)updateWithBranchInfo: (COBranchInfo *)branchInfo;
 - (COBranchInfo *)branchInfo;
 
-- (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID;
-- (void) saveCommitWithMetadata: (NSDictionary *)metadata;
-- (void)saveDeletion;
+- (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID transaction: (COStoreTransaction *)txn;
+- (void) saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn;
+- (void)saveDeletionWithTransaction: (COStoreTransaction *)txn;
 - (BOOL) isBranchUncommitted;
 
 - (void)updateRevisions;

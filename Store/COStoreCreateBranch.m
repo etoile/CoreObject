@@ -5,7 +5,7 @@
 
 @synthesize branch, persistentRoot, initialRevision, parentBranch;
 
-- (BOOL) execute: (COSQLiteStore *)store
+- (BOOL) execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction
 {
     return [[store database] executeUpdate: @"INSERT INTO branches (uuid, proot, initial_revid, current_revid, head_revid, metadata, deleted, parentbranch) VALUES(?,?,?,?,?,NULL,0,?)",
             [branch dataValue],

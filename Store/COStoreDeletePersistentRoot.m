@@ -5,7 +5,7 @@
 
 @synthesize persistentRoot;
 
-- (BOOL) execute: (COSQLiteStore *)store
+- (BOOL) execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction
 {
     return [[store database] executeUpdate: @"UPDATE persistentroots SET deleted = 1 WHERE uuid = ?",
             [persistentRoot dataValue]];

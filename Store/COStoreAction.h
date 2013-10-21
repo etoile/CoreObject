@@ -1,9 +1,11 @@
 #import <Foundation/Foundation.h>
 
-@class COSQLiteStore;
+@class COSQLiteStore, COStoreTransaction;
 
 @protocol COStoreAction <NSObject>
 
-- (BOOL) execute: (COSQLiteStore *)store;
+@property (nonatomic, readonly, strong) ETUUID *persistentRoot;
+
+- (BOOL) execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction;
 
 @end

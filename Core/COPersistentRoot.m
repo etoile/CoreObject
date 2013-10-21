@@ -27,6 +27,7 @@
 #import "COBranchInfo.h"
 #import "COEditingContext+Undo.h"
 #import "COEditingContext+Private.h"
+#import "COStoreTransaction.h"
 
 NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidChangeNotification";
 
@@ -71,6 +72,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         }
         
         _currentBranchUUID =  [_savedState currentBranchUUID];
+		_lastTransactionID = _savedState.transactionID;
     }
     else
     {
@@ -345,6 +347,14 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 #pragma mark Committing Changes
 #pragma mark -
 
+/**
+ * Framework private
+ */
+- (int64_t) lastTransactionID
+{
+	return _lastTransactionID;
+}
+
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
 					metadata: (NSDictionary *)additionalMetadata
 				   undoTrack: (COUndoTrack *)undoTrack
@@ -402,8 +412,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     return _savedState == nil;
 }
 
-- (void)saveCommitWithMetadata: (NSDictionary *)metadata
-               transactionUUID: (ETUUID *)transactionUUID
+- (void) saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn
 {
 	// FIXME: This also rejects changes during undeleted->deleted transition,
 	// while COBranch's equivelant doesn't. Probably should allow changes
@@ -415,12 +424,9 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 					format: @"Attempted to commit changes to deleted persistent root %@", self];
 	}
 	
-    _lastTransactionUUID =  transactionUUID;
-    
+	_lastTransactionID = [txn setOldTransactionID: _lastTransactionID forPersistentRoot: [self UUID]];
+	
 	ETAssert([[self rootObject] isRoot]);
-    
-	COSQLiteStore *store = [_parentContext store];
-    //CORevisionID *revId;
     
 	if ([self isPersistentRootUncommitted])
 	{		
@@ -429,23 +435,26 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         
         if (_cheapCopyRevisionID == nil)
         {
-            _savedState = [store createPersistentRootWithInitialItemGraph: [[self editingBranch] objectGraphContext]
-                                                                     UUID: [self UUID]
-                                                               branchUUID: [[self editingBranch] UUID]
-                                                         revisionMetadata: metadata
-                                                                    error: NULL];
+			// FIXME: Move this into -createPersistentRootWithInitialItemGraph:
+			// and make that take a id<COItemGraph>
+			COItemGraph *graphCopy = [[COItemGraph alloc] initWithItemGraph: [[self editingBranch] objectGraphContext]];
+						
+            _savedState = [txn createPersistentRootWithInitialItemGraph: graphCopy
+																   UUID: [self UUID]
+                                                             branchUUID: [[self editingBranch] UUID]
+													   revisionMetadata: metadata];
         }
         else
         {
 			// Committing a cheap copy, so there must be a parent branch
 			ETUUID *parentBranchUUID = [[[self editingBranch] parentBranch] UUID];
 			ETAssert(parentBranchUUID != nil);
-			
-            _savedState = [store createPersistentRootWithInitialRevision: _cheapCopyRevisionID
-																	UUID: _UUID
-															  branchUUID: [[self editingBranch] UUID]
-														parentBranchUUID: parentBranchUUID
-																   error: NULL];
+
+            _savedState = [txn createPersistentRootWithUUID: _UUID
+												 branchUUID: [[self editingBranch] UUID]
+										   parentBranchUUID: parentBranchUUID
+													 isCopy: YES
+											initialRevision: _cheapCopyRevisionID];
         }
         ETAssert(_savedState != nil);
 		CORevisionID *initialRevID = [[_savedState currentBranchInfo] currentRevisionID];
@@ -461,7 +470,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         // because the store call -createPersistentRootWithInitialContents:
         // handles creating the initial branch.
         
-        [[self editingBranch] didMakeInitialCommitWithRevisionID: initialRevID];
+        [[self editingBranch] didMakeInitialCommitWithRevisionID: initialRevID transaction: txn];
 	}
     else
     {
@@ -470,16 +479,16 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         // N.B. Don't use -branches because that only returns non-deleted branches
         for (COBranch *branch in [_branchForUUID allValues])
         {
-            [branch saveCommitWithMetadata: metadata];
+            [branch saveCommitWithMetadata: metadata transaction: txn];
         }
         
         // Commit a change to the current branch, if needed.
         // Needs to be done after because the above loop may create the branch
         if (![[_savedState currentBranchUUID] isEqual: _currentBranchUUID])
         {
-            ETAssert([store setCurrentBranch: _currentBranchUUID
-                           forPersistentRoot: [self UUID]
-                                       error: NULL]);
+			[txn setCurrentBranch: _currentBranchUUID
+				forPersistentRoot: [self UUID]];
+			
             [_parentContext recordPersistentRoot: self
                                 setCurrentBranch: [self currentBranch]
                                        oldBranch: [self branchForUUID: [_savedState currentBranchUUID]]];
@@ -488,7 +497,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         // N.B.: Ugly, the ordering of changes needs to be carefully controlled
         for (COBranch *branch in [_branchForUUID allValues])
         {
-            [branch saveDeletion];
+            [branch saveDeletionWithTransaction: txn];
         }
     }
 
@@ -603,18 +612,31 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 - (void)storePersistentRootDidChange: (NSNotification *)notif
                        isDistributed: (BOOL)isDistributed
 {
-    ETUUID *notifTransaction = [ETUUID UUIDWithString:
-		[[notif userInfo] objectForKey: kCOPersistentRootTransactionUUID]];
-    if ([_lastTransactionUUID isEqual: notifTransaction])
+    NSNumber *notifTransactionObj = [[notif userInfo] objectForKey: kCOPersistentRootTransactionID];
+	
+	if (notifTransactionObj == nil)
+	{
+		NSLog(@"Warning, invalid nil transaction id");
+		return;
+	}
+	
+	int64_t notifTransaction = [notifTransactionObj longLongValue];
+	
+    if (notifTransaction <= _lastTransactionID)
     {
-//        NSLog(@"----Ignoring update notif %@ %d", _lastTransactionUUID, (int)isDistributed);
+		// N.B.: When running the test suite, most of the time we should
+		// hit this branch.
+		
+//        NSLog(@"----Ignoring update notif %d <= %d (distributed: %d)",
+//			  (int)notifTransaction, (int)_lastTransactionID, (int)isDistributed);
         return;
     }
-//    NSLog(@"++++Not Ignoring update notif (%@, %@, %d)", _lastTransactionUUID, notifTransaction, (int)isDistributed);
+//	NSLog(@"++++Not ignoring update notif %d > %d (distributed: %d)",
+//		  (int)notifTransaction, (int)_lastTransactionID, (int)isDistributed);
     
     COPersistentRootInfo *info =
 		[[self store] persistentRootInfoForUUID: [self UUID]];
-    _savedState =  info;
+    _savedState = info;
     
     for (ETUUID *uuid in [info branchUUIDs])
     {
@@ -623,7 +645,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
     }
     
     _currentBranchUUID =  [_savedState currentBranchUUID];
-    _lastTransactionUUID = notifTransaction;
+    _lastTransactionID = _savedState.transactionID;
     
 	// TODO: Remove or support
     //[self sendChangeNotification];

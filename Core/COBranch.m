@@ -28,8 +28,9 @@
 #import "COMergeInfo.h"
 #import "CORevisionID.h"
 #import "CORevisionCache.h"
+#import "COStoreTransaction.h"
 
-NSString * const kCOBranchLabel = @"COBranchLabel";
+NSString* const kCOBranchLabel = @"COBranchLabel";
 
 @implementation COBranch
 
@@ -505,7 +506,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     return [_persistentRoot store];
 }
 
-- (void)saveCommitWithMetadata: (NSDictionary *)metadata
+- (void)saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn
 {
 	if ([self hasChangesOtherThanDeletionOrUndeletion]
 		&& [[self branchInfo] isDeleted]
@@ -520,17 +521,14 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     ETAssert(_currentRevisionID != nil);
     ETAssert(_newestRevisionID != nil);
     
-	COSQLiteStore *store = [self store];
-    
 	if ([self isBranchUncommitted])
 	{
         // N.B. - this only the case when we're adding a new branch to an existing persistent root.
         
-        [store createBranchWithUUID: _UUID
-                       parentBranch: _parentBranchUUID
-                    initialRevision: _currentRevisionID
-                  forPersistentRoot: [[self persistentRoot] UUID]
-                              error: NULL];
+        [txn createBranchWithUUID: _UUID
+					 parentBranch: _parentBranchUUID
+				  initialRevision: [_currentRevisionID revisionUUID]
+				forPersistentRoot: [[self persistentRoot] UUID]];
         
         [[self editingContext] recordBranchCreation: self];
         
@@ -546,14 +544,11 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         
         // This is the case when the user does [self setCurrentRevision: ], and then commits
         
-        BOOL ok = [store setCurrentRevision: _currentRevisionID
-							initialRevision: nil
-                               headRevision: _newestRevisionID
-                                  forBranch: _UUID
-                           ofPersistentRoot: [[self persistentRoot] UUID]
-                                      error: NULL];
-        ETAssert(ok);
-        
+        [txn setCurrentRevision: [_currentRevisionID revisionUUID]
+				   headRevision: [_newestRevisionID revisionUUID]
+					  forBranch: _UUID
+			   ofPersistentRoot: [[self persistentRoot] UUID]];
+	
 
         [[self editingContext] recordBranchSetCurrentRevisionID: _currentRevisionID
                                                   oldRevisionID: old
@@ -566,11 +561,9 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     if (_metadataChanged)
     {
-        BOOL ok = [store setMetadata: _metadata
-                           forBranch: _UUID
-                    ofPersistentRoot: [[self persistentRoot]    UUID]
-                               error: NULL];
-        ETAssert(ok);
+        [txn setMetadata: _metadata
+			   forBranch: _UUID
+		ofPersistentRoot: [[self persistentRoot] UUID]];
         
         [[self editingContext] recordBranchSetMetadata: self
                                            oldMetadata: [[self branchInfo] metadata]];
@@ -590,22 +583,21 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
             self.mergingBranch = nil;
         }
         
-        CORevisionID *revId = [store writeRevisionWithItemGraph: [self modifiedItemsSnapshot]
-                                                   revisionUUID: [ETUUID UUID]
-                                                       metadata: metadata
-                                               parentRevisionID: _currentRevisionID
-                                          mergeParentRevisionID: mergeParent
-		                                             branchUUID: _UUID
-                                             persistentRootUUID: [_persistentRoot UUID]
-                                                          error: NULL];        
+        CORevisionID *revId = [CORevisionID revisionWithPersistentRootUUID: [_persistentRoot UUID] revisionUUID: [ETUUID UUID]];
+		
+		[txn writeRevisionWithModifiedItems: [self modifiedItemsSnapshot]
+							   revisionUUID: [revId revisionUUID]
+								   metadata: metadata
+						   parentRevisionID: [_currentRevisionID revisionUUID]
+					  mergeParentRevisionID: [mergeParent revisionUUID]
+						 persistentRootUUID: [_persistentRoot UUID]
+								 branchUUID: _UUID];
+
         
-        BOOL ok = [store setCurrentRevision: revId
-                            initialRevision: nil
-                               headRevision: revId
-                                  forBranch: _UUID
-                           ofPersistentRoot: [[self persistentRoot] UUID]
-                                      error: NULL];
-        ETAssert(ok);
+        [txn setCurrentRevision: [revId revisionUUID]
+				   headRevision: [revId revisionUUID]
+					  forBranch: _UUID
+			   ofPersistentRoot: [[self persistentRoot] UUID]];
         
         CORevisionID *oldRevid = _currentRevisionID;
 		CORevisionID *oldHeadRevid = _newestRevisionID;
@@ -627,16 +619,16 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     if (![self isDeleted] && [[self branchInfo] isDeleted])
     {
-        ETAssert([store undeleteBranch: _UUID
-                      ofPersistentRoot: [[self persistentRoot] UUID]
-                                 error: NULL]);
+        [txn undeleteBranch: _UUID
+		   ofPersistentRoot: [[self persistentRoot] UUID]];
+		
         [[self editingContext] recordBranchUndeletion: self];
     }
     
 	[_objectGraph clearChangeTracking];
 }
 
-- (void)saveDeletion
+- (void)saveDeletionWithTransaction: (COStoreTransaction *)txn
 {
     COSQLiteStore *store = [self store];
     
@@ -644,14 +636,13 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     if ([self isDeleted] && ![[self branchInfo] isDeleted])
     {
-        ETAssert([store deleteBranch: _UUID
-                    ofPersistentRoot: [[self persistentRoot] UUID]
-                               error: NULL]);
+        [txn deleteBranch: _UUID
+                    ofPersistentRoot: [[self persistentRoot] UUID]];
         [[self editingContext] recordBranchDeletion: self];
     }    
 }
 
-- (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID
+- (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID transaction: (COStoreTransaction *)txn
 {
     assert(aRevisionID != nil);
     
@@ -659,11 +650,9 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     // FIXME: Copied-n-pasted from above
     if (_metadataChanged)
     {
-        BOOL ok = [[_persistentRoot store] setMetadata: _metadata
-                                             forBranch: _UUID
-                                      ofPersistentRoot: [[self persistentRoot] UUID]
-                                                 error: NULL];
-        ETAssert(ok);
+        [txn setMetadata: _metadata
+			   forBranch: _UUID
+		ofPersistentRoot: [[self persistentRoot] UUID]];
         
         [[self editingContext] recordBranchSetMetadata: self
                                            oldMetadata: [[self branchInfo] metadata]];
