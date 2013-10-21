@@ -10,20 +10,13 @@ The library is saved in ~/ProjectDemoStore
 
 What's working:
 
- - creating / editing outline documents
- - commiting changes
- - making checkpoints
- - restoring to a previous revision (altough the implementation is flawed and needs to be redone)
- - chat with other ProjectDemo instances running on the local network
- 
-What's not yet working:
+-the "New…" menu item, and "New Outline" button
+-Insert, Insert Child, Step Backward, Step Forward toolbar items in an outline window
+-editing the label of an outline item
+-drag and drop of outline items, including between documents
+-Document -> Move to trash (no way to view the trash, but the persistent root is deleted, and the document won't re-open on the next app launch)
+- The undo mode in Preferences
+- "Undo", "Redo", "Step Backward", "Step Forward" in the "Edit" menu
 
- - other document types (drawing, text)
- - no way to delete a document once it's created
- - saving document positions on the screen
- - collaborative editing
- - selective undo
- - normal undo/redo
- - ...
- 
+Probably nothing else works, but it's enough to be a useful demo
  
