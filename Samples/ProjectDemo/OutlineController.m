@@ -55,16 +55,22 @@
 	return (OutlineItem *)[[self projectDocument] rootDocObject];
 }
 
++ (BOOL) isProjectUndo
+{
+	NSString *mode = [[NSUserDefaults standardUserDefaults] valueForKey: @"UndoMode"];
+	
+	return (mode == nil || [mode isEqualToString: @"Project"]);
+}
+
 - (COUndoTrack *) undoStack
 {
     NSString *name = nil;
-	NSString *mode = [[NSUserDefaults standardUserDefaults] valueForKey: @"UndoMode"];
 	
-	if (mode == nil || [mode isEqualToString: @"Project"])
+	if ([[self class] isProjectUndo])
 	{
 		name = @"org.etoile.projectdemo";
 	}
-	else if ([mode isEqualToString: @"Document"])
+	else
 	{
 		name = [NSString stringWithFormat: @"org.etoile.projectdemo-%@",
 			[[doc persistentRoot] UUID]];
@@ -78,7 +84,7 @@
        shortDescription: (NSString*)shortDescription
         longDescription: (NSString*)longDescription;
 {
-	[[[doc objectGraphContext] editingContext] commitWithUndoTrack: [self undoStack]]; // FIXME:
+	[[doc persistentRoot] commitWithIdentifier: @"foo" metadata: nil undoTrack: [self undoStack] error:NULL];
 }
 
 - (void)windowDidLoad
@@ -611,9 +617,14 @@ static int i = 0;
             
             [newParent addItem: copy atIndex: insertionIndex++];
             
-            [self commitWithType: @"kCOTypeMinorEdit"
-                shortDescription: @"Drop Items"
-                 longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
+			
+			if (![[self class] isProjectUndo])
+			{
+				// Only commit the source and destination persistent roots separately if we're in "document undo" mode
+				[self commitWithType: @"kCOTypeMinorEdit"
+					shortDescription: @"Drop Items"
+					 longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
+			}
             
             // Remove from source
 
@@ -622,10 +633,19 @@ static int i = 0;
             [oldParent removeItemAtIndex: oldIndex];
             
             OutlineController *sourceController = [(ApplicationDelegate *)[NSApp delegate] controllerForDocumentRootObject: [oldParent document]];
-            [sourceController commitWithType: @"kCOTypeMinorEdit"
-                            shortDescription: @"Drag Items"
-                             longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
-
+			
+			if (![[self class] isProjectUndo])
+			{
+				// Only commit the source and destination persistent roots separately if we're in "document undo" mode
+				[sourceController commitWithType: @"kCOTypeMinorEdit"
+								shortDescription: @"Drag Items"
+								 longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
+			}
+			else
+			{
+				// Commit both persistent roots in one commit
+				[[[doc persistentRoot] editingContext] commitWithUndoTrack: [self undoStack]];
+			}
         }
 	}
 	

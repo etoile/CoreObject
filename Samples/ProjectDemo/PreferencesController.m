@@ -1,4 +1,5 @@
 #import "PreferencesController.h"
+#import <CoreObject/CoreObject.h>
 
 @implementation PreferencesController
 
@@ -49,10 +50,14 @@
 	if (tag == PER_PROJECT)
 	{
 		value = @"Project";
+		[[COUndoTrack trackForName: @"org.etoile.projectdemo" withEditingContext: nil] clear];
+		NSLog(@"Cleared project stack");
  	}
 	else if (tag == PER_DOCUMENT)
 	{
 		value = @"Document";
+		[[COUndoTrack trackForPattern: @"org.etoile.projectdemo-*" withEditingContext: nil] clear];
+		NSLog(@"Cleared document stacks");
 	}
 	
 	[[NSUserDefaults standardUserDefaults] setValue: value forKey: @"UndoMode"];
