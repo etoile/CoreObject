@@ -261,9 +261,9 @@
  *
  * For initialization, you should usually just use -initWithObjectGraphContext:.
  *
- * If you have subclassed COObject, in most cases, you just want to instantiate 
- * you subclass using the entity description whose name matches your subclass, 
- * and -initWithObjectGraphContext: does it.
+ * If you have subclassed COObject, in most cases, you want to instantiate 
+ * your subclass using the identically named entity description, and 
+ * -initWithObjectGraphContext: does just that.
  *
  * For some use cases (e.g. custom object representation or partial object 
  * loading), you might want to use a subentity or parent entity description 
