@@ -23,14 +23,7 @@ First alpha release blockers
 Backlog from Oct 2nd
 --------------------
 
-- For CORevisionID, does -persistentRootUUID match exactly each persistent root or does it just correspond to the first persistent root in the backing store
-
-- CORevisionID equality involving persistent root UUID (-persistentRootUUID should be the backing store UUID probably)
-
 - Undo changes the current revision is that happens to be recorded by the Undo stack
-
-- To many revision abstractions imo: CORevision, CORevisionInfo, CORevisionID, ETUUID, int64_t.  The code and architecture is more complex than it ought to be.
-Ideally we should have just 3, but we should at least remove one.
 
 - Skip transient property descriptions or at least attributes in -[COObject embeddedOrReferencedObjects]
 
@@ -44,8 +37,6 @@ Ideally we should have just 3, but we should at least remove one.
 - COSearchResult vs COQuery
 
 - Selective Undo for -undoNode: or elsewhere… Should I create a COCommand and call -inverse then compute and apply the selective undo result from this inverse command?
-
-- Store: revert to integer commit id's
 
 - COCommandSetCurrentVersionForBranch: extract selective undo code to COBranch
 
@@ -62,35 +53,9 @@ Ideally we should have just 3, but we should at least remove one.
 Backlog
 -------
 
-x what is the best represent a user's save action (cmd+s) in the current
-store model?
-	=> Using empty commits with metadata, for now.
-
-revision identifiers:
- - We've settled on a UUID for identifying revisions. Quentin was saying there
-   are too many revision abstractions.
-   
-   - CORevision should be used by framework users
-   
-   - ETUUID should be used within CoreObject, with the caveat that, in order
-     to load the revision contents, you also need to know the persistent root
-	 id (any persistent root sharing the backing store works.)
-
-   - CORevisionID should be avoided and may be removed
-
-   - CORevisionInfo is used only as a dumb "property list" to send data from
-     COSQLiteStore to COEditingContext.
-
-   - int64_t as revision IDs is an optimization for SQLite only, and is
-     used only between COSQLiteStore and the BackingStore, never exposed.
-     When a SQLite table has a primary key other than "integer primary key",
-     SQLite internally creates an "integer primary key" column
-
-
 history graph UI
  - summarization (hiding minor revisions)
  - use async fetching of revision info
- x also make a COUndoStack UI (ObjectManager has one)
 
 collaboration
  - interation btn. sync and branching
@@ -115,11 +80,8 @@ typewriter / ProjDemo
 
 
 - Major tasks
-  x App-level undo
-    - polish, fine-tune api
   WIP Diff/merge cleanup
   - Cleanup COObject
-    x synthesize accessors (started)
     - synthesize all accessors
   - Copying support
 
@@ -227,9 +189,7 @@ typewriter / ProjDemo
     use SEL instead of NSString* for better performance, probably.
 
 - COSQLiteStore
-  - Use change count for notifications. Make all mutations increment count.
   - Actually use NSError
-  - Record in COPersistentRootInfo a copySource that records the persistent root UUID a cheap copy was made from (or just a flag, isCopy?)
   - exportRevisions: and importRevisions: that take a set of CORevisionID an returns a delta-compressed NSData
     suitable for network transport.
   - Review error handling, especially handling of errors within transactions
@@ -240,9 +200,6 @@ typewriter / ProjDemo
   - Switch to NSUUID
   
 - History browser
-  x Initial APIs
-  x Initial CORevision cache
-  x Initial graph UI in Typewriter
   - Asychronous fetching
   - Complete UI
 
