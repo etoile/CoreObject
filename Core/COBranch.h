@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COTrack.h>
 
-@class COObject, CORevision, CORevisionID, COPersistentRoot, COBranchInfo, COObjectGraphContext, COEditingContext;
+@class COObject, CORevision, COPersistentRoot, COBranchInfo, COObjectGraphContext, COEditingContext;
 @class COItemGraphDiff, COMergeInfo;
 
 extern NSString * const kCOBranchLabel;
@@ -282,6 +282,7 @@ extern NSString * const kCOBranchLabel;
 
 - (COMergeInfo *) mergeInfoForMergingRevision:(CORevision *)aRevision;
 
+// TODO: Add test of this method
 /**
  * Searches for whether the given revision is on this branch.
  * Returns the corresponding CORevision if it is, or nil if not.
@@ -289,6 +290,6 @@ extern NSString * const kCOBranchLabel;
  * Note that this means nil will be returned if the given revision is not on
  * this branch, even if it on another branch of this persistent root.
  */
-- (CORevision *) revisionWithID: (CORevisionID *)aRevisionID;
+- (CORevision *) revisionWithUUID: (ETUUID *)aRevisionID;
 
 @end

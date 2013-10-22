@@ -28,10 +28,6 @@
 {
     return [self branchInfoForUUID: [self currentBranchUUID]];
 }
-- (CORevisionID *)currentRevisionID
-{
-    return [[self currentBranchInfo] currentRevisionID];
-}
 - (ETUUID *)currentRevisionUUID
 {
 	return [[self currentBranchInfo] currentRevisionUUID];

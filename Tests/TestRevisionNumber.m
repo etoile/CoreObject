@@ -115,21 +115,4 @@
 	 }];
 }
 
-- (void) testRevisionIDEquality
-{
-	ETUUID *prootA = [ETUUID UUID];
-	ETUUID *prootB = [ETUUID UUID];
-	ETUUID *rev1 = [ETUUID UUID];
-	
-	CORevisionID *prootArev1 = [CORevisionID revisionWithPersistentRootUUID: prootA
-															   revisionUUID: rev1];
-
-	CORevisionID *prootBrev1 = [CORevisionID revisionWithPersistentRootUUID: prootB
-															   revisionUUID: rev1];
-	
-	// These are considered equal because only the revisionID determines the
-	// CORevisionID identity. The persistentRootUUID is just extra metadata.
-	UKObjectsEqual(prootArev1, prootBrev1);
-}
-
 @end

@@ -17,11 +17,11 @@ static void SearchForRevisionsClientLacks(NSMutableSet *resultSet, ETUUID *rev, 
     // Recursively search the parent(s)
     
     CORevisionInfo *info = [store revisionInfoForRevisionUUID: rev persistentRootUUID: persistentRootUUID];
-    if ([info parentRevisionID] != nil)
+    if ([info parentRevisionUUID] != nil)
     {
         SearchForRevisionsClientLacks(resultSet, [info parentRevisionUUID], persistentRootUUID, clientLatestRevisions, store);
     }
-    if ([info mergeParentRevisionID] != nil)
+    if ([info mergeParentRevisionUUID] != nil)
     {
         SearchForRevisionsClientLacks(resultSet, [info mergeParentRevisionUUID], persistentRootUUID, clientLatestRevisions, store);
     }
@@ -74,8 +74,8 @@ For now we do.
         }
         NSMutableDictionary *branchPlist = [NSMutableDictionary dictionary];
         branchPlist[@"uuid"] = [branch.UUID stringValue];
-        branchPlist[@"initialRevisionID"] = [[branch.initialRevisionID revisionUUID] stringValue];
-        branchPlist[@"currentRevisionID"] = [[branch.currentRevisionID revisionUUID] stringValue];
+        branchPlist[@"initialRevisionID"] = [branch.initialRevisionUUID stringValue];
+        branchPlist[@"currentRevisionID"] = [branch.currentRevisionUUID stringValue];
         if (branch.metadata != nil)
         {
             branchPlist[@"metadata"] = branch.metadata;
@@ -92,13 +92,13 @@ For now we do.
         CORevisionInfo *revInfo = [aStore revisionInfoForRevisionUUID: revid persistentRootUUID: persistentRoot];
         
         NSMutableDictionary *revInfoPlist = [NSMutableDictionary dictionary];
-        if (revInfo.parentRevisionID != nil)
+        if (revInfo.parentRevisionUUID != nil)
         {
-            revInfoPlist[@"parent"] = [revInfo.parentRevisionID.revisionUUID stringValue];
+            revInfoPlist[@"parent"] = [revInfo.parentRevisionUUID stringValue];
         }
-        if (revInfo.mergeParentRevisionID != nil)
+        if (revInfo.mergeParentRevisionUUID != nil)
         {
-            revInfoPlist[@"mergeParent"] = [revInfo.mergeParentRevisionID.revisionUUID stringValue];
+            revInfoPlist[@"mergeParent"] = [revInfo.mergeParentRevisionUUID stringValue];
         }
         if (revInfo.metadata != nil)
         {

@@ -82,9 +82,6 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 @end
 
 @interface COEditingContext (Deprecated)
-
-- (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid;
-
 @end
 
 @interface COEditingContext (Debugging)

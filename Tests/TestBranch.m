@@ -97,8 +97,8 @@
 	UKObjectsEqual(firstRevision, [originalBranch currentRevision]);
 
     // Verify that the revert to firstRevision is not committed
-    UKObjectsEqual([thirdRevision revisionID],
-                   [[[store persistentRootInfoForUUID: [persistentRoot UUID]] currentBranchInfo] currentRevisionID]);
+    UKObjectsEqual([thirdRevision UUID],
+                   [[store persistentRootInfoForUUID: [persistentRoot UUID]] currentRevisionUUID]);
     
 	// First redo (Groceries -> Shopping List)
 	[originalBranch redo]; //[originalBranch setCurrentRevision: secondRevision];
@@ -244,12 +244,12 @@
 	
     [persistentRoot commit];
     
-	UKObjectsEqual([rev2 revisionID], [[[store persistentRootInfoForUUID: [persistentRoot UUID]]
-                                            branchInfoForUUID: [originalBranch UUID]] currentRevisionID]);
-	UKObjectsEqual([rev6 revisionID], [[[store persistentRootInfoForUUID: [persistentRoot UUID]]
-                                         branchInfoForUUID: [branch1 UUID]] currentRevisionID]);
-	UKObjectsEqual([rev5 revisionID], [[[store persistentRootInfoForUUID: [persistentRoot UUID]]
-                                         branchInfoForUUID: [branch2 UUID]] currentRevisionID]);
+	UKObjectsEqual([rev2 UUID], [[[store persistentRootInfoForUUID: [persistentRoot UUID]]
+                                            branchInfoForUUID: [originalBranch UUID]] currentRevisionUUID]);
+	UKObjectsEqual([rev6 UUID], [[[store persistentRootInfoForUUID: [persistentRoot UUID]]
+                                         branchInfoForUUID: [branch1 UUID]] currentRevisionUUID]);
+	UKObjectsEqual([rev5 UUID], [[[store persistentRootInfoForUUID: [persistentRoot UUID]]
+                                         branchInfoForUUID: [branch2 UUID]] currentRevisionUUID]);
 	
 //	NSArray *parentTrackUUIDs = A([initialTrack UUID], [branch1 UUID]);
 //	

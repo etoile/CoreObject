@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETUUID.h>
 
-@class CORevisionID, COSQLiteStore, CORevision;
+@class COSQLiteStore, CORevision;
 
 
 @interface CORevisionCache : NSObject
@@ -41,11 +41,4 @@
 // TODO: Don't expose. It is a cache implementation detail.
 + (id)cacheForStoreUUID: (ETUUID *)aUUID;
 
-@end
-
-@interface CORevisionCache (Deprecated)
-- (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid;
-
-+ (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid
-                             storeUUID: (ETUUID *)aStoreUUID;
 @end

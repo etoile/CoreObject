@@ -171,6 +171,22 @@
     }
 }
 
+- (ETUUID *) revisionUUIDForRevid: (int64_t)aRevid
+{
+    NSData *revUUID = [db_ dataForQuery:
+					   [NSString stringWithFormat: @"SELECT uuid FROM %@ WHERE revid = ?", [self tableName]],
+					   [NSNumber numberWithLongLong: aRevid]];
+    
+    if (revUUID != nil)
+    {
+        return [ETUUID UUIDWithData: revUUID];
+    }
+    else
+    {
+        return nil;
+    }
+}
+
 - (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aRevisionUUID
 {
     CORevisionInfo *result = nil;
@@ -184,9 +200,9 @@
         int64_t mergeparent = [rs longLongIntForColumnIndex: 1];
         
         result = [[CORevisionInfo alloc] init];
-        result.revisionID = [CORevisionID revisionWithPersistentRootUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 3]] revisionUUID: aRevisionUUID];
-        result.parentRevisionID = [self revisionIDForRevid: parent];
-        result.mergeParentRevisionID = [self revisionIDForRevid: mergeparent];
+        result.revisionUUID = aRevisionUUID;
+        result.parentRevisionUUID = [self revisionUUIDForRevid: parent];
+        result.mergeParentRevisionUUID = [self revisionUUIDForRevid: mergeparent];
 		result.branchUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
 		result.persistentRootUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 3]];
         NSData *data = [rs dataForColumnIndex: 4];
@@ -695,9 +711,9 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 	
 	CORevisionInfo *rev = [CORevisionInfo new];
 
-	[rev setRevisionID: [CORevisionID revisionWithPersistentRootUUID: _uuid revisionUUID: uuid]];
-	[rev setParentRevisionID: (id)[NSNumber numberWithLongLong: parent]];
-	[rev setMergeParentRevisionID: (id)[NSNumber numberWithLongLong: mergeparent]];
+	[rev setRevisionUUID: uuid];
+	[rev setParentRevisionUUID: (id)[NSNumber numberWithLongLong: parent]];
+	[rev setMergeParentRevisionUUID: (id)[NSNumber numberWithLongLong: mergeparent]];
 	[rev setPersistentRootUUID: [ETUUID UUIDWithData: [rs dataForColumn: @"persistentrootuuid"]]];
 	[rev setBranchUUID: [ETUUID UUIDWithData: [rs dataForColumn: @"branchuuid"]]];
 	[rev setMetadata: metadata];
@@ -708,7 +724,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 	/* Memorize the revision ID to support resolving parent and merge parent 
 	   revision IDs once revIDs contains all the revisions */
 
-	[revIDs setObject: [rev revisionID]
+	[revIDs setObject: [rev revisionUUID]
 			   forKey: [NSNumber numberWithLongLong: revid]];
 
 	 return rev;
@@ -719,10 +735,10 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 {
 	for (CORevisionInfo *revInfo in revInfos)
 	{
-		[revInfo setParentRevisionID: [revIDs objectForKey: [revInfo parentRevisionID]]];
-		[revInfo setMergeParentRevisionID: [revIDs objectForKey: [revInfo mergeParentRevisionID]]];
+		[revInfo setParentRevisionUUID: [revIDs objectForKey: [revInfo parentRevisionUUID]]];
+		[revInfo setMergeParentRevisionUUID: [revIDs objectForKey: [revInfo mergeParentRevisionUUID]]];
 
-		ETAssert([revInfo parentRevisionID] != nil || [revInfo isEqual: [revInfos firstObject]]);
+		ETAssert([revInfo parentRevisionUUID] != nil || [revInfo isEqual: [revInfos firstObject]]);
 	}
 }
 

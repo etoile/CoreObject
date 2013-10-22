@@ -679,11 +679,6 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
     return [CORevisionCache revisionForRevisionUUID: aRevid persistentRootUUID: aPersistentRoot storeUUID: [_store UUID]];
 }
 
-- (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid
-{
-    return [CORevisionCache revisionForRevisionID: aRevid storeUUID: [_store UUID]];
-}
-
 - (COBranch *) branchForUUID: (ETUUID *)aBranch
 {
 	if (aBranch != nil)

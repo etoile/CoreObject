@@ -1,50 +1,17 @@
 #import "COBranchInfo.h"
-#import "CORevisionID.h"
 #import <EtoileFoundation/EtoileFoundation.h>
 
 @implementation COBranchInfo
 
 @synthesize UUID = uuid_;
 @synthesize persistentRootUUID = _persistentRootUUID;
-@synthesize initialRevisionID = initialRevisionId_;
-@synthesize headRevisionID = headRevisionId_;
-@synthesize currentRevisionID = currentRevisionId_;
 @synthesize deleted = deleted_;
 @synthesize metadata = metadata_;
 @synthesize parentBranchUUID = parentBranchUUID_;
 
-- (ETUUID *) initialRevisionUUID
-{
-	return [initialRevisionId_ revisionUUID];
-}
-
-- (ETUUID *) headRevisionUUID
-{
-	return [headRevisionId_ revisionUUID];
-}
-
-- (ETUUID *) currentRevisionUUID
-{
-	return [currentRevisionId_ revisionUUID];
-}
-
-- (void) setInitialRevisionUUID:(ETUUID *)aUUID
-{
-	initialRevisionId_ = [[CORevisionID alloc] initWithPersistentRootUUID: self.persistentRootUUID
-															 revisionUUID: aUUID];
-}
-
-- (void) setHeadRevisionUUID:(ETUUID *)aUUID
-{
-	headRevisionId_ = [[CORevisionID alloc] initWithPersistentRootUUID: self.persistentRootUUID
-															 revisionUUID: aUUID];
-}
-
-- (void) setCurrentRevisionUUID:(ETUUID *)aUUID
-{
-	currentRevisionId_ = [[CORevisionID alloc] initWithPersistentRootUUID: self.persistentRootUUID
-															 revisionUUID: aUUID];
-}
+@synthesize initialRevisionUUID = _initialRevisionUUID;
+@synthesize headRevisionUUID = _headRevisionUUID;
+@synthesize currentRevisionUUID = _currentRevisionUUID;
 
 - (ETUUID *) remoteMirror
 {
@@ -68,7 +35,7 @@
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat: @"<Branch %@ <curr. rev.: %@> %@>", uuid_, currentRevisionId_, metadata_];
+    return [NSString stringWithFormat: @"<Branch %@ <curr. rev.: %@> %@>", uuid_, _currentRevisionUUID, metadata_];
 }
 
 @end

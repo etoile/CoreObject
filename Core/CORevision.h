@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COTrack.h>
 
-@class COEditingContext, CORevisionInfo, CORevisionID, CORevisionCache, COCommitDescriptor;
+@class COEditingContext, CORevisionInfo, CORevisionCache, COCommitDescriptor;
 
 /** 
  * @group Core
@@ -106,7 +106,6 @@
  * number in the given revision cache. 
  */
 - (id)initWithCache: (CORevisionCache *)aCache revisionInfo: (CORevisionInfo *)aRevInfo;
-- (CORevisionID *)revisionID;
 
 /** @taskunit Deprecated */
 

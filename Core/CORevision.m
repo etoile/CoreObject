@@ -12,7 +12,6 @@
 #import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
 #import "CORevisionCache.h"
-#import "CORevisionID.h"
 
 
 @implementation CORevision
@@ -23,7 +22,7 @@
 	SUPERINIT;
 	cache = aCache;
 	revisionInfo =  aRevInfo;
-    assert([revisionInfo revisionID] != nil);
+    assert([revisionInfo revisionUUID] != nil);
 	return self;
 }
 
@@ -32,7 +31,7 @@
 	if ([rhs isKindOfClass: [CORevision class]] == NO)
 		return NO;
 
-	return [revisionInfo.revisionID.revisionUUID isEqual: ((CORevision *)rhs)->revisionInfo.revisionID.revisionUUID];
+	return [revisionInfo.revisionUUID isEqual: ((CORevision *)rhs)->revisionInfo.revisionUUID];
 }
 
 - (NSArray *)propertyNames
@@ -42,26 +41,21 @@
 		@"localizedShortDescription", @"metadata")];
 }
 
-- (CORevisionID *)revisionID
-{
-    assert([revisionInfo revisionID] != nil);
-	return [revisionInfo revisionID];
-}
-
 - (ETUUID *)UUID
 {
-	return [[self revisionID] revisionUUID];
+	return [revisionInfo revisionUUID];
 }
 
 - (CORevision *)parentRevision
 {
-    if ([revisionInfo parentRevisionID] == nil)
+    if ([revisionInfo parentRevisionUUID] == nil)
     {
         return nil;
     }
     
-	CORevisionID *parentRevID = [revisionInfo parentRevisionID];
-    return [cache revisionForRevisionID: parentRevID];
+	ETUUID *parentRevID = [revisionInfo parentRevisionUUID];
+    return [cache revisionForRevisionUUID: parentRevID
+					   persistentRootUUID: [revisionInfo persistentRootUUID]];
 }
 
 - (ETUUID *)persistentRootUUID

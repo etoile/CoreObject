@@ -161,17 +161,17 @@ static ETUUID *branchBUUID;
     // Server writes a second commit.
     
     txn = [[COStoreTransaction alloc] init];
-    CORevisionID *serverCommit2 = [CORevisionID revisionWithPersistentRootUUID: persistentRootUUID revisionUUID: [ETUUID UUID]];
+    ETUUID *serverCommit2 = [ETUUID UUID];
 	
 	[txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"2"]
-						   revisionUUID: [serverCommit2 revisionUUID]
+						   revisionUUID: serverCommit2
 							   metadata: nil
-					   parentRevisionID: [[serverInfo currentRevisionID] revisionUUID]
+					   parentRevisionID: [serverInfo currentRevisionUUID]
 				  mergeParentRevisionID: nil
 					 persistentRootUUID: persistentRootUUID
 							 branchUUID: branchAUUID];
 
-    [txn setCurrentRevision: [serverCommit2 revisionUUID]
+    [txn setCurrentRevision: serverCommit2
 			   headRevision: nil
 				  forBranch: branchAUUID
 		   ofPersistentRoot: persistentRootUUID];
@@ -229,17 +229,17 @@ static ETUUID *branchBUUID;
 	
     // Server writes a second commit.
     
-    CORevisionID *serverCommit2 = [CORevisionID revisionWithPersistentRootUUID: cheapCopyUUID revisionUUID: [ETUUID UUID]];
+    ETUUID *serverCommit2 = [ETUUID UUID];
 	
 	[txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"2"]
-						   revisionUUID: [serverCommit2 revisionUUID]
+						   revisionUUID: serverCommit2
 							   metadata: nil
-					   parentRevisionID: [[serverCheapCopyInfo currentRevisionID] revisionUUID]
+					   parentRevisionID: [serverCheapCopyInfo currentRevisionUUID]
 				  mergeParentRevisionID: nil
 					 persistentRootUUID: cheapCopyUUID
 							 branchUUID: branchAUUID];
 
-	[txn setCurrentRevision: [serverCommit2 revisionUUID]
+	[txn setCurrentRevision: serverCommit2
 			   headRevision: nil
 				  forBranch: cheapCopyBranchUUID
 		   ofPersistentRoot: cheapCopyUUID];

@@ -2,7 +2,6 @@
 
 @implementation COSearchResult
 
-@synthesize revision = revision_;
-@synthesize innerObjectUUID = innerObjectUUID_;
+@synthesize persistentRoot, revision, innerObjectUUID;
 
 @end

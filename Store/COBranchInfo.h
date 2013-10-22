@@ -1,15 +1,15 @@
 #import <Foundation/Foundation.h>
 
-@class ETUUID, CORevisionID;
+@class ETUUID;
 
 @interface COBranchInfo : NSObject
 {
 @private
     ETUUID *uuid_;
     ETUUID *_persistentRootUUID;
-    CORevisionID *initialRevisionId_;
-    CORevisionID *headRevisionId_;
-    CORevisionID *currentRevisionId_;
+    ETUUID *_initialRevisionUUID;
+    ETUUID *_headRevisionUUID;
+    ETUUID *_currentRevisionUUID;
     NSDictionary *metadata_;
     BOOL deleted_;
     ETUUID *parentBranchUUID_;
@@ -40,18 +40,6 @@
  * revision, haven't yet made a change) which suggests it should probably be
  * removed.
  */
-@property (readwrite, nonatomic, retain) CORevisionID *headRevisionID;
-/**
- * The oldest revision on the branch. Indicates "where a feature branch was
- * forked from master"
- */
-@property (readwrite, nonatomic, strong) CORevisionID *initialRevisionID;
-/**
- * The current revision of this branch.
- */
-@property (readwrite, nonatomic, strong) CORevisionID *currentRevisionID;
-
-
 @property (readwrite, nonatomic, strong) ETUUID *headRevisionUUID;
 /**
  * The oldest revision on the branch. Indicates "where a feature branch was

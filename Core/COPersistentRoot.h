@@ -12,7 +12,7 @@
 #import <CoreObject/COEditingContext.h>
 #import <CoreObject/COItemGraph.h>
 
-@class COBranch, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo, COObjectGraphContext, CORevisionID;
+@class COBranch, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo, COObjectGraphContext;
 
 /**
  * Posted when any of the following changes are made to a COPersistentRoot:

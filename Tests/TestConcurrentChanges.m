@@ -27,7 +27,7 @@
 {
 	// Load the revision history (to support testing it it is updated in reaction to a commit)
 	NSArray *revs = [[persistentRoot editingBranch] nodes];
-	CORevisionID *newRevID = nil;
+	ETUUID *newRevID = nil;
 
     // Load in another context
     {
@@ -40,13 +40,13 @@
         
         //NSLog(@"Committing change to %@", [persistentRoot persistentRootUUID]);
         [ctx2 commit];
-		newRevID = [[rootObj revision] revisionID];
+		newRevID = [[rootObj revision] UUID];
     }
 
     // Wait a bit for a distributed notification to arrive to ctx
     [self wait];
 
-	CORevision *newRev = [ctx revisionForRevisionID: newRevID];
+	CORevision *newRev = [ctx revisionForRevisionUUID: newRevID persistentRootUUID: [persistentRoot UUID]];
 
 	UKObjectsEqual([revs arrayByAddingObject: newRev], [[persistentRoot editingBranch] nodes]);
     UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: @"label"]);
@@ -55,12 +55,12 @@
 
 - (void) testsDetectsStoreSetCurrentRevision
 {
-    CORevisionID *firstRevid = [[persistentRoot currentRevision] revisionID];
+    ETUUID *firstRevid = [[persistentRoot currentRevision] UUID];
     UKNotNil(firstRevid);
     
     [[persistentRoot rootObject] setLabel: @"change"];
     [ctx commit];
-    CORevisionID *secondRevid = [[persistentRoot currentRevision] revisionID];
+    ETUUID *secondRevid = [[persistentRoot currentRevision] UUID];
     UKNotNil(secondRevid);
     UKObjectsNotEqual(firstRevid, secondRevid);
     
@@ -68,7 +68,7 @@
     // Revert persistentRoot back to the first revision using the store API
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
 	
-	[txn setCurrentRevision: [firstRevid revisionUUID]
+	[txn setCurrentRevision: firstRevid
 			   headRevision: nil
 				  forBranch: [[persistentRoot currentBranch] UUID]
 		   ofPersistentRoot: [persistentRoot UUID]];
@@ -80,7 +80,7 @@
     [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
-    UKObjectsEqual(firstRevid, [[persistentRoot currentRevision] revisionID]);
+    UKObjectsEqual(firstRevid, [[persistentRoot currentRevision] UUID]);
     UKFalse([ctx hasChanges]);
 }
 
@@ -91,7 +91,7 @@
 	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
 	[txn createBranchWithUUID: secondbranchUUID
 				 parentBranch: nil
-			  initialRevision: [[[persistentRoot currentRevision] revisionID] revisionUUID]
+			  initialRevision: [[persistentRoot currentRevision] UUID]
 			forPersistentRoot: [persistentRoot UUID]];
 
 	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: [persistentRoot UUID]];

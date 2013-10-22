@@ -1,5 +1,4 @@
 #import "COCommand.h"
-#import "CORevisionID.h"
 
 @class CORevision;
 

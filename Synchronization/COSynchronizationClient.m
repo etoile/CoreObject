@@ -24,7 +24,7 @@
         // and two stores may not use the same backing UUID for a persistent root.
         //
         // Note that we tell the server end the persistent root that the revisions belong to.
-        [clientNewestRevisionIDForBranchUUID setObject: [[[branch currentRevisionID] revisionUUID] stringValue]
+        [clientNewestRevisionIDForBranchUUID setObject: [[branch currentRevisionUUID] stringValue]
                                                 forKey: [[branch UUID] stringValue]];
     }
     

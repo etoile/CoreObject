@@ -167,7 +167,7 @@ static ETUUID *childUUID2;
 										 revisionMetadata: [self initialMetadata]];
     prootUUID =  [proot UUID];
     initialBranchUUID =  [proot currentBranchUUID];
-    initialRevisionUUID = [[[proot currentBranchInfo] currentRevisionID] revisionUUID];
+    initialRevisionUUID = [proot currentRevisionUUID];
     
     branchAUUID =  [ETUUID UUID];
     [txn createBranchWithUUID: branchAUUID
@@ -185,34 +185,34 @@ static ETUUID *childUUID2;
     
     for (int i = 0; i < BRANCH_LENGTH; i++)
     {
-		CORevisionID *revid = [CORevisionID revisionWithPersistentRootUUID: prootUUID revisionUUID: [ETUUID UUID]];
+		ETUUID *revid = [ETUUID UUID];
 		
         [txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: i]
-							   revisionUUID: [revid revisionUUID]
+							   revisionUUID: revid
 								   metadata: [self branchAMetadata]
 						   parentRevisionID: (i == 0) ? initialRevisionUUID : [branchARevisionUUIDs lastObject]
 					  mergeParentRevisionID: nil
 						 persistentRootUUID: prootUUID
 								 branchUUID: branchAUUID];
 		
-        [branchARevisionUUIDs addObject: [revid revisionUUID]];
+        [branchARevisionUUIDs addObject: revid];
     }
     
     // Branch B
     
     for (int i = 0; i < BRANCH_LENGTH; i++)
     {
-		CORevisionID *revid = [CORevisionID revisionWithPersistentRootUUID: prootUUID revisionUUID: [ETUUID UUID]];
+		ETUUID *revid = [ETUUID UUID];
 
         [txn writeRevisionWithModifiedItems: [self makeBranchBItemTreeAtIndex: i]
-							   revisionUUID: [revid revisionUUID]
+							   revisionUUID: revid
 								   metadata: [self branchBMetadata]
 						   parentRevisionID: (i == 0) ? initialRevisionUUID : [branchBRevisionUUIDs lastObject]
 					  mergeParentRevisionID: nil
 						 persistentRootUUID: prootUUID
 								 branchUUID: branchBUUID];
 		
-        [branchBRevisionUUIDs addObject: [revid revisionUUID]];
+        [branchBRevisionUUIDs addObject: revid];
     }
 
     [txn setCurrentRevision: [branchARevisionUUIDs lastObject]
@@ -273,7 +273,7 @@ static ETUUID *childUUID2;
     {
         COBranchInfo *branchObj = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
         UKFalse([branchObj isDeleted]);
-        UKObjectsEqual(initialState.currentRevisionID, branchObj.currentRevisionID);
+        UKObjectsEqual(initialState.currentRevisionUUID, branchObj.currentRevisionUUID);
     }
 
     // Should have no effect
@@ -282,7 +282,7 @@ static ETUUID *childUUID2;
     // Verify the branch is still there
     {
         COBranchInfo *branchObj = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
-        UKObjectsEqual(initialState.currentRevisionID, branchObj.currentRevisionID);
+        UKObjectsEqual(initialState.currentRevisionUUID, branchObj.currentRevisionUUID);
     }
     
     // Really delete it
@@ -522,10 +522,10 @@ static ETUUID *childUUID2;
     
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-		CORevisionID *withAttachment = [CORevisionID revisionWithPersistentRootUUID: prootUUID revisionUUID: [ETUUID UUID]];
+		ETUUID *withAttachment = [ETUUID UUID];
 		
 		[txn writeRevisionWithModifiedItems: tree
-							   revisionUUID: [withAttachment revisionUUID]
+							   revisionUUID: withAttachment
 								   metadata: nil
 						   parentRevisionID: initialRevisionUUID
 					  mergeParentRevisionID: nil
@@ -533,8 +533,8 @@ static ETUUID *childUUID2;
 								 branchUUID: branchAUUID];
 		
 		
-		[txn setCurrentRevision: [withAttachment revisionUUID]
-                   headRevision: [withAttachment revisionUUID]
+		[txn setCurrentRevision: withAttachment
+                   headRevision: withAttachment
 					  forBranch: initialBranchUUID
 			   ofPersistentRoot: prootUUID];
 		
@@ -630,7 +630,7 @@ static ETUUID *childUUID2;
 - (void) testRevisionInfo
 {
     CORevisionInfo *info = [store revisionInfoForRevisionUUID: initialRevisionUUID persistentRootUUID: prootUUID];
-    UKNil([info parentRevisionID]);
+    UKNil([info parentRevisionUUID]);
     UKObjectsEqual(initialRevisionUUID, [info revisionUUID]);
 	UKObjectsEqual([proot currentBranchUUID], [info branchUUID]);
 }
@@ -770,7 +770,7 @@ static ETUUID *childUUID2;
     // gives us when we read it back.
 
     UKObjectsEqual(copy.branchUUIDs, [store persistentRootInfoForUUID: [copy UUID]].branchUUIDs);
-    UKObjectsEqual([[copy currentBranchInfo] currentRevisionID], [[store persistentRootInfoForUUID: [copy UUID]] currentBranchInfo].currentRevisionID);
+    UKObjectsEqual([[copy currentBranchInfo] currentRevisionUUID], [[store persistentRootInfoForUUID: [copy UUID]] currentBranchInfo].currentRevisionUUID);
     
     // 2. try changing. Verify that proot and copy are totally independent
 
@@ -855,15 +855,15 @@ static ETUUID *childUUID2;
 {
     COSQLiteStore *store2 = [[COSQLiteStore alloc] initWithURL: [store URL]];
     
-    ETUUID *currentRevisionID = [[store2 persistentRootInfoForUUID: prootUUID] currentRevisionUUID];
-    ETUUID *branchARevisionID = [[[store2 persistentRootInfoForUUID: prootUUID]
+    ETUUID *currentRevisionUUID = [[store2 persistentRootInfoForUUID: prootUUID] currentRevisionUUID];
+    ETUUID *branchARevisionUUID = [[[store2 persistentRootInfoForUUID: prootUUID]
                                         branchInfoForUUID: branchAUUID] currentRevisionUUID];
-    ETUUID *branchBRevisionID = [[[store2 persistentRootInfoForUUID: prootUUID]
+    ETUUID *branchBRevisionUUID = [[[store2 persistentRootInfoForUUID: prootUUID]
                                         branchInfoForUUID: branchBUUID] currentRevisionUUID];
     
-    UKObjectsEqual([self makeInitialItemTree], [store2 itemGraphForRevisionUUID: currentRevisionID persistentRoot: prootUUID]);
-    UKTrue(COItemGraphEqualToItemGraph([self makeBranchAItemTreeAtIndex: BRANCH_LENGTH - 1], [store2 itemGraphForRevisionUUID: branchARevisionID persistentRoot: prootUUID]));
-    UKTrue(COItemGraphEqualToItemGraph([self makeBranchBItemTreeAtIndex: BRANCH_LENGTH - 1], [store2 itemGraphForRevisionUUID: branchBRevisionID persistentRoot: prootUUID]));
+    UKObjectsEqual([self makeInitialItemTree], [store2 itemGraphForRevisionUUID: currentRevisionUUID persistentRoot: prootUUID]);
+    UKTrue(COItemGraphEqualToItemGraph([self makeBranchAItemTreeAtIndex: BRANCH_LENGTH - 1], [store2 itemGraphForRevisionUUID: branchARevisionUUID persistentRoot: prootUUID]));
+    UKTrue(COItemGraphEqualToItemGraph([self makeBranchBItemTreeAtIndex: BRANCH_LENGTH - 1], [store2 itemGraphForRevisionUUID: branchBRevisionUUID persistentRoot: prootUUID]));
 }
 
 - (void)testEmptyCommitWithNoChanges

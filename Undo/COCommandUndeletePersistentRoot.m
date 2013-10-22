@@ -6,7 +6,6 @@
 #import "COBranch.h"
 #import "CORevision.h"
 #import "CORevisionCache.h"
-#import "CORevisionID.h"
 
 @implementation COCommandUndeletePersistentRoot
 

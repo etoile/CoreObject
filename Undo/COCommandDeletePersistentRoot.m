@@ -4,7 +4,6 @@
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
-#import "CORevisionID.h"
 
 static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevisionID";
 

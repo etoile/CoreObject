@@ -1,6 +1,5 @@
 #import <Foundation/Foundation.h>
 
-@class CORevisionID;
 @class COItemGraphDiff;
 
 @interface COMergeInfo : NSObject

@@ -704,20 +704,17 @@
             while ([rs next])
             {
                 ETUUID *branch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-                CORevisionID *initialRevid = [CORevisionID revisionWithPersistentRootUUID: backingUUID
-                                                                       revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]]];
-                CORevisionID *currentRevid = [CORevisionID revisionWithPersistentRootUUID: backingUUID
-                                                                          revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]]];
-                CORevisionID *headRevid = [CORevisionID revisionWithPersistentRootUUID: backingUUID
-																			 revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 3]]];
+                ETUUID *initialRevid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
+                ETUUID *currentRevid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
+                ETUUID *headRevid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 3]];
                 id branchMeta = [self readMetadata: [rs dataForColumnIndex: 4]];
                 
                 COBranchInfo *state = [[COBranchInfo alloc] init];
                 state.UUID = branch;
 				state.persistentRootUUID = aUUID;
-                state.initialRevisionID = initialRevid;
-                state.currentRevisionID = currentRevid;
-				state.headRevisionID = headRevid;
+                state.initialRevisionUUID = initialRevid;
+                state.currentRevisionUUID = currentRevid;
+				state.headRevisionUUID = headRevid;
                 state.metadata = branchMeta;
                 state.deleted = [rs boolForColumnIndex: 5];
 				state.parentBranchUUID = [rs dataForColumnIndex: 6] != nil
@@ -928,8 +925,8 @@
             
             COSearchResult *searchResult = [[COSearchResult alloc] init];
             searchResult.innerObjectUUID = inner_object_uuid;
-            searchResult.revision = [CORevisionID revisionWithPersistentRootUUID: root
-                                                                 revisionUUID: revUUID];
+            searchResult.revision = revUUID;
+			searchResult.persistentRoot = root;
             [results addObject: searchResult];
         }
         [rs close];

@@ -63,23 +63,22 @@ static ETUUID *rootUUID;
 								  parentBranchUUID: nil
 							   initialRevisionUUID: [prootA currentRevisionUUID]];
     
-    CORevisionID *prootBRev = [CORevisionID revisionWithPersistentRootUUID: [prootB UUID]
-															  revisionUUID: [ETUUID UUID]];
+    ETUUID *prootBRev = [ETUUID UUID];
 	
 	[txn writeRevisionWithModifiedItems: [self prooBitemTree]
-						   revisionUUID: [prootBRev revisionUUID]
+						   revisionUUID: prootBRev
 							   metadata: nil
-					   parentRevisionID: [[[prootA currentBranchInfo] currentRevisionID] revisionUUID]
+					   parentRevisionID: [prootA currentRevisionUUID]
 				  mergeParentRevisionID: nil
 					 persistentRootUUID: [prootB UUID]
 							 branchUUID: prootBBranchUUID];
 
-    [txn setCurrentRevision: [prootBRev revisionUUID]
-				 headRevision: [prootBRev revisionUUID]
+    [txn setCurrentRevision: prootBRev
+				 headRevision: prootBRev
 	                forBranch: [prootB currentBranchUUID]
 	         ofPersistentRoot: [prootB UUID]];
 
-    prootB.currentBranchInfo.currentRevisionID = prootBRev;
+    prootB.currentBranchInfo.currentRevisionUUID = prootBRev;
     
 	prootAChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: [prootA UUID]];
 	prootBChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: [prootB UUID]];

@@ -8,7 +8,6 @@
 
 #import "CORevisionCache.h"
 #import "CORevision.h"
-#import "CORevisionID.h"
 #import "COSQLiteStore.h"
 
 @implementation CORevisionCache
@@ -70,23 +69,6 @@ static NSMutableDictionary *cachesByStoreUUID = nil;
 {
     return [[self cacheForStoreUUID: aStoreUUID] revisionForRevisionUUID: aRevid
 													  persistentRootUUID: aPersistentRoot];
-}
-
-@end
-
-@implementation CORevisionCache (Deprecated)
-
-- (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid
-{
-	return [self revisionForRevisionUUID: [aRevid revisionUUID]
-					  persistentRootUUID: [aRevid revisionPersistentRootUUID]];
-}
-
-+ (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid storeUUID: (ETUUID *)aStoreUUID
-{
-    return [self revisionForRevisionUUID: [aRevid revisionUUID]
-					  persistentRootUUID: [aRevid revisionPersistentRootUUID]
-							   storeUUID: aStoreUUID];
 }
 
 @end

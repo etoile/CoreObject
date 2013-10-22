@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 
 @class COPersistentRoot, COEditingContext, COObjectGraphContext;
-@class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo, CORevisionID, COPath;
+@class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo, COPath;
 @class COCrossPersistentRootReferenceCache, COUndoStackStore, COCommandGroup;
 @class COUndoTrack, CORevisionCache;
 

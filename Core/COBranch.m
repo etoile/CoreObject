@@ -26,7 +26,6 @@
 #import "COLeastCommonAncestor.h"
 #import "COItemGraphDiff.h"
 #import "COMergeInfo.h"
-#import "CORevisionID.h"
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
 
@@ -251,11 +250,12 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (CORevision *)initialRevision
 {
-    CORevisionID *revid = [[self branchInfo] initialRevisionID];
+    ETUUID *revid = [[self branchInfo] initialRevisionUUID];
     
     if (revid != nil)
     {
-        return [[self editingContext] revisionForRevisionID: revid];
+        return [[self editingContext] revisionForRevisionUUID: revid
+										   persistentRootUUID: [[self persistentRoot] UUID]];
     }
     
     return nil;
@@ -585,10 +585,10 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     NSArray *changedItemUUIDs = [(NSSet *)[[[_objectGraph changedObjects] mappedCollection] UUID] allObjects];
     if ([changedItemUUIDs count] > 0 || self.shouldMakeEmptyCommit)
     {
-        CORevisionID *mergeParent = nil;
+        ETUUID *mergeParent = nil;
         if (self.mergingBranch != nil)
         {
-            mergeParent = [[self.mergingBranch currentRevision] revisionID];
+            mergeParent = [[self.mergingBranch currentRevision] UUID];
             self.mergingBranch = nil;
         }
         
@@ -598,7 +598,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 							   revisionUUID: revUUID
 								   metadata: metadata
 						   parentRevisionID: _currentRevisionUUID
-					  mergeParentRevisionID: [mergeParent revisionUUID]
+					  mergeParentRevisionID: mergeParent
 						 persistentRootUUID: [_persistentRoot UUID]
 								 branchUUID: _UUID];
 
@@ -691,13 +691,13 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     [_persistentRoot sendChangeNotification];
 }
 
-- (CORevision *) revisionWithID: (CORevisionID *)aRevisionID
+- (CORevision *) revisionWithUUID: (ETUUID *)aRevisionID
 {
     CORevision *oldest = [self initialRevision];
     CORevision *rev = [self currentRevision];
     do
     {
-        if ([[rev revisionID] isEqual: aRevisionID])
+        if ([[rev UUID] isEqual: aRevisionID])
         {
             return rev;
         }
