@@ -22,11 +22,10 @@ static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectG
 	NSMutableArray *result = [NSMutableArray array];
 	for (ETPropertyDescription *propDesc in [[anObject entityDescription] allPropertyDescriptions])
 	{
-		// FIXME: This should be uncommented, but it causes test failures.
-		//		if (![propDesc isPersistent])
-		//		{
-		//			continue;
-		//		}
+		if (![propDesc isPersistent])
+		{
+			continue;
+		}
 		
 		NSString *propertyName = [propDesc name];
 		id value = [anObject valueForKey: propertyName];
