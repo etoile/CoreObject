@@ -57,11 +57,11 @@ static ETUUID *rootUUID;
 
 	ETUUID *prootBBranchUUID = [ETUUID UUID];
 	
-	prootB = [txn createPersistentRootWithUUID: [ETUUID UUID]
-									branchUUID: [ETUUID UUID]
-							  parentBranchUUID: nil
-										isCopy: YES
-							   initialRevision: [[prootA currentBranchInfo] currentRevisionID]];
+	prootB = [txn createPersistentRootCopyWithUUID: [ETUUID UUID]
+						  parentPersistentRootUUID: [prootA UUID]
+										branchUUID: [ETUUID UUID]
+								  parentBranchUUID: nil
+							   initialRevisionUUID: [prootA currentRevisionUUID]];
     
     CORevisionID *prootBRev = [CORevisionID revisionWithPersistentRootUUID: [prootB UUID]
 															  revisionUUID: [ETUUID UUID]];
@@ -95,8 +95,8 @@ static ETUUID *rootUUID;
     UKNotNil(prootA);
     UKNotNil(prootB);
     
-    CORevisionInfo *prootARevInfo = [store revisionInfoForRevisionID: [prootA currentRevisionID]];
-    CORevisionInfo *prootBRevInfo = [store revisionInfoForRevisionID: [prootB currentRevisionID]];
+    CORevisionInfo *prootARevInfo = [store revisionInfoForRevisionUUID: [prootA currentRevisionUUID] persistentRootUUID: [prootA UUID]];
+    CORevisionInfo *prootBRevInfo = [store revisionInfoForRevisionUUID: [prootB currentRevisionUUID] persistentRootUUID: [prootB UUID]];
     
     UKNotNil(prootARevInfo);
     UKNotNil(prootBRevInfo);

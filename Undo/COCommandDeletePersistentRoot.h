@@ -3,7 +3,7 @@
 @interface COCommandDeletePersistentRoot : COSingleCommand
 {
 	@private
-    CORevisionID *_initialRevisionID;
+    ETUUID *_initialRevisionID;
 }
 
 /**
@@ -13,6 +13,6 @@
  * If the command is a undelete inverse or was not obtained using 
  * -[COCommand inverse], returns nil.
  */
-@property (nonatomic, strong) CORevisionID *initialRevisionID;
+@property (nonatomic, strong) ETUUID *initialRevisionID;
 
 @end

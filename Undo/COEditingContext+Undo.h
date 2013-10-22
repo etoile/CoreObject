@@ -57,7 +57,7 @@
 // Called from COPersistentRoot
 
 - (void) recordPersistentRootCreation: (COPersistentRoot *)aPersistentRoot
-                  atInitialRevisionID: (CORevisionID *)aRevID;
+                  atInitialRevisionID: (ETUUID *)aRevID;
 - (void) recordPersistentRoot: (COPersistentRoot *)aPersistentRoot
              setCurrentBranch: (COBranch *)aBranch
                     oldBranch: (COBranch *)oldBranch;

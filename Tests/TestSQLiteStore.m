@@ -629,7 +629,7 @@ static ETUUID *childUUID2;
 
 - (void) testRevisionInfo
 {
-    CORevisionInfo *info = [store revisionInfoForRevisionID: [CORevisionID revisionWithPersistentRootUUID: prootUUID revisionUUID: initialRevisionUUID]];
+    CORevisionInfo *info = [store revisionInfoForRevisionUUID: initialRevisionUUID persistentRootUUID: prootUUID];
     UKNil([info parentRevisionID]);
     UKObjectsEqual(initialRevisionUUID, [info revisionUUID]);
 	UKObjectsEqual([proot currentBranchUUID], [info branchUUID]);
@@ -731,10 +731,10 @@ static ETUUID *childUUID2;
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
 		copy = [txn createPersistentRootCopyWithUUID: [ETUUID UUID]
-										  branchUUID: [ETUUID UUID]
 							parentPersistentRootUUID: prootUUID
+										  branchUUID: [ETUUID UUID]
 									parentBranchUUID: nil
-									 initialRevision: initialRevisionUUID];
+								 initialRevisionUUID: initialRevisionUUID];
 		copyChangeCount = [txn setOldTransactionID: copyChangeCount forPersistentRoot: [copy UUID]];
 		UKTrue([store commitStoreTransaction: txn]);
 	}
@@ -838,11 +838,11 @@ static ETUUID *childUUID2;
     ETUUID *cheapCopyBranchUUID = [ETUUID UUID];
 
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-    COPersistentRootInfo *cheapCopy = [txn createPersistentRootWithUUID: cheapCopyUUID
-															 branchUUID: cheapCopyBranchUUID
-													   parentBranchUUID: nil
-																 isCopy: YES
-														initialRevision: [CORevisionID revisionWithPersistentRootUUID: prootUUID revisionUUID: [branchARevisionUUIDs lastObject]]];
+    COPersistentRootInfo *cheapCopy = [txn createPersistentRootCopyWithUUID: cheapCopyUUID
+												   parentPersistentRootUUID:  prootUUID
+																 branchUUID: cheapCopyBranchUUID
+														   parentBranchUUID: nil
+														initialRevisionUUID: [branchARevisionUUIDs lastObject]];
     UKTrue([store commitStoreTransaction: txn]);
 
     UKObjectsEqual(rootUUID, [store rootObjectUUIDForPersistentRoot: [proot UUID]]);

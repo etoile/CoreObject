@@ -55,21 +55,11 @@
 /**
  * Convenience method
  */
-- (COPersistentRootInfo *) createPersistentRootWithUUID: (ETUUID *)uuid
-                                             branchUUID: (ETUUID *)aBranchUUID
-									   parentBranchUUID: (ETUUID *)aParentBranch
-                                                 isCopy: (BOOL)isCopy
-                                        initialRevision: (CORevisionID *)aRevision;
-
-
-/**
- * Convenience method
- */
 - (COPersistentRootInfo *) createPersistentRootCopyWithUUID: (ETUUID *)uuid
-												 branchUUID: (ETUUID *)aBranchUUID
 								   parentPersistentRootUUID: (ETUUID *)aParentPersistentRoot
+												 branchUUID: (ETUUID *)aBranchUUID
 										   parentBranchUUID: (ETUUID *)aParentBranch
-											initialRevision: (ETUUID *)aRevision;
+										initialRevisionUUID: (ETUUID *)aRevision;
 
 /**
  * Convenience method

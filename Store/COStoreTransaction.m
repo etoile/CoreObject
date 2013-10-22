@@ -101,22 +101,22 @@
 /**
  * Convenience method
  */
-- (COPersistentRootInfo *) createPersistentRootWithUUID: (ETUUID *)uuid
-                                             branchUUID: (ETUUID *)aBranchUUID
-									   parentBranchUUID: (ETUUID *)aParentBranch
-                                                 isCopy: (BOOL)isCopy
-                                        initialRevision: (CORevisionID *)aRevision
+- (COPersistentRootInfo *) createPersistentRootCopyWithUUID: (ETUUID *)uuid
+								   parentPersistentRootUUID: (ETUUID *)aParentPersistentRoot
+												 branchUUID: (ETUUID *)aBranchUUID
+										   parentBranchUUID: (ETUUID *)aParentBranch
+										initialRevisionUUID: (ETUUID *)aRevision
 {
     [self createPersistentRootWithUUID: uuid
-                         persistentRootForCopy: isCopy ? aRevision.revisionPersistentRootUUID : nil];
+				 persistentRootForCopy: aParentPersistentRoot];
     
     [self createBranchWithUUID: aBranchUUID
-						  parentBranch: aParentBranch
-                       initialRevision: aRevision.revisionUUID
-                     forPersistentRoot: uuid];
+				  parentBranch: aParentBranch
+			   initialRevision: aRevision
+			 forPersistentRoot: uuid];
     
     [self setCurrentBranch: aBranchUUID
-                 forPersistentRoot: uuid];
+		 forPersistentRoot: uuid];
 	
     COPersistentRootInfo *plist = [[COPersistentRootInfo alloc] init];
     plist.UUID = uuid;
@@ -126,9 +126,9 @@
     {
         COBranchInfo *branch = [[COBranchInfo alloc] init];
         branch.UUID = aBranchUUID;
-        branch.initialRevisionID = aRevision;
-        branch.currentRevisionID = aRevision;
-        branch.headRevisionID = aRevision;
+        branch.initialRevisionUUID = aRevision;
+        branch.currentRevisionUUID = aRevision;
+        branch.headRevisionUUID = aRevision;
         branch.metadata = nil;
         branch.deleted = NO;
         branch.parentBranchUUID = aParentBranch;
@@ -138,22 +138,6 @@
     }
     
     return plist;
-}
-
-/**
- * Convenience method
- */
-- (COPersistentRootInfo *) createPersistentRootCopyWithUUID: (ETUUID *)uuid
-												 branchUUID: (ETUUID *)aBranchUUID
-								   parentPersistentRootUUID: (ETUUID *)aParentPersistentRoot
-										   parentBranchUUID: (ETUUID *)aParentBranch
-											initialRevision: (ETUUID *)aRevision
-{
-	return [self createPersistentRootWithUUID: uuid
-								   branchUUID: aBranchUUID
-							 parentBranchUUID: aParentBranch
-									   isCopy: YES
-							  initialRevision: [CORevisionID revisionWithPersistentRootUUID: aParentPersistentRoot revisionUUID: aRevision]];
 }
 
 /**
@@ -169,8 +153,7 @@
     NILARG_EXCEPTION_TEST(aBranchUUID);
     
 	ETUUID *revisionUUID = [ETUUID UUID];
-	CORevisionID *revisionID = [CORevisionID revisionWithPersistentRootUUID: persistentRootUUID
-															   revisionUUID: revisionUUID];
+	
 	[self writeRevisionWithModifiedItems: contents
 							revisionUUID: revisionUUID
 								metadata: metadata
@@ -179,11 +162,11 @@
 					  persistentRootUUID: persistentRootUUID
 							  branchUUID: aBranchUUID];
     
-    return [self createPersistentRootWithUUID: persistentRootUUID
-                                   branchUUID: aBranchUUID
-							 parentBranchUUID: nil
-                                       isCopy: NO
-                              initialRevision: revisionID];
+    return [self createPersistentRootCopyWithUUID: persistentRootUUID
+						 parentPersistentRootUUID: nil
+									   branchUUID: aBranchUUID
+								 parentBranchUUID: nil
+							  initialRevisionUUID: revisionUUID];
 }
 
 /** @taskunit Persistent Root Modification */

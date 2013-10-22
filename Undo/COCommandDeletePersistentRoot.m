@@ -16,11 +16,11 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 	if (self == nil)
 		return nil;
 
-	id serializedRevID = [plist objectForKey: kCOCommandInitialRevisionID];
+	id serializedRevID = plist[kCOCommandInitialRevisionID];
 
 	if (serializedRevID != nil)
 	{
-   		_initialRevisionID = [CORevisionID revisionIDWithPlist: serializedRevID];
+   		_initialRevisionID = [ETUUID UUIDWithString: serializedRevID];
 	}
     return self;
 }
@@ -31,7 +31,7 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 	if (_initialRevisionID != nil)
 	{
-    	[result setObject: [_initialRevisionID plist] forKey: kCOCommandInitialRevisionID];
+    	[result setObject: [_initialRevisionID stringValue] forKey: kCOCommandInitialRevisionID];
 	}
     return result;
 }

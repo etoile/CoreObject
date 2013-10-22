@@ -48,14 +48,14 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 	if (self == nil)
 		return nil;
 
-   	_initialRevisionID = [CORevisionID revisionIDWithPlist: [plist objectForKey: kCOCommandInitialRevisionID]];
+   	_initialRevisionID = [ETUUID UUIDWithString: plist[kCOCommandInitialRevisionID]];
     return self;
 }
 
 - (id) plist
 {
     NSMutableDictionary *result = [super plist];
-    [result setObject: [_initialRevisionID plist] forKey: kCOCommandInitialRevisionID];
+    [result setObject: [_initialRevisionID stringValue] forKey: kCOCommandInitialRevisionID];
     return result;
 }
 
@@ -68,7 +68,8 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 - (CORevision *)revision
 {
-	return [CORevisionCache revisionForRevisionID: _initialRevisionID
+	return [CORevisionCache revisionForRevisionUUID: _initialRevisionID
+								 persistentRootUUID: _persistentRootUUID
 	                                    storeUUID: [self storeUUID]];
 }
 
@@ -77,7 +78,7 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 - (ETUUID *)UUID
 {
-	return [_initialRevisionID revisionUUID];
+	return _initialRevisionID;
 }
 
 - (NSDictionary *)metadata

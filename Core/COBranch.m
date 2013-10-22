@@ -60,7 +60,7 @@ NSString* const kCOBranchLabel = @"COBranchLabel";
         objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
             persistentRoot: (COPersistentRoot *)aContext
           parentBranchUUID: (ETUUID *)aParentBranchUUID
-parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
+parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 {
 	NILARG_EXCEPTION_TEST(aUUID);
 	NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
@@ -103,8 +103,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     {
         // Creating a new branch
         
-        _currentRevisionUUID = [parentRevisionForNewBranch revisionUUID];
-		_headRevisionUUID = [parentRevisionForNewBranch revisionUUID];
+        _currentRevisionUUID = parentRevisionForNewBranch;
+		_headRevisionUUID = parentRevisionForNewBranch;
         _isCreated = NO;
         
         // If _parentRevisionID is nil, we're a new branch for a new persistent root
@@ -430,8 +430,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev
 {
-    return [[[self persistentRoot] editingContext] insertNewPersistentRootWithRevisionID: [aRev revisionID]
-																			parentBranch: self];
+    return [[[self persistentRoot] editingContext] insertNewPersistentRootWithRevisionUUID: [aRev UUID]
+																			  parentBranch: self];
 }
 
 - (BOOL)mergeChangesFromTrack: (COBranch *)aSourceTrack
@@ -649,7 +649,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     }    
 }
 
-- (void)didMakeInitialCommitWithRevisionID: (CORevisionID *)aRevisionID transaction: (COStoreTransaction *)txn
+- (void)didMakeInitialCommitWithRevisionID: (ETUUID *)aRevisionID transaction: (COStoreTransaction *)txn
 {
     assert(aRevisionID != nil);
     
@@ -669,8 +669,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     ETAssert(_isCreated == NO);
     
-    _currentRevisionUUID =  [aRevisionID revisionUUID];
-	_headRevisionUUID = [aRevisionID revisionUUID];
+    _currentRevisionUUID =  aRevisionID;
+	_headRevisionUUID = aRevisionID;
     _isCreated = YES;
     
     [_objectGraph clearChangeTracking];

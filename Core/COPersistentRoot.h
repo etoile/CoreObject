@@ -97,7 +97,12 @@ extern NSString * const COPersistentRootDidChangeNotification;
     /**
      * Only used when creating a persistent root as a cheap copy.
      */
-    CORevisionID *_cheapCopyRevisionID;
+    ETUUID *_cheapCopyRevisionUUID;
+    /**
+     * Only used when creating a persistent root as a cheap copy.
+     */
+    ETUUID *_cheapCopyPersistentRootUUID;
+	
     int64_t _lastTransactionID;
 }
 

@@ -1017,48 +1017,6 @@
 
 @end
 
-@implementation COSQLiteStore (Deprecated)
-
-- (CORevisionInfo *) revisionInfoForRevisionID: (CORevisionID *)aToken
-{
-	return [self revisionInfoForRevisionUUID: [aToken revisionUUID]
-						  persistentRootUUID: [aToken revisionPersistentRootUUID]];
-}
-
-- (COItemGraph *) partialItemGraphFromRevisionID: (CORevisionID *)baseRevid
-                                    toRevisionID: (CORevisionID *)finalRevid
-{
-	
-	return [self partialItemGraphFromRevisionUUID: [baseRevid revisionUUID]
-								   toRevisionUUID: [finalRevid revisionUUID]
-								   persistentRoot: [baseRevid revisionPersistentRootUUID]];
-}
-
-- (COItemGraph *) itemGraphForRevisionID: (CORevisionID *)aToken
-{
-	return [self itemGraphForRevisionUUID: [aToken revisionUUID]
-						   persistentRoot: [aToken revisionPersistentRootUUID]];
-}
-
-- (COItem *) item: (ETUUID *)anitem atRevisionID: (CORevisionID *)aToken
-{
-    NSParameterAssert(aToken != nil);
-	
-    __block COItem *item = nil;
-    
-    assert(dispatch_get_current_queue() != queue_);
-    
-    dispatch_sync(queue_, ^(){
-        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-        COItemGraph *tree = [backing itemGraphForRevid: [backing revidForRevisionID: aToken]
-                                   restrictToItemUUIDs: S(anitem)];
-        item = [tree itemForUUID: anitem];
-    });
-    return item;
-}
-
-@end
-
 NSString *COStorePersistentRootDidChangeNotification = @"COStorePersistentRootDidChangeNotification";
 NSString *kCOPersistentRootUUID = @"COPersistentRootUUID";
 NSString *kCOPersistentRootTransactionID = @"COPersistentRootTransactionID";

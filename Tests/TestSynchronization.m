@@ -62,7 +62,7 @@ static ETUUID *branchBUUID;
     UKNotNil(serverInfo);
 	[txn createBranchWithUUID: branchBUUID
 				 parentBranch: nil
-			  initialRevision: [[serverInfo currentRevisionID] revisionUUID]
+			  initialRevision: [serverInfo currentRevisionUUID]
 			forPersistentRoot: persistentRootUUID];
     UKObjectsEqual(branchAUUID, [serverInfo currentBranchUUID]);
 	serverChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: persistentRootUUID];
@@ -221,11 +221,11 @@ static ETUUID *branchBUUID;
     
     ETUUID *cheapCopyUUID = [ETUUID UUID];
     ETUUID *cheapCopyBranchUUID = [ETUUID UUID];
-    COPersistentRootInfo *serverCheapCopyInfo = [txn createPersistentRootWithUUID: cheapCopyUUID
-																	   branchUUID: cheapCopyBranchUUID
-																 parentBranchUUID: nil
-																		   isCopy: YES
-																  initialRevision: [serverInfo currentRevisionID]];
+    COPersistentRootInfo *serverCheapCopyInfo = [txn createPersistentRootCopyWithUUID: cheapCopyUUID
+															 parentPersistentRootUUID: persistentRootUUID
+																		   branchUUID: cheapCopyBranchUUID
+																	 parentBranchUUID: nil
+																  initialRevisionUUID: [serverInfo currentRevisionUUID]];
 	
     // Server writes a second commit.
     

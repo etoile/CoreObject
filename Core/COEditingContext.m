@@ -190,7 +190,8 @@
     }
     
     COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: info
-                                                          cheapCopyRevisionID: nil
+                                                        cheapCopyRevisionUUID: nil
+												  cheapCopyPersistentRootUUID: nil
 															 parentBranchUUID: nil
 	                                                       objectGraphContext: anObjectGrapContext
                                                                 parentContext: self];
@@ -219,11 +220,12 @@
     return persistentRoot;
 }
 
-- (COPersistentRoot *)insertNewPersistentRootWithRevisionID: (CORevisionID *)aRevid
+- (COPersistentRoot *)insertNewPersistentRootWithRevisionUUID: (ETUUID *)aRevid
 											   parentBranch: (COBranch *)aParentBranch
 {
     COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: nil
-                                                          cheapCopyRevisionID: aRevid
+														cheapCopyRevisionUUID: aRevid
+												  cheapCopyPersistentRootUUID: [[aParentBranch persistentRoot] UUID]
 															 parentBranchUUID: [aParentBranch UUID]
 	                                                       objectGraphContext: nil 
                                                                 parentContext: self];

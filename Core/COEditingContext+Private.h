@@ -22,8 +22,9 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (COPersistentRoot *)insertNewPersistentRootWithRevisionID: (CORevisionID *)aRevid
-											   parentBranch: (COBranch *)aParentBranch;
+- (COPersistentRoot *)insertNewPersistentRootWithRevisionUUID: (ETUUID *)aRevid
+												 parentBranch: (COBranch *)aParentBranch;
+
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

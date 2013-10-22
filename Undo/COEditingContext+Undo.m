@@ -96,7 +96,7 @@
 // Called from COPersistentRoot
 
 - (void) recordPersistentRootCreation: (COPersistentRoot *)aPersistentRoot
-                  atInitialRevisionID: (CORevisionID *)aRevID
+                  atInitialRevisionID: (ETUUID *)aRevID
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 

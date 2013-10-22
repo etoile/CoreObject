@@ -38,7 +38,8 @@ NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidCh
 @synthesize branchesPendingUndeletion = _branchesPendingUndeletion;
 
 - (id) initWithInfo: (COPersistentRootInfo *)info
-cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
+cheapCopyRevisionUUID: (ETUUID *)cheapCopyRevisionID
+cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
    parentBranchUUID: (ETUUID *)aBranchUUID
  objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
       parentContext: (COEditingContext *)aCtxt
@@ -88,7 +89,8 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         [_branchForUUID setObject: branch forKey: branchUUID];
         
         _currentBranchUUID =  branchUUID;
-        _cheapCopyRevisionID =  cheapCopyRevisionID;
+        _cheapCopyRevisionUUID =  cheapCopyRevisionID;
+		_cheapCopyPersistentRootUUID =  cheapCopyPersistentRootID;
     }
 
 	return self;
@@ -439,7 +441,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
         ETAssert([self editingBranch] != nil);
         ETAssert([self editingBranch] == [self currentBranch]);
         
-        if (_cheapCopyRevisionID == nil)
+        if (_cheapCopyRevisionUUID == nil)
         {
 			// FIXME: Move this into -createPersistentRootWithInitialItemGraph:
 			// and make that take a id<COItemGraph>
@@ -455,15 +457,16 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 			// Committing a cheap copy, so there must be a parent branch
 			ETUUID *parentBranchUUID = [[[self editingBranch] parentBranch] UUID];
 			ETAssert(parentBranchUUID != nil);
-
-            _savedState = [txn createPersistentRootWithUUID: _UUID
-												 branchUUID: [[self editingBranch] UUID]
-										   parentBranchUUID: parentBranchUUID
-													 isCopy: YES
-											initialRevision: _cheapCopyRevisionID];
+			ETAssert(_cheapCopyPersistentRootUUID != nil);
+			
+            _savedState = [txn createPersistentRootCopyWithUUID: _UUID
+									   parentPersistentRootUUID: _cheapCopyPersistentRootUUID
+													 branchUUID: [[self editingBranch] UUID]
+											   parentBranchUUID: parentBranchUUID
+											initialRevisionUUID: _cheapCopyRevisionUUID];
         }
         ETAssert(_savedState != nil);
-		CORevisionID *initialRevID = [[_savedState currentBranchInfo] currentRevisionID];
+		ETUUID *initialRevID = [[_savedState currentBranchInfo] currentRevisionUUID];
 		ETAssert(initialRevID != nil);
 
         [_parentContext recordPersistentRootCreation: self
@@ -545,7 +548,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	                                  objectGraphContext: nil
                                           persistentRoot: self
                                         parentBranchUUID: [aParent UUID]
-                              parentRevisionForNewBranch: [aRev revisionID]];
+                              parentRevisionForNewBranch: [aRev UUID]];
     
     [newBranch setMetadata: D(aLabel, @"COBranchLabel")];
     
@@ -563,7 +566,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
                                       objectGraphContext: nil
                                           persistentRoot: self
                                         parentBranchUUID: [aParent UUID]
-                              parentRevisionForNewBranch: [aRev revisionID]];
+                              parentRevisionForNewBranch: [aRev UUID]];
     
     if (metadata != nil)
     {

@@ -230,11 +230,11 @@
 - (void) testsDetectsStoreCreatePersistentRoot
 {
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-    COPersistentRootInfo *info = [txn createPersistentRootWithUUID: [ETUUID UUID]
-														branchUUID: [ETUUID UUID]
-												  parentBranchUUID: nil
-															isCopy: YES
-												   initialRevision: [[persistentRoot currentRevision] revisionID]];
+    COPersistentRootInfo *info = [txn createPersistentRootCopyWithUUID: [ETUUID UUID]
+											  parentPersistentRootUUID: [persistentRoot UUID]
+															branchUUID: [ETUUID UUID]
+													  parentBranchUUID: nil
+												   initialRevisionUUID: [[persistentRoot currentRevision] UUID]];
 	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: [persistentRoot UUID]];
 	UKTrue([store commitStoreTransaction: txn]);
     UKNotNil(info);

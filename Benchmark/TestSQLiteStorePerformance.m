@@ -207,17 +207,18 @@ static int itemChangedAtCommit(int i)
     
     COPersistentRootInfo *proot = [store persistentRootInfoForUUID: prootUUID];
     
-    CORevisionID *lastCommitId = [[proot currentBranchInfo] currentRevisionID];
+    ETUUID *lastCommitId = [[proot currentBranchInfo] currentRevisionUUID];
     
     // Now traverse them in reverse order and test that the items are as expected.
     // There are NUM_CHILDREN + 1 commits (the initial one made by creating the persistent roots)
 
     for (int rev=NUM_COMMITS-1; rev>=1; rev--)
     {
-        CORevisionID *parentCommitId = [[store revisionInfoForRevisionID: lastCommitId] parentRevisionID];
+        ETUUID *parentCommitId = [[store revisionInfoForRevisionUUID: lastCommitId persistentRootUUID: prootUUID] parentRevisionUUID];
         
-        COItemGraph *tree = [store partialItemGraphFromRevisionID: parentCommitId
-                                                   toRevisionID: lastCommitId];
+        COItemGraph *tree = [store partialItemGraphFromRevisionUUID: parentCommitId
+													 toRevisionUUID: lastCommitId
+													 persistentRoot: prootUUID];
         
         int i = itemChangedAtCommit(rev);
         COItem *item = [tree itemForUUID: childUUIDs[i]];
@@ -268,7 +269,7 @@ static int itemChangedAtCommit(int i)
         
         // Step back one revision
         
-        lastCommitId = [[store revisionInfoForRevisionID: lastCommitId] parentRevisionUUID];
+        lastCommitId = [[store revisionInfoForRevisionUUID: lastCommitId persistentRootUUID: prootUUID] parentRevisionUUID];
     }
     
     NSLog(@"reading back %d full snapshots of a %d-item persistent root took %lf ms",
@@ -334,11 +335,11 @@ static int itemChangedAtCommit(int i)
     
     for (int i =0; i<NUM_PERSISTENT_ROOT_COPIES; i++)
     {
-        [txn createPersistentRootWithUUID: [ETUUID UUID]
-							   branchUUID: [ETUUID UUID]
-						 parentBranchUUID: nil
-								   isCopy: YES
-						  initialRevision: [[proot currentBranchInfo] currentRevisionID]];
+        [txn createPersistentRootCopyWithUUID: [ETUUID UUID]
+					 parentPersistentRootUUID: [proot UUID]
+								   branchUUID: [ETUUID UUID]
+							 parentBranchUUID: nil
+						  initialRevisionUUID: [[proot currentBranchInfo] currentRevisionUUID]];
     }
     UKTrue([store commitStoreTransaction: txn]);
     

@@ -27,7 +27,8 @@
  * See -[COBranch makeCopyFromRevision:]
  */
 - (id) initWithInfo: (COPersistentRootInfo *)info
-cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
+cheapCopyRevisionUUID: (ETUUID *)cheapCopyRevisionID
+cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
    parentBranchUUID: (ETUUID *)aBranchUUID
  objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
       parentContext: (COEditingContext *)aCtxt;
