@@ -588,7 +588,6 @@
 
 
 - (void)awakeFromFetch;
-- (void)willLoad;
 - (void)didLoad;
 - (void)didReload;
 - (void)didLoadObjectGraph;

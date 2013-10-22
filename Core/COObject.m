@@ -977,14 +977,6 @@ objectGraphContext: (COObjectGraphContext *)aContext
     [self validateMultivaluedPropertiesUsingMetamodel];
 }
 
-- (void)willLoad
-{
-	ETAssert(_variableStorage == nil);
-	_variableStorage = [self newVariableStorage];
-    _outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
-    _incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
-}
-
 - (void)didLoad
 {
 	

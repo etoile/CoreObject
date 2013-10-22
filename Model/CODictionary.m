@@ -59,12 +59,6 @@
 	return newObject;
 }
 
-- (void)willLoad
-{
-	[super willLoad];
-	_content = [NSMutableDictionary new];
-}
-
 /* Prevent -[COObject awakeFromFetch] to check that -tags is a valid collection.
 For a loaded object, -tags return nil because tags are not serialized. */
 - (void)awakeFromFetch
