@@ -242,11 +242,6 @@
     return ok;
 }
 
-- (void) checkInTransaction
-{
-    assert(transaction_ != nil);
-}
-
 - (NSArray *) allBackingUUIDs
 {
     NSMutableArray *result = [NSMutableArray array];
@@ -592,27 +587,6 @@
 
 /** @taskunit persistent roots */
 
-- (BOOL) checkAndUpdateChangeCount: (int64_t *)aChangeCount forPersistentRootId: (NSNumber *)root_id
-{
-    return YES;
-//    
-//    const int64_t user = *aChangeCount;
-//    const int64_t actual = [db_ int64ForQuery: @"SELECT changecount FROM persistentroots WHERE root_id = ?", root_id];
-//    
-//    if (actual == user)
-//    {
-//        const int64_t newCount = user + 1;
-//        
-//        [db_ executeUpdate: @"UPDATE persistentroots SET changecount = ? WHERE root_id = ?",
-//         [NSNumber numberWithLongLong: newCount],
-//         root_id];
-//        
-//        *aChangeCount = newCount;
-//        return YES;
-//    }
-//    return NO;
-}
-
 - (NSArray *) persistentRootUUIDs
 {
     NSMutableArray *result = [NSMutableArray array];
@@ -756,16 +730,6 @@
 }
 
 /** @taskunit writing persistent roots */
-
-- (NSData *) writeMetadata: (NSDictionary *)meta
-{
-    NSData *data = nil;
-    if (meta != nil)
-    {
-        data = [NSJSONSerialization dataWithJSONObject: meta options: 0 error: NULL];
-    }
-    return data;
-}
 
 - (NSDictionary *) readMetadata: (NSData*)data
 {
