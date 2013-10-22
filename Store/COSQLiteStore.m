@@ -15,6 +15,16 @@
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
 
+NSString * const COStorePersistentRootDidChangeNotification = @"COStorePersistentRootDidChangeNotification";
+NSString * const kCOPersistentRootUUID = @"COPersistentRootUUID";
+NSString * const kCOPersistentRootTransactionID = @"COPersistentRootTransactionID";
+NSString * const kCOStoreUUID = @"COStoreUUID";
+NSString * const kCOStoreURL = @"COStoreURL";
+
+NSString * const COPersistentRootAttributeExportSize = @"COPersistentRootAttributeExportSize";
+NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeUsedSize";
+
+
 @interface COSQLiteStore (AttachmentsPrivate)
 
 - (NSArray *) attachments;
@@ -304,7 +314,7 @@
     
     dispatch_sync(queue_, ^(){
         COSQLiteStorePersistentRootBackingStore *backingStore =
-		[self backingStoreForPersistentRootUUID: prootUUID];
+		[self backingStoreForPersistentRootUUID: prootUUID createIfNotPresent: YES];
 
         result = [backingStore revisionInfosForBranchUUID: aBranchUUID
                                          headRevisionUUID: headRevUUID
@@ -315,6 +325,7 @@
 }
 
 - (ETUUID *) backingUUIDForPersistentRootUUID: (ETUUID *)aUUID
+						   createIfNotPresent: (BOOL)createIfNotPresent
 {
     assert(dispatch_get_current_queue() == queue_);
     
@@ -328,9 +339,14 @@
         }
         else
         {
-            // HACK
-            backingUUID = aUUID;
-            //[NSException raise: NSInvalidArgumentException format: @"persistent root %@ not found", aUUID];
+			if (createIfNotPresent)
+			{
+				backingUUID = aUUID;
+			}
+			else
+			{
+				return nil;
+			}
         }
         
         [backingStoreUUIDForPersistentRootUUID_ setObject: backingUUID forKey: aUUID];
@@ -339,10 +355,19 @@
 }
 
 - (COSQLiteStorePersistentRootBackingStore *) backingStoreForPersistentRootUUID: (ETUUID *)aUUID
+															 createIfNotPresent: (BOOL)createIfNotPresent
 {
     assert(dispatch_get_current_queue() == queue_);
     
-    return [self backingStoreForUUID: [self backingUUIDForPersistentRootUUID: aUUID]
+	ETUUID *bsUUID = [self backingUUIDForPersistentRootUUID: aUUID
+										 createIfNotPresent: createIfNotPresent];
+	
+	if (bsUUID == nil)
+	{
+		return nil;
+	}
+	
+    return [self backingStoreForUUID: bsUUID
                                error: NULL];
 }
 
@@ -396,7 +421,7 @@
     assert(dispatch_get_current_queue() != queue_);
     
     dispatch_sync(queue_, ^(){
-        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot];
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot createIfNotPresent: YES];
         result = [backing revisionInfoForRevisionUUID: aRevision];
     });
     
@@ -416,7 +441,7 @@
     assert(dispatch_get_current_queue() != queue_);
     
     dispatch_sync(queue_, ^(){
-        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot];
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot createIfNotPresent: YES];
 
         result = [backing partialItemGraphFromRevid: [backing revidForUUID: baseRevid]
                                             toRevid: [backing revidForUUID: finalRevid]];
@@ -436,7 +461,8 @@
     assert(dispatch_get_current_queue() != queue_);
     
     dispatch_sync(queue_, ^(){
-        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot];
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot
+																				createIfNotPresent: YES];
         result = [backing itemGraphForRevid: [backing revidForUUID: aRevisionUUID]];
     });
     return result;
@@ -451,7 +477,7 @@
     assert(dispatch_get_current_queue() != queue_);
     
     dispatch_sync(queue_, ^(){
-        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot];
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot createIfNotPresent: YES];
         result = [backing rootUUID];
     });
     
@@ -476,7 +502,7 @@
     [db_ savepoint: @"updateSearchIndexesForItemUUIDs"];
     
     
-    ETUUID *backingStoreUUID = [self backingUUIDForPersistentRootUUID: aPersistentRoot];
+    ETUUID *backingStoreUUID = [self backingUUIDForPersistentRootUUID: aPersistentRoot createIfNotPresent: YES];
     NSData *backingUUIDData = [backingStoreUUID dataValue];
     
     NSMutableArray *ftsContent = [NSMutableArray array];
@@ -558,7 +584,8 @@
 {
     assert(dispatch_get_current_queue() == queue_);
     
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aUUID];
+    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aUUID
+																			createIfNotPresent: YES];
     if (backing == nil)
     {
         return NO;
@@ -775,7 +802,8 @@
     
     dispatch_sync(queue_, ^(){
         
-        ETUUID *backingUUID = [self backingUUIDForPersistentRootUUID: aRoot];
+        ETUUID *backingUUID = [self backingUUIDForPersistentRootUUID: aRoot
+												  createIfNotPresent: YES];
         COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID error: NULL];
         //NSNumber *backingId = [self rootIdForPersistentRootUUID: backingUUID];
         NSData *backingUUIDData = [backingUUID dataValue];
@@ -903,7 +931,8 @@
         
         for (ETUUID *persistentRoot in  [[NSSet setWithArray: [self persistentRootUUIDs]]
                                          objectsPassingTest: ^(id obj, BOOL *stop) {
-                                             return [[self backingUUIDForPersistentRootUUID: obj] isEqual: backingUUID];
+                                             return [[self backingUUIDForPersistentRootUUID: obj
+																		 createIfNotPresent: YES] isEqual: backingUUID];
                                          }])
         {
             [result appendFormat: @"%@ ", persistentRoot];
@@ -941,10 +970,28 @@
     });
 }
 
-@end
+/** @taskunit Attributes */
 
-NSString *COStorePersistentRootDidChangeNotification = @"COStorePersistentRootDidChangeNotification";
-NSString *kCOPersistentRootUUID = @"COPersistentRootUUID";
-NSString *kCOPersistentRootTransactionID = @"COPersistentRootTransactionID";
-NSString *kCOStoreUUID = @"COStoreUUID";
-NSString *kCOStoreURL = @"COStoreURL";
+- (NSDictionary *) attributesForPersistentRootWithUUID: (ETUUID *)aUUID
+{
+	__block NSDictionary *result = nil;
+    
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+		COSQLiteStorePersistentRootBackingStore *bs = [self backingStoreForPersistentRootUUID: aUUID
+																		   createIfNotPresent: NO];
+		
+		if (bs == nil)
+			return;
+		
+		uint64_t exportsize = [bs fileSize];
+		uint64_t usedsize = [[bs UUID] isEqual: aUUID] ? exportsize : 0;
+		
+		result = @{ COPersistentRootAttributeExportSize : @(exportsize),
+				  COPersistentRootAttributeUsedSize : @(usedsize) };
+	});
+	return result;
+}
+
+@end

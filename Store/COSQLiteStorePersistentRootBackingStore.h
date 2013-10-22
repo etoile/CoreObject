@@ -36,6 +36,7 @@
 
 - (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aToken;
 
+- (ETUUID *) UUID;
 - (ETUUID *) rootUUID;
 - (BOOL) hasRevid: (int64_t)revid;
 
@@ -78,5 +79,7 @@
 - (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
                        headRevisionUUID: (ETUUID *)aHeadRevUUID
                                 options: (NSUInteger)options;
+
+- (uint64_t) fileSize;
 
 @end

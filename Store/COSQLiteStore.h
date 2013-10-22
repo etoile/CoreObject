@@ -13,6 +13,24 @@ enum COBranchRevisionReadingOptions
 };
 typedef NSUInteger COBranchRevisionReadingOptions;
 
+extern NSString * const COStorePersistentRootDidChangeNotification;
+extern NSString * const kCOPersistentRootUUID;
+extern NSString * const kCOPersistentRootTransactionID;
+extern NSString * const kCOStoreUUID;
+extern NSString * const kCOStoreURL;
+
+/**
+ * Size in bytes that this persistent root would occupy if exported,
+ * including all history.
+ */
+extern NSString * const COPersistentRootAttributeExportSize;
+/**
+ * Size in bytes used by this persistent root, including all history.
+ * For cheap copies, this excludes the size of the parent (will
+ * currently just return 0).
+ */
+extern NSString * const COPersistentRootAttributeUsedSize;
+
 /**
  * This class implements a Core Object store using SQLite databases.
  *
@@ -313,10 +331,12 @@ typedef NSUInteger COBranchRevisionReadingOptions;
 
 - (void) clearStore;
 
-@end
+/** @taskunit Attributes */
 
-extern NSString *COStorePersistentRootDidChangeNotification;
-extern NSString *kCOPersistentRootUUID;
-extern NSString *kCOPersistentRootTransactionID;
-extern NSString *kCOStoreUUID;
-extern NSString *kCOStoreURL;
+/**
+ * Returns a dictionary of attributes describing the persistent root
+ * such as COPersistentRootAttributeExportSize and COPersistentRootAttributeUsedSize
+ */
+- (NSDictionary *) attributesForPersistentRootWithUUID: (ETUUID *)aUUID;
+
+@end

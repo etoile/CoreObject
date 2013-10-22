@@ -199,6 +199,11 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	return self.metadata[@"parentPersistentRoot"] != nil;
 }
 
+- (NSDictionary *)attributes
+{
+	return [[self store] attributesForPersistentRootWithUUID: _UUID];
+}
+
 - (COBranch *)currentBranch
 {
 	return [_branchForUUID objectForKey: _currentBranchUUID];

@@ -105,6 +105,21 @@ static ETUUID *rootUUID;
     
     UKObjectsEqual([self prootAitemTree], [self currentItemGraphForPersistentRoot: [prootA UUID]]);
     UKObjectsEqual([self prooBitemTree], [self currentItemGraphForPersistentRoot: [prootB UUID]]);
+	
+	NSDictionary *prootAAttrs = [store attributesForPersistentRootWithUUID: [prootA UUID]];
+	NSDictionary *prootBAttrs = [store attributesForPersistentRootWithUUID: [prootB UUID]];
+	
+	// For the original (non cheap copy)
+	
+	UKIntsNotEqual(0, [prootAAttrs[COPersistentRootAttributeExportSize] longLongValue]);
+	UKIntsNotEqual(0, [prootAAttrs[COPersistentRootAttributeUsedSize] longLongValue]);
+	UKIntsEqual([prootAAttrs[COPersistentRootAttributeExportSize] longLongValue],
+				[prootAAttrs[COPersistentRootAttributeUsedSize] longLongValue]);
+	
+	// For the cheap copy
+	
+	UKTrue([prootBAttrs[COPersistentRootAttributeUsedSize] longLongValue] <
+		   [prootBAttrs[COPersistentRootAttributeExportSize] longLongValue]);
 }
 
 - (void) testDeleteOriginalPersistentRoot

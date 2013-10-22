@@ -105,6 +105,11 @@
 	return self;
 }
 
+- (ETUUID *) UUID
+{
+	return _uuid;
+}
+
 - (BOOL)close
 {
     if (!_shareDB)
@@ -757,6 +762,14 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
 							usingRevisionIDs: revIDs];
 
 	return revInfos;
+}
+
+- (uint64_t) fileSize
+{
+	NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfItemAtPath: [db_ databasePath]
+																		   error: NULL];
+	
+	return [attrs[NSFileSize] unsignedLongLongValue];
 }
 
 @end

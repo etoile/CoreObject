@@ -158,7 +158,12 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * Returns YES if this persistent root is a copy (self.parentPersistentRoot != nil)
  */
 @property (nonatomic, readonly) BOOL isCopy;
-
+/**
+ * Returns attributes of the persistent root as reported by the store,
+ *
+ * See COPersistentRootAttributeExportSize, COPersistentRootAttributeUsedSize
+ */
+@property (nonatomic, readonly) NSDictionary *attributes;
 
 /** @taskunit Accessing Branches */
 

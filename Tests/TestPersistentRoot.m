@@ -467,4 +467,16 @@
 	 }];
 }
 
+- (void) testAttributesOnUncommittedPersistentRoot
+{
+    COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	UKNil([persistentRoot2 attributes]);
+}
+
+- (void) testAttributes
+{
+	NSDictionary *attrs = [persistentRoot attributes];
+	UKIntsNotEqual(0, [attrs[COPersistentRootAttributeExportSize] longLongValue]);
+}
+
 @end
