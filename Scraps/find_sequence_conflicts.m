@@ -1,12 +1,18 @@
-#import "COSequenceMerge.h"
 
-BOOL COOverlappingRanges(NSRange r1, NSRange r2)
-{
-	return (r1.location >= r2.location && r1.location < (r2.location + r2.length) && r1.length > 0)
-		|| (r2.location >= r1.location && r2.location < (r1.location + r1.length) && r2.length > 0);
-}
+/**
+ * @returns an NSSet of NSIndexSets, where each index set is one set of conflicting indices in the
+ * provided array.
+ *
+ * objects in sortedOps should conform to COEdit
+ *
+ * linear time.
+ */
+NSSet *COFindConflicts(NSArray *sortedOps);
 
-#if 0
+/**
+ */
+NSArray *COEditsByUniquingNonconflictingDuplicates(NSArray *edits);
+
 NSSet *COFindConflicts(NSArray *sortedOps)
 {
 	NSMutableSet *conflicts = [NSMutableSet set];
@@ -90,4 +96,3 @@ NSArray *COEditsByUniquingNonconflictingDuplicates(NSArray *edits)
 	}
 	return result;
 }
-#endif

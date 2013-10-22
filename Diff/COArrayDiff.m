@@ -2,7 +2,6 @@
 #include "diff.h"
 
 #import <EtoileFoundation/Macros.h>
-#import "COSequenceMerge.h"
 #import <CoreObject/CoreObject.h>
 
 static bool comparefn(size_t i, size_t j, void *userdata1, void *userdata2)

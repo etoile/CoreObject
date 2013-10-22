@@ -2,7 +2,6 @@
 #import <EtoileFoundation/Macros.h>
 #import "COItemGraphEdit.h"
 #import "COType.h"
-#import "COSequenceMerge.h"
 
 #pragma mark base class
 

@@ -166,7 +166,6 @@
 		6680848B178DAFE3003A3CC6 /* COArrayDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66808480178DAFE3003A3CC6 /* COArrayDiff.m */; };
 		6680848C178DAFE3003A3CC6 /* COItemGraphDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 66808481178DAFE3003A3CC6 /* COItemGraphDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6680848D178DAFE3003A3CC6 /* COItemGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66808482178DAFE3003A3CC6 /* COItemGraphDiff.m */; };
-		6680848F178DAFE3003A3CC6 /* COSequenceMerge.m in Sources */ = {isa = PBXBuildFile; fileRef = 66808484178DAFE3003A3CC6 /* COSequenceMerge.m */; };
 		66808490178DAFE3003A3CC6 /* COItemGraphEdit.h in Headers */ = {isa = PBXBuildFile; fileRef = 66808485178DAFE3003A3CC6 /* COItemGraphEdit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66808491178DAFE3003A3CC6 /* COItemGraphEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 66808486178DAFE3003A3CC6 /* COItemGraphEdit.m */; };
 		66808492178DAFE3003A3CC6 /* diff.cc in Sources */ = {isa = PBXBuildFile; fileRef = 66808487178DAFE3003A3CC6 /* diff.cc */; };
@@ -602,8 +601,6 @@
 		66808480178DAFE3003A3CC6 /* COArrayDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COArrayDiff.m; path = Diff/COArrayDiff.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		66808481178DAFE3003A3CC6 /* COItemGraphDiff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = COItemGraphDiff.h; path = Diff/COItemGraphDiff.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		66808482178DAFE3003A3CC6 /* COItemGraphDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COItemGraphDiff.m; path = Diff/COItemGraphDiff.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		66808483178DAFE3003A3CC6 /* COSequenceMerge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = COSequenceMerge.h; path = Diff/COSequenceMerge.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		66808484178DAFE3003A3CC6 /* COSequenceMerge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COSequenceMerge.m; path = Diff/COSequenceMerge.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		66808485178DAFE3003A3CC6 /* COItemGraphEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COItemGraphEdit.h; path = Diff/COItemGraphEdit.h; sourceTree = "<group>"; };
 		66808486178DAFE3003A3CC6 /* COItemGraphEdit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COItemGraphEdit.m; path = Diff/COItemGraphEdit.m; sourceTree = "<group>"; };
 		66808487178DAFE3003A3CC6 /* diff.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = diff.cc; path = Diff/diff.cc; sourceTree = "<group>"; };
@@ -1138,8 +1135,6 @@
 				66808480178DAFE3003A3CC6 /* COArrayDiff.m */,
 				66808481178DAFE3003A3CC6 /* COItemGraphDiff.h */,
 				66808482178DAFE3003A3CC6 /* COItemGraphDiff.m */,
-				66808483178DAFE3003A3CC6 /* COSequenceMerge.h */,
-				66808484178DAFE3003A3CC6 /* COSequenceMerge.m */,
 				66808487178DAFE3003A3CC6 /* diff.cc */,
 				66808488178DAFE3003A3CC6 /* diff.h */,
 				66808489178DAFE3003A3CC6 /* diff.hh */,
@@ -1749,7 +1744,6 @@
 				6680846E178CD526003A3CC6 /* COCopier.m in Sources */,
 				6680848B178DAFE3003A3CC6 /* COArrayDiff.m in Sources */,
 				6680848D178DAFE3003A3CC6 /* COItemGraphDiff.m in Sources */,
-				6680848F178DAFE3003A3CC6 /* COSequenceMerge.m in Sources */,
 				66808491178DAFE3003A3CC6 /* COItemGraphEdit.m in Sources */,
 				66808492178DAFE3003A3CC6 /* diff.cc in Sources */,
 				668084CF17900C35003A3CC6 /* COType.m in Sources */,
