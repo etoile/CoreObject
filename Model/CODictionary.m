@@ -194,7 +194,12 @@ For a loaded object, -tags return nil because tags are not serialized. */
 	[values setObject: [[self entityDescription] name] forKey: kCOObjectEntityNameProperty];
     [types setObject: [NSNumber numberWithInt: kCOTypeString] forKey: kCOObjectEntityNameProperty];
 
-	return [COItem itemWithTypesForAttributes: types valuesForAttributes: values];
+    values[kCOObjectIsSharedProperty] = @(self.isShared);
+    types[kCOObjectIsSharedProperty] = @(kCOTypeInt64);
+
+	return [[COItem alloc] initWithUUID: [self UUID]
+                      typesForAttributes: types
+                     valuesForAttributes: values];
 }
 
 - (void)setStoreItem: (COItem *)aStoreItem
@@ -206,6 +211,17 @@ For a loaded object, -tags return nil because tags are not serialized. */
 	{
 		ETPropertyDescription *propertyDesc =
 			[ETPropertyDescription descriptionWithName: property type: rootType];
+
+        if ([property isEqualToString: kCOObjectEntityNameProperty])
+        {
+            // HACK
+            continue;
+        }
+		else if ([property isEqualToString: kCOObjectIsSharedProperty])
+		{
+			_isShared = [[aStoreItem valueForAttribute: kCOObjectIsSharedProperty] boolValue];
+			continue;
+		}
 
 		id serializedValue = [aStoreItem valueForAttribute: property];
 		COType serializedType = [aStoreItem typeForAttribute: property];

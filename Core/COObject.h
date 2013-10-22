@@ -223,6 +223,7 @@
     NSMutableDictionary *_outgoingSerializedRelationshipCache;
 	BOOL _inDescription; // FIXME: remove; only for debugging
 	BOOL _isInitialized;
+	@protected
 	BOOL _isShared;
 }
 
