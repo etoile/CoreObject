@@ -37,6 +37,8 @@
 
 - (CORevisionInfo *) revisionForID: (CORevisionID *)aToken;
 
+- (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aToken;
+
 - (ETUUID *) rootUUID;
 - (BOOL) hasRevid: (int64_t)revid;
 

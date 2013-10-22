@@ -274,21 +274,6 @@
     return result;
 }
 
-- (CORevisionID *) revisionIDForRevisionUUID: (ETUUID *)aRevisionUUID
-                          persistentRootUUID: (ETUUID *)aPersistentRoot
-{
-    __block ETUUID *backingUUID;
-    
-    assert(dispatch_get_current_queue() != queue_);
-    
-    dispatch_sync(queue_, ^(){
-        backingUUID = [self backingUUIDForPersistentRootUUID: aPersistentRoot];
-    });
-    
-    return [CORevisionID revisionWithPersistentRootUUID: backingUUID
-                                        revisionUUID: aRevisionUUID];
-}
-
 - (ETUUID *)headRevisionUUIDForBranchUUID: (ETUUID *)aBranchUUID
 {
 	NILARG_EXCEPTION_TEST(aBranchUUID);
@@ -411,90 +396,77 @@
 
 /** @taskunit reading states */
 
-- (CORevisionInfo *) revisionInfoForRevisionID: (CORevisionID *)aToken
+- (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aRevision
+							  persistentRootUUID: (ETUUID *)aPersistentRoot
 {
-    NSParameterAssert(aToken != nil);
-   
+    NSParameterAssert(aRevision != nil);
+    NSParameterAssert(aPersistentRoot != nil);
+	
     __block CORevisionInfo *result = nil;
     
     assert(dispatch_get_current_queue() != queue_);
     
     dispatch_sync(queue_, ^(){
-        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-        result = [backing revisionForID: aToken];
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot];
+        result = [backing revisionInfoForRevisionUUID: aRevision];
     });
     
     return result;
 }
 
-- (COItemGraph *) partialItemGraphFromRevisionID: (CORevisionID *)baseRevid
-                                    toRevisionID: (CORevisionID *)finalRevid
+- (COItemGraph *) partialItemGraphFromRevisionUUID: (ETUUID *)baseRevid
+                                    toRevisionUUID: (ETUUID *)finalRevid
+									persistentRoot: (ETUUID *)aPersistentRoot
 {
     NSParameterAssert(baseRevid != nil);
     NSParameterAssert(finalRevid != nil);
+    NSParameterAssert(aPersistentRoot != nil);
     
     __block COItemGraph *result = nil;
     
     assert(dispatch_get_current_queue() != queue_);
     
     dispatch_sync(queue_, ^(){
-        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: baseRevid];
-        COSQLiteStorePersistentRootBackingStore *backing2 = [self backingStoreForRevisionID: finalRevid];
-        NSParameterAssert(backing == backing2);
-        
-        result = [backing partialItemGraphFromRevid: [backing revidForRevisionID: baseRevid]
-                                            toRevid: [backing revidForRevisionID: finalRevid]];
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot];
+
+        result = [backing partialItemGraphFromRevid: [backing revidForUUID: baseRevid]
+                                            toRevid: [backing revidForUUID: finalRevid]];
     });
     
     return result;
 }
 
-- (COItemGraph *) itemGraphForRevisionID: (CORevisionID *)aToken
+- (COItemGraph *) itemGraphForRevisionUUID: (ETUUID *)aRevisionUUID
+							persistentRoot: (ETUUID *)aPersistentRoot
 {
-    NSParameterAssert(aToken != nil);
+    NSParameterAssert(aRevisionUUID != nil);
+    NSParameterAssert(aPersistentRoot != nil);
     
     __block COItemGraph *result = nil;
     
     assert(dispatch_get_current_queue() != queue_);
     
     dispatch_sync(queue_, ^(){
-        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-        result = [backing itemGraphForRevid: [backing revidForRevisionID: aToken]];
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot];
+        result = [backing itemGraphForRevid: [backing revidForUUID: aRevisionUUID]];
     });
     return result;
 }
 
-- (ETUUID *) rootObjectUUIDForRevisionID: (CORevisionID *)aToken
+- (ETUUID *) rootObjectUUIDForPersistentRoot: (ETUUID *)aPersistentRoot
 {
-    NSParameterAssert(aToken != nil);
+    NSParameterAssert(aPersistentRoot != nil);
     
     __block ETUUID *result = nil;
     
     assert(dispatch_get_current_queue() != queue_);
     
     dispatch_sync(queue_, ^(){
-        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot];
         result = [backing rootUUID];
     });
     
     return result;
-}
-
-- (COItem *) item: (ETUUID *)anitem atRevisionID: (CORevisionID *)aToken
-{
-    NSParameterAssert(aToken != nil);
-
-    __block COItem *item = nil;
-    
-    assert(dispatch_get_current_queue() != queue_);
-    
-    dispatch_sync(queue_, ^(){
-        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
-        COItemGraph *tree = [backing itemGraphForRevid: [backing revidForRevisionID: aToken]
-                                   restrictToItemUUIDs: S(anitem)];
-        item = [tree itemForUUID: anitem];
-    });
-    return item;
 }
 
 /** @taskunit writing states */
@@ -1041,6 +1013,68 @@
         
         [self setupSchema];
     });
+}
+
+@end
+
+@implementation COSQLiteStore (Deprecated)
+
+- (CORevisionID *) revisionIDForRevisionUUID: (ETUUID *)aRevisionUUID
+                          persistentRootUUID: (ETUUID *)aPersistentRoot
+{
+    __block ETUUID *backingUUID;
+    
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        backingUUID = [self backingUUIDForPersistentRootUUID: aPersistentRoot];
+    });
+    
+    return [CORevisionID revisionWithPersistentRootUUID: backingUUID
+										   revisionUUID: aRevisionUUID];
+}
+
+- (CORevisionInfo *) revisionInfoForRevisionID: (CORevisionID *)aToken
+{
+	return [self revisionInfoForRevisionUUID: [aToken revisionUUID]
+						  persistentRootUUID: [aToken revisionPersistentRootUUID]];
+}
+
+- (COItemGraph *) partialItemGraphFromRevisionID: (CORevisionID *)baseRevid
+                                    toRevisionID: (CORevisionID *)finalRevid
+{
+	
+	return [self partialItemGraphFromRevisionUUID: [baseRevid revisionUUID]
+								   toRevisionUUID: [finalRevid revisionUUID]
+								   persistentRoot: [baseRevid revisionPersistentRootUUID]];
+}
+
+- (COItemGraph *) itemGraphForRevisionID: (CORevisionID *)aToken
+{
+	return [self itemGraphForRevisionUUID: [aToken revisionUUID]
+						   persistentRoot: [aToken revisionPersistentRootUUID]];
+}
+
+- (ETUUID *) rootObjectUUIDForRevisionID: (CORevisionID *)aToken
+{
+    return [self rootObjectUUIDForPersistentRoot: [aToken revisionPersistentRootUUID]];
+}
+
+- (COItem *) item: (ETUUID *)anitem atRevisionID: (CORevisionID *)aToken
+{
+    NSParameterAssert(aToken != nil);
+	
+    __block COItem *item = nil;
+    
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForRevisionID: aToken];
+        COItemGraph *tree = [backing itemGraphForRevid: [backing revidForRevisionID: aToken]
+                                   restrictToItemUUIDs: S(anitem)];
+        item = [tree itemForUUID: anitem];
+    });
+    return item;
 }
 
 @end

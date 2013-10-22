@@ -233,16 +233,9 @@ typedef NSUInteger COBranchRevisionReadingOptions;
  * 
  * Adding an in-memory cache for this will probably imporant.
  */
-- (CORevisionInfo *) revisionInfoForRevisionID: (CORevisionID *)aToken;
+- (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aRevision
+							  persistentRootUUID: (ETUUID *)aPersistentRoot;
 
-/**
- * CORevisionID are not portable across stores (since different stores may
- * store a persistent root under different backing store UUIDs)
- * but a (persistent root UUID, revision UUID) pair is. This method is
- * for converting from that representation back to a CORevisionID.
- */
-- (CORevisionID *) revisionIDForRevisionUUID: (ETUUID *)aRevisionUUID
-                          persistentRootUUID: (ETUUID *)aPersistentRoot;
 
 /**
  * N.B. This is the only API for discovering divergent revisions
@@ -260,23 +253,21 @@ typedef NSUInteger COBranchRevisionReadingOptions;
  * In the future if we add an internal in-memory revision cache to COSQLiteStore, this may
  * no longer be of much use.
  */
-- (COItemGraph *) partialItemGraphFromRevisionID: (CORevisionID *)baseRevid
-                                    toRevisionID: (CORevisionID *)finalRevid;
+- (COItemGraph *) partialItemGraphFromRevisionUUID: (ETUUID *)baseRevid
+                                    toRevisionUUID: (ETUUID *)finalRevid
+									persistentRoot: (ETUUID *)aPersistentRoot;
 
 /**
  * Returns the state the inner object graph at a given revision.
  */
-- (COItemGraph *) itemGraphForRevisionID: (CORevisionID *)aToken;
+- (COItemGraph *) itemGraphForRevisionUUID: (ETUUID *)aRevisionUUID
+							persistentRoot: (ETUUID *)aPersistentRoot;
 
 /**
- * Returns the UUID of the root object at the given revision ID
+ * Returns the UUID of the root object of the given persistent root.
  */
-- (ETUUID *) rootObjectUUIDForRevisionID: (CORevisionID *)aToken;
+- (ETUUID *) rootObjectUUIDForPersistentRoot: (ETUUID *)aPersistentRoot;
 
-/**
- * Returns the state of a single inner object at a given revision.
- */
-- (COItem *) item: (ETUUID *)anitem atRevisionID: (CORevisionID *)aToken;
 
 
 /** @taskunit Persistent Root Reading */
@@ -321,6 +312,23 @@ typedef NSUInteger COBranchRevisionReadingOptions;
 - (BOOL) commitStoreTransaction: (COStoreTransaction *)aTransaction;
 
 - (void) clearStore;
+
+@end
+
+@interface COSQLiteStore (Deprecated)
+
+- (CORevisionID *) revisionIDForRevisionUUID: (ETUUID *)aRevisionUUID
+                          persistentRootUUID: (ETUUID *)aPersistentRoot;
+- (CORevisionInfo *) revisionInfoForRevisionID: (CORevisionID *)aToken;
+- (COItemGraph *) partialItemGraphFromRevisionID: (CORevisionID *)baseRevid
+                                    toRevisionID: (CORevisionID *)finalRevid;
+- (COItemGraph *) itemGraphForRevisionID: (CORevisionID *)aToken;
+- (ETUUID *) rootObjectUUIDForRevisionID: (CORevisionID *)aToken;
+/**
+ * Returns the state of a single inner object at a given revision.
+ * This method has no callers at the moment.
+ */
+- (COItem *) item: (ETUUID *)anitem atRevisionID: (CORevisionID *)aToken;
 
 @end
 

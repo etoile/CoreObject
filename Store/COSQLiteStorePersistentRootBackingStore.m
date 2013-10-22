@@ -171,12 +171,12 @@
     }
 }
 
-- (CORevisionInfo *) revisionForID: (CORevisionID *)aToken
+- (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aRevisionUUID
 {
     CORevisionInfo *result = nil;
     FMResultSet *rs = [db_ executeQuery:
                        [NSString stringWithFormat: @"SELECT parent, mergeparent, branchuuid, persistentrootuuid, metadata, timestamp FROM %@ WHERE uuid = ?", [self tableName]],
-                       [[aToken revisionUUID] dataValue]];
+                       [aRevisionUUID dataValue]];
 	if ([rs next])
 	{
         // N.B.: Watch for null being returned as 0
@@ -184,7 +184,7 @@
         int64_t mergeparent = [rs longLongIntForColumnIndex: 1];
         
         result = [[CORevisionInfo alloc] init];
-        result.revisionID = aToken;
+        result.revisionID = [CORevisionID revisionWithPersistentRootUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 3]] revisionUUID: aRevisionUUID];
         result.parentRevisionID = [self revisionIDForRevid: parent];
         result.mergeParentRevisionID = [self revisionIDForRevid: mergeparent];
 		result.branchUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
@@ -201,6 +201,11 @@
     [rs close];
     
 	return result;
+}
+
+- (CORevisionInfo *) revisionForID: (CORevisionID *)aToken
+{
+	return [self revisionInfoForRevisionUUID: [aToken revisionUUID]];
 }
 
 - (int64_t) revidForUUID: (ETUUID *)aUUID
