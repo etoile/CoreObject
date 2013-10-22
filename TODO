@@ -44,8 +44,6 @@ Backlog from Oct 2nd
 
 - GC: only collect divergent revisions older than X days
 
-- Fix COObjectGraphContext GC following cross-object-graph-context references
-
 - A generic object manager than can open any store and display any COObject
   - Should support displaying all key/values (like past StoreBorwser prototypes)
   - Not blocking release, but critical for ObjectManager
