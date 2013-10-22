@@ -4,8 +4,6 @@ TODO
 First alpha release blockers
 ----------------------------
 
-- Support for composite cross-persistent root references as we discussed
-
 - Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
 
 - Shorten -[COObject description] output
@@ -24,8 +22,6 @@ Backlog from Oct 2nd
 --------------------
 
 - Undo changes the current revision is that happens to be recorded by the Undo stack
-
-- Skip transient property descriptions or at least attributes in -[COObject embeddedOrReferencedObjects]
 
 - Implement -persistentEntityDescription to support partial loading
 
@@ -83,11 +79,7 @@ typewriter / ProjDemo
     - synthesize all accessors
   - Copying support
 
-- Tests
-  - Pass all tests, including all from NestedVersioning, rewriting them where needed.
-
 - COEditingContext / COPersistentRoot / COBranch
-  - Add tests for Quentin's improvements to -[COPersistentRoot hasChanges] on 
   - support for loading the root object of a persistent root as a fault
   - asychronous loading of persistent root contents / unfaulting faulted root object
   - full support for cross-persistent root references
@@ -98,17 +90,7 @@ typewriter / ProjDemo
   - support "transient roots" in a COEditingContext. These are COObjectGraphContext wrappers.
     Or, support creating a persistent root in code, then calling "freeze" which will make it 
     read-only and prevent it from being committed to disk?
-  - make deleted persistent roots read-only?
   - expose COSQLiteStore's finalize deletion method
-  - (aesthetic) decide to what extent COPersistentRoot, COBranch should
-    provide convenience methods that deletate to the COObjectGraphContext:
-      [[(COPersistentRoot *)self editingBranch] objectGraphContext]
-      
-    e.g. I think we should surely keep:
-     -[COPersistentRoot rootObject] = { return [[self editingBranch] rootObject]; }
-     -[COBranch rootObject] = { return [[self objectGraphContext] rootObject]; }
-     
-    All of the other methods, I don't know.
   WIP Extend COBranch API to support branches and merging revisions accross tracks
   - Expose COSQLiteStore's attachments feature
   - test [[persistentRoot currentBranch] currentRevision] on a newly created
@@ -139,11 +121,6 @@ typewriter / ProjDemo
 
 - Oject copy model easy to extend in COObject subclasses (see COObject and COEditingContext copy methods)
   - Tune object copy model to respect user expectations about copy/paste in various recurrent use cases
-  - Finish COCopier
-  - Support another reference type for copy: NOT a composite reference, but acts like one for the pruposes of copy. see the copy keynote, and the yellow arrows
-    => 2013-08-13: Discussed with Quentin and we decided this is probably not so important
-  - Maybe need an "isShared" flag related to whether an object is copied when things that refer to it are copied.
-    I need to understand the use case a bit more
 
 - Metamodel
   - Add checks that derived properties are not persistent
@@ -167,9 +144,6 @@ typewriter / ProjDemo
   - We should have dedicated array/set multivalue mutation methods rather than using:
     -[COObject (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key]
     for both, IMO (Eric)
-  WIP Rather than dynamic subclassing which is flawed/broken (it's impossible to interact cleanly with KVO or other users of dynamic subclassing),
-    synthesize accessors for properties when the app developer has made a subclass and marked the property @dynamic. Either using +resolveInstanceMethod
-    or some earlier time when the metamodel/class are registered.
   - Use NSSortedSet for sorted composite relationships
   - Use weak references to other COObject instances to prevent retain cycles
   - Variable storage, relationship cache, relationship integrity implementations
@@ -211,13 +185,10 @@ typewriter / ProjDemo
 Future Work
 -----------
 
+- Support for composite cross-persistent root references as we discussed
 - Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
 - Switch from FMDB to an SQL abstraction backend
 - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
-- Figure out how to compute and present each core object size... Possible choices would be:
-	- a raw size including the object history data
-	- a snapshot size (excluding the history data)
-	- a directory or file size to be expected if the object is exported
 - Turn COObject into zombies once garbage collected (see -markAsRemovedFromContext)
 x Figure out how to navigate large root object sets very quickly (evaluate writing a COSQLCursor class)/
   How to scroll smoothly through 50 000 root objects in an Object Manager without loading all the objects in memory?
