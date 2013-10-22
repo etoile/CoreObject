@@ -995,6 +995,11 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 }
 
+- (void)didLoadObjectGraph
+{
+	
+}
+
 #pragma mark - Hash and Equality
 
 - (NSUInteger)hash

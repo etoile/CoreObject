@@ -223,6 +223,37 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	return obj;
 }
 
+/**
+ * Sends -didLoadObjectGraph to the objects just deserialized from the given 
+ * items.
+ *
+ * The root object (if deserialized), is the last object to receive 
+ * -didLoadObjectGraph.
+ */
+- (void)finishLoadingObjectsWithUUIDs: (NSArray *)itemUUIDs
+{
+	for (ETUUID *UUID in itemUUIDs)
+	{
+		// NOTE: Based on the assumption, the root object UUID remains the same
+		BOOL isRootObject = [[self rootItemUUID] isEqual: UUID];
+
+		if (isRootObject)
+			continue;
+		
+		COObject *object = [self objectWithUUID: UUID];
+		ETAssert(object != nil);
+
+		[object didLoadObjectGraph];
+	}
+
+	BOOL wasRootObjectDeserialized = [itemUUIDs containsObject: [self rootItemUUID]];
+
+	if (wasRootObjectDeserialized)
+	{
+		[[self rootObject] didLoadObjectGraph];
+	}
+}
+
 #pragma mark -
 #pragma mark Item Graph Protocol
 
@@ -277,6 +308,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     {
         [self addItem: item markAsInserted: NO];
     }
+	[self finishLoadingObjectsWithUUIDs: [_loadingItemGraph itemUUIDs]];
 	
 	_loadingItemGraph = nil;
 }
@@ -303,7 +335,8 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     {
         [self addItem: [aTree itemForUUID: uuid] markAsInserted: NO];
     }
-	
+	[self finishLoadingObjectsWithUUIDs: [aTree itemUUIDs]];
+
 	_loadingItemGraph = nil;
     
     // 3. Do GC

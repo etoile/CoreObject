@@ -591,6 +591,7 @@
 - (void)willLoad;
 - (void)didLoad;
 - (void)didReload;
+- (void)didLoadObjectGraph;
 
 
 /** @taskunit Object Equality */
