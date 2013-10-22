@@ -257,6 +257,8 @@
 		66E451CB17CC456700205679 /* TestCOObjectSynthesizedAccessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E451CA17CC456700205679 /* TestCOObjectSynthesizedAccessors.m */; };
 		66E451D617CC461F00205679 /* OutlineItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E451D517CC461F00205679 /* OutlineItem.m */; };
 		66E451D917CC565200205679 /* Tag.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E451D817CC565100205679 /* Tag.m */; };
+		66E4CF4F1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.h in Headers */ = {isa = PBXBuildFile; fileRef = 66E4CF4D1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.h */; };
+		66E4CF501816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E4CF4E1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.m */; };
 		66FB156017A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FB155E17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66FB156117A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB155F17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.m */; };
 		66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */; };
@@ -703,6 +705,8 @@
 		66E451D517CC461F00205679 /* OutlineItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OutlineItem.m; path = Tests/OutlineItem.m; sourceTree = "<group>"; };
 		66E451D717CC565100205679 /* Tag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tag.h; path = Tests/Tag.h; sourceTree = "<group>"; };
 		66E451D817CC565100205679 /* Tag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Tag.m; path = Tests/Tag.m; sourceTree = "<group>"; };
+		66E4CF4D1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COStoreSetPersistentRootMetadata.h; path = Store/COStoreSetPersistentRootMetadata.h; sourceTree = "<group>"; };
+		66E4CF4E1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COStoreSetPersistentRootMetadata.m; path = Store/COStoreSetPersistentRootMetadata.m; sourceTree = "<group>"; };
 		66FB155E17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCrossPersistentRootReferenceCache.h; path = Core/COCrossPersistentRootReferenceCache.h; sourceTree = "<group>"; };
 		66FB155F17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCrossPersistentRootReferenceCache.m; path = Core/COCrossPersistentRootReferenceCache.m; sourceTree = "<group>"; };
 		66FB157017A8F53D003BFC9B /* TestObjectGraphContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestObjectGraphContext.m; path = Tests/TestObjectGraphContext.m; sourceTree = "<group>"; };
@@ -932,6 +936,8 @@
 				66457FB017E8BFE5003C51A8 /* COStoreUndeleteBranch.m */,
 				66457FB117E8BFE5003C51A8 /* COStoreUndeletePersistentRoot.h */,
 				66457FB217E8BFE5003C51A8 /* COStoreUndeletePersistentRoot.m */,
+				66E4CF4D1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.h */,
+				66E4CF4E1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.m */,
 				66457FB317E8BFE5003C51A8 /* COStoreWriteRevision.h */,
 				66457FB417E8BFE5003C51A8 /* COStoreWriteRevision.m */,
 				66457FCD17E8C9CF003C51A8 /* COStoreAction.h */,
@@ -1350,6 +1356,7 @@
 				609C00801704C2BA00D01AAB /* CORevision.h in Headers */,
 				609C00941704C3DA00D01AAB /* COEditingContext.h in Headers */,
 				609C00981704C3DA00D01AAB /* COObject.h in Headers */,
+				66E4CF4F1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.h in Headers */,
 				609C009A1704C3DA00D01AAB /* COPersistentRoot.h in Headers */,
 				609C009C1704C3DA00D01AAB /* COQuery.h in Headers */,
 				609C00AC1704C3EF00D01AAB /* COBookmark.h in Headers */,
@@ -1776,6 +1783,7 @@
 				66457FBC17E8BFE5003C51A8 /* COStoreDeletePersistentRoot.m in Sources */,
 				66457FBE17E8BFE5003C51A8 /* COStoreSetBranchMetadata.m in Sources */,
 				66457FC017E8BFE5003C51A8 /* COStoreSetCurrentBranch.m in Sources */,
+				66E4CF501816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.m in Sources */,
 				66457FC217E8BFE5003C51A8 /* COStoreSetCurrentRevision.m in Sources */,
 				66457FC417E8BFE5003C51A8 /* COStoreTransaction.m in Sources */,
 				66457FC617E8BFE5003C51A8 /* COStoreUndeleteBranch.m in Sources */,

@@ -7,6 +7,7 @@
 #import "COStoreSetBranchMetadata.h"
 #import "COStoreDeletePersistentRoot.h"
 #import "COStoreUndeletePersistentRoot.h"
+#import "COStoreSetPersistentRootMetadata.h"
 #import "COStoreDeleteBranch.h"
 #import "COStoreUndeleteBranch.h"
 #import "COStoreWriteRevision.h"
@@ -230,6 +231,17 @@
     COStoreSetBranchMetadata *op = [[COStoreSetBranchMetadata alloc] init];
     op.metadata = metadata;
     op.branch = aBranch;
+    op.persistentRoot = aRoot;
+    [self addOperation: op];
+}
+
+- (void) setMetadata: (NSDictionary *)metadata
+   forPersistentRoot: (ETUUID *)aRoot
+{
+    NILARG_EXCEPTION_TEST(aRoot);
+    
+    COStoreSetPersistentRootMetadata *op = [[COStoreSetPersistentRootMetadata alloc] init];
+    op.metadata = metadata;
     op.persistentRoot = aRoot;
     [self addOperation: op];
 }

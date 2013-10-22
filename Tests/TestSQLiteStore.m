@@ -341,6 +341,31 @@ static ETUUID *childUUID2;
     UKNil([[[store persistentRootInfoForUUID: prootUUID] currentBranchInfo] metadata]);
 }
 
+- (void) testPersistentRootMetadata
+{
+    // A plain call to -createPersistentRootWithInitialItemGraph: creates a persistent root
+    // with nil metadata; this is intentional.
+    UKNil([[store persistentRootInfoForUUID: prootUUID] metadata]);
+    
+	{
+		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+		[txn setMetadata: D(@"hello world", @"msg")
+	   forPersistentRoot: prootUUID];
+		[self updateChangeCountAndCommitTransaction: txn];
+	}
+    
+    UKObjectsEqual(D(@"hello world", @"msg"), [[store persistentRootInfoForUUID: prootUUID] metadata]);
+    
+	{
+		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+		[txn setMetadata: nil
+	   forPersistentRoot: prootUUID];
+		[self updateChangeCountAndCommitTransaction: txn];
+	}
+    UKNil([[store persistentRootInfoForUUID: prootUUID] metadata]);
+}
+
+
 - (void) testSetCurrentBranch
 {
     UKObjectsEqual(initialBranchUUID, [[store persistentRootInfoForUUID: prootUUID] currentBranchUUID]);

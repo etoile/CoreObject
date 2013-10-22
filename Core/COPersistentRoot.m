@@ -74,6 +74,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         
         _currentBranchUUID =  [_savedState currentBranchUUID];
 		_lastTransactionID = _savedState.transactionID;
+		_metadata = _savedState.metadata;
     }
     else
     {
@@ -107,6 +108,17 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	return [desc stringByReplacingOccurrencesOfString: @"\\n" withString: @"\n"];
 }
 #endif
+
+- (NSDictionary *)metadata
+{
+	return [NSDictionary dictionaryWithDictionary: _metadata];
+}
+
+- (void)setMetadata: (NSDictionary *)aMetadata
+{
+    _metadata = [NSDictionary dictionaryWithDictionary: aMetadata];
+    _metadataChanged = YES;
+}
 
 - (BOOL)isPersistentRoot
 {
@@ -307,6 +319,9 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     
     if ([_branchesPendingUndeletion count] > 0)
         return YES;
+	
+	if (_metadataChanged)
+        return YES;
 
 	for (COBranch *branch in [self branches])
 	{
@@ -343,6 +358,13 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	[_branchesPendingDeletion removeAllObjects];
 	[_branchesPendingUndeletion removeAllObjects];
 
+	if (_metadataChanged)
+    {
+		_metadata = [NSDictionary dictionaryWithDictionary:
+					 [[self persistentRootInfo] metadata]];
+        _metadataChanged = NO;
+    }
+	
 	ETAssert([self hasChanges] == NO);
 }
 
@@ -510,6 +532,16 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         }
     }
 	
+	if (_metadataChanged)
+	{
+		[txn setMetadata: _metadata
+	   forPersistentRoot: _UUID];
+		
+		// FIXME: Undo support for persistent root metadata
+		
+		_metadataChanged = NO;
+	}
+	
 	ETAssert([[self branchesPendingInsertion] isEmpty]);
 	[_branchesPendingDeletion removeAllObjects];
 	[_branchesPendingUndeletion removeAllObjects];
@@ -653,10 +685,15 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         [self updateBranchWithBranchInfo: branchInfo];
     }
     
+	// FIXME: Factor out like -[COBranch updateBranchWithBranchInfo:]
+	// TODO: Test that _everything_ is reloaded
+	
     _currentBranchUUID =  [_savedState currentBranchUUID];
     _lastTransactionID = _savedState.transactionID;
-    
+    _metadata = _savedState.metadata;
+	
 	// TODO: Remove or support
+	// It's correct to send a notification here since the persistent root was updated.. should write tests and uncomment this --Eric
     //[self sendChangeNotification];
 }
 

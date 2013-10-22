@@ -110,7 +110,7 @@
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots ("
      "uuid BLOB PRIMARY KEY NOT NULL, backingstore BLOB NOT NULL, "
-     "currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionid INTEGER)"];
+     "currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionid INTEGER, metadata BLOB)"];
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL PRIMARY KEY, "
      "proot BLOB NOT NULL, initial_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
@@ -664,12 +664,12 @@
         BOOL deleted = NO;
 		int64_t transactionID = -1;
         NSMutableDictionary *branchDict = [NSMutableDictionary dictionary];
-
+		id persistentRootMetadata = nil;
         
         [db_ savepoint: @"persistentRootInfoForUUID"]; // N.B. The transaction is so the two SELECTs see the same DB. Needed?
 
         {
-            FMResultSet *rs = [db_ executeQuery: @"SELECT currentbranch, backingstore, deleted, transactionid FROM persistentroots WHERE uuid = ?", [aUUID dataValue]];
+            FMResultSet *rs = [db_ executeQuery: @"SELECT currentbranch, backingstore, deleted, transactionid, metadata FROM persistentroots WHERE uuid = ?", [aUUID dataValue]];
             if ([rs next])
             {
                 currBranch = [rs dataForColumnIndex: 0] != nil
@@ -678,6 +678,7 @@
                 backingUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
                 deleted = [rs boolForColumnIndex: 2];
 				transactionID = [rs int64ForColumnIndex: 3];
+				persistentRootMetadata = [self readMetadata: [rs dataForColumnIndex: 4]];
             }
             else
             {
@@ -724,6 +725,7 @@
         result.currentBranchUUID = currBranch;
         result.deleted = deleted;
 		result.transactionID = transactionID;
+		result.metadata = persistentRootMetadata;
     });
     
     return result;

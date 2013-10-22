@@ -103,6 +103,9 @@ extern NSString * const COPersistentRootDidChangeNotification;
      */
     ETUUID *_cheapCopyPersistentRootUUID;
 	
+	NSDictionary *_metadata;    
+    BOOL _metadataChanged;
+	
     int64_t _lastTransactionID;
 }
 
@@ -121,6 +124,8 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * though).
  */
 @property (nonatomic, readonly) ETUUID *UUID;
+
+@property (nonatomic, readwrite, copy) NSDictionary *metadata;
 /**
  * The persistent root deletion status.
  *

@@ -385,4 +385,65 @@
 // TODO: Test these behaviours during deleted->undeleted and undeleted->deleted
 // transitions.
 
+- (void) testPersistentRootMetadata
+{
+    [ctx commit];
+	
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
+									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual(@{}, [testProot metadata]);
+	 }];
+    
+    [persistentRoot setMetadata: @{@"key" : @"value"}];
+    
+    UKObjectsEqual((@{@"key" : @"value"}), [persistentRoot metadata]);
+
+	UKRaisesException([[persistentRoot metadata] setValue: @"foo" forKey: @"bar"]);
+	
+    UKTrue([ctx hasChanges]);
+    UKTrue([persistentRoot hasChanges]);
+    
+    [persistentRoot discardAllChanges];
+    
+    UKObjectsEqual(@{}, [persistentRoot metadata]);
+    UKFalse([persistentRoot hasChanges]);
+    
+    [persistentRoot setMetadata: @{@"key" : @"value"}];
+    
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        UKObjectsEqual(@{}, [[ctx2 persistentRootForUUID: [persistentRoot UUID]] metadata]);
+    }
+    
+    [ctx commit];
+    
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual((@{@"key" : @"value"}), [testProot metadata]);
+		 UKFalse([testCtx hasChanges]);
+	 }];
+    
+    [persistentRoot setMetadata: @{@"key" : @"value2"}];
+    UKObjectsEqual((@{@"key" : @"value2"}), [persistentRoot metadata]);
+    
+    [persistentRoot discardAllChanges];
+    
+    UKObjectsEqual((@{@"key" : @"value"}), [persistentRoot metadata]);
+}
+
+- (void) testPersistentRootMetadataOnPersistentRootFirstCommit
+{
+    COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [persistentRoot2 setMetadata: @{@"hello" : @"world"}];
+    [ctx commit];
+    
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot2
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual((@{@"hello" : @"world"}), [testProot metadata]);
+	 }];
+}
+
 @end

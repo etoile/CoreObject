@@ -95,6 +95,9 @@
            forBranch: (ETUUID *)aBranch
     ofPersistentRoot: (ETUUID *)aRoot;
 
+- (void) setMetadata: (NSDictionary *)metadata
+   forPersistentRoot: (ETUUID *)aRoot;
+
 /** @taskunit Persistent Root Deletion */
 
 /**

@@ -9,6 +9,7 @@
 @synthesize branchForUUID = branchForUUID_;
 @synthesize deleted = _deleted;
 @synthesize transactionID = _transactionID;
+@synthesize metadata = _metadata;
 
 - (NSSet *) branchUUIDs
 {
