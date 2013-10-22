@@ -244,11 +244,11 @@ static int itemChangedAtCommit(int i)
 
     COPersistentRootInfo *proot = [store persistentRootInfoForUUID: prootUUID];
     
-    CORevisionID *lastCommitId = [[proot currentBranchInfo] currentRevisionID];
+    ETUUID *lastCommitId = [[proot currentBranchInfo] currentRevisionUUID];
     
     for (int rev=NUM_COMMITS-1; rev>=0; rev--)
     {
-        COItemGraph *tree = [store itemGraphForRevisionID: lastCommitId];
+        COItemGraph *tree = [store itemGraphForRevisionUUID: lastCommitId persistentRoot: prootUUID];
         
         // Check the state
         UKObjectsEqual(rootUUID, [tree rootItemUUID]);
@@ -268,7 +268,7 @@ static int itemChangedAtCommit(int i)
         
         // Step back one revision
         
-        lastCommitId = [[store revisionInfoForRevisionID: lastCommitId] parentRevisionID];
+        lastCommitId = [[store revisionInfoForRevisionID: lastCommitId] parentRevisionUUID];
     }
     
     NSLog(@"reading back %d full snapshots of a %d-item persistent root took %lf ms",
@@ -376,7 +376,7 @@ static int itemChangedAtCommit(int i)
     
     startDate = [NSDate date];
     
-    COItemGraph *readBack = [store itemGraphForRevisionID: [[proot currentBranchInfo] currentRevisionID]];
+    COItemGraph *readBack = [self currentItemGraphForPersistentRoot: [proot UUID]];
     
     NSLog(@"reading %d item itemtree took %lf ms", (int)[[readBack itemUUIDs] count],
           1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);

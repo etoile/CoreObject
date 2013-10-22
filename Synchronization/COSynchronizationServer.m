@@ -5,7 +5,7 @@
 
 @implementation COSynchronizationServer
 
-static void SearchForRevisionsClientLacks(NSMutableSet *resultSet, CORevisionID *rev, NSSet *clientLatestRevisions, COSQLiteStore *store)
+static void SearchForRevisionsClientLacks(NSMutableSet *resultSet, ETUUID *rev, ETUUID *persistentRootUUID, NSSet *clientLatestRevisions, COSQLiteStore *store)
 {
     if ([clientLatestRevisions containsObject: rev])
     {
@@ -16,14 +16,14 @@ static void SearchForRevisionsClientLacks(NSMutableSet *resultSet, CORevisionID 
     
     // Recursively search the parent(s)
     
-    CORevisionInfo *info = [store revisionInfoForRevisionID: rev];
+    CORevisionInfo *info = [store revisionInfoForRevisionUUID: rev persistentRootUUID: persistentRootUUID];
     if ([info parentRevisionID] != nil)
     {
-        SearchForRevisionsClientLacks(resultSet, [info parentRevisionID], clientLatestRevisions, store);
+        SearchForRevisionsClientLacks(resultSet, [info parentRevisionUUID], persistentRootUUID, clientLatestRevisions, store);
     }
     if ([info mergeParentRevisionID] != nil)
     {
-        SearchForRevisionsClientLacks(resultSet, [info mergeParentRevisionID], clientLatestRevisions, store);
+        SearchForRevisionsClientLacks(resultSet, [info mergeParentRevisionUUID], persistentRootUUID, clientLatestRevisions, store);
     }
 }
 
@@ -51,8 +51,7 @@ For now we do.
     NSMutableSet *clientLatestRevisions = [NSMutableSet set];
     for (NSString *revisionUUIDString in [[aRequest objectForKey: @"clientNewestRevisionIDForBranchUUID"] allValues])
     {
-        CORevisionID *revid = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: revisionUUIDString]
-                                             persistentRootUUID: persistentRoot];
+        ETUUID *revid = [ETUUID UUIDWithString: revisionUUIDString];
 
         [clientLatestRevisions addObject: revid];
     }
@@ -61,7 +60,7 @@ For now we do.
     NSMutableSet *revisionsClientLacks = [NSMutableSet set];
     for (COBranchInfo *branch in [serverInfo branches])
     {
-        SearchForRevisionsClientLacks(revisionsClientLacks, [branch currentRevisionID], clientLatestRevisions, aStore);
+        SearchForRevisionsClientLacks(revisionsClientLacks, [branch currentRevisionUUID], persistentRoot, clientLatestRevisions, aStore);
     }
     
     // Now prepare the property list output
@@ -87,10 +86,10 @@ For now we do.
     }
     
     NSMutableDictionary *contentsForRevisionID = [NSMutableDictionary dictionary];
-    for (CORevisionID *revid in revisionsClientLacks)
+    for (ETUUID *revid in revisionsClientLacks)
     {
-        id<COItemGraph> graph = [aStore itemGraphForRevisionID: revid];
-        CORevisionInfo *revInfo = [aStore revisionInfoForRevisionID: revid];
+        id<COItemGraph> graph = [aStore itemGraphForRevisionUUID: revid persistentRoot: persistentRoot];
+        CORevisionInfo *revInfo = [aStore revisionInfoForRevisionUUID: revid persistentRootUUID: persistentRoot];
         
         NSMutableDictionary *revInfoPlist = [NSMutableDictionary dictionary];
         if (revInfo.parentRevisionID != nil)
@@ -110,7 +109,7 @@ For now we do.
         id graphPlist = COItemGraphToJSONPropertyList(graph);
         
         [contentsForRevisionID setObject: @{ @"graph" : graphPlist, @"info" : revInfoPlist }
-                                  forKey: [[revid revisionUUID] stringValue]];
+                                  forKey: [revid stringValue]];
     }
     
     return @{@"persistentRoot" : [persistentRoot stringValue],

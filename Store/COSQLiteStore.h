@@ -317,13 +317,10 @@ typedef NSUInteger COBranchRevisionReadingOptions;
 
 @interface COSQLiteStore (Deprecated)
 
-- (CORevisionID *) revisionIDForRevisionUUID: (ETUUID *)aRevisionUUID
-                          persistentRootUUID: (ETUUID *)aPersistentRoot;
 - (CORevisionInfo *) revisionInfoForRevisionID: (CORevisionID *)aToken;
 - (COItemGraph *) partialItemGraphFromRevisionID: (CORevisionID *)baseRevid
                                     toRevisionID: (CORevisionID *)finalRevid;
 - (COItemGraph *) itemGraphForRevisionID: (CORevisionID *)aToken;
-- (ETUUID *) rootObjectUUIDForRevisionID: (CORevisionID *)aToken;
 /**
  * Returns the state of a single inner object at a given revision.
  * This method has no callers at the moment.

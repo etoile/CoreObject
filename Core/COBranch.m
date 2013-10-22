@@ -684,7 +684,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     // TODO: Use optimized method on the store to get a delta for more performance
     
-	id<COItemGraph> aGraph = [[self store] itemGraphForRevisionID: [revision revisionID]];
+	id<COItemGraph> aGraph = [[self store] itemGraphForRevisionUUID: [revision UUID] persistentRoot: [[self persistentRoot] UUID]];
     
     [_objectGraph setItemGraph: aGraph];
     

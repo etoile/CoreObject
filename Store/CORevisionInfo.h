@@ -22,6 +22,11 @@
 @property (readwrite, nonatomic, strong) CORevisionID *revisionID;
 @property (readwrite, nonatomic, strong) CORevisionID *parentRevisionID;
 @property (readwrite, nonatomic, strong) CORevisionID *mergeParentRevisionID;
+
+@property (readonly, nonatomic, strong) ETUUID *revisionUUID;
+@property (readonly, nonatomic, strong) ETUUID *parentRevisionUUID;
+@property (readonly, nonatomic, strong) ETUUID *mergeParentRevisionUUID;
+
 @property (readwrite, nonatomic, strong) ETUUID *persistentRootUUID;
 @property (readwrite, nonatomic, strong) ETUUID *branchUUID;
 @property (readwrite, nonatomic, copy) NSDictionary *metadata;

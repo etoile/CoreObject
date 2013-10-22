@@ -89,7 +89,7 @@ static ETUUID *tagUUID;
     UKTrue([store finalizeDeletionsForPersistentRoot: [docProot UUID]
                                                error: NULL]);
     
-    UKNil([store itemGraphForRevisionID: [[docProot currentBranchInfo] currentRevisionID]]);    
+    UKNil([store itemGraphForRevisionUUID: [[docProot currentBranchInfo] currentRevisionUUID] persistentRoot: [docProot UUID]]);
 }
 
 @end

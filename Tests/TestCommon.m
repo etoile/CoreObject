@@ -91,6 +91,24 @@ NSString * const kCOParent = @"parentContainer";
 	}
 }
 
+- (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch
+{
+	ETUUID *persistentRoot = [store persistentRootUUIDForBranchUUID: aBranch];
+	COPersistentRootInfo *info = [store persistentRootInfoForUUID: persistentRoot];
+	COBranchInfo *branchInfo = [info branchInfoForUUID: aBranch];
+	
+	return [store itemGraphForRevisionUUID: branchInfo.currentRevisionUUID
+							persistentRoot: persistentRoot];
+}
+
+- (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot
+{
+	COPersistentRootInfo *info = [store persistentRootInfoForUUID: aPersistentRoot];
+	
+	return [store itemGraphForRevisionUUID: info.currentRevisionUUID
+							persistentRoot: aPersistentRoot];
+}
+
 @end
 
 @implementation EditingContextTestCase

@@ -60,6 +60,9 @@ extern NSString * const kCOParent;
 			 current: (ETUUID *)expectedCurrent
 				head: (ETUUID *)expectedHead;
 
+- (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch;
+- (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot;
+
 @end
 
 /**

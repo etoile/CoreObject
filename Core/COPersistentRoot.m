@@ -697,7 +697,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 {
     COObjectGraphContext *ctx = [[COObjectGraphContext alloc]
 		initWithModelRepository: [[self editingContext] modelRepository]];
-    id <COItemGraph> items = [[self store] itemGraphForRevisionID: [aRevision revisionID]];
+    id <COItemGraph> items = [[self store] itemGraphForRevisionUUID: [aRevision UUID] persistentRoot: _UUID];
 
     [ctx setItemGraph: items];
 

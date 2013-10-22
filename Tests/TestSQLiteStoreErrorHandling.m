@@ -145,7 +145,7 @@ static ETUUID *rootUUID;
             [txn writeRevisionWithModifiedItems: [self makeChangedItemGraph]
 								   revisionUUID: [ETUUID UUID]
 									   metadata: nil
-							   parentRevisionID: [[info currentRevisionID] revisionUUID]
+							   parentRevisionID: [info currentRevisionUUID]
 						  mergeParentRevisionID: nil
 							 persistentRootUUID: [info UUID]
 									 branchUUID: [info currentBranchUUID]];
@@ -154,7 +154,7 @@ static ETUUID *rootUUID;
         
         // Check we can still read the initial revision
         
-        UKObjectsEqual([self makeInitialItemGraph], [store itemGraphForRevisionID: [info currentRevisionID]]);
+        UKObjectsEqual([self makeInitialItemGraph], [store itemGraphForRevisionUUID: [info currentRevisionUUID] persistentRoot: [info UUID]]);
     }
     
     assert([[NSFileManager defaultManager] removeItemAtPath: dir error: NULL]);

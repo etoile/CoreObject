@@ -1019,21 +1019,6 @@
 
 @implementation COSQLiteStore (Deprecated)
 
-- (CORevisionID *) revisionIDForRevisionUUID: (ETUUID *)aRevisionUUID
-                          persistentRootUUID: (ETUUID *)aPersistentRoot
-{
-    __block ETUUID *backingUUID;
-    
-    assert(dispatch_get_current_queue() != queue_);
-    
-    dispatch_sync(queue_, ^(){
-        backingUUID = [self backingUUIDForPersistentRootUUID: aPersistentRoot];
-    });
-    
-    return [CORevisionID revisionWithPersistentRootUUID: backingUUID
-										   revisionUUID: aRevisionUUID];
-}
-
 - (CORevisionInfo *) revisionInfoForRevisionID: (CORevisionID *)aToken
 {
 	return [self revisionInfoForRevisionUUID: [aToken revisionUUID]
@@ -1053,11 +1038,6 @@
 {
 	return [self itemGraphForRevisionUUID: [aToken revisionUUID]
 						   persistentRoot: [aToken revisionPersistentRootUUID]];
-}
-
-- (ETUUID *) rootObjectUUIDForRevisionID: (CORevisionID *)aToken
-{
-    return [self rootObjectUUIDForPersistentRoot: [aToken revisionPersistentRootUUID]];
 }
 
 - (COItem *) item: (ETUUID *)anitem atRevisionID: (CORevisionID *)aToken

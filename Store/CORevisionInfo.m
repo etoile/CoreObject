@@ -11,6 +11,20 @@
 @synthesize metadata = _metadata;
 @synthesize date = _date;
 
+- (ETUUID *)revisionUUID
+{
+	return [self.revisionID revisionUUID];
+}
+
+- (ETUUID *)parentRevisionUUID
+{
+	return [self.parentRevisionID revisionUUID];
+}
+
+- (ETUUID *)mergeParentRevisionUUID
+{
+	return [self.mergeParentRevisionID revisionUUID];
+}
 
 - (BOOL) isEqual:(id)object
 {
