@@ -32,6 +32,10 @@
 {
     return [[self currentBranchInfo] currentRevisionID];
 }
+- (ETUUID *)currentRevisionUUID
+{
+	return [[self currentBranchInfo] currentRevisionUUID];
+}
 
 - (NSArray *)branchInfosWithMetadataValue: (id)aValue forKey: (NSString *)aKey
 {

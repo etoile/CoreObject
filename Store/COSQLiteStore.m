@@ -742,6 +742,7 @@
                 
                 COBranchInfo *state = [[COBranchInfo alloc] init];
                 state.UUID = branch;
+				state.persistentRootUUID = aUUID;
                 state.initialRevisionID = initialRevid;
                 state.currentRevisionID = currentRevid;
 				state.headRevisionID = headRevid;

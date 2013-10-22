@@ -50,6 +50,16 @@ extern NSString * const kCOParent;
  */
 + (void)deleteStore;
 
+- (void) checkPersistentRoot: (ETUUID *)aPersistentRoot
+		  hasInitialRevision: (ETUUID *)expectedInitial
+					 current: (ETUUID *)expectedCurrent
+						head: (ETUUID *)expectedHead;
+
+- (void) checkBranch: (ETUUID *)aBranch
+  hasInitialRevision: (ETUUID *)expectedInitial
+			 current: (ETUUID *)expectedCurrent
+				head: (ETUUID *)expectedHead;
+
 @end
 
 /**

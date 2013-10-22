@@ -40,6 +40,57 @@ NSString * const kCOParent = @"parentContainer";
 	return [NSURL fileURLWithPath: [@"~/TestStore.sqlite" stringByExpandingTildeInPath]];
 }
 
+- (void) checkPersistentRoot: (ETUUID *)aPersistentRoot
+		  hasInitialRevision: (ETUUID *)expectedInitial
+					 current: (ETUUID *)expectedCurrent
+						head: (ETUUID *)expectedHead
+{
+	COPersistentRootInfo *info = [store persistentRootInfoForUUID: aPersistentRoot];
+	return [self checkBranch: info.currentBranchUUID
+		  hasInitialRevision: expectedInitial
+					 current: expectedCurrent
+						head: expectedHead];
+}
+
+- (void) checkBranch: (ETUUID *)aBranch
+  hasInitialRevision: (ETUUID *)expectedInitial
+			 current: (ETUUID *)expectedCurrent
+				head: (ETUUID *)expectedHead
+{
+	ETUUID *persistentRoot = [store persistentRootUUIDForBranchUUID: aBranch];
+	COPersistentRootInfo *info = [store persistentRootInfoForUUID: persistentRoot];
+	COBranchInfo *branchInfo = [info branchInfoForUUID: aBranch];
+	
+	UKNotNil(branchInfo);
+	
+	if (expectedInitial == nil)
+	{
+		UKNil(branchInfo.initialRevisionUUID);
+	}
+	else
+	{
+		UKObjectsEqual(expectedInitial, branchInfo.initialRevisionUUID);
+	}
+
+	if (expectedCurrent == nil)
+	{
+		UKNil(branchInfo.currentRevisionUUID);
+	}
+	else
+	{
+		UKObjectsEqual(expectedCurrent, branchInfo.currentRevisionUUID);
+	}
+	
+	if (expectedHead == nil)
+	{
+		UKNil(branchInfo.headRevisionUUID);
+	}
+	else
+	{
+		UKObjectsEqual(expectedHead, branchInfo.headRevisionUUID);
+	}
+}
+
 @end
 
 @implementation EditingContextTestCase

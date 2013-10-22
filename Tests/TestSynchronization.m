@@ -120,10 +120,10 @@ static ETUUID *branchBUUID;
     UKObjectsNotEqual(branchAUUID, [replicatedBranchA UUID]);
     
     // Check out the revisions of the branches
-    
-    UKObjectsEqual([[serverInfo currentRevisionID] revisionUUID], [[currentBranch currentRevisionID] revisionUUID]);
-    UKObjectsEqual([[serverInfo currentRevisionID] revisionUUID], [[replicatedBranchA currentRevisionID] revisionUUID]);
-    UKObjectsEqual([[serverInfo currentRevisionID] revisionUUID], [[replicatedBranchB currentRevisionID] revisionUUID]);
+
+    UKObjectsEqual([serverInfo currentRevisionUUID], [currentBranch currentRevisionUUID]);
+    UKObjectsEqual([serverInfo currentRevisionUUID], [replicatedBranchA currentRevisionUUID]);
+    UKObjectsEqual([serverInfo currentRevisionUUID], [replicatedBranchB currentRevisionUUID]);
     
     UKObjectsEqual([self itemGraphWithLabel: @"1"], [store itemGraphForRevisionID: [currentBranch currentRevisionID]]);
     UKObjectsEqual([self itemGraphWithLabel: @"1"], [store itemGraphForRevisionID: [replicatedBranchA currentRevisionID]]);

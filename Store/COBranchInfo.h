@@ -6,6 +6,7 @@
 {
 @private
     ETUUID *uuid_;
+    ETUUID *_persistentRootUUID;
     CORevisionID *initialRevisionId_;
     CORevisionID *headRevisionId_;
     CORevisionID *currentRevisionId_;
@@ -15,6 +16,8 @@
 }
 
 @property (readwrite, nonatomic, strong) ETUUID *UUID;
+
+@property (readwrite, nonatomic, strong) ETUUID *persistentRootUUID;
 
 /**
  * The newest revision on the branch.
@@ -47,6 +50,19 @@
  * The current revision of this branch.
  */
 @property (readwrite, nonatomic, strong) CORevisionID *currentRevisionID;
+
+
+@property (readwrite, nonatomic, strong) ETUUID *headRevisionUUID;
+/**
+ * The oldest revision on the branch. Indicates "where a feature branch was
+ * forked from master"
+ */
+@property (readwrite, nonatomic, strong) ETUUID *initialRevisionUUID;
+/**
+ * The current revision of this branch.
+ */
+@property (readwrite, nonatomic, strong) ETUUID *currentRevisionUUID;
+
 /**
  * Metadata, like the user-facing name of the branch.
  * Note that branches have metadata while persistent roots do not. Persistent

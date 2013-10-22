@@ -319,12 +319,12 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         return YES;
     }
     
-    if (![[[self branchInfo] currentRevisionID] isEqual: _currentRevisionID])
+    if (![[[self branchInfo] currentRevisionUUID] isEqual: [_currentRevisionID revisionUUID]])
     {
         return YES;
     }
     
-	if (![[[self branchInfo] headRevisionID] isEqual: _newestRevisionID])
+	if (![[[self branchInfo] headRevisionUUID] isEqual: [_newestRevisionID revisionUUID]])
     {
         return YES;
     }
@@ -367,13 +367,13 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         _metadataChanged = NO;
     }
     
-    if (![[[self branchInfo] currentRevisionID] isEqual: _currentRevisionID])
+    if (![[[self branchInfo] currentRevisionUUID] isEqual: [_currentRevisionID revisionUUID]])
     {
         [self setCurrentRevision:
             [[self editingContext] revisionForRevisionID: [[self branchInfo] currentRevisionID]]];
     }
 
-	if (![[[self branchInfo] headRevisionID] isEqual: _newestRevisionID])
+	if (![[[self branchInfo] headRevisionUUID] isEqual: [_newestRevisionID revisionUUID]])
     {
         [self setHeadRevision:
 		 [[self editingContext] revisionForRevisionID: [[self branchInfo] headRevisionID]]];
@@ -534,8 +534,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         
         _isCreated = YES;
     }
-    else if (![[[self branchInfo] currentRevisionID] isEqual: _currentRevisionID]
-			 || ![[[self branchInfo] headRevisionID] isEqual: _newestRevisionID] )
+    else if (![[[self branchInfo] currentRevisionUUID] isEqual: [_currentRevisionID revisionUUID]]
+			 || ![[[self branchInfo] headRevisionUUID] isEqual: [_newestRevisionID revisionUUID]] )
     {
         CORevisionID *old = [[self branchInfo] currentRevisionID];
         assert(old != nil);
