@@ -22,6 +22,7 @@
 
 #import "COPersistentRoot+Private.h"
 #import "COSQLiteStore+Private.h"
+#import "COStoreTransaction.h"
 
 #define SA(x) [NSSet setWithArray: x]
 

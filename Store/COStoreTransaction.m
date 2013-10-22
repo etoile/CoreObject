@@ -68,9 +68,11 @@
                              branchUUID: (ETUUID*)branch
 {
     NILARG_EXCEPTION_TEST(anItemTree);
-    NILARG_EXCEPTION_TEST(aRevisionUUID);
-    NILARG_EXCEPTION_TEST(aUUID);
-    NILARG_EXCEPTION_TEST(branch);
+    NSParameterAssert([aRevisionUUID isKindOfClass: [ETUUID class]]);
+    NSParameterAssert(aParent == nil || [aParent isKindOfClass: [ETUUID class]]);
+	NSParameterAssert(aMergeParent == nil || [aMergeParent isKindOfClass: [ETUUID class]]);
+    NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
+    NSParameterAssert([branch isKindOfClass: [ETUUID class]]);
     
     COStoreWriteRevision *op = [[COStoreWriteRevision alloc] init];
     op.modifiedItems = anItemTree;
@@ -136,6 +138,22 @@
     }
     
     return plist;
+}
+
+/**
+ * Convenience method
+ */
+- (COPersistentRootInfo *) createPersistentRootCopyWithUUID: (ETUUID *)uuid
+												 branchUUID: (ETUUID *)aBranchUUID
+								   parentPersistentRootUUID: (ETUUID *)aParentPersistentRoot
+										   parentBranchUUID: (ETUUID *)aParentBranch
+											initialRevision: (ETUUID *)aRevision
+{
+	return [self createPersistentRootWithUUID: uuid
+								   branchUUID: aBranchUUID
+							 parentBranchUUID: aParentBranch
+									   isCopy: YES
+							  initialRevision: [CORevisionID revisionWithPersistentRootUUID: aParentPersistentRoot revisionUUID: aRevision]];
 }
 
 /**

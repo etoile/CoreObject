@@ -8,6 +8,7 @@
 @interface TestSynchronization : EditingContextTestCase <UKTest>
 {
     COSQLiteStore *serverStore;
+	int64_t serverChangeCount;
 }
 @end
 
@@ -25,7 +26,7 @@ static ETUUID *branchBUUID;
         rootItemUUID = [[ETUUID alloc] init];
         persistentRootUUID = [[ETUUID alloc] init];
         branchAUUID = [[ETUUID alloc] init];
-        branchBUUID = [[ETUUID alloc] init];        
+        branchBUUID = [[ETUUID alloc] init];
     }
 }
 
@@ -53,20 +54,19 @@ static ETUUID *branchBUUID;
 
 - (void)testReplicateToClientWithoutPersistentRoot
 {
-    [serverStore beginTransactionWithError: NULL];
-    COPersistentRootInfo *serverInfo = [serverStore createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
-                                                                                        UUID: persistentRootUUID
-                                                                                  branchUUID: branchAUUID
-                                                                            revisionMetadata: nil
-                                                                                       error: NULL];
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    COPersistentRootInfo *serverInfo = [txn createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
+																				UUID: persistentRootUUID
+																		  branchUUID: branchAUUID
+																	revisionMetadata: nil];
     UKNotNil(serverInfo);
-    UKTrue([serverStore createBranchWithUUID: branchBUUID
-                                parentBranch: nil
-                             initialRevision: [serverInfo currentRevisionID]
-                           forPersistentRoot: persistentRootUUID
-                                       error: NULL]);
+	[txn createBranchWithUUID: branchBUUID
+				 parentBranch: nil
+			  initialRevision: [[serverInfo currentRevisionID] revisionUUID]
+			forPersistentRoot: persistentRootUUID];
     UKObjectsEqual(branchAUUID, [serverInfo currentBranchUUID]);
-    [serverStore commitTransactionWithError: NULL];
+	serverChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: persistentRootUUID];
+    UKTrue([serverStore commitStoreTransaction: txn]);
     
     /* 
        * = current branch
@@ -139,13 +139,13 @@ static ETUUID *branchBUUID;
     COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
     COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
     
-    [serverStore beginTransactionWithError: NULL];
-    COPersistentRootInfo *serverInfo = [serverStore createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
-                                                                                        UUID: persistentRootUUID
-                                                                                  branchUUID: branchAUUID
-                                                                            revisionMetadata: nil
-                                                                                       error: NULL];
-    [serverStore commitTransactionWithError: NULL];
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    COPersistentRootInfo *serverInfo = [txn createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
+																				UUID: persistentRootUUID
+																		  branchUUID: branchAUUID
+																	revisionMetadata: nil];
+	serverChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: persistentRootUUID];
+    UKTrue([serverStore commitStoreTransaction: txn]);
 
     // Pull from server to client
         
@@ -160,23 +160,25 @@ static ETUUID *branchBUUID;
     
     // Server writes a second commit.
     
-    [serverStore beginTransactionWithError: NULL];
-    CORevisionID *serverCommit2 = [serverStore writeRevisionWithItemGraph: [self itemGraphWithLabel: @"2"]
-                                                             revisionUUID: [ETUUID UUID]
-                                                                 metadata: nil
-                                                         parentRevisionID: [serverInfo currentRevisionID]
-                                                    mergeParentRevisionID: nil
-															   branchUUID: branchAUUID
-                                                       persistentRootUUID: persistentRootUUID
-                                                                    error: NULL];
+    txn = [[COStoreTransaction alloc] init];
+    CORevisionID *serverCommit2 = [CORevisionID revisionWithPersistentRootUUID: persistentRootUUID revisionUUID: [ETUUID UUID]];
+	
+	[txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"2"]
+						   revisionUUID: [serverCommit2 revisionUUID]
+							   metadata: nil
+					   parentRevisionID: [[serverInfo currentRevisionID] revisionUUID]
+				  mergeParentRevisionID: nil
+					 persistentRootUUID: persistentRootUUID
+							 branchUUID: branchAUUID];
 
-    UKTrue([serverStore setCurrentRevision: serverCommit2
-						   initialRevision: nil
-							  headRevision: nil
-                                 forBranch: branchAUUID
-                          ofPersistentRoot: persistentRootUUID
-                                     error: NULL]);
-    [serverStore commitTransactionWithError: NULL];
+    [txn setCurrentRevision: [serverCommit2 revisionUUID]
+			   headRevision: nil
+				  forBranch: branchAUUID
+		   ofPersistentRoot: persistentRootUUID];
+	
+	serverChangeCount = [txn setOldTransactionID: serverChangeCount forPersistentRoot: persistentRootUUID];
+	
+    UKTrue([serverStore commitStoreTransaction: txn]);
     
     // Pull from server to client
     
@@ -211,39 +213,38 @@ static ETUUID *branchBUUID;
     COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
     COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
 
-    [serverStore beginTransactionWithError: NULL];
-    COPersistentRootInfo *serverInfo = [serverStore createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
-                                                                                        UUID: persistentRootUUID
-                                                                                  branchUUID: branchAUUID
-                                                                            revisionMetadata: nil
-                                                                                       error: NULL];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    COPersistentRootInfo *serverInfo = [txn createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
+																				UUID: persistentRootUUID
+																		  branchUUID: branchAUUID
+																	revisionMetadata: nil];
     
     ETUUID *cheapCopyUUID = [ETUUID UUID];
     ETUUID *cheapCopyBranchUUID = [ETUUID UUID];
-    COPersistentRootInfo *serverCheapCopyInfo = [serverStore createPersistentRootWithInitialRevision: [serverInfo currentRevisionID]
-                                                                                                UUID: cheapCopyUUID
-                                                                                          branchUUID: cheapCopyBranchUUID
-																					parentBranchUUID: nil
-                                                                                               error: NULL];    
+    COPersistentRootInfo *serverCheapCopyInfo = [txn createPersistentRootWithUUID: cheapCopyUUID
+																	   branchUUID: cheapCopyBranchUUID
+																 parentBranchUUID: nil
+																		   isCopy: YES
+																  initialRevision: [serverInfo currentRevisionID]];
+	
     // Server writes a second commit.
     
-    CORevisionID *serverCommit2 = [serverStore writeRevisionWithItemGraph: [self itemGraphWithLabel: @"2"]
-                                                             revisionUUID: [ETUUID UUID]
-                                                                 metadata: nil
-                                                         parentRevisionID: [serverCheapCopyInfo currentRevisionID]
-                                                    mergeParentRevisionID: nil
-	                                                           branchUUID: branchAUUID
-                                                       persistentRootUUID: cheapCopyUUID
-                                                                    error: NULL];
+    CORevisionID *serverCommit2 = [CORevisionID revisionWithPersistentRootUUID: cheapCopyUUID revisionUUID: [ETUUID UUID]];
+	
+	[txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"2"]
+						   revisionUUID: [serverCommit2 revisionUUID]
+							   metadata: nil
+					   parentRevisionID: [[serverCheapCopyInfo currentRevisionID] revisionUUID]
+				  mergeParentRevisionID: nil
+					 persistentRootUUID: cheapCopyUUID
+							 branchUUID: branchAUUID];
 
-    UKTrue([serverStore setCurrentRevision: serverCommit2
-						   initialRevision: nil
-							  headRevision: nil
-                                 forBranch: cheapCopyBranchUUID
-                          ofPersistentRoot: cheapCopyUUID
-                                     error: NULL]);
+	[txn setCurrentRevision: [serverCommit2 revisionUUID]
+			   headRevision: nil
+				  forBranch: cheapCopyBranchUUID
+		   ofPersistentRoot: cheapCopyUUID];
     
-    [serverStore commitTransactionWithError: NULL];
+    UKTrue([serverStore commitStoreTransaction: txn]);
     
     // Replicate the original persistent root on the client
     

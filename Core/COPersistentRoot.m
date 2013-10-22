@@ -355,6 +355,14 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 	return _lastTransactionID;
 }
 
+/**
+ * Framework private
+ */
+- (void) setLastTransactionID: (int64_t) value
+{
+	_lastTransactionID = value;
+}
+
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
 					metadata: (NSDictionary *)additionalMetadata
 				   undoTrack: (COUndoTrack *)undoTrack
@@ -423,8 +431,6 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
 		[NSException raise: NSGenericException
 					format: @"Attempted to commit changes to deleted persistent root %@", self];
 	}
-	
-	_lastTransactionID = [txn setOldTransactionID: _lastTransactionID forPersistentRoot: [self UUID]];
 	
 	ETAssert([[self rootObject] isRoot]);
     
@@ -500,7 +506,7 @@ cheapCopyRevisionID: (CORevisionID *)cheapCopyRevisionID
             [branch saveDeletionWithTransaction: txn];
         }
     }
-
+	
 	ETAssert([[self branchesPendingInsertion] isEmpty]);
 	[_branchesPendingDeletion removeAllObjects];
 	[_branchesPendingUndeletion removeAllObjects];

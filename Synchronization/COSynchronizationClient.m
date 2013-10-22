@@ -3,6 +3,7 @@
 
 #import "COSQLiteStore.h"
 #import "COSQLiteStore+Private.h"
+#import "COStoreTransaction.h"
 
 @implementation COSynchronizationClient
 
@@ -32,18 +33,17 @@
              @"serverID" : anID};
 }
 
-static CORevisionID *RevisionIDForRevisionUUID(NSString *aRevisionUUID, ETUUID *persistentRoot, COSQLiteStore *aStore)
+static ETUUID *RevisionUUIDFromString(NSString *aRevisionUUID)
 {
     if (aRevisionUUID != nil)
     {
         ETUUID *uuid = [ETUUID UUIDWithString: aRevisionUUID];
-        CORevisionID *revid = [aStore revisionIDForRevisionUUID: uuid persistentRootUUID: persistentRoot];
-        return revid;
+        return uuid;
     }
     return nil;
 }
 
-static void DFSInsertRevisions(NSMutableSet *revisionUUIDsToHandle, ETUUID *revisionUUID, NSDictionary *revisionsPlist, COSQLiteStore *store, ETUUID *persistentRoot)
+static void DFSInsertRevisions(NSMutableSet *revisionUUIDsToHandle, ETUUID *revisionUUID, NSDictionary *revisionsPlist, COStoreTransaction *txn, ETUUID *persistentRoot)
 {
     if (![revisionUUIDsToHandle containsObject: revisionUUID])
     {
@@ -62,11 +62,11 @@ static void DFSInsertRevisions(NSMutableSet *revisionUUIDsToHandle, ETUUID *revi
     
     if (parentString != nil)
     {
-        DFSInsertRevisions(revisionUUIDsToHandle, [ETUUID UUIDWithString: parentString], revisionsPlist, store, persistentRoot);
+        DFSInsertRevisions(revisionUUIDsToHandle, [ETUUID UUIDWithString: parentString], revisionsPlist, txn, persistentRoot);
     }    
     if (mergeParentString != nil)
     {
-        DFSInsertRevisions(revisionUUIDsToHandle, [ETUUID UUIDWithString: mergeParentString], revisionsPlist, store, persistentRoot);
+        DFSInsertRevisions(revisionUUIDsToHandle, [ETUUID UUIDWithString: mergeParentString], revisionsPlist, txn, persistentRoot);
     }
  
     // Now both parents are inserted, or were already in our store.
@@ -74,24 +74,20 @@ static void DFSInsertRevisions(NSMutableSet *revisionUUIDsToHandle, ETUUID *revi
     id metadata = revDict[@"info"][@"metadata"];
     COItemGraph *graph = COItemGraphFromJSONPropertyLisy(revDict[@"graph"]);
     
-    CORevisionID *parentRevid = RevisionIDForRevisionUUID(parentString, persistentRoot, store);
-    CORevisionID *mergeParentRevid = RevisionIDForRevisionUUID(mergeParentString, persistentRoot, store);
+    ETUUID *parentRevid = RevisionUUIDFromString(parentString);
+    ETUUID *mergeParentRevid = RevisionUUIDFromString(mergeParentString);
 	ETUUID *branchUUID = [ETUUID UUIDWithString: revDict[@"info"][@"branchUUID"]];
 	
-    CORevisionID *revid = [store writeRevisionWithItemGraph: graph
-                                               revisionUUID: revisionUUID
-                                                   metadata: metadata
-                                           parentRevisionID: parentRevid
-                                      mergeParentRevisionID: mergeParentRevid
-												 branchUUID: branchUUID
-                                         persistentRootUUID: persistentRoot
-                                                      error: NULL];
-    
-    assert([[revid revisionUUID] isEqual: revisionUUID]);
-    assert(revid != nil);
+	[txn writeRevisionWithModifiedItems: graph
+						   revisionUUID: revisionUUID
+							   metadata: metadata
+					   parentRevisionID: parentRevid
+				  mergeParentRevisionID: mergeParentRevid
+					 persistentRootUUID: persistentRoot
+							 branchUUID: branchUUID];
 }
 
-static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, ETUUID *persistentRoot)
+static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *txn, ETUUID *persistentRoot)
 {
     NSMutableSet *revisionUUIDsToHandle = [NSMutableSet set];
     for (NSString *revisionUUIDString in revisionsPlist)
@@ -107,14 +103,14 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
     while (![revisionUUIDsToHandle isEmpty])
     {
         DFSInsertRevisions(revisionUUIDsToHandle, [revisionUUIDsToHandle anyObject],
-                           revisionsPlist, store, persistentRoot);
+                           revisionsPlist, txn, persistentRoot);
     }
 }
 
 - (void) handleUpdateResponse: (NSDictionary *)aResponse
                         store: (COSQLiteStore *)aStore
 {
-    assert([aStore beginTransactionWithError: NULL]);
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
     
     NSString *serverID = aResponse[@"serverID"];
     ETUUID *persistentRoot = [ETUUID UUIDWithString: aResponse[@"persistentRoot"]];
@@ -126,13 +122,15 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
     {
         // No: create it
         
-        info = [aStore createPersistentRootWithUUID: persistentRoot error: NULL];
-        assert(info != nil);
+		[txn createPersistentRootWithUUID: persistentRoot persistentRootForCopy: nil];
+		
+        info = [[COPersistentRootInfo alloc] init];
+		info.UUID = persistentRoot;
     }
     
     // Insert the revisions the server sent us.
     
-    InsertRevisions(aResponse[@"revisions"], aStore, persistentRoot);
+    InsertRevisions(aResponse[@"revisions"], txn, persistentRoot);
 
     ETUUID *currentBranchUUID = [ETUUID UUIDWithString: aResponse[@"currentBranchUUID"]];
     ETUUID *replicatedServerCurrentRevision = nil;
@@ -155,10 +153,8 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
             }
         }
         
-        CORevisionID *currentRevisionID = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: branchPlist[@"currentRevisionID"]]
-                                                         persistentRootUUID: persistentRoot];
-        CORevisionID *initialRevisionID = [aStore revisionIDForRevisionUUID: [ETUUID UUIDWithString: branchPlist[@"initialRevisionID"]]
-                                                 persistentRootUUID: persistentRoot];
+        ETUUID *currentRevisionID = [ETUUID UUIDWithString: branchPlist[@"currentRevisionID"]];
+        ETUUID *initialRevisionID = [ETUUID UUIDWithString: branchPlist[@"initialRevisionID"]];
         
         ETUUID *branchUUID;
         
@@ -168,33 +164,28 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
             
             branchUUID = [ETUUID UUID];
             
-            assert([aStore createBranchWithUUID: branchUUID
-                                   parentBranch: nil
-                                initialRevision: currentRevisionID
-                              forPersistentRoot: persistentRoot
-                                          error: NULL]);
+            [txn createBranchWithUUID: branchUUID
+						 parentBranch: nil
+					  initialRevision: currentRevisionID
+					forPersistentRoot: persistentRoot];
             
-            BOOL ok = [aStore setMetadata: @{ @"source" : serverID, @"replcatedBranch" : branchUUIDString }
-                                forBranch: branchUUID
-                         ofPersistentRoot: persistentRoot
-                                    error: NULL];
-            assert(ok);
+            [txn setMetadata: @{ @"source" : serverID, @"replcatedBranch" : branchUUIDString }
+				   forBranch: branchUUID
+			ofPersistentRoot: persistentRoot];
         }
         else
         {
             branchUUID = [branchToUpdate UUID];
         }
         
-        assert([aStore setCurrentRevision: currentRevisionID
-                              initialRevision: initialRevisionID
-							 headRevision: initialRevisionID // FIXME: What should headRevision be set to? nil ot initialRevisionID?
-                                 forBranch: branchUUID
-                          ofPersistentRoot: persistentRoot
-                                    error: NULL]);
+        [txn setCurrentRevision: currentRevisionID
+				   headRevision: initialRevisionID // FIXME: What should headRevision be set to? nil ot initialRevisionID?
+					  forBranch: branchUUID
+			   ofPersistentRoot: persistentRoot];
         
         if ([branchUUIDString isEqualToString: aResponse[@"currentBranchUUID"]])
         {
-            replicatedServerCurrentRevision = currentRevisionID.revisionUUID;
+            replicatedServerCurrentRevision = currentRevisionID;
         }
     }
     
@@ -202,19 +193,20 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COSQLiteStore *store, 
 
     if ([info currentBranchUUID] == nil)
     {
-        assert([aStore createBranchWithUUID: currentBranchUUID
-                               parentBranch: nil
-                            initialRevision: [CORevisionID revisionWithPersistentRootUUID: persistentRoot
-                                                                             revisionUUID: replicatedServerCurrentRevision]
-                          forPersistentRoot: persistentRoot
-                                      error: NULL]);
+        [txn createBranchWithUUID: currentBranchUUID
+					 parentBranch: nil
+				  initialRevision: replicatedServerCurrentRevision
+				forPersistentRoot: persistentRoot];
         
-        assert([aStore setCurrentBranch: currentBranchUUID
-                      forPersistentRoot: persistentRoot
-                                  error: NULL]);
+        [txn setCurrentBranch: currentBranchUUID
+			forPersistentRoot: persistentRoot];
     }
     
-    assert([aStore commitTransactionWithError: NULL]);
+	[txn setOldTransactionID: info.transactionID forPersistentRoot: persistentRoot];
+	
+    BOOL ok = [aStore commitStoreTransaction: txn];
+	
+	ETAssert(ok);
 }
 
 @end

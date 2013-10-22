@@ -630,8 +630,6 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (void)saveDeletionWithTransaction: (COStoreTransaction *)txn
 {
-    COSQLiteStore *store = [self store];
-    
     // Write branch deletion
     
     if ([self isDeleted] && ![[self branchInfo] isDeleted])

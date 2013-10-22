@@ -182,17 +182,31 @@
         [db_ beginTransaction];
         
 		// update the last transaction field before we commit.
-        // FIXME: Validate transaction ID
 		
 		NSMutableDictionary *txnIDForPersistentRoot = [[NSMutableDictionary alloc] init];
 		
         for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
         {
-			int64_t txnId = [aTransaction oldTransactionIDForPersistentRoot: modifiedUUID] + 1;
-            [db_ executeUpdate: @"UPDATE persistentroots SET transactionid = ? WHERE uuid = ?",
-			 @(txnId), [modifiedUUID dataValue]];
+			const BOOL isPresent = [db_ boolForQuery: @"SELECT COUNT(*) > 0 FROM persistentroots WHERE uuid = ?", [modifiedUUID dataValue]];
 			
-			txnIDForPersistentRoot[modifiedUUID] = @(txnId);
+			int64_t currentValue = [db_ int64ForQuery: @"SELECT transactionid FROM persistentroots WHERE uuid = ?", [modifiedUUID dataValue]];
+			int64_t clientValue = [aTransaction oldTransactionIDForPersistentRoot: modifiedUUID];
+			
+			if (clientValue != currentValue && isPresent)
+			{
+				ok = NO;
+				NSLog(@"Transaction id mismatch for %@. DB had %d, transaction had %d",
+					  modifiedUUID, (int)currentValue, (int)clientValue);
+				[db_ rollback];
+				return;
+			}
+			
+			int64_t newValue = clientValue + 1;
+			
+            [db_ executeUpdate: @"UPDATE persistentroots SET transactionid = ? WHERE uuid = ?",
+			 @(newValue), [modifiedUUID dataValue]];
+			
+			txnIDForPersistentRoot[modifiedUUID] = @(newValue);
         }
         
         for (id<COStoreAction> op in aTransaction.operations)
@@ -614,28 +628,6 @@
     }
 }
 
-// Public method
-- (CORevisionID *) writeRevisionWithItemGraph: (COItemGraph*)anItemTree
-                                 revisionUUID: (ETUUID *)aRevisionUUID
-                                     metadata: (NSDictionary *)metadata
-                             parentRevisionID: (CORevisionID *)aParent
-                        mergeParentRevisionID: (CORevisionID *)aMergeParent
-                                   branchUUID: (ETUUID *)aBranchUUID
-                           persistentRootUUID: (ETUUID *)aPersistentRootUUID
-                                        error: (NSError **)error
-{
-    [transaction_ writeRevisionWithModifiedItems: anItemTree
-                                    revisionUUID: aRevisionUUID
-                                        metadata: metadata
-                                parentRevisionID: aParent.revisionUUID
-                           mergeParentRevisionID: aMergeParent.revisionUUID
-                              persistentRootUUID: aPersistentRootUUID
-                                      branchUUID: aBranchUUID];
-    
-    return [CORevisionID revisionWithPersistentRootUUID: aPersistentRootUUID
-                                           revisionUUID: aRevisionUUID];
-}
-
 /** @taskunit persistent roots */
 
 - (BOOL) checkAndUpdateChangeCount: (int64_t *)aChangeCount forPersistentRootId: (NSNumber *)root_id
@@ -824,115 +816,6 @@
     return nil;
 }
 
-- (COPersistentRootInfo *) createPersistentRootWithUUID: (ETUUID *)uuid
-                                             branchUUID: (ETUUID *)aBranchUUID
-									   parentBranchUUID: (ETUUID *)aParentBranch
-                                                 isCopy: (BOOL)isCopy
-                                        initialRevision: (CORevisionID *)aRevision
-                                                  error: (NSError **)error
-{
-	return [transaction_ createPersistentRootWithUUID: uuid
-										   branchUUID: aBranchUUID
-									 parentBranchUUID: aParentBranch
-											   isCopy: isCopy
-									  initialRevision: aRevision];
-}
-
-- (COPersistentRootInfo *) createPersistentRootWithInitialItemGraph: (id<COItemGraph>)contents
-                                                               UUID: (ETUUID *)persistentRootUUID
-                                                         branchUUID: (ETUUID *)aBranchUUID
-                                                   revisionMetadata: (NSDictionary *)metadata
-                                                              error: (NSError **)error
-{
-    [self checkInTransaction];
-
-	return [transaction_ createPersistentRootWithInitialItemGraph: contents
-															 UUID: persistentRootUUID
-													   branchUUID: aBranchUUID
-												 revisionMetadata: metadata];
-}
-
-- (COPersistentRootInfo *) createPersistentRootWithInitialRevision: (CORevisionID *)aRevision
-                                                              UUID: (ETUUID *)persistentRootUUID
-                                                        branchUUID: (ETUUID *)aBranchUUID
-												  parentBranchUUID: (ETUUID *)aParentBranch
-                                                             error: (NSError **)error
-{
-    [self checkInTransaction];
-    
-    NILARG_EXCEPTION_TEST(aRevision);
-    NILARG_EXCEPTION_TEST(persistentRootUUID);
-    NILARG_EXCEPTION_TEST(aBranchUUID);
-    //[self validateRevision: aRevision];
-    
-    return [self createPersistentRootWithUUID: persistentRootUUID
-                                   branchUUID: aBranchUUID
-							 parentBranchUUID: aParentBranch
-                                       isCopy: YES
-                              initialRevision: aRevision
-                                        error: error];
-}
-
-- (COPersistentRootInfo *) createPersistentRootWithUUID: (ETUUID *)persistentRootUUID
-                                                  error: (NSError **)error
-{
-    [self checkInTransaction];
-    [transaction_ createPersistentRootWithUUID: persistentRootUUID
-                         persistentRootForCopy: nil];
-    
-    COPersistentRootInfo *plist = [[COPersistentRootInfo alloc] init];
-    plist.UUID = persistentRootUUID;
-    plist.deleted = NO;
-    
-    return plist;
-}
-
-- (BOOL) deletePersistentRoot: (ETUUID *)aRoot
-                        error: (NSError **)error
-{
-    [self checkInTransaction];
-    [transaction_ deletePersistentRoot: aRoot];
-    
-    return YES;
-}
-
-- (BOOL) undeletePersistentRoot: (ETUUID *)aRoot
-                          error: (NSError **)error
-{
-    [self checkInTransaction];
-    [transaction_ undeletePersistentRoot: aRoot];
-    
-    return YES;
-}
-
-- (BOOL) setCurrentBranch: (ETUUID *)aBranch
-		forPersistentRoot: (ETUUID *)aRoot
-                 error: (NSError **)error
-{
-    [self checkInTransaction];
-    
-    [transaction_ setCurrentBranch: aBranch
-                 forPersistentRoot: aRoot];
-    
-    return YES;
-}
-
-- (BOOL) createBranchWithUUID: (ETUUID *)branchUUID
-                 parentBranch: (ETUUID *)aParentBranch
-              initialRevision: (CORevisionID *)revId
-            forPersistentRoot: (ETUUID *)aRoot
-                        error: (NSError **)error
-{
-    [self checkInTransaction];
-    
-    [transaction_ createBranchWithUUID: branchUUID
-						  parentBranch: aParentBranch
-                       initialRevision: revId.revisionUUID
-                     forPersistentRoot: aRoot];
-    
-    return YES;
-}
-
 - (void) validateRevision: (CORevisionID*)aRev
 {
     if (aRev == nil)
@@ -958,58 +841,6 @@
     }
     
     [self validateRevision: aRev];
-}
-
-- (BOOL) setCurrentRevision: (CORevisionID*)currentRev
-			initialRevision: (CORevisionID*)initialRev
-               headRevision: (CORevisionID*)headRev
-                  forBranch: (ETUUID *)aBranch
-           ofPersistentRoot: (ETUUID *)aRoot
-                      error: (NSError **)error
-{
-    [self checkInTransaction];
-    [transaction_ setCurrentRevision: currentRev.revisionUUID
-						headRevision: headRev.revisionUUID
-                           forBranch: aBranch
-                    ofPersistentRoot: aRoot];
-    
-    return YES;
-}
-
-
-- (BOOL) deleteBranch: (ETUUID *)aBranch
-     ofPersistentRoot: (ETUUID *)aRoot
-                error: (NSError **)error
-{
-    [self checkInTransaction];
-    [transaction_ deleteBranch: aBranch
-              ofPersistentRoot: aRoot];
-    
-    return YES;
-}
-
-- (BOOL) undeleteBranch: (ETUUID *)aBranch
-       ofPersistentRoot: (ETUUID *)aRoot
-                  error: (NSError **)error
-{
-    [self checkInTransaction];
-    [transaction_ undeleteBranch: aBranch
-                ofPersistentRoot: aRoot];
-    
-    return YES;
-}
-
-- (BOOL) setMetadata: (NSDictionary *)meta
-           forBranch: (ETUUID *)aBranch
-    ofPersistentRoot: (ETUUID *)aRoot
-               error: (NSError **)error
-{
-    [self checkInTransaction];
-    [transaction_ setMetadata: meta
-                    forBranch: aBranch
-             ofPersistentRoot: aRoot];
-    
-    return YES;
 }
 
 - (BOOL) finalizeGarbageAttachments

@@ -60,6 +60,17 @@
 									   parentBranchUUID: (ETUUID *)aParentBranch
                                                  isCopy: (BOOL)isCopy
                                         initialRevision: (CORevisionID *)aRevision;
+
+
+/**
+ * Convenience method
+ */
+- (COPersistentRootInfo *) createPersistentRootCopyWithUUID: (ETUUID *)uuid
+												 branchUUID: (ETUUID *)aBranchUUID
+								   parentPersistentRootUUID: (ETUUID *)aParentPersistentRoot
+										   parentBranchUUID: (ETUUID *)aParentBranch
+											initialRevision: (ETUUID *)aRevision;
+
 /**
  * Convenience method
  */

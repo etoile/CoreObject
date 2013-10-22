@@ -81,15 +81,14 @@ static ETUUID *rootUUID;
         // At this point the SQLite database file in dir can be freely modified, but creating files in dir will
         // fail since it's readonly, so creating new persistent roots should fail.
         
-        NSError *error = nil;
-        [store beginTransactionWithError: NULL];
-        BOOL ok = [store createPersistentRootWithInitialItemGraph: [self makeInitialItemGraph]
-                                                             UUID: [ETUUID UUID]
-                                                       branchUUID: [ETUUID UUID]
-                                                 revisionMetadata: nil
-                                                            error: &error];
-        ok = ok && [store commitTransactionWithError: NULL];
-        UKFalse(ok);
+		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+		
+		[txn createPersistentRootWithInitialItemGraph: [self makeInitialItemGraph]
+												 UUID: [ETUUID UUID]
+										   branchUUID: [ETUUID UUID]
+									 revisionMetadata: nil];
+       
+        UKFalse([store commitStoreTransaction: txn]);
     }
     
     assert([[NSFileManager defaultManager] setAttributes: REABLE_WRITABLE_SEARCHABLE_DIRECTORY_ATTRIBUTES
@@ -103,7 +102,8 @@ static ETUUID *rootUUID;
     NSString *dir = [self tempPathWithName: @"coreobject-index-become-readonly"];
     
     COPersistentRootInfo *info = nil;
-    
+    int64_t changeCount;
+	
     @autoreleasepool {
         assert([[NSFileManager defaultManager] createDirectoryAtPath: dir
                                          withIntermediateDirectories: NO
@@ -114,13 +114,13 @@ static ETUUID *rootUUID;
                                                                                isDirectory: YES]];
         UKNotNil(store);
         
-        [store beginTransactionWithError: NULL];
-        info = [store createPersistentRootWithInitialItemGraph: [self makeInitialItemGraph]
-                                                                UUID: [ETUUID UUID]
-                                                          branchUUID: [ETUUID UUID]
-                                                    revisionMetadata: nil
-                                                               error: NULL];
-        [store commitTransactionWithError: NULL];
+        COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+        info = [txn createPersistentRootWithInitialItemGraph: [self makeInitialItemGraph]
+														UUID: [ETUUID UUID]
+												  branchUUID: [ETUUID UUID]
+										    revisionMetadata: nil];
+		changeCount = [txn setOldTransactionID: -1 forPersistentRoot: [info UUID]];
+        UKTrue([store commitStoreTransaction: txn]);
         
         UKNotNil(info);
     }
@@ -139,18 +139,17 @@ static ETUUID *rootUUID;
     @autoreleasepool {
         COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir
                                                                                isDirectory: YES]];        
-        NSError *writeRevisionError = nil;
-        if ([store beginTransactionWithError: NULL])
+        
         {
-            [store writeRevisionWithItemGraph: [self makeChangedItemGraph]
-                                       revisionUUID: [ETUUID UUID]
-                                           metadata: nil
-                                   parentRevisionID: [info currentRevisionID]
-                              mergeParentRevisionID: nil
-			                             branchUUID: [info currentBranchUUID]
-                                 persistentRootUUID: [info UUID]
-                                              error: &writeRevisionError];
-            UKFalse([store commitTransactionWithError: NULL]);
+			COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+            [txn writeRevisionWithModifiedItems: [self makeChangedItemGraph]
+								   revisionUUID: [ETUUID UUID]
+									   metadata: nil
+							   parentRevisionID: [[info currentRevisionID] revisionUUID]
+						  mergeParentRevisionID: nil
+							 persistentRootUUID: [info UUID]
+									 branchUUID: [info currentBranchUUID]];
+            UKFalse([store commitStoreTransaction: txn]);
         }
         
         // Check we can still read the initial revision

@@ -516,7 +516,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 		[persistentRoot saveCommitWithMetadata: metadata transaction: transaction];
 	}
 	
-	/* Record persistent root deletions at the store level */
+	/* Add persistent root deletions to the transaction */
 	
 	for (COPersistentRoot *persistentRoot in persistentRoots)
 	{
@@ -526,20 +526,41 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
         {
             [transaction deletePersistentRoot: uuid];
             [self recordPersistentRootDeletion: persistentRoot];
-            
+        }
+        else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
+        {
+            [transaction undeletePersistentRoot: uuid];
+            [self recordPersistentRootUndeletion: persistentRoot];
+        }
+    }
+
+	/* Update transaction IDs (can't add to the transaction after this) */
+	
+	for (ETUUID *uuid in [transaction persistentRootUUIDs])
+	{
+		COPersistentRoot *persistentRoot = [self persistentRootForUUID: uuid];
+
+		persistentRoot.lastTransactionID = [transaction setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: uuid];
+	}
+	
+	/* Update _persistentRootsPendingDeletion and _persistentRootsPendingUndeletion and unload
+	   persistent roots. */
+	
+	for (COPersistentRoot *persistentRoot in persistentRoots)
+	{
+		if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
+        {
             [_persistentRootsPendingDeletion removeObject: persistentRoot];
             
             [self unloadPersistentRoot: persistentRoot];
         }
         else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
         {
-            [transaction undeletePersistentRoot: uuid];
-            [self recordPersistentRootUndeletion: persistentRoot];
-            
             [_persistentRootsPendingUndeletion removeObject: persistentRoot];
         }
     }
-
+											
+				
     ETAssert([_store commitStoreTransaction: transaction]);
 	COCommand *command = [self recordEndUndoGroupWithUndoTrack: track];
     
