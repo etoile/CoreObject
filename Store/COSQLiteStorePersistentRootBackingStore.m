@@ -9,7 +9,6 @@
 #import "COSQLiteStorePersistentRootBackingStoreBinaryFormats.h"
 #import "COItem+Binary.h"
 #import "CORevisionInfo.h"
-#import "CORevisionID.h"
 #import "COSQLiteStore.h"
 
 @interface COSQLiteStore (Private)
@@ -154,23 +153,6 @@
 
  */
 
-- (CORevisionID *) revisionIDForRevid: (int64_t)aRevid
-{
-    NSData *revUUID = [db_ dataForQuery:
-                          [NSString stringWithFormat: @"SELECT uuid FROM %@ WHERE revid = ?", [self tableName]],
-                          [NSNumber numberWithLongLong: aRevid]];
-    
-    if (revUUID != nil)
-    {
-        return [CORevisionID revisionWithPersistentRootUUID: _uuid
-                                            revisionUUID: [ETUUID UUIDWithData: revUUID]];
-    }
-    else
-    {
-        return nil;
-    }
-}
-
 - (ETUUID *) revisionUUIDForRevid: (int64_t)aRevid
 {
     NSData *revUUID = [db_ dataForQuery:
@@ -219,11 +201,6 @@
 	return result;
 }
 
-- (CORevisionInfo *) revisionForID: (CORevisionID *)aToken
-{
-	return [self revisionInfoForRevisionUUID: [aToken revisionUUID]];
-}
-
 - (int64_t) revidForUUID: (ETUUID *)aUUID
 {
     NSNumber *revid = [db_ numberForQuery:
@@ -233,11 +210,6 @@
         return -1;
     }
     return [revid longLongValue];
-}
-
-- (int64_t) revidForRevisionID: (CORevisionID *)aToken
-{
-    return [self revidForUUID: [aToken revisionUUID]];
 }
 
 - (ETUUID *) rootUUID
@@ -430,7 +402,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
  * @param aParent -1 for no parent, otherwise the parent of this commit
  * @param modifiedItems nil for all items in anItemTree, otherwise a subset
  */
-- (CORevisionID *) writeItemGraph: (COItemGraph*)anItemTree
+- (BOOL) writeItemGraph: (COItemGraph*)anItemTree
                      revisionUUID: (ETUUID *)aRevisionUUID
                      withMetadata: (NSDictionary *)metadata
                        withParent: (int64_t)aParent
@@ -546,15 +518,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
         ok = ok && [db_ commit];
     }
     
-    if (!ok)
-    {
-        return nil;
-    }
-    
-    CORevisionID *revidObject = [CORevisionID revisionWithPersistentRootUUID: _uuid
-                                                             revisionUUID: aRevisionUUID];
-
-    return revidObject;
+    return ok;
 }
 
 - (NSIndexSet *) revidsFromRevid: (int64_t)baseRevid toRevid: (int64_t)revid

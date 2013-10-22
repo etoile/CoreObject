@@ -1,6 +1,5 @@
 #import "COSQLiteStore.h"
 #import "COSQLiteStorePersistentRootBackingStore.h"
-#import "CORevisionID.h"
 #import "CORevisionInfo.h"
 #import <EtoileFoundation/Macros.h>
 #import <EtoileFoundation/ETUUID.h>
@@ -368,11 +367,6 @@
     return result;
 }
 
-- (COSQLiteStorePersistentRootBackingStore *) backingStoreForRevisionID: (CORevisionID *)aToken
-{
-    return [self backingStoreForPersistentRootUUID: [aToken revisionPersistentRootUUID]];
-}
-
 // FIXME: Implement this method for removing empty backing stores.
 // Currently the "furtherst" you can delete a persistent root leaves an
 // empty backing store (the SQLite DB should have zero rows)
@@ -479,14 +473,15 @@
  * and which branches reference that revision ID, but that should be really fast.
  */
 - (void) updateSearchIndexesForItemTree: (id<COItemGraph>)anItemTree
-                 revisionIDBeingWritten: (CORevisionID *)aRevision
+                 revisionIDBeingWritten: (ETUUID *)aRevision
+			 persistentRootBeingWritten: (ETUUID *)aPersistentRoot
 {
     assert(dispatch_get_current_queue() == queue_);
     
     [db_ savepoint: @"updateSearchIndexesForItemUUIDs"];
     
     
-    ETUUID *backingStoreUUID = [self backingUUIDForPersistentRootUUID: [aRevision revisionPersistentRootUUID]];
+    ETUUID *backingStoreUUID = [self backingUUIDForPersistentRootUUID: aPersistentRoot];
     NSData *backingUUIDData = [backingStoreUUID dataValue];
     
     NSMutableArray *ftsContent = [NSMutableArray array];
@@ -501,7 +496,7 @@
         {
             [db_ executeUpdate: @"INSERT INTO proot_refs(root_id, revid, inner_object_uuid, dest_root_id) VALUES(?,?,?,?)",
                 backingUUIDData,
-                [[aRevision revisionUUID] dataValue],
+                [aRevision dataValue],
                 [uuid dataValue],
                 [referenced dataValue]];
         }
@@ -511,7 +506,7 @@
         {
             [db_ executeUpdate: @"INSERT INTO attachment_refs(root_id, revid, attachment_hash) VALUES(?,?,?)",
              backingUUIDData ,
-             [[aRevision revisionUUID] dataValue],
+             [aRevision dataValue],
              attachment];
         }
     }
@@ -519,7 +514,7 @@
     
     [db_ executeUpdate: @"INSERT INTO fts_docid_to_revisionid(backingstore, revid) VALUES(?, ?)",
      backingUUIDData,
-     [[aRevision revisionUUID] dataValue]];
+     [aRevision dataValue]];
     
     [db_ executeUpdate: @"INSERT INTO fts(docid, text) VALUES(?,?)",
      [NSNumber numberWithLongLong: [db_ lastInsertRowId]],
@@ -532,7 +527,7 @@
     assert(![db_ hadError]);
 }
 
-- (NSArray *) revisionIDsMatchingQuery: (NSString *)aQuery
+- (NSArray *) searchResultsForQuery: (NSString *)aQuery
 {
     NSMutableArray *result = [NSMutableArray array];
     
@@ -545,9 +540,11 @@
 
         while ([rs next])
         {
-            CORevisionID *revId = [CORevisionID revisionWithPersistentRootUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]
-                                                               revisionUUID: [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]]];
-            [result addObject: revId];
+			COSearchResult *searchResult = [[COSearchResult alloc] init];
+            searchResult.innerObjectUUID = nil;
+            searchResult.revision = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
+			searchResult.persistentRoot = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+            [result addObject: searchResult];
         }
         [rs close];
     });
@@ -572,32 +569,25 @@
         return NO;
     }
     
-    CORevisionID *revid = [backing writeItemGraph: anItemTree
-                                     revisionUUID: aRevisionUUID
-                                     withMetadata: metadata
-                                       withParent: [backing revidForUUID: aParent]
-                                  withMergeParent: [backing revidForUUID: aMergeParent]
-	                                   branchUUID: branch
-                               persistentrootUUID: aUUID
-                                            error: NULL];
+    BOOL ok = [backing writeItemGraph: anItemTree
+						 revisionUUID: aRevisionUUID
+						 withMetadata: metadata
+						   withParent: [backing revidForUUID: aParent]
+					  withMergeParent: [backing revidForUUID: aMergeParent]
+						   branchUUID: branch
+				   persistentrootUUID: aUUID
+								error: NULL];
     
-    if (revid == nil)
+    if (!ok)
     {
         NSLog(@"Error creating revision");
     }
     
-    if (revid != nil)
-    {
-        assert([backing hasRevid: [backing revidForUUID: [revid revisionUUID]]]);
-        
-        [self updateSearchIndexesForItemTree: anItemTree
-                      revisionIDBeingWritten: revid];
-        return YES;
-    }
-    else
-    {
-        return NO;
-    }
+	[self updateSearchIndexesForItemTree: anItemTree
+				  revisionIDBeingWritten: aRevisionUUID
+			  persistentRootBeingWritten: aUUID];
+	
+	return YES;
 }
 
 /** @taskunit persistent roots */
@@ -786,33 +776,6 @@
     return nil;
 }
 
-- (void) validateRevision: (CORevisionID*)aRev
-{
-    if (aRev == nil)
-    {
-        return;
-    }
-    
-    COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: [aRev revisionPersistentRootUUID]];
-    
-    if (![backing hasRevid: [backing revidForRevisionID: aRev]])
-    {
-        [NSException raise: NSInvalidArgumentException
-                    format: @"CORevisionID %@ has an index not present in the backing store", aRev];
-    }
-}
-
-- (void) validateRevision: (CORevisionID*)aRev
-        forPersistentRoot: (ETUUID *)aRoot
-{
-    if (aRev == nil)
-    {
-        return;
-    }
-    
-    [self validateRevision: aRev];
-}
-
 - (BOOL) finalizeGarbageAttachments
 {
     assert(dispatch_get_current_queue() == queue_);
@@ -985,12 +948,12 @@
         COSQLiteStorePersistentRootBackingStore *bs = [self backingStoreForUUID: backingUUID error: NULL];
         for (int64_t i=0 ;; i++)
         {
-            CORevisionID *revisionID = [bs revisionIDForRevid: i];
+            ETUUID *revisionID = [bs revisionUUIDForRevid: i];
             if (revisionID == nil)
             {
                 break;
             }
-            [result appendFormat: @"\t\t %lld (UUID: %@)\n", (long long int)i, [revisionID revisionUUID]];
+            [result appendFormat: @"\t\t %lld (UUID: %@)\n", (long long int)i, revisionID];
         }
     }
     return result;

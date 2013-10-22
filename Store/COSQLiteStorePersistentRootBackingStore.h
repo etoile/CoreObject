@@ -4,7 +4,6 @@
 @class FMDatabase;
 @class COItemGraph;
 @class CORevisionInfo;
-@class CORevisionID;
 @class COSQLiteStore;
 
 /**
@@ -35,8 +34,6 @@
 - (BOOL) beginTransaction;
 - (BOOL) commit;
 
-- (CORevisionInfo *) revisionForID: (CORevisionID *)aToken;
-
 - (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aToken;
 
 - (ETUUID *) rootUUID;
@@ -56,18 +53,14 @@
                                     toRevid: (int64_t)revid
                         restrictToItemUUIDs: (NSSet *)itemSet;
 
-/**
- * 
- * @returns 0 for the first commit on an empty backing store, -1 on error
- */
-- (CORevisionID *) writeItemGraph: (COItemGraph *)anItemTree
-                     revisionUUID: (ETUUID *)aRevisionUUID
-                     withMetadata: (NSDictionary *)metadata
-                       withParent: (int64_t)aParent
-                  withMergeParent: (int64_t)aMergeParent
-                       branchUUID: (ETUUID *)aBranchUUID
-               persistentrootUUID: (ETUUID *)aPersistentRootUUID
-                            error: (NSError **)error;
+- (BOOL) writeItemGraph: (COItemGraph *)anItemTree
+		   revisionUUID: (ETUUID *)aRevisionUUID
+		   withMetadata: (NSDictionary *)metadata
+			 withParent: (int64_t)aParent
+		withMergeParent: (int64_t)aMergeParent
+			 branchUUID: (ETUUID *)aBranchUUID
+	 persistentrootUUID: (ETUUID *)aPersistentRootUUID
+				  error: (NSError **)error;
 
 - (NSIndexSet *) revidsFromRevid: (int64_t)baseRevid toRevid: (int64_t)finalRevid;
 
@@ -79,9 +72,8 @@
 - (NSIndexSet *) revidsUsedRange;
 
 - (int64_t) revidForUUID: (ETUUID *)aUUID;
-- (int64_t) revidForRevisionID: (CORevisionID *)aToken;
 
-- (CORevisionID *) revisionIDForRevid: (int64_t)aRevid;
+- (ETUUID *) revisionUUIDForRevid: (int64_t)aRevid;
 
 - (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
                        headRevisionUUID: (ETUUID *)aHeadRevUUID

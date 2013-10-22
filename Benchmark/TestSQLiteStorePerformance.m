@@ -286,7 +286,7 @@ static int itemChangedAtCommit(int i)
     
     NSDate *startDate = [NSDate date];
     
-    NSArray *results = [store revisionIDsMatchingQuery: [NSString stringWithFormat: @"\"modified %d in commit 32\"",
+    NSArray *results = [store searchResultsForQuery: [NSString stringWithFormat: @"\"modified %d in commit 32\"",
                                                          itemIndex]];
     
     NSLog(@"FTS took %lf ms", 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
@@ -294,9 +294,9 @@ static int itemChangedAtCommit(int i)
     UKTrue([results count] == 1);
     if ([results count] == 1)
     {
-        CORevisionID *revid = [results objectAtIndex: 0];
-        UKObjectsEqual([proot UUID], revid.revisionPersistentRootUUID);
-        UKObjectsEqual([revisionUUIDs objectAtIndex: 32], [revid revisionUUID]);
+        COSearchResult *result = [results objectAtIndex: 0];
+        UKObjectsEqual([proot UUID], result.persistentRoot);
+        UKObjectsEqual([revisionUUIDs objectAtIndex: 32], result.revision);
     }
 }
 

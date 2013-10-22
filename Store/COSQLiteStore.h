@@ -3,7 +3,7 @@
 
 @protocol COItemGraph;
 @class ETUUID;
-@class COItem, CORevisionID, CORevisionInfo, COItemGraph, COBranchInfo, COPersistentRootInfo;
+@class COItem, CORevisionInfo, COItemGraph, COBranchInfo, COPersistentRootInfo;
 @class FMDatabase, COStoreTransaction;
 
 enum COBranchRevisionReadingOptions
@@ -288,9 +288,9 @@ typedef NSUInteger COBranchRevisionReadingOptions;
 /** @taskunit Search. API not final. */
 
 /**
- * @returns an array of CORevisionID
+ * @returns an array of COSearchResult
  */
-- (NSArray *) revisionIDsMatchingQuery: (NSString *)aQuery;
+- (NSArray *) searchResultsForQuery: (NSString *)aQuery;
 
 /**
  * @returns an array of COSearchResult
