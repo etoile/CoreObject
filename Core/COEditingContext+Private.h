@@ -74,9 +74,15 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
  */
 - (COCrossPersistentRootReferenceCache *) crossReferenceCache;
 
-- (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid;
+- (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid persistentRootUUID: (ETUUID *)aPersistentRoot;
 
 - (COBranch *) branchForUUID: (ETUUID *)aBranch;
+
+@end
+
+@interface COEditingContext (Deprecated)
+
+- (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid;
 
 @end
 

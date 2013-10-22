@@ -46,8 +46,8 @@ extern NSString * const kCOBranchLabel;
      * recorded in _persistentRoot's _savedState, it means the user has reverted
      * to a past revision.
      */
-	CORevisionID *_currentRevisionID;
-	CORevisionID *_newestRevisionID;
+	ETUUID *_currentRevisionUUID;
+	ETUUID *_headRevisionUUID;
     
     /**
      * If different than the metadata for this branch in _persistentRoot's _savedState,

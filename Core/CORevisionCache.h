@@ -21,16 +21,16 @@
 
 /** @taskunit Revision Access */
 
-
-+ (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid
-                             storeUUID: (ETUUID *)aStoreUUID;
-
++ (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
+					  persistentRootUUID: (ETUUID *)aPersistentRoot
+							   storeUUID: (ETUUID *)aStoreUUID;
 
 /** @taskunit Subclassing */
 
 
 - (id) initWithStore: (COSQLiteStore *)aStore;
-- (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid;
+- (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
+					  persistentRootUUID: (ETUUID *)aPersistentRoot;
 
 @property (nonatomic, readonly) COSQLiteStore *store;
 
@@ -41,4 +41,11 @@
 // TODO: Don't expose. It is a cache implementation detail.
 + (id)cacheForStoreUUID: (ETUUID *)aUUID;
 
+@end
+
+@interface CORevisionCache (Deprecated)
+- (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid;
+
++ (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid
+                             storeUUID: (ETUUID *)aStoreUUID;
 @end

@@ -103,16 +103,21 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     {
         // Creating a new branch
         
-        _currentRevisionID = parentRevisionForNewBranch;
-		_newestRevisionID = parentRevisionForNewBranch;
+        _currentRevisionUUID = [parentRevisionForNewBranch revisionUUID];
+		_headRevisionUUID = [parentRevisionForNewBranch revisionUUID];
         _isCreated = NO;
         
         // If _parentRevisionID is nil, we're a new branch for a new persistent root
         // Otherwise, we're a new branch for an existing (committed) persistent root
         
-        if (_currentRevisionID != nil)
+        if (_currentRevisionUUID != nil)
         {
-            id<COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionID: _currentRevisionID];
+			ETUUID *parentPersistentRoot = [[_persistentRoot store] persistentRootUUIDForBranchUUID: _parentBranchUUID];
+			
+			// N.B., normally we could pass [[self persistentRoot] UUID] here, but our persistent root is not
+			// yet committed.
+            id<COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionUUID: _currentRevisionUUID
+																		persistentRoot: parentPersistentRoot];
             [_objectGraph setItemGraph: aGraph];
             
             ETAssert(![_objectGraph hasChanges]);
@@ -136,7 +141,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (BOOL) isBranchPersistentRootUncommitted
 {
-    return _currentRevisionID == nil && _isCreated == NO;
+    return _currentRevisionUUID == nil && _isCreated == NO;
 }
 
 - (NSString *)displayName
@@ -269,9 +274,10 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (CORevision *)headRevision
 {
-    if (_newestRevisionID != nil)
+    if (_headRevisionUUID != nil)
     {
-        return [[self editingContext] revisionForRevisionID: _newestRevisionID];
+        return [[self editingContext] revisionForRevisionUUID: _headRevisionUUID
+										   persistentRootUUID: [[self persistentRoot] UUID]];
     }
     
     return nil;
@@ -281,15 +287,16 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
 	NILARG_EXCEPTION_TEST(aRevision);
 
-	_newestRevisionID = [aRevision revisionID];
+	_headRevisionUUID = [aRevision UUID];
 }
 
 
 - (CORevision *)currentRevision
 {
-    if (_currentRevisionID != nil)
+    if (_currentRevisionUUID != nil)
     {
-        return [[self editingContext] revisionForRevisionID: _currentRevisionID];
+        return [[self editingContext] revisionForRevisionUUID: _currentRevisionUUID
+										   persistentRootUUID: [[self persistentRoot] UUID]];
     }
     return nil;
 }
@@ -298,7 +305,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
     NILARG_EXCEPTION_TEST(currentRevision);
     
-    _currentRevisionID =  [currentRevision revisionID];
+    _currentRevisionUUID = [currentRevision UUID];
     [self reloadAtRevision: currentRevision];
 }
 
@@ -319,12 +326,12 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         return YES;
     }
     
-    if (![[[self branchInfo] currentRevisionUUID] isEqual: [_currentRevisionID revisionUUID]])
+    if (![[[self branchInfo] currentRevisionUUID] isEqual: _currentRevisionUUID])
     {
         return YES;
     }
     
-	if (![[[self branchInfo] headRevisionUUID] isEqual: [_newestRevisionID revisionUUID]])
+	if (![[[self branchInfo] headRevisionUUID] isEqual: _headRevisionUUID])
     {
         return YES;
     }
@@ -367,16 +374,18 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         _metadataChanged = NO;
     }
     
-    if (![[[self branchInfo] currentRevisionUUID] isEqual: [_currentRevisionID revisionUUID]])
+    if (![[[self branchInfo] currentRevisionUUID] isEqual: _currentRevisionUUID])
     {
         [self setCurrentRevision:
-            [[self editingContext] revisionForRevisionID: [[self branchInfo] currentRevisionID]]];
+            [[self editingContext] revisionForRevisionUUID: [[self branchInfo] currentRevisionUUID]
+										persistentRootUUID: [[self persistentRoot] UUID]]];
     }
 
-	if (![[[self branchInfo] headRevisionUUID] isEqual: [_newestRevisionID revisionUUID]])
+	if (![[[self branchInfo] headRevisionUUID] isEqual: _headRevisionUUID])
     {
         [self setHeadRevision:
-		 [[self editingContext] revisionForRevisionID: [[self branchInfo] headRevisionID]]];
+		 [[self editingContext] revisionForRevisionUUID: [[self branchInfo] headRevisionUUID]
+									 persistentRootUUID: [[self persistentRoot] UUID]]];
     }
 	
     if ([self isDeleted] != [[self branchInfo] isDeleted])
@@ -518,8 +527,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 	
 	ETAssert([[_objectGraph rootObject] isRoot]);
     ETAssert(![self isBranchPersistentRootUncommitted]);
-    ETAssert(_currentRevisionID != nil);
-    ETAssert(_newestRevisionID != nil);
+    ETAssert(_currentRevisionUUID != nil);
+    ETAssert(_headRevisionUUID != nil);
     
 	if ([self isBranchUncommitted])
 	{
@@ -527,15 +536,15 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         
         [txn createBranchWithUUID: _UUID
 					 parentBranch: _parentBranchUUID
-				  initialRevision: [_currentRevisionID revisionUUID]
+				  initialRevision: _currentRevisionUUID
 				forPersistentRoot: [[self persistentRoot] UUID]];
         
         [[self editingContext] recordBranchCreation: self];
         
         _isCreated = YES;
     }
-    else if (![[[self branchInfo] currentRevisionUUID] isEqual: [_currentRevisionID revisionUUID]]
-			 || ![[[self branchInfo] headRevisionUUID] isEqual: [_newestRevisionID revisionUUID]] )
+    else if (![[[self branchInfo] currentRevisionUUID] isEqual: _currentRevisionUUID]
+			 || ![[[self branchInfo] headRevisionUUID] isEqual: _headRevisionUUID] )
     {
         CORevisionID *old = [[self branchInfo] currentRevisionID];
         assert(old != nil);
@@ -544,15 +553,15 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
         
         // This is the case when the user does [self setCurrentRevision: ], and then commits
         
-        [txn setCurrentRevision: [_currentRevisionID revisionUUID]
-				   headRevision: [_newestRevisionID revisionUUID]
+        [txn setCurrentRevision: _currentRevisionUUID
+				   headRevision: _headRevisionUUID
 					  forBranch: _UUID
 			   ofPersistentRoot: [[self persistentRoot] UUID]];
 	
 
-        [[self editingContext] recordBranchSetCurrentRevisionID: _currentRevisionID
+        [[self editingContext] recordBranchSetCurrentRevisionID: [CORevisionID revisionWithPersistentRootUUID:[[self persistentRoot] UUID] revisionUUID: _currentRevisionUUID]
                                                   oldRevisionID: old
-												 headRevisionID: _newestRevisionID
+												 headRevisionID: [CORevisionID revisionWithPersistentRootUUID:[[self persistentRoot] UUID] revisionUUID: _headRevisionUUID]
 											  oldHeadRevisionID: oldHead
                                                        ofBranch: self];
     }
@@ -583,34 +592,34 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
             self.mergingBranch = nil;
         }
         
-        CORevisionID *revId = [CORevisionID revisionWithPersistentRootUUID: [_persistentRoot UUID] revisionUUID: [ETUUID UUID]];
+        ETUUID *revUUID = [ETUUID UUID];
 		
 		[txn writeRevisionWithModifiedItems: [self modifiedItemsSnapshot]
-							   revisionUUID: [revId revisionUUID]
+							   revisionUUID: revUUID
 								   metadata: metadata
-						   parentRevisionID: [_currentRevisionID revisionUUID]
+						   parentRevisionID: _currentRevisionUUID
 					  mergeParentRevisionID: [mergeParent revisionUUID]
 						 persistentRootUUID: [_persistentRoot UUID]
 								 branchUUID: _UUID];
 
         
-        [txn setCurrentRevision: [revId revisionUUID]
-				   headRevision: [revId revisionUUID]
+        [txn setCurrentRevision: revUUID
+				   headRevision: revUUID
 					  forBranch: _UUID
 			   ofPersistentRoot: [[self persistentRoot] UUID]];
         
-        CORevisionID *oldRevid = _currentRevisionID;
-		CORevisionID *oldHeadRevid = _newestRevisionID;
+        CORevisionID *oldRevid = [CORevisionID revisionWithPersistentRootUUID:[[self persistentRoot] UUID] revisionUUID: _currentRevisionUUID];
+		CORevisionID *oldHeadRevid = [CORevisionID revisionWithPersistentRootUUID:[[self persistentRoot] UUID] revisionUUID: _headRevisionUUID];
         assert(oldRevid != nil);
         assert(oldHeadRevid != nil);
-        assert(revId != nil);
-        _currentRevisionID = revId;
-		_newestRevisionID = revId;
+        assert(revUUID != nil);
+        _currentRevisionUUID = revUUID;
+		_headRevisionUUID = revUUID;
         self.shouldMakeEmptyCommit = NO;
         
-        [[self editingContext] recordBranchSetCurrentRevisionID: _currentRevisionID
+        [[self editingContext] recordBranchSetCurrentRevisionID: [CORevisionID revisionWithPersistentRootUUID:[[self persistentRoot] UUID] revisionUUID: _currentRevisionUUID]
                                                   oldRevisionID: oldRevid
-												 headRevisionID: _currentRevisionID
+												 headRevisionID: [CORevisionID revisionWithPersistentRootUUID:[[self persistentRoot] UUID] revisionUUID: _currentRevisionUUID]
 											  oldHeadRevisionID: oldHeadRevid
                                                        ofBranch: self];
     }
@@ -660,8 +669,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     
     ETAssert(_isCreated == NO);
     
-    _currentRevisionID =  aRevisionID;
-	_newestRevisionID = aRevisionID;
+    _currentRevisionUUID =  [aRevisionID revisionUUID];
+	_headRevisionUUID = [aRevisionID revisionUUID];
     _isCreated = YES;
     
     [_objectGraph clearChangeTracking];
@@ -751,7 +760,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (void)updateRevisions
 {
-	CORevision *currentRev = [[self editingContext] revisionForRevisionID: _currentRevisionID];
+	CORevision *currentRev = [[self editingContext] revisionForRevisionUUID: _currentRevisionUUID persistentRootUUID: [[self persistentRoot] UUID]];
 
 	if ([currentRev isEqual: [_revisions lastObject]] || _revisions == nil)
 		return;
@@ -774,13 +783,13 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
     ETAssert(branchInfo != nil);
     
-    _currentRevisionID =  [branchInfo currentRevisionID];
-	_newestRevisionID = [branchInfo headRevisionID];
+    _currentRevisionUUID =  [branchInfo currentRevisionUUID];
+	_headRevisionUUID = [branchInfo headRevisionUUID];
     _metadata =  [NSMutableDictionary dictionaryWithDictionary:[branchInfo metadata]];
     _isCreated = YES;
     _parentBranchUUID = [branchInfo parentBranchUUID];
 	
-    id<COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionID: _currentRevisionID];
+    id<COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionUUID: _currentRevisionUUID persistentRoot: [[self persistentRoot] UUID]];
     [_objectGraph setItemGraph: aGraph];
 	
 	[self updateRevisions];
@@ -795,7 +804,7 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 {
     NSSet *objects;
     
-    if (_currentRevisionID == nil)
+    if (_currentRevisionUUID == nil)
     {
         objects = [_objectGraph loadedObjects];
     }

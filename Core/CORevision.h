@@ -108,7 +108,6 @@
 - (id)initWithCache: (CORevisionCache *)aCache revisionInfo: (CORevisionInfo *)aRevInfo;
 - (CORevisionID *)revisionID;
 
-
 /** @taskunit Deprecated */
 
 /** 

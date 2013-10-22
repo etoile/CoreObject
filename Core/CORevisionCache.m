@@ -48,13 +48,14 @@ static NSMutableDictionary *cachesByStoreUUID = nil;
     _revisionForRevisionID = [[NSMutableDictionary alloc] init];
     return self;
 }
-
-- (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid
+- (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
+					  persistentRootUUID: (ETUUID *)aPersistentRoot
 {
     CORevision *cached = [_revisionForRevisionID objectForKey: aRevid];
     if (cached == nil)
     {
-        CORevisionInfo *info = [[self store] revisionInfoForRevisionID: aRevid];
+        CORevisionInfo *info = [[self store] revisionInfoForRevisionUUID: aRevid
+													  persistentRootUUID: aPersistentRoot];
         
         cached = [[CORevision alloc] initWithCache: self revisionInfo: info];
         
@@ -63,9 +64,29 @@ static NSMutableDictionary *cachesByStoreUUID = nil;
     return cached;
 }
 
++ (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
+					  persistentRootUUID: (ETUUID *)aPersistentRoot
+							   storeUUID: (ETUUID *)aStoreUUID
+{
+    return [[self cacheForStoreUUID: aStoreUUID] revisionForRevisionUUID: aRevid
+													  persistentRootUUID: aPersistentRoot];
+}
+
+@end
+
+@implementation CORevisionCache (Deprecated)
+
+- (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid
+{
+	return [self revisionForRevisionUUID: [aRevid revisionUUID]
+					  persistentRootUUID: [aRevid revisionPersistentRootUUID]];
+}
+
 + (CORevision *) revisionForRevisionID: (CORevisionID *)aRevid storeUUID: (ETUUID *)aStoreUUID
 {
-    return [[self cacheForStoreUUID: aStoreUUID] revisionForRevisionID: aRevid];
+    return [self revisionForRevisionUUID: [aRevid revisionUUID]
+					  persistentRootUUID: [aRevid revisionPersistentRootUUID]
+							   storeUUID: aStoreUUID];
 }
 
 @end

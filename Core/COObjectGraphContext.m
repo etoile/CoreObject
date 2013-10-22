@@ -283,6 +283,8 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 - (void)setItemGraph: (id <COItemGraph>)aTree
 {
+	NSParameterAssert(aTree != nil);
+	
 	[self discardObjects: [self insertedObjects]];
     [self clearChangeTracking];
 
