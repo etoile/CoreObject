@@ -61,6 +61,8 @@
 - (void) recordPersistentRoot: (COPersistentRoot *)aPersistentRoot
              setCurrentBranch: (COBranch *)aBranch
                     oldBranch: (COBranch *)oldBranch;
+- (void) recordPersistentRootSetMetadata: (COPersistentRoot *)aPersistentRoot
+							 oldMetadata: (id)oldMetadata;
 
 // Called from COBranch
 

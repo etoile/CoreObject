@@ -17,6 +17,7 @@
 #import "COCommandSetCurrentVersionForBranch.h"
 #import "COCommandDeletePersistentRoot.h"
 #import "COCommandUndeletePersistentRoot.h"
+#import "COCommandSetPersistentRootMetadata.h"
 
 @implementation COEditingContext (Undo)
 
@@ -122,6 +123,20 @@
     edit.oldBranchUUID = [oldBranch UUID];
     edit.branchUUID = [aBranch UUID];
     
+    [self recordCommand: edit];
+}
+
+- (void) recordPersistentRootSetMetadata: (COPersistentRoot *)aPersistentRoot
+							 oldMetadata: (id)oldMetadata
+{
+	COCommandSetPersistentRootMetadata *edit = [[COCommandSetPersistentRootMetadata alloc] init];
+	edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
+    edit.persistentRootUUID = [aPersistentRoot UUID];
+    edit.timestamp = [NSDate date];
+    
+	edit.oldMetadata = oldMetadata;
+	edit.metadata = aPersistentRoot.metadata;
+	
     [self recordCommand: edit];
 }
 

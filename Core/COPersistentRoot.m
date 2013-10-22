@@ -537,7 +537,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		[txn setMetadata: _metadata
 	   forPersistentRoot: _UUID];
 		
-		// FIXME: Undo support for persistent root metadata
+		[_parentContext recordPersistentRootSetMetadata: self oldMetadata: [_savedState metadata]];
 		
 		_metadataChanged = NO;
 	}

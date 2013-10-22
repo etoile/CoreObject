@@ -245,6 +245,30 @@
     }
 }
 
+- (void) testUndoSetPersistentRootMetadata
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [persistentRoot setMetadata: D(@"world", @"hello")];
+    [ctx commit];
+    
+    [persistentRoot setMetadata: D(@"world2", @"hello")];
+    [ctx commitWithUndoTrack: _testTrack];
+    
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+		
+		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
+		
+        UKObjectsEqual(D(@"world2", @"hello"), [ctx2persistentRoot metadata]);
+        [testTrack undo];
+        UKObjectsEqual(D(@"world", @"hello"), [ctx2persistentRoot metadata]);
+        [testTrack redo];
+        UKObjectsEqual(D(@"world2", @"hello"), [ctx2persistentRoot metadata]);
+    }
+}
+
 - (void) testUndoSetCurrentBranch
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];

@@ -5,6 +5,7 @@
 #import "COCommandDeleteBranch.h"
 #import "COCommandUndeleteBranch.h"
 #import "COCommandSetBranchMetadata.h"
+#import "COCommandSetPersistentRootMetadata.h"
 #import "COCommandSetCurrentBranch.h"
 #import "COCommandSetCurrentVersionForBranch.h"
 #import "COCommandDeletePersistentRoot.h"
@@ -17,6 +18,7 @@ static NSString * const kCOCommandTypeEditGroup = @"COCommandTypeEditGroup";
 static NSString * const kCOCommandTypeDeleteBranch = @"COCommandTypeDeleteBranch";
 static NSString * const kCOCommandTypeUndeleteBranch = @"COCommandTypeUndeleteBranch";
 static NSString * const kCOCommandTypeSetBranchMetadata = @"COCommandTypeSetBranchMetadata";
+static NSString * const kCOCommandTypeSetPersistentRootMetadata = @"COCommandTypeSetPersistentRootMetadata";
 static NSString * const kCOCommandTypeSetCurrentBranch = @"COCommandTypeSetCurrentBranch";
 static NSString * const kCOCommandTypeSetCurrentVersionForBranch = @"COCommandTypeSetCurrentVersionForBranch";
 static NSString * const kCOCommandTypeDeletePersistentRoot = @"COCommandTypeDeletePersistentRoot";
@@ -42,7 +44,8 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
            [COCommandSetCurrentVersionForBranch class], kCOCommandTypeSetCurrentVersionForBranch,
            [COCommandDeletePersistentRoot class], kCOCommandTypeDeletePersistentRoot,
            [COCommandUndeletePersistentRoot class], kCOCommandTypeUndeletePersistentRoot, 
-	       [COCommandCreatePersistentRoot class], kCOCommandTypeCreatePersistentRoot);
+	       [COCommandCreatePersistentRoot class], kCOCommandTypeCreatePersistentRoot,
+		   [COCommandSetPersistentRootMetadata class], kCOCommandTypeSetPersistentRootMetadata);
 }
 
 + (COCommand *) commandWithPlist: (id)aPlist
