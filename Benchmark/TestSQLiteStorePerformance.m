@@ -4,7 +4,7 @@
 
 @interface TestSQLiteStorePerformance : SQLiteStoreTestCase <UKTest>
 {
-    NSMutableArray *revisionIDs;
+    NSMutableArray *revisionUUIDs;
 }
 @end
 
@@ -98,19 +98,18 @@ static int itemChangedAtCommit(int i)
 
 - (ETUUID *) makeDemoPersistentRoot
 {
-    revisionIDs =  [NSMutableArray array];
+    revisionUUIDs =  [NSMutableArray array];
     NSDate *startDate = [NSDate date];
     
     COItemGraph *initialTree = [self makeInitialItemTree];
     
     // Commit them to a persistet root
     
-    [store beginTransactionWithError: NULL];
-    COPersistentRootInfo *proot = [store createPersistentRootWithInitialItemGraph: initialTree
-                                                                            UUID: [ETUUID UUID]
-                                                                      branchUUID: [ETUUID UUID]
-                                                                        revisionMetadata: nil
-                                                                           error: NULL];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    COPersistentRootInfo *proot = [txn createPersistentRootWithInitialItemGraph: initialTree
+																		   UUID: [ETUUID UUID]
+																	 branchUUID: [ETUUID UUID]
+															   revisionMetadata: nil];
 	
 	// Make another copy of the item graph because we're going to modify it
 	// (currently you can't modify a graph passed in to -createPersistentRootWithInitialItemGraph)
@@ -118,7 +117,7 @@ static int itemChangedAtCommit(int i)
 	
 	// Commit a change to each object
 	
-    [revisionIDs addObject: [[proot currentBranchInfo] currentRevisionID]];
+    [revisionUUIDs addObject: [[[proot currentBranchInfo] currentRevisionID] revisionUUID]];
     for (int commit=1; commit<NUM_COMMITS; commit++)
     {
         int i = itemChangedAtCommit(commit);
@@ -134,25 +133,28 @@ static int itemChangedAtCommit(int i)
 		COItemGraph *deltaGraph = [[COItemGraph alloc] initWithItems: @[item]
 														rootItemUUID: [initialTree rootItemUUID]];
 		
-        [revisionIDs addObject: [store writeRevisionWithItemGraph: deltaGraph
-                                                     revisionUUID: [ETUUID UUID]
-                                                         metadata: nil
-                                                 parentRevisionID: [revisionIDs lastObject]
-                                            mergeParentRevisionID: nil 
-                                                       branchUUID: [proot currentBranchUUID]
-                                               persistentRootUUID: [proot UUID]
-                                                            error: NULL]];
+		ETUUID *revisionUUID = [ETUUID UUID];
+		
+		[txn writeRevisionWithModifiedItems: deltaGraph
+							   revisionUUID: revisionUUID
+								   metadata: nil
+						   parentRevisionID: [revisionUUIDs lastObject]
+					  mergeParentRevisionID: nil
+						 persistentRootUUID: [proot UUID]
+								 branchUUID: [proot currentBranchUUID]];
+		
+        [revisionUUIDs addObject: revisionUUID];
     }
     
     // Set the persistent root's state to the last commit
     
-    [store setCurrentRevision: [revisionIDs lastObject]
-			  initialRevision: [[proot currentBranchInfo] currentRevisionID]
-                 headRevision: [revisionIDs lastObject]
-                    forBranch: [proot currentBranchUUID]
-             ofPersistentRoot: [proot UUID]
-                        error: NULL];
+    [txn setCurrentRevision: [revisionUUIDs lastObject]
+			   headRevision: [revisionUUIDs lastObject]
+				  forBranch: [proot currentBranchUUID]
+             ofPersistentRoot: [proot UUID]];
     
+	UKTrue([store commitStoreTransaction: txn]);
+	
     NSLog(@"committing a %d-item persistent root and then making %d commits which touched 1 item each took %lf ms",
           NUM_CHILDREN, NUM_COMMITS, 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
     
@@ -161,8 +163,6 @@ static int itemChangedAtCommit(int i)
 //        NSLog(@"label: %@", [self labelForCommit: NUM_COMMITS - 1
 //                                           child: i]);
 //    }
-    
-    [store commitTransactionWithError: NULL];
     
     return [proot UUID];
 }
@@ -238,7 +238,6 @@ static int itemChangedAtCommit(int i)
 
 - (void) testReloadFullStates
 {
-    COItemGraph *initialTree = [self makeInitialItemTree];
     ETUUID *prootUUID = [self makeDemoPersistentRoot];
     
     NSDate *startDate = [NSDate date];
@@ -253,18 +252,16 @@ static int itemChangedAtCommit(int i)
         
         // Check the state
         UKObjectsEqual(rootUUID, [tree rootItemUUID]);
-		
-		// TODO: Should be UKObjectsEqual - UnitKit has performance problems
-		// cause by generating output messages that are never displayed
-        assert([[initialTree itemForUUID: rootUUID] isEqual:
-                       [tree itemForUUID: rootUUID]]);
-        
+		      
         for (int i=0; i<NUM_CHILDREN; i++)
         {
             // on rev=NUM_CHILDREN, child[NUM_CHILDREN - 1]'s name was changed
             
             NSString *expectedLabel = [self labelForCommit: rev child: i];
             
+			// TODO: Should be UKObjectsEqual - UnitKit has performance problems
+			// cause by generating output messages that are never displayed
+
             assert([expectedLabel isEqualToString:
                            [[tree itemForUUID: childUUIDs[i]] valueForAttribute: @"name"]]);
         }
@@ -298,7 +295,7 @@ static int itemChangedAtCommit(int i)
     {
         CORevisionID *revid = [results objectAtIndex: 0];
         UKObjectsEqual([proot UUID], revid.revisionPersistentRootUUID);
-        UKObjectsEqual([revisionIDs objectAtIndex: 32], revid);
+        UKObjectsEqual([revisionUUIDs objectAtIndex: 32], [revid revisionUUID]);
     }
 }
 
@@ -309,18 +306,16 @@ static int itemChangedAtCommit(int i)
     
     NSDate *startDate = [NSDate date];
     
-    [store beginTransactionWithError: NULL];
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
     for (int i =0; i<NUM_PERSISTENT_ROOTS; i++)
     {
-		[store createPersistentRootWithInitialItemGraph: it
-                                                  UUID: [ETUUID UUID]
-                                            branchUUID: [ETUUID UUID]
-                                              revisionMetadata: nil
-                                                 error: NULL];
+		[txn createPersistentRootWithInitialItemGraph: it
+												 UUID: [ETUUID UUID]
+										   branchUUID: [ETUUID UUID]
+									 revisionMetadata: nil];
     }
-    [store commitTransactionWithError: NULL];
+    UKTrue([store commitStoreTransaction: txn]);
     
-    UKPass();
     NSLog(@"creating %d persistent roots each containing a %d-item tree took %lf ms", NUM_PERSISTENT_ROOTS,
           NUM_CHILDREN_PER_PERSISTENT_ROOT, 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
@@ -331,24 +326,22 @@ static int itemChangedAtCommit(int i)
     
     COItemGraph *it = [self makeItemTreeWithChildCount: NUM_CHILDREN_PER_PERSISTENT_ROOT];
 
-    [store beginTransactionWithError: NULL];
-    COPersistentRootInfo *proot = [store createPersistentRootWithInitialItemGraph: it
-                                                                            UUID: [ETUUID UUID]
-                                                                      branchUUID: [ETUUID UUID]
-                                                                        revisionMetadata: nil
-                                                                           error: NULL];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    COPersistentRootInfo *proot = [txn createPersistentRootWithInitialItemGraph: it
+																		   UUID: [ETUUID UUID]
+																	 branchUUID: [ETUUID UUID]
+															   revisionMetadata: nil];
     
     for (int i =0; i<NUM_PERSISTENT_ROOT_COPIES; i++)
     {
-        [store createPersistentRootWithInitialRevision: [[proot currentBranchInfo] currentRevisionID]
-                                                  UUID: [ETUUID UUID]
-                                            branchUUID: [ETUUID UUID]
-									  parentBranchUUID:	nil
-                                                 error: NULL];
+        [txn createPersistentRootWithUUID: [ETUUID UUID]
+							   branchUUID: [ETUUID UUID]
+						 parentBranchUUID: nil
+								   isCopy: YES
+						  initialRevision: [[proot currentBranchInfo] currentRevisionID]];
     }
-    [store commitTransactionWithError: NULL];
+    UKTrue([store commitStoreTransaction: txn]);
     
-    UKPass();
     NSLog(@"creating %d persistent root copies took %lf ms", NUM_PERSISTENT_ROOT_COPIES,
           1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
@@ -369,13 +362,12 @@ static int itemChangedAtCommit(int i)
     
     startDate = [NSDate date];
     
-    [store beginTransactionWithError: NULL];
-    COPersistentRootInfo *proot = [store createPersistentRootWithInitialItemGraph: it
-                                                                            UUID: [ETUUID UUID]
-                                                                      branchUUID: [ETUUID UUID]
-                                                                        revisionMetadata: nil
-                                                                           error: NULL];
-    [store commitTransactionWithError: NULL];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    COPersistentRootInfo *proot = [txn createPersistentRootWithInitialItemGraph: it
+																		   UUID: [ETUUID UUID]
+																	 branchUUID: [ETUUID UUID]
+															   revisionMetadata: nil];
+    UKTrue([store commitStoreTransaction: txn]);
     
     NSLog(@"committing %d item itemtree took %lf ms", LOTS_OF_EMBEDDED_ITEMS,
           1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
