@@ -6,19 +6,19 @@
 @interface COCommandSetCurrentVersionForBranch : COSingleCommand
 {
     ETUUID *_branchUUID;
-    CORevisionID *_oldRevisionID;
-    CORevisionID *_newRevisionID;
+    ETUUID *_oldRevisionUUID;
+    ETUUID *_newRevisionUUID;
 	
-	CORevisionID *_oldHeadRevisionID;
-    CORevisionID *_newHeadRevisionID;
+	ETUUID *_oldHeadRevisionUUID;
+    ETUUID *_newHeadRevisionUUID;
 }
 
 @property (readwrite, nonatomic, copy) ETUUID *branchUUID;
-@property (readwrite, nonatomic, copy) CORevisionID *oldRevisionID;
-@property (readwrite, nonatomic, copy) CORevisionID *revisionID;
+@property (readwrite, nonatomic, copy) ETUUID *oldRevisionUUID;
+@property (readwrite, nonatomic, copy) ETUUID *revisionUUID;
 
-@property (readwrite, nonatomic, copy) CORevisionID *oldHeadRevisionID;
-@property (readwrite, nonatomic, copy) CORevisionID *headRevisionID;
+@property (readwrite, nonatomic, copy) ETUUID *oldHeadRevisionUUID;
+@property (readwrite, nonatomic, copy) ETUUID *headRevisionUUID;
 
 
 @property (nonatomic, readonly) CORevision *oldRevision;

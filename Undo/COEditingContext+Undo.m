@@ -142,25 +142,30 @@
     [self recordCommand: edit];
 }
 
-- (void) recordBranchSetCurrentRevisionID: (CORevisionID *)current
-                            oldRevisionID: (CORevisionID *)old
-						   headRevisionID: (CORevisionID *)head
-                        oldHeadRevisionID: (CORevisionID *)oldHead
-                                 ofBranch: (COBranch *)aBranch
+- (void) recordBranchSetCurrentRevisionUUID: (ETUUID *)current
+                            oldRevisionUUID: (ETUUID *)old
+						   headRevisionUUID: (ETUUID *)head
+                        oldHeadRevisionUUID: (ETUUID *)oldHead
+								   ofBranch: (COBranch *)aBranch
 
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
-    
+    NILARG_EXCEPTION_TEST(current);
+	NILARG_EXCEPTION_TEST(old);
+	NILARG_EXCEPTION_TEST(head);
+	NILARG_EXCEPTION_TEST(oldHead);
+	NILARG_EXCEPTION_TEST(aBranch);
+	
     COCommandSetCurrentVersionForBranch *edit = [[COCommandSetCurrentVersionForBranch alloc] init];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] UUID];
     edit.timestamp = [NSDate date];
     
     edit.branchUUID = [aBranch UUID];
-    edit.oldRevisionID = old;
-    edit.revisionID = current;
-	edit.headRevisionID = head;
-	edit.oldHeadRevisionID = oldHead;
+    edit.oldRevisionUUID = old;
+    edit.revisionUUID = current;
+	edit.headRevisionUUID = head;
+	edit.oldHeadRevisionUUID = oldHead;
     
     [self recordCommand: edit];
 }

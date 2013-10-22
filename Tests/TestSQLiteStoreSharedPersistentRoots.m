@@ -101,8 +101,8 @@ static ETUUID *rootUUID;
     UKNotNil(prootARevInfo);
     UKNotNil(prootBRevInfo);
     
-    UKObjectsNotEqual([prootARevInfo revisionID], [prootBRevInfo revisionID]);
-    UKObjectsEqual([prootARevInfo revisionID], [prootBRevInfo parentRevisionID]);
+    UKObjectsNotEqual([prootARevInfo revisionUUID], [prootBRevInfo revisionUUID]);
+    UKObjectsEqual([prootARevInfo revisionUUID], [prootBRevInfo parentRevisionUUID]);
     
     UKObjectsEqual([self prootAitemTree], [self currentItemGraphForPersistentRoot: [prootA UUID]]);
     UKObjectsEqual([self prooBitemTree], [self currentItemGraphForPersistentRoot: [prootB UUID]]);

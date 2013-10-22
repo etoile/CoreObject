@@ -546,10 +546,10 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
     else if (![[[self branchInfo] currentRevisionUUID] isEqual: _currentRevisionUUID]
 			 || ![[[self branchInfo] headRevisionUUID] isEqual: _headRevisionUUID] )
     {
-        CORevisionID *old = [[self branchInfo] currentRevisionID];
+        ETUUID *old = [[self branchInfo] currentRevisionUUID];
         assert(old != nil);
 		
-		CORevisionID *oldHead = [[self branchInfo] headRevisionID];
+		ETUUID *oldHead = [[self branchInfo] headRevisionUUID];
         
         // This is the case when the user does [self setCurrentRevision: ], and then commits
         
@@ -559,11 +559,11 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 			   ofPersistentRoot: [[self persistentRoot] UUID]];
 	
 
-        [[self editingContext] recordBranchSetCurrentRevisionID: [CORevisionID revisionWithPersistentRootUUID:[[self persistentRoot] UUID] revisionUUID: _currentRevisionUUID]
-                                                  oldRevisionID: old
-												 headRevisionID: [CORevisionID revisionWithPersistentRootUUID:[[self persistentRoot] UUID] revisionUUID: _headRevisionUUID]
-											  oldHeadRevisionID: oldHead
-                                                       ofBranch: self];
+        [[self editingContext] recordBranchSetCurrentRevisionUUID: _currentRevisionUUID
+                                                  oldRevisionUUID: old
+												 headRevisionUUID: _headRevisionUUID
+											  oldHeadRevisionUUID: oldHead
+														 ofBranch: self];
     }
     
     // Write metadata
@@ -608,8 +608,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 					  forBranch: _UUID
 			   ofPersistentRoot: [[self persistentRoot] UUID]];
         
-        CORevisionID *oldRevid = [CORevisionID revisionWithPersistentRootUUID:[[self persistentRoot] UUID] revisionUUID: _currentRevisionUUID];
-		CORevisionID *oldHeadRevid = [CORevisionID revisionWithPersistentRootUUID:[[self persistentRoot] UUID] revisionUUID: _headRevisionUUID];
+        ETUUID *oldRevid = _currentRevisionUUID;
+		ETUUID *oldHeadRevid = _headRevisionUUID;
         assert(oldRevid != nil);
         assert(oldHeadRevid != nil);
         assert(revUUID != nil);
@@ -617,10 +617,10 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 		_headRevisionUUID = revUUID;
         self.shouldMakeEmptyCommit = NO;
         
-        [[self editingContext] recordBranchSetCurrentRevisionID: [CORevisionID revisionWithPersistentRootUUID:[[self persistentRoot] UUID] revisionUUID: _currentRevisionUUID]
-                                                  oldRevisionID: oldRevid
-												 headRevisionID: [CORevisionID revisionWithPersistentRootUUID:[[self persistentRoot] UUID] revisionUUID: _currentRevisionUUID]
-											  oldHeadRevisionID: oldHeadRevid
+        [[self editingContext] recordBranchSetCurrentRevisionUUID: _currentRevisionUUID
+                                                  oldRevisionUUID: oldRevid
+												 headRevisionUUID: _currentRevisionUUID
+											  oldHeadRevisionUUID: oldHeadRevid
                                                        ofBranch: self];
     }
 
@@ -709,35 +709,37 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
 - (COMergeInfo *) mergeInfoForMergingBranch: (COBranch *)aBranch
 {
-    CORevisionID *lca = [COLeastCommonAncestor commonAncestorForCommit: [[aBranch currentRevision] revisionID]
-                                                             andCommit: [[self currentRevision] revisionID]
-                                                                 store: [self store]];
-    id <COItemGraph> baseGraph = [[self store] itemGraphForRevisionID: lca];
+    ETUUID *lca = [COLeastCommonAncestor commonAncestorForCommit: [[aBranch currentRevision] UUID]
+													   andCommit: [[self currentRevision] UUID]
+												  persistentRoot: [[self persistentRoot] UUID]
+														   store: [self store]];
+    id <COItemGraph> baseGraph = [[self store] itemGraphForRevisionUUID: lca persistentRoot: [[self persistentRoot] UUID]];
     
     return [self diffForMergingGraphWithSelf: [aBranch objectGraphContext]
-                                  revisionID: [[aBranch currentRevision] revisionID]
+                                  revisionID: [[aBranch currentRevision] UUID]
                                    baseGraph: baseGraph
                               baseRevisionID: lca];
 }
 
 - (COMergeInfo *) mergeInfoForMergingRevision:(CORevision *)aRevision
 {
-    CORevisionID *lca = [COLeastCommonAncestor commonAncestorForCommit: [aRevision revisionID]
-                                                             andCommit: [[self currentRevision] revisionID]
-                                                                 store: [self store]];
-    id <COItemGraph> baseGraph = [[self store] itemGraphForRevisionID: lca];
-    id <COItemGraph> mergeGraph = [[self store] itemGraphForRevisionID: [aRevision revisionID]];
+    ETUUID *lca = [COLeastCommonAncestor commonAncestorForCommit: [aRevision UUID]
+													   andCommit: [[self currentRevision] UUID]
+												  persistentRoot: [[self persistentRoot] UUID]
+														   store: [self store]];
+    id <COItemGraph> baseGraph = [[self store] itemGraphForRevisionUUID: lca persistentRoot: [[self persistentRoot] UUID]];
+    id <COItemGraph> mergeGraph = [[self store] itemGraphForRevisionUUID: [aRevision UUID] persistentRoot: [[self persistentRoot] UUID]];
 
     return [self diffForMergingGraphWithSelf: mergeGraph
-                                  revisionID: [aRevision revisionID]
+                                  revisionID: [aRevision UUID]
                                    baseGraph: baseGraph
                               baseRevisionID: lca];
 }
 
 - (COMergeInfo *) diffForMergingGraphWithSelf: (id <COItemGraph>) mergeGraph
-                                       revisionID: (CORevisionID *) mergeRevisionID
-                                        baseGraph: (id <COItemGraph>) baseGraph
-                                   baseRevisionID: (CORevisionID *)aBaseRevisionID
+								   revisionID: (ETUUID *) mergeRevisionID
+									baseGraph: (id <COItemGraph>) baseGraph
+							   baseRevisionID: (ETUUID *)aBaseRevisionID
 {
     COItemGraphDiff *mergingBranchDiff = [COItemGraphDiff diffItemTree: baseGraph withItemTree: mergeGraph sourceIdentifier: @"merged"];
     COItemGraphDiff *selfDiff = [COItemGraphDiff diffItemTree: baseGraph withItemTree: [self objectGraphContext] sourceIdentifier: @"self"];
@@ -746,8 +748,8 @@ parentRevisionForNewBranch: (CORevisionID *)parentRevisionForNewBranch
 
     COMergeInfo *result = [[COMergeInfo alloc] init];
     result.mergeDestinationRevision = [self currentRevision];
-    result.mergeSourceRevision = [[self editingContext] revisionForRevisionID: mergeRevisionID];
-    result.baseRevision = [[self editingContext] revisionForRevisionID: aBaseRevisionID];
+    result.mergeSourceRevision = [[self editingContext] revisionForRevisionUUID: mergeRevisionID persistentRootUUID: [[self persistentRoot] UUID]];
+    result.baseRevision = [[self editingContext] revisionForRevisionUUID: aBaseRevisionID persistentRootUUID: [[self persistentRoot] UUID]];
     result.diff = merged;
     return result;
 }

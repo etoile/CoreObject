@@ -631,7 +631,7 @@ static ETUUID *childUUID2;
 {
     CORevisionInfo *info = [store revisionInfoForRevisionID: [CORevisionID revisionWithPersistentRootUUID: prootUUID revisionUUID: initialRevisionUUID]];
     UKNil([info parentRevisionID]);
-    UKObjectsEqual(initialRevisionUUID, [[info revisionID] revisionUUID]);
+    UKObjectsEqual(initialRevisionUUID, [info revisionUUID]);
 	UKObjectsEqual([proot currentBranchUUID], [info branchUUID]);
 }
 
@@ -715,7 +715,7 @@ static ETUUID *childUUID2;
 					  current: initialRevisionUUID
 						 head: initialRevisionUUID];
 	
-    UKObjectsEqual([self makeInitialItemTree], [store itemGraphForRevisionID: [CORevisionID revisionWithPersistentRootUUID: prootUUID revisionUUID: initialRevisionUUID]]);
+    UKObjectsEqual([self makeInitialItemTree], [self currentItemGraphForPersistentRoot: prootUUID]);
     UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
 }
 

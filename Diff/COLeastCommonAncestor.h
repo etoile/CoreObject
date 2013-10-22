@@ -1,16 +1,18 @@
 #import <Foundation/Foundation.h>
 
-@class CORevisionID;
+@class ETUUID;
 @class COSQLiteStore;
 
 @interface COLeastCommonAncestor : NSObject
 
-+ (CORevisionID *)commonAncestorForCommit: (CORevisionID *)commitA
-                                andCommit: (CORevisionID *)commitB
-                                    store: (COSQLiteStore *)aStore;
++ (ETUUID *)commonAncestorForCommit: (ETUUID *)commitA
+                          andCommit: (ETUUID *)commitB
+					 persistentRoot: (ETUUID *)persistentRoot
+                              store: (COSQLiteStore *)aStore;
 
-+ (BOOL)        isRevision: (CORevisionID *)commitA
- equalToOrParentOfRevision: (CORevisionID *)commitB
++ (BOOL)        isRevision: (ETUUID *)commitA
+ equalToOrParentOfRevision: (ETUUID *)commitB
+			persistentRoot: (ETUUID *)persistentRoot
                      store: (COSQLiteStore *)aStore;
 
 @end

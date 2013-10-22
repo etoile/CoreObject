@@ -9,18 +9,21 @@
  * Naiive algorithm: gather paths from commitA to the root, and commitB to the root,
  * and return their first intersection.
  */
-+ (CORevisionID *)commonAncestorForCommit: (CORevisionID *)commitA
-                                andCommit: (CORevisionID *)commitB
-                                    store: (COSQLiteStore *)aStore
++ (ETUUID *)commonAncestorForCommit: (ETUUID *)commitA
+                          andCommit: (ETUUID *)commitB
+					 persistentRoot: (ETUUID *)persistentRoot
+                              store: (COSQLiteStore *)aStore
 {
 	NSMutableSet *ancestorsOfA = [NSMutableSet set];
 	
-	for (CORevisionID *temp = commitA; temp != nil; temp = [[aStore revisionInfoForRevisionID: temp] parentRevisionID])
+	// TODO: Use CORevision version so we hit the revision cache?
+	
+	for (ETUUID *temp = commitA; temp != nil; temp = [[aStore revisionInfoForRevisionUUID: temp persistentRootUUID: persistentRoot] parentRevisionUUID])
 	{
 		[ancestorsOfA addObject: temp];
 	}
 	
-	for (CORevisionID *temp = commitB; temp != nil; temp = [[aStore revisionInfoForRevisionID: temp] parentRevisionID])
+	for (ETUUID *temp = commitB; temp != nil; temp = [[aStore revisionInfoForRevisionUUID: temp persistentRootUUID: persistentRoot] parentRevisionUUID])
 	{
 		if ([ancestorsOfA containsObject: temp])
 		{
@@ -32,18 +35,21 @@
 	return nil;
 }
 
-+ (BOOL)        isRevision: (CORevisionID *)commitA
- equalToOrParentOfRevision: (CORevisionID *)commitB
++ (BOOL)        isRevision: (ETUUID *)commitA
+ equalToOrParentOfRevision: (ETUUID *)commitB
+			persistentRoot: (ETUUID *)persistentRoot
                      store: (COSQLiteStore *)aStore
 {
-    CORevisionID *rev = commitB;
+	// TODO: Use CORevision so we hit the revision cache?
+	
+    ETUUID *rev = commitB;
     while (rev != nil)
     {
         if ([rev isEqual: commitA])
         {
             return YES;
         }
-        rev = [[aStore revisionInfoForRevisionID: rev] parentRevisionID];
+        rev = [[aStore revisionInfoForRevisionUUID: rev persistentRootUUID: persistentRoot] parentRevisionUUID];
     }
     return NO;
 }
