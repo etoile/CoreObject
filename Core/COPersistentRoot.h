@@ -150,6 +150,14 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * See -[COBranch firstRevision] and -[CORevision date].
  */
 @property (nonatomic, readonly) NSDate *creationDate;
+/**
+ * The persistent root this is a copy of, or nil if the receiver is not a copy
+ */
+@property (nonatomic, readonly) COPersistentRoot *parentPersistentRoot;
+/**
+ * Returns YES if this persistent root is a copy (self.parentPersistentRoot != nil)
+ */
+@property (nonatomic, readonly) BOOL isCopy;
 
 
 /** @taskunit Accessing Branches */

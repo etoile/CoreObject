@@ -92,6 +92,12 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         _currentBranchUUID =  branchUUID;
         _cheapCopyRevisionUUID =  cheapCopyRevisionID;
 		_cheapCopyPersistentRootUUID =  cheapCopyPersistentRootID;
+		
+		if (_cheapCopyPersistentRootUUID != nil)
+		{
+			// FIXME: Make a proper metadata key for this
+			self.metadata = @{ @"parentPersistentRoot" : [_cheapCopyPersistentRootUUID stringValue] };
+		}
     }
 
 	return self;
@@ -176,6 +182,21 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 - (NSDate *)creationDate
 {
 	return [[[self currentBranch] firstRevision] date];
+}
+
+- (COPersistentRoot *)parentPersistentRoot
+{
+	NSString *uuidString = self.metadata[@"parentPersistentRoot"];
+	if (uuidString != nil)
+	{
+		return [[self editingContext] persistentRootForUUID: [ETUUID UUIDWithString: uuidString]];
+	}
+	return nil;
+}
+
+- (BOOL)isCopy
+{
+	return self.metadata[@"parentPersistentRoot"] != nil;
 }
 
 - (COBranch *)currentBranch

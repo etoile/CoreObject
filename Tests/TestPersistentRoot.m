@@ -211,33 +211,54 @@
 	UKTrue([[ctx persistentRootsPendingInsertion] containsObject: copyRoot]);
     
 	COBranch *copyRootBranch = [copyRoot currentBranch];
+	UKObjectsEqual(originalBranch, [copyRootBranch parentBranch]);
+	UKObjectsEqual(persistentRoot, [copyRoot parentPersistentRoot]);
+	UKFalse([persistentRoot isCopy]);
+	UKTrue([copyRoot isCopy]);
 	
     [ctx commit];
-    
-    UKObjectsEqual(rev1, [copyRoot currentRevision]);
-    
-    UKNotNil([store persistentRootInfoForUUID: [copyRoot UUID]]);
-    
-    UKObjectsNotEqual([copyRootBranch UUID], [originalBranch UUID]);
-    UKObjectsNotEqual([copyRoot UUID], [persistentRoot UUID]);
-    
-    UKObjectsEqual(rev1, [copyRootBranch initialRevision]);
-    UKObjectsEqual(rev1, [copyRootBranch currentRevision]);
-    UKObjectsEqual(rev1, [originalBranch currentRevision]);
 	
+	[self checkPersistentRootWithExistingAndNewContext: copyRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual(rev1, [testProot currentRevision]);
+		 
+		 // FIXME: It might be cleaner if we could get rid of these -UUID calls
+		 // and have -[COBranch isEqual:]/-[COPersistentRoot isEqual:] work
+		 
+		 UKObjectsNotEqual([originalBranch UUID], [testBranch UUID]);
+		 UKObjectsNotEqual([persistentRoot UUID], [testProot UUID]);
+		 
+		 UKObjectsEqual([originalBranch UUID], [[testBranch parentBranch] UUID]);
+		 UKObjectsEqual([persistentRoot UUID], [[testProot parentPersistentRoot] UUID]);
+		 
+		 UKObjectsEqual(rev1, [testBranch initialRevision]);
+		 UKObjectsEqual(rev1, [testBranch currentRevision]);
+		 UKObjectsEqual(rev1, [testBranch headRevision]);
+		 
+		 UKTrue([testProot isCopy]);
+	 }];
+
     /* Make a commit in the cheap copy */
     
    	[[copyRoot rootObject] setValue: @"Todo" forProperty: @"label"];
 	
     [ctx commit];
     
-	UKObjectsEqual(originalBranch, [copyRootBranch parentBranch]);
+	[self checkPersistentRootWithExistingAndNewContext: copyRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual(@"Todo", [[testProot rootObject] label]);
+	 }];
 	
-	/* Cheap copy creation doesn't touch the current persistent root revision */
-	UKObjectsEqual([[persistentRoot rootObject] revision], rev1);
-	
-    /* Cheap copy creation doesn't switch the branch */
-    UKObjectsSame(originalBranch, [persistentRoot currentBranch]);
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 /* Cheap copy creation doesn't touch the current persistent root revision */
+		 UKObjectsEqual(rev1, [testProot currentRevision]);
+		 /* Cheap copy creation doesn't switch the branch */
+		 UKObjectsEqual([originalBranch UUID], [testBranch UUID]);
+	 }];
 }
 
 - (void) testDeleteUncommittedBranch
