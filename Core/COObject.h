@@ -139,7 +139,7 @@
  *
  * @section Notifications
  *
- * To better control persistency, -awakeFromFetch, -didReload, -willTurnIntoFault
+ * To better control persistency, -awakeFromDeserialization, -didReload, -willTurnIntoFault
  *
  * @section Serialization
  *
@@ -161,11 +161,11 @@
  * -[COEditingContext objectWithUUID:].
  *
  * When an object that was previously a fault is loaded, then once the 
- * attribute values have been deserialized, -awakeFromFetch is sent to the 
+ * attribute values have been deserialized, -awakeFromDeserialization is sent to the 
  * object to let it update its state before being used. You can thus override 
- * -awakeFromFetch to recreate transient properties, recompute correct property 
+ * -awakeFromDeserialization to recreate transient properties, recompute correct property 
  * values based on the deserialized values, etc. But you must not access or 
- * update persistent relationships in -awakeFromFetch directly. You can override 
+ * update persistent relationships in -awakeFromDeserialization directly. You can override 
  * -didLoad to manipulate persistent relationships in a such way.<br />
  * Loading an object can result in multiple objects being loaded if some 
  * relationships are unfaulted. For example, an accessor can depend on or alter 
@@ -174,12 +174,12 @@
  * To give a more concrete example in EtoileUI, -[ETLayoutItem setView:] uses   
  * -[ETLayoutItemGroup handleAttacheViewOfItem:] to adjust the parent view.<br />
  * For -loadObject:, the loaded object and all the relationships transitively 
- * loaded receive -awakeFromFetch, then at the very end -didLoad is called. At 
+ * loaded receive -awakeFromDeserialization, then at the very end -didLoad is called. At 
  * this point, you can be sure the objects are not in a partially 
  * initialized/deserialized state.<br />
  * Don't forget to call the superclass implementation first for both 
- * -awakeFromFetch and -didLoad.<br />
- * In addition, navigating a root object history results in -awakeFromFetch 
+ * -awakeFromDeserialization and -didLoad.<br />
+ * In addition, navigating a root object history results in -awakeFromDeserialization 
  * being sent to each object loaded to a new revision in the object graph (not 
  * yet the case), rather being turned back into a fault. When every object in 
  * the object graph has been reloaded or turned back into fault, -didReload is 
@@ -588,7 +588,7 @@
 /** @taskunit Overridable Notifications */
 
 
-- (void)awakeFromFetch;
+- (void)awakeFromDeserialization;
 - (void)didLoad;
 - (void)didReload;
 - (void)didLoadObjectGraph;

@@ -59,9 +59,9 @@
 	return newObject;
 }
 
-/* Prevent -[COObject awakeFromFetch] to check that -tags is a valid collection.
+/* Prevent -[COObject awakeFromDeserialization] to check that -tags is a valid collection.
 For a loaded object, -tags return nil because tags are not serialized. */
-- (void)awakeFromFetch
+- (void)awakeFromDeserialization
 {
 	ETAssert(_content != nil);
 }

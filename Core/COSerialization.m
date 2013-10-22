@@ -705,7 +705,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 		[self setSerializedValue: value forPropertyDescription: propertyDesc];
 	}
 
-	[self awakeFromFetch];
+	[self awakeFromDeserialization];
     // TODO: Decide whether to update relationship cache here. Document it.
 }
 
