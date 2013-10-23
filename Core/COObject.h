@@ -334,7 +334,7 @@
  * Whether it is permissible to make an alias to the receiver when copying
  * an object graph. Default is YES.
  */
-@property (nonatomic, readwrite) BOOL isShared;
+@property (nonatomic, readonly) BOOL isShared;
 
 /** @taskunit History Attributes */
 

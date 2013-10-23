@@ -229,7 +229,6 @@ See +[NSObject typePrefix]. */
 	_variableStorage = [self newVariableStorage];
     _outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
 	_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
-	_isShared = YES;
 	
 	[_objectGraphContext registerObject: self isNew: inserted];
 
@@ -275,11 +274,6 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	return [self initWithUUID: [ETUUID UUID]
 	        entityDescription: anEntityDesc
 	       objectGraphContext: aContext];
-}
-
-- (BOOL)isSharedInstance
-{
-	return [[[[self class] ifResponds] sharedInstance] isEqual: self];
 }
 
 // TODO: Maybe add convenience copying method, - (COObject *) copyWithCopier: (COCopier *)aCopier

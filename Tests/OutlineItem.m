@@ -45,7 +45,20 @@
 	return @"contents";
 }
 
-@dynamic isShared;
+- (BOOL)isShared
+{
+	return [self valueForVariableStorageKey: @"isShared"];
+}
+
+- (void)setIsShared:(BOOL)isShared
+{
+	[self willChangeValueForProperty: @"isShared"];
+	[self setValue: @(isShared) forVariableStorageKey: @"isShared"];
+	[self didChangeValueForProperty: @"isShared"];
+}
+
+// FIXME: Fix COObject+Accessors to support overriding read-only properties as read-write
+//@dynamic isShared;
 @dynamic label;
 @dynamic contents;
 @dynamic parentContainer;
