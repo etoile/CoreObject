@@ -209,11 +209,6 @@ For a loaded object, -tags return nil because tags are not serialized. */
             // HACK
             continue;
         }
-		else if ([property isEqualToString: kCOObjectIsSharedProperty])
-		{
-			_isShared = [[aStoreItem valueForAttribute: kCOObjectIsSharedProperty] boolValue];
-			continue;
-		}
 
 		id serializedValue = [aStoreItem valueForAttribute: property];
 		COType serializedType = [aStoreItem typeForAttribute: property];

@@ -23,7 +23,7 @@
 @implementation COObject (COSerialization)
 
 NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
-NSString *kCOObjectIsSharedProperty = @"org.etoile-project.coreobject.isshared";
+NSString *kCOObjectIsSharedProperty = @"isShared";
 
 /* Returns whether the given value is a primitive type supported by CoreObject
 serialization. */
@@ -381,9 +381,6 @@ serialization. */
     [values setObject: [[self entityDescription] name] forKey: kCOObjectEntityNameProperty];
     [types setObject: [NSNumber numberWithInt: kCOTypeString] forKey: kCOObjectEntityNameProperty];
 	
-    values[kCOObjectIsSharedProperty] = @(self.isShared);
-    types[kCOObjectIsSharedProperty] = @(kCOTypeInt64);
-	
 	return [[COItem alloc] initWithUUID: [self UUID]
 	                 typesForAttributes: types
 	                valuesForAttributes: values];
@@ -671,11 +668,6 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
             // HACK
             continue;
         }
-		else if ([property isEqualToString: kCOObjectIsSharedProperty])
-		{
-			_isShared = [[aStoreItem valueForAttribute: kCOObjectIsSharedProperty] boolValue];
-			continue;
-		}
         
 		ETPropertyDescription *propertyDesc =
 			[[self entityDescription] propertyDescriptionForName: property];

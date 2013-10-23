@@ -68,6 +68,8 @@ See +[NSObject typePrefix]. */
 		[ETPropertyDescription descriptionWithName: @"isPersistent" type: (id)@"BOOL"];
 	ETPropertyDescription *isRoot =
 		[ETPropertyDescription descriptionWithName: @"isRoot" type: (id)@"BOOL"];
+	ETPropertyDescription *isShared =
+		[ETPropertyDescription descriptionWithName: @"isShared" type: (id)@"BOOL"];
 
 	/* Basic Properties */
 
@@ -107,7 +109,7 @@ See +[NSObject typePrefix]. */
 #ifndef GNUSTEP
 	transientProperties = [transientProperties arrayByAddingObject: icon];
 #endif
-	NSArray *persistentProperties = A(name, tags);
+	NSArray *persistentProperties = A(isShared, name, tags);
 	NSArray *properties =
 		[transientProperties arrayByAddingObjectsFromArray: persistentProperties];
 
@@ -322,13 +324,14 @@ objectGraphContext: (COObjectGraphContext *)aContext
 	return _isShared;
 }
 
-- (void) setIsShared:(BOOL)isShared
+- (void) setIsShared: (BOOL)isShared
 {
-	if (_isShared != isShared)
-	{
-		_isShared = isShared;
-		[self markAsUpdatedIfNeededForProperty: nil];
-	}
+	if (_isShared == isShared)
+		return;
+
+	[self willChangeValueForProperty: @"isShared"];
+	_isShared = isShared;
+	[self didChangeValueForProperty: @"isShared"];
 }
 
 - (CORevision *)revision
@@ -825,6 +828,14 @@ objectGraphContext: (COObjectGraphContext *)aContext
 {
 	id newValue = [self valueForStorageKey: key];
 	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
+
+	// FIXME: EtoileUI entity descriptions don't declare all required properties 
+	/*if (propertyDesc == nil)
+	{
+		[NSException raise: NSInvalidArgumentException
+					format: @"Property %@ is not declared in the metamodel %@ for %@",
+		                    key, _entityDescription, self];
+	}*/
 
 	[self validateNewValue: newValue propertyDescription: propertyDesc];
 
