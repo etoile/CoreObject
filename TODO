@@ -112,6 +112,10 @@ Future Work
   - didAwaken: replacement: At the end of the setStoreItem:, call -awakeFromDeserialization
     At the end of object graph loading, -didLoadObjectGraph on each object in topological sort order
 
+  - Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
+
+  - Turn COObject into zombies once garbage collected (see -markAsRemovedFromContext)
+
 
 - COItem
 
@@ -122,12 +126,6 @@ Future Work
     
     (Well, use a simple wrapper class instead of std::pair.) We could also
     use SEL instead of NSString* for better performance, probably.
-
-  - Support for composite cross-persistent root references as we discussed
-
-  - Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
-
-  - Turn COObject into zombies once garbage collected (see -markAsRemovedFromContext)
 
 
 - Collaboration
