@@ -46,6 +46,8 @@ extern NSString *kCOObjectIsSharedProperty;
 - (id)serializedValueForValue: (id)aValue;
 - (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value;
 - (SEL)serializationGetterForProperty: (NSString *)property;
+- (COItem *)storeItemWithTypes: (NSMutableDictionary *)types
+                        values: (NSMutableDictionary *)values;
 
 /** @taskunit Deserialization */
 

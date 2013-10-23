@@ -191,15 +191,7 @@ For a loaded object, -tags return nil because tags are not serialized. */
 		[types setObject: serializedType forKey: [propertyDesc name]];
 	}
 
-	[values setObject: [[self entityDescription] name] forKey: kCOObjectEntityNameProperty];
-    [types setObject: [NSNumber numberWithInt: kCOTypeString] forKey: kCOObjectEntityNameProperty];
-
-    values[kCOObjectIsSharedProperty] = @(self.isShared);
-    types[kCOObjectIsSharedProperty] = @(kCOTypeInt64);
-
-	return [[COItem alloc] initWithUUID: [self UUID]
-                      typesForAttributes: types
-                     valuesForAttributes: values];
+	return [self storeItemWithTypes: types values: values];
 }
 
 - (void)setStoreItem: (COItem *)aStoreItem

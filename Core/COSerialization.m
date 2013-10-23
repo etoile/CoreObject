@@ -375,6 +375,20 @@ serialization. */
 	return [self valueForStorageKey: [aPropertyDesc name]];
 }
 
+- (COItem *)storeItemWithTypes: (NSMutableDictionary *)types
+                        values: (NSMutableDictionary *)values
+{
+    [values setObject: [[self entityDescription] name] forKey: kCOObjectEntityNameProperty];
+    [types setObject: [NSNumber numberWithInt: kCOTypeString] forKey: kCOObjectEntityNameProperty];
+	
+    values[kCOObjectIsSharedProperty] = @(self.isShared);
+    types[kCOObjectIsSharedProperty] = @(kCOTypeInt64);
+	
+	return [[COItem alloc] initWithUUID: [self UUID]
+	                 typesForAttributes: types
+	                valuesForAttributes: values];
+}
+
 - (COItem *)storeItem
 {
 	NSArray *serializedPropertyDescs =
@@ -397,15 +411,7 @@ serialization. */
 		[types setObject: serializedType forKey: [propertyDesc name]];
 	}
 	
-    [values setObject: [[self entityDescription] name] forKey: kCOObjectEntityNameProperty];
-    [types setObject: [NSNumber numberWithInt: kCOTypeString] forKey: kCOObjectEntityNameProperty];
-
-    values[kCOObjectIsSharedProperty] = @(self.isShared);
-    types[kCOObjectIsSharedProperty] = @(kCOTypeInt64);
-	
-	return [[COItem alloc] initWithUUID: [self UUID]
-                      typesForAttributes: types
-                     valuesForAttributes: values];
+	return [self storeItemWithTypes: types values: values];
 }
 
 /* Returns a NSValue object for a scalar string value if possible.
