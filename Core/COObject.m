@@ -207,9 +207,17 @@ See +[NSObject typePrefix]. */
 		                     [anEntityDescription fullName], [self className],
 		                     NSStringFromClass(entityClass)];
 	}
+	
+	if (![anEntityDescription isKindOfEntity: [repo descriptionForName: @"Anonymous.COObject"]])
+	{
+		[NSException raise: NSInvalidArgumentException
+					format: @"The COObject class only supports entitiy descriptions that "
+							"are subentities of COObject, but %@ is not.",
+							[anEntityDescription fullName]];
+	}
 }
 
-- (id) commonInitWithUUID: (ETUUID *)aUUID 
+- (id) commonInitWithUUID: (ETUUID *)aUUID
         entityDescription: (ETEntityDescription *)anEntityDescription
        objectGraphContext: (COObjectGraphContext *)aContext
 					isNew: (BOOL)inserted

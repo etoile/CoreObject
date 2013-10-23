@@ -44,6 +44,26 @@
 											            objectGraphContext: [COObjectGraphContext new]]);
 }
 
+- (void) testEntityDescriptionMissingCOObjectParent
+{
+    ETEntityDescription *rootEntity = [ETEntityDescription descriptionWithName: @"RootEntity"];
+	ETEntityDescription *emptyEntity = [ETEntityDescription descriptionWithName: @"EmptyEntity"];
+	[emptyEntity setParent: (id)@"Anonymous.COObject"];
+
+	[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: rootEntity];
+	[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: emptyEntity];
+	[[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
+	
+	// Expected to fail because rootEntity does not declare COObject as its parent
+	UKRaisesException([[COObject alloc] initWithEntityDescription: rootEntity
+											   objectGraphContext: [COObjectGraphContext new]]);
+	UKRaisesException([ctx insertNewPersistentRootWithEntityName: @"Anonymous.RootEntity"]);
+	
+	UKDoesNotRaiseException([[COObject alloc] initWithEntityDescription: emptyEntity
+													 objectGraphContext: [COObjectGraphContext new]]);
+	UKDoesNotRaiseException([ctx insertNewPersistentRootWithEntityName: @"Anonymous.EmptyEntity"]);
+}
+
 - (void) testCreationAndModificationDates
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
