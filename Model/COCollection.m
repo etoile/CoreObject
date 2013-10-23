@@ -65,7 +65,7 @@
 	}
 }
 
-- (void)didReload
+- (void)didLoadObjectGraph
 {
 	[self didUpdate];
 }
