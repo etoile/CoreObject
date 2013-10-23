@@ -32,18 +32,42 @@
 	NSMutableDictionary *_content;
 }
 
+
 /** @taskunit Keyed Collection Protocol */
 
+
+/**
+ * See -[NSDictionary allKeys].
+ */
 - (NSArray *)allKeys;
+/**
+ * See -[NSDictionary allValues].
+ */
 - (NSArray *)allValues;
+/**
+ * See -[NSDictionary objectForKey:].
+ */
 - (id)objectForKey: (id)aKey;
+/**
+ * See -[NSDictionary setObject:forKey:].
+ */
 - (void)setObject: (id)anObject forKey: (id)aKey;
+/**
+ * See -[NSDictionary removeObjectForKey:].
+ */
 - (void)removeObjectForKey: (id)aKey;
+/**
+ * See -[NSDictionary removeAllObjects].
+ */
 - (void)removeAllObjects;
+
 
 /** @taskunit Collection Protocol Additions */
 
-/** Returns self. */
+
+/** 
+ * Returns self. 
+ */
 + (Class) mutableClass;
 
 @end

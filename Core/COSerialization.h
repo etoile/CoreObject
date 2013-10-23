@@ -54,6 +54,7 @@ extern NSString *kCOObjectIsSharedProperty;
 - (id)valueForSerializedValue: (id)value
                        ofType: (COType)type
           propertyDescription: (ETPropertyDescription *)aPropertyDesc;
+- (void)validateStoreItem: (COItem *)aStoreItem;
 
 /** @taskunit Testing */
 

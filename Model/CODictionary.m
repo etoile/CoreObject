@@ -40,13 +40,18 @@
 	return collection;	
 }
 
+- (void)resetInternalState
+{
+	_content = [NSMutableDictionary new];
+}
+
 - (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
 	self = [super initWithObjectGraphContext: aContext];
 	if (self == nil)
 		return nil;
 
-	_content = [NSMutableDictionary new];
+	[self resetInternalState];
 	return self;
 }
 
@@ -59,8 +64,12 @@
 	return newObject;
 }
 
-/* Prevent -[COObject awakeFromDeserialization] to check that -tags is a valid collection.
-For a loaded object, -tags return nil because tags are not serialized. */
+/**
+ * Prevents -[COObject awakeFromDeserialization] to check that -tags is a valid 
+ * collection.
+ *
+ * For a loaded CODictionary, -tags return nil because tags are not serialized.
+ */
 - (void)awakeFromDeserialization
 {
 	ETAssert(_content != nil);
@@ -149,29 +158,10 @@ For a loaded object, -tags return nil because tags are not serialized. */
 #pragma mark Serialization
 #pragma mark -
 
-/* For -[COPersistentRoot saveCommitWithMetadata:] and old serialization */
-- (NSArray *)persistentPropertyNames
-{
-	return [self allKeys];
-}
-
-/* For old serialization */
-- (id)serializedValueForProperty: (NSString *)key
-{
-	return [self objectForKey: key];
-}
-
-/* For old serialization */
-- (void)setSerializedValue: (id)value forProperty: (NSString *)key
-{
-	if ([key isEqualToString: @"_entity"])
-		return;
-
-	[self setObject: value forKey: key];
-}
-
 - (COItem *)storeItem
 {
+	ETAssert(_content != nil);
+
 	ETModelDescriptionRepository *repo = [[[self persistentRoot] parentContext] modelRepository];
 	ETEntityDescription *rootType = [repo descriptionForName: @"Object"];
 	NSMutableDictionary *types =
@@ -196,6 +186,9 @@ For a loaded object, -tags return nil because tags are not serialized. */
 
 - (void)setStoreItem: (COItem *)aStoreItem
 {
+	[self resetInternalState];
+	[self validateStoreItem: aStoreItem];
+
 	ETModelDescriptionRepository *repo = [[[self persistentRoot] parentContext] modelRepository];
 	ETEntityDescription *rootType = [repo descriptionForName: @"Object"];
 
@@ -226,6 +219,8 @@ For a loaded object, -tags return nil because tags are not serialized. */
 		                     propertyDescription: propertyDesc];
 		[_content setObject: value forKey: property];
 	}
+
+	[self awakeFromDeserialization];
 }
 
 @end

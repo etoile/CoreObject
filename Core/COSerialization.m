@@ -714,7 +714,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	id value = [self serializedValueForPropertyDescription: propertyDesc];
 	id serializedValue = [self serializedValueForValue: value];
 	NSNumber *serializedType = [self serializedTypeForPropertyDescription: propertyDesc
-	                                                                value: serializedValue];
+	                                                                value: value];
 	
 	return [self valueForSerializedValue: serializedValue
 	                              ofType: [serializedType intValue]
