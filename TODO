@@ -4,8 +4,6 @@ TODO
 First alpha release blockers
 ----------------------------
 
-- Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
-
 - Shorten -[COObject description] output
 
 - Improve -[COObject detailedDescription] code and make output more readable
@@ -28,7 +26,8 @@ Future Work
     suitable for network transport.
 	
   - GC: only collect divergent revisions older than X days
-
+  
+  -  Switch from FMDB to an SQL abstraction backend
 
 - COEditingContext
 
@@ -36,7 +35,7 @@ Future Work
 
   - expose COSQLiteStore's finalize deletion method
 
-  - expose store's searching functionality
+  - expose store's searching functionality (integrate COSearchResult and COQuery)
 
   - Switch to NSUUID everywhere?
 
@@ -59,6 +58,8 @@ Future Work
   - Extend COBranch API to support branches and merging revisions accross tracks
 
   - Extract selective undo code from undo system
+  
+  - Implement selective undo in -[COBranch undoNode:]
 
 
 - Metamodel
@@ -97,10 +98,7 @@ Future Work
 
   - Attempting to set a value for a readonly property should raise an exception
   
-  - Variable storage, relationship cache, relationship integrity implementations
-    are a mess and need to be rewritten. The variable storage is very
-    inefficient (makes mutable copy of collection even when using mutable
-    colelction mutation method, so n inserts in O(n^2).), which must be fixed.
+  - The variable storage is very inefficient (makes mutable copy of collection even when using mutable collection mutation method, so n inserts in O(n^2).), which must be fixed.
 
   - Check COObject KVO semantics and documentation.
     I think we valueForUndefinedKey
@@ -109,12 +107,12 @@ Future Work
   
   - Check the set of properties declared by COObject makes sense and isn't too much / too little
 
-  - didAwaken: replacement: At the end of the setStoreItem:, call -awakeFromDeserialization
-    At the end of object graph loading, -didLoadObjectGraph on each object in topological sort order
 
   - Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
 
   - Turn COObject into zombies once garbage collected (see -markAsRemovedFromContext)
+
+  - Keyed CoreObject relationship support (if possible)
 
 
 - COItem
@@ -148,11 +146,10 @@ Future Work
 
 - Model objects (COObject subclasses included with CoreObject for convenience)
 
-  - for COLibrary, evaluate whether we can enfore the constraint that one
-    persistent root belongs to one library
+  - for COLibrary, evaluate whether we can enfore the constraint that one persistent root belongs to one library
 
+  - Hide CODictionary as an implementation detail
 
-- ProjectDemo
 
  - supply commit metadata
 
@@ -166,14 +163,25 @@ Future Work
    asynchronously expanding the graph.
 
 
+- EtoileUI
+
+  - Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
+
+
 Missing Features
 ----------------
 
 - Persistent root faulting; currently the entire store is loaded in memory
 
+- Partial loading (loading an object using another entity e.g. COPerson as COObject)
+
+  - Add -persistentEntityDescription (for a partially loaded person object, -persistentEntityDescription would return COPerson when -entityDescription returns COObject)
+
 - Schema Upgrade
 
-- NSPredicate to SQL generator using OMeta (not sure)
+- Better query support (in-memory and in-store as sketched in COQuery)
+
+  - NSPredicate to SQL generator using OMeta (not sure)
 
 - Import/Export
 
