@@ -70,6 +70,7 @@ See +[NSObject typePrefix]. */
 		[ETPropertyDescription descriptionWithName: @"isRoot" type: (id)@"BOOL"];
 	ETPropertyDescription *isShared =
 		[ETPropertyDescription descriptionWithName: @"isShared" type: (id)@"BOOL"];
+	[isShared setReadOnly: YES];
 
 	/* Basic Properties */
 
@@ -321,17 +322,7 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 - (BOOL) isShared
 {
-	return _isShared;
-}
-
-- (void) setIsShared: (BOOL)isShared
-{
-	if (_isShared == isShared)
-		return;
-
-	[self willChangeValueForProperty: @"isShared"];
-	_isShared = isShared;
-	[self didChangeValueForProperty: @"isShared"];
+	return YES;
 }
 
 - (CORevision *)revision

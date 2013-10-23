@@ -2,6 +2,7 @@
 
 @interface OutlineItem : COContainer
 
+@property (nonatomic, assign) BOOL isShared;
 @property (readwrite, strong, nonatomic) NSString *label;
 @property (readwrite, strong, nonatomic) NSArray *contents;
 @property (weak, readonly, nonatomic) OutlineItem *parentContainer;

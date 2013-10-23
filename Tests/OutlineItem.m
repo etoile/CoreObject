@@ -6,7 +6,11 @@
 {
     ETEntityDescription *outlineEntity = [ETEntityDescription descriptionWithName: @"OutlineItem"];
     [outlineEntity setParent: (id)@"Anonymous.COContainer"];
-    
+
+	ETPropertyDescription *isShared = [ETPropertyDescription descriptionWithName: @"isShared"
+                                                                                 type: (id)@"BOOL"];
+    [isShared setPersistent: YES];
+	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  type: (id)@"Anonymous.NSString"];
     [labelProperty setPersistent: YES];
@@ -31,7 +35,7 @@
     [parentCollectionsProperty setMultivalued: YES];
     [parentCollectionsProperty setOpposite: (id)@"Anonymous.Tag.contents"];
     
-    [outlineEntity setPropertyDescriptions: A(labelProperty, contentsProperty, parentContainerProperty, parentCollectionsProperty)];
+    [outlineEntity setPropertyDescriptions: A(isShared, labelProperty, contentsProperty, parentContainerProperty, parentCollectionsProperty)];
 
     return outlineEntity;
 }
@@ -41,6 +45,7 @@
 	return @"contents";
 }
 
+@dynamic isShared;
 @dynamic label;
 @dynamic contents;
 @dynamic parentContainer;
