@@ -18,196 +18,192 @@ First alpha release blockers
 
 - Remove automatic keyed archiving in COSerialization and require explicit serialization accessors (containing code such as [NSKeyedArchiver archivedDataWithRootObject: value])
 
-Backlog from Oct 2nd
---------------------
 
-- Undo changes the current revision is that happens to be recorded by the Undo stack
+Future Work
+-----------
 
-- Implement -persistentEntityDescription to support partial loading
+- Store
 
-- Rename COTrack to COHistoryTrack protocol
-
-- Implement something like COSelectiveHistoryTrack (using a query to select revisions based on criterias e.g. inner object subset)
-- Do we want something to aggregate the history of multiple persistent roots in this same class?
-
-- COSearchResult vs COQuery
-
-- Selective Undo for -undoNode: or elsewhere… Should I create a COCommand and call -inverse then compute and apply the selective undo result from this inverse command?
-
-- COCommandSetCurrentVersionForBranch: extract selective undo code to COBranch
-
-- COLibrary: sepcial COContainer, one CoreObject can only belong to a single library
-
-- GC: only collect divergent revisions older than X days
-
-- A generic object manager than can open any store and display any COObject
-  - Should support displaying all key/values (like past StoreBorwser prototypes)
-  - Not blocking release, but critical for ObjectManager
-
-Backlog
--------
-
-history graph UI
- - summarization (hiding minor revisions)
- - use async fetching of revision info
-
-collaboration
- - interation btn. sync and branching
- - automatic / continuous sync
- - more test cases
- - use delta compression
-
-deletion
- - preserving merge info
- - cross refs shouldn't be tracked?
-
-cross refs
- - switch to url? support cross-store use case?
- - async faulting
-
-typewriter / ProjDemo
- - supply commit metadata
- - use deletion
- - use cross refs
- - use attachments
- - merge UI
+  - exportRevisions: and importRevisions: that take a set of CORevisionID an returns a delta-compressed NSData
+    suitable for network transport.
+	
+  - GC: only collect divergent revisions older than X days
 
 
-- Major tasks
-  WIP Diff/merge cleanup
-  - Cleanup COObject
-    - synthesize all accessors
-  - Copying support
+- COEditingContext
 
-- COEditingContext / COPersistentRoot / COBranch
-  - support for loading the root object of a persistent root as a fault
-  - asychronous loading of persistent root contents / unfaulting faulted root object
-  - full support for cross-persistent root references
-    - handle persistent roots unloading
-    - all other corner cases in TestCrossPersistentRootReferences.m
-  x Use notifications posted by COSQLiteStore (very basic support)
-    - think of all corner cases
-  - support "transient roots" in a COEditingContext. These are COObjectGraphContext wrappers.
-    Or, support creating a persistent root in code, then calling "freeze" which will make it 
-    read-only and prevent it from being committed to disk?
-  - expose COSQLiteStore's finalize deletion method
-  WIP Extend COBranch API to support branches and merging revisions accross tracks
   - Expose COSQLiteStore's attachments feature
+
+  - expose COSQLiteStore's finalize deletion method
+
+  - expose store's searching functionality
+
+  - Switch to NSUUID everywhere?
+
+
+- COPersistentRoot
+
   - test [[persistentRoot currentBranch] currentRevision] on a newly created
     persistent root
+	
   - Making additional changes to an uncomitted cheap copy persistent root is broken (we
     don't look at the COObjectGraphContext)
-    
-- didAwaken: replacement
-    - At the end of the setStoreItem:, call -awakeFromDeserialization
-    - At the end of object graph loading, -didLoadObjectGraph on each object in topological sort order
+	
+  - Refactor handling of store notifications and test it more thoroughly. Should
+    post a persistent root change notification to the application if we load
+	changes that another process made in the store.
 
-- diff/merge API and code
-  - Improve Merging (move detection and custom attributed string merger)
-  - Need to support persisted partial merge resolutions.
-    - Thought about this a bit. I don't think we can provide it in general in the framework,
-      apps will have to implement support for it.
-      
-      Some apps may want to open a temporary persistent root, with its own
-      metamodel for managing the merge, others may want to do it only in memory.
-      
-      Also, though the diff/merge happens at the persistent root granularity,
-      there may be multiple inner object trees with different merge UI's.
-      (e.g. several types of objects on a canvas in a composite documents)
-  - Build an example app with a merging UI
-  - Requirements:
-    - We will highlight the area where a conflict appeared. It will show the automatic result, and let the user make a manual edit
-    - allow both collapsed (like SourceTree) and expanded (like Xcode) diff view
+	
+- COBranch
 
-- Oject copy model easy to extend in COObject subclasses (see COObject and COEditingContext copy methods)
-  - Tune object copy model to respect user expectations about copy/paste in various recurrent use cases
+  - Extend COBranch API to support branches and merging revisions accross tracks
+
+  - Extract selective undo code from undo system
+
 
 - Metamodel
+
   - Add checks that derived properties are not persistent
+
   - Add check that parent property (isContainer = YES) is derived
+
   - Add check that one side of an opposite is derived
+
   - Review other constraints
+
   - Add a check that the derived side of a multivalued opposite is unordered
+
   - Add an "indexed" flag to ETPropertyDescription to tell the store whether to include values of that property in search indexes
+
   - Move to CoreObject
-  - It scans over every loaded ObjC class, this is really slow and should be removed
+
+  - Scan over every loaded ObjC class is ugly
+
+  - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
+
 
 - COObject
-  - Attempting to set a value for a readonly property should raise an exception
-  - Check COObject KVO semantics and documentation
-  - See if we can get rid of all of the properties that only make sense for root objects.
-    Maybe have a convention that the root inner object is a subtype of COObject that
-    has all of these properties. If we want to make an arbitrary object a root object, 
-    we would actually make it a child of the real/wrapper root obejct with all of the
-    root object metadata.
-  - Clean out legacy code
+
+  - Better error message if you try to use a composite relationship across persistent roots, 
+    currently you get a COPath does not respond to UUIDValue exception.
+
   - We should have dedicated array/set multivalue mutation methods rather than using:
     -[COObject (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key]
     for both, IMO (Eric)
+
   - Use NSSortedSet for sorted composite relationships
+
   - Use weak references to other COObject instances to prevent retain cycles
+
+  - Attempting to set a value for a readonly property should raise an exception
+  
   - Variable storage, relationship cache, relationship integrity implementations
     are a mess and need to be rewritten. The variable storage is very
     inefficient (makes mutable copy of collection even when using mutable
     colelction mutation method, so n inserts in O(n^2).), which must be fixed.
+
+  - Check COObject KVO semantics and documentation.
+    I think we valueForUndefinedKey
+	
   - Throw an exception if the developer names a property that conflicts with a NSObject/COObject method
+  
+  - Check the set of properties declared by COObject makes sense and isn't too much / too little
+
+  - didAwaken: replacement: At the end of the setStoreItem:, call -awakeFromDeserialization
+    At the end of object graph loading, -didLoadObjectGraph on each object in topological sort order
+
 
 - COItem
+
   - tidy up ugly NSMutableDictionary / NSDictionary casting
+
   - use a std::unordered_map<NSString *, std::pair<uint32_t, id>>
     (i.e. map from string to (COType, object) pair). 
     
     (Well, use a simple wrapper class instead of std::pair.) We could also
     use SEL instead of NSString* for better performance, probably.
 
-- COSQLiteStore
-  - Actually use NSError
-  - exportRevisions: and importRevisions: that take a set of CORevisionID an returns a delta-compressed NSData
-    suitable for network transport.
-  - Review error handling, especially handling of errors within transactions
+  - Support for composite cross-persistent root references as we discussed
 
-- Make COQuery a bit more usable
+  - Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
 
-- General
-  - Switch to NSUUID
-  
-- History browser
-  - Asychronous fetching
-  - Complete UI
+  - Turn COObject into zombies once garbage collected (see -markAsRemovedFromContext)
+
 
 - Collaboration
-  x Initial prototype working in Typewriter
 
-- Error handling
-  - Better error message if you try to use a composite relationship across persistent roots, 
-    currently you get a COPath does not respond to UUIDValue exception.
+  - interation btn. sync and branching
 
-Future Work
------------
+  - automatic / continuous sync
 
-- Support for composite cross-persistent root references as we discussed
-- Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
-- Switch from FMDB to an SQL abstraction backend
-- Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
-- Turn COObject into zombies once garbage collected (see -markAsRemovedFromContext)
-x Figure out how to navigate large root object sets very quickly (evaluate writing a COSQLCursor class)/
-  How to scroll smoothly through 50 000 root objects in an Object Manager without loading all the objects in memory?
-  - I think we more or less have this figured out
+  - more test cases
+
+  - use delta compression instead of sending the full snapshot of every revision over the protocol
+
+
+- COUndoTrack
+
+  - Expose an API for selective undo of actions from the undo/redo stacks
+
+  - Rename COTrack to COHistoryTrack protocol
+
+
+- Model objects (COObject subclasses included with CoreObject for convenience)
+
+  - for COLibrary, evaluate whether we can enfore the constraint that one
+    persistent root belongs to one library
+
+
+- ProjectDemo
+
+ - supply commit metadata
+
+ - use cross references
+
+ - use attachments
+
+ - merge UI
+ 
+ - Improve history graph UI. Implement summarization (collapsing minor edits) and
+   asynchronously expanding the graph.
 
 
 Missing Features
 ----------------
 
+- Persistent root faulting; currently the entire store is loaded in memory
+
 - Schema Upgrade
-- NSPredicate to SQL generator using OMeta
+
+- NSPredicate to SQL generator using OMeta (not sure)
+
 - Import/Export
+
+- Write a generic object manager than can open any store and display any COObject
+
+  - Should support displaying all key/values (like past StoreBorwser prototypes)
+    Not blocking release, but critical for ObjectManager
+
+- Implement something like COSelectiveHistoryTrack (using a query to select revisions based on criterias e.g. inner object subset)
+
+- Something to aggregate the history of multiple persistent roots in this same class?
 
 
 Open Questions
 --------------
 
+- How much support for composite cross-persistent root references should CoreObject provide?
+  Would a "deep copy" that recursively makes copies of referenced persistent roots be useful?
+
+- Support transient persistent roots?  These are COObjectGraphContext wrappers.
+  Or, support creating a persistent root in code, then calling "freeze" which will make it
+  read-only and prevent it from being committed to disk?
+
+- Do cross-store references make sense? i.e. switch from COPath to a URL?
+
 - Adjust COEditingContext loaded object cache to use a strategy that matches which root objects are going to be accessed recurrently (e.g. photos in a Photo Manager should have priority over other root objects)
-- Write a COSQLCursor that can load root objects in advance
-- Just minimize the apparent loading time at the UI level (and no other optimizations possibly)
-- Use an object pool mechanism to allocate COObject or subclass instances
-- Allocate special fault objects that support some basic properties (e.g. -name) and retrieve their values from a single query against the store (e.g. multiples root object names a in single query)
+
+- Scalability to 50k persistent roots, 50k root objects
+
+- Reintroduce history compaction (will it be needed?), which was present but bitrotted and is not supported right now.
+  Possibly just collapse "minor edits" or collapse to daily snapshots + explicit tags. Not sure how much space this will save though.
