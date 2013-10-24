@@ -34,9 +34,9 @@
  * For a subclass, this method results in the subclass designated initializer 
  * being called.
  */
-- (id)initWithUUID: (ETUUID *)aUUID 
+/*- (id)initWithUUID: (ETUUID *)aUUID
  entityDescription: (ETEntityDescription *)anEntityDescription
-objectGraphContext: (COObjectGraphContext *)aContext;
+objectGraphContext: (COObjectGraphContext *)aContext;*/
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

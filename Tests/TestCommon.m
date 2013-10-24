@@ -170,12 +170,6 @@ NSString * const kCOParent = @"parentContainer";
 
 - (id)insertObjectWithEntityName: (NSString *)aFullName
 {
-    return [self insertObjectWithEntityName: aFullName UUID: [ETUUID UUID]];
-}
-
-- (id)insertObjectWithEntityName: (NSString *)aFullName
-                            UUID: (ETUUID *)aUUID
-{
     ETEntityDescription *desc = [[self modelRepository] descriptionForName: aFullName];
     if (desc == nil)
 	{
@@ -184,9 +178,8 @@ NSString * const kCOParent = @"parentContainer";
 	Class objClass = [[self modelRepository] classForEntityDescription: desc];
     
     /* Nil root object means the new object will be a root */
-	COObject *obj = [[objClass alloc] initWithUUID: aUUID
-                                 entityDescription: desc
-                                objectGraphContext: self];
+	COObject *obj = [[objClass alloc] initWithEntityDescription: desc
+                                             objectGraphContext: self];
     
 	return obj;
 }

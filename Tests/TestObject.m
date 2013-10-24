@@ -64,6 +64,11 @@
 	UKDoesNotRaiseException([ctx insertNewPersistentRootWithEntityName: @"Anonymous.EmptyEntity"]);
 }
 
+- (void) testInit
+{
+	UKRaisesException([[COObject alloc] init]);
+}
+
 - (void) testCreationAndModificationDates
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];

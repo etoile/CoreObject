@@ -207,9 +207,8 @@
     COObjectGraphContext *graph = [COObjectGraphContext objectGraphContext];
     
 	Class cls = [[self modelRepository] classForEntityDescription: desc];
-	COObject *rootObject = [[cls alloc] initWithUUID: [ETUUID UUID]
-                                    entityDescription: desc
-                                   objectGraphContext: graph];
+	COObject *rootObject = [[cls alloc] initWithEntityDescription: desc
+                                               objectGraphContext: graph];
 	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
 	                                                 objectGraphContext: [rootObject objectGraphContext]];
 

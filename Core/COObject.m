@@ -243,19 +243,6 @@ See +[NSObject typePrefix]. */
 	return self;
 }
 
-- (id)initWithUUID: (ETUUID *)aUUID 
- entityDescription: (ETEntityDescription *)anEntityDescription
-objectGraphContext: (COObjectGraphContext *)aContext
-{
-	SUPERINIT;
-	self = [self commonInitWithUUID: aUUID 
-	              entityDescription: anEntityDescription
-	             objectGraphContext: aContext
-	                          isNew: YES];
-	if (!(self = [self init])) return nil;
-	return self;
-}
-
 - (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
 	if (_isInitialized)
@@ -279,9 +266,17 @@ objectGraphContext: (COObjectGraphContext *)aContext
 - (id) initWithEntityDescription: (ETEntityDescription *)anEntityDesc
               objectGraphContext: (COObjectGraphContext *)aContext
 {
-	return [self initWithUUID: [ETUUID UUID]
-	        entityDescription: anEntityDesc
-	       objectGraphContext: aContext];
+	SUPERINIT;
+	self = [self commonInitWithUUID: [ETUUID UUID]
+	              entityDescription: anEntityDesc
+	             objectGraphContext: aContext
+	                          isNew: YES];
+	
+	self = [self initWithObjectGraphContext: aContext];
+	if (self == nil)
+		return nil;
+
+	return self;
 }
 
 // TODO: Maybe add convenience copying method, - (COObject *) copyWithCopier: (COCopier *)aCopier
