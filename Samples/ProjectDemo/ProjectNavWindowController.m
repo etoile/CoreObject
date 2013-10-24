@@ -1,5 +1,6 @@
 #import "ProjectNavWindowController.h"
-#import "PRoject.h"
+#import "Project.h"
+#import "ApplicationDelegate.h"
 
 @implementation ProjectNavWindowController
 
@@ -25,6 +26,21 @@
 	// Hmm.. we really need to listen for persistent root creation
 	// and update our outline view.
 	
+	[outline setTarget: self];
+	[outline setDoubleAction: @selector(doubleClick:)];
+}
+
+/* NSOutlineView Target/Action */
+
+- (void)doubleClick: (id)sender
+{
+	if (sender == outline)
+	{
+		id item = [outline itemAtRow: [outline selectedRow]];
+		NSLog(@"Double click: %@", item);
+		
+		[[[NSApp delegate] controllerForDocumentRootObject: item] showWindow: nil];
+	}
 }
 
 /* NSOutlineView data source */
@@ -68,6 +84,9 @@
 
 - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
+	
+	[item setValue: object forProperty: @"name"];
+	[[[NSApp delegate] editingContext] commit];
 //	if (nil == item) { item = [self rootObject]; }
 //	
 //	if ([item isKindOfClass: [OutlineItem class]])
