@@ -510,6 +510,7 @@
 
 
 /**
+ * <override-never />
  * Returns a value from the variable storage.
  *
  * Can be used to read a property with no instance variable.
@@ -519,6 +520,7 @@
  */
 - (id)valueForVariableStorageKey: (NSString *)key;
 /**
+ * <override-never />
  * Sets a value in the variable storage.
  *
  * Can be used to write a property with no instance variable.
