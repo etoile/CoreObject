@@ -28,28 +28,22 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
- * COPersistentRoot uses this method to initialize a new object that was never 
- * committed.
+ * Prepares an object to be initialized or deserialized.
  *
- * For a subclass, this method results in the subclass designated initializer 
- * being called.
+ * COObject initialization is broken in two steps:
+ * 
+ * <list>
+ * <item>For a new object, prepare and initialize using the designated 
+ * initializer (-initWithObjectGraphContext: or some other subclass designated 
+ * initializer)</item>
+ * <item>For loading an object, prepare and deserialize using -setStoreItem: 
+ * (see -[COObjectGraphContext objectWithUUID:entityDescription:])</item>
+ * </list>
  */
-/*- (id)initWithUUID: (ETUUID *)aUUID
- entityDescription: (ETEntityDescription *)anEntityDescription
-objectGraphContext: (COObjectGraphContext *)aContext;*/
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * COPersistentRoot uses this method to initialize a reloaded object that was 
- * previously committed.
- *
- * For a subclass, this method doesn't result in the subclass designated 
- * initializer being called.
- */
-- (id)commonInitWithUUID: (ETUUID *)aUUID
-       entityDescription: (ETEntityDescription *)anEntityDescription
-      objectGraphContext: (COObjectGraphContext *)aContext
-                   isNew: (BOOL)inserted;
+- (id)prepareWithUUID: (ETUUID *)aUUID
+    entityDescription: (ETEntityDescription *)anEntityDescription
+   objectGraphContext: (COObjectGraphContext *)aContext
+                isNew: (BOOL)inserted;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

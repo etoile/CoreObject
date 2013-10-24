@@ -217,10 +217,10 @@ See +[NSObject typePrefix]. */
 	}
 }
 
-- (id) commonInitWithUUID: (ETUUID *)aUUID
-        entityDescription: (ETEntityDescription *)anEntityDescription
-       objectGraphContext: (COObjectGraphContext *)aContext
-					isNew: (BOOL)inserted
+- (id)prepareWithUUID: (ETUUID *)aUUID
+    entityDescription: (ETEntityDescription *)anEntityDescription
+   objectGraphContext: (COObjectGraphContext *)aContext
+                isNew: (BOOL)inserted  __attribute__((objc_method_family(init)))
 {
 	NILARG_EXCEPTION_TEST(aUUID);
 	NILARG_EXCEPTION_TEST(anEntityDescription);
@@ -230,10 +230,12 @@ See +[NSObject typePrefix]. */
 	[self validateEntityDescription: anEntityDescription
 	   inModelDescriptionRepository: [aContext modelRepository]];
 
+	SUPERINIT;
+
 	_UUID = aUUID;
 	_entityDescription =  anEntityDescription;
 	_objectGraphContext = aContext;
-	_isInitialized = YES;
+	_isPrepared = YES;
 	_variableStorage = [self newVariableStorage];
     _outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
 	_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
@@ -245,17 +247,19 @@ See +[NSObject typePrefix]. */
 
 - (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
-	if (_isInitialized)
+	/* We execute overriden initializer implementations e.g. 
+	   -[ETShape initWithBezierPath:objectGraphContext:], until reaching the 
+	   topmost COObject designed initializer (aka -[COObject initWithGraphContext:]), 
+	   where we return immediately when the basic initialization is done 
+	   (this happens when -initWithEntityDescription:objectGraphContext: is used). */
+	if (_isPrepared)
 		return self;
 
-	NILARG_EXCEPTION_TEST(aContext);
-
-	SUPERINIT;
 	ETModelDescriptionRepository *repo = [aContext modelRepository];
-	return [self commonInitWithUUID: [ETUUID UUID]
-	              entityDescription: [repo entityDescriptionForClass: [self class]]
-	             objectGraphContext: aContext
-	                          isNew: YES];
+	return [self prepareWithUUID: [ETUUID UUID]
+	           entityDescription: [repo entityDescriptionForClass: [self class]]
+	          objectGraphContext: aContext
+	                       isNew: YES];
 }
 
 - (id)init
@@ -263,15 +267,15 @@ See +[NSObject typePrefix]. */
 	return [self initWithObjectGraphContext: nil];
 }
 
-- (id) initWithEntityDescription: (ETEntityDescription *)anEntityDesc
-              objectGraphContext: (COObjectGraphContext *)aContext
+- (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
+             objectGraphContext: (COObjectGraphContext *)aContext
 {
-	SUPERINIT;
-	self = [self commonInitWithUUID: [ETUUID UUID]
-	              entityDescription: anEntityDesc
-	             objectGraphContext: aContext
-	                          isNew: YES];
-	
+	self = [self prepareWithUUID: [ETUUID UUID]
+	           entityDescription: anEntityDesc
+	          objectGraphContext: aContext
+	                       isNew: YES];
+
+	/* For subclasses that override the designated initializer */
 	self = [self initWithObjectGraphContext: aContext];
 	if (self == nil)
 		return nil;

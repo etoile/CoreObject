@@ -176,13 +176,13 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
    entityDescription: (ETEntityDescription *)anEntityDescription
 {
 	Class objClass = [_modelRepository classForEntityDescription: anEntityDescription];
-	/* For a reloaded object, we must no call -initWithUUID:entityDescription:context:
+	/* For a reloaded object, we must not call -initWithEntityDescription:objectGraphContext:
 	   to prevent the normal initialization process to occur (the COObject
 	   subclass designed initializer being called). */
-	COObject *obj = [[objClass alloc] commonInitWithUUID: aUUID
-                                       entityDescription: anEntityDescription
-	                                  objectGraphContext: self
-	                                               isNew: NO];
+	COObject *obj = [[objClass alloc] prepareWithUUID: aUUID
+                                    entityDescription: anEntityDescription
+	                               objectGraphContext: self
+	                                            isNew: NO];
 	
 	[_loadedObjects setObject: obj forKey: aUUID];
 	

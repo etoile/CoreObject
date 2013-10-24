@@ -222,7 +222,7 @@
 	 */
     NSMutableDictionary *_outgoingSerializedRelationshipCache;
 	BOOL _inDescription; // FIXME: remove; only for debugging
-	BOOL _isInitialized;
+	BOOL _isPrepared;
 }
 
 
@@ -269,6 +269,9 @@
  * rather than the entity description registered for the receiver class in
  * -[COObjectGraphContext modelRepository], and this initializer is the only way 
  * to do that.
+ *
+ * For a subclass, this method results in the subclass designated initializer
+ * being called.
  */
 - (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
              objectGraphContext: (COObjectGraphContext *)aContext;
