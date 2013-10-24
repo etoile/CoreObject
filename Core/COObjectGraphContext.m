@@ -240,7 +240,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 		if (isRootObject)
 			continue;
 		
-		COObject *object = [self objectWithUUID: UUID];
+		COObject *object = [self loadedObjectForUUID: UUID];
 		ETAssert(object != nil);
 
 		[object didLoadObjectGraph];
@@ -357,7 +357,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	if ([self rootItemUUID] == nil)
 		return nil;
 
-    return [self objectWithUUID: [self rootItemUUID]];
+    return [self loadedObjectForUUID: [self rootItemUUID]];
 }
 
 - (void)setRootObject: (COObject *)anObject
@@ -462,7 +462,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     return [NSSet setWithArray: [_loadedObjects allValues]];
 }
 
-- (COObject *) objectWithUUID: (ETUUID *)aUUID
+- (COObject *) loadedObjectForUUID: (ETUUID *)aUUID
 {
 	// NOTE: We serialize UUIDs into strings in various places, this check
 	// helps to intercept string objects that ought to be ETUUID objects.

@@ -289,9 +289,9 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @property (nonatomic, strong) id rootObject;
 /**
- * Shorthand for [[[self editingBranch] objectGraphContext] objectWithUUID:]
+ * Shorthand for [[[self editingBranch] objectGraphContext] loadedObjectForUUID:]
  */
-- (COObject *)objectWithUUID: (ETUUID *)uuid;
+- (COObject *)loadedObjectForUUID: (ETUUID *)uuid;
 /**
  * Shortcut for <code>[[self editingBranch] currentRevision]</code>
  *

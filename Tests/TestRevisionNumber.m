@@ -78,7 +78,7 @@
 	 {
         UKNotNil(testProot);
         
-        COObject *testObj2 = [testProot objectWithUUID: [obj UUID]];
+        COObject *testObj2 = [testProot loadedObjectForUUID: [obj UUID]];
         UKNotNil(testObj2);
         UKObjectsEqual(@"Third Revision", [testObj2 valueForKey: @"label"]);
 	 }];
@@ -90,7 +90,7 @@
         COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         [persistentRootInCtx2 setCurrentRevision: secondCommitRev];
         
-        COObject *obj2 = [persistentRootInCtx2 objectWithUUID: [obj UUID]];
+        COObject *obj2 = [persistentRootInCtx2 loadedObjectForUUID: [obj UUID]];
         UKNotNil(obj2);
         UKObjectsEqual(@"Second Revision", [obj2 valueForProperty: @"label"]);
         
@@ -109,7 +109,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 COObject *testObj2 = [testProot objectWithUUID: [obj UUID]];
+		 COObject *testObj2 = [testProot loadedObjectForUUID: [obj UUID]];
 		 UKNotNil(testObj2);
 		 UKObjectsEqual(@"Fourth Revision", [testObj2 valueForKey: @"label"]);
 	 }];

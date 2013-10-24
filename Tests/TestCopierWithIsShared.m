@@ -151,7 +151,7 @@ static NSArray *initialUUIDs;
 	[[a mutableSetValueForKey: @"contents"] addObject: b];
 	
 	ETUUID *aCopyUUID = [copier copyItemWithUUID: [a UUID] fromGraph: ctx toGraph: ctx];
-	id aCopy = [ctx objectWithUUID: aCopyUUID];
+	id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 	
 	UKIntsEqual(3, [[ctx itemUUIDs] count]);
 	UKObjectsNotEqual(a, aCopy);
@@ -169,7 +169,7 @@ static NSArray *initialUUIDs;
 	b.isShared = YES;
 	
 	ETUUID *aCopyUUID = [copier copyItemWithUUID: [a UUID] fromGraph: ctx toGraph: ctx];
-	id aCopy = [ctx objectWithUUID: aCopyUUID];
+	id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 	
 	UKIntsEqual(3, [[ctx itemUUIDs] count]);
 	UKObjectsNotEqual(a, aCopy);
@@ -187,7 +187,7 @@ static NSArray *initialUUIDs;
 	b.isShared = NO;
 	
 	ETUUID *aCopyUUID = [copier copyItemWithUUID: [a UUID] fromGraph: ctx toGraph: ctx];
-	id aCopy = [ctx objectWithUUID: aCopyUUID];
+	id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 	
 	UKIntsEqual(4, [[ctx itemUUIDs] count]);
 	UKObjectsNotEqual(a, aCopy);

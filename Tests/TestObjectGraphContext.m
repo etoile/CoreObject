@@ -108,8 +108,8 @@
 
     UKObjectsNotEqual(o1copyUUID, o1copy2UUID);
     
-    COObject *o1copy = [ctx2 objectWithUUID: o1copyUUID];
-    COObject *o1copy2 = [ctx2 objectWithUUID: o1copy2UUID];
+    COObject *o1copy = [ctx2 loadedObjectForUUID: o1copyUUID];
+    COObject *o1copy2 = [ctx2 loadedObjectForUUID: o1copy2UUID];
     
     COObject *o2copy = [[o1copy valueForKey: @"contents"] firstObject];
 	COObject *o2copy2 = [[o1copy2 valueForKey: @"contents"] firstObject];
@@ -141,7 +141,7 @@
 	COMutableItem *mutableItem = [COMutableItem item];
     [mutableItem setValue: @"OutlineItem" forAttribute: kCOObjectEntityNameProperty type: kCOTypeString];
     [ctx1 insertOrUpdateItems: A(mutableItem)];
-    COObject *object = [ctx1 objectWithUUID: [mutableItem UUID]];
+    COObject *object = [ctx1 loadedObjectForUUID: [mutableItem UUID]];
     
     [mutableItem setValue: @"hello" forAttribute: kCOLabel type: kCOTypeString];
     

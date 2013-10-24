@@ -321,9 +321,9 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	[[self objectGraphContext] setRootObject: aRootObject];
 }
 
-- (COObject *)objectWithUUID: (ETUUID *)uuid
+- (COObject *)loadedObjectForUUID: (ETUUID *)uuid
 {
-	return [[self objectGraphContext] objectWithUUID: uuid];
+	return [[self objectGraphContext] loadedObjectForUUID: uuid];
 }
 
 - (NSSet *)branchesPendingInsertion

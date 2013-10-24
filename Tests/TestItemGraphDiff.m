@@ -31,13 +31,13 @@
 	
     // Copy the items to ctx2
     [ctx2 setItemGraph: ctx1];
-    [ctx2 setRootObject: [ctx2 objectWithUUID: [parent UUID]]];
+    [ctx2 setRootObject: [ctx2 loadedObjectForUUID: [parent UUID]]];
     
 	COObject *parentCtx2 = [ctx2 rootObject];
-	COObject *childCtx2 = [ctx2 objectWithUUID: [child UUID]];
-	COObject *subchild1Ctx2 = [ctx2 objectWithUUID: [subchild1 UUID]];
-	COObject *subchild2Ctx2 = [ctx2 objectWithUUID: [subchild2 UUID]];
-	COObject *subchild3Ctx2 = [ctx2 objectWithUUID: [subchild3 UUID]];
+	COObject *childCtx2 = [ctx2 loadedObjectForUUID: [child UUID]];
+	COObject *subchild1Ctx2 = [ctx2 loadedObjectForUUID: [subchild1 UUID]];
+	COObject *subchild2Ctx2 = [ctx2 loadedObjectForUUID: [subchild2 UUID]];
+	COObject *subchild3Ctx2 = [ctx2 loadedObjectForUUID: [subchild3 UUID]];
 
 	UKObjectsEqual([parent UUID], [parentCtx2 UUID]);
 	UKObjectsEqual([child UUID], [childCtx2 UUID]);
@@ -96,13 +96,13 @@
 	
     // Copy the items to ctx2
     [ctx2 setItemGraph: ctx1];
-    [ctx2 setRootObject: [ctx2 objectWithUUID: [parent UUID]]];
+    [ctx2 setRootObject: [ctx2 loadedObjectForUUID: [parent UUID]]];
     
     COObject *parentCtx2 = [ctx2 rootObject];
     UKNotNil(parentCtx2);
-	COObject *child1Ctx2 = [ctx2 objectWithUUID: [child1 UUID]];
-	COObject *child2Ctx2 = [ctx2 objectWithUUID: [child2 UUID]];
-	COObject *subchild1Ctx2 = [ctx2 objectWithUUID: [subchild1 UUID]];
+	COObject *child1Ctx2 = [ctx2 loadedObjectForUUID: [child1 UUID]];
+	COObject *child2Ctx2 = [ctx2 loadedObjectForUUID: [child2 UUID]];
+	COObject *subchild1Ctx2 = [ctx2 loadedObjectForUUID: [subchild1 UUID]];
 	
 	// Now make some modifications to ctx2: (move "Salad" from "Groceries" to "Todo")
 	

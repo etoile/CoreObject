@@ -44,7 +44,7 @@
 	UKNotNil([obj valueForProperty: @"contents"]);
 
 	UKObjectsSame(ctx, [[obj persistentRoot] parentContext]);
-	UKObjectsSame(obj, [[obj persistentRoot] objectWithUUID: [obj UUID]]);
+	UKObjectsSame(obj, [[obj persistentRoot] loadedObjectForUUID: [obj UUID]]);
 	UKTrue([[ctx loadedObjects] containsObject: obj]);
 	UKTrue([[ctx loadedRootObjects] containsObject: obj]);
 
@@ -120,7 +120,7 @@
 	/*COPersistentRoot *newPersistentRoot =
 		[ctx contextForPersistentRootUUID: [persistentRoot persistentRootUUID]];
 	COObject *newObj = [newPersistentRoot rootObject];*/
-	COObject *newObj = [ctx objectWithUUID: [obj UUID]];
+	COObject *newObj = [ctx loadedObjectForUUID: [obj UUID]];
 	COPersistentRoot *newPersistentRoot = [newObj persistentRoot];
 
 	UKNotNil(newObj);
@@ -133,7 +133,7 @@
 	UKObjectsEqual([self basicProperties], SA([newObj persistentPropertyNames]));
 	UKStringsEqual(@"Hello", [newObj valueForProperty: @"label"]);
 
-	UKObjectsSame(newObj, [newPersistentRoot objectWithUUID: [newObj UUID]]);
+	UKObjectsSame(newObj, [newPersistentRoot loadedObjectForUUID: [newObj UUID]]);
 	UKObjectsEqual([ctx loadedObjects], S(newObj));
 
 	[persistentRoot release];
@@ -147,7 +147,7 @@
 	ETUUID *u1 = [[o1 UUID] retain];
 
 	[ctx discardAllChanges];
-	UKNil([ctx objectWithUUID: u1]);
+	UKNil([ctx loadedObjectForUUID: u1]);
 	UKFalse([ctx hasChanges]);
 
 	COObject *o2 = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -174,10 +174,10 @@
 	/* Cross references require committed persistent roots */
 	[ctx commit];
 
-	UKObjectsSame(obj2, [persistentRoot objectWithUUID: [persistentRoot2 persistentRootUUID]]);
-	UKObjectsSame(obj, [persistentRoot2 objectWithUUID: [persistentRoot persistentRootUUID]]);
-	UKObjectsSame(obj2, [persistentRoot objectWithUUID: [[persistentRoot2 commitTrack] UUID]]);
-	UKObjectsSame(obj, [persistentRoot2 objectWithUUID: [[persistentRoot commitTrack] UUID]]);
+	UKObjectsSame(obj2, [persistentRoot loadedObjectForUUID: [persistentRoot2 persistentRootUUID]]);
+	UKObjectsSame(obj, [persistentRoot2 loadedObjectForUUID: [persistentRoot persistentRootUUID]]);
+	UKObjectsSame(obj2, [persistentRoot loadedObjectForUUID: [[persistentRoot2 commitTrack] UUID]]);
+	UKObjectsSame(obj, [persistentRoot2 loadedObjectForUUID: [[persistentRoot commitTrack] UUID]]);
 
 	/* Recreate persistent root and root object */
 
@@ -193,10 +193,10 @@
 	UKNotNil(newObj);
 	UKNotNil(newObj2);
 
-	UKObjectsSame(newObj2, [newPersistentRoot objectWithUUID: [persistentRoot2 persistentRootUUID]]);
-	UKObjectsSame(newObj, [newPersistentRoot2 objectWithUUID: [persistentRoot persistentRootUUID]]);
-	UKObjectsSame(newObj2, [newPersistentRoot objectWithUUID: [[persistentRoot2 commitTrack] UUID]]);
-	UKObjectsSame(newObj, [newPersistentRoot2 objectWithUUID: [[persistentRoot commitTrack] UUID]]);
+	UKObjectsSame(newObj2, [newPersistentRoot loadedObjectForUUID: [persistentRoot2 persistentRootUUID]]);
+	UKObjectsSame(newObj, [newPersistentRoot2 loadedObjectForUUID: [persistentRoot persistentRootUUID]]);
+	UKObjectsSame(newObj2, [newPersistentRoot loadedObjectForUUID: [[persistentRoot2 commitTrack] UUID]]);
+	UKObjectsSame(newObj, [newPersistentRoot2 loadedObjectForUUID: [[persistentRoot commitTrack] UUID]]);
 
 	UKObjectsSame(newObj2, [[obj contentArray] lastObject]);
 

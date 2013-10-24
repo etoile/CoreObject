@@ -153,7 +153,7 @@ static ETUUID *drawing2;
                                             toGraph: ctx2];
     UKObjectsNotEqual(tag1copyUUID, [tag1 UUID]);
     
-    COObject *tag1copy = [ctx2 objectWithUUID: tag1copyUUID];
+    COObject *tag1copy = [ctx2 loadedObjectForUUID: tag1copyUUID];
     
     UKIntsEqual(2, [[ctx2 itemUUIDs] count]);
     

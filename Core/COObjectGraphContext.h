@@ -257,7 +257,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * You shouldn't need to use this method, unless you extend CoreObject API.
  */
-- (COObject *)objectWithUUID: (ETUUID *)aUUID;
+- (COObject *)loadedObjectForUUID: (ETUUID *)aUUID;
 
 
 /** @taskunit Debugging */

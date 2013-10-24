@@ -481,7 +481,7 @@
     // secondBranch will edit childObj's label
     
     [rootObj setLabel: @"1"];
-    [(OutlineItem *)[[secondBranch objectGraphContext] objectWithUUID: [childObj UUID]] setLabel: @"2"];
+    [(OutlineItem *)[[secondBranch objectGraphContext] loadedObjectForUUID: [childObj UUID]] setLabel: @"2"];
     [ctx commit];
     
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
@@ -504,13 +504,13 @@
 		 // Check for the proper contents
 		 
 		 UKObjectsEqual(@"1", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialBranchRev] rootObject] label]);
-		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialBranchRev] objectWithUUID: [childObj UUID]] label]);
+		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialBranchRev] loadedObjectForUUID: [childObj UUID]] label]);
 		 
 		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: secondBranchRev] rootObject] label]);
-		 UKObjectsEqual(@"2", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: secondBranchRev] objectWithUUID: [childObj UUID]] label]);
+		 UKObjectsEqual(@"2", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: secondBranchRev] loadedObjectForUUID: [childObj UUID]] label]);
 		 
 		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialRev] rootObject] label]);
-		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialRev] objectWithUUID: [childObj UUID]] label]);
+		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialRev] loadedObjectForUUID: [childObj UUID]] label]);
 	 }];
     
     [initialBranch setMergingBranch: secondBranch];
