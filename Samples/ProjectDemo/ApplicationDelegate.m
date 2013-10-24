@@ -71,32 +71,39 @@
     }
 }
 
+- (NSSet *)projects
+{
+	NSSet *projects = [[[context persistentRoots]
+						mappedCollectionWithBlock: ^(id obj) {
+							return [obj rootObject];
+						}] filteredCollectionWithBlock: ^(id obj) {
+							return [[[obj entityDescription] name] isEqualToString: @"Project"];
+						}];
+	return projects;
+}
 
 - (void)awakeFromNib
 {
 	context = [[COEditingContext alloc] initWithStore:
 			   [[[COSQLiteStore alloc] initWithURL: STORE_URL] autorelease]];
 	
-	ETUUID *uuid = [[NSUserDefaults standardUserDefaults] UUIDForKey: @"projectDemoProjectUUID"];
+	// TODO: Use NSUserDefaults to remember open documents
+	//ETUUID *uuid = [[NSUserDefaults standardUserDefaults] UUIDForKey: @"projectDemoProjectUUID"];
 	
-	Project *loaded = [[context persistentRootForUUID: uuid] rootObject];
-	NSLog(@"Got UUID %@ from user defaults. The context returns: %@", uuid, loaded);
+
+	NSSet *projects = [self projects];
 	
-	if (nil != uuid && nil != loaded)
+	if (![projects isEmpty])
 	{
-		ASSIGN(project, (Project *)[[context persistentRootForUUID: uuid] rootObject]);
-		NSLog(@"Loading existing project %@ = %@", uuid, project);
-		NSLog(@"It has %@ documents", [project documents]);
+		NSLog(@"Loaded projects: %@", projects);
 	}
 	else
 	{
         COPersistentRoot *proot = [context insertNewPersistentRootWithEntityName: @"Anonymous.Project"];
-        
-		ASSIGN(project, [proot rootObject]);
+		[[proot rootObject] setName: @"Untitled project"];
 		[context commit];
+		
 		NSLog(@"Creating a new project %@", [proot UUID]);
-		[[NSUserDefaults standardUserDefaults] setUUID: [proot UUID]
-												forKey: @"projectDemoProjectUUID"];
 	}
 		
 	controllerForDocumentUUID = [[NSMutableDictionary alloc] init];
@@ -108,9 +115,13 @@
 //	desktopWindow = [[DesktopWindow alloc] init];
 	//projectNavWindow = [[ProjectNavWindow alloc] init];
 	overlayShelf = [[OverlayShelf alloc] init];
-	
-	// Show existing documents
-	[self projectDocumentsDidChange: project];
+
+	projects = [self projects];
+	for (Project *project in projects)
+	{
+		// Show existing documents
+		[self projectDocumentsDidChange: project];
+	}
 }
 
 - (COEditingContext*)editingContext
@@ -125,10 +136,8 @@
 
 - (void)dealloc
 {
-	[project release];
 	[controllerForDocumentUUID release];
 	[desktopWindow release];
-	[projectNavWindow release];
 	[super dealloc];
 }
 
@@ -148,7 +157,9 @@
 	[document setDocumentName: [NSString stringWithFormat: @"Document %@", [[persistentRoot UUID] stringValue]]];
 	[document setDocumentType: type];
 	
-	[project addDocument_hack: document];
+	// FIXME: Total hack
+	Project *proj = [[self projects] anyObject];
+	[proj addDocument_hack: document];
 	
 	NSLog(@"Added a document model object %@, outline item %@", document, rootObj);
 	NSLog(@"Changed objects %@", [context changedObjects]);
@@ -157,7 +168,7 @@
 	[newDocumentTypeWindow orderOut: nil];
     
     // FIXME: Hack
-    [self projectDocumentsDidChange: project];
+    [self projectDocumentsDidChange: proj];
 }
 
 - (IBAction) newTextDocument: (id)sender
@@ -243,11 +254,14 @@
 
 - (OutlineController*)controllerForDocumentRootObject: (COObject*)rootObject;
 {
-	for (Document *doc in [project documents])
+	for (Project *project in [self projects])
 	{
-		if ([[[doc rootObject] UUID] isEqual: [rootObject UUID]])
+		for (Document *doc in [project documents])
 		{
-			return [controllerForDocumentUUID objectForKey: [doc UUID]];
+			if ([[[doc rootObject] UUID] isEqual: [rootObject UUID]])
+			{
+				return [controllerForDocumentUUID objectForKey: [doc UUID]];
+			}
 		}
 	}
 	return nil;
@@ -322,11 +336,6 @@
 - (void)showSearchResults: (id)sender
 {
 	[searchWindow orderFront: self];
-}
-
-- (Project *)project
-{
-	return project;
 }
 
 @end

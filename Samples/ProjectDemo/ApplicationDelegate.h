@@ -5,7 +5,7 @@
 #import "CheckpointAsSheetController.h"
 #import "SharingController.h"
 #import "DesktopWindow.h"
-#import "ProjectNavWindow.h"
+#import "ProjectNavWindowController.h"
 #import "OverlayShelf.h"
 #import "TagWindowController.h"
 
@@ -22,11 +22,9 @@
 	IBOutlet TagWindowController *tagWindowController;
 	
 	DesktopWindow *desktopWindow;
-	ProjectNavWindow *projectNavWindow;
 	OverlayShelf *overlayShelf;
 	
 	COEditingContext *context;
-	Project *project;
 	
 	NSMutableDictionary *controllerForDocumentUUID;
 }
@@ -48,8 +46,6 @@
 - (OutlineController*)controllerForDocumentRootObject: (COObject*)rootObject;
 
 - (void)showSearchResults: (id)sender;
-
-- (Project *)project;
 
 - (IBAction) orderFrontPreferencesPanel: (id)sender;
 

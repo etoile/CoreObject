@@ -5,7 +5,8 @@
 + (ETEntityDescription*)newEntityDescription
 {
     ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"Project"];
-    
+    [entity setParent: (id)@"Anonymous.COObject"];
+	
     ETPropertyDescription *documentsProperty = [ETPropertyDescription descriptionWithName: @"documents"
                                                                                      type: (id)@"Document"];
     [documentsProperty setPersistent: YES];
@@ -43,6 +44,14 @@
 - (void) removeTag: (Tag *)tag
 {
 	[[self mutableSetValueForKey: @"tags"] removeObject: tag];
+}
+
+- (NSArray *) documentsSorted
+{
+	NSArray *unsorted = [self.documents allObjects];
+	
+	return [unsorted sortedArrayUsingDescriptors:
+			@[[[NSSortDescriptor alloc] initWithKey:@"name" ascending: YES]]];
 }
 
 @end
