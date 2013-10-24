@@ -467,7 +467,7 @@
 		(command != nil ? D(command, kCOCommandKey) : [NSDictionary dictionary]);
 
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName: COEditingContextDidCommitNotification
+		postNotificationName: COEditingContextDidChangeNotification
 		              object: self
 		            userInfo: userInfo];
 }
@@ -745,6 +745,6 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 
 @end
 
-NSString * const COEditingContextDidCommitNotification =
-	@"COEditingContextDidCommitNotification";
+NSString * const COEditingContextDidChangeNotification =
+	@"COEditingContextDidChangeNotification";
 NSString * const kCOCommandKey = @"kCOCommandKey";

@@ -341,5 +341,5 @@
 
 @end
 
-extern NSString * const COEditingContextDidCommitNotification;
+extern NSString * const COEditingContextDidChangeNotification;
 extern NSString * const kCOCommandKey;
