@@ -20,6 +20,15 @@ First alpha release blockers
 
 - Eliminate all compile warnings
 
+- Fix few things in EtoileUI that prevents to turn on all assertions in COObject
+
+- Fix GNUstep support
+
+- Write remaing class descriptions
+
+- Implement batch mutation in ETCollection and proper KVO support on top of it in COObject
+
+
 Future Work
 -----------
 
