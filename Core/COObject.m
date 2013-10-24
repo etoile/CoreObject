@@ -975,7 +975,6 @@ objectGraphContext: (COObjectGraphContext *)aContext
 
 #pragma mark - Overridable Loading Notifications
 
-// TODO: Change to new -didAwaken method called in a predetermined order
 - (void)awakeFromDeserialization
 {
     [self validateMultivaluedPropertiesUsingMetamodel];
