@@ -191,13 +191,6 @@
  * object is unloaded (property values are released and reset to a null value), 
  * in the end COFault becomes its class and the resulting fault receives 
  * the message -didTurnIntoFault.
- *
- * Property access TODO: 
- * -valueForProperty: is overridden in a special case (ETLayoutItem).
- * We need a special property getter that can never be overridden and has
- * very precise behaviour:
- * 1. call custom getter, if any
- * 2. access variable storage.
  */
 @interface COObject : NSObject <COObjectMatching>
 {
@@ -384,13 +377,15 @@
 /** @taskunit Property-Value Coding */
 
 
-/** 
+/**
+ * <override-never />
  * Returns the properties declared in the receiver entity description.
  *
  * See also -entityDescription and -persistentPropertyNames.
  */
 - (NSArray *)propertyNames;
-/** 
+/**
+ * <override-never />
  * Returns the persistent properties declared in the receiver entity description.
  *
  * The returned array contains the property descriptions which replies YES to 
@@ -400,6 +395,7 @@
  */
 - (NSArray *)persistentPropertyNames;
 /**
+ * <override-never />
  * Returns the property value.
  *
  * When the property is not declared in the entity description, raises an 
@@ -409,6 +405,7 @@
  */
 - (id)valueForProperty: (NSString *)key;
 /**
+ * <override-never />
  * Sets the property value.
  *
  * When the property is not declared in the entity description, raises an 
