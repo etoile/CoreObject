@@ -218,7 +218,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     _currentBranchUUID = [aBranch UUID];
     
     [self updateCrossPersistentRootReferences];
-    [self sendChangeNotification];
 }
 
 - (COBranch *)editingBranch
@@ -242,8 +241,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     }
 
     _editingBranchUUID = [aBranch UUID];
-    
-    [self sendChangeNotification];
 }
 
 - (NSSet *)branches
@@ -279,7 +276,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	}
     
     [self updateCrossPersistentRootReferences];
-	[self sendChangeNotification];
 }
 
 - (void)undeleteBranch: (COBranch *)aBranch
@@ -294,7 +290,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     }
 
     [self updateCrossPersistentRootReferences];
-	[self sendChangeNotification];
 }
 
 - (COObjectGraphContext *)objectGraphContext

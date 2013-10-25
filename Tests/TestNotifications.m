@@ -5,6 +5,7 @@
 @interface TestNotifications : EditingContextTestCase <UKTest>
 {
     COPersistentRoot *persistentRoot1;
+	COBranch *branch2;
     COPersistentRoot *persistentRoot2;
 }
 @end
@@ -23,6 +24,9 @@
 	
     [ctx commit];
 
+	branch2 = [[persistentRoot1 currentBranch] makeBranchWithLabel: @"branch2"];
+	[ctx commit];
+	
     return self;
 }
 
@@ -45,7 +49,17 @@
 		[[persistentRoot1 rootObject] setLabel: @"world"];
 		[ctx commit];
 	} postsNotification: COPersistentRootDidChangeNotification withCount: 1 fromObject: persistentRoot1 withUserInfo: nil];
-	
+}
+
+- (void)testPersistentRootNoNotificationOnInnerObjectChangesLocal
+{
+	[self checkBlock: ^(){
+		[[persistentRoot1 rootObject] setLabel: @"world"];
+	} postsNotification: COPersistentRootDidChangeNotification withCount: 0 fromObject: persistentRoot1 withUserInfo: nil];
+}
+
+- (void)testPersistentRootNoNotificationOnDiscardChangesLocal
+{
 	[self checkBlock: ^(){
 		[[persistentRoot1 rootObject] setLabel: @"world"];
 		[persistentRoot1 discardAllChanges];
@@ -61,6 +75,64 @@
 		[ctx2 commit];
 		
 		[self wait];
+	} postsNotification: COPersistentRootDidChangeNotification withCount: 1 fromObject: persistentRoot1 withUserInfo: nil];
+}
+
+- (void)testPersistentRootNotificationOnSetCurrentBranchLocal
+{
+	[self checkBlock: ^(){
+		[persistentRoot1 setCurrentBranch: branch2];
+		[ctx commit];
+	} postsNotification: COPersistentRootDidChangeNotification withCount: 1 fromObject: persistentRoot1 withUserInfo: nil];
+}
+
+- (void)testPersistentRootNoNotificationOnSetCurrentBranchLocal
+{
+	[self checkBlock: ^(){
+		[persistentRoot1 setCurrentBranch: branch2];
+	} postsNotification: COPersistentRootDidChangeNotification withCount: 0 fromObject: persistentRoot1 withUserInfo: nil];
+}
+
+- (void)testPersistentRootNotificationOnSetEditingBranchLocal
+{
+	[self checkBlock: ^(){
+		[persistentRoot1 setEditingBranch: branch2];
+	} postsNotification: COPersistentRootDidChangeNotification withCount: 0 fromObject: persistentRoot1 withUserInfo: nil];
+}
+
+- (void)testPersistentRootNotificationOnDeleteBranchLocal
+{
+	[self checkBlock: ^(){
+		branch2.deleted = YES;
+		[ctx commit];
+	} postsNotification: COPersistentRootDidChangeNotification withCount: 1 fromObject: persistentRoot1 withUserInfo: nil];
+}
+
+- (void)testPersistentRootNoNotificationOnDeleteBranchLocal
+{
+	[self checkBlock: ^(){
+		branch2.deleted = YES;
+	} postsNotification: COPersistentRootDidChangeNotification withCount: 0 fromObject: persistentRoot1 withUserInfo: nil];
+}
+
+- (void)testPersistentRootNoNotificationOnUndeleteBranchLocal
+{
+	branch2.deleted = YES;
+	[ctx commit];
+	
+	[self checkBlock: ^(){
+		branch2.deleted = NO;
+	} postsNotification: COPersistentRootDidChangeNotification withCount: 0 fromObject: persistentRoot1 withUserInfo: nil];
+}
+
+- (void)testPersistentRootNotificationOnUndeleteBranchLocal
+{
+	branch2.deleted = YES;
+	[ctx commit];
+	
+	[self checkBlock: ^(){
+		branch2.deleted = NO;
+		[ctx commit];
 	} postsNotification: COPersistentRootDidChangeNotification withCount: 1 fromObject: persistentRoot1 withUserInfo: nil];
 }
 
