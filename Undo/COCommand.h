@@ -29,11 +29,11 @@
  *
  * See -initWithPropertyList:.
  */
-+ (COCommand *) commandWithPlist: (id)aPlist;
++ (COCommand *) commandWithPropertyList: (id)aPlist;
 /**
  * Returns the receiver serialized as a property list.
  */
-- (id) plist;
+- (id) propertyList;
 
 
 /** @taskunit Basic Properties */
@@ -75,7 +75,7 @@
  * <init />
  * Initializes and returns a command deserialized from a property list.
  */
-- (id) initWithPlist: (id)plist;
+- (id) initWithPropertyList: (id)plist;
 
 @end
 

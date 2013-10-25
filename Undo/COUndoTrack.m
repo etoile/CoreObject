@@ -125,7 +125,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
         return nil;
     }
     
-    COCommand *edit = [COCommand commandWithPlist: plist];
+    COCommand *edit = [COCommand commandWithPropertyList: plist];
     return edit;
 }
 
@@ -177,7 +177,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     [aContext commit];
     aContext.isRecordingUndo = YES;
     
-    [_store pushAction: [edit plist] stack: pushStack forName: actualStackName];
+    [_store pushAction: [edit propertyList] stack: pushStack forName: actualStackName];
     
     return [_store commitTransaction];
 }
@@ -230,7 +230,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 - (void)addNewUndoCommand: (COCommand *)newCommand
 {
-	[_store pushAction: [newCommand plist] stack: kCOUndoStack forName: _name];
+	[_store pushAction: [newCommand propertyList] stack: kCOUndoStack forName: _name];
 
 	COCommand *currentCommand = [self currentCommand];
 	NSParameterAssert([newCommand isEqual: currentCommand]);
@@ -287,12 +287,12 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	
 	for (NSDictionary *plist in [_store stackContents: kCOUndoStack forName: _name])
 	{
-		[_commands addObject: [COCommand commandWithPlist: plist]];
+		[_commands addObject: [COCommand commandWithPropertyList: plist]];
 	}
 
 	for (NSDictionary *plist in [[_store stackContents: kCORedoStack forName: _name] reverseObjectEnumerator])
 	{
-		[_commands addObject: [COCommand commandWithPlist: plist]];
+		[_commands addObject: [COCommand commandWithPropertyList: plist]];
 	}
 }
 

@@ -14,18 +14,18 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 @synthesize oldMetadata = _oldMetadata;
 @synthesize metadata = _newMetadata;
 
-- (id) initWithPlist: (id)plist
+- (id) initWithPropertyList: (id)plist
 {
-    self = [super initWithPlist: plist];
+    self = [super initWithPropertyList: plist];
     self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandBranchUUID]];
     self.oldMetadata = [plist objectForKey: kCOCommandOldMetadata];
     self.metadata = [plist objectForKey: kCOCommandNewMetadata];
     return self;
 }
 
-- (id) plist
+- (id) propertyList
 {
-    NSMutableDictionary *result = [super plist];
+    NSMutableDictionary *result = [super propertyList];
     [result setObject: [_branchUUID stringValue] forKey: kCOCommandBranchUUID];
     if (_oldMetadata != nil)
     {

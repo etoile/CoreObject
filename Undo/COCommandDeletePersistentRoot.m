@@ -9,9 +9,9 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 @implementation COCommandDeletePersistentRoot
 
-- (id) initWithPlist: (id)plist
+- (id) initWithPropertyList: (id)plist
 {
-    self = [super initWithPlist: plist];
+    self = [super initWithPropertyList: plist];
 	if (self == nil)
 		return nil;
 
@@ -24,9 +24,9 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
     return self;
 }
 
-- (id) plist
+- (id) propertyList
 {
-    NSMutableDictionary *result = [super plist];
+    NSMutableDictionary *result = [super propertyList];
 
 	if (_initialRevisionID != nil)
 	{

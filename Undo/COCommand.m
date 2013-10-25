@@ -50,7 +50,7 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 		   [COCommandSetPersistentRootMetadata class], kCOCommandTypeSetPersistentRootMetadata);
 }
 
-+ (COCommand *) commandWithPlist: (id)aPlist
++ (COCommand *) commandWithPropertyList: (id)aPlist
 {
     NSString *type = [aPlist objectForKey: kCOCommandType];
     
@@ -60,7 +60,7 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
     if (cls != Nil)
     {
-        return [[cls alloc] initWithPlist: aPlist];
+        return [[cls alloc] initWithPropertyList: aPlist];
     }
     else
     {
@@ -69,13 +69,13 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
     }
 }
 
-- (id) initWithPlist: (id)plist
+- (id) initWithPropertyList: (id)plist
 {
     [NSException raise: NSInvalidArgumentException format: @"override"];
     return nil;
 }
 
-- (id) plist
+- (id) propertyList
 {
     NSMutableDictionary *result = [NSMutableDictionary dictionary];
  
@@ -112,7 +112,7 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat: @"<%@: %p> %@", [self class], self, [self plist]];
+    return [NSString stringWithFormat: @"<%@: %p> %@", [self class], self, [self propertyList]];
 }
 
 - (NSArray *)propertyNames
@@ -232,7 +232,7 @@ static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
 #pragma mark -
 #pragma mark Initialization
 
-- (id) initWithPlist: (id)plist
+- (id) initWithPropertyList: (id)plist
 {
     SUPERINIT;
     self.storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandStoreUUID]];
@@ -242,9 +242,9 @@ static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
     return self;
 }
 
-- (id) plist
+- (id) propertyList
 {
-    NSMutableDictionary *result = [super plist];
+    NSMutableDictionary *result = [super propertyList];
     [result setObject: [_storeUUID stringValue] forKey: kCOCommandStoreUUID];
     [result setObject: [_persistentRootUUID stringValue] forKey: kCOCommandPersistentRootUUID];
     [result setObject: [self numberFromDate: _timestamp] forKey: kCOCommandTimestamp];

@@ -26,14 +26,14 @@ static NSString * const kCOCommandContents = @"COCommandContents";
     return self;
 }
 
-- (id) initWithPlist: (id)plist
+- (id) initWithPropertyList: (id)plist
 {
     SUPERINIT;
     
     NSMutableArray *edits = [NSMutableArray array];
     for (id editPlist in [plist objectForKey: kCOCommandContents])
     {
-        COCommand *subEdit = [COCommand commandWithPlist: editPlist];
+        COCommand *subEdit = [COCommand commandWithPropertyList: editPlist];
         [edits addObject: subEdit];
     }
     
@@ -41,14 +41,14 @@ static NSString * const kCOCommandContents = @"COCommandContents";
     return self;
 }
 
-- (id) plist
+- (id) propertyList
 {
-    NSMutableDictionary *result = [super plist];
+    NSMutableDictionary *result = [super propertyList];
     
     NSMutableArray *edits = [NSMutableArray array];
     for (COCommand *subEdit in _contents)
     {
-        id subEditPlist = [subEdit plist];
+        id subEditPlist = [subEdit propertyList];
         [edits addObject: subEditPlist];
     }
     [result setObject: edits forKey: kCOCommandContents];
