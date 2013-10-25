@@ -4,7 +4,8 @@
 
 @interface TestNotifications : EditingContextTestCase <UKTest>
 {
-    COPersistentRoot *persistentRoot;
+    COPersistentRoot *persistentRoot1;
+    COPersistentRoot *persistentRoot2;
 }
 @end
 
@@ -14,8 +15,12 @@
 {
     SUPERINIT;
 
-    persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[persistentRoot rootObject] setLabel: @"hello"];
+    persistentRoot1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [[persistentRoot1 rootObject] setLabel: @"hello"];
+	
+	persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [[persistentRoot2 rootObject] setLabel: @"hello2"];
+	
     [ctx commit];
 
     return self;
@@ -26,37 +31,37 @@
     COUndoTrack *track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
     [track clear];
     
-    [[persistentRoot rootObject] setLabel: @"world"];
+    [[persistentRoot1 rootObject] setLabel: @"world"];
     [ctx commitWithUndoTrack: track];
     
 	[self checkBlock: ^(){
 		[track undo];
-	} postsNotification: COPersistentRootDidChangeNotification withCount: 1 fromObject: persistentRoot withUserInfo: nil];
+	} postsNotification: COPersistentRootDidChangeNotification withCount: 1 fromObject: persistentRoot1 withUserInfo: nil];
 }
 
 - (void)testPersistentRootNotificationOnCommitInnerObjectChangesLocal
 {
 	[self checkBlock: ^(){
-		[[persistentRoot rootObject] setLabel: @"world"];
+		[[persistentRoot1 rootObject] setLabel: @"world"];
 		[ctx commit];
-	} postsNotification: COPersistentRootDidChangeNotification withCount: 1 fromObject: persistentRoot withUserInfo: nil];
+	} postsNotification: COPersistentRootDidChangeNotification withCount: 1 fromObject: persistentRoot1 withUserInfo: nil];
 	
 	[self checkBlock: ^(){
-		[[persistentRoot rootObject] setLabel: @"world"];
-		[persistentRoot discardAllChanges];
-	} postsNotification: COPersistentRootDidChangeNotification withCount: 0 fromObject: persistentRoot withUserInfo: nil];
+		[[persistentRoot1 rootObject] setLabel: @"world"];
+		[persistentRoot1 discardAllChanges];
+	} postsNotification: COPersistentRootDidChangeNotification withCount: 0 fromObject: persistentRoot1 withUserInfo: nil];
 }
 
 - (void)testPersistentRootNotificationOnCommitInnerObjectChangesRemote
 {
 	[self checkBlock: ^(){
 		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-		COPersistentRoot *persistentRoot2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-		[[persistentRoot2 rootObject] setLabel: @"world"];
+		COPersistentRoot *ctx2persistentRoot1 = [ctx2 persistentRootForUUID: [persistentRoot1 UUID]];
+		[[ctx2persistentRoot1 rootObject] setLabel: @"world"];
 		[ctx2 commit];
 		
 		[self wait];
-	} postsNotification: COPersistentRootDidChangeNotification withCount: 1 fromObject: persistentRoot withUserInfo: nil];
+	} postsNotification: COPersistentRootDidChangeNotification withCount: 1 fromObject: persistentRoot1 withUserInfo: nil];
 }
 
 // COEditingContext notifications
@@ -64,12 +69,13 @@
 - (void)testEditingContextNotificationOnCommitInnerObjectChangesLocal
 {
 	[self checkBlock: ^(){
-		[[persistentRoot rootObject] setLabel: @"world"];
+		[[persistentRoot1 rootObject] setLabel: @"world"];
+		[[persistentRoot2 rootObject] setLabel: @"world2"];
 		[ctx commit];
 	} postsNotification: COEditingContextDidChangeNotification withCount: 1 fromObject: ctx	withUserInfo: nil];
 	
 	[self checkBlock: ^(){
-		[[persistentRoot rootObject] setLabel: @"world"];
+		[[persistentRoot1 rootObject] setLabel: @"world"];
 		[ctx discardAllChanges];
 	} postsNotification: COEditingContextDidChangeNotification withCount: 0 fromObject: ctx	withUserInfo: nil];
 }
@@ -78,8 +84,8 @@
 {
 	[self checkBlock: ^(){
 		COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-		COPersistentRoot *persistentRoot2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-		[[persistentRoot2 rootObject] setLabel: @"world"];
+		[[[ctx2 persistentRootForUUID: [persistentRoot1 UUID]] rootObject] setLabel: @"world"];
+		[[[ctx2 persistentRootForUUID: [persistentRoot2 UUID]] rootObject] setLabel: @"world2"];
 		[ctx2 commit];
 		
 		[self wait];
@@ -89,6 +95,7 @@
 - (void)testEditingContextNotificationOnInsertPersistentRoot
 {
 	[self checkBlock: ^(){
+		[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 		[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 		[ctx commit];
 	} postsNotification: COEditingContextDidChangeNotification withCount: 1 fromObject: ctx	withUserInfo: nil];
@@ -102,28 +109,31 @@
 - (void)testEditingContextNotificationOnDeletePersistentRoot
 {
 	[self checkBlock: ^(){
-		persistentRoot.deleted = YES;
+		persistentRoot1.deleted = YES;
+		persistentRoot2.deleted = YES;
 		[ctx commit];
 	} postsNotification: COEditingContextDidChangeNotification withCount: 1 fromObject: ctx	withUserInfo: nil];
 	
 	[self checkBlock: ^(){
-		persistentRoot.deleted = YES;
+		persistentRoot1.deleted = YES;
 		[ctx discardAllChanges];
 	} postsNotification: COEditingContextDidChangeNotification withCount: 0 fromObject: ctx	withUserInfo: nil];
 }
 
 - (void)testEditingContextNotificationOnUndeletePersistentRoot
 {
-	persistentRoot.deleted = YES;
+	persistentRoot1.deleted = YES;
+	persistentRoot2.deleted = YES;
 	[ctx commit];
 	
 	[self checkBlock: ^(){
-		persistentRoot.deleted = NO;
+		persistentRoot1.deleted = NO;
+		persistentRoot2.deleted = NO;
 		[ctx commit];
 	} postsNotification: COEditingContextDidChangeNotification withCount: 1 fromObject: ctx	withUserInfo: nil];
 	
 	[self checkBlock: ^(){
-		persistentRoot.deleted = NO;
+		persistentRoot1.deleted = NO;
 		[ctx discardAllChanges];
 	} postsNotification: COEditingContextDidChangeNotification withCount: 0 fromObject: ctx	withUserInfo: nil];
 }

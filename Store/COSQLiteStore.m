@@ -17,6 +17,9 @@
 
 NSString * const COStorePersistentRootsDidChangeNotification = @"COStorePersistentRootsDidChangeNotification";
 NSString * const kCOStorePersistentRootTransactionIDs = @"COPersistentRootTransactionIDs";
+NSString * const kCOStoreInsertedPersistentRoots = @"COStoreInsertedPersistentRoots";
+NSString * const kCOStoreUpdatedPersistentRoots = @"COStoreUpdatedPersistentRoots";
+NSString * const kCOStoreDeletedPersistentRoots = @"COStoreDeletedPersistentRoots";
 NSString * const kCOStoreUUID = @"COStoreUUID";
 NSString * const kCOStoreURL = @"COStoreURL";
 
@@ -193,6 +196,11 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 		
 		NSMutableDictionary *txnIDForPersistentRoot = [[NSMutableDictionary alloc] init];
 		
+		NSMutableArray *insertedUUIDs = [[NSMutableArray alloc] init];
+		NSMutableArray *deletedUUIDs = [[NSMutableArray alloc] init];
+		
+		// setup
+		
         for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
         {
 			const BOOL isPresent = [db_ boolForQuery: @"SELECT COUNT(*) > 0 FROM persistentroots WHERE uuid = ?", [modifiedUUID dataValue]];
@@ -209,6 +217,9 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 				return;
 			}
 			
+			if (!isPresent)
+				[insertedUUIDs addObject: modifiedUUID];
+			
 			int64_t newValue = clientValue + 1;
 			
             [db_ executeUpdate: @"UPDATE persistentroots SET transactionid = ? WHERE uuid = ?",
@@ -217,6 +228,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 			txnIDForPersistentRoot[modifiedUUID] = @(newValue);
         }
         
+		// perform actions
+		
         for (id<COStoreAction> op in aTransaction.operations)
         {
             BOOL opOk = [op execute: self inTransaction: aTransaction];
@@ -229,6 +242,16 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
             ok = ok && opOk;
         }
         
+		// gather deleted persistent root UUIDs
+		
+		for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
+        {
+			const BOOL isPresent = [db_ boolForQuery: @"SELECT COUNT(*) > 0 FROM persistentroots WHERE uuid = ?", [modifiedUUID dataValue]];
+			
+			if (!isPresent)
+				[deletedUUIDs addObject: modifiedUUID];
+        }
+		
         if (!ok)
         {
             [db_ rollback];
@@ -239,7 +262,9 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
             ok = [db_ commit];
             if (ok)
             {
-                [self postCommitNotificationsWithTransactionIDForPersistentRootUUID: txnIDForPersistentRoot];
+                [self postCommitNotificationsWithTransactionIDForPersistentRootUUID: txnIDForPersistentRoot
+															insertedPersistentRoots: insertedUUIDs
+															 deletedPersistentRoots: deletedUUIDs];
             }
             else
             {
@@ -892,14 +917,29 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 }
 
 - (void) postCommitNotificationsWithTransactionIDForPersistentRootUUID: (NSDictionary *)txnIDForPersistentRoot
+											   insertedPersistentRoots: (NSArray *)insertedUUIDs
+												deletedPersistentRoots: (NSArray *)deletedUUIDs
 {
 	NSMutableDictionary *stringTxnIDForPersistentRoot = [[NSMutableDictionary alloc] init];
+	NSMutableArray *deletedUUIDStrings = [NSMutableArray new];
+	NSMutableArray *insertedUUIDStrings = [NSMutableArray new];
+	
 	for (ETUUID *persistentRootUUID in txnIDForPersistentRoot)
     {
 		stringTxnIDForPersistentRoot[[persistentRootUUID stringValue]] = txnIDForPersistentRoot[persistentRootUUID];
 	}
+	for (ETUUID *persistentRootUUID in insertedUUIDs)
+	{
+		[insertedUUIDStrings addObject: persistentRootUUID.stringValue];
+	}
+	for (ETUUID *persistentRootUUID in deletedUUIDs)
+	{
+		[deletedUUIDStrings addObject: persistentRootUUID.stringValue];
+	}
 	
 	NSDictionary *userInfo = @{kCOStorePersistentRootTransactionIDs : stringTxnIDForPersistentRoot,
+							   kCOStoreDeletedPersistentRoots : deletedUUIDStrings,
+							   kCOStoreInsertedPersistentRoots : insertedUUIDStrings,
 							   kCOStoreUUID : [[self UUID] stringValue],
 							   kCOStoreURL : [[self URL] absoluteString]};
 			

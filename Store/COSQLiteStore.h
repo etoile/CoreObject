@@ -13,8 +13,17 @@ enum COBranchRevisionReadingOptions
 };
 typedef NSUInteger COBranchRevisionReadingOptions;
 
+/**
+ * Semi-private notification name posted by COSQLiteStore. Only intended for
+ * use by COEditingContext or clients using COSQLiteStore directly.
+ */
 extern NSString * const COStorePersistentRootsDidChangeNotification;
+
+/* userInfo dictionary keys for COStorePersistentRootsDidChangeNotification */
+
 extern NSString * const kCOStorePersistentRootTransactionIDs;
+extern NSString * const kCOStoreInsertedPersistentRoots;
+extern NSString * const kCOStoreDeletedPersistentRoots;
 extern NSString * const kCOStoreUUID;
 extern NSString * const kCOStoreURL;
 
