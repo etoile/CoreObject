@@ -72,13 +72,13 @@
 
 
     [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(storePersistentRootDidChange:)
-                                                 name: COStorePersistentRootDidChangeNotification
+                                             selector: @selector(storePersistentRootsDidChange:)
+                                                 name: COStorePersistentRootsDidChangeNotification
                                                object: _store];
 
 	[[NSDistributedNotificationCenter defaultCenter] addObserver: self
-	                                                    selector: @selector(distributedStorePersistentRootDidChange:)
-	                                                        name: COStorePersistentRootDidChangeNotification
+	                                                    selector: @selector(distributedStorePersistentRootsDidChange:)
+	                                                        name: COStorePersistentRootsDidChangeNotification
 	                                                      object: nil];
 
 	return self;
@@ -640,7 +640,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 /* Handles distributed notifications about new revisions to refresh the root
  object graphs present in memory, for which changes have been committed to the
  store by other processes. */
-- (void)distributedStorePersistentRootDidChange: (NSNotification *)notif
+- (void)distributedStorePersistentRootsDidChange: (NSNotification *)notif
 {
     // TODO: Write a test to ensure other store notifications are not handled
     NSDictionary *userInfo = [notif userInfo];
@@ -650,27 +650,32 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
     if ([[[_store UUID] stringValue] isEqual: storeUUID]
         && [[[_store URL] absoluteString] isEqual: storeURL])
     {
-        [self storePersistentRootDidChange: notif isDistributed: YES];
+        [self storePersistentRootsDidChange: notif isDistributed: YES];
     }
 }
 
-- (void)storePersistentRootDidChange: (NSNotification *)notif
+- (void)storePersistentRootsDidChange: (NSNotification *)notif
 {
-    [self storePersistentRootDidChange: notif isDistributed: NO];
+    [self storePersistentRootsDidChange: notif isDistributed: NO];
 }
 
-- (void)storePersistentRootDidChange: (NSNotification *)notif isDistributed: (BOOL)isDistributed
+- (void)storePersistentRootsDidChange: (NSNotification *)notif isDistributed: (BOOL)isDistributed
 {
     NSDictionary *userInfo = [notif userInfo];
-    ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [userInfo objectForKey: kCOPersistentRootUUID]];
-    
+    NSArray *persistentRootUUIDs = [[userInfo[kCOStorePersistentRootTransactionIDs] allKeys] mappedCollectionWithBlock: ^(id uuidString) {
+		return [ETUUID UUIDWithString: uuidString];
+	}];
+	
     //NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
     
-    COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
-    if (loaded != nil)
-    {
-        [loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
-    }
+	for (ETUUID *persistentRootUUID in persistentRootUUIDs)
+	{
+		COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
+		if (loaded != nil)
+		{
+			[loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
+		}
+	}
 }
 
 - (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid persistentRootUUID: (ETUUID *)aPersistentRoot

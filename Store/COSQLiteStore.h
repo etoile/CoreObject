@@ -13,9 +13,8 @@ enum COBranchRevisionReadingOptions
 };
 typedef NSUInteger COBranchRevisionReadingOptions;
 
-extern NSString * const COStorePersistentRootDidChangeNotification;
-extern NSString * const kCOPersistentRootUUID;
-extern NSString * const kCOPersistentRootTransactionID;
+extern NSString * const COStorePersistentRootsDidChangeNotification;
+extern NSString * const kCOStorePersistentRootTransactionIDs;
 extern NSString * const kCOStoreUUID;
 extern NSString * const kCOStoreURL;
 

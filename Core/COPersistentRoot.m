@@ -679,7 +679,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 - (void)storePersistentRootDidChange: (NSNotification *)notif
                        isDistributed: (BOOL)isDistributed
 {
-    NSNumber *notifTransactionObj = [[notif userInfo] objectForKey: kCOPersistentRootTransactionID];
+    NSNumber *notifTransactionObj = notif.userInfo[kCOStorePersistentRootTransactionIDs][self.UUID.stringValue];
 	
 	if (notifTransactionObj == nil)
 	{

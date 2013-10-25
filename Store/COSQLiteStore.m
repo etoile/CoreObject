@@ -15,9 +15,8 @@
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
 
-NSString * const COStorePersistentRootDidChangeNotification = @"COStorePersistentRootDidChangeNotification";
-NSString * const kCOPersistentRootUUID = @"COPersistentRootUUID";
-NSString * const kCOPersistentRootTransactionID = @"COPersistentRootTransactionID";
+NSString * const COStorePersistentRootsDidChangeNotification = @"COStorePersistentRootsDidChangeNotification";
+NSString * const kCOStorePersistentRootTransactionIDs = @"COPersistentRootTransactionIDs";
 NSString * const kCOStoreUUID = @"COStoreUUID";
 NSString * const kCOStoreURL = @"COStoreURL";
 
@@ -894,25 +893,27 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 - (void) postCommitNotificationsWithTransactionIDForPersistentRootUUID: (NSDictionary *)txnIDForPersistentRoot
 {
-    for (ETUUID *persistentRoot in txnIDForPersistentRoot)
+	NSMutableDictionary *stringTxnIDForPersistentRoot = [[NSMutableDictionary alloc] init];
+	for (ETUUID *persistentRootUUID in txnIDForPersistentRoot)
     {
-        NSDictionary *userInfo = @{kCOPersistentRootUUID : [persistentRoot stringValue],
-                                   kCOPersistentRootTransactionID : txnIDForPersistentRoot[persistentRoot],
-                                   kCOStoreUUID : [[self UUID] stringValue],
-                                   kCOStoreURL : [[self URL] absoluteString]};
-                
-        dispatch_async(dispatch_get_main_queue(), ^() {
-            [[NSNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
-                                                                object: self
-                                                              userInfo: userInfo];
+		stringTxnIDForPersistentRoot[[persistentRootUUID stringValue]] = txnIDForPersistentRoot[persistentRootUUID];
+	}
+	
+	NSDictionary *userInfo = @{kCOStorePersistentRootTransactionIDs : stringTxnIDForPersistentRoot,
+							   kCOStoreUUID : [[self UUID] stringValue],
+							   kCOStoreURL : [[self URL] absoluteString]};
+			
+	dispatch_async(dispatch_get_main_queue(), ^() {
+		[[NSNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootsDidChangeNotification
+															object: self
+														  userInfo: userInfo];
 
-            
-            [[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
-                                                                           object: [[self UUID] stringValue]
-                                                                         userInfo: userInfo
-                                                               deliverImmediately: NO];
-        });
-    }
+		
+		[[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootsDidChangeNotification
+																	   object: [[self UUID] stringValue]
+																	 userInfo: userInfo
+														   deliverImmediately: NO];
+	});
 }
 
 - (FMDatabase *) database
