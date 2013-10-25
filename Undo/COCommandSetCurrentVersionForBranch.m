@@ -146,6 +146,11 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     }
 }
 
+- (NSString *)kind
+{
+	return _(@"Branch Version Change");
+}
+
 - (CORevision *)oldRevision
 {
 	return [CORevisionCache revisionForRevisionUUID: _oldRevisionUUID

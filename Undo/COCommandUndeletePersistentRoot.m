@@ -34,6 +34,11 @@
     [[aContext persistentRootForUUID: _persistentRootUUID] setDeleted: NO];
 }
 
+- (NSString *)kind
+{
+	return _(@"Persistent Root Undeletion");
+}
+
 @end
 
 
@@ -63,6 +68,11 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
     COCommandDeletePersistentRoot *inverse = (id)[super inverse];
 	inverse.initialRevisionID = _initialRevisionID;
     return inverse;
+}
+
+- (NSString *)kind
+{
+	return _(@"Persistent Root Creation");
 }
 
 - (CORevision *)revision

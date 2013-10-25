@@ -68,4 +68,9 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
     [branch setMetadata: _newMetadata];
 }
 
+- (NSString *)kind
+{
+	return _(@"Branch Metadata Update");
+}
+
 @end

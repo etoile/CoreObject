@@ -101,6 +101,11 @@ static NSString * const kCOCommandContents = @"COCommandContents";
     }
 }
 
+- (NSString *)kind
+{
+	return _(@"Change Group");
+}
+
 #pragma mark -
 #pragma mark Track Node Protocol
 

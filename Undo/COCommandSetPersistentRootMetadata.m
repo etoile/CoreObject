@@ -62,4 +62,9 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
     [proot setMetadata: _newMetadata];
 }
 
+- (NSString *)kind
+{
+	return _(@"Persistent Root Metadata Update");
+}
+
 @end

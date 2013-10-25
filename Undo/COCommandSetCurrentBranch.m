@@ -59,4 +59,9 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
     [proot setCurrentBranch: branch];
 }
 
+- (NSString *)kind
+{
+	return _(@"Branch Switch");
+}
+
 @end

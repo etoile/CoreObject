@@ -34,6 +34,8 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
 @implementation COCommand
 
+@synthesize kind;
+
 + (NSDictionary *) mapping
 {
     return D([COCommandGroup class], kCOCommandTypeEditGroup,

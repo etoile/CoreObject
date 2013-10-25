@@ -53,4 +53,9 @@ static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
     [branch setDeleted: YES];
 }
 
+- (NSString *)kind
+{
+	return _(@"Branch Deletion");
+}
+
 @end
