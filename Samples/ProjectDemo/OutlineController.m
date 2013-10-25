@@ -21,6 +21,12 @@
 											 selector: @selector(objectGraphContextObjectsDidChange:)
 												 name: COObjectGraphContextObjectsDidChangeNotification
 											   object: [document objectGraphContext]];
+
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(objectGraphContextObjectsDidChange:)
+												 name: COPersistentRootDidChangeNotification
+											   object: [document persistentRoot]];
+
 	
 	return self;
 }
@@ -38,10 +44,11 @@
 
 - (void)objectGraphContextObjectsDidChange: (NSNotification*)notif
 {
-    COObjectGraphContext *objGraph = [notif object];
-    assert(objGraph != nil);
-    assert([objGraph isKindOfClass: [COObjectGraphContext class]]);
-    
+	// HACK: We shouldn't keep the inner object in an ivar, since when the
+	// current branch changes, we need to get the new current object graph
+	// context. This is a workaround.
+	doc = [[doc persistentRoot] rootObject];
+	
     NSLog(@"Reloading outline for %@", doc);
     [outlineView reloadData];
 }
@@ -311,6 +318,13 @@ static int i = 0;
     {
         [stack redo];
     }
+}
+
+- (IBAction) branch: (id)sender
+{
+    COBranch *branch = [[[doc persistentRoot] editingBranch] makeBranchWithLabel: @"Untitled"];
+    [[doc persistentRoot] setCurrentBranch: branch];
+    [[doc persistentRoot] commit];
 }
 
 - (IBAction) stepBackward: (id)sender

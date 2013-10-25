@@ -27,6 +27,7 @@
 
 - (IBAction)moveToTrash:(id)sender;
 
+- (IBAction) branch: (id)sender;
 - (IBAction) stepBackward: (id)sender;
 - (IBAction) stepForward: (id)sender;
 

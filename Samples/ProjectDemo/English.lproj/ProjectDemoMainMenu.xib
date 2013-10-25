@@ -262,6 +262,15 @@
 									<reference key="NSOnImage" ref="128092494"/>
 									<reference key="NSMixedImage" ref="818417131"/>
 								</object>
+								<object class="NSMenuItem" id="460659086">
+									<reference key="NSMenu" ref="958508040"/>
+									<string key="NSTitle">Branch</string>
+									<string key="NSKeyEquiv">b</string>
+									<int key="NSKeyEquivModMask">1572864</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="128092494"/>
+									<reference key="NSMixedImage" ref="818417131"/>
+								</object>
 								<object class="NSMenuItem" id="118857365">
 									<reference key="NSMenu" ref="958508040"/>
 									<string key="NSTitle">Checkpoint</string>
@@ -1345,7 +1354,7 @@
 									<reference key="NSOnImage" ref="128092494"/>
 									<reference key="NSMixedImage" ref="818417131"/>
 								</object>
-								<object class="NSMenuItem" id="905177759">
+								<object class="NSMenuItem" id="180808508">
 									<reference key="NSMenu" ref="853014698"/>
 									<string key="NSTitle">Branches</string>
 									<string key="NSKeyEquiv"/>
@@ -1571,7 +1580,6 @@
 									<string key="NSFrame">{{1, 119}, {223, 15}}</string>
 									<reference key="NSSuperview" ref="371928918"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="371928918"/>
@@ -1672,7 +1680,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="1004890044"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -1768,7 +1776,7 @@
 					<object class="NSPSMatrix" key="NSFrameMatrix"/>
 					<string key="NSFrameSize">{427, 124}</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -2003,7 +2011,7 @@
 					<object class="NSPSMatrix" key="NSFrameMatrix"/>
 					<string key="NSFrameSize">{354, 352}</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMinSize">{100, 116}</string>
 				<string key="NSMaxSize">{400, 416}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
@@ -2062,7 +2070,7 @@
 																		<reference key="NSNextKeyView" ref="306637593"/>
 																		<reference key="NSTableView" ref="223969367"/>
 																	</object>
-																	<object class="_NSCornerView" key="NSCornerView" id="212849535">
+																	<object class="_NSCornerView" key="NSCornerView" id="426250520">
 																		<reference key="NSNextResponder" ref="423544987"/>
 																		<int key="NSvFlags">-2147481856</int>
 																		<string key="NSFrameSize">{15, 20}</string>
@@ -2278,19 +2286,19 @@
 															<reference key="NSTarget" ref="423544987"/>
 															<string key="NSAction">_doScroller:</string>
 														</object>
-														<reference ref="212849535"/>
+														<reference ref="426250520"/>
 													</array>
 													<object class="NSPSMatrix" key="NSFrameMatrix"/>
 													<string key="NSFrame">{{19, 51}, {897, 191}}</string>
 													<reference key="NSSuperview" ref="489768420"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView" ref="212849535"/>
+													<reference key="NSNextKeyView" ref="426250520"/>
 													<int key="NSsFlags">133682</int>
 													<reference key="NSVScroller" ref="143540197"/>
 													<reference key="NSHScroller" ref="187081192"/>
 													<reference key="NSContentView" ref="306637593"/>
 													<reference key="NSHeaderClipView" ref="837468433"/>
-													<reference key="NSCornerView" ref="212849535"/>
+													<reference key="NSCornerView" ref="426250520"/>
 													<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 													<double key="NSMinMagnification">0.25</double>
 													<double key="NSMaxMagnification">4</double>
@@ -2635,7 +2643,6 @@
 											<string key="NSFrame">{{913, 1}, {15, 208}}</string>
 											<reference key="NSSuperview" ref="932318713"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView"/>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											<reference key="NSTarget" ref="932318713"/>
 											<string key="NSAction">_doScroller:</string>
@@ -2671,7 +2678,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="434960808"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -2868,7 +2875,7 @@
 					<object class="NSPSMatrix" key="NSFrameMatrix"/>
 					<string key="NSFrameSize">{276, 320}</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -2984,7 +2991,7 @@
 					<object class="NSPSMatrix" key="NSFrameMatrix"/>
 					<string key="NSFrameSize">{448, 95}</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -3173,14 +3180,14 @@
 					<object class="NSPSMatrix" key="NSFrameMatrix"/>
 					<string key="NSFrameSize">{537, 347}</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
 			<object class="NSCustomObject" id="335263138">
 				<string key="NSClassName">TagWindowController</string>
 			</object>
-			<object class="NSCustomObject" id="370301808">
+			<object class="NSCustomObject" id="778370420">
 				<string key="NSClassName">EWBranchesWindowController</string>
 			</object>
 			<object class="NSCustomObject" id="740286044">
@@ -3214,11 +3221,11 @@
 									<string key="NSFrameSize">{238, 17}</string>
 									<reference key="NSSuperview" ref="687116369"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView" ref="155948249"/>
+									<reference key="NSNextKeyView" ref="228595676"/>
 									<string key="NSReuseIdentifierKey">_NS:16</string>
 									<reference key="NSTableView" ref="964823261"/>
 								</object>
-								<object class="_NSCornerView" key="NSCornerView" id="155948249">
+								<object class="_NSCornerView" key="NSCornerView" id="228595676">
 									<reference key="NSNextResponder" ref="629933046"/>
 									<int key="NSvFlags">-2147483392</int>
 									<string key="NSFrame">{{224, 0}, {16, 17}}</string>
@@ -3344,7 +3351,6 @@
 						<string key="NSFrame">{{1, 119}, {223, 15}}</string>
 						<reference key="NSSuperview" ref="629933046"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:60</string>
 						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						<int key="NSsFlags">1</int>
@@ -3352,7 +3358,7 @@
 						<string key="NSAction">_doScroller:</string>
 						<double key="NSPercent">0.57142859697341919</double>
 					</object>
-					<reference ref="155948249"/>
+					<reference ref="228595676"/>
 				</array>
 				<string key="NSFrameSize">{240, 135}</string>
 				<reference key="NSSuperview"/>
@@ -3364,7 +3370,7 @@
 				<reference key="NSHScroller" ref="328292955"/>
 				<reference key="NSContentView" ref="915452722"/>
 				<reference key="NSHeaderClipView" ref="687116369"/>
-				<reference key="NSCornerView" ref="155948249"/>
+				<reference key="NSCornerView" ref="228595676"/>
 				<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 				<double key="NSMinMagnification">0.25</double>
 				<double key="NSMaxMagnification">4</double>
@@ -4011,6 +4017,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">branch:</string>
+						<reference key="source" ref="471146553"/>
+						<reference key="destination" ref="460659086"/>
+					</object>
+					<string key="id">dMj-rA-7Qm</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">orderFrontFontPanel:</string>
 						<reference key="source" ref="274351205"/>
 						<reference key="destination" ref="796845054"/>
@@ -4460,8 +4474,8 @@
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">showWindow:</string>
-						<reference key="source" ref="370301808"/>
-						<reference key="destination" ref="905177759"/>
+						<reference key="source" ref="778370420"/>
+						<reference key="destination" ref="180808508"/>
 					</object>
 					<string key="id">RCj-NZ-VJy</string>
 				</object>
@@ -4660,6 +4674,7 @@
 							<reference ref="478692598"/>
 							<reference ref="46865251"/>
 							<reference ref="644245618"/>
+							<reference ref="460659086"/>
 						</array>
 						<reference key="parent" ref="753782612"/>
 					</object>
@@ -5447,7 +5462,7 @@
 							<reference ref="966050153"/>
 							<reference ref="81597216"/>
 							<reference ref="353415207"/>
-							<reference ref="905177759"/>
+							<reference ref="180808508"/>
 						</array>
 						<reference key="parent" ref="228054981"/>
 					</object>
@@ -6353,13 +6368,18 @@
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">o4w-es-WwS</string>
-						<reference key="object" ref="905177759"/>
+						<reference key="object" ref="180808508"/>
 						<reference key="parent" ref="853014698"/>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">A0F-d0-oUC</string>
-						<reference key="object" ref="370301808"/>
+						<reference key="object" ref="778370420"/>
 						<reference key="parent" ref="0"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">VbX-C7-6g0</string>
+						<reference key="object" ref="460659086"/>
+						<reference key="parent" ref="958508040"/>
 					</object>
 				</array>
 			</object>
@@ -6970,6 +6990,7 @@
 				<string key="NwG-TW-Yqw.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="R40-0p-aPP.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="S7Z-dK-n8X.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="VbX-C7-6g0.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="VyQ-PP-WL6.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="ZXS-dk-4xu.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="h6U-Gb-4iQ.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -7222,8 +7243,11 @@
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="addChildItem:">id</string>
 						<string key="addItem:">id</string>
+						<string key="branch:">id</string>
 						<string key="history:">id</string>
 						<string key="moveToTrash:">id</string>
+						<string key="projectDemoRedo:">id</string>
+						<string key="projectDemoUndo:">id</string>
 						<string key="redo:">id</string>
 						<string key="shareWith:">id</string>
 						<string key="shiftLeft:">id</string>
@@ -7241,12 +7265,24 @@
 							<string key="name">addItem:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="branch:">
+							<string key="name">branch:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="history:">
 							<string key="name">history:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="moveToTrash:">
 							<string key="name">moveToTrash:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="projectDemoRedo:">
+							<string key="name">projectDemoRedo:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="projectDemoUndo:">
+							<string key="name">projectDemoUndo:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="redo:">
