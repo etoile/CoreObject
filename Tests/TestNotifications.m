@@ -21,7 +21,6 @@
     return self;
 }
 
-#if 0
 - (void)testPersistentRootNotificationOnUndoLocal
 {
     COUndoTrack *track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
@@ -59,7 +58,6 @@
 		[self wait];
 	} postsNotification: COPersistentRootDidChangeNotification withCount: 1 fromObject: persistentRoot withUserInfo: nil];
 }
-#endif
 
 // COEditingContext notifications
 
@@ -76,7 +74,6 @@
 	} postsNotification: COEditingContextDidChangeNotification withCount: 0 fromObject: ctx	withUserInfo: nil];
 }
 
-#if 0
 - (void)testEditingContextNotificationOnCommitInnerObjectChangesRemote
 {
 	[self checkBlock: ^(){
@@ -88,7 +85,6 @@
 		[self wait];
 	} postsNotification: COEditingContextDidChangeNotification withCount: 1 fromObject: ctx	withUserInfo: nil];
 }
-#endif
 
 - (void)testEditingContextNotificationOnInsertPersistentRoot
 {

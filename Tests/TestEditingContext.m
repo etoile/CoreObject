@@ -62,7 +62,7 @@
     UKTrue([ctx hasChanges]);
     UKObjectsEqual([NSSet set], [ctx persistentRoots]);
     UKObjectsEqual(S(persistentRoot), [ctx persistentRootsPendingDeletion]);
-    UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
+    UKObjectsEqual(S(persistentRoot), [ctx deletedPersistentRoots]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);
     UKTrue([persistentRoot isDeleted]);
@@ -156,12 +156,15 @@
         UKNil([store persistentRootInfoForUUID: [pendingInsertion UUID]]);
         UKTrue([[store persistentRootUUIDs] containsObject: [pendingDeletion UUID]]);
         UKTrue([[store deletedPersistentRootUUIDs] containsObject: [pendingUndeletion UUID]]);
+		UKTrue(deletedOnDisk.deleted);
+		UKTrue(pendingDeletion.deleted);
+		UKFalse(pendingUndeletion.deleted);
     }
     
     // 2. Test the accessors
     
     UKObjectsEqual(S(regular, pendingInsertion, pendingUndeletion), [ctx persistentRoots]);
-    UKObjectsEqual(S(deletedOnDisk), [ctx deletedPersistentRoots]);
+    UKObjectsEqual(S(deletedOnDisk, pendingDeletion), [ctx deletedPersistentRoots]);
     UKObjectsEqual(S(pendingInsertion), [ctx persistentRootsPendingInsertion]);
     UKObjectsEqual(S(pendingDeletion), [ctx persistentRootsPendingDeletion]);
     UKObjectsEqual(S(pendingUndeletion), [ctx persistentRootsPendingUndeletion]);

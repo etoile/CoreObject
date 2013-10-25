@@ -81,6 +81,11 @@
 	                                                        name: COStorePersistentRootsDidChangeNotification
 	                                                      object: nil];
 
+	for (ETUUID *uuid in [_store persistentRootUUIDs])
+    {
+        [self persistentRootForUUID: uuid];
+    }
+	
 	return self;
 }
 
@@ -132,32 +137,16 @@
 
 - (NSSet *)persistentRoots
 {
-	// TODO: Revisit once we introduce persistent root faulting. Assumes all persistent roots are loaded.
-    NSMutableSet *persistentRoots = [NSMutableSet set];
-
-    for (ETUUID *uuid in [_store persistentRootUUIDs])
-    {
-        [persistentRoots addObject: [self persistentRootForUUID: uuid]];
-    }
-	[persistentRoots unionSet: [self persistentRootsPendingInsertion]];
-    [persistentRoots unionSet: _persistentRootsPendingUndeletion];
-	[persistentRoots minusSet: _persistentRootsPendingDeletion];
-    
-    return persistentRoots;
+	return [NSSet setWithArray: [[_loadedPersistentRoots allValues] filteredCollectionWithBlock: ^(id obj) {
+		return (BOOL) !((COPersistentRoot *)obj).deleted;
+	}]];
 }
 
 - (NSSet *)deletedPersistentRoots
 {
-    NSMutableSet *result = [NSMutableSet set];
-    
-    for (ETUUID *uuid in [_store deletedPersistentRootUUIDs])
-    {
-        [result addObject: [self persistentRootForUUID: uuid]];
-    }
-
-    [result minusSet: _persistentRootsPendingUndeletion];
-    
-    return result;
+	return [NSSet setWithArray: [[_loadedPersistentRoots allValues] filteredCollectionWithBlock: ^(id obj) {
+		return ((COPersistentRoot *)obj).deleted;
+	}]];
 }
 
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
@@ -668,13 +657,45 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 	
     //NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
     
+	BOOL hadChanges = NO;
+	
 	for (ETUUID *persistentRootUUID in persistentRootUUIDs)
 	{
 		COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
 		if (loaded != nil)
 		{
-			[loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
+			NSNumber *notifTransactionObj = notif.userInfo[kCOStorePersistentRootTransactionIDs][loaded.UUID.stringValue];
+			
+			if (notifTransactionObj == nil)
+			{
+				NSLog(@"Warning, invalid nil transaction id");
+				return;
+			}
+			
+			int64_t notifTransaction = [notifTransactionObj longLongValue];
+			
+			if (notifTransaction > loaded.lastTransactionID)
+			{
+				hadChanges = YES;
+				[loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
+			}
 		}
+		else
+		{
+			COPersistentRoot *newlyInserted = [self persistentRootForUUID: persistentRootUUID];
+			if (newlyInserted != nil)
+			{
+				hadChanges = YES;
+			}
+		}
+	}
+	
+	if (hadChanges)
+	{
+		[[NSNotificationCenter defaultCenter]
+		 postNotificationName: COEditingContextDidChangeNotification
+		 object: self
+		 userInfo: nil];
 	}
 }
 

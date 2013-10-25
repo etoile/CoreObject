@@ -341,5 +341,12 @@
 
 @end
 
+/**
+ * Posted when any changes are committed to this editing context root, including
+ * changes committed in another process.
+ *
+ * The userInfo dictionary is nil. The sender is the affected COEditingContext
+ * object.
+ */
 extern NSString * const COEditingContextDidChangeNotification;
 extern NSString * const kCOCommandKey;

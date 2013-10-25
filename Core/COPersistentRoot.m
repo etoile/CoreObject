@@ -138,16 +138,13 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (BOOL)isDeleted
 {
-    if ([[_parentContext persistentRootsPendingUndeletion] containsObject: self])
-        return NO;
-    
-    if ([[_parentContext persistentRootsPendingDeletion] containsObject: self])
-        return YES;
-    
-    if ([[_parentContext deletedPersistentRoots] containsObject: self])
-        return YES;    
-    
-    return NO;
+	if ([[_parentContext persistentRootsPendingUndeletion] containsObject: self])
+		return NO;
+	
+	if ([[_parentContext persistentRootsPendingDeletion] containsObject: self])
+		return YES;
+	
+    return [_savedState isDeleted];
 }
 
 - (void)setDeleted: (BOOL)deleted
@@ -160,7 +157,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     {
         [_parentContext undeletePersistentRoot: self];
     }
-    [self sendChangeNotification];
 }
 
 - (NSDate *)modificationDate
@@ -679,25 +675,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 - (void)storePersistentRootDidChange: (NSNotification *)notif
                        isDistributed: (BOOL)isDistributed
 {
-    NSNumber *notifTransactionObj = notif.userInfo[kCOStorePersistentRootTransactionIDs][self.UUID.stringValue];
-	
-	if (notifTransactionObj == nil)
-	{
-		NSLog(@"Warning, invalid nil transaction id");
-		return;
-	}
-	
-	int64_t notifTransaction = [notifTransactionObj longLongValue];
-	
-    if (notifTransaction <= _lastTransactionID)
-    {
-		// N.B.: When running the test suite, most of the time we should
-		// hit this branch.
-		
-//        NSLog(@"----Ignoring update notif %d <= %d (distributed: %d)",
-//			  (int)notifTransaction, (int)_lastTransactionID, (int)isDistributed);
-        return;
-    }
 //	NSLog(@"++++Not ignoring update notif %d > %d (distributed: %d)",
 //		  (int)notifTransaction, (int)_lastTransactionID, (int)isDistributed);
     
@@ -718,9 +695,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     _lastTransactionID = _savedState.transactionID;
     _metadata = _savedState.metadata;
 	
-	// TODO: Remove or support
-	// It's correct to send a notification here since the persistent root was updated.. should write tests and uncomment this --Eric
-    //[self sendChangeNotification];
+	[self sendChangeNotification];
 }
 
 - (void)updateCrossPersistentRootReferences

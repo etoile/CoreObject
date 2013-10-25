@@ -15,15 +15,8 @@
 @class COBranch, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo, COObjectGraphContext;
 
 /**
- * Posted when any of the following changes are made to a COPersistentRoot:
- *  - undo/redo
- *  - delete/undelete
- *  - revert
- *  - change branch
- *  - TODO: complete this list
- *
- * But not:
- *  - editing an inner object
+ * Posted when any changes are committed to this persistent root, including
+ * changes committed in another process.
  *
  * The userInfo dictionary is nil. The sender is the affected COPersistentRoot
  * object.
