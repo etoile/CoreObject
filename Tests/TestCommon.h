@@ -60,6 +60,19 @@ extern NSString * const kCOParent;
 			 current: (ETUUID *)expectedCurrent
 				head: (ETUUID *)expectedHead;
 
+/**
+ * Executes the provided block, and tests that the given notification type
+ * is posted exactly count times from sender as a result.
+ *
+ * If expectedUserInfo is non-nil, test that each key/value pair in the dictionary
+ * is also in [notif userInfo].
+ */
+- (void)	checkBlock: (void (^)(void))block
+  postsNotification: (NSString *)notif
+		  withCount: (NSUInteger)count
+		 fromObject: (id)sender
+	   withUserInfo: (NSDictionary *)expectedUserInfo;
+
 - (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch;
 - (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot;
 

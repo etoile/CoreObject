@@ -91,6 +91,32 @@ NSString * const kCOParent = @"parentContainer";
 	}
 }
 
+- (void)	checkBlock: (void (^)(void))block
+  postsNotification: (NSString *)notif
+		  withCount: (NSUInteger)count
+		 fromObject: (id)sender
+	   withUserInfo: (NSDictionary *)expectedUserInfo
+{
+    __block int timesNotified = 0;
+	
+    id observer = [[NSNotificationCenter defaultCenter] addObserverForName: notif
+                                                                    object: sender
+                                                                     queue: nil
+                                                                usingBlock: ^(NSNotification *notif) {
+																	for (NSString *key in expectedUserInfo)
+																	{
+																		UKObjectsEqual(expectedUserInfo[key], notif.userInfo[key]);
+																	}
+																	timesNotified++;
+																}];
+    
+	block();
+    
+    [[NSNotificationCenter defaultCenter] removeObserver: observer];
+	
+    UKIntsEqual(count, timesNotified);
+}
+
 - (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch
 {
 	ETUUID *persistentRoot = [store persistentRootUUIDForBranchUUID: aBranch];
