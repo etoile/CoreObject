@@ -5,7 +5,6 @@
 #import "DrawingController.h"
 #import "TextController.h"
 #import "Document.h"
-#import "HistoryInspectorController.h"
 #import "SharingServer.h"
 #import "SKTDrawDocument.h"
 #import "Project.h"
@@ -127,11 +126,6 @@
 - (COEditingContext*)editingContext
 {
 	return context;
-}
-
-- (HistoryInspectorController*)historyController
-{
-	return historyController;
 }
 
 - (void)dealloc

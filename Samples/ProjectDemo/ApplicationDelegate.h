@@ -1,7 +1,6 @@
 #import <Cocoa/Cocoa.h>
 #import "Project.h"
 #import "NetworkController.h"
-#import "HistoryInspectorController.h"
 #import "CheckpointAsSheetController.h"
 #import "SharingController.h"
 #import "DesktopWindow.h"
@@ -17,7 +16,6 @@
 	
 	IBOutlet SharingController *sharingController;
 	IBOutlet NetworkController *networkController;
-	IBOutlet HistoryInspectorController *historyController;
 	IBOutlet CheckpointAsSheetController *checkpointAsSheetController;
 	IBOutlet TagWindowController *tagWindowController;
 	
@@ -30,7 +28,6 @@
 }
 
 - (COEditingContext*)editingContext;
-- (HistoryInspectorController*)historyController;
 
 - (IBAction) newTextDocument: (id)sender;
 - (IBAction) newOutline: (id)sender;

@@ -19,6 +19,10 @@
 		66708FAB12486F0400E65F00 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		66708FB312486F0400E65F00 /* OutlineController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66708F7212486CD300E65F00 /* OutlineController.m */; };
 		667090011248726900E65F00 /* OutlineInspector.xib in Resources */ = {isa = PBXBuildFile; fileRef = 667090001248726900E65F00 /* OutlineInspector.xib */; };
+		667C6C7B181AF40400BDD213 /* EWBranchesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C72181AF40400BDD213 /* EWBranchesWindowController.m */; };
+		667C6C7F181AF40400BDD213 /* EWUtilityWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C7A181AF40400BDD213 /* EWUtilityWindowController.m */; };
+		667C6C83181AF44E00BDD213 /* Branches.xib in Resources */ = {isa = PBXBuildFile; fileRef = 667C6C81181AF44E00BDD213 /* Branches.xib */; };
+		667C6C84181AF44E00BDD213 /* History.xib in Resources */ = {isa = PBXBuildFile; fileRef = 667C6C82181AF44E00BDD213 /* History.xib */; };
 		6686B80F125513D80065DE1A /* OutlineItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686B7B11253C1850065DE1A /* OutlineItem.m */; };
 		6686B810125513D80065DE1A /* DrawingItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686B7B61253F44F0065DE1A /* DrawingItem.m */; };
 		6686B811125513D80065DE1A /* TextItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686B7B912550B550065DE1A /* TextItem.m */; };
@@ -31,7 +35,6 @@
 		6686BEEB12593D900065DE1A /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BEEA12593D900065DE1A /* Document.m */; };
 		6686BFF5125CF0200065DE1A /* ChatWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6686BFF4125CF0200065DE1A /* ChatWindow.xib */; };
 		6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686C341125EC5070065DE1A /* ProjectDocument.m */; };
-		66983346126BB1150011C7FC /* HistoryInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66983345126BB1150011C7FC /* HistoryInspectorController.m */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66CA1844181A3E5B00DE6AFB /* Search.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66CA1843181A3E5B00DE6AFB /* Search.xib */; };
@@ -189,6 +192,18 @@
 		66708F7212486CD300E65F00 /* OutlineController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutlineController.m; sourceTree = "<group>"; };
 		66708F9412486E9D00E65F00 /* OutlineWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OutlineWindow.xib; sourceTree = "<group>"; };
 		667090001248726900E65F00 /* OutlineInspector.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OutlineInspector.xib; sourceTree = "<group>"; };
+		667C6C71181AF40400BDD213 /* EWBranchesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWBranchesWindowController.h; sourceTree = "<group>"; };
+		667C6C72181AF40400BDD213 /* EWBranchesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWBranchesWindowController.m; sourceTree = "<group>"; };
+		667C6C73181AF40400BDD213 /* EWGraphRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWGraphRenderer.h; sourceTree = "<group>"; };
+		667C6C74181AF40400BDD213 /* EWGraphRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWGraphRenderer.m; sourceTree = "<group>"; };
+		667C6C75181AF40400BDD213 /* EWHistoryGraphView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWHistoryGraphView.h; sourceTree = "<group>"; };
+		667C6C76181AF40400BDD213 /* EWHistoryGraphView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWHistoryGraphView.m; sourceTree = "<group>"; };
+		667C6C77181AF40400BDD213 /* EWHistoryWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWHistoryWindowController.h; sourceTree = "<group>"; };
+		667C6C78181AF40400BDD213 /* EWHistoryWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWHistoryWindowController.m; sourceTree = "<group>"; };
+		667C6C79181AF40400BDD213 /* EWUtilityWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWUtilityWindowController.h; sourceTree = "<group>"; };
+		667C6C7A181AF40400BDD213 /* EWUtilityWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWUtilityWindowController.m; sourceTree = "<group>"; };
+		667C6C81181AF44E00BDD213 /* Branches.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Branches.xib; sourceTree = "<group>"; };
+		667C6C82181AF44E00BDD213 /* History.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = History.xib; sourceTree = "<group>"; };
 		6686B7B01253C1850065DE1A /* OutlineItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutlineItem.h; sourceTree = "<group>"; };
 		6686B7B11253C1850065DE1A /* OutlineItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutlineItem.m; sourceTree = "<group>"; };
 		6686B7B51253F44F0065DE1A /* DrawingItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawingItem.h; sourceTree = "<group>"; };
@@ -218,8 +233,6 @@
 		6686C340125EC5070065DE1A /* ProjectDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectDocument.h; sourceTree = "<group>"; };
 		6686C341125EC5070065DE1A /* ProjectDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectDocument.m; sourceTree = "<group>"; };
 		6698320312691F970011C7FC /* SCRATCHPAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SCRATCHPAD; sourceTree = "<group>"; };
-		66983344126BB1150011C7FC /* HistoryInspectorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HistoryInspectorController.h; sourceTree = "<group>"; };
-		66983345126BB1150011C7FC /* HistoryInspectorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistoryInspectorController.m; sourceTree = "<group>"; };
 		66C33D6F128F395400E5B15B /* ItemReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItemReference.h; sourceTree = "<group>"; };
 		66C33D70128F395400E5B15B /* ItemReference.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItemReference.m; sourceTree = "<group>"; };
 		66C33DEF1290BC7700E5B15B /* SKTCircle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKTCircle.h; sourceTree = "<group>"; };
@@ -362,6 +375,7 @@
 		66708FEF124870CB00E65F00 /* ProjectDemo */ = {
 			isa = PBXGroup;
 			children = (
+				667C6C80181AF42B00BDD213 /* Branches Window */,
 				66E8EE0C12D673BB00780264 /* Search Window */,
 				7991197F12CD4AA9009D28C0 /* Overlay Shelf */,
 				7991190212CD3D36009D28C0 /* Project Navigator */,
@@ -378,6 +392,8 @@
 				667090001248726900E65F00 /* OutlineInspector.xib */,
 				66DBB3821813B1BB0047301A /* Preferences.xib */,
 				8D1107310486CEB800E47090 /* ProjectDemo-Info.plist */,
+				667C6C79181AF40400BDD213 /* EWUtilityWindowController.h */,
+				667C6C7A181AF40400BDD213 /* EWUtilityWindowController.m */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				6686B80B12550FE90065DE1A /* ApplicationDelegate.h */,
 				6686B80C12550FE90065DE1A /* ApplicationDelegate.m */,
@@ -396,6 +412,16 @@
 			);
 			name = ProjectDemo;
 			sourceTree = SOURCE_ROOT;
+		};
+		667C6C80181AF42B00BDD213 /* Branches Window */ = {
+			isa = PBXGroup;
+			children = (
+				667C6C81181AF44E00BDD213 /* Branches.xib */,
+				667C6C71181AF40400BDD213 /* EWBranchesWindowController.h */,
+				667C6C72181AF40400BDD213 /* EWBranchesWindowController.m */,
+			);
+			name = "Branches Window";
+			sourceTree = "<group>";
 		};
 		6686B871125516950065DE1A /* Text Document */ = {
 			isa = PBXGroup;
@@ -453,8 +479,13 @@
 		6686BF431259476B0065DE1A /* History Inspector */ = {
 			isa = PBXGroup;
 			children = (
-				66983344126BB1150011C7FC /* HistoryInspectorController.h */,
-				66983345126BB1150011C7FC /* HistoryInspectorController.m */,
+				667C6C82181AF44E00BDD213 /* History.xib */,
+				667C6C73181AF40400BDD213 /* EWGraphRenderer.h */,
+				667C6C74181AF40400BDD213 /* EWGraphRenderer.m */,
+				667C6C75181AF40400BDD213 /* EWHistoryGraphView.h */,
+				667C6C76181AF40400BDD213 /* EWHistoryGraphView.m */,
+				667C6C77181AF40400BDD213 /* EWHistoryWindowController.h */,
+				667C6C78181AF40400BDD213 /* EWHistoryWindowController.m */,
 			);
 			name = "History Inspector";
 			sourceTree = "<group>";
@@ -730,6 +761,7 @@
 				6686B816125513E80065DE1A /* TextDocument.xib in Resources */,
 				66708F9C12486F0400E65F00 /* ProjectDemoMainMenu.xib in Resources */,
 				667090011248726900E65F00 /* OutlineInspector.xib in Resources */,
+				667C6C83181AF44E00BDD213 /* Branches.xib in Resources */,
 				6686BFF5125CF0200065DE1A /* ChatWindow.xib in Resources */,
 				6627EEDD1278A55A00E06946 /* README in Resources */,
 				79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */,
@@ -742,6 +774,7 @@
 				7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */,
 				7991198A12CD4B72009D28C0 /* stamp.png in Resources */,
 				79911A6312CDB215009D28C0 /* Arrow.tiff in Resources */,
+				667C6C84181AF44E00BDD213 /* History.xib in Resources */,
 				66CA1844181A3E5B00DE6AFB /* Search.xib in Resources */,
 				79911A6412CDB215009D28C0 /* Circle.tiff in Resources */,
 				66DBB3831813B1BB0047301A /* Preferences.xib in Resources */,
@@ -760,6 +793,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				79911A4712CDAECD009D28C0 /* SKTCircle.m in Sources */,
+				667C6C7B181AF40400BDD213 /* EWBranchesWindowController.m in Sources */,
 				79911A4812CDAECD009D28C0 /* SKTDrawDocument.m in Sources */,
 				79911A4912CDAECD009D28C0 /* SKTGraphic.m in Sources */,
 				79911A4A12CDAECD009D28C0 /* SKTImage.m in Sources */,
@@ -774,6 +808,7 @@
 				79911A5312CDAECD009D28C0 /* SKTGridView.m in Sources */,
 				79911A5412CDAECD009D28C0 /* SKTInspectorController.m in Sources */,
 				66C33D90128F449400E5B15B /* ItemReference.m in Sources */,
+				667C6C7F181AF40400BDD213 /* EWUtilityWindowController.m in Sources */,
 				6686B80F125513D80065DE1A /* OutlineItem.m in Sources */,
 				6686B810125513D80065DE1A /* DrawingItem.m in Sources */,
 				6686B811125513D80065DE1A /* TextItem.m in Sources */,
@@ -785,7 +820,6 @@
 				6686BEE812593D800065DE1A /* Project.m in Sources */,
 				6686BEEB12593D900065DE1A /* Document.m in Sources */,
 				6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */,
-				66983346126BB1150011C7FC /* HistoryInspectorController.m in Sources */,
 				6627ED9B12761EBC00E06946 /* CheckpointAsSheetController.m in Sources */,
 				799118FD12CD3C82009D28C0 /* DesktopWindow.m in Sources */,
 				7991190512CD3D75009D28C0 /* ProjectNavWindowController.m in Sources */,
