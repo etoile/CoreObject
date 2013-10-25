@@ -504,7 +504,7 @@ static int i = 0;
     ETUUID *objectUUID = [ETUUID UUIDWithString: plist[@"uuid"]];
     
     COPersistentRoot *persistentRoot = [[[doc persistentRoot] parentContext] persistentRootForUUID: persistentRootUUID];
-    return (OutlineItem *)[persistentRoot objectWithUUID: objectUUID];
+    return (OutlineItem *)[persistentRoot loadedObjectForUUID: objectUUID];
 }
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
@@ -611,7 +611,7 @@ static int i = 0;
                                               fromGraph: [outlineItem objectGraphContext]
                                                 toGraph: [doc objectGraphContext]];
             
-            OutlineItem *copy = (OutlineItem *)[[doc objectGraphContext] objectWithUUID: destUUID];
+            OutlineItem *copy = (OutlineItem *)[[doc objectGraphContext] loadedObjectForUUID: destUUID];
 
             if (insertionIndex == -1) { insertionIndex = [[newParent contents] count]; }
             
