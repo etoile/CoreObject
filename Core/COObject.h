@@ -197,7 +197,7 @@
 	@private
 	ETEntityDescription *_entityDescription;
 	ETUUID *_UUID;
-	COObjectGraphContext *__weak _objectGraphContext; // weak reference
+	COObjectGraphContext *__weak _objectGraphContext;
 	@protected
 	NSMutableDictionary *_variableStorage;
 	@private

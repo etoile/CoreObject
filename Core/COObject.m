@@ -636,7 +636,6 @@ See +[NSObject typePrefix]. */
 						 forKey: key];
 }
 
-// FIXME: Investigate whether this way of implementing KVC is really KVC compliant
 - (id)valueForUndefinedKey: (NSString *)key
 {
 	return [self valueForVariableStorageKey: key];
@@ -644,7 +643,9 @@ See +[NSObject typePrefix]. */
 
 - (void)setValue: (id)value forUndefinedKey: (NSString *)key
 {
+	[self willChangeValueForProperty: key];
 	[self setValue: value forVariableStorageKey: key];
+	[self didChangeValueForProperty: key];
 }
 
 - (id)valueForStorageKey: (NSString *)key
