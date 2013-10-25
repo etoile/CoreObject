@@ -13,6 +13,11 @@
 	return self;
 }
 
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver: self];
+}
+
 - (NSArray *) projectsSorted
 {
 	NSArray *unsorted = [[[NSApp delegate] projects] allObjects];
@@ -28,6 +33,16 @@
 	
 	[outline setTarget: self];
 	[outline setDoubleAction: @selector(doubleClick:)];
+	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(editingContextChanged:)
+												 name: COEditingContextDidChangeNotification
+											   object: [[NSApp delegate] editingContext]];
+}
+
+- (void) editingContextChanged: (NSNotification *)notif
+{
+	[outline reloadData];
 }
 
 /* NSOutlineView Target/Action */
