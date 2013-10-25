@@ -14,44 +14,63 @@
 @class COPersistentRoot, COEditingContext, CORevision, COBranch, CORelationshipCache, COObjectGraphContext, COCrossPersistentRootReferenceCache;
 
 /**
- * Working copy of an object, owned by an editing context.
- * Relies on the context to resolve fault references to other COObjects.
+ * @group Core
+ * @abstract An entity object inside a transient or persistent object graph.
  *
- * You should use ETUUID's to refer to objects outside of the context
- * of a COEditingContext.
+ * An COObject instance is described by a metamodel (see -entityDescription) and 
+ * owned by an object graph context. The object graph context is usually 
+ * owned by a branch if persistent, or standalone if transient. In the latter 
+ * case -[COObject branch] and -[COObject persistentRoot] returns nil.
+ *
+ * From COEditingContext to COObject, there is a owner chain where each element 
+ * owns the one just below in the list:
+ *
+ * <list>
+ * <item>COEditingContext</item>
+ * <item>COPersistentRoot</item>
+ * <item>COBranch</item>
+ * <item>COObjectGraphContext</item>
+ * </list>
  *
  * @section Initialization
  *
- * A core object can be instantiated in one or two steps by using respectively:
+ * A core object can be instantiated by using -initWithObjectGraphContext: or 
+ * some other initializer (-init is not supported). The resulting object is 
+ * a inner object that belongs to the object graph context.
+ *
+ * For a transient object graph context, you can later use 
+ * -[COEditingContext insertPersistentRootWithRootObject:] to turn an existing 
+ * inner object into a root object (the object graph context becoming persistent).
+ *
+ * You can instantiate also a new persistent root and retrieve its root object 
+ * by using -[COEditingContext insertPersistentRootWithEntityName:] or similar 
+ * COEditingContext methods.
+ *
+ * When writing a COObject subclass, -initWithObjectGraphContext can be 
+ * overriden to initialize the the subclass properties.<br />
+ * The designated initializer rule remains valid in the COObject class hierarchy, 
+ * but -initWithObjectGraphContext: must work correctly too (it must never return 
+ * nil or a wrongly initialized instance), usually you have to override it to 
+ * call the designated initializer.<br />
+ * All secondary initializers (inherited or not) must return valid instances or 
+ * nil. The easiest way to comply is described below:
  *
  * <list>
- * <item>-[COEditingContext insertObjectWithEntityName:] or similar 
- * COEditingContext methods</item>
- * <item>-init and -becomePersistentInContext:</item>
+ * <item>For additional initializers, call the designated initializer</item>
+ * <item>For each new designated initializer, override 
+ * -initWithObjectGraphContext: to call it</item>
  * </list>
- *
- * In both cases, -init is used to initialize the object.<br />
- * With -insertObjectWithEntityName:, the object becomes persistent immediately.
- * However in the second case, the object doesn't become persistent until 
- * -becomePersistentInContext: is called. You can use this approach
- * to instantiate transient objects or to mix transient and persistent instances.
- *
- * When writing a COObject subclass, -init can be overriden to initialize the 
- * the subclass properties. See the example in -init documentation.<br />
- * The designated initializer rule remains valid in a COObject class hierarchy, 
- * but -init must work correctly too (it must not return nil or a wrongly 
- * initialized instance), usually you have to override it to call the designated 
- * initializer. And secondary initializers must return valid instances or nil. 
  *
  * Don't create singletons for COObject subclass in +initialize, because 
  * -[COObject entityDescription] would return nil.
  *
  * For multivalued properties stored in instance variables, you are responsible 
  * to allocate the collections in each COObject subclass designed initializer, 
- * and to release them in -dealloc. If a multivalued property is stored in the 
- * the variable storage, COObject allocates the collections at initialization 
- * time and releases them at deallocation time (you can access these collections 
- * using -valueForVariableStorageKey: in your subclass initializers).
+ * and to release them in -dealloc (or use ARC). If a multivalued property is
+ * stored in the variable storage, COObject allocates the collections at 
+ * initialization time and releases them at deallocation time (you can access 
+ * these collections using -valueForVariableStorageKey: in your subclass 
+ * initializers).
  *
  * @section Persistency
  *
