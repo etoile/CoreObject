@@ -34,6 +34,8 @@
 		66983346126BB1150011C7FC /* HistoryInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66983345126BB1150011C7FC /* HistoryInspectorController.m */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
+		66CA1844181A3E5B00DE6AFB /* Search.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66CA1843181A3E5B00DE6AFB /* Search.xib */; };
+		66CA184E181A3F4F00DE6AFB /* SearchWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66CA184D181A3F4F00DE6AFB /* SearchWindowController.m */; };
 		66DBB3781813B1A80047301A /* PreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66DBB3771813B1A80047301A /* PreferencesController.m */; };
 		66DBB3831813B1BB0047301A /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66DBB3821813B1BB0047301A /* Preferences.xib */; };
 		799118FD12CD3C82009D28C0 /* DesktopWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 799118FC12CD3C82009D28C0 /* DesktopWindow.m */; };
@@ -246,6 +248,9 @@
 		66C33E0A1290BC7700E5B15B /* SKTGridView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTGridView.m; sourceTree = "<group>"; };
 		66C33E0B1290BC7700E5B15B /* SKTInspectorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKTInspectorController.h; sourceTree = "<group>"; };
 		66C33E0C1290BC7700E5B15B /* SKTInspectorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTInspectorController.m; sourceTree = "<group>"; };
+		66CA1843181A3E5B00DE6AFB /* Search.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Search.xib; sourceTree = "<group>"; };
+		66CA184C181A3F4F00DE6AFB /* SearchWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchWindowController.h; sourceTree = "<group>"; };
+		66CA184D181A3F4F00DE6AFB /* SearchWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchWindowController.m; sourceTree = "<group>"; };
 		66DBB3761813B1A80047301A /* PreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesController.h; sourceTree = "<group>"; };
 		66DBB3771813B1A80047301A /* PreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesController.m; sourceTree = "<group>"; };
 		66DBB3821813B1BB0047301A /* Preferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
@@ -533,6 +538,9 @@
 		66E8EE0C12D673BB00780264 /* Search Window */ = {
 			isa = PBXGroup;
 			children = (
+				66CA1843181A3E5B00DE6AFB /* Search.xib */,
+				66CA184C181A3F4F00DE6AFB /* SearchWindowController.h */,
+				66CA184D181A3F4F00DE6AFB /* SearchWindowController.m */,
 			);
 			name = "Search Window";
 			sourceTree = "<group>";
@@ -734,6 +742,7 @@
 				7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */,
 				7991198A12CD4B72009D28C0 /* stamp.png in Resources */,
 				79911A6312CDB215009D28C0 /* Arrow.tiff in Resources */,
+				66CA1844181A3E5B00DE6AFB /* Search.xib in Resources */,
 				79911A6412CDB215009D28C0 /* Circle.tiff in Resources */,
 				66DBB3831813B1BB0047301A /* Preferences.xib in Resources */,
 				6638C026181852FD008341E6 /* ProjectNav.xib in Resources */,
@@ -783,6 +792,7 @@
 				7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */,
 				79911A0912CD974A009D28C0 /* Application.m in Sources */,
 				79FC089012DBE8E300DE3C18 /* TagWindowController.m in Sources */,
+				66CA184E181A3F4F00DE6AFB /* SearchWindowController.m in Sources */,
 				79FC08D812DC008C00DE3C18 /* Tag.m in Sources */,
 				6646987F17D3FF6500A1B767 /* DocumentItem.m in Sources */,
 			);
