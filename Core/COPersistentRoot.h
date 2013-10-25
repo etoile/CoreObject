@@ -24,39 +24,57 @@
 extern NSString * const COPersistentRootDidChangeNotification;
 
 /**
- * A persistent root editing context exposes as a working copy a CoreObject 
- * store snapshot restricted to a single persistent root (see COEditingContext also).
+ * @group Core
+ * @abstract A persistent root represents a document or a top-level object in a 
+ * CoreObject store
  *
- * It queues changes and when the user requests it, it attempts to commit them
- * to the store.
+ * A persistent root usually represents a core object in the model
+ * (e.g. library, tag, person, project etc.), and manages a persistent object 
+ * graph and all its history.
+ *
+ * A persistent root history is a tree structure divided into branches. A branch 
+ * is a revision sequence, and a revision is a tree or branch node.<br />
+ * If merges are considered, the history is a graph and not just a tree.
+ *
+ * New persistent roots contains just a single branch (see -branches).
+ *
+ * @section Conceptual Model
  *
  * For each new persistent root, CoreObject produces a new UUID triplet based on:
  *
  * <deflist>
- * <item>a persistent root</item>a commit track collection that results in 
+ * <item>a persistent root</item>a branch collection that results in
  * a history graph describing all the changes made to a document
- * (document has a very loose meaning here)</desc>
- * <item>a commit track</item><desc>the persistent root main branch, more 
- * commit tracks can be created by branching this initial track</desc>
- * <item>a root object</item><desc>the document main object e.g. the top node 
- * of a structed document, a photo object or a contact object</desc>
+ * (document has a very loose meaning here</desc>
+ * <item>a branch</item><desc>the persistent root initial branch</desc>
+ * <item>a root object</item><desc>the document main object e.g. the top node
+ * of a structed document, a photo or contact object</desc>
  * </deflist>
  *
- * Each UUID in this UUID triplet is unique (never reused) accross all 
- * CoreObject stores, unless a persistent root has been replicated accross 
+ * Each UUID in this UUID triplet is unique (never reused) accross all
+ * CoreObject stores, unless a persistent root has been replicated accross
  * stores (not supported for now).<br />
- * Generally speaking, CoreObject constructs (tracks, revisions, objects, 
- * stores etc.) are not allowed to share the same UUID. For the unsupported 
- * replication case, constructs using the same UUID are considered to be 
- * identical (same type and data) but replicated.  
+ * Generally speaking, CoreObject constructs (branches, revisions, objects,
+ * stores etc.) are not allowed to share the same UUID. For the unsupported
+ * replication case, constructs using the same UUID are considered to be
+ * identical (same type and data) but replicated.
  *
- * A persistent root represents a core object but a root object doesn't (see 
- * -rootObject). As such, use -persistentRootUUID to track core objects. 
- * A root object UUID might appear in multiple persistent roots (e.g. 
- * a persistent root copy will use the same root object UUID than the original 
- * persistent root although both core objects or persistent roots are distinct.<br />
- * From a terminology standpoint, persistent root and core object can be used 
+ * A persistent root represents a core object but a root object doesn't (see
+ * -rootObject). As such, use -[COPersistentRoot UUID] to track core objects.
+ * A root object UUID might appear in multiple persistent roots (e.g.
+ * a persistent root copy will use the same root object UUID than the original
+ * persistent root although both core objects or persistent roots are distinct).<br />
+ * From a terminology standpoint, persistent root and core object can be used
  * interchangeably.
+ *
+ * @section Attributes and Metadata
+ *
+ * @section Branches
+ *
+ * @section Cheap Copies
+ *
+ * @section Deletion
+ *
  */
 @interface COPersistentRoot : NSObject <COPersistentObjectContext>
 {
