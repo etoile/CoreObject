@@ -357,12 +357,6 @@
     UKObjectsEqual(@"Hello world", [originalBranch label]);
 }
 
-// NOTE: All dictionaries are reported as mutable on 10.7.
-- (BOOL) reportsImmutableDictionaryCorrectly
-{
-	return ([[NSDictionary dictionary] isKindOfClass: [NSMutableDictionary class]] == NO);
-}
-
 - (void) testBranchMetadata
 {
     [ctx commit];
@@ -380,11 +374,8 @@
     
     UKObjectsEqual(D(@"value", @"key"), [originalBranch metadata]);
 
-	if ([self reportsImmutableDictionaryCorrectly])
-	{
-    	UKFalse([[originalBranch metadata] isKindOfClass: [NSMutableDictionary class]]);
-	}
-    UKTrue([ctx hasChanges]);
+	UKRaisesException([(NSMutableDictionary *)[originalBranch metadata] setObject: @"foo" forKey: @"bar"]);
+	UKTrue([ctx hasChanges]);
     UKTrue([persistentRoot hasChanges]);
     UKTrue([originalBranch hasChanges]);
     
@@ -671,5 +662,65 @@
 
 // TODO: Test these behaviours during deleted->undeleted and undeleted->deleted
 // transitions.
+
+- (void) testSelectiveUndoRedo
+{
+	OutlineItem *root = [persistentRoot rootObject];
+	OutlineItem *child1 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[root addObject: child1];
+	
+    [ctx commit];
+	
+    // make some commits...
+    
+    [root setLabel: @"doc1"];
+    [ctx commitWithUndoTrack: _testTrack];
+    
+	[child1 setLabel: @"child1"];
+    [ctx commitWithUndoTrack: _testTrack];
+    
+	[root setLabel: @"doc1a"];
+    [ctx commitWithUndoTrack: _testTrack];
+	CORevision *doc1Todoc1aRevision = [persistentRoot currentRevision];
+	
+    [child1 setLabel: @"child1a"];
+    [ctx commitWithUndoTrack: _testTrack];
+	CORevision *child1Tochild1aRevision = [persistentRoot currentRevision];
+	
+    // undo doc1 -> doc1a
+	
+	UKObjectsEqual(@"doc1a", [root label]);
+	UKObjectsEqual(@"child1a", [child1 label]);
+	
+	[originalBranch undoNode: doc1Todoc1aRevision];
+	[ctx commit];
+	
+	UKObjectsEqual(@"doc1", [root label]);
+	UKObjectsEqual(@"child1a", [child1 label]);
+	
+	[originalBranch undo];
+	[ctx commit];
+	
+	UKObjectsEqual(@"doc1a", [root label]);
+	UKObjectsEqual(@"child1a", [child1 label]);
+	
+	[originalBranch redo];
+	[ctx commit];
+
+	UKObjectsEqual(@"doc1", [root label]);
+	UKObjectsEqual(@"child1a", [child1 label]);
+
+	[originalBranch undoNode: child1Tochild1aRevision];
+	[ctx commit];
+	
+	UKObjectsEqual(@"doc1", [root label]);
+	UKObjectsEqual(@"child1", [child1 label]);
+	
+	[originalBranch redoNode: doc1Todoc1aRevision];
+	[ctx commit];
+	
+	UKObjectsEqual(@"doc1a", [root label]);
+	UKObjectsEqual(@"child1", [child1 label]);
+}
 
 @end

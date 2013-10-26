@@ -895,7 +895,48 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (void)undoNode: (id <COTrackNode>)aNode
 {
-	// TODO: Implement Selective Undo
+	[self selectiveApplyFromRevision: (CORevision *)aNode toRevision: [(CORevision *)aNode parentRevision]];
+}
+
+- (void)redoNode: (id <COTrackNode>)aNode
+{
+	[self selectiveApplyFromRevision: [(CORevision *)aNode parentRevision] toRevision: (CORevision *)aNode];
+}
+
+- (COItemGraphDiff *) diffToSelectivelyApplyChangesFromRevision: (CORevision *)start
+													 toRevision: (CORevision *)end
+{
+    COItemGraph *currentGraph = [[self store] itemGraphForRevisionUUID: [[self currentRevision] UUID]
+														persistentRoot: [[self persistentRoot] UUID]];
+    
+    COItemGraph *oldGraph = [[self store] itemGraphForRevisionUUID: [start UUID] persistentRoot: [[self persistentRoot] UUID]];
+    COItemGraph *newGraph = [[self store] itemGraphForRevisionUUID: [end UUID] persistentRoot: [[self persistentRoot] UUID]];
+    
+    COItemGraphDiff *diff1 = [COItemGraphDiff diffItemTree: oldGraph withItemTree: newGraph sourceIdentifier: @"diff1"];
+    COItemGraphDiff *diff2 = [COItemGraphDiff diffItemTree: oldGraph withItemTree: currentGraph sourceIdentifier: @"diff2"];
+    
+    COItemGraphDiff *merged = [diff1 itemTreeDiffByMergingWithDiff: diff2];
+    return merged;
+}
+
+- (void)selectiveApplyFromRevision: (CORevision *)start
+						toRevision: (CORevision *)end
+{
+	COItemGraphDiff *merged = [self diffToSelectivelyApplyChangesFromRevision: start toRevision: end];
+	COItemGraph *oldGraph = [[self store] itemGraphForRevisionUUID: [start UUID] persistentRoot: [[self persistentRoot] UUID]];
+	
+	id<COItemGraph> result = [merged itemTreeWithDiffAppliedToItemGraph: oldGraph];
+	
+	// FIXME: Works, but an ugly API mismatch when setting object graph context contents
+	NSMutableArray *items = [NSMutableArray array];
+	for (ETUUID *uuid in [result itemUUIDs])
+	{
+		[items addObject: [result itemForUUID: uuid]];
+	}
+	
+	// FIXME: Handle cross-persistent root relationship constraint violations,
+	// if we introduce those
+	[[self objectGraphContext] insertOrUpdateItems: items];
 }
 
 - (BOOL)isOrdered
