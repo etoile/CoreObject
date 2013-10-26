@@ -27,14 +27,16 @@ static NSString * const kCOCommandTypeCreatePersistentRoot = @"COCommandTypeCrea
 
 // Edit properties
 
-static NSString * const kCOCommandType = @"COCommandType";
-static NSString * const kCOCommandStoreUUID = @"COCommandStoreUUID";
-static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRootUUID";
-static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
+NSString * const kCOCommandType = @"COCommandType";
+NSString * const kCOCommandUUID = @"COCommandUUID";
+NSString * const kCOCommandStoreUUID = @"COCommandStoreUUID";
+NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRootUUID";
+NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
 @implementation COCommand
 
 @synthesize kind;
+@synthesize UUID;
 
 + (NSDictionary *) mapping
 {
@@ -124,11 +126,6 @@ static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
 #pragma mark -
 #pragma mark Track Node Protocol
-
-- (ETUUID *)UUID
-{
-	return nil;
-}
 
 - (ETUUID *)persistentRootUUID
 {
@@ -235,6 +232,7 @@ static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
 - (id) initWithPropertyList: (id)plist
 {
     SUPERINIT;
+	self.UUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandUUID]];
     self.storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandStoreUUID]];
     self.persistentRootUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandPersistentRootUUID]];
 	ETAssert([plist objectForKey: kCOCommandTimestamp] != nil);
@@ -245,6 +243,7 @@ static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
 - (id) propertyList
 {
     NSMutableDictionary *result = [super propertyList];
+	[result setObject: [self.UUID stringValue] forKey: kCOCommandUUID];
     [result setObject: [_storeUUID stringValue] forKey: kCOCommandStoreUUID];
     [result setObject: [_persistentRootUUID stringValue] forKey: kCOCommandPersistentRootUUID];
     [result setObject: [self numberFromDate: _timestamp] forKey: kCOCommandTimestamp];
@@ -265,18 +264,14 @@ static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
 	if ([object isKindOfClass: [COSingleCommand class]] == NO)
 		return NO;
 
-	return ([((COSingleCommand *)object)->_storeUUID isEqual: _storeUUID]
+	return ([((COSingleCommand *)object).UUID isEqual: self.UUID]
+	     && [((COSingleCommand *)object)->_storeUUID isEqual: _storeUUID]
 		 && [((COSingleCommand *)object)->_persistentRootUUID isEqual: _persistentRootUUID]
 		 && [((COSingleCommand *)object)->_timestamp isEqual: _timestamp]);
 }
 
 #pragma mark -
 #pragma mark Track Node Protocol
-
-- (ETUUID *)UUID
-{
-	return nil;
-}
 
 - (ETUUID *)persistentRootUUID
 {

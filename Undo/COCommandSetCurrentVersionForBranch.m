@@ -55,6 +55,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 - (COCommand *) inverse
 {
     COCommandSetCurrentVersionForBranch *inverse = [[COCommandSetCurrentVersionForBranch alloc] init];
+	inverse.UUID = [ETUUID new];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;

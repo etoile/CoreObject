@@ -31,6 +31,7 @@
     if (_isRecordingUndo)
     {
         _currentEditGroup = [[COCommandGroup alloc] init];
+		_currentEditGroup.UUID = [ETUUID new];
     }
     else
     {
@@ -78,6 +79,7 @@
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     
     COCommandDeletePersistentRoot *edit = [[COCommandDeletePersistentRoot alloc] init];
+	edit.UUID = [ETUUID new];
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot UUID];
     edit.timestamp = [NSDate date];
@@ -88,6 +90,7 @@
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
     COCommandUndeletePersistentRoot *edit = [[COCommandUndeletePersistentRoot alloc] init];
+	edit.UUID = [ETUUID new];
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot UUID];
     edit.timestamp = [NSDate date];
@@ -102,6 +105,7 @@
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
     COCommandCreatePersistentRoot *edit = [[COCommandCreatePersistentRoot alloc] init];
+	edit.UUID = [ETUUID new];
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot UUID];
     edit.timestamp = [NSDate date];
@@ -116,6 +120,7 @@
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
     COCommandSetCurrentBranch *edit = [[COCommandSetCurrentBranch alloc] init];
+	edit.UUID = [ETUUID new];
     edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot UUID];
     edit.timestamp = [NSDate date];
@@ -130,6 +135,7 @@
 							 oldMetadata: (id)oldMetadata
 {
 	COCommandSetPersistentRootMetadata *edit = [[COCommandSetPersistentRootMetadata alloc] init];
+	edit.UUID = [ETUUID new];
 	edit.storeUUID = [[[aPersistentRoot editingContext] store] UUID];
     edit.persistentRootUUID = [aPersistentRoot UUID];
     edit.timestamp = [NSDate date];
@@ -148,6 +154,7 @@
 
 	// TODO: Implement COCommandCreateBranch
     COCommandUndeleteBranch *edit = [[COCommandUndeleteBranch alloc] init];
+	edit.UUID = [ETUUID new];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] UUID];
     edit.timestamp = [NSDate date];
@@ -172,6 +179,7 @@
 	NILARG_EXCEPTION_TEST(aBranch);
 	
     COCommandSetCurrentVersionForBranch *edit = [[COCommandSetCurrentVersionForBranch alloc] init];
+	edit.UUID = [ETUUID new];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] UUID];
     edit.timestamp = [NSDate date];
@@ -191,6 +199,7 @@
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     
     COCommandSetBranchMetadata *edit = [[COCommandSetBranchMetadata alloc] init];
+	edit.UUID = [ETUUID new];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] UUID];
     edit.timestamp = [NSDate date];
@@ -207,6 +216,7 @@
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
     COCommandDeleteBranch *edit = [[COCommandDeleteBranch alloc] init];
+	edit.UUID = [ETUUID new];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] UUID];
     edit.timestamp = [NSDate date];
@@ -221,6 +231,7 @@
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
   
     COCommandUndeleteBranch *edit = [[COCommandUndeleteBranch alloc] init];
+	edit.UUID = [ETUUID new];
     edit.storeUUID = [[[aBranch editingContext] store] UUID];
     edit.persistentRootUUID = [[aBranch persistentRoot] UUID];
     edit.timestamp = [NSDate date];

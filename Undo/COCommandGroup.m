@@ -30,6 +30,8 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 {
     SUPERINIT;
     
+	self.UUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandUUID]];
+	
     NSMutableArray *edits = [NSMutableArray array];
     for (id editPlist in [plist objectForKey: kCOCommandContents])
     {
@@ -45,6 +47,8 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 {
     NSMutableDictionary *result = [super propertyList];
     
+	[result setObject: [self.UUID stringValue] forKey: kCOCommandUUID];
+	
     NSMutableArray *edits = [NSMutableArray array];
     for (COCommand *subEdit in _contents)
     {
@@ -66,7 +70,8 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 - (COCommand *) inverse
 {
     COCommandGroup *inverse = [[COCommandGroup alloc] init];
-    
+    inverse.UUID = [ETUUID new];
+	
     NSMutableArray *edits = [NSMutableArray array];
     for (COCommand *subEdit in _contents)
     {
@@ -108,12 +113,6 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 
 #pragma mark -
 #pragma mark Track Node Protocol
-
-- (ETUUID *)UUID
-{
-	// TODO: Return a transaction/batch UUID probably
-	return nil;
-}
 
 - (ETUUID *)persistentRootUUID
 {

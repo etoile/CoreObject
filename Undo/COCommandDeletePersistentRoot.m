@@ -46,6 +46,7 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 	}
 
     COCommandUndeletePersistentRoot *inverse = [[inverseClass alloc] init];
+	inverse.UUID = [ETUUID new];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;

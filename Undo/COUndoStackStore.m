@@ -3,6 +3,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
+#import "COCommand.h"
 
 NSString * const kCOUndoStack = @"undo";
 NSString * const kCORedoStack = @"redo";
@@ -52,8 +53,8 @@ NSString * const kCORedoStack = @"redo";
         }
     }
 
-    [_db executeUpdate: @"CREATE TABLE IF NOT EXISTS undo (idx INTEGER PRIMARY KEY ASC, name STRING, data BLOB)"];
-    [_db executeUpdate: @"CREATE TABLE IF NOT EXISTS redo (idx INTEGER PRIMARY KEY ASC, name STRING, data BLOB)"];
+    [_db executeUpdate: @"CREATE TABLE IF NOT EXISTS undo (idx INTEGER PRIMARY KEY ASC, name STRING NOT NULL, data BLOB NOT NULL, uuid NOT NULL)"];
+    [_db executeUpdate: @"CREATE TABLE IF NOT EXISTS redo (idx INTEGER PRIMARY KEY ASC, name STRING NOT NULL, data BLOB NOT NULL, uuid NOT NULL)"];
     
     return self;
 }
@@ -135,7 +136,7 @@ NSString * const kCORedoStack = @"redo";
     NILARG_EXCEPTION_TEST(aStack);
     
     NSData *aBlob = [NSJSONSerialization dataWithJSONObject: anAction options: 0 error: NULL];
-    BOOL ok = [_db executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (name, data) VALUES (?, ?)", aTable], aStack, aBlob];
+    BOOL ok = [_db executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (name, data, uuid) VALUES (?, ?, ?)", aTable], aStack, aBlob, anAction[kCOCommandUUID]];
     assert(ok);
 }
 
