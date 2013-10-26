@@ -28,6 +28,20 @@ First alpha release blockers
 
 - Implement batch mutation in ETCollection and proper KVO support on top of it in COObject
 
+- ProjectDemo should demonstrate more interesting features of CoreObject. 
+
+  - Make FTS search results more usable
+
+  - Some kind of XMPP collaboration demo that shows off per-user undo tracks
+
+  - Import & improve the Typewriter history graph. Should have selective undo and merge buttons
+  
+  - Simple table-based COUndoTrack UI like ObjectManager, including selective undo/redo controls
+  
+  - Simple COCopier-based copy and paste support
+  
+  - Simple diff visualization
+
 
 Future Work
 -----------
@@ -39,7 +53,8 @@ Future Work
 	
   - GC: only collect divergent revisions older than X days
   
-  -  Switch from FMDB to an SQL abstraction backend
+  - Switch from FMDB to an SQL abstraction backend
+
 
 - COEditingContext
 
@@ -60,18 +75,14 @@ Future Work
   - Making additional changes to an uncomitted cheap copy persistent root is broken (we
     don't look at the COObjectGraphContext)
 	
-  - Refactor handling of store notifications and test it more thoroughly. Should
-    post a persistent root change notification to the application if we load
-	changes that another process made in the store.
+  - Refactor handling of store notifications
 
 	
 - COBranch
 
   - Extend COBranch API to support branches and merging revisions accross tracks
 
-  - Extract selective undo code from undo system
-  
-  - Implement selective undo in -[COBranch undoNode:]
+  - Clean up selective undo code and share implementation with undo system
 
 
 - Metamodel
@@ -119,7 +130,6 @@ Future Work
   
   - Check the set of properties declared by COObject makes sense and isn't too much / too little
 
-
   - Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
 
   - Turn COObject into zombies once garbage collected (see -markAsRemovedFromContext)
@@ -134,8 +144,8 @@ Future Work
   - use a std::unordered_map<NSString *, std::pair<uint32_t, id>>
     (i.e. map from string to (COType, object) pair). 
     
-    (Well, use a simple wrapper class instead of std::pair.) We could also
-    use SEL instead of NSString* for better performance, probably.
+    (Well, use a simple wrapper class instead of std::pair.) NOTE: using
+	SEL as a map key won't work on libobjc2.
 
 
 - Collaboration
@@ -151,7 +161,7 @@ Future Work
 
 - COUndoTrack
 
-  - Expose an API for selective undo of actions from the undo/redo stacks
+  - Refactor COCommand initialization which is a mess
 
   - Rename COTrack to COHistoryTrack protocol
 
@@ -161,7 +171,9 @@ Future Work
   - for COLibrary, evaluate whether we can enfore the constraint that one persistent root belongs to one library
 
   - Hide CODictionary as an implementation detail
+  
 
+- ProjectDemo
 
  - supply commit metadata
 
@@ -173,6 +185,8 @@ Future Work
  
  - Improve history graph UI. Implement summarization (collapsing minor edits) and
    asynchronously expanding the graph.
+   
+ - merge the remaining useful parts of Typewriter to make a single demo app
 
 
 - EtoileUI
