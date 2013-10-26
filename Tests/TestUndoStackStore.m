@@ -50,4 +50,18 @@
     UKObjectsEqual(A(D(@"test-b", kCOCommandUUID)), [_store stackContents: kCORedoStack forName: @"stackA"]);
 }
 
+- (void) testPopByUUID
+{
+    [_store pushAction: D(@"d440baa2-6115-4776-bbca-700d534a7d57", kCOCommandUUID) stack: kCOUndoStack forName: @"stack1"];
+    [_store pushAction: D(@"61efa31f-84b0-4d40-8ef1-f5ae78e2fe12", kCOCommandUUID) stack: kCOUndoStack forName: @"stack1"];
+    [_store pushAction: D(@"5d005d44-7633-468f-b5ee-1016bbdab303", kCOCommandUUID) stack: kCOUndoStack forName: @"stack1"];
+    [_store pushAction: D(@"00cea0f3-2294-4bb0-b448-729bc60668a3", kCOCommandUUID) stack: kCOUndoStack forName: @"stack1"];
+	
+	[_store popActionWithUUID: [ETUUID UUIDWithString: @"61efa31f-84b0-4d40-8ef1-f5ae78e2fe12"] stack: kCOUndoStack forName: @"stack1"];
+	
+	UKObjectsEqual(A(D(@"d440baa2-6115-4776-bbca-700d534a7d57", kCOCommandUUID),
+					 D(@"5d005d44-7633-468f-b5ee-1016bbdab303", kCOCommandUUID),
+					 D(@"00cea0f3-2294-4bb0-b448-729bc60668a3", kCOCommandUUID)), [_store stackContents: kCOUndoStack forName: @"stack1"]);
+}
+
 @end

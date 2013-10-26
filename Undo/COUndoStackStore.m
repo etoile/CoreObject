@@ -115,6 +115,17 @@ NSString * const kCORedoStack = @"redo";
     [_db executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE idx = (SELECT MAX(idx) FROM %@ WHERE name GLOB ?)", aTable, aTable], aStack];
 }
 
+- (void) popActionWithUUID: (ETUUID *)aUUID stack: (NSString *)aTable forName: (NSString *)aStack
+{
+	[_db executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE uuid = ? AND name GLOB ?", aTable], aUUID.stringValue, aStack];
+	assert([_db changes] < 2);
+}
+
+- (NSString *) peekStackName: (NSString *)aTable forActionWithUUID: (ETUUID *)aUUID forName: (NSString *)aStack
+{
+	return [_db stringForQuery: [NSString stringWithFormat: @"SELECT name FROM %@ WHERE uuid = ? AND name GLOB ?", aTable], aUUID.stringValue, aStack];
+}
+
 - (NSDictionary *) peekStack: (NSString *)aTable forName: (NSString *)aStack
 {
     NSData *data = [_db dataForQuery: [NSString stringWithFormat: @"SELECT data FROM %@ WHERE idx = (SELECT MAX(idx) FROM %@ WHERE name GLOB ?)", aTable, aTable], aStack];
@@ -135,6 +146,10 @@ NSString * const kCORedoStack = @"redo";
 {
     NILARG_EXCEPTION_TEST(aStack);
     
+	// Sanity check that UUIDs are not being reused
+	int x = [_db intForQuery: @"select (select count(*) from undo where uuid = ?) + (select count(*) from redo where uuid = ?)", anAction[kCOCommandUUID], anAction[kCOCommandUUID]];
+	assert(x == 0);
+	
     NSData *aBlob = [NSJSONSerialization dataWithJSONObject: anAction options: 0 error: NULL];
     BOOL ok = [_db executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (name, data, uuid) VALUES (?, ?, ?)", aTable], aStack, aBlob, anAction[kCOCommandUUID]];
     assert(ok);

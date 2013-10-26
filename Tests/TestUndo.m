@@ -440,6 +440,84 @@
     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
 }
 
+- (void) testSelectiveUndoRedoOfCommands
+{
+    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *root = [doc1 rootObject];
+	OutlineItem *child1 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[root addObject: child1];
+	
+    [ctx commitWithUndoTrack: _setupTrack];
+		
+    // make some commits...
+    
+    [root setLabel: @"doc1"];
+    [ctx commitWithUndoTrack: _testTrack];
+    [child1 setLabel: @"child1"];
+    [ctx commitWithUndoTrack: _testTrack];
+    [root setLabel: @"doc1a"];
+    [ctx commitWithUndoTrack: _testTrack];
+    [child1 setLabel: @"child1a"];
+    [ctx commitWithUndoTrack: _testTrack];
+	
+    // undo doc1 -> doc1a
+	id<COTrackNode> node = [[_testTrack nodes] objectAtIndex: ([_testTrack count] - 2)];
+
+	UKObjectsEqual(@"doc1a", [root label]);
+	UKObjectsEqual(@"child1a", [child1 label]);
+	
+    [_testTrack undoNode: node];
+
+	UKObjectsEqual(@"doc1", [root label]);
+	UKObjectsEqual(@"child1a", [child1 label]);
+
+	[_testTrack undo];
+	
+	UKObjectsEqual(@"doc1", [root label]);
+	UKObjectsEqual(@"child1", [child1 label]);
+	
+	[_testTrack undo];
+	
+	UKObjectsEqual(@"doc1", [root label]);
+	UKNil([child1 label]);
+	
+	[_testTrack undo];
+	
+	UKNil([root label]);
+	UKNil([child1 label]);
+	
+	// redo nil -> child1
+	[_testTrack redoNode: [[_testTrack nodes] objectAtIndex: 2]];
+	
+	UKNil([root label]);
+	UKObjectsEqual(@"child1", [child1 label]);
+	
+	[_testTrack undo];
+	
+	UKNil([root label]);
+	UKNil([child1 label]);
+	
+	[_testTrack redo];
+	
+	UKNil([root label]);
+	UKObjectsEqual(@"child1", [child1 label]);
+	
+	[_testTrack redo];
+	
+	UKObjectsEqual(@"doc1", [root label]);
+	UKObjectsEqual(@"child1", [child1 label]);
+	
+	[_testTrack redo];
+	
+	UKObjectsEqual(@"doc1", [root label]);
+	UKObjectsEqual(@"child1a", [child1 label]);
+
+	[_testTrack redo];
+	
+	UKObjectsEqual(@"doc1a", [root label]);
+	UKObjectsEqual(@"child1a", [child1 label]);
+}
+
 @end
 
 

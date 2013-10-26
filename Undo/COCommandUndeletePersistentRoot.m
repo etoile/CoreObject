@@ -86,11 +86,6 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 #pragma mark -
 #pragma mark Track Node Protocol
 
-- (ETUUID *)UUID
-{
-	return _initialRevisionID;
-}
-
 - (NSDictionary *)metadata
 {
 	return [[self revision] metadata];

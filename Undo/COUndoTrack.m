@@ -139,31 +139,27 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     return [anEdit canApplyToContext: aContext];
 }
 
-- (BOOL) popAndApplyFromStack: (NSString *)popStack
-                  pushToStack: (NSString*)pushStack
-                         name: (NSString *)aName
-                    toContext: (COEditingContext *)aContext
+- (BOOL) popAndApplyCommand: (COCommand *)edit
+				  fromStack: (NSString *)popStack
+				pushToStack: (NSString*)pushStack
+					   name: (NSString *)aName
+				  toContext: (COEditingContext *)aContext
 {
     [_store beginTransaction];
     
-    NSString *actualStackName = [_store peekStackName: popStack forName: aName];
+	ETUUID *actionUUID = [edit UUID];
+    NSString *actualStackName = [_store peekStackName: popStack forActionWithUUID: actionUUID forName: aName];
 	BOOL isUndo = [popStack isEqual: kCOUndoStack];
-    COCommand *edit = [self peekEditFromStack: popStack forName: aName];
 	COCommand *appliedEdit = (isUndo ? [edit inverse] : edit);
-
+	
     if (![self canApplyEdit: appliedEdit toContext: aContext])
     {
-        // DEBUG: Break here
-        edit = [self peekEditFromStack: popStack forName: aName];
-		appliedEdit =  (isUndo ? [edit inverse] : edit);
-        [self canApplyEdit: appliedEdit toContext: aContext];
-        
-        [_store commitTransaction];
+		[_store commitTransaction];
         [NSException raise: NSInvalidArgumentException format: @"Can't apply edit %@", edit];
     }
     
     // Pop from undo track
-    [_store popStack: popStack forName: aName];
+    [_store popActionWithUUID: actionUUID stack: popStack forName: aName];
     
     // Apply the edit
     [appliedEdit applyToContext: aContext];
@@ -180,6 +176,22 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     [_store pushAction: [edit propertyList] stack: pushStack forName: actualStackName];
     
     return [_store commitTransaction];
+}
+
+- (BOOL) popAndApplyFromStack: (NSString *)popStack
+                  pushToStack: (NSString*)pushStack
+                         name: (NSString *)aName
+                    toContext: (COEditingContext *)aContext
+{
+    COCommand *edit = [self peekEditFromStack: popStack forName: aName];
+
+	if (edit == nil)
+	{
+		NSLog(@"error");
+		return NO;
+	}
+	
+	return [self popAndApplyCommand: edit fromStack:popStack pushToStack:pushStack name:aName toContext:aContext];
 }
 
 - (void) recordCommand: (COCommand *)aCommand
@@ -351,7 +363,18 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 - (void)undoNode: (id <COTrackNode>)aNode
 {
-	// TODO: Implement Selective Undo
+	[self popAndApplyCommand: (COCommand *)aNode fromStack:kCOUndoStack pushToStack:kCORedoStack name:_name toContext:_editingContext];
+	
+	[self reloadCommands];
+	[self didUpdate];
+}
+
+- (void)redoNode: (id <COTrackNode>)aNode
+{
+	[self popAndApplyCommand: (COCommand *)aNode fromStack:kCORedoStack pushToStack:kCOUndoStack name:_name toContext:_editingContext];
+	
+	[self reloadCommands];
+	[self didUpdate];
 }
 
 - (BOOL)isOrdered

@@ -68,6 +68,10 @@
  * the track subclass.
  */
 - (void)undoNode: (id <COTrackNode>)aNode;
+/**
+ * Same as -undoNode:, but for redoing a node
+ */
+- (void)redoNode: (id <COTrackNode>)aNode;
 
 @end
 

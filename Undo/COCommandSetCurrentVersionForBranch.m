@@ -169,11 +169,6 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 #pragma mark -
 #pragma mark Track Node Protocol
 
-- (ETUUID *)UUID
-{
-	return _newRevisionUUID;
-}
-
 - (ETUUID *)branchUUID
 {
 	return _branchUUID;

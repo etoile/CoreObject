@@ -2,6 +2,7 @@
 
 @class COUndoTrack;
 @class FMDatabase;
+@class ETUUID;
 
 extern NSString * const kCOUndoStack;
 extern NSString * const kCORedoStack;
@@ -32,5 +33,7 @@ extern NSString * const kCORedoStack;
 - (NSDictionary *) peekStack: (NSString *)aTable forName: (NSString *)aStack;
 - (NSString *) peekStackName: (NSString *)aTable forName: (NSString *)aStack;
 - (void) pushAction: (NSDictionary *)anAction stack: (NSString *)aTable forName: (NSString *)aStack;
+- (void) popActionWithUUID: (ETUUID *)aUUID stack: (NSString *)aTable forName: (NSString *)aStack;
+- (NSString *) peekStackName: (NSString *)aTable forActionWithUUID: (ETUUID *)aUUID forName: (NSString *)aStack;
 
 @end
