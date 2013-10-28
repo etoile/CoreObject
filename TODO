@@ -38,8 +38,6 @@ First alpha release blockers
   
   - Simple table-based COUndoTrack UI like ObjectManager, including selective undo/redo controls
   
-  - Simple COCopier-based copy and paste support
-  
   - Simple diff visualization
 
 

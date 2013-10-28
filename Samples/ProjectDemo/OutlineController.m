@@ -512,6 +512,72 @@ static int i = 0;
 	return [pb writeObjects: pbItems];
 }
 
+- (NSArray *)selectedRows
+{
+	NSMutableArray *result = [NSMutableArray array];
+	
+	NSIndexSet *selIndexes = [outlineView selectedRowIndexes];
+	
+	for (NSUInteger i = [selIndexes firstIndex]; i != NSNotFound; i = [selIndexes indexGreaterThanIndex: i])
+	{
+		[result addObject: [outlineView itemAtRow: i]];
+	}
+	
+	return [NSArray arrayWithArray: result];
+}
+
+#pragma mark cut / copy / paste
+
+- (IBAction)copy:(id)sender
+{
+	NSArray *rows = [self selectedRows];
+	
+	if ([rows count] == 0)
+	{
+		NSLog(@"Nothing to copy");
+		return;
+	}
+
+	[self outlineView: outlineView writeItems: rows toPasteboard: [NSPasteboard generalPasteboard]];
+}
+
+- (IBAction)paste:(id)sender
+{
+	NSLog(@"Paste!");
+	
+	// test paste destination
+	
+	NSArray *rows = [self selectedRows];
+	
+	OutlineItem *parent;
+	NSUInteger index;
+	
+	if ([rows count] == 0)
+	{
+		parent = nil;
+		index = [[[self rootObject] contents] count];
+	}
+	else
+	{
+		OutlineItem *item = rows[0];
+		parent = [item parent];
+		index = [[parent contents] indexOfObject: item] + 1;
+	}
+
+	[self pasteFromPasteboard: [NSPasteboard generalPasteboard]
+					   atItem: parent
+				   childIndex: index
+					pasteLink: NO];
+}
+
+- (IBAction)cut:(id)sender
+{
+	[self copy: sender];
+	[self delete: sender];
+}
+
+#pragma mark drag & drop
+
 - (OutlineItem *) outlineItemForPasteboardPropertyList: (id)plist
 {
     ETUUID *persistentRootUUID = [ETUUID UUIDWithString: plist[@"persistentRoot"]];
@@ -548,6 +614,14 @@ static int i = 0;
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)newParent childIndex:(NSInteger)index
 {
+	return [self pasteFromPasteboard: [info draggingPasteboard]
+							  atItem: newParent
+						  childIndex: index
+						   pasteLink: [info draggingSourceOperationMask] == NSDragOperationLink];
+}
+
+- (BOOL) pasteFromPasteboard: (NSPasteboard *)pasteboard atItem:(id)newParent childIndex:(NSInteger)index pasteLink: (BOOL)pasteLink
+{
 	if (nil == newParent) { newParent = [self rootObject]; }
 	
 	NSUInteger insertionIndex = index;
@@ -556,9 +630,9 @@ static int i = 0;
 	NSMutableIndexSet *newSelectedRows = [NSMutableIndexSet indexSet];
 	NSMutableArray *outlineItems = [NSMutableArray array];
 	
-	for (NSPasteboardItem *pbItem in [[info draggingPasteboard] pasteboardItems])
+	for (NSPasteboardItem *pbItem in [pasteboard pasteboardItems])
 	{
-        id plist = [pbItem propertyListForType: @"org.etoile.outlineItem"];	
+        id plist = [pbItem propertyListForType: @"org.etoile.outlineItem"];
         OutlineItem *srcItem = [self outlineItemForPasteboardPropertyList: plist];
 		[outlineItems addObject: srcItem];
 	}
@@ -566,7 +640,7 @@ static int i = 0;
 	
 	/* Make a link if the user is holding control */
 	
-	if ([info draggingSourceOperationMask] == NSDragOperationLink &&
+	if (pasteLink &&
 		![[outlineItems objectAtIndex: 0] isKindOfClass: [ItemReference class]]) // Don't make links to link objects
 	{
 		OutlineItem *itemToLinkTo = [outlineItems objectAtIndex: 0];
@@ -578,8 +652,8 @@ static int i = 0;
 														   context: [[self rootObject] objectContext]];
 		[ref autorelease];
 		
-		[newParent addItem: ref 
-				   atIndex: insertionIndex]; 
+		[newParent addItem: ref
+				   atIndex: insertionIndex];
 		
 		[self commitWithType: @"kCOTypeMinorEdit"
 			shortDescription: @"Drop Link"
@@ -608,7 +682,7 @@ static int i = 0;
             else
             {
                 [oldParent removeItemAtIndex: oldIndex];
-                [newParent addItem: outlineItem atIndex: insertionIndex++]; 
+                [newParent addItem: outlineItem atIndex: insertionIndex++];
             }
             
             [self commitWithType: @"kCOTypeMinorEdit"
@@ -620,13 +694,13 @@ static int i = 0;
             // User dragged cross-peristent root
             
             COCopier *copier = [[[COCopier alloc] init] autorelease];
-
+			
             ETUUID *destUUID = [copier copyItemWithUUID: [outlineItem UUID]
                                               fromGraph: [outlineItem objectGraphContext]
                                                 toGraph: [doc objectGraphContext]];
             
             OutlineItem *copy = (OutlineItem *)[[doc objectGraphContext] loadedObjectForUUID: destUUID];
-
+			
             if (insertionIndex == -1) { insertionIndex = [[newParent contents] count]; }
             
             [newParent addItem: copy atIndex: insertionIndex++];
@@ -641,7 +715,7 @@ static int i = 0;
 			}
             
             // Remove from source
-
+			
             OutlineItem *oldParent = [outlineItem parent];
             NSUInteger oldIndex = [[oldParent contents] indexOfObject: outlineItem];
             [oldParent removeItemAtIndex: oldIndex];
@@ -663,18 +737,19 @@ static int i = 0;
         }
 	}
 	
-
+	
 	
 	[outlineView expandItem: newParent];
 	
 	for (OutlineItem *outlineItem in outlineItems)
 	{
 		[newSelectedRows addIndex: [outlineView rowForItem: outlineItem]];
-	}  
+	}
 	[outlineView selectRowIndexes: newSelectedRows byExtendingSelection: NO];
 	
 	return YES;
 }
+
 
 /* OutlineItem delegate */
 
