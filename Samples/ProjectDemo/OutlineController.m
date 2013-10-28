@@ -567,7 +567,8 @@ static int i = 0;
 	[self pasteFromPasteboard: [NSPasteboard generalPasteboard]
 					   atItem: parent
 				   childIndex: index
-					pasteLink: NO];
+					pasteLink: NO
+					pasteCopy: YES];
 }
 
 - (IBAction)cut:(id)sender
@@ -609,18 +610,28 @@ static int i = 0;
 			}
 		}
 	}
-	return NSDragOperationPrivate;
+	
+	if ([info draggingSourceOperationMask] & NSDragOperationCopy)
+		return NSDragOperationCopy;
+	
+	if ([info draggingSourceOperationMask] & NSDragOperationLink)
+		return NSDragOperationLink;
+	
+	return NSDragOperationMove;
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)newParent childIndex:(NSInteger)index
 {
+	NSLog(@"Dragging mask: %d", (int)[info draggingSourceOperationMask]);
+	
 	return [self pasteFromPasteboard: [info draggingPasteboard]
 							  atItem: newParent
 						  childIndex: index
-						   pasteLink: [info draggingSourceOperationMask] == NSDragOperationLink];
+						   pasteLink: [info draggingSourceOperationMask] == NSDragOperationLink
+						   pasteCopy: [info draggingSourceOperationMask] == NSDragOperationCopy];
 }
 
-- (BOOL) pasteFromPasteboard: (NSPasteboard *)pasteboard atItem:(id)newParent childIndex:(NSInteger)index pasteLink: (BOOL)pasteLink
+- (BOOL) pasteFromPasteboard: (NSPasteboard *)pasteboard atItem:(id)newParent childIndex:(NSInteger)index pasteLink: (BOOL)pasteLink pasteCopy: (BOOL)pasteCopy
 {
 	if (nil == newParent) { newParent = [self rootObject]; }
 	
@@ -666,8 +677,11 @@ static int i = 0;
 	
 	for (OutlineItem *outlineItem in outlineItems)
 	{
-        if ([[outlineItem persistentRoot] isEqual: [doc persistentRoot]])
+        if ([[outlineItem persistentRoot] isEqual: [doc persistentRoot]]
+			&& !pasteCopy)
         {
+			// Move within persistent root
+			
             OutlineItem *oldParent = [outlineItem parent];
             NSUInteger oldIndex = [[oldParent contents] indexOfObject: outlineItem];
             
@@ -717,9 +731,12 @@ static int i = 0;
             // Remove from source
 			
             OutlineItem *oldParent = [outlineItem parent];
-            NSUInteger oldIndex = [[oldParent contents] indexOfObject: outlineItem];
-            [oldParent removeItemAtIndex: oldIndex];
-            
+			if (!pasteCopy)
+			{
+				NSUInteger oldIndex = [[oldParent contents] indexOfObject: outlineItem];
+				[oldParent removeItemAtIndex: oldIndex];
+			}
+			
             OutlineController *sourceController = [(ApplicationDelegate *)[NSApp delegate] controllerForDocumentRootObject: [oldParent document]];
 			
 			if (![[self class] isProjectUndo])
