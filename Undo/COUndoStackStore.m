@@ -41,6 +41,7 @@ NSString * const kCORedoStack = @"redo";
         
     _db = [[FMDatabase alloc] initWithPath: [dir stringByAppendingPathComponent: @"undo.sqlite"]];
     [_db setShouldCacheStatements: YES];
+	[_db setLogsErrors: YES];
     assert([_db open]);
     
     // Use write-ahead-log mode
