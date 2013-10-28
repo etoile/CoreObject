@@ -29,6 +29,18 @@
     return self;
 }
 
+// TODO: Improve the output
+- (NSString *)description
+{
+	NSMutableDictionary *dict = D(_persistentRootToObjects, @"Persistent root to Objects",
+	                              _objectToPersistentRoots, @"Object to Persistent Roots");
+
+	/* For Mac OS X, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
+	NSString *desc = [dict description];
+	desc = [desc stringByReplacingOccurrencesOfString: @"\\n" withString: @"\n"];
+	desc = [desc stringByReplacingOccurrencesOfString: @"\\\"" withString: @""];
+	return desc;
+}
 
 - (NSArray *) affectedObjectsForChangeInPersistentRoot: (ETUUID *)aPersistentRoot
 {

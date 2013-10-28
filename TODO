@@ -4,6 +4,8 @@ TODO
 First alpha release blockers
 ----------------------------
 
+- Fix COCrossPersistentRootCache to support multiple persistent relationships in a COObject (see FIXME in -[TestCrossPersistentRootReferences testBranchDeletion])
+
 - Fix EtoileUI entity descriptions to declare all required properties (see -didChangeValueForProperty:oldValue:)
 
 - Shorten -[COObject description] output

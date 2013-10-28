@@ -141,10 +141,9 @@
  * // Direct setters are rare, but nonetheless it is possible to write one as below...
  * - (void)setNames: (id <ETCollection>)newNames
  * {
- *     id oldCollection = [[names mutableCopy] autorelease];
  *     [self willChangeValueForProperty: @"names"];
  *     names =  newNames;
- *     [self didChangeValueForProperty: @"names" oldValue: oldCollection];
+ *     [self didChangeValueForProperty: @"names"];
  * }
  * </example>
  *
@@ -233,6 +232,11 @@
 	 * (current revision change, branch switch etc.).
 	 */
     NSMutableDictionary *_outgoingSerializedRelationshipCache;
+	/**
+	 * Stack of old collection values during nested change notifications i.e. 
+	 * -willChangeValueForProperty: is called multiple times for the same object.
+	 */
+	NSMutableArray *_oldValues;
 	BOOL _inDescription; // FIXME: remove; only for debugging
 	BOOL _isPrepared;
 }
@@ -576,7 +580,6 @@
  * Can be overriden, but the superclass implementation must be called.
  */
 - (void)didChangeValueForProperty: (NSString *)key;
-- (void)didChangeValueForProperty: (NSString *)key oldValue: (id)oldValue;
 
 
 /** @taskunit Collection Mutation with Integrity Check */

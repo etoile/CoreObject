@@ -67,7 +67,7 @@ static void genericSetter(id self, SEL theCmd, id value)
 	
 	[self willChangeValueForProperty: key];
 	[self setValue: value forVariableStorageKey: key];
-	[self didChangeValueForProperty: key oldValue: oldValue];
+	[self didChangeValueForProperty: key];
 }
 
 + (BOOL)resolveInstanceMethod:(SEL)sel

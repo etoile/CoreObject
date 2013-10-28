@@ -239,7 +239,8 @@ See +[NSObject typePrefix]. */
 	_variableStorage = [self newVariableStorage];
     _outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
 	_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
-	
+	_oldValues = [NSMutableArray new];
+
 	[_objectGraphContext registerObject: self isNew: inserted];
 
 	return self;
@@ -294,12 +295,10 @@ See +[NSObject typePrefix]. */
 	
 	newObject->_UUID = [[ETUUID alloc] init];
 	newObject->_objectGraphContext = _objectGraphContext;
-	if (_variableStorage != nil)
-	{
-		newObject->_variableStorage = [self newVariableStorage];
-        newObject->_outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
-        newObject->_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
-	}
+	newObject->_variableStorage = [self newVariableStorage];
+	newObject->_outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
+	newObject->_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
+	newObject->_oldValues = [NSMutableArray new];
 
 	return newObject;
 }
@@ -671,21 +670,22 @@ See +[NSObject typePrefix]. */
 
 - (void)willChangeValueForProperty: (NSString *)key
 {
+	ETPropertyDescription *propertyDesc =
+		[_entityDescription propertyDescriptionForName: key];
+
+	if ([propertyDesc isMultivalued] && [self isCoreObjectRelationship: propertyDesc])
+	{
+		id <ETCollection> oldCollection = [[self valueForStorageKey: key] mutableCopy];
+
+		[_oldValues addObject: [ETKeyValuePair pairWithKey: key
+		                                             value: oldCollection]];
+	}
 	[super willChangeValueForKey: key];
 }
 
 - (void) markAsUpdatedIfNeededForProperty: (NSString*)prop
 {	
 	[_objectGraphContext markObjectAsUpdated: self forProperty: prop];
-}
-
-/**
- * FIXME: This API is broken, see note in -[CORelationshipCache addReferenceFromSourceObject:sourceProperty:targetProperty:]
- * I'm not sure if we can support it. --Eric 
- */
-- (void)didChangeValueForProperty: (NSString *)key
-{
-	[self didChangeValueForProperty: key oldValue: nil];
 }
 
 - (void)validateTypeForNewValue: (id)newValue
@@ -817,10 +817,32 @@ See +[NSObject typePrefix]. */
 	}
 }
 
-- (void)didChangeValueForProperty: (NSString *)key oldValue: (id)oldValue
+- (id)oldCoreObjectRelationshipValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
-	id newValue = [self valueForStorageKey: key];
+	if ([aPropertyDesc isMultivalued] == NO || [self isCoreObjectRelationship: aPropertyDesc] == NO)
+		return nil;
+
+	ETKeyValuePair *pair = [_oldValues lastObject];
+
+	if ([[pair key] isEqual: [aPropertyDesc name]] == NO)
+	{
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"-willChangeValueForProperty: and -didChangeValueForProperty: "
+		                     "must be paired in setters. Either "
+		                     "-willChangeValueForProperty: was not called for %@ "
+		                     "or -didChangeValueForProperty: was not called for %@.",
+		                    [aPropertyDesc name], [pair key]];
+	}
+
+	[_oldValues removeLastObject];
+	return [pair value];
+}
+
+- (void)didChangeValueForProperty: (NSString *)key
+{
 	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
+	id newValue = [self valueForStorageKey: key];
+	id oldValue = [self oldCoreObjectRelationshipValueForPropertyDescription: propertyDesc];
 
 	// FIXME: EtoileUI entity descriptions don't declare all required properties 
 	/*if (propertyDesc == nil)
@@ -885,15 +907,13 @@ See +[NSObject typePrefix]. */
 
 - (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
 {
-	// NOTE: We validate the entire collection in -didChangeValueForProperty:oldValue:
+	// NOTE: We validate the entire collection in -didChangeValueForProperty:
 	// We could possibly validate just the inserted objects here.
-
-	id oldCollection = [[self valueForStorageKey: key] mutableCopy];
 	id collection = [self collectionForProperty: key insertionIndex: index];
 
 	[self willChangeValueForProperty: key];
 	[collection insertObject: object atIndex: index hint: hint];
-	[self didChangeValueForProperty: key oldValue: oldCollection];
+	[self didChangeValueForProperty: key];
 }
 
 - (id)collectionForProperty: (NSString *)key removalIndex: (NSInteger)index
@@ -937,15 +957,13 @@ See +[NSObject typePrefix]. */
 
 - (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
 {
-	// NOTE: We validate the entire collection in -didChangeValueForProperty:oldValue:
+	// NOTE: We validate the entire collection in -didChangeValueForProperty
 	// We could possibly validate just the removed objects here.
-
-	id oldCollection = [[self valueForStorageKey: key] mutableCopy];
 	id collection = [self collectionForProperty: key removalIndex: index];
 
 	[self willChangeValueForProperty: key];
 	[collection removeObject: object atIndex: index hint: hint];
-	[self didChangeValueForProperty: key oldValue: oldCollection];
+	[self didChangeValueForProperty: key];
 }
 
 - (void) validateMultivaluedPropertiesUsingMetamodel
@@ -1113,7 +1131,8 @@ static int indent = 0;
 	}
 	
 	_inDescription = YES;
-	NSString *desc = [NSString stringWithFormat: @"<%@(%@) %p UUID=%@ properties=%@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _UUID, [self propertyNames]];
+	NSString *desc = [NSString stringWithFormat: @"<%@(%@) %p - %@>",
+		NSStringFromClass([self class]), [[self entityDescription] name], self, _UUID];
 
 	_inDescription = NO;
 	return desc;
