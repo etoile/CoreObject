@@ -62,7 +62,8 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
             
             // Update the cross-persistent root reference cache
             
-            [[self crossReferenceCache] clearReferencedPersistentRootsForObject: self];
+            [[self crossReferenceCache] clearReferencedPersistentRootsForProperty: [aProperty name]
+																		 ofObject: self];
         }
     }
 }
@@ -105,7 +106,8 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
                     if ([refObject isKindOfClass: [COPath class]])
                     {
                         [[self crossReferenceCache] addReferencedPersistentRoot: [(COPath *)refObject persistentRoot]
-                                                                      forObject: self];
+																	forProperty: [aProperty name]
+																	   ofObject: self];
                     }
                 }
             }
@@ -114,7 +116,8 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
                 if ([relationshipAsCOPathOrETUUID isKindOfClass: [COPath class]])
                 {
                     [[self crossReferenceCache] addReferencedPersistentRoot: [(COPath *)relationshipAsCOPathOrETUUID persistentRoot]
-                                                                  forObject: self];
+																forProperty: [aProperty name]
+																   ofObject: self];
                 }
             }
         }

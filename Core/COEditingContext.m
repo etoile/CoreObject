@@ -604,6 +604,9 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
     
     COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID];
     ETAssert(persistentRoot != nil);
+	
+	if ([persistentRoot isDeleted])
+		return nil;
     
     COBranch *branch;
     if (branchUUID != nil)

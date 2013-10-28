@@ -17,10 +17,10 @@
 	
 	assert([self rootObject] != nil);
 	
-	[[NSNotificationCenter defaultCenter] addObserver: self
-											 selector: @selector(objectGraphContextObjectsDidChange:)
-												 name: COObjectGraphContextObjectsDidChangeNotification
-											   object: [document objectGraphContext]];
+//	[[NSNotificationCenter defaultCenter] addObserver: self
+//											 selector: @selector(objectGraphContextObjectsDidChange:)
+//												 name: COObjectGraphContextObjectsDidChangeNotification
+//											   object: [document objectGraphContext]];
 
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(objectGraphContextObjectsDidChange:)

@@ -19,15 +19,13 @@
 
     ETPropertyDescription *childTagsProperty =
     [ETPropertyDescription descriptionWithName: @"childTags" type: (id)@"Anonymous.Tag"];
-    [childTagsProperty setPersistent: YES];
     [childTagsProperty setMultivalued: YES];
     [childTagsProperty setOrdered: NO];
-	// isComposite will be YES
+	[childTagsProperty setPersistent: YES];
     
     ETPropertyDescription *parentTagProperty =
     [ETPropertyDescription descriptionWithName: @"parentTag" type: (id)@"Anonymous.Tag"];
     [parentTagProperty setOpposite: childTagsProperty];
-    [parentTagProperty setIsContainer: YES];
     
     [tagEntity setPropertyDescriptions: A(tagLabelProperty, contentsProperty, childTagsProperty, parentTagProperty)];
     return tagEntity;

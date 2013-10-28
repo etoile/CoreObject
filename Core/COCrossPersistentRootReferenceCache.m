@@ -7,6 +7,31 @@
  */
 
 #import "COCrossPersistentRootReferenceCache.h"
+#import "COObject.h"
+
+@interface COCrossRefInfo : NSObject
+
+@property (readwrite, nonatomic, weak) COObject *sourceObject;
+@property (readwrite, nonatomic, copy) NSString *sourceProperty;
+@property (readwrite, nonatomic, copy) ETUUID *tagetPersistentRoot;
+
+@end
+
+@implementation COCrossRefInfo
+
+@synthesize sourceObject, sourceProperty, tagetPersistentRoot;
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat: @"<COCrossRefInfo from %@ (persistent root %@) : %@ to persistent root %@>",
+			[self.sourceObject UUID],
+			[[self.sourceObject persistentRoot] UUID],
+			sourceProperty,
+			tagetPersistentRoot];
+}
+
+@end
+
 
 @implementation COCrossPersistentRootReferenceCache
 
@@ -17,14 +42,14 @@
 	// FIXME: For versions prior to 10.8, objects must be explicitly removed
 	// from the map table if manual reference couting is used.
 #if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
-	_objectToPersistentRoots = [[NSMapTable alloc] initWithKeyOptions: NSMapTableWeakMemory
+	_weakObjectToCrossRefInfoArray = [[NSMapTable alloc] initWithKeyOptions: NSMapTableWeakMemory
 #else
-	_objectToPersistentRoots = [[NSMapTable alloc] initWithKeyOptions: NSMapTableZeroingWeakMemory							
+	_weakObjectToCrossRefInfoArray = [[NSMapTable alloc] initWithKeyOptions: NSMapTableZeroingWeakMemory
 #endif
                                                          valueOptions: NSMapTableStrongMemory
                                                              capacity: 16];
     
-    _persistentRootToObjects = [[NSMutableDictionary alloc] init];
+    _persistentRootUUIDToCrossRefInfoArray = [[NSMutableDictionary alloc] init];
     
     return self;
 }
@@ -32,83 +57,94 @@
 // TODO: Improve the output
 - (NSString *)description
 {
-	NSMutableDictionary *dict = D(_persistentRootToObjects, @"Persistent root to Objects",
-	                              _objectToPersistentRoots, @"Object to Persistent Roots");
-
-	/* For Mac OS X, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
-	NSString *desc = [dict description];
-	desc = [desc stringByReplacingOccurrencesOfString: @"\\n" withString: @"\n"];
-	desc = [desc stringByReplacingOccurrencesOfString: @"\\\"" withString: @""];
-	return desc;
-}
-
-- (NSArray *) affectedObjectsForChangeInPersistentRoot: (ETUUID *)aPersistentRoot
-{
-    NSHashTable *set = [_persistentRootToObjects objectForKey: aPersistentRoot];
-    return [set allObjects];
+	NSMutableString *result = [NSMutableString string];
+	for (NSArray *array in [_persistentRootUUIDToCrossRefInfoArray allValues])
+	{
+		for (COCrossRefInfo *info in array)
+		{
+			[result appendFormat: @"%@\n", info];
+		}
+	}
+	return result;
 }
 
 - (NSArray *) referencedPersistentRootUUIDsForObject: (COObject *)anObject
 {
-    NSSet *set = [_objectToPersistentRoots objectForKey: anObject];
-    return [set allObjects];
+	NSArray *crossRefInfos = [_weakObjectToCrossRefInfoArray objectForKey: anObject];
+	
+	NSMutableSet *set = [NSMutableSet set];
+	for (COCrossRefInfo *info in crossRefInfos)
+	{
+		[set addObject: info.tagetPersistentRoot];
+	}
+	return [set allObjects];
+}
+									  
+- (NSArray *) affectedObjectsForChangeInPersistentRoot: (ETUUID *)aPersistentRoot
+{
+	NSArray *crossRefInfos = [_persistentRootUUIDToCrossRefInfoArray objectForKey: aPersistentRoot];
+	
+	NSMutableSet *set = [NSMutableSet set];
+	for (COCrossRefInfo *info in crossRefInfos)
+	{
+		[set addObject: info.sourceObject];
+	}
+	return [set allObjects];
 }
 
 - (void) addReferencedPersistentRoot: (ETUUID *)aPersistentRoot
-                           forObject: (COObject *)anObject
+						 forProperty: (NSString *)aProperty
+						    ofObject: (COObject *)anObject
 {
+	COCrossRefInfo *info = [[COCrossRefInfo alloc] init];
+	info.sourceObject = anObject;
+	info.sourceProperty = aProperty;
+	info.tagetPersistentRoot = aPersistentRoot;
+	
     {
-        NSMutableSet *persistentRootSet = [_objectToPersistentRoots objectForKey: anObject];
-        if (persistentRootSet == nil)
+        NSMutableArray *infos = [_weakObjectToCrossRefInfoArray objectForKey: anObject];
+        if (infos == nil)
         {
-            persistentRootSet = [NSMutableSet set];
-            [_objectToPersistentRoots setObject: persistentRootSet forKey: anObject];
+            infos = [[NSMutableArray alloc] init];
+            [_weakObjectToCrossRefInfoArray setObject: infos forKey: anObject];
         }
-        [persistentRootSet addObject: aPersistentRoot];
+        [infos addObject: info];
     }
 
     {
-        NSHashTable *objectSet = [_persistentRootToObjects objectForKey: aPersistentRoot];
-        if (objectSet == nil)
+        NSMutableArray *infos = [_persistentRootUUIDToCrossRefInfoArray objectForKey: aPersistentRoot];
+        if (infos == nil)
         {
-			// FIXME: For versions prior to 10.8, objects must be explicitly
-			// removed from the hash table if manual reference couting is used.
-#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
-			objectSet = [NSHashTable weakObjectsHashTable];
-#else
-            objectSet = [NSHashTable hashTableWithWeakObjects];
-#endif
-            [_persistentRootToObjects setObject: objectSet forKey: aPersistentRoot];
+            infos = [[NSMutableArray alloc] init];
+            [_persistentRootUUIDToCrossRefInfoArray setObject: infos forKey: aPersistentRoot];
         }
-        [objectSet addObject: anObject];
+        [infos addObject: info];
     }
 }
 
-- (void) removeReferencedPersistentRoot: (ETUUID *)aPersistentRoot
-                              forObject: (COObject *)anObject
+- (void) clearReferencedPersistentRootsForProperty: (NSString *)aProperty
+										  ofObject: (COObject *)anObject
 {
-    {
-        NSMutableSet *persistentRootSet = [_objectToPersistentRoots objectForKey: anObject];
-        [persistentRootSet removeObject: aPersistentRoot];
-    }
-    
-    {
-        NSHashTable *objectSet = [_persistentRootToObjects objectForKey: aPersistentRoot];
-        [objectSet removeObject: anObject];
-    }
-}
-
-- (void) clearReferencedPersistentRootsForObject: (COObject *)anObject
-{
-    NSMutableSet *persistentRootSet = [_objectToPersistentRoots objectForKey: anObject];
-    
-    for (ETUUID *persistentRoot in persistentRootSet)
-    {
-        NSHashTable *objectSet = [_persistentRootToObjects objectForKey: persistentRoot];
-        [objectSet removeObject: anObject];
-    }
-    
-    [persistentRootSet removeAllObjects];
+	NSMutableArray *infos = [_weakObjectToCrossRefInfoArray objectForKey: anObject];
+	for (COCrossRefInfo *info in [infos copy])
+	{
+		assert(info.sourceObject == anObject);
+		if ([info.sourceProperty isEqual: aProperty])
+		{
+			NSMutableArray *inverseInfos = [_persistentRootUUIDToCrossRefInfoArray objectForKey: info.tagetPersistentRoot];
+			for (COCrossRefInfo *inverseInfo in [inverseInfos copy])
+			{
+				assert([inverseInfo.tagetPersistentRoot isEqual: info.tagetPersistentRoot]);
+				if (inverseInfo.sourceObject == anObject &&
+					[inverseInfo.sourceProperty isEqual: aProperty])
+				{
+					[inverseInfos removeObjectIdenticalTo: inverseInfo];
+				}
+			}
+			
+			[infos removeObjectIdenticalTo: info];
+		}
+	}
 }
 
 @end
