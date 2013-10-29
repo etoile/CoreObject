@@ -4,8 +4,6 @@ TODO
 First alpha release blockers
 ----------------------------
 
-- Fix EtoileUI entity descriptions to declare all required properties (see -didChangeValueForProperty:oldValue:)
-
 - Improve -[COObject detailedDescription] code and make output more readable
 
 - Check and update all Core API documentation (underway)

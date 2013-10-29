@@ -294,6 +294,7 @@ See +[NSObject typePrefix]. */
 	COObject *newObject = [[self class] allocWithZone: aZone];
 	
 	newObject->_UUID = [[ETUUID alloc] init];
+	newObject->_entityDescription = _entityDescription;
 	newObject->_objectGraphContext = _objectGraphContext;
 	newObject->_variableStorage = [self newVariableStorage];
 	newObject->_outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
@@ -854,12 +855,12 @@ See +[NSObject typePrefix]. */
 	id oldValue = [self oldCoreObjectRelationshipValueForPropertyDescription: propertyDesc];
 
 	// FIXME: EtoileUI entity descriptions don't declare all required properties 
-	/*if (propertyDesc == nil)
+	if (propertyDesc == nil)
 	{
 		[NSException raise: NSInvalidArgumentException
 					format: @"Property %@ is not declared in the metamodel %@ for %@",
 		                    key, _entityDescription, self];
-	}*/
+	}
 
 	[self validateNewValue: newValue propertyDescription: propertyDesc];
 
