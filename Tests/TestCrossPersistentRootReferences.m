@@ -434,7 +434,9 @@
     
     // Add photo2 inner item. Note that the photo1 cross-persistent-root reference is
     // still present in library1.contents, it's just hidden.
-    
+    // FIXME: That is the part that's difficult to implement and not currently implemented.
+	// See comment in -[COObject updateOutgoingSerializedRelationshipCacheForProperty]
+	
     COObject *photo2 = [[library1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [photo2 setValue: @"photo2" forProperty: @"label"];
     [[library1 rootObject] insertObject: photo2 atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];

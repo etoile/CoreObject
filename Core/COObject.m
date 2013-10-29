@@ -740,6 +740,15 @@ See +[NSObject typePrefix]. */
  */
 - (void)updateOutgoingSerializedRelationshipCacheForProperty: (NSString *)key
 {
+	// FIXME: In order to make -[TestCrossPersistentRootReferences testPersistentRootUndeletion]
+	// work, we will need a different approach to updating _outgoingSerializedRelationshipCache
+	//
+	// We should preserve references in _outgoingSerializedRelationshipCache that are currently
+	// hidden in [self valueForStorageKey: key] (references to deleted persistent roots / branches).
+	// This will be complicated to implement, so I'm not sure that hiding broken cross-persistent
+	// root references in CoreObject is the right choice; it might be easier to let apps hide them
+	// at the UI level.
+	
 	BOOL isOutgoingPersistentRelationship =
 		([_outgoingSerializedRelationshipCache objectForKey: key] != nil);
 

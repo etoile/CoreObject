@@ -135,6 +135,9 @@ Future Work
   - Turn COObject into zombies once garbage collected (see -markAsRemovedFromContext)
 
   - Keyed CoreObject relationship support (if possible)
+  
+  - Implement -updateOutgoingSerializedRelationshipCacheForProperty correctly, or else discard the idea
+    of automatically hiding broken cross-references.
 
 
 - COItem
