@@ -854,7 +854,6 @@ See +[NSObject typePrefix]. */
 	id newValue = [self valueForStorageKey: key];
 	id oldValue = [self oldCoreObjectRelationshipValueForPropertyDescription: propertyDesc];
 
-	// FIXME: EtoileUI entity descriptions don't declare all required properties 
 	if (propertyDesc == nil)
 	{
 		[NSException raise: NSInvalidArgumentException

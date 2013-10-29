@@ -128,15 +128,10 @@
 
 - (NSString *)description
 {
-	// FIXME: Test if the parent revision is the first revision ever made to the
-	// store correctly. For now we test nil, but this probably doesn't make
-	// sense for the new store.
-	// Could be better to print the parent revision ID rather than the
-	// parent revision objects, if the description is too verbose.
 	return [NSString stringWithFormat: @"%@ (%@ <= %@)", 
 		NSStringFromClass([self class]),
 		[self UUID],
-		([self parentRevision] != nil ? [[self parentRevision] UUID] : @"root")];
+		([self parentRevision] != nil ? [[self parentRevision] UUID] : @"none")];
 }
 
 @end
