@@ -29,23 +29,25 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return self;
 }
 
+- (NSMutableArray *)commandsFromPropertyList: (NSDictionary *)plist
+{
+	NSMutableArray *commands = [NSMutableArray array];
+
+    for (id subplist in [plist objectForKey: kCOCommandContents])
+    {
+        COCommand *command = [COCommand commandWithPropertyList: subplist];
+        [commands addObject: command];
+    }
+
+	return commands;
+}
+
 - (id) initWithPropertyList: (id)plist
 {
     SUPERINIT;
-    
-	self.UUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandUUID]];
-
-    NSMutableArray *edits = [NSMutableArray array];
-    for (id editPlist in [plist objectForKey: kCOCommandContents])
-    {
-        COCommand *subEdit = [COCommand commandWithPropertyList: editPlist];
-        [edits addObject: subEdit];
-    }
-    
-    self.contents = edits;
-
+	_UUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandUUID]];
+    _contents = [self commandsFromPropertyList: plist];
 	_metadata = [plist objectForKey: kCOCommandMetadata];
-
     return self;
 }
 
@@ -53,20 +55,13 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 {
     NSMutableDictionary *result = [super propertyList];
     
-	[result setObject: [self.UUID stringValue] forKey: kCOCommandUUID];
-	
-    NSMutableArray *edits = [NSMutableArray array];
-    for (COCommand *subEdit in _contents)
-    {
-        id subEditPlist = [subEdit propertyList];
-        [edits addObject: subEditPlist];
-    }
-    [result setObject: edits forKey: kCOCommandContents];
-
+	[result setObject: [_UUID stringValue] forKey: kCOCommandUUID];
+    [result setObject: [[_contents mappedCollection] propertyList] forKey: kCOCommandContents];
 	if (_metadata != nil)
 	{
 		[result setObject: _metadata forKey: kCOCommandMetadata];
 	}
+
     return result;
 }
 
@@ -78,29 +73,35 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	return ([((COCommandGroup *)object)->_UUID isEqual: _UUID]);
 }
 
+- (NSMutableArray *)inversedCommands
+{
+	NSMutableArray *inversedCommands = [NSMutableArray array];
+	
+    for (COCommand *command in _contents)
+    {
+		// Insert the inverses back to front, so the inverse of the most recent
+		// action will be first.
+        [inversedCommands insertObject: [command inverse] atIndex: 0];
+    }
+
+	return inversedCommands;
+}
+
 - (COCommand *) inverse
 {
     COCommandGroup *inverse = [[COCommandGroup alloc] init];
     inverse.UUID = [ETUUID new];
-	
-    NSMutableArray *edits = [NSMutableArray array];
-    for (COCommand *subEdit in _contents)
-    {
-        COCommand *subEditInverse = [subEdit inverse];
-		// Insert the inverses back to front, so the inverse of the most recent action will be first.
-        [edits insertObject: subEditInverse atIndex: 0];
-    }
-    inverse.contents = edits;
-    
+    inverse.contents = [self inversedCommands];
     return inverse;
 }
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
 	NILARG_EXCEPTION_TEST(aContext);
-    for (COCommand *subEdit in _contents)
+
+    for (COCommand *command in _contents)
     {
-        if (![subEdit canApplyToContext: aContext])
+        if (![command canApplyToContext: aContext])
         {
             return NO;
         }
@@ -111,9 +112,10 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 - (void) applyToContext: (COEditingContext *)aContext
 {
 	NILARG_EXCEPTION_TEST(aContext);
-    for (COCommand *subEdit in _contents)
+
+    for (COCommand *command in _contents)
     {
-        [subEdit applyToContext: aContext];
+        [command applyToContext: aContext];
     }
 }
 

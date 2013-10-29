@@ -228,11 +228,10 @@ static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
 - (id) initWithPropertyList: (id)plist
 {
     SUPERINIT;
-
-    self.storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandStoreUUID]];
-    self.persistentRootUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandPersistentRootUUID]];
+    _storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandStoreUUID]];
+    _persistentRootUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandPersistentRootUUID]];
 	ETAssert([plist objectForKey: kCOCommandTimestamp] != nil);
-    self.timestamp = [self dateFromNumber: [plist objectForKey: kCOCommandTimestamp]];
+    _timestamp = [self dateFromNumber: [plist objectForKey: kCOCommandTimestamp]];
     return self;
 }
 
@@ -248,9 +247,9 @@ static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
 - (id) copyWithZone:(NSZone *)zone
 {
     COSingleCommand *aCopy = [[[self class] allocWithZone: zone] init];
-    aCopy.storeUUID = _storeUUID;
-    aCopy.persistentRootUUID = _persistentRootUUID;
-    aCopy.timestamp = _timestamp;
+    aCopy->_storeUUID = _storeUUID;
+    aCopy->_persistentRootUUID = _persistentRootUUID;
+    aCopy->_timestamp = _timestamp;
     return aCopy;
 }
 
