@@ -16,12 +16,12 @@
 /** @taskunit Basic Properties */
 
 
-@property (readwrite, nonatomic, copy) ETUUID *branchUUID;
-@property (readwrite, nonatomic, copy) ETUUID *oldRevisionUUID;
-@property (readwrite, nonatomic, copy) ETUUID *revisionUUID;
+@property (nonatomic, copy) ETUUID *branchUUID;
+@property (nonatomic, copy) ETUUID *oldRevisionUUID;
+@property (nonatomic, copy) ETUUID *revisionUUID;
 
-@property (readwrite, nonatomic, copy) ETUUID *oldHeadRevisionUUID;
-@property (readwrite, nonatomic, copy) ETUUID *headRevisionUUID;
+@property (nonatomic, copy) ETUUID *oldHeadRevisionUUID;
+@property (nonatomic, copy) ETUUID *headRevisionUUID;
 
 
 @property (nonatomic, readonly) CORevision *oldRevision;

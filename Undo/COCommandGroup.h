@@ -16,6 +16,7 @@
     NSMutableArray *_contents;
 	NSDictionary *_metadata;
 }
+
 /**
  * The commit UUID. 
  *

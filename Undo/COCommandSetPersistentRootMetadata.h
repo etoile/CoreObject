@@ -6,7 +6,7 @@
     NSDictionary *_newMetadata;
 }
 
-@property (readwrite, nonatomic, copy) NSDictionary *oldMetadata;
-@property (readwrite, nonatomic, copy) NSDictionary *metadata;
+@property (nonatomic, copy) NSDictionary *oldMetadata;
+@property (nonatomic, copy) NSDictionary *metadata;
 
 @end
