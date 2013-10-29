@@ -884,25 +884,29 @@ See +[NSObject typePrefix]. */
 
 #pragma mark - Collection Mutation with Integrity Check
 
-- (id)collectionForProperty: (NSString *)key insertionIndex: (NSInteger)index
+- (id)collectionForProperty: (NSString *)key mutationIndex: (NSInteger)index
 {
 	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
 	id collection = [self valueForStorageKey: key];
+	Class expectedCollectionClass = [[self collectionClassForPropertyDescription: desc] mutableClass];
+
+	if (!([collection isKindOfClass: expectedCollectionClass]))
+	{
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"Multivalued property %@ not set up properly in %@. "
+		                     "The collection class %@ doesn't match the property "
+		                     "description which was requiring %@.",
+		                    desc, self, [collection class], expectedCollectionClass];
+	}
 
 	if (index == ETUndeterminedIndex)
 	{
 		if (![desc isMultivalued])
 		{
 			[NSException raise: NSInvalidArgumentException 
-						format: @"Attempt to call addObject:forProperty: for %@ "
-			                     "which is not a multivalued property of %@",
+						format: @"Attempt to call insertion or mutation methods "
+			                     "for %@ which is not a multivalued property of %@",
 			                     key, self];
-		}
-		if (!([collection isKindOfClass: [NSMutableArray class]]
-		   || [collection isKindOfClass: [NSMutableSet class]]))
-		{
-			[NSException raise: NSInternalInconsistencyException 
-						format: @"Multivalued property not set up properly"];
 		}
 	}
 	else
@@ -910,16 +914,13 @@ See +[NSObject typePrefix]. */
 		if (!([desc isMultivalued] && [desc isOrdered]))
 		{
 			[NSException raise: NSInvalidArgumentException
-						format: @"Attempt to call insertObject:atIndex:forProperty: "
-			                     "for %@ which is not an ordered multivalued property of %@",
+						format: @"Attempt to call index-based insertion and "
+			                     "removal methods for %@ which is not an ordered "
+			                     "multivalued property of %@",
 			                     key, self];
 		}
-		if (!([collection isKindOfClass: [NSMutableArray class]]))
-		{
-			[NSException raise: NSInternalInconsistencyException
-			            format: @"Multivalued property not set up properly"];
-		}
 	}
+
 	return collection;
 }
 
@@ -927,57 +928,18 @@ See +[NSObject typePrefix]. */
 {
 	// NOTE: We validate the entire collection in -didChangeValueForProperty:
 	// We could possibly validate just the inserted objects here.
-	id collection = [self collectionForProperty: key insertionIndex: index];
+	id collection = [self collectionForProperty: key mutationIndex: index];
 
 	[self willChangeValueForProperty: key];
 	[collection insertObject: object atIndex: index hint: hint];
 	[self didChangeValueForProperty: key];
 }
 
-- (id)collectionForProperty: (NSString *)key removalIndex: (NSInteger)index
-{
-	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
-	id collection = [self valueForStorageKey: key];
-
-	if (index == ETUndeterminedIndex)
-	{
-		if (![desc isMultivalued])
-		{
-			[NSException raise: NSInvalidArgumentException
-			            format: @"Attempt to call removeObject:forProperty: for "
-			                     "%@ which is not a multivalued property of %@",
-			                     key, self];
-		}
-		if (!([collection isKindOfClass: [NSMutableArray class]]
-		   || [collection isKindOfClass: [NSMutableSet class]]))
-		{
-			[NSException raise: NSInternalInconsistencyException
-			            format: @"Multivalued property not set up properly"];
-		}
-	}
-	else
-	{
-		if (!([desc isMultivalued] && [desc isOrdered]))
-		{
-			[NSException raise: NSInvalidArgumentException
-			            format: @"Attempt to call removeObject:atIndex:forProperty: "
-			                     "for %@ which is not an ordered multivalued property of %@",
-			                     key, self];
-		}
-		if (!([collection isKindOfClass: [NSMutableArray class]]))
-		{
-			[NSException raise: NSInternalInconsistencyException
-			            format: @"Multivalued property not set up properly"];
-		}
-	}
-	return collection;
-}
-
 - (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
 {
 	// NOTE: We validate the entire collection in -didChangeValueForProperty
 	// We could possibly validate just the removed objects here.
-	id collection = [self collectionForProperty: key removalIndex: index];
+	id collection = [self collectionForProperty: key mutationIndex: index];
 
 	[self willChangeValueForProperty: key];
 	[collection removeObject: object atIndex: index hint: hint];
