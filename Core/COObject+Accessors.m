@@ -29,37 +29,20 @@ NSString *SetterToProperty(NSString *prop)
             [prop substringWithRange: NSMakeRange(4,  [prop length] - 5)]];
 }
 
-static id genericGetter(id theSelf, SEL theCmd)
+static id genericGetter(id self, SEL theCmd)
 {
-    // FIXME: This is the simplest thing that would work..
-    //
-    // Variable storage should be changed to an array. This should be
+    // FIXME: Variable storage should be changed to an array. This should be
     // rewritten to use a hashmap lookup which maps theCmd to an index in the
     // array.
-    
-    id result = [theSelf valueForVariableStorageKey: NSStringFromSelector(theCmd)];
-    return result;
+
+    return [self valueForVariableStorageKey: NSStringFromSelector(theCmd)];
 }
 
 static void genericSetter(id self, SEL theCmd, id value)
 {
     // FIXME: Same comment as the genericGetter
-    
+
     NSString *key = SetterToProperty(NSStringFromSelector(theCmd));
-	
- 	BOOL isMultivalued = [[[self entityDescription] propertyDescriptionForName: key] isMultivalued];
-    
-    if (isMultivalued)
-    {
-        if (([value isKindOfClass: [NSArray class]] && ![value isKindOfClass: [NSMutableArray class]]))
-        {
-            value = [NSMutableArray arrayWithArray: value];
-        }
-        else if (([value isKindOfClass: [NSSet class]] && ![value isKindOfClass: [NSMutableSet class]]))
-        {
-            value = [NSSet setWithSet: value];
-        }
-    }
 
 	[self willChangeValueForProperty: key];
 	[self setValue: value forVariableStorageKey: key];

@@ -630,10 +630,19 @@ See +[NSObject typePrefix]. */
 	return (value == [NSNull null] ? nil : value);
 }
 
-- (void)setValue: (id)value forVariableStorageKey: (NSString *)key
+- (void)setValue: (id)aValue forVariableStorageKey: (NSString *)key
 {
+	ETPropertyDescription *propertyDesc = [[self entityDescription] propertyDescriptionForName: key];
+    id value = aValue;
+	BOOL isPersistentDictionary = ([propertyDesc isKeyed] && [propertyDesc isPersistent]);
+
+    if ([propertyDesc isMultivalued] && isPersistentDictionary == NO)
+    {
+		value = [aValue mutableCopy];
+    }
+	
 	[_variableStorage setObject: (value == nil ? [NSNull null] : value)
-						 forKey: key];
+	                     forKey: key];
 }
 
 - (id)valueForUndefinedKey: (NSString *)key
