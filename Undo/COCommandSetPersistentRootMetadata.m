@@ -37,7 +37,6 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 - (COCommand *) inverse
 {
     COCommandSetPersistentRootMetadata *inverse = [[COCommandSetPersistentRootMetadata alloc] init];
-	inverse.UUID = [ETUUID new];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;

@@ -12,10 +12,19 @@
 @interface COCommandGroup : COCommand <ETCollection>
 {
 	@private
+	ETUUID *_UUID;
     NSMutableArray *_contents;
 	NSDictionary *_metadata;
 }
-
+/**
+ * The commit UUID. 
+ *
+ * Allows an in-memory instance to be unambiguously mapped to a row in the SQL 
+ * database behind COUndoTrack. Generated when the command is created, persists
+ * across reads and writes to the database, but not preserved across calls to 
+ * -inverse.
+ */
+@property (nonatomic, copy) ETUUID *UUID;
 /**
  * The atomic commands grouped in the receiver for a commit. 
  *

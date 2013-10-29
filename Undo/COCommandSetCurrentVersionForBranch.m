@@ -55,7 +55,6 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 - (COCommand *) inverse
 {
     COCommandSetCurrentVersionForBranch *inverse = [[COCommandSetCurrentVersionForBranch alloc] init];
-	inverse.UUID = [ETUUID new];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;
@@ -169,6 +168,11 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 #pragma mark -
 #pragma mark Track Node Protocol
 
+- (ETUUID *)UUID
+{
+	return [[self revision] UUID];
+}
+
 - (ETUUID *)branchUUID
 {
 	return _branchUUID;
@@ -179,7 +183,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 	return [[self revision] metadata];
 }
 
-- (NSString *)localizedShortDescription;
+- (NSString *)localizedShortDescription
 {
 	return [[self revision] localizedShortDescription];
 }

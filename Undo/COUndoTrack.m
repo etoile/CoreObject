@@ -363,6 +363,8 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 - (void)undoNode: (id <COTrackNode>)aNode
 {
+	INVALIDARG_EXCEPTION_TEST(aNode, [[self nodes] containsObject: aNode]);
+
 	[self popAndApplyCommand: (COCommand *)aNode fromStack:kCOUndoStack pushToStack:kCORedoStack name:_name toContext:_editingContext];
 	
 	[self reloadCommands];
@@ -371,6 +373,8 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 - (void)redoNode: (id <COTrackNode>)aNode
 {
+	INVALIDARG_EXCEPTION_TEST(aNode, [[self nodes] containsObject: aNode]);
+
 	[self popAndApplyCommand: (COCommand *)aNode fromStack:kCORedoStack pushToStack:kCOUndoStack name:_name toContext:_editingContext];
 	
 	[self reloadCommands];

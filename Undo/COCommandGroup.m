@@ -11,7 +11,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 @implementation COCommandGroup
 
-@synthesize contents = _contents, metadata = _metadata;
+@synthesize UUID = _UUID, contents = _contents, metadata = _metadata;
 
 + (void) initialize
 {
@@ -24,6 +24,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 - (id)init
 {
     SUPERINIT;
+	_UUID = [ETUUID UUID];
     _contents = [[NSMutableArray alloc] init];
     return self;
 }
@@ -33,7 +34,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     SUPERINIT;
     
 	self.UUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandUUID]];
-	
+
     NSMutableArray *edits = [NSMutableArray array];
     for (id editPlist in [plist objectForKey: kCOCommandContents])
     {
@@ -74,7 +75,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	if ([object isKindOfClass: [COCommandGroup class]] == NO)
 		return NO;
 
-	return ([((COCommandGroup *)object)->_contents isEqual: _contents]);
+	return ([((COCommandGroup *)object)->_UUID isEqual: _UUID]);
 }
 
 - (COCommand *) inverse

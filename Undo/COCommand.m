@@ -35,9 +35,6 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
 @implementation COCommand
 
-@synthesize kind;
-@synthesize UUID;
-
 + (NSDictionary *) mapping
 {
     return D([COCommandGroup class], kCOCommandTypeEditGroup,
@@ -231,7 +228,7 @@ static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
 - (id) initWithPropertyList: (id)plist
 {
     SUPERINIT;
-	self.UUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandUUID]];
+
     self.storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandStoreUUID]];
     self.persistentRootUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandPersistentRootUUID]];
 	ETAssert([plist objectForKey: kCOCommandTimestamp] != nil);
@@ -242,7 +239,6 @@ static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
 - (id) propertyList
 {
     NSMutableDictionary *result = [super propertyList];
-	[result setObject: [self.UUID stringValue] forKey: kCOCommandUUID];
     [result setObject: [_storeUUID stringValue] forKey: kCOCommandStoreUUID];
     [result setObject: [_persistentRootUUID stringValue] forKey: kCOCommandPersistentRootUUID];
     [result setObject: [self numberFromDate: _timestamp] forKey: kCOCommandTimestamp];
@@ -263,8 +259,7 @@ static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
 	if ([object isKindOfClass: [COSingleCommand class]] == NO)
 		return NO;
 
-	return ([((COSingleCommand *)object).UUID isEqual: self.UUID]
-	     && [((COSingleCommand *)object)->_storeUUID isEqual: _storeUUID]
+	return ([((COSingleCommand *)object)->_storeUUID isEqual: _storeUUID]
 		 && [((COSingleCommand *)object)->_persistentRootUUID isEqual: _persistentRootUUID]
 		 && [((COSingleCommand *)object)->_timestamp isEqual: _timestamp]);
 }

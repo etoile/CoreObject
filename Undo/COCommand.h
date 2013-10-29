@@ -41,13 +41,7 @@ extern NSString * const kCOCommandTimestamp;
  * Returns the receiver serialized as a property list.
  */
 - (id) propertyList;
-/**
- * UUID of the command. Allows an in-memory instance to be
- * unambiguously mapped to a row in the SQL database. Generated when the command
- * is created, persists across reads and writes to the database, but not 
- * preserved across calls to -inverse.
- */
-@property (nonatomic, readwrite, copy) ETUUID *UUID;
+
 
 /** @taskunit Basic Properties */
 

@@ -33,7 +33,6 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
 - (COCommand *) inverse
 {
     COCommandSetCurrentBranch *inverse = [[COCommandSetCurrentBranch alloc] init];
-	inverse.UUID = [ETUUID new];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
     inverse.timestamp = _timestamp;

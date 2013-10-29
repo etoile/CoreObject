@@ -163,6 +163,8 @@ Future Work
   - Refactor COCommand initialization which is a mess
 
   - Rename COTrack to COHistoryTrack protocol
+  
+  - Reduce commit description related code duplication in CORevision and COCommandGroup
 
 
 - Model objects (COObject subclasses included with CoreObject for convenience)
