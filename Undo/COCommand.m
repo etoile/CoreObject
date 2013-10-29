@@ -124,6 +124,11 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 #pragma mark -
 #pragma mark Track Node Protocol
 
+- (ETUUID *)UUID
+{
+	return nil;
+}
+
 - (ETUUID *)persistentRootUUID
 {
 	return nil;
