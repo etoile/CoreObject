@@ -4,6 +4,8 @@ TODO
 First alpha release blockers
 ----------------------------
 
+- Fix outdated COCommitDescriptor API doc and review properties (most properties should be read-only probably)
+
 - Improve -[COObject detailedDescription] code and make output more readable
 
 - Check and update all Core API documentation (underway)
@@ -78,6 +80,8 @@ Future Work
 
   - Clean up selective undo code and share implementation with undo system
 
+  - Implement -isCopy and -isTrunkBranch
+  
 
 - Metamodel
 
@@ -132,6 +136,10 @@ Future Work
   
   - Implement -updateOutgoingSerializedRelationshipCacheForProperty correctly, or else discard the idea
     of automatically hiding broken cross-references.
+	
+  - Turn _variableStorage into a private ivar once EtoileUI doesn't access it directly
+  
+  - -valueForVariableStorageKey: or at least the synthesized getter, should return defensive copies if requested in the metamodel (this should even be the default perhaps, especially for collections)
 
 
 - COItem
