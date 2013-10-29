@@ -2,14 +2,16 @@
 #import "COCommand.h"
 #import "COCommandSetCurrentVersionForBranch.h"
 #import "COCommandUndeletePersistentRoot.h"
+#import "COCommitDescriptor.h"
 #import "CORevision.h"
 #import <EtoileFoundation/Macros.h>
 
 static NSString * const kCOCommandContents = @"COCommandContents";
+static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 @implementation COCommandGroup
 
-@synthesize contents = _contents;
+@synthesize contents = _contents, metadata = _metadata;
 
 + (void) initialize
 {
@@ -40,6 +42,9 @@ static NSString * const kCOCommandContents = @"COCommandContents";
     }
     
     self.contents = edits;
+
+	_metadata = [plist objectForKey: kCOCommandMetadata];
+
     return self;
 }
 
@@ -56,6 +61,11 @@ static NSString * const kCOCommandContents = @"COCommandContents";
         [edits addObject: subEditPlist];
     }
     [result setObject: edits forKey: kCOCommandContents];
+
+	if (_metadata != nil)
+	{
+		[result setObject: _metadata forKey: kCOCommandMetadata];
+	}
     return result;
 }
 
@@ -129,25 +139,36 @@ static NSString * const kCOCommandContents = @"COCommandContents";
 	return [[_contents firstObject] date];
 }
 
-- (CORevision *)revisionWithMetadata
+- (COCommitDescriptor *)commitDescriptor
 {
-	for (COCommand *command in _contents)
-	{
-		BOOL hasNewRevision =
-			([command isKindOfClass: [COCommandSetCurrentVersionForBranch class]]
-		 		|| [command isKindOfClass: [COCommandCreatePersistentRoot class]]);
+	NSString *commitDescriptorId =
+		[[self metadata] objectForKey: kCOCommitMetadataIdentifier];
 
-		if (hasNewRevision)
-		{
-			return [(COCommandSetCurrentVersionForBranch *)command revision];
-		}
-	}
-	return nil;
+	if (commitDescriptorId == nil)
+		return nil;
+
+	return [COCommitDescriptor registeredDescriptorForIdentifier: commitDescriptorId];
+}
+
+- (NSString *)localizedTypeDescription
+{
+	COCommitDescriptor *descriptor = [self commitDescriptor];
+
+	if (descriptor == nil)
+		return [[self metadata] objectForKey: kCOCommitMetadataTypeDescription];
+
+	return [descriptor localizedTypeDescription];
 }
 
 - (NSString *)localizedShortDescription
 {
-	return [[self revisionWithMetadata] localizedShortDescription];
+	COCommitDescriptor *descriptor = [self commitDescriptor];
+
+	if (descriptor == nil)
+		return [[self metadata] objectForKey: kCOCommitMetadataShortDescription];
+	
+	return [descriptor localizedShortDescriptionWithArguments:
+		[[self metadata] objectForKey: kCOCommitMetadataShortDescriptionArguments]];
 }
 
 #pragma mark -

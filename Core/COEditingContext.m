@@ -498,7 +498,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 	/* Commit persistent root changes (deleted persistent roots included) */
 
     COStoreTransaction *transaction = [[COStoreTransaction alloc] init];
-    [self recordBeginUndoGroup];
+    [self recordBeginUndoGroupWithMetadata: metadata];
     
 	// TODO: Add a batch commit UUID in the metadata
 	for (COPersistentRoot *persistentRoot in persistentRoots)

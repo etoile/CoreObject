@@ -6,6 +6,7 @@
 #import "COUndoTrack.h"
 #import "COCommand.h"
 #import "COCommandGroup.h"
+#import "COCommitDescriptor.h"
 #import <EtoileFoundation/Macros.h>
 #import "COSQLiteStore.h"
 
@@ -25,13 +26,14 @@
 
 // Called from COEditingContext
 
-- (void) recordBeginUndoGroup
+- (void) recordBeginUndoGroupWithMetadata: (NSDictionary *)metadata
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     if (_isRecordingUndo)
     {
         _currentEditGroup = [[COCommandGroup alloc] init];
 		_currentEditGroup.UUID = [ETUUID new];
+		_currentEditGroup.metadata = metadata;
     }
     else
     {
@@ -52,18 +54,11 @@
 		return nil;
 	}
 
+	[track recordCommand: _currentEditGroup];
+
 	COCommand *recordedCommand = _currentEditGroup;
-
-	// Optimisation: collapse COCommandGroups that contain only one child
-	if ([_currentEditGroup.contents count] == 1)
-	{
-		recordedCommand = [_currentEditGroup.contents firstObject];
-	}
-
-	[track recordCommand: recordedCommand];
-	
 	_currentEditGroup = nil;
-	
+
 	return recordedCommand;
 }
 

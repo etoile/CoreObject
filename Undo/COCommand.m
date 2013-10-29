@@ -149,13 +149,12 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
 - (NSString *)localizedTypeDescription
 {
-	// TODO: Override in subclasses to return a human-readable description
-	return [self className];
+	return [self kind];
 }
 
 - (NSString *)localizedShortDescription;
 {
-	return [[self metadata] objectForKey: kCOCommitMetadataShortDescription];
+	return nil;
 }
 
 @end

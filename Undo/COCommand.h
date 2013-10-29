@@ -13,7 +13,7 @@ extern NSString * const kCOCommandTimestamp;
 
 /**
  * @group Undo Actions
- * @abstract A command represents a commit done in an editing context
+ * @abstract A command represents a committed change in an editing context
  *
  * For each store change operation (e.g. branch creation, new revision etc.), 
  * there is a distinct command in the COCommand class hierarchy.

@@ -179,11 +179,6 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 	return [[self revision] metadata];
 }
 
-- (NSString *)localizedTypeDescription
-{
-	return [[self revision] localizedTypeDescription];
-}
-
 - (NSString *)localizedShortDescription;
 {
 	return [[self revision] localizedShortDescription];

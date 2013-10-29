@@ -52,7 +52,7 @@
 	 isSetVersionFrom: (CORevision *)a
 				   to: (CORevision *)b
 {
-	COCommandSetCurrentVersionForBranch *command = (COCommandSetCurrentVersionForBranch *)aCommand;
+	COCommandSetCurrentVersionForBranch *command = [[(COCommandGroup *)aCommand contents] firstObject];
 	UKObjectKindOf(command, COCommandSetCurrentVersionForBranch);
 	UKObjectsEqual(a, command.oldRevision);
 	UKObjectsEqual(b, command.revision);
