@@ -60,11 +60,7 @@ static void genericSetter(id self, SEL theCmd, id value)
             value = [NSSet setWithSet: value];
         }
     }
-    
-	id oldValue = [self valueForProperty: key];
-	
-    oldValue = (isMultivalued ? [oldValue mutableCopy] : oldValue);
-	
+
 	[self willChangeValueForProperty: key];
 	[self setValue: value forVariableStorageKey: key];
 	[self didChangeValueForProperty: key];
