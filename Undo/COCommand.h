@@ -100,7 +100,6 @@ extern NSString * const kCOCommandTimestamp;
 {
     ETUUID *_storeUUID;
     ETUUID *_persistentRootUUID;
-    NSDate *_timestamp;
 }
 
 
@@ -117,10 +116,6 @@ extern NSString * const kCOCommandTimestamp;
  * (for an inverse).
  */
 @property (nonatomic, copy) ETUUID *persistentRootUUID;
- /*
-  * The commit time.
-  */
-@property (nonatomic, copy) NSDate *timestamp;
 
 
 /** @taskunit Framework Private */

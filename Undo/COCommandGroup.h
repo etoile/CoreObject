@@ -15,6 +15,7 @@
 	ETUUID *_UUID;
     NSMutableArray *_contents;
 	NSDictionary *_metadata;
+    NSDate *_timestamp;
 }
 
 /**
@@ -43,5 +44,9 @@
  * to return the equivalent commit descriptor descriptions.
  */
 @property (nonatomic, readonly) COCommitDescriptor *commitDescriptor;
+/*
+ * The commit time.
+ */
+@property (nonatomic, copy) NSDate *timestamp;
 
 @end

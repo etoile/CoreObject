@@ -58,6 +58,17 @@
 	UKObjectsEqual(b, command.revision);
 }
 
+- (void) testTimestamp
+{
+	id <COTrackNode> current = [track currentNode];
+	
+	double timeIntervalSinceLastNodeCommitted = [[NSDate date] timeIntervalSinceDate: [current date]];
+	
+	// i.e., the last undo node must have been created between 0 and 100ms ago.
+	UKTrue(timeIntervalSinceLastNodeCommitted < 0.1);
+	UKTrue(timeIntervalSinceLastNodeCommitted >= 0);
+}
+
 - (void) testCurrentNodeAfter2Undo
 {
 	// The current node represents the change that was applied
