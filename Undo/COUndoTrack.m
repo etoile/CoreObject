@@ -13,7 +13,7 @@
 #import "COUndoTrack.h"
 #import "COEditingContext+Undo.h"
 #import "COEditingContext+Private.h"
-#import "COCommand.h"
+#import "COCommandGroup.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
 
 NSString * const COUndoStackDidChangeNotification = @"COUndoStackDidChangeNotification";
@@ -117,7 +117,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	[_commands removeAllObjects];
 }
 
-- (COCommand *) peekEditFromStack: (NSString *)aStack forName: (NSString *)aName
+- (COCommandGroup *) peekEditFromStack: (NSString *)aStack forName: (NSString *)aName
 {
     id plist = [_store peekStack: aStack forName: aName];
     if (plist == nil)
@@ -125,7 +125,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
         return nil;
     }
     
-    COCommand *edit = [COCommand commandWithPropertyList: plist];
+    COCommandGroup *edit = (COCommandGroup *)[COCommand commandWithPropertyList: plist];
     return edit;
 }
 
@@ -139,7 +139,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     return [anEdit canApplyToContext: aContext];
 }
 
-- (BOOL) popAndApplyCommand: (COCommand *)edit
+- (BOOL) popAndApplyCommand: (COCommandGroup *)edit
 				  fromStack: (NSString *)popStack
 				pushToStack: (NSString*)pushStack
 					   name: (NSString *)aName
@@ -150,7 +150,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	ETUUID *actionUUID = [edit UUID];
     NSString *actualStackName = [_store peekStackName: popStack forActionWithUUID: actionUUID forName: aName];
 	BOOL isUndo = [popStack isEqual: kCOUndoStack];
-	COCommand *appliedEdit = (isUndo ? [edit inverse] : edit);
+	COCommandGroup *appliedEdit = (isUndo ? [edit inverse] : edit);
 	
     if (![self canApplyEdit: appliedEdit toContext: aContext])
     {
@@ -183,7 +183,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
                          name: (NSString *)aName
                     toContext: (COEditingContext *)aContext
 {
-    COCommand *edit = [self peekEditFromStack: popStack forName: aName];
+    COCommandGroup *edit = [self peekEditFromStack: popStack forName: aName];
 
 	if (edit == nil)
 	{
@@ -254,7 +254,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	[_commands addObject: newCommand];
 }
 
-- (COCommand *)currentCommand
+- (COCommandGroup *)currentCommand
 {
 	return [self peekEditFromStack: kCOUndoStack forName: _name];
 }
@@ -358,14 +358,14 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 {
 	INVALIDARG_EXCEPTION_TEST(node, [node isKindOfClass: [COCommand class]]
 							|| [node isKindOfClass: [COEndOfUndoTrackPlaceholderNode class]]);
-	[self setCurrentCommand: (COCommand *)node];
+	[self setCurrentCommand: (COCommandGroup *)node];
 }
 
 - (void)undoNode: (id <COTrackNode>)aNode
 {
 	INVALIDARG_EXCEPTION_TEST(aNode, [[self nodes] containsObject: aNode]);
 
-	[self popAndApplyCommand: (COCommand *)aNode fromStack:kCOUndoStack pushToStack:kCORedoStack name:_name toContext:_editingContext];
+	[self popAndApplyCommand: (COCommandGroup *)aNode fromStack:kCOUndoStack pushToStack:kCORedoStack name:_name toContext:_editingContext];
 	
 	[self reloadCommands];
 	[self didUpdate];
@@ -375,7 +375,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 {
 	INVALIDARG_EXCEPTION_TEST(aNode, [[self nodes] containsObject: aNode]);
 
-	[self popAndApplyCommand: (COCommand *)aNode fromStack:kCORedoStack pushToStack:kCOUndoStack name:_name toContext:_editingContext];
+	[self popAndApplyCommand: (COCommandGroup *)aNode fromStack:kCORedoStack pushToStack:kCOUndoStack name:_name toContext:_editingContext];
 	
 	[self reloadCommands];
 	[self didUpdate];

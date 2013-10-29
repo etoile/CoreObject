@@ -25,7 +25,7 @@ extern NSString * const kCOCommandTimestamp;
  * (e.g. branch creation and new revision at the same time), the command group 
  * is going to contain several commands just for a single persistent root.
  */
-@interface COCommand : NSObject <COTrackNode>
+@interface COCommand : NSObject
 
 /** @taskunit Initialization and Serialization */
 

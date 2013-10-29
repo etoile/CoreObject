@@ -9,7 +9,7 @@
  *
  * See COCommand for a detailed presentation.
  */
-@interface COCommandGroup : COCommand <ETCollection>
+@interface COCommandGroup : COCommand <COTrackNode, ETCollection>
 {
 	@private
 	ETUUID *_UUID;
@@ -48,5 +48,7 @@
  * The commit time.
  */
 @property (nonatomic, copy) NSDate *timestamp;
+
+- (COCommandGroup *) inverse;
 
 @end
