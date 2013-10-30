@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3D01D09F1646BF0200917AC8 /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D01D0941646BEF400917AC8 /* UnitKit.framework */; };
-		601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D44180C0F5300CED07E /* COObject+Private.h */; };
+		601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D44180C0F5300CED07E /* COObject+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		601C1D4F180C115D00CED07E /* COObjectGraphContext+GarbageCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */; };
 		601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */; };
 		6033A8031817F78B00BDF65C /* TestDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 6033A8021817F78B00BDF65C /* TestDictionary.m */; };
@@ -1363,7 +1363,6 @@
 				609C00801704C2BA00D01AAB /* CORevision.h in Headers */,
 				609C00941704C3DA00D01AAB /* COEditingContext.h in Headers */,
 				609C00981704C3DA00D01AAB /* COObject.h in Headers */,
-				66E4CF4F1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.h in Headers */,
 				609C009A1704C3DA00D01AAB /* COPersistentRoot.h in Headers */,
 				609C009C1704C3DA00D01AAB /* COQuery.h in Headers */,
 				609C00AC1704C3EF00D01AAB /* COBookmark.h in Headers */,
@@ -1411,7 +1410,6 @@
 				663CE29917C07ED800E729F5 /* COCommandDeleteBranch.h in Headers */,
 				663CE29B17C07ED800E729F5 /* COCommandSetBranchMetadata.h in Headers */,
 				663CE29D17C07ED800E729F5 /* COCommandSetCurrentBranch.h in Headers */,
-				662AC93D1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h in Headers */,
 				663CE29F17C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.h in Headers */,
 				663CE2A117C07ED800E729F5 /* COUndoStackStore.h in Headers */,
 				663CE2B617C0B05900E729F5 /* COEditingContext+Undo.h in Headers */,
@@ -1430,11 +1428,12 @@
 				660D4CD917D5C7CB003C9ACC /* COLeastCommonAncestor.h in Headers */,
 				660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */,
 				668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */,
-				6646974A17CDA78300A1B767 /* COEditingContext+Private.h in Headers */,
+				66E4CF4F1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.h in Headers */,
+				662AC93D1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h in Headers */,
+				601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */,
 				6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */,
 				6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */,
 				6646985A17D3C55600A1B767 /* COObjectGraphContext+Private.h in Headers */,
-				60CAAC6417E3117E00E8E2B1 /* COTrack.h in Headers */,
 				66457FB517E8BFE5003C51A8 /* COStoreCreateBranch.h in Headers */,
 				66457FB717E8BFE5003C51A8 /* COStoreCreatePersistentRoot.h in Headers */,
 				66E4CF531816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.h in Headers */,
@@ -1449,8 +1448,9 @@
 				66457FC917E8BFE5003C51A8 /* COStoreWriteRevision.h in Headers */,
 				66457FCF17E8C9D0003C51A8 /* COStoreAction.h in Headers */,
 				66457FEC17E9683F003C51A8 /* CORevisionCache.h in Headers */,
-				601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */,
 				601C1D4F180C115D00CED07E /* COObjectGraphContext+GarbageCollection.h in Headers */,
+				6646974A17CDA78300A1B767 /* COEditingContext+Private.h in Headers */,
+				60CAAC6417E3117E00E8E2B1 /* COTrack.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
