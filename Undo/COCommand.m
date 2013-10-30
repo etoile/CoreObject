@@ -121,6 +121,44 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 		  @"localizedTypeDescription", @"localizedShortDescription")];
 }
 
+#pragma mark -
+#pragma mark Track Node Protocol
+
+- (ETUUID *)UUID
+{
+	return nil;
+}
+
+- (ETUUID *)persistentRootUUID
+{
+	return nil;
+}
+
+- (ETUUID *)branchUUID
+{
+	return nil;
+}
+
+- (NSDate *)date
+{
+	return nil;
+}
+
+- (NSDictionary *)metadata
+{
+	return nil;
+}
+
+- (NSString *)localizedTypeDescription
+{
+	return [self kind];
+}
+
+- (NSString *)localizedShortDescription;
+{
+	return nil;
+}
+
 @end
 
 @implementation COSingleCommand
@@ -162,6 +200,14 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
 	return [((COSingleCommand *)object)->_storeUUID isEqual: _storeUUID]
 			&& [((COSingleCommand *)object)->_persistentRootUUID isEqual: _persistentRootUUID];
+}
+
+#pragma mark -
+#pragma mark Track Node Protocol
+
+- (ETUUID *)persistentRootUUID
+{
+	return _persistentRootUUID;
 }
 
 @end

@@ -158,16 +158,6 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 #pragma mark -
 #pragma mark Track Node Protocol
 
-- (ETUUID *)persistentRootUUID
-{
-	return nil;
-}
-
-- (ETUUID *)branchUUID
-{
-	return nil;
-}
-
 - (NSDate *)date
 {
 	return _timestamp;

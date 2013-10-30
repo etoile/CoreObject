@@ -78,5 +78,4 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 	return _(@"Persistent Root Deletion");
 }
 
-
 @end

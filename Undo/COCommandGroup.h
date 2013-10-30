@@ -9,7 +9,7 @@
  *
  * See COCommand for a detailed presentation.
  */
-@interface COCommandGroup : COCommand <COTrackNode, ETCollection>
+@interface COCommandGroup : COCommand <ETCollection>
 {
 	@private
 	ETUUID *_UUID;
