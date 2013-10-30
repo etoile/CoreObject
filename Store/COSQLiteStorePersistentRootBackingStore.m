@@ -10,6 +10,7 @@
 #import "COItem+Binary.h"
 #import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
+#import "CODateSerialization.h"
 
 @interface COSQLiteStore (Private)
 
@@ -86,7 +87,7 @@
     
     [db_ executeUpdate: [NSString stringWithFormat:
                          @"CREATE TABLE IF NOT EXISTS %@ (revid INTEGER PRIMARY KEY ASC, "
-                         "contents BLOB, metadata BLOB, timestamp REAL, parent INTEGER, mergeparent INTEGER, branchuuid BLOB, persistentrootuuid BLOB, deltabase INTEGER, "
+                         "contents BLOB, metadata BLOB, timestamp INTEGER, parent INTEGER, mergeparent INTEGER, branchuuid BLOB, persistentrootuuid BLOB, deltabase INTEGER, "
                          "bytesInDeltaRun INTEGER, garbage BOOLEAN, uuid BLOB)", [self tableName]]];
 
     [db_ executeUpdate: [NSString stringWithFormat:
@@ -199,7 +200,7 @@
                                                               options: 0
                                                                 error: NULL];
         }
-        result.date = [rs dateForColumnIndex: 5];
+        result.date = CODateFromJavaTimestamp([rs numberForColumnIndex: 5]);
 	}
     [rs close];
     
@@ -491,7 +492,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
         [NSNumber numberWithLongLong: rowid],
         contentsBlob,
         metadataBlob,
-        [NSDate date],
+        CODateToJavaTimestamp([NSDate date]),
         [NSNumber numberWithLongLong: aParent],
         [NSNumber numberWithLongLong: aMergeParent],
 		[aBranchUUID dataValue],

@@ -4,6 +4,7 @@
 #import "COCommandUndeletePersistentRoot.h"
 #import "COCommitDescriptor.h"
 #import "CORevision.h"
+#import "CODateSerialization.h"
 #import <EtoileFoundation/Macros.h>
 
 static NSString * const kCOCommandContents = @"COCommandContents";
@@ -13,31 +14,6 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 @synthesize UUID = _UUID, contents = _contents, metadata = _metadata;
 @synthesize timestamp = _timestamp;
-
-#pragma mark -
-#pragma mark Date Serialization
-
-/**
- * Rationale for presisting dates in Java's format (milliseconds since 1970-Jan-01):
- * - widely used
- * - int64_t, so can write exactly in base 10 unlike a double
- * - millisecond precision is good enough for our needs
- */
-- (NSDate *)dateFromJavaTimestampNumber: (NSNumber *)aNumber
-{
-	NILARG_EXCEPTION_TEST(aNumber);
-	const long long int javaDate = [aNumber longLongValue];
-	
-	return [NSDate dateWithTimeIntervalSince1970: javaDate / 1000.0];
-}
-
-- (NSNumber *)javaTimestampNumberFromDate: (NSDate *)aDate
-{
-	NILARG_EXCEPTION_TEST(aDate);
-	const long long int javaDate = llrint([aDate timeIntervalSince1970] * 1000.0);
-	
-	return [NSNumber numberWithLongLong: javaDate];
-}
 
 #pragma mark -
 #pragma mark Initialization
@@ -78,7 +54,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	_UUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandUUID]];
     _contents = [self commandsFromPropertyList: plist];
 	_metadata = [plist objectForKey: kCOCommandMetadata];
-	_timestamp = [self dateFromJavaTimestampNumber: [plist objectForKey: kCOCommandTimestamp]];
+	_timestamp = CODateFromJavaTimestamp([plist objectForKey: kCOCommandTimestamp]);
     return self;
 }
 
@@ -92,7 +68,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	{
 		[result setObject: _metadata forKey: kCOCommandMetadata];
 	}
-	[result setObject: [self javaTimestampNumberFromDate: _timestamp] forKey: kCOCommandTimestamp];
+	[result setObject: CODateToJavaTimestamp(_timestamp) forKey: kCOCommandTimestamp];
 	
     return result;
 }
