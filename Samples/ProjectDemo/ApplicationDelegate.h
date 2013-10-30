@@ -3,7 +3,6 @@
 #import "NetworkController.h"
 #import "CheckpointAsSheetController.h"
 #import "SharingController.h"
-#import "DesktopWindow.h"
 #import "ProjectNavWindowController.h"
 #import "OverlayShelf.h"
 #import "TagWindowController.h"
@@ -19,7 +18,6 @@
 	IBOutlet CheckpointAsSheetController *checkpointAsSheetController;
 	IBOutlet TagWindowController *tagWindowController;
 	
-	DesktopWindow *desktopWindow;
 	OverlayShelf *overlayShelf;
 	
 	COEditingContext *context;
@@ -37,6 +35,7 @@
 
 - (void) shareWithInspectorForDocument: (Document*)doc;
 
+- (NSSet *)projects;
 - (IBAction)newProject: (id)sender;
 - (IBAction)deleteProject: (id)sender;
 

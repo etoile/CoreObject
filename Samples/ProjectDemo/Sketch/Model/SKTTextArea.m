@@ -21,7 +21,7 @@
 	self = [super initWithObjectGraphContext: aContext];
 	if (self) 
 	{
-		_contents = [[NSTextStorage allocWithZone:[self zone]] init];
+		_contents = [[NSTextStorage alloc] init];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SKT_contentsChanged:) name:NSTextStorageDidProcessEditingNotification object:_contents];
 	}
 	return self;
@@ -30,8 +30,6 @@
 - (void)dealloc 
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [_contents release];
-    [super dealloc];
 }
 
 - (id)copyWithZone:(NSZone *)zone 
@@ -47,9 +45,9 @@
 {
     if (contents != _contents) 
 	{
-        NSAttributedString *contentsCopy = [[NSAttributedString allocWithZone:[self zone]] initWithAttributedString:_contents];
+        NSAttributedString *contentsCopy = [[NSAttributedString alloc] initWithAttributedString:_contents];
         //[[[self undoManager] prepareWithInvocationTarget:self] setContents:contentsCopy];
-        [contentsCopy release];
+
         // We are willing to accept either a string or an attributed string.
         if ([contents isKindOfClass:[NSAttributedString class]]) 
 		{
@@ -119,7 +117,6 @@
         [tc setWidthTracksTextView:NO];
         [tc setHeightTracksTextView:NO];
         [sharedLM addTextContainer:tc];
-        [tc release];
     }
     return sharedLM;
 }
@@ -132,7 +129,7 @@
         [[self fillColor] set];
         NSRectFill(bounds);
     }
-    if (view && ([view editingGraphic] == self) || ([view creatingGraphic] == self)) 
+    if (([view editingGraphic] == self) || ([view creatingGraphic] == self))
 	{
         [[NSColor knobColor] set];
         NSFrameRect(NSInsetRect(bounds, -1.0, -1.0));
@@ -289,18 +286,16 @@ static const float SKTRightMargin = 36.0;
 static NSTextView *newEditor() 
 {
     // This method returns an NSTextView whose NSLayoutManager has a refcount of 1.  It is the caller's responsibility to release the NSLayoutManager.  This function is only for the use of the following method.
-    NSLayoutManager *lm = [[NSLayoutManager allocWithZone:NULL] init];
-    NSTextContainer *tc = [[NSTextContainer allocWithZone:NULL] initWithContainerSize:NSMakeSize(1.0e6, 1.0e6)];
-    NSTextView *tv = [[NSTextView allocWithZone:NULL] initWithFrame:NSMakeRect(0.0, 0.0, 100.0, 100.0) textContainer:nil];
+    NSLayoutManager *lm = [[NSLayoutManager alloc] init];
+    NSTextContainer *tc = [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(1.0e6, 1.0e6)];
+    NSTextView *tv = [[NSTextView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 100.0, 100.0) textContainer:nil];
 
     [lm addTextContainer:tc];
-    [tc release];
 
     [tv setTextContainerInset:NSMakeSize(0.0, 0.0)];
     [tv setDrawsBackground:NO];
     [tv setAllowsUndo:YES];
     [tc setTextView:tv];
-    [tv release];
 
     return tv;
 }
@@ -374,10 +369,6 @@ static BOOL sharedEditorInUse = NO;
         if (editor == sharedEditor) 
 		{
             sharedEditorInUse = NO;
-        }
-		else 
-		{
-            [[editor layoutManager] release];
         }
         [view setEditingGraphic:nil editorView:nil];
     }

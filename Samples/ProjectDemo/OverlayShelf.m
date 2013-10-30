@@ -13,7 +13,7 @@
 - (id)initWithFrame: (NSRect)r
 {
 	self = [super initWithFrame: r];
-	stamp = [[NSImage imageNamed: @"stamp"] retain];
+	stamp = [NSImage imageNamed: @"stamp"];
 
 	return self;
 }
@@ -33,13 +33,6 @@
 		 operation: NSCompositeSourceOver
 		  fraction: 1.0f];
 }
-
-- (void)dealloc
-{
-	[stamp release];
-	[super dealloc];
-}
-
 
 @end
 
@@ -62,7 +55,7 @@
 	[self setIgnoresMouseEvents: NO];
 	[self setReleasedWhenClosed: NO];
 	
-	[self setContentView: [[[OverlayShelfView alloc] initWithFrame: frame] autorelease]];
+	[self setContentView: [[OverlayShelfView alloc] initWithFrame: frame]];
 	
 	[self setCollectionBehavior: NSWindowCollectionBehaviorCanJoinAllSpaces | NSWindowCollectionBehaviorStationary | NSWindowCollectionBehaviorIgnoresCycle];
 	

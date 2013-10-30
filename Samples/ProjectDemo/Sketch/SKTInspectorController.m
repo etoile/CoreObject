@@ -16,7 +16,7 @@
     static SKTInspectorController *_sharedInspectorController = nil;
 
     if (!_sharedInspectorController) {
-        _sharedInspectorController = [[SKTInspectorController allocWithZone:[self zone]] init];
+        _sharedInspectorController = [[SKTInspectorController alloc] init];
     }
     return _sharedInspectorController;
 }
@@ -35,7 +35,6 @@
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [super dealloc];
 }
 
 - (void)setMainWindow:(NSWindow *)mainWindow {

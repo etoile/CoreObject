@@ -9,6 +9,7 @@
 #import "SKTToolPaletteController.h"
 #import "SKTImage.h"
 #import "SKTGridPanelController.h"
+#import "DrawingController.h"
 #import <math.h>
 
 NSString *SKTGraphicViewSelectionDidChangeNotification = @"SKTGraphicViewSelectionDidChange";
@@ -23,7 +24,7 @@ static float SKTDefaultPasteCascadeDelta = 10.0;
         NSMutableArray *dragTypes = [NSMutableArray arrayWithObjects:NSColorPboardType, NSFilenamesPboardType, nil];
         [dragTypes addObjectsFromArray:[NSImage imagePasteboardTypes]];
         [self registerForDraggedTypes:dragTypes];
-        _selectedGraphics = [[NSMutableArray allocWithZone:[self zone]] init];
+        _selectedGraphics = [[NSMutableArray alloc] init];
         _creatingGraphic = nil;
         _rubberbandRect = NSZeroRect;
         _rubberbandGraphics = nil;
@@ -38,7 +39,7 @@ static float SKTDefaultPasteCascadeDelta = 10.0;
         _gvFlags.showsGrid = NO;
         _gvFlags.knobsHidden = NO;
         _gridSpacing = 8.0;
-        _gridColor = [[NSColor lightGrayColor] retain];
+        _gridColor = [NSColor lightGrayColor];
         _unhideKnobsTimer = nil;
     }
     return self;
@@ -46,10 +47,6 @@ static float SKTDefaultPasteCascadeDelta = 10.0;
 
 - (void)dealloc {
     [self endEditing];
-    [_selectedGraphics release];
-    [_rubberbandGraphics release];
-    [_gridColor release];
-    [super dealloc];
 }
 
 - (DrawingController*)drawingController
@@ -89,8 +86,8 @@ static float SKTDefaultPasteCascadeDelta = 10.0;
     return _selectedGraphics;
 }
 
-static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) {
-    NSArray *graphics = (NSArray *)gArray;
+static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) {
+    NSArray *graphics = (__bridge NSArray *)gArray;
     unsigned index1, index2;
 
     index1 = [graphics indexOfObjectIdenticalTo:graphic1];
@@ -105,7 +102,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 }
 
 - (NSArray *)orderedSelectedGraphics  {
-    return [[self selectedGraphics] sortedArrayUsingFunction:SKT_orderGraphicsFrontToBack context:[self graphics]];
+    return [[self selectedGraphics] sortedArrayUsingFunction:SKT_orderGraphicsFrontToBack context:(__bridge void *)([self graphics])];
 }
 
 - (BOOL)graphicIsSelected:(SKTGraphic *)graphic {
@@ -341,7 +338,7 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 
 - (void)createGraphicOfClass:(Class)theClass withEvent:(NSEvent *)theEvent {
     SKTDrawDocument *document = [self drawDocument];
-    _creatingGraphic = [[theClass allocWithZone:[document zone]] initWithObjectGraphContext: [document objectGraphContext]];
+    _creatingGraphic = [[theClass alloc] initWithObjectGraphContext: [document objectGraphContext]];
     if ([_creatingGraphic createWithEvent:theEvent inView:self]) {
         [document insertGraphic:_creatingGraphic atIndex:0];
         [self selectGraphic:_creatingGraphic];
@@ -356,7 +353,6 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 //								shortDescription: @"Insert Shape"
 //								  longDescription: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Create %@", @"UndoStrings", @"Action name for newly created graphics.  Class name is inserted at the substitution."), [[NSBundle mainBundle] localizedStringForKey:NSStringFromClass(theClass) value:@"" table:@"GraphicClassNames"]]];
     }
-    [_creatingGraphic release];
     _creatingGraphic = nil;
 }
 
@@ -417,7 +413,6 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
                 [self performSelector:@selector(invalidateGraphic:) withEachObjectInSet:_rubberbandGraphics];
             }
             _rubberbandRect = NSZeroRect;
-            [_rubberbandGraphics release];
             _rubberbandGraphics = nil;
         } else {
             NSRect newRubberbandRect = SKTRectFromPoints(origPoint, curPoint);
@@ -425,8 +420,8 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
                 [self setNeedsDisplayInRect:_rubberbandRect];
                 [self performSelector:@selector(invalidateGraphic:) withEachObjectInSet:_rubberbandGraphics];
                 _rubberbandRect = newRubberbandRect;
-                [_rubberbandGraphics release];
-                _rubberbandGraphics = [[self graphicsIntersectingRect:_rubberbandRect] retain];
+
+                _rubberbandGraphics = [self graphicsIntersectingRect:_rubberbandRect];
                 [self setNeedsDisplayInRect:_rubberbandRect];
                 [self performSelector:@selector(invalidateGraphic:) withEachObjectInSet:_rubberbandGraphics];
             }
@@ -450,7 +445,6 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
     }
    
     _rubberbandRect = NSZeroRect;
-    [_rubberbandGraphics release];
     _rubberbandGraphics = nil;
 }
 
@@ -615,14 +609,14 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 - (BOOL)makeNewImageFromPasteboard:(NSPasteboard *)pboard atPoint:(NSPoint)point {
     NSString *type = [pboard availableTypeFromArray:[NSImage imagePasteboardTypes]];
     if (type) {
-        NSImage *contents = [[NSImage allocWithZone:[[self drawDocument] zone]] initWithPasteboard:pboard];
+        NSImage *contents = [[NSImage alloc] initWithPasteboard:pboard];
         if (contents) {
-            SKTImage *newImage = [[SKTImage allocWithZone:[[self drawDocument] zone]] init];
+            SKTImage *newImage = [[SKTImage alloc] init];
             [newImage setBounds:NSMakeRect(point.x, point.y - [contents size].height, [contents size].width, [contents size].height)];
             [newImage setImage:contents];
-            [contents release];
+
             [[self drawDocument] insertGraphic:newImage atIndex:0];
-            [newImage release];
+
             [self clearSelection];
             [self selectGraphic:newImage];
             return YES;
@@ -634,14 +628,14 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 - (BOOL)makeNewImageFromContentsOfFile:(NSString *)filename atPoint:(NSPoint)point {
     NSString *extension = [filename pathExtension];
     if ([[NSImage imageFileTypes] containsObject:extension]) {
-        NSImage *contents = [[NSImage allocWithZone:[[self drawDocument] zone]] initWithContentsOfFile:filename];
+        NSImage *contents = [[NSImage alloc] initWithContentsOfFile:filename];
         if (contents) {
-            SKTImage *newImage = [[SKTImage allocWithZone:[[self drawDocument] zone]] init];
+            SKTImage *newImage = [[SKTImage alloc] init];
             [newImage setBounds:NSMakeRect(point.x, point.y, [contents size].width, [contents size].height)];
             [newImage setImage:contents];
-            [contents release];
+
             [[self drawDocument] insertGraphic:newImage atIndex:0];
-            [newImage release];
+
             [self clearSelection];
             [self selectGraphic:newImage];
             return YES;
@@ -801,10 +795,10 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 }
 
 - (IBAction)delete:(id)sender {
-    NSArray *selCopy = [[NSArray allocWithZone:[self zone]] initWithArray:[self selectedGraphics]];
+    NSArray *selCopy = [[NSArray alloc] initWithArray:[self selectedGraphics]];
     if ([selCopy count] > 0) {
         [[self drawDocument] performSelector:@selector(removeGraphic:) withEachObjectInArray:selCopy];
-        [selCopy release];
+
         //[[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Delete", @"UndoStrings", @"Action name for deletions.")];
     }
 }
@@ -1264,11 +1258,8 @@ static int SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gArray) 
 }
 
 - (void)setGridColor:(NSColor *)color {
-    if (_gridColor != color) {
-        [_gridColor release];
-        _gridColor = [color retain];
-        [self setNeedsDisplay:YES];
-    }
+	_gridColor = color;
+	[self setNeedsDisplay:YES];
 }
 
 @end

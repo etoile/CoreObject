@@ -7,7 +7,7 @@
 {
 	self = [super initWithWindowNibName: @"TextDocument"];
 	
-	if (!self) { [self release]; return nil; }
+	if (!self) { return nil; }
 	
 	doc = document; // weak ref
 	isSharing = sharing;
@@ -30,7 +30,7 @@
 	[textView setDelegate: self];
 	
 	NSString *label = [[doc rootDocObject] label];
-	[[textView textStorage] setAttributedString: [[[NSAttributedString alloc] initWithString: label] autorelease]];	
+	[[textView textStorage] setAttributedString: [[NSAttributedString alloc] initWithString: label]];	
 }
 
 - (void)textDidChange:(NSNotification*)notif

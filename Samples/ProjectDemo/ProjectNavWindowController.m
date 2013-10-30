@@ -20,7 +20,7 @@
 
 - (NSArray *) projectsSorted
 {
-	NSArray *unsorted = [[[NSApp delegate] projects] allObjects];
+	NSArray *unsorted = [[(ApplicationDelegate *)[NSApp delegate] projects] allObjects];
 	
 	return [unsorted sortedArrayUsingDescriptors:
 	 @[[[NSSortDescriptor alloc] initWithKey:@"name" ascending: YES]]];
@@ -54,7 +54,7 @@
 		id item = [outline itemAtRow: [outline selectedRow]];
 		NSLog(@"Double click: %@", item);
 		
-		[[[NSApp delegate] controllerForDocumentRootObject: item] showWindow: nil];
+		[[(ApplicationDelegate *)[NSApp delegate] controllerForDocumentRootObject: item] showWindow: nil];
 	}
 }
 

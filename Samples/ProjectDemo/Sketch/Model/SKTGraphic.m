@@ -45,12 +45,6 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
     return self;
 }
 
-- (void)dealloc {
-    [_fillColor release];
-    [_strokeColor release];
-    [super dealloc];
-}
-
 - (id)copyWithZone:(NSZone *)zone {
     id newObj = [[[self class] allocWithZone:zone] initWithObjectGraphContext: [self objectGraphContext]];
 
@@ -110,12 +104,11 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 }
 
 - (void)setFillColor:(NSColor *)fillColor {
-    if (_fillColor != fillColor) {
-        //[[[self undoManager] prepareWithInvocationTarget:self] setFillColor:_fillColor];
-        [_fillColor autorelease];
-        _fillColor = [fillColor retain];
-        [self didChange];
-    }
+
+	//[[[self undoManager] prepareWithInvocationTarget:self] setFillColor:_fillColor];
+	_fillColor = fillColor;
+	[self didChange];
+
     if (_fillColor) {
         [self setDrawsFill:YES];
     } else {
@@ -140,12 +133,10 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 }
 
 - (void)setStrokeColor:(NSColor *)strokeColor {
-    if (_strokeColor != strokeColor) {
         //[[[self undoManager] prepareWithInvocationTarget:self] setStrokeColor:_strokeColor];
-        [_strokeColor autorelease];
-        _strokeColor = [strokeColor retain];
-        [self didChange];
-    }
+	_strokeColor = strokeColor;
+	[self didChange];
+    
     if (_strokeColor) {
         [self setDrawsStroke:YES];
     } else {
@@ -344,7 +335,7 @@ NSString *SKTStrokeLineWidthKey = @"StrokeLineWidth";
         theClass = NSClassFromString([@"SKT" stringByAppendingString:[dict objectForKey:SKTClassKey]]);
     }
     if (theClass) {
-        theGraphic = [[[theClass allocWithZone:NULL] init] autorelease];
+        theGraphic = [[theClass alloc] init];
         if (theGraphic) {
             [theGraphic loadPropertyListRepresentation:dict];
         }
@@ -543,7 +534,7 @@ NSString *SKTStrokeLineWidthKey = @"StrokeLineWidth";
     if (!crosshairCursor) {
         NSImage *crosshairImage = [NSImage imageNamed:@"Cross"];
         NSSize imageSize = [crosshairImage size];
-        crosshairCursor = [[NSCursor allocWithZone:[self zone]] initWithImage:crosshairImage hotSpot:NSMakePoint((imageSize.width / 2.0), (imageSize.height / 2.0))];
+        crosshairCursor = [[NSCursor alloc] initWithImage:crosshairImage hotSpot:NSMakePoint((imageSize.width / 2.0), (imageSize.height / 2.0))];
     }
     return crosshairCursor;
 }

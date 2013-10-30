@@ -1,4 +1,5 @@
 #import "EWUtilityWindowController.h"
+#import "OutlineController.h"
 
 @implementation EWUtilityWindowController
 
@@ -25,7 +26,7 @@
     
     if (wc != nil && [wc respondsToSelector: @selector(projectDocument)])
     {
-		Document *doc = [(id)wc projectDocument];
+		Document *doc = [(OutlineController *)wc projectDocument];
         NSLog(@"Automatically changing inspected document to: %@", doc);
         [self setInspectedDocument: doc];
     }    

@@ -38,11 +38,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[super dealloc];
-}
-
 /* Accessor Methods */
 
 @dynamic label;

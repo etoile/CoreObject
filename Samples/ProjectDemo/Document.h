@@ -14,7 +14,7 @@
 
 @property (readonly, nonatomic, retain) Project *project;
 @property (readwrite, nonatomic, retain) NSString *documentType;
-@property (readwrite, nonatomic, retain) COObject *rootDocObject;
+@property (readwrite, nonatomic, retain) id rootDocObject;
 @property (readwrite, nonatomic, retain) NSString *documentName;
 @property (readwrite, nonatomic, retain) NSSet *docTags;
 

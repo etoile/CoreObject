@@ -1,4 +1,5 @@
 #import "DrawingController.h"
+#import "SKTDrawDocument.h"
 
 @implementation DrawingController
 
@@ -6,17 +7,12 @@
 {
 	self = [super initWithWindowNibName: @"DrawingDocument"];
 	
-	if (!self) { [self release]; return nil; }
+	if (!self) { return nil; }
 	
 	doc = document; // weak ref
 	isSharing = sharing;
 
 	return self;
-}
-
-- (void)dealloc
-{
-	[super dealloc];
 }
 
 - (id)initWithDocument: (id)document
@@ -64,12 +60,12 @@
 
 - (void)windowFrameDidChange:(NSNotification*)notification
 {
-	[doc setScreenRectValue: [[self window] frame]];
-	
-	assert([[doc objectContext] objectHasChanges: [doc uuid]]);
-	assert([[doc valueForProperty: @"screenRect"] isEqual: NSStringFromRect([[self window] frame])]);
-	
-    [[[doc objectGraphContext] editingContext] commit];
+//	[doc setScreenRectValue: [[self window] frame]];
+//	
+//	assert([[doc objectContext] objectHasChanges: [doc uuid]]);
+//	assert([[doc valueForProperty: @"screenRect"] isEqual: NSStringFromRect([[self window] frame])]);
+//	
+//    [[[doc objectGraphContext] editingContext] commit];
     
 //	[[doc objectContext] commitWithType: kCOTypeMinorEdit
 //		shortDescription: @"Move Window"
@@ -115,7 +111,7 @@
 
 - (SKTDrawDocument *)drawDocument
 {
-	SKTDrawDocument *drawDoc = [doc rootDocObject];
+	SKTDrawDocument *drawDoc = (SKTDrawDocument *)[doc rootDocObject];
 	assert([drawDoc isKindOfClass: [SKTDrawDocument class]]);
 	return drawDoc;
 }

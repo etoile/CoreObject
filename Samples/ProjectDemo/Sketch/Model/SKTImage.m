@@ -24,14 +24,6 @@
     return self;
 }
 
-- (void)dealloc {
-    if (_image != _cachedImage) {
-        [_cachedImage release];
-    }
-    [_image release];
-    [super dealloc];
-}
-
 - (id)copyWithZone:(NSZone *)zone {
     id newObj = [super copyWithZone:zone];
 
@@ -43,17 +35,14 @@
 }
 
 - (void)SKT_clearCachedImage {
-    if (_cachedImage != _image) {
-        [_cachedImage release];
-    }
     _cachedImage = nil;
 }
 
 - (void)setImage:(NSImage *)image {
     if (image != _image) {
         //[[[self undoManager] prepareWithInvocationTarget:self] setImage:_image];
-        [_image release];
-        _image = [image retain];
+
+        _image = image;
         [self SKT_clearCachedImage];
         [self didChange];
     }
@@ -75,7 +64,7 @@
             BOOL flippedHorizontally = [self flippedHorizontally];
             BOOL flippedVertically = [self flippedVertically];
             
-            _cachedImage = [[NSImage allocWithZone:[self zone]] initWithSize:bounds.size];
+            _cachedImage = [[NSImage alloc] initWithSize:bounds.size];
             if (!NSIsEmptyRect(bounds)) {
                 // Only draw in the image if it has any content.
                 [_cachedImage lockFocus];
@@ -209,10 +198,9 @@ NSString *SKTFlippedVerticallyKey = @"FlippedVertically";
     NSImage *newImage;
     filePath = [filePath stringByStandardizingPath];
     filePath = [filePath stringByExpandingTildeInPath];
-    newImage = [[NSImage allocWithZone:[self zone]] initWithContentsOfFile:filePath];
+    newImage = [[NSImage alloc] initWithContentsOfFile:filePath];
     if (newImage) {
         [self setImage:newImage];
-        [newImage release];
     }
 }
 

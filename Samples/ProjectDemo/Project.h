@@ -10,4 +10,6 @@
 
 - (NSArray *) documentsSorted;
 
+- (void) addDocument_hack: (Document *)document;
+
 @end

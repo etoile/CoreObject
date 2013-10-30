@@ -10,7 +10,7 @@
 {
 	self = [super initWithWindowNibName: @"OutlineWindow"];
 	
-	if (!self) { [self release]; return nil; }
+	if (!self) { return nil; }
 	
 	doc = document; // weak ref
 	isSharing = sharing;
@@ -39,7 +39,6 @@
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
-	[super dealloc];
 }
 
 - (void)objectGraphContextObjectsDidChange: (NSNotification*)notif
@@ -235,10 +234,8 @@ static int i = 0;
 	assert(indexOfItemInParent != NSNotFound);
 	if (grandparent != nil)
 	{
-		[item retain];
 		[parent removeItemAtIndex: indexOfItemInParent];
 		[grandparent addItem: item atIndex: [[grandparent contents] indexOfObject: parent] + 1];
-		[item release];
 		
 		[self commitWithType: @"kCOTypeMinorEdit"
 			shortDescription: @"Shift Left"
@@ -261,10 +258,9 @@ static int i = 0;
 		
 		if ([newParent isKindOfClass: [OutlineItem class]])
 		{		
-			[item retain];
+
 			[parent removeItemAtIndex: [[parent contents] indexOfObject: item]];
 			[newParent addItem: item];
-			[item release];
 			
 			[self commitWithType: @"kCOTypeMinorEdit"
 				shortDescription: @"Shift Right"
@@ -280,7 +276,7 @@ static int i = 0;
 
 - (IBAction) shareWith: (id)sender
 {
-	[[[NSApplication sharedApplication] delegate] shareWithInspectorForDocument: doc];
+	[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] shareWithInspectorForDocument: doc];
 }
 
 - (IBAction)moveToTrash:(id)sender
@@ -352,7 +348,7 @@ static int i = 0;
 
 - (IBAction) history: (id)sender
 {
-	[[[NSApp delegate] historyController] showHistoryForDocument: doc];
+	//[(ApplicationDelegate *)[[NSApp delegate] historyController] showHistoryForDocument: doc];
 }
 
 /* NSResponder */
@@ -369,19 +365,17 @@ static int i = 0;
 
 - (void)deleteForward:(id)sender
 {
-	id itemToDelete = [self selectedItem];
+	OutlineItem *itemToDelete = [self selectedItem];
 	if (itemToDelete != nil && itemToDelete != [self rootObject])
 	{
 		NSInteger index = [[[itemToDelete parent] contents] indexOfObject: itemToDelete];
 		assert(index != NSNotFound);
-		NSString *label = [[itemToDelete label] retain];
+		NSString *label = [itemToDelete label];
 		[[itemToDelete parent] removeItemAtIndex: index];
 		
 		[self commitWithType: @"kCOTypeMinorEdit"
 			shortDescription: @"Delete Item"
 			 longDescription: [NSString stringWithFormat: @"Delete Item %@", label]];
-
-		[label release];
 	}
 }
 
@@ -409,7 +403,7 @@ static int i = 0;
 			id target = [item referencedItem];
 			
 			id root = [target root];
-			OutlineController *otherController = [[[NSApplication sharedApplication] delegate]
+			OutlineController *otherController = [(ApplicationDelegate *)[[NSApplication sharedApplication] delegate]
 												  controllerForDocumentRootObject: root];
 			assert(otherController != nil);
 			
@@ -452,9 +446,9 @@ static int i = 0;
 	return [[item contents] objectAtIndex: index];
 }
 
-- (BOOL) outlineView: (NSOutlineView *)outlineView isItemExpandable: (id)item
+- (BOOL) outlineView: (NSOutlineView *)ov isItemExpandable: (id)item
 {
-	return [self outlineView: outlineView numberOfChildrenOfItem: item] > 0;
+	return [self outlineView: ov numberOfChildrenOfItem: item] > 0;
 }
 
 - (NSInteger) outlineView: (NSOutlineView *)outlineView numberOfChildrenOfItem: (id)item
@@ -482,14 +476,12 @@ static int i = 0;
 
 	if ([item isKindOfClass: [OutlineItem class]])
 	{
-		NSString *oldLabel = [[item label] retain];
+		NSString *oldLabel = [item label];
 		[item setLabel: object];
 	
 		[self commitWithType: @"kCOTypeMinorEdit"
 			shortDescription: @"Edit Label"
 			 longDescription: [NSString stringWithFormat: @"Edit label from %@ to %@", oldLabel, [item label]]];
-	
-		[oldLabel release];
 	}
 }
 
@@ -499,7 +491,7 @@ static int i = 0;
     
 	for (OutlineItem *outlineItem in items)
 	{
-        NSPasteboardItem *item = [[[NSPasteboardItem alloc] init] autorelease];
+        NSPasteboardItem *item = [[NSPasteboardItem alloc] init];
         
         // FIXME: Pass editing branch?
 		[item setPropertyList: @{ @"persistentRoot" : [[[outlineItem persistentRoot] UUID] stringValue],
@@ -654,6 +646,7 @@ static int i = 0;
 	if (pasteLink &&
 		![[outlineItems objectAtIndex: 0] isKindOfClass: [ItemReference class]]) // Don't make links to link objects
 	{
+		/*
 		OutlineItem *itemToLinkTo = [outlineItems objectAtIndex: 0];
 		
 		if (insertionIndex == -1) { insertionIndex = [[newParent contents] count]; }
@@ -661,15 +654,15 @@ static int i = 0;
 		ItemReference *ref = [[ItemReference alloc] initWithParent: newParent
 													referencedItem: itemToLinkTo
 														   context: [[self rootObject] objectContext]];
-		[ref autorelease];
-		
+
 		[newParent addItem: ref
 				   atIndex: insertionIndex];
 		
 		[self commitWithType: @"kCOTypeMinorEdit"
 			shortDescription: @"Drop Link"
 			 longDescription: [NSString stringWithFormat: @"Drop Link to %@ on %@", [itemToLinkTo label], [newParent label]]];
-		
+		 */
+		NSLog(@"Links unimplemented");
 		return;
 	}
 	
@@ -707,7 +700,7 @@ static int i = 0;
         {
             // User dragged cross-peristent root
             
-            COCopier *copier = [[[COCopier alloc] init] autorelease];
+            COCopier *copier = [[COCopier alloc] init];
 			
             ETUUID *destUUID = [copier copyItemWithUUID: [outlineItem UUID]
                                               fromGraph: [outlineItem objectGraphContext]

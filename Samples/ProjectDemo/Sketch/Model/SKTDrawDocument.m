@@ -40,7 +40,6 @@ NSString *SKTDrawDocumentType = @"Apple Sketch Graphic Format";
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [super dealloc];
 }
 
 @dynamic graphics;
@@ -173,7 +172,6 @@ static int SKTCurrentDrawDocumentVersion = 1;
 	// We're done drawing.
 	[image unlockFocus];
 	tiffData = [image TIFFRepresentation];
-	[image release];
 
     } else {
 
@@ -210,7 +208,7 @@ static int SKTCurrentDrawDocumentVersion = 1;
     NSRect bounds = [self drawingBoundsForGraphics:graphics];
     SKTRenderingView *view = [[SKTRenderingView alloc] initWithFrame:bounds graphics:graphics];
     NSData *pdfData = [view dataWithPDFInsideRect:bounds];
-    [view release];
+
     return pdfData;
 
 }
@@ -251,14 +249,14 @@ static int SKTCurrentDrawDocumentVersion = 1;
 - (void)insertGraphic:(SKTGraphic *)graphic atIndex:(unsigned)index {
     //[[[self undoManager] prepareWithInvocationTarget:self] removeGraphicAtIndex:index];
     
-    NSMutableArray *array = [[self.graphics mutableCopy] autorelease];
+    NSMutableArray *array = [self.graphics mutableCopy];
     [array insertObject: graphic atIndex: index];
 
     self.graphics = array;
 }
 
 - (void)removeGraphicAtIndex:(unsigned)index {
-    NSMutableArray *array = [[self.graphics mutableCopy] autorelease];
+    NSMutableArray *array = [self.graphics mutableCopy];
     [array removeObjectAtIndex: index];
     
     self.graphics = array;

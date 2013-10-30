@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		661210DC18217451003AEC29 /* AccountWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 661210DA18217451003AEC29 /* AccountWindowController.m */; };
+		661210EE18217818003AEC29 /* XMPPController.m in Sources */ = {isa = PBXBuildFile; fileRef = 661210ED18217818003AEC29 /* XMPPController.m */; };
+		661210F818217955003AEC29 /* AccountBox.xib in Resources */ = {isa = PBXBuildFile; fileRef = 661210F718217955003AEC29 /* AccountBox.xib */; };
 		6627ED9B12761EBC00E06946 /* CheckpointAsSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627ED9A12761EBC00E06946 /* CheckpointAsSheetController.m */; };
 		6627EEDD1278A55A00E06946 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 6627EEDC1278A55A00E06946 /* README */; };
 		6638C026181852FD008341E6 /* ProjectNav.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6638C025181852FD008341E6 /* ProjectNav.xib */; };
@@ -41,7 +44,6 @@
 		66CA184E181A3F4F00DE6AFB /* SearchWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66CA184D181A3F4F00DE6AFB /* SearchWindowController.m */; };
 		66DBB3781813B1A80047301A /* PreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66DBB3771813B1A80047301A /* PreferencesController.m */; };
 		66DBB3831813B1BB0047301A /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66DBB3821813B1BB0047301A /* Preferences.xib */; };
-		799118FD12CD3C82009D28C0 /* DesktopWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 799118FC12CD3C82009D28C0 /* DesktopWindow.m */; };
 		7991190512CD3D75009D28C0 /* ProjectNavWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7991190412CD3D75009D28C0 /* ProjectNavWindowController.m */; };
 		7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7991191412CD3F3C009D28C0 /* 2560x1600.jpg */; };
 		7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */ = {isa = PBXBuildFile; fileRef = 7991198512CD4B1A009D28C0 /* OverlayShelf.m */; };
@@ -170,6 +172,11 @@
 /* Begin PBXFileReference section */
 		1DDD58150DA1D0A300B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ProjectDemoMainMenu.xib; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		661210D918217451003AEC29 /* AccountWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountWindowController.h; sourceTree = "<group>"; };
+		661210DA18217451003AEC29 /* AccountWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AccountWindowController.m; sourceTree = "<group>"; };
+		661210EC18217818003AEC29 /* XMPPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMPPController.h; sourceTree = "<group>"; };
+		661210ED18217818003AEC29 /* XMPPController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMPPController.m; sourceTree = "<group>"; };
+		661210F718217955003AEC29 /* AccountBox.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AccountBox.xib; sourceTree = "<group>"; };
 		6627ED9912761EBC00E06946 /* CheckpointAsSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CheckpointAsSheetController.h; sourceTree = "<group>"; };
 		6627ED9A12761EBC00E06946 /* CheckpointAsSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CheckpointAsSheetController.m; sourceTree = "<group>"; };
 		6627EDF812762B8C00E06946 /* SharingServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingServer.h; sourceTree = "<group>"; };
@@ -267,8 +274,6 @@
 		66DBB3761813B1A80047301A /* PreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesController.h; sourceTree = "<group>"; };
 		66DBB3771813B1A80047301A /* PreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesController.m; sourceTree = "<group>"; };
 		66DBB3821813B1BB0047301A /* Preferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
-		799118FB12CD3C82009D28C0 /* DesktopWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DesktopWindow.h; sourceTree = "<group>"; };
-		799118FC12CD3C82009D28C0 /* DesktopWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DesktopWindow.m; sourceTree = "<group>"; };
 		7991190312CD3D75009D28C0 /* ProjectNavWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectNavWindowController.h; sourceTree = "<group>"; };
 		7991190412CD3D75009D28C0 /* ProjectNavWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectNavWindowController.m; sourceTree = "<group>"; };
 		7991191412CD3F3C009D28C0 /* 2560x1600.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = 2560x1600.jpg; path = Images/2560x1600.jpg; sourceTree = "<group>"; };
@@ -379,7 +384,6 @@
 				66E8EE0C12D673BB00780264 /* Search Window */,
 				7991197F12CD4AA9009D28C0 /* Overlay Shelf */,
 				7991190212CD3D36009D28C0 /* Project Navigator */,
-				799118F812CD3C63009D28C0 /* Desktop */,
 				66C33DED1290BC7700E5B15B /* Sketch */,
 				79F122B2128A4A4200EC0255 /* Icons */,
 				6686B8A1125522D70065DE1A /* Model Objects */,
@@ -493,6 +497,11 @@
 		6686BFD8125AE74B0065DE1A /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				661210F718217955003AEC29 /* AccountBox.xib */,
+				661210D918217451003AEC29 /* AccountWindowController.h */,
+				661210DA18217451003AEC29 /* AccountWindowController.m */,
+				661210EC18217818003AEC29 /* XMPPController.h */,
+				661210ED18217818003AEC29 /* XMPPController.m */,
 				6627EF511278EE8400E06946 /* SharingController.h */,
 				6627EF521278EE8400E06946 /* SharingController.m */,
 				6686C126125D7F140065DE1A /* NetworkController.h */,
@@ -574,15 +583,6 @@
 				66CA184D181A3F4F00DE6AFB /* SearchWindowController.m */,
 			);
 			name = "Search Window";
-			sourceTree = "<group>";
-		};
-		799118F812CD3C63009D28C0 /* Desktop */ = {
-			isa = PBXGroup;
-			children = (
-				799118FB12CD3C82009D28C0 /* DesktopWindow.h */,
-				799118FC12CD3C82009D28C0 /* DesktopWindow.m */,
-			);
-			name = Desktop;
 			sourceTree = "<group>";
 		};
 		7991190212CD3D36009D28C0 /* Project Navigator */ = {
@@ -765,6 +765,7 @@
 				6686BFF5125CF0200065DE1A /* ChatWindow.xib in Resources */,
 				6627EEDD1278A55A00E06946 /* README in Resources */,
 				79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */,
+				661210F818217955003AEC29 /* AccountBox.xib in Resources */,
 				79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */,
 				79F122B1128A49FE00EC0255 /* history.tiff in Resources */,
 				79F122C4128A4B7800EC0255 /* format-indent-less.tiff in Resources */,
@@ -799,6 +800,7 @@
 				79911A4A12CDAECD009D28C0 /* SKTImage.m in Sources */,
 				79911A4B12CDAECD009D28C0 /* SKTLine.m in Sources */,
 				66DBB3781813B1A80047301A /* PreferencesController.m in Sources */,
+				661210DC18217451003AEC29 /* AccountWindowController.m in Sources */,
 				79911A4C12CDAECD009D28C0 /* SKTRectangle.m in Sources */,
 				79911A4D12CDAECD009D28C0 /* SKTRenderingView.m in Sources */,
 				79911A4E12CDAECD009D28C0 /* SKTTextArea.m in Sources */,
@@ -812,6 +814,7 @@
 				6686B80F125513D80065DE1A /* OutlineItem.m in Sources */,
 				6686B810125513D80065DE1A /* DrawingItem.m in Sources */,
 				6686B811125513D80065DE1A /* TextItem.m in Sources */,
+				661210EE18217818003AEC29 /* XMPPController.m in Sources */,
 				6686B812125513D80065DE1A /* TextController.m in Sources */,
 				6686B813125513D80065DE1A /* DrawingController.m in Sources */,
 				66708FB312486F0400E65F00 /* OutlineController.m in Sources */,
@@ -821,7 +824,6 @@
 				6686BEEB12593D900065DE1A /* Document.m in Sources */,
 				6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */,
 				6627ED9B12761EBC00E06946 /* CheckpointAsSheetController.m in Sources */,
-				799118FD12CD3C82009D28C0 /* DesktopWindow.m in Sources */,
 				7991190512CD3D75009D28C0 /* ProjectNavWindowController.m in Sources */,
 				7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */,
 				79911A0912CD974A009D28C0 /* Application.m in Sources */,
@@ -883,6 +885,7 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 			};
 			name = Debug;
@@ -890,6 +893,7 @@
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 			};
 			name = Release;

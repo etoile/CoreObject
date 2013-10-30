@@ -33,14 +33,12 @@
     [forwardButton setHighlightMode:YES];
 	[forwardButton setTarget: self];
 	[forwardButton setAction: @selector(globalForward:)];
-	[forwardButton retain];	
 	
     NSStatusItem *backButton = [bar statusItemWithLength:NSSquareStatusItemLength];
 	[backButton setImage: [NSImage imageNamed: NSImageNameGoLeftTemplate]];
     [backButton setHighlightMode:YES];
 	[backButton setTarget: self];
 	[backButton setAction: @selector(globalBack:)];
-	[backButton retain];
 }
 
 - (void)showShelf: (id)sender
@@ -83,8 +81,7 @@
 
 - (void)awakeFromNib
 {
-	context = [[COEditingContext alloc] initWithStore:
-			   [[[COSQLiteStore alloc] initWithURL: STORE_URL] autorelease]];
+	context = [COEditingContext contextWithURL: STORE_URL];
 	
 	// TODO: Use NSUserDefaults to remember open documents
 	//ETUUID *uuid = [[NSUserDefaults standardUserDefaults] UUIDForKey: @"projectDemoProjectUUID"];
@@ -99,7 +96,7 @@
 	else
 	{
         COPersistentRoot *proot = [context insertNewPersistentRootWithEntityName: @"Anonymous.Project"];
-		[[proot rootObject] setName: @"Untitled project"];
+		[(OutlineItem *)[proot rootObject] setName: @"Untitled project"];
 		[context commit];
 		
 		NSLog(@"Creating a new project %@", [proot UUID]);
@@ -128,13 +125,6 @@
 	return context;
 }
 
-- (void)dealloc
-{
-	[controllerForDocumentUUID release];
-	[desktopWindow release];
-	[super dealloc];
-}
-
 - (void) newDocumentWithType: (NSString*)type rootObjectEntity: (NSString*)rootObjEntity
 {
     COPersistentRoot *persistentRoot = [context insertNewPersistentRootWithEntityName: @"Anonymous.Document"];
@@ -156,7 +146,7 @@
 	[proj addDocument_hack: document];
 	
 	NSLog(@"Added a document model object %@, outline item %@", document, rootObj);
-	NSLog(@"Changed objects %@", [context changedObjects]);
+	
 	[context commit];
 	
 	[newDocumentTypeWindow orderOut: nil];
@@ -194,7 +184,7 @@
 
 - (Document *)keyDocument
 {
-	return [[self keyDocumentController] projectDocument];
+	return [(OutlineController *)[self keyDocumentController] projectDocument];
 }
 
 /* NSResponder */
@@ -230,12 +220,12 @@
 
 - (IBAction)newProject: (id)sender
 {
-	Project *newProject = [[Project alloc] initWithObjectGraphContext: context];
-	[context commit];
-	NSLog(@"Creating a new project %@ = %@", [newProject uuid], newProject); 
-	[newProject setDelegate: self];
-
-	
+//	Project *newProject = [[Project alloc] initWithObjectGraphContext: context];
+//	[context commit];
+//	NSLog(@"Creating a new project %@ = %@", [newProject uuid], newProject); 
+//	[newProject setDelegate: self];
+//
+//	
 }
 
 - (IBAction)deleteProject: (id)sender
@@ -246,7 +236,7 @@
 
 
 
-- (OutlineController*)controllerForDocumentRootObject: (COObject*)rootObject;
+- (OutlineController*)controllerForDocumentRootObject: (COObject*)rootObject
 {
 	for (Project *project in [self projects])
 	{
@@ -300,7 +290,7 @@
 			assert(cls != Nil);
 			
 			// Create a new document controller
-			controller = [[[cls alloc] initWithDocument: doc] autorelease];
+			controller = [[cls alloc] initWithDocument: doc];
 			[controller showWindow: nil];
 			[controllerForDocumentUUID setObject: controller forKey: [doc UUID]];
 			// Observe key document changes
@@ -324,7 +314,8 @@
 
 - (void) shareWithInspectorForDocument: (Document*)doc
 {
-	[sharingController shareWithInspectorForDocument: doc];
+	NSLog(@"Share %@", doc);
+	//[sharingController shareWithInspectorForDocument: doc];
 }
 
 - (void)showSearchResults: (id)sender

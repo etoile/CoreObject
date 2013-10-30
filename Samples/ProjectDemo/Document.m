@@ -1,4 +1,5 @@
 #import "Document.h"
+#import <CoreObject/COObject+Private.h>
 
 @implementation Document
 
@@ -46,6 +47,8 @@
 
 - (NSRect) screenRect
 {
+	// FIXME: -valueForStorageKey: is private, either it should be public, or I'm doing something wrong here
+	
 	return [[self valueForStorageKey: @"screenRect"] rectValue];
 }
 - (void) setScreenRect:(NSRect)r
