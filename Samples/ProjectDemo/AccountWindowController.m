@@ -9,6 +9,14 @@
     return self;
 }
 
+-(void)windowDidLoad
+{
+	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+	[jidBox setStringValue: [defs stringForKey: @"XMPPJID"]];
+	[passwordBox setStringValue: [defs stringForKey: @"XMPPPassword"]];
+	[serverBox setStringValue: [defs  stringForKey: @"XMPPServer"]];
+}
+
 - (IBAction) yes: (id)sender
 {
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
