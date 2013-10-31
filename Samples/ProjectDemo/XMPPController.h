@@ -7,6 +7,9 @@
 	XMPPStream *xmppStream;
 	XMPPRosterMemoryStorage *xmppRosterStorage;
 	XMPPRoster *xmppRoster;
+	
+	NSArray *currentRoster;
+	Document *currentDocument;
 }
 
 + (XMPPController *) sharedInstance;

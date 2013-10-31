@@ -128,8 +128,24 @@
 	[alert runModal];
 }
 
+- (void) shareWith: (id)sender
+{
+	NSLog(@"Share with %@", sender);
+}
+
 - (void) shareWithInspectorForDocument: (Document*)doc
 {
+	NSMenu *theMenu = [[NSMenu alloc] initWithTitle:@"People"];
+	
+	NSArray *array = [xmppRosterStorage sortedUsersByAvailabilityName];
+	NSUInteger i = 0;
+	for (id<XMPPUser> user in array)
+	{
+		NSMenuItem *item = [theMenu insertItemWithTitle: [[user jid] bare] action: @selector(shareWith:) keyEquivalent:@"" atIndex: i++];
+		[item setTarget: self];
+	}
+
+    [NSMenu popUpContextMenu:theMenu withEvent:[[NSApp mainWindow] currentEvent] forView:nil];
 }
 
 @end
