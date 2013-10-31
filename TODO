@@ -106,6 +106,8 @@ Future Work
   - Scan over every loaded ObjC class is ugly
 
   - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
+  
+  - Add serialization transformer support (this would mean to add -serializationTransformerName and -serializedType { return transformerName != nil ? transformer.type : type } to ETPropertyDescription). This would help to reduce code duplication and potential mistake in serialization accessors, and allow -roundTripValueForProperty: to be usable in tests even if serialization accessors are used. As a result, serialization accessor use would be restricted to just 3 or 5 special cases in EtoileUI.
 
 
 - COObject
