@@ -321,8 +321,6 @@
 		6627EE9612777D6300E06946 /* SharingClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingClient.h; sourceTree = "<group>"; };
 		6627EE9712777D6300E06946 /* SharingClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingClient.m; sourceTree = "<group>"; };
 		6627EEDC1278A55A00E06946 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
-		6627EF511278EE8400E06946 /* SharingController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingController.h; sourceTree = "<group>"; };
-		6627EF521278EE8400E06946 /* SharingController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingController.m; sourceTree = "<group>"; };
 		6638C025181852FD008341E6 /* ProjectNav.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProjectNav.xib; sourceTree = "<group>"; };
 		664697DD17CFF76200A1B767 /* ProjectDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProjectDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		664697DF17CFF7FC00A1B767 /* CoreObject.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CoreObject.xcodeproj; path = ../../CoreObject.xcodeproj; sourceTree = "<group>"; };
@@ -364,14 +362,10 @@
 		6686BEE712593D800065DE1A /* Project.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Project.m; sourceTree = "<group>"; };
 		6686BEE912593D900065DE1A /* Document.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Document.h; sourceTree = "<group>"; };
 		6686BEEA12593D900065DE1A /* Document.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Document.m; sourceTree = "<group>"; };
-		6686BFDD125AE7730065DE1A /* CONetworkPeer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CONetworkPeer.m; sourceTree = "<group>"; };
-		6686BFE0125AE7730065DE1A /* CONetworkPeer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CONetworkPeer.h; sourceTree = "<group>"; };
 		6686BFE2125AEF550065DE1A /* NOTES-Networking */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "NOTES-Networking"; sourceTree = "<group>"; };
 		6686BFF4125CF0200065DE1A /* ChatWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatWindow.xib; sourceTree = "<group>"; };
 		6686BFF8125CF1B90065DE1A /* ChatWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatWindowController.h; sourceTree = "<group>"; };
 		6686BFF9125CF1B90065DE1A /* ChatWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatWindowController.m; sourceTree = "<group>"; };
-		6686C126125D7F140065DE1A /* NetworkController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkController.h; sourceTree = "<group>"; };
-		6686C127125D7F140065DE1A /* NetworkController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkController.m; sourceTree = "<group>"; };
 		6686C340125EC5070065DE1A /* ProjectDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectDocument.h; sourceTree = "<group>"; };
 		6686C341125EC5070065DE1A /* ProjectDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectDocument.m; sourceTree = "<group>"; };
 		6698320312691F970011C7FC /* SCRATCHPAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SCRATCHPAD; sourceTree = "<group>"; };
@@ -901,26 +895,12 @@
 				661210DA18217451003AEC29 /* AccountWindowController.m */,
 				661210EC18217818003AEC29 /* XMPPController.h */,
 				661210ED18217818003AEC29 /* XMPPController.m */,
-				6627EF511278EE8400E06946 /* SharingController.h */,
-				6627EF521278EE8400E06946 /* SharingController.m */,
-				6686C126125D7F140065DE1A /* NetworkController.h */,
-				6686C127125D7F140065DE1A /* NetworkController.m */,
 				6627EE921277634200E06946 /* Client */,
 				6627EE911277625B00E06946 /* Server */,
 				6686BFF0125CEC380065DE1A /* Chat UI */,
-				6686BFEF125CEC300065DE1A /* Library */,
 				6686BFE2125AEF550065DE1A /* NOTES-Networking */,
 			);
 			name = Networking;
-			sourceTree = "<group>";
-		};
-		6686BFEF125CEC300065DE1A /* Library */ = {
-			isa = PBXGroup;
-			children = (
-				6686BFE0125AE7730065DE1A /* CONetworkPeer.h */,
-				6686BFDD125AE7730065DE1A /* CONetworkPeer.m */,
-			);
-			name = Library;
 			sourceTree = "<group>";
 		};
 		6686BFF0125CEC380065DE1A /* Chat UI */ = {

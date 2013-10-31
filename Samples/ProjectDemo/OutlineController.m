@@ -1,5 +1,4 @@
 #import "OutlineController.h"
-#import "SharingController.h"
 #import "ItemReference.h"
 #import "Document.h"
 #import "ApplicationDelegate.h"
@@ -126,9 +125,9 @@
 		NSString *title;
 		if (isSharing)
 		{
-			title = [NSString stringWithFormat: @"Shared Document %@ From %@",
-					 [doc documentName],
-					 [[NSClassFromString(@"SharingController") sharedSharingController] fullNameOfUserSharingDocument: doc]];
+//			title = [NSString stringWithFormat: @"Shared Document %@ From %@",
+//					 [doc documentName],
+//					 [[NSClassFromString(@"SharingController") sharedSharingController] fullNameOfUserSharingDocument: doc]];
 		}
 		else
 		{

@@ -1,11 +1,11 @@
 #import <Cocoa/Cocoa.h>
 #import "Project.h"
-#import "NetworkController.h"
 #import "CheckpointAsSheetController.h"
-#import "SharingController.h"
+#import "XMPPController.h"
 #import "ProjectNavWindowController.h"
 #import "OverlayShelf.h"
 #import "TagWindowController.h"
+#import "OutlineController.h"
 
 @interface ApplicationDelegate : NSObject
 {
@@ -13,8 +13,7 @@
 	IBOutlet NSWindow *networkWindow;
 	IBOutlet NSWindow *searchWindow;
 	
-	IBOutlet SharingController *sharingController;
-	IBOutlet NetworkController *networkController;
+	IBOutlet XMPPController *xmppController;
 	IBOutlet CheckpointAsSheetController *checkpointAsSheetController;
 	IBOutlet TagWindowController *tagWindowController;
 	

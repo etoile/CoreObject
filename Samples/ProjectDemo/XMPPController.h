@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import "XMPPFramework.h"
+#import "Document.h"
 
 @interface XMPPController : NSObject
 {
@@ -11,5 +12,6 @@
 + (XMPPController *) sharedInstance;
 
 - (void) reconnect;
+- (void) shareWithInspectorForDocument: (Document*)doc;
 
 @end

@@ -4,9 +4,15 @@ neat things we want:
  - revision control / checkpointing / branching / merging / selective undo
  - collaborative editing
 
-It uses my CoreObject rewrite as its persistence layer.
 
-The library is saved in ~/ProjectDemoStore
+Command line arguments example:
+
+-storeURL ~/anotherStore.coreobject
+-XMPPJID foo@bar.com
+-XMPPPassword password
+
+
+The library is saved in ~/ProjectDemo.coreobject by default
 
 What's working:
 

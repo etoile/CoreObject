@@ -10,9 +10,21 @@
 #import "Project.h"
 #import <CoreObject/CoreObject.h>
 
-#define STORE_URL [NSURL URLWithString: [@"~/ProjectDemoStore" stringByExpandingTildeInPath]]
-
 @implementation ApplicationDelegate
+
++ (void) initialize
+{
+	if (self == [ApplicationDelegate class])
+	{
+		[[NSUserDefaults standardUserDefaults] registerDefaults:
+		 @{ @"storeURL" : @"~/ProjectDemo.coreobject"}];
+	}
+}
+
+- (NSURL *) storeURL
+{
+	return [[NSUserDefaults standardUserDefaults] URLForKey: @"storeURL"];
+}
 
 - (void)globalForward: (id)sender
 {
@@ -81,7 +93,7 @@
 
 - (void)awakeFromNib
 {
-	context = [COEditingContext contextWithURL: STORE_URL];
+	context = [COEditingContext contextWithURL: [self storeURL]];
 	
 	// TODO: Use NSUserDefaults to remember open documents
 	//ETUUID *uuid = [[NSUserDefaults standardUserDefaults] UUIDForKey: @"projectDemoProjectUUID"];
@@ -315,7 +327,7 @@
 - (void) shareWithInspectorForDocument: (Document*)doc
 {
 	NSLog(@"Share %@", doc);
-	//[sharingController shareWithInspectorForDocument: doc];
+	[xmppController shareWithInspectorForDocument: doc];
 }
 
 - (void)showSearchResults: (id)sender

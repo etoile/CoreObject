@@ -314,7 +314,7 @@
 										<object class="NSTextView" id="1020043142">
 											<reference key="NSNextResponder" ref="379660971"/>
 											<int key="NSvFlags">2322</int>
-											<string key="NSFrameSize">{480, 270}</string>
+											<string key="NSFrameSize">{465, 270}</string>
 											<reference key="NSSuperview" ref="379660971"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="413431993">
 												<object class="NSLayoutManager" key="NSLayoutManager">
@@ -331,7 +331,7 @@
 													<nil key="NSDelegate"/>
 												</object>
 												<reference key="NSTextView" ref="1020043142"/>
-												<double key="NSWidth">480</double>
+												<double key="NSWidth">465</double>
 												<int key="NSTCFlags">1</int>
 											</object>
 											<object class="NSTextViewSharedData" key="NSSharedData">
@@ -383,7 +383,7 @@
 											<nil key="NSDelegate"/>
 										</object>
 									</array>
-									<string key="NSFrame">{{1, 1}, {480, 270}}</string>
+									<string key="NSFrame">{{1, 1}, {465, 270}}</string>
 									<reference key="NSSuperview" ref="24334463"/>
 									<reference key="NSNextKeyView" ref="1020043142"/>
 									<reference key="NSDocView" ref="1020043142"/>
@@ -412,7 +412,7 @@
 								<object class="NSScroller" id="1022588078">
 									<reference key="NSNextResponder" ref="24334463"/>
 									<int key="NSvFlags">256</int>
-									<string key="NSFrame">{{465, 1}, {16, 270}}</string>
+									<string key="NSFrame">{{466, 1}, {15, 270}}</string>
 									<reference key="NSSuperview" ref="24334463"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<reference key="NSTarget" ref="24334463"/>
