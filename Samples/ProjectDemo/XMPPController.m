@@ -4,6 +4,7 @@
 #import "DDLog.h"
 #import "DDTTYLogger.h"
 #import "Document.h"
+#import "ApplicationDelegate.h"
 
 @implementation XMPPController
 
@@ -98,16 +99,111 @@
 	NSArray *array = [sender sortedUsersByAvailabilityName];
 	
 	NSLog(@"Roster: %@", array);
+}
+
+- (NSString *) serializePropertyList: (id)plist
+{
+	NSData *data = [NSJSONSerialization dataWithJSONObject: plist options: 0 error: NULL];
+	return [data base64String];
+}
+
+- (id) deserializePropertyList: (NSString *)base64String
+{
+	NSData *data = [base64String base64DecodedData];
+	return [NSJSONSerialization JSONObjectWithData: data options:0 error: NULL];
+}
+
+- (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
+{
+	if ([[message attributeStringValueForName: @"type"] isEqualToString: @"coreobject"])
+	{
+		NSXMLElement *body = (NSXMLElement *)[message childAtIndex: 0];
+		
+		NSString *coreObjectMessageName = [body name];
+		
+		if ([coreObjectMessageName isEqualToString: @"sharing-invitation"])
+		{
+			ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [body attributeStringValueForName: @"uuid"]];
+			
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText: [NSString stringWithFormat: @"%@ is offering to share a document %@ with you", [[message from] bare], persistentRootUUID]];
+			[alert addButtonWithTitle:@"Accept"];
+			[alert addButtonWithTitle:@"Cancel"];
+			
+			if (NSAlertFirstButtonReturn == [alert runModal])
+			{
+				COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
+				id request = [client updateRequestForPersistentRoot: persistentRootUUID
+														   serverID: [[message from] full]
+															  store: [(ApplicationDelegate *)[NSApp delegate] store]];
+			
+				
+				NSXMLElement *body = [NSXMLElement elementWithName:@"pull-request"];
+				[body setObjectValue: [self serializePropertyList: request]];
+				
+				NSXMLElement *responseMessage = [NSXMLElement elementWithName:@"message"];
+				[responseMessage addAttributeWithName:@"type" stringValue:@"coreobject"];
+				[responseMessage addAttributeWithName:@"to" stringValue:[[message from] full]];
+				[responseMessage addChild:body];
+				
+				[xmppStream sendElement:responseMessage];
+			}
+		}
+		else if ([coreObjectMessageName isEqualToString: @"pull-request"])
+		{
+			id request = [self deserializePropertyList: [body objectValue]];
+			
+			NSLog(@"Got staring invitation response: %@", request);
+			
+			COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
+			id response = [server handleUpdateRequest: request store: [(ApplicationDelegate *)[NSApp delegate] store]];
+			
+			NSXMLElement *body = [NSXMLElement elementWithName:@"pull-request-response"];
+			[body setObjectValue: [self serializePropertyList: response]];
+			
+			NSXMLElement *responseMessage = [NSXMLElement elementWithName:@"message"];
+			[responseMessage addAttributeWithName:@"type" stringValue:@"coreobject"];
+			[responseMessage addAttributeWithName:@"to" stringValue:[[message from] full]];
+			[responseMessage addChild:body];
+			
+			[xmppStream sendElement:responseMessage];
+		}
+		else if ([coreObjectMessageName isEqualToString: @"pull-request-response"])
+		{
+			id response = [self deserializePropertyList: [body objectValue]];
+			
+			NSLog(@"Got pull-request-response %@", response);
+			
+			COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
+			[client handleUpdateResponse: response store: [(ApplicationDelegate *)[NSApp delegate] store]];
+			
+			ETUUID *persistentRootUUID = [ETUUID UUIDWithString: response[@"persistentRoot"]];
+			
+			COEditingContext *ctx = [(ApplicationDelegate *)[NSApp delegate] editingContext];
+			COPersistentRoot *newPersistentRoot = [ctx persistentRootForUUID: persistentRootUUID];
+			COObject *rootObject = [newPersistentRoot rootObject];
+			
+			[(ApplicationDelegate *)[NSApp delegate] registerDocumentRootObject: rootObject];
+		}
+	}
+	else
+	{
+		NSLog(@"Ignoring non-Coreobject message %@", message);
+	}
+}
+
+- (void) shareWith: (id)sender
+{
+	id<XMPPUser> user = [sender representedObject];
 	
-	// Send a message to the first user
+	ETUUID *persistentRootUUID = [[currentDocument persistentRoot] UUID];
+
+	NSLog(@"Share %@ with %@", persistentRootUUID, user);
+		
+	XMPPJID *jid = [user jid];
 	
-	if ([array count] == 0)
-		return;
-	
-	XMPPJID *jid = [(id<XMPPUser>)[array firstObject] jid];
-	
-	NSXMLElement *body = [NSXMLElement elementWithName:@"object"];
-	[body setStringValue: [NSString stringWithFormat:@"hello world %@!", [jid full]]];
+	NSXMLElement *body = [NSXMLElement elementWithName:@"sharing-invitation"];
+	[body addAttributeWithName:@"uuid" stringValue: [persistentRootUUID stringValue]];
 	
 	NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
 	[message addAttributeWithName:@"type" stringValue:@"coreobject"];
@@ -117,31 +213,15 @@
 	[xmppStream sendElement:message];
 }
 
-- (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
-{
-	NSLog(@"Got message: %@", message);
-	
-	NSAlert *alert = [[NSAlert alloc] init];
-	[alert setMessageText: [NSString stringWithFormat: @"%@ is offering to share a document with you", [[message from] bare]]];
-	[alert addButtonWithTitle:@"Accept"];
-	[alert addButtonWithTitle:@"Cancel"];
-	[alert runModal];
-}
-
-- (void) shareWith: (id)sender
-{
-	NSLog(@"Share with %@", sender);
-}
-
 - (void) shareWithInspectorForDocument: (Document*)doc
 {
-	NSMenu *theMenu = [[NSMenu alloc] initWithTitle:@"People"];
+	currentDocument = doc;
 	
-	NSArray *array = [xmppRosterStorage sortedUsersByAvailabilityName];
-	NSUInteger i = 0;
-	for (id<XMPPUser> user in array)
+	NSMenu *theMenu = [[NSMenu alloc] initWithTitle:@"People"];
+	for (id<XMPPUser> user in [xmppRosterStorage sortedUsersByAvailabilityName])
 	{
-		NSMenuItem *item = [theMenu insertItemWithTitle: [[user jid] bare] action: @selector(shareWith:) keyEquivalent:@"" atIndex: i++];
+		NSMenuItem *item = [theMenu addItemWithTitle: [[user jid] bare] action: @selector(shareWith:) keyEquivalent:@""];
+		[item setRepresentedObject: user];
 		[item setTarget: self];
 	}
 

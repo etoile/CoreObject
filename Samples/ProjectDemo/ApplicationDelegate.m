@@ -136,6 +136,10 @@
 {
 	return context;
 }
+- (COSQLiteStore *) store
+{
+	return [context store];
+}
 
 - (void) newDocumentWithType: (NSString*)type rootObjectEntity: (NSString*)rootObjEntity
 {
@@ -153,11 +157,16 @@
 	[document setDocumentName: [NSString stringWithFormat: @"Document %@", [[persistentRoot UUID] stringValue]]];
 	[document setDocumentType: type];
 	
+	[self registerDocumentRootObject: document];
+}
+
+- (void) registerDocumentRootObject: (Document *)aDoc
+{
 	// FIXME: Total hack
 	Project *proj = [[self projects] anyObject];
-	[proj addDocument_hack: document];
+	[proj addDocument_hack: aDoc];
 	
-	NSLog(@"Added a document model object %@, outline item %@", document, rootObj);
+	NSLog(@"Added a document model object %@", aDoc);
 	
 	[context commit];
 	
@@ -165,6 +174,7 @@
     
     // FIXME: Hack
     [self projectDocumentsDidChange: proj];
+
 }
 
 - (IBAction) newTextDocument: (id)sender

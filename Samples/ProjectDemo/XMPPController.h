@@ -8,7 +8,6 @@
 	XMPPRosterMemoryStorage *xmppRosterStorage;
 	XMPPRoster *xmppRoster;
 	
-	NSArray *currentRoster;
 	Document *currentDocument;
 }
 

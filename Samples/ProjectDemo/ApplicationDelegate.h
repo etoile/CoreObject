@@ -25,6 +25,7 @@
 }
 
 - (COEditingContext*)editingContext;
+- (COSQLiteStore *) store;
 
 - (IBAction) newTextDocument: (id)sender;
 - (IBAction) newOutline: (id)sender;
@@ -48,5 +49,7 @@
 
 - (NSWindowController*) keyDocumentController;
 - (Document *)keyDocument;
+
+- (void) registerDocumentRootObject: (Document *)aDoc;
 
 @end
