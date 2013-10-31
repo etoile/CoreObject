@@ -50,6 +50,10 @@ Future Work
   - GC: only collect divergent revisions older than X days
   
   - Switch from FMDB to an SQL abstraction backend
+  
+  - Keep a hash of the revision contents for integrity checking. For this to work
+    we need to guarantee that the binary serialization of a COItem is the same
+	every time. i.e. sort anything that's unordered in a stable way.
 
 
 - COEditingContext
