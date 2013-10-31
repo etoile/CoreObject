@@ -1292,7 +1292,7 @@
 				INFOPLIST_FILE = "ProjectDemo-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/ericwa/dev/etoile/trunk/Etoile/Frameworks/CoreObject/Samples/ProjectDemo/XMPPFramework/Vendor/libidn,
+					"$(PROJECT_DIR)/XMPPFramework/Vendor/libidn",
 				);
 				PRODUCT_NAME = ProjectDemo;
 				SDKROOT = macosx;
@@ -1311,7 +1311,7 @@
 				INFOPLIST_FILE = "ProjectDemo-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/ericwa/dev/etoile/trunk/Etoile/Frameworks/CoreObject/Samples/ProjectDemo/XMPPFramework/Vendor/libidn,
+					"$(PROJECT_DIR)/XMPPFramework/Vendor/libidn",
 				);
 				PRODUCT_NAME = ProjectDemo;
 				SDKROOT = macosx;
