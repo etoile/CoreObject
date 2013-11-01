@@ -6,6 +6,8 @@
 #import "Document.h"
 #import "ApplicationDelegate.h"
 
+#import <CoreObject/CoreObject.h>
+
 @implementation XMPPController
 
 + (XMPPController *) sharedInstance
@@ -104,13 +106,28 @@
 - (NSString *) serializePropertyList: (id)plist
 {
 	NSData *data = [NSJSONSerialization dataWithJSONObject: plist options: 0 error: NULL];
-	return [data base64String];
+	return [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
 }
 
 - (id) deserializePropertyList: (NSString *)base64String
 {
-	NSData *data = [base64String base64DecodedData];
+	NSData *data = [base64String dataUsingEncoding: NSUTF8StringEncoding];
 	return [NSJSONSerialization JSONObjectWithData: data options:0 error: NULL];
+}
+
+- (void) sendCoreobjectMessageType: (NSString *)aType
+								to: (XMPPJID *)aJID
+		   withPayloadPropertyList: (id)aPlist
+{
+	NSXMLElement *body = [NSXMLElement elementWithName: aType];
+	[body setObjectValue: [self serializePropertyList: aPlist]];
+	
+	NSXMLElement *responseMessage = [NSXMLElement elementWithName:@"message"];
+	[responseMessage addAttributeWithName:@"type" stringValue:@"coreobject"];
+	[responseMessage addAttributeWithName:@"to" stringValue:[aJID full]];
+	[responseMessage addChild:body];
+	
+	[xmppStream sendElement:responseMessage];
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
@@ -137,16 +154,7 @@
 														   serverID: [[message from] full]
 															  store: [(ApplicationDelegate *)[NSApp delegate] store]];
 			
-				
-				NSXMLElement *body = [NSXMLElement elementWithName:@"pull-request"];
-				[body setObjectValue: [self serializePropertyList: request]];
-				
-				NSXMLElement *responseMessage = [NSXMLElement elementWithName:@"message"];
-				[responseMessage addAttributeWithName:@"type" stringValue:@"coreobject"];
-				[responseMessage addAttributeWithName:@"to" stringValue:[[message from] full]];
-				[responseMessage addChild:body];
-				
-				[xmppStream sendElement:responseMessage];
+				[self sendCoreobjectMessageType: @"pull-request" to:[message from] withPayloadPropertyList:request];
 			}
 		}
 		else if ([coreObjectMessageName isEqualToString: @"pull-request"])
@@ -158,15 +166,7 @@
 			COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
 			id response = [server handleUpdateRequest: request store: [(ApplicationDelegate *)[NSApp delegate] store]];
 			
-			NSXMLElement *body = [NSXMLElement elementWithName:@"pull-request-response"];
-			[body setObjectValue: [self serializePropertyList: response]];
-			
-			NSXMLElement *responseMessage = [NSXMLElement elementWithName:@"message"];
-			[responseMessage addAttributeWithName:@"type" stringValue:@"coreobject"];
-			[responseMessage addAttributeWithName:@"to" stringValue:[[message from] full]];
-			[responseMessage addChild:body];
-			
-			[xmppStream sendElement:responseMessage];
+			[self sendCoreobjectMessageType:@"pull-request-response" to:[message from] withPayloadPropertyList:response];
 		}
 		else if ([coreObjectMessageName isEqualToString: @"pull-request-response"])
 		{
@@ -181,7 +181,7 @@
 			
 			COEditingContext *ctx = [(ApplicationDelegate *)[NSApp delegate] editingContext];
 			COPersistentRoot *newPersistentRoot = [ctx persistentRootForUUID: persistentRootUUID];
-			COObject *rootObject = [newPersistentRoot rootObject];
+			Document *rootObject = [newPersistentRoot rootObject];
 			
 			[(ApplicationDelegate *)[NSApp delegate] registerDocumentRootObject: rootObject];
 		}
@@ -227,5 +227,56 @@
 
     [NSMenu popUpContextMenu:theMenu withEvent:[[NSApp mainWindow] currentEvent] forView:nil];
 }
+
+#if 0
++ (void) pullFrom: (COPersistentRoot *)source into: (COPersistentRoot *)dest
+{
+
+    // Now merge "origin/master" into "master"
+    
+    COPersistentRootInfo *info = [[dest store] persistentRootInfoForUUID: [dest UUID]];
+    
+    ETUUID *uuid = [[[info branchInfosWithMetadataValue: [[[source currentBranch] UUID] stringValue]
+                                                 forKey: @"replcatedBranch"] firstObject] UUID];
+    
+    COBranch *master = [dest currentBranch];
+    COBranch *originMaster = [dest branchForUUID: uuid];
+    assert(master != nil);
+    assert([info branchInfoForUUID: uuid] != nil);
+    assert(originMaster != nil);
+    assert(![master isEqual: originMaster]);
+    
+    // FF merge?
+    
+    if ([COLeastCommonAncestor isRevision: [[master currentRevision] UUID]
+                equalToOrParentOfRevision: [[originMaster currentRevision] UUID]
+						   persistentRoot: [dest UUID]
+                                    store: [dest store]])
+    {
+        [master setCurrentRevision: [originMaster currentRevision]];
+        [dest commit];
+    }
+    else
+    {
+        // Regular merge
+        
+        [master setMergingBranch: originMaster];
+        
+        COMergeInfo *mergeInfo = [master mergeInfoForMergingBranch: originMaster];
+        if([mergeInfo.diff hasConflicts])
+        {
+            NSLog(@"Attempting to auto-resolve conflicts favouring the other user...");
+            [mergeInfo.diff resolveConflictsFavoringSourceIdentifier: @"merged"]; // FIXME: Hardcoded
+        }
+        
+        [mergeInfo.diff applyTo: [master objectGraphContext]];
+        
+        // HACK: should be a regular -commit, I guess, but there's a bug where
+        // -commit uses the last used undo track, instead of none. So explicitly pass nil,
+        // so this commit doesn't record an undo command.
+        [[dest editingContext] commitWithUndoTrack: nil];
+    }
+}
+#endif
 
 @end
