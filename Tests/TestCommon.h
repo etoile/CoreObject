@@ -74,7 +74,14 @@ extern NSString * const kCOParent;
 	   withUserInfo: (NSDictionary *)expectedUserInfo;
 
 - (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch;
+
+- (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch
+									  store: (COSQLiteStore *)aStore;
+
 - (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot;
+
+- (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot
+											  store: (COSQLiteStore *)aStore;
 
 @end
 

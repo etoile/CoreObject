@@ -119,8 +119,14 @@ NSString * const kCOParent = @"parentContainer";
 
 - (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch
 {
-	ETUUID *persistentRoot = [store persistentRootUUIDForBranchUUID: aBranch];
-	COPersistentRootInfo *info = [store persistentRootInfoForUUID: persistentRoot];
+	return [self currentItemGraphForBranch: aBranch store: store];
+}
+
+- (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch
+									  store: (COSQLiteStore *)aStore
+{
+	ETUUID *persistentRoot = [aStore persistentRootUUIDForBranchUUID: aBranch];
+	COPersistentRootInfo *info = [aStore persistentRootInfoForUUID: persistentRoot];
 	COBranchInfo *branchInfo = [info branchInfoForUUID: aBranch];
 	
 	return [store itemGraphForRevisionUUID: branchInfo.currentRevisionUUID
@@ -129,9 +135,15 @@ NSString * const kCOParent = @"parentContainer";
 
 - (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot
 {
-	COPersistentRootInfo *info = [store persistentRootInfoForUUID: aPersistentRoot];
+	return [self currentItemGraphForPersistentRoot: aPersistentRoot store: store];
+}
+
+- (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot
+											  store: (COSQLiteStore *)aStore
+{
+	COPersistentRootInfo *info = [aStore persistentRootInfoForUUID: aPersistentRoot];
 	
-	return [store itemGraphForRevisionUUID: info.currentRevisionUUID
+	return [aStore itemGraphForRevisionUUID: info.currentRevisionUUID
 							persistentRoot: aPersistentRoot];
 }
 

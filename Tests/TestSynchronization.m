@@ -288,5 +288,82 @@ static ETUUID *branchBUUID;
     // Ideally it shares the same backing store as the original persistent root. But that's not going to be easy to do.
 }
 
+- (void)testPullInBothDirections
+{
+    COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
+    COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
+    
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    COPersistentRootInfo *serverInfo = [txn createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
+																				UUID: persistentRootUUID
+																		  branchUUID: branchAUUID
+																	revisionMetadata: nil];
+	serverChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: persistentRootUUID];
+    UKTrue([serverStore commitStoreTransaction: txn]);
+	
+    // Pull from server to client
+	
+    id request = [client updateRequestForPersistentRoot: persistentRootUUID
+                                               serverID: @"server"
+                                                  store: store];
+    id response = [server handleUpdateRequest: request store: serverStore];
+    [client handleUpdateResponse: response store: store];
+	
+	   
+    // Client writes a commit.
+    
+	COPersistentRootInfo *clientInfo = [store persistentRootInfoForUUID: persistentRootUUID];
+    UKNotNil(clientInfo);
+	UKIntsEqual(2, [[clientInfo branches] count]);
+	
+    txn = [[COStoreTransaction alloc] init];
+    ETUUID *clientCommit2 = [ETUUID UUID];
+	
+	[txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"2"]
+						   revisionUUID: clientCommit2
+							   metadata: nil
+					   parentRevisionID: [serverInfo currentRevisionUUID]
+				  mergeParentRevisionID: nil
+					 persistentRootUUID: persistentRootUUID
+							 branchUUID: branchAUUID];
+	
+    [txn setCurrentRevision: clientCommit2
+			   headRevision: nil
+				  forBranch: branchAUUID
+		   ofPersistentRoot: persistentRootUUID];
+	
+	[txn setOldTransactionID: clientInfo.transactionID forPersistentRoot: persistentRootUUID];
+	
+    UKTrue([store commitStoreTransaction: txn]);
+    
+    // Pull from client to server
+    
+    id request2 = [client updateRequestForPersistentRoot: persistentRootUUID
+												serverID: @"client"
+												   store: serverStore];
+    id response2 = [server handleUpdateRequest: request2 store: store];
+    [client handleUpdateResponse: response2 store: serverStore];
+    
+    // Commit has been replicated to the server
+    
+    serverInfo = [serverStore persistentRootInfoForUUID: persistentRootUUID];
+    UKNotNil(serverInfo);
+    
+    UKIntsEqual(2, [[serverInfo branches] count]);
+	
+    COBranchInfo *currentBranch = [serverInfo currentBranchInfo];
+    
+    COBranchInfo *replicatedBranchA = [[serverInfo branchInfosWithMetadataValue: [branchAUUID stringValue]
+                                                                         forKey: @"replcatedBranch"] firstObject];
+    
+    UKTrue([[[replicatedBranchA metadata] objectForKey: @"source"] isEqual: @"client"]);
+    
+    // The replicated branch should have been update, but the other branch should not have
+    
+    UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: [currentBranch UUID] store: serverStore]);
+    UKObjectsEqual([self itemGraphWithLabel: @"2"], [self currentItemGraphForBranch: [replicatedBranchA UUID] store: serverStore]);
+}
+
+
 @end
 
