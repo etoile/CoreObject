@@ -14,9 +14,18 @@
 @interface SharingSession : NSObject
 {
 	COPersistentRoot *_persistentRoot;
+	
+	COBranch *_masterBranch;
+	/**
+	 * Only non-nil for the client
+	 */
+	COBranch *_originMasterBranch;
+	
 	XMPPJID *_peerJID;
 	XMPPStream *_xmppStream;
 	BOOL _isServer;
+	
+	ETUUID *_lastRevisionUUID;
 }
 
 - (id)initWithPersistentRoot: (COPersistentRoot *)persistentRoot

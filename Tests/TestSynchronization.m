@@ -364,6 +364,56 @@ static ETUUID *branchBUUID;
     UKObjectsEqual([self itemGraphWithLabel: @"2"], [self currentItemGraphForBranch: [replicatedBranchA UUID] store: serverStore]);
 }
 
+- (void)testPullInBothDirectionsWithEditingContextAPI
+{
+    COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
+    COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
+
+	COEditingContext *serverCtx = [[COEditingContext alloc] initWithStore: serverStore];
+	COPersistentRoot *serverPersistentRoot = [serverCtx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	
+	ETUUID *uuid = nil;
+	uuid = [serverPersistentRoot UUID];
+	[[serverPersistentRoot rootObject] setLabel: @"v1"];
+	UKTrue([serverCtx commit]);
+
+    // Pull from server to client
+	
+    id request = [client updateRequestForPersistentRoot: uuid
+                                               serverID: @"server"
+                                                  store: store];
+    id response = [server handleUpdateRequest: request store: serverStore];
+    [client handleUpdateResponse: response store: store];
+	
+    // Client writes a commit.
+    
+	[self wait];
+	
+	{
+		COPersistentRoot *clientPersistentRoot = [ctx persistentRootForUUID: uuid];
+		UKNotNil(clientPersistentRoot);
+		UKObjectsEqual(@"v1", [[clientPersistentRoot rootObject] label]);
+		[[clientPersistentRoot rootObject] setLabel: @"v2"];
+		UKTrue([ctx commit]);
+	}
+	   
+    // Pull from client to server
+    
+    id request2 = [client updateRequestForPersistentRoot: uuid
+												serverID: @"client"
+												   store: serverStore];
+    id response2 = [server handleUpdateRequest: request2 store: store];
+    [client handleUpdateResponse: response2 store: serverStore];
+    
+    // Commit has been replicated to the server
+	
+    UKIntsEqual(1, [[serverPersistentRoot branches] count]);
+	
+	[self wait];
+		
+    UKIntsEqual(2, [[serverPersistentRoot branches] count]);
+}
+
 
 @end
 

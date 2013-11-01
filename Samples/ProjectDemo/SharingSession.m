@@ -17,7 +17,11 @@
 	_peerJID = peerJID;
 	_xmppStream = xmppStream;
 	_isServer = isServer;
-		
+	_lastRevisionUUID = [[persistentRoot currentRevision] UUID];
+	
+	[self setBranches];
+
+	
 	OutlineController *docController = [(ApplicationDelegate *)[NSApp delegate]
 										controllerForDocumentRootObject: [_persistentRoot rootObject]];
 	[docController setSharingSession: self];
@@ -37,8 +41,28 @@
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
+- (void) setBranches
+{
+	_masterBranch = [_persistentRoot currentBranch];
+	
+	for (COBranch *branch in [_persistentRoot branches])
+	{
+		if (branch.metadata[@"replcatedBranch"] != nil)
+		{
+			_originMasterBranch = branch;
+			break;
+		}
+	}
+}
+
 - (void) persistentRootDidChange: (NSNotification *)notif
 {
+	if ([[[_persistentRoot currentRevision] UUID] isEqual: _lastRevisionUUID])
+	{
+		NSLog(@"Ignoring persistentRootDidChange:");
+		return;
+	}
+	
 	NSLog(@"Shared Persistent root did change. Server? %d", (int)_isServer);
 	
 	[self askPeerToPullFromUs];
@@ -112,8 +136,13 @@
 			
 			COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
 			[client handleUpdateResponse: response store: [_persistentRoot store]];
-		
-			[self pullDidFinish];
+	
+			dispatch_async(dispatch_get_main_queue(), ^() {
+				NSLog(@"The store notification should have been posted");
+				[self pullDidFinish];
+			});
+			
+			//[self pullDidFinish];
 		}
 	}
 	else
@@ -131,52 +160,42 @@
 		NSLog(@"Branch: %@", branch);
 	}
 	
-	/*
+	[self setBranches];
+	
+	assert(_masterBranch != nil);
+	assert(_originMasterBranch != nil);
+	
 	// Now merge "origin/master" into "master"
-    
-    COPersistentRootInfo *info = [[_persistentRoot store] persistentRootInfoForUUID: [_persistentRoot UUID]];
-    
-    ETUUID *uuid = [[[info branchInfosWithMetadataValue: [[[source currentBranch] UUID] stringValue]
-                                                 forKey: @"replcatedBranch"] firstObject] UUID];
-    
-    COBranch *master = [dest currentBranch];
-    COBranch *originMaster = [dest branchForUUID: uuid];
-    assert(master != nil);
-    assert([info branchInfoForUUID: uuid] != nil);
-    assert(originMaster != nil);
-    assert(![master isEqual: originMaster]);
-    
+
     // FF merge?
     
-    if ([COLeastCommonAncestor isRevision: [[master currentRevision] UUID]
-                equalToOrParentOfRevision: [[originMaster currentRevision] UUID]
-						   persistentRoot: [dest UUID]
-                                    store: [dest store]])
+    if ([COLeastCommonAncestor isRevision: [[_masterBranch currentRevision] UUID]
+                equalToOrParentOfRevision: [[_originMasterBranch currentRevision] UUID]
+						   persistentRoot: [_persistentRoot UUID]
+                                    store: [_persistentRoot store]])
     {
-        [master setCurrentRevision: [originMaster currentRevision]];
-        [dest commit];
+        [_masterBranch setCurrentRevision: [_originMasterBranch currentRevision]];
+		_lastRevisionUUID = [[_originMasterBranch currentRevision] UUID];
+        [_persistentRoot commit];
     }
     else
     {
         // Regular merge
         
-        [master setMergingBranch: originMaster];
+        [_masterBranch setMergingBranch: _originMasterBranch];
         
-        COMergeInfo *mergeInfo = [master mergeInfoForMergingBranch: originMaster];
+        COMergeInfo *mergeInfo = [_masterBranch mergeInfoForMergingBranch: _originMasterBranch];
         if([mergeInfo.diff hasConflicts])
         {
             NSLog(@"Attempting to auto-resolve conflicts favouring the other user...");
             [mergeInfo.diff resolveConflictsFavoringSourceIdentifier: @"merged"]; // FIXME: Hardcoded
         }
         
-        [mergeInfo.diff applyTo: [master objectGraphContext]];
+        [mergeInfo.diff applyTo: [_masterBranch objectGraphContext]];
         
-        // HACK: should be a regular -commit, I guess, but there's a bug where
-        // -commit uses the last used undo track, instead of none. So explicitly pass nil,
-        // so this commit doesn't record an undo command.
-        [[dest editingContext] commitWithUndoTrack: nil];
+		_lastRevisionUUID = [[_masterBranch currentRevision] UUID];
+        [[_persistentRoot editingContext] commit];
     }
-	 */
 }
 
 @end
