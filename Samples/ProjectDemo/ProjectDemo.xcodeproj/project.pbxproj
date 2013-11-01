@@ -55,6 +55,7 @@
 		661212061821B3F6003AEC29 /* XMPPDateTimeProfiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 661212041821B3F6003AEC29 /* XMPPDateTimeProfiles.m */; };
 		6627ED9B12761EBC00E06946 /* CheckpointAsSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6627ED9A12761EBC00E06946 /* CheckpointAsSheetController.m */; };
 		6627EEDD1278A55A00E06946 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 6627EEDC1278A55A00E06946 /* README */; };
+		662C2B78182431EC00ED975F /* SharingSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 662C2B77182431EC00ED975F /* SharingSession.m */; };
 		6638C026181852FD008341E6 /* ProjectNav.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6638C025181852FD008341E6 /* ProjectNav.xib */; };
 		664697F417CFF82100A1B767 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664697EA17CFF7FD00A1B767 /* CoreObject.framework */; };
 		6646980617CFF8AA00A1B767 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664697FF17CFF8A200A1B767 /* EtoileFoundation.framework */; };
@@ -321,6 +322,8 @@
 		6627EE9612777D6300E06946 /* SharingClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingClient.h; sourceTree = "<group>"; };
 		6627EE9712777D6300E06946 /* SharingClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingClient.m; sourceTree = "<group>"; };
 		6627EEDC1278A55A00E06946 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		662C2B76182431EC00ED975F /* SharingSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingSession.h; sourceTree = "<group>"; };
+		662C2B77182431EC00ED975F /* SharingSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingSession.m; sourceTree = "<group>"; };
 		6638C025181852FD008341E6 /* ProjectNav.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProjectNav.xib; sourceTree = "<group>"; };
 		664697DD17CFF76200A1B767 /* ProjectDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProjectDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		664697DF17CFF7FC00A1B767 /* CoreObject.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CoreObject.xcodeproj; path = ../../CoreObject.xcodeproj; sourceTree = "<group>"; };
@@ -899,6 +902,8 @@
 				6627EE911277625B00E06946 /* Server */,
 				6686BFF0125CEC380065DE1A /* Chat UI */,
 				6686BFE2125AEF550065DE1A /* NOTES-Networking */,
+				662C2B76182431EC00ED975F /* SharingSession.h */,
+				662C2B77182431EC00ED975F /* SharingSession.m */,
 			);
 			name = Networking;
 			sourceTree = "<group>";
@@ -1177,6 +1182,7 @@
 				79911A4712CDAECD009D28C0 /* SKTCircle.m in Sources */,
 				6612118A1821A482003AEC29 /* DDASLLogger.m in Sources */,
 				661212061821B3F6003AEC29 /* XMPPDateTimeProfiles.m in Sources */,
+				662C2B78182431EC00ED975F /* SharingSession.m in Sources */,
 				661211DE1821A568003AEC29 /* XMPPPresence.m in Sources */,
 				667C6C7B181AF40400BDD213 /* EWBranchesWindowController.m in Sources */,
 				661211FA1821B216003AEC29 /* XMPPRoster.m in Sources */,

@@ -9,6 +9,8 @@
 	XMPPRoster *xmppRoster;
 	
 	Document *currentDocument;
+	
+	NSMutableDictionary *sharingSessionsByPersistentRootUUID;
 }
 
 + (XMPPController *) sharedInstance;

@@ -5,14 +5,15 @@
 
 @implementation OutlineController
 
-- (id)initWithDocument: (id)document isSharing: (BOOL)sharing;
+@synthesize sharingSession = _sharingSession;
+
+- (id)initWithDocument: (id)document
 {
 	self = [super initWithWindowNibName: @"OutlineWindow"];
 	
 	if (!self) { return nil; }
 	
 	doc = document; // weak ref
-	isSharing = sharing;
 	
 	assert([self rootObject] != nil);
 	
@@ -30,9 +31,9 @@
 	return self;
 }
 
-- (id)initWithDocument: (id)document
+- (BOOL) isSharing
 {
-	return [self initWithDocument:document isSharing: NO];
+	return _sharingSession != nil;
 }
 
 - (void)dealloc
@@ -123,7 +124,7 @@
 	if ([doc documentName])
 	{
 		NSString *title;
-		if (isSharing)
+		if ([self isSharing])
 		{
 //			title = [NSString stringWithFormat: @"Shared Document %@ From %@",
 //					 [doc documentName],
@@ -137,7 +138,7 @@
 	}
 	
 	// Disable the share button if it is a shared document
-	if (isSharing)
+	if ([self isSharing])
 	{
 		for (NSToolbarItem *item in [[[self window] toolbar] items])
 		{

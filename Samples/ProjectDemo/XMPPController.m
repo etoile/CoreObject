@@ -5,6 +5,7 @@
 #import "DDTTYLogger.h"
 #import "Document.h"
 #import "ApplicationDelegate.h"
+#import "SharingSession.h"
 
 #import <CoreObject/CoreObject.h>
 
@@ -27,6 +28,8 @@
 	sharedInstance = self;
 	
     if (self) {
+		sharingSessionsByPersistentRootUUID = [[NSMutableDictionary alloc] init];
+		
 		[DDLog addLogger:[DDTTYLogger sharedInstance]];
 		
 		xmppStream = [[XMPPStream alloc] init];
@@ -184,6 +187,12 @@
 			Document *rootObject = [newPersistentRoot rootObject];
 			
 			[(ApplicationDelegate *)[NSApp delegate] registerDocumentRootObject: rootObject];
+			
+			SharingSession *session = [[SharingSession alloc] initWithPersistentRoot: newPersistentRoot
+																			 peerJID: [message from]
+																		  xmppStream: xmppStream
+																			isServer: NO];
+			[sharingSessionsByPersistentRootUUID setObject: session forKey: persistentRootUUID];
 		}
 	}
 	else
@@ -211,6 +220,14 @@
 	[message addChild:body];
 	
 	[xmppStream sendElement:message];
+	
+	// Set up session object
+	
+	SharingSession *session = [[SharingSession alloc] initWithPersistentRoot: [currentDocument persistentRoot]
+																	 peerJID: jid
+																  xmppStream: xmppStream
+																	isServer: YES];
+	[sharingSessionsByPersistentRootUUID setObject: session forKey: persistentRootUUID];
 }
 
 - (void) shareWithInspectorForDocument: (Document*)doc
@@ -227,56 +244,5 @@
 
     [NSMenu popUpContextMenu:theMenu withEvent:[[NSApp mainWindow] currentEvent] forView:nil];
 }
-
-#if 0
-+ (void) pullFrom: (COPersistentRoot *)source into: (COPersistentRoot *)dest
-{
-
-    // Now merge "origin/master" into "master"
-    
-    COPersistentRootInfo *info = [[dest store] persistentRootInfoForUUID: [dest UUID]];
-    
-    ETUUID *uuid = [[[info branchInfosWithMetadataValue: [[[source currentBranch] UUID] stringValue]
-                                                 forKey: @"replcatedBranch"] firstObject] UUID];
-    
-    COBranch *master = [dest currentBranch];
-    COBranch *originMaster = [dest branchForUUID: uuid];
-    assert(master != nil);
-    assert([info branchInfoForUUID: uuid] != nil);
-    assert(originMaster != nil);
-    assert(![master isEqual: originMaster]);
-    
-    // FF merge?
-    
-    if ([COLeastCommonAncestor isRevision: [[master currentRevision] UUID]
-                equalToOrParentOfRevision: [[originMaster currentRevision] UUID]
-						   persistentRoot: [dest UUID]
-                                    store: [dest store]])
-    {
-        [master setCurrentRevision: [originMaster currentRevision]];
-        [dest commit];
-    }
-    else
-    {
-        // Regular merge
-        
-        [master setMergingBranch: originMaster];
-        
-        COMergeInfo *mergeInfo = [master mergeInfoForMergingBranch: originMaster];
-        if([mergeInfo.diff hasConflicts])
-        {
-            NSLog(@"Attempting to auto-resolve conflicts favouring the other user...");
-            [mergeInfo.diff resolveConflictsFavoringSourceIdentifier: @"merged"]; // FIXME: Hardcoded
-        }
-        
-        [mergeInfo.diff applyTo: [master objectGraphContext]];
-        
-        // HACK: should be a regular -commit, I guess, but there's a bug where
-        // -commit uses the last used undo track, instead of none. So explicitly pass nil,
-        // so this commit doesn't record an undo command.
-        [[dest editingContext] commitWithUndoTrack: nil];
-    }
-}
-#endif
 
 @end

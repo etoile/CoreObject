@@ -1,15 +1,18 @@
 #import <Cocoa/Cocoa.h>
 #import "OutlineItem.h"
 #import "Document.h"
+#import "SharingSession.h"
 
 @interface OutlineController : NSWindowController
 {
 	IBOutlet NSOutlineView *outlineView;
 	Document *doc; // weak ref
-	BOOL isSharing;
+
+	SharingSession * __weak _sharingSession;
 }
 
-- (id)initWithDocument: (id)document isSharing: (BOOL)sharing;
+@property (nonatomic, readwrite, weak) SharingSession *sharingSession;
+
 - (id)initWithDocument: (id)document;
 
 - (Document*)projectDocument;
