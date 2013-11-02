@@ -754,7 +754,7 @@
 				6686BDC712592C1B0065DE1A /* Utilities */,
 				6646977017CE789700A1B767 /* Synchronization */,
 				6686BDB212592C1B0065DE1A /* Supporting Files */,
-				60C913AC165BBE7500E0C5F4 /* Examples */,
+				60C913AC165BBE7500E0C5F4 /* Samples */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
@@ -786,12 +786,12 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		60C913AC165BBE7500E0C5F4 /* Examples */ = {
+		60C913AC165BBE7500E0C5F4 /* Samples */ = {
 			isa = PBXGroup;
 			children = (
 				60C913C9165BD51800E0C5F4 /* BasicPersistence */,
 			);
-			name = Examples;
+			name = Samples;
 			sourceTree = "<group>";
 		};
 		60C913C9165BD51800E0C5F4 /* BasicPersistence */ = {

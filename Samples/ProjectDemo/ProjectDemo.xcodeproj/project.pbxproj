@@ -80,7 +80,6 @@
 		6686B816125513E80065DE1A /* TextDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6686B7CB12550C2A0065DE1A /* TextDocument.xib */; };
 		6686BEE812593D800065DE1A /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BEE712593D800065DE1A /* Project.m */; };
 		6686BEEB12593D900065DE1A /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BEEA12593D900065DE1A /* Document.m */; };
-		6686BFF5125CF0200065DE1A /* ChatWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6686BFF4125CF0200065DE1A /* ChatWindow.xib */; };
 		6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686C341125EC5070065DE1A /* ProjectDocument.m */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
@@ -93,7 +92,6 @@
 		66DBB3831813B1BB0047301A /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66DBB3821813B1BB0047301A /* Preferences.xib */; };
 		7991190512CD3D75009D28C0 /* ProjectNavWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7991190412CD3D75009D28C0 /* ProjectNavWindowController.m */; };
 		7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7991191412CD3F3C009D28C0 /* 2560x1600.jpg */; };
-		7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */ = {isa = PBXBuildFile; fileRef = 7991198512CD4B1A009D28C0 /* OverlayShelf.m */; };
 		7991198A12CD4B72009D28C0 /* stamp.png in Resources */ = {isa = PBXBuildFile; fileRef = 7991198912CD4B72009D28C0 /* stamp.png */; };
 		79911A0912CD974A009D28C0 /* Application.m in Sources */ = {isa = PBXBuildFile; fileRef = 79911A0812CD974A009D28C0 /* Application.m */; };
 		79911A4712CDAECD009D28C0 /* SKTCircle.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33DF01290BC7700E5B15B /* SKTCircle.m */; };
@@ -145,13 +143,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 60C913B3165BBED000E0C5F4;
 			remoteInfo = BasicPersistence;
-		};
-		664697EF17CFF7FD00A1B767 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 664697DF17CFF7FC00A1B767 /* CoreObject.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 66C3669A17B426BF009ACF2F;
-			remoteInfo = Typewriter;
 		};
 		664697F117CFF80D00A1B767 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -318,12 +309,6 @@
 		661212041821B3F6003AEC29 /* XMPPDateTimeProfiles.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMPPDateTimeProfiles.m; sourceTree = "<group>"; };
 		6627ED9912761EBC00E06946 /* CheckpointAsSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CheckpointAsSheetController.h; sourceTree = "<group>"; };
 		6627ED9A12761EBC00E06946 /* CheckpointAsSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CheckpointAsSheetController.m; sourceTree = "<group>"; };
-		6627EDF812762B8C00E06946 /* SharingServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingServer.h; sourceTree = "<group>"; };
-		6627EDF912762B8C00E06946 /* SharingServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingServer.m; sourceTree = "<group>"; };
-		6627EE341276317A00E06946 /* SharingServerPeer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingServerPeer.h; sourceTree = "<group>"; };
-		6627EE351276317A00E06946 /* SharingServerPeer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingServerPeer.m; sourceTree = "<group>"; };
-		6627EE9612777D6300E06946 /* SharingClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingClient.h; sourceTree = "<group>"; };
-		6627EE9712777D6300E06946 /* SharingClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingClient.m; sourceTree = "<group>"; };
 		6627EEDC1278A55A00E06946 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		662C2B76182431EC00ED975F /* SharingSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingSession.h; sourceTree = "<group>"; };
 		662C2B77182431EC00ED975F /* SharingSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingSession.m; sourceTree = "<group>"; };
@@ -368,10 +353,6 @@
 		6686BEE712593D800065DE1A /* Project.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Project.m; sourceTree = "<group>"; };
 		6686BEE912593D900065DE1A /* Document.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Document.h; sourceTree = "<group>"; };
 		6686BEEA12593D900065DE1A /* Document.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Document.m; sourceTree = "<group>"; };
-		6686BFE2125AEF550065DE1A /* NOTES-Networking */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "NOTES-Networking"; sourceTree = "<group>"; };
-		6686BFF4125CF0200065DE1A /* ChatWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatWindow.xib; sourceTree = "<group>"; };
-		6686BFF8125CF1B90065DE1A /* ChatWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatWindowController.h; sourceTree = "<group>"; };
-		6686BFF9125CF1B90065DE1A /* ChatWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatWindowController.m; sourceTree = "<group>"; };
 		6686C340125EC5070065DE1A /* ProjectDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectDocument.h; sourceTree = "<group>"; };
 		6686C341125EC5070065DE1A /* ProjectDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectDocument.m; sourceTree = "<group>"; };
 		6698320312691F970011C7FC /* SCRATCHPAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SCRATCHPAD; sourceTree = "<group>"; };
@@ -412,8 +393,6 @@
 		7991190312CD3D75009D28C0 /* ProjectNavWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectNavWindowController.h; sourceTree = "<group>"; };
 		7991190412CD3D75009D28C0 /* ProjectNavWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectNavWindowController.m; sourceTree = "<group>"; };
 		7991191412CD3F3C009D28C0 /* 2560x1600.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = 2560x1600.jpg; path = Images/2560x1600.jpg; sourceTree = "<group>"; };
-		7991198412CD4B1A009D28C0 /* OverlayShelf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OverlayShelf.h; sourceTree = "<group>"; };
-		7991198512CD4B1A009D28C0 /* OverlayShelf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OverlayShelf.m; sourceTree = "<group>"; };
 		7991198912CD4B72009D28C0 /* stamp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stamp.png; sourceTree = "<group>"; };
 		79911A0712CD974A009D28C0 /* Application.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Application.h; sourceTree = "<group>"; };
 		79911A0812CD974A009D28C0 /* Application.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Application.m; sourceTree = "<group>"; };
@@ -725,26 +704,6 @@
 			path = "XEP-0082";
 			sourceTree = "<group>";
 		};
-		6627EE911277625B00E06946 /* Server */ = {
-			isa = PBXGroup;
-			children = (
-				6627EDF812762B8C00E06946 /* SharingServer.h */,
-				6627EDF912762B8C00E06946 /* SharingServer.m */,
-				6627EE341276317A00E06946 /* SharingServerPeer.h */,
-				6627EE351276317A00E06946 /* SharingServerPeer.m */,
-			);
-			name = Server;
-			sourceTree = "<group>";
-		};
-		6627EE921277634200E06946 /* Client */ = {
-			isa = PBXGroup;
-			children = (
-				6627EE9612777D6300E06946 /* SharingClient.h */,
-				6627EE9712777D6300E06946 /* SharingClient.m */,
-			);
-			name = Client;
-			sourceTree = "<group>";
-		};
 		664697DE17CFF76200A1B767 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -760,7 +719,6 @@
 				664697EC17CFF7FD00A1B767 /* Test */,
 				66DBB37E1813B1A90047301A /* BenchmarkCoreObject */,
 				664697EE17CFF7FD00A1B767 /* BasicPersistence */,
-				664697F017CFF7FD00A1B767 /* Typewriter.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -781,7 +739,6 @@
 			children = (
 				667C6C80181AF42B00BDD213 /* Branches Window */,
 				66E8EE0C12D673BB00780264 /* Search Window */,
-				7991197F12CD4AA9009D28C0 /* Overlay Shelf */,
 				7991190212CD3D36009D28C0 /* Project Navigator */,
 				66C33DED1290BC7700E5B15B /* Sketch */,
 				79F122B2128A4A4200EC0255 /* Icons */,
@@ -901,24 +858,10 @@
 				661210DA18217451003AEC29 /* AccountWindowController.m */,
 				661210EC18217818003AEC29 /* XMPPController.h */,
 				661210ED18217818003AEC29 /* XMPPController.m */,
-				6627EE921277634200E06946 /* Client */,
-				6627EE911277625B00E06946 /* Server */,
-				6686BFF0125CEC380065DE1A /* Chat UI */,
-				6686BFE2125AEF550065DE1A /* NOTES-Networking */,
 				662C2B76182431EC00ED975F /* SharingSession.h */,
 				662C2B77182431EC00ED975F /* SharingSession.m */,
 			);
 			name = Networking;
-			sourceTree = "<group>";
-		};
-		6686BFF0125CEC380065DE1A /* Chat UI */ = {
-			isa = PBXGroup;
-			children = (
-				6686BFF4125CF0200065DE1A /* ChatWindow.xib */,
-				6686BFF8125CF1B90065DE1A /* ChatWindowController.h */,
-				6686BFF9125CF1B90065DE1A /* ChatWindowController.m */,
-			);
-			name = "Chat UI";
 			sourceTree = "<group>";
 		};
 		66C33DED1290BC7700E5B15B /* Sketch */ = {
@@ -980,15 +923,6 @@
 				6638C025181852FD008341E6 /* ProjectNav.xib */,
 			);
 			name = "Project Navigator";
-			sourceTree = "<group>";
-		};
-		7991197F12CD4AA9009D28C0 /* Overlay Shelf */ = {
-			isa = PBXGroup;
-			children = (
-				7991198412CD4B1A009D28C0 /* OverlayShelf.h */,
-				7991198512CD4B1A009D28C0 /* OverlayShelf.m */,
-			);
-			name = "Overlay Shelf";
 			sourceTree = "<group>";
 		};
 		79F122B2128A4A4200EC0255 /* Icons */ = {
@@ -1094,13 +1028,6 @@
 			remoteRef = 664697ED17CFF7FD00A1B767 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		664697F017CFF7FD00A1B767 /* Typewriter.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = Typewriter.app;
-			remoteRef = 664697EF17CFF7FD00A1B767 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		664697FD17CFF8A200A1B767 /* EtoileXML.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -1149,7 +1076,6 @@
 				66708F9C12486F0400E65F00 /* ProjectDemoMainMenu.xib in Resources */,
 				667090011248726900E65F00 /* OutlineInspector.xib in Resources */,
 				667C6C83181AF44E00BDD213 /* Branches.xib in Resources */,
-				6686BFF5125CF0200065DE1A /* ChatWindow.xib in Resources */,
 				6627EEDD1278A55A00E06946 /* README in Resources */,
 				79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */,
 				661210F818217955003AEC29 /* AccountBox.xib in Resources */,
@@ -1254,7 +1180,6 @@
 				661211D21821A568003AEC29 /* XMPPDigestMD5Authentication.m in Sources */,
 				661211DF1821A568003AEC29 /* XMPPStream.m in Sources */,
 				661211D71821A568003AEC29 /* NSXMLElement+XMPP.m in Sources */,
-				7991198612CD4B1A009D28C0 /* OverlayShelf.m in Sources */,
 				79911A0912CD974A009D28C0 /* Application.m in Sources */,
 				79FC089012DBE8E300DE3C18 /* TagWindowController.m in Sources */,
 				66CA184E181A3F4F00DE6AFB /* SearchWindowController.m in Sources */,
