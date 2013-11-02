@@ -191,8 +191,20 @@
             [mergeInfo.diff resolveConflictsFavoringSourceIdentifier: @"merged"]; // FIXME: Hardcoded
         }
         
-        [mergeInfo.diff applyTo: [_masterBranch objectGraphContext]];
-        
+		NSLog(@"Applying diff %@", mergeInfo.diff);
+		
+		
+		id<COItemGraph> oldGraph = [_persistentRoot objectGraphContextForPreviewingRevision: mergeInfo.baseRevision];
+		id<COItemGraph> mergeResult = [mergeInfo.diff itemTreeWithDiffAppliedToItemGraph: oldGraph];
+		
+		// FIXME: Works, but an ugly API mismatch when setting object graph context contents
+		NSMutableArray *items = [NSMutableArray array];
+		for (ETUUID *uuid in [mergeResult itemUUIDs])
+		{
+			[items addObject: [mergeResult itemForUUID: uuid]];
+		}
+		[[_masterBranch objectGraphContext] insertOrUpdateItems: items];
+
 		_lastRevisionUUID = [[_masterBranch currentRevision] UUID];
         [[_persistentRoot editingContext] commit];
     }
