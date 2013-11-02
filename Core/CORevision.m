@@ -34,6 +34,11 @@
 	return [revisionInfo.revisionUUID isEqual: ((CORevision *)rhs)->revisionInfo.revisionUUID];
 }
 
+- (NSUInteger)hash
+{
+	return [revisionInfo.revisionUUID hash];
+}
+
 - (NSArray *)propertyNames
 {
 	return [[super propertyNames] arrayByAddingObjectsFromArray: 
@@ -55,6 +60,18 @@
     
 	ETUUID *parentRevID = [revisionInfo parentRevisionUUID];
     return [cache revisionForRevisionUUID: parentRevID
+					   persistentRootUUID: [revisionInfo persistentRootUUID]];
+}
+
+- (CORevision *)mergeParentRevision
+{
+    if ([revisionInfo mergeParentRevisionUUID] == nil)
+    {
+        return nil;
+    }
+    
+	ETUUID *revID = [revisionInfo mergeParentRevisionUUID];
+    return [cache revisionForRevisionUUID: revID
 					   persistentRootUUID: [revisionInfo persistentRootUUID]];
 }
 

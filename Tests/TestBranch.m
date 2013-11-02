@@ -506,11 +506,18 @@
     
     [initialBranch setMergingBranch: secondBranch];
     
+	CORevision *headRevBeforeMerge = [initialBranch currentRevision];
+	CORevision *mergingBranchRevision = [secondBranch currentRevision];
+	
     COMergeInfo *mergeInfo = [initialBranch mergeInfoForMergingBranch: secondBranch];
     UKFalse([mergeInfo.diff hasConflicts]);
     
     [mergeInfo.diff applyTo: [initialBranch objectGraphContext]];
     [persistentRoot commit];
+	
+	CORevision *mergedRevision = [persistentRoot currentRevision];
+	UKObjectsEqual(headRevBeforeMerge, [mergedRevision parentRevision]);
+	UKObjectsEqual(mergingBranchRevision, [mergedRevision mergeParentRevision]);
 }
 
 - (void) testRevertToRevision

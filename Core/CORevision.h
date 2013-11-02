@@ -60,6 +60,11 @@
  */
 - (CORevision *)parentRevision;
 /**
+ * If this revision is the result of merging another branch into the this branch,
+ * the revision that was merged in, otherwise nil
+ */
+- (CORevision *)mergeParentRevision;
+/**
  * Returns the persistent root UUID involved in the revision.
  *
  * It is possible that this persistent root no longer exists.

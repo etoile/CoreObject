@@ -142,6 +142,9 @@
 
 - (void) testRevisionParentRevision
 {
+	UKNil([r0 parentRevision]);
+	UKNil([r0 mergeParentRevision]);
+	UKObjectsEqual(r0, [r1 parentRevision]);
 	UKObjectsEqual(r1, [r2 parentRevision]);
 	UKObjectsEqual(r1, [r3 parentRevision]);
 	UKObjectsEqual(r2, [r4 parentRevision]);
