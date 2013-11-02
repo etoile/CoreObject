@@ -2,9 +2,8 @@
 #import "EWGraphRenderer.h"
 #import <EtoileFoundation/Macros.h>
 
-#import "EWDocument.h"
-
-#import "COBranch+Private.h"
+#import "Document.h"
+#import <CoreObject/CoreObject.h>
 
 @implementation EWHistoryGraphView
 
@@ -29,17 +28,7 @@
 
 - (NSSet *) revisionIDsOnBranch: (COBranch *)aBranch
 {
-	COSQLiteStore *store = [[aBranch persistentRoot] store];
-	
-	NSArray *infos = [store revisionInfosForBranchUUID: [aBranch UUID]
-											   options: COBranchRevisionReadingDivergentRevisions];
-	
-    NSMutableSet *revisionIDs = [NSMutableSet set];
-	for (CORevisionInfo *info in infos)
-    {
-		[revisionIDs addObject: [info revisionID]];
-	}	
-	return revisionIDs;
+	return [NSSet setWithArray: [aBranch nodes]];
 }
 
 - (void) setPersistentRoot: (COPersistentRoot *)proot
@@ -56,7 +45,7 @@
     
     [self setGraphRenderer: [[EWGraphRenderer alloc] initWithCommits: allCommitsOnAllBranches
                                                         branchCommits: [self revisionIDsOnBranch: aBranch]
-                                                        currentCommit: [[aBranch currentRevision] revisionID]
+                                                        currentCommit: [aBranch currentRevision]
                                                                 store: aStore]];
 }
 
@@ -78,7 +67,7 @@
 - (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)userData
 {
 //	COSQLiteStore *store = [graphRenderer store];
-	CORevisionID *commit = [graphRenderer commitAtPoint: point];
+	CORevision *commit = [graphRenderer commitAtPoint: point];
 	
 	if (commit == nil)
 	{
@@ -132,7 +121,7 @@
 	
 	[self removeAllToolTips];
     
-	for (CORevisionID *commit in [graphRenderer commits])
+	for (CORevision *commit in [graphRenderer commits])
 	{
 		NSRect r = [graphRenderer rectForCommit: commit];
 		[self addToolTipRect:r owner:self userData:(__bridge void *)(commit)];
@@ -158,7 +147,7 @@
     NSPoint pt = [self convertPoint: [theEvent locationInWindow] 
 						   fromView: nil];
 	
-    CORevisionID *commit = [graphRenderer commitAtPoint: pt];
+    CORevision *commit = [graphRenderer commitAtPoint: pt];
 	
 	if (nil != commit)
 	{
@@ -210,7 +199,7 @@
 		NSPoint pt = [self convertPoint: [theEvent locationInWindow] 
 							   fromView: nil];
 		
-		CORevisionID *commit = [graphRenderer commitAtPoint: pt];
+		CORevision *commit = [graphRenderer commitAtPoint: pt];
 
         if (commit != nil)
         {
@@ -218,39 +207,39 @@
             
             // FIXME: Hacky to hit NSDocument directly from here!
             
-            EWDocument *doc = [[NSDocumentController sharedDocumentController] currentDocument];
-            
-            [doc persistentSwitchToStateToken: commit];            
+//            EWDocument *doc = [[NSDocumentController sharedDocumentController] currentDocument];
+//            
+//            [doc persistentSwitchToStateToken: commit];            
         }
 	}
 }
 
-- (void)mouseEntered:(NSEvent *)theEvent
-{    
-    CORevisionID *commit = [theEvent userData];
-    mouseoverCommit =  commit;
-    [self setNeedsDisplay: YES];
-    NSLog(@"show %@", commit);
-    
-    // FIXME: Hacky to hit NSDocument directly from here!
-    
-    EWDocument *doc = [[NSDocumentController sharedDocumentController] currentDocument];
-    
-    [doc loadStateToken: commit];
-}
-
--(void)mouseExited:(NSEvent *)theEvent
-{
-    NSLog(@"restore current state");
-    mouseoverCommit = nil;
-    [self setNeedsDisplay: YES];
-    
-    
-    // FIXME: Hacky to hit NSDocument directly from here!
-    
-    EWDocument *doc = [[NSDocumentController sharedDocumentController] currentDocument];
-    
-    [doc loadStateToken: [[[[doc currentPersistentRoot] editingBranch] currentRevision] revisionID]];
-}
+//- (void)mouseEntered:(NSEvent *)theEvent
+//{    
+//    CORevisionID *commit = [theEvent userData];
+//    mouseoverCommit =  commit;
+//    [self setNeedsDisplay: YES];
+//    NSLog(@"show %@", commit);
+//    
+//    // FIXME: Hacky to hit NSDocument directly from here!
+//    
+//    EWDocument *doc = [[NSDocumentController sharedDocumentController] currentDocument];
+//    
+//    [doc loadStateToken: commit];
+//}
+//
+//-(void)mouseExited:(NSEvent *)theEvent
+//{
+//    NSLog(@"restore current state");
+//    mouseoverCommit = nil;
+//    [self setNeedsDisplay: YES];
+//    
+//    
+//    // FIXME: Hacky to hit NSDocument directly from here!
+//    
+//    EWDocument *doc = [[NSDocumentController sharedDocumentController] currentDocument];
+//    
+//    [doc loadStateToken: [[[[doc currentPersistentRoot] editingBranch] currentRevision] revisionID]];
+//}
 
 @end

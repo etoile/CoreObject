@@ -86,6 +86,9 @@
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66CA1844181A3E5B00DE6AFB /* Search.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66CA1843181A3E5B00DE6AFB /* Search.xib */; };
 		66CA184E181A3F4F00DE6AFB /* SearchWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66CA184D181A3F4F00DE6AFB /* SearchWindowController.m */; };
+		66D73786182597330023692B /* EWHistoryGraphView.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C76181AF40400BDD213 /* EWHistoryGraphView.m */; };
+		66D73787182597330023692B /* EWHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C78181AF40400BDD213 /* EWHistoryWindowController.m */; };
+		66D737881825973A0023692B /* EWGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C74181AF40400BDD213 /* EWGraphRenderer.m */; };
 		66DBB3781813B1A80047301A /* PreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66DBB3771813B1A80047301A /* PreferencesController.m */; };
 		66DBB3831813B1BB0047301A /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66DBB3821813B1BB0047301A /* Preferences.xib */; };
 		7991190512CD3D75009D28C0 /* ProjectNavWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7991190412CD3D75009D28C0 /* ProjectNavWindowController.m */; };
@@ -1178,6 +1181,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66D737881825973A0023692B /* EWGraphRenderer.m in Sources */,
+				66D73786182597330023692B /* EWHistoryGraphView.m in Sources */,
+				66D73787182597330023692B /* EWHistoryWindowController.m in Sources */,
 				6612118C1821A482003AEC29 /* DDLog.m in Sources */,
 				79911A4712CDAECD009D28C0 /* SKTCircle.m in Sources */,
 				6612118A1821A482003AEC29 /* DDASLLogger.m in Sources */,
@@ -1290,6 +1296,7 @@
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -1309,6 +1316,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,

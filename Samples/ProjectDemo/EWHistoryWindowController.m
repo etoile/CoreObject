@@ -1,5 +1,5 @@
 #import "EWHistoryWindowController.h"
-#import "EWDocument.h"
+#import "Document.h"
 #import <CoreObject/CoreObject.h>
 
 @implementation EWHistoryWindowController
@@ -12,8 +12,6 @@
     return self;
 }
 
-
-
 + (EWHistoryWindowController *) sharedController
 {
     static EWHistoryWindowController *shared;
@@ -23,34 +21,37 @@
     return shared;
 }
 
-- (void) setInspectedDocument: (NSDocument *)aDoc
+- (void) setInspectedDocument: (Document *)aDoc
 {
     NSLog(@"Inspect %@", aDoc);
     
+	[self setPersistentRoot: [aDoc persistentRoot]];
+}
+
+- (void) setPersistentRoot: (COPersistentRoot *)aPersistentRoot
+{
     [[NSNotificationCenter defaultCenter] removeObserver: self
                                                     name: COPersistentRootDidChangeNotification
                                                   object: persistentRoot_];
     
-    COPersistentRoot *proot = [(EWDocument *)aDoc currentPersistentRoot];
-    persistentRoot_ =  proot;
+    persistentRoot_ =  aPersistentRoot;
     
-    [self updateWithProot: proot
-                    store: [(EWDocument *)aDoc store]];
+    COBranch *branch = [persistentRoot_ currentBranch];
     
+    //NSLog(@"current branch: %@ has %d commits.g v %@", branch, (int)[[branch allCommits] count], graphView_);
+    
+    [self updateWithProot: persistentRoot_ store: [persistentRoot_ store]];
+
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(storePersistentRootMetadataDidChange:)
                                                  name: COPersistentRootDidChangeNotification
-                                               object: proot];
+                                               object: aPersistentRoot];
 }
 
 - (void) updateWithProot: (COPersistentRoot *)proot
                    store: (COSQLiteStore *)store
 {
-    COBranch *branch = [proot currentBranch];
-    
-    //NSLog(@"current branch: %@ has %d commits.g v %@", branch, (int)[[branch allCommits] count], graphView_);
-    
-    [graphView_ setPersistentRoot: proot branch: branch store: store];
+	[graphView_ setPersistentRoot: persistentRoot_ branch: [proot currentBranch] store: [persistentRoot_ store]];
 }
 
 - (void) show

@@ -4,28 +4,28 @@
 
 @implementation EWGraphRenderer
 
-static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID, NSInteger currentLevel, NSMutableDictionary *levelForUUID)
+static NSInteger visit(NSDictionary *childrenForUUID, CORevision *currentRevision, NSInteger currentLevel, NSMutableDictionary *levelForUUID)
 {
-	//NSLog(@"visiting %@", currentUUID);
+	//NSLog(@"visiting %@", currentRevision);
 	
-	NSNumber *currentSavedLevel = [levelForUUID objectForKey: currentUUID];
+	NSNumber *currentSavedLevel = [levelForUUID objectForKey: [currentRevision UUID]];
 	if (currentSavedLevel != nil)
 	{
-		//NSLog(@"%@ already has a level %@", currentUUID, currentSavedLevel);
+		//NSLog(@"%@ already has a level %@", currentRevision, currentSavedLevel);
 		return 0;
 	}
 	else
 	{
 		[levelForUUID setObject: [NSNumber numberWithInteger: currentLevel]
-						 forKey: currentUUID];
+						 forKey: [currentRevision UUID]];
 	}
 	
 	
-	NSArray *children = [childrenForUUID objectForKey: currentUUID];
+	NSArray *children = [childrenForUUID objectForKey: [currentRevision UUID]];
 	assert(children != nil);
 	
 	NSInteger maxLevelUsed = currentLevel - 1;
-	for (CORevisionID *child in children)
+	for (CORevision *child in children)
 	{
 		NSInteger childMax = 
 			visit(childrenForUUID, child, maxLevelUsed + 1, levelForUUID);
@@ -41,8 +41,8 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 - (NSArray *) sortedCommits: (NSSet *)commits
 {
     return [[commits allObjects] sortedArrayUsingComparator: ^(id obj1, id obj2) {
-        CORevisionInfo *obj1Info = [store revisionInfoForRevisionID: obj1];
-        CORevisionInfo *obj2Info = [store revisionInfoForRevisionID: obj2];
+        CORevision *obj1Info = obj1;
+        CORevision *obj2Info = obj2;
         
         return [[obj1Info date] compare: [obj2Info date]];
     }];
@@ -50,7 +50,7 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 
 - (id) initWithCommits: (NSSet*)stateTokens
          branchCommits: (NSSet*)branchCommits
-         currentCommit: (CORevisionID*)currentCommit
+         currentCommit: (CORevision*)currentCommit
                  store: (COSQLiteStore*)aStore
 {
 	SUPERINIT;
@@ -70,10 +70,10 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 }
 
 
-- (CORevisionID*) parentForRevisonID: (CORevisionID*)aRevID
+- (CORevision*) parentForRevison: (CORevision*)aRevID
 {
     // N.B.: Accesses disk. Insert a cache / run graph rendering in a thread in the future
-    return [[store revisionInfoForRevisionID: aRevID] parentRevisionID];
+    return [aRevID parentRevision];
 }
 
 - (void) layoutGraph
@@ -87,46 +87,46 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 		
 	childrenForUUID =  [NSMutableDictionary dictionaryWithCapacity: [allCommitsSorted count]];
 	
-	for (CORevisionID *aCommit in allCommitsSorted)
+	for (CORevision *aCommit in allCommitsSorted)
 	{
-		[childrenForUUID setObject: [NSMutableArray array] forKey: aCommit];
+		[childrenForUUID setObject: [NSMutableArray array] forKey: [aCommit UUID]];
 	}
-	for (CORevisionID *aCommit in allCommitsSorted)
+	for (CORevision *aCommit in allCommitsSorted)
 	{
-		CORevisionID *aParent = [self parentForRevisonID: aCommit];
+		CORevision *aParent = [self parentForRevison: aCommit];
 		if (aParent != nil)
 		{
-			NSMutableArray *children = [childrenForUUID objectForKey: aParent];
-			assert(children != nil); // i.e., assert([allCommitsSorted containsObject: aParent])
-			[children addObject: aCommit];
+			NSMutableArray *children = [childrenForUUID objectForKey: [aParent UUID]];
+			if (children != nil)
+				[children addObject: aCommit];
 		}
         
-        CORevisionID *mergeParent = [[store revisionInfoForRevisionID: aCommit] mergeParentRevisionID];
+        CORevision *mergeParent = [aCommit mergeParentRevision];
         if (mergeParent != nil)
         {
             NSLog(@"merge parent of %@ is %@", aCommit, mergeParent);
-            [[childrenForUUID objectForKey: mergeParent] addObject: aCommit];
+            [[childrenForUUID objectForKey: [mergeParent UUID]] addObject: aCommit];
         }
 	}
 
 	// remove commits which have no children/parents
 	
-	for (CORevisionID *aCommit in [NSArray arrayWithArray: allCommitsSorted])
-	{
-		if ([[childrenForUUID objectForKey: aCommit] count] == 0 &&
-			[self parentForRevisonID: aCommit] == nil)
-		{
-			//NSLog(@"removed %@ because it had no parents/children (%d)", 
-			//	  aCommit, (int)[allCommitsSorted indexOfObject: aCommit]);
-			[allCommitsSorted removeObject: aCommit];
-
-		}
-	}
+//	for (CORevision *aCommit in [NSArray arrayWithArray: allCommitsSorted])
+//	{
+//		if ([[childrenForUUID objectForKey: aCommit] count] == 0 &&
+//			[self parentForRevison: aCommit] == nil)
+//		{
+//			//NSLog(@"removed %@ because it had no parents/children (%d)", 
+//			//	  aCommit, (int)[allCommitsSorted indexOfObject: aCommit]);
+//			[allCommitsSorted removeObject: aCommit];
+//
+//		}
+//	}
 	
 	
 	// some nodes should have more than 1 child
 	
-	for (CORevisionID *aCommit in allCommitsSorted)
+	for (CORevision *aCommit in allCommitsSorted)
 	{
 		//NSLog(@"%@ children: %@", aCommit, [childrenForUUID objectForKey: aCommit]);
 	}
@@ -135,9 +135,9 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 	// find roots
 	
 	NSMutableArray *roots = [NSMutableArray array];
-	for (CORevisionID *aCommit in allCommitsSorted)
+	for (CORevision *aCommit in allCommitsSorted)
 	{
-		CORevisionID *aParent = [self parentForRevisonID: aCommit];
+		CORevision *aParent = [self parentForRevison: aCommit];
 		if (nil == aParent)
 		{
 			[roots addObject: aCommit];
@@ -162,7 +162,7 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 	levelForUUID =  [NSMutableDictionary dictionary];
 
 	NSInteger maxLevel = 0;
-	for (CORevisionID *root in roots)
+	for (CORevision *root in roots)
 	{
 		//NSLog(@"Starting root %@ at %d", root, (int)maxLevel);
 		maxLevel = visit(childrenForUUID, root, maxLevel, levelForUUID) + 1;
@@ -171,24 +171,26 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 	//NSLog(@"graph output:");
 	
 	maxLevelUsed = 0;
-	for (CORevisionID *aCommit in allCommitsSorted)
+	for (CORevision *aCommit in allCommitsSorted)
 	{
-		NSInteger level = [[levelForUUID objectForKey: aCommit] integerValue];
+		NSNumber *levelObj = [levelForUUID objectForKey: [aCommit UUID]];
+		assert(levelObj != nil);
+		NSInteger level = [levelObj integerValue];
 		
 		if (level > maxLevelUsed)
 			maxLevelUsed = level;
 		
 		//NSLog(@"%d", (int)level);
 	}
-
+	
 	// sanity check: Every object's parent must appear to its left.
 	
 	{
 		NSInteger i;
 		for (i=0; i<[allCommitsSorted count]; i++)
 		{
-			CORevisionID *aCommit = [allCommitsSorted objectAtIndex: i];
-			CORevisionID *aCommitParent = [self parentForRevisonID: aCommit];
+			CORevision *aCommit = [allCommitsSorted objectAtIndex: i];
+			CORevision *aCommitParent = [self parentForRevison: aCommit];
 			
 			if (aCommitParent != nil)
 			{
@@ -198,6 +200,8 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 			}
 		}
 	}
+	
+	
 }
 
 - (NSArray *) commits
@@ -212,9 +216,9 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevisionID *currentUUID,
 	return s;
 }
 
-- (NSRect) rectForCommit: (CORevisionID*)aCommit
+- (NSRect) rectForCommit: (CORevision*)aCommit
 {
-	NSNumber *rowObj = [levelForUUID objectForKey: aCommit];
+	NSNumber *rowObj = [levelForUUID objectForKey: [aCommit UUID]];
 	assert(rowObj != nil);
 	NSUInteger row = [rowObj integerValue];
 	NSUInteger col = [allCommitsSorted indexOfObject: aCommit];
@@ -258,7 +262,7 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 	[NSGraphicsContext restoreGraphicsState];
 }
 
-- (NSColor *)colorForCommit: (CORevisionID *)aCommit
+- (NSColor *)colorForCommit: (CORevision *)aCommit
 {
     if ([aCommit isEqual: currentCommit_])
     {
@@ -274,7 +278,7 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 	}
 }
 
-- (CGFloat) thicknessForCommit: (CORevisionID *)aCommit
+- (CGFloat) thicknessForCommit: (CORevision *)aCommit
 {
     if ([aCommit isEqual: currentCommit_])
     {
@@ -286,11 +290,11 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 	}
 }
 
-- (void) drawWithHighlightedCommit: (CORevisionID *)aCommit
+- (void) drawWithHighlightedCommit: (CORevision *)aCommit
 {
 	for (NSUInteger col = 0; col < [allCommitsSorted count]; col++)
 	{
-		CORevisionID *commit = [allCommitsSorted objectAtIndex: col];		
+		CORevision *commit = [allCommitsSorted objectAtIndex: col];
 		
 		NSColor *color = [self colorForCommit: commit];
 		CGFloat thickness = [self thicknessForCommit: commit];
@@ -307,7 +311,7 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
         [circle setLineWidth: thickness];
         [circle stroke];
     
-		for (CORevisionID *child in [childrenForUUID objectForKey: commit])
+		for (CORevision *child in [childrenForUUID objectForKey: [commit UUID]])
 		{
 			NSRect r2 = [self rectForCommit: child];
 			
@@ -323,9 +327,9 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 	}
 }
 
-- (CORevisionID *)commitAtPoint: (NSPoint)aPoint
+- (CORevision *)commitAtPoint: (NSPoint)aPoint
 {
-	for (CORevisionID *commit in allCommitsSorted)
+	for (CORevision *commit in allCommitsSorted)
 	{
 		if (NSPointInRect(aPoint, [self rectForCommit: commit]))
 		{

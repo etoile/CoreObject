@@ -6,10 +6,8 @@
 @interface EWHistoryGraphView : NSView
 {
 	EWGraphRenderer *graphRenderer;
-    
     NSMutableArray *trackingRects;
-    
-    CORevisionID *mouseoverCommit;
+    CORevision *mouseoverCommit;
 }
 
 - (void)  setPersistentRoot: (COPersistentRoot *)proot
