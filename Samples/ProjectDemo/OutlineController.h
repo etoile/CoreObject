@@ -34,5 +34,6 @@
 - (IBAction) stepBackward: (id)sender;
 - (IBAction) stepForward: (id)sender;
 
+- (void) switchToRevision: (CORevision *)aRevision;
 
 @end

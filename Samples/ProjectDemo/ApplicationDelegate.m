@@ -5,7 +5,6 @@
 #import "DrawingController.h"
 #import "TextController.h"
 #import "Document.h"
-#import "SharingServer.h"
 #import "SKTDrawDocument.h"
 #import "Project.h"
 #import <CoreObject/CoreObject.h>
@@ -53,33 +52,6 @@
 	[backButton setAction: @selector(globalBack:)];
 }
 
-- (void)showShelf: (id)sender
-{
-	[overlayShelf setIgnoresMouseEvents: NO];
-	[overlayShelf setAlphaValue:0.0];
-	[overlayShelf orderFront: sender];
-	[[overlayShelf animator] setAlphaValue:1.0];
-}
-
-- (void)hideShelf: (id)sender
-{
-	[overlayShelf setIgnoresMouseEvents: YES];
-	[[overlayShelf animator] setAlphaValue:0.0];
-
-}
-
-- (void)toggleShelf: (id)sender
-{
-    if ([overlayShelf alphaValue] == 1.0)
-    {
-        [self hideShelf: sender];
-    }
-    else
-    {
-        [self showShelf: sender];
-    }
-}
-
 - (NSSet *)projects
 {
 	NSSet *projects = [[[context persistentRoots]
@@ -120,9 +92,6 @@
 	
 	// UI Setup
 	[self addStatusBarButtons];
-//	desktopWindow = [[DesktopWindow alloc] init];
-	//projectNavWindow = [[ProjectNavWindow alloc] init];
-	overlayShelf = [[OverlayShelf alloc] init];
 
 	projects = [self projects];
 	for (Project *project in projects)
@@ -271,6 +240,11 @@
 		}
 	}
 	return nil;
+}
+
+- (OutlineController*)controllerForPersistentRoot: (COPersistentRoot *)persistentRoot
+{
+	return [self controllerForDocumentRootObject: [persistentRoot rootObject]];
 }
 
 /* Project delegate */

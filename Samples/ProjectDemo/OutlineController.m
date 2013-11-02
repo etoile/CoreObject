@@ -295,6 +295,15 @@ static int i = 0;
 	[self close];
 }
 
+- (void) switchToRevision: (CORevision *)aRevision
+{
+	[[doc persistentRoot] setCurrentRevision: aRevision];
+	
+	[self commitWithType: @"kCOTypeMinorEdit"
+		shortDescription: @"Revert to revision"
+		 longDescription: [NSString stringWithFormat: @"Revert to revision"]];
+}
+
 /* History stuff */
 
 - (IBAction) projectDemoUndo: (id)sender

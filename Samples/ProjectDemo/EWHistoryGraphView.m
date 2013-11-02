@@ -4,6 +4,8 @@
 
 #import "Document.h"
 #import <CoreObject/CoreObject.h>
+#import "OutlineController.h"
+#import "ApplicationDelegate.h"
 
 @implementation EWHistoryGraphView
 
@@ -47,6 +49,8 @@
                                                         branchCommits: [self revisionIDsOnBranch: aBranch]
                                                         currentCommit: [aBranch currentRevision]
                                                                 store: aStore]];
+	
+	persistentRoot = proot;
 }
 
 - (void) drawRect:(NSRect)dirtyRect
@@ -205,11 +209,8 @@
         {
             NSLog(@"switch to %@", commit);
             
-            // FIXME: Hacky to hit NSDocument directly from here!
-            
-//            EWDocument *doc = [[NSDocumentController sharedDocumentController] currentDocument];
-//            
-//            [doc persistentSwitchToStateToken: commit];            
+			OutlineController *controller = [(ApplicationDelegate *)[NSApp delegate] controllerForPersistentRoot:persistentRoot];
+			[controller switchToRevision: commit];
         }
 	}
 }

@@ -3,7 +3,6 @@
 #import "CheckpointAsSheetController.h"
 #import "XMPPController.h"
 #import "ProjectNavWindowController.h"
-#import "OverlayShelf.h"
 #import "TagWindowController.h"
 #import "OutlineController.h"
 
@@ -16,8 +15,6 @@
 	IBOutlet XMPPController *xmppController;
 	IBOutlet CheckpointAsSheetController *checkpointAsSheetController;
 	IBOutlet TagWindowController *tagWindowController;
-	
-	OverlayShelf *overlayShelf;
 	
 	COEditingContext *context;
 	
@@ -40,6 +37,7 @@
 - (IBAction)deleteProject: (id)sender;
 
 - (OutlineController*)controllerForDocumentRootObject: (COObject*)rootObject;
+- (OutlineController*)controllerForPersistentRoot: (COPersistentRoot *)persistentRoot;
 
 - (void)showSearchResults: (id)sender;
 

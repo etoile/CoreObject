@@ -185,21 +185,21 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevision *currentRevisio
 	
 	// sanity check: Every object's parent must appear to its left.
 	
-	{
-		NSInteger i;
-		for (i=0; i<[allCommitsSorted count]; i++)
-		{
-			CORevision *aCommit = [allCommitsSorted objectAtIndex: i];
-			CORevision *aCommitParent = [self parentForRevison: aCommit];
-			
-			if (aCommitParent != nil)
-			{
-				NSUInteger j = [allCommitsSorted indexOfObject: aCommitParent];
-				assert(j != NSNotFound);
-				assert(j < i);
-			}
-		}
-	}
+//	{
+//		NSInteger i;
+//		for (i=0; i<[allCommitsSorted count]; i++)
+//		{
+//			CORevision *aCommit = [allCommitsSorted objectAtIndex: i];
+//			CORevision *aCommitParent = [self parentForRevison: aCommit];
+//			
+//			if (aCommitParent != nil)
+//			{
+//				NSUInteger j = [allCommitsSorted indexOfObject: aCommitParent];
+//				assert(j != NSNotFound);
+//				assert(j < i);
+//			}
+//		}
+//	}
 	
 	
 }
