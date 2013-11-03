@@ -210,4 +210,14 @@
     }
 }
 
+- (BOOL) isServer
+{
+	return _isServer;
+}
+
+- (NSString *) peerName
+{
+	return [_peerJID bare];
+}
+
 @end

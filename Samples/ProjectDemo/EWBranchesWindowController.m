@@ -42,13 +42,6 @@ static EWBranchesWindowController *shared;
     [self setPersistentRoot: [aDoc persistentRoot]];
 }
 
-- (void) show
-{
-    [self showWindow: self];
-    [self setInspectedDocument: [[NSDocumentController sharedDocumentController]
-                                 currentDocument]];
-}
-
 - (NSArray *) orderedBranches
 {
     NSArray *unsorted = [[_persistentRoot branches] allObjects];

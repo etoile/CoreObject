@@ -35,4 +35,8 @@
 
 @property (nonatomic, readonly, strong) COPersistentRoot *persistentRoot;
 
+@property (nonatomic, readonly, assign) BOOL isServer;
+
+@property (nonatomic, readonly, strong) NSString *peerName;
+
 @end

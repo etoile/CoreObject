@@ -5,7 +5,51 @@
 
 @implementation OutlineController
 
-@synthesize sharingSession = _sharingSession;
+- (SharingSession *) sharingSession
+{
+	return _sharingSession;
+}
+
+- (void) setSharingSession:(SharingSession *)sharingSession
+{
+	_sharingSession = sharingSession;
+	
+	[self updateUIForSharingSession];
+}
+
+- (void) updateUIForSharingSession
+{
+	NSString *docName = [doc documentName];
+	NSString *title;
+	if ([self isSharing])
+	{
+		if (_sharingSession.isServer)
+		{
+			title = [NSString stringWithFormat: @"%@ - sharing with %@", docName, _sharingSession.peerName];
+		}
+		else
+		{
+			title = [NSString stringWithFormat: @"%@ - shared by %@", docName, _sharingSession.peerName];
+		}
+	}
+	else
+	{
+		title = docName;
+	}
+	[[self window] setTitle: title];
+
+	// Disable the share button if it is a shared document
+	if ([self isSharing])
+	{
+		for (NSToolbarItem *item in [[[self window] toolbar] items])
+		{
+			if ([[item itemIdentifier] isEqual: @"share"])
+			{
+				[item setEnabled: NO];
+			}
+		}
+	}
+}
 
 - (id)initWithDocument: (id)document
 {
@@ -121,33 +165,7 @@
 												 name: NSWindowDidEndLiveResizeNotification 
 											   object: [self window]];	
 	
-	if ([doc documentName])
-	{
-		NSString *title;
-		if ([self isSharing])
-		{
-//			title = [NSString stringWithFormat: @"Shared Document %@ From %@",
-//					 [doc documentName],
-//					 [[NSClassFromString(@"SharingController") sharedSharingController] fullNameOfUserSharingDocument: doc]];
-		}
-		else
-		{
-			title = [doc documentName];
-		}
-		[[self window] setTitle: title]; 
-	}
-	
-	// Disable the share button if it is a shared document
-	if ([self isSharing])
-	{
-		for (NSToolbarItem *item in [[[self window] toolbar] items])
-		{
-			if ([[item itemIdentifier] isEqual: @"share"])
-			{
-				[item setEnabled: NO];
-			}
-		}
-	}
+	[self updateUIForSharingSession];
 }
 
 - (void)windowFrameDidChange:(NSNotification*)notification
@@ -253,7 +271,7 @@ static int i = 0;
 	assert(indexOfItemInParent != NSNotFound);
 	if (parent != nil && indexOfItemInParent > 0)
 	{
-		NSLog(@"Requesting object at %d in collection of %d", indexOfItemInParent - 1, [[parent contents] count]);
+		NSLog(@"Requesting object at %d in collection of %d", indexOfItemInParent - 1, (int)[[parent contents] count]);
 		OutlineItem *newParent = [[parent contents] objectAtIndex: (indexOfItemInParent - 1)];
 		
 		if ([newParent isKindOfClass: [OutlineItem class]])

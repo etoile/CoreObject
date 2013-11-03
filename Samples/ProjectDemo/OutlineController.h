@@ -22,8 +22,8 @@
 - (IBAction) addChildItem: (id)sender;
 - (IBAction) shiftLeft: (id)sender;
 - (IBAction) shiftRight: (id)sender;
-- (IBAction) undo: (id)sender;
-- (IBAction) redo: (id)sender;
+- (IBAction) projectDemoUndo: (id)sender;
+- (IBAction) projectDemoRedo: (id)sender;
 - (IBAction) history: (id)sender;
 
 - (IBAction) shareWith: (id)sender;
