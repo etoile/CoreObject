@@ -41,8 +41,6 @@
 
 - (void)showSearchResults: (id)sender;
 
-- (IBAction) orderFrontPreferencesPanel: (id)sender;
-
 /* Convenience */
 
 - (NSWindowController*) keyDocumentController;

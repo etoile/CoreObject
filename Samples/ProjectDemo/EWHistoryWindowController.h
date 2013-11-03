@@ -11,8 +11,6 @@
 
 + (EWHistoryWindowController *) sharedController;
 
-- (void) show;
-
 - (IBAction) sliderChanged: (id)sender;
 
 @end

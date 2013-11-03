@@ -4,7 +4,6 @@
 
 #import <AppKit/AppKit.h>
 
-@class SKTDrawWindowController;
 @class SKTDrawDocument;
 @class SKTGraphic;
 @class DrawingController;
@@ -40,10 +39,6 @@
     NSRect _verticalRulerLineRect;
     NSRect _horizontalRulerLineRect;
 }
-
-// SKTDrawWindowController accessors and convenience methods
-- (void)setDrawWindowController:(SKTDrawWindowController *)theController;
-- (SKTDrawWindowController *)drawWindowController;
 
 - (SKTDrawDocument *)drawDocument;
 - (NSArray *)graphics;

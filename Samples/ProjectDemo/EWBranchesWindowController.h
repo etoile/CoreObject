@@ -11,6 +11,4 @@
 
 + (EWBranchesWindowController *) sharedController;
 
-- (void) show;
-
 @end

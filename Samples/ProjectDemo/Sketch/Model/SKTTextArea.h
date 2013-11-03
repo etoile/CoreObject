@@ -4,7 +4,7 @@
 
 #import "SKTGraphic.h"
 
-@interface SKTTextArea : SKTGraphic {
+@interface SKTTextArea : SKTGraphic <NSTextViewDelegate> {
     @private
     NSTextStorage *_contents;
 }

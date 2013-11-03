@@ -77,7 +77,7 @@
                     [transform concat];
                 }
 
-                [[image bestRepresentationForDevice:nil] drawInRect:NSMakeRect(0.0, 0.0, bounds.size.width, bounds.size.height)];
+                [image drawInRect:NSMakeRect(0.0, 0.0, bounds.size.width, bounds.size.height)];
                 [_cachedImage unlockFocus];
             }
         }

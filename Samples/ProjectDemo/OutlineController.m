@@ -271,7 +271,8 @@ static int i = 0;
 	assert(indexOfItemInParent != NSNotFound);
 	if (parent != nil && indexOfItemInParent > 0)
 	{
-		NSLog(@"Requesting object at %d in collection of %d", indexOfItemInParent - 1, (int)[[parent contents] count]);
+		NSLog(@"Requesting object at %d in collection of %d",
+			  (int)(indexOfItemInParent - 1), (int)[[parent contents] count]);
 		OutlineItem *newParent = [[parent contents] objectAtIndex: (indexOfItemInParent - 1)];
 		
 		if ([newParent isKindOfClass: [OutlineItem class]])

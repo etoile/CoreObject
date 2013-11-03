@@ -50,13 +50,9 @@ extern NSString *SKTGraphicDidChangeNotification;
     } _gFlags;
 }
 
-- (id)init;
-
 // ========================= Document accessors and conveniences =========================
 
 @property (readonly, nonatomic) SKTDrawDocument *document;
-
-- (NSUndoManager *)undoManager;
 
 // =================================== Primitives ===================================
 - (void)didChange;

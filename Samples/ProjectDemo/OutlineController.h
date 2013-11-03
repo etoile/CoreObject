@@ -3,7 +3,7 @@
 #import "Document.h"
 #import "SharingSession.h"
 
-@interface OutlineController : NSWindowController
+@interface OutlineController : NSWindowController <NSOutlineViewDelegate>
 {
 	IBOutlet NSOutlineView *outlineView;
 	Document *doc; // weak ref
