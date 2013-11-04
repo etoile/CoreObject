@@ -964,6 +964,22 @@ static ETUUID *childUUID2;
 					 persistentRootUUID: prootUUID
 							 branchUUID: branchAUUID];
 	
+	prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
+    UKFalse([store commitStoreTransaction: txn]);
+}
+
+- (void) testInsertDuplicateRevisionUUID
+{
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+	[txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
+						   revisionUUID: [self lateBranchA]
+							   metadata: nil
+					   parentRevisionID: initialRevisionUUID
+				  mergeParentRevisionID: nil
+					 persistentRootUUID: prootUUID
+							 branchUUID: branchAUUID];
+	
+	prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
     UKFalse([store commitStoreTransaction: txn]);
 }
 

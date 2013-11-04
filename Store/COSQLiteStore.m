@@ -627,6 +627,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     if (!ok)
     {
         NSLog(@"Error creating revision");
+		return NO;
     }
     
 	[self updateSearchIndexesForItemTree: anItemTree

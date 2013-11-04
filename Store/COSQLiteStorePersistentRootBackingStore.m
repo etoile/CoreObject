@@ -88,11 +88,12 @@
     [db_ executeUpdate: [NSString stringWithFormat:
                          @"CREATE TABLE IF NOT EXISTS %@ (revid INTEGER PRIMARY KEY ASC, "
                          "contents BLOB, metadata BLOB, timestamp INTEGER, parent INTEGER, mergeparent INTEGER, branchuuid BLOB, persistentrootuuid BLOB, deltabase INTEGER, "
-                         "bytesInDeltaRun INTEGER, garbage BOOLEAN, uuid BLOB)", [self tableName]]];
+                         "bytesInDeltaRun INTEGER, garbage BOOLEAN, uuid BLOB NOT NULL UNIQUE)", [self tableName]]];
 
     [db_ executeUpdate: [NSString stringWithFormat:
                          @"CREATE INDEX IF NOT EXISTS %@ ON %@ (uuid)", [[self tableName] stringByAppendingString: @"_uuid"], [self tableName]]];
     
+	// This table always contains exactly one row
 	[db_ executeUpdate: [NSString stringWithFormat:
 						 @"CREATE TABLE IF NOT EXISTS %@ (root BLOB CHECK (length(root) = 16))", [self metadataTableName]]];
 	
