@@ -1,6 +1,8 @@
 #import "COSQLiteStore.h"
 #import "FMDatabase.h"
 
+@class COSQLiteStorePersistentRootBackingStore;
+
 /**
  * Private methods which are exposed so tests can look at the store internals.
  */
@@ -17,5 +19,9 @@
                   mergeParentRevisionID: (ETUUID *)aMergeParent
                      persistentRootUUID: (ETUUID *)aUUID
                              branchUUID: (ETUUID*)branch;
+
+- (COSQLiteStorePersistentRootBackingStore *) backingStoreForPersistentRootUUID: (ETUUID *)aUUID
+															 createIfNotPresent: (BOOL)createIfNotPresent;
+
 
 @end
