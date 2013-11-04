@@ -364,7 +364,7 @@ static ETUUID *branchBUUID;
     UKObjectsEqual([self itemGraphWithLabel: @"2"], [self currentItemGraphForBranch: [replicatedBranchA UUID] store: serverStore]);
 }
 
-- (void)testPullInBothDirectionsWithEditingContextAPI
+- (void)testPullFromServerToClientThenClientToServerAndClientToServer
 {
     COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
     COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
@@ -379,11 +379,13 @@ static ETUUID *branchBUUID;
 
     // Pull from server to client
 	
-    id request = [client updateRequestForPersistentRoot: uuid
-                                               serverID: @"server"
-                                                  store: store];
-    id response = [server handleUpdateRequest: request store: serverStore];
-    [client handleUpdateResponse: response store: store];
+	{
+		id request = [client updateRequestForPersistentRoot: uuid
+												   serverID: @"server"
+													  store: store];
+		id response = [server handleUpdateRequest: request store: serverStore];
+		[client handleUpdateResponse: response store: store];
+	}
 	
     // Client writes a commit.
     
@@ -399,21 +401,80 @@ static ETUUID *branchBUUID;
 	   
     // Pull from client to server
     
-    id request2 = [client updateRequestForPersistentRoot: uuid
-												serverID: @"client"
-												   store: serverStore];
-    id response2 = [server handleUpdateRequest: request2 store: store];
-    [client handleUpdateResponse: response2 store: serverStore];
-    
+	{
+		id request = [client updateRequestForPersistentRoot: uuid
+													serverID: @"client"
+													   store: serverStore];
+		id response = [server handleUpdateRequest: request store: store];
+		UKIntsEqual(1, [[response[@"revisions"] allKeys] count]);
+		[client handleUpdateResponse: response store: serverStore];
+    }
+	
     // Commit has been replicated to the server
 	
     UKIntsEqual(1, [[serverPersistentRoot branches] count]);
-	
 	[self wait];
-		
     UKIntsEqual(2, [[serverPersistentRoot branches] count]);
-}
+	
+	// Server merges remote branch into local branch
+	{
+		COBranch *serverLocalBranch = [serverPersistentRoot currentBranch];
+		NSSet *serverRemoteBranches = [[serverPersistentRoot branches] filteredCollectionWithBlock: ^(id obj)
+										{
+											return (BOOL) ([obj metadata][@"replcatedBranch"] != nil);
+										}];
+		UKIntsEqual(1, [serverRemoteBranches count]);
+		COBranch *serverRemoteBranch = [serverRemoteBranches anyObject];
+		UKObjectsNotSame(serverLocalBranch, serverRemoteBranch);
+		
+		UKObjectsEqual(@"v1", [[serverLocalBranch rootObject] label]);
+		// Fast-forward merge
+		[serverLocalBranch setCurrentRevision: [serverRemoteBranch currentRevision]];
+		UKObjectsEqual(@"v2", [[serverLocalBranch rootObject] label]);
+		[serverPersistentRoot commit];
+	}
+	
+    // Client writes a commit.
 
+	{
+		COPersistentRoot *clientPersistentRoot = [ctx persistentRootForUUID: uuid];
+		UKNotNil(clientPersistentRoot);
+		UKObjectsEqual(@"v2", [[clientPersistentRoot rootObject] label]);
+		[[clientPersistentRoot rootObject] setLabel: @"v3"];
+		UKTrue([ctx commit]);
+	}
+	
+    // Pull from client to server
+    
+	{
+		id request = [client updateRequestForPersistentRoot: uuid
+													serverID: @"client"
+													   store: serverStore];
+		id response = [server handleUpdateRequest: request store: store];
+		// FIXME: Fails
+		//UKIntsEqual(1, [[response[@"revisions"] allKeys] count]);
+		[client handleUpdateResponse: response store: serverStore];
+	}
+	
+	// Server merges remote branch into local branch
+	{
+		COBranch *serverLocalBranch = [serverPersistentRoot currentBranch];
+		NSSet *serverRemoteBranches = [[serverPersistentRoot branches] filteredCollectionWithBlock: ^(id obj)
+									   {
+										   return (BOOL) ([obj metadata][@"replcatedBranch"] != nil);
+									   }];
+		UKIntsEqual(1, [serverRemoteBranches count]);
+		COBranch *serverRemoteBranch = [serverRemoteBranches anyObject];
+		UKObjectsNotSame(serverLocalBranch, serverRemoteBranch);
+		
+		UKObjectsEqual(@"v2", [[serverLocalBranch rootObject] label]);
+		// Fast-forward merge
+		[serverLocalBranch setCurrentRevision: [serverRemoteBranch currentRevision]];
+		// FIXME: Fails
+		//UKObjectsEqual(@"v3", [[serverLocalBranch rootObject] label]);
+		[serverPersistentRoot commit];
+	}
+}
 
 @end
 
