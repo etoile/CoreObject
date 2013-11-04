@@ -66,7 +66,7 @@
 		66094848178794D40049468B /* COItem+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 66094846178794D40049468B /* COItem+JSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6609485E1787A1160049468B /* CORelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6609485C1787A1160049468B /* CORelationshipCache.m */; };
 		6609485F1787A1160049468B /* CORelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 6609485D1787A1160049468B /* CORelationshipCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		660B838D1827614200714474 /* COSQLiteStore+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 660B838B1827614200714474 /* COSQLiteStore+Debugging.h */; };
+		660B838D1827614200714474 /* COSQLiteStore+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 660B838B1827614200714474 /* COSQLiteStore+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660B838E1827614200714474 /* COSQLiteStore+Debugging.m in Sources */ = {isa = PBXBuildFile; fileRef = 660B838C1827614200714474 /* COSQLiteStore+Debugging.m */; };
 		660D4CD917D5C7CB003C9ACC /* COLeastCommonAncestor.h in Headers */ = {isa = PBXBuildFile; fileRef = 660D4CD717D5C7CB003C9ACC /* COLeastCommonAncestor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660D4CDA17D5C7CB003C9ACC /* COLeastCommonAncestor.m in Sources */ = {isa = PBXBuildFile; fileRef = 660D4CD817D5C7CB003C9ACC /* COLeastCommonAncestor.m */; };
@@ -1253,7 +1253,6 @@
 				609C00801704C2BA00D01AAB /* CORevision.h in Headers */,
 				609C00941704C3DA00D01AAB /* COEditingContext.h in Headers */,
 				609C00981704C3DA00D01AAB /* COObject.h in Headers */,
-				660B838D1827614200714474 /* COSQLiteStore+Debugging.h in Headers */,
 				609C009A1704C3DA00D01AAB /* COPersistentRoot.h in Headers */,
 				609C009C1704C3DA00D01AAB /* COQuery.h in Headers */,
 				609C00AC1704C3EF00D01AAB /* COBookmark.h in Headers */,
@@ -1320,6 +1319,7 @@
 				660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */,
 				668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */,
 				66E4CF4F1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.h in Headers */,
+				660B838D1827614200714474 /* COSQLiteStore+Debugging.h in Headers */,
 				661211401821986B003AEC29 /* CODateSerialization.h in Headers */,
 				662AC93D1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h in Headers */,
 				601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */,
