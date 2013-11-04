@@ -10,15 +10,15 @@
 - (NSString *) dotNameForRevisionUUID: (ETUUID *)aUUID
 {
 	NSString *str = [aUUID stringValue];
-	str = [str substringToIndex: 4]; // HACK: Trim the UUID after the 4th char
+	str = [str stringByReplacingOccurrencesOfString: @"-" withString: @"_"];
 	
-	return [@"r" stringByAppendingString: str];
+	return [@"rev_" stringByAppendingString: str];
 }
 
 - (NSString *) dotNameForBranchUUID: (ETUUID *)aUUID
 {
 	NSString *str = [aUUID stringValue];
-	str = [str substringToIndex: 4]; // HACK: Trim the UUID after the 4th char
+	str = [str stringByReplacingOccurrencesOfString: @"-" withString: @"_"];
 	
 	return [@"branch_" stringByAppendingString: str];
 }
@@ -27,7 +27,7 @@
 {
 	if (revInfo.mergeParentRevisionUUID != nil)
 	{
-		[dest appendFormat: @" %@ -> %@;\n", [self dotNameForRevisionUUID: revInfo.mergeParentRevisionUUID], [self dotNameForRevisionUUID: revInfo.revisionUUID]];
+		[dest appendFormat: @" %@ -> %@ [color=orange];\n", [self dotNameForRevisionUUID: revInfo.mergeParentRevisionUUID], [self dotNameForRevisionUUID: revInfo.revisionUUID]];
 		[dest appendFormat: @" %@ -> %@;\n", [self dotNameForRevisionUUID: revInfo.parentRevisionUUID], [self dotNameForRevisionUUID: revInfo.revisionUUID]];
 	}
 	else if (revInfo.parentRevisionUUID != nil)
