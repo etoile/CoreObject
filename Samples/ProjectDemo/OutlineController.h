@@ -34,6 +34,8 @@
 - (IBAction) stepBackward: (id)sender;
 - (IBAction) stepForward: (id)sender;
 
+- (IBAction) showGraphvizHistoryGraph: (id)sender;
+
 - (void) switchToRevision: (CORevision *)aRevision;
 
 @end

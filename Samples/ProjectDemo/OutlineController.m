@@ -2,6 +2,7 @@
 #import "ItemReference.h"
 #import "Document.h"
 #import "ApplicationDelegate.h"
+#import <CoreObject/COSQLiteStore+Debugging.h>
 
 @implementation OutlineController
 
@@ -372,6 +373,11 @@ static int i = 0;
 	[self commitWithType: @"kCOTypeMinorEdit"
 		shortDescription: @"Step Forward"
 		 longDescription: [NSString stringWithFormat: @"Step Forward"]];
+}
+
+- (IBAction) showGraphvizHistoryGraph: (id)sender
+{
+	[[[doc persistentRoot] store] showGraphForPersistentRootUUID: [[doc persistentRoot] UUID]];
 }
 
 - (IBAction) history: (id)sender
