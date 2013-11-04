@@ -451,10 +451,11 @@ static ETUUID *branchBUUID;
 													serverID: @"client"
 													   store: serverStore];
 		id response = [server handleUpdateRequest: request store: store];
-		// FIXME: Fails
-		//UKIntsEqual(1, [[response[@"revisions"] allKeys] count]);
+		UKIntsEqual(1, [[response[@"revisions"] allKeys] count]);
 		[client handleUpdateResponse: response store: serverStore];
 	}
+	
+	[self wait];
 	
 	// Server merges remote branch into local branch
 	{
@@ -470,8 +471,7 @@ static ETUUID *branchBUUID;
 		UKObjectsEqual(@"v2", [[serverLocalBranch rootObject] label]);
 		// Fast-forward merge
 		[serverLocalBranch setCurrentRevision: [serverRemoteBranch currentRevision]];
-		// FIXME: Fails
-		//UKObjectsEqual(@"v3", [[serverLocalBranch rootObject] label]);
+		UKObjectsEqual(@"v3", [[serverLocalBranch rootObject] label]);
 		[serverPersistentRoot commit];
 	}
 }

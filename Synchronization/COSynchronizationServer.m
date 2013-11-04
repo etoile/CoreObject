@@ -1,31 +1,44 @@
 #import "COSynchronizationServer.h"
 
 #import <CoreObject/CoreObject.h>
+#import "CORevisionCache.h"
 #import <EtoileFoundation/EtoileFoundation.h>
 
 @implementation COSynchronizationServer
 
-static void SearchForRevisionsClientLacks(NSMutableSet *resultSet, ETUUID *rev, ETUUID *persistentRootUUID, NSSet *clientLatestRevisions, COSQLiteStore *store)
+static void FindAllParents(NSMutableSet *resultSet, ETUUID *rev, ETUUID *persistentRootUUID, COSQLiteStore *store, NSSet *stopSet)
 {
-    if ([clientLatestRevisions containsObject: rev])
-    {
+    if ([resultSet containsObject: rev])
         return;
-    }
-    
+
+    if (stopSet != nil && [stopSet containsObject: rev])
+		return;
+	
     [resultSet addObject: rev];
     
     // Recursively search the parent(s)
     
-    CORevisionInfo *info = [store revisionInfoForRevisionUUID: rev persistentRootUUID: persistentRootUUID];
-    if ([info parentRevisionUUID] != nil)
+    CORevision *revision = [CORevisionCache revisionForRevisionUUID: rev persistentRootUUID: persistentRootUUID storeUUID: [store UUID]];
+	
+    if ([revision parentRevision] != nil)
     {
-        SearchForRevisionsClientLacks(resultSet, [info parentRevisionUUID], persistentRootUUID, clientLatestRevisions, store);
+        FindAllParents(resultSet, [[revision parentRevision] UUID], persistentRootUUID, store, stopSet);
     }
-    if ([info mergeParentRevisionUUID] != nil)
+    if ([revision mergeParentRevision] != nil)
     {
-        SearchForRevisionsClientLacks(resultSet, [info mergeParentRevisionUUID], persistentRootUUID, clientLatestRevisions, store);
+        FindAllParents(resultSet, [[revision mergeParentRevision] UUID], persistentRootUUID, store, stopSet);
     }
 }
+
+- (BOOL) shouldSendBranch: (COBranchInfo *)branch
+{
+	if (branch.metadata[@"source"] != nil)
+	{
+		return NO;
+	}
+	return YES;
+}
+
 
 /*
 
@@ -47,20 +60,23 @@ For now we do.
     ETUUID *persistentRoot = [ETUUID UUIDWithString: aRequest[@"persistentRoot"]];
     COPersistentRootInfo *serverInfo = [aStore persistentRootInfoForUUID: persistentRoot];
     
-    // 1. Gather a set of CORevisionID that represent the "heads" of all of the clients' branches
-    NSMutableSet *clientLatestRevisions = [NSMutableSet set];
+	// 1. Calculate the set of revision ETUUID the client has
+    NSMutableSet *revisionsClientHas = [NSMutableSet set];
     for (NSString *revisionUUIDString in [[aRequest objectForKey: @"clientNewestRevisionIDForBranchUUID"] allValues])
     {
         ETUUID *revid = [ETUUID UUIDWithString: revisionUUIDString];
 
-        [clientLatestRevisions addObject: revid];
+		FindAllParents(revisionsClientHas, revid, persistentRoot, aStore, nil);
     }
     
     // 2. Calculate the set of CORevisionID that the client lacks
     NSMutableSet *revisionsClientLacks = [NSMutableSet set];
     for (COBranchInfo *branch in [serverInfo branches])
     {
-        SearchForRevisionsClientLacks(revisionsClientLacks, [branch currentRevisionUUID], persistentRoot, clientLatestRevisions, aStore);
+		if ([self shouldSendBranch: branch])
+		{
+			FindAllParents(revisionsClientLacks, [branch currentRevisionUUID], persistentRoot, aStore, revisionsClientHas);
+		}
     }
     
     // Now prepare the property list output
