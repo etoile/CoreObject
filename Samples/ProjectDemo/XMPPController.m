@@ -67,6 +67,8 @@
 		return;
 	}
 	
+	[[[NSApplication sharedApplication] dockTile] setBadgeLabel: jid];
+	
 	NSLog(@"Connect to %@ %@ %@", jid, password, server);
 	
 	xmppStream.myJID = [XMPPJID jidWithString: jid];
@@ -101,9 +103,6 @@
 
 - (void)xmppRosterDidChange:(XMPPRosterMemoryStorage *)sender
 {
-	NSArray *array = [sender sortedUsersByAvailabilityName];
-	
-	NSLog(@"Roster: %@", array);
 }
 
 - (NSString *) serializePropertyList: (id)plist

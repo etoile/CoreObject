@@ -27,7 +27,7 @@
     if (wc != nil && [wc respondsToSelector: @selector(projectDocument)])
     {
 		Document *doc = [(OutlineController *)wc projectDocument];
-        NSLog(@"Automatically changing inspected document to: %@", doc);
+//        NSLog(@"Automatically changing inspected document to: %@", doc);
         [self setInspectedDocument: doc];
     }    
 }

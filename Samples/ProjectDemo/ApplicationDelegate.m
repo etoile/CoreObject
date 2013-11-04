@@ -65,6 +65,11 @@
 
 - (void)awakeFromNib
 {
+	if ([[NSUserDefaults standardUserDefaults] boolForKey: @"clearStore"])
+	{
+		[[[COSQLiteStore alloc] initWithURL: [self storeURL]] clearStore];
+	}
+
 	context = [COEditingContext contextWithURL: [self storeURL]];
 	
 	// TODO: Use NSUserDefaults to remember open documents
@@ -251,7 +256,7 @@
 
 - (void)keyDocumentChanged: (NSNotification*)notif
 {
-	NSLog(@"Key document changed to: %@", [self keyDocumentController]);
+	//NSLog(@"Key document changed to: %@", [self keyDocumentController]);
 	
 	[tagWindowController setDocument: [self keyDocument]];
 	

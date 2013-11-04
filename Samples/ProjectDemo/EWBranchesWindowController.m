@@ -37,8 +37,6 @@ static EWBranchesWindowController *shared;
 
 - (void) setInspectedDocument: (Document *)aDoc
 {
-    NSLog(@"Inspect %@", aDoc);
-    
     [self setPersistentRoot: [aDoc persistentRoot]];
 }
 
@@ -54,8 +52,6 @@ static EWBranchesWindowController *shared;
 
 - (void) storePersistentRootMetadataDidChange: (NSNotification *)notif
 {
-    NSLog(@"branches window: view did change: %@", notif);
-    
     [table reloadData];
 }
 

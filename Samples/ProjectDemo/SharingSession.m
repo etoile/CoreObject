@@ -96,7 +96,8 @@
 	[responseMessage addAttributeWithName:@"type" stringValue:@"coreobject"];
 	[responseMessage addAttributeWithName:@"to" stringValue:[aJID full]];
 	[responseMessage addChild:body];
-	
+
+	NSLog(@"< sending %@ to %@ size %d", aType, aJID, (int)[[body XMLString] length]);
 	[_xmppStream sendElement:responseMessage];
 }
 
@@ -107,6 +108,8 @@
 		NSXMLElement *body = (NSXMLElement *)[message childAtIndex: 0];
 		
 		NSString *coreObjectMessageName = [body name];
+		
+		NSLog(@"> recv'd %@, %d chars", coreObjectMessageName, (int)[[body XMLString] length]);
 		
 		if ([coreObjectMessageName isEqualToString: @"pull-from-us"])
 		{
@@ -132,13 +135,13 @@
 		{
 			id response = [self deserializePropertyList: [body objectValue]];
 			
-			NSLog(@"Got pull reply %@", response);
+			NSArray *revs = [response[@"revisions"] allKeys];
+			NSLog(@"      Got pull reply with revs: %@", revs);
 			
 			COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
 			[client handleUpdateResponse: response store: [_persistentRoot store]];
 	
 			dispatch_async(dispatch_get_main_queue(), ^() {
-				NSLog(@"The store notification should have been posted");
 				[self pullDidFinish];
 			});
 			
@@ -154,11 +157,6 @@
 - (void) pullDidFinish
 {
 	NSLog(@"Pull did finish");
-	
-	for (COBranch *branch in [_persistentRoot branches])
-	{
-		NSLog(@"Branch: %@", branch);
-	}
 	
 	[self setBranches];
 	

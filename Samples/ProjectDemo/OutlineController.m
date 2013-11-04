@@ -92,7 +92,7 @@
 	// context. This is a workaround.
 	doc = [[doc persistentRoot] rootObject];
 	
-    NSLog(@"Reloading outline for %@", doc);
+    //NSLog(@"Reloading outline for %@", doc);
     [outlineView reloadData];
 }
 

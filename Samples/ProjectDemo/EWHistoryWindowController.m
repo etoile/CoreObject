@@ -29,8 +29,6 @@
 
 - (void) setInspectedDocument: (Document *)aDoc
 {
-    NSLog(@"Inspect %@", aDoc);
-    
 	[self setPersistentRoot: [aDoc persistentRoot]];
 }
 
