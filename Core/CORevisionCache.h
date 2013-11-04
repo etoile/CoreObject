@@ -21,6 +21,10 @@
 
 /** @taskunit Revision Access */
 
+/**
+ * Look up the requested revision in the cache. Returns nil if the revision is
+ * not found.
+ */
 + (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
 					  persistentRootUUID: (ETUUID *)aPersistentRoot
 							   storeUUID: (ETUUID *)aStoreUUID;

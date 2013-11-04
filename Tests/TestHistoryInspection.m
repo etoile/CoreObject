@@ -265,4 +265,16 @@
 
 // FIXME: Test these things when reloading from a store
 
+/**
+ * It's important for syncing to be able to look up a revision in the cache
+ * that is not present and get nil instead of an exception
+ */
+- (void) testRevisionCacheReturnsNilForUnknownRevision
+{
+	CORevision *rev = [CORevisionCache revisionForRevisionUUID: [ETUUID UUID]
+											persistentRootUUID: [p1 UUID]
+													 storeUUID: [[p1 store] UUID]];
+	UKNil(rev);
+}
+
 @end

@@ -56,6 +56,9 @@ static NSMutableDictionary *cachesByStoreUUID = nil;
         CORevisionInfo *info = [[self store] revisionInfoForRevisionUUID: aRevid
 													  persistentRootUUID: aPersistentRoot];
         
+		if (info == nil)
+			return nil;
+
         cached = [[CORevision alloc] initWithCache: self revisionInfo: info];
         
         [_revisionForRevisionID setObject: cached forKey: aRevid];
