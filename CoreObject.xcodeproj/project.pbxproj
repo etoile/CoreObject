@@ -128,7 +128,6 @@
 		6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646975317CDA8DB00A1B767 /* COPersistentRoot+Private.h */; };
 		6646976317CDB94300A1B767 /* COUndoTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646976117CDB94300A1B767 /* COUndoTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6646976417CDB94300A1B767 /* COUndoTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646976217CDB94300A1B767 /* COUndoTrack.m */; };
-		6646976F17CDBBF200A1B767 /* COUndoNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646976E17CDBBF200A1B767 /* COUndoNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6646977B17CE7CAC00A1B767 /* COSynchronizationClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646977917CE7CAC00A1B767 /* COSynchronizationClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6646977C17CE7CAC00A1B767 /* COSynchronizationClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646977A17CE7CAC00A1B767 /* COSynchronizationClient.m */; };
 		6646977F17CE7E2600A1B767 /* COSynchronizationServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646977D17CE7E2600A1B767 /* COSynchronizationServer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -526,7 +525,6 @@
 		6646975517CDA94000A1B767 /* COBranch+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "COBranch+Private.h"; path = "Core/COBranch+Private.h"; sourceTree = "<group>"; };
 		6646976117CDB94300A1B767 /* COUndoTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COUndoTrack.h; sourceTree = "<group>"; };
 		6646976217CDB94300A1B767 /* COUndoTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COUndoTrack.m; sourceTree = "<group>"; };
-		6646976E17CDBBF200A1B767 /* COUndoNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COUndoNode.h; sourceTree = "<group>"; };
 		6646977917CE7CAC00A1B767 /* COSynchronizationClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizationClient.h; path = Synchronization/COSynchronizationClient.h; sourceTree = "<group>"; };
 		6646977A17CE7CAC00A1B767 /* COSynchronizationClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COSynchronizationClient.m; path = Synchronization/COSynchronizationClient.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		6646977D17CE7E2600A1B767 /* COSynchronizationServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizationServer.h; path = Synchronization/COSynchronizationServer.h; sourceTree = "<group>"; };
@@ -838,7 +836,6 @@
 				663CE2B517C0B05800E729F5 /* COEditingContext+Undo.m */,
 				6646976117CDB94300A1B767 /* COUndoTrack.h */,
 				6646976217CDB94300A1B767 /* COUndoTrack.m */,
-				6646976E17CDBBF200A1B767 /* COUndoNode.h */,
 				662AC93B1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h */,
 				662AC93C1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m */,
 			);
@@ -1270,7 +1267,6 @@
 				609C01AC170AC93100D01AAB /* NSObject+CoreObject.h in Headers */,
 				6675F8C11785C02A001E5622 /* COItem.h in Headers */,
 				6646976317CDB94300A1B767 /* COUndoTrack.h in Headers */,
-				6646976F17CDBBF200A1B767 /* COUndoNode.h in Headers */,
 				6646977B17CE7CAC00A1B767 /* COSynchronizationClient.h in Headers */,
 				6646977F17CE7E2600A1B767 /* COSynchronizationServer.h in Headers */,
 				6675F8C71785C02A001E5622 /* COType.h in Headers */,
