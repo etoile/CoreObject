@@ -139,7 +139,8 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 			{
 				NSAssert([value isRoot], @"A property must point to a root object "
 					"for references accross persistent roots");
-				return [COPath pathWithPersistentRoot: [[value persistentRoot] UUID]]; // Create path to the current branch by default
+				// Create path to the current branch by default
+				return [COPath pathWithPersistentRoot: [[value persistentRoot] UUID]];
 			}
 		}
 		else
@@ -184,9 +185,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	}
 	else
 	{
-		// FIXME: Don't encode using the keyed archiving unless the property
-		// description requires it explicitly.
-		return [NSKeyedArchiver archivedDataWithRootObject: value];
+		NSAssert2(NO, @"Unsupported serialization type %@ for %@", [value class], value);
 	}
 	return nil;
 }
@@ -225,16 +224,19 @@ serialization. */
 
 	if ([self isCoreObjectEntityType: type])
 	{
-		//if (value == nil || ([value persistentRoot] == [self persistentRoot]))
-		//{
-			return ([aPropertyDesc isComposite] ? kCOTypeCompositeReference : kCOTypeReference);
-		//}
-		//else
-		//{
-		//	NSAssert([value isRoot], @"A property must point to a root object "
-		//		"for references accross persistent roots");
-		//	return kCOTypeReference;
-		//}
+		return ([aPropertyDesc isComposite] ? kCOTypeCompositeReference : kCOTypeReference);
+	}
+	else if ([typeName isEqualToString: @"NSObject"])
+	{
+		/* For persistent relationship such as -[ETLayoutItem representedObject], 
+		   where the value must be a COObject entity type (or some derived kind) 
+		   to be persisted. For other NSObject derived instances, the 
+		   relationship is treated as transient.
+
+		   For such property, a serialization getter must be implemented to 
+		   return nil when the value is not a persistent COObject instance 
+		   (otherwise -serializedValueForValue: raises an exception).*/
+		return kCOTypeReference;
 	}
 	else if ([typeName isEqualToString: @"BOOL"]
 	      || [typeName isEqualToString: @"NSInteger"]
@@ -280,23 +282,44 @@ serialization. */
 	{
 		return kCOTypeString;
 	}
-	else
+	else if ([self serializationGetterForProperty: [aPropertyDesc name]])
 	{
-        // For a case like ETShape.pathResizeSelector,
-        // the COObject subclass implements -serializedPathResizeSelector to return an NSString.
+        // For a case like ETShape.pathResizeSelector, the COObject subclass
+		// implements -serializedPathResizeSelector to return an NSString.
         // However, the typeName is "SEL".
-        //
-        // Not sure of the correct fix.
-        // HACK:
+
+		/* Serialialization accessors can override the types declared in the 
+		   property description using either NSString or NSData, but no other 
+		   types.
+		   For a multivalued property, the same applies, since the property 
+		   description type is the element type. For example, a serialization 
+		   getter can return an array of ETUTI objects as an array of NSString 
+		   objects. */
         if ([value isKindOfClass: [NSString class]])
         {
             return kCOTypeString;
         }
-        
-		// FIXME: Don't encode using the keyed archiving unless the property
-		// description requires it explicitly.
-		//NSAssert(NO, @"Unsupported serialization type %@ for %@", type, value);
-		return kCOTypeBlob;
+        else if ([value isKindOfClass: [NSData class]])
+		{
+			return kCOTypeBlob;
+		}
+		else if (value == nil)
+		{
+			// NOTE: We use an arbitrary type
+			return kCOTypeBlob;
+		}
+		else
+		{
+			NSString *getterString =
+				NSStringFromSelector([self serializationGetterForProperty: [aPropertyDesc name]]);
+
+			NSAssert(NO, @"Unsupported serialization type %@ for %@ returned by "
+				"serialization getter %@", type, value, getterString);
+		}
+	}
+	else
+	{
+		NSAssert(NO, @"Unsupported serialization type %@ for %@", type, value);
 	}
 	return 0;
 }
@@ -366,6 +389,10 @@ serialization. */
 
 	if (getter != NULL)
 	{
+		NSAssert([self serializationSetterForProperty: [aPropertyDesc name]] != NULL,
+			@"Serialization getter %@ must have a matching serialization setter",
+				 NSStringFromSelector(getter));
+
 		return [self performSelector: getter];
 	}
 	
@@ -525,7 +552,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
         }
         else
         {
-	    NSAssert2(NO, @"Unsupported serialization type %@ for %@", COTypeDescription(type), value);
+			NSAssert2(NO, @"Unsupported serialization type %@ for %@", COTypeDescription(type), value);
         }
     }
 
@@ -592,7 +619,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 
 			if ([typeName isEqualToString: @"NSData"] == NO)
 			{
-				return [NSKeyedUnarchiver unarchiveObjectWithData: (NSData *)value];
+				ETAssert([self respondsToSelector: [self serializationSetterForProperty: [aPropertyDesc name]]]);
 			}
 			return value;
 		}
@@ -604,6 +631,16 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	}
 }
 
+- (SEL)serializationSetterForProperty: (NSString *)property
+{
+	NSString *capitalizedKey = [property stringByCapitalizingFirstLetter];
+	NSString *setterString =
+		[NSString stringWithFormat: @"%@%@%@", @"setSerialized", capitalizedKey, @":"];
+	SEL setter = NSSelectorFromString(setterString);
+
+	return ([self respondsToSelector: setter] ? setter : NULL);
+}
+
 // TODO: Could be changed to -setSerializedValue:forProperty: once the previous
 // serialization format has been removed.
 - (void)setSerializedValue: (id)value forPropertyDescription: (ETPropertyDescription *)aPropertyDesc
@@ -612,11 +649,14 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 
 	/* First we try to use the setter named 'setSerialized' + 'key' */
 
-	SEL setter = NSSelectorFromString([NSString stringWithFormat: @"%@%@%@", 
-		@"setSerialized", [key stringByCapitalizingFirstLetter], @":"]);
+	SEL setter = [self serializationSetterForProperty: key];
 
 	if ([self respondsToSelector: setter])
 	{
+		NSAssert([self serializationGetterForProperty: [aPropertyDesc name]] != NULL,
+			@"Serialization setter %@ must have a matching serialization getter",
+				 NSStringFromSelector(setter));
+		
 		[self performSelector: setter withObject: value];
 		return;
 	}	
