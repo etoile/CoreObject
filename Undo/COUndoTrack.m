@@ -70,16 +70,6 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     return self;
 }
 
-- (NSArray *) undoNodes
-{
-    return [_store stackContents: kCOUndoStack forName: _name];
-}
-
-- (NSArray *) redoNodes
-{
-    return [_store stackContents: kCORedoStack forName: _name];
-}
-
 #pragma mark -
 #pragma mark Undo and Redo
 
@@ -236,7 +226,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	if (_commands == nil)
 		return;
 
-	NSUInteger currentIndex = [_commands indexOfObject: [self currentCommand]];
+	NSUInteger currentIndex = [_commands indexOfObject: [self currentNode]];
 	[_commands removeObjectsFromIndex: currentIndex + 1];
 }
 

@@ -146,11 +146,4 @@ extern NSString * const kCOUndoStackName;
  */
 - (void) recordCommand: (COCommand *)aCommand;
 
-
-/** @taskunit Deprecated */
-
-
-@property (weak, readonly, nonatomic) NSArray *undoNodes;
-@property (weak, readonly, nonatomic) NSArray *redoNodes;
-
 @end

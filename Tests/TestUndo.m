@@ -352,8 +352,7 @@
 
 - (void) testTrackAPI
 {
-    UKObjectsEqual(@[], [_testTrack undoNodes]);
-    UKObjectsEqual(@[], [_testTrack redoNodes]);
+    UKIntsEqual(1, [[_testTrack nodes] count]); // Placeholder node
     UKFalse([_testTrack canRedo]);
     UKFalse([_testTrack canUndo]);
     
@@ -363,8 +362,8 @@
     [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
     [ctx commitWithUndoTrack: _testTrack];
     
-    UKIntsEqual(2, [[_testTrack undoNodes] count]);
-    UKObjectsEqual(@[], [_testTrack redoNodes]);
+    UKIntsEqual(3, [[_testTrack nodes] count]);
+    UKIntsEqual(2, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
     UKFalse([_testTrack canRedo]);
     UKTrue([_testTrack canUndo]);
     
