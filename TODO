@@ -16,8 +16,6 @@ First alpha release blockers
 
 - Eliminate all compile warnings
 
-- Fix few things in EtoileUI that prevents to turn on all assertions in COObject
-
 - Fix GNUstep support
 
 - Write remaing class descriptions

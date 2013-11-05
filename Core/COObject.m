@@ -733,11 +733,8 @@ See +[NSObject typePrefix]. */
 	// NOTE: For the CoreObject benchmark, no visible slowdowns.
 	[self validateEditingContextForNewValue: newValue
                         propertyDescription: propertyDesc];
-
-	// FIXME: Won't work with EtoileUI until  all serialization accessors are
-	// implemented (e.g. -[ETShape serializedPath])
-	//[self validateTypeForNewValue: newValue
-	//          propertyDescription: propertyDesc];
+	[self validateTypeForNewValue: newValue
+	          propertyDescription: propertyDesc];
 }
 
 /**
