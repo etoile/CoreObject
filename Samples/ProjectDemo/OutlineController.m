@@ -127,6 +127,11 @@
 			[[doc persistentRoot] UUID]];
 	}
 	   
+	if ([self isSharing])
+	{
+		name = [name stringByAppendingFormat: @"-%@", [_sharingSession ourName]];
+	}
+	
     return [COUndoTrack trackForName: name
 				  withEditingContext: [[doc persistentRoot] editingContext]];
 }

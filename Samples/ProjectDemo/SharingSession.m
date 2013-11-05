@@ -218,4 +218,9 @@
 	return [_peerJID bare];
 }
 
+- (NSString *) ourName
+{
+	return [[_xmppStream myJID] bare];
+}
+
 @end

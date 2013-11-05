@@ -20,7 +20,7 @@
 	 * Only non-nil for the client
 	 */
 	COBranch *_originMasterBranch;
-	
+
 	XMPPJID *_peerJID;
 	XMPPStream *_xmppStream;
 	BOOL _isServer;
@@ -38,5 +38,6 @@
 @property (nonatomic, readonly, assign) BOOL isServer;
 
 @property (nonatomic, readonly, strong) NSString *peerName;
+@property (nonatomic, readonly, strong) NSString *ourName;
 
 @end
