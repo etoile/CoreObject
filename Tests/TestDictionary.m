@@ -71,6 +71,28 @@
 	UKTrue([[model entries] isEmpty]);
 }
 
+- (void)testMutation
+{
+	[model insertObject: @"pear"
+	            atIndex: ETUndeterminedIndex
+	               hint: [ETKeyValuePair pairWithKey: @"fruit" value: @"pear"]
+	        forProperty: @"entries"];
+
+	[model insertObject: @"leak"
+	            atIndex: ETUndeterminedIndex
+	               hint: [ETKeyValuePair pairWithKey: @"vegetable" value: @"leak"]
+	        forProperty: @"entries"];
+
+	UKObjectsEqual(D(@"pear", @"fruit", @"leak", @"vegetable"), [[model entries] content]);
+
+	[model removeObject: nil
+	            atIndex: ETUndeterminedIndex
+	               hint: [ETKeyValuePair pairWithKey: @"fruit" value: nil]
+	        forProperty: @"entries"];
+			
+	UKObjectsEqual(D(@"leak", @"vegetable"), [[model entries] content]);
+}
+
 - (void)testSerializationRoundTrip
 {
 	UKObjectsEqual([model entries], [model roundTripValueForProperty: @"entries"]);

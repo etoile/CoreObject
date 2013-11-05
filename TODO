@@ -12,8 +12,6 @@ First alpha release blockers
 
 - Check code quality for all Core classes (underway)
 
-- Support dictionaries in -collectionForProperty:removalIndex: and -collectionForProperty:insertionIndex: (write some tests too)
-
 - Eliminate all compile warnings
 
 - Fix GNUstep support
