@@ -76,7 +76,8 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 - (BOOL)canUndo
 {
     COCommand *edit = [self peekEditFromStack: kCOUndoStack forName: _name];
-    return [self canApplyEdit: edit toContext: _editingContext];
+	COCommand *inverse = [edit inverse];
+    return [self canApplyEdit: inverse toContext: _editingContext];
 }
 
 - (BOOL)canRedo

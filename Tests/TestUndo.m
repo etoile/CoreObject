@@ -517,6 +517,51 @@
 	UKObjectsEqual(@"child1a", [child1 label]);
 }
 
+- (void) testSelectiveUndoRedoOfCommands2
+{
+    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *root = [doc1 rootObject];
+	[ctx commitWithUndoTrack: _testTrack];
+	
+	OutlineItem *child1 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[root addObject: child1];
+	[ctx commitWithUndoTrack: _testTrack];
+
+	OutlineItem *child2 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[root addObject: child2];
+	[ctx commitWithUndoTrack: _testTrack];
+
+	UKObjectsEqual((@[child1, child2]), [root contents]);
+	UKIntsEqual(4, [[_testTrack nodes] count]);
+	UKIntsEqual(3, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+	
+	// undo child1 insertion
+	id<COTrackNode> node = [[_testTrack nodes] objectAtIndex: 2];
+	UKObjectsNotEqual(node, [_testTrack currentNode]);
+	[_testTrack undoNode: node];
+	
+	UKObjectsEqual(@[child2], [root contents]);
+	UKIntsEqual(2, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+	UKTrue([_testTrack canUndo]);
+	
+	// undo child2 insertion
+	[_testTrack undo];
+
+	UKObjectsEqual(@[], [root contents]);
+	UKIntsEqual(1, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+	UKTrue([_testTrack canUndo]);
+
+	// perform 2 redos
+	
+	UKTrue([_testTrack canRedo]);
+	[_testTrack redo];
+	UKTrue([_testTrack canRedo]);
+	[_testTrack redo];
+	UKObjectsEqual((@[child1, child2]), [root contents]);
+	UKFalse([_testTrack canRedo]);
+	UKTrue([_testTrack canUndo]);
+}
+
 @end
 
 
