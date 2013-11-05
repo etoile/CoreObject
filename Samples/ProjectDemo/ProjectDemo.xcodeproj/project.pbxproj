@@ -61,6 +61,8 @@
 		6646980617CFF8AA00A1B767 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664697FF17CFF8A200A1B767 /* EtoileFoundation.framework */; };
 		6646987F17D3FF6500A1B767 /* DocumentItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646987E17D3FF6000A1B767 /* DocumentItem.m */; };
 		6646988717D407A400A1B767 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6646988617D407A000A1B767 /* AppKit.framework */; };
+		665D41E9182868840044E6B9 /* EWUndoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 665D41E7182868840044E6B9 /* EWUndoWindowController.m */; };
+		665D41EA182868840044E6B9 /* Undo.xib in Resources */ = {isa = PBXBuildFile; fileRef = 665D41E8182868840044E6B9 /* Undo.xib */; };
 		66708F9C12486F0400E65F00 /* ProjectDemoMainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* ProjectDemoMainMenu.xib */; };
 		66708F9F12486F0400E65F00 /* OutlineWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66708F9412486E9D00E65F00 /* OutlineWindow.xib */; };
 		66708FAB12486F0400E65F00 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
@@ -319,6 +321,9 @@
 		6646987D17D3FF5B00A1B767 /* DocumentItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DocumentItem.h; sourceTree = "<group>"; };
 		6646987E17D3FF6000A1B767 /* DocumentItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DocumentItem.m; sourceTree = "<group>"; };
 		6646988617D407A000A1B767 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = ../../../../../../System/Library/Frameworks/AppKit.framework; sourceTree = "<group>"; };
+		665D41E6182868840044E6B9 /* EWUndoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWUndoWindowController.h; sourceTree = "<group>"; };
+		665D41E7182868840044E6B9 /* EWUndoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWUndoWindowController.m; sourceTree = "<group>"; };
+		665D41E8182868840044E6B9 /* Undo.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Undo.xib; sourceTree = "<group>"; };
 		66708F7112486CD300E65F00 /* OutlineController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutlineController.h; sourceTree = "<group>"; };
 		66708F7212486CD300E65F00 /* OutlineController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutlineController.m; sourceTree = "<group>"; };
 		66708F9412486E9D00E65F00 /* OutlineWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OutlineWindow.xib; sourceTree = "<group>"; };
@@ -734,9 +739,20 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		665D41DF182868300044E6B9 /* Undo Window */ = {
+			isa = PBXGroup;
+			children = (
+				665D41E6182868840044E6B9 /* EWUndoWindowController.h */,
+				665D41E7182868840044E6B9 /* EWUndoWindowController.m */,
+				665D41E8182868840044E6B9 /* Undo.xib */,
+			);
+			name = "Undo Window";
+			sourceTree = "<group>";
+		};
 		66708FEF124870CB00E65F00 /* ProjectDemo */ = {
 			isa = PBXGroup;
 			children = (
+				665D41DF182868300044E6B9 /* Undo Window */,
 				667C6C80181AF42B00BDD213 /* Branches Window */,
 				66E8EE0C12D673BB00780264 /* Search Window */,
 				7991190212CD3D36009D28C0 /* Project Navigator */,
@@ -1081,6 +1097,7 @@
 				661210F818217955003AEC29 /* AccountBox.xib in Resources */,
 				79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */,
 				79F122B1128A49FE00EC0255 /* history.tiff in Resources */,
+				665D41EA182868840044E6B9 /* Undo.xib in Resources */,
 				79F122C4128A4B7800EC0255 /* format-indent-less.tiff in Resources */,
 				79F122C5128A4B7800EC0255 /* format-indent-more.tiff in Resources */,
 				79F122C6128A4B7800EC0255 /* list-add.tiff in Resources */,
@@ -1140,6 +1157,7 @@
 				79911A5012CDAECD009D28C0 /* SKTFoundationExtras.m in Sources */,
 				79911A5112CDAECD009D28C0 /* SKTGraphicView.m in Sources */,
 				661211F91821B216003AEC29 /* XMPPUserMemoryStorageObject.m in Sources */,
+				665D41E9182868840044E6B9 /* EWUndoWindowController.m in Sources */,
 				79911A5212CDAECD009D28C0 /* SKTGridPanelController.m in Sources */,
 				661211891821A482003AEC29 /* DDAbstractDatabaseLogger.m in Sources */,
 				79911A5312CDAECD009D28C0 /* SKTGridView.m in Sources */,

@@ -11,14 +11,11 @@
 	IBOutlet NSTableView *table;
 	IBOutlet NSTextField *stackLabel;
     
-    EWDocument *_inspectedDocument;
+    COPersistentRoot *_persistentRoot;
+	COUndoTrack *_track;
 }
 
 - (IBAction) undo: (id)sender;
 - (IBAction) redo: (id)sender;
-
-+ (EWUndoWindowController *) sharedController;
-
-- (void) show;
 
 @end

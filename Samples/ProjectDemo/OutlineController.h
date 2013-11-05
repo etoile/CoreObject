@@ -37,5 +37,6 @@
 - (IBAction) showGraphvizHistoryGraph: (id)sender;
 
 - (void) switchToRevision: (CORevision *)aRevision;
+- (COUndoTrack *) undoStack;
 
 @end
