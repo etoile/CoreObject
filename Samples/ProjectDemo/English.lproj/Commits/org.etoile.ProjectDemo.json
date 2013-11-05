@@ -1,0 +1,81 @@
+{
+    "types":
+	{
+		"renaming": "Object Renaming",
+		"modification": "Modification",
+		"creation": "Object Creation",
+		"deletion": "Object Deletion",
+		"copy": "Object Copy",
+		"history": "History related",
+	},
+
+	"descriptors":
+	{
+		"add-item":
+		{
+			"type": "creation",
+			"shortDescription": "Add item"
+		},
+		
+		"add-child-item":
+		{
+			"type": "creation",
+			"shortDescription": "Add child item"
+		},
+		
+		"shift-left":
+		{
+			"type": "modification",
+			"shortDescription": "Shift left"
+		},
+
+		"shift-right":
+		{
+			"type": "modification",
+		  	"shortDescription": "Shift right"
+		},
+
+		"revert":
+		{
+			"type": "history",
+		  	"shortDescription": "Revert to revision"
+		},
+		
+		"step-backward":
+		{
+			"type": "history",
+		  	"shortDescription": "Step Backward"
+		},
+		
+		"step-forward":
+		{
+			"type": "history",
+		  	"shortDescription": "Step Forward"
+		},
+		
+		"delete":
+		{
+			"type": "deletion",
+			"shortDescription": "Deleted one or several objects"
+		},
+		
+		"rename":
+		{
+			"type": "renaming",
+		  	"shortDescription": "Rename outline item"
+		},
+		
+		"duplicate":
+		{
+			"type": "copy",
+			"shortDescription": "Duplicate %@"
+		},
+		
+		"drop":
+		{
+			"type": "copy",
+			"shortDescription": "Drop items"
+		},
+		
+	}
+}

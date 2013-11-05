@@ -31,6 +31,64 @@
     [table setTarget: self];
 }
 
+- (void) setInspectedDocument: (Document *)aDoc
+{
+	NSLog(@"UndoWindow: set inspected document");
+	
+    _persistentRoot = [aDoc persistentRoot];
+	
+	OutlineController *outline = [(ApplicationDelegate *)[NSApp delegate] controllerForPersistentRoot: _persistentRoot];
+	[self setUndoStack: [outline undoStack]];
+}
+
+- (void) setUndoStack: (COUndoTrack *)stack
+{
+	_track = stack;
+	NSLog(@"Set undo stack %@ has %d items", _track, (int)[[_track nodes] count]);
+    [table reloadData];
+	[self validateButtons];
+}
+
+- (void) undoStackDidChange: (NSNotification *)notif
+{
+    NSLog(@"undo track did change: %@", [notif userInfo]);
+	
+    OutlineController *outline = [(ApplicationDelegate *)[NSApp delegate] controllerForPersistentRoot: _persistentRoot];
+	[self setUndoStack: [outline undoStack]];
+}
+
+- (COUndoTrack *)undoStack
+{
+    return _track;
+}
+
+- (void) validateButtons
+{
+	[undo setEnabled: [_track canUndo]];
+	[redo setEnabled: [_track canRedo]];
+	
+	[selectiveUndo setEnabled: NO];
+	[selectiveRedo setEnabled: NO];
+	
+	id<COTrackNode> node = [self selectedNode];
+	const NSUInteger currentNodeIndex = [[_track nodes] indexOfObject: [_track currentNode]];
+	const NSUInteger nodeIndex = [[_track nodes] indexOfObject: node];
+
+	if (node != nil && nodeIndex != NSNotFound)
+	{
+		[selectiveUndo setEnabled: nodeIndex <= currentNodeIndex];
+		[selectiveRedo setEnabled: nodeIndex > currentNodeIndex];
+	}
+}
+
+/* Target/action */
+
+- (void) doubleClick: (id)sender
+{
+	id<COTrackNode> node = [self selectedNode];
+	[_track setCurrentNode: node];
+}
+
 - (IBAction) undo: (id)sender
 {
 	[_track undo];
@@ -41,43 +99,34 @@
 	[_track redo];
 }
 
-- (void) setInspectedDocument: (Document *)aDoc
+- (IBAction) selectiveUndo: (id)sender
 {
-    _persistentRoot = [aDoc persistentRoot];
-	
-	OutlineController *outline = [(ApplicationDelegate *)[NSApp delegate] controllerForPersistentRoot: _persistentRoot];
-	_track = [outline undoStack];
+	id<COTrackNode> node = [self selectedNode];
+	if (node != nil)
+	{
+		[_track undoNode: node];
+	}
 }
 
-- (void) setUndoStack: (COUndoTrack *)stack
+- (IBAction) selectiveRedo: (id)sender
 {
-    [table reloadData];
+	id<COTrackNode> node = [self selectedNode];
+	if (node != nil)
+	{
+		[_track redoNode: node];
+	}
 }
 
-- (void) undoStackDidChange: (NSNotification *)notif
-{
-    NSLog(@"undo track did change: %@", [notif userInfo]);
-    
-    NSString *stackName = [notif userInfo][kCOUndoStackName];
-    
-    [table reloadData];
-}
+/* Convenience */
 
-- (COUndoTrack *)undoStack
-{
-    return _track;
-}
-
-/* Target/action */
-
-- (void) doubleClick: (id)sender
+- (id<COTrackNode>) selectedNode
 {
 	const NSUInteger row = [table selectedRow];
 	if (row == NSNotFound)
-		return;
+	return;
 	
 	id<COTrackNode> node = [self nodeAtIndex: row];
-	[_track setCurrentNode: node];
+	return node;
 }
 
 /* NSTableViewDataSource */
@@ -93,6 +142,10 @@
 {
     COUndoTrack *stack = [self undoStack];
     NSArray *nodes = [stack nodes];
+	
+	if (anIndex >= [nodes count])
+		return nil;
+	
 	return [nodes objectAtIndex: anIndex];
 }
 
@@ -104,12 +157,35 @@
     {
         return [node localizedShortDescription];
     }
+	else if ([[tableColumn identifier] isEqual: @"isCurrent"])
+    {
+        if ([[_track currentNode] isEqual: node])
+		{
+			return @YES;
+		}
+    }
     
     return nil;
 }
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
+	id<COTrackNode> node = [self nodeAtIndex: row];
+	
+	if ([[tableColumn identifier] isEqual: @"isCurrent"])
+    {
+		if ([object boolValue] && node != nil)
+		{
+			[_track setCurrentNode: node];
+		}
+    }
+}
+
+/* NSTableViewDelegate */
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+	[self validateButtons];
 }
 
 @end

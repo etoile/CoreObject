@@ -13,6 +13,9 @@
 
 @property (nonatomic, readwrite, weak) SharingSession *sharingSession;
 
+- (COPersistentRoot *) persistentRoot;
+- (COEditingContext *) editingContext;
+
 - (id)initWithDocument: (id)document;
 
 - (Document*)projectDocument;

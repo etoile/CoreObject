@@ -131,11 +131,11 @@
 				  withEditingContext: [[doc persistentRoot] editingContext]];
 }
 
-- (void) commitWithType: (NSString*)type
-       shortDescription: (NSString*)shortDescription
-        longDescription: (NSString*)longDescription;
+- (void) commitWithIdentifier: (NSString *)identifier
 {
-	[[doc persistentRoot] commitWithIdentifier: @"foo" metadata: nil undoTrack: [self undoStack] error:NULL];
+	identifier = [@"org.etoile.ProjectDemo." stringByAppendingString: identifier];
+	
+	[[self persistentRoot] commitWithIdentifier: identifier metadata: nil undoTrack: [self undoStack] error:NULL];
 }
 
 - (void)windowDidLoad
@@ -211,6 +211,16 @@ static int i = 0;
 	return dest;
 }
 
+- (COPersistentRoot *) persistentRoot
+{
+	return [doc persistentRoot];
+}
+
+- (COEditingContext *) editingContext
+{
+	return [[doc persistentRoot] editingContext];
+}
+
 /* IB Actions */
 
 - (IBAction) addItem: (id)sender;
@@ -221,9 +231,8 @@ static int i = 0;
 	
 	[outlineView expandItem: dest];
 	
-	[self commitWithType: @"kCOTypeMinorEdit"
-		shortDescription: @"Add Item"
-		 longDescription: [NSString stringWithFormat: @"Add item %@", [item label]]];
+	[self commitWithIdentifier: @"add-item"];
+	//	TODO: pass [item label] to commit description
 }
 
 - (IBAction) addChildItem: (id)sender;
@@ -237,9 +246,7 @@ static int i = 0;
 		
 		[outlineView expandItem: dest];
 		
-		[self commitWithType: @"kCOTypeMinorEdit"
-			shortDescription: @"Add Child Item"
-			 longDescription: [NSString stringWithFormat: @"Add child item %@ to %@", [item label], [dest label]]];
+		[self commitWithIdentifier: @"add-child-item"];
 	}
 }
 
@@ -256,9 +263,7 @@ static int i = 0;
 		[parent removeItemAtIndex: indexOfItemInParent];
 		[grandparent addItem: item atIndex: [[grandparent contents] indexOfObject: parent] + 1];
 		
-		[self commitWithType: @"kCOTypeMinorEdit"
-			shortDescription: @"Shift Left"
-			 longDescription: [NSString stringWithFormat: @"Shift left item %@", [item label]]];
+		[self commitWithIdentifier: @"shift-left"];
 		
 		[outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex:[outlineView rowForItem: item]]
 				 byExtendingSelection: NO];
@@ -282,9 +287,7 @@ static int i = 0;
 			[parent removeItemAtIndex: [[parent contents] indexOfObject: item]];
 			[newParent addItem: item];
 			
-			[self commitWithType: @"kCOTypeMinorEdit"
-				shortDescription: @"Shift Right"
-				 longDescription: [NSString stringWithFormat: @"Shift right item %@", [item label]]];
+			[self commitWithIdentifier: @"shift-right"]; // TODO: Pass [item label]
 			
 			[outlineView expandItem: newParent];
 			
@@ -319,9 +322,7 @@ static int i = 0;
 {
 	[[doc persistentRoot] setCurrentRevision: aRevision];
 	
-	[self commitWithType: @"kCOTypeMinorEdit"
-		shortDescription: @"Revert to revision"
-		 longDescription: [NSString stringWithFormat: @"Revert to revision"]];
+	[self commitWithIdentifier: @"revert"];
 }
 
 /* History stuff */
@@ -359,10 +360,9 @@ static int i = 0;
 	if ([[[doc persistentRoot] editingBranch] canUndo])
 		[[[doc persistentRoot] editingBranch] undo];
 	
-	[self commitWithType: @"kCOTypeMinorEdit"
-		shortDescription: @"Step Back"
-		 longDescription: [NSString stringWithFormat: @"Step Back"]];
+	[self commitWithIdentifier: @"step-backward"];
 }
+
 - (IBAction) stepForward: (id)sender
 {
 	NSLog(@"Step forward");
@@ -370,9 +370,7 @@ static int i = 0;
 	if ([[[doc persistentRoot] editingBranch] canRedo])
 		[[[doc persistentRoot] editingBranch] redo];
 	
-	[self commitWithType: @"kCOTypeMinorEdit"
-		shortDescription: @"Step Forward"
-		 longDescription: [NSString stringWithFormat: @"Step Forward"]];
+	[self commitWithIdentifier: @"step-forward"];
 }
 
 - (IBAction) showGraphvizHistoryGraph: (id)sender
@@ -407,9 +405,7 @@ static int i = 0;
 		NSString *label = [itemToDelete label];
 		[[itemToDelete parent] removeItemAtIndex: index];
 		
-		[self commitWithType: @"kCOTypeMinorEdit"
-			shortDescription: @"Delete Item"
-			 longDescription: [NSString stringWithFormat: @"Delete Item %@", label]];
+		[self commitWithIdentifier: @"delete"];
 	}
 }
 
@@ -513,9 +509,7 @@ static int i = 0;
 		NSString *oldLabel = [item label];
 		[item setLabel: object];
 	
-		[self commitWithType: @"kCOTypeMinorEdit"
-			shortDescription: @"Edit Label"
-			 longDescription: [NSString stringWithFormat: @"Edit label from %@ to %@", oldLabel, [item label]]];
+		[self commitWithIdentifier: @"rename"]; // TODO: Use [item label] in description
 	}
 }
 
@@ -726,9 +720,7 @@ static int i = 0;
                 [newParent addItem: outlineItem atIndex: insertionIndex++];
             }
             
-            [self commitWithType: @"kCOTypeMinorEdit"
-                shortDescription: @"Drop Items"
-                 longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
+            [self commitWithIdentifier: @"drop"];
         }
         else
         {
@@ -750,9 +742,7 @@ static int i = 0;
 			if (![[self class] isProjectUndo])
 			{
 				// Only commit the source and destination persistent roots separately if we're in "document undo" mode
-				[self commitWithType: @"kCOTypeMinorEdit"
-					shortDescription: @"Drop Items"
-					 longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
+				[self commitWithIdentifier: @"drop"];
 			}
             
             // Remove from source
@@ -769,9 +759,7 @@ static int i = 0;
 			if (![[self class] isProjectUndo])
 			{
 				// Only commit the source and destination persistent roots separately if we're in "document undo" mode
-				[sourceController commitWithType: @"kCOTypeMinorEdit"
-								shortDescription: @"Drag Items"
-								 longDescription: [NSString stringWithFormat: @"Drop %d items on %@", (int)[outlineItems count], [newParent label]]];
+				[sourceController commitWithIdentifier: @"drop"];
 			}
 			else
 			{

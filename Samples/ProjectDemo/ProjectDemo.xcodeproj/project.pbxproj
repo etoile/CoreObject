@@ -83,6 +83,7 @@
 		6686BEE812593D800065DE1A /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BEE712593D800065DE1A /* Project.m */; };
 		6686BEEB12593D900065DE1A /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BEEA12593D900065DE1A /* Document.m */; };
 		6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686C341125EC5070065DE1A /* ProjectDocument.m */; };
+		66A313611828C5CA00CE0B0D /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 66A3135F1828C5CA00CE0B0D /* Commits */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66CA1844181A3E5B00DE6AFB /* Search.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66CA1843181A3E5B00DE6AFB /* Search.xib */; };
@@ -361,6 +362,8 @@
 		6686C340125EC5070065DE1A /* ProjectDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectDocument.h; sourceTree = "<group>"; };
 		6686C341125EC5070065DE1A /* ProjectDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectDocument.m; sourceTree = "<group>"; };
 		6698320312691F970011C7FC /* SCRATCHPAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SCRATCHPAD; sourceTree = "<group>"; };
+		66A313601828C5CA00CE0B0D /* English */ = {isa = PBXFileReference; lastKnownFileType = folder; name = English; path = English.lproj/Commits; sourceTree = "<group>"; };
+		66A313621828C5D600CE0B0D /* org.etoile.ProjectDemo.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = org.etoile.ProjectDemo.json; path = English.lproj/Commits/org.etoile.ProjectDemo.json; sourceTree = "<group>"; };
 		66C33D6F128F395400E5B15B /* ItemReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItemReference.h; sourceTree = "<group>"; };
 		66C33D70128F395400E5B15B /* ItemReference.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItemReference.m; sourceTree = "<group>"; };
 		66C33DEF1290BC7700E5B15B /* SKTCircle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKTCircle.h; sourceTree = "<group>"; };
@@ -779,6 +782,8 @@
 				6686C341125EC5070065DE1A /* ProjectDocument.m */,
 				6627ED9912761EBC00E06946 /* CheckpointAsSheetController.h */,
 				6627ED9A12761EBC00E06946 /* CheckpointAsSheetController.m */,
+				66A3135F1828C5CA00CE0B0D /* Commits */,
+				66A313621828C5D600CE0B0D /* org.etoile.ProjectDemo.json */,
 				6698320312691F970011C7FC /* SCRATCHPAD */,
 				6627EEDC1278A55A00E06946 /* README */,
 				79911A0712CD974A009D28C0 /* Application.h */,
@@ -1114,6 +1119,7 @@
 				79911A6612CDB215009D28C0 /* Rectangle.tiff in Resources */,
 				661211901821A482003AEC29 /* README.txt in Resources */,
 				79911A6712CDB215009D28C0 /* TextGraphic.tiff in Resources */,
+				66A313611828C5CA00CE0B0D /* Commits in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1229,6 +1235,14 @@
 				1DDD58150DA1D0A300B32029 /* English */,
 			);
 			name = ProjectDemoMainMenu.xib;
+			sourceTree = "<group>";
+		};
+		66A3135F1828C5CA00CE0B0D /* Commits */ = {
+			isa = PBXVariantGroup;
+			children = (
+				66A313601828C5CA00CE0B0D /* English */,
+			);
+			name = Commits;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

@@ -68,6 +68,8 @@
 	if ([[NSUserDefaults standardUserDefaults] boolForKey: @"clearStore"])
 	{
 		[[[COSQLiteStore alloc] initWithURL: [self storeURL]] clearStore];
+		[[COUndoTrack trackForPattern: @"org.etoile.projectdemo*"
+				  withEditingContext: [COEditingContext contextWithURL: [self storeURL]]] clear];
 	}
 
 	context = [COEditingContext contextWithURL: [self storeURL]];

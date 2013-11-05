@@ -175,8 +175,19 @@ Future Work
   - Refactor COCommand initialization which is a mess
 
   - Rename COTrack to COHistoryTrack protocol
-  
+
   - Reduce commit description related code duplication in CORevision and COCommandGroup
+
+  - Concurrency between processes is not robust (no checking that in-memory
+    revisions snapshot is in sync with what is in the DB)
+
+  - e.g:
+    a = [COUndoTrack trackForName: @"test" withEditingContext: ctx]
+    b = [COUndoTrack trackForName: @"test" withEditingContext: ctx]
+	...
+	[ctx commitWithUndoTrack: a]
+
+	[a nodes] will not equal [b nodes] but I would expect them to be the equal
 
 
 - Model objects (COObject subclasses included with CoreObject for convenience)
@@ -187,8 +198,6 @@ Future Work
   
 
 - ProjectDemo
-
- - supply commit metadata
 
  - use cross references
 
