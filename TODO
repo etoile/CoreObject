@@ -4,6 +4,8 @@ TODO
 First alpha release blockers
 ----------------------------
 
+- Fix libdispatch use which prevents CoreObject compilation on GNUstep, we should either extend libobjc2/toydispatch or migrate to the equivalent high-level ObjC API (using NSOperationQueue)
+
 - Fix outdated COCommitDescriptor API doc and review properties (most properties should be read-only probably)
 
 - Check and update all Core API documentation (underway)
