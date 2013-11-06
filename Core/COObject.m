@@ -1035,7 +1035,7 @@ See +[NSObject typePrefix]. */
 {
 	NSMutableDictionary *options =
 		[D([self propertyNames], kETDescriptionOptionValuesForKeyPaths,
-		@"\t", @"kETDescriptionOptionPropertyIndent") mutableCopy];
+		@"\t", kETDescriptionOptionPropertyIndent) mutableCopy];
 
 	if (aProperty != nil)
 	{
