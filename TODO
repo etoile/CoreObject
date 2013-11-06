@@ -6,8 +6,6 @@ First alpha release blockers
 
 - Fix outdated COCommitDescriptor API doc and review properties (most properties should be read-only probably)
 
-- Improve -[COObject detailedDescription] code and make output more readable
-
 - Check and update all Core API documentation (underway)
 
 - Check code quality for all Core classes (underway)

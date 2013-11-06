@@ -69,6 +69,14 @@
 	UKRaisesException([[COObject alloc] init]);
 }
 
+- (void) testDetailedDescription
+{
+	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
+	COObject *object = [proot rootObject];
+
+	UKStringsEqual([object description], [object stringValue]);
+}
+
 - (void) testCreationAndModificationDates
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];

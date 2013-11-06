@@ -1031,88 +1031,29 @@ See +[NSObject typePrefix]. */
 
 #pragma mark - Description
 
-static int indent = 0;
+- (NSString *)detailedDescriptionWithTraversalKey: (NSString *)aProperty
+{
+	NSMutableDictionary *options =
+		[D([self propertyNames], kETDescriptionOptionValuesForKeyPaths,
+		@"\t", @"kETDescriptionOptionPropertyIndent") mutableCopy];
+
+	if (aProperty != nil)
+	{
+		[options setObject: aProperty forKey: kETDescriptionOptionTraversalKey];
+	}
+
+	return [self descriptionWithOptions: options];
+}
 
 - (NSString *)detailedDescription
 {
-	if (_inDescription)
-	{
-		return [NSString stringWithFormat: @"<Recursive reference to %@(%@) at %p UUID %@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _UUID];
-	}
-	_inDescription = YES;
-	indent++;
-	NSMutableString *str = [NSMutableString stringWithFormat: @"<%@(%@) at %p UUID %@ data: {\n",  [[self entityDescription] name], NSStringFromClass([self class]), self, _UUID];
-	indent++;
-	
-	NSMutableArray *props = [NSMutableArray arrayWithArray: [self persistentPropertyNames]];
-	if ([props containsObject: @"contents"])
-	{
-		[props removeObject: @"contents"];
-		[props insertObject: @"contents" atIndex: 0];
-	}
-	if ([props containsObject: @"label"])
-	{
-		[props removeObject: @"label"];
-		[props insertObject: @"label" atIndex: 0];
-	}
-	for (NSString *prop in props)
-	{
-		NSMutableString *valuestring = [NSMutableString string];
-		id value = [self valueForProperty: prop];
-		if ([value isKindOfClass: [NSSet class]])
-		{
-			[valuestring appendFormat: @"(\n"];
-			for (id item in value)
-			{
-				for (int i=0; i<indent + 1; i++) [valuestring appendFormat: @"\t"];
-				[valuestring appendFormat: @"%@\n", [item description]];	
-			}
-			for (int i=0; i<indent; i++) [valuestring appendFormat: @"\t"];
-			[valuestring appendFormat: @"),\n"];
-		}
-		else if ([value isKindOfClass: [NSArray class]])
-		{
-			[valuestring appendFormat: @"{\n"];
-			for (id item in value)
-			{
-				for (int i=0; i<indent + 1; i++) [valuestring appendFormat: @"\t"];
-				[valuestring appendFormat: @"%@", [item description]];	
-			}
-			for (int i=0; i<indent; i++) [valuestring appendFormat: @"\t"];
-			[valuestring appendFormat: @"},\n"];
-		}
-		else
-		{
-			[valuestring appendFormat: @"%@,\n", [value description]];
-		}
-
-		
-		for (int i=0; i<indent; i++) [str appendFormat: @"\t"];
-		[str appendFormat:@"%@ : %@", prop, valuestring]; 
-	}
-	indent--;
-	for (int i=0; i<indent; i++) [str appendFormat: @"\t"];
-	[str appendFormat:@"}>\n"];
-	indent--;
-	_inDescription = NO;
-	return str;
+	return [self detailedDescriptionWithTraversalKey: nil];
 }
 
 - (NSString *)description
 {
-	if (_inDescription)
-	{
-		// If we are called recursively, don't print the contents of _variableStorage
-		// since it would result in an infinite loop.
-		return [NSString stringWithFormat: @"<Recursive reference to %@(%@) at %p UUID %@>", [[self entityDescription] name], NSStringFromClass([self class]), self, _UUID];
-	}
-	
-	_inDescription = YES;
-	NSString *desc = [NSString stringWithFormat: @"<%@(%@) %p - %@>",
+	return [NSString stringWithFormat: @"<%@(%@) %p - %@>",
 		NSStringFromClass([self class]), [[self entityDescription] name], self, _UUID];
-
-	_inDescription = NO;
-	return desc;
 }
 
 - (NSString *)typeDescription

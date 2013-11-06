@@ -237,7 +237,6 @@
 	 * -willChangeValueForProperty: is called multiple times for the same object.
 	 */
 	NSMutableArray *_oldValues;
-	BOOL _inDescription; // FIXME: remove; only for debugging
 	BOOL _isPrepared;
 }
 
@@ -707,8 +706,25 @@
 
 /** 
  * Returns a description that includes the receiver properties and their values. 
+ *
+ * See -detailedDescriptionWithTraversalKey:, and -[NSObject descriptionWithOptions:] 
+ * to implement custom detailed descriptions.
  */
 - (NSString *)detailedDescription;
+/** 
+ * Returns a tree description for all the objects encountered while traversing 
+ * the given relationship (including the receiver).
+ *
+ * For each relationship object, the output looks the same than -
+ * detailedDescription.
+ *
+ * You can use this method to print an object graph or tree. The max traversal 
+ * depth is 20 levels.
+ *
+ * See -[NSObject descriptionWithOptions:] to implement custom detailed 
+ * descriptions.
+ */
+- (NSString *)detailedDescriptionWithTraversalKey: (NSString *)aProperty;
 /** 
  * Returns a short description to summarize the receiver. 
  */
