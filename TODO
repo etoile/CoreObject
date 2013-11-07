@@ -12,24 +12,37 @@ First alpha release blockers
 
 - Check code quality for all Core classes (underway)
 
-- Eliminate all compile warnings
-
 - Fix GNUstep support
 
 - Write remaing class descriptions
 
 - Implement batch mutation in ETCollection and proper KVO support on top of it in COObject
 
+- The hiding dead cross-references feature is broken and will be very complex to implement correctly:
+  See:
+  [TestCrossPersistentRootReferences testPersistentRootUndeletion]
+
+  Right now, if you modify a collection after some elements have been
+  hidden, the hidden elements will be permanently removed. The correct implementation
+  is for every change to a collection with hidden
+  elements, diff the collection before and after the change, and apply the diff to 
+  the underlying "serialized relationship cache" representation.
+
+  I'm not sure if it's worth supporting hiding dead references at the CoreObject level.
+
+  The alternative is letting UI code check if references are broken and choose how to deal with
+  them - could display broken link icon, or hide the reference. This will reduce complexity in
+  CoreObject, give UI's more flexibility, but they will have to do some extra
+  work to get a good default behaviour (hiding broken refs).
+
 - ProjectDemo should demonstrate more interesting features of CoreObject. 
 
   - Make FTS search results more usable
 
-  - Some kind of XMPP collaboration demo that shows off per-user undo tracks
+  - Some kind of XMPP collaboration demo that shows off per-user undo tracks (underway)
 
-  - Import & improve the Typewriter history graph. Should have selective undo and merge buttons
-  
-  - Simple table-based COUndoTrack UI like ObjectManager, including selective undo/redo controls
-  
+  - Improve the history graph. Should have selective undo and merge buttons
+
   - Simple diff visualization
 
 
