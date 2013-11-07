@@ -1,0 +1,5 @@
+#import "COSynchronizerAcknowledgementFromClientMessage.h"
+
+@implementation COSynchronizerAcknowledgementFromClientMessage
+@synthesize clientID, lastRevisionUUIDSentByServer;
+@end

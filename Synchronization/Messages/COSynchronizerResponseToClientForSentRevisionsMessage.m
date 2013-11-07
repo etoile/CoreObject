@@ -1,0 +1,5 @@
+#import "COSynchronizerResponseToClientForSentRevisionsMessage.h"
+
+@implementation COSynchronizerResponseToClientForSentRevisionsMessage
+@synthesize lastRevisionUUIDSentByClient, revisions;
+@end
