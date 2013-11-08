@@ -1,5 +1,7 @@
 #import <CoreObject/CoreObject.h>
 
+@class COStoreTransaction;
+
 /**
  * To properly send a COSynchronizerRevision over the network, it's assumed
  * that you have also sent any referenced attachments if needed. This should
@@ -12,4 +14,10 @@
 @property (nonatomic, readwrite, strong) ETUUID *parentRevisionUUID;
 @property (nonatomic, readwrite, copy) NSDictionary *metadata;
 @property (nonatomic, readwrite, strong) NSDate *date;
+
+- (void) writeToTransaction: (COStoreTransaction *)txn
+		 persistentRootUUID: (ETUUID *)persistentRoot
+				 branchUUID: (ETUUID *)branch;
+
+- (id) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store;
 @end

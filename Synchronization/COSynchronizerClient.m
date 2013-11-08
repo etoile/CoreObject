@@ -7,10 +7,18 @@
 #import "COSynchronizerAcknowledgementFromClientMessage.h"
 #import "COSynchronizerPersistentRootInfoToClientMessage.h"
 
+#import "COSynchronizerUtils.h"
+
+#import "COSQLiteStore.h"
+#import "COStoreTransaction.h"
+
 @implementation COSynchronizerClient
 
 @synthesize delegate = _delegate;
+@synthesize branch = _branch;
+@synthesize clientID = _clientID;
 
+- (COPersistentRoot *)persistentRoot { return [_branch persistentRoot]; }
 
 /**
  * If [self.branch currentRevision] has "from-server" metadata, returns nil
@@ -22,7 +30,13 @@
  */
 - (CORevision *) lastRevisionInTransitToServer
 {
-	return nil;
+	CORevision *lastRevisionFromServer = [self lastRevisionFromServer];
+	if ([lastRevisionFromServer isEqual: [_branch currentRevision]])
+	{
+		return nil;
+	}
+	
+	return [_branch currentRevision];
 }
 
 /**
@@ -31,17 +45,77 @@
  */
 - (CORevision *) lastRevisionFromServer
 {
+	CORevision *currentRevision = [_branch currentRevision];
+	
+	while (currentRevision != nil)
+	{
+		NSDictionary *metadata = [currentRevision metadata];
+		
+		if ([metadata[@"fromServer"] boolValue])
+		{
+			return currentRevision;
+		}
+		
+		currentRevision = [currentRevision parentRevision];
+	}
+
+	NSAssert(NO, @"COSynchronizerClient should have at least one revision with "
+				  "fromServer=YES");
 	return nil;
 }
 
 
 - (id) initWithSetupMessage: (COSynchronizerPersistentRootInfoToClientMessage *)message
+				   clientID: (NSString *)clientID
+			 editingContext: (COEditingContext *)ctx
 {
-	[[NSNotificationCenter defaultCenter] addObserver: self
-											 selector: @selector(persistentRootDidChange:)
-												 name: COPersistentRootDidChangeNotification
-											   object: [_branch persistentRoot]];
+	SUPERINIT;
+	
+	_ctx = ctx;
+	
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+	
+	// 1. Do we have the persistent root?
+	__block COPersistentRoot *persistentRoot = [ctx persistentRootForUUID: message.persistentRootUUID];
+    if (persistentRoot == nil)
+    {
+		[txn createPersistentRootWithUUID: message.persistentRootUUID persistentRootForCopy: nil];
+    }
+	
+	// 2. Do we have the branch?
+	if (persistentRoot == nil
+		|| [persistentRoot branchForUUID: message.branchUUID] == nil)
+	{
+		[txn createBranchWithUUID: message.branchUUID
+					 parentBranch: nil
+				  initialRevision: message.currentRevision.revisionUUID
+				forPersistentRoot: message.persistentRootUUID];
+	}
+	
+	// 3. Do we have the revision?
+	if ([[ctx store] revisionInfoForRevisionUUID: message.currentRevision.revisionUUID
+							  persistentRootUUID: message.persistentRootUUID] == nil)
+	{
+		[message.currentRevision writeToTransaction: txn
+								 persistentRootUUID: message.persistentRootUUID
+										 branchUUID: message.branchUUID];
+	}
+	
+	[[_ctx store] commitStoreTransaction: txn];
 
+	dispatch_async(dispatch_get_main_queue(), ^(){
+		persistentRoot = [_ctx persistentRootForUUID: message.persistentRootUUID];
+		ETAssert(persistentRoot != nil);
+		_branch = [persistentRoot branchForUUID: message.branchUUID];
+		ETAssert(_branch != nil);
+		
+		[[NSNotificationCenter defaultCenter] addObserver: self
+												 selector: @selector(persistentRootDidChange:)
+													 name: COPersistentRootDidChangeNotification
+												   object: persistentRoot];
+	});
+	
+	
 	return self;
 }
 
@@ -59,76 +133,111 @@
 {
 	if (![self isAwaitingResponse])
 	{
-		
+		[self sendPushToServer];
 	}
 }
 
-- (void) handleMessage: (NSDictionary *)aPropertyList
+- (void) handleRevisionsFromServer: (NSArray *)revs
 {
-	if ([self isAwaitingResponse])
+	ETUUID *currentRevUUID = [[self lastRevisionFromServer] UUID];
+	
+	NSUInteger i = [revs indexOfObjectPassingTest: ^(id obj, NSUInteger idx, BOOL *stop)
+					{
+						COSynchronizerRevision *revision = obj;
+						return [revision.parentRevisionUUID isEqual: currentRevUUID];
+					}];
+	
+	ETAssert(i != NSNotFound);
+	
+	NSArray *revsToUse = [revs subarrayWithRange: NSMakeRange(i, [revs count] - i)];
+	
+	
+	// Apply the revisions
+	
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+	for (COSynchronizerRevision *rev in revsToUse)
 	{
-//		if (![aPropertyList[@"revisionSentFromClient"] isEqual: [[lastRevisionInTransitToServer UUID] stringValue]])
-//		{
-//			return;
-//		}
-				
-		[self handleResponseForSentRevisions];
+		[rev writeToTransaction: txn
+			 persistentRootUUID: self.persistentRoot.UUID
+					 branchUUID: self.branch.UUID];
 	}
-	else
-	{
-		[self handlePushedRevisionsFromServer];
-	}
+	// TODO: Ideally we'd just do one store commit, instead of two,
+	// but the +rebaseRevision method below requires these revisions to be committed already.
+	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
+	
+	// Rebase [self.branch currentRevision] onto the new revisions
+	
+	txn = [[COStoreTransaction alloc] init];
+	NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: [[self.branch currentRevision] UUID]
+												  ontoRevision: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
+											persistentRootUUID: self.persistentRoot.UUID
+													branchUUID: self.branch.UUID
+														 store: [self.persistentRoot store]
+												   transaction: txn];
+	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
+
+	[_branch setCurrentRevision: [rebasedRevs lastObject]];
+	
+	// Send receipt
+	
+	[self sendReceiptToServer];
+	
+	// Only does anything if there are unpushed revisions.
+	// Note this is only possible if we are called from -handleResponseMessage:.
+	
+	[self sendPushToServer];
 }
 
 - (void) handlePushMessage: (COSynchronizerPushedRevisionsToClientMessage *)aMessage
 {
-	
+	[self handleRevisionsFromServer: aMessage.revisions];
 }
+
 - (void) handleResponseMessage: (COSynchronizerResponseToClientForSentRevisionsMessage *)aMessage
 {
+	if (![aMessage.lastRevisionUUIDSentByClient isEqual: [[self lastRevisionInTransitToServer] UUID]])
+	{
+		return;
+	}
 	
+	[self handleRevisionsFromServer: aMessage.revisions];
 }
 
-
-/**
- * Server pushed us some revisions out of the blue.
- */
-- (void) handlePushedRevisionsFromServer
+- (void) sendReceiptToServer
 {
-	
+	COSynchronizerAcknowledgementFromClientMessage *message = [[COSynchronizerAcknowledgementFromClientMessage alloc] init];
+	message.clientID = self.clientID;
+	message.lastRevisionUUIDSentByServer = [[self lastRevisionFromServer] UUID];
+	[self.delegate sendReceiptToServer: message];
 }
 
-- (void) handleResponseForSentRevisions
+- (void) sendPushToServer
 {
+	NSMutableArray *revs = [[NSMutableArray alloc] init];
 	
-	// Add the received revisions to our store.
+	NSArray *revUUIDs = [COLeastCommonAncestor revisionUUIDsFromRevisionUUIDExclusive: [[self lastRevisionFromServer] UUID]
+															  toRevisionUUIDInclusive: [[self.branch currentRevision] UUID]
+																	   persistentRoot: self.persistentRoot.UUID
+																				store: self.persistentRoot.store];
 	
-	/* The server can send us an ordered array.
-	 
-	 It is guaranteed that there will be a chain starting at revisionInTransitToServer
-	 containing one or more revisions.
-	 
-	 It is possible that first N revisions sent by the server are ones
-	 we have already received, this is fine.
-	 
-	 */
+	for (ETUUID *revUUID in revUUIDs)
+	{
+		COSynchronizerRevision *rev = [[COSynchronizerRevision alloc] initWithUUID: revUUID
+																	persistentRoot: self.persistentRoot.UUID
+																			 store: self.persistentRoot.store];
+		[revs addObject: rev];
+	}
 	
+	if ([revs isEmpty])
+	{
+		NSLog(@"sendPushToServer bailing because there is nothing to push");
+		return;
+	}
 	
-	
-//	if [branch currentRevision] != revisionInTransitToServer,
-//	{
-//		// rebase the changes after [branch currentRevision] onto the last revision
-//		// sent from the server.
-//		
-//	}
-//	else
-//	{
-//		// send receipt
-//	}
-//	lastRevisionInTransitToServer = nil;
-	
-	
-
+	COSynchronizerPushedRevisionsFromClientMessage *message = [[COSynchronizerPushedRevisionsFromClientMessage alloc] init];
+	message.clientID = self.clientID;
+	message.revisions = revs;
+	[self.delegate sendPushToServer: message];
 }
 
 @end

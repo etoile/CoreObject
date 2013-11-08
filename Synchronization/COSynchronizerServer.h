@@ -37,6 +37,9 @@
 	id<COSynchronizerServerDelegate> delegate;
 }
 
+@property (nonatomic, readonly, strong) COPersistentRoot *persistentRoot;
+@property (nonatomic, readonly, strong) COBranch *branch;
+
 @property (nonatomic, readwrite, strong) id<COSynchronizerServerDelegate> delegate;
 
 - (void) handlePushedRevisionsFromClient: (COSynchronizerPushedRevisionsFromClientMessage *)aMessage;

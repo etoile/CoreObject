@@ -52,16 +52,27 @@
  to work. A 30-day no garbage collection policy will take care of this,
  or the GC could scan for refs in the undo database.
  
- - tolerant of any messages being dropped.
+ - tolerant of any messages being dropped, or being delivered in any order
  
  */
 @interface COSynchronizerClient : NSObject
 {
+	COEditingContext *_ctx;
 	COBranch *_branch;
+	NSString *_clientID;
+	
 	id<COSynchronizerClientDelegate> _delegate;
 }
 
-- (id) initWithSetupMessage: (COSynchronizerPersistentRootInfoToClientMessage *)message;
+- (id) initWithSetupMessage: (COSynchronizerPersistentRootInfoToClientMessage *)message
+				   clientID: (NSString *)clientID
+			 editingContext: (COEditingContext *)ctx;
+
+
+@property (nonatomic, readonly, strong) NSString *clientID;
+
+@property (nonatomic, readonly, strong) COPersistentRoot *persistentRoot;
+@property (nonatomic, readonly, strong) COBranch *branch;
 
 @property (nonatomic, readwrite, strong) id<COSynchronizerClientDelegate> delegate;
 

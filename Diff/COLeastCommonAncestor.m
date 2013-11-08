@@ -53,4 +53,27 @@
     return NO;
 }
 
++ (NSArray *) revisionUUIDsFromRevisionUUIDExclusive: (ETUUID *)start
+							 toRevisionUUIDInclusive: (ETUUID *)end
+									  persistentRoot: (ETUUID *)persistentRoot
+											   store: (COSQLiteStore *)aStore
+{
+	// TODO: Use CORevision so we hit the revision cache?
+	
+	NSMutableArray *result = [[NSMutableArray alloc] init];
+	
+    ETUUID *rev = end;
+    while (rev != nil)
+    {
+        if ([rev isEqual: start])
+        {
+            return result;
+        }
+		[result insertObject: rev atIndex: 0];
+        rev = [[aStore revisionInfoForRevisionUUID: rev persistentRootUUID: persistentRoot] parentRevisionUUID];
+    }
+    return nil;
+}
+
+
 @end
