@@ -101,20 +101,17 @@
 										 branchUUID: message.branchUUID];
 	}
 	
-	[[_ctx store] commitStoreTransaction: txn];
+	ETAssert([[_ctx store] commitStoreTransaction: txn]);
 
-	dispatch_async(dispatch_get_main_queue(), ^(){
-		persistentRoot = [_ctx persistentRootForUUID: message.persistentRootUUID];
-		ETAssert(persistentRoot != nil);
-		_branch = [persistentRoot branchForUUID: message.branchUUID];
-		ETAssert(_branch != nil);
-		
-		[[NSNotificationCenter defaultCenter] addObserver: self
-												 selector: @selector(persistentRootDidChange:)
-													 name: COPersistentRootDidChangeNotification
-												   object: persistentRoot];
-	});
+	persistentRoot = [_ctx persistentRootForUUID: message.persistentRootUUID];
+	ETAssert(persistentRoot != nil);
+	_branch = [persistentRoot branchForUUID: message.branchUUID];
+	ETAssert(_branch != nil);
 	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(persistentRootDidChange:)
+												 name: COPersistentRootDidChangeNotification
+											   object: persistentRoot];
 	
 	return self;
 }

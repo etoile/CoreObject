@@ -72,6 +72,9 @@
 
 #import <CoreObject/COSynchronizationClient.h>
 #import <CoreObject/COSynchronizationServer.h>
+#import <CoreObject/COSynchronizerClient.h>
+#import <CoreObject/COSynchronizerServer.h>
+
 
 /* Utilities */
 

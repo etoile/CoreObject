@@ -2,8 +2,12 @@
 #import <UnitKit/UnitKit.h>
 #import <CoreObject/CoreObject.h>
 
-#import "COSynchronizationClient.h"
-#import "COSynchronizationServer.h"
+#import "COSynchronizerRevision.h"
+#import "COSynchronizerPushedRevisionsToClientMessage.h"
+#import "COSynchronizerPushedRevisionsFromClientMessage.h"
+#import "COSynchronizerResponseToClientForSentRevisionsMessage.h"
+#import "COSynchronizerAcknowledgementFromClientMessage.h"
+#import "COSynchronizerPersistentRootInfoToClientMessage.h"
 
 #import "COStoreTransaction.h"
 

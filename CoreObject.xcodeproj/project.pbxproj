@@ -62,15 +62,15 @@
 		60CAAC6517E3117E00E8E2B1 /* COTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CAAC6317E3117E00E8E2B1 /* COTrack.m */; };
 		60FB089813C3076200C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
-		660179C8182AFA4B006E7D7B /* COSynchronizerRevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179C6182AFA4B006E7D7B /* COSynchronizerRevision.h */; };
+		660179C8182AFA4B006E7D7B /* COSynchronizerRevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179C6182AFA4B006E7D7B /* COSynchronizerRevision.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660179C9182AFA4B006E7D7B /* COSynchronizerRevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 660179C7182AFA4B006E7D7B /* COSynchronizerRevision.m */; };
-		660179CC182AFA5D006E7D7B /* COSynchronizerPushedRevisionsToClientMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179CA182AFA5D006E7D7B /* COSynchronizerPushedRevisionsToClientMessage.h */; };
+		660179CC182AFA5D006E7D7B /* COSynchronizerPushedRevisionsToClientMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179CA182AFA5D006E7D7B /* COSynchronizerPushedRevisionsToClientMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660179CD182AFA5D006E7D7B /* COSynchronizerPushedRevisionsToClientMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 660179CB182AFA5D006E7D7B /* COSynchronizerPushedRevisionsToClientMessage.m */; };
-		660179D0182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179CE182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.h */; };
+		660179D0182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179CE182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660179D1182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 660179CF182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.m */; };
-		660179D4182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179D2182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.h */; };
+		660179D4182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179D2182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660179D5182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 660179D3182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.m */; };
-		660179D8182AFA84006E7D7B /* COSynchronizerAcknowledgementFromClientMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179D6182AFA84006E7D7B /* COSynchronizerAcknowledgementFromClientMessage.h */; };
+		660179D8182AFA84006E7D7B /* COSynchronizerAcknowledgementFromClientMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179D6182AFA84006E7D7B /* COSynchronizerAcknowledgementFromClientMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660179D9182AFA84006E7D7B /* COSynchronizerAcknowledgementFromClientMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 660179D7182AFA84006E7D7B /* COSynchronizerAcknowledgementFromClientMessage.m */; };
 		66094847178794D40049468B /* COItem+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 66094845178794D40049468B /* COItem+JSON.m */; };
 		66094848178794D40049468B /* COItem+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 66094846178794D40049468B /* COItem+JSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -109,14 +109,14 @@
 		663CE2BD17C15A4800E729F5 /* COCommandGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2BB17C15A4800E729F5 /* COCommandGroup.m */; };
 		663CE2BF17C1815B00E729F5 /* COCommandDeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2B217C09DE700E729F5 /* COCommandDeletePersistentRoot.m */; };
 		663CE2CD17C1837700E729F5 /* TestUndoStackStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2CC17C1837700E729F5 /* TestUndoStackStore.m */; };
-		663E9B9F182B85790083AC46 /* COSynchronizerPersistentRootInfoToClientMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 663E9B9D182B85790083AC46 /* COSynchronizerPersistentRootInfoToClientMessage.h */; };
+		663E9B9F182B85790083AC46 /* COSynchronizerPersistentRootInfoToClientMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 663E9B9D182B85790083AC46 /* COSynchronizerPersistentRootInfoToClientMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		663E9BA0182B85790083AC46 /* COSynchronizerPersistentRootInfoToClientMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 663E9B9E182B85790083AC46 /* COSynchronizerPersistentRootInfoToClientMessage.m */; };
-		663E9BAA182D8A890083AC46 /* COSynchronizerUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 663E9BA8182D8A890083AC46 /* COSynchronizerUtils.h */; };
+		663E9BAA182D8A890083AC46 /* COSynchronizerUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 663E9BA8182D8A890083AC46 /* COSynchronizerUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		663E9BAB182D8A890083AC46 /* COSynchronizerUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 663E9BA9182D8A890083AC46 /* COSynchronizerUtils.m */; };
-		66405DC3182A0D4D00A6EF7A /* COSynchronizerClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 66405DC1182A0D4D00A6EF7A /* COSynchronizerClient.h */; };
+		66405DC3182A0D4D00A6EF7A /* COSynchronizerClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 66405DC1182A0D4D00A6EF7A /* COSynchronizerClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66405DC4182A0D4D00A6EF7A /* COSynchronizerClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 66405DC2182A0D4D00A6EF7A /* COSynchronizerClient.m */; };
 		66405DCE182A1F2C00A6EF7A /* TestSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66405DCD182A1F2C00A6EF7A /* TestSynchronizer.m */; };
-		66405DD1182A255800A6EF7A /* COSynchronizerServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 66405DCF182A255800A6EF7A /* COSynchronizerServer.h */; };
+		66405DD1182A255800A6EF7A /* COSynchronizerServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 66405DCF182A255800A6EF7A /* COSynchronizerServer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66405DD2182A255800A6EF7A /* COSynchronizerServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66405DD0182A255800A6EF7A /* COSynchronizerServer.m */; };
 		66457FB517E8BFE5003C51A8 /* COStoreCreateBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 66457F9F17E8BFE5003C51A8 /* COStoreCreateBranch.h */; };
 		66457FB617E8BFE5003C51A8 /* COStoreCreateBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 66457FA017E8BFE5003C51A8 /* COStoreCreateBranch.m */; };
@@ -1314,7 +1314,6 @@
 			files = (
 				609C00801704C2BA00D01AAB /* CORevision.h in Headers */,
 				609C00941704C3DA00D01AAB /* COEditingContext.h in Headers */,
-				663E9BAA182D8A890083AC46 /* COSynchronizerUtils.h in Headers */,
 				609C00981704C3DA00D01AAB /* COObject.h in Headers */,
 				609C009A1704C3DA00D01AAB /* COPersistentRoot.h in Headers */,
 				609C009C1704C3DA00D01AAB /* COQuery.h in Headers */,
@@ -1345,7 +1344,6 @@
 				66D96CC2178B717200D1553C /* COSearchResult.h in Headers */,
 				66D96CC4178B717200D1553C /* COSQLiteStore.h in Headers */,
 				66D96CC6178B717200D1553C /* COSQLiteStore+Attachments.h in Headers */,
-				66405DC3182A0D4D00A6EF7A /* COSynchronizerClient.h in Headers */,
 				66D96CC8178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.h in Headers */,
 				6675F8C51785C02A001E5622 /* COPath.h in Headers */,
 				66094848178794D40049468B /* COItem+JSON.h in Headers */,
@@ -1363,7 +1361,6 @@
 				663CE29917C07ED800E729F5 /* COCommandDeleteBranch.h in Headers */,
 				663CE29B17C07ED800E729F5 /* COCommandSetBranchMetadata.h in Headers */,
 				663CE29D17C07ED800E729F5 /* COCommandSetCurrentBranch.h in Headers */,
-				660179D0182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.h in Headers */,
 				663CE29F17C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.h in Headers */,
 				663CE2A117C07ED800E729F5 /* COUndoStackStore.h in Headers */,
 				663CE2B617C0B05900E729F5 /* COEditingContext+Undo.h in Headers */,
@@ -1375,22 +1372,22 @@
 				669724D917D4614F0090B31A /* CODeleteAttribute.h in Headers */,
 				669724DD17D461750090B31A /* COSetInsertion.h in Headers */,
 				669724E117D461940090B31A /* COSetDeletion.h in Headers */,
-				660179C8182AFA4B006E7D7B /* COSynchronizerRevision.h in Headers */,
-				663E9B9F182B85790083AC46 /* COSynchronizerPersistentRootInfoToClientMessage.h in Headers */,
 				669724E517D463B00090B31A /* COSequenceEdit.h in Headers */,
 				669724E917D464170090B31A /* COSequenceDeletion.h in Headers */,
 				669724ED17D464400090B31A /* COSequenceInsertion.h in Headers */,
 				669724F117D4646E0090B31A /* COSequenceModification.h in Headers */,
 				660D4CD917D5C7CB003C9ACC /* COLeastCommonAncestor.h in Headers */,
+				663E9BAA182D8A890083AC46 /* COSynchronizerUtils.h in Headers */,
+				66405DC3182A0D4D00A6EF7A /* COSynchronizerClient.h in Headers */,
+				660179D0182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.h in Headers */,
+				660179C8182AFA4B006E7D7B /* COSynchronizerRevision.h in Headers */,
+				663E9B9F182B85790083AC46 /* COSynchronizerPersistentRootInfoToClientMessage.h in Headers */,
 				660179D4182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.h in Headers */,
-				660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */,
-				668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */,
+				660179D8182AFA84006E7D7B /* COSynchronizerAcknowledgementFromClientMessage.h in Headers */,
+				660179CC182AFA5D006E7D7B /* COSynchronizerPushedRevisionsToClientMessage.h in Headers */,
 				66E4CF4F1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.h in Headers */,
-				660B838D1827614200714474 /* COSQLiteStore+Debugging.h in Headers */,
 				661211401821986B003AEC29 /* CODateSerialization.h in Headers */,
 				662AC93D1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h in Headers */,
-				601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */,
-				660179CC182AFA5D006E7D7B /* COSynchronizerPushedRevisionsToClientMessage.h in Headers */,
 				6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */,
 				6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */,
 				66405DD1182A255800A6EF7A /* COSynchronizerServer.h in Headers */,
@@ -1407,10 +1404,13 @@
 				66457FC517E8BFE5003C51A8 /* COStoreUndeleteBranch.h in Headers */,
 				66457FC717E8BFE5003C51A8 /* COStoreUndeletePersistentRoot.h in Headers */,
 				66457FC917E8BFE5003C51A8 /* COStoreWriteRevision.h in Headers */,
-				660179D8182AFA84006E7D7B /* COSynchronizerAcknowledgementFromClientMessage.h in Headers */,
 				66457FCF17E8C9D0003C51A8 /* COStoreAction.h in Headers */,
 				66457FEC17E9683F003C51A8 /* CORevisionCache.h in Headers */,
 				601C1D4F180C115D00CED07E /* COObjectGraphContext+GarbageCollection.h in Headers */,
+				660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */,
+				668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */,
+				660B838D1827614200714474 /* COSQLiteStore+Debugging.h in Headers */,
+				601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */,
 				6646974A17CDA78300A1B767 /* COEditingContext+Private.h in Headers */,
 				60CAAC6417E3117E00E8E2B1 /* COTrack.h in Headers */,
 			);

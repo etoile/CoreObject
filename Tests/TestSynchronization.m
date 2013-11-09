@@ -42,8 +42,8 @@ static ETUUID *branchBUUID;
 - (id)init
 {
 	SUPERINIT;
-    [[NSFileManager defaultManager] removeItemAtPath: [SERVER_STORE_URL path] error: NULL];
     serverStore = [[COSQLiteStore alloc] initWithURL: SERVER_STORE_URL];
+	[serverStore clearStore];
 	return self;
 }
 

@@ -12,14 +12,18 @@
 
 @implementation COSynchronizerServer
 
-@synthesize delegate, persistentRoot = persistentRoot, branch = branch;
+@synthesize delegate, branch = branch;
 
-- (id)init
+- (COPersistentRoot *)persistentRoot { return [branch persistentRoot]; }
+
+- (id) initWithBranch: (COBranch *)aBranch;
 {
+	SUPERINIT;
+	branch = aBranch;
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(persistentRootDidChange:)
 												 name: COPersistentRootDidChangeNotification
-											   object: persistentRoot];
+											   object: self.persistentRoot];
 	
 	return self;
 }
@@ -67,15 +71,13 @@
 
 - (void) addClientID: (NSString *)clientID
 {
-//	if ([lastConfirmedRevisionForClientID valueForKey: clientID] != nil)
-//	{
-//		NSLog(@"Already have client %@", clientID);
-//		return;
-//	}
-//	
-//	ETAssert([[branch nodes] containsObject: aRevision]);
-//	
-//	[lastConfirmedRevisionForClientID setObject: aRevision forKey: clientID];
+	if ([lastSentRevisionForClientID valueForKey: clientID] != nil)
+	{
+		NSLog(@"Already have client %@", clientID);
+		return;
+	}
+	
+	[self sendPersistentRootInfoMessageToClient: clientID];
 }
 
 - (void) removeClientID: (NSString *)clientID
@@ -138,10 +140,20 @@
 	
 }
 
-- (void) sendPersistentRootInfoMessage: (COSynchronizerPersistentRootInfoToClientMessage *)aMessage
-							  toClient: (NSString *)aClient
+- (void) sendPersistentRootInfoMessageToClient: (NSString *)aClient
 {
+	COSynchronizerPersistentRootInfoToClientMessage *message = [[COSynchronizerPersistentRootInfoToClientMessage alloc] init];
 	
+	message.persistentRootUUID = self.persistentRoot.UUID;
+	message.persistentRootMetadata = self.persistentRoot.metadata;
+	message.branchUUID = self.branch.UUID;
+	message.branchMetadata = self.branch.metadata;
+	message.currentRevision = [[COSynchronizerRevision alloc] initWithUUID: self.branch.currentRevision.UUID
+															persistentRoot: self.persistentRoot.UUID
+																	 store: self.persistentRoot.store];
+	
+	lastSentRevisionForClientID[aClient] = self.branch.currentRevision.UUID;
+	[self.delegate sendPersistentRootInfoMessage: message toClient: aClient];
 }
 
 @end

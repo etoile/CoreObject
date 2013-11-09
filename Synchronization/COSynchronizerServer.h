@@ -21,7 +21,6 @@
 
 @interface COSynchronizerServer : NSObject
 {
-	COPersistentRoot *persistentRoot;
 	COBranch *branch;
 	
 	/**
@@ -36,6 +35,8 @@
 	
 	id<COSynchronizerServerDelegate> delegate;
 }
+
+- (id) initWithBranch: (COBranch *)aBranch;
 
 @property (nonatomic, readonly, strong) COPersistentRoot *persistentRoot;
 @property (nonatomic, readonly, strong) COBranch *branch;
