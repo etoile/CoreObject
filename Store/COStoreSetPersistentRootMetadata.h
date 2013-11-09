@@ -3,7 +3,6 @@
 
 @interface COStoreSetPersistentRootMetadata : NSObject <COStoreAction>
 
-@property (nonatomic, retain, readwrite) ETUUID *persistentRoot;
 @property (nonatomic, retain, readwrite) NSDictionary *metadata;
 
 @end

@@ -313,13 +313,13 @@ serialization. */
 			NSString *getterString =
 				NSStringFromSelector([self serializationGetterForProperty: [aPropertyDesc name]]);
 
-			NSAssert(NO, @"Unsupported serialization type %@ for %@ returned by "
+			NSAssert3(NO, @"Unsupported serialization type %@ for %@ returned by "
 				"serialization getter %@", type, value, getterString);
 		}
 	}
 	else
 	{
-		NSAssert(NO, @"Unsupported serialization type %@ for %@", type, value);
+		NSAssert2(NO, @"Unsupported serialization type %@ for %@", type, value);
 	}
 	return 0;
 }
@@ -389,7 +389,7 @@ serialization. */
 
 	if (getter != NULL)
 	{
-		NSAssert([self serializationSetterForProperty: [aPropertyDesc name]] != NULL,
+		NSAssert1([self serializationSetterForProperty: [aPropertyDesc name]] != NULL,
 			@"Serialization getter %@ must have a matching serialization setter",
 				 NSStringFromSelector(getter));
 
@@ -653,7 +653,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 
 	if ([self respondsToSelector: setter])
 	{
-		NSAssert([self serializationGetterForProperty: [aPropertyDesc name]] != NULL,
+		NSAssert1([self serializationGetterForProperty: [aPropertyDesc name]] != NULL,
 			@"Serialization setter %@ must have a matching serialization getter",
 				 NSStringFromSelector(setter));
 		

@@ -37,7 +37,7 @@ NSString * const kCORedoStack = @"redo";
     [[NSFileManager defaultManager] createDirectoryAtPath: dir
                               withIntermediateDirectories: YES
                                                attributes: nil
-                                                    error: nil];
+                                                    error: NULL];
         
     _db = [[FMDatabase alloc] initWithPath: [dir stringByAppendingPathComponent: @"undo.sqlite"]];
     [_db setShouldCacheStatements: YES];

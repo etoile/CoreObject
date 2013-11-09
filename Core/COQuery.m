@@ -19,12 +19,14 @@
 	return query;
 }
 
+#ifndef GNUSTEP
 + (COQuery *)queryWithPredicateBlock: (BOOL (^)(id object, NSDictionary *bindings))aBlock
 {
 	COQuery *query = [[COQuery alloc] init];
 	[query setPredicate: [NSPredicate predicateWithBlock: aBlock]];
 	return query;
 }
+#endif
 
 + (COQuery *)queryWithSQLString: (NSString *)aSQLString
 {

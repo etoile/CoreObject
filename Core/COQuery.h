@@ -38,12 +38,14 @@
  * Returns a new autoreleased query that uses a predicate.
  */
 + (COQuery *)queryWithPredicate: (NSPredicate *)aPredicate;
+#ifndef GNUSTEP
 /**
  * Returns a new autoreleased query that uses a predicate based on a block.
  *
  * See -[NSPredicate predicateWithBlock:].
  */
 + (COQuery *)queryWithPredicateBlock: (BOOL (^)(id object, NSDictionary *bindings))aBlock;
+#endif
 /**
  * Returns a new autoreleased query that uses a SQL request.
  */

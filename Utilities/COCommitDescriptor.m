@@ -25,11 +25,15 @@ static NSMutableDictionary *descriptorTypeTable = nil;
                             typeTable: (NSMutableDictionary *)aTypeTable
 {
 	NSParameterAssert(aCommitFile != nil);
+#ifdef GNUSTEP
+	NSData *JSONData = [NSData dataWithContentsOfFile: aCommitFile];
+#else
 	// TODO: Error handling
 	NSError *dataError = nil;
 	NSData *JSONData =
 		[NSData dataWithContentsOfFile: aCommitFile options: 0 error: &dataError];
 	ETAssert(dataError == nil);
+#endif
 	NSError *JSONError = nil;
 	NSDictionary *plist =
 		[NSJSONSerialization JSONObjectWithData: JSONData options: 0 error: &JSONError];

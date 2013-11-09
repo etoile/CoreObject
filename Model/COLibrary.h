@@ -25,10 +25,10 @@
  */
 @interface COLibrary : COContainer
 {
-	NSString *identifier;
+	NSString *_identifier;
 }
 
-@property (strong, nonatomic) NSString *identifier;
+@property (nonatomic, readwrite, strong) NSString *identifier;
 
 /**
  * Returns YES.

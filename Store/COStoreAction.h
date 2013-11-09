@@ -4,7 +4,7 @@
 
 @protocol COStoreAction <NSObject>
 
-@property (nonatomic, readonly, strong) ETUUID *persistentRoot;
+@property (nonatomic, strong) ETUUID *persistentRoot;
 
 - (BOOL) execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction;
 

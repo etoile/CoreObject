@@ -8,7 +8,6 @@
  */
 @interface COStoreCreatePersistentRoot : NSObject <COStoreAction>
 
-@property (nonatomic, retain, readwrite) ETUUID *persistentRoot;
 @property (nonatomic, retain, readwrite) ETUUID *persistentRootForCopy;
 
 @end

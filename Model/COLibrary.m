@@ -63,6 +63,16 @@
 	return YES;
 }
 
+- (NSString *)identifier
+{
+	return _identifier;
+}
+
+- (void)setIdentifier: (NSString *)anIdentifier
+{
+	_identifier = anIdentifier;
+}
+
 @end
 
 
@@ -77,10 +87,14 @@
 		initWithObjectGraphContext: [COObjectGraphContext objectGraphContext]];
 	[group setName: _(@"All Objects")];
 	[group setTargetCollection: [[[[self persistentRoots] mappedCollection] rootObject] allObjects]];
+#ifdef GNUSTEP
+	[group setQuery: [COQuery queryWithPredicate: [NSPredicate predicateWithFormat: @"isLibrary == YES"]]];
+#else
 	[group setQuery: [COQuery queryWithPredicateBlock: ^ BOOL (id object, NSDictionary *bindings)
 	{
 		return [object isLibrary];
 	}]];
+#endif
 	return group;
 }
 

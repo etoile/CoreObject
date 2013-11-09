@@ -6,7 +6,11 @@
 
 - (NSURL *) attachmentsURL
 {
-    return [url_ URLByAppendingPathComponent: @"attachments" isDirectory: YES];
+#ifdef GNUSTEP
+	return [url_ URLByAppendingPathComponent: @"attachments/"];
+#else
+	return [url_ URLByAppendingPathComponent: @"attachments" isDirectory: YES];
+#endif
 }
 
 static NSData *hashItemAtURL(NSURL *aURL)
@@ -16,9 +20,13 @@ static NSData *hashItemAtURL(NSURL *aURL)
     {
         return nil;
     }
-    
-    NSFileHandle *fh = [NSFileHandle fileHandleForReadingFromURL: aURL
-                                                           error: NULL];
+
+#ifdef GNUSTEP
+	NSFileHandle *fh = [NSFileHandle fileHandleForReadingAtPath: [aURL path]];
+#else
+	NSFileHandle *fh = [NSFileHandle fileHandleForReadingFromURL: aURL
+	                                                       error: NULL];
+#endif
     
     int fd = [fh fileDescriptor];
     

@@ -9,7 +9,7 @@ LIBRARIES_DEPEND_UPON = $(shell pkg-config --libs sqlite3) -lEtoileFoundation $(
 
 CoreObject_INCLUDE_DIRS = -IStore/fmdb/src
 CoreObject_LDFLAGS += -lstdc++ -lobjcxx -lsqlite3 -ldispatch
-CoreObject_OBJCFLAGS += -fobjc-arc
+CoreObject_OBJCFLAGS += -fobjc-arc -Wno-arc-performSelector-leaks -Wall
 
 ifeq ($(test), yes)
   BUNDLE_NAME = $(FRAMEWORK_NAME)
@@ -17,7 +17,7 @@ ifeq ($(test), yes)
   CoreObject_PRINCIPAL_CLASS = TestCommon
 endif
 
-OTHER_HEADER_DIRS = . Core Diff Model Store Undo Tracks Synchronization Utilities StorageDataModel
+OTHER_HEADER_DIRS = . Core Diff Model Store Undo Tracks Synchronization Synchronization/Messages Utilities StorageDataModel
 
 CoreObject_HEADER_FILES_DIR = Headers
 CoreObject_HEADER_FILES = $(notdir $(wildcard Headers/*.h))
@@ -34,6 +34,7 @@ CoreObject_OBJC_FILES += $(wildcard Tracks/*.m)
 CoreObject_OBJC_FILES += $(wildcard Utilities/*.m)
 CoreObject_OBJC_FILES += $(wildcard StorageDataModel/*.m)
 CoreObject_OBJC_FILES += $(wildcard Synchronization/*.m)
+CoreObject_OBJC_FILES += $(wildcard Synchronization/Messages/*.m)
 # Don't compile fmdb/src/fmdb.m
 CoreObject_OBJC_FILES += $(wildcard Store/fmdb/src/FM*.m)
 

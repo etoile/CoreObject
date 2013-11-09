@@ -433,7 +433,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     {
         if (![db_ beginTransaction])
         {
-            return nil;
+            return NO;
         }
     }
     

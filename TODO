@@ -49,6 +49,15 @@ First alpha release blockers
 Future Work
 -----------
 
+- GNUstep
+
+  - Add -URLByAppendingPathComponent:isDirectory: and -fileHandleForReadingFromURL:error: to GNUstep (see COSQLiteStore+Attachments)
+
+  - Add -dateWithContentsOfFile:options:error: to GNUstep (see COOCommitDescriptor)
+
+  - Add -predicateWithBlock: to GNUstep (see COQuery)
+
+
 - Store
 
   - exportRevisions: and importRevisions: that take a set of CORevisionID an returns a delta-compressed NSData

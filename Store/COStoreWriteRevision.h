@@ -7,7 +7,6 @@
 @property (nonatomic, retain, readwrite) ETUUID *revisionUUID;
 @property (nonatomic, retain, readwrite) ETUUID *parentRevisionUUID;
 @property (nonatomic, retain, readwrite) ETUUID *mergeParentRevisionUUID;
-@property (nonatomic, retain, readwrite) ETUUID *persistentRoot;
 @property (nonatomic, retain, readwrite) ETUUID *branch;
 @property (nonatomic, retain, readwrite) NSDictionary *metadata;
 
