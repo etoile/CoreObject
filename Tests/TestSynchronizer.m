@@ -236,7 +236,7 @@
 	[clientCtx commit];
 	return clientChild1;
 }
-#if 0
+
 - (void) testServerEdit
 {
 	COObject *serverChild1 = [self addAndCommitServerChild];
@@ -248,7 +248,6 @@
 	UKObjectsEqual([[serverBranch rootObject] UUID], [[clientBranch rootObject] UUID]);
 	UKObjectsEqual([serverChild1 UUID], [clientChild1 UUID]);
 }
-#endif
 
 - (void) testClientEdit
 {

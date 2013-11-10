@@ -1,5 +1,5 @@
 #import "COSynchronizerClient.h"
-
+#import "CORevisionCache.h"
 #import "COSynchronizerRevision.h"
 #import "COSynchronizerPushedRevisionsToClientMessage.h"
 #import "COSynchronizerPushedRevisionsFromClientMessage.h"
@@ -37,6 +37,7 @@
 	SUPERINIT;
 	
 	_ctx = ctx;
+	_clientID = clientID;
 	
 	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
 	
@@ -125,16 +126,33 @@
 	
 	// Rebase [self.branch currentRevision] onto the new revisions
 	
-	txn = [[COStoreTransaction alloc] init];
-	NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: [[self.branch currentRevision] UUID]
-												  ontoRevision: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
-											persistentRootUUID: self.persistentRoot.UUID
-													branchUUID: self.branch.UUID
-														 store: [self.persistentRoot store]
-												   transaction: txn];
-	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
+	if (![COLeastCommonAncestor isRevision: [[self.branch currentRevision] UUID]
+				equalToOrParentOfRevision: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
+						   persistentRoot: self.persistentRoot.UUID
+									store: [self.persistentRoot store]])
+	{
+		txn = [[COStoreTransaction alloc] init];
+		NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: [[self.branch currentRevision] UUID]
+													  ontoRevision: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
+												persistentRootUUID: self.persistentRoot.UUID
+														branchUUID: self.branch.UUID
+															 store: [self.persistentRoot store]
+													   transaction: txn];
+		ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 
-	[_branch setCurrentRevision: [rebasedRevs lastObject]];
+		[_branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [rebasedRevs lastObject]
+														   persistentRootUUID: self.persistentRoot.UUID
+																	storeUUID: [[self.persistentRoot store] UUID]]];
+	}
+	else
+	{
+		// Fast-forward
+		
+		[_branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
+														   persistentRootUUID: self.persistentRoot.UUID
+																	storeUUID: [[self.persistentRoot store] UUID]]];
+	}
+	[self.persistentRoot commit];
 	
 	// Send receipt
 	

@@ -34,6 +34,12 @@
 	NSMutableDictionary *lastSentRevisionForClientID;
 	
 	id<COSynchronizerServerDelegate> delegate;
+	
+	// HACK: These two are used to pass info between two methods in
+	// COSynchronizerServer where one calls the other via a commit notification
+	
+	ETUUID *currentlyHandlingLastSentRevision;
+	NSString *currentlyRespondingToClient;
 }
 
 - (id) initWithBranch: (COBranch *)aBranch;

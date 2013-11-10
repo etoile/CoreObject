@@ -21,6 +21,8 @@
 {
 	SUPERINIT;
 	branch = aBranch;
+	lastConfirmedRevisionForClientID = [NSMutableDictionary new];
+	lastSentRevisionForClientID = [NSMutableDictionary new];
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(persistentRootDidChange:)
 												 name: COPersistentRootDidChangeNotification
@@ -36,13 +38,13 @@
 
 - (void) persistentRootDidChange: (NSNotification *)notif
 {
-	for (NSString *clientID in [lastConfirmedRevisionForClientID allKeys])
+	for (NSString *clientID in [self clientIDs])
 	{
 		[self sendPushToClient: clientID];
 	}
 }
 
-- (void) handleRevisionsFromClient: (NSArray *)revs
+- (void) handleRevisions: (NSArray *)revs fromClient: (NSString *)clientID
 {
 	// TODO: Ideally we wouldn't even commit these revisions before rebasing them
 	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
@@ -70,8 +72,21 @@
 	[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [rebasedRevs lastObject]
 													  persistentRootUUID: self.persistentRoot.UUID
 															   storeUUID: [[self.persistentRoot store] UUID]]];
+	
+	// Set the following ivars so -sendPushToClient: sends a response message
+	// instead of a regular push message.
+
+	ETAssert(clientID != nil);
+	currentlyHandlingLastSentRevision = [(COSynchronizerRevision *)[revs lastObject] revisionUUID];
+	currentlyRespondingToClient = clientID;
+	
 	// Will cause a call to -[self persistentRootDidChange:]
 	[self.persistentRoot commit];
+}
+
+- (NSArray *)clientIDs
+{
+	return [lastSentRevisionForClientID allKeys];
 }
 
 - (void) addClientID: (NSString *)clientID
@@ -93,7 +108,7 @@
 
 - (void) handlePushedRevisionsFromClient: (COSynchronizerPushedRevisionsFromClientMessage *)aMessage
 {
-	[self handleRevisionsFromClient: aMessage.revisions];
+	[self handleRevisions: aMessage.revisions fromClient: aMessage.clientID];
 }
 
 - (void) handleReceiptFromClient: (COSynchronizerAcknowledgementFromClientMessage *)aMessage
@@ -133,16 +148,25 @@
 		return;
 	}
 	
-	COSynchronizerPushedRevisionsToClientMessage *message = [[COSynchronizerPushedRevisionsToClientMessage alloc] init];
-	message.revisions = revs;
-	[self.delegate sendPushedRevisions: message toClients: @[clientID]];
-}
-
-
-- (void) sendResponseMessage: (COSynchronizerResponseToClientForSentRevisionsMessage *)aPropertyList
-					toClient: (NSString *)aJID
-{
-	
+	if (currentlyHandlingLastSentRevision != nil)
+	{
+		ETAssert(currentlyRespondingToClient != nil);
+		
+		COSynchronizerResponseToClientForSentRevisionsMessage * message = [[COSynchronizerResponseToClientForSentRevisionsMessage alloc] init];
+		message.revisions = revs;
+		message.lastRevisionUUIDSentByClient = currentlyHandlingLastSentRevision;
+		
+		[self.delegate sendResponseMessage: message toClient: currentlyRespondingToClient];
+		
+		currentlyHandlingLastSentRevision = nil;
+		currentlyRespondingToClient = nil;
+	}
+	else
+	{
+		COSynchronizerPushedRevisionsToClientMessage *message = [[COSynchronizerPushedRevisionsToClientMessage alloc] init];
+		message.revisions = revs;
+		[self.delegate sendPushedRevisions: message toClients: @[clientID]];
+	}
 }
 
 - (void) sendPersistentRootInfoMessageToClient: (NSString *)aClient
