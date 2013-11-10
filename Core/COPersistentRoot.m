@@ -473,6 +473,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 					format: @"Attempted to commit changes to deleted persistent root %@", self];
 	}
 	
+	ETAssert([self currentBranch] != nil);
+	ETAssert([self rootObject] != nil);
 	ETAssert([[self rootObject] isRoot]);
     
 	if ([self isPersistentRootUncommitted])
