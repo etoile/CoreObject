@@ -98,12 +98,13 @@
 
 - (void) handleRevisionsFromServer: (NSArray *)revs
 {
-	ETUUID *currentRevUUID = [self lastRevisionUUIDFromServer];
+	ETUUID *lastServerRevUUID = [self lastRevisionUUIDFromServer];
+	_lastRevisionUUIDFromServer = [[revs lastObject] revisionUUID];
 	
 	NSUInteger i = [revs indexOfObjectPassingTest: ^(id obj, NSUInteger idx, BOOL *stop)
 					{
 						COSynchronizerRevision *revision = obj;
-						return [revision.parentRevisionUUID isEqual: currentRevUUID];
+						return [revision.parentRevisionUUID isEqual: lastServerRevUUID];
 					}];
 	
 	ETAssert(i != NSNotFound);

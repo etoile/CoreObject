@@ -126,6 +126,7 @@
 	{
 		return;
 	}
+	lastSentRevisionForClientID[clientID] = [[branch currentRevision] UUID];
 	
 	NSMutableArray *revs = [[NSMutableArray alloc] init];
 	

@@ -261,7 +261,6 @@
 	UKObjectsEqual([clientChild1 UUID], [serverChild1 UUID]);
 }
 
-#if 0
 - (void) testServerAndClientEdit
 {
 	COObject *serverChild1 = [self addAndCommitServerChild];
@@ -270,17 +269,12 @@
 	[transport deliverMessagesToServer];
 	
 	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	
-	// N.B. I'm assuming that since the client's child was merged in afterwards,
-	// it was inserted at position 0.
-	UKObjectsEqual(clientChild1, [[serverBranch rootObject] contents][0]);
-	UKObjectsSame(serverChild1, [[serverBranch rootObject] contents][1]);
+	UKObjectsEqual(S(clientChild1, serverChild1), SA([[serverBranch rootObject] contents]));
 	
 	[transport deliverMessagesToClient];
 	
 	UKIntsEqual(2, [[[clientBranch rootObject] contents] count]);
-	UKObjectsSame(clientChild1, [[clientBranch rootObject] contents][0]);
-	UKObjectsEqual(serverChild1, [[clientBranch rootObject] contents][1]);
+	UKObjectsEqual(S(clientChild1, serverChild1), SA([[clientBranch rootObject] contents]));
 }
 
 - (void) testClientAndServerEdit
@@ -291,16 +285,13 @@
 	[transport deliverMessagesToClient];
 	
 	UKIntsEqual(2, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(serverChild1, [[clientBranch rootObject] contents][0]);
-	UKObjectsSame(clientChild1, [[clientBranch rootObject] contents][1]);
-
+	UKObjectsEqual(S(clientChild1, serverChild1), SA([[clientBranch rootObject] contents]));
 	
 	[transport deliverMessagesToServer];
 	
 	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsSame(serverChild1, [[serverBranch rootObject] contents][0]);
-	UKObjectsEqual(clientChild1, [[serverBranch rootObject] contents][1]);
+	UKObjectsEqual(S(clientChild1, serverChild1), SA([[serverBranch rootObject] contents]));
 }
-#endif
+
 @end
 

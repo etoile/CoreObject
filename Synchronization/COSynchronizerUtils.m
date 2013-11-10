@@ -54,7 +54,7 @@
 			[diff resolveConflictsFavoringSourceIdentifier: @"merged"]; // FIXME: Hardcoded
 		}
 		
-		NSLog(@"Applying diff %@", diff);
+		//NSLog(@"Applying diff %@", diff);
 		
 		COItemGraph *mergeResult = [diff itemTreeWithDiffAppliedToItemGraph: baseGraph];
 		
