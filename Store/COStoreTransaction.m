@@ -45,6 +45,19 @@
 	return [results allObjects];
 }
 
+- (BOOL) touchesMutableStateForPersistentRootUUID: (ETUUID *)aUUID
+{
+	for (id <COStoreAction> action in operations)
+	{
+		if ([action.persistentRoot isEqual: aUUID]
+			&& ![action isKindOfClass: [COStoreWriteRevision class]])
+		{
+			return YES;
+		}
+	}
+	return NO;
+}
+
 /** @taskunit Transaction ID */
 
 - (int64_t) oldTransactionIDForPersistentRoot: (ETUUID *)aPersistentRoot

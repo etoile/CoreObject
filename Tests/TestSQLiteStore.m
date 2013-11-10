@@ -983,4 +983,22 @@ static ETUUID *childUUID2;
     UKFalse([store commitStoreTransaction: txn]);
 }
 
+/**
+ * Writing a new revision does not touch the mutable state of a persistent
+ * root, so there is no need to provide a transaction ID for the persistent
+ * root. This test ensures that the store allows this.
+ */
+- (void) testWriteRevisionDoesNotNeedValidTransactionID
+{
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+	[txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
+						   revisionUUID: [ETUUID UUID]
+							   metadata: nil
+					   parentRevisionID: initialRevisionUUID
+				  mergeParentRevisionID: nil
+					 persistentRootUUID: prootUUID
+							 branchUUID: branchAUUID];
+    UKTrue([store commitStoreTransaction: txn]);
+}
+
 @end

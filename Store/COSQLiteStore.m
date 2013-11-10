@@ -207,9 +207,12 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
         {
 			const BOOL isPresent = [db_ boolForQuery: @"SELECT COUNT(*) > 0 FROM persistentroots WHERE uuid = ?", [modifiedUUID dataValue]];
-			
+			const BOOL modifiesMutableState = [aTransaction touchesMutableStateForPersistentRootUUID: modifiedUUID];
 			int64_t currentValue = [db_ int64ForQuery: @"SELECT transactionid FROM persistentroots WHERE uuid = ?", [modifiedUUID dataValue]];
 			int64_t clientValue = [aTransaction oldTransactionIDForPersistentRoot: modifiedUUID];
+			
+			if (!modifiesMutableState)
+				continue;
 			
 			if (clientValue != currentValue && isPresent)
 			{

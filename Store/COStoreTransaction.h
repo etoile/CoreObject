@@ -25,6 +25,13 @@
 
 - (NSArray *) persistentRootUUIDs;
 
+/**
+ * Returns YES if this transaction contains an action affecting the mutable
+ * state of the persistent root with the given UUID. i.e., an action other
+ * than writing a revision. Otherwise, returns NO.
+ */
+- (BOOL) touchesMutableStateForPersistentRootUUID: (ETUUID *)aUUID;
+
 - (int64_t) oldTransactionIDForPersistentRoot: (ETUUID *)aPersistentRoot;
 
 /**
