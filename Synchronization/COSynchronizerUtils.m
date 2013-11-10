@@ -62,7 +62,7 @@
 		[newRevids addObject: nextRev];
 		[txn writeRevisionWithModifiedItems: mergeResult
 							   revisionUUID: nextRev
-								   metadata: @{}
+								   metadata: @{} // FIXME: Reuse metadata from source revision?
 						   parentRevisionID: currentDest
 					  mergeParentRevisionID: nil
 						 persistentRootUUID: persistentRoot

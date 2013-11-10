@@ -249,7 +249,7 @@
 	UKObjectsEqual([serverChild1 UUID], [clientChild1 UUID]);
 }
 #endif
-#if 0
+
 - (void) testClientEdit
 {
 	COObject *clientChild1 = [self addAndCommitClientChild];
@@ -261,7 +261,7 @@
 	UKObjectsEqual([[clientBranch rootObject] UUID], [[serverBranch rootObject] UUID]);
 	UKObjectsEqual([clientChild1 UUID], [serverChild1 UUID]);
 }
-#endif
+
 #if 0
 - (void) testServerAndClientEdit
 {

@@ -1,4 +1,5 @@
 #import "COSynchronizerServer.h"
+#import "CORevisionCache.h"
 
 #import "COSynchronizerRevision.h"
 #import "COSynchronizerPushedRevisionsToClientMessage.h"
@@ -53,6 +54,8 @@
 	}
 	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 	
+	// FIXME: Ideally, don't rebase if it's possible to just fast-forward
+	
 	// Rebase revs onto the current revisions
 	
 	txn = [[COStoreTransaction alloc] init];
@@ -64,7 +67,9 @@
 												   transaction: txn];
 	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 	
-	[branch setCurrentRevision: [rebasedRevs lastObject]];
+	[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [rebasedRevs lastObject]
+													  persistentRootUUID: self.persistentRoot.UUID
+															   storeUUID: [[self.persistentRoot store] UUID]]];
 	// Will cause a call to -[self persistentRootDidChange:]
 	[self.persistentRoot commit];
 }
