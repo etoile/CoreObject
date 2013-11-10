@@ -20,50 +20,15 @@
 
 - (COPersistentRoot *)persistentRoot { return [_branch persistentRoot]; }
 
-/**
- * If [self.branch currentRevision] has "from-server" metadata, returns nil
- * (we are not awaiting a response from the server.)
- *
- * Otherwise, returns [self.branch currentRevision] - which is the _last_
- * (possibly of a batch) of commits that were made locally, that are currently
- * in transit to the server.
- */
-- (CORevision *) lastRevisionInTransitToServer
+- (ETUUID *) lastRevisionUUIDInTransitToServer
 {
-	CORevision *lastRevisionFromServer = [self lastRevisionFromServer];
-	if ([lastRevisionFromServer isEqual: [_branch currentRevision]])
-	{
-		return nil;
-	}
-	
-	return [_branch currentRevision];
+	return _lastRevisionUUIDInTransitToServer;
 }
 
-/**
- * Returns the last revision on self.branch that has "from-server" metadata.
- * Always non-nil.
- */
-- (CORevision *) lastRevisionFromServer
+- (ETUUID *) lastRevisionUUIDFromServer
 {
-	CORevision *currentRevision = [_branch currentRevision];
-	
-	while (currentRevision != nil)
-	{
-		NSDictionary *metadata = [currentRevision metadata];
-		
-		if ([metadata[@"fromServer"] boolValue])
-		{
-			return currentRevision;
-		}
-		
-		currentRevision = [currentRevision parentRevision];
-	}
-
-	NSAssert(NO, @"COSynchronizerClient should have at least one revision with "
-				  "fromServer=YES");
-	return nil;
+	return _lastRevisionUUIDFromServer;
 }
-
 
 - (id) initWithSetupMessage: (COSynchronizerPersistentRootInfoToClientMessage *)message
 				   clientID: (NSString *)clientID
@@ -90,6 +55,9 @@
 					 parentBranch: nil
 				  initialRevision: message.currentRevision.revisionUUID
 				forPersistentRoot: message.persistentRootUUID];
+		
+		[txn setCurrentBranch: message.branchUUID
+			forPersistentRoot: message.persistentRootUUID];
 	}
 	
 	// 3. Do we have the revision?
@@ -107,6 +75,7 @@
 	ETAssert(persistentRoot != nil);
 	_branch = [persistentRoot branchForUUID: message.branchUUID];
 	ETAssert(_branch != nil);
+	_lastRevisionUUIDFromServer = message.currentRevision.revisionUUID;
 	
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(persistentRootDidChange:)
@@ -121,22 +90,14 @@
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
-- (BOOL) isAwaitingResponse
-{
-	return [self lastRevisionInTransitToServer] != nil;
-}
-
 - (void) persistentRootDidChange: (NSNotification *)notif
 {
-	if (![self isAwaitingResponse])
-	{
-		[self sendPushToServer];
-	}
+	[self sendPushToServer];
 }
 
 - (void) handleRevisionsFromServer: (NSArray *)revs
 {
-	ETUUID *currentRevUUID = [[self lastRevisionFromServer] UUID];
+	ETUUID *currentRevUUID = [self lastRevisionUUIDFromServer];
 	
 	NSUInteger i = [revs indexOfObjectPassingTest: ^(id obj, NSUInteger idx, BOOL *stop)
 					{
@@ -192,10 +153,12 @@
 
 - (void) handleResponseMessage: (COSynchronizerResponseToClientForSentRevisionsMessage *)aMessage
 {
-	if (![aMessage.lastRevisionUUIDSentByClient isEqual: [[self lastRevisionInTransitToServer] UUID]])
+	if (![aMessage.lastRevisionUUIDSentByClient isEqual: [self lastRevisionUUIDInTransitToServer]])
 	{
 		return;
 	}
+	
+	_lastRevisionUUIDInTransitToServer = nil;
 	
 	[self handleRevisionsFromServer: aMessage.revisions];
 }
@@ -204,19 +167,30 @@
 {
 	COSynchronizerAcknowledgementFromClientMessage *message = [[COSynchronizerAcknowledgementFromClientMessage alloc] init];
 	message.clientID = self.clientID;
-	message.lastRevisionUUIDSentByServer = [[self lastRevisionFromServer] UUID];
+	message.lastRevisionUUIDSentByServer = [self lastRevisionUUIDFromServer];
 	[self.delegate sendReceiptToServer: message];
 }
 
 - (void) sendPushToServer
 {
+	ETAssert([self lastRevisionUUIDFromServer] != nil);
+	if ([self lastRevisionUUIDInTransitToServer] != nil)
+	{
+		return;
+	}
+	if ([[[self.branch currentRevision] UUID] isEqual: [self lastRevisionUUIDFromServer]])
+	{
+		NSLog(@"sendPushToServer bailing because there is nothing to push");
+		return;
+	}
+	
 	NSMutableArray *revs = [[NSMutableArray alloc] init];
 	
-	NSArray *revUUIDs = [COLeastCommonAncestor revisionUUIDsFromRevisionUUIDExclusive: [[self lastRevisionFromServer] UUID]
+	NSArray *revUUIDs = [COLeastCommonAncestor revisionUUIDsFromRevisionUUIDExclusive: [self lastRevisionUUIDFromServer]
 															  toRevisionUUIDInclusive: [[self.branch currentRevision] UUID]
 																	   persistentRoot: self.persistentRoot.UUID
 																				store: self.persistentRoot.store];
-	
+
 	for (ETUUID *revUUID in revUUIDs)
 	{
 		COSynchronizerRevision *rev = [[COSynchronizerRevision alloc] initWithUUID: revUUID
@@ -225,11 +199,9 @@
 		[revs addObject: rev];
 	}
 	
-	if ([revs isEmpty])
-	{
-		NSLog(@"sendPushToServer bailing because there is nothing to push");
-		return;
-	}
+	ETAssert(![revs isEmpty]);
+	ETAssert(_lastRevisionUUIDInTransitToServer == nil);
+	_lastRevisionUUIDInTransitToServer = [[self.branch currentRevision] UUID];
 	
 	COSynchronizerPushedRevisionsFromClientMessage *message = [[COSynchronizerPushedRevisionsFromClientMessage alloc] init];
 	message.clientID = self.clientID;

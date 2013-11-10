@@ -212,11 +212,14 @@
 
 - (void) testBasicReplicationToClient
 {
+	UKNotNil(clientPersistentRoot);
+	UKNotNil(clientBranch);
+	UKNotNil(clientPersistentRoot.currentBranch);
+	UKObjectsSame(clientBranch, clientPersistentRoot.currentBranch);
 	UKObjectsEqual([serverPersistentRoot UUID], [clientPersistentRoot UUID]);
 	UKObjectsEqual([serverBranch UUID], [clientBranch UUID]);
 	UKObjectsEqual([[serverBranch rootObject] UUID], [[clientBranch rootObject] UUID]);
 }
-#if 0
 
 - (COObject *) addAndCommitServerChild
 {
@@ -233,7 +236,7 @@
 	[clientCtx commit];
 	return clientChild1;
 }
-
+#if 0
 - (void) testServerEdit
 {
 	COObject *serverChild1 = [self addAndCommitServerChild];
@@ -245,7 +248,8 @@
 	UKObjectsEqual([[serverBranch rootObject] UUID], [[clientBranch rootObject] UUID]);
 	UKObjectsEqual([serverChild1 UUID], [clientChild1 UUID]);
 }
-
+#endif
+#if 0
 - (void) testClientEdit
 {
 	COObject *clientChild1 = [self addAndCommitClientChild];
@@ -257,7 +261,8 @@
 	UKObjectsEqual([[clientBranch rootObject] UUID], [[serverBranch rootObject] UUID]);
 	UKObjectsEqual([clientChild1 UUID], [serverChild1 UUID]);
 }
-
+#endif
+#if 0
 - (void) testServerAndClientEdit
 {
 	COObject *serverChild1 = [self addAndCommitServerChild];

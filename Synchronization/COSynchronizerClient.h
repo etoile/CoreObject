@@ -61,6 +61,9 @@
 	COBranch *_branch;
 	NSString *_clientID;
 	
+	ETUUID *_lastRevisionUUIDFromServer;
+	ETUUID *_lastRevisionUUIDInTransitToServer;
+	
 	id<COSynchronizerClientDelegate> _delegate;
 }
 
