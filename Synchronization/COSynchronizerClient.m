@@ -117,9 +117,16 @@
 	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
 	for (COSynchronizerRevision *rev in revsToUse)
 	{
-		[rev writeToTransaction: txn
-			 persistentRootUUID: self.persistentRoot.UUID
-					 branchUUID: self.branch.UUID];
+		CORevision *existingRevisions = [CORevisionCache revisionForRevisionUUID: rev.revisionUUID
+															  persistentRootUUID: self.persistentRoot.UUID
+																	   storeUUID: [[self.persistentRoot store] UUID]];
+								  
+		if (nil == existingRevisions)
+		{
+			[rev writeToTransaction: txn
+				 persistentRootUUID: self.persistentRoot.UUID
+						 branchUUID: self.branch.UUID];
+		}
 	}
 	// TODO: Ideally we'd just do one store commit, instead of two,
 	// but the +rebaseRevision method below requires these revisions to be committed already.

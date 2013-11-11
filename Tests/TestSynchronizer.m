@@ -253,7 +253,7 @@
 	[clientCtx commit];
 	return clientChild1;
 }
-#if 0
+
 - (void) testBasicReplicationToClient
 {
 	UKNotNil(clientPersistentRoot);
@@ -264,7 +264,6 @@
 	UKObjectsEqual([serverBranch UUID], [clientBranch UUID]);
 	UKObjectsEqual([[serverBranch rootObject] UUID], [[clientBranch rootObject] UUID]);
 }
-#endif
 
 - (NSArray *)serverMessages
 {
@@ -274,6 +273,52 @@
 - (NSArray *)clientMessages
 {
 	return [transport messagesForClient: client.clientID];
+}
+
+- (void) testClientEdit
+{
+	COObject *clientChild1 = [self addAndCommitClientChild];
+	
+	UKIntsEqual(1, [[self serverMessages] count]);
+	UKObjectKindOf([self serverMessages][0], COSynchronizerPushedRevisionsFromClientMessage);
+	UKIntsEqual(0, [[self clientMessages] count]);
+	
+	// Server should merge in client's changes, and send a push response back to the client
+	[transport deliverMessagesToServer];
+	
+	UKIntsEqual(0, [[self serverMessages] count]);
+	
+	UKIntsEqual(1, [[self clientMessages] count]);
+	UKObjectKindOf([self clientMessages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
+	
+	UKIntsEqual(1, [[[serverBranch rootObject] contents] count]);
+	UKObjectsEqual(S(clientChild1), SA([[serverBranch rootObject] contents]));
+	
+	// Deliver the response to the client
+	[transport deliverMessagesToClient];
+	
+	// Should not send anything more to server
+	UKIntsEqual(0, [[self serverMessages] count]);
+	UKIntsEqual(0, [[self clientMessages] count]);
+}
+
+- (void) testServerEdit
+{
+	COObject *serverChild1 = [self addAndCommitServerChild];
+	
+	UKIntsEqual(0, [[self serverMessages] count]);
+	UKIntsEqual(1, [[self clientMessages] count]);
+	UKObjectKindOf([self clientMessages][0], COSynchronizerPushedRevisionsToClientMessage);
+	
+	// Deliver push to client
+	[transport deliverMessagesToClient];
+	
+	UKIntsEqual(1, [[[clientBranch rootObject] contents] count]);
+	UKObjectsEqual(S(serverChild1), SA([[clientBranch rootObject] contents]));
+	
+	// No more messages
+	UKIntsEqual(0, [[self clientMessages] count]);
+	UKIntsEqual(0, [[self serverMessages] count]);
 }
 
 - (void) testClientAndServerEdit
