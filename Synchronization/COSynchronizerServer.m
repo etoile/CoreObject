@@ -21,7 +21,6 @@
 {
 	SUPERINIT;
 	branch = aBranch;
-	lastConfirmedRevisionForClientID = [NSMutableDictionary new];
 	lastSentRevisionForClientID = [NSMutableDictionary new];
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(persistentRootDidChange:)
@@ -56,23 +55,35 @@
 	}
 	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 	
-	// FIXME: Ideally, don't rebase if it's possible to just fast-forward
-	
-	// Rebase revs onto the current revisions
-	
-	txn = [[COStoreTransaction alloc] init];
-	NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
-												  ontoRevision: [[self.branch currentRevision] UUID]
-											persistentRootUUID: self.persistentRoot.UUID
-													branchUUID: self.branch.UUID
-														 store: [self.persistentRoot store]
-												   transaction: txn];
-	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
-	
-	[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [rebasedRevs lastObject]
-													  persistentRootUUID: self.persistentRoot.UUID
-															   storeUUID: [[self.persistentRoot store] UUID]]];
-	
+	if (![COLeastCommonAncestor isRevision: [[self.branch currentRevision] UUID]
+				 equalToOrParentOfRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
+							persistentRoot: self.persistentRoot.UUID
+									 store: [self.persistentRoot store]])
+	{
+		// Rebase revs onto the current revisions
+		
+		txn = [[COStoreTransaction alloc] init];
+		NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
+													  ontoRevision: [[self.branch currentRevision] UUID]
+												persistentRootUUID: self.persistentRoot.UUID
+														branchUUID: self.branch.UUID
+															 store: [self.persistentRoot store]
+													   transaction: txn];
+		ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
+		
+		[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [rebasedRevs lastObject]
+														  persistentRootUUID: self.persistentRoot.UUID
+																   storeUUID: [[self.persistentRoot store] UUID]]];
+	}
+	else
+	{
+		// Fast-forward
+		
+		[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
+														   persistentRootUUID: self.persistentRoot.UUID
+																	storeUUID: [[self.persistentRoot store] UUID]]];
+	}
+
 	// Set the following ivars so -sendPushToClient: sends a response message
 	// instead of a regular push message.
 
@@ -102,27 +113,24 @@
 
 - (void) removeClientID: (NSString *)clientID
 {
-	[lastConfirmedRevisionForClientID removeObjectForKey: clientID];
 	[lastSentRevisionForClientID removeObjectForKey: clientID];
 }
 
 - (void) handlePushedRevisionsFromClient: (COSynchronizerPushedRevisionsFromClientMessage *)aMessage
 {
+	ETAssert(aMessage.lastRevisionUUIDSentByServer != nil);
+	lastSentRevisionForClientID[aMessage.clientID] = aMessage.lastRevisionUUIDSentByServer;
 	[self handleRevisions: aMessage.revisions fromClient: aMessage.clientID];
 }
 
 - (void) handleReceiptFromClient: (COSynchronizerAcknowledgementFromClientMessage *)aMessage
 {
-	// FIXME: Check if aMessage.lastRevisionUUIDSentByServer is older than lastConfirmedRevisionForClientID[aMessage.clientID]
-	// (in case the messages got reordered)
-	[lastConfirmedRevisionForClientID setObject: aMessage.lastRevisionUUIDSentByServer
-										 forKey: aMessage.clientID];
 }
 
 - (void) sendPushToClient: (NSString *)clientID
 {
-	ETUUID *lastSentForClient = lastSentRevisionForClientID[clientID];
-	if ([lastSentForClient isEqual: [[branch currentRevision] UUID]])
+	ETUUID *lastConfirmedForClient = lastSentRevisionForClientID[clientID];
+	if ([lastConfirmedForClient isEqual: [[branch currentRevision] UUID]])
 	{
 		return;
 	}
@@ -130,7 +138,7 @@
 	
 	NSMutableArray *revs = [[NSMutableArray alloc] init];
 	
-	NSArray *revUUIDs = [COLeastCommonAncestor revisionUUIDsFromRevisionUUIDExclusive: lastSentForClient
+	NSArray *revUUIDs = [COLeastCommonAncestor revisionUUIDsFromRevisionUUIDExclusive: lastConfirmedForClient
 															  toRevisionUUIDInclusive: [[self.branch currentRevision] UUID]
 																	   persistentRoot: self.persistentRoot.UUID
 																				store: self.persistentRoot.store];

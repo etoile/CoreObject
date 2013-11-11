@@ -14,4 +14,9 @@
  * the client received from the server.
  */
 @property (nonatomic, readwrite, strong) NSArray *revisions;
+/**
+ * Identifier for the message
+ */
+@property (nonatomic, readwrite, strong) ETUUID *lastRevisionUUIDSentByServer;
+
 @end

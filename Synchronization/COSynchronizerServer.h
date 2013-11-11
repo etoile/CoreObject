@@ -22,12 +22,7 @@
 @interface COSynchronizerServer : NSObject
 {
 	COBranch *branch;
-	
-	/**
-	 * NSString : CORevision
-	 */
-	NSMutableDictionary *lastConfirmedRevisionForClientID;
-	
+
 	/**
 	 * Keys in this dictionary determine the active set of clients
 	 */

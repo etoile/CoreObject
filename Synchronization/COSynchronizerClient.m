@@ -127,7 +127,9 @@
 	
 	// Rebase [self.branch currentRevision] onto the new revisions
 	
-	if (![COLeastCommonAncestor isRevision: [[self.branch currentRevision] UUID]
+	if (![[[self.branch currentRevision] UUID] isEqual: _lastRevisionUUIDInTransitToServer]
+		&&
+		![COLeastCommonAncestor isRevision: [[self.branch currentRevision] UUID]
 				equalToOrParentOfRevision: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
 						   persistentRoot: self.persistentRoot.UUID
 									store: [self.persistentRoot store]])
@@ -153,20 +155,21 @@
 														   persistentRootUUID: self.persistentRoot.UUID
 																	storeUUID: [[self.persistentRoot store] UUID]]];
 	}
+	_lastRevisionUUIDInTransitToServer = nil;
 	[self.persistentRoot commit];
 	
 	// Send receipt
 	
 	[self sendReceiptToServer];
-	
-	// Only does anything if there are unpushed revisions.
-	// Note this is only possible if we are called from -handleResponseMessage:.
-	
-	[self sendPushToServer];
 }
 
 - (void) handlePushMessage: (COSynchronizerPushedRevisionsToClientMessage *)aMessage
 {
+	if (_lastRevisionUUIDInTransitToServer != nil)
+	{
+		return;
+	}
+	
 	[self handleRevisionsFromServer: aMessage.revisions];
 }
 
@@ -176,18 +179,12 @@
 	{
 		return;
 	}
-	
-	_lastRevisionUUIDInTransitToServer = nil;
-	
+
 	[self handleRevisionsFromServer: aMessage.revisions];
 }
 
 - (void) sendReceiptToServer
 {
-	COSynchronizerAcknowledgementFromClientMessage *message = [[COSynchronizerAcknowledgementFromClientMessage alloc] init];
-	message.clientID = self.clientID;
-	message.lastRevisionUUIDSentByServer = [self lastRevisionUUIDFromServer];
-	[self.delegate sendReceiptToServer: message];
 }
 
 - (void) sendPushToServer
@@ -225,6 +222,7 @@
 	COSynchronizerPushedRevisionsFromClientMessage *message = [[COSynchronizerPushedRevisionsFromClientMessage alloc] init];
 	message.clientID = self.clientID;
 	message.revisions = revs;
+	message.lastRevisionUUIDSentByServer = [self lastRevisionUUIDFromServer];
 	[self.delegate sendPushToServer: message];
 }
 
