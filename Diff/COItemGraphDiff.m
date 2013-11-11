@@ -521,6 +521,9 @@
 					withItemTree: (COItemGraph *)b
                 sourceIdentifier: (id)aSource
 {
+	NILARG_EXCEPTION_TEST(a);
+	NILARG_EXCEPTION_TEST(b);
+	
 	COItemGraphDiff *result = [[self alloc] initWithOldRootUUID: [a rootItemUUID]
 												   newRootUUID: [b rootItemUUID]];
 

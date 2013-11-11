@@ -37,12 +37,19 @@
 																				  store: store];
 	
 	NSMutableArray *newRevids = [[NSMutableArray alloc] init];
+
+	NSMutableDictionary *transactionGraphs = [[NSMutableDictionary alloc] init];
 	
 	ETUUID *currentDest = dest;
 	for (ETUUID *rev in sourceRevs)
 	{
 		id <COItemGraph> sourceGraph = [store itemGraphForRevisionUUID: rev persistentRoot: persistentRoot];
-		id <COItemGraph> currentDestGraph = [store itemGraphForRevisionUUID: currentDest persistentRoot: persistentRoot];
+		id <COItemGraph> currentDestGraph = transactionGraphs[currentDest];
+		if (currentDestGraph == nil)
+		{
+			currentDestGraph = [store itemGraphForRevisionUUID: currentDest persistentRoot: persistentRoot];
+			ETAssert(currentDestGraph != nil);
+		}
 		
 		COItemGraphDiff *diff = [self diffForRebasingGraph: sourceGraph
 												 ontoGraph: currentDestGraph
@@ -67,6 +74,7 @@
 					  mergeParentRevisionID: nil
 						 persistentRootUUID: persistentRoot
 								 branchUUID: branch];
+		transactionGraphs[nextRev] = mergeResult;
 		
 		currentDest = nextRev;
 	}

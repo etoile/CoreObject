@@ -234,17 +234,17 @@
 	return self;
 }
 
-- (COObject *) addAndCommitServerChild
+- (OutlineItem *) addAndCommitServerChild
 {
-	COObject *serverChild1 = [[serverBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *serverChild1 = [[serverBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[[serverBranch rootObject] addObject: serverChild1];
 	[ctx commit];
 	return serverChild1;
 }
 
-- (COObject *) addAndCommitClientChild
+- (OutlineItem *) addAndCommitClientChild
 {
-	COObject *clientChild1 = [[clientBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *clientChild1 = [[clientBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[[clientBranch rootObject] addObject: clientChild1];
 	[clientCtx commit];
 	return clientChild1;
@@ -273,7 +273,7 @@
 
 - (void) testClientEdit
 {
-	COObject *clientChild1 = [self addAndCommitClientChild];
+	OutlineItem *clientChild1 = [self addAndCommitClientChild];
 	
 	UKIntsEqual(1, [[self serverMessages] count]);
 	UKObjectKindOf([self serverMessages][0], COSynchronizerPushedRevisionsFromClientMessage);
@@ -300,7 +300,7 @@
 
 - (void) testServerEdit
 {
-	COObject *serverChild1 = [self addAndCommitServerChild];
+	OutlineItem *serverChild1 = [self addAndCommitServerChild];
 	
 	UKIntsEqual(0, [[self serverMessages] count]);
 	UKIntsEqual(1, [[self clientMessages] count]);
@@ -319,8 +319,8 @@
 
 - (void) testClientAndServerEdit
 {
-	COObject *serverChild1 = [self addAndCommitServerChild];
-	COObject *clientChild1 = [self addAndCommitClientChild];
+	OutlineItem *serverChild1 = [self addAndCommitServerChild];
+	OutlineItem *clientChild1 = [self addAndCommitClientChild];
 	
 	UKIntsEqual(1, [[self serverMessages] count]);
 	UKObjectKindOf([self serverMessages][0], COSynchronizerPushedRevisionsFromClientMessage);
@@ -360,8 +360,8 @@
 
 - (void) testServerAndClientEdit
 {
-	COObject *serverChild1 = [self addAndCommitServerChild];
-	COObject *clientChild1 = [self addAndCommitClientChild];
+	OutlineItem *serverChild1 = [self addAndCommitServerChild];
+	OutlineItem *clientChild1 = [self addAndCommitClientChild];
 	
 	UKIntsEqual(1, [[self serverMessages] count]);
 	{
@@ -423,6 +423,65 @@
 	UKIntsEqual(2, [[[clientBranch rootObject] contents] count]);
 	UKObjectsEqual(S(clientChild1, serverChild1), SA([[clientBranch rootObject] contents]));
 }
+
+- (void) testLocalClientCommitsAfterPushingToServer
+{
+	OutlineItem *serverChild1 = [self addAndCommitServerChild];
+	OutlineItem *clientChild1 = [self addAndCommitClientChild];
+	
+	UKIntsEqual(1, [[self serverMessages] count]);
+	UKObjectKindOf([self serverMessages][0], COSynchronizerPushedRevisionsFromClientMessage);
+	
+	UKIntsEqual(1, [[self clientMessages] count]);
+	UKObjectKindOf([self clientMessages][0], COSynchronizerPushedRevisionsToClientMessage);
+	
+	// Server should merge in client's changes, and send a push response back to the client
+	[transport deliverMessagesToServer];
+	
+	UKIntsEqual(0, [[self serverMessages] count]);
+	
+	UKIntsEqual(2, [[self clientMessages] count]);
+	UKObjectKindOf([self clientMessages][0], COSynchronizerPushedRevisionsToClientMessage); /* Will be ignored by client */
+	UKObjectKindOf([self clientMessages][1], COSynchronizerResponseToClientForSentRevisionsMessage);
+	
+	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
+	UKObjectsEqual(S(clientChild1, serverChild1), SA([[serverBranch rootObject] contents]));
+	
+	// Before the merged changes arrives at the client, make another commit on the client
+	
+	[[clientBranch rootObject] setLabel: @"more changes"];
+	[clientPersistentRoot commit];
+	
+	// This should not produce any more messages
+	
+	UKIntsEqual(0, [[self serverMessages] count]);
+	UKIntsEqual(2, [[self clientMessages] count]);
+		
+	// Deliver the merge response to the client
+	[transport deliverMessagesToClient];
+	
+	// The client should push back the @"more changes" change to the server
+	
+	UKIntsEqual(1, [[self serverMessages] count]);
+	UKObjectKindOf([self serverMessages][0], COSynchronizerPushedRevisionsFromClientMessage);
+	UKIntsEqual(0, [[self clientMessages] count]);
+	
+	[transport deliverMessagesToServer];
+	
+	
+	UKIntsEqual(0, [[self serverMessages] count]);
+	UKIntsEqual(1, [[self clientMessages] count]);
+	UKObjectKindOf([self clientMessages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
+	
+	UKObjectsEqual(@"more changes", [[serverBranch rootObject] label]);
+	
+	[transport deliverMessagesToClient];
+	
+	// Should not send anything more
+	UKIntsEqual(0, [[self serverMessages] count]);
+	UKIntsEqual(0, [[self clientMessages] count]);
+}
+
 
 @end
 

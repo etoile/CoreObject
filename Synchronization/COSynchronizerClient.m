@@ -133,12 +133,8 @@
 	
 	// Rebase [self.branch currentRevision] onto the new revisions
 	
-	if (![[[self.branch currentRevision] UUID] isEqual: _lastRevisionUUIDInTransitToServer]
-		&&
-		![COLeastCommonAncestor isRevision: [[self.branch currentRevision] UUID]
-				equalToOrParentOfRevision: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
-						   persistentRoot: self.persistentRoot.UUID
-									store: [self.persistentRoot store]])
+	if (_lastRevisionUUIDInTransitToServer != nil
+		&& ![[[self.branch currentRevision] UUID] isEqual: _lastRevisionUUIDInTransitToServer])
 	{
 		txn = [[COStoreTransaction alloc] init];
 		NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: [[self.branch currentRevision] UUID]
