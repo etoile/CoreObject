@@ -94,11 +94,7 @@
 	for (id message in messages)
 	{
 		deliveredAny = YES;
-		if ([message isKindOfClass: [COSynchronizerAcknowledgementFromClientMessage class]])
-		{
-			[server handleReceiptFromClient: message];
-		}
-		else if ([message isKindOfClass: [COSynchronizerPushedRevisionsFromClientMessage class]])
+		if ([message isKindOfClass: [COSynchronizerPushedRevisionsFromClientMessage class]])
 		{
 			[server handlePushedRevisionsFromClient: message];
 		}

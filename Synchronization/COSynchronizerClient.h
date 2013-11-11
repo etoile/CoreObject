@@ -9,7 +9,6 @@
 
 @protocol COSynchronizerClientDelegate <NSObject>
 
-- (void) sendReceiptToServer: (COSynchronizerAcknowledgementFromClientMessage *)message;
 - (void) sendPushToServer: (COSynchronizerPushedRevisionsFromClientMessage *)message;
 
 @end

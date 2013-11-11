@@ -4,7 +4,6 @@
 #import "COSynchronizerPushedRevisionsToClientMessage.h"
 #import "COSynchronizerPushedRevisionsFromClientMessage.h"
 #import "COSynchronizerResponseToClientForSentRevisionsMessage.h"
-#import "COSynchronizerAcknowledgementFromClientMessage.h"
 #import "COSynchronizerPersistentRootInfoToClientMessage.h"
 
 #import "COSynchronizerUtils.h"
@@ -164,10 +163,6 @@
 	}
 	_lastRevisionUUIDInTransitToServer = nil;
 	[self.persistentRoot commit];
-	
-	// Send receipt
-	
-	[self sendReceiptToServer];
 }
 
 - (void) handlePushMessage: (COSynchronizerPushedRevisionsToClientMessage *)aMessage
@@ -188,10 +183,6 @@
 	}
 
 	[self handleRevisionsFromServer: aMessage.revisions];
-}
-
-- (void) sendReceiptToServer
-{
 }
 
 - (void) sendPushToServer

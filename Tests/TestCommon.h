@@ -6,7 +6,6 @@
 #import "COSynchronizerPushedRevisionsToClientMessage.h"
 #import "COSynchronizerPushedRevisionsFromClientMessage.h"
 #import "COSynchronizerResponseToClientForSentRevisionsMessage.h"
-#import "COSynchronizerAcknowledgementFromClientMessage.h"
 #import "COSynchronizerPersistentRootInfoToClientMessage.h"
 
 #import "COStoreTransaction.h"
