@@ -14,7 +14,7 @@
 - (void) sendPropertyListToServer: (id)aPropertyList
 {
 	NSString *text = [COSynchronizerJSONUtils serializePropertyList: aPropertyList];
-	[delegate sendTextToServer: text];
+	[delegate JSONClient: self sendTextToServer: text];
 }
 
 - (void) sendPushToServer: (COSynchronizerPushedRevisionsFromClientMessage *)message

@@ -267,6 +267,7 @@
 		66FD348F1830BB3800898381 /* COSynchronizerJSONClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD348D1830BB3800898381 /* COSynchronizerJSONClient.m */; };
 		66FD349A18314BC200898381 /* COSynchronizerJSONUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FD349818314BC200898381 /* COSynchronizerJSONUtils.h */; };
 		66FD349B18314BC200898381 /* COSynchronizerJSONUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD349918314BC200898381 /* COSynchronizerJSONUtils.m */; };
+		66FD34A6183168B500898381 /* TestSynchronizerJSONTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD34A4183168B500898381 /* TestSynchronizerJSONTransport.m */; };
 		791B4E4C1299C82200CCF472 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
 		791B4E721299C90900CCF472 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6C1299C90900CCF472 /* FMDatabase.m */; };
 		791B4E741299C90900CCF472 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6E1299C90900CCF472 /* FMDatabaseAdditions.m */; };
@@ -698,6 +699,7 @@
 		66FD348D1830BB3800898381 /* COSynchronizerJSONClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizerJSONClient.m; path = Synchronization/COSynchronizerJSONClient.m; sourceTree = "<group>"; };
 		66FD349818314BC200898381 /* COSynchronizerJSONUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizerJSONUtils.h; path = Synchronization/COSynchronizerJSONUtils.h; sourceTree = "<group>"; };
 		66FD349918314BC200898381 /* COSynchronizerJSONUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizerJSONUtils.m; path = Synchronization/COSynchronizerJSONUtils.m; sourceTree = "<group>"; };
+		66FD34A4183168B500898381 /* TestSynchronizerJSONTransport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSynchronizerJSONTransport.m; path = Tests/TestSynchronizerJSONTransport.m; sourceTree = "<group>"; };
 		791B4E2D1299C79300CCF472 /* Test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test; sourceTree = BUILT_PRODUCTS_DIR; };
 		791B4E6B1299C90900CCF472 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabase.h; path = src/FMDatabase.h; sourceTree = "<group>"; };
 		791B4E6C1299C90900CCF472 /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FMDatabase.m; path = src/FMDatabase.m; sourceTree = "<group>"; };
@@ -1259,6 +1261,7 @@
 				66E451CA17CC456700205679 /* TestCOObjectSynthesizedAccessors.m */,
 				6646978F17CEAFD800A1B767 /* TestSynchronization.m */,
 				66405DCD182A1F2C00A6EF7A /* TestSynchronizer.m */,
+				66FD34A4183168B500898381 /* TestSynchronizerJSONTransport.m */,
 				66AB075E17D5846000ADDA17 /* TestMerge.m */,
 				667C24F517E11FC900FFFC85 /* TestNotifications.m */,
 				66470C7117E3D4B200A7E0A9 /* TestHistoryInspection.m */,
@@ -1719,6 +1722,7 @@
 				6680848B178DAFE3003A3CC6 /* COArrayDiff.m in Sources */,
 				6680848D178DAFE3003A3CC6 /* COItemGraphDiff.m in Sources */,
 				66808491178DAFE3003A3CC6 /* COItemGraphEdit.m in Sources */,
+				66FD34A6183168B500898381 /* TestSynchronizerJSONTransport.m in Sources */,
 				66808492178DAFE3003A3CC6 /* diff.cc in Sources */,
 				668084CF17900C35003A3CC6 /* COType.m in Sources */,
 				668084EC1791FBA2003A3CC6 /* COObject+RelationshipCache.m in Sources */,

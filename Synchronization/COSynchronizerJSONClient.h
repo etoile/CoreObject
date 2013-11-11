@@ -1,8 +1,10 @@
 #import <CoreObject/COSynchronizerClient.h>
 
+@class COSynchronizerJSONClient;
+
 @protocol COSynchronizerJSONClientDelegate <NSObject>
 
-- (void) sendTextToServer: (NSString *)text;
+- (void) JSONClient: (COSynchronizerJSONClient *)client sendTextToServer: (NSString *)text;
 
 @end
 
