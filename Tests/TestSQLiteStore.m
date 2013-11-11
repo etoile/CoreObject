@@ -1001,4 +1001,32 @@ static ETUUID *childUUID2;
     UKTrue([store commitStoreTransaction: txn]);
 }
 
+- (void) testWriteRevisionWithNonExistentParent
+{
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+	[txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
+						   revisionUUID: [ETUUID UUID]
+							   metadata: nil
+					   parentRevisionID: [ETUUID UUID]
+				  mergeParentRevisionID: nil
+					 persistentRootUUID: prootUUID
+							 branchUUID: branchAUUID];
+	prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
+    UKFalse([store commitStoreTransaction: txn]);
+}
+
+- (void) testWriteRevisionWithNonExistentMergeParent
+{
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+	[txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
+						   revisionUUID: [ETUUID UUID]
+							   metadata: nil
+					   parentRevisionID: initialRevisionUUID
+				  mergeParentRevisionID: [ETUUID UUID]
+					 persistentRootUUID: prootUUID
+							 branchUUID: branchAUUID];
+	prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
+    UKFalse([store commitStoreTransaction: txn]);
+}
+
 @end

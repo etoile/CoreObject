@@ -621,11 +621,25 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         return NO;
     }
     
+	const int64_t parentRevid = [backing revidForUUID: aParent];
+	const int64_t mergeParentRevid = [backing revidForUUID: aMergeParent];
+	
+	if (aParent != nil && parentRevid == -1)
+	{
+		NSLog(@"Parent revision not found: %@", aParent);
+		return NO;
+	}
+	if (aMergeParent != nil && mergeParentRevid == -1)
+	{
+		NSLog(@"Merge parent revision not found: %@", aMergeParent);
+		return NO;
+	}
+	
     BOOL ok = [backing writeItemGraph: anItemTree
 						 revisionUUID: aRevisionUUID
 						 withMetadata: metadata
-						   withParent: [backing revidForUUID: aParent]
-					  withMergeParent: [backing revidForUUID: aMergeParent]
+						   withParent: parentRevid
+					  withMergeParent: mergeParentRevid
 						   branchUUID: branch
 				   persistentrootUUID: aUUID
 								error: NULL];
