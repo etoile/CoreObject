@@ -20,7 +20,7 @@
 	NSMutableDictionary *clientMessagesForID;
 }
 
-- (COSynchronizerClient *) addClientWithID: (NSString *)anID editingContext: (COEditingContext *)aContext;
+- (void) addClient: (COSynchronizerClient *)aClient;
 
 @property (nonatomic, readonly, strong) COSynchronizerServer *server;
 
@@ -164,21 +164,19 @@
 	while (deliveredAny == YES);
 }
 
-- (COSynchronizerClient *) addClientWithID: (NSString *)anID editingContext: (COEditingContext *)aContext
+- (void) addClient: (COSynchronizerClient *)aClient
 {
-	[server addClientID: anID];
+	[server addClientID: aClient.clientID];
 	
-	ETAssert([clientMessagesForID[anID] count] == 1);
-	ETAssert([clientMessagesForID[anID][0] isKindOfClass: [COSynchronizerPersistentRootInfoToClientMessage class]]);
-	COSynchronizerPersistentRootInfoToClientMessage *setupMessage = clientMessagesForID[anID][0];
-	[clientMessagesForID[anID] removeAllObjects];
+	ETAssert([clientMessagesForID[aClient.clientID] count] == 1);
+	ETAssert([clientMessagesForID[aClient.clientID][0] isKindOfClass: [COSynchronizerPersistentRootInfoToClientMessage class]]);
+	COSynchronizerPersistentRootInfoToClientMessage *setupMessage = clientMessagesForID[aClient.clientID][0];
+	[clientMessagesForID[aClient.clientID] removeAllObjects];
 	
-	COSynchronizerClient *client = [[COSynchronizerClient alloc] initWithSetupMessage: setupMessage
-																			 clientID: anID
-																	   editingContext: aContext];
-	client.delegate = self;
-	clientForID[anID] = client;
-	return client;
+	[aClient handleSetupMessage: setupMessage];
+
+	aClient.delegate = self;
+	clientForID[aClient.clientID] = aClient;
 }
 
 - (NSArray *) serverMessages
@@ -227,9 +225,15 @@
 	transport = [[FakeMessageTransport alloc] initWithSynchronizerServer: server];
 
 	clientCtx = [COEditingContext contextWithURL: CLIENT_STORE_URL];
-	client = [transport addClientWithID: @"client" editingContext: clientCtx];
+	client = [[COSynchronizerClient alloc] initWithClientID: @"client" editingContext: clientCtx];
+	
+	[transport addClient: client];
+	
 	clientPersistentRoot = client.persistentRoot;
 	clientBranch = client.branch;
+	
+	ETAssert(clientPersistentRoot != nil);
+	ETAssert(clientBranch != nil);
 	
 	return self;
 }

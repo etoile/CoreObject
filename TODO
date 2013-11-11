@@ -177,13 +177,9 @@ Future Work
 
 - Collaboration
 
-  - interation btn. sync and branching
-
-  - automatic / continuous sync
-
-  - more test cases
-
   - use delta compression instead of sending the full snapshot of every revision over the protocol
+  
+  - support sending attachments (or large persistent roots) using XMPP file transfer
 
 
 - COUndoTrack

@@ -1,6 +1,6 @@
 #import "COSynchronizerRevision.h"
 #import "COStoreTransaction.h"
-
+#import "CODateSerialization.h"
 @implementation COSynchronizerRevision
 
 @synthesize modifiedItems, revisionUUID, parentRevisionUUID, metadata, date;
@@ -31,6 +31,35 @@
 	self.metadata = info.metadata;
 	self.date = info.date;
 	
+	return self;
+}
+
+- (id) propertyList
+{
+	NSMutableDictionary *result = [NSMutableDictionary dictionary];
+	result[@"modifiedItems"] = COItemGraphToJSONPropertyList(self.modifiedItems);
+	result[@"revisionUUID"] = [self.revisionUUID stringValue];
+	if (self.parentRevisionUUID != nil)
+	{
+		result[@"parentRevisionUUID"] = [self.parentRevisionUUID stringValue];
+	}
+	if (self.metadata != nil)
+	{
+		result[@"metadata"] = self.metadata;
+	}
+	result[@"date"] = CODateToJavaTimestamp(self.date);
+	return result;
+}
+
+- (id) initWithPropertyList: (id)aPropertyList
+{
+	SUPERINIT;
+	self.modifiedItems = COItemGraphFromJSONPropertyLisy(aPropertyList[@"modifiedItems"]);
+	self.revisionUUID = [ETUUID UUIDWithString: aPropertyList[@"revisionUUID"]];
+	self.parentRevisionUUID = aPropertyList[@"parentRevisionUUID"] != nil
+		? [ETUUID UUIDWithString: aPropertyList[@"parentRevisionUUID"]] : nil;
+	self.metadata = aPropertyList[@"metadata"];
+	self.date = CODateFromJavaTimestamp(aPropertyList[@"date"]);
 	return self;
 }
 

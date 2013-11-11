@@ -45,7 +45,6 @@
 @property (nonatomic, readwrite, strong) id<COSynchronizerServerDelegate> delegate;
 
 - (void) handlePushedRevisionsFromClient: (COSynchronizerPushedRevisionsFromClientMessage *)aMessage;
-- (void) handleReceiptFromClient: (COSynchronizerAcknowledgementFromClientMessage *)aMessage;
 
 - (void) addClientID: (NSString *)clientID;
 - (void) removeClientID: (NSString *)clientID;

@@ -29,19 +29,30 @@
 	return _lastRevisionUUIDFromServer;
 }
 
-- (id) initWithSetupMessage: (COSynchronizerPersistentRootInfoToClientMessage *)message
-				   clientID: (NSString *)clientID
-			 editingContext: (COEditingContext *)ctx
+- (id) initWithClientID: (NSString *)clientID
+		 editingContext: (COEditingContext *)ctx
 {
 	SUPERINIT;
 	
 	_ctx = ctx;
 	_clientID = clientID;
 	
+	return self;
+}
+
+
+- (void) handleSetupMessage: (COSynchronizerPersistentRootInfoToClientMessage *)message
+{
+	if (_branch != nil)
+	{
+		NSLog(@"COSynchronizerClient already set up");
+		return;
+	}
+	
 	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
 	
 	// 1. Do we have the persistent root?
-	__block COPersistentRoot *persistentRoot = [ctx persistentRootForUUID: message.persistentRootUUID];
+	__block COPersistentRoot *persistentRoot = [_ctx persistentRootForUUID: message.persistentRootUUID];
     if (persistentRoot == nil)
     {
 		[txn createPersistentRootWithUUID: message.persistentRootUUID persistentRootForCopy: nil];
@@ -61,7 +72,7 @@
 	}
 	
 	// 3. Do we have the revision?
-	if ([[ctx store] revisionInfoForRevisionUUID: message.currentRevision.revisionUUID
+	if ([[_ctx store] revisionInfoForRevisionUUID: message.currentRevision.revisionUUID
 							  persistentRootUUID: message.persistentRootUUID] == nil)
 	{
 		[message.currentRevision writeToTransaction: txn
@@ -81,8 +92,6 @@
 											 selector: @selector(persistentRootDidChange:)
 												 name: COPersistentRootDidChangeNotification
 											   object: persistentRoot];
-	
-	return self;
 }
 
 - (void)dealloc

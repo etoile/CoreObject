@@ -20,4 +20,8 @@
 				 branchUUID: (ETUUID *)branch;
 
 - (id) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store;
+
+- (id) propertyList;
+- (id) initWithPropertyList: (id)aPropertyList;
+
 @end

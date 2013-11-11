@@ -66,9 +66,8 @@
 	id<COSynchronizerClientDelegate> _delegate;
 }
 
-- (id) initWithSetupMessage: (COSynchronizerPersistentRootInfoToClientMessage *)message
-				   clientID: (NSString *)clientID
-			 editingContext: (COEditingContext *)ctx;
+- (id) initWithClientID: (NSString *)clientID
+		 editingContext: (COEditingContext *)ctx;
 
 
 @property (nonatomic, readonly, strong) NSString *clientID;
@@ -78,6 +77,7 @@
 
 @property (nonatomic, readwrite, strong) id<COSynchronizerClientDelegate> delegate;
 
+- (void) handleSetupMessage: (COSynchronizerPersistentRootInfoToClientMessage *)message;
 - (void) handlePushMessage: (COSynchronizerPushedRevisionsToClientMessage *)aMessage;
 - (void) handleResponseMessage: (COSynchronizerResponseToClientForSentRevisionsMessage *)aMessage;
 

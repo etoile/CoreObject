@@ -122,10 +122,6 @@
 	[self handleRevisions: aMessage.revisions fromClient: aMessage.clientID];
 }
 
-- (void) handleReceiptFromClient: (COSynchronizerAcknowledgementFromClientMessage *)aMessage
-{
-}
-
 - (void) sendPushToClient: (NSString *)clientID
 {
 	ETUUID *lastConfirmedForClient = lastSentRevisionForClientID[clientID];
