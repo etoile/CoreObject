@@ -1,0 +1,5 @@
+export BUILT_PRODUCTS_DIR="/Users/ericwa/Library/Developer/Xcode/DerivedData/CoreObject-dvgyobjmdpwcuudhluonipbbvfyf/Build/Products/Debug"
+export CURRENT_ARCH="x86_64"
+export OBJECT_FILE_DIR_normal="/Users/ericwa/Library/Developer/Xcode/DerivedData/CoreObject-dvgyobjmdpwcuudhluonipbbvfyf/Build/Intermediates/CoreObject.build/Debug/CoreObject.build/Objects-normal"
+export OBJROOT="/Users/ericwa/Library/Developer/Xcode/DerivedData/CoreObject-dvgyobjmdpwcuudhluonipbbvfyf/Build/Intermediates"
+export SRCROOT="/Users/ericwa/dev/etoile/trunk/Etoile/Frameworks/CoreObject"
