@@ -6,8 +6,9 @@
 
 - (void) JSONClient: (COSynchronizerJSONClient *)client sendTextToServer: (NSString *)text;
 
-@end
+- (void) JSONClient: (COSynchronizerJSONClient *)client didStartSharingOnBranch: (COBranch *)aBranch;
 
+@end
 @interface COSynchronizerJSONClient : NSObject <COSynchronizerClientDelegate>
 
 @property (nonatomic, readwrite, strong) id<COSynchronizerJSONClientDelegate> delegate;

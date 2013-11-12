@@ -105,29 +105,15 @@
 {
 }
 
-- (NSString *) serializePropertyList: (id)plist
-{
-	NSData *data = [NSJSONSerialization dataWithJSONObject: plist options: 0 error: NULL];
-	return [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-}
-
-- (id) deserializePropertyList: (NSString *)base64String
-{
-	NSData *data = [base64String dataUsingEncoding: NSUTF8StringEncoding];
-	return [NSJSONSerialization JSONObjectWithData: data options:0 error: NULL];
-}
-
 - (void) sendCoreobjectMessageType: (NSString *)aType
 								to: (XMPPJID *)aJID
-		   withPayloadPropertyList: (id)aPlist
+				persistentRootUUID: (ETUUID *)aUUID
 {
-	NSXMLElement *body = [NSXMLElement elementWithName: aType];
-	[body setObjectValue: [self serializePropertyList: aPlist]];
-	
 	NSXMLElement *responseMessage = [NSXMLElement elementWithName:@"message"];
 	[responseMessage addAttributeWithName:@"type" stringValue:@"coreobject"];
+	[responseMessage addAttributeWithName:@"subtype" stringValue: aType];
 	[responseMessage addAttributeWithName:@"to" stringValue:[aJID full]];
-	[responseMessage addChild:body];
+	[responseMessage addAttributeWithName:@"uuid" stringValue: [aUUID stringValue]];
 	
 	[xmppStream sendElement:responseMessage];
 }
@@ -136,14 +122,11 @@
 {
 	if ([[message attributeStringValueForName: @"type"] isEqualToString: @"coreobject"])
 	{
-		NSXMLElement *body = (NSXMLElement *)[message childAtIndex: 0];
+		NSString *subtype = [message attributeStringValueForName: @"subtype"];
+		ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [message attributeStringValueForName: @"uuid"]];
 		
-		NSString *coreObjectMessageName = [body name];
-		
-		if ([coreObjectMessageName isEqualToString: @"sharing-invitation"])
+		if ([subtype isEqualToString: @"sharing-invitation"])
 		{
-			ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [body attributeStringValueForName: @"uuid"]];
-			
 			NSAlert *alert = [[NSAlert alloc] init];
 			[alert setMessageText: [NSString stringWithFormat: @"%@ is offering to share a document %@ with you", [[message from] bare], persistentRootUUID]];
 			[alert addButtonWithTitle:@"Accept"];
@@ -151,52 +134,29 @@
 			
 			if (NSAlertFirstButtonReturn == [alert runModal])
 			{
-				COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
-				id request = [client updateRequestForPersistentRoot: persistentRootUUID
-														   serverID: [[message from] full]
-															  store: [(ApplicationDelegate *)[NSApp delegate] store]];
-			
-				[self sendCoreobjectMessageType: @"pull-request" to:[message from] withPayloadPropertyList:request];
+				COEditingContext *ctx = [(ApplicationDelegate *)[NSApp delegate] editingContext];
+				SharingSession *session = [[SharingSession alloc] initAsClientWithEditingContext: ctx
+																					   serverJID: [message from]
+																					  xmppStream: xmppStream];
+				[sharingSessionsByPersistentRootUUID setObject: session forKey: persistentRootUUID];
+				
+				[self sendCoreobjectMessageType: @"accept-invitation" to:[message from] persistentRootUUID: persistentRootUUID];
 			}
 		}
-		else if ([coreObjectMessageName isEqualToString: @"pull-request"])
+		else if ([subtype isEqualToString: @"accept-invitation"])
 		{
-			id request = [self deserializePropertyList: [body objectValue]];
+			// Set up session object
 			
-			NSLog(@"Got staring invitation response: %@", request);
+			SharingSession *session = [[SharingSession alloc] initAsServerWithBranch: [[currentDocument persistentRoot] currentBranch]
+																		   clientJID: [message from]
+																		  xmppStream: xmppStream];
 			
-			COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
-			id response = [server handleUpdateRequest: request store: [(ApplicationDelegate *)[NSApp delegate] store]];
-			
-			[self sendCoreobjectMessageType:@"pull-request-response" to:[message from] withPayloadPropertyList:response];
-		}
-		else if ([coreObjectMessageName isEqualToString: @"pull-request-response"])
-		{
-			id response = [self deserializePropertyList: [body objectValue]];
-			
-			NSLog(@"Got pull-request-response %@", response);
-			
-			COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
-			[client handleUpdateResponse: response store: [(ApplicationDelegate *)[NSApp delegate] store]];
-			
-			ETUUID *persistentRootUUID = [ETUUID UUIDWithString: response[@"persistentRoot"]];
-			
-			COEditingContext *ctx = [(ApplicationDelegate *)[NSApp delegate] editingContext];
-			COPersistentRoot *newPersistentRoot = [ctx persistentRootForUUID: persistentRootUUID];
-			Document *rootObject = [newPersistentRoot rootObject];
-			
-			[(ApplicationDelegate *)[NSApp delegate] registerDocumentRootObject: rootObject];
-			
-			SharingSession *session = [[SharingSession alloc] initWithPersistentRoot: newPersistentRoot
-																			 peerJID: [message from]
-																		  xmppStream: xmppStream
-																			isServer: NO];
-			[sharingSessionsByPersistentRootUUID setObject: session forKey: persistentRootUUID];
+			[sharingSessionsByPersistentRootUUID setObject: session forKey: persistentRootUUID];			
 		}
 	}
 	else
 	{
-		NSLog(@"Ignoring non-Coreobject message %@", message);
+		NSLog(@"Ignoring non-Coreobject message");
 	}
 }
 
@@ -205,28 +165,11 @@
 	id<XMPPUser> user = [sender representedObject];
 	
 	ETUUID *persistentRootUUID = [[currentDocument persistentRoot] UUID];
-
-	NSLog(@"Share %@ with %@", persistentRootUUID, user);
-		
 	XMPPJID *jid = [user jid];
 	
-	NSXMLElement *body = [NSXMLElement elementWithName:@"sharing-invitation"];
-	[body addAttributeWithName:@"uuid" stringValue: [persistentRootUUID stringValue]];
-	
-	NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
-	[message addAttributeWithName:@"type" stringValue:@"coreobject"];
-	[message addAttributeWithName:@"to" stringValue:[jid full]];
-	[message addChild:body];
-	
-	[xmppStream sendElement:message];
-	
-	// Set up session object
-	
-	SharingSession *session = [[SharingSession alloc] initWithPersistentRoot: [currentDocument persistentRoot]
-																	 peerJID: jid
-																  xmppStream: xmppStream
-																	isServer: YES];
-	[sharingSessionsByPersistentRootUUID setObject: session forKey: persistentRootUUID];
+	NSLog(@"Share %@ with %@", persistentRootUUID, user);
+			
+	[self sendCoreobjectMessageType: @"sharing-invitation" to: jid persistentRootUUID: persistentRootUUID];
 }
 
 - (void) shareWithInspectorForDocument: (Document*)doc

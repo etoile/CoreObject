@@ -34,6 +34,10 @@
 	[self.server receiveText: text fromClient: client.client.clientID];
 }
 
+- (void) JSONClient: (COSynchronizerJSONClient *)client didStartSharingOnBranch: (COBranch *)aBranch
+{
+}
+
 @end
 
 

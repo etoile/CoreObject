@@ -263,11 +263,12 @@
 		66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */; };
 		66FD348A1830B84C00898381 /* COSynchronizerJSONServer.h in Resources */ = {isa = PBXBuildFile; fileRef = 66FD34881830B84C00898381 /* COSynchronizerJSONServer.h */; };
 		66FD348B1830B84C00898381 /* COSynchronizerJSONServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD34891830B84C00898381 /* COSynchronizerJSONServer.m */; };
-		66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FD348C1830BB3800898381 /* COSynchronizerJSONClient.h */; };
+		66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FD348C1830BB3800898381 /* COSynchronizerJSONClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66FD348F1830BB3800898381 /* COSynchronizerJSONClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD348D1830BB3800898381 /* COSynchronizerJSONClient.m */; };
-		66FD349A18314BC200898381 /* COSynchronizerJSONUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FD349818314BC200898381 /* COSynchronizerJSONUtils.h */; };
+		66FD349A18314BC200898381 /* COSynchronizerJSONUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FD349818314BC200898381 /* COSynchronizerJSONUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66FD349B18314BC200898381 /* COSynchronizerJSONUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD349918314BC200898381 /* COSynchronizerJSONUtils.m */; };
-		66FD34A6183168B500898381 /* TestSynchronizerJSONTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD34A4183168B500898381 /* TestSynchronizerJSONTransport.m */; };
+		66FD34B51832050A00898381 /* TestSynchronizerJSONTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD34A4183168B500898381 /* TestSynchronizerJSONTransport.m */; };
+		66FD34B61832055900898381 /* COSynchronizerJSONServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FD34881830B84C00898381 /* COSynchronizerJSONServer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		791B4E4C1299C82200CCF472 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
 		791B4E721299C90900CCF472 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6C1299C90900CCF472 /* FMDatabase.m */; };
 		791B4E741299C90900CCF472 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6E1299C90900CCF472 /* FMDatabaseAdditions.m */; };
@@ -1382,7 +1383,6 @@
 				663CE2BC17C15A4800E729F5 /* COCommandGroup.h in Headers */,
 				662FFB7F17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h in Headers */,
 				662FFB9E17C2DE8100BA3F2F /* COCommandUndeleteBranch.h in Headers */,
-				66FD349A18314BC200898381 /* COSynchronizerJSONUtils.h in Headers */,
 				66808490178DAFE3003A3CC6 /* COItemGraphEdit.h in Headers */,
 				669724D517D4610E0090B31A /* COSetAttribute.h in Headers */,
 				669724D917D4614F0090B31A /* CODeleteAttribute.h in Headers */,
@@ -1403,16 +1403,18 @@
 				66E4CF4F1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.h in Headers */,
 				661211401821986B003AEC29 /* CODateSerialization.h in Headers */,
 				662AC93D1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h in Headers */,
+				66FD34B61832055900898381 /* COSynchronizerJSONServer.h in Headers */,
 				6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */,
 				6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */,
 				66405DD1182A255800A6EF7A /* COSynchronizerServer.h in Headers */,
+				66FD349A18314BC200898381 /* COSynchronizerJSONUtils.h in Headers */,
+				66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */,
 				6646985A17D3C55600A1B767 /* COObjectGraphContext+Private.h in Headers */,
 				66457FB517E8BFE5003C51A8 /* COStoreCreateBranch.h in Headers */,
 				66457FB717E8BFE5003C51A8 /* COStoreCreatePersistentRoot.h in Headers */,
 				66E4CF531816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.h in Headers */,
 				66457FB917E8BFE5003C51A8 /* COStoreDeleteBranch.h in Headers */,
 				66457FBB17E8BFE5003C51A8 /* COStoreDeletePersistentRoot.h in Headers */,
-				66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */,
 				66457FBD17E8BFE5003C51A8 /* COStoreSetBranchMetadata.h in Headers */,
 				66457FBF17E8BFE5003C51A8 /* COStoreSetCurrentBranch.h in Headers */,
 				66457FC117E8BFE5003C51A8 /* COStoreSetCurrentRevision.h in Headers */,
@@ -1722,7 +1724,6 @@
 				6680848B178DAFE3003A3CC6 /* COArrayDiff.m in Sources */,
 				6680848D178DAFE3003A3CC6 /* COItemGraphDiff.m in Sources */,
 				66808491178DAFE3003A3CC6 /* COItemGraphEdit.m in Sources */,
-				66FD34A6183168B500898381 /* TestSynchronizerJSONTransport.m in Sources */,
 				66808492178DAFE3003A3CC6 /* diff.cc in Sources */,
 				668084CF17900C35003A3CC6 /* COType.m in Sources */,
 				668084EC1791FBA2003A3CC6 /* COObject+RelationshipCache.m in Sources */,
@@ -1819,6 +1820,7 @@
 				607B90E717F2D5AD00D8BDEA /* TestCollection.m in Sources */,
 				607B90E817F2D72700D8BDEA /* TestObject.m in Sources */,
 				6033A8031817F78B00BDF65C /* TestDictionary.m in Sources */,
+				66FD34B51832050A00898381 /* TestSynchronizerJSONTransport.m in Sources */,
 				608D69FC181AC2AF006A9858 /* TestObjectUpdate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

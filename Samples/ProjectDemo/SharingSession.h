@@ -2,6 +2,12 @@
 #import <CoreObject/CoreObject.h>
 #import "XMPPFramework.h"
 
+#import <CoreObject/COSynchronizerJSONClient.h>
+#import <CoreObject/COSynchronizerJSONServer.h>
+#import <CoreObject/COSynchronizerClient.h>
+#import <CoreObject/COSynchronizerServer.h>
+
+
 /*
  
  
@@ -11,27 +17,25 @@
    but it complicates things a bit.
  
  */
-@interface SharingSession : NSObject
+@interface SharingSession : NSObject <COSynchronizerJSONClientDelegate, COSynchronizerJSONServerDelegate>
 {
-	COPersistentRoot *_persistentRoot;
-	
-	COBranch *_masterBranch;
-	/**
-	 * Only non-nil for the client
-	 */
-	COBranch *_originMasterBranch;
-
 	XMPPJID *_peerJID;
 	XMPPStream *_xmppStream;
 	BOOL _isServer;
 	
-	ETUUID *_lastRevisionUUID;
+	COSynchronizerJSONClient *_JSONClient;
+	COSynchronizerJSONServer *_JSONServer;
+	COSynchronizerClient *_client;
+	COSynchronizerServer *_server;
 }
 
-- (id)initWithPersistentRoot: (COPersistentRoot *)persistentRoot
-					 peerJID: (XMPPJID *)peerJID
-				  xmppStream: (XMPPStream *)xmppStream
-					isServer: (BOOL)isServer;
+- (id)initAsClientWithEditingContext: (COEditingContext *)ctx
+						   serverJID: (XMPPJID *)peerJID
+						  xmppStream: (XMPPStream *)xmppStream;
+
+- (id)initAsServerWithBranch: (COBranch *)aBranch
+				   clientJID: (XMPPJID *)peerJID
+				  xmppStream: (XMPPStream *)xmppStream;
 
 @property (nonatomic, readonly, strong) COPersistentRoot *persistentRoot;
 

@@ -51,6 +51,9 @@
 	message.branchMetadata = plist[@"branchMetadata"];
 	message.currentRevision = [[COSynchronizerRevision alloc] initWithPropertyList: plist[@"currentRevision"]];
 	[client handleSetupMessage: message];
+	
+	ETAssert(client.branch != nil);
+	[self.delegate JSONClient: self didStartSharingOnBranch: client.branch];
 }
 
 - (void) receiveTextFromServer:(NSString *)text

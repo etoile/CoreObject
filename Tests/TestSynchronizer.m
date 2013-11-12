@@ -46,10 +46,6 @@
 	return self;
 }
 
-- (void) sendReceiptToServer: (COSynchronizerAcknowledgementFromClientMessage *)message
-{
-	[serverMessages addObject: message];
-}
 - (void) sendPushToServer: (COSynchronizerPushedRevisionsFromClientMessage *)message
 {
 	[serverMessages addObject: message];
