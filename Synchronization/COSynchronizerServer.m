@@ -42,45 +42,103 @@
 	}
 }
 
-- (void) handleRevisions: (NSArray *)revs fromClient: (NSString *)clientID
+- (void) handleRevisions: (NSArray *)revs
+			  fromClient: (NSString *)clientID
+lastRevisionUUIDSentByServer: (ETUUID *)lastRevisionUUIDSentToClient
 {
 	// TODO: Ideally we wouldn't even commit these revisions before rebasing them
 	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
 	for (COSynchronizerRevision *rev in revs)
 	{
+		// If client sends a revert, we may have the commit already
+		if (nil != [CORevisionCache revisionForRevisionUUID: [rev revisionUUID]
+										 persistentRootUUID: self.persistentRoot.UUID
+												  storeUUID: [[self.persistentRoot store] UUID]])
+		{
+			NSLog(@"already have %@", [rev revisionUUID]);
+			continue;
+		}
+		
 		[rev writeToTransaction: txn
 			 persistentRootUUID: self.persistentRoot.UUID
 					 branchUUID: self.branch.UUID];
 	}
 	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 	
-	if (![COLeastCommonAncestor isRevision: [[self.branch currentRevision] UUID]
-				 equalToOrParentOfRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
-							persistentRoot: self.persistentRoot.UUID
-									 store: [self.persistentRoot store]])
+	// Is the client sending a revert?
+	
+	if ([revs count] == 1
+		&& [COLeastCommonAncestor isRevision: [revs[0] revisionUUID]
+				   equalToOrParentOfRevision: [[self.branch currentRevision] UUID]
+							  persistentRoot: self.persistentRoot.UUID
+									   store: [self.persistentRoot store]])
 	{
-		// Rebase revs onto the current revisions
+		NSLog(@"Client sent revert from %@ to %@..", lastRevisionUUIDSentToClient, [revs[0] revisionUUID]);
 		
-		txn = [[COStoreTransaction alloc] init];
-		NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
-													  ontoRevision: [[self.branch currentRevision] UUID]
-												persistentRootUUID: self.persistentRoot.UUID
-														branchUUID: self.branch.UUID
-															 store: [self.persistentRoot store]
-													   transaction: txn];
-		ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
-		
-		[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [rebasedRevs lastObject]
-														  persistentRootUUID: self.persistentRoot.UUID
-																   storeUUID: [[self.persistentRoot store] UUID]]];
+		if ([lastRevisionUUIDSentToClient isEqual: [[self.branch currentRevision] UUID]])
+		{
+			// "Rewind"
+			
+			NSLog(@"   doing rewind");
+
+			[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [revs[0] revisionUUID]
+															  persistentRootUUID: self.persistentRoot.UUID
+																	   storeUUID: [[self.persistentRoot store] UUID]]];
+		}
+		else
+		{
+			// merge
+			
+			NSLog(@"   doing merge of base=%@, branch1=%@, branch2 (new parent)=%@",
+				  lastRevisionUUIDSentToClient, [revs[0] revisionUUID], [[self.branch currentRevision] UUID]);			
+			
+			txn = [[COStoreTransaction alloc] init];
+			ETUUID *mergeRevid = [COSynchronizerUtils writeMergeWithBaseRevision: lastRevisionUUIDSentToClient
+																	 firstBranch: [revs[0] revisionUUID]
+																	secondBranch: [[self.branch currentRevision] UUID]
+															  persistentRootUUID: self.persistentRoot.UUID
+																	  branchUUID: self.branch.UUID
+																		   store: [self.persistentRoot store]
+																	 transaction: txn];
+			ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
+			
+			[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: mergeRevid
+															  persistentRootUUID: self.persistentRoot.UUID
+																	   storeUUID: [[self.persistentRoot store] UUID]]];
+		}
 	}
 	else
 	{
-		// Fast-forward
+		// Not a revert, normal pushed commmits
 		
-		[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
-														   persistentRootUUID: self.persistentRoot.UUID
-																	storeUUID: [[self.persistentRoot store] UUID]]];
+		if (![COLeastCommonAncestor isRevision: [[self.branch currentRevision] UUID]
+					 equalToOrParentOfRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
+								persistentRoot: self.persistentRoot.UUID
+										 store: [self.persistentRoot store]])
+		{
+			// Rebase revs onto the current revisions
+			
+			txn = [[COStoreTransaction alloc] init];
+			NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
+														  ontoRevision: [[self.branch currentRevision] UUID]
+													persistentRootUUID: self.persistentRoot.UUID
+															branchUUID: self.branch.UUID
+																 store: [self.persistentRoot store]
+														   transaction: txn];
+			ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
+			
+			[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [rebasedRevs lastObject]
+															  persistentRootUUID: self.persistentRoot.UUID
+																	   storeUUID: [[self.persistentRoot store] UUID]]];
+		}
+		else
+		{
+			// Fast-forward
+			
+			[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
+															   persistentRootUUID: self.persistentRoot.UUID
+																		storeUUID: [[self.persistentRoot store] UUID]]];
+		}
 	}
 
 	// Set the following ivars so -sendPushToClient: sends a response message
@@ -119,7 +177,9 @@
 {
 	ETAssert(aMessage.lastRevisionUUIDSentByServer != nil);
 	lastSentRevisionForClientID[aMessage.clientID] = aMessage.lastRevisionUUIDSentByServer;
-	[self handleRevisions: aMessage.revisions fromClient: aMessage.clientID];
+	[self handleRevisions: aMessage.revisions
+			   fromClient: aMessage.clientID
+lastRevisionUUIDSentByServer: aMessage.lastRevisionUUIDSentByServer];
 }
 
 - (void) sendPushToClient: (NSString *)clientID
@@ -137,6 +197,12 @@
 															  toRevisionUUIDInclusive: [[self.branch currentRevision] UUID]
 																	   persistentRoot: self.persistentRoot.UUID
 																				store: self.persistentRoot.store];
+	
+	if (revUUIDs == nil)
+	{
+		NSLog(@"Server did a revert");
+		revUUIDs = @[[[self.branch currentRevision] UUID]];
+	}
 	
 	for (ETUUID *revUUID in revUUIDs)
 	{

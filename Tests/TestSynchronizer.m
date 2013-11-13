@@ -484,10 +484,8 @@
 
 // Reverting tests
 
-#if 0
 - (void) testBasicServerRevert
 {
-	[self addAndCommitServerChild];
 	[[serverBranch rootObject] setLabel: @"revertThis"];
 	[serverPersistentRoot commit];
 	
@@ -516,7 +514,6 @@
 
 - (void) testBasicClientRevert
 {
-	[self addAndCommitServerChild];
 	[[serverBranch rootObject] setLabel: @"revertThis"];
 	[serverPersistentRoot commit];
 	CORevision *serverLatestRevision = [serverBranch currentRevision];
@@ -538,10 +535,25 @@
 	UKNil([[serverBranch rootObject] label]);
 	UKObjectsEqual([serverLatestRevision parentRevision], [serverBranch currentRevision]);
 	
+	// Deliver the no-op merge result back to the client
+	
+	UKIntsEqual(0, [[self serverMessages] count]);
+	UKIntsEqual(1, [[self clientMessages] count]);
+	
+	CORevision *clientFinalRevision = [clientBranch currentRevision];
+	
+	[transport deliverMessagesToClient];
+
+	UKObjectsEqual(clientFinalRevision, [clientBranch currentRevision]);
+	
+	
 	// No more messages
+	
 	UKIntsEqual(0, [[self clientMessages] count]);
 	UKIntsEqual(0, [[self serverMessages] count]);
 }
+
+#if 0
 
 - (void) testServerRevertWithIncomingChanges
 {

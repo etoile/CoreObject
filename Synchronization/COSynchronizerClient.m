@@ -115,9 +115,17 @@
 						return [revision.parentRevisionUUID isEqual: lastServerRevUUID];
 					}];
 	
-	ETAssert(i != NSNotFound);
-	
-	NSArray *revsToUse = [revs subarrayWithRange: NSMakeRange(i, [revs count] - i)];
+	NSArray *revsToUse;
+	if(i == NSNotFound)
+	{
+		NSLog(@"Client got revert, probably");
+		ETAssert([revs count] == 1);
+		revsToUse = [revs subarrayWithRange: NSMakeRange(0, 1)];
+	}
+	else
+	{
+		revsToUse = [revs subarrayWithRange: NSMakeRange(i, [revs count] - i)];
+	}
 	
 	
 	// Apply the revisions
@@ -210,6 +218,12 @@
 																	   persistentRoot: self.persistentRoot.UUID
 																				store: self.persistentRoot.store];
 
+	if (revUUIDs == nil)
+	{
+		NSLog(@"Client did a revert");
+		revUUIDs = @[[[self.branch currentRevision] UUID]];
+	}
+	
 	for (ETUUID *revUUID in revUUIDs)
 	{
 		COSynchronizerRevision *rev = [[COSynchronizerRevision alloc] initWithUUID: revUUID

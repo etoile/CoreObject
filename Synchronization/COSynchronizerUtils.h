@@ -17,4 +17,16 @@
 					   store: (COSQLiteStore *)store
 				 transaction: (COStoreTransaction *)txn;
 
+/**
+ * Doesn't set merge parent. Parent of written revision is branch2.
+ */
++ (ETUUID *) writeMergeWithBaseRevision: (ETUUID *)source
+							firstBranch: (ETUUID *)branch1
+						   secondBranch: (ETUUID *)branch2
+					 persistentRootUUID: (ETUUID *)persistentRoot
+							 branchUUID: (ETUUID *)branch
+								  store: (COSQLiteStore *)store
+							transaction: (COStoreTransaction *)txn;
+
+
 @end
