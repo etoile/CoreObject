@@ -627,12 +627,12 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 	if (aParent != nil && parentRevid == -1)
 	{
 		NSLog(@"Parent revision not found: %@", aParent);
-		return NO;
+		// FIXME: If we're going to support writing revisions with missing parents
+		// we should probably preserve the parent UUID?
 	}
 	if (aMergeParent != nil && mergeParentRevid == -1)
 	{
 		NSLog(@"Merge parent revision not found: %@", aMergeParent);
-		return NO;
 	}
 	
     BOOL ok = [backing writeItemGraph: anItemTree
