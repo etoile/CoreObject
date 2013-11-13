@@ -482,8 +482,6 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 }
 
-// Reverting tests
-
 - (void) testBasicServerRevert
 {
 	[[serverBranch rootObject] setLabel: @"revertThis"];
@@ -494,29 +492,18 @@
 	UKIntsEqual(0, [[self serverMessages] count]);
 	UKIntsEqual(0, [[self clientMessages] count]);
 	UKObjectsEqual(@"revertThis", [[clientBranch rootObject] label]);
-	CORevision *clientLatestRevision = [clientBranch currentRevision];
 	
 	[serverBranch setCurrentRevision: [[serverBranch currentRevision] parentRevision]];
-	[serverPersistentRoot commit];
+	UKRaisesException([serverPersistentRoot commit]);
 	
 	UKIntsEqual(0, [[self serverMessages] count]);
-	UKIntsEqual(1, [[self clientMessages] count]);
-	
-	[transport deliverMessagesToClient];
-	
-	UKNil([[clientBranch rootObject] label]);
-	UKObjectsEqual([clientLatestRevision parentRevision], [clientBranch currentRevision]);
-	
-	// No more messages
 	UKIntsEqual(0, [[self clientMessages] count]);
-	UKIntsEqual(0, [[self serverMessages] count]);
 }
 
 - (void) testBasicClientRevert
 {
 	[[serverBranch rootObject] setLabel: @"revertThis"];
 	[serverPersistentRoot commit];
-	CORevision *serverLatestRevision = [serverBranch currentRevision];
 	
 	[transport deliverMessagesToClient];
 	
@@ -525,184 +512,13 @@
 	UKObjectsEqual(@"revertThis", [[clientBranch rootObject] label]);
 	
 	[clientBranch setCurrentRevision: [[clientBranch currentRevision] parentRevision]];
-	[clientPersistentRoot commit];
-	
-	UKIntsEqual(1, [[self serverMessages] count]);
-	UKIntsEqual(0, [[self clientMessages] count]);
-	
-	[transport deliverMessagesToServer];
-	
-	UKNil([[serverBranch rootObject] label]);
-	UKObjectsEqual([serverLatestRevision parentRevision], [serverBranch currentRevision]);
-	
-	// Deliver the no-op merge result back to the client
-	
-	UKIntsEqual(0, [[self serverMessages] count]);
-	UKIntsEqual(1, [[self clientMessages] count]);
-	
-	CORevision *clientFinalRevision = [clientBranch currentRevision];
-	
-	[transport deliverMessagesToClient];
+	UKRaisesException([clientPersistentRoot commit]);
 
-	UKObjectsEqual(clientFinalRevision, [clientBranch currentRevision]);
-	
-	
 	// No more messages
 	
 	UKIntsEqual(0, [[self clientMessages] count]);
 	UKIntsEqual(0, [[self serverMessages] count]);
 }
-
-#if 0
-
-- (void) testServerRevertWithIncomingChanges
-{
-	OutlineItem *serverChild = [self addAndCommitServerChild];
-	OutlineItem *serverParent = [serverBranch rootObject];
-	[serverParent setLabel: @"revertThis"];
-	[serverPersistentRoot commit];
-	
-	[transport deliverMessagesToClient];
-
-	OutlineItem *clientChild = [[clientBranch rootObject] contents][0];
-	OutlineItem *clientParent = [clientBranch rootObject];
-	
-	UKObjectsEqual(@"revertThis", serverParent.label);
-	UKNil(serverChild.label);
-	UKObjectsEqual(@"revertThis", clientParent.label);
-	UKNil(clientChild.label);
-
-	// Change the child label on the client
-	
-	[[[clientBranch rootObject] contents][0] setLabel: @"clientChange"];
-	[clientPersistentRoot commit];
-	
-	UKObjectsEqual(@"revertThis", clientParent.label);
-	UKObjectsEqual(@"clientChange", clientChild.label);
-
-	UKIntsEqual(1, [[self serverMessages] count]);
-	UKIntsEqual(0, [[self clientMessages] count]);
-
-	// Server reverts the @"revertThis" label, before accepting the @"clientChange"
-	[serverBranch setCurrentRevision: [[serverBranch currentRevision] parentRevision]];
-	[serverPersistentRoot commit];
-
-	UKNil(serverParent.label);
-	UKNil(serverChild.label);
-
-	UKIntsEqual(1, [[self serverMessages] count]);
-	UKIntsEqual(1, [[self clientMessages] count]);
-	
-	// Should have no effect (client is waiting for response)
-	[transport deliverMessagesToClient];
-	
-	UKObjectsEqual(@"revertThis", clientParent.label);
-	UKObjectsEqual(@"clientChange", clientChild.label);
-	UKIntsEqual(1, [[self serverMessages] count]);
-	UKIntsEqual(0, [[self clientMessages] count]);
-	
-	// Server: accept @"clientChange"
-	
-	[transport deliverMessagesToServer];
-	
-	UKNil(serverParent.label);
-	UKObjectsEqual(@"clientChange", serverChild.label);
-	UKIntsEqual(0, [[self serverMessages] count]);
-	UKIntsEqual(1, [[self clientMessages] count]);
-	
-	// Deliver the reply to the client
-	
-	[transport deliverMessagesToClient];
-	
-	UKNil(clientParent.label);
-	UKObjectsEqual(@"clientChange", clientChild.label);
-	
-	// No more messages
-	UKIntsEqual(0, [[self clientMessages] count]);
-	UKIntsEqual(0, [[self serverMessages] count]);
-}
-
-- (void) testClientRevertWithOutgoingChanges
-{
-	OutlineItem *clientChild = [self addAndCommitClientChild];
-	OutlineItem *clientParent = [clientBranch rootObject];
-	
-	// Client makes a change
-	
-	[clientChild setLabel: @"revertThis"];
-	[clientPersistentRoot commit];
-	
-	
-	// Server also makes a change
-	
-	OutlineItem *serverParent = [serverBranch rootObject];
-	[serverParent setLabel: @"serverChange"];
-	[serverPersistentRoot commit];
-	
-	
-	// Merge in the client's changes on the server.
-	
-	[transport deliverMessagesToServer];
-	
-	OutlineItem *serverChild = [[serverBranch rootObject] contents][0];
-
-	UKNil(clientParent.label);
-	UKObjectsEqual(@"revertThis", clientChild.label);
-	UKObjectsEqual(@"serverChange", serverParent.label);
-	UKObjectsEqual(@"revertThis", serverChild.label);
-	
-	UKIntsEqual(1, [[self clientMessages] count]); // Reply containing the server's merge results
-	UKIntsEqual(0, [[self serverMessages] count]);
-	
-	
-	// At this point, client is waiting for a confirmation from the server.
-	// Client then immediately reverts the change it just sent, before receiving the server's merged revisions
-	
-	[clientBranch setCurrentRevision: [[clientBranch currentRevision] parentRevision]];
-	[clientPersistentRoot commit];
-	
-	UKNil(clientParent.label);
-	UKNil(clientChild.label);
-	
-	UKIntsEqual(1, [[self clientMessages] count]);
-	UKIntsEqual(0, [[self serverMessages] count]);
-	
-	
-	// Deliver the server's change to the client. The client merges in its revert...
-	
-	[transport deliverMessagesToClient];
-	
-	UKObjectsEqual(@"serverChange", clientParent.label);
-	UKNil(clientChild.label);
-
-
-	// ... and pushes the merged result back to the server.
-	
-	UKIntsEqual(1, [[self serverMessages] count]);
-	UKIntsEqual(0, [[self clientMessages] count]);
-	
-	[transport deliverMessagesToServer];
-	
-	UKObjectsEqual(@"serverChange", serverParent.label);
-	UKNil(serverChild.label);
-	
-	// Deliver the no-op merge result back to the client
-	
-	UKIntsEqual(0, [[self serverMessages] count]);
-	UKIntsEqual(1, [[self clientMessages] count]);
-	
-	[transport deliverMessagesToClient];
-	
-	UKObjectsEqual(@"serverChange", clientParent.label);
-	UKNil(clientChild.label);
-
-	
-	// No more messages
-	
-	UKIntsEqual(0, [[self clientMessages] count]);
-	UKIntsEqual(0, [[self serverMessages] count]);
-}
-#endif
 
 @end
 
