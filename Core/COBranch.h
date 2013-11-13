@@ -108,7 +108,19 @@ extern NSString * const kCOBranchLabel;
  * on the next persistent root commit.
  */
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
-
+/**
+ * Non-persistent property (default YES) which can be changed to NO to indicate that
+ * -setCurrentRevision: should not be used to revert the branch to an older state.
+ *
+ * The main use case is when a branch is used for collaborative editing,
+ * this is set to NO by COSynchronizer, since the collaborative editing
+ * protocol we're using doesn't support making reverts, only forward changes.
+ *
+ * The undo framework checks this property to see whether to perform a revert
+ * or commit the equivalant selective undo. Also, if NO, the -undo/-redo methods
+ * on COBranch are disabled (-canUndo and -canRedo return NO).
+ */
+@property (readwrite, nonatomic, assign) BOOL supportsRevert;
 
 /** @taskunit History */
 

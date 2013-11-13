@@ -20,6 +20,7 @@
 {
 	SUPERINIT;
 	branch = aBranch;
+	branch.supportsRevert = NO;
 	lastSentRevisionForClientID = [NSMutableDictionary new];
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(persistentRootDidChange:)

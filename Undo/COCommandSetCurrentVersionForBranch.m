@@ -114,7 +114,8 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     COBranch *branch = [proot branchForUUID: _branchUUID];
 	ETAssert(branch != nil);
 
-    if ([[[branch currentRevision] UUID] isEqual: _oldRevisionUUID])
+    if ([[[branch currentRevision] UUID] isEqual: _oldRevisionUUID]
+		&& branch.supportsRevert)
     {
         [branch setCurrentRevision:
             [aContext revisionForRevisionUUID: _newRevisionUUID persistentRootUUID: _persistentRootUUID]];

@@ -85,6 +85,7 @@
 	persistentRoot = [_ctx persistentRootForUUID: message.persistentRootUUID];
 	ETAssert(persistentRoot != nil);
 	_branch = [persistentRoot branchForUUID: message.branchUUID];
+	_branch.supportsRevert = NO;
 	ETAssert(_branch != nil);
 	_lastRevisionUUIDFromServer = message.currentRevision.revisionUUID;
 	

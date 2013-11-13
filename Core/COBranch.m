@@ -38,6 +38,7 @@ NSString* const kCOBranchLabel = @"COBranchLabel";
 @synthesize objectGraphContext = _objectGraph;
 @synthesize mergingBranch;
 @synthesize shouldMakeEmptyCommit;
+@synthesize supportsRevert;
 
 + (void) initialize
 {
@@ -75,6 +76,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 	SUPERINIT;
 
+	self.supportsRevert = YES;
     _UUID =  aUUID;
         
 	/* The persistent root retains us */
@@ -304,7 +306,9 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 - (void) setCurrentRevision:(CORevision *)currentRevision
 {
     NILARG_EXCEPTION_TEST(currentRevision);
-    
+	
+	// TODO: Check and enforce self.supportsRevert
+	
     _currentRevisionUUID = [currentRevision UUID];
     [self reloadAtRevision: currentRevision];
 }
@@ -470,6 +474,9 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (BOOL)canUndo
 {
+	if (!self.supportsRevert)
+		return NO;
+	
     return [self undoRevision] != nil;
 }
 
@@ -502,6 +509,9 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (BOOL)canRedo
 {
+	if (!self.supportsRevert)
+		return NO;
+
     return [self redoRevision] != nil;
 }
 
