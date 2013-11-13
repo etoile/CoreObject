@@ -35,6 +35,12 @@
 	
 	[_server addClientID: [_peerJID bare]];
 	
+	
+	OutlineController *docController = [(ApplicationDelegate *)[NSApp delegate]
+										controllerForDocumentRootObject: [aBranch rootObject]];
+	ETAssert(docController != nil);
+	[docController setSharingSession: self];
+	
 	return self;
 }
 
@@ -61,11 +67,13 @@
 	ETAssert(aBranch !=  nil);
 	
 	Document *rootObject = [aBranch rootObject];
-	OutlineController *docController = [(ApplicationDelegate *)[NSApp delegate]
-										controllerForDocumentRootObject: rootObject];
-	[docController setSharingSession: self];
 	
 	[(ApplicationDelegate *)[NSApp delegate] registerDocumentRootObject: rootObject];
+	
+	OutlineController *docController = [(ApplicationDelegate *)[NSApp delegate]
+										controllerForDocumentRootObject: rootObject];
+	ETAssert(docController != nil);
+	[docController setSharingSession: self];
 }
 
 - (void) JSONClient: (COSynchronizerJSONClient *)client sendTextToServer: (NSString *)text
