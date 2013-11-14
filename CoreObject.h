@@ -74,7 +74,8 @@
 #import <CoreObject/COSynchronizationServer.h>
 #import <CoreObject/COSynchronizerClient.h>
 #import <CoreObject/COSynchronizerServer.h>
-
+#import <CoreObject/COSynchronizerJSONClient.h>
+#import <CoreObject/COSynchronizerJSONServer.h>
 
 /* Utilities */
 

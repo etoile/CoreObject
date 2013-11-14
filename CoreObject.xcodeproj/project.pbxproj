@@ -70,6 +70,8 @@
 		660179D1182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 660179CF182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.m */; };
 		660179D4182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179D2182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660179D5182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 660179D3182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.m */; };
+		6607178B183445FB0053D7CC /* TestSynchronizerMultiUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 6607178A183445FB0053D7CC /* TestSynchronizerMultiUser.m */; };
+		660717951834462D0053D7CC /* COSynchronizerFakeMessageTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 660717941834462D0053D7CC /* COSynchronizerFakeMessageTransport.m */; };
 		66094847178794D40049468B /* COItem+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 66094845178794D40049468B /* COItem+JSON.m */; };
 		66094848178794D40049468B /* COItem+JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 66094846178794D40049468B /* COItem+JSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6609485E1787A1160049468B /* CORelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6609485C1787A1160049468B /* CORelationshipCache.m */; };
@@ -484,6 +486,9 @@
 		660179CF182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizerResponseToClientForSentRevisionsMessage.m; path = Synchronization/Messages/COSynchronizerResponseToClientForSentRevisionsMessage.m; sourceTree = "<group>"; };
 		660179D2182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizerPushedRevisionsFromClientMessage.h; path = Synchronization/Messages/COSynchronizerPushedRevisionsFromClientMessage.h; sourceTree = "<group>"; };
 		660179D3182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizerPushedRevisionsFromClientMessage.m; path = Synchronization/Messages/COSynchronizerPushedRevisionsFromClientMessage.m; sourceTree = "<group>"; };
+		6607178A183445FB0053D7CC /* TestSynchronizerMultiUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSynchronizerMultiUser.m; path = Tests/TestSynchronizerMultiUser.m; sourceTree = "<group>"; };
+		660717931834462D0053D7CC /* COSynchronizerFakeMessageTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizerFakeMessageTransport.h; path = Tests/COSynchronizerFakeMessageTransport.h; sourceTree = "<group>"; };
+		660717941834462D0053D7CC /* COSynchronizerFakeMessageTransport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizerFakeMessageTransport.m; path = Tests/COSynchronizerFakeMessageTransport.m; sourceTree = "<group>"; };
 		66094845178794D40049468B /* COItem+JSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "COItem+JSON.m"; sourceTree = "<group>"; };
 		66094846178794D40049468B /* COItem+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "COItem+JSON.h"; sourceTree = "<group>"; };
 		6609485C1787A1160049468B /* CORelationshipCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CORelationshipCache.m; path = Core/CORelationshipCache.m; sourceTree = "<group>"; };
@@ -1262,6 +1267,9 @@
 				66E451CA17CC456700205679 /* TestCOObjectSynthesizedAccessors.m */,
 				6646978F17CEAFD800A1B767 /* TestSynchronization.m */,
 				66405DCD182A1F2C00A6EF7A /* TestSynchronizer.m */,
+				6607178A183445FB0053D7CC /* TestSynchronizerMultiUser.m */,
+				660717931834462D0053D7CC /* COSynchronizerFakeMessageTransport.h */,
+				660717941834462D0053D7CC /* COSynchronizerFakeMessageTransport.m */,
 				66FD34A4183168B500898381 /* TestSynchronizerJSONTransport.m */,
 				66AB075E17D5846000ADDA17 /* TestMerge.m */,
 				667C24F517E11FC900FFFC85 /* TestNotifications.m */,
@@ -1798,6 +1806,7 @@
 				66860BA117BED42900B24333 /* TestSQLiteStore.m in Sources */,
 				66860BA217BED42900B24333 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */,
 				66860BA417BED42900B24333 /* TestSQLiteStorePersistentRootBackingStore.m in Sources */,
+				660717951834462D0053D7CC /* COSynchronizerFakeMessageTransport.m in Sources */,
 				66860BA517BED42900B24333 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66618A97181334F8001FA004 /* TestCopierWithIsSharedFalseAndMultipleReferences.m in Sources */,
@@ -1813,6 +1822,7 @@
 				66C97DA817CBD31800898F80 /* TestSQLiteStoreErrorHandling.m in Sources */,
 				66E451CB17CC456700205679 /* TestCOObjectSynthesizedAccessors.m in Sources */,
 				66E451D617CC461F00205679 /* OutlineItem.m in Sources */,
+				6607178B183445FB0053D7CC /* TestSynchronizerMultiUser.m in Sources */,
 				66E451D917CC565200205679 /* Tag.m in Sources */,
 				6646979017CEAFD800A1B767 /* TestSynchronization.m in Sources */,
 				66AB075F17D5846000ADDA17 /* TestMerge.m in Sources */,

@@ -1,4 +1,4 @@
-#import "COSynchronizerClient.h"
+#import <CoreObject/CoreObject.h>
 #import "CORevisionCache.h"
 #import "COSynchronizerRevision.h"
 #import "COSynchronizerPushedRevisionsToClientMessage.h"

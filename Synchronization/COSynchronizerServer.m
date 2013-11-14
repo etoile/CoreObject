@@ -1,4 +1,4 @@
-#import "COSynchronizerServer.h"
+#import <CoreObject/CoreObject.h>
 #import "CORevisionCache.h"
 
 #import "COSynchronizerRevision.h"

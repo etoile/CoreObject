@@ -1,4 +1,4 @@
-#import <CoreObject/COSynchronizerClient.h>
+#import <CoreObject/CoreObject.h>
 
 @class COSynchronizerJSONClient;
 
