@@ -52,19 +52,23 @@ static void genericSetter(id self, SEL theCmd, id value)
 + (BOOL)resolveInstanceMethod:(SEL)sel
 {
     Class classToCheck = self;
-    
+
+	// FIXME: Don't iterate over all properties but access a single property using class_getProperty()
     while (classToCheck != Nil)
     {
         unsigned int propertyCount;
         objc_property_t *propertyList = class_copyPropertyList(classToCheck, &propertyCount);
-        
+
         for (unsigned int i=0; i<propertyCount; i++)
         {
             objc_property_t property = propertyList[i];
-        
-            // FIXME: This portion is a really quick hack; implement properly.
-            // Should check that the property is marked @dynamic.
-            
+			NSString *attributes = [NSString stringWithUTF8String: property_getAttributes(property)];
+			BOOL isDynamic = ([attributes rangeOfString: @"D"].location != NSNotFound);
+
+            // FIXME: Check other property attributes are correct e.g. readwrite and not readonly
+            if (isDynamic == NO)
+				continue;
+
             // TODO: Implement more accessors for performance.
             
             NSString *propName = [NSString stringWithUTF8String: property_getName(property)];

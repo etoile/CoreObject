@@ -64,10 +64,13 @@ See +[NSObject typePrefix]. */
 
 	ETPropertyDescription *UUID =
 		[ETPropertyDescription descriptionWithName: @"UUID" type: (id)@"ETUUID"];
+	[UUID setReadOnly: YES];
 	ETPropertyDescription *isPersistent =
 		[ETPropertyDescription descriptionWithName: @"isPersistent" type: (id)@"BOOL"];
+	[isPersistent setDerived: YES];
 	ETPropertyDescription *isRoot =
 		[ETPropertyDescription descriptionWithName: @"isRoot" type: (id)@"BOOL"];
+	[isRoot setDerived: YES];
 	ETPropertyDescription *isShared =
 		[ETPropertyDescription descriptionWithName: @"isShared" type: (id)@"BOOL"];
 	[isShared setReadOnly: YES];
