@@ -50,7 +50,6 @@ First alpha release blockers
 
 - Make attachments a bit more usable - currently can't declare them in the metamodel AFAIK
 
-- -[COBranch setCurrentRevision:] doesn’t update head revision - probably should (unless it's a revert)
 
 Future Work
 -----------
@@ -183,8 +182,6 @@ Future Work
 
 - Collaboration
 
-  - use delta compression instead of sending the full snapshot of every revision over the protocol
-  
   - support sending attachments (or large persistent roots) using XMPP file transfer
 
 
