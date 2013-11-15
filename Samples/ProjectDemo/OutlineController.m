@@ -146,7 +146,7 @@
 - (void)windowDidLoad
 {
 	[outlineView registerForDraggedTypes:
-		[NSArray arrayWithObject:@"org.etoile.outlineItem"]];
+		@[@"org.etoile.outlineItem", @"public.file-url"]];
 	[outlineView setDelegate: self];
 	[outlineView setTarget: self];
 	[outlineView setDoubleAction: @selector(doubleClick:)];
@@ -624,7 +624,10 @@ static int i = 0;
     
 	for (NSPasteboardItem *pbItem in [[info draggingPasteboard] pasteboardItems])
 	{
-        id plist = [pbItem propertyListForType: @"org.etoile.outlineItem"];	
+        id plist = [pbItem propertyListForType: @"org.etoile.outlineItem"];
+		if (plist == nil)
+			continue;
+		
         OutlineItem *srcItem = [self outlineItemForPasteboardPropertyList: plist];
         
 		for (OutlineItem *tempDest = item; tempDest != nil; tempDest = [tempDest parent])
@@ -669,8 +672,23 @@ static int i = 0;
 	for (NSPasteboardItem *pbItem in [pasteboard pasteboardItems])
 	{
         id plist = [pbItem propertyListForType: @"org.etoile.outlineItem"];
-        OutlineItem *srcItem = [self outlineItemForPasteboardPropertyList: plist];
-		[outlineItems addObject: srcItem];
+		if (plist != nil)
+		{
+			OutlineItem *srcItem = [self outlineItemForPasteboardPropertyList: plist];
+			[outlineItems addObject: srcItem];
+		}
+		
+		plist = [pbItem propertyListForType: @"public.file-url"];
+		if (plist != nil)
+		{
+			NSURL *fileURL = [NSURL URLWithString: plist];
+			NSData *attachmentID = [[[self editingContext] store] importAttachmentFromURL: fileURL];
+			
+			OutlineItem *item = [[OutlineItem alloc] initWithObjectGraphContext: [newParent objectGraphContext]];
+			item.label = [NSString stringWithFormat: @"%@ imported as %@", fileURL, attachmentID];
+			
+			[outlineItems addObject: item];
+		}
 	}
 	
 	
