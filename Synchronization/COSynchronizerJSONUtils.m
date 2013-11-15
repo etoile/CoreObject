@@ -37,4 +37,22 @@
 	return array;
 }
 
++ (NSData *) searchForFirstMissingAttachmentIDInGraph: (id<COItemGraph>)aGraph store: (COSQLiteStore *)aStore
+{
+	for (ETUUID *uuid in [aGraph itemUUIDs])
+	{
+		COItem *item = [aGraph itemForUUID: uuid];
+		for (NSData *attachmentID in [item attachments])
+		{
+			NSURL *url = [aStore URLForAttachmentID: attachmentID];
+			
+			if (![[NSFileManager defaultManager] fileExistsAtPath: [url path]])
+			{
+				return attachmentID;
+			}
+		}
+	}
+	return nil;
+}
+
 @end

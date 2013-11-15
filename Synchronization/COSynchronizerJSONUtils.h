@@ -1,4 +1,4 @@
-#import <Foundation/Foundation.h>
+#import <CoreObject/CoreObject.h>
 
 @interface COSynchronizerJSONUtils : NSObject
 
@@ -7,5 +7,7 @@
 
 + (id) propertyListForRevisionsArray: (NSArray *)revs;
 + (NSArray *) revisionsArrayForPropertyList: (id)aPropertylist;
+
++ (NSData *) searchForFirstMissingAttachmentIDInGraph: (id<COItemGraph>)aGraph store: (COSQLiteStore *)aStore;
 
 @end
