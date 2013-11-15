@@ -250,7 +250,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	return [self peekEditFromStack: kCOUndoStack forName: _name];
 }
 
-- (void)setCurrentCommand: (COCommand *)aCommand
+- (BOOL)setCurrentCommand: (COCommand *)aCommand
 {
 	INVALIDARG_EXCEPTION_TEST(aCommand, [[self nodes] containsObject: aCommand]);
 
@@ -259,6 +259,8 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	BOOL isUndo = (newIndex < oldIndex);
 	BOOL isRedo = (newIndex > oldIndex);
 
+	BOOL appliedAll = YES;
+	
 	if (isUndo)
 	{
 		// TODO: Write an optimized version. For store operation commands
@@ -268,6 +270,11 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 		// The collected revisions follows or matches the current command.
 		while ([[self currentNode] isEqual: aCommand] == NO)
 		{
+			if (![self canUndo])
+			{
+				appliedAll = NO;
+				break;
+			}
 			[self popAndApplyFromStack: kCOUndoStack pushToStack: kCORedoStack name: _name toContext: [self editingContext]];
 		}
 	}
@@ -276,10 +283,17 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 		// TODO: Write an optimized version (see above).
 		while ([[self currentNode] isEqual: aCommand] == NO)
 		{
+			if (![self canRedo])
+			{
+				appliedAll = NO;
+				break;
+			}
 			[self popAndApplyFromStack: kCORedoStack pushToStack: kCOUndoStack name: _name toContext: [self editingContext]];
 		}
 	}
 	[self didUpdate];
+	
+	return appliedAll;
 }
 
 - (void)reloadCommands
@@ -345,11 +359,11 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	return command;
 }
 
-- (void)setCurrentNode: (id <COTrackNode>)node
+- (BOOL)setCurrentNode: (id <COTrackNode>)node
 {
 	INVALIDARG_EXCEPTION_TEST(node, [node isKindOfClass: [COCommand class]]
 							|| [node isKindOfClass: [COEndOfUndoTrackPlaceholderNode class]]);
-	[self setCurrentCommand: (COCommandGroup *)node];
+	return [self setCurrentCommand: (COCommandGroup *)node];
 }
 
 - (void)undoNode: (id <COTrackNode>)aNode

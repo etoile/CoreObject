@@ -91,6 +91,7 @@
 		662FFB8017C2026000BA3F2F /* COCommandUndeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */; };
 		662FFB9E17C2DE8100BA3F2F /* COCommandUndeleteBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		662FFB9F17C2DE8100BA3F2F /* COCommandUndeleteBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 662FFB9D17C2DE8100BA3F2F /* COCommandUndeleteBranch.m */; };
+		663C5CCE1836010B003C433F /* TestUndoStackFailedNavigation.m in Sources */ = {isa = PBXBuildFile; fileRef = 663C5CCD1836010B003C433F /* TestUndoStackFailedNavigation.m */; };
 		663CE29517C07ED800E729F5 /* COCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28717C07ED800E729F5 /* COCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		663CE29617C07ED800E729F5 /* COCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE28817C07ED800E729F5 /* COCommand.m */; };
 		663CE29917C07ED800E729F5 /* COCommandDeleteBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28B17C07ED800E729F5 /* COCommandDeleteBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -508,6 +509,7 @@
 		662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommandUndeletePersistentRoot.m; sourceTree = "<group>"; };
 		662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandUndeleteBranch.h; sourceTree = "<group>"; };
 		662FFB9D17C2DE8100BA3F2F /* COCommandUndeleteBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = COCommandUndeleteBranch.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		663C5CCD1836010B003C433F /* TestUndoStackFailedNavigation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUndoStackFailedNavigation.m; path = Tests/TestUndoStackFailedNavigation.m; sourceTree = "<group>"; };
 		663CE28717C07ED800E729F5 /* COCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommand.h; sourceTree = "<group>"; };
 		663CE28817C07ED800E729F5 /* COCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = COCommand.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		663CE28B17C07ED800E729F5 /* COCommandDeleteBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandDeleteBranch.h; sourceTree = "<group>"; };
@@ -1275,6 +1277,7 @@
 				667C24F517E11FC900FFFC85 /* TestNotifications.m */,
 				66470C7117E3D4B200A7E0A9 /* TestHistoryInspection.m */,
 				6612A89F1800B5A700530847 /* TestUndoStackTrackProtocol.m */,
+				663C5CCD1836010B003C433F /* TestUndoStackFailedNavigation.m */,
 				667F1EDE179C83A20083C3E6 /* NestedVersioning tests */,
 				667F1ECE179C81BE0083C3E6 /* Store Tests */,
 				667F1ECF179C81E00083C3E6 /* Old CoreObject trunk tests */,
@@ -1800,6 +1803,7 @@
 				6646979417CEB01D00A1B767 /* TestConcurrentChanges.m in Sources */,
 				6646979517CEB01D00A1B767 /* TestObjectGraphContext.m in Sources */,
 				6646979617CEB01D00A1B767 /* TestItemGraphDiff.m in Sources */,
+				663C5CCE1836010B003C433F /* TestUndoStackFailedNavigation.m in Sources */,
 				609C00651704C24C00D01AAB /* main.m in Sources */,
 				66860B9F17BED42900B24333 /* TestItem.m in Sources */,
 				66860BA017BED42900B24333 /* TestBinaryReadWrite.m in Sources */,

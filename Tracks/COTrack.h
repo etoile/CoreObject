@@ -53,7 +53,7 @@
  * <override-subclass />
  * Sets the current position in the the track timeline to match the track node.
  */
-- (void)setCurrentNode: (id <COTrackNode>)node;
+- (BOOL)setCurrentNode: (id <COTrackNode>)node;
 
 /** @taskunit Selective Undo */
 

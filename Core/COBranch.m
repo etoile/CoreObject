@@ -896,11 +896,14 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	return [self currentRevision];
 }
 
-- (void)setCurrentNode: (id <COTrackNode>)node
+- (BOOL)setCurrentNode: (id <COTrackNode>)node
 {
 	INVALIDARG_EXCEPTION_TEST(node, [node isKindOfClass: [CORevision class]]);
 	[self setCurrentRevision: (CORevision *)node];
 	[self didUpdate];
+	
+	// TODO: Should return NO if self.supportsRevert is NO and this is a revert
+	return YES;
 }
 
 - (void)undoNode: (id <COTrackNode>)aNode
