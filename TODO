@@ -50,6 +50,7 @@ First alpha release blockers
 
 - Make attachments a bit more usable - currently can't declare them in the metamodel AFAIK
 
+- -[COBranch setCurrentRevision:] doesn’t update head revision - probably should (unless it's a revert)
 
 Future Work
 -----------
