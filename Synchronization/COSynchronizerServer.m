@@ -149,7 +149,8 @@
 	{
 		COSynchronizerRevision *rev = [[COSynchronizerRevision alloc] initWithUUID: revUUID
 																	persistentRoot: self.persistentRoot.UUID
-																			 store: self.persistentRoot.store];
+																			 store: self.persistentRoot.store
+														recordAsDeltaAgainstParent: YES];
 		[revs addObject: rev];
 	}
 	
@@ -190,7 +191,8 @@
 	message.branchMetadata = self.branch.metadata;
 	message.currentRevision = [[COSynchronizerRevision alloc] initWithUUID: self.branch.currentRevision.UUID
 															persistentRoot: self.persistentRoot.UUID
-																	 store: self.persistentRoot.store];
+																	 store: self.persistentRoot.store
+												recordAsDeltaAgainstParent: NO];
 	
 	lastSentRevisionForClientID[aClient] = self.branch.currentRevision.UUID;
 	[self.delegate sendPersistentRootInfoMessage: message toClient: aClient];

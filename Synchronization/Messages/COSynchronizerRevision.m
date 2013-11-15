@@ -18,14 +18,21 @@
 							 branchUUID: branch];
 }
 
-- (id) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store
+- (id) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store recordAsDeltaAgainstParent: (BOOL)delta
 {
 	SUPERINIT;
 	
 	CORevisionInfo *info = [store revisionInfoForRevisionUUID: aUUID persistentRootUUID: aPersistentRoot];
-	COItemGraph *graph = [store itemGraphForRevisionUUID: aUUID persistentRoot: aPersistentRoot];
+
+	if (delta)
+	{
+		self.modifiedItems = [store partialItemGraphFromRevisionUUID: info.parentRevisionUUID toRevisionUUID: aUUID persistentRoot: aPersistentRoot];
+	}
+	else
+	{
+		self.modifiedItems = [store itemGraphForRevisionUUID: aUUID persistentRoot: aPersistentRoot];
+	}
 	
-	self.modifiedItems = graph;
 	self.revisionUUID = aUUID;
 	self.parentRevisionUUID = info.parentRevisionUUID;
 	self.metadata = info.metadata;

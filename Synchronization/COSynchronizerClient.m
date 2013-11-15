@@ -219,7 +219,8 @@
 	{
 		COSynchronizerRevision *rev = [[COSynchronizerRevision alloc] initWithUUID: revUUID
 																	persistentRoot: self.persistentRoot.UUID
-																			 store: self.persistentRoot.store];
+																			 store: self.persistentRoot.store
+														recordAsDeltaAgainstParent: YES];
 		[revs addObject: rev];
 	}
 	

@@ -19,7 +19,7 @@
 		 persistentRootUUID: (ETUUID *)persistentRoot
 				 branchUUID: (ETUUID *)branch;
 
-- (id) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store;
+- (id) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store recordAsDeltaAgainstParent: (BOOL)delta;
 
 - (id) propertyList;
 - (id) initWithPropertyList: (id)aPropertyList;
