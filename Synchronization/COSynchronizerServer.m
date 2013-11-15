@@ -160,7 +160,8 @@
 		return;
 	}
 	
-	if (currentlyHandlingLastSentRevision != nil)
+	if (currentlyHandlingLastSentRevision != nil
+		&& [currentlyRespondingToClient isEqualToString: clientID])
 	{
 		ETAssert(currentlyRespondingToClient != nil);
 		
@@ -168,7 +169,7 @@
 		message.revisions = revs;
 		message.lastRevisionUUIDSentByClient = currentlyHandlingLastSentRevision;
 		
-		[self.delegate sendResponseMessage: message toClient: currentlyRespondingToClient];
+		[self.delegate sendResponseMessage: message toClient: clientID];
 		
 		currentlyHandlingLastSentRevision = nil;
 		currentlyRespondingToClient = nil;

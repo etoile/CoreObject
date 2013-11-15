@@ -84,27 +84,37 @@
 	
 	for (NSString *clientID in clientMessagesForID)
 	{
-		NSArray *messages = [clientMessagesForID[clientID] copy];
-		COSynchronizerClient *client = clientForID[clientID];
-		ETAssert(client != nil);
-		
-		[clientMessagesForID[clientID] removeAllObjects];
-		
-		for (id message in messages)
+		if ([self deliverMessagesToClient: clientID])
 		{
 			deliveredAny = YES;
-			if ([message isKindOfClass: [COSynchronizerPushedRevisionsToClientMessage class]])
-			{
-				[client handlePushMessage: message];
-			}
-			else if ([message isKindOfClass: [COSynchronizerResponseToClientForSentRevisionsMessage class]])
-			{
-				[client handleResponseMessage: message];
-			}
-			else
-			{
-				NSAssert(NO, @"Unsupported server message class: %@", [message class]);
-			}
+		}
+	}
+	return deliveredAny;
+}
+
+- (BOOL) deliverMessagesToClient: (NSString *)clientID
+{
+	BOOL deliveredAny = NO;
+	NSArray *messages = [clientMessagesForID[clientID] copy];
+	COSynchronizerClient *client = clientForID[clientID];
+	ETAssert(client != nil);
+	
+	[clientMessagesForID[clientID] removeAllObjects];
+	
+	for (id message in messages)
+	{
+		deliveredAny = YES;
+		if ([message isKindOfClass: [COSynchronizerPushedRevisionsToClientMessage class]])
+		{
+			[client handlePushMessage: message];
+		}
+		else if ([message isKindOfClass: [COSynchronizerResponseToClientForSentRevisionsMessage class]])
+		{
+			[client handleResponseMessage: message];
+		}
+		else
+		{
+			NSAssert(NO, @"Unsupported server message class: %@", [message class]);
 		}
 	}
 	return deliveredAny;

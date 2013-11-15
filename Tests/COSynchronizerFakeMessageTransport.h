@@ -22,6 +22,7 @@
 
 - (void) deliverMessages;
 - (BOOL) deliverMessagesToClient;
+- (BOOL) deliverMessagesToClient: (NSString *)clientID;
 - (BOOL) deliverMessagesToServer;
 
 - (NSArray *) serverMessages;
