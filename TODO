@@ -45,6 +45,20 @@ First alpha release blockers
 
   - Simple diff visualization
 
+- Fix -[COUndoTrack setCurrentNode:] which behaves badly if it isn't possible to 
+  perform all of the requested undos/redos (it throws an exception, possibly with
+  the current node changed to some intermediate node, but doesn't deliver the change
+  notification). IMHO it's acceptable that -setCurrentNode: may fail with the change 
+  partially applied. It's not atomic; we can just document that as a current limitation.
+
+  However, instead of throwing an exception, I would like to make -setCurrentNode: return a BOOL, 
+  and return NO if it wasn't possible to apply all necessary undos/redos.
+
+- Fix intermittent test failures (TestUndo.m:560, and -[TestSynchronization
+  testReplicateToClientWithoutPersistentRoot] exception about "COItem .. lacks an entity name")
+
+- Make attachments a bit more usable - currently can't declare them in the metamodel AFAIK
+
 
 Future Work
 -----------

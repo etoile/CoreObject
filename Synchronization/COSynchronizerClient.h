@@ -52,6 +52,12 @@
  or the GC could scan for refs in the undo database.
  
  - tolerant of any messages being dropped, or being delivered in any order
+ (at least, we should be able to detect these and go into an error state/throw
+ an exception, so sharing can be restarted, rather than corrupting the document)
+ 
+ - it's in the same family of syncing protocols as Differential Synchronization
+ (http://neil.fraser.name/writing/sync/) but instead of operating on the document
+ text itself, this protocol works with the revision graph
  
  */
 @interface COSynchronizerClient : NSObject
