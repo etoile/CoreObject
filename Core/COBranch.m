@@ -303,14 +303,19 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     return nil;
 }
 
-- (void) setCurrentRevision:(CORevision *)currentRevision
+- (void) setCurrentRevision:(CORevision *)newCurrentRevision
 {
-    NILARG_EXCEPTION_TEST(currentRevision);
+    NILARG_EXCEPTION_TEST(newCurrentRevision);
 	
 	// TODO: Check and enforce self.supportsRevert
 	
-    _currentRevisionUUID = [currentRevision UUID];
-    [self reloadAtRevision: currentRevision];
+	if (![newCurrentRevision isEqualToOrAncestorOfRevision: self.headRevision])
+	{
+		_headRevisionUUID = [newCurrentRevision UUID];
+	}
+	
+    _currentRevisionUUID = [newCurrentRevision UUID];
+    [self reloadAtRevision: newCurrentRevision];
 }
 
 - (COBranch *) parentBranch

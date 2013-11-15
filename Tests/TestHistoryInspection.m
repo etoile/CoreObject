@@ -277,4 +277,39 @@
 	UKNil(rev);
 }
 
+- (void) testHeadRevisionAndCurrentRevision
+{
+	UKObjectsEqual(r2, branch1A.currentRevision);
+	UKObjectsEqual(r2, branch1A.headRevision);
+	UKObjectsEqual(r6, branch1B.currentRevision);
+	UKObjectsEqual(r8, branch1B.headRevision);
+	UKObjectsEqual(r10, branch1C.currentRevision);
+	UKObjectsEqual(r10, branch1C.headRevision);
+	UKObjectsEqual(r4, branch2A.currentRevision);
+	UKObjectsEqual(r4, branch2A.headRevision);
+}
+
+- (void) testSetCurrentRevisionToPastLeavesHeadRevisionUnchanged
+{
+	branch1B.currentRevision = r3;
+	UKObjectsEqual(r8, branch1B.headRevision);
+}
+
+- (void) testSetCurrentRevisionToFutureUpdatesHeadRevision
+{
+	branch1B.currentRevision = r10;
+	UKObjectsEqual(r10, branch1B.headRevision);
+}
+
+- (void) testNewCommitUpdatesHeadRevision
+{
+	[[branch1B rootObject] setLabel: @"new commit"];
+	[p1 commit];
+	
+	CORevision *r11 = [branch1B currentRevision];
+	UKObjectsEqual(r6, [r11 parentRevision]);
+	
+	UKObjectsEqual(r11, branch1B.headRevision);
+}
+
 @end

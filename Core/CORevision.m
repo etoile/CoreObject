@@ -151,4 +151,18 @@
 		([self parentRevision] != nil ? [[self parentRevision] UUID] : @"none")];
 }
 
+- (BOOL) isEqualToOrAncestorOfRevision: (CORevision *)aRevision
+{
+    CORevision *rev = aRevision;
+    while (rev != nil)
+    {
+        if ([rev isEqual: self])
+        {
+            return YES;
+        }
+        rev = [rev parentRevision];
+    }
+    return NO;
+}
+
 @end

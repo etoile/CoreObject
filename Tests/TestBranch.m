@@ -85,17 +85,20 @@
     
     UKNotNil(thirdRevision);
 	UKObjectsNotEqual(thirdRevision, secondRevision);
+	UKObjectsEqual(thirdRevision, originalBranch.headRevision);
 
 	// First undo (Todo -> Shopping List)
 	[originalBranch undo]; //[originalBranch setCurrentRevision: secondRevision];
 	UKStringsEqual(@"Shopping List", [rootObj valueForProperty: @"label"]);
 	UKObjectsEqual(secondRevision, [originalBranch currentRevision]);
-
+	UKObjectsEqual(thirdRevision, originalBranch.headRevision);
+	
 	// Second undo (Shopping List -> Groceries)
 	[originalBranch undo]; //[originalBranch setCurrentRevision: firstRevision];
 	UKStringsEqual(@"Groceries", [rootObj valueForProperty: @"label"]);
 	UKObjectsEqual(firstRevision, [originalBranch currentRevision]);
-
+	UKObjectsEqual(thirdRevision, originalBranch.headRevision);
+	
     // Verify that the revert to firstRevision is not committed
     UKObjectsEqual([thirdRevision UUID],
                    [[store persistentRootInfoForUUID: [persistentRoot UUID]] currentRevisionUUID]);
@@ -104,11 +107,13 @@
 	[originalBranch redo]; //[originalBranch setCurrentRevision: secondRevision];
 	UKStringsEqual(@"Shopping List", [rootObj valueForProperty: @"label"]);
 	UKObjectsEqual(secondRevision, [originalBranch currentRevision]);
-
+	UKObjectsEqual(thirdRevision, originalBranch.headRevision);
+	
     // Second redo (Shopping List -> Todo)
 	[originalBranch redo]; //[originalBranch setCurrentRevision: thirdRevision];
 	UKStringsEqual(@"Todo", [rootObj valueForProperty: @"label"]);
 	UKObjectsEqual(thirdRevision, [originalBranch currentRevision]);
+	UKObjectsEqual(thirdRevision, originalBranch.headRevision);
 }
 
 /**

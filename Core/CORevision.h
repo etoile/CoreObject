@@ -101,6 +101,12 @@
  */
 - (NSString *)localizedShortDescription;
 
+/** @taskunit History Graph Inspection */
+
+/**
+ * Returns whether the receiver is equal to an ancestor of the given revision 
+ */
+- (BOOL) isEqualToOrAncestorOfRevision: (CORevision *)aRevision;
 
 /** @taskunit Framework Private */
 

@@ -162,6 +162,11 @@ extern NSString * const kCOBranchLabel;
  * The revision bound to the state loaded in the object graph context.
  *
  * If the branch is uncommitted, the current revision is nil.
+ *
+ * Setting the current revision can be used to revert to a past revision
+ * or fast-forward to a future revision. If the revision being set is not
+ * an ancestor of the head revision, the head revision is also updated to the
+ * given revision.
  */
 @property (readwrite, strong, nonatomic) CORevision *currentRevision;
 /**
