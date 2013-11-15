@@ -188,6 +188,10 @@
 		return;
 	}
 
+	// Benchmarking:
+	NSTimeInterval roundtrip = [[NSDate date] timeIntervalSinceDate: _lastRevisionUUIDInTransitToServerTimestamp];
+	NSLog(@"===> Round-trip time: %.0f ms", roundtrip * 1000.0);
+	
 	[self handleRevisionsFromServer: aMessage.revisions];
 }
 
@@ -222,6 +226,8 @@
 	ETAssert(![revs isEmpty]);
 	ETAssert(_lastRevisionUUIDInTransitToServer == nil);
 	_lastRevisionUUIDInTransitToServer = [[self.branch currentRevision] UUID];
+	// Benchmarking:
+	_lastRevisionUUIDInTransitToServerTimestamp = [NSDate date];
 	
 	COSynchronizerPushedRevisionsFromClientMessage *message = [[COSynchronizerPushedRevisionsFromClientMessage alloc] init];
 	message.clientID = self.clientID;

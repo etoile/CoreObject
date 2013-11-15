@@ -68,6 +68,8 @@
 	
 	ETUUID *_lastRevisionUUIDFromServer;
 	ETUUID *_lastRevisionUUIDInTransitToServer;
+	/** Just for benchmarking */
+	NSDate *_lastRevisionUUIDInTransitToServerTimestamp;
 	
 	id<COSynchronizerClientDelegate> _delegate;
 }
