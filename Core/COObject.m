@@ -98,15 +98,19 @@ See +[NSObject typePrefix]. */
 #endif
 	ETPropertyDescription *displayName = 
 		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"NSString"];
+	[displayName setDisplayName: _(@"Name")];
 
 	/* Description Properties */
 
 	ETPropertyDescription *revisionDescription =
 		[ETPropertyDescription descriptionWithName: @"revisionDescription" type: (id)@"NSString"];
+	[revisionDescription setDisplayName: _(@"Version")];
 	ETPropertyDescription *tagDescription =
 		[ETPropertyDescription descriptionWithName: @"tagDescription" type: (id)@"NSString"];
+	[tagDescription setDisplayName: _(@"Tags")];
 	ETPropertyDescription *typeDescription =
 		[ETPropertyDescription descriptionWithName: @"typeDescription" type: (id)@"NSString"];
+	[typeDescription setDisplayName: _(@"Type")];
 
 	NSArray *transientProperties = A(UUID, isPersistent, isRoot, identifier,
 		displayName, revisionDescription, tagDescription, typeDescription);
