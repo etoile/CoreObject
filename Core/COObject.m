@@ -1070,7 +1070,7 @@ See +[NSObject typePrefix]. */
 
 - (NSString *)revisionDescription
 {
-	return [[self revision] description];
+	return [[[self revision] UUID] stringValue];
 }
 
 - (NSString *)tagDescription
