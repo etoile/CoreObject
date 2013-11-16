@@ -121,7 +121,7 @@ See +[NSObject typePrefix]. */
 	NSArray *properties =
 		[transientProperties arrayByAddingObjectsFromArray: persistentProperties];
 
-	[[[properties arrayByRemovingObject: @"name"] mappedCollection] setReadOnly: YES];
+	[[[properties arrayByRemovingObject: name] mappedCollection] setReadOnly: YES];
 	[[persistentProperties mappedCollection] setPersistent: YES];
 
 	[object setPropertyDescriptions: properties];
