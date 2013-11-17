@@ -34,8 +34,12 @@
     
     [parentCollectionsProperty setMultivalued: YES];
     [parentCollectionsProperty setOpposite: (id)@"Anonymous.Tag.contents"];
+	
+	ETPropertyDescription *attachmentProperty =
+    [ETPropertyDescription descriptionWithName: @"attachmentID" type: (id)@"Anonymous.COAttachmentID"];
+	[attachmentProperty setPersistent: YES];
     
-    [outlineEntity setPropertyDescriptions: A(isShared, labelProperty, contentsProperty, parentContainerProperty, parentCollectionsProperty)];
+    [outlineEntity setPropertyDescriptions: A(isShared, labelProperty, contentsProperty, parentContainerProperty, parentCollectionsProperty, attachmentProperty)];
 
     return outlineEntity;
 }
@@ -64,5 +68,6 @@
 @dynamic parentContainer;
 @dynamic parentCollections;
 @dynamic checked;
+@dynamic attachmentID;
 
 @end

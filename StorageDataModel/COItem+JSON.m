@@ -2,6 +2,7 @@
 #import <EtoileFoundation/NSData+Hash.h>
 #import <EtoileFoundation/ETUUID.h>
 #import "COPath.h"
+#import "COAttachmentID.h"
 
 @implementation COItem (JSON)
 
@@ -17,7 +18,7 @@ static id plistValueForPrimitiveValue(id aValue, COType aType)
         case kCOTypeInt64: return aValue;
         case kCOTypeDouble: return aValue;
         case kCOTypeString: return aValue;
-        case kCOTypeAttachment:
+        case kCOTypeAttachment: return [[aValue dataValue] base64String];
         case kCOTypeBlob: return [aValue base64String];
         case kCOTypeCompositeReference:
             return [aValue stringValue];
@@ -81,7 +82,7 @@ static id valueForPrimitivePlistValue(id aValue, COType aType)
         case kCOTypeInt64: return aValue;
         case kCOTypeDouble: return basicNumberFromDecimalNumber(aValue);
         case kCOTypeString: return aValue;
-        case kCOTypeAttachment:
+        case kCOTypeAttachment: return [[COAttachmentID alloc] initWithData: [aValue base64DecodedData]];
         case kCOTypeBlob: return [aValue base64DecodedData];
         case kCOTypeCompositeReference:
             return [ETUUID UUIDWithString: aValue];

@@ -67,7 +67,7 @@ enum {
      * A token which can be given to COSQLiteStore to retrieve a local 
      * filesystem path to an immutable attached file.
      *
-     * Represented as NSData (a hash of the attached file's contents).
+     * Represented as COAttachmentID (a hash of the attached file's contents).
      */
     kCOTypeAttachment = 0x07,
    

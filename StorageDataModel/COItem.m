@@ -3,6 +3,7 @@
 #import <EtoileFoundation/ETUUID.h>
 #import "COPath.h"
 #import "COType.h"
+#import "COAttachmentID.h"
 
 static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 {
@@ -200,7 +201,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeAttachment)
 		{
-			for (NSData *embedded in [self allObjectsForAttribute: key])
+			for (COAttachmentID *embedded in [self allObjectsForAttribute: key])
 			{
 				[result addObject: embedded];
 			}

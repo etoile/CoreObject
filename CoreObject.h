@@ -52,6 +52,7 @@
 #import <CoreObject/COItemGraph.h>
 #import <CoreObject/COType.h>
 #import <CoreObject/COPath.h>
+#import <CoreObject/COAttachmentID.h>
 
 /* Store */
 

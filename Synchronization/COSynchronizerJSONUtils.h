@@ -8,6 +8,6 @@
 + (id) propertyListForRevisionsArray: (NSArray *)revs;
 + (NSArray *) revisionsArrayForPropertyList: (id)aPropertylist;
 
-+ (NSData *) searchForFirstMissingAttachmentIDInGraph: (id<COItemGraph>)aGraph store: (COSQLiteStore *)aStore;
++ (COAttachmentID *) searchForFirstMissingAttachmentIDInGraph: (id<COItemGraph>)aGraph store: (COSQLiteStore *)aStore;
 
 @end

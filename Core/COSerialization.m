@@ -15,6 +15,7 @@
 #import "COObjectGraphContext.h"
 #import "COObjectGraphContext+Private.h"
 #import "COPath.h"
+#import "COAttachmentID.h"
 #import "COPersistentRoot.h"
 #import "COEditingContext+Private.h"
 
@@ -115,6 +116,10 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
              || [value isKindOfClass: [COPath class]])
 	{
         return value;
+	}
+	else if ([value isKindOfClass: [COAttachmentID class]])
+	{
+		return value;
 	}
 	else if ([value isKindOfClass: [COObject class]])
 	{
@@ -281,6 +286,10 @@ serialization. */
 	else if ([self isSerializableScalarTypeName: typeName])
 	{
 		return kCOTypeString;
+	}
+	else if ([typeName isEqualToString: @"COAttachmentID"])
+	{
+		return kCOTypeAttachment;
 	}
 	else if ([self serializationGetterForProperty: [aPropertyDesc name]])
 	{
@@ -618,6 +627,16 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 			NSParameterAssert([value isKindOfClass: [NSData class]]);
 
 			if ([typeName isEqualToString: @"NSData"] == NO)
+			{
+				ETAssert([self respondsToSelector: [self serializationSetterForProperty: [aPropertyDesc name]]]);
+			}
+			return value;
+		}
+		else if (type == kCOTypeAttachment)
+		{
+			NSParameterAssert([value isKindOfClass: [COAttachmentID class]]);
+			
+			if ([typeName isEqualToString: @"COAttachmentID"] == NO)
 			{
 				ETAssert([self respondsToSelector: [self serializationSetterForProperty: [aPropertyDesc name]]]);
 			}

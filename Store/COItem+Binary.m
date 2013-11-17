@@ -2,6 +2,7 @@
 #import "COBinaryWriter.h"
 #import "COBinaryReader.h"
 #import "COPath.h"
+#import "COAttachmentID.h"
 #import <EtoileFoundation/Macros.h>
 
 typedef enum {
@@ -91,7 +92,7 @@ static void writePrimitiveValue(co_buffer_t *dest, id aValue, COType aType)
             }
             break;
         case kCOTypeAttachment:
-            co_buffer_store_bytes(dest, [aValue bytes], [aValue length]);
+            co_buffer_store_bytes(dest, [[aValue dataValue] bytes], [[aValue dataValue] length]);
             break;
         default:
             [NSException raise: NSInvalidArgumentException format: @"unknown type %d", aType];
@@ -248,8 +249,18 @@ static void co_read_bytes(void *ctx, const unsigned char *val, size_t size)
     switch (state->state)
     {
         case co_reader_expect_value:
-            co_read_object_value(state, [NSData dataWithBytes: val length: size]);
+		{
+			NSData *data = [NSData dataWithBytes: val length: size];
+			if (COTypePrimitivePart(state->currentType) == kCOTypeAttachment)
+            {
+				co_read_object_value(state, [[COAttachmentID alloc] initWithData: data]);
+			}
+			else
+			{
+				co_read_object_value(state, data);
+			}
             break;
+		}
         default:
             state->state = co_reader_error;
             break;

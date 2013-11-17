@@ -26,6 +26,7 @@
 #import "COSerialization.h"
 #import "COEditingContext+Private.h"
 #import "CORevision.h"
+#import "COAttachmentID.h"
 #include <objc/runtime.h>
 
 @implementation COObject
@@ -439,6 +440,7 @@ See +[NSObject typePrefix]. */
 - (BOOL)isCoreObjectValue: (id)value
 {  
 	return ([value isKindOfClass: [COObject class]]
+		 || [value isKindOfClass: [COAttachmentID class]]
 	     || [self isSerializablePrimitiveValue: value]
 	     || [self isSerializableScalarValue: value]
 		 || value == nil);

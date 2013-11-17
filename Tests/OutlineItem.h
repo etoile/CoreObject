@@ -8,5 +8,6 @@
 @property (weak, readonly, nonatomic) OutlineItem *parentContainer;
 @property (strong, readonly, nonatomic) NSSet *parentCollections;
 @property (readwrite, nonatomic, getter=isChecked, setter=setChecked:) BOOL checked;
+@property (readwrite, strong, nonatomic) COAttachmentID *attachmentID;
 
 @end

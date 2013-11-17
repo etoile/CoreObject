@@ -1,5 +1,6 @@
 #import "COSQLiteStore.h"
 #import "COSQLiteStore+Attachments.h"
+#import "COAttachmentID.h"
 #include <openssl/sha.h>
 
 @implementation COSQLiteStore (Attachments)
@@ -94,14 +95,16 @@ static NSData *dataFromHexString(NSString *hexString)
     return result;
 }
 
-- (NSURL *) URLForAttachmentID: (NSData *)aHash
+- (NSURL *) URLForAttachmentID: (COAttachmentID *)aHash
 {
-    NSParameterAssert([aHash length] == SHA_DIGEST_LENGTH);
-    return [[[self attachmentsURL] URLByAppendingPathComponent: hexString(aHash)]
+	NSData *data = [aHash dataValue];
+	
+    NSParameterAssert([data length] == SHA_DIGEST_LENGTH);
+    return [[[self attachmentsURL] URLByAppendingPathComponent: hexString(data)]
             URLByAppendingPathExtension: @"attachment"];
 }
 
-- (NSData *) importAttachmentFromURL: (NSURL *)aURL
+- (COAttachmentID *) importAttachmentFromURL: (NSURL *)aURL
 {
     NSFileManager *fm = [NSFileManager defaultManager];
     
@@ -115,7 +118,7 @@ static NSData *dataFromHexString(NSString *hexString)
     // Hash it
     
     NSData *hash = hashItemAtURL(aURL);
-    NSURL *attachmentURL = [self URLForAttachmentID: hash];
+    NSURL *attachmentURL = [self URLForAttachmentID: [[COAttachmentID alloc] initWithData: hash]];
     
     if (![fm fileExistsAtPath: [attachmentURL path]])
     {
@@ -127,7 +130,7 @@ static NSData *dataFromHexString(NSString *hexString)
         }
     }
     
-    return hash;
+    return [[COAttachmentID alloc] initWithData: hash];
 }
 
 - (NSArray *) attachments
@@ -149,14 +152,13 @@ static NSData *dataFromHexString(NSString *hexString)
     {
         NSString *attachmentHexString = [file stringByDeletingPathExtension];
         NSData *hash = dataFromHexString(attachmentHexString);
-        [result addObject: hash];
+        [result addObject: [[COAttachmentID alloc] initWithData: hash]];
     }
     return result;
 }
 
-- (BOOL) deleteAttachment: (NSData *)hash
+- (BOOL) deleteAttachment: (COAttachmentID *)hash
 {
-    NSParameterAssert([hash length] == SHA_DIGEST_LENGTH);
     return [[NSFileManager defaultManager] removeItemAtPath: [[self URLForAttachmentID: hash] path]
                                                       error: NULL];
 }

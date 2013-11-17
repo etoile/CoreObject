@@ -195,8 +195,8 @@
 
 - (void) testAttachment
 {
-    NSData *threeBytes = [NSData dataWithBytes: "xyz" length: 3];
-    NSData *zeroBytes = [NSData data];
+    COAttachmentID *threeBytes = [[COAttachmentID alloc] initWithData: [NSData dataWithBytes: "xyz" length: 3]];
+    COAttachmentID *zeroBytes = [[COAttachmentID alloc] initWithData: [NSData data]];
     
 	COMutableItem *item = [COMutableItem item];
     [item setValue: zeroBytes forAttribute: @"zeroBytes" type: kCOTypeAttachment];

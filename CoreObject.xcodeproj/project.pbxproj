@@ -154,6 +154,9 @@
 		66550C0517D51D2700327657 /* Tag.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E451D817CC565100205679 /* Tag.m */; };
 		66550C0717D51D9000327657 /* TestSQLiteStorePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550C0617D51D9000327657 /* TestSQLiteStorePerformance.m */; };
 		66550C0917D51E8F00327657 /* TestBinaryReadWritePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */; };
+		6660B3961839522B009007FD /* TestSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 6660B3951839522B009007FD /* TestSerialization.m */; };
+		6660B3A01839659D009007FD /* COAttachmentID.h in Headers */ = {isa = PBXBuildFile; fileRef = 6660B39E1839659D009007FD /* COAttachmentID.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6660B3A11839659D009007FD /* COAttachmentID.m in Sources */ = {isa = PBXBuildFile; fileRef = 6660B39F1839659D009007FD /* COAttachmentID.m */; };
 		6675F8C11785C02A001E5622 /* COItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BA1785C02A001E5622 /* COItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C21785C02A001E5622 /* COItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BB1785C02A001E5622 /* COItem.m */; };
 		6675F8C31785C02A001E5622 /* COItemGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BC1785C02A001E5622 /* COItemGraph.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -567,6 +570,9 @@
 		66550BF617D51CB100327657 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Benchmark/main.m; sourceTree = "<group>"; };
 		66550C0617D51D9000327657 /* TestSQLiteStorePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStorePerformance.m; path = Benchmark/TestSQLiteStorePerformance.m; sourceTree = "<group>"; };
 		66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBinaryReadWritePerformance.m; path = Benchmark/TestBinaryReadWritePerformance.m; sourceTree = "<group>"; };
+		6660B3951839522B009007FD /* TestSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestSerialization.m; sourceTree = "<group>"; };
+		6660B39E1839659D009007FD /* COAttachmentID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COAttachmentID.h; sourceTree = "<group>"; };
+		6660B39F1839659D009007FD /* COAttachmentID.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COAttachmentID.m; sourceTree = "<group>"; };
 		66618A8B1811C065001FA004 /* TERMINOLOGY */ = {isa = PBXFileReference; lastKnownFileType = text; name = TERMINOLOGY; path = Documentation/TERMINOLOGY; sourceTree = "<group>"; };
 		6675F8BA1785C02A001E5622 /* COItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItem.h; sourceTree = "<group>"; };
 		6675F8BB1785C02A001E5622 /* COItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COItem.m; sourceTree = "<group>"; };
@@ -1021,6 +1027,8 @@
 				6675F8BF1785C02A001E5622 /* COPath.m */,
 				6675F8C01785C02A001E5622 /* COType.h */,
 				668084CE17900C35003A3CC6 /* COType.m */,
+				6660B39E1839659D009007FD /* COAttachmentID.h */,
+				6660B39F1839659D009007FD /* COAttachmentID.m */,
 			);
 			path = StorageDataModel;
 			sourceTree = "<group>";
@@ -1192,6 +1200,7 @@
 				66E40D361836D08D00E5B4A7 /* TestObjectUpdate.m */,
 				66E40D371836D08D00E5B4A7 /* TestPersistentRoot.m */,
 				66E40D381836D08D00E5B4A7 /* TestRevisionNumber.m */,
+				6660B3951839522B009007FD /* TestSerialization.m */,
 			);
 			name = Core;
 			path = Tests/Core;
@@ -1438,6 +1447,7 @@
 				66FD34B61832055900898381 /* COSynchronizerJSONServer.h in Headers */,
 				6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */,
 				6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */,
+				6660B3A01839659D009007FD /* COAttachmentID.h in Headers */,
 				66405DD1182A255800A6EF7A /* COSynchronizerServer.h in Headers */,
 				66FD349A18314BC200898381 /* COSynchronizerJSONUtils.h in Headers */,
 				66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */,
@@ -1736,6 +1746,7 @@
 				609C01AD170AC93100D01AAB /* NSObject+CoreObject.m in Sources */,
 				6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */,
 				6675F8C21785C02A001E5622 /* COItem.m in Sources */,
+				6660B3A11839659D009007FD /* COAttachmentID.m in Sources */,
 				6675F8C41785C02A001E5622 /* COItemGraph.m in Sources */,
 				6675F8C61785C02A001E5622 /* COPath.m in Sources */,
 				66094847178794D40049468B /* COItem+JSON.m in Sources */,
@@ -1815,6 +1826,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6660B3961839522B009007FD /* TestSerialization.m in Sources */,
 				66E40D661836D08D00E5B4A7 /* TestItemGraphDiff.m in Sources */,
 				66E40D5E1836D08D00E5B4A7 /* TestEditingContext.m in Sources */,
 				66E40D621836D08D00E5B4A7 /* TestObjectGraphContext.m in Sources */,

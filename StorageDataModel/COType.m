@@ -1,6 +1,7 @@
 #import "COType.h"
 #import <EtoileFoundation/ETUUID.h>
 #import "COPath.h"
+#import "COAttachmentID.h"
 
 static NSString *
 COTypeMultivalueDescription(COType type)
@@ -64,7 +65,7 @@ COTypePrimitiveValidateObject(COType type, id anObject)
         case kCOTypeCompositeReference: return [anObject isKindOfClass: [ETUUID class]]
             || [anObject isKindOfClass: [COPath class]]
             || anObject == [NSNull null];
-        case kCOTypeAttachment: return [anObject isKindOfClass: [NSData class]]
+        case kCOTypeAttachment: return [anObject isKindOfClass: [COAttachmentID class]]
             || anObject == [NSNull null];
     }
     return NO;

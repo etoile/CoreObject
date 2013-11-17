@@ -500,8 +500,8 @@ static ETUUID *childUUID2;
                         encoding: NSUTF8StringEncoding
 						   error: NULL];
     
-    NSData *hash1 = [store importAttachmentFromURL: [NSURL fileURLWithPath: path1]];
-    NSData *hash2 = [store importAttachmentFromURL: [NSURL fileURLWithPath: path2]];
+    COAttachmentID *hash1 = [store importAttachmentFromURL: [NSURL fileURLWithPath: path1]];
+    COAttachmentID *hash2 = [store importAttachmentFromURL: [NSURL fileURLWithPath: path2]];
     
     UKObjectsEqual(fakeAttachment1, [NSString stringWithContentsOfURL: [store URLForAttachmentID: hash1]
                                                              encoding: NSUTF8StringEncoding
@@ -525,7 +525,7 @@ static ETUUID *childUUID2;
                               encoding: NSUTF8StringEncoding
 								 error: NULL]);
     
-    NSData *hash = [store importAttachmentFromURL: [NSURL fileURLWithPath: path]];
+    COAttachmentID *hash = [store importAttachmentFromURL: [NSURL fileURLWithPath: path]];
     UKNotNil(hash);
     
     NSString *internalPath = [[store URLForAttachmentID: hash] path];
@@ -581,7 +581,7 @@ static ETUUID *childUUID2;
                      atomically: YES
                        encoding: NSUTF8StringEncoding
                          error: NULL];
-    NSData *hash = [store importAttachmentFromURL: [NSURL fileURLWithPath: path]];
+    COAttachmentID *hash = [store importAttachmentFromURL: [NSURL fileURLWithPath: path]];
     
     UKObjectsEqual(fakeAttachment, [NSString stringWithContentsOfURL: [store URLForAttachmentID: hash]
                                                             encoding: NSUTF8StringEncoding

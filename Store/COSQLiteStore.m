@@ -30,7 +30,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 @interface COSQLiteStore (AttachmentsPrivate)
 
 - (NSArray *) attachments;
-- (BOOL) deleteAttachment: (NSData *)hash;
+- (BOOL) deleteAttachment: (COAttachmentID *)hash;
 
 @end
 
@@ -553,12 +553,15 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         }
         
         // Look for attachments
-        for (NSData *attachment in [itemToIndex attachments])
+        for (COAttachmentID *attachment in [itemToIndex attachments])
         {
-            [db_ executeUpdate: @"INSERT INTO attachment_refs(root_id, revid, attachment_hash) VALUES(?,?,?)",
-             backingUUIDData ,
-             [aRevision dataValue],
-             attachment];
+			if ((id)attachment != [NSNull null])
+			{
+				[db_ executeUpdate: @"INSERT INTO attachment_refs(root_id, revid, attachment_hash) VALUES(?,?,?)",
+				 backingUUIDData ,
+				 [aRevision dataValue],
+				 [attachment dataValue]];
+			}
         }
     }
     NSString *allItemsFtsContent = [ftsContent componentsJoinedByString: @" "];    
@@ -823,11 +826,11 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     FMResultSet *rs = [db_ executeQuery: @"SELECT attachment_hash FROM attachment_refs"];
     while ([rs next])
     {
-        [garbage removeObject: [rs dataForColumnIndex: 0]];
+        [garbage removeObject: [[COAttachmentID alloc] initWithData: [rs dataForColumnIndex: 0]]];
     }
     [rs close];
 
-    for (NSData *hash in garbage)
+    for (COAttachmentID *hash in garbage)
     {
         if (![self deleteAttachment: hash])
         {
