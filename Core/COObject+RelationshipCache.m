@@ -36,7 +36,10 @@ static BOOL isCoreObjectEntityType(ETEntityDescription *aType)
 
 static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescription *prop)
 {
-    return [prop isPersistent] && isCoreObjectEntityType([prop type]);
+	// NOTE: For now, we don't support keyed relationships, and we don't want to
+	// interpret a CODictionary as a relationship, when we use it as a
+	// multivalued collection.
+    return ([prop isPersistent] && isCoreObjectEntityType([prop type]) && ![prop isKeyed]);
 }
 
 - (void) removeCachedOutgoingRelationshipsForValue: (id)aValue

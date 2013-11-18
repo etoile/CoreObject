@@ -474,7 +474,7 @@ See +[NSObject typePrefix]. */
 	if ([self isCoreObjectRelationship: propertyDesc] == NO)
 		return;
 
-	if ([value isCollection])
+	if ([value isPrimitiveCollection])
 	{
 		ETAssert([propertyDesc isMultivalued]);
 
@@ -726,7 +726,7 @@ See +[NSObject typePrefix]. */
 	if ([self serializationGetterForProperty: [propertyDesc name]] != NULL)
 		return;
 
-	if ([newValue isCollection])
+	if ([newValue isPrimitiveCollection])
 	{
 		ETAssert([propertyDesc isMultivalued]);
 
