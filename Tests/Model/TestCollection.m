@@ -129,4 +129,22 @@
 	UKObjectsEqual(S(tagGroup), [tag tagGroups]);
 }
 
+- (void)testTag
+{
+	COTag *tag = [[ctx insertNewPersistentRootWithEntityName: @"COTag"] rootObject];
+	COObject *object = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+
+	UKObjectsEqual(S(@"tags"), [object multivaluedPropertyNames]);
+	UKObjectsEqual(S(@"objects", @"tagGroups", @"tags"), [tag multivaluedPropertyNames]);
+
+	UKObjectsEqual([ETUTI typeWithClass: [COObject class]], [tag objectType]);
+	UKTrue([[tag content] isKindOfClass: [NSMutableArray class]]);
+	UKTrue([[object tags] isKindOfClass: [NSSet class]]);
+
+	[tag addObject: object];
+
+	UKObjectsEqual(A(object), [tag content]);
+	UKObjectsEqual(S(tag), [object tags]);
+}
+
 @end

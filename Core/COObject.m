@@ -85,7 +85,6 @@ See +[NSObject typePrefix]. */
 	ETPropertyDescription *tags  =
 		[ETPropertyDescription descriptionWithName: @"tags" type: (id)@"COTag"];
 	[tags setMultivalued: YES];
-	[tags setOrdered: YES];
 
 	// TODO: Move these properties to EtoileFoundation (by adding a NSObject
 	// entity description) or just use -basicPropertyNames in
@@ -114,11 +113,11 @@ See +[NSObject typePrefix]. */
 	[typeDescription setDisplayName: _(@"Type")];
 
 	NSArray *transientProperties = A(UUID, isPersistent, isRoot, identifier,
-		displayName, revisionDescription, tagDescription, typeDescription);
+		displayName, revisionDescription, tagDescription, typeDescription, tags);
 #ifndef GNUSTEP
 	transientProperties = [transientProperties arrayByAddingObject: icon];
 #endif
-	NSArray *persistentProperties = A(isShared, name, tags);
+	NSArray *persistentProperties = A(isShared, name);
 	NSArray *properties =
 		[transientProperties arrayByAddingObjectsFromArray: persistentProperties];
 
@@ -609,6 +608,15 @@ See +[NSObject typePrefix]. */
 
 - (BOOL)isIncomingRelationship: (ETPropertyDescription *)propDesc
 {
+	if ([propDesc opposite] != nil && [propDesc isPersistent] && [[propDesc opposite] isPersistent])
+	{
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"For %@, %@ and its opposite are both declared as "
+		                     "persistent. For a persistent relationship, "
+		                     "CoreObject requires a single side to be declared "
+		                     "as persistent.", self, propDesc];
+	}
+
 	return (![propDesc isPersistent] && nil != [propDesc opposite] && [[propDesc opposite] isPersistent]);
 }
 
