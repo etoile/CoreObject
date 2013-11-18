@@ -237,7 +237,7 @@ extern NSString * const kCOBranchLabel;
 
 
 /**
- * Returns a new commit track by branching the receiver last revision and using 
+ * Returns a new branch by branching the receiver last revision and using 
  * the given label.
  *
  * The receiver must be committed.
@@ -246,20 +246,20 @@ extern NSString * const kCOBranchLabel;
  */
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel;
 /**
- * Returns a new commit track by branching a particular revision and using
- * the given label.
+ * Returns a new branch by branching a particular revision and using the given 
+ * label.
  *
- * The revision must belong to the receiver track, otherwise a 
+ * The revision must belong to the receiver and not a parent branch, otherwise a 
  * NSInvalidArgumentException is raised.
  *
  * The branch creation results in a new revision on the store structure track. 
  * See -[COStore createCommitTrackWithUUID:name:parentRevision:rootObjectUUID:persistentRootUUID:isNewPersistentRoot:].
  *
- * You can assign the returned commit track to the receiver persistent root to 
- * switch the current branch. For example:
+ * You can assign the returned branch to the receiver persistent root to switch 
+ * the current branch. For example:
  *
  * <example>
- * [persistentRoot setCommitTrack: [[persistentRoot commitTrack] makeBranchWithLabel: @"Sandbox"]];
+ * [persistentRoot setCurrentBranch: [[persistentRoot currentBranch] makeBranchWithLabel: @"Sandbox"]];
  * </example>
  *
  * One restriction is that the receiver must be committed - not a newly
@@ -268,20 +268,20 @@ extern NSString * const kCOBranchLabel;
  */
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev;
 /**
- * Returns a new persistent root bound to a new commit track by branching a 
- * particular revision.
+ * Returns a new persistent root by branching a particular revision.
  * 
  * The resulting persistent root is known as a cheap copy, because the copy 
  * doesn't cause the history leading to the new persistent root state to be 
  * duplicated in the store.
  *
- * Although we usually don't call a cheap copy a branch, the new commit track 
- * is a branch from the viewpoint of the history graph.
+ * The cheap copy current branch uses the receiver as its parent branch.
  *
- * The revision must belong to the receiver track, otherwise a
+ * The revision must belong to the receiver and not a parent branch, otherwise a 
  * NSInvalidArgumentException is raised.
  *
  * The receiver must be committed.
+ *
+ * See also -makeBranchWithLable:atRevision: and -[COPersistentRoot parentPersistentRoot].
  */
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev;
 

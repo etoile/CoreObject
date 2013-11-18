@@ -420,6 +420,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
     NILARG_EXCEPTION_TEST(aRev);
+	INVALIDARG_EXCEPTION_TEST(aRev, [[aRev branchUUID] isEqual: _UUID]);
     
     if ([self isBranchUncommitted])
     {
@@ -439,6 +440,15 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev
 {
+    NILARG_EXCEPTION_TEST(aRev);
+	INVALIDARG_EXCEPTION_TEST(aRev, [[aRev branchUUID] isEqual: _UUID]);
+
+    if ([self isBranchUncommitted])
+    {
+        /* See -makeBranchWithLabel:atRevision: exception explanation */
+        [NSException raise: NSGenericException
+		            format: @"uncommitted branches do not support -makeCopyFromRevision:"];
+    }
     return [[[self persistentRoot] editingContext] insertNewPersistentRootWithRevisionUUID: [aRev UUID]
 																			  parentBranch: self];
 }
