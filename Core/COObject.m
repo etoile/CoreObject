@@ -1003,7 +1003,7 @@ See +[NSObject typePrefix]. */
 
 - (NSUInteger)hash
 {
-	return [_UUID hash] ^ 0x39ab6f39b15233de;
+	return [_UUID hash] ^ [[[self persistentRoot] UUID] hash] ^ 0x39ab6f39b15233de;
 }
 
 - (BOOL)isEqual: (id)anObject
@@ -1016,7 +1016,7 @@ See +[NSObject typePrefix]. */
 	{
 		return NO;
 	}
-	if ([[anObject UUID] isEqual: _UUID])
+	if ([[anObject UUID] isEqual: _UUID] && [[[anObject persistentRoot] UUID] isEqual: [[self persistentRoot] UUID]])
 	{
 		return YES;
 	}

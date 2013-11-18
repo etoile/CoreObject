@@ -149,4 +149,22 @@
 	UKStringsEqual(@"bird", [object tagDescription]);
 }
 
+- (void)testCollectionContainingCheapCopyAndOriginal
+{
+	COTag *tag = [[ctx insertNewPersistentRootWithEntityName: @"COTag"] rootObject];
+	COObject *original = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+	
+	[ctx commit];
+
+	COObject *copy = [[[[original objectGraphContext] branch]
+		makeCopyFromRevision: [original revision]] rootObject];
+
+	[tag addObject: original];
+	[tag addObject: copy];
+
+	UKObjectsEqual(A(original, copy), [tag content]);
+	UKObjectsEqual(S(tag), [original tags]);
+	UKObjectsEqual(S(tag), [copy tags]);
+}
+
 @end

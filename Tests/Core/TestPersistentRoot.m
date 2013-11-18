@@ -215,7 +215,10 @@
 	UKObjectsEqual(persistentRoot, [copyRoot parentPersistentRoot]);
 	UKFalse([persistentRoot isCopy]);
 	UKTrue([copyRoot isCopy]);
-	
+
+	UKObjectsEqual([rootObj UUID], [[copyRoot rootObject] UUID]);
+	UKObjectsNotEqual(rootObj, [copyRoot rootObject]);
+
     [ctx commit];
 	
 	[self checkPersistentRootWithExistingAndNewContext: copyRoot
