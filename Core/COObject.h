@@ -393,7 +393,7 @@
  *
  * The returned collection contains COTag objects.
  */
-@property (nonatomic, readonly) NSArray *tags;
+@property (nonatomic, readonly) NSSet *tags;
 
 
 /** @taskunit Property-Value Coding */

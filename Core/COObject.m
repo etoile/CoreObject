@@ -263,6 +263,8 @@ See +[NSObject typePrefix]. */
 	if (_isPrepared)
 		return self;
 
+	NILARG_EXCEPTION_TEST(aContext);
+
 	ETModelDescriptionRepository *repo = [aContext modelRepository];
 	return [self prepareWithUUID: [ETUUID UUID]
 	           entityDescription: [repo entityDescriptionForClass: [self class]]
@@ -367,7 +369,7 @@ See +[NSObject typePrefix]. */
 	[self didChangeValueForProperty: @"name"];
 }
 
-- (NSArray *)tags
+- (NSSet *)tags
 {
 	return [self valueForVariableStorageKey: @"tags"];
 }
@@ -1085,7 +1087,8 @@ See +[NSObject typePrefix]. */
 
 - (NSString *)tagDescription
 {
-	return [(NSArray *)[[[self tags] mappedCollection] tagString] componentsJoinedByString: @", "];
+	return [(NSArray *)[[[[self tags] allObjects] mappedCollection] tagString]
+		componentsJoinedByString: @", "];
 }
 
 #pragma mark - Framework Private

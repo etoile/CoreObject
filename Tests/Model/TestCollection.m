@@ -142,9 +142,11 @@
 	UKTrue([[object tags] isKindOfClass: [NSSet class]]);
 
 	[tag addObject: object];
+	[tag setName: @"bird"];
 
 	UKObjectsEqual(A(object), [tag content]);
 	UKObjectsEqual(S(tag), [object tags]);
+	UKStringsEqual(@"bird", [object tagDescription]);
 }
 
 @end
