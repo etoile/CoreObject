@@ -204,6 +204,11 @@ Future Work
 
 	[a nodes] will not equal [b nodes] but I would expect them to be the equal
 
+  - It looks like, when applying a 'set current version' action does a selective
+    undo/redo, we may get better merges in the future if we rewrite the action
+	to use the revision created from the selective undo/redo. See comment in 
+	-[TestUndo testSelectiveUndoRedoOfCommands2]
+
 
 - Model objects (COObject subclasses included with CoreObject for convenience)
 
