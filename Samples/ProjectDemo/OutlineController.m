@@ -458,6 +458,8 @@ static int i = 0;
 				
 				NSURL *tempURL = [NSURL fileURLWithPath: [NSTemporaryDirectory() stringByAppendingPathComponent: [item label]]];
 				
+				[[NSFileManager defaultManager] removeItemAtURL: tempURL error: NULL];
+				
 				if ([[NSFileManager defaultManager] copyItemAtURL: attachmentPrivateURL
 														toURL: tempURL
 														error: NULL])
