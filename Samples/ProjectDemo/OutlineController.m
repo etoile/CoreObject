@@ -451,13 +451,35 @@ static int i = 0;
 		}
 		else if ([item isKindOfClass: [OutlineItem class]])
 		{
-			// setting a double action on an outline view seems to break normal editing
-			// so we hack it in here.
-			
-			[outlineView editColumn: 0
-								row: [outlineView selectedRow]
-						  withEvent: nil
-							 select: YES];
+			if (((OutlineItem *)item).attachmentID != nil)
+			{
+				COAttachmentID *attachmentID = ((OutlineItem *)item).attachmentID;
+				NSURL *attachmentPrivateURL = [[[self persistentRoot] store] URLForAttachmentID: attachmentID];
+				
+				NSURL *tempURL = [NSURL fileURLWithPath: [NSTemporaryDirectory() stringByAppendingPathComponent: [item label]]];
+				
+				if ([[NSFileManager defaultManager] copyItemAtURL: attachmentPrivateURL
+														toURL: tempURL
+														error: NULL])
+				{
+					[[NSWorkspace sharedWorkspace] openURL: tempURL];
+				}
+				else
+				{
+					NSLog(@"Failed to open attachment '%@'. The file %@ probably does not exist in the store.",
+						  [item label], [attachmentPrivateURL path]);
+				}
+			}
+			else
+			{
+				// setting a double action on an outline view seems to break normal editing
+				// so we hack it in here.
+				
+				[outlineView editColumn: 0
+									row: [outlineView selectedRow]
+							  withEvent: nil
+								 select: YES];
+			}
 		}
 	}
 }
@@ -682,11 +704,11 @@ static int i = 0;
 		if (plist != nil)
 		{
 			NSURL *fileURL = [NSURL URLWithString: plist];
-			NSData *attachmentID = [[[self editingContext] store] importAttachmentFromURL: fileURL];
+			COAttachmentID *attachmentID = [[[self editingContext] store] importAttachmentFromURL: fileURL];
 			
 			OutlineItem *item = [[OutlineItem alloc] initWithObjectGraphContext: [newParent objectGraphContext]];
-			item.label = [NSString stringWithFormat: @"%@ imported as %@", fileURL, attachmentID];
-			
+			item.label = [[fileURL path] lastPathComponent];
+			item.attachmentID = attachmentID;
 			[outlineItems addObject: item];
 		}
 	}

@@ -7,6 +7,7 @@
 @property (readwrite, nonatomic, retain) NSString *label;
 @property (readwrite, nonatomic, retain) OutlineItem *parent;
 @property (readwrite, nonatomic, retain) NSArray *contents;
+@property (readwrite, strong, nonatomic) COAttachmentID *attachmentID;
 
 - (OutlineItem*)root;
 

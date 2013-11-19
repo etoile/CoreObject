@@ -27,7 +27,11 @@
                                                                                  type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
     [labelProperty setPersistent: YES];
     
-    [outlineEntity setPropertyDescriptions: A(parentProperty, contentsProperty, labelProperty)];
+	ETPropertyDescription *attachmentProperty =
+		[ETPropertyDescription descriptionWithName: @"attachmentID" type: (id)@"Anonymous.COAttachmentID"];
+	[attachmentProperty setPersistent: YES];
+	
+    [outlineEntity setPropertyDescriptions: A(parentProperty, contentsProperty, labelProperty, attachmentProperty)];
     return outlineEntity;
 }
 
@@ -43,7 +47,7 @@
 @dynamic label;
 @dynamic parent;
 @dynamic contents;
-
+@dynamic attachmentID;
 - (OutlineItem*)root
 {
 	id root = self;
