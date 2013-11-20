@@ -231,18 +231,6 @@ serialization. */
 	{
 		return ([aPropertyDesc isComposite] ? kCOTypeCompositeReference : kCOTypeReference);
 	}
-	else if ([typeName isEqualToString: @"NSObject"])
-	{
-		/* For persistent relationship such as -[ETLayoutItem representedObject], 
-		   where the value must be a COObject entity type (or some derived kind) 
-		   to be persisted. For other NSObject derived instances, the 
-		   relationship is treated as transient.
-
-		   For such property, a serialization getter must be implemented to 
-		   return nil when the value is not a persistent COObject instance 
-		   (otherwise -serializedValueForValue: raises an exception).*/
-		return kCOTypeReference;
-	}
 	else if ([typeName isEqualToString: @"BOOL"]
 	      || [typeName isEqualToString: @"NSInteger"]
 	      || [typeName isEqualToString: @"NSUInteger"])
@@ -291,7 +279,7 @@ serialization. */
 	{
 		return kCOTypeAttachment;
 	}
-	else if ([self serializationGetterForProperty: [aPropertyDesc name]])
+	else if ([self serializationGetterForProperty: [aPropertyDesc name]] != NULL)
 	{
         // For a case like ETShape.pathResizeSelector, the COObject subclass
 		// implements -serializedPathResizeSelector to return an NSString.
@@ -311,6 +299,20 @@ serialization. */
         else if ([value isKindOfClass: [NSData class]])
 		{
 			return kCOTypeBlob;
+		}
+		else if ([value isKindOfClass: [COObject class]])
+		{
+			ETAssert([typeName isEqualToString: @"NSObject"]);
+
+			/* For persistent relationship such as -[ETLayoutItem representedObject], 
+			   where the value must be a COObject entity type (or some derived kind) 
+			   to be persisted. For other NSObject derived instances, the 
+			   relationship is treated as transient.
+
+			   For such property, a serialization getter must be implemented to 
+			   return nil when the value is not a persistent COObject instance 
+			   (otherwise -serializedValueForValue: raises an exception). */
+			return kCOTypeReference;
 		}
 		else if (value == nil)
 		{

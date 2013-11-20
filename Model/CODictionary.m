@@ -15,6 +15,7 @@
 
 @interface COObject ()
 - (id) copyWithZone: (NSZone *)aZone;
+- (BOOL) isCoreObjectEntityType: (ETEntityDescription *)aType;
 @end
 
 @implementation CODictionary
@@ -158,12 +159,47 @@
 #pragma mark Serialization
 #pragma mark -
 
+- (COType)serializedTypeForValue: (id)value
+{
+	if ([value isKindOfClass: [COObject class]])
+	{
+		return kCOTypeReference;
+	}
+	else if ([value isKindOfClass: [NSString class]])
+	{
+		return kCOTypeString;
+	}
+	else if ([value isKindOfClass: [NSNumber class]])
+	{
+		// TODO: A bit ugly, would be better to add new entity descriptions
+		// such as NSBOOLNumber, NSCGFloatNumber etc.
+		if (strcmp([value objCType], @encode(BOOL)) == 0
+		 || strcmp([value objCType], @encode(NSInteger)) == 0
+		 || strcmp([value objCType], @encode(NSUInteger)) == 0)
+		{
+			return kCOTypeInt64;
+		}
+		else if (strcmp([value objCType], @encode(CGFloat)) == 0
+		      || strcmp([value objCType], @encode(double)) == 0)
+		{
+			return kCOTypeDouble;
+		}
+	}
+	else if ([value isKindOfClass: [NSDate class]])
+	{
+		return kCOTypeBlob;
+	}
+	else
+	{
+		NSAssert1(NO, @"Unsupported serialization type for %@", value);
+	}
+	return 0;
+}
+
 - (COItem *)storeItem
 {
 	ETAssert(_content != nil);
 
-	ETModelDescriptionRepository *repo = [[[self persistentRoot] parentContext] modelRepository];
-	ETEntityDescription *rootType = [repo descriptionForName: @"Object"];
 	NSMutableDictionary *types =
 		[NSMutableDictionary dictionaryWithCapacity: [_content count]];
 	NSMutableDictionary *values =
@@ -171,14 +207,18 @@
 
 	for (NSString *key in [_content allKeys])
 	{
-		ETPropertyDescription *propertyDesc =
-			[ETPropertyDescription descriptionWithName: key type: rootType];
-		id serializedValue = [self serializedValueForValue: [_content objectForKey: key]];
+		id value = [_content objectForKey: key];
+		id serializedValue = [self serializedValueForValue: value];
+		// FIXME: Use [self serializedTypeForPropertyDescription: propertyDesc value: serializedValue];
+		// Look up the property description in the owner object entity
+		// description. For example, 'Group.personsByName' and 
+		// [[groupEntityDesc propertyDescriptionForName: @"personsByName"] type]
+		// just to get our element type.
 		NSNumber *serializedType =
-			[self serializedTypeForPropertyDescription: propertyDesc value: serializedValue];
+			[NSNumber numberWithInteger: [self serializedTypeForValue: value]];
 	
-		[values setObject: serializedValue forKey: [propertyDesc name]];
-		[types setObject: serializedType forKey: [propertyDesc name]];
+		[values setObject: serializedValue forKey: key];
+		[types setObject: serializedType forKey: key];
 	}
 
 	return [self storeItemWithTypes: types values: values];
