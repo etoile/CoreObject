@@ -37,6 +37,12 @@
 
 - (void) persistentRootDidChange: (NSNotification *)notif
 {
+	if (self.persistentRoot == nil)
+	{
+		NSLog(@"%@ outlasted the persistent root is was bound to.", self);
+		return;
+	}
+	
 	for (NSString *clientID in [self clientIDs])
 	{
 		[self sendPushToClient: clientID];

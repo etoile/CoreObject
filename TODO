@@ -61,11 +61,6 @@ First alpha release blockers
 
   - Simple diff visualization
 
-- Fix intermittent test failures (TestUndo.m:560, and -[TestSynchronization
-  testReplicateToClientWithoutPersistentRoot] exception about "COItem .. lacks an entity name")
-
-- Make attachments a bit more usable - currently can't declare them in the metamodel AFAIK
-
 
 Future Work
 -----------

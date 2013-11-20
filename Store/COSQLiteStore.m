@@ -1029,6 +1029,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         [db_ executeUpdate: @"DROP TABLE IF EXISTS attachment_refs"];
         [db_ executeUpdate: @"DROP TABLE IF EXISTS fts_docid_to_revisionid"];
         [db_ executeUpdate: @"DROP TABLE IF EXISTS fts"];
+		[db_ executeUpdate: @"DROP TABLE IF EXISTS storeMetadata"];
         [db_ commit];
         
         [self setupSchema];
