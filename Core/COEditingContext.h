@@ -58,13 +58,16 @@
 @end
 
 /**
- * An editing context exposes a CoreObject store snapshot as a working copy 
- * (in revision control system terminology).
- *
- * It queues changes and when the user requests it, it attempts to commit them 
- * to the store.
- *
- * FIXME: Expand
+ * @group Core
+ * @abstract An editing context exposes an in-memory snapshot of a CoreObject store,
+ * allows the user to queue changes in memory and commit them atomically.
+ * 
+ * This functionality is split across the classes COEditingContext, which handles
+ * persistent root insertion and deletion as well as general information about the
+ * store, COPersistentRoot, which handles state specific to a persistent root - 
+ * the metadata, the current branch, COBranch, which handles the state of a branch
+ * and COObjectGraphContext, which finally exposes the snapshot of inner objects
+ * in a branch and queues changes.
  *
  * @section Object Equality
  *
@@ -77,16 +80,12 @@
  *
  * @section Commits
  *
- * A commit involving multiple persistent roots or branches is not atomic, it 
- * results in a new revision per persistent root branch that was containing 
- * changes.
- * In addition to branch content changes that result in new revisions, a commit 
- * can create various store stucture changes (e.g. renaming a branch, deleting a 
- * persistent root) not visible in the store history. You can use COUndoTrack 
- * to record all these changes as commands.
- * 
+ * In the current implementation, all changes made in a COEditingContext are
+ * committed atomically. However, it is best to think of atomicity only existing
+ * per-persistent root, since persistent roots are the units of versioning.
+ *
  * We usually advice to commit a single persistent root at time to prevent
- * multiple revisions per commit. In this way, you can provide precise undo/redo 
+ * multiple revisions per commit. In this way, you can provide precise undo/redo
  * support matching the user expectations.
  */
 @interface COEditingContext : NSObject <COPersistentObjectContext>
