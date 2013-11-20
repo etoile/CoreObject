@@ -517,40 +517,77 @@
 	UKObjectsEqual(@"child1a", [child1 label]);
 }
 
+- (void) checkCommandIsEndOfTrack: (id<COTrackNode>)aCommand
+{
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], aCommand);
+}
+
+- (void) checkCommand: (id<COTrackNode>)aCommand
+	 isSetVersionFrom: (CORevision *)a
+				   to: (CORevision *)b
+{
+	NSArray *subCommands = [(COCommandGroup *)aCommand contents];
+	UKIntsEqual(1, [subCommands count]);
+	
+	COCommandSetCurrentVersionForBranch *command = [subCommands firstObject];
+	UKObjectKindOf(command, COCommandSetCurrentVersionForBranch);
+	UKObjectsEqual(a, command.oldRevision);
+	UKObjectsEqual(b, command.revision);
+}
+
 - (void) testSelectiveUndoRedoOfCommands2
 {
     COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *root = [doc1 rootObject];
-	[ctx commitWithUndoTrack: _testTrack];
+	[ctx commit];
+	CORevision *r0 = [doc1 currentRevision];
 	
 	OutlineItem *child1 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[root addObject: child1];
 	[ctx commitWithUndoTrack: _testTrack];
-
+	CORevision *r1 = [doc1 currentRevision];
+	
 	OutlineItem *child2 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[root addObject: child2];
 	[ctx commitWithUndoTrack: _testTrack];
-
+	CORevision *r2 = [doc1 currentRevision];
+	
 	UKObjectsEqual((@[child1, child2]), [root contents]);
-	UKIntsEqual(4, [[_testTrack nodes] count]);
-	UKIntsEqual(3, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+	
+	// Check track contents
+	UKIntsEqual(2, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+	UKIntsEqual(3, [_testTrack.nodes count]);
+	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
+	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r1];
+	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r1 to: r2];
 	
 	// undo child1 insertion
-	id<COTrackNode> node = [[_testTrack nodes] objectAtIndex: 2];
-	UKObjectsNotEqual(node, [_testTrack currentNode]);
-	[_testTrack undoNode: node];
+	[_testTrack undoNode: _testTrack.nodes[1]];
+	CORevision *r3 = [doc1 currentRevision];
 	
 	UKObjectsEqual(@[child2], [root contents]);
-	UKIntsEqual(2, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+	
+	// Check track contents
+	UKIntsEqual(1, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
 	UKTrue([_testTrack canUndo]);
+	UKTrue([_testTrack canRedo]);
+	UKIntsEqual(3, [_testTrack.nodes count]);
+	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
+	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r1 to: r2];
+	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r0 to: r1];
 	
 	// undo child2 insertion
 	[_testTrack undo];
-
+	CORevision *r4 = [doc1 currentRevision];
 	UKObjectsEqual(@[], [root contents]);
-	UKIntsEqual(1, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
-	UKTrue([_testTrack canUndo]);
 
+	// Check track contents
+	UKIntsEqual(0, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+	UKIntsEqual(3, [_testTrack.nodes count]);
+	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
+	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r1 to: r2];
+	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r0 to: r1];
+	
 	// perform 2 redos
 	
 	UKTrue([_testTrack canRedo]);
