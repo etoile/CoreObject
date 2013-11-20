@@ -1001,6 +1001,7 @@ See +[NSObject typePrefix]. */
 
 #pragma mark - Hash and Equality
 
+// FIXME: Keep the hash stable when the object becoming persistent
 - (NSUInteger)hash
 {
 	return [_UUID hash] ^ [[[self persistentRoot] UUID] hash] ^ 0x39ab6f39b15233de;
@@ -1016,11 +1017,13 @@ See +[NSObject typePrefix]. */
 	{
 		return NO;
 	}
-	if ([[anObject UUID] isEqual: _UUID] && [[[anObject persistentRoot] UUID] isEqual: [[self persistentRoot] UUID]])
-	{
-		return YES;
-	}
-	return NO;
+
+	// NOTE: For transient object equality, we could test 
+	// [anObject objectGraphContext] == [self objectGraphContext], but this is
+	// useless because we can never have two objects using the same UUID in two
+	// transient object graph contexts, but only in two persistent roots.
+	return ([[anObject UUID] isEqual: _UUID]
+		&& [[[anObject persistentRoot] UUID] isEqual: [[self persistentRoot] UUID]]);
 }
 
 - (BOOL)isTemporallyEqual: (id)anObject

@@ -69,6 +69,56 @@
 	UKRaisesException([[COObject alloc] init]);
 }
 
+- (void) testEquality
+{
+	COObject *object = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+	COObject *otherObject = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+	COBookmark *bookmark = [[ctx insertNewPersistentRootWithEntityName: @"COBookmark"] rootObject];
+
+	UKObjectsEqual(object, object);
+	UKObjectsEqual(bookmark, bookmark);
+
+	UKObjectsNotEqual(object, otherObject);
+	UKObjectsNotEqual(otherObject, object);
+	UKObjectsNotEqual(object, bookmark);
+	UKObjectsNotEqual(bookmark, object);
+
+	NSSet *objects = S(object, bookmark, otherObject);
+
+ 	/* See also -[TestCollection testCollectionContainingCheapCopyAndOriginal] */
+	UKObjectsEqual(objects, S(bookmark, object, otherObject));
+	UKTrue([objects containsObject: object]);
+	UKTrue([objects containsObject: bookmark]);
+	UKTrue([objects containsObject: otherObject]);
+}
+
+#if 0
+- (void) testEqualityFromTransienceToPersistence
+{
+	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
+	COObject *object = [[COObject alloc] initWithObjectGraphContext: objectGraphContext];
+	NSUInteger hash = [object hash];
+
+	/* For testing the hash stability with -[NSSet containsObject:], we must 
+	   insert the objects in the set before object becomes persistent */
+	COBookmark *bookmark = [[ctx insertNewPersistentRootWithEntityName: @"COBookmark"] rootObject];	
+	NSSet *objects = S(object, bookmark);
+
+	UKObjectsEqual(object, object);
+	
+	[ctx insertNewPersistentRootWithRootObject: object];
+
+	UKObjectsEqual(object, object);
+	/* For objects in collections, -hash must never change otherwise 
+	  -[NSSet containsObject:] reports wrong results (at least on Mac OS 10.7) */
+	UKIntsEqual(hash, [object hash]);
+
+	UKObjectsEqual(objects, S(bookmark, object));
+	UKTrue([objects containsObject: object]);
+	UKTrue([objects containsObject: bookmark]);
+}
+#endif
+
 - (void) testDetailedDescription
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];

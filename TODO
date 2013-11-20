@@ -22,6 +22,8 @@ First alpha release blockers
 
 	- All tests pass for both CoreObject and EtoileUI test suite
 
+- Fix -testEqualityFromTransienceToPersistence
+
 - Fix outdated COCommitDescriptor API doc and review properties (most properties should be read-only probably)
 
 - Check and update all Core API documentation (underway)
