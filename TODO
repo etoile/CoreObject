@@ -4,15 +4,29 @@ TODO
 First alpha release blockers
 ----------------------------
 
-- Fix libdispatch use which prevents CoreObject compilation on GNUstep, we should either extend libobjc2/toydispatch or migrate to the equivalent high-level ObjC API (using NSOperationQueue)
+- Fix test suite compilation on GNUstep
+
+	- Add -[NSNotificationCenter addObserverForName:object:queue:usingBlock:] to GNUstep
+
+	- For compatibility with the current GNUstep release, perhaps emulate -addObserverForName:object:queue:usingBlocks: in a category or TestCommon
+
+- Sort out libdispatch solutions on GNUstep
+
+	- In the long run, supporting weak symbols in libBlocksRuntime seems ideal (not yet the case in the LLVM repo)
+
+	- In the meantime, the best is probably to provide a custom libdispatch (patched for libobjc2 support) in GNUstep or Etoile repository
+
+- Fix GNUstep support
+
+	- Samples
+
+	- All tests pass for both CoreObject and EtoileUI test suite
 
 - Fix outdated COCommitDescriptor API doc and review properties (most properties should be read-only probably)
 
 - Check and update all Core API documentation (underway)
 
 - Check code quality for all Core classes (underway)
-
-- Fix GNUstep support
 
 - Write remaing class descriptions
 

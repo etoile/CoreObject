@@ -40,6 +40,13 @@ CoreObject_OBJC_FILES += $(wildcard Store/fmdb/src/FM*.m)
 
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += $(wildcard Tests/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Core/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Diff/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Model/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/StorageDataModel/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Store/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Undo/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Utilities/*.m)
 endif
 
 clean : test=yes
