@@ -51,4 +51,6 @@
 
 - (COCommandGroup *) inverse;
 
+- (COCommandGroup *) rewrittenCommandAfterCommitInContext: (COEditingContext *)aContext;
+
 @end

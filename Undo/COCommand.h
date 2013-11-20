@@ -62,6 +62,8 @@ extern NSString * const kCOCommandTimestamp;
  */
 - (COCommand *) inverse;
 
+- (COCommand *) rewrittenCommandAfterCommitInContext: (COEditingContext *)aContext;
+
 // FIXME: Perhaps distinguish between edits that can't be applied and edits that
 // are already applied. (e.g. "create branch", but that branch already exists)
 

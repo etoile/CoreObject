@@ -125,6 +125,8 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     }
     else
     {
+		_currentRevisionBeforeSelectiveApply = [[branch currentRevision] UUID];
+		
         COItemGraphDiff *merged = [self diffToSelectivelyApplyToContext: aContext];
         COItemGraph *oldGraph = [[proot store] itemGraphForRevisionUUID: _oldRevisionUUID persistentRoot: _persistentRootUUID];
         
@@ -144,6 +146,36 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 		// N.B. newHeadRevisionID is intentionally ignored here, it only applies
 		// if we were able to do a non-selective undo.
     }
+}
+
+- (COCommandSetCurrentVersionForBranch *) rewrittenCommandAfterCommitInContext: (COEditingContext *)aContext
+{
+	if (_currentRevisionBeforeSelectiveApply != nil)
+	{
+		NILARG_EXCEPTION_TEST(aContext);
+		
+		COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
+		COBranch *branch = [proot branchForUUID: _branchUUID];
+		ETAssert(branch != nil);
+	
+		
+		COCommandSetCurrentVersionForBranch *rewritten = [[COCommandSetCurrentVersionForBranch alloc] init];
+		rewritten.storeUUID = _storeUUID;
+		rewritten.persistentRootUUID = _persistentRootUUID;
+		
+		rewritten.branchUUID = _branchUUID;
+		
+		rewritten.oldRevisionUUID = _currentRevisionBeforeSelectiveApply;
+		rewritten.revisionUUID = [[branch currentRevision] UUID];
+		rewritten.oldHeadRevisionUUID = _currentRevisionBeforeSelectiveApply;
+		rewritten.headRevisionUUID = [[branch currentRevision] UUID];
+		return rewritten;
+	}
+	else
+	{
+		return self;
+	}
+
 }
 
 - (NSString *)kind

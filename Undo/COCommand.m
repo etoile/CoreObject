@@ -98,6 +98,12 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
     return nil;
 }
 
+- (COCommand *) rewrittenCommandAfterCommitInContext: (COEditingContext *)aContext
+{
+    [NSException raise: NSInvalidArgumentException format: @"override"];
+    return nil;
+}
+
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
     [NSException raise: NSInvalidArgumentException format: @"override"];
@@ -200,6 +206,11 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
 	return [((COSingleCommand *)object)->_storeUUID isEqual: _storeUUID]
 			&& [((COSingleCommand *)object)->_persistentRootUUID isEqual: _persistentRootUUID];
+}
+
+- (COCommand *) rewrittenCommandAfterCommitInContext: (COEditingContext *)aContex
+{
+	return self;
 }
 
 #pragma mark -

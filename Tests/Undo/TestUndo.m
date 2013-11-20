@@ -535,7 +535,7 @@
 	UKObjectsEqual(b, command.revision);
 }
 
-- (void) testSelectiveUndoRedoOfCommands2
+- (void) testSelectiveUndoRewritesCommands
 {
     COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *root = [doc1 rootObject];
@@ -574,7 +574,9 @@
 	UKIntsEqual(3, [_testTrack.nodes count]);
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r1 to: r2];
-	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r0 to: r1];
+	// child1 insertion was r0->r1, but the selective undo done by the -undoNode:
+	// call above rewrote it as r3->r2.
+	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r3 to: r2];
 	
 	// undo child2 insertion
 	[_testTrack undo];
@@ -585,28 +587,31 @@
 	UKIntsEqual(0, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
 	UKIntsEqual(3, [_testTrack.nodes count]);
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
-	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r1 to: r2];
-	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r0 to: r1];
+	// child2 insertion was r1->r2, but the selective undo done by the -undo
+	// call above rewrote it as r4->r3.
+	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r4 to: r3];
+	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r3 to: r2];
 	
 	// perform 2 redos
 	
 	UKTrue([_testTrack canRedo]);
 	[_testTrack redo];
 	UKObjectsEqual(@[child2], [root contents]);
+	// Test this this -redo was _not_ implemented as a selective undo, but as
+	// a linear redo.
+	UKObjectsEqual(r3, [doc1 currentRevision]);
 	
 	UKTrue([_testTrack canRedo]);
 	[_testTrack redo];
+	// Test this this -redo was _not_ implemented as a selective undo, but as
+	// a linear redo.
+	UKObjectsEqual(r2, [doc1 currentRevision]);
 	
-	// FIXME: This should really be @[child1, child2], but 50% of the time we
-	// get the order wrong, because the diff ends up being []->[1] + []->[2] = ? ([1,2] or [2,1] equally valid)
-	//
-	// The solution is, when we push the action to the
-	// action to the other undo/redo stack after selectively applying it, we should
-	// rewrite the action to use the revision UUID created by the selective undo/apply.
-	//
-	// That will give us a merge that preserves the correct order here.
 	
-	UKObjectsEqual(S(child1, child2), SA([root contents]));
+	// The point of the "command rewriting" with selective undo is to get better
+	// merges. Without the rewriting we have []->[1] + []->[2] = ? ([1,2] or [2,1] equally valid)
+	// with rewriting we get better results
+	UKObjectsEqual((@[child1, child2]), [root contents]);
 	UKFalse([_testTrack canRedo]);
 	UKTrue([_testTrack canUndo]);
 }

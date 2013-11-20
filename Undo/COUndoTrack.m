@@ -142,6 +142,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     NSString *actualStackName = [_store peekStackName: popStack forActionWithUUID: actionUUID forName: aName];
 	BOOL isUndo = [popStack isEqual: kCOUndoStack];
 	COCommandGroup *appliedEdit = (isUndo ? [edit inverse] : edit);
+	appliedEdit.UUID = edit.UUID;
 	
     if (![self canApplyEdit: appliedEdit toContext: aContext])
     {
@@ -164,9 +165,15 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     [aContext commit];
     aContext.isRecordingUndo = YES;
     
-    [_store pushAction: [edit propertyList] stack: pushStack forName: actualStackName];
+	COCommandGroup *rewrittenEdit = [appliedEdit rewrittenCommandAfterCommitInContext: aContext];
+	
+	COCommandGroup *editToPush = (isUndo ? [rewrittenEdit inverse] : rewrittenEdit);
+	editToPush.UUID = rewrittenEdit.UUID;
+    [_store pushAction: [editToPush propertyList] stack: pushStack forName: actualStackName];
     
-    return [_store commitTransaction];
+    BOOL ok = [_store commitTransaction];
+	[self reloadCommands];
+	return ok;
 }
 
 - (BOOL) popAndApplyFromStack: (NSString *)popStack

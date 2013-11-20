@@ -102,6 +102,22 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return inverse;
 }
 
+- (COCommandGroup *) rewrittenCommandAfterCommitInContext: (COEditingContext *)aContext
+{
+	NSMutableArray *rewrittenCommands = [NSMutableArray array];
+	
+    for (COCommand *command in _contents)
+    {
+        [rewrittenCommands addObject: [command rewrittenCommandAfterCommitInContext: aContext]];
+    }
+	
+    COCommandGroup *rewritten = [[COCommandGroup alloc] init];
+	rewritten.contents = rewrittenCommands;
+	rewritten.UUID = self.UUID;
+	rewritten.timestamp = self.timestamp;
+	return rewritten;
+}
+
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
 	NILARG_EXCEPTION_TEST(aContext);
