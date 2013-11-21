@@ -715,7 +715,9 @@ See +[NSObject typePrefix]. */
 
 	if ([propertyDesc isMultivalued] && [self isCoreObjectRelationship: propertyDesc])
 	{
-		id <ETCollection> oldCollection = [[self valueForStorageKey: key] mutableCopy];
+		// NOTE: We use -content to get the internal representation in case the
+		// collection is a CODictionary
+		id <ETCollection> oldCollection = [[[self valueForStorageKey: key] content] mutableCopy];
 
 		[_oldValues addObject: [ETKeyValuePair pairWithKey: key
 		                                             value: oldCollection]];
