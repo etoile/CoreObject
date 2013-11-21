@@ -123,8 +123,9 @@
 	}
 	else
 	{
-		name = [NSString stringWithFormat: @"org.etoile.projectdemo-%@",
-			[[doc persistentRoot] UUID]];
+		name = [NSString stringWithFormat: @"org.etoile.projectdemo-%@-%p",
+			[[doc persistentRoot] UUID],
+				self];
 	}
 	   
 	if ([self isSharing])

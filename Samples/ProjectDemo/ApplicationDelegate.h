@@ -19,6 +19,7 @@
 	COEditingContext *context;
 	
 	NSMutableDictionary *controllerForDocumentUUID;
+	NSMutableArray *controllers;
 }
 
 - (COEditingContext*)editingContext;
@@ -27,6 +28,8 @@
 - (IBAction) newTextDocument: (id)sender;
 - (IBAction) newOutline: (id)sender;
 - (IBAction) newDrawing: (id)sender;
+
+- (IBAction) newWindow: (id)sender;
 
 - (void)checkpointWithName: (NSString*)name;
 

@@ -94,6 +94,7 @@
 	}
 		
 	controllerForDocumentUUID = [[NSMutableDictionary alloc] init];
+	controllers = [NSMutableArray new];
 	
 	//[historyController setContext: context];
 	
@@ -134,6 +135,19 @@
 	[document setDocumentType: type];
 	
 	[self registerDocumentRootObject: document];
+}
+
+- (IBAction) newWindow: (id)sender
+{
+	id wc = [[NSApp mainWindow] windowController];
+	if (wc != nil && [wc respondsToSelector: @selector(projectDocument)])
+    {
+		Document *doc = [(OutlineController *)wc projectDocument];
+
+		OutlineController *controller = [[OutlineController alloc] initWithDocument: doc];
+		[controller showWindow: nil];
+		[controllers addObject: controller];
+	}
 }
 
 - (void) registerDocumentRootObject: (Document *)aDoc
