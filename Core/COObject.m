@@ -180,13 +180,24 @@ See +[NSObject typePrefix]. */
 	return variableStorage;
 }
 
+/**
+ * Declares the outgoing relationships allowed to contain cross persistent 
+ * references by putting keys in the cache. Each key is bound to empty 
+ * collection and represents an allowed relationship.
+ */
 - (NSMutableDictionary *)newOutgoingRelationshipCache
 {
 	NSMutableDictionary *variableStorage = [[NSMutableDictionary alloc] initWithCapacity: 5];
 
 	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
 	{
-		if ([propDesc isMultivalued] == NO || [propDesc isKeyed] || [propDesc isPersistent] == NO)
+		// NOTE: For now, we don't allow to-many relationships using the
+		// element type NSObject, to contain cross persistent root references.
+		// We just support this special case in to-one relationships such as
+		// ETLayoutItem.represententObject in EtoileUI, where the object can be
+		// either transient or persistent (a transient object will raise an
+		// exception at serialization time though).
+		if ([propDesc isMultivalued] == NO || [propDesc isKeyed] || [self isCoreObjectRelationship: propDesc] == NO)
 			continue;
 
 		ETAssert([propDesc isDerived] == NO);
