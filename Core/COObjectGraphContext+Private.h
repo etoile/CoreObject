@@ -18,6 +18,16 @@
  */
 - (void)setBranch: (COBranch *)aBranch;
 /**
+ * The branch UUID.
+ *
+ * If the receiver is transient, returns the future branch UUID that will be 
+ * used to create the branch in case the object graph context becomes persistent.
+ *
+ * Supporting a stable UUID for object graph contexts, means transient inner 
+ * objects have a stable -[COObject hash] even if they become persistent.
+ */
+@property (nonatomic, readonly) ETUUID *branchUUID;
+/**
  * This method is only exposed to be used internally by CoreObject.
  *
  * Returns the inner object bound to the given UUID in the object graph.

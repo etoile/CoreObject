@@ -92,7 +92,6 @@
 	UKTrue([objects containsObject: otherObject]);
 }
 
-#if 0
 - (void) testEqualityFromTransienceToPersistence
 {
 	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
@@ -117,7 +116,6 @@
 	UKTrue([objects containsObject: object]);
 	UKTrue([objects containsObject: bookmark]);
 }
-#endif
 
 - (void) testDetailedDescription
 {

@@ -22,8 +22,6 @@ First alpha release blockers
 
 	- All tests pass for both CoreObject and EtoileUI test suite
 
-- Fix -testEqualityFromTransienceToPersistence
-
 - Fix outdated COCommitDescriptor API doc and review properties (most properties should be read-only probably)
 
 - Check and update all Core API documentation (underway)
@@ -33,6 +31,16 @@ First alpha release blockers
 - Write remaing class descriptions
 
 - Implement batch mutation in ETCollection and proper KVO support on top of it in COObject
+
+- Add dictionary update tests to TestObjectUpdate.m
+
+	- Undo/redo causes -reloadAtRevision: 
+	                -> -setSerializedValue:forPropertyDescription: 
+					-> -willChangeValueForProperty:
+
+	-  We must ensure -willChangeValue:forProperty: and -didChangeValue:forProperty: support CODictionary (see r9653)
+	
+	- To solve this problem and other persistency issues in EtoileUI, a better solution is to hide CODictionary as an implementation detail. This would reduce the complexity a lot in COObject and public API, and in this way we can easily support relationships in keyed collections (probably even bidirectional ones if we want)
 
 - The hiding dead cross-references feature is broken and will be very complex to implement correctly:
   See:

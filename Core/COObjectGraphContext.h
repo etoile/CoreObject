@@ -34,6 +34,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 	@private
 	ETModelDescriptionRepository *_modelRepository;
 	COBranch *__weak _branch;
+	ETUUID *_futureBranchUUID;
     ETUUID *_rootObjectUUID;
 	/** Loaded (or inserted) objects by UUID */
     NSMutableDictionary *_loadedObjects;

@@ -63,6 +63,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     _updatedObjects = [[NSMutableSet alloc] init];
     _updatedPropertiesByObject = [[NSMapTable alloc] init];
     _branch = aBranch;
+	_futureBranchUUID = (aBranch == nil ? [ETUUID UUID] : nil);
     if (aRepo == nil)
     {
         aRepo = [[[_branch persistentRoot] editingContext] modelRepository];
@@ -123,6 +124,11 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 - (void)setBranch: (COBranch *)aBranch
 {
 	_branch = aBranch;
+}
+
+- (ETUUID *)branchUUID
+{
+	return (_branch != nil ? [_branch UUID] : _futureBranchUUID);
 }
 
 - (COPersistentRoot *)persistentRoot
