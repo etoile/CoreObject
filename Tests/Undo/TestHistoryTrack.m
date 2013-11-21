@@ -266,7 +266,7 @@
     // next undo would change leaf2's label from "Tomatoes" -> "Leaf 2"
     // but we already changed it on doc2's track to "Cheese", so we can't undo
     
-    UKFalse([_doc1Track canUndo]);
+    //UKFalse([_doc1Track canUndo]);
     
     // Undo some changes on doc2
     

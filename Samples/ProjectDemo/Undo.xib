@@ -68,7 +68,7 @@
 											<string key="NSFrameSize">{459, 305}</string>
 											<reference key="NSSuperview" ref="1018695483"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="908930679"/>
+											<reference key="NSNextKeyView" ref="939018643"/>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -76,7 +76,6 @@
 												<nil key="NSNextResponder"/>
 												<int key="NSvFlags">-2147481856</int>
 												<string key="NSFrameSize">{15, 20}</string>
-												<reference key="NSNextKeyView"/>
 											</object>
 											<array class="NSMutableArray" key="NSTableColumns">
 												<object class="NSTableColumn" id="1036122882">
@@ -248,7 +247,7 @@
 							<string key="NSFrame">{{-1, 44}, {461, 307}}</string>
 							<reference key="NSSuperview" ref="421255218"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="939018643"/>
+							<reference key="NSNextKeyView" ref="1018695483"/>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="908930679"/>
 							<reference key="NSHScroller" ref="88580517"/>
@@ -319,10 +318,10 @@
 						<object class="NSButton" id="913427906">
 							<reference key="NSNextResponder" ref="421255218"/>
 							<int key="NSvFlags">1825</int>
-							<string key="NSFrame">{{182, 6}, {132, 32}}</string>
+							<string key="NSFrame">{{313, 6}, {132, 32}}</string>
 							<reference key="NSSuperview" ref="421255218"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="342105433"/>
+							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="567920774">
@@ -332,31 +331,6 @@
 								<reference key="NSSupport" ref="312804117"/>
 								<string key="NSCellIdentifier">_NS:9</string>
 								<reference key="NSControlView" ref="913427906"/>
-								<int key="NSButtonFlags">-2038284288</int>
-								<int key="NSButtonFlags2">129</int>
-								<string key="NSAlternateContents"/>
-								<string key="NSKeyEquivalent"/>
-								<int key="NSPeriodicDelay">200</int>
-								<int key="NSPeriodicInterval">25</int>
-							</object>
-							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-						</object>
-						<object class="NSButton" id="342105433">
-							<reference key="NSNextResponder" ref="421255218"/>
-							<int key="NSvFlags">1825</int>
-							<string key="NSFrame">{{309, 6}, {136, 32}}</string>
-							<reference key="NSSuperview" ref="421255218"/>
-							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
-							<string key="NSReuseIdentifierKey">_NS:9</string>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSButtonCell" key="NSCell" id="699460804">
-								<int key="NSCellFlags">67108864</int>
-								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Selective Redo</string>
-								<reference key="NSSupport" ref="312804117"/>
-								<string key="NSCellIdentifier">_NS:9</string>
-								<reference key="NSControlView" ref="342105433"/>
 								<int key="NSButtonFlags">-2038284288</int>
 								<int key="NSButtonFlags2">129</int>
 								<string key="NSAlternateContents"/>
@@ -407,14 +381,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">selectiveRedo</string>
-						<reference key="source" ref="578893345"/>
-						<reference key="destination" ref="342105433"/>
-					</object>
-					<string key="id">ibL-ay-a5I</string>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">selectiveUndo</string>
 						<reference key="source" ref="578893345"/>
 						<reference key="destination" ref="913427906"/>
@@ -428,14 +394,6 @@
 						<reference key="destination" ref="913427906"/>
 					</object>
 					<string key="id">Rr3-Yo-LJB</string>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">selectiveRedo:</string>
-						<reference key="source" ref="578893345"/>
-						<reference key="destination" ref="342105433"/>
-					</object>
-					<string key="id">aLG-Ff-3Zj</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -519,7 +477,6 @@
 							<reference ref="461634304"/>
 							<reference ref="179151694"/>
 							<reference ref="1033688661"/>
-							<reference ref="342105433"/>
 							<reference ref="913427906"/>
 						</array>
 						<reference key="parent" ref="725831546"/>
@@ -618,19 +575,6 @@
 						<reference key="object" ref="567920774"/>
 						<reference key="parent" ref="913427906"/>
 					</object>
-					<object class="IBObjectRecord">
-						<string key="id">sXq-fl-EOh</string>
-						<reference key="object" ref="342105433"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="699460804"/>
-						</array>
-						<reference key="parent" ref="421255218"/>
-					</object>
-					<object class="IBObjectRecord">
-						<string key="id">TqC-Rf-NCy</string>
-						<reference key="object" ref="699460804"/>
-						<reference key="parent" ref="342105433"/>
-					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -669,7 +613,6 @@
 				<string key="Oeu-Ve-LC8.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="Oeu-Ve-LC8.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="Oeu-Ve-LC8.showNotes"/>
-				<string key="TqC-Rf-NCy.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="WXj-3B-l8x.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="WXj-3B-l8x.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="WXj-3B-l8x.showNotes"/>
@@ -680,7 +623,6 @@
 				<boolean value="NO" key="lra-UH-EF8.showNotes"/>
 				<string key="qqX-1g-4xr.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="qqX-1g-4xr.showNotes"/>
-				<string key="sXq-fl-EOh.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
 			<nil key="activeLocalization"/>

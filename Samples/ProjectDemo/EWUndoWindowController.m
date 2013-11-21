@@ -76,8 +76,7 @@
 
 	if (node != nil && nodeIndex != NSNotFound)
 	{
-		[selectiveUndo setEnabled: nodeIndex <= currentNodeIndex];
-		[selectiveRedo setEnabled: nodeIndex > currentNodeIndex];
+		[selectiveUndo setEnabled: YES];
 	}
 }
 

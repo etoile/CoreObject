@@ -165,9 +165,9 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     [aContext commit];
     aContext.isRecordingUndo = YES;
     
-	COCommandGroup *rewrittenEdit = [appliedEdit rewrittenCommandAfterCommitInContext: aContext];
+	COCommandGroup *rewrittenEdit = appliedEdit;// [appliedEdit rewrittenCommandAfterCommitInContext: aContext];
 	
-	COCommandGroup *editToPush = (isUndo ? [rewrittenEdit inverse] : rewrittenEdit);
+	COCommandGroup *editToPush = edit;//(isUndo ? [rewrittenEdit inverse] : rewrittenEdit);
 	editToPush.UUID = rewrittenEdit.UUID;
     [_store pushAction: [editToPush propertyList] stack: pushStack forName: actualStackName];
     
@@ -375,22 +375,27 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 - (void)undoNode: (id <COTrackNode>)aNode
 {
+	COUndoTrack *me = self; // FIXME: ARC hack
+	
 	INVALIDARG_EXCEPTION_TEST(aNode, [[self nodes] containsObject: aNode]);
 
-	[self popAndApplyCommand: (COCommandGroup *)aNode fromStack:kCOUndoStack pushToStack:kCORedoStack name:_name toContext:_editingContext];
+    NSString *actualStackName = [_store peekStackName: kCOUndoStack forActionWithUUID: [aNode UUID] forName: _name];
+	ETAssert(actualStackName != nil);
+	COUndoTrack *track = [COUndoTrack trackForName: actualStackName withEditingContext: _editingContext];
+	ETAssert(track != nil);
 	
+	COCommand *command = [(COCommand *)aNode inverse];
+	[command applyToContext: _editingContext];
+	[_editingContext commitWithUndoTrack: track];
+
 	[self reloadCommands];
 	[self didUpdate];
+	
+	NSLog(@"%@", me); // FIXME: ARC hack
 }
 
 - (void)redoNode: (id <COTrackNode>)aNode
 {
-	INVALIDARG_EXCEPTION_TEST(aNode, [[self nodes] containsObject: aNode]);
-
-	[self popAndApplyCommand: (COCommandGroup *)aNode fromStack:kCORedoStack pushToStack:kCOUndoStack name:_name toContext:_editingContext];
-	
-	[self reloadCommands];
-	[self didUpdate];
 }
 
 - (BOOL)isOrdered

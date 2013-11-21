@@ -9,6 +9,7 @@
 #import "CORevision.h"
 #import "CORevisionCache.h"
 
+#import "COLeastCommonAncestor.h"
 #import "COItemGraphDiff.h"
 #import "COObjectGraphContext.h"
 #import "COSQLiteStore.h"
@@ -82,28 +83,36 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     COItemGraphDiff *diff2 = [COItemGraphDiff diffItemTree: oldGraph withItemTree: currentGraph sourceIdentifier: @"diff2"];
     
     COItemGraphDiff *merged = [diff1 itemTreeDiffByMergingWithDiff: diff2];
+	
+	if([merged hasConflicts])
+	{
+		NSLog(@"Attempting to auto-resolve conflicts favouring the diff1...");
+		[merged resolveConflictsFavoringSourceIdentifier: @"diff1"];
+	}
+	
     return merged;
 }
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
-    // FIXME: Recalculates merge, wasteful
-    
-    COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
-    COBranch *branch = [proot branchForUUID: _branchUUID];
-	ETAssert(branch != nil);
-
-    if ([[[branch currentRevision] UUID] isEqual: _oldRevisionUUID])
-    {
-        return YES;
-    }
-    else
-    {
-        COItemGraphDiff *merged = [self diffToSelectivelyApplyToContext: aContext];
-        
-        return ![merged hasConflicts];
-    }
+	return YES;
+//	NILARG_EXCEPTION_TEST(aContext);
+//    // FIXME: Recalculates merge, wasteful
+//    
+//    COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
+//    COBranch *branch = [proot branchForUUID: _branchUUID];
+//	ETAssert(branch != nil);
+//
+//    if ([[[branch currentRevision] UUID] isEqual: _oldRevisionUUID])
+//    {
+//        return YES;
+//    }
+//    else
+//    {
+//        COItemGraphDiff *merged = [self diffToSelectivelyApplyToContext: aContext];
+//        
+//        return ![merged hasConflicts];
+//    }
 }
 
 - (void) applyToContext: (COEditingContext *)aContext
@@ -119,9 +128,15 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     {
         [branch setCurrentRevision:
             [aContext revisionForRevisionUUID: _newRevisionUUID persistentRootUUID: _persistentRootUUID]];
-		
-		[branch setHeadRevision:
-			[aContext revisionForRevisionUUID: _newHeadRevisionUUID persistentRootUUID: _persistentRootUUID]];
+	
+		if (![COLeastCommonAncestor isRevision: _newHeadRevisionUUID
+					 equalToOrParentOfRevision: _oldHeadRevisionUUID
+								persistentRoot: _persistentRootUUID
+										 store: [aContext store]])
+		{
+			[branch setHeadRevision:
+				[aContext revisionForRevisionUUID: _newHeadRevisionUUID persistentRootUUID: _persistentRootUUID]];
+		}
     }
     else
     {
