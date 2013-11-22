@@ -24,15 +24,13 @@
 {
     NSWindowController *wc = [(NSWindow*)[notif object] windowController];
     
-    if (wc != nil && [wc respondsToSelector: @selector(projectDocument)])
+    if ([wc isKindOfClass: [EWDocumentWindowController class]])
     {
-		Document *doc = [(OutlineController *)wc projectDocument];
-//        NSLog(@"Automatically changing inspected document to: %@", doc);
-        [self setInspectedDocument: doc];
+        [self setInspectedWindowController: (EWDocumentWindowController *)wc];
     }    
 }
 
-- (void) setInspectedDocument: (Document *)aDoc
+- (void) setInspectedWindowController: (EWDocumentWindowController *)aDoc
 {
     [self doesNotRecognizeSelector: _cmd];
 }

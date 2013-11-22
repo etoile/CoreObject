@@ -209,7 +209,7 @@
         {
             NSLog(@"switch to %@", commit);
             
-			OutlineController *controller = [(ApplicationDelegate *)[NSApp delegate] controllerForPersistentRoot:persistentRoot];
+			OutlineController *controller = (OutlineController *)[(ApplicationDelegate *)[NSApp delegate] controllerForPersistentRoot:persistentRoot];
 			[controller switchToRevision: commit];
         }
 	}

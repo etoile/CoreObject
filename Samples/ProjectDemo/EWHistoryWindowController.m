@@ -27,7 +27,7 @@
     [self setWindowFrameAutosaveName: @"pannerWindow"];
 }
 
-- (void) setInspectedDocument: (Document *)aDoc
+- (void) setInspectedWindowController: (EWDocumentWindowController *)aDoc
 {
 	[self setPersistentRoot: [aDoc persistentRoot]];
 }

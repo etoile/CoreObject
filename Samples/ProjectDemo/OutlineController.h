@@ -2,21 +2,21 @@
 #import "OutlineItem.h"
 #import "Document.h"
 #import "SharingSession.h"
+#import "EWDocumentWindowController.h"
 
-@interface OutlineController : NSWindowController <NSOutlineViewDelegate>
+@interface OutlineController : EWDocumentWindowController <NSOutlineViewDelegate>
 {
 	IBOutlet NSOutlineView *outlineView;
-	Document *doc; // weak ref
 
 	SharingSession * __weak _sharingSession;
 }
 
+
+
 @property (nonatomic, readwrite, weak) SharingSession *sharingSession;
 
-- (COPersistentRoot *) persistentRoot;
-- (COEditingContext *) editingContext;
-
-- (id)initWithDocument: (id)document;
+- (instancetype) initWithBranch: (COBranch *)aBranch
+					   windowID: (NSString*)windowID;
 
 - (Document*)projectDocument;
 - (OutlineItem*)rootObject;
@@ -40,6 +40,5 @@
 - (IBAction) showGraphvizHistoryGraph: (id)sender;
 
 - (void) switchToRevision: (CORevision *)aRevision;
-- (COUndoTrack *) undoStack;
 
 @end

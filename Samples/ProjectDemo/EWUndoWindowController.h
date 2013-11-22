@@ -16,7 +16,7 @@
 	IBOutlet NSButton *selectiveUndo;
 	IBOutlet NSButton *selectiveRedo;
 	
-    COPersistentRoot *_persistentRoot;
+	EWDocumentWindowController *wc;
 	COUndoTrack *_track;
 }
 

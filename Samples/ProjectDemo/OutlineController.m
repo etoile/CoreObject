@@ -20,7 +20,7 @@
 
 - (void) updateUIForSharingSession
 {
-	NSString *docName = [doc documentName];
+	NSString *docName = [self.doc documentName];
 	NSString *title;
 	if ([self isSharing])
 	{
@@ -52,26 +52,12 @@
 	}
 }
 
-- (id)initWithDocument: (id)document
+- (instancetype) initWithBranch: (COBranch *)aBranch
+					   windowID: (NSString*)windowID
 {
-	self = [super initWithWindowNibName: @"OutlineWindow"];
-	
-	if (!self) { return nil; }
-	
-	doc = document; // weak ref
-	
-	assert([self rootObject] != nil);
-	
-//	[[NSNotificationCenter defaultCenter] addObserver: self
-//											 selector: @selector(objectGraphContextObjectsDidChange:)
-//												 name: COObjectGraphContextObjectsDidChangeNotification
-//											   object: [document objectGraphContext]];
-
-	[[NSNotificationCenter defaultCenter] addObserver: self
-											 selector: @selector(objectGraphContextObjectsDidChange:)
-												 name: COPersistentRootDidChangeNotification
-											   object: [document persistentRoot]];
-
+	self = [super initWithBranch: aBranch
+						windowID: windowID
+				   windowNibName: @"OutlineWindow"];
 	
 	return self;
 }
@@ -81,67 +67,27 @@
 	return _sharingSession != nil;
 }
 
-- (void)dealloc
-{
-	[[NSNotificationCenter defaultCenter] removeObserver: self];
-}
 
-- (void)objectGraphContextObjectsDidChange: (NSNotification*)notif
+- (void) persistentRootDidChange: (NSNotification *)notif
 {
-	// HACK: We shouldn't keep the inner object in an ivar, since when the
-	// current branch changes, we need to get the new current object graph
-	// context. This is a workaround.
-	doc = [[doc persistentRoot] rootObject];
-	
     //NSLog(@"Reloading outline for %@", doc);
     [outlineView reloadData];
 }
 
 - (Document *)projectDocument
 {
-	return doc;
+	return [self.persistentRoot rootObject];
 }
 - (OutlineItem *)rootObject
 {
 	return (OutlineItem *)[[self projectDocument] rootDocObject];
 }
 
-+ (BOOL) isProjectUndo
-{
-	NSString *mode = [[NSUserDefaults standardUserDefaults] valueForKey: @"UndoMode"];
-	
-	return (mode == nil || [mode isEqualToString: @"Project"]);
-}
-
-- (COUndoTrack *) undoStack
-{
-    NSString *name = nil;
-	
-	if ([[self class] isProjectUndo])
-	{
-		name = @"org.etoile.projectdemo";
-	}
-	else
-	{
-		name = [NSString stringWithFormat: @"org.etoile.projectdemo-%@-%p",
-			[[doc persistentRoot] UUID],
-				self];
-	}
-	   
-	if ([self isSharing])
-	{
-		name = [name stringByAppendingFormat: @"-%@", [_sharingSession ourName]];
-	}
-	
-    return [COUndoTrack trackForName: name
-				  withEditingContext: [[doc persistentRoot] editingContext]];
-}
-
 - (void) commitWithIdentifier: (NSString *)identifier
 {
 	identifier = [@"org.etoile.ProjectDemo." stringByAppendingString: identifier];
 	
-	[[self persistentRoot] commitWithIdentifier: identifier metadata: nil undoTrack: [self undoStack] error:NULL];
+	[[self persistentRoot] commitWithIdentifier: identifier metadata: nil undoTrack: [self undoTrack] error:NULL];
 }
 
 - (void)windowDidLoad
@@ -154,12 +100,12 @@
 	
 	//NSLog(@"Got rect %@ for doc %@", NSStringFromRect([doc screenRectValue]), [doc uuid]);
 	
-	if (!NSIsEmptyRect([doc screenRect]))
-	{
-		// Disable automatic positioning
-		[self setShouldCascadeWindows: NO];
-		[[self window] setFrame: [doc screenRect] display: NO];
-	}
+//	if (!NSIsEmptyRect([doc screenRect]))
+//	{
+//		// Disable automatic positioning
+//		[self setShouldCascadeWindows: NO];
+//		[[self window] setFrame: [doc screenRect] display: NO];
+//	}
 
 	
 	[[NSNotificationCenter defaultCenter] addObserver: self
@@ -215,16 +161,6 @@ static int i = 0;
 	OutlineItem *dest = [[self selectedItem] parent];
 	if (dest == nil) { dest = [self rootObject]; }
 	return dest;
-}
-
-- (COPersistentRoot *) persistentRoot
-{
-	return [doc persistentRoot];
-}
-
-- (COEditingContext *) editingContext
-{
-	return [[doc persistentRoot] editingContext];
 }
 
 /* IB Actions */
@@ -305,20 +241,20 @@ static int i = 0;
 
 - (IBAction) shareWith: (id)sender
 {
-	[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] shareWithInspectorForDocument: doc];
+	[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] shareWithInspectorForDocument: self.doc];
 }
 
 - (IBAction)moveToTrash:(id)sender
 {
 	NSLog(@"Trash %@", self);
 	
-	[doc persistentRoot].deleted = YES;
+	self.persistentRoot.deleted = YES;
 	
-	NSMutableSet *docs = [[doc project] mutableSetValueForKey: @"documents"];
-	assert([docs containsObject: doc]);
-	[docs removeObject: doc];
+	NSMutableSet *docs = [[self.doc project] mutableSetValueForKey: @"documents"];
+	assert([docs containsObject: self.doc]);
+	[docs removeObject: self.doc];
 	
-	[[[doc persistentRoot] editingContext] commit];
+	[self.editingContext commit];
 	
 	// FIXME: Hack
 	[self close];
@@ -326,7 +262,7 @@ static int i = 0;
 
 - (void) switchToRevision: (CORevision *)aRevision
 {
-	[[doc persistentRoot] setCurrentRevision: aRevision];
+	[self.editingBranch setCurrentRevision: aRevision];
 	
 	[self commitWithIdentifier: @"revert"];
 }
@@ -335,7 +271,7 @@ static int i = 0;
 
 - (IBAction) projectDemoUndo: (id)sender
 {
-    COUndoTrack *stack = [self undoStack];
+    COUndoTrack *stack = [self undoTrack];
     
     if ([stack canUndo])
     {
@@ -344,7 +280,7 @@ static int i = 0;
 }
 - (IBAction) projectDemoRedo: (id)sender
 {
-    COUndoTrack *stack = [self undoStack];
+    COUndoTrack *stack = [self undoTrack];
 
     if ([stack canRedo])
     {
@@ -354,17 +290,17 @@ static int i = 0;
 
 - (IBAction) branch: (id)sender
 {
-    COBranch *branch = [[[doc persistentRoot] editingBranch] makeBranchWithLabel: @"Untitled"];
-    [[doc persistentRoot] setCurrentBranch: branch];
-    [[doc persistentRoot] commit];
+    COBranch *branch = [self.editingBranch makeBranchWithLabel: @"Untitled"];
+    [self.persistentRoot setCurrentBranch: branch];
+    [self.persistentRoot commit];
 }
 
 - (IBAction) stepBackward: (id)sender
 {
 	NSLog(@"Step back");
 	
-	if ([[[doc persistentRoot] editingBranch] canUndo])
-		[[[doc persistentRoot] editingBranch] undo];
+	if ([self.editingBranch canUndo])
+		[self.editingBranch undo];
 	
 	[self commitWithIdentifier: @"step-backward"];
 }
@@ -373,15 +309,15 @@ static int i = 0;
 {
 	NSLog(@"Step forward");
 	
-	if ([[[doc persistentRoot] editingBranch] canRedo])
-		[[[doc persistentRoot] editingBranch] redo];
+	if ([self.editingBranch canRedo])
+		[self.editingBranch redo];
 	
 	[self commitWithIdentifier: @"step-forward"];
 }
 
 - (IBAction) showGraphvizHistoryGraph: (id)sender
 {
-	[[[doc persistentRoot] store] showGraphForPersistentRootUUID: [[doc persistentRoot] UUID]];
+	[[self.persistentRoot store] showGraphForPersistentRootUUID: self.persistentRoot.UUID];
 }
 
 - (IBAction) history: (id)sender
@@ -439,7 +375,7 @@ static int i = 0;
 			id target = [item referencedItem];
 			
 			id root = [target root];
-			OutlineController *otherController = [(ApplicationDelegate *)[[NSApplication sharedApplication] delegate]
+			OutlineController *otherController = (OutlineController *)[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate]
 												  controllerForDocumentRootObject: root];
 			assert(otherController != nil);
 			
@@ -551,9 +487,7 @@ static int i = 0;
 	{
         NSPasteboardItem *item = [[NSPasteboardItem alloc] init];
         
-        // FIXME: Pass editing branch?
-		[item setPropertyList: @{ @"persistentRoot" : [[[outlineItem persistentRoot] UUID] stringValue],
-                                  @"uuid" : [[outlineItem UUID] stringValue] }
+		[item setPropertyList: [self pasteboardPropertyListForOutlineItem: outlineItem]
 					  forType: @"org.etoile.outlineItem"];
 		[pbItems addObject: item];
 	}
@@ -629,13 +563,29 @@ static int i = 0;
 
 #pragma mark drag & drop
 
+- (id) pasteboardPropertyListForOutlineItem: (OutlineItem *)outlineItem
+{
+	return @{ @"persistentRoot" : [[[outlineItem persistentRoot] UUID] stringValue],
+			  @"branch" : [[[outlineItem branch] UUID] stringValue],
+			  @"uuid" : [[outlineItem UUID] stringValue] };
+}
+
 - (OutlineItem *) outlineItemForPasteboardPropertyList: (id)plist
 {
     ETUUID *persistentRootUUID = [ETUUID UUIDWithString: plist[@"persistentRoot"]];
+	ETUUID *branchUUID = [ETUUID UUIDWithString: plist[@"branch"]];
     ETUUID *objectUUID = [ETUUID UUIDWithString: plist[@"uuid"]];
     
-    COPersistentRoot *persistentRoot = [[[doc persistentRoot] parentContext] persistentRootForUUID: persistentRootUUID];
-    return (OutlineItem *)[persistentRoot loadedObjectForUUID: objectUUID];
+    COPersistentRoot *persistentRoot = [self.editingContext persistentRootForUUID: persistentRootUUID];
+	ETAssert(persistentRoot != nil);
+	
+	COBranch *branch = [persistentRoot branchForUUID: branchUUID];
+	ETAssert(branch != nil);
+	
+    OutlineItem *result = (OutlineItem *)[[branch objectGraphContext] loadedObjectForUUID: objectUUID];
+	ETAssert(result != nil);
+	
+	return result;
 }
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
@@ -746,7 +696,7 @@ static int i = 0;
 	
 	for (OutlineItem *outlineItem in outlineItems)
 	{
-        if ([[outlineItem persistentRoot] isEqual: [doc persistentRoot]]
+        if ([[outlineItem persistentRoot] isEqual: self.persistentRoot]
 			&& !pasteCopy)
         {
 			// Move within persistent root
@@ -778,9 +728,9 @@ static int i = 0;
 			
             ETUUID *destUUID = [copier copyItemWithUUID: [outlineItem UUID]
                                               fromGraph: [outlineItem objectGraphContext]
-                                                toGraph: [doc objectGraphContext]];
+                                                toGraph: [self.doc objectGraphContext]];
             
-            OutlineItem *copy = (OutlineItem *)[[doc objectGraphContext] loadedObjectForUUID: destUUID];
+            OutlineItem *copy = (OutlineItem *)[[self.doc objectGraphContext] loadedObjectForUUID: destUUID];
 			
             if (insertionIndex == -1) { insertionIndex = [[newParent contents] count]; }
             
@@ -802,7 +752,7 @@ static int i = 0;
 				[oldParent removeItemAtIndex: oldIndex];
 			}
 			
-            OutlineController *sourceController = [(ApplicationDelegate *)[NSApp delegate] controllerForDocumentRootObject: [oldParent document]];
+            OutlineController *sourceController = (OutlineController *)[(ApplicationDelegate *)[NSApp delegate] controllerForDocumentRootObject: [oldParent document]];
 			
 			if (![[self class] isProjectUndo])
 			{
@@ -812,7 +762,7 @@ static int i = 0;
 			else
 			{
 				// Commit both persistent roots in one commit
-				[[[doc persistentRoot] editingContext] commitWithUndoTrack: [self undoStack]];
+				[self.editingContext commitWithUndoTrack: [self undoTrack]];
 			}
         }
 	}

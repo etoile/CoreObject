@@ -18,8 +18,7 @@
 	
 	COEditingContext *context;
 	
-	NSMutableDictionary *controllerForDocumentUUID;
-	NSMutableArray *controllers;
+	NSMutableDictionary *controllerForWindowID;
 }
 
 - (COEditingContext*)editingContext;
@@ -39,8 +38,11 @@
 - (IBAction)newProject: (id)sender;
 - (IBAction)deleteProject: (id)sender;
 
-- (OutlineController*)controllerForDocumentRootObject: (COObject*)rootObject;
-- (OutlineController*)controllerForPersistentRoot: (COPersistentRoot *)persistentRoot;
+// These return the 'first' controller for a given branch or persistent root,
+// however, there could be several.
+
+- (EWDocumentWindowController *)controllerForDocumentRootObject: (COObject*)rootObject;
+- (EWDocumentWindowController *)controllerForPersistentRoot: (COPersistentRoot *)persistentRoot;
 
 - (void)showSearchResults: (id)sender;
 

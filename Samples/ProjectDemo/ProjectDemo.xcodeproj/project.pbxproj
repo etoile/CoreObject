@@ -86,6 +86,7 @@
 		66A313611828C5CA00CE0B0D /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 66A3135F1828C5CA00CE0B0D /* Commits */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
+		66C3F7F1183EB6BA0044F5E1 /* EWDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3F7F0183EB6BA0044F5E1 /* EWDocumentWindowController.m */; };
 		66CA1844181A3E5B00DE6AFB /* Search.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66CA1843181A3E5B00DE6AFB /* Search.xib */; };
 		66CA184E181A3F4F00DE6AFB /* SearchWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66CA184D181A3F4F00DE6AFB /* SearchWindowController.m */; };
 		66D73786182597330023692B /* EWHistoryGraphView.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C76181AF40400BDD213 /* EWHistoryGraphView.m */; };
@@ -392,6 +393,8 @@
 		66C33E0A1290BC7700E5B15B /* SKTGridView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTGridView.m; sourceTree = "<group>"; };
 		66C33E0B1290BC7700E5B15B /* SKTInspectorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKTInspectorController.h; sourceTree = "<group>"; };
 		66C33E0C1290BC7700E5B15B /* SKTInspectorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTInspectorController.m; sourceTree = "<group>"; };
+		66C3F7EF183EB6BA0044F5E1 /* EWDocumentWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWDocumentWindowController.h; sourceTree = "<group>"; };
+		66C3F7F0183EB6BA0044F5E1 /* EWDocumentWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWDocumentWindowController.m; sourceTree = "<group>"; };
 		66CA1843181A3E5B00DE6AFB /* Search.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Search.xib; sourceTree = "<group>"; };
 		66CA184C181A3F4F00DE6AFB /* SearchWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchWindowController.h; sourceTree = "<group>"; };
 		66CA184D181A3F4F00DE6AFB /* SearchWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchWindowController.m; sourceTree = "<group>"; };
@@ -755,8 +758,8 @@
 		66708FEF124870CB00E65F00 /* ProjectDemo */ = {
 			isa = PBXGroup;
 			children = (
-				665D41DF182868300044E6B9 /* Undo Window */,
 				667C6C80181AF42B00BDD213 /* Branches Window */,
+				665D41DF182868300044E6B9 /* Undo Window */,
 				66E8EE0C12D673BB00780264 /* Search Window */,
 				7991190212CD3D36009D28C0 /* Project Navigator */,
 				66C33DED1290BC7700E5B15B /* Sketch */,
@@ -773,6 +776,8 @@
 				8D1107310486CEB800E47090 /* ProjectDemo-Info.plist */,
 				667C6C79181AF40400BDD213 /* EWUtilityWindowController.h */,
 				667C6C7A181AF40400BDD213 /* EWUtilityWindowController.m */,
+				66C3F7EF183EB6BA0044F5E1 /* EWDocumentWindowController.h */,
+				66C3F7F0183EB6BA0044F5E1 /* EWDocumentWindowController.m */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				6686B80B12550FE90065DE1A /* ApplicationDelegate.h */,
 				6686B80C12550FE90065DE1A /* ApplicationDelegate.m */,
@@ -1201,6 +1206,7 @@
 				661211D31821A568003AEC29 /* XMPPPlainAuthentication.m in Sources */,
 				6612118D1821A482003AEC29 /* DDTTYLogger.m in Sources */,
 				661211D81821A568003AEC29 /* XMPPElement.m in Sources */,
+				66C3F7F1183EB6BA0044F5E1 /* EWDocumentWindowController.m in Sources */,
 				661211D21821A568003AEC29 /* XMPPDigestMD5Authentication.m in Sources */,
 				661211DF1821A568003AEC29 /* XMPPStream.m in Sources */,
 				661211D71821A568003AEC29 /* NSXMLElement+XMPP.m in Sources */,

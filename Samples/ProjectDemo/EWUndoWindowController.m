@@ -31,20 +31,23 @@
     [table setTarget: self];
 }
 
-- (void) setInspectedDocument: (Document *)aDoc
+- (COBranch *)branch
 {
-	NSLog(@"UndoWindow: set inspected document");
-	
-    _persistentRoot = [aDoc persistentRoot];
-	
-	OutlineController *outline = [(ApplicationDelegate *)[NSApp delegate] controllerForPersistentRoot: _persistentRoot];
-	[self setUndoStack: [outline undoStack]];
+	return wc.editingBranch;
 }
 
-- (void) setUndoStack: (COUndoTrack *)stack
+- (COUndoTrack *)undoTrack
 {
-	_track = stack;
-	NSLog(@"Set undo stack %@ has %d items", _track, (int)[[_track nodes] count]);
+	return wc.undoTrack;
+}
+
+- (void) setInspectedWindowController: (EWDocumentWindowController *)aDoc
+{
+	NSLog(@"UndoWindow: set inspected document");
+
+	wc = aDoc;
+	_track = wc.undoTrack;
+	
     [table reloadData];
 	[self validateButtons];
 }
@@ -53,13 +56,10 @@
 {
     NSLog(@"undo track did change: %@", [notif userInfo]);
 	
-    OutlineController *outline = [(ApplicationDelegate *)[NSApp delegate] controllerForPersistentRoot: _persistentRoot];
-	[self setUndoStack: [outline undoStack]];
-}
-
-- (COUndoTrack *)undoStack
-{
-    return _track;
+	_track = wc.undoTrack;
+	
+    [table reloadData];
+	[self validateButtons];
 }
 
 - (void) validateButtons
@@ -132,15 +132,13 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    COUndoTrack *stack = [self undoStack];
-    const NSUInteger count = [[stack nodes] count];
+    const NSUInteger count = [[_track nodes] count];
     return count;
 }
 
 - (id<COTrackNode>) nodeAtIndex: (NSUInteger)anIndex
 {
-    COUndoTrack *stack = [self undoStack];
-    NSArray *nodes = [stack nodes];
+    NSArray *nodes = [_track nodes];
 	
 	if (anIndex >= [nodes count])
 		return nil;

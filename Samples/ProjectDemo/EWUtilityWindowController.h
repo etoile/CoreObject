@@ -1,5 +1,6 @@
 #import <Cocoa/Cocoa.h>
-#import "Document.h"
+
+#import "EWDocumentWindowController.h"
 
 /**
  * Abstract superclass for utility window controllers.
@@ -8,6 +9,6 @@
  */
 @interface EWUtilityWindowController : NSWindowController
 
-- (void) setInspectedDocument: (Document *)aDoc;
+- (void) setInspectedWindowController: (EWDocumentWindowController *)aDoc;
 
 @end

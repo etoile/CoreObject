@@ -93,8 +93,7 @@
 		NSLog(@"Creating a new project %@", [proot UUID]);
 	}
 		
-	controllerForDocumentUUID = [[NSMutableDictionary alloc] init];
-	controllers = [NSMutableArray new];
+	controllerForWindowID = [[NSMutableDictionary alloc] init];
 	
 	//[historyController setContext: context];
 	
@@ -144,9 +143,12 @@
     {
 		Document *doc = [(OutlineController *)wc projectDocument];
 
-		OutlineController *controller = [[OutlineController alloc] initWithDocument: doc];
+		NSString *windowID = [[ETUUID UUID] stringValue];
+		
+		OutlineController *controller = [[OutlineController alloc] initWithBranch: [doc branch]
+																		 windowID: windowID];
+		controllerForWindowID[windowID] = controller;
 		[controller showWindow: nil];
-		[controllers addObject: controller];
 	}
 }
 
@@ -162,9 +164,13 @@
 	
 	[newDocumentTypeWindow orderOut: nil];
     
-    // FIXME: Hack
-    [self projectDocumentsDidChange: proj];
+	NSString *windowID = [[ETUUID UUID] stringValue];
+	
+	EWDocumentWindowController *controller = [[OutlineController alloc] initWithBranch: [aDoc branch]
+																			  windowID: windowID];
+	[controller showWindow: nil];
 
+	controllerForWindowID[windowID] = controller;
 }
 
 - (IBAction) newTextDocument: (id)sender
@@ -184,7 +190,7 @@
 
 - (NSWindowController*) keyDocumentController
 {
-	for (NSWindowController *controller in [controllerForDocumentUUID allValues])
+	for (NSWindowController *controller in [controllerForWindowID allValues])
 	{
 		if ([[controller window] isKeyWindow])
 		{
@@ -247,86 +253,93 @@
 }
 
 
-
-- (OutlineController*)controllerForDocumentRootObject: (COObject*)rootObject
+- (EWDocumentWindowController*)controllerForDocumentRootObject: (COObject*)rootObject
 {
-	for (Project *project in [self projects])
+	for (EWDocumentWindowController *controller in [controllerForWindowID allValues])
 	{
-		for (Document *doc in [project documents])
+		if ([[[controller doc] rootObject] isEqual: rootObject])
 		{
-			if ([[[doc rootObject] UUID] isEqual: [rootObject UUID]])
-			{
-				return [controllerForDocumentUUID objectForKey: [doc UUID]];
-			}
+			return controller;
 		}
 	}
+	
+//	for (Project *project in [self projects])
+//	{
+//		for (Document *doc in [project documents])
+//		{
+//			if ([[[doc rootObject] UUID] isEqual: [rootObject UUID]])
+//			{
+//				return [controllerForDocumentUUID objectForKey: [doc UUID]];
+//			}
+//		}
+//	}
 	return nil;
 }
 
-- (OutlineController*)controllerForPersistentRoot: (COPersistentRoot *)persistentRoot
+- (EWDocumentWindowController*)controllerForPersistentRoot: (COPersistentRoot *)persistentRoot
 {
 	return [self controllerForDocumentRootObject: [persistentRoot rootObject]];
 }
 
 /* Project delegate */
 
-- (void)keyDocumentChanged: (NSNotification*)notif
-{
-	//NSLog(@"Key document changed to: %@", [self keyDocumentController]);
-	
-	[tagWindowController setDocument: [self keyDocument]];
-	
-	// FIXME: update inspectors	
-}
+//- (void)keyDocumentChanged: (NSNotification*)notif
+//{
+//	//NSLog(@"Key document changed to: %@", [self keyDocumentController]);
+//	
+//	[tagWindowController setDocument: [self keyDocument]];
+//	
+//	// FIXME: update inspectors	
+//}
 
 - (void)projectDocumentsDidChange: (Project*)p
 {
-	NSLog(@"projectDocumentsDidChange: called, loading %d documents", (int)[[p documents] count]);
-	
-	static NSDictionary *classForType;
-	if (classForType == nil)
-	{
-		classForType = [[NSDictionary alloc] initWithObjectsAndKeys:
-			[OutlineController class], @"outline",
-			[DrawingController class], @"drawing",
-			[TextController class], @"text",
-			nil];
-	}
-	
-	NSMutableSet *unwantedDocumentUUIDs = [NSMutableSet setWithArray:
-										   [controllerForDocumentUUID allKeys]];
-	
-	for (Document *doc in [p documents])
-	{
-		[unwantedDocumentUUIDs removeObject: [doc UUID]];
-		
-		OutlineController *controller = [controllerForDocumentUUID objectForKey: [doc UUID]];
-		if (controller == nil)
-		{
-			Class cls = [classForType objectForKey: [doc documentType]];
-			assert(cls != Nil);
-			
-			// Create a new document controller
-			controller = [[cls alloc] initWithDocument: doc];
-			[controller showWindow: nil];
-			[controllerForDocumentUUID setObject: controller forKey: [doc UUID]];
-			// Observe key document changes
-			[[NSNotificationCenter defaultCenter] addObserver: self
-													 selector: @selector(keyDocumentChanged:)
-														 name: NSWindowDidBecomeKeyNotification
-													   object: [controller window]];
-		}
-	}
-	
-	for (ETUUID *unwanted in unwantedDocumentUUIDs)
-	{
-		NSWindow *window = [[controllerForDocumentUUID objectForKey: unwanted] window];
-		[[NSNotificationCenter defaultCenter] removeObserver: self
-														name: NSWindowDidBecomeKeyNotification
-													  object: window];
-		[window orderOut: nil];
-		[controllerForDocumentUUID removeObjectForKey: unwanted];
-	}
+//	NSLog(@"projectDocumentsDidChange: called, loading %d documents", (int)[[p documents] count]);
+//	
+//	static NSDictionary *classForType;
+//	if (classForType == nil)
+//	{
+//		classForType = [[NSDictionary alloc] initWithObjectsAndKeys:
+//			[OutlineController class], @"outline",
+//			[DrawingController class], @"drawing",
+//			[TextController class], @"text",
+//			nil];
+//	}
+//	
+//	NSMutableSet *unwantedDocumentUUIDs = [NSMutableSet setWithArray:
+//										   [controllerForDocumentUUID allKeys]];
+//	
+//	for (Document *doc in [p documents])
+//	{
+//		[unwantedDocumentUUIDs removeObject: [doc UUID]];
+//		
+//		OutlineController *controller = [controllerForDocumentUUID objectForKey: [doc UUID]];
+//		if (controller == nil)
+//		{
+//			Class cls = [classForType objectForKey: [doc documentType]];
+//			assert(cls != Nil);
+//			
+//			// Create a new document controller
+//			controller = [[cls alloc] initWithDocument: doc];
+//			[controller showWindow: nil];
+//			[controllerForDocumentUUID setObject: controller forKey: [doc UUID]];
+//			// Observe key document changes
+//			[[NSNotificationCenter defaultCenter] addObserver: self
+//													 selector: @selector(keyDocumentChanged:)
+//														 name: NSWindowDidBecomeKeyNotification
+//													   object: [controller window]];
+//		}
+//	}
+//	
+//	for (ETUUID *unwanted in unwantedDocumentUUIDs)
+//	{
+//		NSWindow *window = [[controllerForDocumentUUID objectForKey: unwanted] window];
+//		[[NSNotificationCenter defaultCenter] removeObserver: self
+//														name: NSWindowDidBecomeKeyNotification
+//													  object: window];
+//		[window orderOut: nil];
+//		[controllerForDocumentUUID removeObjectForKey: unwanted];
+//	}
 }
 
 - (void) shareWithInspectorForDocument: (Document*)doc

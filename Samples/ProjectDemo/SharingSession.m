@@ -36,7 +36,7 @@
 	[_server addClientID: [_peerJID bare]];
 	
 	
-	OutlineController *docController = [(ApplicationDelegate *)[NSApp delegate]
+	OutlineController *docController = (OutlineController *)[(ApplicationDelegate *)[NSApp delegate]
 										controllerForDocumentRootObject: [aBranch rootObject]];
 	ETAssert(docController != nil);
 	[docController setSharingSession: self];
@@ -70,7 +70,7 @@
 	
 	[(ApplicationDelegate *)[NSApp delegate] registerDocumentRootObject: rootObject];
 	
-	OutlineController *docController = [(ApplicationDelegate *)[NSApp delegate]
+	OutlineController *docController = (OutlineController *)[(ApplicationDelegate *)[NSApp delegate]
 										controllerForDocumentRootObject: rootObject];
 	ETAssert(docController != nil);
 	[docController setSharingSession: self];
