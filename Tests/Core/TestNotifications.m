@@ -93,13 +93,6 @@
 	} postsNotification: COPersistentRootDidChangeNotification withCount: 0 fromObject: persistentRoot1 withUserInfo: nil];
 }
 
-- (void)testPersistentRootNotificationOnSetEditingBranchLocal
-{
-	[self checkBlock: ^(){
-		[persistentRoot1 setEditingBranch: branch2];
-	} postsNotification: COPersistentRootDidChangeNotification withCount: 0 fromObject: persistentRoot1 withUserInfo: nil];
-}
-
 - (void)testPersistentRootNotificationOnDeleteBranchLocal
 {
 	[self checkBlock: ^(){

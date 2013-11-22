@@ -233,11 +233,6 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
             [NSException raise: NSGenericException
 			            format: @"Can't delete the current branch"];
         }
-        if (self == [_persistentRoot editingBranch])
-        {
-            [NSException raise: NSGenericException
-			            format: @"Can't delete the editing branch"];
-        }
     }
     
     if (deleted)

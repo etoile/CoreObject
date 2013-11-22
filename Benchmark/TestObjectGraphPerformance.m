@@ -12,7 +12,7 @@
 - (void)testManyObjects
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	COObjectGraphContext *graph = [[persistentRoot editingBranch] objectGraphContext];
+	COObjectGraphContext *graph = [[persistentRoot currentBranch] objectGraphContext];
 	
 	NSLog(@"Starting performance test");
 	

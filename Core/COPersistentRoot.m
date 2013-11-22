@@ -225,29 +225,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     [self updateCrossPersistentRootReferences];
 }
 
-- (COBranch *)editingBranch
-{
-    if (_editingBranchUUID == nil)
-    {
-        return [self currentBranch];
-    }
-    
-	return [_branchForUUID objectForKey: _editingBranchUUID];
-}
-
-- (void)setEditingBranch: (COBranch *)aBranch
-{
-    if ([self isPersistentRootUncommitted])
-    {
-		// TODO: Use a CoreObject exception type
-        [NSException raise: NSGenericException
-		            format: @"A persistent root must be committed before you "
-		                     "can add or change its branches"];
-    }
-
-    _editingBranchUUID = [aBranch UUID];
-}
-
 - (NSSet *)branches
 {
     return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock:
@@ -299,7 +276,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (COObjectGraphContext *)objectGraphContext
 {
-    return [[self editingBranch] objectGraphContext];
+    return [[self currentBranch] objectGraphContext];
 }
 
 - (COSQLiteStore *)store
@@ -484,30 +461,29 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     
 	if ([self isPersistentRootUncommitted])
 	{		
-        ETAssert([self editingBranch] != nil);
-        ETAssert([self editingBranch] == [self currentBranch]);
+        ETAssert([self currentBranch] != nil);
         
         if (_cheapCopyRevisionUUID == nil)
         {
 			// FIXME: Move this into -createPersistentRootWithInitialItemGraph:
 			// and make that take a id<COItemGraph>
-			COItemGraph *graphCopy = [[COItemGraph alloc] initWithItemGraph: [[self editingBranch] objectGraphContext]];
+			COItemGraph *graphCopy = [[COItemGraph alloc] initWithItemGraph: [[self currentBranch] objectGraphContext]];
 						
             _savedState = [txn createPersistentRootWithInitialItemGraph: graphCopy
 																   UUID: [self UUID]
-                                                             branchUUID: [[self editingBranch] UUID]
+                                                             branchUUID: [[self currentBranch] UUID]
 													   revisionMetadata: metadata];
         }
         else
         {
 			// Committing a cheap copy, so there must be a parent branch
-			ETUUID *parentBranchUUID = [[[self editingBranch] parentBranch] UUID];
+			ETUUID *parentBranchUUID = [[[self currentBranch] parentBranch] UUID];
 			ETAssert(parentBranchUUID != nil);
 			ETAssert(_cheapCopyPersistentRootUUID != nil);
 			
             _savedState = [txn createPersistentRootCopyWithUUID: _UUID
 									   parentPersistentRootUUID: _cheapCopyPersistentRootUUID
-													 branchUUID: [[self editingBranch] UUID]
+													 branchUUID: [[self currentBranch] UUID]
 											   parentBranchUUID: parentBranchUUID
 											initialRevisionUUID: _cheapCopyRevisionUUID];
         }
@@ -525,7 +501,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         // because the store call -createPersistentRootWithInitialContents:
         // handles creating the initial branch.
         
-        [[self editingBranch] didMakeInitialCommitWithRevisionID: initialRevID transaction: txn];
+        [[self currentBranch] didMakeInitialCommitWithRevisionID: initialRevID transaction: txn];
 	}
     else
     {
@@ -636,22 +612,22 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (CORevision *)currentRevision
 {
-    return [[self editingBranch] currentRevision];
+    return [[self currentBranch] currentRevision];
 }
 
 - (void)setCurrentRevision: (CORevision *)revision
 {
-    [[self editingBranch] setCurrentRevision: revision];
+    [[self currentBranch] setCurrentRevision: revision];
 }
 
 - (CORevision *)headRevision
 {
-    return [[self editingBranch] headRevision];
+    return [[self currentBranch] headRevision];
 }
 
 - (void)setHeadRevision: (CORevision *)revision
 {
-    [[self editingBranch] setHeadRevision: revision];
+    [[self currentBranch] setHeadRevision: revision];
 }
 
 - (void)updateBranchWithBranchInfo: (COBranchInfo *)branchInfo

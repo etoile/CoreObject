@@ -26,7 +26,7 @@
 - (void)testsDetectsStoreSetCurrentRevisionDistributedNotification
 {
 	// Load the revision history (to support testing it it is updated in reaction to a commit)
-	NSArray *revs = [[persistentRoot editingBranch] nodes];
+	NSArray *revs = [[persistentRoot currentBranch] nodes];
 	ETUUID *newRevID = nil;
 
     // Load in another context
@@ -48,7 +48,7 @@
 
 	CORevision *newRev = [ctx revisionForRevisionUUID: newRevID persistentRootUUID: [persistentRoot UUID]];
 
-	UKObjectsEqual([revs arrayByAddingObject: newRev], [[persistentRoot editingBranch] nodes]);
+	UKObjectsEqual([revs arrayByAddingObject: newRev], [[persistentRoot currentBranch] nodes]);
     UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: @"label"]);
     UKFalse([ctx hasChanges]);
 }

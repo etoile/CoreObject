@@ -93,7 +93,7 @@
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     {
         COObject *root = [persistentRoot rootObject];
-        COObject *child = [[[persistentRoot editingBranch] objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];    
+        COObject *child = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
         [root insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: kCOContents];
         [ctx commitWithUndoTrack: _setupTrack];
         

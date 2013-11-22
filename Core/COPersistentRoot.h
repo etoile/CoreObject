@@ -100,12 +100,6 @@ extern NSString * const COPersistentRootDidChangeNotification;
      */
     ETUUID *_currentBranchUUID;
     /**
-     * UUID of branch being edited. Not persistent.
-	 *
-     * If nil, means use _currentBranchUUID as the editing branch.
-     */
-    ETUUID *_editingBranchUUID;
-    /**
      * Only used when creating a persistent root as a cheap copy.
      */
     ETUUID *_cheapCopyRevisionUUID;
@@ -179,16 +173,6 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /** @taskunit Accessing Branches */
 
 
-/**
- * The editingBranch is not a persistent value, but is used by COPersistentRoot 
- * methods like -rootObject, -objectGraphContext, etc. as the default object 
- * graph presented by the persistent root.
- *
- * By default, -editingBranch just returns -currentBranch. However, if you
- * call -setEditingBranch: explicitly, then that branch will be used and
- * -editingBranch will no longer track -currentBranch.
- */
-@property (nonatomic, readwrite, strong) COBranch *editingBranch;
 /**
  * The branch that opens when double-clicking a persistent root to edit it.
  *
@@ -296,22 +280,22 @@ extern NSString * const COPersistentRootDidChangeNotification;
 
 
 /**
- * Shorthand for [[[self editingBranch] objectGraphContext] rootObject]
+ * Shorthand for [[[self currentBranch] objectGraphContext] rootObject]
  */
 @property (nonatomic, strong) id rootObject;
 /**
- * Shorthand for [[[self editingBranch] objectGraphContext] loadedObjectForUUID:]
+ * Shorthand for [[[self currentBranch] objectGraphContext] loadedObjectForUUID:]
  */
 - (COObject *)loadedObjectForUUID: (ETUUID *)uuid;
 /**
- * Shortcut for <code>[[self editingBranch] currentRevision]</code>
+ * Shortcut for <code>[[self currentBranch] currentRevision]</code>
  *
  * For a new persistent root, the revision is nil, unless it is a cheap copy. 
  * See -[COBranch makeCopyFromRevision:].
  */
 @property (nonatomic, strong) CORevision *currentRevision;
 /**
- * Shortcut for <code>[[self editingBranch] headRevision]</code>
+ * Shortcut for <code>[[self currentBranch] headRevision]</code>
  */
 @property (nonatomic, strong) CORevision *headRevision;
 /**
