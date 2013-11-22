@@ -309,7 +309,12 @@
  * See also -propertyNames and -persistentPropertyNames.
  */
 @property (nonatomic, readonly) ETEntityDescription *entityDescription;
-/** 
+/**
+ * Returns the branch when the receiver is persistent, otherwise
+ * returns nil.
+ */
+@property (nonatomic, readonly) COBranch *branch;
+/**
  * Returns the persistent root when the receiver is persistent, otherwise 
  * returns nil.
  */

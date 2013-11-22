@@ -326,6 +326,11 @@ See +[NSObject typePrefix]. */
 
 #pragma mark - Persistency Attributes
 
+- (COBranch *) branch
+{
+	return [_objectGraphContext branch];
+}
+
 - (COPersistentRoot *)persistentRoot
 {
 	return [_objectGraphContext persistentRoot];
