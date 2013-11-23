@@ -21,7 +21,6 @@
 #import "COBranch+Private.h"
 #import "COPath.h"
 #import "COObjectGraphContext.h"
-#import "COCrossPersistentRootReferenceCache.h"
 #import "COUndoStackStore.h"
 #import "COEditingContext+Undo.h"
 #import "COEditingContext+Private.h"
@@ -64,7 +63,6 @@
 	_loadedPersistentRoots = [NSMutableDictionary new];
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
-    _crossRefCache = [[COCrossPersistentRootReferenceCache alloc] init];
     _isRecordingUndo = YES;
 
 	[CORevisionCache prepareCacheForStore: store];
@@ -282,8 +280,6 @@
         // NOTE: Deleted persistent roots are removed from the cache on commit.
         [_persistentRootsPendingDeletion addObject: aPersistentRoot];
     }
-    
-    [aPersistentRoot updateCrossPersistentRootReferences];
 }
 
 - (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot
@@ -296,8 +292,6 @@
     {
         [_persistentRootsPendingUndeletion addObject: aPersistentRoot];
     }
-    
-    [aPersistentRoot updateCrossPersistentRootReferences];
 }
 
 - (BOOL)hasChanges
@@ -597,34 +591,26 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
     ETUUID *persistentRootUUID = [aPath persistentRoot];
     ETAssert(persistentRootUUID != nil);
     
-    ETUUID *branchUUID = [aPath branch];
-    
     /* Specifying an inner object is unsupported and will be removed from COPath */
     ETAssert([aPath innerObject] == nil);
-    
-    COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID];
-    ETAssert(persistentRoot != nil);
 	
-	if ([persistentRoot isDeleted])
-		return nil;
+    /* Specifying a branch is also unsupported; currently all cross-persistent root
+	   references are to the current branch.
+
+	   Supporting references to specific branches would require
+	   -[COPersistentRoot currentBranch] returning a special COBranch object distinct
+	   from any of [COPersistentRoot branches].
+	 */
+    ETAssert([aPath branch] == nil);
+	
+    COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID];
+	
+	// FIXME: We will need to handle the case where a reference points to a
+	// persistent root that has been permanently deleted from the store,
+	// perhaps by allocating a placeholder "broken link" persistent root.
+    ETAssert(persistentRoot != nil);
     
-    COBranch *branch;
-    if (branchUUID != nil)
-    {
-        branch = [persistentRoot branchForUUID: branchUUID];
-    }
-    else
-    {
-        branch = [persistentRoot currentBranch];
-    }
-    
-    if ([branch isDeleted])
-    {
-        return nil;
-    }
-    
-    COObjectGraphContext *objectGraphContext = [branch objectGraphContext];
-    return [objectGraphContext rootObject];
+	return [[persistentRoot currentBranch] rootObject];
 }
 
 // Notification handling

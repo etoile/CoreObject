@@ -264,8 +264,6 @@
 		66E4CF501816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E4CF4E1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.m */; };
 		66E4CF531816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.h in Headers */ = {isa = PBXBuildFile; fileRef = 66E4CF511816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.h */; };
 		66E4CF541816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E4CF521816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.m */; };
-		66FB156017A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FB155E17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		66FB156117A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB155F17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.m */; };
 		66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */; };
 		66FD348A1830B84C00898381 /* COSynchronizerJSONServer.h in Resources */ = {isa = PBXBuildFile; fileRef = 66FD34881830B84C00898381 /* COSynchronizerJSONServer.h */; };
 		66FD348B1830B84C00898381 /* COSynchronizerJSONServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD34891830B84C00898381 /* COSynchronizerJSONServer.m */; };
@@ -692,8 +690,6 @@
 		66E4CF4E1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COStoreSetPersistentRootMetadata.m; path = Store/COStoreSetPersistentRootMetadata.m; sourceTree = "<group>"; };
 		66E4CF511816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandSetPersistentRootMetadata.h; sourceTree = "<group>"; };
 		66E4CF521816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommandSetPersistentRootMetadata.m; sourceTree = "<group>"; };
-		66FB155E17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCrossPersistentRootReferenceCache.h; path = Core/COCrossPersistentRootReferenceCache.h; sourceTree = "<group>"; };
-		66FB155F17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCrossPersistentRootReferenceCache.m; path = Core/COCrossPersistentRootReferenceCache.m; sourceTree = "<group>"; };
 		66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObject+Accessors.m"; path = "Core/COObject+Accessors.m"; sourceTree = "<group>"; };
 		66FD34881830B84C00898381 /* COSynchronizerJSONServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizerJSONServer.h; path = Synchronization/COSynchronizerJSONServer.h; sourceTree = "<group>"; };
 		66FD34891830B84C00898381 /* COSynchronizerJSONServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizerJSONServer.m; path = Synchronization/COSynchronizerJSONServer.m; sourceTree = "<group>"; };
@@ -1076,8 +1072,6 @@
 				606E3DC01787A07E00ED42DA /* COSerialization.m */,
 				6680846B178CD526003A3CC6 /* COCopier.h */,
 				6680846C178CD526003A3CC6 /* COCopier.m */,
-				66FB155E17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.h */,
-				66FB155F17A8F24E003BFC9B /* COCrossPersistentRootReferenceCache.m */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -1413,7 +1407,6 @@
 				66808493178DAFE3003A3CC6 /* diff.h in Headers */,
 				66808494178DAFE3003A3CC6 /* diff.hh in Headers */,
 				668084ED1791FBA2003A3CC6 /* COObject+RelationshipCache.h in Headers */,
-				66FB156017A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.h in Headers */,
 				663CE29517C07ED800E729F5 /* COCommand.h in Headers */,
 				663CE29917C07ED800E729F5 /* COCommandDeleteBranch.h in Headers */,
 				663CE29B17C07ED800E729F5 /* COCommandSetBranchMetadata.h in Headers */,
@@ -1771,7 +1764,6 @@
 				668084CF17900C35003A3CC6 /* COType.m in Sources */,
 				668084EC1791FBA2003A3CC6 /* COObject+RelationshipCache.m in Sources */,
 				668084F11791FBAB003A3CC6 /* COObjectGraphContext.m in Sources */,
-				66FB156117A8F24F003BFC9B /* COCrossPersistentRootReferenceCache.m in Sources */,
 				66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */,
 				66FD348B1830B84C00898381 /* COSynchronizerJSONServer.m in Sources */,
 				660179D5182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.m in Sources */,

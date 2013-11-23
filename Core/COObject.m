@@ -180,36 +180,6 @@ See +[NSObject typePrefix]. */
 	return variableStorage;
 }
 
-/**
- * Declares the outgoing relationships allowed to contain cross persistent 
- * references by putting keys in the cache. Each key is bound to empty 
- * collection and represents an allowed relationship.
- */
-- (NSMutableDictionary *)newOutgoingRelationshipCache
-{
-	NSMutableDictionary *variableStorage = [[NSMutableDictionary alloc] initWithCapacity: 5];
-
-	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
-	{
-		// NOTE: For now, we don't allow to-many relationships using the
-		// element type NSObject, to contain cross persistent root references.
-		// We just support this special case in to-one relationships such as
-		// ETLayoutItem.represententObject in EtoileUI, where the object can be
-		// either transient or persistent (a transient object will raise an
-		// exception at serialization time though).
-		if ([propDesc isMultivalued] == NO || [propDesc isKeyed] || [self isCoreObjectRelationship: propDesc] == NO)
-			continue;
-
-		ETAssert([propDesc isDerived] == NO);
-
-		id collection = [self newCollectionForPropertyDescription: propDesc];
-
-		[variableStorage setObject: collection forKey: [propDesc name]];
-	}
-
-	return variableStorage;
-}
-
 - (void)validateEntityDescription: (ETEntityDescription *)anEntityDescription
      inModelDescriptionRepository: (ETModelDescriptionRepository *)repo
 {
@@ -255,7 +225,6 @@ See +[NSObject typePrefix]. */
 	_objectGraphContext = aContext;
 	_isPrepared = YES;
 	_variableStorage = [self newVariableStorage];
-    _outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
 	_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
 	_oldValues = [NSMutableArray new];
 
@@ -317,7 +286,6 @@ See +[NSObject typePrefix]. */
 	newObject->_entityDescription = _entityDescription;
 	newObject->_objectGraphContext = _objectGraphContext;
 	newObject->_variableStorage = [self newVariableStorage];
-	newObject->_outgoingSerializedRelationshipCache = [self newOutgoingRelationshipCache];
 	newObject->_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
 	newObject->_oldValues = [NSMutableArray new];
 
@@ -775,43 +743,6 @@ See +[NSObject typePrefix]. */
 }
 
 /**
- * For an outgoing relationship, turns COObject elements into ETUUID and COPath 
- * collections that we keep cached.
- *
- * For attributes, and incoming or transient relationships, does nothing.
- *
- * See -updateCrossPersistentRootReferences.
- */
-- (void)updateOutgoingSerializedRelationshipCacheForProperty: (NSString *)key
-{
-	// FIXME: In order to make -[TestCrossPersistentRootReferences testPersistentRootUndeletion]
-	// work, we will need a different approach to updating _outgoingSerializedRelationshipCache
-	//
-	// We should preserve references in _outgoingSerializedRelationshipCache that are currently
-	// hidden in [self valueForStorageKey: key] (references to deleted persistent roots / branches).
-	// This will be complicated to implement, so I'm not sure that hiding broken cross-persistent
-	// root references in CoreObject is the right choice; it might be easier to let apps hide them
-	// at the UI level.
-	
-	BOOL isOutgoingPersistentRelationship =
-		([_outgoingSerializedRelationshipCache objectForKey: key] != nil);
-
-    if (isOutgoingPersistentRelationship == NO)
-		return;
-	
-	// NOTE: We cannot use -serializedValueForPropertyDescription: since the
-	// latter method attempts to access the cache we want to update.
-	// For relationships, serialization accessors are not allowed, so skipping  
-	// -serializedValueForPropertyDescription: doesn't matter.
-	id serializedValue = [self serializedValueForValue: [self valueForStorageKey: key]];
-	
-	//NSLog(@"Outgoing Relationship Cache: setting %@ from %@ to %@", key,
-	//     [_outgoingSerializedRelationshipCache objectForKey: key], serializedValue);
-
-	[_outgoingSerializedRelationshipCache setObject: serializedValue forKey: key];
-}
-
-/**
  * Removes objects from their old parents (the new parent is the receiver).
  *
  * From a metamodel viewpoint, composite = children (incoming relationship) and
@@ -906,7 +837,6 @@ See +[NSObject typePrefix]. */
 
 	[self validateNewValue: newValue propertyDescription: propertyDesc];
 
-	[self updateOutgoingSerializedRelationshipCacheForProperty: key];
 	[self updateCompositeRelationshipForPropertyDescription: propertyDesc];
     [self updateCachedOutgoingRelationshipsForOldValue: oldValue
 	                                          newValue: newValue
@@ -1112,53 +1042,6 @@ See +[NSObject typePrefix]. */
 - (CORelationshipCache *)incomingRelationshipCache
 {
     return _incomingRelationshipCache;
-}
-
-- (COCrossPersistentRootReferenceCache *)crossReferenceCache
-{
-    return [[_objectGraphContext editingContext] crossReferenceCache];
-}
-
-/**
- * Cross persistent root references can become invalid, if other persistent 
- * roots undergo a state switch (current revision change, branch switch etc.).
- *
- * An invalid reference points either to:
- * - an outdated instance (although COObject are reused if loaded in memory)
- * - a past object (or deleted object)
- * - a future object (an object that doesn't exist yet in the current state)
- *
- * Calling -updateCrossPersistentRootReferences on every state switch ensures 
- * the outdated instance case never occurs. CoreObject does it, so the problem 
- * shouldn't arise.
- *
- * For a persistent root state switch, we use 
- * -valueForSerializedValue:ofType:propertyDescription: to recreate each 
- * persistent outgoing relationship in the receiver. This deserialization method 
- * will hide or skip objects that corresponds to UUID or COPath elements that 
- * cannot be resolved in the editing context (because their corresponding object 
- * doesn't exist yet or has been deleted in the currently loaded state).
- */
-- (void) updateCrossPersistentRootReferences
-{
-    for (NSString *key in [_outgoingSerializedRelationshipCache allKeys])
-    {
-        ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
-		ETAssert([propDesc isPersistent]);
-
-		// HACK
-		COType collectionType = ([propDesc isOrdered] ? kCOTypeArray : kCOTypeSet);
-        COType type = kCOTypeReference | ([propDesc isMultivalued] ? collectionType : 0);
-
-		id serializedValue = [_outgoingSerializedRelationshipCache objectForKey: key];
-        id value = [self valueForSerializedValue: serializedValue
-		                                  ofType: type
-		                     propertyDescription: propDesc];
-        
-        // N.B., we need to set this in a way that doesn't cause us to recalculate
-		// and overwrite the version stored in _outgoingSerializedRelationshipCache
-        [self setValue: value forStorageKey: key];
-    }
 }
 
 - (void) markAsRemovedFromContext

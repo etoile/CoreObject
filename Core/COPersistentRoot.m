@@ -22,7 +22,6 @@
 #import "COSerialization.h"
 #import "COSQLiteStore.h"
 #import "COPersistentRootInfo.h"
-#import "COCrossPersistentRootReferenceCache.h"
 #import "COPersistentRootInfo.h"
 #import "COBranchInfo.h"
 #import "COEditingContext+Undo.h"
@@ -221,8 +220,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     }
 
     _currentBranchUUID = [aBranch UUID];
-    
-    [self updateCrossPersistentRootReferences];
 }
 
 - (NSSet *)branches
@@ -256,8 +253,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	{
 		[_branchesPendingDeletion addObject: aBranch];
 	}
-    
-    [self updateCrossPersistentRootReferences];
 }
 
 - (void)undeleteBranch: (COBranch *)aBranch
@@ -270,8 +265,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     {
         [_branchesPendingUndeletion addObject: aBranch];
     }
-
-    [self updateCrossPersistentRootReferences];
 }
 
 - (COObjectGraphContext *)objectGraphContext
@@ -674,35 +667,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     _metadata = _savedState.metadata;
 	
 	[self sendChangeNotification];
-}
-
-- (void)updateCrossPersistentRootReferences
-{
-    NSArray *objs = [[_parentContext crossReferenceCache] affectedObjectsForChangeInPersistentRoot: [self UUID]];
-    
-    for (COObject *obj in objs)
-    {
-        [obj updateCrossPersistentRootReferences];
-    }
-    
-    // TODO: May need something like this?
-//    for (COBranch *branch in [_branchForUUID allValues])
-//    {
-//        COObjectGraphContext *graph = [branch objectGraphContext];
-//        for (COObject *obj in [graph allObjects])
-//        {
-//            NSArray *persistentRoots = [[_parentContext crossReferenceCache] referencedPersistentRootUUIDsForObject: obj];
-//            for (ETUUID *persistentRootUUID in persistentRoots)
-//            {
-//                COPersistentRoot *persistentRoot = [_parentContext persistentRootForUUID: persistentRootUUID];
-//                for (COBranch *otherBranch in [persistentRoot->_branchForUUID allValues])
-//                {
-//                    COObjectGraphContext *otherGraph = [otherBranch objectGraphContext];
-//                    [[otherGraph rootObject] updateCrossPersistentRootReferences];                    
-//                }
-//            }
-//        }
-//    }
 }
 
 - (void)sendChangeNotification

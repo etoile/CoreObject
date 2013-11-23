@@ -224,14 +224,6 @@
 	 * allow storing incoming relationships in ivars or variable storage. 
 	 */
     CORelationshipCache *_incomingRelationshipCache;
-	/** 
-	 * Cache keyed by property names for outgoing relationships represented as 
-	 * ETUUID or COPath object collections (sets or arrays). 
-	 * This cache is used to resolve references pointing to objects in other 
-	 * persistent roots, if these other persistent roots undergo a state switch 
-	 * (current revision change, branch switch etc.).
-	 */
-    NSMutableDictionary *_outgoingSerializedRelationshipCache;
 	/**
 	 * Stack of old collection values during nested change notifications i.e. 
 	 * -willChangeValueForProperty: is called multiple times for the same object.

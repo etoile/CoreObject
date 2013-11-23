@@ -12,7 +12,6 @@
 #import "CORelationshipCache.h"
 #import "COObjectGraphContext.h"
 #import "COEditingContext.h"
-#import "COCrossPersistentRootReferenceCache.h"
 #import "COPath.h"
 
 @implementation COObject (RelationshipCache)
@@ -62,11 +61,6 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
                 [[(COObject *)aValue incomingRelationshipCache] removeReferencesForPropertyInSource: [aProperty name]
                                                                                sourceObject: self];
             }
-            
-            // Update the cross-persistent root reference cache
-            
-            [[self crossReferenceCache] clearReferencedPersistentRootsForProperty: [aProperty name]
-																		 ofObject: self];
         }
     }
 }
@@ -98,32 +92,7 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
                                                                           targetProperty: [propertyInTarget name]];
                 }
             }
-            
-            // Update the cross-persistent root reference cache
-            
-            id relationshipAsCOPathOrETUUID = [_outgoingSerializedRelationshipCache objectForKey: [aProperty name]];
-            if ([aProperty isMultivalued])
-            {
-                for (id refObject in relationshipAsCOPathOrETUUID)
-                {
-                    if ([refObject isKindOfClass: [COPath class]])
-                    {
-                        [[self crossReferenceCache] addReferencedPersistentRoot: [(COPath *)refObject persistentRoot]
-																	forProperty: [aProperty name]
-																	   ofObject: self];
-                    }
-                }
-            }
-            else
-            {
-                if ([relationshipAsCOPathOrETUUID isKindOfClass: [COPath class]])
-                {
-                    [[self crossReferenceCache] addReferencedPersistentRoot: [(COPath *)relationshipAsCOPathOrETUUID persistentRoot]
-																forProperty: [aProperty name]
-																   ofObject: self];
-                }
-            }
-        }
+		}
     }
 }
 

@@ -112,6 +112,8 @@ extern NSString * const COPersistentRootDidChangeNotification;
     BOOL _metadataChanged;
 	
     int64_t _lastTransactionID;
+	
+	COObjectGraphContext *_currentBranchObjectGraph;
 }
 
 

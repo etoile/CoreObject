@@ -386,14 +386,6 @@ serialization. */
 // serialization format has been removed.
 - (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
-    /* Check the outgoing serialized relationship cache */
-    
-    id relationship = [_outgoingSerializedRelationshipCache objectForKey: [aPropertyDesc name]];
-    if (relationship != nil)
-    {
-        return relationship;
-    }
-    
 	/* First we try to use the getter named 'serialized' + 'key' */
 
 	SEL getter = [self serializationGetterForProperty: [aPropertyDesc name]];
@@ -743,19 +735,6 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 			                    serializedValue, COTypeDescription(serializedType), property, [self entityDescription]];
 		}
 
-        // Cache ETUUID / COPath version of relationship
-        if ([self isCoreObjectEntityType: [propertyDesc type]])
-        {
-            if ([serializedValue isKindOfClass: [NSSet class]]
-                || [serializedValue isKindOfClass: [NSArray class]])
-            {
-                serializedValue = [serializedValue mutableCopy];
-            }
-
-            [_outgoingSerializedRelationshipCache setObject: serializedValue
-                                               forKey: property];
-        }
-        
 		id value = [self valueForSerializedValue: serializedValue
 		                                  ofType: serializedType
 		                     propertyDescription: propertyDesc];
