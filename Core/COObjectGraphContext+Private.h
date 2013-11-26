@@ -17,6 +17,9 @@
  * Sets the branch owning the object graph.
  */
 - (void)setBranch: (COBranch *)aBranch;
+
+- (void)setPersistentRoot: (COPersistentRoot *)aPersistentRoot;
+
 /**
  * The branch UUID.
  *
@@ -54,5 +57,5 @@
  * instance.
  */
 - (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
-
+- (void) removeUnreachableObjects;
 @end

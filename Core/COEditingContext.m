@@ -199,6 +199,7 @@
 	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
 	                                                 objectGraphContext: [rootObject objectGraphContext]];
 
+	ETAssert([rootObject objectGraphContext] == persistentRoot.objectGraphContext);
 	[[rootObject objectGraphContext] setRootObject: rootObject];
     
     ETAssert([[persistentRoot rootObject] isRoot]);
@@ -594,23 +595,26 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
     /* Specifying an inner object is unsupported and will be removed from COPath */
     ETAssert([aPath innerObject] == nil);
 	
-    /* Specifying a branch is also unsupported; currently all cross-persistent root
-	   references are to the current branch.
-
-	   Supporting references to specific branches would require
-	   -[COPersistentRoot currentBranch] returning a special COBranch object distinct
-	   from any of [COPersistentRoot branches].
-	 */
-    ETAssert([aPath branch] == nil);
+	ETUUID *branchUUID = [aPath branch];
 	
-    COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID];
-	
+	COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID];
 	// FIXME: We will need to handle the case where a reference points to a
 	// persistent root that has been permanently deleted from the store,
 	// perhaps by allocating a placeholder "broken link" persistent root.
     ETAssert(persistentRoot != nil);
-    
-	return [[persistentRoot currentBranch] rootObject];
+	
+	if (branchUUID != nil)
+	{
+		COBranch *branch = [persistentRoot branchForUUID: branchUUID];
+		// FIXME: Again, this is a simplification, should handle broken refs.
+		ETAssert(branch != nil);
+		
+		return [branch rootObject];
+	}
+	else
+	{
+		return [persistentRoot rootObject];
+	}
 }
 
 // Notification handling

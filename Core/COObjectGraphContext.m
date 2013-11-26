@@ -48,7 +48,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
  */
 @implementation COObjectGraphContext
 
-@synthesize branch = _branch, modelRepository = _modelRepository;
+@synthesize modelRepository = _modelRepository;
 @synthesize insertedObjects = _insertedObjects, updatedObjects = _updatedObjects,
 	updatedPropertiesByObject = _updatedPropertiesByObject;
 
@@ -63,10 +63,11 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     _updatedObjects = [[NSMutableSet alloc] init];
     _updatedPropertiesByObject = [[NSMapTable alloc] init];
     _branch = aBranch;
+	_persistentRoot = [aBranch persistentRoot];
 	_futureBranchUUID = (aBranch == nil ? [ETUUID UUID] : nil);
     if (aRepo == nil)
     {
-        aRepo = [[[_branch persistentRoot] editingContext] modelRepository];
+        aRepo = [[_persistentRoot editingContext] modelRepository];
     }
     _modelRepository =  aRepo;
     return self;
@@ -121,24 +122,40 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 #pragma mark -
 #pragma mark Related Persistency Management Objects
 
+- (COBranch *)branch
+{
+	if (_branch == nil && _persistentRoot != nil)
+	{
+		return [_persistentRoot currentBranch];
+	}
+	return _branch;
+}
+
 - (void)setBranch: (COBranch *)aBranch
 {
 	_branch = aBranch;
+	_persistentRoot = [aBranch persistentRoot];
 }
 
 - (ETUUID *)branchUUID
 {
-	return (_branch != nil ? [_branch UUID] : _futureBranchUUID);
+	return ([self branch] != nil ? [[self branch] UUID] : _futureBranchUUID);
 }
 
 - (COPersistentRoot *)persistentRoot
 {
-    return [_branch persistentRoot];
+    return _persistentRoot;
+}
+
+- (void)setPersistentRoot: (COPersistentRoot *)aPersistentRoot
+{
+	_persistentRoot = aPersistentRoot;
+	_branch = nil;
 }
 
 - (COEditingContext *)editingContext
 {
-    return [[_branch persistentRoot] parentContext];
+    return [_persistentRoot parentContext];
 }
 
 #pragma mark -
@@ -345,11 +362,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 	_loadingItemGraph = nil;
     
-    // 3. Do GC
-    
-    [self removeUnreachableObjects];
-    
-    // 4. Clear change tracking again.
+    // Clear change tracking again.
     
     [self clearChangeTracking];
 }

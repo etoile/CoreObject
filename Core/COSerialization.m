@@ -17,6 +17,7 @@
 #import "COPath.h"
 #import "COAttachmentID.h"
 #import "COPersistentRoot.h"
+#import "COBranch.h"
 #import "COEditingContext+Private.h"
 
 #include <objc/runtime.h>
@@ -142,10 +143,27 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 			}
 			else
 			{
+				// Serialize this cross-persistent root reference as a COPath
+				
 				NSAssert([value isRoot], @"A property must point to a root object "
 					"for references accross persistent roots");
-				// Create path to the current branch by default
-				return [COPath pathWithPersistentRoot: [[value persistentRoot] UUID]];
+				
+				COPersistentRoot *referencedPersistentRoot = [value persistentRoot];
+				COObjectGraphContext *referencedPersistentRootCurrentBranchGraph = [referencedPersistentRoot objectGraphContext];
+				COObjectGraphContext *referencedObjectGraph = [value objectGraphContext];
+				COBranch *referencedBranch = [value branch];
+				
+				if (referencedObjectGraph == referencedPersistentRootCurrentBranchGraph)
+				{
+					// Serialize as a reference to the current branch
+					return [COPath pathWithPersistentRoot: [referencedPersistentRoot UUID]];
+				}
+				else
+				{
+					// Serialize as a reference to a specific branch
+					return [COPath pathWithPersistentRoot: [referencedPersistentRoot UUID]
+												   branch: [referencedBranch UUID]];
+				}
 			}
 		}
 		else

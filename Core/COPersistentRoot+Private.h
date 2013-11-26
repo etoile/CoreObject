@@ -69,5 +69,5 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (void)deleteBranch: (COBranch *)aBranch;
 - (void)undeleteBranch: (COBranch *)aBranch;
- 
+
 @end

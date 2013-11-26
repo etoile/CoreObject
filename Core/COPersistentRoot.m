@@ -8,6 +8,7 @@
  */
 
 #import "COPersistentRoot.h"
+#import "COPersistentRoot+Private.h"
 #import "COBranch.h"
 #import "COBranch+Private.h"
 #import "COEditingContext.h"
@@ -61,7 +62,16 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     _branchForUUID = [[NSMutableDictionary alloc] init];
 	_branchesPendingDeletion = [NSMutableSet new];
 	_branchesPendingUndeletion = [NSMutableSet new];
-    
+	if (anObjectGraphContext != nil)
+	{
+		_currentBranchObjectGraph = anObjectGraphContext;
+	}
+	else
+	{
+		_currentBranchObjectGraph = [[COObjectGraphContext alloc] init];
+	}
+	[_currentBranchObjectGraph setPersistentRoot: self];
+	
     if (_savedState != nil)
     {
         _UUID =  [_savedState UUID];
@@ -74,6 +84,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         _currentBranchUUID =  [_savedState currentBranchUUID];
 		_lastTransactionID = _savedState.transactionID;
 		_metadata = _savedState.metadata;
+		
+		[_currentBranchObjectGraph setItemGraph: [[self currentBranch] objectGraphContext]];
     }
     else
     {
@@ -85,12 +97,13 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		//ETUUID *branchUUID = [anObjectGraphContext branchUUID];
         ETUUID *branchUUID =
 			(anObjectGraphContext != nil ? [anObjectGraphContext branchUUID] : [ETUUID UUID]);
+
         COBranch *branch = [[COBranch alloc] initWithUUID: branchUUID
-		                                objectGraphContext: anObjectGraphContext
+		                                objectGraphContext: nil
                                             persistentRoot: self
                                           parentBranchUUID: aBranchUUID
                                 parentRevisionForNewBranch: cheapCopyRevisionID];
-        
+		[[branch objectGraphContext] setItemGraph: _currentBranchObjectGraph];
         [_branchForUUID setObject: branch forKey: branchUUID];
         
         _currentBranchUUID =  branchUUID;
@@ -103,7 +116,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 			self.metadata = @{ @"parentPersistentRoot" : [_cheapCopyPersistentRootUUID stringValue] };
 		}
     }
-
+	
 	return self;
 }
 
@@ -211,15 +224,10 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (void)setCurrentBranch: (COBranch *)aBranch
 {
-    if ([self isPersistentRootUncommitted])
-    {
-		// TODO: Use a CoreObject exception type
-        [NSException raise: NSGenericException
-		            format: @"A persistent root must be committed before you "
-		                     "can add or change its branches"];
-    }
-
     _currentBranchUUID = [aBranch UUID];
+	
+	_currentBranchObjectGraph.branch = aBranch;
+	[_currentBranchObjectGraph setItemGraph: [aBranch objectGraphContext]];
 }
 
 - (NSSet *)branches
@@ -269,7 +277,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (COObjectGraphContext *)objectGraphContext
 {
-    return [[self currentBranch] objectGraphContext];
+    return _currentBranchObjectGraph;
 }
 
 - (COSQLiteStore *)store
@@ -451,16 +459,31 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	ETAssert([self currentBranch] != nil);
 	ETAssert([self rootObject] != nil);
 	ETAssert([[self rootObject] isRoot]);
+	ETAssert([[self objectGraphContext] rootObject] != nil
+			 || [[[self currentBranch] objectGraphContext] rootObject] != nil);
     
 	if ([self isPersistentRootUncommitted])
 	{		
         ETAssert([self currentBranch] != nil);
-        
+		BOOL usingCurrentBranchObjectGraph = YES;
+		
         if (_cheapCopyRevisionUUID == nil)
         {
+			ETAssert(!([[[self currentBranch] objectGraphContext] hasChanges]
+					   && [_currentBranchObjectGraph hasChanges]));
 			// FIXME: Move this into -createPersistentRootWithInitialItemGraph:
 			// and make that take a id<COItemGraph>
-			COItemGraph *graphCopy = [[COItemGraph alloc] initWithItemGraph: [[self currentBranch] objectGraphContext]];
+
+			COObjectGraphContext *graphCtx = _currentBranchObjectGraph;
+			if ([[[self currentBranch] objectGraphContext] hasChanges])
+			{
+				usingCurrentBranchObjectGraph = NO;
+				graphCtx = [[self currentBranch] objectGraphContext];
+			}
+			
+			// FIXME: check both _currentBranchObjectGraph and [branch objectGraphContext]
+			// FIXME: After, update the other graph with the contents of the one we committed
+			COItemGraph *graphCopy = [[COItemGraph alloc] initWithItemGraph: graphCtx];
 						
             _savedState = [txn createPersistentRootWithInitialItemGraph: graphCopy
 																   UUID: [self UUID]
@@ -495,6 +518,17 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         // handles creating the initial branch.
         
         [[self currentBranch] didMakeInitialCommitWithRevisionID: initialRevID transaction: txn];
+		
+		if (usingCurrentBranchObjectGraph)
+		{
+			[_currentBranchObjectGraph clearChangeTracking];
+			[[[self currentBranch] objectGraphContext] setItemGraph: _currentBranchObjectGraph];
+		}
+		else
+		{
+			[[[self currentBranch] objectGraphContext] clearChangeTracking];
+			[_currentBranchObjectGraph setItemGraph: [[self currentBranch] objectGraphContext]];
+		}
 	}
     else
     {
@@ -663,6 +697,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	// TODO: Test that _everything_ is reloaded
 	
     _currentBranchUUID =  [_savedState currentBranchUUID];
+	[_currentBranchObjectGraph setItemGraph: [[self currentBranch] objectGraphContext]];
     _lastTransactionID = _savedState.transactionID;
     _metadata = _savedState.metadata;
 	
