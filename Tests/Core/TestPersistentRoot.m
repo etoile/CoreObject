@@ -94,10 +94,10 @@
     COObject *sandboxRootObj = [[branch objectGraphContext] rootObject];
     
 	[sandboxRootObj setValue: @"Todo" forProperty: @"label"];
-	
-    UKObjectsEqual(@"Todo", [[persistentRoot rootObject] valueForProperty: @"label"]);
     
 	[persistentRoot commit];
+
+	UKObjectsEqual(@"Todo", [[persistentRoot rootObject] valueForProperty: @"label"]);
 	
     UKObjectsEqual([branch UUID],
                    [[store persistentRootInfoForUUID: [persistentRoot UUID]] currentBranchUUID]);
