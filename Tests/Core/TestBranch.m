@@ -29,11 +29,16 @@
     
 	[ctx commit];
 	
+	UKFalse([[persistentRoot objectGraphContext] hasChanges]);
+	UKFalse([[originalBranch objectGraphContext] hasChanges]);
+	
 	UKNotNil(originalBranch.currentRevision);
 	UKNotNil(originalBranch.headRevision);
 	
 	altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
 	[ctx commit];
+
+	UKFalse([[altBranch objectGraphContext] hasChanges]);
 	
     _testTrack = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
     [_testTrack clear];
@@ -553,6 +558,7 @@
     [persistentRoot commit];
     CORevision *firstRevision = [originalBranch currentRevision];
     
+	UKTrue([originalBranch rootObject] != nil);
     [[originalBranch rootObject] setLabel: @"test"];
     [persistentRoot commit];
     CORevision *secondRevision = [originalBranch currentRevision];

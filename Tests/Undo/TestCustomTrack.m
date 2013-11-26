@@ -175,6 +175,7 @@ selective undo is involved. */
 	[_testTrack undo];
 	[_testTrack undo];
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
+	// i.e., check for garbage collection
 	UKNil([docPersistentRoot loadedObjectForUUID: [para2 UUID]]);
 	UKObjectsEqual(@[para1], [doc contents]);
 
