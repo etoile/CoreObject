@@ -136,6 +136,16 @@
     UKRaisesException([(COMutableItem *)root1Item setValue: @"foo" forAttribute: kCOLabel type: kCOTypeString]);
 }
 
+- (void) testItemUUIDsWithInsertedObject
+{
+	UKObjectsEqual(S([root1 UUID]), SA([ctx1 itemUUIDs]));
+	
+    COObject *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
+	
+	UKObjectsEqual(S([root1 UUID], [tag1 UUID]), SA([ctx1 itemUUIDs]));
+	UKNotNil([ctx1 itemForUUID: [tag1 UUID]]);
+}
+
 - (void)testAddItem
 {
 	COMutableItem *mutableItem = [COMutableItem item];
