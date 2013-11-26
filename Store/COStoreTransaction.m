@@ -82,6 +82,7 @@
                              branchUUID: (ETUUID*)branch
 {
     NILARG_EXCEPTION_TEST(anItemTree);
+    NILARG_EXCEPTION_TEST([anItemTree rootItemUUID]);
     NSParameterAssert([aRevisionUUID isKindOfClass: [ETUUID class]]);
     NSParameterAssert(aParent == nil || [aParent isKindOfClass: [ETUUID class]]);
 	NSParameterAssert(aMergeParent == nil || [aMergeParent isKindOfClass: [ETUUID class]]);

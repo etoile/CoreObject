@@ -95,7 +95,7 @@
     
 	// This table always contains exactly one row
 	[db_ executeUpdate: [NSString stringWithFormat:
-						 @"CREATE TABLE IF NOT EXISTS %@ (root BLOB CHECK (length(root) = 16))", [self metadataTableName]]];
+						 @"CREATE TABLE IF NOT EXISTS %@ (root BLOB NOT NULL CHECK (length(root) = 16))", [self metadataTableName]]];
 	
 	// FIXME: -hadError only looks at the success of the last statement.
     if ([db_ hadError])
@@ -427,7 +427,8 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     NSParameterAssert(aRevisionUUID != nil);
     NSParameterAssert(aBranchUUID != nil);
     NSParameterAssert(aPersistentRootUUID != nil);
-    
+    NSParameterAssert([anItemTree rootItemUUID] != nil);
+	
     BOOL inTransaction = [db_ inTransaction];
     if (!inTransaction)
     {
