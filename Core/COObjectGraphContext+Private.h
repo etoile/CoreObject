@@ -58,4 +58,5 @@
  */
 - (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
 - (void) removeUnreachableObjects;
+- (BOOL) isTrackingSpecificBranch;
 @end

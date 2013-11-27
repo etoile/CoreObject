@@ -75,7 +75,22 @@
 		 UKObjectsEqual(@"photo2", [[photo2ctx2 rootObject] valueForKey: @"label"]);
 	 }];
 }
-#if 0
+
+- (void) testSpecificAndCurrentBranchReferenceInSet
+{
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COBranch *branchA = [photo1 currentBranch];
+    
+	OutlineItem *photo1root = [photo1 rootObject];
+	OutlineItem *branchAroot = [branchA rootObject];
+	
+	UKObjectsNotEqual(photo1root, branchAroot);
+	UKFalse([photo1root hash] == [branchAroot hash]);
+	
+    NSSet *set = S(photo1root, branchAroot);
+	UKIntsEqual(2, [set count]);
+}
+
 /*
  Verifies that when you have references to:
  
@@ -103,32 +118,31 @@
 	//  \--childB
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    COObject *photo1root = [photo1 rootObject];
-    [photo1root setValue: @"photo1, branch A" forProperty: @"label"];
+	COBranch *branchA = [photo1 currentBranch];
+    OutlineItem *photo1root = [photo1 rootObject];
+    photo1root.label = @"photo1, branch A";
     
-    COObject *childA = [[photo1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    [childA setValue: @"childA" forProperty: @"label"];
+    OutlineItem *childA = [[photo1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    childA.label = @"childA";
     
-    [photo1root insertObject: childA atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [photo1root addObject: childA];
     [photo1 commit];
     
     COBranch *branchB = [[photo1 currentBranch] makeBranchWithLabel: @"branchB"];
-    COObject *photo1branchBroot = [[branchB objectGraphContext] rootObject];
-    [photo1branchBroot setValue: @"photo1, branch B" forProperty: @"label"];
+    OutlineItem *photo1branchBroot = [[branchB objectGraphContext] rootObject];
+    photo1branchBroot.label = @"photo1, branch B";
     
-    COObject *childB = [[photo1branchBroot valueForKey: @"contents"] firstObject];
-    // FIXME: Why was -setValue:forKey: appearing to work but not logging a change in the object graph?
-    [childB setValue: @"childB" forProperty: @"label"];
+    OutlineItem *childB = [photo1branchBroot.contents firstObject];
+    childB.label = @"childB";
     
     [ctx commit];
     
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    /* This creates a reference to the current branch of photo1. */
-    // FIXME: What should the API for referring to a specific branch look loke?
-    [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
-
+    [[library1 rootObject] setContents: S([photo1 rootObject], [branchA rootObject])];
+	UKIntsEqual(2, [[[library1 rootObject] contents] count]);
+	
     [ctx commit];
     
     UKObjectsEqual(S(@"photo1, branch A"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
@@ -138,8 +152,8 @@
     
     [photo1 setCurrentBranch: branchB];
     
-    UKObjectsEqual(S(@"photo1, branch B"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
-    UKObjectsEqual(S(A(@"childB")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
+    UKObjectsEqual(S(@"photo1, branch A", @"photo1, branch B"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(A(@"childA"), A(@"childB")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
     
     [ctx commit];
     
@@ -157,11 +171,11 @@
         
         // Actual test of cross-persistent-root references
         
-        UKObjectsEqual(S(@"photo1, branch B"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
-        UKObjectsEqual(S(A(@"childB")), [[library1ctx2 rootObject] valueForKeyPath: @"contents.contents.label"]);
+        UKObjectsEqual(S(@"photo1, branch A", @"photo1, branch B"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+        UKObjectsEqual(S(A(@"childA"), A(@"childB")), [[library1ctx2 rootObject] valueForKeyPath: @"contents.contents.label"]);
 	 }];
 }
-#endif
+
 #if 0
 - (void) testBranchDeletion
 {

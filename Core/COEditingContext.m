@@ -196,13 +196,15 @@
 	Class cls = [[self modelRepository] classForEntityDescription: desc];
 	COObject *rootObject = [[cls alloc] initWithEntityDescription: desc
                                                objectGraphContext: graph];
+	[graph setRootObject: rootObject];
+
 	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
-	                                                 objectGraphContext: [rootObject objectGraphContext]];
+	                                                 objectGraphContext: graph];
 
 	ETAssert([rootObject objectGraphContext] == persistentRoot.objectGraphContext);
-	[[rootObject objectGraphContext] setRootObject: rootObject];
     
     ETAssert([[persistentRoot rootObject] isRoot]);
+    ETAssert([[[persistentRoot currentBranch] rootObject] isRoot]);
 	
     return persistentRoot;
 }

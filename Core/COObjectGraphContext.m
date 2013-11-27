@@ -158,6 +158,11 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     return [_persistentRoot parentContext];
 }
 
+- (BOOL) isTrackingSpecificBranch
+{
+	return [self persistentRoot] != nil && self != [[self persistentRoot] objectGraphContext];
+}
+
 #pragma mark -
 #pragma mark Metamodel Access
 

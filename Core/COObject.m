@@ -951,7 +951,7 @@ See +[NSObject typePrefix]. */
 
 - (NSUInteger)hash
 {
-	return [_UUID hash] ^ [[_objectGraphContext branchUUID] hash] ^ 0x39ab6f39b15233de;
+	return [_UUID hash] ^ [[_objectGraphContext branchUUID] hash] ^ [_objectGraphContext isTrackingSpecificBranch] ^ 0x39ab6f39b15233de;
 }
 
 - (BOOL)isEqual: (id)anObject
@@ -966,7 +966,8 @@ See +[NSObject typePrefix]. */
 	}
 
 	return ([[anObject UUID] isEqual: _UUID]
-		&& [[[anObject objectGraphContext] branchUUID] isEqual: [_objectGraphContext branchUUID]]);
+		&& [[[anObject objectGraphContext] branchUUID] isEqual: [_objectGraphContext branchUUID]]
+		&& ([_objectGraphContext isTrackingSpecificBranch] == [[anObject objectGraphContext] isTrackingSpecificBranch]));
 }
 
 - (BOOL)isTemporallyEqual: (id)anObject
