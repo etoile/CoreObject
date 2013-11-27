@@ -439,9 +439,7 @@
     UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
 }
 
-// TODO: Rewrite if we keep the new semantics (nov 21)
-#if 0
-- (void) testSelectiveUndoRedoOfCommands
+- (void) testSelectiveUndoOfCommands
 {
     COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *root = [doc1 rootObject];
@@ -460,65 +458,32 @@
     [ctx commitWithUndoTrack: _testTrack];
     [child1 setLabel: @"child1a"];
     [ctx commitWithUndoTrack: _testTrack];
-	
-    // undo doc1 -> doc1a
+	   
 	id<COTrackNode> node = [[_testTrack nodes] objectAtIndex: ([_testTrack count] - 2)];
 
 	UKObjectsEqual(@"doc1a", [root label]);
 	UKObjectsEqual(@"child1a", [child1 label]);
 	
-    [_testTrack undoNode: node];
+    [_testTrack undoNode: node]; // selective undo doc1 -> doc1a
 
 	UKObjectsEqual(@"doc1", [root label]);
 	UKObjectsEqual(@"child1a", [child1 label]);
 
-	[_testTrack undo];
-	
-	UKObjectsEqual(@"doc1", [root label]);
-	UKObjectsEqual(@"child1", [child1 label]);
-	
-	[_testTrack undo];
-	
-	UKObjectsEqual(@"doc1", [root label]);
-	UKNil([child1 label]);
-	
-	[_testTrack undo];
-	
-	UKNil([root label]);
-	UKNil([child1 label]);
-	
-	// redo nil -> child1
-	[_testTrack redoNode: [[_testTrack nodes] objectAtIndex: 2]];
-	
-	UKNil([root label]);
-	UKObjectsEqual(@"child1", [child1 label]);
-	
-	[_testTrack undo];
-	
-	UKNil([root label]);
-	UKNil([child1 label]);
-	
-	[_testTrack redo];
-	
-	UKNil([root label]);
-	UKObjectsEqual(@"child1", [child1 label]);
-	
-	[_testTrack redo];
-	
-	UKObjectsEqual(@"doc1", [root label]);
-	UKObjectsEqual(@"child1", [child1 label]);
-	
-	[_testTrack redo];
-	
-	UKObjectsEqual(@"doc1", [root label]);
-	UKObjectsEqual(@"child1a", [child1 label]);
-
-	[_testTrack redo];
+	[_testTrack undo]; // undo the above -undoNode
 	
 	UKObjectsEqual(@"doc1a", [root label]);
 	UKObjectsEqual(@"child1a", [child1 label]);
+	
+	[_testTrack undo]; // undo child1 -> child1a
+	
+	UKObjectsEqual(@"doc1a", [root label]);
+	UKObjectsEqual(@"child1", [child1 label]);
+	
+	[_testTrack undo]; // undo doc1 -> doc1a
+	
+	UKObjectsEqual(@"doc1", [root label]);
+	UKObjectsEqual(@"child1", [child1 label]);
 }
-#endif
 
 - (void) checkCommandIsEndOfTrack: (id<COTrackNode>)aCommand
 {
@@ -538,10 +503,19 @@
 	UKObjectsEqual(b, command.revision);
 }
 
-// TODO: Rewrite if we keep the new semantics (nov 21)
-#if 0
-- (void) testSelectiveUndoRewritesCommands
+- (void) testSelectiveUndoOfCommands2
 {
+	/*
+	
+	 setup:                           |  test:
+									  |
+	 r0   r1        r2                |  r3
+									  |
+	 []   [child1]  [child1, child2]  |  [child2]
+	                                  |
+									  |  (selective undo of r0->r1)
+	 */
+	
     COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *root = [doc1 rootObject];
 	[ctx commit];
@@ -566,61 +540,20 @@
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r1];
 	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r1 to: r2];
 	
-	// undo child1 insertion
+	// selective undo child1 insertion
 	[_testTrack undoNode: _testTrack.nodes[1]];
 	CORevision *r3 = [doc1 currentRevision];
 	
 	UKObjectsEqual(@[child2], [root contents]);
 	
 	// Check track contents
-	UKIntsEqual(1, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
-	UKTrue([_testTrack canUndo]);
-	UKTrue([_testTrack canRedo]);
-	UKIntsEqual(3, [_testTrack.nodes count]);
+	UKIntsEqual(3, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+	UKIntsEqual(4, [_testTrack.nodes count]);
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
-	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r1 to: r2];
-	// child1 insertion was r0->r1, but the selective undo done by the -undoNode:
-	// call above rewrote it as r3->r2.
-	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r3 to: r2];
-	
-	// undo child2 insertion
-	[_testTrack undo];
-	CORevision *r4 = [doc1 currentRevision];
-	UKObjectsEqual(@[], [root contents]);
-
-	// Check track contents
-	UKIntsEqual(0, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
-	UKIntsEqual(3, [_testTrack.nodes count]);
-	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
-	// child2 insertion was r1->r2, but the selective undo done by the -undo
-	// call above rewrote it as r4->r3.
-	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r4 to: r3];
-	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r3 to: r2];
-	
-	// perform 2 redos
-	
-	UKTrue([_testTrack canRedo]);
-	[_testTrack redo];
-	UKObjectsEqual(@[child2], [root contents]);
-	// Test this this -redo was _not_ implemented as a selective undo, but as
-	// a linear redo.
-	UKObjectsEqual(r3, [doc1 currentRevision]);
-	
-	UKTrue([_testTrack canRedo]);
-	[_testTrack redo];
-	// Test this this -redo was _not_ implemented as a selective undo, but as
-	// a linear redo.
-	UKObjectsEqual(r2, [doc1 currentRevision]);
-	
-	
-	// The point of the "command rewriting" with selective undo is to get better
-	// merges. Without the rewriting we have []->[1] + []->[2] = ? ([1,2] or [2,1] equally valid)
-	// with rewriting we get better results
-	UKObjectsEqual((@[child1, child2]), [root contents]);
-	UKFalse([_testTrack canRedo]);
-	UKTrue([_testTrack canUndo]);
+	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r1];
+	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r1 to: r2];
+	[self checkCommand: _testTrack.nodes[3] isSetVersionFrom: r2 to: r3];
 }
-#endif
 
 @end
 

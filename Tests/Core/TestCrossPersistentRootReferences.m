@@ -176,7 +176,6 @@
 	 }];
 }
 
-#if 0
 - (void) testBranchDeletion
 {
     // library1 <<persistent root>>
@@ -186,8 +185,6 @@
 	// photo1 <<persistent root, branchA>>
     //
 	// photo1 <<persistent root, branchB>>
-	//  |
-	//  \--childB
     //
     // Test the effect of deleting branchB
     
@@ -196,42 +193,32 @@
     
     COBranch *branchA = [photo1 currentBranch];
     COBranch *branchB = [branchA makeBranchWithLabel: @"branchB"];
-    
-    COObject *photo1branchBroot = [[branchB objectGraphContext] rootObject];
-    
-    [photo1branchBroot setValue: @"photo1, branch B" forProperty: @"label"];
-    
-    COObject *childB = [[branchB objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    [childB setValue: @"childB" forProperty: @"label"];
-    
-    [photo1branchBroot insertObject: childB atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-    
-    //[ctx commit];
+    [branchB.rootObject setLabel: @"photo1, branch B"];
     
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
     
     /* This creates a reference to branch B of photo1. */
-    COPath *branchBRef = [COPath pathWithPersistentRoot: [photo1 UUID] branch: [branchB UUID]];
-    COMutableItem *library1RootItem = [[[library1 objectGraphContext] itemForUUID: [[library1 objectGraphContext] rootItemUUID]] mutableCopy];
-    [library1RootItem setValue: S(branchBRef) forAttribute: @"contents"];
-    [[library1 objectGraphContext] insertOrUpdateItems: A(library1RootItem)];
-    
-    //[ctx commit];
-    
-    UKObjectsEqual(S(@"photo1, branch B"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
-    UKObjectsEqual(S(A(@"childB")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
-    
-    // Now delete branch B. This should automatically update the cross-persistent reference
-    
-    branchB.deleted = YES;
-    
-	UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
-    
+	[[library1 rootObject] addObject: branchB.rootObject];
     [ctx commit];
+
+	branchB.deleted = YES;
+    [ctx commit];
+	
+	[store finalizeDeletionsForPersistentRoot: [photo1 UUID]
+									 error: NULL];
+	
+	// TODO: The persistent root should notice that the branch was permanently
+	// deleted, and move the COObjectGraphContext to a CODeletedBranch
+	// (but the COObject pointer to the root object remains valid.)
+	//
+	// 4 cases:
+	// - loaded in memory -> root broken reference in memory, deleted
+	// - not in memory -> root broken reference in memory, deleted
+	// - root broken reference in memory, deleted -> restored from backup (?)
+	// - not in memory -> loaded in memory (regular case)
 }
-#endif
 
 - (void) testMultipleRelationshipsPerObject
 {
