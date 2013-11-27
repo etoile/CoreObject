@@ -26,20 +26,20 @@
     // 1. Set it up in memory
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setValue: @"photo1" forProperty: @"label"];
+    [[photo1 rootObject] setLabel: @"photo1"];
     
     COPersistentRoot *photo2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo2 rootObject] setValue: @"photo2" forProperty: @"label"];
+    [[photo2 rootObject] setLabel: @"photo2"];
     
     COPersistentRoot *library = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    [[library rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
-    [[library rootObject] insertObject: [photo2 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    [[library rootObject] addObject: [photo1 rootObject]];
+    [[library rootObject] addObject: [photo2 rootObject]];
     
-    UKObjectsEqual(S([photo1 rootObject], [photo2 rootObject]), [[library rootObject] valueForKey: @"contents"]);
+    UKObjectsEqual(S([photo1 rootObject], [photo2 rootObject]), [[library rootObject] contents]);
     
     // Do the computed parentCollections properties work across persistent root boundaries?
-    UKObjectsEqual(S([library rootObject]), [[photo1 rootObject] valueForKey: @"parentCollections"]);
-    UKObjectsEqual(S([library rootObject]), [[photo2 rootObject] valueForKey: @"parentCollections"]);
+    UKObjectsEqual(S([library rootObject]), [[photo1 rootObject] parentCollections]);
+    UKObjectsEqual(S([library rootObject]), [[photo2 rootObject] parentCollections]);
     
     // Check that nothing is committed yet
     UKObjectsEqual([NSArray array], [store persistentRootUUIDs]);
@@ -71,8 +71,8 @@
 		 UKObjectsEqual([photo2 UUID], [photo2ctx2 UUID]);
 		 UKObjectsEqual([[photo1 rootObject] UUID], [[photo1ctx2 rootObject] UUID]);
 		 UKObjectsEqual([[photo2 rootObject] UUID], [[photo2ctx2 rootObject] UUID]);
-		 UKObjectsEqual(@"photo1", [[photo1ctx2 rootObject] valueForKey: @"label"]);
-		 UKObjectsEqual(@"photo2", [[photo2ctx2 rootObject] valueForKey: @"label"]);
+		 UKObjectsEqual(@"photo1", [[photo1ctx2 rootObject] label]);
+		 UKObjectsEqual(@"photo2", [[photo2ctx2 rootObject] label]);
 	 }];
 }
 
@@ -347,14 +347,14 @@
     // Test that deleting library1 hides the parent relationship in photo1 to library1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setValue: @"photo1" forProperty: @"label"];
+    [[photo1 rootObject] setLabel: @"photo1"];
     [photo1 commit];
     
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    [[library1 rootObject] setValue: @"library1" forProperty: @"label"];
-    [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    [[library1 rootObject] setLabel: @"library1"];
+    [[library1 rootObject] addObject: [photo1 rootObject]];
     [ctx commit];
     
     UKObjectsEqual(S(@"photo1"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
@@ -382,14 +382,14 @@
     // Test that undeleting photo1 restores the child relationship in library1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setValue: @"photo1" forProperty: @"label"];
+    [[photo1 rootObject] setLabel: @"photo1"];
     [photo1 commit];
         
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
     /* This creates a reference to photo1. */
-    [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    [[library1 rootObject] addObject: [photo1 rootObject]];
     
     [ctx commit];
     
@@ -407,7 +407,7 @@
 	
     COObject *photo2 = [[library1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [photo2 setValue: @"photo2" forProperty: @"label"];
-    [[library1 rootObject] insertObject: photo2 atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    [[library1 rootObject] addObject: photo2];
     
     UKObjectsEqual(S(@"photo1", @"photo2"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
     
@@ -441,14 +441,14 @@
     // Test that undeleting library1 restores the parent relationship in photo1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setValue: @"photo1" forProperty: @"label"];
+    [[photo1 rootObject] setLabel: @"photo1"];
     [photo1 commit];
     
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    [[library1 rootObject] setValue: @"library1" forProperty: @"label"];
-    [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    [[library1 rootObject] setLabel: @"library1"];
+    [[library1 rootObject] addObject: [photo1 rootObject]];
     [ctx commit];
     
     library1.deleted = YES;
@@ -473,105 +473,12 @@
 #endif
 }
 
-#if 0
 - (void) testCompositeCrossReference
 {
     COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    COPersistentRoot *doc2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     COPersistentRoot *child1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[doc1 rootObject] insertObject: [child1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
-	[[doc1 rootObject] setLabel: @"doc1 with child1"];
-	[[doc2 rootObject] setLabel: @"doc2"];
-	[[child1 rootObject] setLabel: @"child1"];
-	[ctx commit];
-	
-	// Check setup
-	
-	[self testPersistentRootWithExistingAndNewContext: doc1
-											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 id testDoc1root = [testPersistentRoot rootObject];
-		 UKTrue([[[testDoc1root entityDescription] propertyDescriptionForName: @"contents"] isComposite]);
-		 id testChild1rootObj = [[testDoc1root contents] objectAtIndex: 0];
-		 UKObjectsEqual(@"child1", [testChild1rootObj label]);
-		 UKObjectsEqual([child1 UUID], [[testChild1rootObj persistentRoot] UUID]);
-	 }];
-	
-	// Move child1 to doc2. Expected that it is automatically removed from doc1.
-
-	UKFalse([doc1 hasChanges]);
-    [[doc2 rootObject] insertObject: [child1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
-	UKTrue([doc1 hasChanges]);
-	[[doc1 rootObject] setLabel: @"doc1"];
-	[[doc2 rootObject] setLabel: @"doc2 with child1"];
-	[ctx commit];
-	
-	[self testPersistentRootWithExistingAndNewContext: doc1
-											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKTrue([[[testPersistentRoot rootObject] contents] isEmpty]);
-		 UKObjectsEqual(@"doc1", [[testPersistentRoot rootObject] label]);
-	 }];
-	[self testPersistentRootWithExistingAndNewContext: doc2
-											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 id testDoc2root = [testPersistentRoot rootObject];
-		 id testChild1rootObj = [[testDoc2root contents] objectAtIndex: 0];
-		 UKObjectsEqual(@"child1", [testChild1rootObj label]);
-		 UKObjectsEqual([child1 UUID], [[testChild1rootObj persistentRoot] UUID]);
-	 }];
-	
-	// Now, revert doc1
-	
-	[[doc1 currentBranch] undo];
-	UKTrue([doc1 hasConsistencyViolation]); // not sure about this?
-	UKObjectsEqual(@"doc1 with child1", [[doc1 rootObject] label]);
-	
-	// chil1 should still be in doc2, and doc1.contents should be empty
-	
+    [[doc1 rootObject] addObject: [child1 rootObject]];
 	UKRaisesException([ctx commit]);
 }
-#endif
-
-/*
- 
- List of some scenarios to test:
- 
- - Performace for a library containing references to 50000 persistent roots
- - (DONE) API for adding a cross-reference to a specific branch
- - (DONE) How do we deal with possible broken relationships? Maybe need a special COBrokenLink object? => the reference will simply disappear
- - (N/A) What about relationships where the type of the destination
- is wrong? => not going to allow
-
- - (DONE) testBasic scenario, but photo1's persistent root is deleted
- - (N/A) testBasic scenario, but photo1's persistent root's root object is changed
- to something other than an OutlineItem.
-   => We're not going to allow doing that
- 
- - (DONE) Test accessing the parent of photo1 when the library persistent root is deleted
- 
- 
- Idea: Two views of references.
- 
- 1. Basic
- 
- Cross-persistent root refs are indistinguishable from regular intra-persistent-root refs.
- Whether the Cross-persistent-root ref is to the default branch or an explicit branch is indistinguishable.
- Cross-persistent-root refs to a deleted persistent root are simply hidden.
- 
- 2. Show metadata
- 
- Basically raw access to the COItem level.
- You get to see COPath objects, so you can see if it's a branch specific relationship,
- an can check if they're broken. (Maybe a wrapper on top of COPath, instead of
- raw COPath objects.)
- 
- => We need to keep the COItem-level representation for relationships in memory,
- so if you delete a persistent root then restore it, the relationships in the
- Basic level reappear automatically.
- 
- 
- */
-
 
 @end
