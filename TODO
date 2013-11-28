@@ -42,22 +42,8 @@ First alpha release blockers
 	
 	- To solve this problem and other persistency issues in EtoileUI, a better solution is to hide CODictionary as an implementation detail. This would reduce the complexity a lot in COObject and public API, and in this way we can easily support relationships in keyed collections (probably even bidirectional ones if we want)
 
-- The hiding dead cross-references feature is broken and will be very complex to implement correctly:
-  See:
-  [TestCrossPersistentRootReferences testPersistentRootUndeletion]
-
-  Right now, if you modify a collection after some elements have been
-  hidden, the hidden elements will be permanently removed. The correct implementation
-  is for every change to a collection with hidden
-  elements, diff the collection before and after the change, and apply the diff to 
-  the underlying "serialized relationship cache" representation.
-
-  I'm not sure if it's worth supporting hiding dead references at the CoreObject level.
-
-  The alternative is letting UI code check if references are broken and choose how to deal with
-  them - could display broken link icon, or hide the reference. This will reduce complexity in
-  CoreObject, give UI's more flexibility, but they will have to do some extra
-  work to get a good default behaviour (hiding broken refs).
+- Implement support for "dead cross-references"; currently an assertion will fail.
+  Or, postpone this until after first release? 
 
 - ProjectDemo should demonstrate more interesting features of CoreObject. 
 
@@ -223,11 +209,6 @@ Future Work
 
 	[a nodes] will not equal [b nodes] but I would expect them to be the equal
 
-  - It looks like, when applying a 'set current version' action does a selective
-    undo/redo, we may get better merges in the future if we rewrite the action
-	to use the revision created from the selective undo/redo. See comment in 
-	-[TestUndo testSelectiveUndoRedoOfCommands2]
-
 
 - Model objects (COObject subclasses included with CoreObject for convenience)
 
@@ -284,14 +265,6 @@ Missing Features
 
 Open Questions
 --------------
-
-- Currently COUndoTrack is conservative and won't let you make an undo that would result
-  in merge conflicts. However, we could easily relax this constraint and automatically resolve
-  conflicts favouring the newer commit (for example). Auto-resolving seems
-  to work well in practice (I'm doing it in COSynchronizer).
-
-- How much support for composite cross-persistent root references should CoreObject provide?
-  Would a "deep copy" that recursively makes copies of referenced persistent roots be useful?
 
 - Support transient persistent roots?  These are COObjectGraphContext wrappers.
   Or, support creating a persistent root in code, then calling "freeze" which will make it
