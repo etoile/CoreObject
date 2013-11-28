@@ -229,6 +229,13 @@
 	 * -willChangeValueForProperty: is called multiple times for the same object.
 	 */
 	NSMutableArray *_oldValues;
+	/**
+	 * Dictionary UUIDs by property names. Used by 
+	 * -[COObject storeItemFromDictionaryForPropertyDescription:] to recreate 
+	 * a COItem representing a keyed multivalued property using the same stable 
+	 * UUID accross repeated serializations.
+	 */
+	NSMutableDictionary *_additionalStoreItemUUIDs;
 	BOOL _isPrepared;
 }
 

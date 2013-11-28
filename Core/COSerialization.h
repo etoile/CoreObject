@@ -19,6 +19,8 @@ extern NSString *kCOObjectIsSharedProperty;
 @interface COObject (COSerialization)
 
 /**
+ * @group Object Serialization
+ *
  * The receiver serialized representation.
  *
  * -storeItem is used to serialize a COObject state and -setStoreItem: to 
@@ -46,8 +48,11 @@ extern NSString *kCOObjectIsSharedProperty;
 - (id)serializedValueForValue: (id)aValue;
 - (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value;
 - (SEL)serializationGetterForProperty: (NSString *)property;
-- (COItem *)storeItemWithTypes: (NSMutableDictionary *)types
-                        values: (NSMutableDictionary *)values;
+- (COItem *)storeItemWithUUID: (ETUUID *)aUUID
+                        types: (NSMutableDictionary *)types
+                       values: (NSMutableDictionary *)values
+                   entityName: (NSString *)anEntityName;
+- (COItem *)additionalStoreItemForUUID: (ETUUID *)anItemUUID;
 
 /** @taskunit Deserialization */
 

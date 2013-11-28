@@ -47,6 +47,10 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
+- (NSDictionary *)additionalStoreItemUUIDs;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (CORelationshipCache *)incomingRelationshipCache;
 /**
  * This method is only exposed to be used internally by CoreObject.

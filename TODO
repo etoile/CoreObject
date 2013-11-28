@@ -32,16 +32,6 @@ First alpha release blockers
 
 - Implement batch mutation in ETCollection and proper KVO support on top of it in COObject
 
-- Add dictionary update tests to TestObjectUpdate.m
-
-	- Undo/redo causes -reloadAtRevision: 
-	                -> -setSerializedValue:forPropertyDescription: 
-					-> -willChangeValueForProperty:
-
-	-  We must ensure -willChangeValue:forProperty: and -didChangeValue:forProperty: support CODictionary (see r9653)
-	
-	- To solve this problem and other persistency issues in EtoileUI, a better solution is to hide CODictionary as an implementation detail. This would reduce the complexity a lot in COObject and public API, and in this way we can easily support relationships in keyed collections (probably even bidirectional ones if we want)
-
 - Implement support for "dead cross-references"; currently an assertion will fail.
   Or, postpone this until after first release? 
 
@@ -172,6 +162,8 @@ Future Work
   - Turn _variableStorage into a private ivar once EtoileUI doesn't access it directly
   
   - -valueForVariableStorageKey: or at least the synthesized getter, should return defensive copies if requested in the metamodel (this should even be the default perhaps, especially for collections)
+  
+  - Add dictionary update tests to TestObjectUpdate.m
 
 
 - COItem
@@ -213,9 +205,19 @@ Future Work
 - Model objects (COObject subclasses included with CoreObject for convenience)
 
   - for COLibrary, evaluate whether we can enfore the constraint that one persistent root belongs to one library
-
-  - Hide CODictionary as an implementation detail
   
+
+- Serialization
+
+	- Deserialization code skips unresolvable collection elements, this doesn't look correct...       
+	
+		if (deserializedValue != nil)
+		{
+			[resultCollection addObject: deserializedValue];
+		}
+  - For collection metamodel assertions, check all collection metamodel attributes (isKeyed, isOrdered, isMultivalued) and document we should update these assertions if we add more collection attributes to the metamodel:
+  
+		NSAssert([aPropertyDesc isKeyed] && [aPropertyDesc isMultivalued], @"Serialization type doesn't match metamodel");
 
 - ProjectDemo
 

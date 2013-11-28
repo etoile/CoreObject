@@ -9,65 +9,40 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COObject.h>
+#import <CoreObject/COItem.h>
 
 /**
- * @group Object Collection and Organization
+ * @group Object Serialization
  *
- * CODictionary is a concrete class that exposes a NSDictionary-compatible API 
- * to support keyed collections in the CoreObject model. Dictionaries are not 
- * supported by the CoreObject serialization format.
+ * CODictionarySerialization is a category to support persistent keyed 
+ * properties in the CoreObject model. Dictionaries are not supported natively 
+ * by the CoreObject serialization format.
  *
- * Both COObject and CODictionary are built on top of on COStoreItem, a 
- * low-level store representation for storing, diffing and merging entities 
- * and keyed collections.
+ * Both COObject and dictionary persistency are built on top of on COItem, a 
+ * low-level store representation for storing, diffing and merging records. 
  *
- * CODictionary is a mutable collection. It is a low-level collection similar 
- * to NSArray or NSDictionary and not a high-level collection such as 
- * COCollection. As a result, CODictionary cannot be used as a root object for 
- * a persistent root (e.g. you cannot tag it or change its modification date).
+ * A record is a unordered collection that contains attribute-value pairs,  
+ * representing either an entity or a dictionary in CoreObject.
  */
-@interface CODictionary : COObject <ETKeyedCollection, ETCollectionMutation>
-{
-	@private
-	NSMutableDictionary *_content;
-}
+@interface COObject (CODictionarySerialization)
 
+/** @taskunit Serialization Additions */
 
-/** @taskunit Keyed Collection Protocol */
+- (COItem *)storeItemFromDictionaryForPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
+- (NSDictionary *)dictionaryFromStoreItem: (COItem *)anItem
+                   forPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
 
+@end
 
 /**
- * See -[NSDictionary allKeys].
+ * @group Object Serialization
+ *
+ * Additions to store item to support dictionary serialization.
  */
-- (NSArray *)allKeys;
+@interface COItem (CODictionarySerialization)
 /**
- * See -[NSDictionary allValues].
+ * Returns YES when the item doesn't represent an entity object in the 
+ * object graph context, but just a property attached to some COObject instance.
  */
-- (NSArray *)allValues;
-/**
- * See -[NSDictionary objectForKey:].
- */
-- (id)objectForKey: (id)aKey;
-/**
- * See -[NSDictionary setObject:forKey:].
- */
-- (void)setObject: (id)anObject forKey: (id)aKey;
-/**
- * See -[NSDictionary removeObjectForKey:].
- */
-- (void)removeObjectForKey: (id)aKey;
-/**
- * See -[NSDictionary removeAllObjects].
- */
-- (void)removeAllObjects;
-
-
-/** @taskunit Collection Protocol Additions */
-
-
-/** 
- * Returns self. 
- */
-+ (Class) mutableClass;
-
+- (BOOL)isAdditionalItem;
 @end

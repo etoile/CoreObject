@@ -59,6 +59,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 {
     SUPERINIT;
     _loadedObjects = [[NSMutableDictionary alloc] init];
+	_objectsByAdditionalItemUUIDs = [[NSMutableDictionary alloc] init];
     _insertedObjects = [[NSMutableSet alloc] init];
     _updatedObjects = [[NSMutableSet alloc] init];
     _updatedPropertiesByObject = [[NSMapTable alloc] init];
@@ -247,8 +248,18 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	                   entityDescription: [self descriptionForItem: anItem]];
 
     [obj setStoreItem: anItem];
+	
+	for (ETUUID *itemUUID in [[obj additionalStoreItemUUIDs] objectEnumerator])
+	{
+		[_objectsByAdditionalItemUUIDs setObject: obj forKey: itemUUID];
+	}
 
 	return obj;
+}
+
+- (id <COItemGraph>)loadingItemGraph
+{
+	return _loadingItemGraph;
 }
 
 /**
@@ -269,7 +280,8 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 			continue;
 		
 		COObject *object = [self loadedObjectForUUID: UUID];
-		ETAssert(object != nil);
+		// TODO: Don't include the additional item UUIDs in the UUIDs argument
+		ETAssert(object != nil || [[_loadingItemGraph itemForUUID: UUID] isAdditionalItem]);
 
 		[object didLoadObjectGraph];
 	}
@@ -292,17 +304,28 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 - (COItem *)itemForUUID: (ETUUID *)aUUID
 {
-    return [[_loadedObjects objectForKey: aUUID] storeItem];
+    COObject *object = [_loadedObjects objectForKey: aUUID];
+	
+	if (object != nil)
+		return [object storeItem];
+
+	return [[_objectsByAdditionalItemUUIDs objectForKey: aUUID] additionalStoreItemForUUID: aUUID];
 }
 
 - (NSArray *)itemUUIDs
 {
-    return [_loadedObjects allKeys];
+    NSArray *additionalItemUUIDs = [_objectsByAdditionalItemUUIDs allKeys];
+
+	return [[_loadedObjects allKeys] arrayByAddingObjectsFromArray: additionalItemUUIDs];
 }
 
 - (void)addItem: (COItem *)item markAsInserted: (BOOL)markInserted
 {
     NSParameterAssert(item != nil);
+
+	/* Additional items are deserialized by their owner object deserialization */
+	if ([item isAdditionalItem])
+		return;
     
     ETUUID *uuid = [item UUID];
     COObject *currentObject = [_loadedObjects objectForKey: uuid];
@@ -406,9 +429,15 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	INVALIDARG_EXCEPTION_TEST(object, [_loadedObjects objectForKey: uuid] == nil);
     
     [_loadedObjects setObject: object forKey: uuid];
+
 	if (inserted)
 	{
 		[_insertedObjects addObject: object];
+		
+		for (ETUUID *itemUUID in [[object additionalStoreItemUUIDs] objectEnumerator])
+		{
+			[_objectsByAdditionalItemUUIDs setObject: object forKey: itemUUID];
+		}
 	}
 }
 
@@ -468,6 +497,11 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 - (void)discardObjects: (NSSet *)objects
 {
+	for (COObject *obj in objects)
+	{
+		[_objectsByAdditionalItemUUIDs removeObjectsForKeys: [[obj additionalStoreItemUUIDs] allValues]];
+	}
+
 	[_loadedObjects removeObjectsForKeys: [(id)[[objects mappedCollection] UUID] allObjects]];
 }
 
@@ -524,10 +558,17 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     
     [_insertedObjects removeObject: anObject];
     [_updatedObjects removeObject: anObject];
+	
+	// TODO: Put the three next steps into a -discardObject: method, and rewrite
+	// -discardObjects: to call -discardObject:
     
     // Mark the object as a "zombie"
     
     [anObject markAsRemovedFromContext];
+
+	// Remove it from the additional item to object lookup table
+
+	[_objectsByAdditionalItemUUIDs removeObjectsForKeys: [[anObject additionalStoreItemUUIDs] allValues]];
     
     // Release it from the objects dictionary (may release it)
     

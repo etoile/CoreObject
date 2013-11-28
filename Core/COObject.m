@@ -11,7 +11,6 @@
  */
 
 #import "COObject.h"
-#import "CODictionary.h"
 #import "COError.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
@@ -137,7 +136,11 @@ See +[NSObject typePrefix]. */
 
 	if ([propDesc isKeyed])
 	{
-		return ([propDesc isPersistent] ? [CODictionary class] : [NSDictionary class]);
+		// NOTE: Could be better to return nil in the assertion case, and move
+		// the assertion in methods calling -collectionClassForPropertyDescription:.
+		NSAssert1([propDesc isOrdered] == NO || [propDesc isPersistent] == NO,
+			@"Persistent keyed collection %@ cannot be ordered.", propDesc);
+		return [NSDictionary class];
 	}
 	else
 	{
@@ -150,10 +153,6 @@ See +[NSObject typePrefix]. */
 	Class class = [self collectionClassForPropertyDescription: propDesc];
 	ETAssert([class conformsToProtocol: @protocol(ETCollection)]);
 
-	if ([class isSubclassOfClass: [CODictionary class]])
-	{
-		return [[CODictionary alloc] initWithObjectGraphContext: _objectGraphContext];
-	}
 	return [[class mutableClass] new];
 }
 
@@ -205,6 +204,29 @@ See +[NSObject typePrefix]. */
 	}
 }
 
+- (NSArray *)keyedPersistentPropertyDescriptions
+{
+	return [[_entityDescription allPersistentPropertyDescriptions]
+		filteredCollectionWithBlock: ^ (id propDesc) { return [propDesc isKeyed]; }];
+}
+
+- (NSMutableDictionary *)newAdditionalStoreItemUUIDs: (BOOL)isDeserialization
+{
+	NSMutableDictionary *storeItemUUIDs = [NSMutableDictionary new];
+
+	for (ETPropertyDescription *propertyDesc in [self keyedPersistentPropertyDescriptions])
+	{
+		[storeItemUUIDs setObject: (isDeserialization ? [NSNull null] : [ETUUID UUID])
+		                   forKey: [propertyDesc name]];
+	}
+	return storeItemUUIDs;
+}
+
+- (NSDictionary *)additionalStoreItemUUIDs
+{
+	return _additionalStoreItemUUIDs;
+}
+
 - (id)prepareWithUUID: (ETUUID *)aUUID
     entityDescription: (ETEntityDescription *)anEntityDescription
    objectGraphContext: (COObjectGraphContext *)aContext
@@ -227,6 +249,7 @@ See +[NSObject typePrefix]. */
 	_variableStorage = [self newVariableStorage];
 	_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
 	_oldValues = [NSMutableArray new];
+	_additionalStoreItemUUIDs = [self newAdditionalStoreItemUUIDs: (inserted == NO)];
 
 	[_objectGraphContext registerObject: self isNew: inserted];
 
@@ -688,9 +711,7 @@ See +[NSObject typePrefix]. */
 
 	if ([propertyDesc isMultivalued] && [self isCoreObjectRelationship: propertyDesc])
 	{
-		// NOTE: We use -content to get the internal representation in case the
-		// collection is a CODictionary
-		id <ETCollection> oldCollection = [[[self valueForStorageKey: key] content] mutableCopy];
+		id <ETCollection> oldCollection = [[self valueForStorageKey: key] mutableCopy];
 
 		[_oldValues addObject: [ETKeyValuePair pairWithKey: key
 		                                             value: oldCollection]];
@@ -939,6 +960,7 @@ See +[NSObject typePrefix]. */
 
 - (void)awakeFromDeserialization
 {
+	ETAssert([[_additionalStoreItemUUIDs allValues] containsObject: [NSNull null]] == NO);
     [self validateMultivaluedPropertiesUsingMetamodel];
 }
 

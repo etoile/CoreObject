@@ -3,9 +3,10 @@
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
 #import "CODictionary.h"
+#import "COObjectGraphContext+Private.h"
 
 @interface Model : COObject
-@property (nonatomic, strong) CODictionary *entries;
+@property (nonatomic, strong) NSMutableDictionary *entries;
 @end
 
 @implementation Model
@@ -20,7 +21,6 @@
 	// the property descriptions that we will inherit through the parent
 	if ([[object name] isEqual: [Model className]] == NO)
 		return object;
-
 
 	ETPropertyDescription *entries =
 		[ETPropertyDescription descriptionWithName: @"entries" type: (id)@"NSString"];
@@ -49,6 +49,40 @@
 	SUPERINIT;
 	model = [[ctx insertNewPersistentRootWithEntityName: @"Model"] rootObject];
 	return self;
+}
+
+- (void)testModelInitialization
+{
+	[ctx commit];
+
+	[self checkPersistentRootWithExistingAndNewContext: [model persistentRoot]
+	                                           inBlock:
+	^ (COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		Model *testModel = [testPersistentRoot rootObject];
+
+		UKObjectsEqual([NSDictionary dictionary], [testModel valueForProperty: @"entries"]);
+		UKObjectKindOf([testModel valueForProperty: @"entries"], NSMutableDictionary);
+	}];
+}
+
+- (void)testSetContent
+{
+	[model setValue: D(@"boum", @"sound") forProperty: @"entries"];
+	
+	UKObjectsEqual(S(model), [[model objectGraphContext] insertedObjects]);
+
+	[ctx commit];
+
+	[self checkPersistentRootWithExistingAndNewContext: [model persistentRoot]
+	                                           inBlock:
+	^ (COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		Model *testModel = [testPersistentRoot rootObject];
+
+		UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
+		UKObjectKindOf([testModel valueForProperty: @"entries"], NSMutableDictionary);
+	}];
 }
 
 - (void)testDirectMutation

@@ -21,6 +21,8 @@
 - (void)setPersistentRoot: (COPersistentRoot *)aPersistentRoot;
 
 /**
+ * This property is only exposed to be used internally by CoreObject.
+ *
  * The branch UUID.
  *
  * If the receiver is transient, returns the future branch UUID that will be 
@@ -44,6 +46,16 @@
  * deserialization without accessing the store.
  */
 - (id)objectReferenceWithUUID: (ETUUID *)aUUID;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Returns the item graph getting loaded into the object graph context.
+ *
+ * If no loading involving multiple items is underway, returns nil.
+ *
+ * See -setItemGraph: and -insertAndUpdateItems:.
+ */
+- (id <COItemGraph>)loadingItemGraph;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

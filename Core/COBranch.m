@@ -17,6 +17,7 @@
 #import "COSQLiteStore.h"
 #import "COPersistentRootInfo.h"
 #import "COObject.h"
+#import "COObject+Private.h"
 #import "CORevision.h"
 #import "FMDatabase.h"
 #import "CORevisionInfo.h"
@@ -884,6 +885,12 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     {
         COItem *item = [graph itemForUUID: [obj UUID]];
         [dict setObject: item forKey: [obj UUID]];
+
+		for (ETUUID *itemUUID in [[obj additionalStoreItemUUIDs] objectEnumerator])
+		{
+			[dict setObject: [obj additionalStoreItemForUUID: itemUUID]
+			         forKey: itemUUID];
+		}
     }
     
     return [[COItemGraph alloc] initWithItemForUUID: dict rootItemUUID: [graph rootItemUUID]];

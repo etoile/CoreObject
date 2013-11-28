@@ -9,7 +9,7 @@
  */
 
 #import "COObjectGraphContext+GarbageCollection.h"
-#import "CODictionary.h"
+#import "COObject.h"
 
 @implementation COObjectGraphContext (COGarbageCollection)
 
@@ -34,7 +34,7 @@ static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectG
         {
 			if ([propDesc isKeyed])
 			{
-				assert([value isKindOfClass: [CODictionary class]] || [value isKindOfClass: [NSDictionary class]]);
+				assert([value isKindOfClass: [NSDictionary class]]);
 			}
 			else
 			{
