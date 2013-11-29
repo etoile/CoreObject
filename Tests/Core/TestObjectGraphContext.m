@@ -279,14 +279,4 @@
     UKRaisesException([ctx1 setRootObject: root2]);
 }
 
-- (void) testMixingObjectsBetweenObjectContexts
-{
-	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
-	OutlineItem *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
-	
-	UKObjectsNotSame([root1 objectGraphContext], [root2 objectGraphContext]);
-	
-	// FIXME: Check that adding root2 to root1 throws an exception
-}
-
 @end
