@@ -22,6 +22,8 @@
 
 #import "OutlineItem.h"
 #import "Tag.h"
+#import "Parent.h"
+#import "Child.h"
 
 #import "COPersistentRoot+Private.h"
 #import "COSQLiteStore+Private.h"

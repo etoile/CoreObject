@@ -709,12 +709,22 @@ See +[NSObject typePrefix]. */
 	ETPropertyDescription *propertyDesc =
 		[_entityDescription propertyDescriptionForName: key];
 
-	if ([propertyDesc isMultivalued] && [self isCoreObjectRelationship: propertyDesc])
+	if ([self isCoreObjectRelationship: propertyDesc])
 	{
-		id <ETCollection> oldCollection = [[self valueForStorageKey: key] mutableCopy];
+		if ([propertyDesc isMultivalued])
+		{
+			id <ETCollection> oldCollection = [[self valueForStorageKey: key] mutableCopy];
 
-		[_oldValues addObject: [ETKeyValuePair pairWithKey: key
-		                                             value: oldCollection]];
+			[_oldValues addObject: [ETKeyValuePair pairWithKey: key
+														 value: oldCollection]];
+		}
+		else
+		{
+			id <ETCollection> oldValue = [self valueForStorageKey: key];
+			
+			[_oldValues addObject: [ETKeyValuePair pairWithKey: key
+														 value: oldValue]];
+		}
 	}
 	[super willChangeValueForKey: key];
 }
@@ -789,6 +799,10 @@ See +[NSObject typePrefix]. */
 	NSString *key = [propertyDesc name];
 	ETPropertyDescription *parentDesc = [propertyDesc opposite];
 	id value = [self valueForStorageKey: key];
+	
+	if (value == nil)
+		return;
+	
 	/* For parent-to-children relationship, just handle to-one or to-many in the same way  */
 	id <ETCollection> children =
 		([propertyDesc isMultivalued] ? value : [NSArray arrayWithObject: value]);
@@ -807,24 +821,34 @@ See +[NSObject typePrefix]. */
 		if (oldParent == nil || oldParent == self)
 			continue;
 		
-		// FIXME: EtoileUI handles removing the object from its old parent.
-		// In that case, don't try to do it ourselves.
-		id <ETCollection> oldParentChildren = [oldParent valueForStorageKey: key];
-		BOOL alreadyRemoved = (![oldParentChildren containsObject: child]);
-		
-		if (alreadyRemoved)
-			continue;
+		if ([propertyDesc isMultivalued])
+		{
+			// FIXME: EtoileUI handles removing the object from its old parent.
+			// In that case, don't try to do it ourselves.
+			id <ETCollection> oldParentChildren = [oldParent valueForStorageKey: key];
+			BOOL alreadyRemoved = (![oldParentChildren containsObject: child]);
+			
+			if (alreadyRemoved)
+				continue;
 
-		[oldParent removeObject: child
-		                atIndex: ETUndeterminedIndex
-		                   hint: nil
-		            forProperty: key];
+			[oldParent removeObject: child
+							atIndex: ETUndeterminedIndex
+							   hint: nil
+						forProperty: key];
+		}
+		else
+		{
+			id oldParentChild = [oldParent valueForStorageKey: key];			
+			ETAssert(oldParentChild == child);
+			
+			[oldParent setValue: nil forStorageKey: key];
+		}
 	}
 }
 
 - (id)oldCoreObjectRelationshipValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
-	if ([aPropertyDesc isMultivalued] == NO || [self isCoreObjectRelationship: aPropertyDesc] == NO)
+	if ([self isCoreObjectRelationship: aPropertyDesc] == NO)
 		return nil;
 
 	ETKeyValuePair *pair = [_oldValues lastObject];
