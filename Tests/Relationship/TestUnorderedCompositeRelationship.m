@@ -2,7 +2,7 @@
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
-@interface TestCompositeUnorderedMultivalued : EditingContextTestCase <UKTest>
+@interface TestUnorderedCompositeRelationship : EditingContextTestCase <UKTest>
 {
 	COPersistentRoot *persistentRoot;
 	Folder *parent;
@@ -11,7 +11,7 @@
 }
 @end
 
-@implementation TestCompositeUnorderedMultivalued
+@implementation TestUnorderedCompositeRelationship
 
 - (id) init
 {

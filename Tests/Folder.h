@@ -1,7 +1,5 @@
 #import <CoreObject/CoreObject.h>
 
-@class Parent;
-
 /**
  * Folder has a composite, multivalued, unordered relationship to other folders
  * called 'contents'. Note that it can only contain other Folders.

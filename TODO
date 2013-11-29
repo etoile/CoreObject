@@ -45,6 +45,8 @@ First alpha release blockers
 
   - Simple diff visualization
 
+- Test behaviour of one:many relationship that is not declared as composite,
+  I think it will break or give weird results
 
 Future Work
 -----------

@@ -2,7 +2,7 @@
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
-@interface TestCompositeUnivalued : EditingContextTestCase <UKTest>
+@interface TestUnivaluedCompositeRelationship : EditingContextTestCase <UKTest>
 {
 	COPersistentRoot *persistentRoot;
 	Parent *parent;
@@ -10,7 +10,7 @@
 }
 @end
 
-@implementation TestCompositeUnivalued
+@implementation TestUnivaluedCompositeRelationship
 
 - (id) init
 {

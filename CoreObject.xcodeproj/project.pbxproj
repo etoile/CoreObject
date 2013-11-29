@@ -80,9 +80,6 @@
 		661211411821986B003AEC29 /* CODateSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 6612113F1821986B003AEC29 /* CODateSerialization.m */; };
 		6621BF101847F06D000809CF /* Parent.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF0F1847F06D000809CF /* Parent.m */; };
 		6621BF1A1847F077000809CF /* Child.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF191847F077000809CF /* Child.m */; };
-		6621BF1D1847F4C2000809CF /* TestCompositeUnivalued.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF1C1847F4C2000809CF /* TestCompositeUnivalued.m */; };
-		6621BF201847FE22000809CF /* TestCompositeOrderedMultivalued.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF1F1847FE22000809CF /* TestCompositeOrderedMultivalued.m */; };
-		6621BF231848112F000809CF /* TestCompositeUnorderedMultivalued.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF221848112F000809CF /* TestCompositeUnorderedMultivalued.m */; };
 		6621BF2618482159000809CF /* Folder.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF2518482159000809CF /* Folder.m */; };
 		662AC93D1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 662AC93B1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h */; };
 		662AC93E1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 662AC93C1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m */; };
@@ -203,6 +200,12 @@
 		669724EE17D464400090B31A /* COSequenceInsertion.m in Sources */ = {isa = PBXBuildFile; fileRef = 669724EC17D464400090B31A /* COSequenceInsertion.m */; };
 		669724F117D4646E0090B31A /* COSequenceModification.h in Headers */ = {isa = PBXBuildFile; fileRef = 669724EF17D4646D0090B31A /* COSequenceModification.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		669724F217D4646E0090B31A /* COSequenceModification.m in Sources */ = {isa = PBXBuildFile; fileRef = 669724F017D4646D0090B31A /* COSequenceModification.m */; };
+		6699DDA7184887C30003E803 /* TestOrderedCompositeRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDA4184887C30003E803 /* TestOrderedCompositeRelationship.m */; };
+		6699DDA8184887C30003E803 /* TestUnivaluedCompositeRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDA5184887C30003E803 /* TestUnivaluedCompositeRelationship.m */; };
+		6699DDA9184887C30003E803 /* TestUnorderedCompositeRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDA6184887C30003E803 /* TestUnorderedCompositeRelationship.m */; };
+		6699DDAC184887E70003E803 /* TestOrderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAB184887E70003E803 /* TestOrderedRelationship.m */; };
+		6699DDAF184887F60003E803 /* TestUnivaluedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */; };
+		6699DDB2184888050003E803 /* TestUnorderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDB1184888050003E803 /* TestUnorderedRelationship.m */; };
 		66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66C3670C17B5F9B0009ACF2F /* COBranchInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3670A17B5F9AF009ACF2F /* COBranchInfo.m */; };
@@ -505,9 +508,6 @@
 		6621BF0F1847F06D000809CF /* Parent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Parent.m; path = Tests/Parent.m; sourceTree = "<group>"; };
 		6621BF181847F077000809CF /* Child.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Child.h; path = Tests/Child.h; sourceTree = "<group>"; };
 		6621BF191847F077000809CF /* Child.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Child.m; path = Tests/Child.m; sourceTree = "<group>"; };
-		6621BF1C1847F4C2000809CF /* TestCompositeUnivalued.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCompositeUnivalued.m; sourceTree = "<group>"; };
-		6621BF1F1847FE22000809CF /* TestCompositeOrderedMultivalued.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCompositeOrderedMultivalued.m; sourceTree = "<group>"; };
-		6621BF221848112F000809CF /* TestCompositeUnorderedMultivalued.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCompositeUnorderedMultivalued.m; sourceTree = "<group>"; };
 		6621BF2418482159000809CF /* Folder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Folder.h; path = Tests/Folder.h; sourceTree = "<group>"; };
 		6621BF2518482159000809CF /* Folder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Folder.m; path = Tests/Folder.m; sourceTree = "<group>"; };
 		662AC93B1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEndOfUndoTrackPlaceholderNode.h; sourceTree = "<group>"; };
@@ -632,6 +632,12 @@
 		669963EB11600FD500359BE6 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		669965351162E17500359BE6 /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = /usr/lib/libz.1.2.5.dylib; sourceTree = "<absolute>"; };
 		6699653F1162E1C000359BE6 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
+		6699DDA4184887C30003E803 /* TestOrderedCompositeRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestOrderedCompositeRelationship.m; sourceTree = "<group>"; };
+		6699DDA5184887C30003E803 /* TestUnivaluedCompositeRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnivaluedCompositeRelationship.m; sourceTree = "<group>"; };
+		6699DDA6184887C30003E803 /* TestUnorderedCompositeRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnorderedCompositeRelationship.m; sourceTree = "<group>"; };
+		6699DDAB184887E70003E803 /* TestOrderedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestOrderedRelationship.m; sourceTree = "<group>"; };
+		6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnivaluedRelationship.m; sourceTree = "<group>"; };
+		6699DDB1184888050003E803 /* TestUnorderedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnorderedRelationship.m; sourceTree = "<group>"; };
 		66C3669E17B426C0009ACF2F /* Typewriter-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = "Typewriter-Info.plist"; path = "Samples/Typewriter/Typewriter-Info.plist"; sourceTree = "<group>"; };
 		66C366A017B426C0009ACF2F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		66C366A217B426C0009ACF2F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Samples/Typewriter/main.m; sourceTree = SOURCE_ROOT; };
@@ -1158,6 +1164,20 @@
 			name = Documentation;
 			sourceTree = "<group>";
 		};
+		6699DDA3184887C30003E803 /* Relationship */ = {
+			isa = PBXGroup;
+			children = (
+				6699DDA4184887C30003E803 /* TestOrderedCompositeRelationship.m */,
+				6699DDA5184887C30003E803 /* TestUnivaluedCompositeRelationship.m */,
+				6699DDA6184887C30003E803 /* TestUnorderedCompositeRelationship.m */,
+				6699DDAB184887E70003E803 /* TestOrderedRelationship.m */,
+				6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */,
+				6699DDB1184888050003E803 /* TestUnorderedRelationship.m */,
+			);
+			name = Relationship;
+			path = Tests/Relationship;
+			sourceTree = "<group>";
+		};
 		66C3669D17B426C0009ACF2F /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -1230,9 +1250,6 @@
 			children = (
 				66E40D3D1836D08D00E5B4A7 /* TestCollection.m */,
 				66E40D3E1836D08D00E5B4A7 /* TestDictionary.m */,
-				6621BF1C1847F4C2000809CF /* TestCompositeUnivalued.m */,
-				6621BF1F1847FE22000809CF /* TestCompositeOrderedMultivalued.m */,
-				6621BF221848112F000809CF /* TestCompositeUnorderedMultivalued.m */,
 			);
 			name = Model;
 			path = Tests/Model;
@@ -1321,6 +1338,7 @@
 				609C00541704C24C00D01AAB /* main.m */,
 				609C00581704C24C00D01AAB /* TestCommon.h */,
 				609C00591704C24C00D01AAB /* TestCommon.m */,
+				6699DDA3184887C30003E803 /* Relationship */,
 				66E40D291836D08D00E5B4A7 /* Core */,
 				66E40D391836D08D00E5B4A7 /* Diff */,
 				66E40D3C1836D08D00E5B4A7 /* Model */,
@@ -1844,16 +1862,20 @@
 			files = (
 				6660B3961839522B009007FD /* TestSerialization.m in Sources */,
 				66E40D661836D08D00E5B4A7 /* TestItemGraphDiff.m in Sources */,
+				6699DDB2184888050003E803 /* TestUnorderedRelationship.m in Sources */,
 				66E40D5E1836D08D00E5B4A7 /* TestEditingContext.m in Sources */,
 				66E40D621836D08D00E5B4A7 /* TestObjectGraphContext.m in Sources */,
 				66E40D651836D08D00E5B4A7 /* TestRevisionNumber.m in Sources */,
 				66E40D581836D08D00E5B4A7 /* TestConcurrentChanges.m in Sources */,
 				66E40D5A1836D08D00E5B4A7 /* TestCopier.m in Sources */,
+				6699DDAF184887F60003E803 /* TestUnivaluedRelationship.m in Sources */,
 				66E40D671836D08D00E5B4A7 /* TestMerge.m in Sources */,
 				66E40D781836D08E00E5B4A7 /* TestUndoStackFailedNavigation.m in Sources */,
 				66E40D5C1836D08D00E5B4A7 /* TestCopierWithIsSharedFalseAndMultipleReferences.m in Sources */,
+				6699DDAC184887E70003E803 /* TestOrderedRelationship.m in Sources */,
 				66E40D601836D08D00E5B4A7 /* TestNotifications.m in Sources */,
 				66E40D691836D08D00E5B4A7 /* TestDictionary.m in Sources */,
+				6699DDA9184887C30003E803 /* TestUnorderedCompositeRelationship.m in Sources */,
 				66E40D5F1836D08D00E5B4A7 /* TestHistoryInspection.m in Sources */,
 				609C00651704C24C00D01AAB /* main.m in Sources */,
 				66E40D791836D08E00E5B4A7 /* TestUndoStackStore.m in Sources */,
@@ -1862,15 +1884,14 @@
 				66E40D5B1836D08D00E5B4A7 /* TestCopierWithIsShared.m in Sources */,
 				66E40D6F1836D08D00E5B4A7 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
 				66E40D7A1836D08E00E5B4A7 /* TestUndoStackTrackProtocol.m in Sources */,
-				6621BF201847FE22000809CF /* TestCompositeOrderedMultivalued.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66E451D617CC461F00205679 /* OutlineItem.m in Sources */,
 				66E40D641836D08D00E5B4A7 /* TestPersistentRoot.m in Sources */,
 				66E40D7B1836D08E00E5B4A7 /* TestUndoUseCases.m in Sources */,
 				66E40D711836D08D00E5B4A7 /* TestSynchronization.m in Sources */,
+				6699DDA8184887C30003E803 /* TestUnivaluedCompositeRelationship.m in Sources */,
 				66E40D761836D08E00E5B4A7 /* TestHistoryTrack.m in Sources */,
 				66E451D917CC565200205679 /* Tag.m in Sources */,
-				6621BF1D1847F4C2000809CF /* TestCompositeUnivalued.m in Sources */,
 				66E40D6D1836D08D00E5B4A7 /* TestSQLiteStoreErrorHandling.m in Sources */,
 				66E40D741836D08E00E5B4A7 /* TestSynchronizerMultiUser.m in Sources */,
 				6621BF2618482159000809CF /* Folder.m in Sources */,
@@ -1880,8 +1901,8 @@
 				66E40D6A1836D08D00E5B4A7 /* TestItem.m in Sources */,
 				66E40D591836D08D00E5B4A7 /* TestCOObjectSynthesizedAccessors.m in Sources */,
 				66E40D721836D08D00E5B4A7 /* TestSynchronizer.m in Sources */,
-				6621BF231848112F000809CF /* TestCompositeUnorderedMultivalued.m in Sources */,
 				66E40D571836D08D00E5B4A7 /* TestBranch.m in Sources */,
+				6699DDA7184887C30003E803 /* TestOrderedCompositeRelationship.m in Sources */,
 				66E40D681836D08D00E5B4A7 /* TestCollection.m in Sources */,
 				66E40D751836D08E00E5B4A7 /* TestCustomTrack.m in Sources */,
 				6621BF1A1847F077000809CF /* Child.m in Sources */,

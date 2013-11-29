@@ -2,7 +2,7 @@
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
-@interface TestCompositeOrderedMultivalued : EditingContextTestCase <UKTest>
+@interface TestOrderedCompositeRelationship : EditingContextTestCase <UKTest>
 {
 	COPersistentRoot *persistentRoot;
 	OutlineItem *parent;
@@ -11,7 +11,7 @@
 }
 @end
 
-@implementation TestCompositeOrderedMultivalued
+@implementation TestOrderedCompositeRelationship
 
 - (id) init
 {
