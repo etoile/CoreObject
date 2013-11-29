@@ -80,13 +80,16 @@
 	{
 		Model *testModel = [testPersistentRoot rootObject];
 
-		UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
-		UKObjectKindOf([testModel valueForProperty: @"entries"], NSMutableDictionary);
+		UKObjectsEqual(D(@"boum", @"sound"), [testModel valueForProperty: @"entries"]);
 	}];
 }
 
 - (void)testDirectMutation
 {
+	// TODO: You should never try to mutate the dictionary directly like this
+	// and it should really throw an exception, as should modifying an array/set
+	// returned for a regular multivalued property.
+	
 	[[model entries] setObject: @"pear" forKey: @"fruit"];
 	[[model entries] setObject: @"leak" forKey: @"vegetable"];
 	
