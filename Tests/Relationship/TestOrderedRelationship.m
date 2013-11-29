@@ -111,17 +111,71 @@
 
 @implementation TestOrderedRelationship
 
+/**
+ * Test that an object graph of OrderedGroupNoOpposite can be reloaded in another
+ * context. Test that one OutlineItem can be in two OrderedGroupNoOpposite's.
+ */
 - (void) testOrderedGroupNoOpposite
 {
 	COObjectGraphContext *ctx = [COObjectGraphContext new];
 	OrderedGroupNoOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupNoOpposite"];
 	OrderedGroupNoOpposite *group2 = [ctx insertObjectWithEntityName: @"OrderedGroupNoOpposite"];
-	OrderedGroupNoOpposite *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
-	OrderedGroupNoOpposite *item2 = [ctx insertObjectWithEntityName: @"OutlineItem"];
-	OrderedGroupNoOpposite *item3 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *item2 = [ctx insertObjectWithEntityName: @"OutlineItem"];
 	
-	group1.contents = @[item1, item2, item3];
-	group2.contents = @[item3, item2, item1];
+	group1.contents = @[item1, item2];
+	group2.contents = @[item1];
+	
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	[ctx2 setItemGraph: ctx];
+	
+	OrderedGroupNoOpposite *group1ctx2 = [ctx2 loadedObjectForUUID: [group1 UUID]];
+	OrderedGroupNoOpposite *group2ctx2 = [ctx2 loadedObjectForUUID: [group2 UUID]];
+	OutlineItem *item1ctx2 = [ctx2 loadedObjectForUUID: [item1 UUID]];
+	OutlineItem *item2ctx2 = [ctx2 loadedObjectForUUID: [item2 UUID]];
+	
+	UKObjectsEqual((@[item1ctx2, item2ctx2]), [group1ctx2 contents]);
+	UKObjectsEqual((@[item1ctx2]), [group2ctx2 contents]);
+}
+
+- (void) testOrderedGroupWithOpposite
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	OrderedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupWithOpposite"];
+	OrderedGroupWithOpposite *group2 = [ctx insertObjectWithEntityName: @"OrderedGroupWithOpposite"];
+	OrderedGroupContent *item1 = [ctx insertObjectWithEntityName: @"OrderedGroupContent"];
+	OrderedGroupContent *item2 = [ctx insertObjectWithEntityName: @"OrderedGroupContent"];
+	
+	group1.contents = @[item1, item2];
+	group2.contents = @[item1];
+	
+	UKObjectsEqual(S(group1, group2), [item1 parentGroups]);
+	UKObjectsEqual(S(group1), [item2 parentGroups]);
+
+	// Make some changes
+	
+	group2.contents = @[item1, item2];
+
+	UKObjectsEqual(S(group1, group2), [item2 parentGroups]);
+	
+	group1.contents = @[item2];
+
+	UKObjectsEqual(S(group2), [item1 parentGroups]);
+	
+	// Reload in another graph
+	
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	[ctx2 setItemGraph: ctx];
+	
+	OrderedGroupWithOpposite *group1ctx2 = [ctx2 loadedObjectForUUID: [group1 UUID]];
+	OrderedGroupWithOpposite *group2ctx2 = [ctx2 loadedObjectForUUID: [group2 UUID]];
+	OrderedGroupContent *item1ctx2 = [ctx2 loadedObjectForUUID: [item1 UUID]];
+	OrderedGroupContent *item2ctx2 = [ctx2 loadedObjectForUUID: [item2 UUID]];
+	
+	UKObjectsEqual((@[item2ctx2]), [group1ctx2 contents]);
+	UKObjectsEqual((@[item1ctx2, item2ctx2]), [group2ctx2 contents]);
+	UKObjectsEqual(S(group1ctx2, group2ctx2), [item2ctx2 parentGroups]);
+	UKObjectsEqual(S(group2ctx2), [item1ctx2 parentGroups]);
 }
 
 @end
