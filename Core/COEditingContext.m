@@ -726,9 +726,9 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 	
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
-		for (COBranch *branch in [persistentRoot branches])
+		for (COObjectGraphContext *objectGraphContext in [persistentRoot allObjectGraphContexts])
 		{
-			[collectedObjects addObject: [[branch objectGraphContext] rootObject]];
+			[collectedObjects addObject: [objectGraphContext rootObject]];
 		}
 	}
 	return collectedObjects;
@@ -741,9 +741,9 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
-		for (COBranch *branch in [persistentRoot branches])
+		for (COObjectGraphContext *objectGraphContext in [persistentRoot allObjectGraphContexts])
 		{
-			[collectedObjects unionSet: [[branch objectGraphContext] performSelector: aSelector]];
+			[collectedObjects unionSet: [objectGraphContext performSelector: aSelector]];
 		}
 	}
 	return collectedObjects;
