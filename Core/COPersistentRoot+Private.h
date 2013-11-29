@@ -63,8 +63,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (void)storePersistentRootDidChange: (NSNotification *)notif isDistributed: (BOOL)isDistributed;
 
-- (void) updateCrossPersistentRootReferences;
-
 - (void) sendChangeNotification;
 
 - (void)deleteBranch: (COBranch *)aBranch;
