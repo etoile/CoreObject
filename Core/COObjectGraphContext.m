@@ -248,11 +248,6 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	                   entityDescription: [self descriptionForItem: anItem]];
 
     [obj setStoreItem: anItem];
-	
-	for (ETUUID *itemUUID in [[obj additionalStoreItemUUIDs] objectEnumerator])
-	{
-		[_objectsByAdditionalItemUUIDs setObject: obj forKey: itemUUID];
-	}
 
 	return obj;
 }
@@ -343,6 +338,12 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
         [currentObject setStoreItem: item];
         [_updatedObjects addObject: currentObject];
     }
+
+	for (ETUUID *itemUUID in [[currentObject additionalStoreItemUUIDs] objectEnumerator])
+	{
+		[_objectsByAdditionalItemUUIDs setObject: currentObject forKey: itemUUID];
+	}
+	ETAssert([[_objectsByAdditionalItemUUIDs allKeys] containsCollection: [[currentObject additionalStoreItemUUIDs] allValues]]);
 }
 
 - (void) insertOrUpdateItems: (NSArray *)items

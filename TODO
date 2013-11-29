@@ -166,7 +166,12 @@ Future Work
   - -valueForVariableStorageKey: or at least the synthesized getter, should return defensive copies if requested in the metamodel (this should even be the default perhaps, especially for collections)
   
   - Add dictionary update tests to TestObjectUpdate.m
-
+  
+  - Add relationship update check to detect persistent objects inserted into a transient relationship. The object put in the relationship could belong to:
+  
+    - a transient object graph context --> allowed (see transient property _dropIndicator in -[ETLayout awakeFromDeserialization)
+    - the same object graph context --> disallowed (otherwise we can accidentally easily look up shared instance using the wrong object graph context e.g. _dropIndicator = [ETDropIndicator sharedInstanceForObjectGraphContext: [layout objectGraphContext]])
+    - some other persistent object graph context --> allowed or disallowed (not sure yet)
 
 - COItem
 

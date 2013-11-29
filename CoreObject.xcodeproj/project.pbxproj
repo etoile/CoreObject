@@ -11,12 +11,14 @@
 		601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D44180C0F5300CED07E /* COObject+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		601C1D4F180C115D00CED07E /* COObjectGraphContext+GarbageCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */; };
 		601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */; };
+		602C4DDC1844DDEF002E30F8 /* TestDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D3E1836D08D00E5B4A7 /* TestDictionary.m */; };
 		6043D4D31757B4F9002103CC /* COCommitDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 6043D4C717575D79002103CC /* COCommitDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
 		606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 606E3DBF1787A07E00ED42DA /* COSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 606E3DC01787A07E00ED42DA /* COSerialization.m */; };
 		607EB349178881E60024B34D /* CODictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 607EB347178881E60024B34D /* CODictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		607EB34A178881E60024B34D /* CODictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 607EB348178881E60024B34D /* CODictionary.m */; };
+		60884D411837B09800C5C7C9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60884D401837B09800C5C7C9 /* AppKit.framework */; };
 		609C00651704C24C00D01AAB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00541704C24C00D01AAB /* main.m */; };
 		609C00801704C2BA00D01AAB /* CORevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00781704C2BA00D01AAB /* CORevision.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00811704C2BA00D01AAB /* CORevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00791704C2BA00D01AAB /* CORevision.m */; };
@@ -248,7 +250,6 @@
 		66E40D661836D08D00E5B4A7 /* TestItemGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D3A1836D08D00E5B4A7 /* TestItemGraphDiff.m */; };
 		66E40D671836D08D00E5B4A7 /* TestMerge.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D3B1836D08D00E5B4A7 /* TestMerge.m */; };
 		66E40D681836D08D00E5B4A7 /* TestCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D3D1836D08D00E5B4A7 /* TestCollection.m */; };
-		66E40D691836D08D00E5B4A7 /* TestDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D3E1836D08D00E5B4A7 /* TestDictionary.m */; };
 		66E40D6A1836D08D00E5B4A7 /* TestItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D401836D08D00E5B4A7 /* TestItem.m */; };
 		66E40D6B1836D08D00E5B4A7 /* TestBinaryReadWrite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D421836D08D00E5B4A7 /* TestBinaryReadWrite.m */; };
 		66E40D6C1836D08D00E5B4A7 /* TestSQLiteStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D431836D08D00E5B4A7 /* TestSQLiteStore.m */; };
@@ -445,6 +446,7 @@
 		606E3DC01787A07E00ED42DA /* COSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSerialization.m; path = Core/COSerialization.m; sourceTree = "<group>"; };
 		607EB347178881E60024B34D /* CODictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODictionary.h; path = Model/CODictionary.h; sourceTree = "<group>"; };
 		607EB348178881E60024B34D /* CODictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODictionary.m; path = Model/CODictionary.m; sourceTree = "<group>"; };
+		60884D401837B09800C5C7C9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		60988F16163B6B7A009C4F21 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		609C00541704C24C00D01AAB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Tests/main.m; sourceTree = "<group>"; };
 		609C00581704C24C00D01AAB /* TestCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestCommon.h; path = Tests/TestCommon.h; sourceTree = "<group>"; };
@@ -753,6 +755,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60884D411837B09800C5C7C9 /* AppKit.framework in Frameworks */,
 				60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */,
 				6686BE2A12592D7B0065DE1A /* libcrypto.dylib in Frameworks */,
 				66D96CA0178B6E5600D1553C /* libsqlite3.dylib in Frameworks */,
@@ -808,6 +811,7 @@
 		29B97314FDCFA39411CA2CEA /* ObjectMerging */ = {
 			isa = PBXGroup;
 			children = (
+				60884D401837B09800C5C7C9 /* AppKit.framework */,
 				66D96C9F178B6E5600D1553C /* libsqlite3.dylib */,
 				6699633B115F0C4200359BE6 /* Documentation */,
 				66550BE717D51C5000327657 /* Benchmark */,
@@ -1874,7 +1878,6 @@
 				66E40D5C1836D08D00E5B4A7 /* TestCopierWithIsSharedFalseAndMultipleReferences.m in Sources */,
 				6699DDAC184887E70003E803 /* TestOrderedRelationship.m in Sources */,
 				66E40D601836D08D00E5B4A7 /* TestNotifications.m in Sources */,
-				66E40D691836D08D00E5B4A7 /* TestDictionary.m in Sources */,
 				6699DDA9184887C30003E803 /* TestUnorderedCompositeRelationship.m in Sources */,
 				66E40D5F1836D08D00E5B4A7 /* TestHistoryInspection.m in Sources */,
 				609C00651704C24C00D01AAB /* main.m in Sources */,
@@ -1910,6 +1913,7 @@
 				66E40D6E1836D08D00E5B4A7 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */,
 				66E40D771836D08E00E5B4A7 /* TestUndo.m in Sources */,
 				66E40D6B1836D08D00E5B4A7 /* TestBinaryReadWrite.m in Sources */,
+				602C4DDC1844DDEF002E30F8 /* TestDictionary.m in Sources */,
 				6621BF101847F06D000809CF /* Parent.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

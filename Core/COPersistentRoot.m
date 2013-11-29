@@ -104,6 +104,14 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
                                           parentBranchUUID: aBranchUUID
                                 parentRevisionForNewBranch: cheapCopyRevisionID];
 		[[branch objectGraphContext] setItemGraph: _currentBranchObjectGraph];
+
+		// TODO: Adjust to ensure all tests pass 
+		/*NSAssert([[NSSet setWithArray: [[branch objectGraphContext] itemUUIDs]]
+			isEqual: [NSSet setWithArray: [anObjectGraphContext itemUUIDs]]],
+			@"Mismatched item UUIDs accross identical object graph contexts, due "
+			 "to persistent objects, belonging to the same object graph context, "
+			 "present in a transient relationship.");*/
+
         [_branchForUUID setObject: branch forKey: branchUUID];
         
         _currentBranchUUID =  branchUUID;
@@ -535,6 +543,13 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 			[[[self currentBranch] objectGraphContext] clearChangeTracking];
 			[_currentBranchObjectGraph setItemGraph: [[self currentBranch] objectGraphContext]];
 		}
+
+		// TODO: Adjust to ensure all tests pass (should be a debug assertion)
+		/*NSAssert([[NSSet setWithArray: [[[self currentBranch] objectGraphContext] itemUUIDs]]
+			isEqual: [NSSet setWithArray: [_currentBranchObjectGraph itemUUIDs]]],
+			@"Mismatched item UUIDs accross identical object graph contexts, due "
+			 "to persistent objects, belonging to the same object graph context, "
+			 "present in a transient relationship.");*/
 	}
     else
     {
