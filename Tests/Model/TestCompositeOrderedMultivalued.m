@@ -45,6 +45,8 @@
 		 UKIntsEqual(2, [testParent.contents count]);
 		 
 		 UKObjectsEqual(@"Parent", testParent.label);
+		 UKObjectsSame(testParent, testChild1.parentContainer);
+		 UKObjectsSame(testParent, testChild2.parentContainer);
 		 UKObjectsEqual(@"Child1", testChild1.label);
 		 UKObjectsEqual(@"Child2", testChild2.label);
 	 }];
@@ -54,11 +56,7 @@
 {
 	OutlineItem *child3 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"OutlineItem"];
 	child3.label = @"Child3";
-	
-	UKObjectsEqual((@[child1, child2]), parent.contents);
 
-	UKObjectsSame(parent, child1.parentContainer);
-	UKObjectsSame(parent, child2.parentContainer);
 	UKNil(child3.parentContainer);
 
 	[parent addObject: child3];
@@ -82,6 +80,8 @@
 		 UKIntsEqual(2, [testParent.contents count]);
 		 
 		 UKObjectsEqual(@"Parent", testParent.label);
+		 UKObjectsSame(testParent, testChild2.parentContainer);
+		 UKObjectsSame(testParent, testChild3.parentContainer);
 		 UKObjectsEqual(@"Child2", testChild2.label);
 		 UKObjectsEqual(@"Child3", testChild3.label);
 	 }];

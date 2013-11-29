@@ -24,6 +24,7 @@
 #import "Tag.h"
 #import "Parent.h"
 #import "Child.h"
+#import "Folder.h"
 
 #import "COPersistentRoot+Private.h"
 #import "COSQLiteStore+Private.h"

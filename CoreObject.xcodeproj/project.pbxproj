@@ -83,6 +83,7 @@
 		6621BF1D1847F4C2000809CF /* TestCompositeUnivalued.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF1C1847F4C2000809CF /* TestCompositeUnivalued.m */; };
 		6621BF201847FE22000809CF /* TestCompositeOrderedMultivalued.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF1F1847FE22000809CF /* TestCompositeOrderedMultivalued.m */; };
 		6621BF231848112F000809CF /* TestCompositeUnorderedMultivalued.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF221848112F000809CF /* TestCompositeUnorderedMultivalued.m */; };
+		6621BF2618482159000809CF /* Folder.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF2518482159000809CF /* Folder.m */; };
 		662AC93D1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 662AC93B1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h */; };
 		662AC93E1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 662AC93C1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m */; };
 		662FFB7F17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB7D17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -507,6 +508,8 @@
 		6621BF1C1847F4C2000809CF /* TestCompositeUnivalued.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCompositeUnivalued.m; sourceTree = "<group>"; };
 		6621BF1F1847FE22000809CF /* TestCompositeOrderedMultivalued.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCompositeOrderedMultivalued.m; sourceTree = "<group>"; };
 		6621BF221848112F000809CF /* TestCompositeUnorderedMultivalued.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCompositeUnorderedMultivalued.m; sourceTree = "<group>"; };
+		6621BF2418482159000809CF /* Folder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Folder.h; path = Tests/Folder.h; sourceTree = "<group>"; };
+		6621BF2518482159000809CF /* Folder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Folder.m; path = Tests/Folder.m; sourceTree = "<group>"; };
 		662AC93B1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COEndOfUndoTrackPlaceholderNode.h; sourceTree = "<group>"; };
 		662AC93C1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COEndOfUndoTrackPlaceholderNode.m; sourceTree = "<group>"; };
 		662FFB7D17C2026000BA3F2F /* COCommandUndeletePersistentRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandUndeletePersistentRoot.h; sourceTree = "<group>"; };
@@ -1305,6 +1308,8 @@
 				6621BF0F1847F06D000809CF /* Parent.m */,
 				6621BF181847F077000809CF /* Child.h */,
 				6621BF191847F077000809CF /* Child.m */,
+				6621BF2418482159000809CF /* Folder.h */,
+				6621BF2518482159000809CF /* Folder.m */,
 			);
 			name = "Model Objects";
 			sourceTree = "<group>";
@@ -1868,6 +1873,7 @@
 				6621BF1D1847F4C2000809CF /* TestCompositeUnivalued.m in Sources */,
 				66E40D6D1836D08D00E5B4A7 /* TestSQLiteStoreErrorHandling.m in Sources */,
 				66E40D741836D08E00E5B4A7 /* TestSynchronizerMultiUser.m in Sources */,
+				6621BF2618482159000809CF /* Folder.m in Sources */,
 				66E40D631836D08D00E5B4A7 /* TestObjectUpdate.m in Sources */,
 				66E40D701836D08D00E5B4A7 /* COSynchronizerFakeMessageTransport.m in Sources */,
 				66E40D5D1836D08D00E5B4A7 /* TestCrossPersistentRootReferences.m in Sources */,
