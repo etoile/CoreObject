@@ -3,7 +3,7 @@
 @interface TestObjectGraphContext : NSObject <UKTest> {
     COCopier *copier;
     COObjectGraphContext *ctx1;
-    COObject *root1;
+    OutlineItem *root1;
 }
 
 @end
@@ -37,20 +37,17 @@
     //UKNil([emptyContext rootObject]);
 }
 
-- (COObject *) addObjectWithLabel: (NSString *)label toContext: (COObjectGraphContext *)aCtx
+- (OutlineItem *) addObjectWithLabel: (NSString *)label toContext: (COObjectGraphContext *)aCtx
 {
-    COObject *obj = [aCtx insertObjectWithEntityName: @"OutlineItem"];
-
-    [obj setValue: label
-           forProperty: kCOLabel];
-    
+    OutlineItem *obj = [aCtx insertObjectWithEntityName: @"OutlineItem"];
+	obj.label = label;
     return obj;
 }
 
 
-- (COObject *) addObjectWithLabel: (NSString *)label toObject: (COObject *)dest
+- (OutlineItem *) addObjectWithLabel: (NSString *)label toObject: (OutlineItem *)dest
 {
-    COObject *obj = [self addObjectWithLabel: label toContext: [dest objectGraphContext]];
+    OutlineItem *obj = [self addObjectWithLabel: label toContext: [dest objectGraphContext]];
     [dest insertObject: obj atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     return obj;
 }
@@ -59,12 +56,12 @@
 {
 	COObjectGraphContext *ctx2 = [COObjectGraphContext objectGraphContext];
    
-    COObject *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
+    OutlineItem *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
     [ctx2 setRootObject: root2];
         
-	COObject *parent = [self addObjectWithLabel: @"Shopping" toObject: root1];
-	COObject *child = [self addObjectWithLabel: @"Groceries" toObject: parent];
-	COObject *subchild = [self addObjectWithLabel: @"Pizza" toObject: child];
+	OutlineItem *parent = [self addObjectWithLabel: @"Shopping" toObject: root1];
+	OutlineItem *child = [self addObjectWithLabel: @"Groceries" toObject: parent];
+	OutlineItem *subchild = [self addObjectWithLabel: @"Pizza" toObject: child];
     
     UKObjectsEqual(S([[ctx1 rootObject] UUID], [parent UUID], [child UUID], [subchild UUID]),
                    [NSSet setWithArray: [ctx1 itemUUIDs]]);
@@ -91,11 +88,11 @@
 {
 	COObjectGraphContext *ctx2 = [COObjectGraphContext objectGraphContext];
    
-    COObject *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
+    OutlineItem *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
     [ctx2 setRootObject: root2];
     
-    COObject *o1 = [self addObjectWithLabel: @"Shopping" toObject: root1];
-	COObject *o2 = [self addObjectWithLabel: @"Gift" toObject: o1];
+    OutlineItem *o1 = [self addObjectWithLabel: @"Shopping" toObject: root1];
+	OutlineItem *o2 = [self addObjectWithLabel: @"Gift" toObject: o1];
     UKNotNil(o1);
     
     ETUUID *o1copyUUID = [copier copyItemWithUUID: [o1 UUID]
@@ -108,11 +105,11 @@
 
     UKObjectsNotEqual(o1copyUUID, o1copy2UUID);
     
-    COObject *o1copy = [ctx2 loadedObjectForUUID: o1copyUUID];
-    COObject *o1copy2 = [ctx2 loadedObjectForUUID: o1copy2UUID];
+    OutlineItem *o1copy = [ctx2 loadedObjectForUUID: o1copyUUID];
+    OutlineItem *o1copy2 = [ctx2 loadedObjectForUUID: o1copy2UUID];
     
-    COObject *o2copy = [[o1copy valueForKey: @"contents"] firstObject];
-	COObject *o2copy2 = [[o1copy2 valueForKey: @"contents"] firstObject];
+    OutlineItem *o2copy = [[o1copy valueForKey: @"contents"] firstObject];
+	OutlineItem *o2copy2 = [[o1copy2 valueForKey: @"contents"] firstObject];
     
     UKObjectsNotEqual([o1 UUID], [o1copy UUID]);
     UKObjectsNotEqual([o2 UUID], [o2copy UUID]);
@@ -140,7 +137,7 @@
 {
 	UKObjectsEqual(S([root1 UUID]), SA([ctx1 itemUUIDs]));
 	
-    COObject *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
+    OutlineItem *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
 	
 	UKObjectsEqual(S([root1 UUID], [tag1 UUID]), SA([ctx1 itemUUIDs]));
 	UKNotNil([ctx1 itemForUUID: [tag1 UUID]]);
@@ -151,7 +148,7 @@
 	COMutableItem *mutableItem = [COMutableItem item];
     [mutableItem setValue: @"OutlineItem" forAttribute: kCOObjectEntityNameProperty type: kCOTypeString];
     [ctx1 insertOrUpdateItems: A(mutableItem)];
-    COObject *object = [ctx1 loadedObjectForUUID: [mutableItem UUID]];
+    OutlineItem *object = [ctx1 loadedObjectForUUID: [mutableItem UUID]];
     
     [mutableItem setValue: @"hello" forAttribute: kCOLabel type: kCOTypeString];
     
@@ -165,17 +162,17 @@
 {
 	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
     [ctx2 setRootObject: [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"]];
-	COObject *root = [ctx2 rootObject];
+	OutlineItem *root = [ctx2 rootObject];
     
     UKObjectsEqual(S(root), [ctx2 insertedObjects]);
     UKObjectsEqual([NSSet set], [ctx2 updatedObjects]);
     
-    COObject *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
+    OutlineItem *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
     //[ctx2 setRootObject: root2];
     
     // This modifies root2, but since root2 is still newly inserted, we don't
     // count it as modified
-    COObject *list1 = [self addObjectWithLabel: @"List1" toObject: root2];
+    OutlineItem *list1 = [self addObjectWithLabel: @"List1" toObject: root2];
 
     
     UKObjectsEqual(S(root, list1, root2), [ctx2 insertedObjects]);
@@ -197,15 +194,15 @@
 
 - (void)testShoppingList
 {
-	COObject *workspace = [self addObjectWithLabel: @"Workspace" toObject: root1];
-	COObject *document1 = [self addObjectWithLabel: @"Document1" toObject: workspace];
-	COObject *group1 = [self addObjectWithLabel: @"Group1" toObject: document1];
-	COObject *leaf1 = [self addObjectWithLabel: @"Leaf1" toObject: group1];
-	COObject *leaf2 = [self addObjectWithLabel: @"Leaf2" toObject: group1];
-	COObject *group2 = [self addObjectWithLabel: @"Group2" toObject: document1];
-	COObject *leaf3 = [self addObjectWithLabel: @"Leaf3" toObject: group2];
+	OutlineItem *workspace = [self addObjectWithLabel: @"Workspace" toObject: root1];
+	OutlineItem *document1 = [self addObjectWithLabel: @"Document1" toObject: workspace];
+	OutlineItem *group1 = [self addObjectWithLabel: @"Group1" toObject: document1];
+	OutlineItem *leaf1 = [self addObjectWithLabel: @"Leaf1" toObject: group1];
+	OutlineItem *leaf2 = [self addObjectWithLabel: @"Leaf2" toObject: group1];
+	OutlineItem *group2 = [self addObjectWithLabel: @"Group2" toObject: document1];
+	OutlineItem *leaf3 = [self addObjectWithLabel: @"Leaf3" toObject: group2];
 	
-	COObject *document2 = [self addObjectWithLabel: @"Document2" toObject: workspace];
+	OutlineItem *document2 = [self addObjectWithLabel: @"Document2" toObject: workspace];
 
     UKNil([root1 valueForKey: kCOParent]);
     UKObjectsSame(root1, [workspace valueForKey: kCOParent]);
@@ -278,8 +275,18 @@
 {
 	UKObjectsEqual(root1, [ctx1 rootObject]);
 	
-	COObject *root2 = [self addObjectWithLabel: @"root1" toContext: ctx1];
+	OutlineItem *root2 = [self addObjectWithLabel: @"root1" toContext: ctx1];
     UKRaisesException([ctx1 setRootObject: root2]);
+}
+
+- (void) testMixingObjectsBetweenObjectContexts
+{
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	OutlineItem *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
+	
+	UKObjectsNotSame([root1 objectGraphContext], [root2 objectGraphContext]);
+	
+	// FIXME: Check that adding root2 to root1 throws an exception
 }
 
 @end
