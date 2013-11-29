@@ -337,6 +337,9 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	if (_metadataChanged)
         return YES;
 
+	if ([_currentBranchObjectGraph hasChanges])
+		return YES;
+	
 	for (COBranch *branch in [self branches])
 	{
 		if ([branch isBranchUncommitted])
