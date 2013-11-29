@@ -308,6 +308,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * Returns the object graph for the edited branch
  */
 @property (weak, nonatomic, readonly) COObjectGraphContext *objectGraphContext;
+@property (nonatomic, readonly) NSSet *allObjectGraphContexts;
 
 
 /** @taskunit Committing Changes */

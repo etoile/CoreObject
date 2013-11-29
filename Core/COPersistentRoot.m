@@ -280,6 +280,12 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     return _currentBranchObjectGraph;
 }
 
+- (NSSet *)allObjectGraphContexts
+{
+	NSSet *objectGraphs = (id)[[[self branches] mappedCollection] objectGraphContext];
+	return [objectGraphs setByAddingObject: _currentBranchObjectGraph];
+}
+
 - (COSQLiteStore *)store
 {
 	return [_parentContext store];
