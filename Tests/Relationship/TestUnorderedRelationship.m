@@ -26,6 +26,8 @@
 @property (readwrite, strong, nonatomic) NSSet *parentGroups;
 @end
 
+static int UnorderedGroupNoOppositeDeallocCalls;
+
 @implementation UnorderedGroupNoOpposite
 
 + (ETEntityDescription*)newEntityDescription
@@ -50,6 +52,12 @@
 
 @dynamic label;
 @dynamic contents;
+
+- (void) dealloc
+{
+	UnorderedGroupNoOppositeDeallocCalls++;
+}
+
 @end
 
 @implementation UnorderedGroupWithOpposite
@@ -193,6 +201,43 @@
 	UKObjectsEqual(S(item1ctx2, item2ctx2), [group2ctx2 contents]);
 	UKObjectsEqual(S(group1ctx2, group2ctx2), [item2ctx2 parentGroups]);
 	UKObjectsEqual(S(group2ctx2), [item1ctx2 parentGroups]);
+}
+
+- (void) testRetainCycleMemoryLeakWithUserSuppliedSet
+{
+	const int deallocsBefore = UnorderedGroupNoOppositeDeallocCalls;
+	
+	@autoreleasepool
+	{
+		COObjectGraphContext *ctx = [COObjectGraphContext new];
+		UnorderedGroupNoOpposite *group1 = [ctx insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
+		UnorderedGroupNoOpposite *group2 = [ctx insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
+		group1.contents = S(group2);
+		group2.contents = S(group1);
+	}
+
+	const int deallocs = UnorderedGroupNoOppositeDeallocCalls - deallocsBefore;
+	UKIntsEqual(2, deallocs);
+}
+
+- (void) testRetainCycleMemoryLeakWithFrameworkSuppliedSet
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	UnorderedGroupNoOpposite *group1 = [ctx insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
+	UnorderedGroupNoOpposite *group2 = [ctx insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
+	group1.contents = S(group2);
+	group2.contents = S(group1);
+
+	const int deallocsBefore = UnorderedGroupNoOppositeDeallocCalls;
+	
+	@autoreleasepool
+	{
+ 		COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+		[ctx2 setItemGraph: ctx];
+	}
+	
+	const int deallocs = UnorderedGroupNoOppositeDeallocCalls - deallocsBefore;
+	UKIntsEqual(2, deallocs);
 }
 
 @end
