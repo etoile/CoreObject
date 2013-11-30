@@ -38,6 +38,97 @@
 }
 @end
 
+@implementation COUnsafeRetainedMutableArray
+- (instancetype)init
+{
+	return [self initWithObjects: NULL count: 0];
+}
+- (instancetype)initWithObjects: (const id [])objects count: (NSUInteger)count
+{
+	SUPERINIT;
+	_backing = [NSPointerArray weakObjectsPointerArray];
+	for (NSUInteger i=0; i<count; i++)
+	{
+		[_backing addPointer: (__bridge void *)objects[i]];
+	}
+	return self;
+}
+- (instancetype)initWithCapacity: (NSUInteger)capacity
+{
+	return [self init];
+}
+- (NSUInteger)count
+{
+	return [_backing count];
+}
+- (id)objectAtIndex: (NSUInteger)index
+{
+	return [_backing pointerAtIndex: index];
+}
+- (void)addObject: (id)anObject
+{
+	[_backing addPointer: (__bridge void *)anObject];
+}
+- (void)insertObject: (id)anObject atIndex: (NSUInteger)index
+{
+	[_backing insertPointer: (__bridge void *)anObject atIndex: index];
+}
+- (void)removeLastObject
+{
+	[self removeObjectAtIndex: [self count] - 1];
+}
+- (void)removeObjectAtIndex: (NSUInteger)index
+{
+	[_backing removePointerAtIndex: index];
+}
+- (void)replaceObjectAtIndex: (NSUInteger)index withObject: (id)anObject
+{
+	[_backing replacePointerAtIndex: index withPointer: (__bridge void *)anObject];
+}
+@end
+
+@implementation COUnsafeRetainedMutableSet
+- (instancetype) init
+{
+	return [self initWithObjects: NULL count: 0];
+}
+- (instancetype) initWithObjects: (const id[])objects count: (NSUInteger)count
+{
+	SUPERINIT;
+	_backing = [NSHashTable hashTableWithWeakObjects];
+	for (NSUInteger i=0; i<count; i++)
+	{
+		[_backing addObject: objects[i]];
+	}
+	return self;
+}
+- (instancetype) initWithCapacity: (NSUInteger)numItems
+{
+	return [self init];
+}
+- (NSUInteger) count
+{
+	return [_backing count];
+}
+- (id) member: (id)anObject
+{
+	return [_backing member: anObject];
+}
+- (NSEnumerator *) objectEnumerator
+{
+	return [_backing objectEnumerator];
+}
+- (void) addObject: (id)anObject
+{
+	[_backing addObject: anObject];
+}
+- (void) removeObject: (id)anObject
+{
+	[_backing removeObject: anObject];
+}
+@end
+
+
 @implementation COObject
 
 @synthesize UUID = _UUID, entityDescription = _entityDescription,
@@ -689,18 +780,27 @@ See +[NSObject typePrefix]. */
     }
 			
 	// Convert user value to the form we store it in the variable storage
-	id storageValue;
+	id storageValue = value;
 	if (value == nil)
 	{
 		storageValue = [NSNull null];
 	}
-	else if ([value isKindOfClass: [COObject class]])
+	if ([value isKindOfClass: [COObject class]])
 	{
 		storageValue = [[COWeakRef alloc] initWithObject: value];
 	}
-	else
+	if ([self isCoreObjectRelationship: propertyDesc] )
 	{
-		storageValue = value;
+		if ([value isKindOfClass: [NSArray class]]
+			&& ![value isKindOfClass: [COUnsafeRetainedMutableArray class]])
+		{
+			storageValue = [[COUnsafeRetainedMutableArray alloc] initWithArray: value];
+		}
+		else if ([value isKindOfClass: [NSSet class]]
+				 && ![value isKindOfClass: [COUnsafeRetainedMutableSet class]])
+		{
+			storageValue = [[COUnsafeRetainedMutableSet alloc] initWithSet: value];
+		}
 	}
 	
 	[_variableStorage setObject: storageValue

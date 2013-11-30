@@ -11,7 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COObject.h>
 
-@class CORelationshipCache, COObjectGraphContext, COCrossPersistentRootReferenceCache;
+@class CORelationshipCache, COObjectGraphContext;
 
 @interface COWeakRef : NSObject
 {
@@ -20,6 +20,18 @@
 }
 - (instancetype) initWithObject: (COObject *)anObject;
 
+@end
+
+@interface COUnsafeRetainedMutableSet : NSMutableSet
+{
+	NSHashTable *_backing;
+}
+@end
+
+@interface COUnsafeRetainedMutableArray : NSMutableArray
+{
+	NSPointerArray *_backing;
+}
 @end
 
 @interface COObject ()
@@ -61,14 +73,6 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 - (CORelationshipCache *)incomingRelationshipCache;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-- (COCrossPersistentRootReferenceCache *)crossReferenceCache;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-- (void) updateCrossPersistentRootReferences;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
