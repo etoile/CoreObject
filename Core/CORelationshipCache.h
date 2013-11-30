@@ -25,6 +25,8 @@
 
 - (id) initWithOwner: (COObject *)owner;
 
+- (NSSet *) referringObjects;
+
 /**
  * Returns an array of COObject which have a reference to the
  * owning COObject through the given property in the owning COObject.

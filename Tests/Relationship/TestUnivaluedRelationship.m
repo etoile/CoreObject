@@ -136,6 +136,21 @@
 	UKObjectsEqual(item1ctx2, [group2ctx2 content]);
 }
 
+- (void) testUnivaluedGroupNoOppositeOuterReference
+{
+	COObjectGraphContext *ctx1 = [COObjectGraphContext new];
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	
+	UnivaluedGroupNoOpposite *group1 = [ctx1 insertObjectWithEntityName: @"UnivaluedGroupNoOpposite"];
+	OutlineItem *item1 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
+	
+	group1.content = item1;
+	
+	// Check that the relationship cache knows the inverse relationship, even though it is
+	// not used in the metamodel (non-public API)
+	UKObjectsEqual(S(group1), [item1 referringObjects]);
+}
+
 - (void) testUnivaluedGroupWithOpposite
 {
 	COObjectGraphContext *ctx = [COObjectGraphContext new];
@@ -174,6 +189,10 @@
 	UKNil([group2ctx2 content]);
 	UKObjectsEqual(item1ctx2, [group3ctx2 content]);
 	UKObjectsEqual(S(group1ctx2, group3ctx2), [item1ctx2 parents]);
+	
+	// Check the relationship cache
+	UKObjectsEqual(S(group1, group3), [item1 referringObjects]);
+	UKObjectsEqual(S(group1ctx2, group3ctx2), [item1ctx2 referringObjects]);
 }
 
 @end

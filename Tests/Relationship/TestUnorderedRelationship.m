@@ -140,6 +140,21 @@
 	UKObjectsEqual(S(item1ctx2), [group2ctx2 contents]);
 }
 
+- (void) testUnorderedGroupNoOppositeOuterReference
+{
+	COObjectGraphContext *ctx1 = [COObjectGraphContext new];
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	
+	UnorderedGroupNoOpposite *group1 = [ctx1 insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
+	OutlineItem *item1 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
+	
+	group1.contents = S(item1);
+	
+	// Check that the relationship cache knows the inverse relationship, even though it is
+	// not used in the metamodel (non-public API)
+	UKObjectsEqual(S(group1), [item1 referringObjects]);
+}
+
 - (void) testUnorderedGroupWithOpposite
 {
 	COObjectGraphContext *ctx = [COObjectGraphContext new];

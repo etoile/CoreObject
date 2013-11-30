@@ -83,6 +83,16 @@
     return result;
 }
 
+- (NSSet *) referringObjects
+{
+    NSMutableSet *result = [NSMutableSet set];
+    for (COCachedRelationship *entry in _cachedRelationships)
+    {
+		[result addObject: entry->_sourceObject];
+    }
+    return result;
+}
+
 - (COObject *) referringObjectForPropertyInTarget: (NSString *)aProperty
 {
     NSMutableArray *results = [NSMutableArray array];

@@ -2,6 +2,11 @@
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
+/**
+ * Tests ordered composite relationships.
+ * Note that composites are always inner references, and always have an opposite
+ * (enforced by the metamodel).
+ */
 @interface TestOrderedCompositeRelationship : EditingContextTestCase <UKTest>
 {
 	COPersistentRoot *persistentRoot;

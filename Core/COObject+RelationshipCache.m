@@ -73,25 +73,23 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
     {
         if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
         {
-            ETPropertyDescription *propertyInTarget = [aProperty opposite];
-            if (propertyInTarget != nil)
-            {
-                if ([aProperty isMultivalued])
-                {
-                    for (COObject *obj in aValue)
-                    {
-                        [[obj incomingRelationshipCache] addReferenceFromSourceObject: self
-                                                               sourceProperty: [aProperty name]
-                                                               targetProperty: [propertyInTarget name]];
-                    }
-                }
-                else
-                {
-                    [[(COObject *)aValue incomingRelationshipCache] addReferenceFromSourceObject: self
-                                                                          sourceProperty: [aProperty name]
-                                                                          targetProperty: [propertyInTarget name]];
-                }
-            }
+            ETPropertyDescription *propertyInTarget = [aProperty opposite]; // May be nil
+
+			if ([aProperty isMultivalued])
+			{
+				for (COObject *obj in aValue)
+				{
+					[[obj incomingRelationshipCache] addReferenceFromSourceObject: self
+														   sourceProperty: [aProperty name]
+														   targetProperty: [propertyInTarget name]];
+				}
+			}
+			else
+			{
+				[[(COObject *)aValue incomingRelationshipCache] addReferenceFromSourceObject: self
+																	  sourceProperty: [aProperty name]
+																	  targetProperty: [propertyInTarget name]];
+			}
 		}
     }
 }

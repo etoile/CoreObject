@@ -115,7 +115,7 @@
  * Test that an object graph of OrderedGroupNoOpposite can be reloaded in another
  * context. Test that one OutlineItem can be in two OrderedGroupNoOpposite's.
  */
-- (void) testOrderedGroupNoOpposite
+- (void) testOrderedGroupNoOppositeInnerReference
 {
 	COObjectGraphContext *ctx = [COObjectGraphContext new];
 	OrderedGroupNoOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupNoOpposite"];
@@ -136,6 +136,29 @@
 	
 	UKObjectsEqual((@[item1ctx2, item2ctx2]), [group1ctx2 contents]);
 	UKObjectsEqual((@[item1ctx2]), [group2ctx2 contents]);
+	
+	// Check that the relationship cache knows the inverse relationship, even though it is
+	// not used in the metamodel (non-public API)
+	UKObjectsEqual(S(group1, group2), [item1 referringObjects]);
+	UKObjectsEqual(S(group1), [item2 referringObjects]);
+	
+	UKObjectsEqual(S(group1ctx2, group2ctx2), [item1ctx2 referringObjects]);
+	UKObjectsEqual(S(group1ctx2), [item2ctx2 referringObjects]);
+}
+
+- (void) testOrderedGroupNoOppositeOuterReference
+{
+	COObjectGraphContext *ctx1 = [COObjectGraphContext new];
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	
+	OrderedGroupNoOpposite *group1 = [ctx1 insertObjectWithEntityName: @"OrderedGroupNoOpposite"];
+	OutlineItem *item1 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
+	
+	group1.contents = @[item1];
+	
+	// Check that the relationship cache knows the inverse relationship, even though it is
+	// not used in the metamodel (non-public API)
+	UKObjectsEqual(S(group1), [item1 referringObjects]);
 }
 
 - (void) testOrderedGroupWithOpposite
@@ -176,6 +199,13 @@
 	UKObjectsEqual((@[item1ctx2, item2ctx2]), [group2ctx2 contents]);
 	UKObjectsEqual(S(group1ctx2, group2ctx2), [item2ctx2 parentGroups]);
 	UKObjectsEqual(S(group2ctx2), [item1ctx2 parentGroups]);
+	
+	// Check the relationship cache
+	UKObjectsEqual(S(group2), [item1 referringObjects]);
+	UKObjectsEqual(S(group1, group2), [item2 referringObjects]);
+	
+	UKObjectsEqual(S(group2ctx2), [item1ctx2 referringObjects]);
+	UKObjectsEqual(S(group1ctx2, group2ctx2), [item2ctx2 referringObjects]);
 }
 
 @end

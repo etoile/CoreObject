@@ -1096,4 +1096,11 @@ See +[NSObject typePrefix]. */
     // TODO: Turn the object into a kind of zombie
 }
 
+#pragma mark - Debugging / Testing
+
+- (NSSet *) referringObjects
+{
+	return [_incomingRelationshipCache referringObjects];
+}
+
 @end
