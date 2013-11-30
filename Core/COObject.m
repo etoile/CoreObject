@@ -46,7 +46,7 @@
 - (instancetype)initWithObjects: (const id [])objects count: (NSUInteger)count
 {
 	SUPERINIT;
-	_backing = [NSPointerArray weakObjectsPointerArray];
+	_backing = [NSPointerArray pointerArrayWithWeakObjects];
 	for (NSUInteger i=0; i<count; i++)
 	{
 		[_backing addPointer: (__bridge void *)objects[i]];
