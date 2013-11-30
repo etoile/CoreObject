@@ -162,6 +162,9 @@
 		6660B3961839522B009007FD /* TestSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 6660B3951839522B009007FD /* TestSerialization.m */; };
 		6660B3A01839659D009007FD /* COAttachmentID.h in Headers */ = {isa = PBXBuildFile; fileRef = 6660B39E1839659D009007FD /* COAttachmentID.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6660B3A11839659D009007FD /* COAttachmentID.m in Sources */ = {isa = PBXBuildFile; fileRef = 6660B39F1839659D009007FD /* COAttachmentID.m */; };
+		666888131849961300DBEB10 /* TestOrderedRelationshipWithOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 666888101849961300DBEB10 /* TestOrderedRelationshipWithOpposite.m */; };
+		666888141849961300DBEB10 /* TestUnivaluedRelationshipWithOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 666888111849961300DBEB10 /* TestUnivaluedRelationshipWithOpposite.m */; };
+		666888151849961300DBEB10 /* TestUnorderedRelationshipWithOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 666888121849961300DBEB10 /* TestUnorderedRelationshipWithOpposite.m */; };
 		6675F8C11785C02A001E5622 /* COItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BA1785C02A001E5622 /* COItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C21785C02A001E5622 /* COItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BB1785C02A001E5622 /* COItem.m */; };
 		6675F8C31785C02A001E5622 /* COItemGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BC1785C02A001E5622 /* COItemGraph.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -589,6 +592,9 @@
 		6660B39E1839659D009007FD /* COAttachmentID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COAttachmentID.h; sourceTree = "<group>"; };
 		6660B39F1839659D009007FD /* COAttachmentID.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COAttachmentID.m; sourceTree = "<group>"; };
 		66618A8B1811C065001FA004 /* TERMINOLOGY */ = {isa = PBXFileReference; lastKnownFileType = text; name = TERMINOLOGY; path = Documentation/TERMINOLOGY; sourceTree = "<group>"; };
+		666888101849961300DBEB10 /* TestOrderedRelationshipWithOpposite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestOrderedRelationshipWithOpposite.m; sourceTree = "<group>"; };
+		666888111849961300DBEB10 /* TestUnivaluedRelationshipWithOpposite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnivaluedRelationshipWithOpposite.m; sourceTree = "<group>"; };
+		666888121849961300DBEB10 /* TestUnorderedRelationshipWithOpposite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnorderedRelationshipWithOpposite.m; sourceTree = "<group>"; };
 		6675F8BA1785C02A001E5622 /* COItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItem.h; sourceTree = "<group>"; };
 		6675F8BB1785C02A001E5622 /* COItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COItem.m; sourceTree = "<group>"; };
 		6675F8BC1785C02A001E5622 /* COItemGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COItemGraph.h; sourceTree = "<group>"; };
@@ -1177,6 +1183,9 @@
 				6699DDAB184887E70003E803 /* TestOrderedRelationship.m */,
 				6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */,
 				6699DDB1184888050003E803 /* TestUnorderedRelationship.m */,
+				666888101849961300DBEB10 /* TestOrderedRelationshipWithOpposite.m */,
+				666888111849961300DBEB10 /* TestUnivaluedRelationshipWithOpposite.m */,
+				666888121849961300DBEB10 /* TestUnorderedRelationshipWithOpposite.m */,
 			);
 			name = Relationship;
 			path = Tests/Relationship;
@@ -1875,17 +1884,20 @@
 				6699DDAF184887F60003E803 /* TestUnivaluedRelationship.m in Sources */,
 				66E40D671836D08D00E5B4A7 /* TestMerge.m in Sources */,
 				66E40D781836D08E00E5B4A7 /* TestUndoStackFailedNavigation.m in Sources */,
+				666888141849961300DBEB10 /* TestUnivaluedRelationshipWithOpposite.m in Sources */,
 				66E40D5C1836D08D00E5B4A7 /* TestCopierWithIsSharedFalseAndMultipleReferences.m in Sources */,
 				6699DDAC184887E70003E803 /* TestOrderedRelationship.m in Sources */,
 				66E40D601836D08D00E5B4A7 /* TestNotifications.m in Sources */,
 				6699DDA9184887C30003E803 /* TestUnorderedCompositeRelationship.m in Sources */,
 				66E40D5F1836D08D00E5B4A7 /* TestHistoryInspection.m in Sources */,
+				666888151849961300DBEB10 /* TestUnorderedRelationshipWithOpposite.m in Sources */,
 				609C00651704C24C00D01AAB /* main.m in Sources */,
 				66E40D791836D08E00E5B4A7 /* TestUndoStackStore.m in Sources */,
 				66E40D611836D08D00E5B4A7 /* TestObject.m in Sources */,
 				66E40D6C1836D08D00E5B4A7 /* TestSQLiteStore.m in Sources */,
 				66E40D5B1836D08D00E5B4A7 /* TestCopierWithIsShared.m in Sources */,
 				66E40D6F1836D08D00E5B4A7 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
+				666888131849961300DBEB10 /* TestOrderedRelationshipWithOpposite.m in Sources */,
 				66E40D7A1836D08E00E5B4A7 /* TestUndoStackTrackProtocol.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66E451D617CC461F00205679 /* OutlineItem.m in Sources */,
