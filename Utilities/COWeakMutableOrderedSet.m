@@ -7,21 +7,14 @@
     self = [super init];
     if (self != nil)
     {
-        _objectToIndex = [[NSMapTable alloc] initWithKeyOptions: NSMapTableWeakMemory
+        _objectToIndex = [[NSMapTable alloc] initWithKeyOptions: NSMapTableZeroingWeakMemory
                                                    valueOptions: NSPointerFunctionsIntegerPersonality
                                                        capacity: 16];
         
-        _indexToObject = [[NSPointerArray alloc] initWithOptions: NSPointerFunctionsWeakMemory];
+        _indexToObject = [[NSPointerArray alloc] initWithOptions: NSPointerFunctionsZeroingWeakMemory];
         
     }
     return self;
-}
-
-- (void) dealloc
-{
-    [_objectToIndex release];
-    [_indexToObject release];
-    [super dealloc];
 }
 
 - (NSUInteger) count
@@ -36,7 +29,7 @@
 
 - (NSUInteger) indexOfObject: (id)anObject
 {
-    void *value = NSMapGet(_objectToIndex, anObject);
+    void *value = NSMapGet(_objectToIndex, (__bridge void *)anObject);
     
     if (value == NULL)
     {
@@ -55,14 +48,14 @@
     for (NSUInteger i = anIndex; i < count; i++)
     {
         id object = [_indexToObject pointerAtIndex: i];
-        NSMapRemove(_objectToIndex, object);
-        NSMapInsert(_objectToIndex, object, i + 2);
+        NSMapRemove(_objectToIndex, (__bridge void *)object);
+        NSMapInsert(_objectToIndex, (__bridge void *)object, i + 2);
     }
     
     // 2. Insert new value
     
-    NSMapInsert(_objectToIndex, anObject, anIndex + 1);
-    [_indexToObject insertPointer: anObject atIndex: anIndex];
+    NSMapInsert(_objectToIndex, (__bridge void *)anObject, anIndex + 1);
+    [_indexToObject insertPointer: (__bridge void *)anObject atIndex: anIndex];
 }
 
 - (void) removeObjectAtIndex: (NSUInteger)anIndex
@@ -78,8 +71,8 @@
     for (NSUInteger i = anIndex + 1; i < count; i++)
     {
         id object = [_indexToObject pointerAtIndex: i];
-        NSMapRemove(_objectToIndex, object);
-        NSMapInsert(_objectToIndex, object, i);
+        NSMapRemove(_objectToIndex, (__bridge void *)object);
+        NSMapInsert(_objectToIndex, (__bridge void *)object, i);
     }
     
     // 3. Update _indexToObject
@@ -91,10 +84,10 @@
 {
     id oldObject = [_indexToObject pointerAtIndex: anIndex];
     
-    NSMapRemove(_objectToIndex, oldObject);
-    NSMapInsert(_objectToIndex, anObject, anIndex + 1);
+    NSMapRemove(_objectToIndex, (__bridge void *)oldObject);
+    NSMapInsert(_objectToIndex, (__bridge void *)anObject, anIndex + 1);
     
-    [_indexToObject replacePointerAtIndex: anIndex withPointer: anObject];
+    [_indexToObject replacePointerAtIndex: anIndex withPointer: (__bridge void *)anObject];
 }
 
 @end

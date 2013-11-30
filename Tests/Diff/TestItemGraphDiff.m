@@ -71,7 +71,7 @@
     UKObjectsSame(subchild3, [[child valueForProperty: @"contents"] objectAtIndex: 1]);
     UKObjectsSame(subchild4, [[child valueForProperty: @"contents"] objectAtIndex: 2]);
     
-	UKObjectsEqual(A(@"Pizza", @"Chips", @"Salsa"), [child valueForKeyPath: @"contents.label"]);
+	UKObjectsEqual(ORDEREDSET(@"Pizza", @"Chips", @"Salsa"), [child valueForKeyPath: @"contents.label"]);
 	UKObjectsEqual(subchild4UUID, [subchild4 UUID]);
 }
 

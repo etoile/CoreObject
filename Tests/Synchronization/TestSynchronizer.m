@@ -104,7 +104,7 @@
 	UKObjectKindOf([self clientMessages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
 	UKIntsEqual(1, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1), SA([[serverBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1), [[(OutlineItem *)[serverBranch rootObject] contents] set]);
 	
 	// Deliver the response to the client
 	[transport deliverMessagesToClient];
@@ -126,7 +126,7 @@
 	[transport deliverMessagesToClient];
 	
 	UKIntsEqual(1, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(serverChild1), SA([[clientBranch rootObject] contents]));
+	UKObjectsEqual(S(serverChild1), [[(OutlineItem *)[clientBranch rootObject] contents] set]);
 	
 	// No more messages
 	UKIntsEqual(0, [[self clientMessages] count]);
@@ -150,7 +150,7 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 	
 	UKIntsEqual(1, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1), SA([[clientBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1), [[(OutlineItem *)[clientBranch rootObject] contents] set]);
 	
 	// Server should merge in client's changes, and send a push response back to the client
 	[transport deliverMessagesToServer];
@@ -161,7 +161,7 @@
 	UKObjectKindOf([self clientMessages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
 	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), SA([[serverBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1, serverChild1), [[(OutlineItem *)[serverBranch rootObject] contents] set]);
 	
 	// Deliver the response to the client
 	[transport deliverMessagesToClient];
@@ -171,7 +171,7 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 		
 	UKIntsEqual(2, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), SA([[clientBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1, serverChild1), [[(OutlineItem *)[clientBranch rootObject] contents] set]);
 }
 
 - (void) testServerAndClientEdit
@@ -207,7 +207,7 @@
 	[transport deliverMessagesToServer];
 	
 	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), SA([[serverBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1, serverChild1), [[(OutlineItem *)[serverBranch rootObject] contents] set]);
 	
 	UKIntsEqual(0, [[self serverMessages] count]);
 	
@@ -237,7 +237,7 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 	
 	UKIntsEqual(2, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), SA([[clientBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1, serverChild1), [[(OutlineItem *)[clientBranch rootObject] contents] set]);
 }
 
 - (void) testLocalClientCommitsAfterPushingToServer
@@ -261,7 +261,7 @@
 	UKObjectKindOf([self clientMessages][1], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
 	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), SA([[serverBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1, serverChild1), [[(OutlineItem *)[serverBranch rootObject] contents] set]);
 	
 	// Before the merged changes arrives at the client, make another commit on the client
 	

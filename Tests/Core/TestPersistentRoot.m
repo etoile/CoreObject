@@ -145,10 +145,10 @@
     
     [ctx commit];
     
-    UKObjectsEqual(A(@"childA"), [[photo1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(ORDEREDSET(@"childA"), [[photo1 rootObject] valueForKeyPath: @"contents.label"]);
     [photo1 setCurrentBranch: branchB];
     
-    UKObjectsEqual(A(@"childB"), [[photo1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(ORDEREDSET(@"childB"), [[photo1 rootObject] valueForKeyPath: @"contents.label"]);
     [ctx commit];
     
     // Test that the cross-persistent reference uses branchB when we reopen the store
@@ -157,7 +157,7 @@
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPhoto1, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual([branchB UUID], [[testPhoto1 currentBranch] UUID]);
-		 UKObjectsEqual(A(@"childB"), [[testPhoto1 rootObject] valueForKeyPath: @"contents.label"]);
+		 UKObjectsEqual(ORDEREDSET(@"childB"), [[testPhoto1 rootObject] valueForKeyPath: @"contents.label"]);
 	 }];
 }
 

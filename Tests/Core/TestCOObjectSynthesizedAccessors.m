@@ -35,8 +35,8 @@
     OutlineItem *child2 = [[item objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [child2 setLabel: @"child2"];
 
-    [item setContents: A(child1, child2)];
-    UKObjectsEqual(A(child1, child2), [item contents]);
+    [item setContents: ORDEREDSET(child1, child2)];
+    UKObjectsEqual(ORDEREDSET(child1, child2), [item contents]);
 }
 
 - (void)addPropertyDescriptionToOutlineItem
@@ -87,10 +87,10 @@
     
     // FIXME: Change to mutableOrderedSetValueForKey
     [[item mutableArrayValueForKey: @"contents"] addObject: child1];
-    UKObjectsEqual(@[child1], [item contents]);
+    UKObjectsEqual(ORDEREDSET(child1), [item contents]);
 
     [[item mutableArrayValueForKey: @"contents"] removeObject: child1];
-    UKObjectsEqual(@[], [item contents]);
+    UKObjectsEqual(ORDEREDSET(), [item contents]);
 }
 
 @end

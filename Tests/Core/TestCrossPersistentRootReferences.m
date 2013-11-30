@@ -146,14 +146,14 @@
     [ctx commit];
     
     UKObjectsEqual(S(@"photo1, branch A"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
-    UKObjectsEqual(S(A(@"childA")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
+    UKObjectsEqual(S(ORDEREDSET(@"childA")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
     
     // Now switch the current branch of photo1. This should automatically update the cross-persistent reference
     
     [photo1 setCurrentBranch: branchB];
     
     UKObjectsEqual(S(@"photo1, branch A", @"photo1, branch B"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
-    UKObjectsEqual(S(A(@"childA"), A(@"childB")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
+    UKObjectsEqual(S(ORDEREDSET(@"childA"), ORDEREDSET(@"childB")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
     
     [ctx commit];
     
@@ -167,12 +167,12 @@
         // Sanity check
         
         UKObjectsEqual([branchB UUID], [[photo1ctx2 currentBranch] UUID]);
-        UKObjectsEqual(A(@"childB"), [[photo1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+        UKObjectsEqual(ORDEREDSET(@"childB"), [[photo1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
         
         // Actual test of cross-persistent-root references
         
         UKObjectsEqual(S(@"photo1, branch A", @"photo1, branch B"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
-        UKObjectsEqual(S(A(@"childA"), A(@"childB")), [[library1ctx2 rootObject] valueForKeyPath: @"contents.contents.label"]);
+        UKObjectsEqual(S(ORDEREDSET(@"childA"), ORDEREDSET(@"childB")), [[library1ctx2 rootObject] valueForKeyPath: @"contents.contents.label"]);
 	 }];
 }
 

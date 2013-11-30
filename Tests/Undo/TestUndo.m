@@ -531,7 +531,7 @@
 	[ctx commitWithUndoTrack: _testTrack];
 	CORevision *r2 = [doc1 currentRevision];
 	
-	UKObjectsEqual((@[child1, child2]), [root contents]);
+	UKObjectsEqual(ORDEREDSET(child1, child2), [root contents]);
 	
 	// Check track contents
 	UKIntsEqual(2, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
@@ -544,7 +544,7 @@
 	[_testTrack undoNode: _testTrack.nodes[1]];
 	CORevision *r3 = [doc1 currentRevision];
 	
-	UKObjectsEqual(@[child2], [root contents]);
+	UKObjectsEqual(ORDEREDSET(child2), [root contents]);
 	
 	// Check track contents
 	UKIntsEqual(3, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);

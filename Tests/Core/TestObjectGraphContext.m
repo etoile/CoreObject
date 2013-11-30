@@ -214,11 +214,11 @@
     UKObjectsSame(group2, [leaf3 valueForKey: kCOParent]);
 	UKObjectsSame(workspace, [document2 valueForKey: kCOParent]);
 
-	UKObjectsEqual(A(document1, document2), [workspace valueForKey: kCOContents]);
-	UKObjectsEqual(A(group1, group2), [document1 valueForKey: kCOContents]);
-	UKObjectsEqual([NSArray array], [document2 valueForKey: kCOContents]);
-	UKObjectsEqual(A(leaf1, leaf2), [group1 valueForKey: kCOContents]);
-	UKObjectsEqual(A(leaf3), [group2 valueForKey: kCOContents]);
+	UKObjectsEqual(ORDEREDSET(document1, document2), [workspace valueForKey: kCOContents]);
+	UKObjectsEqual(ORDEREDSET(group1, group2), [document1 valueForKey: kCOContents]);
+	UKObjectsEqual([NSOrderedSet orderedSet], [document2 valueForKey: kCOContents]);
+	UKObjectsEqual(ORDEREDSET(leaf1, leaf2), [group1 valueForKey: kCOContents]);
+	UKObjectsEqual(ORDEREDSET(leaf3), [group2 valueForKey: kCOContents]);
     
 	// Now make some changes
     
@@ -232,11 +232,11 @@
 	UKObjectsSame(group1, [leaf1 valueForKey: kCOParent]);
 	UKObjectsSame(group2, [leaf2 valueForKey: kCOParent]);
 	UKObjectsSame(group2, [leaf3 valueForKey: kCOParent]);
-	UKObjectsEqual(A(document1, document2), [workspace valueForKey: kCOContents]);
-	UKObjectsEqual(A(group1), [document1 valueForKey: kCOContents]);
-	UKObjectsEqual(A(group2), [document2 valueForKey: kCOContents]);
-	UKObjectsEqual(A(leaf1), [group1 valueForKey: kCOContents]);
-	UKObjectsEqual(A(leaf3, leaf2), [group2 valueForKey: kCOContents]);
+	UKObjectsEqual(ORDEREDSET(document1, document2), [workspace valueForKey: kCOContents]);
+	UKObjectsEqual(ORDEREDSET(group1), [document1 valueForKey: kCOContents]);
+	UKObjectsEqual(ORDEREDSET(group2), [document2 valueForKey: kCOContents]);
+	UKObjectsEqual(ORDEREDSET(leaf1), [group1 valueForKey: kCOContents]);
+	UKObjectsEqual(ORDEREDSET(leaf3, leaf2), [group2 valueForKey: kCOContents]);
     
     // Test JSON roundtrip
     
