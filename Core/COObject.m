@@ -16,6 +16,7 @@
 #import "COBranch.h"
 #import "COBranch+Private.h"
 #import "COObject+RelationshipCache.h"
+#import "COObject+Private.h"
 #import "CORelationshipCache.h"
 #import "COSQLiteStore.h"
 #import "COTag.h"
@@ -27,6 +28,15 @@
 #import "CORevision.h"
 #import "COAttachmentID.h"
 #include <objc/runtime.h>
+
+@implementation COWeakRef
+- (instancetype) initWithObject: (COObject *)anObject
+{
+	SUPERINIT;
+	_object = anObject;
+	return self;
+}
+@end
 
 @implementation COObject
 
@@ -653,7 +663,18 @@ See +[NSObject typePrefix]. */
     }
 
 	id value = [_variableStorage objectForKey: key];
-	return (value == [NSNull null] ? nil : value);
+	
+	// Convert value stored in variable storage to a form we can return to the user
+	if (value == [NSNull null])
+	{
+		return nil;
+	}
+	if ([value isKindOfClass: [COWeakRef class]])
+	{
+		return ((COWeakRef *)value)->_object;
+	}
+	
+	return value;
 }
 
 - (void)setValue: (id)aValue forVariableStorageKey: (NSString *)key
@@ -666,8 +687,23 @@ See +[NSObject typePrefix]. */
     {
 		value = [aValue mutableCopy];
     }
+			
+	// Convert user value to the form we store it in the variable storage
+	id storageValue;
+	if (value == nil)
+	{
+		storageValue = [NSNull null];
+	}
+	else if ([value isKindOfClass: [COObject class]])
+	{
+		storageValue = [[COWeakRef alloc] initWithObject: value];
+	}
+	else
+	{
+		storageValue = value;
+	}
 	
-	[_variableStorage setObject: (value == nil ? [NSNull null] : value)
+	[_variableStorage setObject: storageValue
 	                     forKey: key];
 }
 

@@ -13,6 +13,15 @@
 
 @class CORelationshipCache, COObjectGraphContext, COCrossPersistentRootReferenceCache;
 
+@interface COWeakRef : NSObject
+{
+	@public
+	__weak COObject *_object;
+}
+- (instancetype) initWithObject: (COObject *)anObject;
+
+@end
+
 @interface COObject ()
 
 /**
@@ -43,7 +52,7 @@
 - (id)prepareWithUUID: (ETUUID *)aUUID
     entityDescription: (ETEntityDescription *)anEntityDescription
    objectGraphContext: (COObjectGraphContext *)aContext
-                isNew: (BOOL)inserted;
+                isNew: (BOOL)inserted  __attribute__((objc_method_family(init)));
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
