@@ -89,5 +89,9 @@
  * This method is only exposed to be used in the CoreObject tests.
  */
 - (NSSet *) referringObjects;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (void) replaceReferencesToObjectIdenticalTo: (COObject *)anObject withObject: (COObject *)aReplacement;
 
 @end

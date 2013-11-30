@@ -1232,6 +1232,54 @@ See +[NSObject typePrefix]. */
     // TODO: Turn the object into a kind of zombie
 }
 
+/**
+ * The -[COObjectGraphContext insertOrUpdateItems:] API may face a situation
+ * where it needs to replace a COObject instance with another one of a different
+ * subclass.
+ *
+ * e.g. a root object of a fault / a broken reference is loaded as a COObject.
+ * but later, the actual persistent root is loaded and the root object turns
+ * out to be SubclassFoo. 
+ *
+ * In this situation, COObjectGraphContext will turn the old object into a zombie,
+ * allocate a replacement, find all objects with references to the old object
+ * using the relationship cache, and use this method on each of those to fix 
+ * up the references to point to the replacement. (not yet implemented).
+ */
+- (void) replaceReferencesToObjectIdenticalTo: (COObject *)anObject withObject: (COObject *)aReplacement
+{
+	for (NSString *key in [self persistentPropertyNames])
+	{
+		id value = [self valueForStorageKey: key];
+		if (value == anObject)
+		{
+			[self setValue: aReplacement forVariableStorageKey: key];
+		}
+		else if ([value isKindOfClass: [COUnsafeRetainedMutableArray class]])
+		{
+			COUnsafeRetainedMutableArray *array = value;
+			
+			const NSUInteger count = [array count];
+			for (NSUInteger i=0; i<count; i++)
+			{
+				if (array[i] == anObject)
+				{
+					[array replaceObjectAtIndex: i withObject: aReplacement];
+				}
+			}
+		}
+		else if ([value isKindOfClass: [COUnsafeRetainedMutableSet class]])
+		{
+			COUnsafeRetainedMutableSet *set = value;
+			if ([set containsObject: anObject])
+			{
+				[set removeObject: anObject];
+				[set addObject: aReplacement];
+			}
+		}
+	}
+}
+
 #pragma mark - Debugging / Testing
 
 - (NSSet *) referringObjects
