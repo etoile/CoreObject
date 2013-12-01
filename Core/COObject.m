@@ -71,7 +71,16 @@
 }
 - (void)insertObject: (id)anObject atIndex: (NSUInteger)index
 {
-	[_backing insertPointer: (__bridge void *)anObject atIndex: index];
+    // NSPointerArray on 10.7 doesn't allow inserting at the end using index == count, so
+    // call addPointer in that case as a workaround.
+    if (index == [_backing count])
+    {
+        [_backing addPointer: (__bridge void *)anObject];
+    }
+    else
+    {
+        [_backing insertPointer: (__bridge void *)anObject atIndex: index];
+    }
 }
 - (void)removeLastObject
 {
