@@ -95,9 +95,7 @@
 - (NSArray *) contentArray
 {
 	 // FIXME: Should return a new array, but this might break other things currently
-	id<ETCollection> collection = [self valueForProperty: [self contentKey]];
-	
-	return [collection contentArray];
+	return [self valueForProperty: [self contentKey]];
 }
 
 - (void) insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint

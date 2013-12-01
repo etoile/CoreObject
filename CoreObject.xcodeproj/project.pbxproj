@@ -80,8 +80,6 @@
 		660D4CE617D689FC003C9ACC /* COMergeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 660D4CE417D689FC003C9ACC /* COMergeInfo.m */; };
 		661211401821986B003AEC29 /* CODateSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 6612113E1821986B003AEC29 /* CODateSerialization.h */; };
 		661211411821986B003AEC29 /* CODateSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 6612113F1821986B003AEC29 /* CODateSerialization.m */; };
-		661E2B4D184A7AE700226D3D /* COWeakMutableOrderedSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 661E2B4B184A7AE700226D3D /* COWeakMutableOrderedSet.h */; };
-		661E2B4E184A7AE700226D3D /* COWeakMutableOrderedSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 661E2B4C184A7AE700226D3D /* COWeakMutableOrderedSet.m */; };
 		6621BF101847F06D000809CF /* Parent.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF0F1847F06D000809CF /* Parent.m */; };
 		6621BF1A1847F077000809CF /* Child.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF191847F077000809CF /* Child.m */; };
 		6621BF2618482159000809CF /* Folder.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF2518482159000809CF /* Folder.m */; };
@@ -511,8 +509,6 @@
 		660D4CE417D689FC003C9ACC /* COMergeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COMergeInfo.m; path = Diff/COMergeInfo.m; sourceTree = "<group>"; };
 		6612113E1821986B003AEC29 /* CODateSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODateSerialization.h; path = Utilities/CODateSerialization.h; sourceTree = SOURCE_ROOT; };
 		6612113F1821986B003AEC29 /* CODateSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODateSerialization.m; path = Utilities/CODateSerialization.m; sourceTree = SOURCE_ROOT; };
-		661E2B4B184A7AE700226D3D /* COWeakMutableOrderedSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COWeakMutableOrderedSet.h; path = Utilities/COWeakMutableOrderedSet.h; sourceTree = "<group>"; };
-		661E2B4C184A7AE700226D3D /* COWeakMutableOrderedSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COWeakMutableOrderedSet.m; path = Utilities/COWeakMutableOrderedSet.m; sourceTree = "<group>"; };
 		6621BF0E1847F06D000809CF /* Parent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Parent.h; path = Tests/Parent.h; sourceTree = "<group>"; };
 		6621BF0F1847F06D000809CF /* Parent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Parent.m; path = Tests/Parent.m; sourceTree = "<group>"; };
 		6621BF181847F077000809CF /* Child.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Child.h; path = Tests/Child.h; sourceTree = "<group>"; };
@@ -1120,8 +1116,6 @@
 				6043D4C817575D7A002103CC /* COCommitDescriptor.m */,
 				6612113E1821986B003AEC29 /* CODateSerialization.h */,
 				6612113F1821986B003AEC29 /* CODateSerialization.m */,
-				661E2B4B184A7AE700226D3D /* COWeakMutableOrderedSet.h */,
-				661E2B4C184A7AE700226D3D /* COWeakMutableOrderedSet.m */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -1500,7 +1494,6 @@
 				662AC93D1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h in Headers */,
 				66FD34B61832055900898381 /* COSynchronizerJSONServer.h in Headers */,
 				6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */,
-				661E2B4D184A7AE700226D3D /* COWeakMutableOrderedSet.h in Headers */,
 				6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */,
 				6660B3A01839659D009007FD /* COAttachmentID.h in Headers */,
 				66405DD1182A255800A6EF7A /* COSynchronizerServer.h in Headers */,
@@ -1847,7 +1840,6 @@
 				669724D617D4610E0090B31A /* COSetAttribute.m in Sources */,
 				669724DA17D4614F0090B31A /* CODeleteAttribute.m in Sources */,
 				669724DE17D461750090B31A /* COSetInsertion.m in Sources */,
-				661E2B4E184A7AE700226D3D /* COWeakMutableOrderedSet.m in Sources */,
 				669724E217D461940090B31A /* COSetDeletion.m in Sources */,
 				669724E617D463B00090B31A /* COSequenceEdit.m in Sources */,
 				669724EA17D464170090B31A /* COSequenceDeletion.m in Sources */,

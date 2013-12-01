@@ -62,7 +62,7 @@
     [merged applyTo: ctx1];
     
 	UKStringsEqual(@"Groceries", [subchild1 valueForProperty: @"label"]);
-    UKObjectsEqual(ORDEREDSET(subchild1), [child3 contents]);
+    UKObjectsEqual(@[subchild1], [child3 contents]);
 	UKObjectsSame(child3, [subchild1 valueForProperty: @"parentContainer"]);
 	UKIntsEqual(3, [[parent contentArray] count]);
 	OutlineItem *child4 = (id)[ctx1 loadedObjectForUUID: [child4Ctx3 UUID]];
@@ -338,7 +338,7 @@
     UKNotNil(subchild1);
 	UKObjectsSame(child1, [subchild1 valueForProperty: @"parentContainer"]);
     UKIntsEqual(1, [[child1 contents] count]);
-	UKObjectsEqual(ORDEREDSET(subchild1), [child1 contents]);
+	UKObjectsEqual(A(subchild1), [child1 contents]);
 }
 
 /**
@@ -384,7 +384,7 @@
                     [child1a UUID],
                     [child2 UUID],
                     [child3 UUID],
-                    [child4 UUID]]), [[[[[ctx2 rootObject] contents] array] mappedCollection] UUID]);
+                    [child4 UUID]]), [[[(OutlineItem *)[ctx2 rootObject] contents] mappedCollection] UUID]);
     
 	// ctx2:
 	//
@@ -415,7 +415,7 @@
                     [child2 UUID],
                     [child2a UUID],
                     [child3 UUID],
-                    [child4 UUID]]), [[[[(OutlineItem *)[ctx3 rootObject] contents] array] mappedCollection] UUID]);
+                    [child4 UUID]]), [[[(OutlineItem *)[ctx3 rootObject] contents] mappedCollection] UUID]);
     
 	// ctx3:
 	//
@@ -465,7 +465,7 @@
                       [child2 UUID],
                       [child2a UUID],
                       [child3 UUID],
-                      [child4 UUID]]), [[[[parent contents] array] mappedCollection] UUID]);
+                      [child4 UUID]]), [[[parent contents] mappedCollection] UUID]);
 }
 
 /**
@@ -483,24 +483,24 @@
 	OutlineItem *child5 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     OutlineItem *child6 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 
-    parent.contents = ORDEREDSET(child1, child2, child3, child4, child5, child6);
+    parent.contents = @[child1, child2, child3, child4, child5, child6];
 
     
 	[ctx2 setItemGraph: ctx1];
-    ((OutlineItem *)[ctx2 rootObject]).contents = ORDEREDSET([ctx2 loadedObjectForUUID: [child1 UUID]],
-															 [ctx2 loadedObjectForUUID: [child4 UUID]],
-															 [ctx2 loadedObjectForUUID: [child5 UUID]],
-															 [ctx2 loadedObjectForUUID: [child2 UUID]],
-															 [ctx2 loadedObjectForUUID: [child3 UUID]],
-															 [ctx2 loadedObjectForUUID: [child6 UUID]]);
+    ((OutlineItem *)[ctx2 rootObject]).contents = @[[ctx2 loadedObjectForUUID: [child1 UUID]],
+                                                    [ctx2 loadedObjectForUUID: [child4 UUID]],
+                                                    [ctx2 loadedObjectForUUID: [child5 UUID]],
+                                                    [ctx2 loadedObjectForUUID: [child2 UUID]],
+                                                    [ctx2 loadedObjectForUUID: [child3 UUID]],
+                                                    [ctx2 loadedObjectForUUID: [child6 UUID]]];
     
     [ctx3 setItemGraph: ctx1];
-    ((OutlineItem *)[ctx3 rootObject]).contents = ORDEREDSET([ctx3 loadedObjectForUUID: [child1 UUID]],
-															 [ctx3 loadedObjectForUUID: [child2 UUID]],
-															 [ctx3 loadedObjectForUUID: [child4 UUID]],
-															 [ctx3 loadedObjectForUUID: [child5 UUID]],
-															 [ctx3 loadedObjectForUUID: [child3 UUID]],
-															 [ctx3 loadedObjectForUUID: [child6 UUID]]);
+    ((OutlineItem *)[ctx3 rootObject]).contents = @[[ctx3 loadedObjectForUUID: [child1 UUID]],
+                                                    [ctx3 loadedObjectForUUID: [child2 UUID]],
+                                                    [ctx3 loadedObjectForUUID: [child4 UUID]],
+                                                    [ctx3 loadedObjectForUUID: [child5 UUID]],
+                                                    [ctx3 loadedObjectForUUID: [child3 UUID]],
+                                                    [ctx3 loadedObjectForUUID: [child6 UUID]]];
     
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
@@ -829,7 +829,7 @@
 	[doc insertObject: group1 atIndex: 1 hint: nil forProperty: @"contents"];
 	[group1 insertObject: circle1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	[group1 insertObject: square1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	UKObjectsEqual(ORDEREDSET(line1, group1, image1), [doc contents]);
+	UKObjectsEqual((@[line1, group1, image1]), [doc contents]);
     
 	// snapshot the state:  (line1, group1=(circle1, square1), image1) into ctx3
 	[ctx3 setItemGraph: ctx1];

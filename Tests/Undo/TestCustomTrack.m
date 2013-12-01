@@ -171,13 +171,13 @@ selective undo is involved. */
 	/* Sixth and fifth commit undone ('doc' revision) */
     
     UKNotNil([docPersistentRoot loadedObjectForUUID: [para2 UUID]]);
-    UKObjectsEqual(ORDEREDSET(para1, para2), [doc contents]);
+    UKObjectsEqual((@[para1, para2]), [doc contents]);
 	[_testTrack undo];
 	[_testTrack undo];
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
 	// i.e., check for garbage collection
 	UKNil([docPersistentRoot loadedObjectForUUID: [para2 UUID]]);
-	UKObjectsEqual(ORDEREDSET(para1), [doc contents]);
+	UKObjectsEqual(@[para1], [doc contents]);
 
 	/* Fourth commit undone ('object' revision) */
 
@@ -189,7 +189,7 @@ selective undo is involved. */
     UKNotNil([docPersistentRoot loadedObjectForUUID: [para1 UUID]]);
 	[_testTrack undo];
 	UKNil([docPersistentRoot loadedObjectForUUID: [para1 UUID]]);
-    UKObjectsEqual([NSOrderedSet orderedSet], [doc contents]);
+    UKObjectsEqual(@[], [doc contents]);
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
 	/* Second commit undone ('doc' revision) */
@@ -231,7 +231,7 @@ selective undo is involved. */
 
 	// Get the new restored object instance
 	para1 = (OutlineItem *)[docPersistentRoot loadedObjectForUUID: [para1 UUID]];
-    UKObjectsEqual(ORDEREDSET(para1), [doc contents]);
+    UKObjectsEqual(@[para1], [doc contents]);
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
 
 	/* Fourth, fifth and sixth commits redone */
@@ -247,7 +247,7 @@ selective undo is involved. */
 
 	// Get the new restored object instance
 	para2 = (OutlineItem *)[docPersistentRoot loadedObjectForUUID: [para2 UUID]];
-    UKObjectsEqual(ORDEREDSET(para1, para2), [doc contents]);
+    UKObjectsEqual((@[para1, para2]), [doc contents]);
 	UKStringsEqual(@"paragraph 2", [para2 valueForProperty: @"label"]);
 }
 

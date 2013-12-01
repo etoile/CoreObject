@@ -25,13 +25,13 @@
 	persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	parent = [persistentRoot rootObject];
 	parent.label = @"Parent";
-	UKObjectsEqual([NSOrderedSet orderedSet], parent.contents);
+	UKObjectsEqual(@[], parent.contents);
 	
 	child1 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"OutlineItem"];
 	child2 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"OutlineItem"];
 	child1.label = @"Child1";
 	child2.label = @"Child2";
-	parent.contents = ORDEREDSET(child1, child2);
+	parent.contents = @[child1, child2];
 	
 	[ctx commit];
 	
@@ -47,7 +47,6 @@
 		 OutlineItem *testChild1 = testParent.contents[0];
 		 OutlineItem *testChild2 = testParent.contents[1];
 		 
-		 UKObjectKindOf(testParent.contents, NSOrderedSet);
 		 UKIntsEqual(2, [testParent.contents count]);
 		 
 		 UKObjectsEqual(@"Parent", testParent.label);
@@ -68,7 +67,7 @@
 	[parent addObject: child3];
 	[parent removeObject: child1];
 	
-	UKObjectsEqual(ORDEREDSET(child2, child3), parent.contents);
+	UKObjectsEqual((@[child2, child3]), parent.contents);
 	
 	UKNil(child1.parentContainer);
 	UKObjectsSame(parent, child2.parentContainer);
@@ -98,12 +97,12 @@
 	OutlineItem *parent2 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"OutlineItem"];
 	parent2.label = @"Parent2";
 	
-	UKObjectsEqual([NSOrderedSet orderedSet], parent2.contents);
+	UKObjectsEqual(@[], parent2.contents);
 	
 	[parent2 addObject: child1];
 	
-	UKObjectsEqual(ORDEREDSET(child2), parent.contents);
-	UKObjectsEqual(ORDEREDSET(child1), parent2.contents);
+	UKObjectsEqual((@[child2]), parent.contents);
+	UKObjectsEqual((@[child1]), parent2.contents);
 	
 	UKObjectsSame(parent, child2.parentContainer);
 	UKObjectsSame(parent2, child1.parentContainer);

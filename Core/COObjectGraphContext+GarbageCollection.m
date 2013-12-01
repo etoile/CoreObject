@@ -38,25 +38,8 @@ static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectG
 			}
 			else
 			{
-				if ([propDesc isOrdered])
-				{
-					if ([propDesc isComposite])
-					{
-						if (![value isKindOfClass: [NSOrderedSet class]])
-						{
-							NSLog(@"Warning, composite ordered property '%@' of %@ is not a NSOrderedSet but %@",
-								  propertyName, anObject, [value class]);
-						}
-					}
-					else
-					{
-						assert([value isKindOfClass: [NSArray class]]);
-					}
-				}
-				else
-				{
-					assert([value isKindOfClass: [NSSet class]]);
-				}
+				assert([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]);
+				
 			}
 			
 			/* We use -objectEnumerator, because subvalue can be a  CODictionary

@@ -245,21 +245,7 @@ See +[NSObject typePrefix]. */
 	}
 	else
 	{
-		if ([propDesc isOrdered])
-		{
-			if ([propDesc isComposite])
-			{
-				return [NSOrderedSet class];
-			}
-			else
-			{
-				return [NSArray class];
-			}
-		}
-		else
-		{
-			return [NSSet class];
-		}
+		return ([propDesc isOrdered] ? [NSArray class] : [NSSet class]);
 	}
 }
 

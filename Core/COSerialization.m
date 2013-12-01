@@ -179,8 +179,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 			return [NSNull null];
 		}
 	}
-	else if ([value isKindOfClass: [NSArray class]]
-			 || [value isKindOfClass: [NSOrderedSet class]])
+	else if ([value isKindOfClass: [NSArray class]])
 	{
 		NSMutableArray *array = [NSMutableArray arrayWithCapacity: [value count]];
 
@@ -561,40 +560,20 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		NSAssert([aPropertyDesc isKeyed] == NO && [aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
 				 @"Serialization type doesn't match metamodel");
 		
-		id resultCollection;
+		id resultCollection = [NSMutableArray array];
 		
-		if ([aPropertyDesc isComposite])
+		for (id subvalue in value)
 		{
-			resultCollection = [NSMutableOrderedSet orderedSet];
+			id deserializedValue = [self valueForSerializedValue: subvalue
+			                                              ofType: COTypePrimitivePart(type)
+			                                 propertyDescription: aPropertyDesc];
 			
-			for (id subvalue in value)
+			if (deserializedValue != nil)
 			{
-				id deserializedValue = [self valueForSerializedValue: subvalue
-															  ofType: COTypePrimitivePart(type)
-												 propertyDescription: aPropertyDesc];
-				
-				ETAssert(![resultCollection containsObject: deserializedValue]);
-				
 				[resultCollection addObject: deserializedValue];
 			}
 		}
-		else
-		{
-			resultCollection = [NSMutableArray array];
-			
-			for (id subvalue in value)
-			{
-				id deserializedValue = [self valueForSerializedValue: subvalue
-															  ofType: COTypePrimitivePart(type)
-												 propertyDescription: aPropertyDesc];
-				
-				if (deserializedValue != nil)
-				{
-					[resultCollection addObject: deserializedValue];
-				}
-			}
-		}
-		
+
 		// FIXME: Make read-only if needed
 		return resultCollection;
 	}
