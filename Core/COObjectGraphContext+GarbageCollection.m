@@ -42,7 +42,11 @@ static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectG
 				{
 					if ([propDesc isComposite])
 					{
-						assert([value isKindOfClass: [NSOrderedSet class]]);
+						if (![value isKindOfClass: [NSOrderedSet class]])
+						{
+							NSLog(@"Warning, composite ordered property '%@' of %@ is not a NSOrderedSet but %@",
+								  propertyName, anObject, [value class]);
+						}
 					}
 					else
 					{
