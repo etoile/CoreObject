@@ -30,7 +30,10 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 	}
 }
 
+
 @implementation COUnsafeRetainedMutableArray
+
+@synthesize mutable = _mutable;
 
 - (instancetype)init
 {
@@ -108,6 +111,8 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 
 @implementation COUnsafeRetainedMutableSet
 
+@synthesize mutable = _mutable;
+
 - (instancetype)init
 {
 	return [self initWithObjects: NULL count: 0];
@@ -159,6 +164,8 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 
 
 @implementation COMutableDictionary
+
+@synthesize mutable = _mutable;
 
 - (instancetype)init
 {

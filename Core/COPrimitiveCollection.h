@@ -22,7 +22,11 @@
 @end
 
 
-@interface COUnsafeRetainedMutableSet : NSMutableSet
+@protocol COPrimitiveCollection <NSObject>
+@property (nonatomic, getter=isMutable) BOOL mutable;
+@end
+
+@interface COUnsafeRetainedMutableSet : NSMutableSet <COPrimitiveCollection>
 {
 	@public
 	BOOL _mutable;
@@ -30,7 +34,7 @@
 }
 @end
 
-@interface COUnsafeRetainedMutableArray : NSMutableArray
+@interface COUnsafeRetainedMutableArray : NSMutableArray <COPrimitiveCollection>
 {
 	@public
 	BOOL _mutable;
@@ -38,7 +42,7 @@
 }
 @end
 
-@interface COMutableDictionary : NSMutableDictionary
+@interface COMutableDictionary : NSMutableDictionary <COPrimitiveCollection>
 {
 	@public
 	BOOL _mutable;
@@ -66,5 +70,3 @@
 + (Class)coreObjectClass;
 - (id)mutableCoreObjectCopy;
 @end
-
-

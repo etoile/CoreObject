@@ -672,6 +672,7 @@ See +[NSObject typePrefix]. */
 
 - (BOOL)isCoreObjectCollection: (id)aCollection
 {
+	// NOTE: Same as [aCollection conformsToProtocol: @protocol(COPrimitiveCollection)]
 	return ([aCollection class] == [[aCollection class] coreObjectClass]);
 }
 
@@ -683,6 +684,8 @@ See +[NSObject typePrefix]. */
  */
 - (void)setValue: (id)aValue forVariableStorageKey: (NSString *)key
 {
+	// TODO: Raise an exception on an attempt to set an outgoing relationship
+	// (or may be in -setValue:forStorageKey:).
 	ETPropertyDescription *propertyDesc = [[self entityDescription] propertyDescriptionForName: key];
     id storageValue = aValue;
 			
@@ -738,28 +741,32 @@ See +[NSObject typePrefix]. */
 
 #pragma mark - Notifications to be called by Accessors
 
+- (void)pushOldCoreObjectRelationshipValue: (id)oldValue
+                    forPropertyDescription: (ETPropertyDescription *)propertyDesc
+{
+	if ([self isCoreObjectRelationship: propertyDesc] == NO)
+		return;
+
+	id oldValueSnapshot =
+		([propertyDesc isMultivalued] ? [oldValue mutableCopy] : oldValue);
+
+	[_oldValues addObject: [ETKeyValuePair pairWithKey: [propertyDesc name]
+	                                             value: oldValueSnapshot]];
+}
+
 - (void)willChangeValueForProperty: (NSString *)key
 {
 	ETPropertyDescription *propertyDesc =
 		[_entityDescription propertyDescriptionForName: key];
+	id oldValue = [self valueForStorageKey: key];
 
-	if ([self isCoreObjectRelationship: propertyDesc])
+	[self pushOldCoreObjectRelationshipValue: oldValue
+	                  forPropertyDescription: propertyDesc];
+	if ([self isCoreObjectCollection: oldValue])
 	{
-		if ([propertyDesc isMultivalued])
-		{
-			id <ETCollection> oldCollection = [[self valueForStorageKey: key] mutableCopy];
-
-			[_oldValues addObject: [ETKeyValuePair pairWithKey: key
-														 value: oldCollection]];
-		}
-		else
-		{
-			id <ETCollection> oldValue = [self valueForStorageKey: key];
-			
-			[_oldValues addObject: [ETKeyValuePair pairWithKey: key
-														 value: oldValue]];
-		}
+		[(id <COPrimitiveCollection>)oldValue setMutable: YES];
 	}
+
 	[super willChangeValueForKey: key];
 }
 
@@ -934,7 +941,7 @@ See +[NSObject typePrefix]. */
 	}
 }
 
-- (id)oldCoreObjectRelationshipValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
+- (id)popOldCoreObjectRelationshipValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	if ([self isCoreObjectRelationship: aPropertyDesc] == NO)
 		return nil;
@@ -959,7 +966,7 @@ See +[NSObject typePrefix]. */
 {
 	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
 	id newValue = [self valueForStorageKey: key];
-	id oldValue = [self oldCoreObjectRelationshipValueForPropertyDescription: propertyDesc];
+	id oldValue = [self popOldCoreObjectRelationshipValueForPropertyDescription: propertyDesc];
 
 	if (propertyDesc == nil)
 	{
@@ -967,7 +974,11 @@ See +[NSObject typePrefix]. */
 					format: @"Property %@ is not declared in the metamodel %@ for %@",
 		                    key, _entityDescription, self];
 	}
-
+	
+	if ([self isCoreObjectCollection: newValue])
+	{
+		[(id <COPrimitiveCollection>)newValue setMutable: NO];
+	}
 	if ([self removeDuplicatesInValue: newValue propertyDescription: propertyDesc])
 	{
 		// the -removeDuplicatesInValue:propertyDescription: method removed some
@@ -1029,22 +1040,6 @@ See +[NSObject typePrefix]. */
 	return collection;
 }
 
-- (void) setMutableFlag: (BOOL)mutable forCollection: (id)aCollection
-{
-	if ([aCollection isKindOfClass: [COUnsafeRetainedMutableArray class]])
-	{
-		((COUnsafeRetainedMutableArray *)aCollection)->_mutable = mutable;
-	}
-	if ([aCollection isKindOfClass: [COUnsafeRetainedMutableSet class]])
-	{
-		((COUnsafeRetainedMutableSet *)aCollection)->_mutable = mutable;
-	}
-	if ([aCollection isKindOfClass: [COMutableDictionary class]])
-	{
-		((COMutableDictionary *)aCollection)->_mutable = mutable;
-	}
-}
-
 - (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
 {
 	// NOTE: We validate the entire collection in -didChangeValueForProperty:
@@ -1052,11 +1047,7 @@ See +[NSObject typePrefix]. */
 	id collection = [self collectionForProperty: key mutationIndex: index];
 
 	[self willChangeValueForProperty: key];
-	
-	[self setMutableFlag: YES forCollection: collection];
 	[collection insertObject: object atIndex: index hint: hint];
-	[self setMutableFlag: NO forCollection: collection];
-	
 	[self didChangeValueForProperty: key];
 }
 
@@ -1067,11 +1058,7 @@ See +[NSObject typePrefix]. */
 	id collection = [self collectionForProperty: key mutationIndex: index];
 
 	[self willChangeValueForProperty: key];
-	
-	[self setMutableFlag: YES forCollection: collection];
 	[collection removeObject: object atIndex: index hint: hint];
-	[self setMutableFlag: NO forCollection: collection];
-	
 	[self didChangeValueForProperty: key];
 }
 
