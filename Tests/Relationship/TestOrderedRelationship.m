@@ -136,4 +136,16 @@ static int OrderedGroupNoOppositeDeallocCalls;
 	UKIntsEqual(2, deallocs);
 }
 
+- (void) testDuplicatesAutomaticallyRemoved
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	OutlineItem *group1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *item2 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+		
+	group1.contents = @[item1, item2, item1, item1, item1, item2];
+	UKTrue(([@[item2, item1] isEqual: group1.contents]
+			|| [@[item1, item2] isEqual: group1.contents]));
+}
+
 @end

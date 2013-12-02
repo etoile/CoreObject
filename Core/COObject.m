@@ -919,6 +919,60 @@ See +[NSObject typePrefix]. */
 }
 
 /**
+ * If the given property description is an ordered multivalued relationship to 
+ * COObjects (either composite or not), scans for duplicates in the given collection.
+ *
+ * If there are duplicates, removes them and saves the modified value
+ * using -setValue:forStorageKey:, and returns YES. Which values are kept and 
+ * which are not is undefined.
+ *
+ * Otherwise returns NO.
+ */
+- (BOOL) removeDuplicatesInValue: (id)value propertyDescription: (ETPropertyDescription *)propertyDesc
+{
+	NSString *key = [propertyDesc name];
+	
+	if (![self isCoreObjectRelationship: propertyDesc])
+		return NO;
+	
+	if (![propertyDesc isMultivalued])
+		return NO;
+
+	if (![propertyDesc isOrdered])
+		return NO;
+ 
+	BOOL hasDuplicates = NO;
+	NSMutableSet *set = [[NSMutableSet alloc] initWithCapacity: [value count]];
+	for (COObject *object in value)
+	{
+		if ([set containsObject: object])
+		{
+			hasDuplicates = YES;
+			break;
+		}
+		[set addObject: object];
+	}
+	
+	if (!hasDuplicates)
+		return NO;
+	
+	[set removeAllObjects];
+	NSMutableArray *collectionWithDuplicatesRemoved = [[NSMutableArray alloc] initWithCapacity: [value count]];
+	for (COObject *object in value)
+	{
+		if (![set containsObject: object])
+		{
+			[collectionWithDuplicatesRemoved addObject: object];
+		}
+		[set addObject: object];
+	}
+	
+	[self setValue: collectionWithDuplicatesRemoved forStorageKey: key];
+	
+	return YES;
+}
+
+/**
  * Removes objects from their old parents (the new parent is the receiver).
  *
  * From a metamodel viewpoint, composite = children (incoming relationship) and
@@ -1025,6 +1079,14 @@ See +[NSObject typePrefix]. */
 		                    key, _entityDescription, self];
 	}
 
+	if ([self removeDuplicatesInValue: newValue propertyDescription: propertyDesc])
+	{
+		// the -removeDuplicatesInValue:propertyDescription: method removed some
+		// duplicates and saved the resulting de-duplicated collection in the storage
+		// again. Reload the new value.
+		newValue = [self valueForStorageKey: key];
+	}
+	
 	[self validateNewValue: newValue propertyDescription: propertyDesc];
 
 	[self updateCompositeRelationshipForPropertyDescription: propertyDesc];

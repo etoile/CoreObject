@@ -108,4 +108,11 @@
 	UKObjectsSame(parent2, child1.parentContainer);
 }
 
+- (void) testDuplicatesAutomaticallyRemoved
+{
+	parent.contents = @[child2, child2, child1, child1, child1, child2];
+	UKTrue(([@[child2, child1] isEqual: parent.contents]
+			|| [@[child1, child2] isEqual: parent.contents]));
+}
+
 @end
