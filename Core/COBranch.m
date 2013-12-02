@@ -24,6 +24,7 @@
 #import "COBranchInfo.h"
 #import "COObjectGraphContext.h"
 #import "COObjectGraphContext+Private.h"
+#import "COObjectGraphContext+GarbageCollection.h"
 #import "COEditingContext+Undo.h"
 #import "COLeastCommonAncestor.h"
 #import "COItemGraphDiff.h"
@@ -609,6 +610,11 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     
     if ([[modifiedItems itemUUIDs] count] > 0 || self.shouldMakeEmptyCommit)
     {
+		// Validate the graph - see [TestOrderedCompositeRelationship testCompositeCycleWithThreeObjects]
+		// Not sure if this is the best approach to detecting cycles in composites but it's a first
+		// draft anyway.
+		[modifiedItemsSource checkForCyclesInCompositeRelationshipsFromObject: [modifiedItemsSource rootObject]];
+		
         ETUUID *mergeParent = nil;
         if (self.mergingBranch != nil)
         {

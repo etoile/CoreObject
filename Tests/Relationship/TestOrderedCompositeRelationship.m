@@ -130,4 +130,34 @@
 	UKRaisesException([(NSMutableArray *)[[ctx2 rootObject] contents] removeObjectAtIndex: 1]);
 }
 
+/**
+ * The difficulty with detecting cycles is, we want to allow them temporarily
+ * during -setItemGraph:.
+ *
+ * e.g. suppose the graph is "A contains B", and we load a replacement graph
+ * where "B contains A". If item B is processed first, the graph will have
+ * a temporary cycle until A is reloaded, at which point the problem will be
+ * fixed. So we don't want to run cycle detection in -didChangeValueForProperty:
+ * because it would be tripped in that case.
+ */
+- (void) testCompositeCycleWithThreeObjects
+{
+	UKTrue([parent isRoot]);
+	UKObjectsEqual((@[child1, child2]), parent.contents);
+	
+	child1.contents = @[child2];	
+	UKObjectsEqual((@[child1]), parent.contents); /* since adding child2 to child1 moved it */
+
+	child2.contents = @[parent]; /* attempt to create a cycle... */
+
+	UKRaisesException([ctx commit]);
+}
+
+- (void) testCompositeCycleWithOneObject
+{
+	parent.contents = @[parent];
+	
+	UKRaisesException([ctx commit]);
+}
+
 @end

@@ -24,4 +24,6 @@
  */
 - (NSSet *) allReachableObjectUUIDs;
 
+- (void) checkForCyclesInCompositeRelationshipsFromObject: (COObject*)anObject;
+
 @end
