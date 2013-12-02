@@ -139,13 +139,25 @@ static int OrderedGroupNoOppositeDeallocCalls;
 - (void) testDuplicatesAutomaticallyRemoved
 {
 	COObjectGraphContext *ctx = [COObjectGraphContext new];
-	OutlineItem *group1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	OrderedGroupNoOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupNoOpposite"];
 	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
 	OutlineItem *item2 = [ctx insertObjectWithEntityName: @"OutlineItem"];
 		
 	group1.contents = @[item1, item2, item1, item1, item1, item2];
 	UKTrue(([@[item2, item1] isEqual: group1.contents]
 			|| [@[item1, item2] isEqual: group1.contents]));
+}
+
+- (void) testIllegalDirectModificationOfCollection
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	OrderedGroupNoOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupNoOpposite"];
+	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *item2 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	
+	group1.contents = @[item1, item2];
+		
+	UKRaisesException([(NSMutableArray *)group1.contents removeObjectAtIndex: 1]);
 }
 
 @end

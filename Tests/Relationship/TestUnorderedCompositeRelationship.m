@@ -113,4 +113,10 @@
 	UKObjectsSame(parent2, child1.parent);
 }
 
+- (void) testIllegalDirectModificationOfCollection
+{
+	UKObjectsEqual(S(child1, child2), parent.contents);
+	UKRaisesException([(NSMutableSet *)parent.contents removeObject: child1]);
+}
+
 @end

@@ -124,4 +124,28 @@
 	UKObjectsEqual(S(group1ctx2, group2ctx2), [item2ctx2 referringObjects]);
 }
 
+- (void) testDuplicatesAutomaticallyRemoved
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	OrderedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupWithOpposite"];
+	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *item2 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	
+	group1.contents = @[item1, item2, item1, item1, item1, item2];
+	UKTrue(([@[item2, item1] isEqual: group1.contents]
+			|| [@[item1, item2] isEqual: group1.contents]));
+}
+
+- (void) testIllegalDirectModificationOfCollection
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	OrderedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupWithOpposite"];
+	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *item2 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	
+	group1.contents = @[item1, item2];
+	
+	UKRaisesException([(NSMutableArray *)group1.contents removeObjectAtIndex: 1]);
+}
+
 @end

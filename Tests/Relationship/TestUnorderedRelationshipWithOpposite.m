@@ -119,4 +119,16 @@
 	UKObjectsEqual(S(group2ctx2), [item1ctx2 parentGroups]);
 }
 
+- (void) testIllegalDirectModificationOfCollection
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	UnorderedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"UnorderedGroupWithOpposite"];
+	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *item2 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	
+	group1.contents = S(item1, item2);
+	
+	UKRaisesException([(NSMutableSet *)group1.contents removeObject: item1]);
+}
+
 @end

@@ -115,4 +115,10 @@
 			|| [@[child1, child2] isEqual: parent.contents]));
 }
 
+- (void) testIllegalDirectModificationOfCollection
+{
+	UKObjectsEqual((@[child1, child2]), parent.contents);
+	UKRaisesException([(NSMutableArray *)parent.contents removeObjectAtIndex: 1]);
+}
+
 @end

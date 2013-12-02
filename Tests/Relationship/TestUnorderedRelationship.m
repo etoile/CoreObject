@@ -129,4 +129,16 @@ static int UnorderedGroupNoOppositeDeallocCalls;
 	UKIntsEqual(2, deallocs);
 }
 
+- (void) testIllegalDirectModificationOfCollection
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	UnorderedGroupNoOpposite *group1 = [ctx insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
+	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *item2 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	
+	group1.contents = S(item1, item2);
+	
+	UKRaisesException([(NSMutableSet *)group1.contents removeObject: item1]);
+}
+
 @end

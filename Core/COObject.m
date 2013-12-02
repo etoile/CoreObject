@@ -38,6 +38,15 @@
 }
 @end
 
+static inline void
+COThrowExceptionIfNotMutable(BOOL mutable)
+{
+	if (!mutable)
+	{
+		[NSException raise: NSGenericException format: @"Attempted to modify an immutable collection"];
+	}
+}
+
 @implementation COUnsafeRetainedMutableArray
 - (instancetype)init
 {
@@ -67,10 +76,13 @@
 }
 - (void)addObject: (id)anObject
 {
+	COThrowExceptionIfNotMutable(_mutable);
 	[_backing addPointer: (__bridge void *)anObject];
 }
 - (void)insertObject: (id)anObject atIndex: (NSUInteger)index
 {
+	COThrowExceptionIfNotMutable(_mutable);
+	
     // NSPointerArray on 10.7 doesn't allow inserting at the end using index == count, so
     // call addPointer in that case as a workaround.
     if (index == [_backing count])
@@ -84,14 +96,17 @@
 }
 - (void)removeLastObject
 {
+	COThrowExceptionIfNotMutable(_mutable);
 	[self removeObjectAtIndex: [self count] - 1];
 }
 - (void)removeObjectAtIndex: (NSUInteger)index
 {
+	COThrowExceptionIfNotMutable(_mutable);
 	[_backing removePointerAtIndex: index];
 }
 - (void)replaceObjectAtIndex: (NSUInteger)index withObject: (id)anObject
 {
+	COThrowExceptionIfNotMutable(_mutable);
 	[_backing replacePointerAtIndex: index withPointer: (__bridge void *)anObject];
 }
 @end
@@ -129,10 +144,12 @@
 }
 - (void) addObject: (id)anObject
 {
+	COThrowExceptionIfNotMutable(_mutable);
 	[_backing addObject: anObject];
 }
 - (void) removeObject: (id)anObject
 {
+	COThrowExceptionIfNotMutable(_mutable);
 	[_backing removeObject: anObject];
 }
 @end
@@ -1140,6 +1157,18 @@ See +[NSObject typePrefix]. */
 	return collection;
 }
 
+- (void) setMutableFlag: (BOOL)mutable forCollection: (id)aCollection
+{
+	if ([aCollection isKindOfClass: [COUnsafeRetainedMutableArray class]])
+	{
+		((COUnsafeRetainedMutableArray *)aCollection)->_mutable = mutable;
+	}
+	if ([aCollection isKindOfClass: [COUnsafeRetainedMutableSet class]])
+	{
+		((COUnsafeRetainedMutableSet *)aCollection)->_mutable = mutable;
+	}
+}
+
 - (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
 {
 	// NOTE: We validate the entire collection in -didChangeValueForProperty:
@@ -1147,7 +1176,11 @@ See +[NSObject typePrefix]. */
 	id collection = [self collectionForProperty: key mutationIndex: index];
 
 	[self willChangeValueForProperty: key];
+	
+	[self setMutableFlag: YES forCollection: collection];
 	[collection insertObject: object atIndex: index hint: hint];
+	[self setMutableFlag: NO forCollection: collection];
+	
 	[self didChangeValueForProperty: key];
 }
 
@@ -1158,7 +1191,11 @@ See +[NSObject typePrefix]. */
 	id collection = [self collectionForProperty: key mutationIndex: index];
 
 	[self willChangeValueForProperty: key];
+	
+	[self setMutableFlag: YES forCollection: collection];
 	[collection removeObject: object atIndex: index hint: hint];
+	[self setMutableFlag: NO forCollection: collection];
+	
 	[self didChangeValueForProperty: key];
 }
 

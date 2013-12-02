@@ -22,14 +22,19 @@
 
 @end
 
+
 @interface COUnsafeRetainedMutableSet : NSMutableSet
 {
+	@public
+	BOOL _mutable;
 	NSHashTable *_backing;
 }
 @end
 
 @interface COUnsafeRetainedMutableArray : NSMutableArray
 {
+	@public
+	BOOL _mutable;
 	NSPointerArray *_backing;
 }
 @end
