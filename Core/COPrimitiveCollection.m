@@ -205,3 +205,60 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 }
 
 @end
+
+
+@implementation NSObject (COPrimitiveCollection)
+
++ (Class)coreObjectClass
+{
+	return Nil;
+}
+
+- (id)mutableCoreObjectCopy
+{
+	return [self mutableCopy];
+}
+
+@end
+
+@implementation NSArray (COPrimitiveCollection)
+
++ (Class)coreObjectClass
+{
+	return [COUnsafeRetainedMutableArray class];
+}
+
+- (id)mutableCoreObjectCopy
+{
+	return [[[[self class] coreObjectClass] alloc] initWithArray: self];
+}
+
+@end
+
+@implementation NSSet (COPrimitiveCollection)
+
++ (Class)coreObjectClass
+{
+	return [COUnsafeRetainedMutableSet class];
+}
+
+- (id)mutableCoreObjectCopy
+{
+	return [[[[self class] coreObjectClass] alloc] initWithSet: self];
+}
+
+@end
+
+@implementation NSDictionary (COPrimitiveCollection)
+
++ (Class)coreObjectClass
+{
+	return [COMutableDictionary class];
+}
+
+- (id)mutableCoreObjectCopy
+{
+	return [[[[self class] coreObjectClass] alloc] initWithDictionary: self];
+}
+
+@end

@@ -152,14 +152,11 @@ See +[NSObject typePrefix]. */
 
 - (id)newCollectionForPropertyDescription: (ETPropertyDescription *)propDesc
 {
-	if ([propDesc isKeyed])
-	{
-		return [COMutableDictionary new];
-	}
-	else
-	{
-		return ([propDesc isOrdered] ? [NSMutableArray new] : [NSMutableSet new]);
-	}
+	Class proposedClass = [self collectionClassForPropertyDescription: propDesc];
+	Class collectionClass =
+		([propDesc isPersistent] ? [proposedClass coreObjectClass] : [proposedClass mutableClass]);
+
+	return [collectionClass new];
 }
 
 - (NSMutableDictionary *)newVariableStorage
@@ -673,44 +670,35 @@ See +[NSObject typePrefix]. */
 	return value;
 }
 
+- (BOOL)isCoreObjectCollection: (id)aCollection
+{
+	return ([aCollection class] == [[aCollection class] coreObjectClass]);
+}
+
+/**
+ * Avoiding copies for core object primitive collections (e.g. 
+ * COMutableDictionary) is a special optimization to prevent allocating new 
+ * persistent relationship collections during 
+ * -replaceReferencesToObjectIdenticalTo:withObject: (not sure we really need it).
+ */
 - (void)setValue: (id)aValue forVariableStorageKey: (NSString *)key
 {
 	ETPropertyDescription *propertyDesc = [[self entityDescription] propertyDescriptionForName: key];
-    id value = aValue;
-	BOOL isPersistentDictionary = ([propertyDesc isKeyed] && [propertyDesc isPersistent]);
-
-    if ([propertyDesc isMultivalued] && isPersistentDictionary == NO)
-    {
-		value = [aValue mutableCopy];
-    }
+    id storageValue = aValue;
 			
 	// Convert user value to the form we store it in the variable storage
-	id storageValue = value;
-	if (value == nil)
+
+	if (aValue == nil)
 	{
 		storageValue = [NSNull null];
 	}
-	if ([value isKindOfClass: [COObject class]])
+	else if ([aValue isKindOfClass: [COObject class]])
 	{
-		storageValue = [[COWeakRef alloc] initWithObject: value];
+		storageValue = [[COWeakRef alloc] initWithObject: aValue];
 	}
-	if ([self isCoreObjectRelationship: propertyDesc] )
+	else if ([propertyDesc isMultivalued] && [self isCoreObjectCollection: aValue] == NO)
 	{
-		if ([value isKindOfClass: [NSArray class]]
-			&& ![value isKindOfClass: [COUnsafeRetainedMutableArray class]])
-		{
-			storageValue = [[COUnsafeRetainedMutableArray alloc] initWithArray: value];
-		}
-		else if ([value isKindOfClass: [NSSet class]]
-				 && ![value isKindOfClass: [COUnsafeRetainedMutableSet class]])
-		{
-			storageValue = [[COUnsafeRetainedMutableSet alloc] initWithSet: value];
-		}
-	}
-	if ([value isKindOfClass: [NSDictionary class]]
-		&& ![value isKindOfClass: [COMutableDictionary class]])
-	{
-		storageValue = [[COMutableDictionary alloc] initWithDictionary: value];
+		storageValue = [aValue mutableCoreObjectCopy];
 	}
 	
 	[_variableStorage setObject: storageValue

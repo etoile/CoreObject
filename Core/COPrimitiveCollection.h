@@ -45,3 +45,26 @@
 	NSMutableDictionary *_backing;
 }
 @end
+
+
+@interface NSObject (COPrimitiveCollection)
++ (Class)coreObjectClass;
+- (id)mutableCoreObjectCopy;
+@end
+
+@interface NSArray (COPrimitiveCollection)
++ (Class)coreObjectClass;
+- (id)mutableCoreObjectCopy;
+@end
+
+@interface NSSet (COPrimitiveCollection)
++ (Class)coreObjectClass;
+- (id)mutableCoreObjectCopy;
+@end
+
+@interface NSDictionary (COPrimitiveCollection)
++ (Class)coreObjectClass;
+- (id)mutableCoreObjectCopy;
+@end
+
+
