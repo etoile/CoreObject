@@ -594,4 +594,13 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     }
 }
 
+- (void) replaceObject: (COObject *)anObject withObject: (COObject *)aReplacement
+{
+	for (COObject *referrer in [[anObject incomingRelationshipCache] referringObjects])
+	{
+		[referrer replaceReferencesToObjectIdenticalTo: anObject
+											withObject: aReplacement];
+	}
+}
+
 @end
