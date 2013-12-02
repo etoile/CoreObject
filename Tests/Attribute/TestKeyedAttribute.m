@@ -38,13 +38,13 @@
 /**
  * Tests a keyed collection from NSString : NSString
  */
-@interface TestDictionary : EditingContextTestCase <UKTest>
+@interface TestKeyedAttribute : EditingContextTestCase <UKTest>
 {
 	Model *model;
 }
 @end
 
-@implementation TestDictionary
+@implementation TestKeyedAttribute
 
 - (id)init
 {

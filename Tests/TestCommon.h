@@ -38,10 +38,22 @@ extern NSString * const kCOLabel;
 extern NSString * const kCOContents;
 extern NSString * const kCOParent;
 
+@interface TestCase : NSObject
+
+/**
+ * Execute the given block once with the provided objet graph context.
+ * Then, serialize the object graph and load the serialized form in to a new
+ * COObjectGraphContext instane, and re-run the tests in the block.
+ */
+- (void) checkObjectGraphBeforeAndAfterSerializationRoundtrip: (COObjectGraphContext *)anObjectGraph
+													  inBlock: (void (^)(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy))block;
+
+@end
+
 /**
  * Base class for Core Object test classes that need a COSQLiteStore.
  */
-@interface SQLiteStoreTestCase : NSObject
+@interface SQLiteStoreTestCase : TestCase
 {
     COSQLiteStore *store;
 }
@@ -122,6 +134,7 @@ extern NSString * const kCOParent;
  */
 - (void) checkPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
 											  inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
+
 
 /**
  * Runs the default runloop for a short period of time.

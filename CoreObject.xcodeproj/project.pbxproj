@@ -79,9 +79,12 @@
 		660D4CDA17D5C7CB003C9ACC /* COLeastCommonAncestor.m in Sources */ = {isa = PBXBuildFile; fileRef = 660D4CD817D5C7CB003C9ACC /* COLeastCommonAncestor.m */; };
 		660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 660D4CE317D689FC003C9ACC /* COMergeInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660D4CE617D689FC003C9ACC /* COMergeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 660D4CE417D689FC003C9ACC /* COMergeInfo.m */; };
+		6610112F184D2D8A001A3E24 /* TestKeyedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112B184D2D8A001A3E24 /* TestKeyedAttribute.m */; };
+		66101130184D2D8A001A3E24 /* TestOrderedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112C184D2D8A001A3E24 /* TestOrderedAttribute.m */; };
+		66101131184D2D8A001A3E24 /* TestUnivaluedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112D184D2D8A001A3E24 /* TestUnivaluedAttribute.m */; };
+		66101132184D2D8A001A3E24 /* TestUnorderedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112E184D2D8A001A3E24 /* TestUnorderedAttribute.m */; };
 		661211401821986B003AEC29 /* CODateSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 6612113E1821986B003AEC29 /* CODateSerialization.h */; };
 		661211411821986B003AEC29 /* CODateSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 6612113F1821986B003AEC29 /* CODateSerialization.m */; };
-		661E2B78184C3EBB00226D3D /* TestDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 661E2B77184C3EBB00226D3D /* TestDictionary.m */; };
 		661E2B7A184C4C0200226D3D /* TestKeyedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 661E2B79184C4C0200226D3D /* TestKeyedRelationship.m */; };
 		6621BF101847F06D000809CF /* Parent.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF0F1847F06D000809CF /* Parent.m */; };
 		6621BF1A1847F077000809CF /* Child.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF191847F077000809CF /* Child.m */; };
@@ -512,9 +515,12 @@
 		660D4CD817D5C7CB003C9ACC /* COLeastCommonAncestor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COLeastCommonAncestor.m; path = Diff/COLeastCommonAncestor.m; sourceTree = "<group>"; };
 		660D4CE317D689FC003C9ACC /* COMergeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COMergeInfo.h; path = Diff/COMergeInfo.h; sourceTree = "<group>"; };
 		660D4CE417D689FC003C9ACC /* COMergeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COMergeInfo.m; path = Diff/COMergeInfo.m; sourceTree = "<group>"; };
+		6610112B184D2D8A001A3E24 /* TestKeyedAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestKeyedAttribute.m; sourceTree = "<group>"; };
+		6610112C184D2D8A001A3E24 /* TestOrderedAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestOrderedAttribute.m; sourceTree = "<group>"; };
+		6610112D184D2D8A001A3E24 /* TestUnivaluedAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnivaluedAttribute.m; sourceTree = "<group>"; };
+		6610112E184D2D8A001A3E24 /* TestUnorderedAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnorderedAttribute.m; sourceTree = "<group>"; };
 		6612113E1821986B003AEC29 /* CODateSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODateSerialization.h; path = Utilities/CODateSerialization.h; sourceTree = SOURCE_ROOT; };
 		6612113F1821986B003AEC29 /* CODateSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODateSerialization.m; path = Utilities/CODateSerialization.m; sourceTree = SOURCE_ROOT; };
-		661E2B77184C3EBB00226D3D /* TestDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestDictionary.m; sourceTree = "<group>"; };
 		661E2B79184C4C0200226D3D /* TestKeyedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestKeyedRelationship.m; sourceTree = "<group>"; };
 		6621BF0E1847F06D000809CF /* Parent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Parent.h; path = Tests/Parent.h; sourceTree = "<group>"; };
 		6621BF0F1847F06D000809CF /* Parent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Parent.m; path = Tests/Parent.m; sourceTree = "<group>"; };
@@ -925,6 +931,18 @@
 			name = Messages;
 			sourceTree = "<group>";
 		};
+		6610112A184D2D8A001A3E24 /* Attribute */ = {
+			isa = PBXGroup;
+			children = (
+				6610112B184D2D8A001A3E24 /* TestKeyedAttribute.m */,
+				6610112C184D2D8A001A3E24 /* TestOrderedAttribute.m */,
+				6610112D184D2D8A001A3E24 /* TestUnivaluedAttribute.m */,
+				6610112E184D2D8A001A3E24 /* TestUnorderedAttribute.m */,
+			);
+			name = Attribute;
+			path = Tests/Attribute;
+			sourceTree = "<group>";
+		};
 		663CE28617C07ED800E729F5 /* Undo */ = {
 			isa = PBXGroup;
 			children = (
@@ -1194,7 +1212,6 @@
 				666888101849961300DBEB10 /* TestOrderedRelationshipWithOpposite.m */,
 				666888111849961300DBEB10 /* TestUnivaluedRelationshipWithOpposite.m */,
 				666888121849961300DBEB10 /* TestUnorderedRelationshipWithOpposite.m */,
-				661E2B77184C3EBB00226D3D /* TestDictionary.m */,
 				661E2B79184C4C0200226D3D /* TestKeyedRelationship.m */,
 			);
 			name = Relationship;
@@ -1360,6 +1377,7 @@
 				609C00541704C24C00D01AAB /* main.m */,
 				609C00581704C24C00D01AAB /* TestCommon.h */,
 				609C00591704C24C00D01AAB /* TestCommon.m */,
+				6610112A184D2D8A001A3E24 /* Attribute */,
 				6699DDA3184887C30003E803 /* Relationship */,
 				66E40D291836D08D00E5B4A7 /* Core */,
 				66E40D391836D08D00E5B4A7 /* Diff */,
@@ -1885,6 +1903,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6660B3961839522B009007FD /* TestSerialization.m in Sources */,
+				66101130184D2D8A001A3E24 /* TestOrderedAttribute.m in Sources */,
 				66E40D661836D08D00E5B4A7 /* TestItemGraphDiff.m in Sources */,
 				6699DDB2184888050003E803 /* TestUnorderedRelationship.m in Sources */,
 				66E40D5E1836D08D00E5B4A7 /* TestEditingContext.m in Sources */,
@@ -1901,15 +1920,16 @@
 				66E40D601836D08D00E5B4A7 /* TestNotifications.m in Sources */,
 				6699DDA9184887C30003E803 /* TestUnorderedCompositeRelationship.m in Sources */,
 				66E40D5F1836D08D00E5B4A7 /* TestHistoryInspection.m in Sources */,
+				66101131184D2D8A001A3E24 /* TestUnivaluedAttribute.m in Sources */,
 				666888151849961300DBEB10 /* TestUnorderedRelationshipWithOpposite.m in Sources */,
 				609C00651704C24C00D01AAB /* main.m in Sources */,
+				66101132184D2D8A001A3E24 /* TestUnorderedAttribute.m in Sources */,
 				66E40D791836D08E00E5B4A7 /* TestUndoStackStore.m in Sources */,
 				66E40D611836D08D00E5B4A7 /* TestObject.m in Sources */,
 				66E40D6C1836D08D00E5B4A7 /* TestSQLiteStore.m in Sources */,
 				66E40D5B1836D08D00E5B4A7 /* TestCopierWithIsShared.m in Sources */,
 				66E40D6F1836D08D00E5B4A7 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
 				666888131849961300DBEB10 /* TestOrderedRelationshipWithOpposite.m in Sources */,
-				661E2B78184C3EBB00226D3D /* TestDictionary.m in Sources */,
 				66E40D7A1836D08E00E5B4A7 /* TestUndoStackTrackProtocol.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66E451D617CC461F00205679 /* OutlineItem.m in Sources */,
@@ -1937,6 +1957,7 @@
 				66E40D731836D08D00E5B4A7 /* TestSynchronizerJSONTransport.m in Sources */,
 				66E40D6E1836D08D00E5B4A7 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */,
 				66E40D771836D08E00E5B4A7 /* TestUndo.m in Sources */,
+				6610112F184D2D8A001A3E24 /* TestKeyedAttribute.m in Sources */,
 				66E40D6B1836D08D00E5B4A7 /* TestBinaryReadWrite.m in Sources */,
 				6621BF101847F06D000809CF /* Parent.m in Sources */,
 			);

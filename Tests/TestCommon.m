@@ -5,10 +5,30 @@
 #import "COPersistentRoot.h"
 #import "COSQLiteStore.h"
 #import "TestCommon.h"
+#import "COObjectGraphContext+Private.h"
 
 NSString * const kCOLabel = @"label";
 NSString * const kCOContents = @"contents";
 NSString * const kCOParent = @"parentContainer";
+
+@implementation TestCase
+
+- (void) checkObjectGraphBeforeAndAfterSerializationRoundtrip: (COObjectGraphContext *)anObjectGraph
+													  inBlock: (void (^)(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy))block
+{
+	block(anObjectGraph, [anObjectGraph rootObject], NO);
+	
+	NSData *data = COItemGraphToJSONData(anObjectGraph);
+	COItemGraph *deseriazlied = COItemGraphFromJSONData(data);
+	
+	COObjectGraphContext *deserializedContext = [[COObjectGraphContext alloc] init];
+	[deserializedContext setItemGraph: deseriazlied];
+	[deserializedContext removeUnreachableObjects];
+	
+	block(deserializedContext, [deserializedContext rootObject], YES);
+}
+
+@end
 
 @implementation SQLiteStoreTestCase
 
