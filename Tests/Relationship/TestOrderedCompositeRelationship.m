@@ -117,8 +117,17 @@
 
 - (void) testIllegalDirectModificationOfCollection
 {
+	// Test that an exception is raised when modifying when we last set the array using a setter
 	UKObjectsEqual((@[child1, child2]), parent.contents);
 	UKRaisesException([(NSMutableArray *)parent.contents removeObjectAtIndex: 1]);
+	
+	// Test that an exception is raised when modifying after deserialization
+	
+	// TODO: Rewrite in a cleaner way
+	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
+	[ctx2 setItemGraph: parent.objectGraphContext];
+	UKObjectsEqual((@[[child1 UUID], [child2 UUID]]), [[[[ctx2 rootObject] contents] mappedCollection] UUID]);
+	UKRaisesException([(NSMutableArray *)[[ctx2 rootObject] contents] removeObjectAtIndex: 1]);
 }
 
 @end

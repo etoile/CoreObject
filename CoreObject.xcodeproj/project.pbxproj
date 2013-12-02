@@ -80,6 +80,7 @@
 		661211401821986B003AEC29 /* CODateSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 6612113E1821986B003AEC29 /* CODateSerialization.h */; };
 		661211411821986B003AEC29 /* CODateSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 6612113F1821986B003AEC29 /* CODateSerialization.m */; };
 		661E2B78184C3EBB00226D3D /* TestDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 661E2B77184C3EBB00226D3D /* TestDictionary.m */; };
+		661E2B7A184C4C0200226D3D /* TestKeyedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 661E2B79184C4C0200226D3D /* TestKeyedRelationship.m */; };
 		6621BF101847F06D000809CF /* Parent.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF0F1847F06D000809CF /* Parent.m */; };
 		6621BF1A1847F077000809CF /* Child.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF191847F077000809CF /* Child.m */; };
 		6621BF2618482159000809CF /* Folder.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF2518482159000809CF /* Folder.m */; };
@@ -510,6 +511,7 @@
 		6612113E1821986B003AEC29 /* CODateSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODateSerialization.h; path = Utilities/CODateSerialization.h; sourceTree = SOURCE_ROOT; };
 		6612113F1821986B003AEC29 /* CODateSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODateSerialization.m; path = Utilities/CODateSerialization.m; sourceTree = SOURCE_ROOT; };
 		661E2B77184C3EBB00226D3D /* TestDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestDictionary.m; sourceTree = "<group>"; };
+		661E2B79184C4C0200226D3D /* TestKeyedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestKeyedRelationship.m; sourceTree = "<group>"; };
 		6621BF0E1847F06D000809CF /* Parent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Parent.h; path = Tests/Parent.h; sourceTree = "<group>"; };
 		6621BF0F1847F06D000809CF /* Parent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Parent.m; path = Tests/Parent.m; sourceTree = "<group>"; };
 		6621BF181847F077000809CF /* Child.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Child.h; path = Tests/Child.h; sourceTree = "<group>"; };
@@ -1187,6 +1189,7 @@
 				666888111849961300DBEB10 /* TestUnivaluedRelationshipWithOpposite.m */,
 				666888121849961300DBEB10 /* TestUnorderedRelationshipWithOpposite.m */,
 				661E2B77184C3EBB00226D3D /* TestDictionary.m */,
+				661E2B79184C4C0200226D3D /* TestKeyedRelationship.m */,
 			);
 			name = Relationship;
 			path = Tests/Relationship;
@@ -1910,6 +1913,7 @@
 				66E451D917CC565200205679 /* Tag.m in Sources */,
 				66E40D6D1836D08D00E5B4A7 /* TestSQLiteStoreErrorHandling.m in Sources */,
 				66E40D741836D08E00E5B4A7 /* TestSynchronizerMultiUser.m in Sources */,
+				661E2B7A184C4C0200226D3D /* TestKeyedRelationship.m in Sources */,
 				6621BF2618482159000809CF /* Folder.m in Sources */,
 				66E40D631836D08D00E5B4A7 /* TestObjectUpdate.m in Sources */,
 				66E40D701836D08D00E5B4A7 /* COSynchronizerFakeMessageTransport.m in Sources */,
