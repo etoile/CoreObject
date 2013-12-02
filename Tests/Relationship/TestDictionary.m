@@ -53,6 +53,65 @@
 	return self;
 }
 
+- (void)testAdditionalStoreItemUUIDs
+{
+	NSArray *keyedProperties = [[model additionalStoreItemUUIDs] allKeys];
+
+	UKIntsEqual(1, [keyedProperties count]);
+	UKStringsEqual(@"entries", [keyedProperties firstObject]);
+}
+
+/**
+ * Dictionaries are always marked as damaged, and (de)serialized at the same
+ * time than their owner object. As a result, deserializing a single object 
+ * and no other objects, either the model or the dictionary using 
+ * -[COObjectGraphContext insertOrUpdateItems:], is a border case. 
+ * 
+ * For now, we don't support it to prevent breaking -awakeFromDeserialization 
+ * (all non-relationship collections must be deserialized and valid inside 
+ * -awakeFromDeserialization).
+ *
+ * It is possible to respect -[COItemGraph insertOrUpdatedItems:] in all cases, 
+ * but this means some extra complexity in COObjectGraphContext, and no 
+ * reports/exceptions about incorrect additional item loading (a dictionary item 
+ * missing an owner or the reverse).
+ */
+- (void)testItemGraphProtocol
+{
+	ETUUID *dictUUID = [[[model additionalStoreItemUUIDs] allValues] firstObject];
+	COItem *dictItem = [[model objectGraphContext] itemForUUID: dictUUID];
+	COItem *modelItem = [[model objectGraphContext] itemForUUID: [model UUID]];
+
+	UKObjectsEqual(dictUUID, [dictItem UUID]);
+	UKStringsEqual(@"CODictionary", [dictItem valueForAttribute: kCOObjectEntityNameProperty]);
+
+	UKObjectsEqual([model UUID], [modelItem UUID]);
+	UKObjectsEqual(dictUUID, [modelItem valueForAttribute: @"entries"]);
+	
+	/* Test Dictionary Item Insertion */
+
+	[model setValue: D(@"boum", @"sound") forProperty: @"entries"];
+	
+	// TODO: We should possibly add a ownerUUID attribute to dictionary items,
+	// and use an assertion in -addItem:markAsInserted: that ensure the loading
+	// item graph contains the owner UUID each time an additional item is encountered.
+	//
+	// if ([anItem isAdditionalItem])
+	// {
+	//   ETAssert([[_loadingItemGraph itemUUIDs] containsObject: [anItem ownerUUID]]);
+	//   return;
+	// }
+	UKDoesNotRaiseException([[model objectGraphContext] insertOrUpdateItems: A(dictItem)]);
+	UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
+
+	/* Test Model Item Insertion */
+
+	[model setValue: D(@"boum", @"sound") forProperty: @"entries"];
+	
+	UKRaisesException([[model objectGraphContext] insertOrUpdateItems: A(modelItem)]);
+	UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
+}
+
 - (void)testModelInitialization
 {
 	[ctx commit];

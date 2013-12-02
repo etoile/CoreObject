@@ -618,6 +618,9 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		}
 
 		COItem *item = [[[self objectGraphContext] loadingItemGraph] itemForUUID: value];
+		NSAssert(item != nil, @"Dictionary store item missing in item graph %@",
+			[[self objectGraphContext] loadingItemGraph]);
+
 		return [self dictionaryFromStoreItem: item
 		              forPropertyDescription: aPropertyDesc];
 	}
