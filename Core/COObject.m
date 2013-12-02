@@ -154,6 +154,45 @@ COThrowExceptionIfNotMutable(BOOL mutable)
 }
 @end
 
+@implementation COMutableDictionary
+- (instancetype) init
+{
+	return [self initWithObjects: NULL forKeys: NULL count: 0];
+}
+- (instancetype) initWithObjects: (const id[])objects forKeys: (const id<NSCopying>[])keys count: (NSUInteger)count
+{
+	SUPERINIT;
+	_backing = [[NSMutableDictionary alloc] initWithObjects: objects forKeys: keys count: count];
+	return self;
+}
+- (instancetype)initWithCapacity: (NSUInteger)aCount
+{
+	return [self init];
+}
+- (NSUInteger) count
+{
+	return [_backing count];
+}
+- (id) objectForKey: (id)key
+{
+	return [_backing objectForKey: key];
+}
+- (NSEnumerator *) keyEnumerator
+{
+	return [_backing keyEnumerator];
+}
+- (void) removeObjectForKey: (id)aKey
+{
+	COThrowExceptionIfNotMutable(_mutable);
+	[_backing removeObjectForKey: aKey];
+}
+- (void) setObject: (id)anObject forKey: (id<NSCopying>)aKey
+{
+	COThrowExceptionIfNotMutable(_mutable);
+	[_backing setObject: anObject forKey: aKey];
+}
+@end
+
 
 @implementation COObject
 
@@ -277,10 +316,14 @@ See +[NSObject typePrefix]. */
 
 - (id)newCollectionForPropertyDescription: (ETPropertyDescription *)propDesc
 {
-	Class class = [self collectionClassForPropertyDescription: propDesc];
-	ETAssert([class conformsToProtocol: @protocol(ETCollection)]);
-
-	return [[class mutableClass] new];
+	if ([propDesc isKeyed])
+	{
+		return [COMutableDictionary new];
+	}
+	else
+	{
+		return ([propDesc isOrdered] ? [NSMutableArray new] : [NSMutableSet new]);
+	}
 }
 
 - (NSMutableDictionary *)newVariableStorage
@@ -828,6 +871,11 @@ See +[NSObject typePrefix]. */
 			storageValue = [[COUnsafeRetainedMutableSet alloc] initWithSet: value];
 		}
 	}
+	if ([value isKindOfClass: [NSDictionary class]]
+		&& ![value isKindOfClass: [COMutableDictionary class]])
+	{
+		storageValue = [[COMutableDictionary alloc] initWithDictionary: value];
+	}
 	
 	[_variableStorage setObject: storageValue
 	                     forKey: key];
@@ -1167,6 +1215,10 @@ See +[NSObject typePrefix]. */
 	{
 		((COUnsafeRetainedMutableSet *)aCollection)->_mutable = mutable;
 	}
+	if ([aCollection isKindOfClass: [COMutableDictionary class]])
+	{
+		((COMutableDictionary *)aCollection)->_mutable = mutable;
+	}
 }
 
 - (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
@@ -1385,6 +1437,7 @@ See +[NSObject typePrefix]. */
 				[set addObject: aReplacement];
 			}
 		}
+		// FIXME: COMutableDictionary
 	}
 }
 

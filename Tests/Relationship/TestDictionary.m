@@ -6,7 +6,7 @@
 #import "COObjectGraphContext+Private.h"
 
 @interface Model : COObject
-@property (nonatomic, strong) NSMutableDictionary *entries;
+@property (nonatomic, strong) NSDictionary *entries;
 @end
 
 @implementation Model
@@ -35,7 +35,9 @@
 
 @end
 
-
+/**
+ * Tests a keyed collection from NSString : NSString
+ */
 @interface TestDictionary : EditingContextTestCase <UKTest>
 {
 	Model *model;
@@ -62,7 +64,6 @@
 		Model *testModel = [testPersistentRoot rootObject];
 
 		UKObjectsEqual([NSDictionary dictionary], [testModel valueForProperty: @"entries"]);
-		UKObjectKindOf([testModel valueForProperty: @"entries"], NSMutableDictionary);
 	}];
 }
 
@@ -84,28 +85,13 @@
 	}];
 }
 
-- (void)testDirectMutation
+- (void)testIllegalDirectModificationOfCollection
 {
-	// TODO: You should never try to mutate the dictionary directly like this
-	// and it should really throw an exception, as should modifying an array/set
-	// returned for a regular multivalued property.
+	UKRaisesException([(NSMutableDictionary *)[model entries] setObject: @"pear" forKey: @"fruit"]);
 	
-	[[model entries] setObject: @"pear" forKey: @"fruit"];
-	[[model entries] setObject: @"leak" forKey: @"vegetable"];
+	model.entries = @{@"name" : @"John" };
 	
-	UKObjectsEqual(@"pear", [[model entries] objectForKey: @"fruit"]);
-	UKObjectsEqual(@"leak", [[model entries] objectForKey: @"vegetable"]);
-	UKObjectsEqual(S(@"fruit", @"vegetable"), SA([[model entries] allKeys]));
-	UKObjectsEqual(S(@"pear", @"leak"), SA([[model entries] allValues]));
-
-	[[model entries] removeObjectForKey: @"vegetable"];
-
-	UKObjectsEqual(@"pear", [[model entries] objectForKey: @"fruit"]);
-	UKNil([[model entries] objectForKey: @"vegetable"]);
-	
-	[[model entries] removeAllObjects];
-
-	UKTrue([[model entries] isEmpty]);
+	UKRaisesException([(NSMutableDictionary *)[model entries] setObject: @"pear" forKey: @"fruit"]);
 }
 
 - (void)testMutation

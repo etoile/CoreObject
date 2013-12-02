@@ -39,6 +39,14 @@
 }
 @end
 
+@interface COMutableDictionary : NSMutableDictionary
+{
+	@public
+	BOOL _mutable;
+	NSMutableDictionary *_backing;
+}
+@end
+
 @interface COObject ()
 
 /**
