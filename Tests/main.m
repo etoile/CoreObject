@@ -11,9 +11,12 @@ int main (int argc, const char *argv[])
 
 		[[UKTestHandler handler] setQuiet: YES];
 
+		NSDate *startDate = [NSDate date];
+		
 		[runner runTestsInBundle: [NSBundle mainBundle] principalClass: [EditingContextTestCase class]];
 		[runner reportTestResults];
 		
+		printf("Took %d ms\n", (int)([[NSDate date] timeIntervalSinceDate: startDate] * 1000));
     }
     return 0;
 }
