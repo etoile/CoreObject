@@ -151,6 +151,13 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 	_shortDescription = [plist objectForKey: @"shortDescription"];
 	return self;
 }
+
+- (NSString *)description
+{
+	return [D([self identifier], kCOCommitMetadataIdentifier,
+	          [self typeDescription], kCOCommitMetadataTypeDescription,
+	          [self shortDescription], kCOCommitMetadataShortDescription) description];
+}
 											
 - (NSString *)domain
 {
@@ -211,13 +218,6 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 	return [self localizedStringForKey: localizationKey
 	                             value: [self shortDescription]
 	                         arguments: args];
-}
-
-- (NSDictionary *)persistentMetadata
-{
-	return D([self identifier], kCOCommitMetadataIdentifier,
-	         [self typeDescription], kCOCommitMetadataTypeDescription,
-	         [self shortDescription], kCOCommitMetadataShortDescription);
 }
 
 @end
