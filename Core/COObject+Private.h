@@ -13,40 +13,6 @@
 
 @class CORelationshipCache, COObjectGraphContext;
 
-@interface COWeakRef : NSObject
-{
-	@public
-	__weak COObject *_object;
-}
-- (instancetype) initWithObject: (COObject *)anObject;
-
-@end
-
-
-@interface COUnsafeRetainedMutableSet : NSMutableSet
-{
-	@public
-	BOOL _mutable;
-	NSHashTable *_backing;
-}
-@end
-
-@interface COUnsafeRetainedMutableArray : NSMutableArray
-{
-	@public
-	BOOL _mutable;
-	NSPointerArray *_backing;
-}
-@end
-
-@interface COMutableDictionary : NSMutableDictionary
-{
-	@public
-	BOOL _mutable;
-	NSMutableDictionary *_backing;
-}
-@end
-
 @interface COObject ()
 
 /**

@@ -57,6 +57,8 @@
 		60C913C8165BBFBE00E0C5F4 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97324FDCFA39411CA2CEA /* AppKit.framework */; };
 		60CAAC6417E3117E00E8E2B1 /* COTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 60CAAC6217E3117E00E8E2B1 /* COTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60CAAC6517E3117E00E8E2B1 /* COTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CAAC6317E3117E00E8E2B1 /* COTrack.m */; };
+		60EBC19B184CA38200F751F5 /* COPrimitiveCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 60EBC199184CA38200F751F5 /* COPrimitiveCollection.h */; };
+		60EBC19C184CA38200F751F5 /* COPrimitiveCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60EBC19A184CA38200F751F5 /* COPrimitiveCollection.m */; };
 		60FB089813C3076200C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		660179C8182AFA4B006E7D7B /* COSynchronizerRevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179C6182AFA4B006E7D7B /* COSynchronizerRevision.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -489,6 +491,8 @@
 		60C913C5165BBF5000E0C5F4 /* CoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreObject.h; sourceTree = "<group>"; };
 		60CAAC6217E3117E00E8E2B1 /* COTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COTrack.h; path = ../Tracks/COTrack.h; sourceTree = "<group>"; };
 		60CAAC6317E3117E00E8E2B1 /* COTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COTrack.m; path = ../Tracks/COTrack.m; sourceTree = "<group>"; };
+		60EBC199184CA38200F751F5 /* COPrimitiveCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COPrimitiveCollection.h; path = Core/COPrimitiveCollection.h; sourceTree = "<group>"; };
+		60EBC19A184CA38200F751F5 /* COPrimitiveCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COPrimitiveCollection.m; path = Core/COPrimitiveCollection.m; sourceTree = "<group>"; };
 		6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		660179C6182AFA4B006E7D7B /* COSynchronizerRevision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizerRevision.h; path = Synchronization/Messages/COSynchronizerRevision.h; sourceTree = "<group>"; };
 		660179C7182AFA4B006E7D7B /* COSynchronizerRevision.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizerRevision.m; path = Synchronization/Messages/COSynchronizerRevision.m; sourceTree = "<group>"; };
@@ -970,6 +974,8 @@
 		66457FEE17E968F1003C51A8 /* Private */ = {
 			isa = PBXGroup;
 			children = (
+				60EBC199184CA38200F751F5 /* COPrimitiveCollection.h */,
+				60EBC19A184CA38200F751F5 /* COPrimitiveCollection.m */,
 				6609485D1787A1160049468B /* CORelationshipCache.h */,
 				6609485C1787A1160049468B /* CORelationshipCache.m */,
 				66457FEA17E9683E003C51A8 /* CORevisionCache.h */,
@@ -1524,6 +1530,7 @@
 				601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */,
 				6646974A17CDA78300A1B767 /* COEditingContext+Private.h in Headers */,
 				60CAAC6417E3117E00E8E2B1 /* COTrack.h in Headers */,
+				60EBC19B184CA38200F751F5 /* COPrimitiveCollection.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1869,6 +1876,7 @@
 				66457FCA17E8BFE5003C51A8 /* COStoreWriteRevision.m in Sources */,
 				66457FED17E9683F003C51A8 /* CORevisionCache.m in Sources */,
 				601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */,
+				60EBC19C184CA38200F751F5 /* COPrimitiveCollection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
