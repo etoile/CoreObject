@@ -234,27 +234,41 @@
 	[self checkBranchWithExistingAndNewContext: groupA
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 OrderedGroupWithOpposite *testBranchRoot = [testBranch rootObject];
-		 OrderedGroupContent *testJohnRoot = testBranchRoot.contents[0];
-		 OrderedGroupContent *testLucyRoot = testBranchRoot.contents[1];
-		 UKObjectsEqual(@"GroupA", testBranchRoot.label);
+		 OrderedGroupWithOpposite *testBranchARoot = [testBranch rootObject];
+		 OrderedGroupContent *testJohnRoot = testBranchARoot.contents[0];
+		 OrderedGroupContent *testLucyRoot = testBranchARoot.contents[1];
+		 UKObjectsEqual(@"GroupA", testBranchARoot.label);
 		 UKObjectsEqual(@"John", testJohnRoot.label);
 		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
 		 
-		 // FIXME: Finish...
+		 // Ensure that the computer parents of Lucy and John are the "current branch object context" of Group,
+		 // not a specific branch one.
+		 
+		 UKObjectsEqual(S([testProot rootObject]), testJohnRoot.parentGroups);
+		 UKObjectsEqual(S([testProot rootObject]), testLucyRoot.parentGroups);
+		 
+		 UKObjectsNotEqual(S(testBranchARoot), testJohnRoot.parentGroups);
+		 UKObjectsNotEqual(S(testBranchARoot), testLucyRoot.parentGroups);
 	 }];
 
 	[self checkBranchWithExistingAndNewContext: groupB
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 OrderedGroupWithOpposite *testBranchRoot = [testBranch rootObject];
-		 OrderedGroupContent *testJohnRoot = testBranchRoot.contents[0];
-		 OrderedGroupContent *testLucyRoot = testBranchRoot.contents[1];
-		 UKObjectsEqual(@"GroupB", testBranchRoot.label);
+		 OrderedGroupWithOpposite *testBranchBRoot = [testBranch rootObject];
+		 OrderedGroupContent *testJohnRoot = testBranchBRoot.contents[0];
+		 OrderedGroupContent *testLucyRoot = testBranchBRoot.contents[1];
+		 UKObjectsEqual(@"GroupB", testBranchBRoot.label);
 		 UKObjectsEqual(@"John", testJohnRoot.label);
 		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
+
+		 // Ensure that the computer parents of Lucy and John are the "current branch object context" of Group
+		 // not a specific branch one.
 		 
-		 // FIXME: Finish...
+		 UKObjectsEqual(S([testProot rootObject]), testJohnRoot.parentGroups);
+		 UKObjectsEqual(S([testProot rootObject]), testLucyRoot.parentGroups);
+		 
+		 UKObjectsNotEqual(S(testBranchBRoot), testJohnRoot.parentGroups);
+		 UKObjectsNotEqual(S(testBranchBRoot), testLucyRoot.parentGroups);
 	 }];
 }
 

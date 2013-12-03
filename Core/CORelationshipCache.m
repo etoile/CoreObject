@@ -11,6 +11,7 @@
 #import "COType.h"
 #import "COItem.h"
 #import "COObject.h"
+#import "COObjectGraphContext+Private.h"
 
 @interface COCachedRelationship : NSObject
 {
@@ -28,6 +29,9 @@
 @property (readwrite, nonatomic, weak) COObject *sourceObject;
 @property (readwrite, nonatomic, copy) NSString *sourceProperty;
 @property (readwrite, nonatomic, copy) NSString *targetProperty;
+
+- (BOOL) isSourceObjectTrackingSpecificBranch;
+
 
 @end
 
@@ -47,6 +51,11 @@
 - (NSString *)description
 {
 	return [[self descriptionDictionary] description];
+}
+
+- (BOOL) isSourceObjectTrackingSpecificBranch
+{
+	return [_sourceObject.objectGraphContext isTrackingSpecificBranch];
 }
 
 @end
@@ -75,6 +84,9 @@
     NSMutableSet *result = [NSMutableSet set];
     for (COCachedRelationship *entry in _cachedRelationships)
     {
+		if ([entry isSourceObjectTrackingSpecificBranch])
+			continue;
+		
         if ([aProperty isEqualToString: entry->_targetProperty])
         {
             [result addObject: entry->_sourceObject];
@@ -88,6 +100,7 @@
     NSMutableSet *result = [NSMutableSet set];
     for (COCachedRelationship *entry in _cachedRelationships)
     {
+		// N.B.: Don't filter by !isSourceObjectTrackingSpecificBranch as the other methods do
 		[result addObject: entry->_sourceObject];
     }
     return result;
@@ -99,6 +112,9 @@
     
     for (COCachedRelationship *entry in _cachedRelationships)
     {
+		if ([entry isSourceObjectTrackingSpecificBranch])
+			continue;
+
         if ([aProperty isEqualToString: entry->_targetProperty])
         {
             [results addObject: entry->_sourceObject];
