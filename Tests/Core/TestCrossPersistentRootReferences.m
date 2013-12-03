@@ -5,6 +5,11 @@
 @interface TestCrossPersistentRootReferences : EditingContextTestCase <UKTest>
 @end
 
+/**
+ * TODO: Move these to the Relationship/ test files, and
+ * rewrite them to cover multiple scenarios (univalued, ordered, unordered, keyed, unidirectional, bidirectional)
+ * where needed.
+ */
 @implementation TestCrossPersistentRootReferences
 
 /**
@@ -174,6 +179,26 @@
         UKObjectsEqual(S(@"photo1, branch A", @"photo1, branch B"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
         UKObjectsEqual(S(A(@"childA"), A(@"childB")), [[library1ctx2 rootObject] valueForKeyPath: @"contents.contents.label"]);
 	 }];
+}
+
+/**
+ * See: "cross persistent root reference semantics.key" slide 1
+ */
+- (void) testMultipleBranchesOfGroup
+{
+    // Group <<persistent root>>
+	//  |
+	//  \-- << branch A (current branch) >>
+	//  | |
+	//  | |-- John (current branch)
+	//  | |
+	//  | \-- Lucy (current branch)
+	//  |
+	//  \-- << branch B >>
+	//    |
+	//    |-- John (current branch)
+	//    |
+	//    \-- Lucy (current branch)
 }
 
 - (void) testBranchDeletion
