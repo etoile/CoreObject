@@ -2,50 +2,7 @@
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
-@class UnivaluedGroupContent;
-
-/**
- * Test model object that has an univalued relationship to COObject (no opposite)
- */
-@interface UnivaluedGroupNoOpposite: COObject
-@property (readwrite, strong, nonatomic) NSString *label;
-@property (readwrite, strong, nonatomic) COObject *content;
-@end
-
-static int UnivaluedGroupNoOppositeDeallocCalls;
-
-@implementation UnivaluedGroupNoOpposite
-
-+ (ETEntityDescription*)newEntityDescription
-{
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"UnivaluedGroupNoOpposite"];
-    [entity setParent: (id)@"Anonymous.COObject"];
-	
-    ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
-	
-	ETPropertyDescription *contentProperty = [ETPropertyDescription descriptionWithName: @"content"
-																				   type: (id)@"Anonymous.COObject"];
-    [contentProperty setPersistent: YES];
-	
-	[entity setPropertyDescriptions: @[labelProperty, contentProperty]];
-	
-    return entity;
-}
-
-@dynamic label;
-@dynamic content;
-
-- (void) dealloc
-{
-	UnivaluedGroupNoOppositeDeallocCalls++;
-}
-
-@end
-
 @interface TestUnivaluedRelationship : NSObject <UKTest>
-
 @end
 
 @implementation TestUnivaluedRelationship
@@ -92,7 +49,7 @@ static int UnivaluedGroupNoOppositeDeallocCalls;
 
 - (void) testRetainCycleMemoryLeakWithUserSuppliedSet
 {
-	const int deallocsBefore = UnivaluedGroupNoOppositeDeallocCalls;
+	const NSUInteger deallocsBefore = [UnivaluedGroupNoOpposite countOfDeallocCalls];
 	
 	@autoreleasepool
 	{
@@ -103,7 +60,7 @@ static int UnivaluedGroupNoOppositeDeallocCalls;
 		group2.content = group1;
 	}
 	
-	const int deallocs = UnivaluedGroupNoOppositeDeallocCalls - deallocsBefore;
+	const NSUInteger deallocs = [UnivaluedGroupNoOpposite countOfDeallocCalls] - deallocsBefore;
 	UKIntsEqual(2, deallocs);
 }
 
@@ -115,7 +72,7 @@ static int UnivaluedGroupNoOppositeDeallocCalls;
 	group1.content = group2;
 	group2.content = group1;
 	
-	const int deallocsBefore = UnivaluedGroupNoOppositeDeallocCalls;
+	const NSUInteger deallocsBefore = [UnivaluedGroupNoOpposite countOfDeallocCalls];
 	
 	@autoreleasepool
 	{
@@ -123,7 +80,7 @@ static int UnivaluedGroupNoOppositeDeallocCalls;
 		[ctx2 setItemGraph: ctx];
 	}
 	
-	const int deallocs = UnivaluedGroupNoOppositeDeallocCalls - deallocsBefore;
+	const NSUInteger deallocs = [UnivaluedGroupNoOpposite countOfDeallocCalls] - deallocsBefore;
 	UKIntsEqual(2, deallocs);
 }
 

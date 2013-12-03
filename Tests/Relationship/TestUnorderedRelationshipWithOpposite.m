@@ -2,79 +2,7 @@
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
-/**
- * Test model object that has an unordered many-to-many relationship to UnorderedGroupContent
- */
-@interface UnorderedGroupWithOpposite: COObject
-@property (readwrite, strong, nonatomic) NSString *label;
-@property (readwrite, strong, nonatomic) NSSet *contents;
-@end
-
-/**
- * Test model object to be inserted as content in UnorderedGroupWithOpposite
- */
-@interface UnorderedGroupContent : COObject
-@property (readwrite, strong, nonatomic) NSString *label;
-@property (readwrite, strong, nonatomic) NSSet *parentGroups;
-@end
-
-@implementation UnorderedGroupWithOpposite
-
-+ (ETEntityDescription*)newEntityDescription
-{
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"UnorderedGroupWithOpposite"];
-    [entity setParent: (id)@"Anonymous.COObject"];
-	
-    ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
-	
-	ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
-																					type: (id)@"Anonymous.UnorderedGroupContent"];
-    [contentsProperty setPersistent: YES];
-    [contentsProperty setMultivalued: YES];
-    [contentsProperty setOrdered: NO];
-	[contentsProperty setOpposite: (id)@"Anonymous.UnorderedGroupContent.parentGroups"];
-	
-	[entity setPropertyDescriptions: @[labelProperty, contentsProperty]];
-	
-    return entity;
-}
-
-@dynamic label;
-@dynamic contents;
-@end
-
-@implementation UnorderedGroupContent
-
-+ (ETEntityDescription*)newEntityDescription
-{
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"UnorderedGroupContent"];
-    [entity setParent: (id)@"Anonymous.COObject"];
-	
-    ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
-	
-	ETPropertyDescription *parentGroupsProperty = [ETPropertyDescription descriptionWithName: @"parentGroups"
-																						type: (id)@"Anonymous.UnorderedGroupWithOpposite"];
-    [parentGroupsProperty setMultivalued: YES];
-    [parentGroupsProperty setOrdered: NO];
-	[parentGroupsProperty setOpposite: (id)@"Anonymous.UnorderedGroupWithOpposite.contents"];
-	
-	[entity setPropertyDescriptions: @[labelProperty, parentGroupsProperty]];
-	
-    return entity;
-}
-
-@dynamic label;
-@dynamic parentGroups;
-@end
-
-
-
 @interface TestUnorderedRelationshipWithOpposite : NSObject <UKTest>
-
 @end
 
 @implementation TestUnorderedRelationshipWithOpposite

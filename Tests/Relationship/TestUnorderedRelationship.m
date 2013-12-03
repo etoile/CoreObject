@@ -2,50 +2,7 @@
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
-/**
- * Test model object that has an unordered many-to-many relationship to COObject
- */
-@interface UnorderedGroupNoOpposite: COObject
-@property (readwrite, strong, nonatomic) NSString *label;
-@property (readwrite, strong, nonatomic) NSSet *contents;
-@end
-
-static int UnorderedGroupNoOppositeDeallocCalls;
-
-@implementation UnorderedGroupNoOpposite
-
-+ (ETEntityDescription*)newEntityDescription
-{
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"UnorderedGroupNoOpposite"];
-    [entity setParent: (id)@"Anonymous.COObject"];
-	
-    ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
-	
-	ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
-																					type: (id)@"Anonymous.COObject"];
-    [contentsProperty setPersistent: YES];
-    [contentsProperty setMultivalued: YES];
-    [contentsProperty setOrdered: NO];
-	
-	[entity setPropertyDescriptions: @[labelProperty, contentsProperty]];
-	
-    return entity;
-}
-
-@dynamic label;
-@dynamic contents;
-
-- (void) dealloc
-{
-	UnorderedGroupNoOppositeDeallocCalls++;
-}
-
-@end
-
 @interface TestUnorderedRelationship : NSObject <UKTest>
-
 @end
 
 @implementation TestUnorderedRelationship
@@ -94,7 +51,7 @@ static int UnorderedGroupNoOppositeDeallocCalls;
 
 - (void) testRetainCycleMemoryLeakWithUserSuppliedSet
 {
-	const int deallocsBefore = UnorderedGroupNoOppositeDeallocCalls;
+	const NSUInteger deallocsBefore = [UnorderedGroupNoOpposite countOfDeallocCalls];
 	
 	@autoreleasepool
 	{
@@ -105,7 +62,7 @@ static int UnorderedGroupNoOppositeDeallocCalls;
 		group2.contents = S(group1);
 	}
 
-	const int deallocs = UnorderedGroupNoOppositeDeallocCalls - deallocsBefore;
+	const NSUInteger deallocs = [UnorderedGroupNoOpposite countOfDeallocCalls] - deallocsBefore;
 	UKIntsEqual(2, deallocs);
 }
 
@@ -117,7 +74,7 @@ static int UnorderedGroupNoOppositeDeallocCalls;
 	group1.contents = S(group2);
 	group2.contents = S(group1);
 
-	const int deallocsBefore = UnorderedGroupNoOppositeDeallocCalls;
+	const NSUInteger deallocsBefore = [UnorderedGroupNoOpposite countOfDeallocCalls];
 	
 	@autoreleasepool
 	{
@@ -125,7 +82,7 @@ static int UnorderedGroupNoOppositeDeallocCalls;
 		[ctx2 setItemGraph: ctx];
 	}
 	
-	const int deallocs = UnorderedGroupNoOppositeDeallocCalls - deallocsBefore;
+	const NSUInteger deallocs = [UnorderedGroupNoOpposite countOfDeallocCalls] - deallocsBefore;
 	UKIntsEqual(2, deallocs);
 }
 

@@ -5,42 +5,12 @@
 #import "CODictionary.h"
 #import "COObjectGraphContext+Private.h"
 
-@interface Model : COObject
-@property (nonatomic, strong) NSDictionary *entries;
-@end
-
-@implementation Model
-
-@dynamic entries;
-
-+ (ETEntityDescription *) newEntityDescription
-{
-	ETEntityDescription *object = [self newBasicEntityDescription];
-
-	// For subclasses that don't override -newEntityDescription, we must not add 
-	// the property descriptions that we will inherit through the parent
-	if ([[object name] isEqual: [Model className]] == NO)
-		return object;
-
-	ETPropertyDescription *entries =
-		[ETPropertyDescription descriptionWithName: @"entries" type: (id)@"NSString"];
-	[entries setMultivalued: YES];
-	[entries setKeyed: YES];
-	[entries setPersistent: YES];
-
-	[object addPropertyDescription: entries];
-
-	return object;
-}
-
-@end
-
 /**
  * Tests a keyed collection from NSString : NSString
  */
 @interface TestKeyedAttribute : EditingContextTestCase <UKTest>
 {
-	Model *model;
+	KeyedAttributeModel *model;
 }
 @end
 
@@ -49,7 +19,7 @@
 - (id)init
 {
 	SUPERINIT;
-	model = [[ctx insertNewPersistentRootWithEntityName: @"Model"] rootObject];
+	model = [[ctx insertNewPersistentRootWithEntityName: @"KeyedAttributeModel"] rootObject];
 	return self;
 }
 
@@ -104,7 +74,7 @@
 	UKDoesNotRaiseException([[model objectGraphContext] insertOrUpdateItems: A(dictItem)]);
 	UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
 
-	/* Test Model Item Insertion */
+	/* Test KeyedAttributeModel Item Insertion */
 
 	[model setValue: D(@"boum", @"sound") forProperty: @"entries"];
 	
@@ -112,7 +82,7 @@
 	UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
 }
 
-- (void)testModelInitialization
+- (void)testKeyedAttributeModelInitialization
 {
 	[ctx commit];
 
@@ -120,7 +90,7 @@
 	                                           inBlock:
 	^ (COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
-		Model *testModel = [testPersistentRoot rootObject];
+		KeyedAttributeModel *testModel = [testPersistentRoot rootObject];
 
 		UKObjectsEqual([NSDictionary dictionary], [testModel valueForProperty: @"entries"]);
 	}];
@@ -138,7 +108,7 @@
 	                                           inBlock:
 	^ (COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
-		Model *testModel = [testPersistentRoot rootObject];
+		KeyedAttributeModel *testModel = [testPersistentRoot rootObject];
 
 		UKObjectsEqual(D(@"boum", @"sound"), [testModel valueForProperty: @"entries"]);
 	}];

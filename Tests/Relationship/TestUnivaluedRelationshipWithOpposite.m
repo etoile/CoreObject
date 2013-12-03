@@ -2,79 +2,7 @@
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
-@class UnivaluedGroupContent;
-
-/**
- * Test model object that has an univalued relationship to UnivaluedGroupContent
- */
-@interface UnivaluedGroupWithOpposite: COObject
-@property (readwrite, strong, nonatomic) NSString *label;
-@property (readwrite, strong, nonatomic) UnivaluedGroupContent *content;
-@end
-
-/**
- * Test model object to be inserted as content in UnivaluedGroupWithOpposite
- */
-@interface UnivaluedGroupContent : COObject
-@property (readwrite, strong, nonatomic) NSString *label;
-@property (readwrite, strong, nonatomic) NSSet *parents;
-@end
-
-@implementation UnivaluedGroupWithOpposite
-
-+ (ETEntityDescription*)newEntityDescription
-{
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"UnivaluedGroupWithOpposite"];
-    [entity setParent: (id)@"Anonymous.COObject"];
-	
-    ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
-	
-	ETPropertyDescription *contentProperty = [ETPropertyDescription descriptionWithName: @"content"
-																				   type: (id)@"Anonymous.UnivaluedGroupContent"];
-    [contentProperty setPersistent: YES];
-	[contentProperty setOpposite: (id)@"Anonymous.UnivaluedGroupContent.parents"];
-	
-	[entity setPropertyDescriptions: @[labelProperty, contentProperty]];
-	
-    return entity;
-}
-
-@dynamic label;
-@dynamic content;
-@end
-
-@implementation UnivaluedGroupContent
-
-+ (ETEntityDescription*)newEntityDescription
-{
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"UnivaluedGroupContent"];
-    [entity setParent: (id)@"Anonymous.COObject"];
-	
-    ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
-	
-	ETPropertyDescription *parentsProperty = [ETPropertyDescription descriptionWithName: @"parents"
-																				   type: (id)@"Anonymous.UnivaluedGroupWithOpposite"];
-    [parentsProperty setMultivalued: YES];
-    [parentsProperty setOrdered: NO];
-	[parentsProperty setOpposite: (id)@"Anonymous.UnivaluedGroupWithOpposite.content"];
-	
-	[entity setPropertyDescriptions: @[labelProperty, parentsProperty]];
-	
-    return entity;
-}
-
-@dynamic label;
-@dynamic parents;
-@end
-
-
-
 @interface TestUnivaluedRelationshipWithOpposite : NSObject <UKTest>
-
 @end
 
 @implementation TestUnivaluedRelationshipWithOpposite

@@ -83,6 +83,20 @@
 		66101130184D2D8A001A3E24 /* TestOrderedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112C184D2D8A001A3E24 /* TestOrderedAttribute.m */; };
 		66101131184D2D8A001A3E24 /* TestUnivaluedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112D184D2D8A001A3E24 /* TestUnivaluedAttribute.m */; };
 		66101132184D2D8A001A3E24 /* TestUnorderedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112E184D2D8A001A3E24 /* TestUnorderedAttribute.m */; };
+		66101155184D89A4001A3E24 /* OrderedGroupNoOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101154184D89A4001A3E24 /* OrderedGroupNoOpposite.m */; };
+		66101158184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101157184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.m */; };
+		6610115B184D8B9E001A3E24 /* UnorderedGroupNoOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610115A184D8B9E001A3E24 /* UnorderedGroupNoOpposite.m */; };
+		6610115E184D8C30001A3E24 /* OrderedGroupWithOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610115D184D8C30001A3E24 /* OrderedGroupWithOpposite.m */; };
+		66101161184D8C4C001A3E24 /* OrderedGroupContent.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101160184D8C4C001A3E24 /* OrderedGroupContent.m */; };
+		66101164184D8C67001A3E24 /* UnivaluedGroupWithOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101163184D8C67001A3E24 /* UnivaluedGroupWithOpposite.m */; };
+		66101167184D8C83001A3E24 /* UnivaluedGroupContent.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101166184D8C83001A3E24 /* UnivaluedGroupContent.m */; };
+		6610116A184D8CA6001A3E24 /* UnorderedGroupWithOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101169184D8CA6001A3E24 /* UnorderedGroupWithOpposite.m */; };
+		6610116D184D8CB0001A3E24 /* UnorderedGroupContent.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610116C184D8CB0001A3E24 /* UnorderedGroupContent.m */; };
+		66101170184D8E2D001A3E24 /* KeyedRelationshipModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610116F184D8E2D001A3E24 /* KeyedRelationshipModel.m */; };
+		66101173184D8E7F001A3E24 /* KeyedAttributeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101172184D8E7F001A3E24 /* KeyedAttributeModel.m */; };
+		66101176184D8EE5001A3E24 /* OrderedAttributeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101175184D8EE5001A3E24 /* OrderedAttributeModel.m */; };
+		66101179184D8EF0001A3E24 /* UnivaluedAttributeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101178184D8EF0001A3E24 /* UnivaluedAttributeModel.m */; };
+		6610117C184D8EFD001A3E24 /* UnorderedAttributeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610117B184D8EFD001A3E24 /* UnorderedAttributeModel.m */; };
 		661211401821986B003AEC29 /* CODateSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 6612113E1821986B003AEC29 /* CODateSerialization.h */; };
 		661211411821986B003AEC29 /* CODateSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 6612113F1821986B003AEC29 /* CODateSerialization.m */; };
 		661E2B7A184C4C0200226D3D /* TestKeyedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 661E2B79184C4C0200226D3D /* TestKeyedRelationship.m */; };
@@ -519,6 +533,34 @@
 		6610112C184D2D8A001A3E24 /* TestOrderedAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestOrderedAttribute.m; sourceTree = "<group>"; };
 		6610112D184D2D8A001A3E24 /* TestUnivaluedAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnivaluedAttribute.m; sourceTree = "<group>"; };
 		6610112E184D2D8A001A3E24 /* TestUnorderedAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnorderedAttribute.m; sourceTree = "<group>"; };
+		66101153184D89A4001A3E24 /* OrderedGroupNoOpposite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OrderedGroupNoOpposite.h; path = Tests/TestModelObjects/OrderedGroupNoOpposite.h; sourceTree = "<group>"; };
+		66101154184D89A4001A3E24 /* OrderedGroupNoOpposite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OrderedGroupNoOpposite.m; path = Tests/TestModelObjects/OrderedGroupNoOpposite.m; sourceTree = "<group>"; };
+		66101156184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnivaluedGroupNoOpposite.h; path = Tests/TestModelObjects/UnivaluedGroupNoOpposite.h; sourceTree = "<group>"; };
+		66101157184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UnivaluedGroupNoOpposite.m; path = Tests/TestModelObjects/UnivaluedGroupNoOpposite.m; sourceTree = "<group>"; };
+		66101159184D8B9E001A3E24 /* UnorderedGroupNoOpposite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnorderedGroupNoOpposite.h; path = Tests/TestModelObjects/UnorderedGroupNoOpposite.h; sourceTree = "<group>"; };
+		6610115A184D8B9E001A3E24 /* UnorderedGroupNoOpposite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UnorderedGroupNoOpposite.m; path = Tests/TestModelObjects/UnorderedGroupNoOpposite.m; sourceTree = "<group>"; };
+		6610115C184D8C30001A3E24 /* OrderedGroupWithOpposite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OrderedGroupWithOpposite.h; path = Tests/TestModelObjects/OrderedGroupWithOpposite.h; sourceTree = "<group>"; };
+		6610115D184D8C30001A3E24 /* OrderedGroupWithOpposite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OrderedGroupWithOpposite.m; path = Tests/TestModelObjects/OrderedGroupWithOpposite.m; sourceTree = "<group>"; };
+		6610115F184D8C4C001A3E24 /* OrderedGroupContent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OrderedGroupContent.h; path = Tests/TestModelObjects/OrderedGroupContent.h; sourceTree = "<group>"; };
+		66101160184D8C4C001A3E24 /* OrderedGroupContent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OrderedGroupContent.m; path = Tests/TestModelObjects/OrderedGroupContent.m; sourceTree = "<group>"; };
+		66101162184D8C67001A3E24 /* UnivaluedGroupWithOpposite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnivaluedGroupWithOpposite.h; path = Tests/TestModelObjects/UnivaluedGroupWithOpposite.h; sourceTree = "<group>"; };
+		66101163184D8C67001A3E24 /* UnivaluedGroupWithOpposite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UnivaluedGroupWithOpposite.m; path = Tests/TestModelObjects/UnivaluedGroupWithOpposite.m; sourceTree = "<group>"; };
+		66101165184D8C83001A3E24 /* UnivaluedGroupContent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnivaluedGroupContent.h; path = Tests/TestModelObjects/UnivaluedGroupContent.h; sourceTree = "<group>"; };
+		66101166184D8C83001A3E24 /* UnivaluedGroupContent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UnivaluedGroupContent.m; path = Tests/TestModelObjects/UnivaluedGroupContent.m; sourceTree = "<group>"; };
+		66101168184D8CA6001A3E24 /* UnorderedGroupWithOpposite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnorderedGroupWithOpposite.h; path = Tests/TestModelObjects/UnorderedGroupWithOpposite.h; sourceTree = "<group>"; };
+		66101169184D8CA6001A3E24 /* UnorderedGroupWithOpposite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UnorderedGroupWithOpposite.m; path = Tests/TestModelObjects/UnorderedGroupWithOpposite.m; sourceTree = "<group>"; };
+		6610116B184D8CB0001A3E24 /* UnorderedGroupContent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnorderedGroupContent.h; path = Tests/TestModelObjects/UnorderedGroupContent.h; sourceTree = "<group>"; };
+		6610116C184D8CB0001A3E24 /* UnorderedGroupContent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UnorderedGroupContent.m; path = Tests/TestModelObjects/UnorderedGroupContent.m; sourceTree = "<group>"; };
+		6610116E184D8E2D001A3E24 /* KeyedRelationshipModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeyedRelationshipModel.h; path = Tests/TestModelObjects/KeyedRelationshipModel.h; sourceTree = "<group>"; };
+		6610116F184D8E2D001A3E24 /* KeyedRelationshipModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeyedRelationshipModel.m; path = Tests/TestModelObjects/KeyedRelationshipModel.m; sourceTree = "<group>"; };
+		66101171184D8E7F001A3E24 /* KeyedAttributeModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeyedAttributeModel.h; path = Tests/TestModelObjects/KeyedAttributeModel.h; sourceTree = "<group>"; };
+		66101172184D8E7F001A3E24 /* KeyedAttributeModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeyedAttributeModel.m; path = Tests/TestModelObjects/KeyedAttributeModel.m; sourceTree = "<group>"; };
+		66101174184D8EE5001A3E24 /* OrderedAttributeModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OrderedAttributeModel.h; path = Tests/TestModelObjects/OrderedAttributeModel.h; sourceTree = "<group>"; };
+		66101175184D8EE5001A3E24 /* OrderedAttributeModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OrderedAttributeModel.m; path = Tests/TestModelObjects/OrderedAttributeModel.m; sourceTree = "<group>"; };
+		66101177184D8EF0001A3E24 /* UnivaluedAttributeModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnivaluedAttributeModel.h; path = Tests/TestModelObjects/UnivaluedAttributeModel.h; sourceTree = "<group>"; };
+		66101178184D8EF0001A3E24 /* UnivaluedAttributeModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UnivaluedAttributeModel.m; path = Tests/TestModelObjects/UnivaluedAttributeModel.m; sourceTree = "<group>"; };
+		6610117A184D8EFD001A3E24 /* UnorderedAttributeModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnorderedAttributeModel.h; path = Tests/TestModelObjects/UnorderedAttributeModel.h; sourceTree = "<group>"; };
+		6610117B184D8EFD001A3E24 /* UnorderedAttributeModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UnorderedAttributeModel.m; path = Tests/TestModelObjects/UnorderedAttributeModel.m; sourceTree = "<group>"; };
 		6612113E1821986B003AEC29 /* CODateSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODateSerialization.h; path = Utilities/CODateSerialization.h; sourceTree = SOURCE_ROOT; };
 		6612113F1821986B003AEC29 /* CODateSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODateSerialization.m; path = Utilities/CODateSerialization.m; sourceTree = SOURCE_ROOT; };
 		661E2B79184C4C0200226D3D /* TestKeyedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestKeyedRelationship.m; sourceTree = "<group>"; };
@@ -1366,6 +1408,34 @@
 				6621BF191847F077000809CF /* Child.m */,
 				6621BF2418482159000809CF /* Folder.h */,
 				6621BF2518482159000809CF /* Folder.m */,
+				66101153184D89A4001A3E24 /* OrderedGroupNoOpposite.h */,
+				66101154184D89A4001A3E24 /* OrderedGroupNoOpposite.m */,
+				66101156184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.h */,
+				66101157184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.m */,
+				66101159184D8B9E001A3E24 /* UnorderedGroupNoOpposite.h */,
+				6610115A184D8B9E001A3E24 /* UnorderedGroupNoOpposite.m */,
+				6610115C184D8C30001A3E24 /* OrderedGroupWithOpposite.h */,
+				6610115D184D8C30001A3E24 /* OrderedGroupWithOpposite.m */,
+				6610115F184D8C4C001A3E24 /* OrderedGroupContent.h */,
+				66101160184D8C4C001A3E24 /* OrderedGroupContent.m */,
+				66101162184D8C67001A3E24 /* UnivaluedGroupWithOpposite.h */,
+				66101163184D8C67001A3E24 /* UnivaluedGroupWithOpposite.m */,
+				66101165184D8C83001A3E24 /* UnivaluedGroupContent.h */,
+				66101166184D8C83001A3E24 /* UnivaluedGroupContent.m */,
+				66101168184D8CA6001A3E24 /* UnorderedGroupWithOpposite.h */,
+				66101169184D8CA6001A3E24 /* UnorderedGroupWithOpposite.m */,
+				6610116B184D8CB0001A3E24 /* UnorderedGroupContent.h */,
+				6610116C184D8CB0001A3E24 /* UnorderedGroupContent.m */,
+				6610116E184D8E2D001A3E24 /* KeyedRelationshipModel.h */,
+				6610116F184D8E2D001A3E24 /* KeyedRelationshipModel.m */,
+				66101171184D8E7F001A3E24 /* KeyedAttributeModel.h */,
+				66101172184D8E7F001A3E24 /* KeyedAttributeModel.m */,
+				66101174184D8EE5001A3E24 /* OrderedAttributeModel.h */,
+				66101175184D8EE5001A3E24 /* OrderedAttributeModel.m */,
+				66101177184D8EF0001A3E24 /* UnivaluedAttributeModel.h */,
+				66101178184D8EF0001A3E24 /* UnivaluedAttributeModel.m */,
+				6610117A184D8EFD001A3E24 /* UnorderedAttributeModel.h */,
+				6610117B184D8EFD001A3E24 /* UnorderedAttributeModel.m */,
 			);
 			name = "Model Objects";
 			sourceTree = "<group>";
@@ -1912,13 +1982,17 @@
 				66E40D581836D08D00E5B4A7 /* TestConcurrentChanges.m in Sources */,
 				66E40D5A1836D08D00E5B4A7 /* TestCopier.m in Sources */,
 				6699DDAF184887F60003E803 /* TestUnivaluedRelationship.m in Sources */,
+				66101176184D8EE5001A3E24 /* OrderedAttributeModel.m in Sources */,
 				66E40D671836D08D00E5B4A7 /* TestMerge.m in Sources */,
 				66E40D781836D08E00E5B4A7 /* TestUndoStackFailedNavigation.m in Sources */,
 				666888141849961300DBEB10 /* TestUnivaluedRelationshipWithOpposite.m in Sources */,
 				66E40D5C1836D08D00E5B4A7 /* TestCopierWithIsSharedFalseAndMultipleReferences.m in Sources */,
 				6699DDAC184887E70003E803 /* TestOrderedRelationship.m in Sources */,
+				66101173184D8E7F001A3E24 /* KeyedAttributeModel.m in Sources */,
+				6610117C184D8EFD001A3E24 /* UnorderedAttributeModel.m in Sources */,
 				66E40D601836D08D00E5B4A7 /* TestNotifications.m in Sources */,
 				6699DDA9184887C30003E803 /* TestUnorderedCompositeRelationship.m in Sources */,
+				66101179184D8EF0001A3E24 /* UnivaluedAttributeModel.m in Sources */,
 				66E40D5F1836D08D00E5B4A7 /* TestHistoryInspection.m in Sources */,
 				66101131184D2D8A001A3E24 /* TestUnivaluedAttribute.m in Sources */,
 				666888151849961300DBEB10 /* TestUnorderedRelationshipWithOpposite.m in Sources */,
@@ -1927,26 +2001,34 @@
 				66E40D791836D08E00E5B4A7 /* TestUndoStackStore.m in Sources */,
 				66E40D611836D08D00E5B4A7 /* TestObject.m in Sources */,
 				66E40D6C1836D08D00E5B4A7 /* TestSQLiteStore.m in Sources */,
+				6610116A184D8CA6001A3E24 /* UnorderedGroupWithOpposite.m in Sources */,
 				66E40D5B1836D08D00E5B4A7 /* TestCopierWithIsShared.m in Sources */,
 				66E40D6F1836D08D00E5B4A7 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
+				6610116D184D8CB0001A3E24 /* UnorderedGroupContent.m in Sources */,
 				666888131849961300DBEB10 /* TestOrderedRelationshipWithOpposite.m in Sources */,
 				66E40D7A1836D08E00E5B4A7 /* TestUndoStackTrackProtocol.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66E451D617CC461F00205679 /* OutlineItem.m in Sources */,
 				66E40D641836D08D00E5B4A7 /* TestPersistentRoot.m in Sources */,
+				66101164184D8C67001A3E24 /* UnivaluedGroupWithOpposite.m in Sources */,
 				66E40D7B1836D08E00E5B4A7 /* TestUndoUseCases.m in Sources */,
 				66E40D711836D08D00E5B4A7 /* TestSynchronization.m in Sources */,
+				66101167184D8C83001A3E24 /* UnivaluedGroupContent.m in Sources */,
 				6699DDA8184887C30003E803 /* TestUnivaluedCompositeRelationship.m in Sources */,
 				66E40D761836D08E00E5B4A7 /* TestHistoryTrack.m in Sources */,
 				66E451D917CC565200205679 /* Tag.m in Sources */,
 				66E40D6D1836D08D00E5B4A7 /* TestSQLiteStoreErrorHandling.m in Sources */,
 				66E40D741836D08E00E5B4A7 /* TestSynchronizerMultiUser.m in Sources */,
+				6610115B184D8B9E001A3E24 /* UnorderedGroupNoOpposite.m in Sources */,
+				66101170184D8E2D001A3E24 /* KeyedRelationshipModel.m in Sources */,
 				661E2B7A184C4C0200226D3D /* TestKeyedRelationship.m in Sources */,
 				6621BF2618482159000809CF /* Folder.m in Sources */,
+				66101155184D89A4001A3E24 /* OrderedGroupNoOpposite.m in Sources */,
 				66E40D631836D08D00E5B4A7 /* TestObjectUpdate.m in Sources */,
 				66E40D701836D08D00E5B4A7 /* COSynchronizerFakeMessageTransport.m in Sources */,
 				66E40D5D1836D08D00E5B4A7 /* TestCrossPersistentRootReferences.m in Sources */,
 				66E40D6A1836D08D00E5B4A7 /* TestItem.m in Sources */,
+				66101161184D8C4C001A3E24 /* OrderedGroupContent.m in Sources */,
 				66E40D591836D08D00E5B4A7 /* TestCOObjectSynthesizedAccessors.m in Sources */,
 				66E40D721836D08D00E5B4A7 /* TestSynchronizer.m in Sources */,
 				66E40D571836D08D00E5B4A7 /* TestBranch.m in Sources */,
@@ -1954,8 +2036,10 @@
 				66E40D681836D08D00E5B4A7 /* TestCollection.m in Sources */,
 				66E40D751836D08E00E5B4A7 /* TestCustomTrack.m in Sources */,
 				6621BF1A1847F077000809CF /* Child.m in Sources */,
+				6610115E184D8C30001A3E24 /* OrderedGroupWithOpposite.m in Sources */,
 				66E40D731836D08D00E5B4A7 /* TestSynchronizerJSONTransport.m in Sources */,
 				66E40D6E1836D08D00E5B4A7 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */,
+				66101158184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.m in Sources */,
 				66E40D771836D08E00E5B4A7 /* TestUndo.m in Sources */,
 				6610112F184D2D8A001A3E24 /* TestKeyedAttribute.m in Sources */,
 				66E40D6B1836D08D00E5B4A7 /* TestBinaryReadWrite.m in Sources */,
