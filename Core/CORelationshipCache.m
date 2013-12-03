@@ -86,6 +86,12 @@
     NSMutableSet *result = [NSMutableSet set];
     for (COCachedRelationship *entry in _cachedRelationships)
     {
+		/* i.e., hide incoming references that _come from_ specific (non-current) branches
+		   (regardless of whether they are specifc-branch or current-branch references) 
+		 
+		   On slide 1 of 'cross persistent root reference semantics.key',
+		   this corresponds to John (A) and Lucy (A) hiding the dotted incoming references from
+		   Group (B). */
 		if ([entry isSourceObjectTrackingSpecificBranch])
 			continue;
 		
@@ -95,6 +101,12 @@
         }
     }
 	
+	/* If this is an object on a specific branch, pretend that incoming references
+	   for the root objcet on the current branch graph are pointing at us.
+
+	   On slide 2 of 'cross persistent root reference semantics.key',
+	   this corresponds to the non-current branch Lucy (A) viewing the dotted incoming references from
+	   Group (A). */
 	if ([_owner.objectGraphContext isTrackingSpecificBranch])
 	{
 		COObject *currentBranchRootObject = [[_owner persistentRoot] rootObject];
