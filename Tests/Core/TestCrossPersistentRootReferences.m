@@ -182,9 +182,9 @@
 }
 
 /**
- * See: "cross persistent root reference semantics.key" slide 1
+ * See: "cross persistent root reference semantics.key"
  */
-- (void) testMultipleBranchesOfGroup
+- (void) testPersonAndPersonGroupBranch
 {
     // Group <<persistent root>>
 	//  |
@@ -220,7 +220,7 @@
 	
 	[ctx commit];
 	
-	// Setup branch B
+	// Setup Group branch B
 	
 	COBranch *groupB = [groupA makeBranchWithLabel: @"GroupB"];
 	OrderedGroupWithOpposite *groupBRoot = [groupB rootObject];
@@ -229,7 +229,31 @@
 	
 	[ctx commit];
 	
-	// Check out both branches of Group
+	// Check the current (tracking) branch context of Group
+	
+	[self checkPersistentRootWithExistingAndNewContext: group
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 OrderedGroupWithOpposite *testGroupRoot = [testProot rootObject];
+		 OrderedGroupContent *testJohnRoot = testGroupRoot.contents[0];
+		 OrderedGroupContent *testLucyRoot = testGroupRoot.contents[1];
+		 
+		 UKObjectsEqual(@"GroupA", testGroupRoot.label);
+		 UKObjectsEqual(@"John", testJohnRoot.label);
+		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
+		 
+		 UKFalse([[testGroupRoot objectGraphContext] isTrackingSpecificBranch]);
+		 UKFalse([[testJohnRoot objectGraphContext] isTrackingSpecificBranch]);
+		 UKFalse([[testLucyRoot objectGraphContext] isTrackingSpecificBranch]);
+		 
+		 // Ensure that the computed parents of Lucy and John are the "current branch object context" of Group,
+		 // not a specific branch one.
+		 
+		 UKObjectsEqual(S(testGroupRoot), testJohnRoot.parentGroups);
+		 UKObjectsEqual(S(testGroupRoot), testLucyRoot.parentGroups);
+	 }];
+	
+	// Check out both specific branches of Group
 	
 	[self checkBranchWithExistingAndNewContext: groupA
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
@@ -237,11 +261,16 @@
 		 OrderedGroupWithOpposite *testBranchARoot = [testBranch rootObject];
 		 OrderedGroupContent *testJohnRoot = testBranchARoot.contents[0];
 		 OrderedGroupContent *testLucyRoot = testBranchARoot.contents[1];
+		 
 		 UKObjectsEqual(@"GroupA", testBranchARoot.label);
 		 UKObjectsEqual(@"John", testJohnRoot.label);
 		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
+
+		 UKTrue([[testBranchARoot objectGraphContext] isTrackingSpecificBranch]);
+		 UKFalse([[testJohnRoot objectGraphContext] isTrackingSpecificBranch]);
+		 UKFalse([[testLucyRoot objectGraphContext] isTrackingSpecificBranch]);
 		 
-		 // Ensure that the computer parents of Lucy and John are the "current branch object context" of Group,
+		 // Ensure that the computed parents of Lucy and John are the "current branch object context" of Group,
 		 // not a specific branch one.
 		 
 		 UKObjectsEqual(S([testProot rootObject]), testJohnRoot.parentGroups);
@@ -257,11 +286,16 @@
 		 OrderedGroupWithOpposite *testBranchBRoot = [testBranch rootObject];
 		 OrderedGroupContent *testJohnRoot = testBranchBRoot.contents[0];
 		 OrderedGroupContent *testLucyRoot = testBranchBRoot.contents[1];
+		 
 		 UKObjectsEqual(@"GroupB", testBranchBRoot.label);
 		 UKObjectsEqual(@"John", testJohnRoot.label);
 		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
+		 
+		 UKTrue([[testBranchBRoot objectGraphContext] isTrackingSpecificBranch]);
+		 UKFalse([[testJohnRoot objectGraphContext] isTrackingSpecificBranch]);
+		 UKFalse([[testLucyRoot objectGraphContext] isTrackingSpecificBranch]);
 
-		 // Ensure that the computer parents of Lucy and John are the "current branch object context" of Group
+		 // Ensure that the computed parents of Lucy and John are the "current branch object context" of Group
 		 // not a specific branch one.
 		 
 		 UKObjectsEqual(S([testProot rootObject]), testJohnRoot.parentGroups);
@@ -269,6 +303,73 @@
 		 
 		 UKObjectsNotEqual(S(testBranchBRoot), testJohnRoot.parentGroups);
 		 UKObjectsNotEqual(S(testBranchBRoot), testLucyRoot.parentGroups);
+	 }];
+	
+	// Make a branch B of Lucy and make it current
+	
+	COBranch *lucyA = [lucy currentBranch];
+	COBranch *lucyB = [lucyA makeBranchWithLabel: @"LucyB"];
+	[lucy setCurrentBranch: lucyB];
+	OrderedGroupContent *lucyBRoot = [lucyB rootObject];
+	lucyBRoot.label = @"LucyB";
+	[ctx commit];
+	
+	// Check out both specific branches of Group again
+	
+	[self checkBranchWithExistingAndNewContext: groupA
+									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 OrderedGroupWithOpposite *testBranchARoot = [testBranch rootObject];
+		 OrderedGroupContent *testJohnRoot = testBranchARoot.contents[0];
+		 OrderedGroupContent *testLucyRoot = testBranchARoot.contents[1];
+
+		 UKObjectsEqual(@"LucyB", testLucyRoot.label);
+		 
+		 UKObjectsEqual(S([testProot rootObject]), testJohnRoot.parentGroups);
+		 UKObjectsEqual(S([testProot rootObject]), testLucyRoot.parentGroups);
+	 }];
+	
+	[self checkBranchWithExistingAndNewContext: groupB
+									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 OrderedGroupWithOpposite *testBranchBRoot = [testBranch rootObject];
+		 OrderedGroupContent *testJohnRoot = testBranchBRoot.contents[0];
+		 OrderedGroupContent *testLucyRoot = testBranchBRoot.contents[1];
+		 
+		 UKObjectsEqual(@"LucyB", testLucyRoot.label);
+		 
+		 UKObjectsEqual(S([testProot rootObject]), testJohnRoot.parentGroups);
+		 UKObjectsEqual(S([testProot rootObject]), testLucyRoot.parentGroups);
+	 }];
+	
+	// Check out both specifc branches of Lucy
+	
+	[self checkBranchWithExistingAndNewContext: lucyA
+									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 OrderedGroupContent *testLucyARoot = [testBranch rootObject];
+		 UKObjectsEqual(@"Lucy", testLucyARoot.label);
+		 
+		 // The parent ref points to the current branch of Group
+		 UKIntsEqual(1, [testLucyARoot.parentGroups count]);
+		 OrderedGroupWithOpposite *testGroup = [testLucyARoot.parentGroups anyObject];
+		 
+		 UKFalse([[testGroup objectGraphContext] isTrackingSpecificBranch]);
+		 UKObjectsEqual(@"GroupA", testGroup.label);
+	 }];
+	
+	[self checkBranchWithExistingAndNewContext: lucyB
+									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 OrderedGroupContent *testLucyBRoot = [testBranch rootObject];
+		 UKObjectsEqual(@"LucyB", testLucyBRoot.label);
+		 
+		 // The parent ref points to the current branch of Group
+		 UKIntsEqual(1, [testLucyBRoot.parentGroups count]);
+		 OrderedGroupWithOpposite *testGroup = [testLucyBRoot.parentGroups anyObject];
+		 
+		 UKFalse([[testGroup objectGraphContext] isTrackingSpecificBranch]);
+		 UKObjectsEqual(@"GroupA", testGroup.label);
 	 }];
 }
 

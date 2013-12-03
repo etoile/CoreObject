@@ -44,6 +44,7 @@
 #import "COPersistentRoot+Private.h"
 #import "COSQLiteStore+Private.h"
 #import "COObject+Private.h"
+#import "COObjectGraphContext+Private.h"
 #import "CORelationshipCache.h"
 #import "COStoreTransaction.h"
 

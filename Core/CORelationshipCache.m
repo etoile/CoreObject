@@ -11,7 +11,9 @@
 #import "COType.h"
 #import "COItem.h"
 #import "COObject.h"
+#import "COObject+Private.h"
 #import "COObjectGraphContext+Private.h"
+#import "COPersistentRoot.h"
 
 @interface COCachedRelationship : NSObject
 {
@@ -92,6 +94,14 @@
             [result addObject: entry->_sourceObject];
         }
     }
+	
+	if ([_owner.objectGraphContext isTrackingSpecificBranch])
+	{
+		COObject *currentBranchRootObject = [[_owner persistentRoot] rootObject];
+		NSSet *referringObjectsToCurrentBranch = [[currentBranchRootObject incomingRelationshipCache] referringObjectsForPropertyInTarget: aProperty];		
+		[result unionSet: referringObjectsToCurrentBranch];
+	}
+	
     return result;
 }
 
