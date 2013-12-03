@@ -71,7 +71,7 @@
 
 	for (NSString *key in [dict allKeys])
 	{
-		NSAssert([self isSerializablePrimitiveValue: key],
+		NSAssert2([self isSerializablePrimitiveValue: key],
 			@"Unsupported key type %@ in %@. For dictionary serialization, "
 			  "keys must be a primitive CoreObject values (NSString, NSNumber or NSData).",
 			  key, dict);
