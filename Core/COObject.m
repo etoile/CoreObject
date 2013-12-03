@@ -132,7 +132,7 @@ See +[NSObject typePrefix]. */
 
 #pragma mark - Initialization
 
-- (Class)collectionClassForPropertyDescription: (ETPropertyDescription *)propDesc
+- (Class)coreObjectCollectionClassForPropertyDescription: (ETPropertyDescription *)propDesc
 {
 	NSParameterAssert([propDesc isMultivalued]);
 
@@ -142,6 +142,31 @@ See +[NSObject typePrefix]. */
 		// the assertion in methods calling -collectionClassForPropertyDescription:.
 		NSAssert1([propDesc isOrdered] == NO || [propDesc isPersistent] == NO,
 			@"Persistent keyed collection %@ cannot be ordered.", propDesc);
+		return [COMutableDictionary class];
+	}
+	else
+	{
+		if ([self isCoreObjectRelationship: propDesc])
+		{
+			return ([propDesc isOrdered] ? [COUnsafeRetainedMutableArray class] : [COUnsafeRetainedMutableSet class]);
+		}
+		else
+		{
+			return ([propDesc isOrdered] ? [COMutableArray class] : [COMutableSet class]);
+		}
+	}
+}
+
+- (Class)collectionClassForPropertyDescription: (ETPropertyDescription *)propDesc
+{
+	NSParameterAssert([propDesc isMultivalued]);
+	
+	if ([propDesc isKeyed])
+	{
+		// NOTE: Could be better to return nil in the assertion case, and move
+		// the assertion in methods calling -collectionClassForPropertyDescription:.
+		NSAssert1([propDesc isOrdered] == NO || [propDesc isPersistent] == NO,
+				  @"Persistent keyed collection %@ cannot be ordered.", propDesc);
 		return [NSDictionary class];
 	}
 	else
@@ -152,11 +177,17 @@ See +[NSObject typePrefix]. */
 
 - (id)newCollectionForPropertyDescription: (ETPropertyDescription *)propDesc
 {
-	Class proposedClass = [self collectionClassForPropertyDescription: propDesc];
-	Class collectionClass =
-		([propDesc isPersistent] ? [proposedClass coreObjectClass] : [proposedClass mutableClass]);
-
-	return [collectionClass new];
+	if ([propDesc isPersistent])
+	{
+		Class collectionClass = [self coreObjectCollectionClassForPropertyDescription: propDesc];
+		return [collectionClass new];
+	}
+	else
+	{
+		Class proposedClass = [self collectionClassForPropertyDescription: propDesc];
+		Class collectionClass = [proposedClass mutableClass];
+		return [collectionClass new];
+	}
 }
 
 - (NSMutableDictionary *)newVariableStorage
@@ -672,8 +703,28 @@ See +[NSObject typePrefix]. */
 
 - (BOOL)isCoreObjectCollection: (id)aCollection
 {
-	// NOTE: Same as [aCollection conformsToProtocol: @protocol(COPrimitiveCollection)]
-	return ([aCollection class] == [[aCollection class] coreObjectClass]);
+	return [aCollection conformsToProtocol: @protocol(COPrimitiveCollection)];
+}
+
+- (id)mutableCoreObjectCollectionWithCollection: (id)aCollection
+							propertyDescription: (ETPropertyDescription *)propDesc
+{
+	Class collectionClass = [self coreObjectCollectionClassForPropertyDescription: propDesc];
+
+	id collection;
+	if ([propDesc isKeyed])
+	{
+		collection = [[collectionClass alloc] initWithDictionary: aCollection];
+	}
+	else if ([propDesc isOrdered])
+	{
+		collection = [[collectionClass alloc] initWithArray: aCollection];
+	}
+	else
+	{
+		collection = [[collectionClass alloc] initWithSet: aCollection];
+	}
+	return collection;
 }
 
 /**
@@ -701,7 +752,7 @@ See +[NSObject typePrefix]. */
 	}
 	else if ([propertyDesc isMultivalued] && [self isCoreObjectCollection: aValue] == NO)
 	{
-		storageValue = [aValue mutableCoreObjectCopy];
+		storageValue = [self mutableCoreObjectCollectionWithCollection: aValue propertyDescription: propertyDesc];
 	}
 	
 	[_variableStorage setObject: storageValue
@@ -1226,9 +1277,9 @@ See +[NSObject typePrefix]. */
 		{
 			[self setValue: aReplacement forVariableStorageKey: key];
 		}
-		else if ([value isKindOfClass: [COUnsafeRetainedMutableArray class]])
+		else if ([value isKindOfClass: [COMutableArray class]])
 		{
-			COUnsafeRetainedMutableArray *array = value;
+			COMutableArray *array = value;
 			
 			const NSUInteger count = [array count];
 			for (NSUInteger i=0; i<count; i++)
@@ -1239,9 +1290,9 @@ See +[NSObject typePrefix]. */
 				}
 			}
 		}
-		else if ([value isKindOfClass: [COUnsafeRetainedMutableSet class]])
+		else if ([value isKindOfClass: [NSMutableSet class]])
 		{
-			COUnsafeRetainedMutableSet *set = value;
+			NSMutableSet *set = value;
 			if ([set containsObject: anObject])
 			{
 				[set removeObject: anObject];

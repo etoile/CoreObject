@@ -1,6 +1,7 @@
 #import <UnitKit/UnitKit.h>
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
+#import "COPrimitiveCollection.h"
 
 /**
  * Test model object that has an ordered multivalued NSString attribute
@@ -51,13 +52,13 @@
 	SUPERINIT;
 	ctx = [COObjectGraphContext new];
 	group1 = [ctx insertObjectWithEntityName: @"OrderedAttributeModel"];
-	group1.contents = @[@"hello", @"hello", @"world"];
 	[ctx setRootObject: group1];
 	return self;
 }
 
 - (void) testOrderedAttribute
 {
+	group1.contents = @[@"hello", @"hello", @"world"];
 	[self checkObjectGraphBeforeAndAfterSerializationRoundtrip: ctx
 													   inBlock: ^(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy)
 		{
@@ -66,20 +67,50 @@
 		}];
 }
 
-#if 0
 - (void) testIllegalDirectModificationOfCollection
 {
-	COObjectGraphContext *ctx = [COObjectGraphContext new];
-	OrderedAttributeModel *group1 = [ctx insertObjectWithEntityName: @"OrderedAttributeModel"];
-	group1.contents = @[@"hello", @"hello", @"world"];
+	[self checkObjectGraphBeforeAndAfterSerializationRoundtrip: ctx
+													   inBlock: ^(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy)
+	 {
+		 OrderedAttributeModel *testGroup1 = (OrderedAttributeModel *)testRootObject;
+		 UKObjectsEqual([NSArray array], testGroup1.contents);
+		 UKRaisesException([(NSMutableArray *)testGroup1.contents addObject: @"illegal"]);
+	 }];
+	
+	group1.contents = @[@"hello"];
 	
 	[self checkObjectGraphBeforeAndAfterSerializationRoundtrip: ctx
 													   inBlock: ^(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy)
 	 {
 		 OrderedAttributeModel *testGroup1 = (OrderedAttributeModel *)testRootObject;
-		 UKRaisesException([(NSMutableArray *)testGroup1.contents removeObjectAtIndex: 1]);
+		 UKObjectsEqual(A(@"hello"), testGroup1.contents);
+		 UKRaisesException([(NSMutableArray *)testGroup1.contents addObject: @"illegal"]);
 	 }];
 }
-#endif
+
+// TODO: This is ugly, but it's usefult to check for now.
+- (void) testCollectionHasCorrectClass
+{
+	UKObjectKindOf(group1.contents, COMutableArray);
+	UKFalse([group1.contents isKindOfClass: [COUnsafeRetainedMutableArray class]]);
+	
+	group1.contents = A(@"hello");
+	UKObjectKindOf(group1.contents, COMutableArray);
+	UKFalse([group1.contents isKindOfClass: [COUnsafeRetainedMutableArray class]]);
+}
+
+- (void) testCollectionHasStrongReferenceToContents
+{
+	@autoreleasepool
+	{
+		group1.contents = A([@"hello" mutableCopy]);
+		UKObjectsEqual(A(@"hello"), group1.contents);
+	}
+	
+	// N.B.: If the implementation is not keeping strong refs as it should, this should
+	// cause a dangling pointer dereference so may produce weird results or crash instead
+	// of just failing.
+	UKObjectsEqual(A(@"hello"), group1.contents);
+}
 
 @end

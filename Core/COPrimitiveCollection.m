@@ -31,9 +31,14 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 }
 
 
-@implementation COUnsafeRetainedMutableArray
+@implementation COMutableArray
 
 @synthesize mutable = _mutable;
+
+- (NSPointerArray *) makeBacking
+{
+	return [NSPointerArray pointerArrayWithStrongObjects];
+}
 
 - (instancetype)init
 {
@@ -43,7 +48,7 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 - (instancetype)initWithObjects: (const id [])objects count: (NSUInteger)count
 {
 	SUPERINIT;
-	_backing = [NSPointerArray pointerArrayWithWeakObjects];
+	_backing = [self makeBacking];
 	for (NSUInteger i=0; i<count; i++)
 	{
 		[_backing addPointer: (__bridge void *)objects[i]];
@@ -108,10 +113,24 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 
 @end
 
+@implementation COUnsafeRetainedMutableArray
 
-@implementation COUnsafeRetainedMutableSet
+- (NSPointerArray *) makeBacking
+{
+	return [NSPointerArray pointerArrayWithWeakObjects];
+}
+
+@end
+
+
+@implementation COMutableSet
 
 @synthesize mutable = _mutable;
+
+- (NSHashTable *) makeBacking
+{
+	return [[NSHashTable alloc] init];
+}
 
 - (instancetype)init
 {
@@ -121,7 +140,7 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 - (instancetype)initWithObjects: (const id[])objects count: (NSUInteger)count
 {
 	SUPERINIT;
-	_backing = [NSHashTable hashTableWithWeakObjects];
+	_backing = [self makeBacking];
 	for (NSUInteger i=0; i<count; i++)
 	{
 		[_backing addObject: objects[i]];
@@ -158,6 +177,15 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 {
 	COThrowExceptionIfNotMutable(_mutable);
 	[_backing removeObject: anObject];
+}
+
+@end
+
+@implementation COUnsafeRetainedMutableSet
+
+- (NSHashTable *) makeBacking
+{
+	return [NSHashTable hashTableWithWeakObjects];
 }
 
 @end
@@ -209,63 +237,6 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 {
 	COThrowExceptionIfNotMutable(_mutable);
 	[_backing setObject: anObject forKey: aKey];
-}
-
-@end
-
-
-@implementation NSObject (COPrimitiveCollection)
-
-+ (Class)coreObjectClass
-{
-	return Nil;
-}
-
-- (id)mutableCoreObjectCopy
-{
-	return [self mutableCopy];
-}
-
-@end
-
-@implementation NSArray (COPrimitiveCollection)
-
-+ (Class)coreObjectClass
-{
-	return [COUnsafeRetainedMutableArray class];
-}
-
-- (id)mutableCoreObjectCopy
-{
-	return [[[[self class] coreObjectClass] alloc] initWithArray: self];
-}
-
-@end
-
-@implementation NSSet (COPrimitiveCollection)
-
-+ (Class)coreObjectClass
-{
-	return [COUnsafeRetainedMutableSet class];
-}
-
-- (id)mutableCoreObjectCopy
-{
-	return [[[[self class] coreObjectClass] alloc] initWithSet: self];
-}
-
-@end
-
-@implementation NSDictionary (COPrimitiveCollection)
-
-+ (Class)coreObjectClass
-{
-	return [COMutableDictionary class];
-}
-
-- (id)mutableCoreObjectCopy
-{
-	return [[[[self class] coreObjectClass] alloc] initWithDictionary: self];
 }
 
 @end
