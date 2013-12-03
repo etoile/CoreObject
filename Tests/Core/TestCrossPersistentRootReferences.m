@@ -199,6 +199,63 @@
 	//    |-- John (current branch)
 	//    |
 	//    \-- Lucy (current branch)
+	//
+	// We're interested in how the inverse (parent) pointers in John and Lucy are calculated here.
+	   
+	COPersistentRoot *john = [ctx insertNewPersistentRootWithEntityName: @"OrderedGroupContent"];
+	OrderedGroupContent *johnRoot = [john rootObject];
+	johnRoot.label = @"John";
+	
+	COPersistentRoot *lucy = [ctx insertNewPersistentRootWithEntityName: @"OrderedGroupContent"];
+	OrderedGroupContent *lucyRoot = [lucy rootObject];
+	lucyRoot.label = @"Lucy";
+	
+	COPersistentRoot *group = [ctx insertNewPersistentRootWithEntityName: @"OrderedGroupWithOpposite"];
+	[ctx commit]; /* FIXME: HACK */
+	
+	COBranch *groupA = [group currentBranch];
+	OrderedGroupWithOpposite *groupARoot = [groupA rootObject];
+	groupARoot.label = @"GroupA";
+	groupARoot.contents = @[johnRoot, lucyRoot];
+	
+	[ctx commit];
+	
+	// Setup branch B
+	
+	COBranch *groupB = [groupA makeBranchWithLabel: @"GroupB"];
+	OrderedGroupWithOpposite *groupBRoot = [groupB rootObject];
+	groupBRoot.label = @"GroupB";
+	/* No change to groupBRoot.content */
+	
+	[ctx commit];
+	
+	// Check out both branches of Group
+	
+	[self checkBranchWithExistingAndNewContext: groupA
+									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 OrderedGroupWithOpposite *testBranchRoot = [testBranch rootObject];
+		 OrderedGroupContent *testJohnRoot = testBranchRoot.contents[0];
+		 OrderedGroupContent *testLucyRoot = testBranchRoot.contents[1];
+		 UKObjectsEqual(@"GroupA", testBranchRoot.label);
+		 UKObjectsEqual(@"John", testJohnRoot.label);
+		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
+		 
+		 // FIXME: Finish...
+	 }];
+
+	[self checkBranchWithExistingAndNewContext: groupB
+									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 OrderedGroupWithOpposite *testBranchRoot = [testBranch rootObject];
+		 OrderedGroupContent *testJohnRoot = testBranchRoot.contents[0];
+		 OrderedGroupContent *testLucyRoot = testBranchRoot.contents[1];
+		 UKObjectsEqual(@"GroupB", testBranchRoot.label);
+		 UKObjectsEqual(@"John", testJohnRoot.label);
+		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
+		 
+		 // FIXME: Finish...
+	 }];
 }
 
 - (void) testBranchDeletion
