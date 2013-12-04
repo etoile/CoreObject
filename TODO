@@ -10,12 +10,6 @@ First alpha release blockers
 
 	- For compatibility with the current GNUstep release, perhaps emulate -addObserverForName:object:queue:usingBlocks: in a category or TestCommon
 
-- Sort out libdispatch solutions on GNUstep
-
-	- In the long run, supporting weak symbols in libBlocksRuntime seems ideal (not yet the case in the LLVM repo)
-
-	- In the meantime, the best is probably to provide a custom libdispatch (patched for libobjc2 support) in GNUstep or Etoile repository
-
 - Fix GNUstep support
 
 	- Samples
