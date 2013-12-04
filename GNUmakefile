@@ -7,12 +7,14 @@ VERSION = 0.5
 
 LIBRARIES_DEPEND_UPON = $(shell pkg-config --libs sqlite3) -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
 
-CoreObject_INCLUDE_DIRS = -IStore/fmdb/src
+# For test builds, pass one more libdispatch include directory located in GNUstep Local domain
+CoreObject_INCLUDE_DIRS = -IStore/fmdb/src -I$(GNUSTEP_LOCAL_ROOT)/Library/Headers/dispatch
 CoreObject_LDFLAGS += -lstdc++ -lobjcxx -lsqlite3 -ldispatch
 CoreObject_OBJCFLAGS += -fobjc-arc -Wno-arc-performSelector-leaks -Wall
 
 ifeq ($(test), yes)
   BUNDLE_NAME = $(FRAMEWORK_NAME)
+  CoreObject_INCLUDE_DIRS += -I$(PROJECT_DIR)/Tests -I$(PROJECT_DIR)/Tests/TestModelObjects
   CoreObject_LDFLAGS += -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
   CoreObject_PRINCIPAL_CLASS = TestCommon
 endif
@@ -40,12 +42,15 @@ CoreObject_OBJC_FILES += $(wildcard Store/fmdb/src/FM*.m)
 
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += $(wildcard Tests/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Attribute/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Core/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Diff/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Model/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Relationship/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/StorageDataModel/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Store/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Undo/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/TestModelObjects/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Utilities/*.m)
 endif
 
