@@ -6,29 +6,57 @@
 
 @interface EWDocumentWindowController : NSWindowController
 {
-	COBranch *_editingBranch;
+	/**
+	 * Is this the primary window for the persistent root?
+	 * Only the primary window can track the current branch (UI decision).
+	 */
+	BOOL _isPrimaryWindow;
+	COPersistentRoot *_persistentRoot;
+	/**
+	 * If nil, track the current branch.
+	 */
+	COBranch *_pinnedBranch;
 	NSString *_windowID;
+	
+	
+	// UI stuff
+	
+	IBOutlet NSPopUpButton *branchesPopUpButton;
+	IBOutlet NSButton *defaultBranchCheckBox;
 }
 
-- (instancetype) initWithBranch: (COBranch *)aBranch
-					   windowID: (NSString*)windowID
-				  windowNibName: (NSString *)nibName;
+- (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
+											 windowID: (NSString*)windowID
+										windowNibName: (NSString *)nibName;
+
+- (instancetype) initPinnedToBranch: (COBranch *)aBranch
+						   windowID: (NSString*)windowID
+					  windowNibName: (NSString *)nibName;
 
 /**
- * Unique identifier for this window...
+ * Unique identifier for this window
  */
-@property (readwrite, nonatomic, strong) NSString *windowID;
+@property (readonly, nonatomic, strong) NSString *windowID;
+
+@property (readonly, nonatomic, assign) BOOL primaryWindow;
+
+@property (readonly, nonatomic, strong) COPersistentRoot *persistentRoot;
+
+@property (readonly, nonatomic, strong) COObjectGraphContext *objectGraphContext;
+
 /**
- * Branch that this window is editing.
- *
- * Note that we don't use COPersistentRoot.editingBranch but rather
- * this property allows one editing branch per window.
+ * Branch that this window is editing. nil indicates tracking the current branch.
  */
-@property (readwrite, nonatomic, strong) COBranch *editingBranch;
+@property (readwrite, nonatomic, strong) COBranch *pinnedBranch;
+
+/**
+ * Like -pinnedBranch but instead of returning nil when we are tracking
+ * the current branch, returns the current branch object.
+ */
+@property (readonly, nonatomic, strong) COBranch *editingBranch;
 
 @property (readonly, nonatomic, strong) COSQLiteStore *store;
 @property (readonly, nonatomic, strong) COEditingContext *editingContext;
-@property (readonly, nonatomic, strong) COPersistentRoot *persistentRoot;
 @property (readonly, nonatomic, strong) Document *doc;
 
 - (COUndoTrack *) undoTrack;
@@ -36,5 +64,13 @@
 - (void) persistentRootDidChange: (NSNotification *)notif;
 
 + (BOOL) isProjectUndo;
+
+// UI stuff
+
+- (IBAction)checkDefaultBranch: (id)sender;
+
+// Subclasses override
+
+- (void) objectGraphDidChange;
 
 @end

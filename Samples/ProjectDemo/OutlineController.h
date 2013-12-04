@@ -15,8 +15,11 @@
 
 @property (nonatomic, readwrite, weak) SharingSession *sharingSession;
 
-- (instancetype) initWithBranch: (COBranch *)aBranch
-					   windowID: (NSString*)windowID;
+- (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
+											 windowID: (NSString*)windowID;
+
+- (instancetype) initPinnedToBranch: (COBranch *)aBranch
+						   windowID: (NSString*)windowID;
 
 - (Document*)projectDocument;
 - (OutlineItem*)rootObject;

@@ -31,11 +31,6 @@
     [table setTarget: self];
 }
 
-- (COBranch *)branch
-{
-	return wc.editingBranch;
-}
-
 - (COUndoTrack *)undoTrack
 {
 	return wc.undoTrack;

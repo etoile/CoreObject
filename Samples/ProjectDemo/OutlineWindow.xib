@@ -473,7 +473,6 @@
 									<string key="NSFrame">{{1, 256}, {465, 15}}</string>
 									<reference key="NSSuperview" ref="863604277"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="863604277"/>
@@ -527,23 +526,22 @@
 								<string key="NSKeyEquivalent"/>
 								<int key="NSPeriodicDelay">400</int>
 								<int key="NSPeriodicInterval">75</int>
-								<object class="NSMenuItem" key="NSMenuItem" id="645424584">
-									<reference key="NSMenu" ref="701560045"/>
-									<string key="NSTitle">Item 1</string>
-									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<int key="NSState">1</int>
-									<reference key="NSOnImage" ref="188214123"/>
-									<reference key="NSMixedImage" ref="258866355"/>
-									<string key="NSAction">_popUpItemAction:</string>
-									<reference key="NSTarget" ref="287202656"/>
-								</object>
+								<nil key="NSMenuItem"/>
 								<bool key="NSMenuItemRespectAlignment">YES</bool>
 								<object class="NSMenu" key="NSMenu" id="701560045">
 									<string key="NSTitle">OtherViews</string>
 									<array class="NSMutableArray" key="NSMenuItems">
-										<reference ref="645424584"/>
+										<object class="NSMenuItem" id="645424584">
+											<reference key="NSMenu" ref="701560045"/>
+											<string key="NSTitle">Item 1</string>
+											<string key="NSKeyEquiv"/>
+											<int key="NSKeyEquivModMask">1048576</int>
+											<int key="NSMnemonicLoc">2147483647</int>
+											<reference key="NSOnImage" ref="188214123"/>
+											<reference key="NSMixedImage" ref="258866355"/>
+											<string key="NSAction">_popUpItemAction:</string>
+											<reference key="NSTarget" ref="287202656"/>
+										</object>
 										<object class="NSMenuItem" id="589335439">
 											<reference key="NSMenu" ref="701560045"/>
 											<string key="NSTitle">Item 2</string>
@@ -569,6 +567,7 @@
 									</array>
 									<reference key="NSMenuFont" ref="901604842"/>
 								</object>
+								<int key="NSSelectedIndex">-1</int>
 								<int key="NSPreferredEdge">1</int>
 								<bool key="NSUsesItemFromMenu">YES</bool>
 								<bool key="NSAltersState">YES</bool>
@@ -716,6 +715,30 @@
 					<string key="id">835</string>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">branchesPopUpButton</string>
+						<reference key="source" ref="61872091"/>
+						<reference key="destination" ref="1056029717"/>
+					</object>
+					<string key="id">FaQ-A7-wgd</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">defaultBranchCheckBox</string>
+						<reference key="source" ref="61872091"/>
+						<reference key="destination" ref="507837182"/>
+					</object>
+					<string key="id">sJW-Wt-7It</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">checkDefaultBranch:</string>
+						<reference key="source" ref="61872091"/>
+						<reference key="destination" ref="507837182"/>
+					</object>
+					<string key="id">jJG-td-Rdn</string>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">stepBackward:</string>
 						<reference key="source" ref="488463116"/>
@@ -789,8 +812,8 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="863604277"/>
 							<reference ref="429989769"/>
-							<reference ref="1056029717"/>
 							<reference ref="507837182"/>
+							<reference ref="1056029717"/>
 						</array>
 						<reference key="parent" ref="393638332"/>
 					</object>
@@ -1062,6 +1085,34 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">EWDocumentWindowController</string>
 					<string key="superclassName">NSWindowController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="branchPopUpButtonChanged:">id</string>
+						<string key="checkDefaultBranch:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="branchPopUpButtonChanged:">
+							<string key="name">branchPopUpButtonChanged:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="checkDefaultBranch:">
+							<string key="name">checkDefaultBranch:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="branchesPopUpButton">NSPopUpButton</string>
+						<string key="defaultBranchCheckBox">NSButton</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="branchesPopUpButton">
+							<string key="name">branchesPopUpButton</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="defaultBranchCheckBox">
+							<string key="name">defaultBranchCheckBox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/EWDocumentWindowController.h</string>
@@ -1075,10 +1126,8 @@
 						<string key="addItem:">id</string>
 						<string key="branch:">id</string>
 						<string key="copy:">id</string>
-						<string key="cut:">id</string>
 						<string key="history:">id</string>
 						<string key="moveToTrash:">id</string>
-						<string key="paste:">id</string>
 						<string key="projectDemoRedo:">id</string>
 						<string key="projectDemoUndo:">id</string>
 						<string key="shareWith:">id</string>
@@ -1105,20 +1154,12 @@
 							<string key="name">copy:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="cut:">
-							<string key="name">cut:</string>
-							<string key="candidateClassName">id</string>
-						</object>
 						<object class="IBActionInfo" key="history:">
 							<string key="name">history:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="moveToTrash:">
 							<string key="name">moveToTrash:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="paste:">
-							<string key="name">paste:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="projectDemoRedo:">

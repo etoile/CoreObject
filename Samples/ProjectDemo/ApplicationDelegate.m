@@ -145,8 +145,8 @@
 
 		NSString *windowID = [[ETUUID UUID] stringValue];
 		
-		OutlineController *controller = [[OutlineController alloc] initWithBranch: [doc branch]
-																		 windowID: windowID];
+		OutlineController *controller = [[OutlineController alloc] initPinnedToBranch: doc.branch
+																			 windowID: windowID];
 		controllerForWindowID[windowID] = controller;
 		[controller showWindow: nil];
 	}
@@ -166,8 +166,8 @@
     
 	NSString *windowID = [[ETUUID UUID] stringValue];
 	
-	EWDocumentWindowController *controller = [[OutlineController alloc] initWithBranch: [aDoc branch]
-																			  windowID: windowID];
+	EWDocumentWindowController *controller = [[OutlineController alloc] initAsPrimaryWindowForPersistentRoot: aDoc.persistentRoot
+																									windowID: windowID];
 	[controller showWindow: nil];
 
 	controllerForWindowID[windowID] = controller;

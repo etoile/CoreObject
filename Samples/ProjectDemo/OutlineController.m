@@ -37,7 +37,9 @@
 	{
 		title = docName;
 	}
-	[[self window] setTitle: title];
+	
+	if (title != nil)
+		[[self window] setTitle: title];
 
 	// Disable the share button if it is a shared document
 	if ([self isSharing])
@@ -52,13 +54,21 @@
 	}
 }
 
-- (instancetype) initWithBranch: (COBranch *)aBranch
-					   windowID: (NSString*)windowID
+- (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
+											 windowID: (NSString*)windowID
 {
-	self = [super initWithBranch: aBranch
-						windowID: windowID
-				   windowNibName: @"OutlineWindow"];
-	
+	self = [super initAsPrimaryWindowForPersistentRoot: aPersistentRoot
+											  windowID: windowID
+										 windowNibName: @"OutlineWindow"];
+	return self;
+}
+
+- (instancetype) initPinnedToBranch: (COBranch *)aBranch
+						   windowID: (NSString*)windowID
+{
+	self = [super initPinnedToBranch: aBranch
+							windowID: windowID
+					   windowNibName: @"OutlineWindow"];
 	return self;
 }
 
@@ -68,7 +78,7 @@
 }
 
 
-- (void) persistentRootDidChange: (NSNotification *)notif
+- (void) objectGraphDidChange
 {
     //NSLog(@"Reloading outline for %@", doc);
     [outlineView reloadData];
@@ -76,7 +86,7 @@
 
 - (Document *)projectDocument
 {
-	return [self.persistentRoot rootObject];
+	return [self.objectGraphContext rootObject];
 }
 - (OutlineItem *)rootObject
 {
@@ -92,6 +102,8 @@
 
 - (void)windowDidLoad
 {
+	[super windowDidLoad];
+	
 	[outlineView registerForDraggedTypes:
 		@[@"org.etoile.outlineItem", @"public.file-url"]];
 	[outlineView setDelegate: self];
