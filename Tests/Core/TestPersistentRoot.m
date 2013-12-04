@@ -482,4 +482,15 @@
 	UKIntsNotEqual(0, [attrs[COPersistentRootAttributeExportSize] longLongValue]);
 }
 
+- (void) testMixingObjectsAmongObjectGraphsBelongingToSinglePersistentRoot
+{
+	COBranch *altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
+	[ctx commit];
+	
+	OutlineItem *child = [[altBranch objectGraphContext] insertObjectWithEntityName: @"OutlineItem"];
+	[[altBranch rootObject] insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+	
+	UKRaisesException([[originalBranch rootObject] insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]);
+}
+
 @end

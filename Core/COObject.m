@@ -497,6 +497,17 @@ See +[NSObject typePrefix]. */
 	return (involvesTransientObject || valueEditingContext == currentEditingContext);
 }
 
+- (BOOL)isObjectGraphContextValidForObject: (COObject *)value
+{
+	const BOOL isSameObjectGraphContext = (value.objectGraphContext == self.objectGraphContext);
+	const BOOL isEqualPersistentRootUUID = [value.persistentRoot.UUID isEqual: self.persistentRoot.UUID];
+
+	/* It is illegal to mix objects between the object graphs belonging
+	   to the same persistent root. In other words, cross-persistent root references
+	   must actually be to a different persistent root. */
+	return isSameObjectGraphContext || !isEqualPersistentRootUUID;
+}
+
 - (BOOL)isCoreObjectRelationship: (ETPropertyDescription *)propertyDesc
 {
 	if ([propertyDesc isPersistent] == NO)
@@ -527,6 +538,28 @@ See +[NSObject typePrefix]. */
 	else
 	{
 		ETAssert([self isEditingContextValidForObject: (COObject *)value]);
+	}
+}
+
+- (void)validateObjectGraphContextForNewValue: (id)value
+						  propertyDescription: (ETPropertyDescription *)propertyDesc
+{
+	if ([self isCoreObjectRelationship: propertyDesc] == NO)
+		return;
+	
+	// FIXME: -isPrimitiveCollection might be O(N)! Fix or avoid.
+	if ([value isPrimitiveCollection])
+	{
+		ETAssert([propertyDesc isMultivalued]);
+		
+		for (COObject *object in [value objectEnumerator])
+		{
+			ETAssert([self isObjectGraphContextValidForObject: object]);
+		}
+	}
+	else
+	{
+		ETAssert([self isObjectGraphContextValidForObject: (COObject *)value]);
 	}
 }
 
@@ -861,6 +894,8 @@ See +[NSObject typePrefix]. */
 	// NOTE: For the CoreObject benchmark, no visible slowdowns.
 	[self validateEditingContextForNewValue: newValue
                         propertyDescription: propertyDesc];
+	[self validateObjectGraphContextForNewValue: newValue
+							propertyDescription: propertyDesc];
 	[self validateTypeForNewValue: newValue
 	          propertyDescription: propertyDesc];
 }
