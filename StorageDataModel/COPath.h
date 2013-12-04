@@ -8,19 +8,19 @@
 @interface COPath : NSObject <NSCopying>
 {
 @private
-	ETUUID *persistentRoot_;
-	ETUUID *branch_;
-	ETUUID *innerObject_;
+	ETUUID *_persistentRoot;
+	ETUUID *_branch;
 }
 
 /**
- * Returns YES if persistentRoot is set
+ * Non-nil
  */
-- (BOOL) isCrossPersistentRoot;
-
 @property (strong, readonly) ETUUID *persistentRoot;
+/**
+ * May be nil, which indicates that the path points to whatever the current branch 
+ * of persistentRoot is.
+ */
 @property (strong, readonly) ETUUID *branch;
-@property (strong, readonly) ETUUID *innerObject;
 
 /**
  * Implicitly points to the root object of the current branch
@@ -32,15 +32,6 @@
  */
 + (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
 							 branch: (ETUUID*)aBranch;
-
-/**
- * Deprecated. COPath can only point at the root object.
- */
-+ (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
-							 branch: (ETUUID*)aBranch
-					embdeddedObject: (ETUUID *)anObject;
-
-- (COPath *) pathWithNameMapping: (NSDictionary *)aMapping;
 
 // string persistence
 

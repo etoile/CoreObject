@@ -593,9 +593,6 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 {
     ETUUID *persistentRootUUID = [aPath persistentRoot];
     ETAssert(persistentRootUUID != nil);
-    
-    /* Specifying an inner object is unsupported and will be removed from COPath */
-    ETAssert([aPath innerObject] == nil);
 	
 	ETUUID *branchUUID = [aPath branch];
 	

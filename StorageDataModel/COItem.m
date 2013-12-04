@@ -221,7 +221,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		{
 			for (id ref in [self allObjectsForAttribute: key])
 			{
-                if ([ref isKindOfClass: [COPath class]] && [ref isCrossPersistentRoot])
+                if ([ref isKindOfClass: [COPath class]])
                 {
                     [result addObject: [ref persistentRoot]];
                 }
@@ -306,7 +306,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 			}
 			if ([value isKindOfClass: [COPath class]])
 			{
-				[aCopy setValue: [value pathWithNameMapping: aMapping]
+				[aCopy setValue: value
 				   forAttribute: attr
 						   type: type];
 			}
@@ -331,7 +331,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 				}
 				else if ([subValue isKindOfClass: [COPath class]])
 				{
-					[newCollection addObject: [subValue pathWithNameMapping: aMapping]];
+					[newCollection addObject: subValue];
 				}
 			}
 			

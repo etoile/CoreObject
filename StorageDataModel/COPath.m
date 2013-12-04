@@ -4,62 +4,42 @@
 
 @implementation COPath
 
-@synthesize persistentRoot = persistentRoot_;
-@synthesize branch = branch_;
-@synthesize innerObject = innerObject_;
-
-- (BOOL) isCrossPersistentRoot
-{
-    return persistentRoot_ != nil;
-}
+@synthesize persistentRoot = _persistentRoot;
+@synthesize branch = _branch;
 
 - (COPath *) initWithPersistentRoot: (ETUUID *)aRoot
 							 branch: (ETUUID*)aBranch
-					embdeddedObject: (ETUUID *)anObject
 {	
 	SUPERINIT;
 	NILARG_EXCEPTION_TEST(aRoot);
-	persistentRoot_ =  aRoot;
-	branch_ =  aBranch;
-	innerObject_ =  anObject;
+	_persistentRoot = aRoot;
+	_branch =  aBranch;
 	return self;
 }
 
-
 + (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
 {
-	return [self pathWithPersistentRoot:aRoot branch: nil];
+	return [[self alloc] initWithPersistentRoot: aRoot branch: nil];
 }
 
 + (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
 							 branch: (ETUUID*)aBranch
 {
-	return [self pathWithPersistentRoot:aRoot branch:aBranch embdeddedObject:nil];
-}
-
-+ (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
-							 branch: (ETUUID*)aBranch
-					embdeddedObject: (ETUUID *)anObject
-{
-	return [[self alloc] initWithPersistentRoot: aRoot branch: aBranch embdeddedObject: anObject];
+	return [[self alloc] initWithPersistentRoot: aRoot branch: aBranch];
 }
 
 + (COPath *) pathWithString: (NSString*) pathString
 {
 	NILARG_EXCEPTION_TEST(pathString);
 	
-	ETUUID *innerObject = nil;
 	ETUUID *branch = nil;
 	ETUUID *persistentRoot = nil;
 	
 	if ([pathString length] > 0)
 	{
-		NSArray *components = [pathString componentsSeparatedByCharactersInSet:
-							   [NSCharacterSet characterSetWithCharactersInString: @":."]];
+		NSArray *components = [pathString componentsSeparatedByString: @":"];
 		switch ([components count])
 		{
-			case 3:
-				innerObject = [ETUUID UUIDWithString: [components objectAtIndex: 2]];
 			case 2:
 				branch = [ETUUID UUIDWithString: [components objectAtIndex: 1]];
 			case 1:
@@ -69,36 +49,7 @@
 				[NSException raise: NSInvalidArgumentException format: @"unsupported COPath string '%@'", pathString];
 		}
 	}
-	return [COPath pathWithPersistentRoot: persistentRoot branch: branch embdeddedObject: innerObject];
-}
-
-- (COPath *) pathWithNameMapping: (NSDictionary *)aMapping
-{
-	ETUUID *innerObject = innerObject_;
-	ETUUID *branch = branch_;
-	ETUUID *persistentRoot = persistentRoot_;
-    
-    if (innerObject != nil
-        && [aMapping objectForKey: innerObject])
-    {
-        innerObject = [aMapping objectForKey: innerObject];
-    }
-    
-    if (branch != nil
-        && [aMapping objectForKey: branch])
-    {
-        branch = [aMapping objectForKey: branch];
-    }
-    
-    if (persistentRoot != nil
-        && [aMapping objectForKey: persistentRoot])
-    {
-        persistentRoot = [aMapping objectForKey: persistentRoot];
-    }
-    
-    return [COPath pathWithPersistentRoot: persistentRoot
-                                   branch: branch
-                          embdeddedObject: innerObject];
+	return [COPath pathWithPersistentRoot: persistentRoot branch: branch];
 }
 
 - (id) copyWithZone: (NSZone *)zone
@@ -108,32 +59,41 @@
 
 - (NSString *) stringValue
 {
-	NSMutableString *value = [NSMutableString stringWithString: [persistentRoot_ stringValue]];
-	
-	if (branch_ != nil)
+	if (_branch == nil)
 	{
-		[value appendFormat: @":%@", branch_];
+		return [_persistentRoot stringValue];
 	}
-	if (innerObject_ != nil)
+	else
 	{
-		[value appendFormat: @".%@", innerObject_];
+		return [NSString stringWithFormat: @"%@:%@", _persistentRoot, _branch];
 	}
-	
-	return [NSString stringWithString: value];
 }
 
 - (NSUInteger) hash
 {
-	return [[self stringValue] hash];
+	return [_branch hash] ^ [_persistentRoot hash];
 }
 
 - (BOOL) isEqual: (id)anObject
 {
-	return [anObject isKindOfClass: [self class]] &&
-	[[self stringValue] isEqualToString: [anObject stringValue]];
+	if (anObject == self)
+		return YES;
+	
+	if (![anObject isKindOfClass: [COPath class]])
+		return NO;
+	
+	COPath *otherPath = anObject;
+	if (![_persistentRoot isEqual: otherPath->_persistentRoot])
+		return NO;
+	
+	if (!((_branch == nil && otherPath->_branch == nil)
+		  || [_branch isEqual: otherPath->_branch]))
+		return NO;
+	
+	return YES;
 }
 
-- (NSString*) description
+- (NSString *) description
 {
 	return [self stringValue];
 }
