@@ -99,9 +99,7 @@ Future Work
 
 - Metamodel
 
-  - make isContinaer derived (somehting like self.isMultivalued == NO && self.opposite.isMultivalued == NO)
-
-  - Add checks that derived or readonly properties are not persistent
+  - Add checks that derived are not persistent (readonly can be persistent, for set-once properties. Useful for immutable objects).
 
   - Add check that parent property (isContainer = YES) is derived
 
