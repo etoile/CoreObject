@@ -40,7 +40,9 @@ First alpha release blockers
   - Simple diff visualization
 
 - Test behaviour of one:many relationship that is not declared as composite,
-  I think it will break or give weird results
+  I think it will break or give weird results. Decide whether we should support these.
+  i.e. should one:many automatically imply no cycles (which is what the composite flag
+  adds in FAME).
 
 Future Work
 -----------
@@ -101,7 +103,7 @@ Future Work
 
 - Metamodel
 
-  - Add checks that derived properties are not persistent
+  - Add checks that derived or readonly properties are not persistent
 
   - Add check that parent property (isContainer = YES) is derived
 
@@ -131,9 +133,7 @@ Future Work
     -[COObject (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key]
     for both, IMO (Eric)
 
-  - Use NSSortedSet for sorted composite relationships
-
-  - Attempting to set a value for a readonly property should raise an exception
+  - Use NSOrderedSet for relationships
 
   - Check COObject KVO semantics and documentation.
     
@@ -144,12 +144,8 @@ Future Work
   - Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
 
   - Turn COObject into zombies once garbage collected (see -markAsRemovedFromContext)
-
-  - Keyed CoreObject relationship support (if possible)
 	
   - Turn _variableStorage into a private ivar once EtoileUI doesn't access it directly
-  
-  - -valueForVariableStorageKey: or at least the synthesized getter, should return defensive copies if requested in the metamodel (this should even be the default perhaps, especially for collections)
   
   - Add dictionary update tests to TestObjectUpdate.m
   
@@ -158,6 +154,9 @@ Future Work
     - a transient object graph context --> allowed (see transient property _dropIndicator in -[ETLayout awakeFromDeserialization)
     - the same object graph context --> disallowed (otherwise we can accidentally easily look up shared instance using the wrong object graph context e.g. _dropIndicator = [ETDropIndicator sharedInstanceForObjectGraphContext: [layout objectGraphContext]])
     - some other persistent object graph context --> allowed or disallowed (not sure yet)
+
+  - Make primitives with potentially mutable subclasses (NSString and NSData)
+    have immutable copies made before being stored in the variable storage.
 
 - COItem
 
@@ -202,12 +201,6 @@ Future Work
 
 - Serialization
 
-	- Deserialization code skips unresolvable collection elements, this doesn't look correct...       
-	
-		if (deserializedValue != nil)
-		{
-			[resultCollection addObject: deserializedValue];
-		}
   - For collection metamodel assertions, check all collection metamodel attributes (isKeyed, isOrdered, isMultivalued) and document we should update these assertions if we add more collection attributes to the metamodel:
   
 		NSAssert([aPropertyDesc isKeyed] && [aPropertyDesc isMultivalued], @"Serialization type doesn't match metamodel");
