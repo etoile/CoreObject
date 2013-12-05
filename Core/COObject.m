@@ -264,7 +264,7 @@ See +[NSObject typePrefix]. */
 - (id)prepareWithUUID: (ETUUID *)aUUID
     entityDescription: (ETEntityDescription *)anEntityDescription
    objectGraphContext: (COObjectGraphContext *)aContext
-                isNew: (BOOL)inserted  __attribute__((objc_method_family(init)))
+                isNew: (BOOL)inserted
 {
 	NILARG_EXCEPTION_TEST(aUUID);
 	NILARG_EXCEPTION_TEST(anEntityDescription);
