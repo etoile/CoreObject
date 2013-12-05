@@ -39,10 +39,6 @@ First alpha release blockers
 
   - Simple diff visualization
 
-- Test behaviour of one:many relationship that is not declared as composite,
-  I think it will break or give weird results. Decide whether we should support these.
-  i.e. should one:many automatically imply no cycles (which is what the composite flag
-  adds in FAME).
 
 Future Work
 -----------
@@ -102,6 +98,8 @@ Future Work
   
 
 - Metamodel
+
+  - make isContinaer derived (somehting like self.isMultivalued == NO && self.opposite.isMultivalued == NO)
 
   - Add checks that derived or readonly properties are not persistent
 
