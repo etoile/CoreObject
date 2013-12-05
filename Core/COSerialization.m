@@ -568,10 +568,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 			                                              ofType: COTypePrimitivePart(type)
 			                                 propertyDescription: aPropertyDesc];
 			
-			if (deserializedValue != nil)
-			{
-				[resultCollection addObject: deserializedValue];
-			}
+			[resultCollection addObject: deserializedValue];
 		}
 
 		// FIXME: Make read-only if needed
@@ -589,11 +586,8 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 			id deserializedValue = [self valueForSerializedValue: subvalue
 			                                              ofType: COTypePrimitivePart(type)
 			                                 propertyDescription: aPropertyDesc];
-			
-			if (deserializedValue != nil)
-			{
-				[resultCollection addObject: deserializedValue];
-			}
+
+			[resultCollection addObject: deserializedValue];
 		}
 		
 		// FIXME: Make read-only if needed
@@ -650,8 +644,6 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
         {
             /* Look up a inner object reference in the receiver persistent root */
             object = [[self objectGraphContext] objectReferenceWithUUID: value];
-            ETAssert(object != nil);
-            
         }
         else /* COPath */
         {
@@ -659,8 +651,11 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
             object = [[[self persistentRoot] parentContext] crossPersistentRootReferenceWithPath: (COPath *)value];
         }
 
-       	// NOTE: For a COPath, object can be nil.
-		ETAssert(object == nil || [[object entityDescription] isKindOfEntity: [aPropertyDesc type]]);
+		// Even when we add support for broken references, object will still
+		// be non null, so this assertion should always hold.
+		ETAssert(object != nil);
+		ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc type]]);
+		
 		return object;
 	}
     else if (type == kCOTypeInt64 || type == kCOTypeDouble)
