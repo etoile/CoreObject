@@ -417,6 +417,7 @@
 	// - not in memory -> loaded in memory (regular case)
 }
 
+#if 0
 - (void) testMultipleRelationshipsPerObject
 {
     // tag1 <<persistent root>>
@@ -436,6 +437,7 @@
 	COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 	
 	[[[tag1 rootObject] mutableSetValueForKey: @"contents"] addObject: [photo1 rootObject]];
+	// FIXME: Illegal, makes a compoiste cross-reference
 	[[[tag1 rootObject] mutableSetValueForKey: @"childTags"] addObject: [tag2 rootObject]];
 	
 	[ctx commit];
@@ -465,6 +467,7 @@
 	COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 
 	// Same as last test but order of these two statements is swapped
+	// FIXME: Illegal, makes a composite cross reference
 	[[[tag1 rootObject] mutableSetValueForKey: @"childTags"] addObject: [tag2 rootObject]];
 	[[[tag1 rootObject] mutableSetValueForKey: @"contents"] addObject: [photo1 rootObject]];
 	
@@ -487,6 +490,7 @@
 		 UKObjectsEqual(S([[tag2 rootObject] UUID]), [[[[testProot rootObject] childTags] mappedCollection] UUID]);
 	 }];
 }
+#endif
 
 - (void) testPersistentRootDeletion
 {
@@ -661,8 +665,10 @@
 {
     COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     COPersistentRoot *child1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[doc1 rootObject] addObject: [child1 rootObject]];
-	UKRaisesException([ctx commit]);
+    UKRaisesException([[doc1 rootObject] addObject: [child1 rootObject]]);
+	
+	// TODO: In fact, the illegal reference was actually inserted, so the object graph is in an
+	// illegal state now.
 }
 
 @end

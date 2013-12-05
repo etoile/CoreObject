@@ -16,7 +16,7 @@
     
     ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
                                                                                   type: (id)@"Anonymous.OutlineItem"];
-    [parentProperty setIsContainer: YES];
+	[parentProperty setDerived: YES];
     
     ETPropertyDescription *referencedItemProperty = [ETPropertyDescription descriptionWithName: @"referencedItem"
                                                                                           type: (id)@"Anonymous.OutlineItem"];

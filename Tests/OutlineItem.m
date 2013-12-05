@@ -25,14 +25,15 @@
     ETPropertyDescription *parentContainerProperty =
     [ETPropertyDescription descriptionWithName: @"parentContainer" type: (id)@"Anonymous.OutlineItem"];
     
-    [parentContainerProperty setIsContainer: YES];
     [parentContainerProperty setMultivalued: NO];
+	[parentContainerProperty setDerived: YES];
     [parentContainerProperty setOpposite: (id)@"Anonymous.OutlineItem.contents"];
     
     ETPropertyDescription *parentCollectionsProperty =
     [ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.Tag"];
     
     [parentCollectionsProperty setMultivalued: YES];
+	[parentCollectionsProperty setDerived: YES];
     [parentCollectionsProperty setOpposite: (id)@"Anonymous.Tag.contents"];
 	
 	ETPropertyDescription *attachmentProperty =

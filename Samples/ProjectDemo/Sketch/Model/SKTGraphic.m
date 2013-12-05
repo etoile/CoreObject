@@ -18,8 +18,8 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
     
     ETPropertyDescription *documentProperty = [ETPropertyDescription descriptionWithName: @"document"
                                                                                     type: (id)@"SKTDrawDocument"];
+	[documentProperty setDerived: YES];
     [documentProperty setOpposite: (id)@"SKTDrawDocument.graphics"];
-    [documentProperty setIsContainer: YES];
     
     [entity setPropertyDescriptions: A(documentProperty)];
     

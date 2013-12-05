@@ -12,9 +12,7 @@
     
     ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
                                                                                   type: outlineEntity];
-    [parentProperty setIsContainer: YES];
-    
-    
+        
     ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
                                                                                     type: outlineEntity];
     [contentsProperty setMultivalued: YES];

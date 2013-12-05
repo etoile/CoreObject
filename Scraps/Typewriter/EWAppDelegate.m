@@ -39,7 +39,6 @@
         
         ETPropertyDescription *documentProperty =
         [ETPropertyDescription descriptionWithName: @"document" type: (id)@"Anonymous.TypewriterDocument"];
-        [documentProperty setIsContainer: YES];
         [documentProperty setMultivalued: NO];
         [documentProperty setOpposite: (id)@"Anonymous.TypewriterDocument.paragraphs"];
         

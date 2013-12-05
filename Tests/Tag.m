@@ -26,6 +26,10 @@
     ETPropertyDescription *parentTagProperty =
     [ETPropertyDescription descriptionWithName: @"parentTag" type: (id)@"Anonymous.Tag"];
     [parentTagProperty setOpposite: childTagsProperty];
+	[parentTagProperty setDerived: YES];
+	
+	ETAssert([childTagsProperty isComposite]);
+	ETAssert([parentTagProperty isContainer]);
     
     [tagEntity setPropertyDescriptions: A(tagLabelProperty, contentsProperty, childTagsProperty, parentTagProperty)];
     return tagEntity;

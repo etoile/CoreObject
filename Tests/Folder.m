@@ -21,8 +21,8 @@
     ETPropertyDescription *parentProperty =
     [ETPropertyDescription descriptionWithName: @"parent" type: (id)@"Anonymous.Folder"];
     
-    [parentProperty setIsContainer: YES];
     [parentProperty setMultivalued: NO];
+	[parentProperty setDerived: YES];
     [parentProperty setOpposite: (id)@"Anonymous.Folder.contents"];
     
     [entity setPropertyDescriptions: @[labelProperty, contentsProperty, parentProperty]];

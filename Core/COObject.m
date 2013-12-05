@@ -881,10 +881,28 @@ See +[NSObject typePrefix]. */
 		{
 			ETAssert([self isCoreObjectValue: object]);
 		}
+		
+		if ([propertyDesc isComposite])
+		{
+			for (id object in [newValue objectEnumerator])
+			{
+				// i.e., If the property is composite, the object can't be a cross-reference
+				ETAssert([object objectGraphContext] == [self objectGraphContext]);
+			}
+		}
 	}
 	else
 	{
 		ETAssert([self isCoreObjectValue: newValue]);
+		
+		if ([propertyDesc isComposite])
+		{
+			if (newValue != nil)
+			{
+				// i.e., If the property is composite, the object can't be a cross-reference
+				ETAssert([newValue objectGraphContext] == [self objectGraphContext]);
+			}
+		}
 	}
 }
 
