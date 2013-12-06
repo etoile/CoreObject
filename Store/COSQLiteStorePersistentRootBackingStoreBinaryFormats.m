@@ -5,10 +5,10 @@ void ParseCombinedCommitDataInToUUIDToItemDataDictionary(NSMutableDictionary *de
 {
     // format:
     //
-    // |------------|-----------------------|----------| |---..
-    // |128-bit UUID| uint_32 little-endian | item data| | next UUID...
-    // |------------|-----------------------|----------| |---..
-    //                 ^- number of bytes in item data
+    // |-----------------------|---------------------------------------------------| |---..
+    // | uint_32 little-endian | item data (first byte is '#', then 16-byte  UUID) | | next length..
+    // |-----------------------|---------------------------------------------------| |---..
+    //    ^- length in bytes of item data
     
     const unsigned char *bytes = [commitData bytes];
     const NSUInteger len = [commitData length];
@@ -16,14 +16,14 @@ void ParseCombinedCommitDataInToUUIDToItemDataDictionary(NSMutableDictionary *de
     
     while (offset < len)
     {
-        ETUUID *uuid = [[ETUUID alloc] initWithUUID: bytes + offset];
-        offset += 16;
-        
         uint32_t length;
         memcpy(&length, bytes + offset, 4);
         length = NSSwapLittleIntToHost(length);
         offset += 4;
         
+		assert('#' == bytes[offset]);
+		ETUUID *uuid = [[ETUUID alloc] initWithUUID: bytes + offset + 1];
+		
         if ((replaceExisting
              || nil == [dest objectForKey: uuid])
             && (nil == restrictToItemUUIDs
@@ -40,9 +40,6 @@ void ParseCombinedCommitDataInToUUIDToItemDataDictionary(NSMutableDictionary *de
 
 void AddCommitUUIDAndDataToCombinedCommitData(NSMutableData *combinedCommitData, ETUUID *uuidToAdd, NSData *dataToAdd)
 {
-    // TODO: Benchmark, access UUID bytes directly via a pointer?
-    [combinedCommitData appendBytes: [uuidToAdd UUIDValue] length: 16];
-    
     const NSUInteger len = [dataToAdd length];
     if (len > UINT32_MAX)
     {
@@ -54,4 +51,7 @@ void AddCommitUUIDAndDataToCombinedCommitData(NSMutableData *combinedCommitData,
                              length: 4];
     
     [combinedCommitData appendData: dataToAdd];
+
+	assert('#' == ((const unsigned char *)[dataToAdd bytes])[0]);
+	assert(0 == memcmp([uuidToAdd UUIDValue], ((const unsigned char *)[dataToAdd bytes]) + 1, 16));
 }
