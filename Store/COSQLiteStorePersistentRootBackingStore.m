@@ -11,6 +11,7 @@
 #import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
 #import "CODateSerialization.h"
+#import <openssl/sha.h>
 
 @interface COSQLiteStore (Private)
 
