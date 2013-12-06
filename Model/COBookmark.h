@@ -26,7 +26,9 @@
 	NSData *_favIconData;
 }
 
+
 /** @taskunit Initialization */
+
 
 /**
  * <init />
@@ -47,7 +49,9 @@
  */
 - (id) initWithURLFile: (NSString *)aFilePath;
 
+
 /** @taskunit Bookmark Properties */
+
 
 /**
  * The bookmark URL.
@@ -75,6 +79,7 @@
 @property (nonatomic, strong) NSData *favIconData;
 
 @end
+
 
 /**
  * CoreObject additions for NSURL.

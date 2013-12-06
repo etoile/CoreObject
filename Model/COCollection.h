@@ -147,7 +147,9 @@
 @end
 
 
-/** @group Object Collection and Organization */
+/** 
+ * @group Object Collection and Organization 
+ */
 @interface COObject (COCollectionTypeQuerying)
 /**
  * Returns whether the receiver is a group or not.

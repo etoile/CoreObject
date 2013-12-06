@@ -28,18 +28,21 @@
 	NSString *_identifier;
 }
 
-@property (nonatomic, readwrite, strong) NSString *identifier;
+@property (nonatomic, strong) NSString *identifier;
 
 /**
  * Returns YES.
  */
 - (BOOL)isLibrary;
 
+
 /** @taskunit Private */
+
 
 + (NSSet *)additionalEntityDescriptions;
 
 @end
+
 
 /** 
  * @group Object Collection and Organization
@@ -54,9 +57,9 @@
  */
 @interface COEditingContext (COCommonLibraries)
 
-/**
- * @taskunit Library List
- */
+
+/** @taskunit Library List */
+
 
 /**
  * Returns a group listing the libraries in the store.
@@ -68,9 +71,9 @@
  */
 @property (nonatomic, readonly) COGroup *libraryGroup;
 
-/**
- * @taskunit Accessing Libraries Directly
- */
+
+/** @taskunit Accessing Libraries Directly */
+
 
 /** 
  * Returns the library used to collect together the objects using the given 

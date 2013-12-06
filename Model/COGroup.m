@@ -15,7 +15,7 @@
 
 @implementation COGroup
 
-+ (ETEntityDescription *) newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
 	ETEntityDescription *collection = [self newBasicEntityDescription];
 
@@ -47,7 +47,7 @@
 	return YES;
 }
 
-- (NSArray *) contentArray
+- (NSArray *)contentArray
 {
 	return [[self content] allObjects];
 }
@@ -94,19 +94,19 @@
 	return group;	
 }
 
-- (void) setTargetCollection: (id <ETCollection>)aGroup
+- (void)setTargetCollection: (id <ETCollection>)aGroup
 {
 	targetCollection =  (id)aGroup;
 	[self refresh];
 }
 
-- (void) setContentBlock: (COContentBlock)aBlock
+- (void)setContentBlock: (COContentBlock)aBlock
 {
 	contentBlock = [aBlock copy];
 	[self refresh];
 }
 
-- (void) setQuery: (COQuery *)aQuery
+- (void)setQuery: (COQuery *)aQuery
 {
 	query =  aQuery;
 	[self refresh];

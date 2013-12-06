@@ -28,7 +28,9 @@
  */
 - (BOOL)isTag;
 
+
 /** @taskunit Tagging */
+
 
 /**
  * Returns the tag the receiver represents.
@@ -37,9 +39,11 @@
  *
  * By default, returns the name in lower case.
  */
-- (NSString *)tagString;
+@property (nonatomic, readonly) NSString *tagString;
+
 
 /* @taskunit Tag Categories */
+
 
 /**
  * The tag categories to which the tag belongs to.
@@ -47,6 +51,7 @@
 @property (nonatomic, readonly) NSSet *tagGroups;
 
 @end
+
 
 /**
  * @group Object Collection and Organization
@@ -64,6 +69,7 @@
 }
 
 @end
+
 
 /**
  * @group Object Collection and Organization

@@ -15,7 +15,7 @@
 
 @implementation COCollection
 
-+ (void) initialize
++ (void)initialize
 {
 	if (self != [COCollection class])
 		return;
@@ -87,28 +87,28 @@
 		postNotificationName: ETCollectionDidUpdateNotification object: self];
 }
 
-- (NSString *) contentKey
+- (NSString *)contentKey
 {
 	return @"objects";
 }
 
-- (BOOL) isOrdered
+- (BOOL)isOrdered
 {
 	// TODO: If too slow, return the boolean directly.
 	return [[[self entityDescription] propertyDescriptionForName: [self contentKey]] isOrdered];
 }
 
-- (id) content
+- (id)content
 {
 	return [self valueForVariableStorageKey: [self contentKey]];
 }
 
-- (NSArray *) contentArray
+- (NSArray *)contentArray
 {
 	return [[self valueForProperty: [self contentKey]] contentArray];
 }
 
-- (void) insertObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints
+- (void)insertObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints
 {
 	id collection = [self collectionForProperty: [self contentKey] mutationIndexes: indexes];
 
@@ -125,7 +125,7 @@
 	                   mutationKind: ETCollectionMutationKindInsertion];
 }
 
-- (void) removeObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints
+- (void)removeObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints
 {
 	id collection = [self collectionForProperty: [self contentKey] mutationIndexes: indexes];
 

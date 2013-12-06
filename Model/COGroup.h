@@ -59,7 +59,9 @@ typedef NSArray *(^COContentBlock)(void);
 	NSArray *content;
 }
 
+
 /** @taskunit Controlling the Content */
+
 
 /**
  * The target collection used to compute the smart group content.
@@ -107,9 +109,11 @@ typedef NSArray *(^COContentBlock)(void);
  *
  * See -[ETCollection content].
  */
-- (id) content;
+- (id)content;
+
 
 /** @taskunit Updating */
+
 
 /**
  * Forces the receiver content to be recreated by evaluating the query or 
@@ -117,9 +121,11 @@ typedef NSArray *(^COContentBlock)(void);
  *
  * See also -query and -contentBlock.
  */
-- (void) refresh;
+- (void)refresh;
+
 
 /** @taskunit Object Matching */
+
 
 /**
  * Returns the first object whose identifier matches.
