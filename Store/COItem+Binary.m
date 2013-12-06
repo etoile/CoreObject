@@ -54,7 +54,7 @@ static NSNull *NSNullCached;
     }
 }
 
-static void writePrimitiveValue(co_buffer_t *dest, id aValue, COType aType)
+static inline void writePrimitiveValue(co_buffer_t *dest, id aValue, COType aType)
 {
     if (aValue == NSNullCached)
     {
@@ -133,7 +133,59 @@ static int comparePointersToBinaryWriterTokens(const void *ptrA, const void *ptr
 	}
 }
 
-static void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buffer_t *temp)
+static inline void writeArrayContents(co_buffer_t *dest, NSArray *anArray, COType aType, co_buffer_t *temp)
+{
+	assert([anArray isKindOfClass: [NSArray class]]);
+	
+	for (id obj in anArray)
+	{
+		writePrimitiveValue(dest, obj, aType);
+	}
+}
+
+static inline void writeSetContents(co_buffer_t *dest, NSSet *aSet, COType aType, co_buffer_t *temp)
+{
+	assert([aSet isKindOfClass: [NSSet class]]);
+	const size_t setCount = [aSet count];
+	
+	// We need to sort the serialized values since NSSet has no order.
+	
+	co_buffer_clear(temp);
+	
+	const unsigned char **tokenPointers = malloc(sizeof(const unsigned char *) * setCount);
+	
+	// First, write each primitive value to the temporary byte buffer 'temp',
+	// also storing the pointer to the start of each token in the tokenPointers array
+	{
+		size_t i = 0;
+		for (id obj in aSet)
+		{
+			tokenPointers[i++] = co_buffer_get_data(temp) + co_buffer_get_length(temp);
+			
+			writePrimitiveValue(temp, obj, aType);
+		}
+	}
+	
+	// Sort the tokenPointers using a simple comparison function that
+	// uses the length of the token and the byte-for-byte values of the tokens
+	
+	qsort(tokenPointers, setCount, sizeof(const unsigned char *), comparePointersToBinaryWriterTokens);
+	
+	// Copy the sorted tokens into the dest buffer
+	
+	for (size_t i=0; i<setCount; i++)
+	{
+		const unsigned char *tokenPointer = tokenPointers[i];
+		const size_t tokenLength = co_reader_length_of_token(tokenPointer);
+		
+		co_buffer_write(dest, tokenPointer, tokenLength);
+	}
+	
+	free(tokenPointers);
+}
+
+
+static inline void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buffer_t *temp)
 {
     if (COTypeIsUnivalued(aType))
     {
@@ -143,57 +195,15 @@ static void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buffer_t *
     {
         co_buffer_begin_array(dest);
 				
-		if ([aValue isKindOfClass: [NSArray class]])
+		if (COTypeIsOrdered(aType))
 		{
-			for (id obj in aValue)
-			{
-				writePrimitiveValue(dest, obj, aType);
-			}
-		}
-		else if ([aValue isKindOfClass: [NSSet class]])
-		{
-			const size_t setCount = [aValue count];
-			
-			// We need to sort the serialized values since NSSet has no order.
-			
-			co_buffer_clear(temp);
-
-			const unsigned char **tokenPointers = malloc(sizeof(const unsigned char *) * setCount);
-			
-			// First, write each primitive value to the temporary byte buffer 'temp',
-			// also storing the pointer to the start of each token in the tokenPointers array
-			{
-				size_t i = 0;
-				for (id obj in aValue)
-				{
-					tokenPointers[i++] = co_buffer_get_data(temp) + co_buffer_get_length(temp);
-					
-					writePrimitiveValue(temp, obj, aType);
-				}
-			}
-			
-			// Sort the tokenPointers using a simple comparison function that
-			// uses the length of the token and the byte-for-byte values of the tokens
-			
-			qsort(tokenPointers, setCount, sizeof(const unsigned char *), comparePointersToBinaryWriterTokens);
-			
-			// Copy the sorted tokens into the dest buffer
-			
-			for (size_t i=0; i<setCount; i++)
-			{
-				const unsigned char *tokenPointer = tokenPointers[i];
-				const size_t tokenLength = co_reader_length_of_token(tokenPointer);
-				
-				co_buffer_write(dest, tokenPointer, tokenLength);
-			}
-			
-			free(tokenPointers);
+			writeArrayContents(dest, aValue, aType, temp);
 		}
 		else
 		{
-			assert(0);
+			writeSetContents(dest, aValue, aType, temp);
 		}
-		
+
         co_buffer_end_array(dest);
     }
 }
