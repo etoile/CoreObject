@@ -137,14 +137,14 @@
  * deleted on disk), plus those pending insertion and undeletion (and minus 
  * those pending deletion).
  */
-@property (weak, nonatomic, readonly) NSSet *persistentRoots;
+@property (nonatomic, readonly) NSSet *persistentRoots;
 /**
  * Returns persistent roots marked as deleted on disk, excluding those that
  * are pending undeletion.
  *
  * -persistentRootsPendingDeletion are not included in the returned set.
  */
-@property (nonatomic, copy, readonly) NSSet *deletedPersistentRoots;
+@property (nonatomic, readonly) NSSet *deletedPersistentRoots;
 
 
 /** @taskunit Store and Metamodel Access */
@@ -153,12 +153,12 @@
 /**
  * Returns the store for which the editing context acts a working copy.
  */
-@property (strong, nonatomic, readonly) COSQLiteStore *store;
+@property (nonatomic, readonly, strong) COSQLiteStore *store;
 /**
  * Returns the model description repository, which holds the metamodel that 
  * describes all the persistent objects editable in the context.
  */
-@property (nonatomic, readonly) ETModelDescriptionRepository *modelRepository;
+@property (nonatomic, readonly, strong) ETModelDescriptionRepository *modelRepository;
 
 
 /** @taskunit Managing Persistent Roots */
@@ -194,19 +194,19 @@
 /**
  * The new persistent roots to be saved in the store on the next commit.
  */
-@property (nonatomic, copy, readonly) NSSet *persistentRootsPendingInsertion;
+@property (nonatomic, readonly) NSSet *persistentRootsPendingInsertion;
 /**
  * The persistent roots to be deleted in the store on the next commit.
  */
-@property (nonatomic, copy, readonly) NSSet *persistentRootsPendingDeletion;
+@property (nonatomic, readonly) NSSet *persistentRootsPendingDeletion;
 /**
  * The persistent roots to be undeleted in the store on the next commit.
  */
-@property (nonatomic, copy, readonly) NSSet *persistentRootsPendingUndeletion;
+@property (nonatomic, readonly) NSSet *persistentRootsPendingUndeletion;
 /**
  * The persistent roots to be updated in the store on the next commit.
  */
-@property (nonatomic, copy, readonly) NSSet *persistentRootsPendingUpdate;
+@property (nonatomic, readonly) NSSet *persistentRootsPendingUpdate;
 /**
  * Returns whether the context contains uncommitted changes.
  *
@@ -335,7 +335,7 @@
  *
  * See also -[COPersistentObjectContext editingContext].
  */
-@property (weak, nonatomic, readonly) COEditingContext *editingContext;
+@property (nonatomic, readonly) COEditingContext *editingContext;
 
 @end
 

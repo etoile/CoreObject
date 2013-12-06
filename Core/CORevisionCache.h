@@ -36,7 +36,7 @@
 - (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
 					  persistentRootUUID: (ETUUID *)aPersistentRoot;
 
-@property (nonatomic, readonly) COSQLiteStore *store;
+@property (nonatomic, readonly, strong) COSQLiteStore *store;
 
 
 /** @taskunit Framework Private */

@@ -70,16 +70,16 @@ extern NSString * const kCOBranchLabel;
 /**
  * Returns whether the branch represents a cheap copy.
  */
-@property (readonly, nonatomic) BOOL isCopy;
+@property (nonatomic, readonly) BOOL isCopy;
 /**
  * Returns whether the receiver is the current branch of its persistent root.
  */
-@property (readonly, nonatomic) BOOL isCurrentBranch;
+@property (nonatomic, readonly) BOOL isCurrentBranch;
 
 /**
  * Returns whether the receiver was the first branch of its persistent root
  */
-@property (readonly, nonatomic) BOOL isTrunkBranch;
+@property (nonatomic, readonly) BOOL isTrunkBranch;
 
 
 /** @taskunit Basic Properties */
@@ -90,24 +90,24 @@ extern NSString * const kCOBranchLabel;
  *
  * The UUID is never nil.
  */
-@property (strong, readonly, nonatomic) ETUUID *UUID;
+@property (nonatomic, readonly, strong) ETUUID *UUID;
 /**
  * The branch label (used as the branch name in most cases).
  */
-@property (readwrite, copy, nonatomic) NSString *label;
+@property (nonatomic, copy) NSString *label;
 /**
  * The metadata attached to the branch.
  *
  * Any changes to the metadata is saved on the next object graph context commit.
  */
-@property (readwrite, copy, nonatomic) NSDictionary *metadata;
+@property (nonatomic, copy) NSDictionary *metadata;
 /** 
  * The branch deletion status.
  *
  * If the branch is marked as deleted, the deletion is committed to the store 
  * on the next persistent root commit.
  */
-@property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
+@property (nonatomic, assign, getter=isDeleted) BOOL deleted;
 /**
  * Non-persistent property (default YES) which can be changed to NO to indicate that
  * -setCurrentRevision: should not be used to revert the branch to an older state.
@@ -120,7 +120,7 @@ extern NSString * const kCOBranchLabel;
  * or commit the equivalant selective undo. Also, if NO, the -undo/-redo methods
  * on COBranch are disabled (-canUndo and -canRedo return NO).
  */
-@property (readwrite, nonatomic, assign) BOOL supportsRevert;
+@property (nonatomic, assign) BOOL supportsRevert;
 
 /** @taskunit History */
 
@@ -134,7 +134,7 @@ extern NSString * const kCOBranchLabel;
  *
  * For a cheap copy, the parent branch is never nil.
  */
-@property (strong, readonly, nonatomic) COBranch *parentBranch;
+@property (nonatomic, readonly) COBranch *parentBranch;
 /**
  * The revision at which the receiver was forked from the parent branch.
  *
@@ -142,7 +142,7 @@ extern NSString * const kCOBranchLabel;
  * created at the same time than its persistent root. The parent branch is also 
  * nil in this case.
  */
-@property (strong, readonly, nonatomic) CORevision *initialRevision;
+@property (nonatomic, readonly) CORevision *initialRevision;
 /**
  * The oldest revision in the entire branch history.
  *
@@ -168,7 +168,7 @@ extern NSString * const kCOBranchLabel;
  * an ancestor of the head revision, the head revision is also updated to the
  * given revision.
  */
-@property (readwrite, strong, nonatomic) CORevision *currentRevision;
+@property (nonatomic, strong) CORevision *currentRevision;
 /**
  * The revision bound to the most recent commit in the branch.
  *
@@ -176,7 +176,7 @@ extern NSString * const kCOBranchLabel;
  *
  * This is the same than <code>[[self nodes] lastObject]</code>.
  */
-@property (readonly, nonatomic) CORevision *headRevision;
+@property (nonatomic, readonly) CORevision *headRevision;
 
 - (void)reloadAtRevision: (CORevision *)revision;
 
@@ -187,15 +187,15 @@ extern NSString * const kCOBranchLabel;
 /**
  * The editing context owning the branch's persistent root
  */
-@property (weak, readonly, nonatomic) COEditingContext *editingContext;
+@property (nonatomic, readonly) COEditingContext *editingContext;
 /**
  * The persistent root owning the branch.
  */
-@property (weak, readonly, nonatomic) COPersistentRoot *persistentRoot;
+@property (nonatomic, readonly, weak) COPersistentRoot *persistentRoot;
 /**
  * The object graph context owned by the branch.
  */
-@property (readonly, nonatomic) COObjectGraphContext *objectGraphContext;
+@property (nonatomic, readonly, strong) COObjectGraphContext *objectGraphContext;
 /**
  * The root object of the object graph context owned by the branch.
  */
@@ -220,7 +220,7 @@ extern NSString * const kCOBranchLabel;
  *
  * Would be used to cause a "checkpoint" revision to be written.
  */
-@property (readwrite, nonatomic) BOOL shouldMakeEmptyCommit;
+@property (nonatomic, assign) BOOL shouldMakeEmptyCommit;
 
 
 
@@ -293,7 +293,7 @@ extern NSString * const kCOBranchLabel;
  * set. If it is set at commit time, records the _current revision_ of the
  * mergingBranch as the merge parent of the new commit.
  */
-@property (readwrite, nonatomic, strong) COBranch *mergingBranch;
+@property (nonatomic, strong) COBranch *mergingBranch;
 
 - (COMergeInfo *) mergeInfoForMergingBranch: (COBranch *)aBranch;
 

@@ -60,7 +60,7 @@
 /**
  * Returns a SQL representation that can be passed to the COStore API.
  */
-@property (nonatomic, strong, readonly) NSString *SQLString;
+@property (nonatomic, readonly, strong) NSString *SQLString;
 
 /** @taskunit Query Constraints */
 

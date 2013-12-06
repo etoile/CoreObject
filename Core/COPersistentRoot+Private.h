@@ -15,7 +15,7 @@
 
 /** @taskunit Framework Private */
 
-@property (nonatomic, readwrite) int64_t lastTransactionID;
+@property (nonatomic, assign) int64_t lastTransactionID;
 
 /**
  * <init />

@@ -13,7 +13,7 @@
 
 @interface COEditingContext ()
 
-@property (readwrite, nonatomic) BOOL isRecordingUndo;
+@property (nonatomic, assign) BOOL isRecordingUndo;
 
 /**
  * @taskunit Framework Private

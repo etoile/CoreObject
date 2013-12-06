@@ -18,7 +18,7 @@
  */
 @interface CORelationshipCache : NSObject
 {
-@private
+	@private
     NSMutableArray *_cachedRelationships;
     COObject *__weak _owner;
 }

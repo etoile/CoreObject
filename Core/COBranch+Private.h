@@ -29,6 +29,6 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 
 - (void)updateRevisions;
 
-@property (readwrite, nonatomic) CORevision *headRevision;
+@property (nonatomic) CORevision *headRevision;
 
 @end

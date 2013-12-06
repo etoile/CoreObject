@@ -132,14 +132,14 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @property (nonatomic, readonly) ETUUID *UUID;
 
-@property (nonatomic, readwrite, copy) NSDictionary *metadata;
+@property (nonatomic, copy) NSDictionary *metadata;
 /**
  * The persistent root deletion status.
  *
  * If the persistent root is marked as deleted, the deletion is committed to the 
  * store on the next editing context commit.
  */
-@property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
+@property (nonatomic, assign, getter=isDeleted) BOOL deleted;
 /**
  * The newest revision date among all branches.
  *
@@ -184,20 +184,20 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * Changing this value stages it for commit; upon the next -commit, the change 
  * is saved to disk and replicated to other applications.
  */
-@property (nonatomic, readwrite, strong) COBranch *currentBranch;
+@property (nonatomic, strong) COBranch *currentBranch;
 /**
  * All the branches owned by the persistent root (excluding those that are 
  * marked as deleted on disk), plus those pending insertion and undeletion (and 
  * minus those pending deletion).
  */
-@property (weak, nonatomic, readonly) NSSet *branches;
+@property (nonatomic, readonly) NSSet *branches;
 /**
  * All the branches marked as deleted on disk, excluding those that are pending 
  * undeletion.
  *
  * -branchesPendingDeletion are not included in the returned set.
  */
-@property (nonatomic, copy, readonly) NSSet *deletedBranches;
+@property (nonatomic, readonly) NSSet *deletedBranches;
 /**
  * Returns the branch using the given UUID or nil.
  *
@@ -222,13 +222,13 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * The parent context is managed by the user.
  */
-@property (weak, nonatomic, readonly) COEditingContext *parentContext;
+@property (nonatomic, readonly, weak) COEditingContext *parentContext;
 /**
  * Returns -parentContext.
  *
  * See also -[COPersistentObjectContext editingContext].
  */
-@property (weak, nonatomic, readonly) COEditingContext *editingContext;
+@property (nonatomic, readonly, weak) COEditingContext *editingContext;
 
 
 /** @taskunit Pending Changes */
@@ -237,19 +237,19 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /**
  * The new branches to be saved in the store on the next commit.
  */
-@property (nonatomic, copy, readonly) NSSet *branchesPendingInsertion;
+@property (nonatomic, readonly) NSSet *branchesPendingInsertion;
 /**
  * The branche to be deleted in the store on the next commit.
  */
-@property (nonatomic, copy, readonly) NSSet *branchesPendingDeletion;
+@property (nonatomic, readonly) NSSet *branchesPendingDeletion;
 /**
  * The branches to be undeleted in the store on the next commit.
  */
-@property (nonatomic, copy, readonly) NSSet *branchesPendingUndeletion;
+@property (nonatomic, readonly) NSSet *branchesPendingUndeletion;
 /**
  * The branches to be updated in the store on the next commit.
  */
-@property (nonatomic, copy, readonly) NSSet *branchesPendingUpdate;
+@property (nonatomic, readonly) NSSet *branchesPendingUpdate;
 /**
  * Returns whether the persistent root contains uncommitted changes.
  *
@@ -303,11 +303,11 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /**
  * Shorthand for [[self editingContext] store]
  */
-@property (weak, nonatomic, readonly) COSQLiteStore *store;
+@property (nonatomic, readonly) COSQLiteStore *store;
 /**
  * Returns the object graph for the edited branch
  */
-@property (weak, nonatomic, readonly) COObjectGraphContext *objectGraphContext;
+@property (nonatomic, readonly) COObjectGraphContext *objectGraphContext;
 @property (nonatomic, readonly) NSSet *allObjectGraphContexts;
 
 

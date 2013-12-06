@@ -112,13 +112,13 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * For a transient object graph context, returns nil.
  */
-@property (nonatomic, readonly) COBranch *branch;
+@property (nonatomic, readonly, weak) COBranch *branch;
 /**
  * The persistent root owning the branch.
  *
  * For a transient object graph context, returns nil.
  */
-@property (nonatomic, readonly)  COPersistentRoot *persistentRoot;
+@property (nonatomic, readonly, weak)  COPersistentRoot *persistentRoot;
 /**
  * The editing context owing the persistent root.
  *
