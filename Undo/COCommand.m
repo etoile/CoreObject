@@ -76,20 +76,19 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
 - (id) propertyList
 {
-    NSMutableDictionary *result = [NSMutableDictionary dictionary];
- 
-    NSString *resultType = nil;
     NSDictionary *typeToClass = [COCommand mapping];
     for (NSString *type in typeToClass)
     {
-        if ([self class] == [typeToClass objectForKey: type])
+        if ([self class] == typeToClass[type])
         {
-            resultType = type;
+			NSMutableDictionary *result = [NSMutableDictionary dictionary];
+			result[kCOCommandType] = type;
+			return result;
         }
     }
-    
-    [result setObject: resultType forKey: kCOCommandType];
-    return result;
+	
+	ETAssertUnreachable();
+    return nil;
 }
 
 - (COCommand *) inverse

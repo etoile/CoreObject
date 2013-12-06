@@ -70,10 +70,6 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-- (COCrossPersistentRootReferenceCache *) crossReferenceCache;
 
 - (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid persistentRootUUID: (ETUUID *)aPersistentRoot;
 

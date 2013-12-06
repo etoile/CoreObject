@@ -128,11 +128,6 @@
 	return self;
 }
 
-- (COCrossPersistentRootReferenceCache *) crossReferenceCache
-{
-    return _crossRefCache;
-}
-
 - (NSSet *)persistentRoots
 {
 	return [NSSet setWithArray: [[_loadedPersistentRoots allValues] filteredCollectionWithBlock: ^(id obj) {

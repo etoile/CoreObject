@@ -14,7 +14,6 @@
 - (void) updateCachedOutgoingRelationshipsForOldValue: (id)oldVal
                                              newValue: (id)newVal
                             ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
-- (void) addCachedOutgoingRelationships;
 - (void) removeCachedOutgoingRelationships;
 
 @end

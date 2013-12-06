@@ -108,20 +108,6 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
     }
 }
 
-- (void) addCachedOutgoingRelationships
-{
-    for (ETPropertyDescription *prop in [[self entityDescription] propertyDescriptions])
-    {
-        if (isPersistentCoreObjectReferencePropertyDescription(prop))
-        {
-            id value = [self valueForStorageKey: [prop name]];
-            
-            [self addCachedOutgoingRelationshipsForValue: value
-                               ofPropertyWithDescription: prop];
-        }
-    }
-}
-
 - (void) removeCachedOutgoingRelationships
 {
     for (ETPropertyDescription *prop in [[self entityDescription] propertyDescriptions])

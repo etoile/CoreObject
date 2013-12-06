@@ -709,7 +709,6 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     dispatch_sync(queue_, ^(){
         
         ETUUID *currBranch = nil;
-        ETUUID *backingUUID = nil;
         BOOL deleted = NO;
 		int64_t transactionID = -1;
         NSMutableDictionary *branchDict = [NSMutableDictionary dictionary];
@@ -718,16 +717,15 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         [db_ savepoint: @"persistentRootInfoForUUID"]; // N.B. The transaction is so the two SELECTs see the same DB. Needed?
 
         {
-            FMResultSet *rs = [db_ executeQuery: @"SELECT currentbranch, backingstore, deleted, transactionid, metadata FROM persistentroots WHERE uuid = ?", [aUUID dataValue]];
+            FMResultSet *rs = [db_ executeQuery: @"SELECT currentbranch, deleted, transactionid, metadata FROM persistentroots WHERE uuid = ?", [aUUID dataValue]];
             if ([rs next])
             {
                 currBranch = [rs dataForColumnIndex: 0] != nil
                     ? [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]
                     : nil;
-                backingUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
-                deleted = [rs boolForColumnIndex: 2];
-				transactionID = [rs int64ForColumnIndex: 3];
-				persistentRootMetadata = [self readMetadata: [rs dataForColumnIndex: 4]];
+                deleted = [rs boolForColumnIndex: 1];
+				transactionID = [rs int64ForColumnIndex: 2];
+				persistentRootMetadata = [self readMetadata: [rs dataForColumnIndex: 3]];
             }
             else
             {

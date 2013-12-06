@@ -12,7 +12,7 @@
 
 @class COPersistentRoot, COEditingContext, COObjectGraphContext;
 @class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo, COPath;
-@class COCrossPersistentRootReferenceCache, COUndoStackStore, COCommandGroup;
+@class COUndoStackStore, COCommandGroup;
 @class COUndoTrack, CORevisionCache;
 
 // I'm skeptical that there is ever a legitimate case where code is working
@@ -99,7 +99,6 @@
 	NSMutableSet *_persistentRootsPendingDeletion;
     /** Set of persistent roots pending undeletion */
 	NSMutableSet *_persistentRootsPendingUndeletion;
-    COCrossPersistentRootReferenceCache *_crossRefCache;
     /** Undo */
     BOOL _isRecordingUndo;
     COCommandGroup *_currentEditGroup;
