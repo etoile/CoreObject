@@ -35,7 +35,7 @@
 	
 	for (COSearchResult *result in results)
 	{
-		[(NSMutableArray *)searchResults addObject: [result.persistentRoot stringValue]];
+		[(NSMutableArray *)searchResults addObject: [NSString stringWithFormat: @"Revision %@, persistent root %@", result.revision, result.persistentRoot]];
 	}
 	
 	[table reloadData];

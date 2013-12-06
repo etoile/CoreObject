@@ -217,7 +217,7 @@
 - (IBAction)checkDefaultBranch: (id)sender
 {
 	[_persistentRoot setCurrentBranch: self.editingBranch];
-	[_persistentRoot commit];
+	[self.editingContext commitWithUndoTrack: self.undoTrack];
 }
 
 - (void) objectGraphDidChange
