@@ -126,12 +126,8 @@ Future Work
     for both, IMO (Eric)
 
   - Use NSOrderedSet for relationships
-
-  - Check COObject KVO semantics and documentation.
     
   - Throw an exception if the developer names a property that conflicts with a NSObject/COObject method
-  
-  - Check the set of properties declared by COObject makes sense and isn't too much / too little
 
   - Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
 
@@ -149,6 +145,7 @@ Future Work
 
   - Make primitives with potentially mutable subclasses (NSString and NSData)
     have immutable copies made before being stored in the variable storage.
+
 
 - COItem
 
@@ -198,6 +195,7 @@ Future Work
   - For collection metamodel assertions, check all collection metamodel attributes (isKeyed, isOrdered, isMultivalued) and document we should update these assertions if we add more collection attributes to the metamodel:
   
 		NSAssert([aPropertyDesc isKeyed] && [aPropertyDesc isMultivalued], @"Serialization type doesn't match metamodel");
+
 
 - Utilities
 
