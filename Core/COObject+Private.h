@@ -65,6 +65,49 @@
  */
 - (void)setValue: (id)value forStorageKey: (NSString *)key;
 /**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Checks the collection to mutate, and the indexes that goes along, both 
+ * respect the metamodel constraints.
+ *
+ * On success, returns the collection, otherwise raises an exception.
+ */
+- (id)collectionForProperty: (NSString *)key mutationIndexes: (NSIndexSet *)indexes;
+/** 
+ * This method is only exposed to be used internally by COObject e.g. 
+ * -updateCompositeRelationshipForPropertyDescription: (don't use in subclasses).
+ *
+ * Checks the insertion and the object that goes along respect the metamodel 
+ * constraints, then calls 
+ * -willChangeValueForProperty:atIndexes:withObjects:mutationKind:, then 
+ * -insertObjects:atIndexes:hints: on the collection 
+ * bound to the property, and 
+ * -didChangeValueForProperty:atIndexes:withObjects:mutationKind:.
+ *
+ * See also ETCollectionMutation. 
+ */
+- (void) insertObjects: (NSArray *)objects
+             atIndexes: (NSIndexSet *)indexes
+                 hints: (NSArray *)hints
+           forProperty: (NSString *)key;
+/** 
+ * This method is only exposed to be used internally by COObject e.g. 
+ * -updateCompositeRelationshipForPropertyDescription: (don't use in subclasses).
+ *
+ * Checks the removal and the object that goes along respect the metamodel 
+ * constraints, then calls 
+ * -willChangeValueForProperty:atIndexes:withObjects:mutationKind:, then 
+ * -removeObjects:atIndexes:hints: on the collection 
+ * bound to the property, and 
+ * -didChangeValueForProperty:atIndexes:withObjects:mutationKind:.
+ *
+ * See also ETCollectionMutation. 
+ */
+- (void) removeObjects: (NSArray *)objects
+             atIndexes: (NSIndexSet *)indexes
+                 hints: (NSArray *)hints
+           forProperty: (NSString *)key;
+/**
  * This method is only exposed to be used in the CoreObject tests.
  */
 - (NSSet *) referringObjects;

@@ -1177,8 +1177,6 @@ See +[NSObject typePrefix]. */
 
 - (void) insertObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints forProperty: (NSString *)key
 {
-	// NOTE: We validate the entire collection in -commonDidChangeValueForProperty:
-	// We could possibly validate just the inserted objects here.
 	id collection = [self collectionForProperty: key mutationIndexes: indexes];
 
 	[self willChangeValueForProperty: key
@@ -1196,8 +1194,6 @@ See +[NSObject typePrefix]. */
 
 - (void) removeObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints forProperty: (NSString *)key
 {
-	// NOTE: We validate the entire collection in -commonDidChangeValueForProperty:
-	// We could possibly validate just the removed objects here.
 	id collection = [self collectionForProperty: key mutationIndexes: indexes];
 
 	[self willChangeValueForProperty: key

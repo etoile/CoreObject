@@ -635,12 +635,6 @@
                      mutationKind: (ETCollectionMutationKind)mutationKind;
 
 
-/** @taskunit Collection Mutation with Integrity Check */
-
-- (id)collectionForProperty: (NSString *)key mutationIndexes: (NSIndexSet *)indexes;
-- (void) insertObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints forProperty: (NSString *)key;
-- (void) removeObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints forProperty: (NSString *)key;
-
 /** @taskunit Overridable Loading Notifications */
 
 

@@ -8,6 +8,7 @@
 
 #import "COCollection.h"
 #import "COEditingContext.h"
+#import "COObject+Private.h"
 #import "COPersistentRoot.h"
 
 #pragma GCC diagnostic ignored "-Wprotocol"
@@ -100,14 +101,36 @@
 
 - (void) insertObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints
 {
-	[self insertObjects: objects atIndexes: indexes hints: hints forProperty: [self contentKey]];
-	[self didUpdate];
+	id collection = [self collectionForProperty: [self contentKey] mutationIndexes: indexes];
+
+	[self willChangeValueForProperty: [self contentKey]
+	                       atIndexes: indexes
+	                     withObjects: objects
+	                    mutationKind: ETCollectionMutationKindInsertion];
+
+	[collection insertObjects: objects atIndexes: indexes hints: hints];
+
+	[self didChangeValueForProperty: [self contentKey]
+	                      atIndexes: indexes
+	                    withObjects: objects
+	                   mutationKind: ETCollectionMutationKindInsertion];
 }
 
 - (void) removeObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints
 {
-	[self removeObjects: objects atIndexes: indexes hints: hints forProperty: [self contentKey]];
-	[self didUpdate];
+	id collection = [self collectionForProperty: [self contentKey] mutationIndexes: indexes];
+
+	[self willChangeValueForProperty: [self contentKey]
+	                       atIndexes: indexes
+	                     withObjects: objects
+	                    mutationKind: ETCollectionMutationKindRemoval];
+
+	[collection removeObjects: objects atIndexes: indexes hints: hints];
+
+	[self didChangeValueForProperty: [self contentKey]
+	                      atIndexes: indexes
+	                    withObjects: objects
+	                   mutationKind: ETCollectionMutationKindRemoval];
 }
 
 - (id)objectForIdentifier: (NSString *)anId

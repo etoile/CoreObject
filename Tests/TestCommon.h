@@ -167,23 +167,11 @@ extern NSString * const kCOParent;
 
 @interface COObject (TestCommon)
 /** 
- * Checks the insertion and the object that goes along respect the metamodel 
- * constraints, then calls -insertObject:atIndex:hint: on the collection bound 
- * to the property.<br />
- * Finally if the property is a relationship, this method updates the 
- * relationship consistency.
- *
- * See also ETCollectionMutation.
+ * Simple wrapper around -insertObjects:atIndexes:hints:forProperty:.
  */
 - (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
 /** 
- * Checks the insertion and the object that goes along respect the metamodel 
- * constraints, then calls -removeObject:atIndex:hint: on the collection bound 
- * to the property.<br />
- * Finally if the property is a relationship, this method updates the 
- * relationship consistency.
- *
- * See also ETCollectionMutation. 
+ * Simple wrapper around -removeObjects:atIndexes:hints:forProperty:.
  */
 - (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
 @end
