@@ -7,7 +7,6 @@
 
 typedef enum {
     co_reader_expect_object_uuid,
-    co_reader_expect_object_schemaname,
     co_reader_expect_property,
     co_reader_expect_type,
     co_reader_expect_value,
@@ -18,7 +17,6 @@ typedef enum {
 {
 @public
     ETUUID *uuid;
-    NSString *schemaName;
     NSMutableDictionary *values;
     NSMutableDictionary *types;
     NSString *currentProperty;
@@ -209,7 +207,6 @@ static void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buffer_t *
     co_buffer_t buf;
     co_buffer_init(&buf);
     co_buffer_store_uuid(&buf, [self UUID]);
-    co_buffer_store_string(&buf, [self schemaName]);
     co_buffer_begin_object(&buf);
     
 	// TODO: For safety we should probaly serialize the attribute names to UTF-8 and compare
@@ -308,10 +305,6 @@ static void co_read_string(void *ctx, NSString *val)
             state->currentProperty =  val;
             state->state = co_reader_expect_type;
             break;
-        case co_reader_expect_object_schemaname:
-            state->schemaName =  val;
-            state->state = co_reader_expect_property;
-            break;
         default:
             state->state = co_reader_error;
             break;
@@ -328,7 +321,7 @@ static void co_read_uuid(void *ctx, ETUUID *uuid)
             break;
         case co_reader_expect_object_uuid:
             state->uuid =  uuid;
-            state->state = co_reader_expect_object_schemaname;
+            state->state = co_reader_expect_property;
             break;
         default:
             state->state = co_reader_error;
@@ -404,10 +397,6 @@ static void co_read_null(void *ctx)
         case co_reader_expect_value:
             co_read_object_value(state, NSNullCached);
             break;            
-        case co_reader_expect_object_schemaname:
-            state->schemaName =  nil;
-            state->state = co_reader_expect_property;
-            break;
         default:
             state->state = co_reader_error;
             break;
@@ -439,7 +428,6 @@ static void co_read_null(void *ctx)
     uuid =  state->uuid;
     types =  state->types;
     values =  state->values;
-    schemaName =  state->schemaName;
     
     return self;
 }

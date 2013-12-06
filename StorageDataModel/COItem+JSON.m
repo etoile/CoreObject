@@ -162,10 +162,6 @@ static id importValueFromPlist(id aPlist)
                                  [uuid stringValue], @"uuid",
                                  nil];
     
-    if (self.schemaName != nil) {
-        [dict setObject: self.schemaName forKey: @"schema"];
-    }
-    
     return dict;
 }
 
@@ -189,8 +185,6 @@ static id importValueFromPlist(id aPlist)
 	self = [self initWithUUID: aUUID
 		   typesForAttributes: importedTypes
 		  valuesForAttributes: importedValues];
-    
-    self.schemaName = [aPlist objectForKey: @"schema"];
     
     return self;
 }

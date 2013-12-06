@@ -45,8 +45,6 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 
 @implementation COItem
 
-@synthesize schemaName;
-
 - (id) initWithUUID: (ETUUID *)aUUID
  typesForAttributes: (NSDictionary *)typesForAttributes
 valuesForAttributes: (NSDictionary *)valuesForAttributes
@@ -116,8 +114,6 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	if (![otherItem->uuid isEqual: uuid]) return NO;
 	if (![otherItem->types isEqual: types]) return NO;
 	if (![otherItem->values isEqual: values]) return NO;
-    if (!(otherItem->schemaName == nil && schemaName == nil)
-        && ![otherItem->schemaName isEqual: schemaName]) return NO;
 	return YES;
 }
 

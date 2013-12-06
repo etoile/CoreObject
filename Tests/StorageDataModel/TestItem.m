@@ -220,20 +220,6 @@
     return [[COMutableItem alloc] initWithData: [anItem dataValue]];
 }
 
-- (void) testSchemaName
-{
-    COMutableItem *i1 = [COMutableItem item];
-	i1.schemaName = nil;
-
-    UKNil([[self roundTrip: i1] schemaName]);
-    
-    i1.schemaName = @"";
-    UKObjectsEqual(@"", [[self roundTrip: i1] schemaName]);
-    
-    i1.schemaName = @"x";
-    UKObjectsEqual(@"x", [[self roundTrip: i1] schemaName]);
-}
-
 - (void) testMutability
 {	
 	COItem *immutable = [COItem itemWithTypesForAttributes: D(@(kCOTypeString | kCOTypeSet), @"key1",
