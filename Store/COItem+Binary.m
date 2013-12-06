@@ -99,7 +99,43 @@ static void writePrimitiveValue(co_buffer_t *dest, id aValue, COType aType)
     }
 }
 
-static void writeValue(co_buffer_t *dest, id aValue, COType aType)
+/**
+ * Returns an integer less than, equal to, or greater than one if
+ * the bytes pointed to by tokenA are considered less than, equal to, or greater than
+ * the bytes pointed to by tokenB.
+ */
+static int comparePointersToBinaryWriterTokens(const void *ptrA, const void *ptrB)
+{
+	const unsigned char **tokenA = (const unsigned char **)ptrA;
+	const unsigned char **tokenB = (const unsigned char **)ptrB;
+	
+	size_t tokenALength = co_reader_length_of_token(*tokenA);
+	size_t tokenBLength = co_reader_length_of_token(*tokenB);
+	assert(tokenALength > 0 && tokenBLength > 0);
+
+	if (tokenALength < tokenBLength)
+	{
+		return -1;
+	}
+	else if (tokenALength == tokenBLength)
+	{
+		/*
+		 From RFC 3629 (UTF-8):
+		 
+		 The byte-value lexicographic sorting order of UTF-8 strings is the
+		 same as if ordered by character numbers.  Of course this is of
+		 limited interest since a sort order based on character numbers is
+		 almost never culturally valid.
+		 */
+		return memcmp(*tokenA, *tokenB, tokenALength);
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+static void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buffer_t *temp)
 {
     if (COTypeIsPrimitive(aType))
     {
@@ -108,30 +144,87 @@ static void writeValue(co_buffer_t *dest, id aValue, COType aType)
     else
     {
         co_buffer_begin_array(dest);
-        for (id obj in aValue)
-        {
-            writePrimitiveValue(dest, obj, aType);
-        }
+				
+		if ([aValue isKindOfClass: [NSArray class]])
+		{
+			for (id obj in aValue)
+			{
+				writePrimitiveValue(dest, obj, aType);
+			}
+		}
+		else if ([aValue isKindOfClass: [NSSet class]])
+		{
+			const size_t setCount = [aValue count];
+			
+			// We need to sort the serialized values since NSSet has no order.
+			
+			co_buffer_clear(temp);
+
+			const unsigned char **tokenPointers = malloc(sizeof(const unsigned char *) * setCount);
+			
+			// First, write each primitive value to the temporary byte buffer 'temp',
+			// also storing the pointer to the start of each token in the tokenPointers array
+			{
+				size_t i = 0;
+				for (id obj in aValue)
+				{
+					tokenPointers[i++] = co_buffer_get_data(temp) + co_buffer_get_length(temp);
+					
+					writePrimitiveValue(temp, obj, aType);
+				}
+			}
+			
+			// Sort the tokenPointers using a simple comparison function that
+			// uses the length of the token and the byte-for-byte values of the tokens
+			
+			qsort(tokenPointers, setCount, sizeof(const unsigned char *), comparePointersToBinaryWriterTokens);
+			
+			// Copy the sorted tokens into the dest buffer
+			
+			for (size_t i=0; i<setCount; i++)
+			{
+				const unsigned char *tokenPointer = tokenPointers[i];
+				const size_t tokenLength = co_reader_length_of_token(tokenPointer);
+				
+				co_buffer_write(dest, tokenPointer, tokenLength);
+			}
+			
+			free(tokenPointers);
+		}
+		else
+		{
+			assert(0);
+		}
+		
         co_buffer_end_array(dest);
     }
 }
 
 - (NSData *) dataValue
 {
+	/** Parts of the serialization process need temporary storage */
+	co_buffer_t temp;
+	co_buffer_init(&temp);
+	
     co_buffer_t buf;
     co_buffer_init(&buf);
     co_buffer_store_uuid(&buf, [self UUID]);
     co_buffer_store_string(&buf, [self schemaName]);
     co_buffer_begin_object(&buf);
     
-    for (NSString *prop in [self attributeNames])
+	// TODO: For safety we should probaly serialize the attribute names to UTF-8 and compare
+	// them there. Although, I believe compare: should be the same as comparing Unicode character numbers
+	// which is the same as comparing UTF-8 byte sequences (mentiomed in the RFC.)
+	NSArray *propsSorted = [[self attributeNames] sortedArrayUsingSelector: @selector(compare:)];
+	
+    for (NSString *prop in propsSorted)
     {
         COType type = [self typeForAttribute: prop];
         id val = [self valueForAttribute: prop];
         
         co_buffer_store_string(&buf, prop);
         co_buffer_store_integer(&buf, type);
-        writeValue(&buf, val, type);
+        writeValue(&buf, val, type, &temp);
     }
 
     co_buffer_end_object(&buf);

@@ -27,6 +27,43 @@ static inline uint64_t readUint64(const unsigned char *bytes)
     return NSSwapBigLongLongToHost(unswapped);
 }
 
+size_t co_reader_length_of_token(const unsigned char *bytes)
+{
+	const char type = bytes[0];
+	
+	switch (type)
+	{
+		case 'B':
+			return 2;
+		case 'i':
+			return 3;
+		case 'I':
+			return 5;
+		case 'L':
+		case 'F':
+			return 9;
+		case 's':
+			return 2 + readUint8(&bytes[1]);
+		case 'S':
+			return 5 + readUint32(&bytes[1]);
+		case 'd':
+			return 2 + readUint8(&bytes[1]);
+		case 'D':
+		case '#':
+			return 17;
+		case '{':
+		case '}':
+		case '[':
+		case ']':
+		case '0':
+			return 1;
+		default:
+			[NSException raise: NSGenericException
+						format: @"unknown type '%c'", type];
+	}
+	return 0;
+}
+
 void co_reader_read(const unsigned char *bytes, size_t length, void *context, co_reader_callback_t callbacks)
 {
     size_t pos = 0;

@@ -26,6 +26,13 @@ co_buffer_init(co_buffer_t *dest)
 
 static inline
 void
+co_buffer_clear(co_buffer_t *dest)
+{
+    dest->length = 0;
+}
+
+static inline
+void
 co_buffer_free(co_buffer_t *dest)
 {
     free(dest->data);

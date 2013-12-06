@@ -16,3 +16,9 @@ typedef struct {
 } co_reader_callback_t;
 
 void co_reader_read(const unsigned char *bytes, size_t length, void *context, co_reader_callback_t callbacks);
+
+/**
+ * given a pointer to the start of a token, returns the length of that token
+ * in bytes.
+ */
+size_t co_reader_length_of_token(const unsigned char *bytes);
