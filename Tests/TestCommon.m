@@ -243,3 +243,29 @@ NSString * const kCOParent = @"parentContainer";
 }
 
 @end
+
+@implementation COObject (TestCommon)
+
+- (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+{
+	NSIndexSet *indexes =
+		(index != ETUndeterminedIndex ? [NSIndexSet indexSetWithIndex: index] : [NSIndexSet indexSet]);
+	
+	[self insertObjects: (object != nil ? A(object) : [NSArray array])
+	          atIndexes: indexes
+	              hints: (hint != nil ? A(hint) : nil)
+	        forProperty: key];
+}
+
+- (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+{
+	NSIndexSet *indexes =
+		(index != ETUndeterminedIndex ? [NSIndexSet indexSetWithIndex: index] : [NSIndexSet indexSet]);
+	
+	[self removeObjects: (object != nil ? A(object) : [NSArray array])
+	          atIndexes: indexes
+	              hints: (hint != nil ? A(hint) : nil)
+	        forProperty: key];
+}
+
+@end

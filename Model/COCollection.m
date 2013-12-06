@@ -98,15 +98,15 @@
 	return [self valueForProperty: [self contentKey]];
 }
 
-- (void) insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
+- (void) insertObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints
 {
-	[self insertObject: object atIndex: index hint: hint forProperty: [self contentKey]];
+	[self insertObjects: objects atIndexes: indexes hints: hints forProperty: [self contentKey]];
 	[self didUpdate];
 }
 
-- (void) removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
+- (void) removeObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints
 {
-	[self removeObject: object atIndex: index hint: hint forProperty: [self contentKey]];
+	[self removeObjects: objects atIndexes: indexes hints: hints forProperty: [self contentKey]];
 	[self didUpdate];
 }
 

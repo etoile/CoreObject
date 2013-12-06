@@ -838,7 +838,7 @@ See +[NSObject typePrefix]. */
 	                                             value: oldValueSnapshot]];
 }
 
-- (void)willChangeValueForProperty: (NSString *)key
+- (void)commonWillChangeValueForProperty: (NSString *)key
 {
 	ETPropertyDescription *propertyDesc =
 		[_entityDescription propertyDescriptionForName: key];
@@ -852,6 +852,30 @@ See +[NSObject typePrefix]. */
 	}
 
 	[super willChangeValueForKey: key];
+}
+
+- (void)willChangeValueForProperty: (NSString *)key
+{
+	[self commonWillChangeValueForProperty: key];
+	[super willChangeValueForKey: key];
+}
+
+- (void)willChangeValueForProperty: (NSString *)property
+                         atIndexes: (NSIndexSet *)indexes
+                       withObjects: (NSArray *)objects
+                      mutationKind: (ETCollectionMutationKind)mutationKind
+{
+	[self commonWillChangeValueForProperty: property];
+	[self willChangeValueForKey: property atIndexes: indexes withObjects: objects mutationKind: mutationKind];
+}
+
+- (void)didChangeValueForProperty: (NSString *)property
+                        atIndexes: (NSIndexSet *)indexes
+                      withObjects: (NSArray *)objects
+                     mutationKind: (ETCollectionMutationKind)mutationKind
+{
+	[self commonDidChangeValueForProperty: property];
+	[self didChangeValueForKey: property atIndexes: indexes withObjects: objects mutationKind: mutationKind];
 }
 
 - (void) markAsUpdatedIfNeededForProperty: (NSString*)prop
@@ -1030,10 +1054,11 @@ See +[NSObject typePrefix]. */
 			if (alreadyRemoved)
 				continue;
 
-			[oldParent removeObject: child
-							atIndex: ETUndeterminedIndex
-							   hint: nil
-						forProperty: key];
+			// NOTE: A KVO notification must be posted.
+			[oldParent removeObjects: A(child)
+			               atIndexes: [NSIndexSet indexSet]
+			                   hints: [NSArray array]
+						 forProperty: key];
 		}
 		else
 		{
@@ -1066,7 +1091,7 @@ See +[NSObject typePrefix]. */
 	return [pair value];
 }
 
-- (void)didChangeValueForProperty: (NSString *)key
+- (void)commonDidChangeValueForProperty: (NSString *)key
 {
 	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
 	id newValue = [self valueForStorageKey: key];
@@ -1099,12 +1124,18 @@ See +[NSObject typePrefix]. */
                              ofPropertyWithDescription: propertyDesc];
 
 	[self markAsUpdatedIfNeededForProperty: key];	
+
+}
+
+- (void)didChangeValueForProperty: (NSString *)key
+{
+	[self commonDidChangeValueForProperty: key];
 	[super didChangeValueForKey: key];
 }
 
 #pragma mark - Collection Mutation with Integrity Check
 
-- (id)collectionForProperty: (NSString *)key mutationIndex: (NSInteger)index
+- (id)collectionForProperty: (NSString *)key mutationIndexes: (NSIndexSet *)indexes
 {
 	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
 	id collection = [self valueForStorageKey: key];
@@ -1119,7 +1150,7 @@ See +[NSObject typePrefix]. */
 		                    desc, self, [collection class], expectedCollectionClass];
 	}
 
-	if (index == ETUndeterminedIndex)
+	if ([indexes isEmpty])
 	{
 		if (![desc isMultivalued])
 		{
@@ -1144,26 +1175,42 @@ See +[NSObject typePrefix]. */
 	return collection;
 }
 
-- (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+- (void) insertObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints forProperty: (NSString *)key
 {
-	// NOTE: We validate the entire collection in -didChangeValueForProperty:
+	// NOTE: We validate the entire collection in -commonDidChangeValueForProperty:
 	// We could possibly validate just the inserted objects here.
-	id collection = [self collectionForProperty: key mutationIndex: index];
+	id collection = [self collectionForProperty: key mutationIndexes: indexes];
 
-	[self willChangeValueForProperty: key];
-	[collection insertObject: object atIndex: index hint: hint];
-	[self didChangeValueForProperty: key];
+	[self willChangeValueForProperty: key
+	                       atIndexes: indexes
+	                     withObjects: objects
+	                    mutationKind: ETCollectionMutationKindInsertion];
+
+	[collection insertObjects: objects atIndexes: indexes hints: hints];
+
+	[self didChangeValueForProperty: key
+	                      atIndexes: indexes
+	                    withObjects: objects
+	                   mutationKind: ETCollectionMutationKindInsertion];
 }
 
-- (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+- (void) removeObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints forProperty: (NSString *)key
 {
-	// NOTE: We validate the entire collection in -didChangeValueForProperty
+	// NOTE: We validate the entire collection in -commonDidChangeValueForProperty:
 	// We could possibly validate just the removed objects here.
-	id collection = [self collectionForProperty: key mutationIndex: index];
+	id collection = [self collectionForProperty: key mutationIndexes: indexes];
 
-	[self willChangeValueForProperty: key];
-	[collection removeObject: object atIndex: index hint: hint];
-	[self didChangeValueForProperty: key];
+	[self willChangeValueForProperty: key
+	                       atIndexes: indexes
+	                     withObjects: objects
+	                    mutationKind: ETCollectionMutationKindRemoval];
+
+	[collection removeObjects: objects atIndexes: indexes hints: hints];
+
+	[self didChangeValueForProperty: key
+	                      atIndexes: indexes
+	                    withObjects: objects
+	                   mutationKind: ETCollectionMutationKindRemoval];
 }
 
 - (void) validateMultivaluedPropertiesUsingMetamodel

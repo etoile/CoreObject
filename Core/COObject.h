@@ -115,35 +115,77 @@
  * The example below is based on a COObject subclass using a<em>names</em> 
  * instance variable. If the value is stored in the variable storage, the 
  * example must be adjusted to use -valueForVariableStorageKey: and 
- * -setValue:forVariableStorageKey:.<br />
- * -removeObject:atIndex:hint:forProperty: and 
- * -insertObject:atIndex:hint:forProperty: use the instance variable whose 
- * name matches the property (based on Key-Value Coding ivar search rules), or 
- * resort the variable storage when there is no matching ivar.
+ * -setValue:forVariableStorageKey:.
  *
  * <example>
  *
  * - (void)names
  * {
- *     return names;
+ *     // The synthesized accessor would just do the same.
+ *     return [names copy];
  * }
  *
  * - (void)addName: (NSString *)aName
  * {
- *     [self insertObject: aName: atIndex: ETUndeterminedIndex hint: nil forProperty: @"names"];
+ *     NSArray *insertedObjects = A(aName);
+ *     NSIndexSet *insertionIndexes = [NSIndexSet indexSet];
+ *
+ *     [self willChangeValueForProperty: key
+ *	                          atIndexes: insertionIndexes
+ *                          withObjects: insertedObjects
+ *                         mutationKind: ETCollectionMutationKindInsertion];
+ *
+ *     // You can update the collection in whatever you want, the synthesized 
+ *     // accessors would just use ETCollectionMutation methods.
+ *     [names addObject: aName];
+ *
+ *     [self didChangeValueForProperty: key
+ *                           atIndexes: insertionIndexes
+ *                         withObjects: insertedObjects
+ *                        mutationKind: ETCollectionMutationKindInsertion];
  * }
  *
  * - (void)removeName: (NSString *)aName
  * {
- *     [self removeObject: aName: atIndex: ETUndeterminedIndex hint: nil forProperty: @"names"];
+ *     NSArray *removedObjects = A(aName);
+ *     NSIndexSet *removalIndexes = [NSIndexSet indexSet];
+ *
+ *     [self willChangeValueForProperty: key
+ *	                          atIndexes: removalIndexes
+ *                          withObjects: removedObjects
+ *                         mutationKind: ETCollectionMutationKindRemoval];
+ *
+ *     // You can update the collection in whatever you want, the synthesized 
+ *     // accessors would just use ETCollectionMutation methods.
+ *     [names removeObject: aName];
+ *
+ *     [self didChangeValueForProperty: key
+ *                           atIndexes: removalIndexes
+ *                         withObjects: removedObjects
+ *                        mutationKind: ETCollectionMutationKindRemoval];
  * }
  *
  * // Direct setters are rare, but nonetheless it is possible to write one as below...
  * - (void)setNames: (id <ETCollection>)newNames
  * {
- *     [self willChangeValueForProperty: @"names"];
- *     names =  newNames;
- *     [self didChangeValueForProperty: @"names"];
+ *     NSArray *replacementObjects = A(aName);
+ *     // If no indexes are provided, the entire collection is replaced or set.
+ *     NSIndexSet *replacementIndexes = [NSIndexSet indexSet];
+ *
+ *     [self willChangeValueForProperty: key
+ *	                          atIndexes: replacementIndexes
+ *                          withObjects: replacementObjects
+ *                         mutationKind: ETCollectionMutationKindReplacement];
+ *
+ *     // You can update the collection in whatever you want, the synthesized 
+ *     // accessor would just do the same or allocate a custom CoreObject
+ *     // primitive collections.
+ *     names = [newNames mutableCopy];
+ *
+ *     [self didChangeValueForProperty: key
+ *                           atIndexes: replacementIndexes
+ *                         withObjects: replacementObjects
+ *                        mutationKind: ETCollectionMutationKindReplacement];
  * }
  * </example>
  *
@@ -583,32 +625,21 @@
  * Can be overriden, but the superclass implementation must be called.
  */
 - (void)didChangeValueForProperty: (NSString *)key;
+- (void)willChangeValueForProperty: (NSString *)property
+                         atIndexes: (NSIndexSet *)indexes
+                       withObjects: (NSArray *)objects
+                      mutationKind: (ETCollectionMutationKind)mutationKind;
+- (void)didChangeValueForProperty: (NSString *)property
+                        atIndexes: (NSIndexSet *)indexes
+                      withObjects: (NSArray *)objects
+                     mutationKind: (ETCollectionMutationKind)mutationKind;
 
 
 /** @taskunit Collection Mutation with Integrity Check */
 
-
-/** 
- * Checks the insertion and the object that goes along respect the metamodel 
- * constraints, then calls -insertObject:atIndex:hint: on the collection bound 
- * to the property.<br />
- * Finally if the property is a relationship, this method updates the 
- * relationship consistency.
- *
- * See also ETCollectionMutation.
- */
-- (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
-/** 
- * Checks the insertion and the object that goes along respect the metamodel 
- * constraints, then calls -removeObject:atIndex:hint: on the collection bound 
- * to the property.<br />
- * Finally if the property is a relationship, this method updates the 
- * relationship consistency.
- *
- * See also ETCollectionMutation. 
- */
-- (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
-
+- (id)collectionForProperty: (NSString *)key mutationIndexes: (NSIndexSet *)indexes;
+- (void) insertObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints forProperty: (NSString *)key;
+- (void) removeObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints forProperty: (NSString *)key;
 
 /** @taskunit Overridable Loading Notifications */
 
