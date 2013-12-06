@@ -3,75 +3,30 @@
 
 @implementation DrawingController
 
-- (id)initWithDocument: (id)document isSharing: (BOOL)sharing;
+- (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
+											 windowID: (NSString*)windowID
 {
-	self = [super initWithWindowNibName: @"DrawingDocument"];
-	
-	if (!self) { return nil; }
-	
-	doc = document; // weak ref
-	isSharing = sharing;
-
+	self = [super initAsPrimaryWindowForPersistentRoot: aPersistentRoot
+											  windowID: windowID
+										 windowNibName: @"DrawingDocument"];
 	return self;
 }
 
-- (id)initWithDocument: (id)document
+- (instancetype) initPinnedToBranch: (COBranch *)aBranch
+						   windowID: (NSString*)windowID
 {
-	return [self initWithDocument:document isSharing: NO];
+	self = [super initPinnedToBranch: aBranch
+							windowID: windowID
+					   windowNibName: @"DrawingDocument"];
+	return self;
 }
-
 
 - (void)windowDidLoad
 {
-	if (!NSIsEmptyRect([doc screenRect]))
-	{
-		// Disable automatic positioning
-		[self setShouldCascadeWindows: NO];
-		[[self window] setFrame: [doc screenRect] display: NO];		
-	}
-	
-	
-	[[NSNotificationCenter defaultCenter] addObserver: self
-											 selector: @selector(windowFrameDidChange:)
-												 name: NSWindowDidMoveNotification 
-											   object: [self window]];
-	
-	[[NSNotificationCenter defaultCenter] addObserver: self
-											 selector: @selector(windowFrameDidChange:)
-												 name: NSWindowDidEndLiveResizeNotification 
-											   object: [self window]];	
-	
-	if ([doc documentName])
-	{
-		NSString *title;
-		if (isSharing)
-		{
-			title = @"Shared Doc";
-		}
-		else
-		{
-			title = [doc documentName];
-		}
-		[[self window] setTitle: title]; 
-	}
-	
+	[super windowDidLoad];
+
 	[graphicView setDrawingController: self];
 }
-
-- (void)windowFrameDidChange:(NSNotification*)notification
-{
-//	[doc setScreenRectValue: [[self window] frame]];
-//	
-//	assert([[doc objectContext] objectHasChanges: [doc uuid]]);
-//	assert([[doc valueForProperty: @"screenRect"] isEqual: NSStringFromRect([[self window] frame])]);
-//	
-//    [[[doc objectGraphContext] editingContext] commit];
-    
-//	[[doc objectContext] commitWithType: kCOTypeMinorEdit
-//		shortDescription: @"Move Window"
-//		 longDescription: [NSString stringWithFormat: @"Move to %@", NSStringFromRect([doc screenRectValue])]];	
-}
-
 
 - (void) setToolClass: (Class)class
 {
@@ -102,8 +57,6 @@
 	[self setToolClass: [SKTTextArea class]];
 }
 
-
-
 - (Class)currentGraphicClass
 {
 	return toolClass;
@@ -111,14 +64,14 @@
 
 - (SKTDrawDocument *)drawDocument
 {
-	SKTDrawDocument *drawDoc = (SKTDrawDocument *)[doc rootDocObject];
+	SKTDrawDocument *drawDoc = (SKTDrawDocument *)[[self projectDocument] rootDocObject];
 	assert([drawDoc isKindOfClass: [SKTDrawDocument class]]);
 	return drawDoc;
 }
 
 - (Document*)projectDocument
 {
-	return doc;
+	return [self.objectGraphContext rootObject];
 }
 
 @end

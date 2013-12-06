@@ -141,12 +141,12 @@
 	id wc = [[NSApp mainWindow] windowController];
 	if (wc != nil && [wc respondsToSelector: @selector(projectDocument)])
     {
-		Document *doc = [(OutlineController *)wc projectDocument];
+		EWDocumentWindowController *docWC = wc;
 
 		NSString *windowID = [[ETUUID UUID] stringValue];
 		
-		OutlineController *controller = [[OutlineController alloc] initPinnedToBranch: doc.branch
-																			 windowID: windowID];
+		EWDocumentWindowController *controller = [[[docWC class] alloc] initPinnedToBranch: docWC.editingBranch
+																				  windowID: windowID];
 		controllerForWindowID[windowID] = controller;
 		[controller showWindow: nil];
 	}
@@ -166,8 +166,16 @@
     
 	NSString *windowID = [[ETUUID UUID] stringValue];
 	
-	EWDocumentWindowController *controller = [[OutlineController alloc] initAsPrimaryWindowForPersistentRoot: aDoc.persistentRoot
-																									windowID: windowID];
+	NSDictionary *windowControllerClassForRootDocObjectClassName =
+		@{ NSStringFromClass([OutlineItem class]) : [OutlineController class],
+		   NSStringFromClass([SKTDrawDocument class]) : [DrawingController class] };
+	
+	NSString *rootDocObjectClassName = NSStringFromClass([aDoc.rootDocObject class]);
+	Class wcClass = windowControllerClassForRootDocObjectClassName[rootDocObjectClassName];
+	ETAssert([wcClass isSubclassOfClass: [EWDocumentWindowController class]]);
+	
+	EWDocumentWindowController *controller = [[wcClass alloc] initAsPrimaryWindowForPersistentRoot: aDoc.persistentRoot
+																						  windowID: windowID];
 	[controller showWindow: nil];
 
 	controllerForWindowID[windowID] = controller;

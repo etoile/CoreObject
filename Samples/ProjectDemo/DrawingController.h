@@ -1,5 +1,6 @@
 #import <Cocoa/Cocoa.h>
 #import "Document.h"
+#import "EWDocumentWindowController.h"
 
 #import "SKTLine.h"
 #import "SKTCircle.h"
@@ -8,10 +9,8 @@
 #import "SKTGraphicView.h"
 
 
-@interface DrawingController : NSWindowController
+@interface DrawingController : EWDocumentWindowController
 {
-	Document *doc; // weak ref
-	BOOL isSharing;
 	Class toolClass;
 	IBOutlet SKTGraphicView *graphicView;
 }
