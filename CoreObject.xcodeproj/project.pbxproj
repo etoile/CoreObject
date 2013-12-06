@@ -233,6 +233,7 @@
 		6699DDB2184888050003E803 /* TestUnorderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDB1184888050003E803 /* TestUnorderedRelationship.m */; };
 		669FD4F3184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h in Headers */ = {isa = PBXBuildFile; fileRef = 669FD4F1184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h */; };
 		669FD4F4184E7B5F006EE103 /* COObjectGraphContext+Graphviz.m in Sources */ = {isa = PBXBuildFile; fileRef = 669FD4F2184E7B5F006EE103 /* COObjectGraphContext+Graphviz.m */; };
+		66BBB3BC18516ABC005430B1 /* TestItemStableSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BBB3BB18516ABC005430B1 /* TestItemStableSerialization.m */; };
 		66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66C3670C17B5F9B0009ACF2F /* COBranchInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3670A17B5F9AF009ACF2F /* COBranchInfo.m */; };
@@ -705,6 +706,7 @@
 		6699DDB1184888050003E803 /* TestUnorderedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnorderedRelationship.m; sourceTree = "<group>"; };
 		669FD4F1184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Graphviz.h"; path = "Core/COObjectGraphContext+Graphviz.h"; sourceTree = "<group>"; };
 		669FD4F2184E7B5F006EE103 /* COObjectGraphContext+Graphviz.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObjectGraphContext+Graphviz.m"; path = "Core/COObjectGraphContext+Graphviz.m"; sourceTree = "<group>"; };
+		66BBB3BB18516ABC005430B1 /* TestItemStableSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestItemStableSerialization.m; sourceTree = "<group>"; };
 		66C3669E17B426C0009ACF2F /* Typewriter-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = "Typewriter-Info.plist"; path = "Samples/Typewriter/Typewriter-Info.plist"; sourceTree = "<group>"; };
 		66C366A017B426C0009ACF2F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		66C366A217B426C0009ACF2F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Samples/Typewriter/main.m; sourceTree = SOURCE_ROOT; };
@@ -1345,6 +1347,7 @@
 		66E40D3F1836D08D00E5B4A7 /* StorageDataModel */ = {
 			isa = PBXGroup;
 			children = (
+				66BBB3BB18516ABC005430B1 /* TestItemStableSerialization.m */,
 				66E40D401836D08D00E5B4A7 /* TestItem.m */,
 			);
 			name = StorageDataModel;
@@ -2009,6 +2012,7 @@
 				66E40D791836D08E00E5B4A7 /* TestUndoStackStore.m in Sources */,
 				66E40D611836D08D00E5B4A7 /* TestObject.m in Sources */,
 				66E40D6C1836D08D00E5B4A7 /* TestSQLiteStore.m in Sources */,
+				66BBB3BC18516ABC005430B1 /* TestItemStableSerialization.m in Sources */,
 				6610116A184D8CA6001A3E24 /* UnorderedGroupWithOpposite.m in Sources */,
 				66E40D5B1836D08D00E5B4A7 /* TestCopierWithIsShared.m in Sources */,
 				66E40D6F1836D08D00E5B4A7 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
