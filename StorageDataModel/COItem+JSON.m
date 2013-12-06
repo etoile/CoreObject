@@ -39,7 +39,7 @@ static id plistValueForPrimitiveValue(id aValue, COType aType)
 
 static id plistValueForValue(id aValue, COType aType)
 {
-    if (COTypeIsPrimitive(aType))
+    if (COTypeIsUnivalued(aType))
     {
         return plistValueForPrimitiveValue(aValue, aType);
     }
@@ -103,7 +103,7 @@ static id valueForPrimitivePlistValue(id aValue, COType aType)
 
 static id valueForPlistValue(id aValue, COType aType)
 {
-    if (COTypeIsPrimitive(aType))
+    if (COTypeIsUnivalued(aType))
     {
         return valueForPrimitivePlistValue(aValue, aType);
     }

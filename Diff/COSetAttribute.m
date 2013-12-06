@@ -41,7 +41,7 @@
 {
 	if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
 	{
-		if (COTypeIsPrimitive(type))
+		if (COTypeIsUnivalued(type))
 		{
 			return [NSSet setWithObject: value];
 		}

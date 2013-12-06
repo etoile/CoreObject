@@ -89,7 +89,7 @@
 	
 	[dest appendFormat: @"<tr><td>%@</td><td>%@</td><td port=\"%@\">", key, COTypeDescription(type), portName];
 
-	if (COTypeIsPrimitive(type)) /* univalued */
+	if (COTypeIsUnivalued(type)) /* univalued */
 	{
 		if (!(COTypePrimitivePart(type) == kCOTypeCompositeReference
 			  || COTypePrimitivePart(type) == kCOTypeReference))

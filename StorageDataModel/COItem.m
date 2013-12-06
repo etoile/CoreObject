@@ -128,7 +128,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	id value = [self valueForAttribute: attribute];
 	
-	if (COTypeIsPrimitive([self typeForAttribute: attribute]))
+	if (COTypeIsUnivalued([self typeForAttribute: attribute]))
 	{
 		return [NSArray arrayWithObject: value];
 	}
@@ -289,7 +289,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		id value = [aCopy valueForAttribute: attr];
 		COType type = [aCopy typeForAttribute: attr];
 		
-		if (COTypeIsPrimitive(type))
+		if (COTypeIsUnivalued(type))
 		{
 			if ([value isKindOfClass: [ETUUID class]])
 			{

@@ -106,7 +106,7 @@ BOOL COTypeIsMultivalued(COType type)
 }
 
 static inline
-BOOL COTypeIsPrimitive(COType type)
+BOOL COTypeIsUnivalued(COType type)
 {
     return COTypeMultivaluedPart(type) == 0;
 }

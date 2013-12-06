@@ -135,7 +135,7 @@ static int comparePointersToBinaryWriterTokens(const void *ptrA, const void *ptr
 
 static void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buffer_t *temp)
 {
-    if (COTypeIsPrimitive(aType))
+    if (COTypeIsUnivalued(aType))
     {
         return writePrimitiveValue(dest, aValue, aType);
     }
