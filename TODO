@@ -4,6 +4,10 @@ TODO
 First alpha release blockers
 ----------------------------
 
+- Add some collection-oriented KVO update tests to TestObjectUpdate
+
+- Add some basic transient relationship tests
+
 - Fix test suite compilation on GNUstep
 
 	- Add -[NSNotificationCenter addObserverForName:object:queue:usingBlock:] to GNUstep
