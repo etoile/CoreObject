@@ -73,4 +73,29 @@
 
 - (void) objectGraphDidChange;
 
+
+/* History stuff */
+
+- (void) commitWithIdentifier: (NSString *)identifier;
+
+- (void) switchToRevision: (CORevision *)aRevision;
+
+- (IBAction) projectDemoUndo: (id)sender;
+
+- (IBAction) projectDemoRedo: (id)sender;
+
+- (IBAction) branch: (id)sender;
+
+- (IBAction) stepBackward: (id)sender;
+
+- (IBAction) stepForward: (id)sender;
+
+- (IBAction) showGraphvizHistoryGraph: (id)sender;
+
+- (IBAction) history: (id)sender;
+
+- (IBAction) shareWith: (id)sender;
+
+- (IBAction) moveToTrash:(id)sender;
+
 @end

@@ -93,13 +93,6 @@
 	return (OutlineItem *)[[self projectDocument] rootDocObject];
 }
 
-- (void) commitWithIdentifier: (NSString *)identifier
-{
-	identifier = [@"org.etoile.ProjectDemo." stringByAppendingString: identifier];
-	
-	[[self persistentRoot] commitWithIdentifier: identifier metadata: nil undoTrack: [self undoTrack] error:NULL];
-}
-
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
@@ -120,16 +113,16 @@
 //	}
 
 	
-	[[NSNotificationCenter defaultCenter] addObserver: self
-											 selector: @selector(windowFrameDidChange:)
-												 name: NSWindowDidMoveNotification 
-											   object: [self window]];
-	
-	[[NSNotificationCenter defaultCenter] addObserver: self
-											 selector: @selector(windowFrameDidChange:)
-												 name: NSWindowDidEndLiveResizeNotification 
-											   object: [self window]];	
-	
+//	[[NSNotificationCenter defaultCenter] addObserver: self
+//											 selector: @selector(windowFrameDidChange:)
+//												 name: NSWindowDidMoveNotification 
+//											   object: [self window]];
+//	
+//	[[NSNotificationCenter defaultCenter] addObserver: self
+//											 selector: @selector(windowFrameDidChange:)
+//												 name: NSWindowDidEndLiveResizeNotification 
+//											   object: [self window]];	
+//	
 	[self updateUIForSharingSession];
 }
 
@@ -249,92 +242,6 @@ static int i = 0;
 					 byExtendingSelection: NO];
 		}
 	}  
-}
-
-- (IBAction) shareWith: (id)sender
-{
-	[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] shareWithInspectorForDocument: self.doc];
-}
-
-- (IBAction)moveToTrash:(id)sender
-{
-	NSLog(@"Trash %@", self);
-	
-	self.persistentRoot.deleted = YES;
-	
-	NSMutableSet *docs = [[self.doc project] mutableSetValueForKey: @"documents"];
-	assert([docs containsObject: self.doc]);
-	[docs removeObject: self.doc];
-	
-	[self.editingContext commit];
-	
-	// FIXME: Hack
-	[self close];
-}
-
-- (void) switchToRevision: (CORevision *)aRevision
-{
-	[self.editingBranch setCurrentRevision: aRevision];
-	
-	[self commitWithIdentifier: @"revert"];
-}
-
-/* History stuff */
-
-- (IBAction) projectDemoUndo: (id)sender
-{
-    COUndoTrack *stack = [self undoTrack];
-    
-    if ([stack canUndo])
-    {
-        [stack undo];
-    }
-}
-- (IBAction) projectDemoRedo: (id)sender
-{
-    COUndoTrack *stack = [self undoTrack];
-
-    if ([stack canRedo])
-    {
-        [stack redo];
-    }
-}
-
-- (IBAction) branch: (id)sender
-{
-    COBranch *branch = [self.editingBranch makeBranchWithLabel: @"Untitled"];
-    [self.persistentRoot setCurrentBranch: branch];
-    [self.persistentRoot commit];
-}
-
-- (IBAction) stepBackward: (id)sender
-{
-	NSLog(@"Step back");
-	
-	if ([self.editingBranch canUndo])
-		[self.editingBranch undo];
-	
-	[self commitWithIdentifier: @"step-backward"];
-}
-
-- (IBAction) stepForward: (id)sender
-{
-	NSLog(@"Step forward");
-	
-	if ([self.editingBranch canRedo])
-		[self.editingBranch redo];
-	
-	[self commitWithIdentifier: @"step-forward"];
-}
-
-- (IBAction) showGraphvizHistoryGraph: (id)sender
-{
-	[[self.persistentRoot store] showGraphForPersistentRootUUID: self.persistentRoot.UUID];
-}
-
-- (IBAction) history: (id)sender
-{
-	//[(ApplicationDelegate *)[[NSApp delegate] historyController] showHistoryForDocument: doc];
 }
 
 /* NSResponder */
