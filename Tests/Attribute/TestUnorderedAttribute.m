@@ -83,4 +83,9 @@
 	UKObjectsEqual(S(@"hello"), group1.contents);
 }
 
+- (void)testNullDisallowedInCollection
+{
+	UKRaisesException([group1 setContents: S([NSNull null])]);
+}
+
 @end

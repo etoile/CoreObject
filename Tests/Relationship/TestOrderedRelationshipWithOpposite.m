@@ -78,4 +78,12 @@
 	UKRaisesException([(NSMutableArray *)group1.contents removeObjectAtIndex: 1]);
 }
 
+- (void)testNullDisallowedInCollection
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	OrderedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupWithOpposite"];
+	
+	UKRaisesException([group1 setContents: A([NSNull null])]);
+}
+
 @end

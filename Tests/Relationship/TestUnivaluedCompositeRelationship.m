@@ -106,4 +106,16 @@
 	 }];
 }
 
+- (void)testNullAllowedForUnivalued
+{
+	UKDoesNotRaiseException([parent setChild: nil]);
+}
+
+- (void)testNullAndNSNullEquivalent
+{
+	UKNotNil(parent.child);
+	UKDoesNotRaiseException(parent.child = (Child *)[NSNull null]);
+	UKNil(parent.child);
+}
+
 @end

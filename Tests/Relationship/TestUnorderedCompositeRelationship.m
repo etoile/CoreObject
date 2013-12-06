@@ -119,4 +119,9 @@
 	UKRaisesException([(NSMutableSet *)parent.contents removeObject: child1]);
 }
 
+- (void)testNullDisallowedInCollection
+{
+	UKRaisesException([parent setContents: S([NSNull null])]);
+}
+
 @end

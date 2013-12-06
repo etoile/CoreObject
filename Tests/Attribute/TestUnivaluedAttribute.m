@@ -2,10 +2,6 @@
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
-
-
-
-
 @interface TestUnivaluedAttribute : TestCase <UKTest>
 {
 	COObjectGraphContext *ctx;
@@ -33,6 +29,18 @@
 		 UnivaluedAttributeModel *testItem1 = (UnivaluedAttributeModel *)testRootObject;
 		 UKObjectsEqual(@"test", testItem1.label);
 	 }];
+}
+
+- (void)testNullAllowedForUnivalued
+{
+	UKDoesNotRaiseException([item1 setLabel: nil]);
+}
+
+- (void)testNullAndNSNullEquivalent
+{
+	item1.label = @"foo";
+	UKDoesNotRaiseException(item1.label = (NSString *)[NSNull null]);
+	UKNil(item1.label);
 }
 
 @end

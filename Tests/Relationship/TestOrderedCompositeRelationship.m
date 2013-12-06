@@ -160,4 +160,9 @@
 	UKRaisesException([ctx commit]);
 }
 
+- (void)testNullDisallowedInCollection
+{
+	UKRaisesException([parent setContents: A([NSNull null])]);
+}
+
 @end

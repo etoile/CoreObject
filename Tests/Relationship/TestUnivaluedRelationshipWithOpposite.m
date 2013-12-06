@@ -51,4 +51,24 @@
 	UKObjectsEqual(S(group1ctx2, group3ctx2), [item1ctx2 referringObjects]);
 }
 
+- (void)testNullAllowedForUnivalued
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	UnivaluedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"UnivaluedGroupWithOpposite"];
+	
+	UKDoesNotRaiseException([group1 setContent: nil]);
+}
+
+- (void)testNullAndNSNullEquivalent
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	UnivaluedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"UnivaluedGroupWithOpposite"];
+	UnivaluedGroupContent *item1 = [ctx insertObjectWithEntityName: @"UnivaluedGroupContent"];
+	group1.content = item1;
+	
+	UKNotNil(group1.content);
+	UKDoesNotRaiseException(group1.content = (UnivaluedGroupContent *)[NSNull null]);
+	UKNil(group1.content);
+}
+
 @end

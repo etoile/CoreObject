@@ -84,4 +84,24 @@
 	UKIntsEqual(2, deallocs);
 }
 
+- (void)testNullAllowedForUnivalued
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	UnivaluedGroupNoOpposite *group1 = [ctx insertObjectWithEntityName: @"UnivaluedGroupNoOpposite"];
+
+	UKDoesNotRaiseException([group1 setContent: nil]);
+}
+
+- (void)testNullAndNSNullEquivalent
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	UnivaluedGroupNoOpposite *group1 = [ctx insertObjectWithEntityName: @"UnivaluedGroupNoOpposite"];
+	UnivaluedGroupNoOpposite *group2 = [ctx insertObjectWithEntityName: @"UnivaluedGroupNoOpposite"];
+	group1.content = group2;
+	
+	UKNotNil(group1.content);
+	UKDoesNotRaiseException(group1.content = (COObject *)[NSNull null]);
+	UKNil(group1.content);
+}
+
 @end

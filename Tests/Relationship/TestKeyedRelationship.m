@@ -107,4 +107,9 @@
 	}];
 }
 
+- (void)testNullDisallowedInCollection
+{
+	UKRaisesException([model setEntries: @{ @"test" : [NSNull null] }]);
+}
+
 @end
