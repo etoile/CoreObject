@@ -87,7 +87,7 @@
     
     [db_ executeUpdate: [NSString stringWithFormat:
                          @"CREATE TABLE IF NOT EXISTS %@ (revid INTEGER PRIMARY KEY ASC, "
-                         "contents BLOB, metadata BLOB, timestamp INTEGER, parent INTEGER, mergeparent INTEGER, branchuuid BLOB, persistentrootuuid BLOB, deltabase INTEGER, "
+                         "contents BLOB, hash BLOB, metadata BLOB, timestamp INTEGER, parent INTEGER, mergeparent INTEGER, branchuuid BLOB, persistentrootuuid BLOB, deltabase INTEGER, "
                          "bytesInDeltaRun INTEGER, garbage BOOLEAN, uuid BLOB NOT NULL UNIQUE)", [self tableName]]];
 
     [db_ executeUpdate: [NSString stringWithFormat:
@@ -250,7 +250,7 @@
     NSMutableDictionary *dataForUUID = [NSMutableDictionary dictionary];
     
     FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
-                                          @"SELECT revid, contents, parent, deltabase "
+                                          @"SELECT revid, contents, hash, parent, deltabase "
                                           "FROM %@ "
                                           "WHERE revid <= ? AND revid >= (SELECT deltabase FROM %@ WHERE revid = ?) "
                                           "ORDER BY revid DESC", [self tableName], [self tableName]],
@@ -265,11 +265,15 @@
         
         const int64_t revid = [rs longLongIntForColumnIndex: 0];
         NSData *contentsData = [rs dataForColumnIndex: 1];
-        const int64_t parent = [rs longLongIntForColumnIndex: 2];
-        const int64_t deltabase = [rs boolForColumnIndex: 3];
+		NSData *hashData = [rs dataForColumnIndex: 2];
+        const int64_t parent = [rs longLongIntForColumnIndex: 3];
+        const int64_t deltabase = [rs boolForColumnIndex: 4];
         
         if (revid == nextRevId || nextRevId == -1)
         {
+			NSData *actualHash = Sha1Data(contentsData);
+			ETAssert([hashData isEqual: actualHash]);
+			
             ParseCombinedCommitDataInToUUIDToItemDataDictionary(dataForUUID, contentsData, NO, itemSet);
             
             // TODO: If we are filtering to a known set of items, we can break out once we have all of them.
@@ -344,16 +348,27 @@
 }
 
 
-static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *modifiedItems)
+static NSData *contentsBLOBWithItemTree(COItemGraph *itemGraph)
 {
     NSMutableData *result = [NSMutableData dataWithCapacity: 64536];
     
-    for (ETUUID *uuid in modifiedItems)
+	NSArray *sortedUUIDs = [[itemGraph itemUUIDs] sortedArrayUsingComparator: ^(id obj1, id obj2){
+		ETUUID *uuid1 = (ETUUID *)obj1;
+		ETUUID *uuid2 = (ETUUID *)obj2;
+		int result = memcmp([uuid1 UUIDValue], [uuid2 UUIDValue], 16);
+		return (result < 0)
+			? NSOrderedAscending
+			: ((result == 0)
+			   ? NSOrderedSame
+			   : NSOrderedDescending);
+	}];
+	
+    for (ETUUID *uuid in sortedUUIDs)
     {
-        COItem *item = [anItemTree itemForUUID: uuid];
-        NSData *itemJson = [item dataValue];
+        COItem *item = [itemGraph itemForUUID: uuid];
+        NSData *itemData = [item dataValue];
         
-        AddCommitUUIDAndDataToCombinedCommitData(result, uuid, itemJson);
+        AddCommitUUIDAndDataToCombinedCommitData(result, uuid, itemData);
     }
     
     return result;
@@ -405,6 +420,13 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     return bytesInDeltaRun;
 }
 
+static NSData *Sha1Data(NSData *data)
+{
+	unsigned char buffer[20];
+	SHA1([data bytes], [data length], buffer);
+	return [NSData dataWithBytes: buffer length: 20];
+}
+
 /**
  * @param aParent -1 for no parent, otherwise the parent of this commit
  * @param modifiedItems nil for all items in anItemTree, otherwise a subset
@@ -453,7 +475,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     if (delta)
     {
         deltabase = parent_deltabase;
-        contentsBlob = contentsBLOBWithItemTree(anItemTree, [anItemTree itemUUIDs]);
+        contentsBlob = contentsBLOBWithItemTree(anItemTree);
         bytesInDeltaRun = lastBytesInDeltaRun + [contentsBlob length];
     }
     else
@@ -478,7 +500,7 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
             combinedGraph = anItemTree;
         }
         
-        contentsBlob = contentsBLOBWithItemTree(combinedGraph, [combinedGraph itemUUIDs]);
+        contentsBlob = contentsBLOBWithItemTree(combinedGraph);
         bytesInDeltaRun = [contentsBlob length];
     }
 
@@ -489,10 +511,11 @@ static NSData *contentsBLOBWithItemTree(id<COItemGraph> anItemTree, NSArray *mod
     }
     
     BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (revid, "
-        "contents, metadata, timestamp, parent, mergeparent, branchuuid, persistentrootuuid, deltabase, "
-        "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", [self tableName]],
+        "contents, hash, metadata, timestamp, parent, mergeparent, branchuuid, persistentrootuuid, deltabase, "
+        "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", [self tableName]],
         [NSNumber numberWithLongLong: rowid],
         contentsBlob,
+		Sha1Data(contentsBlob),
         metadataBlob,
         CODateToJavaTimestamp([NSDate date]),
         [NSNumber numberWithLongLong: aParent],
