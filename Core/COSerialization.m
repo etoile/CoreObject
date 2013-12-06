@@ -213,6 +213,20 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	}
 	else
 	{
+		// Try value transformer
+		ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: aProperty];
+		if (propDesc.valueTransformerName != nil)
+		{
+			NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: propDesc.valueTransformerName];
+			id result = [transformer transformedValue: value];
+			
+			ETEntityDescription *resultEntityDesc = [[ETModelDescriptionRepository mainRepository] descriptionForName: NSStringFromClass([result class])];
+			ETAssert([resultEntityDesc isKindOfEntity: [propDesc persistentType]]);
+			ETAssert([[[propDesc persistentType] name] isEqual: @"NSString"]); // TODO: Support the other persistent types
+			
+			return result;
+		}
+		
 		NSAssert2(NO, @"Unsupported serialization type %@ for %@", [value class], value);
 	}
 	return nil;
@@ -250,6 +264,12 @@ serialization. */
 	ETEntityDescription *type = [aPropertyDesc type];
 	NSString *typeName = [type name];
 
+	if (aPropertyDesc.valueTransformerName != nil)
+	{
+		ETAssert([[aPropertyDesc.persistentType name] isEqual: @"NSString"]); // TODO: Support the other persistent types
+		return kCOTypeString;
+	}
+	
 	if ([self isCoreObjectEntityType: type])
 	{
 		return ([aPropertyDesc isComposite] ? kCOTypeCompositeReference : kCOTypeReference);
@@ -631,6 +651,20 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	NSString *typeName = [[aPropertyDesc type] name];
 
+	if (aPropertyDesc.valueTransformerName != nil)
+	{
+		ETAssert(COTypePrimitivePart(type) == kCOTypeString); // TODO: Support the other persistent types
+		ETAssert([value isKindOfClass: [NSString class]]);
+		
+		NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: aPropertyDesc.valueTransformerName];
+		id result = [transformer reverseTransformedValue: value];
+		
+		ETEntityDescription *resultEntityDesc = [[ETModelDescriptionRepository mainRepository] descriptionForName: NSStringFromClass([result class])];
+		ETAssert([resultEntityDesc isKindOfEntity: [aPropertyDesc type]]);
+		
+		return result;
+	}
+	
 	if ([value isEqual: [NSNull null]])
 	{
 		ETAssert(COTypeIsValid(type));

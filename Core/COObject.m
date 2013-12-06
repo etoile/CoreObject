@@ -917,7 +917,11 @@ See +[NSObject typePrefix]. */
 	}
 	else
 	{
-		ETAssert([self isCoreObjectValue: newValue]);
+		ETEntityDescription *newValueEntityDesc = [[ETModelDescriptionRepository mainRepository] descriptionForName: NSStringFromClass([newValue class])];
+		const BOOL validType = [newValueEntityDesc isKindOfEntity: [propertyDesc type]];
+		
+		// FIXME: Refactor. validType case is for supporting value transformed objects that aren't COObject subclasses.
+		ETAssert(validType || [self isCoreObjectValue: newValue]);
 		
 		if ([propertyDesc isComposite])
 		{

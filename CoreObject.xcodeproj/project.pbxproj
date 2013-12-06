@@ -169,6 +169,7 @@
 		6646978017CE7E2600A1B767 /* COSynchronizationServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */; };
 		6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */; };
 		6646985A17D3C55600A1B767 /* COObjectGraphContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */; };
+		665352FD18528A6700662309 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60884D401837B09800C5C7C9 /* AppKit.framework */; };
 		66550BF717D51CB100327657 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550BF617D51CB100327657 /* main.m */; };
 		66550BF817D51CB800327657 /* TestObjectGraphPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550BE817D51C6100327657 /* TestObjectGraphPerformance.m */; };
 		66550BF917D51CBD00327657 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
@@ -234,6 +235,7 @@
 		669FD4F3184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h in Headers */ = {isa = PBXBuildFile; fileRef = 669FD4F1184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h */; };
 		669FD4F4184E7B5F006EE103 /* COObjectGraphContext+Graphviz.m in Sources */ = {isa = PBXBuildFile; fileRef = 669FD4F2184E7B5F006EE103 /* COObjectGraphContext+Graphviz.m */; };
 		66BBB3BC18516ABC005430B1 /* TestItemStableSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BBB3BB18516ABC005430B1 /* TestItemStableSerialization.m */; };
+		66BBB3DC185282D2005430B1 /* TestValueTransformerAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BBB3DB185282D2005430B1 /* TestValueTransformerAttribute.m */; };
 		66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66C3670C17B5F9B0009ACF2F /* COBranchInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3670A17B5F9AF009ACF2F /* COBranchInfo.m */; };
@@ -707,6 +709,7 @@
 		669FD4F1184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Graphviz.h"; path = "Core/COObjectGraphContext+Graphviz.h"; sourceTree = "<group>"; };
 		669FD4F2184E7B5F006EE103 /* COObjectGraphContext+Graphviz.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObjectGraphContext+Graphviz.m"; path = "Core/COObjectGraphContext+Graphviz.m"; sourceTree = "<group>"; };
 		66BBB3BB18516ABC005430B1 /* TestItemStableSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestItemStableSerialization.m; sourceTree = "<group>"; };
+		66BBB3DB185282D2005430B1 /* TestValueTransformerAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestValueTransformerAttribute.m; sourceTree = "<group>"; };
 		66C3669E17B426C0009ACF2F /* Typewriter-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = "Typewriter-Info.plist"; path = "Samples/Typewriter/Typewriter-Info.plist"; sourceTree = "<group>"; };
 		66C366A017B426C0009ACF2F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		66C366A217B426C0009ACF2F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Samples/Typewriter/main.m; sourceTree = SOURCE_ROOT; };
@@ -835,6 +838,7 @@
 				3D01D09F1646BF0200917AC8 /* UnitKit.framework in Frameworks */,
 				60FB089813C3076200C2AB94 /* EtoileFoundation.framework in Frameworks */,
 				791B4E4C1299C82200CCF472 /* CoreObject.framework in Frameworks */,
+				665352FD18528A6700662309 /* AppKit.framework in Frameworks */,
 				60C8BC5416322E2C00A2B4EE /* libz.1.2.5.dylib in Frameworks */,
 				60C8BC5516322E3200A2B4EE /* libcrypto.dylib in Frameworks */,
 			);
@@ -986,6 +990,7 @@
 				6610112C184D2D8A001A3E24 /* TestOrderedAttribute.m */,
 				6610112D184D2D8A001A3E24 /* TestUnivaluedAttribute.m */,
 				6610112E184D2D8A001A3E24 /* TestUnorderedAttribute.m */,
+				66BBB3DB185282D2005430B1 /* TestValueTransformerAttribute.m */,
 			);
 			name = Attribute;
 			path = Tests/Attribute;
@@ -2020,6 +2025,7 @@
 				666888131849961300DBEB10 /* TestOrderedRelationshipWithOpposite.m in Sources */,
 				66E40D7A1836D08E00E5B4A7 /* TestUndoStackTrackProtocol.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
+				66BBB3DC185282D2005430B1 /* TestValueTransformerAttribute.m in Sources */,
 				66E451D617CC461F00205679 /* OutlineItem.m in Sources */,
 				66E40D641836D08D00E5B4A7 /* TestPersistentRoot.m in Sources */,
 				66101164184D8C67001A3E24 /* UnivaluedGroupWithOpposite.m in Sources */,
