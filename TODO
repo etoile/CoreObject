@@ -72,6 +72,7 @@ Future Work
 
   - Switch to NSUUID everywhere?
 
+  - Expose COEditingContext(Debugging), probably with a header we can explicit import (should be outside of COEditingContext+Private)
 
 - COPersistentRoot
 
@@ -82,6 +83,8 @@ Future Work
     don't look at the COObjectGraphContext)
 	
   - Refactor handling of store notifications
+  
+  - Add -initialRevision?
 
 	
 - COBranch
@@ -91,7 +94,7 @@ Future Work
   - Clean up selective undo code and share implementation with undo system
 
   - Implement -isCopy and -isTrunkBranch
-  
+
 
 - Metamodel
 
@@ -104,6 +107,10 @@ Future Work
   - Review other constraints
 
   - Add a check that the derived side of a multivalued opposite is unordered
+  
+  - Add a check that complains about ivars for incoming relationships
+  
+  - Add constraint stating that a keyed relationships cannot have an opposite (at least for now)
 
   - Add an "indexed" flag to ETPropertyDescription to tell the store whether to include values of that property in search indexes
 
@@ -114,6 +121,8 @@ Future Work
   - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
   
   - Add serialization transformer support (this would mean to add -serializationTransformerName and -serializedType { return transformerName != nil ? transformer.type : type } to ETPropertyDescription). This would help to reduce code duplication and potential mistake in serialization accessors, and allow -roundTripValueForProperty: to be usable in tests even if serialization accessors are used. As a result, serialization accessor use would be restricted to just 3 or 5 special cases in EtoileUI.
+  
+  	  - Add a check that complains about serialization accessors or serialization transformers for relationships if there is no custom persistent type declared
 
 
 - COObject
@@ -199,20 +208,20 @@ Future Work
 
 - Utilities
 
-	- Define some CoreObject exceptions perhaps
+  - Define some CoreObject exceptions perhaps
 	
-		- COAbstractClassInitializationException
-		- COImmutableCollectionMutationException
-		- what else?
-
-	- Write commit descriptor tests (localization is untested at this time)
+    - COAbstractClassInitializationException
+    - COImmutableCollectionMutationException
+    - what else?
+ 
+  - Write commit descriptor tests (localization is untested at this time)
 	
-	- Implement copying commit descriptor plist and string files to ~/Library/CoreObject/Commits, in order to support browsing changes done by applications uninstalled from the system
+  - Implement copying commit descriptor plist and string files to ~/Library/CoreObject/Commits, in order to support browsing changes done by applications uninstalled from the system
 	
-	- Integrate COCommitDescriptor with Schema Upgrade 
+  - Integrate COCommitDescriptor with Schema Upgrade 
 	
-		- adjust to support versioned descriptors 
-		- multiple commit descriptor versions can present per domain in ~/Library/CoreObject/Commits
+    - adjust to support versioned descriptors 
+    - multiple commit descriptor versions can present per domain in ~/Library/CoreObject/Commits
 	
 
 - ProjectDemo
