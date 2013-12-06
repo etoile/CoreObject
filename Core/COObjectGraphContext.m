@@ -346,7 +346,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	ETAssert([[_objectsByAdditionalItemUUIDs allKeys] containsCollection: [[currentObject additionalStoreItemUUIDs] allValues]]);
 }
 
-- (void) insertOrUpdateItems: (NSArray *)items
+- (void)insertOrUpdateItems: (NSArray *)items
 {
     if ([items count] == 0)
         return;
@@ -381,7 +381,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	// We could also change -[COObjectGraphContext itemForUUID:] to search aTree
 	// during the loading rather than the loaded objects (but that's roughly the
 	// same than we do currently).
-	_loadingItemGraph =  aTree;
+	_loadingItemGraph = aTree;
 
     for (ETUUID *uuid in [aTree itemUUIDs])
     {
@@ -506,7 +506,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	[_loadedObjects removeObjectsForKeys: [(id)[[objects mappedCollection] UUID] allObjects]];
 }
 
-- (void) clearChangeTracking
+- (void)clearChangeTracking
 {
     [_insertedObjects removeAllObjects];
     [_updatedObjects removeAllObjects];
@@ -521,7 +521,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     return [NSSet setWithArray: [_loadedObjects allValues]];
 }
 
-- (COObject *) loadedObjectForUUID: (ETUUID *)aUUID
+- (COObject *)loadedObjectForUUID: (ETUUID *)aUUID
 {
 	// NOTE: We serialize UUIDs into strings in various places, this check
 	// helps to intercept string objects that ought to be ETUUID objects.
@@ -538,8 +538,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
  * Call to update the view to reflect one object becoming unavailable.
  *
  * Preconditions:
- *  - No objects in the context should have composite relationsips
- *    to uuid.
+ *  - No objects in the context should have composite relationships to uuid.
  *
  * Postconditions:
  *  - objectForUUID: will return nil
@@ -547,7 +546,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
  *    and the COEditingContext will release it, so it will be deallocated if
  *    no user code holds a reference to it.
  */
-- (void) removeSingleObjectWithUUID: (ETUUID *)uuid
+- (void)removeSingleObjectWithUUID: (ETUUID *)uuid
 {
     COObject *anObject = [_loadedObjects objectForKey: uuid];
     
@@ -577,7 +576,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     anObject = nil;
 }
 
-- (void) removeUnreachableObjects
+- (void)removeUnreachableObjects
 {
     if ([self rootObject] == nil)
     {
@@ -594,7 +593,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     }
 }
 
-- (void) replaceObject: (COObject *)anObject withObject: (COObject *)aReplacement
+- (void)replaceObject: (COObject *)anObject withObject: (COObject *)aReplacement
 {
 	for (COObject *referrer in [[anObject incomingRelationshipCache] referringObjects])
 	{

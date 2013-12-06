@@ -24,6 +24,8 @@ First alpha release blockers
 
 - Check code quality for all Core classes (underway)
 
+	- Already reviewed classes: COObjectGraphContext
+
 - Write remaing class descriptions
 
 - Implement support for "dead cross-references"; currently an assertion will fail.

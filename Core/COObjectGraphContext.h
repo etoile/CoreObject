@@ -64,7 +64,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * See also -initWithModelRepository:.
  */
-+ (COObjectGraphContext *)objectGraphContextWithModelRepository: (ETModelDescriptionRepository *)aRegistry;
++ (COObjectGraphContext *)objectGraphContextWithModelRepository: (ETModelDescriptionRepository *)aRepo;
 /**
  * Initializes a persistent object graph context owned by a branch.
  */

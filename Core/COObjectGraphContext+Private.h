@@ -17,9 +17,10 @@
  * Sets the branch owning the object graph.
  */
 - (void)setBranch: (COBranch *)aBranch;
-
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (void)setPersistentRoot: (COPersistentRoot *)aPersistentRoot;
-
 /**
  * This property is only exposed to be used internally by CoreObject.
  *
@@ -69,6 +70,13 @@
  * instance.
  */
 - (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (void) removeUnreachableObjects;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (BOOL) isTrackingSpecificBranch;
+
 @end
