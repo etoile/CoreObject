@@ -17,13 +17,29 @@
  * concrete collection subclasses such as COGroup or COContainer.
  *
  * COCollection represents a mutable collection, but subclasses can be immutable.
+ *
+ * The collection content is stored in the property returned by -contentKey.
+ *
+ * COCollection adopts the collection protocols. Which means you can mutate 
+ * COCollection subclass instances using ETCollectionMutation methods such 
+ * as -addObject:, -insertObject:atIndex:, -removeObject:atIndex:, -removeObject:
+ * etc. In addition, the class provides -addObjects:.
+ *
+ * Every time the collection is mutated, COCollection posts a 
+ * ETSourceDidUpdateNotification (in addition the usual Key-Value-Observing 
+ * notifications).<br />
+ * If you override ETCollectionMutation primitive methods in a COCollection 
+ * subclass, you must call -didUpdate in the new implementation (to ensure 
+ * ETSourceDidUpdateNotification is posted).
  */
 @interface COCollection : COObject <ETCollection, ETCollectionMutation>
 {
 
 }
 
+
 /** @taskunit Metamodel */
+
 
 /**
  * Returns a multivalued, ordered and persistent property.
@@ -69,9 +85,11 @@
  * The returned value is controlled by -[ETPropertyDescription isOrdered] for 
  * the content property description (looked up using -contentKey).
  */
-- (BOOL) isOrdered;
+- (BOOL)isOrdered;
+
 
 /** @taskunit Content Access */
+
 
 /**
  * <override-dummy />
@@ -81,14 +99,16 @@
  * ETCollection and ETCollectionMutation protocol methods. Subclasses must 
  * thereby return a valid key, other the collection API won't behave correctly.
  *
- * For example, -insertObject:atIndex:hint: implementation uses the content key 
- * to invoke -[COObject insertObject:atIndex:hint:forProperty:].
+ * For example, -insertObjects:atIndexes:hints: implementation uses the content 
+ * key to retrieve the content collection.
  *
  * By default, returns <em>objects</em>.
  */
 - (NSString *)contentKey;
 
+
 /** @taskunit Collection Mutation Additions */
+
 
 /**
  * Adds all the given objects to the receiver content.
@@ -98,13 +118,15 @@
  * Posts ETSourceDidUpdateNotification.
  *
  * You must invoke this method every time the collection is changed.
- * For example, when you override -insertObject:atIndex:hint:.
+ * For example, when you override -insertObjects:atIndexes:hints:.
  *
  * EtoileUI relies on this notification to reload the UI transparently.
  */
 - (void)didUpdate;
 
+
 /** @taskunit Object Matching */
+
 
 /**
  * Returns the first object whose identifier matches.

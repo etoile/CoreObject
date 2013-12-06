@@ -49,6 +49,16 @@
 	return collection;	
 }
 
+- (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext
+{
+	if ([[self class] isEqual: [COCollection class]])
+	{
+		[NSException raise: NSGenericException
+		            format: @"Attempt to initialize abstract class %@", [self class]];
+	}
+	return [super initWithObjectGraphContext: aContext];
+}
+
 - (ETUTI *)objectType
 {
 	ETPropertyDescription *propertyDesc =
@@ -95,8 +105,7 @@
 
 - (NSArray *) contentArray
 {
-	 // FIXME: Should return a new array, but this might break other things currently
-	return [self valueForProperty: [self contentKey]];
+	return [[self valueForProperty: [self contentKey]] contentArray];
 }
 
 - (void) insertObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints

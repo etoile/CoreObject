@@ -190,6 +190,8 @@ Future Work
 
   - for COLibrary, evaluate whether we can enfore the constraint that one persistent root belongs to one library
   
+  - Test unordered COCollection subclass
+  
 
 - Serialization
 
@@ -198,6 +200,12 @@ Future Work
 		NSAssert([aPropertyDesc isKeyed] && [aPropertyDesc isMultivalued], @"Serialization type doesn't match metamodel");
 
 - Utilities
+
+	- Define some CoreObject exceptions perhaps
+	
+		- COAbstractClassInitializationException
+		- COImmutableCollectionMutationException
+		- what else?
 
 	- Write commit descriptor tests (localization is untested at this time)
 	

@@ -44,6 +44,20 @@
 
 @implementation TestCollection
 
+- (void)testExceptionOnAbstractCollectionInit
+{
+	UKRaisesException([ctx insertNewPersistentRootWithEntityName: @"COCollection"]);
+}
+
+- (void)testDefensiveCopyForContentArray
+{
+	COGroup *group = [[ctx insertNewPersistentRootWithEntityName: @"COGroup"] rootObject];
+	COGroup *container = [[ctx insertNewPersistentRootWithEntityName: @"COContainer"] rootObject];
+
+	UKFalse([[group contentArray] isMutable]);
+	UKFalse([[container contentArray] isMutable]);
+}
+
 - (void)testLibraryGroup
 {
 	UKTrue([[[ctx libraryGroup] content] isEmpty]);
