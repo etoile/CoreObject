@@ -16,15 +16,11 @@ First alpha release blockers
 
 	- All tests pass for both CoreObject and EtoileUI test suite
 
-- Fix outdated COCommitDescriptor API doc and review properties (most properties should be read-only probably)
-
 - Check and update all Core API documentation (underway)
 
 - Check code quality for all Core classes (underway)
 
 - Write remaing class descriptions
-
-- Implement batch mutation in ETCollection and proper KVO support on top of it in COObject
 
 - Implement support for "dead cross-references"; currently an assertion will fail.
   Or, postpone this until after first release? 
@@ -200,6 +196,18 @@ Future Work
   - For collection metamodel assertions, check all collection metamodel attributes (isKeyed, isOrdered, isMultivalued) and document we should update these assertions if we add more collection attributes to the metamodel:
   
 		NSAssert([aPropertyDesc isKeyed] && [aPropertyDesc isMultivalued], @"Serialization type doesn't match metamodel");
+
+- Utilities
+
+	- Write commit descriptor tests (localization is untested at this time)
+	
+	- Implement copying commit descriptor plist and string files to ~/Library/CoreObject/Commits, in order to support browsing changes done by applications uninstalled from the system
+	
+	- Integrate COCommitDescriptor with Schema Upgrade 
+	
+		- adjust to support versioned descriptors 
+		- multiple commit descriptor versions can present per domain in ~/Library/CoreObject/Commits
+	
 
 - ProjectDemo
 

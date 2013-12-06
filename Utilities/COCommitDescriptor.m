@@ -126,6 +126,13 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 	return localizedString;
 }
 
+/**
+ * Registers a commit descriptor based on -[COCommitDescriptor identifier].
+ *
+ * For a nil argument, raises a NSInvalidArgumentException.
+ *
+ * See also -identifier and +registeredDescriptorForIdentifier:.
+ */
 + (void) registerDescriptor: (COCommitDescriptor *)aDescriptor
 {
 	NILARG_EXCEPTION_TEST(aDescriptor);
@@ -185,12 +192,6 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 	return [[[self identifier] componentsSeparatedByString: @"."] lastObject];
 }
 
-- (void) setType: (NSString *)aType
-{
-	NILARG_EXCEPTION_TEST(aType);
-	_type = aType;
-}
-
 - (NSString *)typeDescription
 {
 	return [descriptorTypeTable objectForKey: [self type]];
@@ -203,12 +204,6 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 	return [self localizedStringForKey: localizationKey
 	                             value: [self typeDescription]
 	                         arguments: nil];
-}
-
-- (void) setShortDescription: (NSString *)aDescription
-{
-	NILARG_EXCEPTION_TEST(aDescription);
-	_shortDescription = aDescription;
 }
 
 - (NSString *)localizedShortDescriptionWithArguments: (NSArray *)args

@@ -67,22 +67,12 @@
 
 
 /**
- * Registers a commit descriptor based on -[COCommitDescriptor identifier].
- *
- * For a nil argument, raises a NSInvalidArgumentException.
- *
- * See also -identifier and +registeredDescriptorForIdentifier:.
- */
-+ (void)registerDescriptor: (COCommitDescriptor *)aDescriptor;
-/**
  * Returns the commit descriptor previously registered for a descriptor 
  * identifier.
  *
  * The registration is not persistent and is lost on application termination.
  *
  * For a nil argument, raises a NSInvalidArgumentException.
- *
- * See also +registerDescriptor:.
  */
 + (COCommitDescriptor *)registeredDescriptorForIdentifier: (NSString *)anIdentifier;
 
@@ -115,7 +105,7 @@
  *
  * See also -domain and -name.
  */
-@property (nonatomic, strong) NSString *identifier;
+@property (nonatomic, readonly) NSString *identifier;
 /**
  * A domain representing an editing activity (e.g. an application), and usually 
  * shared among several commit descriptors.
@@ -166,17 +156,17 @@
  * <item>org.etoile-project.AddressBook.renameGroup</item>
  * </list>
  *
- * This property must be set.
+ * This property must be provided (in the plist file).
  *
  * For a nil description, the setter raises a NSInvalidArgumentException.
  *
  * See also -typeDescription and -localizedTypeDescription.
  */
-@property (nonatomic, strong) NSString *type;
+@property (nonatomic, readonly) NSString *type;
 /**
  * Few words that summarizes the action that triggered the commit.
  *
- * This property must be set.
+ * This property must be provided (in the plist file).
  *
  * For a nil description, the setter raises a NSInvalidArgumentException.
  *
@@ -194,13 +184,13 @@
 /**
  * A description that fits on a single line.
  *
- * This property must be set.
+ * This property must be provided (in the plist file).
  *
  * For a nil description, the setter raises a NSInvalidArgumentException.
  *
  * See also -localizedShortDescriptionWithArguments:.
  */
-@property (nonatomic, strong) NSString *shortDescription;
+@property (nonatomic, readonly) NSString *shortDescription;
 /**
  * A localized description for -shortDescription, by optionally interpolating 
  * localized arguments (depending on the commit or the context) into the 
