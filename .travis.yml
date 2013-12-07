@@ -1,2 +1,7 @@
+notifications:
+  email:
+    recipients:
+      - ewasylishen@gmail.com
+      - qmathe@gmail.com
 language: objective-c
 script: ./travis-ci-checkout-deps-and-run-tests.sh
