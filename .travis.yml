@@ -1,0 +1,2 @@
+language: objective-c
+script: ./travis-ci-checkout-deps-and-run-tests.sh
