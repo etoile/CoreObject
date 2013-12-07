@@ -31,6 +31,8 @@
 
 - (void) testEntityDescriptionMismatch
 {
+	UKFail();
+
 	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
 	ETEntityDescription *groupEntity = [repo entityDescriptionForClass: [COGroup class]];
 	ETEntityDescription *libraryEntity = [repo entityDescriptionForClass: [COLibrary class]];
