@@ -193,6 +193,7 @@
 		6675F8C51785C02A001E5622 /* COPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BE1785C02A001E5622 /* COPath.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C61785C02A001E5622 /* COPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BF1785C02A001E5622 /* COPath.m */; };
 		6675F8C71785C02A001E5622 /* COType.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8C01785C02A001E5622 /* COType.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		667BE9231853D35B0066073A /* COColorToHTMLString.m in Sources */ = {isa = PBXBuildFile; fileRef = 667BE9221853D35B0066073A /* COColorToHTMLString.m */; };
 		6680846D178CD526003A3CC6 /* COCopier.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680846B178CD526003A3CC6 /* COCopier.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6680846E178CD526003A3CC6 /* COCopier.m in Sources */ = {isa = PBXBuildFile; fileRef = 6680846C178CD526003A3CC6 /* COCopier.m */; };
 		6680848A178DAFE3003A3CC6 /* COArrayDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680847F178DAFE3003A3CC6 /* COArrayDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -662,6 +663,8 @@
 		6675F8BE1785C02A001E5622 /* COPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COPath.h; sourceTree = "<group>"; };
 		6675F8BF1785C02A001E5622 /* COPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COPath.m; sourceTree = "<group>"; };
 		6675F8C01785C02A001E5622 /* COType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COType.h; sourceTree = "<group>"; };
+		667BE9211853D35B0066073A /* COColorToHTMLString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COColorToHTMLString.h; sourceTree = "<group>"; };
+		667BE9221853D35B0066073A /* COColorToHTMLString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COColorToHTMLString.m; sourceTree = "<group>"; };
 		6680846B178CD526003A3CC6 /* COCopier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCopier.h; path = Core/COCopier.h; sourceTree = "<group>"; };
 		6680846C178CD526003A3CC6 /* COCopier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCopier.m; path = Core/COCopier.m; sourceTree = "<group>"; };
 		6680847F178DAFE3003A3CC6 /* COArrayDiff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COArrayDiff.h; path = Diff/COArrayDiff.h; sourceTree = "<group>"; };
@@ -883,6 +886,7 @@
 			children = (
 				60884D401837B09800C5C7C9 /* AppKit.framework */,
 				66D96C9F178B6E5600D1553C /* libsqlite3.dylib */,
+				667BE9191853D3410066073A /* ValueTransformers */,
 				6699633B115F0C4200359BE6 /* Documentation */,
 				66550BE717D51C5000327657 /* Benchmark */,
 				791B4DF41299C56900CCF472 /* Tests */,
@@ -1137,6 +1141,15 @@
 				6660B39F1839659D009007FD /* COAttachmentID.m */,
 			);
 			path = StorageDataModel;
+			sourceTree = "<group>";
+		};
+		667BE9191853D3410066073A /* ValueTransformers */ = {
+			isa = PBXGroup;
+			children = (
+				667BE9211853D35B0066073A /* COColorToHTMLString.h */,
+				667BE9221853D35B0066073A /* COColorToHTMLString.m */,
+			);
+			path = ValueTransformers;
 			sourceTree = "<group>";
 		};
 		6686BDB212592C1B0065DE1A /* Supporting Files */ = {
@@ -2070,6 +2083,7 @@
 				6621BF1A1847F077000809CF /* Child.m in Sources */,
 				6610115E184D8C30001A3E24 /* OrderedGroupWithOpposite.m in Sources */,
 				66E40D731836D08D00E5B4A7 /* TestSynchronizerJSONTransport.m in Sources */,
+				667BE9231853D35B0066073A /* COColorToHTMLString.m in Sources */,
 				66E40D6E1836D08D00E5B4A7 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */,
 				66101158184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.m in Sources */,
 				66E40D771836D08E00E5B4A7 /* TestUndo.m in Sources */,
