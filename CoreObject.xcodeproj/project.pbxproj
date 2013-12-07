@@ -1704,6 +1704,7 @@
 			buildPhases = (
 				791B4E2A1299C79300CCF472 /* Sources */,
 				791B4E2B1299C79300CCF472 /* Frameworks */,
+				6679B8FF185305E900971C2A /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1837,6 +1838,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		6679B8FF185305E900971C2A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Derived from: https://github.com/gh-unit/gh-unit/blob/master/Scripts/RunTests.sh\n\n# If we aren't running from the command line, then exit\nif [ \"$TESTCOREOBJECT_AUTORUN\" = \"\" ]; then\nexit 0\nfi\n\nexport DYLD_FRAMEWORK_PATH=\"$CONFIGURATION_BUILD_DIR\"\n$TARGET_BUILD_DIR/$EXECUTABLE_PATH\nRETVAL=$?\n\nexit $RETVAL";
+		};
 		66FD34871830B1D900898381 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
