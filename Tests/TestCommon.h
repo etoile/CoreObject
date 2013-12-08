@@ -41,12 +41,16 @@
 #import "UnivaluedAttributeModel.h"
 #import "UnorderedAttributeModel.h"
 
+#import "COAttributedString.h"
+#import "COAttributedStringChunk.h"
+
 #import "COPersistentRoot+Private.h"
 #import "COSQLiteStore+Private.h"
 #import "COObject+Private.h"
 #import "COObjectGraphContext+Private.h"
 #import "CORelationshipCache.h"
 #import "COStoreTransaction.h"
+#import "COObjectGraphContext+Graphviz.h"
 
 #define SA(x) [NSSet setWithArray: x]
 
