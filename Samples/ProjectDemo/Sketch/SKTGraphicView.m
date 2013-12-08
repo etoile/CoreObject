@@ -345,13 +345,7 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
         if ([_creatingGraphic isEditable]) {
             [self startEditingGraphic:_creatingGraphic withEvent:nil ];
         }
-        //[[document undoManager] setActionName:[NSString stringWithFormat:NSLocalizedStringFromTable(@"Create %@", @"UndoStrings", @"Action name for newly created graphics.  Class name is inserted at the substitution."), [[NSBundle mainBundle] localizedStringForKey:NSStringFromClass(theClass) value:@"" table:@"GraphicClassNames"]]];
-        
-        [[[document objectGraphContext] editingContext] commit];
-        
-//		[[document objectContext] commitWithType: kCOTypeMinorEdit
-//								shortDescription: @"Insert Shape"
-//								  longDescription: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Create %@", @"UndoStrings", @"Action name for newly created graphics.  Class name is inserted at the substitution."), [[NSBundle mainBundle] localizedStringForKey:NSStringFromClass(theClass) value:@"" table:@"GraphicClassNames"]]];
+        [_drawingController commitWithIdentifier: @"draw-shape"];
     }
     _creatingGraphic = nil;
 }

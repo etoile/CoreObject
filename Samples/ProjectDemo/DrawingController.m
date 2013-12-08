@@ -74,4 +74,9 @@
 	return [self.objectGraphContext rootObject];
 }
 
+- (void) objectGraphDidChange
+{
+	[graphicView setNeedsDisplay: YES];
+}
+
 @end

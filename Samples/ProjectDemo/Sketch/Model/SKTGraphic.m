@@ -22,7 +22,37 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 	[documentProperty setDerived: YES];
     [documentProperty setOpposite: (id)@"SKTDrawDocument.graphics"];
     
-    [entity setPropertyDescriptions: A(documentProperty)];
+    ETPropertyDescription *boundsProperty = [ETPropertyDescription descriptionWithName: @"bounds"
+																				  type: (id)@"NSValue"];
+	boundsProperty.valueTransformerName = @"CORectToString";
+	boundsProperty.persistentType = (id)@"NSString";
+	boundsProperty.persistent = YES;
+	
+    ETPropertyDescription *drawsFillProperty = [ETPropertyDescription descriptionWithName: @"drawsFill"
+																					 type: (id)@"NSNumber"];
+	drawsFillProperty.persistent = YES;
+	
+    ETPropertyDescription *fillColorProperty = [ETPropertyDescription descriptionWithName: @"fillColor"
+																					 type: (id)@"NSColor"];
+	fillColorProperty.valueTransformerName = @"COColorToHTMLString";
+	fillColorProperty.persistentType = (id)@"NSString";
+	fillColorProperty.persistent = YES;
+
+    ETPropertyDescription *drawsStrokeProperty = [ETPropertyDescription descriptionWithName: @"drawsStroke"
+																					   type: (id)@"NSNumber"];
+	drawsStrokeProperty.persistent = YES;
+	
+    ETPropertyDescription *strokeColorProperty = [ETPropertyDescription descriptionWithName: @"strokeColor"
+																					   type: (id)@"NSColor"];
+	strokeColorProperty.valueTransformerName = @"COColorToHTMLString";
+	strokeColorProperty.persistentType = (id)@"NSString";
+	strokeColorProperty.persistent = YES;
+
+    ETPropertyDescription *strokeLineWidthProperty = [ETPropertyDescription descriptionWithName: @"strokeLineWidth"
+																						   type: (id)@"NSNumber"];
+	strokeLineWidthProperty.persistent = YES;
+	
+    [entity setPropertyDescriptions: A(documentProperty, boundsProperty, drawsFillProperty, fillColorProperty, drawsStrokeProperty, strokeColorProperty, strokeLineWidthProperty)];
     
     return entity;
 }
@@ -93,15 +123,15 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 }
 
 - (void)setDrawsFill:(BOOL)flag {
-    if (_gFlags.drawsFill != flag) {
-        //[[[self undoManager] prepareWithInvocationTarget:self] setDrawsFill:_gFlags.drawsFill];
-        _gFlags.drawsFill = (flag ? YES : NO);
+    if (_drawsFill != flag) {
+        //[[[self undoManager] prepareWithInvocationTarget:self] setDrawsFill:_drawsFill];
+        _drawsFill = (flag ? YES : NO);
         [self didChange];
     }
 }
 
 - (BOOL)drawsFill {
-    return _gFlags.drawsFill;
+    return _drawsFill;
 }
 
 - (void)setFillColor:(NSColor *)fillColor {
@@ -122,15 +152,15 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 }
 
 - (void)setDrawsStroke:(BOOL)flag {
-    if (_gFlags.drawsStroke != flag) {
-        //[[[self undoManager] prepareWithInvocationTarget:self] setDrawsStroke:_gFlags.drawsStroke];
-        _gFlags.drawsStroke = (flag ? YES : NO);
+    if (_drawsStroke != flag) {
+        //[[[self undoManager] prepareWithInvocationTarget:self] setDrawsStroke:_drawsStroke];
+        _drawsStroke = (flag ? YES : NO);
         [self didChange];
     }
 }
 
 - (BOOL)drawsStroke {
-    return _gFlags.drawsStroke;
+    return _drawsStroke;
 }
 
 - (void)setStrokeColor:(NSColor *)strokeColor {

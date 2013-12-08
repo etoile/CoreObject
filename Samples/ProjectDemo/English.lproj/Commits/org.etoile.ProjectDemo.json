@@ -77,5 +77,11 @@
 			"shortDescription": "Drop items"
 		},
 		
+		"draw-shape":
+		{
+			"type": "creation",
+			"shortDescription": "Draw shape"
+		},
+		
 	}
 }

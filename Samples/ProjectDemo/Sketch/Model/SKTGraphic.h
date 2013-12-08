@@ -38,13 +38,18 @@ extern NSString *SKTGraphicDidChangeNotification;
 @interface SKTGraphic : COObject <NSCopying> {
     @private
     NSRect _bounds;
+	/**
+	 * Temporary variable used to store the bounds at the start of a bounds manipulation
+	 */
     NSRect _origBounds;
     float _lineWidth;
     NSColor *_fillColor;
     NSColor *_strokeColor;
-    struct __gFlags {
-        unsigned int drawsFill:1;
-        unsigned int drawsStroke:1;
+
+	BOOL _drawsFill;
+	BOOL _drawsStroke;
+
+	struct __gFlags {
         unsigned int manipulatingBounds:1;
         unsigned int _pad:29;
     } _gFlags;
