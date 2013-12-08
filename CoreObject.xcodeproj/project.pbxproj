@@ -109,6 +109,10 @@
 		662FFB8017C2026000BA3F2F /* COCommandUndeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */; };
 		662FFB9E17C2DE8100BA3F2F /* COCommandUndeleteBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		662FFB9F17C2DE8100BA3F2F /* COCommandUndeleteBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 662FFB9D17C2DE8100BA3F2F /* COCommandUndeleteBranch.m */; };
+		6633F10E185515F1009CE6F7 /* COColorToHTMLString.h in Headers */ = {isa = PBXBuildFile; fileRef = 6633F10A185515F1009CE6F7 /* COColorToHTMLString.h */; };
+		6633F10F185515F1009CE6F7 /* COColorToHTMLString.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F10B185515F1009CE6F7 /* COColorToHTMLString.m */; };
+		6633F110185515F1009CE6F7 /* CORectToString.h in Headers */ = {isa = PBXBuildFile; fileRef = 6633F10C185515F1009CE6F7 /* CORectToString.h */; };
+		6633F111185515F1009CE6F7 /* CORectToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F10D185515F1009CE6F7 /* CORectToString.m */; };
 		663CE29517C07ED800E729F5 /* COCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28717C07ED800E729F5 /* COCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		663CE29617C07ED800E729F5 /* COCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE28817C07ED800E729F5 /* COCommand.m */; };
 		663CE29917C07ED800E729F5 /* COCommandDeleteBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28B17C07ED800E729F5 /* COCommandDeleteBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -193,8 +197,6 @@
 		6675F8C51785C02A001E5622 /* COPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BE1785C02A001E5622 /* COPath.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C61785C02A001E5622 /* COPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BF1785C02A001E5622 /* COPath.m */; };
 		6675F8C71785C02A001E5622 /* COType.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8C01785C02A001E5622 /* COType.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		667BE9371853DD110066073A /* COColorToHTMLString.m in Sources */ = {isa = PBXBuildFile; fileRef = 667BE9221853D35B0066073A /* COColorToHTMLString.m */; };
-		667BE9381853DD110066073A /* CORectToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 667BE9251853DB190066073A /* CORectToString.m */; };
 		6680846D178CD526003A3CC6 /* COCopier.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680846B178CD526003A3CC6 /* COCopier.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6680846E178CD526003A3CC6 /* COCopier.m in Sources */ = {isa = PBXBuildFile; fileRef = 6680846C178CD526003A3CC6 /* COCopier.m */; };
 		6680848A178DAFE3003A3CC6 /* COArrayDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680847F178DAFE3003A3CC6 /* COArrayDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -583,6 +585,10 @@
 		662FFB7E17C2026000BA3F2F /* COCommandUndeletePersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommandUndeletePersistentRoot.m; sourceTree = "<group>"; };
 		662FFB9C17C2DE8100BA3F2F /* COCommandUndeleteBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandUndeleteBranch.h; sourceTree = "<group>"; };
 		662FFB9D17C2DE8100BA3F2F /* COCommandUndeleteBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = COCommandUndeleteBranch.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		6633F10A185515F1009CE6F7 /* COColorToHTMLString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COColorToHTMLString.h; sourceTree = "<group>"; };
+		6633F10B185515F1009CE6F7 /* COColorToHTMLString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COColorToHTMLString.m; sourceTree = "<group>"; };
+		6633F10C185515F1009CE6F7 /* CORectToString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CORectToString.h; sourceTree = "<group>"; };
+		6633F10D185515F1009CE6F7 /* CORectToString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CORectToString.m; sourceTree = "<group>"; };
 		663CE28717C07ED800E729F5 /* COCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommand.h; sourceTree = "<group>"; };
 		663CE28817C07ED800E729F5 /* COCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = COCommand.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		663CE28B17C07ED800E729F5 /* COCommandDeleteBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandDeleteBranch.h; sourceTree = "<group>"; };
@@ -664,10 +670,6 @@
 		6675F8BE1785C02A001E5622 /* COPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COPath.h; sourceTree = "<group>"; };
 		6675F8BF1785C02A001E5622 /* COPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COPath.m; sourceTree = "<group>"; };
 		6675F8C01785C02A001E5622 /* COType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COType.h; sourceTree = "<group>"; };
-		667BE9211853D35B0066073A /* COColorToHTMLString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COColorToHTMLString.h; sourceTree = "<group>"; };
-		667BE9221853D35B0066073A /* COColorToHTMLString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COColorToHTMLString.m; sourceTree = "<group>"; };
-		667BE9241853DB190066073A /* CORectToString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CORectToString.h; sourceTree = "<group>"; };
-		667BE9251853DB190066073A /* CORectToString.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CORectToString.m; sourceTree = "<group>"; };
 		6680846B178CD526003A3CC6 /* COCopier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCopier.h; path = Core/COCopier.h; sourceTree = "<group>"; };
 		6680846C178CD526003A3CC6 /* COCopier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCopier.m; path = Core/COCopier.m; sourceTree = "<group>"; };
 		6680847F178DAFE3003A3CC6 /* COArrayDiff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COArrayDiff.h; path = Diff/COArrayDiff.h; sourceTree = "<group>"; };
@@ -889,7 +891,7 @@
 			children = (
 				60884D401837B09800C5C7C9 /* AppKit.framework */,
 				66D96C9F178B6E5600D1553C /* libsqlite3.dylib */,
-				667BE9191853D3410066073A /* ValueTransformers */,
+				6633F107185515F1009CE6F7 /* Extras */,
 				6699633B115F0C4200359BE6 /* Documentation */,
 				66550BE717D51C5000327657 /* Benchmark */,
 				791B4DF41299C56900CCF472 /* Tests */,
@@ -1001,6 +1003,33 @@
 			);
 			name = Attribute;
 			path = Tests/Attribute;
+			sourceTree = "<group>";
+		};
+		6633F107185515F1009CE6F7 /* Extras */ = {
+			isa = PBXGroup;
+			children = (
+				6633F108185515F1009CE6F7 /* Model */,
+				6633F109185515F1009CE6F7 /* ValueTransformers */,
+			);
+			path = Extras;
+			sourceTree = "<group>";
+		};
+		6633F108185515F1009CE6F7 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		6633F109185515F1009CE6F7 /* ValueTransformers */ = {
+			isa = PBXGroup;
+			children = (
+				6633F10A185515F1009CE6F7 /* COColorToHTMLString.h */,
+				6633F10B185515F1009CE6F7 /* COColorToHTMLString.m */,
+				6633F10C185515F1009CE6F7 /* CORectToString.h */,
+				6633F10D185515F1009CE6F7 /* CORectToString.m */,
+			);
+			path = ValueTransformers;
 			sourceTree = "<group>";
 		};
 		663CE28617C07ED800E729F5 /* Undo */ = {
@@ -1144,17 +1173,6 @@
 				6660B39F1839659D009007FD /* COAttachmentID.m */,
 			);
 			path = StorageDataModel;
-			sourceTree = "<group>";
-		};
-		667BE9191853D3410066073A /* ValueTransformers */ = {
-			isa = PBXGroup;
-			children = (
-				667BE9211853D35B0066073A /* COColorToHTMLString.h */,
-				667BE9221853D35B0066073A /* COColorToHTMLString.m */,
-				667BE9241853DB190066073A /* CORectToString.h */,
-				667BE9251853DB190066073A /* CORectToString.m */,
-			);
-			path = ValueTransformers;
 			sourceTree = "<group>";
 		};
 		6686BDB212592C1B0065DE1A /* Supporting Files */ = {
@@ -1578,6 +1596,7 @@
 				66D96CC0178B717200D1553C /* CORevisionInfo.h in Headers */,
 				66D96CC2178B717200D1553C /* COSearchResult.h in Headers */,
 				66D96CC4178B717200D1553C /* COSQLiteStore.h in Headers */,
+				6633F110185515F1009CE6F7 /* CORectToString.h in Headers */,
 				66D96CC6178B717200D1553C /* COSQLiteStore+Attachments.h in Headers */,
 				66D96CC8178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.h in Headers */,
 				6675F8C51785C02A001E5622 /* COPath.h in Headers */,
@@ -1642,6 +1661,7 @@
 				66457FC717E8BFE5003C51A8 /* COStoreUndeletePersistentRoot.h in Headers */,
 				66457FC917E8BFE5003C51A8 /* COStoreWriteRevision.h in Headers */,
 				66457FCF17E8C9D0003C51A8 /* COStoreAction.h in Headers */,
+				6633F10E185515F1009CE6F7 /* COColorToHTMLString.h in Headers */,
 				66457FEC17E9683F003C51A8 /* CORevisionCache.h in Headers */,
 				601C1D4F180C115D00CED07E /* COObjectGraphContext+GarbageCollection.h in Headers */,
 				669FD4F3184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h in Headers */,
@@ -1912,10 +1932,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				667BE9371853DD110066073A /* COColorToHTMLString.m in Sources */,
-				667BE9381853DD110066073A /* CORectToString.m in Sources */,
 				663CE2BF17C1815B00E729F5 /* COCommandDeletePersistentRoot.m in Sources */,
 				660179D1182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.m in Sources */,
+				6633F10F185515F1009CE6F7 /* COColorToHTMLString.m in Sources */,
 				791B4E721299C90900CCF472 /* FMDatabase.m in Sources */,
 				660179C9182AFA4B006E7D7B /* COSynchronizerRevision.m in Sources */,
 				66FD348F1830BB3800898381 /* COSynchronizerJSONClient.m in Sources */,
@@ -1998,6 +2017,7 @@
 				662AC93E1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m in Sources */,
 				660D4CE617D689FC003C9ACC /* COMergeInfo.m in Sources */,
 				60CAAC6517E3117E00E8E2B1 /* COTrack.m in Sources */,
+				6633F111185515F1009CE6F7 /* CORectToString.m in Sources */,
 				66457FB617E8BFE5003C51A8 /* COStoreCreateBranch.m in Sources */,
 				66E4CF541816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.m in Sources */,
 				66457FB817E8BFE5003C51A8 /* COStoreCreatePersistentRoot.m in Sources */,
