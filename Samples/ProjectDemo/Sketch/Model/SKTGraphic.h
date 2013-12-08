@@ -42,7 +42,7 @@ extern NSString *SKTGraphicDidChangeNotification;
 	 * Temporary variable used to store the bounds at the start of a bounds manipulation
 	 */
     NSRect _origBounds;
-    float _lineWidth;
+    float _strokeLineWidth;
     NSColor *_fillColor;
     NSColor *_strokeColor;
 

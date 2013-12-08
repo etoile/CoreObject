@@ -10,7 +10,7 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTRectangle"];
+    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTLine"];
 	[entity setParent: (id)@"SKTGraphic"];
 	
     ETPropertyDescription *startsAtLowerLeftProperty = [ETPropertyDescription descriptionWithName: @"startsAtLowerLeft"

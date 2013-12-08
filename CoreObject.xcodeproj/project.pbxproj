@@ -193,7 +193,6 @@
 		6675F8C51785C02A001E5622 /* COPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8BE1785C02A001E5622 /* COPath.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6675F8C61785C02A001E5622 /* COPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 6675F8BF1785C02A001E5622 /* COPath.m */; };
 		6675F8C71785C02A001E5622 /* COType.h in Headers */ = {isa = PBXBuildFile; fileRef = 6675F8C01785C02A001E5622 /* COType.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		667BE9231853D35B0066073A /* COColorToHTMLString.m in Sources */ = {isa = PBXBuildFile; fileRef = 667BE9221853D35B0066073A /* COColorToHTMLString.m */; };
 		667BE9371853DD110066073A /* COColorToHTMLString.m in Sources */ = {isa = PBXBuildFile; fileRef = 667BE9221853D35B0066073A /* COColorToHTMLString.m */; };
 		667BE9381853DD110066073A /* CORectToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 667BE9251853DB190066073A /* CORectToString.m */; };
 		6680846D178CD526003A3CC6 /* COCopier.h in Headers */ = {isa = PBXBuildFile; fileRef = 6680846B178CD526003A3CC6 /* COCopier.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2091,7 +2090,6 @@
 				6621BF1A1847F077000809CF /* Child.m in Sources */,
 				6610115E184D8C30001A3E24 /* OrderedGroupWithOpposite.m in Sources */,
 				66E40D731836D08D00E5B4A7 /* TestSynchronizerJSONTransport.m in Sources */,
-				667BE9231853D35B0066073A /* COColorToHTMLString.m in Sources */,
 				66E40D6E1836D08D00E5B4A7 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */,
 				66101158184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.m in Sources */,
 				66E40D771836D08E00E5B4A7 /* TestUndo.m in Sources */,

@@ -111,7 +111,9 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
             [self didChange];
             //[[[self undoManager] prepareWithInvocationTarget:self] setBounds:_bounds];
         }
+		[self willChangeValueForProperty: @"bounds"];
         _bounds = bounds;
+		[self didChangeValueForProperty: @"bounds"];
         if (!_gFlags.manipulatingBounds) {
             [self didChange];
         }
@@ -125,7 +127,9 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 - (void)setDrawsFill:(BOOL)flag {
     if (_drawsFill != flag) {
         //[[[self undoManager] prepareWithInvocationTarget:self] setDrawsFill:_drawsFill];
+		[self willChangeValueForProperty: @"drawsFill"];
         _drawsFill = (flag ? YES : NO);
+		[self didChangeValueForProperty: @"drawsFill"];
         [self didChange];
     }
 }
@@ -137,7 +141,9 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 - (void)setFillColor:(NSColor *)fillColor {
 
 	//[[[self undoManager] prepareWithInvocationTarget:self] setFillColor:_fillColor];
+	[self willChangeValueForProperty: @"fillColor"];
 	_fillColor = fillColor;
+	[self didChangeValueForProperty:@"fillColor"];
 	[self didChange];
 
     if (_fillColor) {
@@ -154,7 +160,9 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 - (void)setDrawsStroke:(BOOL)flag {
     if (_drawsStroke != flag) {
         //[[[self undoManager] prepareWithInvocationTarget:self] setDrawsStroke:_drawsStroke];
+		[self willChangeValueForProperty: @"drawsStroke"];
         _drawsStroke = (flag ? YES : NO);
+		[self didChangeValueForProperty: @"drawsStroke"];
         [self didChange];
     }
 }
@@ -165,7 +173,9 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 - (void)setStrokeColor:(NSColor *)strokeColor {
         //[[[self undoManager] prepareWithInvocationTarget:self] setStrokeColor:_strokeColor];
+	[self willChangeValueForProperty: @"strokeColor"];
 	_strokeColor = strokeColor;
+	[self didChangeValueForProperty: @"strokeColor"];
 	[self didChange];
     
     if (_strokeColor) {
@@ -180,21 +190,26 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 }
 
 - (void)setStrokeLineWidth:(float)width {
-    if (_lineWidth != width) {
+    if (_strokeLineWidth != width) {
         //[[[self undoManager] prepareWithInvocationTarget:self] setStrokeLineWidth:_lineWidth];
+		
         if (width >= 0.0) {
             [self setDrawsStroke:YES];
-            _lineWidth = width;
         } else {
             [self setDrawsStroke:NO];
-            _lineWidth = 0.0;
+			width = 0;
         }
+		
+		[self willChangeValueForProperty: @"strokeLineWidth"];
+		_strokeLineWidth = width;
+		[self didChangeValueForProperty: @"strokeLineWidth"];
+
         [self didChange];
     }
 }
 
 - (float)strokeLineWidth {
-    return _lineWidth;
+    return _strokeLineWidth;
 }
 
 // =================================== Extended mutation ===================================

@@ -83,5 +83,28 @@
 			"shortDescription": "Draw shape"
 		},
 		
+		"resize-shape":
+		{
+			"type": "modification",
+			"shortDescription": "Resize shape"
+		},
+		
+		"move-shape":
+		{
+			"type": "modification",
+			"shortDescription": "Move shape"
+		},
+		
+		"change-shape-color":
+		{
+			"type": "modification",
+			"shortDescription": "Change color of shape"
+		},
+
+		"delete-shape":
+		{
+			"type": "deletion",
+			"shortDescription": "Delete shape"
+		}
 	}
 }

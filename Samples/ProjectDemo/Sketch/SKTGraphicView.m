@@ -387,7 +387,7 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
 
     [graphic stopBoundsManipulation];
 
-    //[[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Resize", @"UndoStrings", @"Action name for resizes.")];
+    [_drawingController commitWithIdentifier: @"resize-shape"];
 }
 
 - (void)rubberbandSelectWithEvent:(NSEvent *)theEvent {
@@ -513,7 +513,7 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
 
         if (didMove) {
             // Only if we really moved.
-            //[[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Move", @"UndoStrings", @"Action name for moves.")];
+            [_drawingController commitWithIdentifier: @"move-shape"];
         }
     }
 }
@@ -775,7 +775,7 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
             [curGraphic setFillColor:color];
             [curGraphic setDrawsFill:YES];
         }
-        //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Set Fill Color", @"UndoStrings", @"Action name for setting fill color.")];
+        [_drawingController commitWithIdentifier: @"change-shape-color"];
     }
 }
 
@@ -793,7 +793,7 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
     if ([selCopy count] > 0) {
         [[self drawDocument] performSelector:@selector(removeGraphic:) withEachObjectInArray:selCopy];
 
-        //[[[self drawDocument] undoManager] setActionName:NSLocalizedStringFromTable(@"Delete", @"UndoStrings", @"Action name for deletions.")];
+        [_drawingController commitWithIdentifier: @"delete-shape"];
     }
 }
 

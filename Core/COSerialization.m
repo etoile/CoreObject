@@ -305,10 +305,15 @@ serialization. */
 			return kCOTypeInt64;
 		}
 		else if (strcmp([value objCType], @encode(CGFloat)) == 0
-		      || strcmp([value objCType], @encode(double)) == 0)
+		      || strcmp([value objCType], @encode(double)) == 0
+			  || strcmp([value objCType], @encode(float)) == 0)
 		{
 			return kCOTypeDouble;
 		}
+		
+		// FIXME: Finish the above... we should handle all values that NSNumber can encode,
+		// except unsigned integers larger than the maximum value of int64_t.
+		ETAssertUnreachable();
 	}
 	else if ([typeName isEqualToString: @"NSData"])
 	{
