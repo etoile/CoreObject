@@ -83,6 +83,11 @@ Future Work
   - Switch to NSUUID everywhere?
 
   - Expose COEditingContext(Debugging), probably with a header we can explicit import (should be outside of COEditingContext+Private)
+  
+  - Test editing context with no store
+  
+  	- Not sure the behavior is still well defined. Could be better to move to a COInMemoryStore (just a null pattern implementation).
+
 
 - COPersistentRoot
 

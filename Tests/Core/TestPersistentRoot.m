@@ -38,6 +38,11 @@
     return self;
 }
 
+- (void)testExceptionOnInit
+{
+	UKRaisesException([[COPersistentRoot alloc] init]);
+}
+
 - (void)testBranchCreation
 {
     [persistentRoot commit];

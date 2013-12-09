@@ -46,6 +46,11 @@
     return self;
 }
 
+- (void)testExceptionOnInit
+{
+	UKRaisesException([[COBranch alloc] init]);
+}
+
 - (void)testNoExistingCommitTrack
 {
 	[rootObj setValue: @"Groceries" forProperty: @"label"];

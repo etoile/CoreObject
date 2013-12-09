@@ -37,6 +37,12 @@ NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidCh
 @synthesize branchesPendingDeletion = _branchesPendingDeletion;
 @synthesize branchesPendingUndeletion = _branchesPendingUndeletion;
 
+- (id)init
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
+}
+
 - (id) initWithInfo: (COPersistentRootInfo *)info
 cheapCopyRevisionUUID: (ETUUID *)cheapCopyRevisionID
 cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
