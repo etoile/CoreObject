@@ -619,7 +619,9 @@
     // This should cause a new revision to be written, even though there
     // are no changes in the inner objects.
     originalBranch.shouldMakeEmptyCommit = YES;
-    [ctx commitWithType: @"save"  shortDescription: @"user pressed save"];
+    [ctx commitWithMetadata: expectedMetadata
+				  undoTrack: nil
+					  error: NULL];
     
 	[self checkBranchWithExistingAndNewContext: originalBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)

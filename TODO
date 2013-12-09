@@ -4,9 +4,9 @@ TODO
 First alpha release blockers
 ----------------------------
 
-- Remove -commitWithType:shortDescription: (or least move it to TestCommon)
+- Remove -commitWithType:shortDescription:
 
-  - Used in EtoileUI, ProjectDemo and CoreObject test suite
+  - Used in EtoileUI, ProjectDemo
 
 - Add some collection-oriented KVO update tests to TestObjectUpdate
 
