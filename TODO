@@ -4,21 +4,25 @@ TODO
 First alpha release blockers
 ----------------------------
 
+- Remove -commitWithType:shortDescription: (or least move it to TestCommon)
+
+  - Used in EtoileUI, ProjectDemo and CoreObject test suite
+
 - Add some collection-oriented KVO update tests to TestObjectUpdate
 
 - Add some basic transient relationship tests
 
 - Fix test suite compilation on GNUstep
 
-	- Add -[NSNotificationCenter addObserverForName:object:queue:usingBlock:] to GNUstep
+  - Add -[NSNotificationCenter addObserverForName:object:queue:usingBlock:] to GNUstep
 
-	- For compatibility with the current GNUstep release, perhaps emulate -addObserverForName:object:queue:usingBlocks: in a category or TestCommon
+  - For compatibility with the current GNUstep release, perhaps emulate -addObserverForName:object:queue:usingBlocks: in a category or TestCommon
 
 - Fix GNUstep support
 
-	- Samples
+  - Samples
 
-	- All tests pass for both CoreObject and EtoileUI test suite
+  - All tests pass for both CoreObject and EtoileUI test suite
 
 - Check and update all Core API documentation (underway)
 

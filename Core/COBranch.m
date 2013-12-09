@@ -738,6 +738,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	}
 }
 
+// TODO: Remove or rewrite... The loop in the middle seems to do nothing.
 - (CORevision *) revisionWithUUID: (ETUUID *)aRevisionID
 {
     CORevision *oldest = [self initialRevision];

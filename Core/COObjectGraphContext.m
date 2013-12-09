@@ -16,6 +16,7 @@
 #import "COSerialization.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
+#import "COBranch+Private.h"
 #import "COItem.h"
 #import "CODictionary.h"
 

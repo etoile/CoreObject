@@ -158,11 +158,15 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @property (nonatomic, readonly) NSDate *creationDate;
 /**
- * The persistent root this is a copy of, or nil if the receiver is not a copy
+ * The persistent root this is a copy of, or nil if the receiver is not a copy.
+ *
+ * See -[COPersistentRoot isCopy].
  */
 @property (nonatomic, readonly) COPersistentRoot *parentPersistentRoot;
 /**
  * Returns YES if this persistent root is a copy (self.parentPersistentRoot != nil)
+ *
+ * See -[COBranch isCopy].
  */
 @property (nonatomic, readonly) BOOL isCopy;
 /**
@@ -257,7 +261,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * branch metadata, reverting branch to a past revision) all count as 
  * uncommitted changes.
  *
- * See also -discardAllChanges.
+ * See also -discardAllChanges and -[COBranch hasChanges].
  */
 - (BOOL)hasChanges;
 /**
@@ -273,7 +277,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * -branchesPendingUndeletion and -branchesPendingUpdate  will all return empty
  * sets once the changes have been discarded.
  *
- * See also -hasChanges.
+ * See also -hasChanges and -[COBranch discardAllChanges].
  */
 - (void)discardAllChanges;
 

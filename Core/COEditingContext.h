@@ -215,7 +215,7 @@
  * metadata, reverting branch to a past revision) all count as uncommitted 
  * changes.
  *
- * See also -discardAllChanges.
+ * See also -discardAllChanges and -[COPersistentRoot hasChanges].
  */
 - (BOOL)hasChanges;
 /**
@@ -232,7 +232,7 @@
  * -persistentRootsPendingUndeletion and -persistentRootsPendingUpdate  will all 
  * return empty sets once the changes have been discarded.
  *
- * See also -hasChanges.
+ * See also -hasChanges and -[COPersistentRoot discardAllChanges].
  */
 - (void)discardAllChanges;
 

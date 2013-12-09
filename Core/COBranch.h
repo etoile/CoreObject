@@ -31,14 +31,8 @@ extern NSString * const kCOBranchLabel;
 {
 	@private
     ETUUID *_UUID;
-    
-    /**
-     * Weak reference
-     */
 	COPersistentRoot *__weak _persistentRoot;
-
     BOOL _isCreated;
-    
     /** 
      * If _isCreated is NO, this is the parent revision to use for the branch.
      *
@@ -48,17 +42,13 @@ extern NSString * const kCOBranchLabel;
      */
 	ETUUID *_currentRevisionUUID;
 	ETUUID *_headRevisionUUID;
-    
     /**
      * If different than the metadata for this branch in _persistentRoot's _savedState,
      * then a metadata change is staged for commit.     
      */
     NSMutableDictionary *_metadata;
-    
     BOOL _metadataChanged;
-    
     COObjectGraphContext *_objectGraph;
-
     ETUUID *_parentBranchUUID;
 	NSMutableArray *_revisions;
 }
@@ -69,6 +59,8 @@ extern NSString * const kCOBranchLabel;
 
 /**
  * Returns whether the branch represents a cheap copy.
+ *
+ * See also -parentBranch.
  */
 @property (nonatomic, readonly) BOOL isCopy;
 /**
@@ -109,15 +101,17 @@ extern NSString * const kCOBranchLabel;
  */
 @property (nonatomic, assign, getter=isDeleted) BOOL deleted;
 /**
- * Non-persistent property (default YES) which can be changed to NO to indicate that
- * -setCurrentRevision: should not be used to revert the branch to an older state.
+ * Controls whether -setCurrentRevision: can be used to revert the branch to an 
+ * older state.
+ *
+ * This property is non-persistent, and returns YES by default.
  *
  * The main use case is when a branch is used for collaborative editing,
  * this is set to NO by COSynchronizer, since the collaborative editing
  * protocol we're using doesn't support making reverts, only forward changes.
  *
  * The undo framework checks this property to see whether to perform a revert
- * or commit the equivalant selective undo. Also, if NO, the -undo/-redo methods
+ * or commit the equivalent selective undo. Also, if NO, the -undo/-redo methods
  * on COBranch are disabled (-canUndo and -canRedo return NO).
  */
 @property (nonatomic, assign) BOOL supportsRevert;
@@ -132,7 +126,7 @@ extern NSString * const kCOBranchLabel;
  * created at the same time than its persistent root. The parent revision is 
  * also nil in this case.
  *
- * For a cheap copy, the parent branch is never nil.
+ * For a cheap copy, the parent branch is never nil. See -isCopy.
  */
 @property (nonatomic, readonly) COBranch *parentBranch;
 /**
@@ -172,13 +166,9 @@ extern NSString * const kCOBranchLabel;
 /**
  * The revision bound to the most recent commit in the branch.
  *
- * In the store terminology, this is the branch head revision.
- *
  * This is the same than <code>[[self nodes] lastObject]</code>.
  */
 @property (nonatomic, readonly) CORevision *headRevision;
-
-- (void)reloadAtRevision: (CORevision *)revision;
 
 
 /** @taskunit Persistent Root and Object Graph Context */
@@ -201,18 +191,29 @@ extern NSString * const kCOBranchLabel;
  */
 @property (nonatomic, strong) id rootObject;
 
-/**
- * @taskunit Pending Changes
- */
+
+/** @taskunit Pending Changes */
 
 
 /**
- * Returns whether any object has been inserted, deleted or updated since the
- * last commit.
+ * Returns whether the branch contains uncommitted changes.
  *
- * See also -changedObjects.
+ * Object insertions and updates in the object graph context, edited branch 
+ * metadata (e.g. changing the label or reverting to a past revision), all count 
+ * as uncommitted changes.
+ *
+ * See also -discardAllChanges and -[COObjectGraphContext hasChanges].
  */
 - (BOOL)hasChanges;
+/**
+ * Discards the uncommitted changes to reset the branch to its last commit state.
+ *
+ * Object insertions and updates in the object graph context, edited branch 
+ * metadata (e.g. changing the label or reverting to a past revision), will be 
+ * cancelled.
+ *
+ * See also -hasChanges and -[COObjectGraphContext discardAllChanges].
+ */
 - (void)discardAllChanges;
 /**
  * If set to YES, the next  commit in the editing context will write a
@@ -223,13 +224,24 @@ extern NSString * const kCOBranchLabel;
 @property (nonatomic, assign) BOOL shouldMakeEmptyCommit;
 
 
-
 /** @taskunit Undo / Redo */
 
 
+/**
+ * See –[COTrack canUndo].
+ */
 - (BOOL)canUndo;
+/**
+ * See –[COTrack canRedo].
+ */
 - (BOOL)canRedo;
+/**
+ * See –[COTrack undo].
+ */
 - (void)undo;
+/**
+ * See –[COTrack redo].
+ */
 - (void)redo;
 
 
@@ -281,32 +293,51 @@ extern NSString * const kCOBranchLabel;
  *
  * The receiver must be committed.
  *
- * See also -makeBranchWithLable:atRevision: and -[COPersistentRoot parentPersistentRoot].
+ * See also -makeBranchWithLable:atRevision:, -isCopy and 
+ * -[COPersistentRoot parentPersistentRoot].
  */
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev;
 
 
-/** @taskunit Merging Between Tracks */
+/** @taskunit Merging Between Branches */
+
 
 /**
- * Branch that is currently being merged. Always returns nil unless explicitly
- * set. If it is set at commit time, records the _current revision_ of the
- * mergingBranch as the merge parent of the new commit.
+ * The branch that is currently being merged. 
+ *
+ * Always returns nil unless explicitly set. 
+ * 
+ * If it is set at commit time, records the <strong>current revision</strong of 
+ * the merging branch as the merge parent of the new commit.
  */
 @property (nonatomic, strong) COBranch *mergingBranch;
-
+/**
+ * Returns a merge info object representing the changes between the receiver and 
+ * the given branch to be merged.
+ *
+ * This method computes the merge (the involved revisions and the diff) based 
+ * on each branch current revision, but doesn't apply it. 
+ *
+ * TODO: Provide an example showing how to apply the diff.
+ *
+ * See also -mergingInfoForMergingRevision:
+ */
 - (COMergeInfo *) mergeInfoForMergingBranch: (COBranch *)aBranch;
-
+/**
+ * Returns a merge info object representing the changes between the receiver 
+ * current revision and the given revision to be merged.
+ *
+ * TODO: Document how the merge is computed if aRevision belongs to the receiver 
+ * rather than another branch.
+ *
+ * This method computes the merge (the involved revisions and the diff), but 
+ * doesn't apply it. 
+ *
+ * TODO: Provide an example showing how to apply the diff.
+ *
+ * See also -mergingInfoForMergingBranch:.
+ */
 - (COMergeInfo *) mergeInfoForMergingRevision:(CORevision *)aRevision;
 
-// TODO: Add test of this method
-/**
- * Searches for whether the given revision is on this branch.
- * Returns the corresponding CORevision if it is, or nil if not.
- *
- * Note that this means nil will be returned if the given revision is not on
- * this branch, even if it on another branch of this persistent root.
- */
-- (CORevision *) revisionWithUUID: (ETUUID *)aRevisionID;
 
 @end
