@@ -500,10 +500,23 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 {
 	for (COObject *obj in objects)
 	{
-		[_objectsByAdditionalItemUUIDs removeObjectsForKeys: [[obj additionalStoreItemUUIDs] allValues]];
+		[self discardObject: obj];
 	}
+}
 
-	[_loadedObjects removeObjectsForKeys: [(id)[[objects mappedCollection] UUID] allObjects]];
+- (void)discardObject: (COObject *)anObject
+{
+    // Mark the object as a "zombie"
+    
+    [anObject markAsRemovedFromContext];
+
+	// Remove it from the additional item to object lookup table
+
+	[_objectsByAdditionalItemUUIDs removeObjectsForKeys: [[anObject additionalStoreItemUUIDs] allValues]];
+    
+    // Release it from the objects dictionary (may release it)
+    
+    [_loadedObjects removeObjectForKey: [anObject UUID]];
 }
 
 - (void)clearChangeTracking
@@ -559,21 +572,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     [_insertedObjects removeObject: anObject];
     [_updatedObjects removeObject: anObject];
 	
-	// TODO: Put the three next steps into a -discardObject: method, and rewrite
-	// -discardObjects: to call -discardObject:
-    
-    // Mark the object as a "zombie"
-    
-    [anObject markAsRemovedFromContext];
-
-	// Remove it from the additional item to object lookup table
-
-	[_objectsByAdditionalItemUUIDs removeObjectsForKeys: [[anObject additionalStoreItemUUIDs] allValues]];
-    
-    // Release it from the objects dictionary (may release it)
-    
-    [_loadedObjects removeObjectForKey: uuid];
-    anObject = nil;
+	[self discardObject: anObject];
 }
 
 - (void)removeUnreachableObjects
