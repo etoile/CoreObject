@@ -11,7 +11,7 @@
 #import <CoreObject/COContainer.h>
 #import <CoreObject/COEditingContext.h>
 
-@class COTagLibrary;
+@class COGroup, COTagLibrary;
 
 /**
  * @group Object Collection and Organization

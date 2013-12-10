@@ -10,8 +10,6 @@ First alpha release blockers
 
 - Add some collection-oriented KVO update tests to TestObjectUpdate
 
-- Add some basic transient relationship tests
-
 - Fix test suite compilation on GNUstep
 
   - Add -[NSNotificationCenter addObserverForName:object:queue:usingBlock:] to GNUstep
@@ -169,6 +167,8 @@ Future Work
 
   - Make primitives with potentially mutable subclasses (NSString and NSData)
     have immutable copies made before being stored in the variable storage.
+
+  - Add more transient relationship tests
 
 
 - COItem
