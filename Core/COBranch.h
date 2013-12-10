@@ -43,14 +43,17 @@ extern NSString * const kCOBranchLabel;
 	ETUUID *_currentRevisionUUID;
 	ETUUID *_headRevisionUUID;
     /**
-     * If different than the metadata for this branch in _persistentRoot's _savedState,
-     * then a metadata change is staged for commit.     
+     * If different than the metadata for this branch in _persistentRoot's 
+     * _savedState, then a metadata change is staged for commit.     
      */
     NSMutableDictionary *_metadata;
     BOOL _metadataChanged;
+	BOOL _supportsRevert;
     COObjectGraphContext *_objectGraph;
+	BOOL _shouldMakeEmptyCommit;
     ETUUID *_parentBranchUUID;
 	NSMutableArray *_revisions;
+	COBranch *_mergingBranch;
 }
 
 

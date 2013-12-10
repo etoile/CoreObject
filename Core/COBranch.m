@@ -36,12 +36,9 @@ NSString* const kCOBranchLabel = @"COBranchLabel";
 
 @implementation COBranch
 
-@synthesize UUID = _UUID;
-@synthesize persistentRoot = _persistentRoot;
-@synthesize objectGraphContext = _objectGraph;
-@synthesize mergingBranch;
-@synthesize shouldMakeEmptyCommit;
-@synthesize supportsRevert;
+@synthesize UUID = _UUID, persistentRoot = _persistentRoot, objectGraphContext = _objectGraph;
+@synthesize shouldMakeEmptyCommit = _shouldMakeEmptyCommit, supportsRevert = _supportsRevert;
+@synthesize mergingBranch = _mergingBranch;
 
 + (void) initialize
 {
@@ -79,7 +76,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 	SUPERINIT;
 
-	self.supportsRevert = YES;
+	_supportsRevert = YES;
     _UUID =  aUUID;
         
 	/* The persistent root retains us */
