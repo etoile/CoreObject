@@ -37,7 +37,6 @@ extern NSString *SKTGraphicDidChangeNotification;
 
 @interface SKTGraphic : COObject <NSCopying> {
     @private
-    NSRect _bounds;
 	/**
 	 * Temporary variable used to store the bounds at the start of a bounds manipulation
 	 */
@@ -62,6 +61,9 @@ extern NSString *SKTGraphicDidChangeNotification;
 // =================================== Primitives ===================================
 - (void)didChange;
     // This sends the did change notification.  All change primitives should call it.
+
+@property NSValue *origin;
+@property NSValue *size;
 
 - (void)setBounds:(NSRect)bounds;
 - (NSRect)bounds;

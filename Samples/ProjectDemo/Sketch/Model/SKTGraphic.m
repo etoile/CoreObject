@@ -22,11 +22,13 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 	[documentProperty setDerived: YES];
     [documentProperty setOpposite: (id)@"SKTDrawDocument.graphics"];
     
-    ETPropertyDescription *boundsProperty = [ETPropertyDescription descriptionWithName: @"bounds"
-																				  type: (id)@"NSValue"];
-	boundsProperty.valueTransformerName = @"CORectToString";
-	boundsProperty.persistentType = (id)@"NSString";
-	boundsProperty.persistent = YES;
+    ETPropertyDescription *originProperty = [ETPropertyDescription descriptionWithName: @"origin"
+																				  type: (id)@"NSPoint"];
+	originProperty.persistent = YES;
+	
+    ETPropertyDescription *sizeProperty = [ETPropertyDescription descriptionWithName: @"size"
+																				  type: (id)@"NSSize"];
+	sizeProperty.persistent = YES;
 	
     ETPropertyDescription *drawsFillProperty = [ETPropertyDescription descriptionWithName: @"drawsFill"
 																					 type: (id)@"NSNumber"];
@@ -52,7 +54,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 																						   type: (id)@"NSNumber"];
 	strokeLineWidthProperty.persistent = YES;
 	
-    [entity setPropertyDescriptions: A(documentProperty, boundsProperty, drawsFillProperty, fillColorProperty, drawsStrokeProperty, strokeColorProperty, strokeLineWidthProperty)];
+    [entity setPropertyDescriptions: A(documentProperty, originProperty, sizeProperty, drawsFillProperty, fillColorProperty, drawsStrokeProperty, strokeColorProperty, strokeLineWidthProperty)];
     
     return entity;
 }
@@ -99,29 +101,36 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 }
 
 // =================================== Primitives ===================================
+
+@dynamic origin, size;
+
 - (void)didChange {
     [self.document invalidateGraphic:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:SKTGraphicDidChangeNotification object:self];
 }
     
 - (void)setBounds:(NSRect)bounds {
-    if (!NSEqualRects(bounds, _bounds)) {
+    if (!NSEqualRects(bounds, self.bounds)) {
         if (!_gFlags.manipulatingBounds) {
             // Send the notification before and after so that observers who invalidate display in views will wind up invalidating both the original rect and the new one.
             [self didChange];
             //[[[self undoManager] prepareWithInvocationTarget:self] setBounds:_bounds];
         }
-		[self willChangeValueForProperty: @"bounds"];
-        _bounds = bounds;
-		[self didChangeValueForProperty: @"bounds"];
-        if (!_gFlags.manipulatingBounds) {
+
+        self.origin = [NSValue valueWithPoint: bounds.origin];
+		self.size = [NSValue valueWithSize: bounds.size];
+		
+		if (!_gFlags.manipulatingBounds) {
             [self didChange];
         }
     }
 }
 
 - (NSRect)bounds {
-    return _bounds;
+    NSRect result;
+	result.origin = [self.origin pointValue];
+	result.size = [self.size sizeValue];
+	return result;
 }
 
 - (void)setDrawsFill:(BOOL)flag {
@@ -216,18 +225,18 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 - (void)startBoundsManipulation {
     // Save the original bounds.
     _gFlags.manipulatingBounds = YES;
-    _origBounds = _bounds;
+    _origBounds = self.bounds;
 }
 
 - (void)stopBoundsManipulation {
     if (_gFlags.manipulatingBounds) {
         // Restore the original bounds, the set the new bounds.
-        if (!NSEqualRects(_origBounds, _bounds)) {
+        if (!NSEqualRects(_origBounds, self.bounds)) {
             NSRect temp;
 
             _gFlags.manipulatingBounds = NO;
-            temp = _bounds;
-            _bounds = _origBounds;
+            temp = self.bounds;
+            [self setBounds: _origBounds];
             [self setBounds:temp];
         } else {
             _gFlags.manipulatingBounds = NO;
