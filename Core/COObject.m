@@ -571,7 +571,6 @@ See +[NSObject typePrefix]. */
 	if ([self isCoreObjectRelationship: propertyDesc] == NO)
 		return;
 
-	// FIXME: -isPrimitiveCollection might be O(N)! Fix or avoid.
 	if ([value isPrimitiveCollection])
 	{
 		ETAssert([propertyDesc isMultivalued]);
