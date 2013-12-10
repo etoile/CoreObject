@@ -1,11 +1,9 @@
 #import <Cocoa/Cocoa.h>
-#import "Document.h"
+#import "EWDocumentWindowController.h"
 
-@interface TextController : NSWindowController <NSTextViewDelegate>
+@interface TextController : EWDocumentWindowController <NSTextViewDelegate>
 {
 	IBOutlet NSTextView *textView;
-	Document *doc; // weak ref
-	BOOL isSharing;
 }
 
 @end

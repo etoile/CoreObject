@@ -168,7 +168,8 @@
 	
 	NSDictionary *windowControllerClassForRootDocObjectClassName =
 		@{ NSStringFromClass([OutlineItem class]) : [OutlineController class],
-		   NSStringFromClass([SKTDrawDocument class]) : [DrawingController class] };
+		   NSStringFromClass([SKTDrawDocument class]) : [DrawingController class],
+		   NSStringFromClass([TextItem class]) : [TextController class]};
 	
 	NSString *rootDocObjectClassName = NSStringFromClass([aDoc.rootDocObject class]);
 	Class wcClass = windowControllerClassForRootDocObjectClassName[rootDocObjectClassName];

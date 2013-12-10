@@ -105,6 +105,12 @@
 		{
 			"type": "deletion",
 			"shortDescription": "Delete shape"
+		},
+		
+		"edit-text":
+		{
+			"type": "modification",
+			"shortDescription": "Edit text document"
 		}
 	}
 }

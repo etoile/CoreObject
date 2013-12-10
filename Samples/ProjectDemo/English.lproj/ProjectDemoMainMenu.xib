@@ -254,6 +254,14 @@
 									<reference key="NSOnImage" ref="128092494"/>
 									<reference key="NSMixedImage" ref="818417131"/>
 								</object>
+								<object class="NSMenuItem" id="432861002">
+									<reference key="NSMenu" ref="958508040"/>
+									<string key="NSTitle">New Text Document</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="128092494"/>
+									<reference key="NSMixedImage" ref="818417131"/>
+								</object>
 								<object class="NSMenuItem" id="785376777">
 									<reference key="NSMenu" ref="958508040"/>
 									<string key="NSTitle">New Window</string>
@@ -1627,6 +1635,7 @@
 									<string key="NSFrame">{{1, 119}, {223, 15}}</string>
 									<reference key="NSSuperview" ref="371928918"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="371928918"/>
@@ -1851,6 +1860,7 @@
 							<string key="NSFrame">{{338, 12}, {96, 32}}</string>
 							<reference key="NSSuperview" ref="967803874"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<string key="NSHuggingPriority">{250, 750}</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="669802616">
@@ -2589,6 +2599,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">newTextDocument:</string>
+						<reference key="source" ref="471146553"/>
+						<reference key="destination" ref="432861002"/>
+					</object>
+					<string key="id">cfq-AN-pY5</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">orderFrontFontPanel:</string>
 						<reference key="source" ref="274351205"/>
 						<reference key="destination" ref="796845054"/>
@@ -3058,6 +3076,7 @@
 							<reference ref="460659086"/>
 							<reference ref="785376777"/>
 							<reference ref="965872364"/>
+							<reference ref="432861002"/>
 						</array>
 						<reference key="parent" ref="753782612"/>
 					</object>
@@ -4191,6 +4210,11 @@
 						<reference key="object" ref="965872364"/>
 						<reference key="parent" ref="958508040"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">bX0-0C-zcR</string>
+						<reference key="object" ref="432861002"/>
+						<reference key="parent" ref="958508040"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -4589,6 +4613,7 @@
 				<string key="R40-0p-aPP.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="UUS-Zm-Uz4.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="VbX-C7-6g0.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="bX0-0C-zcR.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="hSU-uI-2Vd.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="ipP-0V-s99.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="k0h-Ss-iW4.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

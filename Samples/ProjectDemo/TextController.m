@@ -1,48 +1,61 @@
 #import "TextController.h"
 #import <CoreObject/CoreObject.h>
+#import "TextItem.h"
 
 @implementation TextController
 
-- (id)initWithDocument: (id)document isSharing: (BOOL)sharing;
+- (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
+											 windowID: (NSString*)windowID
 {
-	self = [super initWithWindowNibName: @"TextDocument"];
-	
-	if (!self) { return nil; }
-	
-	doc = document; // weak ref
-	isSharing = sharing;
-	
+	self = [super initAsPrimaryWindowForPersistentRoot: aPersistentRoot
+											  windowID: windowID
+										 windowNibName: @"TextDocument"];
 	return self;
 }
 
-- (id)initWithDocument: (id)document
+- (instancetype) initPinnedToBranch: (COBranch *)aBranch
+						   windowID: (NSString*)windowID
 {
-	return [self initWithDocument:document isSharing: NO];
+	self = [super initPinnedToBranch: aBranch
+							windowID: windowID
+					   windowNibName: @"TextDocument"];
+	return self;
+}
+
+- (TextItem *)textDocument
+{
+	TextItem *textDoc = (TextItem *)[[self projectDocument] rootDocObject];
+	assert([textDoc isKindOfClass: [TextItem class]]);
+	return textDoc;
 }
 
 - (Document*)projectDocument
 {
-	return doc;
+	return [self.objectGraphContext rootObject];
+}
+
+- (void) objectGraphDidChange
+{
+	NSString *label = [[self textDocument] label];
+	if (label == nil)
+		label = @"";
+	
+	[[textView textStorage] setAttributedString: [[NSAttributedString alloc] initWithString: label]];
 }
 
 - (void)windowDidLoad
 {
+	[super windowDidLoad];
 	[textView setDelegate: self];
-	
-	NSString *label = [[doc rootDocObject] label];
-	[[textView textStorage] setAttributedString: [[NSAttributedString alloc] initWithString: label]];	
+
+	[self objectGraphDidChange];
 }
 
 - (void)textDidChange:(NSNotification*)notif
 {
-	[[doc rootDocObject] setLabel: [[textView textStorage] string]];
-    
-    // FIXME: Use Metadata
-//	[[doc objectContext] commitWithType:kCOTypeMinorEdit
-//					   shortDescription:@"Edit Text"
-//						longDescription:@"Edit Text"];
-    
-    [[[doc objectGraphContext] editingContext] commit];
+	NSLog(@"-textDidChange: committing.");
+	[[self textDocument] setLabel: [[textView textStorage] string]];
+	[self commitWithIdentifier: @"edit-text"];
 }
 
 @end
