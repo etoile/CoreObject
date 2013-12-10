@@ -671,4 +671,34 @@
 	// illegal state now.
 }
 
+- (void)testCompositeReferenceWithTransientParentAndPersistentChild
+{
+    OutlineItem *parent = [[OutlineItem alloc] initWithObjectGraphContext: [COObjectGraphContext new]];
+    OutlineItem *child = [[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"] rootObject];
+	
+	UKDoesNotRaiseException([parent addObject: child]);
+	
+	// TODO: Perhaps test making the child persistent (ok)
+}
+
+- (void)testCompositeReferenceWithPersistentParentAndTransientChild
+{
+    OutlineItem *parent = [[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"] rootObject];
+    OutlineItem *child = [[OutlineItem alloc] initWithObjectGraphContext: [COObjectGraphContext new]];
+	
+	UKRaisesException([parent addObject: child]);
+}
+
+- (void)testCompositeReferenceAccrossTransientObjectGraphContexts
+{
+    OutlineItem *parent = [[OutlineItem alloc] initWithObjectGraphContext: [COObjectGraphContext new]];
+    OutlineItem *child = [[OutlineItem alloc] initWithObjectGraphContext: [COObjectGraphContext new]];
+	
+	UKDoesNotRaiseException([parent addObject: child]);
+	
+	// TODO: Perhaps test making the child persistent (ok), making the parent
+	/// persistent (invalid), and making the child persistent then the parent
+	// persistent (ok)
+}
+
 @end

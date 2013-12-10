@@ -498,14 +498,38 @@ See +[NSObject typePrefix]. */
 }
 
 - (BOOL)isObjectGraphContextValidForObject: (COObject *)value
+                       propertyDescription: (ETPropertyDescription *)propertyDesc
 {
+	if (value == nil)
+		return YES;
+
 	const BOOL isSameObjectGraphContext = (value.objectGraphContext == self.objectGraphContext);
 	const BOOL isEqualPersistentRootUUID = [value.persistentRoot.UUID isEqual: self.persistentRoot.UUID];
 
-	/* It is illegal to mix objects between the object graphs belonging
-	   to the same persistent root. In other words, cross-persistent root references
-	   must actually be to a different persistent root. */
-	return isSameObjectGraphContext || !isEqualPersistentRootUUID;
+	if ([propertyDesc isComposite] || [propertyDesc isContainer])
+	{
+		/* Composite and container are relationship opposite in the metamodel */
+		COObject *parent = ([propertyDesc isComposite] ? self : value);
+		COObject *child = ([propertyDesc isComposite] ? value : self);
+		BOOL involvesTransientParent = ([parent persistentRoot] == nil);
+		BOOL involvesTransientChild = ([child persistentRoot] == nil);
+
+		/* For a composite/container relationship, parent and child can't be 
+		   references accross object graph contexts (or persistent roots), 
+		   unless the parent object graph context is transient. */
+		return isSameObjectGraphContext
+			|| (involvesTransientParent && involvesTransientChild == NO)
+			|| (involvesTransientParent && involvesTransientChild);
+	}
+	else
+	{
+		/* For a non-composite relationship, it is illegal to mix objects 
+		   between the object graphs (i.e. branches) belonging to the same 
+		   persistent root. In other words, references accross object graph 
+		   contexts must point to a different persistent root (or transient 
+		   object graph context). */
+		return isSameObjectGraphContext || !isEqualPersistentRootUUID;
+	}
 }
 
 - (BOOL)isCoreObjectRelationship: (ETPropertyDescription *)propertyDesc
@@ -546,7 +570,7 @@ See +[NSObject typePrefix]. */
 {
 	if ([self isCoreObjectRelationship: propertyDesc] == NO)
 		return;
-	
+
 	// FIXME: -isPrimitiveCollection might be O(N)! Fix or avoid.
 	if ([value isPrimitiveCollection])
 	{
@@ -554,12 +578,14 @@ See +[NSObject typePrefix]. */
 		
 		for (COObject *object in [value objectEnumerator])
 		{
-			ETAssert([self isObjectGraphContextValidForObject: object]);
+			ETAssert([self isObjectGraphContextValidForObject: object
+			                              propertyDescription: propertyDesc]);
 		}
 	}
 	else
 	{
-		ETAssert([self isObjectGraphContextValidForObject: (COObject *)value]);
+		ETAssert([self isObjectGraphContextValidForObject: (COObject *)value
+		                              propertyDescription: propertyDesc]);
 	}
 }
 
@@ -905,15 +931,6 @@ See +[NSObject typePrefix]. */
 		{
 			ETAssert([self isCoreObjectValue: object]);
 		}
-		
-		if ([propertyDesc isComposite])
-		{
-			for (id object in [newValue objectEnumerator])
-			{
-				// i.e., If the property is composite, the object can't be a cross-reference
-				ETAssert([object objectGraphContext] == [self objectGraphContext]);
-			}
-		}
 	}
 	else
 	{
@@ -922,15 +939,6 @@ See +[NSObject typePrefix]. */
 		
 		// FIXME: Refactor. validType case is for supporting value transformed objects that aren't COObject subclasses.
 		ETAssert(validType || [self isCoreObjectValue: newValue]);
-		
-		if ([propertyDesc isComposite])
-		{
-			if (newValue != nil)
-			{
-				// i.e., If the property is composite, the object can't be a cross-reference
-				ETAssert([newValue objectGraphContext] == [self objectGraphContext]);
-			}
-		}
 	}
 }
 
