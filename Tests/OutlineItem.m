@@ -72,3 +72,38 @@
 @dynamic attachmentID;
 
 @end
+
+
+@implementation TransientOutlineItem
+
++ (ETEntityDescription *)newEntityDescription
+{
+    ETEntityDescription *outlineEntity = [ETEntityDescription descriptionWithName: @"TransientOutlineItem"];
+    [outlineEntity setParent: (id)@"COObject"];
+
+    ETPropertyDescription *contentsProperty =
+		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"TransientOutlineItem"];
+
+    [contentsProperty setMultivalued: YES];
+    [contentsProperty setOrdered: YES];
+    
+    ETPropertyDescription *parentContainerProperty =
+    	[ETPropertyDescription descriptionWithName: @"parentContainer" type: (id)@"TransientOutlineItem"];
+    
+	// NOTE: For a non-persistent relationship, 'container' doesn't necessarily imply 'derived'
+    [parentContainerProperty setMultivalued: NO];
+    [parentContainerProperty setOpposite: (id)@"TransientOutlineItem.contents"];
+       
+    [outlineEntity setPropertyDescriptions: A(contentsProperty, parentContainerProperty)];
+
+    return outlineEntity;
+}
+
+- (NSString *)contentKey
+{
+	return @"contents";
+}
+
+@dynamic contents, parentContainer;
+
+@end

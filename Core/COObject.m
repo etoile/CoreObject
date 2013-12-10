@@ -765,12 +765,21 @@ See +[NSObject typePrefix]. */
 	return [aCollection conformsToProtocol: @protocol(COPrimitiveCollection)];
 }
 
-- (id)mutableCoreObjectCollectionWithCollection: (id)aCollection
-							propertyDescription: (ETPropertyDescription *)propDesc
+- (id)mutableCollectionWithCollection: (id)aCollection
+                  propertyDescription: (ETPropertyDescription *)propDesc
 {
-	Class collectionClass = [self coreObjectCollectionClassForPropertyDescription: propDesc];
+	Class collectionClass = Nil;
+	id collection = nil;
 
-	id collection;
+	if ([propDesc isPersistent])
+	{
+		collectionClass = [self coreObjectCollectionClassForPropertyDescription: propDesc];
+	}
+	else
+	{
+		collectionClass = [[self collectionClassForPropertyDescription: propDesc] mutableClass];
+	}
+
 	if ([propDesc isKeyed])
 	{
 		collection = [[collectionClass alloc] initWithDictionary: aCollection];
@@ -811,7 +820,8 @@ See +[NSObject typePrefix]. */
 	}
 	else if ([propertyDesc isMultivalued] && [self isCoreObjectCollection: aValue] == NO)
 	{
-		storageValue = [self mutableCoreObjectCollectionWithCollection: aValue propertyDescription: propertyDesc];
+		storageValue = [self mutableCollectionWithCollection: aValue
+		                                 propertyDescription: propertyDesc];
 	}
 	
 	[_variableStorage setObject: storageValue

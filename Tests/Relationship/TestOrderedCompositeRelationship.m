@@ -1,6 +1,7 @@
 #import <UnitKit/UnitKit.h>
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
+#import "COPrimitiveCollection.h"
 
 /**
  * Tests ordered composite relationships.
@@ -163,6 +164,69 @@
 - (void)testNullDisallowedInCollection
 {
 	UKRaisesException([parent setContents: A([NSNull null])]);
+}
+
+@end
+
+
+@interface TestTransientOrderedCompositeRelationship : EditingContextTestCase <UKTest>
+{
+	TransientOutlineItem *parent;
+	TransientOutlineItem *child;
+}
+@end
+
+@implementation TestTransientOrderedCompositeRelationship
+
+- (id)init
+{
+	SUPERINIT;
+	parent = [[ctx insertNewPersistentRootWithEntityName: @"TransientOutlineItem"] rootObject];
+	child = [[TransientOutlineItem alloc] initWithObjectGraphContext: [parent objectGraphContext]];
+	return self;
+}
+
+- (void)testInit
+{
+	[self checkVariableStorageCollectionForProperty: @"contents"];
+}
+
+- (void)checkVariableStorageCollectionForProperty: (NSString *)aProperty
+{
+	id <ETCollection> children = [parent valueForVariableStorageKey: aProperty];
+
+	UKObjectKindOf(children, NSMutableArray);
+	UKFalse([children conformsToProtocol: @protocol(COPrimitiveCollection)]);
+}
+
+- (void)testMutateChildren
+{
+	[parent addObject: child];
+	
+	[self checkVariableStorageCollectionForProperty: @"contents"];
+
+	UKObjectsEqual(A(child), parent.contents);
+	UKNil(child.parentContainer);
+}
+
+- (void)testSetParent
+{
+	child.parentContainer = parent;
+
+	[self checkVariableStorageCollectionForProperty: @"contents"];
+
+	UKTrue([parent.contents isEmpty]);
+	UKObjectsEqual(parent, child.parentContainer);
+}
+
+- (void)testReplaceChildren
+{
+	parent.contents = A(child);
+
+	[self checkVariableStorageCollectionForProperty: @"contents"];
+
+	UKObjectsEqual(A(child), parent.contents);
+	UKNil(child.parentContainer);
 }
 
 @end

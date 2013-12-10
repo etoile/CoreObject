@@ -11,3 +11,12 @@
 @property (readwrite, strong, nonatomic) COAttachmentID *attachmentID;
 
 @end
+
+/* OutlineItem variant to test a composite/container transient relationship */
+@interface TransientOutlineItem : COContainer
+
+@property (nonatomic, readwrite, strong) NSArray *contents;
+@property (nonatomic, readwrite, weak) TransientOutlineItem *parentContainer;
+
+@end
+
