@@ -1,6 +1,8 @@
 #import "EWDocumentWindowController.h"
 #import <CoreObject/COSQLiteStore+Debugging.h>
+#import <CoreObject/COObjectGraphContext+Graphviz.h>
 #import "ApplicationDelegate.h"
+
 
 @interface EWDocumentWindowController ()
 @end
@@ -291,6 +293,11 @@
 - (IBAction) showGraphvizHistoryGraph: (id)sender
 {
 	[[self.persistentRoot store] showGraphForPersistentRootUUID: self.persistentRoot.UUID];
+}
+
+- (IBAction) showGraphvizItemGraph: (id)sender
+{
+	[self.objectGraphContext showGraph];
 }
 
 - (IBAction) history: (id)sender

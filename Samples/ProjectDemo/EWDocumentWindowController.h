@@ -91,6 +91,7 @@
 - (IBAction) stepForward: (id)sender;
 
 - (IBAction) showGraphvizHistoryGraph: (id)sender;
+- (IBAction) showGraphvizItemGraph: (id)sender;
 
 - (IBAction) history: (id)sender;
 

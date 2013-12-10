@@ -21,6 +21,9 @@ static float SKTDefaultPasteCascadeDelta = 10.0;
 - (id)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+		// HACK: Avoid a commit on every mouse event when the user is dragging the mouse across the color wheel
+		[[NSColorPanel sharedColorPanel] setContinuous: NO];
+		
         NSMutableArray *dragTypes = [NSMutableArray arrayWithObjects:NSColorPboardType, NSFilenamesPboardType, nil];
         [dragTypes addObjectsFromArray:[NSImage imagePasteboardTypes]];
         [self registerForDraggedTypes:dragTypes];

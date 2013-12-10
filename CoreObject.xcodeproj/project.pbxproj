@@ -243,7 +243,7 @@
 		6699DDAC184887E70003E803 /* TestOrderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAB184887E70003E803 /* TestOrderedRelationship.m */; };
 		6699DDAF184887F60003E803 /* TestUnivaluedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */; };
 		6699DDB2184888050003E803 /* TestUnorderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDB1184888050003E803 /* TestUnorderedRelationship.m */; };
-		669FD4F3184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h in Headers */ = {isa = PBXBuildFile; fileRef = 669FD4F1184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h */; };
+		669FD4F3184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h in Headers */ = {isa = PBXBuildFile; fileRef = 669FD4F1184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		669FD4F4184E7B5F006EE103 /* COObjectGraphContext+Graphviz.m in Sources */ = {isa = PBXBuildFile; fileRef = 669FD4F2184E7B5F006EE103 /* COObjectGraphContext+Graphviz.m */; };
 		66BBB3BC18516ABC005430B1 /* TestItemStableSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BBB3BB18516ABC005430B1 /* TestItemStableSerialization.m */; };
 		66BBB3DC185282D2005430B1 /* TestValueTransformerAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BBB3DB185282D2005430B1 /* TestValueTransformerAttribute.m */; };
@@ -1684,6 +1684,7 @@
 				6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */,
 				6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */,
 				6660B3A01839659D009007FD /* COAttachmentID.h in Headers */,
+				669FD4F3184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h in Headers */,
 				66405DD1182A255800A6EF7A /* COSynchronizerServer.h in Headers */,
 				66FD349A18314BC200898381 /* COSynchronizerJSONUtils.h in Headers */,
 				66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */,
@@ -1705,7 +1706,6 @@
 				6633F10E185515F1009CE6F7 /* COColorToHTMLString.h in Headers */,
 				66457FEC17E9683F003C51A8 /* CORevisionCache.h in Headers */,
 				601C1D4F180C115D00CED07E /* COObjectGraphContext+GarbageCollection.h in Headers */,
-				669FD4F3184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h in Headers */,
 				660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */,
 				668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */,
 				660B838D1827614200714474 /* COSQLiteStore+Debugging.h in Headers */,

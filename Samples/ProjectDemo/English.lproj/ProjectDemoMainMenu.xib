@@ -254,7 +254,7 @@
 									<reference key="NSOnImage" ref="128092494"/>
 									<reference key="NSMixedImage" ref="818417131"/>
 								</object>
-								<object class="NSMenuItem" id="432861002">
+								<object class="NSMenuItem" id="1063054571">
 									<reference key="NSMenu" ref="958508040"/>
 									<string key="NSTitle">New Text Document</string>
 									<string key="NSKeyEquiv"/>
@@ -1321,6 +1321,14 @@
 									<reference key="NSOnImage" ref="128092494"/>
 									<reference key="NSMixedImage" ref="818417131"/>
 								</object>
+								<object class="NSMenuItem" id="186813650">
+									<reference key="NSMenu" ref="182514203"/>
+									<string key="NSTitle">Graphviz Item Graph</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="128092494"/>
+									<reference key="NSMixedImage" ref="818417131"/>
+								</object>
 								<object class="NSMenuItem" id="796451796">
 									<reference key="NSMenu" ref="182514203"/>
 									<string key="NSTitle">Search Results</string>
@@ -1635,7 +1643,6 @@
 									<string key="NSFrame">{{1, 119}, {223, 15}}</string>
 									<reference key="NSSuperview" ref="371928918"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="371928918"/>
@@ -1736,7 +1743,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="1004890044"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -1860,7 +1867,6 @@
 							<string key="NSFrame">{{338, 12}, {96, 32}}</string>
 							<reference key="NSSuperview" ref="967803874"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSHuggingPriority">{250, 750}</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="669802616">
@@ -1886,7 +1892,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="1052229269"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -2575,14 +2581,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">showGraphvizHistoryGraph:</string>
-						<reference key="source" ref="471146553"/>
-						<reference key="destination" ref="620307725"/>
-					</object>
-					<string key="id">HxY-f4-hey</string>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">newWindow:</string>
 						<reference key="source" ref="471146553"/>
 						<reference key="destination" ref="785376777"/>
@@ -2601,9 +2599,25 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">newTextDocument:</string>
 						<reference key="source" ref="471146553"/>
-						<reference key="destination" ref="432861002"/>
+						<reference key="destination" ref="1063054571"/>
 					</object>
 					<string key="id">cfq-AN-pY5</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">showGraphvizHistoryGraph:</string>
+						<reference key="source" ref="471146553"/>
+						<reference key="destination" ref="620307725"/>
+					</object>
+					<string key="id">n7A-EE-yg2</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">showGraphvizItemGraph:</string>
+						<reference key="source" ref="471146553"/>
+						<reference key="destination" ref="186813650"/>
+					</object>
+					<string key="id">ZBK-zI-f0d</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -3076,7 +3090,7 @@
 							<reference ref="460659086"/>
 							<reference ref="785376777"/>
 							<reference ref="965872364"/>
-							<reference ref="432861002"/>
+							<reference ref="1063054571"/>
 						</array>
 						<reference key="parent" ref="753782612"/>
 					</object>
@@ -3811,6 +3825,7 @@
 							<reference ref="331876632"/>
 							<reference ref="255650207"/>
 							<reference ref="620307725"/>
+							<reference ref="186813650"/>
 						</array>
 						<reference key="parent" ref="674842447"/>
 					</object>
@@ -4212,8 +4227,13 @@
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">bX0-0C-zcR</string>
-						<reference key="object" ref="432861002"/>
+						<reference key="object" ref="1063054571"/>
 						<reference key="parent" ref="958508040"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">Utb-QV-D8k</string>
+						<reference key="object" ref="186813650"/>
+						<reference key="parent" ref="182514203"/>
 					</object>
 				</array>
 			</object>
@@ -4612,6 +4632,7 @@
 				<string key="NwG-TW-Yqw.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="R40-0p-aPP.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="UUS-Zm-Uz4.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="Utb-QV-D8k.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="VbX-C7-6g0.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="bX0-0C-zcR.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="hSU-uI-2Vd.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4815,6 +4836,7 @@
 						<string key="projectDemoUndo:">id</string>
 						<string key="shareWith:">id</string>
 						<string key="showGraphvizHistoryGraph:">id</string>
+						<string key="showGraphvizItemGraph:">id</string>
 						<string key="stepBackward:">id</string>
 						<string key="stepForward:">id</string>
 					</dictionary>
@@ -4849,6 +4871,10 @@
 						</object>
 						<object class="IBActionInfo" key="showGraphvizHistoryGraph:">
 							<string key="name">showGraphvizHistoryGraph:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showGraphvizItemGraph:">
+							<string key="name">showGraphvizItemGraph:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="stepBackward:">
