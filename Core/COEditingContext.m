@@ -53,12 +53,15 @@
 	[[self modelRepository] resolveNamedObjectReferences];
 }
 
-- (id)initWithStore: (COSQLiteStore *)store
+- (id)initWithStore: (COSQLiteStore *)store modelRepository: (ETModelDescriptionRepository *)aRepo
 {
+	NILARG_EXCEPTION_TEST(aRepo);
+	INVALIDARG_EXCEPTION_TEST(aRepo, [aRepo entityDescriptionForClass: [COObject class]] != nil);
+
 	SUPERINIT;
 
 	_store =  store;
-	_modelRepository = [ETModelDescriptionRepository mainRepository];
+	_modelRepository = aRepo;
 	_loadedPersistentRoots = [NSMutableDictionary new];
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
@@ -72,10 +75,11 @@
                                                  name: COStorePersistentRootsDidChangeNotification
                                                object: _store];
 
-	[[NSDistributedNotificationCenter defaultCenter] addObserver: self
-	                                                    selector: @selector(distributedStorePersistentRootsDidChange:)
-	                                                        name: COStorePersistentRootsDidChangeNotification
-	                                                      object: nil];
+	[[NSDistributedNotificationCenter defaultCenter]
+		addObserver: self
+	       selector: @selector(distributedStorePersistentRootsDidChange:)
+		       name: COStorePersistentRootsDidChangeNotification
+		     object: nil];
 
 	for (ETUUID *uuid in [_store persistentRootUUIDs])
     {
@@ -83,6 +87,12 @@
     }
 	
 	return self;
+}
+
+- (id)initWithStore: (COSQLiteStore *)store
+{
+	return [self initWithStore: store
+	           modelRepository: [ETModelDescriptionRepository mainRepository]];
 }
 
 - (id)init

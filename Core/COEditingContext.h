@@ -114,10 +114,23 @@
  */
 + (COEditingContext *)contextWithURL: (NSURL *)aURL;
 /**
- * <init />
  * Initializes a context which persists its content in the given store.
+ *
+ * The model repository is set to -[ETModelDescription mainRepository].
+ *
+ * See also -initWithStore:modelRepository:.
  */
 - (id)initWithStore: (COSQLiteStore *)store;
+/**
+ * <init />
+ * Initializes a context which persists its content in the given store, and 
+ * manages it using the metamodel provided by the model description repository.
+ *
+ * For a nil model repository, or a repository that doesn't a COObject entity 
+ * description, raises a NSInvalidArgumentException.
+ */
+- (id)initWithStore: (COSQLiteStore *)store
+    modelRepository: (ETModelDescriptionRepository *)aRepo;
 /**
  * Initializes the context with no store. 
  * As a result, the context content is not persisted.
