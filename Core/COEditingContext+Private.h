@@ -9,7 +9,7 @@
 
 #import <CoreObject/COEditingContext.h>
 
-@class COUndoTrack;
+@class COPath, COUndoTrack;
 
 @interface COEditingContext ()
 

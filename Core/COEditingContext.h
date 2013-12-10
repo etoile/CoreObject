@@ -10,16 +10,14 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COPersistentRoot, COEditingContext, COObjectGraphContext;
-@class COSQLiteStore, CORevision, COObject, COGroup, COSmartGroup, COBranch, COError, COPersistentRootInfo, COPath;
-@class COUndoStackStore, COCommandGroup;
-@class COUndoTrack, CORevisionCache;
+@class COSQLiteStore, COEditingContext, COPersistentRoot, COBranch, COObjectGraphContext, COObject;
+@class COUndoTrack, COCommandGroup;
 
 // I'm skeptical that there is ever a legitimate case where code is working
 // with an id<COPersistentObjectContext> and doesn't know whether it's an
 // editing context or persistent root... but I guess it's harmless to keep for
 // now --Eric
-/** 
+/**
  * Protocol to support managing either persistent roots or inner objects
  * inside an object graph context without knowing the context type in advance.
  *
