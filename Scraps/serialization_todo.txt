@@ -1,0 +1,29 @@
+BTW, on a related note, I agree with this comment in COSerialization:
+
+// TODO: A bit ugly, would be better to add new entity descriptions
+// such as NSBOOLNumber, NSCGFloatNumber etc.
+
+What I would like to do is have a section in COSerialization.h or COObject.h like this:
+
+// Basic types
+
+extern NSString const * COEntityNameBool;
+extern NSString const * COEntityNameInt64;
+extern NSString const * COEntityNameDouble;
+extern NSString const * COEntityNameAttachmentID;
+extern NSString const * COEntityNameString;
+extern NSString const * COEntityNameBlob;
+
+// Convenience types, which are automatically translated to a basic type
+
+extern NSString const * COEntityNameNSRect;
+extern NSString const * COEntityNameNSSize;
+etc.
+
+…as well as very clear documentation that if you call aPropertyDesc.persistent = YES;, one of the following must be true:
+
+- the type is one of those listed above
+- or the type is a descendent of COObject
+- or the persistentType is set to one of the types listed above, and a value transformer name is set
+
+otherwise an exception is thrown. Does that sound reasonable?
