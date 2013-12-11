@@ -1,41 +1,39 @@
 #import <CoreObject/CoreObject.h>
 #import "COObjectGraphContext+Graphviz.h"
 
-@implementation COObjectGraphContext (Graphviz)
-
-- (NSString *) graphvizNodeNameForUUID: (ETUUID *)aUUID
+static NSString *COGraphvizNodeNameForUUID(ETUUID *aUUID)
 {
 	NSString *str = [aUUID stringValue];
 	str = [str stringByReplacingOccurrencesOfString: @"-" withString: @"_"];
 	return [@"uuid_" stringByAppendingString: str];
 }
 
-- (NSString *) graphvizNodeNameForPath: (COPath *)aPath
+static NSString *COGraphvizNodeNameForPath(COPath *aPath)
 {
 	NSString *str = @"path_";
-	str = [str stringByAppendingString: [self graphvizNodeNameForUUID: aPath.persistentRoot]];
+	str = [str stringByAppendingString: COGraphvizNodeNameForUUID(aPath.persistentRoot)];
 	if (aPath.branch != nil)
 	{
-		str = [str stringByAppendingString: [self graphvizNodeNameForUUID: aPath.branch]];
+		str = [str stringByAppendingString: COGraphvizNodeNameForUUID(aPath.branch)];
 	}
 	return str;
 }
 
-- (NSString *) graphvizNodeNameForObject: (id)anObject
+static NSString *COGraphvizNodeNameForObject(id anObject)
 {
 	if ([anObject isKindOfClass: [ETUUID class]])
 	{
-		return [self graphvizNodeNameForUUID: anObject];
+		return COGraphvizNodeNameForUUID(anObject);
 	}
 	else if ([anObject isKindOfClass: [COPath class]])
 	{
-		return [self graphvizNodeNameForPath: anObject];
+		return COGraphvizNodeNameForPath(anObject);
 	}
-	ETAssertUnreachable();
+	assert(0);
 	return nil;
 }
 
-- (NSString*) graphvizPortNameForAttribute: (NSString *)anAttribute
+static NSString *COGraphvizPortNameForAttribute(NSString *anAttribute)
 {
 	NSString *str = @"port_";
 	str = [str stringByAppendingString: anAttribute];
@@ -43,12 +41,14 @@
 	return str;
 }
 
-- (NSString *) graphvizNodeNameForCollectionNodeForAttribute: (NSString *)anAttribute itemUUID: (ETUUID *)aUUID
+static NSString *COGraphvizNodeNameForCollectionNodeForAttribute(NSString *anAttribute, ETUUID *aUUID)
 {
-	return [NSString stringWithFormat: @"collection_%@_%@", [self graphvizNodeNameForUUID: aUUID], [self graphvizPortNameForAttribute: anAttribute]];
+	return [NSString stringWithFormat: @"collection_%@_%@",
+			COGraphvizNodeNameForUUID(aUUID),
+			COGraphvizPortNameForAttribute(anAttribute)];
 }
 
-- (NSString *) sanatizeStringForHTML: (NSString *)aString
+static NSString *COGraphvizSanatizeStringForHTML(NSString *aString)
 {
 	aString = [aString stringByReplacingOccurrencesOfString: @"<"
 												 withString: @"&lt;"];
@@ -57,14 +57,14 @@
 	return aString;
 }
 
-- (NSString *) graphvizPortNameForIndex: (NSUInteger)i
+static NSString *COGraphvizPortNameForIndex(NSUInteger i)
 {
 	return [NSString stringWithFormat: @"p%llu", (unsigned long long)i];
 }
 
-- (void) writeNodeForPath: (COPath *)aPath toString: (NSMutableString *)dest
+static void COGraphvizWriteNodeForPathToString(COPath *aPath, NSMutableString *dest)
 {
-	NSString *destNodeName = [self graphvizNodeNameForPath: aPath];
+	NSString *destNodeName = COGraphvizNodeNameForPath(aPath);
 
 	NSString *label = [NSString stringWithFormat: @"Cross-persistent root reference to %@", aPath.persistentRoot];
 	if (aPath.branch == nil)
@@ -79,13 +79,13 @@
 	[dest appendFormat: @"%@ [label=\"%@\"];\n", destNodeName, label];
 }
 
-- (void) writeHTMLTableRowForAttribute: (NSString *)key forItem: (COItem *)anItem toString: (NSMutableString *)dest suffix: (NSMutableString *)extraNodes
+static void COGraphvizWriteHTMLTableRowForAttributeOfItem(NSString *key, COItem *anItem, NSMutableString *dest, NSMutableString *extraNodes)
 {
 	COType type = [anItem typeForAttribute: key];
 	id value = [anItem valueForAttribute: key];
 	
-	NSString *nodeName = [self graphvizNodeNameForUUID: anItem.UUID];
-	NSString *portName = [self graphvizPortNameForAttribute: key];
+	NSString *nodeName = COGraphvizNodeNameForUUID(anItem.UUID);
+	NSString *portName = COGraphvizPortNameForAttribute(key);
 	
 	[dest appendFormat: @"<tr><td>%@</td><td>%@</td><td port=\"%@\">", key, COTypeDescription(type), portName];
 
@@ -96,24 +96,24 @@
 		{
 			/* non-object reference. */
 			/* value is NSData, NSString, or NSNumber */
-			[dest appendString: [self sanatizeStringForHTML: [value stringValue]]];
+			[dest appendString: COGraphvizSanatizeStringForHTML([value stringValue])];
 		}
 		else /* object reference */
 		{
-			NSString *destNodeName = [self graphvizNodeNameForObject: value];
+			NSString *destNodeName = COGraphvizNodeNameForObject(value);
 			[extraNodes appendFormat: @"%@:%@ -> %@;\n", nodeName, portName, destNodeName];
 			
 			/* draw the target of a cross-persistent root reference */
 			if ([value isKindOfClass: [COPath class]])
 			{
-				[self writeNodeForPath: value toString: extraNodes];
+				COGraphvizWriteNodeForPathToString(value, extraNodes);
 			}
 		}
 	}
 	else /* multivalued */
 	{
 		/** Node name for the box to display the collection contents in */
-		NSString *collectionNodeName = [self graphvizNodeNameForCollectionNodeForAttribute: key itemUUID: anItem.UUID];
+		NSString *collectionNodeName = COGraphvizNodeNameForCollectionNodeForAttribute(key, anItem.UUID);
 		[extraNodes appendFormat: @"%@:%@ -> %@;\n", nodeName, portName, collectionNodeName];
 		
 		// Output a node for the collection with one port per element in the collection
@@ -142,7 +142,7 @@
 				subvalueLabel = [subvalue stringValue];
 			}
 			
-			[extraNodes appendFormat: @"<%@> %@", [self graphvizPortNameForIndex: i], subvalueLabel];
+			[extraNodes appendFormat: @"<%@> %@", COGraphvizPortNameForIndex(i), subvalueLabel];
 			if (i < [collectionArray count] - 1)
 			{
 				[extraNodes appendFormat: @"|"];
@@ -159,22 +159,23 @@
 			if (!([subvalue isKindOfClass: [ETUUID class]] || [subvalue isKindOfClass: [COPath class]]))
 				continue;
 			
-			NSString *destNodeName = [self graphvizNodeNameForObject: subvalue];
-			[extraNodes appendFormat: @"%@:%@ -> %@;\n", collectionNodeName, [self graphvizPortNameForIndex: i], destNodeName];
+			NSString *destNodeName = COGraphvizNodeNameForObject(subvalue);
+			[extraNodes appendFormat: @"%@:%@ -> %@;\n", collectionNodeName, COGraphvizPortNameForIndex(i), destNodeName];
 			
 			// Output cross-persistent root reference nodes if needed
 			if ([subvalue isKindOfClass: [COPath class]])
 			{
-				[self writeNodeForPath: subvalue toString: extraNodes];
+				COGraphvizWriteNodeForPathToString(subvalue, extraNodes);
 			}
 		}
 	}
 		
 	[dest appendFormat: @"</td></tr>"];
 }
-- (void) writeDotNodeForItem: (COItem *)anItem toString: (NSMutableString *)dest
+
+static void COGraphvizWriteDotNodeForItem(COItem *anItem, NSMutableString *dest)
 {
-	NSString *nodeName = [self graphvizNodeNameForUUID: anItem.UUID];
+	NSString *nodeName = COGraphvizNodeNameForUUID(anItem.UUID);
 	NSString *nodeTitle = [anItem.UUID stringValue];
 	
 	NSMutableString *extraNodes = [NSMutableString string];
@@ -182,42 +183,58 @@
 	[dest appendFormat: @"%@ [shape=plaintext, label=<<table border=\"0\" cellborder=\"1\" cellspacing=\"0\"><tr><td colspan=\"3\">%@</td></tr>", nodeName, nodeTitle];
 	for (NSString *attr in [anItem attributeNames])
 	{
-		[self writeHTMLTableRowForAttribute: attr forItem: anItem toString: dest suffix: extraNodes];
+		COGraphvizWriteHTMLTableRowForAttributeOfItem(attr, anItem, dest, extraNodes);
 	}
 	[dest appendFormat: @"</table>>];\n"];
 	[dest appendString: extraNodes];
 }
 
-- (NSString *) dotGraph
+NSString *COGraphvizDotFileForItemGraph(id<COItemGraph> graph)
 {
 	NSMutableString *result = [NSMutableString string];
 	[result appendString: @"digraph G {\n"];
-	for (ETUUID *uuid in [self itemUUIDs])
+	for (ETUUID *uuid in [graph itemUUIDs])
 	{
-		COItem *item = [self itemForUUID: uuid];
-		[self writeDotNodeForItem: item toString: result];
+		COItem *item = [graph itemForUUID: uuid];
+		COGraphvizWriteDotNodeForItem(item, result);
 	}
 
 	[result appendString: @"root_item [label=\"Graph Root\"];\n"];
-	if ([self rootItemUUID] != nil)
+	if ([graph rootItemUUID] != nil)
 	{
-		[result appendFormat: @"root_item -> %@;\n", [self graphvizNodeNameForUUID: [self rootItemUUID]]];
+		[result appendFormat: @"root_item -> %@;\n", COGraphvizNodeNameForUUID([graph rootItemUUID])];
 	}
 	[result appendString: @"}\n"];
     return result;
 }
 
-- (void) showGraph
+void COGraphvizShowGraph(id<COItemGraph> graph)
 {
 	NSString *basePath = [NSString stringWithFormat: @"%@-%d",
-						  [NSTemporaryDirectory() stringByAppendingPathComponent: [[[self branch] UUID] stringValue]],
+						  [NSTemporaryDirectory() stringByAppendingPathComponent: [[graph rootItemUUID] stringValue]],
 						  rand()];
 	
 	NSString *dotGraphPath = [basePath stringByAppendingPathExtension: @"gv"];
 	NSString *pdfPath = [basePath stringByAppendingPathExtension: @"pdf"];
-	[[self dotGraph] writeToFile: dotGraphPath atomically: YES encoding: NSUTF8StringEncoding error: NULL];
+	[COGraphvizDotFileForItemGraph(graph) writeToFile: dotGraphPath atomically: YES encoding: NSUTF8StringEncoding error: NULL];
 	
 	system([[NSString stringWithFormat: @"dot -Tpdf %@ -o %@ && open %@", dotGraphPath, pdfPath, pdfPath] UTF8String]);
+}
+
+@implementation COObjectGraphContext (Graphviz)
+
+- (void) showGraph
+{
+	COGraphvizShowGraph(self);
+}
+
+@end
+
+@implementation COItemGraph (Graphviz)
+
+- (void) showGraph
+{
+	COGraphvizShowGraph(self);
 }
 
 @end
