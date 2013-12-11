@@ -1753,9 +1753,6 @@
 			<object class="NSCustomObject" id="956091428">
 				<string key="NSClassName">ApplicationDelegate</string>
 			</object>
-			<object class="NSCustomObject" id="713665540">
-				<string key="NSClassName">NetworkController</string>
-			</object>
 			<object class="NSDateFormatter" id="1001119473">
 				<dictionary class="NSMutableDictionary" key="NS.attributes">
 					<integer value="2" key="dateStyle"/>
@@ -2682,14 +2679,6 @@
 						<reference key="destination" ref="23199983"/>
 					</object>
 					<string key="id">712</string>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">networkController</string>
-						<reference key="source" ref="956091428"/>
-						<reference key="destination" ref="713665540"/>
-					</object>
-					<string key="id">628</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -4016,11 +4005,6 @@
 						<reference key="parent" ref="0"/>
 					</object>
 					<object class="IBObjectRecord">
-						<string key="id">606</string>
-						<reference key="object" ref="713665540"/>
-						<reference key="parent" ref="0"/>
-					</object>
-					<object class="IBObjectRecord">
 						<string key="id">721</string>
 						<reference key="object" ref="1001119473"/>
 						<reference key="parent" ref="0"/>
@@ -4522,8 +4506,6 @@
 				<boolean value="NO" key="599.showNotes"/>
 				<string key="603.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="603.showNotes"/>
-				<string key="606.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="NO" key="606.showNotes"/>
 				<string key="674.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="674.showNotes"/>
 				<boolean value="NO" key="690.IBNSWindowAutoPositionCentersHorizontal"/>
