@@ -2,6 +2,8 @@
 #import "XMPPFramework.h"
 #import "Document.h"
 
+@class SharingSession;
+
 @interface XMPPController : NSObject
 {
 	XMPPStream *xmppStream;
@@ -17,5 +19,11 @@
 
 - (void) reconnect;
 - (void) shareWithInspectorForDocument: (Document*)doc;
+
+- (NSArray *) sortedUsersByAvailabilityName;
+
+- (XMPPRoster *) roster;
+
+- (SharingSession *) sharingSessionForPersistentRootUUID: (ETUUID *)aUUID fullJID: (NSString *)aJID;
 
 @end

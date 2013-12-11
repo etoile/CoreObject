@@ -44,4 +44,6 @@
 @property (nonatomic, readonly, strong) NSString *peerName;
 @property (nonatomic, readonly, strong) NSString *ourName;
 
+@property (nonatomic, readonly, strong) XMPPJID *peerJID;
+
 @end

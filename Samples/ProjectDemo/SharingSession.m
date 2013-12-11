@@ -4,6 +4,8 @@
 
 @implementation SharingSession
 
+@synthesize peerJID = _peerJID;
+
 - (id)initWithPeerJID: (XMPPJID *)peerJID
 		   xmppStream: (XMPPStream *)xmppStream
 			 isServer: (BOOL)isServer

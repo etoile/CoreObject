@@ -76,6 +76,11 @@
 	[xmppStream connectWithTimeout: XMPPStreamTimeoutNone error: NULL];
 }
 
+- (XMPPRoster *) roster
+{
+	return xmppRoster;
+}
+
 - (void)xmppStreamDidConnect:(XMPPStream *)sender
 {
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
@@ -172,6 +177,11 @@
 	[self sendCoreobjectMessageType: @"sharing-invitation" to: jid persistentRootUUID: persistentRootUUID];
 }
 
+- (NSArray *) sortedUsersByAvailabilityName
+{
+	return [xmppRosterStorage sortedUsersByAvailabilityName];
+}
+
 - (void) shareWithInspectorForDocument: (Document*)doc
 {
 	currentDocument = doc;
@@ -185,6 +195,16 @@
 	}
 
     [NSMenu popUpContextMenu:theMenu withEvent:[[NSApp mainWindow] currentEvent] forView:nil];
+}
+
+- (SharingSession *) sharingSessionForPersistentRootUUID: (ETUUID *)aUUID fullJID: (NSString *)aJID
+{
+	SharingSession *session = [sharingSessionsByPersistentRootUUID objectForKey: aUUID];
+	if ([[session.peerJID full] isEqual: aJID])
+	{
+		return session;
+	}
+	return nil;
 }
 
 @end

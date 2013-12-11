@@ -83,6 +83,8 @@
 		6686BEE812593D800065DE1A /* Project.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BEE712593D800065DE1A /* Project.m */; };
 		6686BEEB12593D900065DE1A /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686BEEA12593D900065DE1A /* Document.m */; };
 		6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686C341125EC5070065DE1A /* ProjectDocument.m */; };
+		6689D9891859050600EC48FB /* SharingDrawer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6689D9881859050600EC48FB /* SharingDrawer.xib */; };
+		6689D9921859053E00EC48FB /* SharingDrawerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6689D9911859053E00EC48FB /* SharingDrawerViewController.m */; };
 		66A313611828C5CA00CE0B0D /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 66A3135F1828C5CA00CE0B0D /* Commits */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
@@ -362,6 +364,9 @@
 		6686BEEA12593D900065DE1A /* Document.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Document.m; sourceTree = "<group>"; };
 		6686C340125EC5070065DE1A /* ProjectDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectDocument.h; sourceTree = "<group>"; };
 		6686C341125EC5070065DE1A /* ProjectDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectDocument.m; sourceTree = "<group>"; };
+		6689D9881859050600EC48FB /* SharingDrawer.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SharingDrawer.xib; sourceTree = "<group>"; };
+		6689D9901859053E00EC48FB /* SharingDrawerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingDrawerViewController.h; sourceTree = "<group>"; };
+		6689D9911859053E00EC48FB /* SharingDrawerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingDrawerViewController.m; sourceTree = "<group>"; };
 		6698320312691F970011C7FC /* SCRATCHPAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SCRATCHPAD; sourceTree = "<group>"; };
 		66A313601828C5CA00CE0B0D /* English */ = {isa = PBXFileReference; lastKnownFileType = folder; name = English; path = English.lproj/Commits; sourceTree = "<group>"; };
 		66A313621828C5D600CE0B0D /* org.etoile.ProjectDemo.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = org.etoile.ProjectDemo.json; path = English.lproj/Commits/org.etoile.ProjectDemo.json; sourceTree = "<group>"; };
@@ -886,6 +891,9 @@
 				661210ED18217818003AEC29 /* XMPPController.m */,
 				662C2B76182431EC00ED975F /* SharingSession.h */,
 				662C2B77182431EC00ED975F /* SharingSession.m */,
+				6689D9881859050600EC48FB /* SharingDrawer.xib */,
+				6689D9901859053E00EC48FB /* SharingDrawerViewController.h */,
+				6689D9911859053E00EC48FB /* SharingDrawerViewController.m */,
 			);
 			name = Networking;
 			sourceTree = "<group>";
@@ -1121,6 +1129,7 @@
 				66DBB3831813B1BB0047301A /* Preferences.xib in Resources */,
 				6638C026181852FD008341E6 /* ProjectNav.xib in Resources */,
 				79911A6512CDB215009D28C0 /* Line.tiff in Resources */,
+				6689D9891859050600EC48FB /* SharingDrawer.xib in Resources */,
 				79911A6612CDB215009D28C0 /* Rectangle.tiff in Resources */,
 				661211901821A482003AEC29 /* README.txt in Resources */,
 				79911A6712CDB215009D28C0 /* TextGraphic.tiff in Resources */,
@@ -1203,6 +1212,7 @@
 				7991190512CD3D75009D28C0 /* ProjectNavWindowController.m in Sources */,
 				661211DA1821A568003AEC29 /* XMPPJID.m in Sources */,
 				661211E31821A568003AEC29 /* XMPPIDTracker.m in Sources */,
+				6689D9921859053E00EC48FB /* SharingDrawerViewController.m in Sources */,
 				661211D31821A568003AEC29 /* XMPPPlainAuthentication.m in Sources */,
 				6612118D1821A482003AEC29 /* DDTTYLogger.m in Sources */,
 				661211D81821A568003AEC29 /* XMPPElement.m in Sources */,

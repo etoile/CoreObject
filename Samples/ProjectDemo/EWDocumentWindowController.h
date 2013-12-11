@@ -3,6 +3,7 @@
 #import "Document.h"
 #import "SharingSession.h"
 #import "EWDocumentWindowController.h"
+#import "SharingDrawerViewController.h"
 
 @interface EWDocumentWindowController : NSWindowController
 {
@@ -17,7 +18,8 @@
 	 */
 	COBranch *_pinnedBranch;
 	NSString *_windowID;
-	
+	NSDrawer *_sharingDrawer;
+	SharingDrawerViewController *_sharingDrawerViewController;
 	
 	// UI stuff
 	

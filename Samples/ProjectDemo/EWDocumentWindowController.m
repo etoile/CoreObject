@@ -53,6 +53,18 @@
 	return self;
 }
 
+- (void)windowDidLoad
+{
+	[self resetBranchesMenu];
+	[self resetBranchesCheckbox];
+	
+	_sharingDrawer = [[NSDrawer alloc] initWithContentSize: NSMakeSize(160, 100) preferredEdge: NSMaxXEdge];
+	_sharingDrawerViewController = [[SharingDrawerViewController alloc] init];
+	
+	[_sharingDrawer setParentWindow: [self window]];
+	[_sharingDrawer setContentView: [_sharingDrawerViewController view]];
+}
+
 @synthesize windowID = _windowID;
 @synthesize primaryWindow = _isPrimaryWindow;
 @synthesize persistentRoot = _persistentRoot;
@@ -212,12 +224,6 @@
 	}
 }
 
-- (void)windowDidLoad
-{
-	[self resetBranchesMenu];
-	[self resetBranchesCheckbox];
-}
-
 - (IBAction)checkDefaultBranch: (id)sender
 {
 	[_persistentRoot setCurrentBranch: self.editingBranch];
@@ -307,7 +313,8 @@
 
 - (IBAction) shareWith: (id)sender
 {
-	[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] shareWithInspectorForDocument: self.doc];
+	[_sharingDrawer toggle: sender];
+	//[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] shareWithInspectorForDocument: self.doc];
 }
 
 - (IBAction)moveToTrash:(id)sender
