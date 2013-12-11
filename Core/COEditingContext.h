@@ -299,7 +299,6 @@
  * See also -[NSObject isEditingContext].
  */
 @property (nonatomic, readonly) BOOL isEditingContext;
-
 /**
  * Returns self.
  *
@@ -313,8 +312,17 @@
  * Posted when any changes are committed to this editing context root, including
  * changes committed in another process.
  *
- * The userInfo dictionary is nil. The sender is the affected COEditingContext
- * object.
+ * The userInfo dictionary contains the command produced by the commit, under 
+ * the key kCOCommandKey. For a  commit was produced by an undo/redo action 
+ * (see COUndoTrack), the dictionary doesn't contain the command.<br />
+ * The kCOCommandKey object is provided just for debugging purpose (e.g. to log 
+ * each commit done locally, while not reporting concurrent commits from other 
+ * processes that trigger an automatic reloading).
+ *
+ * The sender is the affected COEditingContext object.
  */
 extern NSString * const COEditingContextDidChangeNotification;
+/**
+ * See userInfo explanation in COEditingContextDidChangeNotification.
+ */
 extern NSString * const kCOCommandKey;

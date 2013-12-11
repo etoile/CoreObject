@@ -24,9 +24,11 @@ First alpha release blockers
 
 - Check and update all Core API documentation (underway)
 
+	- Already reviewed classes: COObjectGraphContext, COEditingContext
+
 - Check code quality for all Core classes (underway)
 
-	- Already reviewed classes: COObjectGraphContext
+	- Already reviewed classes: COObjectGraphContext, COEditingContext
 
 - Write remaing class descriptions
 

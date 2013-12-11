@@ -12,7 +12,7 @@
 #import "COPersistentRoot+Private.h"
 #import "COError.h"
 #import "COObject.h"
-#import "COObject+Private.h"
+//#import "COObject+Private.h"
 #import "COSQLiteStore.h"
 #import "CORevision.h"
 #import "COBranch.h"
@@ -566,7 +566,8 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 	{
 		COPersistentRoot *persistentRoot = [self persistentRootForUUID: uuid];
 
-		persistentRoot.lastTransactionID = [transaction setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: uuid];
+		persistentRoot.lastTransactionID = [transaction setOldTransactionID: persistentRoot.lastTransactionID
+		                                                  forPersistentRoot: uuid];
 	}
 	
 	/* Update _persistentRootsPendingDeletion and _persistentRootsPendingUndeletion and unload
