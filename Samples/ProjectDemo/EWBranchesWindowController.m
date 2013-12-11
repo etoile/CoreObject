@@ -71,6 +71,14 @@ static EWBranchesWindowController *shared;
     [table reloadData];
 }
 
+- (void) commitWithIdentifier: (NSString *)identifier
+{
+	identifier = [@"org.etoile.ProjectDemo." stringByAppendingString: identifier];
+	
+	// FIXME: Pass a valid undo track as EWDocumentWindowController does it
+	[_persistentRoot commitWithIdentifier: identifier metadata: nil undoTrack: nil error: NULL];
+}
+
 - (COBranch *)selectedBranch
 {
     COBranch *branch = [[self orderedBranches] objectAtIndex: [table selectedRow]];
@@ -84,7 +92,7 @@ static EWBranchesWindowController *shared;
 		COBranch *branch = [self selectedBranch];
 		
         [_persistentRoot setCurrentBranch: branch];
-		[_persistentRoot commitWithType: @"minorEdit" shortDescription: @"Set branch"];
+		[self commitWithIdentifier: @"set-branch"];
 	}
 }
 
@@ -142,7 +150,7 @@ static EWBranchesWindowController *shared;
     if ([[tableColumn identifier] isEqual: @"name"])
     {
         [branch setLabel: object];
-        [_persistentRoot commitWithType: @"minorEdit" shortDescription: @"Set branch label"];
+        [self commitWithIdentifier: @"set-branch-label"];
     }
     else if ([[tableColumn identifier] isEqual: @"important"])
     {
@@ -150,14 +158,14 @@ static EWBranchesWindowController *shared;
         NSMutableDictionary *metadata = [NSMutableDictionary dictionaryWithDictionary: [branch metadata]];
         metadata[@"important"] = object;
         [branch setMetadata: metadata];
-        [_persistentRoot commitWithType: @"minorEdit" shortDescription: @"Set branch importance"];
+        [self commitWithIdentifier: @"set-branch-importance"];
     }
     else if ([[tableColumn identifier] isEqual: @"checked"])
     {
         if ([object boolValue])
         {
             [_persistentRoot setCurrentBranch: branch];
-			[_persistentRoot commitWithType: @"minorEdit" shortDescription: @"Set branch"];
+			[self commitWithIdentifier: @"set-branch"];
         }
     }
 }

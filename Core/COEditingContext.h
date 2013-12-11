@@ -284,16 +284,6 @@
 
 
 /**
- * Commits the current changes to the store with some basic metadatas and 
- * returns whether it succeeds.
- *
- * The description will be visible at the UI level when browsing the history.
- *
- * See -commitWithMetadata:undoTrack:error:.
- */
-- (BOOL)commitWithType: (NSString *)type
-      shortDescription: (NSString *)shortDescription;
-/**
  * Returns YES.
  *
  * See also -[NSObject isEditingContext].

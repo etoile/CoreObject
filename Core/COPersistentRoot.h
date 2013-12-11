@@ -363,20 +363,5 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * Reason for deprecating: I don't like NSObject+CoreObject idea, violates tell-don't-ask principle.
  */
 @property (nonatomic, readonly) BOOL isPersistentRoot;
-/**
- * Commits the current changes to the store with some basic metadatas and
- * returns the resulting revision.
- *
- * A commit on a single persistent root is atomic.
- *
- * This method won't commit changes of other persistent roots loaded in the 
- * parent context.
- *
- * The description will be visible at the UI level when browsing the history.
- *
- * See -commitWithMetadata:.
- */
-- (BOOL)commitWithType: (NSString *)type
-      shortDescription: (NSString *)shortDescription;
 
 @end

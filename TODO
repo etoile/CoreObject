@@ -4,10 +4,6 @@ TODO
 First alpha release blockers
 ----------------------------
 
-- Remove -commitWithType:shortDescription:
-
-  - Used in ProjectDemo
-
 - Add some collection-oriented KVO update tests to TestObjectUpdate
 
 - Fix test suite compilation on GNUstep

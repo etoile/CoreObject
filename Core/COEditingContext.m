@@ -454,23 +454,7 @@
 
 - (BOOL)commit
 {
-	return [self commitWithType: nil shortDescription: nil];
-}
-
-- (BOOL)commitWithType: (NSString *)type
-      shortDescription: (NSString *)shortDescription
-{
-	NSString *commitType = type;
-	
-	if (type == nil)
-	{
-		commitType = @"Unknown";
-	}
-	if (shortDescription == nil)
-	{
-		shortDescription = @"";
-	}
-	return [self commitWithMetadata: D(shortDescription, @"shortDescription", commitType, @"type")];
+	return [self commitWithMetadata: [NSDictionary dictionary]];
 }
 
 // FIXME: This was moved here because Typewriter expects changes to be

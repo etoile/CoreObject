@@ -433,25 +433,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (BOOL)commit
 {
-	// TODO: Should call -commitWithIdentifier:metadata:undoTrack:error:
-	return [self commitWithType: nil shortDescription: nil];
-}
-
-// TODO: Remove
-- (BOOL)commitWithType: (NSString *)type
-      shortDescription: (NSString *)shortDescription
-{
-	NSString *commitType = type;
-	
-	if (type == nil)
-	{
-		commitType = @"Unknown";
-	}
-	if (shortDescription == nil)
-	{
-		shortDescription = @"";
-	}
-	return [self commitWithMetadata: D(shortDescription, @"shortDescription", commitType, @"type")];
+	return [self commitWithMetadata: [NSDictionary dictionary]];
 }
 
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata

@@ -7,10 +7,29 @@
 		"deletion": "Object Deletion",
 		"copy": "Object Copy",
 		"history": "History related",
+		"branch": "Branch related"
 	},
 
 	"descriptors":
 	{
+		"set-branch":
+		{
+			"type": "branch",
+			"shortDescription": "Set branch"
+		},
+
+		"set-branch-label":
+		{
+			"type": "branch",
+			"shortDescription": "Set branch label"
+		},
+
+		"set-branch-importance":
+		{
+			"type": "branch",
+			"shortDescription": "Set branch importance"
+		},
+
 		"add-item":
 		{
 			"type": "creation",
