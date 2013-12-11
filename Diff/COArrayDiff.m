@@ -57,6 +57,8 @@ void COApplyEditsToArray(NSMutableArray *array, NSArray *edits)
     const NSUInteger editsCount = [edits count];
     
 	NSInteger i = 0;
+	NSInteger nextI = 0;
+	NSInteger lastEditStart = -1;
     for (NSUInteger whichEdit = 0; whichEdit < editsCount; whichEdit++)
 	{
         COSequenceEdit *op = [edits objectAtIndex: whichEdit];
@@ -69,6 +71,11 @@ void COApplyEditsToArray(NSMutableArray *array, NSArray *edits)
                 continue;
             }
         }
+		
+		if ([op range].location != lastEditStart)
+		{
+			i = nextI;
+		}
         
 		if ([op isMemberOfClass: [COSequenceInsertion class]])
 		{
@@ -78,14 +85,14 @@ void COApplyEditsToArray(NSMutableArray *array, NSArray *edits)
 			[array insertObjects: [opp objects]
 					   atIndexes: [NSIndexSet indexSetWithIndexesInRange: range]];
 			
-			i += range.length;
+			nextI += range.length;
 		}
 		else if ([op isMemberOfClass: [COSequenceDeletion class]])
 		{
 			NSRange range = NSMakeRange([op range].location + i, [op range].length);
 			
 			[array removeObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: range]];
-			i -= range.length;
+			nextI -= range.length;
 		}
 		else if ([op isMemberOfClass: [COSequenceModification class]])
 		{
@@ -96,13 +103,15 @@ void COApplyEditsToArray(NSMutableArray *array, NSArray *edits)
 			[array removeObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: deleteRange]];
 			[array insertObjects: [opp objects]
 					   atIndexes: [NSIndexSet indexSetWithIndexesInRange: insertRange]];
-			i += (insertRange.length - deleteRange.length);
+			nextI += (insertRange.length - deleteRange.length);
 		}
 		else
 		{
 			[NSException raise: NSInternalInconsistencyException
 						format: @"Unexpected edit type"];
-		}    
+		}
+		
+		lastEditStart = [op range].location;
 	}
 }
 
