@@ -314,7 +314,8 @@
  *
  * The userInfo dictionary contains the command produced by the commit, under 
  * the key kCOCommandKey. For a  commit was produced by an undo/redo action 
- * (see COUndoTrack), the dictionary doesn't contain the command.<br />
+ * (see COUndoTrack) or changes committed in another processes, the dictionary 
+ * doesn't contain the command.<br />
  * The kCOCommandKey object is provided just for debugging purpose (e.g. to log 
  * each commit done locally, while not reporting concurrent commits from other 
  * processes that trigger an automatic reloading).
