@@ -6,7 +6,7 @@ First alpha release blockers
 
 - Remove -commitWithType:shortDescription:
 
-  - Used in EtoileUI, ProjectDemo
+  - Used in ProjectDemo
 
 - Add some collection-oriented KVO update tests to TestObjectUpdate
 

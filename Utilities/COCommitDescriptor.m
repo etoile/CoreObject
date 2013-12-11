@@ -63,9 +63,17 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 + (void)loadCommitDescriptorsInTable: (NSMutableDictionary *)aDescriptorTable
                            typeTable: (NSMutableDictionary *)aTypeTable
 {
-	NSArray *commitsFiles =
-		[[NSBundle mainBundle] pathsForResourcesOfType: @"json" inDirectory: @"Commits"];
-	
+	NSMutableArray *commitsFiles = [NSMutableArray array];
+	NSArray *bundles =
+		[A([NSBundle mainBundle]) arrayByAddingObjectsFromArray: [NSBundle allFrameworks]];
+
+	bundles = [bundles arrayByAddingObjectsFromArray: [NSBundle allBundles]];
+
+	for (NSBundle *bundle in bundles)
+	{
+		[commitsFiles addObjectsFromArray: [bundle pathsForResourcesOfType: @"json"
+		                                                       inDirectory: @"Commits"]];
+	}
 	
 	for (NSString *file in commitsFiles)
 	{
