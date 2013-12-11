@@ -18,7 +18,6 @@
 #import <CoreObject/CORevision.h>
 #import <CoreObject/COSerialization.h>
 #import <CoreObject/COSQLiteStore.h>
-#import <CoreObject/COPersistentObjectContext.h>
 
 /* Model */
 
@@ -83,3 +82,4 @@
 #import <CoreObject/COCommitDescriptor.h>
 #import <CoreObject/COError.h>
 #import <CoreObject/COTrack.h>
+#import <CoreObject/COPersistentObjectContext.h>
