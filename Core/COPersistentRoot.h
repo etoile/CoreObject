@@ -11,6 +11,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COEditingContext.h>
 #import <CoreObject/COItemGraph.h>
+#import <CoreObject/COPersistentObjectContext.h>
 
 @class COBranch, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo, COObjectGraphContext;
 

@@ -6,9 +6,9 @@
 	License:  Modified BSD  (see COPYING)
  */
 
-#import "NSObject+CoreObject.h"
+#import "COPersistentObjectContext.h"
 
-@implementation NSObject (CoreObject)
+@implementation NSObject (COPersistentObjectContext)
 
 - (BOOL)isEditingContext
 {

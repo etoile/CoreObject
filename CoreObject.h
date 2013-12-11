@@ -18,7 +18,7 @@
 #import <CoreObject/CORevision.h>
 #import <CoreObject/COSerialization.h>
 #import <CoreObject/COSQLiteStore.h>
-#import <CoreObject/NSObject+CoreObject.h>
+#import <CoreObject/COPersistentObjectContext.h>
 
 /* Model */
 

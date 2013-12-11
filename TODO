@@ -107,6 +107,13 @@ Future Work
   - Clean up selective undo code and share implementation with undo system
 
   - Implement -isCopy and -isTrunkBranch
+  
+
+- COPersistentObjectContext
+
+	- Find a better name for this protocol, that gives it less importance, and convey it can represent a transient object graph context (or at least doesn't go against this use case). 
+	
+	- Perhaps move it to EtoileUI
 
 
 - Metamodel
