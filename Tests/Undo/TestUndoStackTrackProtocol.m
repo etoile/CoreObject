@@ -64,8 +64,8 @@
 	
 	double timeIntervalSinceLastNodeCommitted = [[NSDate date] timeIntervalSinceDate: [current date]];
 	
-	// i.e., the last undo node must have been created between 0 and 100ms ago.
-	UKTrue(timeIntervalSinceLastNodeCommitted < 0.1);
+	// i.e., the last undo node must have been created between 0 and 250ms ago.
+	UKTrue(timeIntervalSinceLastNodeCommitted < 0.250);
 	UKTrue(timeIntervalSinceLastNodeCommitted >= 0);
 }
 
