@@ -22,10 +22,12 @@
 }
 
 - (id)initAsServerWithBranch: (COBranch *)aBranch
-				   clientJID: (XMPPJID *)peerJID
 				  xmppStream: (XMPPStream *)xmppStream;
 {
-	self = [self initWithPeerJID: peerJID xmppStream: xmppStream isServer: YES];
+	NILARG_EXCEPTION_TEST(aBranch);
+	NILARG_EXCEPTION_TEST(xmppStream);
+
+	self = [self initWithPeerJID: nil xmppStream: xmppStream isServer: YES];
 	
 	_server = [[COSynchronizerServer alloc] initWithBranch: aBranch];
 	
@@ -35,15 +37,20 @@
 	
 	_server.delegate = _JSONServer;
 	
-	[_server addClientID: [_peerJID bare]];
-	
-	
-	OutlineController *docController = (OutlineController *)[(ApplicationDelegate *)[NSApp delegate]
-										controllerForDocumentRootObject: [aBranch rootObject]];
-	ETAssert(docController != nil);
-	[docController setSharingSession: self];
-	
+//	OutlineController *docController = (OutlineController *)[(ApplicationDelegate *)[NSApp delegate]
+//										controllerForDocumentRootObject: [aBranch rootObject]];
+//	ETAssert(docController != nil);
+//	[docController setSharingSession: self];
+//	
 	return self;
+}
+
+
+- (void) addClientJID: (XMPPJID *)peerJID
+{
+	ETAssert(_peerJID == nil);
+	_peerJID = peerJID;
+	[_server addClientID: [_peerJID bare]];
 }
 
 - (id)initAsClientWithEditingContext: (COEditingContext *)ctx
@@ -70,10 +77,8 @@
 	
 	Document *rootObject = [aBranch rootObject];
 	
-	[(ApplicationDelegate *)[NSApp delegate] registerDocumentRootObject: rootObject];
+	OutlineController *docController = (OutlineController *) [(ApplicationDelegate *)[NSApp delegate] registerDocumentRootObject: rootObject];
 	
-	OutlineController *docController = (OutlineController *)[(ApplicationDelegate *)[NSApp delegate]
-										controllerForDocumentRootObject: rootObject];
 	ETAssert(docController != nil);
 	[docController setSharingSession: self];
 }

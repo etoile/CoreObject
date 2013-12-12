@@ -59,7 +59,7 @@
 	[self resetBranchesCheckbox];
 	
 	_sharingDrawer = [[NSDrawer alloc] initWithContentSize: NSMakeSize(160, 100) preferredEdge: NSMaxXEdge];
-	_sharingDrawerViewController = [[SharingDrawerViewController alloc] init];
+	_sharingDrawerViewController = [[SharingDrawerViewController alloc] initWithParent: self];
 	
 	[_sharingDrawer setParentWindow: [self window]];
 	[_sharingDrawer setContentView: [_sharingDrawerViewController view]];

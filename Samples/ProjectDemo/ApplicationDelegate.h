@@ -51,6 +51,6 @@
 - (NSWindowController*) keyDocumentController;
 - (Document *)keyDocument;
 
-- (void) registerDocumentRootObject: (Document *)aDoc;
+- (EWDocumentWindowController *) registerDocumentRootObject: (Document *)aDoc;
 
 @end

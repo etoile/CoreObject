@@ -152,7 +152,7 @@
 	}
 }
 
-- (void) registerDocumentRootObject: (Document *)aDoc
+- (EWDocumentWindowController *) registerDocumentRootObject: (Document *)aDoc
 {
 	// FIXME: Total hack
 	Project *proj = [[self projects] anyObject];
@@ -180,6 +180,8 @@
 	[controller showWindow: nil];
 
 	controllerForWindowID[windowID] = controller;
+	
+	return controller;
 }
 
 - (IBAction) newTextDocument: (id)sender

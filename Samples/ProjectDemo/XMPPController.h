@@ -10,20 +10,20 @@
 	XMPPRosterMemoryStorage *xmppRosterStorage;
 	XMPPRoster *xmppRoster;
 	
-	Document *currentDocument;
-	
 	NSMutableDictionary *sharingSessionsByPersistentRootUUID;
 }
 
 + (XMPPController *) sharedInstance;
 
+@property (readonly, strong) XMPPStream *xmppStream;
+
 - (void) reconnect;
 - (void) shareWithInspectorForDocument: (Document*)doc;
-
-- (NSArray *) sortedUsersByAvailabilityName;
 
 - (XMPPRoster *) roster;
 
 - (SharingSession *) sharingSessionForPersistentRootUUID: (ETUUID *)aUUID fullJID: (NSString *)aJID;
+
+- (void) shareBranch: (COBranch*)aBranch withJID: (XMPPJID *)jid;
 
 @end

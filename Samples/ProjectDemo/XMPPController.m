@@ -16,6 +16,8 @@
     return [[XMPPController alloc] init];
 }
 
+@synthesize xmppStream = xmppStream;
+
 - (id)init
 {
 	static XMPPController *sharedInstance;
@@ -150,13 +152,9 @@
 		}
 		else if ([subtype isEqualToString: @"accept-invitation"])
 		{
-			// Set up session object
-			
-			SharingSession *session = [[SharingSession alloc] initAsServerWithBranch: [[currentDocument persistentRoot] currentBranch]
-																		   clientJID: [message from]
-																		  xmppStream: xmppStream];
-			
-			[sharingSessionsByPersistentRootUUID setObject: session forKey: persistentRootUUID];			
+			SharingSession *session = sharingSessionsByPersistentRootUUID[persistentRootUUID];
+			ETAssert(session != nil);
+			[session addClientJID: [message from]];
 		}
 	}
 	else
@@ -165,36 +163,18 @@
 	}
 }
 
-- (void) shareWith: (id)sender
+- (void) shareBranch: (COBranch*)aBranch withJID: (XMPPJID *)jid
 {
-	id<XMPPUser> user = [sender representedObject];
-	
-	ETUUID *persistentRootUUID = [[currentDocument persistentRoot] UUID];
-	XMPPJID *jid = [user jid];
-	
-	NSLog(@"Share %@ with %@", persistentRootUUID, user);
+	NSLog(@"Share %@ with %@", aBranch, jid);
 			
-	[self sendCoreobjectMessageType: @"sharing-invitation" to: jid persistentRootUUID: persistentRootUUID];
-}
-
-- (NSArray *) sortedUsersByAvailabilityName
-{
-	return [xmppRosterStorage sortedUsersByAvailabilityName];
-}
-
-- (void) shareWithInspectorForDocument: (Document*)doc
-{
-	currentDocument = doc;
+	// Set up session object
 	
-	NSMenu *theMenu = [[NSMenu alloc] initWithTitle:@"People"];
-	for (id<XMPPUser> user in [xmppRosterStorage sortedUsersByAvailabilityName])
-	{
-		NSMenuItem *item = [theMenu addItemWithTitle: [[user jid] bare] action: @selector(shareWith:) keyEquivalent:@""];
-		[item setRepresentedObject: user];
-		[item setTarget: self];
-	}
-
-    [NSMenu popUpContextMenu:theMenu withEvent:[[NSApp mainWindow] currentEvent] forView:nil];
+	SharingSession *session = [[SharingSession alloc] initAsServerWithBranch: aBranch
+																  xmppStream: xmppStream];
+	
+	[sharingSessionsByPersistentRootUUID setObject: session forKey: aBranch.persistentRoot.UUID];
+	
+	[self sendCoreobjectMessageType: @"sharing-invitation" to: jid persistentRootUUID: aBranch.persistentRoot.UUID];
 }
 
 - (SharingSession *) sharingSessionForPersistentRootUUID: (ETUUID *)aUUID fullJID: (NSString *)aJID

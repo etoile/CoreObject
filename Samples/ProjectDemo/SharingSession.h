@@ -19,6 +19,7 @@
  */
 @interface SharingSession : NSObject <COSynchronizerJSONClientDelegate, COSynchronizerJSONServerDelegate>
 {
+	// FIXME: Change to collection
 	XMPPJID *_peerJID;
 	XMPPStream *_xmppStream;
 	BOOL _isServer;
@@ -34,7 +35,6 @@
 						  xmppStream: (XMPPStream *)xmppStream;
 
 - (id)initAsServerWithBranch: (COBranch *)aBranch
-				   clientJID: (XMPPJID *)peerJID
 				  xmppStream: (XMPPStream *)xmppStream;
 
 @property (nonatomic, readonly, strong) COPersistentRoot *persistentRoot;
@@ -45,5 +45,7 @@
 @property (nonatomic, readonly, strong) NSString *ourName;
 
 @property (nonatomic, readonly, strong) XMPPJID *peerJID;
+
+- (void) addClientJID: (XMPPJID *)peerJID;
 
 @end
