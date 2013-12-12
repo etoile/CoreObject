@@ -4,6 +4,9 @@
 
 @implementation SharingSession
 
+@synthesize branchUUID = _branchUUID;
+@synthesize persistentRootUUID = _persistentRootUUID;
+
 - (id)initAsServerWithBranch: (COBranch *)aBranch
 				  xmppStream: (XMPPStream *)xmppStream;
 {
@@ -13,6 +16,8 @@
 	SUPERINIT;
 	
 	_isServer = YES;
+	_branchUUID = aBranch.UUID;
+	_persistentRootUUID = aBranch.persistentRoot.UUID;
 	_xmppStream = xmppStream;
 	[_xmppStream addDelegate: self delegateQueue: dispatch_get_main_queue()];
 	
@@ -55,13 +60,22 @@
 	return NO;
 }
 
+
 - (id)initAsClientWithEditingContext: (COEditingContext *)ctx
+				  persistentRootUUID: (ETUUID *)persistentRootUUID
+						  branchUUID: (ETUUID *)branchUUID
 						   serverJID: (XMPPJID *)peerJID
 						  xmppStream: (XMPPStream *)xmppStream
 {
 	SUPERINIT;
 	
 	_isServer = NO;
+	/*
+	 * Note that the client will probably not have branchUUID in its store
+	 * when the SharingSession object is created
+	 */
+	_branchUUID = branchUUID;
+	_persistentRootUUID = persistentRootUUID;
 	_xmppStream = xmppStream;
 	_serverJID = peerJID;
 
@@ -102,9 +116,14 @@
 
 - (void) sendCoreObjectMessageWithPayload: (NSString *)aString toFullJIDString: (NSString *)fullJID
 {
+	ETAssert(self.persistentRootUUID != nil);
+	ETAssert(self.branchUUID != nil);
+	
 	NSXMLElement *responseMessage = [NSXMLElement elementWithName:@"message"];
 	[responseMessage addAttributeWithName:@"type" stringValue: @"coreobject-synchronizer"];
 	[responseMessage addAttributeWithName:@"to" stringValue: fullJID];
+	[responseMessage addAttributeWithName:@"persistentroot" stringValue: [self.persistentRootUUID stringValue]];
+	[responseMessage addAttributeWithName:@"branch" stringValue: [self.branchUUID stringValue]];
 	[responseMessage setObjectValue: aString];
 
 	NSLog(@"<-- sending %d chars", (int)[[responseMessage XMLString] length]);
@@ -115,6 +134,16 @@
 {
 	if ([[message attributeStringValueForName: @"type"] isEqualToString: @"coreobject-synchronizer"])
 	{
+		ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [message attributeStringValueForName: @"persistentroot"]];
+		ETUUID *branchUUID = [ETUUID UUIDWithString: [message attributeStringValueForName: @"branch"]];
+
+		if (!([persistentRootUUID isEqual: _persistentRootUUID]
+			  && [branchUUID isEqual: _branchUUID]))
+		{
+			NSLog(@"SharingSession on branch %@ ignoring message for branch %@", self.branchUUID, branchUUID);
+			return;
+		}
+		
 		NSString *payload = [message stringValue];
 		
 		if (_isServer)
@@ -138,18 +167,6 @@
 - (NSString *) ourName
 {
 	return [[_xmppStream myJID] full];
-}
-
-- (COPersistentRoot *) persistentRoot
-{
-	if (_isServer)
-	{
-		return _server.persistentRoot;
-	}
-	else
-	{
-		return _client.persistentRoot;
-	}
 }
 
 @end

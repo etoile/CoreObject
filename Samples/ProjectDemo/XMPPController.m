@@ -144,7 +144,11 @@
 			if (NSAlertFirstButtonReturn == [alert runModal])
 			{
 				COEditingContext *ctx = [(ApplicationDelegate *)[NSApp delegate] editingContext];
+				
+				ETAssert(sharingSessionsByBranchUUID[branchUUID] == nil);
 				SharingSession *session = [[SharingSession alloc] initAsClientWithEditingContext: ctx
+																			  persistentRootUUID: persistentRootUUID
+																					  branchUUID: branchUUID
 																					   serverJID: [message from]
 																					  xmppStream: xmppStream];
 				sharingSessionsByBranchUUID[branchUUID] = session;

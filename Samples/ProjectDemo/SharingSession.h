@@ -12,6 +12,9 @@
  */
 @interface SharingSession : NSObject <COSynchronizerJSONClientDelegate, COSynchronizerJSONServerDelegate>
 {
+	ETUUID *_persistentRootUUID;
+	ETUUID *_branchUUID;
+	
 	XMPPStream *_xmppStream;
 	BOOL _isServer;
 	
@@ -28,13 +31,16 @@
 }
 
 - (id)initAsClientWithEditingContext: (COEditingContext *)ctx
+				  persistentRootUUID: (ETUUID *)persistentRootUUID
+						  branchUUID: (ETUUID *)branchUUID
 						   serverJID: (XMPPJID *)peerJID
 						  xmppStream: (XMPPStream *)xmppStream;
 
 - (id)initAsServerWithBranch: (COBranch *)aBranch
 				  xmppStream: (XMPPStream *)xmppStream;
 
-@property (nonatomic, readonly, strong) COPersistentRoot *persistentRoot;
+@property (nonatomic, readonly) ETUUID *persistentRootUUID;
+@property (nonatomic, readonly) ETUUID *branchUUID;
 
 @property (nonatomic, readonly, assign) BOOL isServer;
 
