@@ -29,7 +29,7 @@
 
 - (void)xmppRosterDidChange:(XMPPRosterMemoryStorage *)sender
 {
-	users = [sender sortedAvailableUsersByName];
+	users = [sender sortedUsersByAvailabilityName];
 	[table reloadData];
 }
 
@@ -43,19 +43,29 @@
     {
 		NSButtonCell *buttonCell = cell;
 		XMPPController *controller = [XMPPController sharedInstance];
-		SharingSession *session = [controller sharingSessionForPersistentRootUUID: [parent.persistentRoot UUID]
-																		  fullJID: [[user jid] full]];
-		if (session != nil)
+		SharingSession *session = [controller sharingSessionForBranch: parent.editingBranch];
+				
+		if ([session isJIDClient: [user jid]])
 		{
 			[buttonCell setTitle: @"Disconnect"];
 			[buttonCell setTarget: self];
 			[buttonCell setAction: @selector(disconnect:)];
+			[buttonCell setEnabled: YES];
 		}
 		else
 		{
-			[buttonCell setTitle: @"Invite"];
-			[buttonCell setTarget: self];
-			[buttonCell setAction: @selector(invite:)];
+			if ([user isOnline])
+			{
+				[buttonCell setTitle: @"Invite"];
+				[buttonCell setTarget: self];
+				[buttonCell setAction: @selector(invite:)];
+				[buttonCell setEnabled: YES];
+			}
+			else
+			{
+				[buttonCell setTitle: @"Offline"];
+				[buttonCell setEnabled: NO];
+			}
 		}
     }
 }
@@ -63,13 +73,12 @@
 - (void)disconnect: (id)sender
 {
 	id<XMPPUser> user = [users objectAtIndex: [table clickedRow]];
-	
+	NSLog(@"TODO: Disconnect %@", [user jid]);
 }
 
 - (void)invite: (id)sender
 {
 	id<XMPPUser> user = [users objectAtIndex: [table clickedRow]];
-	ETUUID *aUUID = [parent.persistentRoot UUID];
 	
 	XMPPController *controller = [XMPPController sharedInstance];
 	[controller shareBranch: parent.editingBranch withJID: user.jid];
@@ -88,7 +97,7 @@
 	
     if ([[tableColumn identifier] isEqual: @"user"])
     {
-        return [[user jid] bare];
+        return [NSString stringWithFormat: @"%@ (%@)", [user nickname], [[user jid] bare]];
     }
     return nil;
 }

@@ -24,14 +24,7 @@
 	NSString *title;
 	if ([self isSharing])
 	{
-		if (_sharingSession.isServer)
-		{
-			title = [NSString stringWithFormat: @"%@ - sharing with %@", docName, _sharingSession.peerName];
-		}
-		else
-		{
-			title = [NSString stringWithFormat: @"%@ - shared by %@", docName, _sharingSession.peerName];
-		}
+		title = @"Shared by XXX";
 	}
 	else
 	{

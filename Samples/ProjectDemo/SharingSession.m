@@ -4,30 +4,17 @@
 
 @implementation SharingSession
 
-@synthesize peerJID = _peerJID;
-
-- (id)initWithPeerJID: (XMPPJID *)peerJID
-		   xmppStream: (XMPPStream *)xmppStream
-			 isServer: (BOOL)isServer
-{
-    SUPERINIT;
-	
-	_peerJID = peerJID;
-	_xmppStream = xmppStream;
-	_isServer = isServer;
-
-	[_xmppStream addDelegate: self delegateQueue: dispatch_get_main_queue()];
-	
-    return self;
-}
-
 - (id)initAsServerWithBranch: (COBranch *)aBranch
 				  xmppStream: (XMPPStream *)xmppStream;
 {
 	NILARG_EXCEPTION_TEST(aBranch);
 	NILARG_EXCEPTION_TEST(xmppStream);
 
-	self = [self initWithPeerJID: nil xmppStream: xmppStream isServer: YES];
+	SUPERINIT;
+	
+	_isServer = YES;
+	_xmppStream = xmppStream;
+	[_xmppStream addDelegate: self delegateQueue: dispatch_get_main_queue()];
 	
 	_server = [[COSynchronizerServer alloc] initWithBranch: aBranch];
 	
@@ -45,21 +32,47 @@
 	return self;
 }
 
-
 - (void) addClientJID: (XMPPJID *)peerJID
 {
-	ETAssert(_peerJID == nil);
-	_peerJID = peerJID;
-	[_server addClientID: [_peerJID bare]];
+	ETAssert(_isServer);
+
+	[_server addClientID: [peerJID full]];
+}
+
+/**
+ * Returns YES if the given JID is one of this server's clients.
+ *
+ * Only looks at the bare portion of the JID, because the use case for this
+ * is showing which users in a roster we are currently sharing with, and
+ * a roster only gives you bare JIDs.
+ */
+- (BOOL) isJIDClient: (XMPPJID *)peerJID
+{
+	for (NSString *fullJIDString in [_server clientIDs])
+	{
+		XMPPJID *bareJID = [[XMPPJID jidWithString: fullJIDString] bareJID];
+		if ([bareJID isEqual: [peerJID bareJID]])
+		{
+			return YES;
+		}
+	}
+	
+	return NO;
 }
 
 - (id)initAsClientWithEditingContext: (COEditingContext *)ctx
 						   serverJID: (XMPPJID *)peerJID
 						  xmppStream: (XMPPStream *)xmppStream
 {
-	self = [self initWithPeerJID: peerJID xmppStream: xmppStream isServer: NO];
+	SUPERINIT;
 	
-	_client = [[COSynchronizerClient alloc] initWithClientID: [[xmppStream myJID] bare]
+	_isServer = NO;
+	_xmppStream = xmppStream;
+	_serverJID = peerJID;
+
+	[_xmppStream addDelegate: self delegateQueue: dispatch_get_main_queue()];
+	
+	_client = [[COSynchronizerClient alloc] initWithClientID: [[xmppStream myJID] full]
 											  editingContext: ctx];
 	
 	_JSONClient = [COSynchronizerJSONClient new];
@@ -85,19 +98,19 @@
 
 - (void) JSONClient: (COSynchronizerJSONClient *)client sendTextToServer: (NSString *)text
 {
-	[self sendCoreObjectMessageWithPayload: text];
+	[self sendCoreObjectMessageWithPayload: text toFullJIDString: [_serverJID full]];
 }
 
 - (void) JSONServer: (COSynchronizerJSONServer *)server sendText: (NSString *)text toClient: (NSString *)client
 {
-	[self sendCoreObjectMessageWithPayload: text];
+	[self sendCoreObjectMessageWithPayload: text toFullJIDString: client];
 }
 
-- (void) sendCoreObjectMessageWithPayload: (NSString *)aString
+- (void) sendCoreObjectMessageWithPayload: (NSString *)aString toFullJIDString: (NSString *)fullJID
 {
 	NSXMLElement *responseMessage = [NSXMLElement elementWithName:@"message"];
-	[responseMessage addAttributeWithName:@"type" stringValue:@"coreobject-synchronizer"];
-	[responseMessage addAttributeWithName:@"to" stringValue:[_peerJID full]];
+	[responseMessage addAttributeWithName:@"type" stringValue: @"coreobject-synchronizer"];
+	[responseMessage addAttributeWithName:@"to" stringValue: fullJID];
 	[responseMessage setObjectValue: aString];
 
 	NSLog(@"<-- sending %d chars", (int)[[responseMessage XMLString] length]);
@@ -111,7 +124,7 @@
 		NSString *payload = [message stringValue];
 		
 		if (_isServer)
-			[_JSONServer receiveText: payload fromClient: [[message from] bare]];
+			[_JSONServer receiveText: payload fromClient: [[message from] full]];
 		else
 			[_JSONClient receiveTextFromServer: payload];
 		
@@ -128,14 +141,9 @@
 	return _isServer;
 }
 
-- (NSString *) peerName
-{
-	return [_peerJID bare];
-}
-
 - (NSString *) ourName
 {
-	return [[_xmppStream myJID] bare];
+	return [[_xmppStream myJID] full];
 }
 
 - (COPersistentRoot *) persistentRoot

@@ -49,5 +49,7 @@
 - (void) addClientID: (NSString *)clientID;
 - (void) removeClientID: (NSString *)clientID;
 
+@property (nonatomic, readonly) NSArray *clientIDs;
+
 @end
 

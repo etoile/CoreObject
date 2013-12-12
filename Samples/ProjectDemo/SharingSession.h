@@ -7,27 +7,24 @@
 #import <CoreObject/COSynchronizerClient.h>
 #import <CoreObject/COSynchronizerServer.h>
 
-
-/*
- 
- 
- 
- Limitations / future plans:
- - We can support sharing branch switches, and the COSharing* code supports it
-   but it complicates things a bit.
- 
+/**
+ * Object that encapsulates the sharing session, for either the client or server.
  */
 @interface SharingSession : NSObject <COSynchronizerJSONClientDelegate, COSynchronizerJSONServerDelegate>
 {
-	// FIXME: Change to collection
-	XMPPJID *_peerJID;
 	XMPPStream *_xmppStream;
 	BOOL _isServer;
 	
-	COSynchronizerJSONClient *_JSONClient;
+	// Only for server object
+	
 	COSynchronizerJSONServer *_JSONServer;
-	COSynchronizerClient *_client;
 	COSynchronizerServer *_server;
+	
+	// Only for client object
+	
+	COSynchronizerClient *_client;
+	COSynchronizerJSONClient *_JSONClient;
+	XMPPJID *_serverJID;
 }
 
 - (id)initAsClientWithEditingContext: (COEditingContext *)ctx
@@ -41,10 +38,9 @@
 
 @property (nonatomic, readonly, assign) BOOL isServer;
 
-@property (nonatomic, readonly, strong) NSString *peerName;
 @property (nonatomic, readonly, strong) NSString *ourName;
 
-@property (nonatomic, readonly, strong) XMPPJID *peerJID;
+- (BOOL) isJIDClient: (XMPPJID *)peerJID;
 
 - (void) addClientJID: (XMPPJID *)peerJID;
 

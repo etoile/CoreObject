@@ -30,7 +30,7 @@
 	sharedInstance = self;
 	
     if (self) {
-		sharingSessionsByPersistentRootUUID = [[NSMutableDictionary alloc] init];
+		sharingSessionsByBranchUUID = [[NSMutableDictionary alloc] init];
 		
 		[DDLog addLogger:[DDTTYLogger sharedInstance]];
 		
@@ -69,7 +69,7 @@
 		return;
 	}
 	
-	[[[NSApplication sharedApplication] dockTile] setBadgeLabel: jid];
+	[[[NSApplication sharedApplication] dockTile] setBadgeLabel: [jid stringByReplacingOccurrencesOfString: @"test" withString: @""]];
 	
 	NSLog(@"Connect to %@ %@ %@", jid, password, server);
 	
@@ -115,13 +115,14 @@
 - (void) sendCoreobjectMessageType: (NSString *)aType
 								to: (XMPPJID *)aJID
 				persistentRootUUID: (ETUUID *)aUUID
+						branchUUID: (ETUUID *)aBranch
 {
 	NSXMLElement *responseMessage = [NSXMLElement elementWithName:@"message"];
 	[responseMessage addAttributeWithName:@"type" stringValue:@"coreobject"];
 	[responseMessage addAttributeWithName:@"subtype" stringValue: aType];
-	[responseMessage addAttributeWithName:@"to" stringValue:[aJID full]];
-	[responseMessage addAttributeWithName:@"uuid" stringValue: [aUUID stringValue]];
-	
+	[responseMessage addAttributeWithName:@"to" stringValue: [aJID full]];
+	[responseMessage addAttributeWithName:@"persistentroot" stringValue: [aUUID stringValue]];
+	[responseMessage addAttributeWithName:@"branch" stringValue: [aBranch stringValue]];
 	[xmppStream sendElement:responseMessage];
 }
 
@@ -130,7 +131,8 @@
 	if ([[message attributeStringValueForName: @"type"] isEqualToString: @"coreobject"])
 	{
 		NSString *subtype = [message attributeStringValueForName: @"subtype"];
-		ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [message attributeStringValueForName: @"uuid"]];
+		ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [message attributeStringValueForName: @"persistentroot"]];
+		ETUUID *branchUUID = [ETUUID UUIDWithString: [message attributeStringValueForName: @"branch"]];
 		
 		if ([subtype isEqualToString: @"sharing-invitation"])
 		{
@@ -145,14 +147,17 @@
 				SharingSession *session = [[SharingSession alloc] initAsClientWithEditingContext: ctx
 																					   serverJID: [message from]
 																					  xmppStream: xmppStream];
-				[sharingSessionsByPersistentRootUUID setObject: session forKey: persistentRootUUID];
+				sharingSessionsByBranchUUID[branchUUID] = session;
 				
-				[self sendCoreobjectMessageType: @"accept-invitation" to:[message from] persistentRootUUID: persistentRootUUID];
+				[self sendCoreobjectMessageType: @"accept-invitation"
+											 to: [message from]
+							 persistentRootUUID: persistentRootUUID
+									 branchUUID: branchUUID];
 			}
 		}
 		else if ([subtype isEqualToString: @"accept-invitation"])
 		{
-			SharingSession *session = sharingSessionsByPersistentRootUUID[persistentRootUUID];
+			SharingSession *session = sharingSessionsByBranchUUID[branchUUID];
 			ETAssert(session != nil);
 			[session addClientJID: [message from]];
 		}
@@ -167,24 +172,28 @@
 {
 	NSLog(@"Share %@ with %@", aBranch, jid);
 			
-	// Set up session object
+	SharingSession *session = sharingSessionsByBranchUUID[aBranch.UUID];
+	if (session == nil)
+	{
+		session = [[SharingSession alloc] initAsServerWithBranch: aBranch
+													  xmppStream: xmppStream];
+		
+		sharingSessionsByBranchUUID[aBranch.UUID] = session;
+		
+		NSLog(@"Created new sharing session for branch %@", aBranch.UUID);
+	}
+	else
+	{
+		NSLog(@"Reusing existing session for branch %@", aBranch.UUID);
+	}
 	
-	SharingSession *session = [[SharingSession alloc] initAsServerWithBranch: aBranch
-																  xmppStream: xmppStream];
-	
-	[sharingSessionsByPersistentRootUUID setObject: session forKey: aBranch.persistentRoot.UUID];
-	
-	[self sendCoreobjectMessageType: @"sharing-invitation" to: jid persistentRootUUID: aBranch.persistentRoot.UUID];
+	[self sendCoreobjectMessageType: @"sharing-invitation" to: jid persistentRootUUID: aBranch.persistentRoot.UUID branchUUID: aBranch.UUID];
 }
 
-- (SharingSession *) sharingSessionForPersistentRootUUID: (ETUUID *)aUUID fullJID: (NSString *)aJID
+- (SharingSession *) sharingSessionForBranch: (COBranch *)aBranch
 {
-	SharingSession *session = [sharingSessionsByPersistentRootUUID objectForKey: aUUID];
-	if ([[session.peerJID full] isEqual: aJID])
-	{
-		return session;
-	}
-	return nil;
+	SharingSession *session = sharingSessionsByBranchUUID[aBranch.UUID];
+	return session;
 }
 
 @end

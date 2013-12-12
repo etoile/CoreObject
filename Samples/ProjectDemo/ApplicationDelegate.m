@@ -356,7 +356,6 @@
 - (void) shareWithInspectorForDocument: (Document*)doc
 {
 	NSLog(@"Share %@", doc);
-	[xmppController shareWithInspectorForDocument: doc];
 }
 
 - (void)showSearchResults: (id)sender
