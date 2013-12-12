@@ -6,45 +6,13 @@
 
 @implementation OutlineController
 
-- (SharingSession *) sharingSession
+- (void) updateWindowTitle
 {
-	return _sharingSession;
-}
-
-- (void) setSharingSession:(SharingSession *)sharingSession
-{
-	_sharingSession = sharingSession;
+	NSString *title = [self.doc documentName];
+	if (title == nil)
+		title = @"untitled";
 	
-	[self updateUIForSharingSession];
-}
-
-- (void) updateUIForSharingSession
-{
-	NSString *docName = [self.doc documentName];
-	NSString *title;
-	if ([self isSharing])
-	{
-		title = @"Shared by XXX";
-	}
-	else
-	{
-		title = docName;
-	}
-	
-	if (title != nil)
-		[[self window] setTitle: title];
-
-	// Disable the share button if it is a shared document
-	if ([self isSharing])
-	{
-		for (NSToolbarItem *item in [[[self window] toolbar] items])
-		{
-			if ([[item itemIdentifier] isEqual: @"share"])
-			{
-				[item setEnabled: NO];
-			}
-		}
-	}
+	[[self window] setTitle: title];
 }
 
 - (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
@@ -64,12 +32,6 @@
 					   windowNibName: @"OutlineWindow"];
 	return self;
 }
-
-- (BOOL) isSharing
-{
-	return _sharingSession != nil;
-}
-
 
 - (void) objectGraphDidChange
 {
@@ -116,7 +78,7 @@
 //												 name: NSWindowDidEndLiveResizeNotification 
 //											   object: [self window]];	
 //	
-	[self updateUIForSharingSession];
+	[self updateWindowTitle];
 }
 
 - (void)windowFrameDidChange:(NSNotification*)notification

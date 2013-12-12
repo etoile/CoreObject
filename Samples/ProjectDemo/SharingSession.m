@@ -23,12 +23,7 @@
 	_JSONServer.delegate = self;
 	
 	_server.delegate = _JSONServer;
-	
-//	OutlineController *docController = (OutlineController *)[(ApplicationDelegate *)[NSApp delegate]
-//										controllerForDocumentRootObject: [aBranch rootObject]];
-//	ETAssert(docController != nil);
-//	[docController setSharingSession: self];
-//	
+
 	return self;
 }
 
@@ -90,10 +85,9 @@
 	
 	Document *rootObject = [aBranch rootObject];
 	
-	OutlineController *docController = (OutlineController *) [(ApplicationDelegate *)[NSApp delegate] registerDocumentRootObject: rootObject];
+	EWDocumentWindowController *docController = [(ApplicationDelegate *)[NSApp delegate] registerDocumentRootObject: rootObject];
 	
 	ETAssert(docController != nil);
-	[docController setSharingSession: self];
 }
 
 - (void) JSONClient: (COSynchronizerJSONClient *)client sendTextToServer: (NSString *)text

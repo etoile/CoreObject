@@ -7,13 +7,7 @@
 @interface OutlineController : EWDocumentWindowController <NSOutlineViewDelegate>
 {
 	IBOutlet NSOutlineView *outlineView;
-
-	SharingSession * __weak _sharingSession;
 }
-
-
-
-@property (nonatomic, readwrite, weak) SharingSession *sharingSession;
 
 - (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
 											 windowID: (NSString*)windowID;
