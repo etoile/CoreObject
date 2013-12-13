@@ -8,7 +8,7 @@
 	IBOutlet NSTableView *table;
 	
 	NSArray *users;
-	EWDocumentWindowController __weak *parent;
+	EWDocumentWindowController *parent;
 }
 
 - (id)initWithParent: (EWDocumentWindowController *)aParent;
