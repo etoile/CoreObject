@@ -10,8 +10,6 @@ First alpha release blockers
 
   - Add -[NSNotificationCenter addObserverForName:object:queue:usingBlock:] to GNUstep
 
-  - For compatibility with the current GNUstep release, perhaps emulate -addObserverForName:object:queue:usingBlocks: in a category or TestCommon
-
 - Fix GNUstep support
 
   - Samples

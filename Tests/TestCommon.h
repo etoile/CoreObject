@@ -179,9 +179,3 @@ extern NSString * const kCOParent;
  */
 - (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
 @end
-
-#ifdef GNUSTEP
-@interface NSNotificationCenter (MissingFromGNUstepBase)
-- (id)addObserverForName: (NSString *)name object: (id)object queue: (NSOperationQueue *)queue usingBlock: (void (^)(NSNotification *))block;
-@end
-#endif
