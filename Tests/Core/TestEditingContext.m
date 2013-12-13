@@ -194,4 +194,11 @@
     UKNil([ctx persistentRootForUUID: nil]);
 }
 
+- (void) testWithNoStore
+{
+	UKRaisesException([[COEditingContext alloc] initWithStore: nil]);
+	UKRaisesException([[COEditingContext alloc] initWithStore: nil modelRepository: [ETModelDescriptionRepository mainRepository]]);
+	UKRaisesException([[COEditingContext alloc] init]);
+}
+
 @end

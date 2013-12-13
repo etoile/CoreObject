@@ -55,6 +55,7 @@
 
 - (id)initWithStore: (COSQLiteStore *)store modelRepository: (ETModelDescriptionRepository *)aRepo
 {
+	NILARG_EXCEPTION_TEST(store);
 	NILARG_EXCEPTION_TEST(aRepo);
 	INVALIDARG_EXCEPTION_TEST(aRepo, [aRepo entityDescriptionForClass: [COObject class]] != nil);
 
@@ -97,7 +98,8 @@
 
 - (id)init
 {
-	return [self initWithStore: nil];
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
 }
 
 - (void)dealloc
