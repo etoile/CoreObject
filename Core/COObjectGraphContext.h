@@ -83,6 +83,16 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 - (id)init;
 
 
+/** @taskunit Description */
+
+
+/**
+ * Returns a description detailing the item graph representation (the serialized 
+ * representation).
+ */
+- (NSString *)detailedDescription;
+
+
 /** @taskunit Type Querying */
 
 

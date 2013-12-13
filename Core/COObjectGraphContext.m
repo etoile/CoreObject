@@ -100,8 +100,13 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     return [[self alloc] initWithModelRepository: aRepo];
 }
 
-
 - (NSString *)description
+{
+	return [NSString stringWithFormat: @"<%@: %p - %@ - rootObject: %@>",
+		NSStringFromClass([self class]), self, [self branchUUID], [self rootItemUUID]];
+}
+
+- (NSString *)detailedDescription
 {
 	NSMutableString *result = [NSMutableString string];
     
