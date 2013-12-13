@@ -25,4 +25,6 @@
 
 - (void) shareBranch: (COBranch*)aBranch withJID: (XMPPJID *)jid;
 
+@property (nonatomic, readonly) NSString *username;
+
 @end

@@ -200,4 +200,9 @@
 	return session;
 }
 
+- (NSString *) username
+{
+	return [xmppStream.myJID bare];
+}
+
 @end

@@ -23,6 +23,14 @@
 	return [@"branch_" stringByAppendingString: str];
 }
 
+- (NSString *) labelForMetadata: (NSDictionary *)metadata
+{
+	NSString *escapedMetadata = [[NSString alloc] initWithData: [NSJSONSerialization dataWithJSONObject: metadata options: 0 error: NULL]
+													  encoding: NSUTF8StringEncoding];
+	// FIXME: escape escapedMetadata
+	return escapedMetadata;
+}
+
 - (void) writeDotNodeForRevisionInfo: (CORevisionInfo *)revInfo toString: (NSMutableString *)dest
 {
 	if (revInfo.mergeParentRevisionUUID != nil)
@@ -37,6 +45,19 @@
 	else
 	{
 		[dest appendFormat: @" %@;\n", [self dotNameForRevisionUUID: revInfo.revisionUUID]];
+	}
+	
+	if (revInfo.metadata != nil)
+	{
+		[dest appendFormat: @" %@ -> %@_metadata [style=dotted,label=\"metadata\"];\n",
+		 [self dotNameForRevisionUUID: revInfo.revisionUUID],
+		 [self dotNameForRevisionUUID: revInfo.revisionUUID]];
+		
+		NSString *escapedMetadata = [self labelForMetadata: revInfo.metadata];
+		
+		[dest appendFormat: @" %@_metadata [shape=box,color=red,label=<%@>];\n",
+		 [self dotNameForRevisionUUID: revInfo.revisionUUID],
+		 escapedMetadata];
 	}
 }
 
@@ -96,8 +117,7 @@
 				 [self dotNameForBranchUUID: branchInfo.UUID],
 				 [self dotNameForBranchUUID: branchInfo.UUID]];
 
-				NSString *escapedMetadata = [[NSString alloc] initWithData: [NSJSONSerialization dataWithJSONObject: branchInfo.metadata options: 0 error: NULL]
-																  encoding: NSUTF8StringEncoding];
+				NSString *escapedMetadata = [self labelForMetadata: branchInfo.metadata];
 				// FIXME: escape escapedMetadata
 				
 				[result appendFormat: @" %@_metadata [shape=box,color=red,label=<%@>];\n",

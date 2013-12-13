@@ -239,8 +239,13 @@
 - (void) commitWithIdentifier: (NSString *)identifier
 {
 	identifier = [@"org.etoile.ProjectDemo." stringByAppendingString: identifier];
+
+	NSMutableDictionary *metadata = [NSMutableDictionary new];
+	XMPPController *xmppController = [XMPPController sharedInstance];
+	if (xmppController.username != nil)
+		metadata[@"username"] = xmppController.username;
 	
-	[[self persistentRoot] commitWithIdentifier: identifier metadata: nil undoTrack: [self undoTrack] error:NULL];
+	[[self persistentRoot] commitWithIdentifier: identifier metadata: metadata undoTrack: [self undoTrack] error:NULL];
 }
 
 - (void) switchToRevision: (CORevision *)aRevision
