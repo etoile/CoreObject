@@ -28,18 +28,11 @@ First alpha release blockers
 
 - Write remaing class descriptions
 
-- Implement support for "dead cross-references"; currently an assertion will fail.
-  Or, postpone this until after first release? 
+- Finish ProjectDemo features needed for a demo; record a demo video
 
-- ProjectDemo should demonstrate more interesting features of CoreObject. 
-
-  - Make FTS search results more usable
-
-  - Some kind of XMPP collaboration demo that shows off per-user undo tracks (underway)
-
-  - Improve the history graph. Should have selective undo and merge buttons
-
-  - Simple diff visualization
+- Pick either MIT or BSD license, update and add missing copyright/license headers
+  
+- Update website
 
 
 Future Work
@@ -63,12 +56,18 @@ Future Work
   
   - Switch from FMDB to an SQL abstraction backend
   
-  - Keep a hash of the revision contents for integrity checking. For this to work
-    we need to guarantee that the binary serialization of a COItem is the same
-	every time. i.e. sort anything that's unordered in a stable way.
+  - Async attachment import
+  
+  - Revisit deletion
+  
+  - Add support for indexing properties other than text ones. Either use a single table with
+	property, value columns and a composite key on (property, value), or one table per
+	indexed property name.
 
 
 - COEditingContext
+
+  - Implement support for "dead cross-references"; currently an assertion will fail.
 
   - Expose COSQLiteStore's attachments feature
 
@@ -83,6 +82,24 @@ Future Work
   - Test editing context with no store
   
   	- Not sure the behavior is still well defined. Could be better to move to a COInMemoryStore (just a null pattern implementation).
+
+	[IMO we shouldn't support "editing context with no store" and should throw an exception if attempted.
+
+	 COObject + COObjectGraphContext with no corresponding COEditingContext or store is fully supported,
+	 and this should let you use all of the CoreObject features that don't depend on persistence.
+	 
+	 The point of COEditingContext/COPersistentRoot/COBranch is to provide a consistent in-memory view on
+	 a store, and a transaction API for committing changes, so they should require a store.
+	 
+	 Let me know if there are use cases where you need some features of COEditingContext/COPersistentRoot/COBranch
+	 but don't want to persist your objects. In theory there shouldn't be any such use cases, either we should make
+	 the necesary features available to COObject + COObjectGraphContext, or the use case should just use a store.
+	 
+	 Writing a COInMemoryStore sounds like a good idea for the test suite, though; it should be quite easy
+	 (just use some nested NSMutableDictionary like { "backing store UUID" : { "revision UUID" : "revision data" }},
+	  and serialize COItemGraph's to JSON or NSData)
+	  
+	  --Eric]
 
 
 - COPersistentRoot
@@ -105,6 +122,8 @@ Future Work
   - Clean up selective undo code and share implementation with undo system
 
   - Implement -isCopy and -isTrunkBranch
+  
+  - Record last modified date on branches
   
 
 - COPersistentObjectContext
@@ -130,17 +149,16 @@ Future Work
   
   - Add constraint stating that a keyed relationships cannot have an opposite (at least for now)
 
-  - Add an "indexed" flag to ETPropertyDescription to tell the store whether to include values of that property in search indexes
-
   - Move to CoreObject
 
   - Scan over every loaded ObjC class is ugly
 
   - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
-  
-  - Add serialization transformer support (this would mean to add -serializationTransformerName and -serializedType { return transformerName != nil ? transformer.type : type } to ETPropertyDescription). This would help to reduce code duplication and potential mistake in serialization accessors, and allow -roundTripValueForProperty: to be usable in tests even if serialization accessors are used. As a result, serialization accessor use would be restricted to just 3 or 5 special cases in EtoileUI.
-  
-  	  - Add a check that complains about serialization accessors or serialization transformers for relationships if there is no custom persistent type declared
+
+  - Add a check that complains about serialization accessors or serialization transformers for relationships if there is no custom persistent type declared
+
+  - For keyed relationships, it's not clear what the permissible types of keys are.
+	The tests just test NSString.
 
 
 - COObject
@@ -174,6 +192,29 @@ Future Work
     have immutable copies made before being stored in the variable storage.
 
   - Add more transient relationship tests
+
+  - Check memory management for transient relationships:
+
+    - Transient collection (which is retaining) can contains persistent COObjects?
+
+	- Persistent collection (weak references) can contain transient COObjects
+
+  - Fix problem with properties that have the first letter uppercase
+  
+  - Synthesize more KVC accessors, such as the multivalued ones
+  
+  - Synthesize accessors for the primitive types (int, BOOL, etc). Just a 'nice to have' feature.
+
+  - Double check support for properties that are both readOnly and persistent (Basically set-once.)
+
+  - For all of the relationship tests, test cross persistent root, and a mix of cross-persistent root
+	and inner objects with in the same relationship.
+	
+  - Test entity type checking for all relationship types (inserting a child where the type is wrong.)
+    Also test this for cross-persistent root relationships.
+
+  - The relationship tests mostly test NSString and COObject references. Test
+    more with NSData, NSNumber, COAttachmentID, etc.
 
 
 - COItem
@@ -210,6 +251,11 @@ Future Work
 	[ctx commitWithUndoTrack: a]
 
 	[a nodes] will not equal [b nodes] but I would expect them to be the equal
+	
+  - Currently the COTrack protocol is ugly because -undo does a commit in 
+	one implementation of the protocol (COUndoTrack) but not the other (COBranch).
+	COUndoTrack needs to do the commit, so maybe document the method as committing
+	and make the COBranch implementation commit.
 
 
 - Model objects (COObject subclasses included with CoreObject for convenience)
@@ -244,20 +290,6 @@ Future Work
 	
     - adjust to support versioned descriptors 
     - multiple commit descriptor versions can present per domain in ~/Library/CoreObject/Commits
-	
-
-- ProjectDemo
-
- - use cross references
-
- - use attachments
-
- - merge UI
- 
- - Improve history graph UI. Implement summarization (collapsing minor edits) and
-   asynchronously expanding the graph.
-   
- - merge the remaining useful parts of Typewriter to make a single demo app
 
 
 - EtoileUI
@@ -278,6 +310,10 @@ Missing Features
 
 - Better query support (in-memory and in-store as sketched in COQuery)
 
+  - Introduce our own query objects for expressing a search query, with
+    implementations that can run against the store in SQL as well as in memory.
+	We will probably need to combine both appraoches to complete a search.
+
   - NSPredicate to SQL generator using OMeta (not sure)
 
 - Import/Export
@@ -297,7 +333,8 @@ Open Questions
 
 - Support transient persistent roots?  These are COObjectGraphContext wrappers.
   Or, support creating a persistent root in code, then calling "freeze" which will make it
-  read-only and prevent it from being committed to disk?
+  read-only and prevent it from being committed to disk? 
+  [I'm feeling this is not such a good idea, see comment in COEditingContext section --Eric]
 
 - Do cross-store references make sense? i.e. switch from COPath to a URL?
 
@@ -307,3 +344,7 @@ Open Questions
 
 - Reintroduce history compaction (will it be needed?), which was present but bitrotted and is not supported right now.
   Possibly just collapse "minor edits" or collapse to daily snapshots + explicit tags. Not sure how much space this will save though.
+
+  Another trick we can try is: when we decided to stop appending deltas and write a new full snapshot,
+  take the previous full snapshot and all of the deltas, and zlib compress the binary
+  representations of those item graphs as a single block.
