@@ -269,3 +269,79 @@ NSString * const kCOParent = @"parentContainer";
 }
 
 @end
+
+
+#ifdef GNUSTEP
+@interface CONotificationBlockOperation : NSOperation
+{
+	NSNotification *_notification;
+	void (^_block)(NSNotification *);
+}
+
+- (id) initWithNotification: (NSNotification *)notif block: (void (^)(NSNotification *))block;
+
+@end
+
+@implementation CONotificationBlockOperation
+
+- (id) initWithNotification: (NSNotification *)notif block: (void (^)(NSNotification *))block
+{
+	self = [super init];
+	if (self == nil)
+		return nil;
+
+	ASSIGN(_notification, notif);
+	ASSIGNCOPY(_block, block);
+	return self;
+
+}
+
+- (void) main
+{
+	_block(_notification);
+}
+
+@end
+
+@interface CONotificationObserver : NSObject
+{
+	NSOperationQueue *_queue;
+	void (^_block)(NSNotification *);
+}
+
+@end
+
+@implementation CONotificationObserver
+
+- (id) initWithQueue: (NSOperationQueue *)queue block: (void (^)(NSNotification *))block
+{
+	self = [super init];
+	if (self == nil)
+		return nil;
+
+	ASSIGN(_queue, queue);
+	ASSIGNCOPY(_block, block);
+	return self;
+}
+
+- (void) didReceiveNotification: (NSNotification *)notif
+{
+	[_queue addOperation: [[CONotificationBlockOperation alloc] initWithNotification: notif block: _block]];
+}
+
+@end
+
+@implementation NSNotificationCenter (MissingFromGNUstepBase)
+
+- (id)addObserverForName: (NSString *)name object: (id)object queue: (NSOperationQueue *)queue usingBlock: (void (^)(NSNotification *))block
+{
+	CONotificationObserver *observer = [CONotificationObserver new];
+
+	[self addObserver: observer selector: @selector(didReceiveNotification:) name: name object: object];
+
+	return observer;
+}
+
+@end
+#endif
+
