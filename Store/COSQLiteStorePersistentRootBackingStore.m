@@ -713,8 +713,8 @@ static NSData *Sha1Data(NSData *data)
 	[rev setPersistentRootUUID: [ETUUID UUIDWithData: [rs dataForColumn: @"persistentrootuuid"]]];
 	[rev setBranchUUID: [ETUUID UUIDWithData: [rs dataForColumn: @"branchuuid"]]];
 	[rev setMetadata: metadata];
-	[rev setDate: [rs dateForColumn: @"timestamp"]];
-
+	[rev setDate: CODateFromJavaTimestamp([rs numberForColumn: @"timestamp"])];
+	
 	int64_t revid = [rs longLongIntForColumn: @"revid"];
 
 	/* Memorize the revision ID to support resolving parent and merge parent 
