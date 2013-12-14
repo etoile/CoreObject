@@ -166,8 +166,8 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  */
 - (void)insertOrUpdateItems: (NSArray *)items;
 /**
- * Does the same than -insertOrUpdateItems:, but in addition discard changes and 
- * deleted objects (by running a GC phase).
+ * Does the same than -insertOrUpdateItems:, but in addition discard 
+ * change tracking (calls -clearChangeTracking).
  */
 - (void)setItemGraph: (id <COItemGraph>)aTree;
 
