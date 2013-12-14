@@ -14,7 +14,7 @@
 
 @interface SKTGraphicView : NSView {
     @private
-	DrawingController __weak *_drawingController;
+	DrawingController *_drawingController;
 	
     NSMutableArray *_selectedGraphics;
     SKTGraphic *_creatingGraphic;
