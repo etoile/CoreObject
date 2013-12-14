@@ -3,7 +3,7 @@
 
 	Author:  Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  Ocstober 2012
-	License:  Modified BSD  (see COPYING)
+	License:  MIT  (see COPYING)
  */
 
 /* Core */

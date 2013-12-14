@@ -1,3 +1,11 @@
+/*
+	Copyright (C) 2012 Eric Wasylishen
+
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>
+	Date:  January 2012
+	License:  MIT  (see COPYING)
+ */
+
 #include "diff.h"
 #include "diff.hh"
 

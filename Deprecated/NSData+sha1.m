@@ -1,3 +1,11 @@
+/*
+    Copyright (C) 2010 Eric Wasylishen
+
+    Author:  Eric Wasylishen <ewasylishen@gmail.com>
+    Date:  July 2010
+    License:  MIT  (see COPYING)
+ */
+
 #include <openssl/sha.h>
 #import "NSData+sha1.h"
 #include "stdio.h"

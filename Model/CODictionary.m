@@ -3,7 +3,7 @@
 
 	Author:  Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  July 2013
-	License:  Modified BSD  (see COPYING)
+	License:  MIT  (see COPYING)
  */
 
 #import "CODictionary.h"
