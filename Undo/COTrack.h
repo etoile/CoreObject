@@ -3,7 +3,7 @@
 
 	Author:  Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  December 2011
-	License:  Modified BSD  (see COPYING)
+	License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
