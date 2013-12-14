@@ -28,8 +28,6 @@ First alpha release blockers
 
 - Finish ProjectDemo features needed for a demo; record a demo video
 
-- Pick either MIT or BSD license, update and add missing copyright/license headers
-  
 - Update website
 
 
@@ -77,28 +75,6 @@ Future Work
 
   - Expose COEditingContext(Debugging), probably with a header we can explicit import (should be outside of COEditingContext+Private)
   
-  - Test editing context with no store
-  
-  	- Not sure the behavior is still well defined. Could be better to move to a COInMemoryStore (just a null pattern implementation).
-
-	[IMO we shouldn't support "editing context with no store" and should throw an exception if attempted.
-
-	 COObject + COObjectGraphContext with no corresponding COEditingContext or store is fully supported,
-	 and this should let you use all of the CoreObject features that don't depend on persistence.
-	 
-	 The point of COEditingContext/COPersistentRoot/COBranch is to provide a consistent in-memory view on
-	 a store, and a transaction API for committing changes, so they should require a store.
-	 
-	 Let me know if there are use cases where you need some features of COEditingContext/COPersistentRoot/COBranch
-	 but don't want to persist your objects. In theory there shouldn't be any such use cases, either we should make
-	 the necesary features available to COObject + COObjectGraphContext, or the use case should just use a store.
-	 
-	 Writing a COInMemoryStore sounds like a good idea for the test suite, though; it should be quite easy
-	 (just use some nested NSMutableDictionary like { "backing store UUID" : { "revision UUID" : "revision data" }},
-	  and serialize COItemGraph's to JSON or NSData)
-	  
-	  --Eric]
-
 
 - COPersistentRoot
 
@@ -147,7 +123,7 @@ Future Work
   
   - Add constraint stating that a keyed relationships cannot have an opposite (at least for now)
 
-  - Move to CoreObject
+  - Move to CoreObject - extract it to a tiny framework CoreObjectModelDescription.framework with no dependencies except Foundation
 
   - Scan over every loaded ObjC class is ugly
 
@@ -215,6 +191,17 @@ Future Work
     more with NSData, NSNumber, COAttachmentID, etc.
 	
   - Attempting to set a value for a readonly property should raise an exception
+
+  - Expose and document the COPrimitiveCollection protocol and the
+    COMutableArray and related collection subclasses, so advanced use cases that need to
+    use ivar storage for collections (or implement custom storage data structures)
+    instead of the variable storage can integrate correctly with CoreObject.
+
+
+- COObjectGraphContext
+
+  - Test -[COObjectGraphContext discardAllChanges] during synchronization. It's important to use 
+    -reloadAtRevision: and not -setCurrentRevision: here, otherwise -supportsRevert would go our way
 
 
 - COItem
