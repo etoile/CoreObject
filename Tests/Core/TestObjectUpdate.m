@@ -1,3 +1,11 @@
+/*
+    Copyright (C) 2013 Quentin Mathe
+
+    Author:  Quentin Mathe <quentin.mathe@gmail.com>
+    Date:  October 2013
+    License:  MIT  (see COPYING)
+ */
+
 #import <UnitKit/UnitKit.h>
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETModelDescriptionRepository.h>

@@ -1,3 +1,12 @@
+/*
+    Copyright (C) 2010 Eric Wasylishen
+
+    Author:  Eric Wasylishen <ewasylishen@gmail.com>,
+             Quentin Mathe <quentin.mathe@gmail.com>
+    Date:  December 2010
+    License:  MIT  (see COPYING)
+ */
+
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
 #import "COObject+Private.h"

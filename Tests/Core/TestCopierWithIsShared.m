@@ -1,3 +1,12 @@
+/*
+    Copyright (C) 2013 Eric Wasylishen
+
+    Author:  Eric Wasylishen <ewasylishen@gmail.com>,
+             Quentin Mathe <quentin.mathe@gmail.com>
+    Date:  October 2013
+    License:  MIT  (see COPYING)
+ */
+
 #import "TestCommon.h"
 #import "COCopier.h"
 

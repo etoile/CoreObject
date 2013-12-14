@@ -1,3 +1,12 @@
+/*
+    Copyright (C) 2011 Quentin Mathe
+
+    Author:  Quentin Mathe <quentin.mathe@gmail.com>,
+    		 Eric Wasylishen <ewasylishen@gmail.com>
+    Date:  October 2011
+    License:  MIT  (see COPYING)
+ */
+
 #import "TestCommon.h"
 #import <CoreObject/COObject.h>
 #import <UnitKit/UnitKit.h>
