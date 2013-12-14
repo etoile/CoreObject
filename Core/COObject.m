@@ -272,7 +272,7 @@ See +[NSObject typePrefix]. */
 	INVALIDARG_EXCEPTION_TEST(aContext, [aContext isKindOfClass: [COObjectGraphContext class]]);
 
 	[self validateEntityDescription: anEntityDescription
-	   inModelDescriptionRepository: [aContext modelRepository]];
+	   inModelDescriptionRepository: [aContext modelDescriptionRepository]];
 
 	SUPERINIT;
 
@@ -302,7 +302,7 @@ See +[NSObject typePrefix]. */
 
 	NILARG_EXCEPTION_TEST(aContext);
 
-	ETModelDescriptionRepository *repo = [aContext modelRepository];
+	ETModelDescriptionRepository *repo = [aContext modelDescriptionRepository];
 	return [self prepareWithUUID: [ETUUID UUID]
 	           entityDescription: [repo entityDescriptionForClass: [self class]]
 	          objectGraphContext: aContext
@@ -537,7 +537,7 @@ See +[NSObject typePrefix]. */
 	if ([propertyDesc isPersistent] == NO)
 		return NO;
 
-	ETModelDescriptionRepository *repo = [_objectGraphContext modelRepository];
+	ETModelDescriptionRepository *repo = [_objectGraphContext modelDescriptionRepository];
 	ETEntityDescription *rootCoreObjectEntity =
 		[repo entityDescriptionForClass: [COObject class]];
 

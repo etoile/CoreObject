@@ -228,12 +228,12 @@ NSString * const kCOParent = @"parentContainer";
 
 - (id)insertObjectWithEntityName: (NSString *)aFullName
 {
-    ETEntityDescription *desc = [[self modelRepository] descriptionForName: aFullName];
+    ETEntityDescription *desc = [[self modelDescriptionRepository] descriptionForName: aFullName];
     if (desc == nil)
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Entity name %@ invalid", aFullName];
 	}
-	Class objClass = [[self modelRepository] classForEntityDescription: desc];
+	Class objClass = [[self modelDescriptionRepository] classForEntityDescription: desc];
     
     /* Nil root object means the new object will be a root */
 	COObject *obj = [[objClass alloc] initWithEntityDescription: desc

@@ -49,7 +49,7 @@
 {
 	@private
 	COSQLiteStore *_store;
-	ETModelDescriptionRepository *_modelRepository;
+	ETModelDescriptionRepository *_modelDescriptionRepository;
 	/** Loaded (or inserted) persistent roots by UUID */
 	NSMutableDictionary *_loadedPersistentRoots;
     /** Set of persistent roots pending deletion */
@@ -77,7 +77,7 @@
  *
  * The model repository is set to -[ETModelDescription mainRepository].
  *
- * See also -initWithStore:modelRepository:.
+ * See also -initWithStore:modelDescriptionRepository:.
  */
 - (id)initWithStore: (COSQLiteStore *)store;
 /**
@@ -89,7 +89,7 @@
  * description, raises a NSInvalidArgumentException.
  */
 - (id)initWithStore: (COSQLiteStore *)store
-    modelRepository: (ETModelDescriptionRepository *)aRepo;
+    modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo;
 /**
  * Initializes the context with no store. 
  * As a result, the context content is not persisted.
@@ -128,7 +128,7 @@
  * Returns the model description repository, which holds the metamodel that 
  * describes all the persistent objects editable in the context.
  */
-@property (nonatomic, readonly, strong) ETModelDescriptionRepository *modelRepository;
+@property (nonatomic, readonly, strong) ETModelDescriptionRepository *modelDescriptionRepository;
 
 
 /** @taskunit Managing Persistent Roots */

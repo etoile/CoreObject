@@ -63,7 +63,7 @@
 {
 	ETPropertyDescription *propertyDesc =
 		[[self entityDescription] propertyDescriptionForName: [self contentKey]];
-	ETModelDescriptionRepository *repo = [[[self persistentRoot] parentContext] modelRepository];
+	ETModelDescriptionRepository *repo = [[[self persistentRoot] parentContext] modelDescriptionRepository];
 
 	return [ETUTI typeWithClass: [repo classForEntityDescription: [propertyDesc type]]];
 }

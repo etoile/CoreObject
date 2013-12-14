@@ -26,7 +26,7 @@
 
 @implementation COEditingContext
 
-@synthesize store = _store, modelRepository = _modelRepository;
+@synthesize store = _store, modelDescriptionRepository = _modelDescriptionRepository;
 @synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
 @synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
 @synthesize isRecordingUndo = _isRecordingUndo;
@@ -45,15 +45,15 @@
 
 	for (ETEntityDescription *entity in entityDescriptions)
 	{
-		if ([[self modelRepository] descriptionForName: [entity fullName]] != nil)
+		if ([[self modelDescriptionRepository] descriptionForName: [entity fullName]] != nil)
 			continue;
 			
-		[[self modelRepository] addUnresolvedDescription: entity];
+		[[self modelDescriptionRepository] addUnresolvedDescription: entity];
 	}
-	[[self modelRepository] resolveNamedObjectReferences];
+	[[self modelDescriptionRepository] resolveNamedObjectReferences];
 }
 
-- (id)initWithStore: (COSQLiteStore *)store modelRepository: (ETModelDescriptionRepository *)aRepo
+- (id)initWithStore: (COSQLiteStore *)store modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
 {
 	NILARG_EXCEPTION_TEST(store);
 	NILARG_EXCEPTION_TEST(aRepo);
@@ -62,7 +62,7 @@
 	SUPERINIT;
 
 	_store =  store;
-	_modelRepository = aRepo;
+	_modelDescriptionRepository = aRepo;
 	_loadedPersistentRoots = [NSMutableDictionary new];
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
@@ -93,7 +93,7 @@
 - (id)initWithStore: (COSQLiteStore *)store
 {
 	return [self initWithStore: store
-	           modelRepository: [ETModelDescriptionRepository mainRepository]];
+	           modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]];
 }
 
 - (id)init
@@ -191,10 +191,10 @@
 
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
 {
-	ETEntityDescription *desc = [[self modelRepository] descriptionForName: anEntityName];
+	ETEntityDescription *desc = [[self modelDescriptionRepository] descriptionForName: anEntityName];
     COObjectGraphContext *graph = [COObjectGraphContext objectGraphContext];
 
-	Class cls = [[self modelRepository] classForEntityDescription: desc];
+	Class cls = [[self modelDescriptionRepository] classForEntityDescription: desc];
 	COObject *rootObject = [[cls alloc] initWithEntityDescription: desc
                                                objectGraphContext: graph];
 	[graph setRootObject: rootObject];

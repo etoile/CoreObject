@@ -323,7 +323,7 @@
  * For some use cases (e.g. custom object representation or partial object 
  * loading), you might want to use a subentity or parent entity description 
  * rather than the entity description registered for the receiver class in
- * -[COObjectGraphContext modelRepository], and this initializer is the only way 
+ * -[COObjectGraphContext modelDescriptionRepository], and this initializer is the only way 
  * to do that.
  *
  * For a subclass, this method results in the subclass designated initializer

@@ -32,7 +32,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 @interface COObjectGraphContext : NSObject <COItemGraph, COPersistentObjectContext>
 {
 	@private
-	ETModelDescriptionRepository *_modelRepository;
+	ETModelDescriptionRepository *_modelDescriptionRepository;
 	COBranch *__weak _branch;
 	COPersistentRoot *__weak _persistentRoot;
 	ETUUID *_futureBranchUUID;
@@ -111,7 +111,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * Returns the model description repository, which holds the metamodel that 
  * describes all the objects managed by the context.
  */
-@property (nonatomic, readonly) ETModelDescriptionRepository *modelRepository;
+@property (nonatomic, readonly) ETModelDescriptionRepository *modelDescriptionRepository;
 
 
 /** @taskunit Related Persistency Management Objects */

@@ -187,7 +187,7 @@
 - (void)addCityPropertyToObject: (COObject *)anObject
 {
 	ETEntityDescription *stringType =
-		[[[anObject objectGraphContext] modelRepository] descriptionForName: @"NSString"];
+		[[[anObject objectGraphContext] modelDescriptionRepository] descriptionForName: @"NSString"];
 	ETPropertyDescription *propertyDesc =
 		[ETPropertyDescription descriptionWithName: @"city" type: stringType];
 	

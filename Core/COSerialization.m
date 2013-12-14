@@ -806,7 +806,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 
 	NSString *entityName = [aStoreItem valueForAttribute: kCOObjectEntityNameProperty];
 	ETEntityDescription *entityDesc =
-		[[[self objectGraphContext] modelRepository] descriptionForName: entityName];
+		[[[self objectGraphContext] modelDescriptionRepository] descriptionForName: entityName];
 
 	/* If B is a subclass of A, and a property description type is A but the 
 	   the property value is a B object, the deserialized property value is 

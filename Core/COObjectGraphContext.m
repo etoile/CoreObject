@@ -49,14 +49,14 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
  */
 @implementation COObjectGraphContext
 
-@synthesize modelRepository = _modelRepository;
+@synthesize modelDescriptionRepository = _modelDescriptionRepository;
 @synthesize insertedObjects = _insertedObjects, updatedObjects = _updatedObjects,
 	updatedPropertiesByObject = _updatedPropertiesByObject;
 
 #pragma mark Creation
 
 - (id)initWithBranch: (COBranch *)aBranch
-     modelRepository: (ETModelDescriptionRepository *)aRepo
+     modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
 {
     SUPERINIT;
     _loadedObjects = [[NSMutableDictionary alloc] init];
@@ -69,20 +69,20 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	_futureBranchUUID = (aBranch == nil ? [ETUUID UUID] : nil);
     if (aRepo == nil)
     {
-        aRepo = [[_persistentRoot editingContext] modelRepository];
+        aRepo = [[_persistentRoot editingContext] modelDescriptionRepository];
     }
-    _modelRepository =  aRepo;
+    _modelDescriptionRepository =  aRepo;
     return self;
 }
 
 - (id)initWithBranch: (COBranch *)aBranch
 {
-    return [self initWithBranch: aBranch modelRepository: nil];
+    return [self initWithBranch: aBranch modelDescriptionRepository: nil];
 }
 
 - (id)initWithModelRepository: (ETModelDescriptionRepository *)aRepo
 {
-    return [self initWithBranch: nil modelRepository: aRepo];
+    return [self initWithBranch: nil modelDescriptionRepository: aRepo];
 }
 
 - (id)init
@@ -194,11 +194,11 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
                     format: @"COItem %@ lacks an entity name", anItem];
     }
     
-	ETEntityDescription *desc = [_modelRepository descriptionForName: name];
+	ETEntityDescription *desc = [_modelDescriptionRepository descriptionForName: name];
     
     if (desc == nil)
     {
-        desc = [_modelRepository descriptionForName: [self defaultEntityName]];
+        desc = [_modelDescriptionRepository descriptionForName: [self defaultEntityName]];
     }
     
     return desc;
@@ -210,7 +210,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 - (id)objectWithUUID: (ETUUID *)aUUID
    entityDescription: (ETEntityDescription *)anEntityDescription
 {
-	Class objClass = [_modelRepository classForEntityDescription: anEntityDescription];
+	Class objClass = [_modelDescriptionRepository classForEntityDescription: anEntityDescription];
 	/* For a reloaded object, we must not call -initWithEntityDescription:objectGraphContext:
 	   to prevent the normal initialization process to occur (the COObject
 	   subclass designed initializer being called). */

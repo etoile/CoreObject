@@ -42,7 +42,7 @@
 - (void)addPropertyDescriptionToOutlineItem
 {
 	ETAssert([[item entityDescription] propertyDescriptionForName: @"something"] == nil);
-	ETEntityDescription *type = [[ctx modelRepository] entityDescriptionForClass: [NSString class]];
+	ETEntityDescription *type = [[ctx modelDescriptionRepository] entityDescriptionForClass: [NSString class]];
 	ETPropertyDescription *propertyDesc = [ETPropertyDescription descriptionWithName: @"something" type: type];
 
 	[[item entityDescription] addPropertyDescription: propertyDesc];

@@ -70,7 +70,7 @@
 
 - (void)testLibraryForContentType
 {
-	ETEntityDescription *bookmarkType = [[ctx modelRepository] descriptionForName: @"COBookmark"];
+	ETEntityDescription *bookmarkType = [[ctx modelDescriptionRepository] descriptionForName: @"COBookmark"];
 
 	UKObjectsEqual([ctx bookmarkLibrary], [ctx libraryForContentType: bookmarkType]);
 }
