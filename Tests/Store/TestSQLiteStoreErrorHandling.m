@@ -50,11 +50,9 @@ static ETUUID *rootUUID;
                                                           attributes: READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES
                                                                error: NULL]);
         
-        UKNil([[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir
-                                                              isDirectory: YES]]);
+        UKNil([[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir]]);
         
-        UKNil([[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: [dir stringByAppendingPathComponent: @"test.coreobject"]
-                                                              isDirectory: YES]]);
+        UKNil([[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: [dir stringByAppendingPathComponent: @"test.coreobject"]]]);
     }
 
     assert([[NSFileManager defaultManager] removeItemAtPath: dir error: NULL]);
@@ -70,8 +68,7 @@ static ETUUID *rootUUID;
                                                           attributes: nil
                                                                error: NULL]);
         
-        COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir
-                                                                               isDirectory: YES]];
+        COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir]];
         UKNotNil(store);
         
         assert([[NSFileManager defaultManager] setAttributes: READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES
@@ -110,8 +107,7 @@ static ETUUID *rootUUID;
                                                           attributes: nil
                                                                error: NULL]);
         
-        COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir
-                                                                               isDirectory: YES]];
+        COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir]];
         UKNotNil(store);
         
         COStoreTransaction *txn = [[COStoreTransaction alloc] init];
@@ -137,8 +133,7 @@ static ETUUID *rootUUID;
     // Now, writing a revision should fail
     
     @autoreleasepool {
-        COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir
-                                                                               isDirectory: YES]];        
+        COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir]];
         
         {
 			COStoreTransaction *txn = [[COStoreTransaction alloc] init];
