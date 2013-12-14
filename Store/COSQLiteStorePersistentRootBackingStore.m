@@ -1,3 +1,11 @@
+/*
+    Copyright (C) 2012 Eric Wasylishen
+
+    Author:  Eric Wasylishen <ewasylishen@gmail.com>
+    Date:  November 2012
+    License:  MIT  (see COPYING)
+ */
+
 #import "COSQLiteStorePersistentRootBackingStore.h"
 #import <EtoileFoundation/Macros.h>
 #import <EtoileFoundation/ETUUID.h>
