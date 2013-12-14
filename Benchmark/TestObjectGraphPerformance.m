@@ -1,3 +1,11 @@
+/*
+	Copyright (C) 2010 Eric Wasylishen
+
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>
+	Date:  November 2010
+	License:  MIT  (see COPYING)
+ */
+
 #import <Foundation/Foundation.h>
 #import <UnitKit/UnitKit.h>
 #import "COEditingContext.h"
