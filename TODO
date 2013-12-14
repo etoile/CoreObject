@@ -213,6 +213,8 @@ Future Work
 
   - The relationship tests mostly test NSString and COObject references. Test
     more with NSData, NSNumber, COAttachmentID, etc.
+	
+  - Attempting to set a value for a readonly property should raise an exception
 
 
 - COItem
@@ -328,11 +330,6 @@ Missing Features
 
 Open Questions
 --------------
-
-- Support transient persistent roots?  These are COObjectGraphContext wrappers.
-  Or, support creating a persistent root in code, then calling "freeze" which will make it
-  read-only and prevent it from being committed to disk? 
-  [I'm feeling this is not such a good idea, see comment in COEditingContext section --Eric]
 
 - Do cross-store references make sense? i.e. switch from COPath to a URL?
 

@@ -222,7 +222,7 @@ extern NSString * const kCOBranchLabel;
  * If set to YES, the next  commit in the editing context will write a
  * new revision on this branch, even if there are no changes to be written.
  *
- * Would be used to cause a "checkpoint" revision to be written.
+ * Use it to cause a "checkpoint" revision to be written.
  */
 @property (nonatomic, assign) BOOL shouldMakeEmptyCommit;
 
@@ -231,19 +231,13 @@ extern NSString * const kCOBranchLabel;
 
 
 /**
- * See –[COTrack canUndo].
- */
-- (BOOL)canUndo;
-/**
- * See –[COTrack canRedo].
- */
-- (BOOL)canRedo;
-/**
- * See –[COTrack undo].
+ * See –[COTrack undo]. Unlike the implementation in -[COUndoTrack undo], 
+ * does not automatically cause a commit.
  */
 - (void)undo;
 /**
- * See –[COTrack redo].
+ * See –[COTrack redo]. Unlike the implementation in -[COUndoTrack redo],
+ * does not automatically cause a commit.
  */
 - (void)redo;
 
@@ -323,6 +317,9 @@ extern NSString * const kCOBranchLabel;
  *
  * TODO: Provide an example showing how to apply the diff.
  *
+ * NOTE: This is an unstable API which could change in the future when the
+ * diff/merge support is finished
+ *
  * See also -mergingInfoForMergingRevision:
  */
 - (COMergeInfo *) mergeInfoForMergingBranch: (COBranch *)aBranch;
@@ -337,6 +334,9 @@ extern NSString * const kCOBranchLabel;
  * doesn't apply it. 
  *
  * TODO: Provide an example showing how to apply the diff.
+ *
+ * NOTE: This is an unstable API which could change in the future when the
+ * diff/merge support is finished
  *
  * See also -mergingInfoForMergingBranch:.
  */

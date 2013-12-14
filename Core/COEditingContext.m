@@ -98,8 +98,7 @@
 
 - (id)init
 {
-	[self doesNotRecognizeSelector: _cmd];
-	return nil;
+	return [self initWithStore: nil];
 }
 
 - (void)dealloc
@@ -459,9 +458,6 @@
 	return [self commitWithMetadata: [NSDictionary dictionary]];
 }
 
-// FIXME: This was moved here because Typewriter expects changes to be
-// committed to store when it receives the notification. Decide if that
-// is valid or not, and add a test case.
 - (void)didCommitWithCommand: (COCommand *)command
              persistentRoots: (NSArray *)persistentRoots
 {
@@ -478,6 +474,8 @@
 	NSDictionary *userInfo =
 		(command != nil ? D(command, kCOCommandKey) : [NSDictionary dictionary]);
 
+	// NOTE: COEditingContextDidChangeNotification needs more testing.
+	// In particular, test that the changes are already committed (which they are)
 	[[NSNotificationCenter defaultCenter]
 		postNotificationName: COEditingContextDidChangeNotification
 		              object: self

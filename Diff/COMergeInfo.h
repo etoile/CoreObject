@@ -2,6 +2,10 @@
 
 @class COItemGraphDiff;
 
+/**
+ * NOTE: This is an unstable API which could change in the future when the
+ * diff/merge support is finished
+ */
 @interface COMergeInfo : NSObject
 
 @property (readwrite, nonatomic, strong) CORevision *baseRevision;
