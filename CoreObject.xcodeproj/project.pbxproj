@@ -307,7 +307,7 @@
 		66E4CF501816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E4CF4E1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.m */; };
 		66E4CF531816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.h in Headers */ = {isa = PBXBuildFile; fileRef = 66E4CF511816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.h */; };
 		66E4CF541816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E4CF521816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.m */; };
-		66E62253185BEA51002A22C1 /* COTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 66E62251185BEA51002A22C1 /* COTrack.h */; };
+		66E62253185BEA51002A22C1 /* COTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 66E62251185BEA51002A22C1 /* COTrack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66E62256185BECF0002A22C1 /* TestValueTransformerAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E62255185BECF0002A22C1 /* TestValueTransformerAttribute.m */; };
 		66E6225C185BEECE002A22C1 /* COSQLiteStore+Graphviz.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E62258185BEECE002A22C1 /* COSQLiteStore+Graphviz.m */; };
 		66E6225D185BEECE002A22C1 /* COObjectGraphContext+Graphviz.h in Headers */ = {isa = PBXBuildFile; fileRef = 66E62259185BEECE002A22C1 /* COObjectGraphContext+Graphviz.h */; };
@@ -1682,7 +1682,6 @@
 				66405DC3182A0D4D00A6EF7A /* COSynchronizerClient.h in Headers */,
 				660179D0182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.h in Headers */,
 				660179C8182AFA4B006E7D7B /* COSynchronizerRevision.h in Headers */,
-				66E62253185BEA51002A22C1 /* COTrack.h in Headers */,
 				663E9B9F182B85790083AC46 /* COSynchronizerPersistentRootInfoToClientMessage.h in Headers */,
 				660179D4182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.h in Headers */,
 				660179CC182AFA5D006E7D7B /* COSynchronizerPushedRevisionsToClientMessage.h in Headers */,
@@ -1691,6 +1690,7 @@
 				662AC93D1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h in Headers */,
 				66FD34B61832055900898381 /* COSynchronizerJSONServer.h in Headers */,
 				6646975417CDA8DC00A1B767 /* COPersistentRoot+Private.h in Headers */,
+				66E62253185BEA51002A22C1 /* COTrack.h in Headers */,
 				6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */,
 				6660B3A01839659D009007FD /* COAttachmentID.h in Headers */,
 				66405DD1182A255800A6EF7A /* COSynchronizerServer.h in Headers */,
