@@ -1,5 +1,5 @@
 #import "EWDocumentWindowController.h"
-#import <CoreObject/COSQLiteStore+Debugging.h>
+#import <CoreObject/COSQLiteStore+Graphviz.h>
 #import <CoreObject/COObjectGraphContext+Graphviz.h>
 #import "ApplicationDelegate.h"
 

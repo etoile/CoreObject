@@ -1,4 +1,4 @@
-#import "COSQLiteStore+Debugging.h"
+#import "COSQLiteStore+Graphviz.h"
 #import "COSQLiteStore+Private.h"
 #import "COSQLiteStorePersistentRootBackingStore.h"
 #import "CORevisionInfo.h"

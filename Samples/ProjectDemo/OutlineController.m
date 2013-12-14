@@ -2,7 +2,7 @@
 #import "ItemReference.h"
 #import "Document.h"
 #import "ApplicationDelegate.h"
-#import <CoreObject/COSQLiteStore+Debugging.h>
+#import <CoreObject/COSQLiteStore+Graphviz.h>
 
 @implementation OutlineController
 
