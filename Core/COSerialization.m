@@ -1,9 +1,10 @@
 /*
 	Copyright (C) 2013 Quentin Mathe
 
-	Author:  Quentin Mathe <quentin.mathe@gmail.com>
+	Author:  Quentin Mathe <quentin.mathe@gmail.com>,
+			 Eric Wasylishen <ewasylishen@gmail.com>
 	Date:  July 2013
-	License:  Modified BSD  (see COPYING)
+	License:  MIT  (see COPYING)
  */
 
 #import "COSerialization.h"

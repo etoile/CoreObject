@@ -1,11 +1,11 @@
 /*
-	Copyright (C) 2011 Christopher Armstrong
+    Copyright (C) 2013 Eric Wasylishen
 
-	Author:  Christopher Armstrong <carmstrong@fastmail.com.au>,
-	         Quentin Mathe <quentin.mathe@gmail.com>,
-	         Eric Wasylishen <ewasylishen@gmail.com>
-	Date:  September 2011
-	License:  Modified BSD  (see COPYING)
+    Author:  Quentin Mathe <quentin.mathe@gmail.com>,
+             Eric Wasylishen <ewasylishen@gmail.com>,
+             Christopher Armstrong <carmstrong@fastmail.com.au>
+    Date:  July 2013
+    License:  Modified BSD  (see COPYING)
  */
 
 #import <EtoileFoundation/EtoileFoundation.h>

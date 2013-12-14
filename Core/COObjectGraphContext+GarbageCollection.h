@@ -4,7 +4,7 @@
 	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
 	         Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  October 2013
-	License:  Modified BSD  (see COPYING)
+	License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>

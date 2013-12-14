@@ -1,10 +1,10 @@
 /*
-	Copyright (C) 2012 Quentin Mathe
+	Copyright (C) 2013 Eric Wasylishen
  
-	Author:  Quentin Mathe <quentin.mathe@gmail.com>, 
-	         Eric Wasylishen <ewasylishen@gmail.com>
-	Date:  November 2012
-	License:  Modified BSD  (see COPYING)
+	Author:  Eric Wasylishen <ewasylishen@gmail.com>,
+             Quentin Mathe <quentin.mathe@gmail.com>	         
+	Date:  July 2013
+	License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>

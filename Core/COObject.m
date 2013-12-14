@@ -1,10 +1,10 @@
 /*
-	Copyright (C) 2010 Eric Wasylishen
+	Copyright (C) 2013 Quentin Mathe
 
-	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
-	         Quentin Mathe <quentin.mathe@gmail.com>
-	Date:  November 2010
-	License:  Modified BSD  (see COPYING)
+	Author:  Quentin Mathe <quentin.mathe@gmail.com>,
+			 Eric Wasylishen <ewasylishen@gmail.com>, 
+	Date:  November 2013
+	License:  MIT  (see COPYING)
 
 	COObjectMatching protocol concrete implementation is based on MIT-licensed 
 	code by Yen-Ju Chen <yjchenx gmail> from the previous CoreObject.

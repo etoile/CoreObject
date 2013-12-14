@@ -1,10 +1,10 @@
 /*
-	Copyright (C) 2010 Eric Wasylishen
+	Copyright (C) 2013 Eric Wasylishen
 
 	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
 	         Quentin Mathe <quentin.mathe@gmail.com>
-	Date:  November 2010
-	License:  Modified BSD  (see COPYING)
+	Date:  July 2013
+	License:  MIT  (see COPYING)
  */
 
 #import "COEditingContext.h"

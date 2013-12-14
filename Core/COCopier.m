@@ -3,7 +3,7 @@
 
 	Author:  Eric Wasylishen <ewasylishen@gmail.com>
 	Date:  May 2013
-	License:  Modified BSD  (see COPYING)
+	License:  MIT  (see COPYING)
  */
 
 #import "COCopier.h"

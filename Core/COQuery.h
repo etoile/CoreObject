@@ -3,7 +3,7 @@
 
 	Author:  Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  November 2011
-	License:  Modified BSD  (see COPYING)
+	License:  MIT  (see COPYING)
 
 	COObjectMatching protocol is based on MIT-licensed code by Yen-Ju Chen 
 	<yjchenx gmail> from the previous CoreObject.

@@ -4,7 +4,7 @@
 	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
 	         Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  November 2010
-	License:  Modified BSD  (see COPYING)
+	License:  MIT  (see COPYING)
  */
 
 #import "CORevision.h"
