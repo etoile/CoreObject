@@ -4,7 +4,6 @@
 	Author:  Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  May 2012
 	License:  MIT  (see COPYING)
-
  */
 
 #import "COError.h"

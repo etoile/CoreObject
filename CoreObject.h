@@ -2,7 +2,7 @@
 	Copyright (C) 2012 Quentin Mathe
 
 	Author:  Quentin Mathe <quentin.mathe@gmail.com>
-	Date:  Ocstober 2012
+	Date:  October 2012
 	License:  MIT  (see COPYING)
  */
 
