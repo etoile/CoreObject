@@ -242,6 +242,8 @@ static inline void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buf
         writeValue(&buf, val, type, &temp);
     }
 
+	co_buffer_free(&temp);
+	
     co_buffer_end_object(&buf);
 
     NSData *result = [NSData dataWithBytes:co_buffer_get_data(&buf)
