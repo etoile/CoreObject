@@ -54,6 +54,7 @@ CoreObject_OBJC_FILES += $(wildcard Tests/Store/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Undo/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/TestModelObjects/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Utilities/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Serialization/*.m)
 endif
 
 clean : test=yes

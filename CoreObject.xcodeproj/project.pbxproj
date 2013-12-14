@@ -245,7 +245,6 @@
 		669FD4F3184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h in Headers */ = {isa = PBXBuildFile; fileRef = 669FD4F1184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		669FD4F4184E7B5F006EE103 /* COObjectGraphContext+Graphviz.m in Sources */ = {isa = PBXBuildFile; fileRef = 669FD4F2184E7B5F006EE103 /* COObjectGraphContext+Graphviz.m */; };
 		66BBB3BC18516ABC005430B1 /* TestItemStableSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BBB3BB18516ABC005430B1 /* TestItemStableSerialization.m */; };
-		66BBB3DC185282D2005430B1 /* TestValueTransformerAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BBB3DB185282D2005430B1 /* TestValueTransformerAttribute.m */; };
 		66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66C3670C17B5F9B0009ACF2F /* COBranchInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3670A17B5F9AF009ACF2F /* COBranchInfo.m */; };
@@ -313,6 +312,7 @@
 		66E4CF531816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.h in Headers */ = {isa = PBXBuildFile; fileRef = 66E4CF511816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.h */; };
 		66E4CF541816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E4CF521816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.m */; };
 		66E62253185BEA51002A22C1 /* COTrack.h in Headers */ = {isa = PBXBuildFile; fileRef = 66E62251185BEA51002A22C1 /* COTrack.h */; };
+		66E62256185BECF0002A22C1 /* TestValueTransformerAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E62255185BECF0002A22C1 /* TestValueTransformerAttribute.m */; };
 		66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */; };
 		66FD348A1830B84C00898381 /* COSynchronizerJSONServer.h in Resources */ = {isa = PBXBuildFile; fileRef = 66FD34881830B84C00898381 /* COSynchronizerJSONServer.h */; };
 		66FD348B1830B84C00898381 /* COSynchronizerJSONServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD34891830B84C00898381 /* COSynchronizerJSONServer.m */; };
@@ -730,7 +730,6 @@
 		669FD4F1184E7B5F006EE103 /* COObjectGraphContext+Graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Graphviz.h"; path = "Core/COObjectGraphContext+Graphviz.h"; sourceTree = "<group>"; };
 		669FD4F2184E7B5F006EE103 /* COObjectGraphContext+Graphviz.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObjectGraphContext+Graphviz.m"; path = "Core/COObjectGraphContext+Graphviz.m"; sourceTree = "<group>"; };
 		66BBB3BB18516ABC005430B1 /* TestItemStableSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestItemStableSerialization.m; sourceTree = "<group>"; };
-		66BBB3DB185282D2005430B1 /* TestValueTransformerAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestValueTransformerAttribute.m; sourceTree = "<group>"; };
 		66C3669E17B426C0009ACF2F /* Typewriter-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = "Typewriter-Info.plist"; path = "Samples/Typewriter/Typewriter-Info.plist"; sourceTree = "<group>"; };
 		66C366A017B426C0009ACF2F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		66C366A217B426C0009ACF2F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Samples/Typewriter/main.m; sourceTree = SOURCE_ROOT; };
@@ -804,6 +803,7 @@
 		66E4CF511816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandSetPersistentRootMetadata.h; sourceTree = "<group>"; };
 		66E4CF521816FE9000AAB0E6 /* COCommandSetPersistentRootMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COCommandSetPersistentRootMetadata.m; sourceTree = "<group>"; };
 		66E62251185BEA51002A22C1 /* COTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COTrack.h; sourceTree = "<group>"; };
+		66E62255185BECF0002A22C1 /* TestValueTransformerAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestValueTransformerAttribute.m; sourceTree = "<group>"; };
 		66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObject+Accessors.m"; path = "Core/COObject+Accessors.m"; sourceTree = "<group>"; };
 		66FD34881830B84C00898381 /* COSynchronizerJSONServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizerJSONServer.h; path = Synchronization/COSynchronizerJSONServer.h; sourceTree = "<group>"; };
 		66FD34891830B84C00898381 /* COSynchronizerJSONServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizerJSONServer.m; path = Synchronization/COSynchronizerJSONServer.m; sourceTree = "<group>"; };
@@ -1002,7 +1002,6 @@
 				6610112C184D2D8A001A3E24 /* TestOrderedAttribute.m */,
 				6610112D184D2D8A001A3E24 /* TestUnivaluedAttribute.m */,
 				6610112E184D2D8A001A3E24 /* TestUnorderedAttribute.m */,
-				66BBB3DB185282D2005430B1 /* TestValueTransformerAttribute.m */,
 			);
 			name = Attribute;
 			path = Tests/Attribute;
@@ -1518,6 +1517,15 @@
 			name = "Model Objects";
 			sourceTree = "<group>";
 		};
+		66E62254185BECF0002A22C1 /* Serialization */ = {
+			isa = PBXGroup;
+			children = (
+				66E62255185BECF0002A22C1 /* TestValueTransformerAttribute.m */,
+			);
+			name = Serialization;
+			path = Tests/Serialization;
+			sourceTree = "<group>";
+		};
 		791B4DF41299C56900CCF472 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -1531,6 +1539,7 @@
 				66E40D291836D08D00E5B4A7 /* Core */,
 				66E40D391836D08D00E5B4A7 /* Diff */,
 				66E40D3C1836D08D00E5B4A7 /* Model */,
+				66E62254185BECF0002A22C1 /* Serialization */,
 				66E40D3F1836D08D00E5B4A7 /* StorageDataModel */,
 				66E40D411836D08D00E5B4A7 /* Store */,
 				66E40D471836D08D00E5B4A7 /* Synchronization */,
@@ -2079,6 +2088,7 @@
 				6660B3961839522B009007FD /* TestSerialization.m in Sources */,
 				66101130184D2D8A001A3E24 /* TestOrderedAttribute.m in Sources */,
 				66E40D661836D08D00E5B4A7 /* TestItemGraphDiff.m in Sources */,
+				66E62256185BECF0002A22C1 /* TestValueTransformerAttribute.m in Sources */,
 				6699DDB2184888050003E803 /* TestUnorderedRelationship.m in Sources */,
 				66E40D5E1836D08D00E5B4A7 /* TestEditingContext.m in Sources */,
 				66E40D621836D08D00E5B4A7 /* TestObjectGraphContext.m in Sources */,
@@ -2114,7 +2124,6 @@
 				666888131849961300DBEB10 /* TestOrderedRelationshipWithOpposite.m in Sources */,
 				66E40D7A1836D08E00E5B4A7 /* TestUndoStackTrackProtocol.m in Sources */,
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
-				66BBB3DC185282D2005430B1 /* TestValueTransformerAttribute.m in Sources */,
 				66E451D617CC461F00205679 /* OutlineItem.m in Sources */,
 				66E40D641836D08D00E5B4A7 /* TestPersistentRoot.m in Sources */,
 				66101164184D8C67001A3E24 /* UnivaluedGroupWithOpposite.m in Sources */,
