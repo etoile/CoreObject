@@ -1,3 +1,11 @@
+/*
+    Copyright (C) 2012 Eric Wasylishen
+
+    Author:  Eric Wasylishen <ewasylishen@gmail.com>
+    Date:  December 2012
+    License:  MIT  (see COPYING)
+ */
+
 #import <Foundation/Foundation.h>
 
 @class ETUUID;

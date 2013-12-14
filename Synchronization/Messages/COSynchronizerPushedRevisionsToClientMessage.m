@@ -1,10 +1,10 @@
-//
-//  COSynchronizerPushedRevisionsToClientMessage.m
-//  CoreObject
-//
-//  Created by Eric Wasylishen on 11/6/2013.
-//  Copyright (c) 2013 Étoilé. All rights reserved.
-//
+/*
+    Copyright (C) 2013 Eric Wasylishen
+
+    Author:  Eric Wasylishen <ewasylishen@gmail.com>
+    Date:  November 2013
+    License:  MIT  (see COPYING)
+ */
 
 #import "COSynchronizerPushedRevisionsToClientMessage.h"
 

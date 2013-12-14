@@ -1,3 +1,11 @@
+/*
+    Copyright (C) 2011 Eric Wasylishen
+
+    Author:  Eric Wasylishen <ewasylishen@gmail.com>
+    Date:  November 2011
+    License:  MIT  (see COPYING)
+ */
+
 #import "COPath.h"
 #import <EtoileFoundation/Macros.h>
 #import <EtoileFoundation/ETUUID.h>
