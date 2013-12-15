@@ -9,6 +9,7 @@ LIBRARIES_DEPEND_UPON = $(shell pkg-config --libs sqlite3) -lEtoileFoundation $(
 
 # For test builds, pass one more libdispatch include directory located in GNUstep Local domain
 CoreObject_INCLUDE_DIRS = -IStore/fmdb/src -I$(GNUSTEP_LOCAL_ROOT)/Library/Headers/dispatch
+CoreObject_CPPFLAGS += -DGNUSTEP_MISSING_API_COMPATIBILITY
 CoreObject_LDFLAGS += -lstdc++ -lobjcxx -lsqlite3 -ldispatch
 CoreObject_OBJCFLAGS += -fobjc-arc -Wno-arc-performSelector-leaks -Wall
 
