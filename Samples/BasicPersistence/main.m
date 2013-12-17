@@ -2,7 +2,7 @@
     Copyright (C) 2011 Christopher Armstrong
 
     Date:  October 2011
-    License:  Modified BSD  (see COPYING)
+    License:  MIT  (see COPYING)
  */
 
 #import <CoreObject/CoreObject.h>

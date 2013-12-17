@@ -2,7 +2,7 @@
 	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
 	Date:  July 2013
-	License:  Modified BSD  (see COPYING)
+	License:  MIT  (see COPYING)
  */
 
 #import <CoreObject/COBranch.h>

@@ -2,7 +2,7 @@
     Copyright (C) 2011 Quentin Mathe, Eric Wasylishen, Christopher Armstrong
 
     Date:  September 2011
-    License:  Modified BSD  (see COPYING)
+    License:  MIT  (see COPYING)
  */
 
 #import <EtoileFoundation/EtoileFoundation.h>
