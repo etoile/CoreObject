@@ -6,17 +6,40 @@ CoreObject
 :License: MIT License
 :Version: 0.5
 
+
+CoreObject is a version-controlled object database, designed to be a humane
+persistence layer for applications with a "never lose any work" philosophy.
+
+At the center is an ACID-compliant object store using SQLite, and built on this are
+semantic merging, rich undo/redo support, collaborative editing, and a
+transaction API for viewing database snapshots in memory and batching changes for commit.
+
+
 Key Features:
 
 - Revision Control	
 
+	- Built on a DVCS (distributed version control system) model
+	- Persistent roots have isolated history
+		- Comparable to separate Git repositories
 	- Based on Object Graph Diff and Merging Model
 		- Each Change is a delta represented as an Object Graph Patch
 	- Two-level History
 		- History Graph per document
 		- Undo Track per activity
 	- Branch
-	- Cheap Copy (a document copy consumes no space)
+	- Cheap Copy (copying a document requires O(1) space)
+	- Localizable History
+	- History Compression and Compaction // Not finished!
+	- Serialization Formats
+		- JSON and Binary (endian-, 32/64-bit- independent)
+		- Stable over multiple invocations for the same object graph
+
+
+- Undo Framework
+
+	- Built on the Revision Control model
+		- Never need to define new Command objects
 	- Pervasive Undo/Redo
 		- Document Changes (Creation, Update and Deletion inside a Document)
 		- Store Changes (Document/Branch Creation, Update and Deletion)
@@ -24,12 +47,7 @@ Key Features:
 	- Persistent Undo Stacks
 		- Mutiple Undo Views on the same document
 		- Undo Stack Union View
-	- Localizable History
-	- History Compression and Compaction
-	- Serialization Formats
-		- JSON and Binary 
-		- Stable over multiple invocations for the same object graph
-		
+
 
 - Object Store
 
@@ -74,12 +92,11 @@ Key Features:
 	- Minimal dependencies (SQLite and EtoileFoundation)
 	- Pervasive UUID use (no string, number or content-based identifiers)
 	- Favor JSON formats
-	- Create a Persistent Object and save it in 4 loc
+	- Create a Persistent Object and save it in 3 loc
 
-		COStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: @"TestStore.db"]];
-		COEditingContext *ctx = [COEditingContext contextWithStore: store];
-		COObject *persistentObject = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
-		[[persistentObject persistentRoot] commit];
+		COEditingContext *ctx = [COEditingContext contextWithURL: [NSURL fileURLWithPath: @"TestStore.db"]];
+		COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
+		[persistentRoot commit];
 
 
 Build and Install
