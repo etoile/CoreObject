@@ -1,7 +1,6 @@
 /*
     Copyright (C) 2011 Eric Wasylishen
 
-    Author:  Eric Wasylishen <ewasylishen@gmail.com>
     Date:  December 2011
     License:  MIT  (see COPYING)
  */

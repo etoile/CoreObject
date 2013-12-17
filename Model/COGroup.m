@@ -1,8 +1,6 @@
 /*
-	Copyright (C) 2010 Eric Wasylishen
+	Copyright (C) 2010 Eric Wasylishen, Quentin Mathe
 
-	Author:  Eric Wasylishen <ewasylishen@gmail.com>, 
-	         Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  November 2010
 	License:  MIT  (see COPYING)
  */

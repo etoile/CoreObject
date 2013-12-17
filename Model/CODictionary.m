@@ -1,7 +1,6 @@
 /*
 	Copyright (C) 2012 Quentin Mathe
 
-	Author:  Quentin Mathe <quentin.mathe@gmail.com>
 	Date:  July 2013
 	License:  MIT  (see COPYING)
  */

@@ -1,9 +1,6 @@
 /*
-    Copyright (C) 2011 Christopher Armstrong
+    Copyright (C) 2011 Quentin Mathe, Eric Wasylishen, Christopher Armstrong
 
-    Author:  Quentin Mathe <quentin.mathe@gmail.com>,
-             Eric Wasylishen <ewasylishen@gmail.com>,
-             Christopher Armstrong <carmstrong@fastmail.com.au>
     Date:  September 2011
     License:  Modified BSD  (see COPYING)
  */

@@ -1,7 +1,6 @@
 /*
     Copyright (C) 2011 Christopher Armstrong
 
-    Author:  Christopher Armstrong <carmstrong@fastmail.com.au>
     Date:  October 2011
     License:  Modified BSD  (see COPYING)
  */
