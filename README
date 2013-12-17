@@ -1,0 +1,100 @@
+CoreObject
+==========
+
+:Maintainers: Eric Wasylishen, Quentin Mathe
+:Authors: Eric Wasylishen <ewasylishen@gmail.com>, Quentin Mathe <quentin.mathe@gmail.com>, Christopher Armstrong <carmstrong@fastmail.com.au>
+:License: MIT License
+:Version: 0.5
+
+Key Features:
+
+- Revision Control	
+
+	- Based on Object Graph Diff and Merging Model
+		- Each Change is a delta represented as an Object Graph Patch
+	- Two-level History
+		- History Graph per document
+		- Undo Track per activity
+	- Branch
+	- Cheap Copy (a document copy consumes no space)
+	- Pervasive Undo/Redo
+		- Document Changes (Creation, Update and Deletion inside a Document)
+		- Store Changes (Document/Branch Creation, Update and Deletion)
+	- Selective Undo (each change can be cancelled individually)
+	- Persistent Undo Stacks
+		- Mutiple Undo Views on the same document
+		- Undo Stack Union View
+	- Localizable History
+	- History Compression and Compaction
+	- Serialization Formats
+		- JSON and Binary 
+		- Stable over multiple invocations for the same object graph
+		
+
+- Object Store
+
+	- Pragmatic OODB atop SQLite
+	- Minimalistic Metamodel
+	- Flexible Storage Model 
+		- Coarse-grained Objects with Metadata (e.g. Documents and their Branches)
+		- Fine-grained Objects (e.g. inside Document Branches)
+		- Optional Object Organization Model based on Tags and Libraries
+		- Built-in Indexing and Search (history included)
+	- Flexible Collection and Relationship Model
+		- Unidirectional or bidirectional
+			- Ordered or unordered
+			- To-one or to-many
+			- Composite
+		- Undirectional Unordered Keyed
+		- Transparent Constraint Enforcements on Update
+	- Cross Document References
+		- named branch
+		- current branch
+		- unidirectional accross arbitrary branch
+		- bidirectional between the current branches
+	- Synthesized Accessors
+	- Transparent Object Graph Copy
+	- Transient Object Graph
+
+- Real-Time Collaboration
+
+	- Any CoreObject-based model supports it (for free)
+	- Based on the Revision Control Model
+	- Very Fast
+	- Full Branch and Undo Support per User
+		- Per User Persistent Undo Stack
+		- Per User Selective Undo
+	- Based on XMPP
+
+- Overall Design
+
+	- Small Code Base (~ 20 000 loc)
+	- Pretty Large Test suite (over 2300 tests)
+	- High Quality API documentation
+	- Minimal dependencies (SQLite and EtoileFoundation)
+	- Pervasive UUID use (no string, number or content-based identifiers)
+	- Favor JSON formats
+	- Create a Persistent Object and save it in 4 loc
+
+		COStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: @"TestStore.db"]];
+		COEditingContext *ctx = [COEditingContext contextWithStore: store];
+		COObject *persistentObject = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+		[[persistentObject persistentRoot] commit];
+
+
+Build and Install
+-----------------
+
+Read INSTALL.Cocoa or INSTALL.GNUstep documents.
+
+
+Mac OS X support
+----------------
+
+CoreObject is supported on Mac OS X (10.7 or higher) and iOS.
+
+An Xcode project is bundled to build CoreObject on Mac OS X. 
+
+Another Xcode project to build the CoreObject demo application can be found in Samples/ProjectDemo.
+
+**Warning:** Xcode 4.6 or higher is required to build these projects.
