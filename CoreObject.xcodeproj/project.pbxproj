@@ -2350,6 +2350,11 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
 				PRODUCT_NAME = Test;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wno-unused-variable",
+					"-Wno-unused-value",
+				);
 			};
 			name = Debug;
 		};
@@ -2358,6 +2363,11 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
 				PRODUCT_NAME = Test;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wno-unused-variable",
+					"-Wno-unused-value",
+				);
 			};
 			name = Release;
 		};
