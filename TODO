@@ -330,3 +330,8 @@ Open Questions
   Another trick we can try is: when we decided to stop appending deltas and write a new full snapshot,
   take the previous full snapshot and all of the deltas, and zlib compress the binary
   representations of those item graphs as a single block.
+
+- Perhaps support Layers in addition to XMPP
+
+	- https://layer.com
+	- http://www.theverge.com/2013/12/4/5173726/you-have-too-many-chat-apps-can-layer-connect-them
