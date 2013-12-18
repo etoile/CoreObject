@@ -179,7 +179,7 @@ static int itemChangedAtCommit(int i)
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity: numChildren+1];
     
-    for (int i=0; i<numChildren; i++)
+    for (NSUInteger i=0; i<numChildren; i++)
     {
         @autoreleasepool {
             COMutableItem *item = [COMutableItem item];

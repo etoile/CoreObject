@@ -59,7 +59,7 @@
 
 - (BOOL)isShared
 {
-	return [self valueForVariableStorageKey: @"isShared"];
+	return [[self valueForVariableStorageKey: @"isShared"] boolValue];
 }
 
 - (void)setIsShared:(BOOL)isShared

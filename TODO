@@ -18,6 +18,12 @@ First alpha release blockers
   
 - Fix deprecated warnings about SHA1 on Mac OS X 10.7
 
+- Decide whether to enable Clang warning 'Implicit Conversions to 32 Bit Type'
+
+	- This produces some CoreObject warnings currently
+	
+	- I have set this warning explicitly to 'No' in TestCoreObject (where we probably don't want it) - Quentin
+
 - Check and update all Core API documentation (underway)
 
 	- Already reviewed classes: COObjectGraphContext, COEditingContext
