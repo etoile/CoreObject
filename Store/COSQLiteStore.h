@@ -13,7 +13,7 @@
 @class COItem, CORevisionInfo, COItemGraph, COBranchInfo, COPersistentRootInfo;
 @class FMDatabase, COStoreTransaction;
 
-enum COBranchRevisionReadingOptions
+enum
 {
 	COBranchRevisionReadingParentBranches = 2,
 	COBranchRevisionReadingDivergentRevisions = 4
