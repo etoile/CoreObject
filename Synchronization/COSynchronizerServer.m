@@ -23,7 +23,7 @@
 
 - (COPersistentRoot *)persistentRoot { return [branch persistentRoot]; }
 
-- (id) initWithBranch: (COBranch *)aBranch;
+- (id) initWithBranch: (COBranch *)aBranch
 {
 	SUPERINIT;
 	branch = aBranch;

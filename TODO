@@ -24,6 +24,8 @@ First alpha release blockers
 	
 	- I have set this warning explicitly to 'No' in TestCoreObject (where we probably don't want it) - Quentin
 
+	- At the same time, we could remove -Wno-sign-compare in CoreObject target too (used to inhibit some -Wextra warnings)
+
 - Check and update all Core API documentation (underway)
 
 	- Already reviewed classes: COObjectGraphContext, COEditingContext

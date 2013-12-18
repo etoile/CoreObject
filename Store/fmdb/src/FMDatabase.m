@@ -204,7 +204,7 @@
     return ret;
 }
 
-- (void)bindObject:(id)obj toColumn:(int)idx inStatement:(sqlite3_stmt*)pStmt; {
+- (void)bindObject:(id)obj toColumn:(int)idx inStatement:(sqlite3_stmt*)pStmt {
     
     if ((!obj) || ((NSNull *)obj == [NSNull null])) {
         sqlite3_bind_null(pStmt, idx);

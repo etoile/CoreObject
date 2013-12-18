@@ -136,7 +136,7 @@
 	return [[self metadata] objectForKey: @"type"];
 }
 
-- (NSString *)shortDescription;
+- (NSString *)shortDescription
 {
 	return [[self metadata] objectForKey: @"shortDescription"];
 }

@@ -2254,7 +2254,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				WARNING_CFLAGS = "-Wall";
 			};
 			name = Debug;
 		};
@@ -2262,7 +2261,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				WARNING_CFLAGS = "-Wall";
 			};
 			name = Release;
 		};
@@ -2282,6 +2280,9 @@
 				PRODUCT_NAME = CoreObject;
 				WARNING_CFLAGS = (
 					"-Wall",
+					"-Wextra",
+					"-Wno-sign-compare",
+					"-Wno-unused-parameter",
 					"-Wno-arc-performSelector-leaks",
 				);
 			};
@@ -2303,6 +2304,9 @@
 				PRODUCT_NAME = CoreObject;
 				WARNING_CFLAGS = (
 					"-Wall",
+					"-Wextra",
+					"-Wno-sign-compare",
+					"-Wno-unused-parameter",
 					"-Wno-arc-performSelector-leaks",
 				);
 			};
@@ -2355,6 +2359,7 @@
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
+					"-Wno-unused-parameter",
 				);
 			};
 			name = Debug;
@@ -2375,6 +2380,7 @@
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
+					"-Wno-unused-parameter",
 				);
 			};
 			name = Release;

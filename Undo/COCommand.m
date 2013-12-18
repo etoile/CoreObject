@@ -166,7 +166,7 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 	return [self kind];
 }
 
-- (NSString *)localizedShortDescription;
+- (NSString *)localizedShortDescription
 {
 	return nil;
 }

@@ -23,39 +23,39 @@ type ret = [resultSet sel:0];                                        \
 return ret;
 
 
-- (NSString*)stringForQuery:(NSString*)query, ...; {
+- (NSString*)stringForQuery:(NSString*)query, ... {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSString *, stringForColumnIndex);
 }
 
-- (int64_t)int64ForQuery:(NSString*)query, ...; {
+- (int64_t)int64ForQuery:(NSString*)query, ... {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(int64_t, int64ForColumnIndex);
 }
 
-- (int)intForQuery:(NSString*)query, ...; {
+- (int)intForQuery:(NSString*)query, ... {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(int, intForColumnIndex);
 }
 
-- (long)longForQuery:(NSString*)query, ...; {
+- (long)longForQuery:(NSString*)query, ... {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(long, longForColumnIndex);
 }
 
-- (BOOL)boolForQuery:(NSString*)query, ...; {
+- (BOOL)boolForQuery:(NSString*)query, ... {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(BOOL, boolForColumnIndex);
 }
 
-- (double)doubleForQuery:(NSString*)query, ...; {
+- (double)doubleForQuery:(NSString*)query, ... {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(double, doubleForColumnIndex);
 }
 
-- (NSData*)dataForQuery:(NSString*)query, ...; {
+- (NSData*)dataForQuery:(NSString*)query, ... {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSData *, dataForColumnIndex);
 }
 
-- (NSDate*)dateForQuery:(NSString*)query, ...; {
+- (NSDate*)dateForQuery:(NSString*)query, ... {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSDate *, dateForColumnIndex);
 }
 
-- (NSNumber*)numberForQuery:(NSString*)query, ...; {
+- (NSNumber*)numberForQuery:(NSString*)query, ... {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSNumber *, numberForColumnIndex);
 }
 
