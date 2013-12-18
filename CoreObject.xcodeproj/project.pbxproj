@@ -10,7 +10,6 @@
 		3D01D09F1646BF0200917AC8 /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D01D0941646BEF400917AC8 /* UnitKit.framework */; };
 		600F72BF1858A71200CB6AC5 /* COPersistentObjectContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		600F72C01858A71200CB6AC5 /* COPersistentObjectContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 600F72BE1858A71200CB6AC5 /* COPersistentObjectContext.m */; };
-		601978051860A62A00635BE2 /* INSTALL in Resources */ = {isa = PBXBuildFile; fileRef = 601978041860A62A00635BE2 /* INSTALL */; };
 		601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D44180C0F5300CED07E /* COObject+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		601C1D4F180C115D00CED07E /* COObjectGraphContext+GarbageCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */; };
 		601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */; };
@@ -481,7 +480,6 @@
 		600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COPersistentObjectContext.h; path = Utilities/COPersistentObjectContext.h; sourceTree = "<group>"; };
 		600F72BE1858A71200CB6AC5 /* COPersistentObjectContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COPersistentObjectContext.m; path = Utilities/COPersistentObjectContext.m; sourceTree = "<group>"; };
 		601977FB1860A52200635BE2 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
-		601978041860A62A00635BE2 /* INSTALL */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = INSTALL; sourceTree = "<group>"; };
 		601C1D44180C0F5300CED07E /* COObject+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObject+Private.h"; path = "Core/COObject+Private.h"; sourceTree = "<group>"; };
 		601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+GarbageCollection.h"; path = "Core/COObjectGraphContext+GarbageCollection.h"; sourceTree = "<group>"; };
 		601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObjectGraphContext+GarbageCollection.m"; path = "Core/COObjectGraphContext+GarbageCollection.m"; sourceTree = "<group>"; };
@@ -1315,7 +1313,6 @@
 			children = (
 				66E62284185CF875002A22C1 /* COPYING */,
 				601977FB1860A52200635BE2 /* README */,
-				601978041860A62A00635BE2 /* INSTALL */,
 				66982A1F11EBC2A0007154CD /* TODO */,
 				66618A8B1811C065001FA004 /* TERMINOLOGY */,
 			);
@@ -1926,7 +1923,6 @@
 			files = (
 				66E62285185CF875002A22C1 /* COPYING in Resources */,
 				66FD348A1830B84C00898381 /* COSynchronizerJSONServer.h in Resources */,
-				601978051860A62A00635BE2 /* INSTALL in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
