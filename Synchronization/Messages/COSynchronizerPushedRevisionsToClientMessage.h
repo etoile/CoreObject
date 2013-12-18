@@ -13,6 +13,10 @@
  * Client should send a COSynchronizerAcknowledgementFromClientMessage in response.
  */
 @interface COSynchronizerPushedRevisionsToClientMessage : NSObject
+{
+	NSArray *_revisions;
+}
+
 /** Array of COSynchronizerRevision */
 @property (nonatomic, readwrite, strong) NSArray *revisions;
 @end

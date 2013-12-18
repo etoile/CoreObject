@@ -9,4 +9,6 @@
 
 @implementation COSynchronizerPushedRevisionsToClientMessage
 
+@synthesize revisions = _revisions;
+
 @end

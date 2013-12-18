@@ -133,6 +133,11 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 		  @"localizedTypeDescription", @"localizedShortDescription")];
 }
 
+- (NSString *)kind
+{
+	return nil;
+}
+
 #pragma mark -
 #pragma mark Track Node Protocol
 

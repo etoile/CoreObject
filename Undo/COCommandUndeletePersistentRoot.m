@@ -52,6 +52,8 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 @implementation COCommandCreatePersistentRoot
 
+@synthesize initialRevisionID = _initialRevisionID;
+
 - (id) initWithPropertyList: (id)plist
 {
     self = [super initWithPropertyList: plist];

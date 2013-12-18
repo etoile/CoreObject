@@ -22,12 +22,12 @@
 /**
  * Non-nil
  */
-@property (strong, readonly) ETUUID *persistentRoot;
+@property (nonatomic, readonly, strong) ETUUID *persistentRoot;
 /**
  * May be nil, which indicates that the path points to whatever the current branch 
  * of persistentRoot is.
  */
-@property (strong, readonly) ETUUID *branch;
+@property (nonatomic, readonly, strong) ETUUID *branch;
 
 /**
  * Implicitly points to the root object of the current branch

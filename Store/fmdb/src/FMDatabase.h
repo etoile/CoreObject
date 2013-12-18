@@ -90,8 +90,6 @@
 
 + (NSString*)sqliteLibVersion;
 
-- (int)changes;
-
 @end
 
 @interface FMStatement : NSObject {
