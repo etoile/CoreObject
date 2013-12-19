@@ -55,7 +55,7 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	UKTrue(difftype_modification == anEdit.type);
 }
 
-- (void) testBasic
+- (void) testMixed
 {
 	const char *array1 = "abcdefg";
 	const char *array2 = "achidxyzg";
@@ -70,6 +70,102 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	[self checkEdit: diff_edit_at_index(diff, 4) isCopyFromLocA:3 length:1 toLocB:4];   // copy 'd'
 	[self checkEdit: diff_edit_at_index(diff, 5) isModifyFromLocA:4 length:2 toLocB:5 length:3]; // modify 'ef' to 'xyz'
 	[self checkEdit: diff_edit_at_index(diff, 6) isCopyFromLocA:6 length:1 toLocB:8];   // copy 'g'
+}
+
+- (void) testMixed2
+{
+	const char *array1 = "abc";
+	const char *array2 = "xaybcz";
+	
+	diffresult_t *diff = diff_arrays(strlen(array1), strlen(array2), arraycomparefn, array1, array2);
+	UKIntsEqual(5, diff_editcount(diff));
+
+	[self checkEdit: diff_edit_at_index(diff, 0) isInsertAtLocA:0 fromLocB:0 length:1]; // insert 'x'
+	[self checkEdit: diff_edit_at_index(diff, 1) isCopyFromLocA:0 length:1 toLocB:1];   // copy 'a'
+	[self checkEdit: diff_edit_at_index(diff, 2) isInsertAtLocA:1 fromLocB:2 length:1]; // insert 'y'
+	[self checkEdit: diff_edit_at_index(diff, 3) isCopyFromLocA:1 length:2 toLocB:3];   // copy 'bc'
+	[self checkEdit: diff_edit_at_index(diff, 4) isInsertAtLocA:3 fromLocB:5 length:1]; // insert 'z'
+}
+
+- (void) testInsertAtStart
+{
+	const char *array1 = "a";
+	const char *array2 = "ba";
+	
+	diffresult_t *diff = diff_arrays(strlen(array1), strlen(array2), arraycomparefn, array1, array2);
+	UKIntsEqual(2, diff_editcount(diff));
+	
+	[self checkEdit: diff_edit_at_index(diff, 0) isInsertAtLocA: 0 fromLocB: 0 length: 1]; // insert 'b'
+	[self checkEdit: diff_edit_at_index(diff, 1) isCopyFromLocA: 0 length: 1 toLocB: 1];   // copy 'a'
+}
+
+- (void) testDeleteAtStart
+{
+	const char *array1 = "ba";
+	const char *array2 = "a";
+	
+	diffresult_t *diff = diff_arrays(strlen(array1), strlen(array2), arraycomparefn, array1, array2);
+	UKIntsEqual(2, diff_editcount(diff));
+	
+	[self checkEdit: diff_edit_at_index(diff, 0) isDeleteFromLocA: 0 length: 1];           // delete 'b'
+	[self checkEdit: diff_edit_at_index(diff, 1) isCopyFromLocA: 1 length: 1 toLocB: 0];   // copy 'a'
+}
+
+- (void) testInsertAtEnd
+{
+	const char *array1 = "a";
+	const char *array2 = "ab";
+	
+	diffresult_t *diff = diff_arrays(strlen(array1), strlen(array2), arraycomparefn, array1, array2);
+	UKIntsEqual(2, diff_editcount(diff));
+
+	[self checkEdit: diff_edit_at_index(diff, 0) isCopyFromLocA: 0 length: 1 toLocB: 0];   // copy 'a'
+	[self checkEdit: diff_edit_at_index(diff, 1) isInsertAtLocA: 1 fromLocB: 1 length: 1]; // insert 'b'
+}
+
+- (void) testDeleteAtEnd
+{
+	const char *array1 = "ab";
+	const char *array2 = "a";
+	
+	diffresult_t *diff = diff_arrays(strlen(array1), strlen(array2), arraycomparefn, array1, array2);
+	UKIntsEqual(2, diff_editcount(diff));
+	
+	[self checkEdit: diff_edit_at_index(diff, 0) isCopyFromLocA: 0 length: 1 toLocB: 0];    // copy 'a'
+	[self checkEdit: diff_edit_at_index(diff, 1) isDeleteFromLocA: 1 length: 1];           // delete 'b'
+}
+
+- (void) testReplaceAll
+{
+	const char *array1 = "x";
+	const char *array2 = "y";
+	
+	diffresult_t *diff = diff_arrays(strlen(array1), strlen(array2), arraycomparefn, array1, array2);
+	UKIntsEqual(1, diff_editcount(diff));
+	
+	[self checkEdit: diff_edit_at_index(diff, 0) isModifyFromLocA: 0 length: 1 toLocB: 0 length: 1]; // modify 'x' to 'y'
+}
+
+- (void) testInsertAll
+{
+	const char *array1 = "";
+	const char *array2 = "a";
+	
+	diffresult_t *diff = diff_arrays(strlen(array1), strlen(array2), arraycomparefn, array1, array2);
+	UKIntsEqual(1, diff_editcount(diff));
+	
+	[self checkEdit: diff_edit_at_index(diff, 0) isInsertAtLocA: 0 fromLocB: 0 length: 1]; // insert 'a'
+}
+
+- (void) testDeleteAll
+{
+	const char *array1 = "a";
+	const char *array2 = "";
+	
+	diffresult_t *diff = diff_arrays(strlen(array1), strlen(array2), arraycomparefn, array1, array2);
+	UKIntsEqual(1, diff_editcount(diff));
+	
+	[self checkEdit: diff_edit_at_index(diff, 0) isDeleteFromLocA: 0 length: 1];           // delete 'a'
 }
 
 @end
