@@ -9,5 +9,5 @@
 
 @interface COAttributedStringChunk : COObject
 @property (nonatomic, readwrite, strong) NSString *text;
-@property (nonatomic, readwrite, strong) NSString *htmlCode;
+@property (nonatomic, readwrite, strong) NSSet *attributes;
 @end

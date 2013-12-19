@@ -14,6 +14,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 // types	
 	
@@ -27,7 +28,8 @@ typedef enum
 {
 	difftype_insertion,
 	difftype_deletion,
-	difftype_modification
+	difftype_modification,
+	difftype_copy
 } difftype_t;
 
 typedef struct
@@ -42,7 +44,7 @@ typedef void diffresult_t;
 /**
  * return true if array_a[i] is equal to array_b[j]
  */
-typedef bool (*diff_arraycomparefn_t)(size_t i, size_t j, void *userdata1, void *userdata2);
+typedef bool (*diff_arraycomparefn_t)(size_t i, size_t j, const void *userdata1, const void *userdata2);
 
 // functions	
 
@@ -53,7 +55,7 @@ typedef bool (*diff_arraycomparefn_t)(size_t i, size_t j, void *userdata1, void 
  * checks elements at two indices for equality.
  */
 diffresult_t *diff_arrays(size_t alength, size_t blength, diff_arraycomparefn_t comparefn, 
-						  void *userdata1, void *userdata2);
+						  const void *userdata1, const void *userdata2);
 /**
  * returns the number of edits in the diff
  */

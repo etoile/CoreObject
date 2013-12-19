@@ -50,6 +50,8 @@
 
 #import "COAttributedString.h"
 #import "COAttributedStringChunk.h"
+#import "COAttributedStringWrapper.h"
+#import "COAttributedStringAttribute.h"
 
 #import "COPersistentRoot+Private.h"
 #import "COSQLiteStore+Private.h"
@@ -58,6 +60,8 @@
 #import "CORelationshipCache.h"
 #import "COStoreTransaction.h"
 #import "COObjectGraphContext+Graphviz.h"
+
+#import "diff.h"
 
 #define SA(x) [NSSet setWithArray: x]
 

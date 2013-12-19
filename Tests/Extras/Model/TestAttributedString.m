@@ -12,6 +12,13 @@
 
 @implementation TestAttributedString
 
+- (COAttributedStringAttribute *) makeAttr: (NSString *)htmlCode inCtx: (COObjectGraphContext *)ctx
+{
+	COAttributedStringAttribute *attribute = [ctx insertObjectWithEntityName: @"COAttributedStringAttribute"];
+	attribute.htmlCode = htmlCode;
+	return attribute;
+}
+
 - (void) testMerge
 {
 	/*
@@ -46,7 +53,7 @@
 	
 	ctx2String.chunks = @[ctx2Chunk1, ctx2Chunk2];
 	ctx2Chunk1.text = @"ab";
-	ctx2Chunk1.htmlCode = @"b";
+	ctx2Chunk1.attributes = S([self makeAttr: @"b" inCtx: ctx2]);
 	ctx2Chunk2.text = @"c";
 
 	/*
@@ -68,14 +75,21 @@
 	ctx3String.chunks = @[ctx3Chunk1, ctx3Chunk2];
 	ctx3Chunk1.text = @"da";
 	ctx3Chunk2.text = @"bc";
-	ctx3Chunk2.htmlCode = @"i";
+	ctx3Chunk2.attributes = S([self makeAttr: @"i" inCtx: ctx3]);
+	
+	COAttributedStringWrapper *wrapper = [COAttributedStringWrapper new];
+	wrapper.backing = ctx3String;
+
+	[[wrapper RTFFromRange: NSMakeRange(0, [wrapper length]) documentAttributes: nil]
+	 writeToFile: [@"~/test.rtf" stringByExpandingTildeInPath]
+	 atomically: YES];
 	
 //	[ctx1 showGraph];
 //	[ctx2 showGraph];
 //	[ctx3 showGraph];
 	
-	COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
-    COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
+//	COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
+//    COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
 	
 //	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
 //	

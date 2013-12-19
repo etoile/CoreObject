@@ -12,14 +12,14 @@ class diffarray_wrapper
 {
 private:
 	diff_arraycomparefn_t comparefn;
-	void *userdata1, *userdata2;
+	const void *userdata1, *userdata2;
 public:
 	bool equal(size_t i, size_t j)
 	{
 		return comparefn(i, j, userdata1, userdata2);
 	}
 	diffarray_wrapper(diff_arraycomparefn_t comparefn,
-					  void *userdata1, void *userdata2) :
+					  const void *userdata1, const void *userdata2) :
         comparefn(comparefn), userdata1(userdata1), userdata2(userdata2) {};
 };
 
@@ -30,7 +30,7 @@ typedef struct
 } diffresult_internal_t;
 
 diffresult_t *diff_arrays(size_t alength, size_t blength, diff_arraycomparefn_t comparefn,
-						  void *userdata1, void *userdata2)
+						  const void *userdata1, const void *userdata2)
 {
 	diffarray_wrapper wrapper(comparefn, userdata1, userdata2);
 	
@@ -55,6 +55,7 @@ diffresult_t *diff_arrays(size_t alength, size_t blength, diff_arraycomparefn_t 
 			case ManagedFusion::INSERTION: difftype = difftype_insertion; break;
 			case ManagedFusion::DELETION: difftype = difftype_deletion; break;
 			case ManagedFusion::MODIFICATION: difftype = difftype_modification; break;
+			case ManagedFusion::COPY: difftype = difftype_copy; break;
 		}
 		
 		edits[i].range_in_a = firstRange;

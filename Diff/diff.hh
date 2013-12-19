@@ -82,6 +82,8 @@
 #define Difference_H
 
 #include <vector>
+#include <algorithm>
+#include <cassert>
 
 namespace ManagedFusion
 {
@@ -151,7 +153,8 @@ namespace ManagedFusion
 	enum DifferenceType {
 		INSERTION,
 		DELETION,
-		MODIFICATION
+		MODIFICATION,
+		COPY
 	};
 	
 	/// <summary>details of one difference.</summary>
@@ -417,6 +420,82 @@ namespace ManagedFusion
 		}
 	} // LCS()
 	
+	static int canEmitCopy(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
+	{
+		assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
+		if (modifiedRangeA != NULL && modifiedRangeB == NULL)
+		{
+			if (modifiedRangeA->location > posA)
+			{
+				return modifiedRangeA->location - posA;
+			}
+			return 0;
+		}
+		else if (modifiedRangeA == NULL && modifiedRangeB != NULL)
+		{
+			if (modifiedRangeB->location > posB)
+			{
+				return modifiedRangeB->location - posB;
+			}
+			return 0;
+		}
+		else
+		{
+			if (modifiedRangeB->location > posB && modifiedRangeA->location > posA)
+			{
+				return std::min(modifiedRangeB->location - posB,
+								modifiedRangeA->location - posA);
+			}
+			return 0;
+		}
+	}
+	
+	static bool canEmitModification(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
+	{
+		assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
+		if (modifiedRangeA != NULL && modifiedRangeB != NULL)
+		{
+			return modifiedRangeA->location == posA && modifiedRangeB->location == posB;
+		}
+		return false;
+	}
+	
+	static bool canEmitDeletion(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
+	{
+		assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
+		const int offset = posB - posA;
+		
+		if (modifiedRangeB == NULL)
+			return true;
+		
+		if (modifiedRangeA == NULL)
+			return false;
+		
+		// TODO: Check and explain the reasoning behind this condition
+		if (modifiedRangeA->location < modifiedRangeB->location + offset)
+			return true;
+
+		return false;
+	}
+	
+	static bool canEmitInsertion(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
+	{
+		assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
+		const int offset = posB - posA;
+		
+		if (modifiedRangeA == NULL)
+			return true;
+		
+		if (modifiedRangeB == NULL)
+			return false;
+
+		// TODO: Check and explain the reasoning behind this condition
+		if (modifiedRangeA->location > modifiedRangeB->location + offset)
+			return true;
+
+		return false;
+	}
+	
 	/// <summary>Scan the tables of which lines are inserted and deleted,
 	/// producing an edit script in forward order.  
 	/// </summary>
@@ -426,33 +505,71 @@ namespace ManagedFusion
 	{
 		std::vector<DifferenceItem> result;
 		
+		// Indexes into the DataA.modified and DataB.modified vectors
+		// (the vectors of modified (non-matching) ranges in A and B)
+		// that we are currently looking at
 		int i=0, j=0;
-		int offset=0;
+		
+		// Position in the input arrays that we have written out edits for
+		// all characters to the left of.
+		int posA=0, posB=0;
+				
 		while (i < DataA.modified.size() || j < DataB.modified.size())
 		{
-			if ((i < DataA.modified.size() && j < DataB.modified.size()) && DataA.modified[i].location == DataB.modified[j].location + offset)
+			Range *modifiedRangeA = (i < DataA.modified.size()) ? &(DataA.modified[i]) : (Range *)0;
+			Range *modifiedRangeB = (j < DataB.modified.size()) ? &(DataB.modified[j]) : (Range *)0;
+			
+			assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
+			
+			int charsToCopy = canEmitCopy(posA, posB, modifiedRangeA, modifiedRangeB);
+			if (charsToCopy > 0)
 			{
-				DifferenceItem it(MODIFICATION, DataA.modified[i], DataB.modified[j]);
+				DifferenceItem it(COPY, Range(posA, charsToCopy), Range(posB, charsToCopy));
 				result.push_back(it);
-				offset += (DataA.modified[i].length - DataB.modified[j].length);
+				posA += charsToCopy;
+				posB += charsToCopy;
+			}
+			
+			if (canEmitModification(posA, posB, modifiedRangeA, modifiedRangeB))
+			{
+				DifferenceItem it(MODIFICATION, *modifiedRangeA, *modifiedRangeB);
+				result.push_back(it);
+				posA += modifiedRangeA->length;
+				posB += modifiedRangeB->length;
 				i++;
 				j++;
 			}
-			else if ((j == DataB.modified.size()) || (i < DataA.modified.size() && DataA.modified[i].location < DataB.modified[j].location + offset))
+			else if (canEmitDeletion(posA, posB, modifiedRangeA, modifiedRangeB))
 			{
-				DifferenceItem it(DELETION, DataA.modified[i], Range(0,0));
+				DifferenceItem it(DELETION, *modifiedRangeA, Range(0,0));
 				result.push_back(it);
-				offset += DataA.modified[i].length;
+				posA += modifiedRangeA->length;
 				i++;
 			}
-			else // (DataA.modified[i].location > DataB.modified[j].location + offset)
+			else if (canEmitInsertion(posA, posB, modifiedRangeA, modifiedRangeB))
 			{
-				DifferenceItem it(INSERTION, Range(DataB.modified[j].location + offset, 0), DataB.modified[j]);
+				DifferenceItem it(INSERTION, Range(posA, 0), *modifiedRangeB);
 				result.push_back(it);
-				offset -= DataB.modified[j].length;
+				posB += modifiedRangeB->length;
 				j++;
+			}
+			else
+			{
+				assert(0);
 			}
 		}
+		
+		// Possibly push a final copy edit
+		
+		if (posA < DataA.Length)
+		{
+			assert(posB < DataB.Length);
+			assert((DataA.Length - posA) == (DataB.Length - posB));
+			
+			DifferenceItem it(COPY, Range(posA, (DataA.Length - posA)), Range(posB, (DataB.Length - posB)));
+			result.push_back(it);
+		}
+		
 		return result;
 	}
 } // namespace ManagedFusion

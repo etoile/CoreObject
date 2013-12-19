@@ -14,15 +14,16 @@
     [entity setParent: (id)@"COObject"];
 	
 	ETPropertyDescription *textProperty = [ETPropertyDescription descriptionWithName: @"text"
-																				 type: (id)@"NSString"];
+																				type: (id)@"NSString"];
 	textProperty.persistent = YES;
 	
-	ETPropertyDescription *htmlCodeProperty = [ETPropertyDescription descriptionWithName: @"htmlCode"
-																					type: (id)@"NSString"];
-	htmlCodeProperty.persistent = YES;
+	ETPropertyDescription *attributesProperty = [ETPropertyDescription descriptionWithName: @"attributes"
+																					  type: (id)@"COAttributedStringAttribute"];
+	attributesProperty.multivalued = YES;
+	attributesProperty.persistent = YES;
 	
-	[entity setPropertyDescriptions: @[textProperty, htmlCodeProperty]];
+	[entity setPropertyDescriptions: @[textProperty, attributesProperty]];
     return entity;
 }
-@dynamic text, htmlCode;
+@dynamic text, attributes;
 @end
