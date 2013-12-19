@@ -398,7 +398,8 @@ namespace ManagedFusion
 			// mark as inserted lines.
 			//while (LowerB < UpperB)
 			//  DataB.modified[LowerB++] = true;
-			DataB.addRange(Range(LowerB, UpperB-LowerB)); // FIXME: off by 1?  
+			if (UpperB > LowerB)
+				DataB.addRange(Range(LowerB, UpperB-LowerB)); // FIXME: off by 1?
 			
 		}
 		else if (LowerB == UpperB)
@@ -406,7 +407,8 @@ namespace ManagedFusion
 			// mark as deleted lines.
 			//while (LowerA < UpperA)
 			//  DataA.modified[LowerA++] = true;
-			DataA.addRange(Range(LowerA, UpperA-LowerA)); // FIXME: off by 1?  
+			if (UpperA > LowerA)
+				DataA.addRange(Range(LowerA, UpperA-LowerA)); // FIXME: off by 1?  
 		}
 		else
 		{

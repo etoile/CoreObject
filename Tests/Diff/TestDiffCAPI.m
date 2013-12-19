@@ -168,4 +168,21 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	[self checkEdit: diff_edit_at_index(diff, 0) isDeleteFromLocA: 0 length: 1];           // delete 'a'
 }
 
+- (void) testEmpty
+{
+	diffresult_t *diff = diff_arrays(0, 0, arraycomparefn, NULL, NULL);
+	UKIntsEqual(0, diff_editcount(diff));
+}
+
+- (void) testSame
+{
+	const char *array1 = "a";
+	const char *array2 = "a";
+	
+	diffresult_t *diff = diff_arrays(strlen(array1), strlen(array2), arraycomparefn, array1, array2);
+	UKIntsEqual(1, diff_editcount(diff));
+	
+	[self checkEdit: diff_edit_at_index(diff, 0) isCopyFromLocA:0 length:1 toLocB:0];
+}
+
 @end
