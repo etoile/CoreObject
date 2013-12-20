@@ -708,4 +708,50 @@
 	// persistent (ok)
 }
 
+// TODO: The code below probably belongs to TestUnivaluedRelationshipWithOpposite,
+// but this requires to rework Relationship test classes as TestCommon subclasses.
+
+/**
+ * When a persistent root is created, the current branch is split in two 
+ * replicates, the tracking branch -[COPersistentRoot objectGraphContext] 
+ * (using the initial object graph context), and the non-tracking branch 
+ * that can accessed through -[COPersistentRoot branchForUUID:].
+ *
+ * The non-tracking branch is created as a replicate using -setItemGraph:.
+ */
+- (void) testUnivaluedGroupWithOppositeInPersistentRoot
+{
+	/* The group in the tracking branch */
+	UnivaluedGroupWithOpposite *group =
+		[[UnivaluedGroupWithOpposite alloc] initWithObjectGraphContext: [COObjectGraphContext new]];
+	UnivaluedGroupContent *content =
+		[[UnivaluedGroupContent alloc] initWithObjectGraphContext: [group objectGraphContext]];
+	[group setContent: content];
+	
+	UKObjectsSame(content, [group content]);
+	UKObjectsSame(group, [[content parents] anyObject]);
+	UKObjectsEqual(S(group), [content parents]);
+
+	COPersistentRoot *proot = [ctx insertNewPersistentRootWithRootObject: group];
+	COBranch *nonTrackingBranch = [proot branchForUUID: [[group objectGraphContext] branchUUID]];
+	
+	/* The group and content in the non-tracking branch */
+	UnivaluedGroupWithOpposite *shadowGroup =
+		[[nonTrackingBranch objectGraphContext] loadedObjectForUUID: [group UUID]];
+	UnivaluedGroupContent *shadowContent =
+		[[nonTrackingBranch objectGraphContext] loadedObjectForUUID: [content UUID]];
+
+	UKObjectsSame(shadowContent, [shadowGroup content]);
+	UKObjectsSame(shadowGroup, [[shadowContent parents] anyObject]);
+	UKObjectsEqual(S(shadowGroup), [shadowContent parents]);
+	
+	UKObjectsNotSame(group, shadowGroup);
+	UKObjectsNotSame(content, shadowContent);
+	
+	// TODO: Make a change in one branch, then commit and test both the tracking
+	// and non-tracking branch contains the same object graphs in the current
+	// context and a recreated context.
+}
+
+
 @end

@@ -31,7 +31,7 @@
 @property (readwrite, nonatomic, copy) NSString *sourceProperty;
 @property (readwrite, nonatomic, copy) NSString *targetProperty;
 
-- (BOOL) isSourceObjectTrackingSpecificBranch;
+- (BOOL) isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject;
 
 
 @end
@@ -54,8 +54,12 @@
 	return [[self descriptionDictionary] description];
 }
 
-- (BOOL) isSourceObjectTrackingSpecificBranch
+- (BOOL) isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject
 {
+	if (_sourceObject.objectGraphContext == aTargetObject.objectGraphContext)
+	{
+		return NO;
+	}
 	return [_sourceObject.objectGraphContext isTrackingSpecificBranch];
 }
 
@@ -91,7 +95,7 @@
 		   On slide 1 of 'cross persistent root reference semantics.key',
 		   this corresponds to John (A) and Lucy (A) hiding the dotted incoming references from
 		   Group (B). */
-		if ([entry isSourceObjectTrackingSpecificBranch])
+		if ([entry isSourceObjectTrackingSpecificBranchForTargetObject: _owner])
 			continue;
 		
         if ([aProperty isEqualToString: entry->_targetProperty])
@@ -133,7 +137,7 @@
     
     for (COCachedRelationship *entry in _cachedRelationships)
     {
-		if ([entry isSourceObjectTrackingSpecificBranch])
+		if ([entry isSourceObjectTrackingSpecificBranchForTargetObject: _owner])
 			continue;
 
         if ([aProperty isEqualToString: entry->_targetProperty])
