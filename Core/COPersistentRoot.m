@@ -41,6 +41,34 @@ NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidCh
 	return nil;
 }
 
+// TODO: Could be debug only (measure how slow this check is)
+- (void) validateNewObjectGraphContext: (COObjectGraphContext *)newContext
+                           createdFrom: (COObjectGraphContext *)oldContext
+{
+	NSSet *newItemUUIDs = [NSSet setWithArray: [newContext itemUUIDs]];
+	NSSet *oldItemUUIDs = [NSSet setWithArray: [oldContext itemUUIDs]];
+
+	if ([newItemUUIDs isEqual: oldItemUUIDs])
+		return;
+
+	NSMutableSet *mismatchedItemUUIDsInNewContext = [newItemUUIDs mutableCopy];
+	[mismatchedItemUUIDsInNewContext minusSet: oldItemUUIDs];
+	NSMutableSet *mismatchedItemUUIDsInOldContext = [oldItemUUIDs mutableCopy];
+	[mismatchedItemUUIDsInOldContext minusSet: newItemUUIDs];
+
+	NSAssert2([mismatchedItemUUIDsInOldContext isEmpty],
+		@"Mismatched item UUIDs accross identical object graph contexts, due "
+		 "to persistent objects, belonging to the old object graph context %@, "
+		 "present in a transient relationship (or several ones): \n%@", oldContext, 
+		[oldContext loadedObjectsForUUIDs: [mismatchedItemUUIDsInOldContext allObjects]]);
+
+	NSAssert2([mismatchedItemUUIDsInNewContext isEmpty],
+		@"Mismatched item UUIDs accross identical object graph contexts, due "
+		 "to persistent objects, belonging to the new object graph context %@, "
+		 "present in a transient relationship (or several ones):  \n%@", newContext, 
+		[newContext loadedObjectsForUUIDs: [mismatchedItemUUIDsInNewContext allObjects]]);
+}
+
 - (id) initWithInfo: (COPersistentRootInfo *)info
 cheapCopyRevisionUUID: (ETUUID *)cheapCopyRevisionID
 cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
@@ -109,12 +137,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
                                 parentRevisionForNewBranch: cheapCopyRevisionID];
 		[[branch objectGraphContext] setItemGraph: _currentBranchObjectGraph];
 
-		// TODO: should be a debug assertion
-		NSAssert([[NSSet setWithArray: [[branch objectGraphContext] itemUUIDs]]
-			isEqual: [NSSet setWithArray: [_currentBranchObjectGraph itemUUIDs]]],
-			@"Mismatched item UUIDs accross identical object graph contexts, due "
-			 "to persistent objects, belonging to the same object graph context, "
-			 "present in a transient relationship.");
+		[self validateNewObjectGraphContext: _currentBranchObjectGraph
+		                        createdFrom: [branch objectGraphContext]];
 
         [_branchForUUID setObject: branch forKey: branchUUID];
         
@@ -533,12 +557,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 			[_currentBranchObjectGraph setItemGraph: [[self currentBranch] objectGraphContext]];
 		}
 
-		// TODO: should be a debug assertion
-		NSAssert([[NSSet setWithArray: [[[self currentBranch] objectGraphContext] itemUUIDs]]
-			isEqual: [NSSet setWithArray: [_currentBranchObjectGraph itemUUIDs]]],
-			@"Mismatched item UUIDs accross identical object graph contexts, due "
-			 "to persistent objects, belonging to the same object graph context, "
-			 "present in a transient relationship.");
+		[self validateNewObjectGraphContext: _currentBranchObjectGraph
+		                        createdFrom: [[self currentBranch] objectGraphContext]];
 	}
     else
     {

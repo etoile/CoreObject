@@ -62,6 +62,12 @@
  */
 - (void)registerObject: (COObject *)object isNew: (BOOL)inserted;
 /**
+ * Returns the inner objects bound to the given UUIDs in the object graph.
+ *
+ * See -loadedObjectForUUID:.
+ */
+- (NSArray *)loadedObjectsForUUIDs: (NSArray *)UUIDs;
+/**
  * This method is only exposed to be used internally by CoreObject.
  *
  * Tells the object graph context a property value has changed in a COObject

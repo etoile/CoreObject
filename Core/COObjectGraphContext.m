@@ -544,6 +544,18 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	return obj;
 }
 
+- (NSArray *)loadedObjectsForUUIDs: (NSArray *)UUIDs
+{
+	NSMutableArray *objects = [NSMutableArray arrayWithCapacity: [UUIDs count]];
+
+	for (ETUUID *UUID in UUIDs)
+	{
+		[objects addObject: [self loadedObjectForUUID: UUID]];
+	}
+	return objects;
+}
+
+
 #pragma mark -
 #pragma mark Garbage Collection
 
