@@ -33,7 +33,8 @@ Key Features:
 	- History Compression and Compaction // Not finished!
 	- Serialization Formats
 		- JSON and Binary (endian-, 32/64-bit- independent)
-		- Stable over multiple invocations for the same object graph
+		- Stable over multiple invocations for the same object graph (no merge issues in SCM)
+		- Integrity Checking (every single committed change includes a checksum)
 
 
 - Undo Framework
@@ -89,6 +90,9 @@ Key Features:
 	- Small Code Base (~ 20 000 loc)
 	- Pretty Large Test suite (over 2300 tests)
 	- High Quality API documentation
+	- Good Debugging Support 
+		 - View object graph in memory as PDF diagram (can be generated from the debugger or in code)
+		 - Short and Detailed Descriptions for logging objects
 	- Minimal dependencies (SQLite and EtoileFoundation)
 	- Pervasive UUID use (no string, number or content-based identifiers)
 	- Favor JSON formats
