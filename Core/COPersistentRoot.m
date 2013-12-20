@@ -56,6 +56,8 @@ NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidCh
 	NSMutableSet *mismatchedItemUUIDsInOldContext = [oldItemUUIDs mutableCopy];
 	[mismatchedItemUUIDsInOldContext minusSet: newItemUUIDs];
 
+	// FIXME: Unless we run GC phase in the new context, mismatches in the old
+	// context will remain invisible.
 	NSAssert2([mismatchedItemUUIDsInOldContext isEmpty],
 		@"Mismatched item UUIDs accross identical object graph contexts, due "
 		 "to persistent objects, belonging to the old object graph context %@, "
