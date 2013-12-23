@@ -36,8 +36,8 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void)didMakeInitialCommitWithRevisionID: (ETUUID *)aRevisionID
-                               transaction: (COStoreTransaction *)txn;
+- (void)didMakeInitialCommitWithRevisionUUID: (ETUUID *)aRevisionUUID
+                                 transaction: (COStoreTransaction *)txn;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

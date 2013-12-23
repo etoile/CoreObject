@@ -25,7 +25,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /**
  * @group Core
  * @abstract A persistent root represents a document or a top-level object in a 
- * CoreObject store
+ * CoreObject store.
  *
  * A persistent root usually represents a core object in the model
  * (e.g. library, tag, person, project etc.), and manages a persistent object 

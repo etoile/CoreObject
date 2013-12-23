@@ -546,7 +546,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         // because the store call -createPersistentRootWithInitialContents:
         // handles creating the initial branch.
         
-        [[self currentBranch] didMakeInitialCommitWithRevisionID: initialRevID transaction: txn];
+        [[self currentBranch] didMakeInitialCommitWithRevisionUUID: initialRevID transaction: txn];
 		
 		if (usingCurrentBranchObjectGraph)
 		{

@@ -14,15 +14,8 @@
 extern NSString * const kCOBranchLabel;
 
 /**
- * A persistent history track on an object.
- * 
- * Unlike COHistoryTrack, COCommitTrack is built to:
- * <list>
- * <item>track a single object</item>
- * <item>persist the track nodes and the current node</item>
- * <item>move the current node to the next or previous track node, to move the 
- * undo/redo pointer in the track timeline</item>
- * </list>
+ * @group Core
+ * @abstract A branch represents a distinct timeline in a persistent root history.
  */
 @interface COBranch : NSObject <COTrack>
 {
@@ -69,7 +62,7 @@ extern NSString * const kCOBranchLabel;
 @property (nonatomic, readonly) BOOL isCurrentBranch;
 
 /**
- * Returns whether the receiver was the first branch of its persistent root
+ * Returns whether the receiver was the first branch of its persistent root.
  */
 @property (nonatomic, readonly) BOOL isTrunkBranch;
 
@@ -115,6 +108,7 @@ extern NSString * const kCOBranchLabel;
  * on COBranch are disabled (-canUndo and -canRedo return NO).
  */
 @property (nonatomic, assign) BOOL supportsRevert;
+
 
 /** @taskunit History */
 
@@ -175,7 +169,7 @@ extern NSString * const kCOBranchLabel;
 
 
 /**
- * The editing context owning the branch's persistent root
+ * The editing context owning the branch's persistent root.
  */
 @property (nonatomic, readonly) COEditingContext *editingContext;
 /**
