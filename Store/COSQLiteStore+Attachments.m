@@ -8,7 +8,16 @@
 #import "COSQLiteStore.h"
 #import "COSQLiteStore+Attachments.h"
 #import "COAttachmentID.h"
-#include <openssl/sha.h>
+#ifdef GNUSTEP
+#	include <openssl/sha.h>
+#else
+#	include <CommonCrypto/CommonDigest.h>
+#	define SHA_CTX CC_SHA1_CTX
+#	define SHA_DIGEST_LENGTH CC_SHA1_DIGEST_LENGTH
+# 	define SHA1_Init CC_SHA1_Init
+# 	define SHA1_Update CC_SHA1_Update
+# 	define SHA1_Final CC_SHA1_Final
+#endif
 
 @implementation COSQLiteStore (Attachments)
 

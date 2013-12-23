@@ -15,8 +15,6 @@ First alpha release blockers
   - Samples
 
   - All tests pass for both CoreObject and EtoileUI test suite
-  
-- Fix deprecated warnings about SHA1 on Mac OS X 10.7
 
 - Decide whether to enable Clang warning 'Implicit Conversions to 32 Bit Type'
 
@@ -28,11 +26,11 @@ First alpha release blockers
 
 - Check and update all Core API documentation (underway)
 
-	- Already reviewed classes: COObjectGraphContext, COEditingContext
+	- Already reviewed classes: COObjectGraphContext, COEditingContext, COBranch
 
 - Check code quality for all Core classes (underway)
 
-	- Already reviewed classes: COObjectGraphContext, COEditingContext
+	- Already reviewed classes: COObjectGraphContext, COEditingContext, COBranch
 
 - Write remaing class descriptions
 
