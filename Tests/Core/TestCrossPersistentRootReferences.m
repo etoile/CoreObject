@@ -721,11 +721,13 @@
  */
 - (void) testUnivaluedGroupWithOppositeInPersistentRoot
 {
+	COObjectGraphContext *graph = [COObjectGraphContext new];
+
 	/* The group in the tracking branch */
 	UnivaluedGroupWithOpposite *group =
-		[[UnivaluedGroupWithOpposite alloc] initWithObjectGraphContext: [COObjectGraphContext new]];
+		[[UnivaluedGroupWithOpposite alloc] initWithObjectGraphContext: graph];
 	UnivaluedGroupContent *content =
-		[[UnivaluedGroupContent alloc] initWithObjectGraphContext: [group objectGraphContext]];
+		[[UnivaluedGroupContent alloc] initWithObjectGraphContext: graph];
 	[group setContent: content];
 	
 	UKObjectsSame(content, [group content]);
@@ -733,7 +735,7 @@
 	UKObjectsEqual(S(group), [content parents]);
 
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithRootObject: group];
-	COBranch *nonTrackingBranch = [proot branchForUUID: [[group objectGraphContext] branchUUID]];
+	COBranch *nonTrackingBranch = [proot branchForUUID: [graph branchUUID]];
 	
 	/* The group and content in the non-tracking branch */
 	UnivaluedGroupWithOpposite *shadowGroup =
