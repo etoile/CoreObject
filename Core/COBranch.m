@@ -696,23 +696,6 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	}
 }
 
-// TODO: Remove or rewrite... The loop in the middle seems to do nothing.
-- (CORevision *)revisionWithUUID: (ETUUID *)aRevisionID
-{
-    CORevision *oldest = [self initialRevision];
-    CORevision *rev = [self currentRevision];
-    do
-    {
-        if ([[rev UUID] isEqual: aRevisionID])
-        {
-            return rev;
-        }
-    }
-    while (![rev isEqual: oldest]);
-    
-    return nil;
-}
-
 - (COMergeInfo *) mergeInfoForMergingBranch: (COBranch *)aBranch
 {
     ETUUID *lca = [COLeastCommonAncestor commonAncestorForCommit: [[aBranch currentRevision] UUID]

@@ -50,7 +50,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (BOOL) isBranchUncommitted;
+- (BOOL)isBranchUncommitted;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -59,15 +59,5 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
  * This method is only exposed to be used internally by CoreObject.
  */
 @property (nonatomic) CORevision *headRevision;
-/**
- * This method is only exposed to be used internally by CoreObject.
- *
- * Searches for whether the given revision is on this branch.
- * Returns the corresponding CORevision if it is, or nil if not.
- *
- * Note that this means nil will be returned if the given revision is not on
- * this branch, even if it on another branch of this persistent root.
- */
-- (CORevision *) revisionWithUUID: (ETUUID *)aRevisionID;
 
 @end
