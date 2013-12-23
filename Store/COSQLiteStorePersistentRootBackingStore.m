@@ -18,7 +18,12 @@
 #import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
 #import "CODateSerialization.h"
-#import <openssl/sha.h>
+#ifdef GNUSTEP
+#	include <openssl/sha.h>
+#else
+#	include <CommonCrypto/CommonDigest.h>
+#	define SHA1 CC_SHA1
+#endif
 
 @interface COSQLiteStore (Private)
 
