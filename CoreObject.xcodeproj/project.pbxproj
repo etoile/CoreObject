@@ -486,7 +486,7 @@
 		3D01D08A1646BEF400917AC8 /* UnitKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UnitKit.xcodeproj; path = ../UnitKit/Source/UnitKit.xcodeproj; sourceTree = "<group>"; };
 		600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COPersistentObjectContext.h; path = Utilities/COPersistentObjectContext.h; sourceTree = "<group>"; };
 		600F72BE1858A71200CB6AC5 /* COPersistentObjectContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COPersistentObjectContext.m; path = Utilities/COPersistentObjectContext.m; sourceTree = "<group>"; };
-		601977FB1860A52200635BE2 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		601977FB1860A52200635BE2 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		601C1D44180C0F5300CED07E /* COObject+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObject+Private.h"; path = "Core/COObject+Private.h"; sourceTree = "<group>"; };
 		601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+GarbageCollection.h"; path = "Core/COObjectGraphContext+GarbageCollection.h"; sourceTree = "<group>"; };
 		601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObjectGraphContext+GarbageCollection.m"; path = "Core/COObjectGraphContext+GarbageCollection.m"; sourceTree = "<group>"; };
@@ -1331,7 +1331,7 @@
 			isa = PBXGroup;
 			children = (
 				66E62284185CF875002A22C1 /* COPYING */,
-				601977FB1860A52200635BE2 /* README */,
+				601977FB1860A52200635BE2 /* README.md */,
 				66982A1F11EBC2A0007154CD /* TODO */,
 				66618A8B1811C065001FA004 /* TERMINOLOGY */,
 			);
