@@ -6,12 +6,19 @@
 @interface COAttributedStringDiff : NSObject
 {
 	NSMutableArray *_operations;
+	
+	/* Temporary storage during construction */
+	
+	id _source;
+	COAttributedString *_first;
+	COAttributedString *_second;
 }
 
 @property (readonly) NSMutableArray *operations;
 
 - (id) initWithFirstAttributedString: (COAttributedString *)first
-              secondAttributedString: (COAttributedString *)second;
+              secondAttributedString: (COAttributedString *)second
+							  source: (id)source;
 
 @end
 

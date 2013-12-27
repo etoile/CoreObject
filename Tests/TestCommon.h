@@ -52,6 +52,7 @@
 #import "COAttributedStringChunk.h"
 #import "COAttributedStringWrapper.h"
 #import "COAttributedStringAttribute.h"
+#import "COAttributedStringDiff.h"
 
 #import "COPersistentRoot+Private.h"
 #import "COSQLiteStore+Private.h"

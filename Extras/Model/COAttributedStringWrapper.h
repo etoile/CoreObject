@@ -14,6 +14,8 @@
 	COAttributedString *_backing;
 }
 
+- (instancetype) initWithBacking: (COAttributedString *)aBacking;
+
 @property (nonatomic, strong) COAttributedString *backing;
 
 @end

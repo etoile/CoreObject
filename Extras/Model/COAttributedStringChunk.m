@@ -26,4 +26,20 @@
     return entity;
 }
 @dynamic text, attributes;
+
+- (COItemGraph *) subchunkItemGraphWithRange: (NSRange)aRange
+{
+	COItemGraph *result = [[COItemGraph alloc] init];
+	COCopier *copier = [[COCopier alloc] init];
+	
+	ETUUID *copyRootUUID = [copier copyItemWithUUID: self.UUID fromGraph: self.objectGraphContext toGraph: result];
+	result.rootItemUUID = copyRootUUID;
+	
+	COMutableItem *chunkCopy = [result itemForUUID: copyRootUUID];
+	[chunkCopy setValue: [self.text substringWithRange: aRange]
+		   forAttribute: @"text"];
+	
+	return result;
+}
+
 @end

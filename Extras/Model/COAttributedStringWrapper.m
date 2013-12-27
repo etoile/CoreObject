@@ -18,6 +18,13 @@
 
 @synthesize backing = _backing;
 
+- (instancetype) initWithBacking: (COAttributedString *)aBacking
+{
+	SUPERINIT;
+	self.backing = aBacking;
+	return self;
+}
+
 // Primitive NSAttributedString methods
 
 - (NSString *)string

@@ -25,4 +25,14 @@
 }
 
 @dynamic chunks;
+
+- (COItemGraph *) substringItemGraphWithRange: (NSRange)aRange
+{
+	COItemGraph *result = [[COItemGraph alloc] init];
+	
+	// FIXME: Implement
+	
+	return result;
+}
+
 @end

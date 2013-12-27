@@ -70,7 +70,8 @@
 
 - (id) initWithItemGraph: (id<COItemGraph>)aGraph;
 
-- (ETUUID *) rootItemUUID;
+@property (nonatomic, strong) ETUUID *rootItemUUID;
+
 - (COMutableItem *) itemForUUID: (ETUUID *)aUUID;
 
 - (NSArray *) itemUUIDs;

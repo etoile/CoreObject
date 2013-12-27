@@ -13,6 +13,13 @@
 
 @implementation COItemGraph
 
+- (instancetype) init
+{
+	SUPERINIT;
+    itemForUUID_ = [[NSMutableDictionary alloc] init];
+	return self;
+}
+
 - (id) initWithItemForUUID: (NSDictionary *) itemForUUID
               rootItemUUID: (ETUUID *)root
 {
@@ -65,12 +72,7 @@
     return result;
 }
 
-
-
-- (ETUUID *) rootItemUUID
-{
-    return rootItemUUID_;
-}
+@synthesize rootItemUUID = rootItemUUID_;
 
 - (COMutableItem *) itemForUUID: (ETUUID *)aUUID
 {

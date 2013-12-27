@@ -88,8 +88,8 @@
 //	[ctx2 showGraph];
 //	[ctx3 showGraph];
 	
-//	COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
-//    COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
+	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: ctx1String secondAttributedString: ctx2String source: @"diff12"];
+    COAttributedStringDiff *diff13 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: ctx1String secondAttributedString: ctx3String source: @"diff13"];
 	
 //	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
 //	
