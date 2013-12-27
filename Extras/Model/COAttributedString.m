@@ -6,6 +6,7 @@
  */
 
 #import "COAttributedString.h"
+#import "COAttributedStringChunk.h"
 
 @implementation COAttributedString
 
@@ -32,6 +33,47 @@
 	
 	// FIXME: Implement
 	
+	return result;
+}
+
+- (COAttributedStringChunk *) chunkContainingIndex: (NSUInteger)anIndex chunkStart: (NSUInteger *)chunkStartOut chunkIndex: (NSUInteger *)chunkIndexOut
+{
+	COAttributedStringChunk *target = nil;
+	NSUInteger i = 0, chunkIndex = 0;
+	
+	for (COAttributedStringChunk *chunk in self.chunks)
+	{
+		const NSUInteger chunkLen = [chunk.text length];
+		if (anIndex >= i && anIndex < (i + chunkLen))
+		{
+			target = chunk;
+			
+			if (chunkStartOut != NULL)
+			{
+				*chunkStartOut = i;
+			}
+			
+			if (chunkIndexOut != NULL)
+			{
+				*chunkIndexOut = chunkIndex;
+			}
+			
+			break;
+		}
+		i += chunkLen;
+		chunkIndex++;
+	}
+	
+	return target;
+}
+
+- (NSUInteger) length
+{
+	NSUInteger result = 0;
+	for (COAttributedStringChunk *chunk in self.chunks)
+	{
+		result += [chunk.text length];
+	}
 	return result;
 }
 

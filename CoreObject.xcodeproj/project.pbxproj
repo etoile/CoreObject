@@ -75,6 +75,7 @@
 		660D4CDA17D5C7CB003C9ACC /* COLeastCommonAncestor.m in Sources */ = {isa = PBXBuildFile; fileRef = 660D4CD817D5C7CB003C9ACC /* COLeastCommonAncestor.m */; };
 		660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 660D4CE317D689FC003C9ACC /* COMergeInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660D4CE617D689FC003C9ACC /* COMergeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 660D4CE417D689FC003C9ACC /* COMergeInfo.m */; };
+		660EE3A5186E072500E8C22C /* TestAttributedStringDiffOperations.m in Sources */ = {isa = PBXBuildFile; fileRef = 660EE3A4186E072500E8C22C /* TestAttributedStringDiffOperations.m */; };
 		6610112F184D2D8A001A3E24 /* TestKeyedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112B184D2D8A001A3E24 /* TestKeyedAttribute.m */; };
 		66101130184D2D8A001A3E24 /* TestOrderedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112C184D2D8A001A3E24 /* TestOrderedAttribute.m */; };
 		66101131184D2D8A001A3E24 /* TestUnivaluedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112D184D2D8A001A3E24 /* TestUnivaluedAttribute.m */; };
@@ -551,6 +552,7 @@
 		660D4CD817D5C7CB003C9ACC /* COLeastCommonAncestor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COLeastCommonAncestor.m; path = Diff/COLeastCommonAncestor.m; sourceTree = "<group>"; };
 		660D4CE317D689FC003C9ACC /* COMergeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COMergeInfo.h; path = Diff/COMergeInfo.h; sourceTree = "<group>"; };
 		660D4CE417D689FC003C9ACC /* COMergeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COMergeInfo.m; path = Diff/COMergeInfo.m; sourceTree = "<group>"; };
+		660EE3A4186E072500E8C22C /* TestAttributedStringDiffOperations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedStringDiffOperations.m; sourceTree = "<group>"; };
 		6610112B184D2D8A001A3E24 /* TestKeyedAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestKeyedAttribute.m; sourceTree = "<group>"; };
 		6610112C184D2D8A001A3E24 /* TestOrderedAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestOrderedAttribute.m; sourceTree = "<group>"; };
 		6610112D184D2D8A001A3E24 /* TestUnivaluedAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnivaluedAttribute.m; sourceTree = "<group>"; };
@@ -1077,6 +1079,7 @@
 			isa = PBXGroup;
 			children = (
 				6633F12118552570009CE6F7 /* TestAttributedString.m */,
+				660EE3A4186E072500E8C22C /* TestAttributedStringDiffOperations.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2206,6 +2209,7 @@
 				6621BF1A1847F077000809CF /* Child.m in Sources */,
 				6610115E184D8C30001A3E24 /* OrderedGroupWithOpposite.m in Sources */,
 				66E40D731836D08D00E5B4A7 /* TestSynchronizerJSONTransport.m in Sources */,
+				660EE3A5186E072500E8C22C /* TestAttributedStringDiffOperations.m in Sources */,
 				66E40D6E1836D08D00E5B4A7 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */,
 				662CF34E1858547800B90D10 /* TestArrayDiff.m in Sources */,
 				66101158184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.m in Sources */,

@@ -1,6 +1,17 @@
+/*
+	Copyright (C) 2013 Eric Wasylishen
+ 
+	Date:  December 2013
+	License:  MIT  (see COPYING)
+ */
+
+#import "COAttributedString.h"
 #import "COAttributedStringDiff.h"
 #import "COAttributedStringWrapper.h"
 #include "diff.h"
+
+// FIXME: Hack to get -insertObjects:atIndexes:hints:forProperty:
+#import "COObject+Private.h"
 
 @implementation COAttributedStringDiff
 
@@ -104,26 +115,131 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	// FIXME: Implement
 }
 
+#pragma mark - Diff Application
+
+- (void) applyToAttributedString: (COAttributedString *)target
+{
+	NSInteger i = 0;
+	for (id<COAttributedStringDiffOperation> op in self.operations)
+	{
+		NSLog(@"Applying %@", op);
+	
+		i += [op applyOperationToAttributedString: target withOffset: i];
+	}
+}
 
 @end
 
+#pragma mark - Operation Classes
 
 @implementation COAttributedStringDiffOperationInsertAttributedSubstring
 @synthesize range, source, attributedStringItemGraph;
+
+- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
+{
+	COObjectGraphContext *targetCtx = [target objectGraphContext];
+	const NSInteger insertionPos = range.location + offset;
+	
+	NSUInteger chunkIndex = 0, chunkStart = 0;
+	COAttributedStringChunk *chunk = [target chunkContainingIndex: insertionPos chunkStart: &chunkStart chunkIndex: &chunkIndex];
+	
+	[targetCtx insertOrUpdateItems: [attributedStringItemGraph items]];
+	
+	COAttributedString *sourceString = [targetCtx loadedObjectForUUID: [attributedStringItemGraph rootItemUUID]];
+	
+	if (chunk == nil)
+	{
+		// Inserting at the end of the string
+		ETAssert(insertionPos == [target length]);
+	}
+	else if (insertionPos == chunkStart)
+	{
+		// Inserting to the left of 'chunk'
+		
+	}
+	else
+	{
+		// We need to split 'chunk'
+		
+		ETAssert(insertionPos > chunkStart);
+		
+		NSUInteger leftChunkLength = insertionPos - chunkStart;
+		NSString *leftString = [chunk.text substringToIndex: leftChunkLength];
+		NSString *rightString = [chunk.text substringFromIndex: leftChunkLength];
+		
+		// First, trim 'chunk' down to the point where we are splitting it
+		
+		chunk.text = leftString;
+		
+		// Create a new chunk for the right side, copying from the left side so we also copy the
+		// attributes.
+		// FIXME: Since attributes aren't referred to with a composite rel'n, currently
+		// they are being aliased and not copied.
+		
+		COCopier *copier = [COCopier new];
+		ETUUID *rightChunkUUID = [copier copyItemWithUUID: [chunk UUID] fromGraph: targetCtx toGraph: targetCtx];
+		COAttributedStringChunk *rightChunk = [targetCtx loadedObjectForUUID: rightChunkUUID];
+		rightChunk.text = rightString;
+
+		// Insert the chunks we need to insert
+		
+		// FIXME: Why is -insertObjects:atIndexes:hints:forProperty: private?!
+		[target insertObjects: sourceString.chunks
+					atIndexes: [[NSIndexSet alloc] initWithIndexesInRange: NSMakeRange(chunkIndex + 1, [sourceString.chunks count])]
+						hints: nil
+				  forProperty: @"chunks"];
+		
+		// Insert rightChunk
+		
+		[target insertObjects: @[rightChunk]
+					atIndexes: [[NSIndexSet alloc] initWithIndex: chunkIndex + 1 + [sourceString.chunks count]]
+						hints: nil
+				  forProperty: @"chunks"];
+		
+		return [sourceString length];
+	}
+	
+	return 0;
+}
+
 @end
 
 @implementation COAttributedStringDiffOperationDeleteRange
 @synthesize range, source;
+
+- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
+{
+	return -range.length;
+}
+
 @end
 
 @implementation COAttributedStringDiffOperationReplaceRange
 @synthesize range, source, attributedStringItemGraph;
+
+- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
+{
+	return 0;
+}
+
 @end
 
 @implementation COAttributedStringDiffOperationAddAttribute
 @synthesize range, source, attributeItemGraph;
+
+- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
+{
+	return 0;
+}
+
 @end
 
 @implementation COAttributedStringDiffOperationRemoveAttribute
 @synthesize range, source, attributeItemGraph;
+
+- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
+{
+	return 0;
+}
+
 @end

@@ -7,6 +7,8 @@
 
 #import <CoreObject/CoreObject.h>
 
+@class COAttributedStringChunk;
+
 /**
  * Behaviour of COAttributedString:
  *
@@ -15,6 +17,9 @@
  *                                 \--> " ... the very worst ... " (insert "very")
  *   merge result is:
  *   " ... _the very worst_ ... " (very is underlined)
+ *
+ * - TODO: when pasting, you may want the attributes surrounding the paste 
+ *   target to be extended over the pasted text, or not. Make it configurable.
  *
  * - COAttributedStringChunk and COAttributedStringAttribute are private objects...
  *   their UUIDs are irrelevant
@@ -26,5 +31,17 @@
 @property (nonatomic, readwrite, strong) NSArray *chunks;
 
 - (COItemGraph *) substringItemGraphWithRange: (NSRange)aRange;
+
+/**
+ * Returns the chunk containing the given index. 
+ * If the index is the end of the string, returns nil.
+ * If the index is between two chunks, returns the chunk on the right.
+ *
+ * If a non-nil chunk is returned, and chunkStartOut is non-NULL, writes the
+ * index of the beginning of the returned chunk into chunkStartOut.
+ */
+- (COAttributedStringChunk *) chunkContainingIndex: (NSUInteger)anIndex chunkStart: (NSUInteger *)chunkStartOut chunkIndex: (NSUInteger *)chunkIndexOut;
+
+@property (nonatomic, readonly, assign) NSUInteger length;
 
 @end

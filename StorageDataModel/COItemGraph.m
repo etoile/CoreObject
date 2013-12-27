@@ -84,6 +84,11 @@
     return [itemForUUID_ allKeys];
 }
 
+- (NSArray *) items
+{
+	return [itemForUUID_ allValues];
+}
+
 - (NSString *)description
 {
 	NSMutableString *result = [NSMutableString string];

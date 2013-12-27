@@ -76,6 +76,8 @@
 
 - (NSArray *) itemUUIDs;
 
+- (NSArray *) items;
+
 - (void) insertOrUpdateItems: (NSArray *)items;
 
 - (void) addItemGraph: (id<COItemGraph>)aGraph;
