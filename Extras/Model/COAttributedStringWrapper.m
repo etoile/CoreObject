@@ -39,30 +39,16 @@
 
 - (NSDictionary *)attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)aRangeOut
 {
-	COAttributedStringChunk *target = nil;
-	
-	{
-		NSUInteger i = 0;
-		for (COAttributedStringChunk *chunk in _backing.chunks)
-		{
-			NSUInteger chunkLen = [chunk.text length];
-			if (anIndex >= i && anIndex < (i + chunkLen))
-			{
-				target = chunk;
-				
-				if (aRangeOut != NULL)
-				{
-					*aRangeOut = NSMakeRange(i, chunkLen);
-				}
-				
-				break;
-			}
-			i += chunkLen;
-		}
-	}
+	NSUInteger chunkIndex = 0, chunkStart = 0;
+	COAttributedStringChunk *target = [self.backing chunkContainingIndex: anIndex chunkStart: &chunkStart chunkIndex: &chunkIndex];
 	
 	if (target != nil)
 	{
+		if (aRangeOut != NULL)
+		{
+			*aRangeOut = NSMakeRange(chunkStart, [target.text length]);
+		}
+		
 		NSMutableDictionary *result = [NSMutableDictionary new];
 		
 		NSFont *font = [NSFont userFontOfSize: 12];

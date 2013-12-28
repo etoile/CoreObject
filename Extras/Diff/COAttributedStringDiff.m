@@ -139,67 +139,20 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 {
 	COObjectGraphContext *targetCtx = [target objectGraphContext];
 	const NSInteger insertionPos = range.location + offset;
-	
-	NSUInteger chunkIndex = 0, chunkStart = 0;
-	COAttributedStringChunk *chunk = [target chunkContainingIndex: insertionPos chunkStart: &chunkStart chunkIndex: &chunkIndex];
-	
+		
 	[targetCtx insertOrUpdateItems: [attributedStringItemGraph items]];
 	
 	COAttributedString *sourceString = [targetCtx loadedObjectForUUID: [attributedStringItemGraph rootItemUUID]];
 	
-	if (chunk == nil)
-	{
-		// Inserting at the end of the string
-		ETAssert(insertionPos == [target length]);
-	}
-	else if (insertionPos == chunkStart)
-	{
-		// Inserting to the left of 'chunk'
+	const NSInteger insertionPosChunkIndex = [target splitChunkAtIndex: insertionPos];
 		
-	}
-	else
-	{
-		// We need to split 'chunk'
-		
-		ETAssert(insertionPos > chunkStart);
-		
-		NSUInteger leftChunkLength = insertionPos - chunkStart;
-		NSString *leftString = [chunk.text substringToIndex: leftChunkLength];
-		NSString *rightString = [chunk.text substringFromIndex: leftChunkLength];
-		
-		// First, trim 'chunk' down to the point where we are splitting it
-		
-		chunk.text = leftString;
-		
-		// Create a new chunk for the right side, copying from the left side so we also copy the
-		// attributes.
-		// FIXME: Since attributes aren't referred to with a composite rel'n, currently
-		// they are being aliased and not copied.
-		
-		COCopier *copier = [COCopier new];
-		ETUUID *rightChunkUUID = [copier copyItemWithUUID: [chunk UUID] fromGraph: targetCtx toGraph: targetCtx];
-		COAttributedStringChunk *rightChunk = [targetCtx loadedObjectForUUID: rightChunkUUID];
-		rightChunk.text = rightString;
-
-		// Insert the chunks we need to insert
-		
-		// FIXME: Why is -insertObjects:atIndexes:hints:forProperty: private?!
-		[target insertObjects: sourceString.chunks
-					atIndexes: [[NSIndexSet alloc] initWithIndexesInRange: NSMakeRange(chunkIndex + 1, [sourceString.chunks count])]
-						hints: nil
-				  forProperty: @"chunks"];
-		
-		// Insert rightChunk
-		
-		[target insertObjects: @[rightChunk]
-					atIndexes: [[NSIndexSet alloc] initWithIndex: chunkIndex + 1 + [sourceString.chunks count]]
-						hints: nil
-				  forProperty: @"chunks"];
-		
-		return [sourceString length];
-	}
+	// FIXME: Why is -insertObjects:atIndexes:hints:forProperty: private?!
+	[target insertObjects: sourceString.chunks
+				atIndexes: [[NSIndexSet alloc] initWithIndexesInRange: NSMakeRange(insertionPosChunkIndex, [sourceString.chunks count])]
+					hints: nil
+			  forProperty: @"chunks"];
 	
-	return 0;
+	return [sourceString length];
 }
 
 @end
