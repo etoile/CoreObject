@@ -44,4 +44,11 @@
 
 @property (nonatomic, readonly, assign) NSUInteger length;
 
+/**
+ * Splits the chunk at the given character index. 
+ * Returns the _chunk index_ of the split location. 
+ * If the given characterIndex is already on a chunk boundary, does nothing.
+ */
+- (NSUInteger) splitChunkAtIndex: (NSUInteger)characterIndex;
+
 @end

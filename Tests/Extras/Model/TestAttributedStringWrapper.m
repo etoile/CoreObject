@@ -87,6 +87,23 @@
 	[as replaceCharactersInRange: NSMakeRange(2, 5) withString: @"-"];
 	
 	UKObjectsEqual(@"ab-hi", [as string]);
+	
+	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(0, 3) inAttributedString: as];
+}
+
+- (void) testSetAttributes
+{
+	COObjectGraphContext *source = [self makeAttributedString];
+	[self appendString: @"abc" htmlCode: nil toAttributedString: [source rootObject]];
+	
+	COAttributedStringWrapper *as = [COAttributedStringWrapper new];
+	as.backing = [source rootObject];
+	
+	// Underline 'b'
+	[as setAttributes: @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)} range: NSMakeRange(1, 1)];
+	
+	UKObjectsEqual(@"abc", [as string]);
+	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1, 1) inAttributedString: as];
 }
 
 - (void) testTextStorageNotificationsCalled

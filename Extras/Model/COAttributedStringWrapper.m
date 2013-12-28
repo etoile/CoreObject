@@ -123,9 +123,53 @@
 	}
 }
 
+- (COAttributedStringAttribute *) makeAttr: (NSString *)htmlCode
+{
+	COAttributedStringAttribute *attribute = [[COAttributedStringAttribute alloc] initWithObjectGraphContext: [_backing objectGraphContext]];
+	attribute.htmlCode = htmlCode;
+	return attribute;
+}
+
+- (void)setAttributes:(NSDictionary *)attrs forChunk: (COAttributedStringChunk *)aChunk
+{
+	NSMutableSet *newAttribs = [NSMutableSet new];
+	
+	for (NSString *attributeName in attrs)
+	{
+		id attributeValue = attrs[attributeName];
+		
+		if ([attributeName isEqual: NSUnderlineStyleAttributeName] && [attributeValue isEqual: @(NSUnderlineStyleSingle)])
+		{
+			[newAttribs addObject: [self makeAttr: @"u"]];
+		}
+	}
+	
+	aChunk.attributes = newAttribs;
+}
+
 - (void)setAttributes: (NSDictionary *)aDict range: (NSRange)aRange
 {
+	if (aRange.length == 0)
+	{
+		return;
+	}
 	
+	// TODO: We could avoid splitting if the given range already has exactly
+	// the right attributes
+	
+	const NSUInteger splitChunk1 = [_backing splitChunkAtIndex: aRange.location];
+	const NSUInteger splitChunk2 = [_backing splitChunkAtIndex: NSMaxRange(aRange)];
+	
+	ETAssert(splitChunk2 > splitChunk1);
+	
+	// Set all chunks from splitChunk1, up to but not including splitChunk2, to
+	// have the attributes in aDict
+	
+	for (NSUInteger i = splitChunk1; i < splitChunk2; i++)
+	{
+		COAttributedStringChunk *chunk = _backing.chunks[i];
+		[self setAttributes: aDict forChunk: chunk];
+	}
 }
 
 @end
