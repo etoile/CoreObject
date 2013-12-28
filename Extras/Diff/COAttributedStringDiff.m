@@ -162,6 +162,11 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
+	const NSInteger deletionStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
+	const NSInteger deletionEndChunkIndex = [target splitChunkAtIndex: NSMaxRange(range) + offset];
+	
+	[[target mutableArrayValueForKey: @"chunks"] removeObjectsInRange: NSMakeRange(deletionStartChunkIndex, deletionEndChunkIndex - deletionStartChunkIndex)];
+	
 	return -range.length;
 }
 
@@ -172,7 +177,18 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
-	return 0;
+	COObjectGraphContext *targetCtx = [target objectGraphContext];
+	
+	[targetCtx insertOrUpdateItems: [attributedStringItemGraph items]];
+	COAttributedString *sourceString = [targetCtx loadedObjectForUUID: [attributedStringItemGraph rootItemUUID]];
+	
+	const NSInteger deletionStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
+	const NSInteger deletionEndChunkIndex = [target splitChunkAtIndex: NSMaxRange(range) + offset];
+	
+	[[target mutableArrayValueForKey: @"chunks"] replaceObjectsInRange: NSMakeRange(deletionStartChunkIndex, deletionEndChunkIndex - deletionStartChunkIndex)
+												  withObjectsFromArray: sourceString.chunks];
+	
+	return [sourceString length] - range.length;
 }
 
 @end
@@ -182,6 +198,18 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
+	[target.objectGraphContext insertOrUpdateItems: [attributeItemGraph items]];
+	COAttributedStringAttribute *attributeToAdd = [target.objectGraphContext loadedObjectForUUID: [attributeItemGraph rootItemUUID]];
+	
+	const NSInteger editStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
+	const NSInteger editEndChunkIndex = [target splitChunkAtIndex: NSMaxRange(range) + offset];
+
+	for (NSUInteger chunkIndex = editStartChunkIndex; chunkIndex < editEndChunkIndex; chunkIndex++)
+	{
+		COAttributedStringChunk *chunk = target.chunks[chunkIndex];
+		[[chunk mutableSetValueForKey: @"attributes"] addObject: attributeToAdd];
+	}
+		
 	return 0;
 }
 
@@ -192,6 +220,25 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
+	[target.objectGraphContext insertOrUpdateItems: [attributeItemGraph items]];
+	COAttributedStringAttribute *attributeToRemove = [target.objectGraphContext loadedObjectForUUID: [attributeItemGraph rootItemUUID]];
+	
+	const NSInteger editStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
+	const NSInteger editEndChunkIndex = [target splitChunkAtIndex: NSMaxRange(range) + offset];
+	
+	for (NSUInteger chunkIndex = editStartChunkIndex; chunkIndex < editEndChunkIndex; chunkIndex++)
+	{
+		COAttributedStringChunk *chunk = target.chunks[chunkIndex];
+		
+		for (COAttributedStringAttribute *attribute in [chunk.attributes copy])
+		{
+			if ([attribute.htmlCode isEqualToString: attributeToRemove.htmlCode])
+			{
+				[[chunk mutableSetValueForKey: @"attributes"] removeObject: attribute];
+			}
+		}
+	}
+	
 	return 0;
 }
 
