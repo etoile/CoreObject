@@ -117,6 +117,11 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 
 #pragma mark - Diff Application
 
+- (void) addOperationsFromDiff: (COAttributedStringDiff *)aDiff
+{
+	[_operations addObjectsFromArray: aDiff.operations];
+}
+
 - (void) applyToAttributedString: (COAttributedString *)target
 {
 	NSInteger i = 0;
@@ -143,7 +148,7 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	[targetCtx insertOrUpdateItems: [attributedStringItemGraph items]];
 	
 	COAttributedString *sourceString = [targetCtx loadedObjectForUUID: [attributedStringItemGraph rootItemUUID]];
-	
+	const NSUInteger sourceStringLength = [sourceString length];
 	const NSInteger insertionPosChunkIndex = [target splitChunkAtIndex: insertionPos];
 		
 	// FIXME: Why is -insertObjects:atIndexes:hints:forProperty: private?!
@@ -152,7 +157,7 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 					hints: nil
 			  forProperty: @"chunks"];
 	
-	return [sourceString length];
+	return sourceStringLength;
 }
 
 @end
@@ -181,6 +186,7 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	
 	[targetCtx insertOrUpdateItems: [attributedStringItemGraph items]];
 	COAttributedString *sourceString = [targetCtx loadedObjectForUUID: [attributedStringItemGraph rootItemUUID]];
+	const NSUInteger sourceStringLength = [sourceString length];
 	
 	const NSInteger deletionStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
 	const NSInteger deletionEndChunkIndex = [target splitChunkAtIndex: NSMaxRange(range) + offset];
@@ -188,7 +194,7 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	[[target mutableArrayValueForKey: @"chunks"] replaceObjectsInRange: NSMakeRange(deletionStartChunkIndex, deletionEndChunkIndex - deletionStartChunkIndex)
 												  withObjectsFromArray: sourceString.chunks];
 	
-	return [sourceString length] - range.length;
+	return sourceStringLength - range.length;
 }
 
 @end

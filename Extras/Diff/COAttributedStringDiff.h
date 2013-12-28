@@ -30,6 +30,8 @@
               secondAttributedString: (COAttributedString *)second
 							  source: (id)source;
 
+- (void) addOperationsFromDiff: (COAttributedStringDiff *)aDiff;
+
 - (void) applyToAttributedString: (COAttributedString *)target;
 
 @end

@@ -5,18 +5,55 @@
     License:  MIT  (see COPYING)
  */
 
-#import "TestCommon.h"
+#import "TestAttributedStringCommon.h"
 
-@interface TestAttributedString : TestCase <UKTest>
+@interface TestAttributedString : TestAttributedStringCommon <UKTest>
 @end
 
 @implementation TestAttributedString
 
-- (COAttributedStringAttribute *) makeAttr: (NSString *)htmlCode inCtx: (COObjectGraphContext *)ctx
+- (void) testDiffInsertion
 {
-	COAttributedStringAttribute *attribute = [ctx insertObjectWithEntityName: @"COAttributedStringAttribute"];
-	attribute.htmlCode = htmlCode;
-	return attribute;
+	/*
+	 ctx1:
+	 
+	 "()"
+	 
+	 */
+	
+	COObjectGraphContext *ctx1 = [self makeAttributedString];
+	[self appendString: @"()" htmlCode: nil toAttributedString: [ctx1 rootObject]];
+	
+	
+	/*
+	 ctx2:
+	 
+	 "(abc)"
+	    ^^
+	    bold
+	 
+	 */
+	
+	COObjectGraphContext *ctx2 = [self makeAttributedString];
+	[self appendString: @"(a" htmlCode: nil toAttributedString: [ctx2 rootObject]];
+	[self appendString: @"bc" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
+	[self appendString: @")" htmlCode: nil toAttributedString: [ctx2 rootObject]];
+	
+	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
+																			secondAttributedString: [ctx2 rootObject]
+																							source: nil];
+	
+	UKIntsEqual(1, [diff12.operations count]);
+	COAttributedStringDiffOperationInsertAttributedSubstring *op = diff12.operations[0];
+	UKObjectKindOf(op, COAttributedStringDiffOperationInsertAttributedSubstring);
+	UKIntsEqual(1, op.range.location);
+
+	[op applyOperationToAttributedString: [ctx1 rootObject] withOffset: 0];
+	
+	// NOTE: It would also be valid if the first two characters '(' and 'a' were joined.
+	
+	UKObjectsEqual(A(@"(", @"a", @"bc", @")"), [[ctx1 rootObject] valueForKeyPath: @"chunks.text"]);
+	UKObjectsEqual(A(S(), S(), S(@"b"), S()), [[ctx1 rootObject] valueForKeyPath: @"chunks.attributes.htmlCode"]);
 }
 
 - (void) testMerge
@@ -28,13 +65,9 @@
 	 	 
 	 */
 	
-	COObjectGraphContext *ctx1 = [COObjectGraphContext new];
-	COAttributedString *ctx1String = [ctx1 insertObjectWithEntityName: @"COAttributedString"];
-	COAttributedStringChunk *ctx1Chunk1 = [ctx1 insertObjectWithEntityName: @"COAttributedStringChunk"];
-		
-	ctx1.rootObject = ctx1String;
-	ctx1String.chunks = @[ctx1Chunk1];
-	ctx1Chunk1.text = @"abc";
+	COObjectGraphContext *ctx1 = [self makeAttributedString];
+	[self appendString: @"abc" htmlCode: nil toAttributedString: [ctx1 rootObject]];
+
 	
 	/*
 	 ctx2:
@@ -45,17 +78,10 @@
 	 
 	 */
 	
-	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
-	[ctx2 setItemGraph: ctx1];
-	COAttributedString *ctx2String = ctx2.rootObject;
-	COAttributedStringChunk *ctx2Chunk1 = ctx2String.chunks[0];
-	COAttributedStringChunk *ctx2Chunk2 = [ctx2 insertObjectWithEntityName: @"COAttributedStringChunk"];
+	COObjectGraphContext *ctx2 = [self makeAttributedString];
+	[self appendString: @"ab" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
+	[self appendString: @"c" htmlCode: nil toAttributedString: [ctx2 rootObject]];
 	
-	ctx2String.chunks = @[ctx2Chunk1, ctx2Chunk2];
-	ctx2Chunk1.text = @"ab";
-	ctx2Chunk1.attributes = S([self makeAttr: @"b" inCtx: ctx2]);
-	ctx2Chunk2.text = @"c";
-
 	/*
 	 ctx3:
 	 
@@ -66,30 +92,17 @@
 	 */
 
 	
-	COObjectGraphContext *ctx3 = [COObjectGraphContext new];
-	[ctx3 setItemGraph: ctx1];
-	COAttributedString *ctx3String = ctx3.rootObject;
-	COAttributedStringChunk *ctx3Chunk1 = ctx3String.chunks[0];
-	COAttributedStringChunk *ctx3Chunk2 = [ctx3 insertObjectWithEntityName: @"COAttributedStringChunk"];
+	COObjectGraphContext *ctx3 = [self makeAttributedString];
+	[self appendString: @"da" htmlCode: nil toAttributedString: [ctx3 rootObject]];
+	[self appendString: @"bc" htmlCode: @"i" toAttributedString: [ctx3 rootObject]];
 	
-	ctx3String.chunks = @[ctx3Chunk1, ctx3Chunk2];
-	ctx3Chunk1.text = @"da";
-	ctx3Chunk2.text = @"bc";
-	ctx3Chunk2.attributes = S([self makeAttr: @"i" inCtx: ctx3]);
+	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
+																			secondAttributedString: [ctx2 rootObject]
+																							source: @"diff12"];
 	
-	COAttributedStringWrapper *wrapper = [COAttributedStringWrapper new];
-	wrapper.backing = ctx3String;
-
-	[[wrapper RTFFromRange: NSMakeRange(0, [wrapper length]) documentAttributes: nil]
-	 writeToFile: [@"~/test.rtf" stringByExpandingTildeInPath]
-	 atomically: YES];
-	
-//	[ctx1 showGraph];
-//	[ctx2 showGraph];
-//	[ctx3 showGraph];
-	
-	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: ctx1String secondAttributedString: ctx2String source: @"diff12"];
-    COAttributedStringDiff *diff13 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: ctx1String secondAttributedString: ctx3String source: @"diff13"];
+    COAttributedStringDiff *diff13 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
+																			secondAttributedString: [ctx3 rootObject]
+																							source: @"diff13"];
 	
 //	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
 //	

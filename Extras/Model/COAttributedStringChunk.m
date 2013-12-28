@@ -22,7 +22,13 @@
 	attributesProperty.multivalued = YES;
 	attributesProperty.persistent = YES;
 	
-	[entity setPropertyDescriptions: @[textProperty, attributesProperty]];
+	ETPropertyDescription *parentStringProperty = [ETPropertyDescription descriptionWithName: @"parentString"
+																						type: (id)@"COAttributedString"];
+	parentStringProperty.multivalued = NO;
+	parentStringProperty.derived = YES;
+	parentStringProperty.opposite = (id)@"Anonymous.COAttributedString.chunks";
+	
+	[entity setPropertyDescriptions: @[textProperty, attributesProperty, parentStringProperty]];
     return entity;
 }
 @dynamic text, attributes;

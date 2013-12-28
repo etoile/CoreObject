@@ -82,6 +82,8 @@
     
     for (ETUUID *uuid in compositeObjectCopySet)
     {
+		// FIXME: This isn't intuitive... we just copy one layer deep of non-composite references 
+		
         for (ETUUID *referenced in [[source itemForUUID: uuid] referencedItemUUIDs])
         {
             if (![compositeObjectCopySet containsObject: referenced])

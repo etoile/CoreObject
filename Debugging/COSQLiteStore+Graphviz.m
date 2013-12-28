@@ -163,6 +163,11 @@ void COViewDOTGraphFile(NSString *dotFilePath)
 
 	for (NSString *executablePath in @[@"/usr/bin/dot", @"/usr/local/bin/dot"])
 	{
+		if (![[NSFileManager defaultManager] fileExistsAtPath: executablePath])
+		{
+			continue;
+		}
+		
 		@try
 		{
 			NSTask *task = [NSTask launchedTaskWithLaunchPath: executablePath arguments: @[@"-Tpdf", dotFilePath, @"-o", pdfPath]];

@@ -10,6 +10,8 @@
 
 // FIXME: Hack to get -insertObjects:atIndexes:hints:forProperty:
 #import "COObject+Private.h"
+#import "COObjectGraphContext+Private.h"
+#import "COObjectGraphContext+Graphviz.h"
 
 @implementation COAttributedString
 
@@ -23,6 +25,7 @@
 	chunksProperty.multivalued = YES;
 	chunksProperty.ordered = YES;
 	chunksProperty.persistent = YES;
+	chunksProperty.opposite = (id)@"Anonymous.COAttributedStringChunk.parentString";
 	
 	[entity setPropertyDescriptions: @[chunksProperty]];
     return entity;
@@ -32,10 +35,24 @@
 
 - (COItemGraph *) substringItemGraphWithRange: (NSRange)aRange
 {
-	COItemGraph *result = [[COItemGraph alloc] init];
+	// Copy the receiver into a temporary context
+	COObjectGraphContext *tempCtx = [COObjectGraphContext new];
 	
-	// FIXME: Implement
+	COCopier *copier = [COCopier new];
+	ETUUID *copyUUID = [copier copyItemWithUUID: [self UUID] fromGraph: self.objectGraphContext toGraph: tempCtx];
+	COAttributedString *tempCopy = [tempCtx loadedObjectForUUID: copyUUID];
+	[tempCtx setRootObject: tempCopy];
 	
+	// Split the copy with the given range
+	NSUInteger start = [tempCopy splitChunkAtIndex: aRange.location];
+	NSUInteger end = [tempCopy splitChunkAtIndex: aRange.location + aRange.length];
+	
+	// Remove all chunks outside the requested range.
+	tempCopy.chunks = [tempCopy.chunks subarrayWithRange: NSMakeRange(start, end-start)];
+	
+	[tempCtx removeUnreachableObjects];
+	
+	COItemGraph *result = [[COItemGraph alloc] initWithItemGraph: tempCtx];
 	return result;
 }
 
