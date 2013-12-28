@@ -142,6 +142,19 @@
 		{
 			[newAttribs addObject: [self makeAttr: @"u"]];
 		}
+		else if ([attributeName isEqual: NSFontAttributeName])
+		{
+			NSFont *font = attributeValue;
+			NSFontSymbolicTraits traits = [[font fontDescriptor] symbolicTraits];
+			if ((traits & NSFontBoldTrait) == NSFontBoldTrait)
+			{
+				[newAttribs addObject: [self makeAttr: @"b"]];
+			}
+			if ((traits & NSFontItalicTrait) == NSFontItalicTrait)
+			{
+				[newAttribs addObject: [self makeAttr: @"i"]];
+			}
+		}
 	}
 	
 	aChunk.attributes = newAttribs;

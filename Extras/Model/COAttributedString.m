@@ -82,6 +82,9 @@
 
 - (NSUInteger) splitChunkAtIndex: (NSUInteger)characterIndex
 {
+	if (characterIndex == [self length])
+		return [self.chunks count];
+	
 	NSUInteger chunkIndex = 0, chunkStart = 0;
 	COAttributedStringChunk *chunk = [self chunkContainingIndex: characterIndex chunkStart: &chunkStart chunkIndex: &chunkIndex];
 	

@@ -15,7 +15,10 @@
 - (void) checkAttribute: (NSString *)attributeName hasValue: (id)expectedValue withLongestEffectiveRange: (NSRange)expectedRange inAttributedString: (NSAttributedString *)target
 {
 	NSRange actualRange;
-	id actualValue = [target attribute: attributeName atIndex: expectedRange.location effectiveRange: &actualRange];
+	id actualValue = [target attribute: attributeName
+							   atIndex: expectedRange.location
+				 longestEffectiveRange: &actualRange
+							   inRange: NSMakeRange(0, [target length])];
 	
 	if (expectedValue == nil)
 	{
@@ -30,20 +33,35 @@
 	UKIntsEqual(expectedRange.length, actualRange.length);
 }
 
+- (void) checkFontHasTraits: (NSFontSymbolicTraits)traits withLongestEffectiveRange: (NSRange)expectedRange inAttributedString: (NSAttributedString *)target
+{
+	NSRange actualRange;
+	NSFont *actualFont = [target attribute: NSFontAttributeName
+								   atIndex: expectedRange.location
+					 longestEffectiveRange: &actualRange
+								   inRange: NSMakeRange(0, [target length])];
+	
+	NSFontSymbolicTraits actualTraits = [[actualFont fontDescriptor] symbolicTraits];
+	
+	UKTrue((actualTraits & traits) == traits);
+	
+	UKIntsEqual(expectedRange.location, actualRange.location);
+	UKIntsEqual(expectedRange.length, actualRange.length);
+}
+
 - (void) testWrapperBasic
 {
 	COObjectGraphContext *source = [self makeAttributedString];
 	[self appendString: @"X" htmlCode: @"b" toAttributedString: [source rootObject]];
 	[self appendString: @"Y" htmlCode: @"u" toAttributedString: [source rootObject]];
 	
-	COAttributedStringWrapper *wrapper = [COAttributedStringWrapper new];
-	wrapper.backing = [source rootObject];
+	COAttributedStringWrapper *as = [COAttributedStringWrapper new];
+	as.backing = [source rootObject];
 			
-	UKIntsEqual(2, [wrapper length]);
+	UKIntsEqual(2, [as length]);
 	
-	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1, 1) inAttributedString: wrapper];
-	
-	// TODO: Check bold font
+	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1, 1) inAttributedString: as];
+	[self checkFontHasTraits: NSFontBoldTrait withLongestEffectiveRange: NSMakeRange(0, 1) inAttributedString: as];
 }
 
 - (void) testWrapperInsertCharacters
@@ -89,6 +107,7 @@
 	UKObjectsEqual(@"ab-hi", [as string]);
 	
 	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(0, 3) inAttributedString: as];
+	[self checkFontHasTraits: NSFontItalicTrait withLongestEffectiveRange: NSMakeRange(3, 2) inAttributedString: as];
 }
 
 - (void) testSetAttributes
@@ -99,11 +118,18 @@
 	COAttributedStringWrapper *as = [COAttributedStringWrapper new];
 	as.backing = [source rootObject];
 	
-	// Underline 'b'
+	NSFontManager *fm = [NSFontManager sharedFontManager];
+	NSFont *bold = [fm convertFont: [NSFont userFontOfSize: 12] toHaveTrait: NSFontBoldTrait];
+	NSFont *boldItalic = [fm convertFont: bold toHaveTrait: NSFontItalicTrait];
+	
+	[as setAttributes: @{NSFontAttributeName : bold} range: NSMakeRange(0, 1)];
 	[as setAttributes: @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)} range: NSMakeRange(1, 1)];
+	[as setAttributes: @{NSFontAttributeName : boldItalic} range: NSMakeRange(2, 1)];
 	
 	UKObjectsEqual(@"abc", [as string]);
+	[self checkFontHasTraits: NSFontBoldTrait withLongestEffectiveRange: NSMakeRange(0, 1) inAttributedString: as];
 	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1, 1) inAttributedString: as];
+	[self checkFontHasTraits: NSFontBoldTrait | NSFontItalicTrait withLongestEffectiveRange: NSMakeRange(2, 1) inAttributedString: as];
 }
 
 - (void) testTextStorageNotificationsCalled
