@@ -9,6 +9,8 @@
 
 @class ETUUID;
 
+void COViewDOTGraphFile(NSString *path);
+
 @interface COSQLiteStore (Debugging)
 
 - (NSString *) dotGraphForPersistentRootUUID: (ETUUID *)aUUID;

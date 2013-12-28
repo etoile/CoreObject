@@ -11,6 +11,7 @@
 #import "CORevisionInfo.h"
 #import "COPersistentRootInfo.h"
 #import "COBranchInfo.h"
+#import <AppKit/AppKit.h>
 
 @implementation COSQLiteStore (Debugging)
 
@@ -150,10 +151,33 @@
 						  rand()];
 	
 	NSString *dotGraphPath = [basePath stringByAppendingPathExtension: @"gv"];
-	NSString *pdfPath = [basePath stringByAppendingPathExtension: @"pdf"];
+	
 	[[self dotGraphForPersistentRootUUID: aUUID] writeToFile: dotGraphPath atomically: YES encoding: NSUTF8StringEncoding error: NULL];
 	
-	system([[NSString stringWithFormat: @"dot -Tpdf %@ -o %@ && open %@", dotGraphPath, pdfPath, pdfPath] UTF8String]);
+	COViewDOTGraphFile(dotGraphPath);
+}
+
+void COViewDOTGraphFile(NSString *dotFilePath)
+{
+	NSString *pdfPath = [dotFilePath stringByAppendingPathExtension: @"pdf"];
+
+	for (NSString *executablePath in @[@"/usr/bin/dot", @"/usr/local/bin/dot"])
+	{
+		@try
+		{
+			NSTask *task = [NSTask launchedTaskWithLaunchPath: executablePath arguments: @[@"-Tpdf", dotFilePath, @"-o", pdfPath]];
+			[task waitUntilExit];
+			
+			if ([task terminationStatus] == 0)
+			{
+				[[NSWorkspace sharedWorkspace] openFile: pdfPath];
+				break;
+			}
+		}
+		@catch (NSException *exc)
+		{
+		}
+	}
 }
 
 @end

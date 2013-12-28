@@ -42,8 +42,6 @@ First alpha release blockers
 
 - Update website
 
-- Fix graphviz launching to find /usr/local/bin/dot 
-
 Future Work
 -----------
 

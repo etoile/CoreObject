@@ -7,6 +7,7 @@
 
 #import <CoreObject/CoreObject.h>
 #import "COObjectGraphContext+Graphviz.h"
+#import "COSQLiteStore+Graphviz.h"
 
 static NSString *COGraphvizNodeNameForUUID(ETUUID *aUUID)
 {
@@ -222,10 +223,9 @@ void COGraphvizShowGraph(id<COItemGraph> graph)
 						  rand()];
 	
 	NSString *dotGraphPath = [basePath stringByAppendingPathExtension: @"gv"];
-	NSString *pdfPath = [basePath stringByAppendingPathExtension: @"pdf"];
 	[COGraphvizDotFileForItemGraph(graph) writeToFile: dotGraphPath atomically: YES encoding: NSUTF8StringEncoding error: NULL];
 	
-	system([[NSString stringWithFormat: @"dot -Tpdf %@ -o %@ && open %@", dotGraphPath, pdfPath, pdfPath] UTF8String]);
+	COViewDOTGraphFile(dotGraphPath);
 }
 
 @implementation COObjectGraphContext (Graphviz)
