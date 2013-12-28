@@ -77,6 +77,10 @@
 			{
 				font = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSFontItalicTrait];
 			}
+			if ([attr.htmlCode isEqualToString: @"u"])
+			{
+				result[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+			}
 		}
 		
 		result[NSFontAttributeName] = font;
@@ -91,8 +95,34 @@
 
 - (void)replaceCharactersInRange: (NSRange)aRange withString: (NSString *)aString
 {
+	NSUInteger chunkIndex = 0, chunkStart = 0;
+	COAttributedStringChunk *chunk = [_backing chunkContainingIndex: aRange.location chunkStart: &chunkStart chunkIndex: &chunkIndex];
+	const NSUInteger chunkLength = [[chunk text] length];
 	
+	const NSUInteger indexInChunk = aRange.location - chunkStart;
+	NSUInteger lengthInChunkToReplace = aRange.length;
+	if (indexInChunk + lengthInChunkToReplace > chunkLength)
+	{
+		lengthInChunkToReplace = chunkLength - indexInChunk;
+	}
+	
+	NSString *newText = [chunk.text stringByReplacingCharactersInRange: NSMakeRange(indexInChunk, lengthInChunkToReplace) withString: aString];
+	chunk.text = newText;
+	
+	NSUInteger remainingLengthToDelete = aRange.length - lengthInChunkToReplace;
+	
+	while (remainingLengthToDelete > 0)
+	{
+		// Scan forward through the following chunks, trimming text as needed
+
+		chunk = _backing.chunks[++chunkIndex];
+
+		lengthInChunkToReplace = MIN([[chunk text] length], remainingLengthToDelete);
+		chunk.text = [chunk.text stringByReplacingCharactersInRange: NSMakeRange(0, lengthInChunkToReplace) withString: @""];
+		remainingLengthToDelete -= lengthInChunkToReplace;
+	}
 }
+
 - (void)setAttributes: (NSDictionary *)aDict range: (NSRange)aRange
 {
 	

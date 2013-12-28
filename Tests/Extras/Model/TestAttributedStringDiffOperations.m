@@ -5,42 +5,12 @@
 	License:  MIT  (see COPYING)
  */
 
-#import "TestCommon.h"
+#import "TestAttributedStringCommon.h"
 
-@interface TestAttributedStringDiffOperations : TestCase <UKTest>
+@interface TestAttributedStringDiffOperations : TestAttributedStringCommon <UKTest>
 @end
 
 @implementation TestAttributedStringDiffOperations
-
-- (COAttributedStringAttribute *) makeAttr: (NSString *)htmlCode inCtx: (COObjectGraphContext *)ctx
-{
-	COAttributedStringAttribute *attribute = [ctx insertObjectWithEntityName: @"COAttributedStringAttribute"];
-	attribute.htmlCode = htmlCode;
-	return attribute;
-}
-
-- (COObjectGraphContext *) makeAttributedString
-{
-	COObjectGraphContext *ctx1 = [COObjectGraphContext new];
-	COAttributedString *ctx1String = [ctx1 insertObjectWithEntityName: @"COAttributedString"];
-	ctx1.rootObject = ctx1String;
-	return ctx1;
-}
-
-- (void) appendString: (NSString *)string htmlCode: (NSString *)aCode toAttributedString: (COAttributedString *)dest
-{
-	COObjectGraphContext *ctx = [dest objectGraphContext];
-	COAttributedStringChunk *chunk = [ctx insertObjectWithEntityName: @"COAttributedStringChunk"];
-	chunk.text = string;
-	
-	if (aCode != nil)
-	{
-		chunk.attributes = S([self makeAttr: aCode inCtx: ctx]);
-	}
-
-	[dest insertObject: chunk atIndex: ETUndeterminedIndex hint: nil forProperty: @"chunks"];
-}
-
 
 - (void) testInsertAttributedSubstring
 {
