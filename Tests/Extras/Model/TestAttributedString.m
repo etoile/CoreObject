@@ -56,6 +56,49 @@
 	UKObjectsEqual(A(S(), S(), S(@"b"), S()), [[ctx1 rootObject] valueForKeyPath: @"chunks.attributes.htmlCode"]);
 }
 
+- (void) testDiffDeletion
+{
+	COObjectGraphContext *ctx1 = [self makeAttributedString];
+	[self appendString: @"abc" htmlCode: @"b" toAttributedString: [ctx1 rootObject]];
+	[self appendString: @"def" htmlCode: @"i" toAttributedString: [ctx1 rootObject]];
+	[self appendString: @"ghi" htmlCode: @"u" toAttributedString: [ctx1 rootObject]];
+	
+	COObjectGraphContext *ctx2 = [self makeAttributedString];
+	[self appendString: @"a" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
+	[self appendString: @"i" htmlCode: @"u" toAttributedString: [ctx2 rootObject]];
+	
+	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
+																			secondAttributedString: [ctx2 rootObject]
+																							source: nil];
+	
+	UKIntsEqual(1, [diff12.operations count]);
+	COAttributedStringDiffOperationDeleteRange *op = diff12.operations[0];
+	UKObjectKindOf(op, COAttributedStringDiffOperationDeleteRange);
+	UKIntsEqual(1, op.range.location);
+	UKIntsEqual(7, op.range.length);
+}
+
+- (void) testDiffReplacement
+{
+	COObjectGraphContext *ctx1 = [self makeAttributedString];
+	[self appendString: @"abcdefg" htmlCode: @"b" toAttributedString: [ctx1 rootObject]];
+	
+	COObjectGraphContext *ctx2 = [self makeAttributedString];
+	[self appendString: @"ab" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
+	[self appendString: @"CDE" htmlCode: @"u" toAttributedString: [ctx2 rootObject]];
+	[self appendString: @"fg" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
+	
+	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
+																			secondAttributedString: [ctx2 rootObject]
+																							source: nil];
+	
+	UKIntsEqual(1, [diff12.operations count]);
+	COAttributedStringDiffOperationReplaceRange *op = diff12.operations[0];
+	UKObjectKindOf(op, COAttributedStringDiffOperationReplaceRange);
+	UKIntsEqual(2, op.range.location);
+	UKIntsEqual(3, op.range.length);
+}
+
 - (void) testMerge
 {
 	/*
@@ -104,11 +147,8 @@
 																			secondAttributedString: [ctx3 rootObject]
 																							source: @"diff13"];
 	
-//	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
-//	
-//	COObjectGraphContext *ctxMerged = [COObjectGraphContext new];
-//	[ctxMerged setItemGraph: ctx1];
-//	[merged applyTo: ctxMerged];
+	[diff12 addOperationsFromDiff: diff13];
+	[diff12 applyToAttributedString: [ctx1 rootObject]];
 	
 	/*
 	 ctxExpected:
@@ -118,12 +158,14 @@
 	   bold
 	    ^^
 		italic
-	   
-	 Note that the merge process will introduce new objects when it splits chunks, so we can't
-	 just build the expected object graph ahead of time but have to do the merge and inspect
-	 the result.
-	 
+	   	
 	 */
+	
+//	COAttributedStringWrapper *wrapper = [COAttributedStringWrapper new];
+//	wrapper.backing = [ctx1 rootObject];
+//	[[wrapper RTFFromRange: NSMakeRange(0, [wrapper length]) documentAttributes: nil]
+//	 writeToFile: [@"~/test.rtf" stringByExpandingTildeInPath]
+//	 atomically: YES];
 	
 	UKPass();
 }
