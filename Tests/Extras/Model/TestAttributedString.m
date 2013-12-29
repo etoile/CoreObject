@@ -214,13 +214,8 @@
 	   	
 	 */
 	
-//	COAttributedStringWrapper *wrapper = [COAttributedStringWrapper new];
-//	wrapper.backing = [ctx1 rootObject];
-//	[[wrapper RTFFromRange: NSMakeRange(0, [wrapper length]) documentAttributes: nil]
-//	 writeToFile: [@"~/test.rtf" stringByExpandingTildeInPath]
-//	 atomically: YES];
-	
-	UKPass();
+	UKObjectsEqual(A(@"d", @"a",    @"b",          @"c"), [[ctx1 rootObject] valueForKeyPath: @"chunks.text"]);
+	UKObjectsEqual(A(S(),  S(@"b"), S(@"b", @"i"), S(@"i")), [[ctx1 rootObject] valueForKeyPath: @"chunks.attributes.htmlCode"]);
 }
 
 @end
