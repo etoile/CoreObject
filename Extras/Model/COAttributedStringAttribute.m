@@ -21,6 +21,32 @@
 	[entity setPropertyDescriptions: @[htmlCodeProperty]];
     return entity;
 }
+
 @dynamic htmlCode;
+
+- (NSUInteger) hash
+{
+	return [self.htmlCode hash];
+}
+
+- (BOOL) isEqual: (id)anObject
+{
+	if (![anObject isKindOfClass: [COAttributedStringAttribute class]])
+		return NO;
+	
+	COAttributedStringAttribute *anAttribute = anObject;
+	return [self.htmlCode isEqual: anAttribute.htmlCode];
+}
+
+- (COItemGraph *) attributeItemGraph
+{
+	COItemGraph *result = [[COItemGraph alloc] init];
+	
+	COCopier *copier = [COCopier new];
+	ETUUID *copyUUID = [copier copyItemWithUUID: [self UUID] fromGraph: self.objectGraphContext toGraph: result];
+	[result setRootItemUUID: copyUUID];
+	
+	return result;
+}
 
 @end

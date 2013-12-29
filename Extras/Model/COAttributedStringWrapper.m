@@ -46,7 +46,7 @@
 	{
 		if (aRangeOut != NULL)
 		{
-			*aRangeOut = NSMakeRange(chunkStart, [target.text length]);
+			*aRangeOut = NSMakeRange(chunkStart, target.length);
 		}
 		
 		NSMutableDictionary *result = [NSMutableDictionary new];

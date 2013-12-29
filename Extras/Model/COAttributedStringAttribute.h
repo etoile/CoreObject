@@ -11,4 +11,11 @@
 
 @property (nonatomic, readwrite, strong) NSString *htmlCode;
 
+/**
+ * Overridden. Compares htmlCode.
+ */
+- (BOOL) isEqual: (id)anObject;
+
+- (COItemGraph *) attributeItemGraph;
+
 @end

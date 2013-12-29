@@ -105,14 +105,80 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	[_operations addObject: op];
 }
 
-- (void) recordCopyRangeA: (NSRange)rangeInA rangeB: (NSRange)rangeInB
+- (void) recordAddAttribute: (COAttributedStringAttribute *)attr toRangeA: (NSRange)rangeInA
+{
+	COItemGraph *graph = [attr attributeItemGraph];
+	
+	COAttributedStringDiffOperationAddAttribute *op = [COAttributedStringDiffOperationAddAttribute new];
+	op.range = rangeInA;
+	op.source = _source;
+	op.attributeItemGraph = graph;
+	
+	[_operations addObject: op];
+}
+
+- (void) recordRemoveAttribute: (COAttributedStringAttribute *)attr toRangeA: (NSRange)rangeInA
+{
+	COItemGraph *graph = [attr attributeItemGraph];
+	
+	COAttributedStringDiffOperationRemoveAttribute *op = [COAttributedStringDiffOperationRemoveAttribute new];
+	op.range = rangeInA;
+	op.source = _source;
+	op.attributeItemGraph = graph;
+	
+	[_operations addObject: op];
+}
+
+- (void) recordCopyRangeA: (NSRange)firstRange rangeB: (NSRange)secondRange
 {
 	// The textual content of these regions is unchanged. Iterate
 	// through the attributes and see if they are the same too.
 	
-	assert(rangeInA.length == rangeInB.length);
+	ETAssert(firstRange.length == secondRange.length);
 	
-	// FIXME: Implement
+	NSUInteger i=0;
+	while (i<firstRange.length)
+	{
+		NSRange rangeAtIForFirstString;
+		NSRange rangeAtIForSecondString;
+		NSSet *firstAttributes = [_first attributesSetAtIndex: firstRange.location + i
+										longestEffectiveRange: &rangeAtIForFirstString
+													  inRange: firstRange];
+		NSSet *secondAttributes = [_second attributesSetAtIndex: secondRange.location + i
+										  longestEffectiveRange: &rangeAtIForSecondString
+														inRange: secondRange];
+		
+		ETAssert(rangeAtIForFirstString.location >= firstRange.location);
+		ETAssert(rangeAtIForSecondString.location >= secondRange.location);
+		
+		const NSUInteger minLength = MIN(rangeAtIForFirstString.length, rangeAtIForSecondString.length);
+		ETAssert(minLength >= 1);
+		const NSRange consideredRangeForFirstString = NSMakeRange(rangeAtIForFirstString.location,  minLength);
+		
+		if (![firstAttributes isEqual: secondAttributes])
+		{
+			{
+				NSMutableSet *removed = [NSMutableSet setWithSet: firstAttributes];
+				[removed minusSet: secondAttributes];
+				
+				for (COAttributedStringAttribute *attr in removed)
+				{
+					[self recordRemoveAttribute: attr toRangeA: consideredRangeForFirstString];
+				}
+			}
+			{
+				NSMutableSet *added = [NSMutableSet setWithSet: secondAttributes];
+				[added minusSet: firstAttributes];
+				
+				for (COAttributedStringAttribute *attr in added)
+				{
+					[self recordAddAttribute: attr toRangeA: consideredRangeForFirstString];
+				}
+			}
+		}
+		
+		i += minLength;
+	}
 }
 
 #pragma mark - Diff Application

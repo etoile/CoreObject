@@ -63,7 +63,7 @@
 	
 	for (COAttributedStringChunk *chunk in self.chunks)
 	{
-		const NSUInteger chunkLen = [chunk.text length];
+		const NSUInteger chunkLen = chunk.length;
 		if (anIndex >= i && anIndex < (i + chunkLen))
 		{
 			target = chunk;
@@ -92,7 +92,7 @@
 	NSUInteger result = 0;
 	for (COAttributedStringChunk *chunk in self.chunks)
 	{
-		result += [chunk.text length];
+		result += chunk.length;
 	}
 	return result;
 }
@@ -138,6 +138,60 @@
 			forProperty: @"chunks"];
 	
 	return chunkIndex + 1;
+}
+
+- (NSSet *) attributesSetAtIndex: (NSUInteger)characterIndex longestEffectiveRange: (NSRange *)rangeOut inRange: (NSRange)rangeLimit
+{
+	NSUInteger chunkIndex = 0, chunkStart = 0;
+	COAttributedStringChunk *chunk = [self chunkContainingIndex: characterIndex chunkStart: &chunkStart chunkIndex: &chunkIndex];
+	NSSet *attribs = chunk.attributes;
+	
+	if (rangeOut != NULL)
+	{
+		NSRange longestEffectiveRange = NSMakeRange(chunkStart, chunk.length);
+
+		// Look left
+		
+		for (NSInteger j=chunkIndex-1; j>=0; j--)
+		{
+			COAttributedStringChunk *leftChunk = self.chunks[j];
+			
+			// NOTE: NSSet of COAttributedStringAttribute comparison works because
+			// COAttributedStringAttribute overrides -isEqual:
+			if ([leftChunk.attributes isEqual: attribs])
+			{
+				longestEffectiveRange.location -= leftChunk.length;
+				longestEffectiveRange.length += leftChunk.length;
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		// Look right
+		
+		for (NSInteger j=chunkIndex+1; j<[self.chunks count]; j++)
+		{
+			COAttributedStringChunk *rightChunk = self.chunks[j];
+			if ([rightChunk.attributes isEqual: attribs])
+			{
+				longestEffectiveRange.length += rightChunk.length;
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		// Trim longestEffectiveRange
+		
+		longestEffectiveRange = NSIntersectionRange(longestEffectiveRange, rangeLimit);
+		
+		*rangeOut = longestEffectiveRange;
+	}
+	
+	return attribs;
 }
 
 @end

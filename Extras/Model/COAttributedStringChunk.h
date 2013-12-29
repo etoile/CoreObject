@@ -16,4 +16,6 @@
  */
 - (COItemGraph *) subchunkItemGraphWithRange: (NSRange)aRange;
 
+@property (nonatomic, readonly) NSUInteger length;
+
 @end

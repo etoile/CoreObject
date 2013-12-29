@@ -51,4 +51,6 @@
  */
 - (NSUInteger) splitChunkAtIndex: (NSUInteger)characterIndex;
 
+- (NSSet *) attributesSetAtIndex: (NSUInteger)characterIndex longestEffectiveRange: (NSRange *)rangeOut inRange: (NSRange)rangeLimit;
+
 @end

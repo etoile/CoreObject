@@ -48,4 +48,9 @@
 	return result;
 }
 
+- (NSUInteger) length
+{
+	return [self.text length];
+}
+
 @end

@@ -99,6 +99,44 @@
 	UKIntsEqual(3, op.range.length);
 }
 
+- (void) testDiffAddAttribute
+{
+	COObjectGraphContext *ctx1 = [self makeAttributedString];
+	[self appendString: @"abc" htmlCode: nil toAttributedString: [ctx1 rootObject]];
+	
+	COObjectGraphContext *ctx2 = [self makeAttributedString];
+	[self appendString: @"abc" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
+	
+	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
+																			secondAttributedString: [ctx2 rootObject]
+																							source: nil];
+	
+	UKIntsEqual(1, [diff12.operations count]);
+	COAttributedStringDiffOperationAddAttribute *op = diff12.operations[0];
+	UKObjectKindOf(op, COAttributedStringDiffOperationAddAttribute);
+	UKIntsEqual(0, op.range.location);
+	UKIntsEqual(3, op.range.length);
+}
+
+- (void) testDiffRemoveAttribute
+{
+	COObjectGraphContext *ctx1 = [self makeAttributedString];
+	[self appendString: @"abc" htmlCode: @"b" toAttributedString: [ctx1 rootObject]];
+	
+	COObjectGraphContext *ctx2 = [self makeAttributedString];
+	[self appendString: @"abc" htmlCode: nil toAttributedString: [ctx2 rootObject]];
+	
+	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
+																			secondAttributedString: [ctx2 rootObject]
+																							source: nil];
+	
+	UKIntsEqual(1, [diff12.operations count]);
+	COAttributedStringDiffOperationRemoveAttribute *op = diff12.operations[0];
+	UKObjectKindOf(op, COAttributedStringDiffOperationRemoveAttribute);
+	UKIntsEqual(0, op.range.location);
+	UKIntsEqual(3, op.range.length);
+}
+
 - (void) testMerge
 {
 	/*
