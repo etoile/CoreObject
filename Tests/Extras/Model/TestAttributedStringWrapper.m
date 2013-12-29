@@ -7,6 +7,30 @@
 
 #import "TestAttributedStringCommon.h"
 
+typedef void (^EditedBlockType)(NSUInteger editedMask, NSRange range, NSInteger delta);
+
+/**
+ * Extended version of COAttributedStringWrapper that runs a block when
+ * its -edited:range:changeInLength: method is called.
+ */
+@interface COAttributedStringWrapperTestExtensions : COAttributedStringWrapper
+@property (nonatomic, strong) EditedBlockType editedBlock;
+@end
+
+@implementation COAttributedStringWrapperTestExtensions
+@synthesize editedBlock;
+- (void) edited: (NSUInteger)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
+{
+	[super edited: editedMask range: range changeInLength: delta];
+	
+	if (self.editedBlock != nil)
+	{
+		self.editedBlock(editedMask, range, delta);
+	}
+}
+@end
+
+
 @interface TestAttributedStringWrapper : TestAttributedStringCommon <UKTest>
 @end
 
@@ -55,9 +79,7 @@
 	[self appendString: @"X" htmlCode: @"b" toAttributedString: [source rootObject]];
 	[self appendString: @"Y" htmlCode: @"u" toAttributedString: [source rootObject]];
 	
-	COAttributedStringWrapper *as = [COAttributedStringWrapper new];
-	as.backing = [source rootObject];
-			
+	COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: [source rootObject]];
 	UKIntsEqual(2, [as length]);
 	
 	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1, 1) inAttributedString: as];
@@ -69,9 +91,7 @@
 	COObjectGraphContext *source = [self makeAttributedString];
 	[self appendString: @"()" htmlCode: @"u" toAttributedString: [source rootObject]];
 	
-	COAttributedStringWrapper *as = [COAttributedStringWrapper new];
-	as.backing = [source rootObject];
-	
+	COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: [source rootObject]];
 	[as replaceCharactersInRange: NSMakeRange(1, 0) withString: @"test"];
 	
 	UKObjectsEqual(@"(test)", [as string]);
@@ -83,9 +103,7 @@
 	COObjectGraphContext *source = [self makeAttributedString];
 	[self appendString: @"()" htmlCode: @"u" toAttributedString: [source rootObject]];
 	
-	COAttributedStringWrapper *as = [COAttributedStringWrapper new];
-	as.backing = [source rootObject];
-	
+	COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: [source rootObject]];
 	[as replaceCharactersInRange: NSMakeRange(1, 1) withString: @">"];
 	
 	UKObjectsEqual(@"(>", [as string]);
@@ -99,9 +117,7 @@
 	[self appendString: @"def" htmlCode: @"b" toAttributedString: [source rootObject]];
 	[self appendString: @"ghi" htmlCode: @"i" toAttributedString: [source rootObject]];
 	
-	COAttributedStringWrapper *as = [COAttributedStringWrapper new];
-	as.backing = [source rootObject];
-	
+	COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: [source rootObject]];
 	[as replaceCharactersInRange: NSMakeRange(2, 5) withString: @"-"];
 	
 	UKObjectsEqual(@"ab-hi", [as string]);
@@ -115,9 +131,7 @@
 	COObjectGraphContext *source = [self makeAttributedString];
 	[self appendString: @"abc" htmlCode: nil toAttributedString: [source rootObject]];
 	
-	COAttributedStringWrapper *as = [COAttributedStringWrapper new];
-	as.backing = [source rootObject];
-	
+	COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: [source rootObject]];	
 	NSFontManager *fm = [NSFontManager sharedFontManager];
 	NSFont *bold = [fm convertFont: [NSFont userFontOfSize: 12] toHaveTrait: NSFontBoldTrait];
 	NSFont *boldItalic = [fm convertFont: bold toHaveTrait: NSFontItalicTrait];
@@ -134,7 +148,21 @@
 
 - (void) testTextStorageNotificationsCalled
 {
-	// When we modify the text storage backing (e.g. reloading a different graph state), we need to call some notification methods
+	COObjectGraphContext *source = [self makeAttributedString];
+	[self appendString: @"()" htmlCode: @"u" toAttributedString: [source rootObject]];
+		
+	COAttributedStringWrapperTestExtensions *as = [[COAttributedStringWrapperTestExtensions alloc] initWithBacking: [source rootObject]];
+	__block int editedCalls = 0;
+	as.editedBlock = ^(NSUInteger editedMask, NSRange range, NSInteger delta)
+	{
+		editedCalls++;
+	};
+
+	UKIntsEqual(0, editedCalls);
+	[self appendString: @"()" htmlCode: @"i" toAttributedString: [source rootObject]];
+	
+	// TODO: Currently, a lot of redundant -edited:... calls are made
+	UKFalse(0 == editedCalls);
 }
 
 @end

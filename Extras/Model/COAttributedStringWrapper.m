@@ -21,8 +21,37 @@
 - (instancetype) initWithBacking: (COAttributedString *)aBacking
 {
 	SUPERINIT;
-	self.backing = aBacking;
+	_lastNotifiedLength = [aBacking length];
+	_backing = aBacking;
+	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(objectGraphContextObjectsDidChangeNotification:)
+												 name: COObjectGraphContextObjectsDidChangeNotification
+											   object: aBacking.objectGraphContext];
+	
 	return self;
+}
+
+- (void) dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver: self];
+}
+
+- (void) objectGraphContextObjectsDidChangeNotification: (NSNotification *)notif
+{
+	if (_inPrimitiveMethod)
+		return;
+	
+	NSUInteger currentLength = [self length];
+	NSInteger delta = (NSInteger)currentLength - _lastNotifiedLength;
+	NSUInteger oldLength = _lastNotifiedLength;
+	_lastNotifiedLength = currentLength;
+	
+	NSLog(@"Last time -edited:range:changeInLength: was called, length was %d. Changed by %d", (int)_lastNotifiedLength, (int)delta);
+
+	[self edited: NSTextStorageEditedAttributes | NSTextStorageEditedCharacters
+		   range: NSMakeRange(0, oldLength)
+  changeInLength: delta];
 }
 
 // Primitive NSAttributedString methods
@@ -34,6 +63,10 @@
 
 - (NSDictionary *)attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)aRangeOut
 {
+	_inPrimitiveMethod = YES;
+	
+	// TODO: What should the attributes be at the end of the string?
+	
 	NSUInteger chunkIndex = 0, chunkStart = 0;
 	COAttributedStringChunk *target = [self.backing chunkContainingIndex: anIndex chunkStart: &chunkStart chunkIndex: &chunkIndex];
 	
@@ -66,9 +99,11 @@
 		
 		result[NSFontAttributeName] = font;
 		
+		_inPrimitiveMethod = NO;
 		return result;
 	}
 	
+	_inPrimitiveMethod = NO;
 	return nil;
 }
 
@@ -76,6 +111,8 @@
 
 - (void)replaceCharactersInRange: (NSRange)aRange withString: (NSString *)aString
 {
+	_inPrimitiveMethod = YES;
+	
 	NSUInteger chunkIndex = 0, chunkStart = 0;
 	COAttributedStringChunk *chunk = [_backing chunkContainingIndex: aRange.location chunkStart: &chunkStart chunkIndex: &chunkIndex];
 	const NSUInteger chunkLength = [[chunk text] length];
@@ -102,6 +139,8 @@
 		chunk.text = [chunk.text stringByReplacingCharactersInRange: NSMakeRange(0, lengthInChunkToReplace) withString: @""];
 		remainingLengthToDelete -= lengthInChunkToReplace;
 	}
+	
+	_inPrimitiveMethod = NO;
 }
 
 - (COAttributedStringAttribute *) makeAttr: (NSString *)htmlCode
@@ -148,6 +187,8 @@
 		return;
 	}
 	
+	_inPrimitiveMethod = YES;
+	
 	// TODO: We could avoid splitting if the given range already has exactly
 	// the right attributes
 	
@@ -164,6 +205,8 @@
 		COAttributedStringChunk *chunk = _backing.chunks[i];
 		[self setAttributes: aDict forChunk: chunk];
 	}
+	
+	_inPrimitiveMethod = NO;
 }
 
 @end

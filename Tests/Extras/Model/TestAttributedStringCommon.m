@@ -9,6 +9,12 @@
 	return attribute;
 }
 
+- (void) addHtmlCode: (NSString *)code toChunk: (COAttributedStringChunk *)aChunk
+{
+	COAttributedStringAttribute *attr = [self makeAttr: code inCtx: aChunk.objectGraphContext];
+	[aChunk insertObject: attr atIndex: ETUndeterminedIndex hint: nil forProperty: @"attributes"];
+}
+
 - (COObjectGraphContext *) makeAttributedString
 {
 	COObjectGraphContext *ctx1 = [COObjectGraphContext new];
@@ -23,12 +29,10 @@
 	COAttributedStringChunk *chunk = [ctx insertObjectWithEntityName: @"COAttributedStringChunk"];
 	chunk.text = string;
 	
-	NSMutableSet *attribs = [NSMutableSet new];
 	for (NSString *code in codes)
 	{
-		[attribs addObject: [self makeAttr: code inCtx: ctx]];
+		[self addHtmlCode: code toChunk: chunk];
 	}
-	chunk.attributes = attribs;
 	
 	[dest insertObject: chunk atIndex: ETUndeterminedIndex hint: nil forProperty: @"chunks"];
 }

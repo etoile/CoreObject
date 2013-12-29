@@ -4,6 +4,8 @@
 
 - (COAttributedStringAttribute *) makeAttr: (NSString *)htmlCode inCtx: (COObjectGraphContext *)ctx;
 
+- (void) addHtmlCode: (NSString *)code toChunk: (COAttributedStringChunk *)aChunk;
+
 - (COObjectGraphContext *) makeAttributedString;
 
 - (void) appendString: (NSString *)string htmlCodes: (NSArray *)codes toAttributedString: (COAttributedString *)dest;

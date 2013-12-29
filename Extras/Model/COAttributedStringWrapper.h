@@ -12,10 +12,12 @@
 @interface COAttributedStringWrapper : NSTextStorage
 {
 	COAttributedString *_backing;
+	NSUInteger _lastNotifiedLength;
+	BOOL _inPrimitiveMethod;
 }
 
 - (instancetype) initWithBacking: (COAttributedString *)aBacking;
 
-@property (nonatomic, strong) COAttributedString *backing;
+@property (nonatomic, readonly, strong) COAttributedString *backing;
 
 @end
