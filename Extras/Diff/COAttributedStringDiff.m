@@ -22,7 +22,50 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	return [(__bridge NSString *)userdata1 characterAtIndex: i]
 	== [(__bridge NSString *)userdata2 characterAtIndex: j];
 }
+
+static BOOL coalesceOpPair(id<COAttributedStringDiffOperation> op, id<COAttributedStringDiffOperation> nextOp)
+{
+	const BOOL isOpAttributeOp = ([op isKindOfClass: [COAttributedStringDiffOperationAddAttribute class]]
+								  || [op isKindOfClass: [COAttributedStringDiffOperationRemoveAttribute class]]);
+	const BOOL isOpSameClassAsNextOp = ([op class] == [nextOp class]);
+	const BOOL isAdjacent = NSMaxRange([op range]) == [nextOp range].location;
 	
+	if (isOpAttributeOp && isOpSameClassAsNextOp && isAdjacent)
+	{
+		COObjectGraphContext *opAttributeGraph = [COObjectGraphContext new];
+		[opAttributeGraph setItemGraph: [(COAttributedStringDiffOperationAddAttribute *)op attributeItemGraph]];
+		COAttributedStringAttribute *opAttribute = [opAttributeGraph rootObject];
+		
+		COObjectGraphContext *nextOpAttributeGraph = [COObjectGraphContext new];
+		[nextOpAttributeGraph setItemGraph: [(COAttributedStringDiffOperationAddAttribute *)nextOp attributeItemGraph]];
+		COAttributedStringAttribute *nextOpAttribute = [nextOpAttributeGraph rootObject];
+		
+		const BOOL sameAttributes = [opAttribute isEqual: nextOpAttribute];
+		if (sameAttributes)
+		{
+			op.range = NSMakeRange(op.range.location, op.range.length + nextOp.range.length);
+			return YES;
+		}
+	}
+	return NO;
+}
+
+static void coalesceOps(NSMutableArray *ops, NSUInteger i)
+{
+	if (i+1 >= [ops count])
+		return;
+	
+	if (coalesceOpPair(ops[i], ops[i+1]))
+	{
+		[ops removeObjectAtIndex: i+1];
+		coalesceOps(ops, i);
+	}
+	else
+	{
+		return coalesceOps(ops, i+1);
+	}
+}
+
 - (instancetype) initWithFirstAttributedString: (COAttributedString *)first
 						secondAttributedString: (COAttributedString *)second
 										source: (id)source
@@ -63,6 +106,9 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	}
 	
 	diff_free(result);
+	
+	// To make testing easier
+	coalesceOps(_operations, 0);
 	
 	return self;
 }
@@ -148,8 +194,17 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 										  longestEffectiveRange: &rangeAtIForSecondString
 														inRange: secondRange];
 		
-		ETAssert(rangeAtIForFirstString.location >= firstRange.location);
-		ETAssert(rangeAtIForSecondString.location >= secondRange.location);
+		if (rangeAtIForFirstString.location < firstRange.location + i)
+		{
+			rangeAtIForFirstString.length -= (firstRange.location + i) - rangeAtIForFirstString.location;
+			rangeAtIForFirstString.location = firstRange.location + i;
+		}
+		
+		if (rangeAtIForSecondString.location < secondRange.location + i)
+		{
+			rangeAtIForSecondString.length -= (secondRange.location + i) - rangeAtIForSecondString.location;
+			rangeAtIForSecondString.location = secondRange.location + i;
+		}
 		
 		const NSUInteger minLength = MIN(rangeAtIForFirstString.length, rangeAtIForSecondString.length);
 		ETAssert(minLength >= 1);

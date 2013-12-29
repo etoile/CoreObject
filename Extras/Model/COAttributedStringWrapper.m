@@ -29,12 +29,7 @@
 
 - (NSString *)string
 {
-	NSMutableString *result = [NSMutableString new];
-	for (COAttributedStringChunk *chunk in _backing.chunks)
-	{
-		[result appendString: chunk.text];
-	}
-	return result;
+	return [_backing string];
 }
 
 - (NSDictionary *)attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)aRangeOut

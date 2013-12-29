@@ -48,12 +48,10 @@
 	UKObjectKindOf(op, COAttributedStringDiffOperationInsertAttributedSubstring);
 	UKIntsEqual(1, op.range.location);
 
-	[op applyOperationToAttributedString: [ctx1 rootObject] withOffset: 0];
-	
-	// NOTE: It would also be valid if the first two characters '(' and 'a' were joined.
-	
-	UKObjectsEqual(A(@"(", @"a", @"bc", @")"), [[ctx1 rootObject] valueForKeyPath: @"chunks.text"]);
-	UKObjectsEqual(A(S(), S(), S(@"b"), S()), [[ctx1 rootObject] valueForKeyPath: @"chunks.attributes.htmlCode"]);
+	COObjectGraphContext *insertedStringCtx = [COObjectGraphContext new];
+	[insertedStringCtx setItemGraph: op.attributedStringItemGraph];
+	UKObjectsEqual(A(@"a", @"bc"), [[insertedStringCtx rootObject] valueForKeyPath: @"chunks.text"]);
+	UKObjectsEqual(A(S(),  S(@"b")), [[insertedStringCtx rootObject] valueForKeyPath: @"chunks.attributes.htmlCode"]);
 }
 
 - (void) testDiffDeletion
@@ -97,15 +95,28 @@
 	UKObjectKindOf(op, COAttributedStringDiffOperationReplaceRange);
 	UKIntsEqual(2, op.range.location);
 	UKIntsEqual(3, op.range.length);
+	
+	COObjectGraphContext *insertedStringCtx = [COObjectGraphContext new];
+	[insertedStringCtx setItemGraph: op.attributedStringItemGraph];
+	UKObjectsEqual(A(@"CDE"), [[insertedStringCtx rootObject] valueForKeyPath: @"chunks.text"]);
+	UKObjectsEqual(A(S(@"u")), [[insertedStringCtx rootObject] valueForKeyPath: @"chunks.attributes.htmlCode"]);
 }
 
 - (void) testDiffAddAttribute
 {
 	COObjectGraphContext *ctx1 = [self makeAttributedString];
 	[self appendString: @"abc" htmlCode: nil toAttributedString: [ctx1 rootObject]];
+	[self appendString: @"def" htmlCode: @"i" toAttributedString: [ctx1 rootObject]];
+	[self appendString: @"ghi" htmlCode: @"u" toAttributedString: [ctx1 rootObject]];
+	
+	// Make 'cdefg' bold
 	
 	COObjectGraphContext *ctx2 = [self makeAttributedString];
-	[self appendString: @"abc" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
+	[self appendString: @"ab" htmlCode: nil toAttributedString: [ctx2 rootObject]];
+	[self appendString: @"c" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
+	[self appendString: @"def" htmlCodes: @[@"b", @"i"] toAttributedString: [ctx2 rootObject]];
+	[self appendString: @"g" htmlCodes: @[@"b", @"u"] toAttributedString: [ctx2 rootObject]];
+	[self appendString: @"hi" htmlCode: @"u" toAttributedString: [ctx2 rootObject]];
 	
 	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
 																			secondAttributedString: [ctx2 rootObject]
@@ -114,8 +125,12 @@
 	UKIntsEqual(1, [diff12.operations count]);
 	COAttributedStringDiffOperationAddAttribute *op = diff12.operations[0];
 	UKObjectKindOf(op, COAttributedStringDiffOperationAddAttribute);
-	UKIntsEqual(0, op.range.location);
-	UKIntsEqual(3, op.range.length);
+	UKIntsEqual(2, op.range.location);
+	UKIntsEqual(5, op.range.length);
+	
+	COObjectGraphContext *insertedAttributeCtx = [COObjectGraphContext new];
+	[insertedAttributeCtx setItemGraph: op.attributeItemGraph];
+	UKObjectsEqual(@"b", [[insertedAttributeCtx rootObject] htmlCode]);
 }
 
 - (void) testDiffRemoveAttribute

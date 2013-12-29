@@ -33,6 +33,16 @@
 
 @dynamic chunks;
 
+- (NSString *)string
+{
+	NSMutableString *result = [NSMutableString new];
+	for (COAttributedStringChunk *chunk in self.chunks)
+	{
+		[result appendString: chunk.text];
+	}
+	return result;
+}
+
 - (COItemGraph *) substringItemGraphWithRange: (NSRange)aRange
 {
 	// Copy the receiver into a temporary context
