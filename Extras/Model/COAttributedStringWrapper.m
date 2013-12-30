@@ -63,11 +63,37 @@
 	return [_backing string];
 }
 
+- (id)attribute:(NSString *)attrName atIndex:(NSUInteger)location effectiveRange:(NSRangePointer)range
+{
+	NSLog(@"attribute %@ at Index %d effective range", attrName, (int)location);
+	
+	id result = [super attribute: attrName atIndex: location effectiveRange: range];
+	
+	NSLog(@"returned result: %@ range %@", result, range != NULL ? NSStringFromRange(*range) : nil);
+	
+	return result;
+}
+
+- (id)attribute:(NSString *)attrName atIndex:(NSUInteger)location longestEffectiveRange:(NSRangePointer)range inRange:(NSRange)rangeLimit
+{
+	NSLog(@">>>attribute %@ at Index %d longest effective range inRange %@", attrName, (int)location, NSStringFromRange(rangeLimit));
+
+	// HACK:
+	if (NSMaxRange(rangeLimit) > [self length])
+	{
+		rangeLimit.length -= (NSMaxRange(rangeLimit) - [self length]);
+	}
+	
+	id result = [super attribute: attrName atIndex: location longestEffectiveRange: range inRange: rangeLimit];
+	
+	NSLog(@">>>returned result: %@ range %@", result, range != NULL ? NSStringFromRange(*range) : nil);
+	
+	return result;
+}
+
 - (NSDictionary *)attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)aRangeOut
 {
 	_inPrimitiveMethod = YES;
-	
-	// TODO: What should the attributes be at the end of the string?
 	
 	NSUInteger chunkIndex = 0, chunkStart = 0;
 	COAttributedStringChunk *target = [self.backing chunkContainingIndex: anIndex chunkStart: &chunkStart chunkIndex: &chunkIndex];
@@ -102,10 +128,13 @@
 		result[NSFontAttributeName] = font;
 		
 		_inPrimitiveMethod = NO;
+		NSLog(@"%p (%@) attributesAtIndex %d are '%@'", self, [self string], (int)anIndex, result);
 		return result;
 	}
-	
+
 	_inPrimitiveMethod = NO;
+	
+	[NSException raise: NSInvalidArgumentException format: @"Index %u out of bounds", (unsigned)anIndex];
 	return nil;
 }
 
@@ -113,6 +142,8 @@
 
 - (void)replaceCharactersInRange: (NSRange)aRange withString: (NSString *)aString
 {
+	NSLog(@"%p (%@) replaceCharactersInRange %@ with '%@'", self, [self string], NSStringFromRange(aRange), aString);
+	
 	_inPrimitiveMethod = YES;
 		
 	NSUInteger chunkIndex = 0, chunkStart = 0;
@@ -172,7 +203,7 @@
 	return attribute;
 }
 
-- (void)setAttributes:(NSDictionary *)attrs forChunk: (COAttributedStringChunk *)aChunk
+- (NSSet *) ourAttributesForAttributeDict: (NSDictionary *)attrs
 {
 	NSMutableSet *newAttribs = [NSMutableSet new];
 	
@@ -198,22 +229,45 @@
 			}
 		}
 	}
-	
-	aChunk.attributes = newAttribs;
+
+	return newAttribs;
+}
+
+- (void)setAttributes:(NSDictionary *)attrs forChunk: (COAttributedStringChunk *)aChunk
+{
+	aChunk.attributes = [self ourAttributesForAttributeDict: attrs];
 }
 
 - (void)setAttributes: (NSDictionary *)aDict range: (NSRange)aRange
 {
+	NSLog(@"%p (%@) Set attributes %@ range %@", self, [self string], aDict, NSStringFromRange(aRange));
+	
 	if (aRange.length == 0)
 	{
 		return;
 	}
 	
+	// Short-circuit
+	{
+		NSUInteger chunkIndex = 0, chunkStart = 0;
+		COAttributedStringChunk *target = [self.backing chunkContainingIndex: aRange.location chunkStart: &chunkStart chunkIndex: &chunkIndex];
+
+		if (chunkStart <= aRange.location
+			&& (chunkStart + target.length) >= NSMaxRange(aRange))
+		{
+			NSSet *existingAttribs = target.attributes;
+			NSSet *proposedAttribs = [self ourAttributesForAttributeDict: aDict];
+			
+			if ([existingAttribs isEqual: proposedAttribs])
+			{
+				[self edited: NSTextStorageEditedAttributes range: aRange changeInLength: 0];
+				return;
+			}
+		}
+	}
+	
 	_inPrimitiveMethod = YES;
-	
-	// TODO: We could avoid splitting if the given range already has exactly
-	// the right attributes
-	
+		
 	const NSUInteger splitChunk1 = [_backing splitChunkAtIndex: aRange.location];
 	const NSUInteger splitChunk2 = [_backing splitChunkAtIndex: NSMaxRange(aRange)];
 	
