@@ -217,6 +217,19 @@
 	UKTrue(bookmark->setterInvoked);
 }
 
+- (void) testUsingZombieObjectRaisesException
+{
+	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+	
+	OutlineItem *obj2 = [[OutlineItem alloc] initWithObjectGraphContext: proot.objectGraphContext];
+	[obj2 setLabel: @"test"];
+	
+	/* obj2 is removed since it's unreachable */
+	[proot.objectGraphContext removeUnreachableObjects];
+	
+	UKRaisesException([obj2 setLabel: @"test2"]);
+}
+
 @end
 
 

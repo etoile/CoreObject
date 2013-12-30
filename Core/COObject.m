@@ -719,6 +719,20 @@ See +[NSObject typePrefix]. */
 	return (![propDesc isPersistent] && nil != [propDesc opposite] && [[propDesc opposite] isPersistent]);
 }
 
+- (void) checkIsNotRemovedFromContext
+{
+	// If this assertion fails, it means you are attempting to access a property's variable storage
+	// of a COObject instance that has been "detached" from its COObjectGraphContext (see -markAsRemovedFromContext).
+	//
+	// This should only happen due to buggy application code that hangs on to
+	// COObject pointers after they are no longer valid.
+	//
+	// -markAsRemovedFromContext sets _variableStorage to nil as an indication
+	// that we are a "zombie" object. Another possible check could be:
+	// (self == [_objectGraphContext loadedObjectForUUID: _UUID])
+	ETAssert(_variableStorage != nil);
+}
+
 /**
  * Can return incoming relationships, although they are not stored in the 
  * variable storage. This allows -valueForStorageKey: and -valueForProperty: to 
@@ -726,6 +740,10 @@ See +[NSObject typePrefix]. */
  */
 - (id)valueForVariableStorageKey: (NSString *)key
 {
+	// NOTE: This is just a debugging aid, and the check is only placed
+	// here because -valueForVariableStorageKey: is a commonly called method.
+	[self checkIsNotRemovedFromContext];
+	
     ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
 
 	// NOTE: In CoreObject, incoming relationships (e.g. parent(s)) are stored 
@@ -1366,7 +1384,8 @@ See +[NSObject typePrefix]. */
 
 - (void) markAsRemovedFromContext
 {
-    // TODO: Turn the object into a kind of zombie
+	// See -checkIsNotRemovedFromContext.
+	_variableStorage = nil;
 }
 
 /**
