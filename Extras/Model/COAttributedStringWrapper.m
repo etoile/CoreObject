@@ -118,12 +118,20 @@
 	NSUInteger chunkIndex = 0, chunkStart = 0;
 	COAttributedStringChunk *chunk = [_backing chunkContainingIndex: aRange.location chunkStart: &chunkStart chunkIndex: &chunkIndex];
 	
+	/* Sepecial case: empty string */
 	if ([_backing.chunks count] == 0)
 	{
 		chunk = [[COAttributedStringChunk alloc] initWithObjectGraphContext: _backing.objectGraphContext];
 		chunk.text = @"";
 		_backing.chunks = @[chunk];
-	}	
+	}
+	
+	/* Special case: inserting at end of string */
+	if (chunk == nil && aRange.location == [self length])
+	{
+		ETAssert([self length] > 0);
+		chunk = [_backing chunkContainingIndex: aRange.location - 1 chunkStart: &chunkStart chunkIndex: &chunkIndex];
+	}
 	
 	ETAssert(chunk != nil);
 	const NSUInteger chunkLength = [[chunk text] length];
@@ -150,6 +158,9 @@
 		chunk.text = [chunk.text stringByReplacingCharactersInRange: NSMakeRange(0, lengthInChunkToReplace) withString: @""];
 		remainingLengthToDelete -= lengthInChunkToReplace;
 	}
+	
+	// TODO: Add tests that check for this
+	[self edited: NSTextStorageEditedCharacters range: aRange changeInLength: [aString length] - aRange.length];
 	
 	_inPrimitiveMethod = NO;
 }
@@ -216,6 +227,9 @@
 		COAttributedStringChunk *chunk = _backing.chunks[i];
 		[self setAttributes: aDict forChunk: chunk];
 	}
+	
+	// TODO: Add tests that check for this
+	[self edited: NSTextStorageEditedAttributes range: aRange changeInLength: 0];
 	
 	_inPrimitiveMethod = NO;
 }

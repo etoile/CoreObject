@@ -173,6 +173,29 @@ typedef void (^EditedBlockType)(NSUInteger editedMask, NSRange range, NSInteger 
 	[as replaceCharactersInRange: NSMakeRange(0, 0) withString: @"a"];
 	
 	UKObjectsEqual(@"a", [as string]);
-}	
+}
+
+- (void) testInsertAtEndOfString
+{
+	COObjectGraphContext *source = [self makeAttributedString];
+	COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: [source rootObject]];
+	
+	[as replaceCharactersInRange: NSMakeRange(0, 0) withString: @"a"];
+	[as replaceCharactersInRange: NSMakeRange(1, 0) withString: @"b"];
+
+	UKObjectsEqual(@"ab", [as string]);
+}
+
+- (void) testInsertAfterTwoChunks
+{
+	COObjectGraphContext *source = [self makeAttributedString];
+	[self appendString: @"a" htmlCode: nil toAttributedString: [source rootObject]];
+	[self appendString: @"b" htmlCode: nil toAttributedString: [source rootObject]];
+	
+	COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: [source rootObject]];
+	[as replaceCharactersInRange: NSMakeRange(2, 0) withString: @"c"];
+	
+	UKObjectsEqual(@"abc", [as string]);
+}
 
 @end
