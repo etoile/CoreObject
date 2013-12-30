@@ -8,15 +8,22 @@
     ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"TextItem"];
     [entity setParent: (id)@"DocumentItem"];
     
-    ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
+    ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"attrString"
+                                                                                 type: (id)@"COAttributedString"];
     [labelProperty setPersistent: YES];
     [entity setPropertyDescriptions: A(labelProperty)];
     return entity;
 }
 
+- (instancetype) initWithObjectGraphContext:(COObjectGraphContext *)aContext
+{
+	self = [super initWithObjectGraphContext: aContext];
+	self.attrString = [[COAttributedString alloc] initWithObjectGraphContext: aContext];
+	return self;
+}
+
 /* Accessor Methods */
 
-@dynamic label;
+@dynamic attrString;
 
 @end

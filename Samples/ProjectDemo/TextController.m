@@ -26,6 +26,7 @@
 {
 	TextItem *textDoc = (TextItem *)[[self projectDocument] rootDocObject];
 	assert([textDoc isKindOfClass: [TextItem class]]);
+	assert([[textDoc attrString] isKindOfClass: [COAttributedString class]]);
 	return textDoc;
 }
 
@@ -34,27 +35,19 @@
 	return [self.objectGraphContext rootObject];
 }
 
-- (void) objectGraphDidChange
-{
-	NSString *label = [[self textDocument] label];
-	if (label == nil)
-		label = @"";
-	
-	[[textView textStorage] setAttributedString: [[NSAttributedString alloc] initWithString: label]];
-}
-
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
 	[textView setDelegate: self];
 
-	[self objectGraphDidChange];
+	textStorage = [[COAttributedStringWrapper alloc] initWithBacking: [[self textDocument] attrString]];
+	[textStorage addLayoutManager: [textView layoutManager]];
 }
 
 - (void)textDidChange:(NSNotification*)notif
 {
 	NSLog(@"-textDidChange: committing.");
-	[[self textDocument] setLabel: [[textView textStorage] string]];
+
 	[self commitWithIdentifier: @"edit-text"];
 }
 
