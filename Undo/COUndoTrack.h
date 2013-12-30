@@ -112,25 +112,6 @@ extern NSString * const kCOUndoStackName;
 @property (nonatomic, readonly) COEditingContext *editingContext;
 
 
-/** @taskunit Undo and Redo */
-
-/**
- * Returns whether the current command can be undone in the editing context.
- */
-- (BOOL)canUndo;
-/**
- * Returns whether the last undone command can be redone in the editing context.
- */
-- (BOOL)canRedo;
-/**
- * Undoes the current command in the editing context.
- */
-- (void)undo;
-/**
- * Reapplies the last undone command in the editing context.
- */
-- (void)redo;
-
 /**
  * Discards all the commands.
  */

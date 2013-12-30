@@ -72,6 +72,25 @@
  */
 - (void)redoNode: (id <COTrackNode>)aNode;
 
+/** @taskunit Undo and Redo */
+
+/**
+ * Returns whether an undo can be performed
+ */
+- (BOOL)canUndo;
+/**
+ * Returns whether a redo can be performed
+ */
+- (BOOL)canRedo;
+/**
+ * Performs an undo. The meaning of undo is left up to subclasses.
+ */
+- (void)undo;
+/**
+ * Performs a redo. The meaning of redo is left up to subclasses.
+ */
+- (void)redo;
+
 @end
 
 
