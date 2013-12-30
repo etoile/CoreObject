@@ -40,8 +40,8 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 	/** Item graph exposed during loading (nil once the loading is done) */
 	id <COItemGraph> _loadingItemGraph;
 	NSMutableDictionary *_objectsByAdditionalItemUUIDs;
-    NSMutableSet *_insertedObjects;
-    NSMutableSet *_updatedObjects;
+    NSMutableDictionary *_insertedObjects;
+    NSMutableDictionary *_updatedObjects;
     NSMapTable *_updatedPropertiesByObject;
 }
 

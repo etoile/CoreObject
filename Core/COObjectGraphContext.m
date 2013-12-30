@@ -48,8 +48,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 @implementation COObjectGraphContext
 
 @synthesize modelDescriptionRepository = _modelDescriptionRepository;
-@synthesize insertedObjects = _insertedObjects, updatedObjects = _updatedObjects,
-	updatedPropertiesByObject = _updatedPropertiesByObject;
+@synthesize	updatedPropertiesByObject = _updatedPropertiesByObject;
 
 #pragma mark Creation
 
@@ -59,8 +58,8 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     SUPERINIT;
     _loadedObjects = [[NSMutableDictionary alloc] init];
 	_objectsByAdditionalItemUUIDs = [[NSMutableDictionary alloc] init];
-    _insertedObjects = [[NSMutableSet alloc] init];
-    _updatedObjects = [[NSMutableSet alloc] init];
+    _insertedObjects = [[NSMutableDictionary alloc] init];
+    _updatedObjects = [[NSMutableDictionary alloc] init];
     _updatedPropertiesByObject = [[NSMapTable alloc] init];
     _branch = aBranch;
 	_persistentRoot = [aBranch persistentRoot];
@@ -330,13 +329,13 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
         currentObject = [self objectWithStoreItem: item];
         if (markInserted)
         {
-            [_insertedObjects addObject: currentObject];
+            [_insertedObjects setObject: currentObject forKey: uuid];
         }
     }
     else
     {
         [currentObject setStoreItem: item];
-        [_updatedObjects addObject: currentObject];
+        [_updatedObjects setObject: currentObject forKey: uuid];
     }
 
 	for (ETUUID *itemUUID in [[currentObject additionalStoreItemUUIDs] objectEnumerator])
@@ -433,7 +432,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 	if (inserted)
 	{
-		[_insertedObjects addObject: object];
+		[_insertedObjects setObject: object forKey: uuid];
 		
 		for (ETUUID *itemUUID in [[object additionalStoreItemUUIDs] objectEnumerator])
 		{
@@ -447,12 +446,22 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 - (NSSet *)changedObjects
 {
-    return [_insertedObjects setByAddingObjectsFromSet: _updatedObjects];
+    return [self.insertedObjects setByAddingObjectsFromSet: self.updatedObjects];
 }
-   
+
+- (NSSet *) insertedObjects
+{
+	return [NSSet setWithArray: [_insertedObjects allValues]];
+}
+
+- (NSSet *) updatedObjects
+{
+	return [NSSet setWithArray: [_updatedObjects allValues]];
+}
+
 - (BOOL)isUpdatedObject: (COObject *)anObject
 {
-    return [_updatedObjects containsObject: anObject];
+    return [_updatedObjects objectForKey: anObject.UUID] != nil;
 }
 
 - (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty
@@ -468,9 +477,9 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	}
     
     // If it's already marked as inserted, don't mark it as updated
-    if (![_insertedObjects containsObject: obj])
+    if (nil == [_insertedObjects objectForKey: obj.UUID])
     {
-        [_updatedObjects addObject: obj];
+        [_updatedObjects setObject: obj forKey: obj.UUID];
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextObjectsDidChangeNotification
@@ -581,8 +590,8 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     
     // Update change tracking
     
-    [_insertedObjects removeObject: anObject];
-    [_updatedObjects removeObject: anObject];
+    [_insertedObjects removeObjectForKey: uuid];
+    [_updatedObjects removeObjectForKey: uuid];
 	
 	[self discardObject: anObject];
 }
