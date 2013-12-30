@@ -20,6 +20,8 @@
 
 - (instancetype) initWithBacking: (COAttributedString *)aBacking
 {
+	NILARG_EXCEPTION_TEST(aBacking);
+	
 	SUPERINIT;
 	_lastNotifiedLength = [aBacking length];
 	_backing = aBacking;
@@ -112,9 +114,18 @@
 - (void)replaceCharactersInRange: (NSRange)aRange withString: (NSString *)aString
 {
 	_inPrimitiveMethod = YES;
-	
+		
 	NSUInteger chunkIndex = 0, chunkStart = 0;
 	COAttributedStringChunk *chunk = [_backing chunkContainingIndex: aRange.location chunkStart: &chunkStart chunkIndex: &chunkIndex];
+	
+	if ([_backing.chunks count] == 0)
+	{
+		chunk = [[COAttributedStringChunk alloc] initWithObjectGraphContext: _backing.objectGraphContext];
+		chunk.text = @"";
+		_backing.chunks = @[chunk];
+	}	
+	
+	ETAssert(chunk != nil);
 	const NSUInteger chunkLength = [[chunk text] length];
 	
 	const NSUInteger indexInChunk = aRange.location - chunkStart;

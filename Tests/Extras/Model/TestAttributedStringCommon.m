@@ -18,7 +18,7 @@
 - (COObjectGraphContext *) makeAttributedString
 {
 	COObjectGraphContext *ctx1 = [COObjectGraphContext new];
-	COAttributedString *ctx1String = [ctx1 insertObjectWithEntityName: @"COAttributedString"];
+	COAttributedString *ctx1String = [[COAttributedString alloc] initWithObjectGraphContext: ctx1];
 	ctx1.rootObject = ctx1String;
 	return ctx1;
 }

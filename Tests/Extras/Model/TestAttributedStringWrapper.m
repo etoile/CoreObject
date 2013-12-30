@@ -165,4 +165,14 @@ typedef void (^EditedBlockType)(NSUInteger editedMask, NSRange range, NSInteger 
 	UKFalse(0 == editedCalls);
 }
 
+- (void) testInsertInEmptyString
+{
+	COObjectGraphContext *source = [self makeAttributedString];
+	
+	COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: [source rootObject]];
+	[as replaceCharactersInRange: NSMakeRange(0, 0) withString: @"a"];
+	
+	UKObjectsEqual(@"a", [as string]);
+}	
+
 @end
