@@ -29,6 +29,11 @@
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
 
+/**
+ * Expensive, paranoid validation for debugging
+ */
+#define VALIDATE_ITEM_GRAPHS 1
+
 NSString * const kCOBranchLabel = @"COBranchLabel";
 
 @implementation COBranch
@@ -857,8 +862,28 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		}
     }
     
-    return [[COItemGraph alloc] initWithItemForUUID: dict
-	                                   rootItemUUID: [graph rootItemUUID]];
+    COItemGraph *modifiedItems = [[COItemGraph alloc] initWithItemForUUID: dict
+															 rootItemUUID: [graph rootItemUUID]];
+	
+#if VALIDATE_ITEM_GRAPHS
+	if (_currentRevisionUUID == nil)
+	{
+		// On the first commit, validate the graph on its own
+		COValidateItemGraph(modifiedItems);
+	}
+	else
+	{
+		// On subsequent commits, modifiedItems will be a delta. Load the parent graph, which
+		// should be valid itself.
+		COItemGraph *parentGraph = [[self store] itemGraphForRevisionUUID: _currentRevisionUUID persistentRoot: [[self persistentRoot] UUID]];
+		COValidateItemGraph(parentGraph);
+		
+		// Apply the delta, this should be valid too.
+		[parentGraph addItemGraph: modifiedItems];
+		COValidateItemGraph(parentGraph);
+	}
+#endif
+	return modifiedItems;
 }
 
 - (NSMutableArray *)revisionsWithOptions: (COBranchRevisionReadingOptions)options
