@@ -25,6 +25,15 @@
 #	define SHA1 CC_SHA1
 #endif
 
+/**
+ * Validate item graphs on save/load.
+ * (e.g., ensures no broken references).
+ *
+ * This will dramaticaly slow down saving from O(size of delta to write) to
+ * O(size of full state).
+ */
+#define VALIDATE_ITEM_GRAPHS 1
+
 @interface COSQLiteStore (Private)
 
 - (FMDatabase *) database;
@@ -345,7 +354,7 @@
 {
     COItemGraph *result = [self partialItemGraphFromRevid: -1 toRevid: revid restrictToItemUUIDs: nil];
 
-#ifdef DEBUG
+#ifdef VALIDATE_ITEM_GRAPHS
     if (result != nil)
     {
         COValidateItemGraph(result);
@@ -453,8 +462,17 @@ static NSData *Sha1Data(NSData *data)
                persistentrootUUID: (ETUUID *)aPersistentRootUUID
                             error: (NSError **)error
 {
-#ifdef DEBUG
-    COValidateItemGraph(anItemTree);
+#ifdef VALIDATE_ITEM_GRAPHS
+	if (aParent == -1)
+	{
+		COValidateItemGraph(anItemTree);
+	}
+	else
+	{
+		COItemGraph *combinedGraph = [self itemGraphForRevid: aParent];
+		[combinedGraph addItemGraph: anItemTree];
+		COValidateItemGraph(combinedGraph);
+	}
 #endif
 
     NSParameterAssert(aParent >= -1);
