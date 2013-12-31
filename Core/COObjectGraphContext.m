@@ -230,13 +230,20 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	if (loadedObject != nil)
 		return loadedObject;
     
+	COItem *item = [_loadingItemGraph itemForUUID: aUUID];
+    if (item == nil)
+    {
+        [NSException raise: NSInvalidArgumentException
+                    format: @"Couldn't resolve reference to object %@", aUUID];
+    }
+	
 	/* The metamodel cannot be used for the entity description because the 
 	   loaded object type could be a subtype of the type declared in the 
 	   metamodel. For example, a to-one relationship of type COObject could 
 	   point a COBookmark object, so allocating a COObject as declared in the 
 	   metamodel doesn't give us the right object. */
 	return [self objectWithUUID: aUUID
-	          entityDescription: [self descriptionForItem: [_loadingItemGraph itemForUUID: aUUID]]];
+	          entityDescription: [self descriptionForItem: item]];
 }
 
 - (COObject *)objectWithStoreItem: (COItem *)anItem
