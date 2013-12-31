@@ -49,11 +49,19 @@
 	NSUInteger oldLength = _lastNotifiedLength;
 	_lastNotifiedLength = currentLength;
 	
-	NSLog(@"Last time -edited:range:changeInLength: was called, length was %d. Changed by %d", (int)_lastNotifiedLength, (int)delta);
-
-	[self edited: NSTextStorageEditedAttributes | NSTextStorageEditedCharacters
-		   range: NSMakeRange(0, oldLength)
-  changeInLength: delta];
+	if (oldLength > 100 || delta > 100)
+	{
+		NSLog(@"Abort");
+		assert(0);
+	}
+	
+	// FIXME: This is breaking things, disabled for now
+	
+//	NSLog(@"Last time -edited:range:changeInLength: was called, length was %d. Changed by %d", (int)_lastNotifiedLength, (int)delta);
+//
+//	[self edited: NSTextStorageEditedAttributes | NSTextStorageEditedCharacters
+//		   range: NSMakeRange(0, oldLength)
+//  changeInLength: delta];
 }
 
 // Primitive NSAttributedString methods
@@ -63,36 +71,38 @@
 	return [_backing string];
 }
 
-- (id)attribute:(NSString *)attrName atIndex:(NSUInteger)location effectiveRange:(NSRangePointer)range
-{
-	NSLog(@"attribute %@ at Index %d effective range", attrName, (int)location);
-	
-	id result = [super attribute: attrName atIndex: location effectiveRange: range];
-	
-	NSLog(@"returned result: %@ range %@", result, range != NULL ? NSStringFromRange(*range) : nil);
-	
-	return result;
-}
-
-- (id)attribute:(NSString *)attrName atIndex:(NSUInteger)location longestEffectiveRange:(NSRangePointer)range inRange:(NSRange)rangeLimit
-{
-	NSLog(@">>>attribute %@ at Index %d longest effective range inRange %@", attrName, (int)location, NSStringFromRange(rangeLimit));
-
-	// HACK:
-	if (NSMaxRange(rangeLimit) > [self length])
-	{
-		rangeLimit.length -= (NSMaxRange(rangeLimit) - [self length]);
-	}
-	
-	id result = [super attribute: attrName atIndex: location longestEffectiveRange: range inRange: rangeLimit];
-	
-	NSLog(@">>>returned result: %@ range %@", result, range != NULL ? NSStringFromRange(*range) : nil);
-	
-	return result;
-}
+//- (id)attribute:(NSString *)attrName atIndex:(NSUInteger)location effectiveRange:(NSRangePointer)range
+//{
+//	NSLog(@"attribute %@ at Index %d effective range", attrName, (int)location);
+//	
+//	id result = [super attribute: attrName atIndex: location effectiveRange: range];
+//	
+//	NSLog(@"returned result: %@ range %@", result, range != NULL ? NSStringFromRange(*range) : nil);
+//	
+//	return result;
+//}
+//
+//- (id)attribute:(NSString *)attrName atIndex:(NSUInteger)location longestEffectiveRange:(NSRangePointer)range inRange:(NSRange)rangeLimit
+//{
+//	NSLog(@">>>attribute %@ at Index %d longest effective range inRange %@", attrName, (int)location, NSStringFromRange(rangeLimit));
+//
+//	// HACK:
+//	if (NSMaxRange(rangeLimit) > [self length])
+//	{
+//		rangeLimit.length -= (NSMaxRange(rangeLimit) - [self length]);
+//	}
+//	
+//	id result = [super attribute: attrName atIndex: location longestEffectiveRange: range inRange: rangeLimit];
+//	
+//	NSLog(@">>>returned result: %@ range %@", result, range != NULL ? NSStringFromRange(*range) : nil);
+//	
+//	return result;
+//}
 
 - (NSDictionary *)attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)aRangeOut
 {
+	NSLog(@"%p (%@) attributesAtIndex %d", self, [self string], (int)anIndex);
+	
 	_inPrimitiveMethod = YES;
 	
 	NSUInteger chunkIndex = 0, chunkStart = 0;
@@ -128,7 +138,7 @@
 		result[NSFontAttributeName] = font;
 		
 		_inPrimitiveMethod = NO;
-		NSLog(@"%p (%@) attributesAtIndex %d are '%@'", self, [self string], (int)anIndex, result);
+		NSLog(@"     attributesAtIndex %d are '%@', effective range %@", (int)anIndex, result, NSStringFromRange(NSMakeRange(chunkStart, target.length)));
 		return result;
 	}
 

@@ -68,17 +68,17 @@
 	[self edited: NSTextStorageEditedAttributes range: aRange changeInLength: 0];
 }
 
-- (id) attribute: (NSString *)attrName atIndex: (NSUInteger)location longestEffectiveRange: (NSRangePointer)range inRange: (NSRange)rangeLimit
-{
-	// HACK:
-	if (NSMaxRange(rangeLimit) > [self length])
-	{
-		rangeLimit.length -= (NSMaxRange(rangeLimit) - [self length]);
-	}
-	
-	id result = [super attribute: attrName atIndex: location longestEffectiveRange: range inRange: rangeLimit];
-	return result;
-}
+//- (id) attribute: (NSString *)attrName atIndex: (NSUInteger)location longestEffectiveRange: (NSRangePointer)range inRange: (NSRange)rangeLimit
+//{
+//	// HACK:
+//	if (NSMaxRange(rangeLimit) > [self length])
+//	{
+//		rangeLimit.length -= (NSMaxRange(rangeLimit) - [self length]);
+//	}
+//	
+//	id result = [super attribute: attrName atIndex: location longestEffectiveRange: range inRange: rangeLimit];
+//	return result;
+//}
 
 @end
 
@@ -236,7 +236,8 @@
 	id value = [as attribute: @"foo"
 					 atIndex: 0
 	   longestEffectiveRange: &longestEffectiveRange
-					 inRange: NSMakeRange(0, 2)]; /* We need to handle the range spuriously extending beyond the string length */
+					 inRange: NSMakeRange(0, 1)];
+//					 inRange: NSMakeRange(0, 2)]; /* We need to handle the range spuriously extending beyond the string length */
 	
 	UKNil(value);
 	UKIntsEqual(0, longestEffectiveRange.location);
