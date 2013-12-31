@@ -42,6 +42,9 @@ First alpha release blockers
 
 - Update website
 
+- Fix disk IO errors on OS X 10.7
+
+
 Future Work
 -----------
 
