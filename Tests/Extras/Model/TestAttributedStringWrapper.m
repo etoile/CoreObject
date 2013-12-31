@@ -7,33 +7,117 @@
 
 #import "TestAttributedStringCommon.h"
 
-//typedef void (^EditedBlockType)(NSUInteger editedMask, NSRange range, NSInteger delta);
-//
-///**
-// * Extended version of COAttributedStringWrapper that runs a block when
-// * its -edited:range:changeInLength: method is called.
-// */
-//@interface COAttributedStringWrapperTestExtensions : COAttributedStringWrapper
-//@property (nonatomic, strong) EditedBlockType editedBlock;
-//@end
-//
-//@implementation COAttributedStringWrapperTestExtensions
-//@synthesize editedBlock;
-//- (void) edited: (NSUInteger)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
-//{
-//	[super edited: editedMask range: range changeInLength: delta];
-//	
-//	if (self.editedBlock != nil)
-//	{
-//		self.editedBlock(editedMask, range, delta);
-//	}
-//}
-//@end
+/**
+ * Record of a call to -[NSTextStorage edited:range:changeInLength:]
+ */
+@interface EditedCall : NSObject
+@property (nonatomic) NSUInteger editedMask;
+@property (nonatomic) NSRange range;
+@property (nonatomic) NSInteger changeInLength;
++ (EditedCall *) edited: (NSUInteger)editedMask range: (NSRange)range changeInLength: (NSInteger)delta;
+@end
+
+@implementation EditedCall
+@synthesize editedMask, range, changeInLength;
++ (EditedCall *) edited: (NSUInteger)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
+{
+	EditedCall *result = [EditedCall new];
+	result.editedMask = editedMask;
+	result.range = range;
+	result.changeInLength = delta;
+	return result;
+}
+- (NSUInteger)hash
+{
+	return editedMask ^ range.location ^ range.length ^ changeInLength;
+}
+- (BOOL) isEqual:(id)object
+{
+	if (![object isKindOfClass: [EditedCall class]])
+		return NO;
+	
+	EditedCall *other = (EditedCall *)object;
+	return other.editedMask == editedMask
+		&& NSEqualRanges(other.range, range)
+		&& other.changeInLength == changeInLength;
+}
+- (NSString *)description
+{
+	NSString *mask = @"";
+	if ((editedMask & NSTextStorageEditedCharacters) == NSTextStorageEditedCharacters)
+	{
+		mask = [mask stringByAppendingString: @"NSTextStorageEditedCharacters"];
+	}
+	if ((editedMask & NSTextStorageEditedAttributes) == NSTextStorageEditedAttributes)
+	{
+		if ([mask length] > 0)
+		{
+			mask = [mask stringByAppendingString: @"|"];
+		}
+		mask = [mask stringByAppendingString: @"NSTextStorageEditedAttributes"];
+	}
+	
+	return [NSString stringWithFormat: @"<EditedCall mask: %@ range: %@ changeInLength: %d>",
+			mask,
+			NSStringFromRange(range),
+			(int)changeInLength];
+}
+@end
 
 
-@interface SimpleTextStorage : NSTextStorage
+
+@protocol EditedCallLogging
+- (void) clearEditCalls;
+/**
+ * Returns an array of EditedCall objects representing the calls to
+ * -edited:range:changeInLength: with the character edit mask set, since the last call to clearEditCalls
+ */
+- (NSArray *) characterEditCalls;
+@end
+
+
+
+/**
+ * Extended version of COAttributedStringWrapper that logs calls to
+ * -edited:range:changeInLength:
+ */
+@interface COAttributedStringWrapperTestExtensions : COAttributedStringWrapper <EditedCallLogging>
+{
+	NSMutableArray *_editedCalls;
+}
+@end
+
+@implementation COAttributedStringWrapperTestExtensions
+
+- (void) edited: (NSUInteger)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
+{
+	if (_editedCalls == nil)
+		_editedCalls = [NSMutableArray new];
+	[_editedCalls addObject: [EditedCall edited: editedMask range: range changeInLength: delta]];
+		
+	[super edited: editedMask range: range changeInLength: delta];
+}
+
+- (void) clearEditCalls
+{
+	[_editedCalls removeAllObjects];
+}
+
+- (NSArray *) characterEditCalls
+{
+	return [_editedCalls filteredCollectionWithBlock: ^(id obj) {
+		return (BOOL)([obj editedMask] & NSTextStorageEditedCharacters);
+	}];
+}
+
+@end
+
+
+
+@interface SimpleTextStorage : NSTextStorage <EditedCallLogging>
 {
 	NSMutableAttributedString *_backing;
+	NSMutableArray *_editedCalls;
 }
 @end
 
@@ -43,6 +127,7 @@
 {
     self = [super init];
 	_backing = [[NSMutableAttributedString alloc] init];
+	_editedCalls = [NSMutableArray new];
     return self;
 }
 
@@ -68,17 +153,23 @@
 	[self edited: NSTextStorageEditedAttributes range: aRange changeInLength: 0];
 }
 
-//- (id) attribute: (NSString *)attrName atIndex: (NSUInteger)location longestEffectiveRange: (NSRangePointer)range inRange: (NSRange)rangeLimit
-//{
-//	// HACK:
-//	if (NSMaxRange(rangeLimit) > [self length])
-//	{
-//		rangeLimit.length -= (NSMaxRange(rangeLimit) - [self length]);
-//	}
-//	
-//	id result = [super attribute: attrName atIndex: location longestEffectiveRange: range inRange: rangeLimit];
-//	return result;
-//}
+- (void) edited: (NSUInteger)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
+{
+	[_editedCalls addObject: [EditedCall edited: editedMask range: range changeInLength: delta]];
+	[super edited: editedMask range: range changeInLength: delta];
+}
+
+- (void) clearEditCalls
+{
+	[_editedCalls removeAllObjects];
+}
+
+- (NSArray *) characterEditCalls
+{
+	return [_editedCalls filteredCollectionWithBlock: ^(id obj) {
+		return (BOOL)([obj editedMask] & NSTextStorageEditedCharacters);
+	}];
+}
 
 @end
 
@@ -131,6 +222,15 @@
 	UKIntsEqual(expectedRange.length, actualRange.length);
 }
 
+- (void) checkCharacterEdits: (NSArray *)expected
+{
+	if ([as conformsToProtocol: @protocol(EditedCallLogging)])
+	{
+		NSArray *actual = [(id<EditedCallLogging>)as characterEditCalls];
+		UKObjectsEqual(expected, actual);
+	}
+}
+
 - (void) setFontTraits: (NSFontSymbolicTraits)traits inRange: (NSRange)aRange inTextStorage: (NSTextStorage *)target
 {
 	NSFont *font = [[NSFontManager sharedFontManager] convertFont: [NSFont userFontOfSize: 12] toHaveTrait: traits];
@@ -147,7 +247,8 @@
 
 	UKIntsEqual(2, [as length]);
 	[self checkFontHasTraits: NSFontBoldTrait withLongestEffectiveRange: NSMakeRange(0, 1) inAttributedString: as];
-	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1, 1) inAttributedString: as];	
+	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1, 1) inAttributedString: as];
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 2]]];
 }
 
 - (void) testInsertCharacters
@@ -158,6 +259,9 @@
 	
 	UKObjectsEqual(@"(test)", [as string]);
 	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(0, 6) inAttributedString: as];
+	
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 2],
+								 [EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 0) changeInLength: 4]]];
 }
 
 - (void) testReplaceCharacters
@@ -168,6 +272,9 @@
 	
 	UKObjectsEqual(@"(>", [as string]);
 	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(0, 2) inAttributedString: as];
+	
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 2],
+								 [EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 1) changeInLength: 0]]];
 }
 
 - (void) testReplaceCharactersAcrossAttributes
@@ -184,30 +291,13 @@
 	[self checkFontHasTraits: NSFontItalicTrait withLongestEffectiveRange: NSMakeRange(3, 2) inAttributedString: as];
 }
 
-//- (void) testTextStorageNotificationsCalled
-//{
-//	COObjectGraphContext *source = [self makeAttributedString];
-//	[self appendString: @"()" htmlCode: @"u" toAttributedString: [source rootObject]];
-//	
-//	COAttributedStringWrapperTestExtensions *as = [[COAttributedStringWrapperTestExtensions alloc] initWithBacking: [source rootObject]];
-//	__block int editedCalls = 0;
-//	as.editedBlock = ^(NSUInteger editedMask, NSRange range, NSInteger delta)
-//	{
-//		editedCalls++;
-//	};
-//	
-//	UKIntsEqual(0, editedCalls);
-//	[self appendString: @"()" htmlCode: @"i" toAttributedString: [source rootObject]];
-//	
-//	// TODO: Currently, a lot of redundant -edited:... calls are made
-//	UKFalse(0 == editedCalls);
-//}
-
 - (void) testInsertInEmptyString
 {
 	[as replaceCharactersInRange: NSMakeRange(0, 0) withString: @"a"];
 	
 	UKObjectsEqual(@"a", [as string]);
+	
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 1]]];
 }
 
 - (void) testInsertAtEndOfString
@@ -216,6 +306,9 @@
 	[as replaceCharactersInRange: NSMakeRange(1, 0) withString: @"b"];
 	
 	UKObjectsEqual(@"ab", [as string]);
+	
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 1],
+								 [EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 0) changeInLength: 1]]];
 }
 
 - (void) testInsertAfterTwoChunks
@@ -226,6 +319,11 @@
 	[as replaceCharactersInRange: NSMakeRange(2, 0) withString: @"c"];
 	
 	UKObjectsEqual(@"abc", [as string]);
+	
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 1],
+								 [EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 0) changeInLength: 1],
+								 [EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(2, 0) changeInLength: 1]]];
+
 }
 
 - (void) testLongestEffectiveRange
@@ -237,11 +335,13 @@
 					 atIndex: 0
 	   longestEffectiveRange: &longestEffectiveRange
 					 inRange: NSMakeRange(0, 1)];
-//					 inRange: NSMakeRange(0, 2)]; /* We need to handle the range spuriously extending beyond the string length */
 	
 	UKNil(value);
 	UKIntsEqual(0, longestEffectiveRange.location);
 	UKIntsEqual(1, longestEffectiveRange.length);
+	
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 1]]];
+
 }
 
 - (void) testAttributeAtIndex
@@ -252,6 +352,9 @@
 	NSRange effectiveRange;
 	UKObjectsEqual(@(NSUnderlineStyleSingle), [as attribute: NSUnderlineStyleAttributeName atIndex: 0 effectiveRange: &effectiveRange]);
 	UKRaisesException([as attribute: @"foo" atIndex: 1 effectiveRange: &effectiveRange]);
+	
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 1]]];
+
 }
 
 - (void) testNonExistentAttributeAtStart
@@ -266,6 +369,8 @@
 	UKNil(value);
 	UKIntsEqual(0, effectiveRange.location);
 	UKIntsEqual(1, effectiveRange.length);
+	
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 1]]];
 }
 
 - (void) testNonExistentAttributeAtEnd
@@ -274,6 +379,8 @@
 	
 	NSRange effectiveRange;
 	UKRaisesException([as attribute: NSUnderlineStyleAttributeName atIndex: 1 effectiveRange: &effectiveRange]);
+
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 1]]];
 }
 
 - (void) testReadAttributeInEmptyString
@@ -327,7 +434,6 @@
 }
 
 @end
-
 
 
 /**
