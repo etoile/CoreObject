@@ -185,43 +185,6 @@
 
 @implementation AbstractTextStorageTests
 
-- (void) checkAttribute: (NSString *)attributeName hasValue: (id)expectedValue withLongestEffectiveRange: (NSRange)expectedRange inAttributedString: (NSAttributedString *)target
-{
-	NSRange actualRange;
-	id actualValue = [target attribute: attributeName
-							   atIndex: expectedRange.location
-				 longestEffectiveRange: &actualRange
-							   inRange: NSMakeRange(0, [target length])];
-	
-	if (expectedValue == nil)
-	{
-		UKNil(actualValue);
-	}
-	else
-	{
-		UKObjectsEqual(expectedValue, actualValue);
-	}
-	
-	UKIntsEqual(expectedRange.location, actualRange.location);
-	UKIntsEqual(expectedRange.length, actualRange.length);
-}
-
-- (void) checkFontHasTraits: (NSFontSymbolicTraits)traits withLongestEffectiveRange: (NSRange)expectedRange inAttributedString: (NSAttributedString *)target
-{
-	NSRange actualRange;
-	NSFont *actualFont = [target attribute: NSFontAttributeName
-								   atIndex: expectedRange.location
-					 longestEffectiveRange: &actualRange
-								   inRange: NSMakeRange(0, [target length])];
-	
-	NSFontSymbolicTraits actualTraits = [[actualFont fontDescriptor] symbolicTraits];
-	
-	UKTrue((actualTraits & traits) == traits);
-	
-	UKIntsEqual(expectedRange.location, actualRange.location);
-	UKIntsEqual(expectedRange.length, actualRange.length);
-}
-
 - (void) checkCharacterEdits: (NSArray *)expected
 {
 	if ([as conformsToProtocol: @protocol(EditedCallLogging)])
