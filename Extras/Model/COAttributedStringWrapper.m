@@ -49,19 +49,11 @@
 	NSUInteger oldLength = _lastNotifiedLength;
 	_lastNotifiedLength = currentLength;
 	
-	if (oldLength > 100 || delta > 100)
-	{
-		NSLog(@"Abort");
-		assert(0);
-	}
-	
-	// FIXME: This is breaking things, disabled for now
-	
-//	NSLog(@"Last time -edited:range:changeInLength: was called, length was %d. Changed by %d", (int)_lastNotifiedLength, (int)delta);
-//
-//	[self edited: NSTextStorageEditedAttributes | NSTextStorageEditedCharacters
-//		   range: NSMakeRange(0, oldLength)
-//  changeInLength: delta];
+	NSLog(@"!!!! COAtrributedString length modified by %d (outside of a NSTextStorage mutation method)", (int)delta);
+		
+	[self edited: NSTextStorageEditedAttributes | NSTextStorageEditedCharacters
+		   range: NSMakeRange(0, oldLength)
+  changeInLength: delta];
 }
 
 // Primitive NSAttributedString methods
@@ -101,7 +93,7 @@
 
 - (NSDictionary *)attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)aRangeOut
 {
-	NSLog(@"%p (%@) attributesAtIndex %d", self, [self string], (int)anIndex);
+	//NSLog(@"%p (%@) attributesAtIndex %d", self, [self string], (int)anIndex);
 	
 	_inPrimitiveMethod = YES;
 	
@@ -138,7 +130,7 @@
 		result[NSFontAttributeName] = font;
 		
 		_inPrimitiveMethod = NO;
-		NSLog(@"     attributesAtIndex %d are '%@', effective range %@", (int)anIndex, result, NSStringFromRange(NSMakeRange(chunkStart, target.length)));
+		//NSLog(@"     attributesAtIndex %d are '%@', effective range %@", (int)anIndex, result, NSStringFromRange(NSMakeRange(chunkStart, target.length)));
 		return result;
 	}
 
@@ -152,7 +144,7 @@
 
 - (void)replaceCharactersInRange: (NSRange)aRange withString: (NSString *)aString
 {
-	NSLog(@"%p (%@) replaceCharactersInRange %@ with '%@'", self, [self string], NSStringFromRange(aRange), aString);
+	//NSLog(@"%p (%@) replaceCharactersInRange %@ with '%@'", self, [self string], NSStringFromRange(aRange), aString);
 	
 	_inPrimitiveMethod = YES;
 		
@@ -201,7 +193,9 @@
 	}
 	
 	// TODO: Add tests that check for this
-	[self edited: NSTextStorageEditedCharacters range: aRange changeInLength: [aString length] - aRange.length];
+	const NSInteger delta = [aString length] - aRange.length;
+	[self edited: NSTextStorageEditedCharacters range: aRange changeInLength: delta];
+	_lastNotifiedLength += delta;
 	
 	_inPrimitiveMethod = NO;
 }
@@ -250,12 +244,14 @@
 
 - (void)setAttributes: (NSDictionary *)aDict range: (NSRange)aRange
 {
-	NSLog(@"%p (%@) Set attributes %@ range %@", self, [self string], aDict, NSStringFromRange(aRange));
+	//NSLog(@"%p (%@) Set attributes %@ range %@", self, [self string], aDict, NSStringFromRange(aRange));
 	
 	if (aRange.length == 0)
 	{
 		return;
 	}
+	
+	_inPrimitiveMethod = YES;
 	
 	// Short-circuit
 	{
@@ -271,12 +267,11 @@
 			if ([existingAttribs isEqual: proposedAttribs])
 			{
 				[self edited: NSTextStorageEditedAttributes range: aRange changeInLength: 0];
+				_inPrimitiveMethod = NO;
 				return;
 			}
 		}
 	}
-	
-	_inPrimitiveMethod = YES;
 		
 	const NSUInteger splitChunk1 = [_backing splitChunkAtIndex: aRange.location];
 	const NSUInteger splitChunk2 = [_backing splitChunkAtIndex: NSMaxRange(aRange)];
