@@ -48,6 +48,8 @@
 #import "UnivaluedAttributeModel.h"
 #import "UnorderedAttributeModel.h"
 
+#import "OverriddenIsEqualObject.h"
+
 #import "COAttributedString.h"
 #import "COAttributedStringChunk.h"
 #import "COAttributedStringWrapper.h"

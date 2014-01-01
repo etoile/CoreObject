@@ -180,6 +180,7 @@
 		6646978017CE7E2600A1B767 /* COSynchronizationServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */; };
 		6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6646985A17D3C55600A1B767 /* COObjectGraphContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		664F8B0218741011001AD224 /* OverriddenIsEqualObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F8B0118741011001AD224 /* OverriddenIsEqualObject.m */; };
 		665352FD18528A6700662309 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60884D401837B09800C5C7C9 /* AppKit.framework */; };
 		66539E0C1860472E0077FB18 /* COAttributedStringWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 66539E0A1860472E0077FB18 /* COAttributedStringWrapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66539E0D1860472E0077FB18 /* COAttributedStringWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 66539E0B1860472E0077FB18 /* COAttributedStringWrapper.m */; };
@@ -681,6 +682,8 @@
 		6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COSynchronizationServer.m; path = Synchronization/COSynchronizationServer.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COSQLiteStore+Private.h"; path = "Store/COSQLiteStore+Private.h"; sourceTree = "<group>"; };
 		6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Private.h"; path = "Core/COObjectGraphContext+Private.h"; sourceTree = "<group>"; };
+		664F8B0018741011001AD224 /* OverriddenIsEqualObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OverriddenIsEqualObject.h; path = Tests/TestModelObjects/OverriddenIsEqualObject.h; sourceTree = "<group>"; };
+		664F8B0118741011001AD224 /* OverriddenIsEqualObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OverriddenIsEqualObject.m; path = Tests/TestModelObjects/OverriddenIsEqualObject.m; sourceTree = "<group>"; };
 		66539E0A1860472E0077FB18 /* COAttributedStringWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COAttributedStringWrapper.h; sourceTree = "<group>"; };
 		66539E0B1860472E0077FB18 /* COAttributedStringWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COAttributedStringWrapper.m; sourceTree = "<group>"; };
 		66550BE817D51C6100327657 /* TestObjectGraphPerformance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TestObjectGraphPerformance.m; path = Benchmark/TestObjectGraphPerformance.m; sourceTree = "<group>"; };
@@ -1564,6 +1567,8 @@
 				66101178184D8EF0001A3E24 /* UnivaluedAttributeModel.m */,
 				6610117A184D8EFD001A3E24 /* UnorderedAttributeModel.h */,
 				6610117B184D8EFD001A3E24 /* UnorderedAttributeModel.m */,
+				664F8B0018741011001AD224 /* OverriddenIsEqualObject.h */,
+				664F8B0118741011001AD224 /* OverriddenIsEqualObject.m */,
 			);
 			name = "Model Objects";
 			sourceTree = "<group>";
@@ -2169,6 +2174,7 @@
 				66E40D781836D08E00E5B4A7 /* TestUndoStackFailedNavigation.m in Sources */,
 				666888141849961300DBEB10 /* TestUnivaluedRelationshipWithOpposite.m in Sources */,
 				66E40D5C1836D08D00E5B4A7 /* TestCopierWithIsSharedFalseAndMultipleReferences.m in Sources */,
+				664F8B0218741011001AD224 /* OverriddenIsEqualObject.m in Sources */,
 				6699DDAC184887E70003E803 /* TestOrderedRelationship.m in Sources */,
 				66101173184D8E7F001A3E24 /* KeyedAttributeModel.m in Sources */,
 				6610117C184D8EFD001A3E24 /* UnorderedAttributeModel.m in Sources */,
