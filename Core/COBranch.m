@@ -679,7 +679,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     
     [_objectGraph clearChangeTracking];
     
-    ETAssert([[_objectGraph changedObjects] count] == 0);
+    ETAssert(![_objectGraph hasChanges]);
 }
 
 - (void)reloadAtRevision: (CORevision *)revision
@@ -835,25 +835,26 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (COItemGraph *)modifiedItemsSnapshot
 {
-    NSSet *objects = nil;
+    NSSet *objectUUIDs = nil;
     COObjectGraphContext *graph = [self modifiedItemsSource];
 	
     if (_currentRevisionUUID == nil)
     {
-        objects = [graph loadedObjects];
+        objectUUIDs = [NSSet setWithArray: [graph itemUUIDs]];
     }
     else
     {
-        objects = [graph changedObjects];
+        objectUUIDs = [graph changedObjectUUIDs];
     }
     
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
     
-    for (COObject *obj in objects)
+    for (ETUUID *uuid in objectUUIDs)
     {
-        COItem *item = [graph itemForUUID: [obj UUID]];
+		COObject *obj = [graph loadedObjectForUUID: uuid];
+        COItem *item = [graph itemForUUID: uuid];
 
-        [dict setObject: item forKey: [obj UUID]];
+        [dict setObject: item forKey: uuid];
 
 		for (ETUUID *itemUUID in [[obj additionalStoreItemUUIDs] objectEnumerator])
 		{

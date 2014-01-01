@@ -755,6 +755,11 @@
 	UKObjectsEqual(@"child1", [child1 label]);
 }
 
+/**
+ * This test ensures that CoreObject doesn't internally keep track of COObjects
+ * in NSSets. This would be dangerous, if a subclass changed the semantics of
+ * isEqual:
+ */
 - (void) testOverriddenIsEqualsObject
 {
 	OverriddenIsEqualObject *obj1 = [[OverriddenIsEqualObject alloc] initWithObjectGraphContext: [originalBranch objectGraphContext]];
@@ -775,14 +780,8 @@
 		 OverriddenIsEqualObject *testObj1 = [[testBranch objectGraphContext] loadedObjectForUUID: obj1.UUID];
 		 OverriddenIsEqualObject *testObj2 = [[testBranch objectGraphContext] loadedObjectForUUID: obj2.UUID];
 		 
-		 // FIXME: Currently, in -[COBranch modifiedItemsSnapshot] the list of COObjects to write to the store
-		 // passes through an NSSet, which means only one of the objects will get written.
-		 //
-		 // Either we must avoid using COObjects in NSSet internally in CoreObject (should be easy),
-		 // or we must disallow overriding -isEqual: (ideally with a runtime check to verify that it hasn't been overridden)
-		 
-//		 UKNotNil(testObj1);
-//		 UKNotNil(testObj2);
+		 UKNotNil(testObj1);
+		 UKNotNil(testObj2);
 	 }];
 }
 

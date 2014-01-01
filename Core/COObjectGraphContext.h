@@ -40,9 +40,9 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 	/** Item graph exposed during loading (nil once the loading is done) */
 	id <COItemGraph> _loadingItemGraph;
 	NSMutableDictionary *_objectsByAdditionalItemUUIDs;
-    NSMutableDictionary *_insertedObjects;
-    NSMutableDictionary *_updatedObjects;
-    NSMapTable *_updatedPropertiesByObject;
+    NSMutableSet *_insertedObjectUUIDs;
+    NSMutableSet *_updatedObjectUUIDs;
+    NSMutableDictionary *_updatedPropertiesByUUID;
 }
 
 
@@ -200,18 +200,18 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 
 
 /**
- * Returns the objects inserted since change tracking was cleared.
+ * Returns the object UUIDs inserted since change tracking was cleared.
  *
  * After a commit, returns an empty set.
  */
-@property (nonatomic, readonly) NSSet *insertedObjects;
+@property (nonatomic, readonly) NSSet *insertedObjectUUIDs;
 /**
- * Returns the objects whose properties have been edited since change tracking 
+ * Returns the object UUIDs whose properties have been edited since change tracking
  * was cleared.
  *
  * After a commit, returns an empty set.
  */
-@property (nonatomic, readonly) NSSet *updatedObjects;
+@property (nonatomic, readonly) NSSet *updatedObjectUUIDs;
 /**
  * Returns whether the object is among the updated objects.
  *
@@ -219,12 +219,12 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  */
 - (BOOL)isUpdatedObject: (COObject *)anObject;
 /**
- * Returns the union of the inserted and updated objects. See -insertedObjects
- * and -updatedObjects.
+ * Returns the union of the inserted and updated objects. See -insertedObjectUUIDs
+ * and -updatedObjectUUIDs.
  *
  * After a commit, returns an empty set.
  */
-@property (nonatomic, readonly) NSSet *changedObjects;
+@property (nonatomic, readonly) NSSet *changedObjectUUIDs;
 /**
  * Returns whether the context contains uncommitted changes.
  *
@@ -260,7 +260,7 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  *
  * See also -objectWithUUID: and -rootObject.
  */
-@property (nonatomic, readonly) NSSet *loadedObjects;
+@property (nonatomic, readonly) NSArray *loadedObjects;
 /**
  * Returns the inner object bound to the given UUID in the object graph.
  *
@@ -281,6 +281,6 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * Useful to debug the object changes reported to the context since the last 
  * commit.
  */
-@property (nonatomic, readonly) NSMapTable *updatedPropertiesByObject;
+@property (nonatomic, readonly) NSDictionary *updatedPropertiesByUUID;
 
 @end

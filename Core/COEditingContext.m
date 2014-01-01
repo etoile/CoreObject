@@ -702,14 +702,14 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 
 @implementation COEditingContext (Debugging)
 
-- (NSSet *)loadedObjects
+- (NSArray *)loadedObjects
 {
-	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(loadedObjects)];
+	return [self arrayByCollectingObjectsFromPersistentRootsUsingSelector: @selector(loadedObjects)];
 }
 
-- (NSSet *)loadedRootObjects
+- (NSArray *)loadedRootObjects
 {
-	NSMutableSet *collectedObjects = [NSMutableSet set];
+	NSMutableArray *collectedObjects = [NSMutableArray new];
 	
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
@@ -721,34 +721,33 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 	return collectedObjects;
 }
 
-// NOTE: We could rewrite it using -foldWithBlock: or -leftFold (could be faster)
-- (NSSet *)setByCollectingObjectsFromPersistentRootsUsingSelector: (SEL)aSelector
+- (NSArray *)arrayByCollectingObjectsFromPersistentRootsUsingSelector: (SEL)aSelector
 {
-	NSMutableSet *collectedObjects = [NSMutableSet set];
+	NSMutableArray *collectedObjects = [NSMutableArray new];
 
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
 		for (COObjectGraphContext *objectGraphContext in [persistentRoot allObjectGraphContexts])
 		{
-			[collectedObjects unionSet: [objectGraphContext performSelector: aSelector]];
+			[collectedObjects addObjectsFromArray: [objectGraphContext performSelector: aSelector]];
 		}
 	}
 	return collectedObjects;
 }
 
-- (NSSet *)insertedObjects
+- (NSArray *)insertedObjects
 {
-	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(insertedObjects)];
+	return [self arrayByCollectingObjectsFromPersistentRootsUsingSelector: @selector(insertedObjects)];
 }
 
-- (NSSet *)updatedObjects
+- (NSArray *)updatedObjects
 {
-	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(updatedObjects)];
+	return [self arrayByCollectingObjectsFromPersistentRootsUsingSelector: @selector(updatedObjects)];
 }
 
-- (NSSet *)changedObjects
+- (NSArray *)changedObjects
 {
-	return [self setByCollectingObjectsFromPersistentRootsUsingSelector: @selector(changedObjects)];
+	return [self arrayByCollectingObjectsFromPersistentRootsUsingSelector: @selector(changedObjects)];
 }
 
 @end

@@ -93,7 +93,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
  *
  * See also -loadedObjectUUIDs.
  */
-- (NSSet *)loadedObjects;
+- (NSArray *)loadedObjects;
 /**
  * Returns the root objects presently managed by the receiver in memory.
  *
@@ -101,7 +101,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
  *
  * The returned objects are a subset of -loadedObjects.
  */
-- (NSSet *)loadedRootObjects;
+- (NSArray *)loadedRootObjects;
 
 /**
  * @taskunit Pending Changes
@@ -113,20 +113,20 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
  *
  * After a commit, returns an empty set.
  */
-- (NSSet *)insertedObjects;
+- (NSArray *)insertedObjects;
 /**
  * Returns the objects whose properties have been edited in the context and to
  * be updated in the store on the next commit.
  *
  * After a commit, returns an empty set.
  */
-- (NSSet *)updatedObjects;
+- (NSArray *)updatedObjects;
 /**
  * Returns the union of the inserted and updated objects. See -insertedObjects
  * and -updatedObjects.
  *
  * After a commit, returns an empty set.
  */
-- (NSSet *)changedObjects;
+- (NSArray *)changedObjects;
 
 @end

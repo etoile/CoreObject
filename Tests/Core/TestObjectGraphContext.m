@@ -170,9 +170,9 @@
 	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
     [ctx2 setRootObject: [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"]];
 	OutlineItem *root = [ctx2 rootObject];
-    
-    UKObjectsEqual(S(root), [ctx2 insertedObjects]);
-    UKObjectsEqual([NSSet set], [ctx2 updatedObjects]);
+
+    UKObjectsEqual(S(root.UUID), [ctx2 insertedObjectUUIDs]);
+    UKObjectsEqual([NSSet set], [ctx2 updatedObjectUUIDs]);
     
     OutlineItem *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
     //[ctx2 setRootObject: root2];
@@ -182,21 +182,21 @@
     OutlineItem *list1 = [self addObjectWithLabel: @"List1" toObject: root2];
 
     
-    UKObjectsEqual(S(root, list1, root2), [ctx2 insertedObjects]);
-    UKObjectsEqual([NSSet set], [ctx2 updatedObjects]);
+    UKObjectsEqual(S(root.UUID, list1.UUID, root2.UUID), [ctx2 insertedObjectUUIDs]);
+    UKObjectsEqual([NSSet set], [ctx2 updatedObjectUUIDs]);
     
     [ctx2 clearChangeTracking];
     
-    UKObjectsEqual([NSSet set], [ctx2 insertedObjects]);
-    UKObjectsEqual([NSSet set], [ctx2 updatedObjects]);
+    UKObjectsEqual([NSSet set], [ctx2 insertedObjectUUIDs]);
+    UKObjectsEqual([NSSet set], [ctx2 updatedObjectUUIDs]);
     
     // After calling -clearChangeTracking, further changes to those recently inserted
     // objects count as modifications.
     
     [root2 setValue: @"test" forProperty: kCOLabel];
     
-    UKObjectsEqual([NSSet set], [ctx2 insertedObjects]);
-    UKObjectsEqual(S(root2), [ctx2 updatedObjects]);
+    UKObjectsEqual([NSSet set], [ctx2 insertedObjectUUIDs]);
+    UKObjectsEqual(S(root2.UUID), [ctx2 updatedObjectUUIDs]);
 }
 
 - (void)testShoppingList

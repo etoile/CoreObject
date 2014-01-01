@@ -289,7 +289,7 @@
  * 
  * During the initialization, the receiver is automatically inserted into
  * the object graph context. As a result, the receiver appears in
- * -[COObjectGraphContext insertedObjects] on return.
+ * -[COObjectGraphContext insertedObjectUUIDs] on return.
  *
  * If the object graph context is transient (not owned by any branch), the
  * returned object is transient, otherwise it is persistent.<br />
@@ -557,7 +557,7 @@
  * For a removed object, if no incoming relationships retains it, the object is 
  * going to be deleted (collected in the next GC phase).
  *
- * See also COError, -[COObjectGraphContext insertedObjects], 
+ * See also COError, -[COObjectGraphContext insertedObjectUUIDs],
  * -[COObjectGraphContext updatedObjects] and -[COObjectGraphContext changedObjects].
  */
 - (NSArray *)validate;
