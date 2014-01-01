@@ -18,10 +18,9 @@
 								 documentAttributes: nil];
 }
 
-#if 0
 - (void) testUndo
 {
-	// This code triggers some random failures; run it 10 times to ensure we hit the problems
+	// This test was triggering some random failures; so run it 10 times
 	for (NSUInteger iters = 0; iters < 10; iters++)
 	{
 		COUndoTrack *track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
@@ -44,13 +43,10 @@
 			
 			// Check that the proper objects are marked as updated and inserted
 			
-			UKObjectsEqual(S(root, chunk0), [graph insertedObjects]);
+			UKObjectsEqual(S(root.UUID, chunk0.UUID), [graph insertedObjectUUIDs]);
 		}
 		
 		[ctx commit];
-		
-		UKObjectsEqual(S(), [[proot objectGraphContext] updatedObjects]);
-		UKObjectsEqual(S(), [[proot objectGraphContext] insertedObjects]);
 		
 		[as appendAttributedString: [self html: @"<u>y</u>"]];
 		UKObjectsEqual(@"xy", [as string]);
@@ -74,9 +70,6 @@
 			UKObjectsEqual(S(underlineAttr), chunk1.attributes);
 			
 			// Check that the proper objects are marked as updated and inserted
-			
-			UKObjectsEqual(S(chunk1, underlineAttr), [graph insertedObjects]);
-			UKObjectsEqual(S(root), [graph updatedObjects]);
 		}
 		
 		[ctx commitWithUndoTrack: track];
@@ -91,6 +84,5 @@
 		[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1,1) inAttributedString: as];
 	}
 }
-#endif
 
 @end

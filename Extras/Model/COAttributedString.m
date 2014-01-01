@@ -38,7 +38,10 @@
 	NSMutableString *result = [NSMutableString new];
 	for (COAttributedStringChunk *chunk in self.chunks)
 	{
-		[result appendString: chunk.text];
+		if (chunk.text != nil)
+		{
+			[result appendString: chunk.text];
+		}
 	}
 	return result;
 }
