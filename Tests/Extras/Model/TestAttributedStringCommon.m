@@ -23,7 +23,7 @@
 	return ctx1;
 }
 
-- (void) appendString: (NSString *)string htmlCodes: (NSArray *)codes toAttributedString: (COAttributedString *)dest
+- (COAttributedStringChunk *) appendString: (NSString *)string htmlCodes: (NSArray *)codes toAttributedString: (COAttributedString *)dest
 {
 	COObjectGraphContext *graph = [dest objectGraphContext];
 	COAttributedStringChunk *chunk = [graph insertObjectWithEntityName: @"COAttributedStringChunk"];
@@ -35,11 +35,12 @@
 	}
 	
 	[dest insertObject: chunk atIndex: ETUndeterminedIndex hint: nil forProperty: @"chunks"];
+	return chunk;
 }
 
-- (void) appendString: (NSString *)string htmlCode: (NSString *)aCode toAttributedString: (COAttributedString *)dest
+- (COAttributedStringChunk *) appendString: (NSString *)string htmlCode: (NSString *)aCode toAttributedString: (COAttributedString *)dest
 {
-	[self appendString: string htmlCodes: (aCode == nil ? @[] : @[aCode]) toAttributedString: dest];
+	return [self appendString: string htmlCodes: (aCode == nil ? @[] : @[aCode]) toAttributedString: dest];
 }
 
 - (void) checkAttribute: (NSString *)attributeName hasValue: (id)expectedValue withLongestEffectiveRange: (NSRange)expectedRange inAttributedString: (NSAttributedString *)target
