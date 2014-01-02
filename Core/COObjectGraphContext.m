@@ -517,9 +517,16 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 - (void)discardObject: (COObject *)anObject
 {
+	ETUUID *uuid = [anObject UUID];
+	
     // Mark the object as a "zombie"
     
     [anObject markAsRemovedFromContext];
+	
+	// Update change tracking
+    
+    [_insertedObjectUUIDs removeObject: uuid];
+    [_updatedObjectUUIDs removeObject: uuid];
 
 	// Remove it from the additional item to object lookup table
 
@@ -527,7 +534,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     
     // Release it from the objects dictionary (may release it)
     
-    [_loadedObjects removeObjectForKey: [anObject UUID]];
+    [_loadedObjects removeObjectForKey: uuid];
 }
 
 - (void)clearChangeTracking
@@ -585,34 +592,6 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 #pragma mark -
 #pragma mark Garbage Collection
 
-/**
- * Call to update the view to reflect one object becoming unavailable.
- *
- * Preconditions:
- *  - No objects in the context should have composite relationships to uuid.
- *
- * Postconditions:
- *  - objectForUUID: will return nil
- *  - the COObject previously held by the context will be turned into a "zombie"
- *    and the COEditingContext will release it, so it will be deallocated if
- *    no user code holds a reference to it.
- */
-- (void)removeSingleObjectWithUUID: (ETUUID *)uuid
-{
-    COObject *anObject = [_loadedObjects objectForKey: uuid];
-    
-    // Update relationship cache
-    
-    [anObject removeCachedOutgoingRelationships];
-    
-    // Update change tracking
-    
-    [_insertedObjectUUIDs removeObject: uuid];
-    [_updatedObjectUUIDs removeObject: uuid];
-	
-	[self discardObject: anObject];
-}
-
 - (void)removeUnreachableObjects
 {
     if ([self rootObject] == nil)
@@ -624,10 +603,14 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	NSSet *liveUUIDs = [self allReachableObjectUUIDs];
     [deadUUIDs minusSet: liveUUIDs];
     
+	// FIXME: Should the other places that call -discardObjectsWithUUIDs: also do this?
     for (ETUUID *deadUUID in deadUUIDs)
     {
-        [self removeSingleObjectWithUUID: deadUUID];
+		COObject *anObject = [_loadedObjects objectForKey: deadUUID];
+		[anObject removeCachedOutgoingRelationships];
     }
+	
+	[self discardObjectsWithUUIDs: deadUUIDs];
 }
 
 - (void)replaceObject: (COObject *)anObject withObject: (COObject *)aReplacement

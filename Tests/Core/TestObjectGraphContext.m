@@ -286,4 +286,47 @@
     UKRaisesException([ctx1 setRootObject: root2]);
 }
 
+/**
+ * Adds two parent/child object pairs, that are not referred to by the root
+ * object, so they will get garbage collected.
+ */
+- (void) addGarbageToObjectGraphContext
+{
+	OrderedGroupWithOpposite *parent1 = [[OrderedGroupWithOpposite alloc] initWithObjectGraphContext: ctx1];
+	OrderedGroupContent *child1 = [[OrderedGroupContent alloc] initWithObjectGraphContext: ctx1];
+	OrderedGroupContent *child2 = [[OrderedGroupContent alloc] initWithObjectGraphContext: ctx1];
+	OrderedGroupWithOpposite *parent2 = [[OrderedGroupWithOpposite alloc] initWithObjectGraphContext: ctx1];
+	parent1.contents = @[child1];
+	parent2.contents = @[child2];
+}
+
+/**
+ * This is carefully set up to trigger a message-to-deallocated-instance
+ * bug that existed in -removeUnreachableObjects.
+ */
+- (void) doTestGarbageCollection
+{
+	@autoreleasepool {
+		UKIntsEqual(1, [[ctx1 loadedObjects] count]);
+		
+		[self addGarbageToObjectGraphContext];
+		
+		UKTrue([[ctx1 loadedObjects] count] > 1);
+	}
+	
+	[ctx1 removeUnreachableObjects];
+
+	@autoreleasepool {
+		UKIntsEqual(1, [[ctx1 loadedObjects] count]);
+	}
+}
+
+- (void) testGarbageCollection
+{
+	for (NSUInteger i = 0; i<10; i++)
+	{
+		[self doTestGarbageCollection];
+	}
+}
+
 @end
