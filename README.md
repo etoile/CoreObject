@@ -15,7 +15,11 @@ semantic merging, rich undo/redo support, collaborative editing, and a
 transaction API for viewing database snapshots in memory and batching changes for commit.
 
 
-Key Features:
+[![Build Status](https://travis-ci.org/etoile/CoreObject.png?branch=master)](https://travis-ci.org/etoile/CoreObject)
+
+
+Key Features
+------------
 
 - Revision Control	
 
