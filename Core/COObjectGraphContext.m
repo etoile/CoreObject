@@ -172,18 +172,19 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 #pragma mark -
 #pragma mark Metamodel Access
 
-- (NSString *)entityNameForItem: (COItem *)anItem
++ (NSString *)entityNameForItem: (COItem *)anItem
 {
     return [anItem valueForAttribute: kCOObjectEntityNameProperty];
 }
 
 // NOTE: If we decide to make the method public, move it to COEditingContext
-- (NSString *)defaultEntityName
++ (NSString *)defaultEntityName
 {
 	return @"COObject";
 }
 
-- (ETEntityDescription *)descriptionForItem: (COItem *)anItem
++ (ETEntityDescription *)descriptionForItem: (COItem *)anItem
+				 modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository
 {
     NSString *name = [self entityNameForItem: anItem];
     
@@ -193,14 +194,19 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
                     format: @"COItem %@ lacks an entity name", anItem];
     }
     
-	ETEntityDescription *desc = [_modelDescriptionRepository descriptionForName: name];
+	ETEntityDescription *desc = [aRepository descriptionForName: name];
     
     if (desc == nil)
     {
-        desc = [_modelDescriptionRepository descriptionForName: [self defaultEntityName]];
+        desc = [aRepository descriptionForName: [self defaultEntityName]];
     }
     
     return desc;
+}
+
+- (ETEntityDescription *)descriptionForItem: (COItem *)anItem
+{
+	return [[self class] descriptionForItem: anItem modelDescriptionRepository: _modelDescriptionRepository];
 }
 
 #pragma mark -

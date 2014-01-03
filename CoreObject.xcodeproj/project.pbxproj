@@ -181,6 +181,8 @@
 		6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6646985A17D3C55600A1B767 /* COObjectGraphContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		664F8B0218741011001AD224 /* OverriddenIsEqualObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F8B0118741011001AD224 /* OverriddenIsEqualObject.m */; };
+		664F8B1618762411001AD224 /* CODiffManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 664F8B1418762411001AD224 /* CODiffManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		664F8B1718762411001AD224 /* CODiffManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F8B1518762411001AD224 /* CODiffManager.m */; };
 		665352FD18528A6700662309 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60884D401837B09800C5C7C9 /* AppKit.framework */; };
 		66539E0C1860472E0077FB18 /* COAttributedStringWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 66539E0A1860472E0077FB18 /* COAttributedStringWrapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66539E0D1860472E0077FB18 /* COAttributedStringWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 66539E0B1860472E0077FB18 /* COAttributedStringWrapper.m */; };
@@ -684,6 +686,8 @@
 		6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Private.h"; path = "Core/COObjectGraphContext+Private.h"; sourceTree = "<group>"; };
 		664F8B0018741011001AD224 /* OverriddenIsEqualObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OverriddenIsEqualObject.h; path = Tests/TestModelObjects/OverriddenIsEqualObject.h; sourceTree = "<group>"; };
 		664F8B0118741011001AD224 /* OverriddenIsEqualObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OverriddenIsEqualObject.m; path = Tests/TestModelObjects/OverriddenIsEqualObject.m; sourceTree = "<group>"; };
+		664F8B1418762411001AD224 /* CODiffManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODiffManager.h; path = Diff/CODiffManager.h; sourceTree = "<group>"; };
+		664F8B1518762411001AD224 /* CODiffManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODiffManager.m; path = Diff/CODiffManager.m; sourceTree = "<group>"; };
 		66539E0A1860472E0077FB18 /* COAttributedStringWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COAttributedStringWrapper.h; sourceTree = "<group>"; };
 		66539E0B1860472E0077FB18 /* COAttributedStringWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COAttributedStringWrapper.m; sourceTree = "<group>"; };
 		66550BE817D51C6100327657 /* TestObjectGraphPerformance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TestObjectGraphPerformance.m; path = Benchmark/TestObjectGraphPerformance.m; sourceTree = "<group>"; };
@@ -1320,6 +1324,8 @@
 				660D4CD817D5C7CB003C9ACC /* COLeastCommonAncestor.m */,
 				660D4CE317D689FC003C9ACC /* COMergeInfo.h */,
 				660D4CE417D689FC003C9ACC /* COMergeInfo.m */,
+				664F8B1418762411001AD224 /* CODiffManager.h */,
+				664F8B1518762411001AD224 /* CODiffManager.m */,
 			);
 			name = "Diff & Merge (Low-level API)";
 			sourceTree = "<group>";
@@ -1778,6 +1784,7 @@
 				66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */,
 				660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */,
 				668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */,
+				664F8B1618762411001AD224 /* CODiffManager.h in Headers */,
 				601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */,
 				6646974A17CDA78300A1B767 /* COEditingContext+Private.h in Headers */,
 				600F72BF1858A71200CB6AC5 /* COPersistentObjectContext.h in Headers */,
@@ -2099,6 +2106,7 @@
 				668084F11791FBAB003A3CC6 /* COObjectGraphContext.m in Sources */,
 				66D3FCDE1860EB61009BDF50 /* COAttributedStringDiff.m in Sources */,
 				66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */,
+				664F8B1718762411001AD224 /* CODiffManager.m in Sources */,
 				66FD348B1830B84C00898381 /* COSynchronizerJSONServer.m in Sources */,
 				660179D5182AFA78006E7D7B /* COSynchronizerPushedRevisionsFromClientMessage.m in Sources */,
 				66C3670C17B5F9B0009ACF2F /* COBranchInfo.m in Sources */,

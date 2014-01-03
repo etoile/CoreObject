@@ -66,6 +66,67 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 	}
 }
 
++ (instancetype) diffItemUUIDs: (NSArray *)uuids
+					 fromGraph: (id <COItemGraph>)a
+					   toGraph: (id <COItemGraph>)b
+			  sourceIdentifier: (id)aSource
+{
+	// FIXME: Ugly hack.
+	COObjectGraphContext *ctxA = [[COObjectGraphContext alloc] init];
+	[ctxA setItemGraph: a];
+	COObjectGraphContext *ctxB = [[COObjectGraphContext alloc] init];
+	[ctxB setItemGraph: b];
+	
+	for (ETUUID *uuid in uuids)
+	{
+		COAttributedString *objectA = [ctxA loadedObjectForUUID: uuid];
+		COAttributedString *objectB = [ctxB loadedObjectForUUID: uuid];
+		if ([objectA isKindOfClass: [COAttributedString class]])
+		{
+			COAttributedStringDiff *result = [[self alloc] initWithFirstAttributedString: objectA
+										secondAttributedString: objectB
+														source: aSource];
+			result->_attributedStringUUID = uuid;
+			return result;
+		}
+	}
+	return nil;
+}
+
+- (id<CODiffAlgorithm>) itemTreeDiffByMergingWithDiff: (id<CODiffAlgorithm>)aDiff
+{
+	ETAssert([((COAttributedStringDiff *)aDiff)->_attributedStringUUID isEqual:
+			  self->_attributedStringUUID]);
+	
+	COAttributedStringDiff *result = [COAttributedStringDiff new];
+	result->_operations = [NSMutableArray new];
+	[result addOperationsFromDiff: self];
+	[result addOperationsFromDiff: (COAttributedStringDiff *)aDiff];
+	return result;
+}
+
+- (void) applyTo: (id<COItemGraph>)dest
+{
+	ETAssert(self->_attributedStringUUID != nil);
+	
+	COObjectGraphContext *workingCtx = [[COObjectGraphContext alloc] init];
+	[workingCtx setItemGraph: dest];
+	
+	COAttributedString *as = [workingCtx loadedObjectForUUID: self->_attributedStringUUID];
+	ETAssert([as isKindOfClass: [COAttributedString class]]);
+	
+	[self applyToAttributedString: as];
+	
+	// Copy the changes back to dest.
+	// FIXME: Updates all objects in the context
+	NSMutableArray *items = [NSMutableArray new];
+	for (ETUUID *uuid in [workingCtx itemUUIDs])
+	{
+		[items addObject: [workingCtx itemForUUID: uuid]];
+	}
+	[dest insertOrUpdateItems: items];
+}
+
 - (instancetype) initWithFirstAttributedString: (COAttributedString *)first
 						secondAttributedString: (COAttributedString *)second
 										source: (id)source
@@ -241,6 +302,24 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 - (void) addOperationsFromDiff: (COAttributedStringDiff *)aDiff
 {
 	[_operations addObjectsFromArray: aDiff.operations];
+	
+	[_operations sortUsingComparator: ^(id obj1, id obj2){
+		NSRange r1 = ((id<COAttributedStringDiffOperation>)obj1).range;
+		NSRange r2 = ((id<COAttributedStringDiffOperation>)obj2).range;
+		
+		if (r1.location < r2.location)
+		{
+			return NSOrderedAscending;
+		}
+		if (r1.location == r2.location)
+		{
+			return NSOrderedSame;
+		}
+		else
+		{
+			return NSOrderedDescending;
+		}
+	}];
 }
 
 - (void) applyToAttributedString: (COAttributedString *)target

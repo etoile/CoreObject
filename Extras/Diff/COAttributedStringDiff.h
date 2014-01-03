@@ -13,8 +13,10 @@
 /**
  * TODO: Don't use COAttributedString directly but work on the item representation (?)
  */
-@interface COAttributedStringDiff : NSObject
+@interface COAttributedStringDiff : NSObject <CODiffAlgorithm>
 {
+	ETUUID *_attributedStringUUID;
+	
 	NSMutableArray *_operations;
 	
 	/* Temporary storage during construction */
@@ -33,6 +35,17 @@
 - (void) addOperationsFromDiff: (COAttributedStringDiff *)aDiff;
 
 - (void) applyToAttributedString: (COAttributedString *)target;
+
+/* @taskunit CODiffAlgorithm Protocol */
+
++ (instancetype) diffItemUUIDs: (NSArray *)uuids
+					 fromGraph: (id <COItemGraph>)a
+					   toGraph: (id <COItemGraph>)b
+			  sourceIdentifier: (id)aSource;
+
+- (id<CODiffAlgorithm>) itemTreeDiffByMergingWithDiff: (id<CODiffAlgorithm>)aDiff;
+
+- (void) applyTo: (id<COItemGraph>)dest;
 
 @end
 

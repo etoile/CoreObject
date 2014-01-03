@@ -9,6 +9,7 @@
 #import <CoreObject/COArrayDiff.h>
 #import <CoreObject/COType.h>
 #import <CoreObject/COItemGraph.h>
+#import <CoreObject/CODiffManager.h>
 
 @class ETUUID;
 @class COMutableItem;
@@ -57,7 +58,7 @@
  * - conflicts arise when the same subtree is inserted in multiple places.
  * - note that a _COSubtree_ cannot exist in an inconsistent state.
  */
-@interface COItemGraphDiff : NSObject <NSCopying, CODiffArraysDelegate>
+@interface COItemGraphDiff : NSObject <NSCopying, CODiffArraysDelegate, CODiffAlgorithm>
 {
 	ETUUID *oldRoot;
 	ETUUID *newRoot;
@@ -78,6 +79,11 @@
 + (COItemGraphDiff *) diffItemTree: (id <COItemGraph>)a
                      withItemTree: (id <COItemGraph>)b
                  sourceIdentifier: (id)aSource;
+
++ (instancetype) diffItemUUIDs: (NSArray *)uuids
+					 fromGraph: (id <COItemGraph>)a
+					   toGraph: (id <COItemGraph>)b
+			  sourceIdentifier: (id)aSource;
 
 - (void) applyTo: (id<COItemGraph>)dest;
 

@@ -30,6 +30,7 @@
 
 /* Diff Framework (the Diff API is very unstable) */
 
+#import <CoreObject/CODiffManager.h>
 #import <CoreObject/COArrayDiff.h>
 #import <CoreObject/COMergeInfo.h>
 #import <CoreObject/COItemGraphDiff.h>

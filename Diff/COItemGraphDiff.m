@@ -528,13 +528,24 @@
 					withItemTree: (COItemGraph *)b
                 sourceIdentifier: (id)aSource
 {
+	return [self diffItemUUIDs: [b itemUUIDs]
+					 fromGraph: a
+					   toGraph: b
+			  sourceIdentifier: aSource];
+}
+
++ (instancetype) diffItemUUIDs: (NSArray *)uuids
+					 fromGraph: (id <COItemGraph>)a
+					   toGraph: (id <COItemGraph>)b
+			  sourceIdentifier: (id)aSource
+{
 	NILARG_EXCEPTION_TEST(a);
 	NILARG_EXCEPTION_TEST(b);
 	
 	COItemGraphDiff *result = [[self alloc] initWithOldRootUUID: [a rootItemUUID]
-												   newRootUUID: [b rootItemUUID]];
-
-	for (ETUUID *aUUID in [b itemUUIDs])
+													newRootUUID: [b rootItemUUID]];
+	
+	for (ETUUID *aUUID in uuids)
 	{
 		COItem *commonItemA = [a itemForUUID: aUUID]; // may be nil if the item was inserted in b
 		COItem *commonItemB = [b itemForUUID: aUUID];

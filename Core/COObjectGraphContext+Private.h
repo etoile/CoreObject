@@ -95,4 +95,23 @@
  */
 - (NSArray *)changedObjects;
 
+/** @taskunit Metamodel Access */
+
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
++ (NSString *)entityNameForItem: (COItem *)anItem;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
++ (NSString *)defaultEntityName;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
++ (ETEntityDescription *)descriptionForItem: (COItem *)anItem
+				 modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (ETEntityDescription *)descriptionForItem: (COItem *)anItem;
 @end
