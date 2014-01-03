@@ -28,6 +28,9 @@
 	chunksProperty.opposite = (id)@"Anonymous.COAttributedStringChunk.parentString";
 	
 	[entity setPropertyDescriptions: @[chunksProperty]];
+	
+	entity.diffAlgorithm = @"COAttributedStringDiff";
+	
     return entity;
 }
 

@@ -29,6 +29,9 @@
 	parentStringProperty.opposite = (id)@"Anonymous.COAttributedString.chunks";
 	
 	[entity setPropertyDescriptions: @[textProperty, attributesProperty, parentStringProperty]];
+	
+	entity.diffAlgorithm = @"COAttributedStringDiff";
+	
     return entity;
 }
 @dynamic text, attributes;

@@ -19,6 +19,9 @@
 	htmlCodeProperty.persistent = YES;
 	
 	[entity setPropertyDescriptions: @[htmlCodeProperty]];
+	
+	entity.diffAlgorithm = @"COAttributedStringDiff";
+	
     return entity;
 }
 
