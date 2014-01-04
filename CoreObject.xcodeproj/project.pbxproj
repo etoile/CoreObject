@@ -1801,6 +1801,7 @@
 				60C913AF165BBED000E0C5F4 /* Sources */,
 				60C913B0165BBED000E0C5F4 /* Frameworks */,
 				60C913B1165BBED000E0C5F4 /* CopyFiles */,
+				662FE52818779807005D04AC /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1819,6 +1820,7 @@
 				66550BE917D51C8800327657 /* Sources */,
 				66550BEA17D51C8800327657 /* Frameworks */,
 				66550BEB17D51C8800327657 /* CopyFiles */,
+				662FE53018779893005D04AC /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1993,6 +1995,32 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		662FE52818779807005D04AC /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Derived from: https://github.com/gh-unit/gh-unit/blob/master/Scripts/RunTests.sh\n\n# If we aren't running from the command line, then exit\nif [ \"$TESTCOREOBJECT_AUTORUN\" = \"\" ]; then\nexit 0\nfi\n\nexport DYLD_FRAMEWORK_PATH=\"$CONFIGURATION_BUILD_DIR\"\n$TARGET_BUILD_DIR/$EXECUTABLE_PATH\nRETVAL=$?\n\nexit $RETVAL";
+		};
+		662FE53018779893005D04AC /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Derived from: https://github.com/gh-unit/gh-unit/blob/master/Scripts/RunTests.sh\n\n# If we aren't running from the command line, then exit\nif [ \"$TESTCOREOBJECT_AUTORUN\" = \"\" ]; then\nexit 0\nfi\n\nexport DYLD_FRAMEWORK_PATH=\"$CONFIGURATION_BUILD_DIR\"\n$TARGET_BUILD_DIR/$EXECUTABLE_PATH\nRETVAL=$?\n\nexit $RETVAL";
+		};
 		6679B8FF185305E900971C2A /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
