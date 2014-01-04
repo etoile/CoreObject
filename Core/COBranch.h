@@ -9,7 +9,7 @@
 #import <CoreObject/COTrack.h>
 
 @class COObject, CORevision, COPersistentRoot, COBranchInfo, COObjectGraphContext, COEditingContext;
-@class COItemGraphDiff, COMergeInfo;
+@class CODiffManager, COMergeInfo;
 
 extern NSString * const kCOBranchLabel;
 

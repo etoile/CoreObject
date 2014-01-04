@@ -82,7 +82,8 @@
 		NSMutableArray *itemsForDiffClass = itemUUIDsByDiffAlgorithmName[NSStringFromClass(diffClass)];
 		if (itemsForDiffClass == nil)
 		{
-			itemUUIDsByDiffAlgorithmName[NSStringFromClass(diffClass)] = [NSMutableArray new];
+			itemsForDiffClass = [NSMutableArray new];
+			itemUUIDsByDiffAlgorithmName[NSStringFromClass(diffClass)] = itemsForDiffClass;
 		}
 		[itemsForDiffClass addObject: aUUID];
 	}
@@ -114,8 +115,11 @@
 	return result;
 }
 
-- (void) addOperationsFromDiff: (CODiffManager *)otherDiff
+- (CODiffManager *) diffByMergingWithDiff: (CODiffManager *)otherDiff
 {
+	CODiffManager *result = [[CODiffManager alloc] init];
+	
+	NSMutableDictionary *resultDict = [NSMutableDictionary new];
 	for (NSString *algorithmName in otherDiff.subDiffsByAlgorithmName)
 	{
 		id<CODiffAlgorithm> otherSubDiff = otherDiff.subDiffsByAlgorithmName[algorithmName];
@@ -124,13 +128,16 @@
 		if (ourSubDiff == nil)
 		{
 			// FIXME: Breaks if 'otherDiff' is modified later
-			self.subDiffsByAlgorithmName[algorithmName] = otherSubDiff;
+			resultDict[algorithmName] = otherSubDiff;
 		}
 		else
 		{
-			self.subDiffsByAlgorithmName[algorithmName] = [ourSubDiff itemTreeDiffByMergingWithDiff: otherSubDiff];
+			resultDict[algorithmName] = [ourSubDiff itemTreeDiffByMergingWithDiff: otherSubDiff];
 		}
 	}
+	
+	result->subDiffsByAlgorithmName = resultDict;
+	return result;
 }
 
 - (void) applyTo: (id<COItemGraph>)dest
@@ -140,6 +147,24 @@
 		id<CODiffAlgorithm> ourSubDiff = self.subDiffsByAlgorithmName[algorithmName];
 		
 		[ourSubDiff applyTo: dest];
+	}
+}
+
+- (BOOL) hasConflicts
+{
+	for (id<CODiffAlgorithm> diff in [subDiffsByAlgorithmName allValues])
+	{
+		if ([diff hasConflicts])
+			return YES;
+	}
+	return NO;
+}
+
+- (void) resolveConflictsFavoringSourceIdentifier: (id)aSource
+{
+	for (id<CODiffAlgorithm> diff in [subDiffsByAlgorithmName allValues])
+	{
+		[diff resolveConflictsFavoringSourceIdentifier: aSource];
 	}
 }
 

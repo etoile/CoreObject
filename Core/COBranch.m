@@ -24,7 +24,7 @@
 #import "COObjectGraphContext+GarbageCollection.h"
 #import "COEditingContext+Undo.h"
 #import "COLeastCommonAncestor.h"
-#import "COItemGraphDiff.h"
+#import "CODiffManager.h"
 #import "COMergeInfo.h"
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
@@ -738,13 +738,15 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 									baseGraph: (id <COItemGraph>)baseGraph
 							   baseRevisionID: (ETUUID *)aBaseRevisionID
 {
-    COItemGraphDiff *mergingBranchDiff = [COItemGraphDiff diffItemTree: baseGraph
-	                                                      withItemTree: mergeGraph
-	                                                  sourceIdentifier: @"merged"];
-    COItemGraphDiff *selfDiff = [COItemGraphDiff diffItemTree: baseGraph
-	                                             withItemTree: [self objectGraphContext]
-	                                         sourceIdentifier: @"self"];
-    COItemGraphDiff *merged = [selfDiff itemTreeDiffByMergingWithDiff: mergingBranchDiff];
+    CODiffManager *mergingBranchDiff = [CODiffManager diffItemGraph: baseGraph
+													  withItemGraph: mergeGraph
+										 modelDescriptionRepository: [[self editingContext] modelDescriptionRepository]
+												   sourceIdentifier: @"merged"];
+    CODiffManager *selfDiff = [CODiffManager diffItemGraph: baseGraph
+											 withItemGraph: [self objectGraphContext]
+								modelDescriptionRepository: [[self editingContext] modelDescriptionRepository]
+										  sourceIdentifier: @"self"];
+    CODiffManager *merged = [selfDiff diffByMergingWithDiff: mergingBranchDiff];
 
     COMergeInfo *result = [[COMergeInfo alloc] init];
 
@@ -971,7 +973,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	                      toRevision: (CORevision *)aNode];
 }
 
-- (COItemGraphDiff *)diffToSelectivelyApplyChangesFromRevision: (CORevision *)start
+- (CODiffManager *)diffToSelectivelyApplyChangesFromRevision: (CORevision *)start
                                                     toRevision: (CORevision *)end
 {
     COItemGraph *currentGraph = [[self store] itemGraphForRevisionUUID: [[self currentRevision] UUID]
@@ -982,25 +984,28 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     COItemGraph *newGraph = [[self store] itemGraphForRevisionUUID: [end UUID]
 	                                                persistentRoot: [[self persistentRoot] UUID]];
     
-    COItemGraphDiff *diff1 = [COItemGraphDiff diffItemTree: oldGraph
-	                                          withItemTree: newGraph
+    CODiffManager *diff1 = [CODiffManager diffItemGraph: oldGraph
+										  withItemGraph: newGraph
+							 modelDescriptionRepository: [[self editingContext] modelDescriptionRepository]
 	                                      sourceIdentifier: @"diff1"];
-    COItemGraphDiff *diff2 = [COItemGraphDiff diffItemTree: oldGraph
-	                                          withItemTree: currentGraph
-	                                      sourceIdentifier: @"diff2"];
+    CODiffManager *diff2 = [CODiffManager diffItemGraph: oldGraph
+										  withItemGraph: currentGraph
+							 modelDescriptionRepository: [[self editingContext] modelDescriptionRepository]
+									   sourceIdentifier: @"diff2"];
     
-    return [diff1 itemTreeDiffByMergingWithDiff: diff2];
+    return [diff1 diffByMergingWithDiff: diff2];
 }
 
 - (void)selectiveApplyFromRevision: (CORevision *)start
 						toRevision: (CORevision *)end
 {
-	COItemGraphDiff *merged = [self diffToSelectivelyApplyChangesFromRevision: start
+	CODiffManager *merged = [self diffToSelectivelyApplyChangesFromRevision: start
 	                                                               toRevision: end];
 	COItemGraph *oldGraph = [[self store] itemGraphForRevisionUUID: [start UUID]
 	                                                persistentRoot: [[self persistentRoot] UUID]];
 
-	id <COItemGraph> result = [merged itemTreeWithDiffAppliedToItemGraph: oldGraph];
+	id <COItemGraph> result = [[COItemGraph alloc] initWithItemGraph: oldGraph];
+	[merged applyTo: result];
 
 	// FIXME: Works, but an ugly API mismatch when setting object graph context contents
 	NSMutableArray *items = [NSMutableArray array];

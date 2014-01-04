@@ -17,7 +17,7 @@
 #import "CORevisionCache.h"
 
 #import "COLeastCommonAncestor.h"
-#import "COItemGraphDiff.h"
+#import "CODiffManager.h"
 #import "COObjectGraphContext.h"
 #import "COSQLiteStore.h"
 
@@ -74,7 +74,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     return inverse;
 }
 
-- (COItemGraphDiff *) diffToSelectivelyApplyToContext: (COEditingContext *)aContext
+- (CODiffManager *) diffToSelectivelyApplyToContext: (COEditingContext *)aContext
 {
     // Current state of the branch
     COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
@@ -86,10 +86,16 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     COItemGraph *oldGraph = [[proot store] itemGraphForRevisionUUID: _oldRevisionUUID persistentRoot: _persistentRootUUID];
     COItemGraph *newGraph = [[proot store] itemGraphForRevisionUUID: _newRevisionUUID persistentRoot: _persistentRootUUID];
     
-    COItemGraphDiff *diff1 = [COItemGraphDiff diffItemTree: oldGraph withItemTree: newGraph sourceIdentifier: @"diff1"];
-    COItemGraphDiff *diff2 = [COItemGraphDiff diffItemTree: oldGraph withItemTree: currentGraph sourceIdentifier: @"diff2"];
+    CODiffManager *diff1 = [CODiffManager diffItemGraph: oldGraph
+										  withItemGraph: newGraph
+							 modelDescriptionRepository: [aContext modelDescriptionRepository]
+									   sourceIdentifier: @"diff1"];
+    CODiffManager *diff2 = [CODiffManager diffItemGraph: oldGraph
+										  withItemGraph: currentGraph
+							 modelDescriptionRepository: [aContext modelDescriptionRepository]
+									   sourceIdentifier: @"diff2"];
     
-    COItemGraphDiff *merged = [diff1 itemTreeDiffByMergingWithDiff: diff2];
+    CODiffManager *merged = [diff1 diffByMergingWithDiff: diff2];
 	
 	if([merged hasConflicts])
 	{
@@ -149,10 +155,11 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     {
 		_currentRevisionBeforeSelectiveApply = [[branch currentRevision] UUID];
 		
-        COItemGraphDiff *merged = [self diffToSelectivelyApplyToContext: aContext];
+        CODiffManager *merged = [self diffToSelectivelyApplyToContext: aContext];
         COItemGraph *oldGraph = [[proot store] itemGraphForRevisionUUID: _oldRevisionUUID persistentRoot: _persistentRootUUID];
         
-        id<COItemGraph> result = [merged itemTreeWithDiffAppliedToItemGraph: oldGraph];
+        id<COItemGraph> result = [[COItemGraph alloc] initWithItemGraph: oldGraph];
+		[merged applyTo: result];
         
         // FIXME: Works, but an ugly API mismatch when setting object graph context contents
         NSMutableArray *items = [NSMutableArray array];

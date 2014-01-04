@@ -19,6 +19,9 @@
 
 - (void) applyTo: (id<COItemGraph>)dest;
 
+- (BOOL) hasConflicts;
+- (void) resolveConflictsFavoringSourceIdentifier: (id)aSource;
+
 @end
 
 /**
@@ -45,8 +48,11 @@
 	   modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository
 				 sourceIdentifier: (id)aSource;
 
-- (void) addOperationsFromDiff: (CODiffManager *)aDiff;
+- (CODiffManager *) diffByMergingWithDiff: (CODiffManager *)otherDiff;
 
 - (void) applyTo: (id<COItemGraph>)dest;
+
+- (BOOL) hasConflicts;
+- (void) resolveConflictsFavoringSourceIdentifier: (id)aSource;
 
 @end

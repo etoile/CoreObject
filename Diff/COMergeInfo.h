@@ -7,7 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class COItemGraphDiff;
+@class CODiffManager;
 
 /**
  * NOTE: This is an unstable API which could change in the future when the
@@ -19,6 +19,6 @@
 @property (readwrite, nonatomic, strong) CORevision *mergeSourceRevision;
 @property (readwrite, nonatomic, strong) CORevision *mergeDestinationRevision;
 
-@property (readwrite, nonatomic, strong) COItemGraphDiff *diff;
+@property (readwrite, nonatomic, strong) CODiffManager *diff;
 
 @end

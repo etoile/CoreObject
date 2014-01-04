@@ -168,20 +168,9 @@ void COViewDOTGraphFile(NSString *dotFilePath)
 			continue;
 		}
 		
-		@try
-		{
-			NSTask *task = [NSTask launchedTaskWithLaunchPath: executablePath arguments: @[@"-Tpdf", dotFilePath, @"-o", pdfPath]];
-			[task waitUntilExit];
-			
-			if ([task terminationStatus] == 0)
-			{
-				[[NSWorkspace sharedWorkspace] openFile: pdfPath];
-				break;
-			}
-		}
-		@catch (NSException *exc)
-		{
-		}
+		system([[NSString stringWithFormat: @"%@ -Tpdf '%@' -o '%@'", executablePath, dotFilePath, pdfPath] UTF8String]);
+		[[NSWorkspace sharedWorkspace] openFile: pdfPath];
+		break;
 	}
 }
 

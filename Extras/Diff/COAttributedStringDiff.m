@@ -333,6 +333,17 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 	}
 }
 
+- (BOOL) hasConflicts
+{
+	// FIXME: Implement
+	return NO;
+}
+
+- (void) resolveConflictsFavoringSourceIdentifier: (id)aSource
+{
+	// FIXME: Implement
+}
+
 @end
 
 #pragma mark - Operation Classes
