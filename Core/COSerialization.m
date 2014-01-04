@@ -19,6 +19,7 @@
 #import "COPersistentRoot.h"
 #import "COBranch.h"
 #import "COEditingContext+Private.h"
+#import "CODateSerialization.h"
 
 #include <objc/runtime.h>
 
@@ -210,6 +211,11 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	{
 		return [self serializedValueForScalarValue: value];
 	}
+	else if ([value isKindOfClass: [NSDate class]])
+	{
+		/** For convenience, serialize NSDate as a int64_t using Java semantics. */
+		return CODateToJavaTimestamp(value);
+	}
 	else
 	{
 		// Try value transformer
@@ -374,6 +380,11 @@ serialization. */
 			NSAssert3(NO, @"Unsupported serialization type %@ for %@ returned by "
 				"serialization getter %@", type, value, getterString);
 		}
+	}
+	else if ([typeName isEqualToString: @"NSDate"])
+	{
+		/** For convenience, serialize NSDate as a int64_t using Java semantics. */
+		return kCOTypeInt64;
 	}
 	else
 	{
@@ -696,7 +707,15 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		
 		return object;
 	}
-    else if (type == kCOTypeInt64 || type == kCOTypeDouble)
+    else if (type == kCOTypeInt64)
+	{
+		if ([typeName isEqualToString: @"NSDate"])
+		{
+			return CODateFromJavaTimestamp(value);
+		}
+		return value;
+	}
+	else if (type == kCOTypeDouble)
 	{
 		return value;
 	}
