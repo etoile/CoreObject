@@ -55,16 +55,10 @@
 {
 	self = [super initWithObjectGraphContext: aContext];
 	appointments = [NSMutableArray new];
-	today = [[NSDate date] retain];
+	today = [NSDate date];
 	return self;
 }
 
-- (void)dealloc
-{
-	[today release];
-	[appointments release];
-	[super dealloc];
-}
 
 - (NSArray*)appointments
 {
@@ -73,7 +67,7 @@
 
 - (void)addAppointment: (Appointment*)anAppointment
 {
-	[self insertObject: anAppointment atIndex: ETUndeterminedIndex hint: nil forProperty: @"appointments"];
+	[[self mutableArrayValueForKey: @"appointments"] addObject: anAppointment];
 }
 
 - (NSDate*)today
@@ -120,8 +114,8 @@
             objectGraphContext: (COObjectGraphContext *)aGraph
 {
 	self = [super initWithObjectGraphContext:aGraph];
-	startDate = [aStartDate retain];
-	endDate = [aEndDate retain];
+	startDate = aStartDate;
+	endDate = aEndDate;
 	return self;
 }
 
@@ -151,36 +145,32 @@
 
 int main(int argc, char **argv)
 {
-	NSAutoreleasePool *pool = [NSAutoreleasePool new];
+	@autoreleasepool
+	{
+		COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: @"TestStore.db"]];
+		COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
+		
+		// Create the calendar and appointment and persist them
 
-	COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: @"TestStore.db"]];
-	COEditingContext *ctx = [[COEditingContext alloc] initWithStore: store];
-	
-	// Create the calendar and appointment and persist them
+		Calendar *calendar = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.Calendar"] rootObject];
+		ETUUID *persistentRootUUID = [[calendar persistentRoot] UUID];
+		NSDate *futureDate = [NSDate dateWithTimeIntervalSinceNow: 3600];
+		Appointment *appointment = [[Appointment alloc] initWithStartDate: [NSDate date]
+																  endDate: futureDate
+													   objectGraphContext: [calendar objectGraphContext]];
+		[calendar addAppointment: appointment];
 
-	Calendar *calendar = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.Calendar"] rootObject];
-	ETUUID *persistentRootUUID = [[calendar persistentRoot] UUID];
-	NSDate *futureDate = [NSDate dateWithTimeIntervalSinceNow: 3600];
-	Appointment *appointment = AUTORELEASE([[Appointment alloc] initWithStartDate: [NSDate date]
-	                                                                      endDate: futureDate
-                                                                      objectGraphContext: [calendar objectGraphContext]]);
-	[calendar addAppointment: appointment];
+		[ctx commit];
 
-	[ctx commit];
-	[ctx release];
+		// Reload the calendar from a new context
 
-	// Reload the calendar from a new context
-
-	ctx = [[COEditingContext alloc] initWithStore: store];
-										
-	calendar = [[ctx persistentRootForUUID: persistentRootUUID] rootObject];
-	appointment = [[calendar appointments] firstObject];
-										
-	NSLog(@"Reloaded calendar with date: %@", [calendar today]);
-	NSLog(@"First appointment: %@ - %@", [appointment startDate], [appointment endDate]);
-
-	[ctx release];
-	[store release];
-	[pool drain];
+		ctx = [[COEditingContext alloc] initWithStore: store];
+											
+		calendar = [[ctx persistentRootForUUID: persistentRootUUID] rootObject];
+		appointment = [[calendar appointments] firstObject];
+											
+		NSLog(@"Reloaded calendar with date: %@", [calendar today]);
+		NSLog(@"First appointment: %@ - %@", [appointment startDate], [appointment endDate]);
+	}
 	return 0;
 }
