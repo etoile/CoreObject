@@ -141,7 +141,7 @@ int main(int argc, char **argv)
 }
 
 /** 
- * If the example is run several times, persistent roots created during the previous run will be
+ * If the example is run several times, persistent roots created during the previous runs will be
  * printed among the store contents in addition to the one just created.
  */
 void ShowStoreContentsForContext(COEditingContext *ctx)
