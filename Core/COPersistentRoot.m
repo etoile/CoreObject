@@ -10,17 +10,13 @@
 #import "COBranch.h"
 #import "COBranch+Private.h"
 #import "COEditingContext.h"
-#import "COError.h"
 #import "COItem.h"
 #import "COObject.h"
 #import "COObject+Private.h"
 #import "COObjectGraphContext.h"
 #import "COObjectGraphContext+Private.h"
-#import "CORelationshipCache.h"
 #import "CORevision.h"
-#import "COSerialization.h"
 #import "COSQLiteStore.h"
-#import "COPersistentRootInfo.h"
 #import "COPersistentRootInfo.h"
 #import "COBranchInfo.h"
 #import "COEditingContext+Undo.h"
@@ -34,6 +30,8 @@ NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidCh
 @synthesize parentContext = _parentContext, UUID = _UUID;
 @synthesize branchesPendingDeletion = _branchesPendingDeletion;
 @synthesize branchesPendingUndeletion = _branchesPendingUndeletion;
+
+#pragma mark Creating a New Persistent Root -
 
 - (id)init
 {
@@ -131,7 +129,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		//ETUUID *branchUUID = [anObjectGraphContext branchUUID];
         ETUUID *branchUUID =
 			(anObjectGraphContext != nil ? [anObjectGraphContext branchUUID] : [ETUUID UUID]);
-
         COBranch *branch = [[COBranch alloc] initWithUUID: branchUUID
 		                                objectGraphContext: nil
                                             persistentRoot: self
@@ -158,17 +155,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	return self;
 }
 
-#if 0
-- (NSString *)description
-{
-	// TODO: Improve the indenting
-	NSString *desc = [D([self insertedObjects], @"Inserted Objects",
-	                    [self deletedObjects], @"Deleted Objects",
-	                    _updatedPropertiesByObject, @"Updated Objects") description];
-	/* For Mac OS X, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
-	return [desc stringByReplacingOccurrencesOfString: @"\\n" withString: @"\n"];
-}
-#endif
+#pragma mark Persistent Root Properties -
 
 - (NSDictionary *)metadata
 {
@@ -238,11 +225,11 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 - (COPersistentRoot *)parentPersistentRoot
 {
 	NSString *uuidString = self.metadata[@"parentPersistentRoot"];
-	if (uuidString != nil)
-	{
-		return [[self editingContext] persistentRootForUUID: [ETUUID UUIDWithString: uuidString]];
-	}
-	return nil;
+
+	if (uuidString == nil)
+		return nil;
+
+	return [[self editingContext] persistentRootForUUID: [ETUUID UUIDWithString: uuidString]];
 }
 
 - (BOOL)isCopy
@@ -254,6 +241,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 {
 	return [[self store] attributesForPersistentRootWithUUID: _UUID];
 }
+
+#pragma mark Accessing Branches -
 
 - (COBranch *)currentBranch
 {
@@ -270,14 +259,18 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSSet *)branches
 {
-    return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock:
-                                        ^(id obj) { return (BOOL)![obj isDeleted]; }]];
+    return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock: ^(id obj)
+	{
+		return (BOOL)![obj isDeleted];
+	}]];
 }
 
 - (NSSet *)deletedBranches
 {
-    return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock:
-                                        ^(id obj) { return (BOOL)[[obj branchInfo] isDeleted]; }]];
+    return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock: ^(id obj)
+	{
+		return (BOOL)[[obj branchInfo] isDeleted];
+	}]];
 }
 
 - (COBranch *)branchForUUID: (ETUUID *)aUUID
@@ -313,47 +306,22 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     }
 }
 
-- (COObjectGraphContext *)objectGraphContext
-{
-    return _currentBranchObjectGraph;
-}
-
-- (NSSet *)allObjectGraphContexts
-{
-	NSSet *objectGraphs = (id)[[[self branches] mappedCollection] objectGraphContext];
-	return [objectGraphs setByAddingObject: _currentBranchObjectGraph];
-}
-
-- (COSQLiteStore *)store
-{
-	return [_parentContext store];
-}
-
-- (id)rootObject
-{
-	return [[self objectGraphContext] rootObject];
-}
-
-- (void)setRootObject: (COObject *)aRootObject
-{
-	[[self objectGraphContext] setRootObject: aRootObject];
-}
-
-- (COObject *)loadedObjectForUUID: (ETUUID *)uuid
-{
-	return [[self objectGraphContext] loadedObjectForUUID: uuid];
-}
+#pragma mark Pending Changes -
 
 - (NSSet *)branchesPendingInsertion
 {
-    return [[self branches] filteredCollectionWithBlock:
-		                    ^(id obj) { return [obj isBranchUncommitted]; }];
+    return [[self branches] filteredCollectionWithBlock: ^(id obj)
+	{
+		return [obj isBranchUncommitted];
+	}];
 }
 
 - (NSSet *)branchesPendingUpdate
 {
-    return [[self branches] filteredCollectionWithBlock:
-		                    ^(id obj) { return [obj hasChanges]; }];
+    return [[self branches] filteredCollectionWithBlock: ^(id obj)
+	{
+		return [obj hasChanges];
+	}];
 }
 
 - (BOOL)hasChanges
@@ -407,29 +375,74 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 	if (_metadataChanged)
     {
-		_metadata = [NSDictionary dictionaryWithDictionary:
-					 [[self persistentRootInfo] metadata]];
+		_metadata = [[[self persistentRootInfo] metadata] copy];
         _metadataChanged = NO;
     }
 	
 	ETAssert([self hasChanges] == NO);
 }
 
-#pragma mark Committing Changes
-#pragma mark -
+#pragma mark Convenience -
 
-/**
- * Framework private
- */
-- (int64_t) lastTransactionID
+- (COObjectGraphContext *)objectGraphContext
+{
+    return _currentBranchObjectGraph;
+}
+
+- (NSSet *)allObjectGraphContexts
+{
+	NSSet *objectGraphs = (id)[[[self branches] mappedCollection] objectGraphContext];
+	return [objectGraphs setByAddingObject: _currentBranchObjectGraph];
+}
+
+- (id)rootObject
+{
+	return [[self objectGraphContext] rootObject];
+}
+
+- (void)setRootObject: (COObject *)aRootObject
+{
+	[[self objectGraphContext] setRootObject: aRootObject];
+}
+
+- (COObject *)loadedObjectForUUID: (ETUUID *)uuid
+{
+	return [[self objectGraphContext] loadedObjectForUUID: uuid];
+}
+
+- (CORevision *)currentRevision
+{
+    return [[self currentBranch] currentRevision];
+}
+
+- (void)setCurrentRevision: (CORevision *)revision
+{
+    [[self currentBranch] setCurrentRevision: revision];
+}
+
+- (CORevision *)headRevision
+{
+    return [[self currentBranch] headRevision];
+}
+
+- (void)setHeadRevision: (CORevision *)revision
+{
+    [[self currentBranch] setHeadRevision: revision];
+}
+
+- (COSQLiteStore *)store
+{
+	return [_parentContext store];
+}
+
+#pragma mark Committing Changes -
+
+- (int64_t)lastTransactionID
 {
 	return _lastTransactionID;
 }
 
-/**
- * Framework private
- */
-- (void) setLastTransactionID: (int64_t) value
+- (void)setLastTransactionID: (int64_t) value
 {
 	_lastTransactionID = value;
 }
@@ -440,7 +453,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
                        error: (NSError **)anError
 {
 	NILARG_EXCEPTION_TEST(aCommitDescriptorId);
-	INVALIDARG_EXCEPTION_TEST(additionalMetadata, [additionalMetadata containsKey: aCommitDescriptorId] == NO);
+	INVALIDARG_EXCEPTION_TEST(additionalMetadata,
+		[additionalMetadata containsKey: aCommitDescriptorId] == NO);
 
 	NSMutableDictionary *metadata =
 		[D(aCommitDescriptorId, kCOCommitMetadataIdentifier) mutableCopy];
@@ -476,8 +490,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 - (void) saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn
 {
 	// FIXME: This also rejects changes during undeleted->deleted transition,
-	// while COBranch's equivelant doesn't. Probably should allow changes
-	// to be combined with delet sion in a single commit; change that
+	// while COBranch's equivalent doesn't. Probably should allow changes
+	// to be combined with deletion in a single commit; change that
 	// and add tests for that.
 	if ([self hasChanges] && self.isDeleted)
 	{
@@ -539,9 +553,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         [_parentContext recordPersistentRootCreation: self
 		                         atInitialRevisionID: initialRevID];
         
-        
-        //revId = [[info currentBranchInfo] currentRevisionID];
-        
         // N.B., we don't call -saveCommitWithMetadata: on the branch,
         // because the store call -createPersistentRootWithInitialContents:
         // handles creating the initial branch.
@@ -593,10 +604,10 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	
 	if (_metadataChanged)
 	{
-		[txn setMetadata: _metadata
-	   forPersistentRoot: _UUID];
+		[txn setMetadata: _metadata forPersistentRoot: _UUID];
 		
-		[_parentContext recordPersistentRootSetMetadata: self oldMetadata: [_savedState metadata]];
+		[_parentContext recordPersistentRootSetMetadata: self
+		                                    oldMetadata: [_savedState metadata]];
 		
 		_metadataChanged = NO;
 	}
@@ -613,12 +624,12 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (void)reloadPersistentRootInfo
 {
-    COPersistentRootInfo *newInfo =
-		[[self store] persistentRootInfoForUUID: [self UUID]];
-    if (newInfo != nil)
-    {
-        _savedState =  newInfo;
-    }
+    COPersistentRootInfo *newInfo = [[self store] persistentRootInfoForUUID: [self UUID]];
+
+    if (newInfo == nil)
+		return;
+
+	_savedState = newInfo;
 }
 
 - (void)didMakeNewCommit
@@ -630,6 +641,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		[branch updateRevisions];
 	}
 }
+
+#pragma mark Creating and Updating Branches -
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel
                        atRevision: (CORevision *)aRev
@@ -663,30 +676,10 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     {
         [newBranch setMetadata: metadata];
     }
-    
+
     [_branchForUUID setObject: newBranch forKey: [newBranch UUID]];
     
     return newBranch;
-}
-
-- (CORevision *)currentRevision
-{
-    return [[self currentBranch] currentRevision];
-}
-
-- (void)setCurrentRevision: (CORevision *)revision
-{
-    [[self currentBranch] setCurrentRevision: revision];
-}
-
-- (CORevision *)headRevision
-{
-    return [[self currentBranch] headRevision];
-}
-
-- (void)setHeadRevision: (CORevision *)revision
-{
-    [[self currentBranch] setHeadRevision: revision];
 }
 
 - (void)updateBranchWithBranchInfo: (COBranchInfo *)branchInfo
@@ -708,6 +701,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         [branch updateWithBranchInfo: branchInfo];
     }
 }
+
+#pragma mark Notifications Handling -
 
 - (void)storePersistentRootDidChange: (NSNotification *)notif
                        isDistributed: (BOOL)isDistributed
@@ -743,11 +738,14 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		              object: self];
 }
 
+#pragma mark Previewing Old Revision -
+
 - (COObjectGraphContext *)objectGraphContextForPreviewingRevision: (CORevision *)aRevision
 {
     COObjectGraphContext *ctx = [[COObjectGraphContext alloc]
 		initWithModelRepository: [[self editingContext] modelDescriptionRepository]];
-    id <COItemGraph> items = [[self store] itemGraphForRevisionUUID: [aRevision UUID] persistentRoot: _UUID];
+    id <COItemGraph> items = [[self store] itemGraphForRevisionUUID: [aRevision UUID]
+	                                                 persistentRoot: _UUID];
 
     [ctx setItemGraph: items];
 
