@@ -17,66 +17,86 @@
 @property (nonatomic, readwrite, strong) NSDate *endDate;
 @property (nonatomic, readonly, weak) Calendar *calendar;
 
-- (id)initWithStartDate: (NSDate*)aStartDate
-                endDate: (NSDate*)aEndDate
+- (id)initWithStartDate: (NSDate *)aStartDate
+                endDate: (NSDate *)aEndDate
 	 objectGraphContext: (COObjectGraphContext *)aGraph;
 @end
 
 
 @implementation Calendar
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
 	ETEntityDescription *desc = [self newBasicEntityDescription];
-	if ([[desc name] isEqual: [Calendar className]])
-	{
-		ETPropertyDescription *appointments = [ETPropertyDescription descriptionWithName: @"appointments"
-																					type: (id)@"Anonymous.Appointment"];
-		[appointments setMultivalued: YES];
-		[appointments setOrdered: NO];
-		[appointments setPersistent: YES];
-		[desc setPropertyDescriptions: @[appointments]];
-	}
+
+	if (![[desc name] isEqual: [Calendar className]])
+		return desc;
+
+	ETPropertyDescription *appointments = [ETPropertyDescription descriptionWithName: @"appointments"
+	                                                                            type: (id)@"Appointment"];
+	[appointments setMultivalued: YES];
+	[appointments setOrdered: NO];
+	[appointments setPersistent: YES];
+
+	[desc setPropertyDescriptions: @[appointments]];
+
 	return desc;
 }
 
 @dynamic appointments;
 
-- (void) addAppointment: (Appointment*)anAppointment
+- (void) addAppointment: (Appointment *)anAppointment
 {
-	[[self mutableSetValueForKey: @"appointments"] addObject: anAppointment];
+	[self willChangeValueForProperty: @"appointments"
+	                       atIndexes: [NSIndexSet indexSet]
+	                     withObjects: @[anAppointment]
+	                    mutationKind: ETCollectionMutationKindInsertion];
+
+	[[self valueForVariableStorageKey: @"appointments"] addObject: anAppointment];
+
+	[self didChangeValueForProperty: @"appointments"
+	                      atIndexes: [NSIndexSet indexSet]
+	                    withObjects: @[anAppointment]
+	                   mutationKind: ETCollectionMutationKindInsertion];
 }
 
 @end
 
 @implementation Appointment 
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
 	ETEntityDescription *desc = [self newBasicEntityDescription];
-	if ([[desc name] isEqual: [Appointment className]])
-	{
-		ETPropertyDescription *calendar = [ETPropertyDescription descriptionWithName: @"calendar"
-																				type: (id)@"Calendar"];
-		[calendar setOpposite: (id)@"Calendar.appointments"];
-		ETPropertyDescription *startDate = [ETPropertyDescription descriptionWithName: @"startDate"
-																				 type: (id)@"NSDate"];
-		[startDate setPersistent: YES];
-		ETPropertyDescription *endDate = [ETPropertyDescription descriptionWithName: @"endDate"
-																			   type: (id)@"NSDate"];
-		[endDate setPersistent: YES];
-		[desc setPropertyDescriptions: A(startDate, endDate, calendar)];
-	}
+
+	if (![[desc name] isEqual: [Appointment className]])
+		return desc;
+
+	ETPropertyDescription *calendar = [ETPropertyDescription descriptionWithName: @"calendar"
+	                                                                        type: (id)@"Calendar"];
+	[calendar setOpposite: (id)@"Calendar.appointments"];
+	ETPropertyDescription *startDate = [ETPropertyDescription descriptionWithName: @"startDate"
+	                                                                         type: (id)@"NSDate"];
+	[startDate setPersistent: YES];
+	ETPropertyDescription *endDate = [ETPropertyDescription descriptionWithName: @"endDate"
+	                                                                       type: (id)@"NSDate"];
+	[endDate setPersistent: YES];
+
+	[desc setPropertyDescriptions: @[startDate, endDate, calendar]];
+
 	return desc;
 }
 
-- (id)initWithStartDate: (NSDate*)aStartDate
-                endDate: (NSDate*)aEndDate
+- (id)initWithStartDate: (NSDate *)aStartDate
+                endDate: (NSDate *)aEndDate
             objectGraphContext: (COObjectGraphContext *)aGraph
 {
-	self = [super initWithObjectGraphContext:aGraph];
+	self = [super initWithObjectGraphContext: aGraph];
+	if (self == nil)
+		return nil;
+	
 	self.startDate = aStartDate;
 	self.endDate = aEndDate;
+
 	return self;
 }
 
@@ -84,53 +104,64 @@
 
 @end
 
+
+void ShowStoreContentsForContext(COEditingContext *newCtx);
+
 int main(int argc, char **argv)
 {
 	@autoreleasepool
 	{
 		NSURL *url = [NSURL fileURLWithPath: @"TestStore.db"];
-		ETUUID *persistentRootUUID = nil;
 		
-		{
-			COEditingContext *ctx = [COEditingContext contextWithURL: url];
-			
-			// Create a new calendar and appointment and persist them
+		// Create a new calendar and appointment and persist them
 
-			Calendar *calendar = [[ctx insertNewPersistentRootWithEntityName: @"Calendar"] rootObject];
-			persistentRootUUID = [[calendar persistentRoot] UUID];
-			NSDate *futureDate = [NSDate dateWithTimeIntervalSinceNow: 3600];
-			Appointment *appointment = [[Appointment alloc] initWithStartDate: [NSDate date]
-																	  endDate: futureDate
-														   objectGraphContext: [calendar objectGraphContext]];
-			[calendar addAppointment: appointment];
+		COEditingContext *ctx = [COEditingContext contextWithURL: url];
+		Calendar *calendar = [[ctx insertNewPersistentRootWithEntityName: @"Calendar"] rootObject];
+		ETUUID *persistentRootUUID = [[calendar persistentRoot] UUID];
+		NSDate *futureDate = [NSDate dateWithTimeIntervalSinceNow: 3600];
+		Appointment *appointment = [[Appointment alloc] initWithStartDate: [NSDate date]
+		                                                          endDate: futureDate
+		                                               objectGraphContext: [calendar objectGraphContext]];
 
-			[ctx commit];
-		}
-		
-		{
-			// Reload the calendar from a new context
+		[calendar addAppointment: appointment];
 
-			COEditingContext *ctx = [COEditingContext contextWithURL: url];
-			
-			NSLog(@"Store %@ contents:", [url path]);
-			for (COPersistentRoot *persistentRoot in ctx.persistentRoots)
-			{
-				NSLog(@"\tPersistent root %@ (root object class: %@)",
-					  [persistentRoot UUID], [[persistentRoot rootObject] class]);
-				
-				if ([[persistentRoot rootObject] isKindOfClass: [Calendar class]])
-				{
-					Calendar *calendar = [persistentRoot rootObject];
-					
-					for (Appointment *appointment in calendar.appointments)
-					{
-						assert(appointment.calendar == calendar);
-						NSLog(@"\t\tAppointment %@: %@ - %@", [appointment UUID], [appointment startDate], [appointment endDate]);
-					}
-				}
-			}
-			
-		}
+		[ctx commit];
+
+		// Reload the calendar from a new context
+
+		COEditingContext *newCtx = [COEditingContext contextWithURL: url];
+		Calendar *newCalendar = [[newCtx persistentRootForUUID: persistentRootUUID] rootObject];	                                         
+		Appointment *newAppointment = [[newCalendar appointments] anyObject];
+	
+		NSLog(@"Reloaded appointment: %@ - %@\n\n", [newAppointment startDate], [newAppointment endDate]);
+
+		ShowStoreContentsForContext(newCtx);
 	}
 	return 0;
+}
+
+/** 
+ * If the example is run several times, persistent roots created during the previous run will be
+ * printed among the store contents in addition to the one just created.
+ */
+void ShowStoreContentsForContext(COEditingContext *ctx)
+{
+	NSLog(@"Store %@ contents:", [[[ctx store] URL] path]);
+
+	for (COPersistentRoot *persistentRoot in ctx.persistentRoots)
+	{
+		NSLog(@"\tPersistent root %@ (root object class: %@)", [persistentRoot UUID], [[persistentRoot rootObject] class]);
+		
+		if (![[persistentRoot rootObject] isKindOfClass: [Calendar class]])
+			continue;
+	
+		Calendar *calendar = [persistentRoot rootObject];
+			
+		for (Appointment *appointment in calendar.appointments)
+		{
+			assert(appointment.calendar == calendar);
+
+			NSLog(@"\t\tAppointment %@: %@ - %@", [appointment UUID], [appointment startDate], [appointment endDate]);
+		}
+	}
 }
