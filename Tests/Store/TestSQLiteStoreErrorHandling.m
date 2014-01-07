@@ -77,11 +77,16 @@ static ETUUID *rootUUID;
         
         COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir]];
         UKNotNil(store);
-        
+
+#ifdef GNUSTEP
+        assert([[NSFileManager defaultManager] changeFileAttributes: READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES
+                                                             atPath: dir]);
+
+#else 
         assert([[NSFileManager defaultManager] setAttributes: READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES
                                                 ofItemAtPath: dir
                                                        error: NULL]);
-        
+#endif
         // At this point the SQLite database file in dir can be freely modified, but creating files in dir will
         // fail since it's readonly, so creating new persistent roots should fail.
         
@@ -94,10 +99,16 @@ static ETUUID *rootUUID;
        
         UKFalse([store commitStoreTransaction: txn]);
     }
-    
+
+#ifdef GNUSTEP
+    assert([[NSFileManager defaultManager] changeFileAttributes: REABLE_WRITABLE_SEARCHABLE_DIRECTORY_ATTRIBUTES
+                                                         atPath: dir]);
+
+#else 
     assert([[NSFileManager defaultManager] setAttributes: REABLE_WRITABLE_SEARCHABLE_DIRECTORY_ATTRIBUTES
                                             ofItemAtPath: dir
                                                    error: NULL]);
+#endif
     assert([[NSFileManager defaultManager] removeItemAtPath: dir error: NULL]);
 }
 
@@ -132,9 +143,15 @@ static ETUUID *rootUUID;
     
     for (NSString *filename in [[NSFileManager defaultManager] contentsOfDirectoryAtPath: dir error: NULL])
     {
+#ifdef GNUSTEP
+        assert([[NSFileManager defaultManager] changeFileAttributes: READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES
+                                                             atPath: dir]);
+
+#else 
         assert([[NSFileManager defaultManager] setAttributes: READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES
                                                 ofItemAtPath: [dir stringByAppendingPathComponent: filename]
                                                        error: NULL]);
+#endif
     }
 
     // Now, writing a revision should fail

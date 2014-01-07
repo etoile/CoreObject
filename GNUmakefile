@@ -15,7 +15,7 @@ CoreObject_OBJCFLAGS += -fobjc-arc -Wno-arc-performSelector-leaks -Wall
 
 ifeq ($(test), yes)
   BUNDLE_NAME = $(FRAMEWORK_NAME)
-  CoreObject_INCLUDE_DIRS += -I$(PROJECT_DIR)/Tests -I$(PROJECT_DIR)/Tests/TestModelObjects
+  CoreObject_INCLUDE_DIRS += -I$(PROJECT_DIR)/Tests -I$(PROJECT_DIR)/Tests/TestModelObjects -I$(PROJECT_DIR)/Tests/Extras/Model 
   CoreObject_LDFLAGS += -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
   CoreObject_PRINCIPAL_CLASS = TestCommon
 endif
@@ -50,14 +50,15 @@ CoreObject_OBJC_FILES += $(wildcard Tests/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Attribute/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Core/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Diff/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Extras/Model*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Model/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Relationship/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/StorageDataModel/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Store/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Undo/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Serialization/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/TestModelObjects/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Utilities/*.m)
-CoreObject_OBJC_FILES += $(wildcard Tests/Serialization/*.m)
 endif
 
 clean : test=yes
