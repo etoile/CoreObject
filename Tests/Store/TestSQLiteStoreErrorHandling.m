@@ -145,7 +145,7 @@ static ETUUID *rootUUID;
     {
 #ifdef GNUSTEP
         assert([[NSFileManager defaultManager] changeFileAttributes: READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES
-                                                             atPath: dir]);
+                                                             atPath: [dir stringByAppendingPathComponent: filename]]);
 
 #else 
         assert([[NSFileManager defaultManager] setAttributes: READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES
