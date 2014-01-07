@@ -11,7 +11,8 @@ LIBRARIES_DEPEND_UPON = $(shell pkg-config --libs sqlite3) -lEtoileFoundation $(
 CoreObject_INCLUDE_DIRS = -IStore/fmdb/src -I$(GNUSTEP_LOCAL_ROOT)/Library/Headers/dispatch
 CoreObject_CPPFLAGS += -DGNUSTEP_MISSING_API_COMPATIBILITY
 CoreObject_LDFLAGS += -lstdc++ -lobjcxx -lsqlite3 -ldispatch
-CoreObject_OBJCFLAGS += -fobjc-arc -Wall -Wno-arc-performSelector-leaks 
+# TODO: Check that -fobjc-arc is all we need to pass, then remove -fobjc-nonfragile-abi -fblocks
+CoreObject_OBJCFLAGS += -fobjc-nonfragile-abi -fblocks -fobjc-arc -Wall -Wno-arc-performSelector-leaks 
 
 ifeq ($(test), yes)
   BUNDLE_NAME = $(FRAMEWORK_NAME)
@@ -52,7 +53,7 @@ CoreObject_OBJC_FILES += $(wildcard Tests/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Attribute/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Core/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Diff/*.m)
-CoreObject_OBJC_FILES += $(wildcard Tests/Extras/Model*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Extras/Model/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Model/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Relationship/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/StorageDataModel/*.m)
