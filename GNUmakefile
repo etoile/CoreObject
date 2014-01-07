@@ -11,13 +11,16 @@ LIBRARIES_DEPEND_UPON = $(shell pkg-config --libs sqlite3) -lEtoileFoundation $(
 CoreObject_INCLUDE_DIRS = -IStore/fmdb/src -I$(GNUSTEP_LOCAL_ROOT)/Library/Headers/dispatch
 CoreObject_CPPFLAGS += -DGNUSTEP_MISSING_API_COMPATIBILITY
 CoreObject_LDFLAGS += -lstdc++ -lobjcxx -lsqlite3 -ldispatch
-CoreObject_OBJCFLAGS += -fobjc-arc -Wno-arc-performSelector-leaks -Wall
+CoreObject_OBJCFLAGS += -fobjc-arc -Wall -Wno-arc-performSelector-leaks 
 
 ifeq ($(test), yes)
   BUNDLE_NAME = $(FRAMEWORK_NAME)
   CoreObject_INCLUDE_DIRS += -I$(PROJECT_DIR)/Tests -I$(PROJECT_DIR)/Tests/TestModelObjects -I$(PROJECT_DIR)/Tests/Extras/Model 
+  CoreObject_OBJCFLAGS += -Wno-unused-variable -Wno-unused-value
   CoreObject_LDFLAGS += -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
   CoreObject_PRINCIPAL_CLASS = TestCommon
+else
+  CoreObject_OBJCFLAGS += -Wextra -Wno-sign-compare -Wno-unused-parameter
 endif
 
 OTHER_HEADER_DIRS = . Core Debugging Diff Extras/Diff Extras/Model Extras/ValueTransformers Model Store Undo Synchronization Synchronization/Messages Utilities StorageDataModel
