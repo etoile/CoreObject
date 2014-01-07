@@ -20,7 +20,7 @@ ifeq ($(test), yes)
   CoreObject_PRINCIPAL_CLASS = TestCommon
 endif
 
-OTHER_HEADER_DIRS = . Core Debugging Diff Extras/Model Extras/ValueTransformers Model Store Undo Tracks Synchronization Synchronization/Messages Utilities StorageDataModel
+OTHER_HEADER_DIRS = . Core Debugging Diff Extras/Model Extras/ValueTransformers Model Store Undo Synchronization Synchronization/Messages Utilities StorageDataModel
 
 CoreObject_HEADER_FILES_DIR = Headers
 CoreObject_HEADER_FILES = $(notdir $(wildcard Headers/*.h))
@@ -37,7 +37,6 @@ CoreObject_OBJC_FILES += $(wildcard Store/*.m)
 CoreObject_C_FILES = $(wildcard Store/*.c)
 CoreObject_OBJC_FILES += $(wildcard Debugging/*.m)
 CoreObject_OBJC_FILES += $(wildcard Undo/*.m)
-CoreObject_OBJC_FILES += $(wildcard Tracks/*.m)
 CoreObject_OBJC_FILES += $(wildcard Utilities/*.m)
 CoreObject_OBJC_FILES += $(wildcard StorageDataModel/*.m)
 CoreObject_OBJC_FILES += $(wildcard Synchronization/*.m)
