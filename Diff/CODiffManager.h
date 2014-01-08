@@ -17,7 +17,10 @@
 
 - (id<CODiffAlgorithm>) itemTreeDiffByMergingWithDiff: (id<CODiffAlgorithm>)aDiff;
 
-- (void) applyTo: (id<COItemGraph>)dest;
+/**
+ * Returns ETUUID : COItem dictionary
+ */
+- (NSDictionary *) addedOrUpdatedItemsForApplyingTo: (id<COItemGraph>)dest;
 
 - (BOOL) hasConflicts;
 - (void) resolveConflictsFavoringSourceIdentifier: (id)aSource;

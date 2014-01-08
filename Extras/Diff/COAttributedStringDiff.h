@@ -12,18 +12,13 @@
 
 /**
  * TODO: Don't use COAttributedString directly but work on the item representation (?)
+ *
+ * FIXME: One problem is, item graph A + diff(item graph A, item graph B) will
+ * not given exactly item graph B. The chunk / attribute UUIDs will be different.
  */
 @interface COAttributedStringDiff : NSObject <CODiffAlgorithm>
 {
-	ETUUID *_attributedStringUUID;
-	
 	NSMutableArray *_operations;
-	
-	/* Temporary storage during construction */
-	
-	id _source;
-	COAttributedString *_first;
-	COAttributedString *_second;
 }
 
 @property (nonatomic, readonly) NSMutableArray *operations;
@@ -45,12 +40,11 @@
 
 - (id<CODiffAlgorithm>) itemTreeDiffByMergingWithDiff: (id<CODiffAlgorithm>)aDiff;
 
-- (void) applyTo: (id<COItemGraph>)dest;
-
 @end
 
 @protocol COAttributedStringDiffOperation <NSObject>
 @required
+@property (nonatomic, readwrite, strong) ETUUID *attributedStringUUID;
 @property (nonatomic, readwrite, assign) NSRange range;
 @property (nonatomic, readwrite, strong) id source;
 /**

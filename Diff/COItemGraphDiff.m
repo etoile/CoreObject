@@ -680,7 +680,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 				format: @"unknown edit type %@", anyEdit];
 }
 
-- (void) applyTo: (id<COItemGraph>)dest
+- (NSDictionary *) addedOrUpdatedItemsForApplyingTo: (id<COItemGraph>)dest
 {
 	/**
      does applying a diff to a subtree in-place even make sense?
@@ -711,7 +711,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 					format: @"resolve conflicts before applying diff"];
 	}
     
-    NSMutableArray *insertedOrUpdated = [NSMutableArray array];
+    NSMutableDictionary *insertedOrUpdated = [NSMutableDictionary new];
     
 	// apply all of the edits
 	
@@ -732,10 +732,16 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 			COApplyEditsToMutableItem(edits, item);
 		}
         
-        [insertedOrUpdated addObject: item];
+        insertedOrUpdated[modifiedUUID] = item;
 	}
 	
-    [dest insertOrUpdateItems: insertedOrUpdated];
+	return insertedOrUpdated;
+}
+
+- (void) applyTo: (id<COItemGraph>)dest
+{
+	NSDictionary *insertedOrUpdated = [self addedOrUpdatedItemsForApplyingTo: dest];
+    [dest insertOrUpdateItems: [insertedOrUpdated allValues]];
 }
 
 - (COItemGraph *) itemTreeWithDiffAppliedToItemGraph: (id<COItemGraph>)aGraph

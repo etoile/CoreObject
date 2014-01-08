@@ -50,7 +50,7 @@ static BOOL coalesceOpPair(id<COAttributedStringDiffOperation> op, id<COAttribut
 	return NO;
 }
 
-static void coalesceOps(NSMutableArray *ops, NSUInteger i)
+static void coalesceOpsInternal(NSMutableArray *ops, NSUInteger i)
 {
 	if (i+1 >= [ops count])
 		return;
@@ -58,12 +58,17 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 	if (coalesceOpPair(ops[i], ops[i+1]))
 	{
 		[ops removeObjectAtIndex: i+1];
-		coalesceOps(ops, i);
+		coalesceOpsInternal(ops, i);
 	}
 	else
 	{
-		return coalesceOps(ops, i+1);
+		return coalesceOpsInternal(ops, i+1);
 	}
+}
+
+static void coalesceOps(NSMutableArray *ops)
+{
+	coalesceOpsInternal(ops, 0);
 }
 
 + (instancetype) diffItemUUIDs: (NSArray *)uuids
@@ -77,27 +82,35 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 	COObjectGraphContext *ctxB = [[COObjectGraphContext alloc] init];
 	[ctxB setItemGraph: b];
 	
+	COAttributedStringDiff *result = [[COAttributedStringDiff alloc] init];
+	result->_operations = [NSMutableArray new];
+	
 	for (ETUUID *uuid in uuids)
 	{
 		COAttributedString *objectA = [ctxA loadedObjectForUUID: uuid];
 		COAttributedString *objectB = [ctxB loadedObjectForUUID: uuid];
-		if ([objectA isKindOfClass: [COAttributedString class]])
+		
+		// HACK: -diffFirst: method won't handle one string being nil, so just
+		// make a fake string.
+		if (objectA == nil)
 		{
-			COAttributedStringDiff *result = [[self alloc] initWithFirstAttributedString: objectA
-										secondAttributedString: objectB
-														source: aSource];
-			result->_attributedStringUUID = uuid;
-			return result;
+			objectA = [[COAttributedString alloc] prepareWithUUID: uuid
+												entityDescription: [[ctxA modelDescriptionRepository] entityDescriptionForClass: [COAttributedString class]]
+											   objectGraphContext: ctxA
+															isNew: YES];
+		}
+		
+		if ([objectB isKindOfClass: [COAttributedString class]])
+		{
+			[result diffFirst:objectA second: objectB source: aSource];
 		}
 	}
-	return nil;
+
+	return result;
 }
 
 - (id<CODiffAlgorithm>) itemTreeDiffByMergingWithDiff: (id<CODiffAlgorithm>)aDiff
 {
-	ETAssert([((COAttributedStringDiff *)aDiff)->_attributedStringUUID isEqual:
-			  self->_attributedStringUUID]);
-	
 	COAttributedStringDiff *result = [COAttributedStringDiff new];
 	result->_operations = [NSMutableArray new];
 	[result addOperationsFromDiff: self];
@@ -105,42 +118,23 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 	return result;
 }
 
-- (void) applyTo: (id<COItemGraph>)dest
-{
-	ETAssert(self->_attributedStringUUID != nil);
-	
-	COObjectGraphContext *workingCtx = [[COObjectGraphContext alloc] init];
-	[workingCtx setItemGraph: dest];
-	
-	COAttributedString *as = [workingCtx loadedObjectForUUID: self->_attributedStringUUID];
-	ETAssert([as isKindOfClass: [COAttributedString class]]);
-	
-	[self applyToAttributedString: as];
-	
-	// Copy the changes back to dest.
-	// FIXME: Updates all objects in the context
-	NSMutableArray *items = [NSMutableArray new];
-	for (ETUUID *uuid in [workingCtx itemUUIDs])
-	{
-		[items addObject: [workingCtx itemForUUID: uuid]];
-	}
-	[dest insertOrUpdateItems: items];
-}
-
 - (instancetype) initWithFirstAttributedString: (COAttributedString *)first
 						secondAttributedString: (COAttributedString *)second
 										source: (id)source
 {
 	SUPERINIT;
-	
-	_first = first;
-	_second = second;
-	_source = source;
 	_operations = [NSMutableArray new];
-	
-	NSString *firstString = [[[COAttributedStringWrapper alloc] initWithBacking: _first] string];
-	NSString *secondString = [[[COAttributedStringWrapper alloc] initWithBacking: _second] string];
-	
+	[self diffFirst: first second: second source: source];
+	return self;
+}
+
+- (void) diffFirst: (COAttributedString *)first
+			second: (COAttributedString *)second
+			source: (id)source
+{
+	NSString *firstString = [[[COAttributedStringWrapper alloc] initWithBacking: first] string];
+	NSString *secondString = [[[COAttributedStringWrapper alloc] initWithBacking: second] string];
+		
 	diffresult_t *result = diff_arrays([firstString length], [secondString length], arraycomparefn, (__bridge void *)firstString, (__bridge void *)secondString);
 	
 	for (size_t i = 0; i < diff_editcount(result); i++)
@@ -152,16 +146,16 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 		switch (edit.type)
 		{
 			case difftype_insertion:
-				[self recordInsertionRangeA: rangeInA rangeB: rangeInB];
+				[self recordInsertionRangeA: rangeInA rangeB: rangeInB first: first second: second source: source];
 				break;
 			case difftype_deletion:
-				[self recordDeletionRangeA: rangeInA rangeB: rangeInB];
+				[self recordDeletionRangeA: rangeInA rangeB: rangeInB first: first second: second source: source];
 				break;
 			case difftype_modification:
-				[self recordModificationRangeA: rangeInA rangeB: rangeInB];
+				[self recordModificationRangeA: rangeInA rangeB: rangeInB first: first second: second source: source];
 				break;
 			case difftype_copy:
-				[self recordCopyRangeA: rangeInA rangeB: rangeInB];
+				[self recordCopyRangeA: rangeInA rangeB: rangeInB first: first second: second source: source];
 				break;
 		}
 	}
@@ -169,74 +163,77 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 	diff_free(result);
 	
 	// To make testing easier
-	coalesceOps(_operations, 0);
-	
-	return self;
+	coalesceOps(_operations);
 }
 
-- (void) recordInsertionRangeA: (NSRange)rangeInA rangeB: (NSRange)rangeInB
+- (void) recordInsertionRangeA: (NSRange)rangeInA rangeB: (NSRange)rangeInB first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
 {
-	COItemGraph *graph = [_second substringItemGraphWithRange: rangeInB];
+	COItemGraph *graph = [second substringItemGraphWithRange: rangeInB];
 	
 	COAttributedStringDiffOperationInsertAttributedSubstring *op = [COAttributedStringDiffOperationInsertAttributedSubstring new];
+	op.attributedStringUUID = second.UUID;
 	op.range = rangeInA;
-	op.source = _source;
+	op.source = source;
 	op.attributedStringItemGraph = graph;
 	
 	[_operations addObject: op];
 }
 
-- (void) recordDeletionRangeA: (NSRange)rangeInA rangeB: (NSRange)rangeInB
+- (void) recordDeletionRangeA: (NSRange)rangeInA rangeB: (NSRange)rangeInB first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
 {
 	COAttributedStringDiffOperationDeleteRange *op = [COAttributedStringDiffOperationDeleteRange new];
+	op.attributedStringUUID = second.UUID;
 	op.range = rangeInA;
-	op.source = _source;
+	op.source = source;
 	
 	[_operations addObject: op];
 }
 
-- (void) recordModificationRangeA: (NSRange)rangeInA rangeB: (NSRange)rangeInB
+- (void) recordModificationRangeA: (NSRange)rangeInA rangeB: (NSRange)rangeInB first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
 {
 	// The semantics of "modification" are that the old and new
 	// block are totally unrelated. Thus the old and new attributes
 	// are totally semantically unrelated, so we just record it in the diff as
 	// 'replace this range with this new attributed string'
 	
-	COItemGraph *graph = [_second substringItemGraphWithRange: rangeInB];
+	COItemGraph *graph = [second substringItemGraphWithRange: rangeInB];
 	
 	COAttributedStringDiffOperationReplaceRange *op = [COAttributedStringDiffOperationReplaceRange new];
+	op.attributedStringUUID = second.UUID;
 	op.range = rangeInA;
-	op.source = _source;
+	op.source = source;
 	op.attributedStringItemGraph = graph;
 	
 	[_operations addObject: op];
 }
 
-- (void) recordAddAttribute: (COAttributedStringAttribute *)attr toRangeA: (NSRange)rangeInA
+- (void) recordAddAttribute: (COAttributedStringAttribute *)attr toRangeA: (NSRange)rangeInA first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
 {
 	COItemGraph *graph = [attr attributeItemGraph];
 	
 	COAttributedStringDiffOperationAddAttribute *op = [COAttributedStringDiffOperationAddAttribute new];
 	op.range = rangeInA;
-	op.source = _source;
+	op.source = source;
 	op.attributeItemGraph = graph;
+	op.attributedStringUUID = second.UUID;
 	
 	[_operations addObject: op];
 }
 
-- (void) recordRemoveAttribute: (COAttributedStringAttribute *)attr toRangeA: (NSRange)rangeInA
+- (void) recordRemoveAttribute: (COAttributedStringAttribute *)attr toRangeA: (NSRange)rangeInA first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
 {
 	COItemGraph *graph = [attr attributeItemGraph];
 	
 	COAttributedStringDiffOperationRemoveAttribute *op = [COAttributedStringDiffOperationRemoveAttribute new];
 	op.range = rangeInA;
-	op.source = _source;
+	op.source = source;
 	op.attributeItemGraph = graph;
+	op.attributedStringUUID = second.UUID;
 	
 	[_operations addObject: op];
 }
 
-- (void) recordCopyRangeA: (NSRange)firstRange rangeB: (NSRange)secondRange
+- (void) recordCopyRangeA: (NSRange)firstRange rangeB: (NSRange)secondRange first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
 {
 	// The textual content of these regions is unchanged. Iterate
 	// through the attributes and see if they are the same too.
@@ -248,10 +245,10 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 	{
 		NSRange rangeAtIForFirstString;
 		NSRange rangeAtIForSecondString;
-		NSSet *firstAttributes = [_first attributesSetAtIndex: firstRange.location + i
+		NSSet *firstAttributes = [first attributesSetAtIndex: firstRange.location + i
 										longestEffectiveRange: &rangeAtIForFirstString
 													  inRange: firstRange];
-		NSSet *secondAttributes = [_second attributesSetAtIndex: secondRange.location + i
+		NSSet *secondAttributes = [second attributesSetAtIndex: secondRange.location + i
 										  longestEffectiveRange: &rangeAtIForSecondString
 														inRange: secondRange];
 		
@@ -279,7 +276,7 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 				
 				for (COAttributedStringAttribute *attr in removed)
 				{
-					[self recordRemoveAttribute: attr toRangeA: consideredRangeForFirstString];
+					[self recordRemoveAttribute: attr toRangeA: consideredRangeForFirstString first: first second: second source: source];
 				}
 			}
 			{
@@ -288,7 +285,7 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 				
 				for (COAttributedStringAttribute *attr in added)
 				{
-					[self recordAddAttribute: attr toRangeA: consideredRangeForFirstString];
+					[self recordAddAttribute: attr toRangeA: consideredRangeForFirstString first: first second: second source: source];
 				}
 			}
 		}
@@ -299,13 +296,20 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 
 #pragma mark - Diff Application
 
-- (void) addOperationsFromDiff: (COAttributedStringDiff *)aDiff
+- (void) sortOperations
 {
-	[_operations addObjectsFromArray: aDiff.operations];
-	
 	[_operations sortUsingComparator: ^(id obj1, id obj2){
-		NSRange r1 = ((id<COAttributedStringDiffOperation>)obj1).range;
-		NSRange r2 = ((id<COAttributedStringDiffOperation>)obj2).range;
+		id<COAttributedStringDiffOperation> string1 = obj1;
+		id<COAttributedStringDiffOperation> string2 = obj2;
+		
+		if (![string1.attributedStringUUID isEqual: string2.attributedStringUUID])
+		{
+			int result = memcmp([string1.attributedStringUUID UUIDValue], [string2.attributedStringUUID UUIDValue], 16);
+			return (result < 0) ? NSOrderedAscending : NSOrderedDescending;
+		}
+		
+		NSRange r1 = string1.range;
+		NSRange r2 = string2.range;
 		
 		if (r1.location < r2.location)
 		{
@@ -320,16 +324,83 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 			return NSOrderedDescending;
 		}
 	}];
+	
+	// To make testing easier
+	coalesceOps(_operations);
 }
 
-- (void) applyToAttributedString: (COAttributedString *)target
+- (void) addOperationsFromDiff: (COAttributedStringDiff *)aDiff
 {
+	[_operations addObjectsFromArray: aDiff.operations];
+	
+	[self sortOperations];
+}
+
+- (NSDictionary *) operationArraysByUUID
+{
+	NSMutableDictionary *operationArrays = [NSMutableDictionary new];
+	for (id<COAttributedStringDiffOperation>op in _operations)
+	{
+		NSMutableArray *array = operationArrays[op.attributedStringUUID];
+		if (array == nil)
+		{
+			array = [NSMutableArray new];
+			operationArrays[op.attributedStringUUID] = array;
+		}
+		[array addObject: op];
+	}
+	return operationArrays;
+}
+
+- (NSDictionary *) addedOrUpdatedItemsForApplyingTo: (id<COItemGraph>)dest
+{
+	COObjectGraphContext *workingCtx = [[COObjectGraphContext alloc] init];
+	[workingCtx setItemGraph: dest];
+	
+	[self applyToObjectGraph: workingCtx];
+
+	// Sort of a hack..
+	
+	COItemGraphDiff *diff = [COItemGraphDiff diffItemTree: dest withItemTree: workingCtx sourceIdentifier: @""];
+	NSDictionary *result = [diff addedOrUpdatedItemsForApplyingTo: dest];
+	return result;
+}
+
+- (void) applyToAttributedString: (COAttributedString *)attrStr
+{
+	NSDictionary *operationArraysByUUID = [self operationArraysByUUID];
+	NSArray *array = operationArraysByUUID[attrStr.UUID];
 	NSInteger i = 0;
-	for (id<COAttributedStringDiffOperation> op in self.operations)
+	for (id<COAttributedStringDiffOperation> op in array)
 	{
 		NSLog(@"Applying %@", op);
-	
-		i += [op applyOperationToAttributedString: target withOffset: i];
+		
+		i += [op applyOperationToAttributedString: attrStr withOffset: i];
+	}
+}
+
+- (void) applyToObjectGraph: (COObjectGraphContext *)dest
+{
+	NSDictionary *operationArraysByUUID = [self operationArraysByUUID];
+	for (ETUUID *attributedStringUUID in operationArraysByUUID)
+	{
+		COAttributedString *attrStr = [dest loadedObjectForUUID: attributedStringUUID];
+		if (attrStr == nil)
+		{
+			attrStr = [[COAttributedString alloc] prepareWithUUID: attributedStringUUID
+												entityDescription: [[dest modelDescriptionRepository] entityDescriptionForClass: [COAttributedString class]]
+											   objectGraphContext: dest
+															isNew: YES];
+		}
+		
+		NSArray *array = operationArraysByUUID[attributedStringUUID];
+		NSInteger i = 0;
+		for (id<COAttributedStringDiffOperation> op in array)
+		{
+			NSLog(@"Applying %@", op);
+			
+			i += [op applyOperationToAttributedString: attrStr withOffset: i];
+		}
 	}
 }
 
@@ -349,7 +420,7 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 #pragma mark - Operation Classes
 
 @implementation COAttributedStringDiffOperationInsertAttributedSubstring
-@synthesize range, source, attributedStringItemGraph;
+@synthesize range, source, attributedStringItemGraph, attributedStringUUID;
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
@@ -374,7 +445,7 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 @end
 
 @implementation COAttributedStringDiffOperationDeleteRange
-@synthesize range, source;
+@synthesize range, source, attributedStringUUID;
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
@@ -389,7 +460,7 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 @end
 
 @implementation COAttributedStringDiffOperationReplaceRange
-@synthesize range, source, attributedStringItemGraph;
+@synthesize range, source, attributedStringItemGraph, attributedStringUUID;
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
@@ -411,7 +482,7 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 @end
 
 @implementation COAttributedStringDiffOperationAddAttribute
-@synthesize range, source, attributeItemGraph;
+@synthesize range, source, attributeItemGraph, attributedStringUUID;
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
@@ -433,7 +504,7 @@ static void coalesceOps(NSMutableArray *ops, NSUInteger i)
 @end
 
 @implementation COAttributedStringDiffOperationRemoveAttribute
-@synthesize range, source, attributeItemGraph;
+@synthesize range, source, attributeItemGraph, attributedStringUUID;
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {

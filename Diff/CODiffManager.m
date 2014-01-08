@@ -73,12 +73,6 @@
 		Class diffClass = [self diffAlgorithmClassForItem: commonItemB
 							   modelDescriptionRepository: aRepository];
 		
-		// HACK: Use COItemGraphDiff if the item is being added
-		if (commonItemA == nil)
-		{
-			diffClass = [COItemGraphDiff class];
-		}
-		
 		NSMutableArray *itemsForDiffClass = itemUUIDsByDiffAlgorithmName[NSStringFromClass(diffClass)];
 		if (itemsForDiffClass == nil)
 		{
@@ -142,12 +136,24 @@
 
 - (void) applyTo: (id<COItemGraph>)dest
 {
+	NSMutableDictionary *itemsByUUID = [NSMutableDictionary new];
 	for (NSString *algorithmName in self.subDiffsByAlgorithmName)
 	{
 		id<CODiffAlgorithm> ourSubDiff = self.subDiffsByAlgorithmName[algorithmName];
+
+		NSDictionary *diffOutput = [ourSubDiff addedOrUpdatedItemsForApplyingTo: dest];
 		
-		[ourSubDiff applyTo: dest];
+		assert(![[NSSet setWithArray: [itemsByUUID allKeys]]
+				 intersectsSet: [NSSet setWithArray: [diffOutput allKeys]]]);
+		
+		[itemsByUUID addEntriesFromDictionary: diffOutput];
 	}
+	
+	COItemGraph *preview = [[COItemGraph alloc] initWithItemGraph: dest];
+	[preview insertOrUpdateItems: [itemsByUUID allValues]];
+	
+	
+	[dest insertOrUpdateItems: [itemsByUUID allValues]];
 }
 
 - (BOOL) hasConflicts
