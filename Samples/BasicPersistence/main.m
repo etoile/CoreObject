@@ -45,21 +45,6 @@
 
 @dynamic appointments;
 
-- (void) addAppointment: (Appointment *)anAppointment
-{
-	[self willChangeValueForProperty: @"appointments"
-	                       atIndexes: [NSIndexSet indexSet]
-	                     withObjects: @[anAppointment]
-	                    mutationKind: ETCollectionMutationKindInsertion];
-
-	[[self valueForVariableStorageKey: @"appointments"] addObject: anAppointment];
-
-	[self didChangeValueForProperty: @"appointments"
-	                      atIndexes: [NSIndexSet indexSet]
-	                    withObjects: @[anAppointment]
-	                   mutationKind: ETCollectionMutationKindInsertion];
-}
-
 @end
 
 @implementation Appointment 
@@ -123,7 +108,7 @@ int main(int argc, char **argv)
 		                                                          endDate: futureDate
 		                                               objectGraphContext: [calendar objectGraphContext]];
 
-		[calendar addAppointment: appointment];
+		calendar.appointments = [NSSet setWithObject: appointment];
 
 		[ctx commit];
 
