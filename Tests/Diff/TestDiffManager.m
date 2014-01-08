@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen
+	Copyright (C) 2014 Eric Wasylishen
  
 	Date:  December 2013
 	License:  MIT  (see COPYING)

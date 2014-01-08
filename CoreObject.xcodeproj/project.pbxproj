@@ -248,6 +248,7 @@
 		6699DDAC184887E70003E803 /* TestOrderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAB184887E70003E803 /* TestOrderedRelationship.m */; };
 		6699DDAF184887F60003E803 /* TestUnivaluedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */; };
 		6699DDB2184888050003E803 /* TestUnorderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDB1184888050003E803 /* TestUnorderedRelationship.m */; };
+		66A00A21187DFA8D005CFE16 /* TestAttributedStringMerge.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A00A20187DFA8D005CFE16 /* TestAttributedStringMerge.m */; };
 		66B1FC6918727D7E00745859 /* TestAttributedStringHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B1FC6818727D7E00745859 /* TestAttributedStringHistory.m */; };
 		66B1FC72187377ED00745859 /* TestAttributedString.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B1FC71187377ED00745859 /* TestAttributedString.m */; };
 		66B6DC5C187A020900870370 /* TestDiffManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B6DC5B187A020900870370 /* TestDiffManager.m */; };
@@ -754,6 +755,7 @@
 		6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnivaluedRelationship.m; sourceTree = "<group>"; };
 		6699DDB1184888050003E803 /* TestUnorderedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnorderedRelationship.m; sourceTree = "<group>"; };
 		66A00A18187DDB6A005CFE16 /* COObjectGraphContext+Debugging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Debugging.h"; path = "Core/COObjectGraphContext+Debugging.h"; sourceTree = "<group>"; };
+		66A00A20187DFA8D005CFE16 /* TestAttributedStringMerge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedStringMerge.m; sourceTree = "<group>"; };
 		66B1FC6818727D7E00745859 /* TestAttributedStringHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedStringHistory.m; sourceTree = "<group>"; };
 		66B1FC71187377ED00745859 /* TestAttributedString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedString.m; sourceTree = "<group>"; };
 		66B6DC5B187A020900870370 /* TestDiffManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestDiffManager.m; sourceTree = "<group>"; };
@@ -1101,6 +1103,7 @@
 				660EE3B1186E3DA600E8C22C /* TestAttributedStringCommon.m */,
 				66B1FC71187377ED00745859 /* TestAttributedString.m */,
 				6633F12118552570009CE6F7 /* TestAttributedStringDiff.m */,
+				66A00A20187DFA8D005CFE16 /* TestAttributedStringMerge.m */,
 				660EE3A4186E072500E8C22C /* TestAttributedStringDiffOperations.m */,
 				660EE3AE186E3D8700E8C22C /* TestAttributedStringWrapper.m */,
 				66B1FC6818727D7E00745859 /* TestAttributedStringHistory.m */,
@@ -2247,6 +2250,7 @@
 				66E40D7B1836D08E00E5B4A7 /* TestUndoUseCases.m in Sources */,
 				66E40D711836D08D00E5B4A7 /* TestSynchronization.m in Sources */,
 				66EF4276186251A800E15C59 /* TestDiffCAPI.m in Sources */,
+				66A00A21187DFA8D005CFE16 /* TestAttributedStringMerge.m in Sources */,
 				66101167184D8C83001A3E24 /* UnivaluedGroupContent.m in Sources */,
 				6699DDA8184887C30003E803 /* TestUnivaluedCompositeRelationship.m in Sources */,
 				66E40D761836D08E00E5B4A7 /* TestHistoryTrack.m in Sources */,
