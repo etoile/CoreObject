@@ -753,6 +753,7 @@
 		6699DDAB184887E70003E803 /* TestOrderedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestOrderedRelationship.m; sourceTree = "<group>"; };
 		6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnivaluedRelationship.m; sourceTree = "<group>"; };
 		6699DDB1184888050003E803 /* TestUnorderedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnorderedRelationship.m; sourceTree = "<group>"; };
+		66A00A18187DDB6A005CFE16 /* COObjectGraphContext+Debugging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Debugging.h"; path = "Core/COObjectGraphContext+Debugging.h"; sourceTree = "<group>"; };
 		66B1FC6818727D7E00745859 /* TestAttributedStringHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedStringHistory.m; sourceTree = "<group>"; };
 		66B1FC71187377ED00745859 /* TestAttributedString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedString.m; sourceTree = "<group>"; };
 		66B6DC5B187A020900870370 /* TestDiffManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestDiffManager.m; sourceTree = "<group>"; };
@@ -1275,6 +1276,7 @@
 				668084EA1791FBA2003A3CC6 /* COObject+RelationshipCache.m */,
 				668084EE1791FBAB003A3CC6 /* COObjectGraphContext.h */,
 				6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */,
+				66A00A18187DDB6A005CFE16 /* COObjectGraphContext+Debugging.h */,
 				668084EF1791FBAB003A3CC6 /* COObjectGraphContext.m */,
 				609C008E1704C3DA00D01AAB /* COPersistentRoot.h */,
 				6646975317CDA8DB00A1B767 /* COPersistentRoot+Private.h */,
