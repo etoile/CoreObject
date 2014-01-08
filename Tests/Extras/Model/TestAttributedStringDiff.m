@@ -174,7 +174,9 @@
 	 
 	 */
 	
-	COObjectGraphContext *ctx2 = [self makeAttributedString];
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	[ctx2 setItemGraph: ctx1];
+	[self clearAttributedString: [ctx2 rootObject]];
 	[self appendString: @"ab" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
 	[self appendString: @"c" htmlCode: nil toAttributedString: [ctx2 rootObject]];
 	
@@ -188,7 +190,10 @@
 	 */
 
 	
-	COObjectGraphContext *ctx3 = [self makeAttributedString];
+	COObjectGraphContext *ctx3 = [COObjectGraphContext new];
+	[ctx3 setItemGraph: ctx1];
+	[self clearAttributedString: [ctx3 rootObject]];
+
 	[self appendString: @"da" htmlCode: nil toAttributedString: [ctx3 rootObject]];
 	[self appendString: @"bc" htmlCode: @"i" toAttributedString: [ctx3 rootObject]];
 	

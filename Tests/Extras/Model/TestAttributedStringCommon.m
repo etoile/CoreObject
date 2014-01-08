@@ -23,6 +23,11 @@
 	return ctx1;
 }
 
+- (void) clearAttributedString: (COAttributedString *)dest
+{
+	dest.chunks = @[];
+}
+
 - (COAttributedStringChunk *) appendString: (NSString *)string htmlCodes: (NSArray *)codes toAttributedString: (COAttributedString *)dest
 {
 	COObjectGraphContext *graph = [dest objectGraphContext];

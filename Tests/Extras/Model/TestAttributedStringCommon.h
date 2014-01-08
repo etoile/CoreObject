@@ -8,6 +8,8 @@
 
 - (COObjectGraphContext *) makeAttributedString;
 
+- (void) clearAttributedString: (COAttributedString *)dest;
+
 - (COAttributedStringChunk *) appendString: (NSString *)string htmlCodes: (NSArray *)codes toAttributedString: (COAttributedString *)dest;
 
 - (COAttributedStringChunk *) appendString: (NSString *)string htmlCode: (NSString *)aCode toAttributedString: (COAttributedString *)dest;
