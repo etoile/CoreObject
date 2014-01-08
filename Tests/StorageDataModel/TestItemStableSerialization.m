@@ -71,6 +71,12 @@
 {
 	return [objects objectEnumerator];
 }
+- (NSUInteger)countByEnumeratingWithState: (NSFastEnumerationState *)state 
+                                  objects: (__unsafe_unretained id[])stackbuf 
+                                    count: (NSUInteger)len
+{
+	return [objects countByEnumeratingWithState: state objects: stackbuf count: len];
+}
 @end
 
 

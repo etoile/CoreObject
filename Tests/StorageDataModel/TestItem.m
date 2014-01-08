@@ -69,6 +69,9 @@
 - (void) testJSONDoubleEquality
 {
 	NSNumber *value = [NSNumber numberWithDouble: 123.456789012];
+
+	UKTrue(strcmp([value objCType], "d") == 0);
+
 	NSNumber *decimalValue = [NSDecimalNumber numberWithDouble: 123.456789012];
 	NSData *data = [NSJSONSerialization dataWithJSONObject: D(value, @"number") options: 0 error: NULL];
 	NSNumber *roundTripValue =
@@ -76,7 +79,11 @@
 	NSNumber *newValue = [NSNumber numberWithDouble: [roundTripValue doubleValue]];
 	NSNumber *newValueFromDesc = [NSNumber numberWithDouble: [[roundTripValue description] doubleValue]];
 
+#ifndef GNUSTEP
+	// NOTE: Doesn't matter on GNUstep since newValue is not a NSDecimalNumber, 
+	// and we don't have to convert it into a NSDoubleNumber (unlike on 10.7).
 	UKTrue([[NSDecimalNumber defaultBehavior] scale] == NSDecimalNoScale);
+#endif
 
 	NSLog(@"Double representation in JSON: %@",
 		  [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding]);

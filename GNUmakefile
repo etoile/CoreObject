@@ -9,11 +9,10 @@ LIBRARIES_DEPEND_UPON = $(shell pkg-config --libs sqlite3) -lEtoileFoundation $(
 
 # For test builds, pass one more libdispatch include directory located in GNUstep Local domain
 CoreObject_INCLUDE_DIRS = -IStore/fmdb/src -I$(GNUSTEP_LOCAL_ROOT)/Library/Headers/dispatch
-CoreObject_CPPFLAGS += -DGNUSTEP_MISSING_API_COMPATIBILITY
+CoreObject_CPPFLAGS += -DGNUSTEP_MISSING_API_COMPATIBILITY -DOS_OBJECT_USE_OBJC=0
 CoreObject_LDFLAGS += -lstdc++ -lobjcxx -lsqlite3 -ldispatch
 # TODO: Check that -fobjc-arc is all we need to pass, then remove -fobjc-nonfragile-abi -fblocks
-CoreObject_OBJCFLAGS += -fobjc-nonfragile-abi -fblocks -fobjc-arc -Wall -Wno-arc-performSelector-leaks 
-
+CoreObject_OBJCFLAGS += -fobjc-nonfragile-abi -fblocks -fobjc-arc -Wall -Wno-arc-performSelector-leaks
 ifeq ($(test), yes)
   BUNDLE_NAME = $(FRAMEWORK_NAME)
   CoreObject_INCLUDE_DIRS += -I$(PROJECT_DIR)/Tests -I$(PROJECT_DIR)/Tests/TestModelObjects -I$(PROJECT_DIR)/Tests/Extras/Model 
@@ -50,18 +49,18 @@ CoreObject_OBJC_FILES += $(wildcard Store/fmdb/src/FM*.m)
 
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += $(wildcard Tests/*.m)
-CoreObject_OBJC_FILES += $(wildcard Tests/Attribute/*.m)
-CoreObject_OBJC_FILES += $(wildcard Tests/Core/*.m)
-CoreObject_OBJC_FILES += $(wildcard Tests/Diff/*.m)
-CoreObject_OBJC_FILES += $(wildcard Tests/Extras/Model/*.m)
-CoreObject_OBJC_FILES += $(wildcard Tests/Model/*.m)
-CoreObject_OBJC_FILES += $(wildcard Tests/Relationship/*.m)
+#CoreObject_OBJC_FILES += $(wildcard Tests/Attribute/*.m)
+#CoreObject_OBJC_FILES += $(wildcard Tests/Core/*.m)
+#CoreObject_OBJC_FILES += $(wildcard Tests/Diff/*.m)
+#CoreObject_OBJC_FILES += $(wildcard Tests/Extras/Model/*.m)
+#CoreObject_OBJC_FILES += $(wildcard Tests/Model/*.m)
+#CoreObject_OBJC_FILES += $(wildcard Tests/Relationship/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/StorageDataModel/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Store/*.m)
-CoreObject_OBJC_FILES += $(wildcard Tests/Undo/*.m)
-CoreObject_OBJC_FILES += $(wildcard Tests/Serialization/*.m)
+#CoreObject_OBJC_FILES += $(wildcard Tests/Undo/*.m)
+#CoreObject_OBJC_FILES += $(wildcard Tests/Serialization/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/TestModelObjects/*.m)
-CoreObject_OBJC_FILES += $(wildcard Tests/Utilities/*.m)
+#CoreObject_OBJC_FILES += $(wildcard Tests/Utilities/*.m)
 endif
 
 clean : test=yes
