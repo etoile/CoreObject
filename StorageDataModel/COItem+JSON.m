@@ -6,12 +6,95 @@
  */
 
 #import "COItem+JSON.h"
-#import <EtoileFoundation/NSData+Hash.h>
-#import <EtoileFoundation/ETUUID.h>
+#import <EtoileFoundation/EtoileFoundation.h>
 #import "COPath.h"
 #import "COAttachmentID.h"
 
 @implementation COItem (JSON)
+
+// Semi-hack: we store the UUID alongside the real object properties.
+// This property name is reserved for JSON serialization and cannot be used
+// as an actual property name.
+NSString *kCOJSONObjectUUIDProperty = @"org.etoile-project.coreobject.uuid";
+
+// COType -> string
+
+static NSString *arraySuffix = @"-array";
+static NSString *setSuffix = @"-set";
+static NSString *intPrefix = @"int";
+static NSString *floatPrefix = @"float";
+static NSString *stringPrefix = @"string";
+static NSString *blobPrefix = @"blob";
+static NSString *referencePrefix = @"reference";
+static NSString *compositePrefix = @"composite";
+static NSString *attachmentPrefix = @"attachment";
+
+static NSString *
+COJSONMultivalueTypeToString(COType type)
+{
+    if (COTypeIsMultivalued(type))
+    {
+        if (COTypeIsOrdered(type))
+        {
+            return arraySuffix;
+        }
+        else
+        {
+            return setSuffix;
+        }
+    }
+    return @"";
+}
+
+static NSString *
+COJSONPrimitiveTypeToString(COType type)
+{
+    switch (COTypePrimitivePart(type))
+    {
+			case kCOTypeInt64: return intPrefix;
+			case kCOTypeDouble: return floatPrefix;
+			case kCOTypeString: return stringPrefix;
+			case kCOTypeBlob: return blobPrefix;
+			case kCOTypeReference: return referencePrefix;
+			case kCOTypeCompositeReference: return compositePrefix;
+			case kCOTypeAttachment: return attachmentPrefix;
+    }
+    return @"";
+}
+
+static NSString *
+COJSONTypeToString(COType type)
+{
+	NSCAssert(COTypeIsValid(type), @"type to serialize not valid");
+    return [COJSONPrimitiveTypeToString(type) stringByAppendingString: COJSONMultivalueTypeToString(type)];
+}
+
+// string -> COType
+
+static COType
+COJSONStringToType(NSString *type)
+{
+	NSArray *components = [type componentsSeparatedByString: @"-"];
+	
+	COType result = [@{ intPrefix : @(kCOTypeInt64),
+						floatPrefix : @(kCOTypeDouble),
+						stringPrefix : @(kCOTypeString),
+						blobPrefix : @(kCOTypeBlob),
+						referencePrefix : @(kCOTypeReference),
+						compositePrefix : @(kCOTypeCompositeReference),
+						attachmentPrefix : @(kCOTypeAttachment) }[components[0]] intValue];
+		
+	if ([type hasSuffix: setSuffix])
+		result |= kCOTypeSet;
+	else if ([type hasSuffix: arraySuffix])
+		result |= kCOTypeArray;
+	
+	NSCAssert(COTypeIsValid(result), @"deserialized type not valid");
+	
+	return result;
+}
+
+// COItem attribute value -> JSON-compatible plist
 
 static id plistValueForPrimitiveValue(id aValue, COType aType)
 {
@@ -46,9 +129,11 @@ static id plistValueForPrimitiveValue(id aValue, COType aType)
 
 static id plistValueForValue(id aValue, COType aType)
 {
+	NSString *typeString = COJSONTypeToString(aType);
+	
     if (COTypeIsUnivalued(aType))
     {
-        return plistValueForPrimitiveValue(aValue, aType);
+        return @{ typeString : plistValueForPrimitiveValue(aValue, aType) };
     }
     else
     {
@@ -57,9 +142,11 @@ static id plistValueForValue(id aValue, COType aType)
         {
             [collection addObject: plistValueForPrimitiveValue(obj, aType)];
         }
-        return collection;
+        return @{ typeString : collection };
     }
 }
+
+// JSON-compatible plist -> COItem attribute value
 
 /* 
  * Returning the parsed value as a NSNumber rather a NSDecimalNumber to ensure 
@@ -108,8 +195,12 @@ static id valueForPrimitivePlistValue(id aValue, COType aType)
     }
 }
 
-static id valueForPlistValue(id aValue, COType aType)
+static id importValueFromPlist(id typeValuePair)
 {
+	NSCAssert([typeValuePair count] == 1, @"JSON value dictionary should be one key : one value");
+	COType aType = COJSONStringToType([typeValuePair allKeys][0]);
+	id aValue = [typeValuePair allValues][0];
+	
     if (COTypeIsUnivalued(aType))
     {
         return valueForPrimitivePlistValue(aValue, aType);
@@ -134,23 +225,11 @@ static id valueForPlistValue(id aValue, COType aType)
     }
 }
 
-static id exportToPlist(id aValue, COType aType)
+static COType importTypeFromPlist(id typeValuePair)
 {
-	NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity: 2];
-	[result setObject: [NSNumber numberWithInt: aType] forKey: @"type"];
-	[result setObject: plistValueForValue(aValue, aType) forKey: @"value"];
-	return result;
-}
-
-static COType importTypeFromPlist(id aPlist)
-{
-    return [[aPlist objectForKey: @"type"] intValue];
-}
-
-static id importValueFromPlist(id aPlist)
-{
-    return valueForPlistValue([aPlist objectForKey: @"value"],
-                              [[aPlist objectForKey: @"type"] intValue]);
+	NSCAssert([typeValuePair count] == 1, @"JSON value dictionary should be one key : one value");
+	COType aType = COJSONStringToType([typeValuePair allKeys][0]);
+	return aType;
 }
 
 - (id) JSONPlist
@@ -159,33 +238,35 @@ static id importValueFromPlist(id aPlist)
 	
 	for (NSString *key in values)
 	{
-		id plistValue = exportToPlist([values objectForKey: key], [[types objectForKey: key] intValue]);
+		id plistValue = plistValueForValue([values objectForKey: key], [[types objectForKey: key] intValue]);
 		[plistValues setObject: plistValue
 						forKey: key];
 	}
 	
-	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                 plistValues, @"values",
-                                 [uuid stringValue], @"uuid",
-                                 nil];
-    
-    return dict;
+	ETAssert(plistValues[kCOJSONObjectUUIDProperty] == nil);
+	plistValues[kCOJSONObjectUUIDProperty] = [self.UUID stringValue];
+	
+    return plistValues;
 }
 
 - (id) initWithJSONPlist: (id)aPlist
 {
-	ETUUID *aUUID = [ETUUID UUIDWithString: [aPlist objectForKey: @"uuid"]];
+	ETUUID *aUUID = [ETUUID UUIDWithString: aPlist[kCOJSONObjectUUIDProperty]];
     
 	NSMutableDictionary *importedValues = [NSMutableDictionary dictionary];
 	NSMutableDictionary *importedTypes = [NSMutableDictionary dictionary];
-	for (NSString *key in [aPlist objectForKey: @"values"])
+
+	for (NSString *key in aPlist)
 	{
-		id objPlist = [[aPlist objectForKey: @"values"] objectForKey: key];
+		if ([key isEqualToString: kCOJSONObjectUUIDProperty])
+			continue;
 		
-		[importedValues setObject: importValueFromPlist(objPlist)
+		id typeValuePair = aPlist[key];
+		
+		[importedValues setObject: importValueFromPlist(typeValuePair)
 						   forKey: key];
 		
-		[importedTypes setObject: [NSNumber numberWithInt: importTypeFromPlist(objPlist)]
+		[importedTypes setObject: [NSNumber numberWithInt: importTypeFromPlist(typeValuePair)]
 						  forKey: key];
 	}
 	
