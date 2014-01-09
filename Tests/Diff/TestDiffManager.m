@@ -5,6 +5,9 @@
 	License:  MIT  (see COPYING)
  */
 
+// NOTE: This allows to skip compiling all Tests/Model/Extras until all other tests pass on GNUstep.
+#ifndef GNUSTEP
+
 #import "TestAttributedStringCommon.h"
 
 @interface TestDiffManager : EditingContextTestCase <UKTest>
@@ -164,3 +167,5 @@
 }
 
 @end
+
+#endif

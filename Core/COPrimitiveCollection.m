@@ -161,6 +161,13 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 	return [_backing member: anObject];
 }
 
+- (NSUInteger)countByEnumeratingWithState: (NSFastEnumerationState *)state 
+                                  objects: (__unsafe_unretained id[])stackbuf 
+                                    count: (NSUInteger)len
+{
+	return [_backing countByEnumeratingWithState: state objects: stackbuf count: len];
+}
+
 - (NSEnumerator *)objectEnumerator
 {
 	return [_backing objectEnumerator];
