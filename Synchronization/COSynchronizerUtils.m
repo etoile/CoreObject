@@ -11,14 +11,15 @@
 
 @implementation COSynchronizerUtils
 
-+ (COItemGraphDiff *)diffForRebasingGraph: (id <COItemGraph>)sourceGraph
-								ontoGraph: (id <COItemGraph>)destGraph
-								baseGraph: (id <COItemGraph>)baseGraph
++ (CODiffManager *)diffForRebasingGraph: (id <COItemGraph>)sourceGraph
+							  ontoGraph: (id <COItemGraph>)destGraph
+							  baseGraph: (id <COItemGraph>)baseGraph
+			 modelDescriptionRepository: (ETModelDescriptionRepository *)repo
 {
-    COItemGraphDiff *mergingBranchDiff = [COItemGraphDiff diffItemTree: baseGraph withItemTree: sourceGraph sourceIdentifier: @"merged"];
-    COItemGraphDiff *selfDiff = [COItemGraphDiff diffItemTree: baseGraph withItemTree: destGraph sourceIdentifier: @"self"];
+    CODiffManager *mergingBranchDiff = [CODiffManager diffItemGraph: baseGraph withItemGraph: sourceGraph modelDescriptionRepository: repo sourceIdentifier: @"merged"];
+    CODiffManager *selfDiff = [CODiffManager diffItemGraph: baseGraph withItemGraph: destGraph modelDescriptionRepository: repo sourceIdentifier: @"self"];
     
-    COItemGraphDiff *merged = [selfDiff itemTreeDiffByMergingWithDiff: mergingBranchDiff];
+    CODiffManager *merged = [selfDiff diffByMergingWithDiff: mergingBranchDiff];
 	return merged;
 }
 
@@ -28,6 +29,7 @@
 				  branchUUID: (ETUUID *)branch
 					   store: (COSQLiteStore *)store
 				 transaction: (COStoreTransaction *)txn
+  modelDescriptionRepository: (ETModelDescriptionRepository *)repo
 {
 	ETUUID *lca = [COLeastCommonAncestor commonAncestorForCommit: source
 													   andCommit: dest
@@ -58,9 +60,10 @@
 			ETAssert(currentDestGraph != nil);
 		}
 		
-		COItemGraphDiff *diff = [self diffForRebasingGraph: sourceGraph
-												 ontoGraph: currentDestGraph
-												 baseGraph: baseGraph];
+		CODiffManager *diff = [self diffForRebasingGraph: sourceGraph
+											   ontoGraph: currentDestGraph
+											   baseGraph: baseGraph
+							  modelDescriptionRepository: repo];
 		
 		if([diff hasConflicts])
 		{
@@ -70,7 +73,8 @@
 		
 		//NSLog(@"Applying diff %@", diff);
 		
-		COItemGraph *mergeResult = [diff itemTreeWithDiffAppliedToItemGraph: baseGraph];
+		COItemGraph *mergeResult = [[COItemGraph alloc] initWithItemGraph: baseGraph];
+		[diff applyTo: mergeResult];
 		
 		ETUUID *nextRev = [ETUUID UUID];
 		[newRevids addObject: nextRev];

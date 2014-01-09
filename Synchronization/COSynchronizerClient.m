@@ -159,7 +159,8 @@
 												persistentRootUUID: self.persistentRoot.UUID
 														branchUUID: self.branch.UUID
 															 store: [self.persistentRoot store]
-													   transaction: txn];
+													   transaction: txn
+										modelDescriptionRepository: self.persistentRoot.editingContext.modelDescriptionRepository];
 		ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 
 		[_branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [rebasedRevs lastObject]

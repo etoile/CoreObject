@@ -22,6 +22,7 @@
 		  persistentRootUUID: (ETUUID *)persistentRoot
 				  branchUUID: (ETUUID *)branch
 					   store: (COSQLiteStore *)store
-				 transaction: (COStoreTransaction *)txn;
+				 transaction: (COStoreTransaction *)txn
+  modelDescriptionRepository: (ETModelDescriptionRepository *)repo;
 
 @end

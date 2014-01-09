@@ -344,8 +344,6 @@
 	UKIntsEqual(0, [[self serverMessages] count]);
 }
 
-// FIME: Failing
-#if 0
 - (void) testMergeOverlappingAttributeAdditions
 {
 	/*
@@ -406,7 +404,6 @@
 	UKObjectsEqual(A(@"He",    @"ll",         @"o"), [serverStr valueForKeyPath: @"chunks.text"]);
 	UKObjectsEqual(A(S(@"b"),  S(@"b", @"u"), S(@"u")), [serverStr valueForKeyPath: @"chunks.attributes.htmlCode"]);
 }
-#endif
 
 @end
 
