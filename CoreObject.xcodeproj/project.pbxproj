@@ -249,6 +249,12 @@
 		6699DDAF184887F60003E803 /* TestUnivaluedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */; };
 		6699DDB2184888050003E803 /* TestUnorderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDB1184888050003E803 /* TestUnorderedRelationship.m */; };
 		66A00A21187DFA8D005CFE16 /* TestAttributedStringMerge.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A00A20187DFA8D005CFE16 /* TestAttributedStringMerge.m */; };
+		66A00A29187E7BA1005CFE16 /* CORevision+Graphviz.h in Headers */ = {isa = PBXBuildFile; fileRef = 66A00A27187E7BA1005CFE16 /* CORevision+Graphviz.h */; };
+		66A00A2A187E7BA1005CFE16 /* CORevision+Graphviz.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A00A28187E7BA1005CFE16 /* CORevision+Graphviz.m */; };
+		66A00A34187E7C83005CFE16 /* COPersistentRoot+Graphviz.h in Headers */ = {isa = PBXBuildFile; fileRef = 66A00A32187E7C83005CFE16 /* COPersistentRoot+Graphviz.h */; };
+		66A00A35187E7C83005CFE16 /* COPersistentRoot+Graphviz.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A00A33187E7C83005CFE16 /* COPersistentRoot+Graphviz.m */; };
+		66A00A38187E7D12005CFE16 /* COBranch+Graphviz.h in Headers */ = {isa = PBXBuildFile; fileRef = 66A00A36187E7D12005CFE16 /* COBranch+Graphviz.h */; };
+		66A00A39187E7D12005CFE16 /* COBranch+Graphviz.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A00A37187E7D12005CFE16 /* COBranch+Graphviz.m */; };
 		66B1FC6918727D7E00745859 /* TestAttributedStringHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B1FC6818727D7E00745859 /* TestAttributedStringHistory.m */; };
 		66B1FC72187377ED00745859 /* TestAttributedString.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B1FC71187377ED00745859 /* TestAttributedString.m */; };
 		66B6DC5C187A020900870370 /* TestDiffManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B6DC5B187A020900870370 /* TestDiffManager.m */; };
@@ -756,6 +762,12 @@
 		6699DDB1184888050003E803 /* TestUnorderedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnorderedRelationship.m; sourceTree = "<group>"; };
 		66A00A18187DDB6A005CFE16 /* COObjectGraphContext+Debugging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Debugging.h"; path = "Core/COObjectGraphContext+Debugging.h"; sourceTree = "<group>"; };
 		66A00A20187DFA8D005CFE16 /* TestAttributedStringMerge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedStringMerge.m; sourceTree = "<group>"; };
+		66A00A27187E7BA1005CFE16 /* CORevision+Graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CORevision+Graphviz.h"; path = "Debugging/CORevision+Graphviz.h"; sourceTree = "<group>"; };
+		66A00A28187E7BA1005CFE16 /* CORevision+Graphviz.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "CORevision+Graphviz.m"; path = "Debugging/CORevision+Graphviz.m"; sourceTree = "<group>"; };
+		66A00A32187E7C83005CFE16 /* COPersistentRoot+Graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COPersistentRoot+Graphviz.h"; path = "Debugging/COPersistentRoot+Graphviz.h"; sourceTree = "<group>"; };
+		66A00A33187E7C83005CFE16 /* COPersistentRoot+Graphviz.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COPersistentRoot+Graphviz.m"; path = "Debugging/COPersistentRoot+Graphviz.m"; sourceTree = "<group>"; };
+		66A00A36187E7D12005CFE16 /* COBranch+Graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COBranch+Graphviz.h"; path = "Debugging/COBranch+Graphviz.h"; sourceTree = "<group>"; };
+		66A00A37187E7D12005CFE16 /* COBranch+Graphviz.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COBranch+Graphviz.m"; path = "Debugging/COBranch+Graphviz.m"; sourceTree = "<group>"; };
 		66B1FC6818727D7E00745859 /* TestAttributedStringHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedStringHistory.m; sourceTree = "<group>"; };
 		66B1FC71187377ED00745859 /* TestAttributedString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedString.m; sourceTree = "<group>"; };
 		66B6DC5B187A020900870370 /* TestDiffManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestDiffManager.m; sourceTree = "<group>"; };
@@ -1603,6 +1615,12 @@
 				66E62258185BEECE002A22C1 /* COSQLiteStore+Graphviz.m */,
 				66E62259185BEECE002A22C1 /* COObjectGraphContext+Graphviz.h */,
 				66E6225A185BEECE002A22C1 /* COObjectGraphContext+Graphviz.m */,
+				66A00A27187E7BA1005CFE16 /* CORevision+Graphviz.h */,
+				66A00A28187E7BA1005CFE16 /* CORevision+Graphviz.m */,
+				66A00A32187E7C83005CFE16 /* COPersistentRoot+Graphviz.h */,
+				66A00A33187E7C83005CFE16 /* COPersistentRoot+Graphviz.m */,
+				66A00A36187E7D12005CFE16 /* COBranch+Graphviz.h */,
+				66A00A37187E7D12005CFE16 /* COBranch+Graphviz.m */,
 			);
 			name = Debugging;
 			sourceTree = "<group>";
@@ -1743,9 +1761,11 @@
 				669724E517D463B00090B31A /* COSequenceEdit.h in Headers */,
 				669724E917D464170090B31A /* COSequenceDeletion.h in Headers */,
 				669724ED17D464400090B31A /* COSequenceInsertion.h in Headers */,
+				66A00A29187E7BA1005CFE16 /* CORevision+Graphviz.h in Headers */,
 				669724F117D4646E0090B31A /* COSequenceModification.h in Headers */,
 				660D4CD917D5C7CB003C9ACC /* COLeastCommonAncestor.h in Headers */,
 				663E9BAA182D8A890083AC46 /* COSynchronizerUtils.h in Headers */,
+				66A00A38187E7D12005CFE16 /* COBranch+Graphviz.h in Headers */,
 				66405DC3182A0D4D00A6EF7A /* COSynchronizerClient.h in Headers */,
 				660179D0182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.h in Headers */,
 				660179C8182AFA4B006E7D7B /* COSynchronizerRevision.h in Headers */,
@@ -1795,6 +1815,7 @@
 				664F8B1618762411001AD224 /* CODiffManager.h in Headers */,
 				601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */,
 				6646974A17CDA78300A1B767 /* COEditingContext+Private.h in Headers */,
+				66A00A34187E7C83005CFE16 /* COPersistentRoot+Graphviz.h in Headers */,
 				600F72BF1858A71200CB6AC5 /* COPersistentObjectContext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2089,6 +2110,7 @@
 				660179D1182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.m in Sources */,
 				66E6225C185BEECE002A22C1 /* COSQLiteStore+Graphviz.m in Sources */,
 				6633F10F185515F1009CE6F7 /* COColorToHTMLString.m in Sources */,
+				66A00A39187E7D12005CFE16 /* COBranch+Graphviz.m in Sources */,
 				791B4E721299C90900CCF472 /* FMDatabase.m in Sources */,
 				660179C9182AFA4B006E7D7B /* COSynchronizerRevision.m in Sources */,
 				66FD348F1830BB3800898381 /* COSynchronizerJSONClient.m in Sources */,
@@ -2156,6 +2178,7 @@
 				663CE2B717C0B05900E729F5 /* COEditingContext+Undo.m in Sources */,
 				663CE2BD17C15A4800E729F5 /* COCommandGroup.m in Sources */,
 				662FFB8017C2026000BA3F2F /* COCommandUndeletePersistentRoot.m in Sources */,
+				66A00A2A187E7BA1005CFE16 /* CORevision+Graphviz.m in Sources */,
 				662FFB9F17C2DE8100BA3F2F /* COCommandUndeleteBranch.m in Sources */,
 				6646976417CDB94300A1B767 /* COUndoTrack.m in Sources */,
 				6646977C17CE7CAC00A1B767 /* COSynchronizationClient.m in Sources */,
@@ -2171,6 +2194,7 @@
 				66D3FCCF1860E197009BDF50 /* COAttributedStringAttribute.m in Sources */,
 				669724EE17D464400090B31A /* COSequenceInsertion.m in Sources */,
 				669724F217D4646E0090B31A /* COSequenceModification.m in Sources */,
+				66A00A35187E7C83005CFE16 /* COPersistentRoot+Graphviz.m in Sources */,
 				660D4CDA17D5C7CB003C9ACC /* COLeastCommonAncestor.m in Sources */,
 				662AC93E1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m in Sources */,
 				660D4CE617D689FC003C9ACC /* COMergeInfo.m in Sources */,
