@@ -344,6 +344,25 @@
 	UKRaisesException([as attribute: NSUnderlineStyleAttributeName atIndex: 0 effectiveRange: &effectiveRange]);
 }
 
+- (void) testEraseAndAdd
+{
+	// Add "<b>1</b>23"
+	[as replaceCharactersInRange: NSMakeRange(0, 0) withString: @"1"];
+	[as replaceCharactersInRange: NSMakeRange(1, 0) withString: @"2"];
+	[as replaceCharactersInRange: NSMakeRange(2, 0) withString: @"3"];
+	[self setFontTraits: NSFontBoldTrait inRange: NSMakeRange(0, 1) inTextStorage: as];
+	UKObjectsEqual(@"123", [as string]);
+	
+	// Erase it
+	[as replaceCharactersInRange: NSMakeRange(0, [as length]) withString: @""];
+	UKObjectsEqual(@"", [as string]);
+	
+	// Add "x"
+	[as replaceCharactersInRange: NSMakeRange(0, 0) withString: @"x"];
+	UKObjectsEqual(@"x", [as string]);
+	[self checkFontHasTraits: 0 withLongestEffectiveRange: NSMakeRange(0, 1) inAttributedString: as];
+}
+
 @end
 
 

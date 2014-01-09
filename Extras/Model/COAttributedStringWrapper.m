@@ -152,7 +152,7 @@
 	COAttributedStringChunk *chunk = [_backing chunkContainingIndex: aRange.location chunkStart: &chunkStart chunkIndex: &chunkIndex];
 	
 	/* Sepecial case: empty string */
-	if ([_backing.chunks count] == 0)
+	if ([self length] == 0)
 	{
 		chunk = [[COAttributedStringChunk alloc] initWithObjectGraphContext: _backing.objectGraphContext];
 		chunk.text = @"";
