@@ -70,7 +70,7 @@ support bookmark search based on URL text. */
 
 - (void)setSerializedURL: (NSString *)aURLString
 {
-	_URL =  [NSURL URLWithString: aURLString];
+	_URL = (aURLString != nil ? [NSURL URLWithString: aURLString] : nil);
 }
 
 - (void)setLastVisitedDate:(NSDate *)aDate
