@@ -1,6 +1,6 @@
 #import "TestAttributedStringCommon.h"
 
-@implementation TestAttributedStringCommon
+@implementation EditingContextTestCase (TestAttributedStringCommon)
 
 - (COAttributedStringAttribute *) makeAttr: (NSString *)htmlCode inCtx: (COObjectGraphContext *)graph
 {
@@ -83,6 +83,14 @@
 	
 	UKIntsEqual(expectedRange.location, actualRange.location);
 	UKIntsEqual(expectedRange.length, actualRange.length);
+}
+
+- (void) setFontTraits: (NSFontSymbolicTraits)traits inRange: (NSRange)aRange inTextStorage: (NSTextStorage *)target
+{
+	NSFont *font = [[NSFontManager sharedFontManager] convertFont: [NSFont userFontOfSize: 12] toHaveTrait: traits];
+	[target addAttribute: NSFontAttributeName
+				   value: font
+				   range: aRange];
 }
 
 @end

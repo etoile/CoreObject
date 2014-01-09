@@ -7,7 +7,7 @@
 
 #import "TestAttributedStringCommon.h"
 
-@interface TestAttributedStringDiff : TestAttributedStringCommon <UKTest>
+@interface TestAttributedStringDiff : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestAttributedStringDiff

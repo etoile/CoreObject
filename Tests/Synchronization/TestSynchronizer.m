@@ -10,6 +10,7 @@
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
 #import "COSynchronizerFakeMessageTransport.h"
+#import "TestAttributedStringCommon.h"
 
 #define CLIENT_STORE_URL [NSURL fileURLWithPath: [@"~/TestStore2.sqlite" stringByExpandingTildeInPath]]
 
@@ -36,7 +37,7 @@
 	
 	[[[COSQLiteStore alloc] initWithURL: CLIENT_STORE_URL] clearStore];
 	
-	serverPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	serverPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupNoOpposite"];
 	serverBranch = [serverPersistentRoot currentBranch];
 	[ctx commit];
 	
@@ -57,18 +58,18 @@
 	return self;
 }
 
-- (OutlineItem *) addAndCommitServerChild
+- (UnorderedGroupNoOpposite *) addAndCommitServerChild
 {
-	OutlineItem *serverChild1 = [[serverBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	[[serverBranch rootObject] addObject: serverChild1];
+	UnorderedGroupNoOpposite *serverChild1 = [[serverBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
+	[[[serverBranch rootObject] mutableSetValueForKey: @"contents"] addObject: serverChild1];
 	[ctx commit];
 	return serverChild1;
 }
 
-- (OutlineItem *) addAndCommitClientChild
+- (UnorderedGroupNoOpposite *) addAndCommitClientChild
 {
-	OutlineItem *clientChild1 = [[clientBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	[[clientBranch rootObject] addObject: clientChild1];
+	UnorderedGroupNoOpposite *clientChild1 = [[clientBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
+	[[[clientBranch rootObject] mutableSetValueForKey: @"contents"] addObject: clientChild1];
 	[clientCtx commit];
 	return clientChild1;
 }
@@ -96,7 +97,7 @@
 
 - (void) testClientEdit
 {
-	OutlineItem *clientChild1 = [self addAndCommitClientChild];
+	UnorderedGroupNoOpposite *clientChild1 = [self addAndCommitClientChild];
 	
 	UKIntsEqual(1, [[self serverMessages] count]);
 	UKObjectKindOf([self serverMessages][0], COSynchronizerPushedRevisionsFromClientMessage);
@@ -111,7 +112,7 @@
 	UKObjectKindOf([self clientMessages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
 	UKIntsEqual(1, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1), SA([[serverBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1), [[serverBranch rootObject] contents]);
 	
 	// Deliver the response to the client
 	[transport deliverMessagesToClient];
@@ -123,7 +124,7 @@
 
 - (void) testServerEdit
 {
-	OutlineItem *serverChild1 = [self addAndCommitServerChild];
+	UnorderedGroupNoOpposite *serverChild1 = [self addAndCommitServerChild];
 	
 	UKIntsEqual(0, [[self serverMessages] count]);
 	UKIntsEqual(1, [[self clientMessages] count]);
@@ -133,7 +134,7 @@
 	[transport deliverMessagesToClient];
 	
 	UKIntsEqual(1, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(serverChild1), SA([[clientBranch rootObject] contents]));
+	UKObjectsEqual(S(serverChild1), [[clientBranch rootObject] contents]);
 	
 	// No more messages
 	UKIntsEqual(0, [[self clientMessages] count]);
@@ -142,8 +143,8 @@
 
 - (void) testClientAndServerEdit
 {
-	OutlineItem *serverChild1 = [self addAndCommitServerChild];
-	OutlineItem *clientChild1 = [self addAndCommitClientChild];
+	UnorderedGroupNoOpposite *serverChild1 = [self addAndCommitServerChild];
+	UnorderedGroupNoOpposite *clientChild1 = [self addAndCommitClientChild];
 	
 	UKIntsEqual(1, [[self serverMessages] count]);
 	UKObjectKindOf([self serverMessages][0], COSynchronizerPushedRevisionsFromClientMessage);
@@ -157,7 +158,7 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 	
 	UKIntsEqual(1, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1), SA([[clientBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1), [[clientBranch rootObject] contents]);
 	
 	// Server should merge in client's changes, and send a push response back to the client
 	[transport deliverMessagesToServer];
@@ -168,7 +169,7 @@
 	UKObjectKindOf([self clientMessages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
 	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), SA([[serverBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1, serverChild1), [[serverBranch rootObject] contents]);
 	
 	// Deliver the response to the client
 	[transport deliverMessagesToClient];
@@ -178,13 +179,13 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 		
 	UKIntsEqual(2, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), SA([[clientBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1, serverChild1), [[clientBranch rootObject] contents]);
 }
 
 - (void) testServerAndClientEdit
 {
-	OutlineItem *serverChild1 = [self addAndCommitServerChild];
-	OutlineItem *clientChild1 = [self addAndCommitClientChild];
+	UnorderedGroupNoOpposite *serverChild1 = [self addAndCommitServerChild];
+	UnorderedGroupNoOpposite *clientChild1 = [self addAndCommitClientChild];
 	
 	UKIntsEqual(1, [[self serverMessages] count]);
 	{
@@ -214,7 +215,7 @@
 	[transport deliverMessagesToServer];
 	
 	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), SA([[serverBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1, serverChild1), [[serverBranch rootObject] contents]);
 	
 	UKIntsEqual(0, [[self serverMessages] count]);
 	
@@ -244,13 +245,13 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 	
 	UKIntsEqual(2, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), SA([[clientBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1, serverChild1), [[clientBranch rootObject] contents]);
 }
 
 - (void) testLocalClientCommitsAfterPushingToServer
 {
-	OutlineItem *serverChild1 = [self addAndCommitServerChild];
-	OutlineItem *clientChild1 = [self addAndCommitClientChild];
+	UnorderedGroupNoOpposite *serverChild1 = [self addAndCommitServerChild];
+	UnorderedGroupNoOpposite *clientChild1 = [self addAndCommitClientChild];
 	
 	UKIntsEqual(1, [[self serverMessages] count]);
 	UKObjectKindOf([self serverMessages][0], COSynchronizerPushedRevisionsFromClientMessage);
@@ -268,7 +269,7 @@
 	UKObjectKindOf([self clientMessages][1], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
 	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), SA([[serverBranch rootObject] contents]));
+	UKObjectsEqual(S(clientChild1, serverChild1), [[serverBranch rootObject] contents]);
 	
 	// Before the merged changes arrives at the client, make another commit on the client
 	
@@ -342,6 +343,70 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 	UKIntsEqual(0, [[self serverMessages] count]);
 }
+
+// FIME: Failing
+#if 0
+- (void) testMergeOverlappingAttributeAdditions
+{
+	/*
+	 server:
+	 
+	 "Hello"
+	 
+	 */
+		
+	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
+	[[serverBranch rootObject] setContents: S(serverStr)];
+	[self appendString: @"Hello" htmlCode: nil toAttributedString: serverStr];
+	[serverPersistentRoot commit];
+	
+	[transport deliverMessagesToClient];
+	
+	/*
+	 client:
+	 
+	 "Hello"
+	  ^^^^
+	 bold
+	 
+	 */
+	
+	COAttributedString *clientStr = [[[clientBranch rootObject] contents] anyObject];
+	COAttributedStringWrapper *clientWrapper = [[COAttributedStringWrapper alloc] initWithBacking: clientStr];
+	[self setFontTraits: NSFontBoldTrait inRange: NSMakeRange(0,4) inTextStorage: clientWrapper];
+	[clientPersistentRoot commit];
+	
+	/*
+	 server:
+	 
+	 "Hello"
+	    ^^^
+	 underline
+	 
+	 */
+	
+	COAttributedStringWrapper *serverWrapper = [[COAttributedStringWrapper alloc] initWithBacking: serverStr];
+	[serverWrapper setAttributes: @{ NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle) } range: NSMakeRange(2, 3)];
+	[serverPersistentRoot commit];
+	
+	[transport deliverMessagesToServer];
+	
+	
+	/*
+	 ctxExpected:
+	 
+	 "Hello"
+	  ^^^^
+	 bold
+	    ^^^
+	 underline
+	 
+	 */
+	
+	UKObjectsEqual(A(@"He",    @"ll",         @"o"), [serverStr valueForKeyPath: @"chunks.text"]);
+	UKObjectsEqual(A(S(@"b"),  S(@"b", @"u"), S(@"u")), [serverStr valueForKeyPath: @"chunks.attributes.htmlCode"]);
+}
+#endif
 
 @end
 

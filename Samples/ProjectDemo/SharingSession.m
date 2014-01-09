@@ -116,47 +116,55 @@
 
 - (void) sendCoreObjectMessageWithPayload: (NSString *)aString toFullJIDString: (NSString *)fullJID
 {
-	ETAssert(self.persistentRootUUID != nil);
-	ETAssert(self.branchUUID != nil);
-	
-	NSXMLElement *responseMessage = [NSXMLElement elementWithName:@"message"];
-	[responseMessage addAttributeWithName:@"type" stringValue: @"coreobject-synchronizer"];
-	[responseMessage addAttributeWithName:@"to" stringValue: fullJID];
-	[responseMessage addAttributeWithName:@"persistentroot" stringValue: [self.persistentRootUUID stringValue]];
-	[responseMessage addAttributeWithName:@"branch" stringValue: [self.branchUUID stringValue]];
-	[responseMessage setObjectValue: aString];
-
-	NSLog(@"<-- sending %d chars", (int)[[responseMessage XMLString] length]);
-	[_xmppStream sendElement:responseMessage];
+	double delayInSeconds = 2.0;
+	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+		ETAssert(self.persistentRootUUID != nil);
+		ETAssert(self.branchUUID != nil);
+		
+		NSXMLElement *responseMessage = [NSXMLElement elementWithName:@"message"];
+		[responseMessage addAttributeWithName:@"type" stringValue: @"coreobject-synchronizer"];
+		[responseMessage addAttributeWithName:@"to" stringValue: fullJID];
+		[responseMessage addAttributeWithName:@"persistentroot" stringValue: [self.persistentRootUUID stringValue]];
+		[responseMessage addAttributeWithName:@"branch" stringValue: [self.branchUUID stringValue]];
+		[responseMessage setObjectValue: aString];
+		
+		NSLog(@"<-- sending %d chars", (int)[[responseMessage XMLString] length]);
+		[_xmppStream sendElement:responseMessage];
+	});
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
 {
-	if ([[message attributeStringValueForName: @"type"] isEqualToString: @"coreobject-synchronizer"])
-	{
-		ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [message attributeStringValueForName: @"persistentroot"]];
-		ETUUID *branchUUID = [ETUUID UUIDWithString: [message attributeStringValueForName: @"branch"]];
-
-		if (!([persistentRootUUID isEqual: _persistentRootUUID]
-			  && [branchUUID isEqual: _branchUUID]))
+	double delayInSeconds = 2.0;
+	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+		if ([[message attributeStringValueForName: @"type"] isEqualToString: @"coreobject-synchronizer"])
 		{
-			NSLog(@"SharingSession on branch %@ ignoring message for branch %@", self.branchUUID, branchUUID);
-			return;
-		}
-		
-		NSString *payload = [message stringValue];
-		
-		if (_isServer)
+			ETUUID *persistentRootUUID = [ETUUID UUIDWithString: [message attributeStringValueForName: @"persistentroot"]];
+			ETUUID *branchUUID = [ETUUID UUIDWithString: [message attributeStringValueForName: @"branch"]];
+			
+			if (!([persistentRootUUID isEqual: _persistentRootUUID]
+				  && [branchUUID isEqual: _branchUUID]))
+			{
+				NSLog(@"SharingSession on branch %@ ignoring message for branch %@", self.branchUUID, branchUUID);
+				return;
+			}
+			
+			NSString *payload = [message stringValue];
+			
+			if (_isServer)
 			[_JSONServer receiveText: payload fromClient: [[message from] full]];
-		else
+			else
 			[_JSONClient receiveTextFromServer: payload];
-		
-		NSLog(@"--> received %d chars", (int)[[message XMLString] length]);
-	}
-	else
-	{
-		NSLog(@"Ignoring non-Coreobject message %@", message);
-	}
+			
+			NSLog(@"--> received %d chars", (int)[[message XMLString] length]);
+		}
+		else
+		{
+			NSLog(@"Ignoring non-Coreobject message %@", message);
+		}
+	});
 }
 
 - (BOOL) isServer

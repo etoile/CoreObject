@@ -7,7 +7,7 @@
 
 #import "TestAttributedStringCommon.h"
 
-@interface TestAttributedStringMerge : TestAttributedStringCommon <UKTest>
+@interface TestAttributedStringMerge : EditingContextTestCase <UKTest>
 @end
 
 @implementation TestAttributedStringMerge
@@ -107,10 +107,9 @@
 	
 	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
 	[ctx2 setItemGraph: ctx1];
-	[self clearAttributedString: [ctx2 rootObject]];
-	[self appendString: @"Hell" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
-	[self appendString: @"o" htmlCode: nil toAttributedString: [ctx2 rootObject]];
-	
+	COAttributedStringWrapper *ctx2Wrapper = [[COAttributedStringWrapper alloc] initWithBacking: [ctx2 rootObject]];
+	[self setFontTraits: NSFontBoldTrait inRange: NSMakeRange(0,4) inTextStorage: ctx2Wrapper];
+			
 	/*
 	 ctx3:
 	 
@@ -120,13 +119,13 @@
 	 
 	 */
 	
-	
 	COObjectGraphContext *ctx3 = [COObjectGraphContext new];
 	[ctx3 setItemGraph: ctx1];
-	[self clearAttributedString: [ctx3 rootObject]];
 	
-	[self appendString: @"He" htmlCode: nil toAttributedString: [ctx3 rootObject]];
-	[self appendString: @"llo" htmlCode: @"u" toAttributedString: [ctx3 rootObject]];
+	COAttributedStringWrapper *ctx3Wrapper = [[COAttributedStringWrapper alloc] initWithBacking: [ctx3 rootObject]];
+	[ctx3Wrapper setAttributes: @{ NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle) } range: NSMakeRange(2, 3)];
+
+	
 	
 	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
 																			secondAttributedString: [ctx2 rootObject]

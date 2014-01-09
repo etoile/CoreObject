@@ -177,7 +177,7 @@
 /**
  * Abstract class for tests that test an NSTextStorage subclass
  */
-@interface AbstractTextStorageTests : TestAttributedStringCommon
+@interface AbstractTextStorageTests : EditingContextTestCase
 {
 	NSTextStorage *as;
 }
@@ -192,14 +192,6 @@
 		NSArray *actual = [(id<EditedCallLogging>)as characterEditCalls];
 		UKObjectsEqual(expected, actual);
 	}
-}
-
-- (void) setFontTraits: (NSFontSymbolicTraits)traits inRange: (NSRange)aRange inTextStorage: (NSTextStorage *)target
-{
-	NSFont *font = [[NSFontManager sharedFontManager] convertFont: [NSFont userFontOfSize: 12] toHaveTrait: traits];
-	[target addAttribute: NSFontAttributeName
-				   value: font
-				   range: aRange];
 }
 
 - (void) testBasic
