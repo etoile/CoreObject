@@ -415,9 +415,63 @@ static void coalesceOps(NSMutableArray *ops)
 	// FIXME: Implement
 }
 
+- (NSString *)description
+{
+	NSMutableString *desc = [NSMutableString stringWithString: [super description]];
+	[desc appendFormat: @" {\n"];
+	for (COItemGraphEdit *edit in _operations)
+	{
+		[desc appendFormat: @"\t%@\n", [edit description]];
+	}
+ 	[desc appendFormat: @"}"];
+	return desc;
+}
+
 @end
 
 #pragma mark - Operation Classes
+
+static NSString *
+COHTMLCodesForAttributesItemGraph(COItemGraph *graph)
+{
+	NSString *htmlCodes = [[[graph items] mappedCollectionWithBlock:
+							^(id obj) { return [obj valueForAttribute: @"htmlCode"]; }] componentsJoinedByString: @","];
+	return htmlCodes;
+}
+
+static NSString *
+CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
+{
+	COObjectGraphContext *tempCtx = [COObjectGraphContext new];
+	[tempCtx setItemGraph: graph];
+	
+	COAttributedString *string = [tempCtx rootObject];
+	NSMutableString *result = [NSMutableString new];
+	for (COAttributedStringChunk *chunk in string.chunks)
+	{
+		if ([chunk.attributes count] == 0)
+		{
+			[result appendFormat: @"<span>%@</span>", chunk.text];
+		}
+		else
+		{
+			NSArray *attrs = [[chunk.attributes allObjects] sortedArrayUsingDescriptors:
+								  @[[NSSortDescriptor sortDescriptorWithKey: @"htmlCode" ascending: YES]]];
+			for (COAttributedStringAttribute *attr in attrs)
+			{
+				[result appendFormat: @"<%@>", attr.htmlCode];
+			}
+			[result appendFormat: @"%@", chunk.text];
+			for (COAttributedStringAttribute *attr in attrs)
+			{
+				[result appendFormat: @"</%@>", attr.htmlCode];
+			}
+		}
+	}
+	
+	return result;
+}
+
 
 @implementation COAttributedStringDiffOperationInsertAttributedSubstring
 @synthesize range, source, attributedStringItemGraph, attributedStringUUID;
@@ -442,6 +496,12 @@ static void coalesceOps(NSMutableArray *ops)
 	return sourceStringLength;
 }
 
+- (NSString *) description
+{
+	return [NSString stringWithFormat: @"%@: insert %@ at %@ (%@)",
+			self.attributedStringUUID, CODescriptionForAttributedStringItemGraph(self.attributedStringItemGraph), NSStringFromRange(self.range), self.source];
+}
+
 @end
 
 @implementation COAttributedStringDiffOperationDeleteRange
@@ -455,6 +515,12 @@ static void coalesceOps(NSMutableArray *ops)
 	[[target mutableArrayValueForKey: @"chunks"] removeObjectsInRange: NSMakeRange(deletionStartChunkIndex, deletionEndChunkIndex - deletionStartChunkIndex)];
 	
 	return -range.length;
+}
+
+- (NSString *) description
+{
+	return [NSString stringWithFormat: @"%@: delete %@ (%@)",
+			self.attributedStringUUID, NSStringFromRange(self.range), self.source];
 }
 
 @end
@@ -479,6 +545,12 @@ static void coalesceOps(NSMutableArray *ops)
 	return sourceStringLength - range.length;
 }
 
+- (NSString *) description
+{
+	return [NSString stringWithFormat: @"%@: replace %@ with %@ (%@)",
+			self.attributedStringUUID, NSStringFromRange(self.range), CODescriptionForAttributedStringItemGraph(self.attributedStringItemGraph), self.source];
+}
+
 @end
 
 @implementation COAttributedStringDiffOperationAddAttribute
@@ -499,6 +571,12 @@ static void coalesceOps(NSMutableArray *ops)
 	}
 		
 	return 0;
+}
+
+- (NSString *) description
+{
+	return [NSString stringWithFormat: @"%@: add attrs (%@) to %@ (%@)",
+			self.attributedStringUUID, COHTMLCodesForAttributesItemGraph(self.attributeItemGraph), NSStringFromRange(self.range), self.source];
 }
 
 @end
@@ -528,6 +606,12 @@ static void coalesceOps(NSMutableArray *ops)
 	}
 	
 	return 0;
+}
+
+- (NSString *) description
+{
+	return [NSString stringWithFormat: @"%@: remove attrs (%@) from %@ (%@)",
+			self.attributedStringUUID, COHTMLCodesForAttributesItemGraph(self.attributeItemGraph), NSStringFromRange(self.range), self.source];
 }
 
 @end

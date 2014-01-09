@@ -6,6 +6,7 @@
  */
 
 #import "COAttributedStringChunk.h"
+#import "COAttributedStringAttribute.h"
 
 @implementation COAttributedStringChunk
 + (ETEntityDescription*)newEntityDescription
@@ -54,6 +55,11 @@
 - (NSUInteger) length
 {
 	return [self.text length];
+}
+
+- (NSString *) attributesDebugDescription
+{
+	return [[(NSSet *)[[self.attributes mappedCollection] htmlCode] allObjects] componentsJoinedByString: @","];
 }
 
 @end

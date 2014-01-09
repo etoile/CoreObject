@@ -18,4 +18,9 @@
 
 @property (nonatomic, readonly) NSUInteger length;
 
+/**
+ * Returns a string like @"b,u" if the chunk is bold and underlined
+ */
+- (NSString *) attributesDebugDescription;
+
 @end
