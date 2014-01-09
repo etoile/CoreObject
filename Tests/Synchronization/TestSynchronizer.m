@@ -405,5 +405,50 @@
 	UKObjectsEqual(A(S(@"b"),  S(@"b", @"u"), S(@"u")), [serverStr valueForKeyPath: @"chunks.attributes.htmlCode"]);
 }
 
+- (void) testClientAttributedStringEdits
+{
+	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
+	COAttributedStringWrapper *serverWrapper = [[COAttributedStringWrapper alloc] initWithBacking: serverStr];
+	[[serverBranch rootObject] setContents: S(serverStr)];
+	[serverPersistentRoot commit];
+	
+	[transport deliverMessagesToClient];
+	
+	COAttributedString *clientStr = [[[clientBranch rootObject] contents] anyObject];
+	COAttributedStringWrapper *clientWrapper = [[COAttributedStringWrapper alloc] initWithBacking: clientStr];
+	[clientWrapper replaceCharactersInRange: NSMakeRange(0,0) withString: @"a"];
+	[clientPersistentRoot commit];
+
+	[clientWrapper replaceCharactersInRange: NSMakeRange(1,0) withString: @"b"];
+	[clientPersistentRoot commit];
+
+	[clientWrapper replaceCharactersInRange: NSMakeRange(2,0) withString: @"c"];
+	[clientPersistentRoot commit];
+
+	// deliver 'a' to server. The client will only have sent one message, since
+	// it waits for confirmation before sending more.
+	[transport deliverMessagesToServer];
+	UKObjectsEqual(@"a", [serverWrapper string]);
+	
+	// confirmation that 'a' was received -> client
+	// Make sure that the client doesn't do any unnecessary rebasing
+	ETUUID *clientABCRevision = [[clientBranch currentRevision] UUID];
+	[transport deliverMessagesToClient];
+	UKObjectsEqual(clientABCRevision, [[clientBranch currentRevision] UUID]);
+	UKObjectsEqual(@"abc", [clientWrapper string]);
+
+	// 'ab' and 'abc' commits -> server
+	[transport deliverMessagesToServer];
+	UKObjectsEqual(@"abc", [serverWrapper string]);
+
+	// confirmation that all 3 commits were received
+	[transport deliverMessagesToClient];
+	UKObjectsEqual(@"abc", [clientWrapper string]);
+	
+	UKIntsEqual(0, [[self clientMessages] count]);
+	UKIntsEqual(0, [[self serverMessages] count]);
+}
+
+
 @end
 

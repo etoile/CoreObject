@@ -150,8 +150,15 @@
 	
 	// Rebase [self.branch currentRevision] onto the new revisions
 	
+	const BOOL isCurrentRevDescendentOfServerRev =
+		[COLeastCommonAncestor isRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
+				equalToOrParentOfRevision: [[self.branch currentRevision] UUID]
+						   persistentRoot: self.persistentRoot.UUID
+									store: [self.persistentRoot store]];
+	
 	if (_lastRevisionUUIDInTransitToServer != nil
-		&& ![[[self.branch currentRevision] UUID] isEqual: _lastRevisionUUIDInTransitToServer])
+		&& ![[[self.branch currentRevision] UUID] isEqual: _lastRevisionUUIDInTransitToServer]
+		&& !isCurrentRevDescendentOfServerRev)
 	{
 		txn = [[COStoreTransaction alloc] init];
 		NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: [[self.branch currentRevision] UUID]
@@ -167,7 +174,7 @@
 														   persistentRootUUID: self.persistentRoot.UUID
 																	storeUUID: [[self.persistentRoot store] UUID]]];
 	}
-	else
+	else if (!isCurrentRevDescendentOfServerRev)
 	{
 		// Fast-forward
 		

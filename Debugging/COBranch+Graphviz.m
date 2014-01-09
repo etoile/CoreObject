@@ -13,7 +13,7 @@
 
 - (void) showHistory
 {
-	[self.persistentRoot.store showGraphForPersistentRootUUID: self.UUID];
+	[self.persistentRoot showHistory];
 }
 
 @end
