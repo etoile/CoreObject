@@ -13,6 +13,7 @@ CoreObject_CPPFLAGS += -DGNUSTEP_MISSING_API_COMPATIBILITY -DOS_OBJECT_USE_OBJC=
 CoreObject_LDFLAGS += -lstdc++ -lobjcxx -lsqlite3 -ldispatch
 # TODO: Check that -fobjc-arc is all we need to pass, then remove -fobjc-nonfragile-abi -fblocks
 CoreObject_OBJCFLAGS += -fobjc-nonfragile-abi -fblocks -fobjc-arc -Wall -Wno-arc-performSelector-leaks
+
 ifeq ($(test), yes)
   BUNDLE_NAME = $(FRAMEWORK_NAME)
   CoreObject_INCLUDE_DIRS += -I$(PROJECT_DIR)/Tests -I$(PROJECT_DIR)/Tests/TestModelObjects -I$(PROJECT_DIR)/Tests/Extras/Model 
@@ -21,6 +22,11 @@ ifeq ($(test), yes)
   CoreObject_PRINCIPAL_CLASS = TestCommon
 else
   CoreObject_OBJCFLAGS += -Wextra -Wno-sign-compare -Wno-unused-parameter
+endif
+
+# For running the test suite without a SSD (see also prepare-coreobject-ramdisk.sh that must be run before)
+ifeq ($(ramdisk), yes)
+  CoreObject_CPPFLAGS += -DIN_MEMORY_STORE
 endif
 
 OTHER_HEADER_DIRS = . Core Debugging Diff Extras/Diff Extras/Model Extras/ValueTransformers Model Store Undo Synchronization Synchronization/Messages Utilities StorageDataModel

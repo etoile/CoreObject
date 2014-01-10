@@ -96,7 +96,11 @@ doesNotPostNotification: (NSString *)notif
 
 + (NSURL *) storeURL
 {
+#ifdef IN_MEMORY_STORE
+	return [NSURL fileURLWithPath: @"/tmp/coreobject-ramdisk"];
+#else
 	return [NSURL fileURLWithPath: [@"~/TestStore.sqlite" stringByExpandingTildeInPath]];
+#endif
 }
 
 - (void) checkPersistentRoot: (ETUUID *)aPersistentRoot
