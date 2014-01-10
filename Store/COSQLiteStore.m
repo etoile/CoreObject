@@ -958,10 +958,11 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 	                                                    object: self
 	                                                  userInfo: userInfo];
 
-	[[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootsDidChangeNotification
-	                                                               object: [_uuid stringValue]
-	                                                             userInfo: userInfo
-	                                                   deliverImmediately: YES];
+	[[NSDistributedNotificationCenter defaultCenter]
+		postNotificationName: COStorePersistentRootsDidChangeNotification
+		              object: [[self UUID] stringValue]
+		            userInfo: userInfo
+		  deliverImmediately: YES];
 }
 
 - (void) postCommitNotificationsWithTransactionIDForPersistentRootUUID: (NSDictionary *)txnIDForPersistentRoot
@@ -991,9 +992,9 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 							   kCOStoreUUID : [[self UUID] stringValue],
 							   kCOStoreURL : [[self URL] absoluteString]};
 
-	[self performSelectorOnMainThread: @selector(postCommitNotificationsWithUserInfo:) 
-                               withObject: userInfo 
-                            waitUntilDone: NO];
+	[self performSelectorOnMainThread: @selector(postCommitNotificationsWithUserInfo:)
+	                       withObject: userInfo 
+	                    waitUntilDone: NO];
 }
 
 - (FMDatabase *) database
