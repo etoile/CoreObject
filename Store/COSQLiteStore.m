@@ -944,6 +944,26 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     return results;
 }
 
+/**
+ * We could put this code in a block passed to dispatch_async(dispatch_get_main_queue(), theBlock) 
+ * and  call dispatch_async() in our  caller, but dispatch_get_main_queue() is only supported for 
+ * Mac OS X (not on Linux or elsewhere). In future, GNUstep GUI could create a wrapper queue 
+ * around NSRunLoop and set it as _dispatch_main_q.
+ */
+- (void) postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo
+{
+	ETAssert([NSThread isMainThread]);
+
+	[[NSNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootsDidChangeNotification
+	                                                    object: self
+	                                                  userInfo: userInfo];
+
+	[[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootsDidChangeNotification
+	                                                               object: [_uuid stringValue]
+	                                                             userInfo: userInfo
+	                                                   deliverImmediately: YES];
+}
+
 - (void) postCommitNotificationsWithTransactionIDForPersistentRootUUID: (NSDictionary *)txnIDForPersistentRoot
 											   insertedPersistentRoots: (NSArray *)insertedUUIDs
 												deletedPersistentRoots: (NSArray *)deletedUUIDs
@@ -970,18 +990,10 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 							   kCOStoreInsertedPersistentRoots : insertedUUIDStrings,
 							   kCOStoreUUID : [[self UUID] stringValue],
 							   kCOStoreURL : [[self URL] absoluteString]};
-			
-	dispatch_async(dispatch_get_main_queue(), ^() {
-		[[NSNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootsDidChangeNotification
-															object: self
-														  userInfo: userInfo];
 
-		
-		[[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootsDidChangeNotification
-																	   object: [[self UUID] stringValue]
-																	 userInfo: userInfo
-														   deliverImmediately: NO];
-	});
+	[self performSelectorOnMainThread: @selector(postCommitNotificationsWithUserInfo:) 
+                               withObject: userInfo 
+                            waitUntilDone: NO];
 }
 
 - (FMDatabase *) database
