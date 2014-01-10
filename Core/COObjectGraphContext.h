@@ -13,7 +13,30 @@
 @class COPersistentRoot, COBranch, COObject, CORelationshipCache;
 @class COItemGraph, COItem;
 
+/**
+ * This notification is sent by the context during -clearChangeTracking.
+ *
+ * It will tell you about all possible mutations that can happen to a
+ * COObjectGraphContext over its lifetime (inserting objects, updating objects,
+ * reverting changes**, reloading a new state).
+ *
+ *   ** It's not totally clear if this should cause a notification to be sent
+ *      or not, since the graph is reverted to the state it was in when the
+ *      last COObjectGraphContextObjectsDidChangeNotification was set.
+ *      See -[TestObjectGraphContext testNotificationAfterDiscardForPersistentContext]
+ */
 extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
+/**
+ * User info dictionary key for COObjectGraphContextObjectsDidChangeNotification.
+ * The value is an NSSet of ETUUID objects.
+ */
+extern NSString * const COInsertedObjectsKey;
+/**
+ * User info dictionary key for COObjectGraphContextObjectsDidChangeNotification.
+ * The value is an NSSet of ETUUID objects.
+ */
+extern NSString * const COUpdatedObjectsKey;
+
 
 /**
  * TODO: Write class description
@@ -161,6 +184,9 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  * object is updated.
  * 
  * This must leave the object graph in a consistent state.
+ *
+ * This marks the corresponding objects as inserted/object.
+ * and does not call -clearChangeTracking.
  */
 - (void)insertOrUpdateItems: (NSArray *)items;
 /**
@@ -234,18 +260,33 @@ extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
  */
 - (BOOL)hasChanges;
 /**
- * Reloads to the current revision.
+ * If the receiver is owned by a branch, reloads to the current revision, clearing
+ * all changes.
  *
- * All existing changes are cleared and all loaded objects are discarded
- * (references to these objects become invalid as a result).
+ * Otherwise, all loaded objects are discarded (references to these objects become 
+ * invalid as a result).
  *
  * See also -clearChangeTracking and -[COBranch reloadAtRevision:].
  */
 - (void)discardAllChanges;
 /**
- * Clears uncommitted object insertions and updates.
+ * Conceptually, ends the current transaction and begins a new one.
+ *
+ * To be exact, this clears the record of inserted and updated objects so the
+ * current state of the object graph is regarded as pristine. 
+ * It's the caller's responsibility to have actually saved the changes somewhere
+ * before calling this (this is taken care of by COBranch.)
+ *
+ * This method sends the COObjectGraphContextObjectsDidChangeNotification.
  *
  * After calling this method, -hasChanges returns NO.
+ *
+ * This method is semi-private; it is part of the API used by COBranch and
+ * framwork users should normally never call this method.
+ *
+ * TODO: Could be clearer to rename to -markChangesCommitted or -acceptAllChanges
+ * because the intent is not about "clearing" but about telling the object graph
+ * context that the changes were committed.
  */
 - (void)clearChangeTracking;
 

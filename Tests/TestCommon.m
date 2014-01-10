@@ -61,6 +61,12 @@ NSString * const kCOParent = @"parentContainer";
     UKIntsEqual(count, timesNotified);
 }
 
+- (void)	checkBlock: (void (^)(void))block
+doesNotPostNotification: (NSString *)notif
+{
+	[self checkBlock: block postsNotification: notif withCount: 0 fromObject: nil withUserInfo: nil];
+}
+
 @end
 
 @implementation SQLiteStoreTestCase

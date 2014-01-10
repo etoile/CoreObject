@@ -20,6 +20,9 @@
 
 NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGraphContextObjectsDidChangeNotification";
 
+NSString * const COInsertedObjectsKey = @"COInsertedObjects";
+NSString * const COUpdatedObjectsKey = @"COUpdatedObjectsKey";
+
 /**
  * COEditingContext semantics:
  *
@@ -328,7 +331,11 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 	return [[_loadedObjects allKeys] arrayByAddingObjectsFromArray: additionalItemUUIDs];
 }
 
-- (void)addItem: (COItem *)item markAsInserted: (BOOL)markInserted
+/**
+ * Caller must handle marking the item as inserted/updated, if desired.
+ * Note that this may call itself recursively
+ */
+- (void)addItem: (COItem *)item
 {
     NSParameterAssert(item != nil);
 
@@ -342,15 +349,10 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     if (currentObject == nil)
     {
         currentObject = [self objectWithStoreItem: item];
-        if (markInserted)
-        {
-            [_insertedObjectUUIDs addObject: uuid];
-        }
     }
     else
     {
         [currentObject setStoreItem: item];
-        [_updatedObjectUUIDs addObject: uuid];
     }
 
 	for (ETUUID *itemUUID in [[currentObject additionalStoreItemUUIDs] objectEnumerator])
@@ -364,6 +366,20 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 {
     if ([items count] == 0)
         return;
+	
+	// Update change tracking
+	for (COItem *item in items)
+	{
+		if ([_loadedObjects objectForKey: item.UUID] != nil)
+		{
+			// TODO: Check it the item is actually different?
+			[_updatedObjectUUIDs addObject: item.UUID];
+		}
+		else
+		{
+			[_insertedObjectUUIDs addObject: item.UUID];
+		}
+	}
     
     // Wrap the items array in a COItemGraph, so they can be located by
     // -objectReferenceWithUUID:. The rootItemUUID is ignored.
@@ -372,24 +388,37 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     
     for (COItem *item in items)
     {
-        [self addItem: item markAsInserted: NO];
+        [self addItem: item];
     }
 	[self finishLoadingObjectsWithUUIDs: [_loadingItemGraph itemUUIDs]];
 	
 	_loadingItemGraph = nil;
+	
+	// NOTE: -clearChangeTracking *not* called
 }
 
 - (void)setItemGraph: (id <COItemGraph>)aTree
 {
 	NSParameterAssert(aTree != nil);
 	
-	[self discardObjectsWithUUIDs: _insertedObjectUUIDs];
-    [self clearChangeTracking];
-
-    // 1. Do updates.
-
+	// i.e., the root object can be set once and never changed.
+	NSParameterAssert(_rootObjectUUID == nil || [_rootObjectUUID isEqual: [aTree rootItemUUID]]);
     _rootObjectUUID =  [aTree rootItemUUID];
     
+	// Update change tracking
+	for (ETUUID *itemUUID in [aTree itemUUIDs])
+	{
+		if ([_loadedObjects objectForKey: itemUUID] != nil)
+		{
+			// TODO: Check it the item is actually different?
+			[_updatedObjectUUIDs addObject: itemUUID];
+		}
+		else
+		{
+			[_insertedObjectUUIDs addObject: itemUUID];
+		}
+	}
+	
 	// NOTE: To prevent caching the item graph during the loading, a better
 	// approach could be to allocate all the objects before loading them.
 	// We could also change -[COObjectGraphContext itemForUUID:] to search aTree
@@ -399,13 +428,13 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
     for (ETUUID *uuid in [aTree itemUUIDs])
     {
-        [self addItem: [aTree itemForUUID: uuid] markAsInserted: NO];
+        [self addItem: [aTree itemForUUID: uuid]];
     }
 	[self finishLoadingObjectsWithUUIDs: [aTree itemUUIDs]];
 
 	_loadingItemGraph = nil;
     
-    // Clear change tracking again.
+    // Clear change tracking
     
     [self clearChangeTracking];
 }
@@ -487,9 +516,6 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
     {
         [_updatedObjectUUIDs addObject: uuid];
     }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextObjectsDidChangeNotification
-                                                        object: self];
 }
    
 - (BOOL)hasChanges
@@ -502,7 +528,7 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 {
 	if ([self branch] == nil)
 	{
-		[self discardObjectsWithUUIDs: _insertedObjectUUIDs];
+		[self discardObjectsWithUUIDs: [NSSet setWithArray: [_loadedObjects allKeys]]];
 		[self clearChangeTracking];
 		ETAssert([[self loadedObjects] isEmpty]);
 	}
@@ -545,9 +571,17 @@ NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGr
 
 - (void)clearChangeTracking
 {
+	NSSet *insertedObjects = [_insertedObjectUUIDs copy];
+	NSSet *updatedObjects = [_updatedObjectUUIDs copy];
+	
     [_insertedObjectUUIDs removeAllObjects];
     [_updatedObjectUUIDs removeAllObjects];
     [_updatedPropertiesByUUID removeAllObjects];
+			
+    [[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextObjectsDidChangeNotification
+                                                        object: self
+													  userInfo: @{ COInsertedObjectsKey : insertedObjects,
+																   COUpdatedObjectsKey : updatedObjects }];
 }
 
 - (NSArray *)insertedObjects

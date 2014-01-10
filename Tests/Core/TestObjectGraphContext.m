@@ -7,7 +7,7 @@
 
 #import "TestCommon.h"
 
-@interface TestObjectGraphContext : NSObject <UKTest> {
+@interface TestObjectGraphContext : EditingContextTestCase <UKTest> {
     COCopier *copier;
     COObjectGraphContext *ctx1;
     OutlineItem *root1;
@@ -152,9 +152,15 @@
 
 - (void)testAddItem
 {
+	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	
 	COMutableItem *mutableItem = [COMutableItem item];
     [mutableItem setValue: @"OutlineItem" forAttribute: kCOObjectEntityNameProperty type: kCOTypeString];
     [ctx1 insertOrUpdateItems: A(mutableItem)];
+	
+	UKObjectsEqual(S(mutableItem.UUID), ctx1.insertedObjectUUIDs);
+	UKObjectsEqual(S(), ctx1.updatedObjectUUIDs);
+	
     OutlineItem *object = [ctx1 loadedObjectForUUID: [mutableItem UUID]];
     
     [mutableItem setValue: @"hello" forAttribute: kCOLabel type: kCOTypeString];
@@ -284,6 +290,13 @@
 	
 	OutlineItem *root2 = [self addObjectWithLabel: @"root1" toContext: ctx1];
     UKRaisesException([ctx1 setRootObject: root2]);
+	
+	// Test changing through -setItemGraph:
+	
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	OutlineItem *root3 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+	
+	UKRaisesException([ctx1 setItemGraph: ctx2]);
 }
 
 /**
@@ -327,6 +340,175 @@
 	{
 		[self doTestGarbageCollection];
 	}
+}
+
+#pragma mark - COObjectGraphContextObjectsDidChangeNotification
+
+- (void) testObjectsDidChangeNotificationNotPostedAfterInsert
+{
+	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	
+	__block OutlineItem *child1;
+	[self checkBlock: ^{
+		child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+	} doesNotPostNotification: COObjectGraphContextObjectsDidChangeNotification];
+}
+
+- (void) testObjectsDidChangeNotificationNotPostedAfterEdit
+{
+	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	
+	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+	[self checkBlock: ^{
+		root1.label = @"Test";
+		root1.contents = @[child1];
+		child1.label = @"Hello world";
+	} doesNotPostNotification: COObjectGraphContextObjectsDidChangeNotification];
+}
+
+- (void) testObjectsDidChangeNotificationPostedAfterInsert
+{
+	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	
+	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+	
+	[self checkBlock: ^{
+		[ctx1 clearChangeTracking];
+	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
+		   withCount: 1
+		  fromObject: ctx1
+		withUserInfo: @{ COInsertedObjectsKey : S(child1.UUID),
+						 COUpdatedObjectsKey : S() }];
+}
+
+- (void) testObjectsDidChangeNotificationPostedAfterUpdate
+{
+	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	
+	root1.label = @"Root item";
+	
+	[self checkBlock: ^{
+		[ctx1 clearChangeTracking];
+	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
+		   withCount: 1
+		  fromObject: ctx1
+		withUserInfo: @{ COInsertedObjectsKey : S(),
+						 COUpdatedObjectsKey : S(root1.UUID) }];
+}
+
+- (void) testObjectsDidChangeNotificationPostedAfterInsertAndUpdate
+{
+	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	
+	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+	child1.label = @"child1";
+	root1.contents = @[child1];
+	
+	[self checkBlock: ^{
+		[ctx1 clearChangeTracking];
+	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
+		   withCount: 1
+		  fromObject: ctx1
+		withUserInfo: @{ COInsertedObjectsKey : S(child1.UUID),
+						 COUpdatedObjectsKey : S(root1.UUID) }]; /* N.B. child1.UUID is not in the updated set */
+}
+
+- (void) testNotificationAfterDiscardForTransientContext
+{
+	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	
+	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+	child1.label = @"child1";
+	root1.contents = @[child1];
+	
+	[self checkBlock: ^{
+		[ctx1 discardAllChanges];
+	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
+		   withCount: 1
+		  fromObject: ctx1
+		withUserInfo: @{ COInsertedObjectsKey : S(),
+						 COUpdatedObjectsKey : S() }];
+	
+	// TODO: See comment in -testNotificationAfterDiscardForPersistentContext
+}
+
+- (void) testNotificationAfterDiscardForPersistentContext
+{
+	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+	[proot commit];
+	
+	COObjectGraphContext *persistentCtx = [proot objectGraphContext];
+	OutlineItem *persistentCtxRoot = [persistentCtx rootObject];
+	UKFalse([persistentCtx hasChanges]);
+	
+	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: persistentCtx];
+	child1.label = @"child1";
+	persistentCtxRoot.contents = @[child1];
+	
+	[self checkBlock: ^{
+		[ctx1 discardAllChanges];
+	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
+		   withCount: 1
+		  fromObject: ctx1
+		withUserInfo: @{ COInsertedObjectsKey : S(),
+						 COUpdatedObjectsKey : S() }];
+
+	// TODO: Not sure what is best:
+	// a) the above (COObjectGraphContextObjectsDidChangeNotification, object sets are empty)
+	// b) a new notification COObjectGraphContextObjectsDidDiscardChangesNotification
+	// c) no notification
+	//
+	// In a way we don't need to send a notification, since we're just reverting
+	// to the state when the last notification was sent.
+}
+
+- (void) testNotificationAfterSetItemGraph
+{
+	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+
+	// Make some changes in a copy of ctx1
+	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
+	[ctx2 setItemGraph: ctx1];
+	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+	child1.label = @"child1";
+	[[ctx2 rootObject] setContents: @[child1]];
+	
+	[self checkBlock: ^{
+		// Load those changes into ctx1. Should post a notifcation.
+		[ctx1 setItemGraph: ctx2];
+	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
+		   withCount: 1
+		  fromObject: ctx1
+		withUserInfo: @{ COInsertedObjectsKey : S(child1.UUID),
+						 COUpdatedObjectsKey : S(root1.UUID) }];
+}
+
+- (void) testNotificationAfterInsertOrUpdateItems
+{
+	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	
+	// Make some changes in a copy of ctx1
+	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
+	[ctx2 setItemGraph: ctx1];
+	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+	child1.label = @"child1";
+	[[ctx2 rootObject] setContents: @[child1]];
+	
+	NSArray *exportedItems = @[[ctx2 itemForUUID: ctx2.rootItemUUID],
+							   [ctx2 itemForUUID: child1.UUID]];
+	
+	[self checkBlock: ^{
+		// Load those changes into ctx1 using -insertOrUpdateItems:. Should not post a notifcation.
+		[ctx1 insertOrUpdateItems: exportedItems];
+	} doesNotPostNotification: COObjectGraphContextObjectsDidChangeNotification];
+	
+	[self checkBlock: ^{
+		[ctx1 clearChangeTracking];
+	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
+		   withCount: 1
+		  fromObject: ctx1
+		withUserInfo: @{ COInsertedObjectsKey : S(child1.UUID),
+						 COUpdatedObjectsKey : S(root1.UUID) }];
 }
 
 @end

@@ -94,6 +94,9 @@ extern NSString * const kCOParent;
 		 fromObject: (id)sender
 	   withUserInfo: (NSDictionary *)expectedUserInfo;
 
+- (void)	checkBlock: (void (^)(void))block
+doesNotPostNotification: (NSString *)notif;
+
 @end
 
 /**
