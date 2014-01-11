@@ -18,6 +18,7 @@
 	NSString *oldValue;
 	NSString *newValue;
 	id poster;
+	int notificationCount;
 }
 
 @end
@@ -59,6 +60,7 @@
 		oldValue = [change objectForKey: NSKeyValueChangeOldKey];
 		newValue = [change objectForKey: NSKeyValueChangeNewKey];
 		poster = anObject;
+		notificationCount++;
 	}
 }
 
@@ -85,6 +87,7 @@
 	UKObjectsEqual([NSNull null], oldValue);
 	UKObjectsEqual([self newValue], newValue);
 	UKObjectsSame(object, poster);
+	UKIntsEqual(1, notificationCount);
 }
 
 - (void)validateUpdate
@@ -191,20 +194,31 @@
 	return @"Edmonton";
 }
 
-- (void)addCityPropertyToObject: (COObject *)anObject
++ (void)addCityPropertyToEntity: (ETEntityDescription *)anEntity
 {
 	ETEntityDescription *stringType =
-		[[[anObject objectGraphContext] modelDescriptionRepository] descriptionForName: @"NSString"];
+		[[ETModelDescriptionRepository mainRepository] descriptionForName: @"NSString"];
 	ETPropertyDescription *propertyDesc =
 		[ETPropertyDescription descriptionWithName: @"city" type: stringType];
 	
-	[[anObject entityDescription] addPropertyDescription: propertyDesc];
+	[anEntity addPropertyDescription: propertyDesc];
 }
 
 - (id) init
 {
+	// N.B., We must add the 'city' property to COObject before registering
+	// an observer for the 'city' key (done in [super init]), because we need
+	// COObject to tell the KVO machinery that COObject will manually send
+	// change notifications for the 'city' key (see +[COObject automaticallyNotifiesObserversForKey:]
+	// and the [super didChangeValueForKey:] call in -[COObject didChangeValueForProperty]).
+	//
+	// If this was done after adding the KVO observer, KVO would do the dynamic
+	// subclassing trick since it doesn't know that COObject will send manual KVO change
+	// notifications for 'city', and we'd end up getting 2 notifications instead of 1 in -testKVC.
+	[TestDirectVariableStorageUpdate addCityPropertyToEntity:
+	 [[ETModelDescriptionRepository mainRepository] entityDescriptionForClass: [COObject class]]];
+		 
 	SUPERINIT;
-	[self addCityPropertyToObject: object];
 	return self;
 }
 

@@ -615,6 +615,18 @@ See +[NSObject typePrefix]. */
 	return YES;
 }
 
++ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key
+{
+	ETEntityDescription *desc = [[ETModelDescriptionRepository mainRepository] entityDescriptionForClass: self];
+	NSArray *propertyNames = [desc allPropertyDescriptionNames];
+	
+	if ([propertyNames containsObject: key])
+	{
+		return NO; // i.e., COObject's implementation notifies the KVO system for this key
+	}
+	return YES;
+}
+
 #pragma mark - Validation
 
 - (NSArray *)validateAllValues
