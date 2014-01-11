@@ -25,6 +25,7 @@
 	SUPERINIT;
 	_lastNotifiedLength = [aBacking length];
 	_backing = aBacking;
+	_cachedString = [aBacking string];
 	
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(objectGraphContextObjectsDidChangeNotification:)
@@ -41,6 +42,8 @@
 
 - (void) objectGraphContextObjectsDidChangeNotification: (NSNotification *)notif
 {
+	_cachedString = [_backing string];
+	
 	if (_inPrimitiveMethod)
 		return;
 	
@@ -60,7 +63,7 @@
 
 - (NSString *)string
 {
-	return [_backing string];
+	return _cachedString;
 }
 
 //- (id)attribute:(NSString *)attrName atIndex:(NSUInteger)location effectiveRange:(NSRangePointer)range
@@ -194,6 +197,7 @@
 	
 	// TODO: Add tests that check for this
 	const NSInteger delta = [aString length] - aRange.length;
+	_cachedString = [_backing string];
 	[self edited: NSTextStorageEditedCharacters range: aRange changeInLength: delta];
 	_lastNotifiedLength += delta;
 	

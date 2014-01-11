@@ -14,6 +14,7 @@
 	COAttributedString *_backing;
 	NSUInteger _lastNotifiedLength;
 	BOOL _inPrimitiveMethod;
+	NSString *_cachedString;
 }
 
 - (instancetype) initWithBacking: (COAttributedString *)aBacking;
