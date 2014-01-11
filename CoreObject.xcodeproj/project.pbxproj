@@ -76,7 +76,7 @@
 		660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 660D4CE317D689FC003C9ACC /* COMergeInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660D4CE617D689FC003C9ACC /* COMergeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 660D4CE417D689FC003C9ACC /* COMergeInfo.m */; };
 		660EE3A5186E072500E8C22C /* TestAttributedStringDiffOperations.m in Sources */ = {isa = PBXBuildFile; fileRef = 660EE3A4186E072500E8C22C /* TestAttributedStringDiffOperations.m */; };
-		660EE3AF186E3D8700E8C22C /* TestAttributedStringWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 660EE3AE186E3D8700E8C22C /* TestAttributedStringWrapper.m */; };
+		660EE3AF186E3D8700E8C22C /* TestNSTextStorageSubclass.m in Sources */ = {isa = PBXBuildFile; fileRef = 660EE3AE186E3D8700E8C22C /* TestNSTextStorageSubclass.m */; };
 		660EE3B2186E3DA600E8C22C /* TestAttributedStringCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 660EE3B1186E3DA600E8C22C /* TestAttributedStringCommon.m */; };
 		6610112F184D2D8A001A3E24 /* TestKeyedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112B184D2D8A001A3E24 /* TestKeyedAttribute.m */; };
 		66101130184D2D8A001A3E24 /* TestOrderedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112C184D2D8A001A3E24 /* TestOrderedAttribute.m */; };
@@ -568,7 +568,7 @@
 		660D4CE317D689FC003C9ACC /* COMergeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COMergeInfo.h; path = Diff/COMergeInfo.h; sourceTree = "<group>"; };
 		660D4CE417D689FC003C9ACC /* COMergeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COMergeInfo.m; path = Diff/COMergeInfo.m; sourceTree = "<group>"; };
 		660EE3A4186E072500E8C22C /* TestAttributedStringDiffOperations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedStringDiffOperations.m; sourceTree = "<group>"; };
-		660EE3AE186E3D8700E8C22C /* TestAttributedStringWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedStringWrapper.m; sourceTree = "<group>"; };
+		660EE3AE186E3D8700E8C22C /* TestNSTextStorageSubclass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestNSTextStorageSubclass.m; sourceTree = "<group>"; };
 		660EE3B1186E3DA600E8C22C /* TestAttributedStringCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedStringCommon.m; sourceTree = "<group>"; };
 		660EE3B3186E3DC100E8C22C /* TestAttributedStringCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestAttributedStringCommon.h; sourceTree = "<group>"; };
 		6610112B184D2D8A001A3E24 /* TestKeyedAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestKeyedAttribute.m; sourceTree = "<group>"; };
@@ -1117,7 +1117,7 @@
 				6633F12118552570009CE6F7 /* TestAttributedStringDiff.m */,
 				66A00A20187DFA8D005CFE16 /* TestAttributedStringMerge.m */,
 				660EE3A4186E072500E8C22C /* TestAttributedStringDiffOperations.m */,
-				660EE3AE186E3D8700E8C22C /* TestAttributedStringWrapper.m */,
+				660EE3AE186E3D8700E8C22C /* TestNSTextStorageSubclass.m */,
 				66B1FC6818727D7E00745859 /* TestAttributedStringHistory.m */,
 			);
 			path = Model;
@@ -2286,7 +2286,7 @@
 				66101170184D8E2D001A3E24 /* KeyedRelationshipModel.m in Sources */,
 				661E2B7A184C4C0200226D3D /* TestKeyedRelationship.m in Sources */,
 				6621BF2618482159000809CF /* Folder.m in Sources */,
-				660EE3AF186E3D8700E8C22C /* TestAttributedStringWrapper.m in Sources */,
+				660EE3AF186E3D8700E8C22C /* TestNSTextStorageSubclass.m in Sources */,
 				66101155184D89A4001A3E24 /* OrderedGroupNoOpposite.m in Sources */,
 				66E40D631836D08D00E5B4A7 /* TestObjectUpdate.m in Sources */,
 				66E40D701836D08D00E5B4A7 /* COSynchronizerFakeMessageTransport.m in Sources */,
