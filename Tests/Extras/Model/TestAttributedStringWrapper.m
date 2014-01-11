@@ -106,7 +106,7 @@
 - (NSArray *) characterEditCalls
 {
 	return [_editedCalls filteredCollectionWithBlock: ^(id obj) {
-		return (BOOL)([obj editedMask] & NSTextStorageEditedCharacters);
+		return (BOOL)([(EditedCall *)obj editedMask] & NSTextStorageEditedCharacters);
 	}];
 }
 
@@ -167,7 +167,7 @@
 - (NSArray *) characterEditCalls
 {
 	return [_editedCalls filteredCollectionWithBlock: ^(id obj) {
-		return (BOOL)([obj editedMask] & NSTextStorageEditedCharacters);
+		return (BOOL)([(EditedCall *)obj editedMask] & NSTextStorageEditedCharacters);
 	}];
 }
 
@@ -413,6 +413,7 @@
 /**
  * Concrete subclass of AbstractTextStorageTests that uses a NSTextView's text storage
  */
+#ifndef GNUSTEP
 @interface NSTextViewTextStorageTests : AbstractTextStorageTests <UKTest>
 @end
 
@@ -426,3 +427,4 @@
 }
 
 @end
+#endif
