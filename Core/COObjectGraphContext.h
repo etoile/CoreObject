@@ -37,6 +37,14 @@ extern NSString * const COInsertedObjectsKey;
  */
 extern NSString * const COUpdatedObjectsKey;
 
+/**
+ * Sent before objects are relinquished by COObjectGraphContext
+ */
+extern NSString * const COObjectGraphContextWillRelinquishObjectsNotification;
+/**
+ * Array of COObjects
+ */
+extern NSString * const CORelinquishedObjectsKey;
 
 /**
  * TODO: Write class description

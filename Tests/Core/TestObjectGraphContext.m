@@ -511,4 +511,18 @@
 						 COUpdatedObjectsKey : S(root1.UUID) }];
 }
 
+#pragma mark - COObjectGraphContextWillRelinquishObjectsNotification
+
+- (void) testWillRelinquishObjectsNotification
+{
+	OutlineItem *garbage = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+	
+	[self checkBlock: ^{
+		[ctx1 removeUnreachableObjects];
+	} postsNotification: COObjectGraphContextWillRelinquishObjectsNotification
+		   withCount: 1
+		  fromObject: ctx1
+		withUserInfo: @{ CORelinquishedObjectsKey : @[garbage] }];
+}
+
 @end

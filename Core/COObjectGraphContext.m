@@ -20,8 +20,11 @@
 
 NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGraphContextObjectsDidChangeNotification";
 
-NSString * const COInsertedObjectsKey = @"COInsertedObjects";
+NSString * const COInsertedObjectsKey = @"COInsertedObjectsKey";
 NSString * const COUpdatedObjectsKey = @"COUpdatedObjectsKey";
+NSString * const COObjectGraphContextWillRelinquishObjectsNotification = @"COObjectGraphContextWillRelinquishObjectsNotification";
+NSString * const CORelinquishedObjectsKey = @"CORelinquishedObjectsKey";
+
 
 /**
  * COEditingContext semantics:
@@ -538,15 +541,31 @@ NSString * const COUpdatedObjectsKey = @"COUpdatedObjectsKey";
 	}
 }
 
+/**
+ * Posts COObjectGraphContextWillRelinquishObjectsNotification
+ */
 - (void)discardObjectsWithUUIDs: (NSSet *)objectUUIDs
 {
+	NSMutableArray *objectsToDiscard = [NSMutableArray new];
 	for (ETUUID *uuid in objectUUIDs)
 	{
 		COObject *obj = [self loadedObjectForUUID: uuid];
-		[self discardObject: obj];
+		[objectsToDiscard addObject: obj];
+	}
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextWillRelinquishObjectsNotification
+														object: self
+													  userInfo: @{ CORelinquishedObjectsKey : objectsToDiscard} ];
+	
+	for (COObject *objectToDiscard in objectsToDiscard)
+	{
+		[self discardObject: objectToDiscard];
 	}
 }
 
+/**
+ * Caller must post COObjectGraphContextWillRelinquishObjectsNotification
+ */
 - (void)discardObject: (COObject *)anObject
 {
 	ETUUID *uuid = [anObject UUID];
