@@ -561,12 +561,12 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		
 		if (usingCurrentBranchObjectGraph)
 		{
-			[_currentBranchObjectGraph clearChangeTracking];
+			[_currentBranchObjectGraph acceptAllChanges];
 			[[[self currentBranch] objectGraphContext] setItemGraph: _currentBranchObjectGraph];
 		}
 		else
 		{
-			[[[self currentBranch] objectGraphContext] clearChangeTracking];
+			[[[self currentBranch] objectGraphContext] acceptAllChanges];
 			[_currentBranchObjectGraph setItemGraph: [[self currentBranch] objectGraphContext]];
 		}
 

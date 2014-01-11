@@ -619,7 +619,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
                                                        ofBranch: self];
 		if (modifiedItemsSource == _objectGraph)
 		{
-			[_objectGraph clearChangeTracking];
+			[_objectGraph acceptAllChanges];
 			if (self == [self.persistentRoot currentBranch])
 			{
 				[[self.persistentRoot objectGraphContext] setItemGraph: _objectGraph];
@@ -628,7 +628,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		else
 		{
 			ETAssert(modifiedItemsSource == [_persistentRoot objectGraphContext]);
-			[[_persistentRoot objectGraphContext] clearChangeTracking];
+			[[_persistentRoot objectGraphContext] acceptAllChanges];
 			[_objectGraph setItemGraph: [_persistentRoot objectGraphContext]];
 		}
     }
@@ -677,7 +677,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	_headRevisionUUID = aRevisionUUID;
     _isCreated = YES;
     
-    [_objectGraph clearChangeTracking];
+    [_objectGraph acceptAllChanges];
     
     ETAssert(![_objectGraph hasChanges]);
 }

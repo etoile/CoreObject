@@ -394,7 +394,7 @@ NSString * const COUpdatedObjectsKey = @"COUpdatedObjectsKey";
 	
 	_loadingItemGraph = nil;
 	
-	// NOTE: -clearChangeTracking *not* called
+	// NOTE: -acceptAllChanges *not* called
 }
 
 - (void)setItemGraph: (id <COItemGraph>)aTree
@@ -436,7 +436,7 @@ NSString * const COUpdatedObjectsKey = @"COUpdatedObjectsKey";
     
     // Clear change tracking
     
-    [self clearChangeTracking];
+    [self acceptAllChanges];
 }
 
 #pragma mark -
@@ -529,7 +529,7 @@ NSString * const COUpdatedObjectsKey = @"COUpdatedObjectsKey";
 	if ([self branch] == nil)
 	{
 		[self discardObjectsWithUUIDs: [NSSet setWithArray: [_loadedObjects allKeys]]];
-		[self clearChangeTracking];
+		[self acceptAllChanges];
 		ETAssert([[self loadedObjects] isEmpty]);
 	}
 	else
@@ -569,7 +569,7 @@ NSString * const COUpdatedObjectsKey = @"COUpdatedObjectsKey";
     [_loadedObjects removeObjectForKey: uuid];
 }
 
-- (void)clearChangeTracking
+- (void)acceptAllChanges
 {
 	NSSet *insertedObjects = [_insertedObjectUUIDs copy];
 	NSSet *updatedObjects = [_updatedObjectUUIDs copy];

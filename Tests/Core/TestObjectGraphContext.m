@@ -152,7 +152,7 @@
 
 - (void)testAddItem
 {
-	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	[ctx1 acceptAllChanges]; // TODO: Move to test -init
 	
 	COMutableItem *mutableItem = [COMutableItem item];
     [mutableItem setValue: @"OutlineItem" forAttribute: kCOObjectEntityNameProperty type: kCOTypeString];
@@ -191,12 +191,12 @@
     UKObjectsEqual(S(root.UUID, list1.UUID, root2.UUID), [ctx2 insertedObjectUUIDs]);
     UKObjectsEqual([NSSet set], [ctx2 updatedObjectUUIDs]);
     
-    [ctx2 clearChangeTracking];
+    [ctx2 acceptAllChanges];
     
     UKObjectsEqual([NSSet set], [ctx2 insertedObjectUUIDs]);
     UKObjectsEqual([NSSet set], [ctx2 updatedObjectUUIDs]);
     
-    // After calling -clearChangeTracking, further changes to those recently inserted
+    // After calling -acceptAllChanges, further changes to those recently inserted
     // objects count as modifications.
     
     [root2 setValue: @"test" forProperty: kCOLabel];
@@ -346,7 +346,7 @@
 
 - (void) testObjectsDidChangeNotificationNotPostedAfterInsert
 {
-	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	[ctx1 acceptAllChanges]; // TODO: Move to test -init
 	
 	__block OutlineItem *child1;
 	[self checkBlock: ^{
@@ -356,7 +356,7 @@
 
 - (void) testObjectsDidChangeNotificationNotPostedAfterEdit
 {
-	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	[ctx1 acceptAllChanges]; // TODO: Move to test -init
 	
 	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
 	[self checkBlock: ^{
@@ -368,12 +368,12 @@
 
 - (void) testObjectsDidChangeNotificationPostedAfterInsert
 {
-	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	[ctx1 acceptAllChanges]; // TODO: Move to test -init
 	
 	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
 	
 	[self checkBlock: ^{
-		[ctx1 clearChangeTracking];
+		[ctx1 acceptAllChanges];
 	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
 		   withCount: 1
 		  fromObject: ctx1
@@ -383,12 +383,12 @@
 
 - (void) testObjectsDidChangeNotificationPostedAfterUpdate
 {
-	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	[ctx1 acceptAllChanges]; // TODO: Move to test -init
 	
 	root1.label = @"Root item";
 	
 	[self checkBlock: ^{
-		[ctx1 clearChangeTracking];
+		[ctx1 acceptAllChanges];
 	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
 		   withCount: 1
 		  fromObject: ctx1
@@ -398,14 +398,14 @@
 
 - (void) testObjectsDidChangeNotificationPostedAfterInsertAndUpdate
 {
-	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	[ctx1 acceptAllChanges]; // TODO: Move to test -init
 	
 	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
 	child1.label = @"child1";
 	root1.contents = @[child1];
 	
 	[self checkBlock: ^{
-		[ctx1 clearChangeTracking];
+		[ctx1 acceptAllChanges];
 	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
 		   withCount: 1
 		  fromObject: ctx1
@@ -415,7 +415,7 @@
 
 - (void) testNotificationAfterDiscardForTransientContext
 {
-	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	[ctx1 acceptAllChanges]; // TODO: Move to test -init
 	
 	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
 	child1.label = @"child1";
@@ -464,7 +464,7 @@
 
 - (void) testNotificationAfterSetItemGraph
 {
-	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	[ctx1 acceptAllChanges]; // TODO: Move to test -init
 
 	// Make some changes in a copy of ctx1
 	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
@@ -485,7 +485,7 @@
 
 - (void) testNotificationAfterInsertOrUpdateItems
 {
-	[ctx1 clearChangeTracking]; // TODO: Move to test -init
+	[ctx1 acceptAllChanges]; // TODO: Move to test -init
 	
 	// Make some changes in a copy of ctx1
 	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
@@ -503,7 +503,7 @@
 	} doesNotPostNotification: COObjectGraphContextObjectsDidChangeNotification];
 	
 	[self checkBlock: ^{
-		[ctx1 clearChangeTracking];
+		[ctx1 acceptAllChanges];
 	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
 		   withCount: 1
 		  fromObject: ctx1

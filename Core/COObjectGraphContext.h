@@ -14,7 +14,7 @@
 @class COItemGraph, COItem;
 
 /**
- * This notification is sent by the context during -clearChangeTracking.
+ * This notification is sent by the context during -acceptAllChanges.
  *
  * It will tell you about all possible mutations that can happen to a
  * COObjectGraphContext over its lifetime (inserting objects, updating objects,
@@ -186,12 +186,12 @@ extern NSString * const COUpdatedObjectsKey;
  * This must leave the object graph in a consistent state.
  *
  * This marks the corresponding objects as inserted/object.
- * and does not call -clearChangeTracking.
+ * and does not call -acceptAllChanges.
  */
 - (void)insertOrUpdateItems: (NSArray *)items;
 /**
  * Does the same than -insertOrUpdateItems:, but in addition discard 
- * change tracking (calls -clearChangeTracking).
+ * change tracking (calls -acceptAllChanges).
  */
 - (void)setItemGraph: (id <COItemGraph>)aTree;
 
@@ -266,7 +266,7 @@ extern NSString * const COUpdatedObjectsKey;
  * Otherwise, all loaded objects are discarded (references to these objects become 
  * invalid as a result).
  *
- * See also -clearChangeTracking and -[COBranch reloadAtRevision:].
+ * See also -acceptAllChanges and -[COBranch reloadAtRevision:].
  */
 - (void)discardAllChanges;
 /**
@@ -283,12 +283,8 @@ extern NSString * const COUpdatedObjectsKey;
  *
  * This method is semi-private; it is part of the API used by COBranch and
  * framwork users should normally never call this method.
- *
- * TODO: Could be clearer to rename to -markChangesCommitted or -acceptAllChanges
- * because the intent is not about "clearing" but about telling the object graph
- * context that the changes were committed.
  */
-- (void)clearChangeTracking;
+- (void)acceptAllChanges;
 
 
 /** @taskunit Accessing Loaded Objects */
