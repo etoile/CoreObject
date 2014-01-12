@@ -25,6 +25,9 @@ NSString * const COUpdatedObjectsKey = @"COUpdatedObjectsKey";
 NSString * const COObjectGraphContextWillRelinquishObjectsNotification = @"COObjectGraphContextWillRelinquishObjectsNotification";
 NSString * const CORelinquishedObjectsKey = @"CORelinquishedObjectsKey";
 
+NSString * const COObjectGraphContextBeginBatchChangeNotification = @"COObjectGraphContextBeginBatchChangeNotification";
+NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraphContextEndBatchChangeNotification";
+
 
 /**
  * COEditingContext semantics:
@@ -369,6 +372,9 @@ NSString * const CORelinquishedObjectsKey = @"CORelinquishedObjectsKey";
 {
     if ([items count] == 0)
         return;
+
+	[[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextBeginBatchChangeNotification
+														object: self];
 	
 	// Update change tracking
 	for (COItem *item in items)
@@ -398,10 +404,16 @@ NSString * const CORelinquishedObjectsKey = @"CORelinquishedObjectsKey";
 	_loadingItemGraph = nil;
 	
 	// NOTE: -acceptAllChanges *not* called
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextEndBatchChangeNotification
+														object: self];
 }
 
 - (void)setItemGraph: (id <COItemGraph>)aTree
 {
+	[[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextBeginBatchChangeNotification
+														object: self];
+	
 	NSParameterAssert(aTree != nil);
 	
 	// i.e., the root object can be set once and never changed.
@@ -440,6 +452,9 @@ NSString * const CORelinquishedObjectsKey = @"CORelinquishedObjectsKey";
     // Clear change tracking
     
     [self acceptAllChanges];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextEndBatchChangeNotification
+														object: self];
 }
 
 #pragma mark -

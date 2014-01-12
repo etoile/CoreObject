@@ -24,6 +24,8 @@
  *      or not, since the graph is reverted to the state it was in when the
  *      last COObjectGraphContextObjectsDidChangeNotification was set.
  *      See -[TestObjectGraphContext testNotificationAfterDiscardForPersistentContext]
+ *
+ * TODO: Rename to DidAcceptChangesNotification
  */
 extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 /**
@@ -45,6 +47,9 @@ extern NSString * const COObjectGraphContextWillRelinquishObjectsNotification;
  * Array of COObjects
  */
 extern NSString * const CORelinquishedObjectsKey;
+
+extern NSString * const COObjectGraphContextBeginBatchChangeNotification;
+extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 
 /**
  * TODO: Write class description
