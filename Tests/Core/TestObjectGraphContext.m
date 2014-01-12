@@ -525,4 +525,32 @@
 		withUserInfo: @{ CORelinquishedObjectsKey : @[garbage] }];
 }
 
+#pragma mark - COObjectGraphContextWillRelinquishObjectsNotification
+
+- (void) testBeginEndBatchNotification
+{
+	COObjectGraphContext *altCtx = [COObjectGraphContext new];
+	[altCtx setItemGraph: ctx1];
+	OutlineItem *obj1 = [[OutlineItem alloc] initWithObjectGraphContext: altCtx];
+	OutlineItem *obj2 = [[OutlineItem alloc] initWithObjectGraphContext: altCtx];
+	[[altCtx rootObject] setContents: @[obj1]];
+	obj1.contents = @[obj2];
+		
+	// FIXME: These are not very good tests
+	
+	[self checkBlock: ^{
+		[ctx1 setItemGraph: altCtx];
+	} postsNotification: COObjectGraphContextBeginBatchChangeNotification
+		   withCount: 1
+		  fromObject: ctx1
+		withUserInfo: nil];
+	
+	[self checkBlock: ^{
+		[ctx1 setItemGraph: altCtx];
+	} postsNotification: COObjectGraphContextEndBatchChangeNotification
+		   withCount: 1
+		  fromObject: ctx1
+		withUserInfo: nil];
+}
+
 @end
