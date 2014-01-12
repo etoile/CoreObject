@@ -43,6 +43,16 @@
 											 selector: @selector(objectGraphContextWillRelinquishObjectsNotification:)
 												 name: COObjectGraphContextWillRelinquishObjectsNotification
 											   object: aBacking.objectGraphContext];
+
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(objectGraphContextBeginBatchChangeNotification:)
+												 name: COObjectGraphContextBeginBatchChangeNotification
+											   object: aBacking.objectGraphContext];
+	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(objectGraphContextEndBatchChangeNotification:)
+												 name: COObjectGraphContextEndBatchChangeNotification
+											   object: aBacking.objectGraphContext];
 	
 	return self;
 }
@@ -55,6 +65,18 @@
 	{
 		[self unregisterAsObserverOf: object];
 	}
+}
+
+// Optimisation
+- (void) objectGraphContextBeginBatchChangeNotification: (NSNotification *)notif
+{
+	[self beginEditing];
+}
+
+// Optimisation
+- (void) objectGraphContextEndBatchChangeNotification: (NSNotification *)notif
+{
+	[self endEditing];
 }
 
 static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *prefixOut, NSUInteger *suffixOut)
@@ -195,7 +217,9 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 
 		// Handle characters inserted/removed. See -record... methods above
 		
+		[self beginEditing];
 		CODiffArrays(oldArray, newArray, self, oldArray);
+		[self endEditing];
 	}
 	else if ([keyPath isEqualToString: @"text"])
 	{

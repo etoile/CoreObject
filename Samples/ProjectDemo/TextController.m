@@ -62,5 +62,7 @@
 - (void)textStorageDidProcessEditing:(NSNotification *)notification
 {
 	NSLog(@"Text storage did process editing. %@ edited range: %@", notification.userInfo, NSStringFromRange([textStorage editedRange]));
+	[textView setNeedsDisplay: YES];
+	
 }
 @end
