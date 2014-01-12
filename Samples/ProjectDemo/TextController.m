@@ -42,13 +42,25 @@
 
 	textStorage = [[COAttributedStringWrapper alloc] initWithBacking: [[self textDocument] attrString]];
 	[textStorage addLayoutManager: [textView layoutManager]];
+	[textStorage setDelegate: self];
 }
 
 - (void)textDidChange:(NSNotification*)notif
 {
 	NSLog(@"-textDidChange: committing.");
-
+	
 	[self commitWithIdentifier: @"edit-text"];
 }
 
+- (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
+{
+	NSLog(@"should add %@", replacementString);
+	return YES;
+}
+
+
+- (void)textStorageDidProcessEditing:(NSNotification *)notification
+{
+	NSLog(@"Text storage did process editing. %@ edited range: %@", notification.userInfo, NSStringFromRange([textStorage editedRange]));
+}
 @end

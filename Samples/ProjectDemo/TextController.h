@@ -2,7 +2,7 @@
 #import "EWDocumentWindowController.h"
 #import <CoreObject/COAttributedStringWrapper.h>
 
-@interface TextController : EWDocumentWindowController <NSTextViewDelegate>
+@interface TextController : EWDocumentWindowController <NSTextViewDelegate, NSTextStorageDelegate>
 {
 	IBOutlet NSTextView *textView;
 	COAttributedStringWrapper *textStorage;

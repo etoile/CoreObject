@@ -162,16 +162,13 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (_inPrimitiveMethod)
-		return;
-	
-	_cachedString = [_backing string];
+	// First,set up KVO for any inserted chunks
 	
 	if ([keyPath isEqualToString: @"chunks"])
 	{
 		NSArray *oldArray = change[NSKeyValueChangeOldKey];
 		NSArray *newArray = change[NSKeyValueChangeNewKey];
-
+		
 		NSMutableSet *newChunks = [NSMutableSet setWithSet: [NSSet setWithArray: newArray]];
 		[newChunks minusSet: [NSSet setWithArray: oldArray]];
 		
@@ -184,7 +181,18 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 			[chunk addObserver: self forKeyPath: @"text" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
 			[chunk addObserver: self forKeyPath: @"attributes" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
 		}
-		
+	}
+	
+	if (_inPrimitiveMethod)
+		return;
+	
+	_cachedString = [_backing string];
+	
+	if ([keyPath isEqualToString: @"chunks"])
+	{
+		NSArray *oldArray = change[NSKeyValueChangeOldKey];
+		NSArray *newArray = change[NSKeyValueChangeNewKey];
+
 		// Handle characters inserted/removed. See -record... methods above
 		
 		CODiffArrays(oldArray, newArray, self, oldArray);
@@ -526,5 +534,18 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	
 	_inPrimitiveMethod = NO;
 }
+
+- (void) beginEditing
+{
+	NSLog(@"->> beginEditing");
+	[super beginEditing];
+}
+
+- (void) endEditing
+{
+	NSLog(@"<<- endEditing");
+	[super endEditing];
+}
+
 
 @end

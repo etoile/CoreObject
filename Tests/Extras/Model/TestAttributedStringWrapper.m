@@ -377,6 +377,7 @@
 {
 	COObjectGraphContext *objectGraph;
 	COAttributedString *attributedString;
+	NSTextView *tv;
 }
 @end
 
@@ -385,10 +386,20 @@
 - (instancetype) init
 {
 	self = [super init];
+		
 	objectGraph = [self makeAttributedString];
 	attributedString = [objectGraph rootObject];
 	as = [[COAttributedStringWrapperTestExtensions alloc] initWithBacking: attributedString];
+	
+	tv = [[NSTextView alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)];
+	[as addLayoutManager: [tv layoutManager]];
+	
 	return self;
+}
+
+- (void) dealloc
+{
+	[as removeLayoutManager: [tv layoutManager]];
 }
 
 - (void) testObjectGraphEdits
@@ -412,9 +423,7 @@
 	
 	// Replicate that change to objectGraph
 	[objectGraph setItemGraph: remoteCtx];
-#if 0
 	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 1]]];
-#endif
 }
 
 - (void) testBoldingSingleCharacter
@@ -434,6 +443,56 @@
 	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedAttributes range: NSMakeRange(2, 1) changeInLength: 0]]];
 #endif
 }
+
+- (void) testTypeTwoCharactersAndRevert
+{
+	// 'x'
+	[as replaceCharactersInRange: NSMakeRange(0, 0) withString: @"x"];
+	[objectGraph acceptAllChanges];
+	UKObjectsEqual(@"x", [as string]);
+	
+	// Create snapshot1 from objectGraph
+	COObjectGraphContext *snapshot1 = [COObjectGraphContext new];
+	[snapshot1 setItemGraph: objectGraph];
+
+	// 'xy'
+	[as replaceCharactersInRange: NSMakeRange(1, 0) withString: @"y"];
+	[objectGraph acceptAllChanges];
+	UKObjectsEqual(@"xy", [as string]);
+	
+	// restore to snapshot1
+	[(COAttributedStringWrapperTestExtensions *)as clearEditCalls];
+	[objectGraph setItemGraph: snapshot1];
+	UKObjectsEqual(@"x", [as string]);
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 1) changeInLength: -1]]];
+	
+	UKDoesNotRaiseException([tv dataWithPDFInsideRect: NSMakeRect(0, 0, 100, 100)]);
+}
+
+- (void) testDeleteMultipleChunks
+{
+	// 'a<b>b</b><i>c</i>'
+	[as replaceCharactersInRange: NSMakeRange(0, 0) withString: @"abc"];
+	[self setFontTraits: NSFontBoldTrait inRange: NSMakeRange(1,1) inTextStorage:as];
+	[self setFontTraits: NSFontItalicTrait inRange: NSMakeRange(2,1) inTextStorage:as];
+	[objectGraph acceptAllChanges];
+		
+	// Create branch1 from objectGraph
+	COObjectGraphContext *branch1 = [COObjectGraphContext new];
+	[branch1 setItemGraph: objectGraph];
+	// Erase '<b>b</b><i>c</i>' in the snapshot, append '<u>d</u>'
+	[[branch1 rootObject] setChunks: @[[[[branch1 rootObject] chunks] firstObject]]];
+	[self appendString: @"d" htmlCode: @"u" toAttributedString: [branch1 rootObject]];
+	
+	// revert objectGraph to branch1
+	[(COAttributedStringWrapperTestExtensions *)as clearEditCalls];
+	[objectGraph setItemGraph: branch1];
+	UKObjectsEqual(@"a", [as string]);
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 2) changeInLength: -2]]];
+	
+	UKDoesNotRaiseException([tv dataWithPDFInsideRect: NSMakeRect(0, 0, 100, 100)]);
+}
+
 
 @end
 
