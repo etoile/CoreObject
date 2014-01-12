@@ -191,6 +191,8 @@
 	{
 		NSArray *actual = [(id<EditedCallLogging>)as characterEditCalls];
 		UKObjectsEqual(expected, actual);
+		
+		[(id<EditedCallLogging>)as clearEditCalls];
 	}
 }
 
@@ -374,6 +376,7 @@
 @interface COAttributedStringWrapperTextStorageTests : AbstractTextStorageTests <UKTest>
 {
 	COObjectGraphContext *objectGraph;
+	COAttributedString *attributedString;
 }
 @end
 
@@ -383,8 +386,53 @@
 {
 	self = [super init];
 	objectGraph = [self makeAttributedString];
-	as = [[COAttributedStringWrapper alloc] initWithBacking: [objectGraph rootObject]];
+	attributedString = [objectGraph rootObject];
+	as = [[COAttributedStringWrapperTestExtensions alloc] initWithBacking: attributedString];
 	return self;
+}
+
+- (void) testObjectGraphEdits
+{
+	[self appendString: @"abc" htmlCode: nil toAttributedString: [objectGraph rootObject]];
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 3]]];
+	
+	((COAttributedStringChunk *)attributedString.chunks[0]).text = @"ac";
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 1) changeInLength: -1]]];
+
+	((COAttributedStringChunk *)attributedString.chunks[0]).text = @"abc";
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 0) changeInLength: 1]]];
+}
+
+- (void) testTypeSingleCharacter
+{
+	// Set up a clone of objectGraph, type a single character in it
+	COObjectGraphContext *remoteCtx = [COObjectGraphContext new];
+	[remoteCtx setItemGraph: objectGraph];
+	[self appendString: @"x" htmlCode: nil toAttributedString: [remoteCtx rootObject]];
+	
+	// Replicate that change to objectGraph
+	[objectGraph setItemGraph: remoteCtx];
+#if 0
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 1]]];
+#endif
+}
+
+- (void) testBoldingSingleCharacter
+{
+	[self appendString: @"abc" htmlCode: nil toAttributedString: attributedString];
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 3]]];
+	
+	// Set up a clone of objectGraph, and make the "c" bold
+	COObjectGraphContext *remoteCtx = [COObjectGraphContext new];
+	[remoteCtx setItemGraph: objectGraph];
+	COAttributedStringWrapper *remoteCtxWrapper = [[COAttributedStringWrapper alloc] initWithBacking: [remoteCtx rootObject]];
+	[self setFontTraits: NSFontBoldTrait inRange: NSMakeRange(2, 1) inTextStorage: remoteCtxWrapper];
+	
+	// Replicate that change to objectGraph
+	[objectGraph setItemGraph: remoteCtx];
+#if 0
+	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedAttributes range: NSMakeRange(2, 1) changeInLength: 0]]];
+#endif
 }
 
 @end

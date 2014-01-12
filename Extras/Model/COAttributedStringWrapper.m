@@ -10,7 +10,7 @@
 #import "COAttributedStringChunk.h"
 #import "COAttributedStringAttribute.h"
 
-@interface COAttributedStringWrapper ()
+@interface COAttributedStringWrapper () <CODiffArraysDelegate>
 
 @end
 
@@ -26,10 +26,22 @@
 	_lastNotifiedLength = [aBacking length];
 	_backing = aBacking;
 	_cachedString = [aBacking string];
+		
+	[_backing addObserver: self forKeyPath: @"chunks" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
+	for (COAttributedStringChunk *chunk in _backing.chunks)
+	{
+		[chunk addObserver: self forKeyPath: @"text" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
+		[chunk addObserver: self forKeyPath: @"attributes" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
+	}
 	
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(objectGraphContextObjectsDidChangeNotification:)
 												 name: COObjectGraphContextObjectsDidChangeNotification
+											   object: aBacking.objectGraphContext];
+	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(objectGraphContextWillRelinquishObjectsNotification:)
+												 name: COObjectGraphContextWillRelinquishObjectsNotification
 											   object: aBacking.objectGraphContext];
 	
 	return self;
@@ -38,25 +50,243 @@
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
+	
+	for (COObject *object in [_backing.objectGraphContext loadedObjects])
+	{
+		[self unregisterAsObserverOf: object];
+	}
+}
+
+static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *prefixOut, NSUInteger *suffixOut)
+{
+	const NSUInteger alen = [a length];
+	const NSUInteger blen = [b length];
+	
+	NSUInteger i;
+	
+	for (i = 0; i < MIN(alen, blen); i++)
+	{
+		if ([a characterAtIndex: i] != [b characterAtIndex: i])
+			break;
+	}
+
+	*prefixOut = i;
+	
+	NSUInteger j;
+	
+	for (j = 0; j < MIN(alen - i, blen - i); j++)
+	{
+		if ([a characterAtIndex: [a length] - 1 - j] != [b characterAtIndex: [b length] - 1 - j])
+			break;
+	}
+
+	*suffixOut = j;
+}
+
+// These three methods are called by -observeValueForKeyPath:...
+
+- (void)recordInsertionWithLocation: (NSUInteger)aLocation
+					insertedObjects: (id)anArray
+						   userInfo: (id)info
+{
+	NSRange characterRange = {[(COAttributedStringChunk *)anArray[0] characterIndex], 0};
+	NSUInteger lengthDelta = 0;
+	for (COAttributedStringChunk *insertedChunk in anArray)
+	{
+		ETAssert(insertedChunk.parentString == _backing);
+		lengthDelta += insertedChunk.length;
+	}
+	
+	[self edited: NSTextStorageEditedCharacters range: characterRange changeInLength: lengthDelta];
+}
+
+- (void)recordDeletionWithRange: (NSRange)aRange
+					   userInfo: (id)info
+{
+	NSArray *oldArray = info;
+	NSArray *deletedChunks = [oldArray subarrayWithRange: aRange];
+	
+	NSInteger deletedChunksLength = 0;
+	for (COAttributedStringChunk *deletedChunk in deletedChunks)
+	{
+		deletedChunksLength += deletedChunk.length;
+	}
+	
+	// UGLY: The deleted character range would start at deletedChunk[aRange.location]'s character index.
+	// But since it's a deleted chunk, it's no longer in the chunks array, so we can't ask it for its starting
+	// character index.
+	NSRange characterRange = {0, deletedChunksLength};
+	if (aRange.location > 0)
+	{
+		COAttributedStringChunk *chunkBeforeDeletedChunk = oldArray[aRange.location - 1];
+		ETAssert(chunkBeforeDeletedChunk.parentString == _backing);
+		characterRange.location = NSMaxRange([chunkBeforeDeletedChunk characterRange]);
+	}
+	
+	[self edited: NSTextStorageEditedCharacters range: characterRange changeInLength: -deletedChunksLength];
+}
+
+- (void)recordModificationWithRange: (NSRange)aRange
+					insertedObjects: (id)anArray
+						   userInfo: (id)info
+{
+	NSArray *oldArray = info;
+	NSArray *deletedChunks = [oldArray subarrayWithRange: aRange];
+	
+	NSInteger deletedChunksLength = 0;
+	for (COAttributedStringChunk *deletedChunk in deletedChunks)
+	{
+		deletedChunksLength += deletedChunk.length;
+	}
+		
+	NSInteger insertedChunksLength = 0;
+	for (COAttributedStringChunk *insertedChunk in anArray)
+	{
+		ETAssert(insertedChunk.parentString == _backing);
+		insertedChunksLength += insertedChunk.length;
+	}
+	
+	NSRange characterRange = {0, deletedChunksLength};
+	if (aRange.location > 0)
+	{
+		COAttributedStringChunk *chunkBeforeDeletedChunk = oldArray[aRange.location - 1];
+		ETAssert(chunkBeforeDeletedChunk.parentString == _backing);
+		characterRange.location = NSMaxRange([chunkBeforeDeletedChunk characterRange]);
+	}
+	
+	NSInteger delta = insertedChunksLength - deletedChunksLength;
+	
+	[self edited: NSTextStorageEditedCharacters range: characterRange changeInLength: delta];
+	
+}
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	if (_inPrimitiveMethod)
+		return;
+	
+	_cachedString = [_backing string];
+	
+	if ([keyPath isEqualToString: @"chunks"])
+	{
+		NSArray *oldArray = change[NSKeyValueChangeOldKey];
+		NSArray *newArray = change[NSKeyValueChangeNewKey];
+
+		NSMutableSet *newChunks = [NSMutableSet setWithSet: [NSSet setWithArray: newArray]];
+		[newChunks minusSet: [NSSet setWithArray: oldArray]];
+		
+		NSLog(@"%@: New chunks: %@", object, newChunks);
+		
+		// Set up observation for the new chunks
+		
+		for (COAttributedStringChunk *chunk in newChunks)
+		{
+			[chunk addObserver: self forKeyPath: @"text" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
+			[chunk addObserver: self forKeyPath: @"attributes" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
+		}
+		
+		// Handle characters inserted/removed. See -record... methods above
+		
+		CODiffArrays(oldArray, newArray, self, oldArray);
+	}
+	else if ([keyPath isEqualToString: @"text"])
+	{
+		NSLog(@"%@: Text changed from %@ to %@", object, change[NSKeyValueChangeOldKey], change[NSKeyValueChangeNewKey]);
+		
+		COAttributedStringChunk *chunk = object;
+		NSString *oldText = change[NSKeyValueChangeOldKey];
+		
+		if ((id)oldText == (id)[NSNull null])
+		{
+			oldText = @"";
+		}
+		
+		NSString *newText = change[NSKeyValueChangeNewKey];
+		NSInteger lengthDelta = (NSInteger)[newText length] - (NSInteger)[oldText length];
+		
+		// Only pay attention if the chunk is attached to the string we are watching
+		if (chunk.parentString == _backing)
+		{
+			NSRange chunkRange = chunk.characterRange;
+			
+			NSRange modifiedRange = NSMakeRange(chunkRange.location, oldText.length);
+			
+			// Optimisation: chop off common prefix and suffix
+			
+			NSUInteger commonPrefix, commonSuffix;
+			LengthOfCommonPrefixAndSuffix(oldText, newText, &commonPrefix, &commonSuffix);
+			
+			modifiedRange.location += commonPrefix;
+			modifiedRange.length -= (commonPrefix + commonSuffix);
+			
+			[self edited: NSTextStorageEditedCharacters range: modifiedRange changeInLength: lengthDelta];
+		}
+	}
+	else if ([keyPath isEqualToString: @"attributes"])
+	{
+		
+	}
 }
 
 - (void) objectGraphContextObjectsDidChangeNotification: (NSNotification *)notif
 {
-	_cachedString = [_backing string];
+//	_cachedString = [_backing string];
+//	
+//	if (_inPrimitiveMethod)
+//		return;
+//	
+//	NSUInteger currentLength = [self length];
+//	NSInteger delta = (NSInteger)currentLength - _lastNotifiedLength;
+//	NSUInteger oldLength = _lastNotifiedLength;
+//	_lastNotifiedLength = currentLength;
+//	
+//	NSLog(@"!!!! COAtrributedString length modified by %d (outside of a NSTextStorage mutation method)", (int)delta);
+//		
+//	[self edited: NSTextStorageEditedAttributes | NSTextStorageEditedCharacters
+//		   range: NSMakeRange(0, oldLength)
+//  changeInLength: delta];
+}
+
+- (void) unregisterAsObserverOf: (COObject *)object
+{
+	// FIXME: We need to keep track of exactly what objects we're observing
 	
-	if (_inPrimitiveMethod)
-		return;
-	
-	NSUInteger currentLength = [self length];
-	NSInteger delta = (NSInteger)currentLength - _lastNotifiedLength;
-	NSUInteger oldLength = _lastNotifiedLength;
-	_lastNotifiedLength = currentLength;
-	
-	NSLog(@"!!!! COAtrributedString length modified by %d (outside of a NSTextStorage mutation method)", (int)delta);
-		
-	[self edited: NSTextStorageEditedAttributes | NSTextStorageEditedCharacters
-		   range: NSMakeRange(0, oldLength)
-  changeInLength: delta];
+	if ([object isKindOfClass: [COAttributedString class]])
+	{
+		@try
+		{
+			[object removeObserver: self forKeyPath: @"chunks"];
+		}
+		@catch (NSException *e)
+		{
+		}
+	}
+	else if ([object isKindOfClass: [COAttributedStringChunk class]])
+	{
+		@try
+		{
+			[object removeObserver: self forKeyPath: @"text"];
+		}
+		@catch (NSException *e)
+		{
+		}
+		@try
+		{
+			[object removeObserver: self forKeyPath: @"attributes"];
+		}
+		@catch (NSException *e)
+		{
+		}
+	}
+}
+
+- (void) objectGraphContextWillRelinquishObjectsNotification: (NSNotification *)notif
+{
+	NSArray *objects = [notif userInfo][CORelinquishedObjectsKey];
+	for (COObject *object in objects)
+	{
+		[self unregisterAsObserverOf: object];
+	}
 }
 
 // Primitive NSAttributedString methods

@@ -7,6 +7,7 @@
 
 #import "COAttributedStringChunk.h"
 #import "COAttributedStringAttribute.h"
+#import "COAttributedString.h"
 
 @implementation COAttributedStringChunk
 + (ETEntityDescription*)newEntityDescription
@@ -35,7 +36,7 @@
 	
     return entity;
 }
-@dynamic text, attributes;
+@dynamic text, attributes, parentString;
 
 - (COItemGraph *) subchunkItemGraphWithRange: (NSRange)aRange
 {
@@ -60,6 +61,25 @@
 - (NSString *) attributesDebugDescription
 {
 	return [[(NSSet *)[[self.attributes mappedCollection] htmlCode] allObjects] componentsJoinedByString: @","];
+}
+
+- (NSUInteger) characterIndex
+{
+	NSUInteger i = 0;
+	
+	for (COAttributedStringChunk *chunk in self.parentString.chunks)
+	{
+		if (chunk == self)
+			return i;
+		else
+			i += chunk.length;
+	}
+	return NSUIntegerMax;
+}
+
+- (NSRange) characterRange
+{
+	return NSMakeRange([self characterIndex], [self length]);
 }
 
 @end

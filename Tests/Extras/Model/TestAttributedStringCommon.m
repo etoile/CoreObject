@@ -39,7 +39,7 @@
 		[self addHtmlCode: code toChunk: chunk];
 	}
 	
-	[dest insertObject: chunk atIndex: ETUndeterminedIndex hint: nil forProperty: @"chunks"];
+	[[dest mutableArrayValueForKey: @"chunks"] addObject: chunk];
 	return chunk;
 }
 
