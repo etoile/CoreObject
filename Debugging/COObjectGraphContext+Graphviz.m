@@ -8,6 +8,7 @@
 #import <CoreObject/CoreObject.h>
 #import "COObjectGraphContext+Graphviz.h"
 #import "COSQLiteStore+Graphviz.h"
+#import "COItem+JSON.h"
 
 static NSString *COGraphvizNodeNameForUUID(ETUUID *aUUID)
 {
@@ -62,7 +63,15 @@ static NSString *COGraphvizSanatizeStringForHTML(NSString *aString)
 												 withString: @"&lt;"];
 	aString = [aString stringByReplacingOccurrencesOfString: @">"
 												 withString: @"&gt;"];
-	return aString;
+	
+	NSMutableString *result = [NSMutableString new];
+	while ([aString length] > 80)
+	{
+		[result appendFormat: @"%@<br/>", [aString substringToIndex:80]];
+		aString = [aString substringFromIndex:80];
+	}
+	[result appendString: aString];
+	return result;
 }
 
 static NSString *COGraphvizPortNameForIndex(NSUInteger i)
@@ -87,6 +96,15 @@ static void COGraphvizWriteNodeForPathToString(COPath *aPath, NSMutableString *d
 	[dest appendFormat: @"%@ [label=\"%@\"];\n", destNodeName, label];
 }
 
+static NSString *COPrettyPrintKey(NSString *key)
+{
+	if ([key isEqualToString: kCOObjectEntityNameProperty])
+		return @"<font color=\"red\">entity</font>";
+	else if ([key isEqualToString: kCOObjectIsSharedProperty])
+		return @"<font color=\"red\">isShared</font>";
+	return key;
+}
+
 static void COGraphvizWriteHTMLTableRowForAttributeOfItem(NSString *key, COItem *anItem, NSMutableString *dest, NSMutableString *extraNodes)
 {
 	COType type = [anItem typeForAttribute: key];
@@ -95,7 +113,7 @@ static void COGraphvizWriteHTMLTableRowForAttributeOfItem(NSString *key, COItem 
 	NSString *nodeName = COGraphvizNodeNameForUUID(anItem.UUID);
 	NSString *portName = COGraphvizPortNameForAttribute(key);
 	
-	[dest appendFormat: @"<tr><td>%@</td><td>%@</td><td port=\"%@\">", key, COTypeDescription(type), portName];
+	[dest appendFormat: @"<tr><td>%@</td><td>%@</td><td port=\"%@\">", COPrettyPrintKey(key), COJSONTypeToString(type), portName];
 
 	if (COTypeIsUnivalued(type)) /* univalued */
 	{
@@ -201,6 +219,7 @@ NSString *COGraphvizDotFileForItemGraph(id<COItemGraph> graph)
 {
 	NSMutableString *result = [NSMutableString string];
 	[result appendString: @"digraph G {\n"];
+	[result appendString: @"rankdir=LR;\n"];
 	for (ETUUID *uuid in [graph itemUUIDs])
 	{
 		COItem *item = [graph itemForUUID: uuid];

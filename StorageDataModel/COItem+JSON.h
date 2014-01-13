@@ -7,6 +7,10 @@
 
 #import <CoreObject/COItem.h>
 
+// HACK: Used by graphviz to pretty-print types
+NSString * COJSONTypeToString(COType type);
+
+
 @interface COItem (JSON)
 
 /**

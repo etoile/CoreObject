@@ -62,7 +62,7 @@ COJSONPrimitiveTypeToString(COType type)
     return @"";
 }
 
-static NSString *
+NSString *
 COJSONTypeToString(COType type)
 {
 	NSCAssert(COTypeIsValid(type), @"type to serialize not valid");
