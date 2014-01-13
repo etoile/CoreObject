@@ -126,10 +126,22 @@
 			"shortDescription": "Delete shape"
 		},
 		
-		"edit-text":
+		"insert-text":
 		{
 			"type": "modification",
-			"shortDescription": "Edit text document"
+			"shortDescription": "Insert text '%@'"
+		},
+
+		"delete-text":
+		{
+			"type": "deletion",
+			"shortDescription": "Delete text '%@'"
+		},
+
+		"modify-text":
+		{
+			"type": "modification",
+			"shortDescription": "Modify text '%@'"
 		}
 	}
 }

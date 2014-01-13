@@ -80,6 +80,8 @@
 
 - (void) commitWithIdentifier: (NSString *)identifier;
 
+- (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args;
+
 - (void) switchToRevision: (CORevision *)aRevision;
 
 - (IBAction) projectDemoUndo: (id)sender;

@@ -54,6 +54,10 @@
 	_track = wc.undoTrack;
 	
     [table reloadData];
+	
+	if ([table numberOfRows] > 0)
+		[table scrollRowToVisible: [table numberOfRows] - 1];
+	
 	[self validateButtons];
 }
 

@@ -236,16 +236,24 @@
 
 /* History stuff */
 
-- (void) commitWithIdentifier: (NSString *)identifier
+- (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args
 {
 	identifier = [@"org.etoile.ProjectDemo." stringByAppendingString: identifier];
-
+	
 	NSMutableDictionary *metadata = [NSMutableDictionary new];
+	if (args != nil)
+		metadata[kCOCommitMetadataShortDescriptionArguments] = args;
+	
 	XMPPController *xmppController = [XMPPController sharedInstance];
 	if (xmppController.username != nil)
 		metadata[@"username"] = xmppController.username;
 	
 	[[self persistentRoot] commitWithIdentifier: identifier metadata: metadata undoTrack: [self undoTrack] error:NULL];
+}
+
+- (void) commitWithIdentifier: (NSString *)identifier
+{
+	[self commitWithIdentifier: identifier descriptionArguments: nil];
 }
 
 - (void) switchToRevision: (CORevision *)aRevision

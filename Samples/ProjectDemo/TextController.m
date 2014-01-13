@@ -47,22 +47,45 @@
 
 - (void)textDidChange:(NSNotification*)notif
 {
-	NSLog(@"-textDidChange: committing.");
-	
-	[self commitWithIdentifier: @"edit-text"];
+	NSLog(@"-textDidChange:");
 }
 
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
 {
 	NSLog(@"should add %@", replacementString);
+	
+	if ([replacementString isEqualToString: @""])
+		textToDelete = [[[aTextView textStorage] string] substringWithRange: affectedCharRange];
+	
 	return YES;
 }
 
-
 - (void)textStorageDidProcessEditing:(NSNotification *)notification
 {
-	NSLog(@"Text storage did process editing. %@ edited range: %@", notification.userInfo, NSStringFromRange([textStorage editedRange]));
+	NSString *editedText = [[textStorage string] substringWithRange: [textStorage editedRange]];
+	
+	NSLog(@"Text storage did process editing. %@ edited range: %@ = %@", notification.userInfo, NSStringFromRange([textStorage editedRange]), editedText);
 	[textView setNeedsDisplay: YES];
 	
+
+	if ([[self objectGraphContext] hasChanges])
+	{
+		if ([textStorage changeInLength] > 0)
+		{
+			[self commitWithIdentifier: @"insert-text" descriptionArguments: @[editedText]];
+		}
+		else if ([textStorage changeInLength] < 0)
+		{
+			[self commitWithIdentifier: @"delete-text" descriptionArguments: @[textToDelete]];
+		}
+		else
+		{
+			[self commitWithIdentifier: @"modify-text" descriptionArguments: @[editedText]];
+		}
+	}
+	else
+	{
+		NSLog(@"No changes, not committing");
+	}
 }
 @end
