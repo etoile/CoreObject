@@ -25,6 +25,8 @@
 	
 	IBOutlet NSPopUpButton *branchesPopUpButton;
 	IBOutlet NSButton *defaultBranchCheckBox;
+	
+	COUndoTrack *_undoTrack;
 }
 
 - (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot

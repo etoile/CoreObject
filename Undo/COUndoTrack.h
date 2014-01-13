@@ -67,6 +67,9 @@ extern NSString * const kCOUndoStackName;
     NSString *_name;
 	NSMutableArray *_commands;
 	COEditingContext *_editingContext;
+	
+	BOOL _coalescing;
+	ETUUID *_lastCoalescedCommandUUID;
 }
 
 
@@ -117,6 +120,8 @@ extern NSString * const kCOUndoStackName;
  */
 - (void)clear;
 
+- (void)beginCoalescing;
+- (void)endCoalescing;
 
 /** @taskunit Framework Private */
 

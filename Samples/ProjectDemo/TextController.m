@@ -43,6 +43,8 @@
 	textStorage = [[COAttributedStringWrapper alloc] initWithBacking: [[self textDocument] attrString]];
 	[textStorage addLayoutManager: [textView layoutManager]];
 	[textStorage setDelegate: self];
+	
+	[[self undoTrack] beginCoalescing];
 }
 
 - (void)textDidChange:(NSNotification*)notif
@@ -92,10 +94,27 @@ static NSString *Trim(NSString *text)
 		{
 			[self commitWithIdentifier: @"modify-text" descriptionArguments: @[Trim(editedText)]];
 		}
+		
+		if (coalescingTimer != nil)
+		{
+			[coalescingTimer invalidate];
+		}
+		coalescingTimer = [NSTimer scheduledTimerWithTimeInterval: 2 target: self selector: @selector(calescingTimer:) userInfo: nil repeats: NO];
 	}
 	else
 	{
 		NSLog(@"No changes, not committing");
 	}
 }
+
+- (void) calescingTimer: (NSTimer *)timer
+{
+	NSLog(@"Breaking coalescing...");
+	[[self undoTrack] endCoalescing];
+	[[self undoTrack] beginCoalescing];
+	
+	[coalescingTimer invalidate];
+	coalescingTimer = nil;
+}
+
 @end

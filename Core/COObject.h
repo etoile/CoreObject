@@ -402,8 +402,8 @@
 
 
 /**
- * Return the revision of this object in the branch owning the object graph 
- * context.
+ * Return the revision object corresponding to the most recent commit of the
+ * branch owning the object graph context.
  *
  * See also -[COBranch currentRevision].
  */

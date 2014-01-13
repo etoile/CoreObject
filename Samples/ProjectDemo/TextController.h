@@ -9,6 +9,8 @@
 	
 	// Hack to save text being deleted for the commit label
 	NSString *textToDelete;
+	
+	NSTimer *coalescingTimer;
 }
 
 @end

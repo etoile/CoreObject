@@ -562,6 +562,65 @@
 	[self checkCommand: _testTrack.nodes[3] isSetVersionFrom: r2 to: r3];
 }
 
+- (void)testUndoCoalescing
+{
+	CORevision *r0, *r1, *r2, *r3, *r4, *r5, *r6;
+    OutlineItem *item = [[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"] rootObject];
+    [ctx commit];
+	r0 = [item revision];
+	
+	// First coalesced block
+	
+	[_testTrack beginCoalescing];
+	{
+		item.label = @"a";
+		[ctx commitWithUndoTrack: _testTrack];
+		r1 = [item revision];
+		
+		item.label = @"ab";
+		[ctx commitWithUndoTrack: _testTrack];
+		r2 = [item revision];
+	}
+	[_testTrack endCoalescing];
+
+	// N.B. Intentionally calling -nodes, which has the side effect of causing
+	// COUndoTrack to cache the nodes in memory, to try to break things
+	UKIntsEqual(2, [[_testTrack nodes] count]);
+	
+	// Second coalesced block
+	
+	[_testTrack beginCoalescing];
+	{
+		item.label = @"abc";
+		[ctx commitWithUndoTrack: _testTrack];
+		r3 = [item revision];
+		
+		item.label = @"abcd";
+		[ctx commitWithUndoTrack: _testTrack];
+		r4 = [item revision];
+	}
+	[_testTrack endCoalescing];
+
+	// Two more non-colesced commits
+	
+	item.label = @"foo";
+	[ctx commitWithUndoTrack: _testTrack];
+	r5 = [item revision];
+	
+	item.label = @"bar";
+	[ctx commitWithUndoTrack: _testTrack];
+	r6 = [item revision];
+
+	// Check track contents
+	UKIntsEqual(4, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+	UKIntsEqual(5, [_testTrack.nodes count]);
+	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
+	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r2];
+	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r2 to: r4];
+	[self checkCommand: _testTrack.nodes[3] isSetVersionFrom: r4 to: r5];
+	[self checkCommand: _testTrack.nodes[4] isSetVersionFrom: r5 to: r6];
+}
+
 @end
 
 

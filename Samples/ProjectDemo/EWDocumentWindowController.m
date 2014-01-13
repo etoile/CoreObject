@@ -143,19 +143,20 @@
 
 - (COUndoTrack *) undoTrack
 {
-    NSString *name = nil;
-	
-	if ([[self class] isProjectUndo])
+	if (_undoTrack == nil)
 	{
-		name = @"org.etoile.projectdemo";
+		NSString *name = self.windowID;
+
+		// TODO: Re-enable
+//		if ([[self class] isProjectUndo])
+//		{
+//			name = @"org.etoile.projectdemo";
+//		}
+		
+		_undoTrack = [COUndoTrack trackForName: name
+							withEditingContext: self.editingContext];
 	}
-	else
-	{
-		name = self.windowID;
-	}
-	
-    return [COUndoTrack trackForName: name
-				  withEditingContext: self.editingContext];
+	return _undoTrack;
 }
 
 // UI Stuff

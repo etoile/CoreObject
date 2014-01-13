@@ -13,6 +13,7 @@
 #import "COEditingContext+Private.h"
 #import "COCommandGroup.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
+#import "COCommandSetCurrentVersionForBranch.h"
 
 NSString * const COUndoStackDidChangeNotification = @"COUndoStackDidChangeNotification";
 NSString * const kCOUndoStackName = @"COUndoStackName";
@@ -116,6 +117,13 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
     
     COCommandGroup *edit = (COCommandGroup *)[COCommand commandWithPropertyList: plist];
     return edit;
+}
+
+- (COCommandGroup *) popEditFromStack: (NSString *)aStack forName: (NSString *)aName
+{
+    COCommandGroup *result = [self peekEditFromStack: aStack forName: aName];
+	[_store popStack: aStack forName: aName];
+    return result;
 }
 
 - (BOOL) canApplyEdit: (COCommand*)anEdit toContext: (COEditingContext *)aContext
@@ -236,18 +244,98 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	[_commands removeObjectsFromIndex: currentIndex + 1];
 }
 
-- (void)addNewUndoCommand: (COCommand *)newCommand
+static BOOL coalesceOpPair(COCommand *op, COCommand *nextOp)
 {
+	if ([op isKindOfClass: [COCommandSetCurrentVersionForBranch class]]
+		&& [nextOp isKindOfClass: [COCommandSetCurrentVersionForBranch class]])
+	{
+		COCommandSetCurrentVersionForBranch *firstSetVersion = (COCommandSetCurrentVersionForBranch *)op;
+		COCommandSetCurrentVersionForBranch *nextSetVersion = (COCommandSetCurrentVersionForBranch *)nextOp;
+		
+		if ([nextSetVersion.oldHeadRevisionUUID isEqual: firstSetVersion.headRevisionUUID]
+			&& [nextSetVersion.oldRevisionUUID isEqual: firstSetVersion.revisionUUID])
+		{
+			firstSetVersion.headRevisionUUID = nextSetVersion.headRevisionUUID;
+			firstSetVersion.revisionUUID = nextSetVersion.revisionUUID;
+			return YES;
+		}
+	}
+	return NO;
+}
+
+static void coalesceOpsInternal(NSMutableArray *ops, NSUInteger i)
+{
+	if (i+1 >= [ops count])
+		return;
+	
+	if (coalesceOpPair(ops[i], ops[i+1]))
+	{
+		[ops removeObjectAtIndex: i+1];
+		coalesceOpsInternal(ops, i);
+	}
+	else
+	{
+		return coalesceOpsInternal(ops, i+1);
+	}
+}
+
+/**
+ * This will collapse contiguous runs of COCommandSetCurrentVersionForBranch commands
+ * whose old and new revisions match up. e.g.
+ *
+ *     @[<COCommandSetCurrentVersionForBranch r0 -> r1>, <COCommandSetCurrentVersionForBranch r1 -> r2>]
+ *
+ * gets collapsed to:
+ *
+ *     @[<COCommandSetCurrentVersionForBranch r0 -> r2>]
+ */
+static void coalesceOps(NSMutableArray *ops)
+{
+	coalesceOpsInternal(ops, 0);
+}
+
+- (void)insertCommandsFromGroup: (COCommandGroup *)source atStartOfGroup: (COCommandGroup *)dest
+{
+	NSMutableArray *newCommands = [NSMutableArray arrayWithArray: source.contents];
+	[newCommands addObjectsFromArray: dest.contents];
+	coalesceOps(newCommands);
+	dest.contents = newCommands;
+}
+
+- (void)addNewUndoCommand: (COCommandGroup *)newCommand
+{
+	[_store beginTransaction];
+	if (_coalescing)
+	{
+		if (_lastCoalescedCommandUUID != nil)
+		{
+			// Pop from the in-memory copy since we are about to pop from the SQL DB
+			if ([_commands count] > 0)
+				[_commands removeLastObject];
+			
+			COCommandGroup *lastGroup = [self popEditFromStack: kCOUndoStack forName: _name];
+					
+			if (lastGroup != nil)
+			{
+				//NSLog(@"Coalescing %@ and %@", lastGroup, newCommand);
+				[self insertCommandsFromGroup: lastGroup atStartOfGroup: newCommand];
+			}
+		}
+		_lastCoalescedCommandUUID = newCommand.UUID;
+	}
+	
 	[_store pushAction: [newCommand propertyList] stack: kCOUndoStack forName: _name];
 
 	COCommand *currentCommand = [self currentCommand];
 	NSParameterAssert([newCommand isEqual: currentCommand]);
 	BOOL currentCommandUnchanged = [currentCommand isEqual: [_commands lastObject]];
 	
-	if (currentCommandUnchanged || _commands == nil)
-		return;
-
-	[_commands addObject: newCommand];
+	if (!currentCommandUnchanged && _commands != nil)
+	{
+		[_commands addObject: newCommand];
+	}
+	
+	ETAssert([_store commitTransaction]);
 }
 
 - (COCommandGroup *)currentCommand
@@ -409,6 +497,20 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 - (NSArray *)contentArray
 {
 	return [NSArray arrayWithArray: [self nodes]];
+}
+
+#pragma mark - Coalescing
+
+- (void)beginCoalescing
+{
+	_coalescing = YES;
+	_lastCoalescedCommandUUID = nil;
+}
+
+- (void)endCoalescing
+{
+	_coalescing = NO;
+	_lastCoalescedCommandUUID = nil;
 }
 
 @end
