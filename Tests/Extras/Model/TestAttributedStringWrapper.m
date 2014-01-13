@@ -216,8 +216,6 @@
 	{
 		NSArray *actual = [(id<EditedCallLogging>)as characterEditCalls];
 		UKObjectsEqual(expected, actual);
-		
-		[(id<EditedCallLogging>)as clearEditCalls];
 	}
 }
 
@@ -431,12 +429,15 @@
 {
 	[self appendString: @"abc" htmlCode: nil toAttributedString: [objectGraph rootObject]];
 	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 3]]];
-	
+	[(COAttributedStringWrapperTestExtensions *)as clearEditCalls];
+	 
 	((COAttributedStringChunk *)attributedString.chunks[0]).text = @"ac";
 	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 1) changeInLength: -1]]];
-
+	[(COAttributedStringWrapperTestExtensions *)as clearEditCalls];
+	
 	((COAttributedStringChunk *)attributedString.chunks[0]).text = @"abc";
 	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 0) changeInLength: 1]]];
+	[(COAttributedStringWrapperTestExtensions *)as clearEditCalls];
 }
 
 - (void) testTypeSingleCharacter
@@ -447,6 +448,7 @@
 	[self appendString: @"x" htmlCode: nil toAttributedString: [remoteCtx rootObject]];
 	
 	// Replicate that change to objectGraph
+	[(COAttributedStringWrapperTestExtensions *)as clearEditCalls];
 	[objectGraph setItemGraph: remoteCtx];
 
 	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 1]]];
@@ -463,6 +465,8 @@
 	[remoteCtx setItemGraph: objectGraph];
 	COAttributedStringWrapper *remoteCtxWrapper = [[COAttributedStringWrapper alloc] initWithBacking: [remoteCtx rootObject]];
 	[self setFontTraits: NSFontBoldTrait inRange: NSMakeRange(2, 1) inTextStorage: remoteCtxWrapper];
+	
+	[(COAttributedStringWrapperTestExtensions *)as clearEditCalls];
 	
 	// Replicate that change to objectGraph
 	[objectGraph setItemGraph: remoteCtx];
@@ -523,7 +527,6 @@
 	
 	UKDoesNotRaiseException([tv dataWithPDFInsideRect: NSMakeRect(0, 0, 100, 100)]);
 }
-
 
 @end
 
