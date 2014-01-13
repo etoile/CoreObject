@@ -449,24 +449,7 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 	NSMutableString *result = [NSMutableString new];
 	for (COAttributedStringChunk *chunk in string.chunks)
 	{
-		if ([chunk.attributes count] == 0)
-		{
-			[result appendFormat: @"<span>%@</span>", chunk.text];
-		}
-		else
-		{
-			NSArray *attrs = [[chunk.attributes allObjects] sortedArrayUsingDescriptors:
-								  @[[NSSortDescriptor sortDescriptorWithKey: @"htmlCode" ascending: YES]]];
-			for (COAttributedStringAttribute *attr in attrs)
-			{
-				[result appendFormat: @"<%@>", attr.htmlCode];
-			}
-			[result appendFormat: @"%@", chunk.text];
-			for (COAttributedStringAttribute *attr in attrs)
-			{
-				[result appendFormat: @"</%@>", attr.htmlCode];
-			}
-		}
+		[result appendFormat: @"%@", chunk];
 	}
 	
 	return result;

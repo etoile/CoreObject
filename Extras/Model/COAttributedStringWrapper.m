@@ -119,6 +119,12 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		lengthDelta += insertedChunk.length;
 	}
 	
+	if (lengthDelta == 0)
+	{
+		NSLog(@"Warning, an empty chunk is being inserted");
+		return;
+	}
+	
 	[self edited: NSTextStorageEditedCharacters range: characterRange changeInLength: lengthDelta];
 }
 
@@ -216,6 +222,9 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		NSArray *newArray = change[NSKeyValueChangeNewKey];
 
 		// Handle characters inserted/removed. See -record... methods above
+		//
+		// This is going to produce overly coarse -edited calls.
+		// We should probably do an actual character-by-character diff
 		
 		[self beginEditing];
 		CODiffArrays(oldArray, newArray, self, oldArray);
@@ -235,6 +244,12 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		
 		NSString *newText = change[NSKeyValueChangeNewKey];
 		NSInteger lengthDelta = (NSInteger)[newText length] - (NSInteger)[oldText length];
+		
+		
+		if ([oldText isEqualToString: newText])
+		{
+			return;
+		}
 		
 		// Only pay attention if the chunk is attached to the string we are watching
 		if (chunk.parentString == _backing)
@@ -262,21 +277,6 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 
 - (void) objectGraphContextObjectsDidChangeNotification: (NSNotification *)notif
 {
-//	_cachedString = [_backing string];
-//	
-//	if (_inPrimitiveMethod)
-//		return;
-//	
-//	NSUInteger currentLength = [self length];
-//	NSInteger delta = (NSInteger)currentLength - _lastNotifiedLength;
-//	NSUInteger oldLength = _lastNotifiedLength;
-//	_lastNotifiedLength = currentLength;
-//	
-//	NSLog(@"!!!! COAtrributedString length modified by %d (outside of a NSTextStorage mutation method)", (int)delta);
-//		
-//	[self edited: NSTextStorageEditedAttributes | NSTextStorageEditedCharacters
-//		   range: NSMakeRange(0, oldLength)
-//  changeInLength: delta];
 }
 
 - (void) unregisterAsObserverOf: (COObject *)object
@@ -327,34 +327,6 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 {
 	return _cachedString;
 }
-
-//- (id)attribute:(NSString *)attrName atIndex:(NSUInteger)location effectiveRange:(NSRangePointer)range
-//{
-//	NSLog(@"attribute %@ at Index %d effective range", attrName, (int)location);
-//	
-//	id result = [super attribute: attrName atIndex: location effectiveRange: range];
-//	
-//	NSLog(@"returned result: %@ range %@", result, range != NULL ? NSStringFromRange(*range) : nil);
-//	
-//	return result;
-//}
-//
-//- (id)attribute:(NSString *)attrName atIndex:(NSUInteger)location longestEffectiveRange:(NSRangePointer)range inRange:(NSRange)rangeLimit
-//{
-//	NSLog(@">>>attribute %@ at Index %d longest effective range inRange %@", attrName, (int)location, NSStringFromRange(rangeLimit));
-//
-//	// HACK:
-//	if (NSMaxRange(rangeLimit) > [self length])
-//	{
-//		rangeLimit.length -= (NSMaxRange(rangeLimit) - [self length]);
-//	}
-//	
-//	id result = [super attribute: attrName atIndex: location longestEffectiveRange: range inRange: rangeLimit];
-//	
-//	NSLog(@">>>returned result: %@ range %@", result, range != NULL ? NSStringFromRange(*range) : nil);
-//	
-//	return result;
-//}
 
 - (NSDictionary *)attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)aRangeOut
 {

@@ -73,6 +73,13 @@
  * -edited:range:changeInLength: with the character edit mask set, since the last call to clearEditCalls
  */
 - (NSArray *) characterEditCalls;
+
+/**
+ * Returns the total length change reported by -edited: calls, since
+ * the last call to -clearEditCalls
+ */
+- (NSInteger) changeInLength;
+
 @end
 
 
@@ -84,6 +91,7 @@
 @interface COAttributedStringWrapperTestExtensions : COAttributedStringWrapper <EditedCallLogging>
 {
 	NSMutableArray *_editedCalls;
+	NSInteger _changeInLength;
 }
 @end
 
@@ -93,13 +101,17 @@
 {
 	if (_editedCalls == nil)
 		_editedCalls = [NSMutableArray new];
+	
 	[_editedCalls addObject: [EditedCall edited: editedMask range: range changeInLength: delta]];
-		
+	
+	_changeInLength += delta;
+	
 	[super edited: editedMask range: range changeInLength: delta];
 }
 
 - (void) clearEditCalls
 {
+	_changeInLength = 0;
 	[_editedCalls removeAllObjects];
 }
 
@@ -110,6 +122,11 @@
 	}];
 }
 
+- (NSInteger) changeInLength
+{
+	return _changeInLength;
+}
+
 @end
 
 
@@ -118,6 +135,7 @@
 {
 	NSMutableAttributedString *_backing;
 	NSMutableArray *_editedCalls;
+	NSInteger _changeInLength;
 }
 @end
 
@@ -156,11 +174,13 @@
 - (void) edited: (NSUInteger)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
 {
 	[_editedCalls addObject: [EditedCall edited: editedMask range: range changeInLength: delta]];
+	_changeInLength += delta;
 	[super edited: editedMask range: range changeInLength: delta];
 }
 
 - (void) clearEditCalls
 {
+	_changeInLength = 0;
 	[_editedCalls removeAllObjects];
 }
 
@@ -169,6 +189,11 @@
 	return [_editedCalls filteredCollectionWithBlock: ^(id obj) {
 		return (BOOL)([(EditedCall *)obj editedMask] & NSTextStorageEditedCharacters);
 	}];
+}
+
+- (NSInteger) changeInLength
+{
+	return _changeInLength;
 }
 
 @end
@@ -423,9 +448,9 @@
 	
 	// Replicate that change to objectGraph
 	[objectGraph setItemGraph: remoteCtx];
-#if 0
+
 	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(0, 0) changeInLength: 1]]];
-#endif
+	UKIntsEqual(1, [(COAttributedStringWrapperTestExtensions *)as changeInLength]);
 }
 
 - (void) testBoldingSingleCharacter
@@ -444,6 +469,7 @@
 #if 0
 	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedAttributes range: NSMakeRange(2, 1) changeInLength: 0]]];
 #endif
+	UKIntsEqual(0, [(COAttributedStringWrapperTestExtensions *)as changeInLength]);
 }
 
 - (void) testTypeTwoCharactersAndRevert
@@ -466,7 +492,8 @@
 	[(COAttributedStringWrapperTestExtensions *)as clearEditCalls];
 	[objectGraph setItemGraph: snapshot1];
 	UKObjectsEqual(@"x", [as string]);
-	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 1) changeInLength: -1]]];
+	//[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 1) changeInLength: -1]]];
+	UKIntsEqual(-1, [(COAttributedStringWrapperTestExtensions *)as changeInLength]);
 	
 	UKDoesNotRaiseException([tv dataWithPDFInsideRect: NSMakeRect(0, 0, 100, 100)]);
 }
@@ -490,9 +517,9 @@
 	[(COAttributedStringWrapperTestExtensions *)as clearEditCalls];
 	[objectGraph setItemGraph: branch1];
 	UKObjectsEqual(@"ad", [as string]);
-#if 0
-	[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 2) changeInLength: -2]]];
-#endif
+
+	//[self checkCharacterEdits: @[[EditedCall edited: NSTextStorageEditedCharacters range: NSMakeRange(1, 2) changeInLength: -1]]];
+	UKIntsEqual(-1, [(COAttributedStringWrapperTestExtensions *)as changeInLength]);
 	
 	UKDoesNotRaiseException([tv dataWithPDFInsideRect: NSMakeRect(0, 0, 100, 100)]);
 }

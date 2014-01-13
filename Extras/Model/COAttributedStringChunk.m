@@ -82,4 +82,28 @@
 	return NSMakeRange([self characterIndex], [self length]);
 }
 
+- (NSString *) description
+{
+	NSMutableString *result = [NSMutableString new];
+	if ([self.attributes count] == 0)
+	{
+		[result appendFormat: @"<span>%@</span>", self.text];
+	}
+	else
+	{
+		NSArray *attrs = [[self.attributes allObjects] sortedArrayUsingDescriptors:
+						  @[[NSSortDescriptor sortDescriptorWithKey: @"htmlCode" ascending: YES]]];
+		for (COAttributedStringAttribute *attr in attrs)
+		{
+			[result appendFormat: @"<%@>", attr.htmlCode];
+		}
+		[result appendFormat: @"%@", self.text];
+		for (COAttributedStringAttribute *attr in attrs)
+		{
+			[result appendFormat: @"</%@>", attr.htmlCode];
+		}
+	}
+	return result;
+}
+
 @end
