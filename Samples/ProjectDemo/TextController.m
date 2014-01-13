@@ -60,6 +60,16 @@
 	return YES;
 }
 
+static NSString *Trim(NSString *text)
+{
+	if ([text length] > 30)
+		return [[text substringToIndex: 30] stringByAppendingFormat: @"%C", (unichar)0x2026 /* elipsis */ ];
+	
+	text = [text stringByReplacingOccurrencesOfString: @"\n" withString: @""];
+	
+	return text;
+}
+
 - (void)textStorageDidProcessEditing:(NSNotification *)notification
 {
 	NSString *editedText = [[textStorage string] substringWithRange: [textStorage editedRange]];
@@ -72,15 +82,15 @@
 	{
 		if ([textStorage changeInLength] > 0)
 		{
-			[self commitWithIdentifier: @"insert-text" descriptionArguments: @[editedText]];
+			[self commitWithIdentifier: @"insert-text" descriptionArguments: @[Trim(editedText)]];
 		}
 		else if ([textStorage changeInLength] < 0)
 		{
-			[self commitWithIdentifier: @"delete-text" descriptionArguments: @[textToDelete]];
+			[self commitWithIdentifier: @"delete-text" descriptionArguments: @[Trim(textToDelete)]];
 		}
 		else
 		{
-			[self commitWithIdentifier: @"modify-text" descriptionArguments: @[editedText]];
+			[self commitWithIdentifier: @"modify-text" descriptionArguments: @[Trim(editedText)]];
 		}
 	}
 	else
