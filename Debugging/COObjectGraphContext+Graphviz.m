@@ -113,8 +113,11 @@ static void COGraphvizWriteHTMLTableRowForAttributeOfItem(NSString *key, COItem 
 	NSString *nodeName = COGraphvizNodeNameForUUID(anItem.UUID);
 	NSString *portName = COGraphvizPortNameForAttribute(key);
 	
-	[dest appendFormat: @"<tr><td>%@</td><td>%@</td><td port=\"%@\">", COPrettyPrintKey(key), COJSONTypeToString(type), portName];
-
+	[dest appendFormat: @"<tr>"];
+	[dest appendFormat: @"<td align=\"left\">%@</td>", COPrettyPrintKey(key)];
+	[dest appendFormat: @"<td align=\"left\">%@</td>", COJSONTypeToString(type)];
+	[dest appendFormat: @"<td align=\"left\" port=\"%@\">", portName];
+	
 	if (COTypeIsUnivalued(type)) /* univalued */
 	{
 		if (!(COTypePrimitivePart(type) == kCOTypeCompositeReference
