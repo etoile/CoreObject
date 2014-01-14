@@ -1,0 +1,21 @@
+{
+    "types":
+	{
+		"history": "History related",
+	},
+
+	"descriptors":
+	{
+		"selective-undo":
+		{
+			"type": "history",
+			"shortDescription": "Selective undo '%@'"
+		},
+
+		"selective-redo":
+		{
+			"type": "history",
+			"shortDescription": "Selective redo '%@'"
+		}
+	}
+}

@@ -472,7 +472,15 @@ static void coalesceOps(NSMutableArray *ops)
 	
 	COCommand *command = [(COCommand *)aNode inverse];
 	[command applyToContext: _editingContext];
-	[_editingContext commitWithUndoTrack: track];
+	
+	NSString *commitShortDescription = [aNode localizedShortDescription];
+	if (commitShortDescription == nil)
+		commitShortDescription = @"";
+	
+	[_editingContext commitWithIdentifier: @"org.etoile.CoreObject.selective-undo"
+								 metadata: @{ kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]}
+								undoTrack: track
+									error: NULL];
 
 	[self reloadCommands];
 	[self didUpdate];

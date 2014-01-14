@@ -248,6 +248,7 @@
 		6699DDAC184887E70003E803 /* TestOrderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAB184887E70003E803 /* TestOrderedRelationship.m */; };
 		6699DDAF184887F60003E803 /* TestUnivaluedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */; };
 		6699DDB2184888050003E803 /* TestUnorderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDB1184888050003E803 /* TestUnorderedRelationship.m */; };
+		669A728F1885C43B00E98795 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 669A728D1885C43B00E98795 /* Commits */; };
 		66A00A21187DFA8D005CFE16 /* TestAttributedStringMerge.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A00A20187DFA8D005CFE16 /* TestAttributedStringMerge.m */; };
 		66A00A29187E7BA1005CFE16 /* CORevision+Graphviz.h in Headers */ = {isa = PBXBuildFile; fileRef = 66A00A27187E7BA1005CFE16 /* CORevision+Graphviz.h */; };
 		66A00A2A187E7BA1005CFE16 /* CORevision+Graphviz.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A00A28187E7BA1005CFE16 /* CORevision+Graphviz.m */; };
@@ -339,7 +340,6 @@
 		66EEB2B7186D3CBA003695E6 /* TestItemGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EEB2B6186D3CBA003695E6 /* TestItemGraph.m */; };
 		66EF4276186251A800E15C59 /* TestDiffCAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EF4275186251A800E15C59 /* TestDiffCAPI.m */; };
 		66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */; };
-		66FD348A1830B84C00898381 /* COSynchronizerJSONServer.h in Resources */ = {isa = PBXBuildFile; fileRef = 66FD34881830B84C00898381 /* COSynchronizerJSONServer.h */; };
 		66FD348B1830B84C00898381 /* COSynchronizerJSONServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD34891830B84C00898381 /* COSynchronizerJSONServer.m */; };
 		66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FD348C1830BB3800898381 /* COSynchronizerJSONClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66FD348F1830BB3800898381 /* COSynchronizerJSONClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD348D1830BB3800898381 /* COSynchronizerJSONClient.m */; };
@@ -760,6 +760,8 @@
 		6699DDAB184887E70003E803 /* TestOrderedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestOrderedRelationship.m; sourceTree = "<group>"; };
 		6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnivaluedRelationship.m; sourceTree = "<group>"; };
 		6699DDB1184888050003E803 /* TestUnorderedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnorderedRelationship.m; sourceTree = "<group>"; };
+		669A728E1885C43B00E98795 /* English */ = {isa = PBXFileReference; lastKnownFileType = folder; name = English; path = Commits; sourceTree = "<group>"; };
+		669A72901885C46100E98795 /* org.etoile.CoreObject.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = org.etoile.CoreObject.json; path = Commits/org.etoile.CoreObject.json; sourceTree = "<group>"; };
 		66A00A18187DDB6A005CFE16 /* COObjectGraphContext+Debugging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Debugging.h"; path = "Core/COObjectGraphContext+Debugging.h"; sourceTree = "<group>"; };
 		66A00A20187DFA8D005CFE16 /* TestAttributedStringMerge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedStringMerge.m; sourceTree = "<group>"; };
 		66A00A27187E7BA1005CFE16 /* CORevision+Graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CORevision+Graphviz.h"; path = "Debugging/CORevision+Graphviz.h"; sourceTree = "<group>"; };
@@ -958,6 +960,7 @@
 			children = (
 				60884D401837B09800C5C7C9 /* AppKit.framework */,
 				66D96C9F178B6E5600D1553C /* libsqlite3.dylib */,
+				669A72821885C42C00E98795 /* English.lproj */,
 				66E62257185BEEB5002A22C1 /* Debugging */,
 				6633F107185515F1009CE6F7 /* Extras */,
 				6699633B115F0C4200359BE6 /* Documentation */,
@@ -1401,6 +1404,15 @@
 			);
 			name = Relationship;
 			path = Tests/Relationship;
+			sourceTree = "<group>";
+		};
+		669A72821885C42C00E98795 /* English.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				669A72901885C46100E98795 /* org.etoile.CoreObject.json */,
+				669A728D1885C43B00E98795 /* Commits */,
+			);
+			path = English.lproj;
 			sourceTree = "<group>";
 		};
 		66C3669D17B426C0009ACF2F /* Supporting Files */ = {
@@ -2016,8 +2028,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				669A728F1885C43B00E98795 /* Commits in Resources */,
 				66E62285185CF875002A22C1 /* COPYING in Resources */,
-				66FD348A1830B84C00898381 /* COSynchronizerJSONServer.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2360,6 +2372,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		669A728D1885C43B00E98795 /* Commits */ = {
+			isa = PBXVariantGroup;
+			children = (
+				669A728E1885C43B00E98795 /* English */,
+			);
+			name = Commits;
+			sourceTree = "<group>";
+		};
 		66C3669F17B426C0009ACF2F /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (

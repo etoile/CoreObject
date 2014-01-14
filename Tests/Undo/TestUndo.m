@@ -560,6 +560,8 @@
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r1];
 	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r1 to: r2];
 	[self checkCommand: _testTrack.nodes[3] isSetVersionFrom: r2 to: r3];
+	
+	UKObjectsEqual(@"org.etoile.CoreObject.selective-undo", [[_testTrack.nodes[3] commitDescriptor] identifier]);
 }
 
 - (void)testUndoCoalescing
@@ -619,6 +621,11 @@
 	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r2 to: r4];
 	[self checkCommand: _testTrack.nodes[3] isSetVersionFrom: r4 to: r5];
 	[self checkCommand: _testTrack.nodes[4] isSetVersionFrom: r5 to: r6];
+}
+
+- (void) testSelectiveUndoCommitDescriptor
+{
+	UKNotNil([COCommitDescriptor registeredDescriptorForIdentifier: @"org.etoile.CoreObject.selective-undo"]);
 }
 
 @end
