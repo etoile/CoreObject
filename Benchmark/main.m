@@ -15,12 +15,24 @@ int main (int argc, const char *argv[])
 {
     @autoreleasepool {
 		UKRunner *runner = [UKRunner new];
-
-		[[UKTestHandler handler] setQuiet: YES];
-
+		
+		UKTestHandler *handler = [UKTestHandler handler];
+		[handler setQuiet: YES];
+		
+		NSDate *startDate = [NSDate date];
+		
 		[runner runTestsInBundle: [NSBundle mainBundle] principalClass: [EditingContextTestCase class]];
 		[runner reportTestResults];
 		
+		printf("Took %d ms\n", (int)([[NSDate date] timeIntervalSinceDate: startDate] * 1000));
+		
+		if ([handler exceptionsReported] > 0 || [handler testsFailed] > 0)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
     }
-    return 0;
 }

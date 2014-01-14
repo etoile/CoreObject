@@ -762,11 +762,12 @@
  */
 - (void) testOverriddenIsEqualsObject
 {
-	OverriddenIsEqualObject *obj1 = [[OverriddenIsEqualObject alloc] initWithObjectGraphContext: [originalBranch objectGraphContext]];
+	COPersistentRoot *proot2 = [ctx insertNewPersistentRootWithEntityName: @"OrderedGroupNoOpposite"];
+	OverriddenIsEqualObject *obj1 = [[OverriddenIsEqualObject alloc] initWithObjectGraphContext: [proot2 objectGraphContext]];
 	obj1.label = @"test";
-	
-	OverriddenIsEqualObject *obj2 = [[OverriddenIsEqualObject alloc] initWithObjectGraphContext: [originalBranch objectGraphContext]];
+	OverriddenIsEqualObject *obj2 = [[OverriddenIsEqualObject alloc] initWithObjectGraphContext: [proot2 objectGraphContext]];
 	obj2.label = @"test";
+	[(OrderedGroupNoOpposite *)[proot2 rootObject] setContents: @[obj1, obj2]];
 	
 	// The -isEqual: method on OverriddenIsEqualObject is overridden to do a
 	// deep comparison of the label attribute, and ignore the objects' UUIDs.
@@ -774,14 +775,32 @@
 	
 	[ctx commit];
 	
-	[self checkBranchWithExistingAndNewContext: originalBranch
-									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	[self checkPersistentRootWithExistingAndNewContext: proot2
+										inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 OverriddenIsEqualObject *testObj1 = [[testBranch objectGraphContext] loadedObjectForUUID: obj1.UUID];
-		 OverriddenIsEqualObject *testObj2 = [[testBranch objectGraphContext] loadedObjectForUUID: obj2.UUID];
+		 OverriddenIsEqualObject *testObj1 = [[testProot objectGraphContext] loadedObjectForUUID: obj1.UUID];
+		 OverriddenIsEqualObject *testObj2 = [[testProot objectGraphContext] loadedObjectForUUID: obj2.UUID];
 		 
 		 UKNotNil(testObj1);
 		 UKNotNil(testObj2);
+	 }];
+}
+
+- (void) testGarbageObjectsNotCommitted
+{
+	OutlineItem *garbage = [[OutlineItem alloc] initWithObjectGraphContext: [persistentRoot objectGraphContext]];
+	OutlineItem *notGarbage = [[OutlineItem alloc] initWithObjectGraphContext: [persistentRoot objectGraphContext]];
+
+	rootObj.contents = @[notGarbage];
+		
+	/* No references to 'garbage', so it should be garbage-collected at this point
+	   and not committed. */
+	[ctx commit];
+	
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKNil([[testProot objectGraphContext] loadedObjectForUUID: garbage.UUID]);
 	 }];
 }
 

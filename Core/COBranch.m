@@ -572,6 +572,14 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     // Write a regular commit
 	
 	COObjectGraphContext *modifiedItemsSource = [self modifiedItemsSource];
+	
+	// Garbage-collect the context we are going to commit.
+	// Skip the garbage collection if there are no changes to commit.
+	if ([modifiedItemsSource hasChanges])
+	{
+		[modifiedItemsSource removeUnreachableObjects];
+	}
+	
 	COItemGraph *modifiedItems = [self modifiedItemsSnapshot];
     
     if ([[modifiedItems itemUUIDs] count] > 0 || self.shouldMakeEmptyCommit)
