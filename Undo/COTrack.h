@@ -60,9 +60,6 @@
  * <override-subclass />
  * Does a selective undo to cancel the changes involved in the track node revision.
  *
- * For a selective undo, this method must invoke 
- * -selectiveUndoWithRevision:inEditingContext:.
- *
  * How the track decides between selective undo vs normal undo/redo is up to 
  * the track subclass.
  */

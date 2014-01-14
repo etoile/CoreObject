@@ -13,11 +13,8 @@
 extern NSString * const COUndoStackDidChangeNotification;
 extern NSString * const kCOUndoStackName;
 
-
-
-
 /**
- * @group History Interaction
+ * @group Undo
  *
  * An undo track represents a history track that can record commits selectively. 
  *
@@ -56,7 +53,8 @@ extern NSString * const kCOUndoStackName;
  *
  * You can navigate the command sequence to change the editing context state 
  * using -undo, -redo and -setCurrentNode:. COUndoStack supports the same 
- * history navigation protocol than COBranch.
+ * history navigation protocol than COBranch. Note that the COUndoTrack versions
+ * perform an editing context commit automatically.
  *
  * You shouldn't subclass COUndoTrack.
  */

@@ -73,6 +73,8 @@ Future Work
   - Async attachment import
   
   - Revisit deletion
+
+  - Don't leave empty backing store databases cluttering the store directory
   
   - Add support for indexing properties other than text ones. Either use a single table with
 	property, value columns and a composite key on (property, value), or one table per
@@ -168,8 +170,6 @@ Future Work
 
   - Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
 
-  - Turn COObject into zombies once garbage collected (see -markAsRemovedFromContext)
-	
   - Turn _variableStorage into a private ivar once EtoileUI doesn't access it directly
   
   - Add dictionary update tests to TestObjectUpdate.m
@@ -283,11 +283,6 @@ the following situations at least:
 	[ctx commitWithUndoTrack: a]
 
 	[a nodes] will not equal [b nodes] but I would expect them to be the equal
-	
-  - Currently the COTrack protocol is ugly because -undo does a commit in 
-	one implementation of the protocol (COUndoTrack) but not the other (COBranch).
-	COUndoTrack needs to do the commit, so maybe document the method as committing
-	and make the COBranch implementation commit.
 
 
 - Model objects (COObject subclasses included with CoreObject for convenience)
