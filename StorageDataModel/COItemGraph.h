@@ -11,6 +11,8 @@
 @class COItem, COMutableItem;
 
 /**
+ * @group Storage Data Model
+ * @abstract
  * Protocol for a mutable item graph
  *
  * The object model is:
@@ -39,14 +41,16 @@
 @end
 
 /**
- * An item tree is just a mutable set of COItem objects along
- * with the UUID of the root object.
+ * @group Storage Data Model
+ * @abstract
+ * An item graph is a mutable set of COItem objects, and a root item UUID, which
+ * is the designated entry point to the object graph.
  *
- * However, there is no guarantee that the items form a complete tree,
- * or even that the item for the root UUID is in the set of items.
- *
- * The intended use for COItemTree is as a really simple
- * delta mechanism, so you can compute (COItemTree + COItemTree) = a new COItemTree
+ * COItemGraph is allowed to contain broken references (i.e. it can contain
+ * COItems which have ETUUID references to items not in the COItemGraph, or
+ * even be missing the COItem for the root item UUID) - this
+ * is to allow COItemGraph to act as a simple delta mechanism, so you can
+ * compute (COItemGraph + COItemGraph) = a new COItemGraph.
  */
 @interface COItemGraph : NSObject <COItemGraph>
 {

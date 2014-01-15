@@ -15,7 +15,57 @@ extern NSString * const kCOBranchLabel;
 
 /**
  * @group Core
- * @abstract A branch represents a distinct timeline in a persistent root history.
+ * @abstract A branch is a pointer to a revision in the history graph. It represents
+ * a variation of a persistent root.
+ *
+ * @section Conceptual Model
+ *
+ * 'currentRevision' is the most important property of a branch, that defines
+ * which revision the branch views. 
+ *
+ * Branches are central to the process of committing changes in inner objects.
+ * To commit changes in the branch's COObjectGraphContext, a new revision
+ * is created with the changes, and the 'currentRevision' property is modified 
+ * to point to the new revision.
+ *
+ * The 'headRevision' is an extra detail that gives branches a primitive form
+ * of undo/redo. When 'currentRevision' is reverted to an older revision,
+ * 'headRevision' remains in the same place, making it possible to "redo", i.e.
+ * move the 'currentRevision' back towards 'headRevision'. This is exposed by the
+ * COTrack API.
+ *
+ * @section Common Use Cases
+ *
+ * The most common use case would be accesesing the object graph through
+ * -objectGraphContext, or reverting to al old revision with the 'revision' property.
+ *
+ * @section Attributes and Metadata
+ *
+ * The 'metadata' property behaves just like COPersistentRoot's. 
+ * It can be set to a JSON compatible NSDictionary
+ * to store arbitrary application metadata. This property is persistent, but
+ * not versioned (although metadata changes can will be undone/redone by COUndoTrack,
+ * if the commit that changes the metadata is recorded to a track).
+ *
+ * @section Cheap Copies
+ *
+ * Branches support a kind of cheap copy, which is really just creating a new
+ * branch starting at the same revision as the reveiver (and with the parent branch
+ * metadata set). See -makeBranchWithLabel:.
+ *
+ * @section Deletion
+ *
+ * Branches follow a similar pattern for deletion as Persistent Roots, with a
+ * 'deleted' flag. Modifying the flag marks the branch as having
+ * changes to commit. Having the 'deleted' flag set and committed is
+ * like having a file in the trash. The branch can be undeleted by simply setting the 'deleted'
+ * flag to NO and committing that change.
+ *
+ * Branches play a role in the deletion model for revisions, which are garbage collected
+ * (like git). When a branch has the deleted flag set to YES,
+ * is it possible for CoreObject to irreversibly delete the branch and any revisons
+ * that are only accessible by the branch. Revisions will never
+ * be deleted if there is some non-deleted branch that can access them.
  */
 @interface COBranch : NSObject <COTrack>
 {

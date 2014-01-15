@@ -11,21 +11,22 @@
 @class ETUUID;
 
 /**
- * This is a low-level model object which makes up the contents of a commit's
- * item tree. (a commit is a set of COItem plus the UUID of the root COItem.)
+ * @group Storage Data Model
+ * @abstract 
+ * COItem is a "semi-serialized" representation of an inner object. It is essentially
+ * just a strongly typed dictionary (See COType.h for the mapping between possible
+ * COType values and the corresponding permissible Objective-C classes).
+ * Note that COItem only contains "value" obects (or possibly, sets/arrays of value
+ * objects). So, for example, references to other inner objects are stored as
+ * ETUUID instances. 
+ * 
+ * COItem acts as an intermediate layer during serialization or deserialization -
+ * the binary and JSON formats are both straightforward mappings of COItem to a byte stream.
  *
- * It oversees import/export to/from plist format, delegating some of the work
- * to COType+Plist.
- *
- *
- * *NOTE*: COItem does not participate in an object graph with other COItem
- * objects; it's basically a "value" object. It can contain NSSet/NSDictionary/NSArray,
- * but these containers can only contain COUUID/NSData/NSNumber/NSString/COPath.
- *
- * See COSubtree for a higher-level model object, which uses COItem internally
- * but lets you manipulate a set of COItem's as the corresponding tree of ObjC objects, 
- * which is easier to work with than raw COItem (but they are exactly equivelant
- * in terms of the data they represent.)
+ * COItem helps decouple object graph concerns (which are handled by COObjectGraphContext)
+ * from the details of actual serialization (handled by COItem+Binary and COItem+JSON),
+ * and COItem also defines the abstract storage model (independent of a particular
+ * serialization format like binary or JSON) that CoreObject uses. 
  */
 @interface COItem : NSObject <NSCopying, NSMutableCopying>
 {

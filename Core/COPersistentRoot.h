@@ -24,25 +24,21 @@ extern NSString * const COPersistentRootDidChangeNotification;
 
 /**
  * @group Core
- * @abstract A persistent root represents a document or a top-level object in a 
- * CoreObject store.
+ * @abstract A persistent root is a versioned sandbox inside a CoreObject store
+ * (in DVCS terminology, a persistent root is a repository), which encapsulates
+ * an object graph of inner objects and a history graph (DAG) of revisions (which
+ * are snapshots of the inner object graph). A persistent root has one
+ * or more branches, which are pointers on to the history graph.
  *
- * A persistent root usually represents a core object in the model
- * (e.g. library, tag, person, project etc.), and manages a persistent object 
- * graph and all its history.
- *
- * A persistent root history is a tree structure divided into branches. A branch 
- * is a revision sequence, and a revision is a tree or branch node.<br />
- * If merges are considered, the history is a graph and not just a tree.
- *
- * New persistent roots contains just a single branch (see -branches).
+ * Considering all of the above parts together, a persistent root represents
+ * a document or a top-level object in a CoreObject store.
  *
  * @section Conceptual Model
  *
  * For each new persistent root, CoreObject produces a new UUID triplet based on:
  *
  * <deflist>
- * <item>a persistent root</item>a branch collection that results in
+ * <item>a persistent root</item><desc>a branch collection that results in
  * a history graph describing all the changes made to a document
  * (document has a very loose meaning here</desc>
  * <item>a branch</item><desc>the persistent root initial branch</desc>
@@ -50,30 +46,67 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * of a structed document, a photo or contact object</desc>
  * </deflist>
  *
- * Each UUID in this UUID triplet is unique (never reused) accross all
+ * The persistent root UUID and branch UUID are unique (never reused) accross all
  * CoreObject stores, unless a persistent root has been replicated accross
- * stores (not supported for now).<br />
+ * stores. Two persistent roots can have the same root object UUID when one
+ * is a cheap copy of the other.
  * Generally speaking, CoreObject constructs (branches, revisions, objects,
  * stores etc.) are not allowed to share the same UUID. For the unsupported
  * replication case, constructs using the same UUID are considered to be
  * identical (same type and data) but replicated.
  *
- * A persistent root represents a core object but a root object doesn't (see
- * -rootObject). As such, use -[COPersistentRoot UUID] to track core objects.
- * A root object UUID might appear in multiple persistent roots (e.g.
- * a persistent root copy will use the same root object UUID than the original
- * persistent root although both core objects or persistent roots are distinct).<br />
+ * A persistent root represents a core object but a root object doesn't. 
+ * As such, use -[COPersistentRoot UUID] to track core objects.
  * From a terminology standpoint, persistent root and core object can be used
  * interchangeably.
  *
+ * FIXME: I think we should just eliminate the term "core object" as it only 
+ * makes things more confusing. --Eric
+ *
+ * @section Common Use Cases
+ *
+ * The most common use case would be accesesing the object graph through
+ * -objectGraphContext (if branches aren't being used by the application).
+ *
  * @section Attributes and Metadata
+ *
+ * The 'metadata' property can be set to a JSON compatible NSDictionary
+ * to store arbitrary application metadata. This property is persistent, but
+ * not versioned (although metadata changes can will be undone/redone by COUndoTrack,
+ * if the commit that changes the metadata is recorded to a track).
  *
  * @section Branches
  *
+ * Branches act similarly to git in that a branch is a movable pointer on to the
+ * history graph. See COBranch for more detail. 
+ *
+ * New persistent roots contains just a single branch (see -branches).
+ *
+ * You can ignore the COBranch API and just use COPersistentRoot to access
+ * the object graph (-objectGraphContext).
+ *
  * @section Cheap Copies
+ *
+ * Making a cheap copy of a persistent root creates a new persistent root (with
+ * a new UUID) and a single branch (also with a new UUID), however the current revision
+ * of the new branch will be set to the revision where the cheap copy was made.
+ * The copy is a true copy, in that it can have no observable effect on the source
+ * persistent root. However, the fact that it's a cheap copy will be evident in the
+ * interconnected history graphs.
  *
  * @section Deletion
  *
+ * CoreObject uses an explicit deletion model for Persistent Roots, controlled
+ * by the 'deleted' flag. Modifying the flag marks the persistent root as having
+ * changes to commit. A persistent root with the 'deleted' flag set on disk is
+ * like a file in the trash. It can be undeleted by simply setting the 'deleted'
+ * flag to NO and committing that change. 
+ *
+ * Only when the deleted flag is set to YES (and committed), is it possible for
+ * CoreObject to irreversibly delete the underling storage of the persistent root.
+ * 
+ * Currently, the only way to do this is to call a lower level store API, however
+ * this functionality will probably be exposed in COEditingContext at some point.
  */
 @interface COPersistentRoot : NSObject <COPersistentObjectContext>
 {

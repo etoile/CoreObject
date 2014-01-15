@@ -13,7 +13,7 @@
 @protocol COTrackNode;
 
 /** 
- * @group History Navigation
+ * @group Undo
  *
  * TODO: Rewrite
  *

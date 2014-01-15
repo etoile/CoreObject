@@ -22,6 +22,8 @@
  *
  * It allows to combine a predicate or a raw SQL query with various additional 
  * constraints, and control how the search results are returned.
+ *
+ * NOTE: This API is unstable and incomplete.
  */
 @interface COQuery : NSObject
 {

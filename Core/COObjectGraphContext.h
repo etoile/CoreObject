@@ -52,8 +52,18 @@ extern NSString * const COObjectGraphContextBeginBatchChangeNotification;
 extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 
 /**
- * TODO: Write class description
+ * @group Core
+ * @abstract 
+ * An object graph that manages COObject instances (COObject instances can only
+ * exist inside a COObjectGraphContext). Implements the COItemGraph protocol
+ * which allows viewing the COObjectGraphContext in a semi-serialized form 
+ * (as a set of COItem objects), as well as the -setItemGraph: method which 
+ * allows deserializing a given graph of COItems (reusing existing COObject
+ * instances if possible).
  *
+ * Also tracks which objects in the object graph have been modified, which 
+ * is what allows CoreObject to commit deltas instead of writing a full
+ * snapshot of every object in the object graph on every commit.
  *
  * @section Object Equality
  *

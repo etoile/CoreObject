@@ -13,25 +13,11 @@
 
 /** 
  * @group Core
- * @abstract A revision represents a commit in the store history.
- *
- * A revision represents a set of changes to 
- 
- to various changes, that were committed at the same
- * time and belong to a single root object and its inner objects. See 
- * -[COStore finishCommit]. 
- *
- * -changedObjectUUIDs and -valuesAndPropertiesForObjectUUID: can be used to 
- * retrieve the committed changes. 
- *
- * CORevision adopts the collection protocol and its content is a record 
- * collection where each CORecord represents a changed object whose properties 
- * are:
- *
- * <deflist>
- * <item>objectUUID</item><desc>The changed object UUID</desc>
- * <item>properties</item><desc>The properties changed in the object</desc>
- * </deflist>
+ * @abstract CORevision represents a revision in the history graph.
+ * A revision contains a snapshot of the inner objects, various metadata including
+ * parent revisions (one, or two for a merge commit), a UUID, the UUID of the
+ * branch that the revision was originally made on, and a arbitrary JSON dictionary
+ * for application use. Revisions are immutable.
  */
 @interface CORevision : NSObject <COTrackNode>
 {

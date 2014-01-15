@@ -15,7 +15,7 @@ extern NSString * const kCOUndoStackName;
 
 /**
  * @group Undo
- *
+ * @abstract
  * An undo track represents a history track that can record commits selectively. 
  *
  * For a commit done in an editing context, an undo track can be passed using 

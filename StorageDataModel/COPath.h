@@ -10,7 +10,13 @@
 @class ETUUID;
 
 /**
- *
+ * @group Storage Data Model
+ * @abstract
+ * COPath represents a cross-persistent root reference to the root object of
+ * a persistent root. It can either point to whatever the current branch is when
+ * the COPath is dereferenced, or can point to a specific branch.
+ * 
+ * COPath is used as a value object inside COItem.
  */
 @interface COPath : NSObject <NSCopying>
 {

@@ -17,12 +17,28 @@
  * @abstract An editing context exposes an in-memory snapshot of a CoreObject store,
  * allows the user to queue changes in memory and commit them atomically.
  * 
- * This functionality is split across the classes COEditingContext, which handles
- * persistent root insertion and deletion as well as general information about the
- * store, COPersistentRoot, which handles state specific to a persistent root - 
- * the metadata, the current branch, COBranch, which handles the state of a branch
- * and COObjectGraphContext, which finally exposes the snapshot of inner objects
- * in a branch and queues changes.
+ * Its functionality is split across 5 main classes (there is a owner chain where each element
+ * owns the one just below in the list):
+ *
+ * <deflist>
+ * <item>COEditingContext</item><desc>Entry point for opening and creating stores.
+ * Handles persistent root insertion and deletion</desc>
+ * <item>COPersistentRoot</item><desc>Versioned sandbox of inner objects,
+ * with a history graph (CORevision), and one or more branches (COBranch).</desc>
+ * <item>COBranch</item><desc>A position on the history graph, with the revision
+ * contents exposed as a COObjectGraphContext</desc>
+ * <item>COObjectGraphContext</item><desc>manages COObject graph, tracks 
+ * changes and handles reloading new states.</desc>
+ * <item>COObject</item><desc>Mutable inner object.</desc>
+ * </deflist>
+ *
+ * CORevision also fits this set although it is not directly owned by one object.
+ *
+ * @section Common Use Cases
+ *
+ * Typically COEditingContext is used at application startup to create or
+ * open a store (+contextWithURL:), when creating or accessing
+ * persistent roots, and to commit changes in all persistent roots.
  *
  * @section Object Equality
  *
@@ -36,12 +52,10 @@
  * @section Commits
  *
  * In the current implementation, all changes made in a COEditingContext are
- * committed atomically. However, it is best to think of atomicity only existing
- * per-persistent root, since persistent roots are the units of versioning.
- *
- * We usually advice to commit a single persistent root at time to prevent
- * multiple revisions per commit. In this way, you can provide precise undo/redo
- * support matching the user expectations.
+ * committed atomically in one SQLite transaction. However, when you consider 
+ * CoreObject as a version control system, atomicity only exists
+ * per-persistent root, since persistent roots are the units of versioning and
+ * each can be manipulated independently (rolled back, etc.)
  */
 @interface COEditingContext : NSObject <COPersistentObjectContext>
 {

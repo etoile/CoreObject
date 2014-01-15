@@ -13,7 +13,9 @@
 
 /**
  * @group Core
- * @abstract An entity object inside a transient or persistent object graph.
+ * @abstract A mutable in-memory representation of an inner object in an object
+ * graph context (a counterpart to COItem, whose relationships are
+ * represented as Objective-C pointers instead of UUIDs).
  *
  * An COObject instance is described by a metamodel (see -entityDescription) and 
  * owned by an object graph context. The object graph context is usually 
@@ -28,7 +30,12 @@
  * <item>COPersistentRoot</item>
  * <item>COBranch</item>
  * <item>COObjectGraphContext</item>
+ * <item>COObject</item>
  * </list>
+ *
+ * The COObject class itself can represent objects with any entity description,
+ * but you can also make subclasses of COObject for a particular entity
+ * to get static type checking.
  *
  * @section Initialization
  *
@@ -69,16 +76,6 @@
  * initialization time and releases them at deallocation time (you can access 
  * these collections using -valueForVariableStorageKey: in your subclass 
  * initializers).
- *
- * @section Persistency
- *
- * Whan an object becomes persistent, you invoke 
- * -becomePersistentInContext: or the editing context does it.
- * Hence -becomePersistentInContext: can be overriden to udpate   
- * or initialize properties at persistency time. For example, 
- * -becomePersistentInContext: can be propagated to the instance
- * relationships to transively turn a transient object graph into a persistent 
- * one.
  *
  * @section Writing Accessors
  *

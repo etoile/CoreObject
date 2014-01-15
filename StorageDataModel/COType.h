@@ -8,6 +8,8 @@
 #import <Foundation/Foundation.h>
 
 /**
+ * @group Storage Data Model
+ * @abstract
  * Each key/value pair of a COItem has a COType associated with it.
  *
  * The type defines the set of permissible values which can be set for
@@ -52,7 +54,7 @@ enum {
      * A reference that does not necessairily model parent-child relationships -
      * could be graphs with cycles, etc.
      *
-     * Represented as COUUID for inner references and COPath for references
+     * Represented as ETUUID for inner references and COPath for references
      * to other persistent roots.
      */
     kCOTypeReference = 0x05,
@@ -66,7 +68,7 @@ enum {
      * to enhance support for loading data with no metamodel available, and ease
      * debugging.
      *
-     * Represented as COUUID.
+     * Represented as ETUUID.
      */
     kCOTypeCompositeReference = 0x06,
 
