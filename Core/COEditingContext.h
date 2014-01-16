@@ -287,9 +287,23 @@
  * You should avoid using this method in release code, it is mainly useful for
  * debugging and quick development.
  *
- *  See also -commitWithMetadata:undoTrack:error:.
+ * See also -commitWithMetadata:undoTrack:error:.
  */
 - (BOOL)commitWithUndoTrack: (COUndoTrack *)aStack;
+
+
+/** @taskunit Description */
+
+
+/**
+ * Returns a short description to summarize the receiver.
+ */
+- (NSString *)description;
+/**
+ * Returns a multi-line description including informations about the pending 
+ * changes.
+ */
+- (NSString *)detailedDescription;
 
 
 /** @taskunit Deprecated */

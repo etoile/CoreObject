@@ -1003,7 +1003,13 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     return db_;
 }
 
-- (NSString *) description
+- (NSString *)description
+{
+	return [NSString stringWithFormat: @"<%@ %p - %@ (%@)>",
+		NSStringFromClass([self class]), self, _uuid, url_];
+}
+
+- (NSString *) detailedDescription
 {
     NSMutableString *result = [NSMutableString string];
     [result appendFormat: @"<COSQLiteStore at %@ (UUID: %@)\n", self.URL, self.UUID];

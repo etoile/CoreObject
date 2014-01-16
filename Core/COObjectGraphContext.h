@@ -131,6 +131,10 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 
 
 /**
+ * Returns a short description to summarize the receiver.
+ */
+- (NSString *)description;
+/**
  * Returns a description detailing the item graph representation (the serialized 
  * representation).
  */

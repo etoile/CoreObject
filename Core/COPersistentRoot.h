@@ -139,12 +139,9 @@ extern NSString * const COPersistentRootDidChangeNotification;
      * Only used when creating a persistent root as a cheap copy.
      */
     ETUUID *_cheapCopyPersistentRootUUID;
-	
 	NSDictionary *_metadata;    
     BOOL _metadataChanged;
-	
     int64_t _lastTransactionID;
-	
 	COObjectGraphContext *_currentBranchObjectGraph;
 }
 
@@ -382,6 +379,20 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * Tentative API...
  */
 - (COObjectGraphContext *)objectGraphContextForPreviewingRevision: (CORevision *)aRevision;
+
+
+/** @taskunit Description */
+
+
+/**
+ * Returns a short description to summarize the receiver.
+ */
+- (NSString *)description;
+/**
+ * Returns a multi-line description including informations about the branches,  
+ * deletion status, attached metadata and pending changes.
+ */
+- (NSString *)detailedDescription;
 
 
 /** @taskunit Deprecated */

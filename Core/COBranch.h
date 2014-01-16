@@ -363,7 +363,7 @@ extern NSString * const kCOBranchLabel;
  *
  * See also -mergingInfoForMergingRevision:
  */
-- (COMergeInfo *) mergeInfoForMergingBranch: (COBranch *)aBranch;
+- (COMergeInfo *)mergeInfoForMergingBranch: (COBranch *)aBranch;
 /**
  * Returns a merge info object representing the changes between the receiver 
  * current revision and the given revision to be merged.
@@ -381,7 +381,21 @@ extern NSString * const kCOBranchLabel;
  *
  * See also -mergingInfoForMergingBranch:.
  */
-- (COMergeInfo *) mergeInfoForMergingRevision:(CORevision *)aRevision;
+- (COMergeInfo *)mergeInfoForMergingRevision:(CORevision *)aRevision;
+
+
+/** @taskunit Description */
+
+
+/**
+ * Returns a short description to summarize the receiver.
+ */
+- (NSString *)description;
+/**
+ * Returns a multi-line description including informations about the branch kind, 
+ * deletion status, revisions and pending changes.
+ */
+- (NSString *)detailedDescription;
 
 
 @end

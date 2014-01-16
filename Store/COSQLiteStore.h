@@ -354,4 +354,18 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  */
 - (NSDictionary *) attributesForPersistentRootWithUUID: (ETUUID *)aUUID;
 
+
+/** @taskunit Description */
+
+
+/**
+ * Returns a short description to summarize the receiver.
+ */
+- (NSString *)description;
+/**
+ * Returns a multi-line description listing all the backing stores and their 
+ * revisions.
+ */
+- (NSString *)detailedDescription;
+
 @end

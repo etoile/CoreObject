@@ -107,6 +107,24 @@
 
 - (NSString *)description
 {
+	return [NSString stringWithFormat: @"<%@ %p - store: %@ (%@)>",
+		NSStringFromClass([self class]), self, [_store UUID], [_store URL]];
+}
+
+- (NSString *)detailedDescription
+{
+	NSArray *properties = A(@"modelDescriptionRepository", @"hasChanges", 
+		@"persistentRootsPendingInsertion", @"persistentRootsPendingUpdate",
+		@"persistentRootsPendingDeletion", @"persistentRootsPendingUndeletion");
+	NSMutableDictionary *options =
+		[D(properties, kETDescriptionOptionValuesForKeyPaths,
+		@"\t", kETDescriptionOptionPropertyIndent) mutableCopy];
+
+	return [self descriptionWithOptions: options];
+}
+
+- (NSString *)changeDescription
+{
 	NSMutableDictionary *changeSummary = [NSMutableDictionary dictionary];
 
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])

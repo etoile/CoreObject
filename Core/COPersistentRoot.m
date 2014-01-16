@@ -155,6 +155,26 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	return self;
 }
 
+- (NSString *)description
+{
+	return [NSString stringWithFormat: @"<%@ %p - %@>",
+		NSStringFromClass([self class]), self, _UUID];
+}
+
+- (NSString *)detailedDescription
+{
+	NSArray *properties = A(@"editingContext", @"currentBranch",
+		@"branches", @"deleted", @"modificationDate", @"creationDate",
+		@"parentPersistentRoot", @"isCopy", @"attributes", @"hasChanges",
+		@"branchesPendingInsertion", @"branchesPendingUpdate",
+		@"branchesPendingDeletion", @"branchesPendingUndeletion");
+	NSMutableDictionary *options =
+		[D(properties, kETDescriptionOptionValuesForKeyPaths,
+		@"\t", kETDescriptionOptionPropertyIndent) mutableCopy];
+
+	return [self descriptionWithOptions: options];
+}
+
 #pragma mark Persistent Root Properties -
 
 - (NSDictionary *)metadata

@@ -138,6 +138,26 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	return self;	
 }
 
+- (NSString *)description
+{
+	return [NSString stringWithFormat: @"<%@ %p - %@ (%@) - revision: %@>",
+		NSStringFromClass([self class]), self, _UUID, [self label], [[self currentRevision] UUID]];
+}
+
+- (NSString *)detailedDescription
+{
+	NSArray *properties = A(@"persistentRoot", @"rootObject",
+		@"deleted", @"currentRevision.UUID", @"headRevision.UUID",
+		@"initialRevision.UUID", @"firstRevision.UUID", @"parentBranch",
+		@"isCurrentBranch", @"isTrunkBranch", @"isCopy", @"supportsRevert",
+		@"hasChanges");
+	NSMutableDictionary *options =
+		[D(properties, kETDescriptionOptionValuesForKeyPaths,
+		@"\t", kETDescriptionOptionPropertyIndent) mutableCopy];
+
+	return [self descriptionWithOptions: options];
+}
+
 - (COEditingContext *) editingContext
 {
     return [_persistentRoot editingContext];
