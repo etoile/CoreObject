@@ -113,10 +113,15 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 {
 	NSRange characterRange = {[(COAttributedStringChunk *)anArray[0] characterIndex], 0};
 	NSUInteger lengthDelta = 0;
+	BOOL hasAttributes = NO;
 	for (COAttributedStringChunk *insertedChunk in anArray)
 	{
 		ETAssert(insertedChunk.parentString == _backing);
 		lengthDelta += insertedChunk.length;
+		if ([insertedChunk.attributes count] > 0)
+		{
+			hasAttributes = YES;
+		}
 	}
 	
 	if (lengthDelta == 0)
@@ -125,7 +130,11 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		return;
 	}
 	
-	[self edited: NSTextStorageEditedCharacters | NSTextStorageEditedAttributes range: characterRange changeInLength: lengthDelta];
+	NSUInteger mask = NSTextStorageEditedCharacters;
+	if (hasAttributes)
+		mask = mask | NSTextStorageEditedAttributes;
+	
+	[self edited: mask range: characterRange changeInLength: lengthDelta];
 }
 
 - (void)recordDeletionWithRange: (NSRange)aRange

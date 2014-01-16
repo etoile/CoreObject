@@ -104,6 +104,10 @@
                    fromGraph: (id<COItemGraph>)source
                      toGraph: (id<COItemGraph>)dest
 {
+	NILARG_EXCEPTION_TEST(aUUID);
+	NILARG_EXCEPTION_TEST(source);
+	NILARG_EXCEPTION_TEST(dest);
+	
     NSSet *uuidsToCopy = [self itemUUIDsToCopyForItemItemWithUUID: aUUID
                                                         fromGraph: source
                                                           toGraph: dest];

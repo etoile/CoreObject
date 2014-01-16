@@ -346,7 +346,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 {
 	[self checkBlock: ^() {
 		[self appendString: @"abc" htmlCode: nil toAttributedString: [objectGraph rootObject]];
-	} modifiesRange: NSMakeRange(0, 3) mask: NSTextStorageEditedCharacters | NSTextStorageEditedAttributes delta: 3 newString: @"abc"];
+	} modifiesRange: NSMakeRange(0, 3) mask: NSTextStorageEditedCharacters delta: 3 newString: @"abc"];
 
 	[self checkBlock: ^() {
 		((COAttributedStringChunk *)attributedString.chunks[0]).text = @"ac";
