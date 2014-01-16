@@ -243,16 +243,18 @@
 
 - (ETUUID *) rootUUID
 {
-    ETUUID *result = nil;
-    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT root FROM %@", [self metadataTableName]]];
-	if ([rs next])
+	if (_rootObjectUUID == nil)
 	{
-        result = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-	}
-    [rs close];
-    
-	return result;
+		FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT root FROM %@", [self metadataTableName]]];
+		if ([rs next])
+		{
+			_rootObjectUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+		}
+		[rs close];
+    }
+	return _rootObjectUUID;
 }
+
 
 - (BOOL) hasRevid: (int64_t)revid
 {

@@ -24,6 +24,11 @@
     ETUUID *_uuid;
     FMDatabase *db_;
     BOOL _shareDB;
+	
+	/**
+	 * Can be cached after being read for the first time, since it can never change
+	 */
+	ETUUID *_rootObjectUUID;
 }
 
 /**
