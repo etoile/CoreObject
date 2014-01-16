@@ -116,7 +116,7 @@ Read INSTALL.Cocoa or INSTALL.GNUstep documents.
 Mac OS X support
 ----------------
 
-CoreObject is supported on Mac OS X (10.7 or higher) and iOS.
+CoreObject is supported on Mac OS X (10.7 or higher), and iOS support is coming soon.
 
 An Xcode project is bundled to build CoreObject on Mac OS X. 
 

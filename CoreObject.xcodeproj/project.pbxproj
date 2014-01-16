@@ -514,6 +514,8 @@
 		607EB347178881E60024B34D /* CODictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODictionary.h; path = Model/CODictionary.h; sourceTree = "<group>"; };
 		607EB348178881E60024B34D /* CODictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODictionary.m; path = Model/CODictionary.m; sourceTree = "<group>"; };
 		60884D401837B09800C5C7C9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		60951A2518884A3700687CF0 /* INSTALL.Cocoa */ = {isa = PBXFileReference; lastKnownFileType = text; path = INSTALL.Cocoa; sourceTree = "<group>"; };
+		60951A2618884A3800687CF0 /* INSTALL.GNUstep */ = {isa = PBXFileReference; lastKnownFileType = text; path = INSTALL.GNUstep; sourceTree = "<group>"; };
 		60988F16163B6B7A009C4F21 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		609C00541704C24C00D01AAB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Tests/main.m; sourceTree = "<group>"; };
 		609C00581704C24C00D01AAB /* TestCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestCommon.h; path = Tests/TestCommon.h; sourceTree = "<group>"; };
@@ -1382,6 +1384,8 @@
 			children = (
 				66E62284185CF875002A22C1 /* COPYING */,
 				601977FB1860A52200635BE2 /* README.md */,
+				60951A2518884A3700687CF0 /* INSTALL.Cocoa */,
+				60951A2618884A3800687CF0 /* INSTALL.GNUstep */,
 				66982A1F11EBC2A0007154CD /* TODO */,
 				66618A8B1811C065001FA004 /* TERMINOLOGY */,
 			);
