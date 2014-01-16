@@ -561,7 +561,13 @@
 	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r1 to: r2];
 	[self checkCommand: _testTrack.nodes[3] isSetVersionFrom: r2 to: r3];
 	
+	// Check that the commit created by COUndoTrack has proper commit metadata
 	UKObjectsEqual(@"org.etoile.CoreObject.selective-undo", [[_testTrack.nodes[3] commitDescriptor] identifier]);
+	
+	// Efficiency test: the r3 commit should only have written one item to the store
+	// (root) since that was the only change.
+	COItemGraph *r3PartialItemGraph = [[ctx store] partialItemGraphFromRevisionUUID: [r2 UUID] toRevisionUUID: [r3 UUID] persistentRoot: [doc1 UUID]];
+	UKObjectsEqual(@[root.UUID], [r3PartialItemGraph itemUUIDs]);
 }
 
 - (void)testUndoCoalescing

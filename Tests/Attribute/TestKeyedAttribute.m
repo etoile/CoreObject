@@ -85,6 +85,12 @@
 
 	[model setValue: D(@"boum", @"sound") forProperty: @"entries"];
 	
+	/* Test that an exception is thrown when updating modelItem without including dictItem */
+
+	// FIXME: This clashes with COItemGraph as a delta mechanism.. unless I am missing some
+	// details, if dictItem is not present in the array passed to -insertOrUpdateItems:,
+	// the already loaded copy should be used.
+	
 	UKRaisesException([[model objectGraphContext] insertOrUpdateItems: A(modelItem)]);
 	UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
 }

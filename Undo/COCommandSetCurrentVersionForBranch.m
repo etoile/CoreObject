@@ -15,6 +15,7 @@
 #import "COBranch+Private.h"
 #import "CORevision.h"
 #import "CORevisionCache.h"
+#import "COItem.h"
 
 #import "COLeastCommonAncestor.h"
 #import "CODiffManager.h"
@@ -165,7 +166,13 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
         NSMutableArray *items = [NSMutableArray array];
         for (ETUUID *uuid in [result itemUUIDs])
         {
-            [items addObject: [result itemForUUID: uuid]];
+			COItem *replacementItem = [result itemForUUID: uuid];
+			COItem *existingItem = [[branch objectGraphContext] itemForUUID: uuid];
+			if (existingItem == nil
+				|| ![existingItem isEqual: replacementItem])
+			{
+				[items addObject: replacementItem];
+			}
         }
         
 		// FIXME: Handle cross-persistent root relationship constraint violations,

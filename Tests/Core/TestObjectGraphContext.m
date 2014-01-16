@@ -553,4 +553,19 @@
 		withUserInfo: nil];
 }
 
+- (void) testAddUnchangedItem
+{
+	[ctx1 acceptAllChanges];
+	UKFalse([ctx1 hasChanges]);
+	
+	COItem *rootItem = [ctx1 itemForUUID: [ctx1 rootItemUUID]];
+	
+	// Should be a no-op
+	[ctx1 insertOrUpdateItems: @[rootItem]];
+	
+#if 0
+	UKFalse([ctx1 hasChanges]);
+#endif
+}
+
 @end
