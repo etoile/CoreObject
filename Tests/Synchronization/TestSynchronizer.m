@@ -479,7 +479,7 @@
 	[clientWrapper replaceCharactersInRange: NSMakeRange(1,0) withString: @"b"];
 	[clientPersistentRoot commit];
 	
-	[clientWrapper replaceCharactersInRange: NSMakeRange(2,0) withString: @"b"];
+	[clientWrapper replaceCharactersInRange: NSMakeRange(2,0) withString: @"c"];
 	[clientPersistentRoot commit];
 	
 	// 3 commits on server
@@ -500,7 +500,6 @@
 	UKTrue([@"adef" isEqualToString: [serverWrapper string]]
 		   || [@"defa" isEqualToString: [serverWrapper string]]);
 	
-#if 0
 	// The client does the critical merge
 	[transport deliverMessagesToClient]; /// 4 messages. One for the server's 3 commits, and one for the result of merging the client's first change
 	UKTrue([@"abcdef" isEqualToString: [clientWrapper string]]
@@ -518,7 +517,6 @@
 	
 	UKIntsEqual(0, [[self clientMessages] count]);
 	UKIntsEqual(0, [[self serverMessages] count]);
-#endif
 }
 
 @end

@@ -76,8 +76,18 @@
 		// Rebase revs onto the current revisions
 		
 		txn = [[COStoreTransaction alloc] init];
-		NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
-													  ontoRevision: [[self.branch currentRevision] UUID]
+		
+		ETUUID *source = [(COSynchronizerRevision *)[revs lastObject] revisionUUID];
+		ETUUID *dest = [[self.branch currentRevision] UUID];
+		
+		ETUUID *lca = [COLeastCommonAncestor commonAncestorForCommit: source
+														   andCommit: dest
+													  persistentRoot: self.persistentRoot.UUID
+															   store: [self.persistentRoot store]];
+		
+		NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: source
+													  ontoRevision: dest
+													commonAncestor: lca
 												persistentRootUUID: self.persistentRoot.UUID
 														branchUUID: self.branch.UUID
 															 store: [self.persistentRoot store]

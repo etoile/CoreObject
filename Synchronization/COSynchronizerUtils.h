@@ -19,6 +19,7 @@
  */
 + (NSArray *) rebaseRevision: (ETUUID *)source
 				ontoRevision: (ETUUID *)dest
+			  commonAncestor: (ETUUID *)lca
 		  persistentRootUUID: (ETUUID *)persistentRoot
 				  branchUUID: (ETUUID *)branch
 					   store: (COSQLiteStore *)store

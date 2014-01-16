@@ -25,43 +25,37 @@
 
 + (NSArray *) rebaseRevision: (ETUUID *)source
 				ontoRevision: (ETUUID *)dest
+			  commonAncestor: (ETUUID *)lca
 		  persistentRootUUID: (ETUUID *)persistentRoot
 				  branchUUID: (ETUUID *)branch
 					   store: (COSQLiteStore *)store
 				 transaction: (COStoreTransaction *)txn
   modelDescriptionRepository: (ETModelDescriptionRepository *)repo
 {
-	ETUUID *lca = [COLeastCommonAncestor commonAncestorForCommit: source
-													   andCommit: dest
-												  persistentRoot: persistentRoot
-														   store: store];
-	
+	ETAssert(source != nil);
+	ETAssert(dest != nil);
 	ETAssert(lca != nil);
-	
+		
 	id <COItemGraph> baseGraph = [store itemGraphForRevisionUUID: lca persistentRoot: persistentRoot];
+	id <COItemGraph> destGraph = [store itemGraphForRevisionUUID: dest persistentRoot: persistentRoot];
 	
+	// Gather the revisions to rebase (between 'lca', exclusive, and 'source', inclusive)
 	NSArray *sourceRevs = [COLeastCommonAncestor revisionUUIDsFromRevisionUUIDExclusive: lca
 																toRevisionUUIDInclusive: source
 																		 persistentRoot: persistentRoot
 																				  store: store];
+	ETAssert(sourceRevs != nil);
+	ETAssert([sourceRevs count] > 0);
 	
 	NSMutableArray *newRevids = [[NSMutableArray alloc] init];
 
-	NSMutableDictionary *transactionGraphs = [[NSMutableDictionary alloc] init];
-	
 	ETUUID *currentDest = dest;
 	for (ETUUID *rev in sourceRevs)
 	{
 		id <COItemGraph> sourceGraph = [store itemGraphForRevisionUUID: rev persistentRoot: persistentRoot];
-		id <COItemGraph> currentDestGraph = transactionGraphs[currentDest];
-		if (currentDestGraph == nil)
-		{
-			currentDestGraph = [store itemGraphForRevisionUUID: currentDest persistentRoot: persistentRoot];
-			ETAssert(currentDestGraph != nil);
-		}
-		
+
 		CODiffManager *diff = [self diffForRebasingGraph: sourceGraph
-											   ontoGraph: currentDestGraph
+											   ontoGraph: destGraph
 											   baseGraph: baseGraph
 							  modelDescriptionRepository: repo];
 		
@@ -85,8 +79,6 @@
 					  mergeParentRevisionID: nil
 						 persistentRootUUID: persistentRoot
 								 branchUUID: branch];
-		transactionGraphs[nextRev] = mergeResult;
-		
 		currentDest = nextRev;
 	}
 	
