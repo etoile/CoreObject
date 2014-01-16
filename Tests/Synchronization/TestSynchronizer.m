@@ -405,6 +405,8 @@
 	UKObjectsEqual(A(S(@"b"),  S(@"b", @"u"), S(@"u")), [serverStr valueForKeyPath: @"chunks.attributes.htmlCode"]);
 }
 
+#pragma mark - COAttributedString
+
 - (void) testClientAttributedStringEdits
 {
 	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
@@ -449,6 +451,75 @@
 	UKIntsEqual(0, [[self serverMessages] count]);
 }
 
+/**
+ * For this to pass, the client and server need to use a consistent
+ * conflict resolution pattern. i.e., they must both favour the client's changes,
+ * or both favour the server's changes.
+ *
+ * It's an interesting case because the merge is split into two phases,
+ * in one the first character of the client's text ("a") is merged, and later
+ * the next two are ("bc").
+ */
+- (void) testConflictingAttributedStringInserts
+{
+	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
+	COAttributedStringWrapper *serverWrapper = [[COAttributedStringWrapper alloc] initWithBacking: serverStr];
+	[[serverBranch rootObject] setContents: S(serverStr)];
+	[serverPersistentRoot commit];
+	
+	[transport deliverMessagesToClient];
+	
+	// 3 commits on client
+	
+	COAttributedString *clientStr = [[[clientBranch rootObject] contents] anyObject];
+	COAttributedStringWrapper *clientWrapper = [[COAttributedStringWrapper alloc] initWithBacking: clientStr];
+	[clientWrapper replaceCharactersInRange: NSMakeRange(0,0) withString: @"a"];
+	[clientPersistentRoot commit];
+	
+	[clientWrapper replaceCharactersInRange: NSMakeRange(1,0) withString: @"b"];
+	[clientPersistentRoot commit];
+	
+	[clientWrapper replaceCharactersInRange: NSMakeRange(2,0) withString: @"b"];
+	[clientPersistentRoot commit];
+	
+	// 3 commits on server
+	
+	[serverWrapper replaceCharactersInRange: NSMakeRange(0,0) withString: @"d"];
+	[serverPersistentRoot commit];
+	
+	[serverWrapper replaceCharactersInRange: NSMakeRange(1,0) withString: @"e"];
+	[serverPersistentRoot commit];
+	
+	[serverWrapper replaceCharactersInRange: NSMakeRange(2,0) withString: @"f"];
+	[serverPersistentRoot commit];
+	
+	
+	// deliver 'a' to server. The client will only have sent one message, since
+	// it waits for confirmation before sending more.
+	[transport deliverMessagesToServer];
+	UKTrue([@"adef" isEqualToString: [serverWrapper string]]
+		   || [@"defa" isEqualToString: [serverWrapper string]]);
+	
+#if 0
+	// The client does the critical merge
+	[transport deliverMessagesToClient]; /// 4 messages. One for the server's 3 commits, and one for the result of merging the client's first change
+	UKTrue([@"abcdef" isEqualToString: [clientWrapper string]]
+		   || [@"defabc" isEqualToString: [clientWrapper string]]);
+	
+	// Send confirmation to server
+	[transport deliverMessagesToServer];
+	UKTrue([@"abcdef" isEqualToString: [serverWrapper string]]
+		   || [@"defabc" isEqualToString: [serverWrapper string]]);
+	
+	// Send confirmation back to client
+	[transport deliverMessagesToClient];
+	UKTrue([@"abcdef" isEqualToString: [clientWrapper string]]
+		   || [@"defabc" isEqualToString: [clientWrapper string]]);
+	
+	UKIntsEqual(0, [[self clientMessages] count]);
+	UKIntsEqual(0, [[self serverMessages] count]);
+#endif
+}
 
 @end
 

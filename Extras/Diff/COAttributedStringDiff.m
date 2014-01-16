@@ -296,7 +296,7 @@ static void coalesceOps(NSMutableArray *ops)
 
 #pragma mark - Diff Application
 
-- (void) sortOperations
+- (void) sortOperationsFavouringSourceIdentifier: (id)aSource
 {
 	[_operations sortUsingComparator: ^(id obj1, id obj2){
 		id<COAttributedStringDiffOperation> string1 = obj1;
@@ -317,6 +317,15 @@ static void coalesceOps(NSMutableArray *ops)
 		}
 		if (r1.location == r2.location)
 		{
+			if ([aSource isEqual: [string1 source]])
+			{
+				return NSOrderedAscending;
+			}
+			if ([aSource isEqual: [string2 source]])
+			{
+				return NSOrderedDescending;
+			}
+			
 			return NSOrderedSame;
 		}
 		else
@@ -333,7 +342,17 @@ static void coalesceOps(NSMutableArray *ops)
 {
 	[_operations addObjectsFromArray: aDiff.operations];
 	
-	[self sortOperations];
+	[self sortOperationsFavouringSourceIdentifier: nil];
+}
+
+- (COAttributedStringDiff *) diffByMergingWithDiff: (COAttributedStringDiff *)aDiff
+{
+	COAttributedStringDiff *result = [COAttributedStringDiff new];
+	result->_operations = [NSMutableArray new];
+	[result->_operations addObjectsFromArray: _operations];
+	[result->_operations addObjectsFromArray: [aDiff operations]];
+	[result sortOperationsFavouringSourceIdentifier: nil];
+	return result;
 }
 
 - (NSDictionary *) operationArraysByUUID
@@ -412,7 +431,9 @@ static void coalesceOps(NSMutableArray *ops)
 
 - (void) resolveConflictsFavoringSourceIdentifier: (id)aSource
 {
-	// FIXME: Implement
+	[self sortOperationsFavouringSourceIdentifier: aSource];
+	
+	// FIXME: Handle actual conflicts
 }
 
 - (NSString *)description

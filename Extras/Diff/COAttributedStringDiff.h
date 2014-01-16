@@ -28,6 +28,7 @@
 							  source: (id)source;
 
 - (void) addOperationsFromDiff: (COAttributedStringDiff *)aDiff;
+- (COAttributedStringDiff *) diffByMergingWithDiff: (COAttributedStringDiff *)aDiff;
 
 - (void) applyToAttributedString: (COAttributedString *)target;
 
