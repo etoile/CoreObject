@@ -242,6 +242,11 @@ the following situations at least:
     use ivar storage for collections (or implement custom storage data structures)
     instead of the variable storage can integrate correctly with CoreObject.
 
+  - Avoid hardcoding the model description repository in +automaticallyNotifiesObserversForKey:
+  
+    - the simplest solution could be to return NO and let subclasses override it to return YES (e.g. for the rare case, where the user wants to have hand-written accessors + automatic KVO notifications for some transient properties) 
+	- or to return NO and just forbid overriding it (since returning YES seems almost useless if we synthesize accessors, and we support @dynamic even for transient properties)
+	- check +[COObject automaticallyNotifiesObserversForKey:] doesn't break KVO notifications for transient and non-derived properties in EtoileUI subclasses
 
 - COObjectGraphContext
 

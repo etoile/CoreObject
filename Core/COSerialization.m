@@ -213,7 +213,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	}
 	else if ([value isKindOfClass: [NSDate class]])
 	{
-		/** For convenience, serialize NSDate as a int64_t using Java semantics. */
+		/* For convenience, serialize NSDate as a int64_t using Java semantics. */
 		return CODateToJavaTimestamp(value);
 	}
 	else
@@ -225,7 +225,8 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 			NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: propDesc.valueTransformerName];
 			id result = [transformer transformedValue: value];
 			
-			ETEntityDescription *resultEntityDesc = [[ETModelDescriptionRepository mainRepository] descriptionForName: NSStringFromClass([result class])];
+			ETEntityDescription *resultEntityDesc = [[[self objectGraphContext] modelDescriptionRepository]
+				entityDescriptionForClass: [result class]];
 			ETAssert([resultEntityDesc isKindOfEntity: [propDesc persistentType]]);
 			ETAssert([[[propDesc persistentType] name] isEqual: @"NSString"]); // TODO: Support the other persistent types
 			
@@ -674,7 +675,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: aPropertyDesc.valueTransformerName];
 		id result = [transformer reverseTransformedValue: value];
 		
-		ETEntityDescription *resultEntityDesc = [[ETModelDescriptionRepository mainRepository] descriptionForName: NSStringFromClass([result class])];
+		ETEntityDescription *resultEntityDesc = [[[self objectGraphContext] modelDescriptionRepository] entityDescriptionForClass: [result class]];
 		ETAssert([resultEntityDesc isKindOfEntity: [aPropertyDesc type]]);
 		
 		return result;
