@@ -125,7 +125,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		return;
 	}
 	
-	[self edited: NSTextStorageEditedCharacters range: characterRange changeInLength: lengthDelta];
+	[self edited: NSTextStorageEditedCharacters | NSTextStorageEditedAttributes range: characterRange changeInLength: lengthDelta];
 }
 
 - (void)recordDeletionWithRange: (NSRange)aRange
@@ -151,7 +151,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		characterRange.location = NSMaxRange([chunkBeforeDeletedChunk characterRange]);
 	}
 	
-	[self edited: NSTextStorageEditedCharacters range: characterRange changeInLength: -deletedChunksLength];
+	[self edited: NSTextStorageEditedCharacters | NSTextStorageEditedAttributes range: characterRange changeInLength: -deletedChunksLength];
 }
 
 - (void)recordModificationWithRange: (NSRange)aRange
@@ -184,7 +184,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	
 	NSInteger delta = insertedChunksLength - deletedChunksLength;
 	
-	[self edited: NSTextStorageEditedCharacters range: characterRange changeInLength: delta];
+	[self edited: NSTextStorageEditedCharacters | NSTextStorageEditedAttributes range: characterRange changeInLength: delta];
 	
 }
 
@@ -271,7 +271,15 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	}
 	else if ([keyPath isEqualToString: @"attributes"])
 	{
+		COAttributedStringChunk *chunk = object;
+		ETAssert([chunk isKindOfClass: [COAttributedStringChunk class]]);
 		
+		if ([change[NSKeyValueChangeOldKey] isEqual: change[NSKeyValueChangeNewKey]])
+		{
+			return;
+		}
+		
+		[self edited: NSTextStorageEditedAttributes range: [chunk characterRange] changeInLength: 0];
 	}
 }
 
