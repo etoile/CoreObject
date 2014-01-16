@@ -92,7 +92,7 @@ Key Features
 - Overall Design
 
 	- Small Code Base (~ 20 000 loc)
-	- Pretty Large Test suite (over 2300 tests)
+	- Pretty Large Test suite (over 3000 tests)
 	- High Quality API documentation
 	- Good Debugging Support 
 		 - View object graph in memory as PDF diagram (can be generated from the debugger or in code)
