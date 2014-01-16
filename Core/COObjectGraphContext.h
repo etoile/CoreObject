@@ -106,9 +106,9 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * Returns a new autoreleased transient object graph context using the given 
  * model description repository.
  *
- * See also -initWithModelRepository:.
+ * See also -initWithModelDescriptionRepository:.
  */
-+ (COObjectGraphContext *)objectGraphContextWithModelRepository: (ETModelDescriptionRepository *)aRepo;
++ (COObjectGraphContext *)objectGraphContextWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo;
 /**
  * Initializes a persistent object graph context owned by a branch.
  */
@@ -117,7 +117,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * Initializes a transient object graph context using the given model
  * description repository.
  */
-- (id)initWithModelRepository: (ETModelDescriptionRepository *)aRepo;
+- (id)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo;
 /**
  * Returns a new transient object graph context using the main model description 
  * repository.

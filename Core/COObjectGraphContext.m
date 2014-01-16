@@ -88,14 +88,14 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     return [self initWithBranch: aBranch modelDescriptionRepository: nil];
 }
 
-- (id)initWithModelRepository: (ETModelDescriptionRepository *)aRepo
+- (id)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
 {
     return [self initWithBranch: nil modelDescriptionRepository: aRepo];
 }
 
 - (id)init
 {
-    return [self initWithModelRepository: [ETModelDescriptionRepository mainRepository]];
+    return [self initWithModelDescriptionRepository: [ETModelDescriptionRepository mainRepository]];
 }
 
 + (COObjectGraphContext *)objectGraphContext
@@ -103,9 +103,9 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     return [[self alloc] init];
 }
 
-+ (COObjectGraphContext *)objectGraphContextWithModelRepository: (ETModelDescriptionRepository *)aRepo
++ (COObjectGraphContext *)objectGraphContextWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
 {
-    return [[self alloc] initWithModelRepository: aRepo];
+    return [[self alloc] initWithModelDescriptionRepository: aRepo];
 }
 
 - (NSString *)description
