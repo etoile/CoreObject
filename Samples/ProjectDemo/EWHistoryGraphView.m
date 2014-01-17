@@ -9,6 +9,7 @@
 
 @implementation EWHistoryGraphView
 
+#if 0
 - (id) initWithFrame:(NSRect)frame
 {
     self = [super initWithFrame:frame];
@@ -242,5 +243,6 @@
 //    
 //    [doc loadStateToken: [[[[doc currentPersistentRoot] editingBranch] currentRevision] revisionID]];
 //}
+#endif
 
 @end

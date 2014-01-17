@@ -1,208 +1,11 @@
 #import "EWGraphRenderer.h"
 #import <EtoileFoundation/Macros.h>
 #import <CoreObject/CoreObject.h>
+#import <CoreObject/CORevisionCache.h>
 
 @implementation EWGraphRenderer
 
-static NSInteger visit(NSDictionary *childrenForUUID, CORevision *currentRevision, NSInteger currentLevel, NSMutableDictionary *levelForUUID)
-{
-	//NSLog(@"visiting %@", currentRevision);
-	
-	NSNumber *currentSavedLevel = [levelForUUID objectForKey: [currentRevision UUID]];
-	if (currentSavedLevel != nil)
-	{
-		//NSLog(@"%@ already has a level %@", currentRevision, currentSavedLevel);
-		return 0;
-	}
-	else
-	{
-		[levelForUUID setObject: [NSNumber numberWithInteger: currentLevel]
-						 forKey: [currentRevision UUID]];
-	}
-	
-	
-	NSArray *children = [childrenForUUID objectForKey: [currentRevision UUID]];
-	assert(children != nil);
-	
-	NSInteger maxLevelUsed = currentLevel - 1;
-	for (CORevision *child in children)
-	{
-		NSInteger childMax = 
-			visit(childrenForUUID, child, maxLevelUsed + 1, levelForUUID);
-		
-		if (childMax > maxLevelUsed)
-		{
-			maxLevelUsed = childMax;
-		}
-	}
-	return MAX(currentLevel, maxLevelUsed);
-}
-
-- (NSArray *) sortedCommits: (NSSet *)commits
-{
-    return [[commits allObjects] sortedArrayUsingComparator: ^(id obj1, id obj2) {
-        CORevision *obj1Info = obj1;
-        CORevision *obj2Info = obj2;
-        
-        return [[obj1Info date] compare: [obj2Info date]];
-    }];
-}
-
-- (id) initWithCommits: (NSSet*)stateTokens
-         branchCommits: (NSSet*)branchCommits
-         currentCommit: (CORevision*)currentCommit
-                 store: (COSQLiteStore*)aStore
-{
-	SUPERINIT;
-	store =  aStore;
-    
-    allCommitsSorted =  [NSMutableArray arrayWithArray: [self sortedCommits: stateTokens]];
-    currentCommit_ =  currentCommit;
-    branchCommits_ =  branchCommits;
-    
-    [self layoutGraph];
-	return self;
-}
-
-- (COSQLiteStore *)store
-{
-	return store;
-}
-
-
-- (CORevision*) parentForRevison: (CORevision*)aRevID
-{
-    // N.B.: Accesses disk. Insert a cache / run graph rendering in a thread in the future
-    return [aRevID parentRevision];
-}
-
-- (void) layoutGraph
-{
-	//
-	// Now we just have to decide on the Y position of each node.
-	//
-	
-	// find children for each commit (retaining sorted order)
-	// this is the "display" graph
-		
-	childrenForUUID =  [NSMutableDictionary dictionaryWithCapacity: [allCommitsSorted count]];
-	
-	for (CORevision *aCommit in allCommitsSorted)
-	{
-		[childrenForUUID setObject: [NSMutableArray array] forKey: [aCommit UUID]];
-	}
-	for (CORevision *aCommit in allCommitsSorted)
-	{
-		CORevision *aParent = [self parentForRevison: aCommit];
-		if (aParent != nil)
-		{
-			NSMutableArray *children = [childrenForUUID objectForKey: [aParent UUID]];
-			if (children != nil)
-				[children addObject: aCommit];
-		}
-        
-        CORevision *mergeParent = [aCommit mergeParentRevision];
-        if (mergeParent != nil)
-        {
-            NSLog(@"merge parent of %@ is %@", aCommit, mergeParent);
-            [[childrenForUUID objectForKey: [mergeParent UUID]] addObject: aCommit];
-        }
-	}
-
-	// remove commits which have no children/parents
-	
-//	for (CORevision *aCommit in [NSArray arrayWithArray: allCommitsSorted])
-//	{
-//		if ([[childrenForUUID objectForKey: aCommit] count] == 0 &&
-//			[self parentForRevison: aCommit] == nil)
-//		{
-//			//NSLog(@"removed %@ because it had no parents/children (%d)", 
-//			//	  aCommit, (int)[allCommitsSorted indexOfObject: aCommit]);
-//			[allCommitsSorted removeObject: aCommit];
-//
-//		}
-//	}
-	
-	
-	// some nodes should have more than 1 child
-	
-	for (CORevision *aCommit in allCommitsSorted)
-	{
-		//NSLog(@"%@ children: %@", aCommit, [childrenForUUID objectForKey: aCommit]);
-	}
-	
-	
-	// find roots
-	
-	NSMutableArray *roots = [NSMutableArray array];
-	for (CORevision *aCommit in allCommitsSorted)
-	{
-		CORevision *aParent = [self parentForRevison: aCommit];
-		if (nil == aParent)
-		{
-			[roots addObject: aCommit];
-		}
-	}
-	
-	//NSLog(@"Graph drawing:: %d roots", (int)[roots count]);
-	
-	//
-	// now to find the Y position, we do a DFS on the display graph.
-	// the first root gets assigned level 0. when we visit a node,
-	// the first child gets assigned to the current level, the second
-	// child gets the current level + 1, etc. then we just visit the children
-	// in order.
-	//
-
-	// FIXME: we need to do some extra work to handle the case when
-	// a DAG in the forest has more than one root. this should be rare in practice,
-	// because it means you merged two projects that started from scratch with no common
-	// ancestor. but we should still support drawing graphs with that.
-
-	levelForUUID =  [NSMutableDictionary dictionary];
-
-	NSInteger maxLevel = 0;
-	for (CORevision *root in roots)
-	{
-		//NSLog(@"Starting root %@ at %d", root, (int)maxLevel);
-		maxLevel = visit(childrenForUUID, root, maxLevel, levelForUUID) + 1;
-	}
-	
-	//NSLog(@"graph output:");
-	
-	maxLevelUsed = 0;
-	for (CORevision *aCommit in allCommitsSorted)
-	{
-		NSNumber *levelObj = [levelForUUID objectForKey: [aCommit UUID]];
-		assert(levelObj != nil);
-		NSInteger level = [levelObj integerValue];
-		
-		if (level > maxLevelUsed)
-			maxLevelUsed = level;
-		
-		//NSLog(@"%d", (int)level);
-	}
-	
-	// sanity check: Every object's parent must appear to its left.
-	
-//	{
-//		NSInteger i;
-//		for (i=0; i<[allCommitsSorted count]; i++)
-//		{
-//			CORevision *aCommit = [allCommitsSorted objectAtIndex: i];
-//			CORevision *aCommitParent = [self parentForRevison: aCommit];
-//			
-//			if (aCommitParent != nil)
-//			{
-//				NSUInteger j = [allCommitsSorted indexOfObject: aCommitParent];
-//				assert(j != NSNotFound);
-//				assert(j < i);
-//			}
-//		}
-//	}
-	
-	
-}
+#if 0
 
 - (NSArray *) commits
 {
@@ -226,40 +29,6 @@ static NSInteger visit(NSDictionary *childrenForUUID, CORevision *currentRevisio
 	NSRect cellRect = NSMakeRect(col * 32, row * 32, 16, 16);
 	
 	return cellRect;
-}
-
-static void EWDrawHorizontalArrowOfLength(CGFloat length)
-{
-	const CGFloat cap = 8;
-	NSBezierPath *path = [NSBezierPath bezierPath];
-	[path moveToPoint: NSMakePoint(0, 0)];
-	[path lineToPoint: NSMakePoint(length - cap, 0)];
-	[path stroke];
-	
-	[path removeAllPoints];
-	[path moveToPoint: NSMakePoint(length - cap, cap / 2.0)];
-	[path lineToPoint: NSMakePoint(length - cap, cap / -2.0)];
-	[path lineToPoint: NSMakePoint(length, 0)];
-	[path closePath];
-	[path fill];
-}
-
-#define EWRandFloat() (rand()/(CGFloat)(RAND_MAX))
-
-static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
-{	
-	[NSGraphicsContext saveGraphicsState];
-	
-	//[[NSColor colorWithCalibratedHue:EWRandFloat() saturation:1 brightness:0.5 alpha:0.5] set];
-	
-	NSAffineTransform *xform = [NSAffineTransform transform];
-	[xform translateXBy:p1.x yBy:p1.y];
-	[xform rotateByRadians: atan2(p2.y-p1.y, p2.x-p1.x)];
-	[xform concat];
-
-	EWDrawHorizontalArrowOfLength(sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2)));
-	
-	[NSGraphicsContext restoreGraphicsState];
 }
 
 - (NSColor *)colorForCommit: (CORevision *)aCommit
@@ -337,6 +106,273 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 		}
 	}
 	return nil;
+}
+#endif
+
+#pragma mark - New code
+
+static NSArray *RevisionInfosChronological(NSSet *commits)
+{
+    return [[commits allObjects] sortedArrayUsingComparator: ^(id obj1, id obj2) {
+        CORevisionInfo *obj1Info = obj1;
+        CORevisionInfo *obj2Info = obj2;
+        
+        return [[obj2Info date] compare: [obj1Info date]];
+    }];
+}
+
+static NSSet *RevisionInfoSet(COPersistentRoot *proot)
+{
+	NSMutableSet *revisionInfos = [NSMutableSet new];
+	for (COBranch *branch in proot.branches)
+	{
+		[revisionInfos addObjectsFromArray:
+		 [proot.store revisionInfosForBranchUUID: branch.UUID
+										 options: COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions]];
+	}
+	return revisionInfos;
+}
+
+- (void) buildRevisionInfoForUUID
+{
+	ETAssert(revisionInfosChronological != nil);
+	revisionInfoForUUID = [NSMutableDictionary new];
+	for (CORevisionInfo *info in revisionInfosChronological)
+	{
+		revisionInfoForUUID[info.revisionUUID] = info;
+	}
+}
+
+- (void) buildRevisionInfosChronological
+{
+	NSSet *revisionInfoSet = RevisionInfoSet(persistentRoot);
+	revisionInfosChronological = RevisionInfosChronological(revisionInfoSet);
+}
+
+- (void) buildChildrenForUUID
+{
+	ETAssert(revisionInfosChronological != nil);
+	childrenForUUID = [NSMutableDictionary dictionaryWithCapacity: [revisionInfosChronological count]];
+	
+	for (CORevisionInfo *aCommit in revisionInfosChronological)
+	{
+		childrenForUUID[aCommit.revisionUUID] = [NSMutableArray new];
+	}
+	for (CORevisionInfo *aCommit in revisionInfosChronological)
+	{
+		if (aCommit.parentRevisionUUID != nil)
+		{
+			[childrenForUUID[aCommit.parentRevisionUUID] addObject: aCommit.revisionUUID];
+		}
+		if (aCommit.mergeParentRevisionUUID != nil)
+		{
+			[childrenForUUID[aCommit.mergeParentRevisionUUID] addObject: aCommit.revisionUUID];
+		}
+	}
+}
+
+- (NSArray *) childrenForUUID: (ETUUID *)aUUID
+{
+	return childrenForUUID[aUUID];
+}
+
+- (NSArray *) graphRootUUIDS
+{
+	ETAssert(childrenForUUID != nil);
+	
+	NSMutableArray *roots = [NSMutableArray array];
+	for (CORevisionInfo *aCommit in revisionInfosChronological)
+	{
+		if (nil == [self childrenForUUID: aCommit.parentRevisionUUID]
+			&& nil == [self childrenForUUID: aCommit.mergeParentRevisionUUID])
+		{
+			[roots addObject: aCommit.revisionUUID];
+		}
+	}
+	return roots;
+}
+
+- (NSInteger) maxLevelForDrawingGraphFromUUID: (ETUUID *)currentRevision
+								 currentLevel: (NSInteger)currentLevel
+{
+	//NSLog(@"visiting %@", currentRevision);
+	
+	NSNumber *currentSavedLevel = levelForUUID[currentRevision];
+	if (currentSavedLevel != nil)
+	{
+		//NSLog(@"%@ already has a level %@", currentRevision, currentSavedLevel);
+		return currentLevel;
+	}
+	else
+	{
+		levelForUUID[currentRevision] = @(currentLevel);
+	}
+	
+	NSArray *children = [self childrenForUUID: currentRevision];
+	ETAssert(children != nil);
+	
+	NSInteger maxLevelUsed = currentLevel - 1;
+	for (ETUUID *child in children)
+	{
+		maxLevelUsed = [self maxLevelForDrawingGraphFromUUID: child currentLevel: maxLevelUsed + 1];
+	}
+	return MAX(currentLevel, maxLevelUsed);
+}
+
+- (void) buildLevelForUUID
+{
+	NSArray *roots = [self graphRootUUIDS];
+	
+	// now to find the Y position, we do a DFS on the display graph.
+	// the first root gets assigned level 0. when we visit a node,
+	// the first child gets assigned to the current level, the second
+	// child gets the current level + 1, etc. then we just visit the children
+	// in order.
+	//
+	
+	// FIXME: we need to do some extra work to handle the case when
+	// a DAG in the forest has more than one root. this should be rare in practice,
+	// because it means you merged two projects that started from scratch with no common
+	// ancestor. but we should still support drawing graphs with that.
+	
+	levelForUUID =  [NSMutableDictionary dictionary];
+	
+	NSInteger maxLevel = 0;
+	for (ETUUID *root in roots)
+	{
+		//NSLog(@"Starting root %@ at %d", root, (int)maxLevel);
+		maxLevel = [self maxLevelForDrawingGraphFromUUID: root currentLevel: maxLevel] + 1;
+	}
+}
+
+- (void) updateWithProot: (COPersistentRoot *)aproot
+{
+	persistentRoot = aproot;
+
+	[self buildRevisionInfosChronological];
+	[self buildRevisionInfoForUUID];
+	[self buildChildrenForUUID];
+	[self buildLevelForUUID];
+}
+
+- (NSUInteger) count
+{
+	return [revisionInfosChronological count];
+}
+
+- (CORevision *) revisionAtIndex: (NSUInteger)index
+{
+	CORevisionInfo *info = revisionInfosChronological[index];
+	return [CORevisionCache revisionForRevisionUUID: info.revisionUUID
+								 persistentRootUUID: persistentRoot.UUID
+										  storeUUID: persistentRoot.store.UUID];
+}
+
+#pragma mark - Drawing
+
+static void EWDrawHorizontalArrowOfLength(CGFloat length)
+{
+	const CGFloat cap = 8;
+	NSBezierPath *path = [NSBezierPath bezierPath];
+	[path moveToPoint: NSMakePoint(0, 0)];
+	[path lineToPoint: NSMakePoint(length - cap, 0)];
+	[path stroke];
+	
+	[path removeAllPoints];
+	[path moveToPoint: NSMakePoint(length - cap, cap / 2.0)];
+	[path lineToPoint: NSMakePoint(length - cap, cap / -2.0)];
+	[path lineToPoint: NSMakePoint(length, 0)];
+	[path closePath];
+	[path fill];
+}
+
+#define EWRandFloat() (rand()/(CGFloat)(RAND_MAX))
+
+static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
+{
+	[NSGraphicsContext saveGraphicsState];
+	
+	NSAffineTransform *xform = [NSAffineTransform transform];
+	[xform translateXBy:p1.x yBy:p1.y];
+	[xform rotateByRadians: atan2(p2.y-p1.y, p2.x-p1.x)];
+	[xform concat];
+	
+	EWDrawHorizontalArrowOfLength(sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2)));
+	
+	[NSGraphicsContext restoreGraphicsState];
+}
+
+- (NSRect) circleRectAtLevel: (NSInteger)level inRect: (NSRect)aRect
+{
+	aRect.size.width = aRect.size.height;
+	aRect = NSInsetRect(aRect, 3, 3);
+	
+	aRect.origin.x += level * (2.5 * aRect.size.width);
+	return aRect;
+}
+
+- (NSRect) rectForUUID: (ETUUID *)commit currentRow: (NSUInteger)row inRect: (NSRect)aRect
+{
+	const NSInteger level = [levelForUUID[commit] integerValue];
+	const NSInteger rowToDraw = [revisionInfosChronological indexOfObject: revisionInfoForUUID[commit]];
+	
+	NSRect currentRowRect = [self circleRectAtLevel: level inRect: aRect];
+	
+	currentRowRect.origin.y += ((NSInteger)rowToDraw - row) * aRect.size.height;
+	
+	return currentRowRect;
+}
+
+- (void) drawLineFromUUID: (ETUUID *)commit1 toUUID: (ETUUID *)commit2 currentRow: (NSUInteger)row inRect: (NSRect)aRect
+{
+	NSRect r = [self rectForUUID: commit1 currentRow: row inRect: aRect];
+	NSRect r2 = [self rectForUUID: commit2 currentRow: row inRect: aRect];
+	
+	NSPoint p = NSMakePoint(r.origin.x + r.size.width/2, r.origin.y + r.size.height/2);
+	NSPoint p2 = NSMakePoint(r2.origin.x + r2.size.width/2, r2.origin.y + r2.size.height/2);
+	
+	EWDrawArrowFromTo(p, p2);
+	
+//	NSBezierPath *bp = [NSBezierPath bezierPath];
+//	[bp moveToPoint: p];
+//	[bp lineToPoint: p2];
+//	[bp stroke];
+}
+
+- (void) drawLinesRecursive: (ETUUID *)commit currentRow: (NSUInteger)row inRect: (NSRect)aRect
+{
+	for (ETUUID *child in [self childrenForUUID: commit])
+	{
+		[self drawLineFromUUID: commit toUUID: child currentRow: row inRect: aRect];
+	}
+	
+	// Draw the lines for parents until we hit level 0;
+	CORevisionInfo *revisionInfo = revisionInfoForUUID[commit];
+	
+	if (revisionInfo.parentRevisionUUID != nil)
+	{
+		[self drawLinesRecursive: revisionInfo.parentRevisionUUID currentRow: row inRect: aRect];
+	}
+	
+	if (revisionInfo.mergeParentRevisionUUID != nil)
+	{
+		[self drawLinesRecursive: revisionInfo.mergeParentRevisionUUID currentRow: row inRect: aRect];
+	}
+}
+
+- (void) drawRevisionAtIndex: (NSUInteger)index inRect: (NSRect)aRect
+{
+	CORevisionInfo *revisionInfo = revisionInfosChronological[index];
+	ETUUID *commit = [revisionInfo revisionUUID];
+	const NSInteger level = [levelForUUID[commit] integerValue];
+
+	[[NSColor blueColor] set];
+	
+	NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect: [self circleRectAtLevel: level inRect: aRect]];
+	[circle setLineWidth: 1];
+	[circle stroke];
+	
+	[self drawLinesRecursive: commit currentRow: index inRect: aRect];
 }
 
 @end

@@ -1,6 +1,7 @@
 #import "EWHistoryWindowController.h"
 #import "Document.h"
 #import <CoreObject/CoreObject.h>
+#import "EWGraphRenderer.h"
 
 @implementation EWHistoryWindowController
 
@@ -10,6 +11,13 @@
     if (self) {
     }
     return self;
+}
+
+-(void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver: self
+                                                    name: COPersistentRootDidChangeNotification
+                                                  object: persistentRoot];
 }
 
 + (EWHistoryWindowController *) sharedController
@@ -23,8 +31,6 @@
 
 - (void) awakeFromNib
 {
-    [self setShouldCascadeWindows: NO];
-    [self setWindowFrameAutosaveName: @"pannerWindow"];
 }
 
 - (void) setInspectedWindowController: (EWDocumentWindowController *)aDoc
@@ -34,41 +40,66 @@
 
 - (void) storePersistentRootMetadataDidChange: (NSNotification *)notif
 {
-    NSLog(@"history window: view did change: %@", notif);
-    
-    [self updateWithProot: persistentRoot_
-                    store: [persistentRoot_ store]];
+    [self updateTable];
 }
 
 - (void) setPersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self
                                                     name: COPersistentRootDidChangeNotification
-                                                  object: persistentRoot_];
+                                                  object: persistentRoot];
     
-    persistentRoot_ =  aPersistentRoot;
+    persistentRoot = aPersistentRoot;
     
-    COBranch *branch = [persistentRoot_ currentBranch];
-
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(storePersistentRootMetadataDidChange:)
                                                  name: COPersistentRootDidChangeNotification
-                                               object: aPersistentRoot];
+                                               object: persistentRoot];
 	
     //NSLog(@"current branch: %@ has %d commits.g v %@", branch, (int)[[branch allCommits] count], graphView_);
     
-    [self updateWithProot: persistentRoot_ store: [persistentRoot_ store]];
+    [self updateTable];
 }
 
-- (void) updateWithProot: (COPersistentRoot *)proot
-                   store: (COSQLiteStore *)store
+- (void) updateTable
 {
-	[graphView_ setPersistentRoot: persistentRoot_ branch: [proot currentBranch] store: [persistentRoot_ store]];
+	NSLog(@"history window: updating: %@", persistentRoot);
+	[graphRenderer updateWithProot: persistentRoot];
+	[tableView reloadData];
 }
 
-- (void) sliderChanged: (id)sender
+/* NSTableViewDataSource */
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    NSLog(@"%lf", [sender doubleValue]);
+	return [graphRenderer count];
+}
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+	CORevision *revision = [graphRenderer revisionAtIndex: row];
+	
+    if ([[tableColumn identifier] isEqual: @"graph"])
+    {
+        return @(row);
+    }
+    else if ([[tableColumn identifier] isEqual: @"description"])
+    {
+        return [revision localizedShortDescription];
+    }
+    else if ([[tableColumn identifier] isEqual: @"author"])
+    {
+		return [revision metadata][@"username"];
+    }
+	else if ([[tableColumn identifier] isEqual: @"date"])
+	{
+		return [revision date];
+	}
+	
+    return nil;
+}
+
+- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
 }
 
 @end

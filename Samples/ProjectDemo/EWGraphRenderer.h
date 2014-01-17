@@ -3,32 +3,19 @@
 
 @interface EWGraphRenderer : NSObject
 {
-	NSSize size;
-	NSMutableArray *allCommitsSorted;
+	NSArray *revisionInfosChronological;
+	NSMutableDictionary *revisionInfoForUUID;
 	NSMutableDictionary *childrenForUUID;
 	NSMutableDictionary *levelForUUID;
-	NSUInteger maxLevelUsed;
-	COSQLiteStore *store;
-    
-    // Used for coloring the graph
-    CORevision *currentCommit_;
-    NSSet *branchCommits_;
+	
+	COPersistentRoot *persistentRoot;
 }
 
-- (id) initWithCommits: (NSSet*)stateTokens
-         branchCommits: (NSSet*)tokensOnBranch
-         currentCommit: (CORevision*)currentCommit
-                 store: (COSQLiteStore*)aStore;
-- (void) layoutGraph;
+- (void) updateWithProot: (COPersistentRoot *)proot;
 
-- (COSQLiteStore *)store;
+- (NSUInteger) count;
+- (CORevision *) revisionAtIndex: (NSUInteger)index;
+- (void) drawRevisionAtIndex: (NSUInteger)index inRect: (NSRect)aRect;
 
-- (NSSize) size;
-- (void) drawWithHighlightedCommit: (CORevision *)aCommit;
-
-- (CORevision *)commitAtPoint: (NSPoint)aPoint;
-
-- (NSRect) rectForCommit:(CORevision *)aCommit;
-- (NSArray *) commits;
 
 @end

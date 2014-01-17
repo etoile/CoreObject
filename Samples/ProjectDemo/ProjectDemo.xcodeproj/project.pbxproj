@@ -96,6 +96,7 @@
 		66D737881825973A0023692B /* EWGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C74181AF40400BDD213 /* EWGraphRenderer.m */; };
 		66DBB3781813B1A80047301A /* PreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66DBB3771813B1A80047301A /* PreferencesController.m */; };
 		66DBB3831813B1BB0047301A /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66DBB3821813B1BB0047301A /* Preferences.xib */; };
+		66F1800918890E040046A951 /* EWGraphCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 66F1800818890E040046A951 /* EWGraphCell.m */; };
 		7991190512CD3D75009D28C0 /* ProjectNavWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7991190412CD3D75009D28C0 /* ProjectNavWindowController.m */; };
 		7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7991191412CD3F3C009D28C0 /* 2560x1600.jpg */; };
 		7991198A12CD4B72009D28C0 /* stamp.png in Resources */ = {isa = PBXBuildFile; fileRef = 7991198912CD4B72009D28C0 /* stamp.png */; };
@@ -406,6 +407,8 @@
 		66DBB3761813B1A80047301A /* PreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesController.h; sourceTree = "<group>"; };
 		66DBB3771813B1A80047301A /* PreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesController.m; sourceTree = "<group>"; };
 		66DBB3821813B1BB0047301A /* Preferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
+		66F1800718890E040046A951 /* EWGraphCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWGraphCell.h; sourceTree = "<group>"; };
+		66F1800818890E040046A951 /* EWGraphCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWGraphCell.m; sourceTree = "<group>"; };
 		7991190312CD3D75009D28C0 /* ProjectNavWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectNavWindowController.h; sourceTree = "<group>"; };
 		7991190412CD3D75009D28C0 /* ProjectNavWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectNavWindowController.m; sourceTree = "<group>"; };
 		7991191412CD3F3C009D28C0 /* 2560x1600.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = 2560x1600.jpg; path = Images/2560x1600.jpg; sourceTree = "<group>"; };
@@ -877,6 +880,8 @@
 				667C6C76181AF40400BDD213 /* EWHistoryGraphView.m */,
 				667C6C77181AF40400BDD213 /* EWHistoryWindowController.h */,
 				667C6C78181AF40400BDD213 /* EWHistoryWindowController.m */,
+				66F1800718890E040046A951 /* EWGraphCell.h */,
+				66F1800818890E040046A951 /* EWGraphCell.m */,
 			);
 			name = "History Inspector";
 			sourceTree = "<group>";
@@ -1173,6 +1178,7 @@
 				79911A4C12CDAECD009D28C0 /* SKTRectangle.m in Sources */,
 				661211D91821A568003AEC29 /* XMPPIQ.m in Sources */,
 				79911A4D12CDAECD009D28C0 /* SKTRenderingView.m in Sources */,
+				66F1800918890E040046A951 /* EWGraphCell.m in Sources */,
 				79911A4E12CDAECD009D28C0 /* SKTTextArea.m in Sources */,
 				79911A5012CDAECD009D28C0 /* SKTFoundationExtras.m in Sources */,
 				79911A5112CDAECD009D28C0 /* SKTGraphicView.m in Sources */,
