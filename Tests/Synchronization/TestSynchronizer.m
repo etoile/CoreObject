@@ -451,6 +451,13 @@
 	UKIntsEqual(0, [[self serverMessages] count]);
 }
 
+- (NSString *)stringForRevision: (CORevision *)aRevision persistentRoot: (COPersistentRoot *)proot
+{
+	COObjectGraphContext *graph = [proot objectGraphContextForPreviewingRevision: aRevision];
+	COAttributedStringWrapper *wrapper = [[COAttributedStringWrapper alloc] initWithBacking: [[[graph rootObject] contents] anyObject]];
+	return [wrapper string];
+}
+
 /**
  * For this to pass, the client and server need to use a consistent
  * conflict resolution pattern. i.e., they must both favour the client's changes,
@@ -481,6 +488,8 @@
 	
 	[clientWrapper replaceCharactersInRange: NSMakeRange(2,0) withString: @"c"];
 	[clientPersistentRoot commit];
+	CORevision *clientABCrev = clientPersistentRoot.currentRevision;
+	
 	
 	// 3 commits on server
 	
@@ -500,10 +509,52 @@
 	UKTrue([@"adef" isEqualToString: [serverWrapper string]]
 		   || [@"defa" isEqualToString: [serverWrapper string]]);
 	
+	
 	// The client does the critical merge
-	[transport deliverMessagesToClient]; /// 4 messages. One for the server's 3 commits, and one for the result of merging the client's first change
+	
+	/**
+	 * Messages 1-3 are pushes from the server for the server's "a", "ab", "abc"
+	 * commits. The client ignores these because it is waiting for a response to its push.
+	 * Message 4 is the response to the client's push
+	 */
+	UKIntsEqual(4, [[self clientMessages] count]);
+	UKIntsEqual(0, [[self serverMessages] count]);
+	
+	/**
+	 * The client gets a revision with "defa" or "adef", and then rebases 2
+	 * commits ("ab", "abc") on top of that to get ("defa", "defab", "defabc")
+	 * or ("adef", "abdef", "abcdef")
+	 */
+	[transport deliverMessagesToClient];
+		
 	UKTrue([@"abcdef" isEqualToString: [clientWrapper string]]
 		   || [@"defabc" isEqualToString: [clientWrapper string]]);
+	
+	// Check the new client history graph
+	
+	CORevision *client_DEFABC_Revision = clientPersistentRoot.currentRevision;
+	CORevision *client_DEFAB_Revision = client_DEFABC_Revision.parentRevision;
+	CORevision *client_DEFA_Revision = client_DEFAB_Revision.parentRevision;
+	CORevision *client_DEF_Revision = client_DEFA_Revision.parentRevision;
+	CORevision *client_DE_Revision = client_DEF_Revision.parentRevision;
+	CORevision *client_D_Revision = client_DE_Revision.parentRevision;
+
+	NSString *client_DEFABC_String = [self stringForRevision: client_DEFABC_Revision persistentRoot: clientPersistentRoot];
+	NSString *client_DEFAB_String = [self stringForRevision: client_DEFAB_Revision persistentRoot: clientPersistentRoot];
+	NSString *client_DEFA_String = [self stringForRevision: client_DEFA_Revision persistentRoot: clientPersistentRoot];
+	NSString *client_DEF_String = [self stringForRevision: client_DEF_Revision persistentRoot: clientPersistentRoot];
+	NSString *client_DE_String = [self stringForRevision: client_DE_Revision persistentRoot: clientPersistentRoot];
+	NSString *client_D_String = [self stringForRevision: client_D_Revision persistentRoot: clientPersistentRoot];
+
+	UKTrue([@"abcdef" isEqualToString: client_DEFABC_String]
+		   || [@"defabc" isEqualToString: client_DEFABC_String]);
+	UKTrue([@"abdef" isEqualToString: client_DEFAB_String]
+		   || [@"defab" isEqualToString: client_DEFAB_String]);
+	UKTrue([@"adef" isEqualToString: client_DEFA_String]
+		   || [@"defa" isEqualToString: client_DEFA_String]);
+	UKTrue([@"def" isEqualToString: client_DEF_String]);
+	UKTrue([@"de" isEqualToString: client_DE_String]);
+	UKTrue([@"d" isEqualToString: client_D_String]);
 	
 	// Send confirmation to server
 	[transport deliverMessagesToServer];
