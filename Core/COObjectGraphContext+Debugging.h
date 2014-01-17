@@ -7,6 +7,12 @@
 
 #import <CodeObject/COObjectGraphContext.h>
 
+/** 
+ * @group Debugging
+ * @abstract Change tracking debugging additions related to COObjectGraphContext
+ *
+ * This category isn't part of the official public API. 
+ */
 @interface COObjectGraphContext (CODebugging)
 
 /**
