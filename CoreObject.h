@@ -83,3 +83,7 @@
 #import <CoreObject/COError.h>
 #import <CoreObject/COTrack.h>
 #import <CoreObject/COPersistentObjectContext.h>
+
+/* Debugging */
+
+#import <CoreObject/COObjectGraphContext+Debugging.h>

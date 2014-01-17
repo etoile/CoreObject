@@ -334,17 +334,4 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  */
 - (id)loadedObjectForUUID: (ETUUID *)aUUID;
 
-
-/** @taskunit Debugging */
-
-
-/**
- * A table listing the properties updated per object since change tracking was
- * cleared.
- *
- * Useful to debug the object changes reported to the context since the last 
- * commit.
- */
-@property (nonatomic, readonly) NSDictionary *updatedPropertiesByUUID;
-
 @end

@@ -57,7 +57,6 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 @implementation COObjectGraphContext
 
 @synthesize modelDescriptionRepository = _modelDescriptionRepository;
-@synthesize	updatedPropertiesByUUID = _updatedPropertiesByUUID;
 @synthesize insertedObjectUUIDs = _insertedObjectUUIDs;
 @synthesize updatedObjectUUIDs = _updatedObjectUUIDs;
 
@@ -631,6 +630,11 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 - (NSArray *)changedObjects
 {
 	return [self loadedObjectsForUUIDs: [[self changedObjectUUIDs] allObjects]];
+}
+
+- (NSDictionary *)updatedPropertiesByUUID
+{
+	return _updatedPropertiesByUUID;
 }
 
 #pragma mark -
