@@ -471,7 +471,7 @@
 	[ctx2 setItemGraph: ctx1];
 	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
 	child1.label = @"child1";
-	[[ctx2 rootObject] setContents: @[child1]];
+	[(OutlineItem *)[ctx2 rootObject] setContents: @[child1]];
 	
 	[self checkBlock: ^{
 		// Load those changes into ctx1. Should post a notifcation.
@@ -492,7 +492,7 @@
 	[ctx2 setItemGraph: ctx1];
 	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
 	child1.label = @"child1";
-	[[ctx2 rootObject] setContents: @[child1]];
+	[(OutlineItem *)[ctx2 rootObject] setContents: @[child1]];
 	
 	NSArray *exportedItems = @[[ctx2 itemForUUID: ctx2.rootItemUUID],
 							   [ctx2 itemForUUID: child1.UUID]];
@@ -533,7 +533,7 @@
 	[altCtx setItemGraph: ctx1];
 	OutlineItem *obj1 = [[OutlineItem alloc] initWithObjectGraphContext: altCtx];
 	OutlineItem *obj2 = [[OutlineItem alloc] initWithObjectGraphContext: altCtx];
-	[[altCtx rootObject] setContents: @[obj1]];
+	[(OutlineItem *)[altCtx rootObject] setContents: @[obj1]];
 	obj1.contents = @[obj2];
 		
 	// FIXME: These are not very good tests
