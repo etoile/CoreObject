@@ -31,6 +31,13 @@ in the Scheme menu.
 For a more complex demo, open Samples/ProjectDemo/ProjectDemo.xcodeproj and 
 choose ProjectDemo in the Scheme menu.
 
+To install in /Library/Frameworks, do the build in the shell: 
+
+sudo xcodebuild -scheme CoreObject -configuration Release clean install DSTROOT=/Library INSTALL_PATH=/Frameworks
+
+**Note:** By default, INSTALL_PATH is set to @rpath and DSTROOT to the project 
+directory.
+
 
 Test suite
 ----------
