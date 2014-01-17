@@ -510,6 +510,7 @@
 		601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+GarbageCollection.h"; path = "Core/COObjectGraphContext+GarbageCollection.h"; sourceTree = "<group>"; };
 		601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObjectGraphContext+GarbageCollection.m"; path = "Core/COObjectGraphContext+GarbageCollection.m"; sourceTree = "<group>"; };
 		601FD94418893ED50002F957 /* COEditingContext+Debugging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COEditingContext+Debugging.h"; path = "Core/COEditingContext+Debugging.h"; sourceTree = "<group>"; };
+		601FD946188944360002F957 /* HACKING.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = HACKING.md; sourceTree = "<group>"; };
 		6043D4C717575D79002103CC /* COCommitDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCommitDescriptor.h; path = Utilities/COCommitDescriptor.h; sourceTree = "<group>"; };
 		6043D4C817575D7A002103CC /* COCommitDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCommitDescriptor.m; path = Utilities/COCommitDescriptor.m; sourceTree = "<group>"; };
 		606E3DBF1787A07E00ED42DA /* COSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSerialization.h; path = Core/COSerialization.h; sourceTree = "<group>"; };
@@ -1390,6 +1391,7 @@
 				601977FB1860A52200635BE2 /* README.md */,
 				60951A2518884A3700687CF0 /* INSTALL.Cocoa.md */,
 				60951A2618884A3800687CF0 /* INSTALL.GNUstep.md */,
+				601FD946188944360002F957 /* HACKING.md */,
 				66982A1F11EBC2A0007154CD /* TODO */,
 				66618A8B1811C065001FA004 /* TERMINOLOGY */,
 			);
