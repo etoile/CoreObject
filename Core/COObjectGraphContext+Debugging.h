@@ -5,13 +5,15 @@
 	License:  MIT  (see COPYING)
  */
 
-#import <CodeObject/COObjectGraphContext.h>
+#import <CoreObject/COObjectGraphContext.h>
 
 /** 
  * @group Debugging
- * @abstract Change tracking debugging additions related to COObjectGraphContext
+ * @abstract Additions to debug change tracking in an object graph context
  *
- * This category isn't part of the official public API. 
+ * This category isn't part of the official public API.
+ *
+ * See also COEditingContext(CODebugging).
  */
 @interface COObjectGraphContext (CODebugging)
 

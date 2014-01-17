@@ -11,18 +11,15 @@
 
 @interface COEditingContext ()
 
-@property (nonatomic, assign) BOOL isRecordingUndo;
-
 /**
- * @taskunit Framework Private
+ * This property is only exposed to be used internally by CoreObject.
  */
-
+@property (nonatomic, assign) BOOL isRecordingUndo;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
 - (COPersistentRoot *)insertNewPersistentRootWithRevisionUUID: (ETUUID *)aRevid
 												 parentBranch: (COBranch *)aParentBranch;
-
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -68,65 +65,14 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
-
-- (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid persistentRootUUID: (ETUUID *)aPersistentRoot;
-
-- (COBranch *) branchForUUID: (ETUUID *)aBranch;
-
-@end
-
-@interface COEditingContext (Deprecated)
-@end
-
-@interface COEditingContext (Debugging)
-
 /**
- * @taskunit Loaded Objects
+ * This method is only exposed to be used internally by CoreObject.
  */
-
+- (CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid
+                     persistentRootUUID: (ETUUID *)aPersistentRoot;
 /**
- * Returns the objects presently managed by the receiver in memory.
- *
- * The returned objects include -insertedObjects.
- *
- * Faults can be included among the returned objects.
- *
- * See also -loadedObjectUUIDs.
+ * This method is only exposed to be used internally by CoreObject.
  */
-- (NSArray *)loadedObjects;
-/**
- * Returns the root objects presently managed by the receiver in memory.
- *
- * Faults and inserted objects can be included among the returned objects.
- *
- * The returned objects are a subset of -loadedObjects.
- */
-- (NSArray *)loadedRootObjects;
-
-/**
- * @taskunit Pending Changes
- */
-
-/**
- * Returns the new objects added to the context with -insertObject: and to be
- * added to the store on the next commit.
- *
- * After a commit, returns an empty set.
- */
-- (NSArray *)insertedObjects;
-/**
- * Returns the objects whose properties have been edited in the context and to
- * be updated in the store on the next commit.
- *
- * After a commit, returns an empty set.
- */
-- (NSArray *)updatedObjects;
-/**
- * Returns the union of the inserted and updated objects. See -insertedObjects
- * and -updatedObjects.
- *
- * After a commit, returns an empty set.
- */
-- (NSArray *)changedObjects;
+- (COBranch *)branchForUUID: (ETUUID *)aBranch;
 
 @end

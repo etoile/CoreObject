@@ -86,4 +86,5 @@
 
 /* Debugging */
 
+#import <CoreObject/COEditingContext+Debugging.h>
 #import <CoreObject/COObjectGraphContext+Debugging.h>
