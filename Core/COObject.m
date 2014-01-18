@@ -913,8 +913,6 @@ See +[NSObject typePrefix]. */
 	{
 		[(id <COPrimitiveCollection>)oldValue setMutable: YES];
 	}
-
-	[super willChangeValueForKey: key];
 }
 
 - (void)willChangeValueForProperty: (NSString *)key
