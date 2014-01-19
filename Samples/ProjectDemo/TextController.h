@@ -7,8 +7,9 @@
 	IBOutlet NSTextView *textView;
 	COAttributedStringWrapper *textStorage;
 	
-	// Hack to save text being deleted for the commit label
-	NSString *textToDelete;
+	// Hack to save text being changed for the commit label
+	NSString *textToRemove;
+	NSString *textToInsert;
 	
 	NSTimer *coalescingTimer;
 }

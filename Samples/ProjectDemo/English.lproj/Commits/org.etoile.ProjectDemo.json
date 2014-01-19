@@ -141,7 +141,7 @@
 		"modify-text":
 		{
 			"type": "modification",
-			"shortDescription": "Modify text '%@'"
+			"shortDescription": "Replace text '%@' with '%@'"
 		}
 	}
 }

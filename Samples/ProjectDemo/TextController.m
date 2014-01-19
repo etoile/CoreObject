@@ -56,8 +56,12 @@
 {
 	NSLog(@"should add %@", replacementString);
 	
-	if ([replacementString isEqualToString: @""])
-		textToDelete = [[[aTextView textStorage] string] substringWithRange: affectedCharRange];
+	if (affectedCharRange.length > 0)
+		textToRemove = [[[aTextView textStorage] string] substringWithRange: affectedCharRange];
+	else
+		textToRemove = @"";
+	
+	textToInsert = [replacementString copy];
 	
 	return YES;
 }
@@ -82,17 +86,17 @@ static NSString *Trim(NSString *text)
 
 	if ([[self objectGraphContext] hasChanges])
 	{
-		if ([textStorage changeInLength] > 0)
+		if ([textToRemove isEqual: @""])
 		{
-			[self commitWithIdentifier: @"insert-text" descriptionArguments: @[Trim(editedText)]];
+			[self commitWithIdentifier: @"insert-text" descriptionArguments: @[Trim(textToInsert)]];
 		}
-		else if ([textStorage changeInLength] < 0)
+		else if ([textToInsert isEqual: @""])
 		{
-			[self commitWithIdentifier: @"delete-text" descriptionArguments: @[Trim(textToDelete)]];
+			[self commitWithIdentifier: @"delete-text" descriptionArguments: @[Trim(textToRemove)]];
 		}
 		else
 		{
-			[self commitWithIdentifier: @"modify-text" descriptionArguments: @[Trim(editedText)]];
+			[self commitWithIdentifier: @"modify-text" descriptionArguments: @[Trim(textToRemove), Trim(textToInsert)]];
 		}
 		
 		if (coalescingTimer != nil)
