@@ -4,9 +4,11 @@
 @interface EWGraphRenderer : NSObject
 {
 	NSArray *revisionInfosChronological;
+	NSMutableDictionary *rowIndexForUUID;
 	NSMutableDictionary *revisionInfoForUUID;
 	NSMutableDictionary *childrenForUUID;
 	NSMutableDictionary *levelForUUID;
+	NSMutableArray *graphRows;
 	
 	COPersistentRoot *persistentRoot;
 }

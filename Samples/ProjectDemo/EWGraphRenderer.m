@@ -3,6 +3,16 @@
 #import <CoreObject/CoreObject.h>
 #import <CoreObject/CORevisionCache.h>
 
+@interface EWGraphRow : NSObject
+@property (nonatomic) NSMutableArray *intersectingLines;
+@property (nonatomic) ETUUID *revisionUUID;
+@end
+
+@implementation EWGraphRow
+@synthesize intersectingLines, revisionUUID;
+@end
+
+
 @implementation EWGraphRenderer
 
 #if 0
@@ -149,6 +159,44 @@ static NSSet *RevisionInfoSet(COPersistentRoot *proot)
 	revisionInfosChronological = RevisionInfosChronological(revisionInfoSet);
 }
 
+- (void) buildRowIndexForUUID
+{
+	ETAssert(revisionInfosChronological != nil);
+	
+	rowIndexForUUID = [NSMutableDictionary new];
+	NSUInteger i = 0;
+	for (CORevisionInfo *info in revisionInfosChronological)
+	{
+		rowIndexForUUID[info.revisionUUID] = @(i);
+		i++;
+	}
+}
+
+/**
+ * Returns an array with the 0, 1, or 2 parent UUIDs of the given revision UUID
+ */
+- (NSArray *)parentUUIDsForRevisionUUID: (ETUUID *)aUUID
+{
+	NSMutableArray *result = [NSMutableArray new];
+	CORevisionInfo *aCommit = revisionInfoForUUID[aUUID];
+	ETAssert(aCommit != nil);
+	
+	if (aCommit.parentRevisionUUID != nil)
+	{
+		[result addObject: aCommit.parentRevisionUUID];
+	}
+	if (aCommit.mergeParentRevisionUUID != nil)
+	{
+		[result addObject: aCommit.mergeParentRevisionUUID];
+	}
+	return result;
+}
+
+- (NSArray *) childrenForUUID: (ETUUID *)aUUID
+{
+	return childrenForUUID[aUUID];
+}
+
 - (void) buildChildrenForUUID
 {
 	ETAssert(revisionInfosChronological != nil);
@@ -160,21 +208,13 @@ static NSSet *RevisionInfoSet(COPersistentRoot *proot)
 	}
 	for (CORevisionInfo *aCommit in revisionInfosChronological)
 	{
-		if (aCommit.parentRevisionUUID != nil)
+		for (ETUUID *parentUUID in [self parentUUIDsForRevisionUUID: aCommit.revisionUUID])
 		{
-			[childrenForUUID[aCommit.parentRevisionUUID] addObject: aCommit.revisionUUID];
-		}
-		if (aCommit.mergeParentRevisionUUID != nil)
-		{
-			[childrenForUUID[aCommit.mergeParentRevisionUUID] addObject: aCommit.revisionUUID];
+			[childrenForUUID[parentUUID] addObject: aCommit.revisionUUID];
 		}
 	}
 }
 
-- (NSArray *) childrenForUUID: (ETUUID *)aUUID
-{
-	return childrenForUUID[aUUID];
-}
 
 - (NSArray *) graphRootUUIDS
 {
@@ -228,13 +268,7 @@ static NSSet *RevisionInfoSet(COPersistentRoot *proot)
 	// the first child gets assigned to the current level, the second
 	// child gets the current level + 1, etc. then we just visit the children
 	// in order.
-	//
-	
-	// FIXME: we need to do some extra work to handle the case when
-	// a DAG in the forest has more than one root. this should be rare in practice,
-	// because it means you merged two projects that started from scratch with no common
-	// ancestor. but we should still support drawing graphs with that.
-	
+
 	levelForUUID =  [NSMutableDictionary dictionary];
 	
 	NSInteger maxLevel = 0;
@@ -245,14 +279,51 @@ static NSSet *RevisionInfoSet(COPersistentRoot *proot)
 	}
 }
 
+- (void) buildGraphRows
+{
+	ETAssert(revisionInfosChronological != nil);
+	
+	graphRows = [NSMutableArray new];
+	for (CORevisionInfo *aCommit in revisionInfosChronological)
+	{
+		EWGraphRow *row = [EWGraphRow new];
+		row.revisionUUID = aCommit.revisionUUID;
+		row.intersectingLines = [NSMutableArray new];
+		[graphRows addObject: row];
+	}
+	
+	for (CORevisionInfo *aCommit in revisionInfosChronological)
+	{
+		for (ETUUID *parentUUID in [self parentUUIDsForRevisionUUID: aCommit.revisionUUID])
+		{
+			NSNumber *childIndexObject = rowIndexForUUID[aCommit.revisionUUID];
+			NSNumber *parentIndexObject = rowIndexForUUID[parentUUID];
+			ETAssert(childIndexObject != nil);
+			ETAssert(parentIndexObject != nil);
+			
+			const NSUInteger childIndex = [childIndexObject unsignedIntegerValue];
+			const NSUInteger parentIndex = [parentIndexObject unsignedIntegerValue];
+			ETAssert(childIndex < parentIndex);
+			
+			for (NSUInteger i = childIndex; i <= parentIndex; i++)
+			{
+				EWGraphRow *currentRow = graphRows[i];
+				[currentRow.intersectingLines addObject: parentUUID];
+			}
+		}
+	}
+}
+
 - (void) updateWithProot: (COPersistentRoot *)aproot
 {
 	persistentRoot = aproot;
 
 	[self buildRevisionInfosChronological];
+	[self buildRowIndexForUUID];
 	[self buildRevisionInfoForUUID];
 	[self buildChildrenForUUID];
 	[self buildLevelForUUID];
+	[self buildGraphRows];
 }
 
 - (NSUInteger) count
@@ -313,12 +384,18 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 
 - (NSRect) rectForUUID: (ETUUID *)commit currentRow: (NSUInteger)row inRect: (NSRect)aRect
 {
-	const NSInteger level = [levelForUUID[commit] integerValue];
-	const NSInteger rowToDraw = [revisionInfosChronological indexOfObject: revisionInfoForUUID[commit]];
+	NSNumber *levelObject = levelForUUID[commit];
+	ETAssert(levelObject != nil);
+	const NSInteger level = [levelObject integerValue];
+	
+	const NSUInteger rowToDraw = [revisionInfosChronological indexOfObject: revisionInfoForUUID[commit]];
+	ETAssert(rowToDraw != NSNotFound);
+	
+	// We are in flipped coordinates
 	
 	NSRect currentRowRect = [self circleRectAtLevel: level inRect: aRect];
 	
-	currentRowRect.origin.y += ((NSInteger)rowToDraw - row) * aRect.size.height;
+	currentRowRect.origin.y += ((CGFloat)rowToDraw - (CGFloat)row) * aRect.size.height;
 	
 	return currentRowRect;
 }
@@ -331,48 +408,49 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 	NSPoint p = NSMakePoint(r.origin.x + r.size.width/2, r.origin.y + r.size.height/2);
 	NSPoint p2 = NSMakePoint(r2.origin.x + r2.size.width/2, r2.origin.y + r2.size.height/2);
 	
-	EWDrawArrowFromTo(p, p2);
+	NSLog(@"%@ to %@ %@ to %@", commit1, commit2, NSStringFromPoint(p), NSStringFromPoint(p2));
 	
-//	NSBezierPath *bp = [NSBezierPath bezierPath];
-//	[bp moveToPoint: p];
-//	[bp lineToPoint: p2];
-//	[bp stroke];
-}
-
-- (void) drawLinesRecursive: (ETUUID *)commit currentRow: (NSUInteger)row inRect: (NSRect)aRect
-{
-	for (ETUUID *child in [self childrenForUUID: commit])
-	{
-		[self drawLineFromUUID: commit toUUID: child currentRow: row inRect: aRect];
-	}
+//	EWDrawArrowFromTo(p, p2);
 	
-	// Draw the lines for parents until we hit level 0;
-	CORevisionInfo *revisionInfo = revisionInfoForUUID[commit];
-	
-	if (revisionInfo.parentRevisionUUID != nil)
-	{
-		[self drawLinesRecursive: revisionInfo.parentRevisionUUID currentRow: row inRect: aRect];
-	}
-	
-	if (revisionInfo.mergeParentRevisionUUID != nil)
-	{
-		[self drawLinesRecursive: revisionInfo.mergeParentRevisionUUID currentRow: row inRect: aRect];
-	}
+	NSBezierPath *bp = [NSBezierPath bezierPath];
+	[bp moveToPoint: p];
+	[bp lineToPoint: p2];
+	[bp stroke];
 }
 
 - (void) drawRevisionAtIndex: (NSUInteger)index inRect: (NSRect)aRect
 {
+	[NSGraphicsContext saveGraphicsState];
+	
+	[[NSBezierPath bezierPathWithRect: aRect] setClip];
+	
 	CORevisionInfo *revisionInfo = revisionInfosChronological[index];
 	ETUUID *commit = [revisionInfo revisionUUID];
 	const NSInteger level = [levelForUUID[commit] integerValue];
 
-	[[NSColor blueColor] set];
 	
+	[[NSColor blueColor] set];
+
+	// Draw lines
+	
+	EWGraphRow *graphRow = graphRows[index];
+	
+	for (ETUUID *parent in graphRow.intersectingLines)
+	{
+		for (ETUUID *child in [self childrenForUUID: parent])
+		{
+			[self drawLineFromUUID: parent toUUID: child currentRow: index inRect: aRect];
+		}
+	}
+	
+	[[NSColor blueColor] setStroke];
+	[[NSColor whiteColor] setFill];
 	NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect: [self circleRectAtLevel: level inRect: aRect]];
 	[circle setLineWidth: 1];
+	[circle fill];
 	[circle stroke];
 	
-	[self drawLinesRecursive: commit currentRow: index inRect: aRect];
+	[NSGraphicsContext restoreGraphicsState];
 }
 
 @end
