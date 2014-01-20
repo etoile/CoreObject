@@ -74,6 +74,16 @@
 	return self;
 }
 
+- (void)dealloc
+{
+	NSError *error = nil;
+
+    [[NSFileManager defaultManager] removeItemAtURL: CLIENT1_STORE_URL error: &error];
+	ETAssert(error == nil);
+	[[NSFileManager defaultManager] removeItemAtURL: CLIENT2_STORE_URL error: NULL];
+	ETAssert(error == nil);
+}
+
 - (OutlineItem *) addAndCommitServerChild
 {
 	OutlineItem *serverChild = [[serverBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];

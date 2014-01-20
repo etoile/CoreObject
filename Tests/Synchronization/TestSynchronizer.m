@@ -58,6 +58,14 @@
 	return self;
 }
 
+- (void)dealloc
+{
+	NSError *error = nil;
+
+    [[NSFileManager defaultManager] removeItemAtURL: CLIENT_STORE_URL error: &error];
+	ETAssert(error == nil);
+}
+
 - (UnorderedGroupNoOpposite *) addAndCommitServerChild
 {
 	UnorderedGroupNoOpposite *serverChild1 = [[serverBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];

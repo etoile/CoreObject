@@ -56,7 +56,10 @@ static ETUUID *branchBUUID;
 
 - (void)dealloc
 {
-    [[NSFileManager defaultManager] removeItemAtPath: [SERVER_STORE_URL path] error: NULL];
+	NSError *error = nil;
+
+    [[NSFileManager defaultManager] removeItemAtURL: SERVER_STORE_URL error: &error];
+	ETAssert(error == nil);
 }
 
 - (void)testReplicateToClientWithoutPersistentRoot

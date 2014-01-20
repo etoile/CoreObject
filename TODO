@@ -78,6 +78,8 @@ Future Work
 
   - Don't leave empty backing store databases cluttering the store directory
   
+    - Doesn't happen while running the test suite anymore, but I don't remove it since backing stores might still need to be deleted on store compaction (for deleted persistent roots).
+  
   - Add support for indexing properties other than text ones. Either use a single table with
 	property, value columns and a composite key on (property, value), or one table per
 	indexed property name.

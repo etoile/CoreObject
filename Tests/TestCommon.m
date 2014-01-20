@@ -89,9 +89,27 @@ doesNotPostNotification: (NSString *)notif
     return self;
 }
 
+- (void) dealloc
+{
+#ifdef DELETE_STORE_AFTER_EACH_TEST_METHOD
+	// FIXME: For Mac OS X 10.7, this is unsupported, SQLite disk errors
+	// (DB Error: 10 "disk I/O error") appear in TestStoreSQLite.m.
+	[[self class] deleteStore];
+#endif
+}
+
 + (void) deleteStore
 {
-	[[NSFileManager defaultManager] removeItemAtURL: [self storeURL] error: NULL];
+	BOOL isDir = NO;
+
+	if ([[NSFileManager defaultManager] fileExistsAtPath: [[self storeURL] path]
+	                                         isDirectory: &isDir] && isDir)
+	{
+		NSError *error = nil;
+
+		[[NSFileManager defaultManager] removeItemAtURL: [self storeURL] error: &error];
+		ETAssert(error == nil);
+	}
 }
 
 + (NSURL *) storeURL
