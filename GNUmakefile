@@ -19,7 +19,7 @@ ifeq ($(test), yes)
   CoreObject_INCLUDE_DIRS += -I$(PROJECT_DIR)/Tests -I$(PROJECT_DIR)/Tests/TestModelObjects -I$(PROJECT_DIR)/Tests/Extras/Model 
   CoreObject_OBJCFLAGS += -Wno-unused-variable -Wno-unused-value
   CoreObject_LDFLAGS += -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
-  CoreObject_PRINCIPAL_CLASS = TestCommon
+  CoreObject_PRINCIPAL_CLASS = EditingContextTestCase
 else
   CoreObject_OBJCFLAGS += -Wextra -Wno-sign-compare -Wno-unused-parameter
 endif
@@ -56,7 +56,7 @@ CoreObject_OBJC_FILES += $(wildcard Store/fmdb/src/FM*.m)
 ifeq ($(test), yes)
 CoreObject_OBJC_FILES += $(wildcard Tests/*.m)
 #CoreObject_OBJC_FILES += $(wildcard Tests/Attribute/*.m)
-#CoreObject_OBJC_FILES += $(wildcard Tests/Core/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Core/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Diff/*.m)
 #CoreObject_OBJC_FILES += $(wildcard Tests/Extras/Model/*.m)
 #CoreObject_OBJC_FILES += $(wildcard Tests/Model/*.m)

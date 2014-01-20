@@ -71,14 +71,6 @@ doesNotPostNotification: (NSString *)notif
 
 @implementation SQLiteStoreTestCase
 
-+ (void) initialize
-{
-    if (self == [SQLiteStoreTestCase class])
-    {
-        [self deleteStore];
-    }
-}
-
 - (id) init
 {
     self = [super init];
@@ -115,7 +107,7 @@ doesNotPostNotification: (NSString *)notif
 + (NSURL *) storeURL
 {
 #ifdef IN_MEMORY_STORE
-	return [NSURL fileURLWithPath: @"/tmp/coreobject-ramdisk"];
+	return [NSURL fileURLWithPath: @"/tmp/coreobject-ramdisk/TestStore.sqlite"];
 #else
 	return [NSURL fileURLWithPath: [@"~/TestStore.sqlite" stringByExpandingTildeInPath]];
 #endif
@@ -205,6 +197,16 @@ doesNotPostNotification: (NSString *)notif
 @end
 
 @implementation EditingContextTestCase
+
++ (void) willRunTestSuite
+{
+	[SQLiteStoreTestCase deleteStore];
+}
+
++ (void) didRunTestSuite
+{
+	[SQLiteStoreTestCase deleteStore];
+}
 
 - (id) init
 {
