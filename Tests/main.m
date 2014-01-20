@@ -23,8 +23,6 @@ int main (int argc, const char *argv[])
 		
 		[runner runTestsInBundle: [NSBundle mainBundle] principalClass: [EditingContextTestCase class]];
 		[runner reportTestResults];
-
-		[SQLiteStoreTestCase deleteStore];
 		
 		printf("Took %d ms\n", (int)([[NSDate date] timeIntervalSinceDate: startDate] * 1000));
 
