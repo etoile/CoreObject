@@ -56,13 +56,15 @@
 {
 	NSLog(@"should add %@", replacementString);
 	
+	// These are just used to provide commit metadata
+	
 	if (affectedCharRange.length > 0)
-		textToRemove = [[[aTextView textStorage] string] substringWithRange: affectedCharRange];
+		affectedText = [[[aTextView textStorage] string] substringWithRange: affectedCharRange];
 	else
-		textToRemove = @"";
+		affectedText = @"";
 	
-	textToInsert = [replacementString copy];
-	
+	replacementText = replacementString;
+
 	return YES;
 }
 
@@ -86,17 +88,25 @@ static NSString *Trim(NSString *text)
 
 	if ([[self objectGraphContext] hasChanges])
 	{
-		if ([textToRemove isEqual: @""])
+		if (replacementText == nil && [affectedText length] > 0)
 		{
-			[self commitWithIdentifier: @"insert-text" descriptionArguments: @[Trim(textToInsert)]];
+			[self commitWithIdentifier: @"modify-text" descriptionArguments: @[Trim(affectedText)]];
 		}
-		else if ([textToInsert isEqual: @""])
+		else if ([replacementText isEqualToString: @""] && [affectedText length] > 0)
 		{
-			[self commitWithIdentifier: @"delete-text" descriptionArguments: @[Trim(textToRemove)]];
+			[self commitWithIdentifier: @"delete-text" descriptionArguments: @[Trim(affectedText)]];
+		}
+		else if ([replacementText length] > 0 && [affectedText isEqualToString: @""])
+		{
+			[self commitWithIdentifier: @"insert-text" descriptionArguments: @[Trim(replacementText)]];
+		}
+		else if ([replacementText length] > 0 && [affectedText length] > 0)
+		{
+			[self commitWithIdentifier: @"replace-text" descriptionArguments: @[Trim(affectedText), Trim(replacementText)]];
 		}
 		else
 		{
-			[self commitWithIdentifier: @"modify-text" descriptionArguments: @[Trim(textToRemove), Trim(textToInsert)]];
+			ETAssert(NO);
 		}
 		
 		if (coalescingTimer != nil)

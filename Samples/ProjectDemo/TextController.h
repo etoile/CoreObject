@@ -8,8 +8,8 @@
 	COAttributedStringWrapper *textStorage;
 	
 	// Hack to save text being changed for the commit label
-	NSString *textToRemove;
-	NSString *textToInsert;
+	NSString *affectedText;
+	NSString *replacementText;
 	
 	NSTimer *coalescingTimer;
 }

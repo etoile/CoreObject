@@ -138,10 +138,16 @@
 			"shortDescription": "Delete text '%@'"
 		},
 
-		"modify-text":
+		"replace-text":
 		{
 			"type": "modification",
 			"shortDescription": "Replace text '%@' with '%@'"
+		},
+
+		"modify-text":
+		{
+			"type": "modification",
+			"shortDescription": "Change attributes of text '%@'"
 		}
 	}
 }
