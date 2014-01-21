@@ -45,11 +45,6 @@
 	return YES;
 }
 
-- (NSArray *)contentArray
-{
-	return [[self content] allObjects];
-}
-
 @end
 
 
