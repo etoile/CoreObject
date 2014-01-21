@@ -182,6 +182,12 @@
 		6646978017CE7E2600A1B767 /* COSynchronizationServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */; };
 		6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6646985A17D3C55600A1B767 /* COObjectGraphContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		664F279A188E2DC900DF36FC /* TestSynchronizerCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F2799188E2DC900DF36FC /* TestSynchronizerCommon.m */; };
+		664F279D188E683400DF36FC /* TestSynchronizerPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F279C188E683400DF36FC /* TestSynchronizerPerformance.m */; };
+		664F279E188E699B00DF36FC /* OrderedGroupNoOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101154184D89A4001A3E24 /* OrderedGroupNoOpposite.m */; };
+		664F279F188E699B00DF36FC /* UnorderedGroupNoOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610115A184D8B9E001A3E24 /* UnorderedGroupNoOpposite.m */; };
+		664F27A0188E69AD00DF36FC /* TestSynchronizerCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F2799188E2DC900DF36FC /* TestSynchronizerCommon.m */; };
+		664F27A1188E69C000DF36FC /* COSynchronizerFakeMessageTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D491836D08D00E5B4A7 /* COSynchronizerFakeMessageTransport.m */; };
 		664F8B0218741011001AD224 /* OverriddenIsEqualObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F8B0118741011001AD224 /* OverriddenIsEqualObject.m */; };
 		664F8B1618762411001AD224 /* CODiffManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 664F8B1418762411001AD224 /* CODiffManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		664F8B1718762411001AD224 /* CODiffManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F8B1518762411001AD224 /* CODiffManager.m */; };
@@ -698,6 +704,9 @@
 		6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COSynchronizationServer.m; path = Synchronization/COSynchronizationServer.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COSQLiteStore+Private.h"; path = "Store/COSQLiteStore+Private.h"; sourceTree = "<group>"; };
 		6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Private.h"; path = "Core/COObjectGraphContext+Private.h"; sourceTree = "<group>"; };
+		664F2798188E2DC900DF36FC /* TestSynchronizerCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestSynchronizerCommon.h; sourceTree = "<group>"; };
+		664F2799188E2DC900DF36FC /* TestSynchronizerCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestSynchronizerCommon.m; sourceTree = "<group>"; };
+		664F279C188E683400DF36FC /* TestSynchronizerPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestSynchronizerPerformance.m; sourceTree = "<group>"; };
 		664F8B0018741011001AD224 /* OverriddenIsEqualObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OverriddenIsEqualObject.h; path = Tests/TestModelObjects/OverriddenIsEqualObject.h; sourceTree = "<group>"; };
 		664F8B0118741011001AD224 /* OverriddenIsEqualObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OverriddenIsEqualObject.m; path = Tests/TestModelObjects/OverriddenIsEqualObject.m; sourceTree = "<group>"; };
 		664F8B1418762411001AD224 /* CODiffManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODiffManager.h; path = Diff/CODiffManager.h; sourceTree = "<group>"; };
@@ -1243,9 +1252,19 @@
 			name = Synchronization;
 			sourceTree = "<group>";
 		};
+		664F279B188E683400DF36FC /* Synchronization */ = {
+			isa = PBXGroup;
+			children = (
+				664F279C188E683400DF36FC /* TestSynchronizerPerformance.m */,
+			);
+			name = Synchronization;
+			path = Benchmark/Synchronization;
+			sourceTree = "<group>";
+		};
 		66550BE717D51C5000327657 /* Benchmark */ = {
 			isa = PBXGroup;
 			children = (
+				664F279B188E683400DF36FC /* Synchronization */,
 				66550C0617D51D9000327657 /* TestSQLiteStorePerformance.m */,
 				66550BF617D51CB100327657 /* main.m */,
 				66550BE817D51C6100327657 /* TestObjectGraphPerformance.m */,
@@ -1546,6 +1565,8 @@
 				66E40D4B1836D08D00E5B4A7 /* TestSynchronizer.m */,
 				66E40D4C1836D08D00E5B4A7 /* TestSynchronizerJSONTransport.m */,
 				66E40D4D1836D08D00E5B4A7 /* TestSynchronizerMultiUser.m */,
+				664F2798188E2DC900DF36FC /* TestSynchronizerCommon.h */,
+				664F2799188E2DC900DF36FC /* TestSynchronizerCommon.m */,
 			);
 			name = Synchronization;
 			path = Tests/Synchronization;
@@ -2115,8 +2136,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				664F27A1188E69C000DF36FC /* COSynchronizerFakeMessageTransport.m in Sources */,
+				664F27A0188E69AD00DF36FC /* TestSynchronizerCommon.m in Sources */,
+				664F279E188E699B00DF36FC /* OrderedGroupNoOpposite.m in Sources */,
+				664F279F188E699B00DF36FC /* UnorderedGroupNoOpposite.m in Sources */,
 				66550C0417D51D2700327657 /* OutlineItem.m in Sources */,
 				66550C0517D51D2700327657 /* Tag.m in Sources */,
+				664F279D188E683400DF36FC /* TestSynchronizerPerformance.m in Sources */,
 				66550C0317D51D1800327657 /* TestCommon.m in Sources */,
 				66550BF817D51CB800327657 /* TestObjectGraphPerformance.m in Sources */,
 				66D7980917ED18A200B07A2A /* BenchmarkItem.m in Sources */,
@@ -2281,6 +2307,7 @@
 				66101132184D2D8A001A3E24 /* TestUnorderedAttribute.m in Sources */,
 				66E40D791836D08E00E5B4A7 /* TestUndoStackStore.m in Sources */,
 				66E40D611836D08D00E5B4A7 /* TestObject.m in Sources */,
+				664F279A188E2DC900DF36FC /* TestSynchronizerCommon.m in Sources */,
 				66E40D6C1836D08D00E5B4A7 /* TestSQLiteStore.m in Sources */,
 				660EE3B2186E3DA600E8C22C /* TestAttributedStringCommon.m in Sources */,
 				66BBB3BC18516ABC005430B1 /* TestItemStableSerialization.m in Sources */,
