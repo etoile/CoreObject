@@ -11,18 +11,6 @@
 
 @implementation COSynchronizerUtils
 
-+ (CODiffManager *)diffForRebasingGraph: (id <COItemGraph>)sourceGraph
-							  ontoGraph: (id <COItemGraph>)destGraph
-							  baseGraph: (id <COItemGraph>)baseGraph
-			 modelDescriptionRepository: (ETModelDescriptionRepository *)repo
-{
-    CODiffManager *mergingBranchDiff = [CODiffManager diffItemGraph: baseGraph withItemGraph: sourceGraph modelDescriptionRepository: repo sourceIdentifier: @"merged"];
-    CODiffManager *selfDiff = [CODiffManager diffItemGraph: baseGraph withItemGraph: destGraph modelDescriptionRepository: repo sourceIdentifier: @"self"];
-    
-    CODiffManager *merged = [selfDiff diffByMergingWithDiff: mergingBranchDiff];
-	return merged;
-}
-
 + (NSArray *) rebaseRevision: (ETUUID *)source
 				ontoRevision: (ETUUID *)dest
 			  commonAncestor: (ETUUID *)lca
@@ -49,15 +37,16 @@
 	
 	NSMutableArray *newRevids = [[NSMutableArray alloc] init];
 
+	CODiffManager *selfDiff = [CODiffManager diffItemGraph: baseGraph withItemGraph: destGraph modelDescriptionRepository: repo sourceIdentifier: @"self"];
+	
 	ETUUID *currentDest = dest;
 	for (ETUUID *rev in sourceRevs)
 	{
 		id <COItemGraph> sourceGraph = [store itemGraphForRevisionUUID: rev persistentRoot: persistentRoot];
 
-		CODiffManager *diff = [self diffForRebasingGraph: sourceGraph
-											   ontoGraph: destGraph
-											   baseGraph: baseGraph
-							  modelDescriptionRepository: repo];
+		CODiffManager *mergingBranchDiff = [CODiffManager diffItemGraph: baseGraph withItemGraph: sourceGraph modelDescriptionRepository: repo sourceIdentifier: @"merged"];
+		
+		CODiffManager *diff = [selfDiff diffByMergingWithDiff: mergingBranchDiff];
 		
 		if([diff hasConflicts])
 		{
