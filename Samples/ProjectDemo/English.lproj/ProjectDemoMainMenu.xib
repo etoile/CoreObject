@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1070</int>
-		<string key="IBDocument.SystemVersion">13A603</string>
+		<string key="IBDocument.SystemVersion">13B42</string>
 		<string key="IBDocument.InterfaceBuilderVersion">4514</string>
 		<string key="IBDocument.AppKitVersion">1265</string>
-		<string key="IBDocument.HIToolboxVersion">695.00</string>
+		<string key="IBDocument.HIToolboxVersion">696.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">4514</string>
@@ -271,6 +271,16 @@
 									<reference key="NSOnImage" ref="128092494"/>
 									<reference key="NSMixedImage" ref="818417131"/>
 								</object>
+								<object class="NSMenuItem" id="264406320">
+									<reference key="NSMenu" ref="958508040"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="128092494"/>
+									<reference key="NSMixedImage" ref="818417131"/>
+								</object>
 								<object class="NSMenuItem" id="690211329">
 									<reference key="NSMenu" ref="958508040"/>
 									<string key="NSTitle">Close</string>
@@ -289,11 +299,29 @@
 									<reference key="NSOnImage" ref="128092494"/>
 									<reference key="NSMixedImage" ref="818417131"/>
 								</object>
+								<object class="NSMenuItem" id="209018966">
+									<reference key="NSMenu" ref="958508040"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="128092494"/>
+									<reference key="NSMixedImage" ref="818417131"/>
+								</object>
 								<object class="NSMenuItem" id="460659086">
 									<reference key="NSMenu" ref="958508040"/>
 									<string key="NSTitle">Branch</string>
 									<string key="NSKeyEquiv">b</string>
 									<int key="NSKeyEquivModMask">1572864</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="128092494"/>
+									<reference key="NSMixedImage" ref="818417131"/>
+								</object>
+								<object class="NSMenuItem" id="212240817">
+									<reference key="NSMenu" ref="958508040"/>
+									<string key="NSTitle">Duplicate</string>
+									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="128092494"/>
 									<reference key="NSMixedImage" ref="818417131"/>
@@ -1743,7 +1771,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="1004890044"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -1889,7 +1917,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="1052229269"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -2618,6 +2646,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">duplicate:</string>
+						<reference key="source" ref="471146553"/>
+						<reference key="destination" ref="212240817"/>
+					</object>
+					<string key="id">s31-wh-6Ek</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">orderFrontFontPanel:</string>
 						<reference key="source" ref="274351205"/>
 						<reference key="destination" ref="796845054"/>
@@ -3080,6 +3116,9 @@
 							<reference ref="785376777"/>
 							<reference ref="965872364"/>
 							<reference ref="1063054571"/>
+							<reference ref="264406320"/>
+							<reference ref="212240817"/>
+							<reference ref="209018966"/>
 						</array>
 						<reference key="parent" ref="753782612"/>
 					</object>
@@ -4219,6 +4258,21 @@
 						<reference key="object" ref="186813650"/>
 						<reference key="parent" ref="182514203"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">Go5-4C-6Ug</string>
+						<reference key="object" ref="264406320"/>
+						<reference key="parent" ref="958508040"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">63D-vf-eb7</string>
+						<reference key="object" ref="212240817"/>
+						<reference key="parent" ref="958508040"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">iq1-Ev-g7D</string>
+						<reference key="object" ref="209018966"/>
+						<reference key="parent" ref="958508040"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -4506,6 +4560,7 @@
 				<boolean value="NO" key="599.showNotes"/>
 				<string key="603.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="603.showNotes"/>
+				<string key="63D-vf-eb7.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="674.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="674.showNotes"/>
 				<boolean value="NO" key="690.IBNSWindowAutoPositionCentersHorizontal"/>
@@ -4609,6 +4664,7 @@
 				<string key="9xf-eK-abN.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="A0F-d0-oUC.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="DEf-Y0-PTG.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="Go5-4C-6Ug.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="I6F-dJ-MtP.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="JBd-NY-Z04.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="NwG-TW-Yqw.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4619,6 +4675,7 @@
 				<string key="bX0-0C-zcR.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="hSU-uI-2Vd.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="ipP-0V-s99.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="iq1-Ev-g7D.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="k0h-Ss-iW4.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="miK-2e-lyD.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="nC5-KY-Bp0.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4680,6 +4737,7 @@
 					<string key="superclassName">NSObject</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="deleteProject:">id</string>
+						<string key="duplicate:">id</string>
 						<string key="newDrawing:">id</string>
 						<string key="newOutline:">id</string>
 						<string key="newProject:">id</string>
@@ -4689,6 +4747,10 @@
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="deleteProject:">
 							<string key="name">deleteProject:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="duplicate:">
+							<string key="name">duplicate:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="newDrawing:">
@@ -4888,38 +4950,35 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">EWHistoryGraphView</string>
-					<string key="superclassName">NSView</string>
+					<string key="className">EWGraphRenderer</string>
+					<string key="superclassName">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/EWHistoryGraphView.h</string>
+						<string key="minorKey">./Classes/EWGraphRenderer.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">EWHistoryWindowController</string>
 					<string key="superclassName">EWUtilityWindowController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">sliderChanged:</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">sliderChanged:</string>
-						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">sliderChanged:</string>
-							<string key="candidateClassName">id</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="graphRenderer">EWGraphRenderer</string>
+						<string key="tableView">NSTableView</string>
+						<string key="textView">NSTextView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="graphRenderer">
+							<string key="name">graphRenderer</string>
+							<string key="candidateClassName">EWGraphRenderer</string>
 						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">graphView_</string>
-						<string key="NS.object.0">EWHistoryGraphView</string>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<string key="NS.key.0">graphView_</string>
-						<object class="IBToOneOutletInfo" key="NS.object.0">
-							<string key="name">graphView_</string>
-							<string key="candidateClassName">EWHistoryGraphView</string>
+						<object class="IBToOneOutletInfo" key="tableView">
+							<string key="name">tableView</string>
+							<string key="candidateClassName">NSTableView</string>
 						</object>
-					</object>
+						<object class="IBToOneOutletInfo" key="textView">
+							<string key="name">textView</string>
+							<string key="candidateClassName">NSTextView</string>
+						</object>
+					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/EWHistoryWindowController.h</string>

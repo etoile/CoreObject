@@ -446,7 +446,7 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 	[[NSColor blueColor] setStroke];
 	[[NSColor whiteColor] setFill];
 	NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect: [self circleRectAtLevel: level inRect: aRect]];
-	[circle setLineWidth: 1];
+	[circle setLineWidth: [[[persistentRoot currentRevision] UUID] isEqual: commit] ? 2 : 1];
 	[circle fill];
 	[circle stroke];
 	

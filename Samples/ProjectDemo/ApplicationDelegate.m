@@ -152,6 +152,20 @@
 	}
 }
 
+- (IBAction) duplicate:(id)sender
+{
+	id wcObject = [[NSApp mainWindow] windowController];
+	if (wcObject != nil && [wcObject respondsToSelector: @selector(projectDocument)])
+    {
+		EWDocumentWindowController *wc = wcObject;
+		
+		COPersistentRoot *persistentRoot = [[wc editingBranch] makeCopyFromRevision: [[wc editingBranch] currentRevision]];
+		assert(persistentRoot != nil);
+				
+		[self registerDocumentRootObject: [persistentRoot rootObject]];
+	}
+}
+
 - (EWDocumentWindowController *) registerDocumentRootObject: (Document *)aDoc
 {
 	// FIXME: Total hack

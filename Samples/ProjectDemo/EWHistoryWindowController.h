@@ -10,6 +10,7 @@
 	IBOutlet EWGraphRenderer *graphRenderer;
 	
     COPersistentRoot *persistentRoot;
+	EWDocumentWindowController *wc;
 }
 
 + (EWHistoryWindowController *) sharedController;

@@ -31,10 +31,52 @@
 
 - (void) awakeFromNib
 {
+	[tableView setMenu: [self tableMenu]];
+}
+
+#pragma mark - Context menu
+
+- (NSMenu *) tableMenu
+{
+	NSMenu *menu = [[NSMenu alloc] initWithTitle: @""];
+	[menu addItemWithTitle: @"Selective Undo" action: @selector(selectiveUndo:) keyEquivalent: @""];
+	[menu addItemWithTitle: @"Selective Apply" action: @selector(selectiveApply:) keyEquivalent: @""];
+	[menu addItem: [NSMenuItem separatorItem]];
+	[menu addItemWithTitle: @"Switch To Commit" action: @selector(switchToCommit:) keyEquivalent: @""];
+	
+	for (NSMenuItem *item in [menu itemArray])
+	{
+		[item setTarget: self];
+	}
+	
+	return menu;
+}
+
+- (CORevision *) clickedRevision
+{
+	return [graphRenderer revisionAtIndex: [tableView clickedRow]];
+}
+
+- (void) selectiveUndo: (id)sender
+{
+	CORevision *revision = [self clickedRevision];
+}
+
+- (void) selectiveApply: (id)sender
+{
+	CORevision *revision = [self clickedRevision];
+}
+
+- (void) switchToCommit: (id)sender
+{
+	CORevision *revision = [self clickedRevision];
+
+	[wc switchToRevision: revision];
 }
 
 - (void) setInspectedWindowController: (EWDocumentWindowController *)aDoc
 {
+	wc = aDoc;
 	[self setPersistentRoot: [aDoc persistentRoot]];
 }
 

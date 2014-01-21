@@ -30,6 +30,8 @@
 
 - (IBAction) newWindow: (id)sender;
 
+- (IBAction) duplicate:(id)sender;
+
 - (void)checkpointWithName: (NSString*)name;
 
 - (void) shareWithInspectorForDocument: (Document*)doc;
