@@ -30,6 +30,10 @@
 
 - (UnorderedGroupNoOpposite *) addAndCommitServerChild;
 - (UnorderedGroupNoOpposite *) addAndCommitClientChild;
+
+- (NSDictionary *)serverMetadataForTest;
+- (NSDictionary *)clientMetadataForTest;
+
 - (NSArray *)serverMessages;
 - (NSArray *)clientMessages;
 

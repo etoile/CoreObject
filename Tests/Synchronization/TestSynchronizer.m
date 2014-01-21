@@ -202,7 +202,8 @@
 	// Before the merged changes arrives at the client, make another commit on the client
 	
 	[[clientBranch rootObject] setLabel: @"more changes"];
-	[clientPersistentRoot commit];
+	[clientPersistentRoot commitWithMetadata: [self clientMetadataForTest]];
+	UKObjectsEqual([self clientMetadataForTest], [[clientPersistentRoot currentRevision] metadata]);
 	
 	// This should not produce any more messages
 	
@@ -211,6 +212,9 @@
 		
 	// Deliver the merge response to the client
 	[transport deliverMessagesToClient];
+
+	UKObjectsEqual(@"more changes", [[clientBranch rootObject] label]);
+	UKObjectsEqual([self clientMetadataForTest], [[clientPersistentRoot currentRevision] metadata]);
 	
 	// The client should push back the @"more changes" change to the server
 	
@@ -493,68 +497,6 @@
 	[transport deliverMessagesToClient];
 	UKTrue([@"abcdef" isEqualToString: [clientWrapper string]]
 		   || [@"defabc" isEqualToString: [clientWrapper string]]);
-	
-	UKIntsEqual(0, [[self clientMessages] count]);
-	UKIntsEqual(0, [[self serverMessages] count]);
-}
-
-/**
- * This is a version of testConflictingAttributedStringInserts but designed for benchmarking.
- */
-- (void) testAttributedStringRebasePerformance
-{
-	NSString *charactersToInsert = @"Hello, this is the first insertion which will be inserted character-by-character. ";
-	NSString *stringToInsert = @"Another insertion. ";
-	NSString *baseString = @"Test.";
-	
-	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
-	COAttributedStringWrapper *serverWrapper = [[COAttributedStringWrapper alloc] initWithBacking: serverStr];
-	[serverWrapper replaceCharactersInRange: NSMakeRange(0, 0) withString: baseString];
-	[[serverBranch rootObject] setContents: S(serverStr)];
-	[serverPersistentRoot commit];
-	
-	[transport deliverMessagesToClient];
-	
-	// several commits on client
-	
-	COAttributedString *clientStr = [[[clientBranch rootObject] contents] anyObject];
-	COAttributedStringWrapper *clientWrapper = [[COAttributedStringWrapper alloc] initWithBacking: clientStr];
-	
-	UKObjectsEqual(baseString, [clientWrapper string]);
-	
-	for (NSUInteger i = 0; i < [charactersToInsert length]; i++)
-	{
-		[clientWrapper replaceCharactersInRange: NSMakeRange(i, 0)
-									 withString: [charactersToInsert substringWithRange: NSMakeRange(i, 1)]];
-		[clientPersistentRoot commit];
-	}
-	
-	UKObjectsEqual([charactersToInsert stringByAppendingString: baseString], [clientWrapper string]);
-	
-	// 1 commit on server
-	
-	[serverWrapper replaceCharactersInRange: NSMakeRange(0,0) withString: stringToInsert];
-	[serverPersistentRoot commit];
-	
-	// deliver first client commit to server. This will be the first character of 'charactersToInsert'
-	[transport deliverMessagesToServer];
-	
-	UKTrue(([[NSString stringWithFormat: @"%@%@%@", stringToInsert, [charactersToInsert substringToIndex: 1], baseString] isEqualToString: [serverWrapper string]]
-		   || [[NSString stringWithFormat: @"%@%@%@", [charactersToInsert substringToIndex: 1], stringToInsert, baseString] isEqualToString: [serverWrapper string]]));
-	
-	[transport deliverMessagesToClient];
-	
-	// Send confirmation to server
-	[transport deliverMessagesToServer];
-
-	// Send confirmation back to client
-	[transport deliverMessagesToClient];
-	
-	UKTrue(([[NSString stringWithFormat: @"%@%@%@", stringToInsert, charactersToInsert, baseString] isEqualToString: [serverWrapper string]]
-		   || [[NSString stringWithFormat: @"%@%@%@", charactersToInsert, stringToInsert, baseString] isEqualToString: [serverWrapper string]]));
-
-	UKTrue(([[NSString stringWithFormat: @"%@%@%@", stringToInsert, charactersToInsert, baseString] isEqualToString: [clientWrapper string]]
-		   || [[NSString stringWithFormat: @"%@%@%@", charactersToInsert, stringToInsert, baseString] isEqualToString: [clientWrapper string]]));
 	
 	UKIntsEqual(0, [[self clientMessages] count]);
 	UKIntsEqual(0, [[self serverMessages] count]);

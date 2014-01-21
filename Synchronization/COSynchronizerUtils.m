@@ -42,8 +42,10 @@
 	ETUUID *currentDest = dest;
 	for (ETUUID *rev in sourceRevs)
 	{
+		NSDictionary *sourceMetadata = [[store revisionInfoForRevisionUUID: rev persistentRootUUID: persistentRoot] metadata];
 		id <COItemGraph> sourceGraph = [store itemGraphForRevisionUUID: rev persistentRoot: persistentRoot];
-
+		ETAssert(sourceGraph != nil);
+		
 		CODiffManager *mergingBranchDiff = [CODiffManager diffItemGraph: baseGraph withItemGraph: sourceGraph modelDescriptionRepository: repo sourceIdentifier: @"merged"];
 		
 		CODiffManager *diff = [selfDiff diffByMergingWithDiff: mergingBranchDiff];
@@ -63,7 +65,7 @@
 		[newRevids addObject: nextRev];
 		[txn writeRevisionWithModifiedItems: mergeResult
 							   revisionUUID: nextRev
-								   metadata: @{} // FIXME: Reuse metadata from source revision?
+								   metadata: sourceMetadata
 						   parentRevisionID: currentDest
 					  mergeParentRevisionID: nil
 						 persistentRootUUID: persistentRoot

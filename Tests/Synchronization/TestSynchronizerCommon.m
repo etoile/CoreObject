@@ -45,11 +45,21 @@
 	ETAssert(error == nil);
 }
 
+- (NSDictionary *)serverMetadataForTest
+{
+	return @{ @"testMetadata" : @"server"};
+}
+
+- (NSDictionary *)clientMetadataForTest
+{
+	return @{ @"testMetadata" : @"client"};
+}
+
 - (UnorderedGroupNoOpposite *) addAndCommitServerChild
 {
 	UnorderedGroupNoOpposite *serverChild1 = [[serverBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
 	[[[serverBranch rootObject] mutableSetValueForKey: @"contents"] addObject: serverChild1];
-	[ctx commit];
+	[serverPersistentRoot commitWithMetadata: [self serverMetadataForTest]];
 	return serverChild1;
 }
 
@@ -57,7 +67,7 @@
 {
 	UnorderedGroupNoOpposite *clientChild1 = [[clientBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
 	[[[clientBranch rootObject] mutableSetValueForKey: @"contents"] addObject: clientChild1];
-	[clientCtx commit];
+	[clientPersistentRoot commitWithMetadata: [self clientMetadataForTest]];
 	return clientChild1;
 }
 
