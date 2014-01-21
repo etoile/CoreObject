@@ -9,6 +9,49 @@
 #import "COSQLiteStore.h"
 #import "COStoreTransaction.h"
 
+@interface COGraphCache : NSObject
+{
+	COSQLiteStore *store;
+	ETUUID *persistentRoot;
+	NSMutableDictionary *cache;
+}
+- (instancetype) initWithPersistentRootUUID: (ETUUID *)aUUID store: (COSQLiteStore *)aStore;
+/**
+ * Don't modify the returned graph
+ */
+- (COItemGraph *) graphForUUID: (ETUUID *)aRevision;
+@end
+
+@implementation COGraphCache
+
+- (instancetype) initWithPersistentRootUUID: (ETUUID *)aUUID store: (COSQLiteStore *)aStore
+{
+	SUPERINIT;
+	persistentRoot = aUUID;
+	store = aStore;
+	cache = [NSMutableDictionary new];
+	return self;
+}
+
+- (COItemGraph *) graphForUUID: (ETUUID *)aRevision
+{
+	COItemGraph *result = cache[aRevision];
+	if (result == nil)
+	{
+		result = [store itemGraphForRevisionUUID: aRevision persistentRoot: persistentRoot];
+		cache[aRevision] = result;
+	}
+	return result;
+}
+
+- (void) setGraph: (COItemGraph *)aGraph forUUID: (ETUUID *)aRevision
+{
+	cache[aRevision] = aGraph;
+}
+
+@end
+
+
 @implementation COSynchronizerUtils
 
 + (NSArray *) rebaseRevision: (ETUUID *)source
@@ -23,10 +66,7 @@
 	ETAssert(source != nil);
 	ETAssert(dest != nil);
 	ETAssert(lca != nil);
-		
-	id <COItemGraph> baseGraph = [store itemGraphForRevisionUUID: lca persistentRoot: persistentRoot];
-	id <COItemGraph> destGraph = [store itemGraphForRevisionUUID: dest persistentRoot: persistentRoot];
-	
+			
 	// Gather the revisions to rebase (between 'lca', exclusive, and 'source', inclusive)
 	NSArray *sourceRevs = [COLeastCommonAncestor revisionUUIDsFromRevisionUUIDExclusive: lca
 																toRevisionUUIDInclusive: source
@@ -36,30 +76,33 @@
 	ETAssert([sourceRevs count] > 0);
 	
 	NSMutableArray *newRevids = [[NSMutableArray alloc] init];
-
-	CODiffManager *selfDiff = [CODiffManager diffItemGraph: baseGraph withItemGraph: destGraph modelDescriptionRepository: repo sourceIdentifier: @"self"];
 	
+	COGraphCache *cache = [[COGraphCache alloc] initWithPersistentRootUUID: persistentRoot store: store];
+		
+	ETUUID *currentLCA = lca;
 	ETUUID *currentDest = dest;
-	for (ETUUID *rev in sourceRevs)
+	for (ETUUID *sourceRev in sourceRevs)
 	{
-		NSDictionary *sourceMetadata = [[store revisionInfoForRevisionUUID: rev persistentRootUUID: persistentRoot] metadata];
-		id <COItemGraph> sourceGraph = [store itemGraphForRevisionUUID: rev persistentRoot: persistentRoot];
-		ETAssert(sourceGraph != nil);
+		NSDictionary *sourceMetadata = [[store revisionInfoForRevisionUUID: sourceRev persistentRootUUID: persistentRoot] metadata];
+		id <COItemGraph> currentSourceGraph = [cache graphForUUID: sourceRev];
+		id <COItemGraph> currentDestGraph = [cache graphForUUID: currentDest];
+		id <COItemGraph> currentLCAGraph = [cache graphForUUID: currentLCA];
+				
+		CODiffManager *sourceBranchDiff = [CODiffManager diffItemGraph: currentLCAGraph withItemGraph: currentSourceGraph modelDescriptionRepository: repo sourceIdentifier: @"source"];
+		CODiffManager *destBranchDiff = [CODiffManager diffItemGraph: currentLCAGraph withItemGraph: currentDestGraph modelDescriptionRepository: repo sourceIdentifier: @"dest"];
 		
-		CODiffManager *mergingBranchDiff = [CODiffManager diffItemGraph: baseGraph withItemGraph: sourceGraph modelDescriptionRepository: repo sourceIdentifier: @"merged"];
+		CODiffManager *mergedDiff = [destBranchDiff diffByMergingWithDiff: sourceBranchDiff];
 		
-		CODiffManager *diff = [selfDiff diffByMergingWithDiff: mergingBranchDiff];
-		
-		if([diff hasConflicts])
+		if([mergedDiff hasConflicts])
 		{
 			NSLog(@"Attempting to auto-resolve conflicts favouring the other user...");
-			[diff resolveConflictsFavoringSourceIdentifier: @"merged"]; // FIXME: Hardcoded
+			[mergedDiff resolveConflictsFavoringSourceIdentifier: @"source"]; // FIXME: Hardcoded
 		}
 		
 		//NSLog(@"Applying diff %@", diff);
 		
-		COItemGraph *mergeResult = [[COItemGraph alloc] initWithItemGraph: baseGraph];
-		[diff applyTo: mergeResult];
+		COItemGraph *mergeResult = [[COItemGraph alloc] initWithItemGraph: currentLCAGraph];
+		[mergedDiff applyTo: mergeResult];
 		
 		ETUUID *nextRev = [ETUUID UUID];
 		[newRevids addObject: nextRev];
@@ -70,7 +113,10 @@
 					  mergeParentRevisionID: nil
 						 persistentRootUUID: persistentRoot
 								 branchUUID: branch];
+
+		[cache setGraph: mergeResult forUUID: nextRev];
 		currentDest = nextRev;
+		currentLCA = sourceRev;
 	}
 	
 	return newRevids;
