@@ -228,6 +228,11 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 	return [_backing objectForKey: key];
 }
 
+- (NSEnumerator *)objectEnumerator
+{
+	return [_backing objectEnumerator];
+}
+
 - (NSEnumerator *)keyEnumerator
 {
 	return [_backing keyEnumerator];
