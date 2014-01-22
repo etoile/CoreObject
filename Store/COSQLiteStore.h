@@ -15,7 +15,20 @@
 
 enum
 {
+	/**
+	 * Return revisions between the branch's initial revision and head revision, inclusive
+	 */
+	COBranchRevisionReadingDefault = 0,
+	/**
+	 * Return all parent revisions of the branch's head revision, including those in other
+	 * branches.
+	 * TODO: Specify how merge parents are treated
+	 */
 	COBranchRevisionReadingParentBranches = 2,
+	/**
+	 * Finds the set of revisions specified by the other flags, and then
+	 * expands it by recursively finding all child revisions.
+	 */
 	COBranchRevisionReadingDivergentRevisions = 4
 };
 typedef NSUInteger COBranchRevisionReadingOptions;
@@ -239,7 +252,6 @@ extern NSString * const COPersistentRootAttributeUsedSize;
     NSMutableDictionary *backingStores_; // COUUID (backing store UUID => COCQLiteStorePersistentRootBackingStore)
     NSMutableDictionary *backingStoreUUIDForPersistentRootUUID_;
     
-    COStoreTransaction *transaction_;
     dispatch_queue_t queue_;
 }
 

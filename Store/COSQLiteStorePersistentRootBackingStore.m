@@ -129,6 +129,15 @@
 	return self;
 }
 
+- (void) clearBackingStore
+{
+	[db_ beginDeferredTransaction];
+	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE IF EXISTS %@", [self tableName]]];
+	[db_ executeUpdate: [NSString stringWithFormat: @"DROP INDEX IF EXISTS %@", [[self tableName] stringByAppendingString: @"_uuid"]]];
+	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE IF EXISTS %@", [self metadataTableName]]];
+	ETAssert([db_ commit]);
+}
+
 - (ETUUID *) UUID
 {
 	return _uuid;

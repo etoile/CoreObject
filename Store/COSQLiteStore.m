@@ -181,17 +181,6 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 /** @taskunit Transactions */
 
-- (BOOL) beginTransactionWithError: (NSError **)error
-{
-	transaction_ = [[COStoreTransaction alloc] init];
-    return YES;
-}
-
-- (BOOL) commitTransactionWithError: (NSError **)error
-{
-    return [self commitStoreTransaction: transaction_];
-}
-
 - (BOOL) commitStoreTransaction: (COStoreTransaction *)aTransaction
 {
     __block BOOL ok = YES;
@@ -1045,7 +1034,17 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 - (void) clearStore
 {
     dispatch_sync(queue_, ^() {
-        [db_ beginDeferredTransaction];        
+        [db_ beginTransaction];
+		
+		FMResultSet *rs = [db_ executeQuery: @"SELECT DISTINCT backingstore FROM persistentroots"];
+        while ([rs next])
+        {
+            ETUUID *uuid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+			COSQLiteStorePersistentRootBackingStore *bs = [self backingStoreForUUID: uuid error: NULL];
+			[bs clearBackingStore];
+        }
+        [rs close];
+		
         [db_ executeUpdate: @"DROP TABLE IF EXISTS persistentroots"];
         [db_ executeUpdate: @"DROP TABLE IF EXISTS branches"];
         [db_ executeUpdate: @"DROP TABLE IF EXISTS proot_refs"];
@@ -1055,6 +1054,9 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 		[db_ executeUpdate: @"DROP TABLE IF EXISTS storeMetadata"];
         [db_ commit];
         
+		[backingStores_ removeAllObjects];
+		[backingStoreUUIDForPersistentRootUUID_ removeAllObjects];
+		
         [self setupSchema];
     });
 }

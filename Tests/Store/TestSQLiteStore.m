@@ -1040,41 +1040,4 @@ static ETUUID *childUUID2;
     UKTrue([store commitStoreTransaction: txn]);
 }
 
-- (void) testRevisionInfosForBranchDefaultOptions
-{
-	NSArray *revInfos = [store revisionInfosForBranchUUID: branchAUUID
-												  options: 0];
-
-	
-	NSArray *revUUIDs = (NSArray *)[(CORevisionInfo *)[revInfos mappedCollection] revisionUUID];
-	
-	UKObjectsEqual(branchARevisionUUIDs, revUUIDs);
-	
-	for (CORevisionInfo *info in revInfos)
-	{
-		UKNotNil(info.date);
-		UKTrue(fabs([info.date timeIntervalSinceNow]) < 1.0); /* Less than 1 second old */
-		UKObjectsEqual(prootUUID, info.persistentRootUUID);
-		UKObjectsEqual(branchAUUID, info.branchUUID);
-		
-		// TODO: Check other properties
-	}
-}
-
-- (void) testRevisionInfosForBranchWithParentBranchesOption
-{
-	NSArray *revInfos = [store revisionInfosForBranchUUID: branchAUUID
-												  options: COBranchRevisionReadingParentBranches];
-	
-	
-	NSArray *revUUIDs = (NSArray *)[(CORevisionInfo *)[revInfos mappedCollection] revisionUUID];
-	NSArray *expected = [@[initialRevisionUUID] arrayByAddingObjectsFromArray: branchARevisionUUIDs];
-	
-	UKObjectsEqual(expected, revUUIDs);
-}
-
-
-// TODO: Test divergent branches option
-// TODO: Test divergent branches option | parent branches option
-
 @end

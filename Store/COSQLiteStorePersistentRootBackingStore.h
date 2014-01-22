@@ -94,4 +94,6 @@
 
 - (uint64_t) fileSize;
 
+- (void) clearBackingStore;
+
 @end
