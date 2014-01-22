@@ -13,70 +13,46 @@
 
 @synthesize store = _store;
 
-static NSMutableDictionary *cachesByStoreUUID = nil;
+/**
+ * N.B.: The values are unsafe retained
+ */
+static NSMapTable *cachesByStoreUUID = nil;
 
 + (void)initialize
 {
 	if (self != [CORevisionCache class])
 		return;
 
-	cachesByStoreUUID = [NSMutableDictionary new];
+	cachesByStoreUUID = [NSMapTable mapTableWithStrongToWeakObjects];
 }
 
-+ (id)cacheForStoreUUID: (ETUUID *)aUUID
++ (id) cacheForStoreUUID: (ETUUID *)aUUID
 {
 	return [cachesByStoreUUID objectForKey: aUUID];
 }
 
-+ (void) prepareCacheForStore: (COSQLiteStore *)aStore
+- (void) dealloc
 {
-	NILARG_EXCEPTION_TEST(aStore);
-	CORevisionCache *cache = [cachesByStoreUUID objectForKey: [aStore UUID]];
-
-	if (cache == nil)
-	{
-		cache = [[CORevisionCache alloc] initWithStore: aStore];
-
-		[cachesByStoreUUID setObject: cache
-		                      forKey: [aStore UUID]];
-	}
-	[cache retainFromClient];
-}
-
-+ (void) discardCacheForStore: (COSQLiteStore *)aStore
-{
-	NILARG_EXCEPTION_TEST(aStore);
-	CORevisionCache *cache = [cachesByStoreUUID objectForKey: [aStore UUID]];
-	ETAssert(cache != nil);
-
-	BOOL discard = [cache releaseFromClient];
-
-	if (discard)
-	{
-		[cachesByStoreUUID removeObjectForKey: [aStore UUID]];
-	}
+	[cachesByStoreUUID removeObjectForKey: _storeUUID];
 }
 
 - (id) initWithStore: (COSQLiteStore *)aStore
 {
+	NILARG_EXCEPTION_TEST(aStore);
+	
+	CORevisionCache *cache = [cachesByStoreUUID objectForKey: [aStore UUID]];
+	if (cache != nil)
+	{
+		return cache;
+	}
+	
     SUPERINIT;
 	_store = aStore;
     _revisionForRevisionID = [[NSMutableDictionary alloc] init];
-	_clientCount = 0;
+	_storeUUID = [aStore UUID];
+	[cachesByStoreUUID setObject: self
+						  forKey: _storeUUID];
     return self;
-}
-
-- (void)retainFromClient
-{
-	_clientCount++;
-}
-
-- (BOOL)releaseFromClient
-{
-	ETAssert(_clientCount > 0);
-	_clientCount--;
-	
-	return (_clientCount == 0);
 }
 
 - (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid

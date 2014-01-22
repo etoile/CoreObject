@@ -10,7 +10,7 @@
 #import <CoreObject/COPersistentObjectContext.h>
 
 @class COSQLiteStore, COEditingContext, COPersistentRoot, COBranch, COObjectGraphContext, COObject;
-@class COUndoTrack, COCommandGroup;
+@class COUndoTrack, COCommandGroup, CORevisionCache;
 
 /**
  * @group Core
@@ -71,6 +71,7 @@
     /** Undo */
     BOOL _isRecordingUndo;
     COCommandGroup *_currentEditGroup;
+	CORevisionCache *_revisionCache;
 }
 
 

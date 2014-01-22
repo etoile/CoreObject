@@ -65,8 +65,8 @@
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
     _isRecordingUndo = YES;
-
-	[CORevisionCache prepareCacheForStore: store];
+	_revisionCache = [[CORevisionCache alloc] initWithStore: _store];
+	
 	[self registerAdditionalEntityDescriptions];
 
     [[NSNotificationCenter defaultCenter] addObserver: self
@@ -103,8 +103,6 @@
 {
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-
-	[CORevisionCache discardCacheForStore: _store];
 }
 
 - (NSString *)description

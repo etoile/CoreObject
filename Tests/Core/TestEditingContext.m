@@ -209,19 +209,22 @@
 
 - (void) testRevisionCacheManagementForMultipleStoreInstances
 {
-	COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore:
-		[[COSQLiteStore alloc] initWithURL: [[self class] storeURL]]];
-	
-	UKObjectsNotSame(store, [ctx2 store]);
-	UKObjectsEqual([store UUID], [[ctx2 store] UUID]);
-	
-	UKObjectsSame(store, [[CORevisionCache cacheForStoreUUID: [store UUID]] store]);
+	@autoreleasepool
+	{
+		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore:
+			[[COSQLiteStore alloc] initWithURL: [[self class] storeURL]]];
+		
+		UKObjectsNotSame(store, [ctx2 store]);
+		UKObjectsEqual([store UUID], [[ctx2 store] UUID]);
+		
+		UKObjectsSame(store, [[CORevisionCache cacheForStoreUUID: [store UUID]] store]);
 
-	ctx = nil;
+		ctx = nil;
 
-	UKObjectsSame(store, [[CORevisionCache cacheForStoreUUID: [store UUID]] store]);
+		UKObjectsSame(store, [[CORevisionCache cacheForStoreUUID: [store UUID]] store]);
 
-	ctx2 = nil;
+		ctx2 = nil;
+	}
 
 	UKNil([CORevisionCache cacheForStoreUUID: [store UUID]]);
 }

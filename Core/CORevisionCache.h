@@ -14,13 +14,9 @@
 @interface CORevisionCache : NSObject
 {
 	@private
-    COSQLiteStore *_store;
+    COSQLiteStore * __weak _store;
     NSMutableDictionary *_revisionForRevisionID;
-	/** 
-	 * How many objects (e.g. editing contexts) retain stores that use the same 
-	 * UUID than [_store UUID].
-	 */
-	NSInteger _clientCount;
+	ETUUID *_storeUUID;
 }
 
 /** @taskunit Revision Access */
@@ -40,13 +36,11 @@
 - (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
 					  persistentRootUUID: (ETUUID *)aPersistentRoot;
 
-@property (nonatomic, readonly, strong) COSQLiteStore *store;
+@property (nonatomic, readonly, weak) COSQLiteStore *store;
 
 
 /** @taskunit Framework Private */
 
-+ (void) prepareCacheForStore: (COSQLiteStore *)aStore;
-+ (void) discardCacheForStore: (COSQLiteStore *)aStore;
 // TODO: Don't expose. It is a cache implementation detail.
 + (id)cacheForStoreUUID: (ETUUID *)aUUID;
 
