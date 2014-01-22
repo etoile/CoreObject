@@ -285,9 +285,20 @@ extern NSString * const COPersistentRootAttributeUsedSize;
 /**
  * N.B. This is the only API for discovering divergent revisions
  * (revisions which aren't ancestors of the current revision of a branch)
+ *
+ * NOTE: Unstable API
  */
 - (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
                                 options: (COBranchRevisionReadingOptions)options;
+
+/**
+ * Returns all revision infos of the backing store where the given persistent
+ * root is stored
+ *
+ * NOTE: Unstable API
+ */
+- (NSArray *)revisionInfosForBackingStoreOfPersistentRootUUID: (ETUUID *)aPersistentRoot;
+
 
 /**
  * Returns a delta between the given revision IDs.

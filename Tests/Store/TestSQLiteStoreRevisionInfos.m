@@ -160,4 +160,10 @@ RevisionInfoUUIDs(NSArray *revInfos)
 }
 #endif
 
+- (void) testRevisionInfosForBackingStoreOfPersistentRootUUID
+{
+	UKObjectsEqual(A(r0, r1, r2, r3, r4, r5, r6), RevisionInfoUUIDs([store revisionInfosForBackingStoreOfPersistentRootUUID: p1]));
+	UKObjectsEqual(A(r0, r1, r2, r3, r4, r5, r6), RevisionInfoUUIDs([store revisionInfosForBackingStoreOfPersistentRootUUID: p2]));
+}
+
 @end

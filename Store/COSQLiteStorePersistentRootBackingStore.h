@@ -92,6 +92,8 @@
                        headRevisionUUID: (ETUUID *)aHeadRevUUID
                                 options: (NSUInteger)options;
 
+- (NSArray *)revisionInfos;
+
 - (uint64_t) fileSize;
 
 - (void) clearBackingStore;

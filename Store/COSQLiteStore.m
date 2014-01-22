@@ -349,6 +349,22 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     return result;
 }
 
+- (NSArray *)revisionInfosForBackingStoreOfPersistentRootUUID: (ETUUID *)aPersistentRoot
+{
+    __block NSArray *result = nil;
+    
+    assert(dispatch_get_current_queue() != queue_);
+    
+    dispatch_sync(queue_, ^(){
+        COSQLiteStorePersistentRootBackingStore *backingStore =
+		[self backingStoreForPersistentRootUUID: aPersistentRoot createIfNotPresent: YES];
+		
+        result = [backingStore revisionInfos];
+    });
+    
+    return result;
+}
+
 - (ETUUID *) backingUUIDForPersistentRootUUID: (ETUUID *)aUUID
 						   createIfNotPresent: (BOOL)createIfNotPresent
 {

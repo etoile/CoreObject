@@ -107,6 +107,9 @@
         }
     }
     
+	[db_ beginDeferredTransaction];
+	
+	// N.B. UNIQUE constraint on uuid gives it an index automatically.
     [db_ executeUpdate: [NSString stringWithFormat:
                          @"CREATE TABLE IF NOT EXISTS %@ (revid INTEGER PRIMARY KEY ASC, "
                          "contents BLOB, hash BLOB, metadata BLOB, timestamp INTEGER, parent INTEGER, mergeparent INTEGER, branchuuid BLOB, persistentrootuuid BLOB, deltabase INTEGER, "
@@ -118,6 +121,8 @@
 	// This table always contains exactly one row
 	[db_ executeUpdate: [NSString stringWithFormat:
 						 @"CREATE TABLE IF NOT EXISTS %@ (root BLOB NOT NULL CHECK (length(root) = 16))", [self metadataTableName]]];
+	
+	[db_ commit];
 	
 	// FIXME: -hadError only looks at the success of the last statement.
     if ([db_ hadError])
@@ -829,6 +834,30 @@ static NSData *Sha1Data(NSData *data)
 	[self resolveRevisionIDsInRevisionsInfos: revInfos
 							usingRevisionIDs: revIDs];
 
+	return revInfos;
+}
+
+- (NSArray *)revisionInfos
+{
+	FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
+										  @"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
+										  "FROM %@ ORDER BY revid DESC",
+										  [self tableName]]];
+	
+	NSUInteger suggestedMaxRevCount = 50000;
+	NSMutableArray *revInfos = [NSMutableArray arrayWithCapacity: suggestedMaxRevCount];
+	NSMutableDictionary *revIDs = [NSMutableDictionary dictionaryWithCapacity: suggestedMaxRevCount];
+	
+	while ([rs next])
+	{
+		[revInfos insertObject: [self revisionInfoWithResultSet: rs revisionIDs: revIDs]
+					   atIndex: 0];
+    }
+	[rs close];
+	
+	[self resolveRevisionIDsInRevisionsInfos: revInfos
+							usingRevisionIDs: revIDs];
+	
 	return revInfos;
 }
 
