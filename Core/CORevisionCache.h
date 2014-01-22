@@ -16,6 +16,11 @@
 	@private
     COSQLiteStore *_store;
     NSMutableDictionary *_revisionForRevisionID;
+	/** 
+	 * How many objects (e.g. editing contexts) retain stores that use the same 
+	 * UUID than [_store UUID].
+	 */
+	NSInteger _clientCount;
 }
 
 /** @taskunit Revision Access */
@@ -41,6 +46,7 @@
 /** @taskunit Framework Private */
 
 + (void) prepareCacheForStore: (COSQLiteStore *)aStore;
++ (void) discardCacheForStore: (COSQLiteStore *)aStore;
 // TODO: Don't expose. It is a cache implementation detail.
 + (id)cacheForStoreUUID: (ETUUID *)aUUID;
 

@@ -30,12 +30,30 @@ static NSMutableDictionary *cachesByStoreUUID = nil;
 
 + (void) prepareCacheForStore: (COSQLiteStore *)aStore
 {
+	NILARG_EXCEPTION_TEST(aStore);
 	CORevisionCache *cache = [cachesByStoreUUID objectForKey: [aStore UUID]];
 
 	if (cache == nil)
 	{
-		[cachesByStoreUUID setObject: [[CORevisionCache alloc] initWithStore: aStore]
+		cache = [[CORevisionCache alloc] initWithStore: aStore];
+
+		[cachesByStoreUUID setObject: cache
 		                      forKey: [aStore UUID]];
+	}
+	[cache retainFromClient];
+}
+
++ (void) discardCacheForStore: (COSQLiteStore *)aStore
+{
+	NILARG_EXCEPTION_TEST(aStore);
+	CORevisionCache *cache = [cachesByStoreUUID objectForKey: [aStore UUID]];
+	ETAssert(cache != nil);
+
+	BOOL discard = [cache releaseFromClient];
+
+	if (discard)
+	{
+		[cachesByStoreUUID removeObjectForKey: [aStore UUID]];
 	}
 }
 
@@ -44,8 +62,23 @@ static NSMutableDictionary *cachesByStoreUUID = nil;
     SUPERINIT;
 	_store = aStore;
     _revisionForRevisionID = [[NSMutableDictionary alloc] init];
+	_clientCount = 0;
     return self;
 }
+
+- (void)retainFromClient
+{
+	_clientCount++;
+}
+
+- (BOOL)releaseFromClient
+{
+	ETAssert(_clientCount > 0);
+	_clientCount--;
+	
+	return (_clientCount == 0);
+}
+
 - (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
 					  persistentRootUUID: (ETUUID *)aPersistentRoot
 {

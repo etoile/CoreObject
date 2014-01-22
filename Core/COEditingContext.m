@@ -103,6 +103,8 @@
 {
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
     [[NSNotificationCenter defaultCenter] removeObserver: self];
+
+	[CORevisionCache discardCacheForStore: _store];
 }
 
 - (NSString *)description
