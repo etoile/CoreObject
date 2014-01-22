@@ -133,13 +133,8 @@ static NSArray *RevisionInfosChronological(NSSet *commits)
 
 static NSSet *RevisionInfoSet(COPersistentRoot *proot)
 {
-	NSMutableSet *revisionInfos = [NSMutableSet new];
-	for (COBranch *branch in proot.branches)
-	{
-		[revisionInfos addObjectsFromArray:
-		 [proot.store revisionInfosForBranchUUID: branch.UUID
-										 options: COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions]];
-	}
+	NSSet *revisionInfos = [NSSet setWithArray:
+							[proot.store revisionInfosForBackingStoreOfPersistentRootUUID: proot.UUID]];
 	return revisionInfos;
 }
 

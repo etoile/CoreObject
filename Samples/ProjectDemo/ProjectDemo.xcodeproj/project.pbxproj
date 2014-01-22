@@ -91,7 +91,6 @@
 		66C3F7F1183EB6BA0044F5E1 /* EWDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3F7F0183EB6BA0044F5E1 /* EWDocumentWindowController.m */; };
 		66CA1844181A3E5B00DE6AFB /* Search.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66CA1843181A3E5B00DE6AFB /* Search.xib */; };
 		66CA184E181A3F4F00DE6AFB /* SearchWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66CA184D181A3F4F00DE6AFB /* SearchWindowController.m */; };
-		66D73786182597330023692B /* EWHistoryGraphView.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C76181AF40400BDD213 /* EWHistoryGraphView.m */; };
 		66D73787182597330023692B /* EWHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C78181AF40400BDD213 /* EWHistoryWindowController.m */; };
 		66D737881825973A0023692B /* EWGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C74181AF40400BDD213 /* EWGraphRenderer.m */; };
 		66DBB3781813B1A80047301A /* PreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66DBB3771813B1A80047301A /* PreferencesController.m */; };
@@ -337,8 +336,6 @@
 		667C6C72181AF40400BDD213 /* EWBranchesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWBranchesWindowController.m; sourceTree = "<group>"; };
 		667C6C73181AF40400BDD213 /* EWGraphRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWGraphRenderer.h; sourceTree = "<group>"; };
 		667C6C74181AF40400BDD213 /* EWGraphRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWGraphRenderer.m; sourceTree = "<group>"; };
-		667C6C75181AF40400BDD213 /* EWHistoryGraphView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWHistoryGraphView.h; sourceTree = "<group>"; };
-		667C6C76181AF40400BDD213 /* EWHistoryGraphView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWHistoryGraphView.m; sourceTree = "<group>"; };
 		667C6C77181AF40400BDD213 /* EWHistoryWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWHistoryWindowController.h; sourceTree = "<group>"; };
 		667C6C78181AF40400BDD213 /* EWHistoryWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWHistoryWindowController.m; sourceTree = "<group>"; };
 		667C6C79181AF40400BDD213 /* EWUtilityWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWUtilityWindowController.h; sourceTree = "<group>"; };
@@ -876,8 +873,6 @@
 				667C6C82181AF44E00BDD213 /* History.xib */,
 				667C6C73181AF40400BDD213 /* EWGraphRenderer.h */,
 				667C6C74181AF40400BDD213 /* EWGraphRenderer.m */,
-				667C6C75181AF40400BDD213 /* EWHistoryGraphView.h */,
-				667C6C76181AF40400BDD213 /* EWHistoryGraphView.m */,
 				667C6C77181AF40400BDD213 /* EWHistoryWindowController.h */,
 				667C6C78181AF40400BDD213 /* EWHistoryWindowController.m */,
 				66F1800718890E040046A951 /* EWGraphCell.h */,
@@ -1150,7 +1145,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				66D737881825973A0023692B /* EWGraphRenderer.m in Sources */,
-				66D73786182597330023692B /* EWHistoryGraphView.m in Sources */,
 				66D73787182597330023692B /* EWHistoryWindowController.m in Sources */,
 				6612118C1821A482003AEC29 /* DDLog.m in Sources */,
 				79911A4712CDAECD009D28C0 /* SKTCircle.m in Sources */,
