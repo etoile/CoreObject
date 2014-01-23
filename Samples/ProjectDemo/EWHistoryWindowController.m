@@ -110,6 +110,12 @@
 	[tableView reloadData];
 }
 
+- (void) windowDidLoad
+{
+	NSLog(@"%@: -windowDidLoad", self);
+	[self updateTable];
+}
+
 /* NSTableViewDataSource */
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
