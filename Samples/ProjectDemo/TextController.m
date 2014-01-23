@@ -106,7 +106,7 @@ static NSString *Trim(NSString *text)
 		}
 		else
 		{
-			ETAssert(NO);
+			NSLog(@"%@: got -textStorageDidProcessEditing:, but it wasn't caused by us.. ignoring", self);
 		}
 		
 		if (coalescingTimer != nil)
