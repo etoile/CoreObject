@@ -20,14 +20,26 @@ enum
 	 */
 	COBranchRevisionReadingDefault = 0,
 	/**
-	 * Return all parent revisions of the branch's head revision, including those in other
-	 * branches.
-	 * TODO: Specify how merge parents are treated
+	 * Return all parent revisions of the branch's head revision, including those in
+	 * parent branches.
+	 *
+	 * Revisions on branches merged into the branch, or on branches merged into
+	 * parent branches are not included.
 	 */
 	COBranchRevisionReadingParentBranches = 2,
 	/**
-	 * Finds the set of revisions specified by the other flags, and then
-	 * expands it by recursively finding all child revisions.
+	 * Finds the revisions which have the same branch UUID as the one being queried,
+	 * but are located on anonymous/implicit branches.
+	 *
+	 * These divergent revisions are usually created by undo/redo actions.
+	 *
+	 * Although no branch creation was requested, a divergent revision sequence
+	 * form a "branch" in the history graph, this is why we call these branches implicit or anonymous.
+	 *
+	 * Note that this will not return revisions that are descendents of the 
+	 * head revision.
+	 *
+	 * See "lost head" example in COSQLiteStore documentation.
 	 */
 	COBranchRevisionReadingDivergentRevisions = 4
 };
