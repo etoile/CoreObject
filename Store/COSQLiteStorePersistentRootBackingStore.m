@@ -115,9 +115,6 @@
                          "contents BLOB, hash BLOB, metadata BLOB, timestamp INTEGER, parent INTEGER, mergeparent INTEGER, branchuuid BLOB, persistentrootuuid BLOB, deltabase INTEGER, "
                          "bytesInDeltaRun INTEGER, garbage BOOLEAN, uuid BLOB NOT NULL UNIQUE)", [self tableName]]];
 
-    [db_ executeUpdate: [NSString stringWithFormat:
-                         @"CREATE INDEX IF NOT EXISTS %@ ON %@ (uuid)", [[self tableName] stringByAppendingString: @"_uuid"], [self tableName]]];
-    
 	// This table always contains exactly one row
 	[db_ executeUpdate: [NSString stringWithFormat:
 						 @"CREATE TABLE IF NOT EXISTS %@ (root BLOB NOT NULL CHECK (length(root) = 16))", [self metadataTableName]]];
@@ -138,7 +135,6 @@
 {
 	[db_ beginDeferredTransaction];
 	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE IF EXISTS %@", [self tableName]]];
-	[db_ executeUpdate: [NSString stringWithFormat: @"DROP INDEX IF EXISTS %@", [[self tableName] stringByAppendingString: @"_uuid"]]];
 	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE IF EXISTS %@", [self metadataTableName]]];
 	ETAssert([db_ commit]);
 }
