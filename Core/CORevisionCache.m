@@ -61,6 +61,7 @@ static NSMapTable *cachesByStoreUUID = nil;
     CORevision *cached = [_revisionForRevisionID objectForKey: aRevid];
     if (cached == nil)
     {
+		ETAssert([self store] != nil);
         CORevisionInfo *info = [[self store] revisionInfoForRevisionUUID: aRevid
 													  persistentRootUUID: aPersistentRoot];
         

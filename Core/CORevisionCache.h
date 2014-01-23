@@ -14,7 +14,7 @@
 @interface CORevisionCache : NSObject
 {
 	@private
-    COSQLiteStore * __weak _store;
+    COSQLiteStore *_store;
     NSMutableDictionary *_revisionForRevisionID;
 	ETUUID *_storeUUID;
 }
@@ -36,7 +36,7 @@
 - (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
 					  persistentRootUUID: (ETUUID *)aPersistentRoot;
 
-@property (nonatomic, readonly, weak) COSQLiteStore *store;
+@property (nonatomic, readonly, strong) COSQLiteStore *store;
 
 
 /** @taskunit Framework Private */
