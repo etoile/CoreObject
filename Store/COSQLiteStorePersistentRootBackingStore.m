@@ -769,12 +769,24 @@ static NSData *Sha1Data(NSData *data)
                                 options: (COBranchRevisionReadingOptions)options
 {
 	NILARG_EXCEPTION_TEST(aBranchUUID);
+	FMResultSet *rs = nil;
 
-	int64_t headRevid = [self revidForUUID: aHeadRevUUID];
-	FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
-		@"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
-		 "FROM %@ WHERE revid BETWEEN 0 AND ? ORDER BY revid DESC",
-		[self tableName]], [NSNumber numberWithLongLong: headRevid]];
+	if (options & COBranchRevisionReadingDivergentRevisions)
+	{
+		rs = [db_ executeQuery: [NSString stringWithFormat:
+			@"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
+		 	 "FROM %@ WHERE revid BETWEEN 0 AND (SELECT MAX(revid) FROM %@ WHERE branchuuid = ?) "
+			 "ORDER BY revid DESC", [self tableName], [self tableName]], [aBranchUUID dataValue]];
+	}
+	else
+	{
+		int64_t headRevid = [self revidForUUID: aHeadRevUUID];
+
+		rs = [db_ executeQuery: [NSString stringWithFormat:
+			@"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
+			 "FROM %@ WHERE revid BETWEEN 0 AND ? ORDER BY revid DESC",
+			 [self tableName]], [NSNumber numberWithLongLong: headRevid]];
+	}
 
 	NSUInteger suggestedMaxRevCount = 50000;
 	NSMutableArray *revInfos = [NSMutableArray arrayWithCapacity: suggestedMaxRevCount];

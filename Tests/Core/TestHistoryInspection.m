@@ -10,6 +10,10 @@
 #import "TestCommon.h"
 #import "CORevisionCache.h"
 
+@interface COBranch ()
+- (void) setHeadRevision: (CORevision *)rev;
+@end
+
 @interface TestHistoryInspection : EditingContextTestCase <UKTest>
 {
     COPersistentRoot *p1;
@@ -241,6 +245,28 @@
 	UKObjectsEqual(A(r0, r1, r3, r5, r6, r8), [self revisionsForBranch: branch1B options: options]);
 	UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
 	UKObjectsEqual(A(r0, r1, r2, r4), [self revisionsForBranch: branch2A options: options]);
+}
+
+- (void)testBranchRevisionsIncludingParentBranchesAndDivergentRevisionsForOldHeadRevision
+{
+	COBranchRevisionReadingOptions options =
+		(COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions);
+
+	/* We set the head revision to a revision older than branch1C newest revision, 
+	   and we adjust the current revision to ensure: 
+	   
+	   'current revision' <= 'head revision' */
+	[branch1C setCurrentRevision: r3];
+	[branch1C setHeadRevision: r5];
+	[ctx commit];
+
+	COPersistentRootInfo *p1Info = [[ctx store] persistentRootInfoForUUID: [p1 UUID]];
+
+	UKObjectsEqual([r5 UUID], [[p1Info branchInfoForUUID: [branch1C UUID]] headRevisionUUID]);
+	UKObjectsEqual([r3 UUID], [[p1Info branchInfoForUUID: [branch1C UUID]] currentRevisionUUID]);
+
+	UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
+	UKObjectsEqual(A(r0, r1, r3, r5, r6, r8), [self revisionsForBranch: branch1B options: options]);
 }
 
 - (void) wait
