@@ -25,7 +25,7 @@
 static const int NUM_CHILDREN = 200;
 static const int NUM_COMMITS = 200;
 
-static const int NUM_PERSISTENT_ROOTS = 100;
+static const int NUM_PERSISTENT_ROOTS = 3000;
 static const int NUM_CHILDREN_PER_PERSISTENT_ROOT = 100;
 static const int NUM_PERSISTENT_ROOT_COPIES = 200;
 

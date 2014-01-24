@@ -1068,11 +1068,11 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 			[bs clearBackingStore];
 		}
 		
-        [db_ executeUpdate: @"DROP TABLE IF EXISTS persistentroots"];
-        [db_ executeUpdate: @"DROP TABLE IF EXISTS branches"];
-        [db_ executeUpdate: @"DROP TABLE IF EXISTS proot_refs"];
-        [db_ executeUpdate: @"DROP TABLE IF EXISTS attachment_refs"];
-        [db_ executeUpdate: @"DROP TABLE IF EXISTS fts_docid_to_revisionid"];
+        [db_ executeUpdate: @"DELETE FROM persistentroots"];
+        [db_ executeUpdate: @"DELETE FROM branches"];
+        [db_ executeUpdate: @"DELETE FROM proot_refs"];
+        [db_ executeUpdate: @"DELETE FROM attachment_refs"];
+        [db_ executeUpdate: @"DELETE FROM fts_docid_to_revisionid"];
         [db_ executeUpdate: @"DROP TABLE IF EXISTS fts"];
 		[db_ executeUpdate: @"DROP TABLE IF EXISTS storeMetadata"];
         [db_ commit];

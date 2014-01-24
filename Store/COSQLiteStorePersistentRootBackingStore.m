@@ -134,8 +134,8 @@
 - (void) clearBackingStore
 {
 	[self beginTransaction];
-	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE IF EXISTS %@", [self tableName]]];
-	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE IF EXISTS %@", [self metadataTableName]]];
+	[db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@", [self tableName]]];
+	[db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@", [self metadataTableName]]];
 	ETAssert([self commit]);
 }
 
