@@ -60,17 +60,18 @@
 - (void) selectiveUndo: (id)sender
 {
 	CORevision *revision = [self clickedRevision];
+	[wc selectiveUndo: revision];
 }
 
 - (void) selectiveApply: (id)sender
 {
 	CORevision *revision = [self clickedRevision];
+	[wc selectiveRedo: revision];
 }
 
 - (void) switchToCommit: (id)sender
 {
 	CORevision *revision = [self clickedRevision];
-
 	[wc switchToRevision: revision];
 }
 

@@ -86,6 +86,10 @@
 
 - (void) switchToRevision: (CORevision *)aRevision;
 
+- (void) selectiveUndo: (CORevision *)aRevision;
+
+- (void) selectiveRedo: (CORevision *)aRevision;
+
 - (IBAction) projectDemoUndo: (id)sender;
 
 - (IBAction) projectDemoRedo: (id)sender;

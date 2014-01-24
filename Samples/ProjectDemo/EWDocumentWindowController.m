@@ -264,6 +264,16 @@
 	[self commitWithIdentifier: @"revert"];
 }
 
+- (void) selectiveUndo: (CORevision *)aRevision
+{
+	
+}
+
+- (void) selectiveRedo: (CORevision *)aRevision
+{
+	
+}
+
 - (IBAction) projectDemoUndo: (id)sender
 {
     COUndoTrack *stack = [self undoTrack];
