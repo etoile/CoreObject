@@ -43,9 +43,6 @@
 
 - (BOOL)close;
 
-- (BOOL) beginTransaction;
-- (BOOL) commit;
-
 - (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aToken;
 
 - (ETUUID *) UUID;

@@ -107,7 +107,7 @@
         }
     }
     
-	[db_ beginDeferredTransaction];
+	[self beginTransaction];
 	
 	// N.B. UNIQUE constraint on uuid gives it an index automatically.
     [db_ executeUpdate: [NSString stringWithFormat:
@@ -119,7 +119,7 @@
 	[db_ executeUpdate: [NSString stringWithFormat:
 						 @"CREATE TABLE IF NOT EXISTS %@ (root BLOB NOT NULL CHECK (length(root) = 16))", [self metadataTableName]]];
 	
-	[db_ commit];
+	[self commit];
 	
 	// FIXME: -hadError only looks at the success of the last statement.
     if ([db_ hadError])
@@ -133,10 +133,10 @@
 
 - (void) clearBackingStore
 {
-	[db_ beginDeferredTransaction];
+	[self beginTransaction];
 	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE IF EXISTS %@", [self tableName]]];
 	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE IF EXISTS %@", [self metadataTableName]]];
-	ETAssert([db_ commit]);
+	ETAssert([self commit]);
 }
 
 - (ETUUID *) UUID
@@ -159,11 +159,15 @@
 
 - (BOOL) beginTransaction
 {
-    return [db_ beginTransaction];
+    return [db_ savepoint: @"backingStore"];
 }
 - (BOOL) commit
 {
-    return [db_ commit];
+    return [db_ releaseSavepoint: @"backingStore"];
+}
+- (BOOL) rollback
+{
+    return [db_ rollbackToSavepoint: @"backingStore"];
 }
 
 /* DB Setup */
@@ -494,14 +498,7 @@ static NSData *Sha1Data(NSData *data)
     NSParameterAssert(aPersistentRootUUID != nil);
     NSParameterAssert([anItemTree rootItemUUID] != nil);
 	
-    BOOL inTransaction = [db_ inTransaction];
-    if (!inTransaction)
-    {
-        if (![db_ beginTransaction])
-        {
-            return NO;
-        }
-    }
+    [self beginTransaction];
     
     const int64_t parent_deltabase = [self deltabaseForRowid: aParent];
     const int64_t rowid = [self nextRowid];
@@ -580,17 +577,11 @@ static NSData *Sha1Data(NSData *data)
 	}
 	else if (![currentRoot isEqual: [anItemTree rootItemUUID]])
 	{
-		if (!inTransaction)
-		{
-			[db_ rollback];
-		}
+		[self rollback];
 		return NO;
 	}
 	
-    if (!inTransaction)
-    {
-        ok = ok && [db_ commit];
-    }
+	[self commit];
     
     return ok;
 }
@@ -646,11 +637,7 @@ static NSData *Sha1Data(NSData *data)
 
 - (BOOL) deleteRevids: (NSIndexSet *)revids
 {
-    BOOL inTransaction = [db_ inTransaction];
-    if (!inTransaction)
-    {
-        [db_ beginTransaction];
-    }
+    [self beginTransaction];
     
     for (NSUInteger i = [revids firstIndex]; i != NSNotFound; i = [revids indexGreaterThanIndex: i])
     {
@@ -710,10 +697,7 @@ static NSData *Sha1Data(NSData *data)
     
     // TODO: Vacuum here?
     
-    if (!inTransaction)
-    {
-        [db_ commit];
-    }
+    [self commit];
     
     return ![db_ hadError];
 }

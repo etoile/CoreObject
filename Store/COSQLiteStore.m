@@ -1052,14 +1052,21 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     dispatch_sync(queue_, ^() {
         [db_ beginTransaction];
 		
+		NSMutableArray *backingStoresToClear = [NSMutableArray new];
+		
 		FMResultSet *rs = [db_ executeQuery: @"SELECT DISTINCT backingstore FROM persistentroots"];
         while ([rs next])
         {
             ETUUID *uuid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-			COSQLiteStorePersistentRootBackingStore *bs = [self backingStoreForUUID: uuid error: NULL];
-			[bs clearBackingStore];
+			[backingStoresToClear addObject: uuid];
         }
         [rs close];
+		
+		for (ETUUID *uuid in backingStoresToClear)
+		{
+			COSQLiteStorePersistentRootBackingStore *bs = [self backingStoreForUUID: uuid error: NULL];
+			[bs clearBackingStore];
+		}
 		
         [db_ executeUpdate: @"DROP TABLE IF EXISTS persistentroots"];
         [db_ executeUpdate: @"DROP TABLE IF EXISTS branches"];
