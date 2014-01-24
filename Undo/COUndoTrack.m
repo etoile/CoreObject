@@ -169,7 +169,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	// command COCommandCreatePersistentRoot or COCommandNewRevisionForBranch
 	// that create new revisions in the store.
     [aContext commitWithIdentifier: isUndo ?  @"org.etoile.CoreObject.undo" : @"org.etoile.CoreObject.redo"
-						  metadata: @{ kCOCommitMetadataShortDescriptionArguments : @[[edit localizedShortDescription]] }
+						  metadata: [edit localizedShortDescription] != nil ? @{ kCOCommitMetadataShortDescriptionArguments : @[[edit localizedShortDescription]] } : @{}
 						 undoTrack: nil
 							 error: NULL];
     aContext.isRecordingUndo = YES;
