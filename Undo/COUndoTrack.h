@@ -8,7 +8,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreObject/COTrack.h>
 
-@class COUndoStackStore, COEditingContext, COCommand;
+@class COUndoStackStore, COEditingContext, COCommand, COCommandGroup;
 
 extern NSString * const COUndoStackDidChangeNotification;
 extern NSString * const kCOUndoStackName;
@@ -129,6 +129,6 @@ extern NSString * const kCOUndoStackName;
  *
  * See also -currentCommand.
  */
-- (void) recordCommand: (COCommand *)aCommand;
+- (void) recordCommand: (COCommandGroup *)aCommand;
 
 @end

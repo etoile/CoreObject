@@ -21,6 +21,7 @@
 #import "CODiffManager.h"
 #import "COObjectGraphContext.h"
 #import "COSQLiteStore.h"
+#import "COUndoTrack.h"
 
 static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
 static NSString * const kCOCommandOldRevisionID = @"COCommandOldRevisionID";
@@ -39,9 +40,9 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 @synthesize headRevisionUUID = _newHeadRevisionUUID;
 
 
-- (id) initWithPropertyList: (id)plist
+- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
-    self = [super initWithPropertyList: plist];
+    self = [super initWithPropertyList: plist parentUndoTrack: aParent];
     self.branchUUID = [ETUUID UUIDWithString: plist[kCOCommandBranchUUID]];
     self.oldRevisionUUID = [ETUUID UUIDWithString: plist[kCOCommandOldRevisionID]];
     self.revisionUUID = [ETUUID UUIDWithString: plist[kCOCommandNewRevisionID]];
@@ -221,16 +222,16 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 
 - (CORevision *)oldRevision
 {
-	return [CORevisionCache revisionForRevisionUUID: _oldRevisionUUID
-								 persistentRootUUID: _persistentRootUUID
-										  storeUUID: [self storeUUID]];
+	ETAssert(_parentUndoTrack != nil);
+	return [_parentUndoTrack.editingContext revisionForRevisionUUID: _oldRevisionUUID
+												 persistentRootUUID: _persistentRootUUID];
 }
 
 - (CORevision *)revision
 {
-	return [CORevisionCache revisionForRevisionUUID: _newRevisionUUID
-								 persistentRootUUID: _persistentRootUUID
-										  storeUUID: [self storeUUID]];
+	ETAssert(_parentUndoTrack != nil);
+	return [_parentUndoTrack.editingContext revisionForRevisionUUID: _newRevisionUUID
+												 persistentRootUUID: _persistentRootUUID];
 }
 
 #pragma mark -

@@ -21,9 +21,9 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
 @synthesize oldBranchUUID = _oldBranchUUID;
 @synthesize branchUUID = _newBranchUUID;
 
-- (id) initWithPropertyList: (id)plist
+- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
-    self = [super initWithPropertyList: plist];
+    self = [super initWithPropertyList: plist parentUndoTrack: aParent];
     self.oldBranchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandOldBranchUUID]];
     self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandNewBranchUUID]];
     return self;

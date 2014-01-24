@@ -115,7 +115,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
         return nil;
     }
     
-    COCommandGroup *edit = (COCommandGroup *)[COCommand commandWithPropertyList: plist];
+    COCommandGroup *edit = (COCommandGroup *)[COCommand commandWithPropertyList: plist parentUndoTrack: self];
     return edit;
 }
 
@@ -201,12 +201,28 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	return [self popAndApplyCommand: edit fromStack:popStack pushToStack:pushStack name:aName toContext:aContext];
 }
 
-- (void) recordCommand: (COCommand *)aCommand
+- (void) setParentPointersForCommandGroup: (COCommandGroup *)aCommand
 {
-	NILARG_EXCEPTION_TEST(aCommand);
+	ETAssert(aCommand.parentUndoTrack == nil);
+	for (COCommand *childCommand in aCommand.contents)
+	{
+		ETAssert(childCommand.parentUndoTrack == nil);
+	}
+	
+	aCommand.parentUndoTrack = self;
+	for (COCommand *childCommand in aCommand.contents)
+	{
+		childCommand.parentUndoTrack = self;
+	}
+}
+
+- (void) recordCommand: (COCommandGroup *)aCommand
+{
+	ETAssert([aCommand isKindOfClass: [COCommandGroup class]]);
 	// TODO: A SQL constraint and batch UUID would prevent pushing a command twice more strictly.
 	INVALIDARG_EXCEPTION_TEST(aCommand, [aCommand isEqual: [self currentCommand]] == NO);
 
+	[self setParentPointersForCommandGroup: aCommand];
 	[self discardRedoCommands];
 	[self addNewUndoCommand: aCommand];
 	[self didUpdate];
@@ -400,12 +416,12 @@ static void coalesceOps(NSMutableArray *ops)
 	
 	for (NSDictionary *plist in [_store stackContents: kCOUndoStack forName: _name])
 	{
-		[_commands addObject: [COCommand commandWithPropertyList: plist]];
+		[_commands addObject: [COCommand commandWithPropertyList: plist parentUndoTrack: self]];
 	}
 
 	for (NSDictionary *plist in [[_store stackContents: kCORedoStack forName: _name] reverseObjectEnumerator])
 	{
-		[_commands addObject: [COCommand commandWithPropertyList: plist]];
+		[_commands addObject: [COCommand commandWithPropertyList: plist parentUndoTrack: self]];
 	}
 }
 

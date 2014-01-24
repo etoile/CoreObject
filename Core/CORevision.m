@@ -49,6 +49,14 @@
 	return [revisionInfo revisionUUID];
 }
 
+- (CORevisionCache *) cache
+{
+	if (cache == nil)
+		[NSException raise: NSGenericException
+					format: @"Attempted to access a CORevision property from a revision whose parent revision cache/editing context have been deallocated"];
+	return cache;
+}
+
 - (CORevision *)parentRevision
 {
     if ([revisionInfo parentRevisionUUID] == nil)
@@ -57,8 +65,8 @@
     }
     
 	ETUUID *parentRevID = [revisionInfo parentRevisionUUID];
-    return [cache revisionForRevisionUUID: parentRevID
-					   persistentRootUUID: [revisionInfo persistentRootUUID]];
+    return [[self cache] revisionForRevisionUUID: parentRevID
+							  persistentRootUUID: [revisionInfo persistentRootUUID]];
 }
 
 - (CORevision *)mergeParentRevision
@@ -69,8 +77,8 @@
     }
     
 	ETUUID *revID = [revisionInfo mergeParentRevisionUUID];
-    return [cache revisionForRevisionUUID: revID
-					   persistentRootUUID: [revisionInfo persistentRootUUID]];
+    return [[self cache] revisionForRevisionUUID: revID
+							  persistentRootUUID: [revisionInfo persistentRootUUID]];
 }
 
 - (ETUUID *)persistentRootUUID

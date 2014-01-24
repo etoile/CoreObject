@@ -10,7 +10,7 @@
 #import <CoreObject/COTrack.h>
 
 @class COEditingContext;
-
+@class COUndoTrack;
 extern NSString * const kCOCommandType;
 extern NSString * const kCOCommandUUID;
 extern NSString * const kCOCommandStoreUUID;
@@ -33,7 +33,9 @@ extern NSString * const kCOCommandTimestamp;
  * is going to contain several commands just for a single persistent root.
  */
 @interface COCommand : NSObject <COTrackNode>
-
+{
+	COUndoTrack __weak *_parentUndoTrack;
+}
 /** @taskunit Initialization and Serialization */
 
 
@@ -43,7 +45,7 @@ extern NSString * const kCOCommandTimestamp;
  *
  * See -initWithPropertyList:.
  */
-+ (COCommand *) commandWithPropertyList: (id)aPlist;
++ (COCommand *) commandWithPropertyList: (id)aPlist parentUndoTrack: (COUndoTrack *)aParent;
 /**
  * Returns the receiver serialized as a property list.
  */
@@ -55,6 +57,7 @@ extern NSString * const kCOCommandTimestamp;
 
 @property (nonatomic, readonly) NSString *kind;
 
+@property (nonatomic, readwrite, weak) COUndoTrack *parentUndoTrack;
 
 /** @taskunit Applying and Reverting Changes */
 
@@ -91,7 +94,7 @@ extern NSString * const kCOCommandTimestamp;
  * <init />
  * Initializes and returns a command deserialized from a property list.
  */
-- (id) initWithPropertyList: (id)plist;
+- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent;
 
 @end
 

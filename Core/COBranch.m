@@ -922,13 +922,11 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	NSArray *revInfos = [[self store] revisionInfosForBranchUUID: [self UUID]
 	                                                     options: options];
 	NSMutableArray *revs = [NSMutableArray array];
-	CORevisionCache *cache =
-		[CORevisionCache cacheForStoreUUID: [[[self editingContext] store] UUID]];
 
 	for (CORevisionInfo *revInfo in revInfos)
 	{
-		[revs addObject: [[CORevision alloc] initWithCache: cache
-		                                      revisionInfo: revInfo]];
+		[revs addObject: [self.editingContext revisionForRevisionUUID: revInfo.revisionUUID
+												   persistentRootUUID: revInfo.persistentRootUUID]];
 	}
 	return revs;
 }

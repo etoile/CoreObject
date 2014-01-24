@@ -13,6 +13,8 @@
 #import "COBranch.h"
 #import "CORevision.h"
 #import "CORevisionCache.h"
+#import "COUndoTrack.h"
+#import "COEditingContext+Private.h"
 
 @implementation COCommandUndeletePersistentRoot
 
@@ -54,9 +56,9 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 @synthesize initialRevisionID = _initialRevisionID;
 
-- (id) initWithPropertyList: (id)plist
+- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
-    self = [super initWithPropertyList: plist];
+    self = [super initWithPropertyList: plist parentUndoTrack: aParent];
 	if (self == nil)
 		return nil;
 
@@ -85,9 +87,8 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 - (CORevision *)revision
 {
-	return [CORevisionCache revisionForRevisionUUID: _initialRevisionID
-								 persistentRootUUID: _persistentRootUUID
-	                                    storeUUID: [self storeUUID]];
+	return [_parentUndoTrack.editingContext revisionForRevisionUUID: _initialRevisionID
+												 persistentRootUUID: _persistentRootUUID];
 }
 
 #pragma mark -

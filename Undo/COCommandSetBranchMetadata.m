@@ -21,9 +21,9 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 @synthesize oldMetadata = _oldMetadata;
 @synthesize metadata = _newMetadata;
 
-- (id) initWithPropertyList: (id)plist
+- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
-    self = [super initWithPropertyList: plist];
+    self = [super initWithPropertyList: plist parentUndoTrack: aParent];
     self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandBranchUUID]];
     self.oldMetadata = [plist objectForKey: kCOCommandOldMetadata];
     self.metadata = [plist objectForKey: kCOCommandNewMetadata];

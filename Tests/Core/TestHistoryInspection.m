@@ -208,12 +208,10 @@
 	NSArray *revInfos = [[ctx store] revisionInfosForBranchUUID: [aBranch UUID]
 	                                                    options: options];
 	NSMutableArray *revs = [NSMutableArray array];
-	CORevisionCache *cache = [CORevisionCache cacheForStoreUUID: [[ctx store] UUID]];
 	
 	for (CORevisionInfo *revInfo in revInfos)
 	{
-		[revs addObject: [[CORevision alloc] initWithCache: cache
-                                              revisionInfo: revInfo]];
+		[revs addObject: [ctx revisionForRevisionUUID: revInfo.revisionUUID persistentRootUUID: revInfo.persistentRootUUID]];
 	}
 	return revs;
 }
@@ -304,9 +302,8 @@
  */
 - (void) testRevisionCacheReturnsNilForUnknownRevision
 {
-	CORevision *rev = [CORevisionCache revisionForRevisionUUID: [ETUUID UUID]
-											persistentRootUUID: [p1 UUID]
-													 storeUUID: [[p1 store] UUID]];
+	CORevision *rev = [ctx revisionForRevisionUUID: [ETUUID UUID]
+								persistentRootUUID: [p1 UUID]];
 	UKNil(rev);
 }
 

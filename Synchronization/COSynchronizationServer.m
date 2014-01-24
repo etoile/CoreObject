@@ -25,15 +25,15 @@ static void FindAllParents(NSMutableSet *resultSet, ETUUID *rev, ETUUID *persist
     
     // Recursively search the parent(s)
     
-    CORevision *revision = [CORevisionCache revisionForRevisionUUID: rev persistentRootUUID: persistentRootUUID storeUUID: [store UUID]];
+    CORevisionInfo *revision = [store revisionInfoForRevisionUUID: rev persistentRootUUID: persistentRootUUID];
 	
-    if ([revision parentRevision] != nil)
+    if ([revision parentRevisionUUID] != nil)
     {
-        FindAllParents(resultSet, [[revision parentRevision] UUID], persistentRootUUID, store, stopSet);
+        FindAllParents(resultSet, [revision parentRevisionUUID], persistentRootUUID, store, stopSet);
     }
-    if ([revision mergeParentRevision] != nil)
+    if ([revision mergeParentRevisionUUID] != nil)
     {
-        FindAllParents(resultSet, [[revision mergeParentRevision] UUID], persistentRootUUID, store, stopSet);
+        FindAllParents(resultSet, [revision mergeParentRevisionUUID], persistentRootUUID, store, stopSet);
     }
 }
 

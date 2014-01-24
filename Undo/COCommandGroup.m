@@ -42,26 +42,27 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return self;
 }
 
-- (NSMutableArray *)commandsFromPropertyList: (NSDictionary *)plist
+- (NSMutableArray *)commandsFromPropertyList: (NSDictionary *)plist parentUndoTrack: (COUndoTrack *)aParent
 {
 	NSMutableArray *commands = [NSMutableArray array];
 
     for (id subplist in [plist objectForKey: kCOCommandContents])
     {
-        COCommand *command = [COCommand commandWithPropertyList: subplist];
+        COCommand *command = [COCommand commandWithPropertyList: subplist parentUndoTrack: aParent];
         [commands addObject: command];
     }
 
 	return commands;
 }
 
-- (id) initWithPropertyList: (id)plist
+- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
     SUPERINIT;
 	_UUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandUUID]];
-    _contents = [self commandsFromPropertyList: plist];
+    _contents = [self commandsFromPropertyList: plist parentUndoTrack: aParent];
 	_metadata = [plist objectForKey: kCOCommandMetadata];
 	_timestamp = CODateFromJavaTimestamp([plist objectForKey: kCOCommandTimestamp]);
+	_parentUndoTrack = aParent;
     return self;
 }
 

@@ -63,6 +63,7 @@
 #import "CORelationshipCache.h"
 #import "COStoreTransaction.h"
 #import "COObjectGraphContext+Graphviz.h"
+#import "COEditingContext+Private.h"
 
 #import "diff.h"
 

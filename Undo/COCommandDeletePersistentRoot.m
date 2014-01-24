@@ -18,9 +18,9 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 @synthesize initialRevisionID = _initialRevisionID;
 
-- (id) initWithPropertyList: (id)plist
+- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
-    self = [super initWithPropertyList: plist];
+    self = [super initWithPropertyList: plist parentUndoTrack: aParent];
 	if (self == nil)
 		return nil;
 

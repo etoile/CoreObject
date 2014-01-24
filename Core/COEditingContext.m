@@ -65,7 +65,7 @@
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
     _isRecordingUndo = YES;
-	_revisionCache = [[CORevisionCache alloc] initWithStore: _store];
+	_revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
 	
 	[self registerAdditionalEntityDescriptions];
 
@@ -699,9 +699,8 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 
 - (CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid persistentRootUUID: (ETUUID *)aPersistentRoot
 {
-    return [CORevisionCache revisionForRevisionUUID: aRevid
-	                             persistentRootUUID: aPersistentRoot
-	                                      storeUUID: [_store UUID]];
+    return [_revisionCache revisionForRevisionUUID: aRevid
+								persistentRootUUID: aPersistentRoot];
 }
 
 - (COBranch *)branchForUUID: (ETUUID *)aBranch

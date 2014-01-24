@@ -6,6 +6,7 @@
  */
 
 #import <CoreObject/CoreObject.h>
+#import <CoreObject/COEditingContext+Private.h>
 #import "CORevisionCache.h"
 
 #import "COSynchronizerRevision.h"
@@ -95,17 +96,15 @@
 										modelDescriptionRepository: self.persistentRoot.editingContext.modelDescriptionRepository];
 		ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 		
-		[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [rebasedRevs lastObject]
-														  persistentRootUUID: self.persistentRoot.UUID
-																   storeUUID: [[self.persistentRoot store] UUID]]];
+		[branch setCurrentRevision: [self.persistentRoot.editingContext revisionForRevisionUUID: [rebasedRevs lastObject]
+																			 persistentRootUUID: self.persistentRoot.UUID]];
 	}
 	else
 	{
 		// Fast-forward
 		
-		[branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
-														   persistentRootUUID: self.persistentRoot.UUID
-																	storeUUID: [[self.persistentRoot store] UUID]]];
+		[branch setCurrentRevision: [self.persistentRoot.editingContext revisionForRevisionUUID: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
+																			 persistentRootUUID: self.persistentRoot.UUID]];
 	}
 
 	// Set the following ivars so -sendPushToClient: sends a response message

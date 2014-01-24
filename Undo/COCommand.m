@@ -42,6 +42,8 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
 @implementation COCommand
 
+@synthesize parentUndoTrack = _parentUndoTrack;
+
 + (NSDictionary *) mapping
 {
     return D([COCommandGroup class], kCOCommandTypeEditGroup,
@@ -56,7 +58,7 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 		   [COCommandSetPersistentRootMetadata class], kCOCommandTypeSetPersistentRootMetadata);
 }
 
-+ (COCommand *) commandWithPropertyList: (id)aPlist
++ (COCommand *) commandWithPropertyList: (id)aPlist parentUndoTrack: (COUndoTrack *)aParent
 {
     NSString *type = [aPlist objectForKey: kCOCommandType];
     
@@ -66,7 +68,7 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 
     if (cls != Nil)
     {
-        return [[cls alloc] initWithPropertyList: aPlist];
+        return [[cls alloc] initWithPropertyList: aPlist parentUndoTrack: aParent];
     }
     else
     {
@@ -75,7 +77,7 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
     }
 }
 
-- (id) initWithPropertyList: (id)plist
+- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
     [NSException raise: NSInvalidArgumentException format: @"override"];
     return nil;
@@ -186,9 +188,10 @@ NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 #pragma mark -
 #pragma mark Initialization
 
-- (id) initWithPropertyList: (id)plist
+- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
     SUPERINIT;
+	_parentUndoTrack = aParent;
     _storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandStoreUUID]];
     _persistentRootUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandPersistentRootUUID]];
     return self;

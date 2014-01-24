@@ -1,7 +1,7 @@
 #import "EWGraphRenderer.h"
 #import <EtoileFoundation/Macros.h>
 #import <CoreObject/CoreObject.h>
-#import <CoreObject/CORevisionCache.h>
+#import <CoreObject/COEditingContext+Private.h>
 
 @interface EWGraphRow : NSObject
 @property (nonatomic) NSMutableArray *intersectingLines;
@@ -223,9 +223,8 @@ static NSSet *RevisionInfoSet(COPersistentRoot *proot)
 - (CORevision *) revisionAtIndex: (NSUInteger)index
 {
 	CORevisionInfo *info = revisionInfosChronological[index];
-	return [CORevisionCache revisionForRevisionUUID: info.revisionUUID
-								 persistentRootUUID: persistentRoot.UUID
-										  storeUUID: persistentRoot.store.UUID];
+	return [persistentRoot.editingContext revisionForRevisionUUID: info.revisionUUID
+											   persistentRootUUID: persistentRoot.UUID];
 }
 
 #pragma mark - Drawing

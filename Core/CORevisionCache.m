@@ -7,63 +7,37 @@
 
 #import "CORevisionCache.h"
 #import "CORevision.h"
+#import "COEditingContext.h"
 #import "COSQLiteStore.h"
 
 @implementation CORevisionCache
 
-@synthesize store = _store;
+@synthesize parentEditingContext = _parentContext;
 
-/**
- * N.B.: The values are unsafe retained
- */
-static NSMapTable *cachesByStoreUUID = nil;
-
-+ (void)initialize
+- (id) initWithParentEditingContext: (COEditingContext *)aCtx
 {
-	if (self != [CORevisionCache class])
-		return;
-
-	cachesByStoreUUID = [NSMapTable mapTableWithStrongToWeakObjects];
-}
-
-+ (id) cacheForStoreUUID: (ETUUID *)aUUID
-{
-	return [cachesByStoreUUID objectForKey: aUUID];
-}
-
-- (void) dealloc
-{
-	[cachesByStoreUUID removeObjectForKey: _storeUUID];
-}
-
-- (id) initWithStore: (COSQLiteStore *)aStore
-{
-	NILARG_EXCEPTION_TEST(aStore);
-	
-	CORevisionCache *cache = [cachesByStoreUUID objectForKey: [aStore UUID]];
-	if (cache != nil)
-	{
-		return cache;
-	}
+	NILARG_EXCEPTION_TEST(aCtx);
 	
     SUPERINIT;
-	_store = aStore;
+	_parentContext = aCtx;
     _revisionForRevisionID = [[NSMutableDictionary alloc] init];
-	_storeUUID = [aStore UUID];
-	[cachesByStoreUUID setObject: self
-						  forKey: _storeUUID];
+
     return self;
 }
 
 - (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
 					  persistentRootUUID: (ETUUID *)aPersistentRoot
 {
+	ETAssert(_parentContext != nil);
+	
     CORevision *cached = [_revisionForRevisionID objectForKey: aRevid];
     if (cached == nil)
     {
-		ETAssert([self store] != nil);
-        CORevisionInfo *info = [[self store] revisionInfoForRevisionUUID: aRevid
-													  persistentRootUUID: aPersistentRoot];
+		COSQLiteStore *store = _parentContext.store;
+		ETAssert(store != nil);
+		
+        CORevisionInfo *info = [store revisionInfoForRevisionUUID: aRevid
+											   persistentRootUUID: aPersistentRoot];
         
 		if (info == nil)
 			return nil;
@@ -73,14 +47,6 @@ static NSMapTable *cachesByStoreUUID = nil;
         [_revisionForRevisionID setObject: cached forKey: aRevid];
     }
     return cached;
-}
-
-+ (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
-					  persistentRootUUID: (ETUUID *)aPersistentRoot
-							   storeUUID: (ETUUID *)aStoreUUID
-{
-    return [[self cacheForStoreUUID: aStoreUUID] revisionForRevisionUUID: aRevid
-													  persistentRootUUID: aPersistentRoot];
 }
 
 @end

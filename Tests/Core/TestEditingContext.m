@@ -207,26 +207,54 @@
 	UKRaisesException([[COEditingContext alloc] init]);
 }
 
-- (void) testRevisionCacheManagementForMultipleStoreInstances
+- (void) testRevisionEqualityFromMultipleEditingContexts
 {
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	[ctx commit];
+	
+	CORevision *firstRevision = persistentRoot.currentRevision;
+	
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 if (isNewContext)
+		 {
+			 CORevision *testRevision = testProot.currentRevision;
+			 UKObjectsNotSame(testRevision, firstRevision);
+			 UKObjectsEqual(testRevision.UUID, firstRevision.UUID);
+			 UKObjectsEqual(testRevision, firstRevision);
+		 }
+	 }];
+}
+
+- (void) testRevisionLifetime
+{
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	[ctx commit];
+	CORevision *r1 = persistentRoot.currentRevision;
+	
+	[[persistentRoot rootObject] setLabel: @"test"];
+	[ctx commit];
+	CORevision *r2 = persistentRoot.currentRevision;
+		
+	CORevision *r2cxt2 = nil;
+	
 	@autoreleasepool
 	{
 		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore:
 			[[COSQLiteStore alloc] initWithURL: [[self class] storeURL]]];
 		
-		UKObjectsNotSame(store, [ctx2 store]);
-		UKObjectsEqual([store UUID], [[ctx2 store] UUID]);
-		
-		UKObjectsSame(store, [[CORevisionCache cacheForStoreUUID: [store UUID]] store]);
-
-		ctx = nil;
-
-		UKObjectsSame(store, [[CORevisionCache cacheForStoreUUID: [store UUID]] store]);
-
-		ctx2 = nil;
+		r2cxt2 = [[ctx2 persistentRootForUUID: persistentRoot.UUID] currentRevision];
 	}
+	
+	// At this point, r2ctx2's editing context is deallocated, so calling
+	// any methods on r2ctx2 that require loading more revisions should throw
+	// an exception
+	
+	UKObjectsEqual(r2.UUID, r2cxt2.UUID);
 
-	UKNil([CORevisionCache cacheForStoreUUID: [store UUID]]);
+	UKObjectsEqual(r1, [r2 parentRevision]);
+	UKRaisesException([r2cxt2 parentRevision]);
 }
 
 @end

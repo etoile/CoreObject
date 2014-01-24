@@ -6,6 +6,7 @@
  */
 
 #import <CoreObject/CoreObject.h>
+#import <CoreObject/COEditingContext+Private.h>
 #import "CORevisionCache.h"
 #import "COSynchronizerRevision.h"
 #import "COSynchronizerPushedRevisionsToClientMessage.h"
@@ -133,9 +134,8 @@
 	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
 	for (COSynchronizerRevision *rev in revsToUse)
 	{
-		CORevision *existingRevisions = [CORevisionCache revisionForRevisionUUID: rev.revisionUUID
-															  persistentRootUUID: self.persistentRoot.UUID
-																	   storeUUID: [[self.persistentRoot store] UUID]];
+		CORevision *existingRevisions = [self.persistentRoot.editingContext revisionForRevisionUUID: rev.revisionUUID
+																				 persistentRootUUID: self.persistentRoot.UUID];
 								  
 		if (nil == existingRevisions)
 		{
@@ -182,17 +182,15 @@
 										modelDescriptionRepository: self.persistentRoot.editingContext.modelDescriptionRepository];
 		ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 
-		[_branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [rebasedRevs lastObject]
-														   persistentRootUUID: self.persistentRoot.UUID
-																	storeUUID: [[self.persistentRoot store] UUID]]];
+		[_branch setCurrentRevision: [self.persistentRoot.editingContext revisionForRevisionUUID: [rebasedRevs lastObject]
+																			  persistentRootUUID: self.persistentRoot.UUID]];
 	}
 	else if (!isCurrentRevDescendentOfServerRev)
 	{
 		// Fast-forward
 		
-		[_branch setCurrentRevision: [CORevisionCache revisionForRevisionUUID: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
-														   persistentRootUUID: self.persistentRoot.UUID
-																	storeUUID: [[self.persistentRoot store] UUID]]];
+		[_branch setCurrentRevision: [self.persistentRoot.editingContext revisionForRevisionUUID: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
+																			  persistentRootUUID: self.persistentRoot.UUID]];
 	}
 	_lastRevisionUUIDInTransitToServer = nil;
 	[self.persistentRoot commit];
