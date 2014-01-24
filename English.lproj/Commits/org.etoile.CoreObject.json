@@ -16,6 +16,18 @@
 		{
 			"type": "history",
 			"shortDescription": "Selective redo '%@'"
+		},
+		
+		"undo":
+		{
+			"type": "history",
+			"shortDescription": "Undo '%@'"
+		},
+		
+		"redo":
+		{
+			"type": "history",
+			"shortDescription": "Redo '%@'"
 		}
 	}
 }

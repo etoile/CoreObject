@@ -168,7 +168,10 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	// we could implement -validateUndoCommitWithCommand: to ensure there is no
 	// command COCommandCreatePersistentRoot or COCommandNewRevisionForBranch
 	// that create new revisions in the store.
-    [aContext commit];
+    [aContext commitWithIdentifier: isUndo ?  @"org.etoile.CoreObject.undo" : @"org.etoile.CoreObject.redo"
+						  metadata: @{ kCOCommitMetadataShortDescriptionArguments : @[[edit localizedShortDescription]] }
+						 undoTrack: nil
+							 error: NULL];
     aContext.isRecordingUndo = YES;
     
 	COCommandGroup *rewrittenEdit = appliedEdit;// [appliedEdit rewrittenCommandAfterCommitInContext: aContext];
