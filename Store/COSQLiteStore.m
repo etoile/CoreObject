@@ -417,7 +417,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     COSQLiteStorePersistentRootBackingStore *result = [backingStores_ objectForKey: aUUID];
     if (result == nil)
     {
-        result = [[COSQLiteStorePersistentRootBackingStore alloc] initWithPersistentRootUUID: aUUID store: self useStoreDB: NO error: error];
+        result = [[COSQLiteStorePersistentRootBackingStore alloc] initWithPersistentRootUUID: aUUID store: self useStoreDB: BACKING_STORES_SHARE_SAME_SQLITE_DB error: error];
         if (result == nil)
         {
             return nil;

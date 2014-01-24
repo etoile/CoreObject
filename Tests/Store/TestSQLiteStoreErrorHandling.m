@@ -96,8 +96,11 @@ static ETUUID *rootUUID;
 												 UUID: [ETUUID UUID]
 										   branchUUID: [ETUUID UUID]
 									 revisionMetadata: nil];
-       
-        UKFalse([store commitStoreTransaction: txn]);
+#if BACKING_STORES_SHARE_SAME_SQLITE_DB == YES
+		UKTrue([store commitStoreTransaction: txn]);
+#else
+		UKFalse([store commitStoreTransaction: txn]);
+#endif
     }
 
 #ifdef GNUSTEP
