@@ -12,6 +12,8 @@
 	NSString *replacementText;
 	
 	NSTimer *coalescingTimer;
+	
+	BOOL changedByUser;
 }
 
 @end

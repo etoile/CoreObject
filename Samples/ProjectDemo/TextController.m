@@ -54,6 +54,8 @@
 
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
 {
+	changedByUser = YES;
+	
 	NSLog(@"should add %@", replacementString);
 	
 	// These are just used to provide commit metadata
@@ -85,6 +87,15 @@ static NSString *Trim(NSString *text)
 	NSLog(@"Text storage did process editing. %@ edited range: %@ = %@", notification.userInfo, NSStringFromRange([textStorage editedRange]), editedText);
 	[textView setNeedsDisplay: YES];
 	
+	if (changedByUser)
+	{
+		changedByUser = NO;
+	}
+	else if ([[self objectGraphContext] hasChanges])
+	{
+		NSLog(@"Processing editing with changes, but it wasn't the user's changes, ignoring");
+		return;
+	}
 
 	if ([[self objectGraphContext] hasChanges])
 	{
