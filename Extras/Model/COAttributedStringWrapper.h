@@ -15,6 +15,11 @@
 	NSUInteger _lastNotifiedLength;
 	BOOL _inPrimitiveMethod;
 	NSString *_cachedString;
+	/**
+	 * For tracking what we are observing with KVO,
+	 * so we can unregister accurately.
+	 */
+	NSMutableSet *_observedObjectsSet;
 }
 
 - (instancetype) initWithBacking: (COAttributedString *)aBacking;

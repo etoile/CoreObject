@@ -26,10 +26,13 @@
 	_lastNotifiedLength = [aBacking length];
 	_backing = aBacking;
 	_cachedString = [aBacking string];
-		
+	_observedObjectsSet = [NSMutableSet new];
+	
+	[_observedObjectsSet addObject: _backing];
 	[_backing addObserver: self forKeyPath: @"chunks" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
 	for (COAttributedStringChunk *chunk in _backing.chunks)
 	{
+		[_observedObjectsSet addObject: chunk];
 		[chunk addObserver: self forKeyPath: @"text" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
 		[chunk addObserver: self forKeyPath: @"attributes" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
 	}
@@ -61,7 +64,7 @@
 {
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
 	
-	for (COObject *object in [_backing.objectGraphContext loadedObjects])
+	for (COObject *object in [_observedObjectsSet copy])
 	{
 		[self unregisterAsObserverOf: object];
 	}
@@ -215,6 +218,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		
 		for (COAttributedStringChunk *chunk in newChunks)
 		{
+			[_observedObjectsSet addObject: chunk];
 			[chunk addObserver: self forKeyPath: @"text" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
 			[chunk addObserver: self forKeyPath: @"attributes" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
 		}
@@ -298,34 +302,19 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 
 - (void) unregisterAsObserverOf: (COObject *)object
 {
-	// FIXME: We need to keep track of exactly what objects we're observing
+	if (![_observedObjectsSet containsObject: object])
+		return;
+
+	[_observedObjectsSet removeObject: object];
 	
 	if ([object isKindOfClass: [COAttributedString class]])
 	{
-		@try
-		{
-			[object removeObserver: self forKeyPath: @"chunks"];
-		}
-		@catch (NSException *e)
-		{
-		}
+		[object removeObserver: self forKeyPath: @"chunks"];
 	}
 	else if ([object isKindOfClass: [COAttributedStringChunk class]])
 	{
-		@try
-		{
-			[object removeObserver: self forKeyPath: @"text"];
-		}
-		@catch (NSException *e)
-		{
-		}
-		@try
-		{
-			[object removeObserver: self forKeyPath: @"attributes"];
-		}
-		@catch (NSException *e)
-		{
-		}
+		[object removeObserver: self forKeyPath: @"text"];
+		[object removeObserver: self forKeyPath: @"attributes"];
 	}
 }
 
