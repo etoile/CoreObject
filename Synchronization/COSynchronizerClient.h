@@ -78,7 +78,7 @@
 	/** Just for benchmarking */
 	NSDate *_lastRevisionUUIDInTransitToServerTimestamp;
 	
-	id<COSynchronizerClientDelegate> _delegate;
+	id<COSynchronizerClientDelegate> __weak _delegate;
 }
 
 - (id) initWithClientID: (NSString *)clientID
@@ -90,7 +90,7 @@
 @property (nonatomic, readonly, strong) COPersistentRoot *persistentRoot;
 @property (nonatomic, readonly, strong) COBranch *branch;
 
-@property (nonatomic, readwrite, strong) id<COSynchronizerClientDelegate> delegate;
+@property (nonatomic, readwrite, weak) id<COSynchronizerClientDelegate> delegate;
 
 - (void) handleSetupMessage: (COSynchronizerPersistentRootInfoToClientMessage *)message;
 - (void) handlePushMessage: (COSynchronizerPushedRevisionsToClientMessage *)aMessage;

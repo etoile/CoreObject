@@ -35,7 +35,7 @@
 	 */
 	NSMutableDictionary *lastSentRevisionForClientID;
 	
-	id<COSynchronizerServerDelegate> delegate;
+	id<COSynchronizerServerDelegate> __weak delegate;
 	
 	// HACK: These two are used to pass info between two methods in
 	// COSynchronizerServer where one calls the other via a commit notification
@@ -49,7 +49,7 @@
 @property (nonatomic, readonly, strong) COPersistentRoot *persistentRoot;
 @property (nonatomic, readonly, strong) COBranch *branch;
 
-@property (nonatomic, readwrite, strong) id<COSynchronizerServerDelegate> delegate;
+@property (nonatomic, readwrite, weak) id<COSynchronizerServerDelegate> delegate;
 
 - (void) handlePushedRevisionsFromClient: (COSynchronizerPushedRevisionsFromClientMessage *)aMessage;
 
