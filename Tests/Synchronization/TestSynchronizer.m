@@ -238,6 +238,8 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 }
 
+// FIXME: For some reason, this test case causes a COSQLiteStore to be leaked.
+// I think it's something to do with the exception thrown during -commit.
 - (void) testBasicServerRevert
 {
 	[[serverBranch rootObject] setLabel: @"revertThis"];
@@ -256,6 +258,7 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 }
 
+// FIXME: This test case causes a COSQLiteStore to be leaked (see previous test too).
 - (void) testBasicClientRevert
 {
 	[[serverBranch rootObject] setLabel: @"revertThis"];
