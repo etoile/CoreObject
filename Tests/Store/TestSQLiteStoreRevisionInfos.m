@@ -10,8 +10,13 @@
 #import "COSQLiteStore+Attachments.h"
 
 /**
+ * Tests the store method -revisionInfosForBranchUUID:options:
+ *
  * For each execution of a test method, the store is recreated and a persistent root
  * is created in -init with a single commit, with the contents returned by -makeInitialItemTree.
+ *
+ * TODO: Switch to the more complex history graph in TestHistoryInspection
+ * See comments in TestHistoryInspection.
  */
 @interface TestSQLiteStoreRevisionInfos : SQLiteStoreTestCase <UKTest>
 {
@@ -136,16 +141,15 @@ RevisionInfoUUIDs(NSArray *revInfos)
 	UKObjectsEqual(A(r0, r6), RevisionInfoUUIDs(b2ARevInfos));
 }
 
-#if 0
 - (void) testRevisionInfosForBranchWithDivergentRevisionsOption
 {
     NSArray *b1ARevInfos = [store revisionInfosForBranchUUID: b1A options: COBranchRevisionReadingDivergentRevisions];
     NSArray *b1BRevInfos = [store revisionInfosForBranchUUID: b1B options: COBranchRevisionReadingDivergentRevisions];
     NSArray *b2ARevInfos = [store revisionInfosForBranchUUID: b2A options: COBranchRevisionReadingDivergentRevisions];
 	
-    UKObjectsEqual(A(r0, r1, r2, r3, r4, r5, r6), RevisionInfoUUIDs(b1ARevInfos));
+    UKObjectsEqual(A(r0, r1), RevisionInfoUUIDs(b1ARevInfos));
 	UKObjectsEqual(A(r2, r3, r4, r5), RevisionInfoUUIDs(b1BRevInfos));
-	UKObjectsEqual(A(r0, r6), RevisionInfoUUIDs(b2ARevInfos));
+	UKObjectsEqual(A(r6), RevisionInfoUUIDs(b2ARevInfos));
 }
 
 - (void) testRevisionInfosForBranchWithParentBranchesAndDivergentRevisionsOption
@@ -154,11 +158,10 @@ RevisionInfoUUIDs(NSArray *revInfos)
     NSArray *b1BRevInfos = [store revisionInfosForBranchUUID: b1B options: COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions];
     NSArray *b2ARevInfos = [store revisionInfosForBranchUUID: b2A options: COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions];
 	
-    UKObjectsEqual(A(r0, r1, r2, r3, r4, r5, r6), RevisionInfoUUIDs(b1ARevInfos));
-	UKObjectsEqual(A(r0, r1, r2, r3, r4, r5, r6), RevisionInfoUUIDs(b1BRevInfos));
-	UKObjectsEqual(A(r0, r1, r2, r3, r4, r5, r6), RevisionInfoUUIDs(b2ARevInfos));
+    UKObjectsEqual(A(r0, r1), RevisionInfoUUIDs(b1ARevInfos));
+	UKObjectsEqual(A(r0, r1, r2, r3, r4, r5), RevisionInfoUUIDs(b1BRevInfos));
+	UKObjectsEqual(A(r0, r6), RevisionInfoUUIDs(b2ARevInfos));
 }
-#endif
 
 - (void) testRevisionInfosForBackingStoreOfPersistentRootUUID
 {

@@ -23,7 +23,7 @@ enum
 	COBranchRevisionReadingDefault = 0,
 	/**
 	 * Return all parent revisions of the branch's head revision, including those in
-	 * parent branches.
+	 * parent branches, as well as those in parent persistent roots.
 	 *
 	 * Revisions on branches merged into the branch, or on branches merged into
 	 * parent branches are not included.
@@ -38,8 +38,8 @@ enum
 	 * Although no branch creation was requested, a divergent revision sequence
 	 * form a "branch" in the history graph, this is why we call these branches implicit or anonymous.
 	 *
-	 * Note that this will not return revisions that are descendents of the 
-	 * head revision.
+	 * If combined with COBranchRevisionReadingParentBranches, also includes divergent
+	 * revisions belonging to the parent of the branch being queried, and its parent, etc.
 	 *
 	 * See "lost head" example in COSQLiteStore documentation.
 	 */

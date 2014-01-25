@@ -14,6 +14,15 @@
 - (void) setHeadRevision: (CORevision *)rev;
 @end
 
+/**
+ * TODO: Factor out a class which builds this example history graph
+ * using only COSQLiteStore methods (see TestSQLiteStoreRevisionInfos for an example
+ * of how to do this fairly concisely), and use it in various places in 
+ * the test suite where a complex history graph would be useful.
+ *
+ * Then move the tests in this class which just test -revisionsForBranch:options:
+ * to TestSQLiteStoreRevisionInfos (merging with the tests there as needed).
+ */
 @interface TestHistoryInspection : EditingContextTestCase <UKTest>
 {
     COPersistentRoot *p1;
@@ -241,6 +250,9 @@
 	
 	UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: options]);
 	UKObjectsEqual(A(r0, r1, r3, r5, r6, r8), [self revisionsForBranch: branch1B options: options]);
+	
+	// FIXME: For this next line, if r5 is included, r8 should also be (since they are both
+	// diverget revisions in branch 1B).
 	UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
 	UKObjectsEqual(A(r0, r1, r2, r4), [self revisionsForBranch: branch2A options: options]);
 }
@@ -294,7 +306,7 @@
 	UKObjectsEqual(A(r0, r1, r2, r4, r11), [branch2A nodes]);
 }
 
-// FIXME: Test these things when reloading from a store
+// TODO: Test these things when reloading from a store
 
 /**
  * It's important for syncing to be able to look up a revision in the cache
