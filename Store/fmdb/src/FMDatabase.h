@@ -2,6 +2,8 @@
 #import "sqlite3.h"
 #import "FMResultSet.h"
 
+#define FMDatabase_DEBUG
+
 @interface FMDatabase : NSObject 
 {
 	sqlite3*    db;
@@ -15,7 +17,10 @@
     BOOL        shouldCacheStatements;
     NSMutableDictionary *cachedStatements;
 }
-
+#ifdef FMDatabase_DEBUG
++ (void) logOpenDatabases;
++ (int) countOfOpenDatabases;
+#endif
 
 + (id)databaseWithPath:(NSString*)inPath;
 - (id)initWithPath:(NSString*)inPath;

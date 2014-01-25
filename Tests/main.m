@@ -43,16 +43,29 @@ int main (int argc, const char *argv[])
 		[runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 	}
 
-	// TODO: Maybe count up the number of leaked COSQLiteStore instances at this
+	// Count up the number of open sqlite database connections at this
 	// point.
 	//
-	// As of 2014-01-24, there are 3 leaked stores:
+	// As of 2014-01-24, there are 3 open connections:
 	//
 	//  - In TestSynchronizer, -testBasicServerRevert and -testBasicClientRevert each leak a store.
 	//    (I don't understand why, but they're not so serious because
 	//     they only happen when throwing an exception in response to incorrect API usage.)
 	//
-	//  - +[COUndoStackStore defaultStore] intentionally leaks a database connection.
+	//  - +[COUndoStackStore defaultStore] intentionally opens and never closes a database connection
+	//    to the ~/Library/CoreObject/Undo/undo.sqlite database
 
+	@autoreleasepool
+	{
+		[FMDatabase logOpenDatabases];
+
+		const int expectedOpenDatabases = 3;
+		if ([FMDatabase countOfOpenDatabases] > expectedOpenDatabases)
+		{
+			NSLog(@"ERROR: Expected only %d SQLite database connections to still be open.", expectedOpenDatabases);
+			status = 1;
+		}
+	}
+	
 	return status;
 }
