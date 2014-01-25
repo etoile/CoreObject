@@ -127,6 +127,26 @@
 	//UKTrue([objects containsObject: bookmark]);
 }
 
+- (void) testHashStabilityAcrossSetCurrentBranch
+{
+	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+	COObject *object = [proot rootObject];
+	const NSUInteger hash = [object hash];
+	[ctx commit];
+	
+	COBranch *secondaryBranch = [[proot currentBranch] makeBranchWithLabel: @"secondaryBranch"];
+	[proot setCurrentBranch: secondaryBranch];
+	[ctx commit];
+	
+	// This breaks currently, because object belongs to the "current branch object graph"
+	// [proot objectGraphContext]. The branch of [proot objectGraphContext] changes
+	// when -setCurrentBranch: is called, but the branch UUID is incorporated
+	// into -[COObject hash] right now, so this fails
+#if 0
+	UKIntsEqual(hash, [object hash]);
+#endif
+}
+
 - (void) testDetailedDescription
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
