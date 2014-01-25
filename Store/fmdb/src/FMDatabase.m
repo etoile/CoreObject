@@ -1,5 +1,6 @@
 #import "FMDatabase.h"
 #import "unistd.h"
+#include <dispatch/dispatch.h>
 
 @implementation FMDatabase
 
