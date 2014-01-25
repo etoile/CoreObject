@@ -70,6 +70,8 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	[self checkEdit: diff_edit_at_index(diff, 4) isCopyFromLocA:3 length:1 toLocB:4];   // copy 'd'
 	[self checkEdit: diff_edit_at_index(diff, 5) isModifyFromLocA:4 length:2 toLocB:5 length:3]; // modify 'ef' to 'xyz'
 	[self checkEdit: diff_edit_at_index(diff, 6) isCopyFromLocA:6 length:1 toLocB:8];   // copy 'g'
+	
+	diff_free(diff);
 }
 
 - (void) testMixed2
@@ -85,6 +87,8 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	[self checkEdit: diff_edit_at_index(diff, 2) isInsertAtLocA:1 fromLocB:2 length:1]; // insert 'y'
 	[self checkEdit: diff_edit_at_index(diff, 3) isCopyFromLocA:1 length:2 toLocB:3];   // copy 'bc'
 	[self checkEdit: diff_edit_at_index(diff, 4) isInsertAtLocA:3 fromLocB:5 length:1]; // insert 'z'
+	
+	diff_free(diff);
 }
 
 - (void) testInsertAtStart
@@ -97,6 +101,8 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	
 	[self checkEdit: diff_edit_at_index(diff, 0) isInsertAtLocA: 0 fromLocB: 0 length: 1]; // insert 'b'
 	[self checkEdit: diff_edit_at_index(diff, 1) isCopyFromLocA: 0 length: 1 toLocB: 1];   // copy 'a'
+
+	diff_free(diff);
 }
 
 - (void) testDeleteAtStart
@@ -109,6 +115,8 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	
 	[self checkEdit: diff_edit_at_index(diff, 0) isDeleteFromLocA: 0 length: 1];           // delete 'b'
 	[self checkEdit: diff_edit_at_index(diff, 1) isCopyFromLocA: 1 length: 1 toLocB: 0];   // copy 'a'
+
+	diff_free(diff);
 }
 
 - (void) testInsertAtEnd
@@ -121,6 +129,8 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 
 	[self checkEdit: diff_edit_at_index(diff, 0) isCopyFromLocA: 0 length: 1 toLocB: 0];   // copy 'a'
 	[self checkEdit: diff_edit_at_index(diff, 1) isInsertAtLocA: 1 fromLocB: 1 length: 1]; // insert 'b'
+
+	diff_free(diff);
 }
 
 - (void) testDeleteAtEnd
@@ -133,6 +143,8 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	
 	[self checkEdit: diff_edit_at_index(diff, 0) isCopyFromLocA: 0 length: 1 toLocB: 0];    // copy 'a'
 	[self checkEdit: diff_edit_at_index(diff, 1) isDeleteFromLocA: 1 length: 1];           // delete 'b'
+
+	diff_free(diff);
 }
 
 - (void) testReplaceAll
@@ -144,6 +156,8 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	UKIntsEqual(1, diff_editcount(diff));
 	
 	[self checkEdit: diff_edit_at_index(diff, 0) isModifyFromLocA: 0 length: 1 toLocB: 0 length: 1]; // modify 'x' to 'y'
+
+	diff_free(diff);
 }
 
 - (void) testInsertAll
@@ -155,6 +169,8 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	UKIntsEqual(1, diff_editcount(diff));
 	
 	[self checkEdit: diff_edit_at_index(diff, 0) isInsertAtLocA: 0 fromLocB: 0 length: 1]; // insert 'a'
+
+	diff_free(diff);
 }
 
 - (void) testDeleteAll
@@ -166,12 +182,16 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	UKIntsEqual(1, diff_editcount(diff));
 	
 	[self checkEdit: diff_edit_at_index(diff, 0) isDeleteFromLocA: 0 length: 1];           // delete 'a'
+
+	diff_free(diff);
 }
 
 - (void) testEmpty
 {
 	diffresult_t *diff = diff_arrays(0, 0, arraycomparefn, NULL, NULL);
 	UKIntsEqual(0, diff_editcount(diff));
+
+	diff_free(diff);
 }
 
 - (void) testSame
@@ -183,6 +203,8 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	UKIntsEqual(1, diff_editcount(diff));
 	
 	[self checkEdit: diff_edit_at_index(diff, 0) isCopyFromLocA:0 length:1 toLocB:0];
+
+	diff_free(diff);
 }
 
 @end
