@@ -697,6 +697,8 @@
 
 /** 
  * Returns a hash based on the UUID. 
+ *
+ * You must never override -hash.
  */
 - (NSUInteger)hash;
 /**
@@ -707,6 +709,10 @@
  *
  * Use -isTemporallyEqual: to check both UUID and revision match. For example, 
  * when the same object is in use in multiple editing contexts simultaneously.
+ *
+ * You must never override -isEqual:. This is a consequence of the fact that
+ * we promise it is safe to put a COObject instance in an NSSet and then mutate
+ * the COObject.
  */
 - (BOOL)isEqual: (id)anObject;
 /** 
