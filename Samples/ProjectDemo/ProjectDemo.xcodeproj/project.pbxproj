@@ -61,6 +61,7 @@
 		6646980617CFF8AA00A1B767 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664697FF17CFF8A200A1B767 /* EtoileFoundation.framework */; };
 		6646987F17D3FF6500A1B767 /* DocumentItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646987E17D3FF6000A1B767 /* DocumentItem.m */; };
 		6646988717D407A400A1B767 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6646988617D407A000A1B767 /* AppKit.framework */; };
+		66568C6A189399A80075FD9A /* TODO.md in Resources */ = {isa = PBXBuildFile; fileRef = 66568C69189399A80075FD9A /* TODO.md */; };
 		665D41E9182868840044E6B9 /* EWUndoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 665D41E7182868840044E6B9 /* EWUndoWindowController.m */; };
 		665D41EA182868840044E6B9 /* Undo.xib in Resources */ = {isa = PBXBuildFile; fileRef = 665D41E8182868840044E6B9 /* Undo.xib */; };
 		66708F9C12486F0400E65F00 /* ProjectDemoMainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* ProjectDemoMainMenu.xib */; };
@@ -325,6 +326,7 @@
 		6646987D17D3FF5B00A1B767 /* DocumentItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DocumentItem.h; sourceTree = "<group>"; };
 		6646987E17D3FF6000A1B767 /* DocumentItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DocumentItem.m; sourceTree = "<group>"; };
 		6646988617D407A000A1B767 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = ../../../../../../System/Library/Frameworks/AppKit.framework; sourceTree = "<group>"; };
+		66568C69189399A80075FD9A /* TODO.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO.md; sourceTree = "<group>"; };
 		665D41E6182868840044E6B9 /* EWUndoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWUndoWindowController.h; sourceTree = "<group>"; };
 		665D41E7182868840044E6B9 /* EWUndoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWUndoWindowController.m; sourceTree = "<group>"; };
 		665D41E8182868840044E6B9 /* Undo.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Undo.xib; sourceTree = "<group>"; };
@@ -796,6 +798,7 @@
 				66A313621828C5D600CE0B0D /* org.etoile.ProjectDemo.json */,
 				6698320312691F970011C7FC /* SCRATCHPAD */,
 				6627EEDC1278A55A00E06946 /* README.md */,
+				66568C69189399A80075FD9A /* TODO.md */,
 				79911A0712CD974A009D28C0 /* Application.h */,
 				79911A0812CD974A009D28C0 /* Application.m */,
 				79FC088E12DBE8E300DE3C18 /* TagWindowController.h */,
@@ -1120,6 +1123,7 @@
 				79F122C5128A4B7800EC0255 /* format-indent-more.tiff in Resources */,
 				79F122C6128A4B7800EC0255 /* list-add.tiff in Resources */,
 				66C33D71128F395400E5B15B /* ItemReference.m in Resources */,
+				66568C6A189399A80075FD9A /* TODO.md in Resources */,
 				7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */,
 				7991198A12CD4B72009D28C0 /* stamp.png in Resources */,
 				79911A6312CDB215009D28C0 /* Arrow.tiff in Resources */,
