@@ -7,6 +7,7 @@
 
 #import "COAttributedString.h"
 #import "COAttributedStringChunk.h"
+#import "COAttributedStringAttribute.h"
 
 // FIXME: Hack to get -insertObjects:atIndexes:hints:forProperty:
 #import "COObject+Private.h"
@@ -176,9 +177,7 @@
 		{
 			COAttributedStringChunk *leftChunk = self.chunks[j];
 			
-			// NOTE: NSSet of COAttributedStringAttribute comparison works because
-			// COAttributedStringAttribute overrides -isEqual:
-			if ([leftChunk.attributes isEqual: attribs])
+			if ([COAttributedStringAttribute isAttributeSet: leftChunk.attributes equalToSet: attribs])
 			{
 				longestEffectiveRange.location -= leftChunk.length;
 				longestEffectiveRange.length += leftChunk.length;
@@ -194,7 +193,7 @@
 		for (NSInteger j=chunkIndex+1; j<[self.chunks count]; j++)
 		{
 			COAttributedStringChunk *rightChunk = self.chunks[j];
-			if ([rightChunk.attributes isEqual: attribs])
+			if ([COAttributedStringAttribute isAttributeSet: rightChunk.attributes equalToSet: attribs])
 			{
 				longestEffectiveRange.length += rightChunk.length;
 			}

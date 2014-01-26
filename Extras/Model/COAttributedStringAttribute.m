@@ -27,20 +27,6 @@
 
 @dynamic htmlCode;
 
-- (NSUInteger) hash
-{
-	return [self.htmlCode hash];
-}
-
-- (BOOL) isEqual: (id)anObject
-{
-	if (![anObject isKindOfClass: [COAttributedStringAttribute class]])
-		return NO;
-	
-	COAttributedStringAttribute *anAttribute = anObject;
-	return [self.htmlCode isEqual: anAttribute.htmlCode];
-}
-
 - (COItemGraph *) attributeItemGraph
 {
 	COItemGraph *result = [[COItemGraph alloc] init];
@@ -49,6 +35,26 @@
 	ETUUID *copyUUID = [copier copyItemWithUUID: [self UUID] fromGraph: self.objectGraphContext toGraph: result];
 	[result setRootItemUUID: copyUUID];
 	
+	return result;
+}
+
++ (BOOL) isAttributeSet: (NSSet *)aSet equalToSet: (NSSet *)anotherSet
+{
+	return [[[aSet mappedCollection] htmlCode] isEqual: [[anotherSet mappedCollection] htmlCode]];
+}
+
++ (NSSet *) attributeSet: (NSSet *)aSet minusSet: (NSSet *)anotherSet
+{
+	NSSet *htmlCodesToRemove = (NSSet *)[[anotherSet mappedCollection] htmlCode];
+	
+	NSMutableSet *result = [NSMutableSet set];
+	for (COAttributedStringAttribute *attr in aSet)
+	{
+		if (![htmlCodesToRemove containsObject: attr.htmlCode])
+		{
+			[result addObject: attr];
+		}
+	}
 	return result;
 }
 

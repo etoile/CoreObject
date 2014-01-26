@@ -40,7 +40,7 @@ static BOOL coalesceOpPair(id<COAttributedStringDiffOperation> op, id<COAttribut
 		[nextOpAttributeGraph setItemGraph: [(COAttributedStringDiffOperationAddAttribute *)nextOp attributeItemGraph]];
 		COAttributedStringAttribute *nextOpAttribute = [nextOpAttributeGraph rootObject];
 		
-		const BOOL sameAttributes = [opAttribute isEqual: nextOpAttribute];
+		const BOOL sameAttributes = [opAttribute.htmlCode isEqualToString: nextOpAttribute.htmlCode];
 		if (sameAttributes)
 		{
 			op.range = NSMakeRange(op.range.location, op.range.length + nextOp.range.length);
@@ -268,11 +268,10 @@ static void coalesceOps(NSMutableArray *ops)
 		ETAssert(minLength >= 1);
 		const NSRange consideredRangeForFirstString = NSMakeRange(rangeAtIForFirstString.location,  minLength);
 		
-		if (![firstAttributes isEqual: secondAttributes])
+		if (![COAttributedStringAttribute isAttributeSet: firstAttributes equalToSet: secondAttributes])
 		{
 			{
-				NSMutableSet *removed = [NSMutableSet setWithSet: firstAttributes];
-				[removed minusSet: secondAttributes];
+				NSSet *removed = [COAttributedStringAttribute attributeSet: firstAttributes minusSet: secondAttributes];
 				
 				for (COAttributedStringAttribute *attr in removed)
 				{
@@ -280,8 +279,7 @@ static void coalesceOps(NSMutableArray *ops)
 				}
 			}
 			{
-				NSMutableSet *added = [NSMutableSet setWithSet: secondAttributes];
-				[added minusSet: firstAttributes];
+				NSSet *added = [COAttributedStringAttribute attributeSet: secondAttributes minusSet: firstAttributes];
 				
 				for (COAttributedStringAttribute *attr in added)
 				{

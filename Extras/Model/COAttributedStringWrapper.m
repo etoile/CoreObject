@@ -451,6 +451,9 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	return attribute;
 }
 
+/**
+ * Returns set of COAttributedStringAttribute
+ */
 - (NSSet *) ourAttributesForAttributeDict: (NSDictionary *)attrs
 {
 	NSMutableSet *newAttribs = [NSMutableSet new];
@@ -508,7 +511,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 			NSSet *existingAttribs = target.attributes;
 			NSSet *proposedAttribs = [self ourAttributesForAttributeDict: aDict];
 			
-			if ([existingAttribs isEqual: proposedAttribs])
+			if ([COAttributedStringAttribute isAttributeSet: existingAttribs equalToSet: proposedAttribs])
 			{
 				[self edited: NSTextStorageEditedAttributes range: aRange changeInLength: 0];
 				_inPrimitiveMethod = NO;
