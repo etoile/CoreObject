@@ -5,7 +5,7 @@
 #import "EWDocumentWindowController.h"
 #import "SharingDrawerViewController.h"
 
-@interface EWDocumentWindowController : NSWindowController
+@interface EWDocumentWindowController : NSWindowController <NSWindowDelegate>
 {
 	/**
 	 * Is this the primary window for the persistent root?

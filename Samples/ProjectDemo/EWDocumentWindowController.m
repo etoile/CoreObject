@@ -57,6 +57,7 @@
 {
 	[self resetBranchesMenu];
 	[self resetBranchesCheckbox];
+	[self resetTitle];
 	
 	_sharingDrawer = [[NSDrawer alloc] initWithContentSize: NSMakeSize(280, 100) preferredEdge: NSMaxXEdge];
 	_sharingDrawerViewController = [[SharingDrawerViewController alloc] initWithParent: self];
@@ -125,6 +126,7 @@
 {
 	[self resetBranchesMenu];
 	[self resetBranchesCheckbox];
+	[self resetTitle];
 	
 	[self objectGraphDidChange];
 }
@@ -223,6 +225,30 @@
 			[branchesPopUpButton selectItem: item];
 		}
 	}
+}
+
+- (Document *) documentObject
+{
+	Document *document = [self.objectGraphContext rootObject];
+	if (![document isKindOfClass: [Document class]])
+	{
+		NSLog(@"ERROR: -[%@ %@]: Expected root object to be a Document instance, instead it is: %@",
+			  NSStringFromClass([self class]),
+			  NSStringFromSelector(_cmd),
+			  document);
+		return nil;
+	}
+	return document;
+}
+
+- (void) resetTitle
+{
+	NSString *title = @"";
+	if (self.documentObject.documentName != nil)
+	{
+		title = self.documentObject.documentName;
+	}
+	[[self window] setTitle: title];
 }
 
 - (IBAction)checkDefaultBranch: (id)sender
@@ -355,6 +381,11 @@
 	
 	// FIXME: Hack
 	[self close];
+}
+
+- (IBAction)rename:(id)sender
+{
+	NSLog(@"Rename me");
 }
 
 @end

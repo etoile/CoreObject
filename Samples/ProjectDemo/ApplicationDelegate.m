@@ -117,6 +117,43 @@
 	return [context store];
 }
 
+#pragma mark Untitled document name
+
+- (NSString *) untitledDocumentNameForIndex: (NSUInteger)index
+{
+	return [NSString stringWithFormat: @"Untitled %d", (int)index];
+}
+
+- (BOOL) isDocumentNameInUse: (NSString *)aName
+{
+	for (COPersistentRoot *persistentRoot in context.persistentRoots)
+	{
+		COObject *document = [persistentRoot rootObject];
+		if ([document isKindOfClass: [Document class]])
+		{
+			if ([[(Document *)document documentName] isEqualToString: aName])
+				return YES;
+		}
+	}
+	return NO;
+}
+
+/**
+ * Returns a document name like "Untitled 1" that is not currently in use
+ * for a document in context
+ */
+- (NSString *) untitledDocumentName
+{
+	NSUInteger i = 1;
+	while ([self isDocumentNameInUse: [self untitledDocumentNameForIndex: i]])
+	{
+		i++;
+	}
+	return [self untitledDocumentNameForIndex: i];
+}
+
+#pragma mark New document
+
 - (void) newDocumentWithType: (NSString*)type rootObjectEntity: (NSString*)rootObjEntity
 {
     COPersistentRoot *persistentRoot = [context insertNewPersistentRootWithEntityName: @"Anonymous.Document"];
@@ -130,7 +167,7 @@
 	Document *document = [persistentRoot rootObject];
 	[document setRootDocObject: rootObj];
     assert([document rootDocObject] == rootObj);
-	[document setDocumentName: [NSString stringWithFormat: @"Document %@", [[persistentRoot UUID] stringValue]]];
+	[document setDocumentName: [self untitledDocumentName]];
 	[document setDocumentType: type];
 	
 	[self registerDocumentRootObject: document];
