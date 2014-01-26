@@ -174,4 +174,9 @@
 	}
 }
 
+- (NSString *) description
+{
+	return [subDiffsByAlgorithmName description];
+}
+
 @end
