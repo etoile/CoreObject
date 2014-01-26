@@ -198,8 +198,11 @@
 		
 		COPersistentRoot *persistentRoot = [[wc editingBranch] makeCopyFromRevision: [[wc editingBranch] currentRevision]];
 		assert(persistentRoot != nil);
-				
-		[self registerDocumentRootObject: [persistentRoot rootObject]];
+		
+		Document *doc = persistentRoot.rootObject;
+		doc.documentName = [NSString stringWithFormat: @"Copy of %@", doc.documentName];
+		
+		[self registerDocumentRootObject: doc];
 	}
 }
 
