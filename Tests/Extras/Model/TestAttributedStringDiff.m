@@ -152,4 +152,40 @@
 	UKIntsEqual(3, op.range.length);
 }
 
+- (void) testApplyDiffWithRemoveRangeAndRemoveAttributes
+{
+	COObjectGraphContext *target = [self makeAttributedString];
+	[self appendString: @"Hello " htmlCode: nil toAttributedString: [target rootObject]];
+	[self appendString: @"World" htmlCode: @"b" toAttributedString: [target rootObject]];
+	
+	COAttributedStringDiffOperationDeleteRange *op1 = [[COAttributedStringDiffOperationDeleteRange alloc] init];
+	op1.attributedStringUUID = [[target rootObject] UUID];
+	op1.range = NSMakeRange(0, 6);
+	op1.source = @"diff2";
+	
+	COAttributedStringDiffOperationDeleteRange *op2 = [[COAttributedStringDiffOperationDeleteRange alloc] init];
+	op2.attributedStringUUID = [[target rootObject] UUID];
+	op2.range = NSMakeRange(6, 5);
+	op2.source = @"diff1";
+	
+	COObjectGraphContext *boldGraph = [COObjectGraphContext new];
+	[boldGraph setRootObject: [self makeAttr: @"b" inCtx: boldGraph]];
+	
+	COAttributedStringDiffOperationRemoveAttribute *op3 = [[COAttributedStringDiffOperationRemoveAttribute alloc] init];
+	op3.attributedStringUUID = [[target rootObject] UUID];
+	op3.attributeItemGraph = [[COItemGraph alloc] initWithItemGraph: boldGraph];
+	op3.range = NSMakeRange(6, 5);
+	op3.source = @"diff2";
+	
+	COAttributedStringDiff *diff = [[COAttributedStringDiff alloc] initWithOperations: @[op1, op2, op3]];
+	
+	// FIXME: -addedOrUpdatedItemsForApplyingTo: raises exception
+#if 0
+	NSDictionary *diffOutput = [diff addedOrUpdatedItemsForApplyingTo: target];
+	[target insertOrUpdateItems: [diffOutput allValues]];
+	
+	UKObjectsEqual(@"", [[target rootObject] string]);
+#endif
+}
+
 @end

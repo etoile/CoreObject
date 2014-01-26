@@ -41,6 +41,11 @@
 
 - (id<CODiffAlgorithm>) itemTreeDiffByMergingWithDiff: (id<CODiffAlgorithm>)aDiff;
 
+/** 
+ * For testing
+ */
+- (instancetype) initWithOperations: (NSArray *)ops;
+
 @end
 
 @protocol COAttributedStringDiffOperation <NSObject>

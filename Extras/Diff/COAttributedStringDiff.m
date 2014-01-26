@@ -118,6 +118,13 @@ static void coalesceOps(NSMutableArray *ops)
 	return result;
 }
 
+- (instancetype) initWithOperations: (NSArray *)ops
+{
+	SUPERINIT;
+	_operations = [[NSMutableArray alloc] initWithArray: ops];
+	return self;
+}
+
 - (instancetype) initWithFirstAttributedString: (COAttributedString *)first
 						secondAttributedString: (COAttributedString *)second
 										source: (id)source
