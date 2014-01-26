@@ -326,6 +326,14 @@
 									<reference key="NSOnImage" ref="128092494"/>
 									<reference key="NSMixedImage" ref="818417131"/>
 								</object>
+								<object class="NSMenuItem" id="790466051">
+									<reference key="NSMenu" ref="958508040"/>
+									<string key="NSTitle">Rename</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="128092494"/>
+									<reference key="NSMixedImage" ref="818417131"/>
+								</object>
 								<object class="NSMenuItem" id="118857365">
 									<reference key="NSMenu" ref="958508040"/>
 									<string key="NSTitle">Checkpoint</string>
@@ -1671,6 +1679,7 @@
 									<string key="NSFrame">{{1, 119}, {223, 15}}</string>
 									<reference key="NSSuperview" ref="371928918"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="371928918"/>
@@ -1892,6 +1901,7 @@
 							<string key="NSFrame">{{338, 12}, {96, 32}}</string>
 							<reference key="NSSuperview" ref="967803874"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<string key="NSHuggingPriority">{250, 750}</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="669802616">
@@ -2654,6 +2664,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">rename:</string>
+						<reference key="source" ref="471146553"/>
+						<reference key="destination" ref="790466051"/>
+					</object>
+					<string key="id">uXv-Mz-FlG</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">orderFrontFontPanel:</string>
 						<reference key="source" ref="274351205"/>
 						<reference key="destination" ref="796845054"/>
@@ -3119,6 +3137,7 @@
 							<reference ref="264406320"/>
 							<reference ref="212240817"/>
 							<reference ref="209018966"/>
+							<reference ref="790466051"/>
 						</array>
 						<reference key="parent" ref="753782612"/>
 					</object>
@@ -4273,6 +4292,11 @@
 						<reference key="object" ref="209018966"/>
 						<reference key="parent" ref="958508040"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">fYY-QW-Nd0</string>
+						<reference key="object" ref="790466051"/>
+						<reference key="parent" ref="958508040"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -4673,6 +4697,7 @@
 				<string key="Utb-QV-D8k.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="VbX-C7-6g0.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="bX0-0C-zcR.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="fYY-QW-Nd0.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="hSU-uI-2Vd.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="ipP-0V-s99.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="iq1-Ev-g7D.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

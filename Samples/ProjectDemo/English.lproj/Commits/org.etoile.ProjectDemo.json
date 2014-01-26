@@ -12,6 +12,12 @@
 
 	"descriptors":
 	{
+		"rename-document":
+		{
+			"type": "renaming",
+			"shortDescription": "Rename document from '%@' to '%@'"
+		},
+		
 		"set-branch":
 		{
 			"type": "branch",

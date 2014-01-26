@@ -385,7 +385,27 @@
 
 - (IBAction)rename:(id)sender
 {
-	NSLog(@"Rename me");
+    NSAlert *alert = [NSAlert alertWithMessageText: @"Rename document"
+                                     defaultButton: @"OK"
+                                   alternateButton: @"Cancel"
+                                       otherButton: nil
+                         informativeTextWithFormat: @""];
+	
+    NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
+    [input setStringValue: [[self documentObject] documentName]];
+    [alert setAccessoryView:input];
+	
+    NSInteger button = [alert runModal];
+    if (button == NSAlertDefaultReturn) {
+        [input validateEditing];
+        
+		NSString *oldName = self.documentObject.documentName;
+		
+		self.documentObject.documentName = [input stringValue];
+		
+		[self commitWithIdentifier: @"rename-document"
+			  descriptionArguments: @[oldName, self.documentObject.documentName]];
+    }
 }
 
 @end
