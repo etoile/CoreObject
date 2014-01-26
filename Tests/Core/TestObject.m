@@ -250,6 +250,30 @@
 	UKRaisesException([obj2 setLabel: @"test2"]);
 }
 
+/**
+ * Simple test of -objectGraphContext, -branch, -persistentRoot, and -editingContext
+ */
+- (void) testPersistencyAttributes
+{
+	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
+	COObject *object = [[COObject alloc] initWithObjectGraphContext: objectGraphContext];
+	
+	UKObjectsSame(objectGraphContext, [object objectGraphContext]);
+	UKNil([object branch]);
+	UKNil([object persistentRoot]);
+	UKNil([object editingContext]);
+	
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithRootObject: object];
+	COBranch *branch = [persistentRoot currentBranch];
+	UKNotNil(persistentRoot);
+	UKNotNil(branch);
+	
+	UKObjectsSame(objectGraphContext, [object objectGraphContext]);
+	UKObjectsSame(branch, [object branch]);
+	UKObjectsSame(persistentRoot, [object persistentRoot]);
+	UKObjectsSame(ctx, [object editingContext]);
+}
+
 @end
 
 

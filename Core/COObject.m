@@ -359,6 +359,11 @@ See +[NSObject typePrefix]. */
 	return [_objectGraphContext persistentRoot];
 }
 
+- (COEditingContext *)editingContext
+{
+	return [_objectGraphContext editingContext];
+}
+
 - (id) rootObject
 {
 	return [_objectGraphContext rootObject];

@@ -349,16 +349,21 @@
  * Returns the branch when the receiver is persistent, otherwise
  * returns nil.
  */
-@property (nonatomic, readonly) COBranch *branch;
+@property (nonatomic, readonly, weak) COBranch *branch;
 /**
  * Returns the persistent root when the receiver is persistent, otherwise 
  * returns nil.
  */
-@property (nonatomic, readonly) COPersistentRoot *persistentRoot;
+@property (nonatomic, readonly, weak) COPersistentRoot *persistentRoot;
+/**
+ * Returns the editing context when the receiver is persistent, otherwise
+ * returns nil.
+ */
+@property (nonatomic, readonly, weak) COEditingContext *editingContext;
 /**
  * Returns the object graph context owning the receiver.
  */
-@property (nonatomic, readonly) COObjectGraphContext *objectGraphContext;
+@property (nonatomic, readonly, weak) COObjectGraphContext *objectGraphContext;
 /** 
  * Returns the root object when the receiver is persistent, otherwise returns nil.
  *
