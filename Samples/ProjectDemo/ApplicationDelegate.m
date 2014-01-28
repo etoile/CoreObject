@@ -159,6 +159,8 @@
     COPersistentRoot *persistentRoot = [context insertNewPersistentRootWithEntityName: @"Anonymous.Document"];
     assert(persistentRoot != nil);
     
+	persistentRoot.currentBranch.label = @"Initial Branch";
+	
 	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
 	ETEntityDescription *desc = [repo descriptionForName: rootObjEntity];
     COObject *rootObj = [[[repo classForEntityDescription: desc] alloc] initWithEntityDescription:desc
