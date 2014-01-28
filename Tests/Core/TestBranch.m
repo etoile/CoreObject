@@ -804,4 +804,23 @@
 	 }];
 }
 
+- (void) testCommitOnMultipleBranchesSimultaneously
+{
+	[[altBranch rootObject] setLabel: @"change1"];
+	[[originalBranch rootObject] setLabel: @"change2"];
+	[ctx commit];
+	
+	[self checkBranchWithExistingAndNewContext: altBranch
+									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual(@"change1", [[testBranch rootObject] label]);
+	 }];
+
+	[self checkBranchWithExistingAndNewContext: originalBranch
+									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual(@"change2", [[testBranch rootObject] label]);
+	 }];
+}
+
 @end

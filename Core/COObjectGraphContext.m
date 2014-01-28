@@ -700,4 +700,20 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	}
 }
 
+- (COItemGraph *)modifiedItemsSnapshot
+{
+    NSSet *objectUUIDs = [self changedObjectUUIDs];
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    
+    for (ETUUID *uuid in objectUUIDs)
+    {
+        COItem *item = [self itemForUUID: uuid];
+        dict[uuid] = item;
+    }
+    
+    COItemGraph *modifiedItems = [[COItemGraph alloc] initWithItemForUUID: dict
+															 rootItemUUID: [self rootItemUUID]];
+	return modifiedItems;
+}
+
 @end

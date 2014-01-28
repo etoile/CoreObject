@@ -560,11 +560,48 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 			ETAssert(parentBranchUUID != nil);
 			ETAssert(_cheapCopyPersistentRootUUID != nil);
 			
-            _savedState = [txn createPersistentRootCopyWithUUID: _UUID
-									   parentPersistentRootUUID: _cheapCopyPersistentRootUUID
-													 branchUUID: [[self currentBranch] UUID]
-											   parentBranchUUID: parentBranchUUID
-											initialRevisionUUID: _cheapCopyRevisionUUID];
+			const BOOL currentBranchObjectGraphHasChanges = [_currentBranchObjectGraph hasChanges];
+			const BOOL specificBranchObjectGraphHasChanges = [[[self currentBranch] objectGraphContext] hasChanges];
+			
+			ETAssert(!(currentBranchObjectGraphHasChanges && specificBranchObjectGraphHasChanges));
+			
+			if (currentBranchObjectGraphHasChanges || specificBranchObjectGraphHasChanges)
+			{
+				ETUUID *newRevisionUUID = [ETUUID UUID];
+				
+				_savedState = [txn createPersistentRootCopyWithUUID: _UUID
+										   parentPersistentRootUUID: _cheapCopyPersistentRootUUID
+														 branchUUID: [[self currentBranch] UUID]
+												   parentBranchUUID: parentBranchUUID
+												initialRevisionUUID: newRevisionUUID];
+				
+				COItemGraph *modifiedItems;
+				if (currentBranchObjectGraphHasChanges)
+				{
+					modifiedItems = [_currentBranchObjectGraph modifiedItemsSnapshot];
+				}
+				else
+				{
+					modifiedItems = [[[self currentBranch] objectGraphContext] modifiedItemsSnapshot];
+					usingCurrentBranchObjectGraph = NO;
+				}
+				
+				[txn writeRevisionWithModifiedItems: modifiedItems
+									   revisionUUID: newRevisionUUID
+										   metadata: metadata
+								   parentRevisionID: _cheapCopyRevisionUUID
+							  mergeParentRevisionID: nil
+								 persistentRootUUID: _UUID
+										 branchUUID: [[self currentBranch] UUID]];
+			}
+			else
+			{
+				_savedState = [txn createPersistentRootCopyWithUUID: _UUID
+										   parentPersistentRootUUID: _cheapCopyPersistentRootUUID
+														 branchUUID: [[self currentBranch] UUID]
+												   parentBranchUUID: parentBranchUUID
+												initialRevisionUUID: _cheapCopyRevisionUUID];
+			}
         }
         ETAssert(_savedState != nil);
 		ETUUID *initialRevID = [[_savedState currentBranchInfo] currentRevisionUUID];

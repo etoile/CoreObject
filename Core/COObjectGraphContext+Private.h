@@ -103,4 +103,9 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 - (ETEntityDescription *)descriptionForItem: (COItem *)anItem;
+
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (COItemGraph *)modifiedItemsSnapshot;
 @end

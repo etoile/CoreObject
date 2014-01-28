@@ -451,7 +451,8 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 - (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev
 {
     NILARG_EXCEPTION_TEST(aRev);
-	INVALIDARG_EXCEPTION_TEST(aRev, [[aRev branchUUID] isEqual: _UUID]);
+	// TODO: Check that aRev is between head and initial?
+	// NOTE: The previous check here was wrong; aRev.branch does not need to be the receiver
 
     if ([self isBranchUncommitted])
     {
@@ -886,6 +887,8 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
         [dict setObject: item forKey: uuid];
 
+		// FIXME: Doing this here is wrong.. -changedObjectUUIDs should include
+		// all items needed to generate the new object graph state from the old state.
 		for (ETUUID *itemUUID in [[obj additionalStoreItemUUIDs] objectEnumerator])
 		{
 			[dict setObject: [obj additionalStoreItemForUUID: itemUUID]

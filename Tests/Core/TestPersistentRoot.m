@@ -276,6 +276,68 @@
 	 }];
 }
 
+- (void)testCheapCopyCreationWithEdit
+{
+	ETAssert(![persistentRoot hasChanges]);
+	
+    COPersistentRoot *copyRoot = [originalBranch makeCopyFromRevision: r1];
+	UKObjectsEqual(r1, [copyRoot currentRevision]);
+	[[copyRoot rootObject] setLabel: @"a change"];
+    [ctx commit];
+	
+	[self checkPersistentRootWithExistingAndNewContext: copyRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsNotEqual(r1, [testBranch initialRevision]);
+		 UKObjectsNotEqual(r1, [testProot currentRevision]);
+		 UKObjectsEqual(@"a change", [[testProot rootObject] label]);
+	 }];
+}
+
+- (void)testCheapCopyCreationWithEditInBranchObjectGraphContext
+{
+	ETAssert(![persistentRoot hasChanges]);
+	
+    COPersistentRoot *copyRoot = [originalBranch makeCopyFromRevision: r1];
+	UKObjectsEqual(r1, [copyRoot currentRevision]);
+	[[[copyRoot currentBranch] rootObject] setLabel: @"a change"];
+    [ctx commit];
+	
+	[self checkPersistentRootWithExistingAndNewContext: copyRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsNotEqual(r1, [testBranch initialRevision]);
+		 UKObjectsNotEqual(r1, [testProot currentRevision]);
+		 UKObjectsEqual(@"a change", [[testProot rootObject] label]);
+	 }];
+}
+
+
+- (void)testCheapCopyOfCheapCopy
+{
+	ETAssert(![persistentRoot hasChanges]);
+	
+    COPersistentRoot *copy1 = [originalBranch makeCopyFromRevision: r1];
+    [ctx commit];
+	
+	COPersistentRoot *copy2 = [[copy1 currentBranch] makeCopyFromRevision: r1];
+    [ctx commit];
+	
+	[self checkPersistentRootWithExistingAndNewContext: copy2
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual(r1, [testProot currentRevision]);
+	 }];
+}
+
+- (void) testCreateBranchInUncommittedCheapCopyDisallowed
+{
+	ETAssert(![persistentRoot hasChanges]);
+	
+    COPersistentRoot *copy1 = [originalBranch makeCopyFromRevision: r1];
+	UKRaisesException([[copy1 currentBranch] makeBranchWithLabel: @"hello"]);
+}
+
 - (void) testDeleteUncommittedBranch
 {
     [ctx commit];

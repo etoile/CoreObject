@@ -105,9 +105,6 @@ Future Work
   - test [[persistentRoot currentBranch] currentRevision] on a newly created
     persistent root
 	
-  - Making additional changes to an uncomitted cheap copy persistent root is broken (we
-    don't look at the COObjectGraphContext)
-	
   - Refactor handling of store notifications
   
   - Add -initialRevision?
