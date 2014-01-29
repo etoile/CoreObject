@@ -43,6 +43,8 @@ int main (int argc, const char *argv[])
 		[runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 	}
 
+#ifdef FMDatabase_DEBUG
+
 	// Count up the number of open sqlite database connections at this
 	// point.
 	//
@@ -66,6 +68,8 @@ int main (int argc, const char *argv[])
 			status = 1;
 		}
 	}
-	
+
+#endif
+
 	return status;
 }
