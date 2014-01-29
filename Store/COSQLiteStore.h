@@ -165,27 +165,83 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  * Garbage collection / deletion semantics
  * ---------------------------------------
  *
- * - Persistent roots are never garbage collected, they must be deleted explicitly by the user. [1]
- *   For convenience, once deleted, they can be undeleted. Typical use case:
- *        - user creates a document, types in it a bit.
+ * - Persistent roots are never garbage collected, they must be deleted explicitly by the user. 
+ *   See Footnotes section for the motivations for this design.
+ *   For convenience, once deleted, they can be undeleted until the "finalize deletions" operation
+ *   is run on that persistent root. To implement this, persistent roots have a "deleted" flag,
+ *   and this flag can be switched between true and false with no side-effects until "finalize deletions"
+ *   is called.
+ *
+ *   Typical user experience:
+ *
+ *        - User creates a document, types in it a bit.
  *        - It's a temporary note, so when they're done with it, they delete it.
- *        - The note is moved to the trash. CMD+Z undoes the move to trash.
+ *        - The deleted flag is set to YES (analogous to the document being in the trash).
+ *          CMD+Z undoes the move to trash and sets the 'deleted' flag to NO.
+ *
  *   So by having the not deleted/deleted flag at the store level, we can easily
  *   make "delete" a command-pattern invertible undo action.
  *
- * - There are attachments which are stored separately from the revision data in backing stores,
- *   however from the point of view of data lifetime, it's as if the attachment is part of the revision
- *   data in the backing store.
+ * - Branches follow the same pattern as persistent roots: branches are not garbage collected;
+ *   they have a "deleted" flag which is explictly toggled - with the caveat that, because branches are
+ *   owned by persistent roots, when a persietent root deletion is made permanent
+ *   by "finalize deletions", all of its branches are also permanently deleted
+ *   (regardless of the setting of the 'deleted' flag on each branch).
  *
- * - Branches can be deleted. Like persistent roots, they can be undeleted, and the list of deleted braches
- *   for a persistent root can be queried.  
+ * - Revisions _are_ garbage collected (unlike persistent roots and branches).
+ *   The garbage collection works by treating all _head revisions_ of all existing branches 
+ *   (i.e., branches that have not yet been permanently deleted from the stoer) as
+ *   GC roots, and the living revisions are found by tracing the 'parent' and 'merge parent'
+ *   links of revisions. All revisions unreachable in this way are deleted. (Note this is
+ *   more or less the same model as git).
  *
- * - There is a "finalize deletions" command that the user can invoke on a persistent root, which permanently removes:
- *   * the persistent root, if it is marked as deleted
- *   * branches of the persistent root marked as deleted
- *   * all unreachable revisions in the same backing store as the persistent root
+ *   The revision GC is currently triggered by the same "finalize deletions" method that makes explicit
+ *   persistent root and branch deletions permanent, but it could be triggered as a separate step.
  *
- * - Additionally there is a separate command to delete all unreachable attachments in the store
+ * - You can draw a graph of object ownership like this:
+ *
+ *                             1               *                 *             *
+ *      Persistent Root        ---------------->     Branch      -------------->   Revision
+ *
+ *       (No owner)                          (Owned by Persistent Root)         (Owned by the set of branches
+ *                                                                               that can reach this revision by
+ *                                                                               following parent or merge parent
+ *                                                                            pointers, starting at the branch head.
+ *                                                                           Note that this set is not fixed for a 
+ *                                                                            evision and can change over time.)
+ *
+ *   (Only deleted explicitly             (Deleted explicitly at user's       (Garbage collected if the set of
+ *    at the user's request)                request, and also when owner        owners described above is empty at
+ *                                                  is deleted)                   the time when the GC is run)
+ *
+ *
+ * - Note: Revisions have a "branchUUID" attribute. This is used as metadata and has no role in the
+ *   GC/deletion semantics.
+ *
+ * - Implementation detail: store attachments are also garbage collected, but unlike the other aspects
+ *   of CoreObject's deletion semantics, this is completely hidden from the user. You can think of
+ *   the attachment being stored directly in item graph for each revision
+ *
+ * - Pseudocode for finalize deletions:
+ *
+ *   function finalizeDeletions(persistentRoot):
+ *       if persistentRoot's deleted flag is set to true then:
+ *           permanently erase the persistent root object from the database
+ *           as well as all of its branches.
+ *           # Note that the revisions are unaffected, unless the garbage collection
+ *           # that runs later decides they can be deleted.
+ *       else:
+ *           for each branch of persistentRoot:
+ *               if branch's deleted flag is set to true then:
+ *                   permanently erase the branch object from the database
+ *               end if
+ *           end for
+ *       end if
+ *
+ *       garbage-collect unreachable revisions
+ *       garbage-collect unreachable attachments
+ *   end function
+ *
  *
  * - Over time, the user may want to prune the history of a branch. This is implemented
  *   by moving ahead the 'base' pointer of a branch, and performing a "finalize deletions" command on the
@@ -232,7 +288,7 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  *
  *   In the "explicit deletion" design, which is what we are using, persistent roots are never deleted
  *   unless explicitly removed by the user. In addition, I setteled on a two step deletion, where first
- *   the user calls -deletePersistentRoot:, and then -finalizeDeletionsForPersistentRoot: to permanently delete it.
+ *   the user calls -deletePersistentRoot: (which can be undone), and then -finalizeDeletionsForPersistentRoot: to permanently delete it.
  *
  *   The garbage collection design has serious problems. I was going to allow the user to designate some
  *   persistent roots as GC roots, which would never be garbage collected, and the rest would be eligible
