@@ -142,4 +142,36 @@ static NSString *Trim(NSString *text)
 	coalescingTimer = nil;
 }
 
+- (void) objectGraphDidChange
+{
+	NSLog(@"Text Object graph did change");
+}
+
+- (void) objectGraphContextDidSwitch
+{
+	NSLog(@"Text Object graph did switch");
+
+	// v1
+//
+//	textStorage.backing = [[self textDocument] attrString];
+	
+	// v2
+	
+	@autoreleasepool
+	{
+		NSLog(@"Text Object graph will switch from %@ (%p)", textStorage, textStorage);
+		[textStorage removeLayoutManager: [textView layoutManager]];
+		textStorage = nil;
+	}
+	
+	textStorage = [[COAttributedStringWrapper alloc] initWithBacking: [[self textDocument] attrString]];
+	
+	NSLog(@"Text Object graph will switch to %@ (%p)", textStorage, textStorage);
+	
+	[textStorage setDelegate: self];
+	[textStorage addLayoutManager: [textView layoutManager]];
+
+	NSLog(@"Text Object graph did switch to %@ (%p)", textStorage, textStorage);
+}
+
 @end

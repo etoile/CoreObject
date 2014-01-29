@@ -16,18 +16,20 @@
 
 @implementation COAttributedStringWrapper
 
-@synthesize backing = _backing;
-
 - (instancetype) initWithBacking: (COAttributedString *)aBacking
 {
 	NILARG_EXCEPTION_TEST(aBacking);
 	
 	SUPERINIT;
-	_lastNotifiedLength = [aBacking length];
-	_backing = aBacking;
-	_cachedString = [aBacking string];
-	_observedObjectsSet = [NSMutableSet new];
+	_observedObjectsSet = [NSHashTable hashTableWithOptions: NSPointerFunctionsObjectPointerPersonality | NSHashTableStrongMemory];
 	
+	[self setBacking: aBacking];
+	
+	return self;
+}
+
+- (void) registerToObserveBacking
+{
 	[_observedObjectsSet addObject: _backing];
 	[_backing addObserver: self forKeyPath: @"chunks" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
 	for (COAttributedStringChunk *chunk in _backing.chunks)
@@ -40,27 +42,25 @@
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(objectGraphContextObjectsDidChangeNotification:)
 												 name: COObjectGraphContextObjectsDidChangeNotification
-											   object: aBacking.objectGraphContext];
+											   object: _backing.objectGraphContext];
 	
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(objectGraphContextWillRelinquishObjectsNotification:)
 												 name: COObjectGraphContextWillRelinquishObjectsNotification
-											   object: aBacking.objectGraphContext];
-
+											   object: _backing.objectGraphContext];
+	
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(objectGraphContextBeginBatchChangeNotification:)
 												 name: COObjectGraphContextBeginBatchChangeNotification
-											   object: aBacking.objectGraphContext];
+											   object: _backing.objectGraphContext];
 	
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(objectGraphContextEndBatchChangeNotification:)
 												 name: COObjectGraphContextEndBatchChangeNotification
-											   object: aBacking.objectGraphContext];
-	
-	return self;
+											   object: _backing.objectGraphContext];
 }
 
-- (void) dealloc
+- (void) unregisterToObserveBacking
 {
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
 	
@@ -68,6 +68,32 @@
 	{
 		[self unregisterAsObserverOf: object];
 	}
+
+	ETAssert([_observedObjectsSet count] == 0);
+}
+
+- (COAttributedString *)backing
+{
+	return _backing;
+}
+
+- (void)setBacking:(COAttributedString *)backing
+{
+	_lastNotifiedLength = [backing length];
+	_cachedString = [backing string];
+	
+	[self unregisterToObserveBacking];
+	_backing = backing;
+	[self registerToObserveBacking];
+	
+	// TODO: Call -edited:...
+}
+
+- (void) dealloc
+{
+	NSLog(@"COASW %p dealloc", self);
+
+	[self unregisterToObserveBacking];
 }
 
 // Optimisation

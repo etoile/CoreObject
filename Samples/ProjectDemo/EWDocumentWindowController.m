@@ -99,7 +99,9 @@
 		[self resetBranchesMenu];
 		[self resetBranchesCheckbox];
 		
-		[self objectGraphDidChange];
+		NSLog(@"setPinnedBranch: called");
+		
+		[self objectGraphContextDidSwitch];
 	}
 }
 
@@ -259,6 +261,12 @@
 
 - (void) objectGraphDidChange
 {
+}
+
+- (void) objectGraphContextDidSwitch
+{
+	// Dummy implementation.
+	[self objectGraphDidChange];
 }
 
 /* History stuff */

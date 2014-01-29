@@ -77,6 +77,11 @@
 
 - (void) objectGraphDidChange;
 
+/**
+ * Called when objectGraphContext is switched to a new instance. Subclasses
+ * should reload everything. This is called when the branch is switched
+ */
+- (void) objectGraphContextDidSwitch;
 
 /* History stuff */
 

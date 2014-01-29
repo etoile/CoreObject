@@ -19,11 +19,11 @@
 	 * For tracking what we are observing with KVO,
 	 * so we can unregister accurately.
 	 */
-	NSMutableSet *_observedObjectsSet;
+	NSHashTable *_observedObjectsSet;
 }
 
 - (instancetype) initWithBacking: (COAttributedString *)aBacking;
 
-@property (nonatomic, readonly, strong) COAttributedString *backing;
+@property (nonatomic, readwrite, strong) COAttributedString *backing;
 
 @end
