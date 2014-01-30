@@ -134,13 +134,15 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     // Persistent Root and Branch tables
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroots ("
-     "uuid BLOB PRIMARY KEY NOT NULL, backingstore BLOB NOT NULL, "
-     "currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionid INTEGER, metadata BLOB)"];
+     "uuid BLOB PRIMARY KEY NOT NULL, currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionid INTEGER, metadata BLOB)"];
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL PRIMARY KEY, "
      "proot BLOB NOT NULL, initial_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
      "head_revid BLOB NOT NULL, metadata BLOB, deleted BOOLEAN DEFAULT 0, parentbranch BLOB)"];
     
+	[db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroot_backingstores ("
+     "uuid BLOB PRIMARY KEY NOT NULL, backingstore BLOB NOT NULL)"];
+	
     // FTS indexes & reference caching tables (in theory, could be regenerated - although not supported)
     
     /**
@@ -288,7 +290,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     assert(dispatch_get_current_queue() != queue_);
     
     dispatch_sync(queue_, ^(){
-        FMResultSet *rs = [db_ executeQuery: @"SELECT DISTINCT backingstore FROM persistentroots"];
+        FMResultSet *rs = [db_ executeQuery: @"SELECT DISTINCT backingstore FROM persistentroot_backingstores"];
         sqlite3_stmt *statement = [[rs statement] statement];
         
         while ([rs next])
@@ -377,7 +379,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     ETUUID *backingUUID = [backingStoreUUIDForPersistentRootUUID_ objectForKey: aUUID];
     if (backingUUID == nil)
     {
-        NSData *data = [db_ dataForQuery: @"SELECT backingstore FROM persistentroots WHERE uuid = ?", [aUUID dataValue]];
+        NSData *data = [db_ dataForQuery: @"SELECT backingstore FROM persistentroot_backingstores WHERE uuid = ?", [aUUID dataValue]];
         if (data != nil)
         {
             backingUUID = [ETUUID UUIDWithData: data];
@@ -605,7 +607,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     dispatch_sync(queue_, ^(){
         FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, revid FROM "
                            "(SELECT backingstore, revid FROM fts_docid_to_revisionid WHERE docid IN (SELECT docid FROM fts WHERE text MATCH ?)) "
-                           "INNER JOIN persistentroots USING(backingstore)", aQuery];
+                           "INNER JOIN persistentroot_backingstores USING(backingstore)", aQuery];
 
         while ([rs next])
         {
@@ -873,9 +875,9 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         
         // Delete branches / the persistent root
         
-        [db_ executeUpdate: @"DELETE FROM branches WHERE proot IN (SELECT uuid FROM persistentroots WHERE deleted = 1 AND backingstore = ?)", backingUUIDData];
-        [db_ executeUpdate: @"DELETE FROM branches WHERE deleted = 1 AND proot IN (SELECT uuid FROM persistentroots WHERE backingstore = ?)", backingUUIDData];
-        [db_ executeUpdate: @"DELETE FROM persistentroots WHERE deleted = 1 AND backingstore = ?", backingUUIDData];
+        [db_ executeUpdate: @"DELETE FROM branches WHERE proot IN (SELECT uuid FROM persistentroots INNER JOIN persistentroot_backingstores USING(uuid) WHERE deleted = 1 AND backingstore = ?)", backingUUIDData];
+        [db_ executeUpdate: @"DELETE FROM branches WHERE deleted = 1 AND proot IN (SELECT uuid FROM persistentroot_backingstores WHERE backingstore = ?)", backingUUIDData];
+        [db_ executeUpdate: @"DELETE FROM persistentroots WHERE uuid IN (SELECT uuid FROM persistentroots INNER JOIN persistentroot_backingstores USING(uuid) WHERE deleted = 1 AND backingstore = ?)", backingUUIDData];
         
         NSMutableIndexSet *keptRevisions = [NSMutableIndexSet indexSet];
         
@@ -884,7 +886,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
                                                 "branches.initial_revid "
                                                 "FROM persistentroots "
                                                 "INNER JOIN branches ON persistentroots.uuid = branches.proot "
-                                                "WHERE persistentroots.backingstore = ?", backingUUIDData];
+												"INNER JOIN persistentroot_backingstores ON persistentroots.uuid = persistentroot_backingstores.uuid "
+                                                "WHERE persistentroot_backingstores.backingstore = ?", backingUUIDData];
         while ([rs next])
         {
             ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
@@ -1058,7 +1061,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 		
 		NSMutableArray *backingStoresToClear = [NSMutableArray new];
 		
-		FMResultSet *rs = [db_ executeQuery: @"SELECT DISTINCT backingstore FROM persistentroots"];
+		FMResultSet *rs = [db_ executeQuery: @"SELECT DISTINCT backingstore FROM persistentroot_backingstores"];
         while ([rs next])
         {
             ETUUID *uuid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
@@ -1073,6 +1076,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 		}
 		
         [db_ executeUpdate: @"DELETE FROM persistentroots"];
+		[db_ executeUpdate: @"DELETE FROM persistentroot_backingstores"];
         [db_ executeUpdate: @"DELETE FROM branches"];
         [db_ executeUpdate: @"DELETE FROM proot_refs"];
         [db_ executeUpdate: @"DELETE FROM attachment_refs"];

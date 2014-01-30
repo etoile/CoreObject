@@ -1124,11 +1124,8 @@ static ETUUID *childUUID2;
 	UKNil([store2 persistentRootInfoForUUID: cheapCopyUUID1]);
 	UKNotNil([store2 persistentRootInfoForUUID: cheapCopyUUID2]);
 	
-	// TODO: Fix this
-#if 0
 	UKTrue(COItemGraphEqualToItemGraph([self itemTreeWithChildNameChange: @"newRevisionUUID"],
 									   [store2 itemGraphForRevisionUUID: newRevisionUUID persistentRoot: cheapCopyUUID1]));
-#endif
 	UKTrue(COItemGraphEqualToItemGraph([self itemTreeWithChildNameChange: @"newRevisionUUID"],
 									   [store2 itemGraphForRevisionUUID: newRevisionUUID persistentRoot: cheapCopyUUID2]));
 
