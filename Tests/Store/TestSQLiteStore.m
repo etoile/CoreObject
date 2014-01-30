@@ -1040,4 +1040,98 @@ static ETUUID *childUUID2;
     UKTrue([store commitStoreTransaction: txn]);
 }
 
+/**
+ * check that the store can retrieve the item graph for a (persistentRoot, revisionUUID) pair
+ * even if persistentRoot has been permanently deleted, and persistentRoot != the backing store UUID.
+ */
+- (void) testAccessItemGraphAfterPersistentRootDeletion
+{
+	/**
+	 * Persistent root that will be created & deleted
+	 */
+	ETUUID *cheapCopyUUID1 = [ETUUID UUID];
+    ETUUID *cheapCopyBranchUUID1 = [ETUUID UUID];
+
+	/**
+	 * Persistent root to prevent newRevisionUUID from being GC'ed
+	 */
+	ETUUID *cheapCopyUUID2 = [ETUUID UUID];
+    ETUUID *cheapCopyBranchUUID2 = [ETUUID UUID];
+
+	/**
+	 * Revision to commit in cheapCopyUUID1
+	 */
+	ETUUID *newRevisionUUID = [ETUUID UUID];
+	
+	int64_t cheapCopy1TransactionID = 0;
+	int64_t cheapCopy2TransactionID = 0;
+	
+	// 1. Make a cheap copy and write a new revision in it.
+	//    This is just to give a situation where we have a revision whose
+	//    persistentRootUUID is not the same as the backing store's
+	
+	{
+		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+
+		COPersistentRootInfo *cheapCopy1 = [txn createPersistentRootCopyWithUUID: cheapCopyUUID1
+														parentPersistentRootUUID: prootUUID
+																	  branchUUID: cheapCopyBranchUUID1
+																parentBranchUUID: nil
+															 initialRevisionUUID: newRevisionUUID];
+		
+		[txn writeRevisionWithModifiedItems: [self itemTreeWithChildNameChange: @"newRevisionUUID"]
+							   revisionUUID: newRevisionUUID
+								   metadata: nil
+						   parentRevisionID: initialRevisionUUID
+					  mergeParentRevisionID: nil
+						 persistentRootUUID: cheapCopyUUID1
+								 branchUUID: cheapCopyBranchUUID1];
+
+		cheapCopy1TransactionID = [txn setOldTransactionID: cheapCopy1.transactionID forPersistentRoot: cheapCopyUUID1];
+		
+		UKTrue([store commitStoreTransaction: txn]);
+	}
+	
+	UKTrue(COItemGraphEqualToItemGraph([self itemTreeWithChildNameChange: @"newRevisionUUID"],
+									   [store itemGraphForRevisionUUID: newRevisionUUID persistentRoot: cheapCopyUUID1]));
+	
+	// 2. Make another cheap copy based on cheapCopyUUID1. Then delete cheapCopyUUID1
+	
+	{
+		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+		
+		COPersistentRootInfo *cheapCopy2 = [txn createPersistentRootCopyWithUUID: cheapCopyUUID2
+														parentPersistentRootUUID: cheapCopyUUID1
+																	  branchUUID: cheapCopyBranchUUID2
+																parentBranchUUID: nil
+															 initialRevisionUUID: newRevisionUUID];
+		
+		[txn deletePersistentRoot: cheapCopyUUID1];
+		
+		cheapCopy1TransactionID = [txn setOldTransactionID: cheapCopy1TransactionID forPersistentRoot: cheapCopyUUID1];
+		cheapCopy1TransactionID = [txn setOldTransactionID: cheapCopy2.transactionID forPersistentRoot: cheapCopyUUID2];
+		
+		UKTrue([store commitStoreTransaction: txn]);
+		
+		UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
+	}
+		
+	// 3. Ensure we can reopen the store, and still read back newRevisionUUID,
+	// even though proot it was committed on is deleted.
+	
+	COSQLiteStore *store2 = [[COSQLiteStore alloc] initWithURL: [store URL]];
+
+	UKNil([store2 persistentRootInfoForUUID: cheapCopyUUID1]);
+	UKNotNil([store2 persistentRootInfoForUUID: cheapCopyUUID2]);
+	
+	// TODO: Fix this
+#if 0
+	UKTrue(COItemGraphEqualToItemGraph([self itemTreeWithChildNameChange: @"newRevisionUUID"],
+									   [store2 itemGraphForRevisionUUID: newRevisionUUID persistentRoot: cheapCopyUUID1]));
+#endif
+	UKTrue(COItemGraphEqualToItemGraph([self itemTreeWithChildNameChange: @"newRevisionUUID"],
+									   [store2 itemGraphForRevisionUUID: newRevisionUUID persistentRoot: cheapCopyUUID2]));
+
+}
+
 @end
