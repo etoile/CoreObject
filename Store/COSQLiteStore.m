@@ -95,6 +95,10 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 - (void) dealloc
 {
+	dispatch_sync(queue_, ^() {
+		[db_ close];
+		db_ = nil;
+	});
 	// N.B.: We are using deployment target 10.7, so ARC does not manage libdispatch objects.
 	// If we switch to deployment target 10.8, ARC will manage libdispatch objects automatically.
 	// For GNUstep, ARC doesn't manage libdispatch objects since libobjc2 doesn't support it 
