@@ -178,7 +178,7 @@
 	[ctx commit];
 
 	COObject *copy = [[[[original objectGraphContext] branch]
-		makeCopyFromRevision: [original revision]] rootObject];
+		makePersistentRootCopyFromRevision: [original revision]] rootObject];
 
 	[tag addObject: original];
 	[tag addObject: copy];

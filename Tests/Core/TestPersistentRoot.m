@@ -218,7 +218,7 @@
     [persistentRoot commit];
     
 	CORevision *rev1 = [originalBranch currentRevision];
-    COPersistentRoot *copyRoot = [originalBranch makeCopyFromRevision: rev1];
+    COPersistentRoot *copyRoot = [originalBranch makePersistentRootCopyFromRevision: rev1];
     UKNil([store persistentRootInfoForUUID: [copyRoot UUID]]);
 	UKTrue([[ctx persistentRootsPendingInsertion] containsObject: copyRoot]);
     
@@ -280,7 +280,7 @@
 {
 	ETAssert(![persistentRoot hasChanges]);
 	
-    COPersistentRoot *copyRoot = [originalBranch makeCopyFromRevision: r1];
+    COPersistentRoot *copyRoot = [originalBranch makePersistentRootCopyFromRevision: r1];
 	UKObjectsEqual(r1, [copyRoot currentRevision]);
 	[[copyRoot rootObject] setLabel: @"a change"];
     [ctx commit];
@@ -298,7 +298,7 @@
 {
 	ETAssert(![persistentRoot hasChanges]);
 	
-    COPersistentRoot *copyRoot = [originalBranch makeCopyFromRevision: r1];
+    COPersistentRoot *copyRoot = [originalBranch makePersistentRootCopyFromRevision: r1];
 	UKObjectsEqual(r1, [copyRoot currentRevision]);
 	[[[copyRoot currentBranch] rootObject] setLabel: @"a change"];
     [ctx commit];
@@ -317,10 +317,10 @@
 {
 	ETAssert(![persistentRoot hasChanges]);
 	
-    COPersistentRoot *copy1 = [originalBranch makeCopyFromRevision: r1];
+    COPersistentRoot *copy1 = [originalBranch makePersistentRootCopyFromRevision: r1];
     [ctx commit];
 	
-	COPersistentRoot *copy2 = [[copy1 currentBranch] makeCopyFromRevision: r1];
+	COPersistentRoot *copy2 = [[copy1 currentBranch] makePersistentRootCopyFromRevision: r1];
     [ctx commit];
 	
 	[self checkPersistentRootWithExistingAndNewContext: copy2
@@ -334,7 +334,7 @@
 {
 	ETAssert(![persistentRoot hasChanges]);
 	
-    COPersistentRoot *copy1 = [originalBranch makeCopyFromRevision: r1];
+    COPersistentRoot *copy1 = [originalBranch makePersistentRootCopyFromRevision: r1];
 	UKRaisesException([[copy1 currentBranch] makeBranchWithLabel: @"hello"]);
 }
 

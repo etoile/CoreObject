@@ -295,8 +295,8 @@ extern NSString * const kCOBranchLabel;
 
 
 /**
- * Returns a new branch by branching the receiver last revision and using 
- * the given label.
+ * Returns a new branch whose current revision is set to the receiver's current revision,
+ * and adds the given label to the branch's metadata. The resulting branch uses the receiver as its parent branch.
  *
  * The receiver must be committed.
  *
@@ -304,14 +304,10 @@ extern NSString * const kCOBranchLabel;
  */
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel;
 /**
- * Returns a new branch by branching a particular revision and using the given 
- * label.
+ * Returns a new branch whose current revision is set to the given revision,
+ * and adds the given label to the branch's metadata. The resulting branch uses the receiver as its parent branch.
  *
- * The revision must belong to the receiver and not a parent branch, otherwise a 
- * NSInvalidArgumentException is raised.
- *
- * The branch creation results in a new revision on the store structure track. 
- * See -[COStore createCommitTrackWithUUID:name:parentRevision:rootObjectUUID:persistentRootUUID:isNewPersistentRoot:].
+ * The revision must be equal to or an ancestor of 'headRevision'.
  *
  * You can assign the returned branch to the receiver persistent root to switch 
  * the current branch. For example:
@@ -320,30 +316,34 @@ extern NSString * const kCOBranchLabel;
  * [persistentRoot setCurrentBranch: [[persistentRoot currentBranch] makeBranchWithLabel: @"Sandbox"]];
  * </example>
  *
- * One restriction is that the receiver must be committed - not a newly
- * created branch, or the default branch of a persistent root. This is just for
- * implementation simplicity, not a fundamental design limitation.
+ * The receiver must be committed - not a newly created branch, or the default
+ * branch of an uncommitted persistent root.
  */
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev;
 /**
- * Returns a new persistent root by branching a particular revision.
- * 
+ * Returns a new persistent root whose current revision is set to the given revision,
+ *
  * The resulting persistent root is known as a cheap copy, because the copy 
  * doesn't cause the history leading to the new persistent root state to be 
  * duplicated in the store.
  *
  * The cheap copy current branch uses the receiver as its parent branch.
  *
- * The revision must belong to the receiver and not a parent branch, otherwise a 
- * NSInvalidArgumentException is raised.
+ * The revision must be equal to or an ancestor of 'headRevision'.
  *
  * The receiver must be committed.
  *
  * See also -makeBranchWithLable:atRevision:, -isCopy and 
  * -[COPersistentRoot parentPersistentRoot].
  */
-- (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev;
-
+- (COPersistentRoot *)makePersistentRootCopyFromRevision: (CORevision *)aRev;
+/**
+ * Returns a new persistent root whose current revision is set to the receiver's
+ * current revision.
+ *
+ * See -makePersistentRootCopyFromRevision:
+ */
+- (COPersistentRoot *)makePersistentRootCopy;
 
 /** @taskunit Merging Between Branches */
 

@@ -198,7 +198,7 @@
     {
 		EWDocumentWindowController *wc = wcObject;
 		
-		COPersistentRoot *persistentRoot = [[wc editingBranch] makeCopyFromRevision: [[wc editingBranch] currentRevision]];
+		COPersistentRoot *persistentRoot = [[wc editingBranch] makePersistentRootCopy];
 		assert(persistentRoot != nil);
 		
 		Document *doc = persistentRoot.rootObject;

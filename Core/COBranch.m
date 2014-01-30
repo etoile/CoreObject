@@ -436,7 +436,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
     NILARG_EXCEPTION_TEST(aRev);
-	INVALIDARG_EXCEPTION_TEST(aRev, [[aRev branchUUID] isEqual: _UUID]);
+	INVALIDARG_EXCEPTION_TEST(aRev, [aRev isEqualToOrAncestorOfRevision: [self headRevision]]);
     
     if ([self isBranchUncommitted])
     {
@@ -453,11 +453,10 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     return [_persistentRoot makeBranchWithLabel: aLabel atRevision: aRev parentBranch: self];
 }
 
-- (COPersistentRoot *)makeCopyFromRevision: (CORevision *)aRev
+- (COPersistentRoot *)makePersistentRootCopyFromRevision: (CORevision *)aRev
 {
     NILARG_EXCEPTION_TEST(aRev);
-	// TODO: Check that aRev is between head and initial?
-	// NOTE: The previous check here was wrong; aRev.branch does not need to be the receiver
+	INVALIDARG_EXCEPTION_TEST(aRev, [aRev isEqualToOrAncestorOfRevision: [self headRevision]]);
 
     if ([self isBranchUncommitted])
     {
@@ -467,6 +466,11 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     }
     return [[[self persistentRoot] editingContext] insertNewPersistentRootWithRevisionUUID: [aRev UUID]
 																			  parentBranch: self];
+}
+
+- (COPersistentRoot *)makePersistentRootCopy
+{
+	return [self makePersistentRootCopyFromRevision: [self currentRevision]];
 }
 
 - (BOOL)needsReloadNodes: (NSArray *)currentLoadedNodes

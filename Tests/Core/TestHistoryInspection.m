@@ -105,7 +105,7 @@
     [ctx commit];
     r3 = [branch1B currentRevision];
     
-    p2 = [branch1A makeCopyFromRevision: r2];
+    p2 = [branch1A makePersistentRootCopy];
     [ctx commit]; // FIXME: This commit is a hack, should be removed. add test and fix.
 
     branch2A = [p2 currentBranch];
