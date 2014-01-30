@@ -266,24 +266,27 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (CORevision *)initialRevision
 {
-    ETUUID *revid = [[self branchInfo] initialRevisionUUID];
-    
-    if (revid == nil)
-		return nil;
-
-	return [[self editingContext] revisionForRevisionUUID: revid
-	                                   persistentRootUUID: [[self persistentRoot] UUID]];
+	CORevision *rev = [self headRevision];
+	while ([rev parentRevision] != nil)
+	{
+		CORevision *revParent = [rev parentRevision];
+		
+		if (![revParent.branchUUID isEqual: self.UUID])
+			break;
+		
+		rev = revParent;
+	}	
+	return rev;
 }
 
 - (CORevision *)firstRevision
 {
-	COBranch *branch = self;
-
-	while ([branch parentBranch] != nil)
+	CORevision *rev = [self currentRevision];
+	while ([rev parentRevision] != nil)
 	{
-		branch = [branch parentBranch];
+		rev = [rev parentRevision];
 	}
-	return [branch initialRevision];
+	return rev;
 }
 
 - (CORevision *)headRevision
@@ -293,6 +296,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
         return [[self editingContext] revisionForRevisionUUID: _headRevisionUUID
 										   persistentRootUUID: [[self persistentRoot] UUID]];
     }
+	ETAssert([self isBranchUncommitted]);
     return nil;
 }
 
@@ -309,6 +313,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
         return [[self editingContext] revisionForRevisionUUID: _currentRevisionUUID
 										   persistentRootUUID: [[self persistentRoot] UUID]];
     }
+	ETAssert([self isBranchUncommitted]);
     return nil;
 }
 

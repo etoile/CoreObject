@@ -16,7 +16,6 @@
 @synthesize metadata = metadata_;
 @synthesize parentBranchUUID = parentBranchUUID_;
 
-@synthesize initialRevisionUUID = _initialRevisionUUID;
 @synthesize headRevisionUUID = _headRevisionUUID;
 @synthesize currentRevisionUUID = _currentRevisionUUID;
 

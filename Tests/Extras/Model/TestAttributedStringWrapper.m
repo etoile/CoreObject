@@ -337,8 +337,6 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 
 - (void) dealloc
 {
-	[tv dataWithPDFInsideRect: NSMakeRect(0, 0, 100, 100)];
-
 	[as removeLayoutManager: [tv layoutManager]];
 }
 

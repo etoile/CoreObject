@@ -399,7 +399,6 @@ static ETUUID *childUUID2;
 - (void) testSetCurrentVersion
 {
 	[self checkBranch: branchAUUID
-   hasInitialRevision: initialRevisionUUID
 			  current: [branchARevisionUUIDs lastObject]
 				 head: [branchARevisionUUIDs lastObject]];
 
@@ -413,7 +412,6 @@ static ETUUID *childUUID2;
 	}
 	
 	[self checkBranch: branchAUUID
-   hasInitialRevision: initialRevisionUUID
 			  current: [self lateBranchA]
 				 head: [branchARevisionUUIDs lastObject]];
     	{
@@ -426,7 +424,6 @@ static ETUUID *childUUID2;
 	}
     
 	[self checkBranch: branchAUUID
-   hasInitialRevision: initialRevisionUUID
 			  current: [self lateBranchA]
 				 head: [self lateBranchA]];
 
@@ -438,7 +435,6 @@ static ETUUID *childUUID2;
     COBranchInfo *branchA = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
 	
 	[self checkBranch: branchAUUID
-   hasInitialRevision: initialRevisionUUID
 			  current: [branchARevisionUUIDs lastObject]
 				 head: [branchARevisionUUIDs lastObject]];
 
@@ -743,7 +739,6 @@ static ETUUID *childUUID2;
     UKObjectsEqual(S(prootUUID), [NSSet setWithArray: [store persistentRootUUIDs]]);
 	
 	[self checkPersistentRoot: prootUUID
-		   hasInitialRevision: initialRevisionUUID
 					  current: initialRevisionUUID
 						 head: initialRevisionUUID];
 	
@@ -789,12 +784,10 @@ static ETUUID *childUUID2;
     // Check that the branch data is the same
 
 	[self checkPersistentRoot: prootUUID
-		   hasInitialRevision: initialRevisionUUID
 					  current: initialRevisionUUID
 						 head: initialRevisionUUID];
 	
 	[self checkPersistentRoot: [copy UUID]
-		   hasInitialRevision: initialRevisionUUID
 					  current: initialRevisionUUID
 						 head: initialRevisionUUID];
 	
@@ -818,12 +811,10 @@ static ETUUID *childUUID2;
 	}
     
 	[self checkPersistentRoot: prootUUID
-		   hasInitialRevision: initialRevisionUUID
 					  current: rev1
 						 head: rev1];
 	
 	[self checkPersistentRoot: [copy UUID]
-		   hasInitialRevision: initialRevisionUUID
 					  current: initialRevisionUUID
 						 head: initialRevisionUUID];
 	
@@ -842,12 +833,10 @@ static ETUUID *childUUID2;
 	}
 
 	[self checkPersistentRoot: prootUUID
-		   hasInitialRevision: initialRevisionUUID
 					  current: rev1
 						 head: rev1];
 	
 	[self checkPersistentRoot: [copy UUID]
-		   hasInitialRevision: initialRevisionUUID
 					  current: rev2
 						 head: rev2];
 }

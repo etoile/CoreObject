@@ -137,7 +137,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
      "uuid BLOB PRIMARY KEY NOT NULL, currentbranch BLOB, deleted BOOLEAN DEFAULT 0, transactionid INTEGER, metadata BLOB)"];
     
     [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS branches (uuid BLOB NOT NULL PRIMARY KEY, "
-     "proot BLOB NOT NULL, initial_revid BLOB NOT NULL, current_revid BLOB NOT NULL, "
+     "proot BLOB NOT NULL, current_revid BLOB NOT NULL, "
      "head_revid BLOB NOT NULL, metadata BLOB, deleted BOOLEAN DEFAULT 0, parentbranch BLOB)"];
     
 	[db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroot_backingstores ("
@@ -755,25 +755,23 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         }
         
         {
-            FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, initial_revid, current_revid, head_revid, metadata, deleted, parentbranch FROM branches WHERE proot = ?", [aUUID dataValue]];
+            FMResultSet *rs = [db_ executeQuery: @"SELECT uuid, current_revid, head_revid, metadata, deleted, parentbranch FROM branches WHERE proot = ?", [aUUID dataValue]];
             while ([rs next])
             {
                 ETUUID *branch = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-                ETUUID *initialRevid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
-                ETUUID *currentRevid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
-                ETUUID *headRevid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 3]];
-                id branchMeta = [self readMetadata: [rs dataForColumnIndex: 4]];
+                ETUUID *currentRevid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
+                ETUUID *headRevid = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
+                id branchMeta = [self readMetadata: [rs dataForColumnIndex: 3]];
                 
                 COBranchInfo *state = [[COBranchInfo alloc] init];
                 state.UUID = branch;
 				state.persistentRootUUID = aUUID;
-                state.initialRevisionUUID = initialRevid;
                 state.currentRevisionUUID = currentRevid;
 				state.headRevisionUUID = headRevid;
                 state.metadata = branchMeta;
-                state.deleted = [rs boolForColumnIndex: 5];
-				state.parentBranchUUID = [rs dataForColumnIndex: 6] != nil
-					? [ETUUID UUIDWithData: [rs dataForColumnIndex: 6]]
+                state.deleted = [rs boolForColumnIndex: 4];
+				state.parentBranchUUID = [rs dataForColumnIndex: 5] != nil
+					? [ETUUID UUIDWithData: [rs dataForColumnIndex: 5]]
 					: nil;
                 
                 [branchDict setObject: state forKey: branch];
@@ -882,8 +880,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         NSMutableIndexSet *keptRevisions = [NSMutableIndexSet indexSet];
         
         FMResultSet *rs = [db_ executeQuery: @"SELECT "
-                                                "branches.current_revid, "
-                                                "branches.initial_revid "
+                                                "branches.current_revid "
                                                 "FROM persistentroots "
                                                 "INNER JOIN branches ON persistentroots.uuid = branches.proot "
 												"INNER JOIN persistentroot_backingstores ON persistentroots.uuid = persistentroot_backingstores.uuid "
@@ -891,9 +888,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         while ([rs next])
         {
             ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-            ETUUID *initial = [ETUUID UUIDWithData: [rs dataForColumnIndex: 1]];
             
-            NSIndexSet *revs = [backing revidsFromRevid: [backing revidForUUID: initial]
+            NSIndexSet *revs = [backing revidsFromRevid: 0
                                                 toRevid: [backing revidForUUID: head]];
             [keptRevisions addIndexes: revs];
         }

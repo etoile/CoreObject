@@ -161,8 +161,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *tx
         }
         
         ETUUID *currentRevisionID = [ETUUID UUIDWithString: branchPlist[@"currentRevisionID"]];
-        ETUUID *initialRevisionID = [ETUUID UUIDWithString: branchPlist[@"initialRevisionID"]];
-        
+
         ETUUID *branchUUID;
         
         if (branchToUpdate == nil)
@@ -186,7 +185,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *tx
         }
         
         [txn setCurrentRevision: currentRevisionID
-				   headRevision: initialRevisionID // FIXME: What should headRevision be set to? nil ot initialRevisionID?
+				   headRevision: currentRevisionID
 					  forBranch: branchUUID
 			   ofPersistentRoot: persistentRoot];
         

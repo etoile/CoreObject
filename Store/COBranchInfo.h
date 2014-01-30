@@ -14,7 +14,6 @@
 @private
     ETUUID *uuid_;
     ETUUID *_persistentRootUUID;
-    ETUUID *_initialRevisionUUID;
     ETUUID *_headRevisionUUID;
     ETUUID *_currentRevisionUUID;
     NSDictionary *metadata_;
@@ -48,11 +47,6 @@
  * removed.
  */
 @property (readwrite, nonatomic, strong) ETUUID *headRevisionUUID;
-/**
- * The oldest revision on the branch. Indicates "where a feature branch was
- * forked from master"
- */
-@property (readwrite, nonatomic, strong) ETUUID *initialRevisionUUID;
 /**
  * The current revision of this branch.
  */

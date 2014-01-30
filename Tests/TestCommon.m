@@ -114,19 +114,16 @@ doesNotPostNotification: (NSString *)notif
 }
 
 - (void) checkPersistentRoot: (ETUUID *)aPersistentRoot
-		  hasInitialRevision: (ETUUID *)expectedInitial
 					 current: (ETUUID *)expectedCurrent
 						head: (ETUUID *)expectedHead
 {
 	COPersistentRootInfo *info = [store persistentRootInfoForUUID: aPersistentRoot];
 	return [self checkBranch: info.currentBranchUUID
-		  hasInitialRevision: expectedInitial
 					 current: expectedCurrent
 						head: expectedHead];
 }
 
 - (void) checkBranch: (ETUUID *)aBranch
-  hasInitialRevision: (ETUUID *)expectedInitial
 			 current: (ETUUID *)expectedCurrent
 				head: (ETUUID *)expectedHead
 {
@@ -136,15 +133,6 @@ doesNotPostNotification: (NSString *)notif
 	
 	UKNotNil(branchInfo);
 	
-	if (expectedInitial == nil)
-	{
-		UKNil(branchInfo.initialRevisionUUID);
-	}
-	else
-	{
-		UKObjectsEqual(expectedInitial, branchInfo.initialRevisionUUID);
-	}
-
 	if (expectedCurrent == nil)
 	{
 		UKNil(branchInfo.currentRevisionUUID);

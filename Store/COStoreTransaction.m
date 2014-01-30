@@ -148,7 +148,6 @@
     {
         COBranchInfo *branch = [[COBranchInfo alloc] init];
         branch.UUID = aBranchUUID;
-        branch.initialRevisionUUID = aRevision;
         branch.currentRevisionUUID = aRevision;
         branch.headRevisionUUID = aRevision;
         branch.metadata = nil;
