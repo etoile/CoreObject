@@ -272,11 +272,19 @@ extern NSString * const kCOBranchLabel;
 
 
 /**
+ * "Step backward" method: sets the current revision to be the parent of
+ * currentRevision. Note that there is no limit on this method: you can step
+ * backwards to before a persistent root was created, assuming the reciever is owned
+ * by a persistent root that is a cheap copy.
+ *
  * See –[COTrack undo]. Unlike the implementation in -[COUndoTrack undo], 
  * does not automatically cause a commit.
  */
 - (void)undo;
 /**
+ * "Step forward" method: sets the current revision to be the child of
+ * currentRevision that lies on the path towards headRevision.
+ *
  * See –[COTrack redo]. Unlike the implementation in -[COUndoTrack redo],
  * does not automatically cause a commit.
  */

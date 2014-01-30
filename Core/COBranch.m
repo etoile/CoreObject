@@ -476,10 +476,15 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (CORevision *)undoRevision
 {
+	// Quentin argued you should be able to "step back"
+	// in a cheap copy to before the copy was made. I'm disabling this
+	// block to get that behaviour.
+#if 0
     if ([[self initialRevision] isEqual: [self currentRevision]])
     {
         return nil;
     }
+#endif
     
     CORevision *revision = [[self currentRevision] parentRevision];
     return revision;
