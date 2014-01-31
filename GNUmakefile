@@ -63,7 +63,7 @@ CoreObject_OBJC_FILES += $(wildcard Tests/Model/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Relationship/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/StorageDataModel/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Store/*.m)
-#CoreObject_OBJC_FILES += $(wildcard Tests/Undo/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/Undo/TestUndoStackTrackProtocol.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Serialization/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/TestModelObjects/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Utilities/*.m)
@@ -71,9 +71,37 @@ endif
 
 clean : test=yes
 
+CoreObjectDoc_HEADER_DIRS =
+CoreObjectDoc_SOURCE_DIRS =
+CoreObjectDoc_DOC_FILES = \
+	Core/COBranch.h \
+	Core/COEditingContext.h \
+	Core/COEditingContext+Debugging.h \
+	Core/COObject.h \
+	Core/COObjectGraphContext.h \
+	Core/COObjectGraphContext+Debugging.h \
+	Core/COPersistentRoot.h \
+	Core/COQuery.h \
+	Core/COSerialization.h \
+	Core/CORevision.h \
+	Model/COBookmark.h \
+	Model/COContainer.h \
+	Model/COCollection.h \
+	Model/COGroup.h \
+	Model/COLibrary.h \
+	Model/COTag.h \
+	Undo/COCommand.h \
+	Undo/COCommandGroup.h \
+	Undo/COTrack.h \
+	Undo/COUndoTrack.h \
+	Utilities/COCommitDescriptor.h \
+	Utilities/CODateSerialization.h \
+	Utilities/COError.h  
+
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 -include ../../etoile.make
 -include etoile.make
+-include ../../documentation.make
 ifeq ($(test), yes)
   include $(GNUSTEP_MAKEFILES)/bundle.make
 else	
