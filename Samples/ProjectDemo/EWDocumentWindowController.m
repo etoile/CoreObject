@@ -246,9 +246,9 @@
 - (void) resetTitle
 {
 	NSString *title = @"";
-	if (self.documentObject.documentName != nil)
+	if (self.persistentRoot.metadata[@"documentName"] != nil)
 	{
-		title = self.documentObject.documentName;
+		title = self.persistentRoot.metadata[@"documentName"];
 	}
 	[[self window] setTitle: title];
 }
@@ -400,19 +400,20 @@
                          informativeTextWithFormat: @""];
 	
     NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
-    [input setStringValue: [[self documentObject] documentName]];
+    [input setStringValue: self.persistentRoot.metadata[@"documentName"]];
     [alert setAccessoryView:input];
 	
     NSInteger button = [alert runModal];
     if (button == NSAlertDefaultReturn) {
         [input validateEditing];
         
-		NSString *oldName = self.documentObject.documentName;
-		
-		self.documentObject.documentName = [input stringValue];
-		
+		NSString *oldDocName = self.persistentRoot.metadata[@"documentName"];
+		NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: self.persistentRoot.metadata];
+		md[@"documentName"] = [input stringValue];
+		self.persistentRoot.metadata = md;
+				
 		[self commitWithIdentifier: @"rename-document"
-			  descriptionArguments: @[oldName, self.documentObject.documentName]];
+			  descriptionArguments: @[oldDocName, self.persistentRoot.metadata[@"documentName"]]];
     }
 }
 

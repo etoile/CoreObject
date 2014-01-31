@@ -6,15 +6,6 @@
 
 @implementation OutlineController
 
-- (void) updateWindowTitle
-{
-	NSString *title = [self.doc documentName];
-	if (title == nil)
-		title = @"untitled";
-	
-	[[self window] setTitle: title];
-}
-
 - (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
 											 windowID: (NSString*)windowID
 {
@@ -78,7 +69,6 @@
 //												 name: NSWindowDidEndLiveResizeNotification 
 //											   object: [self window]];	
 //	
-	[self updateWindowTitle];
 }
 
 - (void)windowFrameDidChange:(NSNotification*)notification
