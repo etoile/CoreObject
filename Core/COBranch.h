@@ -353,7 +353,7 @@ extern NSString * const kCOBranchLabel;
  *
  * Always returns nil unless explicitly set. 
  * 
- * If it is set at commit time, records the <strong>current revision</strong of 
+ * If it is set at commit time, records the <strong>current revision</strong> of 
  * the merging branch as the merge parent of the new commit.
  */
 @property (nonatomic, strong) COBranch *mergingBranch;

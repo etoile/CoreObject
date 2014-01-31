@@ -21,15 +21,15 @@
  * owns the one just below in the list):
  *
  * <deflist>
- * <item>COEditingContext</item><desc>Entry point for opening and creating stores.
+ * <term>COEditingContext</term><desc>Entry point for opening and creating stores.
  * Handles persistent root insertion and deletion</desc>
- * <item>COPersistentRoot</item><desc>Versioned sandbox of inner objects,
+ * <term>COPersistentRoot</term><desc>Versioned sandbox of inner objects,
  * with a history graph (CORevision), and one or more branches (COBranch).</desc>
- * <item>COBranch</item><desc>A position on the history graph, with the revision
+ * <term>COBranch</term><desc>A position on the history graph, with the revision
  * contents exposed as a COObjectGraphContext</desc>
- * <item>COObjectGraphContext</item><desc>manages COObject graph, tracks 
+ * <term>COObjectGraphContext</term><desc>manages COObject graph, tracks 
  * changes and handles reloading new states.</desc>
- * <item>COObject</item><desc>Mutable inner object.</desc>
+ * <term>COObject</term><desc>Mutable inner object.</desc>
  * </deflist>
  *
  * CORevision also fits this set although it is not directly owned by one object.

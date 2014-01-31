@@ -14,7 +14,8 @@
 @class COItemGraph, COItem;
 
 /**
- * This notification is sent by the context during -acceptAllChanges.
+ * This notification is sent by the context during 
+ * -[COObjectGraphContext acceptAllChanges].
  *
  * It will tell you about all possible mutations that can happen to a
  * COObjectGraphContext over its lifetime (inserting objects, updating objects,
@@ -322,7 +323,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  *
  * The root object is included among the returned objects.
  *
- * See also -objectWithUUID: and -rootObject.
+ * See also -loadedObjectForUUID: and -rootObject.
  */
 @property (nonatomic, readonly) NSArray *loadedObjects;
 /**

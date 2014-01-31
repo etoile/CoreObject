@@ -85,7 +85,7 @@
  * (relationships or collection-based attributes), the basic accessor pattern 
  * won't work correctly.
  *
- * <strong>Basic Accessor Pattern</strong/>
+ * <strong>Basic Accessor Pattern</strong>
  *
  * <example>
  * - (void)name
@@ -105,7 +105,7 @@
  * }
  * </example>
  *
- * <strong>Multivalued Accessor Pattern</strong/>
+ * <strong>Multivalued Accessor Pattern</strong>
  *
  * The example below is based on a COObject subclass using a<em>names</em> 
  * instance variable. If the value is stored in the variable storage, the 
@@ -113,7 +113,6 @@
  * -setValue:forVariableStorageKey:.
  *
  * <example>
- *
  * - (void)names
  * {
  *     // The synthesized accessor would just do the same.
@@ -161,7 +160,7 @@
  * }
  *
  * // Direct setters are rare, but nonetheless it is possible to write one as below...
- * - (void)setNames: (id <ETCollection>)newNames
+ * - (void)setNames: (id &lt;ETCollection&gt;)newNames
  * {
  *     NSArray *replacementObjects = A(aName);
  *     // If no indexes are provided, the entire collection is replaced or set.
@@ -560,7 +559,8 @@
  * going to be deleted (collected in the next GC phase).
  *
  * See also COError, -[COObjectGraphContext insertedObjectUUIDs],
- * -[COObjectGraphContext updatedObjects] and -[COObjectGraphContext changedObjects].
+ * -[COObjectGraphContext updatedObjectUUIDs] and 
+ * -[COObjectGraphContext changedObjectUUIDs].
  */
 - (NSArray *)validate;
 /**

@@ -38,11 +38,11 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * For each new persistent root, CoreObject produces a new UUID triplet based on:
  *
  * <deflist>
- * <item>a persistent root</item><desc>a branch collection that results in
+ * <term>a persistent root</term><desc>a branch collection that results in
  * a history graph describing all the changes made to a document
  * (document has a very loose meaning here</desc>
- * <item>a branch</item><desc>the persistent root initial branch</desc>
- * <item>a root object</item><desc>the document main object e.g. the top node
+ * <term>a branch</term><desc>the persistent root initial branch</desc>
+ * <term>a root object</term><desc>the document main object e.g. the top node
  * of a structed document, a photo or contact object</desc>
  * </deflist>
  *
