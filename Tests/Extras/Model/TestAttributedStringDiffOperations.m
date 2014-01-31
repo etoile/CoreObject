@@ -14,13 +14,9 @@
 
 - (void) testInsertAttributedSubstring
 {
-	COObjectGraphContext *target = [self makeAttributedString];
-	[self appendString: @"()" htmlCode: @"i" toAttributedString: [target rootObject]];
-	
-	COObjectGraphContext *source = [self makeAttributedString];
-	[self appendString: @"X" htmlCode: @"b" toAttributedString: [source rootObject]];
-	[self appendString: @"Y" htmlCode: @"u" toAttributedString: [source rootObject]];
-	
+	COObjectGraphContext *target = [self makeAttributedStringWithHTML: @"<i>()</i>"];
+	COObjectGraphContext *source = [self makeAttributedString2WithHTML: @"<b>X</b><u>Y</u>"];
+
 	COAttributedStringDiffOperationInsertAttributedSubstring *op = [COAttributedStringDiffOperationInsertAttributedSubstring new];
 	op.range = NSMakeRange(1, 0);
 	op.source = nil;
@@ -35,10 +31,7 @@
 
 - (void) testDeleteRange
 {
-	COObjectGraphContext *target = [self makeAttributedString];
-	[self appendString: @"abc" htmlCode: @"b" toAttributedString: [target rootObject]];
-	[self appendString: @"def" htmlCode: @"u" toAttributedString: [target rootObject]];
-	[self appendString: @"ghi" htmlCode: @"i" toAttributedString: [target rootObject]];
+	COObjectGraphContext *target = [self makeAttributedStringWithHTML: @"<B>abc</B><U>def</U><I>ghi</I>"];
 	
 	COAttributedStringDiffOperationDeleteRange *op = [COAttributedStringDiffOperationDeleteRange new];
 	op.range = NSMakeRange(2, 5);
@@ -53,14 +46,8 @@
 
 - (void) testReplaceRange
 {
-	COObjectGraphContext *target = [self makeAttributedString];
-	[self appendString: @"abc" htmlCode: @"b" toAttributedString: [target rootObject]];
-	[self appendString: @"def" htmlCode: @"u" toAttributedString: [target rootObject]];
-	[self appendString: @"ghi" htmlCode: @"i" toAttributedString: [target rootObject]];
-	
-	COObjectGraphContext *source = [self makeAttributedString];
-	[self appendString: @"X" htmlCode: @"i" toAttributedString: [source rootObject]];
-	[self appendString: @"Y" htmlCode: @"u" toAttributedString: [source rootObject]];
+	COObjectGraphContext *target = [self makeAttributedStringWithHTML: @"<B>abc</B><U>def</U><I>ghi</I>"];
+	COObjectGraphContext *source = [self makeAttributedString2WithHTML: @"<I>X</I><U>Y</U>"];
 	
 	COAttributedStringDiffOperationReplaceRange *op = [COAttributedStringDiffOperationReplaceRange new];
 	op.range = NSMakeRange(2, 5);
@@ -76,8 +63,7 @@
 
 - (void) testAddAttribute
 {
-	COObjectGraphContext *target = [self makeAttributedString];
-	[self appendString: @"Hello World" htmlCode: nil toAttributedString: [target rootObject]];
+	COObjectGraphContext *target = [self makeAttributedStringWithHTML: @"Hello World"];
 	
 	COObjectGraphContext *source = [COObjectGraphContext new];
 	[source setRootObject: [self makeAttr: @"b" inCtx: source]];
@@ -97,8 +83,7 @@
 
 - (void) testRemoveAttribute
 {
-	COObjectGraphContext *target = [self makeAttributedString];
-	[self appendString: @"Hello World" htmlCode: @"b" toAttributedString: [target rootObject]];
+	COObjectGraphContext *target = [self makeAttributedStringWithHTML: @"<B>Hello World</B>"];
 	
 	COObjectGraphContext *source = [COObjectGraphContext new];
 	[source setRootObject: [self makeAttr: @"b" inCtx: source]];

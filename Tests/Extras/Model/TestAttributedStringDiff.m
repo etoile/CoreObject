@@ -14,31 +14,9 @@
 
 - (void) testDiffInsertion
 {
-	/*
-	 ctx1:
-	 
-	 "()"
-	 
-	 */
-	
-	COObjectGraphContext *ctx1 = [self makeAttributedString];
-	[self appendString: @"()" htmlCode: nil toAttributedString: [ctx1 rootObject]];
-	
-	
-	/*
-	 ctx2:
-	 
-	 "(abc)"
-	    ^^
-	    bold
-	 
-	 */
-	
-	COObjectGraphContext *ctx2 = [self makeAttributedString];
-	[self appendString: @"(a" htmlCode: nil toAttributedString: [ctx2 rootObject]];
-	[self appendString: @"bc" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
-	[self appendString: @")" htmlCode: nil toAttributedString: [ctx2 rootObject]];
-	
+	COObjectGraphContext *ctx1 = [self makeAttributedStringWithHTML: @"()"];
+	COObjectGraphContext *ctx2 = [self makeAttributedStringWithHTML: @"(a<B>bc</B>)"];
+
 	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
 																			secondAttributedString: [ctx2 rootObject]
 																							source: nil];
@@ -56,14 +34,8 @@
 
 - (void) testDiffDeletion
 {
-	COObjectGraphContext *ctx1 = [self makeAttributedString];
-	[self appendString: @"abc" htmlCode: @"b" toAttributedString: [ctx1 rootObject]];
-	[self appendString: @"def" htmlCode: @"i" toAttributedString: [ctx1 rootObject]];
-	[self appendString: @"ghi" htmlCode: @"u" toAttributedString: [ctx1 rootObject]];
-	
-	COObjectGraphContext *ctx2 = [self makeAttributedString];
-	[self appendString: @"a" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
-	[self appendString: @"i" htmlCode: @"u" toAttributedString: [ctx2 rootObject]];
+	COObjectGraphContext *ctx1 = [self makeAttributedStringWithHTML: @"<B>abc</B><I>def</I><U>ghi</U>"];
+	COObjectGraphContext *ctx2 = [self makeAttributedStringWithHTML: @"<B>a</B><U>i</U>"];
 	
 	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
 																			secondAttributedString: [ctx2 rootObject]
@@ -78,14 +50,9 @@
 
 - (void) testDiffReplacement
 {
-	COObjectGraphContext *ctx1 = [self makeAttributedString];
-	[self appendString: @"abcdefg" htmlCode: @"b" toAttributedString: [ctx1 rootObject]];
-	
-	COObjectGraphContext *ctx2 = [self makeAttributedString];
-	[self appendString: @"ab" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
-	[self appendString: @"CDE" htmlCode: @"u" toAttributedString: [ctx2 rootObject]];
-	[self appendString: @"fg" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
-	
+	COObjectGraphContext *ctx1 = [self makeAttributedStringWithHTML: @"<B>abcdefg</B>"];
+	COObjectGraphContext *ctx2 = [self makeAttributedStringWithHTML: @"<B>ab</B><U>CDE</U><B>fg</B>"];
+
 	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
 																			secondAttributedString: [ctx2 rootObject]
 																							source: nil];
@@ -104,19 +71,9 @@
 
 - (void) testDiffAddAttribute
 {
-	COObjectGraphContext *ctx1 = [self makeAttributedString];
-	[self appendString: @"abc" htmlCode: nil toAttributedString: [ctx1 rootObject]];
-	[self appendString: @"def" htmlCode: @"i" toAttributedString: [ctx1 rootObject]];
-	[self appendString: @"ghi" htmlCode: @"u" toAttributedString: [ctx1 rootObject]];
-	
+	COObjectGraphContext *ctx1 = [self makeAttributedStringWithHTML: @"abc<I>def</I><U>ghi</U>"];
 	// Make 'cdefg' bold
-	
-	COObjectGraphContext *ctx2 = [self makeAttributedString];
-	[self appendString: @"ab" htmlCode: nil toAttributedString: [ctx2 rootObject]];
-	[self appendString: @"c" htmlCode: @"b" toAttributedString: [ctx2 rootObject]];
-	[self appendString: @"def" htmlCodes: @[@"b", @"i"] toAttributedString: [ctx2 rootObject]];
-	[self appendString: @"g" htmlCodes: @[@"b", @"u"] toAttributedString: [ctx2 rootObject]];
-	[self appendString: @"hi" htmlCode: @"u" toAttributedString: [ctx2 rootObject]];
+	COObjectGraphContext *ctx2 = [self makeAttributedStringWithHTML: @"ab<B>c<I>def</I><U>g</B>hi</U>"];
 	
 	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
 																			secondAttributedString: [ctx2 rootObject]
@@ -135,11 +92,8 @@
 
 - (void) testDiffRemoveAttribute
 {
-	COObjectGraphContext *ctx1 = [self makeAttributedString];
-	[self appendString: @"abc" htmlCode: @"b" toAttributedString: [ctx1 rootObject]];
-	
-	COObjectGraphContext *ctx2 = [self makeAttributedString];
-	[self appendString: @"abc" htmlCode: nil toAttributedString: [ctx2 rootObject]];
+	COObjectGraphContext *ctx1 = [self makeAttributedStringWithHTML: @"<B>abc</B>"];
+	COObjectGraphContext *ctx2 = [self makeAttributedStringWithHTML: @"abc"];
 	
 	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
 																			secondAttributedString: [ctx2 rootObject]
@@ -154,10 +108,8 @@
 
 - (void) testApplyDiffWithRemoveRangeAndRemoveAttributes
 {
-	COObjectGraphContext *target = [self makeAttributedString];
-	[self appendString: @"Hello " htmlCode: nil toAttributedString: [target rootObject]];
-	[self appendString: @"World" htmlCode: @"b" toAttributedString: [target rootObject]];
-	
+	COObjectGraphContext *target = [self makeAttributedStringWithHTML: @"Hello <B>World</B>"];
+
 	COAttributedStringDiffOperationDeleteRange *op1 = [[COAttributedStringDiffOperationDeleteRange alloc] init];
 	op1.attributedStringUUID = [[target rootObject] UUID];
 	op1.range = NSMakeRange(0, 6);

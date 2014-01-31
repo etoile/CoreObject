@@ -8,6 +8,16 @@
 
 - (COObjectGraphContext *) makeAttributedString;
 
+/**
+ * Parses the given HTML and turns it in to a COAttributedString.
+ * Always makes a COAttributedString with the same UUID.
+ */
+- (COObjectGraphContext *) makeAttributedStringWithHTML: (NSString *)html;
+/**
+ * Same as -makeAttributedStringWithHTML: but uses a different UUID
+ */
+- (COObjectGraphContext *) makeAttributedString2WithHTML: (NSString *)html;
+
 - (void) clearAttributedString: (COAttributedString *)dest;
 
 - (COAttributedStringChunk *) appendString: (NSString *)string htmlCodes: (NSArray *)codes toAttributedString: (COAttributedString *)dest;
@@ -19,5 +29,12 @@
 - (void) checkFontHasTraits: (NSFontSymbolicTraits)traits withLongestEffectiveRange: (NSRange)expectedRange inAttributedString: (NSAttributedString *)target;
 
 - (void) setFontTraits: (NSFontSymbolicTraits)traits inRange: (NSRange)aRange inTextStorage: (NSTextStorage *)target;
+
+- (void) appendHTMLString: (NSString *)html toAttributedString: (COAttributedString *)dest;
+
+- (void) checkMergingBase: (NSString *)base
+			  withBranchA: (NSString *)branchA
+			  withBranchB: (NSString *)branchB
+					gives: (NSString *)result;
 
 @end
