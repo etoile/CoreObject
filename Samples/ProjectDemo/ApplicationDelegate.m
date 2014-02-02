@@ -209,6 +209,29 @@
 	}
 }
 
+- (EWDocumentWindowController *) makeWindowControllerForDocumentRootObject: (Document *)aDoc
+{
+	ETAssert([aDoc isKindOfClass: [Document class]]);
+	
+	NSString *windowID = [[ETUUID UUID] stringValue];
+	
+	NSDictionary *windowControllerClassForRootDocObjectClassName =
+	@{ NSStringFromClass([OutlineItem class]) : [OutlineController class],
+	   NSStringFromClass([SKTDrawDocument class]) : [DrawingController class],
+	   NSStringFromClass([TextItem class]) : [TextController class]};
+	
+	NSString *rootDocObjectClassName = NSStringFromClass([aDoc.rootDocObject class]);
+	Class wcClass = windowControllerClassForRootDocObjectClassName[rootDocObjectClassName];
+	ETAssert([wcClass isSubclassOfClass: [EWDocumentWindowController class]]);
+	
+	EWDocumentWindowController *controller = [[wcClass alloc] initAsPrimaryWindowForPersistentRoot: aDoc.persistentRoot
+																						  windowID: windowID];
+	[controller showWindow: nil];
+	
+	controllerForWindowID[windowID] = controller;
+	return  controller;
+}
+
 - (EWDocumentWindowController *) registerDocumentRootObject: (Document *)aDoc
 {
 	// FIXME: Total hack
@@ -221,23 +244,7 @@
 	
 	[newDocumentTypeWindow orderOut: nil];
     
-	NSString *windowID = [[ETUUID UUID] stringValue];
-	
-	NSDictionary *windowControllerClassForRootDocObjectClassName =
-		@{ NSStringFromClass([OutlineItem class]) : [OutlineController class],
-		   NSStringFromClass([SKTDrawDocument class]) : [DrawingController class],
-		   NSStringFromClass([TextItem class]) : [TextController class]};
-	
-	NSString *rootDocObjectClassName = NSStringFromClass([aDoc.rootDocObject class]);
-	Class wcClass = windowControllerClassForRootDocObjectClassName[rootDocObjectClassName];
-	ETAssert([wcClass isSubclassOfClass: [EWDocumentWindowController class]]);
-	
-	EWDocumentWindowController *controller = [[wcClass alloc] initAsPrimaryWindowForPersistentRoot: aDoc.persistentRoot
-																						  windowID: windowID];
-	[controller showWindow: nil];
-
-	controllerForWindowID[windowID] = controller;
-	
+	EWDocumentWindowController *controller = [self makeWindowControllerForDocumentRootObject: aDoc];
 	return controller;
 }
 
@@ -347,6 +354,16 @@
 - (EWDocumentWindowController*)controllerForPersistentRoot: (COPersistentRoot *)persistentRoot
 {
 	return [self controllerForDocumentRootObject: [persistentRoot rootObject]];
+}
+
+- (void) openDocumentWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
+{
+	EWDocumentWindowController *wc = [self controllerForPersistentRoot: aPersistentRoot];
+	if (wc == nil)
+	{
+		wc = [self makeWindowControllerForDocumentRootObject: [aPersistentRoot rootObject]];
+	}
+	[wc showWindow: nil];
 }
 
 /* Project delegate */

@@ -46,6 +46,8 @@
 - (EWDocumentWindowController *)controllerForDocumentRootObject: (COObject*)rootObject;
 - (EWDocumentWindowController *)controllerForPersistentRoot: (COPersistentRoot *)persistentRoot;
 
+- (void) openDocumentWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot;
+
 - (void)showSearchResults: (id)sender;
 
 /* Convenience */

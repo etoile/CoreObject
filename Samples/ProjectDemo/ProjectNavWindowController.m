@@ -52,9 +52,11 @@
 	if (sender == outline)
 	{
 		id item = [outline itemAtRow: [outline selectedRow]];
-		NSLog(@"Double click: %@", item);
 		
-		[[(ApplicationDelegate *)[NSApp delegate] controllerForDocumentRootObject: item] showWindow: nil];
+		COPersistentRoot *proot = [item persistentRoot];
+		NSLog(@"Double click: %@", proot);
+		
+		[(ApplicationDelegate *)[NSApp delegate] openDocumentWindowForPersistentRoot: proot];
 	}
 }
 
@@ -94,7 +96,11 @@
 {
 	if (nil == item) { return nil; }
 	
-	return [item valueForProperty: @"name"];
+	if ([item isKindOfClass: [Document class]])
+	{
+		return [[[item persistentRoot] metadata] valueForKey: @"documentName"];
+	}
+	return @"?";
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
