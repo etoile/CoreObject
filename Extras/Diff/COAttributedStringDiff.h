@@ -61,21 +61,30 @@
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset;
 @end
 
-@interface COAttributedStringDiffOperationInsertAttributedSubstring : NSObject <COAttributedStringDiffOperation>
+@interface COAttributedStringOperation : NSObject <COAttributedStringDiffOperation>
+{
+@protected;
+	ETUUID *attributedStringUUID;
+	NSRange range;
+	id source;
+}
+@end
+
+@interface COAttributedStringDiffOperationInsertAttributedSubstring : COAttributedStringOperation
 @property (nonatomic, readwrite, strong) COItemGraph *attributedStringItemGraph;
 @end
 
-@interface COAttributedStringDiffOperationDeleteRange : NSObject <COAttributedStringDiffOperation>
+@interface COAttributedStringDiffOperationDeleteRange : COAttributedStringOperation
 @end
 
-@interface COAttributedStringDiffOperationReplaceRange : NSObject <COAttributedStringDiffOperation>
+@interface COAttributedStringDiffOperationReplaceRange : COAttributedStringOperation
 @property (nonatomic, readwrite, strong) COItemGraph *attributedStringItemGraph;
 @end
 
-@interface COAttributedStringDiffOperationAddAttribute : NSObject <COAttributedStringDiffOperation>
+@interface COAttributedStringDiffOperationAddAttribute : COAttributedStringOperation
 @property (nonatomic, readwrite, strong) COItemGraph *attributeItemGraph;
 @end
 
-@interface COAttributedStringDiffOperationRemoveAttribute : NSObject <COAttributedStringDiffOperation>
+@interface COAttributedStringDiffOperationRemoveAttribute : COAttributedStringOperation
 @property (nonatomic, readwrite, strong) COItemGraph *attributeItemGraph;
 @end

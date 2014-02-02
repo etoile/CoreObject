@@ -55,4 +55,6 @@
 
 - (NSSet *) attributesSetAtIndex: (NSUInteger)characterIndex longestEffectiveRange: (NSRange *)rangeOut inRange: (NSRange)rangeLimit;
 
++ (BOOL) isAttributedStringItemGraph: (COItemGraph *)aGraph equalToItemGraph: (COItemGraph *)anotherGraph;
+
 @end

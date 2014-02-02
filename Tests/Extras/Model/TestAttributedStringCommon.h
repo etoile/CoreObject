@@ -1,5 +1,8 @@
 #import "TestCommon.h"
 
+ETUUID *AttributedString1UUID();
+ETUUID *AttributedString2UUID();
+
 @interface EditingContextTestCase (TestAttributedStringCommon)
 
 - (COAttributedStringAttribute *) makeAttr: (NSString *)htmlCode inCtx: (COObjectGraphContext *)ctx;
@@ -36,5 +39,19 @@
 			  withBranchA: (NSString *)branchA
 			  withBranchB: (NSString *)branchB
 					gives: (NSString *)result;
+
+#pragma mark - test infrastructure
+
+- (void) checkDiffHTML: (NSString*)stringA withHTML: (NSString *)stringB givesOperations: (NSSet*)aSet;
+
+- (id<COAttributedStringDiffOperation>) insertHTML: (NSString*)aString atIndex: (NSUInteger)index;
+
+- (id<COAttributedStringDiffOperation>) replaceRangeOp: (NSRange)aRange withHTML: (NSString *)aString;
+
+- (id<COAttributedStringDiffOperation>) deleteRangeOp: (NSRange)aRange;
+
+- (id<COAttributedStringDiffOperation>) addAttributeOp: (NSString*)aString inRange: (NSRange)aRange;
+
+- (id<COAttributedStringDiffOperation>) removeAttributeOp: (NSString*)aString inRange: (NSRange)aRange;
 
 @end

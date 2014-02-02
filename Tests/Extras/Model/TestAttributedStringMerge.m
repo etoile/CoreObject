@@ -86,4 +86,42 @@
 	}
 }
 
+#if 0
+
+- (void) testMergeDeleteAndInsert
+{
+	COObjectGraphContext *ctx1 = [self makeAttributedString];
+	[self appendString: @"abc" htmlCode: nil toAttributedString: [ctx1 rootObject]];
+	UKObjectsEqual(@"abc", [[ctx1 rootObject] string]);
+	
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	[ctx2 setItemGraph: ctx1];
+	[self clearAttributedString: [ctx2 rootObject]];
+	UKObjectsEqual(@"", [[ctx2 rootObject] string]);
+	
+	COObjectGraphContext *ctx3 = [COObjectGraphContext new];
+	[ctx3 setItemGraph: ctx1];
+	[self clearAttributedString: [ctx3 rootObject]];
+	[self appendString: @"dabcefg" htmlCode: nil toAttributedString: [ctx3 rootObject]];
+	UKObjectsEqual(@"dabcefg", [[ctx3 rootObject] string]);
+	
+	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
+																			secondAttributedString: [ctx2 rootObject]
+																							source: @"diff12"];
+	
+    COAttributedStringDiff *diff13 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
+																			secondAttributedString: [ctx3 rootObject]
+																							source: @"diff13"];
+	
+	{
+		COAttributedStringDiff *mergeA = [diff12 diffByMergingWithDiff: diff13];
+		COObjectGraphContext *mergeAapplied = [[COObjectGraphContext alloc] init];
+		[mergeAapplied setItemGraph: ctx1];
+		[mergeA applyToAttributedString: [mergeAapplied rootObject]];
+		UKObjectsEqual(@"defg", [(COAttributedString *)[mergeAapplied rootObject] string]);
+	}
+}
+
+#endif
+
 @end

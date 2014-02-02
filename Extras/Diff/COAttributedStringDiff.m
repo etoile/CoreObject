@@ -481,9 +481,35 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 	return result;
 }
 
+@implementation COAttributedStringOperation
+@synthesize range = range, source = source, attributedStringUUID = attributedStringUUID;
+
+- (NSUInteger)hash
+{
+	return [NSStringFromClass([self class]) hash] ^ range.location ^ range.length ^ [attributedStringUUID hash];
+}
+
+- (BOOL)isEqual:(id)object
+{
+	if (![object isKindOfClass: [self class]])
+		return NO;
+	
+	COAttributedStringOperation *op = object;
+	return NSEqualRanges(self.range, op.range)
+		&& [self.attributedStringUUID isEqual: op.attributedStringUUID];
+}
+
+- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
+{
+	[NSException raise: NSGenericException format: @"unimplemented"];
+	return 0;
+}
+
+@end
+
 
 @implementation COAttributedStringDiffOperationInsertAttributedSubstring
-@synthesize range, source, attributedStringItemGraph, attributedStringUUID;
+@synthesize attributedStringItemGraph;
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
@@ -511,10 +537,20 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 			self.attributedStringUUID, CODescriptionForAttributedStringItemGraph(self.attributedStringItemGraph), NSStringFromRange(self.range), self.source];
 }
 
+- (BOOL) isEqual:(id)object
+{
+	if (![super isEqual: object])
+		return NO;
+	
+	COAttributedStringDiffOperationInsertAttributedSubstring *op = object;
+	
+	return [COAttributedString isAttributedStringItemGraph: self.attributedStringItemGraph
+										  equalToItemGraph: op.attributedStringItemGraph];
+}
+
 @end
 
 @implementation COAttributedStringDiffOperationDeleteRange
-@synthesize range, source, attributedStringUUID;
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
@@ -535,7 +571,7 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 @end
 
 @implementation COAttributedStringDiffOperationReplaceRange
-@synthesize range, source, attributedStringItemGraph, attributedStringUUID;
+@synthesize attributedStringItemGraph;
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
@@ -560,10 +596,21 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 			self.attributedStringUUID, NSStringFromRange(self.range), CODescriptionForAttributedStringItemGraph(self.attributedStringItemGraph), self.source];
 }
 
+- (BOOL) isEqual:(id)object
+{
+	if (![super isEqual: object])
+		return NO;
+	
+	COAttributedStringDiffOperationReplaceRange *op = object;
+	
+	return [COAttributedString isAttributedStringItemGraph: self.attributedStringItemGraph
+										  equalToItemGraph: op.attributedStringItemGraph];
+}
+
 @end
 
 @implementation COAttributedStringDiffOperationAddAttribute
-@synthesize range, source, attributeItemGraph, attributedStringUUID;
+@synthesize attributeItemGraph;
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
@@ -588,10 +635,22 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 			self.attributedStringUUID, COHTMLCodesForAttributesItemGraph(self.attributeItemGraph), NSStringFromRange(self.range), self.source];
 }
 
+- (BOOL) isEqual:(id)object
+{
+	if (![super isEqual: object])
+		return NO;
+	
+	COAttributedStringDiffOperationAddAttribute *op = object;
+	
+	return [COAttributedStringAttribute isAttributeItemGraph: self.attributeItemGraph
+											equalToItemGraph: op.attributeItemGraph];
+}
+
+
 @end
 
 @implementation COAttributedStringDiffOperationRemoveAttribute
-@synthesize range, source, attributeItemGraph, attributedStringUUID;
+@synthesize attributeItemGraph;
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
@@ -621,6 +680,17 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 {
 	return [NSString stringWithFormat: @"%@: remove attrs (%@) from %@ (%@)",
 			self.attributedStringUUID, COHTMLCodesForAttributesItemGraph(self.attributeItemGraph), NSStringFromRange(self.range), self.source];
+}
+
+- (BOOL) isEqual:(id)object
+{
+	if (![super isEqual: object])
+		return NO;
+	
+	COAttributedStringDiffOperationRemoveAttribute *op = object;
+	
+	return [COAttributedStringAttribute isAttributeItemGraph: self.attributeItemGraph
+											equalToItemGraph: op.attributeItemGraph];
 }
 
 @end

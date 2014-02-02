@@ -14,6 +14,8 @@
 #import "COObjectGraphContext+Private.h"
 #import "COObjectGraphContext+Graphviz.h"
 
+#import "COAttributedStringWrapper.h"
+
 @implementation COAttributedString
 
 + (ETEntityDescription*)newEntityDescription
@@ -211,6 +213,19 @@
 	}
 	
 	return attribs;
+}
+
++ (BOOL) isAttributedStringItemGraph: (COItemGraph *)aGraph equalToItemGraph: (COItemGraph *)anotherGraph
+{
+	COObjectGraphContext *ctx1 = [COObjectGraphContext new];
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	[ctx1 setItemGraph: aGraph];
+	[ctx2 setItemGraph: anotherGraph];
+	
+	COAttributedStringWrapper *actualWrapper = [[COAttributedStringWrapper alloc] initWithBacking: [ctx1 rootObject]];
+	COAttributedStringWrapper *expectedWrapper = [[COAttributedStringWrapper alloc] initWithBacking: [ctx2 rootObject]];
+	
+	return [expectedWrapper isEqual: actualWrapper];
 }
 
 @end

@@ -16,4 +16,8 @@
 + (BOOL) isAttributeSet: (NSSet *)aSet equalToSet: (NSSet *)anotherSet;
 + (NSSet *) attributeSet: (NSSet *)aSet minusSet: (NSSet *)anotherSet;
 
++ (COItemGraph *) attributeItemGraphForHTMLCode: (NSString *)aCode;
+
++ (BOOL) isAttributeItemGraph: (COItemGraph *)aGraph equalToItemGraph: (COItemGraph *)anotherGraph;
+
 @end

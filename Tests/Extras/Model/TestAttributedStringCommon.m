@@ -26,26 +26,34 @@
 	return ctx1;
 }
 
-- (COObjectGraphContext *) makeAttributedString
+ETUUID *AttributedString1UUID()
 {
 	static ETUUID *uuid;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 		uuid = [ETUUID new];
 	});
-	
-	return [self makeAttributedStringWithUUID: uuid];
+	return uuid;
+}
+
+ETUUID *AttributedString2UUID()
+{
+	static ETUUID *uuid;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		uuid = [ETUUID new];
+	});
+	return uuid;
+}
+
+- (COObjectGraphContext *) makeAttributedString
+{
+	return [self makeAttributedStringWithUUID: AttributedString1UUID()];
 }
 
 - (COObjectGraphContext *) makeAttributedString2
 {
-	static ETUUID *uuid;
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-		uuid = [ETUUID new];
-	});
-	
-	return [self makeAttributedStringWithUUID: uuid];
+	return [self makeAttributedStringWithUUID: AttributedString2UUID()];
 }
 
 - (COObjectGraphContext *) makeAttributedStringWithHTML: (NSString *)html
@@ -232,11 +240,90 @@
 	[self clearAttributedString: [expectedCtx rootObject]];
 	[self appendHTMLString: result toAttributedString: [expectedCtx rootObject]];
 	
+	[self checkAttributedString: [destCtx rootObject] isEqalToAttributedString: [expectedCtx rootObject]];
+}
+
+#pragma mark - test infrastructure
+
+- (void) checkAttributedString: (COAttributedString *)actual isEqalToAttributedString: (COAttributedString *)expected
+{
+	// Easy test: are the string contents equal?
 	
-	COAttributedStringWrapper *actualWrapper = [[COAttributedStringWrapper alloc] initWithBacking: [destCtx rootObject]];
-	COAttributedStringWrapper *expectedWrapper = [[COAttributedStringWrapper alloc] initWithBacking: [expectedCtx rootObject]];
+	UKObjectsEqual([expected string], [actual string]);
+	
+	// HACK: use COAttributedStringWrapper to compare the attributes
+	
+	COAttributedStringWrapper *actualWrapper = [[COAttributedStringWrapper alloc] initWithBacking: actual];
+	COAttributedStringWrapper *expectedWrapper = [[COAttributedStringWrapper alloc] initWithBacking: expected];
 	
 	UKObjectsEqual(expectedWrapper, actualWrapper);
+}
+
+- (void) checkDiffHTML: (NSString*)stringA withHTML: (NSString *)stringB givesOperations: (NSSet*)aSet
+{
+	COObjectGraphContext *ctx1 = [self makeAttributedStringWithHTML: stringA];
+	COObjectGraphContext *ctx2 = [self makeAttributedStringWithHTML: stringB];
+	
+	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
+																			secondAttributedString: [ctx2 rootObject]
+																							source: nil];
+	
+	NSSet *ops = [NSSet setWithArray: [diff12 operations]];
+	
+	UKObjectsEqual(aSet, ops);
+	
+	// Now check that we can apply the diff
+	[diff12 applyToAttributedString: [ctx1 rootObject]];
+	
+	[self checkAttributedString: [ctx1 rootObject] isEqalToAttributedString: [ctx2 rootObject]];
+}
+
+- (id<COAttributedStringDiffOperation>) insertHTML: (NSString*)aString atIndex: (NSUInteger)index
+{
+	COObjectGraphContext *ctx1 = [self makeAttributedStringWithHTML: aString];
+	
+	COAttributedStringDiffOperationInsertAttributedSubstring *op = [COAttributedStringDiffOperationInsertAttributedSubstring new];
+	op.attributedStringItemGraph = [[COItemGraph alloc] initWithItemGraph: ctx1];
+	op.range = NSMakeRange(index, 0);
+	op.attributedStringUUID = AttributedString1UUID();
+	return op;
+}
+
+- (id<COAttributedStringDiffOperation>) replaceRangeOp: (NSRange)aRange withHTML: (NSString *)aString
+{
+	COObjectGraphContext *ctx1 = [self makeAttributedStringWithHTML: aString];
+	
+	COAttributedStringDiffOperationReplaceRange *op = [COAttributedStringDiffOperationReplaceRange new];
+	op.attributedStringItemGraph = [[COItemGraph alloc] initWithItemGraph: ctx1];
+	op.range = aRange;
+	op.attributedStringUUID = AttributedString1UUID();
+	return op;
+}
+
+- (id<COAttributedStringDiffOperation>) deleteRangeOp: (NSRange)aRange
+{
+	COAttributedStringDiffOperationDeleteRange *op = [COAttributedStringDiffOperationDeleteRange new];
+	op.range = aRange;
+	op.attributedStringUUID = AttributedString1UUID();
+	return op;
+}
+
+- (id<COAttributedStringDiffOperation>) addAttributeOp: (NSString*)aString inRange: (NSRange)aRange
+{
+	COAttributedStringDiffOperationAddAttribute *op = [COAttributedStringDiffOperationAddAttribute new];
+	op.range = aRange;
+	op.attributedStringUUID = AttributedString1UUID();
+	op.attributeItemGraph = [COAttributedStringAttribute attributeItemGraphForHTMLCode: aString];
+	return op;
+}
+
+- (id<COAttributedStringDiffOperation>) removeAttributeOp: (NSString*)aString inRange: (NSRange)aRange
+{
+	COAttributedStringDiffOperationRemoveAttribute *op = [COAttributedStringDiffOperationRemoveAttribute new];
+	op.range = aRange;
+	op.attributedStringUUID = AttributedString1UUID();
+	op.attributeItemGraph = [COAttributedStringAttribute attributeItemGraphForHTMLCode: aString];
+	return op;
 }
 
 @end

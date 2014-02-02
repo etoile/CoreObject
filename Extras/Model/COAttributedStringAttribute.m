@@ -58,4 +58,25 @@
 	return result;
 }
 
++ (COItemGraph *) attributeItemGraphForHTMLCode: (NSString *)aCode
+{
+	COObjectGraphContext *tempCtx = [COObjectGraphContext new];
+	COAttributedStringAttribute *attr = [[COAttributedStringAttribute alloc] initWithObjectGraphContext: tempCtx];
+	attr.htmlCode = aCode;
+	return [attr attributeItemGraph];
+}
+
++ (BOOL) isAttributeItemGraph: (COItemGraph *)aGraph equalToItemGraph: (COItemGraph *)anotherGraph
+{
+	COObjectGraphContext *ctx1 = [COObjectGraphContext new];
+	[ctx1 setItemGraph: aGraph];
+	COAttributedStringAttribute *anAttr = [ctx1 rootObject];
+	
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	[ctx2 setItemGraph: anotherGraph];
+	COAttributedStringAttribute *anotherAttr = [ctx2 rootObject];
+	
+	return [anAttr.htmlCode isEqualToString: anotherAttr.htmlCode];
+}
+
 @end
