@@ -59,6 +59,8 @@
 	ETPropertyDescription *calendar = [ETPropertyDescription descriptionWithName: @"calendar"
 	                                                                        type: (id)@"Calendar"];
 	[calendar setOpposite: (id)@"Calendar.appointments"];
+	[calendar setDerived: YES];
+	
 	ETPropertyDescription *startDate = [ETPropertyDescription descriptionWithName: @"startDate"
 	                                                                         type: (id)@"NSDate"];
 	[startDate setPersistent: YES];

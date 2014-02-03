@@ -78,7 +78,7 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
 			ETAssert(![aProperty isDerived]);
 			if (propertyInTarget != nil)
 			{
-				ETAssert([propertyInTarget isDerived]);
+				NSAssert2([propertyInTarget isDerived], @"Your metamodel is invalid - the property %@ (opposite of %@) should be marked as derived.", [propertyInTarget fullName], [aProperty fullName]);
 				ETAssert(![propertyInTarget isPersistent]);
 			}
 			
