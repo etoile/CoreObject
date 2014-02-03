@@ -157,8 +157,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat: @"<%@ %p - %@>",
-		NSStringFromClass([self class]), self, _UUID];
+	return [NSString stringWithFormat: @"<%@ %p - %@ - %@>",
+		NSStringFromClass([self class]), self, _UUID, [[[self rootObject] entityDescription] name]];
 }
 
 - (NSString *)detailedDescription
