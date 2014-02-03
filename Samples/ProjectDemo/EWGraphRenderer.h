@@ -11,6 +11,9 @@
 	NSMutableArray *graphRows;
 	
 	COPersistentRoot *persistentRoot;
+	
+	NSMutableDictionary *branchHeadForRevisionUUID;
+	NSMutableDictionary *branchCurrentForRevisionUUID;
 }
 
 - (void) updateWithProot: (COPersistentRoot *)proot;
@@ -19,5 +22,6 @@
 - (CORevision *) revisionAtIndex: (NSUInteger)index;
 - (void) drawRevisionAtIndex: (NSUInteger)index inRect: (NSRect)aRect;
 
+- (NSArray *) branchesForIndex: (NSUInteger) index;
 
 @end

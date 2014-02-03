@@ -203,6 +203,20 @@ static NSSet *RevisionInfoSet(COPersistentRoot *proot)
 	}
 }
 
+- (void) buildBranchForRevisionUUID
+{
+	branchHeadForRevisionUUID = [NSMutableDictionary new];
+	branchCurrentForRevisionUUID = [NSMutableDictionary new];
+	
+	for (COBranch *branch in persistentRoot.branches)
+	{
+		if (branch.headRevision != nil)
+			branchHeadForRevisionUUID[branch.headRevision.UUID] = branch;
+		if (branch.currentRevision != nil)
+			branchCurrentForRevisionUUID[branch.currentRevision.UUID] = branch;
+	}
+}
+
 - (void) updateWithProot: (COPersistentRoot *)aproot
 {
 	persistentRoot = aproot;
@@ -213,6 +227,7 @@ static NSSet *RevisionInfoSet(COPersistentRoot *proot)
 	[self buildChildrenForUUID];
 	[self buildLevelForUUID];
 	[self buildGraphRows];
+	[self buildBranchForRevisionUUID];
 }
 
 - (NSUInteger) count
@@ -339,6 +354,21 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 	[circle stroke];
 	
 	[NSGraphicsContext restoreGraphicsState];
+}
+
+- (NSArray *) branchesForIndex: (NSUInteger) index
+{
+	NSMutableArray *result = [NSMutableArray new];
+	ETUUID *revUUID = [[self revisionAtIndex: index] UUID];
+	
+	if (revUUID != nil)
+	{
+		if (branchHeadForRevisionUUID[revUUID] != nil)
+			[result addObject: branchHeadForRevisionUUID[revUUID]];
+		if (branchCurrentForRevisionUUID[revUUID] != nil)
+			[result addObject: branchCurrentForRevisionUUID[revUUID]];
+	}
+	return result;
 }
 
 @end

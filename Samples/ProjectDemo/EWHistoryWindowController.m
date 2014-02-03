@@ -133,7 +133,7 @@
     }
     else if ([[tableColumn identifier] isEqual: @"description"])
     {
-        return [revision localizedShortDescription];
+        return @(row);
     }
     else if ([[tableColumn identifier] isEqual: @"author"])
     {

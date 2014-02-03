@@ -57,6 +57,7 @@
 		6627EEDD1278A55A00E06946 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 6627EEDC1278A55A00E06946 /* README.md */; };
 		662C2B78182431EC00ED975F /* SharingSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 662C2B77182431EC00ED975F /* SharingSession.m */; };
 		6638C026181852FD008341E6 /* ProjectNav.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6638C025181852FD008341E6 /* ProjectNav.xib */; };
+		663EFCD7189F90FF0030BD2F /* EWGraphLabelCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFCD6189F90FF0030BD2F /* EWGraphLabelCell.m */; };
 		664697F417CFF82100A1B767 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664697EA17CFF7FD00A1B767 /* CoreObject.framework */; };
 		6646980617CFF8AA00A1B767 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664697FF17CFF8A200A1B767 /* EtoileFoundation.framework */; };
 		6646987F17D3FF6500A1B767 /* DocumentItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646987E17D3FF6000A1B767 /* DocumentItem.m */; };
@@ -320,6 +321,8 @@
 		662C2B76182431EC00ED975F /* SharingSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingSession.h; sourceTree = "<group>"; };
 		662C2B77182431EC00ED975F /* SharingSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingSession.m; sourceTree = "<group>"; };
 		6638C025181852FD008341E6 /* ProjectNav.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProjectNav.xib; sourceTree = "<group>"; };
+		663EFCD5189F90FF0030BD2F /* EWGraphLabelCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWGraphLabelCell.h; sourceTree = "<group>"; };
+		663EFCD6189F90FF0030BD2F /* EWGraphLabelCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWGraphLabelCell.m; sourceTree = "<group>"; };
 		664697DD17CFF76200A1B767 /* ProjectDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProjectDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		664697DF17CFF7FC00A1B767 /* CoreObject.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CoreObject.xcodeproj; path = ../../CoreObject.xcodeproj; sourceTree = "<group>"; };
 		664697F517CFF8A100A1B767 /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../../../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
@@ -880,6 +883,8 @@
 				667C6C78181AF40400BDD213 /* EWHistoryWindowController.m */,
 				66F1800718890E040046A951 /* EWGraphCell.h */,
 				66F1800818890E040046A951 /* EWGraphCell.m */,
+				663EFCD5189F90FF0030BD2F /* EWGraphLabelCell.h */,
+				663EFCD6189F90FF0030BD2F /* EWGraphLabelCell.m */,
 			);
 			name = "History Inspector";
 			sourceTree = "<group>";
@@ -1185,6 +1190,7 @@
 				79911A5212CDAECD009D28C0 /* SKTGridPanelController.m in Sources */,
 				661211891821A482003AEC29 /* DDAbstractDatabaseLogger.m in Sources */,
 				79911A5312CDAECD009D28C0 /* SKTGridView.m in Sources */,
+				663EFCD7189F90FF0030BD2F /* EWGraphLabelCell.m in Sources */,
 				79911A5412CDAECD009D28C0 /* SKTInspectorController.m in Sources */,
 				661211CF1821A568003AEC29 /* XMPPAnonymousAuthentication.m in Sources */,
 				66C33D90128F449400E5B15B /* ItemReference.m in Sources */,
