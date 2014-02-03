@@ -11,8 +11,7 @@
 
 /**
  * @group Built-in Object Types
- *
- * COBookmark represents a URL-based link.
+ * @abstract COBookmark represents a URL-based link.
  *
  * COObject API includes the bookmark name, creation date and 
  * modification date. For example, see -[COObject name].
@@ -68,7 +67,7 @@
  */
 @property (nonatomic, strong) NSDate *lastVisitedDate;
 /**
- * The image data for the fav icon bound to the ULR.
+ * The image data for the fav icon bound to the URL.
  *
  * You would usually retrieve it from the URL. It is the small icon 
  * displayed in a web browser address bar.
@@ -81,7 +80,8 @@
 
 
 /**
- * CoreObject additions for NSURL.
+ * @group Utilities
+ * @abstract CoreObject additions for NSURL.
  */
 @interface NSURL (COBookmark)
 /**
