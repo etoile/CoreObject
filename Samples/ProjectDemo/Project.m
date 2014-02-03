@@ -11,7 +11,7 @@
                                                                                      type: (id)@"Document"];
     [documentsProperty setPersistent: YES];
     [documentsProperty setMultivalued: YES];
-    [documentsProperty setOpposite: (id)@"Document.project"];
+    [documentsProperty setOpposite: (id)@"Document.projects"];
     [documentsProperty setOrdered: NO];
 
     ETPropertyDescription *tagsProperty = [ETPropertyDescription descriptionWithName: @"tags"

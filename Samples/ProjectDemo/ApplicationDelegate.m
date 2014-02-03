@@ -332,7 +332,7 @@
 {
 	for (EWDocumentWindowController *controller in [controllerForWindowID allValues])
 	{
-		if ([[[controller doc] rootObject] isEqual: rootObject])
+		if ([[controller documentObject] isEqual: rootObject])
 		{
 			return controller;
 		}

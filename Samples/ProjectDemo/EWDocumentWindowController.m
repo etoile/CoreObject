@@ -381,11 +381,22 @@
 	
 	self.persistentRoot.deleted = YES;
 	
-	NSMutableSet *docs = [[self.doc project] mutableSetValueForKey: @"documents"];
-	assert([docs containsObject: self.doc]);
-	[docs removeObject: self.doc];
+	NSSet *projects = [[self documentObject] projects];
 	
+	if (projects == nil || [projects isEmpty])
+	{
+		NSLog(@"Broken cross-ref");
+		[[self documentObject] projects];
+	}
+	
+	for (Project *project in projects)
+	{
+		NSMutableSet *docs = [project mutableSetValueForKey: @"documents"];
+		assert([docs containsObject: [self documentObject]]);
+		[docs removeObject: [self documentObject]];
+	}
 	[self.editingContext commit];
+	
 	
 	// FIXME: Hack
 	[self close];

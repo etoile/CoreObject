@@ -12,7 +12,7 @@
 - (BOOL) isOpen;
 - (void) setIsOpen:(BOOL)i;
 
-@property (readonly, nonatomic, retain) Project *project;
+@property (readonly, nonatomic, retain) NSSet *projects;
 @property (readwrite, nonatomic, retain) NSString *documentType;
 @property (readwrite, nonatomic, retain) id rootDocObject;
 @property (readwrite, nonatomic, retain) NSString *documentName;

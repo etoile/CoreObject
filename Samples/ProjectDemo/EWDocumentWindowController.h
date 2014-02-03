@@ -61,7 +61,8 @@
 
 @property (readonly, nonatomic, strong) COSQLiteStore *store;
 @property (readonly, nonatomic, strong) COEditingContext *editingContext;
-@property (readonly, nonatomic, strong) Document *doc;
+
+- (Document *) documentObject;
 
 - (COUndoTrack *) undoTrack;
 

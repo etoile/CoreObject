@@ -592,9 +592,9 @@ static int i = 0;
 			
             ETUUID *destUUID = [copier copyItemWithUUID: [outlineItem UUID]
                                               fromGraph: [outlineItem objectGraphContext]
-                                                toGraph: [self.doc objectGraphContext]];
+                                                toGraph: [self objectGraphContext]];
             
-            OutlineItem *copy = (OutlineItem *)[[self.doc objectGraphContext] loadedObjectForUUID: destUUID];
+            OutlineItem *copy = (OutlineItem *)[[self objectGraphContext] loadedObjectForUUID: destUUID];
 			
             if (insertionIndex == -1) { insertionIndex = [[newParent contents] count]; }
             
