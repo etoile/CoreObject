@@ -134,7 +134,7 @@ Future Work
 
   - Add check that parent property (isContainer = YES) is derived
 
-  - Add check that one side of an opposite is derived
+  - Add check that one side of an opposite is derived (now sanity-checked in COObject+RelationshipCache, but should be impossible to configure a metamodel with this constraint broken)
 
   - Review other constraints
 

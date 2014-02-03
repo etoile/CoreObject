@@ -74,6 +74,14 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
         {
             ETPropertyDescription *propertyInTarget = [aProperty opposite]; // May be nil
 
+			// Metamodel sanity check
+			ETAssert(![aProperty isDerived]);
+			if (propertyInTarget != nil)
+			{
+				ETAssert([propertyInTarget isDerived]);
+				ETAssert(![propertyInTarget isPersistent]);
+			}
+			
 			if ([aProperty isMultivalued])
 			{
 				for (COObject *obj in aValue)

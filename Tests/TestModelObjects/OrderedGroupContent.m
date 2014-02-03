@@ -23,6 +23,7 @@
     [parentGroupsProperty setMultivalued: YES];
     [parentGroupsProperty setOrdered: NO];
 	[parentGroupsProperty setOpposite: (id)@"Anonymous.OrderedGroupWithOpposite.contents"];
+	[parentGroupsProperty setDerived: YES];
 	
 	[entity setPropertyDescriptions: @[labelProperty, parentGroupsProperty]];
 	

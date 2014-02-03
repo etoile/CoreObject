@@ -84,6 +84,7 @@ See +[NSObject typePrefix]. */
 	ETPropertyDescription *tags  =
 		[ETPropertyDescription descriptionWithName: @"tags" type: (id)@"COTag"];
 	[tags setMultivalued: YES];
+	[tags setDerived: YES];
 
 	// TODO: Move these properties to EtoileFoundation (by adding a NSObject
 	// entity description) or just use -basicPropertyNames in

@@ -37,6 +37,7 @@
 		[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"COTagGroup"];
 	[tagGroups setMultivalued: YES];
 	[tagGroups setOpposite: (id)@"COTagGroup.objects"];
+	[tagGroups setDerived: YES];
 
 	[collection setPropertyDescriptions: A(objects, tagGroups)];
 
