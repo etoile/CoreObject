@@ -43,8 +43,8 @@ extern NSString * const kCOUndoStackName;
  * However an undo track can track both: 
  * 
  * <list>
- * <item>store structure history (represented as custom commands e.g. COCommandDeleteBranch etc.)
- * <item>branch history (represented as COCommandNewRevisionForBranch)
+ * <item>store structure history (represented as custom commands e.g. COCommandDeleteBranch etc.)</item>
+ * <item>branch history (represented as COCommandNewRevisionForBranch)</item>
  * </list>
  *
  * undo tracks can track all these changes or a subset per application or per 

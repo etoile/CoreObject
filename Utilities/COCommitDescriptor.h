@@ -36,7 +36,7 @@
  * [editingContext commitWithIdentifier: kOMCommitCreate
  *                             metadata: metadata
  *                            undoTrack: undoTrack
- *                                error: &error];
+ *                                error: &amp;error];
  * </example>
  *
  * For the previous example, the commit short description is going to be 
@@ -82,7 +82,7 @@
 /**
  * A unique identifier among all the commit descriptors.
  *
- * The identifier format is <em><domain-in-reverse-DNS-notation>.<name></em>. 
+ * The identifier format is <em>&lt;domain-in-reverse-DNS-notation&gt;.&lt;name&gt;</em>. 
  * For org.etoile-project.ObjectManager.rename:
  *
  * <deflist>
@@ -223,6 +223,7 @@ extern NSString *kCOCommitMetadataShortDescription;
  * among the commit metadata.
  *
  * The value must be a string array that can used to interpolate the format 
- * string of -shortDescription and -localizedShortDescription.
+ * string of -[COCommitDescriptor shortDescription] and 
+ * -[COCommitDescriptor localizedShortDescription].
  */
 extern NSString *kCOCommitMetadataShortDescriptionArguments;
