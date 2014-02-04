@@ -431,6 +431,7 @@ static int i = 0;
 {
 	return @{ @"persistentRoot" : [[[outlineItem persistentRoot] UUID] stringValue],
 			  @"branch" : [[[outlineItem branch] UUID] stringValue],
+			  @"usesMainObjectGraph" : @([outlineItem objectGraphContext] == [[outlineItem persistentRoot] objectGraphContext]),
 			  @"uuid" : [[outlineItem UUID] stringValue] };
 }
 
@@ -439,14 +440,29 @@ static int i = 0;
     ETUUID *persistentRootUUID = [ETUUID UUIDWithString: plist[@"persistentRoot"]];
 	ETUUID *branchUUID = [ETUUID UUIDWithString: plist[@"branch"]];
     ETUUID *objectUUID = [ETUUID UUIDWithString: plist[@"uuid"]];
-    
+    BOOL usesMainObjectGraph = [plist[@"usesMainObjectGraph"] boolValue];
+	
     COPersistentRoot *persistentRoot = [self.editingContext persistentRootForUUID: persistentRootUUID];
 	ETAssert(persistentRoot != nil);
 	
 	COBranch *branch = [persistentRoot branchForUUID: branchUUID];
-	ETAssert(branch != nil);
 	
-    OutlineItem *result = (OutlineItem *)[[branch objectGraphContext] loadedObjectForUUID: objectUUID];
+	COObjectGraphContext *objectGraph;
+	
+	// This is to ensure we don't modify both [persistentRoot objectGraphContext] and
+	// [branch objectGraphContext]
+	if (branch == self.editingBranch)
+	{
+		objectGraph = self.objectGraphContext;
+	}
+	else
+	{
+		objectGraph = usesMainObjectGraph ? [persistentRoot objectGraphContext] : [[persistentRoot branchForUUID: branchUUID] objectGraphContext];
+	}
+	
+	ETAssert(objectGraph != nil);
+	
+    OutlineItem *result = (OutlineItem *)[objectGraph loadedObjectForUUID: objectUUID];
 	ETAssert(result != nil);
 	
 	return result;

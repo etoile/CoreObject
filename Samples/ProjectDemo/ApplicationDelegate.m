@@ -204,6 +204,8 @@
 		md[@"documentName"] = [NSString stringWithFormat: @"Copy of %@", oldDocName];
 		persistentRoot.metadata = md;
 		
+		persistentRoot.currentBranch.label = @"Initial Branch";
+		
 		Document *doc = persistentRoot.rootObject;
 		[self registerDocumentRootObject: doc];
 	}
