@@ -12,9 +12,8 @@
 
 /** 
  * @group Object Collection and Organization
- *
- * COContainer is a mutable, ordered, strong (contained objects can only be in 
- * one COContainer) collection class.
+ * @abstract COContainer is a mutable, ordered, strong (contained objects can 
+ * only be in one COContainer) collection class.
  *
  * Unlike COGroup, COContainer can the same object multiple times at various 
  * indexes.
@@ -23,6 +22,8 @@
 {
 
 }
+
+/** @taskunit Type Querying */
 
 /**
  * Returns YES.

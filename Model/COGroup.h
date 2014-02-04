@@ -13,9 +13,8 @@
 
 /**
  * @group Object Collection and Organization
- *
- * COGroup is a mutable, ordered, weak (an object can be in any number of 
- * collections) collection class.
+ * @abstract COGroup is a mutable, ordered, weak (an object can be in any 
+ * number of collections) collection class.
  *
  * Unlike COContainer, COGroup contains distinct objects, an object cannot 
  * appear multiple times at various indexes.
@@ -27,6 +26,8 @@
 {
 
 }
+
+/** @taskunit Type Querying */
 
 /**
  * Returns YES.
@@ -40,8 +41,8 @@ typedef NSArray *(^COContentBlock)(void);
 
 /**
  * @group Object Collection and Organization
- *
- * A custom group class whose content is provided a query or a code block.
+ * @abstract A custom group class whose content is provided a query or a code 
+ * block.
  *
  * COSmartGroup is an immutable, ordered, weak (an object can be in any number 
  * of collections) collection class.
@@ -100,7 +101,9 @@ typedef NSArray *(^COContentBlock)(void);
  */
 @property (nonatomic, copy) COContentBlock contentBlock;
 
+
 /** @taskunit Accessing the Content */
+
 
 /**
  * Returns the last computed smart group content.

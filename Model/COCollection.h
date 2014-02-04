@@ -11,9 +11,8 @@
 
 /**
  * @group Object Collection and Organization
- *
- * COCollection is a abstract class that provides a common API to various 
- * concrete collection subclasses such as COGroup or COContainer.
+ * @abstract COCollection is a abstract class that provides a common API to 
+ * various concrete collection subclasses such as COGroup or COContainer.
  *
  * COCollection represents a mutable collection, but subclasses can be immutable.
  *
@@ -68,7 +67,7 @@
  * Returns UTI type for the collection elements.
  *
  * For inserting a new object in the collection, you can use this method to 
- * known the object class to instantiate. 
+ * know the object class to instantiate. 
  *
  * The returned UTI depends on -[ETPropertyDescription type] for the content 
  * property description (looked up using -contentKey).<br />
@@ -94,12 +93,12 @@
  * <override-dummy />
  * Returns the property name that holds the collection content.
  *
- * This method is used by COCollection to implement 
- * ETCollection and ETCollectionMutation protocol methods. Subclasses must 
- * thereby return a valid key, other the collection API won't behave correctly.
+ * This method is used by COCollection to implement ETCollection and
+ * ETCollectionMutation protocol methods. Subclasses must thereby return a 
+ * valid key, other the collection API won't behave correctly.
  *
- * For example, -insertObjects:atIndexes:hints: implementation uses the content 
- * key to retrieve the content collection.
+ * For example, -[ETCollectionMutation insertObjects:atIndexes:hints:] 
+ * implementation uses the content key to retrieve the content collection.
  *
  * By default, returns <em>objects</em>.
  */
@@ -117,7 +116,8 @@
  * Posts ETSourceDidUpdateNotification.
  *
  * You must invoke this method every time the collection is changed.
- * For example, when you override -insertObjects:atIndexes:hints:.
+ * For example, when you override 
+ * -[ETCollectionMutation insertObjects:atIndexes:hints:].
  *
  * EtoileUI relies on this notification to reload the UI transparently.
  */

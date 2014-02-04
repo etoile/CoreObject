@@ -14,20 +14,40 @@
 
 /**
  * @group Object Collection and Organization
+ * @abstract COLibrary is used to represents libraries such as photo, music, 
+ * tag etc.  
  *
- * COLibrary is used to represents libraries such as photo, music, tag etc.  
- * 
- * Contained objects can only be one library.
+ * Contained objects can only be in a single library. The content is ordered 
+ * (to ensure the object order remains stable in the UI without sorting it).
  *
- * The content is ordered (to ensure the object order remains stable in the UI 
- * without sorting it).
+ * To access and change the objects in the library, use COCollection API. For 
+ * example, -content returns all the objects in the library.
  */
 @interface COLibrary : COContainer
 {
+	@private
 	NSString *_identifier;
 }
 
+
+/** @taskunit Library Kind */
+
+
+/**
+ * An identifier that in most cases represents the library kind (to be precise, 
+ * this is usually the content kind such as music, photo etc.).
+ *
+ * CoreObject declares various identifier constants corresponding to common 
+ * library kinds.
+ *
+ * The identifier is used to look up the libraries in 
+ * COEditingContext(COCommonLibraries) API. 
+ */
 @property (nonatomic, strong) NSString *identifier;
+
+
+/** @taskunit Type Querying */
+
 
 /**
  * Returns YES.
@@ -36,7 +56,6 @@
 
 
 /** @taskunit Private */
-
 
 + (NSSet *)additionalEntityDescriptions;
 
