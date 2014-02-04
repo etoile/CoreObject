@@ -50,6 +50,12 @@
 	UKRaisesException([[COPersistentRoot alloc] init]);
 }
 
+- (void)testUncommittedPersistentRootCurrentRevision
+{
+	COPersistentRoot *newPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	UKNil(newPersistentRoot.currentRevision);
+}
+
 - (void)testBranchCreation
 {
     [persistentRoot commit];
