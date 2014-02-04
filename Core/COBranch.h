@@ -1,4 +1,4 @@
-/*
+/**
     Copyright (C) 2011 Quentin Mathe, Eric Wasylishen, Christopher Armstrong
 
     Date:  September 2011
@@ -15,57 +15,71 @@ extern NSString * const kCOBranchLabel;
 
 /**
  * @group Core
- * @abstract A branch is a pointer to a revision in the history graph. It represents
- * a variation of a persistent root.
+ * @abstract A branch is a pointer to a revision in the history graph. It 
+ * represents a variation of a persistent root.
  *
  * @section Conceptual Model
  *
- * 'currentRevision' is the most important property of a branch, that defines
+ * -currentRevision is the most important property of a branch, that defines 
  * which revision the branch views. 
  *
  * Branches are central to the process of committing changes in inner objects.
  * To commit changes in the branch's COObjectGraphContext, a new revision
- * is created with the changes, and the 'currentRevision' property is modified 
+ * is created with the changes, and the -currentRevision property is modified 
  * to point to the new revision.
  *
- * The 'headRevision' is an extra detail that gives branches a primitive form
- * of undo/redo. When 'currentRevision' is reverted to an older revision,
- * 'headRevision' remains in the same place, making it possible to "redo", i.e.
- * move the 'currentRevision' back towards 'headRevision'. This is exposed by the
- * COTrack API.
+ * The -headRevision is an extra detail that gives branches a primitive form of 
+ * undo/redo. When -currentRevision is reverted to an older revision, 
+ * -headRevision remains in the same place, making it possible to "redo", i.e. 
+ * move the current revision back towards -headRevision. This primitive 
+ * undo/redo is exposed by the COTrack API.
  *
  * @section Common Use Cases
  *
- * The most common use case would be accesesing the object graph through
- * -objectGraphContext, or reverting to al old revision with the 'revision' property.
+ * The most common use case would be accessing the object graph through
+ * -objectGraphContext, or reverting to an old revision with the 
+ * -currentRevision property.
  *
  * @section Attributes and Metadata
  *
- * The 'metadata' property behaves just like COPersistentRoot's. 
- * It can be set to a JSON compatible NSDictionary
- * to store arbitrary application metadata. This property is persistent, but
- * not versioned (although metadata changes can will be undone/redone by COUndoTrack,
- * if the commit that changes the metadata is recorded to a track).
+ * The -metadata property behaves just like COPersistentRoot's. It can be set 
+ * to a JSON compatible NSDictionary to store arbitrary application metadata. 
+ * This property is persistent, but not versioned (although metadata changes 
+ * can will be undone/redone by COUndoTrack, if the commit that changes the 
+ * metadata is recorded to a track).
+ *
+ * @section Creation
+ *
+ * Branches are never instantiated directly, but each new persistent root 
+ * includes an initial branch. You can access persistent root's branches 
+ * through -[COPersistentRoot branchForUUID:] and 
+ * -[COPersistentRoot currentBranch] for the "default" branch.
+ *
+ * For existing persistent roots, new branches can be created by branching 
+ * existing branches with -makeBranchWithLabel:atRevision: or 
+ * -makeBranchWithLabel:.
  *
  * @section Cheap Copies
  *
  * Branches support a kind of cheap copy, which is really just creating a new
- * branch starting at the same revision as the reveiver (and with the parent branch
- * metadata set). See -makeBranchWithLabel:.
+ * branch starting at the same revision as the receiver (and with the parent 
+ * branch metadata set). See -makePersistentRootCopyFromRevision: or  
+ * -makePersistentRootCopy.
+ *
  *
  * @section Deletion
  *
- * Branches follow a similar pattern for deletion as Persistent Roots, with a
- * 'deleted' flag. Modifying the flag marks the branch as having
- * changes to commit. Having the 'deleted' flag set and committed is
- * like having a file in the trash. The branch can be undeleted by simply setting the 'deleted'
- * flag to NO and committing that change.
+ * Branches follow a similar pattern for deletion as Persistent Roots, with a 
+ * -deleted flag. Modifying the flag marks the branch as having changes to 
+ * commit. Having the -deleted flag set and committed is like having a file in 
+ * the trash. The branch can be undeleted by simply setting the -deleted flag 
+ * to NO and committing that change.
  *
- * Branches play a role in the deletion model for revisions, which are garbage collected
- * (like git). When a branch has the deleted flag set to YES,
- * is it possible for CoreObject to irreversibly delete the branch and any revisons
- * that are only accessible by the branch. Revisions will never
- * be deleted if there is some non-deleted branch that can access them.
+ * Branches play a role in the deletion model for revisions, which are garbage 
+ * collected (like git). When a branch has the deleted flag set to YES, it is 
+ * possible for CoreObject to irreversibly delete the branch and any revisions
+ * that are only accessible by the branch. Revisions will never be deleted if 
+ * there is some non-deleted branch that can access them.
  */
 @interface COBranch : NSObject <COTrack>
 {
@@ -149,13 +163,13 @@ extern NSString * const kCOBranchLabel;
  *
  * This property is non-persistent, and returns YES by default.
  *
- * The main use case is when a branch is used for collaborative editing,
- * this is set to NO by COSynchronizer, since the collaborative editing
- * protocol we're using doesn't support making reverts, only forward changes.
+ * The main use case is when a branch is used for collaborative editing, this 
+ * is set to NO by COSynchronizer, since the collaborative editing protocol 
+ * we're using doesn't support making reverts, only forward changes.
  *
  * The undo framework checks this property to see whether to perform a revert
- * or commit the equivalent selective undo. Also, if NO, the -undo/-redo methods
- * on COBranch are disabled (-canUndo and -canRedo return NO).
+ * or commit the equivalent selective undo. Also, if NO, the -undo and -redo 
+ * methods on COBranch are disabled (-canUndo and -canRedo return NO).
  */
 @property (nonatomic, assign) BOOL supportsRevert;
 
@@ -179,6 +193,8 @@ extern NSString * const kCOBranchLabel;
  * If the parent revision is nil, this means the receiver is a branch that was 
  * created at the same time than its persistent root. The parent branch is also 
  * nil in this case.
+ *
+ * See also -parentBranch and -firstRevision.
  */
 @property (nonatomic, readonly) CORevision *initialRevision;
 /**
@@ -194,6 +210,8 @@ extern NSString * const kCOBranchLabel;
  * For all branches in a persistent root, returns the same revision.
  *
  * This is the same than <code>[[self nodes] firstObject]</code>.
+ *
+ * See also -initialRevision.
  */
 @property (nonatomic, readonly) CORevision *firstRevision;
 /**
@@ -205,12 +223,19 @@ extern NSString * const kCOBranchLabel;
  * or fast-forward to a future revision. If the revision being set is not
  * an ancestor of the head revision, the head revision is also updated to the
  * given revision.
+ *
+ * For the track protocol, -[COTrack currentNode] is the same than the current 
+ * revision. 
+ *
+ * See also -headRevision.
  */
 @property (nonatomic, strong) CORevision *currentRevision;
 /**
  * The revision bound to the most recent commit in the branch.
  *
  * This is the same than <code>[[self nodes] lastObject]</code>.
+ *
+ * See also -currentRevision.
  */
 @property (nonatomic, readonly) CORevision *headRevision;
 
@@ -272,20 +297,33 @@ extern NSString * const kCOBranchLabel;
 
 
 /**
- * "Step backward" method: sets the current revision to be the parent of
- * currentRevision. Note that there is no limit on this method: you can step
- * backwards to before a persistent root was created, assuming the reciever is owned
- * by a persistent root that is a cheap copy.
+ * Steps backward in the branch history.
  *
- * See –[COTrack undo]. Unlike the implementation in -[COUndoTrack undo], 
- * does not automatically cause a commit.
+ * From a track viewpoint, this method sets -currentNode to the previous node 
+ * in -nodes.
+ *
+ * From the branch viewpoint, the current revision is set the parent of 
+ * -currentRevision that lies on the patch towards -firstRevision. 
+ *
+ * Note that there is no limit related to the -initialRevision. You can step 
+ * backwards to before a branch was created, assuming -parentBranch is not nil, 
+ * and before a persistent root was created, assuming the receiver is owned by 
+ * a persistent root that is a cheap copy.
+ *
+ * See -[COTrack undo]. Unlike the implementation in -[COUndoTrack undo], does 
+ * not automatically cause a commit.
  */
 - (void)undo;
 /**
- * "Step forward" method: sets the current revision to be the child of
- * currentRevision that lies on the path towards headRevision.
+ * Steps forwards in the branch history.
  *
- * See –[COTrack redo]. Unlike the implementation in -[COUndoTrack redo],
+ * From a track viewpoint, this method sets the -currentNode to the next node 
+ * in -nodes.
+ * 
+ * From the branch viewpoint, the current revision is set to the child of 
+ * -currentRevision that lies on the path towards -headRevision.
+ *
+ * See -[COTrack redo]. Unlike the implementation in -[COUndoTrack redo],
  * does not automatically cause a commit.
  */
 - (void)redo;
@@ -295,8 +333,9 @@ extern NSString * const kCOBranchLabel;
 
 
 /**
- * Returns a new branch whose current revision is set to the receiver's current revision,
- * and adds the given label to the branch's metadata. The resulting branch uses the receiver as its parent branch.
+ * Returns a new branch whose current revision is set to the receiver's current 
+ * revision, and adds the given label to the branch's metadata. The resulting 
+ * branch uses the receiver as its parent branch.
  *
  * The receiver must be committed.
  *
@@ -305,9 +344,10 @@ extern NSString * const kCOBranchLabel;
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel;
 /**
  * Returns a new branch whose current revision is set to the given revision,
- * and adds the given label to the branch's metadata. The resulting branch uses the receiver as its parent branch.
+ * and adds the given label to the branch's metadata. The resulting branch uses 
+ * the receiver as its parent branch.
  *
- * The revision must be equal to or an ancestor of 'headRevision'.
+ * The revision must be equal to or an ancestor of -headRevision.
  *
  * You can assign the returned branch to the receiver persistent root to switch 
  * the current branch. For example:
@@ -321,7 +361,8 @@ extern NSString * const kCOBranchLabel;
  */
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev;
 /**
- * Returns a new persistent root whose current revision is set to the given revision,
+ * Returns a new persistent root whose current revision is set to the given 
+ * revision.
  *
  * The resulting persistent root is known as a cheap copy, because the copy 
  * doesn't cause the history leading to the new persistent root state to be 
@@ -329,11 +370,11 @@ extern NSString * const kCOBranchLabel;
  *
  * The cheap copy current branch uses the receiver as its parent branch.
  *
- * The revision must be equal to or an ancestor of 'headRevision'.
+ * The revision must be equal to or an ancestor of -headRevision.
  *
  * The receiver must be committed.
  *
- * See also -makeBranchWithLable:atRevision:, -isCopy and 
+ * See also -makeBranchWithLabel:atRevision:, -isCopy and 
  * -[COPersistentRoot parentPersistentRoot].
  */
 - (COPersistentRoot *)makePersistentRootCopyFromRevision: (CORevision *)aRev;
@@ -345,6 +386,7 @@ extern NSString * const kCOBranchLabel;
  */
 - (COPersistentRoot *)makePersistentRootCopy;
 
+
 /** @taskunit Merging Between Branches */
 
 
@@ -353,7 +395,7 @@ extern NSString * const kCOBranchLabel;
  *
  * Always returns nil unless explicitly set. 
  * 
- * If it is set at commit time, records the <strong>current revision</strong> of 
+ * If it is set at commit time, records the <em>current revision</em> of 
  * the merging branch as the merge parent of the new commit.
  */
 @property (nonatomic, strong) COBranch *mergingBranch;
@@ -369,7 +411,7 @@ extern NSString * const kCOBranchLabel;
  * NOTE: This is an unstable API which could change in the future when the
  * diff/merge support is finished
  *
- * See also -mergingInfoForMergingRevision:
+ * See also -mergeInfoForMergingRevision:
  */
 - (COMergeInfo *)mergeInfoForMergingBranch: (COBranch *)aBranch;
 /**
@@ -387,7 +429,7 @@ extern NSString * const kCOBranchLabel;
  * NOTE: This is an unstable API which could change in the future when the
  * diff/merge support is finished
  *
- * See also -mergingInfoForMergingBranch:.
+ * See also -mergeInfoForMergingBranch:.
  */
 - (COMergeInfo *)mergeInfoForMergingRevision:(CORevision *)aRevision;
 
