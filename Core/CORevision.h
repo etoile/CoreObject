@@ -30,8 +30,8 @@
  * (i.e. changes to the inner objects), a new revision will be created on 
  * commit.
  *
- * As explained in COPersistentRoot and COUndoTrack, a commit can create 
- * multiple revisions or even none.
+ * As explained in COUndoTrack and the Commits section of COEditingContext, a 
+ * commit can create multiple revisions or even none.
  *
  * Revisions are immutable.
  */
