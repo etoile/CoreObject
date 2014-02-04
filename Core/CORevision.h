@@ -14,10 +14,26 @@
 /** 
  * @group Core
  * @abstract CORevision represents a revision in the history graph.
- * A revision contains a snapshot of the inner objects, various metadata including
- * parent revisions (one, or two for a merge commit), a UUID, the UUID of the
- * branch that the revision was originally made on, and a arbitrary JSON dictionary
- * for application use. Revisions are immutable.
+ *
+ * A revision contains:
+ *
+ * <list>
+ * <item>a snapshot of the inner objects</item>
+ * <item>various metadata including parent revisions (one, or two for a merge 
+ * commit)</item>
+ * <item>a UUID</item>
+ * <item>the UUID of the branch that the revision was originally made on</item>
+ * <item>an arbitrary JSON dictionary for application use</item>
+ * </list>
+ *
+ * For each COBranch that contains uncommitted object graph context changes 
+ * (i.e. changes to the inner objects), a new revision will be created on 
+ * commit.
+ *
+ * As explained in COPersistentRoot and COUndoTrack, a commit can create 
+ * multiple revisions or even none.
+ *
+ * Revisions are immutable.
  */
 @interface CORevision : NSObject <COTrackNode>
 {
@@ -45,7 +61,7 @@
 - (CORevision *)parentRevision;
 /**
  * If this revision is the result of merging another branch into the this branch,
- * the revision that was merged in, otherwise nil
+ * returns the revision that was merged in, otherwise nil.
  */
 - (CORevision *)mergeParentRevision;
 /**
@@ -73,7 +89,7 @@
  */
 - (COCommitDescriptor *)commitDescriptor;
 /**
- * Returns -[COCommitDescription localizedTypeDescription].
+ * Returns -[COCommitDescriptor localizedTypeDescription].
  */
 - (NSString *)localizedTypeDescription;
 /**
@@ -81,16 +97,19 @@
  * provided under the key kCOCommitMetadataShortDescriptionArguments in 
  * -metadata.
  *
- * See -[COCommitDescription localizedShortDescriptionWithArguments:]
+ * See -[COCommitDescriptor localizedShortDescriptionWithArguments:]
  */
 - (NSString *)localizedShortDescription;
 
+
 /** @taskunit History Graph Inspection */
 
+
 /**
- * Returns whether the receiver is equal to an ancestor of the given revision 
+ * Returns whether the receiver is equal to an ancestor of the given revision. 
  */
 - (BOOL) isEqualToOrAncestorOfRevision: (CORevision *)aRevision;
+
 
 /** @taskunit Framework Private */
 
@@ -102,19 +121,21 @@
  */
 - (id)initWithCache: (CORevisionCache *)aCache revisionInfo: (CORevisionInfo *)aRevInfo;
 
+
 /** @taskunit Deprecated */
+
 
 /** 
  * Returns the revision type.
  *
  * e.g. merge, persistent root creation, minor edit, etc.
- * 
+ *
  * Note: This type notion is a bit vague currently. 
  */
 - (NSString *)type;
 /** 
  * Returns the revision short description.
- * 
+ *
  * This description is optional.
  */
 - (NSString *)shortDescription;
