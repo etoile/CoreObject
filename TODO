@@ -322,6 +322,17 @@ the following situations at least:
     - multiple commit descriptor versions can present per domain in ~/Library/CoreObject/Commits
 
 
+- Documentation
+
+  - Expose the following API if needed once more mature and documented:
+    - COCopier, COPrimitiveCollection
+    - all COCommand subclasses
+    - Diff
+    - Extras
+    - Store 
+    - StorageDataModel
+    - Synchronization
+
 - EtoileUI
 
   - Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
