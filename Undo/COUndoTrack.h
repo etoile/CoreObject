@@ -15,13 +15,14 @@ extern NSString * const kCOUndoStackName;
 
 /**
  * @group Undo
- * @abstract
- * An undo track represents a history track that can record commits selectively. 
+ * @abstract An undo track represents a history track that can record commits 
+ * selectively. 
  *
  * For a commit done in an editing context, an undo track can be passed using 
- * –[COEditingContext commitWithIdentifier:undoStack:]. When the commit is saved, 
- * the editing context records the commit as a command using -recordCommand:.
- * At this point, the undo track saves the command on disk.
+ * -[COEditingContext commitWithIdentifier:metadata:undoTrack:error:] or 
+ * similar commit methods. When the commit is saved, the editing context 
+ * records the commit as a command using -recordCommand:. At this point, the 
+ * undo track saves the command on disk.
  *
  * Commits that contain object graph context changes result in new revisions in 
  * the store. For other commits that just contain store structure changes:
@@ -43,18 +44,20 @@ extern NSString * const kCOUndoStackName;
  * However an undo track can track both: 
  * 
  * <list>
- * <item>store structure history (represented as custom commands e.g. COCommandDeleteBranch etc.)</item>
+ * <item>store structure history (represented as custom commands e.g. 
+ * COCommandDeleteBranch etc.)</item>
  * <item>branch history (represented as COCommandNewRevisionForBranch)</item>
  * </list>
  *
- * undo tracks can track all these changes or a subset per application or per 
+ * Undo tracks can track all these changes or a subset per application or per 
  * use cases, and provide undo/redo support. For undo/redo menu actions, never 
  * manipulate the branch history directly, but use an undo track.
  *
  * You can navigate the command sequence to change the editing context state 
- * using -undo, -redo and -setCurrentNode:. COUndoStack supports the same 
- * history navigation protocol than COBranch. Note that the COUndoTrack versions
- * perform an editing context commit automatically.
+ * using -undo, -redo and -setCurrentNode:. COUndoTrack supports the same 
+ * history navigation protocol than COBranch. Note that the COUndoTrack 
+ * implementation (of these COTrack methods) can perform an editing context 
+ * commit automatically.
  *
  * You shouldn't subclass COUndoTrack.
  */
@@ -87,39 +90,66 @@ extern NSString * const kCOUndoStackName;
  * tracks that match the given pattern.
  *
  * The returned track must not be passed to commit methods e.g.  
- * -[COEditingContext commmitWithIdentitifer:undoTrack:], otherwise the commit 
- * raises an exception.
+ * -[COEditingContext commmitWithIdentitifer:metadata:undoTrack:error:], 
+ * otherwise the commit raises an exception.
  *
  * See -editingContext.
  */
 + (COUndoTrack *)trackForPattern: (NSString *)aPattern
               withEditingContext: (COEditingContext *)aContext;
 
+
 /** @taskunit Basic Properties */
 
 
 /**
- * The unique name bound to the stack.
+ * The unique name bound to the track.
  */
 @property (nonatomic, readonly) NSString *name;
 /**
  * The editing context that is changed if -undo, -redo or -setCurrentNode: are 
  * called.
  *
- * If you pass an undo track to -[COEditingContext commitWithIdentifier:undoStack:], 
- * then usually you want undo and redo to apply to the same editing context. 
- * To do so, just set up the undo track using -[COUndoStack setEditingContext:].
+ * If you pass an undo track to -[COEditingContext commitWithIdentifier:metadata:undoTrack:error:] 
+ * or similar commit methods, then usually you want undo and redo to apply to 
+ * the same editing context. To do so, just set up the undo track using 
+ * -[COUndoTrack setEditingContext:].
  */
 @property (nonatomic, readonly) COEditingContext *editingContext;
+
+
+/** @taskunit Clearing and Coalescing Commands */
 
 
 /**
  * Discards all the commands.
  */
 - (void)clear;
-
+/**
+ * Tells the receiver to put the next recorded commands in the same command 
+ * group until -endCoalescing is called.
+ *
+ * For the next commits, the track won't create a command group per commit.
+ *
+ * By bracketing multiple commits with -beginCoalescing and -endCoalescing, 
+ * these multiple commits can be recorded as a single one (i.e. a single 
+ * COCommandGroup) on the track.
+ *
+ * Calling -beginCoalescing doesn't change the rules for the branch revision 
+ * creation on commit. 
+ *
+ * See also -endCoalescing.
+ */
 - (void)beginCoalescing;
+/** 
+ * Tells the receiver to group the next recorded commands per commit.
+ *
+ * For the next commits, the track will create a command group per commit.
+ *
+ * See also -beginCoalescing.
+ */
 - (void)endCoalescing;
+
 
 /** @taskunit Framework Private */
 
