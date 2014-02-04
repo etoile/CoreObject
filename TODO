@@ -18,6 +18,8 @@ First alpha release blockers
   
   - Support benchmark suite on GNUstep
 
+- Remove deprecated -type and -shortDescription in CORevision (all EtoileUI-based applications need to be check)
+
 - Check and update all Core API documentation (underway)
 
 	- Already reviewed classes: COObjectGraphContext, COEditingContext, COBranch
@@ -332,6 +334,8 @@ the following situations at least:
     - Store 
     - StorageDataModel
     - Synchronization
+
+  - Once all COCommand class hierarchy appear in the API documentation, their @group should be changed to 'Undo Actions' to ensure COUndoTrack and COTrack don't get lost among all these subclasses.
 
 - EtoileUI
 

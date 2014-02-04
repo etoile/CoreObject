@@ -19,7 +19,7 @@ extern NSString * const kCOCommandTimestamp;
 
 
 /**
- * @group Undo Actions
+ * @group Undo
  * @abstract A command represents a committed change in an editing context
  *
  * For each store change operation (e.g. branch creation, new revision etc.), 
@@ -100,7 +100,7 @@ extern NSString * const kCOCommandTimestamp;
 
 
 /**
- * @group Undo Actions
+ * @group Undo
  * @abstract A command representing a single store structure change
  *
  * A single command corresponds to an atomic operation inside a commit 

@@ -11,7 +11,7 @@
 @class COCommitDescriptor;
 
 /**
- * @group Undo Actions
+ * @group Undo
  * @abstract A command group represents a commit done in an editing context
  *
  * See COCommand for a detailed presentation.
