@@ -213,7 +213,8 @@
 {
 	ETAssert([aDoc isKindOfClass: [Document class]]);
 	
-	NSString *windowID = [[ETUUID UUID] stringValue];
+	NSString *windowID = [[[aDoc persistentRoot] UUID] stringValue];
+	ETAssert(controllerForWindowID[windowID] == nil);
 	
 	NSDictionary *windowControllerClassForRootDocObjectClassName =
 	@{ NSStringFromClass([OutlineItem class]) : [OutlineController class],
