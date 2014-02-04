@@ -18,14 +18,6 @@ First alpha release blockers
   
   - Support benchmark suite on GNUstep
 
-- Decide whether to enable Clang warning 'Implicit Conversions to 32 Bit Type'
-
-	- This produces some CoreObject warnings currently
-	
-	- I have set this warning explicitly to 'No' in TestCoreObject (where we probably don't want it) - Quentin
-
-	- At the same time, we could remove -Wno-sign-compare in CoreObject target too (used to inhibit some -Wextra warnings)
-
 - Check and update all Core API documentation (underway)
 
 	- Already reviewed classes: COObjectGraphContext, COEditingContext, COBranch
@@ -44,11 +36,19 @@ First alpha release blockers
 
 - Update website
 
-- Fix disk IO errors on OS X 10.7
-
 
 Future Work
 -----------
+
+- General
+
+	- Decide whether to enable Clang warning 'Implicit Conversions to 32 Bit Type'
+
+		- This produces some CoreObject warnings currently
+	
+		- I have set this warning explicitly to 'No' in TestCoreObject (where we probably don't want it) - Quentin
+
+		- At the same time, we could remove -Wno-sign-compare in CoreObject target too (used to inhibit some -Wextra warnings)
 
 - GNUstep
 
@@ -102,9 +102,6 @@ Future Work
 
 - COPersistentRoot
 
-  - test [[persistentRoot currentBranch] currentRevision] on a newly created
-    persistent root
-	
   - Refactor handling of store notifications
   
   - Add -initialRevision?
@@ -334,6 +331,15 @@ Missing Features
 ----------------
 
 - Persistent root faulting; currently the entire store is loaded in memory
+
+	- A challenge will be supporting cross-persistent root reference inverses.
+	i.e. suppose we open a store, load a document persistent root into memory.
+	Accessing the derived property "document.tags" requires a search query over
+	the current revisions of the current branches of all persistent roots in the whole store
+	(at least conceptually). The store keeps an index of cross-persistent references
+	anticipating this problem, but it's not currently used. The most straightforawrd
+	solution would be to load every persistent root that has ever had a cross-reference
+	to document at the same time as when we load "document".
 
 - Partial loading (loading an object using another entity e.g. COPerson as COObject)
 
