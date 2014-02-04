@@ -9,7 +9,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 
 /** 
- * @group Error
+ * @group Utilities
  * @abstract NSError subclass to collect and report validation results
  *
  * COError is used by CoreObject validation support such as 

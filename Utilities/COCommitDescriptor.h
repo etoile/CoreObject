@@ -9,7 +9,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 
 /** 
- * @group Utilites
+ * @group Utilities
  * @abstract A commit descriptor represents transient and persistent revision 
  * metadata.
  *

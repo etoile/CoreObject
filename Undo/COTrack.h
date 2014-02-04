@@ -91,6 +91,9 @@
 @end
 
 
+/**
+ * @group Undo
+ */
 @protocol COTrackNode <NSObject>
 /**
  * See -[CORevision metadata].

@@ -15,11 +15,12 @@
 extern NSString *kCOObjectEntityNameProperty;
 extern NSString *kCOObjectIsSharedProperty;
 
+/**
+ * @group Core
+ */
 @interface COObject (COSerialization)
 
 /**
- * @group Object Serialization
- *
  * The receiver serialized representation.
  *
  * -storeItem is used to serialize a COObject state and -setStoreItem: to 
