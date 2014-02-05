@@ -23,7 +23,8 @@
  * It allows to combine a predicate or a raw SQL query with various additional 
  * constraints, and control how the search results are returned.
  *
- * NOTE: This API is unstable and incomplete.
+ * NOTE: This API is unstable and incomplete, and SQL query support is not 
+ * implemented.
  */
 @interface COQuery : NSObject
 {
@@ -33,7 +34,9 @@
 	BOOL matchesAgainstObjectsInMemory;
 }
 
+
 /** @taskunit Initialization */
+
 
 /**
  * Returns a new autoreleased query that uses a predicate.
@@ -49,10 +52,15 @@
 #endif
 /**
  * Returns a new autoreleased query that uses a SQL request.
+ *
+ * Note: To search the store based on the returned query is not implemented, so 
+ * this method is useless presently.
  */
 + (COQuery *)queryWithSQLString: (NSString *)aSQLString;
 
+
 /** @taskunit Query Representations */
+
 
 /**
  * The predicate that expresses the query.
@@ -63,7 +71,9 @@
  */
 @property (nonatomic, readonly, strong) NSString *SQLString;
 
+
 /** @taskunit Query Constraints */
+
 
 /**
  * Determines whether the objects in memory should be searched directly, rather 
@@ -81,7 +91,9 @@
  */
 @property (nonatomic, assign) BOOL matchesAgainstObjectsInMemory;
 
+
 @end
+
 
 /**
  * @group Query
