@@ -66,7 +66,6 @@ extern NSString * const kCOBranchLabel;
  * branch metadata set). See -makePersistentRootCopyFromRevision: or  
  * -makePersistentRootCopy.
  *
- *
  * @section Deletion
  *
  * Branches follow a similar pattern for deletion as Persistent Roots, with a 
@@ -145,9 +144,11 @@ extern NSString * const kCOBranchLabel;
  */
 @property (nonatomic, copy) NSString *label;
 /**
- * The metadata attached to the branch.
+ * The metadata in JSON format attached to the branch.
  *
- * Any changes to the metadata is saved on the next object graph context commit.
+ * Any changes to the metadata is saved on the next branch commit.
+ *
+ * You must never overwrite any existing metadata set by CoreObject.
  */
 @property (nonatomic, copy) NSDictionary *metadata;
 /** 
@@ -218,6 +219,8 @@ extern NSString * const kCOBranchLabel;
  * The revision bound to the state loaded in the object graph context.
  *
  * If the branch is uncommitted, the current revision is nil.
+ *
+ * A current revision change is saved on the next branch commit.
  *
  * Setting the current revision can be used to revert to a past revision
  * or fast-forward to a future revision. If the revision being set is not
