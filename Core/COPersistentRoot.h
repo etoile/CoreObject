@@ -26,8 +26,8 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * @group Core
  * @abstract A persistent root is a versioned sandbox inside a CoreObject store
  * (in DVCS terminology, a persistent root is a repository), which encapsulates
- * an object graph of inner objects and a history graph (DAG) of revisions (which
- * are snapshots of the inner object graph). A persistent root has one
+ * an object graph of inner objects and a history graph (DAG) of revisions 
+ * (which are snapshots of the inner object graph). A persistent root has one 
  * or more branches, which are pointers on to the history graph.
  *
  * Considering all of the above parts together, a persistent root represents
@@ -35,75 +35,91 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * @section Conceptual Model
  *
- * For each new persistent root, CoreObject produces a new UUID triplet based on:
+ * For each new persistent root, CoreObject produces a new UUID triplet based 
+ * on: 
  *
  * <deflist>
  * <term>a persistent root</term><desc>a branch collection that results in
  * a history graph describing all the changes made to a document
- * (document has a very loose meaning here</desc>
+ * (document has a very loose meaning here)</desc>
  * <term>a branch</term><desc>the persistent root initial branch</desc>
  * <term>a root object</term><desc>the document main object e.g. the top node
  * of a structed document, a photo or contact object</desc>
  * </deflist>
  *
- * The persistent root UUID and branch UUID are unique (never reused) accross all
- * CoreObject stores, unless a persistent root has been replicated accross
- * stores. Two persistent roots can have the same root object UUID when one
- * is a cheap copy of the other.
+ * The persistent root UUID and branch UUID are unique (never reused) accross 
+ * all CoreObject stores, unless a persistent root has been replicated accross 
+ * stores.
+ *
  * Generally speaking, CoreObject constructs (branches, revisions, objects,
- * stores etc.) are not allowed to share the same UUID. For the unsupported
- * replication case, constructs using the same UUID are considered to be
- * identical (same type and data) but replicated.
+ * stores etc.) are not allowed to share the same UUID. For the replication 
+ * case, constructs using the same UUID are considered to be identical (same 
+ * type and data) but replicated. For now, replication support is restricted 
+ * to collaborative editing (the synchronization protocol is discussed in 
+ * COSynchronizerClient).
  *
- * A persistent root represents a core object but a root object doesn't. 
- * As such, use -[COPersistentRoot UUID] to track core objects.
- * From a terminology standpoint, persistent root and core object can be used
- * interchangeably.
- *
- * FIXME: I think we should just eliminate the term "core object" as it only 
- * makes things more confusing. --Eric
+ * For each persistent root, the root object UUID is reused accross branches.
+ * For a persistent root cheap copy, the root object UUID of the parent 
+ * persistent root is reused. As such, use -[COPersistentRoot UUID] to track 
+ * top-level objects in the CoreObject store.
  *
  * @section Common Use Cases
  *
- * The most common use case would be accesesing the object graph through
+ * The most common use case would be accesssing the object graph through
  * -objectGraphContext (if branches aren't being used by the application).
  *
  * @section Attributes and Metadata
  *
- * The 'metadata' property can be set to a JSON compatible NSDictionary
- * to store arbitrary application metadata. This property is persistent, but
- * not versioned (although metadata changes can will be undone/redone by COUndoTrack,
- * if the commit that changes the metadata is recorded to a track).
+ * The -metadata property can be set to a JSON compatible NSDictionary to store 
+ * arbitrary application metadata. This property is persistent, but not 
+ * versioned (although metadata changes can will be undone/redone by 
+ * COUndoTrack, if the commit that changes the metadata is recorded to an  
+ * undo track).
  *
  * @section Branches
  *
- * Branches act similarly to git in that a branch is a movable pointer on to the
- * history graph. See COBranch for more detail. 
+ * Branches act similarly to git in that a branch is a movable pointer on to 
+ * the history graph. See COBranch for more detail. 
  *
  * New persistent roots contains just a single branch (see -branches).
  *
- * You can ignore the COBranch API and just use COPersistentRoot to access
- * the object graph (-objectGraphContext).
+ * You can ignore the COBranch API and just use COPersistentRoot to access the 
+ * object graph (-objectGraphContext).
+ *
+ * @section Creation
+ *
+ * Persistent roots are never instantiated directly, but can be created with 
+ * -[COEditingContext insertNewPersistentRootWithRootObject:] or 
+ * -[COEditingContext insertNewPersistentRootWithEntityName:]. A persistent 
+ * root doesn't become persistent until it gets committed to the store. 
+ *
+ * You can access uncommitted persistent roots or recreate previously committed 
+ * ones, through -[COEditingContext persistentRootForUUID:] or 
+ * -[COEditingContext persistentRoots].
  *
  * @section Cheap Copies
  *
  * Making a cheap copy of a persistent root creates a new persistent root (with
- * a new UUID) and a single branch (also with a new UUID), however the current revision
- * of the new branch will be set to the revision where the cheap copy was made.
- * The copy is a true copy, in that it can have no observable effect on the source
- * persistent root. However, the fact that it's a cheap copy will be evident in the
- * interconnected history graphs.
+ * a new UUID) and a single branch (also with a new UUID), however the current 
+ * revision of the new branch will be set to the revision where the cheap copy 
+ * was made. See -[COBranch makePersistentRootCopyFromRevision:] or 
+ * -[COBranch makePersistentRootCopy].
+ *
+ * The copy is a true copy, in that it can have no observable effect on the 
+ * source persistent root. However, the fact that it's a cheap copy will be 
+ * evident in the interconnected history graphs.
  *
  * @section Deletion
  *
  * CoreObject uses an explicit deletion model for Persistent Roots, controlled
- * by the 'deleted' flag. Modifying the flag marks the persistent root as having
- * changes to commit. A persistent root with the 'deleted' flag set on disk is
- * like a file in the trash. It can be undeleted by simply setting the 'deleted'
+ * by the -deleted flag. Modifying the flag marks the persistent root as having
+ * changes to commit. A persistent root with the -deleted flag set on disk is
+ * like a file in the trash. It can be undeleted by simply setting the -deleted 
  * flag to NO and committing that change. 
  *
  * Only when the deleted flag is set to YES (and committed), is it possible for
- * CoreObject to irreversibly delete the underling storage of the persistent root.
+ * CoreObject to irreversibly delete the underlying storage of the persistent 
+ * root.
  * 
  * Currently, the only way to do this is to call a lower level store API, however
  * this functionality will probably be exposed in COEditingContext at some point.
@@ -160,22 +176,36 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * though).
  */
 @property (nonatomic, readonly) ETUUID *UUID;
-
+/**
+ * The metadata in JSON format attached to the persistent root.
+ *
+ * Any changes to the metadata is saved on the next persistent root commit.
+ *
+ * You must never overwrite any existing metadata set by CoreObject.
+ */
 @property (nonatomic, copy) NSDictionary *metadata;
 /**
  * The persistent root deletion status.
  *
  * If the persistent root is marked as deleted, the deletion is committed to the 
  * store on the next editing context commit.
+ *
+ * If set to YES for an uncommitted branch, the branch isn't staged for 
+ * deletion, but immediately discarded. As a result, a deleted uncommitted 
+ * branch cannot be undeleted.
+ *
+ * TODO: Document the current branch deletion behavior (either on -currentBranch 
+ * or in -branches for the current branch UUID). If supported, we should  
+ * explain how a new current branch is picked.
  */
 @property (nonatomic, assign, getter=isDeleted) BOOL deleted;
 /**
- * The newest revision date among all branches.
+ * The newest head revision date among all branches.
  *
  * Changing a branch current revision doesn't alter the returned date. See 
  * -[COBranch currentRevision].
  *
- * See -[COBranch newestRevision] and -[CORevision date].
+ * See -[COBranch headRevision] and -[CORevision date].
  */
 @property (nonatomic, readonly) NSDate *modificationDate;
 /**
@@ -193,15 +223,15 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @property (nonatomic, readonly) COPersistentRoot *parentPersistentRoot;
 /**
- * Returns YES if this persistent root is a copy (self.parentPersistentRoot != nil)
+ * Returns YES if this persistent root is a copy (-parentPersistentRoot != nil).
  *
  * See -[COBranch isCopy].
  */
 @property (nonatomic, readonly) BOOL isCopy;
 /**
- * Returns attributes of the persistent root as reported by the store,
+ * Returns attributes of the persistent root as reported by the store.
  *
- * See COPersistentRootAttributeExportSize, COPersistentRootAttributeUsedSize
+ * See COPersistentRootAttributeExportSize, COPersistentRootAttributeUsedSize.
  */
 @property (nonatomic, readonly) NSDictionary *attributes;
 
@@ -213,16 +243,21 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * The branch that opens when double-clicking a persistent root to edit it.
  *
  * Also used to resolve inter-persistent root references to this persistent root 
- * when no explicit branch.
+ * when no explicit branch is provided.
  *
- * Changing this value stages it for commit; upon the next -commit, the change 
- * is saved to disk and replicated to other applications.
+ * Changing this value stages it for commit; upon the next persistent root 
+ * commit, the change is saved to disk and replicated to other applications.
+ *
+ * TODO: Document the deletion behavior for [[self currentBranch] setDeleted: YES]. 
  */
 @property (nonatomic, strong) COBranch *currentBranch;
 /**
  * All the branches owned by the persistent root (excluding those that are 
  * marked as deleted on disk), plus those pending insertion and undeletion (and 
  * minus those pending deletion).
+ *
+ * The returned branches never contains the -currentBranch object, but contains 
+ * another current branch instance (both instances use the same UUID).
  */
 @property (nonatomic, readonly) NSSet *branches;
 /**
@@ -230,6 +265,9 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * undeletion.
  *
  * -branchesPendingDeletion are not included in the returned set.
+ *
+ * TODO: Document if the current branch UUID can appear among the returned 
+ * branches.
  */
 @property (nonatomic, readonly) NSSet *deletedBranches;
 /**
@@ -237,8 +275,14 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * The persistent root retains the returned branch.
  *
- * TODO: Document if this method can return branches among deleted branches and 
- * branches pending insertion, deletion and undeletion.
+ * This method can return the same branches than -branches and -deletedBranches 
+ * (including those pending deletion and undeletion), but the loading is 
+ * restricted to the requested branch.
+ *
+ * For the current branch UUID, never returns the -currentBranch object, but a 
+ * distinct current branch instance (both instances use the same UUID).
+ *
+ * See also -setDeleted:.
  */
 - (COBranch *)branchForUUID: (ETUUID *)aUUID;
 
@@ -316,32 +360,40 @@ extern NSString * const COPersistentRootDidChangeNotification;
 
 
 /**
- * Shorthand for [[[self currentBranch] objectGraphContext] rootObject]
+ * Shorthand for <code>[[[self currentBranch] objectGraphContext] rootObject]</code>.
  */
 @property (nonatomic, strong) id rootObject;
 /**
- * Shorthand for [[[self currentBranch] objectGraphContext] loadedObjectForUUID:]
+ * Shorthand for <code>[[[self currentBranch] objectGraphContext] loadedObjectForUUID:]</code>.
  */
 - (COObject *)loadedObjectForUUID: (ETUUID *)uuid;
 /**
- * Shortcut for <code>[[self currentBranch] currentRevision]</code>
+ * Shortcut for <code>[[self currentBranch] currentRevision]</code>.
  *
  * For a new persistent root, the revision is nil, unless it is a cheap copy. 
  * See -[COBranch makeCopyFromRevision:].
  */
 @property (nonatomic, strong) CORevision *currentRevision;
 /**
- * Shortcut for <code>[[self currentBranch] headRevision]</code>
+ * Shortcut for <code>[[self currentBranch] headRevision]</code>.
  */
 @property (nonatomic, strong) CORevision *headRevision;
 /**
- * Shorthand for [[self editingContext] store]
+ * Shorthand for <code>[[self editingContext] store]</code>.
  */
 @property (nonatomic, readonly) COSQLiteStore *store;
 /**
- * Returns the object graph for the edited branch
+ * Returns the object graph for the -currentBranch.
+ *
+ * See also -allObjectGraphContexts.
  */
 @property (nonatomic, readonly) COObjectGraphContext *objectGraphContext;
+/**
+ * Returns the object graphs for the -branches, plus the object graph for the 
+ * -currentBranch. 
+ *
+ * See also -objectGraphContext.
+ */
 @property (nonatomic, readonly) NSSet *allObjectGraphContexts;
 
 
@@ -376,6 +428,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  
 /**
  * Returns a read-only object graph context of the contents of a revision.
+ *
  * Tentative API...
  */
 - (COObjectGraphContext *)objectGraphContextForPreviewingRevision: (CORevision *)aRevision;
