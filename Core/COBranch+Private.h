@@ -57,6 +57,8 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 - (void)updateRevisions;
 /**
  * This method is only exposed to be used internally by CoreObject.
+ *
+ * A head revision change is saved on the next branch commit.
  */
 @property (nonatomic) CORevision *headRevision;
 
