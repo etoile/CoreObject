@@ -44,8 +44,9 @@
 /** @taskunit Changing Track Nodes */
 
 /**
- * Returns the current track node that reflects the current position in the 
- * the track timeline. 
+ * The current node represents the change that was applied to arrive at the
+ * current state, or in other words, the change that will be undone if -undo
+ * is called.
  */
 - (id <COTrackNode>)currentNode;
 /**

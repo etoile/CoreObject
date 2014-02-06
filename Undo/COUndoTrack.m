@@ -526,6 +526,22 @@ static void coalesceOps(NSMutableArray *ops)
 	return [NSArray arrayWithArray: [self nodes]];
 }
 
+#pragma mark - Convenience
+
+- (NSString *) undoMenuItemTitle
+{
+	NSString *shortDescription = [[self currentNode] localizedShortDescription];
+	// TODO: Localize the "Undo" string
+	return [NSString stringWithFormat: @"Undo %@", shortDescription];
+}
+
+- (NSString *) redoMenuItemTitle
+{
+	NSString *shortDescription =  [[self nextNodeOnTrackFrom: [self currentNode] backwards: NO] localizedShortDescription];
+	// TODO: Localize the "Redo" string
+	return [NSString stringWithFormat: @"Redo %@", shortDescription];
+}
+
 #pragma mark - Coalescing
 
 - (void)beginCoalescing

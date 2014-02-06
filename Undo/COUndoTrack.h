@@ -151,6 +151,21 @@ extern NSString * const kCOUndoStackName;
 - (void)endCoalescing;
 
 
+
+/** @taskunit Convenience */
+
+
+/**
+ * Returns a localized menu item title describing the command to undo
+ */
+- (NSString *) undoMenuItemTitle;
+/**
+ * Returns a localized menu item title describing the command to redo
+ */
+- (NSString *) redoMenuItemTitle;
+
+
+
 /** @taskunit Framework Private */
 
 
