@@ -156,6 +156,10 @@ extern NSString * const kCOBranchLabel;
  *
  * If the branch is marked as deleted, the deletion is committed to the store 
  * on the next persistent root commit.
+ *
+ * You can't delete the current branch (if -isCurrentBranch is YES, 
+ * setting -deleted to YES throws an exception) because persistent roots must
+ * always have a current branch.
  */
 @property (nonatomic, assign, getter=isDeleted) BOOL deleted;
 /**
