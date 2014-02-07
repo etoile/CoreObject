@@ -191,7 +191,13 @@
     UKObjectsEqual(S(pendingInsertion), [ctx persistentRootsPendingInsertion]);
     UKObjectsEqual(S(pendingDeletion), [ctx persistentRootsPendingDeletion]);
     UKObjectsEqual(S(pendingUndeletion), [ctx persistentRootsPendingUndeletion]);
-    
+
+	UKObjectsEqual(regular, [ctx persistentRootForUUID: [regular UUID]]);
+	UKObjectsEqual(deletedOnDisk, [ctx persistentRootForUUID: [deletedOnDisk UUID]]);
+   	UKObjectsEqual(pendingInsertion, [ctx persistentRootForUUID: [pendingInsertion UUID]]);
+	UKObjectsEqual(pendingDeletion, [ctx persistentRootForUUID: [pendingDeletion UUID]]);
+   	UKObjectsEqual(pendingUndeletion, [ctx persistentRootForUUID: [pendingUndeletion UUID]]);
+
     // 3. Test what happens when we commit (all pending changes are made and no longer pending)
     
     [ctx commit];
