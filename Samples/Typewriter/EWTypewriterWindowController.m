@@ -23,6 +23,12 @@
 
 @implementation EWTypewriterWindowController
 
+/**
+ * Pasteboard item property list is an NSString persistent root UUID
+ */
+static NSString * EWNoteDragType = @"org.etoile.Typewriter.Note";
+static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
+
 #pragma mark - properties
 
 @synthesize notesTable = notesTable;
@@ -118,6 +124,10 @@
 	[notesTable setDataSource: noteListDataSource];
 	[notesTable setDelegate: noteListDataSource];
 
+	// Drag & drop
+	
+	[tagsOutline registerForDraggedTypes: @[EWNoteDragType]];
+	
 	// Text view setup
 	
 	[textView setDelegate: self];
@@ -352,8 +362,12 @@
 	{
 		return [[(COTagLibrary *)item tagGroups] count];
 	}
+	else if ([item isKindOfClass: [COTagGroup class]])
+	{
+		return [[(COCollection *)item content] count];
+	}
 	
-	return [[(COCollection *)item content] count];
+	return 0;
 }
 
 - (id) outlineView: (NSOutlineView *)outlineView objectValueForTableColumn: (NSTableColumn *)column byItem: (id)item
@@ -376,6 +390,40 @@
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
 	[self.owner selectTag: nil];
+}
+
+#pragma mark Drag & Drop
+
+- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
+{
+	if (![item isTag])
+	{
+		return NSDragOperationNone;
+	}
+    
+	return NSDragOperationMove;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index
+{
+	NSPasteboard *pasteboard = [info draggingPasteboard];
+	COTag *tag = item;
+	ETAssert([tag isTag]);
+	
+	for (NSPasteboardItem *pbItem in [pasteboard pasteboardItems])
+	{
+        id plist = [pbItem propertyListForType: EWNoteDragType];
+		COPersistentRoot *notePersistentRoot = [owner.editingContext persistentRootForUUID: [ETUUID UUIDWithString: plist]];
+		ETAssert(notePersistentRoot != nil);
+		
+		COObject *noteRootObject = [notePersistentRoot rootObject];
+		
+		[tag addObject: noteRootObject];
+	}
+	
+	[self.owner commitWithIdentifier: @"tag-note" descriptionArguments: @[]];
+	
+	return YES;
 }
 
 @end
@@ -433,6 +481,24 @@
 	{
 		[owner selectNote: rows[[owner.notesTable selectedRow]]];
 	}
+}
+
+- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pb
+{
+	NSMutableArray *pbItems = [NSMutableArray array];
+    
+	NSArray *objs = [self.owner arrangedNotePersistentRoots];
+	
+	[rowIndexes enumerateIndexesUsingBlock: ^(NSUInteger idx, BOOL *stop) {
+		COPersistentRoot *persistentRoot = objs[idx];
+		
+		NSPasteboardItem *item = [[NSPasteboardItem alloc] init];
+		[item setPropertyList: [[persistentRoot UUID] stringValue] forType: EWNoteDragType];
+		[pbItems addObject: item];
+	}];
+
+	[pb clearContents];
+	return [pb writeObjects: pbItems];
 }
 
 @end
