@@ -366,8 +366,11 @@
 {
 	if (nil == item) { item = [self rootObject]; }
 	
+	NSString *oldName = [item name] != nil ? [item name] : @"";
+	NSString *newName = [object stringValue] != nil ? [object stringValue] : @"";
+	
 	[(COObject *)item setName: object];
-	[self.owner commitWithIdentifier: @"rename-tag" descriptionArguments: @[]];
+	[self.owner commitWithIdentifier: @"rename-tag" descriptionArguments: @[oldName, newName]];
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
@@ -412,9 +415,14 @@
 	if ([[tableColumn identifier] isEqual: @"name"])
     {
         NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: persistentRoot.metadata];
-		md[@"label"] = [object stringValue];
+		
+		NSString *oldName = md[@"label"] != nil ? md[@"label"] : @"";
+		NSString *newName = [object stringValue] != nil ? [object stringValue] : @"";
+		
+		md[@"label"] = newName;
 		persistentRoot.metadata = md;
-		[persistentRoot commit];
+		
+		[self.owner commitWithIdentifier: @"rename-note" descriptionArguments: @[oldName, newName]];
     }
 }
 

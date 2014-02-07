@@ -22,6 +22,31 @@
 			"type": "creation",
 			"shortDescription": "Create note"
 		},
+		"rename-note":
+		{
+			"type": "renaming",
+			"shortDescription": "Rename note from '%@' to '%@'"
+		},
+		
+		
+		
+		"delete-tag":
+		{
+			"type": "deletion",
+			"shortDescription": "Delete tag '%@'"
+		},
+		"add-tag":
+		{
+			"type": "creation",
+			"shortDescription": "Create tag"
+		},
+		"rename-tag":
+		{
+			"type": "renaming",
+			"shortDescription": "Rename tag from '%@' to '%@'"
+		},
+		
+		
 		
 		
 		
