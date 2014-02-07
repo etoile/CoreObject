@@ -44,6 +44,23 @@
     UKNil([store persistentRootInfoForUUID: uuid]);
 }
 
+- (void)testExceptionOnNewPersistentRootForModelDescriptionRepositoryMismatch
+{
+	ETModelDescriptionRepository *newRepo = [ETModelDescriptionRepository new];
+	ETEntityDescription *rootEntity =
+		[[ctx modelDescriptionRepository] entityDescriptionForClass: [COObject class]];
+
+	[newRepo addDescription: rootEntity];
+	[newRepo setEntityDescription: rootEntity forClass: [COObject class]];
+
+	COObjectGraphContext *objectGraph =
+		[[COObjectGraphContext alloc] initWithModelDescriptionRepository: newRepo];
+	COObject *rootObject = [[COObject alloc] initWithObjectGraphContext: objectGraph];
+
+	UKObjectsNotEqual(newRepo, [ctx modelDescriptionRepository]);
+	UKRaisesException([ctx insertNewPersistentRootWithRootObject: rootObject]);
+}
+
 - (void)testDeleteCommittedPersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];

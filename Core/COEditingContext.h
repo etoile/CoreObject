@@ -228,7 +228,8 @@
  * a NSInvalidArgumentException is raised.
  *
  * The object graph context of the root object must also use the same model 
- * description repository than the receiver.
+ * description repository than the receiver, otherwise a 
+ * NSInvalidArgumentException is raised.
  *
  * For a nil root object, raises a NSInvalidArgumentException.
  */
