@@ -25,6 +25,10 @@
     NSDate *_timestamp;
 }
 
+
+/** @taskunit Basic Properties */
+
+
 /**
  * The commit UUID. 
  *
@@ -51,13 +55,10 @@
  * to return the equivalent commit descriptor descriptions.
  */
 @property (nonatomic, readonly) COCommitDescriptor *commitDescriptor;
-/*
+/**
  * The commit time.
  */
 @property (nonatomic, copy) NSDate *timestamp;
 
-- (COCommandGroup *) inverse;
-
-- (COCommandGroup *) rewrittenCommandAfterCommitInContext: (COEditingContext *)aContext;
 
 @end

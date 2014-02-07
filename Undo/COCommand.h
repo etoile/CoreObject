@@ -9,8 +9,8 @@
 #import <EtoileFoundation/ETUUID.h>
 #import <CoreObject/COTrack.h>
 
-@class COEditingContext;
-@class COUndoTrack;
+@class COEditingContext, COUndoTrack;
+
 extern NSString * const kCOCommandType;
 extern NSString * const kCOCommandUUID;
 extern NSString * const kCOCommandStoreUUID;
@@ -36,33 +36,33 @@ extern NSString * const kCOCommandTimestamp;
 {
 	COUndoTrack __weak *_parentUndoTrack;
 }
-/** @taskunit Initialization and Serialization */
-
-
-/**
- * <init />
- * Returns a command deserialized from a property list.
- *
- * See -initWithPropertyList:.
- */
-+ (COCommand *) commandWithPropertyList: (id)aPlist parentUndoTrack: (COUndoTrack *)aParent;
-/**
- * Returns the receiver serialized as a property list.
- */
-- (id) propertyList;
 
 
 /** @taskunit Basic Properties */
 
 
+/**
+ * <override-subclass />
+ * A localized string describing the command.
+ *
+ * For example, -[COCommandDeletePersistentRoot kind] returns <em>Persistent 
+ * Root Deletion</em>.
+ */
 @property (nonatomic, readonly) NSString *kind;
-
+/**
+ * The undo track on which the command was recorded.
+ *
+ * Never returns nil once the command has been recorded, see 
+ * -[COUndoTrack recordCommand:].
+ */
 @property (nonatomic, readwrite, weak) COUndoTrack *parentUndoTrack;
+
 
 /** @taskunit Applying and Reverting Changes */
 
 
 /**
+ * <override-subclass />
  * Returns a command that represents an inverse action.
  *
  * You can use the inverse to unapply the receiver changes in an editing context.
@@ -71,17 +71,35 @@ extern NSString * const kCOCommandTimestamp;
  * <code>[command inverse]</code>.
  */
 - (COCommand *) inverse;
-
+/**
+ * <override-dummy />
+ * Returns a new command which can be applied or unapplied with semantics 
+ * and observable results identical to the receiver in the given editing 
+ * context.
+ *
+ * By default, returns self, but can be overriden to return a new command.
+ *
+ * This method exists to support turning a selective undo into a linear undo, 
+ * and a selective redo into a linear redo. This results in a simpler command 
+ * sequence or history in the undo track.
+ *
+ * Command Rewriting is unrelated to Undo Coalescing (see 
+ * -[COUndoTrack beginUndoCoalescing]).
+ *
+ * Note: for now, this feature is disabled.
+ */
 - (COCommand *) rewrittenCommandAfterCommitInContext: (COEditingContext *)aContext;
 
 // FIXME: Perhaps distinguish between edits that can't be applied and edits that
 // are already applied. (e.g. "create branch", but that branch already exists)
 
 /** 
+ * <override-subclass />
  * Returns whether the receiver changes can be applied to the editing context.
  */
 - (BOOL) canApplyToContext: (COEditingContext *)aContext;
 /**
+ * <override-subclass />
  * Applies the receiver changes to the editing context.
  */
 - (void) applyToContext: (COEditingContext *)aContext;
@@ -91,10 +109,21 @@ extern NSString * const kCOCommandTimestamp;
 
 
 /**
+ * <override-never />
+ * Returns a command deserialized from a property list.
+ *
+ * See -initWithPropertyList:parentUndoTrack:.
+ */
++ (COCommand *) commandWithPropertyList: (id)aPlist parentUndoTrack: (COUndoTrack *)aParent;
+/**
  * <init />
  * Initializes and returns a command deserialized from a property list.
  */
 - (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent;
+/**
+ * Returns the receiver serialized as a property list.
+ */
+- (id) propertyList;
 
 @end
 
