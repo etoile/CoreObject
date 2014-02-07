@@ -1,0 +1,173 @@
+{
+    "types":
+	{
+		"renaming": "Object Renaming",
+		"modification": "Modification",
+		"creation": "Object Creation",
+		"deletion": "Object Deletion",
+		"copy": "Object Copy",
+		"history": "History related",
+		"branch": "Branch related"
+	},
+
+	"descriptors":
+	{
+		"delete-note":
+		{
+			"type": "deletion",
+			"shortDescription": "Delete note '%@'"
+		},
+		"add-note":
+		{
+			"type": "creation",
+			"shortDescription": "Create note"
+		},
+		
+		
+		
+		
+		"rename-document":
+		{
+			"type": "renaming",
+			"shortDescription": "Rename document from '%@' to '%@'"
+		},
+		
+		"set-branch":
+		{
+			"type": "branch",
+			"shortDescription": "Set branch"
+		},
+
+		"set-branch-label":
+		{
+			"type": "branch",
+			"shortDescription": "Set branch label"
+		},
+
+		"set-branch-importance":
+		{
+			"type": "branch",
+			"shortDescription": "Set branch importance"
+		},
+
+		"add-item":
+		{
+			"type": "creation",
+			"shortDescription": "Add item"
+		},
+		
+		"add-child-item":
+		{
+			"type": "creation",
+			"shortDescription": "Add child item"
+		},
+		
+		"shift-left":
+		{
+			"type": "modification",
+			"shortDescription": "Shift left"
+		},
+
+		"shift-right":
+		{
+			"type": "modification",
+		  	"shortDescription": "Shift right"
+		},
+
+		"revert":
+		{
+			"type": "history",
+		  	"shortDescription": "Revert to revision"
+		},
+		
+		"step-backward":
+		{
+			"type": "history",
+		  	"shortDescription": "Step Backward"
+		},
+		
+		"step-forward":
+		{
+			"type": "history",
+		  	"shortDescription": "Step Forward"
+		},
+		
+		"delete":
+		{
+			"type": "deletion",
+			"shortDescription": "Deleted one or several objects"
+		},
+		
+		"rename":
+		{
+			"type": "renaming",
+		  	"shortDescription": "Rename outline item"
+		},
+		
+		"duplicate":
+		{
+			"type": "copy",
+			"shortDescription": "Duplicate %@"
+		},
+		
+		"drop":
+		{
+			"type": "copy",
+			"shortDescription": "Drop items"
+		},
+		
+		"draw-shape":
+		{
+			"type": "creation",
+			"shortDescription": "Draw shape"
+		},
+		
+		"resize-shape":
+		{
+			"type": "modification",
+			"shortDescription": "Resize shape"
+		},
+		
+		"move-shape":
+		{
+			"type": "modification",
+			"shortDescription": "Move shape"
+		},
+		
+		"change-shape-color":
+		{
+			"type": "modification",
+			"shortDescription": "Change color of shape"
+		},
+
+		"delete-shape":
+		{
+			"type": "deletion",
+			"shortDescription": "Delete shape"
+		},
+		
+		"insert-text":
+		{
+			"type": "modification",
+			"shortDescription": "Insert text '%@'"
+		},
+
+		"delete-text":
+		{
+			"type": "deletion",
+			"shortDescription": "Delete text '%@'"
+		},
+
+		"replace-text":
+		{
+			"type": "modification",
+			"shortDescription": "Replace text '%@' with '%@'"
+		},
+
+		"modify-text":
+		{
+			"type": "modification",
+			"shortDescription": "Change attributes of text '%@'"
+		}
+	}
+}
