@@ -105,6 +105,10 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (void)windowDidLoad
 {
+	// Disable AppKit's automatic restoration; we implement our own in
+	// -[EWAppDelegate applicationDidFinishLaunching:]
+	[[self window] setRestorable: NO];
+	
 	undoManagerBridge = [[EWUndoManager alloc] init];
 	[undoManagerBridge setDelegate: self];
 	
