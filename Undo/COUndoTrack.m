@@ -530,14 +530,34 @@ static void coalesceOps(NSMutableArray *ops)
 
 - (NSString *) undoMenuItemTitle
 {
-	NSString *shortDescription = [[self currentNode] localizedShortDescription];
+	id<COTrackNode> node = [self currentNode];
+	NSString *shortDescription;
+	if (node == [COEndOfUndoTrackPlaceholderNode sharedInstance])
+	{
+		shortDescription = @"";
+	}
+	else
+	{
+		shortDescription = [node localizedShortDescription];
+	}
+	
 	// TODO: Localize the "Undo" string
 	return [NSString stringWithFormat: @"Undo %@", shortDescription];
 }
 
 - (NSString *) redoMenuItemTitle
 {
-	NSString *shortDescription =  [[self nextNodeOnTrackFrom: [self currentNode] backwards: NO] localizedShortDescription];
+	id<COTrackNode> node = [self nextNodeOnTrackFrom: [self currentNode] backwards: NO];
+	NSString *shortDescription;
+	if (node == nil)
+	{
+		shortDescription = @"";
+	}
+	else
+	{
+		shortDescription = [node localizedShortDescription];
+	}
+	
 	// TODO: Localize the "Redo" string
 	return [NSString stringWithFormat: @"Redo %@", shortDescription];
 }
