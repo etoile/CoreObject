@@ -1,4 +1,4 @@
-/*
+/**
 	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
 	Date:  July 2013

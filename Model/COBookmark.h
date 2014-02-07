@@ -1,4 +1,4 @@
-/*
+/**
 	Copyright (C) 2013 Quentin Mathe
 
 	Date:  March 2013

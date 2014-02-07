@@ -1,4 +1,4 @@
-/*
+/**
 	Copyright (C) 2013 Eric Wasylishen
 
 	Date:  September 2013
