@@ -266,6 +266,20 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 		[self commitWithIdentifier: @"delete-note" descriptionArguments: @[label]];
 		[notesTable reloadData];
 	}
+	else if ([[self window] firstResponder] == tagsOutline)
+	{
+		if ([self selectedTag] != nil)
+		{
+			COTag *tag = [self selectedTag];
+			NSSet *tagGroups = [tag tagGroups];
+			for (COTagGroup *parentGroup in tagGroups)
+			{
+				[parentGroup removeObject: tag];
+			}
+			[self commitWithIdentifier: @"delete-tag" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
+			[tagsOutline reloadData];
+		}
+	}
 }
 
 #pragma mark - Private
