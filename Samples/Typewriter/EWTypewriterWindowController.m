@@ -50,7 +50,7 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 				  }]];
 	
 	[results setArray: [set allObjects]];
-	[results sortUsingDescriptors: @[[NSSortDescriptor sortDescriptorWithKey: @"metadata.label" ascending: YES]]];
+	[results sortUsingDescriptors: @[[NSSortDescriptor sortDescriptorWithKey: @"modificationDate" ascending: NO]]];
 	
 	// Filter by tag
 	
@@ -168,7 +168,14 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (IBAction) addNote:(id)sender
 {
-	[self.editingContext insertNewPersistentRootWithEntityName: @"TypewriterDocument"];
+	COPersistentRoot *newNote = [self.editingContext insertNewPersistentRootWithEntityName: @"TypewriterDocument"];
+	
+	COTag *currentTag = [self selectedTag];
+	if (currentTag != nil)
+	{
+		[currentTag addObject: [newNote rootObject]];
+	}
+	
 	[self commitWithIdentifier: @"add-note" descriptionArguments: @[]];
 	[notesTable reloadData];
 }
