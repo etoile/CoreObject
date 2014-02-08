@@ -680,7 +680,9 @@
 
 - (void)testCompositeReferenceWithTransientParentAndPersistentChild
 {
-    OutlineItem *parent = [[OutlineItem alloc] initWithObjectGraphContext: [COObjectGraphContext new]];
+	COObjectGraphContext *transientCtx1 = [COObjectGraphContext new];
+	
+    OutlineItem *parent = [[OutlineItem alloc] initWithObjectGraphContext: transientCtx1];
     OutlineItem *child = [[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"] rootObject];
 	
 	UKDoesNotRaiseException([parent addObject: child]);
@@ -690,16 +692,21 @@
 
 - (void)testCompositeReferenceWithPersistentParentAndTransientChild
 {
+	COObjectGraphContext *transientCtx1 = [COObjectGraphContext new];
+	
     OutlineItem *parent = [[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"] rootObject];
-    OutlineItem *child = [[OutlineItem alloc] initWithObjectGraphContext: [COObjectGraphContext new]];
+    OutlineItem *child = [[OutlineItem alloc] initWithObjectGraphContext: transientCtx1];
 	
 	UKRaisesException([parent addObject: child]);
 }
 
 - (void)testCompositeReferenceAccrossTransientObjectGraphContexts
 {
-    OutlineItem *parent = [[OutlineItem alloc] initWithObjectGraphContext: [COObjectGraphContext new]];
-    OutlineItem *child = [[OutlineItem alloc] initWithObjectGraphContext: [COObjectGraphContext new]];
+	COObjectGraphContext *transientCtx1 = [COObjectGraphContext new];
+	COObjectGraphContext *transientCtx2 = [COObjectGraphContext new];
+
+    OutlineItem *parent = [[OutlineItem alloc] initWithObjectGraphContext: transientCtx1];
+    OutlineItem *child = [[OutlineItem alloc] initWithObjectGraphContext: transientCtx2];
 	
 	UKDoesNotRaiseException([parent addObject: child]);
 	
