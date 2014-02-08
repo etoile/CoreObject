@@ -12,13 +12,21 @@
 #import "TypewriterDocument.h"
 
 @interface EWTagListDataSource : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate>
+{
+	NSMutableSet *oldSelection;
+}
 @property (nonatomic, weak) EWTypewriterWindowController *owner;
 @property (nonatomic, strong) NSOutlineView *outlineView;
+- (void)reloadData;
 @end
 
 @interface EWNoteListDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
+{
+	NSMutableSet *oldSelection;
+}
 @property (nonatomic, weak) EWTypewriterWindowController *owner;
 @property (nonatomic, strong) NSTableView *tableView;
+- (void)reloadData;
 @end
 
 @implementation EWTypewriterWindowController
@@ -162,8 +170,8 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (void) editingContextChanged: (NSNotification *)notif
 {
-	[tagsOutline reloadData];
-	[notesTable reloadData];
+	[tagListDataSource reloadData];
+	[noteListDataSource reloadData];
 }
 
 #pragma mark - IBActions
@@ -179,7 +187,7 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	[targetTagGroup addObject: newTag];
 	
 	[self commitWithIdentifier: @"add-tag" descriptionArguments: @[]];
-	[tagsOutline reloadData];
+	[tagListDataSource reloadData];
 }
 
 - (IBAction) addTagGroup:(id)sender
@@ -189,12 +197,15 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	[[[self tagLibrary] mutableArrayValueForKey: @"tagGroups"] addObject: newTagGroup];
 	
 	[self commitWithIdentifier: @"add-tag-group" descriptionArguments: @[]];
-	[tagsOutline reloadData];
+	[tagListDataSource reloadData];
 }
 
 - (IBAction) addNote:(id)sender
 {
 	COPersistentRoot *newNote = [self.editingContext insertNewPersistentRootWithEntityName: @"TypewriterDocument"];
+	NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: newNote.metadata];
+	[md addEntriesFromDictionary: @{ @"label" : @"Untitled Note" }];
+	newNote.metadata = md;
 	
 	COTag *currentTag = [self selectedTag];
 	if (currentTag != nil)
@@ -203,7 +214,7 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	}
 	
 	[self commitWithIdentifier: @"add-note" descriptionArguments: @[]];
-	[notesTable reloadData];
+	[noteListDataSource reloadData];
 }
 
 #pragma mark - EWUndoManagerDelegate
@@ -301,7 +312,7 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 		}
 		
 		[self commitWithIdentifier: @"delete-note" descriptionArguments: @[label]];
-		[notesTable reloadData];
+		[noteListDataSource reloadData];
 	}
 	else if ([[self window] firstResponder] == tagsOutline)
 	{
@@ -314,7 +325,7 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 				[parentGroup removeObject: tag];
 			}
 			[self commitWithIdentifier: @"delete-tag" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
-			[tagsOutline reloadData];
+			[tagListDataSource reloadData];
 		}
 	}
 }
@@ -353,7 +364,7 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 {
 	NSLog(@"Selected tag %@", aTag);
 	
-	[notesTable reloadData];
+	[noteListDataSource reloadData];
 }
 
 - (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args
@@ -382,6 +393,13 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 @implementation EWTagListDataSource
 
 @synthesize owner, outlineView;
+
+- (id) init
+{
+	SUPERINIT;
+	oldSelection = [NSMutableSet new];
+	return self;
+}
 
 - (id) rootObject
 {
@@ -438,9 +456,37 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	[self.owner commitWithIdentifier: @"rename-tag" descriptionArguments: @[oldName, newName]];
 }
 
+- (void)cacheSelection
+{
+	[oldSelection removeAllObjects];
+	NSIndexSet *indexes = [self.outlineView selectedRowIndexes];
+	for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+	{
+		[oldSelection addObject: [self.outlineView itemAtRow: i]];
+	}
+}
+
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
+	[self cacheSelection];
 	[self.owner selectTag: nil];
+}
+
+- (void)reloadData
+{
+	[self.outlineView reloadData];
+	
+	NSMutableIndexSet *newSelectedRows = [NSMutableIndexSet new];
+	for (id obj in oldSelection)
+	{
+		NSInteger row = [self.outlineView rowForItem: obj];
+		if (row != -1)
+		{
+			[newSelectedRows addIndex: row];
+		}
+	}
+	[self.outlineView selectRowIndexes: newSelectedRows byExtendingSelection: NO];
+	[self cacheSelection];
 }
 
 #pragma mark Drag & Drop
@@ -482,6 +528,14 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 @implementation EWNoteListDataSource
 
 @synthesize owner, tableView;
+
+- (id) init
+{
+	SUPERINIT;
+	oldSelection = [NSMutableSet new];
+	return self;
+}
+
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
@@ -525,14 +579,47 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
     }
 }
 
+- (void)cacheSelection
+{
+	[oldSelection removeAllObjects];
+	NSArray *objs = [self.owner arrangedNotePersistentRoots];
+	NSIndexSet *indexes = [self.tableView selectedRowIndexes];
+	for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+	{
+		[oldSelection addObject: objs[i]];
+	}
+}
+
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
+	[self cacheSelection];
+	
 	NSArray *rows = [self.owner arrangedNotePersistentRoots];
 	if ([owner.notesTable selectedRow] >= 0 && [owner.notesTable selectedRow] < [rows count])
 	{
 		[owner selectNote: rows[[owner.notesTable selectedRow]]];
 	}
 }
+
+- (void)reloadData
+{
+	[self.tableView reloadData];
+	
+	NSArray *objs = [self.owner arrangedNotePersistentRoots];
+	NSMutableIndexSet *newSelectedRows = [NSMutableIndexSet new];
+	for (id obj in oldSelection)
+	{
+		NSUInteger row = [objs indexOfObject: obj];
+		if (row != NSNotFound)
+		{
+			[newSelectedRows addIndex: row];
+		}
+	}
+	[self.tableView selectRowIndexes: newSelectedRows byExtendingSelection: NO];
+	[self cacheSelection];
+}
+
+#pragma mark Drag & Drop
 
 - (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pb
 {
