@@ -274,6 +274,18 @@
 	UKObjectsSame(ctx, [object editingContext]);
 }
 
+- (void) testEntityDescriptionImmutableAfterCOObjectCreation
+{
+	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
+	OutlineItem *object = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
+	
+	ETEntityDescription *entityDesc = [object entityDescription];
+	ETPropertyDescription *contentsDesc = [entityDesc propertyDescriptionForName: @"contents"];
+	
+	UKTrue([contentsDesc isOrdered]);
+	UKRaisesException([contentsDesc setOrdered: NO]);
+}
+
 @end
 
 

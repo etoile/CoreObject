@@ -273,6 +273,8 @@ See +[NSObject typePrefix]. */
 	[self validateEntityDescription: anEntityDescription
 	   inModelDescriptionRepository: [aContext modelDescriptionRepository]];
 
+	[anEntityDescription makeFrozen];
+	
 	SUPERINIT;
 
 	_UUID = aUUID;

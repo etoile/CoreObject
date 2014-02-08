@@ -46,33 +46,9 @@
     UKObjectsEqual(A(child1, child2), [item contents]);
 }
 
-- (void)addPropertyDescriptionToOutlineItem
-{
-	ETAssert([[item entityDescription] propertyDescriptionForName: @"something"] == nil);
-	ETEntityDescription *type = [[ctx modelDescriptionRepository] entityDescriptionForClass: [NSString class]];
-	ETPropertyDescription *propertyDesc = [ETPropertyDescription descriptionWithName: @"something" type: type];
-
-	[[item entityDescription] addPropertyDescription: propertyDesc];
-
-	ETAssert([propertyDesc isReadOnly] == NO);
-}
-
-- (void)removePropertyDescriptionFromOutlineItem
-{
-	ETPropertyDescription *propertyDesc = [[item entityDescription] propertyDescriptionForName: @"something"];
-	[[item entityDescription] removePropertyDescription: propertyDesc];
-}
-
 - (void)testSynthesizedAccessorsRestrictedToDynamicProperties
 {
 	UKRaisesException([item unkownMethod]);
-
-	[self addPropertyDescriptionToOutlineItem];
-
-	UKNil([item valueForProperty: @"something"]);
-	UKRaisesException([item something]);
-
-	[self removePropertyDescriptionFromOutlineItem];
 
 	NSAssert([[[item entityDescription] propertyDescriptionForName: @"isPersistent"] isReadOnly],
 		@"We expect isPersistent to be read-only for COObject and its subclasses");

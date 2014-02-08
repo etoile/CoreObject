@@ -12,6 +12,9 @@
 #import "COObject.h"
 #import "COObject+Private.h"
 
+@interface TestObjectUpdateEntity : COObject
+@end
+
 @interface TestObjectUpdate : EditingContextTestCase
 {
 	id object;
@@ -33,6 +36,18 @@
 @end
 
 
+@implementation TestObjectUpdateEntity
+
++ (ETEntityDescription*)newEntityDescription
+{
+    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"TestObjectUpdateEntity"];
+    [entity setParent: (id)@"Anonymous.COObject"];
+    return entity;
+}
+
+@end
+
+
 @implementation TestObjectUpdate
 
 - (NSString *) property
@@ -47,7 +62,7 @@
 
 - (NSString *) entityName
 {
-	return @"COObject";
+	return @"TestObjectUpdateEntity";
 }
 
 - (void) observeValueForKeyPath: (NSString *)keyPath
@@ -196,12 +211,15 @@
 
 + (void)addCityPropertyToEntity: (ETEntityDescription *)anEntity
 {
-	ETEntityDescription *stringType =
-		[[ETModelDescriptionRepository mainRepository] descriptionForName: @"NSString"];
-	ETPropertyDescription *propertyDesc =
-		[ETPropertyDescription descriptionWithName: @"city" type: stringType];
-	
-	[anEntity addPropertyDescription: propertyDesc];
+	if (![[anEntity propertyDescriptionNames] containsObject: @"city"])
+	{
+		ETEntityDescription *stringType =
+			[[ETModelDescriptionRepository mainRepository] descriptionForName: @"NSString"];
+		ETPropertyDescription *propertyDesc =
+			[ETPropertyDescription descriptionWithName: @"city" type: stringType];
+		
+		[anEntity addPropertyDescription: propertyDesc];
+	}
 }
 
 - (id) init
@@ -215,8 +233,12 @@
 	// If this was done after adding the KVO observer, KVO would do the dynamic
 	// subclassing trick since it doesn't know that COObject will send manual KVO change
 	// notifications for 'city', and we'd end up getting 2 notifications instead of 1 in -testKVC.
+	
+	// NOTE: The above comment no longer applies because you can't modify
+	// an entity description after creating a COObject instance that uses it.
+	
 	[TestDirectVariableStorageUpdate addCityPropertyToEntity:
-	 [[ETModelDescriptionRepository mainRepository] entityDescriptionForClass: [COObject class]]];
+	 [[ETModelDescriptionRepository mainRepository] entityDescriptionForClass: [TestObjectUpdateEntity class]]];
 		 
 	SUPERINIT;
 	return self;
