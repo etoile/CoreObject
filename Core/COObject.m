@@ -958,6 +958,31 @@ See +[NSObject typePrefix]. */
 	[_objectGraphContext markObjectAsUpdated: self forProperty: prop];
 }
 
+- (void)  validateSingleValue: (id)singleValue
+conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
+{
+	ETAssert(_objectGraphContext != nil);
+	
+	// nil is an allowed value for all CoreObject univalued property types
+	if (singleValue == nil)
+		return;
+	
+	ETEntityDescription *newValueEntityDesc = [[_objectGraphContext modelDescriptionRepository] entityDescriptionForClass: [singleValue class]];
+	ETAssert(newValueEntityDesc != nil);
+	const BOOL validType = [newValueEntityDesc isKindOfEntity: [propertyDesc type]];
+	
+	if (validType)
+		return;
+	
+	// HACK: Special case for BOOL
+	if ([singleValue isKindOfClass: [NSNumber class]]
+		&& [[[propertyDesc type] name] isEqualToString: @"BOOL"])
+		return;
+	
+	[NSException raise: NSGenericException
+				format: @"single value '%@' (entity %@) does not conform to type %@ (property %@)", singleValue, newValueEntityDesc, [propertyDesc type], propertyDesc];
+}
+
 - (void)validateTypeForNewValue: (id)newValue
             propertyDescription: (ETPropertyDescription *)propertyDesc
 {
@@ -978,16 +1003,12 @@ See +[NSObject typePrefix]. */
 
 		for (id object in [newValue objectEnumerator])
 		{
-			ETAssert([self isCoreObjectValue: object]);
+			[self validateSingleValue: object conformsToPropertyDescription: propertyDesc];
 		}
 	}
 	else
 	{
-		ETEntityDescription *newValueEntityDesc = [[_objectGraphContext modelDescriptionRepository] entityDescriptionForClass: [newValue class]];
-		const BOOL validType = [newValueEntityDesc isKindOfEntity: [propertyDesc type]];
-		
-		// FIXME: Refactor. validType case is for supporting value transformed objects that aren't COObject subclasses.
-		ETAssert(validType || [self isCoreObjectValue: newValue]);
+		[self validateSingleValue: newValue conformsToPropertyDescription: propertyDesc];
 	}
 }
 

@@ -65,8 +65,8 @@
 {
 	COObjectGraphContext *ctx = [COObjectGraphContext new];
 	OrderedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupWithOpposite"];
-	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *item2 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	OrderedGroupContent *item1 = [ctx insertObjectWithEntityName: @"OrderedGroupContent"];
+	OrderedGroupContent *item2 = [ctx insertObjectWithEntityName: @"OrderedGroupContent"];
 	
 	group1.contents = @[item1, item2, item1, item1, item1, item2];
 	UKTrue(([@[item2, item1] isEqual: group1.contents]
@@ -77,8 +77,8 @@
 {
 	COObjectGraphContext *ctx = [COObjectGraphContext new];
 	OrderedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupWithOpposite"];
-	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *item2 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	OrderedGroupContent *item1 = [ctx insertObjectWithEntityName: @"OrderedGroupContent"];
+	OrderedGroupContent *item2 = [ctx insertObjectWithEntityName: @"OrderedGroupContent"];
 	
 	group1.contents = @[item1, item2];
 	
@@ -91,6 +91,15 @@
 	OrderedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupWithOpposite"];
 	
 	UKRaisesException([group1 setContents: A([NSNull null])]);
+}
+
+- (void) testWrongEntityTypeInCollection
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	OrderedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupWithOpposite"];
+	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	
+	UKRaisesException(group1.contents = @[item1]);
 }
 
 @end

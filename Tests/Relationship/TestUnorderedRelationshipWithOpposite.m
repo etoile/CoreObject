@@ -58,8 +58,8 @@
 {
 	COObjectGraphContext *ctx = [COObjectGraphContext new];
 	UnorderedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"UnorderedGroupWithOpposite"];
-	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *item2 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	UnorderedGroupContent *item1 = [ctx insertObjectWithEntityName: @"UnorderedGroupContent"];
+	UnorderedGroupContent *item2 = [ctx insertObjectWithEntityName: @"UnorderedGroupContent"];
 	
 	group1.contents = S(item1, item2);
 	
@@ -72,6 +72,15 @@
 	UnorderedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"UnorderedGroupWithOpposite"];
 	
 	UKRaisesException([group1 setContents: S([NSNull null])]);
+}
+
+- (void) testWrongEntityTypeInCollection
+{
+	COObjectGraphContext *ctx = [COObjectGraphContext new];
+	UnorderedGroupWithOpposite *group1 = [ctx insertObjectWithEntityName: @"UnorderedGroupWithOpposite"];
+	OutlineItem *item1 = [ctx insertObjectWithEntityName: @"OutlineItem"];
+	
+	UKRaisesException([group1 setContents: S(item1)]);
 }
 
 @end

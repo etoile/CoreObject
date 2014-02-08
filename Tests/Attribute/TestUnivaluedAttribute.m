@@ -62,4 +62,9 @@
 	UKObjectsEqual(@"", item1.label);
 }
 
+- (void) testNumberValueDisallowedForStringAttribute
+{
+	UKRaisesException([item1 setLabel: (id)[NSNumber numberWithInt: 123]]);
+}
+
 @end
