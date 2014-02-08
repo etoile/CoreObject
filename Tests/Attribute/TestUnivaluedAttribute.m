@@ -50,4 +50,16 @@
 	UKNil(item1.label);
 }
 
+- (void) testStringCopied
+{
+	NSMutableString *mutableString = [NSMutableString new];
+	item1.label = mutableString;
+	
+	UKObjectsEqual(@"", item1.label);
+	
+	[mutableString setString: @"test"];
+	
+	UKObjectsEqual(@"", item1.label);
+}
+
 @end

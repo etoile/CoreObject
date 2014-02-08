@@ -841,7 +841,7 @@ See +[NSObject typePrefix]. */
 	// TODO: Raise an exception on an attempt to set an outgoing relationship
 	// (or may be in -setValue:forStorageKey:).
 	ETPropertyDescription *propertyDesc = [[self entityDescription] propertyDescriptionForName: key];
-    id storageValue = aValue;
+    id storageValue;
 			
 	// Convert user value to the form we store it in the variable storage
 
@@ -857,6 +857,12 @@ See +[NSObject typePrefix]. */
 	{
 		storageValue = [self mutableCollectionWithCollection: aValue
 		                                 propertyDescription: propertyDesc];
+	}
+	else
+	{
+		// TODO: In debugging mode, we could check the class of the value
+		// is permitted
+		storageValue = [aValue copy];
 	}
 	
 	[_variableStorage setObject: storageValue

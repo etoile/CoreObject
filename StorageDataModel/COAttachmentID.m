@@ -41,4 +41,9 @@
 	return [_data isEqual: [object dataValue]];
 }
 
+- (id) copyWithZone:(NSZone *)zone
+{
+	return self;
+}
+
 @end
