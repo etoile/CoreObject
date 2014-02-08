@@ -48,6 +48,21 @@
 		
 		
 		
+		"delete-tag-group":
+		{
+			"type": "deletion",
+			"shortDescription": "Delete tag group '%@'"
+		},
+		"add-tag-group":
+		{
+			"type": "creation",
+			"shortDescription": "Create tag group"
+		},
+		"rename-tag-group":
+		{
+			"type": "renaming",
+			"shortDescription": "Rename tag group from '%@' to '%@'"
+		},
 		
 		
 		

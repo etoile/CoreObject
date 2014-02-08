@@ -37,6 +37,7 @@
 @property (nonatomic, readonly) COUndoTrack *undoTrack;
 
 - (IBAction) addTag:(id)sender;
+- (IBAction) addTagGroup:(id)sender;
 - (IBAction) addNote:(id)sender;
 
 @end

@@ -92,6 +92,20 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	return nil;
 }
 
+- (COTagGroup *) selectedTagGroup
+{
+	NSInteger selectedRow = [tagsOutline selectedRow];
+	if (selectedRow != -1)
+	{
+		id object = [tagsOutline itemAtRow: selectedRow];
+		if ([object isKindOfClass: [COTagGroup class]])
+		{
+			return object;
+		}
+	}
+	return nil;
+}
+
 - (void) dealloc
 {
 	[textStorage setDelegate: nil];
@@ -156,13 +170,25 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (IBAction) addTag:(id)sender
 {
-	COTagGroup *defaultTagGroup = [self defaultTagGroup];
-	
-	COTag *newTag = [[COTag alloc] initWithObjectGraphContext: [[[self document] libraryPersistentRoot] objectGraphContext]];
+	COTagGroup *targetTagGroup = [self selectedTagGroup];
+	if (targetTagGroup == nil)
+		targetTagGroup = [self defaultTagGroup];
+		
+	COTag *newTag = [[COTag alloc] initWithObjectGraphContext: [[self tagLibrary] objectGraphContext]];
 	newTag.name = @"New Tag";
-	[defaultTagGroup addObject: newTag];
+	[targetTagGroup addObject: newTag];
 	
 	[self commitWithIdentifier: @"add-tag" descriptionArguments: @[]];
+	[tagsOutline reloadData];
+}
+
+- (IBAction) addTagGroup:(id)sender
+{
+	COTagGroup *newTagGroup = [[COTagGroup alloc] initWithObjectGraphContext: [[self tagLibrary] objectGraphContext]];
+	newTagGroup.name = @"New Tag Group";
+	[[[self tagLibrary] mutableArrayValueForKey: @"tagGroups"] addObject: newTagGroup];
+	
+	[self commitWithIdentifier: @"add-tag-group" descriptionArguments: @[]];
 	[tagsOutline reloadData];
 }
 
