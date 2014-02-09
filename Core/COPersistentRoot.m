@@ -289,7 +289,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 {
     return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock: ^(id obj)
 	{
-		return (BOOL)[[obj branchInfo] isDeleted];
+		return (BOOL)[obj isDeleted];
 	}]];
 }
 

@@ -378,7 +378,7 @@
     
     UKObjectsEqual(S(originalBranch), [persistentRoot branches]);
     UKObjectsEqual(S(branch), [persistentRoot branchesPendingDeletion]);
-	UKTrue([[persistentRoot deletedBranches] isEmpty]);
+    UKObjectsEqual(S(branch), [persistentRoot deletedBranches]);
     UKTrue([branch isDeleted]);
     
     [ctx commit];
@@ -571,6 +571,90 @@
 	[[altBranch rootObject] insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
 	UKRaisesException([[originalBranch rootObject] insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]);
+}
+
+/**
+ * Try to test all of the requirements of -branches and the other accessors
+ */
+- (void) testBranchesAccessors
+{
+	COBranch *current = [persistentRoot currentBranch];
+    COBranch *regular;
+    COBranch *deletedOnDisk;
+    COBranch *pendingInsertion;
+    COBranch *pendingDeletion;
+    COBranch *pendingUndeletion;
+    
+    // 1. Setup the branches
+    {
+        regular = [[persistentRoot currentBranch] makeBranchWithLabel: @"regular"];
+		[persistentRoot commit];
+
+        deletedOnDisk = [[persistentRoot currentBranch] makeBranchWithLabel: @"deletedOnDisk"];
+        [persistentRoot commit];
+        deletedOnDisk.deleted = YES;
+        [persistentRoot commit];
+
+        pendingDeletion = [[persistentRoot currentBranch] makeBranchWithLabel: @"pendingDeletion"];
+        [persistentRoot commit];
+
+        pendingUndeletion = [[persistentRoot currentBranch] makeBranchWithLabel: @"pendingUndeletion"];
+        [persistentRoot commit];
+        pendingUndeletion.deleted = YES;
+        [persistentRoot commit];
+
+		pendingInsertion = [[persistentRoot currentBranch] makeBranchWithLabel: @"pendingInsertion"];
+		pendingDeletion.deleted = YES;
+        pendingUndeletion.deleted = NO;
+
+		COPersistentRootInfo *persistentRootInfo = [store persistentRootInfoForUUID: [persistentRoot UUID]];
+
+        // Check that the constraints we wanted to set up hold
+		
+        UKTrue([[persistentRootInfo branchUUIDs] containsObject: [regular UUID]]);
+        UKTrue([[persistentRootInfo branchUUIDs] containsObject: [deletedOnDisk UUID]]);
+		UKNil([persistentRootInfo branchInfoForUUID: [pendingInsertion UUID]]);
+		UKTrue([[persistentRootInfo branchUUIDs] containsObject: [pendingDeletion UUID]]);
+        UKTrue([[persistentRootInfo branchUUIDs] containsObject: [pendingUndeletion UUID]]);
+		UKTrue(deletedOnDisk.deleted);
+		UKTrue(pendingDeletion.deleted);
+		UKFalse(pendingUndeletion.deleted);
+    }
+    
+    // 2. Test the accessors
+    
+    UKObjectsEqual(S(current, regular, pendingInsertion, pendingUndeletion), [persistentRoot branches]);
+    UKObjectsEqual(S(deletedOnDisk, pendingDeletion), [persistentRoot deletedBranches]);
+    UKObjectsEqual(S(pendingInsertion), [persistentRoot branchesPendingInsertion]);
+    UKObjectsEqual(S(pendingDeletion), [persistentRoot branchesPendingDeletion]);
+    UKObjectsEqual(S(pendingUndeletion), [persistentRoot branchesPendingUndeletion]);
+
+	UKObjectsEqual(regular, [persistentRoot branchForUUID: [regular UUID]]);
+	UKObjectsEqual(deletedOnDisk, [persistentRoot branchForUUID: [deletedOnDisk UUID]]);
+   	UKObjectsEqual(pendingInsertion, [persistentRoot branchForUUID: [pendingInsertion UUID]]);
+	UKObjectsEqual(pendingDeletion, [persistentRoot branchForUUID: [pendingDeletion UUID]]);
+   	UKObjectsEqual(pendingUndeletion, [persistentRoot branchForUUID: [pendingUndeletion UUID]]);
+
+    // 3. Test what happens when we commit (all pending changes are made and no longer pending)
+    
+    [ctx commit];
+    
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 COBranch *testCurrent = [testPersistentRoot branchForUUID: [current UUID]];
+		 COBranch *testRegular = [testPersistentRoot branchForUUID: [regular UUID]];
+		 COBranch *testDeletedOnDisk = [testPersistentRoot branchForUUID: [deletedOnDisk UUID]];
+		 COBranch *testPendingInsertion = [testPersistentRoot branchForUUID: [pendingInsertion UUID]];
+		 COBranch *testPendingDeletion = [testPersistentRoot branchForUUID: [pendingDeletion UUID]];
+		 COBranch *testPendingUndeletion = [testPersistentRoot branchForUUID: [pendingUndeletion UUID]];
+		 
+		 UKObjectsEqual(S(testCurrent, testRegular, testPendingInsertion, testPendingUndeletion), [testPersistentRoot branches]);
+		 UKObjectsEqual(S(testDeletedOnDisk, testPendingDeletion), [testPersistentRoot deletedBranches]);
+		 UKObjectsEqual([NSSet set], [testPersistentRoot branchesPendingInsertion]);
+		 UKObjectsEqual([NSSet set], [testPersistentRoot branchesPendingDeletion]);
+		 UKObjectsEqual([NSSet set], [testPersistentRoot branchesPendingUndeletion]);
+	 }];
 }
 
 @end

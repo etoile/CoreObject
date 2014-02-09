@@ -238,11 +238,8 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     
     if ([[_persistentRoot branchesPendingDeletion] containsObject: self])
         return YES;
-
-    if ([[_persistentRoot deletedBranches] containsObject: self])
-        return YES;
     
-    return NO;
+    return [[[_persistentRoot persistentRootInfo] branchInfoForUUID: _UUID] isDeleted];
 }
 
 - (void) setDeleted:(BOOL)deleted
