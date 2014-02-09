@@ -9,9 +9,8 @@ and use CoreObject.
 
 You also need to have the SQLite and EtoileFoundation libraries installed:
 
-	* libsqlite 3.7.7 (the one bundled with Mac OS X 10.7), see http://www.sqlite.org/
-
-	* EtoileFoundation, see https://github.com/etoile/EtoileFoundation
+  - libsqlite 3.7.7 (the one bundled with Mac OS X 10.7), see <http://www.sqlite.org/>
+  - EtoileFoundation, see <https://github.com/etoile/EtoileFoundation>
 
 **Note:** If you have the entire Etoile repository, EtoileFoundation is built 
 together with CoreObject (as a workspace subproject).
@@ -33,7 +32,7 @@ choose ProjectDemo in the Scheme menu.
 
 To install in /Library/Frameworks, do the build in the shell: 
 
-sudo xcodebuild -scheme CoreObject -configuration Release clean install DSTROOT=/Library INSTALL_PATH=/Frameworks
+	sudo xcodebuild -scheme CoreObject -configuration Release clean install DSTROOT=/Library INSTALL_PATH=/Frameworks
 
 **Note:** By default, INSTALL_PATH is set to @rpath and DSTROOT to the project 
 directory.
@@ -42,7 +41,7 @@ directory.
 Test suite
 ----------
 
-UnitKit is required, see https://github.com/etoile/UnitKit
+UnitKit is required, see <https://github.com/etoile/UnitKit>
 
 **Note:** If you have the entire Etoile repository, UnitKit is built together 
 with CoreObject (as a workspace subproject).

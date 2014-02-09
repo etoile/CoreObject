@@ -5,23 +5,19 @@ Required software
 -----------------
 
 You need to have the GNUstep core libraries installed in order to compile and 
-use CoreObject, see http://www.gnustep.org/. The core packages are, at a minimum:
+use CoreObject, see <http://www.gnustep.org/>. The core packages are, at a minimum:
 
-	* gnustep-make 2.6.6 or higher
-
-	* gnustep-base trunk
-
-	* gnustep-gui recent release
-
-	* gnustep-back recent release
+  - gnustep-make 2.6.6 or higher
+  - gnustep-base trunk
+  - gnustep-gui recent release
+  - gnustep-back recent release
 
 **Note**: GNUstep GUI and Back dependencies are temporary.
 
 You also need to have the SQLite and EtoileFoundation libraries installed:
 
-    * libsqlite 3.7.7, see http://www.sqlite.org/
-
-	* EtoileFoundation, see https://github.com/etoile/EtoileFoundation
+  - libsqlite 3.7.7, see <http://www.sqlite.org/>
+  - EtoileFoundation, see <https://github.com/etoile/EtoileFoundation>
 
 **Note:** If you have the entire Etoile repository, EtoileFoundation is built 
 together with CoreObject, by running 'make' in Frameworks or any other parent 
@@ -35,15 +31,15 @@ Square brackets "[ ]" are used to indicate optional parameters.
 
 To build and install the CoreObject framework (use gmake on non-GNU systems):
 
-   * make
-
-   * [sudo [-E]] make install
+	make
+	
+	[sudo [-E]] make install
 
 
 Test suite
 ----------
 
-UnitKit is required, see https://github.com/etoile/UnitKit
+UnitKit is required, see <https://github.com/etoile/UnitKit>
 
 **Note:** If you have the entire Etoile repository, UnitKit is built together 
 with CoreObject, by running 'make' in Frameworks or any other parent directories.
@@ -52,16 +48,16 @@ Square brackets "[ ]" are used to indicate optional parameters.
 
 To produce a test bundle and run the test suite:
 
-	* make test=yes 
+	make test=yes 
 	
-	* ukrun [-q]
+	ukrun [-q]
 	
 In addition, the project includes a benchmark suite built as a test bundle. To 
 build and run it:
 
-	* make benchmark=yes
+	make benchmark=yes
 	
-	* ukrun [-q] BenchmarkCoreObject.bundle
+	ukrun [-q] BenchmarkCoreObject.bundle
 
 
 Trouble
