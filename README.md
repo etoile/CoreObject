@@ -1,10 +1,14 @@
 CoreObject
 ==========
 
-:Maintainers: Eric Wasylishen, Quentin Mathe
-:Authors: Eric Wasylishen <ewasylishen@gmail.com>, Quentin Mathe <quentin.mathe@gmail.com>, Christopher Armstrong <carmstrong@fastmail.com.au>
-:License: MIT License
-:Version: 0.5
+Maintainers
+: Eric Wasylishen, Quentin Mathe
+Authors
+: Eric Wasylishen <ewasylishen@gmail.com>, Quentin Mathe <quentin.mathe@gmail.com>, Christopher Armstrong <carmstrong@fastmail.com.au>
+License
+: MIT License
+Version
+: 0.5
 
 
 CoreObject is a version-controlled object database, designed to be a humane
