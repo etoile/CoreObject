@@ -50,6 +50,11 @@
 			"type": "renaming",
 			"shortDescription": "Rename tag from '%@' to '%@'"
 		},
+		"move-tag":
+		{
+			"type": "renaming",
+			"shortDescription": "Move tag '%@'"
+		},
 		
 		
 		

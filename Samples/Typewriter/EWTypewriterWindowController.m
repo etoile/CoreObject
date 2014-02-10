@@ -152,7 +152,7 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 	// Drag & drop
 	
-	[tagsOutline registerForDraggedTypes: @[EWNoteDragType]];
+	[tagsOutline registerForDraggedTypes: @[EWNoteDragType, EWTagDragType]];
 	
 	// Text view setup
 	
@@ -500,34 +500,77 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
 {
-	if (![item isTag])
+	if ([[[info draggingPasteboard] types] containsObject: EWTagDragType])
 	{
-		return NSDragOperationNone;
+		if ([item isKindOfClass: [COTagGroup class]])
+			return NSDragOperationMove;
 	}
-    
-	return NSDragOperationMove;
+	else if ([[[info draggingPasteboard] types] containsObject: EWNoteDragType])
+	{
+		if ([item isTag])
+			return NSDragOperationMove;
+	}
+	return NSDragOperationNone;
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index
 {
 	NSPasteboard *pasteboard = [info draggingPasteboard];
-	COTag *tag = item;
-	ETAssert([tag isTag]);
 	
-	for (NSPasteboardItem *pbItem in [pasteboard pasteboardItems])
+	if ([[[info draggingPasteboard] types] containsObject: EWTagDragType])
 	{
-        id plist = [pbItem propertyListForType: EWNoteDragType];
-		COPersistentRoot *notePersistentRoot = [owner.editingContext persistentRootForUUID: [ETUUID UUIDWithString: plist]];
-		ETAssert(notePersistentRoot != nil);
+		COTagGroup *tagGroup = item;
+		ETAssert([tagGroup isKindOfClass: [COTagGroup class]]);
 		
-		COObject *noteRootObject = [notePersistentRoot rootObject];
+		id plist = [pasteboard propertyListForType: EWTagDragType];
+		COTag *tag = [[[self.owner tagLibrary] objectGraphContext] loadedObjectForUUID: [ETUUID UUIDWithString: plist]];
+		ETAssert(tag != nil);
+			
+		[tagGroup addObject: tag];
 		
-		[tag addObject: noteRootObject];
+		[self.owner commitWithIdentifier: @"move-tag" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
+	}
+	else if ([[[info draggingPasteboard] types] containsObject: EWNoteDragType])
+	{
+		COTag *tag = item;
+		ETAssert([tag isTag]);
+		
+		for (NSPasteboardItem *pbItem in [pasteboard pasteboardItems])
+		{
+			id plist = [pbItem propertyListForType: EWNoteDragType];
+			COPersistentRoot *notePersistentRoot = [owner.editingContext persistentRootForUUID: [ETUUID UUIDWithString: plist]];
+			ETAssert(notePersistentRoot != nil);
+			
+			COObject *noteRootObject = [notePersistentRoot rootObject];
+			
+			[tag addObject: noteRootObject];
+		}
+		
+		[self.owner commitWithIdentifier: @"tag-note" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
 	}
 	
-	[self.owner commitWithIdentifier: @"tag-note" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
-	
 	return YES;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pb
+{
+	if ([items count] != 1)
+		return NO;
+	
+	if (![items[0] isTag])
+		return NO;
+	
+	NSMutableArray *pbItems = [NSMutableArray array];
+    
+	for (COObject *item in items)
+	{
+		NSPasteboardItem *pbitem = [[NSPasteboardItem alloc] init];
+		[pbitem setPropertyList: [[item UUID] stringValue] forType: EWTagDragType];
+		[pbItems addObject: pbitem];
+	}
+	
+	[pb clearContents];
+	return [pb writeObjects: pbItems];
 }
 
 @end
