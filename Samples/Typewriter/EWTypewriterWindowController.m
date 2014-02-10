@@ -327,6 +327,13 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 			[self commitWithIdentifier: @"delete-tag" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
 			[tagListDataSource reloadData];
 		}
+		if ([self selectedTagGroup] != nil)
+		{
+			COTagGroup *tagGroup = [self selectedTagGroup];
+			[[[self tagLibrary] mutableArrayValueForKey: @"tagGroups"] removeObject: tagGroup];
+			[self commitWithIdentifier: @"delete-tag-group" descriptionArguments: @[tagGroup.name != nil ? tagGroup.name : @""]];
+			[tagListDataSource reloadData];
+		}
 	}
 }
 
