@@ -4,7 +4,7 @@ TODO
 First alpha release blockers
 ----------------------------
 
-- Add some collection-oriented KVO update tests to TestObjectUpdate
+- Fix EtoileUI test suite crash on assertion in -checkIsNotRemoveFromContext
 
 - Fix test suite compilation on GNUstep
 
@@ -12,25 +12,22 @@ First alpha release blockers
 
 - Fix GNUstep support
 
-  - Samples
-
   - All tests pass for both CoreObject and EtoileUI test suite
-  
-  - Support benchmark suite on GNUstep
 
 - Remove deprecated -type and -shortDescription in CORevision (all EtoileUI-based applications need to be check)
 
-- Check and update all Core API documentation (underway)
+- Check and update all Core, Model, Undo and Utilities API documentation (underway)
 
-	- Already reviewed classes: COObjectGraphContext, COEditingContext, COBranch
+	- Already reviewed classes
+
+		- Core: COObjectGraphContext, COEditingContext, COBranch, CORevision, COQuery
+		- Model: all
+		- Undo: COUndoTrack, COCommand, COSingleCommand, COCommandGroup
+		- Utitilies: none
 
 - Check code quality for all Core classes (underway)
 
 	- Already reviewed classes: COObjectGraphContext, COEditingContext, COBranch
-
-- Write remaing class descriptions
-
-- API Documentation output for Core, Mode, Undo and Utilities
 
 - iOS 5 and higher support (if I manage to finish it in the next two weeks - Quentin)
 
@@ -53,6 +50,10 @@ Future Work
 		- At the same time, we could remove -Wno-sign-compare in CoreObject target too (used to inhibit some -Wextra warnings)
 
 - GNUstep
+
+  - Port Samples
+  
+  - Port benchmark suite
 
   - Add -URLByAppendingPathComponent:isDirectory: and -fileHandleForReadingFromURL:error: to GNUstep (see COSQLiteStore+Attachments)
 
@@ -247,11 +248,16 @@ the following situations at least:
     - the simplest solution could be to return NO and let subclasses override it to return YES (e.g. for the rare case, where the user wants to have hand-written accessors + automatic KVO notifications for some transient properties) 
 	- or to return NO and just forbid overriding it (since returning YES seems almost useless if we synthesize accessors, and we support @dynamic even for transient properties)
 	- check +[COObject automaticallyNotifiesObserversForKey:] doesn't break KVO notifications for transient and non-derived properties in EtoileUI subclasses
+	
+  - Add some collection-oriented KVO update tests to TestObjectUpdate
+
 
 - COObjectGraphContext
 
   - Test -[COObjectGraphContext discardAllChanges] during synchronization. It's important to use 
     -reloadAtRevision: and not -setCurrentRevision: here, otherwise -supportsRevert would go our way
+
+  - Test nil univalued relationship case (see r10270)
 
 
 - COItem
