@@ -364,16 +364,24 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 - (void) selectNote: (COPersistentRoot *)aNote
 {
 	selectedNote = aNote;
-	NSLog(@"Select %@", selectedNote);
 	
 	TypewriterDocument *doc = [selectedNote rootObject];
-	
-	[textStorage removeLayoutManager: [textView layoutManager]];
-	textStorage = nil;
-	
-	textStorage = [[COAttributedStringWrapper alloc] initWithBacking: [doc attrString]];
-	[textStorage addLayoutManager: [textView layoutManager]];
-	[textStorage setDelegate: self];
+
+	if ([doc attrString] != [textStorage backing])
+	{
+		NSLog(@"Select %@. Old text storage: %p", selectedNote, textStorage);
+
+		textStorage = [[COAttributedStringWrapper alloc] initWithBacking: [doc attrString]];
+		[textStorage setDelegate: self];
+		
+		[textView.layoutManager replaceTextStorage: textStorage];
+
+		NSLog(@"TV's ts: %p, New Text storage; %p", [textView textStorage], textStorage);
+	}
+	else
+	{
+		NSLog(@"selectNote: the attributed string hasn't changed");
+	}
 	
 	// Set window title
 	if (selectedNote.metadata[@"label"] != nil)
