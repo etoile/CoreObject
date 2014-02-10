@@ -117,7 +117,7 @@ static NSArray *CompositeReachableObjectsFromObject(COObject *anObject)
 				[result addObject: subvalue];
             }
         }
-        else
+        else if (value != nil)
         {
 			[result addObject: value];
 		}
