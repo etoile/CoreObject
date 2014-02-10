@@ -518,7 +518,7 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 		[tag addObject: noteRootObject];
 	}
 	
-	[self.owner commitWithIdentifier: @"tag-note" descriptionArguments: @[]];
+	[self.owner commitWithIdentifier: @"tag-note" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
 	
 	return YES;
 }

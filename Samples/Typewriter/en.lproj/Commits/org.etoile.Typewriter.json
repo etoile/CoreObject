@@ -2,6 +2,7 @@
     "types":
 	{
 		"renaming": "Object Renaming",
+		"tagging": "Object Tagging",
 		"modification": "Modification",
 		"creation": "Object Creation",
 		"deletion": "Object Deletion",
@@ -27,7 +28,11 @@
 			"type": "renaming",
 			"shortDescription": "Rename note from '%@' to '%@'"
 		},
-		
+		"tag-note":
+		{
+			"type": "tagging",
+			"shortDescription": "Tag note as '%@'"
+		},
 		
 		
 		"delete-tag":
