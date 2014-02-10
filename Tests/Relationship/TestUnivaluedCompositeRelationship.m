@@ -115,7 +115,9 @@
 
 - (void)testNullAllowedForUnivalued
 {
+	UKNotNil(parent.child);
 	UKDoesNotRaiseException([parent setChild: nil]);
+	UKNil(parent.child);
 }
 
 - (void)testNullAndNSNullEquivalent
@@ -123,6 +125,12 @@
 	UKNotNil(parent.child);
 	UKDoesNotRaiseException(parent.child = (Child *)[NSNull null]);
 	UKNil(parent.child);
+}
+
+- (void)testNullCompositeDuringCompositeValidation
+{
+	[parent setChild: nil];
+	UKDoesNotRaiseException([parent.objectGraphContext checkForCyclesInCompositeRelationshipsFromObject: parent]);
 }
 
 @end

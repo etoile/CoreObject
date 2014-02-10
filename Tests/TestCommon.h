@@ -9,6 +9,8 @@
 #import <UnitKit/UnitKit.h>
 #import <CoreObject/CoreObject.h>
 
+#import "COObjectGraphContext+GarbageCollection.h"
+
 #import "COSynchronizerRevision.h"
 #import "COSynchronizerPushedRevisionsToClientMessage.h"
 #import "COSynchronizerPushedRevisionsFromClientMessage.h"

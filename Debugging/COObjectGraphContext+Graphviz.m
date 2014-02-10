@@ -38,6 +38,10 @@ static NSString *COGraphvizNodeNameForObject(id anObject)
 	{
 		return COGraphvizNodeNameForPath(anObject);
 	}
+	else if (anObject == [NSNull null])
+	{
+		return @"Null";
+	}
 	assert(0);
 	return nil;
 }
