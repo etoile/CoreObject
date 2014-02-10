@@ -175,6 +175,31 @@
     }
 }
 
+- (void) testUndoCreateBranchWithMetadata
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx commit];
+    
+    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
+	secondBranch.metadata = @{ @"some" : @"metadata" };
+    [ctx commitWithUndoTrack: _testTrack];
+	
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+		
+		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
+		
+        UKFalse([ctx2secondBranch isDeleted]);
+        [testTrack undo];
+        UKTrue([ctx2secondBranch isDeleted]);
+        [testTrack redo];
+        UKFalse([ctx2secondBranch isDeleted]);
+    }
+}
+
 - (void) testUndoCreateBranchAndSetCurrent
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
@@ -317,6 +342,27 @@
 - (void) testUndoCreatePersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    [ctx commitWithUndoTrack: _testTrack];
+    
+    // Load in another context
+    {
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+		
+		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
+		
+        UKFalse([ctx2persistentRoot isDeleted]);
+        [testTrack undo];
+        UKTrue([ctx2persistentRoot isDeleted]);
+        [testTrack redo];
+        UKFalse([ctx2persistentRoot isDeleted]);
+    }
+}
+
+- (void) testUndoCreatePersistentRootWithMetadata
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	persistentRoot.metadata = @{ @"some" : @"new metadata" };
     [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context

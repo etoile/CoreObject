@@ -509,11 +509,9 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (void) saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn
 {
-	// FIXME: This also rejects changes during undeleted->deleted transition,
-	// while COBranch's equivalent doesn't. Probably should allow changes
-	// to be combined with deletion in a single commit; change that
-	// and add tests for that.
-	if ([self hasChanges] && self.isDeleted)
+	if ([self hasChanges]
+		&& self.isDeleted
+		&& [[self persistentRootInfo] isDeleted])
 	{
 		[NSException raise: NSGenericException
 					format: @"Attempted to commit changes to deleted persistent root %@", self];
