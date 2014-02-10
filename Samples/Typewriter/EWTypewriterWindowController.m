@@ -217,6 +217,28 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	[noteListDataSource reloadData];
 }
 
+- (IBAction) duplicate:(id)sender
+{
+	if ([[self window] firstResponder] == notesTable)
+	{
+		NSArray *selections = [self selectedNotePersistentRoots];
+		if ([selections count] == 0)
+			return;
+		
+		COPersistentRoot *selectedPersistentRoot = selections[0];
+		COPersistentRoot *copyOfSelection = [selectedPersistentRoot.currentBranch makePersistentRootCopy];
+
+		NSString *sourceLabel = selectedPersistentRoot.metadata[@"label"];
+		
+		NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: copyOfSelection.metadata];
+		[md addEntriesFromDictionary: @{ @"label" : [NSString stringWithFormat: @"Copy of %@", sourceLabel] }];
+		copyOfSelection.metadata = md;
+		
+		[self commitWithIdentifier: @"duplicate-note" descriptionArguments: @[sourceLabel]];
+		[noteListDataSource reloadData];
+	}
+}
+
 #pragma mark - EWUndoManagerDelegate
 
 - (void) undo

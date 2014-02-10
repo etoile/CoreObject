@@ -792,6 +792,14 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="NSOnImage" ref="34833285"/>
 						<reference key="NSMixedImage" ref="364306784"/>
 					</object>
+					<object class="NSMenuItem" id="468336720">
+						<reference key="NSMenu" ref="745608519"/>
+						<string key="NSTitle">Duplicate Note</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="34833285"/>
+						<reference key="NSMixedImage" ref="364306784"/>
+					</object>
 					<object class="NSMenuItem" id="382729460">
 						<reference key="NSMenu" ref="745608519"/>
 						<bool key="NSIsDisabled">YES</bool>
@@ -902,6 +910,14 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="destination" ref="351973014"/>
 					</object>
 					<int key="connectionID">100276</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">duplicate:</string>
+						<reference key="source" ref="613418571"/>
+						<reference key="destination" ref="468336720"/>
+					</object>
+					<int key="connectionID">100278</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1207,6 +1223,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<reference ref="387794810"/>
 							<reference ref="168366984"/>
 							<reference ref="382729460"/>
+							<reference ref="468336720"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Notes context menu</string>
@@ -1224,6 +1241,11 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<object class="IBObjectRecord">
 						<int key="objectID">100272</int>
 						<reference key="object" ref="382729460"/>
+						<reference key="parent" ref="745608519"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100277</int>
+						<reference key="object" ref="468336720"/>
 						<reference key="parent" ref="745608519"/>
 					</object>
 				</array>
@@ -1271,6 +1293,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 				<string key="100266.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100267.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100272.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100277.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="5.IBWindowTemplateEditedContentRect">{{133, 170}, {507, 413}}</string>
 				<string key="6.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1279,7 +1302,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100276</int>
+			<int key="maxID">100278</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1298,6 +1321,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<string key="addNote:">id</string>
 						<string key="addTag:">id</string>
 						<string key="addTagGroup:">id</string>
+						<string key="duplicate:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="addNote:">
@@ -1310,6 +1334,10 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						</object>
 						<object class="IBActionInfo" key="addTagGroup:">
 							<string key="name">addTagGroup:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="duplicate:">
+							<string key="name">duplicate:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 					</dictionary>

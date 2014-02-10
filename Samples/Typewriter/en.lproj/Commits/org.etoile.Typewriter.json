@@ -33,7 +33,11 @@
 			"type": "tagging",
 			"shortDescription": "Tag note as '%@'"
 		},
-		
+		"duplicate-note":
+		{
+			"type": "creation",
+			"shortDescription": "Duplicate '%@'"
+		},
 		
 		"delete-tag":
 		{

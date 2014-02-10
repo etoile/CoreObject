@@ -39,6 +39,7 @@
 - (IBAction) addTag:(id)sender;
 - (IBAction) addTagGroup:(id)sender;
 - (IBAction) addNote:(id)sender;
+- (IBAction) duplicate:(id)sender;
 
 @end
 
