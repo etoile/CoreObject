@@ -862,7 +862,9 @@ See +[NSObject typePrefix]. */
 	{
 		// TODO: In debugging mode, we could check the class of the value
 		// is permitted
-		storageValue = [aValue copy];
+		// TODO: Once EtoileUI is migrated to serialization transformers,
+		// replace [self isCoreObjectValue: aValue] by [propertyDesc isPersistent]
+		storageValue = ([self isCoreObjectValue: aValue] ? [aValue copy] : aValue);
 	}
 	
 	[_variableStorage setObject: storageValue
@@ -962,25 +964,22 @@ See +[NSObject typePrefix]. */
 conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
 	ETAssert(_objectGraphContext != nil);
-	
+
+	// TODO: We should move this nil check inside -isValidValue:type:
 	// nil is an allowed value for all CoreObject univalued property types
 	if (singleValue == nil)
 		return;
 	
-	ETEntityDescription *newValueEntityDesc = [[_objectGraphContext modelDescriptionRepository] entityDescriptionForClass: [singleValue class]];
+	ETEntityDescription *newValueEntityDesc = [[_objectGraphContext modelDescriptionRepository]
+		entityDescriptionForClass: [singleValue class]];
 	ETAssert(newValueEntityDesc != nil);
-	const BOOL validType = [newValueEntityDesc isKindOfEntity: [propertyDesc type]];
 	
-	if (validType)
+	if ([[propertyDesc type] isValidValue: singleValue type: newValueEntityDesc])
 		return;
 	
-	// HACK: Special case for BOOL
-	if ([singleValue isKindOfClass: [NSNumber class]]
-		&& [[[propertyDesc type] name] isEqualToString: @"BOOL"])
-		return;
-	
-	[NSException raise: NSGenericException
-				format: @"single value '%@' (entity %@) does not conform to type %@ (property %@)", singleValue, newValueEntityDesc, [propertyDesc type], propertyDesc];
+	[NSException raise: NSInvalidArgumentException
+	            format: @"single value '%@' (entity %@) does not conform to type %@ (property %@)",
+	                    singleValue, newValueEntityDesc, [propertyDesc type], propertyDesc];
 }
 
 - (void)validateTypeForNewValue: (id)newValue
