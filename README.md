@@ -106,9 +106,9 @@ Key Features
 	- Favor JSON formats
 	- Create a Persistent Object and save it in 3 loc
 
-		COEditingContext *ctx = [COEditingContext contextWithURL: [NSURL fileURLWithPath: @"TestStore.db"]];
-		COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
-		[persistentRoot commit];
+			COEditingContext *ctx = [COEditingContext contextWithURL: [NSURL fileURLWithPath: @"TestStore.db"]];
+			COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
+			[persistentRoot commit];
 
 
 Build and Install
