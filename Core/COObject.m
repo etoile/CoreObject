@@ -864,6 +864,9 @@ See +[NSObject typePrefix]. */
 		// is permitted
 		// TODO: Once EtoileUI is migrated to serialization transformers,
 		// replace [self isCoreObjectValue: aValue] by [propertyDesc isPersistent]
+		// (Also, remember it will affect COSerialization's value transformer support,
+		// since if a value transformer is in use you can have random NSObjects in the
+		// variable storage --Eric)
 		storageValue = ([self isCoreObjectValue: aValue] ? [aValue copy] : aValue);
 	}
 	
