@@ -98,10 +98,6 @@
  * library per CoreObject store. See -[COEditingContext tagLibrary].
  */
 @interface COTagLibrary : COLibrary
-{
-	@private
-	NSMutableArray *_tagGroups;
-}
 
 /** @taskunit Organizing Tags */
 

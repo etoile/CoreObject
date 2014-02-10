@@ -100,7 +100,7 @@
 
 @implementation COTagLibrary
 
-@synthesize tagGroups = _tagGroups;
+@dynamic tagGroups;
 
 + (ETEntityDescription *)newEntityDescription
 {
@@ -134,7 +134,6 @@
 
 	[self setIdentifier: kCOLibraryIdentifierTag];
 	[self setName: _(@"Tags")];
-	_tagGroups = [[NSMutableArray alloc] init];
 	return self;
 }
 
