@@ -31,11 +31,8 @@
  * an NSUndoManager subclass (e.g., NSWindowDelegate -windowWillReturnUndoManager).
  */
 @interface EWUndoManager : NSObject
-{
-    id<EWUndoManagerDelegate> __weak delegate_;
-}
 
-- (void) setDelegate: (id<EWUndoManagerDelegate>)delegate;
+@property (nonatomic, readwrite, unsafe_unretained) id<EWUndoManagerDelegate> delegate;
 
 - (void) undo;
 - (void) redo;
