@@ -15,7 +15,7 @@
 {
 	NSMutableSet *oldSelection;
 }
-@property (nonatomic, weak) EWTypewriterWindowController *owner;
+@property (nonatomic, unsafe_unretained) EWTypewriterWindowController *owner;
 @property (nonatomic, strong) NSOutlineView *outlineView;
 - (void)reloadData;
 @end
@@ -24,7 +24,7 @@
 {
 	NSMutableSet *oldSelection;
 }
-@property (nonatomic, weak) EWTypewriterWindowController *owner;
+@property (nonatomic, unsafe_unretained) EWTypewriterWindowController *owner;
 @property (nonatomic, strong) NSTableView *tableView;
 - (void)reloadData;
 @end
