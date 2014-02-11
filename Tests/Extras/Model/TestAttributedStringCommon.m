@@ -132,6 +132,20 @@ ETUUID *AttributedString2UUID()
 	UKIntsEqual(expectedRange.length, actualRange.length);
 }
 
+- (void) checkAttributedString: (NSAttributedString *)attrStr equalsHTML: (NSString *)html
+{
+	COObjectGraphContext *expectedCtx = [self makeAttributedStringWithHTML: html];
+	COAttributedStringWrapper *expectedAttrStr = [[COAttributedStringWrapper alloc] initWithBacking: [expectedCtx rootObject]];
+	
+	UKObjectsEqual(expectedAttrStr, attrStr);
+}
+
+- (void) checkCOAttributedString: (COAttributedString *)coAttrStr equalsHTML: (NSString *)html
+{
+	COAttributedStringWrapper *attrStr = [[COAttributedStringWrapper alloc] initWithBacking: coAttrStr];
+	[self checkAttributedString: attrStr equalsHTML: html];
+}
+
 - (void) setFontTraits: (NSFontSymbolicTraits)traits inRange: (NSRange)aRange inTextStorage: (NSTextStorage *)target
 {
 	NSFont *font = [[NSFontManager sharedFontManager] convertFont: [NSFont userFontOfSize: 12] toHaveTrait: traits];

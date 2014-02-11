@@ -336,8 +336,9 @@
 	 
 	 */
 	
-	UKObjectsEqual(A(@"He",    @"ll",         @"o"), [serverStr valueForKeyPath: @"chunks.text"]);
-	UKObjectsEqual(A(S(@"b"),  S(@"b", @"u"), S(@"u")), [serverStr valueForKeyPath: @"chunks.attributes.htmlCode"]);
+	UKObjectsEqual(@"Hello", [serverWrapper string]);
+	[self checkFontHasTraits: NSFontBoldTrait withLongestEffectiveRange: NSMakeRange(0,4) inAttributedString: serverWrapper];
+	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(2, 3) inAttributedString: serverWrapper];
 }
 
 #pragma mark - COAttributedString

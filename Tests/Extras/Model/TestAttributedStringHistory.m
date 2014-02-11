@@ -64,7 +64,7 @@
 			
 			UKObjectsEqual(@"x", chunk0.text);
 			UKObjectsEqual(@"y", chunk1.text);
-			UKObjectsEqual(@"u", underlineAttr.htmlCode);
+			//UKObjectsEqual(@"u", underlineAttr.htmlCode);
 			UKObjectsEqual(A(chunk0, chunk1), root.chunks);
 			UKObjectsEqual(S(), chunk0.attributes);
 			UKObjectsEqual(S(underlineAttr), chunk1.attributes);

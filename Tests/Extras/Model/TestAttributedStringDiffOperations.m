@@ -25,8 +25,7 @@
 	NSInteger delta = [op applyOperationToAttributedString: [target rootObject] withOffset: 0];
 	UKIntsEqual(2, delta);
 
-	UKObjectsEqual(A(@"(", @"X", @"Y", @")"), [[target rootObject] valueForKeyPath: @"chunks.text"]);
-	UKObjectsEqual(A(S(@"i"), S(@"b"), S(@"u"), S(@"i")), [[target rootObject] valueForKeyPath: @"chunks.attributes.htmlCode"]);
+	[self checkCOAttributedString: [target rootObject] equalsHTML: @"<I>(</I><B>X</B><U>Y</U><I>)</I>"];
 }
 
 - (void) testDeleteRange
@@ -40,8 +39,7 @@
 	NSInteger delta = [op applyOperationToAttributedString: [target rootObject] withOffset: 0];
 	UKIntsEqual(-5, delta);
 	
-	UKObjectsEqual(A(@"ab", @"hi"), [[target rootObject] valueForKeyPath: @"chunks.text"]);
-	UKObjectsEqual(A(S(@"b"), S(@"i")), [[target rootObject] valueForKeyPath: @"chunks.attributes.htmlCode"]);
+	[self checkCOAttributedString: [target rootObject] equalsHTML: @"<B>ab</B><I>hi</I>"];
 }
 
 - (void) testReplaceRange
@@ -57,8 +55,7 @@
 	NSInteger delta = [op applyOperationToAttributedString: [target rootObject] withOffset: 0];
 	UKIntsEqual(-3, delta);
 	
-	UKObjectsEqual(A(@"ab", @"X", @"Y", @"hi"), [[target rootObject] valueForKeyPath: @"chunks.text"]);
-	UKObjectsEqual(A(S(@"b"), S(@"i"), S(@"u"), S(@"i")), [[target rootObject] valueForKeyPath: @"chunks.attributes.htmlCode"]);
+	[self checkCOAttributedString: [target rootObject] equalsHTML: @"<B>ab</B><I>X</I><U>Y</U><I>hi</I>"];
 }
 
 - (void) testAddAttribute
@@ -77,8 +74,7 @@
 	NSInteger delta = [op applyOperationToAttributedString: [target rootObject] withOffset: 0];
 	UKIntsEqual(0, delta);
 	
-	UKObjectsEqual(A(@"Hello ", @"World"), [[target rootObject] valueForKeyPath: @"chunks.text"]);
-	UKObjectsEqual(A(S(), S(@"b")), [[target rootObject] valueForKeyPath: @"chunks.attributes.htmlCode"]);
+	[self checkCOAttributedString: [target rootObject] equalsHTML: @"Hello <B>World</B>"];
 }
 
 - (void) testRemoveAttribute
@@ -97,8 +93,7 @@
 	NSInteger delta = [op applyOperationToAttributedString: [target rootObject] withOffset: 0];
 	UKIntsEqual(0, delta);
 	
-	UKObjectsEqual(A(@"Hello ", @"World"), [[target rootObject] valueForKeyPath: @"chunks.text"]);
-	UKObjectsEqual(A(S(@"b"), S()), [[target rootObject] valueForKeyPath: @"chunks.attributes.htmlCode"]);
+	[self checkCOAttributedString: [target rootObject] equalsHTML: @"<B>Hello </B>World"];
 }
 
 @end

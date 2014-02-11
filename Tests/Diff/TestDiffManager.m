@@ -155,14 +155,6 @@
 		
 		COAttributedStringWrapper *w2 = [[COAttributedStringWrapper alloc] initWithBacking: attributedString2];
 		UKObjectsEqual(@"hello world", [w2 string]);
-		
-		// These fail because the string is split up too much
-		
-//		UKObjectsEqual(A(@"this ", @"isn't", @" a big test"), [attributedString valueForKeyPath: @"chunks.text"]);
-//		UKObjectsEqual(A(S(@"i"), S(@"b", @"i"), S(@"i")), [attributedString valueForKeyPath: @"chunks.attributes.htmlCode"]);
-
-		UKObjectsEqual(A(@"hello world"), [attributedString2 valueForKeyPath: @"chunks.text"]);
-		UKObjectsEqual(A(S()), [attributedString2 valueForKeyPath: @"chunks.attributes.htmlCode"]);
 	}
 }
 

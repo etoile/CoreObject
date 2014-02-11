@@ -40,6 +40,10 @@ ETUUID *AttributedString2UUID();
 			  withBranchB: (NSString *)branchB
 					gives: (NSString *)result;
 
+- (void) checkAttributedString: (NSAttributedString *)attrStr equalsHTML: (NSString *)html;
+
+- (void) checkCOAttributedString: (COAttributedString *)coAttrStr equalsHTML: (NSString *)html;
+
 #pragma mark - test infrastructure
 
 - (void) checkDiffHTML: (NSString*)stringA withHTML: (NSString *)stringB givesOperations: (NSSet*)aSet;
