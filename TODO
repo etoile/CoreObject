@@ -22,7 +22,7 @@ First alpha release blockers
 
 		- Core: COObjectGraphContext, COEditingContext, COBranch, CORevision, COQuery
 		- Model: all
-		- Undo: COUndoTrack, COCommand, COSingleCommand, COCommandGroup
+		- Undo: all 
 		- Utitilies: none
 
 - Check code quality for all Core classes (underway)
