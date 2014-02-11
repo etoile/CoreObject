@@ -174,7 +174,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 							 error: NULL];
     aContext.isRecordingUndo = YES;
     
-	COCommandGroup *rewrittenEdit = appliedEdit;// [appliedEdit rewrittenCommandAfterCommitInContext: aContext];
+	COCommandGroup *rewrittenEdit = appliedEdit;
 	
 	COCommandGroup *editToPush = edit;//(isUndo ? [rewrittenEdit inverse] : rewrittenEdit);
 	editToPush.UUID = rewrittenEdit.UUID;

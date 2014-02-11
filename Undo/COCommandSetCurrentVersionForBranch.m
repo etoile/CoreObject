@@ -185,36 +185,6 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     }
 }
 
-- (COCommandSetCurrentVersionForBranch *) rewrittenCommandAfterCommitInContext: (COEditingContext *)aContext
-{
-	if (_currentRevisionBeforeSelectiveApply != nil)
-	{
-		NILARG_EXCEPTION_TEST(aContext);
-		
-		COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
-		COBranch *branch = [proot branchForUUID: _branchUUID];
-		ETAssert(branch != nil);
-	
-		
-		COCommandSetCurrentVersionForBranch *rewritten = [[COCommandSetCurrentVersionForBranch alloc] init];
-		rewritten.storeUUID = _storeUUID;
-		rewritten.persistentRootUUID = _persistentRootUUID;
-		
-		rewritten.branchUUID = _branchUUID;
-		
-		rewritten.oldRevisionUUID = _currentRevisionBeforeSelectiveApply;
-		rewritten.revisionUUID = [[branch currentRevision] UUID];
-		rewritten.oldHeadRevisionUUID = _currentRevisionBeforeSelectiveApply;
-		rewritten.headRevisionUUID = [[branch currentRevision] UUID];
-		return rewritten;
-	}
-	else
-	{
-		return self;
-	}
-
-}
-
 - (NSString *)kind
 {
 	return _(@"Branch Version Change");

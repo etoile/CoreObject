@@ -71,24 +71,6 @@ extern NSString * const kCOCommandTimestamp;
  * <code>[command inverse]</code>.
  */
 - (COCommand *) inverse;
-/**
- * <override-dummy />
- * Returns a new command which can be applied or unapplied with semantics 
- * and observable results identical to the receiver in the given editing 
- * context.
- *
- * By default, returns self, but can be overriden to return a new command.
- *
- * This method exists to support turning a selective undo into a linear undo, 
- * and a selective redo into a linear redo. This results in a simpler command 
- * sequence or history in the undo track.
- *
- * Command Rewriting is unrelated to Undo Coalescing (see 
- * -[COUndoTrack beginUndoCoalescing]).
- *
- * Note: for now, this feature is disabled.
- */
-- (COCommand *) rewrittenCommandAfterCommitInContext: (COEditingContext *)aContext;
 
 // FIXME: Perhaps distinguish between edits that can't be applied and edits that
 // are already applied. (e.g. "create branch", but that branch already exists)
