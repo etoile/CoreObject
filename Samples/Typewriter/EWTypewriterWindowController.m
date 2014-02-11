@@ -158,6 +158,18 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	
 	[textView setDelegate: self];
 	
+	// Set initial text view contents
+	
+	if ([[self selectedNotePersistentRoots] count] > 0)
+	{
+		[self selectNote: [self selectedNotePersistentRoots][0]];
+	}
+	else
+	{
+		[self selectNote: nil];
+	}
+	
+	
 	// Observe editing context changes
 	
 	[[NSNotificationCenter defaultCenter] addObserver: self
@@ -364,6 +376,20 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 - (void) selectNote: (COPersistentRoot *)aNote
 {
 	selectedNote = aNote;
+	
+	if (selectedNote == nil)
+	{
+		// Nothing selected
+		NSLog(@"Nothing selected");
+		[textView setEditable: NO];
+		[textView setHidden: YES];
+		return;
+	}
+	else
+	{
+		[textView setEditable: YES];
+		[textView setHidden: NO];
+	}
 	
 	TypewriterDocument *doc = [selectedNote rootObject];
 
@@ -678,6 +704,10 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	if ([owner.notesTable selectedRow] >= 0 && [owner.notesTable selectedRow] < [rows count])
 	{
 		[owner selectNote: rows[[owner.notesTable selectedRow]]];
+	}
+	else
+	{
+		[owner selectNote: nil];
 	}
 }
 
