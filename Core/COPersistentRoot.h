@@ -262,9 +262,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
 @property (nonatomic, readonly) NSSet *branches;
 /**
  * All the branches marked as deleted on disk, excluding those that are pending 
- * undeletion.
- *
- * -branchesPendingDeletion are not included in the returned set.
+ * undeletion, plus those pending deletion.
  *
  * TODO: Document if the current branch UUID can appear among the returned 
  * branches.
