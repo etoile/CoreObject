@@ -20,6 +20,7 @@
     IBOutlet EWTextView *textView;
 	IBOutlet NSTableView *notesTable;
 	IBOutlet NSOutlineView *tagsOutline;
+	IBOutlet NSSearchField *searchfield;
 	
 	COAttributedStringWrapper *textStorage;
 	BOOL changedByUser;
@@ -40,6 +41,8 @@
 - (IBAction) addTagGroup:(id)sender;
 - (IBAction) addNote:(id)sender;
 - (IBAction) duplicate:(id)sender;
+
+- (IBAction) search: (id)sender;
 
 @end
 

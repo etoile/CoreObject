@@ -78,6 +78,27 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 		}
 	}]];
 	
+	// Filter by search query
+	// Very slow
+	
+	NSString *searchQuery = [searchfield stringValue];
+	[results filterUsingPredicate:
+	 [NSPredicate predicateWithBlock: ^(id object, NSDictionary *bindings) {
+		if ([searchQuery length] == 0)
+		{
+			return YES;
+		}
+		else
+		{
+			TypewriterDocument *doc = [object rootObject];
+			COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: doc.attrString];
+			NSString *docString = [as string];
+			
+			NSRange range = [docString rangeOfString: searchQuery];
+			return (BOOL)(range.location != NSNotFound);
+		}
+	}]];
+	
 	return results;
 }
 
@@ -449,6 +470,13 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 - (COTagGroup *)defaultTagGroup
 {
 	return [self tagLibrary].tagGroups[0];
+}
+
+#pragma mark - Search
+
+- (void)search:(id)sender
+{
+	[noteListDataSource reloadData];
 }
 
 @end
