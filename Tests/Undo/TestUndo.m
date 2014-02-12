@@ -505,35 +505,44 @@
     
     [root setLabel: @"doc1"];
     [ctx commitWithUndoTrack: _testTrack];
+	id<COTrackNode> node0 = [[_testTrack nodes] lastObject];
+
     [child1 setLabel: @"child1"];
     [ctx commitWithUndoTrack: _testTrack];
-    [root setLabel: @"doc1a"];
+    id<COTrackNode> node1 = [[_testTrack nodes] lastObject];
+	
+	[root setLabel: @"doc1a"];
     [ctx commitWithUndoTrack: _testTrack];
-    [child1 setLabel: @"child1a"];
+    id<COTrackNode> node2 = [[_testTrack nodes] lastObject];
+	
+	[child1 setLabel: @"child1a"];
     [ctx commitWithUndoTrack: _testTrack];
-	   
-	id<COTrackNode> node = [[_testTrack nodes] objectAtIndex: ([_testTrack count] - 2)];
-
+	id<COTrackNode> node3 = [[_testTrack nodes] lastObject];
+	
 	UKObjectsEqual(@"doc1a", [root label]);
 	UKObjectsEqual(@"child1a", [child1 label]);
 	
-    [_testTrack undoNode: node]; // selective undo doc1 -> doc1a
-
+    [_testTrack undoNode: node2]; // selective undo doc1 -> doc1a
+	id<COTrackNode> node4 = [[_testTrack nodes] lastObject];
+	
 	UKObjectsEqual(@"doc1", [root label]);
 	UKObjectsEqual(@"child1a", [child1 label]);
 
 	[_testTrack undo]; // undo the above -undoNode
 	
+	UKObjectsEqual(node3, [_testTrack currentNode]);
 	UKObjectsEqual(@"doc1a", [root label]);
 	UKObjectsEqual(@"child1a", [child1 label]);
 	
 	[_testTrack undo]; // undo child1 -> child1a
 	
+	UKObjectsEqual(node2, [_testTrack currentNode]);
 	UKObjectsEqual(@"doc1a", [root label]);
 	UKObjectsEqual(@"child1", [child1 label]);
 	
 	[_testTrack undo]; // undo doc1 -> doc1a
 	
+	UKObjectsEqual(node1, [_testTrack currentNode]);
 	UKObjectsEqual(@"doc1", [root label]);
 	UKObjectsEqual(@"child1", [child1 label]);
 }
