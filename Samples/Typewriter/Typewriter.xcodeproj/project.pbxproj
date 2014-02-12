@@ -26,6 +26,9 @@
 		66B7DB3718A96FD900010BCB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 663EFD2C18A17E270030BD2F /* Cocoa.framework */; };
 		66B7DB3818A96FEE00010BCB /* CoreObject.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 663EFD9318A180170030BD2F /* CoreObject.framework */; };
 		66B7DB3918A96FF500010BCB /* EtoileFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66B7DB2C18A96F9100010BCB /* EtoileFoundation.framework */; };
+		66EDFEC218ABFF9E00B29CFE /* EWUndoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EDFEBE18ABFF9E00B29CFE /* EWUndoWindowController.m */; };
+		66EDFEC318ABFF9E00B29CFE /* EWUtilityWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EDFEC018ABFF9E00B29CFE /* EWUtilityWindowController.m */; };
+		66EDFEC418ABFF9E00B29CFE /* Undo.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66EDFEC118ABFF9E00B29CFE /* Undo.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -146,6 +149,11 @@
 		667A9A8F18A5A34E009A2F0E /* document_stroke.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = document_stroke.icns; sourceTree = "<group>"; };
 		66B7DB1C18A96F2900010BCB /* EtoileFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EtoileFoundation.framework; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Typewriter-ewqruishaxmvlhhefeyihtxobbmk/Build/Products/Debug/EtoileFoundation.framework"; sourceTree = "<group>"; };
 		66B7DB2218A96F9100010BCB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../../../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
+		66EDFEBD18ABFF9E00B29CFE /* EWUndoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWUndoWindowController.h; path = ../CommonUI/EWUndoWindowController.h; sourceTree = "<group>"; };
+		66EDFEBE18ABFF9E00B29CFE /* EWUndoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWUndoWindowController.m; path = ../CommonUI/EWUndoWindowController.m; sourceTree = "<group>"; };
+		66EDFEBF18ABFF9E00B29CFE /* EWUtilityWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWUtilityWindowController.h; path = ../CommonUI/EWUtilityWindowController.h; sourceTree = "<group>"; };
+		66EDFEC018ABFF9E00B29CFE /* EWUtilityWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWUtilityWindowController.m; path = ../CommonUI/EWUtilityWindowController.m; sourceTree = "<group>"; };
+		66EDFEC118ABFF9E00B29CFE /* Undo.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = Undo.xib; path = ../CommonUI/Undo.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,6 +176,7 @@
 				663EFD8818A180150030BD2F /* CoreObject.xcodeproj */,
 				66B7DB2218A96F9100010BCB /* EtoileFoundation.xcodeproj */,
 				663EFD3218A17E270030BD2F /* Typewriter */,
+				66EDFEB618ABFF9100B29CFE /* CommonUI */,
 				663EFD2B18A17E270030BD2F /* Frameworks */,
 				663EFD2A18A17E270030BD2F /* Products */,
 				664CC9EE18A4A321002F04B7 /* Resources */,
@@ -274,6 +283,18 @@
 				66B7DB3018A96F9100010BCB /* PlugInExample.plugin */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		66EDFEB618ABFF9100B29CFE /* CommonUI */ = {
+			isa = PBXGroup;
+			children = (
+				66EDFEBD18ABFF9E00B29CFE /* EWUndoWindowController.h */,
+				66EDFEBE18ABFF9E00B29CFE /* EWUndoWindowController.m */,
+				66EDFEBF18ABFF9E00B29CFE /* EWUtilityWindowController.h */,
+				66EDFEC018ABFF9E00B29CFE /* EWUtilityWindowController.m */,
+				66EDFEC118ABFF9E00B29CFE /* Undo.xib */,
+			);
+			name = CommonUI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -406,6 +427,7 @@
 				667A9A9018A5A34E009A2F0E /* document_stroke.icns in Resources */,
 				663EFD7B18A17FB30030BD2F /* Document.xib in Resources */,
 				664CC9F618A4A3FC002F04B7 /* plus_8x8.png in Resources */,
+				66EDFEC418ABFF9E00B29CFE /* Undo.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -417,10 +439,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				663EFD8518A17FB30030BD2F /* EWUndoManager.m in Sources */,
+				66EDFEC218ABFF9E00B29CFE /* EWUndoWindowController.m in Sources */,
 				663EFD8418A17FB30030BD2F /* EWTypewriterWindowController.m in Sources */,
 				663EFD8118A17FB30030BD2F /* EWDocument.m in Sources */,
 				664E93B518A1929300261673 /* TypewriterDocument.m in Sources */,
 				663EFD8018A17FB30030BD2F /* EWAppDelegate.m in Sources */,
+				66EDFEC318ABFF9E00B29CFE /* EWUtilityWindowController.m in Sources */,
 				663EFD8618A17FB30030BD2F /* main.m in Sources */,
 				663EFD8318A17FB30030BD2F /* EWTextView.m in Sources */,
 			);
