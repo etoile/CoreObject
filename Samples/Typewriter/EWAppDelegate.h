@@ -9,4 +9,7 @@
 #import <CoreObject/CoreObject.h>
 
 @interface EWAppDelegate : NSObject
+
+- (IBAction) orderFrontTypewriter: (id)sender;
+
 @end

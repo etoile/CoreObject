@@ -31,10 +31,29 @@
 
 - (void) applicationDidFinishLaunching: (NSNotification*)notif
 {
+	[self makeDocument];
+}
+
+- (void) makeDocument
+{
 	EWDocument *doc = [[EWDocument alloc] initWithStoreURL: [EWAppDelegate defaultDocumentURL]];
 	[[NSDocumentController sharedDocumentController] addDocument: doc];
 	[doc makeWindowControllers];
 	[doc showWindows];
+}
+
+- (IBAction) orderFrontTypewriter: (id)sender
+{
+	NSDocumentController *dc = [NSDocumentController sharedDocumentController];
+	
+	if ([[dc documents] isEmpty])
+	{
+		[self makeDocument];
+	}
+	else
+	{
+		[[dc documents][0] showWindows];
+	}
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
