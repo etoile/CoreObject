@@ -33,7 +33,9 @@
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window
 {
-    return [[[NSDocumentController sharedDocumentController] currentDocument] undoManager];
+	NSWindow *appMainWindow = [[NSApplication sharedApplication] mainWindow];
+	NSAssert([self window] != appMainWindow, @"EWUtilityWindowController can only be used with panels (-canBecomeMainWindow must return NO)");
+    return [[[NSApplication sharedApplication] mainWindow] undoManager];
 }
 
 @end
