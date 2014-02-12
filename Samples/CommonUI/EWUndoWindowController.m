@@ -25,6 +25,27 @@
 {
     [table setDoubleAction: @selector(doubleClick:)];
     [table setTarget: self];
+	
+	[self update];
+}
+
+- (void) update
+{
+    [table reloadData];
+	[self validateButtons];
+		
+	if ([table numberOfRows] > 0)
+	{
+		NSUInteger idx = [[_track nodes] indexOfObject: [_track currentNode]];
+		if (idx != NSNotFound)
+		{
+			[table scrollRowToVisible: idx];
+		}
+		else
+		{
+			[table scrollRowToVisible: [table numberOfRows] - 1];
+		}
+	}
 }
 
 - (COUndoTrack *)undoTrack
@@ -47,20 +68,14 @@
 		_track = nil;
 	}
 	
-    [table reloadData];
-	[self validateButtons];
+	[self update];
 }
 
 - (void) undoStackDidChange: (NSNotification *)notif
 {
     NSLog(@"undo track did change: %@", [notif userInfo]);
 	
-    [table reloadData];
-	
-	if ([table numberOfRows] > 0)
-		[table scrollRowToVisible: [table numberOfRows] - 1];
-	
-	[self validateButtons];
+    [self update];
 }
 
 - (void) validateButtons
@@ -71,13 +86,14 @@
 	[selectiveUndo setEnabled: NO];
 	[selectiveRedo setEnabled: NO];
 	
-	id<COTrackNode> node = [self selectedNode];
-	const NSUInteger nodeIndex = [[_track nodes] indexOfObject: node];
-
-	if (node != nil && nodeIndex != NSNotFound)
-	{
-		[selectiveUndo setEnabled: YES];
-	}
+	id<COTrackNode> highlightedNode = [self selectedNode];
+	const NSUInteger highlightedNodeIndex = [[_track nodes] indexOfObject: highlightedNode];
+	const NSUInteger currentNodeIndex = [[_track nodes] indexOfObject: [_track currentNode]];
+	const BOOL canSelectiveUndo = (highlightedNode != nil
+								   && highlightedNode != [COEndOfUndoTrackPlaceholderNode sharedInstance]
+								   && highlightedNodeIndex != NSNotFound
+								   && highlightedNodeIndex < currentNodeIndex);
+	[selectiveUndo setEnabled: canSelectiveUndo];
 }
 
 /* Target/action */
