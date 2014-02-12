@@ -802,6 +802,52 @@
 	 {
 		 UKNil([[testProot objectGraphContext] loadedObjectForUUID: garbage.UUID]);
 	 }];
+	
+	// Implementation test: pull out the actual store revision and make sure it doesn't contain garbage
+	
+	COItemGraph *lastCommitDelta = [store partialItemGraphFromRevisionUUID: persistentRoot.currentRevision.parentRevision.UUID
+															toRevisionUUID: persistentRoot.currentRevision.UUID
+															persistentRoot: persistentRoot.UUID];
+	/* The last commit changed exactly 2 objects: rootObj (modified) and notGarbage (inserted */
+	UKObjectsEqual(S(rootObj.UUID, notGarbage.UUID), SA([lastCommitDelta itemUUIDs]));
+}
+
+- (void) testCommittedGarbageObjectsNotReloaded
+{
+	OutlineItem *garbage = [[OutlineItem alloc] initWithObjectGraphContext: [persistentRoot objectGraphContext]];
+	garbage.name = @"Garbage";
+	rootObj.contents = @[garbage];
+	[ctx commit];
+	
+	/* Sanity check - at this point, the 'garbage' object is still reachable (i.e., not yet garbage) */
+	
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKNotNil([[testProot objectGraphContext] loadedObjectForUUID: garbage.UUID]);
+	 }];
+	
+	/* Now delete 'garbage' from its parent, making it actually garbage */
+	
+	rootObj.contents = @[];
+	[ctx commit];
+	
+	/* When we reload the current revision in another editing context, we should
+	   not load the garbage object as a COObject.
+	 
+	   Rationale: while it IS still present in the item graph returned returned
+	   from the store (at least until another full snapshot happens in the store),
+	   there's no point loading it as a COObject since it's not reachable in the graph.
+	 */
+	
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 // FIXME: Failing
+#if 0
+		 UKNil([[testProot objectGraphContext] loadedObjectForUUID: garbage.UUID]);
+#endif
+	 }];
 }
 
 - (void) testCommitOnMultipleBranchesSimultaneously
