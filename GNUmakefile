@@ -96,6 +96,12 @@ CoreObjectDoc_DOC_FILES = \
 	Model/COGroup.h \
 	Model/COLibrary.h \
 	Model/COTag.h \
+	StorageDataModel/COAttachmentID.h \
+	StorageDataModel/COItemGraph.h \
+	StorageDataModel/COItem.h \
+	StorageDataModel/COItem+JSON.h \
+	StorageDataModel/COPath.h \
+	StorageDataModel/COType.h \
 	Undo/COCommand.h \
 	Undo/COCommandGroup.h \
 	Undo/COTrack.h \
