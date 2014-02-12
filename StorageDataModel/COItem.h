@@ -62,6 +62,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
 - (NSSet *) compositeReferencedItemUUIDs;
 - (NSSet *) referencedItemUUIDs;
+- (NSSet *) allInnerReferencedItemUUIDs;
 
 // GC helper methods
 - (NSArray *) attachments;

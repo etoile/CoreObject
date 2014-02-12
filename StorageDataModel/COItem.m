@@ -185,6 +185,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		{
 			for (ETUUID *embedded in [self allObjectsForAttribute: key])
 			{
+				// FIXME: May return COPath!
 				[result addObject: embedded];
 			}
 		}
@@ -192,6 +193,32 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	return [NSSet setWithSet: result];
 }
 
+- (NSSet *) allInnerReferencedItemUUIDs
+{
+	NSMutableSet *result = [NSMutableSet set];
+	
+	for (NSString *key in [self attributeNames])
+	{
+		COType type = [self typeForAttribute: key];
+		if (COTypePrimitivePart(type) == kCOTypeCompositeReference
+			|| COTypePrimitivePart(type) == kCOTypeReference)
+		{
+			for (id aChild in [self allObjectsForAttribute: key])
+			{
+				// Ignore cross-persistent root references
+				if ([aChild isKindOfClass: [COPath class]])
+					continue;
+				
+				// Ignore NSNull (that means the relationship is set to nil)
+				if ([aChild isKindOfClass: [NSNull class]])
+					continue;
+				
+				[result addObject: aChild];
+			}
+		}
+	}
+	return [NSSet setWithSet: result];
+}
 
 // Helper methods for doing GC
 

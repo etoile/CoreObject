@@ -10,6 +10,7 @@
 #import <EtoileFoundation/ETUUID.h>
 #import "COItem.h"
 #import "COItem+JSON.h"
+#import "COPath.h"
 
 @implementation COItemGraph
 
@@ -276,4 +277,35 @@ BOOL COItemGraphEqualToItemGraph(id<COItemGraph> first, id<COItemGraph> second)
     }
     
     return COItemGraphEqualToItemGraphComparingItemUUID(first, second, [first rootItemUUID]);
+}
+
+static void
+COItemGraphReachableUUIDsInternal(id<COItemGraph> aGraph, ETUUID *aUUID, NSMutableSet *result)
+{
+	if (![aUUID isKindOfClass: [ETUUID class]])
+	{
+		[NSException raise: NSInvalidArgumentException format: @"Expected ETUUID argument to COItemGraphReachableUUIDsInternal, got %@", aUUID];
+	}
+	
+	if ([result containsObject: aUUID])
+		return;
+	
+	[result addObject: aUUID];
+	
+    COItem *item = [aGraph itemForUUID: aUUID];
+    for (id aChild in [item allInnerReferencedItemUUIDs])
+    {
+        COItemGraphReachableUUIDsInternal(aGraph, aChild, result);
+    }
+}
+
+NSSet *
+COItemGraphReachableUUIDs(id<COItemGraph> aGraph)
+{
+    NSMutableSet *result = [NSMutableSet new];
+	if ([aGraph rootItemUUID] != nil)
+	{
+		COItemGraphReachableUUIDsInternal(aGraph, [aGraph rootItemUUID], result);
+	}
+	return result;
 }

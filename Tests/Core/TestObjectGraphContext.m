@@ -150,14 +150,39 @@
 	UKNotNil([ctx1 itemForUUID: [tag1 UUID]]);
 }
 
-- (void)testAddItem
+#pragma mark - -insertOrUpdateItems: and -setItemGraph:
+
+- (void) testSetItemGraphOnEmptyContextDoesNotCopyGarbage
+{
+	OutlineItem *child = [self addObjectWithLabel: @"child" toObject: root1];
+	OutlineItem *garbage = [self addObjectWithLabel: @"garbage" toContext: ctx1];
+	
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	UKFalse([ctx2 hasChanges]);
+	
+	[ctx2 setItemGraph: ctx1];
+	UKObjectsEqual(S(root1.UUID, child.UUID), SA([ctx2 itemUUIDs]));
+	UKObjectsEqual(@"root1", [[ctx2 loadedObjectForUUID: root1.UUID] label]);
+	UKObjectsEqual(@"child", [[ctx2 loadedObjectForUUID: child.UUID] label]);
+	UKNil([ctx2 loadedObjectForUUID: garbage.UUID]);
+	UKFalse([ctx2 hasChanges]);
+}
+
+- (void) testSetItemGraphLackingRootItem
+{
+	
+}
+
+- (void)testInsertItemWithInsertOrUpdateItems
 {
 	[ctx1 acceptAllChanges]; // TODO: Move to test -init
+	UKFalse([ctx1 hasChanges]);
 	
 	COMutableItem *mutableItem = [COMutableItem item];
     [mutableItem setValue: @"OutlineItem" forAttribute: kCOObjectEntityNameProperty type: kCOTypeString];
     [ctx1 insertOrUpdateItems: A(mutableItem)];
 	
+	UKTrue([ctx1 hasChanges]);
 	UKObjectsEqual(S(mutableItem.UUID), ctx1.insertedObjectUUIDs);
 	UKObjectsEqual(S(), ctx1.updatedObjectUUIDs);
 	
@@ -170,6 +195,24 @@
     UKObjectsEqual(@"hello", [mutableItem valueForAttribute: kCOLabel]);
     UKNil([object valueForKey: kCOLabel]);
 }
+
+- (void)testUpdateItemWithInsertOrUpdateItems
+{
+	[ctx1 acceptAllChanges]; // TODO: Move to test -init
+	UKFalse([ctx1 hasChanges]);
+	
+	COMutableItem *mutableItem = [[ctx1 itemForUUID: root1.UUID] mutableCopy];
+    [mutableItem setValue: @"test" forAttribute: kCOLabel type: kCOTypeString];
+    [ctx1 insertOrUpdateItems: A(mutableItem)];
+	
+	UKTrue([ctx1 hasChanges]);
+	UKObjectsEqual(S(), ctx1.insertedObjectUUIDs);
+	UKObjectsEqual(S(root1.UUID), ctx1.updatedObjectUUIDs);
+	
+    UKObjectsSame(root1, [ctx1 loadedObjectForUUID: [mutableItem UUID]]);
+}
+
+#pragma mark -
 
 - (void)testChangeTrackingBasic
 {

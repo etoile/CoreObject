@@ -100,3 +100,8 @@ COItemGraph *COItemGraphFromJSONPropertyLisy(id plist);
 COItemGraph *COItemGraphFromJSONData(NSData *json);
 
 BOOL COItemGraphEqualToItemGraph(id<COItemGraph> first, id<COItemGraph> second);
+
+/**
+ * If [aGraph rootItemUUID] is nil, returns the empty set
+ */
+NSSet *COItemGraphReachableUUIDs(id<COItemGraph> aGraph);

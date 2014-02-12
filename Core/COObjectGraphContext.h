@@ -220,6 +220,13 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 /**
  * Does the same than -insertOrUpdateItems:, but in addition discard 
  * change tracking (calls -acceptAllChanges).
+ *
+ * Only loads objects from aTree reachable from a DFS starting at the root object.
+ *
+ * As a special case, if both the receiver and aTree have a nil root object, 
+ * loads all objects from aTree.
+ * 
+ * FIXME: Document more corner cases (what causes exceptions to be thrown)
  */
 - (void)setItemGraph: (id <COItemGraph>)aTree;
 

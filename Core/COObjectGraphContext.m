@@ -321,6 +321,8 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (COItem *)itemForUUID: (ETUUID *)aUUID
 {
+	ETAssert([aUUID isKindOfClass: [ETUUID class]]);
+	
     COObject *object = [_loadedObjects objectForKey: aUUID];
 	
 	if (object != nil)
@@ -419,8 +421,17 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	NSParameterAssert(_rootObjectUUID == nil || [_rootObjectUUID isEqual: [aTree rootItemUUID]]);
     _rootObjectUUID =  [aTree rootItemUUID];
     
+	NSSet *aTreeReachableUUIDs = COItemGraphReachableUUIDs(aTree);
+	if ([aTreeReachableUUIDs count] == 0)
+	{
+		// Special case. Both the givem graph, and the receiver have no root UUID.
+		// In that case, just take all of the objects from the aTree
+		
+		aTreeReachableUUIDs = [NSSet setWithArray: [aTree itemUUIDs]];
+	}
+	
 	// Update change tracking
-	for (ETUUID *itemUUID in [aTree itemUUIDs])
+	for (ETUUID *itemUUID in aTreeReachableUUIDs)
 	{
 		if ([_loadedObjects objectForKey: itemUUID] != nil)
 		{
@@ -440,11 +451,11 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	// same than we do currently).
 	_loadingItemGraph = aTree;
 
-    for (ETUUID *uuid in [aTree itemUUIDs])
+    for (ETUUID *uuid in aTreeReachableUUIDs)
     {
         [self addItem: [aTree itemForUUID: uuid]];
     }
-	[self finishLoadingObjectsWithUUIDs: [aTree itemUUIDs]];
+	[self finishLoadingObjectsWithUUIDs: [aTreeReachableUUIDs allObjects]];
 
 	_loadingItemGraph = nil;
     

@@ -854,10 +854,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 // FIXME: Failing
-#if 0
 		 UKNil([[testProot objectGraphContext] loadedObjectForUUID: garbage.UUID]);
-#endif
 	 }];
 }
 

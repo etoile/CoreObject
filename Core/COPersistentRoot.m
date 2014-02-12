@@ -43,8 +43,8 @@ NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidCh
 - (void) validateNewObjectGraphContext: (COObjectGraphContext *)newContext
                            createdFrom: (COObjectGraphContext *)oldContext
 {
-	NSSet *newItemUUIDs = [NSSet setWithArray: [newContext itemUUIDs]];
-	NSSet *oldItemUUIDs = [NSSet setWithArray: [oldContext itemUUIDs]];
+	NSSet *newItemUUIDs = COItemGraphReachableUUIDs(newContext);
+	NSSet *oldItemUUIDs = COItemGraphReachableUUIDs(oldContext);
 
 	if ([newItemUUIDs isEqual: oldItemUUIDs])
 		return;
