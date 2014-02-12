@@ -6,8 +6,8 @@
  */
 
 #import "COLibrary.h"
-#import "COGroup.h"
 #import "COObjectGraphContext.h"
+#import "COSmartGroup.h"
 #import "COTag.h"
 #import "COPersistentRoot.h"
 

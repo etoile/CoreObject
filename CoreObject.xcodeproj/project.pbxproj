@@ -19,6 +19,9 @@
 		6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
 		606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 606E3DBF1787A07E00ED42DA /* COSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 606E3DC01787A07E00ED42DA /* COSerialization.m */; };
+		607335B418AB96A6008A02DC /* COSmartGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 607335B218AB96A6008A02DC /* COSmartGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		607335B518AB96A6008A02DC /* COSmartGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 607335B318AB96A6008A02DC /* COSmartGroup.m */; };
+		607335BD18AB96AD008A02DC /* COSmartGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 607335B318AB96A6008A02DC /* COSmartGroup.m */; };
 		607EB349178881E60024B34D /* CODictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 607EB347178881E60024B34D /* CODictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		607EB34A178881E60024B34D /* CODictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 607EB348178881E60024B34D /* CODictionary.m */; };
 		60884D411837B09800C5C7C9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60884D401837B09800C5C7C9 /* AppKit.framework */; };
@@ -523,6 +526,8 @@
 		6043D4C817575D7A002103CC /* COCommitDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCommitDescriptor.m; path = Utilities/COCommitDescriptor.m; sourceTree = "<group>"; };
 		606E3DBF1787A07E00ED42DA /* COSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSerialization.h; path = Core/COSerialization.h; sourceTree = "<group>"; };
 		606E3DC01787A07E00ED42DA /* COSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSerialization.m; path = Core/COSerialization.m; sourceTree = "<group>"; };
+		607335B218AB96A6008A02DC /* COSmartGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSmartGroup.h; path = Model/COSmartGroup.h; sourceTree = "<group>"; };
+		607335B318AB96A6008A02DC /* COSmartGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSmartGroup.m; path = Model/COSmartGroup.m; sourceTree = "<group>"; };
 		607EB347178881E60024B34D /* CODictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODictionary.h; path = Model/CODictionary.h; sourceTree = "<group>"; };
 		607EB348178881E60024B34D /* CODictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODictionary.m; path = Model/CODictionary.m; sourceTree = "<group>"; };
 		60884D401837B09800C5C7C9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -1474,6 +1479,8 @@
 				607EB348178881E60024B34D /* CODictionary.m */,
 				609C00A61704C3EF00D01AAB /* COGroup.h */,
 				609C00A71704C3EF00D01AAB /* COGroup.m */,
+				607335B218AB96A6008A02DC /* COSmartGroup.h */,
+				607335B318AB96A6008A02DC /* COSmartGroup.m */,
 				609C00A81704C3EF00D01AAB /* COLibrary.h */,
 				609C00A91704C3EF00D01AAB /* COLibrary.m */,
 				609C00AA1704C3EF00D01AAB /* COTag.h */,
@@ -1868,6 +1875,7 @@
 				600F72BF1858A71200CB6AC5 /* COPersistentObjectContext.h in Headers */,
 				601FD943188935E40002F957 /* COObjectGraphContext+Debugging.h in Headers */,
 				601FD94518893ED50002F957 /* COEditingContext+Debugging.h in Headers */,
+				607335B418AB96A6008A02DC /* COSmartGroup.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2275,6 +2283,7 @@
 				601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */,
 				60EBC19C184CA38200F751F5 /* COPrimitiveCollection.m in Sources */,
 				600F72C01858A71200CB6AC5 /* COPersistentObjectContext.m in Sources */,
+				607335B518AB96A6008A02DC /* COSmartGroup.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2370,6 +2379,7 @@
 				66E40D6B1836D08D00E5B4A7 /* TestBinaryReadWrite.m in Sources */,
 				664F27A4188F4E9600DF36FC /* TestSQLiteStoreRevisionInfos.m in Sources */,
 				6621BF101847F06D000809CF /* Parent.m in Sources */,
+				607335BD18AB96AD008A02DC /* COSmartGroup.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
