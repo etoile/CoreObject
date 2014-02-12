@@ -60,7 +60,10 @@
 
 - (NSString *) attributesDebugDescription
 {
-	return [[(NSSet *)[[self.attributes mappedCollection] htmlCode] allObjects] componentsJoinedByString: @","];
+	return [[self.attributes mappedCollectionWithBlock: ^(id anObj) {
+		COAttributedStringAttribute *attr = anObj;
+		return [NSString stringWithFormat: @"%@=%@", attr.styleKey, attr.styleValue];
+	}] componentsJoinedByString: @","];
 }
 
 - (NSUInteger) characterIndex
@@ -95,12 +98,12 @@
 						  @[[NSSortDescriptor sortDescriptorWithKey: @"htmlCode" ascending: YES]]];
 		for (COAttributedStringAttribute *attr in attrs)
 		{
-			[result appendFormat: @"<%@>", attr.htmlCode];
+			[result appendFormat: @"<%@>", attr];
 		}
 		[result appendFormat: @"%@", self.text];
 		for (COAttributedStringAttribute *attr in attrs)
 		{
-			[result appendFormat: @"</%@>", attr.htmlCode];
+			[result appendFormat: @"</%@>", attr];
 		}
 	}
 	return result;

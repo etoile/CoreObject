@@ -40,7 +40,7 @@ static BOOL coalesceOpPair(id<COAttributedStringDiffOperation> op, id<COAttribut
 		[nextOpAttributeGraph setItemGraph: [(COAttributedStringDiffOperationAddAttribute *)nextOp attributeItemGraph]];
 		COAttributedStringAttribute *nextOpAttribute = [nextOpAttributeGraph rootObject];
 		
-		const BOOL sameAttributes = [opAttribute.htmlCode isEqualToString: nextOpAttribute.htmlCode];
+		const BOOL sameAttributes = [opAttribute isDeeplyEqualToAttribute: nextOpAttribute];
 		if (sameAttributes)
 		{
 			op.range = NSMakeRange(op.range.location, op.range.length + nextOp.range.length);
@@ -666,7 +666,7 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 		
 		for (COAttributedStringAttribute *attribute in [chunk.attributes copy])
 		{
-			if ([attribute.htmlCode isEqualToString: attributeToRemove.htmlCode])
+			if ([attribute isDeeplyEqualToAttribute: attributeToRemove])
 			{
 				[[chunk mutableSetValueForKey: @"attributes"] removeObject: attribute];
 			}

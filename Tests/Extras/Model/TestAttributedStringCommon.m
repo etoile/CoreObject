@@ -4,8 +4,18 @@
 
 - (COAttributedStringAttribute *) makeAttr: (NSString *)htmlCode inCtx: (COObjectGraphContext *)graph
 {
+	NSDictionary *styleKeyValueForHTML = @{
+										   @"b" : @[ @"font-weight" , @"bold" ],
+										   @"u" : @[ @"text-decoration" , @"underline" ],
+										   @"i" : @[ @"font-style" , @"oblique" ]
+										   };
+	
 	COAttributedStringAttribute *attribute = [graph insertObjectWithEntityName: @"COAttributedStringAttribute"];
-	attribute.htmlCode = htmlCode;
+	
+	NSArray *keyValue = styleKeyValueForHTML[[htmlCode lowercaseString]];
+	attribute.styleKey = keyValue[0];
+	attribute.styleValue = keyValue[1];
+	
 	return attribute;
 }
 
@@ -322,12 +332,19 @@ ETUUID *AttributedString2UUID()
 	return op;
 }
 
+- (COItemGraph *) attributeItemGraphForHTMLCode: (NSString *)htmlCode
+{
+	COObjectGraphContext *tempCtx = [COObjectGraphContext new];
+	COAttributedStringAttribute *attr = [self makeAttr: htmlCode inCtx: tempCtx];
+	return [attr attributeItemGraph];
+}
+
 - (id<COAttributedStringDiffOperation>) addAttributeOp: (NSString*)aString inRange: (NSRange)aRange
 {
 	COAttributedStringDiffOperationAddAttribute *op = [COAttributedStringDiffOperationAddAttribute new];
 	op.range = aRange;
 	op.attributedStringUUID = AttributedString1UUID();
-	op.attributeItemGraph = [COAttributedStringAttribute attributeItemGraphForHTMLCode: aString];
+	op.attributeItemGraph = [self attributeItemGraphForHTMLCode: aString];
 	return op;
 }
 
@@ -336,7 +353,7 @@ ETUUID *AttributedString2UUID()
 	COAttributedStringDiffOperationRemoveAttribute *op = [COAttributedStringDiffOperationRemoveAttribute new];
 	op.range = aRange;
 	op.attributedStringUUID = AttributedString1UUID();
-	op.attributeItemGraph = [COAttributedStringAttribute attributeItemGraphForHTMLCode: aString];
+	op.attributeItemGraph = [self attributeItemGraphForHTMLCode: aString];
 	return op;
 }
 

@@ -9,15 +9,24 @@
 
 @interface COAttributedStringAttribute : COObject
 
-@property (nonatomic, readwrite, strong) NSString *htmlCode;
+/**
+ * e.g. font-weight
+ */
+@property (nonatomic, readwrite, strong) NSString *styleKey;
+/**
+ * e.g. bold
+ */
+@property (nonatomic, readwrite, strong) NSString *styleValue;
 
 - (COItemGraph *) attributeItemGraph;
 
 + (BOOL) isAttributeSet: (NSSet *)aSet equalToSet: (NSSet *)anotherSet;
 + (NSSet *) attributeSet: (NSSet *)aSet minusSet: (NSSet *)anotherSet;
 
-+ (COItemGraph *) attributeItemGraphForHTMLCode: (NSString *)aCode;
++ (COItemGraph *) attributeItemGraphForStyleKey: (NSString *)aKey styleValue: (NSString *)aValue;
 
 + (BOOL) isAttributeItemGraph: (COItemGraph *)aGraph equalToItemGraph: (COItemGraph *)anotherGraph;
+
+- (BOOL) isDeeplyEqualToAttribute: (COAttributedStringAttribute *)anAttribute;
 
 @end

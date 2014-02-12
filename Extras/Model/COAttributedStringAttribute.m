@@ -9,23 +9,28 @@
 
 @implementation COAttributedStringAttribute
 
+@dynamic styleKey, styleValue;
+
 + (ETEntityDescription*)newEntityDescription
 {
     ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"COAttributedStringAttribute"];
     [entity setParent: (id)@"COObject"];
 	
-	ETPropertyDescription *htmlCodeProperty = [ETPropertyDescription descriptionWithName: @"htmlCode"
+	ETPropertyDescription *styleKeyProperty = [ETPropertyDescription descriptionWithName: @"styleKey"
 																					type: (id)@"NSString"];
-	htmlCodeProperty.persistent = YES;
+	styleKeyProperty.persistent = YES;
+
+	ETPropertyDescription *styleValueProperty = [ETPropertyDescription descriptionWithName: @"styleValue"
+																					  type: (id)@"NSString"];
+	styleValueProperty.persistent = YES;
+
 	
-	[entity setPropertyDescriptions: @[htmlCodeProperty]];
+	[entity setPropertyDescriptions: @[styleKeyProperty, styleValueProperty]];
 	
 	entity.diffAlgorithm = @"COAttributedStringDiff";
 	
     return entity;
 }
-
-@dynamic htmlCode;
 
 - (COItemGraph *) attributeItemGraph
 {
@@ -38,19 +43,30 @@
 	return result;
 }
 
++ (NSDictionary *) dictionaryForAttributeSet: (NSSet *)aSet
+{
+	NSMutableDictionary *result = [NSMutableDictionary new];
+	for (COAttributedStringAttribute *attr in aSet)
+	{
+		result[attr.styleKey] = attr.styleValue;
+	}
+	return result;
+}
+
 + (BOOL) isAttributeSet: (NSSet *)aSet equalToSet: (NSSet *)anotherSet
 {
-	return [[[aSet mappedCollection] htmlCode] isEqual: [[anotherSet mappedCollection] htmlCode]];
+	return [[self dictionaryForAttributeSet: aSet]
+			isEqual: [self dictionaryForAttributeSet: anotherSet]];
 }
 
 + (NSSet *) attributeSet: (NSSet *)aSet minusSet: (NSSet *)anotherSet
 {
-	NSSet *htmlCodesToRemove = (NSSet *)[[anotherSet mappedCollection] htmlCode];
+	NSDictionary *pairsToRemove = [self dictionaryForAttributeSet: anotherSet];
 	
 	NSMutableSet *result = [NSMutableSet set];
 	for (COAttributedStringAttribute *attr in aSet)
 	{
-		if (![htmlCodesToRemove containsObject: attr.htmlCode])
+		if (![pairsToRemove[attr.styleKey] isEqualToString: attr.styleValue])
 		{
 			[result addObject: attr];
 		}
@@ -58,11 +74,12 @@
 	return result;
 }
 
-+ (COItemGraph *) attributeItemGraphForHTMLCode: (NSString *)aCode
++ (COItemGraph *) attributeItemGraphForStyleKey: (NSString *)aKey styleValue: (NSString *)aValue
 {
 	COObjectGraphContext *tempCtx = [COObjectGraphContext new];
 	COAttributedStringAttribute *attr = [[COAttributedStringAttribute alloc] initWithObjectGraphContext: tempCtx];
-	attr.htmlCode = aCode;
+	attr.styleKey = aKey;
+	attr.styleValue = aValue;
 	return [attr attributeItemGraph];
 }
 
@@ -76,7 +93,18 @@
 	[ctx2 setItemGraph: anotherGraph];
 	COAttributedStringAttribute *anotherAttr = [ctx2 rootObject];
 	
-	return [anAttr.htmlCode isEqualToString: anotherAttr.htmlCode];
+	return [anAttr isDeeplyEqualToAttribute: anotherAttr];
+}
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat: @"%@=%@", self.styleKey, self.styleValue];
+}
+
+- (BOOL) isDeeplyEqualToAttribute: (COAttributedStringAttribute *)anAttribute
+{
+	return [self.styleKey isEqualToString: anAttribute.styleKey]
+		&& [self.styleValue isEqualToString: anAttribute.styleValue];
 }
 
 @end

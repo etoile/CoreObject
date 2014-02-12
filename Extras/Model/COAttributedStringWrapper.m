@@ -382,17 +382,21 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		
 		for (COAttributedStringAttribute *attr in target.attributes)
 		{
-			if ([attr.htmlCode isEqualToString: @"b"])
+			if ([attr.styleKey isEqualToString: @"font-weight"] && [attr.styleValue isEqualToString: @"bold"])
 			{
 				font = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSFontBoldTrait];
 			}
-			if ([attr.htmlCode isEqualToString: @"i"])
+			if ([attr.styleKey isEqualToString: @"font-style"] && [attr.styleValue isEqualToString: @"oblique"])
 			{
 				font = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSFontItalicTrait];
 			}
-			if ([attr.htmlCode isEqualToString: @"u"])
+			if ([attr.styleKey isEqualToString: @"text-decoration"] && [attr.styleValue isEqualToString: @"underline"])
 			{
 				result[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+			}
+			if ([attr.styleKey isEqualToString: @"text-decoration"] && [attr.styleValue isEqualToString: @"line-through"])
+			{
+				result[NSStrikethroughStyleAttributeName] = @(NSUnderlineStyleSingle);
 			}
 		}
 		
@@ -470,10 +474,11 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	_inPrimitiveMethod = NO;
 }
 
-- (COAttributedStringAttribute *) makeAttr: (NSString *)htmlCode
+- (COAttributedStringAttribute *) makeAttr: (NSString *)key value: (NSString *)value
 {
 	COAttributedStringAttribute *attribute = [[COAttributedStringAttribute alloc] initWithObjectGraphContext: [_backing objectGraphContext]];
-	attribute.htmlCode = htmlCode;
+	attribute.styleKey = key;
+	attribute.styleValue = value;
 	return attribute;
 }
 
@@ -488,9 +493,9 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	{
 		id attributeValue = attrs[attributeName];
 		
-		if ([attributeName isEqual: NSUnderlineStyleAttributeName] && [attributeValue isEqual: @(NSUnderlineStyleSingle)])
+		if ([attributeName isEqual: NSUnderlineStyleAttributeName] && [attributeValue intValue] == NSUnderlineStyleSingle)
 		{
-			[newAttribs addObject: [self makeAttr: @"u"]];
+			[newAttribs addObject: [self makeAttr: @"text-decoration" value: @"underline"]];
 		}
 		else if ([attributeName isEqual: NSFontAttributeName])
 		{
@@ -498,12 +503,20 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 			NSFontSymbolicTraits traits = [[font fontDescriptor] symbolicTraits];
 			if ((traits & NSFontBoldTrait) == NSFontBoldTrait)
 			{
-				[newAttribs addObject: [self makeAttr: @"b"]];
+				[newAttribs addObject: [self makeAttr: @"font-weight" value: @"bold"]];
 			}
 			if ((traits & NSFontItalicTrait) == NSFontItalicTrait)
 			{
-				[newAttribs addObject: [self makeAttr: @"i"]];
+				[newAttribs addObject: [self makeAttr: @"font-style" value: @"oblique"]];
 			}
+		}
+		else if ([attributeName isEqual: NSStrikethroughStyleAttributeName] && [attributeValue intValue] == NSUnderlineStyleSingle)
+		{
+			[newAttribs addObject: [self makeAttr: @"text-decoration" value: @"line-through"]];
+		}
+		else if ([attributeName isEqual: NSForegroundColorAttributeName])
+		{
+			
 		}
 	}
 
