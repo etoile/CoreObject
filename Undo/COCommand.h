@@ -11,13 +11,6 @@
 
 @class COEditingContext, COUndoTrack;
 
-extern NSString * const kCOCommandType;
-extern NSString * const kCOCommandUUID;
-extern NSString * const kCOCommandStoreUUID;
-extern NSString * const kCOCommandPersistentRootUUID;
-extern NSString * const kCOCommandTimestamp;
-
-
 /**
  * @group Undo
  * @abstract A command represents a committed change in an editing context

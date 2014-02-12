@@ -12,6 +12,8 @@
 #import "FMDatabaseAdditions.h"
 #import "COCommand.h"
 
+extern NSString * const kCOCommandUUID;
+
 NSString * const kCOUndoStack = @"undo";
 NSString * const kCORedoStack = @"redo";
 

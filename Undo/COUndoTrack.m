@@ -15,6 +15,8 @@
 #import "COEndOfUndoTrackPlaceholderNode.h"
 #import "COCommandSetCurrentVersionForBranch.h"
 
+extern NSString * const kCOCommandUUID;
+
 NSString * const COUndoStackDidChangeNotification = @"COUndoStackDidChangeNotification";
 NSString * const kCOUndoStackName = @"COUndoStackName";
 
@@ -147,7 +149,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	ETUUID *actionUUID = [edit UUID];
     NSString *actualStackName = [_store peekStackName: popStack forActionWithUUID: actionUUID forName: aName];
 	BOOL isUndo = [popStack isEqual: kCOUndoStack];
-	COCommandGroup *appliedEdit = (isUndo ? [edit inverse] : edit);
+	COCommandGroup *appliedEdit = (isUndo ? (COCommandGroup *)[edit inverse] : edit);
 	appliedEdit.UUID = edit.UUID;
 	
     if (![self canApplyEdit: appliedEdit toContext: aContext])

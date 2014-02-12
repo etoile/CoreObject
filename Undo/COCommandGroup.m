@@ -14,6 +14,8 @@
 #import "CODateSerialization.h"
 #import <EtoileFoundation/Macros.h>
 
+NSString * const kCOCommandUUID = @"COCommandUUID";
+static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 static NSString * const kCOCommandContents = @"COCommandContents";
 static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 

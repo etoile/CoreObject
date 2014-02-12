@@ -34,11 +34,9 @@ static NSString * const kCOCommandTypeCreatePersistentRoot = @"COCommandTypeCrea
 
 // Edit properties
 
-NSString * const kCOCommandType = @"COCommandType";
-NSString * const kCOCommandUUID = @"COCommandUUID";
-NSString * const kCOCommandStoreUUID = @"COCommandStoreUUID";
-NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRootUUID";
-NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
+static NSString * const kCOCommandType = @"COCommandType";
+static NSString * const kCOCommandStoreUUID = @"COCommandStoreUUID";
+static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRootUUID";
 
 @implementation COCommand
 

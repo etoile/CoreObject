@@ -8,6 +8,8 @@
 #import "TestCommon.h"
 #import "COCommand.h"
 
+extern NSString * const kCOCommandUUID;
+
 @interface TestUndoStackStore : NSObject <UKTest>
 {
     COUndoStackStore *_store;
