@@ -163,6 +163,7 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	tagListDataSource.outlineView = tagsOutline;
 	[tagsOutline setDataSource: tagListDataSource];
 	[tagsOutline setDelegate: tagListDataSource];
+	[tagsOutline expandItem: nil expandChildren: YES]; // Initially expand all tags
 	
 	ETAssert(notesTable != nil);
 	noteListDataSource = [EWNoteListDataSource new];
@@ -189,7 +190,6 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	{
 		[self selectNote: nil];
 	}
-	
 	
 	// Observe editing context changes
 	
@@ -544,7 +544,15 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	NSString *newName = [object stringValue] != nil ? [object stringValue] : @"";
 	
 	[(COObject *)item setName: object];
-	[self.owner commitWithIdentifier: @"rename-tag" descriptionArguments: @[oldName, newName]];
+	
+	if ([item isTag])
+	{
+		[self.owner commitWithIdentifier: @"rename-tag" descriptionArguments: @[oldName, newName]];
+	}
+	else
+	{
+		[self.owner commitWithIdentifier: @"rename-tag-group" descriptionArguments: @[oldName, newName]];
+	}
 }
 
 - (void)cacheSelection
