@@ -580,6 +580,11 @@ static NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	[self cacheSelection];
 }
 
+- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
+{
+	return [item isKindOfClass: [COTagGroup class]];
+}
+
 #pragma mark Drag & Drop
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
