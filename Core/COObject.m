@@ -1402,8 +1402,8 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat: @"<%@(%@) %p - %@>",
-		NSStringFromClass([self class]), [[self entityDescription] name], self, _UUID];
+	return [NSString stringWithFormat: @"<%@(%@) '%@' %p - %@>",
+		NSStringFromClass([self class]), [[self entityDescription] name], self.name, self, _UUID];
 }
 
 - (NSString *)typeDescription
