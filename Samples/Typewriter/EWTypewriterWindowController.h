@@ -15,6 +15,10 @@
 @class EWTagListDataSource;
 @class EWNoteListDataSource;
 
+NSString * EWNoteDragType;
+NSString * EWTagDragType;
+
+
 @interface EWTypewriterWindowController : NSWindowController <NSWindowDelegate, NSTextViewDelegate, NSTextStorageDelegate, EWUndoManagerDelegate>
 {
     IBOutlet EWTextView *textView;
@@ -43,6 +47,12 @@
 - (IBAction) duplicate:(id)sender;
 
 - (IBAction) search: (id)sender;
+
+- (COTagLibrary *)tagLibrary;
+- (NSArray *) arrangedNotePersistentRoots;
+- (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args;
+- (void) selectNote: (COPersistentRoot *)aNote;
+- (void) selectTag: (COTag *)aTag;
 
 @end
 

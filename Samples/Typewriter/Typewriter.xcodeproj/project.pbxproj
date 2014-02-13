@@ -29,6 +29,8 @@
 		66EDFEC218ABFF9E00B29CFE /* EWUndoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EDFEBE18ABFF9E00B29CFE /* EWUndoWindowController.m */; };
 		66EDFEC318ABFF9E00B29CFE /* EWUtilityWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EDFEC018ABFF9E00B29CFE /* EWUtilityWindowController.m */; };
 		66EDFEC418ABFF9E00B29CFE /* Undo.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66EDFEC118ABFF9E00B29CFE /* Undo.xib */; };
+		66EDFED218ACA7AD00B29CFE /* EWTagListDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EDFED118ACA7AD00B29CFE /* EWTagListDataSource.m */; };
+		66EDFEDB18ACA7BC00B29CFE /* EWNoteListDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EDFEDA18ACA7BC00B29CFE /* EWNoteListDataSource.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -154,6 +156,10 @@
 		66EDFEBF18ABFF9E00B29CFE /* EWUtilityWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWUtilityWindowController.h; path = ../CommonUI/EWUtilityWindowController.h; sourceTree = "<group>"; };
 		66EDFEC018ABFF9E00B29CFE /* EWUtilityWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWUtilityWindowController.m; path = ../CommonUI/EWUtilityWindowController.m; sourceTree = "<group>"; };
 		66EDFEC118ABFF9E00B29CFE /* Undo.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = Undo.xib; path = ../CommonUI/Undo.xib; sourceTree = "<group>"; };
+		66EDFED018ACA7AD00B29CFE /* EWTagListDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWTagListDataSource.h; sourceTree = SOURCE_ROOT; };
+		66EDFED118ACA7AD00B29CFE /* EWTagListDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWTagListDataSource.m; sourceTree = SOURCE_ROOT; };
+		66EDFED918ACA7BC00B29CFE /* EWNoteListDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWNoteListDataSource.h; sourceTree = SOURCE_ROOT; };
+		66EDFEDA18ACA7BC00B29CFE /* EWNoteListDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWNoteListDataSource.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -229,6 +235,10 @@
 				663EFD7718A17FB30030BD2F /* main.m */,
 				663EFD7818A17FB30030BD2F /* Typewriter-Info.plist */,
 				663EFD7918A17FB30030BD2F /* Typewriter-Prefix.pch */,
+				66EDFED018ACA7AD00B29CFE /* EWTagListDataSource.h */,
+				66EDFED118ACA7AD00B29CFE /* EWTagListDataSource.m */,
+				66EDFED918ACA7BC00B29CFE /* EWNoteListDataSource.h */,
+				66EDFEDA18ACA7BC00B29CFE /* EWNoteListDataSource.m */,
 			);
 			path = Typewriter;
 			sourceTree = "<group>";
@@ -443,6 +453,8 @@
 				663EFD8418A17FB30030BD2F /* EWTypewriterWindowController.m in Sources */,
 				663EFD8118A17FB30030BD2F /* EWDocument.m in Sources */,
 				664E93B518A1929300261673 /* TypewriterDocument.m in Sources */,
+				66EDFED218ACA7AD00B29CFE /* EWTagListDataSource.m in Sources */,
+				66EDFEDB18ACA7BC00B29CFE /* EWNoteListDataSource.m in Sources */,
 				663EFD8018A17FB30030BD2F /* EWAppDelegate.m in Sources */,
 				66EDFEC318ABFF9E00B29CFE /* EWUtilityWindowController.m in Sources */,
 				663EFD8618A17FB30030BD2F /* main.m in Sources */,
