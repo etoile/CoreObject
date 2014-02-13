@@ -1402,8 +1402,12 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 
 - (NSString *)description
 {
+	// TODO: Should we have a isZombie property?
+	// TODO: Print less detail?
+	NSString *name = (_variableStorage == nil) ? @"<zombie object>" : self.name;
+		
 	return [NSString stringWithFormat: @"<%@(%@) '%@' %p - %@>",
-		NSStringFromClass([self class]), [[self entityDescription] name], self.name, self, _UUID];
+		NSStringFromClass([self class]), [[self entityDescription] name], name, self, _UUID];
 }
 
 - (NSString *)typeDescription
