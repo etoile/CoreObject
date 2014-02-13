@@ -21,19 +21,15 @@
 
 - (id) rootObject
 {
-	return [owner tagLibrary];
+	return rootTreeNode;
 }
 
 - (id) outlineView: (NSOutlineView *)outlineView child: (NSInteger)index ofItem: (id)item
 {
 	if (nil == item) { item = [self rootObject]; }
+	NSTreeNode *treeNode = item;
 	
-	if ([item isLibrary])
-	{
-		return [[(COTagLibrary *)item tagGroups] objectAtIndex: index];
-	}
-	
-	return [[(COCollection *)item content] objectAtIndex: index];
+	return [[treeNode childNodes] objectAtIndex: index];
 }
 
 - (BOOL) outlineView: (NSOutlineView *)ov isItemExpandable: (id)item
@@ -44,35 +40,32 @@
 - (NSInteger) outlineView: (NSOutlineView *)outlineView numberOfChildrenOfItem: (id)item
 {
 	if (nil == item) { item = [self rootObject]; }
+	NSTreeNode *treeNode = item;
 	
-	if ([item isLibrary])
-	{
-		return [[(COTagLibrary *)item tagGroups] count];
-	}
-	else if ([item isKindOfClass: [COTagGroup class]])
-	{
-		return [[(COCollection *)item content] count];
-	}
-	
-	return 0;
+	return [[treeNode childNodes] count];
 }
 
 - (id) outlineView: (NSOutlineView *)outlineView objectValueForTableColumn: (NSTableColumn *)column byItem: (id)item
 {
 	if (nil == item) { item = [self rootObject]; }
-	return [(COObject *)item name];
+	NSTreeNode *treeNode = item;
+		
+	return [(COObject *)[treeNode representedObject] name];
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
 	if (nil == item) { item = [self rootObject]; }
+	NSTreeNode *treeNode = item;
 	
-	NSString *oldName = [item name] != nil ? [item name] : @"";
+	COObject *treeNodeRepObj = [treeNode representedObject];
+	
+	NSString *oldName = [treeNodeRepObj name] != nil ? [treeNodeRepObj name] : @"";
 	NSString *newName = [object stringValue] != nil ? [object stringValue] : @"";
 	
-	[(COObject *)item setName: object];
+	[(COObject *)treeNodeRepObj setName: object];
 	
-	if ([item isTag])
+	if ([treeNodeRepObj isTag])
 	{
 		[self.owner commitWithIdentifier: @"rename-tag" descriptionArguments: @[oldName, newName]];
 	}
@@ -88,7 +81,7 @@
 	NSIndexSet *indexes = [self.outlineView selectedRowIndexes];
 	for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
 	{
-		[oldSelection addObject: [self.outlineView itemAtRow: i]];
+		[oldSelection addObject: [[self.outlineView itemAtRow: i] representedObject]];
 	}
 }
 
@@ -100,24 +93,44 @@
 
 - (void)reloadData
 {
+	// Build tree nodes
+	
+	COTagLibrary *library = [self.owner tagLibrary];
+	rootTreeNode = [[NSTreeNode alloc] initWithRepresentedObject: library];
+	for (COTagGroup *tagGroup in [library tagGroups])
+	{
+		NSTreeNode *tagGroupNode = [[NSTreeNode alloc] initWithRepresentedObject: tagGroup];
+		[[rootTreeNode mutableChildNodes] addObject: tagGroupNode];
+		for (COTag *tag in [tagGroup content])
+		{
+			NSTreeNode *tagNode = [[NSTreeNode alloc] initWithRepresentedObject: tag];
+			[[tagGroupNode mutableChildNodes] addObject: tagNode];			
+		}
+	}
+	
 	[self.outlineView reloadData];
 	
 	NSMutableIndexSet *newSelectedRows = [NSMutableIndexSet new];
 	for (id obj in oldSelection)
 	{
-		NSInteger row = [self.outlineView rowForItem: obj];
-		if (row != -1)
+		for (NSInteger row = 0; row < [self.outlineView numberOfRows]; row++)
 		{
-			[newSelectedRows addIndex: row];
+			if ([[self.outlineView itemAtRow: row] representedObject] == obj)
+			{
+				[newSelectedRows addIndex: row];
+				break;
+			}
 		}
 	}
 	[self.outlineView selectRowIndexes: newSelectedRows byExtendingSelection: NO];
 	[self cacheSelection];
+	
+	[self.outlineView expandItem: nil expandChildren: YES]; // Initially expand all tags
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
 {
-	return [item isKindOfClass: [COTagGroup class]];
+	return [[item representedObject] isKindOfClass: [COTagGroup class]];
 }
 
 #pragma mark Drag & Drop
@@ -126,12 +139,12 @@
 {
 	if ([[[info draggingPasteboard] types] containsObject: EWTagDragType])
 	{
-		if ([item isKindOfClass: [COTagGroup class]])
+		if ([[item representedObject] isKindOfClass: [COTagGroup class]])
 			return NSDragOperationMove;
 	}
 	else if ([[[info draggingPasteboard] types] containsObject: EWNoteDragType])
 	{
-		if ([item isTag])
+		if ([[item representedObject] isTag])
 			return NSDragOperationMove;
 	}
 	return NSDragOperationNone;
@@ -143,7 +156,7 @@
 	
 	if ([[[info draggingPasteboard] types] containsObject: EWTagDragType])
 	{
-		COTagGroup *tagGroup = item;
+		COTagGroup *tagGroup = [item representedObject];
 		ETAssert([tagGroup isKindOfClass: [COTagGroup class]]);
 		
 		id plist = [pasteboard propertyListForType: EWTagDragType];
@@ -156,7 +169,7 @@
 	}
 	else if ([[[info draggingPasteboard] types] containsObject: EWNoteDragType])
 	{
-		COTag *tag = item;
+		COTag *tag = [item representedObject];
 		ETAssert([tag isTag]);
 		
 		for (NSPasteboardItem *pbItem in [pasteboard pasteboardItems])
@@ -181,13 +194,14 @@
 	if ([items count] != 1)
 		return NO;
 	
-	if (![items[0] isTag])
+	if (![[items[0] representedObject] isTag])
 		return NO;
 	
 	NSMutableArray *pbItems = [NSMutableArray array];
     
-	for (COObject *item in items)
+	for (NSTreeNode *node in items)
 	{
+		COObject *item = [node representedObject];
 		NSPasteboardItem *pbitem = [[NSPasteboardItem alloc] init];
 		[pbitem setPropertyList: [[item UUID] stringValue] forType: EWTagDragType];
 		[pbItems addObject: pbitem];

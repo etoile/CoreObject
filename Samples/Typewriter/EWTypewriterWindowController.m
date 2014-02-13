@@ -97,9 +97,9 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	if (selectedRow != -1)
 	{
 		id object = [tagsOutline itemAtRow: selectedRow];
-		if ([object isTag])
+		if ([[object representedObject] isTag])
 		{
-			return object;
+			return [object representedObject];
 		}
 	}
 	return nil;
@@ -111,9 +111,9 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	if (selectedRow != -1)
 	{
 		id object = [tagsOutline itemAtRow: selectedRow];
-		if ([object isKindOfClass: [COTagGroup class]])
+		if ([[object representedObject] isKindOfClass: [COTagGroup class]])
 		{
-			return object;
+			return [object representedObject];
 		}
 	}
 	return nil;
@@ -147,7 +147,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	tagListDataSource.outlineView = tagsOutline;
 	[tagsOutline setDataSource: tagListDataSource];
 	[tagsOutline setDelegate: tagListDataSource];
-	[tagsOutline expandItem: nil expandChildren: YES]; // Initially expand all tags
+	[tagListDataSource reloadData];	
 	
 	ETAssert(notesTable != nil);
 	noteListDataSource = [EWNoteListDataSource new];

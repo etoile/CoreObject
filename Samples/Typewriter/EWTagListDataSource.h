@@ -11,6 +11,7 @@
 
 @interface EWTagListDataSource : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate>
 {
+	NSTreeNode *rootTreeNode;
 	NSMutableSet *oldSelection;
 }
 
