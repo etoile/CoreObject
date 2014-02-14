@@ -18,6 +18,7 @@
 - (NSData*)dataForQuery:(NSString*)objs, ...;
 - (NSDate*)dateForQuery:(NSString*)objs, ...;
 - (NSNumber*)numberForQuery:(NSString*)query, ...;
+- (NSArray*)arrayForQuery:(NSString*)query, ...;
 
 // Notice that there's no dataNoCopyForQuery:.
 // That would be a bad idea, because we close out the result set, and then what

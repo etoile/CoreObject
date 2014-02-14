@@ -72,6 +72,36 @@
     }
 }
 
+- (id)objectForColumnIndex:(int)columnIdx {
+    int columnType = sqlite3_column_type(statement.statement, columnIdx);
+    
+    id returnValue = nil;
+    
+    if (columnType == SQLITE_INTEGER) {
+        returnValue = [NSNumber numberWithLongLong:[self longLongIntForColumnIndex:columnIdx]];
+    }
+    else if (columnType == SQLITE_FLOAT) {
+        returnValue = [NSNumber numberWithDouble:[self doubleForColumnIndex:columnIdx]];
+    }
+    else if (columnType == SQLITE_BLOB) {
+        returnValue = [self dataForColumnIndex:columnIdx];
+    }
+    else {
+        //default to a string for everything else
+        returnValue = [self stringForColumnIndex:columnIdx];
+    }
+    
+    if (returnValue == nil) {
+        returnValue = [NSNull null];
+    }
+    
+    return returnValue;
+}
+
+- (id)objectForColumnName:(NSString*)columnName {
+    return [self objectForColumnIndex:[self columnIndexForName:columnName]];
+}
+
 - (NSDictionary *)resultDict {
     
     NSInteger num_cols = sqlite3_data_count(statement.statement);
@@ -86,28 +116,8 @@
             
             if (col_name) {
                 NSString *colName = [NSString stringWithUTF8String:col_name];
-                id value = nil;
-                
-                // fetch according to type
-                switch (sqlite3_column_type(statement.statement, i)) {
-                    case SQLITE_INTEGER: {
-                        value = [NSNumber numberWithLongLong:[self longLongIntForColumnIndex:i]];
-                        break;
-                    }
-                    case SQLITE_FLOAT: {
-                        value = [NSNumber numberWithDouble:[self doubleForColumnIndex:i]];
-                        break;
-                    }
-                    case SQLITE_TEXT: {
-                        value = [self stringForColumnIndex:i];
-                        break;
-                    }
-                    case SQLITE_BLOB: {
-                        value = [self dataForColumnIndex:i];
-                        break;
-                    }
-                }
-                
+                id value = [self objectForColumnName: colName];
+				
                 // save to dict
                 if (value) {
                     [dict setObject:value forKey:colName];
