@@ -392,6 +392,11 @@ See +[NSObject typePrefix]. */
 	return ([self persistentRoot] != nil);
 }
 
+- (BOOL)isZombie
+{
+	return _variableStorage == nil;
+}
+
 #pragma mark - Basic Properties
 
 - (NSString *)displayName
@@ -1402,9 +1407,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 
 - (NSString *)description
 {
-	// TODO: Should we have a isZombie property?
-	// TODO: Print less detail?
-	NSString *name = (_variableStorage == nil) ? @"<zombie object>" : self.name;
+	NSString *name = [self isZombie] ? @"<zombie object>" : self.name;
 		
 	return [NSString stringWithFormat: @"<%@(%@) '%@' %p - %@>",
 		NSStringFromClass([self class]), [[self entityDescription] name], name, self, _UUID];

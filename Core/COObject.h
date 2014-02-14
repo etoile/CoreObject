@@ -383,6 +383,23 @@
  * See also -persistentRoot.
  */
 @property (nonatomic, readonly) BOOL isPersistent;
+/**
+ * Returns whether the receiver has been relinquished by the object graph 
+ * context (during a GC phase).
+ *
+ * A zombie object is an invalid inner object that must not be used, since 
+ * messages that access its state can result in an exception. You should 
+ * replace references to this object by a new one:
+ *
+ * <example>
+ * COObject *newObject = [[persistentRootOrBranch objectGraphContext] objectWithUUID: [zombie UUID]];
+ * </example>
+ *
+ * You are just allowed to call -UUID, -entityDescription and -description on it.
+ *
+ * See also -objectGraphContext.
+ */
+@property (nonatomic, readonly) BOOL isZombie;
 /** 
  * Returns whether the receiver is a root object that provides access to 
  * other inner objects (in the object graph context).
@@ -762,6 +779,10 @@
 - (NSString *)detailedDescriptionWithTraversalKey: (NSString *)aProperty;
 /** 
  * Returns a short description to summarize the receiver. 
+ *
+ * Can be overriden, but must check -isZombie, and if YES, return a basic 
+ * description (limited to -UUID and -entity description), or just call the 
+ * superclass description that is expected to comply the present rule.
  */
 - (NSString *)description;
 /**
