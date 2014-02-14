@@ -79,6 +79,7 @@
  */
 - (void) applyToContext: (COEditingContext *)aContext;
 
+- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx;
 
 /** @taskunit Framework Private */
 

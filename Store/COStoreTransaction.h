@@ -99,6 +99,7 @@
 
 /**
  * All-in-one method for updating the current revision of a persistent root.
+ * You can pass nil for headRev to not change the headRev.
  */
 - (void) setCurrentRevision: (ETUUID *)currentRev
 			   headRevision: (ETUUID *)headRev
@@ -137,5 +138,18 @@
  */
 - (void) undeleteBranch: (ETUUID *)aBranch
        ofPersistentRoot: (ETUUID *)aRoot;
+
+
+/** @taskunit Querying For Changes in the Transaction */
+
+/**
+ * Returns the last current revision set for a branch in the transaction.
+ * Note that the transaction contents are ordered, so a branch could
+ * be set to r1 earlier in the transaction, and later set to r2.
+ *
+ * Returns nil if the branch's current revision is not modified in this transaction.
+ */
+- (ETUUID *) lastSetCurrentRevisionInTransactionForBranch: (ETUUID *)aBranch
+										 ofPersistentRoot: (ETUUID *)aRoot;
 
 @end

@@ -11,6 +11,7 @@
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
+#import "COStoreTransaction.h"
 
 static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevisionID";
 
@@ -80,6 +81,11 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 {
 	NILARG_EXCEPTION_TEST(aContext);
     [[aContext persistentRootForUUID: _persistentRootUUID] setDeleted: YES];
+}
+
+- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+{
+	[txn deletePersistentRoot: _persistentRootUUID];
 }
 
 - (NSString *)kind

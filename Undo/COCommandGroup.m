@@ -136,6 +136,17 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     }
 }
 
+- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+{
+	NILARG_EXCEPTION_TEST(ctx);
+	NILARG_EXCEPTION_TEST(txn);
+	
+    for (COCommand *command in _contents)
+    {
+        [command addToStoreTransaction: txn assumingEditingContextState: ctx];
+    }
+}
+
 - (NSString *)kind
 {
 	return _(@"Change Group");

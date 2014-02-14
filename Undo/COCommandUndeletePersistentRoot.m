@@ -15,6 +15,7 @@
 #import "CORevisionCache.h"
 #import "COUndoTrack.h"
 #import "COEditingContext+Private.h"
+#import "COStoreTransaction.h"
 
 @implementation COCommandUndeletePersistentRoot
 
@@ -40,6 +41,11 @@
 {
 	NILARG_EXCEPTION_TEST(aContext);
     [[aContext persistentRootForUUID: _persistentRootUUID] setDeleted: NO];
+}
+
+- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+{
+	[txn undeletePersistentRoot: _persistentRootUUID];
 }
 
 - (NSString *)kind

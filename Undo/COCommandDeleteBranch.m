@@ -11,6 +11,7 @@
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
+#import "COStoreTransaction.h"
 
 static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
 
@@ -57,6 +58,11 @@ static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
 	ETAssert(branch != nil);
 
     [branch setDeleted: YES];
+}
+
+- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+{
+	[txn deleteBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
 }
 
 - (NSString *)kind

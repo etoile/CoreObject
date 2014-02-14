@@ -10,6 +10,7 @@
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
+#import "COStoreTransaction.h"
 
 static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
 static NSString * const kCOCommandOldMetadata = @"COCommandOldMetadata";
@@ -72,6 +73,11 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
    	ETAssert(branch != nil);
 
     [branch setMetadata: _newMetadata];
+}
+
+- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+{
+	[txn setMetadata: _newMetadata forBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
 }
 
 - (NSString *)kind

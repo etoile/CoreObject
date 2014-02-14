@@ -320,4 +320,25 @@
     [self addOperation: op];    
 }
 
+- (ETUUID *) lastSetCurrentRevisionInTransactionForBranch: (ETUUID *)aBranch
+										 ofPersistentRoot: (ETUUID *)aRoot
+{
+	ETUUID *lastSetCurrentRevision = nil;
+	
+	for (id <COStoreAction> action in operations)
+	{
+		if ([action isKindOfClass: [COStoreSetCurrentRevision class]])
+		{
+			COStoreSetCurrentRevision *op = (COStoreSetCurrentRevision *)action;
+			if ([op.persistentRoot isEqual: aRoot]
+				&& [op.branch isEqual: aBranch])
+			{
+				lastSetCurrentRevision = op.currentRevision;
+			}
+		}
+	}
+	
+	return lastSetCurrentRevision;
+}
+
 @end

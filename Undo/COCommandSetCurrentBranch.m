@@ -10,6 +10,7 @@
 #import "COEditingContext.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
+#import "COStoreTransaction.h"
 
 #import <EtoileFoundation/Macros.h>
 
@@ -63,6 +64,11 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
     ETAssert(branch != nil);
 
     [proot setCurrentBranch: branch];
+}
+
+- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+{
+	[txn setCurrentBranch: _newBranchUUID forPersistentRoot: _persistentRootUUID];
 }
 
 - (NSString *)kind
