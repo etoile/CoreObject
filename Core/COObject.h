@@ -383,23 +383,6 @@
  * See also -persistentRoot.
  */
 @property (nonatomic, readonly) BOOL isPersistent;
-/**
- * Returns whether the receiver has been relinquished by the object graph 
- * context (during a GC phase).
- *
- * A zombie object is an invalid inner object that must not be used, since 
- * messages that access its state can result in an exception. You should 
- * replace references to this object by a new one:
- *
- * <example>
- * COObject *newObject = [[persistentRootOrBranch objectGraphContext] objectWithUUID: [zombie UUID]];
- * </example>
- *
- * You are just allowed to call -UUID, -entityDescription and -description on it.
- *
- * See also -objectGraphContext.
- */
-@property (nonatomic, readonly) BOOL isZombie;
 /** 
  * Returns whether the receiver is a root object that provides access to 
  * other inner objects (in the object graph context).
@@ -816,5 +799,22 @@
  * This is used to present -tags to the user in the UI.
  */
 @property (nonatomic, readonly) NSString *tagDescription;
+/**
+ * Returns whether the receiver has been relinquished by the object graph 
+ * context (during a GC phase). You might encounter this if your app holds 
+ * a strong Objective-C reference to a COObject that is subsequently deleted from an
+ * object graph context.
+ *
+ * This property is only provided for debugging, and should never be used in
+ * application logic (a correctly written program will never encounter a
+ * zombie object.) See COObjectGraphContextWillRelinquishObjectsNotification.
+ *
+ * A zombie object is an invalid inner object that must not be used, since 
+ * messages that access its state can result in an exception. You are just
+ * allowed to call -UUID, -entityDescription and -description on it.
+ *
+ * See also -objectGraphContext.
+ */
+@property (nonatomic, readonly) BOOL isZombie;
 
 @end
