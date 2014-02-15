@@ -146,14 +146,16 @@ Future Work
 
   - Move to CoreObject - extract it to a tiny framework CoreObjectModelDescription.framework with no dependencies except Foundation
 
-  - Scan over every loaded ObjC class is ugly
-
   - Improve metamodel checker to ensure matching Objective-C property types (e.g. a ETCollection must be declared as multivalued, a NSArray as ordered)
 
   - Add a check that complains about serialization accessors or serialization transformers for relationships if there is no custom persistent type declared
 
   - For keyed relationships, it's not clear what the permissible types of keys are.
 	The tests just test NSString.
+
+  - perform validation at freezing time on the set of entities being frozen. This means a group of entities can only become frozen if they are valid. 
+
+  - call +newEntityDescription methods lazily, either at first use of -entityDescriptionForClass: or -descriptionForName: on ETModelDescriptionRepository (for performance)
 
 
 - COObject
