@@ -34,6 +34,18 @@ static int debug_total_connections_opened;
 		}
 	});
 }
+
++ (void) initialize
+{
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		debug_sqliteconnections_queue = dispatch_queue_create("debug_sqliteconnections", 0);
+		debug_sqliteconnections = [[NSMapTable alloc] initWithKeyOptions: NSPointerFunctionsOpaqueMemory | NSPointerFunctionsOpaquePersonality
+															valueOptions: NSMapTableStrongMemory | NSMapTableObjectPointerPersonality
+																capacity: 1000];
+	});
+}
+
 #endif
 
 - (id)initWithPath:(NSString*)aPath {
@@ -46,16 +58,6 @@ static int debug_total_connections_opened;
         crashOnErrors       = 0x00;
         busyRetryTimeout    = 0x00;
     }
-	
-#ifdef FMDatabase_DEBUG
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-		debug_sqliteconnections_queue = dispatch_queue_create("debug_sqliteconnections", 0);
-		debug_sqliteconnections = [[NSMapTable alloc] initWithKeyOptions: NSPointerFunctionsOpaqueMemory | NSPointerFunctionsOpaquePersonality
-															valueOptions: NSMapTableStrongMemory | NSMapTableObjectPointerPersonality
-																capacity: 1000];
-	});
-#endif
 	
 	return self;
 }
