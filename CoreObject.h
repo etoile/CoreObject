@@ -64,7 +64,7 @@
 
 /* Undo */
 
-#import <CoreObject/COUndoStackStore.h>
+#import <CoreObject/COUndoTrackStore.h>
 #import <CoreObject/COUndoTrack.h>
 #import <CoreObject/COEndOfUndoTrackPlaceholderNode.h>
 #import <CoreObject/COEditingContext+Undo.h>

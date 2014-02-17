@@ -12,6 +12,8 @@
 #import "COCommitDescriptor.h"
 #import "CORevision.h"
 #import "CODateSerialization.h"
+#import "COUndoTrackStore.h"
+#import "COUndoTrack.h"
 #import <EtoileFoundation/Macros.h>
 
 NSString * const kCOCommandUUID = @"COCommandUUID";
@@ -23,6 +25,10 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 @synthesize UUID = _UUID, contents = _contents, metadata = _metadata;
 @synthesize timestamp = _timestamp;
+@synthesize sequenceNumber = _sequenceNumber;
+@synthesize parentUUID = _parentUUID;
+@synthesize parentUndoTrack = _parentUndoTrack;
+@synthesize trackName = _trackName;
 
 #pragma mark -
 #pragma mark Initialization
@@ -44,43 +50,52 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return self;
 }
 
+- (instancetype) initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
+									 owner: (COUndoTrack *)anOwner
+{
+	SUPERINIT;
+	_parentUndoTrack = anOwner;
+	_contents = [self commandsFromPropertyList: aCommand.JSONData
+							   parentUndoTrack: anOwner];
+	_metadata = aCommand.metadata;
+	_UUID = aCommand.UUID;
+	_parentUUID = aCommand.parentUUID;
+	_timestamp = aCommand.timestamp;
+	_sequenceNumber = aCommand.sequenceNumber;
+	_trackName = aCommand.trackName;
+	return self;
+}
+
+- (COUndoTrackSerializedCommand *) serializedCommand
+{
+	COUndoTrackSerializedCommand *cmd = [COUndoTrackSerializedCommand new];
+	cmd.JSONData = [self commandsPropertyList];
+	cmd.metadata = _metadata;
+	cmd.UUID = _UUID;
+	cmd.parentUUID = _parentUUID;
+	cmd.trackName = _trackName;
+	cmd.timestamp = _timestamp;
+	cmd.sequenceNumber = _sequenceNumber;
+	return cmd;
+}
+
+- (id) commandsPropertyList
+{
+	return @{kCOCommandContents : [[_contents mappedCollection] propertyList]};
+}
+
 - (NSMutableArray *)commandsFromPropertyList: (NSDictionary *)plist parentUndoTrack: (COUndoTrack *)aParent
 {
 	NSMutableArray *commands = [NSMutableArray array];
 
     for (id subplist in [plist objectForKey: kCOCommandContents])
     {
-        COCommand *command = [COCommand commandWithPropertyList: subplist parentUndoTrack: aParent];
+        COCommand *command = [COCommand commandWithPropertyList: subplist
+												parentUndoTrack: aParent];
         [commands addObject: command];
     }
 
 	return commands;
-}
-
-- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
-{
-    SUPERINIT;
-	_UUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandUUID]];
-    _contents = [self commandsFromPropertyList: plist parentUndoTrack: aParent];
-	_metadata = [plist objectForKey: kCOCommandMetadata];
-	_timestamp = CODateFromJavaTimestamp([plist objectForKey: kCOCommandTimestamp]);
-	_parentUndoTrack = aParent;
-    return self;
-}
-
-- (id) propertyList
-{
-    NSMutableDictionary *result = [super propertyList];
-	
-	[result setObject: [_UUID stringValue] forKey: kCOCommandUUID];
-    [result setObject: [[_contents mappedCollection] propertyList] forKey: kCOCommandContents];
-	if (_metadata != nil)
-	{
-		[result setObject: _metadata forKey: kCOCommandMetadata];
-	}
-	[result setObject: CODateToJavaTimestamp(_timestamp) forKey: kCOCommandTimestamp];
-	
-    return result;
 }
 
 - (BOOL)isEqual: (id)object
@@ -89,6 +104,11 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 		return NO;
 
 	return ([((COCommandGroup *)object)->_UUID isEqual: _UUID]);
+}
+
+- (NSUInteger) hash
+{
+	return [_UUID hash];
 }
 
 - (NSMutableArray *)inversedCommands
@@ -105,7 +125,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	return inversedCommands;
 }
 
-- (COCommand *) inverse
+- (COCommandGroup *) inverse
 {
     COCommandGroup *inverse = [[COCommandGroup alloc] init];
     inverse.contents = [self inversedCommands];
@@ -154,6 +174,16 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 #pragma mark -
 #pragma mark Track Node Protocol
+
+- (ETUUID *)persistentRootUUID
+{
+	return nil;
+}
+
+- (ETUUID *)branchUUID
+{
+	return nil;
+}
 
 - (NSDate *)date
 {
@@ -208,6 +238,13 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 - (NSArray *)contentArray
 {
 	return [NSArray arrayWithArray: [self content]];
+}
+
+#pragma mark -
+
+- (COCommandGroup *) parentCommand
+{
+	return nil;// [_owner commandForUUID: _parentCommandUUID];
 }
 
 @end

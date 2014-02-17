@@ -71,7 +71,14 @@
 {
 	UKObjectsEqual(expected.trackName, actual.trackName);
 	UKObjectsEqual(expected.headCommandUUID, actual.headCommandUUID);
-	UKObjectsEqual(expected.currentCommandUUID, actual.currentCommandUUID);
+	if (expected.currentCommandUUID == nil)
+	{
+		UKNil(actual.currentCommandUUID);
+	}
+	else
+	{
+		UKObjectsEqual(expected.currentCommandUUID, actual.currentCommandUUID);
+	}
 }
 
 - (void) testBasic
@@ -124,6 +131,56 @@
 
 	COUndoTrackSerializedCommand *reloadedCmd3 = [_store commandForUUID: cmd3.UUID];
 	[self checkCommand: reloadedCmd3 isEqualToCommand: cmd3];
+}
+
+/**
+ * NULL is a special value for current command UUID that means "the start of the track"
+ */
+- (void) testNullCurrentCommandPermitted
+{
+	COUndoTrackSerializedCommand *cmd1 = [self makeCommandWithParent: nil track: @"test1"];
+	
+	COUndoTrackState *state = [COUndoTrackState new];
+	state.trackName = @"test1";
+	state.headCommandUUID = cmd1.UUID;
+	state.currentCommandUUID = cmd1.UUID;
+	
+	[_store beginTransaction];
+	[_store addCommand: cmd1];
+	[_store setTrackState: state];
+	[_store commitTransaction];
+	
+	state.currentCommandUUID = nil;
+	
+	[_store beginTransaction];
+	[_store setTrackState: state];
+	[_store commitTransaction];
+
+	// Try reloading
+	
+	COUndoTrackState *reloadedState2 = [_store stateForTrackName: @"test1"];
+	[self checkState: reloadedState2 isEqualToState: state];
+}
+
+- (void) testDivergent
+{
+	COUndoTrackSerializedCommand *cmd1 = [self makeCommandWithParent: nil track: @"test1"];
+	COUndoTrackSerializedCommand *cmd1a = [self makeCommandWithParent: cmd1.UUID track: @"test1"];
+	COUndoTrackSerializedCommand *cmd1b = [self makeCommandWithParent: cmd1.UUID track: @"test1"];
+	
+	COUndoTrackState *state = [COUndoTrackState new];
+	state.trackName = @"test1";
+	state.headCommandUUID = cmd1b.UUID;
+	state.currentCommandUUID = cmd1b.UUID;
+	
+	[_store beginTransaction];
+	[_store addCommand: cmd1];
+	[_store addCommand: cmd1a];
+	[_store addCommand: cmd1b];
+	[_store setTrackState: state];
+	[_store commitTransaction];
+	
+	UKObjectsEqual(S(cmd1.UUID, cmd1a.UUID, cmd1b.UUID), SA([_store allCommandUUIDsOnTrackWithName: @"test1"]));
 }
 
 @end

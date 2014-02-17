@@ -11,6 +11,9 @@
 @class FMDatabase;
 @class ETUUID;
 
+NSString * const COUndoTrackStoreTracksDidChangeNotification;
+NSString * const COUndoTrackStoreChangedTracks;
+
 @interface COUndoTrackSerializedCommand : NSObject
 @property (readwrite, nonatomic) id JSONData;
 @property (readwrite, nonatomic) NSDictionary *metadata;
@@ -30,6 +33,7 @@
 @interface COUndoTrackStore : NSObject
 {
     FMDatabase *_db;
+	NSMutableSet *_modifiedTracks;
 }
 
 + (COUndoTrackStore *) defaultStore;
@@ -40,9 +44,11 @@
 - (BOOL) commitTransaction;
 
 - (NSArray *) trackNames;
+- (NSArray *) trackNamesMatchingGlobPattern: (NSString *)aPattern;
 - (COUndoTrackState *) stateForTrackName: (NSString*)aName;
 - (void) setTrackState: (COUndoTrackState *)aState;
 - (void) removeTrackWithName: (NSString*)aName;
+- (NSArray *) allCommandUUIDsOnTrackWithName: (NSString*)aName;
 
 /**
  * sequenceNumber is set in the provided command object
@@ -50,5 +56,7 @@
 - (void) addCommand: (COUndoTrackSerializedCommand *)aCommand;
 - (COUndoTrackSerializedCommand *) commandForUUID: (ETUUID *)aUUID;
 - (void) removeCommandForUUID: (ETUUID *)aUUID;
+
+- (BOOL) string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern;
 
 @end

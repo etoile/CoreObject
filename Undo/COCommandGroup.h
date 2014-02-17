@@ -9,6 +9,7 @@
 #import <CoreObject/COCommand.h>
 
 @class COCommitDescriptor;
+@class COUndoTrackSerializedCommand;
 
 /**
  * @group Undo
@@ -16,19 +17,40 @@
  *
  * See COCommand for a detailed presentation.
  */
-@interface COCommandGroup : COCommand <ETCollection>
+@interface COCommandGroup : NSObject <COTrackNode, ETCollection>
 {
 	@private
-	ETUUID *_UUID;
-    NSMutableArray *_contents;
+	COUndoTrack __weak *_parentUndoTrack;
+	/**
+	 * Not equal to _parentUndoTrack.name if _parentUndoTrack is a pattern track
+	 */
+	NSString *_trackName;
+	NSMutableArray *_contents;
 	NSDictionary *_metadata;
+	ETUUID *_UUID;
+	ETUUID *_parentUUID;
     NSDate *_timestamp;
+	int64_t _sequenceNumber;
 }
 
+- (instancetype) initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
+									 owner: (COUndoTrack *)anOwner;
+
+- (COUndoTrackSerializedCommand *) serializedCommand;
 
 /** @taskunit Basic Properties */
 
-
+/**
+ * The undo track on which the command was recorded.
+ *
+ * Never returns nil once the command has been recorded, see
+ * -[COUndoTrack recordCommand:].
+ */
+@property (nonatomic, readwrite, weak) COUndoTrack *parentUndoTrack;
+/**
+ * The undo track name on which the command was recorded.
+ */
+@property (nonatomic, readwrite, strong) NSString *trackName;
 /**
  * The commit UUID. 
  *
@@ -55,10 +77,13 @@
  * to return the equivalent commit descriptor descriptions.
  */
 @property (nonatomic, readonly) COCommitDescriptor *commitDescriptor;
+@property (nonatomic, readwrite) ETUUID *parentUUID;
 /**
  * The commit time.
  */
 @property (nonatomic, copy) NSDate *timestamp;
+@property (nonatomic, readwrite) int64_t sequenceNumber;
 
-
+- (COCommandGroup *) inverse;
+- (void) applyToContext: (COEditingContext *)aContext;
 @end

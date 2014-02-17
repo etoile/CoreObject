@@ -9,7 +9,6 @@
 #import "COPersistentRoot.h"
 #import "COBranch.h"
 #import "CORevision.h"
-#import "COUndoStackStore.h"
 #import "COUndoTrack.h"
 #import "COCommand.h"
 #import "COCommandGroup.h"

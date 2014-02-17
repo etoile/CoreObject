@@ -13,6 +13,9 @@
 #import "COCommand.h"
 #import "CODateSerialization.h"
 
+NSString * const COUndoTrackStoreTracksDidChangeNotification = @"COUndoTrackStoreTracksDidChangeNotification";
+NSString * const COUndoTrackStoreChangedTracks = @"COUndoTrackStoreChangedTracks";
+
 @implementation COUndoTrackSerializedCommand
 @synthesize JSONData, metadata, UUID, parentUUID, trackName, timestamp, sequenceNumber;
 @end
@@ -86,6 +89,8 @@
 {
     SUPERINIT;
     
+	_modifiedTracks = [NSMutableSet new];
+	
     NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
 
     NSString *dir = [[[libraryDirs objectAtIndex: 0]
@@ -122,8 +127,9 @@
 							 "uuid BLOB NOT NULL UNIQUE, parentid INTEGER, trackname STRING NOT NULL, data BLOB NOT NULL, "
 							 "metadata BLOB, timestamp INTEGER NOT NULL)"];
 		
+		// NULL currentid means "the start of the track"
 		[_db executeUpdate: @"CREATE TABLE IF NOT EXISTS tracks (trackname STRING PRIMARY KEY, "
-							 "headid INTEGER NOT NULL, currentid INTEGER NOT NULL, "
+							 "headid INTEGER NOT NULL, currentid INTEGER, "
 							 "FOREIGN KEY(headid) REFERENCES commands(id), "
 							 "FOREIGN KEY(currentid) REFERENCES commands(id))"];
 	}
@@ -142,7 +148,12 @@
 
 - (BOOL) commitTransaction
 {
-    return [_db commit];
+    BOOL ok = [_db commit];
+	if (ok)
+	{
+		[self postCommitNotifications];
+	}
+	return ok;
 }
 
 - (NSArray *) trackNames
@@ -150,12 +161,17 @@
 	return [_db arrayForQuery: @"SELECT DISTINCT trackname FROM tracks"];
 }
 
+- (NSArray *) trackNamesMatchingGlobPattern: (NSString *)aPattern
+{
+	return [_db arrayForQuery: @"SELECT DISTINCT trackname FROM tracks WHERE trackname GLOB ?", aPattern];
+}
+
 - (COUndoTrackState *) stateForTrackName: (NSString*)aName
 {
     FMResultSet *rs = [_db executeQuery: @"SELECT track.trackname, head.uuid AS headuuid, current.uuid AS currentuuid "
 										  "FROM tracks AS track "
-										  "INNER JOIN commands AS head ON track.headid = head.id "
-										  "INNER JOIN commands AS current ON track.currentid = current.id "
+										  "LEFT OUTER JOIN commands AS head ON track.headid = head.id "
+										  "LEFT OUTER JOIN commands AS current ON track.currentid = current.id "
 										  "WHERE track.trackname = ?", aName];
 	COUndoTrackState *result = nil;
     if ([rs next])
@@ -163,7 +179,9 @@
 		result = [COUndoTrackState new];
 		result.trackName = [rs stringForColumn: @"trackname"];
 		result.headCommandUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"headuuid"]];
-		result.currentCommandUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"currentuuid"]];
+		result.currentCommandUUID = [rs dataForColumn: @"currentuuid"] != nil
+									? [ETUUID UUIDWithData: [rs dataForColumn: @"currentuuid"]]
+									: nil;
     }
     [rs close];
     return result;
@@ -171,15 +189,26 @@
 
 - (void) setTrackState: (COUndoTrackState *)aState
 {
+	ETAssert([_db inTransaction]);
 	[_db executeUpdate: @"INSERT OR REPLACE INTO tracks (trackname, headid, currentid) "
 						@"VALUES (?, (SELECT id FROM commands WHERE uuid = ?), (SELECT id FROM commands WHERE uuid = ?))",
 						aState.trackName, [aState.headCommandUUID dataValue], [aState.currentCommandUUID dataValue]];
+	[_modifiedTracks addObject: aState.trackName];
 }
 
 - (void) removeTrackWithName: (NSString*)aName
 {
+	ETAssert([_db inTransaction]);
 	[_db executeUpdate: @"DELETE FROM tracks WHERE trackname = ?", aName];
 	[_db executeUpdate: @"DELETE FROM commands WHERE trackname = ?", aName];
+	[_modifiedTracks addObject: aName];
+}
+
+- (NSArray *) allCommandUUIDsOnTrackWithName: (NSString*)aName
+{
+	return [[_db arrayForQuery: @"SELECT uuid FROM commands WHERE trackname = ?", aName] mappedCollectionWithBlock: ^(id object) {
+		return [ETUUID UUIDWithData: object];
+	}];
 }
 
 - (NSData *) serialize: (id)json
@@ -237,6 +266,33 @@
 - (void) removeCommandForUUID: (ETUUID *)aUUID
 {
 	[_db executeUpdate: @"DELETE FROM commands WHERE uuid = ?", [aUUID dataValue]];
+}
+
+- (BOOL) string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern
+{
+	return [_db boolForQuery: @"SELECT 1 WHERE ? GLOB ?", aString, aPattern];
+}
+
+- (void) postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo
+{
+	ETAssert([NSThread isMainThread]);
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName: COUndoTrackStoreTracksDidChangeNotification
+	                                                    object: self
+	                                                  userInfo: userInfo];
+	
+	[[NSDistributedNotificationCenter defaultCenter]
+	 postNotificationName: COUndoTrackStoreTracksDidChangeNotification
+	 object: [_db databasePath]
+	 userInfo: userInfo
+	 deliverImmediately: YES];
+}
+
+- (void) postCommitNotifications
+{
+	NSDictionary *userInfo = @{COUndoTrackStoreChangedTracks : [_modifiedTracks allObjects]};
+	[self postCommitNotificationsWithUserInfo: userInfo];
+	[_modifiedTracks removeAllObjects];
 }
 
 @end

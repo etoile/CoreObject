@@ -10,6 +10,7 @@
 #import <CoreObject/CoreObject.h>
 
 #import "COObjectGraphContext+GarbageCollection.h"
+#import "CODateSerialization.h"
 
 #import "COSynchronizerRevision.h"
 #import "COSynchronizerPushedRevisionsToClientMessage.h"
@@ -66,6 +67,7 @@
 #import "COStoreTransaction.h"
 #import "COObjectGraphContext+Graphviz.h"
 #import "COEditingContext+Private.h"
+#import "COCommandGroup.h"
 
 #import "diff.h"
 

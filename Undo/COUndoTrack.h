@@ -8,7 +8,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreObject/COTrack.h>
 
-@class COUndoStackStore, COEditingContext, COCommand, COCommandGroup;
+@class COUndoTrackStore, COUndoTrackState, COEditingContext, COCommand, COCommandGroup;
 
 extern NSString * const COUndoStackDidChangeNotification;
 extern NSString * const kCOUndoStackName;
@@ -64,15 +64,16 @@ extern NSString * const kCOUndoStackName;
 @interface COUndoTrack : NSObject <COTrack>
 {
 	@private
-    COUndoStackStore *_store;
+    COUndoTrackStore *_store;
     NSString *_name;
-	NSMutableArray *_commands;
+	NSMutableArray *_nodesOnCurrentUndoBranch;
+	NSMutableDictionary *_commandsByUUID;
 	COEditingContext *_editingContext;
+	NSMutableDictionary *_trackStateForName;
 	
 	BOOL _coalescing;
 	ETUUID *_lastCoalescedCommandUUID;
 }
-
 
 /** @taskunit Track Access and Creation */
 
@@ -109,11 +110,6 @@ extern NSString * const kCOUndoStackName;
 /**
  * The editing context that is changed if -undo, -redo or -setCurrentNode: are 
  * called.
- *
- * If you pass an undo track to -[COEditingContext commitWithIdentifier:metadata:undoTrack:error:] 
- * or similar commit methods, then usually you want undo and redo to apply to 
- * the same editing context. To do so, just set up the undo track using 
- * -[COUndoTrack setEditingContext:].
  */
 @property (nonatomic, readonly) COEditingContext *editingContext;
 
@@ -165,6 +161,14 @@ extern NSString * const kCOUndoStackName;
 - (NSString *) redoMenuItemTitle;
 
 
+/** @taskunit Divergent Commands */
+
+
+/**
+ * returns all commands ordered by commit order
+ */
+- (NSArray *) allCommands;
+
 
 /** @taskunit Framework Private */
 
@@ -175,5 +179,7 @@ extern NSString * const kCOUndoStackName;
  * See also -currentCommand.
  */
 - (void) recordCommand: (COCommandGroup *)aCommand;
+
+@property (nonatomic, readonly) COUndoTrackStore *store;
 
 @end
