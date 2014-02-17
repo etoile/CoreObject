@@ -7,7 +7,7 @@
 
 #import <CoreObject/COCommand.h>
 
-@interface COCommandUndeletePersistentRoot : COSingleCommand
+@interface COCommandUndeletePersistentRoot : COCommand
 @end
 
 @interface COCommandCreatePersistentRoot : COCommandUndeletePersistentRoot

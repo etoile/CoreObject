@@ -41,6 +41,8 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 @implementation COCommand
 
 @synthesize parentUndoTrack = _parentUndoTrack;
+@synthesize storeUUID = _storeUUID;
+@synthesize persistentRootUUID = _persistentRootUUID;
 
 + (NSDictionary *) mapping
 {
@@ -77,8 +79,11 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 
 - (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
-    [NSException raise: NSInvalidArgumentException format: @"override"];
-    return nil;
+    SUPERINIT;
+	_parentUndoTrack = aParent;
+    _storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandStoreUUID]];
+    _persistentRootUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandPersistentRootUUID]];
+    return self;
 }
 
 - (id) propertyList
@@ -90,6 +95,9 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
         {
 			NSMutableDictionary *result = [NSMutableDictionary dictionary];
 			result[kCOCommandType] = type;
+			
+			[result setObject: [_storeUUID stringValue] forKey: kCOCommandStoreUUID];
+			[result setObject: [_persistentRootUUID stringValue] forKey: kCOCommandPersistentRootUUID];
 			return result;
         }
     }
@@ -170,36 +178,9 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 	return nil;
 }
 
-@end
-
-@implementation COSingleCommand
-
-@synthesize storeUUID = _storeUUID;
-@synthesize persistentRootUUID = _persistentRootUUID;
-
-#pragma mark -
-#pragma mark Initialization
-
-- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
-{
-    SUPERINIT;
-	_parentUndoTrack = aParent;
-    _storeUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandStoreUUID]];
-    _persistentRootUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandPersistentRootUUID]];
-    return self;
-}
-
-- (id) propertyList
-{
-    NSMutableDictionary *result = [super propertyList];
-    [result setObject: [_storeUUID stringValue] forKey: kCOCommandStoreUUID];
-    [result setObject: [_persistentRootUUID stringValue] forKey: kCOCommandPersistentRootUUID];
-    return result;
-}
-
 - (id) copyWithZone:(NSZone *)zone
 {
-    COSingleCommand *aCopy = [[[self class] allocWithZone: zone] init];
+    COCommand *aCopy = [[[self class] allocWithZone: zone] init];
     aCopy->_storeUUID = _storeUUID;
     aCopy->_persistentRootUUID = _persistentRootUUID;
     return aCopy;
@@ -209,17 +190,9 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 {
 	if ([object isKindOfClass: [self class]] == NO)
 		return NO;
-
-	return [((COSingleCommand *)object)->_storeUUID isEqual: _storeUUID]
-			&& [((COSingleCommand *)object)->_persistentRootUUID isEqual: _persistentRootUUID];
-}
-
-#pragma mark -
-#pragma mark Track Node Protocol
-
-- (ETUUID *)persistentRootUUID
-{
-	return _persistentRootUUID;
+	
+	return [((COCommand *)object)->_storeUUID isEqual: _storeUUID]
+	&& [((COCommand *)object)->_persistentRootUUID isEqual: _persistentRootUUID];
 }
 
 @end

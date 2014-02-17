@@ -7,7 +7,7 @@
 
 #import <CoreObject/COCommand.h>
 
-@interface COCommandDeletePersistentRoot : COSingleCommand
+@interface COCommandDeletePersistentRoot : COCommand
 {
 	@private
     ETUUID *_initialRevisionID;

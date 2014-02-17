@@ -7,7 +7,7 @@
 
 #import <CoreObject/COCommand.h>
 
-@interface COCommandUndeleteBranch : COSingleCommand
+@interface COCommandUndeleteBranch : COCommand
 {
     ETUUID *_branchUUID;
 }

@@ -28,6 +28,8 @@
 @interface COCommand : NSObject <COTrackNode>
 {
 	COUndoTrack __weak *_parentUndoTrack;
+	ETUUID *_storeUUID;
+    ETUUID *_persistentRootUUID;
 }
 
 
@@ -49,6 +51,16 @@
  * -[COUndoTrack recordCommand:].
  */
 @property (nonatomic, readwrite, weak) COUndoTrack *parentUndoTrack;
+/**
+ * The UUID of the store against which the changes were or would be committed
+ * (for an inverse).
+ */
+@property (nonatomic, copy) ETUUID *storeUUID;
+/**
+ * The UUID of the persistent root to which the changes were or would be applied
+ * (for an inverse).
+ */
+@property (nonatomic, copy) ETUUID *persistentRootUUID;
 
 
 /** @taskunit Applying and Reverting Changes */
@@ -62,6 +74,11 @@
  *
  * <code>[[command inverse] inverse]</code> must be equal 
  * <code>[command inverse]</code>.
+ *
+ * A single command corresponds to an atomic operation inside a commit
+ * (e.g. just a branch creation or just a new revision).
+ *
+ * For each commit, single commands are grouped into a COCommandGroup.
  */
 - (COCommand *) inverse;
 
@@ -100,48 +117,9 @@
  * Returns the receiver serialized as a property list.
  */
 - (id) propertyList;
-
-@end
-
-
-/**
- * @group Undo
- * @abstract A command representing a single store structure change
- *
- * A single command corresponds to an atomic operation inside a commit 
- * (e.g. just a branch creation or just a new revision).
- *
- * For each commit, single commands are grouped into a COCommandGroup.
- */
-@interface COSingleCommand : COCommand <NSCopying>
-{
-    ETUUID *_storeUUID;
-    ETUUID *_persistentRootUUID;
-}
-
-
-/** @taskunit Basic Properties */
-
-
-/**
- * The UUID of the store against which the changes were or would be committed 
- * (for an inverse).
- */
-@property (nonatomic, copy) ETUUID *storeUUID;
-/**
- * The UUID of the persistent root to which the changes were or would be applied 
- * (for an inverse).
- */
-@property (nonatomic, copy) ETUUID *persistentRootUUID;
-
-
-/** @taskunit Framework Private */
-
-
 /**
  * Returns a new command equal to the receiver.
  */
 - (id) copyWithZone: (NSZone *)zone;
 
 @end
-

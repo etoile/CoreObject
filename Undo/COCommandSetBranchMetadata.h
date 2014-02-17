@@ -7,7 +7,7 @@
 
 #import <CoreObject/COCommand.h>
 
-@interface COCommandSetBranchMetadata : COSingleCommand
+@interface COCommandSetBranchMetadata : COCommand
 {
     ETUUID *_branchUUID;
     NSDictionary *_oldMetadata;

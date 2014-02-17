@@ -9,7 +9,7 @@
 
 @class CORevision;
 
-@interface COCommandSetCurrentVersionForBranch : COSingleCommand
+@interface COCommandSetCurrentVersionForBranch : COCommand
 {
     ETUUID *_branchUUID;
     ETUUID *_oldRevisionUUID;

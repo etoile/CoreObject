@@ -7,7 +7,7 @@
 
 #import <CoreObject/COCommand.h>
 
-@interface COCommandSetPersistentRootMetadata : COSingleCommand
+@interface COCommandSetPersistentRootMetadata : COCommand
 {
     NSDictionary *_oldMetadata;
     NSDictionary *_newMetadata;
