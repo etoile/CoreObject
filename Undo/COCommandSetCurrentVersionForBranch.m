@@ -244,7 +244,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 		
 		[txn writeRevisionWithModifiedItems: result
 							   revisionUUID: newRevisionUUID
-								   metadata: self.metadata
+								   metadata: nil // FIXME: Copy from commented out part of COUndoTrack
 						   parentRevisionID: branchCurrentRevisionUUID
 					  mergeParentRevisionID: nil
 						 persistentRootUUID: _persistentRootUUID

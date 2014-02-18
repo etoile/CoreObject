@@ -780,6 +780,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	
     _currentBranchUUID =  [_savedState currentBranchUUID];
 	[_currentBranchObjectGraph setItemGraph: [[self currentBranch] objectGraphContext]];
+	[_currentBranchObjectGraph removeUnreachableObjects];
     _lastTransactionID = _savedState.transactionID;
     _metadata = _savedState.metadata;
 	

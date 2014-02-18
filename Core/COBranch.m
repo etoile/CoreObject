@@ -842,6 +842,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		[[_persistentRoot store] itemGraphForRevisionUUID: _currentRevisionUUID
 		                                   persistentRoot: [[self persistentRoot] UUID]];
     [_objectGraph setItemGraph: aGraph];
+	[_objectGraph removeUnreachableObjects];
 	
 	[self updateRevisions];
 }

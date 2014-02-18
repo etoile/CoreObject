@@ -426,8 +426,10 @@ static ETUUID *branchBUUID;
 	
     // Commit has been replicated to the server
 	
-    UKIntsEqual(1, [[serverPersistentRoot branches] count]);
-	[self wait];
+	// These next two lines are no longer needed if -commitStoreTransaction:
+	// blocks while sending in-process editing context notifications.
+    //UKIntsEqual(1, [[serverPersistentRoot branches] count]);
+	//[self wait];
     UKIntsEqual(2, [[serverPersistentRoot branches] count]);
 	
 	// Server merges remote branch into local branch

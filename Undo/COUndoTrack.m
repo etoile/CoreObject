@@ -14,6 +14,8 @@
 #import "COCommandGroup.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
 #import "COCommandSetCurrentVersionForBranch.h"
+#import "COStoreTransaction.h"
+#import "COPersistentRoot+Private.h"
 
 extern NSString * const kCOCommandUUID;
 
@@ -316,42 +318,57 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	ETAssert([undo1 count] == 0 || [redo1 count] == 0);
 	ETAssert([undo2 count] == 0 || [redo2 count] == 0);
 	
+	COStoreTransaction *txn = [COStoreTransaction new];
+	
 	for (COCommandGroup *cmd in undo1)
 	{
-		[self doCommand: cmd inverse: YES];
+		[self doCommand: cmd inverse: YES addToStoreTransaction: txn];
 	}
 	for (COCommandGroup *cmd in redo1)
 	{
-		[self doCommand: cmd inverse: NO];
+		[self doCommand: cmd inverse: NO addToStoreTransaction: txn];
 	}
 	for (COCommandGroup *cmd in undo2)
 	{
-		[self doCommand: cmd inverse: YES];
+		[self doCommand: cmd inverse: YES addToStoreTransaction: txn];
 	}
 	for (COCommandGroup *cmd in redo2)
 	{
-		[self doCommand: cmd inverse: NO];
+		[self doCommand: cmd inverse: NO addToStoreTransaction: txn];
 	}
+	
+	// Set the last transaction IDs so the store will accept our transaction
+	for (ETUUID *uuid in [txn persistentRootUUIDs])
+	{
+		COPersistentRoot *proot = [_editingContext persistentRootForUUID: uuid];
+		[txn setOldTransactionID: proot.lastTransactionID forPersistentRoot: uuid];
+	}
+
+	BOOL ok = [[_editingContext store] commitStoreTransaction: txn];
+	ETAssert(ok);
 }
 
-- (void) doCommand: (COCommandGroup *)aCommand inverse: (BOOL)inverse
+- (void) doCommand: (COCommandGroup *)aCommand inverse: (BOOL)inverse addToStoreTransaction: (COStoreTransaction *)txn
 {
 	COCommandGroup *commandToApply = (inverse ? [aCommand inverse] : aCommand);
-	[commandToApply applyToContext: _editingContext];
-    
+//	[commandToApply applyToContext: _editingContext];
+	[commandToApply addToStoreTransaction: txn assumingEditingContextState: _editingContext];
+	
+
+	
     // N.B. This must not automatically push a revision
-    _editingContext.isRecordingUndo = NO;
+//    _editingContext.isRecordingUndo = NO;
 	// TODO: If we can detect a non-selective undo and -commit returns a command,
 	// we could implement -validateUndoCommitWithCommand: to ensure there is no
 	// command COCommandCreatePersistentRoot or COCommandNewRevisionForBranch
 	// that create new revisions in the store.
-    [_editingContext commitWithIdentifier: inverse ?  @"org.etoile.CoreObject.undo" : @"org.etoile.CoreObject.redo"
-						  metadata: [commandToApply localizedShortDescription] != nil
-										? @{ kCOCommitMetadataShortDescriptionArguments : @[[commandToApply localizedShortDescription]] }
-										: @{}
-						 undoTrack: nil
-							 error: NULL];
-    _editingContext.isRecordingUndo = YES;
+//    [_editingContext commitWithIdentifier: inverse ?  @"org.etoile.CoreObject.undo" : @"org.etoile.CoreObject.redo"
+//						  metadata: [commandToApply localizedShortDescription] != nil
+//										? @{ kCOCommitMetadataShortDescriptionArguments : @[[commandToApply localizedShortDescription]] }
+//										: @{}
+//						 undoTrack: nil
+//							 error: NULL];
+//    _editingContext.isRecordingUndo = YES;
 	
 	// Update the current command for this track.
 

@@ -86,4 +86,6 @@
 
 - (COCommandGroup *) inverse;
 - (void) applyToContext: (COEditingContext *)aContext;
+- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx;
+
 @end

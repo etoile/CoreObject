@@ -193,16 +193,15 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     
     assert(dispatch_get_current_queue() != queue_);
     
+	NSMutableDictionary *txnIDForPersistentRoot = [[NSMutableDictionary alloc] init];
+	NSMutableArray *insertedUUIDs = [[NSMutableArray alloc] init];
+	NSMutableArray *deletedUUIDs = [[NSMutableArray alloc] init];
+	
     dispatch_sync(queue_, ^() {
         [db_ beginTransaction];
         
 		// update the last transaction field before we commit.
-		
-		NSMutableDictionary *txnIDForPersistentRoot = [[NSMutableDictionary alloc] init];
-		
-		NSMutableArray *insertedUUIDs = [[NSMutableArray alloc] init];
-		NSMutableArray *deletedUUIDs = [[NSMutableArray alloc] init];
-		
+
 		// setup
 		
         for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
@@ -267,19 +266,20 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         else
         {
             ok = [db_ commit];
-            if (ok)
-            {
-                [self postCommitNotificationsWithTransactionIDForPersistentRootUUID: txnIDForPersistentRoot
-															insertedPersistentRoots: insertedUUIDs
-															 deletedPersistentRoots: deletedUUIDs];
-            }
-            else
-            {
-                NSLog(@"Commit failed");
-            }
         }
     });
     
+	if (ok)
+	{
+		[self postCommitNotificationsWithTransactionIDForPersistentRootUUID: txnIDForPersistentRoot
+													insertedPersistentRoots: insertedUUIDs
+													 deletedPersistentRoots: deletedUUIDs];
+	}
+	else
+	{
+		NSLog(@"Commit failed");
+	}
+	
     return ok;
 }
 
@@ -1000,9 +1000,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 							   kCOStoreUUID : [[self UUID] stringValue],
 							   kCOStoreURL : [[self URL] absoluteString]};
 
-	[self performSelectorOnMainThread: @selector(postCommitNotificationsWithUserInfo:)
-	                       withObject: userInfo 
-	                    waitUntilDone: NO];
+	[self postCommitNotificationsWithUserInfo: userInfo];
 }
 
 - (FMDatabase *) database
