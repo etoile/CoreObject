@@ -11,8 +11,18 @@
 @class FMDatabase;
 @class ETUUID;
 
-NSString * const COUndoTrackStoreTracksDidChangeNotification;
-NSString * const COUndoTrackStoreChangedTracks;
+NSString * const COUndoTrackStoreTrackDidChangeNotification;
+
+// User info keys for COUndoTrackStoreTrackDidChangeNotification
+NSString * const COUndoTrackStoreTrackName;
+/**
+ * UUID string
+ */
+NSString * const COUndoTrackStoreTrackHeadCommandUUID;
+/**
+ * NSNull or UUID string
+ */
+NSString * const COUndoTrackStoreTrackCurrentCommandUUID;
 
 @interface COUndoTrackSerializedCommand : NSObject
 @property (readwrite, nonatomic) id JSONData;
@@ -24,7 +34,7 @@ NSString * const COUndoTrackStoreChangedTracks;
 @property (readwrite, nonatomic) int64_t sequenceNumber;
 @end
 
-@interface COUndoTrackState : NSObject
+@interface COUndoTrackState : NSObject <NSCopying>
 @property (readwrite, nonatomic) NSString *trackName;
 @property (readwrite, nonatomic) ETUUID *headCommandUUID;
 @property (readwrite, nonatomic) ETUUID *currentCommandUUID;
@@ -33,7 +43,7 @@ NSString * const COUndoTrackStoreChangedTracks;
 @interface COUndoTrackStore : NSObject
 {
     FMDatabase *_db;
-	NSMutableSet *_modifiedTracks;
+	NSMutableDictionary *_modifiedTrackStateForTrackName;
 }
 
 + (COUndoTrackStore *) defaultStore;

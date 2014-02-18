@@ -13,8 +13,10 @@
 #import "COCommand.h"
 #import "CODateSerialization.h"
 
-NSString * const COUndoTrackStoreTracksDidChangeNotification = @"COUndoTrackStoreTracksDidChangeNotification";
-NSString * const COUndoTrackStoreChangedTracks = @"COUndoTrackStoreChangedTracks";
+NSString * const COUndoTrackStoreTrackDidChangeNotification = @"COUndoTrackStoreTrackDidChangeNotification";
+NSString * const COUndoTrackStoreTrackName = @"COUndoTrackStoreTrackName";
+NSString * const COUndoTrackStoreTrackHeadCommandUUID = @"COUndoTrackStoreTrackHeadCommandUUID";
+NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTrackCurrentCommandUUID";
 
 @implementation COUndoTrackSerializedCommand
 @synthesize JSONData, metadata, UUID, parentUUID, trackName, timestamp, sequenceNumber;
@@ -22,6 +24,24 @@ NSString * const COUndoTrackStoreChangedTracks = @"COUndoTrackStoreChangedTracks
 
 @implementation COUndoTrackState
 @synthesize trackName, headCommandUUID, currentCommandUUID;
+- (id)copyWithZone:(NSZone *)zone
+{
+	COUndoTrackState *aCopy = [COUndoTrackState new];
+	aCopy.trackName = self.trackName;
+	aCopy.headCommandUUID = self.headCommandUUID;
+	aCopy.currentCommandUUID = self.currentCommandUUID;
+	return aCopy;
+}
+- (BOOL) isEqual:(id)object
+{
+	if (![object isKindOfClass: [COUndoTrackState class]])
+		return NO;
+	COUndoTrackState *otherState = object;
+	return [self.trackName isEqual: otherState.trackName]
+		&& [self.headCommandUUID isEqual: otherState.headCommandUUID]
+		&& ((self.currentCommandUUID == nil && otherState.currentCommandUUID == nil)
+			|| [self.currentCommandUUID isEqual: otherState.currentCommandUUID]);
+}
 @end
 
 /*
@@ -89,7 +109,7 @@ NSString * const COUndoTrackStoreChangedTracks = @"COUndoTrackStoreChangedTracks
 {
     SUPERINIT;
     
-	_modifiedTracks = [NSMutableSet new];
+	_modifiedTrackStateForTrackName = [NSMutableDictionary new];
 	
     NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
 
@@ -193,7 +213,7 @@ NSString * const COUndoTrackStoreChangedTracks = @"COUndoTrackStoreChangedTracks
 	[_db executeUpdate: @"INSERT OR REPLACE INTO tracks (trackname, headid, currentid) "
 						@"VALUES (?, (SELECT id FROM commands WHERE uuid = ?), (SELECT id FROM commands WHERE uuid = ?))",
 						aState.trackName, [aState.headCommandUUID dataValue], [aState.currentCommandUUID dataValue]];
-	[_modifiedTracks addObject: aState.trackName];
+	_modifiedTrackStateForTrackName[aState.trackName] = [aState copy];
 }
 
 - (void) removeTrackWithName: (NSString*)aName
@@ -201,7 +221,6 @@ NSString * const COUndoTrackStoreChangedTracks = @"COUndoTrackStoreChangedTracks
 	ETAssert([_db inTransaction]);
 	[_db executeUpdate: @"DELETE FROM tracks WHERE trackname = ?", aName];
 	[_db executeUpdate: @"DELETE FROM commands WHERE trackname = ?", aName];
-	[_modifiedTracks addObject: aName];
 }
 
 - (NSArray *) allCommandUUIDsOnTrackWithName: (NSString*)aName
@@ -277,12 +296,12 @@ NSString * const COUndoTrackStoreChangedTracks = @"COUndoTrackStoreChangedTracks
 {
 	ETAssert([NSThread isMainThread]);
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName: COUndoTrackStoreTracksDidChangeNotification
+	[[NSNotificationCenter defaultCenter] postNotificationName: COUndoTrackStoreTrackDidChangeNotification
 	                                                    object: self
 	                                                  userInfo: userInfo];
 	
 	[[NSDistributedNotificationCenter defaultCenter]
-	 postNotificationName: COUndoTrackStoreTracksDidChangeNotification
+	 postNotificationName: COUndoTrackStoreTrackDidChangeNotification
 	 object: [_db databasePath]
 	 userInfo: userInfo
 	 deliverImmediately: YES];
@@ -290,9 +309,21 @@ NSString * const COUndoTrackStoreChangedTracks = @"COUndoTrackStoreChangedTracks
 
 - (void) postCommitNotifications
 {
-	NSDictionary *userInfo = @{COUndoTrackStoreChangedTracks : [_modifiedTracks allObjects]};
-	[self postCommitNotificationsWithUserInfo: userInfo];
-	[_modifiedTracks removeAllObjects];
+	for (NSString *modifiedTrack in _modifiedTrackStateForTrackName)
+	{
+		COUndoTrackState *state = _modifiedTrackStateForTrackName[modifiedTrack];
+		
+		id currentUUIDString = state.currentCommandUUID != nil
+			? [state.currentCommandUUID stringValue]
+			: [NSNull null];
+		
+		NSDictionary *userInfo = @{COUndoTrackStoreTrackName : modifiedTrack,
+								   COUndoTrackStoreTrackHeadCommandUUID : [state.headCommandUUID stringValue],
+								   COUndoTrackStoreTrackCurrentCommandUUID : currentUUIDString};
+		[self postCommitNotificationsWithUserInfo: userInfo];
+		
+	}
+	[_modifiedTrackStateForTrackName removeAllObjects];
 }
 
 @end

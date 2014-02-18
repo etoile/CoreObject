@@ -72,8 +72,8 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	_commandsByUUID = [NSMutableDictionary new];
 	
 	[[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(storeTracksDidChange:)
-                                                 name: COUndoTrackStoreTracksDidChangeNotification
+                                             selector: @selector(storeTrackDidChange:)
+                                                 name: COUndoTrackStoreTrackDidChangeNotification
                                                object: _store];
 	
     return self;
@@ -541,12 +541,29 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 #pragma mark - Notification handling
 
-- (void) storeTracksDidChange: (NSNotification *)notif
+- (void) storeTrackDidChange: (NSNotification *)notif
 {
-	NSArray *changedTracks = [notif userInfo][COUndoTrackStoreChangedTracks];
-	// FIXME: Do fine-grained reloading only if needed
-	
-	[self reload];
+	NSDictionary *userInfo = [notif userInfo];
+	COUndoTrackState *notifState = [COUndoTrackState new];
+	notifState.trackName = userInfo[COUndoTrackStoreTrackName];
+	notifState.headCommandUUID = [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackHeadCommandUUID]];
+	notifState.currentCommandUUID = userInfo[COUndoTrackStoreTrackCurrentCommandUUID] != [NSNull null]
+		? [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackCurrentCommandUUID]]
+		: nil;
+		
+	if ([_store string: notifState.trackName matchesGlobPattern: _name])
+	{
+		COUndoTrackState *inMemoryState = _trackStateForName[notifState.trackName];
+		if (![inMemoryState isEqual: notifState])
+		{
+			//NSLog(@"Doing track reload");
+			[self reload];
+		}
+		else
+		{
+			//NSLog(@"Skipping track reload");
+		}
+	}
 }
 
 - (void) postNotificationsForStackName: (NSString *)aStack
