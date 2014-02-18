@@ -12,6 +12,8 @@
 @interface TestUndoTrack : EditingContextTestCase <UKTest>
 {
     COUndoTrack *_track;
+	COUndoTrack *_track2;
+	COUndoTrack *_patternTrack;
 }
 
 @end
@@ -24,6 +26,12 @@
     
     _track = [COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx];
 	[_track clear];
+	
+	_track2 = [COUndoTrack trackForName: TEST_TRACK @"2" withEditingContext: ctx];
+	[_track2 clear];
+	
+	_patternTrack = [COUndoTrack trackForPattern: TEST_TRACK @"*" withEditingContext: ctx];
+	[_patternTrack clear];
 	
 	return self;
 }
@@ -119,10 +127,9 @@
 	UKIntsEqual(3, [S(group1, group1a, group1b) count]);
 }
 
-- (void) testPatternTrack
+- (void) testUndoOnPatternTrack
 {
-	COUndoTrack *track2 = [COUndoTrack trackForName: TEST_TRACK @"2" withEditingContext: ctx];
-	[track2 clear];
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance]), [_patternTrack nodes]);
 	
 	COCommandGroup *group1a = [[COCommandGroup alloc] init];
 	COCommandGroup *group1b = [[COCommandGroup alloc] init];
@@ -130,40 +137,68 @@
 	COCommandGroup *group2b = [[COCommandGroup alloc] init];
 	
 	[_track recordCommand: group1a];
-	[track2 recordCommand: group2a];
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1a), [_patternTrack nodes]);
+	
+	[_track2 recordCommand: group2a];
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1a, group2a), [_patternTrack nodes]);
+	
 	[_track recordCommand: group1b];
-	[track2 recordCommand: group2b];
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1a, group2a, group1b), [_patternTrack nodes]);
 	
-	COUndoTrack *patternTrack = [COUndoTrack trackForPattern: TEST_TRACK @"*" withEditingContext: ctx];
-	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1a, group2a, group1b, group2b), [patternTrack nodes]);
+	[_track2 recordCommand: group2b];
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1a, group2a, group1b, group2b), [_patternTrack nodes]);
 	
-	[patternTrack undo];
+	[_patternTrack undo];
 	
 	UKObjectsEqual(group1b, [_track currentNode]);
-	UKObjectsEqual(group2a, [track2 currentNode]);
+	UKObjectsEqual(group2a, [_track2 currentNode]);
 	UKObjectsEqual(group1b, [[COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx] currentNode]);
 	UKObjectsEqual(group2a, [[COUndoTrack trackForName: TEST_TRACK @"2" withEditingContext: ctx] currentNode]);
 	
-	[patternTrack undo];
+	[_patternTrack undo];
 	
 	UKObjectsEqual(group1a, [_track currentNode]);
-	UKObjectsEqual(group2a, [track2 currentNode]);
+	UKObjectsEqual(group2a, [_track2 currentNode]);
 	UKObjectsEqual(group1a, [[COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx] currentNode]);
 	UKObjectsEqual(group2a, [[COUndoTrack trackForName: TEST_TRACK @"2" withEditingContext: ctx] currentNode]);
 	
-	[patternTrack undo];
+	[_patternTrack undo];
 	
 	UKObjectsEqual(group1a, [_track currentNode]);
-	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [track2 currentNode]);
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [_track2 currentNode]);
 	UKObjectsEqual(group1a, [[COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx] currentNode]);
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [[COUndoTrack trackForName: TEST_TRACK @"2" withEditingContext: ctx] currentNode]);
 	
-	[patternTrack undo];
+	[_patternTrack undo];
 	
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [_track currentNode]);
-	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [track2 currentNode]);
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [_track2 currentNode]);
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [[COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx] currentNode]);
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [[COUndoTrack trackForName: TEST_TRACK @"2" withEditingContext: ctx] currentNode]);
+}
+
+- (void) testUndoOnPatternTrackObservedTracks
+{
+	COCommandGroup *group1a = [[COCommandGroup alloc] init];
+	COCommandGroup *group1b = [[COCommandGroup alloc] init];
+	COCommandGroup *group2a = [[COCommandGroup alloc] init];
+	COCommandGroup *group2b = [[COCommandGroup alloc] init];
+	
+	[_track recordCommand: group1a];
+	[_track2 recordCommand: group2a];
+	[_track recordCommand: group1b];
+	[_track2 recordCommand: group2b];
+
+	// NOTE: This has the effect of reordering the commands in [_patternTrack nodes]
+	[_track undo];
+	
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1a, group2a, group2b, group1b), [_patternTrack nodes]);
+	UKObjectsEqual(group2b, [_patternTrack currentNode]);
+	
+	[_track undo];
+
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group2a, group2b, group1a, group1b), [_patternTrack nodes]);
+	UKObjectsEqual(group2b, [_patternTrack currentNode]);
 }
 
 @end

@@ -444,15 +444,22 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	// Populate _nodesOnCurrentUndoBranch, from the head backwards
 	if ([_trackStateForName count] > 0)
 	{
+		NSMutableArray *undoNodes = [NSMutableArray new];
+		NSMutableArray *redoNodes = [NSMutableArray new];
+		
 		for (COUndoTrackState *trackState in [_trackStateForName allValues])
 		{
+			NSMutableArray *targetArray = redoNodes;
 			ETUUID *commandUUID = trackState.headCommandUUID;
 			while (commandUUID != nil)
 			{
+				if ([commandUUID isEqual: trackState.currentCommandUUID])
+					targetArray = undoNodes;
+				
 				COCommandGroup *command = [self commandForUUID: commandUUID];
 				ETAssert([command.UUID isEqual: commandUUID]);
 				
-				[_nodesOnCurrentUndoBranch addObject: command];
+				[targetArray addObject: command];
 				commandUUID = command.parentUUID;
 			}
 			
@@ -465,10 +472,20 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 		
 		// Now, sort the nodes
 		
-		[_nodesOnCurrentUndoBranch sortUsingDescriptors:
+		[undoNodes sortUsingDescriptors:
 		 @[[NSSortDescriptor sortDescriptorWithKey: @"sequenceNumber" ascending: YES]]];
+		
+		[redoNodes sortUsingDescriptors:
+		 @[[NSSortDescriptor sortDescriptorWithKey: @"sequenceNumber" ascending: YES]]];
+		
+		[_nodesOnCurrentUndoBranch addObject: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
+		[_nodesOnCurrentUndoBranch addObjectsFromArray: undoNodes];
+		[_nodesOnCurrentUndoBranch addObjectsFromArray: redoNodes];
 	}
-	[_nodesOnCurrentUndoBranch insertObject: [COEndOfUndoTrackPlaceholderNode sharedInstance] atIndex: 0];
+	else
+	{
+		[_nodesOnCurrentUndoBranch setArray: @[[COEndOfUndoTrackPlaceholderNode sharedInstance]]];
+	}
 }
 
 - (void) reload
