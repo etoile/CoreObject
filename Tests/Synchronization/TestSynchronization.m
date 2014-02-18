@@ -40,6 +40,7 @@ static ETUUID *branchBUUID;
 - (COItemGraph *) itemGraphWithLabel: (NSString *)aLabel
 {
     COMutableItem *child = [[COMutableItem alloc] initWithUUID: rootItemUUID];
+	[child setValue: @"OutlineItem" forAttribute: kCOObjectEntityNameProperty type: kCOTypeString];
     [child setValue: aLabel
        forAttribute: @"label"
                type: kCOTypeString];
