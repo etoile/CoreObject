@@ -20,6 +20,18 @@
 
 @implementation TestUndoTrack
 
+#pragma mark - test infrastructure
+
+- (void) checkSettingCurrentNodeOfTrack: (COUndoTrack *)aTrack
+									 to: (id<COTrackNode>)aNode
+							undoesNodes: (NSArray *)undoNodes
+							redoesNodes: (NSArray *)redoNodes
+{
+	
+}
+
+#pragma mark - tests
+
 - (id) init
 {
     SUPERINIT;
@@ -127,6 +139,24 @@
 	UKIntsEqual(3, [S(group1, group1a, group1b) count]);
 }
 
+- (void) testSetCurrentNodeToDivergentNode
+{
+	COCommandGroup *group1 = [[COCommandGroup alloc] init];
+	COCommandGroup *group1a = [[COCommandGroup alloc] init];
+	COCommandGroup *group1b = [[COCommandGroup alloc] init];
+	
+	[_track recordCommand: group1];
+	[_track recordCommand: group1a];
+	[_track setCurrentNode: group1];
+	[_track recordCommand: group1b];
+	
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1, group1b), [_track nodes]);
+
+	[_track setCurrentNode: group1a];
+
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1, group1a), [_track nodes]);
+}
+
 - (void) testUndoOnPatternTrack
 {
 	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance]), [_patternTrack nodes]);
@@ -200,5 +230,7 @@
 	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group2a, group2b, group1a, group1b), [_patternTrack nodes]);
 	UKObjectsEqual(group2b, [_patternTrack currentNode]);
 }
+
+// TODO: Test mixing commands between tracks illegally
 
 @end

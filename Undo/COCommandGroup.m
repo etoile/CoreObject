@@ -247,4 +247,9 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	return nil;// [_owner commandForUUID: _parentCommandUUID];
 }
 
+- (NSString *) description
+{
+	return [NSString stringWithFormat: @"COCommandGroup %@", _UUID];
+}
+
 @end

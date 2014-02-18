@@ -160,10 +160,13 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	
 	if (targetIndex == NSNotFound)
 	{
-		NSLog(@"Warning, -setCurrentNode called with %@, which is not on the track's current branch", node);
-		return NO;
+		// Handle the more complex case of navigating to a node that isn't in _nodesOnCurrentUndoBranch
+		return [self setCurrentNodeToDivergentNode: node];
 	}
 
+	// From now on, we're handling the simple case of navigating to another node
+	// in the _nodesOnCurrentUndoBranch array.
+	
 	if (targetIndex == currentIndex)
 		return YES;
 	
@@ -188,6 +191,75 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	}
 	
 	[self undo: undo1 redo: redo1 undo: @[] redo: @[]];
+	
+	BOOL ok = [_store commitTransaction];
+	if (ok)
+	{
+		[self didUpdate];
+	}
+	return ok;
+}
+
+- (NSArray *) nodesFromNode: (id <COTrackNode>)node toTargetNode: (id <COTrackNode>)targetNode
+{
+	NSMutableArray *result = [NSMutableArray new];
+	for (id <COTrackNode> temp = targetNode; temp != nil; temp = [self commandForUUID: [(COCommandGroup *)temp parentUUID]])
+	{
+		if ([temp isEqual: node])
+		{
+			return result;
+		}
+
+		[result insertObject: temp atIndex: 0];
+	}
+	
+	[NSException raise: NSGenericException format: @"Didn't find target node"];
+	return nil;
+}
+
+- (BOOL)setCurrentNodeToDivergentNode: (id <COTrackNode>)node
+{
+	NILARG_EXCEPTION_TEST(node);
+	ETAssert(![_nodesOnCurrentUndoBranch containsObject: node]);
+	ETAssert(![node isEqual: [self currentNode]]);
+	
+	// TODO: Handle special case when [self currentNode] == [COEndOfTrack..
+	ETUUID *commonAncestorUUID = [self commonAncestorForCommandWithUUID: [[self currentNode] UUID]
+													 andCommandWithUUID: [node UUID]];
+	COCommandGroup *commonAncestor = [self commandForUUID: commonAncestorUUID];
+	const NSUInteger commonAncestorIndex = [_nodesOnCurrentUndoBranch indexOfObject: commonAncestor];
+	const NSUInteger currentIndex = [_nodesOnCurrentUndoBranch indexOfObject: [self currentNode]];
+	ETAssert(commonAncestorIndex != NSNotFound);
+	ETAssert(currentIndex != NSNotFound);
+
+	[_store beginTransaction];
+	
+	NSMutableArray *undo1 = [NSMutableArray new];
+	NSMutableArray *redo1 = [NSMutableArray new];
+	
+	if (commonAncestorIndex < currentIndex)
+	{
+		for (NSUInteger i = currentIndex; i > commonAncestorIndex; i--)
+		{
+			[undo1 addObject: _nodesOnCurrentUndoBranch[i]];
+		}
+	}
+	else if (commonAncestorIndex > currentIndex)
+	{
+		for (NSUInteger i = currentIndex + 1; i <= commonAncestorIndex; i++)
+		{
+			[redo1 addObject: _nodesOnCurrentUndoBranch[i]];
+		}
+	}
+	
+	// Now we are at commonAncestorIndex.
+	
+	NSArray *redo2 = [self nodesFromNode: commonAncestor toTargetNode: node];
+	
+	[self undo: undo1 redo: redo1 undo: @[] redo: redo2];
+	
+	// FIXME: Not sure if we should need to call this explicitly
+	[self reloadNodesOnCurrentBranch];
 	
 	BOOL ok = [_store commitTransaction];
 	if (ok)
@@ -310,6 +382,41 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 #pragma mark - Private
 
+- (BOOL) isCommandUUID: (ETUUID *)commitA equalToOrParentOfCommandUUID: (ETUUID *)commitB
+{
+    ETUUID *rev = commitB;
+    while (rev != nil)
+    {
+        if ([rev isEqual: commitA])
+        {
+            return YES;
+        }
+        rev = [[self commandForUUID: rev] parentUUID];
+    }
+    return NO;
+}
+
+- (ETUUID *) commonAncestorForCommandWithUUID: (ETUUID *)commitA andCommandWithUUID: (ETUUID *)commitB
+{
+	NSMutableSet *ancestorsOfA = [NSMutableSet set];
+	
+	for (ETUUID *temp = commitA; temp != nil; temp = [[self commandForUUID: temp] parentUUID])
+	{
+		[ancestorsOfA addObject: temp];
+	}
+	
+	for (ETUUID *temp = commitB; temp != nil; temp = [[self commandForUUID: temp] parentUUID])
+	{
+		if ([ancestorsOfA containsObject: temp])
+		{
+			return temp;
+		}
+	}
+	
+	// No common ancestor
+	return nil;
+}
+
 /**
  * Undo and redo the given commands, in order
  */
@@ -377,7 +484,16 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	
 	// FIgure out the new current and head UUIDS
 	ETUUID *newCurrentNodeUUID = inverse ? aCommand.parentUUID : aCommand.UUID;
-	ETUUID *newHeadNodeUUID = currentTrackState.headCommandUUID;
+	ETUUID *newHeadNodeUUID;
+	if (newCurrentNodeUUID == nil
+		|| [self isCommandUUID: newCurrentNodeUUID equalToOrParentOfCommandUUID: currentTrackState.headCommandUUID])
+	{
+		newHeadNodeUUID = currentTrackState.headCommandUUID;
+	}
+	else
+	{
+		newHeadNodeUUID = newCurrentNodeUUID;
+	}
 	
 	// Write out the new store state
 	
