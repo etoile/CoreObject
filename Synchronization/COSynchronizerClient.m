@@ -151,10 +151,9 @@
 	// Rebase [self.branch currentRevision] onto the new revisions
 	
 	const BOOL isCurrentRevDescendentOfServerRev =
-		[COLeastCommonAncestor isRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
-				equalToOrParentOfRevision: [[self.branch currentRevision] UUID]
-						   persistentRoot: self.persistentRoot.UUID
-									store: [self.persistentRoot store]];
+			[_ctx isRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
+   equalToOrParentOfRevision: [[self.branch currentRevision] UUID]
+			  persistentRoot: self.persistentRoot.UUID];
 	
 	if (_lastRevisionUUIDInTransitToServer != nil
 		&& ![[[self.branch currentRevision] UUID] isEqual: _lastRevisionUUIDInTransitToServer]
@@ -179,6 +178,7 @@
 														branchUUID: self.branch.UUID
 															 store: [self.persistentRoot store]
 													   transaction: txn
+													editingContext: self.persistentRoot.editingContext
 										modelDescriptionRepository: self.persistentRoot.editingContext.modelDescriptionRepository];
 		ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 
@@ -235,10 +235,9 @@
 	
 	NSMutableArray *revs = [[NSMutableArray alloc] init];
 	
-	NSArray *revUUIDs = [COLeastCommonAncestor revisionUUIDsFromRevisionUUIDExclusive: [self lastRevisionUUIDFromServer]
-															  toRevisionUUIDInclusive: [[self.branch currentRevision] UUID]
-																	   persistentRoot: self.persistentRoot.UUID
-																				store: self.persistentRoot.store];
+	NSArray *revUUIDs = [_ctx revisionUUIDsFromRevisionUUIDExclusive: [self lastRevisionUUIDFromServer]
+											 toRevisionUUIDInclusive: [[self.branch currentRevision] UUID]
+													  persistentRoot: self.persistentRoot.UUID];
 
 	for (ETUUID *revUUID in revUUIDs)
 	{

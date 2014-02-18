@@ -743,10 +743,9 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (COMergeInfo *) mergeInfoForMergingBranch: (COBranch *)aBranch
 {
-    ETUUID *lca = [COLeastCommonAncestor commonAncestorForCommit: [[aBranch currentRevision] UUID]
-													   andCommit: [[self currentRevision] UUID]
-												  persistentRoot: [[self persistentRoot] UUID]
-														   store: [self store]];
+    ETUUID *lca = [self.editingContext commonAncestorForCommit: [[aBranch currentRevision] UUID]
+													 andCommit: [[self currentRevision] UUID]
+												persistentRoot: [[self persistentRoot] UUID]];
     id <COItemGraph> baseGraph = [[self store] itemGraphForRevisionUUID: lca
 	                                                     persistentRoot: [[self persistentRoot] UUID]];
     
@@ -758,10 +757,9 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (COMergeInfo *) mergeInfoForMergingRevision: (CORevision *)aRevision
 {
-    ETUUID *lca = [COLeastCommonAncestor commonAncestorForCommit: [aRevision UUID]
+    ETUUID *lca = [self.editingContext commonAncestorForCommit: [aRevision UUID]
 													   andCommit: [[self currentRevision] UUID]
-												  persistentRoot: [[self persistentRoot] UUID]
-														   store: [self store]];
+												  persistentRoot: [[self persistentRoot] UUID]];
     id <COItemGraph> baseGraph = [[self store] itemGraphForRevisionUUID: lca
 	                                                     persistentRoot: [[self persistentRoot] UUID]];
     id <COItemGraph> mergeGraph = [[self store] itemGraphForRevisionUUID: [aRevision UUID]

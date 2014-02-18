@@ -69,10 +69,9 @@
 	}
 	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 	
-	if (![COLeastCommonAncestor isRevision: [[self.branch currentRevision] UUID]
+	if (![branch.editingContext isRevision: [[self.branch currentRevision] UUID]
 				 equalToOrParentOfRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
-							persistentRoot: self.persistentRoot.UUID
-									 store: [self.persistentRoot store]])
+							persistentRoot: self.persistentRoot.UUID])
 	{
 		// Rebase revs onto the current revisions
 		
@@ -81,10 +80,9 @@
 		ETUUID *source = [(COSynchronizerRevision *)[revs lastObject] revisionUUID];
 		ETUUID *dest = [[self.branch currentRevision] UUID];
 		
-		ETUUID *lca = [COLeastCommonAncestor commonAncestorForCommit: source
-														   andCommit: dest
-													  persistentRoot: self.persistentRoot.UUID
-															   store: [self.persistentRoot store]];
+		ETUUID *lca = [self.persistentRoot.editingContext commonAncestorForCommit: source
+																		andCommit: dest
+																   persistentRoot: self.persistentRoot.UUID];
 		
 		NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: source
 													  ontoRevision: dest
@@ -93,6 +91,7 @@
 														branchUUID: self.branch.UUID
 															 store: [self.persistentRoot store]
 													   transaction: txn
+													editingContext: self.persistentRoot.editingContext
 										modelDescriptionRepository: self.persistentRoot.editingContext.modelDescriptionRepository];
 		ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 		
@@ -157,10 +156,10 @@
 	
 	NSMutableArray *revs = [[NSMutableArray alloc] init];
 	
-	NSArray *revUUIDs = [COLeastCommonAncestor revisionUUIDsFromRevisionUUIDExclusive: lastConfirmedForClient
+	ETAssert(branch.editingContext != nil);
+	NSArray *revUUIDs = [branch.editingContext revisionUUIDsFromRevisionUUIDExclusive: lastConfirmedForClient
 															  toRevisionUUIDInclusive: [[self.branch currentRevision] UUID]
-																	   persistentRoot: self.persistentRoot.UUID
-																				store: self.persistentRoot.store];
+																	   persistentRoot: self.persistentRoot.UUID];
 	
 	if (revUUIDs == nil)
 	{

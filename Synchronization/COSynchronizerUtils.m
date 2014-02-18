@@ -61,6 +61,7 @@
 				  branchUUID: (ETUUID *)branch
 					   store: (COSQLiteStore *)store
 				 transaction: (COStoreTransaction *)txn
+			  editingContext: (COEditingContext *)ctx
   modelDescriptionRepository: (ETModelDescriptionRepository *)repo
 {
 	ETAssert(source != nil);
@@ -68,10 +69,9 @@
 	ETAssert(lca != nil);
 			
 	// Gather the revisions to rebase (between 'lca', exclusive, and 'source', inclusive)
-	NSArray *sourceRevs = [COLeastCommonAncestor revisionUUIDsFromRevisionUUIDExclusive: lca
-																toRevisionUUIDInclusive: source
-																		 persistentRoot: persistentRoot
-																				  store: store];
+	NSArray *sourceRevs = [ctx revisionUUIDsFromRevisionUUIDExclusive: lca
+											  toRevisionUUIDInclusive: source
+													   persistentRoot: persistentRoot];
 	ETAssert(sourceRevs != nil);
 	ETAssert([sourceRevs count] > 0);
 	

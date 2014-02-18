@@ -24,6 +24,7 @@
 				  branchUUID: (ETUUID *)branch
 					   store: (COSQLiteStore *)store
 				 transaction: (COStoreTransaction *)txn
+			  editingContext: (COEditingContext *)ctx
   modelDescriptionRepository: (ETModelDescriptionRepository *)repo;
 
 @end

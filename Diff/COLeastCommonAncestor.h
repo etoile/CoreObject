@@ -6,28 +6,25 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CoreObject/COEditingContext.h>
 
 @class ETUUID;
-@class COSQLiteStore;
 
-@interface COLeastCommonAncestor : NSObject
+@interface COEditingContext (CommonAncestor)
 
-+ (ETUUID *)commonAncestorForCommit: (ETUUID *)commitA
-                          andCommit: (ETUUID *)commitB
-					 persistentRoot: (ETUUID *)persistentRoot
-                              store: (COSQLiteStore *)aStore;
+- (ETUUID *)commonAncestorForCommit: (ETUUID *)commitA
+						  andCommit: (ETUUID *)commitB
+					 persistentRoot: (ETUUID *)persistentRoot;
 
-+ (BOOL)        isRevision: (ETUUID *)commitA
+- (BOOL)        isRevision: (ETUUID *)commitA
  equalToOrParentOfRevision: (ETUUID *)commitB
-			persistentRoot: (ETUUID *)persistentRoot
-                     store: (COSQLiteStore *)aStore;
+			persistentRoot: (ETUUID *)persistentRoot;
 
 /**
  * As a sepecial case if [start isEqual: end] returns the empty array
  */
-+ (NSArray *) revisionUUIDsFromRevisionUUIDExclusive: (ETUUID *)start
+- (NSArray *) revisionUUIDsFromRevisionUUIDExclusive: (ETUUID *)start
 							 toRevisionUUIDInclusive: (ETUUID *)end
-									  persistentRoot: (ETUUID *)persistentRoot
-											   store: (COSQLiteStore *)aStore;
+									  persistentRoot: (ETUUID *)persistentRoot;
 
 @end

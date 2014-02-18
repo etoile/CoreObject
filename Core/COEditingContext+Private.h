@@ -6,6 +6,7 @@
  */
 
 #import <CoreObject/COEditingContext.h>
+#import <CoreObject/CORevision.h>
 
 @class COPath, COUndoTrack;
 
