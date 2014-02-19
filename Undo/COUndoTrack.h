@@ -168,6 +168,10 @@ extern NSString * const kCOUndoStackName;
  * returns all commands ordered by commit order
  */
 - (NSArray *) allCommands;
+/**
+ * Returns all commands that are children of the given node. the order is undefined
+ */
+- (NSArray *) childrenOfNode: (id<COTrackNode>)aNode;
 
 
 /** @taskunit Framework Private */

@@ -380,6 +380,27 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	return [_commandsByUUID allValues];
 }
 
+- (NSArray *) childrenOfNode: (id<COTrackNode>)aNode
+{
+	// TODO: Precompute this and cache in a dictionary?
+	
+	NSMutableArray *result = [NSMutableArray new];
+	for (COCommandGroup *command in [self allCommands])
+	{
+		if (aNode == [COEndOfUndoTrackPlaceholderNode sharedInstance])
+		{
+			if (command.parentUUID == nil)
+				[result addObject: command];
+		}
+		else
+		{
+			if ([command.parentUUID isEqual: [aNode UUID]])
+				[result addObject: command];
+		}
+	}
+	return result;
+}
+
 #pragma mark - Private
 
 - (BOOL) isCommandUUID: (ETUUID *)commitA equalToOrParentOfCommandUUID: (ETUUID *)commitB
