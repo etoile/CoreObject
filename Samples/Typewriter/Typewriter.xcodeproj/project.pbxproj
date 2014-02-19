@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		662599E018B551E400235B65 /* EWGraphLabelCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599D818B551E400235B65 /* EWGraphLabelCell.m */; };
+		662599E218B551E400235B65 /* EWGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599DA18B551E400235B65 /* EWGraphRenderer.m */; };
+		662599E318B551E400235B65 /* EWGraphCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599DE18B551E400235B65 /* EWGraphCell.m */; };
 		663EFD7B18A17FB30030BD2F /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 663EFD6118A17FB30030BD2F /* Document.xib */; };
 		663EFD7D18A17FB30030BD2F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 663EFD6518A17FB30030BD2F /* InfoPlist.strings */; };
 		663EFD7E18A17FB30030BD2F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 663EFD6718A17FB30030BD2F /* MainMenu.xib */; };
@@ -34,6 +37,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		662599EC18B551E400235B65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 66B7DB2218A96F9100010BCB /* EtoileFoundation.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 602E12AE18B3A10E004F171B;
+			remoteInfo = "EtoileFoundation (iOS)";
+		};
+		662599EE18B551E400235B65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 66B7DB2218A96F9100010BCB /* EtoileFoundation.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 602E13A818B3A836004F171B;
+			remoteInfo = "PlugInExample (iOS)";
+		};
 		663EFD9218A180170030BD2F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 663EFD8818A180150030BD2F /* CoreObject.xcodeproj */;
@@ -121,6 +138,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		662599D818B551E400235B65 /* EWGraphLabelCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWGraphLabelCell.m; path = ../CommonUI/EWGraphLabelCell.m; sourceTree = "<group>"; };
+		662599DA18B551E400235B65 /* EWGraphRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWGraphRenderer.m; path = ../CommonUI/EWGraphRenderer.m; sourceTree = "<group>"; };
+		662599DB18B551E400235B65 /* EWGraphRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWGraphRenderer.h; path = ../CommonUI/EWGraphRenderer.h; sourceTree = "<group>"; };
+		662599DC18B551E400235B65 /* EWGraphLabelCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWGraphLabelCell.h; path = ../CommonUI/EWGraphLabelCell.h; sourceTree = "<group>"; };
+		662599DE18B551E400235B65 /* EWGraphCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWGraphCell.m; path = ../CommonUI/EWGraphCell.m; sourceTree = "<group>"; };
+		662599DF18B551E400235B65 /* EWGraphCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWGraphCell.h; path = ../CommonUI/EWGraphCell.h; sourceTree = "<group>"; };
 		663EFD2918A17E270030BD2F /* Typewriter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Typewriter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		663EFD2C18A17E270030BD2F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		663EFD2F18A17E270030BD2F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -291,6 +314,8 @@
 				66B7DB2C18A96F9100010BCB /* EtoileFoundation.framework */,
 				66B7DB2E18A96F9100010BCB /* TestEtoileFoundation.bundle */,
 				66B7DB3018A96F9100010BCB /* PlugInExample.plugin */,
+				662599ED18B551E400235B65 /* libEtoileFoundation.a */,
+				662599EF18B551E400235B65 /* PlugInExample.plugin */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -298,6 +323,12 @@
 		66EDFEB618ABFF9100B29CFE /* CommonUI */ = {
 			isa = PBXGroup;
 			children = (
+				662599DA18B551E400235B65 /* EWGraphRenderer.m */,
+				662599DB18B551E400235B65 /* EWGraphRenderer.h */,
+				662599DC18B551E400235B65 /* EWGraphLabelCell.h */,
+				662599D818B551E400235B65 /* EWGraphLabelCell.m */,
+				662599DF18B551E400235B65 /* EWGraphCell.h */,
+				662599DE18B551E400235B65 /* EWGraphCell.m */,
 				66EDFEBD18ABFF9E00B29CFE /* EWUndoWindowController.h */,
 				66EDFEBE18ABFF9E00B29CFE /* EWUndoWindowController.m */,
 				66EDFEBF18ABFF9E00B29CFE /* EWUtilityWindowController.h */,
@@ -367,6 +398,20 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		662599ED18B551E400235B65 /* libEtoileFoundation.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libEtoileFoundation.a;
+			remoteRef = 662599EC18B551E400235B65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		662599EF18B551E400235B65 /* PlugInExample.plugin */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = PlugInExample.plugin;
+			remoteRef = 662599EE18B551E400235B65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		663EFD9318A180170030BD2F /* CoreObject.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -449,6 +494,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				663EFD8518A17FB30030BD2F /* EWUndoManager.m in Sources */,
+				662599E318B551E400235B65 /* EWGraphCell.m in Sources */,
+				662599E218B551E400235B65 /* EWGraphRenderer.m in Sources */,
 				66EDFEC218ABFF9E00B29CFE /* EWUndoWindowController.m in Sources */,
 				663EFD8418A17FB30030BD2F /* EWTypewriterWindowController.m in Sources */,
 				663EFD8118A17FB30030BD2F /* EWDocument.m in Sources */,
@@ -459,6 +506,7 @@
 				66EDFEC318ABFF9E00B29CFE /* EWUtilityWindowController.m in Sources */,
 				663EFD8618A17FB30030BD2F /* main.m in Sources */,
 				663EFD8318A17FB30030BD2F /* EWTextView.m in Sources */,
+				662599E018B551E400235B65 /* EWGraphLabelCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,4 +1,5 @@
 #import "EWUndoWindowController.h"
+#import "EWGraphRenderer.h"
 #import <CoreObject/CoreObject.h>
 #import <EtoileFoundation/Macros.h>
 
@@ -31,20 +32,21 @@
 
 - (void) update
 {
+	[graphRenderer updateWithTrack: _track];
     [table reloadData];
 	[self validateButtons];
 		
 	if ([table numberOfRows] > 0)
 	{
-		NSUInteger idx = [[_track nodes] indexOfObject: [_track currentNode]];
-		if (idx != NSNotFound)
-		{
-			[table scrollRowToVisible: idx];
-		}
-		else
-		{
-			[table scrollRowToVisible: [table numberOfRows] - 1];
-		}
+//		NSUInteger idx = [[_track nodes] indexOfObject: [_track currentNode]];
+//		if (idx != NSNotFound)
+//		{
+//			[table scrollRowToVisible: idx];
+//		}
+//		else
+//		{
+//			[table scrollRowToVisible: [table numberOfRows] - 1];
+//		}
 	}
 }
 
@@ -136,11 +138,11 @@
 
 - (id<COTrackNode>) selectedNode
 {
-	const NSUInteger row = [table selectedRow];
-	if (row == NSNotFound)
+	const NSInteger row = [table selectedRow];
+	if (row == -1)
 		return nil;
 	
-	id<COTrackNode> node = [self nodeAtIndex: row];
+	id<COTrackNode> node = [graphRenderer revisionAtIndex: row];
 	return node;
 }
 
@@ -148,50 +150,15 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    const NSUInteger count = [[_track nodes] count];
-    return count;
+	return [graphRenderer count];
 }
-
-- (id<COTrackNode>) nodeAtIndex: (NSUInteger)anIndex
-{
-    NSArray *nodes = [_track nodes];
-	
-	if (anIndex >= [nodes count])
-		return nil;
-	
-	return [nodes objectAtIndex: anIndex];
-}
-
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    id<COTrackNode> node = [self nodeAtIndex: row];
-    
-    if ([[tableColumn identifier] isEqual: @"name"])
-    {
-        return [node localizedShortDescription];
-    }
-	else if ([[tableColumn identifier] isEqual: @"isCurrent"])
-    {
-        if ([[_track currentNode] isEqual: node])
-		{
-			return @YES;
-		}
-    }
-    
-    return nil;
+	return @(row);
 }
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	id<COTrackNode> node = [self nodeAtIndex: row];
-	
-	if ([[tableColumn identifier] isEqual: @"isCurrent"])
-    {
-		if ([object boolValue] && node != nil)
-		{
-			[_track setCurrentNode: node];
-		}
-    }
 }
 
 /* NSTableViewDelegate */
