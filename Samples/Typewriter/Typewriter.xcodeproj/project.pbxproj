@@ -10,6 +10,7 @@
 		662599E018B551E400235B65 /* EWGraphLabelCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599D818B551E400235B65 /* EWGraphLabelCell.m */; };
 		662599E218B551E400235B65 /* EWGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599DA18B551E400235B65 /* EWGraphRenderer.m */; };
 		662599E318B551E400235B65 /* EWGraphCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599DE18B551E400235B65 /* EWGraphCell.m */; };
+		662599F218B5776300235B65 /* PrioritySplitViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599F118B5776300235B65 /* PrioritySplitViewDelegate.m */; };
 		663EFD7B18A17FB30030BD2F /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 663EFD6118A17FB30030BD2F /* Document.xib */; };
 		663EFD7D18A17FB30030BD2F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 663EFD6518A17FB30030BD2F /* InfoPlist.strings */; };
 		663EFD7E18A17FB30030BD2F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 663EFD6718A17FB30030BD2F /* MainMenu.xib */; };
@@ -144,6 +145,8 @@
 		662599DC18B551E400235B65 /* EWGraphLabelCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWGraphLabelCell.h; path = ../CommonUI/EWGraphLabelCell.h; sourceTree = "<group>"; };
 		662599DE18B551E400235B65 /* EWGraphCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWGraphCell.m; path = ../CommonUI/EWGraphCell.m; sourceTree = "<group>"; };
 		662599DF18B551E400235B65 /* EWGraphCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWGraphCell.h; path = ../CommonUI/EWGraphCell.h; sourceTree = "<group>"; };
+		662599F018B5776300235B65 /* PrioritySplitViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrioritySplitViewDelegate.h; sourceTree = SOURCE_ROOT; };
+		662599F118B5776300235B65 /* PrioritySplitViewDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrioritySplitViewDelegate.m; sourceTree = SOURCE_ROOT; };
 		663EFD2918A17E270030BD2F /* Typewriter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Typewriter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		663EFD2C18A17E270030BD2F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		663EFD2F18A17E270030BD2F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -251,6 +254,8 @@
 				663EFD6E18A17FB30030BD2F /* EWDocument.m */,
 				663EFD7118A17FB30030BD2F /* EWTextView.h */,
 				663EFD7218A17FB30030BD2F /* EWTextView.m */,
+				662599F018B5776300235B65 /* PrioritySplitViewDelegate.h */,
+				662599F118B5776300235B65 /* PrioritySplitViewDelegate.m */,
 				663EFD7318A17FB30030BD2F /* EWTypewriterWindowController.h */,
 				663EFD7418A17FB30030BD2F /* EWTypewriterWindowController.m */,
 				663EFD7518A17FB30030BD2F /* EWUndoManager.h */,
@@ -503,6 +508,7 @@
 				66EDFED218ACA7AD00B29CFE /* EWTagListDataSource.m in Sources */,
 				66EDFEDB18ACA7BC00B29CFE /* EWNoteListDataSource.m in Sources */,
 				663EFD8018A17FB30030BD2F /* EWAppDelegate.m in Sources */,
+				662599F218B5776300235B65 /* PrioritySplitViewDelegate.m in Sources */,
 				66EDFEC318ABFF9E00B29CFE /* EWUtilityWindowController.m in Sources */,
 				663EFD8618A17FB30030BD2F /* main.m in Sources */,
 				663EFD8318A17FB30030BD2F /* EWTextView.m in Sources */,

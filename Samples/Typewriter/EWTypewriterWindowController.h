@@ -14,6 +14,7 @@
 
 @class EWTagListDataSource;
 @class EWNoteListDataSource;
+@class PrioritySplitViewDelegate;
 
 NSString * EWNoteDragType;
 NSString * EWTagDragType;
@@ -25,7 +26,9 @@ NSString * EWTagDragType;
 	IBOutlet NSTableView *notesTable;
 	IBOutlet NSOutlineView *tagsOutline;
 	IBOutlet NSSearchField *searchfield;
+	IBOutlet NSSplitView *splitView;
 	
+	PrioritySplitViewDelegate *splitViewDelegate;
 	COAttributedStringWrapper *textStorage;
 	BOOL changedByUser;
 	COPersistentRoot *selectedNote;

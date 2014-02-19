@@ -12,6 +12,7 @@
 #import "TypewriterDocument.h"
 #import "EWTagListDataSource.h"
 #import "EWNoteListDataSource.h"
+#import "PrioritySplitViewDelegate.h"
 
 @implementation EWTypewriterWindowController
 
@@ -181,6 +182,13 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 											 selector: @selector(editingContextChanged:)
 												 name: COEditingContextDidChangeNotification
 											   object: self.editingContext];
+	
+	// Setup split view resizing behaviour
+	splitViewDelegate = [[PrioritySplitViewDelegate alloc] init];
+	[splitViewDelegate setPriority: 2 forViewAtIndex: 0];
+	[splitViewDelegate setPriority: 1 forViewAtIndex: 1];
+	[splitViewDelegate setPriority: 0 forViewAtIndex: 2];
+	[splitView setDelegate: splitViewDelegate];
 }
 
 #pragma mark - Notification methods
