@@ -145,7 +145,10 @@ extern NSString * const kCOUndoStackName;
  * See also -beginCoalescing.
  */
 - (void)endCoalescing;
-
+/**
+ * Returns whether coalescing is active.
+ */
+- (BOOL)isCoalescing;
 
 
 /** @taskunit Convenience */

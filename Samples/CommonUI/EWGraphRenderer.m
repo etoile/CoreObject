@@ -304,7 +304,7 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 	NSPoint p = NSMakePoint(r.origin.x + r.size.width/2, r.origin.y + r.size.height/2);
 	NSPoint p2 = NSMakePoint(r2.origin.x + r2.size.width/2, r2.origin.y + r2.size.height/2);
 	
-	NSLog(@"%@ to %@ %@ to %@", commit1, commit2, NSStringFromPoint(p), NSStringFromPoint(p2));
+	//NSLog(@"%@ to %@ %@ to %@", commit1, commit2, NSStringFromPoint(p), NSStringFromPoint(p2));
 	
 //	EWDrawArrowFromTo(p, p2);
 	

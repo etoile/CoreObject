@@ -331,13 +331,30 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	
 	if ([selectedNote.objectGraphContext hasChanges])
 	{
-		[self commitWithIdentifier: @"modify-text" descriptionArguments: @[]];
+		[self commitWithIdentifier: @"modify-text" descriptionArguments: @[] coalesce: YES];
+		
+		if (coalescingTimer != nil)
+		{
+			[coalescingTimer invalidate];
+		}
+		coalescingTimer = [NSTimer scheduledTimerWithTimeInterval: 2 target: self selector: @selector(coalescingTimer:) userInfo: nil repeats: NO];
 	}
 	else
 	{
 		NSLog(@"No changes, not committing");
 	}
 }
+
+- (void) coalescingTimer: (NSTimer *)timer
+{
+	NSLog(@"Breaking coalescing...");
+	[[self undoTrack] endCoalescing];
+	[[self undoTrack] beginCoalescing];
+	
+	[coalescingTimer invalidate];
+	coalescingTimer = nil;
+}
+
 
 #pragma mark - NSResponder
 
@@ -445,13 +462,30 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args
 {
+	[self commitWithIdentifier: identifier descriptionArguments: args coalesce: NO];
+}
+
+- (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args coalesce: (BOOL)requestCoalescing
+{
 	identifier = [@"org.etoile.Typewriter." stringByAppendingString: identifier];
 	
 	NSMutableDictionary *metadata = [NSMutableDictionary new];
 	if (args != nil)
 		metadata[kCOCommitMetadataShortDescriptionArguments] = args;
 	
-	[self.editingContext commitWithIdentifier: identifier metadata: metadata undoTrack: undoTrack error: NULL];
+	if (requestCoalescing && ![[self undoTrack] isCoalescing])
+	{
+		[[self undoTrack] beginCoalescing];
+	}
+	else if (!requestCoalescing && [[self undoTrack] isCoalescing])
+	{
+		[[self undoTrack] endCoalescing];
+	}
+	
+	[self.editingContext commitWithIdentifier: identifier
+									 metadata: metadata
+									undoTrack: undoTrack
+										error: NULL];
 }
 
 - (COTagLibrary *)tagLibrary

@@ -320,6 +320,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	// Set aCommand's parent pointer
 	aCommand.parentUUID = state.currentCommandUUID;
 
+	ETUUID *coalescedCommandUUIDToDelete = nil;
 	if (_coalescing)
 	{
 		if (_lastCoalescedCommandUUID != nil)
@@ -334,6 +335,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 				[self insertCommandsFromGroup: lastGroup atStartOfGroup: aCommand];
 
 				aCommand.parentUUID = lastGroup.parentUUID;
+				coalescedCommandUUIDToDelete = _lastCoalescedCommandUUID;
 			}
 		}
 		_lastCoalescedCommandUUID = aCommand.UUID;
@@ -352,6 +354,13 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	
 	[_store setTrackState: newStoreState];
 	_trackStateForName[_name] = newStoreState;
+	
+	// Delete the obsolete last command created by coalescing
+	if (coalescedCommandUUIDToDelete != nil)
+	{
+		[_store removeCommandForUUID: coalescedCommandUUIDToDelete];
+		[_commandsByUUID removeObjectForKey: coalescedCommandUUIDToDelete];
+	}
 	
 	// Finally, update our commands array
 	
@@ -771,6 +780,11 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 {
 	_coalescing = NO;
 	_lastCoalescedCommandUUID = nil;
+}
+
+- (BOOL)isCoalescing
+{
+	return _coalescing;
 }
 
 static BOOL coalesceOpPair(COCommand *op, COCommand *nextOp)

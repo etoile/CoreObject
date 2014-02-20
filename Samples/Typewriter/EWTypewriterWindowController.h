@@ -37,6 +37,8 @@ NSString * EWTagDragType;
 	
 	EWTagListDataSource *tagListDataSource;
 	EWNoteListDataSource *noteListDataSource;
+	
+	NSTimer *coalescingTimer;
 }
 
 @property (nonatomic, readonly) NSTableView *notesTable;
