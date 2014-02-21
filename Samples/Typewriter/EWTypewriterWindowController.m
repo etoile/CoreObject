@@ -106,15 +106,20 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	return nil;
 }
 
-- (COTagGroup *) selectedTagGroup
+- (COTagGroup *) tagGroupOfSelectedRow
 {
 	NSInteger selectedRow = [tagsOutline selectedRow];
 	if (selectedRow != -1)
 	{
-		id object = [tagsOutline itemAtRow: selectedRow];
+		NSTreeNode *object = [tagsOutline itemAtRow: selectedRow];
 		if ([[object representedObject] isKindOfClass: [COTagGroup class]])
 		{
 			return [object representedObject];
+		}
+		else if ([[object representedObject] isKindOfClass: [COTag class]])
+		{
+			COTagGroup *tagGroup = [[object parentNode] representedObject];
+			return tagGroup;
 		}
 	}
 	return nil;
@@ -205,7 +210,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (IBAction) addTag:(id)sender
 {
-	COTagGroup *targetTagGroup = [self selectedTagGroup];
+	COTagGroup *targetTagGroup = [self tagGroupOfSelectedRow];
 	if (targetTagGroup == nil)
 		targetTagGroup = [self defaultTagGroup];
 		
@@ -260,6 +265,13 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 		NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: copyOfSelection.metadata];
 		[md addEntriesFromDictionary: @{ @"label" : [NSString stringWithFormat: @"Copy of %@", sourceLabel] }];
 		copyOfSelection.metadata = md;
+		
+		// Also give it the selected tag
+		COTag *selectedTag = [self selectedTag];
+		if (selectedTag != nil)
+		{
+			[selectedTag addObject: [copyOfSelection rootObject]];
+		}
 		
 		[self commitWithIdentifier: @"duplicate-note" descriptionArguments: @[sourceLabel]];
 		[noteListDataSource reloadData];
@@ -385,17 +397,15 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 		if ([self selectedTag] != nil)
 		{
 			COTag *tag = [self selectedTag];
-			NSSet *tagGroups = [tag tagGroups];
-			for (COTagGroup *parentGroup in tagGroups)
-			{
-				[parentGroup removeObject: tag];
-			}
+			COTagGroup *tagGroup = [self tagGroupOfSelectedRow];
+			[tagGroup removeObject: tag];
+
 			[self commitWithIdentifier: @"delete-tag" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
 			[tagListDataSource reloadData];
 		}
-		if ([self selectedTagGroup] != nil)
+		else if ([self tagGroupOfSelectedRow] != nil)
 		{
-			COTagGroup *tagGroup = [self selectedTagGroup];
+			COTagGroup *tagGroup = [self tagGroupOfSelectedRow];
 			[[[self tagLibrary] mutableArrayValueForKey: @"tagGroups"] removeObject: tagGroup];
 			[self commitWithIdentifier: @"delete-tag-group" descriptionArguments: @[tagGroup.name != nil ? tagGroup.name : @""]];
 			[tagListDataSource reloadData];
