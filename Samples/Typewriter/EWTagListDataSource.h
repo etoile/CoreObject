@@ -18,5 +18,5 @@
 @property (nonatomic, unsafe_unretained) EWTypewriterWindowController *owner;
 @property (nonatomic, strong) NSOutlineView *outlineView;
 - (void)reloadData;
-
+- (void)cacheSelection;
 @end

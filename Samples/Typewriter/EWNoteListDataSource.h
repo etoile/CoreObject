@@ -17,4 +17,5 @@
 @property (nonatomic, unsafe_unretained) EWTypewriterWindowController *owner;
 @property (nonatomic, strong) NSTableView *tableView;
 - (void)reloadData;
+- (void)cacheSelection;
 @end

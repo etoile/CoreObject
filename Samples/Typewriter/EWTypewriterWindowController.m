@@ -148,15 +148,17 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	tagListDataSource.outlineView = tagsOutline;
 	[tagsOutline setDataSource: tagListDataSource];
 	[tagsOutline setDelegate: tagListDataSource];
-	[tagListDataSource reloadData];	
-	
+	[tagListDataSource cacheSelection];
+	[tagListDataSource reloadData];
+
 	ETAssert(notesTable != nil);
 	noteListDataSource = [EWNoteListDataSource new];
 	noteListDataSource.owner = self;
 	noteListDataSource.tableView = notesTable;
 	[notesTable setDataSource: noteListDataSource];
 	[notesTable setDelegate: noteListDataSource];
-
+	[noteListDataSource cacheSelection];
+	
 	// Drag & drop
 	
 	[tagsOutline registerForDraggedTypes: @[EWNoteDragType, EWTagDragType]];
@@ -331,7 +333,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	
 	if ([selectedNote.objectGraphContext hasChanges])
 	{
-		[self commitWithIdentifier: @"modify-text" descriptionArguments: @[] coalesce: YES];
+		[self commitWithIdentifier: @"typing" descriptionArguments: @[] coalesce: YES];
 		
 		if (coalescingTimer != nil)
 		{

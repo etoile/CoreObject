@@ -80,6 +80,15 @@
 		
 		
 		
+		"typing":
+		{
+			"type": "modification",
+			"shortDescription": "Typing"
+		},
+		
+		
+		
+		
 		"rename-document":
 		{
 			"type": "renaming",
