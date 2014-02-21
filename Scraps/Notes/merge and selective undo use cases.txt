@@ -1,0 +1,41 @@
+realistic selective undo use cases with no conflicts:
+
+	1.	selective undo deleting an object
+	2.	selective undo of "apply effect in image editor"
+
+realistic selective undo use cases with conflicts:
+
+	1.	selective undo deleting an object from a container, but that container has been subsequently deleted.
+	⁃	user could be shown the diff and be able to drag the object being restored in to the desired place
+
+
+
+realistic merge use cases with no conflicts:
+
+	1.	merging a document with a subdocument. in one branch the document has been edited, in the other branch only the subdocument has been edited.
+
+realistic merge use cases with conflicts:
+
+	1.	merging corrections in a letter or other document
+	2.	
+
+
+---
+
+
+custom merge algorithm api - brainstorming
+
+use cases:
+ - rich text merge (combinable attributes like bold, underline vs non-combinable structure like chapter/section)
+ - recursive diff/merge of embedded persistent roots
+
+idea:
+ - automatic/built in algorithm does a trivial first pass simply by unioning the two edit scripts. it has a built-in/default algorithm for conflict detection based on: sequence edit conflicts, subtree conflicts (same tree moved to two places), etc.
+ - the first pass merged edit script is passed to each algorithm, which has a chance to resolve some conflicts automatically, or mark additional pairs of edits as conflicting (which weren't detected as such by the default algorithm.)
+
+
+merge ui ideas:
+
+one option should be a fully manual merge. you see the two diffs presented like the working copy diff view in sourcetree. you construct the final merge by staging changes from either side.
+
+- trying a merge should definately commit to a temporary branch, and not mess up what you're currently working on.
