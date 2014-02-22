@@ -106,26 +106,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
 - (void)removeValueForAttribute: (NSString*)anAttribute;
 
-/**
- * Creates the container if needed.
- */
-- (void)   addObject: (id)aValue
-toUnorderedAttribute: (NSString*)anAttribute
-				type: (COType)aType;
-
-/**
- * Creates the container if needed.
- */
-- (void)   addObject: (id)aValue
-  toOrderedAttribute: (NSString*)anAttribute
-			 atIndex: (NSUInteger)anIndex
-				type: (COType)aType;
-
-
 /** @taskunit convenience */
-
-- (void) addObject: (id)aValue
-	  forAttribute: (NSString*)anAttribute;
 
 - (void) setValue: (id)aValue
 	 forAttribute: (NSString*)anAttribute;
