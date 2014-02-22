@@ -130,7 +130,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         ETUUID *branchUUID =
 			(anObjectGraphContext != nil ? [anObjectGraphContext branchUUID] : [ETUUID UUID]);
         COBranch *branch = [[COBranch alloc] initWithUUID: branchUUID
-		                                objectGraphContext: nil
                                             persistentRoot: self
                                           parentBranchUUID: aBranchUUID
                                 parentRevisionForNewBranch: cheapCopyRevisionID];
@@ -704,7 +703,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
                      parentBranch: (COBranch *)aParent
 {
     COBranch *newBranch = [[COBranch alloc] initWithUUID: [ETUUID UUID]
-	                                  objectGraphContext: nil
                                           persistentRoot: self
                                         parentBranchUUID: [aParent UUID]
                               parentRevisionForNewBranch: [aRev UUID]];
@@ -722,7 +720,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
                     parentBranch: (COBranch *)aParent
 {
     COBranch *newBranch = [[COBranch alloc] initWithUUID: aUUID
-                                      objectGraphContext: nil
                                           persistentRoot: self
                                         parentBranchUUID: [aParent UUID]
                               parentRevisionForNewBranch: [aRev UUID]];
@@ -744,7 +741,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     if (branch == nil)
     {
         branch = [[COBranch alloc] initWithUUID: [branchInfo UUID]
-                             objectGraphContext: nil
                                  persistentRoot: self
                                parentBranchUUID: [branchInfo parentBranchUUID]
                      parentRevisionForNewBranch: nil];

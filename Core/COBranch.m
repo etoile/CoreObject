@@ -61,7 +61,6 @@ NSString * const kCOBranchLabel = @"COBranchLabel";
  * Until the loaded revision is known, it is useless to cache track nodes. 
  */
 - (id)        initWithUUID: (ETUUID *)aUUID
-        objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
             persistentRoot: (COPersistentRoot *)aContext
           parentBranchUUID: (ETUUID *)aParentBranchUUID
 parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
@@ -69,9 +68,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	NILARG_EXCEPTION_TEST(aUUID);
 	NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
 	NILARG_EXCEPTION_TEST(aContext);
-	INVALIDARG_EXCEPTION_TEST(anObjectGraphContext,
-		anObjectGraphContext == nil || [anObjectGraphContext branch] == nil);
-							  
+				
 	if ([[aContext parentContext] store] == nil)
 	{
 		[NSException raise: NSInvalidArgumentException
@@ -88,15 +85,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	_persistentRoot = aContext;
     _parentBranchUUID = aParentBranchUUID;
     
-	if (anObjectGraphContext == nil)
-	{
-    	_objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
-    }
-	else
-	{
-		_objectGraph =  anObjectGraphContext;
-		[anObjectGraphContext setBranch: self];
-	}
+	_objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
 
     if ([_persistentRoot persistentRootInfo] != nil
         && parentRevisionForNewBranch == nil)

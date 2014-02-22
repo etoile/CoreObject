@@ -13,7 +13,6 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 - (id)        initWithUUID: (ETUUID *)aUUID
-        objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
             persistentRoot: (COPersistentRoot *)aPersistentRoot
           parentBranchUUID: (ETUUID *)aParentBranchUUID
 parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
