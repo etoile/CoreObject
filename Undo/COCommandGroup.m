@@ -177,6 +177,12 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (ETUUID *)persistentRootUUID
 {
+	// This is kind of a hack
+	for (COCommand *command in [_contents reverseObjectEnumerator])
+	{
+		if (command.persistentRootUUID != nil)
+			return command.persistentRootUUID;
+	}
 	return nil;
 }
 

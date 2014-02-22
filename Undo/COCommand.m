@@ -153,11 +153,6 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 	return nil;
 }
 
-- (ETUUID *)persistentRootUUID
-{
-	return nil;
-}
-
 - (ETUUID *)branchUUID
 {
 	return nil;
