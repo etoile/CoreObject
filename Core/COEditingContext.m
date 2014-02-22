@@ -477,7 +477,7 @@
 	return [self commitWithMetadata: [NSDictionary dictionary]];
 }
 
-- (void)didCommitWithCommand: (COCommand *)command
+- (void)didCommitWithCommand: (COCommandGroup *)command
              persistentRoots: (NSArray *)persistentRoots
 {
 	for (COPersistentRoot *ctxt in persistentRoots)
@@ -592,7 +592,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 											
 				
     ETAssert([_store commitStoreTransaction: transaction]);
-	COCommand *command = [self recordEndUndoGroupWithUndoTrack: track];
+	COCommandGroup *command = [self recordEndUndoGroupWithUndoTrack: track];
     
 	/* For a commit triggered by undo/redo on a COUndoTrack, the command is nil */
 	[self didCommitWithCommand: command persistentRoots: persistentRoots];

@@ -46,7 +46,7 @@
     }
 }
 
-- (COCommand *) recordEndUndoGroupWithUndoTrack: (COUndoTrack *)track
+- (COCommandGroup *) recordEndUndoGroupWithUndoTrack: (COUndoTrack *)track
 {
     if (_isRecordingUndo == NO)
 		return nil;
@@ -61,7 +61,7 @@
 
 	[track recordCommand: _currentEditGroup];
 
-	COCommand *recordedCommand = _currentEditGroup;
+	COCommandGroup *recordedCommand = _currentEditGroup;
 	_currentEditGroup = nil;
 
 	return recordedCommand;
