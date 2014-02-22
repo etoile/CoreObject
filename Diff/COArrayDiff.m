@@ -11,7 +11,7 @@
 #import <EtoileFoundation/Macros.h>
 #import <CoreObject/CoreObject.h>
 
-static bool comparefn(size_t i, size_t j, void *userdata1, void *userdata2)
+static bool comparefn(size_t i, size_t j, const void *userdata1, const void *userdata2)
 {
 	return [[(__bridge NSArray*)userdata1 objectAtIndex: i] isEqual:
 			[(__bridge NSArray*)userdata2 objectAtIndex: j]];
@@ -19,7 +19,7 @@ static bool comparefn(size_t i, size_t j, void *userdata1, void *userdata2)
 
 void CODiffArrays(NSArray *a, NSArray *b, id<CODiffArraysDelegate>delegate, id userInfo)
 {
-	diffresult_t *result = diff_arrays([a count], [b count], comparefn, (__bridge void *)(a), (__bridge void *)(b));
+	diffresult_t *result = diff_arrays([a count], [b count], comparefn, (__bridge const void *)(a), (__bridge const void *)(b));
 	
 	for (size_t i=0; i<diff_editcount(result); i++)
 	{
@@ -47,6 +47,8 @@ void CODiffArrays(NSArray *a, NSArray *b, id<CODiffArraysDelegate>delegate, id u
 									  insertedObjects: [b subarrayWithRange: secondRange]
 											 userInfo: userInfo];
 																				  
+				break;
+			case difftype_copy:
 				break;
 		}
 	}	
