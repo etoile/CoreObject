@@ -208,16 +208,16 @@ Future Work
   -  For all of the relationship tests, we need to come up with some solution to exercise all Relationship tests in    
 the following situations at least:
 
-		- references in the same transient object contexts (we just cover this case currently)
-		- references accross transient object contexts
-		- references accross persistent object graph contexts
+      - references in the same transient object contexts (we just cover this case currently)
+	  - references accross transient object contexts
+	  - references accross persistent object graph contexts
                                                                 
 	To get a good test coverage, we probably need to have an abstract TestRelationship test class and concrete test subclasses covering each variation by initializing the test class instance with the proper object graph contexts. For persistent object graph contexts, we want some mechanism to check the relationship states:
 	
-		- before commit (we need to catch tracking and non-tracking branch border cases that can arise on persistent root initialization)
-		- after commit in another recreated context
+	  - before commit (we need to catch tracking and non-tracking branch border cases that can arise on persistent root initialization)
+	  - after commit in another recreated context
 		
-		Wrapping all test method code with -checkObjectGraphContextWithExistingAndNew(Editing)Context:inBlock: in abstract classes such as TestUnivaluedRelationship should do the trick.
+	Wrapping all test method code with -checkObjectGraphContextWithExistingAndNew(Editing)Context:inBlock: in abstract classes such as TestUnivaluedRelationship should do the trick.
 		
 		@interface TestRelationship : TestCommon // Abstract
 		{
@@ -230,7 +230,7 @@ the following situations at least:
 		
 		@interface TestUnivaluedRelationshipAccrossPersistentObjectGraphContexts : TestUnivaluedRelationship  <UKTest>
 		
-		See -testUnivaluedGroupWithOppositeInPersistentRoot as a starting point.
+	See -testUnivaluedGroupWithOppositeInPersistentRoot as a starting point.
 	
   - Test entity type checking for all relationship types (inserting a child where the type is wrong.)
     Also test this for cross-persistent root relationships.
