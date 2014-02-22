@@ -19,4 +19,6 @@
 @property (nonatomic, strong) NSOutlineView *outlineView;
 - (void)reloadData;
 - (void)cacheSelection;
+
+- (void) setNextSelection: (ETUUID *)aUUID;
 @end

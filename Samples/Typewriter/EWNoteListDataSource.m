@@ -69,8 +69,13 @@
 	NSIndexSet *indexes = [self.tableView selectedRowIndexes];
 	for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
 	{
-		[oldSelection addObject: objs[i]];
+		[oldSelection addObject: [objs[i] UUID]];
 	}
+}
+
+- (void) setNextSelection: (ETUUID *)aUUID
+{
+	nextSelection = aUUID;
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
@@ -94,12 +99,20 @@
 	
 	NSArray *objs = [self.owner arrangedNotePersistentRoots];
 	NSMutableIndexSet *newSelectedRows = [NSMutableIndexSet new];
-	for (id obj in oldSelection)
+	
+	NSSet *uuidsToSelect = nextSelection != nil ? S(nextSelection) : oldSelection;
+	nextSelection = nil;
+	
+	for (ETUUID *uuid in uuidsToSelect)
 	{
-		NSUInteger row = [objs indexOfObject: obj];
-		if (row != NSNotFound)
+		NSInteger row = 0;
+		for (COPersistentRoot *proot in objs)
 		{
-			[newSelectedRows addIndex: row];
+			if ([proot.UUID isEqual: uuid])
+			{
+				[newSelectedRows addIndex: row];
+			}
+			row++;
 		}
 	}
 	[self.tableView selectRowIndexes: newSelectedRows byExtendingSelection: NO];

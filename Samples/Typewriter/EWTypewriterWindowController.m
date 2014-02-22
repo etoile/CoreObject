@@ -89,38 +89,50 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (NSArray *) selectedNotePersistentRoots
 {
-	return [[self arrangedNotePersistentRoots] objectsAtIndexes: [notesTable selectedRowIndexes]];
+	NSInteger selectedRow = [notesTable clickedRow];
+	if (selectedRow == -1)
+		selectedRow = [notesTable selectedRow];
+	
+	if (selectedRow == -1)
+		return @[];
+	
+	return @[[[self arrangedNotePersistentRoots] objectAtIndex: selectedRow]];
+}
+
+- (NSTreeNode *) tagsOutlineClickedOrSelectedTreeNode
+{
+	NSInteger selectedRow = [tagsOutline clickedRow];
+	if (selectedRow == -1)
+		selectedRow = [tagsOutline selectedRow];
+	
+	if (selectedRow == -1)
+		return nil;
+	
+	NSTreeNode *node = [tagsOutline itemAtRow: selectedRow];
+	return node;
 }
 
 - (COTag *) selectedTag
 {
-	NSInteger selectedRow = [tagsOutline selectedRow];
-	if (selectedRow != -1)
+	NSTreeNode * object = [self tagsOutlineClickedOrSelectedTreeNode];
+	if ([[object representedObject] isTag])
 	{
-		id object = [tagsOutline itemAtRow: selectedRow];
-		if ([[object representedObject] isTag])
-		{
-			return [object representedObject];
-		}
+		return [object representedObject];
 	}
 	return nil;
 }
 
 - (COTagGroup *) tagGroupOfSelectedRow
 {
-	NSInteger selectedRow = [tagsOutline selectedRow];
-	if (selectedRow != -1)
+	NSTreeNode * object = [self tagsOutlineClickedOrSelectedTreeNode];
+	if ([[object representedObject] isKindOfClass: [COTagGroup class]])
 	{
-		NSTreeNode *object = [tagsOutline itemAtRow: selectedRow];
-		if ([[object representedObject] isKindOfClass: [COTagGroup class]])
-		{
-			return [object representedObject];
-		}
-		else if ([[object representedObject] isKindOfClass: [COTag class]])
-		{
-			COTagGroup *tagGroup = [[object parentNode] representedObject];
-			return tagGroup;
-		}
+		return [object representedObject];
+	}
+	else if ([[object representedObject] isKindOfClass: [COTag class]])
+	{
+		COTagGroup *tagGroup = [[object parentNode] representedObject];
+		return tagGroup;
 	}
 	return nil;
 }
@@ -219,6 +231,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	[targetTagGroup addObject: newTag];
 	
 	[self commitWithIdentifier: @"add-tag" descriptionArguments: @[]];
+	[tagListDataSource setNextSelection: newTag.UUID];
 	[tagListDataSource reloadData];
 }
 
@@ -229,6 +242,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	[[[self tagLibrary] mutableArrayValueForKey: @"tagGroups"] addObject: newTagGroup];
 	
 	[self commitWithIdentifier: @"add-tag-group" descriptionArguments: @[]];
+	[tagListDataSource setNextSelection: newTagGroup.UUID];
 	[tagListDataSource reloadData];
 }
 
@@ -246,6 +260,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	}
 	
 	[self commitWithIdentifier: @"add-note" descriptionArguments: @[]];
+	[noteListDataSource setNextSelection: newNote.UUID];
 	[noteListDataSource reloadData];
 }
 
@@ -274,6 +289,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 		}
 		
 		[self commitWithIdentifier: @"duplicate-note" descriptionArguments: @[sourceLabel]];
+		[noteListDataSource setNextSelection: copyOfSelection.UUID];
 		[noteListDataSource reloadData];
 	}
 }

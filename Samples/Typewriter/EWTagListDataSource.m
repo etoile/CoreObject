@@ -81,8 +81,14 @@
 	NSIndexSet *indexes = [self.outlineView selectedRowIndexes];
 	for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
 	{
-		[oldSelection addObject: [[self.outlineView itemAtRow: i] representedObject]];
+		COObject *object = [[self.outlineView itemAtRow: i] representedObject];
+		[oldSelection addObject: object.UUID];
 	}
+}
+
+- (void) setNextSelection: (ETUUID *)aUUID
+{
+	[oldSelection setSet: S(aUUID)];
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
@@ -109,13 +115,14 @@
 	}
 	
 	[self.outlineView reloadData];
+	[self.outlineView expandItem: nil expandChildren: YES]; // Initially expand all tags - needs to be done before the selection restoration
 	
 	NSMutableIndexSet *newSelectedRows = [NSMutableIndexSet new];
-	for (id obj in oldSelection)
+	for (ETUUID *uuid in oldSelection)
 	{
 		for (NSInteger row = 0; row < [self.outlineView numberOfRows]; row++)
 		{
-			if ([[self.outlineView itemAtRow: row] representedObject] == obj)
+			if ([[[[self.outlineView itemAtRow: row] representedObject] UUID] isEqual: uuid])
 			{
 				[newSelectedRows addIndex: row];
 				break;
@@ -124,8 +131,6 @@
 	}
 	[self.outlineView selectRowIndexes: newSelectedRows byExtendingSelection: NO];
 	[self cacheSelection];
-	
-	[self.outlineView expandItem: nil expandChildren: YES]; // Initially expand all tags
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
