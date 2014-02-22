@@ -50,14 +50,13 @@ static ETUUID *childUUIDs[NUM_CHILDREN];
 {
     COMutableItem *rootItem = [[COMutableItem alloc] initWithUUID: rootUUID];
     [rootItem setValue: @"root" forAttribute: @"name" type: kCOTypeString];
-    [rootItem setValue: A()
-          forAttribute: @"children"
-                  type: kCOTypeCompositeReference | kCOTypeArray];
     
+	NSMutableArray *uuids = [NSMutableArray new];
     for (int i=0; i<NUM_CHILDREN; i++)
     {
-        [rootItem addObject: childUUIDs[i] forAttribute: @"children"];
+		[uuids addObject: childUUIDs[i]];
     }
+	[rootItem setValue: uuids forAttribute: @"children" type: kCOTypeCompositeReference | kCOTypeArray];
     return rootItem;
 }
 
