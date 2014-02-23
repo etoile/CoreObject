@@ -350,6 +350,7 @@
 		66E62285185CF875002A22C1 /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = 66E62284185CF875002A22C1 /* COPYING */; };
 		66E6820918B6E035003294EB /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048465518B6C03E006E4EDC /* UnitKit.framework */; };
 		66E6824118B972C4003294EB /* BenchmarkCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E6824018B972C4003294EB /* BenchmarkCommon.m */; };
+		66E6826118BA9B5D003294EB /* TestObjectPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E6826018BA9B5D003294EB /* TestObjectPerformance.m */; };
 		66E725CE18AF50610032F28F /* TestUndoTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E725CD18AF50610032F28F /* TestUndoTrack.m */; };
 		66EEB2B7186D3CBA003695E6 /* TestItemGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EEB2B6186D3CBA003695E6 /* TestItemGraph.m */; };
 		66EF4276186251A800E15C59 /* TestDiffCAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EF4275186251A800E15C59 /* TestDiffCAPI.m */; };
@@ -898,6 +899,7 @@
 		66E62284185CF875002A22C1 /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
 		66E6823F18B972C4003294EB /* BenchmarkCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BenchmarkCommon.h; path = Benchmark/BenchmarkCommon.h; sourceTree = "<group>"; };
 		66E6824018B972C4003294EB /* BenchmarkCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BenchmarkCommon.m; path = Benchmark/BenchmarkCommon.m; sourceTree = "<group>"; };
+		66E6826018BA9B5D003294EB /* TestObjectPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestObjectPerformance.m; path = Benchmark/TestObjectPerformance.m; sourceTree = "<group>"; };
 		66E725CD18AF50610032F28F /* TestUndoTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUndoTrack.m; sourceTree = "<group>"; };
 		66EEB2B6186D3CBA003695E6 /* TestItemGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestItemGraph.m; sourceTree = "<group>"; };
 		66EF4275186251A800E15C59 /* TestDiffCAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestDiffCAPI.m; sourceTree = "<group>"; };
@@ -1304,6 +1306,7 @@
 				66568C91189598BB0075FD9A /* TestMultiplePersistentRootPerformance.m */,
 				66E6823F18B972C4003294EB /* BenchmarkCommon.h */,
 				66E6824018B972C4003294EB /* BenchmarkCommon.m */,
+				66E6826018BA9B5D003294EB /* TestObjectPerformance.m */,
 			);
 			name = Benchmark;
 			sourceTree = "<group>";
@@ -2212,6 +2215,7 @@
 				664F279D188E683400DF36FC /* TestSynchronizerPerformance.m in Sources */,
 				66550C0317D51D1800327657 /* TestCommon.m in Sources */,
 				66550BF817D51CB800327657 /* TestObjectGraphPerformance.m in Sources */,
+				66E6826118BA9B5D003294EB /* TestObjectPerformance.m in Sources */,
 				66D7980917ED18A200B07A2A /* BenchmarkItem.m in Sources */,
 				66550BF717D51CB100327657 /* main.m in Sources */,
 				66550C0717D51D9000327657 /* TestSQLiteStorePerformance.m in Sources */,
