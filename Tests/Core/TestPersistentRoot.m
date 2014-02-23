@@ -666,7 +666,7 @@
 	[[proot2 rootObject] setLabel: @"Hello"];
 	[ctx commit];
 	
-	//UKNil([branch objectGraphContextWithoutUnfaulting]);
+	UKNil([branch objectGraphContextWithoutUnfaulting]);
 }
 
 @end

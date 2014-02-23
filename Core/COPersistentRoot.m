@@ -419,8 +419,15 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSSet *)allObjectGraphContexts
 {
-	NSSet *objectGraphs = (id)[[[self branches] mappedCollection] objectGraphContext];
-	return [objectGraphs setByAddingObject: _currentBranchObjectGraph];
+	NSMutableSet *objectGraphs = [NSMutableSet new];
+	[objectGraphs addObject: _currentBranchObjectGraph];
+	for (COBranch *branch in self.branches)
+	{
+		COObjectGraphContext *branchObjectGraph = [branch objectGraphContextWithoutUnfaulting];
+		if (branchObjectGraph != nil)
+			[objectGraphs addObject: branchObjectGraph];
+	}
+ 	return objectGraphs;
 }
 
 - (id)rootObject
@@ -633,7 +640,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		}
 
 		[self validateNewObjectGraphContext: _currentBranchObjectGraph
-		                        createdFrom: [[self currentBranch] objectGraphContext]];
+		                        createdFrom: [[self currentBranch] objectGraphContextWithoutUnfaulting]];
 	}
     else
     {
