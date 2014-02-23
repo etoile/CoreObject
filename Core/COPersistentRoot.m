@@ -133,8 +133,14 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
                                             persistentRoot: self
                                           parentBranchUUID: aBranchUUID
                                 parentRevisionForNewBranch: cheapCopyRevisionID];
-		[[branch objectGraphContext] setItemGraph: _currentBranchObjectGraph];
 
+		if (cheapCopyPersistentRootID != nil)
+		{
+			id <COItemGraph> aGraph = [[self store] itemGraphForRevisionUUID: cheapCopyRevisionID
+															  persistentRoot: cheapCopyPersistentRootID];
+			[_currentBranchObjectGraph setItemGraph: aGraph];
+		}
+		
 		[self validateNewObjectGraphContext: _currentBranchObjectGraph
 		                        createdFrom: [branch objectGraphContext]];
 
@@ -523,19 +529,18 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 			 || [[[self currentBranch] objectGraphContext] rootObject] != nil);
     
 	if ([self isPersistentRootUncommitted])
-	{		
-        ETAssert([self currentBranch] != nil);
+	{
 		BOOL usingCurrentBranchObjectGraph = YES;
 		
         if (_cheapCopyRevisionUUID == nil)
         {
-			ETAssert(!([[[self currentBranch] objectGraphContext] hasChanges]
+			ETAssert(!([[[self currentBranch] objectGraphContextWithoutUnfaulting] hasChanges]
 					   && [_currentBranchObjectGraph hasChanges]));
 			// FIXME: Move this into -createPersistentRootWithInitialItemGraph:
 			// and make that take a id<COItemGraph>
 
 			COObjectGraphContext *graphCtx = _currentBranchObjectGraph;
-			if ([[[self currentBranch] objectGraphContext] hasChanges])
+			if ([[[self currentBranch] objectGraphContextWithoutUnfaulting] hasChanges])
 			{
 				usingCurrentBranchObjectGraph = NO;
 				graphCtx = [[self currentBranch] objectGraphContext];
@@ -616,7 +621,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		if (usingCurrentBranchObjectGraph)
 		{
 			[_currentBranchObjectGraph acceptAllChanges];
-			[[[self currentBranch] objectGraphContext] setItemGraph: _currentBranchObjectGraph];
+			[[[self currentBranch] objectGraphContextWithoutUnfaulting] setItemGraph: _currentBranchObjectGraph];
 		}
 		else
 		{

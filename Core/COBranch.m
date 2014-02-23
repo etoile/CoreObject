@@ -38,7 +38,7 @@ NSString * const kCOBranchLabel = @"COBranchLabel";
 
 @implementation COBranch
 
-@synthesize UUID = _UUID, persistentRoot = _persistentRoot, objectGraphContext = _objectGraph;
+@synthesize UUID = _UUID, persistentRoot = _persistentRoot;
 @synthesize shouldMakeEmptyCommit = _shouldMakeEmptyCommit, supportsRevert = _supportsRevert;
 @synthesize mergingBranch = _mergingBranch;
 
@@ -84,9 +84,8 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	/* The persistent root retains us */
 	_persistentRoot = aContext;
     _parentBranchUUID = aParentBranchUUID;
-    
-	_objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
-
+    _objectGraph = nil;
+	
     if ([_persistentRoot persistentRootInfo] != nil
         && parentRevisionForNewBranch == nil)
     {
@@ -104,22 +103,6 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
         
         // If _parentRevisionID is nil, we're a new branch for a new persistent root
         // Otherwise, we're a new branch for an existing (committed) persistent root
-        
-        if (_currentRevisionUUID != nil)
-        {
-			ETUUID *parentPersistentRoot = [[_persistentRoot store]
-				persistentRootUUIDForBranchUUID: _parentBranchUUID];
-
-			// N.B., normally we could pass [[self persistentRoot] UUID] here, but our persistent root is not
-			// yet committed.
-            id <COItemGraph> aGraph =
-				[[_persistentRoot store] itemGraphForRevisionUUID: _currentRevisionUUID
-			                                       persistentRoot: parentPersistentRoot];
-            [_objectGraph setItemGraph: aGraph];
-			[_persistentRoot.objectGraphContext setItemGraph: aGraph];
-            
-            ETAssert(![_objectGraph hasChanges]);
-        }
         
         _metadata = [[NSMutableDictionary alloc] init];
     }
@@ -150,6 +133,44 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 - (COEditingContext *) editingContext
 {
     return [_persistentRoot editingContext];
+}
+
+- (COObjectGraphContext *) objectGraphContext
+{
+	if (_objectGraph == nil)
+	{
+		NSLog(@"%@: unfaulting object graph context", self);
+		
+		_objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
+		
+		if (_currentRevisionUUID != nil
+			&& ![self.persistentRoot isPersistentRootUncommitted])
+		{
+			id <COItemGraph> aGraph = [[_persistentRoot store] itemGraphForRevisionUUID: _currentRevisionUUID
+																		 persistentRoot: self.persistentRoot.UUID];
+			ETAssert(aGraph != nil);
+		
+			[_objectGraph setItemGraph: aGraph];
+		}
+		else
+		{
+			[_objectGraph setItemGraph: self.persistentRoot.objectGraphContext];
+		}
+		ETAssert(![_objectGraph hasChanges]);
+	}
+	return _objectGraph;
+}
+
+- (COObjectGraphContext *) objectGraphContextWithoutUnfaulting
+{
+	return _objectGraph;
+}
+
+- (BOOL)objectGraphContextHasChanges
+{
+	if (_objectGraph != nil)
+		return [_objectGraph hasChanges];
+	return NO;
 }
 
 - (BOOL) isBranchUncommitted
@@ -350,7 +371,11 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
         return YES;
     }
     
-	return [[self objectGraphContext] hasChanges];
+	if (_objectGraph != nil)
+	{
+		return [_objectGraph hasChanges];
+	}
+	return NO;
 }
 
 - (BOOL)hasChanges
@@ -593,74 +618,73 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     // Write a regular commit
 	
 	COObjectGraphContext *modifiedItemsSource = [self modifiedItemsSource];
-	
-	// Garbage-collect the context we are going to commit.
-	// Skip the garbage collection if there are no changes to commit.
-	if ([modifiedItemsSource hasChanges])
+	if (modifiedItemsSource != nil || self.shouldMakeEmptyCommit)
 	{
-		[modifiedItemsSource removeUnreachableObjects];
-	}
-	
-	COItemGraph *modifiedItems = [self modifiedItemsSnapshot];
-    
-    if ([[modifiedItems itemUUIDs] count] > 0 || self.shouldMakeEmptyCommit)
-    {
-		// Validate the graph - see [TestOrderedCompositeRelationship testCompositeCycleWithThreeObjects]
-		// Not sure if this is the best approach to detecting cycles in composites but it's a first
-		// draft anyway.
-		[modifiedItemsSource checkForCyclesInCompositeRelationshipsFromObject: [modifiedItemsSource rootObject]];
-		
-        ETUUID *mergeParent = nil;
-        if (self.mergingBranch != nil)
-        {
-            mergeParent = [[self.mergingBranch currentRevision] UUID];
-            self.mergingBranch = nil;
-        }
-        
-        ETUUID *revUUID = [ETUUID UUID];
-		
-		[txn writeRevisionWithModifiedItems: modifiedItems
-							   revisionUUID: revUUID
-								   metadata: metadata
-						   parentRevisionID: _currentRevisionUUID
-					  mergeParentRevisionID: mergeParent
-						 persistentRootUUID: [_persistentRoot UUID]
-								 branchUUID: _UUID];
-
-        [txn setCurrentRevision: revUUID
-				   headRevision: revUUID
-					  forBranch: _UUID
-			   ofPersistentRoot: [[self persistentRoot] UUID]];
-        
-        ETUUID *oldRevUUID = _currentRevisionUUID;
-		ETUUID *oldHeadRevUUID = _headRevisionUUID;
-        ETAssert(oldRevUUID != nil);
-        ETAssert(oldHeadRevUUID != nil);
-        ETAssert(revUUID != nil);
-        _currentRevisionUUID = revUUID;
-		_headRevisionUUID = revUUID;
-        self.shouldMakeEmptyCommit = NO;
-        
-        [[self editingContext] recordBranchSetCurrentRevisionUUID: _currentRevisionUUID
-                                                  oldRevisionUUID: oldRevUUID
-												 headRevisionUUID: _currentRevisionUUID
-											  oldHeadRevisionUUID: oldHeadRevUUID
-                                                       ofBranch: self];
-		if (modifiedItemsSource == _objectGraph)
+		COItemGraph *modifiedItems = [self modifiedItemsSnapshot];
+		if ([[modifiedItems itemUUIDs] count] > 0 || self.shouldMakeEmptyCommit)
 		{
-			[_objectGraph acceptAllChanges];
-			if (self == [self.persistentRoot currentBranch])
+			// Validate the graph - see [TestOrderedCompositeRelationship testCompositeCycleWithThreeObjects]
+			// Not sure if this is the best approach to detecting cycles in composites but it's a first
+			// draft anyway.
+			[modifiedItemsSource checkForCyclesInCompositeRelationshipsFromObject: [modifiedItemsSource rootObject]];
+			
+			ETUUID *mergeParent = nil;
+			if (self.mergingBranch != nil)
 			{
-				[[self.persistentRoot objectGraphContext] setItemGraph: _objectGraph];
+				mergeParent = [[self.mergingBranch currentRevision] UUID];
+				self.mergingBranch = nil;
+			}
+			
+			ETUUID *revUUID = [ETUUID UUID];
+			
+			[txn writeRevisionWithModifiedItems: modifiedItems
+								   revisionUUID: revUUID
+									   metadata: metadata
+							   parentRevisionID: _currentRevisionUUID
+						  mergeParentRevisionID: mergeParent
+							 persistentRootUUID: [_persistentRoot UUID]
+									 branchUUID: _UUID];
+
+			[txn setCurrentRevision: revUUID
+					   headRevision: revUUID
+						  forBranch: _UUID
+				   ofPersistentRoot: [[self persistentRoot] UUID]];
+			
+			ETUUID *oldRevUUID = _currentRevisionUUID;
+			ETUUID *oldHeadRevUUID = _headRevisionUUID;
+			ETAssert(oldRevUUID != nil);
+			ETAssert(oldHeadRevUUID != nil);
+			ETAssert(revUUID != nil);
+			_currentRevisionUUID = revUUID;
+			_headRevisionUUID = revUUID;
+			self.shouldMakeEmptyCommit = NO;
+			
+			[[self editingContext] recordBranchSetCurrentRevisionUUID: _currentRevisionUUID
+													  oldRevisionUUID: oldRevUUID
+													 headRevisionUUID: _currentRevisionUUID
+												  oldHeadRevisionUUID: oldHeadRevUUID
+														   ofBranch: self];
+			if (modifiedItemsSource == _objectGraph
+				&& _objectGraph != nil)
+			{
+				[_objectGraph acceptAllChanges];
+				if (self == [self.persistentRoot currentBranch])
+				{
+					[[self.persistentRoot objectGraphContext] setItemGraph: _objectGraph];
+				}
+			}
+			else
+			{
+				ETAssert(modifiedItemsSource == [_persistentRoot objectGraphContext]);
+				[[_persistentRoot objectGraphContext] acceptAllChanges];
+				
+				if (_objectGraph != nil)
+				{
+					[_objectGraph setItemGraph: [_persistentRoot objectGraphContext]];
+				}
 			}
 		}
-		else
-		{
-			ETAssert(modifiedItemsSource == [_persistentRoot objectGraphContext]);
-			[[_persistentRoot objectGraphContext] acceptAllChanges];
-			[_objectGraph setItemGraph: [_persistentRoot objectGraphContext]];
-		}
-    }
+	}
 
     // Write branch undeletion
     
@@ -706,9 +730,11 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	_headRevisionUUID = aRevisionUUID;
     _isCreated = YES;
     
-    [_objectGraph acceptAllChanges];
-    
-    ETAssert(![_objectGraph hasChanges]);
+	if (_objectGraph != nil)
+	{
+		[_objectGraph acceptAllChanges];
+		ETAssert(![_objectGraph hasChanges]);
+	}
 }
 
 - (void)reloadAtRevision: (CORevision *)revision
@@ -720,8 +746,11 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	id <COItemGraph> aGraph = [[self store] itemGraphForRevisionUUID: [revision UUID]
 	                                                  persistentRoot: [[self persistentRoot] UUID]];
     
-    [_objectGraph setItemGraph: aGraph];
-	[_objectGraph removeUnreachableObjects];
+	if (_objectGraph != nil)
+	{
+		[_objectGraph setItemGraph: aGraph];
+		[_objectGraph removeUnreachableObjects];
+	}
 	
 	if (self == [self.persistentRoot currentBranch])
 	{
@@ -825,28 +854,32 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     _isCreated = YES;
     _parentBranchUUID = [branchInfo parentBranchUUID];
 	
-    id<COItemGraph> aGraph =
-		[[_persistentRoot store] itemGraphForRevisionUUID: _currentRevisionUUID
-		                                   persistentRoot: [[self persistentRoot] UUID]];
-    [_objectGraph setItemGraph: aGraph];
-	[_objectGraph removeUnreachableObjects];
+	if (_objectGraph != nil)
+	{
+		id<COItemGraph> aGraph =
+			[[_persistentRoot store] itemGraphForRevisionUUID: _currentRevisionUUID
+											   persistentRoot: [[self persistentRoot] UUID]];
+		[_objectGraph setItemGraph: aGraph];
+		[_objectGraph removeUnreachableObjects];
+	}
 	
 	[self updateRevisions];
 }
 
 - (id)rootObject
 {
-    return [_objectGraph rootObject];
+    return [self.objectGraphContext rootObject];
 }
 
+/**
+ * Returns either nil, _objectGraph, or [_persistentRoot objectGraphContext]
+ */
 - (COObjectGraphContext *)modifiedItemsSource
 {
-	COObjectGraphContext *graph = nil;
-
 	if (self == [_persistentRoot currentBranch]
 		&& [[_persistentRoot objectGraphContext] hasChanges])
 	{
-		graph = [_persistentRoot objectGraphContext];
+		COObjectGraphContext *graph = [_persistentRoot objectGraphContext];
 		
 		if ([_objectGraph hasChanges])
 		{
@@ -854,19 +887,36 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 						format: @"You appear to have modified both [persistentRoot objectGraphContext] and "
 								"[[persistentRoot currentBranch] objectGraphContext]"];
 		}
+		return graph;
 	}
 	else
 	{
-		graph = _objectGraph;
+		return _objectGraph;
 	}
-
-	return graph;
 }
 
 - (COItemGraph *)modifiedItemsSnapshot
 {
     NSSet *objectUUIDs = nil;
     COObjectGraphContext *graph = [self modifiedItemsSource];
+
+	if (graph == nil)
+	{
+		return [[COItemGraph alloc] initWithItemForUUID: @{}
+										   rootItemUUID: [[self.persistentRoot rootObject] UUID]];
+	}
+	
+	// Garbage-collect the context we are going to commit.
+	// Skip the garbage collection if there are no changes to commit.
+	//
+	// NOTE: This means that every commit requires an O(N) in-memory search
+	// to find and remove orphaned objects. Re-evaluate whether this makes sense.
+	// If we skipped it, the main disadvantage would be if you modified objects
+	// and then detached them from the graph, they would still get committed.
+	if ([graph hasChanges])
+	{
+		[graph removeUnreachableObjects];
+	}
 	
     if (_currentRevisionUUID == nil)
     {

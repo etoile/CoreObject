@@ -61,4 +61,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
  */
 @property (nonatomic) CORevision *headRevision;
 
+- (COObjectGraphContext *) objectGraphContextWithoutUnfaulting;
+- (BOOL)objectGraphContextHasChanges;
+
 @end
