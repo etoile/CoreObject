@@ -349,6 +349,7 @@
 		66E6225F185BEECE002A22C1 /* COSQLiteStore+Graphviz.h in Headers */ = {isa = PBXBuildFile; fileRef = 66E6225B185BEECE002A22C1 /* COSQLiteStore+Graphviz.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66E62285185CF875002A22C1 /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = 66E62284185CF875002A22C1 /* COPYING */; };
 		66E6820918B6E035003294EB /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048465518B6C03E006E4EDC /* UnitKit.framework */; };
+		66E6824118B972C4003294EB /* BenchmarkCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E6824018B972C4003294EB /* BenchmarkCommon.m */; };
 		66E725CE18AF50610032F28F /* TestUndoTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E725CD18AF50610032F28F /* TestUndoTrack.m */; };
 		66EEB2B7186D3CBA003695E6 /* TestItemGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EEB2B6186D3CBA003695E6 /* TestItemGraph.m */; };
 		66EF4276186251A800E15C59 /* TestDiffCAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EF4275186251A800E15C59 /* TestDiffCAPI.m */; };
@@ -895,6 +896,8 @@
 		66E6225A185BEECE002A22C1 /* COObjectGraphContext+Graphviz.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObjectGraphContext+Graphviz.m"; path = "Debugging/COObjectGraphContext+Graphviz.m"; sourceTree = "<group>"; };
 		66E6225B185BEECE002A22C1 /* COSQLiteStore+Graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COSQLiteStore+Graphviz.h"; path = "Debugging/COSQLiteStore+Graphviz.h"; sourceTree = "<group>"; };
 		66E62284185CF875002A22C1 /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
+		66E6823F18B972C4003294EB /* BenchmarkCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BenchmarkCommon.h; path = Benchmark/BenchmarkCommon.h; sourceTree = "<group>"; };
+		66E6824018B972C4003294EB /* BenchmarkCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BenchmarkCommon.m; path = Benchmark/BenchmarkCommon.m; sourceTree = "<group>"; };
 		66E725CD18AF50610032F28F /* TestUndoTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUndoTrack.m; sourceTree = "<group>"; };
 		66EEB2B6186D3CBA003695E6 /* TestItemGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestItemGraph.m; sourceTree = "<group>"; };
 		66EF4275186251A800E15C59 /* TestDiffCAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestDiffCAPI.m; sourceTree = "<group>"; };
@@ -1299,6 +1302,8 @@
 				66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */,
 				66D7980817ED18A200B07A2A /* BenchmarkItem.m */,
 				66568C91189598BB0075FD9A /* TestMultiplePersistentRootPerformance.m */,
+				66E6823F18B972C4003294EB /* BenchmarkCommon.h */,
+				66E6824018B972C4003294EB /* BenchmarkCommon.m */,
 			);
 			name = Benchmark;
 			sourceTree = "<group>";
@@ -2198,6 +2203,7 @@
 			files = (
 				664F27A1188E69C000DF36FC /* COSynchronizerFakeMessageTransport.m in Sources */,
 				664F27A0188E69AD00DF36FC /* TestSynchronizerCommon.m in Sources */,
+				66E6824118B972C4003294EB /* BenchmarkCommon.m in Sources */,
 				664F279E188E699B00DF36FC /* OrderedGroupNoOpposite.m in Sources */,
 				664F279F188E699B00DF36FC /* UnorderedGroupNoOpposite.m in Sources */,
 				66550C0417D51D2700327657 /* OutlineItem.m in Sources */,
