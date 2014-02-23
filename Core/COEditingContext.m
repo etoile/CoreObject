@@ -221,7 +221,6 @@
 
 	ETAssert([rootObject objectGraphContext] == persistentRoot.objectGraphContext);
     ETAssert([[persistentRoot rootObject] isRoot]);
-    ETAssert([[[persistentRoot currentBranch] rootObject] isRoot]);
 	
     return persistentRoot;
 }

@@ -60,6 +60,7 @@
 #import "COAttributedStringDiff.h"
 
 #import "COPersistentRoot+Private.h"
+#import "COBranch+Private.h"
 #import "COSQLiteStore+Private.h"
 #import "COObject+Private.h"
 #import "COObjectGraphContext+Private.h"

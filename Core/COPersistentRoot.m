@@ -43,6 +43,9 @@ NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidCh
 - (void) validateNewObjectGraphContext: (COObjectGraphContext *)newContext
                            createdFrom: (COObjectGraphContext *)oldContext
 {
+	if (oldContext == nil)
+		return;
+	
 	NSSet *newItemUUIDs = COItemGraphReachableUUIDs(newContext);
 	NSSet *oldItemUUIDs = COItemGraphReachableUUIDs(oldContext);
 
@@ -142,7 +145,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		}
 		
 		[self validateNewObjectGraphContext: _currentBranchObjectGraph
-		                        createdFrom: [branch objectGraphContext]];
+		                        createdFrom: [branch objectGraphContextWithoutUnfaulting]];
 
         [_branchForUUID setObject: branch forKey: branchUUID];
         

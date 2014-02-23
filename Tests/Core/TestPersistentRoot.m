@@ -657,4 +657,16 @@
 	 }];
 }
 
+- (void) testNormalPersistentRootUsageDoesNotCreateBranchObjectGraphContext
+{
+    COPersistentRoot *proot2 =  [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COBranch *branch = proot2.currentBranch;
+	[ctx commit];
+	
+	[[proot2 rootObject] setLabel: @"Hello"];
+	[ctx commit];
+	
+	//UKNil([branch objectGraphContextWithoutUnfaulting]);
+}
+
 @end
