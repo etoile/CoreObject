@@ -120,7 +120,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		_lastTransactionID = _savedState.transactionID;
 		_metadata = _savedState.metadata;
 		
-		[_currentBranchObjectGraph setItemGraph: [[self currentBranch] objectGraphContext]];
+		[self reloadCurrentBranchObjectGraph];
     }
     else
     {
@@ -139,9 +139,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 		if (cheapCopyPersistentRootID != nil)
 		{
-			id <COItemGraph> aGraph = [[self store] itemGraphForRevisionUUID: cheapCopyRevisionID
-															  persistentRoot: cheapCopyPersistentRootID];
-			[_currentBranchObjectGraph setItemGraph: aGraph];
+			[self setCurrentBranchObjectGraphToRevisionUUID: cheapCopyRevisionID
+										 persistentRootUUID: cheapCopyPersistentRootID];
 		}
 		
 		[self validateNewObjectGraphContext: _currentBranchObjectGraph
@@ -181,6 +180,21 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		@"\t", kETDescriptionOptionPropertyIndent) mutableCopy];
 
 	return [self descriptionWithOptions: options];
+}
+
+- (void) setCurrentBranchObjectGraphToRevisionUUID: (ETUUID *)aRevision
+								persistentRootUUID: (ETUUID*)aPersistentRoot
+{
+	id <COItemGraph> aGraph = [[self store] itemGraphForRevisionUUID: aRevision
+													  persistentRoot: aPersistentRoot];
+	[_currentBranchObjectGraph setItemGraph: aGraph];
+	[_currentBranchObjectGraph removeUnreachableObjects];
+}
+
+- (void) reloadCurrentBranchObjectGraph
+{
+	[self setCurrentBranchObjectGraphToRevisionUUID: self.currentRevision.UUID
+								 persistentRootUUID: self.UUID];
 }
 
 #pragma mark Persistent Root Properties -
@@ -280,9 +294,9 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 - (void)setCurrentBranch: (COBranch *)aBranch
 {
     _currentBranchUUID = [aBranch UUID];
-	
 	_currentBranchObjectGraph.branch = aBranch;
-	[_currentBranchObjectGraph setItemGraph: [aBranch objectGraphContext]];
+	
+	[self reloadCurrentBranchObjectGraph];
 }
 
 - (NSSet *)branches
@@ -406,6 +420,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		_metadata = [[[self persistentRootInfo] metadata] copy];
         _metadataChanged = NO;
     }
+	
+	[_currentBranchObjectGraph discardAllChanges];
 	
 	ETAssert([self hasChanges] == NO);
 }
@@ -536,7 +552,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	ETAssert([self rootObject] != nil);
 	ETAssert([[self rootObject] isRoot]);
 	ETAssert([[self objectGraphContext] rootObject] != nil
-			 || [[[self currentBranch] objectGraphContext] rootObject] != nil);
+			 || [[[self currentBranch] objectGraphContextWithoutUnfaulting] rootObject] != nil);
     
 	if ([self isPersistentRootUncommitted])
 	{
@@ -553,7 +569,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 			if ([[[self currentBranch] objectGraphContextWithoutUnfaulting] hasChanges])
 			{
 				usingCurrentBranchObjectGraph = NO;
-				graphCtx = [[self currentBranch] objectGraphContext];
+				graphCtx = [[self currentBranch] objectGraphContextWithoutUnfaulting];
 			}
 			
 			// FIXME: check both _currentBranchObjectGraph and [branch objectGraphContext]
@@ -573,7 +589,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 			ETAssert(_cheapCopyPersistentRootUUID != nil);
 			
 			const BOOL currentBranchObjectGraphHasChanges = [_currentBranchObjectGraph hasChanges];
-			const BOOL specificBranchObjectGraphHasChanges = [[[self currentBranch] objectGraphContext] hasChanges];
+			const BOOL specificBranchObjectGraphHasChanges = [[[self currentBranch] objectGraphContextWithoutUnfaulting] hasChanges];
 			
 			ETAssert(!(currentBranchObjectGraphHasChanges && specificBranchObjectGraphHasChanges));
 			
@@ -594,7 +610,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 				}
 				else
 				{
-					modifiedItems = [[[self currentBranch] objectGraphContext] modifiedItemsSnapshot];
+					modifiedItems = [[[self currentBranch] objectGraphContextWithoutUnfaulting] modifiedItemsSnapshot];
 					usingCurrentBranchObjectGraph = NO;
 				}
 				
@@ -635,7 +651,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		}
 		else
 		{
-			[[[self currentBranch] objectGraphContext] acceptAllChanges];
+			[[[self currentBranch] objectGraphContextWithoutUnfaulting] acceptAllChanges];
 			[_currentBranchObjectGraph setItemGraph: [[self currentBranch] objectGraphContext]];
 		}
 
@@ -790,10 +806,10 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	// TODO: Test that _everything_ is reloaded
 	
     _currentBranchUUID =  [_savedState currentBranchUUID];
-	[_currentBranchObjectGraph setItemGraph: [[self currentBranch] objectGraphContext]];
-	[_currentBranchObjectGraph removeUnreachableObjects];
     _lastTransactionID = _savedState.transactionID;
     _metadata = _savedState.metadata;
+	
+	[self reloadCurrentBranchObjectGraph];
 	
 	[self sendChangeNotification];
 }

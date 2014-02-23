@@ -666,7 +666,11 @@
 	[[proot2 rootObject] setLabel: @"Hello"];
 	[ctx commit];
 	
-	UKNil([branch objectGraphContextWithoutUnfaulting]);
+	[self checkBranchWithExistingAndNewContext: branch
+									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKNil([testBranch objectGraphContextWithoutUnfaulting]);
+	 }];
 }
 
 @end

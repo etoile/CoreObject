@@ -430,7 +430,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     
     self.shouldMakeEmptyCommit = NO;
     
-	[[self objectGraphContext] discardAllChanges];
+	[_objectGraph discardAllChanges];
 }
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel
