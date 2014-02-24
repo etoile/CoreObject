@@ -32,7 +32,7 @@
 /**
  * Expensive, paranoid validation for debugging
  */
-#define VALIDATE_ITEM_GRAPHS 1
+//#define VALIDATE_ITEM_GRAPHS 1
 
 NSString * const kCOBranchLabel = @"COBranchLabel";
 

@@ -32,7 +32,7 @@
  * This will dramaticaly slow down saving from O(size of delta to write) to
  * O(size of full state).
  */
-#define VALIDATE_ITEM_GRAPHS 1
+//#define VALIDATE_ITEM_GRAPHS 1
 
 @interface COSQLiteStore (Private)
 
