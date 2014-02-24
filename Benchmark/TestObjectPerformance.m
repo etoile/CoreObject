@@ -13,7 +13,10 @@
 #import "BenchmarkCommon.h"
 
 #define CREATION_ITERATIONS 1000
-#define ACCESS_ITERATIONS   1000000
+#define ACCESS_ITERATIONS   100000
+#define MODIFICATION_ITERATIONS 1000
+
+#define US_PER_SECOND 1000000
 
 /*
  
@@ -24,7 +27,7 @@
 
 @interface FoundationModelObject : NSObject
 @property (nonatomic, readwrite) NSString *stringProperty;
-@property (nonatomic, readwrite) NSArray *arrayProperty;
+@property (nonatomic, readwrite) NSMutableArray *arrayProperty;
 @end
 
 @implementation FoundationModelObject
@@ -67,7 +70,7 @@
 	foundationChild1.stringProperty = @"child1";
 	foundationChild2.stringProperty = @"child2";
 	foundationChild3.stringProperty = @"child3";
-	foundationParent.arrayProperty = @[foundationChild1, foundationChild2, foundationChild3];
+	foundationParent.arrayProperty = [@[foundationChild1, foundationChild2, foundationChild3] mutableCopy];
 }
 
 - (void) createCoreObjects
@@ -169,6 +172,47 @@ TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessCoreObjectOrderedRelationship,
 	NSLog(@"Foundation object graph ordered relationship acces took %f us, core object graph ordered relationship access took %f us. CO is %f times worse.",
 		  timeToAccessFoundationObjectOrderedRelationship * 1000000,
 		  timeToAccessCoreObjectOrderedRelationship * 1000000,
+		  coreObjectTimesWorse);
+}
+
+#pragma mark - relationship modification
+
+- (void) modifyFoundationRelationship
+{
+	// Move child3 to be a child of child1
+	[foundationParent.arrayProperty removeObjectAtIndex: 2];
+	[foundationChild1.arrayProperty addObject: foundationChild3];
+	
+	// Move it back
+	[foundationChild1.arrayProperty removeObjectAtIndex: 0];
+	[foundationParent.arrayProperty addObject: foundationChild3];
+}
+
+- (void) modifyCoreObjectRelationship
+{
+	// Move child3 to be a child of child1
+	[coreobjectChild1 addObject: coreobjectChild3];
+	
+	// Move it back
+	[coreobjectParent addObject: coreobjectChild3];
+}
+
+TIME_METHOD(timeToModifyFoundationObjectOrderedRelationship, MODIFICATION_ITERATIONS, [self modifyFoundationRelationship]);
+TIME_METHOD(timeToModifyCoreObjectOrderedRelationship, MODIFICATION_ITERATIONS, [self modifyCoreObjectRelationship]);
+
+- (void) testOrderedRelationshipModification
+{
+	NSTimeInterval timeToModifyFoundationObjectOrderedRelationship = [self timeToModifyFoundationObjectOrderedRelationship];
+	NSTimeInterval timeToModifyCoreObjectOrderedRelationship = [self timeToModifyCoreObjectOrderedRelationship];
+	
+	UKObjectsEqual(A(coreobjectChild1, coreobjectChild2, coreobjectChild3), coreobjectParent.contents);
+	UKObjectsEqual(A(foundationChild1, foundationChild2, foundationChild3), foundationParent.arrayProperty);
+	
+	double coreObjectTimesWorse = timeToModifyCoreObjectOrderedRelationship / timeToModifyFoundationObjectOrderedRelationship;
+	
+	NSLog(@"Foundation relationship modifications took %f us, core object relationship modification took %f us. CO is %f times worse.",
+		  timeToModifyFoundationObjectOrderedRelationship * US_PER_SECOND,
+		  timeToModifyCoreObjectOrderedRelationship * US_PER_SECOND,
 		  coreObjectTimesWorse);
 }
 
