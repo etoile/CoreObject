@@ -113,7 +113,7 @@
 	
 	double coreObjectTimesWorse = timeToCreateCoreObjectGraph / timeToCreateFoundationObjectGraph;
 	
-	NSLog(@"Foundation object graph took %f us, core object graph took %f us. CO is %f times wrose.",
+	NSLog(@"Foundation object graph took %f us, core object graph took %f us. CO is %f times worse.",
 		  timeToCreateFoundationObjectGraph * 1000000,
 		  timeToCreateCoreObjectGraph * 1000000,
 		  coreObjectTimesWorse);
@@ -154,7 +154,7 @@
 	
 	double coreObjectTimesWorse = timeToAccessCoreObjectStringProperty / timeToAccessFoundationObjectStringProperty;
 	
-	NSLog(@"Foundation object graph string property acces took %f us, core object graph string property access took %f us. CO is %f times wrose.",
+	NSLog(@"Foundation object graph string property acces took %f us, core object graph string property access took %f us. CO is %f times worse.",
 		  timeToAccessFoundationObjectStringProperty * 1000000,
 		  timeToAccessCoreObjectStringProperty * 1000000,
 		  coreObjectTimesWorse);
@@ -195,7 +195,7 @@
 	
 	double coreObjectTimesWorse = timeToAccessCoreObjectOrderedRelationship / timeToAccessFoundationObjectOrderedRelationship;
 	
-	NSLog(@"Foundation object graph ordered relationship acces took %f us, core object graph ordered relationship access took %f us. CO is %f times wrose.",
+	NSLog(@"Foundation object graph ordered relationship acces took %f us, core object graph ordered relationship access took %f us. CO is %f times worse.",
 		  timeToAccessFoundationObjectOrderedRelationship * 1000000,
 		  timeToAccessCoreObjectOrderedRelationship * 1000000,
 		  coreObjectTimesWorse);

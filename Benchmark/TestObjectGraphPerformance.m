@@ -15,6 +15,9 @@
 @interface TestObjectGraphPerformance : EditingContextTestCase <UKTest>
 @end
 
+#define COMMIT_ITERATIONS 10
+#define MS_PER_SECOND 1000
+
 @implementation TestObjectGraphPerformance
 
 - (void) make3LevelNestedTreeInContainer: (COContainer *)root
@@ -41,42 +44,56 @@
 	}
 }
 
-- (void) makeIncrementalCommitToPersistentRoot: (COPersistentRoot *)persistentRoot
+- (NSTimeInterval) timeToMakeInitialCommitToPersistentRoot: (COPersistentRoot *)persistentRoot
 {
-	COObjectGraphContext *graph = [persistentRoot objectGraphContext];
-	NSArray *itemUUIDS = [graph itemUUIDs];
-	OutlineItem *randomItem = [graph loadedObjectForUUID: itemUUIDS[rand() % [itemUUIDS count]]];
-	randomItem.label = @"modification";
-	
-	NSDate *start = [NSDate date];
-	[ctx commit];
-	const NSTimeInterval secondsForDeltaSave = [[NSDate date] timeIntervalSinceDate: start];
-	
-	NSLog(@"Took %f ms to commit a change to 1 object out of a graph of %d. Raw SQLite speed for committing 1k of data is: %f ms",
-		  secondsForDeltaSave * 1000.0,
-		  (int)[itemUUIDS count],
-		  [BenchmarkCommon timeToCommit1KUsingSQLite]*1000.0);
-	
-	// FIXME: The incremental save is much too slow due to unnecessary
-	// serialization of the entire object graph
-	//	UKTrue(secondsForDeltaSave < (0.1 * secondsForFullSave));
-	//  UKTrue(secondsForDeltaSave < 2*[BenchmarkCommon timeToCommit1KUsingSQLite]);
-}
-
-- (void) testCommitIsIncremental
-{
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 	COObjectGraphContext *graph = [persistentRoot objectGraphContext];
 	[self make3LevelNestedTreeInContainer: [graph rootObject]];
-	NSArray *itemUUIDS = [graph itemUUIDs];
 	
 	NSDate *start = [NSDate date];
 	[ctx commit];
 	const NSTimeInterval secondsForFullSave = [[NSDate date] timeIntervalSinceDate: start];
+	return secondsForFullSave;
+}
+
+- (void) makeIncrementalCommitToPersistentRoot: (COPersistentRoot *)persistentRoot
+{
+	COObjectGraphContext *graph = [persistentRoot objectGraphContext];
+	NSArray *itemUUIDS = [graph itemUUIDs];
+	int randNumber = rand();
+	OutlineItem *randomItem = [graph loadedObjectForUUID: itemUUIDS[randNumber % [itemUUIDS count]]];
+	randomItem.label = [NSString stringWithFormat: @"random number: %d", randNumber];
+	[ctx commit];
+}
+
+- (NSTimeInterval) timeToMakeIncrementalCommitToPersistentRoot: (COPersistentRoot *)persistentRoot
+{
+	NSDate *start = [NSDate date];
+	for (int i=0; i<COMMIT_ITERATIONS; i++)
+	{
+		[self makeIncrementalCommitToPersistentRoot: persistentRoot];
+	}
+	const NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start] / COMMIT_ITERATIONS;
+	return time;
+}
+
+- (void) testCommitIsIncremental
+{
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+
+	NSTimeInterval timeToMakeInitialCommitToPersistentRoot = [self timeToMakeInitialCommitToPersistentRoot: persistentRoot];
+	NSTimeInterval timeToMakeIncrementalCommitToPersistentRoot = [self timeToMakeIncrementalCommitToPersistentRoot: persistentRoot];
+	NSTimeInterval timeToCommit1KUsingSQLite = [BenchmarkCommon timeToCommit1KUsingSQLite];
 	
-	NSLog(@"Took %f ms to commit %d objects", secondsForFullSave * 1000.0, (int)[itemUUIDS count]);
+	double coreObjectTimesWorse = timeToMakeIncrementalCommitToPersistentRoot / timeToCommit1KUsingSQLite;
 	
-	[self makeIncrementalCommitToPersistentRoot: persistentRoot];
+	NSLog(@"Took %f ms to commit %d objects",
+		  timeToMakeInitialCommitToPersistentRoot * MS_PER_SECOND,
+		  (int)[[persistentRoot.objectGraphContext itemUUIDs] count]);
+	
+	NSLog(@"Took %f ms to commit a change to 1 object in that graph. SQLite takes %f ms to commit 1K bytes. CO is %f times worse.",
+		  timeToMakeIncrementalCommitToPersistentRoot * MS_PER_SECOND,
+		  timeToCommit1KUsingSQLite * MS_PER_SECOND,
+		  coreObjectTimesWorse);
 }
 
 @end
