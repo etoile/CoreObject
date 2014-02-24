@@ -84,27 +84,37 @@
 	coreobjectParent.contents = @[coreobjectChild1, coreobjectChild2, coreobjectChild3];
 }
 
+#pragma mark - macros
+
+#define TIME_METHOD(name, iterations, expression) \
+- (NSTimeInterval) name \
+{ \
+	NSDate *start = [NSDate date]; \
+	for (int i=0; i<(iterations); i++) \
+	{ \
+		expression; \
+	} \
+	return [[NSDate date] timeIntervalSinceDate: start] / iterations; \
+}
+
+#define TIME_METHOD_WITH_EXPECTED_RESULT(name, iterations, expression, expected) \
+- (NSTimeInterval) name \
+{ \
+	NSDate *start = [NSDate date]; \
+	id result = nil; \
+	for (int i=0; i<(iterations); i++) \
+	{ \
+		result = (expression); \
+	} \
+	NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start] / iterations; \
+	ETAssert([(expected) isEqual: result]); \
+	return time; \
+}
+
 #pragma mark - object graph access
 
-- (NSTimeInterval) timeToCreateFoundationObjectGraph
-{
-	NSDate *start = [NSDate date];
-	for (int i=0; i<CREATION_ITERATIONS; i++)
-	{
-		[self createFoundationObjects];
-	}
-	return [[NSDate date] timeIntervalSinceDate: start] / CREATION_ITERATIONS;
-}
-
-- (NSTimeInterval) timeToCreateCoreObjectGraph
-{
-	NSDate *start = [NSDate date];
-	for (int i=0; i<CREATION_ITERATIONS; i++)
-	{
-		[self createCoreObjects];
-	}
-	return [[NSDate date] timeIntervalSinceDate: start] / CREATION_ITERATIONS;
-}
+TIME_METHOD(timeToCreateFoundationObjectGraph, CREATION_ITERATIONS, [self createFoundationObjects]);
+TIME_METHOD(timeToCreateCoreObjectGraph, CREATION_ITERATIONS, [self createCoreObjects]);
 
 - (void) testObjectGraphCreationPerformance
 {
@@ -121,31 +131,8 @@
 
 #pragma mark - string property access
 
-- (NSTimeInterval) timeToAccessFoundationObjectStringProperty
-{
-	id value = nil;
-	NSDate *start = [NSDate date];
-	for (int i=0; i<ACCESS_ITERATIONS; i++)
-	{
-		value = foundationParent.stringProperty;
-	}
-	NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start] / ACCESS_ITERATIONS;
-	ETAssert([value isEqualToString: @"parent"]);
-	return time;
-}
-
-- (NSTimeInterval) timeToAccessCoreObjectStringProperty
-{
-	id value = nil;
-	NSDate *start = [NSDate date];
-	for (int i=0; i<ACCESS_ITERATIONS; i++)
-	{
-		value = coreobjectParent.label;
-	}
-	NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start] / ACCESS_ITERATIONS;
-	ETAssert([value isEqualToString: @"parent"]);
-	return time;
-}
+TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessFoundationObjectStringProperty, ACCESS_ITERATIONS, foundationParent.stringProperty, @"parent")
+TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessCoreObjectStringProperty, ACCESS_ITERATIONS, coreobjectParent.label, @"parent")
 
 - (void) testStringPropertyAccess
 {
@@ -162,31 +149,15 @@
 
 #pragma mark - ordered relationship access
 
-- (NSTimeInterval) timeToAccessFoundationObjectOrderedRelationship
-{
-	id value = nil;
-	NSDate *start = [NSDate date];
-	for (int i=0; i<ACCESS_ITERATIONS; i++)
-	{
-		value = foundationParent.arrayProperty;
-	}
-	NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start] / ACCESS_ITERATIONS;
-	ETAssert([value isEqual: A(foundationChild1, foundationChild2, foundationChild3)]);
-	return time;
-}
+TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessFoundationObjectOrderedRelationship,
+								 ACCESS_ITERATIONS,
+								 foundationParent.arrayProperty,
+								 A(foundationChild1, foundationChild2, foundationChild3))
 
-- (NSTimeInterval) timeToAccessCoreObjectOrderedRelationship
-{
-	id value = nil;
-	NSDate *start = [NSDate date];
-	for (int i=0; i<ACCESS_ITERATIONS; i++)
-	{
-		value = coreobjectParent.contents;
-	}
-	NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start] / ACCESS_ITERATIONS;
-	ETAssert([value isEqual: A(coreobjectChild1, coreobjectChild2, coreobjectChild3)]);
-	return time;
-}
+TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessCoreObjectOrderedRelationship,
+								 ACCESS_ITERATIONS,
+								 coreobjectParent.contents,
+								 A(coreobjectChild1, coreobjectChild2, coreobjectChild3))
 
 - (void) testOrderedRelationshipAccess
 {
