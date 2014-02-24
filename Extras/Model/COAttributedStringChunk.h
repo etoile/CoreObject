@@ -10,6 +10,10 @@
 @class COAttributedString;
 
 @interface COAttributedStringChunk : COObject
+{
+	NSString *text;
+}
+
 @property (nonatomic, readwrite, strong) NSString *text;
 @property (nonatomic, readwrite, strong) NSSet *attributes;
 @property (nonatomic, readonly, weak) COAttributedString *parentString;

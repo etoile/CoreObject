@@ -36,7 +36,7 @@
 	
     return entity;
 }
-@dynamic text, attributes, parentString;
+@dynamic attributes, parentString;
 
 - (COItemGraph *) subchunkItemGraphWithRange: (NSRange)aRange
 {
@@ -53,9 +53,25 @@
 	return result;
 }
 
+// TODO: Storing "text" in an ivar is a hack done because the variable storage is
+// currently too slow. See -[TestObjectPerformance testStringPropertyAccess] which
+// is tracking the problem.
+- (NSString *)text
+{
+	return text;
+}
+
+- (void)setText: (NSString *)aText
+{
+	[self willChangeValueForProperty: @"text"];
+	text = aText;
+	[self didChangeValueForProperty: @"text"];
+}
+
+// NOTE: This gets called a lot by AppKit
 - (NSUInteger) length
 {
-	return [self.text length];
+	return [text length];
 }
 
 - (NSString *) attributesDebugDescription
