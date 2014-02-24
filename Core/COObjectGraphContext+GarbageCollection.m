@@ -7,6 +7,7 @@
  */
 
 #import "COObjectGraphContext+GarbageCollection.h"
+#import "COObjectGraphContext+Debugging.h"
 #import "COObject.h"
 
 @implementation COObjectGraphContext (COGarbageCollection)
@@ -125,26 +126,40 @@ static NSArray *CompositeReachableObjectsFromObject(COObject *anObject)
 	return result;
 }
 
-static void FindCyclesInCompositeRelationshipsFromObject(COObject *anObject, NSMutableSet *collectedUUIDSet)
+static void FindCyclesInContainersOfObject(COObject *currentObject, COObject *objectBeingSearchedFor)
 {
-    ETUUID *uuid = [anObject UUID];
-    if ([collectedUUIDSet containsObject: uuid])
-    {
-        [NSException raise: NSGenericException format: @"Cycle detected"];
-    }
-    [collectedUUIDSet addObject: uuid];
-    
-    // Call recursively on all composite and referenced objects
-    for (COObject *obj in CompositeReachableObjectsFromObject(anObject))
-    {
-        FindCyclesInCompositeRelationshipsFromObject(obj, collectedUUIDSet);
-    }
+	for (ETPropertyDescription *propDesc in [[currentObject entityDescription] allPropertyDescriptions])
+	{
+		if ([propDesc isContainer])
+		{
+			NSString *propertyName = [propDesc name];
+			COObject *container = [currentObject valueForKey: propertyName];
+			
+			if (container == objectBeingSearchedFor)
+				[NSException raise: NSGenericException format: @"Cycle detected"];
+			
+			if (container != nil)
+				FindCyclesInContainersOfObject(container, objectBeingSearchedFor);
+		}
+	}
 }
 
 - (void) checkForCyclesInCompositeRelationshipsFromObject: (COObject*)anObject
 {
-	NSMutableSet *result = [[NSMutableSet alloc] initWithCapacity: [_loadedObjects count]];
-	FindCyclesInCompositeRelationshipsFromObject(anObject, result);
+	FindCyclesInContainersOfObject(anObject, anObject);
+}
+
+- (void) checkForCyclesInCompositeRelationshipsInObjects: (NSArray *)objects
+{
+	for (COObject *object in objects)
+	{
+		[self checkForCyclesInCompositeRelationshipsFromObject: object];
+	}
+}
+
+- (void) checkForCyclesInCompositeRelationshipsInChangedObjects
+{
+	[self checkForCyclesInCompositeRelationshipsInObjects: [self changedObjects]];
 }
 
 @end

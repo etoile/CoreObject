@@ -130,7 +130,7 @@
 - (void)testNullCompositeDuringCompositeValidation
 {
 	[parent setChild: nil];
-	UKDoesNotRaiseException([parent.objectGraphContext checkForCyclesInCompositeRelationshipsFromObject: parent]);
+	UKDoesNotRaiseException([parent.objectGraphContext checkForCyclesInCompositeRelationshipsInChangedObjects]);
 }
 
 @end

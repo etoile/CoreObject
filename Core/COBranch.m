@@ -623,11 +623,6 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		COItemGraph *modifiedItems = [self modifiedItemsSnapshot];
 		if ([[modifiedItems itemUUIDs] count] > 0 || self.shouldMakeEmptyCommit)
 		{
-			// Validate the graph - see [TestOrderedCompositeRelationship testCompositeCycleWithThreeObjects]
-			// Not sure if this is the best approach to detecting cycles in composites but it's a first
-			// draft anyway.
-			[modifiedItemsSource checkForCyclesInCompositeRelationshipsFromObject: [modifiedItemsSource rootObject]];
-			
 			ETUUID *mergeParent = nil;
 			if (self.mergingBranch != nil)
 			{
@@ -917,6 +912,9 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	{
 		[graph removeUnreachableObjects];
 	}
+	
+	// Check for composite cycles - see [TestOrderedCompositeRelationship testCompositeCycleWithThreeObjects]
+	[graph checkForCyclesInCompositeRelationshipsInChangedObjects];
 	
     if (_currentRevisionUUID == nil)
     {
