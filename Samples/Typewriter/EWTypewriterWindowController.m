@@ -47,18 +47,29 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	
 	// Filter by tag
 	
+	COTagGroup *selectedTagGroup = [self tagGroupOfSelectedRow];
 	COTag *selectedTag = [self selectedTag];
 	
 	[results filterUsingPredicate:
 	 [NSPredicate predicateWithBlock: ^(id object, NSDictionary *bindings) {
+		COObject *rootObject = [object rootObject];
 		if (selectedTag == nil)
 		{
-			return YES;
+			if (selectedTagGroup == nil)
+				return YES;
+			else
+			{
+				for (COTag *tagOfObject in [rootObject tags])
+				{
+					if ([[selectedTagGroup content] containsObject: tagOfObject])
+						return YES;
+				}
+				return NO;
+			}
 		}
 		else
 		{
 			NSArray *tagContents = [selectedTag content];
-			id rootObject = [object rootObject];
 			return [tagContents containsObject: rootObject];
 		}
 	}]];
@@ -112,9 +123,31 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	return node;
 }
 
-- (COTag *) selectedTag
+- (COTag *) clickedOrSelectedTag
 {
 	NSTreeNode * object = [self tagsOutlineClickedOrSelectedTreeNode];
+	if ([[object representedObject] isTag])
+	{
+		return [object representedObject];
+	}
+	return nil;
+}
+
+- (NSTreeNode *) tagsOutlineSelectedTreeNode
+{
+	NSInteger selectedRow = [tagsOutline selectedRow];
+	
+	if (selectedRow == -1)
+		return nil;
+	
+	NSTreeNode *node = [tagsOutline itemAtRow: selectedRow];
+	return node;
+}
+
+
+- (COTag *) selectedTag
+{
+	NSTreeNode * object = [self tagsOutlineSelectedTreeNode];
 	if ([[object representedObject] isTag])
 	{
 		return [object representedObject];
@@ -214,6 +247,9 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (void) editingContextChanged: (NSNotification *)notif
 {
+	// TODO: Should check modified persistent root UUIDs and only update the
+	// tags list if the project was modified, or the notes list if the project
+	// or one of the notes was modified.
 	[tagListDataSource reloadData];
 	[noteListDataSource reloadData];
 }
@@ -253,7 +289,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	[md addEntriesFromDictionary: @{ @"label" : @"Untitled Note" }];
 	newNote.metadata = md;
 	
-	COTag *currentTag = [self selectedTag];
+	COTag *currentTag = [self clickedOrSelectedTag];
 	if (currentTag != nil)
 	{
 		[currentTag addObject: [newNote rootObject]];
@@ -282,7 +318,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 		copyOfSelection.metadata = md;
 		
 		// Also give it the selected tag
-		COTag *selectedTag = [self selectedTag];
+		COTag *selectedTag = [self clickedOrSelectedTag];
 		if (selectedTag != nil)
 		{
 			[selectedTag addObject: [copyOfSelection rootObject]];
@@ -410,9 +446,9 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	}
 	else if ([[self window] firstResponder] == tagsOutline)
 	{
-		if ([self selectedTag] != nil)
+		if ([self clickedOrSelectedTag] != nil)
 		{
-			COTag *tag = [self selectedTag];
+			COTag *tag = [self clickedOrSelectedTag];
 			COTagGroup *tagGroup = [self tagGroupOfSelectedRow];
 			[tagGroup removeObject: tag];
 

@@ -77,18 +77,26 @@
 
 - (void)cacheSelection
 {
-	[oldSelection removeAllObjects];
-	NSIndexSet *indexes = [self.outlineView selectedRowIndexes];
-	for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+	if ([[self.outlineView selectedRowIndexes] count] != 0)
 	{
-		COObject *object = [[self.outlineView itemAtRow: i] representedObject];
-		[oldSelection addObject: object.UUID];
+		[oldSelection removeAllObjects];
+		NSIndexSet *indexes = [self.outlineView selectedRowIndexes];
+		for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+		{
+			COObject *object = [[self.outlineView itemAtRow: i] representedObject];
+			[oldSelection addObject: object.UUID];
+		}
+		NSLog(@"Caching selected tags as %@", oldSelection);
+		if ([oldSelection isEmpty])
+		{
+			NSLog(@"hih");
+		}
 	}
 }
 
 - (void) setNextSelection: (ETUUID *)aUUID
 {
-	[oldSelection setSet: S(aUUID)];
+	nextSelection = aUUID;
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
@@ -117,8 +125,19 @@
 	[self.outlineView reloadData];
 	[self.outlineView expandItem: nil expandChildren: YES]; // Initially expand all tags - needs to be done before the selection restoration
 	
+	NSSet *uuidsToSelect;
+	if (nextSelection != nil)
+	{
+		uuidsToSelect = S(nextSelection);
+	}
+	else
+	{
+		uuidsToSelect = oldSelection;
+	}
+	nextSelection = nil;
+	
 	NSMutableIndexSet *newSelectedRows = [NSMutableIndexSet new];
-	for (ETUUID *uuid in oldSelection)
+	for (ETUUID *uuid in uuidsToSelect)
 	{
 		for (NSInteger row = 0; row < [self.outlineView numberOfRows]; row++)
 		{

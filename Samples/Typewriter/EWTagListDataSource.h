@@ -13,6 +13,7 @@
 {
 	NSTreeNode *rootTreeNode;
 	NSMutableSet *oldSelection;
+	ETUUID *nextSelection;
 }
 
 @property (nonatomic, unsafe_unretained) EWTypewriterWindowController *owner;
