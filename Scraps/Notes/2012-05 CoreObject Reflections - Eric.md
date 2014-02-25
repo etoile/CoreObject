@@ -2,6 +2,44 @@
 CoreObject Reflections May, 2012
 ==========================
 
+###ObjectMerging
+
+ - problems with ObjectMerging:
+ 
+    - store wasn't designed with persistent roots in mind initially as first-class citizens
+    
+    - "relationship consistency" idea is flawed. should only store one side of the relationships (e.g. the "children" side of parent/child relationships) and the other direction should be computed
+    
+    - mixing multiple persistent roots in one object context is messy
+    
+ - positive features of ObjectMerging:
+ 
+    - proper editing context API with faulting, tracking changes to be committed.
+    
+    - proof-of-concept diff/merge on property-list like documents
+
+###NestedVersioning
+
+ - problems with NestedVersioning:
+ 
+    - Too general of a tool (persistent roots are not a concept in the store, but implemented as a layer on top)
+    
+    - nested history graphs so complex that they're impossible to understand
+    
+    - merge algorithm very very complex
+    
+    - the undo functionality appears to be rich (e.g. you can undo branch switching, deleting persistent roots, etc.) but it's impossible to customize
+
+ - positive features of NestedVersioning:
+ 
+    - the metamodel used seems to be really clean. (A commit is a tree of COItem objects. A COItem is basically a dictionary mapping string keys to primitive values (or arrays/sets of primitive values) and types, with the COType class defining the type system)
+    
+    - proof-of-concept that cheap copy of branches and persistent roots, as well as undo of  branch switching, deleting persistent roots, etc. can be implemented relatively simply
+    
+    - more complete diff/merge system than ObjectMerging, although still needs work
+	
+---
+
 Things that are definitely done the correctly in nestedversioning:
 
 - no separate metamodel
