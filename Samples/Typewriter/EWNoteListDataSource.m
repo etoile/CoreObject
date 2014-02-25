@@ -39,7 +39,7 @@
     }
     else if ([[tableColumn identifier] isEqual: @"date"])
     {
-        return [NSDate date];
+        return persistentRoot.modificationDate;
     }
     return nil;
 }
