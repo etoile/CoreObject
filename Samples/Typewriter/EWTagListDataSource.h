@@ -9,11 +9,17 @@
 
 @class EWTypewriterWindowController;
 
+@interface EWTagGroupTagPair : NSObject
+@property (nonatomic, readonly) ETUUID *tagGroup;
+@property (nonatomic, readonly) ETUUID *tag;
+- (instancetype)initWithTagGroup: (ETUUID *)aTagGroup tag: (ETUUID*)aTag;
+@end
+
 @interface EWTagListDataSource : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate>
 {
 	NSTreeNode *rootTreeNode;
 	NSMutableSet *oldSelection;
-	ETUUID *nextSelection;
+	EWTagGroupTagPair *nextSelection;
 }
 
 @property (nonatomic, unsafe_unretained) EWTypewriterWindowController *owner;
@@ -21,5 +27,5 @@
 - (void)reloadData;
 - (void)cacheSelection;
 
-- (void) setNextSelection: (ETUUID *)aUUID;
+- (void) setNextSelection: (EWTagGroupTagPair *)aUUID;
 @end

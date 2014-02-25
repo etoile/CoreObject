@@ -8,6 +8,30 @@
 #import "EWTagListDataSource.h"
 #import "EWTypewriterWindowController.h"
 
+@implementation EWTagGroupTagPair
+@synthesize tagGroup, tag;
+- (instancetype)initWithTagGroup: (ETUUID *)aTagGroup tag: (ETUUID*)aTag
+{
+	SUPERINIT;
+	tagGroup = aTagGroup;
+	tag = aTag;
+	return self;
+}
+- (NSUInteger)hash
+{
+	return [tagGroup hash] ^ [tag hash];
+}
+- (BOOL) isEqual: (id)other
+{
+	if (![other isKindOfClass: [EWTagGroupTagPair class]])
+		return NO;
+	EWTagGroupTagPair *otherTagGroupPair = other;
+	return [otherTagGroupPair.tagGroup isEqual: tagGroup]
+		&& ([otherTagGroupPair.tag isEqual: tag]
+			|| (otherTagGroupPair.tag == nil && tag == nil));
+}
+@end
+
 @implementation EWTagListDataSource
 
 @synthesize owner, outlineView;
@@ -75,6 +99,25 @@
 	}
 }
 
+- (EWTagGroupTagPair *)tagGroupTagPairForTreeNode: (NSTreeNode *)treeNode
+{
+	COObject *object = [treeNode representedObject];
+	COObject *parentObject = [[treeNode parentNode] representedObject];
+	
+	if ([object isKindOfClass: [COTag class]]
+		&& [parentObject isKindOfClass: [COTagGroup class]])
+	{
+		return [[EWTagGroupTagPair alloc] initWithTagGroup: parentObject.UUID
+													   tag: object.UUID];
+	}
+	else if ([object isKindOfClass: [COTagGroup class]])
+	{
+		return [[EWTagGroupTagPair alloc] initWithTagGroup: object.UUID
+													   tag: nil];
+	}
+	return nil;
+}
+
 - (void)cacheSelection
 {
 	if ([[self.outlineView selectedRowIndexes] count] != 0)
@@ -83,8 +126,12 @@
 		NSIndexSet *indexes = [self.outlineView selectedRowIndexes];
 		for (NSUInteger i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
 		{
-			COObject *object = [[self.outlineView itemAtRow: i] representedObject];
-			[oldSelection addObject: object.UUID];
+			NSTreeNode *treeNode = [self.outlineView itemAtRow: i];
+			EWTagGroupTagPair *tagGroupTag = [self tagGroupTagPairForTreeNode: treeNode];
+			if (tagGroupTag != nil)
+			{
+				[oldSelection addObject: tagGroupTag];
+			}
 		}
 		NSLog(@"Caching selected tags as %@", oldSelection);
 		if ([oldSelection isEmpty])
@@ -94,7 +141,7 @@
 	}
 }
 
-- (void) setNextSelection: (ETUUID *)aUUID
+- (void) setNextSelection: (EWTagGroupTagPair *)aUUID
 {
 	nextSelection = aUUID;
 }
@@ -137,11 +184,12 @@
 	nextSelection = nil;
 	
 	NSMutableIndexSet *newSelectedRows = [NSMutableIndexSet new];
-	for (ETUUID *uuid in uuidsToSelect)
+	for (EWTagGroupTagPair *selectedTagGroupTagPair in uuidsToSelect)
 	{
 		for (NSInteger row = 0; row < [self.outlineView numberOfRows]; row++)
 		{
-			if ([[[[self.outlineView itemAtRow: row] representedObject] UUID] isEqual: uuid])
+			EWTagGroupTagPair *tagGroupTag = [self tagGroupTagPairForTreeNode: [self.outlineView itemAtRow: row]];
+			if ([tagGroupTag isEqual: selectedTagGroupTagPair])
 			{
 				[newSelectedRows addIndex: row];
 				break;
