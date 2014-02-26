@@ -45,6 +45,7 @@ NSString * EWTagDragType;
 
 @property (nonatomic, readonly) COEditingContext *editingContext;
 @property (nonatomic, readonly) COUndoTrack *undoTrack;
+@property (nonatomic, readonly) COAttributedStringWrapper *textStorage;
 
 - (IBAction) addTag:(id)sender;
 - (IBAction) addTagGroup:(id)sender;

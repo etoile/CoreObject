@@ -7,22 +7,20 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>typewriter</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string></string>
 			<key>CFBundleTypeName</key>
-			<string>DocumentType</string>
-			<key>CFBundleTypeOSTypes</key>
+			<string>Typewriter Document</string>
+			<key>LSItemContentTypes</key>
 			<array>
-				<string>????</string>
+				<string>public.html</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>NSDocumentClass</key>
 			<string>EWDocument</string>
+			<key>NSExportableTypes</key>
+			<array>
+				<string>public.html</string>
+			</array>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>

@@ -26,6 +26,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 @synthesize notesTable = notesTable;
 @synthesize undoTrack = undoTrack;
+@synthesize textStorage = textStorage;
 
 - (COEditingContext *) editingContext
 {

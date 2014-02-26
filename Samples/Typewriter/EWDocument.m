@@ -78,4 +78,35 @@
     return @"Document";
 }
 
+#pragma mark - NSDocument data writing
+
+- (NSData *) dataOfType: (NSString *)typeName error: (NSError **)outError
+{
+	if ([typeName isEqualToString: @"public.html"])
+	{
+		EWTypewriterWindowController *windowController = [[NSApp mainWindow] windowController];
+		if (![windowController isKindOfClass: [EWTypewriterWindowController class]])
+			return nil;
+		
+		COAttributedStringWrapper *ts = windowController.textStorage;
+		
+		NSDictionary *dict = @{ NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType };
+		NSData *data = [ts dataFromRange: NSMakeRange(0, [ts length]) documentAttributes: dict error: outError];
+
+		if (data == nil
+			&& outError != NULL)
+		{
+			*outError = [NSError errorWithDomain: NSCocoaErrorDomain
+											code: NSFileWriteUnknownError
+										userInfo: nil];
+		}
+		return data;
+	}
+	else
+	{
+		[NSException raise: NSGenericException format: @"Unsupported writing type %@", typeName];
+		return nil;
+	}
+}
+
 @end
