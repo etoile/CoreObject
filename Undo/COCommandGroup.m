@@ -228,6 +228,18 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 		[[self metadata] objectForKey: kCOCommitMetadataShortDescriptionArguments]];
 }
 
+- (id<COTrackNode>)parentNode
+{
+	if (self.parentUUID == nil)
+		return nil;
+	return [_parentUndoTrack commandForUUID: self.parentUUID];
+}
+
+- (id<COTrackNode>)mergeParentNode
+{
+	return nil;
+}
+
 #pragma mark -
 #pragma mark Collection Protocol
 

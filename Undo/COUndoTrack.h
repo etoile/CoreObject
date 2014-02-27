@@ -181,12 +181,25 @@ extern NSString * const kCOUndoStackName;
 
 
 /**
+ * This method is only exposed to be used internally by CoreObject.
+ *
  * Saves the command on disk and remembers it as the current command.
  *
  * See also -currentCommand.
  */
 - (void) recordCommand: (COCommandGroup *)aCommand;
-
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Returns the undo track store used by this track
+ */
 @property (nonatomic, readonly) COUndoTrackStore *store;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Returns a cached command group, or attempts to load it from the store if
+ * not present in memory.
+ */
+- (COCommandGroup *) commandForUUID: (ETUUID*)aUUID;
 
 @end

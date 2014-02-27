@@ -171,4 +171,16 @@
     return NO;
 }
 
+#pragma mark - COTrackNode Implementation
+
+- (id<COTrackNode>)parentNode
+{
+	return [self parentRevision];
+}
+
+- (id<COTrackNode>)mergeParentNode
+{
+	return [self mergeParentRevision];
+}
+
 @end

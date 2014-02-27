@@ -206,4 +206,13 @@
  * See -[CORevision localizedShortDescription].
  */
 - (NSString *)localizedShortDescription;
+/**
+ * Returns the parent node of this node, or nil if there is none.
+ */
+- (id<COTrackNode>)parentNode;
+/**
+ * Returns the merge parent node of this node, or nil if there is none.
+ */
+- (id<COTrackNode>)mergeParentNode;
+
 @end
