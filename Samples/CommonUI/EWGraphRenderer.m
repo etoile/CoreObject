@@ -19,16 +19,20 @@
 static NSArray *sortTrackNodes(NSArray *commits)
 {
     return [commits sortedArrayUsingComparator: ^(id obj1, id obj2) {
-        COCommandGroup *obj1Info = obj1;
-        COCommandGroup *obj2Info = obj2;
-        
-        if (obj2Info.sequenceNumber < obj1Info.sequenceNumber)
-			return NSOrderedAscending;
-		else if (obj2Info.sequenceNumber > obj1Info.sequenceNumber)
-			return NSOrderedDescending;
-		else
-			return NSOrderedSame;
-    }];
+//        COCommandGroup *obj1Info = obj1;
+//        COCommandGroup *obj2Info = obj2;
+//        
+//        if (obj2Info.sequenceNumber < obj1Info.sequenceNumber)
+//		return NSOrderedAscending;
+//		else if (obj2Info.sequenceNumber > obj1Info.sequenceNumber)
+//		return NSOrderedDescending;
+//		else
+//		return NSOrderedSame;
+
+        id<COTrackNode> obj1Node = obj1;
+        id<COTrackNode> obj2Node = obj2;
+		return [[obj2Node date] compare: [obj1Node date]];
+	}];
 }
 
 - (void) buildRevisionInfoForUUID
@@ -68,11 +72,16 @@ static NSArray *sortTrackNodes(NSArray *commits)
 	id<COTrackNode> aCommit = revisionInfoForUUID[aUUID];
 	ETAssert(aCommit != nil);
 	
-	if (((COCommandGroup *)aCommit).parentUUID != nil)
+	NSMutableArray *result = [NSMutableArray new];
+	if ([aCommit parentNode] != nil)
 	{
-		return @[((COCommandGroup *)aCommit).parentUUID];
+		[result addObject: [[aCommit parentNode] UUID]];
 	}
-	return @[];
+	if ([aCommit mergeParentNode] != nil)
+	{
+		[result addObject: [[aCommit mergeParentNode] UUID]];
+	}
+	return result;
 }
 
 - (NSArray *) childrenForUUID: (ETUUID *)aUUID
@@ -106,7 +115,7 @@ static NSArray *sortTrackNodes(NSArray *commits)
 	NSMutableArray *roots = [NSMutableArray array];
 	for (id<COTrackNode> aCommit in trackNodesChronological)
 	{
-		if (nil == [self childrenForUUID: ((COCommandGroup *)aCommit).parentUUID])
+		if (nil == [self childrenForUUID: [[aCommit parentNode] UUID]])
 		{
 			[roots addObject: aCommit.UUID];
 		}
