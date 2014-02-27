@@ -69,6 +69,13 @@ CoreObject_OBJC_FILES += $(wildcard Tests/TestModelObjects/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Utilities/*.m)
 endif
 
+CoreObject_LANGUAGES = \
+	English
+
+# HACK: Only works for me if we used non-localized resources
+CoreObject_RESOURCE_FILES = \
+	English.lproj/Commits 
+
 clean : test=yes
 
 CoreObjectDoc_MENU_TEMPLATE_FILE = Documentation/Templates/menu.html
