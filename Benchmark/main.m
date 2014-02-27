@@ -19,12 +19,8 @@ int main (int argc, const char *argv[])
 		UKTestHandler *handler = [UKTestHandler handler];
 		[handler setQuiet: YES];
 		
-		NSDate *startDate = [NSDate date];
-		
 		[runner runTestsWithClassNames: nil principalClass: [EditingContextTestCase class]];
 		[runner reportTestResults];
-		
-		printf("Took %d ms\n", (int)([[NSDate date] timeIntervalSinceDate: startDate] * 1000));
 		
 		if ([handler exceptionsReported] > 0 || [handler testsFailed] > 0)
 		{
