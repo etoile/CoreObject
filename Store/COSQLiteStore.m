@@ -48,7 +48,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 	SUPERINIT;
     
     queue_ = dispatch_queue_create([[NSString stringWithFormat: @"COSQLiteStore-%p", self] UTF8String], NULL);
-    
+
+ 
 	url_ = aURL;
 	backingStores_ = [[NSMutableDictionary alloc] init];
     backingStoreUUIDForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
@@ -84,7 +85,12 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         
         ok = [self setupSchema];
     });
-    
+ 
+    __weak FMDatabase *dbWeakRef = db_;   
+    _dbCloseBlock = ^() {
+        [dbWeakRef close];
+    };
+
     if (!ok)
     {
         return nil;
@@ -95,10 +101,13 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 - (void) dealloc
 {
-	dispatch_sync(queue_, ^() {
-		[db_ close];
-		db_ = nil;
-	});
+#if 0
+        dispatch_sync(queue_, ^() {
+                [db_ close];
+                db_ = nil;
+        });
+#endif
+	dispatch_sync(queue_, _dbCloseBlock);
 	// N.B.: We are using deployment target 10.7, so ARC does not manage libdispatch objects.
 	// If we switch to deployment target 10.8, ARC will manage libdispatch objects automatically.
 	// For GNUstep, ARC doesn't manage libdispatch objects since libobjc2 doesn't support it 

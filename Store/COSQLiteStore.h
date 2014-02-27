@@ -323,6 +323,9 @@ extern NSString * const COPersistentRootAttributeUsedSize;
     NSMutableDictionary *backingStoreUUIDForPersistentRootUUID_;
     
     dispatch_queue_t queue_;
+    // HACK: For GNUstep/libobjc2, we can't create blocks inside -dealloc that use self,
+    // so we create it in -initWithURL: and cache it in an ivar.
+    void (^_dbCloseBlock)(void);
 }
 
 /**
