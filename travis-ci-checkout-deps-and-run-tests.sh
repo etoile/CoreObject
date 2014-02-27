@@ -10,8 +10,8 @@ then
   exit 1
 fi
 
-svn co svn://svn.gna.org/svn/etoile/trunk/Etoile/Frameworks/UnitKit
-svn co svn://svn.gna.org/svn/etoile/trunk/Etoile/Frameworks/EtoileFoundation
+git clone https://github.com/etoile/UnitKit
+git clone https://github.com/etoile/EtoileFoundation
 
 # build & run the tests
 cd CoreObject
