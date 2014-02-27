@@ -21,7 +21,7 @@ int main (int argc, const char *argv[])
 		
 		NSDate *startDate = [NSDate date];
 		
-		[runner runTestsInBundle: [NSBundle mainBundle] principalClass: [EditingContextTestCase class]];
+		[runner runTestsWithClassNames: nil principalClass: [EditingContextTestCase class]];
 		[runner reportTestResults];
 		
 		printf("Took %d ms\n", (int)([[NSDate date] timeIntervalSinceDate: startDate] * 1000));
