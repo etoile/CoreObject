@@ -65,6 +65,7 @@
 	UKFalse([[container contentArray] isMutable]);
 }
 
+#if 0
 - (void)testLibraryGroup
 {
 	UKTrue([[[ctx libraryGroup] content] isEmpty]);
@@ -97,7 +98,7 @@
 
 	UKTrue([library isOrdered]);
 }
-								  
+
 - (void)testNoteLibrary
 {
 	COLibrary *library = [ctx noteLibrary];
@@ -113,6 +114,7 @@
 
 	UKTrue([library isOrdered]);
 }
+#endif								  
 
 - (void)testTagLibrary
 {
