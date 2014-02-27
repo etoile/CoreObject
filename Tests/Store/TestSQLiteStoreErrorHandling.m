@@ -96,7 +96,7 @@ static ETUUID *rootUUID;
 												 UUID: [ETUUID UUID]
 										   branchUUID: [ETUUID UUID]
 									 revisionMetadata: nil];
-#if BACKING_STORES_SHARE_SAME_SQLITE_DB == YES
+#if BACKING_STORES_SHARE_SAME_SQLITE_DB == 1
 		UKTrue([store commitStoreTransaction: txn]);
 #else
 		UKFalse([store commitStoreTransaction: txn]);

@@ -13,7 +13,7 @@
 @class COItem, CORevisionInfo, COItemGraph, COBranchInfo, COPersistentRootInfo;
 @class FMDatabase, COStoreTransaction;
 
-#define BACKING_STORES_SHARE_SAME_SQLITE_DB YES
+#define BACKING_STORES_SHARE_SAME_SQLITE_DB 1
 
 enum
 {
