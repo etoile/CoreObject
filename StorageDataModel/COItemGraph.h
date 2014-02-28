@@ -13,9 +13,10 @@
 /**
  * @group Storage Data Model
  * @abstract
- * Protocol for a mutable item graph
+ * Protocol for a mutable item graph.
  *
- * The object model is:
+ * @section Object Model
+ *
  * All objects must have a composite or non-composite relationship path to the root
  * (garbage-collected graph approach). This can be violated in the short term while
  * making a batch of changes.
@@ -23,21 +24,27 @@
  * Garbage collection is not covered by this protocol.
  */
 @protocol COItemGraph <NSObject>
-
+/**
+ * Returns the entry point UUID.
+ */
 - (ETUUID *) rootItemUUID;
 /**
- * Returns immutable item
+ * Returns an immutable item for the UUID.
  */
 - (COItem *) itemForUUID: (ETUUID *)aUUID;
-
+/**
+ * Returns all the item UUIDs in the graph, including -rootItemUUID.
+ */
 - (NSArray *) itemUUIDs;
 /**
- * Insert or updates the given items.
+ * Inserts the items in the graph, or updates existing items when the graph 
+ * contains items with matching UUIDs.
+ *
  * When combined with the receiver, all inner references should be resolved.
- * May broadcase a change notification, up to the subclass.
+ *
+ * May broadcast a change notification, up to the subclass.
  */
 - (void) insertOrUpdateItems: (NSArray *)items;
-
 @end
 
 /**
@@ -48,9 +55,9 @@
  *
  * COItemGraph is allowed to contain broken references (i.e. it can contain
  * COItems which have ETUUID references to items not in the COItemGraph, or
- * even be missing the COItem for the root item UUID) - this
- * is to allow COItemGraph to act as a simple delta mechanism, so you can
- * compute (COItemGraph + COItemGraph) = a new COItemGraph.
+ * even be missing the COItem for the root item UUID) - this is to allow 
+ * COItemGraph to act as a simple delta mechanism, so you can compute 
+ * <em>(COItemGraph + COItemGraph) = a new COItemGraph</em>.
  */
 @interface COItemGraph : NSObject <COItemGraph>
 {
@@ -58,38 +65,60 @@
     NSMutableDictionary *itemForUUID_;
 }
 
+
+/** @taskunit Initialization */
+
+
 + (COItemGraph *)itemGraphWithItemsRootFirst: (NSArray*)items;
-
 /**
- * N.B. items doesn't need to contain rootItemUUID
+ * N.B. items doesn't need to contain rootItemUUID.
  */
-- (id) initWithItemForUUID: (NSDictionary *) itemForUUID
+- (id) initWithItemForUUID: (NSDictionary *)itemForUUID
               rootItemUUID: (ETUUID *)root;
-
 /**
- * N.B. items doesn't need to contain rootItemUUID
+ * N.B. items doesn't need to contain rootItemUUID.
  */
 - (id) initWithItems: (NSArray *)items
         rootItemUUID: (ETUUID *)root;
-
 - (id) initWithItemGraph: (id<COItemGraph>)aGraph;
 
+
+/** @taskunit Item Graph Protocol and Additionss */
+
+/**
+ * See -[COItemGraph rootItemUUID].
+ */
 @property (nonatomic, strong) ETUUID *rootItemUUID;
-
+/**
+ * See -[COItemGraph itemForUUID:].
+ */
 - (COMutableItem *) itemForUUID: (ETUUID *)aUUID;
-
+/**
+ * See -[COItemGraph itemUUIDs].
+ */
 - (NSArray *) itemUUIDs;
-
+/**
+ * Returns all the items in the graph.
+ *
+ * The returned item count is the same than -itemUUIDs.
+ */
 - (NSArray *) items;
-
+/**
+ * See -[COItemGraph insertOrUpdateItems:].
+ */
 - (void) insertOrUpdateItems: (NSArray *)items;
-
+/**
+ * Adds the items from the given item graph to the receiver.
+ *
+ * If two items have the same UUID, the added item replaces the one in the 
+ * receiver.
+ */
 - (void) addItemGraph: (id<COItemGraph>)aGraph;
 
 @end
 
 /**
- * For debugging
+ * For debugging.
  */
 void COValidateItemGraph(id<COItemGraph> aGraph);
 
@@ -102,6 +131,6 @@ COItemGraph *COItemGraphFromJSONData(NSData *json);
 BOOL COItemGraphEqualToItemGraph(id<COItemGraph> first, id<COItemGraph> second);
 
 /**
- * If [aGraph rootItemUUID] is nil, returns the empty set
+ * If <code>[aGraph rootItemUUID]</code> is nil, returns the empty set.
  */
 NSSet *COItemGraphReachableUUIDs(id<COItemGraph> aGraph);
