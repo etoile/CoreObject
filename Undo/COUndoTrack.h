@@ -155,11 +155,11 @@ extern NSString * const kCOUndoStackName;
 
 
 /**
- * Returns a localized menu item title describing the command to undo
+ * Returns a localized menu item title describing the command to undo.
  */
 - (NSString *) undoMenuItemTitle;
 /**
- * Returns a localized menu item title describing the command to redo
+ * Returns a localized menu item title describing the command to redo.
  */
 - (NSString *) redoMenuItemTitle;
 
@@ -168,11 +168,14 @@ extern NSString * const kCOUndoStackName;
 
 
 /**
- * returns all commands ordered by commit order
+ * Returns all commands ordered by commit order.
+ *
+ * See also -[COCommandGroup sequenceNumber].
  */
 - (NSArray *) allCommands;
 /**
- * Returns all commands that are children of the given node. the order is undefined
+ * Returns all commands that are children of the given node (the order is 
+ * undefined).
  */
 - (NSArray *) childrenOfNode: (id<COTrackNode>)aNode;
 
@@ -191,7 +194,7 @@ extern NSString * const kCOUndoStackName;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
- * Returns the undo track store used by this track
+ * Returns the undo track store used by this track.
  */
 @property (nonatomic, readonly) COUndoTrackStore *store;
 /**

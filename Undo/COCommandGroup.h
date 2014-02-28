@@ -33,13 +33,14 @@
 	int64_t _sequenceNumber;
 }
 
-- (instancetype) initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
-									 owner: (COUndoTrack *)anOwner;
-
-- (COUndoTrackSerializedCommand *) serializedCommand;
 
 /** @taskunit Basic Properties */
 
+
+/**
+ * A localized string describing the command.
+ */
+@property (nonatomic, readonly) NSString *kind;
 /**
  * The undo track on which the command was recorded.
  *
@@ -77,15 +78,70 @@
  * to return the equivalent commit descriptor descriptions.
  */
 @property (nonatomic, readonly) COCommitDescriptor *commitDescriptor;
+/**
+ * The UUID of the parent command. 
+ * 
+ * The parent command is the command upon on this one is based, it is not 
+ * necessarily the previous command by -sequenceNumber.
+ *
+ * An Undo track can contain divergences that look like "branches" in the Undo 
+ * history. After an undo, any new commit makes the Undo track diverges. At 
+ * this point, the last undo and the previously created commands that follow it, 
+ * don't appear in the Undo track unless divergent commands are explicitly shown.
+ * 
+ * For the first command in an Undo track, returns nil.
+ */
 @property (nonatomic, readwrite) ETUUID *parentUUID;
 /**
  * The commit time.
  */
 @property (nonatomic, copy) NSDate *timestamp;
+/**
+ * The commit order in the Undo track store.
+ */
 @property (nonatomic, readwrite) int64_t sequenceNumber;
 
+
+/** @taskunit Applying and Reverting Changes */
+
+
+/**
+ * Returns a command that represents an inverse action.
+ *
+ * You can use the inverse to unapply the receiver changes in an editing context.
+ *
+ * <code>[[command inverse] inverse]</code> must be equal 
+ * <code>[command inverse]</code>.
+ */
 - (COCommandGroup *) inverse;
+/** 
+ * Returns whether the receiver changes can be applied to the editing context.
+ */
+- (BOOL) canApplyToContext: (COEditingContext *)aContext;
+/**
+ * Applies the receiver changes to the editing context.
+ */
 - (void) applyToContext: (COEditingContext *)aContext;
-- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx;
+/**
+ * Applies the receiver changes directly to a store transaction.
+ */
+- (void) addToStoreTransaction: (COStoreTransaction *)txn
+   assumingEditingContextState: (COEditingContext *)ctx;
+
+
+/** @taskunit Framework Private */
+
+
+/**
+ * <init />
+ * Initializes a command group from a serialized represention and with a parent 
+ * undo track.
+ */
+- (instancetype) initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
+									 owner: (COUndoTrack *)anOwner;
+/**
+ * Returns a serialized represention.
+ */
+- (COUndoTrackSerializedCommand *) serializedCommand;
 
 @end

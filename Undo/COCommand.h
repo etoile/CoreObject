@@ -95,8 +95,12 @@
  * Applies the receiver changes to the editing context.
  */
 - (void) applyToContext: (COEditingContext *)aContext;
-
-- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx;
+/**
+ * <override-subclass />
+ * Applies the receiver changes directly to a store transaction.
+ */
+- (void) addToStoreTransaction: (COStoreTransaction *)txn
+   assumingEditingContextState: (COEditingContext *)ctx;
 
 /** @taskunit Framework Private */
 
