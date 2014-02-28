@@ -84,7 +84,10 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * New persistent roots contains just a single branch (see -branches).
  *
  * You can ignore the COBranch API and just use COPersistentRoot to access the 
- * object graph (-objectGraphContext).
+ * object graph with -objectGraphContext.
+ *
+ * -objectGraphContext represents a dynamically tracked current branch, that 
+ * presents another content, every time -currentBranch is set to another branch.
  *
  * @section Creation
  *
@@ -123,6 +126,29 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * 
  * Currently, the only way to do this is to call a lower level store API, however
  * this functionality will probably be exposed in COEditingContext at some point.
+ *
+ * @section Cross Persistent Root References
+ *
+ * CoreObject supports to create references to other root objects accross 
+ * persistent roots:
+ *
+ * <list>
+ * <item>unidirectional references to a specific branch (can be any branch 
+ * including the current branch)</item>
+ * <item>bidirectional references accross two dynamically tracked current 
+ * branches</item>
+ * </list>
+ *
+ * For creating dynamically tracked references to a -currentBranch, -rootObject 
+ * must be used as the object being referred from another persistent root. For 
+ * bidirectional references, the relationship cache will ensure the consistency 
+ * is maintained even in case the current branch is changed on either side.
+ *
+ * For creating references to a specific branch, the root object being referred 
+ * from another persistent root, can be any root object, except  
+ * -[COPersistentRoot rootObject]. You would usually use -branches, 
+ * -branchForUUID: or -currentBranch to get a specific branch, then access its 
+ * root object. 
  */
 @interface COPersistentRoot : NSObject <COPersistentObjectContext>
 {
@@ -358,11 +384,24 @@ extern NSString * const COPersistentRootDidChangeNotification;
 
 
 /**
- * Shorthand for <code>[[[self currentBranch] objectGraphContext] rootObject]</code>.
+ * Shorthand for <code>[[self objectGraphContext] rootObject]</code>.
+ *
+ * You can use this root object to create a cross persistent reference that 
+ * dynamically tracks the current branch. If the receiver current branch is 
+ * changed, the next time the persistent root that referred to it is reloaded, 
+ * its reference will point to the new current branch (the reference is 
+ * transparently updated at deserialization time and through change 
+ * notifications from other persistent roots posted by the store).
+ *
+ * If you use <code>[[self currentBranch] rootObject]</code> or 
+ * <code>[otherBranch rootObject]</code>, the cross persistent root reference 
+ * in another persistent root will track a specific branch. For example, even 
+ * if the current branch changes in the receiver, the other persistent root 
+ * will continue to refer to the root object of the previous current branch.
  */
 @property (nonatomic, strong) id rootObject;
 /**
- * Shorthand for <code>[[[self currentBranch] objectGraphContext] loadedObjectForUUID:]</code>.
+ * Shorthand for <code>[[self objectGraphContext] loadedObjectForUUID:]</code>.
  */
 - (COObject *)loadedObjectForUUID: (ETUUID *)uuid;
 /**
@@ -381,16 +420,31 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @property (nonatomic, readonly) COSQLiteStore *store;
 /**
- * Returns the object graph for the -currentBranch.
+ * Returns the object graph that dynamically tracks the -currentBranch.
  *
- * See also -allObjectGraphContexts.
+ * This object graph context is not the same than 
+ * <code>[[self currentBranch] objectGraphContext]</code>, although its content 
+ * is the same (their item graphs are equal). For the same inner object UUID, 
+ * both use distinct inner object instances.
+ *
+ * When -setCurrentBranch: is called, this object graph content changes. It is 
+ * updated with -[COObjectGraphContext setItemGraph:], to present the same 
+ * content than [[self currentBranch] objectGraphContext].
+ *
+ * This object graph context and <code>[[self currentBranch] objectGraphContext]</code>
+ * are kept in sync at commit time. There is a one-way update, so both are not 
+ * allowed to contain changes, otherwise an assertion occurs at commit time.
+ * If -objectGraphContext or <code>[[self currentBranch] objectGraphContext]</code>  
+ * contains some changes, a commit must be done, to start making changes to its 
+ * counterpart.
+ *
+ * See also -allObjectGraphContexts and -rootObject (for cross persistent root 
+ * references).
  */
 @property (nonatomic, readonly) COObjectGraphContext *objectGraphContext;
 /**
- * Returns the object graphs for the -branches, plus the object graph for the 
- * -currentBranch. 
- *
- * See also -objectGraphContext.
+ * Returns the object graphs for the -branches, plus the object graph that 
+ * dynamically tracks the -currentBranch (see -objectGraphContext).
  */
 @property (nonatomic, readonly) NSSet *allObjectGraphContexts;
 
