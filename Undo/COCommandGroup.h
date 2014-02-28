@@ -80,7 +80,7 @@
 @property (nonatomic, readonly) COCommitDescriptor *commitDescriptor;
 /**
  * The UUID of the parent command. 
- * 
+ *
  * The parent command is the command upon on this one is based, it is not 
  * necessarily the previous command by -sequenceNumber.
  *
@@ -88,7 +88,7 @@
  * history. After an undo, any new commit makes the Undo track diverges. At 
  * this point, the last undo and the previously created commands that follow it, 
  * don't appear in the Undo track unless divergent commands are explicitly shown.
- * 
+ *
  * For the first command in an Undo track, returns nil.
  */
 @property (nonatomic, readwrite) ETUUID *parentUUID;
