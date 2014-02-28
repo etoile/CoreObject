@@ -387,11 +387,11 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * Shorthand for <code>[[self objectGraphContext] rootObject]</code>.
  *
  * You can use this root object to create a cross persistent reference that 
- * dynamically tracks the current branch. If the receiver current branch is 
- * changed, the next time the persistent root that referred to it is reloaded, 
- * its reference will point to the new current branch (the reference is 
- * transparently updated at deserialization time and through change 
- * notifications from other persistent roots posted by the store).
+ * dynamically tracks the current branch. If the receiver's current branch is
+ * changed, this object is updated in-place to reflect the new current branch.
+ * By extension, if there are cross-persistent root references in other persistent
+ * roots to this root object, the branch switch is immediately visible through those
+ * references.
  *
  * If you use <code>[[self currentBranch] rootObject]</code> or 
  * <code>[otherBranch rootObject]</code>, the cross persistent root reference 
@@ -443,8 +443,10 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @property (nonatomic, readonly) COObjectGraphContext *objectGraphContext;
 /**
- * Returns the object graphs for the -branches, plus the object graph that 
- * dynamically tracks the -currentBranch (see -objectGraphContext).
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Returns the object graphs for the -branches (if they have been instantiated),
+ * plus the object graph that dynamically tracks the -currentBranch (see -objectGraphContext).
  */
 @property (nonatomic, readonly) NSSet *allObjectGraphContexts;
 
