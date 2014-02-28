@@ -11,11 +11,13 @@
 
 /**
  * @group Storage Data Model
- * @abstract
- * COPath represents a cross-persistent root reference to the root object of
- * a persistent root. It can either point to whatever the current branch is when
- * the COPath is dereferenced, or can point to a specific branch.
- * 
+ * @abstract 
+ * COPath represents a cross-persistent root reference to the root object of a 
+ * persistent root. 
+ *
+ * It can either point to whatever the current branch is when the COPath is 
+ * dereferenced, or can point to a specific branch.
+ *
  * COPath is used as a value object inside COItem.
  */
 @interface COPath : NSObject <NSCopying>
@@ -25,30 +27,50 @@
 	ETUUID *_branch;
 }
 
+
+/** @taskunit Initialization */
+
+
 /**
- * Non-nil
+ * Returns a new path that implicitly points to the root object of the current 
+ * branch.
+ */
++ (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot;
+/**
+ * Returns a new path that implicitly points to the root object.
+ */
++ (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
+                             branch: (ETUUID*)aBranch;
+
+
+/** @taskunit Reference Properties */
+
+
+/**
+ * The UUID of the referenced persistent root.
+ *
+ * Never nil.
  */
 @property (nonatomic, readonly, strong) ETUUID *persistentRoot;
 /**
- * May be nil, which indicates that the path points to whatever the current branch 
- * of persistentRoot is.
+ * The UUID of the referenced branch.
+ *
+ * May be nil, which indicates that the path points to whatever the current 
+ * branch of persistentRoot is.
  */
 @property (nonatomic, readonly, strong) ETUUID *branch;
 
-/**
- * Implicitly points to the root object of the current branch
- */
-+ (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot;
+
+/** @taskunit Persistent String Representation */
+
 
 /**
- * Implicitly points to the root object
+ * Returns a new path from a string representation such as -stringValue.
  */
-+ (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
-							 branch: (ETUUID*)aBranch;
-
-// string persistence
-
 + (COPath *) pathWithString: (NSString*) pathString;
+/**
+ * Returns a string representation of the path.
+ */
 - (NSString *) stringValue;
 
 @end
