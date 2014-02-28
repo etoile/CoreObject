@@ -13,20 +13,23 @@
 /**
  * @group Storage Data Model
  * @abstract 
- * COItem is a "semi-serialized" representation of an inner object. It is essentially
- * just a strongly typed dictionary (See COType.h for the mapping between possible
- * COType values and the corresponding permissible Objective-C classes).
- * Note that COItem only contains "value" obects (or possibly, sets/arrays of value
- * objects). So, for example, references to other inner objects are stored as
- * ETUUID instances. 
+ * COItem is a "semi-serialized" representation of an inner object. 
+ *
+ * It is essentially just a strongly typed dictionary (See COType.h for the 
+ * mapping between possible COType values and the corresponding permissible 
+ * Objective-C classes). Note that COItem only contains "value" obects (or 
+ * possibly, sets/arrays of value objects). So, for example, references to 
+ * other inner objects are stored as ETUUID instances. 
  * 
  * COItem acts as an intermediate layer during serialization or deserialization -
- * the binary and JSON formats are both straightforward mappings of COItem to a byte stream.
+ * the binary and JSON formats are both straightforward mappings of COItem to a 
+ * byte stream.
  *
- * COItem helps decouple object graph concerns (which are handled by COObjectGraphContext)
- * from the details of actual serialization (handled by COItem+Binary and COItem+JSON),
- * and COItem also defines the abstract storage model (independent of a particular
- * serialization format like binary or JSON) that CoreObject uses. 
+ * COItem helps decouple object graph concerns (which are handled by 
+ * COObjectGraphContext) from the details of actual serialization (handled by 
+ * COItem(Binary) and COItem(JSON), and COItem also defines the abstract storage 
+ * model (independent of a particular serialization format like binary or JSON) 
+ * that CoreObject uses. 
  */
 @interface COItem : NSObject <NSCopying, NSMutableCopying>
 {
@@ -38,24 +41,31 @@
     NSMutableDictionary *values;
 }
 
+
+/** @taskunit Initialization */
+
+
 /**
- * designated initializer.
+ * <init />
  */
 - (id) initWithUUID: (ETUUID *)aUUID
  typesForAttributes: (NSDictionary *)typesForAttributes
 valuesForAttributes: (NSDictionary *)valuesForAttributes;
-
 + (COItem *) itemWithTypesForAttributes: (NSDictionary *)typesForAttributes
 					valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
+
+/** @taskunit Accessing Attributes */
+
+
 - (ETUUID *) UUID;
-
 - (NSArray *) attributeNames;
-
 - (COType) typeForAttribute: (NSString *)anAttribute;
 - (id) valueForAttribute: (NSString*)anAttribute;
 
-/** @taskunit convenience */
+
+/** @taskunit Convenience */
+
 
 // allows treating primitive or container, unordered or ordered as NSArray
 - (NSArray*) allObjectsForAttribute: (NSString*)attribute;
@@ -70,48 +80,59 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
 - (NSString *) fullTextSearchContent;
 
-/** @taskunit NSCopying and NSMutableCopying */
+
+/** @taskunit Copying */
+
 
 - (id)copyWithZone:(NSZone *)zone;
 - (id)mutableCopyWithZone:(NSZone *)zone;
 
 /**
- * Returns a mutable item
+ * Returns a mutable item.
  */
 - (id)mutableCopyWithNameMapping: (NSDictionary *)aMapping;
 
 @end
 
 
-
+/**
+ * @group Storage Data Model
+ * @abstract 
+ * A mutable "semi-serialized" representation of an inner object.
+ */
 @interface COMutableItem : COItem
 {
 }
 
-- (id) initWithUUID: (ETUUID*)aUUID;
 
+/** @taskunit Initialization */
+
+
+- (id) initWithUUID: (ETUUID*)aUUID;
 + (COMutableItem *) itemWithTypesForAttributes: (NSDictionary *)typesForAttributes
 						   valuesForAttributes: (NSDictionary *)valuesForAttributes;
 /**
- * new item with new UIID
+ * Returns a new item with new UUID.
  */
 + (COMutableItem *) item;
 + (COMutableItem *) itemWithUUID: (ETUUID *)aUUID;
 
-- (void) setUUID: (ETUUID *)aUUID;
 
+/** @taskunit Accessing Attributes */
+
+
+- (void) setUUID: (ETUUID *)aUUID;
 - (void) setValue: (id)aValue
 	 forAttribute: (NSString*)anAttribute
 			 type: (COType)aType;
-
 - (void)removeValueForAttribute: (NSString*)anAttribute;
 
-/** @taskunit convenience */
+
+/** @taskunit Convenience */
+
 
 - (void) setValue: (id)aValue
 	 forAttribute: (NSString*)anAttribute;
-
-- (id) copyWithZone:(NSZone *)zone;
 
 @end
 

@@ -12,7 +12,8 @@ NSString * COJSONTypeToString(COType type);
 
 /**
  * @group Storage Data Model
- * @abstract COItem JSON Serialization.
+ * @abstract
+ * COItem JSON Serialization.
  */
 @interface COItem (JSON)
 
@@ -21,7 +22,7 @@ NSString * COJSONTypeToString(COType type);
  */
 - (NSData *) JSONData;
 /**
- * Return a plist form of the JSON serialization, suitable for converting to 
+ * Returns a plist form of the JSON serialization, suitable for converting to 
  * JSON bytes using NSJSONSerialization.
  */
 - (id) JSONPlist;

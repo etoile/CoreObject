@@ -9,8 +9,8 @@
 
 /**
  * @group Storage Data Model
- * @abstract Reference to an attachment, composed of the hash of the referenced 
- * attachment.
+ * @abstract 
+ * Reference to an attachment, composed of the hash of the referenced attachment.
  *
  * Can appear as a value object inside a COItem.
  */
