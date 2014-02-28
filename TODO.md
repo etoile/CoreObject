@@ -4,17 +4,7 @@ TODO
 First alpha release blockers
 ----------------------------
 
-- Fix EtoileUI test suite crash on assertion in -checkIsNotRemoveFromContext
-
-- Fix test suite compilation on GNUstep
-
-  - Add -[NSNotificationCenter addObserverForName:object:queue:usingBlock:] to GNUstep
-
 - Fix GNUstep support
-
-  - All tests pass for both CoreObject and EtoileUI test suite
-
-- Remove deprecated -type and -shortDescription in CORevision (all EtoileUI-based applications need to be check)
 
 - Check and update all Core, Model, Undo and Utilities API documentation (underway)
 
@@ -24,12 +14,11 @@ First alpha release blockers
 		- Model: all
 		- Undo: all 
 		- Utitilies: none
+		- Storage Data Model: all (not fully documented though)
 
 - Check code quality for all Core classes (underway)
 
 	- Already reviewed classes: COObjectGraphContext, COEditingContext, COBranch
-
-- iOS 5 and higher support (if I manage to finish it in the next two weeks - Quentin)
 
 - Finish ProjectDemo features needed for a demo; record a demo video
 
@@ -49,6 +38,7 @@ Future Work
 
 		- At the same time, we could remove -Wno-sign-compare in CoreObject target too (used to inhibit some -Wextra warnings)
 
+
 - GNUstep
 
   - Port Samples
@@ -64,6 +54,11 @@ Future Work
   - Perhaps tweak [[NSDecimalNumber defaultBehavior] scale] to return NSDecimalScale by default as Mac OS X does
 
   - Perhaps don't treat -[NSSet countByEnumeratingWithState:objects:count:] as a primitive method to match Mac OS X behavior
+
+
+- iOS
+
+  - iOS 5 and higher support
 
 
 - Store
@@ -345,9 +340,14 @@ the following situations at least:
 
   - Once all COCommand class hierarchy appear in the API documentation, their @group should be changed to 'Undo Actions' to ensure COUndoTrack and COTrack don't get lost among all these subclasses.
 
+
 - EtoileUI
 
   - Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
+
+  - Fix properly EtoileUI test suite crash on assertion in -checkIsNotRemoveFromContext (for now, we just override it in ETUIObject)
+
+  - Remove deprecated -type and -shortDescription in CORevision (all EtoileUI-based applications need to be check)
 
 
 Missing Features
