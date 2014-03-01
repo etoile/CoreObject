@@ -96,7 +96,11 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 /**
  * Abstract class for tests that test an NSTextStorage subclass
  */
+#ifdef GNUSTEP
+@interface AbstractTextStorageTests : EditingContextTestCase
+#else
 @interface AbstractTextStorageTests : EditingContextTestCase <NSTextStorageDelegate>
+#endif
 {
 	NSTextStorage *as;
 	
