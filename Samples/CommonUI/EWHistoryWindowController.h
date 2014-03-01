@@ -8,7 +8,7 @@
 @class EWDocument;
 @class EWGraphRenderer;
 
-@interface EWUndoWindowController : EWUtilityWindowController <NSTableViewDelegate, NSTableViewDataSource, EWGraphRendererDelegate>
+@interface EWHistoryWindowController : NSWindowController <NSTableViewDelegate, NSTableViewDataSource, EWGraphRendererDelegate>
 {
 	IBOutlet NSTableView *table;
 	IBOutlet NSTextField *stackLabel;
@@ -20,9 +20,11 @@
 	
 	IBOutlet EWGraphRenderer *graphRenderer;
 	
-	NSWindowController *wc;
-	COUndoTrack *_track;
+	COPersistentRoot *inspectedPersistentRoot;
+	COBranch *inspectedBranch;
 }
+
+- (instancetype) initWithPersistentRoot: (COPersistentRoot *)aPersistentRoot;
 
 - (IBAction) undo: (id)sender;
 - (IBAction) redo: (id)sender;

@@ -1,19 +1,24 @@
-#import "EWUndoWindowController.h"
+#import "EWHistoryWindowController.h"
 #import "EWGraphRenderer.h"
 #import <CoreObject/CoreObject.h>
-#import <CoreObject/COCommandGroup.h>
 #import <EtoileFoundation/Macros.h>
+#import <CoreObject/COEditingContext+Private.h>
 
-@implementation EWUndoWindowController
+@implementation EWHistoryWindowController
 
-- (id)init
+- (instancetype) initWithPersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
-	self = [super initWithWindowNibName: @"Undo"];
-    if (self) {
+	self = [super initWithWindowNibName: @"History"];
+    if (self)
+	{
+		inspectedPersistentRoot = aPersistentRoot;
+		inspectedBranch = inspectedPersistentRoot.currentBranch;
         [[NSNotificationCenter defaultCenter] addObserver: self
-                                                 selector: @selector(undoStackDidChange:)
-                                                     name: COUndoStackDidChangeNotification
-                                                   object: nil];
+                                                 selector: @selector(persistentRootDidChange:)
+                                                     name: COPersistentRootDidChangeNotification
+                                                   object: aPersistentRoot];
+		
+		
     }
     return self;
 }
@@ -25,16 +30,19 @@
 
 - (void) awakeFromNib
 {
+	graphRenderer.delegate = self;
+	
     [table setDoubleAction: @selector(doubleClick:)];
     [table setTarget: self];
-	graphRenderer.delegate = self;
 	
 	[self update];
 }
 
 - (void) update
 {
-	[graphRenderer updateWithTrack: _track];
+	inspectedBranch = inspectedPersistentRoot.currentBranch;
+	
+	[graphRenderer updateWithTrack: inspectedBranch];
     [table reloadData];
 	[self validateButtons];
 		
@@ -52,47 +60,24 @@
 	}
 }
 
-- (COUndoTrack *)undoTrack
+- (void) persistentRootDidChange: (NSNotification *)notif
 {
-	return _track;
-}
-
-- (void) setInspectedWindowController: (NSWindowController *)aDoc
-{
-	NSLog(@"UndoWindow: set inspected document");
-
-	if ([aDoc respondsToSelector: @selector(undoTrack)])
-	{
-		wc = aDoc;
-		_track = [aDoc performSelector: @selector(undoTrack)];
-	}
-	else
-	{
-		wc = nil;
-		_track = nil;
-	}
-	
-	[self update];
-}
-
-- (void) undoStackDidChange: (NSNotification *)notif
-{
-    NSLog(@"undo track did change: %@", [notif userInfo]);
+    NSLog(@"persistent root did change: %@", [notif userInfo]);
 	
     [self update];
 }
 
 - (void) validateButtons
 {
-	[undo setEnabled: [_track canUndo]];
-	[redo setEnabled: [_track canRedo]];
+	[undo setEnabled: [inspectedBranch canUndo]];
+	[redo setEnabled: [inspectedBranch canRedo]];
 	
 	[selectiveUndo setEnabled: NO];
 	[selectiveRedo setEnabled: NO];
 	
 	id<COTrackNode> highlightedNode = [self selectedNode];
-	const NSUInteger highlightedNodeIndex = [[_track nodes] indexOfObject: highlightedNode];
-	const NSUInteger currentNodeIndex = [[_track nodes] indexOfObject: [_track currentNode]];
+	const NSUInteger highlightedNodeIndex = [[inspectedBranch nodes] indexOfObject: highlightedNode];
+	const NSUInteger currentNodeIndex = [[inspectedBranch nodes] indexOfObject: [inspectedBranch currentNode]];
 	const BOOL canSelectiveUndo = (highlightedNode != nil
 								   && highlightedNode != [COEndOfUndoTrackPlaceholderNode sharedInstance]
 								   && highlightedNodeIndex != NSNotFound
@@ -105,17 +90,17 @@
 - (void) doubleClick: (id)sender
 {
 	id<COTrackNode> node = [self selectedNode];
-	[_track setCurrentNode: node];
+	[inspectedBranch setCurrentNode: node];
 }
 
 - (IBAction) undo: (id)sender
 {
-	[_track undo];
+	[inspectedBranch undo];
 }
 
 - (IBAction) redo: (id)sender
 {
-	[_track redo];
+	[inspectedBranch redo];
 }
 
 - (IBAction) selectiveUndo: (id)sender
@@ -123,7 +108,7 @@
 	id<COTrackNode> node = [self selectedNode];
 	if (node != nil)
 	{
-		[_track undoNode: node];
+		[inspectedBranch undoNode: node];
 	}
 }
 
@@ -132,7 +117,7 @@
 	id<COTrackNode> node = [self selectedNode];
 	if (node != nil)
 	{
-		[_track redoNode: node];
+		[inspectedBranch redoNode: node];
 	}
 }
 
@@ -156,16 +141,6 @@
 }
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	if ([[tableColumn identifier] isEqualToString: @"document"])
-	{
-		id<COTrackNode> node = [graphRenderer revisionAtIndex: row];
-		if (node.persistentRootUUID != nil)
-		{
-			COPersistentRoot *proot = [_track.editingContext persistentRootForUUID: node.persistentRootUUID];
-			return proot.metadata[@"label"];
-		}
-		return @"";
-	}
 	return @(row);
 }
 
@@ -182,25 +157,37 @@
 
 #pragma mark - EWGraphRenderedDelegate
 
-static NSArray *sortTrackNodes(NSArray *commits)
+static NSArray *RevisionInfosChronological(NSSet *commits)
 {
-    return [commits sortedArrayUsingComparator: ^(id obj1, id obj2) {
-        COCommandGroup *obj1Info = obj1;
-        COCommandGroup *obj2Info = obj2;
+    return [[commits allObjects] sortedArrayUsingComparator: ^(id obj1, id obj2) {
+        CORevisionInfo *obj1Info = obj1;
+        CORevisionInfo *obj2Info = obj2;
+        
+        return [[obj2Info date] compare: [obj1Info date]];
+    }];
+}
 
-        if (obj2Info.sequenceNumber < obj1Info.sequenceNumber)
-			return NSOrderedAscending;
-		else if (obj2Info.sequenceNumber > obj1Info.sequenceNumber)
-			return NSOrderedDescending;
-		else
-			return NSOrderedSame;
-	}];
+static NSSet *RevisionInfoSet(COPersistentRoot *proot)
+{
+	NSSet *revisionInfos = [NSSet setWithArray:
+							[proot.store revisionInfosForBackingStoreOfPersistentRootUUID: proot.UUID]];
+	
+	return revisionInfos;
 }
 
 - (NSArray *) allOrderedNodesToDisplayForTrack: (id<COTrack>)aTrack
 {
-	NSArray *allCommands = [_track allCommands];
-	return sortTrackNodes(allCommands);
+	ETAssert(aTrack == inspectedBranch);
+	NSSet *revisionInfoSet = RevisionInfoSet(inspectedPersistentRoot);
+	NSArray *revInfos = RevisionInfosChronological(revisionInfoSet);
+	
+	NSArray *revisions = [revInfos mappedCollectionWithBlock: ^(id obj) {
+		CORevisionInfo *revInfo = obj;
+		return [inspectedPersistentRoot.editingContext revisionForRevisionUUID: revInfo.revisionUUID
+															persistentRootUUID: revInfo.persistentRootUUID];
+	}];
+
+	return revisions;
 }
 
 @end

@@ -13,6 +13,7 @@
 #import "EWTagListDataSource.h"
 #import "EWNoteListDataSource.h"
 #import "PrioritySplitViewDelegate.h"
+#import "EWHistoryWindowController.h"
 
 @implementation EWTypewriterWindowController
 
@@ -328,6 +329,18 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 		[self commitWithIdentifier: @"duplicate-note" descriptionArguments: @[sourceLabel]];
 		[noteListDataSource setNextSelection: copyOfSelection.UUID];
 		[noteListDataSource reloadData];
+	}
+}
+
+- (IBAction)showDocumentHistory:(id)sender
+{
+	NSArray *notes = [self selectedNotePersistentRoots];
+	if ([notes count] == 1)
+	{
+		COPersistentRoot *note = notes[0];
+		EWHistoryWindowController *historyWindow = [[EWHistoryWindowController alloc] initWithPersistentRoot: note];
+		[[self document] addWindowController: historyWindow];
+		[historyWindow showWindow: nil];
 	}
 }
 

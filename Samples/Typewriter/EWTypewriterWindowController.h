@@ -60,6 +60,8 @@ NSString * EWTagDragType;
 - (void) selectNote: (COPersistentRoot *)aNote;
 - (void) selectTag: (COTag *)aTag;
 
+- (IBAction)showDocumentHistory:(id)sender;
+
 @end
 
 

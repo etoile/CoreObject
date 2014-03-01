@@ -1,6 +1,10 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreObject/CoreObject.h>
 
+@protocol EWGraphRendererDelegate <NSObject>
+- (NSArray *) allOrderedNodesToDisplayForTrack: (id<COTrack>)aTrack;
+@end
+
 @interface EWGraphRenderer : NSObject
 {
 	NSArray *trackNodesChronological;
@@ -11,9 +15,6 @@
 	NSMutableArray *graphRows;
 	
 	id<COTrack> track;
-	
-//	NSMutableDictionary *branchHeadForRevisionUUID;
-//	NSMutableDictionary *branchCurrentForRevisionUUID;
 }
 
 - (void) updateWithTrack: (id<COTrack>)aTrack;
@@ -22,6 +23,6 @@
 - (id<COTrackNode>) revisionAtIndex: (NSUInteger)index;
 - (void) drawRevisionAtIndex: (NSUInteger)index inRect: (NSRect)aRect;
 
-//- (NSArray *) branchesForIndex: (NSUInteger) index;
+@property (nonatomic, readwrite, weak) id<EWGraphRendererDelegate> delegate;
 
 @end

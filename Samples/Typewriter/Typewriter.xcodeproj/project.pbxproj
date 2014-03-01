@@ -21,6 +21,8 @@
 		663EFD8518A17FB30030BD2F /* EWUndoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD7618A17FB30030BD2F /* EWUndoManager.m */; };
 		663EFD8618A17FB30030BD2F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD7718A17FB30030BD2F /* main.m */; };
 		663EFD8718A17FB30030BD2F /* Typewriter-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 663EFD7818A17FB30030BD2F /* Typewriter-Info.plist */; };
+		6642F88418C1471900E30BFF /* EWHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6642F88318C1471900E30BFF /* EWHistoryWindowController.m */; };
+		6642F88E18C16C2700E30BFF /* History.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6642F88D18C16C2700E30BFF /* History.xib */; };
 		664CC9E818A4607F002F04B7 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 664CC9E618A4607F002F04B7 /* Commits */; };
 		664CC9F618A4A3FC002F04B7 /* plus_8x8.png in Resources */ = {isa = PBXBuildFile; fileRef = 664CC9F118A4A3FC002F04B7 /* plus_8x8.png */; };
 		664E93B518A1929300261673 /* TypewriterDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 664E93B418A1929300261673 /* TypewriterDocument.m */; };
@@ -172,6 +174,9 @@
 		663EFD7918A17FB30030BD2F /* Typewriter-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Typewriter-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		663EFD8818A180150030BD2F /* CoreObject.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CoreObject.xcodeproj; path = ../../CoreObject.xcodeproj; sourceTree = "<group>"; };
 		663EFD9D18A180210030BD2F /* EtoileFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EtoileFoundation.framework; path = ../../../EtoileFoundation/build/Debug/EtoileFoundation.framework; sourceTree = "<group>"; };
+		6642F88218C1471900E30BFF /* EWHistoryWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWHistoryWindowController.h; path = ../CommonUI/EWHistoryWindowController.h; sourceTree = "<group>"; };
+		6642F88318C1471900E30BFF /* EWHistoryWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWHistoryWindowController.m; path = ../CommonUI/EWHistoryWindowController.m; sourceTree = "<group>"; };
+		6642F88D18C16C2700E30BFF /* History.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = History.xib; path = ../CommonUI/History.xib; sourceTree = "<group>"; };
 		664CC9E718A4607F002F04B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = folder; name = en; path = Commits; sourceTree = "<group>"; };
 		664CC9EC18A4608A002F04B7 /* org.etoile.Typewriter.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = org.etoile.Typewriter.json; path = Commits/org.etoile.Typewriter.json; sourceTree = "<group>"; };
 		664CC9F118A4A3FC002F04B7 /* plus_8x8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = plus_8x8.png; sourceTree = "<group>"; };
@@ -345,8 +350,11 @@
 				662599DE18B551E400235B65 /* EWGraphCell.m */,
 				66EDFEBD18ABFF9E00B29CFE /* EWUndoWindowController.h */,
 				66EDFEBE18ABFF9E00B29CFE /* EWUndoWindowController.m */,
+				6642F88218C1471900E30BFF /* EWHistoryWindowController.h */,
+				6642F88318C1471900E30BFF /* EWHistoryWindowController.m */,
 				66EDFEBF18ABFF9E00B29CFE /* EWUtilityWindowController.h */,
 				66EDFEC018ABFF9E00B29CFE /* EWUtilityWindowController.m */,
+				6642F88D18C16C2700E30BFF /* History.xib */,
 				66EDFEC118ABFF9E00B29CFE /* Undo.xib */,
 			);
 			name = CommonUI;
@@ -495,6 +503,7 @@
 				663EFD7D18A17FB30030BD2F /* InfoPlist.strings in Resources */,
 				66E6821518B723AD003294EB /* plus_8x8@2x.png in Resources */,
 				66E6822018B72428003294EB /* plus_8x8-grey.png in Resources */,
+				6642F88E18C16C2700E30BFF /* History.xib in Resources */,
 				66E6822118B72428003294EB /* plus_8x8-grey@2x.png in Resources */,
 				667A9A9018A5A34E009A2F0E /* document_stroke.icns in Resources */,
 				663EFD7B18A17FB30030BD2F /* Document.xib in Resources */,
@@ -510,6 +519,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6642F88418C1471900E30BFF /* EWHistoryWindowController.m in Sources */,
 				663EFD8518A17FB30030BD2F /* EWUndoManager.m in Sources */,
 				662599E318B551E400235B65 /* EWGraphCell.m in Sources */,
 				662599E218B551E400235B65 /* EWGraphRenderer.m in Sources */,

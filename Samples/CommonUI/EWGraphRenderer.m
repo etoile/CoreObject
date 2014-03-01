@@ -16,25 +16,6 @@
 
 @implementation EWGraphRenderer
 
-static NSArray *sortTrackNodes(NSArray *commits)
-{
-    return [commits sortedArrayUsingComparator: ^(id obj1, id obj2) {
-//        COCommandGroup *obj1Info = obj1;
-//        COCommandGroup *obj2Info = obj2;
-//        
-//        if (obj2Info.sequenceNumber < obj1Info.sequenceNumber)
-//		return NSOrderedAscending;
-//		else if (obj2Info.sequenceNumber > obj1Info.sequenceNumber)
-//		return NSOrderedDescending;
-//		else
-//		return NSOrderedSame;
-
-        id<COTrackNode> obj1Node = obj1;
-        id<COTrackNode> obj2Node = obj2;
-		return [[obj2Node date] compare: [obj1Node date]];
-	}];
-}
-
 - (void) buildRevisionInfoForUUID
 {
 	ETAssert(trackNodesChronological != nil);
@@ -47,8 +28,10 @@ static NSArray *sortTrackNodes(NSArray *commits)
 
 - (void) buildtrackNodesChronological
 {
-	NSArray *allCommands = [(COUndoTrack *)track allCommands];
-	trackNodesChronological = sortTrackNodes(allCommands);
+	ETAssert(self.delegate != nil);
+
+	trackNodesChronological =
+		[NSArray arrayWithArray: [self.delegate allOrderedNodesToDisplayForTrack: track]];
 }
 
 - (void) buildRowIndexForUUID
