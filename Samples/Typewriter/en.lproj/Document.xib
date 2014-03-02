@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1070</int>
-		<string key="IBDocument.SystemVersion">13B42</string>
+		<string key="IBDocument.SystemVersion">13C64</string>
 		<string key="IBDocument.InterfaceBuilderVersion">4514</string>
-		<string key="IBDocument.AppKitVersion">1265</string>
-		<string key="IBDocument.HIToolboxVersion">696.00</string>
+		<string key="IBDocument.AppKitVersion">1265.19</string>
+		<string key="IBDocument.HIToolboxVersion">697.40</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">4514</string>
@@ -872,6 +872,24 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="NSOnImage" ref="34833285"/>
 						<reference key="NSMixedImage" ref="364306784"/>
 					</object>
+					<object class="NSMenuItem" id="428914848">
+						<reference key="NSMenu" ref="745608519"/>
+						<bool key="NSIsDisabled">YES</bool>
+						<bool key="NSIsSeparator">YES</bool>
+						<string key="NSTitle"/>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="34833285"/>
+						<reference key="NSMixedImage" ref="364306784"/>
+					</object>
+					<object class="NSMenuItem" id="317511429">
+						<reference key="NSMenu" ref="745608519"/>
+						<string key="NSTitle">Note History...</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="34833285"/>
+						<reference key="NSMixedImage" ref="364306784"/>
+					</object>
 					<object class="NSMenuItem" id="382729460">
 						<reference key="NSMenu" ref="745608519"/>
 						<bool key="NSIsDisabled">YES</bool>
@@ -1014,6 +1032,14 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="destination" ref="462983073"/>
 					</object>
 					<int key="connectionID">100282</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">showDocumentHistory:</string>
+						<reference key="source" ref="613418571"/>
+						<reference key="destination" ref="317511429"/>
+					</object>
+					<int key="connectionID">100290</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1321,6 +1347,8 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<reference ref="168366984"/>
 							<reference ref="382729460"/>
 							<reference ref="468336720"/>
+							<reference ref="317511429"/>
+							<reference ref="428914848"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Notes context menu</string>
@@ -1357,6 +1385,16 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<int key="objectID">100280</int>
 						<reference key="object" ref="542287560"/>
 						<reference key="parent" ref="462983073"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100288</int>
+						<reference key="object" ref="317511429"/>
+						<reference key="parent" ref="745608519"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100289</int>
+						<reference key="object" ref="428914848"/>
+						<reference key="parent" ref="745608519"/>
 					</object>
 				</array>
 			</object>
@@ -1406,6 +1444,8 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 				<string key="100277.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100279.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100280.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100288.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100289.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="5.IBWindowTemplateEditedContentRect">{{133, 170}, {507, 413}}</string>
 				<string key="6.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1414,7 +1454,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100287</int>
+			<int key="maxID">100290</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1435,6 +1475,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<string key="addTagGroup:">id</string>
 						<string key="duplicate:">id</string>
 						<string key="search:">id</string>
+						<string key="showDocumentHistory:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="addNote:">
@@ -1455,6 +1496,10 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						</object>
 						<object class="IBActionInfo" key="search:">
 							<string key="name">search:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showDocumentHistory:">
+							<string key="name">showDocumentHistory:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 					</dictionary>

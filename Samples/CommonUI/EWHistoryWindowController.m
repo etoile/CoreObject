@@ -38,6 +38,11 @@
 	[self update];
 }
 
+- (NSString *)windowTitleForDocumentDisplayName:(NSString *)displayName
+{
+	return [NSString stringWithFormat: @"%@ History", inspectedPersistentRoot.metadata[@"label"]];
+}
+
 - (void) update
 {
 	inspectedBranch = inspectedPersistentRoot.currentBranch;
@@ -141,6 +146,11 @@
 }
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
+	if ([[tableColumn identifier] isEqualToString: @"date"])
+	{
+		id<COTrackNode> node = [graphRenderer revisionAtIndex: row];
+		return node.date;
+	}
 	return @(row);
 }
 
