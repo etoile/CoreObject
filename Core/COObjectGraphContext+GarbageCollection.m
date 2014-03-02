@@ -93,39 +93,6 @@ static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *col
 
 #pragma mark - cycle detection
 
-/**
- * Given a COObject, returns an array of all of the COObjects directly reachable
- * from that COObject.
- */
-static NSArray *CompositeReachableObjectsFromObject(COObject *anObject)
-{
-	NSMutableArray *result = [NSMutableArray array];
-	for (ETPropertyDescription *propDesc in [[anObject entityDescription] allPropertyDescriptions])
-	{
-		if (!([propDesc isPersistent] && [propDesc isComposite]))
-			continue;
-		
-		NSString *propertyName = [propDesc name];
-		id value = [anObject valueForKey: propertyName];
-        
-        if ([propDesc isMultivalued])
-        {
-			/* We use -objectEnumerator, because subvalue can be a  CODictionary
-			 or a NSDictionary (if a getter exists to expose the CODictionary
-			 as a NSDictionary for UI editing) */
-            for (id subvalue in [value objectEnumerator])
-            {
-				[result addObject: subvalue];
-            }
-        }
-        else if (value != nil)
-        {
-			[result addObject: value];
-		}
-	}
-	return result;
-}
-
 static void FindCyclesInContainersOfObject(COObject *currentObject, COObject *objectBeingSearchedFor)
 {
 	for (ETPropertyDescription *propDesc in [[currentObject entityDescription] allPropertyDescriptions])
