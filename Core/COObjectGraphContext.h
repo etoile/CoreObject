@@ -55,16 +55,80 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 /**
  * @group Core
  * @abstract 
- * An object graph that manages COObject instances (COObject instances can only
- * exist inside a COObjectGraphContext). Implements the COItemGraph protocol
- * which allows viewing the COObjectGraphContext in a semi-serialized form 
- * (as a set of COItem objects), as well as the -setItemGraph: method which 
- * allows deserializing a given graph of COItems (reusing existing COObject
- * instances if possible).
+ * An object graph that manages COObject instances (COObject instances can only 
+ * exist inside a COObjectGraphContext). 
  *
- * Also tracks which objects in the object graph have been modified, which 
- * is what allows CoreObject to commit deltas instead of writing a full
- * snapshot of every object in the object graph on every commit.
+ * @section Conceptual Model
+ *
+ * An object graph context is usually persistent (-branch is not nil), it 
+ * manages the objects that represent the current branch state in-memory, 
+ * and tracks their changes between commits.
+ *
+ * It tracks which objects in the object graph have been modified, which is 
+ * what allows CoreObject to commit deltas instead of writing a fullsnapshot 
+ * of every object in the object graph on every commit.
+ *
+ * All the objects that belong to an object graph are called inner objects 
+ * (including the root object), while objects in other object graph are outer 
+ * objects. A reference to an outer object is a cross-persistent root reference.
+ * For a more in-depth discussion, see Cross Persistent References section in 
+ * COPersistentRoot.
+ *
+ * @section Common Use Cases
+ *
+ * The most common use case would to check whether the object graph contains 
+ * changes with -hasChanges, and more rarely to revert to the last committed 
+ * state with -discardAllChanges e.g. when the user cancels some input in dialog.
+ *
+ * You rarely need to interact directly with COObjectGraphContext API, but 
+ * object graph contexts are passed to COObject initializers to tell the new 
+ * object to which context it belongs to, see -[COObject initWithObjectGraphContext:].
+ *
+ * @section Item Graph Representation
+ *
+ * COObjectGraphContext implements the COItemGraph protocol which allows 
+ * viewing the COObjectGraphContext in a semi-serialized form (as a set of 
+ * COItem objects), as well as the -setItemGraph: method which allows 
+ * deserializing a given graph of COItems (reusing existing COObject instances 
+ * if possible).
+ *
+ * @section Transient Object Graph 
+ *
+ * To manage transient COObject instances, transient object graphs not bound to 
+ * a branch or persistent root can be  created. You can use them to hold an 
+ * object graph state easily recreated in code (at  launch time or on demand) 
+ * without depending on an entire CoreObject stack (an editing context, a 
+ * store etc.).
+ *
+ * With COItemGraph protocol, COObject instances can be moved or copied 
+ * accross persistent and transient object graphs. 
+ *
+ * In CoreObject, outler references (accross persistent object graphs) must 
+ * point to a root object. Between a persistent and a transient object graph, 
+ * this limit doesn't hold, you can refer to multiple objects and not just the 
+ * root object (the root object is optional in a transient object graph). 
+ *
+ * If a transient COObject refers to a persistent one, there is no need to 
+ * observe COObjectGraphContextWillRelinquishObjectsNotification, since the 
+ * relationship cache will automatically update the references.
+ *
+ * A transient object graph can be turned into a persistent one with 
+ * -[COEditingContext insertNewPersistentRootWithRootObject:], where the 
+ * argument is an arbitrary object from the transient object graph.
+ *
+ * @section Creation and Deletion
+ *
+ * Persistent object graph contexts are usually created indirectly, each time a 
+ * persistent root or branch is created, and their object graph is accessed. 
+ * For example, with -[COPersistentRoot objectGraphContext] and 
+ * -[COBranch objectGraphContext].
+ *
+ * To create transient object graphs, use -init, 
+ * -initWithModelDescriptionRepository:, or +objectGraphContext.
+ *
+ * A persistent object graph is deleted in the store, when the branch that owns 
+ * it is deleted (see -[COBranch setDeleted:]). For transient object graphs, 
+ * all their content is lost when they are deallocated.
  *
  * @section Object Equality
  *
@@ -72,7 +136,9 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * object graph context is only considered equal to itself.
  *
  * To compare the contents of two COObjectGraphContext instances you can do:
- * COItemGraphEqualToItemGraph(ctx1, ctx2)
+ * COItemGraphEqualToItemGraph(ctx1, ctx2).
+ *
+ * See also Object Equality section in COEditingContext.
  */
 @interface COObjectGraphContext : NSObject <COItemGraph, COPersistentObjectContext>
 {
@@ -218,14 +284,15 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  */
 - (void)insertOrUpdateItems: (NSArray *)items;
 /**
- * Does the same than -insertOrUpdateItems:, but in addition discard 
+ * Does the same than -insertOrUpdateItems:, but in addition discards  
  * change tracking (calls -acceptAllChanges).
  *
- * Only loads objects from aTree reachable from a DFS starting at the root object.
+ * Only loads objects from aTree reachable from a depth-first search starting 
+ * at the root object.
  *
  * As a special case, if both the receiver and aTree have a nil root object, 
  * loads all objects from aTree.
- * 
+ *
  * FIXME: Document more corner cases (what causes exceptions to be thrown)
  */
 - (void)setItemGraph: (id <COItemGraph>)aTree;
@@ -317,7 +384,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * After calling this method, -hasChanges returns NO.
  *
  * This method is semi-private; it is part of the API used by COBranch and
- * framwork users should normally never call this method.
+ * framework users should normally never call this method.
  */
 - (void)acceptAllChanges;
 
