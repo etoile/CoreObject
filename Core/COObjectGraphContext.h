@@ -61,7 +61,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * @section Conceptual Model
  *
  * An object graph context is usually persistent (-branch is not nil), it 
- * manages the objects that represent the current branch state in-memory, 
+ * manages the objects that represent the current branch state in memory, 
  * and tracks their changes between commits.
  *
  * It tracks which objects in the object graph have been modified, which is 
@@ -69,20 +69,21 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * of every object in the object graph on every commit.
  *
  * All the objects that belong to an object graph are called inner objects 
- * (including the root object), while objects in other object graph are outer 
+ * (including the root object), while objects in other object graphs are outer 
  * objects. A reference to an outer object is a cross-persistent root reference.
  * For a more in-depth discussion, see Cross Persistent References section in 
  * COPersistentRoot.
  *
  * @section Common Use Cases
  *
- * The most common use case would to check whether the object graph contains 
+ * The most common use case would be to check whether the object graph contains 
  * changes with -hasChanges, and more rarely to revert to the last committed 
- * state with -discardAllChanges e.g. when the user cancels some input in dialog.
+ * state with -discardAllChanges e.g. when the user cancels some input in a 
+ * dialog.
  *
  * You rarely need to interact directly with COObjectGraphContext API, but 
  * object graph contexts are passed to COObject initializers to tell the new 
- * object to which context it belongs to, see -[COObject initWithObjectGraphContext:].
+ * object to which context it belongs, see -[COObject initWithObjectGraphContext:].
  *
  * @section Item Graph Representation
  *
@@ -103,7 +104,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * With COItemGraph protocol, COObject instances can be moved or copied 
  * accross persistent and transient object graphs. 
  *
- * In CoreObject, outler references (accross persistent object graphs) must 
+ * In CoreObject, outer references (accross persistent object graphs) must 
  * point to a root object. Between a persistent and a transient object graph, 
  * this limit doesn't hold, you can refer to multiple objects and not just the 
  * root object (the root object is optional in a transient object graph). 
