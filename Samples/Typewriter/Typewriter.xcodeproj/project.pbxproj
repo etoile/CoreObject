@@ -20,7 +20,6 @@
 		663EFD8418A17FB30030BD2F /* EWTypewriterWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD7418A17FB30030BD2F /* EWTypewriterWindowController.m */; };
 		663EFD8518A17FB30030BD2F /* EWUndoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD7618A17FB30030BD2F /* EWUndoManager.m */; };
 		663EFD8618A17FB30030BD2F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD7718A17FB30030BD2F /* main.m */; };
-		663EFD8718A17FB30030BD2F /* Typewriter-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 663EFD7818A17FB30030BD2F /* Typewriter-Info.plist */; };
 		6642F88418C1471900E30BFF /* EWHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6642F88318C1471900E30BFF /* EWHistoryWindowController.m */; };
 		6642F88E18C16C2700E30BFF /* History.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6642F88D18C16C2700E30BFF /* History.xib */; };
 		664CC9E818A4607F002F04B7 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 664CC9E618A4607F002F04B7 /* Commits */; };
@@ -497,7 +496,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				663EFD8718A17FB30030BD2F /* Typewriter-Info.plist in Resources */,
 				663EFD7E18A17FB30030BD2F /* MainMenu.xib in Resources */,
 				664CC9E818A4607F002F04B7 /* Commits in Resources */,
 				663EFD7D18A17FB30030BD2F /* InfoPlist.strings in Resources */,

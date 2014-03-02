@@ -20,7 +20,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface PrioritySplitViewDelegate : NSObject
+@interface PrioritySplitViewDelegate : NSObject <NSSplitViewDelegate>
 {
 	NSMutableDictionary *lengthsByViewIndex;
 	NSMutableDictionary *viewIndicesByPriority;

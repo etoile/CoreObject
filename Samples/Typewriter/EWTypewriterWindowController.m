@@ -269,7 +269,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	[targetTagGroup addObject: newTag];
 	
 	[self commitWithIdentifier: @"add-tag" descriptionArguments: @[]];
-	[tagListDataSource setNextSelection: newTag.UUID];
+	[tagListDataSource setNextSelection: [[EWTagGroupTagPair alloc] initWithTagGroup: targetTagGroup.UUID tag:newTag.UUID]];
 	[tagListDataSource reloadData];
 }
 
@@ -280,7 +280,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	[[[self tagLibrary] mutableArrayValueForKey: @"tagGroups"] addObject: newTagGroup];
 	
 	[self commitWithIdentifier: @"add-tag-group" descriptionArguments: @[]];
-	[tagListDataSource setNextSelection: newTagGroup.UUID];
+	[tagListDataSource setNextSelection: [[EWTagGroupTagPair alloc] initWithTagGroup: newTagGroup.UUID tag:nil]];
 	[tagListDataSource reloadData];
 }
 

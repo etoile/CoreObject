@@ -11,7 +11,7 @@
 
 #import "EWUndoManager.h"
 
-@interface EWDocument : NSDocument <EWUndoManagerDelegate>
+@interface EWDocument : NSDocument
 {
 	COEditingContext *ctx;
 	COPersistentRoot *library;
