@@ -28,6 +28,24 @@
 		{
 			"type": "history",
 			"shortDescription": "Redo '%@'"
+		},
+		
+		"step-backward":
+		{
+			"type": "history",
+			"shortDescription": "Step Backward"
+		},
+		
+		"step-forward":
+		{
+			"type": "history",
+			"shortDescription": "Step Forward"
+		},
+		
+		"revert":
+		{
+			"type": "history",
+			"shortDescription": "Revert"
 		}
 	}
 }

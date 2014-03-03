@@ -97,16 +97,19 @@
 {
 	id<COTrackNode> node = [self selectedNode];
 	[inspectedBranch setCurrentNode: node];
+	[self commitWithIdentifier: @"revert" descriptionArguments: @[]];
 }
 
 - (IBAction) undo: (id)sender
 {
 	[inspectedBranch undo];
+	[self commitWithIdentifier: @"step-backward" descriptionArguments: @[]];
 }
 
 - (IBAction) redo: (id)sender
 {
 	[inspectedBranch redo];
+	[self commitWithIdentifier: @"step-forward" descriptionArguments: @[]];
 }
 
 - (IBAction) selectiveUndo: (id)sender
@@ -115,6 +118,7 @@
 	if (node != nil)
 	{
 		[inspectedBranch undoNode: node];
+		[self commitWithIdentifier: @"selective-undo" descriptionArguments: @[]];
 	}
 }
 
@@ -124,6 +128,7 @@
 	if (node != nil)
 	{
 		[inspectedBranch redoNode: node];
+		[self commitWithIdentifier: @"selective-redo" descriptionArguments: @[]];
 	}
 }
 
@@ -138,6 +143,19 @@
 	id<COTrackNode> node = [graphRenderer revisionAtIndex: row];
 	return node;
 }
+
+- (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args
+{
+	NSMutableDictionary *metadata = [NSMutableDictionary new];
+	if (args != nil)
+		metadata[kCOCommitMetadataShortDescriptionArguments] = args;
+	
+	[inspectedPersistentRoot.editingContext commitWithIdentifier: [@"org.etoile.CoreObject." stringByAppendingString: identifier]
+														metadata: metadata
+													   undoTrack: undoTrackToCommitTo
+														   error: NULL];
+}
+
 
 /* NSTableViewDataSource */
 
