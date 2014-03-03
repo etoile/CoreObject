@@ -6,13 +6,14 @@
 
 @implementation EWHistoryWindowController
 
-- (instancetype) initWithPersistentRoot: (COPersistentRoot *)aPersistentRoot
+- (instancetype) initWithInspectedPersistentRoot: (COPersistentRoot *)aPersistentRoot undoTrack: (COUndoTrack *)aTrack
 {
 	self = [super initWithWindowNibName: @"History"];
     if (self)
 	{
 		inspectedPersistentRoot = aPersistentRoot;
 		inspectedBranch = inspectedPersistentRoot.currentBranch;
+		undoTrackToCommitTo = aTrack;
         [[NSNotificationCenter defaultCenter] addObserver: self
                                                  selector: @selector(persistentRootDidChange:)
                                                      name: COPersistentRootDidChangeNotification

@@ -8,6 +8,11 @@ First alpha release blockers
 
 - Check and update all Core, Model, Undo and Utilities API documentation (underway)
 
+    - talk about how we automatically synchronize COEditingContexts (in the same process or different processes), we should explicitly talk about cross references
+
+    - talk about change notifications in the class descriptions. mention the notifications we support for each class description.
+
+
 	- Already reviewed classes
 
 		- Core: COObjectGraphContext, COEditingContext, COBranch, CORevision, COQuery

@@ -338,7 +338,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	if ([notes count] == 1)
 	{
 		COPersistentRoot *note = notes[0];
-		EWHistoryWindowController *historyWindow = [[EWHistoryWindowController alloc] initWithPersistentRoot: note];
+		EWHistoryWindowController *historyWindow = [[EWHistoryWindowController alloc] initWithInspectedPersistentRoot: note undoTrack: undoTrack];
 		[[self document] addWindowController: historyWindow];
 		[historyWindow showWindow: nil];
 	}

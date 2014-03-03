@@ -22,9 +22,11 @@
 	
 	COPersistentRoot *inspectedPersistentRoot;
 	COBranch *inspectedBranch;
+	
+	COUndoTrack *undoTrackToCommitTo;
 }
 
-- (instancetype) initWithPersistentRoot: (COPersistentRoot *)aPersistentRoot;
+- (instancetype) initWithInspectedPersistentRoot: (COPersistentRoot *)aPersistentRoot undoTrack: (COUndoTrack *)aTrack;
 
 - (IBAction) undo: (id)sender;
 - (IBAction) redo: (id)sender;

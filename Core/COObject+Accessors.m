@@ -50,6 +50,7 @@ static void genericSetter(id self, SEL theCmd, id value)
 
 + (BOOL)resolveInstanceMethod:(SEL)sel
 {
+	NSLog(@"Resolving %@", NSStringFromSelector(sel));
     Class classToCheck = self;
 
 	// FIXME: Don't iterate over all properties but access a single property using class_getProperty()
