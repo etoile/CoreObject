@@ -434,25 +434,34 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     return result;
 }
 
-// FIXME: Implement this method for removing empty backing stores.
-// Currently the "furtherst" you can delete a persistent root leaves an
-// empty backing store (the SQLite DB should have zero rows)
+- (NSString *)backingStorePathForUUID: (ETUUID *)aUUID
+{
+	return [[[self URL] path] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.sqlite", aUUID]];
+}
+
 - (void) deleteBackingStoreWithUUID: (ETUUID *)aUUID
 {
-    ETAssertUnreachable();
-//    {
-//        COSQLiteStorePersistentRootBackingStore *backing = [backingStores_ objectForKey: aUUID];
-//        if (backing != nil)
-//        {
-//            [backing close];
-//            [backingStores_ removeObjectForKey: aUUID];
-//        }
-//    }
-//    
-//    // FIXME: This doesn't appear to ever be tested
-//    
-//    assert([[NSFileManager defaultManager] removeItemAtPath:
-//            [self backingStorePathForUUID: aUUID] error: NULL]);
+#if BACKING_STORES_SHARE_SAME_SQLITE_DB == 1
+	[db_ beginTransaction];
+	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE `commits-%@`", aUUID]];
+	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE `metadata-%@`", aUUID]];
+	[db_ commit];
+#else
+	
+	// FIXME: Test this
+	
+    {
+        COSQLiteStorePersistentRootBackingStore *backing = [backingStores_ objectForKey: aUUID];
+        if (backing != nil)
+        {
+            [backing close];
+            [backingStores_ removeObjectForKey: aUUID];
+        }
+    }
+    
+    assert([[NSFileManager defaultManager] removeItemAtPath:
+            [self backingStorePathForUUID: aUUID] error: NULL]);
+#endif
 }
 
 /** @taskunit reading states */
@@ -871,51 +880,77 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         
         [db_ beginTransaction];
         
+		// Which backing stores can be deleted altogether?
+		
+//		NSArray *bsToDelete = [db_ arrayForQuery:
+//							   @"SELECT backingstore "
+//							   "FROM persistentroots INNER JOIN persistentroot_backingstores USING(uuid) "
+//							   "GROUP BY backingstore "
+//							   "HAVING SUM(deleted) = COUNT(*)"];
+		
         // Delete branches / the persistent root
         
         [db_ executeUpdate: @"DELETE FROM branches WHERE proot IN (SELECT uuid FROM persistentroots INNER JOIN persistentroot_backingstores USING(uuid) WHERE deleted = 1 AND backingstore = ?)", backingUUIDData];
         [db_ executeUpdate: @"DELETE FROM branches WHERE deleted = 1 AND proot IN (SELECT uuid FROM persistentroot_backingstores WHERE backingstore = ?)", backingUUIDData];
         [db_ executeUpdate: @"DELETE FROM persistentroots WHERE uuid IN (SELECT uuid FROM persistentroots INNER JOIN persistentroot_backingstores USING(uuid) WHERE deleted = 1 AND backingstore = ?)", backingUUIDData];
         
-        NSMutableIndexSet *keptRevisions = [NSMutableIndexSet indexSet];
-        
-        FMResultSet *rs = [db_ executeQuery: @"SELECT "
-                                                "branches.current_revid "
-                                                "FROM persistentroots "
-                                                "INNER JOIN branches ON persistentroots.uuid = branches.proot "
-												"INNER JOIN persistentroot_backingstores ON persistentroots.uuid = persistentroot_backingstores.uuid "
-                                                "WHERE persistentroot_backingstores.backingstore = ?", backingUUIDData];
-        while ([rs next])
-        {
-            ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-            
-            NSIndexSet *revs = [backing revidsFromRevid: 0
-                                                toRevid: [backing revidForUUID: head]];
-            [keptRevisions addIndexes: revs];
-        }
-        [rs close];
-        
-        // Now for each index set in deletedRevisionsForBackingStore, subtract the index set
-        // in keptRevisionsForBackingStore
-        
-        NSMutableIndexSet *deletedRevisions = [NSMutableIndexSet indexSet];
-        [deletedRevisions addIndexes: [backing revidsUsedRange]];
-        [deletedRevisions removeIndexes: keptRevisions];
-        
-    //    for (NSUInteger i = [deletedRevisions firstIndex]; i != NSNotFound; i = [deletedRevisions indexGreaterThanIndex: i])
-    //    {
-    //        
-    //        [db_ executeUpdate: @"DELETE FROM attachment_refs WHERE root_id = ? AND revid = ?",
-    //         [backingUUID dataValue],
-    //         [NSNumber numberWithLongLong: i]];
-    //        
-    //        // FIXME: FTS, proot_refs
-    //    }
-        
-        assert([db_ commit]);
-        
-        // Delete the actual revisions
-        assert([backing deleteRevids: deletedRevisions]);
+		if (0 == [db_ intForQuery:
+				   @"SELECT COUNT(*) "
+				   "FROM persistentroots INNER JOIN persistentroot_backingstores USING(uuid) "
+				   "WHERE backingstore = ?", backingUUIDData])
+		{
+			// Delete the backing store
+								
+			// FIXME: For single-database mode, we should only do one commit
+			assert([db_ commit]);
+			
+			[self deleteBackingStoreWithUUID: backingUUID];
+		}
+		else
+		{
+			// Delete just the unreachable revisions
+			
+			NSMutableIndexSet *keptRevisions = [NSMutableIndexSet indexSet];
+			
+			FMResultSet *rs = [db_ executeQuery: @"SELECT "
+							   "branches.current_revid "
+							   "FROM persistentroots "
+							   "INNER JOIN branches ON persistentroots.uuid = branches.proot "
+							   "INNER JOIN persistentroot_backingstores ON persistentroots.uuid = persistentroot_backingstores.uuid "
+							   "WHERE persistentroot_backingstores.backingstore = ?", backingUUIDData];
+			while ([rs next])
+			{
+				ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+				
+				NSIndexSet *revs = [backing revidsFromRevid: 0
+													toRevid: [backing revidForUUID: head]];
+				[keptRevisions addIndexes: revs];
+			}
+			[rs close];
+			
+			// Now for each index set in deletedRevisionsForBackingStore, subtract the index set
+			// in keptRevisionsForBackingStore
+			
+			NSMutableIndexSet *deletedRevisions = [NSMutableIndexSet indexSet];
+			[deletedRevisions addIndexes: [backing revidsUsedRange]];
+			[deletedRevisions removeIndexes: keptRevisions];
+			
+			//    for (NSUInteger i = [deletedRevisions firstIndex]; i != NSNotFound; i = [deletedRevisions indexGreaterThanIndex: i])
+			//    {
+			//
+			//        [db_ executeUpdate: @"DELETE FROM attachment_refs WHERE root_id = ? AND revid = ?",
+			//         [backingUUID dataValue],
+			//         [NSNumber numberWithLongLong: i]];
+			//
+			//        // FIXME: FTS, proot_refs
+			//    }
+			
+			assert([db_ commit]);
+			
+			// Delete the actual revisions
+			assert([backing deleteRevids: deletedRevisions]);
+		}
+
 
         [self finalizeGarbageAttachments];
     });
@@ -1108,6 +1143,11 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 				  COPersistentRootAttributeUsedSize : @(usedsize) };
 	});
 	return result;
+}
+
+- (void) testingRunBlockInStoreQueue: (void (^)())aBlock
+{
+	dispatch_sync(queue_, aBlock);
 }
 
 @end

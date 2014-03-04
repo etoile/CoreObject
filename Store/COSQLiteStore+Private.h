@@ -31,4 +31,6 @@
 															 createIfNotPresent: (BOOL)createIfNotPresent;
 
 
+- (void) testingRunBlockInStoreQueue: (void (^)())aBlock;
+
 @end

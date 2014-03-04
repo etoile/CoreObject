@@ -8,7 +8,8 @@
 #import "TestCommon.h"
 #import "COItem.h"
 #import "COSQLiteStore+Attachments.h"
-
+#import "COSQLiteStore+Private.h"
+#import "FMDatabaseAdditions.h"
 
 /**
  * For each execution of a test method, the store is recreated and a persistent root
@@ -663,12 +664,35 @@ static ETUUID *childUUID2;
 	UKObjectsEqual([proot currentBranchUUID], [info branchUUID]);
 }
 
+- (void) checkHasTables: (BOOL)flag forUUID: (ETUUID *)aUUID
+{
+#if BACKING_STORES_SHARE_SAME_SQLITE_DB == 1
+	[store testingRunBlockInStoreQueue: ^() {
+		BOOL hasCommitsTable = [[store database] tableExists: [NSString stringWithFormat: @"commits-%@", aUUID]];
+		BOOL hasMetadataTable = [[store database] tableExists: [NSString stringWithFormat: @"metadata-%@", aUUID]];
+		
+		if (flag)
+		{
+			UKTrue(hasCommitsTable);
+			UKTrue(hasMetadataTable);
+		}
+		else
+		{
+			UKFalse(hasCommitsTable);
+			UKFalse(hasMetadataTable);
+		}
+	}];
+#endif
+}
+
 - (void) testDeletePersistentRoot
 {
     UKObjectsEqual([NSArray array], [store deletedPersistentRootUUIDs]);
     UKObjectsEqual(A(prootUUID), [store persistentRootUUIDs]);
     UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
 
+	[self checkHasTables: YES forUUID: prootUUID];
+	
     // Delete it
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
@@ -707,6 +731,8 @@ static ETUUID *childUUID2;
     UKNil([store persistentRootInfoForUUID: prootUUID]);
     UKNil([store revisionInfoForRevisionUUID: initialRevisionUUID persistentRootUUID: prootUUID]);
     UKNil([store itemGraphForRevisionUUID: initialRevisionUUID persistentRoot: prootUUID]);
+	
+	[self checkHasTables: NO forUUID: prootUUID];
 }
 
 // FIXME: Uncomment this test and verify that things work/do not work on deleted persistent root, as appropriate

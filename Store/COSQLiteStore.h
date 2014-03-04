@@ -428,6 +428,8 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  * Finalizes the deletion of any unreachable commits (whether due to -setInitialRevision:... moving the initial pointer,
  * or branches being deleted), any deleted branches, or the persistent root itself, as well as all unreachable
  * attachments.
+ *
+ * NOTE: This method is still under development
  */
 - (BOOL) finalizeDeletionsForPersistentRoot: (ETUUID *)aRoot
                                       error: (NSError **)error;
