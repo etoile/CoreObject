@@ -400,7 +400,7 @@
 															<string key="NSFrameSize">{238, 495}</string>
 															<reference key="NSSuperview" ref="24405011"/>
 															<reference key="NSWindow"/>
-															<reference key="NSNextKeyView" ref="582881264"/>
+															<reference key="NSNextKeyView" ref="792382080"/>
 															<string key="NSReuseIdentifierKey">_NS:13</string>
 															<bool key="NSEnabled">YES</bool>
 															<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -568,7 +568,7 @@
 											<string key="NSFrame">{{-1, 24}, {240, 513}}</string>
 											<reference key="NSSuperview" ref="176617811"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="792382080"/>
+											<reference key="NSNextKeyView" ref="24405011"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<int key="NSsFlags">133682</int>
 											<reference key="NSVScroller" ref="582881264"/>
@@ -627,7 +627,7 @@
 															<string key="NSFrameSize">{330, 536}</string>
 															<reference key="NSSuperview" ref="461364143"/>
 															<reference key="NSWindow"/>
-															<reference key="NSNextKeyView" ref="31488030"/>
+															<reference key="NSNextKeyView" ref="465725252"/>
 															<string key="NSReuseIdentifierKey">_NS:13</string>
 															<object class="NSTextContainer" key="NSTextContainer" id="242225663">
 																<object class="NSLayoutManager" key="NSLayoutManager">
@@ -725,7 +725,6 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 													<string key="NSFrame">{{328, 1}, {15, 536}}</string>
 													<reference key="NSSuperview" ref="943032901"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView"/>
 													<string key="NSReuseIdentifierKey">_NS:83</string>
 													<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 													<reference key="NSTarget" ref="943032901"/>
@@ -753,7 +752,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 											<string key="NSFrame">{{-1, -1}, {344, 538}}</string>
 											<reference key="NSSuperview" ref="529160019"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="465725252"/>
+											<reference key="NSNextKeyView" ref="461364143"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<int key="NSsFlags">133266</int>
 											<reference key="NSVScroller" ref="31488030"/>
@@ -1412,6 +1411,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 				<string key="100185.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100186.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100187.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="100188.CustomClassName">EWTableView</string>
 				<string key="100188.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100189.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="100191.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1458,6 +1458,14 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
+				<object class="IBPartialClassDescription">
+					<string key="className">EWTableView</string>
+					<string key="superclassName">NSTableView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/EWTableView.h</string>
+					</object>
+				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">EWTextView</string>
 					<string key="superclassName">NSTextView</string>

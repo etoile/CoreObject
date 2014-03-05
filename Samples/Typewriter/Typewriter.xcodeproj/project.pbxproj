@@ -26,6 +26,7 @@
 		664CC9F618A4A3FC002F04B7 /* plus_8x8.png in Resources */ = {isa = PBXBuildFile; fileRef = 664CC9F118A4A3FC002F04B7 /* plus_8x8.png */; };
 		664E93B518A1929300261673 /* TypewriterDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 664E93B418A1929300261673 /* TypewriterDocument.m */; };
 		667A9A9018A5A34E009A2F0E /* document_stroke.icns in Resources */ = {isa = PBXBuildFile; fileRef = 667A9A8F18A5A34E009A2F0E /* document_stroke.icns */; };
+		66A080F118C7C1A50008739A /* EWTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A080F018C7C1A50008739A /* EWTableView.m */; };
 		66B7DB3518A96FD200010BCB /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 663EFD9318A180170030BD2F /* CoreObject.framework */; };
 		66B7DB3618A96FD400010BCB /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66B7DB2C18A96F9100010BCB /* EtoileFoundation.framework */; };
 		66B7DB3718A96FD900010BCB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 663EFD2C18A17E270030BD2F /* Cocoa.framework */; };
@@ -182,6 +183,8 @@
 		664E93B318A1929300261673 /* TypewriterDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TypewriterDocument.h; sourceTree = "<group>"; };
 		664E93B418A1929300261673 /* TypewriterDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TypewriterDocument.m; sourceTree = "<group>"; };
 		667A9A8F18A5A34E009A2F0E /* document_stroke.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = document_stroke.icns; sourceTree = "<group>"; };
+		66A080EF18C7C1A50008739A /* EWTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWTableView.h; sourceTree = SOURCE_ROOT; };
+		66A080F018C7C1A50008739A /* EWTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWTableView.m; sourceTree = SOURCE_ROOT; };
 		66B7DB1C18A96F2900010BCB /* EtoileFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EtoileFoundation.framework; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Typewriter-ewqruishaxmvlhhefeyihtxobbmk/Build/Products/Debug/EtoileFoundation.framework"; sourceTree = "<group>"; };
 		66B7DB2218A96F9100010BCB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../../../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		66E6821418B723AD003294EB /* plus_8x8@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plus_8x8@2x.png"; sourceTree = "<group>"; };
@@ -277,6 +280,8 @@
 				66EDFED118ACA7AD00B29CFE /* EWTagListDataSource.m */,
 				66EDFED918ACA7BC00B29CFE /* EWNoteListDataSource.h */,
 				66EDFEDA18ACA7BC00B29CFE /* EWNoteListDataSource.m */,
+				66A080EF18C7C1A50008739A /* EWTableView.h */,
+				66A080F018C7C1A50008739A /* EWTableView.m */,
 			);
 			path = Typewriter;
 			sourceTree = "<group>";
@@ -520,6 +525,7 @@
 				6642F88418C1471900E30BFF /* EWHistoryWindowController.m in Sources */,
 				663EFD8518A17FB30030BD2F /* EWUndoManager.m in Sources */,
 				662599E318B551E400235B65 /* EWGraphCell.m in Sources */,
+				66A080F118C7C1A50008739A /* EWTableView.m in Sources */,
 				662599E218B551E400235B65 /* EWGraphRenderer.m in Sources */,
 				66EDFEC218ABFF9E00B29CFE /* EWUndoWindowController.m in Sources */,
 				663EFD8418A17FB30030BD2F /* EWTypewriterWindowController.m in Sources */,

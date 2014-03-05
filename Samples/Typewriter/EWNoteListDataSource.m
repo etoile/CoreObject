@@ -7,6 +7,8 @@
 
 #import "EWNoteListDataSource.h"
 #import "EWTypewriterWindowController.h"
+#import "EWTableView.h"
+#import "TypewriterDocument.h"
 
 @implementation EWNoteListDataSource
 
@@ -137,6 +139,36 @@
 	
 	[pb clearContents];
 	return [pb writeObjects: pbItems];
+}
+
+#pragma mark - Menu
+
+- (NSMenu *) tableView: (EWTableView *)aTableView menuForEvent: (NSEvent *)anEvent defaultMenu: (NSMenu *)aMenu
+{
+	NSMenu *menu = [aMenu copy];
+	
+	NSArray *proots = [self.owner selectedNotePersistentRoots];
+	if ([proots count] == 1)
+	{
+		TypewriterDocument *rootObject = [proots[0] rootObject];
+		NSSet *tags = [rootObject tags];
+		if ([tags count] > 0)
+		{
+			NSInteger insertionIndex = 2;
+			[menu insertItem: [NSMenuItem separatorItem] atIndex: insertionIndex++];
+			
+			for (COTag *tag in tags)
+			{
+				NSMenuItem *item = [menu insertItemWithTitle: [NSString stringWithFormat: @"Remove tag \"%@\"", [tag name]]
+													  action: @selector(removeTagFromNote:)
+											   keyEquivalent: @""
+													 atIndex: insertionIndex++];
+				[item setRepresentedObject: tag];
+			}
+		}
+	}
+	
+	return menu;
 }
 
 @end

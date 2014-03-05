@@ -344,6 +344,25 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	}
 }
 
+- (IBAction) removeTagFromNote:(id)sender
+{
+	NSArray *notes = [self selectedNotePersistentRoots];
+	if ([notes count] == 1)
+	{
+		COPersistentRoot *note = notes[0];
+		TypewriterDocument *noteRootObject = [note rootObject];
+		
+		COTag *tag = [(NSMenuItem *)sender representedObject];
+		
+		NSLog(@"remove %@ from %@", tag, note);
+		
+		ETAssert([tag containsObject: noteRootObject]);
+		[tag removeObject: noteRootObject];
+		
+		[self commitWithIdentifier: @"untag-note" descriptionArguments: @[[tag name], note.metadata[@"label"]]];
+	}
+}
+
 #pragma mark - EWUndoManagerDelegate
 
 - (void) undo

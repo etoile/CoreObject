@@ -54,11 +54,14 @@ NSString * EWTagDragType;
 
 - (IBAction) search: (id)sender;
 
+- (IBAction) removeTagFromNote:(id)sender;
+
 - (COTagLibrary *)tagLibrary;
 - (NSArray *) arrangedNotePersistentRoots;
 - (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args;
 - (void) selectNote: (COPersistentRoot *)aNote;
 - (void) selectTag: (COTag *)aTag;
+- (NSArray *) selectedNotePersistentRoots;
 
 - (IBAction)showDocumentHistory:(id)sender;
 
