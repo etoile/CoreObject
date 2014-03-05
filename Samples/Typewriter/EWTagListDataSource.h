@@ -20,6 +20,7 @@
 	NSTreeNode *rootTreeNode;
 	NSMutableSet *oldSelection;
 	EWTagGroupTagPair *nextSelection;
+	BOOL ignoreSelectionChanges;
 }
 
 @property (nonatomic, unsafe_unretained) EWTypewriterWindowController *owner;

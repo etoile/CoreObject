@@ -120,7 +120,7 @@
 
 - (void)cacheSelection
 {
-	if ([[self.outlineView selectedRowIndexes] count] != 0)
+	if (!ignoreSelectionChanges)
 	{
 		[oldSelection removeAllObjects];
 		NSIndexSet *indexes = [self.outlineView selectedRowIndexes];
@@ -138,6 +138,10 @@
 		{
 			NSLog(@"hih");
 		}
+	}
+	else
+	{
+		NSLog(@"Ignoring selection change");
 	}
 }
 
@@ -169,7 +173,9 @@
 		}
 	}
 	
+	ignoreSelectionChanges = YES;
 	[self.outlineView reloadData];
+	ignoreSelectionChanges = NO;
 	[self.outlineView expandItem: nil expandChildren: YES]; // Initially expand all tags - needs to be done before the selection restoration
 	
 	NSSet *uuidsToSelect;
