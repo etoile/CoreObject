@@ -442,10 +442,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 - (void) deleteBackingStoreWithUUID: (ETUUID *)aUUID
 {
 #if BACKING_STORES_SHARE_SAME_SQLITE_DB == 1
-	[db_ beginTransaction];
-	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE `commits-%@`", aUUID]];
-	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE `metadata-%@`", aUUID]];
-	[db_ commit];
+	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE IF EXISTS `commits-%@`", aUUID]];
+	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE IF EXISTS `metadata-%@`", aUUID]];
 #else
 	
 	// FIXME: Test this
@@ -862,52 +860,70 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     return YES;
 }
 
-// Must not be wrapped in a transaction
-- (BOOL) finalizeDeletionsForPersistentRoot: (ETUUID *)aRoot
-                                      error: (NSError **)error
+- (BOOL) finalizeDeletionsForPersistentRoots: (NSArray *)persistentRootUUIDs
+									   error: (NSError **)error
 {
-    NILARG_EXCEPTION_TEST(aRoot);
+    NILARG_EXCEPTION_TEST(persistentRootUUIDs);
     
     assert(dispatch_get_current_queue() != queue_);
     
     dispatch_sync(queue_, ^(){
         
-        ETUUID *backingUUID = [self backingUUIDForPersistentRootUUID: aRoot
-												  createIfNotPresent: YES];
-        COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID error: NULL];
-        //NSNumber *backingId = [self rootIdForPersistentRootUUID: backingUUID];
-        NSData *backingUUIDData = [backingUUID dataValue];
-        
         [db_ beginTransaction];
         
-		// Which backing stores can be deleted altogether?
+        // Delete rows from branches and persistentroots tables
 		
-//		NSArray *bsToDelete = [db_ arrayForQuery:
-//							   @"SELECT backingstore "
-//							   "FROM persistentroots INNER JOIN persistentroot_backingstores USING(uuid) "
-//							   "GROUP BY backingstore "
-//							   "HAVING SUM(deleted) = COUNT(*)"];
-		
-        // Delete branches / the persistent root
-        
-        [db_ executeUpdate: @"DELETE FROM branches WHERE proot IN (SELECT uuid FROM persistentroots INNER JOIN persistentroot_backingstores USING(uuid) WHERE deleted = 1 AND backingstore = ?)", backingUUIDData];
-        [db_ executeUpdate: @"DELETE FROM branches WHERE deleted = 1 AND proot IN (SELECT uuid FROM persistentroot_backingstores WHERE backingstore = ?)", backingUUIDData];
-        [db_ executeUpdate: @"DELETE FROM persistentroots WHERE uuid IN (SELECT uuid FROM persistentroots INNER JOIN persistentroot_backingstores USING(uuid) WHERE deleted = 1 AND backingstore = ?)", backingUUIDData];
-        
-		if (0 == [db_ intForQuery:
-				   @"SELECT COUNT(*) "
-				   "FROM persistentroots INNER JOIN persistentroot_backingstores USING(uuid) "
-				   "WHERE backingstore = ?", backingUUIDData])
+		for (ETUUID *persistentRoot in persistentRootUUIDs)
 		{
-			// Delete the backing store
-								
-			// FIXME: For single-database mode, we should only do one commit
-			assert([db_ commit]);
+			NSData *persistentRootData = [persistentRoot dataValue];
 			
-			[self deleteBackingStoreWithUUID: backingUUID];
+			[db_ executeUpdate: @"DELETE FROM branches WHERE deleted = 1 AND proot = ?", persistentRootData];
+			
+			if ([db_ boolForQuery: @"SELECT deleted FROM persistentroots WHERE uuid = ?", persistentRootData])
+			{
+				[db_ executeUpdate: @"DELETE FROM branches WHERE proot = ?", persistentRootData];
+				[db_ executeUpdate: @"DELETE FROM persistentroots WHERE uuid = ?", persistentRootData];
+			}
 		}
-		else
+
+		// Delete unused backing stores
+		
+		NSArray *unusedBackingstoreUUIDDatas =
+			[db_ arrayForQuery: @"SELECT backingstore "
+			 "FROM persistentroot_backingstores "
+			 "LEFT OUTER JOIN (SELECT uuid, 1 AS present FROM persistentroots) USING(uuid) "
+			 "GROUP BY backingstore "
+			 "HAVING 0 = COALESCE(SUM(present), 0)"];
+		for (NSData *backingstoreUUIDData in unusedBackingstoreUUIDDatas)
 		{
+			[self deleteBackingStoreWithUUID: [ETUUID UUIDWithData: backingstoreUUIDData]];
+		}
+		
+		// Gather backing stores that need revision GC
+		
+		NSMutableSet *backingStoresForRevisionGC = [NSMutableSet new];
+		for (ETUUID *persistentRoot in persistentRootUUIDs)
+		{
+			NSData *persistentRootData = [persistentRoot dataValue];
+			
+			NSData *backingStoreData = [db_ dataForQuery: @"SELECT backingstore FROM persistentroot_backingstores WHERE uuid = ?", persistentRootData];
+						
+			// Don't attempt revision GC on backing stores we just deleted
+			if (![unusedBackingstoreUUIDDatas containsObject: backingStoreData])
+			{
+				[backingStoresForRevisionGC addObject:
+				 [ETUUID UUIDWithData: backingStoreData]];
+			}
+		}
+		
+		// Do the revision GC
+		
+		for (ETUUID *backingUUID in backingStoresForRevisionGC)
+		{
+			NSData *backingUUIDData = [backingUUID dataValue];
+		
+			COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID error: NULL];
+			
 			// Delete just the unreachable revisions
 			
 			NSMutableIndexSet *keptRevisions = [NSMutableIndexSet indexSet];
@@ -945,17 +961,25 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 			//        // FIXME: FTS, proot_refs
 			//    }
 			
-			assert([db_ commit]);
-			
 			// Delete the actual revisions
 			assert([backing deleteRevids: deletedRevisions]);
 		}
-
-
+		
+		assert([db_ commit]);
+		
         [self finalizeGarbageAttachments];
     });
     
     return YES;
+
+}
+
+
+// Must not be wrapped in a transaction
+- (BOOL) finalizeDeletionsForPersistentRoot: (ETUUID *)aRoot
+                                      error: (NSError **)error
+{
+	return [self finalizeDeletionsForPersistentRoots: @[aRoot] error: error];
 }
 
 /**

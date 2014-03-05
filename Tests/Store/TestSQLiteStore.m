@@ -1128,7 +1128,7 @@ static ETUUID *childUUID2;
 		
 		UKTrue([store commitStoreTransaction: txn]);
 		
-		UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
+		UKTrue([store finalizeDeletionsForPersistentRoot: cheapCopyUUID1 error: NULL]);
 	}
 		
 	// 3. Ensure we can reopen the store, and still read back newRevisionUUID,
