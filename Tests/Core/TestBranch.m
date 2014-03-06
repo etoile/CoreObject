@@ -797,6 +797,8 @@
 #endif
 }
 
+// See comment in -[COBranch modifiedItemsSnapshot] for why this is disabled
+#if 0
 - (void) testGarbageObjectsNotCommitted
 {
 	OutlineItem *garbage = [[OutlineItem alloc] initWithObjectGraphContext: [persistentRoot objectGraphContext]];
@@ -822,6 +824,7 @@
 	/* The last commit changed exactly 2 objects: rootObj (modified) and notGarbage (inserted */
 	UKObjectsEqual(S(rootObj.UUID, notGarbage.UUID), SA([lastCommitDelta itemUUIDs]));
 }
+#endif
 
 - (void) testCommittedGarbageObjectsNotReloaded
 {
@@ -854,7 +857,10 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKNil([[testProot objectGraphContext] loadedObjectForUUID: garbage.UUID]);
+		 if (isNewContext)
+		 {
+			 UKNil([[testProot objectGraphContext] loadedObjectForUUID: garbage.UUID]);
+		 }
 	 }];
 }
 

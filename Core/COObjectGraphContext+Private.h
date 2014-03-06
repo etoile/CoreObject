@@ -108,4 +108,13 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 - (COItemGraph *)modifiedItemsSnapshot;
+
+
+/** @taskunit Garbage collection */
+
+/**
+ * Should be called by COBranch at every commit.
+ */
+- (BOOL) incrementCommitCounterAndCheckIfGCNeeded;
+
 @end

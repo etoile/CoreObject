@@ -727,4 +727,23 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	return modifiedItems;
 }
 
+#define GC_INTERVAL 1000
+
+- (BOOL) incrementCommitCounterAndCheckIfGCNeeded
+{
+	_numberOfCommitsSinceLastGC++;
+	
+	if (_numberOfCommitsSinceLastGC == GC_INTERVAL)
+	{
+		_numberOfCommitsSinceLastGC = 0;
+		return YES;
+	}
+
+#if defined(DEBUG)
+	return YES;
+#else
+	return NO;
+#endif
+}
+
 @end

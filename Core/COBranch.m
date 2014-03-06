@@ -901,16 +901,31 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 										   rootItemUUID: [[self.persistentRoot rootObject] UUID]];
 	}
 	
-	// Garbage-collect the context we are going to commit.
+	// Possibly garbage-collect the context we are going to commit.
+	//
+	// This only happens every 1000 commits in release builds, or every commit in debug builds
 	// Skip the garbage collection if there are no changes to commit.
 	//
-	// NOTE: This means that every commit requires an O(N) in-memory search
-	// to find and remove orphaned objects. Re-evaluate whether this makes sense.
-	// If we skipped it, the main disadvantage would be if you modified objects
-	// and then detached them from the graph, they would still get committed.
+	// Rationale:
+	//
+	// In debug builds, we want to make sure application developers don't
+	// rely on garbage objects remaining uncollected, since it could lead to
+	// incorrect application code that works most of the time.
+	//
+	// However, in release builds, it's worth only doing the garbage collection
+	// occassionally, since the garbage collection requires looking at every
+	// object and not just the modified ones being committed.
+	//
+	// The only caveat is, if you modify objects and detached them from the graph
+	// in the same transaction, they still get committed. This isn't a big deal
+	// becuase this should be rare (only a strange app would do this), and the
+	// detached objects will be ignored at reloading time.
 	if ([graph hasChanges])
 	{
-		[graph removeUnreachableObjects];
+		if ([graph incrementCommitCounterAndCheckIfGCNeeded])
+		{
+			[graph removeUnreachableObjects];
+		}
 	}
 	
 	// Check for composite cycles - see [TestOrderedCompositeRelationship testCompositeCycleWithThreeObjects]
