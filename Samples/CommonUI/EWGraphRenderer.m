@@ -155,7 +155,7 @@
 	
 	// Have we already done this node?
 	if (levelForUUID[currentRevision] != nil)
-		return levelForUUID[currentRevision];
+		return [levelForUUID[currentRevision] integerValue];
 
 	// Is it a root?
 	if ([[self parentUUIDsForRevisionUUID: currentRevision] count] == 0)
