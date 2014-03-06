@@ -668,7 +668,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 					[[self.persistentRoot objectGraphContext] setItemGraph: _objectGraph];
 				}
 			}
-			else
+			else if (modifiedItemsSource != nil)
 			{
 				ETAssert(modifiedItemsSource == [_persistentRoot objectGraphContext]);
 				[[_persistentRoot objectGraphContext] acceptAllChanges];

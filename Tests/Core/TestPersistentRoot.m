@@ -673,4 +673,22 @@
 	 }];
 }
 
+- (void) testSaveCheckpointRevision
+{
+    // This should cause a new revision to be written, even though there
+    // are no changes in the inner objects.
+    persistentRoot.currentBranch.shouldMakeEmptyCommit = YES;
+	UKObjectsEqual(r1, persistentRoot.currentRevision);
+	UKTrue([ctx commitWithIdentifier: @"org.etoile.CoreObject.checkpoint"
+							metadata: @{}
+						   undoTrack: nil
+							   error: NULL]);
+    
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsNotEqual(r1, testProot.currentRevision);
+	 }];
+}
+
 @end
