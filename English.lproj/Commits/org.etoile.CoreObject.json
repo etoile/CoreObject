@@ -46,6 +46,12 @@
 		{
 			"type": "history",
 			"shortDescription": "Revert"
-		}
+		},
+		
+		"checkpoint":
+		{
+			"type": "history",
+			"shortDescription": "Checkpoint"
+		}		
 	}
 }
