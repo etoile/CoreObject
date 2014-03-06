@@ -363,6 +363,20 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	}
 }
 
+- (void)saveDocument:(id)sender
+{
+	NSArray *notes = [self selectedNotePersistentRoots];
+	if ([notes count] == 1)
+	{
+		COPersistentRoot *note = notes[0];
+		note.currentBranch.shouldMakeEmptyCommit = YES;
+		[note commitWithIdentifier: @"org.etoile.CoreObject.checkpoint"
+						  metadata: @{}
+						 undoTrack: nil
+							 error: NULL];
+	}
+}
+
 #pragma mark - EWUndoManagerDelegate
 
 - (void) undo
