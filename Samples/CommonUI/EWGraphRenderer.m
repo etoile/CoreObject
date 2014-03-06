@@ -133,6 +133,70 @@
 	return MAX(currentLevel, maxLevelUsed);
 }
 
+/**
+ * Returns -1 if all of the nodes are unassigned
+ */
+- (NSInteger) maxLevelFromUUIDInclusive: (ETUUID*)a toUUIDExclusive: (ETUUID*)b
+{
+	NSInteger max = -1;
+	for (ETUUID *i = a; ![i isEqual: b]; i = [trackNodesChronological[[rowIndexForUUID[i] integerValue] + 1] UUID])
+	{
+		ETAssert(i != nil);
+		NSNumber *level = levelForUUID[i];
+		if (level != nil && [level integerValue] > max)
+			max = [level integerValue];
+	}
+	return max;
+}
+
+- (NSInteger) assignLevelForUUID: (ETUUID *)currentRevision greaterThanSiblingLevel: (NSInteger)siblingLevel
+{
+	ETAssert([currentRevision isKindOfClass: [ETUUID class]]);
+	
+	// Have we already done this node?
+	if (levelForUUID[currentRevision] != nil)
+		return levelForUUID[currentRevision];
+
+	// Is it a root?
+	if ([[self parentUUIDsForRevisionUUID: currentRevision] count] == 0)
+	{
+		levelForUUID[currentRevision] = @(0);
+	}
+	else
+	{
+		ETUUID *parentUUID = [self parentUUIDsForRevisionUUID: currentRevision][0];
+		ETAssert(parentUUID != nil);
+		
+		NSInteger value = [self maxLevelFromUUIDInclusive: currentRevision
+										  toUUIDExclusive: parentUUID];
+		
+		NSNumber *parentLevel = levelForUUID[parentUUID];
+		ETAssert(parentLevel != nil);
+		
+		if (value == -1)
+		{
+			const NSInteger level = MAX(siblingLevel + 1, [parentLevel integerValue]);
+			levelForUUID[currentRevision] = @(level);
+		}
+		else
+		{
+			const NSInteger level = MAX(siblingLevel + 1, MAX(value + 1, [parentLevel integerValue]));
+			levelForUUID[currentRevision] = @(level);
+		}
+	}
+	
+	NSArray *children = [self childrenForUUID: currentRevision];
+	ETAssert(children != nil);
+	
+	NSInteger childLevel = -1;
+	for (ETUUID *child in children)
+	{
+		childLevel = [self assignLevelForUUID: child greaterThanSiblingLevel: childLevel];
+	}
+	
+	return [levelForUUID[currentRevision] integerValue];
+}
+
 - (void) buildLevelForUUID
 {
 	NSArray *roots = [self graphRootUUIDS];
@@ -145,11 +209,9 @@
 
 	levelForUUID =  [NSMutableDictionary dictionary];
 	
-	NSInteger maxLevel = 0;
 	for (ETUUID *root in roots)
 	{
-		//NSLog(@"Starting root %@ at %d", root, (int)maxLevel);
-		maxLevel = [self maxLevelForDrawingGraphFromUUID: root currentLevel: maxLevel] + 1;
+		[self assignLevelForUUID: root greaterThanSiblingLevel: -1];
 	}
 }
 
