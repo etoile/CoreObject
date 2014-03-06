@@ -623,6 +623,12 @@
 	// (root) since that was the only change.
 	COItemGraph *r3PartialItemGraph = [[ctx store] partialItemGraphFromRevisionUUID: [r2 UUID] toRevisionUUID: [r3 UUID] persistentRoot: [doc1 UUID]];
 	UKObjectsEqual(@[root.UUID], [r3PartialItemGraph itemUUIDs]);
+	
+	// selective redo child1 insertion
+	[_testTrack redoNode: _testTrack.nodes[1]];
+	
+	UKObjectsEqual(A(child1, child2), [root contents]);
+	UKObjectsEqual(@"org.etoile.CoreObject.selective-redo", [[_testTrack.nodes[4] commitDescriptor] identifier]);
 }
 
 - (void)testUndoCoalescing
@@ -687,6 +693,11 @@
 - (void) testSelectiveUndoCommitDescriptor
 {
 	UKNotNil([COCommitDescriptor registeredDescriptorForIdentifier: @"org.etoile.CoreObject.selective-undo"]);
+}
+
+- (void) testSelectiveRedoCommitDescriptor
+{
+	UKNotNil([COCommitDescriptor registeredDescriptorForIdentifier: @"org.etoile.CoreObject.selective-redo"]);
 }
 
 @end

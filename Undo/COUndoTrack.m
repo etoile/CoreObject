@@ -289,7 +289,20 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 
 - (void)redoNode: (id <COTrackNode>)aNode
 {
+	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName withEditingContext: _editingContext];
+	ETAssert(track != nil);
 	
+	COCommand *command = (COCommand *)aNode;
+	[command applyToContext: _editingContext];
+	
+	NSString *commitShortDescription = [aNode localizedShortDescription];
+	if (commitShortDescription == nil)
+		commitShortDescription = @"";
+	
+	[_editingContext commitWithIdentifier: @"org.etoile.CoreObject.selective-redo"
+								 metadata: @{ kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]}
+								undoTrack: track
+									error: NULL];
 }
 
 #pragma mark - COUndoTrack - Other Public Methods
