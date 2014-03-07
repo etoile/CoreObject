@@ -87,17 +87,36 @@
 	[undo setEnabled: [_track canUndo]];
 	[redo setEnabled: [_track canRedo]];
 	
-	[selectiveUndo setEnabled: NO];
-	[selectiveRedo setEnabled: NO];
-	
 	id<COTrackNode> highlightedNode = [self selectedNode];
+		
 	const NSUInteger highlightedNodeIndex = [[_track nodes] indexOfObject: highlightedNode];
 	const NSUInteger currentNodeIndex = [[_track nodes] indexOfObject: [_track currentNode]];
 	const BOOL canSelectiveUndo = (highlightedNode != nil
 								   && highlightedNode != [COEndOfUndoTrackPlaceholderNode sharedInstance]
 								   && highlightedNodeIndex != NSNotFound
 								   && highlightedNodeIndex < currentNodeIndex);
-	[selectiveUndo setEnabled: canSelectiveUndo];
+	
+	const BOOL canSelectiveRedo = (!canSelectiveUndo
+								   && highlightedNode != nil
+								   && highlightedNode != [COEndOfUndoTrackPlaceholderNode sharedInstance]
+								   && highlightedNodeIndex != currentNodeIndex);
+	
+	if (canSelectiveUndo)
+	{
+		[selectiveUndo setEnabled: YES];
+		[selectiveUndo setTitle: @"Selective Undo"];
+		[selectiveUndo setAction: @selector(selectiveUndo:)];
+	}
+	else if (canSelectiveRedo)
+	{
+		[selectiveUndo setEnabled: YES];
+		[selectiveUndo setTitle: @"Selective Redo"];
+		[selectiveUndo setAction: @selector(selectiveRedo:)];
+	}
+	else
+	{
+		[selectiveUndo setEnabled: NO];
+	}
 }
 
 /* Target/action */
