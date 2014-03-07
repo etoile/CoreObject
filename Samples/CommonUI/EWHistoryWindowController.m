@@ -170,6 +170,9 @@
 	if (args != nil)
 		metadata[kCOCommitMetadataShortDescriptionArguments] = args;
 	
+	if ([undoTrackToCommitTo isCoalescing])
+		[undoTrackToCommitTo endCoalescing];
+	
 	[inspectedPersistentRoot.editingContext commitWithIdentifier: [@"org.etoile.CoreObject." stringByAppendingString: identifier]
 														metadata: metadata
 													   undoTrack: undoTrackToCommitTo
@@ -206,30 +209,14 @@
 
 #pragma mark - EWGraphRenderedDelegate
 
-static NSArray *RevisionInfosChronological(NSSet *commits)
-{
-    return [[commits allObjects] sortedArrayUsingComparator: ^(id obj1, id obj2) {
-        CORevisionInfo *obj1Info = obj1;
-        CORevisionInfo *obj2Info = obj2;
-        
-        return [[obj2Info date] compare: [obj1Info date]];
-    }];
-}
-
-static NSSet *RevisionInfoSet(COPersistentRoot *proot)
-{
-	NSSet *revisionInfos = [NSSet setWithArray:
-							[proot.store revisionInfosForBackingStoreOfPersistentRootUUID: proot.UUID]];
-	
-	return revisionInfos;
-}
-
 - (NSArray *) allOrderedNodesToDisplayForTrack: (id<COTrack>)aTrack
 {
 	ETAssert(aTrack == inspectedBranch);
-	NSSet *revisionInfoSet = RevisionInfoSet(inspectedPersistentRoot);
-	NSArray *revInfos = RevisionInfosChronological(revisionInfoSet);
-	
+	COPersistentRoot *proot = ((COBranch *)aTrack).persistentRoot;
+
+	// UGLY: Relies on the output of -revisionInfosForBackingStoreOfPersistentRootUUID: already being sorted
+	NSArray *revInfos = [proot.store revisionInfosForBackingStoreOfPersistentRootUUID: proot.UUID];
+	revInfos = [[revInfos reverseObjectEnumerator] allObjects];
 	NSArray *revisions = [revInfos mappedCollectionWithBlock: ^(id obj) {
 		CORevisionInfo *revInfo = obj;
 		return [inspectedPersistentRoot.editingContext revisionForRevisionUUID: revInfo.revisionUUID
