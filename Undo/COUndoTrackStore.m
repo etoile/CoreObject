@@ -86,7 +86,7 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
  
  This situation is not ideal... but it's not a disaster. Considering the case when the
  user was performing an undo. The undo would have been saved in the editing context,
- but the undo stack wouldbe slightly out of sync (it would not know that the undo was 
+ but the undo track would be slightly out of sync (it would not know that the undo was 
  already done.) Both databases are still in a consistent state. 
  Also, as far as I understand, this should be really rare in practice
  ( BEGIN EXCLUSIVE TRANSACTION succeeds, some writes succeed, but the COMMIT fails).

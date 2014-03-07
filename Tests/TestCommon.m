@@ -215,7 +215,7 @@ doesNotPostNotification: (NSString *)notif
 	//    (I don't understand why, but they're not so serious because
 	//     they only happen when throwing an exception in response to incorrect API usage.)
 	//
-	//  - +[COUndoStackStore defaultStore] intentionally opens and never closes a database connection
+	//  - +[COUndoTrackStore defaultStore] intentionally opens and never closes a database connection
 	//    to the ~/Library/CoreObject/Undo/undo.sqlite database
 
 	@autoreleasepool

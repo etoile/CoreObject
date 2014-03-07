@@ -53,7 +53,7 @@ Key Features
 		- Document Changes (Creation, Update and Deletion inside a Document)
 		- Store Changes (Document/Branch Creation, Update and Deletion)
 	- Selective Undo (each change can be cancelled individually)
-	- Persistent Undo Stacks
+	- Persistent Undo Stacks (tree structured/branching undo)
 		- Mutiple Undo Views on the same document
 		- Undo Stack Union View
 

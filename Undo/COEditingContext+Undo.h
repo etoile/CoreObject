@@ -19,31 +19,30 @@
  *    CoreObject, but I felt this goal would improve the design anyway.)
  *
  * The concept behind the app-level undo system is, there is a per-user database
- * (separate from any CoreObject stores) that stores the user's undo/redo stacks.
+ * (separate from any CoreObject stores) that stores the user's undo/redo tracks.
  * (stored in ~/Library/CoreObject/Undo/undo.sqlite)
  *
  * When saving a batch of changes with a COEditingContext, you can optionally
- * record the edits in an undo track. You can pass any string you want to
- * -commitWithStackNamed: and the inverse edit (or edit group) will be pushed onto that
- * persistent stack, creating it if needed.
+ * record the edits in an undo track, by using one of the commit methods that takes
+ * a COUndoTrack.
  *
- * The undo track database (COUndoStackStore) stores pairs of undo/redo stacks
- * indexed by name. The name is just a flat string; we may want to have suggested 
+ * The undo track database (COUndoTrackStore) stores a tree of serialized COCommandGroup objects
+ * per track. Tracks are identified by their name (just a flat string); we may want to have suggested
  * naming schemes. Examples could be:
  *
- * "<application id>" -- for apps using one stack for several persistent roots
- * "<application id>:<persistent root UUID>" -- for apps using one stack per persistent root
+ * "<application id>" -- for apps using one undo track for several persistent roots
+ * "<application id>:<persistent root UUID>" -- for apps using one undo track per persistent root
  * "<application id>:<persistent root UUID>@username" -- for collaborative editing
  * "<application id>:<persistent root UUID>:<tab/pane name>" -- for a multipane editor
  *
  * Importantly, the names are just treated as opaque identifiers to CoreObject,
- * and the behaviour comes from which edits apps put in which stacks.
+ * and the behaviour comes from which edits apps put on which tracks.
  *
  * This design should support all of these use-cases:
  *
  *  - per-window/tab/pane undo tracks when editing a single persistent root
  *    (e.g. for a graphics editor with split views editing two different parts
- *     of a a document, each pane can have its own stack)
+ *     of a a document, each pane can have its own undo track)
  *
  *  - per-app undo track for a manager application editing many persistent roots
  *

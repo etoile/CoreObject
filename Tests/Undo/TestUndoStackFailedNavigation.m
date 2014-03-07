@@ -10,7 +10,7 @@
 #import "TestCommon.h"
 #import "CORevisionCache.h"
 
-@interface TestUndoStackFailedNavigation : EditingContextTestCase <UKTest>
+@interface TestUndoTrackFailedNavigation : EditingContextTestCase <UKTest>
 {
     COPersistentRoot *persistentRoot;
 	COUndoTrack *track;
@@ -22,7 +22,7 @@
 }
 @end
 
-@implementation TestUndoStackFailedNavigation
+@implementation TestUndoTrackFailedNavigation
 
 - (id) init
 {
@@ -30,7 +30,7 @@
 	track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
 	[track clear];
 	
-	// set root to "0" ---- not on stack
+	// set root to "0" ---- not on undo track
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 	[[persistentRoot rootObject] setLabel: @"0"];
 	[ctx commit];
@@ -53,7 +53,7 @@
 	[ctx commitWithUndoTrack: track];
 	node4 = [track currentNode];
 	
-	// set root to "2" ---- not on stack
+	// set root to "2" ---- not on undo track
 	[[persistentRoot rootObject] setLabel: @"2"];
 	[ctx commit];
 	

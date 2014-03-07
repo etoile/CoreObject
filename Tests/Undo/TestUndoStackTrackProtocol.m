@@ -10,12 +10,12 @@
 #import "TestCommon.h"
 #import "CORevisionCache.h"
 
-@interface TestUndoStackTrackProtocol : EditingContextTestCase <UKTest>
+@interface TestUndoTrackProtocol : EditingContextTestCase <UKTest>
 {
     COPersistentRoot *persistentRoot;
 	COUndoTrack *track;
 	
-	CORevision *r0; // not on stack
+	CORevision *r0; // not on track
 	CORevision *r1;
 	CORevision *r2;
 	CORevision *r3;
@@ -23,7 +23,7 @@
 }
 @end
 
-@implementation TestUndoStackTrackProtocol
+@implementation TestUndoTrackProtocol
 
 - (id) init
 {
@@ -33,7 +33,7 @@
 	
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 	[[persistentRoot rootObject] setLabel: @"0"];
-	[ctx commit]; // not on stack
+	[ctx commit]; // not on undo track
 	r0 = [persistentRoot currentRevision];
 	
 	[[persistentRoot rootObject] setLabel: @"1"];
@@ -89,7 +89,7 @@
 	id <COTrackNode> current = [track currentNode];
 	[self checkCommand: current isSetVersionFrom: r3 to: r4];
 	
-	// Now perform an undo with the COUndoStack API
+	// Now perform an undo with the COUndoTrack API
 	
 	[track undo];
 	current = [track currentNode];
@@ -193,9 +193,9 @@
 	[self checkNodes: nodes];
 }
 
-// N.B.: These must be 3 separate tests, since [stack nodes] caches
+// N.B.: These must be 3 separate tests, since [track nodes] caches
 // the result, and we need to make sure it's calculated corrently when there
-// are are multiple commands in both the undo and redo stacks.
+// are are multiple commands in both the undo and redo tracks.
 
 - (void) testNodesUnaffectedBy1Undo
 {

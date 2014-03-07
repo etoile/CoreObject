@@ -19,8 +19,8 @@
 
 extern NSString * const kCOCommandUUID;
 
-NSString * const COUndoStackDidChangeNotification = @"COUndoStackDidChangeNotification";
-NSString * const kCOUndoStackName = @"COUndoStackName";
+NSString * const COUndoTrackDidChangeNotification = @"COUndoTrackDidChangeNotification";
+NSString * const kCOUndoTrackName = @"COUndoTrackName";
 
 @interface COPatternUndoTrack : COUndoTrack
 @end
@@ -759,11 +759,11 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 	}
 }
 
-- (void) postNotificationsForStackName: (NSString *)aStack
+- (void) postNotificationsForTrackName: (NSString *)aTrack
 {
-    NSDictionary *userInfo = @{kCOUndoStackName : aStack};
+    NSDictionary *userInfo = @{kCOUndoTrackName : aTrack};
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: COUndoStackDidChangeNotification
+    [[NSNotificationCenter defaultCenter] postNotificationName: COUndoTrackDidChangeNotification
                                                         object: self
                                                       userInfo: userInfo];
     
@@ -778,7 +778,7 @@ NSString * const kCOUndoStackName = @"COUndoStackName";
 {
 	[[NSNotificationCenter defaultCenter]
 	 postNotificationName: ETCollectionDidUpdateNotification object: self];
-    [self postNotificationsForStackName: _name];
+    [self postNotificationsForTrackName: _name];
 }
 
 #pragma mark - Coalescing

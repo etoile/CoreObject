@@ -14,7 +14,7 @@
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver: self
                                                  selector: @selector(undoStackDidChange:)
-                                                     name: COUndoStackDidChangeNotification
+                                                     name: COUndoTrackDidChangeNotification
                                                    object: nil];
     }
     return self;

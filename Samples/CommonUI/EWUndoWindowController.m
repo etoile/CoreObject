@@ -11,8 +11,8 @@
 	self = [super initWithWindowNibName: @"Undo"];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver: self
-                                                 selector: @selector(undoStackDidChange:)
-                                                     name: COUndoStackDidChangeNotification
+                                                 selector: @selector(undoTrackDidChange:)
+                                                     name: COUndoTrackDidChangeNotification
                                                    object: nil];
     }
     return self;
@@ -75,7 +75,7 @@
 	[self update];
 }
 
-- (void) undoStackDidChange: (NSNotification *)notif
+- (void) undoTrackDidChange: (NSNotification *)notif
 {
     NSLog(@"undo track did change: %@", [notif userInfo]);
 	

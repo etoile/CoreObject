@@ -10,8 +10,12 @@
 
 @class COUndoTrackStore, COUndoTrackState, COEditingContext, COCommand, COCommandGroup;
 
-extern NSString * const COUndoStackDidChangeNotification;
-extern NSString * const kCOUndoStackName;
+extern NSString * const COUndoTrackDidChangeNotification;
+/**
+ * Key the userInfo dictionary for COUndoTrackDidChangeNotification. The value is
+ * an NSString containing the track name of the track that changed.
+ */
+extern NSString * const kCOUndoTrackName;
 
 /**
  * @group Undo

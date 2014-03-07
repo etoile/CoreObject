@@ -358,7 +358,7 @@
  *
  * See also -commitWithMetadata:undoTrack:error:.
  */
-- (BOOL)commitWithUndoTrack: (COUndoTrack *)aStack;
+- (BOOL)commitWithUndoTrack: (COUndoTrack *)aTrack;
 
 
 /** @taskunit Description */
