@@ -73,22 +73,42 @@
     [self update];
 }
 
+// FIXME: Copied from EWUndoWindowController
 - (void) validateButtons
 {
 	[undo setEnabled: [inspectedBranch canUndo]];
 	[redo setEnabled: [inspectedBranch canRedo]];
 	
-	[selectiveUndo setEnabled: NO];
-	[selectiveRedo setEnabled: NO];
-	
 	id<COTrackNode> highlightedNode = [self selectedNode];
+	
 	const NSUInteger highlightedNodeIndex = [[inspectedBranch nodes] indexOfObject: highlightedNode];
 	const NSUInteger currentNodeIndex = [[inspectedBranch nodes] indexOfObject: [inspectedBranch currentNode]];
 	const BOOL canSelectiveUndo = (highlightedNode != nil
 								   && highlightedNode != [COEndOfUndoTrackPlaceholderNode sharedInstance]
 								   && highlightedNodeIndex != NSNotFound
 								   && highlightedNodeIndex < currentNodeIndex);
-	[selectiveUndo setEnabled: canSelectiveUndo];
+	
+	const BOOL canSelectiveRedo = (!canSelectiveUndo
+								   && highlightedNode != nil
+								   && highlightedNode != [COEndOfUndoTrackPlaceholderNode sharedInstance]
+								   && highlightedNodeIndex != currentNodeIndex);
+	
+	if (canSelectiveUndo)
+	{
+		[selectiveUndo setEnabled: YES];
+		[selectiveUndo setTitle: @"Selective Undo"];
+		[selectiveUndo setAction: @selector(selectiveUndo:)];
+	}
+	else if (canSelectiveRedo)
+	{
+		[selectiveUndo setEnabled: YES];
+		[selectiveUndo setTitle: @"Selective Redo"];
+		[selectiveUndo setAction: @selector(selectiveRedo:)];
+	}
+	else
+	{
+		[selectiveUndo setEnabled: NO];
+	}
 }
 
 /* Target/action */
