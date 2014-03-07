@@ -30,8 +30,75 @@ First alpha release blockers
 - Update website
 
 
-Future Work
------------
+Major Missing Features
+----------------------
+
+- The undo system should support user-defined actions that track state not managed by CoreObject
+
+- Supporting broken cross-references. Since we don't support it, you must not permanently delete anything from a store (with `-[COSQLiteStore finalizeDeletionsForPersistentRoot:error:]`) unless your application doesn't use cross-references.
+
+- Persistent root faulting; currently the entire store is loaded in memory
+
+	- A challenge will be supporting cross-persistent root reference inverses.
+	i.e. suppose we open a store, load a document persistent root into memory.
+	Accessing the derived property "document.tags" requires a search query over
+	the current revisions of the current branches of all persistent roots in the whole store
+	(at least conceptually). The store keeps an index of cross-persistent references
+	anticipating this problem, but it's not currently used. The most straightforawrd
+	solution would be to load every persistent root that has ever had a cross-reference
+	to document at the same time as when we load "document".
+
+- Partial loading (loading an object using another entity e.g. COPerson as COObject)
+
+  - Add -persistentEntityDescription (for a partially loaded person object, -persistentEntityDescription would return COPerson when -entityDescription returns COObject)
+
+- Schema Upgrade
+
+- Better query support (in-memory and in-store as sketched in COQuery)
+
+  - Introduce our own query objects for expressing a search query, with
+    implementations that can run against the store in SQL as well as in memory.
+	We will probably need to combine both appraoches to complete a search.
+
+  - NSPredicate to SQL generator using OMeta (not sure)
+
+- Import/Export
+
+- Write a generic object manager than can open any store and display any COObject
+
+  - Should support displaying all key/values (like past StoreBorwser prototypes)
+    Not blocking release, but critical for ObjectManager
+
+- Implement something like COSelectiveHistoryTrack (using a query to select revisions based on criterias e.g. inner object subset)
+
+- Something to aggregate the history of multiple persistent roots in this same class?
+
+
+Open Questions
+--------------
+
+- Do cross-store references make sense? i.e. switch from COPath to a URL?
+
+- Adjust COEditingContext loaded object cache to use a strategy that matches which root objects are going to be accessed recurrently (e.g. photos in a Photo Manager should have priority over other root objects)
+
+- Scalability to 50k persistent roots, 50k root objects
+
+- Reintroduce history compaction (will it be needed?), which was present but bitrotted and is not supported right now.
+  Possibly just collapse "minor edits" or collapse to daily snapshots + explicit tags. Not sure how much space this will save though.
+
+  Another trick we can try is: when we decided to stop appending deltas and write a new full snapshot,
+  take the previous full snapshot and all of the deltas, and zlib compress the binary
+  representations of those item graphs as a single block.
+
+- Perhaps support Layers in addition to XMPP
+
+	- https://layer.com
+	- http://www.theverge.com/2013/12/4/5173726/you-have-too-many-chat-apps-can-layer-connect-them
+
+
+
+Future Work (Minor features, refactoring, cleanup)
+--------------------------------------------------
 
 - General
 
@@ -300,7 +367,7 @@ the following situations at least:
 
 - Model objects (COObject subclasses included with CoreObject for convenience)
 
-  - for COLibrary, evaluate whether we can enfore the constraint that one persistent root belongs to one library
+  - for COLibrary, evaluate whether we can enfore the constraint that one persistent root belongs to one library (we discussed this and we can't)
   
   - Test unordered COCollection subclass
   
@@ -354,64 +421,3 @@ the following situations at least:
 
   - Remove deprecated -type and -shortDescription in CORevision (all EtoileUI-based applications need to be check)
 
-
-Missing Features
-----------------
-
-- Persistent root faulting; currently the entire store is loaded in memory
-
-	- A challenge will be supporting cross-persistent root reference inverses.
-	i.e. suppose we open a store, load a document persistent root into memory.
-	Accessing the derived property "document.tags" requires a search query over
-	the current revisions of the current branches of all persistent roots in the whole store
-	(at least conceptually). The store keeps an index of cross-persistent references
-	anticipating this problem, but it's not currently used. The most straightforawrd
-	solution would be to load every persistent root that has ever had a cross-reference
-	to document at the same time as when we load "document".
-
-- Partial loading (loading an object using another entity e.g. COPerson as COObject)
-
-  - Add -persistentEntityDescription (for a partially loaded person object, -persistentEntityDescription would return COPerson when -entityDescription returns COObject)
-
-- Schema Upgrade
-
-- Better query support (in-memory and in-store as sketched in COQuery)
-
-  - Introduce our own query objects for expressing a search query, with
-    implementations that can run against the store in SQL as well as in memory.
-	We will probably need to combine both appraoches to complete a search.
-
-  - NSPredicate to SQL generator using OMeta (not sure)
-
-- Import/Export
-
-- Write a generic object manager than can open any store and display any COObject
-
-  - Should support displaying all key/values (like past StoreBorwser prototypes)
-    Not blocking release, but critical for ObjectManager
-
-- Implement something like COSelectiveHistoryTrack (using a query to select revisions based on criterias e.g. inner object subset)
-
-- Something to aggregate the history of multiple persistent roots in this same class?
-
-
-Open Questions
---------------
-
-- Do cross-store references make sense? i.e. switch from COPath to a URL?
-
-- Adjust COEditingContext loaded object cache to use a strategy that matches which root objects are going to be accessed recurrently (e.g. photos in a Photo Manager should have priority over other root objects)
-
-- Scalability to 50k persistent roots, 50k root objects
-
-- Reintroduce history compaction (will it be needed?), which was present but bitrotted and is not supported right now.
-  Possibly just collapse "minor edits" or collapse to daily snapshots + explicit tags. Not sure how much space this will save though.
-
-  Another trick we can try is: when we decided to stop appending deltas and write a new full snapshot,
-  take the previous full snapshot and all of the deltas, and zlib compress the binary
-  representations of those item graphs as a single block.
-
-- Perhaps support Layers in addition to XMPP
-
-	- https://layer.com
-	- http://www.theverge.com/2013/12/4/5173726/you-have-too-many-chat-apps-can-layer-connect-them
