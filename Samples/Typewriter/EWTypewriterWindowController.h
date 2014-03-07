@@ -30,7 +30,6 @@ NSString * EWTagDragType;
 	
 	PrioritySplitViewDelegate *splitViewDelegate;
 	COAttributedStringWrapper *textStorage;
-	BOOL changedByUser;
 	COPersistentRoot *selectedNote;
 	COUndoTrack *undoTrack;
 	EWUndoManager *undoManagerBridge;
@@ -38,7 +37,11 @@ NSString * EWTagDragType;
 	EWTagListDataSource *tagListDataSource;
 	EWNoteListDataSource *noteListDataSource;
 	
+	// Tracking text changes
+	BOOL changedByUser;
 	NSTimer *coalescingTimer;
+	NSString *affectedText;
+	NSString *replacementText;
 }
 
 @property (nonatomic, readonly) NSTableView *notesTable;

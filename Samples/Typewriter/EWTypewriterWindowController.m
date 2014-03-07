@@ -420,7 +420,31 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 - (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
 {
 	changedByUser = YES;
+	
+	NSLog(@"should add %@", replacementString);
+	
+	// These are just used to provide commit metadata
+	
+	if (affectedCharRange.length > 0)
+		affectedText = [[[aTextView textStorage] string] substringWithRange: affectedCharRange];
+	else
+		affectedText = @"";
+	
+	replacementText = replacementString;
+	
 	return YES;
+}
+
+static const unichar ElipsisChar = 0x2026;
+
+static NSString *Trim(NSString *text)
+{
+	if ([text length] > 30)
+		return [[text substringToIndex: 30] stringByAppendingFormat: @"%C", ElipsisChar];
+	
+	text = [text stringByReplacingOccurrencesOfString: @"\n" withString: @""];
+	
+	return text;
 }
 
 #pragma mark - NSTextStorageDelegate
@@ -444,7 +468,26 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	
 	if ([selectedNote.objectGraphContext hasChanges])
 	{
-		[self commitWithIdentifier: @"typing" descriptionArguments: @[] coalesce: YES];
+		if (replacementText == nil && [affectedText length] > 0)
+		{
+			[self commitWithIdentifier: @"modify-text" descriptionArguments: @[Trim(affectedText)] coalesce: YES];
+		}
+		else if ([replacementText isEqualToString: @""] && [affectedText length] > 0)
+		{
+			[self commitWithIdentifier: @"delete-text" descriptionArguments: @[Trim(affectedText)] coalesce: YES];
+		}
+		else if ([replacementText length] > 0 && [affectedText isEqualToString: @""])
+		{
+			[self commitWithIdentifier: @"insert-text" descriptionArguments: @[Trim(replacementText)] coalesce: YES];
+		}
+		else if ([replacementText length] > 0 && [affectedText length] > 0)
+		{
+			[self commitWithIdentifier: @"replace-text" descriptionArguments: @[Trim(affectedText), Trim(replacementText)] coalesce: YES];
+		}
+		else
+		{
+			NSLog(@"%@: got -textStorageDidProcessEditing:, but it wasn't caused by us.. ignoring", self);
+		}
 		
 		if (coalescingTimer != nil)
 		{
