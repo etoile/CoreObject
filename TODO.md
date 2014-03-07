@@ -123,9 +123,9 @@ Future Work (Minor features, refactoring, cleanup)
 
   - Add -predicateWithBlock: to GNUstep (see COQuery)
 
-  - Perhaps tweak [[NSDecimalNumber defaultBehavior] scale] to return NSDecimalScale by default as Mac OS X does
+  - Perhaps tweak `[[NSDecimalNumber defaultBehavior] scale]` to return NSDecimalScale by default as Mac OS X does
 
-  - Perhaps don't treat -[NSSet countByEnumeratingWithState:objects:count:] as a primitive method to match Mac OS X behavior
+  - Perhaps don't treat `-[NSSet countByEnumeratingWithState:objects:count:]` as a primitive method to match Mac OS X behavior
 
 
 - iOS
@@ -231,7 +231,7 @@ Future Work (Minor features, refactoring, cleanup)
     currently you get a COPath does not respond to UUIDValue exception.
 
   - We should have dedicated array/set multivalue mutation methods rather than using:
-    -[COObject (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key]
+    `-[COObject (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key]`
     for both, IMO (Eric)
 
   - Use NSOrderedSet for relationships
@@ -247,7 +247,7 @@ Future Work (Minor features, refactoring, cleanup)
   - Add relationship update check to detect persistent objects inserted into a transient relationship. The object put in the relationship could belong to:
   
     - a transient object graph context --> allowed (see transient property _dropIndicator in -[ETLayout awakeFromDeserialization)
-    - the same object graph context --> disallowed (otherwise we can accidentally easily look up shared instance using the wrong object graph context e.g. _dropIndicator = [ETDropIndicator sharedInstanceForObjectGraphContext: [layout objectGraphContext]])
+    - the same object graph context --> disallowed (otherwise we can accidentally easily look up shared instance using the wrong object graph context e.g. `_dropIndicator = [ETDropIndicator sharedInstanceForObjectGraphContext: [layout objectGraphContext]])`
     - some other persistent object graph context --> allowed or disallowed (not sure yet)
 
   - Make primitives with potentially mutable subclasses (NSString and NSData)
@@ -258,7 +258,6 @@ Future Work (Minor features, refactoring, cleanup)
   - Check memory management for transient relationships:
 
     - Transient collection (which is retaining) can contains persistent COObjects?
-
 	- Persistent collection (weak references) can contain transient COObjects
 
   - Fix problem with properties that have the first letter uppercase
@@ -316,14 +315,14 @@ the following situations at least:
   
     - the simplest solution could be to return NO and let subclasses override it to return YES (e.g. for the rare case, where the user wants to have hand-written accessors + automatic KVO notifications for some transient properties) 
 	- or to return NO and just forbid overriding it (since returning YES seems almost useless if we synthesize accessors, and we support @dynamic even for transient properties)
-	- check +[COObject automaticallyNotifiesObserversForKey:] doesn't break KVO notifications for transient and non-derived properties in EtoileUI subclasses
+	- check `+[COObject automaticallyNotifiesObserversForKey:]` doesn't break KVO notifications for transient and non-derived properties in EtoileUI subclasses
 	
   - Add some collection-oriented KVO update tests to TestObjectUpdate
 
 
 - COObjectGraphContext
 
-  - Test -[COObjectGraphContext discardAllChanges] during synchronization. It's important to use 
+  - Test `-[COObjectGraphContext discardAllChanges]` during synchronization. It's important to use 
     -reloadAtRevision: and not -setCurrentRevision: here, otherwise -supportsRevert would go our way
 
   - Test nil univalued relationship case (see r10270)
@@ -333,7 +332,7 @@ the following situations at least:
 
   - tidy up ugly NSMutableDictionary / NSDictionary casting
 
-  - use a std::unordered_map<NSString *, std::pair<uint32_t, id>>
+  - use a `std::unordered_map<NSString *, std::pair<uint32_t, id>>`
     (i.e. map from string to (COType, object) pair). 
     
     (Well, use a simple wrapper class instead of std::pair.) NOTE: using
@@ -357,10 +356,11 @@ the following situations at least:
     revisions snapshot is in sync with what is in the DB)
 
   - e.g:
-    a = [COUndoTrack trackForName: @"test" withEditingContext: ctx]
-    b = [COUndoTrack trackForName: @"test" withEditingContext: ctx]
-	...
-	[ctx commitWithUndoTrack: a]
+  
+	    a = [COUndoTrack trackForName: @"test" withEditingContext: ctx]
+	    b = [COUndoTrack trackForName: @"test" withEditingContext: ctx]
+	    ...
+	    [ctx commitWithUndoTrack: a]
 
 	[a nodes] will not equal [b nodes] but I would expect them to be the equal
 
@@ -377,9 +377,8 @@ the following situations at least:
   - Make a strict set of supported types, see: Scraps/serialization_todo.txt
 
   - For collection metamodel assertions, check all collection metamodel attributes (isKeyed, isOrdered, isMultivalued) and document we should update these assertions if we add more collection attributes to the metamodel:
-  
-		NSAssert([aPropertyDesc isKeyed] && [aPropertyDesc isMultivalued], @"Serialization type doesn't match metamodel");
-
+        
+        NSAssert([aPropertyDesc isKeyed] && [aPropertyDesc isMultivalued], @"Serialization type doesn't match metamodel");
 
 - Utilities
 
@@ -392,7 +391,6 @@ the following situations at least:
   - Write commit descriptor tests (localization is untested at this time)
 	
   - Implement copying commit descriptor plist and string files to ~/Library/CoreObject/Commits, in order to support browsing changes done by applications uninstalled from the system
-	
   - Integrate COCommitDescriptor with Schema Upgrade 
 	
     - adjust to support versioned descriptors 
