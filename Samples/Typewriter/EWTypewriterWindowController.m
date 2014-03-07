@@ -430,7 +430,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	else
 		affectedText = @"";
 	
-	replacementText = replacementString;
+	replacementText = [[NSString alloc] initWithString: replacementString];
 	
 	return YES;
 }
