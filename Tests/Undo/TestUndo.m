@@ -627,7 +627,10 @@
 	// selective redo child1 insertion
 	[_testTrack redoNode: _testTrack.nodes[1]];
 	
-	UKObjectsEqual(A(child1, child2), [root contents]);
+	// Since the diffs will be [] -> [ child1 ]   +    [] -> [ child2 ], we can
+	// get either [ child2, child1 ] or [ child1, child2 ]
+	//
+	UKObjectsEqual(S(child1, child2), SA([root contents]));
 	UKObjectsEqual(@"org.etoile.CoreObject.selective-redo", [[_testTrack.nodes[4] commitDescriptor] identifier]);
 }
 
