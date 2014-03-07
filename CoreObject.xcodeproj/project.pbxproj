@@ -184,6 +184,8 @@
 		6646978017CE7E2600A1B767 /* COSynchronizationServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */; };
 		6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6646985A17D3C55600A1B767 /* COObjectGraphContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		664E076E18C95BF700CBFF74 /* 1a.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 664E075C18C9592700CBFF74 /* 1a.json */; };
+		664E076F18C95BF900CBFF74 /* 1b.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 664E075D18C9592700CBFF74 /* 1b.json */; };
 		664F279A188E2DC900DF36FC /* TestSynchronizerCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F2799188E2DC900DF36FC /* TestSynchronizerCommon.m */; };
 		664F279D188E683400DF36FC /* TestSynchronizerPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F279C188E683400DF36FC /* TestSynchronizerPerformance.m */; };
 		664F279E188E699B00DF36FC /* OrderedGroupNoOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101154184D89A4001A3E24 /* OrderedGroupNoOpposite.m */; };
@@ -513,6 +515,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		664E076D18C95BF100CBFF74 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				664E076E18C95BF700CBFF74 /* 1a.json in CopyFiles */,
+				664E076F18C95BF900CBFF74 /* 1b.json in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		66550BEB17D51C8800327657 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -727,6 +740,8 @@
 		6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COSynchronizationServer.m; path = Synchronization/COSynchronizationServer.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COSQLiteStore+Private.h"; path = "Store/COSQLiteStore+Private.h"; sourceTree = "<group>"; };
 		6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Private.h"; path = "Core/COObjectGraphContext+Private.h"; sourceTree = "<group>"; };
+		664E075C18C9592700CBFF74 /* 1a.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 1a.json; sourceTree = "<group>"; };
+		664E075D18C9592700CBFF74 /* 1b.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 1b.json; sourceTree = "<group>"; };
 		664F2798188E2DC900DF36FC /* TestSynchronizerCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestSynchronizerCommon.h; sourceTree = "<group>"; };
 		664F2799188E2DC900DF36FC /* TestSynchronizerCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestSynchronizerCommon.m; sourceTree = "<group>"; };
 		664F279C188E683400DF36FC /* TestSynchronizerPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestSynchronizerPerformance.m; sourceTree = "<group>"; };
@@ -1285,6 +1300,24 @@
 			name = Synchronization;
 			sourceTree = "<group>";
 		};
+		664E075A18C9592700CBFF74 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				664E075B18C9592700CBFF74 /* Diff */,
+			);
+			name = Resources;
+			path = Tests/Resources;
+			sourceTree = "<group>";
+		};
+		664E075B18C9592700CBFF74 /* Diff */ = {
+			isa = PBXGroup;
+			children = (
+				664E075C18C9592700CBFF74 /* 1a.json */,
+				664E075D18C9592700CBFF74 /* 1b.json */,
+			);
+			path = Diff;
+			sourceTree = "<group>";
+		};
 		664F279B188E683400DF36FC /* Synchronization */ = {
 			isa = PBXGroup;
 			children = (
@@ -1712,6 +1745,7 @@
 		791B4DF41299C56900CCF472 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				664E075A18C9592700CBFF74 /* Resources */,
 				6633F11E18552562009CE6F7 /* Extras */,
 				66E451DA17CC565F00205679 /* Model Objects */,
 				609C00541704C24C00D01AAB /* main.m */,
@@ -1976,6 +2010,7 @@
 				791B4E2A1299C79300CCF472 /* Sources */,
 				791B4E2B1299C79300CCF472 /* Frameworks */,
 				6679B8FF185305E900971C2A /* ShellScript */,
+				664E076D18C95BF100CBFF74 /* CopyFiles */,
 			);
 			buildRules = (
 			);

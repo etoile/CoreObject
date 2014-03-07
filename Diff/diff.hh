@@ -465,7 +465,6 @@ namespace ManagedFusion
 	static bool canEmitDeletion(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
 	{
 		assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
-		const int offset = posB - posA;
 		
 		if (modifiedRangeB == NULL)
 			return true;
@@ -473,8 +472,7 @@ namespace ManagedFusion
 		if (modifiedRangeA == NULL)
 			return false;
 		
-		// TODO: Check and explain the reasoning behind this condition
-		if (modifiedRangeA->location < modifiedRangeB->location + offset)
+		if (modifiedRangeA->location == posA && modifiedRangeB->location > posB)
 			return true;
 
 		return false;

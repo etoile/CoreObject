@@ -132,4 +132,23 @@
 	
 }
 
+- (COItemGraph *) itemGraphForJSONResourceName: (NSString *)aResource
+{
+	NSString *path = [[NSBundle bundleForClass: [self class]] pathForResource: aResource ofType: @"json"];
+	NSData *data = [NSData dataWithContentsOfFile: path];
+	COItemGraph *result = COItemGraphFromJSONData(data);
+	ETAssert(result != nil);
+	
+	return result;
+}
+
+- (void) testCase1
+{
+	COItemGraph *graph1a = [self itemGraphForJSONResourceName: @"1a"];
+	COItemGraph *graph1b = [self itemGraphForJSONResourceName: @"1b"];
+	
+	COItemGraphDiff *diff = [COItemGraphDiff diffItemTree: graph1a withItemTree: graph1b sourceIdentifier: @"exampleDiff"];
+	UKNotNil(diff);
+}
+
 @end

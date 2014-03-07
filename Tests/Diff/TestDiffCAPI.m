@@ -207,4 +207,21 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	diff_free(diff);
 }
 
+- (void) testDeleteCopyAndInsert
+{
+	const char *array1 = "abijk";
+	const char *array2 = "bjkl";
+	
+	diffresult_t *diff = diff_arrays(strlen(array1), strlen(array2), arraycomparefn, array1, array2);
+	UKIntsEqual(5, diff_editcount(diff));
+	
+	[self checkEdit: diff_edit_at_index(diff, 0) isDeleteFromLocA:0 length:1];
+	[self checkEdit: diff_edit_at_index(diff, 1) isCopyFromLocA:1 length:1 toLocB:0];
+	[self checkEdit: diff_edit_at_index(diff, 2) isDeleteFromLocA:2 length:1];
+	[self checkEdit: diff_edit_at_index(diff, 3) isCopyFromLocA:3 length:2 toLocB:1];
+	[self checkEdit: diff_edit_at_index(diff, 4) isInsertAtLocA:5 fromLocB:3 length:1];
+	
+	diff_free(diff);
+}
+
 @end
