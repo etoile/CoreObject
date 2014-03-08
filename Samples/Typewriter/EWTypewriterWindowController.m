@@ -425,12 +425,20 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	
 	// These are just used to provide commit metadata
 	
-	if (affectedCharRange.length > 0)
-		affectedText = [[[aTextView textStorage] string] substringWithRange: affectedCharRange];
-	else
+	if (affectedText == nil)
 		affectedText = @"";
 	
-	replacementText = [[NSString alloc] initWithString: replacementString];
+	if (replacementText == nil)
+		replacementText = @"";
+	
+	// This is a complete hack (just append together the modified regions and replacement
+	// text of possibly disjoint edits) but it produces commit descriptions that are usually helpful
+	
+	if (affectedCharRange.length > 0)
+		affectedText = [affectedText stringByAppendingString:
+						[[[aTextView textStorage] string] substringWithRange: affectedCharRange]];
+	
+	replacementText = [replacementText stringByAppendingString: replacementString];
 	
 	return YES;
 }
@@ -468,26 +476,7 @@ static NSString *Trim(NSString *text)
 	
 	if ([selectedNote.objectGraphContext hasChanges])
 	{
-		if (replacementText == nil && [affectedText length] > 0)
-		{
-			[self commitWithIdentifier: @"modify-text" descriptionArguments: @[Trim(affectedText)] coalesce: YES];
-		}
-		else if ([replacementText isEqualToString: @""] && [affectedText length] > 0)
-		{
-			[self commitWithIdentifier: @"delete-text" descriptionArguments: @[Trim(affectedText)] coalesce: YES];
-		}
-		else if ([replacementText length] > 0 && [affectedText isEqualToString: @""])
-		{
-			[self commitWithIdentifier: @"insert-text" descriptionArguments: @[Trim(replacementText)] coalesce: YES];
-		}
-		else if ([replacementText length] > 0 && [affectedText length] > 0)
-		{
-			[self commitWithIdentifier: @"replace-text" descriptionArguments: @[Trim(affectedText), Trim(replacementText)] coalesce: YES];
-		}
-		else
-		{
-			NSLog(@"%@: got -textStorageDidProcessEditing:, but it wasn't caused by us.. ignoring", self);
-		}
+		[self commitTextChangesAsCheckpoint: NO];
 		
 		if (coalescingTimer != nil)
 		{
@@ -501,14 +490,48 @@ static NSString *Trim(NSString *text)
 	}
 }
 
+- (void) commitTextChangesAsCheckpoint: (BOOL)isCheckpoint
+{
+	if (isCheckpoint)
+	{
+		selectedNote.currentBranch.shouldMakeEmptyCommit = YES;
+	}
+	
+	if (replacementText == nil && [affectedText length] > 0)
+	{
+		[self commitWithIdentifier: @"modify-text" descriptionArguments: @[Trim(affectedText)] coalesce: YES isMinorTextEdit: !isCheckpoint];
+	}
+	else if ([replacementText isEqualToString: @""] && [affectedText length] > 0)
+	{
+		[self commitWithIdentifier: @"delete-text" descriptionArguments: @[Trim(affectedText)] coalesce: YES isMinorTextEdit: !isCheckpoint];
+	}
+	else if ([replacementText length] > 0 && [affectedText isEqualToString: @""])
+	{
+		[self commitWithIdentifier: @"insert-text" descriptionArguments: @[Trim(replacementText)] coalesce: YES isMinorTextEdit: !isCheckpoint];
+	}
+	else if ([replacementText length] > 0 && [affectedText length] > 0)
+	{
+		[self commitWithIdentifier: @"replace-text" descriptionArguments: @[Trim(affectedText), Trim(replacementText)] coalesce: YES isMinorTextEdit: !isCheckpoint];
+	}
+	else
+	{
+		NSLog(@"%@: got -textStorageDidProcessEditing:, but it wasn't caused by us.. ignoring", self);
+	}
+}
+
 - (void) coalescingTimer: (NSTimer *)timer
 {
 	NSLog(@"Breaking coalescing...");
+	
+	[self commitTextChangesAsCheckpoint: YES];
+	
 	[[self undoTrack] endCoalescing];
 	[[self undoTrack] beginCoalescing];
 	
 	[coalescingTimer invalidate];
 	coalescingTimer = nil;
+	affectedText = nil;
+	replacementText = nil;
 }
 
 
@@ -616,16 +639,18 @@ static NSString *Trim(NSString *text)
 
 - (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args
 {
-	[self commitWithIdentifier: identifier descriptionArguments: args coalesce: NO];
+	[self commitWithIdentifier: identifier descriptionArguments: args coalesce: NO isMinorTextEdit: NO];
 }
 
-- (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args coalesce: (BOOL)requestCoalescing
+- (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args coalesce: (BOOL)requestCoalescing isMinorTextEdit: (BOOL)isMinor
 {
 	identifier = [@"org.etoile.Typewriter." stringByAppendingString: identifier];
 	
 	NSMutableDictionary *metadata = [NSMutableDictionary new];
 	if (args != nil)
 		metadata[kCOCommitMetadataShortDescriptionArguments] = args;
+		
+	metadata[@"minorEdit"] = @(isMinor);
 	
 	if (requestCoalescing && ![[self undoTrack] isCoalescing])
 	{
