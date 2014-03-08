@@ -378,8 +378,15 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 	ETUUID *commit = [revisionInfo UUID];
 	const NSInteger level = [levelForUUID[commit] integerValue];
 
+	if ([revisionInfo.metadata[@"minorEdit"] isEqual: @(YES)])
+	{
+		[[NSColor grayColor] set];
+	}
+	else
+	{
+		[[NSColor blueColor] set];
+	}
 	
-	[[NSColor blueColor] set];
 
 	// Draw lines
 	
@@ -393,7 +400,6 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 		}
 	}
 	
-	[[NSColor blueColor] setStroke];
 	[[NSColor whiteColor] setFill];
 	NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect: [self circleRectAtLevel: level inRect: aRect]];
 	[circle setLineWidth: [[[track currentNode] UUID] isEqual: commit] ? 2 : 1];
