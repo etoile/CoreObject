@@ -14,13 +14,16 @@
 /**
  * @group Core
  * @abstract A mutable in-memory representation of an inner object in an object
- * graph context (a counterpart to COItem, whose relationships are
- * represented as Objective-C pointers instead of UUIDs).
+ * graph context (a counterpart to COItem, whose relationships are represented 
+ * as Objective-C pointers instead of UUIDs).
  *
- * An COObject instance is described by a metamodel (see -entityDescription) and 
- * owned by an object graph context. The object graph context is usually 
- * owned by a branch if persistent, or standalone if transient. In the latter 
- * case -[COObject branch] and -[COObject persistentRoot] returns nil.
+ * A COObject instance is a generic model object described by a metamodel (see 
+ * -entityDescription), and its lifecycle is managed by a COObjectGraphContext.
+ *
+ * For a persistent object, a -branch owns the -objectGraphContext.
+ *
+ * For a transient object, the -objectGraphContext is standalone, -branch and 
+ * -persistentRoot return nil.
  *
  * From COEditingContext to COObject, there is a owner chain where each element 
  * owns the one just below in the list:
@@ -34,14 +37,15 @@
  * </list>
  *
  * The COObject class itself can represent objects with any entity description,
- * but you can also make subclasses of COObject for a particular entity
- * to get static type checking.
+ * but you can also make subclasses of COObject for a particular entity to get 
+ * static type checking.
  *
- * @section Initialization
+ * @section Creation
  *
- * A core object can be instantiated by using -initWithObjectGraphContext: or 
- * some other initializer (-init is not supported). The resulting object is 
- * a inner object that belongs to the object graph context.
+ * A persistent or transient object can be instantiated by using 
+ * -initWithObjectGraphContext: or some other initializer (-init is not 
+ * supported). The resulting object is a inner object that belongs to the object 
+ * graph context.
  *
  * For a transient object graph context, you can later use 
  * -[COEditingContext insertPersistentRootWithRootObject:] to turn an existing 
@@ -76,6 +80,17 @@
  * initialization time and releases them at deallocation time (you can access 
  * these collections using -valueForVariableStorageKey: in your subclass 
  * initializers).
+ *
+ * @section Deletion
+ *
+ * An inner object is deleted, when it becomes unreachable from the root object 
+ * in the -objectGraphContext. 
+ *
+ * It is never explicitly deleted, instead this object must be removed in a 
+ * collection or a relationship, and once this object doesn't belong to any 
+ * collection or relationship that can be accessed from the root object, it 
+ * is declared as unreachable, and will be deleted by the COObjectGraphContext  
+ * garbage collection (usually on a future commit).
  *
  * @section Writing Accessors
  *
@@ -191,60 +206,139 @@
  * To access incoming relationships when no accessors are available, just 
  * use -valueForProperty: as you would do it for other properties.
  *
- * @section Notifications
+ * @section Serialization and Metamodel
  *
- * To better control persistency, -awakeFromDeserialization, -didReload, -willTurnIntoFault
+ * At commit time, all the inner objects in a COObjectGraphContext are 
+ * serialized into an intermediate COItem representation with COItemGraph 
+ * protocol. 
  *
- * @section Serialization
+ * At serialization time, each object is turned into a COItem with 
+ * -[COObject storeItem]. At deserialization, a COItem is passed to 
+ * -[COObject setStoreItem:] to recreate the object state.
  *
- * @section Faulting and Reloading
+ * All properties declared as persistent (see -[ETPropertyDescription isPersistent]) 
+ * in the metamodel are serialized, transient properties are skipped. 
+ * For transient properties, COObject don't manage them in any way, but just 
+ * ensure their values respect the metamodel constraints (in 
+ * -didChangeValueForProperty:). 
  *
- * When a core object not present in memory but exists in the store, 
- * -[COEditingContext objectWithUUID:] uses -[COEditingContext loadObject:] to 
- * bring the object back in memory. All the attribute values are immediately 
- * brought back, however relationships are not loaded immediately. For example, 
- * if a relationship consists of multiple objects that belong to an array, 
- * CoreObject doesn't load the real objects missing in memory, but put a COFault 
- * object in the array for each real object not yet loaded.<br /> 
- * Faults are core objects whose state remain unitialized until a message is 
- * sent to them.
+ * For persistent properties, COObject supports both relationships to other 
+ * inner objects, and attributes that contain primitive objects such as 
+ * NSString or NSDate.
  *
- * Each fault has the same UUID than the core object it stands for. As a result, 
- * when requesting multiple times the same object not present in memory, 
- * the same fault instance is returned every time by 
- * -[COEditingContext objectWithUUID:].
+ * Both attributes and relationships can be either univalued or multivalued 
+ * (to-one or to-many), see -[ETPropertyDescription isMultivalued] in the 
+ * metamodel.
  *
- * When an object that was previously a fault is loaded, then once the 
- * attribute values have been deserialized, -awakeFromDeserialization is sent to the 
- * object to let it update its state before being used. You can thus override 
- * -awakeFromDeserialization to recreate transient properties, recompute correct property 
- * values based on the deserialized values, etc. But you must not access or 
- * update persistent relationships in -awakeFromDeserialization directly. You can override 
- * -didLoad to manipulate persistent relationships in a such way.<br />
- * Loading an object can result in multiple objects being loaded if some 
- * relationships are unfaulted. For example, an accessor can depend on or alter 
- * a relationship object state (e.g. a parent object in a tree structure). 
- * Although you should avoid to do so, in some cases it cannot be avoided. 
- * To give a more concrete example in EtoileUI, -[ETLayoutItem setView:] uses   
- * -[ETLayoutItemGroup handleAttacheViewOfItem:] to adjust the parent view.<br />
- * For -loadObject:, the loaded object and all the relationships transitively 
- * loaded receive -awakeFromDeserialization, then at the very end -didLoad is called. At 
- * this point, you can be sure the objects are not in a partially 
- * initialized/deserialized state.<br />
- * Don't forget to call the superclass implementation first for both 
- * -awakeFromDeserialization and -didLoad.<br />
- * In addition, navigating a root object history results in -awakeFromDeserialization 
- * being sent to each object loaded to a new revision in the object graph (not 
- * yet the case), rather being turned back into a fault. When every object in 
- * the object graph has been reloaded or turned back into fault, -didReload is 
- * sent to the root object.
+ * Relationships can be either undirectional or bidirectional (one-way or two-way). 
+ * To create a bidirectional relationships, -[ETPropertyDescription opposite] 
+ * must be set on one side. The other side or opposite is the inverse 
+ * relationship. For a bidirectional relationship, a single side can be marked 
+ * as persistent, the other side must be transient. The persistent side is 
+ * known as an outgoing relationship, and the transient side as an incoming 
+ * relationship. CoreObject doesn't load incoming relationships into each 
+ * COObject, but load them in the relationship cache. This rule doesn't apply 
+ * to transient relationships.
  *
- * For various reasons such as memory usage or root objects being reloaded to  
- * some revision, core objects can be turned back into faults (not yet supported).
- * Before unloading an object, -willTurnIntoFault is called on it, then the 
- * object is unloaded (property values are released and reset to a null value), 
- * in the end COFault becomes its class and the resulting fault receives 
- * the message -didTurnIntoFault.
+ * With metamodel constraints, CoreObject supports several multivalued 
+ * relationship variations:
+ *
+ * <deflist>
+ * <term>Keyed Relationship</term><desc>hold in a NSDictionary 
+ * – -[ETPropertyDescription isKeyed] == YES in the metamodel</desc>
+ * <term>Ordered Relationship</term><desc>hold in a NSArray 
+ * — -[ETPropertyDescription isOrdered] == YES in the metamodel</desc>
+ * <term>Unordered Relationship</term><desc>hold in a NSSet 
+ * — -[ETPropertyDescription isOrdered] ==  NO in the metamodel</desc>
+ * </deflist>
+ * *
+ * <deflist>
+ * <term>Unidirectional Relationship</term><desc>a one-way relationship 
+ * – -[ETPropertyDescription opposite] == nil in the metamodel</desc>
+ * <term>Bidirectional Relationship</term><desc>a two-way relationship 
+ * – -[ETPropertyDescription opposite != nil in the metamodel</desc>
+ * <term>Composite Relationship</term><desc>a parent/child relationship 
+ * – -[[ETPropertyDescription multivalued] is not the same on both side</desc>
+ * </deflist>
+ *
+ * A persistent keyed relationship is undirectional, 
+ * -[ETPropertyDescription opposite] must be nil.
+ *
+ * A composite relationsip is just a bidirectional relationship subcase, it 
+ * models a tree structure inside the object graph, and in this way, a 
+ * composite determines how the object graph is copied. A composite object 
+ * (or child object) is copied rather than aliased when the tree structure it 
+ * belongs to is copied.
+ *
+ * With metamodel constraints, CoreObject supports several variations over 
+ * attribute collections:
+ *
+ * <deflist>
+ * <term>Keyed Collection</term><desc>hold in a NSDictionary 
+ * – -[ETPropertyDescription isKeyed] == YES in the metamodel</desc>
+ * <term>Ordered Collection</term><desc>hold in a NSArray 
+ * — -[ETPropertyDescription isOrdered] == YES in the metamodel</desc>
+ * <term>Unordered Collection</term><desc>hold in a NSSet 
+ * — -[ETPropertyDescription isOrdered] ==  NO in the metamodel</desc>
+ * </deflist>
+ *
+ * For relationships or attribute collections, both ordered and unordered, 
+ * duplicates are not allowed, and if the same object is inserted twice in a 
+ * collection, CoreObject will remove the previous reference to this object in 
+ * the collection.
+ *
+ * A keyed relationship or attribute collection is unordered,  
+ * -[ETPropertyDescription isOrdered] must be NO. This restriction applies to 
+ * transient properties too currently.
+ *
+ * Note: If a collection is a relationship or an attribute collection is 
+ * controlled by -[ETPropertyDescription type], and whether this entity 
+ * description return YES to -[ETEntityDescription isPrimitive]. You can 
+ * override -[ETEntityDescription isPrimitive] in a ETEntityDescription 
+ * subclass to declare new attribute objects in the metamodel. However 
+ * CoreObject will treat all COObject instances as relationships internally, 
+ * since CoreObject serialized format has a fixed set of attribute types (see 
+ * COType).
+ * 
+ *
+ * @section Object Graph Loading
+ *
+ * When a persistent root's root object is accessed, the entire object graph 
+ * bound to it is loaded (if the root object is not present in memory).
+ *
+ * When a persistent inner object is loaded, once the attribute values have 
+ * been deserialized, -awakeFromDeserialization is sent to the object to let it 
+ * update its state before being used. You can thus override 
+ * -awakeFromDeserialization to recreate transient properties, recompute 
+ * correct property values based on the deserialized values, etc. But you must 
+ * not access or update persistent relationships in -awakeFromDeserialization 
+ * directly. 
+ *
+ * You can override -didLoadObjectGraph to manipulate persistent relationships 
+ * in a such way. Loading a persistent object usually result in the other inner 
+ * objects being loaded, and -didLoadObjectGraph is sent to all the inner 
+ * objects once all these objects have been loaded. 
+ *
+ * Although you should avoid to override -didLoadObjectGraph, in some cases it 
+ * cannot be avoided. For example, an accessor can depend on or alter the state 
+ * of a relationship (e.g. a parent object in a tree structure). To give a more 
+ * concrete example, in EtoileUI -[ETLayoutItem setView:] uses 
+ * -[ETLayoutItemGroup handleAttacheViewOfItem:] to adjust the parent view, so 
+ * -[ETLayoutItem setView:] cannot be used until the parent item is loaded.
+ *
+ * @section Model Validation
+ *
+ * At commit time, all the changed objects are validated with -validate. You can 
+ * override this method to implement some custom validation logic per COObject 
+ * subclass. By default, the object will be validated with the model validation 
+ * logic packaged with the metamodel, -validateAllValues will check each 
+ * property value with the validation rules provided by 
+ * -[ETPropertyDescription role] and -[ETRoleDescription validateValue:forKey:].
+ *
+ * Note: -validateAllValues currently doesn't check that the property values 
+ * respect the constraints set on their related property descriptions. 
+ * For now, CoreObject enforces these metamodel constraints in 
+ * -didChangeValueForProperty:.
  */
 @interface COObject : NSObject <COObjectMatching>
 {
