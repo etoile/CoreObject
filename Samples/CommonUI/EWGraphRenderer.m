@@ -250,20 +250,6 @@
 	}
 }
 
-//- (void) buildBranchForRevisionUUID
-//{
-//	branchHeadForRevisionUUID = [NSMutableDictionary new];
-//	branchCurrentForRevisionUUID = [NSMutableDictionary new];
-//	
-//	for (COBranch *branch in track.branches)
-//	{
-//		if (branch.headRevision != nil)
-//			branchHeadForRevisionUUID[branch.headRevision.UUID] = branch;
-//		if (branch.currentRevision != nil)
-//			branchCurrentForRevisionUUID[branch.currentRevision.UUID] = branch;
-//	}
-//}
-
 - (void) updateWithTrack: (id<COTrack>)aTrack
 {
 	track = aTrack;
@@ -290,38 +276,6 @@
 }
 
 #pragma mark - Drawing
-
-static void EWDrawHorizontalArrowOfLength(CGFloat length)
-{
-	const CGFloat cap = 8;
-	NSBezierPath *path = [NSBezierPath bezierPath];
-	[path moveToPoint: NSMakePoint(0, 0)];
-	[path lineToPoint: NSMakePoint(length - cap, 0)];
-	[path stroke];
-	
-	[path removeAllPoints];
-	[path moveToPoint: NSMakePoint(length - cap, cap / 2.0)];
-	[path lineToPoint: NSMakePoint(length - cap, cap / -2.0)];
-	[path lineToPoint: NSMakePoint(length, 0)];
-	[path closePath];
-	[path fill];
-}
-
-#define EWRandFloat() (rand()/(CGFloat)(RAND_MAX))
-
-static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
-{
-	[NSGraphicsContext saveGraphicsState];
-	
-	NSAffineTransform *xform = [NSAffineTransform transform];
-	[xform translateXBy:p1.x yBy:p1.y];
-	[xform rotateByRadians: atan2(p2.y-p1.y, p2.x-p1.x)];
-	[xform concat];
-	
-	EWDrawHorizontalArrowOfLength(sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2)));
-	
-	[NSGraphicsContext restoreGraphicsState];
-}
 
 - (NSRect) circleRectAtLevel: (NSInteger)level inRect: (NSRect)aRect
 {
@@ -386,7 +340,6 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 	{
 		[[NSColor blueColor] set];
 	}
-	
 
 	// Draw lines
 	
@@ -408,20 +361,5 @@ static void EWDrawArrowFromTo(NSPoint p1, NSPoint p2)
 	
 	[NSGraphicsContext restoreGraphicsState];
 }
-
-//- (NSArray *) branchesForIndex: (NSUInteger) index
-//{
-//	NSMutableArray *result = [NSMutableArray new];
-//	ETUUID *revUUID = [[self revisionAtIndex: index] UUID];
-//	
-//	if (revUUID != nil)
-//	{
-//		if (branchHeadForRevisionUUID[revUUID] != nil)
-//			[result addObject: branchHeadForRevisionUUID[revUUID]];
-//		if (branchCurrentForRevisionUUID[revUUID] != nil)
-//			[result addObject: branchCurrentForRevisionUUID[revUUID]];
-//	}
-//	return result;
-//}
 
 @end
