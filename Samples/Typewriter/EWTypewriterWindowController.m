@@ -438,7 +438,8 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 		affectedText = [affectedText stringByAppendingString:
 						[[[aTextView textStorage] string] substringWithRange: affectedCharRange]];
 	
-	replacementText = [replacementText stringByAppendingString: replacementString];
+	if ([replacementString length] > 0)
+		replacementText = [replacementText stringByAppendingString: replacementString];
 	
 	return YES;
 }
