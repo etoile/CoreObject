@@ -522,17 +522,19 @@ static NSString *Trim(NSString *text)
 
 - (void) coalescingTimer: (NSTimer *)timer
 {
-	NSLog(@"Breaking coalescing...");
-	
-	[self commitTextChangesAsCheckpoint: YES];
-	
-	[[self undoTrack] endCoalescing];
-	[[self undoTrack] beginCoalescing];
-	
-	[coalescingTimer invalidate];
-	coalescingTimer = nil;
-	affectedText = nil;
-	replacementText = nil;
+	if ([[self undoTrack] isCoalescing])
+	{
+		NSLog(@"Breaking coalescing...");
+		
+		[self commitTextChangesAsCheckpoint: YES];
+		
+		[[self undoTrack] endCoalescing];
+
+		[coalescingTimer invalidate];
+		coalescingTimer = nil;
+		affectedText = nil;
+		replacementText = nil;
+	}
 }
 
 
