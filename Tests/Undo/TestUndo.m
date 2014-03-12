@@ -693,6 +693,25 @@
 	[self checkCommand: _testTrack.nodes[4] isSetVersionFrom: r5 to: r6];
 }
 
+- (void)testUndoDisablesCoalescing
+{
+    OutlineItem *item = [[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"] rootObject];
+    [ctx commit];
+	
+	[_testTrack beginCoalescing];
+
+	UKTrue([_testTrack isCoalescing]);
+		
+	item.label = @"a";
+	[ctx commitWithUndoTrack: _testTrack];
+
+	UKTrue([_testTrack isCoalescing]);
+	
+	[_testTrack undo];
+	
+	UKFalse([_testTrack isCoalescing]);
+}
+
 - (void) testSelectiveUndoCommitDescriptor
 {
 	UKNotNil([COCommitDescriptor registeredDescriptorForIdentifier: @"org.etoile.CoreObject.selective-undo"]);

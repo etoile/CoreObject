@@ -153,6 +153,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 
 - (BOOL)setCurrentNode: (id <COTrackNode>)node
 {
+	[self endCoalescing];
 	const NSUInteger currentIndex = [_nodesOnCurrentUndoBranch indexOfObject: [self currentNode]];
 	const NSUInteger targetIndex = [_nodesOnCurrentUndoBranch indexOfObject: node];
 	
