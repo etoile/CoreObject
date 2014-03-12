@@ -30,6 +30,6 @@
 - (id<COTrackNode>) revisionAtIndex: (NSUInteger)index;
 - (void) drawRevisionAtIndex: (NSUInteger)index inRect: (NSRect)aRect;
 
-@property (nonatomic, readwrite, weak) id<EWGraphRendererDelegate> delegate;
+@property (nonatomic, readwrite, unsafe_unretained) id<EWGraphRendererDelegate> delegate;
 
 @end
