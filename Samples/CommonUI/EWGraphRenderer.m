@@ -333,7 +333,7 @@
 {
 	[NSGraphicsContext saveGraphicsState];
 	
-	[[NSBezierPath bezierPathWithRect: aRect] setClip];
+	[[NSBezierPath bezierPathWithRect: aRect] addClip];
 	
 	id <COTrackNode> revisionInfo = trackNodesChronological[index];
 	ETUUID *commit = [revisionInfo UUID];
