@@ -189,6 +189,11 @@ doesNotPostNotification: (NSString *)notif
 + (void) willRunTestSuite
 {
 	[SQLiteStoreTestCase deleteStore];
+
+	// NOTE: We are about to initialize every loaded class. Make sure
+	// NSApplication is created first or various other gui classes on GNUstep
+	// will throw exceptions.
+	[NSApplication sharedApplication];
 }
 
 + (void) didRunTestSuite
