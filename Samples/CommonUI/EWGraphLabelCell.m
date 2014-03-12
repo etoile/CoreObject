@@ -1,3 +1,10 @@
+/*
+	Copyright (C) 2014 Eric Wasylishen
+ 
+	Date:  February 2014
+	License:  MIT  (see COPYING)
+ */
+
 #import "EWGraphLabelCell.h"
 
 @implementation EWGraphLabelCell
