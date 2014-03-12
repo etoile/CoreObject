@@ -59,10 +59,25 @@
 	return self;
 }
 
++ (NSURL *) defaultDocumentURL
+{
+	NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+	
+    NSString *dir = [[[libraryDirs objectAtIndex: 0]
+                      stringByAppendingPathComponent: @"CoreObjectTypewriter"]
+					 stringByAppendingPathComponent: @"Store.coreobjectstore"];
+	
+    [[NSFileManager defaultManager] createDirectoryAtPath: dir
+                              withIntermediateDirectories: YES
+                                               attributes: nil
+                                                    error: NULL];
+	
+	return [NSURL fileURLWithPath: dir isDirectory: YES];
+}
+
 - (id)init
 {
-    [NSException raise: NSIllegalSelectorException format: @"use -initWithPersistentRoot:, not -init"];
-    return nil;
+    return [self initWithStoreURL: [[self class] defaultDocumentURL]];
 }
 
 #pragma mark - NSDocument overrides

@@ -13,30 +13,13 @@
 
 @implementation EWAppDelegate
 
-+ (NSURL *) defaultDocumentURL
-{
-	NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-	
-    NSString *dir = [[[libraryDirs objectAtIndex: 0]
-                      stringByAppendingPathComponent: @"CoreObjectTypewriter"]
-						stringByAppendingPathComponent: @"Store.coreobjectstore"];
-	
-    [[NSFileManager defaultManager] createDirectoryAtPath: dir
-                              withIntermediateDirectories: YES
-                                               attributes: nil
-                                                    error: NULL];
-
-	return [NSURL fileURLWithPath: dir isDirectory: YES];
-}
-
 - (void) applicationDidFinishLaunching: (NSNotification*)notif
 {
-	[self makeDocument];
 }
 
 - (void) makeDocument
 {
-	EWDocument *doc = [[EWDocument alloc] initWithStoreURL: [EWAppDelegate defaultDocumentURL]];
+	EWDocument *doc = [[EWDocument alloc] init];
 	[[NSDocumentController sharedDocumentController] addDocument: doc];
 	[doc makeWindowControllers];
 	[doc showWindows];
@@ -58,7 +41,7 @@
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
-    return NO;
+    return YES;
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
