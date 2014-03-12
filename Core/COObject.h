@@ -39,6 +39,16 @@
  * The COObject class itself can represent objects with any entity description,
  * but you can also make subclasses of COObject for a particular entity to get 
  * static type checking.
+ * 
+ * @section Common Use Cases
+ *
+ * For an existing persistent root or transient object graph context, 
+ * -initWithObjectGraphContext: is used to create additional inner objects. 
+ *
+ * To navigate the object graph, access or change the state of these objects,
+ * -valueForProperty: and -setValue:forProperty: are available. For instances 
+ * of COObject subclasses that declare synthesized properties, you should use 
+ * these accessors rather than those Property-Value Coding methods.
  *
  * @section Creation
  *
@@ -48,19 +58,20 @@
  * graph context.
  *
  * For a transient object graph context, you can later use 
- * -[COEditingContext insertPersistentRootWithRootObject:] to turn an existing 
+ * -[COEditingContext insertNewPersistentRootWithRootObject:] to turn an existing 
  * inner object into a root object (the object graph context becoming persistent).
  *
  * You can instantiate also a new persistent root and retrieve its root object 
- * by using -[COEditingContext insertPersistentRootWithEntityName:] or similar 
+ * by using -[COEditingContext insertNewPersistentRootWithEntityName:] or similar 
  * COEditingContext methods.
  *
- * When writing a COObject subclass, -initWithObjectGraphContext can be 
- * overriden to initialize the the subclass properties.<br />
+ * When writing a COObject subclass, -initWithObjectGraphContext: can be 
+ * overriden to initialize the the subclass properties.
+ *
  * The designated initializer rule remains valid in the COObject class hierarchy, 
  * but -initWithObjectGraphContext: must work correctly too (it must never return 
  * nil or a wrongly initialized instance), usually you have to override it to 
- * call the designated initializer.<br />
+ * call the designated initializer.
  * All secondary initializers (inherited or not) must return valid instances or 
  * nil. The easiest way to comply is described below:
  *
@@ -73,13 +84,7 @@
  * Don't create singletons for COObject subclass in +initialize, because 
  * -[COObject entityDescription] would return nil.
  *
- * For multivalued properties stored in instance variables, you are responsible 
- * to allocate the collections in each COObject subclass designed initializer, 
- * and to release them in -dealloc (or use ARC). If a multivalued property is
- * stored in the variable storage, COObject allocates the collections at 
- * initialization time and releases them at deallocation time (you can access 
- * these collections using -valueForVariableStorageKey: in your subclass 
- * initializers).
+ * For the property initialization rules, see Properties section.
  *
  * @section Deletion
  *
@@ -92,6 +97,30 @@
  * is declared as unreachable, and will be deleted by the COObjectGraphContext  
  * garbage collection (usually on a future commit).
  *
+ * @section Properties
+ *
+ * By default, COObject stores its properties in a variable storage, similar to 
+ * a dictionary. In the rare cases, where the variable storage is too slow, 
+ * properties can be stored in instance variables. 
+ *
+ * In a COObject subclass implementation, the variable storage can be accessed 
+ * with -valueForVariableStorageKey: and -setValue:forVariableStorageKey:. You 
+ * must not access the properties with these methods from other objects, this 
+ * is the same than a direct instance variable access. For reading and writing 
+ * properties, you must use accessors (synthesized or hand-written ones), or 
+ * -valueForProperty: and -setValue:forProperty: (known as Property-Value 
+ * Coding).
+ *
+ * For multivalued properties stored in instance variables, you are responsible 
+ * to allocate the collections in each COObject subclass designed initializer, 
+ * and to release them in -dealloc (or use ARC). If a multivalued property is
+ * stored in the variable storage, COObject allocates the collections at 
+ * initialization time and releases them at deallocation time (you can access 
+ * these collections using -valueForVariableStorageKey: in your subclass 
+ * initializers).
+ *
+ * For explanations about accessors, see Writing Accessors section.
+ *
  * @section Writing Accessors
  *
  * You can use Property-Value Coding to read and write properties. However 
@@ -99,6 +128,18 @@
  * most attributes, we have a basic accessor pattern. For Multivalued properties 
  * (relationships or collection-based attributes), the basic accessor pattern 
  * won't work correctly.
+ *
+ * For a COObject subclass, CoreObject will synthesize attribute accessors at 
+ * run-time, if the property is declared <em>@dynamic</em> on the 
+ * implementation side. For now, CoreObject doesn't synthesize 
+ * collection-compliant accessors (such as Key-Value Coding collection 
+ * accessors) beside <em>set</em> and <em>get</em>, all collection mutation 
+ * methods must be hand-written based on the Multivalued Accessor Pattern. 
+ *
+ * Note: For a COObject subclass such as COCollection that holds a single 
+ * collection, the subclass can conform to ETCollection and ETCollectionMutation 
+ * protocols, and adopt their related traits, in this way no dedicated accessors 
+ * need to be implemented.
  *
  * <strong>Basic Accessor Pattern</strong>
  *
@@ -245,20 +286,20 @@
  *
  * <deflist>
  * <term>Keyed Relationship</term><desc>hold in a NSDictionary 
- * – -[ETPropertyDescription isKeyed] == YES in the metamodel</desc>
+ * – <em>-[ETPropertyDescription isKeyed] == YES in the metamodel</em></desc>
  * <term>Ordered Relationship</term><desc>hold in a NSArray 
- * — -[ETPropertyDescription isOrdered] == YES in the metamodel</desc>
+ * – <em>-[ETPropertyDescription isOrdered] == YES in the metamodel</em></desc>
  * <term>Unordered Relationship</term><desc>hold in a NSSet 
- * — -[ETPropertyDescription isOrdered] ==  NO in the metamodel</desc>
+ * – <em>-[ETPropertyDescription isOrdered] ==  NO in the metamodel</em></desc>
  * </deflist>
- * *
+ *
  * <deflist>
  * <term>Unidirectional Relationship</term><desc>a one-way relationship 
- * – -[ETPropertyDescription opposite] == nil in the metamodel</desc>
+ * – <em>-[ETPropertyDescription opposite] == nil in the metamodel</em></desc>
  * <term>Bidirectional Relationship</term><desc>a two-way relationship 
- * – -[ETPropertyDescription opposite != nil in the metamodel</desc>
+ * – <em>-[ETPropertyDescription opposite != nil in the metamodel</em></desc>
  * <term>Composite Relationship</term><desc>a parent/child relationship 
- * – -[[ETPropertyDescription multivalued] is not the same on both side</desc>
+ * – <em>-[[ETPropertyDescription multivalued] is not the same on both side</em></desc>
  * </deflist>
  *
  * A persistent keyed relationship is undirectional, 
@@ -275,11 +316,11 @@
  *
  * <deflist>
  * <term>Keyed Collection</term><desc>hold in a NSDictionary 
- * – -[ETPropertyDescription isKeyed] == YES in the metamodel</desc>
+ * – <em>-[ETPropertyDescription isKeyed] == YES in the metamodel</em></desc>
  * <term>Ordered Collection</term><desc>hold in a NSArray 
- * — -[ETPropertyDescription isOrdered] == YES in the metamodel</desc>
+ * – <em>-[ETPropertyDescription isOrdered] == YES in the metamodel</em></desc>
  * <term>Unordered Collection</term><desc>hold in a NSSet 
- * — -[ETPropertyDescription isOrdered] ==  NO in the metamodel</desc>
+ * – <em>-[ETPropertyDescription isOrdered] ==  NO in the metamodel</em></desc>
  * </deflist>
  *
  * For relationships or attribute collections, both ordered and unordered, 
