@@ -17,6 +17,7 @@
 		6043D4D31757B4F9002103CC /* COCommitDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 6043D4C717575D79002103CC /* COCommitDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
 		6048468818B6C245006E4EDC /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048465518B6C03E006E4EDC /* UnitKit.framework */; };
+		6059E2BB18D0C4190047D27D /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60884D401837B09800C5C7C9 /* AppKit.framework */; };
 		606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 606E3DBF1787A07E00ED42DA /* COSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 606E3DC01787A07E00ED42DA /* COSerialization.m */; };
 		607335B418AB96A6008A02DC /* COSmartGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 607335B218AB96A6008A02DC /* COSmartGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -384,13 +385,6 @@
 			remoteGlobalIDString = 602E12AE18B3A10E004F171B;
 			remoteInfo = "EtoileFoundation (iOS)";
 		};
-		6048464918B6C03E006E4EDC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 602E13A818B3A836004F171B;
-			remoteInfo = "PlugInExample (iOS)";
-		};
 		6048465418B6C03E006E4EDC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3D01D08A1646BEF400917AC8 /* UnitKit.xcodeproj */;
@@ -439,6 +433,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 60E23C0818B5134100CE38D0;
 			remoteInfo = "TestUnitKit (iOS)";
+		};
+		6059E2C118D0C4190047D27D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 609A557718C209FE0096927F;
+			remoteInfo = "TestEtoileFoundation (iOS)";
 		};
 		60C8BC20163223D300A2B4EE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -950,6 +951,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6059E2BB18D0C4190047D27D /* AppKit.framework in Frameworks */,
 				66E6820918B6E035003294EB /* UnitKit.framework in Frameworks */,
 				66550BFE17D51D0300327657 /* EtoileFoundation.framework in Frameworks */,
 				66550BF917D51CBD00327657 /* CoreObject.framework in Frameworks */,
@@ -1059,7 +1061,7 @@
 			children = (
 				6048465518B6C03E006E4EDC /* UnitKit.framework */,
 				6048465718B6C03E006E4EDC /* ukrun */,
-				6048465918B6C03E006E4EDC /* UnitKitTests.bundle */,
+				6048465918B6C03E006E4EDC /* TestUnitKit.bundle */,
 				6048465B18B6C03E006E4EDC /* TestBundle.bundle */,
 				6048465D18B6C03E006E4EDC /* TestFramework.framework */,
 				6048465F18B6C03E006E4EDC /* libUnitKit.a */,
@@ -1093,7 +1095,7 @@
 				60FB087F13C3066300C2AB94 /* TestEtoileFoundation.bundle */,
 				60C8BC21163223D300A2B4EE /* PlugInExample.plugin */,
 				6048464818B6C03E006E4EDC /* libEtoileFoundation.a */,
-				6048464A18B6C03E006E4EDC /* PlugInExample.plugin */,
+				6059E2C218D0C4190047D27D /* TestEtoileFoundation.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2073,13 +2075,6 @@
 			remoteRef = 6048464718B6C03E006E4EDC /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		6048464A18B6C03E006E4EDC /* PlugInExample.plugin */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = PlugInExample.plugin;
-			remoteRef = 6048464918B6C03E006E4EDC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		6048465518B6C03E006E4EDC /* UnitKit.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -2094,10 +2089,10 @@
 			remoteRef = 6048465618B6C03E006E4EDC /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		6048465918B6C03E006E4EDC /* UnitKitTests.bundle */ = {
+		6048465918B6C03E006E4EDC /* TestUnitKit.bundle */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = UnitKitTests.bundle;
+			path = TestUnitKit.bundle;
 			remoteRef = 6048465818B6C03E006E4EDC /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -2127,6 +2122,13 @@
 			fileType = wrapper.application;
 			path = TestUnitKit.app;
 			remoteRef = 6048466018B6C03E006E4EDC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		6059E2C218D0C4190047D27D /* TestEtoileFoundation.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = TestEtoileFoundation.app;
+			remoteRef = 6059E2C118D0C4190047D27D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		60C8BC21163223D300A2B4EE /* PlugInExample.plugin */ = {
