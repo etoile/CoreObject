@@ -52,15 +52,16 @@
 	
 	if ([[tableColumn identifier] isEqual: @"name"])
     {
-        NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: persistentRoot.metadata];
+		NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: persistentRoot.metadata];
 		
 		NSString *oldName = md[@"label"] != nil ? md[@"label"] : @"";
 		NSString *newName = [object stringValue] != nil ? [object stringValue] : @"";
 		
 		md[@"label"] = newName;
-		persistentRoot.metadata = md;
 		
-		[self.owner commitWithIdentifier: @"rename-note" descriptionArguments: @[oldName, newName]];
+		[self.owner commitChangesInBlock: ^{
+			persistentRoot.metadata = md;
+		} withIdentifier: @"rename-note" descriptionArguments: @[oldName, newName]];
     }
 }
 

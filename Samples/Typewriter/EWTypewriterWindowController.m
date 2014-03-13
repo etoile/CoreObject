@@ -263,41 +263,49 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	COTagGroup *targetTagGroup = [self tagGroupOfSelectedRow];
 	if (targetTagGroup == nil)
 		targetTagGroup = [self defaultTagGroup];
-		
-	COTag *newTag = [[COTag alloc] initWithObjectGraphContext: [[self tagLibrary] objectGraphContext]];
-	newTag.name = @"New Tag";
-	[targetTagGroup addObject: newTag];
+
+	__block COTag *newTag = nil;
 	
-	[self commitWithIdentifier: @"add-tag" descriptionArguments: @[]];
+	[self commitChangesInBlock: ^{
+		newTag = [[COTag alloc] initWithObjectGraphContext: [[self tagLibrary] objectGraphContext]];
+		newTag.name = @"New Tag";
+		[targetTagGroup addObject: newTag];
+	} withIdentifier: @"add-tag" descriptionArguments: @[]];
 	[tagListDataSource setNextSelection: [[EWTagGroupTagPair alloc] initWithTagGroup: targetTagGroup.UUID tag:newTag.UUID]];
 	[tagListDataSource reloadData];
 }
 
 - (IBAction) addTagGroup:(id)sender
 {
-	COTagGroup *newTagGroup = [[COTagGroup alloc] initWithObjectGraphContext: [[self tagLibrary] objectGraphContext]];
-	newTagGroup.name = @"New Tag Group";
-	[[[self tagLibrary] mutableArrayValueForKey: @"tagGroups"] addObject: newTagGroup];
+	__block COTagGroup *newTagGroup = nil;
 	
-	[self commitWithIdentifier: @"add-tag-group" descriptionArguments: @[]];
+	[self commitChangesInBlock: ^{
+		newTagGroup = [[COTagGroup alloc] initWithObjectGraphContext: [[self tagLibrary] objectGraphContext]];
+		newTagGroup.name = @"New Tag Group";
+		[[[self tagLibrary] mutableArrayValueForKey: @"tagGroups"] addObject: newTagGroup];
+	} withIdentifier: @"add-tag-group" descriptionArguments: @[]];
+	
 	[tagListDataSource setNextSelection: [[EWTagGroupTagPair alloc] initWithTagGroup: newTagGroup.UUID tag:nil]];
 	[tagListDataSource reloadData];
 }
 
 - (IBAction) addNote:(id)sender
 {
-	COPersistentRoot *newNote = [self.editingContext insertNewPersistentRootWithEntityName: @"TypewriterDocument"];
-	NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: newNote.metadata];
-	[md addEntriesFromDictionary: @{ @"label" : @"Untitled Note" }];
-	newNote.metadata = md;
+	__block COPersistentRoot *newNote = nil;
 	
-	COTag *currentTag = [self clickedOrSelectedTag];
-	if (currentTag != nil)
-	{
-		[currentTag addObject: [newNote rootObject]];
-	}
+	[self commitChangesInBlock: ^{
+		COPersistentRoot *newNote = [self.editingContext insertNewPersistentRootWithEntityName: @"TypewriterDocument"];
+		NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: newNote.metadata];
+		[md addEntriesFromDictionary: @{ @"label" : @"Untitled Note" }];
+		newNote.metadata = md;
+		
+		COTag *currentTag = [self clickedOrSelectedTag];
+		if (currentTag != nil)
+		{
+			[currentTag addObject: [newNote rootObject]];
+		}
+	} withIdentifier: @"add-note" descriptionArguments: @[]];
 	
-	[self commitWithIdentifier: @"add-note" descriptionArguments: @[]];
 	[noteListDataSource setNextSelection: newNote.UUID];
 	[noteListDataSource reloadData];
 }
@@ -311,22 +319,24 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 			return;
 		
 		COPersistentRoot *selectedPersistentRoot = selections[0];
-		COPersistentRoot *copyOfSelection = [selectedPersistentRoot.currentBranch makePersistentRootCopy];
-
-		NSString *sourceLabel = selectedPersistentRoot.metadata[@"label"];
-		
-		NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: copyOfSelection.metadata];
-		[md addEntriesFromDictionary: @{ @"label" : [NSString stringWithFormat: @"Copy of %@", sourceLabel] }];
-		copyOfSelection.metadata = md;
-		
-		// Also give it the selected tag
-		COTag *selectedTag = [self clickedOrSelectedTag];
-		if (selectedTag != nil)
-		{
-			[selectedTag addObject: [copyOfSelection rootObject]];
-		}
-		
-		[self commitWithIdentifier: @"duplicate-note" descriptionArguments: @[sourceLabel]];
+		__block COPersistentRoot *copyOfSelection = nil;
+		__block NSString *sourceLabel = nil;
+		[self commitChangesInBlock: ^{
+			copyOfSelection = [selectedPersistentRoot.currentBranch makePersistentRootCopy];
+			
+			sourceLabel = selectedPersistentRoot.metadata[@"label"];
+			
+			NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: copyOfSelection.metadata];
+			[md addEntriesFromDictionary: @{ @"label" : [NSString stringWithFormat: @"Copy of %@", sourceLabel] }];
+			copyOfSelection.metadata = md;
+			
+			// Also give it the selected tag
+			COTag *selectedTag = [self clickedOrSelectedTag];
+			if (selectedTag != nil)
+			{
+				[selectedTag addObject: [copyOfSelection rootObject]];
+			}
+	 	} withIdentifier: @"duplicate-note" descriptionArguments: @[sourceLabel]];
 		[noteListDataSource setNextSelection: copyOfSelection.UUID];
 		[noteListDataSource reloadData];
 	}
@@ -354,12 +364,13 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 		
 		COTag *tag = [(NSMenuItem *)sender representedObject];
 		
-		NSLog(@"remove %@ from %@", tag, note);
-		
-		ETAssert([tag containsObject: noteRootObject]);
-		[tag removeObject: noteRootObject];
-		
-		[self commitWithIdentifier: @"untag-note" descriptionArguments: @[[tag name], note.metadata[@"label"]]];
+		[self commitChangesInBlock: ^{
+			NSLog(@"remove %@ from %@", tag, note);
+			
+			ETAssert([tag containsObject: noteRootObject]);
+			[tag removeObject: noteRootObject];
+			
+		}withIdentifier: @"untag-note" descriptionArguments: @[[tag name], note.metadata[@"label"]]];
 	}
 }
 
@@ -381,6 +392,14 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (void) undo
 {
+	if ([selectedNote hasChanges])
+	{
+		// This is kind of confusing: the user has uncommitted typing in the
+		// current note, so commit it, and then immediately undo it.
+		// This lets redo work as expected.
+		[self commitTextChangesAsCheckpoint: NO];
+	}
+	
 	[undoTrack undo];
 }
 - (void) redo
@@ -390,6 +409,10 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (BOOL) canUndo
 {
+	if ([selectedNote hasChanges])
+	{
+		return YES;
+	}
 	return [undoTrack canUndo];
 }
 
@@ -477,8 +500,6 @@ static NSString *Trim(NSString *text)
 	
 	if ([selectedNote.objectGraphContext hasChanges])
 	{
-		[self commitTextChangesAsCheckpoint: NO];
-		
 		if (coalescingTimer != nil)
 		{
 			[coalescingTimer invalidate];
@@ -522,13 +543,13 @@ static NSString *Trim(NSString *text)
 
 - (void) coalescingTimer: (NSTimer *)timer
 {
-	if ([[self undoTrack] isCoalescing])
+	if ([selectedNote hasChanges])
 	{
 		NSLog(@"Breaking coalescing...");
 		
 		[self commitTextChangesAsCheckpoint: YES];
 		
-		[[self undoTrack] endCoalescing];
+		//[[self undoTrack] endCoalescing];
 
 		[coalescingTimer invalidate];
 		coalescingTimer = nil;
@@ -548,16 +569,17 @@ static NSString *Trim(NSString *text)
 	if ([[self window] firstResponder] == notesTable)
 	{
 		NSMutableString *label = [NSMutableString new];
-		for (COPersistentRoot *selectedPersistentRoot in [self selectedNotePersistentRoots])
-		{
-			selectedPersistentRoot.deleted = YES;
-			if (selectedPersistentRoot.metadata[@"label"] != nil)
+				
+		[self commitChangesInBlock: ^{
+			for (COPersistentRoot *selectedPersistentRoot in [self selectedNotePersistentRoots])
 			{
-				[label appendFormat: @" %@", selectedPersistentRoot.metadata[@"label"]];
+				selectedPersistentRoot.deleted = YES;
+				if (selectedPersistentRoot.metadata[@"label"] != nil)
+				{
+					[label appendFormat: @" %@", selectedPersistentRoot.metadata[@"label"]];
+				}
 			}
-		}
-		
-		[self commitWithIdentifier: @"delete-note" descriptionArguments: @[label]];
+		} withIdentifier: @"delete-note" descriptionArguments: @[label]];
 		[noteListDataSource reloadData];
 	}
 	else if ([[self window] firstResponder] == tagsOutline)
@@ -566,16 +588,19 @@ static NSString *Trim(NSString *text)
 		{
 			COTag *tag = [self clickedOrSelectedTag];
 			COTagGroup *tagGroup = [self tagGroupOfSelectedRow];
-			[tagGroup removeObject: tag];
-
-			[self commitWithIdentifier: @"delete-tag" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
+			
+			[self commitChangesInBlock: ^{
+				[tagGroup removeObject: tag];
+			} withIdentifier: @"delete-tag" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
 			[tagListDataSource reloadData];
 		}
 		else if ([self tagGroupOfSelectedRow] != nil)
 		{
 			COTagGroup *tagGroup = [self tagGroupOfSelectedRow];
-			[[[self tagLibrary] mutableArrayValueForKey: @"tagGroups"] removeObject: tagGroup];
-			[self commitWithIdentifier: @"delete-tag-group" descriptionArguments: @[tagGroup.name != nil ? tagGroup.name : @""]];
+			
+			[self commitChangesInBlock: ^{
+				[[[self tagLibrary] mutableArrayValueForKey: @"tagGroups"] removeObject: tagGroup];
+			} withIdentifier: @"delete-tag-group" descriptionArguments: @[tagGroup.name != nil ? tagGroup.name : @""]];
 			[tagListDataSource reloadData];
 		}
 	}
@@ -640,6 +665,32 @@ static NSString *Trim(NSString *text)
 	[noteListDataSource reloadData];
 }
 
+- (void) commitChangesInBlock: (void(^)())aBlock withIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args
+{
+	// First, are there any text changes?
+	if ([selectedNote hasChanges])
+	{
+		NSLog(@"commitChangesInBlock: selected note has text changes, committing them first.");
+		[self commitTextChangesAsCheckpoint: NO];
+	}
+	
+	ETAssert(![selectedNote hasChanges]);
+	
+	aBlock();
+		
+	identifier = [@"org.etoile.Typewriter." stringByAppendingString: identifier];
+	
+	NSMutableDictionary *metadata = [NSMutableDictionary new];
+	if (args != nil)
+		metadata[kCOCommitMetadataShortDescriptionArguments] = args;
+
+	[self.editingContext commitWithIdentifier: identifier
+									 metadata: metadata
+									undoTrack: undoTrack
+										error: NULL];
+}
+
+
 - (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args
 {
 	[self commitWithIdentifier: identifier descriptionArguments: args coalesce: NO isMinorTextEdit: NO];
@@ -655,14 +706,14 @@ static NSString *Trim(NSString *text)
 		
 	metadata[@"minorEdit"] = @(isMinor);
 	
-	if (requestCoalescing && ![[self undoTrack] isCoalescing])
-	{
-		[[self undoTrack] beginCoalescing];
-	}
-	else if (!requestCoalescing && [[self undoTrack] isCoalescing])
-	{
-		[[self undoTrack] endCoalescing];
-	}
+//	if (requestCoalescing && ![[self undoTrack] isCoalescing])
+//	{
+//		[[self undoTrack] beginCoalescing];
+//	}
+//	else if (!requestCoalescing && [[self undoTrack] isCoalescing])
+//	{
+//		[[self undoTrack] endCoalescing];
+//	}
 	
 	[self.editingContext commitWithIdentifier: identifier
 									 metadata: metadata

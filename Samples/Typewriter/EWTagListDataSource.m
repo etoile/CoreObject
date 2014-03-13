@@ -87,16 +87,10 @@
 	NSString *oldName = [treeNodeRepObj name] != nil ? [treeNodeRepObj name] : @"";
 	NSString *newName = [object stringValue] != nil ? [object stringValue] : @"";
 	
-	[(COObject *)treeNodeRepObj setName: object];
-	
-	if ([treeNodeRepObj isTag])
-	{
-		[self.owner commitWithIdentifier: @"rename-tag" descriptionArguments: @[oldName, newName]];
-	}
-	else
-	{
-		[self.owner commitWithIdentifier: @"rename-tag-group" descriptionArguments: @[oldName, newName]];
-	}
+	[self.owner commitChangesInBlock: ^{
+		[(COObject *)treeNodeRepObj setName: object];
+	} withIdentifier: [treeNodeRepObj isTag] ? @"rename-tag" : @"rename-tag-group"
+descriptionArguments: @[oldName, newName]];
 }
 
 - (EWTagGroupTagPair *)tagGroupTagPairForTreeNode: (NSTreeNode *)treeNode
@@ -241,27 +235,27 @@
 		COTag *tag = [[[self.owner tagLibrary] objectGraphContext] loadedObjectForUUID: [ETUUID UUIDWithString: plist]];
 		ETAssert(tag != nil);
 		
-		[tagGroup addObject: tag];
-		
-		[self.owner commitWithIdentifier: @"move-tag" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
+		[self.owner commitChangesInBlock: ^{
+			[tagGroup addObject: tag];
+		} withIdentifier: @"move-tag" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
 	}
 	else if ([[[info draggingPasteboard] types] containsObject: EWNoteDragType])
 	{
 		COTag *tag = [item representedObject];
 		ETAssert([tag isTag]);
-		
-		for (NSPasteboardItem *pbItem in [pasteboard pasteboardItems])
-		{
-			id plist = [pbItem propertyListForType: EWNoteDragType];
-			COPersistentRoot *notePersistentRoot = [owner.editingContext persistentRootForUUID: [ETUUID UUIDWithString: plist]];
-			ETAssert(notePersistentRoot != nil);
-			
-			COObject *noteRootObject = [notePersistentRoot rootObject];
-			
-			[tag addObject: noteRootObject];
-		}
-		
-		[self.owner commitWithIdentifier: @"tag-note" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
+				
+		[self.owner commitChangesInBlock: ^{
+			for (NSPasteboardItem *pbItem in [pasteboard pasteboardItems])
+			{
+				id plist = [pbItem propertyListForType: EWNoteDragType];
+				COPersistentRoot *notePersistentRoot = [owner.editingContext persistentRootForUUID: [ETUUID UUIDWithString: plist]];
+				ETAssert(notePersistentRoot != nil);
+				
+				COObject *noteRootObject = [notePersistentRoot rootObject];
+				
+				[tag addObject: noteRootObject];
+			}
+		} withIdentifier: @"tag-note" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
 	}
 	
 	return YES;

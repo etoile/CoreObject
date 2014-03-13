@@ -61,7 +61,8 @@ NSString * EWTagDragType;
 
 - (COTagLibrary *)tagLibrary;
 - (NSArray *) arrangedNotePersistentRoots;
-- (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args;
+- (void) commitChangesInBlock: (void(^)())aBlock withIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args;
+
 - (void) selectNote: (COPersistentRoot *)aNote;
 - (void) selectTag: (COTag *)aTag;
 - (NSArray *) selectedNotePersistentRoots;

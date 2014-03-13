@@ -31,9 +31,6 @@
 	COUndoTrack *_track;
 }
 
-- (IBAction) undo: (id)sender;
-- (IBAction) redo: (id)sender;
-
 - (IBAction) selectiveUndo: (id)sender;
 - (IBAction) selectiveRedo: (id)sender;
 

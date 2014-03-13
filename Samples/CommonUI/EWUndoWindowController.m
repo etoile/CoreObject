@@ -134,16 +134,6 @@
 	[_track setCurrentNode: node];
 }
 
-- (IBAction) undo: (id)sender
-{
-	[_track undo];
-}
-
-- (IBAction) redo: (id)sender
-{
-	[_track redo];
-}
-
 - (IBAction) selectiveUndo: (id)sender
 {
 	id<COTrackNode> node = [self selectedNode];
