@@ -172,15 +172,19 @@
 }
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
+	id<COTrackNode> node = [graphRenderer revisionAtIndex: row];
 	if ([[tableColumn identifier] isEqualToString: @"document"])
 	{
-		id<COTrackNode> node = [graphRenderer revisionAtIndex: row];
 		if (node.persistentRootUUID != nil)
 		{
 			COPersistentRoot *proot = [_track.editingContext persistentRootForUUID: node.persistentRootUUID];
 			return proot.metadata[@"label"];
 		}
 		return @"";
+	}
+	else if ([[tableColumn identifier] isEqualToString: @"date"])
+	{
+		return node.date;
 	}
 	return @(row);
 }
