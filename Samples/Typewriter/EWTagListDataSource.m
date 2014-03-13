@@ -211,8 +211,17 @@ descriptionArguments: @[oldName, newName]];
 {
 	if ([[[info draggingPasteboard] types] containsObject: EWTagDragType])
 	{
+		id plist = [[info draggingPasteboard] propertyListForType: EWTagDragType];
+		COTag *tag = [[[self.owner tagLibrary] objectGraphContext] loadedObjectForUUID: [ETUUID UUIDWithString: plist]];
+		
 		if ([[item representedObject] isKindOfClass: [COTagGroup class]])
-			return NSDragOperationMove;
+		{
+			COTagGroup *targetTagGroup = [item representedObject];
+			if (![[tag tagGroups] containsObject: targetTagGroup])
+				return NSDragOperationMove;
+			else
+				return NSDragOperationNone;
+		}
 	}
 	else if ([[[info draggingPasteboard] types] containsObject: EWNoteDragType])
 	{
