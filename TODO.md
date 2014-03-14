@@ -4,8 +4,6 @@ TODO
 First alpha release blockers
 ----------------------------
 
-- Fix GNUstep support
-
 - Check and update all Core, Model, Undo and Utilities API documentation (underway)
 
     - talk about how we automatically synchronize COEditingContexts (in the same process or different processes), we should explicitly talk about cross references
@@ -36,6 +34,8 @@ Major Missing Features
 - The undo system should support user-defined actions that track state not managed by CoreObject
 
 - Supporting broken cross-references. Since we don't support it, you must not permanently delete anything from a store (with `-[COSQLiteStore finalizeDeletionsForPersistentRoot:error:]`) unless your application doesn't use cross-references.
+
+- COUndoTrack doesn't cope with attempts by the user to undo changes in persistent roots that are not present in the store (assetions will fail)
 
 - Persistent root faulting; currently the entire store is loaded in memory
 
