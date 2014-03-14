@@ -15,6 +15,7 @@
 
 - (void) applicationDidFinishLaunching: (NSNotification*)notif
 {
+	[self orderFrontTypewriter: nil];
 }
 
 - (void) makeDocument
