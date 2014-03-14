@@ -489,8 +489,7 @@ namespace ManagedFusion
 		if (modifiedRangeB == NULL)
 			return false;
 
-		// TODO: Check and explain the reasoning behind this condition
-		if (modifiedRangeA->location > modifiedRangeB->location + offset)
+		if (modifiedRangeB->location == posB)
 			return true;
 
 		return false;

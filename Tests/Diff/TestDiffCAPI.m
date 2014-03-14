@@ -224,4 +224,24 @@ static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void
 	diff_free(diff);
 }
 
+- (void) testInsertCopyInsertCopyDelete
+{
+	const char *array1 = "aca";
+	const char *array2 = "cabc";
+	
+	diffresult_t *diff = diff_arrays(strlen(array1), strlen(array2), arraycomparefn, array1, array2);
+	
+	// NOTE: This produces an ugly (but correct) diff. The more intuitive diff would be delete 'a', insert 'bc'
+	
+	UKIntsEqual(5, diff_editcount(diff));
+	
+	[self checkEdit: diff_edit_at_index(diff, 0) isInsertAtLocA:0 fromLocB:0 length:1];
+	[self checkEdit: diff_edit_at_index(diff, 1) isCopyFromLocA:0 length:1 toLocB:1];
+	[self checkEdit: diff_edit_at_index(diff, 2) isInsertAtLocA:1 fromLocB:2 length:1];
+	[self checkEdit: diff_edit_at_index(diff, 3) isCopyFromLocA:1 length:1 toLocB:3];
+	[self checkEdit: diff_edit_at_index(diff, 4) isDeleteFromLocA:2 length:1];
+	
+	diff_free(diff);
+}
+
 @end
