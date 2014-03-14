@@ -236,6 +236,32 @@
 		{
 			"type": "modification",
 			"shortDescription": "Change attributes of text '%@'"
+		},
+		
+		
+		
+		"insert-text-and-others-edits":
+		{
+			"type": "modification",
+			"shortDescription": "Insert text '%@' and other edits"
+		},
+		
+		"delete-text-and-others-edits":
+		{
+			"type": "deletion",
+			"shortDescription": "Delete text '%@' and other edits"
+		},
+		
+		"replace-text-and-others-edits":
+		{
+			"type": "modification",
+			"shortDescription": "Replace text '%@' with '%@' and other edits"
+		},
+		
+		"modify-text-and-others-edits":
+		{
+			"type": "modification",
+			"shortDescription": "Change attributes of text '%@' and other edits"
 		}
 	}
 }

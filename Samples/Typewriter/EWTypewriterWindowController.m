@@ -523,7 +523,7 @@ static NSString *Trim(NSString *text)
 	NSString *identifier = @"typing";
 	NSArray *descArgs = @[];
 	
-	if ([diff.operations count] == 1)
+	if ([diff.operations count] >= 1)
 	{
 		COAttributedStringOperation *op = diff.operations[0];
 		
@@ -565,6 +565,16 @@ static NSString *Trim(NSString *text)
 			identifier = @"replace-text";
 			descArgs = @[opRangeStringTrimmed, insertedTextTrimmed];
 		}
+	}
+	
+	if ([diff.operations count] > 1 && ![identifier isEqualToString: @"typing"])
+	{
+		identifier = [identifier stringByAppendingString: @"-and-others-edits"];
+	}
+	
+	if ([identifier isEqualToString: @"typing"])
+	{
+		NSLog(@"Can't write description for diff: %@", diff);
 	}
 
 	[self commitWithIdentifier: identifier descriptionArguments: descArgs];
