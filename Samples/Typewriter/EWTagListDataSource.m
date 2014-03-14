@@ -134,10 +134,6 @@ descriptionArguments: @[oldName, newName]];
 			}
 		}
 		NSLog(@"Caching selected tags as %@", oldSelection);
-		if ([oldSelection isEmpty])
-		{
-			NSLog(@"hih");
-		}
 	}
 	else
 	{

@@ -777,15 +777,6 @@ static NSString *Trim(NSString *text)
 		
 	metadata[@"minorEdit"] = @(isMinor);
 	
-//	if (requestCoalescing && ![[self undoTrack] isCoalescing])
-//	{
-//		[[self undoTrack] beginCoalescing];
-//	}
-//	else if (!requestCoalescing && [[self undoTrack] isCoalescing])
-//	{
-//		[[self undoTrack] endCoalescing];
-//	}
-	
 	[self.editingContext commitWithIdentifier: identifier
 									 metadata: metadata
 									undoTrack: undoTrack
